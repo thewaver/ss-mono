@@ -28,23 +28,6 @@ export type CarouselSlideState = {
     isCurrent: boolean;
 };
 
-export type CarouselStepRenderProps = {
-    /** Which way this control moves the carousel. */
-    step: CarouselStep;
-    /**
-     * Which slide this control would move to, so a control at the end can tell it would wrap around. On a
-     * carousel that does not loop, a control at the end is disabled and this is the slide already showing.
-     */
-    targetIndex: number;
-};
-
-export type CarouselPickRenderProps = {
-    /** Which slide this picker stands for. */
-    index: number;
-    /** Whether this picker's slide is the one showing. */
-    isCurrent: boolean;
-};
-
 export type CarouselPlacementDefs = {
     /**
      * How far the slide is from the one showing, in slides, fractional while the carousel moves and measured the
@@ -102,24 +85,17 @@ export type CarouselPlacementRule = {
     reach?: number;
 };
 
-export type CarouselRotationFlags = {
-    isPlaying: boolean;
-    isHeld: boolean;
-};
-
 export type CarouselState = {
     /** How long a slide is held before the carousel moves on by itself. */
     autoplayDelayMs?: number;
     /** How long the move from one slide to the next takes. */
     transitionDurationMs?: number;
-    /** The space between the slides and the controls the consumer draws beside them. */
-    gap?: number;
-    /** Turns the carousel off, so neither its controls nor its swipes do anything. */
+    /** Turns the carousel off, so neither its controller nor its swipes do anything. */
     isDisabled?: boolean;
     /**
      * Whether stepping past the last slide comes round to the first, and back from the first to the last.
-     * Defaults to `true`. When off, the Previous control on the first slide and the Next control on the last
-     * are disabled and refuse, a swipe past either end springs back, and automatic rotation stops on the last
+     * Defaults to `true`. When off, a step back from the first slide and on from the last is refused, and the
+     * controller's `getCanStep` says so, a swipe past either end springs back, and automatic rotation stops on the last
      * slide by writing `false` to `playback`. With looping off, distances are counted straight rather than the
      * short way round, so a placement that closes into a ring — the drum — shows a seam where the ends meet.
      */
@@ -140,14 +116,9 @@ export type CarouselState = {
 export type CarouselLabels = {
     /**
      * Names one slide for assistive technology, and is told how many there are so it can say third of five.
-     * The index is zero-based, matching `renderSlide` and `renderPick`. It is also what is announced when a
-     * different slide comes up, and what names each picker.
+     * The index is zero-based, matching `renderSlide`. It is also what is announced when a different slide comes up.
      */
     computeSlideLabel: (index: number, count: number) => string;
-    /** Names one of the move controls. */
-    computeStepLabel: (step: CarouselStep) => string;
-    /** Names the play and pause control, told which state it is in. */
-    computeRotationLabel: (isPlaying: boolean) => string;
     /**
      * What the carousel is called when it is announced, so a reader hears carousel rather than region. Defaults to
      * "carousel".

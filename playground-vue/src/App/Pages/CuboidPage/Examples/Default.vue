@@ -5,6 +5,7 @@ import { Button, Cuboid } from "@thewaver/ss-components-vue";
 import { computeCuboidFaceLabel } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
 import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
+import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.vue";
 import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
 import PageCuboidFace from "../../../StyledComponents/CuboidContent/PageCuboidFace.vue";
 import PageCuboidPad from "../../../StyledComponents/CuboidContent/PageCuboidPad.vue";
@@ -31,18 +32,20 @@ const turnPitch = (turn: number) => {
 
 <template>
     <PageCuboidStack>
-        <Cuboid
-            v-model:yaw="yaw"
-            v-model:pitch="pitch"
-            :size="size"
-            :transition-duration-ms="transitionDurationMs"
-            ariaLabel="Six faces"
-            :compute-face-label="computeCuboidFaceLabel"
-        >
-            <template #renderFace="{ face, state }">
-                <PageCuboidFace :face="face" :state="state" />
-            </template>
-        </Cuboid>
+        <PageMeasureBox>
+            <Cuboid
+                v-model:yaw="yaw"
+                v-model:pitch="pitch"
+                :size="size"
+                :transition-duration-ms="transitionDurationMs"
+                ariaLabel="Six faces"
+                :compute-face-label="computeCuboidFaceLabel"
+            >
+                <template #renderFace="{ face, state }">
+                    <PageCuboidFace :face="face" :state="state" />
+                </template>
+            </Cuboid>
+        </PageMeasureBox>
 
         <PageCuboidPad>
             <div />

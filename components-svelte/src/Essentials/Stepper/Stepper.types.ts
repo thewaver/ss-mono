@@ -6,6 +6,7 @@ import type {
     Step,
     StepperConnectorDefs,
     StepperFlags,
+    StepperLayoutExcludesBody,
 } from "@thewaver/ss-components";
 
 import type {
@@ -36,6 +37,9 @@ export type StepperProps<TValue, TState> = BaseStepperProps<TValue, TState> & {
      * than in a run.
      */
     renderStep: Snippet<[step: Step<TValue, TState>, flags: InteractionFlags<StepperFlags>]>;
-    /** Draws the body shown for the current step. */
+    /**
+     * Draws the body shown for the current step, in the panel beside its connector. Refused alongside `computeLayout`,
+     * since a laid-out stepper has nowhere to put the panel.
+     */
     renderBody?: Snippet<[step: Step<TValue, TState>, index: number]>;
-};
+} & StepperLayoutExcludesBody;

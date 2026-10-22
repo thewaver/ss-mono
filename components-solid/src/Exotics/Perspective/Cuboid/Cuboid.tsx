@@ -30,13 +30,13 @@ export const Cuboid = (props: CuboidProps) => {
 
     const getSize = createMemo(() => access(props.size));
 
-    const getReservedSize = createMemo(() => CuboidUtils.getReservedSize(getSize()));
-
     const getTransitionDurationMs = createMemo(
         () => access(props.transitionDurationMs) ?? CUBOID_DEFAULTS.transitionDurationMs,
     );
 
     const getIsUpright = createMemo(() => access(props.isUpright) ?? CUBOID_DEFAULTS.isUpright);
+
+    const getReservedSize = createMemo(() => CuboidUtils.getReservedSize(getSize()));
 
     const getIsDraggable = createMemo(() => access(props.isDraggable) ?? CUBOID_DEFAULTS.isDraggable);
 

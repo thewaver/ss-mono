@@ -1,30 +1,32 @@
 import type { ReactNode } from "react";
 
-import type {
-    BaseFlipbookProps,
-    FlipbookPageState,
-    FlipbookStep,
-    FlipbookStepRenderProps,
-    InteractionFlags,
-} from "@thewaver/ss-components";
-
-import type { InteractionControlProps } from "../../../Primitives/InteractionWrapper/InteractionWrapper.types";
-
-export type FlipbookControlProps = InteractionControlProps<FlipbookStepRenderProps> & {
-    /** Runs when the control is pressed. */
-    onActivate: () => void;
-};
+import type { BaseFlipbookProps, FlipbookPageState, FlipbookStep } from "@thewaver/ss-components";
 
 export type FlipbookControls = {
-    /** Which spread the book is open at. */
-    index: number;
+    /** Which spread the book is open at, counting from zero. */
+    getIndex: () => number;
     /** How many spreads the book opens at, the two covers' included. */
-    spreadCount: number;
+    getSpreadCount: () => number;
     /**
-     * Draws one of the step controls: a real button, named by `computeStepLabel` and painted by `renderStep`, which
-     * turns the book one spread and is disabled at the end it would turn past. It carries its step as its key.
+     * Whether a turn would do anything, so a button standing for it can be disabled.
+     *
+     * @param step Which way the turn would go.
+     * @returns `false` when the book is disabled or already open at that end.
      */
-    renderStep: (step: FlipbookStep) => ReactNode;
+    getCanTurn: (step: FlipbookStep) => boolean;
+    /**
+     * Opens the book one spread further or one back, as an arrow key would.
+     *
+     * @param step Which way to turn.
+     * @returns `false` when the book is disabled or already open at that end.
+     */
+    turn: (step: FlipbookStep) => boolean;
+    /**
+     * Calls `listener` whenever anything the getters report has changed, until the returned function is called. The
+     * getters answer with what the book last drew, so this and one getter are what `useSyncExternalStore` takes —
+     * which is how a consumer's step buttons follow the book.
+     */
+    subscribe: (listener: () => void) => () => void;
 };
 
 export type FlipbookProps<T> = BaseFlipbookProps<T> & {
@@ -39,12 +41,13 @@ export type FlipbookProps<T> = BaseFlipbookProps<T> & {
      * its leaf, so whatever it draws goes over with it.
      */
     renderPage: (page: T, state: FlipbookPageState) => ReactNode;
-    /** Paints one of the step controls inside the button the book builds. */
-    renderStep?: (step: FlipbookStep, renderProps: InteractionFlags<FlipbookStepRenderProps>) => ReactNode;
     /**
-     * Places the step controls, handed the means to draw them, so the page decides where they sit while the book
-     * still builds each one. **They are the single-pointer alternative WCAG 2.5.7 asks for to dragging a page**, so
-     * a book drawn without them takes no drags; the arrow keys turn it either way.
+     * Hands the consumer the controls once the book is up, for turning it from outside.
+     *
+     * **Anything that turns a page without a drag has to be built on these.** The book draws its pages and nothing
+     * else, so the buttons belong to whoever is drawing the page and may sit anywhere on it. That matters beyond
+     * layout: dragging a page is a dragging movement, so WCAG 2.5.7 asks for a single-pointer route that is not a
+     * drag, and the arrow keys do not satisfy it. `turn` is that route, and wiring it up is the consumer's to do.
      */
-    renderControls?: (controls: FlipbookControls) => ReactNode;
+    onMount?: (controls: FlipbookControls) => void;
 };

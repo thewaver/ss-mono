@@ -66,26 +66,12 @@ describe("getFacingFromTurns", () => {
 });
 
 describe("getReservedSize", () => {
-    it("reserves room for the box at any angle, not only the one it rests at", () => {
-        const reserved = CuboidUtils.getReservedSize(SIZE);
-
-        expect(
-            reserved.width,
-            "wider than the face it rests on, which is the least it could get away with",
-        ).toBeGreaterThan(SIZE.width);
-        expect(
-            reserved.width,
-            "and taller than that face too, since a turn can bring the height across",
-        ).toBeGreaterThan(SIZE.height);
-        expect(reserved.height, "the room is square, because either turn can present either extent").toBe(
-            reserved.width,
-        );
-    });
-
-    it("grows with the box rather than being a constant", () => {
-        expect(CuboidUtils.getReservedSize({ width: 400, height: 300, depth: 100 }).width).toBeGreaterThan(
-            CuboidUtils.getReservedSize(SIZE).width,
-        );
+    it("takes the room of the front face, whatever the depth", () => {
+        expect(CuboidUtils.getReservedSize({ width: 200, height: 260, depth: 120 })).toEqual({
+            width: 200,
+            height: 260,
+        });
+        expect(CuboidUtils.getReservedSize({ width: 100, height: 80, depth: 300 })).toEqual({ width: 100, height: 80 });
     });
 });
 

@@ -1,10 +1,6 @@
 <script lang="ts">
     import { Carousel } from "@thewaver/ss-components-svelte";
-    import {
-        computeCarouselRotationLabel,
-        computeCarouselStepLabel,
-        computePositionLabel,
-    } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
+    import { computePositionLabel } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
 
     import type { CarouselExampleProps } from "../../Carousels.types";
     import SlideBack from "./SlideBack.svelte";
@@ -24,8 +20,6 @@
     transitionDurationMs={props.transitionDurationMs}
     ariaLabel={"Bare sampler"}
     computeSlideLabel={computePositionLabel}
-    computeStepLabel={computeCarouselStepLabel}
-    computeRotationLabel={computeCarouselRotationLabel}
 >
     {#snippet renderSlide(slide, state)}
         <SlideFront title={slide} {state} frameClass={props.frameClasses.front} />

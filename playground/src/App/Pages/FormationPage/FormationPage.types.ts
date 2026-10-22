@@ -9,6 +9,7 @@ export type BaseFormationExampleValues = {
     shapeKind: ShapeConst.DefaultShape;
     transitionDurationMs: number;
     transitionDelayMs: number;
+    width: number;
 };
 
 export type BaseFormationExampleProps = BaseFormationExampleValues;

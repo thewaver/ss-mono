@@ -7,6 +7,7 @@ import { computeFlipCardFaceLabel } from "@thewaver/ss-playground/App/PageCompon
 import * as styles from "@thewaver/ss-playground/App/Pages/FlipCardPage/FlipCardPage.css";
 import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
+import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.vue";
 import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
 import PageFlipCardBack from "../../../StyledComponents/FlipCardContent/PageFlipCardBack.vue";
 import PageFlipCardFront from "../../../StyledComponents/FlipCardContent/PageFlipCardFront.vue";
@@ -51,24 +52,26 @@ const turn = (direction: FlipCardTurnDirection) => {
 
 <template>
     <PageFlipCardStack>
-        <FlipCard
-            v-model:flipped="isFlipped"
-            :axis="axis"
-            :size="CARD_SIZE"
-            :transition-duration-ms="transitionDurationMs"
-            :turn-direction="turnDirection"
-            :peek-ratio="peekRatio"
-            ariaLabel="Queen of spades"
-            :compute-face-label="computeFlipCardFaceLabel"
-        >
-            <template #renderFront="state">
-                <PageFlipCardFront :state="state">Q ♠</PageFlipCardFront>
-            </template>
+        <PageMeasureBox>
+            <FlipCard
+                v-model:flipped="isFlipped"
+                :axis="axis"
+                :size="CARD_SIZE"
+                :transition-duration-ms="transitionDurationMs"
+                :turn-direction="turnDirection"
+                :peek-ratio="peekRatio"
+                ariaLabel="Queen of spades"
+                :compute-face-label="computeFlipCardFaceLabel"
+            >
+                <template #renderFront="state">
+                    <PageFlipCardFront :state="state">Q ♠</PageFlipCardFront>
+                </template>
 
-            <template #renderBack="state">
-                <PageFlipCardBack :state="state">♥ ♦ ♣</PageFlipCardBack>
-            </template>
-        </FlipCard>
+                <template #renderBack="state">
+                    <PageFlipCardBack :state="state">♥ ♦ ♣</PageFlipCardBack>
+                </template>
+            </FlipCard>
+        </PageMeasureBox>
 
         <div :class="styles.controls">
             <Button

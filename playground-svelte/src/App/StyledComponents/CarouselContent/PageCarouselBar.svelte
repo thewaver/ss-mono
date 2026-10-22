@@ -5,9 +5,9 @@
 
     import { getLayerClass } from "../Layer/Layer.context";
 
-    let props: { children?: Snippet } = $props();
+    let { ref = $bindable(), ...props }: { ref?: HTMLDivElement; children?: Snippet } = $props();
 
     const layerClass = $derived.by(getLayerClass());
 </script>
 
-<div class={[styles.carouselBar, layerClass]}>{@render props.children?.()}</div>
+<div bind:this={ref} class={[styles.carouselBar, layerClass]}>{@render props.children?.()}</div>

@@ -159,6 +159,8 @@ export const Wheel = <T,>(props: WheelProps<T>) => {
                 aria-roledescription={getRoleDescription()}
                 aria-label={access(props.ariaLabel)}
             >
+                <div class={styles.overheadWheelDisc} aria-hidden="true" />
+
                 <Index each={access(props.wedges)}>
                     {(getWedge, index) => {
                         const getEffect = createMemo(() => getWedgeEffect(index));
@@ -167,8 +169,10 @@ export const Wheel = <T,>(props: WheelProps<T>) => {
                             <div
                                 class={styles.overheadWheelWedge}
                                 style={{
-                                    transform: WheelUtils.getWedgeTransform(getWedgeAngle(index), getEffect()),
-                                    filter: getEffect()?.filter || undefined,
+                                    "transform": WheelUtils.getWedgeTransform(getWedgeAngle(index), getEffect()),
+                                    "filter": getEffect()?.filter || undefined,
+                                    "z-index":
+                                        index === getSelectedIndex() ? WheelConst.SELECTED_WEDGE_LAYER : undefined,
                                 }}
                                 role="group"
                                 aria-roledescription={getWedgeRoleDescription()}

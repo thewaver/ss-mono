@@ -44,6 +44,7 @@ export const carouselBox = style({
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
+    gap: themeVars.spacing.full,
     width: "100%",
     height: 240,
 });

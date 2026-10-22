@@ -9,6 +9,7 @@
         type WheelWedgeState,
         WheelStyles as styles,
     } from "@thewaver/ss-components";
+    import { WheelConst } from "@thewaver/ss-components/internal";
 
     import { MediaQueryMonitorSvelteUtils } from "../../Abstracts/MediaQueryMonitor/MediaQueryMonitorSvelte.utils.svelte.js";
     import { PointerTrackerSvelteUtils } from "../../Abstracts/PointerTracker/PointerTrackerSvelte.utils.svelte.js";
@@ -154,12 +155,15 @@
         aria-roledescription={roleDescription}
         aria-label={props.ariaLabel}
     >
+        <div class={styles.overheadWheelDisc} aria-hidden="true"></div>
+
         {#each props.wedges as wedge, index (index)}
             {@const wedgeEffect = getWedgeEffect(index)}
             <div
                 class={styles.overheadWheelWedge}
                 style:transform={WheelUtils.getWedgeTransform(getWedgeAngle(index), wedgeEffect)}
                 style:filter={wedgeEffect?.filter || undefined}
+                style:z-index={index === selectedIndex ? WheelConst.SELECTED_WEDGE_LAYER : undefined}
                 role="group"
                 aria-roledescription={wedgeRoleDescription}
                 aria-label={getWedgeLabel(index)}

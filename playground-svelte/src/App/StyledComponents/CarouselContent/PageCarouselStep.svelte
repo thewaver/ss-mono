@@ -13,4 +13,4 @@
     let props: CarouselStepProps = $props();
 </script>
 
-<PageControlButtonContent flags={props.renderProps} glyph={STEP_GLYPHS[props.renderProps.step]} />
+<PageControlButtonContent flags={props.flags} glyph={STEP_GLYPHS[props.step]} />

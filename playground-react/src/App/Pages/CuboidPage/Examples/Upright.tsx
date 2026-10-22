@@ -2,6 +2,7 @@ import { Button, CUBOID_FACES, Cuboid } from "@thewaver/ss-components-react";
 import { computeCuboidFaceLabel } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
 import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
+import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
 import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import {
     PageCuboidFace,
@@ -31,18 +32,20 @@ export const UprightExample = (props: Props) => {
 
     return (
         <PageCuboidStack>
-            <Cuboid
-                yaw={props.yaw}
-                pitch={props.pitch}
-                size={props.size}
-                transitionDurationMs={props.transitionDurationMs}
-                isUpright={props.isUpright}
-                isDraggable={props.isDraggable}
-                ariaLabel={"Six faces, kept upright"}
-                computeFaceLabel={computeCuboidFaceLabel}
-                renderFace={(face, state) => <PageCuboidFace face={face} state={state} />}
-                onMount={setController}
-            />
+            <PageMeasureBox>
+                <Cuboid
+                    yaw={props.yaw}
+                    pitch={props.pitch}
+                    size={props.size}
+                    transitionDurationMs={props.transitionDurationMs}
+                    isUpright={props.isUpright}
+                    isDraggable={props.isDraggable}
+                    ariaLabel={"Six faces, kept upright"}
+                    computeFaceLabel={computeCuboidFaceLabel}
+                    renderFace={(face, state) => <PageCuboidFace face={face} state={state} />}
+                    onMount={setController}
+                />
+            </PageMeasureBox>
 
             <PageCuboidPad>
                 <div />

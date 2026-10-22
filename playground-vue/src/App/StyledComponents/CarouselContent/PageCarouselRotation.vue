@@ -8,5 +8,5 @@ defineProps<CarouselRotationProps>();
 </script>
 
 <template>
-    <PageControlButtonContent :flags="flags" :glyph="flags.isPlaying ? CONTROL_GLYPHS.pause : CONTROL_GLYPHS.play" />
+    <PageControlButtonContent :flags="flags" :glyph="isPlaying ? CONTROL_GLYPHS.pause : CONTROL_GLYPHS.play" />
 </template>

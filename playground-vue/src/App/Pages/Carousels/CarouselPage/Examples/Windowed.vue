@@ -1,22 +1,16 @@
 <script setup lang="ts">
-import { useModel } from "vue";
+import { shallowRef, useModel } from "vue";
 
 import { Carousel } from "@thewaver/ss-components-vue";
-import {
-    computeCarouselRotationLabel,
-    computeCarouselStepLabel,
-    computePositionLabel,
-} from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
+import type { CarouselControls } from "@thewaver/ss-components-vue";
+import { computePositionLabel } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
 import { WINDOWED_SLIDE_COUNT } from "@thewaver/ss-playground/App/Pages/Carousels/CarouselPage/CarouselPage.const";
 import { TITLES } from "@thewaver/ss-playground/App/Pages/Carousels/Carousels.const";
 
-import PageCarouselBar from "../../../../StyledComponents/CarouselContent/PageCarouselBar.vue";
-import PageCarouselStep from "../../../../StyledComponents/CarouselContent/PageCarouselStep.vue";
 import type { CarouselExampleProps } from "../../Carousels.types";
+import PageCarouselsBar from "../../PageCarouselsBar.vue";
 import SlideBack from "./SlideBack.vue";
 import WindowedSlide from "./WindowedSlide.vue";
-
-const CAROUSEL_GAP = 10;
 
 const SLIDES = Array.from(
     { length: WINDOWED_SLIDE_COUNT },
@@ -30,6 +24,8 @@ type Props = Omit<CarouselExampleProps, "slides"> & {
 const props = defineProps<Props>();
 
 const index = useModel(props, "index");
+
+const controls = shallowRef<CarouselControls>();
 </script>
 
 <template>
@@ -42,11 +38,9 @@ const index = useModel(props, "index");
         is-windowed
         :orientation="orientation"
         :transition-duration-ms="transitionDurationMs"
-        :gap="CAROUSEL_GAP"
         ariaLabel="A hundred slides"
         :compute-slide-label="computePositionLabel"
-        :compute-step-label="computeCarouselStepLabel"
-        :compute-rotation-label="computeCarouselRotationLabel"
+        @mount="(next: CarouselControls) => (controls = next)"
     >
         <template #renderSlide="{ slide, state }">
             <WindowedSlide
@@ -60,16 +54,7 @@ const index = useModel(props, "index");
         <template #renderSlideBack>
             <SlideBack :frame-class="frameClasses.back" />
         </template>
-
-        <template #renderStep="{ renderProps }">
-            <PageCarouselStep :render-props="renderProps" />
-        </template>
-
-        <template #renderControls="controls">
-            <PageCarouselBar>
-                <component :is="controls.renderStep('previous')" />
-                <component :is="controls.renderStep('next')" />
-            </PageCarouselBar>
-        </template>
     </Carousel>
+
+    <PageCarouselsBar v-if="controls" :controls="controls" :is-disabled="isDisabled" />
 </template>

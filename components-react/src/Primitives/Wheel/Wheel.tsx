@@ -176,6 +176,8 @@ export const Wheel = <T,>(props: WheelProps<T>) => {
             aria-roledescription={roleDescription}
             aria-label={props.ariaLabel}
         >
+            <div className={WheelStyles.overheadWheelDisc} aria-hidden="true" />
+
             {props.wedges.map((wedge, index) => {
                 const effect = getWedgeEffect(index);
 
@@ -186,6 +188,7 @@ export const Wheel = <T,>(props: WheelProps<T>) => {
                         style={{
                             transform: WheelUtils.getWedgeTransform(getWedgeAngle(index), effect),
                             filter: effect?.filter || undefined,
+                            zIndex: index === selectedIndex ? WheelConst.SELECTED_WEDGE_LAYER : undefined,
                         }}
                         role="group"
                         aria-roledescription={wedgeRoleDescription}

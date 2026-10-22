@@ -58,12 +58,14 @@
     let transitionDurationMs = $state(FORMATION_DEFAULTS.transitionDurationMs);
     let transitionDelayMs = $state(FORMATION_DEFAULTS.transitionDelayMs);
     let layoutDefs = $state.raw<Record<string, Record<string, number | boolean>>>({});
+    let widths = $state.raw<Partial<Record<PlacementLayouts.SampleKey, number>>>({});
     let effectDefs = $state.raw<Record<string, Record<string, number | boolean>>>({});
 
     const family = $derived(PlacementLayouts.SAMPLE_LAYOUTS[layoutKey].family);
     const knobs = $derived(PlacementLayoutKnobs.KNOBS_BY_FAMILY[family] as Record<string, Knob>);
     const defaults = $derived(PlacementLayoutDefaults.DEFAULTS_BY_FAMILY[family] as Record<string, unknown>);
     const defs = $derived(layoutDefs[layoutKey] ?? NO_DEFS);
+    const width = $derived(widths[layoutKey] ?? FormationKnobs.STARTING_WIDTHS[layoutKey]);
 
     const layoutEntry = $derived({ family, defs } as unknown as PlacementLayoutEntry);
 
@@ -99,6 +101,7 @@
         shapeKind,
         transitionDurationMs,
         transitionDelayMs,
+        width,
     });
 
     const examples: ExampleDefs[] = [
@@ -134,6 +137,29 @@
                     layoutKey = value;
                 }}
             />
+        </PageProp>
+
+        <PageProp
+            itemKey={"width"}
+            controls={"Sets the width of the box the example's Formation fills"}
+            label={"Width (px)"}
+            hint={
+                "How wide the box holding the arrangement is. Every arrangement is measured against it, so this scales the whole thing; each one starts at a width that suits it, and remembers yours."
+            }
+        >
+            {#key layoutKey}
+                <PageNumberField
+                    value={width}
+                    min={FormationKnobs.MIN_WIDTH}
+                    max={FormationKnobs.MAX_WIDTH}
+                    step={FormationKnobs.WIDTH_STEP}
+                    width={FIELD_WIDTH}
+                    ariaLabel={"Width in pixels"}
+                    onInput={(value) => {
+                        widths = { ...widths, [layoutKey]: value };
+                    }}
+                />
+            {/key}
         </PageProp>
 
         <PageKnobs

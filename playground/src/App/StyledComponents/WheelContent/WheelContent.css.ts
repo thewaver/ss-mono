@@ -6,6 +6,8 @@ import { layerVars } from "../Layer/Layer.css";
 const SPIN_SIZE = 84;
 const PIP_SIZE = 20;
 const PIP_OVERHANG_PERCENT = 50;
+const GLOW_NEAR = "6px";
+const GLOW_FAR = "14px";
 const PIP_SHADOW = "drop-shadow(0 2px 2px rgba(0, 0, 0, 0.75))";
 
 export const isHovered = style({});
@@ -25,6 +27,12 @@ export const wheelWedgeSVG = style({
     position: "absolute",
     inset: 0,
     overflow: "visible",
+
+    selectors: {
+        [`${isSelected} &`]: {
+            filter: `drop-shadow(0 0 ${GLOW_NEAR} ${themeVars.color.primary.light}) drop-shadow(0 0 ${GLOW_FAR} ${themeVars.color.primary.light})`,
+        },
+    },
 });
 
 export const wheelWedgeShape = style({

@@ -1,10 +1,7 @@
-import type { JSX } from "solid-js";
 import { Show, createEffect, createMemo, createSignal, on, onCleanup, onMount } from "solid-js";
 
 import {
     FLIPBOOK_DEFAULTS,
-    type FlipbookStep,
-    type FlipbookStepRenderProps,
     FlipbookUtils,
     LiveAnnouncerUtils,
     type SpineSide,
@@ -15,32 +12,10 @@ import { FlipbookConst } from "@thewaver/ss-components/internal";
 
 import { InteractionTrackerSolidUtils } from "../../../Abstracts/InteractionTracker/InteractionTrackerSolid.utils";
 import { SignalMirrorSolidUtils } from "../../../Abstracts/SignalMirror/SignalMirrorSolid.utils";
-import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import { Spine } from "../../../Primitives/Spine/Spine";
 import { access } from "../../../Utils/propUtils";
 import { accessStore } from "../../../Utils/storeUtils";
-import type { FlipbookControlProps, FlipbookControls, FlipbookProps } from "./FlipbookSolid.types";
-
-const FlipbookControl = (props: FlipbookControlProps) => {
-    const getIsDisabled = () => access(props.flags).isDisabled ?? false;
-
-    return (
-        <button
-            ref={(element) => props.ref?.(element)}
-            type="button"
-            class={styles.flipbookControl}
-            aria-label={access(props.ariaLabel)}
-            aria-disabled={getIsDisabled() || undefined}
-            onClick={() => {
-                if (getIsDisabled()) return;
-
-                props.onActivate();
-            }}
-        >
-            {props.renderContent(() => access(props.flags))}
-        </button>
-    );
-};
+import type { FlipbookControls, FlipbookProps } from "./FlipbookSolid.types";
 
 export const Flipbook = <T,>(props: FlipbookProps<T>) => {
     onMount(() => LiveAnnouncerUtils.reserve("polite"));
@@ -81,8 +56,7 @@ export const Flipbook = <T,>(props: FlipbookProps<T>) => {
 
     const getPosition = accessStore(book.position);
 
-    const getIsDragDisabled = () =>
-        FlipbookUtils.getIsDragDisabled(props.renderControls !== undefined, getIsDisabled(), getPageCount());
+    const getIsDragDisabled = () => FlipbookUtils.getIsDragDisabled(getIsDisabled(), getPageCount());
 
     InteractionTrackerSolidUtils.trackAxialSwipe(getBookRef, getIsDragDisabled, {
         getAxis: () => "horizontal",
@@ -116,30 +90,15 @@ export const Flipbook = <T,>(props: FlipbookProps<T>) => {
         e.preventDefault();
     };
 
-    const renderStepControl = (step: FlipbookStep): JSX.Element => (
-        <InteractionWrapper<FlipbookStepRenderProps>
-            isDisabled={() => FlipbookUtils.getIsStepDisabled(step, getCurrentIndex(), getPageCount(), getIsDisabled())}
-            extraFlags={() => ({
-                step,
-                targetIndex: FlipbookUtils.getStepTarget(step, getCurrentIndex(), getPageCount()),
-            })}
-            renderControl={(setElementRef, getRenderProps) => (
-                <FlipbookControl
-                    ref={setElementRef}
-                    ariaLabel={() => props.computeStepLabel(step)}
-                    flags={getRenderProps}
-                    renderContent={() => props.renderStep?.(() => step, getRenderProps)}
-                    onActivate={() => book.turn(step)}
-                />
-            )}
-        />
-    );
-
     const controls: FlipbookControls = {
         getIndex: getCurrentIndex,
         getSpreadCount,
-        renderStep: renderStepControl,
+        getCanTurn: (step) =>
+            !FlipbookUtils.getIsStepDisabled(step, getCurrentIndex(), getPageCount(), getIsDisabled()),
+        turn: (step) => book.turn(step),
     };
+
+    onMount(() => props.onMount?.(controls));
 
     const renderLeafPage = (leaf: number, side: SpineSide) => {
         const getPage = () => FlipbookUtils.getLeafPage(leaf, side, getPageCount());
@@ -164,7 +123,6 @@ export const Flipbook = <T,>(props: FlipbookProps<T>) => {
     return (
         <div
             class={styles.flipbookRoot}
-            style={{ gap: `${access(props.gap) ?? FLIPBOOK_DEFAULTS.gap}px` }}
             role="region"
             aria-roledescription={access(props.roleDescription) ?? FLIPBOOK_DEFAULTS.roleDescription}
             aria-label={access(props.ariaLabel)}
@@ -192,8 +150,6 @@ export const Flipbook = <T,>(props: FlipbookProps<T>) => {
                     renderFace={(_getLeaf, leaf, side) => renderLeafPage(leaf, side)}
                 />
             </div>
-
-            {props.renderControls?.(controls)}
         </div>
     );
 };

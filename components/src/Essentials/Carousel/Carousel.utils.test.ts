@@ -120,14 +120,14 @@ describe("getTravelsAcross", () => {
 });
 
 describe("getIsSwipeDisabled", () => {
-    it("refuses without controls, while disabled, and with nothing to move between", () => {
-        expect(CarouselUtils.getIsSwipeDisabled(false, false, 4)).toBe(true);
-        expect(CarouselUtils.getIsSwipeDisabled(true, true, 4)).toBe(true);
-        expect(CarouselUtils.getIsSwipeDisabled(true, false, 1)).toBe(true);
+    it("refuses when driven from outside, while disabled, and with nothing to move between", () => {
+        expect(CarouselUtils.getIsSwipeDisabled(true, false, 4)).toBe(true);
+        expect(CarouselUtils.getIsSwipeDisabled(false, true, 4)).toBe(true);
+        expect(CarouselUtils.getIsSwipeDisabled(false, false, 1)).toBe(true);
     });
 
     it("takes the swipe otherwise", () => {
-        expect(CarouselUtils.getIsSwipeDisabled(true, false, 2)).toBe(false);
+        expect(CarouselUtils.getIsSwipeDisabled(false, false, 2)).toBe(false);
     });
 });
 

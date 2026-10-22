@@ -7,6 +7,7 @@
     import PageCuboidFace from "../../../StyledComponents/CuboidContent/PageCuboidFace.svelte";
     import PageCuboidStack from "../../../StyledComponents/CuboidContent/PageCuboidStack.svelte";
     import type { CuboidWanderingExampleProps } from "../CuboidPage.types";
+    import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.svelte";
 
     const QUARTER_TURN = 1;
 
@@ -54,16 +55,18 @@
 </script>
 
 <PageCuboidStack>
-    <Cuboid
-        bind:yaw
-        bind:pitch
-        size={props.size}
-        transitionDurationMs={props.transitionDurationMs}
-        ariaLabel={"Six faces, turning by themselves"}
-        computeFaceLabel={computeCuboidFaceLabel}
-    >
-        {#snippet renderFace(face, state)}
-            <PageCuboidFace {face} {state} />
-        {/snippet}
-    </Cuboid>
+    <PageMeasureBox>
+        <Cuboid
+            bind:yaw
+            bind:pitch
+            size={props.size}
+            transitionDurationMs={props.transitionDurationMs}
+            ariaLabel={"Six faces, turning by themselves"}
+            computeFaceLabel={computeCuboidFaceLabel}
+        >
+            {#snippet renderFace(face, state)}
+                <PageCuboidFace {face} {state} />
+            {/snippet}
+        </Cuboid>
+    </PageMeasureBox>
 </PageCuboidStack>

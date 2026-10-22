@@ -44,7 +44,10 @@ export type BaseStepperValues<TValue, TState> = {
 };
 
 export type BaseStepperCbs<TValue, TState> = {
-    /** Arranges the steps, for a stepper that is something other than a straight run. */
+    /**
+     * Arranges the steps, for a stepper that is something other than a straight run. A laid-out stepper has nowhere to
+     * put a step's panel, so it is refused alongside `renderBody`.
+     */
     computeLayout?: PlacementLayoutFn;
     /** What the steps do as the pointer nears them. */
     computeEffect?: ProximityEffectFn;
@@ -55,3 +58,5 @@ export type BaseStepperCbs<TValue, TState> = {
 };
 
 export type BaseStepperProps<TValue, TState> = BaseStepperValues<TValue, TState> & BaseStepperCbs<TValue, TState>;
+
+export type StepperLayoutExcludesBody = { computeLayout?: undefined } | { renderBody?: undefined };

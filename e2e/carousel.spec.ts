@@ -140,7 +140,11 @@ test("it holds under the pointer, which is the requirement rather than a courtes
         .not.toBe(held);
 });
 
-test("it holds while anything inside it has focus, so a keyboard user is not chased", async ({ page }) => {
+/**
+ * The carousel draws no buttons, so the ones beside it are the page's, outside its box where it cannot see them. The
+ * page hands the carousel a hold while the pointer or focus is on them, which it lets go of once focus leaves.
+ */
+test("it holds while focus is on the buttons drawn for it, so a keyboard user is not chased", async ({ page }) => {
     await page.locator(control(ROTATING, "Next slide")).focus();
 
     const held = await currentSlide(page, ROTATING);
@@ -195,6 +199,8 @@ test("the disabled knob stops the rotation as well as the controls", async ({ pa
  * and run in enough steps to clear the slop the gesture waits for before it takes the pointer over.
  */
 const swipeAcross = async (page: import("@playwright/test").Page, scope: string, from: number, to: number) => {
+    await page.locator(viewport(scope)).scrollIntoViewIfNeeded();
+
     const box = (await page.locator(viewport(scope)).boundingBox())!;
     const y = box.y + box.height * 0.5;
 
@@ -220,15 +226,23 @@ test("a swipe let go before it has traveled far enough puts the slide back", asy
     expect(await currentSlide(page, MANUAL), "a tenth of the width is a nudge, not a step").toBe("1 of 4");
 });
 
-test("a carousel with no controls refuses the swipe, because nothing else could move it", async ({ page }) => {
+/**
+ * The carousel draws no controls of its own, so whether it takes a swipe can no longer hang on whether controls were
+ * drawn. It hangs on whether the page drives `progress`: a carousel moved by a scroll position leaves the gesture to
+ * the browser, so the page's own scrolling is never taken from it, while one with no buttons beside it at all still
+ * takes the swipe — the page owns the buttons, and the carousel cannot see whether it built any.
+ */
+test("a carousel driven by a scroll refuses the swipe, and one with no buttons beside it still takes it", async ({
+    page,
+}) => {
     await expect(
-        page.locator(viewport(NO_CONTROLS)),
+        page.locator(viewport(SCROLLED)),
         "the axis is never claimed, so the browser keeps the whole gesture",
     ).toHaveCSS("touch-action", "auto");
 
     await swipeAcross(page, NO_CONTROLS, 0.8, 0.2);
 
-    expect(await currentSlide(page, NO_CONTROLS), "and the swipe moves nothing").toBe("1 of 4");
+    expect(await currentSlide(page, NO_CONTROLS), "the bare carousel steps the way the finger went").toBe("2 of 4");
 });
 
 /**

@@ -54,11 +54,10 @@ reading.
 20. `GlassSurface` — what is built and what is not — _open, one item postponed until the platform catches up_
 21. Arbitrary placement across controls, and the picking that has to come with it — _open_
 22. The scanline page is twelve examples of one example — _open_
-23. Components that turn under perspective reserve room they do not need at rest — _open_
-24. `CardStack` — the pointer route the library cannot promise — _open_
-25. The submit story — what a native submit carries, and what `Form` hands `onSubmit` — _pending decision_
-26. `Die`'s step buttons and arrow keys fall into a loop of two or three faces — _open, no fix chosen_
-27. The Playground's painters in Windows high-contrast mode — _open, decided, not yet built_
+23. `CardStack` — the pointer route the library cannot promise — _open_
+24. The submit story — what a native submit carries, and what `Form` hands `onSubmit` — _pending decision_
+25. `Die`'s step buttons and arrow keys fall into a loop of two or three faces — _open, no fix chosen_
+26. The Playground's painters in Windows high-contrast mode — _open, decided, not yet built_
 
 ### Build order
 
@@ -713,10 +712,10 @@ are the gaps, each with the reason it is still one.
   page of several current slides needs the arithmetic to start asking how many fit, which is `Scroller`'s question
   and the boundary the two were separated along. Building it would also make the picker ambiguous — a dot per slide
   or a dot per page — and that is a design question rather than a missing line.
-- **The keyboard is whatever the controls are.** There is no arrow-key handling on the region, so a carousel
-  rendered with no `renderControls` has no keyboard route at all. The published pattern puts the arrows on the
-  buttons rather than on the region, so this matches it — but a consumer who skips the controls gets a control
-  a keyboard cannot move, which is worth knowing before it is called a bug.
+- **The keyboard is whatever buttons the consumer builds.** There is no arrow-key handling on the region, and the
+  carousel draws no controls of its own, so a consumer who builds no buttons on its controller has a carousel the
+  keyboard cannot reach. The published pattern puts the arrows on the buttons rather than on the region, so this
+  matches it — but it is worth knowing before it is called a bug.
 
 ---
 
@@ -729,37 +728,7 @@ work waiting.
 **The drum's girth arithmetic was wrong twice, is now measured rather than argued, and the user has retested
 it.** What it reserves and why is in `decisions.md` under _"A drum reserves the room it paints in"_; both wrong
 answers are recorded there too, since the shape of the mistake repeated. The errors they remembered from the
-original codebase were accounted for by those two fixes. One consequence is recorded rather than fixed:
-
-- **A wedge count that changes mid-turn interpolates the radius, and is left alone.** The user's call. A face
-  carries its angle and its distance from the axis in one `transform`, and that property is transitioned, so
-  changing the count while the drum is turning animates the radius over the rotation's duration while the barrel
-  jumps to the new one at once. For those few seconds the faces sit outside the box the component reserved. At
-  rest the transition duration is zero and the change applies instantly, so this needs a live count change
-  **during** a rotation to appear — which is exactly what a Playground knob does and what a fixed prize list
-  never will. Recorded rather than fixed because the fix costs an element per face, up to 48 on a doubled reel,
-  for a transient nothing outside a props panel produces.
-- **What the fix would be, if it is ever wanted.** Splitting the rotation onto an outer element and the radius
-  onto an inner one gives `rotate × translate` in that order with the radius untransitioned, which is the same
-  matrix as today. The individual `rotate` and `translate` CSS properties cannot do it: they compose as
-  `translate × rotate`, and this needs the translation to happen in the face's own turned frame, which is the
-  opposite order.
-
-**An overhead wheel hit-tests outside its visible circle, and is left that way for now.** The user's call, to be
-revisited. Each wedge is a full-size square div carrying the rotation, so a rotated square's corners point at the
-middles of the axis-aligned edges — measured, a press 40px clear of the wheel at mid-height lands on a wedge,
-while the same distance past a corner lands outside it. Nothing paints there and nothing in a wedge is
-interactive, so there is no visible effect; the exposure is a consumer who paints a control into a wedge, or an
-outside-click layer that would read such a press as inside the wheel.
-
-**What was measured, so the next attempt starts from evidence rather than from the three guesses that preceded
-it.** `pointer-events: visiblePainted` on the wedge wrapper does nothing: MDN lists it as SVG-only and
-experimental for HTML, and applying it across the whole wedge subtree left the hit chain identical. `none` on the
-wrapper and on the `<svg>` root, with `visiblePainted` on the shapes, closes it exactly — a press outside the
-wheel falls through and a press on the painted wedge lands on the `path` rather than on a div, so the hit area
-becomes the pie itself. Better than clipping the root to its square or the wedge layer to a circle, both of which
-were considered. **What stopped it is the consumer trap**: anything painted into a wedge silently stops being
-pressable until it opts back in with `pointer-events: auto`.
+original codebase were accounted for by those two fixes.
 
 **An overhead wheel has one slot for its controls and it is the hub, chosen by the user over two alternatives.** A
 drum's controls sit under the barrel; an overhead wheel's sit in the middle of it, and there is no second slot. The
@@ -1000,10 +969,6 @@ is what turned up the origin-placed item it scored as pointing due east.
   for the room. In a page's flow the same thing bites differently: a placed `Toolbar` has
   nothing to collapse into, so a layout that outgrows its column spills rather than adapting. What should
   happen in either case has not been decided.
-- **`Stepper` ignores `renderBody` when it is laid out.** A step's body is a panel beside a vertical
-  connector, and a curve has nowhere to put one, so the placed path drops it. It warns when handed both,
-  naming the pair and asking for one of them to go, so it is no longer silent — but a prop that is ignored is
-  still not a prop that is refused.
 - **`Tree` has no connector slot, so a radial tree's structure reads only from the angles.** A child sits
   inside the angular slice its parent was given, which is enough to see but not enough to state. `Stepper` now
   has both the slot and the geometry — `PlacementUtils.getLinkPath` — so the work is small; what it costs is
@@ -1054,30 +1019,7 @@ actually need designing.
 
 **Nothing is blocked on it** and the shape of the picker has not been argued.
 
-## 23. Components that turn under perspective reserve room they do not need at rest
-
-**The user's rule, given while settling how `CardStack` is sized.** A component that turns a face towards the
-viewer is drawn larger on its near side than it really is, so it spills past its own box part-way through a
-turn. That spill is allowed. **What a component's box should be is the size of its content at rest**, and any
-extra width or height set aside for the bulge is room that stands empty whenever nothing is moving.
-
-**The shape of the correction, in the user's words: something turning horizontally should not reserve extra
-vertical space, and something turning vertically should not reserve extra horizontal space.** The reservation
-along the direction the faces actually travel is a different thing and stays.
-
-**`Wheel` keeps its reserved space and is not part of this.** A drum shows several faces at once when it is
-standing still — the ones curving away above and below the front one are genuinely on screen — so what it
-sets aside is content at rest rather than an allowance for motion.
-
-**`FlipCard` is the case that raised it and the easiest one.** `Barrel` sets its root to the girth, which for
-two faces is the face's own width widened by roughly one percent to cover the bulge, and at rest a two-face
-barrel is flat with nothing projecting at all. Whether the fix is a flag on `Barrel` or a `FlipCard` that
-does not ask for the reservation has not been argued.
-
-**Which other components are affected has not been checked.** The pass is to go through everything that
-animates a perspective transform and take out the adjustments that only motion needs.
-
-## 24. `CardStack` — the pointer route the library cannot promise
+## 23. `CardStack` — the pointer route the library cannot promise
 
 **The same gap `Timeline` and `Scroller` already carry, and it arrived with the component.** A card is sent by
 a swipe, which is both a path-based gesture and a drag, so **2.5.1 Pointer Gestures** (Level A) and **2.5.7
@@ -1096,7 +1038,7 @@ a consumer cannot ask for the gesture without also supplying the route. That tri
 that draws the controls itself, which the user ruled this one must not. The Playground's deck is what
 discharging it looks like: four buttons beside the pile, each calling `send`.
 
-## 25. The submit story — what a native submit carries, and what `Form` hands `onSubmit`
+## 24. The submit story — what a native submit carries, and what `Form` hands `onSubmit`
 
 Three findings from the survey against the reference libraries were lofted here rather than settled one by one,
 because they are one question. **The user's word: lofted, not discarded.**
@@ -1116,7 +1058,7 @@ who wants values takes. _"The form story"_ in `decisions.md` says the library ne
 that entry is what this item would revisit. Focus moving to the first field in error on submit was built
 separately and does not depend on this.
 
-## 26. `Die`'s step buttons and arrow keys fall into a loop of two or three faces
+## 25. `Die`'s step buttons and arrow keys fall into a loop of two or three faces
 
 Reachable on the Die page's icon cloud: pick the d20 and press down a few times. The die goes back and forth
 between the same two faces. Every shape does it — a d20 pressed right goes between faces 1 and 2 from the first
@@ -1143,7 +1085,7 @@ every face upright cannot both hold, so each option gives one up:
 `Cuboid`'s upright mode has the same tension and accepted it, since a box has only six resting orientations
 (`decisions.md`, _"`Cuboid`: upright mode keeps an orientation"_); a d20 has many more faces for the loop to skip.
 
-## 27. The Playground's painters in Windows high-contrast mode
+## 26. The Playground's painters in Windows high-contrast mode
 
 Reachable on the Range page with Windows' high-contrast mode on, or with Chrome's DevTools emulating
 `forced-colors: active`: the track and the filled part of the range turn white on the white page, and only the

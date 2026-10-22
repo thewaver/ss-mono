@@ -119,11 +119,10 @@ describe("FlipbookUtils steps and keys", () => {
 });
 
 describe("FlipbookUtils dragging a page", () => {
-    it("takes a drag only beside the step controls that stand in for it, and only with something to turn", () => {
-        expect(FlipbookUtils.getIsDragDisabled(true, false, TWELVE)).toBe(false);
-        expect(FlipbookUtils.getIsDragDisabled(false, false, TWELVE), "no controls drawn").toBe(true);
-        expect(FlipbookUtils.getIsDragDisabled(true, true, TWELVE), "disabled").toBe(true);
-        expect(FlipbookUtils.getIsDragDisabled(true, false, 1), "a cover alone").toBe(true);
+    it("takes a drag whenever there is something to turn and the book is on", () => {
+        expect(FlipbookUtils.getIsDragDisabled(false, TWELVE)).toBe(false);
+        expect(FlipbookUtils.getIsDragDisabled(true, TWELVE), "disabled").toBe(true);
+        expect(FlipbookUtils.getIsDragDisabled(false, 1), "a cover alone").toBe(true);
     });
 
     it("follows the pointer one leaf at a time, leftwards turning forward", () => {

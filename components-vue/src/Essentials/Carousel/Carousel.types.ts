@@ -1,45 +1,55 @@
 import type { VNodeChild } from "vue";
 
-import type {
-    BaseCarouselProps,
-    CarouselPickRenderProps,
-    CarouselRotationFlags,
-    CarouselSlideState,
-    CarouselState,
-    CarouselStep,
-    CarouselStepRenderProps,
-    InteractionFlags,
-} from "@thewaver/ss-components";
-
-import type { InteractionControlProps } from "../../Primitives/InteractionWrapper/InteractionWrapper.types";
+import type { BaseCarouselProps, CarouselSlideState, CarouselState, CarouselStep } from "@thewaver/ss-components";
 
 export type { CarouselState };
 
-export type CarouselControlProps = InteractionControlProps & {
-    /** Whether this is the slide currently showing. */
-    isCurrent: boolean;
-    /** Runs when this slide is activated. */
-    onActivate: () => void;
-};
-
 export type CarouselControls = {
-    /** Which slide is showing. */
-    index: number;
+    /** Which slide is showing, counting from zero. */
+    getIndex: () => number;
     /** How many slides there are. */
-    count: number;
+    getCount: () => number;
     /** Whether the carousel is advancing by itself. */
-    isPlaying: boolean;
-    /** Whether the pointer, focus or a hidden tab is holding it still. */
-    isHeld: boolean;
-    /** Draws one of the move controls. */
-    renderStep: (step: CarouselStep) => VNodeChild;
+    getIsPlaying: () => boolean;
+    /** Whether the pointer, focus, a hidden tab or the page is holding it still for now. */
+    getIsHeld: () => boolean;
     /**
-     * Draws the picker that jumps straight to one slide. It carries its index as its key, so a list of them needs
-     * none.
+     * Whether a step would do anything, so a button standing for it can be disabled.
+     *
+     * @param step Which way the step would go.
+     * @returns `false` when the carousel is disabled, has nothing to step between, or does not loop and is at that end.
      */
-    renderPick: (index: number) => VNodeChild;
-    /** Draws the play and pause control. */
-    renderRotationControl: () => VNodeChild;
+    getCanStep: (step: CarouselStep) => boolean;
+    /**
+     * Moves one slide on or back, as a swipe would.
+     *
+     * @param step Which way to move.
+     * @returns `false` when the step is refused — see {@link CarouselControls.getCanStep}.
+     */
+    step: (step: CarouselStep) => boolean;
+    /**
+     * Brings one slide up, gliding the short way round on a carousel that loops.
+     *
+     * @param index The slide, counting from zero.
+     * @returns `false` when the carousel is disabled, the slide does not exist, or it is already showing.
+     */
+    pick: (index: number) => boolean;
+    /**
+     * Starts or stops the carousel advancing by itself.
+     *
+     * @param isPlaying Whether it should advance.
+     * @returns `false` when the carousel is disabled or was already in that state.
+     */
+    setIsPlaying: (isPlaying: boolean) => boolean;
+    /**
+     * Holds the carousel still for now, or lets it go, on behalf of the page — for the pointer or keyboard focus
+     * resting on controls the page drew outside the carousel, which it cannot see. The carousel's own holds stay in
+     * force until they lift by themselves, and whether it is playing is left alone.
+     *
+     * @param isHeld Whether the page is holding it.
+     * @returns `false` when the page's hold was already in that state.
+     */
+    setIsHeldByPage: (isHeld: boolean) => boolean;
 };
 
 export type CarouselContentProps<T> = {
@@ -54,7 +64,7 @@ export type CarouselContentProps<T> = {
      * Where the carousel is, `0` to `1`, for driving it from outside — from a scroll position or a pointer, say. On a
      * looping carousel `0` to `1` is one whole lap, so `1` is the first slide again; on one that stops at its ends it
      * runs from the first slide to the last. The carousel writes it as it glides, so it can also be read. A carousel
-     * driven this way is one given no controls, so its swipes and presses are left to the page.
+     * driven this way is moved by the page, so its swipes and presses are left to the page.
      */
     "progress"?: number;
     /** Receives the carousel's position as it glides, which is what `v-model:progress` binds. */
@@ -63,6 +73,16 @@ export type CarouselContentProps<T> = {
     "playback"?: boolean;
     /** Receives the carousel starting or stopping itself, which is what `v-model:playback` binds. */
     "onUpdate:playback"?: (isPlaying: boolean) => void;
+    /**
+     * Hands the consumer the controls once the carousel is up, for driving it from outside.
+     *
+     * **Anything that moves a slide without a swipe, and anything that stops it rotating, has to be built on these.**
+     * The carousel draws its slides and nothing else, so the buttons belong to whoever is drawing the page and may sit
+     * anywhere on it. That matters beyond layout: a swipe is a dragging movement, so WCAG 2.5.7 asks for a
+     * single-pointer route that is not a drag — `step` and `pick` are it — and a carousel that advances by itself needs
+     * a way to pause it under WCAG 2.2.2, which `setIsPlaying` is. Wiring them up is the consumer's to do.
+     */
+    "onMount"?: (controls: CarouselControls) => void;
 };
 
 export type CarouselSlots<T> = {
@@ -77,17 +97,6 @@ export type CarouselSlots<T> = {
      * assistive technology. Left out, a turned slide shows its front from behind.
      */
     renderSlideBack?: (props: { slide: T; state: CarouselSlideState }) => VNodeChild;
-    /** Draws one of the move controls. */
-    renderStep?: (props: { step: CarouselStep; renderProps: InteractionFlags<CarouselStepRenderProps> }) => VNodeChild;
-    /** Draws one of the pickers that jump straight to a slide. */
-    renderPick?: (props: { index: number; renderProps: InteractionFlags<CarouselPickRenderProps> }) => VNodeChild;
-    /** Draws the play and pause control. */
-    renderRotationControl?: (flags: InteractionFlags<CarouselRotationFlags>) => VNodeChild;
-    /**
-     * Draws the controls as a group, for a consumer that wants them somewhere other than where the carousel would put
-     * them. A carousel drawn without it takes no swipes either, since the consumer is then the one moving it.
-     */
-    renderControls?: (controls: CarouselControls) => VNodeChild;
 };
 
 export type CarouselProps<T> = BaseCarouselProps<T> & CarouselContentProps<T>;

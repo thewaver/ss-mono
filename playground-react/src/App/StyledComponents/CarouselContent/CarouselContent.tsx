@@ -7,6 +7,7 @@ import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/Con
 import { PageControlButtonContent } from "../ControlButtonContent/ControlButtonContent";
 import { useLayerClass } from "../Layer/Layer.context";
 import type {
+    CarouselBarProps,
     CarouselPickProps,
     CarouselRotationProps,
     CarouselSlideProps,
@@ -36,20 +37,24 @@ export const PageCarouselBox = (props: PropsWithChildren) => {
     return <div className={[styles.carouselBox, layerClass].join(" ")}>{props.children}</div>;
 };
 
-export const PageCarouselBar = (props: PropsWithChildren) => {
+export const PageCarouselBar = (props: CarouselBarProps) => {
     const layerClass = useLayerClass();
 
-    return <div className={[styles.carouselBar, layerClass].join(" ")}>{props.children}</div>;
+    return (
+        <div ref={props.ref} className={[styles.carouselBar, layerClass].join(" ")}>
+            {props.children}
+        </div>
+    );
 };
 
 export const PageCarouselStep = (props: CarouselStepProps) => (
-    <PageControlButtonContent flags={props.renderProps} glyph={STEP_GLYPHS[props.renderProps.step]} />
+    <PageControlButtonContent flags={props.flags} glyph={STEP_GLYPHS[props.step]} />
 );
 
 export const PageCarouselRotation = (props: CarouselRotationProps) => (
     <PageControlButtonContent
         flags={props.flags}
-        glyph={props.flags.isPlaying ? CONTROL_GLYPHS.pause : CONTROL_GLYPHS.play}
+        glyph={props.isPlaying ? CONTROL_GLYPHS.pause : CONTROL_GLYPHS.play}
     />
 );
 
@@ -61,10 +66,10 @@ export const PageCarouselPick = (props: CarouselPickProps) => {
             className={[
                 styles.carouselPick,
                 layerClass,
-                props.renderProps.isCurrent && styles.isCurrent,
-                props.renderProps.isHovered && styles.isHovered,
-                props.renderProps.isActive && styles.isActive,
-                props.renderProps.isDisabled && styles.isDisabled,
+                props.isCurrent && styles.isCurrent,
+                props.flags.isHovered && styles.isHovered,
+                props.flags.isActive && styles.isActive,
+                props.flags.isDisabled && styles.isDisabled,
             ]
                 .filter(Boolean)
                 .join(" ")}

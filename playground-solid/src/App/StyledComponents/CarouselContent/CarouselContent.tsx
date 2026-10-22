@@ -8,6 +8,7 @@ import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/Con
 import { PageControlButtonContent } from "../ControlButtonContent/ControlButtonContent";
 import { useLayerClass } from "../Layer/Layer.context";
 import type {
+    CarouselBarProps,
     CarouselPickProps,
     CarouselRotationProps,
     CarouselSlideProps,
@@ -39,20 +40,24 @@ export const PageCarouselBox = (props: ParentProps) => {
     return <div class={[styles.carouselBox, getLayerClass()].join(" ")}>{props.children}</div>;
 };
 
-export const PageCarouselBar = (props: ParentProps) => {
+export const PageCarouselBar = (props: ParentProps<CarouselBarProps>) => {
     const getLayerClass = useLayerClass();
 
-    return <div class={[styles.carouselBar, getLayerClass()].join(" ")}>{props.children}</div>;
+    return (
+        <div ref={props.ref} class={[styles.carouselBar, getLayerClass()].join(" ")}>
+            {props.children}
+        </div>
+    );
 };
 
 export const PageCarouselStep = (props: CarouselStepProps) => (
-    <PageControlButtonContent flags={props.renderProps} glyph={() => STEP_GLYPHS[access(props.renderProps).step]} />
+    <PageControlButtonContent flags={props.flags} glyph={() => STEP_GLYPHS[access(props.step)]} />
 );
 
 export const PageCarouselRotation = (props: CarouselRotationProps) => (
     <PageControlButtonContent
         flags={props.flags}
-        glyph={() => (access(props.flags).isPlaying ? CONTROL_GLYPHS.pause : CONTROL_GLYPHS.play)}
+        glyph={() => (access(props.isPlaying) ? CONTROL_GLYPHS.pause : CONTROL_GLYPHS.play)}
     />
 );
 
@@ -64,10 +69,10 @@ export const PageCarouselPick = (props: CarouselPickProps) => {
             class={styles.carouselPick}
             classList={{
                 [getLayerClass()]: true,
-                [styles.isCurrent]: access(props.renderProps).isCurrent,
-                [styles.isHovered]: access(props.renderProps).isHovered,
-                [styles.isActive]: access(props.renderProps).isActive,
-                [styles.isDisabled]: access(props.renderProps).isDisabled,
+                [styles.isCurrent]: access(props.isCurrent),
+                [styles.isHovered]: access(props.flags).isHovered,
+                [styles.isActive]: access(props.flags).isActive,
+                [styles.isDisabled]: access(props.flags).isDisabled,
             }}
             aria-hidden="true"
         />

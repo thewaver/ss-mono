@@ -1,54 +1,48 @@
-import { type CSSProperties, type MouseEvent, type ReactNode, useEffect, useRef, useState } from "react";
+import { type CSSProperties, type MouseEvent, useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import {
     CAROUSEL_DEFAULTS,
     type CarouselFace,
-    type CarouselPickRenderProps,
     type CarouselPlacement,
-    type CarouselRotationFlags,
     type CarouselSlideState,
     type CarouselStep,
-    type CarouselStepRenderProps,
     CarouselStyles,
     CarouselUtils,
     LiveAnnouncerUtils,
 } from "@thewaver/ss-components";
 import { CarouselConst } from "@thewaver/ss-components/internal";
-import { StringUtils } from "@thewaver/ss-utils";
+import { StoreUtils, StringUtils } from "@thewaver/ss-utils";
 
 import { ElementObserverReactUtils } from "../../Abstracts/ElementObserver/ElementObserverReact.utils";
 import { InteractionTrackerReactUtils } from "../../Abstracts/InteractionTracker/InteractionTrackerReact.utils";
 import { SignalMirrorReactUtils } from "../../Abstracts/SignalMirror/SignalMirrorReact.utils";
-import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
 import { useLatest } from "../../Utils/refUtils";
-import type { CarouselControlProps, CarouselControls, CarouselProps } from "./Carousel.types";
+import type { CarouselControls, CarouselProps } from "./Carousel.types";
+
+type ControlsSnapshot = {
+    index: number;
+    count: number;
+    isPlaying: boolean;
+    isHeld: boolean;
+    isLooping: boolean;
+    isDisabled: boolean;
+};
+
+const getIsSameSnapshot = (first: ControlsSnapshot, second: ControlsSnapshot) =>
+    first.index === second.index &&
+    first.count === second.count &&
+    first.isPlaying === second.isPlaying &&
+    first.isHeld === second.isHeld &&
+    first.isLooping === second.isLooping &&
+    first.isDisabled === second.isDisabled;
+
+const getIsStepRefused = (step: CarouselStep, current: ControlsSnapshot) =>
+    CarouselUtils.getIsStepDisabled(step, current.index, current.count, current.isLooping, current.isDisabled);
 
 const toReactStyle = (style: Record<string, string>) =>
     Object.fromEntries(
         Object.entries(style).map(([key, value]) => [StringUtils.kebabToCamelCase(key), value]),
     ) as CSSProperties;
-
-const CarouselControl = (props: CarouselControlProps) => {
-    const isDisabled = props.flags.isDisabled ?? false;
-
-    return (
-        <button
-            ref={props.ref}
-            type="button"
-            className={CarouselStyles.carouselControl}
-            aria-label={props.ariaLabel}
-            aria-disabled={isDisabled || undefined}
-            aria-current={props.isCurrent || undefined}
-            onClick={() => {
-                if (isDisabled) return;
-
-                props.onActivate();
-            }}
-        >
-            {props.renderContent(props.flags)}
-        </button>
-    );
-};
 
 export const Carousel = <T,>(props: CarouselProps<T>) => {
     useEffect(() => LiveAnnouncerUtils.reserve("polite"), []);
@@ -75,7 +69,11 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
     const autoplayDelayMs = props.autoplayDelayMs;
     const slideRoleDescription = props.slideRoleDescription ?? CAROUSEL_DEFAULTS.slideRoleDescription;
 
-    const isHeld = InteractionTrackerReactUtils.useHold(rootRef);
+    const [isHeldByPage, setIsHeldByPage] = useState(false);
+
+    const isHeldWithin = InteractionTrackerReactUtils.useHold(rootRef);
+
+    const isHeld = isHeldWithin || isHeldByPage;
 
     const size = ElementObserverReactUtils.useBorderBoxSize(viewportRef);
 
@@ -99,7 +97,7 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
     const ringPlaces = Array.from({ length: ringCount }, (_, place) => place);
     const toIndex = (place: number) => place % Math.max(count, 1);
 
-    const isPressDisabled = CarouselUtils.getIsSwipeDisabled(props.renderControls !== undefined, isDisabled, count);
+    const isPressDisabled = CarouselUtils.getIsSwipeDisabled(props.progress !== undefined, isDisabled, count);
 
     const setSwipeRatio = (value: number) => {
         swipeRatioRef.current = value;
@@ -324,79 +322,67 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
         if (hit !== undefined) goTo(toIndex(hit));
     };
 
-    const renderStepControl = (step: CarouselStep): ReactNode => {
-        const targetIndex = CarouselUtils.getStepTarget(step, currentIndex, count, isLooping);
+    const snapshot: ControlsSnapshot = { index: currentIndex, count, isPlaying, isHeld, isLooping, isDisabled };
 
-        return (
-            <InteractionWrapper<CarouselStepRenderProps>
-                key={step}
-                isDisabled={CarouselUtils.getIsStepDisabled(step, currentIndex, count, isLooping, isDisabled)}
-                extraFlags={{ step, targetIndex }}
-                renderControl={(setElementRef, renderProps) => (
-                    <CarouselControl
-                        ref={setElementRef}
-                        isCurrent={false}
-                        ariaLabel={props.computeStepLabel(step)}
-                        flags={renderProps}
-                        renderContent={() => props.renderStep?.(step, renderProps)}
-                        onActivate={() => goTo(targetIndex)}
-                    />
-                )}
-            />
-        );
-    };
+    const [controlsStore] = useState(() => StoreUtils.create(snapshot, { isEqual: getIsSameSnapshot }));
 
-    const renderPickControl = (pickIndex: number): ReactNode => (
-        <InteractionWrapper<CarouselPickRenderProps>
-            key={pickIndex}
-            isDisabled={isDisabled}
-            extraFlags={{ index: pickIndex, isCurrent: pickIndex === currentIndex }}
-            renderControl={(setElementRef, renderProps) => (
-                <CarouselControl
-                    ref={setElementRef}
-                    isCurrent={renderProps.isCurrent}
-                    ariaLabel={getSlideLabel(pickIndex)}
-                    flags={renderProps}
-                    renderContent={() => props.renderPick?.(pickIndex, renderProps)}
-                    onActivate={() => goTo(pickIndex)}
-                />
-            )}
-        />
-    );
+    useLayoutEffect(() => {
+        controlsStore.set(snapshot);
+    });
 
-    const renderRotationControl = (): ReactNode => (
-        <InteractionWrapper<CarouselRotationFlags>
-            key="rotation"
-            isDisabled={isDisabled}
-            extraFlags={{ isPlaying, isHeld }}
-            renderControl={(setElementRef, flags) => (
-                <CarouselControl
-                    ref={setElementRef}
-                    isCurrent={false}
-                    ariaLabel={props.computeRotationLabel(isPlaying)}
-                    flags={flags}
-                    renderContent={() => props.renderRotationControl?.(flags)}
-                    onActivate={() => setIsPlaying(!isPlaying)}
-                />
-            )}
-        />
-    );
+    const commandsRef = useLatest({ snapshot, goTo, setIsPlaying, isHeldByPage });
 
-    const controls: CarouselControls = {
-        index: currentIndex,
-        count,
-        isPlaying,
-        isHeld,
-        renderStep: renderStepControl,
-        renderPick: renderPickControl,
-        renderRotationControl,
-    };
+    const [controls] = useState<CarouselControls>(() => ({
+        getIndex: () => controlsStore.get().index,
+        getCount: () => controlsStore.get().count,
+        getIsPlaying: () => controlsStore.get().isPlaying,
+        getIsHeld: () => controlsStore.get().isHeld,
+        getCanStep: (step) => !getIsStepRefused(step, controlsStore.get()),
+        step: (step) => {
+            const { snapshot: current, goTo: goToNow } = commandsRef.current;
+
+            if (getIsStepRefused(step, current)) return false;
+
+            goToNow(CarouselUtils.getStepTarget(step, current.index, current.count, current.isLooping));
+
+            return true;
+        },
+        pick: (index) => {
+            const { snapshot: current, goTo: goToNow } = commandsRef.current;
+
+            if (current.isDisabled || index < 0 || index >= current.count || index === current.index) return false;
+
+            goToNow(index);
+
+            return true;
+        },
+        setIsPlaying: (isPlayingNext) => {
+            const { snapshot: current, setIsPlaying: setIsPlayingNow } = commandsRef.current;
+
+            if (current.isDisabled || isPlayingNext === current.isPlaying) return false;
+
+            setIsPlayingNow(isPlayingNext);
+
+            return true;
+        },
+        setIsHeldByPage: (isHeldNext) => {
+            if (isHeldNext === commandsRef.current.isHeldByPage) return false;
+
+            setIsHeldByPage(isHeldNext);
+
+            return true;
+        },
+        subscribe: controlsStore.subscribe,
+    }));
+
+    useEffect(() => {
+        props.onMount?.(controls);
+    }, [controls]);
 
     return (
         <div
             ref={rootRef}
             className={CarouselStyles.carouselRoot}
-            style={{ gap: `${props.gap ?? CAROUSEL_DEFAULTS.gap}px` }}
             role="region"
             aria-roledescription={props.roleDescription ?? CAROUSEL_DEFAULTS.roleDescription}
             aria-label={props.ariaLabel}
@@ -453,8 +439,6 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
                     );
                 })}
             </div>
-
-            {props.renderControls?.(controls)}
         </div>
     );
 };

@@ -49,20 +49,20 @@ export namespace CarouselUtils {
     };
 
     /**
-     * Which item a step control moves to.
+     * Which item a step moves to.
      *
      * @param step `"previous"` or `"next"`.
      * @param index The current item.
      * @param count How many items there are.
      * @param isLooping Whether stepping past either end continues round. Defaults to `true`.
      * @returns The new index — wrapped when looping, and otherwise the current index where the step would
-     * run off the end, so a control there can tell it has nowhere to go.
+     * run off the end, so a step there can tell it has nowhere to go.
      */
     export const getStepTarget = (step: CarouselStep, index: number, count: number, isLooping = true) =>
         resolveIndex(index + (step === "previous" ? -1 : 1), count, isLooping) ?? wrapIndex(index, count);
 
     /**
-     * Whether a step control has nowhere to go.
+     * Whether a step has nowhere to go.
      *
      * @param step `"previous"` or `"next"`.
      * @param index The current item.
@@ -102,19 +102,20 @@ export namespace CarouselUtils {
     export const getTravelsAcross = (orientation: CarouselOrientation) => orientation === "horizontal";
 
     /**
-     * Whether a swipe across the carousel should be refused.
+     * Whether swipes and presses on the slides are refused.
      *
-     * A carousel whose consumer draws no controls is moved only by that consumer, so its swipes are left to the
-     * browser and its axis is never claimed. A disabled carousel, or one with nothing to move between, refuses
-     * too.
+     * A carousel whose `progress` is written from outside — by a scroll position, say — is moved by that consumer, so
+     * its swipes are left to the browser and its axis is never claimed. A disabled carousel, or one with nothing to
+     * move between, refuses too. Any other carousel takes them, whether or not the consumer built buttons on its
+     * controller: the carousel draws no controls of its own, so it cannot tell.
      *
-     * @param hasControls Whether the consumer draws controls for it.
+     * @param isDrivenFromOutside Whether the consumer writes `progress`.
      * @param isDisabled Whether the carousel is disabled.
      * @param count How many slides there are.
      * @returns `true` when the swipe is to be left to the browser.
      */
-    export const getIsSwipeDisabled = (hasControls: boolean, isDisabled: boolean, count: number) =>
-        !hasControls || isDisabled || count < MIN_ROTATABLE_COUNT;
+    export const getIsSwipeDisabled = (isDrivenFromOutside: boolean, isDisabled: boolean, count: number) =>
+        isDrivenFromOutside || isDisabled || count < MIN_ROTATABLE_COUNT;
 
     /**
      * Holds a swipe's progress to at most one slide either way.
@@ -137,7 +138,7 @@ export namespace CarouselUtils {
     export const getSwipeStep = (direction: SwipeDirection) => (direction === "left" || direction === "up" ? 1 : -1);
 
     /**
-     * Whether a step control is disabled.
+     * Whether a step is refused.
      *
      * @param step `"previous"` or `"next"`.
      * @param index The current slide.

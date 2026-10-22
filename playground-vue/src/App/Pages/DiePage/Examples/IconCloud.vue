@@ -11,6 +11,7 @@ import {
 import * as styles from "@thewaver/ss-playground/App/Pages/DiePage/DiePage.css";
 import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
+import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.vue";
 import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
 import PageDieIcon from "../../../StyledComponents/DieContent/PageDieIcon.vue";
 import type { IconCloudExampleProps } from "../DiePage.types";
@@ -38,24 +39,26 @@ const stepCloud = (direction: RollerDirection) => {
 
 <template>
     <div :class="styles.stage">
-        <Die
-            v-model:face="face"
-            v-model:autoSpin="autoSpin"
-            :shape="shape"
-            :size="size"
-            :idle-delay-ms="idleDelayMs"
-            :settle-duration-ms="settleDurationMs"
-            :momentum-ms="momentumMs"
-            is-movable
-            is-see-through
-            ariaLabel="A cloud of icons"
-            :compute-face-label="computeFaceLabel"
-            @mount="(next: DieController) => (controller = next)"
-        >
-            <template #renderFace="{ index, state }">
-                <PageDieIcon :state="state" :icon="ICON_CLOUD_ICONS[index]?.icon ?? ''" />
-            </template>
-        </Die>
+        <PageMeasureBox>
+            <Die
+                v-model:face="face"
+                v-model:autoSpin="autoSpin"
+                :shape="shape"
+                :size="size"
+                :idle-delay-ms="idleDelayMs"
+                :settle-duration-ms="settleDurationMs"
+                :momentum-ms="momentumMs"
+                is-movable
+                is-see-through
+                ariaLabel="A cloud of icons"
+                :compute-face-label="computeFaceLabel"
+                @mount="(next: DieController) => (controller = next)"
+            >
+                <template #renderFace="{ index, state }">
+                    <PageDieIcon :state="state" :icon="ICON_CLOUD_ICONS[index]?.icon ?? ''" />
+                </template>
+            </Die>
+        </PageMeasureBox>
 
         <div :class="styles.controls">
             <Button id="dieCloudPlayback" :ariaLabel="autoSpin ? 'Pause' : 'Play'" @click="togglePlayback">

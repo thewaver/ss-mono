@@ -1,6 +1,5 @@
 import { globalStyle, style } from "@vanilla-extract/css";
 
-import { buttonElement } from "../../../Essentials/Buttons/Button/Button.css";
 import { spineFace } from "../../../Primitives/Spine/Spine.css";
 
 export const flipbookRoot = style({
@@ -32,8 +31,6 @@ export const flipbookPageFront = style({
 export const flipbookPageBack = style({
     left: 0,
 });
-
-export const flipbookControl = style([buttonElement, {}]);
 
 globalStyle(`${flipbookBook} ${spineFace}`, {
     pointerEvents: "none",

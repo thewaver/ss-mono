@@ -2,8 +2,6 @@ import { type SlotsType, type VNodeChild, computed, defineComponent, onScopeDisp
 
 import {
     FLIPBOOK_DEFAULTS,
-    type FlipbookStep,
-    type FlipbookStepRenderProps,
     FlipbookStyles,
     FlipbookUtils,
     LiveAnnouncerUtils,
@@ -13,50 +11,13 @@ import {
 import { FlipbookConst } from "@thewaver/ss-components/internal";
 
 import { InteractionTrackerVueUtils } from "../../../Abstracts/InteractionTracker/InteractionTrackerVue.utils";
-import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
-import type {
-    InteractionControlSlots,
-    InteractionWrapperSlots,
-} from "../../../Primitives/InteractionWrapper/InteractionWrapper.types";
 import { Spine } from "../../../Primitives/Spine/Spine";
 import type { SpineSlots } from "../../../Primitives/Spine/Spine.types";
 import { watchAfterRender } from "../../../Utils/effectUtils";
 import { callSlot, declareProps, useTwoWay } from "../../../Utils/propUtils";
 import { useStore } from "../../../Utils/storeUtils";
 import type { SlotsContext } from "../../../Utils/typeUtils";
-import type { FlipbookControlProps, FlipbookControls, FlipbookProps, FlipbookSlots } from "./Flipbook.types";
-
-const FlipbookControl = defineComponent(
-    (props: FlipbookControlProps, { slots }: SlotsContext<InteractionControlSlots<FlipbookStepRenderProps>>) =>
-        () => {
-            const isDisabled = props.flags.isDisabled ?? false;
-
-            return (
-                <button
-                    type="button"
-                    class={FlipbookStyles.flipbookControl}
-                    aria-label={props.ariaLabel}
-                    aria-disabled={isDisabled || undefined}
-                    onClick={() => {
-                        if (isDisabled) return;
-
-                        props.onActivate();
-                    }}
-                >
-                    {callSlot(slots.renderContent, props.flags)}
-                </button>
-            );
-        },
-    {
-        name: "FlipbookControl",
-        props: declareProps<FlipbookControlProps>({
-            id: null,
-            ariaLabel: null,
-            flags: null,
-            onActivate: null,
-        }),
-    },
-);
+import type { FlipbookControls, FlipbookProps, FlipbookSlots } from "./Flipbook.types";
 
 export const Flipbook = defineComponent(
     <T,>(props: FlipbookProps<T>, { slots }: SlotsContext<FlipbookSlots<T>>) => {
@@ -88,7 +49,7 @@ export const Flipbook = defineComponent(
 
         InteractionTrackerVueUtils.useAxialSwipe(
             bookRef,
-            () => FlipbookUtils.getIsDragDisabled(slots.renderControls !== undefined, getIsDisabled(), getPageCount()),
+            () => FlipbookUtils.getIsDragDisabled(getIsDisabled(), getPageCount()),
             {
                 axis: "horizontal",
                 commitRatio: () => props.commitRatio ?? FLIPBOOK_DEFAULTS.commitRatio,
@@ -127,31 +88,17 @@ export const Flipbook = defineComponent(
             e.preventDefault();
         };
 
-        const renderStepControl = (step: FlipbookStep): VNodeChild => (
-            <InteractionWrapper
-                key={step}
-                isDisabled={FlipbookUtils.getIsStepDisabled(step, currentIndex.value, getPageCount(), getIsDisabled())}
-                extraFlags={{
-                    step,
-                    targetIndex: FlipbookUtils.getStepTarget(step, currentIndex.value, getPageCount()),
-                }}
-            >
-                {
-                    {
-                        renderControl: ({ setElementRef, flags: renderProps }) => (
-                            <FlipbookControl
-                                ref={setElementRef}
-                                ariaLabel={props.computeStepLabel(step)}
-                                flags={renderProps}
-                                onActivate={() => book.turn(step)}
-                            >
-                                {{ renderContent: () => callSlot(slots.renderStep, { step, renderProps }) }}
-                            </FlipbookControl>
-                        ),
-                    } satisfies InteractionWrapperSlots<FlipbookStepRenderProps>
-                }
-            </InteractionWrapper>
-        );
+        const controls: FlipbookControls = {
+            getIndex: () => currentIndex.value,
+            getSpreadCount: () => FlipbookUtils.getSpreadCount(getPageCount()),
+            getCanTurn: (step) =>
+                !FlipbookUtils.getIsStepDisabled(step, currentIndex.value, getPageCount(), getIsDisabled()),
+            turn: (step) => book.turn(step),
+        };
+
+        watchAfterRender([], () => {
+            props.onMount?.(controls);
+        });
 
         const renderLeafPage = (leaf: number, side: SpineSide): VNodeChild => {
             const page = FlipbookUtils.getLeafPage(leaf, side, getPageCount());
@@ -176,16 +123,9 @@ export const Flipbook = defineComponent(
         return () => {
             const pageCount = getPageCount();
 
-            const controls: FlipbookControls = {
-                index: currentIndex.value,
-                spreadCount: FlipbookUtils.getSpreadCount(pageCount),
-                renderStep: renderStepControl,
-            };
-
             return (
                 <div
                     class={FlipbookStyles.flipbookRoot}
-                    style={{ gap: `${props.gap ?? FLIPBOOK_DEFAULTS.gap}px` }}
                     role="region"
                     aria-roledescription={props.roleDescription ?? FLIPBOOK_DEFAULTS.roleDescription}
                     aria-label={props.ariaLabel}
@@ -216,8 +156,6 @@ export const Flipbook = defineComponent(
                             }
                         </Spine>
                     </div>
-
-                    {callSlot(slots.renderControls, controls)}
                 </div>
             );
         };
@@ -228,17 +166,16 @@ export const Flipbook = defineComponent(
         props: declareProps<FlipbookProps<unknown>>({
             "transitionDurationMs": null,
             "commitRatio": null,
-            "gap": null,
             "isDisabled": Boolean,
             "ariaLabel": null,
             "computePageLabel": null,
             "computeSpreadAnnouncement": null,
-            "computeStepLabel": null,
             "roleDescription": null,
             "pageRoleDescription": null,
             "pages": null,
             "index": null,
             "onUpdate:index": null,
+            "onMount": null,
         }),
     },
 );

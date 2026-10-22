@@ -10,10 +10,12 @@ export const stage = style({
     width: "100%",
 });
 
+export const BOOK_HEIGHT = 340;
+
 export const book = style({
     width: "100%",
     maxWidth: 520,
-    height: 340,
+    height: BOOK_HEIGHT,
     userSelect: "none",
 });
 

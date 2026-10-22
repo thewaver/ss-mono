@@ -1,11 +1,7 @@
 import { createSignal } from "solid-js";
 
 import { Carousel, ElementObserverSolidUtils, access } from "@thewaver/ss-components-solid";
-import {
-    computeCarouselRotationLabel,
-    computeCarouselStepLabel,
-    computePositionLabel,
-} from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
+import { computePositionLabel } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/Carousels/Carousels.css";
 
 import type { CarouselExampleProps } from "../../Carousels.types";
@@ -33,8 +29,6 @@ export const ScrolledExample = (props: Props) => {
                     transitionDurationMs={props.transitionDurationMs}
                     ariaLabel={"Scrolled sampler"}
                     computeSlideLabel={computePositionLabel}
-                    computeStepLabel={computeCarouselStepLabel}
-                    computeRotationLabel={computeCarouselRotationLabel}
                     renderSlide={(getSlide, getState) => (
                         <SlideFront
                             title={getSlide()}

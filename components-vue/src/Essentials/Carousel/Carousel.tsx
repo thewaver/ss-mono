@@ -1,14 +1,11 @@
-import { type SlotsType, type VNodeChild, computed, defineComponent, onScopeDispose, shallowRef, watch } from "vue";
+import { type SlotsType, computed, defineComponent, onScopeDispose, ref, shallowRef, watch } from "vue";
 
 import {
     CAROUSEL_DEFAULTS,
     type CarouselFace,
-    type CarouselPickRenderProps,
     type CarouselPlacement,
-    type CarouselRotationFlags,
     type CarouselSlideState,
     type CarouselStep,
-    type CarouselStepRenderProps,
     CarouselStyles,
     CarouselUtils,
     LiveAnnouncerUtils,
@@ -17,49 +14,10 @@ import { CarouselConst } from "@thewaver/ss-components/internal";
 
 import { ElementObserverVueUtils } from "../../Abstracts/ElementObserver/ElementObserverVue.utils";
 import { InteractionTrackerVueUtils } from "../../Abstracts/InteractionTracker/InteractionTrackerVue.utils";
-import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
-import type {
-    InteractionControlSlots,
-    InteractionWrapperSlots,
-} from "../../Primitives/InteractionWrapper/InteractionWrapper.types";
 import { watchAfterRender } from "../../Utils/effectUtils";
 import { callSlot, declareProps, useTwoWay } from "../../Utils/propUtils";
 import type { SlotsContext } from "../../Utils/typeUtils";
-import type { CarouselControlProps, CarouselControls, CarouselProps, CarouselSlots } from "./Carousel.types";
-
-const CarouselControl = defineComponent(
-    (props: CarouselControlProps, { slots }: SlotsContext<InteractionControlSlots>) =>
-        () => {
-            const isDisabled = props.flags.isDisabled ?? false;
-
-            return (
-                <button
-                    type="button"
-                    class={CarouselStyles.carouselControl}
-                    aria-label={props.ariaLabel}
-                    aria-disabled={isDisabled || undefined}
-                    aria-current={props.isCurrent || undefined}
-                    onClick={() => {
-                        if (isDisabled) return;
-
-                        props.onActivate();
-                    }}
-                >
-                    {callSlot(slots.renderContent, props.flags)}
-                </button>
-            );
-        },
-    {
-        name: "CarouselControl",
-        props: declareProps<CarouselControlProps>({
-            id: null,
-            ariaLabel: null,
-            flags: null,
-            isCurrent: Boolean,
-            onActivate: null,
-        }),
-    },
-);
+import type { CarouselControls, CarouselProps, CarouselSlots } from "./Carousel.types";
 
 export const Carousel = defineComponent(
     <T,>(props: CarouselProps<T>, { slots }: SlotsContext<CarouselSlots<T>>) => {
@@ -85,7 +43,11 @@ export const Carousel = defineComponent(
         const getOrientation = () => props.orientation ?? CAROUSEL_DEFAULTS.orientation;
         const getTransitionDurationMs = () => props.transitionDurationMs ?? CAROUSEL_DEFAULTS.transitionDurationMs;
 
-        const isHeld = InteractionTrackerVueUtils.useHold(rootRef);
+        const isHeldByPage = ref(false);
+
+        const isHeldWithin = InteractionTrackerVueUtils.useHold(rootRef);
+
+        const isHeld = computed(() => isHeldWithin.value || isHeldByPage.value);
 
         const size = ElementObserverVueUtils.useBorderBoxSize(viewportRef);
 
@@ -108,7 +70,7 @@ export const Carousel = defineComponent(
         const toIndex = (place: number) => place % Math.max(count.value, 1);
 
         const getIsPressDisabled = () =>
-            CarouselUtils.getIsSwipeDisabled(slots.renderControls !== undefined, getIsDisabled(), count.value);
+            CarouselUtils.getIsSwipeDisabled(props.progress !== undefined, getIsDisabled(), count.value);
 
         let stopGlide: (() => void) | undefined;
         let writtenProgress: number | undefined;
@@ -276,91 +238,50 @@ export const Carousel = defineComponent(
             isCurrent: place === currentPlace.value,
         });
 
-        const renderStepControl = (step: CarouselStep): VNodeChild => {
-            const targetIndex = CarouselUtils.getStepTarget(step, currentIndex.value, count.value, getIsLooping());
+        const getIsStepRefused = (step: CarouselStep) =>
+            CarouselUtils.getIsStepDisabled(step, currentIndex.value, count.value, getIsLooping(), getIsDisabled());
 
-            return (
-                <InteractionWrapper
-                    key={step}
-                    isDisabled={CarouselUtils.getIsStepDisabled(
-                        step,
-                        currentIndex.value,
-                        count.value,
-                        getIsLooping(),
-                        getIsDisabled(),
-                    )}
-                    extraFlags={{ step, targetIndex }}
-                >
-                    {
-                        {
-                            renderControl: ({ setElementRef, flags: renderProps }) => (
-                                <CarouselControl
-                                    ref={setElementRef}
-                                    isCurrent={false}
-                                    ariaLabel={props.computeStepLabel(step)}
-                                    flags={renderProps}
-                                    onActivate={() => goTo(targetIndex)}
-                                >
-                                    {{ renderContent: () => callSlot(slots.renderStep, { step, renderProps }) }}
-                                </CarouselControl>
-                            ),
-                        } satisfies InteractionWrapperSlots<CarouselStepRenderProps>
-                    }
-                </InteractionWrapper>
-            );
+        const controls: CarouselControls = {
+            getIndex: () => currentIndex.value,
+            getCount: () => count.value,
+            getIsPlaying: () => isPlaying.value,
+            getIsHeld: () => isHeld.value,
+            getCanStep: (step) => !getIsStepRefused(step),
+            step: (step) => {
+                if (getIsStepRefused(step)) return false;
+
+                goTo(CarouselUtils.getStepTarget(step, currentIndex.value, count.value, getIsLooping()));
+
+                return true;
+            },
+            pick: (pickIndex) => {
+                if (getIsDisabled() || pickIndex < 0 || pickIndex >= count.value || pickIndex === currentIndex.value) {
+                    return false;
+                }
+
+                goTo(pickIndex);
+
+                return true;
+            },
+            setIsPlaying: (next) => {
+                if (getIsDisabled() || next === isPlaying.value) return false;
+
+                isPlaying.value = next;
+
+                return true;
+            },
+            setIsHeldByPage: (next) => {
+                if (next === isHeldByPage.value) return false;
+
+                isHeldByPage.value = next;
+
+                return true;
+            },
         };
 
-        const renderPickControl = (pickIndex: number): VNodeChild => (
-            <InteractionWrapper
-                key={pickIndex}
-                isDisabled={getIsDisabled()}
-                extraFlags={{ index: pickIndex, isCurrent: pickIndex === currentIndex.value }}
-            >
-                {
-                    {
-                        renderControl: ({ setElementRef, flags: renderProps }) => (
-                            <CarouselControl
-                                ref={setElementRef}
-                                isCurrent={renderProps.isCurrent}
-                                ariaLabel={getSlideLabel(pickIndex)}
-                                flags={renderProps}
-                                onActivate={() => goTo(pickIndex)}
-                            >
-                                {{
-                                    renderContent: () => callSlot(slots.renderPick, { index: pickIndex, renderProps }),
-                                }}
-                            </CarouselControl>
-                        ),
-                    } satisfies InteractionWrapperSlots<CarouselPickRenderProps>
-                }
-            </InteractionWrapper>
-        );
-
-        const renderRotationControl = (): VNodeChild => (
-            <InteractionWrapper
-                key="rotation"
-                isDisabled={getIsDisabled()}
-                extraFlags={{ isPlaying: isPlaying.value, isHeld: isHeld.value }}
-            >
-                {
-                    {
-                        renderControl: ({ setElementRef, flags }) => (
-                            <CarouselControl
-                                ref={setElementRef}
-                                isCurrent={false}
-                                ariaLabel={props.computeRotationLabel(isPlaying.value)}
-                                flags={flags}
-                                onActivate={() => {
-                                    isPlaying.value = !isPlaying.value;
-                                }}
-                            >
-                                {{ renderContent: () => callSlot(slots.renderRotationControl, flags) }}
-                            </CarouselControl>
-                        ),
-                    } satisfies InteractionWrapperSlots<CarouselRotationFlags>
-                }
-            </InteractionWrapper>
-        );
+        watchAfterRender([], () => {
+            props.onMount?.(controls);
+        });
 
         const handleViewportClick = (e: MouseEvent) => {
             if (getIsPressDisabled()) return;
@@ -385,16 +306,6 @@ export const Carousel = defineComponent(
             const slideRoleDescription = props.slideRoleDescription ?? CAROUSEL_DEFAULTS.slideRoleDescription;
             const isTurnable = slots.renderSlideBack !== undefined;
             const isWindowed = getIsWindowed();
-
-            const controls: CarouselControls = {
-                index: currentIndex.value,
-                count: count.value,
-                isPlaying: isPlaying.value,
-                isHeld: isHeld.value,
-                renderStep: renderStepControl,
-                renderPick: renderPickControl,
-                renderRotationControl,
-            };
 
             const renderSlide = (place: number) => {
                 const distance = getDistance(place);
@@ -463,7 +374,6 @@ export const Carousel = defineComponent(
                 <div
                     ref={rootRef}
                     class={CarouselStyles.carouselRoot}
-                    style={{ gap: `${props.gap ?? CAROUSEL_DEFAULTS.gap}px` }}
                     role="region"
                     aria-roledescription={props.roleDescription ?? CAROUSEL_DEFAULTS.roleDescription}
                     aria-label={props.ariaLabel}
@@ -473,8 +383,6 @@ export const Carousel = defineComponent(
                             (slide) => slide !== undefined,
                         )}
                     </div>
-
-                    {callSlot(slots.renderControls, controls)}
                 </div>
             );
         };
@@ -485,14 +393,11 @@ export const Carousel = defineComponent(
         props: declareProps<CarouselProps<unknown>>({
             "autoplayDelayMs": null,
             "transitionDurationMs": null,
-            "gap": null,
             "isDisabled": Boolean,
             "isLooping": Boolean,
             "isWindowed": Boolean,
             "ariaLabel": null,
             "computeSlideLabel": null,
-            "computeStepLabel": null,
-            "computeRotationLabel": null,
             "roleDescription": null,
             "slideRoleDescription": null,
             "slides": null,
@@ -505,6 +410,7 @@ export const Carousel = defineComponent(
             "onIndexChange": null,
             "orientation": null,
             "placement": null,
+            "onMount": null,
         }),
     },
 );

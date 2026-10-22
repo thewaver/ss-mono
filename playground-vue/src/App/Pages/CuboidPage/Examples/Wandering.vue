@@ -6,6 +6,7 @@ import { Cuboid, CuboidUtils } from "@thewaver/ss-components-vue";
 import { computeCuboidFaceLabel } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
 import { ObjectUtils } from "@thewaver/ss-utils";
 
+import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.vue";
 import PageCuboidFace from "../../../StyledComponents/CuboidContent/PageCuboidFace.vue";
 import PageCuboidStack from "../../../StyledComponents/CuboidContent/PageCuboidStack.vue";
 import type { CuboidWanderingExampleProps } from "../CuboidPage.types";
@@ -60,17 +61,19 @@ watch(
 
 <template>
     <PageCuboidStack>
-        <Cuboid
-            v-model:yaw="yaw"
-            v-model:pitch="pitch"
-            :size="size"
-            :transition-duration-ms="transitionDurationMs"
-            ariaLabel="Six faces, turning by themselves"
-            :compute-face-label="computeCuboidFaceLabel"
-        >
-            <template #renderFace="{ face, state }">
-                <PageCuboidFace :face="face" :state="state" />
-            </template>
-        </Cuboid>
+        <PageMeasureBox>
+            <Cuboid
+                v-model:yaw="yaw"
+                v-model:pitch="pitch"
+                :size="size"
+                :transition-duration-ms="transitionDurationMs"
+                ariaLabel="Six faces, turning by themselves"
+                :compute-face-label="computeCuboidFaceLabel"
+            >
+                <template #renderFace="{ face, state }">
+                    <PageCuboidFace :face="face" :state="state" />
+                </template>
+            </Cuboid>
+        </PageMeasureBox>
     </PageCuboidStack>
 </template>

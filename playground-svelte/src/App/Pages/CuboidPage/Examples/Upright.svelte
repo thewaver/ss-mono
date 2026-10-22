@@ -9,6 +9,7 @@
     import PageCuboidRow from "../../../StyledComponents/CuboidContent/PageCuboidRow.svelte";
     import PageCuboidStack from "../../../StyledComponents/CuboidContent/PageCuboidStack.svelte";
     import type { CuboidUprightExampleProps } from "../CuboidPage.types";
+    import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.svelte";
 
     const QUARTER_TURN = 1;
 
@@ -26,23 +27,25 @@
 {/snippet}
 
 <PageCuboidStack>
-    <Cuboid
-        bind:yaw
-        bind:pitch
-        size={props.size}
-        transitionDurationMs={props.transitionDurationMs}
-        isUpright={props.isUpright}
-        isDraggable={props.isDraggable}
-        ariaLabel={"Six faces, kept upright"}
-        computeFaceLabel={computeCuboidFaceLabel}
-        onMount={(next) => {
-            controller = next;
-        }}
-    >
-        {#snippet renderFace(face, state)}
-            <PageCuboidFace {face} {state} />
-        {/snippet}
-    </Cuboid>
+    <PageMeasureBox>
+        <Cuboid
+            bind:yaw
+            bind:pitch
+            size={props.size}
+            transitionDurationMs={props.transitionDurationMs}
+            isUpright={props.isUpright}
+            isDraggable={props.isDraggable}
+            ariaLabel={"Six faces, kept upright"}
+            computeFaceLabel={computeCuboidFaceLabel}
+            onMount={(next) => {
+                controller = next;
+            }}
+        >
+            {#snippet renderFace(face, state)}
+                <PageCuboidFace {face} {state} />
+            {/snippet}
+        </Cuboid>
+    </PageMeasureBox>
 
     <PageCuboidPad>
         <div></div>

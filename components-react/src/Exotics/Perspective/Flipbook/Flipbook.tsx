@@ -2,8 +2,6 @@ import { type KeyboardEvent, type ReactNode, useEffect, useLayoutEffect, useRef,
 
 import {
     FLIPBOOK_DEFAULTS,
-    type FlipbookStep,
-    type FlipbookStepRenderProps,
     FlipbookStyles,
     FlipbookUtils,
     LiveAnnouncerUtils,
@@ -11,35 +9,19 @@ import {
     SpineUtils,
 } from "@thewaver/ss-components";
 import { FlipbookConst } from "@thewaver/ss-components/internal";
+import { StoreUtils } from "@thewaver/ss-utils";
 
 import { InteractionTrackerReactUtils } from "../../../Abstracts/InteractionTracker/InteractionTrackerReact.utils";
 import { SignalMirrorReactUtils } from "../../../Abstracts/SignalMirror/SignalMirrorReact.utils";
-import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import { Spine } from "../../../Primitives/Spine/Spine";
 import { useLatest } from "../../../Utils/refUtils";
 import { useStore } from "../../../Utils/storeUtils";
-import type { FlipbookControlProps, FlipbookControls, FlipbookProps } from "./Flipbook.types";
+import type { FlipbookControls, FlipbookProps } from "./Flipbook.types";
 
-const FlipbookControl = (props: FlipbookControlProps) => {
-    const isDisabled = props.flags.isDisabled ?? false;
+type ControlsSnapshot = { index: number; pageCount: number; isDisabled: boolean };
 
-    return (
-        <button
-            ref={props.ref}
-            type="button"
-            className={FlipbookStyles.flipbookControl}
-            aria-label={props.ariaLabel}
-            aria-disabled={isDisabled || undefined}
-            onClick={() => {
-                if (isDisabled) return;
-
-                props.onActivate();
-            }}
-        >
-            {props.renderContent(props.flags)}
-        </button>
-    );
-};
+const getIsSameSnapshot = (first: ControlsSnapshot, second: ControlsSnapshot) =>
+    first.index === second.index && first.pageCount === second.pageCount && first.isDisabled === second.isDisabled;
 
 export const Flipbook = <T,>(props: FlipbookProps<T>) => {
     useEffect(() => LiveAnnouncerUtils.reserve("polite"), []);
@@ -56,7 +38,6 @@ export const Flipbook = <T,>(props: FlipbookProps<T>) => {
 
     const pageCount = props.pages.length;
     const currentIndex = FlipbookUtils.clampSpread(index, pageCount);
-    const spreadCount = FlipbookUtils.getSpreadCount(pageCount);
     const isDisabled = props.isDisabled ?? false;
     const commitRatio = props.commitRatio ?? FLIPBOOK_DEFAULTS.commitRatio;
     const transitionDurationMs = props.transitionDurationMs ?? FLIPBOOK_DEFAULTS.transitionDurationMs;
@@ -82,7 +63,7 @@ export const Flipbook = <T,>(props: FlipbookProps<T>) => {
 
     const position = useStore(book.position);
 
-    const isDragDisabled = FlipbookUtils.getIsDragDisabled(props.renderControls !== undefined, isDisabled, pageCount);
+    const isDragDisabled = FlipbookUtils.getIsDragDisabled(isDisabled, pageCount);
 
     InteractionTrackerReactUtils.useAxialSwipe(bookRef, isDragDisabled, {
         axis: "horizontal",
@@ -126,28 +107,29 @@ export const Flipbook = <T,>(props: FlipbookProps<T>) => {
         e.preventDefault();
     };
 
-    const renderStepControl = (step: FlipbookStep): ReactNode => (
-        <InteractionWrapper<FlipbookStepRenderProps>
-            key={step}
-            isDisabled={FlipbookUtils.getIsStepDisabled(step, currentIndex, pageCount, isDisabled)}
-            extraFlags={{ step, targetIndex: FlipbookUtils.getStepTarget(step, currentIndex, pageCount) }}
-            renderControl={(setElementRef, renderProps) => (
-                <FlipbookControl
-                    ref={setElementRef}
-                    ariaLabel={props.computeStepLabel(step)}
-                    flags={renderProps}
-                    renderContent={() => props.renderStep?.(step, renderProps)}
-                    onActivate={() => book.turn(step)}
-                />
-            )}
-        />
-    );
+    const snapshot: ControlsSnapshot = { index: currentIndex, pageCount, isDisabled };
 
-    const controls: FlipbookControls = {
-        index: currentIndex,
-        spreadCount,
-        renderStep: renderStepControl,
-    };
+    const [controlsStore] = useState(() => StoreUtils.create(snapshot, { isEqual: getIsSameSnapshot }));
+
+    useLayoutEffect(() => {
+        controlsStore.set(snapshot);
+    });
+
+    const [controls] = useState<FlipbookControls>(() => ({
+        getIndex: () => controlsStore.get().index,
+        getSpreadCount: () => FlipbookUtils.getSpreadCount(controlsStore.get().pageCount),
+        getCanTurn: (step) => {
+            const current = controlsStore.get();
+
+            return !FlipbookUtils.getIsStepDisabled(step, current.index, current.pageCount, current.isDisabled);
+        },
+        turn: book.turn,
+        subscribe: controlsStore.subscribe,
+    }));
+
+    useEffect(() => {
+        props.onMount?.(controls);
+    }, [controls]);
 
     const renderLeafPage = (leaf: number, side: SpineSide): ReactNode => {
         const page = FlipbookUtils.getLeafPage(leaf, side, pageCount);
@@ -169,7 +151,6 @@ export const Flipbook = <T,>(props: FlipbookProps<T>) => {
     return (
         <div
             className={FlipbookStyles.flipbookRoot}
-            style={{ gap: `${props.gap ?? FLIPBOOK_DEFAULTS.gap}px` }}
             role="region"
             aria-roledescription={props.roleDescription ?? FLIPBOOK_DEFAULTS.roleDescription}
             aria-label={props.ariaLabel}
@@ -189,8 +170,6 @@ export const Flipbook = <T,>(props: FlipbookProps<T>) => {
                     renderFace={(_leaf, leaf, side) => renderLeafPage(leaf, side)}
                 />
             </div>
-
-            {props.renderControls?.(controls)}
         </div>
     );
 };

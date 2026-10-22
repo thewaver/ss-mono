@@ -46,12 +46,14 @@ const isStackedInReverse = shallowRef(FormationKnobs.STARTING_IS_STACKED_IN_REVE
 const transitionDurationMs = shallowRef(FORMATION_DEFAULTS.transitionDurationMs);
 const transitionDelayMs = shallowRef(FORMATION_DEFAULTS.transitionDelayMs);
 const layoutDefs = shallowRef<Record<string, Record<string, number | boolean>>>({});
+const widths = shallowRef<Partial<Record<PlacementLayouts.SampleKey, number>>>({});
 const effectDefs = shallowRef<Record<string, Record<string, number | boolean>>>({});
 
 const family = computed(() => PlacementLayouts.SAMPLE_LAYOUTS[layoutKey.value].family);
 const knobs = computed(() => PlacementLayoutKnobs.KNOBS_BY_FAMILY[family.value] as Record<string, Knob>);
 const defaults = computed(() => PlacementLayoutDefaults.DEFAULTS_BY_FAMILY[family.value] as Record<string, unknown>);
 const defs = computed(() => layoutDefs.value[layoutKey.value] ?? NO_DEFS);
+const width = computed(() => widths.value[layoutKey.value] ?? FormationKnobs.STARTING_WIDTHS[layoutKey.value]);
 
 const layoutEntry = computed(() => ({ family: family.value, defs: defs.value }) as unknown as PlacementLayoutEntry);
 
@@ -92,6 +94,7 @@ const commonProps = computed<FormationExampleProps>(() => ({
     shapeKind: shapeKind.value,
     transitionDurationMs: transitionDurationMs.value,
     transitionDelayMs: transitionDelayMs.value,
+    width: width.value,
 }));
 
 const setLayoutDef = (key: string, value: number | boolean) => {
@@ -132,6 +135,24 @@ const examples: ExampleDefs[] = [
                     :width="FIELD_WIDTH"
                     ariaLabel="Arrangement"
                     @change="(value: PlacementLayouts.SampleKey) => (layoutKey = value)"
+                />
+            </PageProp>
+
+            <PageProp
+                item-key="width"
+                controls="Sets the width of the box the example's Formation fills"
+                label="Width (px)"
+                hint="How wide the box holding the arrangement is. Every arrangement is measured against it, so this scales the whole thing; each one starts at a width that suits it, and remembers yours."
+            >
+                <PageNumberField
+                    :key="layoutKey"
+                    :value="width"
+                    :min="FormationKnobs.MIN_WIDTH"
+                    :max="FormationKnobs.MAX_WIDTH"
+                    :step="FormationKnobs.WIDTH_STEP"
+                    :width="FIELD_WIDTH"
+                    ariaLabel="Width in pixels"
+                    @input="(value: number) => (widths = { ...widths, [layoutKey]: value })"
                 />
             </PageProp>
 

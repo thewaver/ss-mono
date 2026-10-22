@@ -22,7 +22,7 @@
     {@const defs = props.computeFaceDefs(index, face)}
     <div
         class={styles.barrelFace}
-        style:transform={BarrelUtils.getFaceTransform(axis, face, props.angle, index, faceCount, apothem)}
+        style:transform={BarrelUtils.getFaceTurnTransform(axis, props.angle, index, faceCount)}
         style:transition-duration={toMs(props.transitionDurationMs)}
         style:transition-delay={toMs(props.transitionDelayMs)}
         role="group"
@@ -31,7 +31,9 @@
         aria-hidden={defs.isHidden ? "true" : undefined}
         inert={defs.isHidden}
     >
-        {@render props.renderFace(item, index, face)}
+        <div class={styles.barrelFaceOffset} style:transform={BarrelUtils.getFaceOffsetTransform(axis, face, apothem)}>
+            {@render props.renderFace(item, index, face)}
+        </div>
     </div>
 {/snippet}
 

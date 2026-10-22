@@ -29,13 +29,6 @@ export type FlipbookPageState = {
     isShowing: boolean;
 };
 
-export type FlipbookStepRenderProps = {
-    /** Which way this control turns the book. */
-    step: FlipbookStep;
-    /** Which spread this control would open the book at. At either end it is the spread already open. */
-    targetIndex: number;
-};
-
 export type FlipbookBookDefs = {
     /** How many pages there are. */
     getPageCount: () => number;
@@ -56,7 +49,7 @@ export type FlipbookBook = {
      */
     position: Store<number>;
     /**
-     * Opens the book one spread further or one back, as a step control or an arrow key would.
+     * Opens the book one spread further or one back, as the controller's `turn` or an arrow key would.
      *
      * @returns `false` when the book is disabled or already open at that end.
      */
@@ -87,9 +80,7 @@ export type FlipbookState = {
      * the book's whole width. Dragging the full width turns a page all the way over.
      */
     commitRatio?: number;
-    /** The space between the book and the controls the consumer draws beside it. */
-    gap?: number;
-    /** Turns the book off, so neither its controls, its keys nor a drag turn a page. */
+    /** Turns the book off, so neither its controller, its keys nor a drag turn a page. */
     isDisabled?: boolean;
     /** Names the book for assistive technology. The book is a region, and a region must be named. */
     ariaLabel: string;
@@ -108,8 +99,6 @@ export type FlipbookLabels = {
      * four of twelve. Nothing is announced as the book first appears.
      */
     computeSpreadAnnouncement: (pages: number[], count: number) => string;
-    /** Names one of the step controls. */
-    computeStepLabel: (step: FlipbookStep) => string;
     /** What the book is called when it is announced, so a reader hears book rather than region. Defaults to "book". */
     roleDescription?: string;
     /** What one page is called when it is announced, so a reader hears page rather than group. Defaults to "page". */

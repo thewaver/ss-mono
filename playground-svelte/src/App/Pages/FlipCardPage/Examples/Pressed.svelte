@@ -11,6 +11,7 @@
     import PageFlipCardStack from "../../../StyledComponents/FlipCardContent/PageFlipCardStack.svelte";
     import PageRangeContent from "../../../StyledComponents/RangeContent/RangeContent.svelte";
     import type { FlipCardPressedExampleProps } from "../FlipCardPage.types";
+    import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.svelte";
 
     const CARD_SIZE = { width: 220, height: 300 };
 
@@ -46,24 +47,26 @@
 </script>
 
 <PageFlipCardStack>
-    <FlipCard
-        bind:flipped
-        axis={props.axis}
-        size={CARD_SIZE}
-        transitionDurationMs={props.transitionDurationMs}
-        {turnDirection}
-        {peekRatio}
-        ariaLabel={"Queen of spades"}
-        computeFaceLabel={computeFlipCardFaceLabel}
-    >
-        {#snippet renderFront(state)}
-            <PageFlipCardFront {state}>Q ♠</PageFlipCardFront>
-        {/snippet}
+    <PageMeasureBox>
+        <FlipCard
+            bind:flipped
+            axis={props.axis}
+            size={CARD_SIZE}
+            transitionDurationMs={props.transitionDurationMs}
+            {turnDirection}
+            {peekRatio}
+            ariaLabel={"Queen of spades"}
+            computeFaceLabel={computeFlipCardFaceLabel}
+        >
+            {#snippet renderFront(state)}
+                <PageFlipCardFront {state}>Q ♠</PageFlipCardFront>
+            {/snippet}
 
-        {#snippet renderBack(state)}
-            <PageFlipCardBack {state}>♥ ♦ ♣</PageFlipCardBack>
-        {/snippet}
-    </FlipCard>
+            {#snippet renderBack(state)}
+                <PageFlipCardBack {state}>♥ ♦ ♣</PageFlipCardBack>
+            {/snippet}
+        </FlipCard>
+    </PageMeasureBox>
 
     <div class={styles.controls}>
         {#each FLIP_CARD_TURN_DIRECTIONS as direction (direction)}

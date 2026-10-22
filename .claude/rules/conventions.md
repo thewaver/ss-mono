@@ -145,6 +145,15 @@ centering shift along with the element and leaves it half its own size off the p
 faces. Write `translate(x, y) translate(-50%, -50%) rotate(a)`. It looks right at nought degrees and on any square
 element, which is why it survives review; an oblong shows it.
 
+### A component that turns in 3D takes the room of its content at rest, and a turn spills past it
+
+The user's rule. Something turning under perspective is drawn larger on its near side part-way through a turn, so
+it reaches past its own box; that spill is allowed. **What the box is sized to is the content at rest**, and room set
+aside only for the bulge of a turn stands empty whenever nothing moves. A solid that shows several faces at rest — a
+drum of three faces or more, a die — is sized to that silhouette, since it is content at rest. Where which face rests
+in front varies, the faces the box is sized for are decided once rather than followed (a cuboid is sized to its front
+face), so the page never moves as it turns.
+
 ### `isFocused` is focus and `isFocusVisible` is the ring
 
 Both reach every painter, and confusing them rings a control somebody clicked.

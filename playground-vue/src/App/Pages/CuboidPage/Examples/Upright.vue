@@ -6,6 +6,7 @@ import type { CuboidController, CuboidFace } from "@thewaver/ss-components-vue";
 import { computeCuboidFaceLabel } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
 import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
+import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.vue";
 import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
 import PageCuboidFace from "../../../StyledComponents/CuboidContent/PageCuboidFace.vue";
 import PageCuboidPad from "../../../StyledComponents/CuboidContent/PageCuboidPad.vue";
@@ -38,21 +39,23 @@ const turnTo = (face: CuboidFace) => {
 
 <template>
     <PageCuboidStack>
-        <Cuboid
-            v-model:yaw="yaw"
-            v-model:pitch="pitch"
-            :size="size"
-            :transition-duration-ms="transitionDurationMs"
-            :is-upright="isUpright"
-            :is-draggable="isDraggable"
-            ariaLabel="Six faces, kept upright"
-            :compute-face-label="computeCuboidFaceLabel"
-            @mount="(next: CuboidController) => (controller = next)"
-        >
-            <template #renderFace="{ face, state }">
-                <PageCuboidFace :face="face" :state="state" />
-            </template>
-        </Cuboid>
+        <PageMeasureBox>
+            <Cuboid
+                v-model:yaw="yaw"
+                v-model:pitch="pitch"
+                :size="size"
+                :transition-duration-ms="transitionDurationMs"
+                :is-upright="isUpright"
+                :is-draggable="isDraggable"
+                ariaLabel="Six faces, kept upright"
+                :compute-face-label="computeCuboidFaceLabel"
+                @mount="(next: CuboidController) => (controller = next)"
+            >
+                <template #renderFace="{ face, state }">
+                    <PageCuboidFace :face="face" :state="state" />
+                </template>
+            </Cuboid>
+        </PageMeasureBox>
 
         <PageCuboidPad>
             <div />

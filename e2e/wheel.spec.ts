@@ -70,9 +70,9 @@ const transformOf = (page: import("@playwright/test").Page, scope: string) =>
 
 /**
  * How far round the wheel has been, in degrees, read off the first wedge. Every variant writes the angle as
- * the first number in the wedge's transform — an overhead wedge is `rotate(a)` and a drum face is `rotateY(-a)`
- * before its own offset — and the first wedge has no offset, so the sign is the only difference and the
- * magnitude is the angle. The angle only ever increases, so the difference across a spin is the distance
+ * the first number in the wedge's transform — an overhead wedge is `rotate(a)` and a drum face is `rotateY(-a)`,
+ * its offset out from the axis sitting on an inner layer — and the first wedge has no offset, so the sign is the
+ * only difference and the magnitude is the angle. The angle only ever increases, so the difference across a spin is the distance
  * traveled rather than a position modulo a turn.
  */
 const turnedAngle = async (page: import("@playwright/test").Page, scope: string) =>
@@ -82,11 +82,13 @@ const turnedAngle = async (page: import("@playwright/test").Page, scope: string)
  * The same question as `pickedWedges`, asked of a drum. A drum face is a card rather than a slice of an SVG,
  * so what changes when it is picked out is the card's own background rather than a `fill` — but the reading
  * is the same either way: whatever the majority of the faces share is the unpicked look, and anything else
- * is a pick. Only the front faces are counted, since a back is never at the marker.
+ * is a pick. Only the front faces are counted, since a back is never at the marker. A face is two layers — the
+ * turn, and inside it the distance out from the axis, kept apart so a change of face count never animates the
+ * distance — so the card is the child of the inner one.
  */
 const pickedCards = (page: import("@playwright/test").Page, scope: string) =>
     page.evaluate((selector) => {
-        const cards = [...document.querySelectorAll(`${selector} > div`)].filter(
+        const cards = [...document.querySelectorAll(`${selector} > div > div`)].filter(
             (card) => (card as HTMLElement).innerText !== "",
         );
         const backgrounds = cards.map((card) => getComputedStyle(card).backgroundImage);

@@ -10,6 +10,7 @@ import {
 import * as styles from "@thewaver/ss-playground/App/Pages/DiePage/DiePage.css";
 import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
+import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
 import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import { PageDieIcon } from "../../../StyledComponents/DieContent/DieContent";
 import type { IconCloudExampleProps } from "../DiePage.types";
@@ -23,21 +24,25 @@ export const IconCloudExample = (props: Props) => {
 
     return (
         <div className={styles.stage}>
-            <Die
-                shape={props.shape}
-                size={props.size}
-                idleDelayMs={props.idleDelayMs}
-                settleDurationMs={props.settleDurationMs}
-                momentumMs={props.momentumMs}
-                face={props.face}
-                autoSpin={props.autoSpin}
-                isMovable={true}
-                isSeeThrough={true}
-                ariaLabel={"A cloud of icons"}
-                computeFaceLabel={(index) => ICON_CLOUD_ICONS[index]?.label ?? ICON_CLOUD_EMPTY_LABEL}
-                renderFace={(index, state) => <PageDieIcon state={state} icon={ICON_CLOUD_ICONS[index]?.icon ?? ""} />}
-                onMount={setController}
-            />
+            <PageMeasureBox>
+                <Die
+                    shape={props.shape}
+                    size={props.size}
+                    idleDelayMs={props.idleDelayMs}
+                    settleDurationMs={props.settleDurationMs}
+                    momentumMs={props.momentumMs}
+                    face={props.face}
+                    autoSpin={props.autoSpin}
+                    isMovable={true}
+                    isSeeThrough={true}
+                    ariaLabel={"A cloud of icons"}
+                    computeFaceLabel={(index) => ICON_CLOUD_ICONS[index]?.label ?? ICON_CLOUD_EMPTY_LABEL}
+                    renderFace={(index, state) => (
+                        <PageDieIcon state={state} icon={ICON_CLOUD_ICONS[index]?.icon ?? ""} />
+                    )}
+                    onMount={setController}
+                />
+            </PageMeasureBox>
 
             <div className={styles.controls}>
                 <Button

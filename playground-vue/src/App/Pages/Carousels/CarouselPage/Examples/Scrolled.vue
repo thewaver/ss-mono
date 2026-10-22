@@ -2,11 +2,7 @@
 import { shallowRef, useModel } from "vue";
 
 import { Carousel, ElementObserverVueUtils } from "@thewaver/ss-components-vue";
-import {
-    computeCarouselRotationLabel,
-    computeCarouselStepLabel,
-    computePositionLabel,
-} from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
+import { computePositionLabel } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/Carousels/Carousels.css";
 
 import type { CarouselExampleProps } from "../../Carousels.types";
@@ -39,8 +35,6 @@ const progress = ElementObserverVueUtils.useScrollContainerProgress(runwayRef, b
                 :transition-duration-ms="transitionDurationMs"
                 ariaLabel="Scrolled sampler"
                 :compute-slide-label="computePositionLabel"
-                :compute-step-label="computeCarouselStepLabel"
-                :compute-rotation-label="computeCarouselRotationLabel"
             >
                 <template #renderSlide="{ slide, state }">
                     <SlideFront :title="slide" :state="state" :frame-class="frameClasses.front" />

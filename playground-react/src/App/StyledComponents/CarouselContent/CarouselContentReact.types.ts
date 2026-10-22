@@ -1,3 +1,5 @@
+import type { PropsWithChildren, Ref } from "react";
+
 import type {
     BaseCarouselPickProps,
     BaseCarouselRotationProps,
@@ -6,6 +8,8 @@ import type {
 } from "@thewaver/ss-playground/App/StyledComponents/CarouselContent/CarouselContent.types";
 
 export type CarouselSlideProps = BaseCarouselSlideProps;
+
+export type CarouselBarProps = PropsWithChildren<{ ref?: Ref<HTMLDivElement> }>;
 
 export type CarouselStepProps = BaseCarouselStepProps;
 

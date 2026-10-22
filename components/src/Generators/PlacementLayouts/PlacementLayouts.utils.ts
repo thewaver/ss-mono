@@ -400,20 +400,21 @@ export namespace PlacementLayoutUtils {
     /**
      * Places items in a line down the box.
      *
-     * A row read down rather than across, and the one difference is that a column chooses how much of the
-     * width to take while a row has no choice but to fill it. Its items give way vertically.
+     * A row read down rather than across: its items fill the box's width, as a row's fill its width, so a narrow
+     * column is a narrow box — the consumer sets the width on whatever holds it, and the column grows as tall as its
+     * items come to. Its items give way vertically.
      *
-     * @param defs How wide an item is against the box, how tall it is against itself, and the gap between.
+     * @param defs How tall an item is against its own width, and the gap between.
      * @returns A layout function, fitted — its height is whatever the items come to.
      */
     export const createColumn = (defs?: ColumnDefs): FittedLayoutFn => {
         const gapRatio = defs?.gapRatio ?? PlacementLayoutDefaults.COLUMN_DEFAULTS.gapRatio;
-        const itemWidthRatio = defs?.itemWidthRatio ?? PlacementLayoutDefaults.COLUMN_DEFAULTS.itemWidthRatio;
         const itemHeightRatio = defs?.itemHeightRatio ?? PlacementLayoutDefaults.COLUMN_DEFAULTS.itemHeightRatio;
-        const height = itemWidthRatio * itemHeightRatio;
 
         return ({ itemCount }) => ({
-            ...toFittedLayout(toRun(itemCount, { x: itemWidthRatio, y: height }, height * gapRatio, true)),
+            ...toFittedLayout(
+                toRun(itemCount, { x: FULL_SHARE, y: itemHeightRatio }, itemHeightRatio * gapRatio, true),
+            ),
             reachRule: "vertical",
         });
     };

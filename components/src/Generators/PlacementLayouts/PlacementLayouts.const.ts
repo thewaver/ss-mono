@@ -25,7 +25,6 @@ export namespace PlacementLayoutDefaults {
 
     export const COLUMN_DEFAULTS: Required<ColumnDefs> = {
         gapRatio: 0,
-        itemWidthRatio: 0.25,
         itemHeightRatio: 1,
     };
 

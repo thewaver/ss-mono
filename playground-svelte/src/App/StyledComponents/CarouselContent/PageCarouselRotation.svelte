@@ -9,5 +9,5 @@
 
 <PageControlButtonContent
     flags={props.flags}
-    glyph={props.flags.isPlaying ? CONTROL_GLYPHS.pause : CONTROL_GLYPHS.play}
+    glyph={props.isPlaying ? CONTROL_GLYPHS.pause : CONTROL_GLYPHS.play}
 />

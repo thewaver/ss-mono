@@ -8,6 +8,8 @@ import type {
 
 export type CarouselSlideProps = AccessorValues<BaseCarouselSlideValues>;
 
+export type CarouselBarProps = { ref?: (element: HTMLDivElement) => void };
+
 export type CarouselStepProps = AccessorValues<BaseCarouselStepValues>;
 
 export type CarouselPickProps = AccessorValues<BaseCarouselPickValues>;

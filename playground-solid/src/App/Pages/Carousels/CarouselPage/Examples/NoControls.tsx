@@ -1,9 +1,5 @@
 import { Carousel, access } from "@thewaver/ss-components-solid";
-import {
-    computeCarouselRotationLabel,
-    computeCarouselStepLabel,
-    computePositionLabel,
-} from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
+import { computePositionLabel } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
 
 import type { CarouselExampleProps } from "../../Carousels.types";
 import { SlideBack, SlideFront } from "./Slide";
@@ -21,8 +17,6 @@ export const NoControlsExample = (props: Props) => {
             transitionDurationMs={props.transitionDurationMs}
             ariaLabel={"Bare sampler"}
             computeSlideLabel={computePositionLabel}
-            computeStepLabel={computeCarouselStepLabel}
-            computeRotationLabel={computeCarouselRotationLabel}
             renderSlide={(getSlide, getState) => (
                 <SlideFront title={getSlide()} state={getState} frameClass={() => access(props.frameClasses).front} />
             )}

@@ -2,11 +2,7 @@
 import { useModel } from "vue";
 
 import { Carousel } from "@thewaver/ss-components-vue";
-import {
-    computeCarouselRotationLabel,
-    computeCarouselStepLabel,
-    computePositionLabel,
-} from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
+import { computePositionLabel } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
 
 import type { CarouselExampleProps } from "../../Carousels.types";
 import SlideBack from "./SlideBack.vue";
@@ -29,8 +25,6 @@ const index = useModel(props, "index");
         :transition-duration-ms="transitionDurationMs"
         ariaLabel="Bare sampler"
         :compute-slide-label="computePositionLabel"
-        :compute-step-label="computeCarouselStepLabel"
-        :compute-rotation-label="computeCarouselRotationLabel"
     >
         <template #renderSlide="{ slide, state }">
             <SlideFront :title="slide" :state="state" :frame-class="frameClasses.front" />

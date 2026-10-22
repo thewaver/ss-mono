@@ -20,10 +20,23 @@ export namespace FormationKnobs {
     export const MIN_STAGGER_MS = 0;
     export const MAX_STAGGER_MS = 500;
     export const STAGGER_STEP_MS = 10;
+    export const MIN_WIDTH = 60;
+    export const MAX_WIDTH = 600;
+    export const WIDTH_STEP = 10;
 
     export const STARTING_ITEM_COUNT = 6;
     export const STARTING_LAYOUT_KEY: PlacementLayouts.SampleKey = "row";
     export const STARTING_EFFECT_KEY: ProximityEffects.SampleKey = "zoom_in";
     export const STARTING_SHAPE_KIND: ShapeConst.DefaultShape = "lozenge";
     export const STARTING_IS_STACKED_IN_REVERSE = false;
+    export const STARTING_WIDTHS: Record<PlacementLayouts.SampleKey, number> = {
+        arc: 380,
+        cliff: 260,
+        column: 100,
+        honeycomb: 300,
+        ring: 320,
+        row: 380,
+        whorl: 300,
+        zigzag: 240,
+    };
 }

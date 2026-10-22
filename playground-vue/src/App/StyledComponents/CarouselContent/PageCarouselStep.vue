@@ -8,5 +8,5 @@ defineProps<CarouselStepProps>();
 </script>
 
 <template>
-    <PageControlButtonContent :flags="renderProps" :glyph="STEP_GLYPHS[renderProps.step]" />
+    <PageControlButtonContent :flags="flags" :glyph="STEP_GLYPHS[step]" />
 </template>

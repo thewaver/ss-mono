@@ -106,11 +106,18 @@ export namespace BarrelUtils {
     /**
      * How much room to reserve across a barrel, perspective included.
      *
+     * A barrel of three faces or more shows several of them at rest, curving away either side of the one in front, so
+     * its room is the silhouette it really has standing still. A two-face barrel rests flat, one face square to the
+     * viewer, so its room is exactly that face: the bulge of a turn is allowed to spill past it rather than being set
+     * aside as room nothing uses at rest.
+     *
      * @param faceExtent A face's width along the turning direction.
      * @param faceCount How many faces the barrel has.
      */
     export const getGirth = (faceExtent: number, faceCount: number) =>
-        getProjectedExtent(getCircumdiameter(faceExtent, faceCount) * HALF, getApothem(faceExtent, faceCount));
+        faceCount <= MIN_BARREL_FACE_COUNT
+            ? faceExtent
+            : getProjectedExtent(getCircumdiameter(faceExtent, faceCount) * HALF, getApothem(faceExtent, faceCount));
 
     /**
      * How much room the whole barrel takes: its girth along the way it turns, and one face across the other way.
@@ -123,27 +130,29 @@ export namespace BarrelUtils {
         axis === "row" ? { width: girth, height: faceSize.height } : { width: faceSize.width, height: girth };
 
     /**
-     * The transform that puts one face on the barrel's surface.
+     * The turn that puts one face at its place round the barrel.
+     *
+     * A face is two elements: this turn goes on the outer one, which is the one transitioned, and
+     * {@link getFaceOffsetTransform} on the inner one, which never is. Kept apart so that a change of face count
+     * moves each face out to its new distance at once while only the turn animates — one transform carrying both
+     * would animate the distance as well, and for the length of a turn the faces would sit outside the room the
+     * barrel had already resized to.
      *
      * @param axis Which way the barrel turns.
-     * @param face `"front"` or `"back"`. A back is turned a further half turn so it faces outwards.
      * @param angle How far the barrel is currently turned.
      * @param index Which face this is.
      * @param faceCount How many faces the barrel has.
+     */
+    export const getFaceTurnTransform = (axis: BarrelAxis, angle: number, index: number, faceCount: number) =>
+        `${axis === "row" ? "rotateY" : "rotateX"}(${-angle - RotationUtils.getStepAngle(faceCount) * index}deg)`;
+
+    /**
+     * The move that puts one face out on the barrel's surface, once {@link getFaceTurnTransform} has turned it.
+     *
+     * @param axis Which way the barrel turns.
+     * @param face `"front"` or `"back"`. A back is turned a further half turn so it faces outwards.
      * @param apothem How far a face sits from the axis.
      */
-    export const getFaceTransform = (
-        axis: BarrelAxis,
-        face: BarrelFace,
-        angle: number,
-        index: number,
-        faceCount: number,
-        apothem: number,
-    ) => {
-        const rotate = axis === "row" ? "rotateY" : "rotateX";
-        const faceAngle = -angle - RotationUtils.getStepAngle(faceCount) * index;
-        const flip = face === "back" ? ` ${rotate}(${HALF_TURN_DEG}deg)` : "";
-
-        return `${rotate}(${faceAngle}deg) translateZ(${apothem}px)${flip}`;
-    };
+    export const getFaceOffsetTransform = (axis: BarrelAxis, face: BarrelFace, apothem: number) =>
+        `translateZ(${apothem}px)${face === "back" ? ` ${axis === "row" ? "rotateY" : "rotateX"}(${HALF_TURN_DEG}deg)` : ""}`;
 }

@@ -1,15 +1,11 @@
-import type { Accessor, JSX } from "solid-js";
+import type { Accessor } from "solid-js";
 import { Index, Show, createEffect, createMemo, createSignal, on, onCleanup, onMount, untrack } from "solid-js";
 
 import {
     CAROUSEL_DEFAULTS,
     type CarouselFace,
-    type CarouselPickRenderProps,
     type CarouselPlacement,
-    type CarouselRotationFlags,
     type CarouselSlideState,
-    type CarouselStep,
-    type CarouselStepRenderProps,
     CarouselUtils,
     LiveAnnouncerUtils,
     CarouselStyles as styles,
@@ -19,31 +15,8 @@ import { CarouselConst } from "@thewaver/ss-components/internal";
 import { ElementObserverSolidUtils } from "../../Abstracts/ElementObserver/ElementObserverSolid.utils";
 import { InteractionTrackerSolidUtils } from "../../Abstracts/InteractionTracker/InteractionTrackerSolid.utils";
 import { SignalMirrorSolidUtils } from "../../Abstracts/SignalMirror/SignalMirrorSolid.utils";
-import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
 import { access } from "../../Utils/propUtils";
-import type { CarouselControlProps, CarouselControls, CarouselProps } from "./CarouselSolid.types";
-
-const CarouselControl = (props: CarouselControlProps) => {
-    const getIsDisabled = () => access(props.flags).isDisabled ?? false;
-
-    return (
-        <button
-            ref={(element) => props.ref?.(element)}
-            type="button"
-            class={styles.carouselControl}
-            aria-label={access(props.ariaLabel)}
-            aria-disabled={getIsDisabled() || undefined}
-            aria-current={access(props.isCurrent) || undefined}
-            onClick={() => {
-                if (getIsDisabled()) return;
-
-                props.onActivate();
-            }}
-        >
-            {props.renderContent(() => access(props.flags))}
-        </button>
-    );
-};
+import type { CarouselControls, CarouselProps } from "./CarouselSolid.types";
 
 export const Carousel = <T,>(props: CarouselProps<T>) => {
     onMount(() => LiveAnnouncerUtils.reserve("polite"));
@@ -81,7 +54,11 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
 
     const getAutoplayDelayMs = createMemo(() => access(props.autoplayDelayMs));
 
-    const getIsHeld = InteractionTrackerSolidUtils.trackHold(getRootRef);
+    const [getIsHeldByPage, setIsHeldByPage] = createSignal(false);
+
+    const getIsHeldWithin = InteractionTrackerSolidUtils.trackHold(getRootRef);
+
+    const getIsHeld = createMemo(() => getIsHeldWithin() || getIsHeldByPage());
 
     const getSize = ElementObserverSolidUtils.createBorderBoxSizeObserver(getViewportRef);
 
@@ -110,7 +87,7 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
     const toIndex = (place: number) => place % Math.max(getCount(), 1);
 
     const getIsPressDisabled = () =>
-        CarouselUtils.getIsSwipeDisabled(props.renderControls !== undefined, getIsDisabled(), getCount());
+        CarouselUtils.getIsSwipeDisabled(props.progress !== undefined, getIsDisabled(), getCount());
 
     let stopGlide: (() => void) | undefined;
     let writtenProgress: number | undefined;
@@ -302,69 +279,6 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
         if (hit !== undefined) goTo(toIndex(hit));
     };
 
-    const renderStepControl = (step: CarouselStep): JSX.Element => {
-        const getTargetIndex = () => CarouselUtils.getStepTarget(step, getCurrentIndex(), getCount(), getIsLooping());
-
-        return (
-            <InteractionWrapper<CarouselStepRenderProps>
-                isDisabled={() =>
-                    CarouselUtils.getIsStepDisabled(
-                        step,
-                        getCurrentIndex(),
-                        getCount(),
-                        getIsLooping(),
-                        getIsDisabled(),
-                    )
-                }
-                extraFlags={() => ({ step, targetIndex: getTargetIndex() })}
-                renderControl={(setElementRef, getRenderProps) => (
-                    <CarouselControl
-                        ref={setElementRef}
-                        isCurrent={false}
-                        ariaLabel={() => props.computeStepLabel(step)}
-                        flags={getRenderProps}
-                        renderContent={() => props.renderStep?.(() => step, getRenderProps)}
-                        onActivate={() => goTo(getTargetIndex())}
-                    />
-                )}
-            />
-        );
-    };
-
-    const renderPickControl = (index: number): JSX.Element => (
-        <InteractionWrapper<CarouselPickRenderProps>
-            isDisabled={getIsDisabled}
-            extraFlags={() => ({ index, isCurrent: index === getCurrentIndex() })}
-            renderControl={(setElementRef, getRenderProps) => (
-                <CarouselControl
-                    ref={setElementRef}
-                    isCurrent={() => getRenderProps().isCurrent}
-                    ariaLabel={() => getSlideLabel(index)}
-                    flags={getRenderProps}
-                    renderContent={() => props.renderPick?.(() => index, getRenderProps)}
-                    onActivate={() => goTo(index)}
-                />
-            )}
-        />
-    );
-
-    const renderRotationControl = (): JSX.Element => (
-        <InteractionWrapper<CarouselRotationFlags>
-            isDisabled={getIsDisabled}
-            extraFlags={() => ({ isPlaying: getIsPlaying(), isHeld: getIsHeld() })}
-            renderControl={(setElementRef, getFlags) => (
-                <CarouselControl
-                    ref={setElementRef}
-                    isCurrent={false}
-                    ariaLabel={() => props.computeRotationLabel(getIsPlaying())}
-                    flags={getFlags}
-                    renderContent={() => props.renderRotationControl?.(getFlags)}
-                    onActivate={() => setIsPlaying((prev) => !prev)}
-                />
-            )}
-        />
-    );
-
     const renderSlideAt = (getSlide: Accessor<T>, place: number) => {
         const getPlacement = createMemo(() =>
             props.placement.place({
@@ -430,16 +344,46 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
         getCount,
         getIsPlaying,
         getIsHeld,
-        renderStep: renderStepControl,
-        renderPick: renderPickControl,
-        renderRotationControl,
+        getCanStep: (step) =>
+            !CarouselUtils.getIsStepDisabled(step, getCurrentIndex(), getCount(), getIsLooping(), getIsDisabled()),
+        step: (step) => {
+            if (CarouselUtils.getIsStepDisabled(step, getCurrentIndex(), getCount(), getIsLooping(), getIsDisabled())) {
+                return false;
+            }
+
+            goTo(CarouselUtils.getStepTarget(step, getCurrentIndex(), getCount(), getIsLooping()));
+
+            return true;
+        },
+        pick: (index) => {
+            if (getIsDisabled() || index < 0 || index >= getCount() || index === getCurrentIndex()) return false;
+
+            goTo(index);
+
+            return true;
+        },
+        setIsPlaying: (isPlaying) => {
+            if (getIsDisabled() || isPlaying === getIsPlaying()) return false;
+
+            setIsPlaying(isPlaying);
+
+            return true;
+        },
+        setIsHeldByPage: (isHeld) => {
+            if (isHeld === untrack(getIsHeldByPage)) return false;
+
+            setIsHeldByPage(isHeld);
+
+            return true;
+        },
     };
+
+    onMount(() => props.onMount?.(controls));
 
     return (
         <div
             ref={setRootRef}
             class={styles.carouselRoot}
-            style={{ gap: `${access(props.gap) ?? CAROUSEL_DEFAULTS.gap}px` }}
             role="region"
             aria-roledescription={access(props.roleDescription) ?? CAROUSEL_DEFAULTS.roleDescription}
             aria-label={access(props.ariaLabel)}
@@ -455,8 +399,6 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
                     }}
                 </Index>
             </div>
-
-            {props.renderControls?.(controls)}
         </div>
     );
 };

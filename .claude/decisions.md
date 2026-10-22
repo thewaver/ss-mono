@@ -1391,9 +1391,8 @@ the other pages copy. Taken on Claude's judgment under the unsupervised port.
   getters answer with what the wheel last drew, backed by a store that ignores writes that change nothing, and one
   getter plus `subscribe` is what `useSyncExternalStore` takes. `WheelController` is the model for every other
   controller ported after it.
-- **`CarouselControls` holds plain values in React** (`index`, `count`, `isPlaying`, `isHeld`), since it is handed to
-  `renderControls`, and the elements from `renderStep`, `renderPick` and `renderRotationControl` carry their own
-  `key`, so a consumer can put a row of pickers in an array without adding keys.
+- **`CarouselControls` is handed out through `onMount` in React as in every framework**, since the carousel draws no
+  controls of its own; see _"The carousel draws no controls; the consumer builds them on a controller"_.
 - **The drum carousel's resting angle is held in React state together with the index and count it was worked out
   for**, and worked out again during render when those change, so the accumulating angle is never painted one frame
   stale.
@@ -2019,8 +2018,8 @@ folder"_ in `conventions.md`, where `Utils` marks a namespace with no type of it
 promise of purity — so the file is `FrameRateMonitor/FrameRateMonitor.utils.ts` and the namespace is
 `FrameRateMonitorUtils`. **The renaming of the subject stands**; only the file suffix moved back.
 
-**The rule reaches the abstract, not the components that use it.** A `Carousel` still has `getIsRotating`,
-`renderRotationControl` and `CarouselRotationFlags`, because those are the carousel's own vocabulary for what
+**The rule reaches the abstract, not the components that use it.** A `Carousel` still has `getIsRotating`, and its
+controller's `getIsPlaying` and `setIsPlaying`, because those are the carousel's own vocabulary for what
 it does rather than references to the abstract. `RotationUtils` in `ss-utils` keeps its name for the same
 reason from the other side: that package names a namespace `<Subject>Utils` and the subject there is the
 arithmetic, not an agent.
@@ -7680,6 +7679,19 @@ container. The `<li>` is the wrap unit, so a connector never separates from its 
 end on a connector, which is the cost. `maxWidth: 100%` on the list and `minWidth: 0` on the entry stop a
 single over-wide step escaping either edge.
 
+### `Stepper`: a layout and `renderBody` are refused together by the type
+
+**A stepper given `computeLayout` will not type-check with `renderBody` as well.** The user's call, after the placed
+stepper was found accepting a step body and then not drawing it: a body is a panel beside a straight connector, and a
+curve has nowhere to put one. Each prop stays an ordinary documented prop, and the refusal is a separate type,
+`StepperLayoutExcludesBody` — `{ computeLayout?: undefined } | { renderBody?: undefined }` — intersected into the props.
+**That shape rather than a union carrying the two props themselves**, because the Playground's prop tables list rows
+only from object types: a union of two object members printed as source text and the two props vanished from the
+`Stepper` table, while a separate rule leaves both rows in place and shows the rule as one line beside them.
+
+**Vue keeps only the warning**, since `renderBody` is a slot there and a slot cannot be refused by a type.
+`StepperUtils.warnIfBodyIgnored` still runs in every framework, for a consumer writing plain JavaScript.
+
 ### Controls: `SplitPane`, where CSS grid is the arithmetic
 
 Resizable panes with a draggable gutter between each pair.
@@ -10299,9 +10311,9 @@ when the fader stops being visible, which is after the exit has finished and the
 is path-based, so anything operable by one must also be operable with a single pointer and no path. `Modal`
 attaches it only when the alignment is an edge, and only when overlay-click dismissal is still on: `Escape`
 is the path-free route, and a consumer who has already turned off casual dismissal is not handed a more
-casual one. `Carousel` attaches it only when `renderControls` was passed, since a carousel without controls
-has no keyboard route at all — the same shape as the floater observers running only when `renderFloater` is
-passed. A consumer cannot ask for the conformance failure because there is no prop with which to ask.
+casual one. `Carousel` attached it only when `renderControls` was passed until the slot was removed; it now
+attaches it unless the page drives `progress` (a carousel moved by a scroll position leaves the gesture to the
+browser), and the single-pointer route is the consumer's to build on the controller, as `CardStack`'s is.
 
 **A swiping carousel does not rotate, for the same reason a hovered one does not.** WCAG 2.2.2 asks that
 self-moving content not move under the pointer; a finger on the track is a pointer on it. `getIsHeld` keeps
@@ -14613,15 +14625,26 @@ not a courtesy that could be dropped for a tighter API. `getIsHeld` is `hovered 
 hidden`, which is `Toasts`' expression character for character. The explicit stop is separate from the holds
 and outranks them: a stopped carousel stays stopped when the pointer leaves.
 
-**The consumer arranges the controls; the library still owns every button.** `renderControls` receives a
-`CarouselControls` object whose `renderStep`, `renderPick` and `renderRotationControl` **return elements**
-rather than taking callbacks, so a consumer writes the bar — order, wrapper, position — while each control is
-still a real `<button>` with a real name, built by the library. Deliberately not `Scroller`'s arrangement,
-where the consumer renders the button and `backlog.md` records the consequence: a library that renders no
-button cannot promise one is reachable or named. Here the split is along the line that matters — the library
-owns what the control _is_, the consumer owns where it _sits_ and what it looks like. A consumer passing no
-`renderControls` gets a carousel with no controls at all, right for one driven from elsewhere through its
-`index`.
+**The carousel draws no controls; the consumer builds them on a controller.** The first build had a
+`renderControls` slot handing the consumer elements the library built — steps, pickers, a play and pause button —
+so the library owned what a control was and the consumer where it sat. It was replaced, at the user's request, by
+the rule `CardStack` was rebuilt to (_"A component hands out a controller and renders no controls of its own"_ in
+`conventions.md`): the slot put the controls inside the carousel's own box, so nothing wrapping the carousel could
+frame the slides alone. `onMount` now hands over `step`, `pick` and `setIsPlaying` with the getters a button needs
+to disable or name itself, and the consumer draws the buttons — `Scroller`'s arrangement, with its stated cost: a
+library that renders no button cannot promise one is reachable or named. The props block says what has to be built
+on the controller: the single-pointer route WCAG 2.5.7 asks for beside the swipe, and the pause WCAG 2.2.2 asks for
+on a carousel that advances by itself.
+
+**The page's buttons hold the carousel through `setIsHeldByPage`.** With the controls inside its box, focus on Next
+held a rotating carousel by the same tracker that watches the slides; drawn outside, the carousel cannot see them,
+and a keyboard user stepping through was chased. Pausing from the page (`setIsPlaying(false)` on focus) was weighed
+and turned down by the user: it flips the play button to "play" while the person merely sits on Next, and a pause the
+person pressed would have to be told apart from one the page made. A hold has neither problem — it is a second
+source ORed into the carousel's own, it never touches the play state, and it lifts when focus leaves, so a button
+beside the carousel behaves as a slide does. That keeps the carousel's departure from the ARIA pattern's "does not
+restart" (its own hold already resumes), which WCAG 2.2.2 permits since the pause button is the mechanism. Each
+Playground bar runs the framework's hold tracker on its own element and forwards the answer.
 
 **Slides are plain values, not records.** Every other collection here takes records — `Tab<T>`, `TreeNode<T>`,
 `Toast<T>` — because each has per-item capabilities the library acts on. A slide has none: its position is
@@ -15362,10 +15385,10 @@ swipe as path-based in as many words, and neither is satisfied by a keyboard rou
 pointers. Sending a card is a discrete choice rather than something the drag is essential to, so the
 exception does not apply.
 
-**So the obligation lands on the consumer, which is `Timeline`'s and `Scroller`'s position rather than
-`Carousel`'s.** `Carousel` closes it by attaching the swipe only when `renderControls` was passed, so nobody
-can ask for the gesture without the route; that is only available to a component that draws the controls, and
-this one does not. What is left is `send`, handed out at mount, and a props block saying plainly that anything
+**So the obligation lands on the consumer, which is `Timeline`'s and `Scroller`'s position, and now `Carousel`'s
+and `Flipbook`'s as well.** Those two once closed it by taking the gesture only when the consumer drew their
+controls through a slot; that is only available to a component that draws the controls, and once both were moved to
+controllers neither does. What is left is `send`, handed out at mount, and a props block saying plainly that anything
 sending a card without a drag has to be built on it. **A `CardStack` whose only pointer route is the swipe
 fails 2.5.1 and 2.5.7, and the library cannot promise otherwise.** The Playground's deck is what discharging
 it looks like: four buttons beside the pile, each calling `send`.
@@ -15501,14 +15524,15 @@ and shows its back inverted. So pitch cycles like yaw, the inverted states are r
 pins the sequence. What is genuinely degenerate — turning across while on the lid — is left as it is, because
 it is what a box does.
 
-**The room it reserves is the silhouette of the sphere the box sits inside.** `BarrelUtils.getProjectedExtent`
-is now the shared piece: it takes a circumradius and how far the center sits behind the screen, and returns the
-extent the projection can reach — `getGirth` is expressed through it and its numbers are unchanged, which the
-existing wheel tests prove. `Cuboid` passes the half-diagonal of the whole box, so the reservation is correct at
-every orientation including the ones that combine both turns. It over-reserves for a slab — a box 400 wide, 40
-tall and 400 deep reserves a square of its diagonal — and that was chosen deliberately: the drum's reservation
-shipped wrong twice, both times by being tight and self-consistent, and a box that paints outside its room
-overlaps whatever sits beside it.
+**Its box is its front face, width by height, and a turn spills past it.** The user's rule for anything turning under
+perspective: a component's box is its content at rest, and a turn may draw outside it. The first build reserved the
+silhouette of the sphere the box sits inside — correct at every orientation — which on the Playground was a 334px
+square around a 200 × 260 face. A cuboid comes to rest on whichever face its turns leave in front, so "content at
+rest" needed a decision. Sizing to the face showing now moves the page every time it settles on a different face;
+the largest face it can rest on was built first and still left a free-mode cuboid a square of its longest edge,
+since a face can rest on its side. **The user settled it by fiat: the front and the back are the faces a cuboid is
+sized for**, in both modes, and a side or the lid resting larger than them spills past the box as a turn does. So
+`CuboidUtils.getReservedSize` takes the size alone, and the box never changes with the face showing or the mode.
 
 ### `Cuboid`: upright mode keeps an orientation, and the counts become a record of presses
 
@@ -16293,6 +16317,22 @@ fallback — 94.07%, and Firefox 121, which is **ten months later than the unit 
 published package already requires a strictly newer browser than this does, in the one component every control
 passes through.
 
+### A column fills its width, and how wide it is belongs to whatever holds it
+
+**`createColumn` places items the full width of the box, as `createRow` does, and lost `itemWidthRatio`.** The user's
+call, over shrinking the placed box to the span its items cover. On the Formation page a row met its box exactly while
+a column left three quarters of it empty — every layout is written in shares of the box's width, so a column of items a
+quarter of that width stood in the middle of a box four times wider, and the box could not shrink to it because the
+items are measured against the box. Shrinking the box to the drawn span would have fixed every layout at once; it was
+set aside for the narrower fix, which makes the column behave like the row and leaves a column's width to the CSS of
+its container. The Tree page's leaning example, the only other caller, lost its 0.9 and now fills its box.
+
+**The Formation page gives each arrangement its own starting width, with a knob to change it.** The user's call, for
+the Playground only: row and arc 380, ring 320, honeycomb and whorl 300, cliff 260, zigzag 240, column 100 — each
+picked so the arrangement reads at a sensible size, since a width that suits a row makes a zigzag nearly 900px tall.
+Each arrangement remembers its own width while the page is open. **The field is remade when the arrangement changes**,
+keyed on it, because a field that outlives the switch writes its last value into the newly picked arrangement.
+
 ### `Formation`: gliding between arrangements is a transition on the placed box, and the angle left `transform` to allow it
 
 **The glide belongs to `PlacementBox` and `PlacementItem`, and `Formation` only feeds them.** The box holds one duration and hands it to its items through the context, returning `0` while the user asks for reduced motion. Each item takes its own delay, and a stagger is simply that delay growing with position. Any other control that places items can glide by passing the same prop, with nothing new to learn.
@@ -16598,7 +16638,7 @@ can know.
 
 **The cost is stated rather than mitigated: a library that renders no button cannot promise one is reachable or
 named.** A consumer who wires up no control has a wheel that can only be driven from elsewhere through
-`targetIndex`, exactly as `Carousel` with no `renderControls` has no keyboard route. That is the same exposure
+`targetIndex`, exactly as a `Carousel` whose consumer builds no buttons on its controller has no keyboard route. That is the same exposure
 item 13 records for `Scroller` and it is now the wheel's too.
 
 **No slot survives either, and the one that briefly did was kept for a bad reason.** A `renderHub` was left on
@@ -16685,6 +16725,41 @@ Playwright check compares the box a drum reserves against the boxes its faces oc
 `[aria-roledescription="wheel"]`. The pip is a sibling of that element rather than a child, so it can hang over
 the edge without the check reading the overhang as a drum painting outside its room.
 
+### An overhead wheel takes presses only on its round face, and paints wherever it likes
+
+**The wedges and the wheel's own box let presses through; a round disc the size of the wheel takes the wheel's
+presses; ordinary controls inside a wedge take theirs.** Each wedge is a full-size square turned to its angle, so the
+squares' corners reached past the circle and over their neighbors: a press beside the wheel counted as one on it,
+which an outside-click layer would misread, and a control painted into one wedge could have its press taken by a
+neighbor's corner. Settled with the user over two alternatives. Clipping each wedge to its own sector was rejected
+because it also cuts off painting — a glow, a shadow, or an avatar standing out of a wedge's rim, which the user
+named as a design worth keeping. Letting only the painted shape take presses was the measured fix from before, and
+was rejected because `pointer-events` is inherited: anything a consumer puts in a wedge silently stops working.
+
+**The disc relies on a published rule**: an element with `border-radius` takes pointer events only inside the curve
+of its border edge ([CSS Backgrounds 3, corner clipping](https://www.w3.org/TR/css-backgrounds-3/#corner-clipping)).
+**Controls are switched back on by one style rule** over links, buttons, form fields, `summary`, editable content and
+anything with a tab stop. **A consumer's own clickable element with no tab stop is the one case not covered**, and the
+user's call is that it should not be: such an element already fails WCAG 2.1.1 Keyboard, and it opts back in with
+`pointer-events: auto`. CSS cannot see a click listener — `[onclick]` matches only the attribute written in markup,
+which no framework here uses.
+
+**The selected wedge stacks above the others**, so whatever it paints past its edge is drawn over its neighbors
+rather than under them; asked for by the user with the Playground's glow on the picked wedge. A painter cannot do
+that alone, since each wedge is its own stacking context. **The root isolates its stacking** so the lifted wedge stays
+under anything the consumer lays over the wheel, such as the hub's spin button.
+
+### A drum face's turn animates and its distance from the axis does not
+
+**Each face is two elements: the outer one turns and is transitioned, the inner one moves the face out to the
+surface and is not.** Asked for by the user once the cost was put to them. A face used to carry its angle and its
+distance in one transitioned `transform`, so changing the face count mid-turn animated the distance over the turn
+while the barrel resized at once, and for the length of the turn the faces sat outside the room it had reserved.
+`BarrelUtils.getFaceTurnTransform` and `getFaceOffsetTransform` give the two halves; nested, they make the same
+matrix as before, `rotate` then `translateZ`. The individual `rotate` and `translate` properties could not do it on
+one element: they compose as translate-then-rotate, the wrong order for a face pushed out in its own turned frame.
+The cost is one plain element per face, up to 48 on a doubled reel.
+
 ### `DrumWheel` page: three reels take one result through `computeSpinTarget`
 
 **The example is gone; the user removed it because `Odometer`'s pull-to-spin reels already show a slot machine.**
@@ -16718,7 +16793,7 @@ The user's idea, its six questions settled with them in `backlog.md` before anyt
 
 **It is drawn on `Spine` with `SpineUtils.leaves`, the spine through the middle of the book's own box**, so no edge offset is needed. The position is fractional while a page turns, and `Flipbook` moves it frame by frame with `CarouselUtils.glide` rather than through `Spine`'s CSS transition, so a jump of several spreads turns each leaf in turn, a drag lets go from wherever the page was, and the glide ends exactly on the spread. All of it is `FlipbookUtils.createBook`, written once for the four views.
 
-**A page turns three ways, and the buttons are the drag's alternative.** The step controls are real `<button>`s the book builds and the consumer places through `renderControls`, as `Carousel`'s are, named by the required `computeStepLabel` and disabled at the end they would turn past. The arrow keys turn the book while the region itself has focus — Left back, Right on, not swapped under right-to-left text since read pages always lie on the left — and a refused key is left to the page. A drag follows the pointer, one book width of travel being one whole leaf, and on release completes or falls back; **`commitRatio` is `0.25` of the book's width, confirmed by the user.** WCAG 2.5.7 Dragging Movements: turning a page is a discrete choice, so the step buttons are the route, and a book drawn without `renderControls` takes no drags, as `Carousel` does; they also answer 2.5.1. 2.1.1 is met by the arrow keys; 2.3.3 by `transitionDurationMs={0}`, which the Playground passes under reduced motion; 2.2.2 does not apply.
+**A page turns three ways, and the buttons are the drag's alternative.** The book draws no controls: `onMount` hands over `turn`, with `getCanTurn` for disabling a button at either end, and the consumer builds the step buttons on it. The book first drew them through a `renderControls` slot, as `Carousel` did, and both were moved to controllers together at the user's request, so a box framing the book frames the pages alone. The arrow keys turn the book while the region itself has focus — Left back, Right on, not swapped under right-to-left text since read pages always lie on the left — and a refused key is left to the page. A drag follows the pointer, one book width of travel being one whole leaf, and on release completes or falls back; **`commitRatio` is `0.25` of the book's width, confirmed by the user.** WCAG 2.5.7 Dragging Movements: turning a page is a discrete choice, so a button on `turn` is the route, and building it is the consumer's, stated in the props block — the book takes a drag either way, as `CardStack` does. It also answers 2.5.1. 2.1.1 is met by the arrow keys; 2.3.3 by `transitionDurationMs={0}`, which the Playground passes under reduced motion; 2.2.2 does not apply.
 
 **Every reader-facing phrase except the role descriptions is the consumer's.** Each page is named on its own by the required `computePageLabel(index, count)`, and a turn announces the spread through `LiveAnnouncer`, politely, in the words of the required `computeSpreadAnnouncement(pages, count)`, handed the showing pages in reading order; nothing is said as the book first appears. Only `roleDescription` ("book") and `pageRoleDescription` ("page") have defaults. The book is a region, so `ariaLabel` is required. Every page other than the two the book is open at — turned-away pages and those under the pile alike — is `aria-hidden` and `inert`, decided by the spread rather than the angle.
 
@@ -16873,7 +16948,7 @@ export stays where consumers already find it.
 
 **Two objections were raised against this and only one of them held.** That `Carousel` would lean on a namespace
 named for something it is not: it does not hold, because a carousel's own vocabulary is already rotation —
-`getIsRotating`, `renderRotationControl`, `CarouselRotationFlags`. That the old export has to stay: it does not
+`getIsRotating`, `getIsPlaying`, `setIsPlaying`. That the old export has to stay: it does not
 hold either, since a one-line re-export is a cost every arrangement but "leave both" would pay.
 
 **What held is that the function is not angular arithmetic, so `RotationUtils` was not strictly its home
@@ -19115,7 +19190,7 @@ size, every row is pulled towards the vertical middle line, and the board is dra
 height with its top at the top of its box.
 
 **The root's box is the drawn size**, full width and `taper` times the height, so a tapered board reserves no
-empty band above itself — unlike backlog item 23, the drawing does not move, so the box can be exact. **The
+empty band above itself — unlike a component that turns under perspective, the drawing does not move, so the box can be exact. **The
 transform sits on `tileBoardPlane`, a sizeless layer between the root and the rows, not on the root.** On the
 root it bent the root's own box as well: the box the board reported to the page was that shorter box pushed
 through the lean, 400 by 80 for a board drawn 600 by 240, so anything anchoring to the board or scrolling it

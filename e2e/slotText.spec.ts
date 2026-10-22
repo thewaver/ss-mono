@@ -3,6 +3,14 @@ import { type Page, expect, test } from "@playwright/test";
 import { accessibleText, demo, example, prop, readout, revealProp } from "./helpers";
 
 /**
+ * A column is a barrel: a body pushed back along `translateZ`, holding faces that each turn by `rotateX` and, inside
+ * each, a layer that pushes the face out to the surface — also along `translateZ`. So the readers below tell the body
+ * apart by what its own children carry, `div[style*="translateZ"]:has(> [style*="rotateX"])`, written out in each one
+ * because they run in the page and cannot see a constant from this file. A column's painter sits one level inside the
+ * face's inner layer.
+ */
+
+/**
  * Every column is a barrel turned to an angle, so the checks read the angle the component wrote rather than
  * anything about how a digit looks. The angles are cumulative on purpose — they are never wrapped back into
  * a circle — because that is what stops a column going from nine to zero taking the short way round and
@@ -27,7 +35,7 @@ const setField = async (page: Page, key: string, value: string) => {
 const readColumns = (page: Page) =>
     page.evaluate((value) => {
         const barrels = [
-            ...document.querySelectorAll(`${value} [data-demo] div[style*="translateZ"]`),
+            ...document.querySelectorAll(`${value} [data-demo] div[style*="translateZ"]:has(> [style*="rotateX"])`),
         ] as HTMLElement[];
 
         return barrels.flatMap((barrel) => {
@@ -190,7 +198,7 @@ const PULL = "#pullReels";
 const readReelColumns = (page: Page) =>
     page.evaluate((value) => {
         const barrels = [
-            ...document.querySelectorAll(`${value} [data-demo] div[style*="translateZ"]`),
+            ...document.querySelectorAll(`${value} [data-demo] div[style*="translateZ"]:has(> [style*="rotateX"])`),
         ] as HTMLElement[];
 
         return barrels.flatMap((barrel) => {
@@ -215,7 +223,7 @@ const readReelColumns = (page: Page) =>
 const watchReelStops = (page: Page) =>
     page.evaluate((value) => {
         const barrels = [
-            ...document.querySelectorAll(`${value} [data-demo] div[style*="translateZ"]:not([style*="rotateX"])`),
+            ...document.querySelectorAll(`${value} [data-demo] div[style*="translateZ"]:has(> [style*="rotateX"])`),
         ] as HTMLElement[];
         const stops: (number | null)[] = barrels.map(() => null);
 
@@ -337,7 +345,11 @@ const readSlots = (page: Page) =>
             digits: slots
                 .filter((slot) => slot.querySelector('[style*="translateZ"]'))
                 .map((slot) =>
-                    read(slot, slot.querySelector('[style*="rotateX"]')?.firstElementChild?.firstElementChild),
+                    read(
+                        slot,
+                        slot.querySelector('[style*="rotateX"]')?.firstElementChild?.firstElementChild
+                            ?.firstElementChild,
+                    ),
                 ),
             fixed: slots
                 .filter((slot) => !slot.querySelector('[style*="translateZ"]'))
@@ -651,7 +663,7 @@ const pickWordKnob = async (page: Page, key: string, option: string) => {
 const readWordAngles = (page: Page) =>
     page.evaluate((value) => {
         const barrels = [
-            ...document.querySelectorAll(`${value} [data-demo] div[style*="translateZ"]`),
+            ...document.querySelectorAll(`${value} [data-demo] div[style*="translateZ"]:has(> [style*="rotateX"])`),
         ] as HTMLElement[];
 
         return barrels.flatMap((barrel) => {

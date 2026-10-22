@@ -23,6 +23,13 @@ export const barrelFace = style({
     position: "absolute",
     inset: 0,
     transformOrigin: "center center",
+    transformStyle: "preserve-3d",
     transitionProperty: "transform",
+});
+
+export const barrelFaceOffset = style({
+    position: "absolute",
+    inset: 0,
+    transformOrigin: "center center",
     backfaceVisibility: "hidden",
 });

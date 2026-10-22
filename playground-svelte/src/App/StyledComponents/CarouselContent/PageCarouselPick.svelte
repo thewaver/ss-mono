@@ -13,10 +13,10 @@
     class={[
         styles.carouselPick,
         layerClass,
-        props.renderProps.isCurrent && styles.isCurrent,
-        props.renderProps.isHovered && styles.isHovered,
-        props.renderProps.isActive && styles.isActive,
-        props.renderProps.isDisabled && styles.isDisabled,
+        props.isCurrent && styles.isCurrent,
+        props.flags.isHovered && styles.isHovered,
+        props.flags.isActive && styles.isActive,
+        props.flags.isDisabled && styles.isDisabled,
     ]}
     aria-hidden="true"
 ></div>

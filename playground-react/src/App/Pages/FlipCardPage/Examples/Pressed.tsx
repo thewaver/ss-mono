@@ -6,6 +6,7 @@ import { computeFlipCardFaceLabel } from "@thewaver/ss-playground/App/PageCompon
 import * as styles from "@thewaver/ss-playground/App/Pages/FlipCardPage/FlipCardPage.css";
 import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
+import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
 import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import {
     PageFlipCardBack,
@@ -50,18 +51,20 @@ export const PressedExample = (props: Props) => {
 
     return (
         <PageFlipCardStack>
-            <FlipCard
-                flipped={props.flipped}
-                axis={props.axis}
-                size={CARD_SIZE}
-                transitionDurationMs={props.transitionDurationMs}
-                turnDirection={turnDirection}
-                peekRatio={peekRatio}
-                ariaLabel={"Queen of spades"}
-                computeFaceLabel={computeFlipCardFaceLabel}
-                renderFront={(state) => <PageFlipCardFront state={state}>Q ♠</PageFlipCardFront>}
-                renderBack={(state) => <PageFlipCardBack state={state}>♥ ♦ ♣</PageFlipCardBack>}
-            />
+            <PageMeasureBox>
+                <FlipCard
+                    flipped={props.flipped}
+                    axis={props.axis}
+                    size={CARD_SIZE}
+                    transitionDurationMs={props.transitionDurationMs}
+                    turnDirection={turnDirection}
+                    peekRatio={peekRatio}
+                    ariaLabel={"Queen of spades"}
+                    computeFaceLabel={computeFlipCardFaceLabel}
+                    renderFront={(state) => <PageFlipCardFront state={state}>Q ♠</PageFlipCardFront>}
+                    renderBack={(state) => <PageFlipCardBack state={state}>♥ ♦ ♣</PageFlipCardBack>}
+                />
+            </PageMeasureBox>
 
             <div className={styles.controls}>
                 {FLIP_CARD_TURN_DIRECTIONS.map((direction) => (

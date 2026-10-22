@@ -1,7 +1,6 @@
 import type { Matrix3d, Point3d, Size2d, SwipeDirection } from "@thewaver/ss-utils";
 import { AngleUtils, MathUtils, Matrix3dUtils, Point3dUtils } from "@thewaver/ss-utils";
 
-import { BarrelUtils } from "../../../Primitives/Barrel/Barrel.utils";
 import type { CuboidArc, CuboidFace, CuboidSize, CuboidTurns } from "./Cuboid.types";
 
 /** A quarter turn. The cuboid only ever rests on a face, so every angle is a multiple of this. */
@@ -449,22 +448,17 @@ export namespace CuboidUtils {
     };
 
     /**
-     * How much room to leave for a cuboid so it never clips as it turns.
+     * How much room a cuboid takes: its front face, width by height.
      *
-     * The worst case is a corner pointing at the viewer, so the space needed is set by the distance from
-     * the center to a corner rather than by any one dimension. Perspective then makes the near part of
-     * the box larger than life, which is allowed for as well.
+     * A cuboid's box is its content at rest, and a turn is allowed to spill past it. Which face it rests on changes as
+     * it turns, so the room is decided by fiat rather than by the face showing: the front and the back are the faces it
+     * is sized for, and a side or the lid resting larger than them spills past the box, as a turn does. That keeps the
+     * box the same whichever face shows and whichever mode it is in, so the page never moves.
      *
      * @param size The cuboid's width, height and depth.
-     * @returns A square big enough for every orientation, so the layout does not shift as the cuboid
-     * turns.
+     * @returns The room the cuboid's box takes.
      */
-    export const getReservedSize = (size: CuboidSize): Size2d => {
-        const circumradius = Math.hypot(size.width, size.height, size.depth) * HALF;
-        const extent = BarrelUtils.getProjectedExtent(circumradius, size.depth * HALF);
-
-        return { width: extent, height: extent };
-    };
+    export const getReservedSize = (size: CuboidSize): Size2d => ({ width: size.width, height: size.height });
 
     /**
      * Which face is towards the viewer.

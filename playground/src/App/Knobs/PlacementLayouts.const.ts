@@ -91,15 +91,6 @@ export namespace PlacementLayoutKnobs {
             max: 2,
             step: 0.05,
         },
-        itemWidthRatio: {
-            kind: "number",
-            label: "Item width ratio",
-            hint: "How wide an item is against the whole arrangement. A column, unlike a row, picks its own width.",
-            controls: "Sets ColumnDefs.itemWidthRatio",
-            min: 0.05,
-            max: 1,
-            step: 0.05,
-        },
         itemHeightRatio: {
             kind: "number",
             label: "Item height ratio",

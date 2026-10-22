@@ -17,7 +17,6 @@ import {
     EXAMPLES_ROOT,
     EXAMPLE_NAMES,
     FIELD_WIDTH,
-    FORMATION_WIDTH,
     NAMES,
     NO_DEFS,
 } from "@thewaver/ss-playground/App/Pages/FormationPage/FormationPage.const";
@@ -35,7 +34,7 @@ import type { FormationExampleProps } from "./FormationPageReact.types";
 
 const DefaultExampleWrapper = (props: FormationExampleProps) => {
     return (
-        <PageMeasureBox width={FORMATION_WIDTH}>
+        <PageMeasureBox width={props.width}>
             <DefaultExample {...props} />
         </PageMeasureBox>
     );
@@ -54,11 +53,13 @@ export const FormationPage = () => {
     const [transitionDelayMs, setTransitionDelayMs] = useState(FORMATION_DEFAULTS.transitionDelayMs);
     const [layoutDefs, setLayoutDefs] = useState<Record<string, Record<string, number | boolean>>>({});
     const [effectDefs, setEffectDefs] = useState<Record<string, Record<string, number | boolean>>>({});
+    const [widths, setWidths] = useState<Partial<Record<PlacementLayouts.SampleKey, number>>>({});
 
     const family = PlacementLayouts.SAMPLE_LAYOUTS[layoutKey].family;
     const knobs = PlacementLayoutKnobs.KNOBS_BY_FAMILY[family] as Record<string, Knob>;
     const defaults = PlacementLayoutDefaults.DEFAULTS_BY_FAMILY[family] as Record<string, unknown>;
     const defs = layoutDefs[layoutKey] ?? NO_DEFS;
+    const width = widths[layoutKey] ?? FormationKnobs.STARTING_WIDTHS[layoutKey];
 
     const layoutEntry = useMemo(() => ({ family, defs }) as unknown as PlacementLayoutEntry, [family, defs]);
 
@@ -92,6 +93,7 @@ export const FormationPage = () => {
         shapeKind,
         transitionDurationMs,
         transitionDelayMs,
+        width,
     };
 
     const examples = [
@@ -121,6 +123,26 @@ export const FormationPage = () => {
                             width={FIELD_WIDTH}
                             ariaLabel={"Arrangement"}
                             onChange={setLayoutKey}
+                        />
+                    </PageProp>
+
+                    <PageProp
+                        itemKey={"width"}
+                        label={"Width (px)"}
+                        hint={
+                            "How wide the box holding the arrangement is. Every arrangement is measured against it, so this scales the whole thing; each one starts at a width that suits it, and remembers yours."
+                        }
+                        controls={"Sets the width of the box the example's Formation fills"}
+                    >
+                        <PageNumberField
+                            key={layoutKey}
+                            value={width}
+                            min={FormationKnobs.MIN_WIDTH}
+                            max={FormationKnobs.MAX_WIDTH}
+                            step={FormationKnobs.WIDTH_STEP}
+                            width={FIELD_WIDTH}
+                            ariaLabel={"Width in pixels"}
+                            onInput={(next) => setWidths((previous) => ({ ...previous, [layoutKey]: next }))}
                         />
                     </PageProp>
 

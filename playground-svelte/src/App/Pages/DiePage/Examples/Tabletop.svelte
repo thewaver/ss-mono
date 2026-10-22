@@ -6,6 +6,7 @@
     import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
     import PageDieFace from "../../../StyledComponents/DieContent/DieContent.svelte";
     import type { DieExampleProps } from "../DiePage.types";
+    import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.svelte";
 
     const FIRST_NUMBER = 1;
 
@@ -19,24 +20,26 @@
 </script>
 
 <div class={styles.stage}>
-    <Die
-        shape={props.shape}
-        size={props.size}
-        rollDurationMs={props.rollDurationMs}
-        settleDurationMs={props.settleDurationMs}
-        tumbleCount={props.tumbleCount}
-        bind:face
-        ariaLabel={"A die"}
-        computeFaceLabel={(index) => `${index + FIRST_NUMBER}`}
-        computeRollTarget={() => Math.floor(Math.random() * props.shape.faces.length)}
-        onMount={(next) => {
-            controller = next;
-        }}
-    >
-        {#snippet renderFace(index, state)}
-            <PageDieFace {state} label={`${index + FIRST_NUMBER}`} />
-        {/snippet}
-    </Die>
+    <PageMeasureBox>
+        <Die
+            shape={props.shape}
+            size={props.size}
+            rollDurationMs={props.rollDurationMs}
+            settleDurationMs={props.settleDurationMs}
+            tumbleCount={props.tumbleCount}
+            bind:face
+            ariaLabel={"A die"}
+            computeFaceLabel={(index) => `${index + FIRST_NUMBER}`}
+            computeRollTarget={() => Math.floor(Math.random() * props.shape.faces.length)}
+            onMount={(next) => {
+                controller = next;
+            }}
+        >
+            {#snippet renderFace(index, state)}
+                <PageDieFace {state} label={`${index + FIRST_NUMBER}`} />
+            {/snippet}
+        </Die>
+    </PageMeasureBox>
 
     <Button
         id={"dieRoll"}

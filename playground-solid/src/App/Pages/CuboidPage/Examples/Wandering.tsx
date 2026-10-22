@@ -5,6 +5,7 @@ import { Cuboid, CuboidUtils, access } from "@thewaver/ss-components-solid";
 import { computeCuboidFaceLabel } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
 import { ObjectUtils } from "@thewaver/ss-utils";
 
+import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
 import { PageCuboidFace, PageCuboidStack } from "../../../StyledComponents/CuboidContent/CuboidContent";
 import type { CuboidWanderingExampleProps } from "../CuboidPage.types";
 
@@ -53,15 +54,17 @@ export const WanderingExample = (props: Props) => {
 
     return (
         <PageCuboidStack>
-            <Cuboid
-                yaw={props.yaw}
-                pitch={props.pitch}
-                size={props.size}
-                transitionDurationMs={props.transitionDurationMs}
-                ariaLabel={"Six faces, turning by themselves"}
-                computeFaceLabel={computeCuboidFaceLabel}
-                renderFace={(getFace, getState) => <PageCuboidFace face={getFace} state={getState} />}
-            />
+            <PageMeasureBox>
+                <Cuboid
+                    yaw={props.yaw}
+                    pitch={props.pitch}
+                    size={props.size}
+                    transitionDurationMs={props.transitionDurationMs}
+                    ariaLabel={"Six faces, turning by themselves"}
+                    computeFaceLabel={computeCuboidFaceLabel}
+                    renderFace={(getFace, getState) => <PageCuboidFace face={getFace} state={getState} />}
+                />
+            </PageMeasureBox>
         </PageCuboidStack>
     );
 };

@@ -1,7 +1,5 @@
 import { style } from "@vanilla-extract/css";
 
-import { buttonElement } from "../Buttons/Button/Button.css";
-
 export const carouselRoot = style({
     display: "flex",
     flexDirection: "column",
@@ -34,5 +32,3 @@ export const carouselFace = style({
 export const carouselFaceTurnable = style({
     backfaceVisibility: "hidden",
 });
-
-export const carouselControl = style([buttonElement, {}]);

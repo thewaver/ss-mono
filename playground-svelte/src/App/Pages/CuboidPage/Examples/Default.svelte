@@ -8,6 +8,7 @@
     import PageCuboidPad from "../../../StyledComponents/CuboidContent/PageCuboidPad.svelte";
     import PageCuboidStack from "../../../StyledComponents/CuboidContent/PageCuboidStack.svelte";
     import type { CuboidExampleProps } from "../CuboidPage.types";
+    import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.svelte";
 
     const QUARTER_TURN = 1;
 
@@ -25,18 +26,20 @@
 {/snippet}
 
 <PageCuboidStack>
-    <Cuboid
-        bind:yaw
-        bind:pitch
-        size={props.size}
-        transitionDurationMs={props.transitionDurationMs}
-        ariaLabel={"Six faces"}
-        computeFaceLabel={computeCuboidFaceLabel}
-    >
-        {#snippet renderFace(face, state)}
-            <PageCuboidFace {face} {state} />
-        {/snippet}
-    </Cuboid>
+    <PageMeasureBox>
+        <Cuboid
+            bind:yaw
+            bind:pitch
+            size={props.size}
+            transitionDurationMs={props.transitionDurationMs}
+            ariaLabel={"Six faces"}
+            computeFaceLabel={computeCuboidFaceLabel}
+        >
+            {#snippet renderFace(face, state)}
+                <PageCuboidFace {face} {state} />
+            {/snippet}
+        </Cuboid>
+    </PageMeasureBox>
 
     <PageCuboidPad>
         <div></div>

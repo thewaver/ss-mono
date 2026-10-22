@@ -2,6 +2,7 @@ import { Button, Cuboid } from "@thewaver/ss-components-react";
 import { computeCuboidFaceLabel } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
 import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
+import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
 import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import { PageCuboidFace, PageCuboidPad, PageCuboidStack } from "../../../StyledComponents/CuboidContent/CuboidContent";
 import type { CuboidExampleProps } from "../CuboidPage.types";
@@ -25,15 +26,17 @@ export const DefaultExample = (props: Props) => {
 
     return (
         <PageCuboidStack>
-            <Cuboid
-                yaw={props.yaw}
-                pitch={props.pitch}
-                size={props.size}
-                transitionDurationMs={props.transitionDurationMs}
-                ariaLabel={"Six faces"}
-                computeFaceLabel={computeCuboidFaceLabel}
-                renderFace={(face, state) => <PageCuboidFace face={face} state={state} />}
-            />
+            <PageMeasureBox>
+                <Cuboid
+                    yaw={props.yaw}
+                    pitch={props.pitch}
+                    size={props.size}
+                    transitionDurationMs={props.transitionDurationMs}
+                    ariaLabel={"Six faces"}
+                    computeFaceLabel={computeCuboidFaceLabel}
+                    renderFace={(face, state) => <PageCuboidFace face={face} state={state} />}
+                />
+            </PageMeasureBox>
 
             <PageCuboidPad>
                 <div />

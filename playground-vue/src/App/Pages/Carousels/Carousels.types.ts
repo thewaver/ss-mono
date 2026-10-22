@@ -1,6 +1,11 @@
 import type { ComputedRef, Ref } from "vue";
 
-import type { CarouselOrientation, CarouselPlacementRule, CarouselPlacements } from "@thewaver/ss-components-vue";
+import type {
+    CarouselControls,
+    CarouselOrientation,
+    CarouselPlacementRule,
+    CarouselPlacements,
+} from "@thewaver/ss-components-vue";
 import type { SlideFrameClasses } from "@thewaver/ss-playground/App/Pages/Carousels/Carousels.types";
 
 export type CarouselExampleProps = {
@@ -39,4 +44,11 @@ export type PageCarouselsPanelProps = {
     hasDelay?: boolean;
     hasLooping?: boolean;
     hasPlacement?: boolean;
+};
+
+export type PageCarouselsBarProps = {
+    controls: CarouselControls;
+    isDisabled: boolean;
+    hasPicks?: boolean;
+    hasRotation?: boolean;
 };

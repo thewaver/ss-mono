@@ -173,7 +173,7 @@ export namespace FlipbookUtils {
     };
 
     /**
-     * The spread a step control opens the book at.
+     * The spread a turn opens the book at.
      *
      * @param step Which way it turns.
      * @param index The spread the book is open at.
@@ -183,7 +183,7 @@ export namespace FlipbookUtils {
     export const getStepTarget = (step: FlipbookStep, index: number, pageCount: number) =>
         clampSpread(index + (step === "next" ? SINGLE : -SINGLE), pageCount);
 
-    /** Whether a step control is refused: the book is disabled, or already open at the end it turns towards. */
+    /** Whether a turn is refused: the book is disabled, or already open at the end it turns towards. */
     export const getIsStepDisabled = (step: FlipbookStep, index: number, pageCount: number, isDisabled: boolean) =>
         isDisabled || getStepTarget(step, index, pageCount) === clampSpread(index, pageCount);
 
@@ -208,15 +208,15 @@ export namespace FlipbookUtils {
     /**
      * Whether a page can be dragged.
      *
-     * A drag is a dragging movement, so it needs a single-pointer alternative, and the step controls are that
-     * alternative: a book drawn without them is one the consumer turns from elsewhere, and it takes no drags either.
+     * A drag is a dragging movement, so it needs a single-pointer alternative; the book draws no controls of its own,
+     * so that alternative is the consumer's, built on the controller's `turn`, and a drag is taken whether or not they
+     * built it.
      *
-     * @param hasControls Whether the consumer draws the step controls.
      * @param isDisabled Whether the book is disabled.
      * @param pageCount How many pages there are; a book that opens at one spread has nothing to turn.
      */
-    export const getIsDragDisabled = (hasControls: boolean, isDisabled: boolean, pageCount: number) =>
-        !hasControls || isDisabled || getSpreadCount(pageCount) <= SINGLE;
+    export const getIsDragDisabled = (isDisabled: boolean, pageCount: number) =>
+        isDisabled || getSpreadCount(pageCount) <= SINGLE;
 
     /**
      * Where the book is drawn while a page follows the pointer.

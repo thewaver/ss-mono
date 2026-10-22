@@ -5,13 +5,8 @@
     import {
         CAROUSEL_DEFAULTS,
         type CarouselFace,
-        type CarouselPickRenderProps,
-        type CarouselRotationFlags,
         type CarouselSlideState,
-        type CarouselStep,
-        type CarouselStepRenderProps,
         CarouselUtils,
-        type InteractionFlags,
         LiveAnnouncerUtils,
         CarouselStyles as styles,
     } from "@thewaver/ss-components";
@@ -19,9 +14,7 @@
     import { ElementObserverSvelteUtils } from "../../Abstracts/ElementObserver/ElementObserverSvelte.utils.svelte.js";
     import { InteractionTrackerSvelteUtils } from "../../Abstracts/InteractionTracker/InteractionTrackerSvelte.utils.svelte.js";
     import { watchChange } from "../../Utils/effectUtils.svelte.js";
-    import InteractionWrapper from "../../Primitives/InteractionWrapper/InteractionWrapper.svelte";
     import type { CarouselControls, CarouselProps } from "./Carousel.types.js";
-    import CarouselControl from "./CarouselControl.svelte";
 
     const NO_PROGRESS = 0;
     const HIDDEN_OPACITY = 0;
@@ -29,7 +22,7 @@
     let {
         index = $bindable(0),
         playback = $bindable(true),
-        progress = $bindable(NO_PROGRESS),
+        progress = $bindable(),
         ...props
     }: CarouselProps<T> = $props();
 
@@ -41,6 +34,8 @@
     let viewport = $state<HTMLDivElement>();
     let swipeRatio = $state(0);
     let isGliding = $state(false);
+
+    const isDrivenFromOutside = untrack(() => progress !== undefined);
 
     const faceRefs: (HTMLElement | undefined)[] = [];
 
@@ -54,15 +49,17 @@
     const autoplayDelayMs = $derived(props.autoplayDelayMs);
     const slideRoleDescription = $derived(props.slideRoleDescription ?? CAROUSEL_DEFAULTS.slideRoleDescription);
 
-    const getIsHeld = InteractionTrackerSvelteUtils.trackHold(() => root);
+    let isHeldByPage = $state(false);
+
+    const getIsHeldWithin = InteractionTrackerSvelteUtils.trackHold(() => root);
+
+    const getIsHeld = () => getIsHeldWithin() || isHeldByPage;
 
     const getSize = ElementObserverSvelteUtils.createBorderBoxSizeObserver(() => viewport ?? undefined);
 
-    const position = $derived(CarouselUtils.toPosition(progress, count, isLooping));
+    const position = $derived(CarouselUtils.toPosition(progress ?? NO_PROGRESS, count, isLooping));
     const drawnPosition = $derived(position - swipeRatio);
-    const isPressDisabled = $derived(
-        CarouselUtils.getIsSwipeDisabled(props.renderControls !== undefined, isDisabled, count),
-    );
+    const isPressDisabled = $derived(CarouselUtils.getIsSwipeDisabled(isDrivenFromOutside, isDisabled, count));
 
     const copies = $derived(CarouselUtils.getCopyCount(count, props.placement.reach, isLooping));
     const ringCount = $derived(count * copies);
@@ -215,7 +212,7 @@
     });
 
     watchChange(
-        () => progress,
+        () => progress ?? NO_PROGRESS,
         (next) => {
             if (isGliding) {
                 if (next === writtenProgress) return;
@@ -324,81 +321,48 @@
         });
     };
 
-    const controls: CarouselControls = $derived({
-        index: currentIndex,
-        count,
-        isPlaying: playback,
-        isHeld: getIsHeld(),
-        renderStep: stepControl,
-        renderPick: pickControl,
-        renderRotationControl: rotationControl,
-    });
+    const controls: CarouselControls = {
+        getIndex: () => currentIndex,
+        getCount: () => count,
+        getIsPlaying: () => playback,
+        getIsHeld,
+        getCanStep: (step) => !CarouselUtils.getIsStepDisabled(step, currentIndex, count, isLooping, isDisabled),
+        step: (step) => {
+            if (CarouselUtils.getIsStepDisabled(step, currentIndex, count, isLooping, isDisabled)) return false;
+
+            goTo(CarouselUtils.getStepTarget(step, currentIndex, count, isLooping));
+
+            return true;
+        },
+        pick: (pickIndex) => {
+            if (isDisabled || pickIndex < 0 || pickIndex >= count || pickIndex === currentIndex) return false;
+
+            goTo(pickIndex);
+
+            return true;
+        },
+        setIsPlaying: (isPlaying) => {
+            if (isDisabled || isPlaying === playback) return false;
+
+            playback = isPlaying;
+
+            return true;
+        },
+        setIsHeldByPage: (isHeld) => {
+            if (isHeld === untrack(() => isHeldByPage)) return false;
+
+            isHeldByPage = isHeld;
+
+            return true;
+        },
+    };
+
+    $effect(() => untrack(() => props.onMount?.(controls)));
 </script>
-
-{#snippet stepControl(step: CarouselStep)}
-    {@const targetIndex = CarouselUtils.getStepTarget(step, currentIndex, count, isLooping)}
-    <InteractionWrapper
-        isDisabled={CarouselUtils.getIsStepDisabled(step, currentIndex, count, isLooping, isDisabled)}
-        extraFlags={{ step, targetIndex }}
-    >
-        {#snippet renderControl(attachElement, renderProps)}
-            {#snippet stepContent(flags: InteractionFlags<CarouselStepRenderProps>)}
-                {@render props.renderStep?.(step, flags)}
-            {/snippet}
-            <CarouselControl
-                {attachElement}
-                isCurrent={false}
-                ariaLabel={props.computeStepLabel(step)}
-                flags={renderProps}
-                renderContent={stepContent}
-                onActivate={() => goTo(targetIndex)}
-            />
-        {/snippet}
-    </InteractionWrapper>
-{/snippet}
-
-{#snippet pickControl(pickIndex: number)}
-    <InteractionWrapper {isDisabled} extraFlags={{ index: pickIndex, isCurrent: pickIndex === currentIndex }}>
-        {#snippet renderControl(attachElement, renderProps)}
-            {#snippet pickContent(flags: InteractionFlags<CarouselPickRenderProps>)}
-                {@render props.renderPick?.(pickIndex, flags)}
-            {/snippet}
-            <CarouselControl
-                {attachElement}
-                isCurrent={renderProps.isCurrent}
-                ariaLabel={getSlideLabel(pickIndex)}
-                flags={renderProps}
-                renderContent={pickContent}
-                onActivate={() => goTo(pickIndex)}
-            />
-        {/snippet}
-    </InteractionWrapper>
-{/snippet}
-
-{#snippet rotationControl()}
-    <InteractionWrapper {isDisabled} extraFlags={{ isPlaying: playback, isHeld: getIsHeld() }}>
-        {#snippet renderControl(attachElement, flags)}
-            {#snippet rotationContent(contentFlags: InteractionFlags<CarouselRotationFlags>)}
-                {@render props.renderRotationControl?.(contentFlags)}
-            {/snippet}
-            <CarouselControl
-                {attachElement}
-                isCurrent={false}
-                ariaLabel={props.computeRotationLabel(playback)}
-                {flags}
-                renderContent={rotationContent}
-                onActivate={() => {
-                    playback = !playback;
-                }}
-            />
-        {/snippet}
-    </InteractionWrapper>
-{/snippet}
 
 <div
     bind:this={root}
     class={styles.carouselRoot}
-    style:gap={`${props.gap ?? CAROUSEL_DEFAULTS.gap}px`}
     role="region"
     aria-roledescription={props.roleDescription ?? CAROUSEL_DEFAULTS.roleDescription}
     aria-label={props.ariaLabel}
@@ -438,6 +402,4 @@
             </div>
         {/each}
     </div>
-
-    {@render props.renderControls?.(controls)}
 </div>

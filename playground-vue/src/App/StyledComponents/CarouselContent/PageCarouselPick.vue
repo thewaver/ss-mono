@@ -14,10 +14,10 @@ const layerClass = useLayerClass();
         :class="[
             styles.carouselPick,
             layerClass,
-            renderProps.isCurrent && styles.isCurrent,
-            renderProps.isHovered && styles.isHovered,
-            renderProps.isActive && styles.isActive,
-            renderProps.isDisabled && styles.isDisabled,
+            isCurrent && styles.isCurrent,
+            flags.isHovered && styles.isHovered,
+            flags.isActive && styles.isActive,
+            flags.isDisabled && styles.isDisabled,
         ]"
         aria-hidden="true"
     />

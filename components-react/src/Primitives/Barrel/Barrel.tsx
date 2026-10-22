@@ -25,7 +25,7 @@ export const Barrel = <T,>(props: BarrelProps<T>) => {
                 key={face}
                 className={BarrelStyles.barrelFace}
                 style={{
-                    transform: BarrelUtils.getFaceTransform(axis, face, props.angle, index, faceCount, apothem),
+                    transform: BarrelUtils.getFaceTurnTransform(axis, props.angle, index, faceCount),
                     transitionDuration: toMs(props.transitionDurationMs),
                     transitionDelay: toMs(props.transitionDelayMs),
                 }}
@@ -35,7 +35,12 @@ export const Barrel = <T,>(props: BarrelProps<T>) => {
                 aria-hidden={defs.isHidden ? "true" : undefined}
                 inert={defs.isHidden}
             >
-                {props.renderFace(item, index, face)}
+                <div
+                    className={BarrelStyles.barrelFaceOffset}
+                    style={{ transform: BarrelUtils.getFaceOffsetTransform(axis, face, apothem) }}
+                >
+                    {props.renderFace(item, index, face)}
+                </div>
             </div>
         );
     };

@@ -1,30 +1,26 @@
 import type { VNodeChild } from "vue";
 
-import type {
-    BaseFlipbookProps,
-    FlipbookPageState,
-    FlipbookStep,
-    FlipbookStepRenderProps,
-    InteractionFlags,
-} from "@thewaver/ss-components";
-
-import type { InteractionControlProps } from "../../../Primitives/InteractionWrapper/InteractionWrapper.types";
-
-export type FlipbookControlProps = InteractionControlProps<FlipbookStepRenderProps> & {
-    /** Runs when the control is pressed. */
-    onActivate: () => void;
-};
+import type { BaseFlipbookProps, FlipbookPageState, FlipbookStep } from "@thewaver/ss-components";
 
 export type FlipbookControls = {
-    /** Which spread the book is open at. */
-    index: number;
+    /** Which spread the book is open at, counting from zero. */
+    getIndex: () => number;
     /** How many spreads the book opens at, the two covers' included. */
-    spreadCount: number;
+    getSpreadCount: () => number;
     /**
-     * Draws one of the step controls: a real button, named by `computeStepLabel` and painted by `renderStep`, which
-     * turns the book one spread and is disabled at the end it would turn past. It carries its step as its key.
+     * Whether a turn would do anything, so a button standing for it can be disabled.
+     *
+     * @param step Which way the turn would go.
+     * @returns `false` when the book is disabled or already open at that end.
      */
-    renderStep: (step: FlipbookStep) => VNodeChild;
+    getCanTurn: (step: FlipbookStep) => boolean;
+    /**
+     * Opens the book one spread further or one back, as an arrow key would.
+     *
+     * @param step Which way to turn.
+     * @returns `false` when the book is disabled or already open at that end.
+     */
+    turn: (step: FlipbookStep) => boolean;
 };
 
 export type FlipbookContentProps = {
@@ -36,6 +32,15 @@ export type FlipbookContentProps = {
     "index"?: number;
     /** Receives the book's own turns, which is what `v-model:index` binds. */
     "onUpdate:index"?: (index: number) => void;
+    /**
+     * Hands the consumer the controls once the book is up, for turning it from outside.
+     *
+     * **Anything that turns a page without a drag has to be built on these.** The book draws its pages and nothing
+     * else, so the buttons belong to whoever is drawing the page and may sit anywhere on it. That matters beyond
+     * layout: dragging a page is a dragging movement, so WCAG 2.5.7 asks for a single-pointer route that is not a
+     * drag, and the arrow keys do not satisfy it. `turn` is that route, and wiring it up is the consumer's to do.
+     */
+    "onMount"?: (controls: FlipbookControls) => void;
 };
 
 export type FlipbookSlots<T> = {
@@ -44,14 +49,6 @@ export type FlipbookSlots<T> = {
      * leaf, so whatever it draws goes over with it.
      */
     renderPage: (props: { page: T; state: FlipbookPageState }) => VNodeChild;
-    /** Paints one of the step controls inside the button the book builds. */
-    renderStep?: (props: { step: FlipbookStep; renderProps: InteractionFlags<FlipbookStepRenderProps> }) => VNodeChild;
-    /**
-     * Places the step controls, handed the means to draw them, so the page decides where they sit while the book still
-     * builds each one. **They are the single-pointer alternative WCAG 2.5.7 asks for to dragging a page**, so a book
-     * drawn without them takes no drags; the arrow keys turn it either way.
-     */
-    renderControls?: (controls: FlipbookControls) => VNodeChild;
 };
 
 export type FlipbookProps<T> = BaseFlipbookProps<T> & FlipbookContentProps;

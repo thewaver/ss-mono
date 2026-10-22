@@ -12,7 +12,7 @@ purpose: it answers "what is outstanding", and neither of them is.
 | Section                                                 | Count |
 | ------------------------------------------------------- | ----: |
 | [Missing components](#missing-components)               |     3 |
-| [Blockers and known issues](#blockers-and-known-issues) |    11 |
+| [Blockers and known issues](#blockers-and-known-issues) |     7 |
 | [Deliberately not built](#deliberately-not-built)       |    24 |
 | [Accessibility gaps](#accessibility-gaps)               |     9 |
 | [Planned projects](#planned-projects)                   |     4 |
@@ -38,16 +38,12 @@ Something that misbehaves, or a cost nobody has paid down.
 | #   | Where                            | What happens                                                                                                                                                                                                                                                                                              |
 | --- | -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 5   | **What the specs cannot see**    | A green run covers less than it looks: nothing checks appearance, motion-only pages such as `CellAnimation` and `ScanlineAnimation` have no spec, and a callback nothing on the page uses goes untested.                                                                                                  |
-| 25  | **Native form submit**           | **Pending decision.** `Select` submits nothing, the date and time fields submit their display text, and `Form` hands `onSubmit` no values. One question, lofted, not discarded                                                                                                                            |
+| 24  | **Native form submit**           | **Pending decision.** `Select` submits nothing, the date and time fields submit their display text, and `Form` hands `onSubmit` no values. One question, lofted, not discarded                                                                                                                            |
 | 17  | **Every anchored layer**         | **Postponed until browser support exists.** A popup paints where its anchor was one frame ago, so it trails during a scroll                                                                                                                                                                               |
 | 20  | **`GlassSurface`, ripple layer** | **Postponed until the platform catches up.** The rippled edge shows a defect under real GPU rendering that clipping it, however it's clipped, either reproduces or replaces with a different one — a known, unresolved gap in `backdrop-filter` plus `feDisplacementMap`, not particular to this codebase |
-| 16  | **`OverheadWheel`**              | A press up to 70px outside the circle still counts as a press on the wheel, which can steal one aimed at a control in a wedge                                                                                                                                                                             |
-| 16  | **`DrumWheel`**                  | Change the number of faces while it is turning and the faces sit outside the box it reserved until the turn stops                                                                                                                                                                                         |
 | 21  | **Any placed control**           | A layout guesses each item's box, so content wider than the guess overflows it and, on a ring, overlaps a neighbor                                                                                                                                                                                        |
 | 21  | **Any placed control**           | Nothing stops a layout outgrowing the room it is in — a ring can reach past the screen, and a placed toolbar has nothing to collapse into                                                                                                                                                                 |
-| 21  | **`Stepper`, placed**            | `renderBody` is dropped without a word, a curve having nowhere to put a panel                                                                                                                                                                                                                             |
-| 23  | **Anything turning in 3D**       | A component that turns under perspective sets aside room for the bulge, so its box stays bigger than its content even while it is standing still                                                                                                                                                          |
-| 26  | **`Die`, stepping**              | Pressing the same arrow a few times sends the die back and forth between two or three faces, because each step spins the new face upright. No fix chosen; the three put were judged inadequate                                                                                                            |
+| 25  | **`Die`, stepping**              | Pressing the same arrow a few times sends the die back and forth between two or three faces, because each step spins the new face upright. No fix chosen; the three put were judged inadequate                                                                                                            |
 
 ## Deliberately not built
 
@@ -88,13 +84,13 @@ They cluster, and no single item owns them.
 | --- | ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 19  | **`Timeline`**      | It pans by dragging and zooms by pinching, and the library ships no pointer route that is neither — the consumer's buttons are the only answer      |
 | 12  | **`Spotlight`**     | A prompt cannot hide the rest of the page from a screen reader: `inert` marks a subtree and cannot be lifted off one part of it                     |
-| 15  | **`Carousel`**      | A carousel given no `renderControls` has no keyboard route into it whatsoever                                                                       |
+| 15  | **`Carousel`**      | A carousel whose consumer builds no buttons on its controller has no keyboard route into it whatsoever                                              |
 | 18  | **`Table`**         | A cell holding two controls can be reached but not stepped into — there is no key that moves between them                                           |
 | 13  | **`Scroller`**      | The buttons are the consumer's, so the library cannot promise one is named, reachable or in the tab order                                           |
 | 16  | **`OverheadWheel`** | The same again for the hub's control, with the same promise unmade                                                                                  |
 | 11  | **`SlideButton`**   | A fixed hold duration is itself an assumption about dexterity, in a control that exists partly to avoid one                                         |
-| 24  | **`CardStack`**     | A card is sent by a swipe, and the library ships no pointer route that is neither a gesture nor a drag — the consumer's buttons are the only answer |
-| 27  | **Playground**      | In Windows high-contrast mode, painters drawn only in background colors vanish — Range's track and fill go white on white                           |
+| 23  | **`CardStack`**     | A card is sent by a swipe, and the library ships no pointer route that is neither a gesture nor a drag — the consumer's buttons are the only answer |
+| 26  | **Playground**      | In Windows high-contrast mode, painters drawn only in background colors vanish — Range's track and fill go white on white                           |
 
 ## Planned projects
 

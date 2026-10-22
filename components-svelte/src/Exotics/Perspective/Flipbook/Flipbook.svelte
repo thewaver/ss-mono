@@ -4,10 +4,7 @@
 
     import {
         FLIPBOOK_DEFAULTS,
-        type FlipbookStep,
-        type FlipbookStepRenderProps,
         FlipbookUtils,
-        type InteractionFlags,
         LiveAnnouncerUtils,
         type SpineSide,
         SpineUtils,
@@ -15,11 +12,9 @@
     } from "@thewaver/ss-components";
 
     import { InteractionTrackerSvelteUtils } from "../../../Abstracts/InteractionTracker/InteractionTrackerSvelte.utils.svelte.js";
-    import InteractionWrapper from "../../../Primitives/InteractionWrapper/InteractionWrapper.svelte";
     import Spine from "../../../Primitives/Spine/Spine.svelte";
     import { watchChange } from "../../../Utils/effectUtils.svelte.js";
     import { readStore } from "../../../Utils/storeUtils.js";
-    import FlipbookControl from "./FlipbookControl.svelte";
     import type { FlipbookControls, FlipbookProps } from "./Flipbook.types.js";
 
     const FIRST_SPREAD = 0;
@@ -55,7 +50,7 @@
 
     InteractionTrackerSvelteUtils.trackAxialSwipe(
         () => bookElement,
-        () => FlipbookUtils.getIsDragDisabled(props.renderControls !== undefined, isDisabled, pageCount),
+        () => FlipbookUtils.getIsDragDisabled(isDisabled, pageCount),
         {
             getAxis: () => "horizontal",
             getCommitRatio: () => commitRatio,
@@ -95,37 +90,19 @@
         e.preventDefault();
     };
 
-    const controls: FlipbookControls = $derived({
-        index: currentIndex,
-        spreadCount: FlipbookUtils.getSpreadCount(pageCount),
-        renderStep: stepControl,
-    });
-</script>
+    const controls: FlipbookControls = {
+        getIndex: () => currentIndex,
+        getSpreadCount: () => FlipbookUtils.getSpreadCount(pageCount),
+        getCanTurn: (step) => !FlipbookUtils.getIsStepDisabled(step, currentIndex, pageCount, isDisabled),
+        turn: (step) => book.turn(step),
+    };
 
-{#snippet stepControl(step: FlipbookStep)}
-    <InteractionWrapper
-        isDisabled={FlipbookUtils.getIsStepDisabled(step, currentIndex, pageCount, isDisabled)}
-        extraFlags={{ step, targetIndex: FlipbookUtils.getStepTarget(step, currentIndex, pageCount) }}
-    >
-        {#snippet renderControl(attachElement, renderProps)}
-            {#snippet stepContent(flags: InteractionFlags<FlipbookStepRenderProps>)}
-                {@render props.renderStep?.(step, flags)}
-            {/snippet}
-            <FlipbookControl
-                {attachElement}
-                ariaLabel={props.computeStepLabel(step)}
-                flags={renderProps}
-                renderContent={stepContent}
-                onActivate={() => book.turn(step)}
-            />
-        {/snippet}
-    </InteractionWrapper>
-{/snippet}
+    $effect(() => untrack(() => props.onMount?.(controls)));
+</script>
 
 <div
     {@attach (element) => on(element, "keydown", handleKeyDown)}
     class={styles.flipbookRoot}
-    style:gap={`${props.gap ?? FLIPBOOK_DEFAULTS.gap}px`}
     role="region"
     aria-roledescription={props.roleDescription ?? FLIPBOOK_DEFAULTS.roleDescription}
     aria-label={props.ariaLabel}
@@ -159,6 +136,4 @@
             {/snippet}
         </Spine>
     </div>
-
-    {@render props.renderControls?.(controls)}
 </div>

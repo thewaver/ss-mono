@@ -38,7 +38,6 @@ export type RowDefs = {
 
 export type ColumnDefs = {
     gapRatio?: number;
-    itemWidthRatio?: number;
     itemHeightRatio?: number;
 };
 

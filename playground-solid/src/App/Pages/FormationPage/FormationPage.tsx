@@ -1,4 +1,4 @@
-import { createMemo, createSignal } from "solid-js";
+import { Show, createMemo, createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
 
 import {
@@ -18,7 +18,6 @@ import {
     EXAMPLES_ROOT,
     EXAMPLE_NAMES,
     FIELD_WIDTH,
-    FORMATION_WIDTH,
     NAMES,
 } from "@thewaver/ss-playground/App/Pages/FormationPage/FormationPage.const";
 import { ShapeConst } from "@thewaver/ss-utils";
@@ -35,7 +34,7 @@ import type { FormationExampleProps } from "./FormationPageSolid.types";
 
 const DefaultExampleWrapper = (props: FormationExampleProps) => {
     return (
-        <PageMeasureBox width={FORMATION_WIDTH}>
+        <PageMeasureBox width={props.width}>
             <DefaultExample {...props} />
         </PageMeasureBox>
     );
@@ -54,11 +53,13 @@ export const FormationPage = () => {
     const [getTransitionDelayMs, setTransitionDelayMs] = createSignal(FORMATION_DEFAULTS.transitionDelayMs);
     const [layoutDefs, setLayoutDefs] = createStore<Record<string, Record<string, number | boolean>>>({});
     const [effectDefs, setEffectDefs] = createStore<Record<string, Record<string, number | boolean>>>({});
+    const [widths, setWidths] = createStore<Partial<Record<PlacementLayouts.SampleKey, number>>>({});
 
     const getFamily = () => PlacementLayouts.SAMPLE_LAYOUTS[getLayoutKey()].family;
     const getKnobs = () => PlacementLayoutKnobs.KNOBS_BY_FAMILY[getFamily()] as Record<string, Knob>;
     const getDefaults = () => PlacementLayoutDefaults.DEFAULTS_BY_FAMILY[getFamily()] as Record<string, unknown>;
     const getDefs = () => layoutDefs[getLayoutKey()] ?? {};
+    const getWidth = () => widths[getLayoutKey()] ?? FormationKnobs.STARTING_WIDTHS[getLayoutKey()];
 
     const getLayoutEntry = createMemo(
         () => ({ family: getFamily(), defs: getDefs() }) as unknown as PlacementLayoutEntry,
@@ -106,6 +107,7 @@ export const FormationPage = () => {
             shapeKind: getShapeKind,
             transitionDurationMs: getTransitionDurationMs,
             transitionDelayMs: getTransitionDelayMs,
+            width: getWidth,
         };
 
         return [
@@ -137,6 +139,29 @@ export const FormationPage = () => {
                             ariaLabel={"Arrangement"}
                             onChange={(key) => setLayoutKey(() => key)}
                         />
+                    </PageProp>
+
+                    <PageProp
+                        key={"width"}
+                        label={"Width (px)"}
+                        hint={
+                            "How wide the box holding the arrangement is. Every arrangement is measured against it, so this scales the whole thing; each one starts at a width that suits it, and remembers yours."
+                        }
+                        controls={"Sets the width of the box the example's Formation fills"}
+                    >
+                        <Show when={getLayoutKey()} keyed>
+                            {(layoutKey) => (
+                                <PageNumberField
+                                    value={() => widths[layoutKey] ?? FormationKnobs.STARTING_WIDTHS[layoutKey]}
+                                    min={FormationKnobs.MIN_WIDTH}
+                                    max={FormationKnobs.MAX_WIDTH}
+                                    step={FormationKnobs.WIDTH_STEP}
+                                    width={FIELD_WIDTH}
+                                    ariaLabel={"Width in pixels"}
+                                    onInput={(width) => setWidths(layoutKey, width)}
+                                />
+                            )}
+                        </Show>
                     </PageProp>
 
                     <PageKnobs

@@ -29,7 +29,7 @@ export const Barrel = defineComponent(
                         key={face}
                         class={BarrelStyles.barrelFace}
                         style={{
-                            transform: BarrelUtils.getFaceTransform(axis, face, props.angle, index, faceCount, apothem),
+                            transform: BarrelUtils.getFaceTurnTransform(axis, props.angle, index, faceCount),
                             transitionDuration: toMs(props.transitionDurationMs),
                             transitionDelay: toMs(props.transitionDelayMs),
                         }}
@@ -39,7 +39,12 @@ export const Barrel = defineComponent(
                         aria-hidden={defs.isHidden ? "true" : undefined}
                         inert={defs.isHidden}
                     >
-                        {callSlot(slots.renderFace, { item, index, face })}
+                        <div
+                            class={BarrelStyles.barrelFaceOffset}
+                            style={{ transform: BarrelUtils.getFaceOffsetTransform(axis, face, apothem) }}
+                        >
+                            {callSlot(slots.renderFace, { item, index, face })}
+                        </div>
                     </div>
                 );
             };

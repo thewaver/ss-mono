@@ -34,13 +34,11 @@ export const Barrel = <T,>(props: BarrelProps<T>) => {
             <div
                 class={styles.barrelFace}
                 style={{
-                    "transform": BarrelUtils.getFaceTransform(
+                    "transform": BarrelUtils.getFaceTurnTransform(
                         getAxis(),
-                        face,
                         access(props.angle),
                         index,
                         getFaceCount(),
-                        getApothem(),
                     ),
                     "transition-duration":
                         getTransitionDurationMs() === undefined ? undefined : `${getTransitionDurationMs()}ms`,
@@ -53,7 +51,12 @@ export const Barrel = <T,>(props: BarrelProps<T>) => {
                 aria-hidden={getDefs().isHidden || undefined}
                 inert={getDefs().isHidden}
             >
-                {props.renderFace(getFace, index, face)}
+                <div
+                    class={styles.barrelFaceOffset}
+                    style={{ transform: BarrelUtils.getFaceOffsetTransform(getAxis(), face, getApothem()) }}
+                >
+                    {props.renderFace(getFace, index, face)}
+                </div>
             </div>
         );
     };

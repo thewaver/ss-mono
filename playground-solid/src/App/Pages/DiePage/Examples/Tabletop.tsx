@@ -4,6 +4,7 @@ import { Button, Die, access } from "@thewaver/ss-components-solid";
 import type { DieController } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/Pages/DiePage/DiePage.css";
 
+import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
 import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import { PageDieFace } from "../../../StyledComponents/DieContent/DieContent";
 import type { DieExampleProps } from "../DiePage.types";
@@ -17,21 +18,23 @@ export const TabletopExample = (props: Props) => {
 
     return (
         <div class={styles.stage}>
-            <Die
-                shape={props.shape}
-                size={props.size}
-                rollDurationMs={props.rollDurationMs}
-                settleDurationMs={props.settleDurationMs}
-                tumbleCount={props.tumbleCount}
-                face={props.face}
-                ariaLabel={"A die"}
-                computeFaceLabel={(index) => `${index + FIRST_NUMBER}`}
-                computeRollTarget={() => Math.floor(Math.random() * access(props.shape).faces.length)}
-                renderFace={(getIndex, getState) => (
-                    <PageDieFace state={getState} label={() => `${getIndex() + FIRST_NUMBER}`} />
-                )}
-                onMount={setController}
-            />
+            <PageMeasureBox>
+                <Die
+                    shape={props.shape}
+                    size={props.size}
+                    rollDurationMs={props.rollDurationMs}
+                    settleDurationMs={props.settleDurationMs}
+                    tumbleCount={props.tumbleCount}
+                    face={props.face}
+                    ariaLabel={"A die"}
+                    computeFaceLabel={(index) => `${index + FIRST_NUMBER}`}
+                    computeRollTarget={() => Math.floor(Math.random() * access(props.shape).faces.length)}
+                    renderFace={(getIndex, getState) => (
+                        <PageDieFace state={getState} label={() => `${getIndex() + FIRST_NUMBER}`} />
+                    )}
+                    onMount={setController}
+                />
+            </PageMeasureBox>
 
             <Button
                 id={"dieRoll"}
