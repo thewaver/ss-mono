@@ -19,6 +19,7 @@ const MANUAL = demo("manual");
 const ROTATING = demo("rotating");
 const NO_CONTROLS = demo("noControls");
 const SCROLLED = demo("scrolled");
+const WINDOWED = demo("windowed");
 
 const region = (scope: string) => `${scope} [aria-roledescription="carousel"]`;
 const slide = (scope: string) => `${scope} [aria-roledescription="slide"]`;
@@ -397,4 +398,41 @@ test("a drum on the other axis turns end over end, and takes its swipe the same 
     await swipeDown(page, MANUAL, 0.8, 0.3);
 
     expect(await currentSlide(page, MANUAL), "pushing the faces upwards brings the next one round").toBe("2 of 4");
+});
+
+/**
+ * The windowed example holds a hundred slides and counts, in its readout, the slides its painter has been asked to
+ * build. The spec does not name the handful a placement draws — that is the placement's `reach` and changes with it —
+ * only that it is fewer than the whole list, that it is exactly what is in the document, and that stepping does not
+ * grow it.
+ */
+const countsOf = async (page: import("@playwright/test").Page) => {
+    const text = await readout(page, "windowed");
+
+    return {
+        total: Number(/of (\d+)/.exec(text)?.[1]),
+        built: Number(/(\d+) built/.exec(text)?.[1]),
+    };
+};
+
+test("a windowed carousel builds only the slides its placement draws, and keeps it so as it moves", async ({
+    page,
+}) => {
+    const before = await countsOf(page);
+
+    expect(before.built, "a handful are built").toBeGreaterThan(0);
+    expect(before.built, "rather than the whole list").toBeLessThan(before.total);
+    await expect(page.locator(slide(WINDOWED)), "and the count is what is in the document").toHaveCount(before.built);
+
+    for (let step = 0; step < 3; step++) {
+        await page.locator(control(WINDOWED, "Next slide")).click();
+    }
+
+    await page.waitForTimeout(SETTLE_MS);
+
+    expect((await countsOf(page)).built, "stepping on builds the newcomers and drops the ones left behind").toBe(
+        before.built,
+    );
+    await expect(page.locator(slide(WINDOWED))).toHaveCount(before.built);
+    expect(await currentSlide(page, WINDOWED), "and the carousel really did move").toBe(`4 of ${before.total}`);
 });

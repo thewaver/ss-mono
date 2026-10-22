@@ -1,4 +1,4 @@
-import { type SlotsType, type VNodeChild, computed, defineComponent, shallowRef, useId, watch } from "vue";
+import { type SlotsType, type VNodeChild, computed, defineComponent, nextTick, shallowRef, useId, watch } from "vue";
 
 import {
     FloaterStyles,
@@ -537,7 +537,7 @@ const MenuLevel = defineComponent(
 
             e.preventDefault();
 
-            if (step.type === "dismiss") props.onDismiss();
+            if (step.type === "dismiss") props.onDismiss(!e.shiftKey);
             else if (step.type === "activate") activateIndex(step.index);
             else if (step.type === "open") openIndex(step.index);
             else if (step.type === "highlight") highlightIndex(step.index);
@@ -778,6 +778,13 @@ export const Menu = defineComponent(
             flickOrigin.value = undefined;
         };
 
+        const dismiss = (isLeavingForward: boolean) => {
+            const nextTabStop = isLeavingForward ? MenuUtils.computeNextTabStop(triggerElement.value) : undefined;
+
+            close();
+            void nextTick(() => nextTabStop?.focus());
+        };
+
         const pick = (item: MenuItem<T>, radioGroupValues: T[]) => {
             if (MenuUtils.getIsStateful(item) && props.checked !== undefined) {
                 checked.value = MenuUtils.computeNextChecked(
@@ -897,7 +904,7 @@ export const Menu = defineComponent(
                                         }
                                     }}
                                     onClose={close}
-                                    onDismiss={close}
+                                    onDismiss={dismiss}
                                 >
                                     {{
                                         renderItem: slots.renderItem,
@@ -976,6 +983,13 @@ export const ContextMenu = defineComponent(
 
         const close = () => {
             isOpen.value = false;
+        };
+
+        const dismiss = (isLeavingForward: boolean) => {
+            const nextTabStop = isLeavingForward ? MenuUtils.computeNextTabStop(regionRef.value) : undefined;
+
+            close();
+            void nextTick(() => nextTabStop?.focus());
         };
 
         const pick = (item: MenuItem<T>, radioGroupValues: T[]) => {
@@ -1059,7 +1073,7 @@ export const ContextMenu = defineComponent(
                         computeCustomText={props.computeCustomText}
                         onPick={pick}
                         onClose={close}
-                        onDismiss={close}
+                        onDismiss={dismiss}
                     >
                         {{
                             renderItem: slots.renderItem,

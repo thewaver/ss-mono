@@ -33,35 +33,32 @@ reading.
 ### Index
 
 1. Neither animation component can reveal its own children — _postponed until the platform catches up_
-2. `Select` — four things deliberately not built — _open_
-3. `Menu` — two things deliberately not built — _open_
+2. `Select` — three things deliberately not built — _open_
+3. `Menu` — one thing deliberately not built — _open_
 4. Other core controls the library does not have — _open, ordered by the user_
 5. What the verification suite still cannot see — _open_
 6. Planned: a consumer-facing layer of controls above the library — _deferred to a session of its own_
-7. `Toasts` — one thing deliberately not built — _open_
-8. `Calendar` — two things deliberately not built — _open_
-9. `ColorInput` — two things deliberately not built — _open_
-10. `Tabs` — a pairing the consumer can still skip — _open_
-11. `Viewport` as a region: what is settled and what is not — _open_
-12. `Tree` — two things deliberately not built — _open_
-13. `SlideButton` — three things deliberately not built — _open_
-14. `Spotlight` — one thing deliberately not built — _open_
-15. `Scroller` — three things deliberately not built — _open_
-16. `Paginator` — split into a root and pieces, and one thing deliberately not built — _decided, not yet built_
-17. `Carousel` — three things deliberately not built — _open_
-18. The four components ported from React — what did not settle — _open_
-19. An anchored layer trails its anchor during a scroll — _postponed until the platform catches up_
-20. `Table` — six things deliberately not built — _open_
-21. `Timeline` — the pointer routes the library cannot promise — _open_
-22. `GlassSurface` — what is built and what is not — _open, one item postponed until the platform catches up_
-23. Arbitrary placement across controls, and the picking that has to come with it — _open_
-24. The scanline page is twelve examples of one example — _open_
-25. Components that turn under perspective reserve room they do not need at rest — _open_
-26. `CardStack` — the pointer route the library cannot promise — _open_
-27. The submit story — what a native submit carries, and what `Form` hands `onSubmit` — _pending decision_
-28. `Die`'s step buttons and arrow keys fall into a loop of two or three faces — _open, no fix chosen_
-29. A wide arrow vanishes at a corner, and a nearly-as-wide one becomes a sliver — _open, the user is analysing it_
-30. The Playground's painters in Windows high-contrast mode — _open, decided, not yet built_
+7. `Calendar` — one thing deliberately not built — _open_
+8. `ColorInput` — two things deliberately not built — _open_
+9. `Tabs` — a pairing the consumer can still skip — _open_
+10. `Tree` — two things deliberately not built — _open_
+11. `SlideButton` — three things deliberately not built — _open_
+12. `Spotlight` — one thing deliberately not built — _open_
+13. `Scroller` — three things deliberately not built — _open_
+14. `Paginator` — one thing deliberately not built — _open_
+15. `Carousel` — two things deliberately not built — _open_
+16. The four components ported from React — what did not settle — _open_
+17. An anchored layer trails its anchor during a scroll — _postponed until the platform catches up_
+18. `Table` — six things deliberately not built — _open_
+19. `Timeline` — the pointer routes the library cannot promise — _open_
+20. `GlassSurface` — what is built and what is not — _open, one item postponed until the platform catches up_
+21. Arbitrary placement across controls, and the picking that has to come with it — _open_
+22. The scanline page is twelve examples of one example — _open_
+23. Components that turn under perspective reserve room they do not need at rest — _open_
+24. `CardStack` — the pointer route the library cannot promise — _open_
+25. The submit story — what a native submit carries, and what `Form` hands `onSubmit` — _pending decision_
+26. `Die`'s step buttons and arrow keys fall into a loop of two or three faces — _open, no fix chosen_
+27. The Playground's painters in Windows high-contrast mode — _open, decided, not yet built_
 
 ### Build order
 
@@ -132,15 +129,11 @@ the one both components have.
 
 ---
 
-## 2. `Select` — four things deliberately not built
+## 2. `Select` — three things deliberately not built
 
 The decisions behind what exists are in `decisions.md` under the three `Select` headings. These are
 the gaps, each with the reason it is still a gap.
 
-- **A consumer whose filter injects a non-matching option can see the highlight land on it.** While
-  filtering, the highlight goes to the first option rather than to the selection, because the component
-  knows which options are _present_, not which ones _matched_. The fix belongs in the consumer's
-  filter; the trade-off is recorded in `decisions.md`.
 - **The group box is not paintable, only its header is.** The library owns
   `<div role="group" aria-label>` so the role cannot end up in consumer markup; the consumer fills the
   header via `renderGroup`. Handing it a `renderOptions` thunk in `renderPopup`'s shape would give it
@@ -181,7 +174,7 @@ the gaps, each with the reason it is still a gap.
 
 ---
 
-## 3. `Menu` — two things deliberately not built
+## 3. `Menu` — one thing deliberately not built
 
 The decisions behind what exists are in `decisions.md` under _"`Popover` extracted, and `Menu` as the
 second consumer"_ and _"`Menu` submenus: a level per popup, focus moving between them"_. These are the
@@ -193,19 +186,16 @@ gaps, each with the reason it is still a gap.
   than a third copy. What that does **not** decide is the paint and the keyboard — whether a separator is a
   row the walk emits or a thing the painter draws between runs, and whether a group header is reachable.
   A consumer that needs sections today paints them into `renderPopup` around a flat list.
-- **`Tab` closes the menu and returns focus to the trigger rather than moving past it.** APG says move
-  to the next element after the trigger. The menu is portalled to the end of the document, so letting
-  `Tab` through lands focus wherever the portal sits, which is worse than not moving. The cost is one
-  extra `Tab`; fixing it properly means computing the trigger's next tab stop by hand.
-  **_Elsewhere._**
+
+**_Elsewhere._**
 
 - **Groups, separators and stateful items all live inside the menu component.** Radix ships `Group`,
   `Label` and `Separator`, plus `CheckboxItem` and `RadioGroup` / `RadioItem` — which is where the stateful
   rows landed here too, on the user's call. The separators and labels are the first bullet above and are
   still missing.
-- **Nothing does the `Tab` behavior APG asks for.** Radix's menu does nothing at all on `Tab`, and
-  that is filed against it as a spec-compliance bug (radix#1934) which is still open. Closing and
-  returning focus to the trigger is therefore ahead of the field rather than behind it.
+- **Radix does not do the `Tab` behavior APG asks for, and this library now does.** Radix's menu does nothing at
+  all on `Tab`, filed against it as a spec-compliance bug (radix#1934) which is still open. Here Tab closes the
+  menu and moves on to the stop after the trigger; see `decisions.md`.
 - **Right-click is a separate opener, never a separate menu.** Radix ships a whole `ContextMenu`
   component with the same menu inside it; Ark UI and Zag instead add a `ContextTrigger` part to the
   same menu, and open it on a roughly 700ms long press when the pointer is pen or touch. Both keep one
@@ -444,47 +434,7 @@ same example.
 
 ---
 
-## 7. `Toasts` — one thing deliberately not built
-
-The decisions behind what exists are in `decisions.md` under the two `Toasts` headings. This is the
-gap, with the reason it is still a gap.
-
-- **An id re-added while it is leaving fades back in** rather than restarting as a new entry, because the
-  id never left the rendered list. It is the reasonable behavior and it is not obvious, so it is written
-  down rather than left to be rediscovered.
-
-A hidden tab now holds every countdown, so that gap is closed — see `decisions.md`, and note the signal is
-`document.hidden` rather than window focus, which is the narrower of the two published choices. The pause
-arithmetic is covered on a fake clock too, per item 5, so what is left in this item is the gap above
-and nothing about verification.
-
-**_Elsewhere._** Every bullet above has a published answer, and two of them are answers this item did not
-have.
-
-- **Per-toast urgency does not go through the region at all**, and that is the arrangement now built here —
-  see `decisions.md`. Radix announces through a throwaway element per toast, outside the viewport region,
-  with `aria-live` from that toast's own type; the text is inserted after two animation frames so that NVDA
-  picks it up. This library reserves the two shared announcer regions when the stack mounts instead, which
-  answers the same hazard without a per-message frame delay. `role="status"` in both cases rather than
-  `role="alert"`, to stop screen readers stuttering.
-- **The keyboard route is a hotkey, and it is `F8` rather than `F6`.** Radix's viewport takes a `hotkey`
-  prop defaulting to `["F8"]`; from there it is `Tab` within the region and `Escape` on a focused toast.
-  Built, with `Escape` returning focus to wherever the hotkey was pressed rather than acting on a toast.
-- **Both mainstream toasts stop the clock when you look away.** sonner pauses while the document is
-  hidden; Radix pauses on window `blur` alongside pointer and focus, which covers switching windows but
-  not a hidden tab inside a focused window. So neither treats this as a product decision to be deferred —
-  they both took it, by different events.
-- **Why an entry left is reported as two callbacks rather than one field.** sonner gives each toast
-  `onDismiss` and `onAutoClose`. That is still unanswered here: `onShow` and `onHide` report the two
-  transition boundaries, not the reason for the second one. Splitting the callback rather than widening the
-  state a painter reads is the shape to copy if anything ever asks.
-- **The pause arithmetic is the same arithmetic.** Radix subtracts elapsed from remaining on each pause,
-  exactly as here — and per item 5, Playwright's clock API is what would let the remainder be asserted
-  rather than eyeballed.
-
----
-
-## 8. `Calendar` — two things deliberately not built
+## 7. `Calendar` — one thing deliberately not built
 
 Item 4 covers the missing components. These are `Calendar`'s own gaps, each with the reason it is still
 one. The decisions behind what exists are in `decisions.md` under _"Controls: `Calendar`, and the date
@@ -493,10 +443,6 @@ value the library owns"_.
 - **No week numbers and no multi-month view.** Both are extra columns or extra grids around the same
   `DateValueUtils.getMonthGrid`, so neither needs new library machinery; they need a decision about
   whether `Calendar` grows a mode or a consumer composes two of them.
-- **The disabled predicate runs per cell per render.** `computeIsDayDisabled` is called for each of the
-  42 cells inside a reactive read, so a consumer whose predicate hits a network cache will do it 42
-  times a month change. Memoising is the consumer's to do today; whether the library should batch it
-  into one call per grid is open.
 
 **_Elsewhere._**
 
@@ -526,7 +472,7 @@ value the library owns"_.
 
 ---
 
-## 9. `ColorInput` — two things deliberately not built
+## 8. `ColorInput` — two things deliberately not built
 
 `ColorInput` is the custom picker now; the decisions are in `decisions.md` under the `ColorArea` heading.
 These are the gaps.
@@ -581,7 +527,7 @@ every other layer and takes a `visibility` prop like every other popup; both are
 
 ---
 
-## 10. `Tabs` — a pairing the consumer can still skip
+## 9. `Tabs` — a pairing the consumer can still skip
 
 The decisions behind what exists are in `decisions.md` under _"Controls: `Tabs` as records"_ and
 _"`TabPanel`: the pairing is written on the record"_.
@@ -608,26 +554,7 @@ _"`TabPanel`: the pairing is written on the record"_.
 
 ---
 
-## 11. `Viewport` as a region: what is settled and what is not
-
-A viewport now fits its design size into the box the page gives it, clips everything inside it, and keeps
-its own layers within its own bounds; see `decisions.md`. `ViewportWrapperPage` is two 400px squares — a control
-that roams one of them at a scale you can change, and an anchor inside a scrolling area in the other — and
-`viewport.spec.ts` drives both, including that the two scales multiply and that a stack of toasts raised
-inside a nested viewport stays inside it. What is left:
-
-- **A nested viewport needs a sized host, and says nothing when it does not get one.** It measures its own
-  box, so a container with no height gives it a zero-sized region and it renders nothing visible. A warning
-  would be the obvious kindness; whether the library should warn at all is the same question `Label` already
-  answered for itself, and it went the other way.
-- **A fast scroll can still show a frame of drift — see item 19**, which now holds it. It is not a
-  `Viewport` fault: the same frame is lost by every anchored layer on the page, and the scrolled anchor here
-  is only where it is easiest to see. `viewport.spec.ts` asserts the layer lands exactly on its anchor once
-  the scroll settles, which is what a spec can see.
-
----
-
-## 12. `Tree` — two things deliberately not built
+## 10. `Tree` — two things deliberately not built
 
 The decisions behind what exists are in `decisions.md` under _"Controls: `Tree`, and the group box that
 could not be a child"_. These are the gaps, each with the reason it is still one.
@@ -683,7 +610,7 @@ that collapsed on the spot would be holding focus itself.
 
 ---
 
-## 13. `SlideButton` — three things deliberately not built
+## 11. `SlideButton` — three things deliberately not built
 
 The decisions behind what exists are in `decisions.md` under _"Controls: `SlideButton`, and why the gesture
 is the only thing it owns"_, including which WCAG criteria were read and what they decided. These are the
@@ -726,7 +653,7 @@ gaps, each with the reason it is still one.
 
 ---
 
-## 14. `Spotlight` — one thing deliberately not built
+## 12. `Spotlight` — one thing deliberately not built
 
 The decisions behind what exists are in `decisions.md` under _"Controls: `Spotlight`, and three presets
 because a mode cannot move at runtime"_. These are the gaps, each with the reason it is still one.
@@ -739,7 +666,7 @@ because a mode cannot move at runtime"_. These are the gaps, each with the reaso
 
 ---
 
-## 15. `Scroller` — three things deliberately not built
+## 13. `Scroller` — three things deliberately not built
 
 The decisions behind what exists are in `decisions.md` under _"Controls: `Scroller`, and why it renders no
 button of its own"_. These are the gaps, each with the reason it is still one.
@@ -760,65 +687,10 @@ button of its own"_. These are the gaps, each with the reason it is still one.
 
 ---
 
-## 16. `Paginator` — split into a root and pieces, and one thing deliberately not built
+## 14. `Paginator` — one thing deliberately not built
 
 The decisions behind what exists are in `decisions.md` under _"Controls: `Paginator`, where the arithmetic
-is the component"_.
-
-### Decided, not yet built: a root, two pieces, and the ready-made row on top
-
-Settled with the user, question by question, as the answer to three gaps this item used to list — that it counted
-pages rather than items, that nothing handed back "showing 21 to 40 of 383", and that there was no "go to page"
-field — and to a layout the user wanted that the single component cannot draw: first, previous, a "3 of 20" label,
-next, last. A label sits wherever a page wants it, which no slot inside one component can promise, so the paginator
-becomes pieces a page arranges itself, as Ark UI's does.
-
-- **`PaginatorRoot` holds the numbers and draws the landmark.** Props: `itemCount` (required), `pageSize` (optional,
-  default 10 in `PAGINATOR_DEFAULTS`, the default Ant Design and Ark UI both use), `page`, `onPageChange`,
-  `ariaLabel` (required, on the `<nav>`), `isDisabled`, `computeLayout`, `computeEffect`. It renders the one `<nav>`
-  around whatever the page puts inside it, and the pieces read it through a context, the way `Radio` reads
-  `RadioGroup`. `pageCount` is gone from every piece: the page count is `ceil(itemCount / pageSize)`, a short last
-  page holds the remainder, and an empty list has no pages — every step disabled and the pages piece empty.
-- **`PaginatorSteps` is the step controls with a slot between them.** Props: `steps` (default `["previous",
-"next"]`, as now), `renderStep`, `computeStepLabel`, and `children`, drawn between the leading steps (first,
-  previous) and the trailing ones (next, last). With nothing in the slot it is the arrows alone; with
-  `PaginatorPages` in it, it is today's row; with the page's own text in it, it is "‹ 3 of 20 ›".
-- **`PaginatorPages` is the number row, and it alone works out the clusters and gaps.** Props: `siblingCount`,
-  `boundaryCount`, `renderPage`, `renderGap`, `computePageLabel`, all meaning what they mean now.
-- **`Paginator` stays, as a wrapper with no logic of its own.** Its props are today's with `itemCount` and `pageSize`
-  in place of `pageCount`, and it renders `PaginatorRoot` around `PaginatorSteps` with `PaginatorPages` in the slot,
-  handing each its share. Every rule lives in exactly one piece: the entries in `PaginatorPages`, the step targets,
-  disabled ends and labels in `PaginatorSteps`, the numbers, landmark and layout in `PaginatorRoot`. The step, page
-  and gap controls are drawn by three internal building blocks the pieces share, which is today's
-  `renderStepControl`, `renderPageControl` and `renderGapControl` lifted out; they are never pieces a page composes.
-- **A layout belongs to the root, and every control registers with it.** Each step, page and gap control tells the
-  root it exists; the root keeps them in the order they sit in the document, asks the layout for that many places,
-  and each control takes the place at its own position in the list, through the existing `PlacementBox` and
-  `PlacementItem`. So any arrangement a page composes can be laid out as one shape, and the ready-made row is just
-  one such arrangement — today's dial example keeps working through it. The one new job is keeping the order right
-  as controls come and go: the pages piece changes length as the current page nears an end. Registration rather than
-  walking children, because children arrive as finished output in all four frameworks and cannot be taken apart.
-- **"Jump to page" and the "X of Y" label are the page's own, not library components.** The page already holds the
-  page signal, the item count and the page size, so a `NumberInput` or a `Select` writing that signal is the jump,
-  and plain text is the label. The library's part is two exported, documented helpers: `PaginatorUtils.computePageCount(itemCount,
-pageSize)` and `PaginatorUtils.computeItemRange(page, itemCount, pageSize)`, returning the first and last item on
-  the page counting from one, or nothing for an empty list.
-- **The Playground** keeps its five examples on the ready-made `Paginator`, switched to `itemCount` and `pageSize`
-  knobs, and adds composed ones: the arrows with "3 of 20" between them, and a row with a "go to page" `NumberInput`
-  beside it. Its results panel reads `computeItemRange` instead of its own `PAGE_SIZE` arithmetic.
-- **Specs:** `paginator.spec.ts` moves to `itemCount`, and gains a composed arrangement, a layout spanning
-  `PaginatorSteps` and `PaginatorPages` placing every control in document order, and the order holding as the pages
-  piece changes length.
-- **Superseded:** the `hasPageNumbers` prop planned before the split is not built; a row without numbers is
-  `PaginatorSteps` with nothing in its slot.
-
-**Not settled with the user — ask before starting:**
-
-- What a piece does outside a `PaginatorRoot`: draw nothing, or warn. `Radio` outside a `RadioGroup` is the
-  precedent to read first.
-- Where `computeHref`, `linkComponent` and `gap` live. Both pieces need the first two, so the root is the obvious home;
-  `gap` spaces controls within a row, so each piece taking its own, the wrapper passing one value to both, is the
-  likely shape.
+is the component"_ and _"`Paginator` is a root and pieces, with the ready-made row on top"_.
 
 ### Still deliberately not built
 
@@ -830,7 +702,7 @@ pageSize)` and `PaginatorUtils.computeItemRange(page, itemCount, pageSize)`, ret
 
 ---
 
-## 17. `Carousel` — three things deliberately not built
+## 15. `Carousel` — two things deliberately not built
 
 The decisions behind what exists are in `decisions.md` under _"Controls: `Carousel`, and the first component
 that acts without being asked"_ and _"`Carousel`: one component, and how a slide sits is a placement rule"_. These
@@ -845,15 +717,10 @@ are the gaps, each with the reason it is still one.
   rendered with no `renderControls` has no keyboard route at all. The published pattern puts the arrows on the
   buttons rather than on the region, so this matches it — but a consumer who skips the controls gets a control
   a keyboard cannot move, which is worth knowing before it is called a bug.
-- **Every slide is built, always.** All of them are in the document from the first render, `inert` and hidden
-  when away, and every one is placed by the rule on every frame the carousel moves. This is `Accordion`'s trade
-  rather than `Tree`'s: a placement can show any slide at any distance, so none can be left out without asking the
-  rule first. A carousel of a hundred expensive slides builds all hundred, two hundred elements with backs, and
-  windowing it is the same boundary `Select` and `Tree` already record.
 
 ---
 
-## 18. The four components ported from React — what did not settle
+## 16. The four components ported from React — what did not settle
 
 `Satellite`, `Staircase`, `Formation`, `OverheadWheel` and `DrumWheel` came in from a React codebase; what the port
 settled is in `decisions.md`. What did not settle is below, and both entries are decisions taken rather than
@@ -896,7 +763,7 @@ pressable until it opts back in with `pointer-events: auto`.
 
 **An overhead wheel has one slot for its controls and it is the hub, chosen by the user over two alternatives.** A
 drum's controls sit under the barrel; an overhead wheel's sit in the middle of it, and there is no second slot. The
-cost is the one item 15 already records for `Scroller`: a consumer who wants the control somewhere else renders
+cost is the one item 13 already records for `Scroller`: a consumer who wants the control somewhere else renders
 their own button, and a library that renders no button cannot promise it is named or reachable. The two
 alternatives were a second slot beneath the wheel, rejected because the overhead wheel is a square and anything
 under it changes the box it reserves, and a slot with a position prop, rejected because `Toasts` had already
@@ -904,7 +771,7 @@ settled that a component does not fully delegate position. Recorded so it is not
 
 ---
 
-## 19. An anchored layer trails its anchor during a scroll — _postponed until the platform catches up_
+## 17. An anchored layer trails its anchor during a scroll — _postponed until the platform catches up_
 
 **While something is moving, the position an anchored layer paints at is the position its anchor was in one
 frame ago.** At rest the last frame catches up, so it looks settled and only moves when something else does.
@@ -990,7 +857,7 @@ neither was tried.
 
 ---
 
-## 20. `Table` — six things deliberately not built
+## 18. `Table` — six things deliberately not built
 
 The decisions behind what exists are in `decisions.md` under _"Controls: `Table`, a grid rather than a
 table, and why the markup could not be `<table>`"_. These are the gaps, each with the reason it is still one.
@@ -1016,7 +883,7 @@ _Accepted limits_ instead.
 
 ---
 
-## 21. `Timeline` — the pointer routes the library cannot promise
+## 19. `Timeline` — the pointer routes the library cannot promise
 
 The component takes the gestures itself: a drag moves the window, the wheel and a pinch zoom it, and both can
 be switched off. The reasoning, the evidence for the wheel behaving as it does and the press-versus-drag rule
@@ -1041,7 +908,7 @@ are in `decisions.md` under _"`Timeline`: a window over a range"_. What is outst
 
 ---
 
-## 22. `GlassSurface` — what is built and what is not
+## 20. `GlassSurface` — what is built and what is not
 
 The component is built and works: two backdrop layers, the tint, and a specular sheen that follows the
 pointer, with a draggable pane on its page. `GlassDefs` names the four groups of settings, and the ripple and
@@ -1075,7 +942,7 @@ what decides visibility by design, so the page not being in the menu is not a ga
 
 ---
 
-## 23. Arbitrary placement across controls, and the picking that has to come with it
+## 21. Arbitrary placement across controls, and the picking that has to come with it
 
 **The user's proposal, and the direction the library is going next.** A control's items should be placeable
 anywhere rather than only along a line: a `Menu` as a closed ring or a wide fan; a `Paginator` drawn
@@ -1165,7 +1032,7 @@ is what turned up the origin-placed item it scored as pointing due east.
 
 ---
 
-## 24. The scanline page is twelve examples of one example
+## 22. The scanline page is twelve examples of one example
 
 **The user's aside when the per-sample defs work was proposed, promoted to an item by them once that work
 closed.** The page should stop being a gallery of entries and become a single example with knobs that follow
@@ -1187,7 +1054,7 @@ actually need designing.
 
 **Nothing is blocked on it** and the shape of the picker has not been argued.
 
-## 25. Components that turn under perspective reserve room they do not need at rest
+## 23. Components that turn under perspective reserve room they do not need at rest
 
 **The user's rule, given while settling how `CardStack` is sized.** A component that turns a face towards the
 viewer is drawn larger on its near side than it really is, so it spills past its own box part-way through a
@@ -1210,7 +1077,7 @@ does not ask for the reservation has not been argued.
 **Which other components are affected has not been checked.** The pass is to go through everything that
 animates a perspective transform and take out the adjustments that only motion needs.
 
-## 26. `CardStack` — the pointer route the library cannot promise
+## 24. `CardStack` — the pointer route the library cannot promise
 
 **The same gap `Timeline` and `Scroller` already carry, and it arrived with the component.** A card is sent by
 a swipe, which is both a path-based gesture and a drag, so **2.5.1 Pointer Gestures** (Level A) and **2.5.7
@@ -1229,7 +1096,7 @@ a consumer cannot ask for the gesture without also supplying the route. That tri
 that draws the controls itself, which the user ruled this one must not. The Playground's deck is what
 discharging it looks like: four buttons beside the pile, each calling `send`.
 
-## 27. The submit story — what a native submit carries, and what `Form` hands `onSubmit`
+## 25. The submit story — what a native submit carries, and what `Form` hands `onSubmit`
 
 Three findings from the survey against the reference libraries were lofted here rather than settled one by one,
 because they are one question. **The user's word: lofted, not discarded.**
@@ -1249,7 +1116,7 @@ who wants values takes. _"The form story"_ in `decisions.md` says the library ne
 that entry is what this item would revisit. Focus moving to the first field in error on submit was built
 separately and does not depend on this.
 
-## 28. `Die`'s step buttons and arrow keys fall into a loop of two or three faces
+## 26. `Die`'s step buttons and arrow keys fall into a loop of two or three faces
 
 Reachable on the Die page's icon cloud: pick the d20 and press down a few times. The die goes back and forth
 between the same two faces. Every shape does it — a d20 pressed right goes between faces 1 and 2 from the first
@@ -1276,26 +1143,7 @@ every face upright cannot both hold, so each option gives one up:
 `Cuboid`'s upright mode has the same tension and accepted it, since a box has only six resting orientations
 (`decisions.md`, _"`Cuboid`: upright mode keeps an orientation"_); a d20 has many more faces for the loop to skip.
 
-## 29. A wide arrow vanishes at a corner, and a nearly-as-wide one becomes a sliver
-
-Reachable on the Tooltip page: pick the triangle, set its width to at least twice its length, and place the tooltip
-off a corner of its anchor (`left_out` with `bottom_out`). No arrow is drawn. Make it a little narrower than that and
-the arrow comes back as a long thin wedge running down the tooltip's edges.
-
-**The cause is the rule that joins the arrow to the body.** `ShapeUtils.attachArrow` extends the triangle's two sides
-back from the tip until each meets the contour, as asked for so that an arrow on an octagon's corner reaches the two
-neighboring edges (`decisions.md`, _"Arrows: grown on the unrounded contour, aimed by `Anchor`"_). Out of a box corner
-the arrow points along the diagonal, so a side leaning 45° from the arrow's middle line runs exactly parallel to the
-edge it is extended towards and never meets it, and one leaning a little less meets it far away. A symmetric arrow
-leans 45° when it is twice as wide as it is long.
-
-**For now the Playground starts on a 14 × 9 triangle**, which leans about 38° and draws a short wedge at a corner.
-The library is unchanged, so a consumer's wide arrow still vanishes there. The user is analysing the edge cases
-before choosing a fix. The one put to them and not taken yet: limit how far a side may be extended, and past that
-end the side at its base corner and run straight back to the contour along the arrow's direction, which never
-vanishes but gives a wide corner arrow a short straight neck.
-
-## 30. The Playground's painters in Windows high-contrast mode
+## 27. The Playground's painters in Windows high-contrast mode
 
 Reachable on the Range page with Windows' high-contrast mode on, or with Chrome's DevTools emulating
 `forced-colors: active`: the track and the filled part of the range turn white on the white page, and only the
@@ -1320,6 +1168,37 @@ of the answer to "what is left" — see the note at the top of this file. Each o
 reach it, and why it was accepted, so that nobody has to re-derive the argument in order to leave it alone
 again. An entry moves back up into the numbered items only if the user says so, or if something changes that
 makes the reasoning wrong.
+
+**A filter that keeps a non-matching option in `Select` can have the highlight land on it.** While filtering, the
+highlight goes to the first option shown rather than to the selection, because the component knows which options are
+_present_, not which ones _matched_. Reachable with a consumer filter that injects an option the query does not match.
+Accepted by the user: the fix belongs in the consumer's filter, and the trade-off is recorded in `decisions.md` under
+the `Select` headings.
+
+**A `Toasts` entry re-added while it is leaving fades back in** rather than restarting as a new entry, because the id
+never left the rendered list. Reachable by adding a toast, dismissing it, and adding the same id again before the fade
+ends. Accepted by the user as the reasonable behavior; it is written down so it is not rediscovered as a fault.
+
+**A copy of an item never shows what the original holds.** `Wraparound` repeats its content round the real tile, and
+`InfiniteCorridor` and a looping `Carousel` repeat items round their ring; every copy is a separate instance, so text
+typed into the original, a video's place or a checkbox ticked in it is not in its copies, and a `Wraparound` copy
+starts fresh each time it scrolls back into view. Reachable on the Wraparound page with content that holds state.
+Accepted by the user because the platform has no cross-browser way to draw one live element in two places — CSS
+`element()` is experimental and Firefox-only, behind `-moz-`
+([MDN](https://developer.mozilla.org/en-US/docs/Web/CSS/element)) — so a copy can match the original only when the
+state lives in the consumer's data, which every copy then draws alike. The next entry is the one place the library
+adds to it.
+
+**In `InfiniteCorridor`, and in a looping `Carousel` with too few slides to fill its ring, a copy takes over as the
+real item as the ring turns.** Both draw an item more than once round the ring, and the usable instance is always the
+one nearest in front — for the carousel, the one showing. When the ring moves on, a different instance takes that
+role, so whatever the person typed into an item or left playing in it stays with the instance that has just become an
+inert copy, and the usable one in front starts empty. Reachable on the InfiniteCorridor page with an item holding a
+field, by walking the corridor round its loop. Accepted by the user after a fix was argued: keeping one instance real
+and moving it round would protect state only in the corridor, whose items are not expected to be interactive, and in
+the carousel it breaks stepping — the real instance of the next slide can sit backwards round the ring, so Next would
+sometimes glide the wrong way or the long way round. The carousel case also needs a looping carousel with fewer than
+`2 × reach + 1` slides.
 
 **No check runs the whole repository before a push.** The root `npm run build` builds the library packages and
 not the Playgrounds, there is no CI, and the full browser suite takes about half an hour, so a commit can break

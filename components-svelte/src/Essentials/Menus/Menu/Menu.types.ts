@@ -200,8 +200,11 @@ export type MenuLevelProps<T> = {
     onFlickEnd?: (releasedOn: Node | undefined) => void;
     /** Runs when this level closes in the ordinary way, with the menu carrying on above it. */
     onClose: () => void;
-    /** Runs when this level is dismissed from outside — a press elsewhere, focus leaving, or Escape. */
-    onDismiss: () => void;
+    /**
+     * Runs when Tab dismisses the whole menu from this level, told whether it was pressed without Shift — in which
+     * case focus goes on past the opener rather than back to it.
+     */
+    onDismiss: (isLeavingForward: boolean) => void;
 };
 
 export type MenuEntryProps<T> = {

@@ -172,6 +172,7 @@ export type * from "./Essentials/Overlays/Toasts/ToastsSolid.types";
 export * from "./Essentials/Overlays/Tooltip/Tooltip";
 export type * from "./Essentials/Overlays/Tooltip/TooltipSolid.types";
 export * from "./Essentials/Paginator/Paginator";
+export * from "./Essentials/Paginator/Paginator.context";
 export type * from "./Essentials/Paginator/PaginatorSolid.types";
 export * from "./Essentials/Preview/Preview";
 export type * from "./Essentials/Preview/PreviewSolid.types";

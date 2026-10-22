@@ -1,6 +1,7 @@
 import { DOMUtils, type Point2d, Point2dUtils } from "@thewaver/ss-utils";
 
 import type { AnchorPlacement } from "../../../Abstracts/Anchor/Anchor.types";
+import { FocusManagerUtils } from "../../../Abstracts/FocusManager/FocusManager.utils";
 import { InteractionTrackerUtils } from "../../../Abstracts/InteractionTracker/InteractionTracker.utils";
 import type { NavigatorDirection, NavigatorOrientation } from "../../../Abstracts/Navigator/Navigator.types";
 import { NavigatorUtils } from "../../../Abstracts/Navigator/Navigator.utils";
@@ -140,6 +141,29 @@ export namespace MenuUtils {
      * @param kind The item's kind, from {@link MenuUtils.getKind}.
      */
     export const getItemRole = (kind: MenuItemKind): MenuItemRole => MENU_ITEM_ROLES[kind];
+
+    /**
+     * Where Tab goes when it leaves a menu: the first stop in the page's tab order after the element that opened it.
+     *
+     * A menu's popup is portalled to the end of the document, so letting the browser move focus out of it would land
+     * past everything on the page. The published menu-button pattern asks for the stop after the button instead, so
+     * the view works it out before the menu closes and moves focus there itself. Anything inside the opener and
+     * anything inside a menu popup is skipped, since neither is where Tab is going.
+     *
+     * @param opener The element the menu was opened from — its button, or a context menu's region.
+     * @returns The element to focus, or `undefined` when nothing follows the opener, in which case focus is left
+     * where closing the menu puts it.
+     */
+    export const computeNextTabStop = (opener: HTMLElement | undefined) => {
+        if (!opener) return undefined;
+
+        return FocusManagerUtils.getFocusableChildren().find(
+            (element) =>
+                (opener.compareDocumentPosition(element) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0 &&
+                !opener.contains(element) &&
+                element.closest(MENU_POPUP_SELECTOR) === null,
+        );
+    };
 
     /**
      * Scrolls a highlighted item into view inside its own menu, and never scrolls the page.
@@ -398,7 +422,7 @@ export namespace MenuUtils {
     /**
      * What a key pressed inside a level does, typing aside.
      *
-     * Tab leaves the menu. Enter and Space activate the highlighted entry, or are swallowed when it is disabled.
+     * Tab leaves the menu — the view decides where focus goes, from whether Shift was held. Enter and Space activate the highlighted entry, or are swallowed when it is disabled.
      * In a straight menu the arrow pointing at the side submenus open on opens the highlighted entry's submenu
      * and the other one closes the level ({@link toSubmenuKeyDirection}); a laid-out menu has no left or right, so all four
      * arrows walk it and Escape steps out of a band instead — contained, so the menu is not dismissed with it.

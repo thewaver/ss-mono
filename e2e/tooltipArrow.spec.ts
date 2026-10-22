@@ -1,6 +1,6 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { demo, prop } from "./helpers";
+import { demo, prop, revealProp } from "./helpers";
 
 /**
  * The Tooltip page's Arrow setting draws the tooltip body with `Shape` and grows an arrow out of it with
@@ -205,4 +205,121 @@ test("the lightning bolt keeps its lean: its tip on the anchor, its base wholly 
         nearest.every((vertex) => vertex.x < tip.x),
         "both base corners on the same side of the tip",
     ).toBe(true);
+});
+
+/**
+ * "Every arrow at once" draws eight tooltips round one anchor, one per side and corner, with their own knobs. The
+ * corner ones are what the joining rule used to get wrong: their arrows spread down both edges as long slivers, and one
+ * at least twice as wide as it is long vanished. With the sharp box picked the painted contour is straight lines only,
+ * so every number pair in the path is a corner of it, and each corner tooltip is read in its own pixels.
+ */
+const ARROW_BED = demo("arrows");
+
+const readArrowBed = (page: Page) =>
+    page.locator(`${ARROW_BED} svg`).evaluateAll((svgs) =>
+        svgs.map((svg) => {
+            const numbers = (svg.querySelector("path")?.getAttribute("d") ?? "").match(/-?\d+(\.\d+)?/g) ?? [];
+            const vertices = [];
+
+            for (let i = 0; i + 1 < numbers.length; i += 2) {
+                vertices.push({ x: Number(numbers[i]), y: Number(numbers[i + 1]) });
+            }
+
+            return {
+                vertices,
+                size: { width: Number(svg.getAttribute("width")), height: Number(svg.getAttribute("height")) },
+            };
+        }),
+    );
+
+test("a corner arrow is drawn however wide it is, and its base starts half its width down each edge", async ({
+    page,
+}) => {
+    const width = 30;
+    const length = 10;
+
+    await revealProp(page, "arrowBedShape", "arrows");
+    await pick(page, "arrowBedShape", "box");
+    await type(page, "arrowBedWidth", width);
+    await type(page, "arrowBedLength", length);
+    await page.keyboard.press("Escape");
+    await page.waitForTimeout(SETTLE_MS);
+
+    const readings = await readArrowBed(page);
+    const corners = readings.filter((reading) => {
+        const tip = findTip(reading as ArrowReading);
+
+        return Math.max(-tip.x, tip.x - reading.size.width) > 0 && Math.max(-tip.y, tip.y - reading.size.height) > 0;
+    });
+
+    expect(corners, "all four corner tooltips draw an arrow, three times as wide as it is long").toHaveLength(4);
+
+    for (const reading of corners) {
+        const tip = findTip(reading as ArrowReading);
+        const corner = {
+            x: tip.x > reading.size.width * 0.5 ? reading.size.width : 0,
+            y: tip.y > reading.size.height * 0.5 ? reading.size.height : 0,
+        };
+        const base = reading.vertices.filter(
+            (vertex) =>
+                Math.abs(vertex.x - corner.x) < TOLERANCE_PX !== Math.abs(vertex.y - corner.y) < TOLERANCE_PX &&
+                Math.hypot(vertex.x - corner.x, vertex.y - corner.y) <
+                    Math.min(reading.size.width, reading.size.height),
+        );
+
+        expect(base, "one base point on each edge beside the corner").toHaveLength(2);
+
+        for (const vertex of base) {
+            expect(
+                Math.abs(Math.hypot(vertex.x - corner.x, vertex.y - corner.y) - width * 0.5),
+                "half the arrow's width from the corner, rather than spread down the edge",
+            ).toBeLessThan(TOLERANCE_PX);
+        }
+    }
+});
+
+/**
+ * "An arrow going round" aims one tooltip's arrow at a point that travels round its outline as the slider moves, so
+ * every position — the middle of each side, each corner, and everywhere between — can be reached. Wherever the slider
+ * is, an arrow is drawn, and it leaves on the side the slider's angle faces.
+ */
+const CIRCLING = demo("circling");
+
+test("the arrow going round is drawn at every position, on the side its angle faces", async ({ page }) => {
+    const slider = page.locator(`${CIRCLING} input[type="range"]`);
+
+    for (const degrees of [0, 26, 45, 90, 153, 180, 207, 270, 333]) {
+        await slider.fill(String(degrees));
+        await expect(page.locator(`${CIRCLING} svg`)).toHaveCount(1);
+        await page.waitForTimeout(100);
+
+        const [reading] = await page.locator(`${CIRCLING} svg`).evaluateAll((svgs) =>
+            svgs.map((svg) => {
+                const numbers = (svg.querySelector("path")?.getAttribute("d") ?? "").match(/-?\d+(\.\d+)?/g) ?? [];
+                const vertices = [];
+
+                for (let i = 0; i + 1 < numbers.length; i += 2) {
+                    vertices.push({ x: Number(numbers[i]), y: Number(numbers[i + 1]) });
+                }
+
+                return {
+                    vertices,
+                    size: { width: Number(svg.getAttribute("width")), height: Number(svg.getAttribute("height")) },
+                };
+            }),
+        );
+        const tip = findTip(reading as ArrowReading);
+        const radians = (degrees * Math.PI) / 180;
+
+        expect(outside(tip, reading.size), `an arrow is drawn at ${degrees}°`).toBeGreaterThan(TOLERANCE_PX);
+
+        for (const [offset, along] of [
+            [tip.x - reading.size.width * 0.5, Math.cos(radians)],
+            [tip.y - reading.size.height * 0.5, Math.sin(radians)],
+        ]) {
+            if (Math.abs(along) > 0.2) {
+                expect(Math.sign(offset), `and it leaves on the side ${degrees}° faces`).toBe(Math.sign(along));
+            }
+        }
+    }
 });

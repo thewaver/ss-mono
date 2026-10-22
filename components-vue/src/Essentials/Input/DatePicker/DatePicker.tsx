@@ -81,6 +81,7 @@ export const DatePicker = defineComponent(
                 weekStartsOn={props.weekStartsOn}
                 precision={props.precision}
                 ariaLabel={props.calendarLabel}
+                disabledDays={props.disabledDays}
                 computeIsDayDisabled={props.computeIsDayDisabled}
             >
                 {
@@ -220,6 +221,7 @@ export const DatePicker = defineComponent(
             "calendarLabel": null,
             "weekStartsOn": null,
             "precision": null,
+            "disabledDays": null,
             "computeIsDayDisabled": null,
             "visibility": Boolean,
             "onUpdate:visibility": null,

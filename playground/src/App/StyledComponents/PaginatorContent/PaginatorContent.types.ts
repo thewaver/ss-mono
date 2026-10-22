@@ -33,7 +33,15 @@ export type BasePaginatorDialGapContentProps = BasePaginatorDialGapContentValues
 
 export type BasePaginatorPanelValues = {
     page: number;
-    pageCount: number;
+    itemCount: number;
+    pageSize: number;
 };
 
 export type BasePaginatorPanelProps = BasePaginatorPanelValues;
+
+export type BasePaginatorCountContentValues = {
+    page: number;
+    pageCount: number;
+};
+
+export type BasePaginatorCountContentProps = BasePaginatorCountContentValues;

@@ -109,6 +109,35 @@ test("Escape closes and hands focus back, and ArrowUp reopens onto the last item
     expect(await activeMatches(page, trigger("default")), "returning focus to the trigger").toBe(true);
 });
 
+/**
+ * The published menu-button pattern sends Tab on past the trigger rather than back to it. The menu itself is
+ * portalled to the end of the document, so the spec does not name where Tab should land: it asks the browser
+ * first, by tabbing from the closed trigger and marking wherever focus went, and then expects the open menu's
+ * Tab to land on that same element.
+ */
+test("Tab leaves the menu for whatever follows its trigger, and Shift+Tab goes back to the trigger", async ({
+    page,
+}) => {
+    await page.locator(trigger("default")).focus();
+    await page.keyboard.press("Tab");
+    await page.evaluate(() => document.activeElement?.setAttribute("data-after-trigger", ""));
+
+    await openedWithHighlight(page, "default");
+    await page.keyboard.press("Tab");
+
+    await expect(page.locator(MENU), "Tab closes the menu").toHaveCount(0);
+    expect(
+        await activeMatches(page, "[data-after-trigger]"),
+        "and lands where Tab from the closed trigger would have, not back on the trigger",
+    ).toBe(true);
+
+    await openedWithHighlight(page, "default");
+    await page.keyboard.press("Shift+Tab");
+
+    await expect(page.locator(MENU), "Shift+Tab closes it too").toHaveCount(0);
+    expect(await activeMatches(page, trigger("default")), "and hands focus back to the trigger").toBe(true);
+});
+
 test("clicking an item activates it and keeps focus in the menu long enough to resolve", async ({ page }) => {
     await page.locator(trigger("default")).click();
     await page.locator(ITEM, { hasText: "Paste" }).first().click();

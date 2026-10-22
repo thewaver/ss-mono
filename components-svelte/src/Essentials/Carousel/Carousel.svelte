@@ -48,6 +48,7 @@
     const currentIndex = $derived(CarouselUtils.wrapIndex(index, count));
     const isDisabled = $derived(props.isDisabled ?? false);
     const isLooping = $derived(props.isLooping ?? CAROUSEL_DEFAULTS.isLooping);
+    const isWindowed = $derived(props.isWindowed ?? CAROUSEL_DEFAULTS.isWindowed);
     const orientation = $derived(props.orientation ?? CAROUSEL_DEFAULTS.orientation);
     const transitionDurationMs = $derived(props.transitionDurationMs ?? CAROUSEL_DEFAULTS.transitionDurationMs);
     const autoplayDelayMs = $derived(props.autoplayDelayMs);
@@ -81,16 +82,23 @@
 
     const getDistance = (place: number) => CarouselUtils.getDistance(place, ringPosition, ringCount, isLooping);
 
+    const getIsBuiltAt = (place: number) =>
+        CarouselUtils.getIsBuilt(getDistance(place), props.placement.reach, isWindowed);
+
+    const builtPlaces = $derived(ringPlaces.filter(getIsBuiltAt));
+
     const placements = $derived(
         ringPlaces.map((place) =>
-            props.placement.place({
-                distance: getDistance(place),
-                index: place,
-                count: ringCount,
-                size: getSize(),
-                orientation,
-                isLooping,
-            }),
+            getIsBuiltAt(place)
+                ? props.placement.place({
+                      distance: getDistance(place),
+                      index: place,
+                      count: ringCount,
+                      size: getSize(),
+                      orientation,
+                      isLooping,
+                  })
+                : undefined,
         ),
     );
 
@@ -400,7 +408,7 @@
         {@attach (element) => on(element, "click", handleViewportClick)}
         class={styles.carouselViewport}
     >
-        {#each ringPlaces as place (place)}
+        {#each builtPlaces as place (place)}
             {@const item = props.slides[toIndex(place)]}
             <div
                 {@attach attachPlacement(place)}

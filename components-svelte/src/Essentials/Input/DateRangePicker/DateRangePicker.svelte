@@ -107,6 +107,7 @@
         locale={props.locale}
         weekStartsOn={props.weekStartsOn}
         ariaLabel={props.calendarLabel}
+        disabledDays={props.disabledDays}
         computeIsDayDisabled={props.computeIsDayDisabled}
         renderDay={props.renderDay}
         renderWeekday={props.renderWeekday}

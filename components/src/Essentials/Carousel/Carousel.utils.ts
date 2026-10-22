@@ -267,6 +267,18 @@ export namespace CarouselUtils {
     };
 
     /**
+     * Whether a slide is built, for a carousel that builds only what its placement draws.
+     *
+     * @param distance How far the slide is from where the carousel is, from {@link getDistance}.
+     * @param reach How far either side the placement draws — see `CarouselPlacementRule.reach`. Missing means the
+     * rule cannot say, so every slide is built.
+     * @param isWindowed Whether the carousel asked to build only what is drawn.
+     * @returns `true` unless the carousel is windowed and the slide is further away than the rule draws.
+     */
+    export const getIsBuilt = (distance: number, reach: number | undefined, isWindowed: boolean) =>
+        !isWindowed || reach === undefined || Math.abs(distance) <= reach;
+
+    /**
      * How far one slide is from where the carousel is, in slides.
      *
      * On a looping carousel it is the short way round, so with the last slide showing the first sits at `1` rather

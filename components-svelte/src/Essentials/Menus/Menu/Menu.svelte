@@ -1,5 +1,5 @@
 <script lang="ts" generics="T">
-    import { untrack } from "svelte";
+    import { tick, untrack } from "svelte";
 
     import { MENU_DEFAULTS, type MenuFlags, type MenuHighlightPosition, MenuUtils } from "@thewaver/ss-components";
     import type { Point2d } from "@thewaver/ss-utils";
@@ -54,6 +54,13 @@
     const close = () => {
         visibility = false;
         flickOrigin = undefined;
+    };
+
+    const dismiss = (isLeavingForward: boolean) => {
+        const nextTabStop = isLeavingForward ? MenuUtils.computeNextTabStop(triggerElement) : undefined;
+
+        close();
+        void tick().then(() => nextTabStop?.focus());
     };
 
     const [getChecked, setChecked] = createHeldValue([
@@ -183,7 +190,7 @@
                 }
             }}
             onClose={close}
-            onDismiss={close}
+            onDismiss={dismiss}
         />
     {/snippet}
 </InteractionWrapper>

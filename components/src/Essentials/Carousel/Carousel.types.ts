@@ -124,6 +124,15 @@ export type CarouselState = {
      * short way round, so a placement that closes into a ring — the drum — shows a seam where the ends meet.
      */
     isLooping?: boolean;
+    /**
+     * Whether only the slides the placement draws are built. Off by default, every slide is built from the first
+     * render and kept, hidden and unreachable while it is away. On, a slide further from the one showing than the
+     * placement's `reach` is not built at all, and is built again as it comes back within reach — so a hundred
+     * expensive slides cost only the handful in sight. **A slide that leaves and comes back is a new one**: whatever
+     * it held — text typed into it, a video's place — is gone, so keep that in the consumer's own data. A placement
+     * with no `reach` cannot say which slides it draws, and every slide is built as though this were off.
+     */
+    isWindowed?: boolean;
     /** Names the carousel for assistive technology. */
     ariaLabel: string;
 };

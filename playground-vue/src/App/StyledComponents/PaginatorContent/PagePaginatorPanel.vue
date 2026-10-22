@@ -1,47 +1,44 @@
 <script setup lang="ts">
 import { computed } from "vue";
 
-import {
-    FIRST_PAGE,
-    PAGE_SIZE,
-    RESULTS,
-} from "@thewaver/ss-playground/App/StyledComponents/PaginatorContent/PaginatorContent.const";
+import { PaginatorUtils } from "@thewaver/ss-components-vue";
+import { RESULTS } from "@thewaver/ss-playground/App/StyledComponents/PaginatorContent/PaginatorContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/PaginatorContent/PaginatorContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type { PaginatorPanelProps } from "./PaginatorContentVue.types";
 
-const toResult = (index: number) => RESULTS[index % RESULTS.length];
+const toResult = (itemNumber: number) => RESULTS[(itemNumber - 1) % RESULTS.length];
 
 const props = defineProps<PaginatorPanelProps>();
 
 const layerClass = useLayerClass();
 
-const firstIndex = computed(() => (Math.max(props.page, FIRST_PAGE) - FIRST_PAGE) * PAGE_SIZE);
+const range = computed(() => PaginatorUtils.computeItemRange(props.page, props.itemCount, props.pageSize));
 
-const total = computed(() => Math.max(props.pageCount, 0) * PAGE_SIZE);
-
-const indexes = computed(() =>
-    Array.from({ length: PAGE_SIZE }, (_unused, offset) => firstIndex.value + offset).filter(
-        (index) => index < total.value,
-    ),
+const summary = computed(() =>
+    range.value === undefined
+        ? "nothing to show"
+        : `showing ${range.value.first} to ${range.value.last} of ${props.itemCount}`,
 );
+
+const itemNumbers = computed(() => {
+    const current = range.value;
+
+    return current === undefined
+        ? []
+        : Array.from({ length: current.last - current.first + 1 }, (_unused, offset) => current.first + offset);
+});
 </script>
 
 <template>
     <div :class="[styles.paginatorPanel, layerClass]">
-        <div :class="styles.paginatorPanelSummary" role="status">
-            {{
-                indexes.length === 0
-                    ? "nothing to show"
-                    : `showing ${firstIndex + FIRST_PAGE} to ${firstIndex + indexes.length} of ${total}`
-            }}
-        </div>
+        <div :class="styles.paginatorPanelSummary" role="status">{{ summary }}</div>
 
-        <div v-for="index in indexes" :key="index" :class="styles.paginatorPanelRow">
-            <span>{{ toResult(index) }}</span>
+        <div v-for="itemNumber in itemNumbers" :key="itemNumber" :class="styles.paginatorPanelRow">
+            <span>{{ toResult(itemNumber) }}</span>
 
-            <span :class="styles.paginatorPanelIndex">{{ `#${index + FIRST_PAGE}` }}</span>
+            <span :class="styles.paginatorPanelIndex">{{ `#${itemNumber}` }}</span>
         </div>
     </div>
 </template>

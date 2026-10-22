@@ -2,7 +2,7 @@ import { style } from "@vanilla-extract/css";
 
 import { buttonElement } from "../Buttons/Button/Button.css";
 
-export const paginatorRoot = style({
+export const paginatorRow = style({
     display: "flex",
     alignItems: "center",
 });

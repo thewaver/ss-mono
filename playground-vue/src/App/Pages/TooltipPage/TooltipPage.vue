@@ -8,6 +8,7 @@ import {
     EXAMPLES_ROOT,
     EXAMPLE_NAMES,
     FIELD_WIDTH,
+    STARTING_CIRCLING_DEGREES,
 } from "@thewaver/ss-playground/App/Pages/TooltipPage/TooltipPage.const";
 import {
     TOOLTIP_ARROWS,
@@ -25,6 +26,8 @@ import PageNumberField from "../../PageComponents/Field/PageNumberField.vue";
 import PageSelectField from "../../PageComponents/Field/PageSelectField.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
 import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
+import ArrowsExample from "./Examples/Arrows.vue";
+import CirclingExample from "./Examples/Circling.vue";
 import DefaultExample from "./Examples/Default.vue";
 import RichExample from "./Examples/Rich.vue";
 import WordExample from "./Examples/Word.vue";
@@ -45,6 +48,8 @@ const reveal = shallowRef<TooltipReveal>(TooltipKnobs.STARTING_REVEAL);
 const arrow = shallowRef<TooltipArrow>(TooltipKnobs.STARTING_ARROW);
 const arrowWidth = shallowRef(TooltipKnobs.STARTING_ARROW_WIDTH);
 const arrowLength = shallowRef(TooltipKnobs.STARTING_ARROW_LENGTH);
+
+const circlingDegrees = shallowRef(STARTING_CIRCLING_DEGREES);
 
 const placement = computed(() => ({ x: hPlacement.value, y: vPlacement.value }));
 
@@ -83,6 +88,21 @@ const examples: ExampleDefs[] = [
         name: EXAMPLE_NAMES.rich,
         readout: () => "the content is whatever you render, and the anchoring is unchanged by how tall it is",
         path: `${EXAMPLES_ROOT}/Rich.vue`,
+    },
+    {
+        key: "circling",
+        name: EXAMPLE_NAMES.circling,
+        readout: () =>
+            `arrow at ${circlingDegrees.value}° round the tooltip — straight out from the edge it sits on, turning through the diagonal as it rounds a corner`,
+        path: `${EXAMPLES_ROOT}/Circling.vue`,
+    },
+    {
+        key: "arrows",
+        name: EXAMPLE_NAMES.arrows,
+        span: 2,
+        readout: () =>
+            "eight tooltips round one anchor, one per side and corner, each arrow aimed by the same rule a live tooltip uses — the corner ones are where a wide arrow goes wrong",
+        path: `${EXAMPLES_ROOT}/Arrows.vue`,
     },
 ];
 </script>
@@ -301,6 +321,14 @@ const examples: ExampleDefs[] = [
 
         <template #rich>
             <RichExample v-bind="commonProps" />
+        </template>
+
+        <template #circling>
+            <CirclingExample v-model:degrees="circlingDegrees" />
+        </template>
+
+        <template #arrows>
+            <ArrowsExample />
         </template>
     </PageExamples>
 </template>

@@ -476,7 +476,7 @@ describe("ShapeUtils.attachArrow", () => {
         expect(round(right.points)).toContainEqual({ x: 108, y: 20 });
     });
 
-    it("swallows a corner it is attached at, extending its sides back to the edges either side", () => {
+    it("swallows a corner it is attached at, starting its base half its width down each edge", () => {
         const result = ShapeUtils.attachArrow({ points: BOX }, { point: { x: 0, y: 40 }, angle: 135 }, ARROW);
         const points = round(result.points);
 
@@ -553,16 +553,27 @@ describe("ShapeUtils.attachArrow", () => {
         ]);
     });
 
-    it("ends a side that never meets the contour at the point the arrow is attached at", () => {
+    it("keeps a corner arrow's base on the two edges whatever the aim", () => {
         const result = ShapeUtils.attachArrow({ points: BOX }, { point: { x: 100, y: 0 }, angle: -10 }, ARROW);
         const points = round(result.points);
         const tip = points.find((point) => point.x > 100);
 
         expect(points).toHaveLength(6);
-        expect(points).toContainEqual({ x: 100, y: 0 });
-        expect(points.filter((point) => point.x === 100 && point.y > 0 && point.y < 40)).toHaveLength(1);
+        expect(points).not.toContainEqual({ x: 100, y: 0 });
+        expect(points).toContainEqual({ x: 100, y: 5 });
+        expect(points).toContainEqual({ x: 95, y: 0 });
         expect(tip?.x).toBeCloseTo(100 + 8 * Math.cos((10 * Math.PI) / 180), 6);
         expect(tip?.y).toBeCloseTo(-8 * Math.sin((10 * Math.PI) / 180), 6);
+    });
+
+    it("still draws a corner arrow twice as wide as it is long, as compact as a narrow one", () => {
+        const wide = ShapeConst.getIsoscelesArrow(20, 10);
+        const result = ShapeUtils.attachArrow({ points: BOX }, { point: { x: 100, y: 40 }, angle: 45 }, wide);
+        const points = round(result.points);
+
+        expect(points).toHaveLength(6);
+        expect(points).toContainEqual({ x: 100, y: 30 });
+        expect(points).toContainEqual({ x: 90, y: 40 });
     });
 
     it("attaches nothing when there is no aim, or when the tip would land inside", () => {

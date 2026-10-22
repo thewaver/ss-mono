@@ -2,6 +2,7 @@ import type { Snippet } from "svelte";
 
 import type { PlacementRect } from "@thewaver/ss-components-svelte";
 import type {
+    BasePaginatorCountContentProps,
     BasePaginatorDialGapContentProps,
     BasePaginatorGapContentProps,
     BasePaginatorPageContentProps,
@@ -27,3 +28,5 @@ export type PaginatorWedgeProps = {
 };
 
 export type PaginatorPanelProps = BasePaginatorPanelProps;
+
+export type PaginatorCountContentProps = BasePaginatorCountContentProps;

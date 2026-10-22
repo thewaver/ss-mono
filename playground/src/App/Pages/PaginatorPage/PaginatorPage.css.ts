@@ -1,5 +1,7 @@
 import { style } from "@vanilla-extract/css";
 
+import { themeVars } from "../../Theme.css";
+
 export const DIAL_SIZE = 240;
 
 export const halfDial = style({
@@ -19,4 +21,11 @@ export const halfDialPanel = style({
     order: -1,
     display: "flex",
     minHeight: DIAL_SIZE,
+});
+
+export const jumpRow = style({
+    display: "flex",
+    flexWrap: "wrap",
+    alignItems: "center",
+    gap: themeVars.spacing.full,
 });

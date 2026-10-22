@@ -113,6 +113,7 @@ export const CalendarComposite = defineComponent(
                 isDisabled: props.isDisabled,
                 minValue: props.minValue,
                 maxValue: props.maxValue,
+                disabledDays: props.disabledDays,
                 computeIsDayDisabled: props.computeIsDayDisabled,
             });
 
@@ -279,6 +280,7 @@ export const CalendarComposite = defineComponent(
             "maxValue": null,
             "isDisabled": Boolean,
             "gap": null,
+            "disabledDays": null,
             "computeIsDayDisabled": null,
             "month": null,
             "onUpdate:month": null,
@@ -337,6 +339,7 @@ export const Calendar = defineComponent(
             "maxValue": null,
             "isDisabled": Boolean,
             "gap": null,
+            "disabledDays": null,
             "computeIsDayDisabled": null,
             "month": null,
             "onUpdate:month": null,

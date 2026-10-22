@@ -147,8 +147,11 @@ export type MenuLevelProps<T> = AccessorProps<{
     renderHighlightFloater?: (getVisibilityTarget: () => 0 | 1, getTransitionDurationMs: () => number) => JSX.Element;
     /** Runs when this level closes in the ordinary way, with the menu carrying on above it. */
     onClose: () => void;
-    /** Runs when this level is dismissed from outside — a press elsewhere, focus leaving, or Escape. */
-    onDismiss: () => void;
+    /**
+     * Runs when Tab dismisses the whole menu from this level, told whether it was pressed without Shift — in which
+     * case focus goes on past the opener rather than back to it.
+     */
+    onDismiss: (isLeavingForward: boolean) => void;
 }> & {
     /** The item that opened this level, where one did. */
     openerItem?: MaybeAccessor<MenuItem<T> | undefined>;

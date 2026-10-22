@@ -113,6 +113,8 @@ export type * from "./Primitives/Wheel/Wheel.types";
 export * from "./Exotics/Wheels/DrumWheel/DrumWheel";
 export * from "./Exotics/Wheels/OverheadWheel/OverheadWheel";
 export * from "./Essentials/Paginator/Paginator";
+export * from "./Essentials/Paginator/Paginator.context";
+export type * from "./Essentials/Paginator/Paginator.context.types";
 export type * from "./Essentials/Paginator/Paginator.types";
 export * from "./Essentials/MediaSwitchers/AudioSwitcher/AudioSwitcher";
 export type * from "./Essentials/MediaSwitchers/AudioSwitcher/AudioSwitcher.types";

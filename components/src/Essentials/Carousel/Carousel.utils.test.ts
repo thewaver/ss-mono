@@ -317,3 +317,20 @@ describe("getNearestCopy", () => {
         expect(CarouselUtils.getNearestCopy(1, 0.2, 4, 3)).toBe(1);
     });
 });
+
+describe("getIsBuilt", () => {
+    it("builds every slide unless the carousel asked for a window", () => {
+        expect(CarouselUtils.getIsBuilt(40, 2, false)).toBe(true);
+    });
+
+    it("builds only the slides within the rule's reach, either side, fractions included", () => {
+        expect(CarouselUtils.getIsBuilt(2, 2, true)).toBe(true);
+        expect(CarouselUtils.getIsBuilt(-1.5, 2, true)).toBe(true);
+        expect(CarouselUtils.getIsBuilt(2.25, 2, true)).toBe(false);
+        expect(CarouselUtils.getIsBuilt(-3, 2, true)).toBe(false);
+    });
+
+    it("builds everything when the rule cannot say how far it draws", () => {
+        expect(CarouselUtils.getIsBuilt(40, undefined, true)).toBe(true);
+    });
+});

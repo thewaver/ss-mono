@@ -3,6 +3,12 @@
     import { ANCHOR_H_PLACEMENTS, ANCHOR_V_PLACEMENTS, TOOLTIP_DEFAULTS } from "@thewaver/ss-components-svelte";
     import { TooltipKnobs } from "@thewaver/ss-playground/App/Knobs/Tooltips.const";
     import {
+        EXAMPLES_ROOT,
+        EXAMPLE_NAMES,
+        FIELD_WIDTH,
+        STARTING_CIRCLING_DEGREES,
+    } from "@thewaver/ss-playground/App/Pages/TooltipPage/TooltipPage.const";
+    import {
         TOOLTIP_ARROWS,
         TOOLTIP_ARROW_LABELS,
         TOOLTIP_HOVER_DELAY_MS,
@@ -18,15 +24,12 @@
     import PageSelectField from "../../PageComponents/Field/PageSelectField.svelte";
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
     import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
+    import ArrowsExample from "./Examples/Arrows.svelte";
+    import CirclingExample from "./Examples/Circling.svelte";
     import DefaultExample from "./Examples/Default.svelte";
     import RichExample from "./Examples/Rich.svelte";
     import WordExample from "./Examples/Word.svelte";
     import type { TooltipExampleProps } from "./TooltipPageSvelte.types";
-    import {
-    EXAMPLE_NAMES,
-    EXAMPLES_ROOT,
-    FIELD_WIDTH,
-} from "@thewaver/ss-playground/App/Pages/TooltipPage/TooltipPage.const";
 
     let hPlacement = $state<AnchorHPlacement>(TooltipKnobs.STARTING_H_PLACEMENT);
     let vPlacement = $state<AnchorVPlacement>(TooltipKnobs.STARTING_V_PLACEMENT);
@@ -40,6 +43,8 @@
     let arrow = $state<TooltipArrow>(TooltipKnobs.STARTING_ARROW);
     let arrowWidth = $state(TooltipKnobs.STARTING_ARROW_WIDTH);
     let arrowLength = $state(TooltipKnobs.STARTING_ARROW_LENGTH);
+
+    let circlingDegrees = $state(STARTING_CIRCLING_DEGREES);
 
     const placement = $derived({ x: hPlacement, y: vPlacement });
 
@@ -82,6 +87,23 @@
             component: richExample,
             path: `${EXAMPLES_ROOT}/Rich.svelte`,
         },
+        {
+            key: "circling",
+            name: EXAMPLE_NAMES.circling,
+            readout: () =>
+                `arrow at ${circlingDegrees}° round the tooltip — straight out from the edge it sits on, turning through the diagonal as it rounds a corner`,
+            component: circlingExample,
+            path: `${EXAMPLES_ROOT}/Circling.svelte`,
+        },
+        {
+            key: "arrows",
+            name: EXAMPLE_NAMES.arrows,
+            span: 2,
+            readout: () =>
+                "eight tooltips round one anchor, one per side and corner, each arrow aimed by the same rule a live tooltip uses — the corner ones are where a wide arrow goes wrong",
+            component: arrowsExample,
+            path: `${EXAMPLES_ROOT}/Arrows.svelte`,
+        },
     ];
 </script>
 
@@ -95,6 +117,14 @@
 
 {#snippet richExample()}
     <RichExample {...commonProps} />
+{/snippet}
+
+{#snippet circlingExample()}
+    <CirclingExample bind:degrees={circlingDegrees} />
+{/snippet}
+
+{#snippet arrowsExample()}
+    <ArrowsExample />
 {/snippet}
 
 <PagePropsPanel scope={"global"}>

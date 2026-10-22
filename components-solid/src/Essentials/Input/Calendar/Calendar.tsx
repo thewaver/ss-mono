@@ -91,6 +91,7 @@ export const CalendarComposite = (props: CalendarCompositeProps) => {
             isDisabled: access(props.isDisabled),
             minValue: access(props.minValue),
             maxValue: access(props.maxValue),
+            disabledDays: access(props.disabledDays),
             computeIsDayDisabled: props.computeIsDayDisabled,
         });
 

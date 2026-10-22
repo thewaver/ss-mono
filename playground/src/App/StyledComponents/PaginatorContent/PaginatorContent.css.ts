@@ -62,6 +62,13 @@ export const paginatorGap = style([
     },
 ]);
 
+export const paginatorCount = style([
+    cellBase,
+    {
+        whiteSpace: "nowrap",
+    },
+]);
+
 export const paginatorWedge = style({
     position: "relative",
     containerType: "inline-size",

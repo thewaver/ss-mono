@@ -5,6 +5,7 @@ export const CAROUSEL_DEFAULTS = {
     transitionDurationMs: 400,
     gap: 0,
     isLooping: true,
+    isWindowed: false,
     roleDescription: "carousel",
     slideRoleDescription: "slide",
 };

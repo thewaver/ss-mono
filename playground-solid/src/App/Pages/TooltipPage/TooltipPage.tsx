@@ -7,6 +7,7 @@ import {
     EXAMPLES_ROOT,
     EXAMPLE_NAMES,
     FIELD_WIDTH,
+    STARTING_CIRCLING_DEGREES,
 } from "@thewaver/ss-playground/App/Pages/TooltipPage/TooltipPage.const";
 import {
     TOOLTIP_ARROWS,
@@ -22,6 +23,8 @@ import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
+import { ArrowsExample } from "./Examples/Arrows";
+import { CirclingExample } from "./Examples/Circling";
 import { DefaultExample } from "./Examples/Default";
 import { RichExample } from "./Examples/Rich";
 import { WordExample } from "./Examples/Word";
@@ -40,6 +43,8 @@ export const TooltipPage = () => {
     const [getArrow, setArrow] = createSignal<TooltipArrow>(TooltipKnobs.STARTING_ARROW);
     const [getArrowWidth, setArrowWidth] = createSignal(TooltipKnobs.STARTING_ARROW_WIDTH);
     const [getArrowLength, setArrowLength] = createSignal(TooltipKnobs.STARTING_ARROW_LENGTH);
+
+    const circlingDegrees = createSignal(STARTING_CIRCLING_DEGREES);
 
     const getPlacement = createMemo(() => ({ x: getHPlacement(), y: getVPlacement() }));
 
@@ -82,6 +87,23 @@ export const TooltipPage = () => {
                 readout: () => "the content is whatever you render, and the anchoring is unchanged by how tall it is",
                 component: () => <RichExample {...commonProps} />,
                 path: `${EXAMPLES_ROOT}/Rich.tsx`,
+            },
+            {
+                key: "circling",
+                name: EXAMPLE_NAMES.circling,
+                readout: () =>
+                    `arrow at ${circlingDegrees[0]()}° round the tooltip — straight out from the edge it sits on, turning through the diagonal as it rounds a corner`,
+                component: () => <CirclingExample degrees={circlingDegrees} />,
+                path: `${EXAMPLES_ROOT}/Circling.tsx`,
+            },
+            {
+                key: "arrows",
+                name: EXAMPLE_NAMES.arrows,
+                span: 2,
+                readout: () =>
+                    "eight tooltips round one anchor, one per side and corner, each arrow aimed by the same rule a live tooltip uses — the corner ones are where a wide arrow goes wrong",
+                component: () => <ArrowsExample />,
+                path: `${EXAMPLES_ROOT}/Arrows.tsx`,
             },
         ];
     });

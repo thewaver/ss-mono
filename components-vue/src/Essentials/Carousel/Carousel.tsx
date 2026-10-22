@@ -81,6 +81,7 @@ export const Carousel = defineComponent(
         const currentIndex = computed(() => CarouselUtils.wrapIndex(index.value, count.value));
         const getIsDisabled = () => props.isDisabled ?? false;
         const getIsLooping = () => props.isLooping ?? CAROUSEL_DEFAULTS.isLooping;
+        const getIsWindowed = () => props.isWindowed ?? CAROUSEL_DEFAULTS.isWindowed;
         const getOrientation = () => props.orientation ?? CAROUSEL_DEFAULTS.orientation;
         const getTransitionDurationMs = () => props.transitionDurationMs ?? CAROUSEL_DEFAULTS.transitionDurationMs;
 
@@ -383,6 +384,7 @@ export const Carousel = defineComponent(
             const orientation = getOrientation();
             const slideRoleDescription = props.slideRoleDescription ?? CAROUSEL_DEFAULTS.slideRoleDescription;
             const isTurnable = slots.renderSlideBack !== undefined;
+            const isWindowed = getIsWindowed();
 
             const controls: CarouselControls = {
                 index: currentIndex.value,
@@ -395,8 +397,16 @@ export const Carousel = defineComponent(
             };
 
             const renderSlide = (place: number) => {
-                const slide = props.slides[toIndex(place)];
                 const distance = getDistance(place);
+
+                if (!CarouselUtils.getIsBuilt(distance, props.placement.reach, isWindowed)) {
+                    faceRefs[place] = undefined;
+                    placements[place] = undefined;
+
+                    return undefined;
+                }
+
+                const slide = props.slides[toIndex(place)];
                 const placement = props.placement.place({
                     distance,
                     index: place,
@@ -459,7 +469,9 @@ export const Carousel = defineComponent(
                     aria-label={props.ariaLabel}
                 >
                     <div ref={viewportRef} class={CarouselStyles.carouselViewport} onClick={handleViewportClick}>
-                        {Array.from({ length: ringCount.value }, (_, place) => renderSlide(place))}
+                        {Array.from({ length: ringCount.value }, (_, place) => renderSlide(place)).filter(
+                            (slide) => slide !== undefined,
+                        )}
                     </div>
 
                     {callSlot(slots.renderControls, controls)}
@@ -476,6 +488,7 @@ export const Carousel = defineComponent(
             "gap": null,
             "isDisabled": Boolean,
             "isLooping": Boolean,
+            "isWindowed": Boolean,
             "ariaLabel": null,
             "computeSlideLabel": null,
             "computeStepLabel": null,

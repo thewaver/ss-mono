@@ -2,8 +2,15 @@ import type { Accessor, Component, JSX } from "solid-js";
 
 import type {
     BasePaginatorCbs,
+    BasePaginatorPagesCbs,
+    BasePaginatorPagesValues,
+    BasePaginatorRootCbs,
+    BasePaginatorRootValues,
+    BasePaginatorStepsCbs,
+    BasePaginatorStepsValues,
     BasePaginatorValues,
     InteractionFlags,
+    PaginatorContextType,
     PaginatorGapEntry,
     PaginatorPageEntry,
     PaginatorPageRenderProps,
@@ -16,6 +23,10 @@ import type { InteractionControlProps } from "../../Primitives/InteractionWrappe
 import type { AccessorProps, AccessorValues } from "../../Utils/typeUtils";
 
 export type PaginatorLinkProps = JSX.AnchorHTMLAttributes<HTMLAnchorElement> & { href: string };
+
+export type PaginatorSolidContextType = PaginatorContextType & {
+    getLinkComponent: () => Component<PaginatorLinkProps> | undefined;
+};
 
 export type PaginatorItemProps = AccessorProps<
     InteractionControlProps & {
@@ -30,24 +41,41 @@ export type PaginatorItemProps = AccessorProps<
     }
 >;
 
+type PaginatorRootOwnProps = AccessorProps<{
+    /** The component to draw navigating entries with, in every piece inside. */
+    linkComponent?: Component<PaginatorLinkProps>;
+}>;
+
+type PaginatorStepsOwnProps = AccessorProps<{
+    /** Draws one of the move controls. */
+    renderStep: (
+        getStep: Accessor<PaginatorStep>,
+        getRenderProps: () => InteractionFlags<PaginatorStepRenderProps>,
+    ) => JSX.Element;
+}>;
+
+type PaginatorPagesOwnProps = AccessorProps<{
+    /** Draws one page entry. */
+    renderPage: (
+        getEntry: Accessor<PaginatorPageEntry>,
+        getRenderProps: () => InteractionFlags<PaginatorPageRenderProps>,
+    ) => JSX.Element;
+    /** Draws the break standing in for the pages that were left out. */
+    renderGap: (getEntry: Accessor<PaginatorGapEntry>, getPlacement: () => PlacementRect | undefined) => JSX.Element;
+}>;
+
+export type PaginatorRootProps = AccessorValues<BasePaginatorRootValues> & BasePaginatorRootCbs & PaginatorRootOwnProps;
+
+export type PaginatorStepsProps = AccessorValues<BasePaginatorStepsValues> &
+    BasePaginatorStepsCbs &
+    PaginatorStepsOwnProps;
+
+export type PaginatorPagesProps = AccessorValues<BasePaginatorPagesValues> &
+    BasePaginatorPagesCbs &
+    PaginatorPagesOwnProps;
+
 export type PaginatorProps = AccessorValues<BasePaginatorValues> &
     BasePaginatorCbs &
-    AccessorProps<{
-        /** The component to draw navigating entries with. */
-        linkComponent?: Component<PaginatorLinkProps>;
-        /** Draws one page entry. */
-        renderPage: (
-            getEntry: Accessor<PaginatorPageEntry>,
-            getRenderProps: () => InteractionFlags<PaginatorPageRenderProps>,
-        ) => JSX.Element;
-        /** Draws the break standing in for the pages that were left out. */
-        renderGap: (
-            getEntry: Accessor<PaginatorGapEntry>,
-            getPlacement: () => PlacementRect | undefined,
-        ) => JSX.Element;
-        /** Draws one of the move controls. */
-        renderStep: (
-            getStep: Accessor<PaginatorStep>,
-            getRenderProps: () => InteractionFlags<PaginatorStepRenderProps>,
-        ) => JSX.Element;
-    }>;
+    PaginatorRootOwnProps &
+    PaginatorStepsOwnProps &
+    PaginatorPagesOwnProps;

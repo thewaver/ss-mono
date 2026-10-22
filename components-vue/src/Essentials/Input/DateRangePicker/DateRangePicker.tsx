@@ -98,6 +98,7 @@ export const DateRangePicker = defineComponent(
                 locale={props.locale}
                 weekStartsOn={props.weekStartsOn}
                 ariaLabel={props.calendarLabel}
+                disabledDays={props.disabledDays}
                 computeIsDayDisabled={props.computeIsDayDisabled}
             >
                 {
@@ -258,6 +259,7 @@ export const DateRangePicker = defineComponent(
             "startLabel": null,
             "endLabel": null,
             "weekStartsOn": null,
+            "disabledDays": null,
             "computeIsDayDisabled": null,
             "value": null,
             "onUpdate:value": null,

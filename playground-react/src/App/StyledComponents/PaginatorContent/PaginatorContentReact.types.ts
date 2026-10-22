@@ -2,6 +2,7 @@ import type { PropsWithChildren } from "react";
 
 import type { PlacementRect } from "@thewaver/ss-components-react";
 import type {
+    BasePaginatorCountContentProps,
     BasePaginatorDialGapContentProps,
     BasePaginatorGapContentProps,
     BasePaginatorPageContentProps,
@@ -26,3 +27,5 @@ export type PaginatorWedgeProps = PropsWithChildren<{
 }>;
 
 export type PaginatorPanelProps = BasePaginatorPanelProps;
+
+export type PaginatorCountContentProps = BasePaginatorCountContentProps;

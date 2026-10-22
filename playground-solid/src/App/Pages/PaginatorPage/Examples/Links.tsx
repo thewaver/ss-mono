@@ -22,7 +22,8 @@ export const LinksExample = (props: Props) => {
         <PagePaginatorDemo>
             <Paginator
                 page={props.page}
-                pageCount={props.pageCount}
+                itemCount={props.itemCount}
+                pageSize={props.pageSize}
                 siblingCount={props.siblingCount}
                 boundaryCount={props.boundaryCount}
                 isDisabled={props.isDisabled}
@@ -37,7 +38,7 @@ export const LinksExample = (props: Props) => {
                 renderStep={(_getStep, getRenderProps) => <PagePaginatorStep renderProps={getRenderProps} />}
             />
 
-            <PagePaginatorPanel page={props.page} pageCount={props.pageCount} />
+            <PagePaginatorPanel page={props.page} itemCount={props.itemCount} pageSize={props.pageSize} />
         </PagePaginatorDemo>
     );
 };

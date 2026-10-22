@@ -10,6 +10,7 @@ const INNER_RECT_ITERATIONS = 5;
 const INNER_RECT_SAMPLES = 50;
 const CIRCLE_KAPPA = 1;
 const HALF_PI = Math.PI * 0.5;
+const HALF = 0.5;
 const HECTOGON_SIDES = 100;
 const MIN_TANGENT_COS_GAP = 1e-9;
 const MAX_TANGENT_LENGTH_FACTOR = 1e6;
@@ -19,6 +20,7 @@ const ARROW_BASE_END = -3;
 const NO_ARROW_RADII: [number, number, number] = [0, 0, 0];
 const NO_ARROW_EXPONENTS: [number, number, number] = [CIRCLE_KAPPA, CIRCLE_KAPPA, CIRCLE_KAPPA];
 const COINCIDENT_EPSILON = 1e-6;
+const TANGENT_PROBE_DISTANCE = 1e-3;
 
 /** The outer and inner contours of a shape, as both SVG path text and raw points. */
 type ShapePaths = {
@@ -94,6 +96,40 @@ const getCornersBetween = (from: PolygonContourPoint, to: PolygonContourPoint, c
 
         if (corner === to.edgeIndex) return corners;
     }
+};
+
+/**
+ * The contour point a given distance along the contour from another, walking with the corners' order or against it.
+ * The walk goes round corners as it meets them, and stops short of coming back to where it started.
+ */
+const walkContour = (points: Point2d[], from: PolygonContourPoint, distance: number, isForward: boolean) => {
+    const count = points.length;
+    let edge = from.edgeIndex;
+    let ratio = from.edgeRatio;
+    let remaining = distance;
+
+    for (let step = 0; step <= count; step++) {
+        const a = points[edge];
+        const b = points[(edge + 1) % count];
+        const length = Math.hypot(b.x - a.x, b.y - a.y);
+        const room = length * (isForward ? 1 - ratio : ratio);
+
+        if (length > COINCIDENT_EPSILON && remaining <= room) {
+            const edgeRatio = ratio + (isForward ? remaining : -remaining) / length;
+
+            return {
+                point: { x: a.x + (b.x - a.x) * edgeRatio, y: a.y + (b.y - a.y) * edgeRatio },
+                edgeIndex: edge,
+                edgeRatio,
+            };
+        }
+
+        remaining -= room;
+        edge = isForward ? (edge + 1) % count : (edge - 1 + count) % count;
+        ratio = isForward ? 0 : 1;
+    }
+
+    return from;
 };
 
 /** Drops a contour corner that an arrow corner landed on, keeping the arrow's. */
@@ -1028,11 +1064,14 @@ export namespace ShapeUtils {
      * Grows an arrow out of a contour, and reshapes the contour's styling lists to match.
      *
      * The arrow is attached to the unrounded corners, before any of them is drawn: `template` is placed with its origin
-     * on the contour point nearest `aim.point` and turned so its `+y` runs along `aim.angle`, then its two sides are
-     * extended back from the tip until each meets the contour. The two meeting points and the tip replace the stretch
-     * of contour between them, so an arrow at a corner swallows that corner, and the result is still one contour for
-     * {@link getPaths} to round as usual. A side that runs away from the contour and never meets it ends at the point
-     * the arrow is attached at instead, so an odd aim gives a lopsided arrow rather than none.
+     * on the contour point nearest `aim.point` and turned so its `+y` runs along `aim.angle`, giving the tip. Each base
+     * point is found by walking along the contour from that origin, as far as the template's base sits from its origin
+     * across the arrow and towards the same side, so on a straight edge the base is exactly the template's and at a
+     * corner it starts that far down each of the two edges. The two base points and the tip replace the stretch of
+     * contour between them, so an arrow at a corner swallows that corner, and the result is still one contour for
+     * {@link getPaths} to round as usual. Walking rather than extending the arrow's sides is what keeps a corner arrow
+     * compact whatever its width and aim: sides extended back from the tip meet the edges at a shallow angle, far from
+     * the corner, and an arrow twice as wide as it is long at a box corner never meets them at all.
      *
      * The lists come back matched to the new corners. A corner the arrow swallowed loses its entries; the arrow's
      * three corners take the template's styling, sharp unless it says otherwise; and each of the arrow's two sides
@@ -1044,7 +1083,7 @@ export namespace ShapeUtils {
      * anchored layer's arrow is when it overlaps its anchor and has nothing to point at.
      * @param template The arrow's triangle, in its own frame.
      * @returns The contour with the arrow attached, or `geometry` itself when there is nothing to attach to: fewer
-     * than three corners, a tip that lands inside the contour, or two sides that both never meet it.
+     * than three corners, a tip that lands inside the contour, or a base with no width.
      */
 
     export const attachArrow = (
@@ -1067,13 +1106,27 @@ export namespace ShapeUtils {
 
         if (PolygonUtils.getIsPointInside(points, tip)) return geometry;
 
-        const startCrossing = PolygonUtils.castRay(points, tip, Point2d.sub(place(template.baseStart), tip));
-        const endCrossing = PolygonUtils.castRay(points, tip, Point2d.sub(place(template.baseEnd), tip));
+        const across = { x: cos, y: sin };
+        const forwardStep = Point2d.sub(walkContour(points, attachment, TANGENT_PROBE_DISTANCE, true).point, origin);
+        const backwardStep = Point2d.sub(walkContour(points, attachment, TANGENT_PROBE_DISTANCE, false).point, origin);
+        const isForwardAcross =
+            forwardStep.x * across.x + forwardStep.y * across.y >=
+            backwardStep.x * across.x + backwardStep.y * across.y;
+        const perimeter = points.reduce((sum, point, index) => {
+            const next = points[(index + 1) % count];
 
-        if (!startCrossing && !endCrossing) return geometry;
+            return sum + Math.hypot(next.x - point.x, next.y - point.y);
+        }, 0);
+        const toBasePoint = (offset: number) =>
+            walkContour(
+                points,
+                attachment,
+                Math.min(Math.abs(offset), perimeter * HALF),
+                offset >= 0 ? isForwardAcross : !isForwardAcross,
+            );
 
-        const start = startCrossing ?? attachment;
-        const end = endCrossing ?? attachment;
+        const start = toBasePoint(template.baseStart.x);
+        const end = toBasePoint(template.baseEnd.x);
 
         if (Math.hypot(start.point.x - end.point.x, start.point.y - end.point.y) < COINCIDENT_EPSILON) return geometry;
 

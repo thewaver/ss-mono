@@ -64,6 +64,7 @@
             isDisabled: props.isDisabled,
             minValue: props.minValue,
             maxValue: props.maxValue,
+            disabledDays: props.disabledDays,
             computeIsDayDisabled: props.computeIsDayDisabled,
         });
 

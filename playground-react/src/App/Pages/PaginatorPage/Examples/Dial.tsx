@@ -30,7 +30,8 @@ export const DialExample = (props: Props) => {
                 <div className={styles.halfDialRing}>
                     <Paginator
                         page={props.page}
-                        pageCount={props.pageCount}
+                        itemCount={props.itemCount}
+                        pageSize={props.pageSize}
                         siblingCount={props.siblingCount}
                         boundaryCount={props.boundaryCount}
                         isDisabled={props.isDisabled}
@@ -47,7 +48,7 @@ export const DialExample = (props: Props) => {
                 </div>
 
                 <div className={styles.halfDialPanel}>
-                    <PagePaginatorPanel page={props.page} pageCount={props.pageCount} />
+                    <PagePaginatorPanel page={props.page} itemCount={props.itemCount} pageSize={props.pageSize} />
                 </div>
             </div>
         </PagePaginatorDemo>

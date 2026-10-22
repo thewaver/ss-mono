@@ -1,6 +1,6 @@
 import { createMemo, createSignal } from "solid-js";
 
-import { PAGINATOR_DEFAULTS } from "@thewaver/ss-components-solid";
+import { PAGINATOR_DEFAULTS, PaginatorUtils } from "@thewaver/ss-components-solid";
 import { PaginatorKnobs } from "@thewaver/ss-playground/App/Knobs/Paginators.const";
 import {
     COUNT_FIELD_WIDTH,
@@ -13,15 +13,18 @@ import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageCheckField, PageNumberField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
+import { CountExample } from "./Examples/Count";
 import { DialExample } from "./Examples/Dial";
 import { EndsExample } from "./Examples/Ends";
+import { JumpExample } from "./Examples/Jump";
 import { LinkComponentExample } from "./Examples/LinkComponent";
 import { LinksExample } from "./Examples/Links";
 import { StepsExample } from "./Examples/Steps";
 import type { PaginatorExampleProps } from "./PaginatorPageSolid.types";
 
 export const PaginatorPage = () => {
-    const [getPageCount, setPageCount] = createSignal(PaginatorKnobs.STARTING_PAGE_COUNT);
+    const [getItemCount, setItemCount] = createSignal(PaginatorKnobs.STARTING_ITEM_COUNT);
+    const [getPageSize, setPageSize] = createSignal(PaginatorKnobs.STARTING_PAGE_SIZE);
     const [getSiblingCount, setSiblingCount] = createSignal(PAGINATOR_DEFAULTS.siblingCount);
     const [getBoundaryCount, setBoundaryCount] = createSignal(PAGINATOR_DEFAULTS.boundaryCount);
     const [getIsDisabled, setIsDisabled] = createSignal(PaginatorKnobs.STARTING_IS_DISABLED);
@@ -31,10 +34,15 @@ export const PaginatorPage = () => {
     const [getLinkPage, setLinkPage] = createSignal(STARTING_PAGE);
     const [getCustomLinkPage, setCustomLinkPage] = createSignal(STARTING_PAGE);
     const [getDialPage, setDialPage] = createSignal(STARTING_PAGE);
+    const [getCountPage, setCountPage] = createSignal(STARTING_PAGE);
+    const [getJumpPage, setJumpPage] = createSignal(STARTING_PAGE);
+
+    const getPageCount = createMemo(() => PaginatorUtils.computePageCount(getItemCount(), getPageSize()));
 
     const getExamples = createMemo(() => {
         const commonProps: Omit<PaginatorExampleProps, "page" | "onPageChange"> = {
-            pageCount: getPageCount,
+            itemCount: getItemCount,
+            pageSize: getPageSize,
             siblingCount: getSiblingCount,
             boundaryCount: getBoundaryCount,
             isDisabled: getIsDisabled,
@@ -76,6 +84,22 @@ export const PaginatorPage = () => {
                 path: `${EXAMPLES_ROOT}/LinkComponent.tsx`,
             },
             {
+                key: "count",
+                name: EXAMPLE_NAMES.count,
+                readout: () =>
+                    `page ${getCountPage()} of ${getPageCount()} — the steps piece with the page's own text in its slot, and no number row at all`,
+                component: () => <CountExample {...commonProps} page={getCountPage} onPageChange={setCountPage} />,
+                path: `${EXAMPLES_ROOT}/Count.tsx`,
+            },
+            {
+                key: "jump",
+                name: EXAMPLE_NAMES.jump,
+                readout: () =>
+                    `page ${getJumpPage()} of ${getPageCount()} — the field is the page's own, writing the same page the row reads`,
+                component: () => <JumpExample {...commonProps} page={getJumpPage} onPageChange={setJumpPage} />,
+                path: `${EXAMPLES_ROOT}/Jump.tsx`,
+            },
+            {
                 key: "dial",
                 name: EXAMPLE_NAMES.dial,
                 readout: () =>
@@ -90,19 +114,38 @@ export const PaginatorPage = () => {
         <>
             <PagePropsPanel scope={"global"}>
                 <PageProp
-                    key={"pageCount"}
-                    label={"Page count"}
-                    hint={"How many pages there are to page through."}
-                    controls={"Sets PaginatorProps.pageCount"}
+                    key={"itemCount"}
+                    label={"Item count"}
+                    hint={
+                        "How many items there are to page through. The page count is worked out from this and the page size."
+                    }
+                    controls={"Sets PaginatorProps.itemCount"}
                 >
                     <PageNumberField
-                        value={getPageCount}
-                        min={PaginatorKnobs.MIN_PAGE_COUNT}
-                        max={PaginatorKnobs.MAX_PAGE_COUNT}
+                        value={getItemCount}
+                        min={PaginatorKnobs.MIN_ITEM_COUNT}
+                        max={PaginatorKnobs.MAX_ITEM_COUNT}
                         step={PaginatorKnobs.COUNT_STEP}
                         width={COUNT_FIELD_WIDTH}
-                        ariaLabel={"Page count"}
-                        onInput={setPageCount}
+                        ariaLabel={"Item count"}
+                        onInput={setItemCount}
+                    />
+                </PageProp>
+
+                <PageProp
+                    key={"pageSize"}
+                    label={"Page size"}
+                    hint={"How many items one page holds. The last page holds whatever is left over."}
+                    controls={"Sets PaginatorProps.pageSize"}
+                >
+                    <PageNumberField
+                        value={getPageSize}
+                        min={PaginatorKnobs.MIN_PAGE_SIZE}
+                        max={PaginatorKnobs.MAX_PAGE_SIZE}
+                        step={PaginatorKnobs.COUNT_STEP}
+                        width={COUNT_FIELD_WIDTH}
+                        ariaLabel={"Page size"}
+                        onInput={setPageSize}
                     />
                 </PageProp>
 

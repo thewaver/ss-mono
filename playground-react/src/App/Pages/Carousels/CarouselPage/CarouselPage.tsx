@@ -3,6 +3,7 @@ import { useState } from "react";
 import {
     EXAMPLES_ROOT,
     EXAMPLE_NAMES,
+    WINDOWED_SLIDE_COUNT,
 } from "@thewaver/ss-playground/App/Pages/Carousels/CarouselPage/CarouselPage.const";
 
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
@@ -13,6 +14,7 @@ import { NoControlsExample } from "./Examples/NoControls";
 import { RotatingExample } from "./Examples/Rotating";
 import { ScrolledExample } from "./Examples/Scrolled";
 import { SteppedExample } from "./Examples/Stepped";
+import { WindowedExample } from "./Examples/Windowed";
 
 export const CarouselPage = () => {
     const controls = useCarouselsControls();
@@ -22,6 +24,8 @@ export const CarouselPage = () => {
     const rotatingPlayingState = useState(true);
     const barelessIndexState = useState(0);
     const scrolledIndexState = useState(0);
+    const windowedIndexState = useState(0);
+    const [builtCount, setBuiltCount] = useState(0);
 
     const [isLooping] = controls.isLooping;
 
@@ -75,6 +79,27 @@ export const CarouselPage = () => {
                 </PageCarouselBox>
             ),
             path: `${EXAMPLES_ROOT}/NoControls.tsx`,
+        },
+        {
+            key: "windowed",
+            name: EXAMPLE_NAMES.windowed,
+            readout: () =>
+                `slide ${windowedIndexState[0] + 1} of ${WINDOWED_SLIDE_COUNT} | ${builtCount} built — only the slides the placement can draw exist, so the rest cost nothing, and a slide that comes back is built afresh`,
+            component: () => {
+                const { slides: _slides, ...sharedProps } = controls.sharedProps;
+
+                return (
+                    <PageCarouselBox>
+                        <WindowedExample
+                            {...sharedProps}
+                            isLooping={isLooping}
+                            index={windowedIndexState}
+                            onBuiltChange={(change) => setBuiltCount((prev) => prev + change)}
+                        />
+                    </PageCarouselBox>
+                );
+            },
+            path: `${EXAMPLES_ROOT}/Windowed.tsx`,
         },
     ];
 

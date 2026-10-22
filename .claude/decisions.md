@@ -1749,9 +1749,11 @@ local file.
 
 `Abstracts/` renders no DOM (namespaced utils, hook-like factories). `Essentials/` renders DOM.
 `Primitives/` also renders DOM but holds only the shared bodies other components are built out of, which
-are not meaningful on their own. `Composites/` combines Essentials. `Essentials/Input/` groups controls
-carrying a user-editable value (see _"Folder layout"_ in `conventions.md`), and the other purpose groups are
-listed under _"A group is a folder named for what its members are for"_ below. `components/src/index.ts` enumerates every export path individually — not a
+are not meaningful on their own. `Composites/` combines Essentials. `Essentials/Input/` groups the controls
+carrying a value the user edits — `Checkbox`, `Toggle`, `Radio`, `RadioGroup`, `TextInput`, `Label` — by what they
+are for rather than what they are built from, so `Button`, which has no value, sits in `Essentials/Buttons/`; the
+shared bodies they are built from (`BinarySwitch`, `TextField`, `InteractionWrapper`) are in `Primitives/`. The other
+purpose groups are listed under _"A group is a folder named for what its members are for"_ below. `components/src/index.ts` enumerates every export path individually — not a
 barrel. **Its blocks run in order of what is built on what** — `Abstracts`, `Primitives`, `Essentials`,
 `Exotics`, `Composites`, then `Samples` and `Utils` — with the paths inside a block still sorted, and a
 `Generators` block straight after `Abstracts`. The
@@ -4985,7 +4987,7 @@ explicit restore). Two identical siblings and one that does not fit is not the s
 
 ### Arbitrary item placement: `Abstracts/Placement`, and `Menu` as the first consumer
 
-The first half of `backlog.md` item 23. A control's items can be placed anywhere rather than along a line, and
+The first half of `backlog.md` item 21. A control's items can be placed anywhere rather than along a line, and
 the vocabulary for saying where lives in an abstract so the next control can use the same one.
 
 **A placement is a center, a size, an optional turn and an optional depth, all in fractions of the container's
@@ -5059,7 +5061,7 @@ its own chrome, or gets neither.
 
 ### Concentric submenus: `computeLayout` learns where it is, and a submenu borrows its parent's anchor
 
-The second piece of `backlog.md` item 23. A submenu of a laid-out menu is drawn as a wider ring round the
+The second piece of `backlog.md` item 21. A submenu of a laid-out menu is drawn as a wider ring round the
 same center rather than hanging off the item that opened it, so a wheel stays one wheel however deep it goes.
 
 **`computeLayout` takes one object rather than a run of arguments, and the reason is the third one.**
@@ -5588,7 +5590,7 @@ all eleven, which is what lets a consumer offer the whole set by key.
 
 ### `Paginator` takes a layout, and the placed box moves into the abstract
 
-The proving pass of `backlog.md` item 23, against the control the item named as the strongest candidate. A
+The proving pass of `backlog.md` item 21, against the control the item named as the strongest candidate. A
 paginator is arithmetic over a flat list, so a layout is the only thing that changes: the steps, the pages and
 the ellipses go round a dial in the order they already had, and nothing about the counting, the addresses or
 the labels is touched.
@@ -5640,7 +5642,7 @@ the box. So the sector is vocabulary a layout offers and a painter may decline, 
 control has to understand.
 
 **What the pass did not strain, which is worth knowing before the next consumer.** `PlacementUtils.pickIndex`
-still has no caller — a paginator has no gesture that picks by direction, so the loose end item 23 records is
+still has no caller — a paginator has no gesture that picks by direction, so the loose end item 21 records is
 untouched. Nor did anything about levels move: a paginator is one level and always will be, so the concentric
 machinery went unexercised.
 
@@ -5740,7 +5742,7 @@ arrangement is drawn from it — and both suites assert the walk rather than any
 
 ### Every layout sample lives in one place, and none of them is a menu's
 
-The user's call, taken while `backlog.md` item 23's proving pass was still open. `Samples/Menu/Layouts` was
+The user's call, taken while `backlog.md` item 21's proving pass was still open. `Samples/Menu/Layouts` was
 named when a menu was the only thing that had ever asked for a layout; by the end of the pass it held a
 honeycomb and a radial tree, and eleven consumers imported it of which three were menus. It is now
 `Samples/Placement/Layouts`, and the arrangements that came in with `Formation` are in it too.
@@ -6892,7 +6894,7 @@ element and sorts only then.
 
 ### Five more controls take a layout, and each one broke something different
 
-The rest of `backlog.md` item 23's proving pass, run against `Stepper`, `Toolbar`, `Sortable` and `Tree` after
+The rest of `backlog.md` item 21's proving pass, run against `Stepper`, `Toolbar`, `Sortable` and `Tree` after
 `Paginator`, `RadioGroup` and `Tabs`. The reason to keep going past the first was that each control was
 expected to strain a different part of the abstract, and each did.
 
@@ -7156,6 +7158,22 @@ painter's surface has, so a submenu flush against its anchor overlaps the surfac
 cannot know that inset, so `getSubmenuOffset` is where the consumer states it; the Playground passes its own
 surface's padding plus border. Anything a consumer paints _outside_ its box — a drop shadow — overlaps by the
 same arithmetic and is theirs by the same argument.
+
+### `Menu`: Tab leaves for the stop after the trigger
+
+**Tab closes the menu and moves focus to the first tab stop after the element that opened it; Shift+Tab closes it
+and leaves focus on that element.** The user's call, matching the WAI-ARIA menu-button pattern ("Tab: moves focus to
+the next element in the tab sequence"), which Radix's menu does not do. Before this, Tab closed the menu and returned
+focus to the trigger, costing a keyboard user one extra press, because the popup is portalled to the end of the
+document and letting the browser handle Tab would have sent focus past everything on the page.
+
+**The next stop is worked out before the menu closes, then focused after it.** `MenuUtils.computeNextTabStop` takes
+`FocusManagerUtils.getFocusableChildren` — the page's reachable elements in tab order, `inert` ones already left out —
+and returns the first that follows the opener, skipping anything inside the opener and anything inside a menu popup.
+Closing returns focus to the trigger synchronously, through the popover's focus restore, so the view closes first and
+focuses the answer second; with nothing after the opener, focus stays on the trigger. The level reports Tab as the
+same dismiss step it always did, and the view reads Shift from the event, so the shared step type did not change.
+`ContextMenu` does the same from its region.
 
 ### Typeahead: the text is read off the item, and `computeCustomText` is the way out
 
@@ -7769,7 +7787,7 @@ that was typed, with no identity apart from its characters. A consumer needing r
 nothing declines a word, leaving the text in the field to be edited rather than retyped.
 
 **The draft text is private unless asked for**: `text` is optional through
-`SignalMirrorUtils.createOptional`, the arrangement the popups use for their open state.
+`SignalMirrorSolidUtils.createOptional`, the arrangement the popups use for their open state.
 
 **Owning the box means owning the pointer back, which the first build did not.** Fixed afterwards.
 `interactionRoot` sets `pointer-events: none` and each part turns it back on for itself (`buttonElement` does,
@@ -9192,7 +9210,7 @@ stays partly visible lives.
 ### `Accordion`, `Collapsible`, `Preview`, `Tree`: two-way state is optional
 
 **`expanded` on all four, and `value` on `Tree`, follow the carousels' index and the popups'
-visibility**: `SignalMirrorUtils.createOptional` returns the consumer's signal when one is passed and the
+visibility**: `SignalMirrorSolidUtils.createOptional` returns the consumer's signal when one is passed and the
 component's own when not. Nothing in these four needed the consumer to hold the state, and they were the only
 two-way props left required; a navigation tree nobody selects from still had to supply a selection signal. Left
 alone, the tree still marks the activated node selected, still makes it the single tab stop and still calls
@@ -10129,6 +10147,21 @@ alongside `isSelected` and `isOutsideMonth`.
 `InteractionWrapper` owning its own root. `Select` already made this trade between `role="listbox"` and
 `role="option"`; it is in `backlog.md` now that a second component has hit it, a grid's row/cell relationship
 being the stricter of the two.
+
+### `Calendar`: disabled days described rather than computed
+
+**`disabledDays` takes descriptions — a date, `{ from, to }`, `{ before }`, `{ after }`, `{ daysOfWeek }` — beside
+`computeIsDayDisabled`, and both apply.** The user's call, after the per-cell cost of the function was put to them,
+on the strength of react-day-picker's `disabled`, which accepts the same five shapes. The common cases never call
+anything, so the expensive form is visibly the expensive one. **They are a separate data prop rather than a widened
+function prop** because a `Base…Values` type holds no functions and a `Base…Cbs` type holds nothing else, so one
+prop accepting both would belong to neither.
+
+**The semantics are react-day-picker's**: a range includes both ends and is read whichever order its ends were given
+in, `before` and `after` exclude the date itself, and `daysOfWeek` counts from `0`, Sunday, read in the machine's own
+time zone as `DateValueUtils.toDate` reads it. A description is tested against a cell's first day, as the function
+always was, so under `month` or `year` precision `{ daysOfWeek: [0] }` refuses a month that starts on a Sunday — the
+same answer the function gave. `DatePicker`, `DateRangePicker` and `DateTimePicker` pass it through to their calendar.
 
 ### Pointer drag: a ratio, opt-in, and captured
 
@@ -11234,6 +11267,16 @@ what a portal paints over is decided by the portal's own place in the tree rathe
 a portal. It was wrong for the case that matters: a viewport you cannot place cannot be the boundary of
 anything smaller than the window, and the boundary is the point.
 
+### A nested `Viewport` with no room warns once
+
+**A nested viewport whose host measures no width or no height says so in the console, once per viewport.** The
+user's call. Such a viewport scales its design size to fit nothing and draws nothing, and before this the blank had
+no explanation short of reading the source. The usual cause is a host sized only by its content, which here is the
+viewport itself. The check is `ViewportWrapperUtils.warnIfUnsized`, run from `observeAvailableSize`'s
+`ResizeObserver` until it has warned, so it is in the shared helper and every framework has it without a port.
+**A host collapsed on purpose, such as a closed panel, warns too**; the user accepted that as the cost, the false
+warning being rare and harmless next to a silent blank.
+
 ### The viewport is terminal, and an anchored layer tracks its anchor rather than polling for it
 
 Settled, from three defects seen on `ViewportPage`.
@@ -12119,7 +12162,7 @@ the document so they paint behind it.
 layout's formula and the example now spells it a second time, along with a walk of its own data to work out
 which depths are showing — because a ring must disappear when its generation collapses, and only the layout
 knows that today. So the escape hatch is real and the duplication is real with it, which is the argument for
-the slot recorded against item 23 rather than a reason to think nothing is missing.
+the slot recorded against item 21 rather than a reason to think nothing is missing.
 
 **The user's stated position on where this should land**, taken as their framing rather than as a rule
 anything has been changed to follow: a thing that belongs in a particular place should have a render slot of
@@ -12234,7 +12277,7 @@ before it, not by guessing who sent it: detecting a screen reader is neither pos
 to activate for everyone.
 
 **The progress is a flag and a signal, and the signal is optional.** `progress` is the ratio the fill
-is drawn from, taken through `SignalMirrorUtils.createOptional` exactly as a popup's `visibility` is: with no
+is drawn from, taken through `SignalMirrorSolidUtils.createOptional` exactly as a popup's `visibility` is: with no
 prop the control keeps the number to itself, and with one the consumer holds the same variable the painter
 reads. It exists because a flag only reaches `renderContent` — a readout beside the control, a second control
 that reacts half-way, or a warning that appears at eighty per cent is outside that slot and had no route to
@@ -12634,7 +12677,7 @@ page behind is then outside what the layer can see. It is the same trap as `isol
 is why each layer carries its own clip rather than sharing one.
 
 **The fringe this section used to blame on a disagreement between the two backdrop layers is postponed, not
-fixed — see item 22 in `backlog.md` for the current standing.** The margin explanation did not survive a
+fixed — see item 20 in `backlog.md` for the current standing.** The margin explanation did not survive a
 direct test: pushing the margin far past what either layer needs changes nothing, and shrinking it to nearly
 zero changes nothing either. Folding the blur into the ripple filter was tried, looked clean, and was reverted
 anyway — not because it cost Firefox and Safari their blur, though it does, but because "clean" turned out to
@@ -12643,7 +12686,7 @@ building a `feImage` / `feComposite` mask into the filter, so the pane never nee
 ancestor `overflow: hidden` at all, also looked clean under that same software path and also failed once
 checked against a real GPU-accelerated window. Neither fix is in the tree. What each attempt actually ruled
 out is real and kept below; what it did not do is find a fix that survives real rendering, and nothing further
-should be attempted here without a way to check against GPU rendering from the start — see item 22.
+should be attempted here without a way to check against GPU rendering from the start — see item 20.
 
 **The Playground's pane is dragged with `left` and `top`, never with `transform`.** A transform on an
 ancestor creates a stacking context and changes the containing block, and given how readily this arrangement
@@ -12738,7 +12781,7 @@ nothing" trap the backdrop layers above are already written to avoid. Skipping t
 nothing for one.
 
 **The ripple layer's edge is postponed, not fixed, and the investigation is recorded here so it is not repeated
-blind — see item 22 in `backlog.md` for what this means for now.** Found on the Playground's tooltip once
+blind — see item 20 in `backlog.md` for what this means for now.** Found on the Playground's tooltip once
 moved onto `GlassSurface`: a patch of whatever sat behind it rendered sharp and barely warped instead of
 frosted. Chased with a standalone sandbox — raw `feTurbulence` / `feDisplacementMap`, no library code — every
 test run in the browser this session had, which turned out to be headless Chromium and headless Edge, both of
@@ -12867,20 +12910,23 @@ box — origin where it leaves the contour, `+y` the way it points — and the t
 mirrored. The user's lightning bolt (`0,0 · 10,0 · 20,20`) is why the triangle is three free points rather than a
 width and a length; `ShapeConst.getIsoscelesArrow(baseWidth, length)` builds the ordinary one.
 
-**The two sides are extended back from the tip until each meets the contour.** Also the user's: an arrow on an
-octagon's corner has to reach the two neighboring edges. The two meeting points and the tip replace the stretch of
-contour between them. Of the two stretches the meeting points split the contour into, the one replaced is the one
-whose replacement leaves the larger area with the body's own winding, which is what makes the result independent of
-which way the corners run. **A side that runs away from the contour and never meets it ends at the attachment point
-instead**, the user's choice over attaching nothing: a lopsided arrow tells the consumer their aim is odd, a missing
-one looks like a bug. Only a tip inside the contour, or both sides missing, attaches nothing.
+**Each base point is found by walking along the contour from the attachment point**, as far as the template's base
+sits from its origin across the arrow, and towards the same side. On a straight edge that is the template exactly; at a
+corner it starts the base that far down each of the two edges, so the arrow swallows the corner; on an octagon's corner
+it reaches the two neighboring edges, which is what the user first asked of the rule. The two base points and the tip
+replace the stretch of contour between them. Of the two stretches the base points split the contour into, the one
+replaced is the one whose replacement leaves the larger area with the body's own winding, which is what makes the
+result independent of which way the corners run. The walk never misses the contour, so only a tip inside the contour or
+a base with no width attaches nothing.
 
-The rule has a cost worth knowing before blaming the code: a side running nearly parallel to the edge it is extended
-towards meets it far away, so a wide arrow on a box corner — half-angle close to 45° — becomes a long sliver along the
-edges. At 45° or wider, which is any symmetric arrow at least twice as wide as it is long, both sides run parallel to or
-away from the edges and the arrow attaches nothing at a corner. The Playground starts on a 14 × 9 triangle to stay
-clear of it, and `tooltipArrow.spec.ts` types its own narrower one in before checking the corner case; the fix is
-open, in `backlog.md` under _"A wide arrow vanishes at a corner"_.
+**This replaced extending the two sides back from the tip until each met the contour**, after the user found corner
+arrows far too wide on the Tooltip page's "Every arrow at once" example and chose to have them built from the corner
+outward. Extending the sides failed at corners by its nature: off a box corner the arrow points along the diagonal, so a
+side meets an edge at the difference between 45° and the arrow's own half-angle — a shallow angle, far from the corner,
+which spread even the 14 × 9 triangle the Playground then started on into a long sliver down both edges, and a symmetric arrow at least twice
+as wide as it is long never met them at all and drew nothing. Sliding each base point back along the arrow's direction
+was considered on the way and set aside: it fixes the diagonal case but makes the same sliver for an arrow aimed at a
+corner at any other angle.
 
 **The arrow sticks out of the box, into the gap.** The user's call: the body is what `Anchor` measures and positions,
 and making room for the arrow is the consumer's `offset`, if they want it. `Shape` already paints its layers with
@@ -14011,6 +14057,68 @@ the dial going against every other round control in the Playground. A ring's box
 pulled into that half by a negative margin of half the dial's width and stacked above it, and its minimum height
 is the dial's, so the flat edge is never taller than what it meets.
 
+### `Paginator` is a root and pieces, with the ready-made row on top
+
+Built from the plan `backlog.md` carried for it, to give a page a layout the single component could not draw —
+first, previous, a "3 of 20" label, next, last — and to count items rather than pages. A label sits wherever a page
+wants it, which no slot inside one component can promise, so the paginator became pieces a page arranges itself, as
+Ark UI's does.
+
+**`PaginatorRoot` owns the numbers, the landmark and the layout; `PaginatorSteps` and `PaginatorPages` own their
+rows.** The root takes `itemCount`, `pageSize` (default 10, Ant Design's and Ark UI's), `page`, `onPageChange`,
+`ariaLabel`, `isDisabled`, `computeLayout` and `computeEffect`, draws the one `<nav>` and nothing else — it has no
+row style, because what sits inside it is the page's arrangement. The steps piece draws first and previous, its
+`children`, then next and last; the pages piece draws the number row and alone works out the clusters and gaps.
+`Paginator` is a wrapper with no logic, rendering the root around the steps with the pages in the slot, so its row
+is unchanged. The step, page and gap controls are three internal building blocks shared by the pieces, never pieces
+a page composes. `pageCount` is gone from every prop: it is `PaginatorUtils.computePageCount(itemCount, pageSize)`,
+and `computeItemRange` hands back the first and last item on a page for a "showing 21 to 40 of 383" summary. "Jump
+to page" and the "X of Y" label are the page's own, written against the same page signal.
+
+**`computeHref` and `linkComponent` live on the root; `gap` on each piece.** The user's call, over putting all three
+on the root or all three on each piece. Whether the controls are links or buttons is a decision about the whole
+paginator, so the arrows and the numbers can never disagree about it; spacing belongs to a row, and only the pieces
+have rows, so a composed "‹ 3 of 20 ›" can be spaced apart from a number row inside it. The wrapper passes its one
+`gap` to both.
+
+**A piece outside a `PaginatorRoot` warns and draws nothing.** The user's call, following `Table`'s header
+builtins rather than `Radio`. An orphan radio is still a meaningful thing to draw — an unchecked button that the
+group would have wired — but a step or a page number with no count behind it has nothing honest to show: every
+arrow disabled and an empty row, which is drawing nothing with extra steps.
+
+**Every control registers with the root, and the root orders them by document position.** Children arrive as
+finished output in all four frameworks and cannot be taken apart, so registration is the only route; the layout
+asks for as many places as there are controls and each takes the one at its own position in the document,
+whichever piece it belongs to. **A control registers the moment it is made and asks the root to sort again once
+it is in the document.** Both halves are forced. A detached element has no document position, so a control the
+pages piece adds as the current page nears an end cannot be sorted until it is inserted, and
+`PaginatorUtils.orderEntries` keeps the registration order while any element is missing or detached. Registering
+only once mounted was tried and failed: under a layout a control then learned its place after it was already in
+the page, and moving its element into the placed box threw. Registering at once means the place is known before
+the first paint, and the sort on mount corrects it before anything is drawn.
+
+**The ports keep the same two halves, each in its framework's terms.** React registers and asks for the re-sort
+from a layout effect, which runs once the element is in the page and before it is painted; `register` and `reorder`
+keep their identity, so the effect runs only when a control first appears and the re-sort cannot loop. Vue registers
+in setup, re-sorts in `onMounted`, and removes the entry in `onScopeDispose`. **Svelte's root keeps its list in a
+plain array and copies it into state on each change**, because a component being torn down reads state as it stood
+before the current update: when one control was destroyed and others created in the same update, the destroyed
+one's unregister filtered the old list and dropped the newcomers, and the dial drew four blank wedges after paging
+forward. `RadioGroup` and `CheckboxGroup` unregister by filtering state the same way in Svelte and do not have the
+fault, checked by swapping one option for another in a single update: their members register from an `$effect`,
+which runs after the outgoing member's teardown rather than before it, so the teardown never filters a list that
+already holds the newcomer. A paginator control registers the moment it is made, which is what put the newcomer
+ahead of the teardown.
+
+**With no items, every step is disabled.** `computeStepState` says so outright rather than relying on the target
+happening to equal the page, so an empty list behaves the same whatever page the consumer is holding.
+
+**WCAG, checked.** 2.4.3 Focus Order (A), "focusable components receive focus in an order that preserves meaning
+and operability": a layout places controls in document order, which is the tab order, across every piece in the
+arrangement. The Playground's go-to-page field is a `Label` around a visible "Go to page" caption with no
+`aria-label`, so 3.3.2 Labels or Instructions (A), "labels or instructions are provided when content requires user
+input", is met and 2.5.3 Label in Name (A) holds, the name being the visible text.
+
 ### The painter's object: `activation` left the flags, and only the mixed ones became `RenderProps`
 
 Every control hands its painter **one** object rather than a run of arguments, because positional arguments
@@ -14369,7 +14477,7 @@ the library owns only what nobody else can know: how far a step goes and whether
 `getButtonPlacement` is `split`, `start` or `end`, since "together" cannot be placed without saying which side.
 
 **The position is reported as a ratio, and a written ratio scrolls the strip.** `progress` is optional
-and goes through `SignalMirrorUtils.createOptional` like every other two-way prop, and it carries `scrollLeft` divided
+and goes through `SignalMirrorSolidUtils.createOptional` like every other two-way prop, and it carries `scrollLeft` divided
 by the distance there is to travel — zero when nothing overflows. Reporting it is what the stepper cannot do:
 page dots, a progress bar or a "3 of 12" readout all sit outside `renderButton`, and none of them could reach
 the number. Accepting a write is the other half of the same variable, and it is what makes those dots
@@ -14522,7 +14630,7 @@ which a single list of values is not.
 
 **The index is a two-way signal, and this is the clearest case in the library for it.** A rotating carousel
 writes its own index on a timer with nobody having asked, which no consumer callback can be expected to mirror
-back. `SignalMirrorUtils.createOptional` keeps it private until a consumer wants it.
+back. `SignalMirrorSolidUtils.createOptional` keeps it private until a consumer wants it.
 
 **The announcement goes through `LiveAnnouncer` rather than a live region on the track.** The published pattern
 makes the slide container a live region, which works when the slides that are away are removed from the page.
@@ -14637,6 +14745,21 @@ which way a swipe scrolls (Apple's natural-scrolling toggle), and would rather t
 **`Carousel` lives in `Essentials/`.** With no presets built on it, the layering rule puts it there rather than in
 `Primitives/`; the two presets and their Playground pages were deleted, and its page-less entry in the Playground's
 `Primitives` section went, since it has a page of its own and the two collided on one route.
+
+### `Carousel`: building only what the placement draws
+
+**`isWindowed` builds a slide only while it is within the placement's `reach`, and is off by default.** Asked for by
+the user as critical: a carousel can hold a hundred animated, heavily composited slides with only a handful in sight,
+and every one was built, kept and placed on every frame. The window needs no distance of its own, because every
+shipped placement already declares `reach` — how far either side it still draws anything, plus one slide of margin —
+so a slide is built as it comes within reach, before it can be seen, and removed once it is beyond it, including in
+passing during a long glide. A consumer's rule with no `reach` cannot say what it draws, and every slide is built.
+
+**Opt-in rather than automatic, on the user's call, because a slide that leaves and comes back is a new one.**
+Whatever it held — text typed into it, a video's place — is gone, and making that the default would lose a
+consumer's state with no warning. A slide that is away was already `inert` and hidden from screen readers, so
+removing it changes nothing a keyboard or a reader could reach. `CarouselUtils.getIsBuilt` holds the test; the view
+wraps each slide in it, and a removed slide clears its face and placement entries so the press test skips it.
 
 ### `Carousel`'s concertina: an accordion's bellows seen from the front
 
@@ -14784,6 +14907,12 @@ nearest all the way.
 or two later, in whole pixels and moved by whatever else nudges the box, and the first build took the very first of
 those as someone else taking over and stopped on the first frame. `getIsEcho` counts anything within a hundredth of a
 lap of the last few writes as the corridor's own.
+
+**Its items are not expected to be interactive.** Stated by the user when a fix for copies taking over as the real
+item was argued: the corridor is a view to look down, and whatever it draws is decoration. That is why the hand-over of
+the real instance as the ring turns is an accepted limit rather than a fault — it can only lose state an item is not
+expected to hold. The keyboard route and the copies kept out of reach still stand, for the consumer who puts a
+focusable thing in an item anyway.
 
 ### `InfiniteCorridor`'s tube: items lining a ring of sides, upright towards the center
 
@@ -16470,7 +16599,7 @@ can know.
 **The cost is stated rather than mitigated: a library that renders no button cannot promise one is reachable or
 named.** A consumer who wires up no control has a wheel that can only be driven from elsewhere through
 `targetIndex`, exactly as `Carousel` with no `renderControls` has no keyboard route. That is the same exposure
-item 15 records for `Scroller` and it is now the wheel's too.
+item 13 records for `Scroller` and it is now the wheel's too.
 
 **No slot survives either, and the one that briefly did was kept for a bad reason.** A `renderHub` was left on
 the overhead wheel out of deference to an earlier choice — that an overhead wheel has one control slot and it is the
@@ -18986,7 +19115,7 @@ size, every row is pulled towards the vertical middle line, and the board is dra
 height with its top at the top of its box.
 
 **The root's box is the drawn size**, full width and `taper` times the height, so a tapered board reserves no
-empty band above itself — unlike backlog item 25, the drawing does not move, so the box can be exact. **The
+empty band above itself — unlike backlog item 23, the drawing does not move, so the box can be exact. **The
 transform sits on `tileBoardPlane`, a sizeless layer between the root and the rows, not on the root.** On the
 root it bent the root's own box as well: the box the board reported to the page was that shorter box pushed
 through the lean, 400 by 80 for a board drawn 600 by 240, so anything anchoring to the board or scrolling it
@@ -19553,7 +19682,7 @@ assistive-technology activation. The user dropped the work until the platform ca
 
 **The carousels' `playingSignal` and `Trail`'s `isPlayingSignal` are both `playback`**, matching
 CellAnimation, ScanlineAnimation, AudioSwitcher and ParticleSpawner. **`Trail`'s `play()` and `pause()` commands are
-gone**, because each only wrote the playback state, and _"Playback is a signal; a rewind is a command"_ puts that
+gone**, because each only wrote the playback state, and _"Playback is a two-way value; a rewind is a command"_ puts that
 in the signal. `seek` stays as the rewind-shaped command, and the controller keeps `getIsPlaying` for reading. The
 Playground's Play and Pause buttons write the signal directly.
 
@@ -19590,7 +19719,7 @@ looping trail is most often seen.
 otherwise be truncated to the end and the trail would lose ground every time the tab was busy; looping takes
 the remainder, and not looping stops at the end and writes `isPlaying` false so the consumer's own button
 reads the truth. The controller is `getPlace`, `getIsPlaying`, `play`, `pause` and `seek`, and both of the
-signals behind it are `SignalMirrorUtils.createOptional`, exactly as `Rotator` takes its index and its auto-spin —
+signals behind it are `SignalMirrorSolidUtils.createOptional`, exactly as `Rotator` takes its index and its auto-spin —
 pass nothing and the trail simply runs.
 
 **The loop stops while the page is hidden**, through `InteractionTrackerUtils.trackPageHidden`, for the same reason
@@ -19754,7 +19883,7 @@ across, the mixing desk stands up with its three sources in a row above the desk
 **The window is the consumer's state and the component only computes against it.** `range` is the whole
 extent, `view` is the part on screen, and everything the component paints is derived from the pair: a
 span's left and width are its share of the window written as percentages, so a resize needs no code here at
-all and the browser recomputes. The signal is optional through `SignalMirrorUtils.createOptional`, so a page that
+all and the browser recomputes. The signal is optional through `SignalMirrorSolidUtils.createOptional`, so a page that
 does not care gets an internal one and a page that wants a readout passes its own — the same arrangement
 `Carousel` and `Trail` already use.
 
@@ -19951,7 +20080,7 @@ with the level being left shrinking into its tile and fading out on top. Tiles a
 unscaled, and a transform would have stretched every label mid-zoom. `element.animate` is used rather than CSS
 transitions because it starts from a stated first frame on an element that has only just been inserted, which
 a transition cannot do without the new element first being painted in its start position — the frame hazard
-`conventions.md` records under _"Playback is a signal; a rewind is a command"_. The leaving level runs with
+`conventions.md` records under _"Playback is a two-way value; a rewind is a command"_. The leaving level runs with
 `fill: "forwards"` so it cannot flash back to its resting layout in the frame between finishing and being
 removed. The root clips only while a zoom runs, so at rest a focus ring on an edge tile is not cut off.
 

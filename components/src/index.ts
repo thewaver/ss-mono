@@ -217,6 +217,7 @@ export * from "./Essentials/Overlays/Tooltip/Tooltip.const";
 export * as TooltipStyles from "./Essentials/Overlays/Tooltip/Tooltip.css";
 export type * from "./Essentials/Overlays/Tooltip/Tooltip.types";
 export * from "./Essentials/Paginator/Paginator.const";
+export type * from "./Essentials/Paginator/Paginator.context.types";
 export * as PaginatorStyles from "./Essentials/Paginator/Paginator.css";
 export type * from "./Essentials/Paginator/Paginator.types";
 export * from "./Essentials/Paginator/Paginator.utils";

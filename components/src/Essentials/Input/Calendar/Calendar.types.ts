@@ -33,6 +33,13 @@ export type CalendarKeyAction = {
     day: DateValue;
 };
 
+export type CalendarDayMatcher =
+    | DateValue
+    | { from: DateValue; to: DateValue }
+    | { before: DateValue }
+    | { after: DateValue }
+    | { daysOfWeek: number[] };
+
 export type BaseCalendarValues = {
     /** Names the calendar for assistive technology. */
     ariaLabel?: string;
@@ -48,6 +55,13 @@ export type BaseCalendarValues = {
     minValue?: DateValue;
     /** The latest day that can be picked. */
     maxValue?: DateValue;
+    /**
+     * Days that cannot be picked, described rather than computed: a date, a range `{ from, to }` with both ends
+     * included, everything `{ before }` or `{ after }` a date, or the `{ daysOfWeek }` given as numbers from `0`,
+     * Sunday, to `6`, Saturday. A day matching any of them is disabled. These never call anything, so they cost the
+     * same however the page is drawn; `computeIsDayDisabled` is for a rule they cannot describe, and both apply.
+     */
+    disabledDays?: CalendarDayMatcher[];
     /** Turns the calendar off, so no day can be picked and it cannot be paged. */
     isDisabled?: boolean;
     /** The space between day cells. */
@@ -55,7 +69,10 @@ export type BaseCalendarValues = {
 };
 
 export type BaseCalendarCbs = {
-    /** Whether one day can be picked, for rules a plain earliest and latest cannot express. */
+    /**
+     * Whether one day can be picked, for rules neither a plain earliest and latest nor `disabledDays` can express.
+     * It is asked once for every cell on the page, so a slow rule is slow once per cell.
+     */
     computeIsDayDisabled?: (day: DateValue) => boolean;
 };
 

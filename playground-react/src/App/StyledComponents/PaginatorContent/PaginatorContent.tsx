@@ -2,12 +2,10 @@ import type { PropsWithChildren } from "react";
 import { useId } from "react";
 
 import type { PlacementRect } from "@thewaver/ss-components-react";
-import { PlacementUtils } from "@thewaver/ss-components-react";
+import { PaginatorUtils, PlacementUtils } from "@thewaver/ss-components-react";
 import {
-    FIRST_PAGE,
     GAP_MARK,
     HALF,
-    PAGE_SIZE,
     RESULTS,
     STEP_GLYPHS,
 } from "@thewaver/ss-playground/App/StyledComponents/PaginatorContent/PaginatorContent.const";
@@ -15,6 +13,7 @@ import * as styles from "@thewaver/ss-playground/App/StyledComponents/PaginatorC
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type {
+    PaginatorCountContentProps,
     PaginatorDialGapContentProps,
     PaginatorGapContentProps,
     PaginatorPageContentProps,
@@ -23,7 +22,7 @@ import type {
     PaginatorWedgeProps,
 } from "./PaginatorContentReact.types";
 
-const toResult = (index: number) => RESULTS[index % RESULTS.length];
+const toResult = (itemNumber: number) => RESULTS[(itemNumber - 1) % RESULTS.length];
 
 const toViewBox = (rect: PlacementRect) =>
     `${rect.leftShare - rect.widthShare * HALF} ${rect.topShare - rect.heightShare * HALF} ${rect.widthShare} ${rect.heightShare}`;
@@ -162,31 +161,37 @@ export const PagePaginatorDialGap = (props: PaginatorDialGapContentProps) => {
 export const PagePaginatorPanel = (props: PaginatorPanelProps) => {
     const layerClass = useLayerClass();
 
-    const firstIndex = (Math.max(props.page, FIRST_PAGE) - FIRST_PAGE) * PAGE_SIZE;
+    const range = PaginatorUtils.computeItemRange(props.page, props.itemCount, props.pageSize);
 
-    const total = Math.max(props.pageCount, 0) * PAGE_SIZE;
+    const summary =
+        range === undefined ? "nothing to show" : `showing ${range.first} to ${range.last} of ${props.itemCount}`;
 
-    const indexes = Array.from({ length: PAGE_SIZE }, (_unused, offset) => firstIndex + offset).filter(
-        (index) => index < total,
-    );
+    const itemNumbers =
+        range === undefined
+            ? []
+            : Array.from({ length: range.last - range.first + 1 }, (_unused, offset) => range.first + offset);
 
     return (
         <div className={[styles.paginatorPanel, layerClass].join(" ")}>
             <div className={styles.paginatorPanelSummary} role="status">
-                {indexes.length === 0
-                    ? "nothing to show"
-                    : `showing ${firstIndex + FIRST_PAGE} to ${firstIndex + indexes.length} of ${total}`}
+                {summary}
             </div>
 
-            {indexes.map((index) => (
-                <div key={index} className={styles.paginatorPanelRow}>
-                    <span>{toResult(index)}</span>
+            {itemNumbers.map((itemNumber) => (
+                <div key={itemNumber} className={styles.paginatorPanelRow}>
+                    <span>{toResult(itemNumber)}</span>
 
-                    <span className={styles.paginatorPanelIndex}>{`#${index + FIRST_PAGE}`}</span>
+                    <span className={styles.paginatorPanelIndex}>{`#${itemNumber}`}</span>
                 </div>
             ))}
         </div>
     );
+};
+
+export const PagePaginatorCount = (props: PaginatorCountContentProps) => {
+    const layerClass = useLayerClass();
+
+    return <div className={[styles.paginatorCount, layerClass].join(" ")}>{`${props.page} of ${props.pageCount}`}</div>;
 };
 
 export const PagePaginatorDemo = (props: PropsWithChildren) => {

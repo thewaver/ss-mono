@@ -5,7 +5,7 @@ import type { DateValue, DateValueRange, DateValueWeekStart } from "../../../Abs
 import { DateValueUtils } from "../../../Abstracts/DateValue/DateValue.utils";
 import type { NavigatorDirection, NavigatorGrid } from "../../../Abstracts/Navigator/Navigator.types";
 import { NavigatorUtils } from "../../../Abstracts/Navigator/Navigator.utils";
-import type { CalendarKeyAction, CalendarPrecision, CalendarRenderProps } from "./Calendar.types";
+import type { CalendarDayMatcher, CalendarKeyAction, CalendarPrecision, CalendarRenderProps } from "./Calendar.types";
 
 /** Days in a week, which is the width of the day grid. */
 const DAYS_PER_WEEK = 7;
@@ -268,15 +268,47 @@ export namespace CalendarUtils {
     };
 
     /**
+     * Tests whether a day fits one description of disabled days.
+     *
+     * A range is matched with both ends included, whichever order they were given in; `before` and `after` leave
+     * the date itself out; a weekday is read in the machine's own time zone, numbered from `0`, Sunday.
+     *
+     * @param day The day to test.
+     * @param matcher A date, `{ from, to }`, `{ before }`, `{ after }` or `{ daysOfWeek }`.
+     * @returns Whether the day fits it.
+     */
+    export const getIsDayMatched = (day: DateValue, matcher: CalendarDayMatcher) => {
+        if ("daysOfWeek" in matcher) return matcher.daysOfWeek.includes(DateValueUtils.toDate(day).getDay());
+
+        if ("before" in matcher) return DateValueUtils.compare(day, matcher.before) < 0;
+
+        if ("after" in matcher) return DateValueUtils.compare(day, matcher.after) > 0;
+
+        if ("from" in matcher) {
+            const isOrdered = DateValueUtils.compare(matcher.from, matcher.to) <= 0;
+            const start = isOrdered ? matcher.from : matcher.to;
+            const end = isOrdered ? matcher.to : matcher.from;
+
+            return DateValueUtils.compare(day, start) >= 0 && DateValueUtils.compare(day, end) <= 0;
+        }
+
+        return DateValueUtils.isSame(day, matcher);
+    };
+
+    /**
      * Tests whether a cell can be picked.
+     *
+     * The consumer's described days are tested before their own rule, so a day a description already refuses never
+     * reaches the rule.
      *
      * @param day The cell's first day.
      * @param opts.isDisabled Whether the whole calendar is off.
      * @param opts.minValue The earliest day that can be picked, if there is one.
      * @param opts.maxValue The latest day that can be picked, if there is one.
+     * @param opts.disabledDays The consumer's descriptions of refused days, each tested with {@link getIsDayMatched}.
      * @param opts.computeIsDayDisabled The consumer's own rule, handed the cell's first day.
-     * @returns `true` when the calendar is off, when no day of the cell is inside the bounds, or when the
-     * consumer's rule refuses it.
+     * @returns `true` when the calendar is off, when no day of the cell is inside the bounds, when a description
+     * matches the cell's first day, or when the consumer's rule refuses it.
      */
     export const getIsCellDisabled = (
         day: DateValue,
@@ -285,11 +317,13 @@ export namespace CalendarUtils {
             isDisabled?: boolean;
             minValue?: DateValue;
             maxValue?: DateValue;
+            disabledDays?: CalendarDayMatcher[];
             computeIsDayDisabled?: (day: DateValue) => boolean;
         },
     ) =>
         (opts.isDisabled ?? false) ||
         !getIsCellInBounds(day, precision, opts.minValue, opts.maxValue) ||
+        (opts.disabledDays?.some((matcher) => getIsDayMatched(day, matcher)) ?? false) ||
         (opts.computeIsDayDisabled?.(day) ?? false);
 
     /**

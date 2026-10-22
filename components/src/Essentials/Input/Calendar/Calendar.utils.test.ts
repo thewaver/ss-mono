@@ -106,6 +106,44 @@ describe("cells and bounds", () => {
     });
 });
 
+describe("getIsDayMatched and disabledDays", () => {
+    it("matches a single date and nothing beside it", () => {
+        expect(CalendarUtils.getIsDayMatched(date("2026-08-10"), date("2026-08-10"))).toBe(true);
+        expect(CalendarUtils.getIsDayMatched(date("2026-08-11"), date("2026-08-10"))).toBe(false);
+    });
+
+    it("includes both ends of a range, whichever order they were given in", () => {
+        const range = { from: date("2026-08-20"), to: date("2026-08-10") };
+
+        expect(CalendarUtils.getIsDayMatched(date("2026-08-10"), range)).toBe(true);
+        expect(CalendarUtils.getIsDayMatched(date("2026-08-20"), range)).toBe(true);
+        expect(CalendarUtils.getIsDayMatched(date("2026-08-21"), range)).toBe(false);
+    });
+
+    it("leaves the date itself out of before and after", () => {
+        expect(CalendarUtils.getIsDayMatched(date("2026-08-09"), { before: date("2026-08-10") })).toBe(true);
+        expect(CalendarUtils.getIsDayMatched(date("2026-08-10"), { before: date("2026-08-10") })).toBe(false);
+        expect(CalendarUtils.getIsDayMatched(date("2026-08-11"), { after: date("2026-08-10") })).toBe(true);
+        expect(CalendarUtils.getIsDayMatched(date("2026-08-10"), { after: date("2026-08-10") })).toBe(false);
+    });
+
+    it("reads weekdays from Sunday as zero", () => {
+        expect(CalendarUtils.getIsDayMatched(date("2026-08-09"), { daysOfWeek: [0, 6] })).toBe(true);
+        expect(CalendarUtils.getIsDayMatched(date("2026-08-10"), { daysOfWeek: [0, 6] })).toBe(false);
+    });
+
+    it("refuses a day any description matches, and still asks the consumer's rule about the rest", () => {
+        const opts = {
+            disabledDays: [{ daysOfWeek: [0] }],
+            computeIsDayDisabled: (day: ReturnType<typeof date>) => iso(day) === "2026-08-12",
+        };
+
+        expect(CalendarUtils.getIsCellDisabled(date("2026-08-09"), "day", opts)).toBe(true);
+        expect(CalendarUtils.getIsCellDisabled(date("2026-08-12"), "day", opts)).toBe(true);
+        expect(CalendarUtils.getIsCellDisabled(date("2026-08-11"), "day", opts)).toBe(false);
+    });
+});
+
 describe("stepPage and stepLeap", () => {
     it("steps a month, a year and twelve years per page", () => {
         expect(iso(CalendarUtils.stepPage(date("2026-08-10"), "day", 1))).toBe("2026-09-10");

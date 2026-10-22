@@ -210,7 +210,7 @@
 
         e.preventDefault();
 
-        if (step.type === "dismiss") props.onDismiss();
+        if (step.type === "dismiss") props.onDismiss(!e.shiftKey);
         else if (step.type === "activate") activateIndex(step.index);
         else if (step.type === "open") openIndex(step.index);
         else if (step.type === "highlight") highlightIndex(step.index);

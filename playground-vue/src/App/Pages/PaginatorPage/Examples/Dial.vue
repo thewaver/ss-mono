@@ -31,7 +31,8 @@ const props = defineProps<Props>();
             <div :class="styles.halfDialRing">
                 <Paginator
                     :page="page"
-                    :page-count="pageCount"
+                    :item-count="itemCount"
+                    :page-size="pageSize"
                     :sibling-count="siblingCount"
                     :boundary-count="boundaryCount"
                     :is-disabled="isDisabled"
@@ -57,7 +58,7 @@ const props = defineProps<Props>();
             </div>
 
             <div :class="styles.halfDialPanel">
-                <PagePaginatorPanel :page="page" :page-count="pageCount" />
+                <PagePaginatorPanel :page="page" :item-count="itemCount" :page-size="pageSize" />
             </div>
         </div>
     </PagePaginatorDemo>

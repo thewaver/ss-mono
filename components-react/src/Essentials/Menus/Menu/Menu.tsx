@@ -435,7 +435,7 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>) => {
 
         e.preventDefault();
 
-        if (step.type === "dismiss") props.onDismiss();
+        if (step.type === "dismiss") props.onDismiss(!e.shiftKey);
         else if (step.type === "activate") activateIndex(step.index);
         else if (step.type === "open") openIndex(step.index);
         else if (step.type === "highlight") highlightIndex(step.index);
@@ -592,6 +592,21 @@ export const Menu = <T,>(props: MenuProps<T>) => {
         setFlickOrigin(undefined);
     };
 
+    const nextTabStopRef = useRef<HTMLElement | undefined>(undefined);
+
+    const dismiss = (isLeavingForward: boolean) => {
+        nextTabStopRef.current = isLeavingForward ? MenuUtils.computeNextTabStop(triggerElement) : undefined;
+
+        close();
+    };
+
+    useEffect(() => {
+        if (isOpen) return;
+
+        nextTabStopRef.current?.focus();
+        nextTabStopRef.current = undefined;
+    }, [isOpen]);
+
     const checkedValues = props.checked?.[0] ?? MenuConst.EMPTY_CHECKED;
 
     const pick = (item: MenuItem<T>, radioGroupValues: T[]) => {
@@ -707,7 +722,7 @@ export const Menu = <T,>(props: MenuProps<T>) => {
                             }
                         }}
                         onClose={close}
-                        onDismiss={close}
+                        onDismiss={dismiss}
                     />
                 </>
             )}
@@ -736,6 +751,23 @@ export const ContextMenu = <T,>(props: ContextMenuProps<T>) => {
     const close = () => {
         setIsOpen(false);
     };
+
+    const nextTabStopRef = useRef<HTMLElement | undefined>(undefined);
+
+    const dismiss = (isLeavingForward: boolean) => {
+        nextTabStopRef.current = isLeavingForward
+            ? MenuUtils.computeNextTabStop(regionRef.current ?? undefined)
+            : undefined;
+
+        close();
+    };
+
+    useEffect(() => {
+        if (isOpen) return;
+
+        nextTabStopRef.current?.focus();
+        nextTabStopRef.current = undefined;
+    }, [isOpen]);
 
     const checkedValues = props.checked?.[0] ?? MenuConst.EMPTY_CHECKED;
 
@@ -818,7 +850,7 @@ export const ContextMenu = <T,>(props: ContextMenuProps<T>) => {
                 renderHighlightFloater={props.renderHighlightFloater}
                 onPick={pick}
                 onClose={close}
-                onDismiss={close}
+                onDismiss={dismiss}
             />
         </>
     );

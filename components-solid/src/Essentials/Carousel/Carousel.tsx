@@ -61,7 +61,7 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
     );
 
     const faceRefs: (HTMLElement | undefined)[] = [];
-    const placements: Accessor<CarouselPlacement>[] = [];
+    const placements: (Accessor<CarouselPlacement> | undefined)[] = [];
 
     const getCount = createMemo(() => access(props.slides).length);
 
@@ -70,6 +70,8 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
     const getIsDisabled = createMemo(() => access(props.isDisabled) ?? false);
 
     const getIsLooping = createMemo(() => access(props.isLooping) ?? CAROUSEL_DEFAULTS.isLooping);
+
+    const getIsWindowed = createMemo(() => access(props.isWindowed) ?? CAROUSEL_DEFAULTS.isWindowed);
 
     const getOrientation = createMemo(() => access(props.orientation) ?? CAROUSEL_DEFAULTS.orientation);
 
@@ -363,6 +365,66 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
         />
     );
 
+    const renderSlideAt = (getSlide: Accessor<T>, place: number) => {
+        const getPlacement = createMemo(() =>
+            props.placement.place({
+                distance: getDistance(place),
+                index: place,
+                count: getRingCount(),
+                size: getSize(),
+                orientation: getOrientation(),
+                isLooping: getIsLooping(),
+            }),
+        );
+
+        const getIsCurrent = () => place === getCurrentPlace();
+
+        placements[place] = getPlacement;
+
+        onCleanup(() => {
+            faceRefs[place] = undefined;
+            placements[place] = undefined;
+        });
+
+        return (
+            <div
+                class={styles.carouselSlide}
+                style={CarouselUtils.toSlideStyle(getPlacement(), getDistance(place))}
+                role="group"
+                aria-roledescription={getSlideRoleDescription()}
+                aria-label={getSlideLabel(toIndex(place))}
+                aria-hidden={!getIsCurrent() || undefined}
+                inert={!getIsCurrent()}
+            >
+                <div
+                    ref={(element) => {
+                        faceRefs[place] = element;
+                    }}
+                    class={styles.carouselFace}
+                    classList={{ [styles.carouselFaceTurnable]: props.renderSlideBack !== undefined }}
+                >
+                    {props.renderSlide(getSlide, () => getSlideState(place, "front"))}
+                </div>
+
+                <Show when={props.renderSlideBack}>
+                    {(getRenderSlideBack) => (
+                        <div
+                            class={[styles.carouselFace, styles.carouselFaceTurnable].join(" ")}
+                            style={{
+                                transform: CarouselUtils.getBackTransform(
+                                    CarouselUtils.getTurnAxis(getPlacement(), getOrientation()),
+                                ),
+                            }}
+                            aria-hidden="true"
+                        >
+                            {getRenderSlideBack()(getSlide, () => getSlideState(place, "back"))}
+                        </div>
+                    )}
+                </Show>
+            </div>
+        );
+    };
+
     const controls: CarouselControls = {
         getIndex: getCurrentIndex,
         getCount,
@@ -385,62 +447,11 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
             <div ref={setViewportRef} class={styles.carouselViewport} onClick={handleViewportClick}>
                 <Index each={getRingSlides()}>
                     {(getSlide, place) => {
-                        const getPlacement = createMemo(() =>
-                            props.placement.place({
-                                distance: getDistance(place),
-                                index: place,
-                                count: getRingCount(),
-                                size: getSize(),
-                                orientation: getOrientation(),
-                                isLooping: getIsLooping(),
-                            }),
+                        const getIsBuiltHere = createMemo(() =>
+                            CarouselUtils.getIsBuilt(getDistance(place), props.placement.reach, getIsWindowed()),
                         );
 
-                        const getIsCurrent = () => place === getCurrentPlace();
-
-                        placements[place] = getPlacement;
-
-                        onCleanup(() => {
-                            faceRefs[place] = undefined;
-                        });
-
-                        return (
-                            <div
-                                class={styles.carouselSlide}
-                                style={CarouselUtils.toSlideStyle(getPlacement(), getDistance(place))}
-                                role="group"
-                                aria-roledescription={getSlideRoleDescription()}
-                                aria-label={getSlideLabel(toIndex(place))}
-                                aria-hidden={!getIsCurrent() || undefined}
-                                inert={!getIsCurrent()}
-                            >
-                                <div
-                                    ref={(element) => {
-                                        faceRefs[place] = element;
-                                    }}
-                                    class={styles.carouselFace}
-                                    classList={{ [styles.carouselFaceTurnable]: props.renderSlideBack !== undefined }}
-                                >
-                                    {props.renderSlide(getSlide, () => getSlideState(place, "front"))}
-                                </div>
-
-                                <Show when={props.renderSlideBack}>
-                                    {(getRenderSlideBack) => (
-                                        <div
-                                            class={[styles.carouselFace, styles.carouselFaceTurnable].join(" ")}
-                                            style={{
-                                                transform: CarouselUtils.getBackTransform(
-                                                    CarouselUtils.getTurnAxis(getPlacement(), getOrientation()),
-                                                ),
-                                            }}
-                                            aria-hidden="true"
-                                        >
-                                            {getRenderSlideBack()(getSlide, () => getSlideState(place, "back"))}
-                                        </div>
-                                    )}
-                                </Show>
-                            </div>
-                        );
+                        return <Show when={getIsBuiltHere()}>{renderSlideAt(getSlide, place)}</Show>;
                     }}
                 </Index>
             </div>

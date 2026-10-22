@@ -85,6 +85,7 @@
         weekStartsOn={props.weekStartsOn}
         precision={props.precision}
         ariaLabel={props.calendarLabel}
+        disabledDays={props.disabledDays}
         computeIsDayDisabled={props.computeIsDayDisabled}
         renderDay={props.renderDay}
         renderWeekday={props.renderWeekday}

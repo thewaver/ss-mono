@@ -2,6 +2,7 @@ import type { ParentProps } from "solid-js";
 
 import type { AccessorProps, AccessorValues, PlacementRect } from "@thewaver/ss-components-solid";
 import type {
+    BasePaginatorCountContentValues,
     BasePaginatorDialGapContentValues,
     BasePaginatorGapContentValues,
     BasePaginatorPageContentValues,
@@ -28,3 +29,5 @@ export type PaginatorWedgeProps = ParentProps<
 >;
 
 export type PaginatorPanelProps = AccessorValues<BasePaginatorPanelValues>;
+
+export type PaginatorCountContentProps = AccessorValues<BasePaginatorCountContentValues>;

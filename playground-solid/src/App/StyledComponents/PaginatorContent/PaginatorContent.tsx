@@ -1,12 +1,10 @@
 import { For, type ParentProps, Show, createUniqueId } from "solid-js";
 
 import type { PlacementRect } from "@thewaver/ss-components-solid";
-import { PlacementUtils, access } from "@thewaver/ss-components-solid";
+import { PaginatorUtils, PlacementUtils, access } from "@thewaver/ss-components-solid";
 import {
-    FIRST_PAGE,
     GAP_MARK,
     HALF,
-    PAGE_SIZE,
     RESULTS,
     STEP_GLYPHS,
 } from "@thewaver/ss-playground/App/StyledComponents/PaginatorContent/PaginatorContent.const";
@@ -14,6 +12,7 @@ import * as styles from "@thewaver/ss-playground/App/StyledComponents/PaginatorC
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type {
+    PaginatorCountContentProps,
     PaginatorDialGapContentProps,
     PaginatorGapContentProps,
     PaginatorPageContentProps,
@@ -22,7 +21,7 @@ import type {
     PaginatorWedgeProps,
 } from "./PaginatorContentSolid.types";
 
-const toResult = (index: number) => RESULTS[index % RESULTS.length];
+const toResult = (itemNumber: number) => RESULTS[(itemNumber - 1) % RESULTS.length];
 
 const toViewBox = (rect: PlacementRect) =>
     `${rect.leftShare - rect.widthShare * HALF} ${rect.topShare - rect.heightShare * HALF} ${rect.widthShare} ${rect.heightShare}`;
@@ -167,32 +166,50 @@ export const PagePaginatorDialGap = (props: PaginatorDialGapContentProps) => {
 export const PagePaginatorPanel = (props: PaginatorPanelProps) => {
     const getLayerClass = useLayerClass();
 
-    const getFirstIndex = () => (Math.max(access(props.page), FIRST_PAGE) - FIRST_PAGE) * PAGE_SIZE;
+    const getRange = () =>
+        PaginatorUtils.computeItemRange(access(props.page), access(props.itemCount), access(props.pageSize));
 
-    const getTotal = () => Math.max(access(props.pageCount), 0) * PAGE_SIZE;
+    const getSummary = () => {
+        const range = getRange();
 
-    const getIndexes = () =>
-        Array.from({ length: PAGE_SIZE }, (_unused, offset) => getFirstIndex() + offset).filter(
-            (index) => index < getTotal(),
-        );
+        return range === undefined
+            ? "nothing to show"
+            : `showing ${range.first} to ${range.last} of ${access(props.itemCount)}`;
+    };
+
+    const getItemNumbers = () => {
+        const range = getRange();
+
+        return range === undefined
+            ? []
+            : Array.from({ length: range.last - range.first + 1 }, (_unused, offset) => range.first + offset);
+    };
 
     return (
         <div class={[styles.paginatorPanel, getLayerClass()].join(" ")}>
             <div class={styles.paginatorPanelSummary} role="status">
-                {getIndexes().length === 0
-                    ? "nothing to show"
-                    : `showing ${getFirstIndex() + FIRST_PAGE} to ${getFirstIndex() + getIndexes().length} of ${getTotal()}`}
+                {getSummary()}
             </div>
 
-            <For each={getIndexes()}>
-                {(index) => (
+            <For each={getItemNumbers()}>
+                {(itemNumber) => (
                     <div class={styles.paginatorPanelRow}>
-                        <span>{toResult(index)}</span>
+                        <span>{toResult(itemNumber)}</span>
 
-                        <span class={styles.paginatorPanelIndex}>{`#${index + FIRST_PAGE}`}</span>
+                        <span class={styles.paginatorPanelIndex}>{`#${itemNumber}`}</span>
                     </div>
                 )}
             </For>
+        </div>
+    );
+};
+
+export const PagePaginatorCount = (props: PaginatorCountContentProps) => {
+    const getLayerClass = useLayerClass();
+
+    return (
+        <div class={[styles.paginatorCount, getLayerClass()].join(" ")}>
+            {`${access(props.page)} of ${access(props.pageCount)}`}
         </div>
     );
 };

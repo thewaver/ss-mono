@@ -69,6 +69,7 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
     const currentIndex = CarouselUtils.wrapIndex(index, count);
     const isDisabled = props.isDisabled ?? false;
     const isLooping = props.isLooping ?? CAROUSEL_DEFAULTS.isLooping;
+    const isWindowed = props.isWindowed ?? CAROUSEL_DEFAULTS.isWindowed;
     const orientation = props.orientation ?? CAROUSEL_DEFAULTS.orientation;
     const transitionDurationMs = props.transitionDurationMs ?? CAROUSEL_DEFAULTS.transitionDurationMs;
     const autoplayDelayMs = props.autoplayDelayMs;
@@ -287,15 +288,17 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
         if (isPlaybackAtEnd) setIsPlaying(false);
     }, [isPlaybackAtEnd]);
 
-    const placements: CarouselPlacement[] = ringPlaces.map((place) =>
-        props.placement.place({
-            distance: getDistance(place),
-            index: place,
-            count: ringCount,
-            size,
-            orientation,
-            isLooping,
-        }),
+    const placements: (CarouselPlacement | undefined)[] = ringPlaces.map((place) =>
+        CarouselUtils.getIsBuilt(getDistance(place), props.placement.reach, isWindowed)
+            ? props.placement.place({
+                  distance: getDistance(place),
+                  index: place,
+                  count: ringCount,
+                  size,
+                  orientation,
+                  isLooping,
+              })
+            : undefined,
     );
 
     const handleViewportClick = (e: MouseEvent<HTMLDivElement>) => {
@@ -310,7 +313,9 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
         if (getDrawn(currentPlace)?.contains(e.target as Node)) return;
 
         const rects = ringPlaces.map((place) =>
-            place !== currentPlace && placements[place].effect.opacity !== CarouselConst.HIDDEN_OPACITY
+            place !== currentPlace &&
+            placements[place] !== undefined &&
+            placements[place].effect.opacity !== CarouselConst.HIDDEN_OPACITY
                 ? getDrawn(place)?.getBoundingClientRect()
                 : undefined,
         );
@@ -401,6 +406,8 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
                     const slide = props.slides[toIndex(place)];
                     const placement = placements[place];
                     const isCurrent = place === currentPlace;
+
+                    if (placement === undefined) return null;
 
                     return (
                         <div

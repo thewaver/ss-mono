@@ -1,9 +1,23 @@
 import { MathUtils } from "@thewaver/ss-utils";
 
+import type { PlacementLayout, PlacementRect } from "../../Abstracts/Placement/Placement.types";
+import type { PaginatorControlEntry } from "./Paginator.context.types";
 import type { PaginatorEntry, PaginatorRange, PaginatorStep } from "./Paginator.types";
 
 /** Pages are numbered from one, as the user sees them. */
 const FIRST_PAGE = 1;
+
+/** The fewest items a page can hold, whatever size was asked for. */
+const MIN_PAGE_SIZE = 1;
+
+/** What `indexOf` answers for an entry that is not in the list. */
+const MISSING_ENTRY = -1;
+
+/** A whole number of items, never below zero. */
+const toItemCount = (itemCount: number) => Math.max(Math.trunc(itemCount), 0);
+
+/** A whole page size, never below one. */
+const toPageSize = (pageSize: number) => Math.max(Math.trunc(pageSize), MIN_PAGE_SIZE);
 
 /** The whole numbers from one bound to the other, both included, or nothing when they cross. */
 const getRange = (from: number, to: number) =>
@@ -107,12 +121,39 @@ export namespace PaginatorUtils {
     };
 
     /**
-     * How many pages there really are, whatever was asked for.
+     * How many pages a list of items fills.
      *
-     * @param pageCount The count as given, which may be fractional or negative.
+     * The last page holds whatever is left over, so 383 items at 20 a page is 20 pages, and an empty list has no
+     * pages at all.
+     *
+     * @param itemCount How many items there are. A fraction is dropped and a negative count is treated as none.
+     * @param pageSize How many items one page holds. A fraction is dropped and anything below one is treated as one.
      * @returns The whole number of pages, never below zero.
      */
-    export const computePageCount = (pageCount: number) => Math.max(Math.trunc(pageCount), 0);
+    export const computePageCount = (itemCount: number, pageSize: number) =>
+        Math.ceil(toItemCount(itemCount) / toPageSize(pageSize));
+
+    /**
+     * Which items one page shows, for a summary such as "showing 21 to 40 of 383".
+     *
+     * @param page The page, counting from one. Clamped, so an out-of-range page is treated as the nearest real one.
+     * @param itemCount How many items there are.
+     * @param pageSize How many items one page holds.
+     * @returns `first` and `last`, the first and last item on the page counting from one, with `last` short on a short
+     * last page; or `undefined` for an empty list, which has no page to show.
+     */
+    export const computeItemRange = (page: number, itemCount: number, pageSize: number) => {
+        const count = toItemCount(itemCount);
+        const size = toPageSize(pageSize);
+        const pageCount = computePageCount(count, size);
+
+        if (pageCount < FIRST_PAGE) return undefined;
+
+        const current = MathUtils.clamp(Math.trunc(page), FIRST_PAGE, pageCount);
+        const first = (current - FIRST_PAGE) * size + 1;
+
+        return { first, last: Math.min(first + size - 1, count) };
+    };
 
     /**
      * Sorts the requested move controls into the ones drawn before the pages and the ones drawn after.
@@ -132,7 +173,8 @@ export namespace PaginatorUtils {
      * Where a move control goes, and whether it can go there at all.
      *
      * A step that would land on the page already shown is disabled rather than hidden, so previous goes quiet on the
-     * first page and next on the last, and the row keeps its shape.
+     * first page and next on the last, and the row keeps its shape. With no pages at all every step is disabled,
+     * since there is nowhere to go.
      *
      * @param step Which move control.
      * @param page The current page.
@@ -143,6 +185,71 @@ export namespace PaginatorUtils {
     export const computeStepState = (step: PaginatorStep, page: number, pageCount: number, isDisabled: boolean) => {
         const targetPage = getStepTarget(step, page, pageCount);
 
-        return { targetPage, isDisabled: isDisabled || targetPage === page };
+        return { targetPage, isDisabled: isDisabled || pageCount < FIRST_PAGE || targetPage === page };
+    };
+
+    /**
+     * The registered controls in the order they appear in the document.
+     *
+     * A paginator's controls come from several pieces arranged by the page, and register with the root as they are
+     * made, so registration order says nothing certain about where each one sits; the document order is what a layout
+     * follows and a reader walks. It can only be read once every control's element is in the document, since a
+     * detached element has no position to compare, so until then the registration order stands and the caller sorts
+     * again once the newcomers are in.
+     *
+     * @param entries The entries, in the order they registered.
+     * @returns A new list in document order, or `entries` itself while any control's element is missing or detached.
+     */
+    export const orderEntries = (entries: PaginatorControlEntry[]) => {
+        if (entries.some((entry) => !(entry.getElementRef()?.isConnected ?? false))) return entries;
+
+        return [...entries].sort((a, b) =>
+            a.getElementRef()!.compareDocumentPosition(b.getElementRef()!) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1,
+        );
+    };
+
+    /**
+     * Where a layout put one control.
+     *
+     * A layout places items by their position in the run, and a control's position is its place in document order,
+     * whichever piece it belongs to.
+     *
+     * @param ordered The entries in document order, from {@link orderEntries}.
+     * @param layout The root's layout, if it has one.
+     * @param entry The control asking.
+     * @returns Its placement, or `undefined` when the paginator is a plain row or the control has not registered.
+     */
+    export const computePlacement = (
+        ordered: PaginatorControlEntry[],
+        layout: PlacementLayout | undefined,
+        entry: PaginatorControlEntry,
+    ): PlacementRect | undefined => {
+        const index = ordered.indexOf(entry);
+
+        return index === MISSING_ENTRY ? undefined : layout?.placements[index];
+    };
+
+    /**
+     * Where a placed control stacks, so a later one paints over an earlier one where a layout overlaps them.
+     *
+     * @param ordered The entries in document order.
+     * @param entry The control asking.
+     * @returns Its position counting from one, or `undefined` when it has not registered.
+     */
+    export const computeStackAt = (ordered: PaginatorControlEntry[], entry: PaginatorControlEntry) => {
+        const index = ordered.indexOf(entry);
+
+        return index === MISSING_ENTRY ? undefined : index + 1;
+    };
+
+    /**
+     * Warns about a piece rendered outside any `PaginatorRoot`, where there is no item count or page to draw from.
+     *
+     * @param piece The piece's name, for the message.
+     */
+    export const warnOutsideRoot = (piece: string) => {
+        console.warn(
+            `${piece}: no PaginatorRoot around it — it has no item count or page to draw from and renders nothing. Render it inside a PaginatorRoot.`,
+        );
     };
 }

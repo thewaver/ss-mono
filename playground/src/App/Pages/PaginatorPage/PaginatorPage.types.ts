@@ -1,6 +1,7 @@
 export type BasePaginatorExampleValues = {
     page: number;
-    pageCount: number;
+    itemCount: number;
+    pageSize: number;
     siblingCount: number;
     boundaryCount: number;
     isDisabled: boolean;

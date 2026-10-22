@@ -1,6 +1,12 @@
 <script lang="ts">
-    import { PAGINATOR_DEFAULTS } from "@thewaver/ss-components-svelte";
+    import { PAGINATOR_DEFAULTS, PaginatorUtils } from "@thewaver/ss-components-svelte";
     import { PaginatorKnobs } from "@thewaver/ss-playground/App/Knobs/Paginators.const";
+    import {
+        COUNT_FIELD_WIDTH,
+        EXAMPLES_ROOT,
+        EXAMPLE_NAMES,
+        STARTING_PAGE,
+    } from "@thewaver/ss-playground/App/Pages/PaginatorPage/PaginatorPage.const";
 
     import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../PageComponents/Examples/PageExamples.svelte";
@@ -8,20 +14,17 @@
     import PageNumberField from "../../PageComponents/Field/PageNumberField.svelte";
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
     import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
+    import CountExample from "./Examples/Count.svelte";
     import DialExample from "./Examples/Dial.svelte";
     import EndsExample from "./Examples/Ends.svelte";
+    import JumpExample from "./Examples/Jump.svelte";
     import LinkComponentExample from "./Examples/LinkComponent.svelte";
     import LinksExample from "./Examples/Links.svelte";
     import StepsExample from "./Examples/Steps.svelte";
     import type { PaginatorExampleProps } from "./PaginatorPageSvelte.types";
-    import {
-    COUNT_FIELD_WIDTH,
-    EXAMPLE_NAMES,
-    EXAMPLES_ROOT,
-    STARTING_PAGE,
-} from "@thewaver/ss-playground/App/Pages/PaginatorPage/PaginatorPage.const";
 
-    let pageCount = $state(PaginatorKnobs.STARTING_PAGE_COUNT);
+    let itemCount = $state(PaginatorKnobs.STARTING_ITEM_COUNT);
+    let pageSize = $state(PaginatorKnobs.STARTING_PAGE_SIZE);
     let siblingCount = $state(PAGINATOR_DEFAULTS.siblingCount);
     let boundaryCount = $state(PAGINATOR_DEFAULTS.boundaryCount);
     let isDisabled = $state(PaginatorKnobs.STARTING_IS_DISABLED);
@@ -31,9 +34,14 @@
     let linkPage = $state(STARTING_PAGE);
     let customLinkPage = $state(STARTING_PAGE);
     let dialPage = $state(STARTING_PAGE);
+    let countPage = $state(STARTING_PAGE);
+    let jumpPage = $state(STARTING_PAGE);
+
+    const pageCount = $derived(PaginatorUtils.computePageCount(itemCount, pageSize));
 
     const commonProps: Omit<PaginatorExampleProps, "page" | "onPageChange"> = $derived({
-        pageCount,
+        itemCount,
+        pageSize,
         siblingCount,
         boundaryCount,
         isDisabled,
@@ -71,6 +79,22 @@
                 `page ${customLinkPage} of ${pageCount} — the same links rendered by a consumer's own link component`,
             component: linkComponentExample,
             path: `${EXAMPLES_ROOT}/LinkComponent.svelte`,
+        },
+        {
+            key: "count",
+            name: EXAMPLE_NAMES.count,
+            readout: () =>
+                `page ${countPage} of ${pageCount} — the steps piece with the page's own text in its slot, and no number row at all`,
+            component: countExample,
+            path: `${EXAMPLES_ROOT}/Count.svelte`,
+        },
+        {
+            key: "jump",
+            name: EXAMPLE_NAMES.jump,
+            readout: () =>
+                `page ${jumpPage} of ${pageCount} — the field is the page's own, writing the same page the row reads`,
+            component: jumpExample,
+            path: `${EXAMPLES_ROOT}/Jump.svelte`,
         },
         {
             key: "dial",
@@ -133,17 +157,61 @@
     />
 {/snippet}
 
+{#snippet countExample()}
+    <CountExample
+        {...commonProps}
+        page={countPage}
+        onPageChange={(page) => {
+            countPage = page;
+        }}
+    />
+{/snippet}
+
+{#snippet jumpExample()}
+    <JumpExample
+        {...commonProps}
+        page={jumpPage}
+        onPageChange={(page) => {
+            jumpPage = page;
+        }}
+    />
+{/snippet}
+
 <PagePropsPanel scope={"global"}>
-    <PageProp itemKey={"pageCount"} controls={"Sets PaginatorProps.pageCount"} label={"Page count"} hint={"How many pages there are to page through."}>
+    <PageProp
+        itemKey={"itemCount"}
+        controls={"Sets PaginatorProps.itemCount"}
+        label={"Item count"}
+        hint={"How many items there are to page through. The page count is worked out from this and the page size."}
+    >
         <PageNumberField
-            value={pageCount}
-            min={PaginatorKnobs.MIN_PAGE_COUNT}
-            max={PaginatorKnobs.MAX_PAGE_COUNT}
+            value={itemCount}
+            min={PaginatorKnobs.MIN_ITEM_COUNT}
+            max={PaginatorKnobs.MAX_ITEM_COUNT}
             step={PaginatorKnobs.COUNT_STEP}
             width={COUNT_FIELD_WIDTH}
-            ariaLabel={"Page count"}
+            ariaLabel={"Item count"}
             onInput={(value) => {
-                pageCount = value;
+                itemCount = value;
+            }}
+        />
+    </PageProp>
+
+    <PageProp
+        itemKey={"pageSize"}
+        controls={"Sets PaginatorProps.pageSize"}
+        label={"Page size"}
+        hint={"How many items one page holds. The last page holds whatever is left over."}
+    >
+        <PageNumberField
+            value={pageSize}
+            min={PaginatorKnobs.MIN_PAGE_SIZE}
+            max={PaginatorKnobs.MAX_PAGE_SIZE}
+            step={PaginatorKnobs.COUNT_STEP}
+            width={COUNT_FIELD_WIDTH}
+            ariaLabel={"Page size"}
+            onInput={(value) => {
+                pageSize = value;
             }}
         />
     </PageProp>

@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { shallowRef } from "vue";
+import { computed, shallowRef } from "vue";
 
 import {
     EXAMPLES_ROOT,
     EXAMPLE_NAMES,
+    WINDOWED_SLIDE_COUNT,
 } from "@thewaver/ss-playground/App/Pages/Carousels/CarouselPage/CarouselPage.const";
 
 import type { ExampleDefs } from "../../../PageComponents/Examples/Examples.types";
@@ -15,6 +16,7 @@ import NoControlsExample from "./Examples/NoControls.vue";
 import RotatingExample from "./Examples/Rotating.vue";
 import ScrolledExample from "./Examples/Scrolled.vue";
 import SteppedExample from "./Examples/Stepped.vue";
+import WindowedExample from "./Examples/Windowed.vue";
 
 const controls = useCarouselsControls();
 
@@ -25,6 +27,14 @@ const rotatingIndex = shallowRef(0);
 const rotatingPlaying = shallowRef(true);
 const barelessIndex = shallowRef(0);
 const scrolledIndex = shallowRef(0);
+const windowedIndex = shallowRef(0);
+const builtCount = shallowRef(0);
+
+const windowedProps = computed(() => {
+    const { slides: _slides, ...rest } = sharedProps.value;
+
+    return rest;
+});
 
 const examples: ExampleDefs[] = [
     {
@@ -54,6 +64,13 @@ const examples: ExampleDefs[] = [
         readout: () =>
             `slide ${barelessIndex.value + 1} of ${controls.slideCount.value} — nothing is drawn beside the slides, so the surrounding page owns the buttons through the signal it shares`,
         path: `${EXAMPLES_ROOT}/NoControls.vue`,
+    },
+    {
+        key: "windowed",
+        name: EXAMPLE_NAMES.windowed,
+        readout: () =>
+            `slide ${windowedIndex.value + 1} of ${WINDOWED_SLIDE_COUNT} | ${builtCount.value} built — only the slides the placement can draw exist, so the rest cost nothing, and a slide that comes back is built afresh`,
+        path: `${EXAMPLES_ROOT}/Windowed.vue`,
     },
 ];
 </script>
@@ -88,6 +105,17 @@ const examples: ExampleDefs[] = [
 
         <template #scrolled>
             <ScrolledExample v-bind="sharedProps" v-model:index="scrolledIndex" />
+        </template>
+
+        <template #windowed>
+            <PageCarouselBox>
+                <WindowedExample
+                    v-bind="windowedProps"
+                    v-model:index="windowedIndex"
+                    :is-looping="isLooping"
+                    @built-change="(change: number) => (builtCount += change)"
+                />
+            </PageCarouselBox>
         </template>
     </PageExamples>
 </template>

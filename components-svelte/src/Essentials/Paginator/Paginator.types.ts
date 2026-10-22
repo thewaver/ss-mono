@@ -2,7 +2,10 @@ import type { Component, Snippet } from "svelte";
 import type { HTMLAnchorAttributes } from "svelte/elements";
 
 import type {
+    BasePaginatorPagesProps,
     BasePaginatorProps,
+    BasePaginatorRootProps,
+    BasePaginatorStepsProps,
     InteractionFlags,
     PaginatorGapEntry,
     PaginatorPageEntry,
@@ -13,6 +16,7 @@ import type {
 } from "@thewaver/ss-components";
 
 import type { InteractionControlProps } from "../../Primitives/InteractionWrapper/InteractionWrapper.types.js";
+import type { PaginatorSvelteContextType } from "./Paginator.context.types.js";
 
 export type PaginatorLinkProps = HTMLAnchorAttributes & {
     /**
@@ -33,13 +37,55 @@ export type PaginatorItemProps<TExtra extends object> = InteractionControlProps<
     onActivate: () => void;
 };
 
-export type PaginatorProps = BasePaginatorProps & {
-    /** The component to draw navigating entries with. */
+type PaginatorRootOwnProps = {
+    /** The component to draw navigating entries with, in every piece inside. */
     linkComponent?: Component<PaginatorLinkProps>;
+};
+
+type PaginatorStepsOwnProps = {
+    /** Draws one of the move controls. */
+    renderStep: Snippet<[step: PaginatorStep, renderProps: InteractionFlags<PaginatorStepRenderProps>]>;
+};
+
+type PaginatorPagesOwnProps = {
     /** Draws one page entry. */
     renderPage: Snippet<[entry: PaginatorPageEntry, renderProps: InteractionFlags<PaginatorPageRenderProps>]>;
     /** Draws the break standing in for the pages that were left out. */
     renderGap: Snippet<[entry: PaginatorGapEntry, placement: PlacementRect | undefined]>;
-    /** Draws one of the move controls. */
-    renderStep: Snippet<[step: PaginatorStep, renderProps: InteractionFlags<PaginatorStepRenderProps>]>;
+};
+
+export type PaginatorRootProps = BasePaginatorRootProps &
+    PaginatorRootOwnProps & {
+        /** The pieces, arranged however the page wants them, with anything of the page's own between them. */
+        children?: Snippet;
+    };
+
+export type PaginatorStepsProps = BasePaginatorStepsProps &
+    PaginatorStepsOwnProps & {
+        /** What sits between previous and next: a `PaginatorPages`, a "3 of 20" label, or anything else. */
+        children?: Snippet;
+    };
+
+export type PaginatorPagesProps = BasePaginatorPagesProps & PaginatorPagesOwnProps;
+
+export type PaginatorProps = BasePaginatorProps &
+    PaginatorRootOwnProps &
+    PaginatorStepsOwnProps &
+    PaginatorPagesOwnProps;
+
+export type PaginatorStepControlProps = Pick<PaginatorStepsProps, "computeStepLabel" | "renderStep"> & {
+    /** The root this control registers with and reads the page from. */
+    context: PaginatorSvelteContextType;
+    /** Which move control this is. */
+    step: PaginatorStep;
+};
+
+export type PaginatorEntryControlProps<T> = Pick<
+    PaginatorPagesProps,
+    "computePageLabel" | "renderPage" | "renderGap"
+> & {
+    /** The root this control registers with and reads the page from. */
+    context: PaginatorSvelteContextType;
+    /** The page or the gap this control stands for. */
+    entry: T;
 };

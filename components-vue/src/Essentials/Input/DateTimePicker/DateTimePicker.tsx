@@ -138,6 +138,7 @@ export const DateTimePicker = defineComponent(
             "popupTransitionDurationMs": null,
             "calendarLabel": null,
             "weekStartsOn": null,
+            "disabledDays": null,
             "computeIsDayDisabled": null,
             "triggerId": null,
             "triggerAriaLabel": null,

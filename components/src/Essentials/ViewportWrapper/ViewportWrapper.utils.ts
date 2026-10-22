@@ -84,10 +84,32 @@ export namespace ViewportWrapperUtils {
         `translate(${fit.scaleRect.left}px, ${fit.scaleRect.top}px) scale(${fit.scale}, ${fit.scale})`;
 
     /**
+     * Warns about a nested viewport whose host has no width or no height.
+     *
+     * A nested viewport scales its design size to fit its host, so a host with no height of its own — one sized only
+     * by its content, which here is the viewport — gives it nothing to fit into, and it draws nothing at all. That
+     * blank says nothing about its cause, so this names it. A host that is collapsed on purpose, such as a closed
+     * panel, is warned about too, which is the price of the warning.
+     *
+     * @param size The host's measured size.
+     * @returns Whether it warned, so the caller can stop asking.
+     */
+    export const warnIfUnsized = (size: Size2d) => {
+        if (size.width > 0 && size.height > 0) return false;
+
+        console.warn(
+            `ViewportWrapper: a nested viewport's host measures ${size.width} × ${size.height}px, so the viewport is scaled to nothing and draws nothing. Give the box around it a width and a height of its own.`,
+        );
+
+        return true;
+    };
+
+    /**
      * Watches the space a viewport is given.
      *
      * The root viewport's space is the window, followed through a throttled `resize` listener. A nested one's is its
-     * host box, followed through a `ResizeObserver`, so a consumer sizes it with ordinary CSS and passes nothing in.
+     * host box, followed through a `ResizeObserver`, so a consumer sizes it with ordinary CSS and passes nothing in. A
+     * nested host measured with no width or no height is warned about once, through {@link warnIfUnsized}.
      *
      * @param host The host element, which a nested viewport measures. Missing means there is nothing to watch yet.
      * @param isNested Whether another viewport encloses this one.
@@ -118,7 +140,15 @@ export namespace ViewportWrapperUtils {
 
         if (!host) return () => undefined;
 
-        const observer = new ResizeObserver(() => onSize({ width: host.clientWidth, height: host.clientHeight }));
+        let isWarned = false;
+
+        const observer = new ResizeObserver(() => {
+            const size = { width: host.clientWidth, height: host.clientHeight };
+
+            if (!isWarned) isWarned = warnIfUnsized(size);
+
+            onSize(size);
+        });
 
         observer.observe(host);
 

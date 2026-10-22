@@ -2,6 +2,7 @@ import type { Point2d } from "@thewaver/ss-utils";
 
 import type { AnchorPlacement } from "../../../Abstracts/Anchor/Anchor.types";
 import type { DateValue, DateValueWeekStart } from "../../../Abstracts/DateValue/DateValue.types";
+import type { CalendarDayMatcher } from "../Calendar/Calendar.types";
 
 export type BaseDateRangePickerValues = {
     /**
@@ -34,10 +35,12 @@ export type BaseDateRangePickerValues = {
     triggerId?: string;
     /** Names the control that opens the calendar. */
     triggerAriaLabel: string;
+    /** Days the calendar refuses, described rather than computed — see the calendar's own `disabledDays`. */
+    disabledDays?: CalendarDayMatcher[];
 };
 
 export type BaseDateRangePickerCbs = {
-    /** Whether one day can be picked, for rules a plain earliest and latest cannot express. */
+    /** Whether one day can be picked, for rules neither a plain earliest and latest nor `disabledDays` can express. */
     computeIsDayDisabled?: (day: DateValue) => boolean;
 };
 

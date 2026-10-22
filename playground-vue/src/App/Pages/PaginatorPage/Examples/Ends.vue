@@ -26,7 +26,8 @@ const props = defineProps<Props>();
     <PagePaginatorDemo>
         <Paginator
             :page="page"
-            :page-count="pageCount"
+            :item-count="itemCount"
+            :page-size="pageSize"
             :sibling-count="siblingCount"
             :boundary-count="boundaryCount"
             :is-disabled="isDisabled"
@@ -50,6 +51,6 @@ const props = defineProps<Props>();
             </template>
         </Paginator>
 
-        <PagePaginatorPanel :page="page" :page-count="pageCount" />
+        <PagePaginatorPanel :page="page" :item-count="itemCount" :page-size="pageSize" />
     </PagePaginatorDemo>
 </template>

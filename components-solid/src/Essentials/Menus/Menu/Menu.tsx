@@ -368,7 +368,7 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
 
         e.preventDefault();
 
-        if (step.type === "dismiss") props.onDismiss();
+        if (step.type === "dismiss") props.onDismiss(!e.shiftKey);
         else if (step.type === "activate") activateIndex(step.index);
         else if (step.type === "open") openIndex(step.index);
         else if (step.type === "highlight") highlightIndex(step.index);
@@ -597,6 +597,13 @@ export const Menu = <T,>(props: MenuProps<T>) => {
         setFlickOrigin(() => undefined);
     };
 
+    const dismiss = (isLeavingForward: boolean) => {
+        const nextTabStop = isLeavingForward ? MenuUtils.computeNextTabStop(getTriggerRef()) : undefined;
+
+        close();
+        nextTabStop?.focus();
+    };
+
     const getCheckedValues = createMemo(() => props.checked?.[0]() ?? MenuConst.EMPTY_CHECKED);
 
     const pick = (item: MenuItem<T>, radioGroupValues: T[]) => {
@@ -714,7 +721,7 @@ export const Menu = <T,>(props: MenuProps<T>) => {
                             if (!releasedOn || !getTriggerRef()?.contains(releasedOn)) isTogglePrevented = false;
                         }}
                         onClose={close}
-                        onDismiss={close}
+                        onDismiss={dismiss}
                     />
                 </>
             )}
@@ -738,6 +745,13 @@ export const ContextMenu = <T,>(props: ContextMenuProps<T>) => {
 
     const close = () => {
         setIsOpen(false);
+    };
+
+    const dismiss = (isLeavingForward: boolean) => {
+        const nextTabStop = isLeavingForward ? MenuUtils.computeNextTabStop(getRegionRef()) : undefined;
+
+        close();
+        nextTabStop?.focus();
     };
 
     const getCheckedValues = createMemo(() => props.checked?.[0]() ?? MenuConst.EMPTY_CHECKED);
@@ -828,7 +842,7 @@ export const ContextMenu = <T,>(props: ContextMenuProps<T>) => {
                 renderHighlightFloater={props.renderHighlightFloater}
                 onPick={pick}
                 onClose={close}
-                onDismiss={close}
+                onDismiss={dismiss}
             />
         </>
     );

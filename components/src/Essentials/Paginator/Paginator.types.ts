@@ -40,38 +40,64 @@ export type PaginatorStepRenderProps = {
     placement?: PlacementRect;
 };
 
-export type BasePaginatorValues = {
-    /** How many pages there are. */
-    pageCount: number;
-    /** How many pages are shown on each side of the current one before the run is broken. */
-    siblingCount?: number;
-    /** How many pages are always shown at each end, however far away the current page is. */
-    boundaryCount?: number;
-    /** Which move controls are shown, and in what order. */
-    steps?: PaginatorStep[];
-    /** The space between entries. */
-    gap?: number;
+export type BasePaginatorRootValues = {
+    /** How many items there are to page through. The page count is worked out from this and `pageSize`. */
+    itemCount: number;
+    /** How many items one page holds. The last page holds whatever is left over. */
+    pageSize?: number;
+    /** Which page is being shown. It is the only thing that moves the paginator. */
+    page: number;
     /** Turns the paginator off, so none of its pages or controls respond. */
     isDisabled?: boolean;
     /** Names the paginator for assistive technology. */
     ariaLabel: string;
-    /** Which page is being shown. It is the only thing that moves the paginator. */
-    page: number;
 };
 
-export type BasePaginatorCbs = {
-    /** Where one page navigates to, for a paginator of links rather than of buttons. */
+export type BasePaginatorRootCbs = {
+    /** Where one page navigates to, for a paginator of links rather than of buttons. Every piece inside reads it. */
     computeHref?: (page: number) => string;
-    /** Names one page for assistive technology, and is told how many there are so it can say page three of ten. */
-    computePageLabel: (page: number, pageCount: number) => string;
-    /** Names one of the move controls, and is told which page it would go to. */
-    computeStepLabel: (step: PaginatorStep, targetPage: number) => string;
-    /** Arranges the entries, for a paginator that is something other than a straight run. */
+    /** Arranges every step, page and gap inside, in document order, for a paginator that is not a straight run. */
     computeLayout?: PlacementLayoutFn;
     /** What the entries do as the pointer nears them. */
     computeEffect?: ProximityEffectFn;
     /** Runs when a different page is asked for. */
     onPageChange?: (page: number) => void;
 };
+
+export type BasePaginatorRootProps = BasePaginatorRootValues & BasePaginatorRootCbs;
+
+export type BasePaginatorStepsValues = {
+    /** Which move controls are shown. First and previous sit before the slot and next and last after it. */
+    steps?: PaginatorStep[];
+    /** The space between the controls and whatever sits in the slot. */
+    gap?: number;
+};
+
+export type BasePaginatorStepsCbs = {
+    /** Names one of the move controls, and is told which page it would go to. */
+    computeStepLabel: (step: PaginatorStep, targetPage: number) => string;
+};
+
+export type BasePaginatorStepsProps = BasePaginatorStepsValues & BasePaginatorStepsCbs;
+
+export type BasePaginatorPagesValues = {
+    /** How many pages are shown on each side of the current one before the run is broken. */
+    siblingCount?: number;
+    /** How many pages are always shown at each end, however far away the current page is. */
+    boundaryCount?: number;
+    /** The space between entries. */
+    gap?: number;
+};
+
+export type BasePaginatorPagesCbs = {
+    /** Names one page for assistive technology, and is told how many there are so it can say page three of ten. */
+    computePageLabel: (page: number, pageCount: number) => string;
+};
+
+export type BasePaginatorPagesProps = BasePaginatorPagesValues & BasePaginatorPagesCbs;
+
+export type BasePaginatorValues = BasePaginatorRootValues & BasePaginatorStepsValues & BasePaginatorPagesValues;
+
+export type BasePaginatorCbs = BasePaginatorRootCbs & BasePaginatorStepsCbs & BasePaginatorPagesCbs;
 
 export type BasePaginatorProps = BasePaginatorValues & BasePaginatorCbs;

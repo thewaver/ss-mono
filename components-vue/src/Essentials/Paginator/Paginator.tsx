@@ -1,7 +1,18 @@
-import { type SlotsType, type VNodeChild, computed, defineComponent, h } from "vue";
+import {
+    type ComponentPublicInstance,
+    type SlotsType,
+    type VNodeChild,
+    computed,
+    defineComponent,
+    h,
+    onMounted,
+    onScopeDispose,
+    shallowRef,
+} from "vue";
 
 import {
     PAGINATOR_DEFAULTS,
+    type PaginatorControlEntry,
     type PaginatorGapEntry,
     type PaginatorPageEntry,
     type PaginatorPageRenderProps,
@@ -20,8 +31,21 @@ import type {
 import { PlacementBox } from "../../Primitives/PlacementBox/PlacementBox";
 import { PlacementItem } from "../../Primitives/PlacementItem/PlacementItem";
 import { callSlot, declareProps } from "../../Utils/propUtils";
+import { toElement } from "../../Utils/refUtils";
 import type { SlotsContext } from "../../Utils/typeUtils";
-import type { PaginatorItemProps, PaginatorProps, PaginatorSlots } from "./Paginator.types";
+import { providePaginatorContext, usePaginatorContext } from "./Paginator.context";
+import type {
+    PaginatorItemProps,
+    PaginatorPagesProps,
+    PaginatorPagesSlots,
+    PaginatorProps,
+    PaginatorRootProps,
+    PaginatorRootSlots,
+    PaginatorSlots,
+    PaginatorStepsProps,
+    PaginatorStepsSlots,
+    PaginatorVueContextType,
+} from "./Paginator.types";
 
 const PaginatorItem = defineComponent(
     <TExtra extends object>(
@@ -87,184 +111,421 @@ const PaginatorItem = defineComponent(
     },
 );
 
-export const Paginator = defineComponent(
-    (props: PaginatorProps, { slots }: SlotsContext<PaginatorSlots>) => {
-        const pageCount = computed(() => PaginatorUtils.computePageCount(props.pageCount));
-        const steps = computed(() => PaginatorUtils.splitSteps(props.steps ?? PAGINATOR_DEFAULTS.steps));
+const usePlacedControl = (context: PaginatorVueContextType) => {
+    const elementRef = shallowRef<HTMLElement>();
 
-        const entries = computed(() =>
-            PaginatorUtils.getEntries(props.page, {
-                pageCount: pageCount.value,
-                siblingCount: props.siblingCount ?? PAGINATOR_DEFAULTS.siblingCount,
-                boundaryCount: props.boundaryCount ?? PAGINATOR_DEFAULTS.boundaryCount,
-            }),
+    const entry: PaginatorControlEntry = { getElementRef: () => elementRef.value };
+
+    context.register(entry);
+
+    onMounted(() => context.reorder());
+
+    const placement = computed(() => context.computePlacement(entry));
+
+    const stackAt = computed(() => context.computeStackAt(entry));
+
+    const sizing = computed(() =>
+        placement.value === undefined ? PlacementConst.ROW_SIZING : PlacementConst.PLACED_SIZING,
+    );
+
+    const setElementRef = (target: Element | ComponentPublicInstance | null) => {
+        elementRef.value = toElement(target);
+    };
+
+    const renderPlaced = (element: VNodeChild) => {
+        const rect = placement.value;
+
+        return rect === undefined ? (
+            element
+        ) : (
+            <PlacementItem placement={rect} stackAt={stackAt.value}>
+                {{ default: () => element }}
+            </PlacementItem>
         );
+    };
 
-        const itemCount = computed(
-            () => steps.value.leading.length + entries.value.length + steps.value.trailing.length,
-        );
+    return { setElementRef, placement, sizing, renderPlaced };
+};
 
-        const layout = computed(() => props.computeLayout?.({ itemCount: itemCount.value }));
+type PaginatorStepControlProps = Pick<PaginatorStepsProps, "computeStepLabel"> & {
+    context: PaginatorVueContextType;
+    step: PaginatorStep;
+};
 
-        const goTo = (target: number) => {
-            if (target === props.page) return;
+type PaginatorEntryControlProps<T> = Pick<PaginatorPagesProps, "computePageLabel"> & {
+    context: PaginatorVueContextType;
+    entry: T;
+};
 
-            props.onPageChange?.(target);
-        };
+const PaginatorStepControl = defineComponent(
+    (props: PaginatorStepControlProps, { slots }: SlotsContext<Pick<PaginatorStepsSlots, "renderStep">>) => {
+        const placed = usePlacedControl(props.context);
 
         return () => {
-            const isDisabled = props.isDisabled ?? false;
-            const page = props.page;
-            const { leading, trailing } = steps.value;
+            const { targetPage, isDisabled: isStepDisabled } = PaginatorUtils.computeStepState(
+                props.step,
+                props.context.getPage(),
+                props.context.getPageCount(),
+                props.context.getIsDisabled(),
+            );
+
+            return placed.renderPlaced(
+                <InteractionWrapper
+                    sizing={placed.sizing.value}
+                    isDisabled={isStepDisabled}
+                    extraFlags={{ step: props.step, targetPage, placement: placed.placement.value }}
+                >
+                    {
+                        {
+                            renderControl: ({ setElementRef, flags: renderProps }) => (
+                                <PaginatorItem
+                                    ref={(target) => {
+                                        setElementRef(target);
+                                        placed.setElementRef(target);
+                                    }}
+                                    href={isStepDisabled ? undefined : props.context.computeHref(targetPage)}
+                                    isCurrent={false}
+                                    ariaLabel={props.computeStepLabel(props.step, targetPage)}
+                                    flags={renderProps}
+                                    linkComponent={props.context.getLinkComponent()}
+                                    onActivate={() => props.context.goTo(targetPage)}
+                                >
+                                    {
+                                        {
+                                            renderContent: () =>
+                                                callSlot(slots.renderStep, { step: props.step, renderProps }),
+                                        } satisfies InteractionControlSlots<PaginatorStepRenderProps>
+                                    }
+                                </PaginatorItem>
+                            ),
+                        } satisfies Partial<InteractionWrapperSlots<PaginatorStepRenderProps>>
+                    }
+                </InteractionWrapper>,
+            );
+        };
+    },
+    {
+        name: "PaginatorStepControl",
+        slots: Object as SlotsType<Pick<PaginatorStepsSlots, "renderStep">>,
+        props: declareProps<PaginatorStepControlProps>({
+            context: null,
+            step: null,
+            computeStepLabel: null,
+        }),
+    },
+);
+
+const PaginatorPageControl = defineComponent(
+    (
+        props: PaginatorEntryControlProps<PaginatorPageEntry>,
+        { slots }: SlotsContext<Pick<PaginatorPagesSlots, "renderPage">>,
+    ) => {
+        const placed = usePlacedControl(props.context);
+
+        return () => {
+            const page = props.entry.page;
+            const isCurrent = page === props.context.getPage();
+
+            return placed.renderPlaced(
+                <InteractionWrapper
+                    sizing={placed.sizing.value}
+                    isDisabled={props.context.getIsDisabled()}
+                    extraFlags={{ page, isCurrent, placement: placed.placement.value }}
+                >
+                    {
+                        {
+                            renderControl: ({ setElementRef, flags: renderProps }) => (
+                                <PaginatorItem
+                                    ref={(target) => {
+                                        setElementRef(target);
+                                        placed.setElementRef(target);
+                                    }}
+                                    href={props.context.computeHref(page)}
+                                    isCurrent={renderProps.isCurrent}
+                                    ariaLabel={props.computePageLabel(page, props.context.getPageCount())}
+                                    flags={renderProps}
+                                    linkComponent={props.context.getLinkComponent()}
+                                    onActivate={() => props.context.goTo(page)}
+                                >
+                                    {
+                                        {
+                                            renderContent: () =>
+                                                callSlot(slots.renderPage, { entry: props.entry, renderProps }),
+                                        } satisfies InteractionControlSlots<PaginatorPageRenderProps>
+                                    }
+                                </PaginatorItem>
+                            ),
+                        } satisfies Partial<InteractionWrapperSlots<PaginatorPageRenderProps>>
+                    }
+                </InteractionWrapper>,
+            );
+        };
+    },
+    {
+        name: "PaginatorPageControl",
+        slots: Object as SlotsType<Pick<PaginatorPagesSlots, "renderPage">>,
+        props: declareProps<PaginatorEntryControlProps<PaginatorPageEntry>>({
+            context: null,
+            entry: null,
+            computePageLabel: null,
+        }),
+    },
+);
+
+const PaginatorGapControl = defineComponent(
+    (
+        props: PaginatorEntryControlProps<PaginatorGapEntry>,
+        { slots }: SlotsContext<Pick<PaginatorPagesSlots, "renderGap">>,
+    ) => {
+        const placed = usePlacedControl(props.context);
+
+        return () =>
+            placed.renderPlaced(
+                <span ref={placed.setElementRef} class={PaginatorStyles.paginatorGap} aria-hidden="true">
+                    {callSlot(slots.renderGap, { entry: props.entry, placement: placed.placement.value })}
+                </span>,
+            );
+    },
+    {
+        name: "PaginatorGapControl",
+        slots: Object as SlotsType<Pick<PaginatorPagesSlots, "renderGap">>,
+        props: declareProps<PaginatorEntryControlProps<PaginatorGapEntry>>({
+            context: null,
+            entry: null,
+            computePageLabel: null,
+        }),
+    },
+);
+
+export const PaginatorRoot = defineComponent(
+    (props: PaginatorRootProps, { slots }: SlotsContext<PaginatorRootSlots>) => {
+        const pageCount = computed(() =>
+            PaginatorUtils.computePageCount(props.itemCount, props.pageSize ?? PAGINATOR_DEFAULTS.pageSize),
+        );
+
+        const isDisabled = computed(() => props.isDisabled ?? false);
+
+        const entries = shallowRef<PaginatorControlEntry[]>([]);
+
+        const orderVersion = shallowRef(0);
+
+        const orderedEntries = computed(() => {
+            void orderVersion.value;
+
+            return PaginatorUtils.orderEntries(entries.value);
+        });
+
+        const layout = computed(() => props.computeLayout?.({ itemCount: entries.value.length }));
+
+        providePaginatorContext({
+            getPage: () => props.page,
+            getPageCount: () => pageCount.value,
+            getIsDisabled: () => isDisabled.value,
+            getLinkComponent: () => props.linkComponent,
+            computeHref: (page) => props.computeHref?.(page),
+            computePlacement: (entry) => PaginatorUtils.computePlacement(orderedEntries.value, layout.value, entry),
+            computeStackAt: (entry) => PaginatorUtils.computeStackAt(orderedEntries.value, entry),
+            goTo: (page) => {
+                if (page === props.page) return;
+
+                props.onPageChange?.(page);
+            },
+            register: (entry) => {
+                entries.value = [...entries.value, entry];
+
+                onScopeDispose(() => {
+                    entries.value = entries.value.filter((item) => item !== entry);
+                });
+            },
+            reorder: () => {
+                orderVersion.value += 1;
+            },
+        });
+
+        return () => {
             const currentLayout = layout.value;
 
-            const renderPlaced = (index: number, element: VNodeChild) => {
-                const placement = currentLayout?.placements[index];
-
-                return placement ? (
-                    <PlacementItem key={index} placement={placement} stackAt={index + 1}>
-                        {{ default: () => element }}
-                    </PlacementItem>
-                ) : (
-                    element
-                );
-            };
-
-            const renderStepControl = (step: PaginatorStep, index: number) => {
-                const placement = currentLayout?.placements[index];
-                const { targetPage, isDisabled: isStepDisabled } = PaginatorUtils.computeStepState(
-                    step,
-                    page,
-                    pageCount.value,
-                    isDisabled,
-                );
-
-                return renderPlaced(
-                    index,
-                    <InteractionWrapper
-                        key={index}
-                        sizing={placement === undefined ? PlacementConst.ROW_SIZING : PlacementConst.PLACED_SIZING}
-                        isDisabled={isStepDisabled}
-                        extraFlags={{ step, targetPage, placement }}
-                    >
-                        {
-                            {
-                                renderControl: ({ setElementRef, flags: renderProps }) => (
-                                    <PaginatorItem
-                                        ref={setElementRef}
-                                        href={isStepDisabled ? undefined : props.computeHref?.(targetPage)}
-                                        isCurrent={false}
-                                        ariaLabel={props.computeStepLabel(step, targetPage)}
-                                        flags={renderProps}
-                                        linkComponent={props.linkComponent}
-                                        onActivate={() => goTo(targetPage)}
-                                    >
-                                        {
-                                            {
-                                                renderContent: () => callSlot(slots.renderStep, { step, renderProps }),
-                                            } satisfies InteractionControlSlots<PaginatorStepRenderProps>
-                                        }
-                                    </PaginatorItem>
-                                ),
-                            } satisfies Partial<InteractionWrapperSlots<PaginatorStepRenderProps>>
-                        }
-                    </InteractionWrapper>,
-                );
-            };
-
-            const renderPageControl = (entry: PaginatorPageEntry, index: number) => {
-                const placement = currentLayout?.placements[index];
-                const isCurrent = entry.page === page;
-
-                return renderPlaced(
-                    index,
-                    <InteractionWrapper
-                        key={index}
-                        sizing={placement === undefined ? PlacementConst.ROW_SIZING : PlacementConst.PLACED_SIZING}
-                        isDisabled={isDisabled}
-                        extraFlags={{ page: entry.page, isCurrent, placement }}
-                    >
-                        {
-                            {
-                                renderControl: ({ setElementRef, flags: renderProps }) => (
-                                    <PaginatorItem
-                                        ref={setElementRef}
-                                        href={props.computeHref?.(entry.page)}
-                                        isCurrent={isCurrent}
-                                        ariaLabel={props.computePageLabel(entry.page, pageCount.value)}
-                                        flags={renderProps}
-                                        linkComponent={props.linkComponent}
-                                        onActivate={() => goTo(entry.page)}
-                                    >
-                                        {
-                                            {
-                                                renderContent: () => callSlot(slots.renderPage, { entry, renderProps }),
-                                            } satisfies InteractionControlSlots<PaginatorPageRenderProps>
-                                        }
-                                    </PaginatorItem>
-                                ),
-                            } satisfies Partial<InteractionWrapperSlots<PaginatorPageRenderProps>>
-                        }
-                    </InteractionWrapper>,
-                );
-            };
-
-            const renderGapControl = (entry: PaginatorGapEntry, index: number) =>
-                renderPlaced(
-                    index,
-                    <span key={index} class={PaginatorStyles.paginatorGap} aria-hidden="true">
-                        {callSlot(slots.renderGap, { entry, placement: currentLayout?.placements[index] })}
-                    </span>,
-                );
-
-            const row = [
-                ...leading.map((step, index) => renderStepControl(step, index)),
-                ...entries.value.map((entry, index) =>
-                    entry.kind === "page"
-                        ? renderPageControl(entry, leading.length + index)
-                        : renderGapControl(entry, leading.length + index),
-                ),
-                ...trailing.map((step, index) =>
-                    renderStepControl(step, leading.length + entries.value.length + index),
-                ),
-            ];
-
             return (
-                <nav
-                    class={PaginatorStyles.paginatorRoot}
-                    style={{ gap: `${props.gap ?? PAGINATOR_DEFAULTS.gap}px` }}
-                    aria-label={props.ariaLabel}
-                >
+                <nav aria-label={props.ariaLabel}>
                     {currentLayout ? (
                         <PlacementBox layout={currentLayout} computeEffect={props.computeEffect}>
-                            {{ default: () => row }}
+                            {{ default: () => slots.default?.() }}
                         </PlacementBox>
                     ) : (
-                        row
+                        slots.default?.()
                     )}
                 </nav>
             );
         };
     },
     {
-        name: "Paginator",
-        slots: Object as SlotsType<PaginatorSlots>,
-        props: declareProps<PaginatorProps>({
-            pageCount: null,
-            siblingCount: null,
-            boundaryCount: null,
-            steps: null,
-            gap: null,
+        name: "PaginatorRoot",
+        slots: Object as SlotsType<PaginatorRootSlots>,
+        props: declareProps<PaginatorRootProps>({
+            itemCount: null,
+            pageSize: null,
+            page: null,
             isDisabled: Boolean,
             ariaLabel: null,
             linkComponent: null,
             computeHref: null,
-            computePageLabel: null,
-            computeStepLabel: null,
             computeLayout: null,
             computeEffect: null,
-            page: null,
             onPageChange: null,
+        }),
+    },
+);
+
+export const PaginatorSteps = defineComponent(
+    (props: PaginatorStepsProps, { slots }: SlotsContext<PaginatorStepsSlots>) => {
+        const context = usePaginatorContext("PaginatorSteps");
+
+        if (!context) return () => null;
+
+        const splitSteps = computed(() => PaginatorUtils.splitSteps(props.steps ?? PAGINATOR_DEFAULTS.steps));
+
+        const renderStepControl = (step: PaginatorStep, index: number) => (
+            <PaginatorStepControl key={index} context={context} step={step} computeStepLabel={props.computeStepLabel}>
+                {{ renderStep: slots.renderStep } satisfies Partial<PaginatorStepsSlots>}
+            </PaginatorStepControl>
+        );
+
+        return () => (
+            <div class={PaginatorStyles.paginatorRow} style={{ gap: `${props.gap ?? PAGINATOR_DEFAULTS.gap}px` }}>
+                {splitSteps.value.leading.map(renderStepControl)}
+
+                {slots.default?.()}
+
+                {splitSteps.value.trailing.map(renderStepControl)}
+            </div>
+        );
+    },
+    {
+        name: "PaginatorSteps",
+        slots: Object as SlotsType<PaginatorStepsSlots>,
+        props: declareProps<PaginatorStepsProps>({
+            steps: null,
+            gap: null,
+            computeStepLabel: null,
+        }),
+    },
+);
+
+export const PaginatorPages = defineComponent(
+    (props: PaginatorPagesProps, { slots }: SlotsContext<PaginatorPagesSlots>) => {
+        const context = usePaginatorContext("PaginatorPages");
+
+        if (!context) return () => null;
+
+        const entries = computed(() =>
+            PaginatorUtils.getEntries(context.getPage(), {
+                pageCount: context.getPageCount(),
+                siblingCount: props.siblingCount ?? PAGINATOR_DEFAULTS.siblingCount,
+                boundaryCount: props.boundaryCount ?? PAGINATOR_DEFAULTS.boundaryCount,
+            }),
+        );
+
+        return () => (
+            <div class={PaginatorStyles.paginatorRow} style={{ gap: `${props.gap ?? PAGINATOR_DEFAULTS.gap}px` }}>
+                {entries.value.map((entry, index) =>
+                    entry.kind === "page" ? (
+                        <PaginatorPageControl
+                            key={index}
+                            context={context}
+                            entry={entry}
+                            computePageLabel={props.computePageLabel}
+                        >
+                            {{ renderPage: slots.renderPage } satisfies Partial<PaginatorPagesSlots>}
+                        </PaginatorPageControl>
+                    ) : (
+                        <PaginatorGapControl
+                            key={index}
+                            context={context}
+                            entry={entry}
+                            computePageLabel={props.computePageLabel}
+                        >
+                            {{ renderGap: slots.renderGap } satisfies Partial<PaginatorPagesSlots>}
+                        </PaginatorGapControl>
+                    ),
+                )}
+            </div>
+        );
+    },
+    {
+        name: "PaginatorPages",
+        slots: Object as SlotsType<PaginatorPagesSlots>,
+        props: declareProps<PaginatorPagesProps>({
+            siblingCount: null,
+            boundaryCount: null,
+            gap: null,
+            computePageLabel: null,
+        }),
+    },
+);
+
+export const Paginator = defineComponent(
+    (props: PaginatorProps, { slots }: SlotsContext<PaginatorSlots>) =>
+        () => (
+            <PaginatorRoot
+                itemCount={props.itemCount}
+                pageSize={props.pageSize}
+                page={props.page}
+                isDisabled={props.isDisabled}
+                ariaLabel={props.ariaLabel}
+                linkComponent={props.linkComponent}
+                computeHref={props.computeHref}
+                computeLayout={props.computeLayout}
+                computeEffect={props.computeEffect}
+                onPageChange={props.onPageChange}
+            >
+                {{
+                    default: () => (
+                        <PaginatorSteps steps={props.steps} gap={props.gap} computeStepLabel={props.computeStepLabel}>
+                            {
+                                {
+                                    renderStep: slots.renderStep,
+                                    default: () => (
+                                        <PaginatorPages
+                                            siblingCount={props.siblingCount}
+                                            boundaryCount={props.boundaryCount}
+                                            gap={props.gap}
+                                            computePageLabel={props.computePageLabel}
+                                        >
+                                            {
+                                                {
+                                                    renderPage: slots.renderPage,
+                                                    renderGap: slots.renderGap,
+                                                } satisfies Partial<PaginatorPagesSlots>
+                                            }
+                                        </PaginatorPages>
+                                    ),
+                                } satisfies Partial<PaginatorStepsSlots>
+                            }
+                        </PaginatorSteps>
+                    ),
+                }}
+            </PaginatorRoot>
+        ),
+    {
+        name: "Paginator",
+        slots: Object as SlotsType<PaginatorSlots>,
+        props: declareProps<PaginatorProps>({
+            itemCount: null,
+            pageSize: null,
+            page: null,
+            isDisabled: Boolean,
+            ariaLabel: null,
+            steps: null,
+            gap: null,
+            siblingCount: null,
+            boundaryCount: null,
+            linkComponent: null,
+            computeHref: null,
+            computeLayout: null,
+            computeEffect: null,
+            onPageChange: null,
+            computeStepLabel: null,
+            computePageLabel: null,
         }),
     },
 );

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, shallowRef } from "vue";
 
-import { PAGINATOR_DEFAULTS } from "@thewaver/ss-components-vue";
+import { PAGINATOR_DEFAULTS, PaginatorUtils } from "@thewaver/ss-components-vue";
 import { PaginatorKnobs } from "@thewaver/ss-playground/App/Knobs/Paginators.const";
 import {
     COUNT_FIELD_WIDTH,
@@ -16,14 +16,17 @@ import PageCheckField from "../../PageComponents/Field/PageCheckField.vue";
 import PageNumberField from "../../PageComponents/Field/PageNumberField.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
 import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
+import CountExample from "./Examples/Count.vue";
 import DialExample from "./Examples/Dial.vue";
 import EndsExample from "./Examples/Ends.vue";
+import JumpExample from "./Examples/Jump.vue";
 import LinkComponentExample from "./Examples/LinkComponent.vue";
 import LinksExample from "./Examples/Links.vue";
 import StepsExample from "./Examples/Steps.vue";
 import type { PaginatorExampleProps } from "./PaginatorPageVue.types";
 
-const pageCount = shallowRef(PaginatorKnobs.STARTING_PAGE_COUNT);
+const itemCount = shallowRef(PaginatorKnobs.STARTING_ITEM_COUNT);
+const pageSize = shallowRef(PaginatorKnobs.STARTING_PAGE_SIZE);
 const siblingCount = shallowRef(PAGINATOR_DEFAULTS.siblingCount);
 const boundaryCount = shallowRef(PAGINATOR_DEFAULTS.boundaryCount);
 const isDisabled = shallowRef(PaginatorKnobs.STARTING_IS_DISABLED);
@@ -33,9 +36,14 @@ const endPage = shallowRef(STARTING_PAGE);
 const linkPage = shallowRef(STARTING_PAGE);
 const customLinkPage = shallowRef(STARTING_PAGE);
 const dialPage = shallowRef(STARTING_PAGE);
+const countPage = shallowRef(STARTING_PAGE);
+const jumpPage = shallowRef(STARTING_PAGE);
+
+const pageCount = computed(() => PaginatorUtils.computePageCount(itemCount.value, pageSize.value));
 
 const commonProps = computed<Omit<PaginatorExampleProps, "page" | "onPageChange">>(() => ({
-    pageCount: pageCount.value,
+    itemCount: itemCount.value,
+    pageSize: pageSize.value,
     siblingCount: siblingCount.value,
     boundaryCount: boundaryCount.value,
     isDisabled: isDisabled.value,
@@ -71,6 +79,20 @@ const examples: ExampleDefs[] = [
         path: `${EXAMPLES_ROOT}/LinkComponent.vue`,
     },
     {
+        key: "count",
+        name: EXAMPLE_NAMES.count,
+        readout: () =>
+            `page ${countPage.value} of ${pageCount.value} — the steps piece with the page's own text in its slot, and no number row at all`,
+        path: `${EXAMPLES_ROOT}/Count.vue`,
+    },
+    {
+        key: "jump",
+        name: EXAMPLE_NAMES.jump,
+        readout: () =>
+            `page ${jumpPage.value} of ${pageCount.value} — the field is the page's own, writing the same page the row reads`,
+        path: `${EXAMPLES_ROOT}/Jump.vue`,
+    },
+    {
         key: "dial",
         name: EXAMPLE_NAMES.dial,
         readout: () =>
@@ -83,19 +105,36 @@ const examples: ExampleDefs[] = [
 <template>
     <PagePropsPanel scope="global">
         <PageProp
-            item-key="pageCount"
-            controls="Sets PaginatorProps.pageCount"
-            label="Page count"
-            hint="How many pages there are to page through."
+            item-key="itemCount"
+            controls="Sets PaginatorProps.itemCount"
+            label="Item count"
+            hint="How many items there are to page through. The page count is worked out from this and the page size."
         >
             <PageNumberField
-                :value="pageCount"
-                :min="PaginatorKnobs.MIN_PAGE_COUNT"
-                :max="PaginatorKnobs.MAX_PAGE_COUNT"
+                :value="itemCount"
+                :min="PaginatorKnobs.MIN_ITEM_COUNT"
+                :max="PaginatorKnobs.MAX_ITEM_COUNT"
                 :step="PaginatorKnobs.COUNT_STEP"
                 :width="COUNT_FIELD_WIDTH"
-                ariaLabel="Page count"
-                @input="(value: number) => (pageCount = value)"
+                ariaLabel="Item count"
+                @input="(value: number) => (itemCount = value)"
+            />
+        </PageProp>
+
+        <PageProp
+            item-key="pageSize"
+            controls="Sets PaginatorProps.pageSize"
+            label="Page size"
+            hint="How many items one page holds. The last page holds whatever is left over."
+        >
+            <PageNumberField
+                :value="pageSize"
+                :min="PaginatorKnobs.MIN_PAGE_SIZE"
+                :max="PaginatorKnobs.MAX_PAGE_SIZE"
+                :step="PaginatorKnobs.COUNT_STEP"
+                :width="COUNT_FIELD_WIDTH"
+                ariaLabel="Page size"
+                @input="(value: number) => (pageSize = value)"
             />
         </PageProp>
 
@@ -170,6 +209,14 @@ const examples: ExampleDefs[] = [
 
         <template #dial>
             <DialExample v-bind="commonProps" :page="dialPage" @page-change="(page: number) => (dialPage = page)" />
+        </template>
+
+        <template #count>
+            <CountExample v-bind="commonProps" :page="countPage" @page-change="(page: number) => (countPage = page)" />
+        </template>
+
+        <template #jump>
+            <JumpExample v-bind="commonProps" :page="jumpPage" @page-change="(page: number) => (jumpPage = page)" />
         </template>
     </PageExamples>
 </template>

@@ -87,9 +87,37 @@ describe("getStepTarget", () => {
 });
 
 describe("computePageCount", () => {
-    it("drops a fraction and never goes below zero", () => {
-        expect(PaginatorUtils.computePageCount(7.8)).toBe(7);
-        expect(PaginatorUtils.computePageCount(-3)).toBe(0);
+    it("rounds up, so a short last page still counts", () => {
+        expect(PaginatorUtils.computePageCount(383, 20)).toBe(20);
+        expect(PaginatorUtils.computePageCount(380, 20)).toBe(19);
+    });
+
+    it("has no pages for an empty list, and drops a fraction or a negative count", () => {
+        expect(PaginatorUtils.computePageCount(0, 10)).toBe(0);
+        expect(PaginatorUtils.computePageCount(-3, 10)).toBe(0);
+        expect(PaginatorUtils.computePageCount(7.8, 1)).toBe(7);
+    });
+
+    it("treats a page size below one as one", () => {
+        expect(PaginatorUtils.computePageCount(5, 0)).toBe(5);
+    });
+});
+
+describe("computeItemRange", () => {
+    it("names the first and last item on a page, counting from one", () => {
+        expect(PaginatorUtils.computeItemRange(2, 383, 20)).toEqual({ first: 21, last: 40 });
+    });
+
+    it("stops short on a short last page", () => {
+        expect(PaginatorUtils.computeItemRange(20, 383, 20)).toEqual({ first: 381, last: 383 });
+    });
+
+    it("clamps a page beyond the end to the last one", () => {
+        expect(PaginatorUtils.computeItemRange(99, 383, 20)).toEqual({ first: 381, last: 383 });
+    });
+
+    it("has nothing to show for an empty list", () => {
+        expect(PaginatorUtils.computeItemRange(1, 0, 20)).toBeUndefined();
     });
 });
 
@@ -114,5 +142,9 @@ describe("computeStepState", () => {
 
     it("disables every step when the whole paginator is off", () => {
         expect(PaginatorUtils.computeStepState("next", 1, 10, true)).toEqual({ targetPage: 2, isDisabled: true });
+    });
+
+    it("disables every step when there are no pages to go to", () => {
+        expect(PaginatorUtils.computeStepState("next", 3, 0, false).isDisabled).toBe(true);
     });
 });

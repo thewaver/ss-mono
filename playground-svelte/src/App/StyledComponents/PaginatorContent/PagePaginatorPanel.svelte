@@ -1,53 +1,38 @@
 <script lang="ts">
+    import { PaginatorUtils } from "@thewaver/ss-components-svelte";
+    import { RESULTS } from "@thewaver/ss-playground/App/StyledComponents/PaginatorContent/PaginatorContent.const";
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/PaginatorContent/PaginatorContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
     import type { PaginatorPanelProps } from "./PaginatorContentSvelte.types";
-    import {
-        FIRST_PAGE,
-        PAGE_SIZE,
-    } from "@thewaver/ss-playground/App/StyledComponents/PaginatorContent/PaginatorContent.const";
 
-    const RESULTS = [
-        "Aurora",
-        "Basalt",
-        "Cinder",
-        "Drift",
-        "Ember",
-        "Fathom",
-        "Glimmer",
-        "Hollow",
-        "Iris",
-        "Jetty",
-        "Kelp",
-        "Loam",
-    ];
-
-    const toResult = (index: number) => RESULTS[index % RESULTS.length];
+    const toResult = (itemNumber: number) => RESULTS[(itemNumber - 1) % RESULTS.length];
 
     let props: PaginatorPanelProps = $props();
 
     const layerClass = $derived.by(getLayerClass());
 
-    const firstIndex = $derived((Math.max(props.page, FIRST_PAGE) - FIRST_PAGE) * PAGE_SIZE);
+    const range = $derived(PaginatorUtils.computeItemRange(props.page, props.itemCount, props.pageSize));
 
-    const total = $derived(Math.max(props.pageCount, 0) * PAGE_SIZE);
+    const summary = $derived(
+        range === undefined ? "nothing to show" : `showing ${range.first} to ${range.last} of ${props.itemCount}`,
+    );
 
-    const indexes = $derived(
-        Array.from({ length: PAGE_SIZE }, (_unused, offset) => firstIndex + offset).filter((index) => index < total),
+    const itemNumbers = $derived(
+        range === undefined
+            ? []
+            : Array.from({ length: range.last - range.first + 1 }, (_unused, offset) => range.first + offset),
     );
 </script>
 
 <div class={[styles.paginatorPanel, layerClass]}>
     <div class={styles.paginatorPanelSummary} role="status">
-        {indexes.length === 0
-            ? "nothing to show"
-            : `showing ${firstIndex + FIRST_PAGE} to ${firstIndex + indexes.length} of ${total}`}
+        {summary}
     </div>
 
-    {#each indexes as index (index)}
+    {#each itemNumbers as itemNumber (itemNumber)}
         <div class={styles.paginatorPanelRow}>
-            <span>{toResult(index)}</span><span class={styles.paginatorPanelIndex}>{`#${index + FIRST_PAGE}`}</span>
+            <span>{toResult(itemNumber)}</span><span class={styles.paginatorPanelIndex}>{`#${itemNumber}`}</span>
         </div>
     {/each}
 </div>

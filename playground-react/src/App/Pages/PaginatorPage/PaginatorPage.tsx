@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { PAGINATOR_DEFAULTS } from "@thewaver/ss-components-react";
+import { PAGINATOR_DEFAULTS, PaginatorUtils } from "@thewaver/ss-components-react";
 import { PaginatorKnobs } from "@thewaver/ss-playground/App/Knobs/Paginators.const";
 import {
     COUNT_FIELD_WIDTH,
@@ -13,15 +13,18 @@ import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageCheckField, PageNumberField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
+import { CountExample } from "./Examples/Count";
 import { DialExample } from "./Examples/Dial";
 import { EndsExample } from "./Examples/Ends";
+import { JumpExample } from "./Examples/Jump";
 import { LinkComponentExample } from "./Examples/LinkComponent";
 import { LinksExample } from "./Examples/Links";
 import { StepsExample } from "./Examples/Steps";
 import type { PaginatorExampleProps } from "./PaginatorPageReact.types";
 
 export const PaginatorPage = () => {
-    const [pageCount, setPageCount] = useState(PaginatorKnobs.STARTING_PAGE_COUNT);
+    const [itemCount, setItemCount] = useState(PaginatorKnobs.STARTING_ITEM_COUNT);
+    const [pageSize, setPageSize] = useState(PaginatorKnobs.STARTING_PAGE_SIZE);
     const [siblingCount, setSiblingCount] = useState(PAGINATOR_DEFAULTS.siblingCount);
     const [boundaryCount, setBoundaryCount] = useState(PAGINATOR_DEFAULTS.boundaryCount);
     const [isDisabled, setIsDisabled] = useState(PaginatorKnobs.STARTING_IS_DISABLED);
@@ -31,9 +34,14 @@ export const PaginatorPage = () => {
     const [linkPage, setLinkPage] = useState(STARTING_PAGE);
     const [customLinkPage, setCustomLinkPage] = useState(STARTING_PAGE);
     const [dialPage, setDialPage] = useState(STARTING_PAGE);
+    const [countPage, setCountPage] = useState(STARTING_PAGE);
+    const [jumpPage, setJumpPage] = useState(STARTING_PAGE);
+
+    const pageCount = PaginatorUtils.computePageCount(itemCount, pageSize);
 
     const commonProps: Omit<PaginatorExampleProps, "page" | "onPageChange"> = {
-        pageCount,
+        itemCount,
+        pageSize,
         siblingCount,
         boundaryCount,
         isDisabled,
@@ -75,6 +83,22 @@ export const PaginatorPage = () => {
             path: `${EXAMPLES_ROOT}/LinkComponent.tsx`,
         },
         {
+            key: "count",
+            name: EXAMPLE_NAMES.count,
+            readout: () =>
+                `page ${countPage} of ${pageCount} — the steps piece with the page's own text in its slot, and no number row at all`,
+            component: () => <CountExample {...commonProps} page={countPage} onPageChange={setCountPage} />,
+            path: `${EXAMPLES_ROOT}/Count.tsx`,
+        },
+        {
+            key: "jump",
+            name: EXAMPLE_NAMES.jump,
+            readout: () =>
+                `page ${jumpPage} of ${pageCount} — the field is the page's own, writing the same page the row reads`,
+            component: () => <JumpExample {...commonProps} page={jumpPage} onPageChange={setJumpPage} />,
+            path: `${EXAMPLES_ROOT}/Jump.tsx`,
+        },
+        {
             key: "dial",
             name: EXAMPLE_NAMES.dial,
             readout: () =>
@@ -88,19 +112,38 @@ export const PaginatorPage = () => {
         <>
             <PagePropsPanel scope={"global"}>
                 <PageProp
-                    itemKey={"pageCount"}
-                    label={"Page count"}
-                    hint={"How many pages there are to page through."}
-                    controls={"Sets PaginatorProps.pageCount"}
+                    itemKey={"itemCount"}
+                    label={"Item count"}
+                    hint={
+                        "How many items there are to page through. The page count is worked out from this and the page size."
+                    }
+                    controls={"Sets PaginatorProps.itemCount"}
                 >
                     <PageNumberField
-                        value={pageCount}
-                        min={PaginatorKnobs.MIN_PAGE_COUNT}
-                        max={PaginatorKnobs.MAX_PAGE_COUNT}
+                        value={itemCount}
+                        min={PaginatorKnobs.MIN_ITEM_COUNT}
+                        max={PaginatorKnobs.MAX_ITEM_COUNT}
                         step={PaginatorKnobs.COUNT_STEP}
                         width={COUNT_FIELD_WIDTH}
-                        ariaLabel={"Page count"}
-                        onInput={setPageCount}
+                        ariaLabel={"Item count"}
+                        onInput={setItemCount}
+                    />
+                </PageProp>
+
+                <PageProp
+                    itemKey={"pageSize"}
+                    label={"Page size"}
+                    hint={"How many items one page holds. The last page holds whatever is left over."}
+                    controls={"Sets PaginatorProps.pageSize"}
+                >
+                    <PageNumberField
+                        value={pageSize}
+                        min={PaginatorKnobs.MIN_PAGE_SIZE}
+                        max={PaginatorKnobs.MAX_PAGE_SIZE}
+                        step={PaginatorKnobs.COUNT_STEP}
+                        width={COUNT_FIELD_WIDTH}
+                        ariaLabel={"Page size"}
+                        onInput={setPageSize}
                     />
                 </PageProp>
 

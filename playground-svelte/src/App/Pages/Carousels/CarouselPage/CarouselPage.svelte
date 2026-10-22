@@ -8,9 +8,11 @@
     import RotatingExample from "./Examples/Rotating.svelte";
     import ScrolledExample from "./Examples/Scrolled.svelte";
     import SteppedExample from "./Examples/Stepped.svelte";
+    import WindowedExample from "./Examples/Windowed.svelte";
     import {
     EXAMPLE_NAMES,
     EXAMPLES_ROOT,
+    WINDOWED_SLIDE_COUNT,
 } from "@thewaver/ss-playground/App/Pages/Carousels/CarouselPage/CarouselPage.const";
 
     const controls = createCarouselsControls();
@@ -20,6 +22,15 @@
     let rotatingPlaying = $state(true);
     let barelessIndex = $state(0);
     let scrolledIndex = $state(0);
+    let windowedIndex = $state(0);
+    let builtCount = $state(0);
+
+    let builtTally = 0;
+
+    const changeBuiltCount = (change: number) => {
+        builtTally += change;
+        builtCount = builtTally;
+    };
 
     const isLooping = $derived(controls.isLooping);
 
@@ -56,6 +67,14 @@
             component: noControlsExample,
             path: `${EXAMPLES_ROOT}/NoControls.svelte`,
         },
+        {
+            key: "windowed",
+            name: EXAMPLE_NAMES.windowed,
+            readout: () =>
+                `slide ${windowedIndex + 1} of ${WINDOWED_SLIDE_COUNT} | ${builtCount} built — only the slides the placement can draw exist, so the rest cost nothing, and a slide that comes back is built afresh`,
+            component: windowedExample,
+            path: `${EXAMPLES_ROOT}/Windowed.svelte`,
+        },
     ];
 </script>
 
@@ -80,6 +99,18 @@
 {#snippet noControlsExample()}
     <PageCarouselBox>
         <NoControlsExample {...controls.sharedProps} bind:index={barelessIndex} />
+    </PageCarouselBox>
+{/snippet}
+
+{#snippet windowedExample()}
+    {@const { slides: _slides, ...sharedProps } = controls.sharedProps}
+    <PageCarouselBox>
+        <WindowedExample
+            {...sharedProps}
+            {isLooping}
+            bind:index={windowedIndex}
+            onBuiltChange={changeBuiltCount}
+        />
     </PageCarouselBox>
 {/snippet}
 

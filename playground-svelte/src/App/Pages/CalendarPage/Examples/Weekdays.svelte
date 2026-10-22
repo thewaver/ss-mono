@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Calendar, DateValueUtils } from "@thewaver/ss-components-svelte";
+    import { Calendar } from "@thewaver/ss-components-svelte";
     import { LOCALE, TODAY, WEEKEND_DAYS } from "@thewaver/ss-playground/App/Pages/CalendarPage/CalendarPage.const";
 
     import PageCalendarCaption from "../../../PageComponents/CalendarCaption/CalendarCaption.svelte";
@@ -23,7 +23,7 @@
         locale={LOCALE}
         weekStartsOn={props.weekStartsOn}
         ariaLabel={"Choose a working day"}
-        computeIsDayDisabled={(day) => WEEKEND_DAYS.includes(DateValueUtils.toDate(day).getDay())}
+        disabledDays={[{ daysOfWeek: WEEKEND_DAYS }]}
     >
         {#snippet renderDay(_unused, renderProps)}
             <PageCalendarDay {renderProps} />

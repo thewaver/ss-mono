@@ -3,9 +3,10 @@ import { type Page, expect, test } from "@playwright/test";
 import { accessibleText, demo, prop, readout, tagName } from "./helpers";
 
 /**
- * Every list on the page reads the same three knobs — page count, sibling count and boundary count — so
- * the arithmetic under test is the panel's rather than each variant's. What separates the variants is
- * which step controls they ask for and whether their pages are links.
+ * Every list on the page reads the same knobs — item count, page size, sibling count and boundary count —
+ * so the arithmetic under test is the panel's rather than each variant's. The page starts at 60 items, 3 to
+ * a page, which is 20 pages. What separates the variants is which step controls they ask for, whether their
+ * pages are links, and — for the last two — which pieces the page arranged itself.
  *
  * The painter draws a bare number and marks it `aria-hidden`, exactly as the calendar's day cells do, so
  * the visible text and the accessible name are deliberately different things here: `accessibleText` on a
@@ -140,6 +141,80 @@ test("the disabled knob reaches every control in every list", async ({ page }) =
     expect(await readout(page, "steps"), "and nothing moves the page").toContain("page 1 of 20");
 });
 
+test("the page count is worked out from the items and the page size, and the last page holds the remainder", async ({
+    page,
+}) => {
+    await page.locator(field("pageSize")).fill("7");
+    await page.locator(field("pageSize")).blur();
+
+    await expect
+        .poll(() => readout(page, "steps"), { message: "60 items at 7 a page is 9 pages, the ninth holding 4" })
+        .toContain("page 1 of 9");
+
+    await page.locator(pageItem(STEPS, 9)).click();
+
+    await expect(page.locator(`${STEPS} [role="status"]`)).toHaveText("showing 57 to 60 of 60");
+});
+
+test("an empty list has no pages, and every step goes quiet", async ({ page }) => {
+    await page.locator(field("itemCount")).fill("0");
+    await page.locator(field("itemCount")).blur();
+
+    await expect(page.locator(`${STEPS} nav [aria-label^="Page "]`)).toHaveCount(0);
+    await expect(page.locator(`${STEPS} nav [aria-disabled="true"]`)).toHaveCount(
+        await page.locator(item(STEPS)).count(),
+    );
+    await expect(page.locator(`${STEPS} [role="status"]`)).toHaveText("nothing to show");
+});
+
+/**
+ * The last two examples are arranged by the page rather than handed over whole: the steps piece with the
+ * page's own "3 of 20" in its slot and no number row, and the usual row with a field beside it that writes
+ * the same page signal. What they prove is that the pieces read one root, whatever sits between them.
+ */
+const COUNT = demo("count");
+const JUMP = demo("jump");
+
+test("the steps piece puts whatever the page gives it between the leading and the trailing steps", async ({ page }) => {
+    await expect(page.locator(`${COUNT} nav [aria-label^="Page "]`), "no number row was asked for").toHaveCount(0);
+    expect(
+        await page.locator(`${COUNT} nav`).evaluate((nav) => {
+            const text = [...nav.querySelectorAll("div")].find((element) => element.textContent === "1 of 20");
+            const previous = nav.querySelector('[aria-label="Previous page"]');
+            const next = nav.querySelector('[aria-label="Next page"]');
+
+            return (
+                text !== undefined &&
+                previous !== null &&
+                next !== null &&
+                (previous.compareDocumentPosition(text) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0 &&
+                (text.compareDocumentPosition(next) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0
+            );
+        }),
+        "the page's own text sits between previous and next",
+    ).toBe(true);
+
+    await page.locator(step(COUNT, "Next")).click();
+
+    expect(await readout(page, "count")).toContain("page 2 of 20");
+    await expect(page.locator(`${COUNT} nav`), "and the text follows the page it reads").toContainText("2 of 20");
+
+    await page.locator(step(COUNT, "Last")).click();
+
+    await expect(page.locator(step(COUNT, "Next")), "the steps still stop at the end").toHaveAttribute(
+        "aria-disabled",
+        "true",
+    );
+});
+
+test("a field the page puts beside the row moves the same page the row shows", async ({ page }) => {
+    await page.locator(`${JUMP} input`).fill("7");
+    await page.locator(`${JUMP} input`).blur();
+
+    await expect(page.locator(pageItem(JUMP, 7))).toHaveAttribute("aria-current", "page");
+    expect(await readout(page, "jump")).toContain("page 7 of 20");
+});
+
 /**
  * The dial reads the same knobs as the straight rows and asks for the same four step controls `ENDS` does,
  * so what separates the two is the layout function and nothing else — which is what makes them comparable
@@ -221,4 +296,22 @@ test("the page moves from a wedge the same as from a cell, and the wedge that is
         "page",
     );
     await expect(page.locator(pageItem(DIAL, 1))).not.toHaveAttribute("aria-current");
+});
+
+test("the ring keeps document order as the number row changes length under it", async ({ page }) => {
+    for (const number of [4, 5, 6]) await page.locator(pageItem(DIAL, number)).click();
+
+    await expect(page.locator(gap(DIAL)), "a gap either side now, where there was one").toHaveCount(2);
+
+    const turnedBy = toTurnedBy(await placedAngles(page, DIAL));
+
+    expect(turnedBy.length, "a wedge for every step, page and gap after the change").toBe(
+        (await page.locator(item(DIAL)).count()) + (await page.locator(gap(DIAL)).count()),
+    );
+
+    for (let index = 1; index < turnedBy.length; index++) {
+        expect(turnedBy[index], `wedge ${index} still sits further round than the one before it`).toBeGreaterThan(
+            turnedBy[index - 1],
+        );
+    }
 });

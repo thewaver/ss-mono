@@ -63,6 +63,7 @@ export const RangeCalendar = defineComponent(
             "maxValue": null,
             "isDisabled": Boolean,
             "gap": null,
+            "disabledDays": null,
             "computeIsDayDisabled": null,
             "month": null,
             "onUpdate:month": null,

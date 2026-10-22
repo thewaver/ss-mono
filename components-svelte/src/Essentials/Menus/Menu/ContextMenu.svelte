@@ -1,5 +1,5 @@
 <script lang="ts" generics="T">
-    import { untrack } from "svelte";
+    import { tick, untrack } from "svelte";
 
     import { MENU_DEFAULTS, MenuUtils, MenuStyles as styles } from "@thewaver/ss-components";
     import { Rect } from "@thewaver/ss-utils";
@@ -31,6 +31,13 @@
 
     const close = () => {
         visibility = false;
+    };
+
+    const dismiss = (isLeavingForward: boolean) => {
+        const nextTabStop = isLeavingForward ? MenuUtils.computeNextTabStop(region) : undefined;
+
+        close();
+        void tick().then(() => nextTabStop?.focus());
     };
 
     const [getChecked, setChecked] = createHeldValue([
@@ -123,5 +130,5 @@
     renderHighlightFloater={props.renderHighlightFloater}
     onPick={pick}
     onClose={close}
-    onDismiss={close}
+    onDismiss={dismiss}
 />

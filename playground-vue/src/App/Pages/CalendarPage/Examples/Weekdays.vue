@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { useModel } from "vue";
 
-import type { DateValue } from "@thewaver/ss-components-vue";
-import { Calendar, DateValueUtils } from "@thewaver/ss-components-vue";
+import { Calendar } from "@thewaver/ss-components-vue";
 import { LOCALE, TODAY, WEEKEND_DAYS } from "@thewaver/ss-playground/App/Pages/CalendarPage/CalendarPage.const";
 
 import PageCalendarCaption from "../../../PageComponents/CalendarCaption/CalendarCaption.vue";
@@ -18,7 +17,7 @@ const props = defineProps<Props>();
 const value = useModel(props, "value");
 const month = useModel(props, "month");
 
-const computeIsDayDisabled = (day: DateValue) => WEEKEND_DAYS.includes(DateValueUtils.toDate(day).getDay());
+const disabledDays = [{ daysOfWeek: WEEKEND_DAYS }];
 </script>
 
 <template>
@@ -32,7 +31,7 @@ const computeIsDayDisabled = (day: DateValue) => WEEKEND_DAYS.includes(DateValue
             :locale="LOCALE"
             :week-starts-on="weekStartsOn"
             ariaLabel="Choose a working day"
-            :compute-is-day-disabled="computeIsDayDisabled"
+            :disabled-days="disabledDays"
         >
             <template #renderDay="{ flags }">
                 <PageCalendarDay :render-props="flags" />

@@ -1,7 +1,10 @@
-import type { AnchorHTMLAttributes, ComponentType, ReactNode, Ref } from "react";
+import type { AnchorHTMLAttributes, ComponentType, PropsWithChildren, ReactNode, Ref } from "react";
 
 import type {
+    BasePaginatorPagesProps,
     BasePaginatorProps,
+    BasePaginatorRootProps,
+    BasePaginatorStepsProps,
     InteractionFlags,
     PaginatorGapEntry,
     PaginatorPageEntry,
@@ -31,13 +34,30 @@ export type PaginatorItemProps<TExtra extends object> = InteractionControlProps<
     onActivate: () => void;
 };
 
-export type PaginatorProps = BasePaginatorProps & {
-    /** The component to draw navigating entries with. */
+type PaginatorRootOwnProps = {
+    /** The component to draw navigating entries with, in every piece inside. */
     linkComponent?: ComponentType<PaginatorLinkProps>;
+};
+
+type PaginatorStepsOwnProps = {
+    /** Draws one of the move controls. */
+    renderStep: (step: PaginatorStep, renderProps: InteractionFlags<PaginatorStepRenderProps>) => ReactNode;
+};
+
+type PaginatorPagesOwnProps = {
     /** Draws one page entry. */
     renderPage: (entry: PaginatorPageEntry, renderProps: InteractionFlags<PaginatorPageRenderProps>) => ReactNode;
     /** Draws the break standing in for the pages that were left out. */
     renderGap: (entry: PaginatorGapEntry, placement: PlacementRect | undefined) => ReactNode;
-    /** Draws one of the move controls. */
-    renderStep: (step: PaginatorStep, renderProps: InteractionFlags<PaginatorStepRenderProps>) => ReactNode;
 };
+
+export type PaginatorRootProps = PropsWithChildren<BasePaginatorRootProps & PaginatorRootOwnProps>;
+
+export type PaginatorStepsProps = PropsWithChildren<BasePaginatorStepsProps & PaginatorStepsOwnProps>;
+
+export type PaginatorPagesProps = BasePaginatorPagesProps & PaginatorPagesOwnProps;
+
+export type PaginatorProps = BasePaginatorProps &
+    PaginatorRootOwnProps &
+    PaginatorStepsOwnProps &
+    PaginatorPagesOwnProps;
