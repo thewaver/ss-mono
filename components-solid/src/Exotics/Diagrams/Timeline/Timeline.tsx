@@ -266,6 +266,12 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
 
     const getIsZoomable = createMemo(() => (access(props.isZoomable) ?? true) && !getIsDisabled());
 
+    PanZoomUtils.warnIfNoControls(
+        "Timeline",
+        getIsPannable() || getIsZoomable(),
+        props.view !== undefined || props.onMount !== undefined,
+    );
+
     const getPointerRatio = (clientX: number) =>
         PanZoomUtils.computePointerRatio(
             { x: clientX, y: TimelineConst.NOTHING },

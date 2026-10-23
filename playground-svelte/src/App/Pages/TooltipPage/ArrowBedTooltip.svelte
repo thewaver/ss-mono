@@ -23,7 +23,7 @@
     let props: Props = $props();
 </script>
 
-<div class={tooltipStyles.tooltipArrowShadow}>
+<div class={tooltipStyles.tooltipShadow}>
     <Shape
         computePoints={(size) =>
             ShapeUtils.attachArrow(

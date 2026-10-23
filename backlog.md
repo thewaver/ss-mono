@@ -10,8 +10,8 @@ settled a decision that drives future work, that decision moves to `conventions.
 whole library follows and to `decisions.md` when it is about one component; the record of having done the
 work does not go anywhere.
 
-**Accepted limits are not outstanding work, and live in their own section at the end.** Asked for by the user
-on **2026-08-11**: a fault that has been looked at and consciously left alone should not be re-read and
+**Accepted limits are not outstanding work, and live in their own section at the end.** Asked for by the user:
+a fault that has been looked at and consciously left alone should not be re-read and
 re-weighed every time the question is "what is left". They are unnumbered, they are not in the index, and a
 report on the state of the library does not list them unless something has changed about one. Moving an item
 there is a **decision the user takes**, not a way of retiring an item that has merely gone stale — an item
@@ -35,51 +35,20 @@ reading.
 1. Neither animation component can reveal its own children — _postponed until the platform catches up_
 2. `Select` — one thing deliberately not built — _open_
 3. Other core controls the library does not have — _open, ordered by the user_
-4. What the verification suite still cannot see — _open_
-5. Planned: a consumer-facing layer of controls above the library — _deferred to a session of its own_
-6. `ColorInput` — two things deliberately not built — _open_
-7. `SlideButton` — two things deliberately not built — _open_
-8. `Spotlight` — one thing deliberately not built — _open_
-9. `Scroller` — two things deliberately not built — _open_
-10. `Paginator` — one thing deliberately not built — _open_
-11. `Carousel` — two things deliberately not built — _open_
-12. The four components ported from React — what did not settle — _open_
-13. An anchored layer trails its anchor during a scroll — _postponed until the platform catches up_
-14. `Table` — six things deliberately not built — _open_
-15. `Timeline` — the pointer routes the library cannot promise — _open_
-16. `GlassSurface` — what is built and what is not — _open, one item postponed until the platform catches up_
-17. Arbitrary placement across controls, and the picking that has to come with it — _open_
-18. `CardStack` — the pointer route the library cannot promise — _open_
-19. The submit story — what a native submit carries, and what `Form` hands `onSubmit` — _pending decision_
-20. `Die`'s step buttons and arrow keys fall into a loop of two or three faces — _open, no fix chosen_
-21. The Playground's painters in Windows high-contrast mode — _open, decided, not yet built_
-
-### Build order
-
-Covers the unbuilt controls in item 3. The ordering principle is **how much of the existing base
-a thing reuses**: anything that is a preset or a composition of what already works comes before anything
-that needs a new primitive, and anything blocked on an architectural decision comes last, so the
-decision is made once with several consumers in view rather than inferred from the first one.
-
-**Blocked on a primitive that has to be designed first.** Do not start these by inventing the primitive
-privately inside them.
-
-1. **Nothing is blocked on a primitive any more.** The date and time family was the last entry here: the mask
-   covers fixed patterns and growing groups, `MaskedField` holds the shared field, `CurrencyInput` was the third
-   consumer that proved the seam, and the range variants, the date-and-time value, the typed sign and the
-   locale's own grouping have all since been built. See `decisions.md`; that item is closed.
-
-**Out of the cost ordering, deliberately:**
-
-- **The form story is settled, wired and finished.** `Form`, `FormField` and `FormSection` ship and every
-  control reads the description context; see `decisions.md`. This entry used to say the opposite — that it
-  was the one item whose cost _grew_ with delay, because every control built without it grew its own half of
-  the error plumbing — and nothing of it is outstanding now.
-- **Dismissal, open state and openers are all settled.** All five layers dismiss through `Dismisser`, all
-  five take a `visibility` prop, and `Menu` takes an anchor while `ContextMenu` opens at a point; see
-  `decisions.md`. Nothing in this family is outstanding.
-- **`Table` / data grid stays out of scope**, and specifically must not arrive as a by-product of
-  `Tree` or of virtualization.
+4. Planned: a consumer-facing layer of controls above the library — _deferred to a session of its own_
+5. `ColorInput` — two things deliberately not built — _open_
+6. `SlideButton` — two things deliberately not built — _open_
+7. `Spotlight` — one thing deliberately not built — _open_
+8. `Scroller` — two things deliberately not built — _open_
+9. `Paginator` — one thing deliberately not built — _open_
+10. `Carousel` — two things deliberately not built — _open_
+11. An anchored layer trails its anchor during a scroll — _postponed until the platform catches up_
+12. `Table` — six things deliberately not built — _open_
+13. `GlassSurface`'s ripple layer shows a defect at its edge — _postponed until the platform catches up_
+14. Arbitrary placement across controls, and the picking that has to come with it — _open_
+15. The submit story — what a native submit carries, and what `Form` hands `onSubmit` — _pending decision_
+16. `Die`'s step buttons and arrow keys fall into a loop of two or three faces — _open, no fix chosen_
+17. The Playground's painters in Windows high-contrast mode — _open, decided, not yet built_
 
 ---
 
@@ -158,15 +127,9 @@ the gaps, each with the reason it is still a gap.
 
 ## 3. Other core controls the library does not have
 
-`Essentials/Input` covers `TextInput`, `TextArea`, `NumberInput`, `CurrencyInput`, `Checkbox`, `Toggle`, `Radio`,
-`RadioGroup`, `Select`, `MultiSelect`, `FileInput`, `ColorInput`, `Label`, `Calendar`, `DateInput`,
-`DatePicker`, `TagInput` and `TimeInput`; `Essentials` adds `Accordion`, `Breadcrumbs`, `Button`,
-`Carousel`, `FlipCard`,
-`SlideButton`, `Scroller`, `Paginator`, `Sortable`, `SplitPane`, `Stepper`, `Tabs`, `Toolbar`, `Tooltip`, `Popover`, `Menu`, `Modal`, `Drawer`, `Progress`,
-`Range`, `Toasts` and `Tree`.
-Beyond the date and time family, this is what is missing. **The order below is the user's, taken on 2026-08-15 after reading a
-worked example of each**, and it replaces the old ordering by architectural cost — that principle still
-explains what a thing would need, but it no longer decides what comes first.
+What is missing from `Essentials`. **The order below is the user's, taken after reading a worked example of
+each**; the old ordering by architectural cost still explains what a thing would need, but it no longer decides
+what comes first.
 
 **This list cannot be inferred from the Playground**, and reading it as the evidence for what is missing
 is the trap: every control on every page and in every props panel is now a library control, so the
@@ -178,46 +141,31 @@ Anything that wants a drawing surface is the consumer's, and which one they reac
 sprite sheet, a particle system and a renderer are all out of scope by construction rather than by priority,
 and a proposal that begins "the library could draw…" has already answered itself.
 
-**What was dropped on 2026-08-15, so it is not re-proposed:** a segmented control, a rating input,
-and the pure-paint family of `Skeleton`, `Avatar`, `Badge`, `Card` and `Icon`. The paint family was never a
-component question — the Playground already builds three of them as `Surface` examples. **The toolbar was
-dropped with them and has since been reopened by the user and built**: what changed is that the part worth
-having turned out to be the overflow rather than the row, and `decisions.md` records the cut, the roving
-walk and the two paintings of one action. The segmented control and the rating
-are now the **Segmented** and **Rating** variants on the Radio page, which is the whole of what each was;
-see `decisions.md`, which also records why the rating's hover preview needed no library change. None of
-these is an accepted limit, because none is a fault; they are simply not wanted.
+**Dropped by the user, so not re-proposed:** a segmented control and a rating input, each now a variant on the
+Radio page, which is the whole of what it was; and the pure-paint family of `Skeleton`, `Avatar`, `Badge`, `Card`
+and `Icon`, which was never a component question — the Playground already builds three of them as `Surface`
+examples. None of these is an accepted limit, because none is a fault; they are simply not wanted.
 
 ### Next up, in the user's order
 
 **Nothing is queued here.**
 
-**`Breadcrumbs`, `TagInput`, `SplitPane` and `Stepper` were all built on 2026-08-15** and are no longer here; their decisions are in
-`decisions.md`. What each left behind as a gap is recorded there rather than reopened as an item: a
+What the built controls left behind as gaps is recorded in `decisions.md` rather than reopened as items: a
 breadcrumb trail cannot collapse when it is too long, a tag input has no cap, no in-place editing, no
 paste-a-delimited-list and no reordering, a split pane cannot collapse a pane or reset on a double-click, and a stepper draws no connector of its own
 and does not enforce that a linear flow stays linear.
 
 ### Bottom of the list
 
-Placed last by the user on **2026-08-15**, after the difference between it and its nearest existing control
-had been argued. It is not dropped; it is not next.
+Placed last by the user, after the difference between each and its nearest existing control had been argued.
+Neither is dropped; neither is next.
 
-**`Table` / data grid was the other one, and it is built** — asked for directly, out of turn, so the ordering
-here was overtaken rather than wrong. Its decisions are in `decisions.md`. What it left behind as a gap is
-recorded there rather than reopened as an item: no column pinning, no grouping or aggregate rows, no
-expandable rows, no inline cell editing, no filtering, and no key that steps into a cell holding more than one
-control.
-
-- **A command palette.** To be reopened: the list now stands alone as `Listbox`, `TextInput` opens a list of
-  suggestions with the combobox wiring, and `Modal` seals the page behind it, so what was two missing pieces is
-  now closer to one, a document-level hotkey registry, plus a check that the windowed list handles groups. Before
-  those landed it was mostly assembled already — `Select`'s autocomplete inside a `Modal`, since typing to
-  narrow a list is what the autocomplete does. What separates it from `Menu` is that it is opened by a
-  shortcut rather than by a button, and holds every action in the application rather than the few that relate
-  to one element. Two pieces are missing: results gathered from several sources and shown in labeled groups,
-  which is the grouped-and-windowed case item 2 leaves open, and a document-level hotkey, which wants the
-  register-and-stack shape `Dismisser` has rather than a listener per consumer.
+- **A command palette.** Mostly assembled already: `Listbox` stands alone, `TextInput` opens a list of
+  suggestions with the combobox wiring, `Modal` seals the page behind it, and a grouped list can be windowed, so
+  results from several sources can be shown in labeled groups however many there are. What separates it from
+  `Menu` is that it is opened by a shortcut rather than by a button, and holds every action in the application
+  rather than the few that relate to one element. The one piece missing is a document-level hotkey, which wants
+  the register-and-stack shape `Dismisser` has rather than a listener per consumer.
 
 - **A scroll area with custom scrollbars.** Radix, Ark, Mantine and PrimeReact each ship one: the native bar hidden,
   the content and viewport measured, a thumb drawn to mirror the scroll, dragged and clicked. Nothing here draws a
@@ -258,75 +206,7 @@ outstanding.
 
 ---
 
-## 4. What the verification suite still cannot see
-
-`e2e/` drives real clicks and keystrokes in a real browser through Playwright, and `npm run verify:dom`
-runs it. What is worth stating is the shape of its blind spots, because a green run reads as broader
-coverage than it is.
-
-**Nothing checks appearance, and nothing will** — screenshot baselines are an accepted limit rather than a
-pending decision; see the section at the end of this file. So the parity rule that forced
-`aria-disabled`-everywhere — that disabled and disabled-but-reachable must look _identical_ — is checked by eye,
-permanently, and the same goes for `CellAnimation` and `ScanlineAnimation`, which have a
-Playground page and no spec because what they produce is motion over time. A DOM-reading spec over those two
-would assert structure and call it coverage; nothing else here will reach them.
-
-**A callback nothing on the page consumes is invisible to a suite that drives the page**, and `onMount`
-handoffs are in the same position. `ImageSwitcher`'s `onLoad` was the standing example and is now covered —
-the page grew a readout, `ExampleDefs` grew the optional `readout` field `VariantDefs` already had, and the
-spec asserts both that a successful load is reported and that the two swap paths without one (a failed
-source, a cleared source) report nothing. The shape is what to keep: reaching a callback means giving the
-page a reason to consume it first.
-
-**`AudioSwitcher` has left both groups.** It has a page, and `audioSwitcher.spec.ts` drives the fades that
-were the exposure. The component renders nothing and keeps its two `Audio` elements out of the document, so
-the spec records `play` and `pause` on the prototype before the app runs — the same trick
-`noAnimationFrames.spec.ts` uses on `requestAnimationFrame` — and reads the rest off the caption the page
-paints from `playback`, which the component now writes. What that bought immediately: the source
-arriving at mount is no longer played uninvited, and a control painted from the signal is right even where
-the browser has refused to start.
-
-**`RichText` has left both groups.** It has a page and now a spec, and the prop that had nowhere to be
-driven from is driven. `RichTextPage` mounts three examples — a legend naming the five tags the component
-paints, an inline diff over two tags the page named itself, and a `TextArea` holding a source string with
-the parsed result underneath it — with `removeOtherTags` as the page's one global prop, so both answers to
-an unrecognized tag can be seen. `richText.spec.ts` reads computed styles rather than class names, since a
-vanilla-extract class name is hashed and reading one back would only prove a string had been copied around.
-See `decisions.md` for what the diff example settled.
-
-**Covered only through a consumer**, which is worth distinguishing from uncovered because it decides
-whether a spec is worth writing: `Popover` through `Select` and `Menu`, `Radio` through
-`radioGroup.spec.ts`, `Checkbox` through `binarySwitch.spec.ts`, `MultiSelect` through
-`select.spec.ts`, `CornerHighlight` and `Viewport` through whatever page happens to mount them,
-`InteractionWrapper` through every control.
-
-**What a page that stops painting costs is now measured rather than guessed, and the answer split the two
-rAF consumers apart.** `e2e/noAnimationFrames.spec.ts` replaces `requestAnimationFrame` with a function that
-never calls back, before any application code runs — a frozen clock cannot express this, because Playwright
-fakes frames as a 16ms timer and advancing time to reach a fallback fires the frame first. Two findings:
-
-- **`ElementFader`'s 100ms fallback is real and is now driven.** With no frames at all a `Modal` still
-  reaches its visible target, which is the whole reason the fallback was written.
-- **Starving the frames shows the positioner needs no frame to open a layer or to follow a scroll.** With no
-  frames, a layer opens on `ViewportWrapperPage`'s scrolled anchor, because the anchor is read as the layer is
-  shown, and a scroll still lands it exactly, so the capture-phase listener carries a scroll on its own. It does **not** prove the poll has no other job — the test only ever
-  opens a layer and then scrolls, and the poll is the only thing watching for an anchor that moves with no
-  event to announce it. The fear this item used to record, of a popup drifting further and further from its
-  field, is what was actually ruled out.
-
-**Time is no longer a blind spot, and the mechanism is worth knowing before the next timing bug.**
-Playwright's clock API fakes `Date`, `setTimeout`, `setInterval`, `requestAnimationFrame`,
-`requestIdleCallback`, `performance` and `Event.timeStamp`, with `install`, `pauseAt`, `fastForward` and
-`runFor`. `install` freezes time until it is advanced, so a duration becomes a stepped quantity rather
-than a wait — which is what let the toast pause arithmetic be asserted at all, since the question is not
-_whether_ four seconds elapse but _which_ four. `toasts.spec.ts` uses it in one describe block, and that
-is the pattern for anything else of this shape. What the clock does **not** reach is two things: the three
-motion components, whose time is CSS's rather than the page's, and the absence of frames, which needs the
-stub above rather than a fake clock — the two look interchangeable and are not.
-
----
-
-## 5. Planned: a consumer-facing layer of controls above the library — _deferred to a session of its own_
+## 4. Planned: a consumer-facing layer of controls above the library — _deferred to a session of its own_
 
 **Deferred to a near-future session of its own**, by the user, because bundling it with the components then in
 progress would have been awkward. It is no longer deferred indefinitely. The packaging question inside it is a
@@ -342,15 +222,6 @@ entire cost, and in a repo with one author it is small.
 consumer, a painted set is the difference between an afternoon of painting and a page that works on install. Most
 of the cost is packaging rather than drawing, since about forty painters already exist in the Playground and are in
 use there.
-
-Recorded **2026-08-07** as advance notice in three parts. Two of them are built and are no longer
-outstanding: there is no `style.css` anywhere in `src/`, and `App/Theme.css.ts` is the theme — a
-vanilla-extract contract over color, spacing, font size, radius, shadow, the hover / active / disabled
-filters and one animation duration, with a small global block for the reset, the focus ring, the
-scrollbars, links and `body`. The `--clr-*` custom properties this item used to call the de facto theme
-are gone, and the theme's token shape deliberately carries no reasoning — see `decisions.md`.
-
-What is left is the third part.
 
 **A more final-consumer-like layer of controls — `MyButton` and friends — that trade API surface for
 decided behavior.** The stated example: no `renderContent` tooltip renderer, just tooltip content as
@@ -385,14 +256,14 @@ same example.
 
 ---
 
-## 6. `ColorInput` — two things deliberately not built
+## 5. `ColorInput` — two things deliberately not built
 
 `ColorInput` is the custom picker now; the decisions are in `decisions.md` under the `ColorArea` heading.
 These are the gaps.
 
 - **No native color input anywhere, so no form value and no OS picker.** Deliberate, and the cost of
   owning the surface. A consumer who wants the OS dialog has nothing to fall back on.
-- **No eyedropper — _postponed until the platform catches up_, decided by the user on 2026-08-15.** Swatch
+- **No eyedropper — _postponed until the platform catches up_, decided by the user.** Swatch
   presets and recent colors were dropped the same day and are not coming back. The eyedropper is not
   declined, it is waiting: the work is trivial and the support is not there. **Do not propose building it,
   and do not re-argue the design** — that part is settled and recorded below.
@@ -400,7 +271,7 @@ These are the gaps.
     **The trigger is browser support, and it is checkable rather than a matter of judgement.** Re-open this
     when Firefox or Safari ships `EyeDropper`, or when it reaches Baseline. Until then the only thing worth
     doing is reading [caniuse](https://caniuse.com/mdn-api_eyedropper) — do not re-derive the design, the cost
-    or the options, all of which are below and were settled on **2026-08-15**.
+    or the options, all of which are below and are settled.
 
     **What it would take, for when that day comes:** almost nothing in `components/src`. `value` is already a
     hex string and `open()` resolves to `{ sRGBHex }`, so a consumer constructs an `EyeDropper`, awaits it, and
@@ -411,9 +282,6 @@ These are the gaps.
     `"EyeDropper" in window` ships a dead button to most of their users. A `renderEyedropper` slot was weighed
     and rejected: a prop that does nothing in three browsers out of four is the thing this item exists to
     avoid.
-
-**Nothing about dismissal or open state is outstanding.** `ColorInput` dismisses through `Dismisser` like
-every other layer and takes a `visibility` prop like every other popup; both are in `decisions.md`.
 
 **_Elsewhere._**
 
@@ -440,7 +308,7 @@ every other layer and takes a `visibility` prop like every other popup; both are
 
 ---
 
-## 7. `SlideButton` — two things deliberately not built
+## 6. `SlideButton` — two things deliberately not built
 
 The decisions behind what exists are in `decisions.md` under _"Controls: `SlideButton`, and why the gesture
 is the only thing it owns"_, including which WCAG criteria were read and what they decided. These are the
@@ -478,7 +346,7 @@ gaps, each with the reason it is still one.
 
 ---
 
-## 8. `Spotlight` — one thing deliberately not built
+## 7. `Spotlight` — one thing deliberately not built
 
 The decisions behind what exists are in `decisions.md` under _"Controls: `Spotlight`, and three presets
 because a mode cannot move at runtime"_. These are the gaps, each with the reason it is still one.
@@ -491,7 +359,7 @@ because a mode cannot move at runtime"_. These are the gaps, each with the reaso
 
 ---
 
-## 9. `Scroller` — two things deliberately not built
+## 8. `Scroller` — two things deliberately not built
 
 The decisions behind what exists are in `decisions.md` under _"Controls: `Scroller`, and why it renders no
 button of its own"_. These are the gaps, each with the reason it is still one.
@@ -508,7 +376,7 @@ button of its own"_. These are the gaps, each with the reason it is still one.
 
 ---
 
-## 10. `Paginator` — one thing deliberately not built
+## 9. `Paginator` — one thing deliberately not built
 
 The decisions behind what exists are in `decisions.md` under _"Controls: `Paginator`, where the arithmetic
 is the component"_ and _"`Paginator` is a root and pieces, with the ready-made row on top"_.
@@ -523,7 +391,7 @@ is the component"_ and _"`Paginator` is a root and pieces, with the ready-made r
 
 ---
 
-## 11. `Carousel` — two things deliberately not built
+## 10. `Carousel` — two things deliberately not built
 
 The decisions behind what exists are in `decisions.md` under _"Controls: `Carousel`, and the first component
 that acts without being asked"_ and _"`Carousel`: one component, and how a slide sits is a placement rule"_. These
@@ -541,28 +409,7 @@ are the gaps, each with the reason it is still one.
 
 ---
 
-## 12. The four components ported from React — what did not settle
-
-`Satellite`, `Staircase`, `Formation`, `OverheadWheel` and `DrumWheel` came in from a React codebase; what the port
-settled is in `decisions.md`. What did not settle is below, and both entries are decisions taken rather than
-work waiting.
-
-**The drum's girth arithmetic was wrong twice, is now measured rather than argued, and the user has retested
-it.** What it reserves and why is in `decisions.md` under _"A drum reserves the room it paints in"_; both wrong
-answers are recorded there too, since the shape of the mistake repeated. The errors they remembered from the
-original codebase were accounted for by those two fixes.
-
-**An overhead wheel has one slot for its controls and it is the hub, chosen by the user over two alternatives.** A
-drum's controls sit under the barrel; an overhead wheel's sit in the middle of it, and there is no second slot. The
-cost is the one item 9 already records for `Scroller`: a consumer who wants the control somewhere else renders
-their own button, and a library that renders no button cannot promise it is named or reachable. The two
-alternatives were a second slot beneath the wheel, rejected because the overhead wheel is a square and anything
-under it changes the box it reserves, and a slot with a position prop, rejected because `Toasts` had already
-settled that a component does not fully delegate position. Recorded so it is not re-proposed as an oversight.
-
----
-
-## 13. An anchored layer trails its anchor during a scroll — _postponed until the platform catches up_
+## 11. An anchored layer trails its anchor during a scroll — _postponed until the platform catches up_
 
 **While something is moving, the position an anchored layer paints at is the position its anchor was in one
 frame ago.** At rest the last frame catches up, so it looks settled and only moves when something else does.
@@ -648,7 +495,7 @@ neither was tried.
 
 ---
 
-## 14. `Table` — six things deliberately not built
+## 12. `Table` — six things deliberately not built
 
 The decisions behind what exists are in `decisions.md` under _"Controls: `Table`, a grid rather than a
 table, and why the markup could not be `<table>`"_. These are the gaps, each with the reason it is still one.
@@ -674,66 +521,27 @@ _Accepted limits_ instead.
 
 ---
 
-## 15. `Timeline` — the pointer routes the library cannot promise
+## 13. `GlassSurface`'s ripple layer shows a defect at its edge — _postponed until the platform catches up_
 
-The component takes the gestures itself: a drag moves the window, the wheel and a pinch zoom it, and both can
-be switched off. The reasoning, the evidence for the wheel behaving as it does and the press-versus-drag rule
-are in `decisions.md` under _"`Timeline`: a window over a range"_. What is outstanding is the consequence.
+The component is built and works; the reasoning is in `decisions.md` under _"`GlassSurface`, and the two things
+that decide its shape"_. `GlassSurface` sits under `Composites`, which the Playground hides behind
+`SHOW_COMPOSITES` — that flag is what decides visibility by design, so the page not being in the menu is not a gap.
 
-- **Moving and zooming are reachable by dragging, pinching and the keyboard, and by nothing else the library
-  ships.** WCAG **2.5.7 Dragging Movements** wants panning to be achievable "by a single pointer without
-  dragging", and its own worked example is a map that must therefore offer directional buttons; **2.5.1
-  Pointer Gestures** wants the same of the pinch, which is multipoint. A keyboard route answers neither —
-  both criteria are about pointers. So a consumer who drops the component in and wires nothing has a control
-  that fails two Level A / AA criteria, and the library cannot tell them so.
-- **The reason it cannot be closed from inside is the no-controls rule.** What satisfies both criteria is a
-  button, a field or a click target, and this component renders none — the same position `Scroller` and
-  `OverheadWheel` are in, both already recorded. The Playground's tracks example is what discharging it looks
-  like, and its meetings example deliberately has none, so the two sit side by side.
-- **There is a route that would close it without painting anything, and nobody has argued it yet.** A plain
-  click on the axis strip could center the window on the point clicked, which is a single pointer and no
-  dragging; a double-click could zoom in a step. Both are gestures the component already has the arithmetic
-  for, neither adds a control, and neither has been put to the user — the objection to expect is that a
-  click on the axis is a seek in every video editor that has one, which is a different meaning from the one
-  proposed here.
+**The ripple layer's edge shows a defect under real GPU rendering, and it is postponed rather than fixed.** Clipping
+the ripple layer with `clip-path`, an ancestor's `overflow: hidden`, or a `feComposite` mask built into the filter
+itself all either reproduce the fault or introduce a different one, a precise notch at two diagonally opposite
+corners, confirmed in a real Microsoft Edge window and unaffected by curve resolution or device pixel ratio — see
+`decisions.md` for the full investigation. This is not a bug particular to this codebase: the W3C SVG working group
+has an open issue ([w3c/svgwg#1142](https://github.com/w3c/svgwg/issues/1142)) asking for an interoperable way to do
+exactly this — backdrop displacement for "liquid glass" UI — because `backdrop-filter` combined with
+`feDisplacementMap` is not currently reliable, and Safari does not implement the combination at all
+([WebKit bug 245510](https://bugs.webkit.org/show_bug.cgi?id=245510)). **Do not propose a CSS-only or
+filter-internal workaround** — every shape one could take was tried and is recorded in `decisions.md`. Re-open when
+the platform actually supports this, which the W3C issue above is the thing to watch.
 
 ---
 
-## 16. `GlassSurface` — what is built and what is not
-
-The component is built and works: two backdrop layers, the tint, and a specular sheen that follows the
-pointer, with a draggable pane on its page. `GlassDefs` names the four groups of settings, and the ripple and
-the sheen share one noise field. The reasoning is in `decisions.md` under _"`GlassSurface`, and the two
-things that decide its shape"_. Two things are outstanding.
-
-**The defaults are unified.** `DEFAULT_GLASS_DEFS` now carries the page's hand-tuned ripple scale and tint
-opacity, and every control on the page — noise, sheen, backdrop blur, ripple, tint — seeds from it rather
-than repeating a number. A future re-tune changes one place.
-
-`GlassSurface` sits under `Composites`, which the Playground hides behind `SHOW_COMPOSITES` — that flag is
-what decides visibility by design, so the page not being in the menu is not a gap.
-
-- **Nothing uses it yet.** The intent stated when it was commissioned was to replace the Playground's own
-  example boxes and left navigation panel with it. Both currently use a plain `backdrop-filter: blur()`. The
-  cost worth measuring first: a blurred _and_ displaced backdrop repaints whenever anything behind it moves,
-  and a nav panel is large and permanently on screen.
-
-- **The ripple layer's edge shows a defect under real GPU rendering, and it is postponed rather than fixed —
-  _postponed until the platform catches up_.** Clipping the ripple layer with `clip-path`, an ancestor's
-  `overflow: hidden`, or a `feComposite` mask built into the filter itself all either reproduce the fault or
-  introduce a different one, a precise notch at two diagonally opposite corners, confirmed in a real Microsoft
-  Edge window and unaffected by curve resolution or device pixel ratio — see `decisions.md` for the full
-  investigation. This is not a bug particular to this codebase: the W3C SVG working group has an open issue
-  ([w3c/svgwg#1142](https://github.com/w3c/svgwg/issues/1142)) asking for an interoperable way to do exactly
-  this — backdrop displacement for "liquid glass" UI — because `backdrop-filter` combined with
-  `feDisplacementMap` is not currently reliable, and Safari does not implement the combination at all
-  ([WebKit bug 245510](https://bugs.webkit.org/show_bug.cgi?id=245510)). **Do not propose a CSS-only or
-  filter-internal workaround** — every shape one could take was tried and is recorded in `decisions.md`. Re-open
-  when the platform actually supports this, which the W3C issue above is the thing to watch.
-
----
-
-## 17. Arbitrary placement across controls, and the picking that has to come with it
+## 14. Arbitrary placement across controls, and the picking that has to come with it
 
 **The user's proposal, and the direction the library is going next.** A control's items should be placeable
 anywhere rather than only along a line: a `Menu` as a closed ring or a wide fan; a `Paginator` drawn
@@ -756,7 +564,7 @@ parent rather than only a count, and therefore lives in the one page that can su
 
 Ten controls take an optional `computeLayout` and are unchanged without one: `Menu` (with `WheelMenu` and
 `FanMenu` built over it), the overhead `Wheel`, `Paginator`, `RadioGroup`, `Tabs`, `Stepper`, `Toolbar`,
-`Sortable`, `Tree` and `Formation`. The reasoning behind every decision taken is in `decisions.md` under
+`Sortable`, `Tree` and `TableOfContents`; `Formation` requires one. The reasoning behind every decision taken is in `decisions.md` under
 _"Arbitrary item placement"_, _"Concentric submenus"_, _"A wheel of wedges"_, _"The wheel as the ring's second
 consumer"_, _"`WheelMenu`: the wheel becomes a component"_, _"`Paginator` takes a layout"_, _"`RadioGroup` and
 `Tabs` take a layout too"_, _"Every layout sample lives in one place"_, _"`Formation` is the abstract's"_,
@@ -798,39 +606,13 @@ is what turned up the origin-placed item it scored as pointing due east.
   own width — about 30px on the demo wheel, and proportionally more on a bigger one. It reads well enough to
   build on, but every other tuned constant in the repo is the user's, backed by something they measured, and
   this one is not.
-- **The first item is highlighted the moment a menu opens**, before the pointer touches anything. Standard menu
-  behavior and `aria-activedescendant` has to point somewhere, but on a wheel it means something looks chosen
-  while the pointer is still on the opener. The user raised it; suppressing the visual highlight until the
-  pointer or keyboard engages would change `Menu` for every consumer, so it is theirs to call. Unrelated to the
-  hover a stationary pointer used to cause, which is fixed.
 - **`fan` places boxes rather than wedges, and that has never been argued either way.** The wedge vocabulary
   is on `PlacementRect` and any layout may use it; the fan is the one layout whose items are tilted along the
   arc rather than sitting in a band, so cards may well be right for it. It takes `ArcDefs` like the others now.
 
 ---
 
----
-
-## 18. `CardStack` — the pointer route the library cannot promise
-
-**The same gap `Timeline` and `Scroller` already carry, and it arrived with the component.** A card is sent by
-a swipe, which is both a path-based gesture and a drag, so **2.5.1 Pointer Gestures** (Level A) and **2.5.7
-Dragging Movements** (Level AA) both ask for a way to do it with a single pointer and no dragging. A keyboard
-does not answer either of them — both are about pointers — and `CardStack`'s arrow keys therefore close 2.1.1
-and nothing else.
-
-**It cannot be discharged inside the component.** The only things that satisfy the two criteria are controls,
-and the component renders none by the rule the library is built on — see _"A component hands out a controller
-and renders no controls of its own"_ in `conventions.md`. `send` is handed out at mount and the props block
-says plainly that anything sending a card without a drag has to be built on it, but **a `CardStack` whose only
-pointer route is the swipe fails 2.5.1 and 2.5.7, and the library cannot promise otherwise.**
-
-**`Carousel`'s answer is not available here.** It attaches its swipe only when `renderControls` was passed, so
-a consumer cannot ask for the gesture without also supplying the route. That trick is open only to a component
-that draws the controls itself, which the user ruled this one must not. The Playground's deck is what
-discharging it looks like: four buttons beside the pile, each calling `send`.
-
-## 19. The submit story — what a native submit carries, and what `Form` hands `onSubmit`
+## 15. The submit story — what a native submit carries, and what `Form` hands `onSubmit`
 
 Three findings from the survey against the reference libraries were lofted here rather than settled one by one,
 because they are one question. **The user's word: lofted, not discarded.**
@@ -850,7 +632,9 @@ who wants values takes. _"The form story"_ in `decisions.md` says the library ne
 that entry is what this item would revisit. Focus moving to the first field in error on submit was built
 separately and does not depend on this.
 
-## 20. `Die`'s step buttons and arrow keys fall into a loop of two or three faces
+---
+
+## 16. `Die`'s step buttons and arrow keys fall into a loop of two or three faces
 
 Reachable on the Die page's icon cloud: pick the d20 and press down a few times. The die goes back and forth
 between the same two faces. Every shape does it — a d20 pressed right goes between faces 1 and 2 from the first
@@ -877,7 +661,9 @@ every face upright cannot both hold, so each option gives one up:
 `Cuboid`'s upright mode has the same tension and accepted it, since a box has only six resting orientations
 (`decisions.md`, _"`Cuboid`: upright mode keeps an orientation"_); a d20 has many more faces for the loop to skip.
 
-## 21. The Playground's painters in Windows high-contrast mode
+---
+
+## 17. The Playground's painters in Windows high-contrast mode
 
 Reachable on the Range page with Windows' high-contrast mode on, or with Chrome's DevTools emulating
 `forced-colors: active`: the track and the filled part of the range turn white on the white page, and only the
@@ -904,6 +690,14 @@ of the answer to "what is left" — see the note at the top of this file. Each o
 reach it, and why it was accepted, so that nobody has to re-derive the argument in order to leave it alone
 again. An entry moves back up into the numbered items only if the user says so, or if something changes that
 makes the reasoning wrong.
+
+**A `Timeline`, `Bracket`, `PatchBoard` or `CardStack` whose consumer draws no buttons can fail WCAG 2.5.7 and 2.5.1
+without a warning.** Dragging to pan, pinching to zoom and swiping a card each need a way to do the same with one
+pointer and no dragging, and only buttons the consumer draws give one. The library warns when the consumer holds
+nothing a button could be built on — neither the controls handed out at mount nor the shared value (`view`,
+`topIndex`) — but it cannot tell whether buttons were built from either. `Bracket` and `PatchBoard` never warn, since
+their gestures only run once a view is shared. Reachable by giving a `Timeline` a `view` and no buttons. Accepted by
+the user: buttons are the settled route, and a library that draws no controls cannot see whether they exist.
 
 **A filter that keeps a non-matching option in `Select` can have the highlight land on it.** While filtering, the
 highlight goes to the first option shown rather than to the selection, because the component knows which options are
@@ -971,7 +765,7 @@ open nodes mounts a thousand of them. Reachable by handing `computeEstimatedNode
 the same tree: the first is ignored. Accepted because there is no fix, only a boundary — the two answer
 different questions about the same list, and a layout is the one that was asked for.
 
-**Converting a date into a calendar that cannot hold it clamps, silently.** Accepted **2026-08-11**.
+**Converting a date into a calendar that cannot hold it clamps, silently.** Accepted by the user.
 `DateValueUtils.withCalendar` is `toCalendar`, and 15 March 44 BC asked for in the Japanese calendar comes back
 as Meiji 1 — 15 September 1868 — because that calendar's first era begins there. Nothing reports that the value
 moved. Reachable in the Playground in two clicks: hold the Date picker page's historical date and switch the
@@ -1007,8 +801,8 @@ instead of one. Success criterion 2.1.1 is met either way, since the function is
 what is given up is 3.3.2-style discoverability, and the user weighed that against the tab order and kept the
 tab order. The reasoning behind the whole arrangement is in `decisions.md`.
 
-**Screenshot baselines, and with them any automated check on appearance.** Accepted **2026-08-11**, by the
-user, on two grounds: style in this project is far too fluid for a baseline image to mean anything for long,
+**Screenshot baselines, and with them any automated check on appearance.** Accepted by the user, on two
+grounds: style in this project is far too fluid for a baseline image to mean anything for long,
 and appearance is **not the library's responsibility** in the first place — `components/src` paints nothing, every
 painter lives in the Playground, so a committed image would be asserting the demo's taste rather than the
 package's contract.
@@ -1016,8 +810,8 @@ package's contract.
 What this permanently gives up is worth naming so nobody re-proposes it as a gap: the `aria-disabled`-parity
 rule — that disabled and disabled-but-reachable look identical — is checked by eye and only by eye, and
 `CellAnimation` and `ScanlineAnimation` will keep their Playground pages and no specs, because
-motion over time is the one thing a DOM-reading suite cannot see. Item 5 records the blind spot; this is the
-decision not to close it.
+motion over time is the one thing a DOM-reading suite cannot see. `decisions.md`, under _"What the verification
+suite cannot see"_, records the blind spot; this is the decision not to close it.
 
 For the record, since it was researched and would otherwise be re-researched: there are two published
 arrangements and they differ on where the image lives. Playwright's own screenshot assertion commits the

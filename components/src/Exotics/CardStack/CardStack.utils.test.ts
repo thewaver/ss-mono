@@ -190,3 +190,26 @@ describe("createPile", () => {
         expect(pile.send("left")).toBe(true);
     });
 });
+
+describe("warnIfNoSendRoute", () => {
+    const warnCount = (isSwipeable: boolean, hasControls: boolean) => {
+        const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+        CardStackUtils.warnIfNoSendRoute(isSwipeable, hasControls);
+
+        const calls = warn.mock.calls.length;
+
+        warn.mockRestore();
+
+        return calls;
+    };
+
+    it("warns once when the stack can be swiped and the consumer holds neither topIndex nor the controls", () => {
+        expect(warnCount(true, false)).toBe(1);
+    });
+
+    it("says nothing when the consumer holds either, or when the stack cannot be swiped", () => {
+        expect(warnCount(true, true)).toBe(0);
+        expect(warnCount(false, false)).toBe(0);
+    });
+});

@@ -1,28 +1,15 @@
 <script lang="ts">
     import type { Snippet } from "svelte";
 
-    import { GlassSurface, type PartialGlassDefs, Shape } from "@thewaver/ss-components-svelte";
-    import { TooltipKnobs } from "@thewaver/ss-playground/App/Knobs/Tooltips.const";
-    import {
-    BORDER_RADII,
-    TOOLTIP_ARROW_TEMPLATES,
-} from "@thewaver/ss-playground/App/StyledComponents/TooltipContent/TooltipContent.const";
+    import { Shape } from "@thewaver/ss-components-svelte";
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/TooltipContent/TooltipContent.css";
-    import { BORDER_RADIUS_FULL } from "@thewaver/ss-playground/App/Theme.const";
+    import { computeTooltipGeometry } from "@thewaver/ss-playground/App/StyledComponents/TooltipContent/TooltipContent.utils";
     import { themeVars } from "@thewaver/ss-playground/App/Theme.css";
-    import { ShapeConst, ShapeUtils } from "@thewaver/ss-utils";
 
     import PageLayer from "../../PageComponents/Layer/Layer.svelte";
     import type { TooltipContentProps } from "./TooltipContent.types";
 
-    const GLASS_DEFS: PartialGlassDefs = {
-        tint: { color: themeVars.color.surface.dark, opacity: 1 },
-        sheen: { specularConstant: 0 },
-    };
-
     let props: TooltipContentProps & { children?: Snippet } = $props();
-
-    const arrow = $derived(props.arrow === undefined || props.arrow === "none" ? undefined : props.arrow);
 </script>
 
 {#snippet renderBody()}
@@ -36,29 +23,14 @@
         styles.tooltipVisibility,
         styles.tooltipRevealVariants[props.reveal ?? "fade"],
         props.visibilityTarget === 1 && styles.isVisible,
-        arrow && styles.tooltipArrowed,
     ]}
     style:transition-duration={`${props.transitionDurationMs}ms`}
 >
-    {#if arrow}
-        <div class={styles.tooltipArrowShadow}>
-            <Shape
-                computePoints={(size) =>
-                    ShapeUtils.attachArrow(
-                        { points: ShapeConst.getDefaultShapePoints("square", size), joinRadii: [BORDER_RADIUS_FULL] },
-                        props.arrowAim,
-                        TOOLTIP_ARROW_TEMPLATES[arrow](
-                            props.arrowWidth ?? TooltipKnobs.STARTING_ARROW_WIDTH,
-                            props.arrowLength ?? TooltipKnobs.STARTING_ARROW_LENGTH,
-                        ),
-                    )}
-                computeFillDefs={() => [{ color: themeVars.color.surface.dark }]}
-                renderChildren={renderBody}
-            />
-        </div>
-    {:else}
-        <GlassSurface borderRadii={BORDER_RADII} glassDefs={GLASS_DEFS}>
-            {@render renderBody()}
-        </GlassSurface>
-    {/if}
+    <div class={styles.tooltipShadow}>
+        <Shape
+            computePoints={(size) => computeTooltipGeometry(size, props)}
+            computeFillDefs={() => [{ color: themeVars.color.surface.dark }]}
+            renderChildren={renderBody}
+        />
+    </div>
 </div>

@@ -43,7 +43,7 @@ Things Playwright cannot do for us, each of which reads as a component bug:
   finger's scroll-or-dismiss is driven with `Input.dispatchTouchEvent`, in `drawerTouch.spec.ts` alone (the touch
   context is per file).
 
-`backlog.md`, under _"What the verification suite still cannot see"_, carries the gaps.
+`decisions.md`, under _"What the verification suite cannot see"_, carries the gaps.
 
 ### Unit tests: `vitest`, colocated, and only for functions
 

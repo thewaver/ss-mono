@@ -176,6 +176,16 @@
         showSpan: (span) => setView(SpanUtils.reveal(span, view, range)),
     };
 
+    $effect(() =>
+        untrack(() =>
+            PanZoomUtils.warnIfNoControls(
+                "Timeline",
+                isPannable || isZoomable,
+                storedView !== undefined || props.onMount !== undefined,
+            ),
+        ),
+    );
+
     $effect(() => untrack(() => props.onMount?.(controller)));
 
     const gestures = PanZoomUtils.createGestureTracker({

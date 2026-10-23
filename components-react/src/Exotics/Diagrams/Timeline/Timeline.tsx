@@ -118,6 +118,16 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
     const isPannable = (props.isPannable ?? true) && !isDisabled;
     const isZoomable = (props.isZoomable ?? true) && !isDisabled;
 
+    useEffect(
+        () =>
+            PanZoomUtils.warnIfNoControls(
+                "Timeline",
+                isPannable || isZoomable,
+                props.view !== undefined || props.onMount !== undefined,
+            ),
+        [],
+    );
+
     const steps = SpanUtils.chooseTickSteps(
         SpanUtils.getExtent(view),
         size.width,

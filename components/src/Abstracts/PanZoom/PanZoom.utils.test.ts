@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import type { Span } from "@thewaver/ss-utils";
 
@@ -126,5 +126,28 @@ describe("clampView with edges that may be centered", () => {
         expect(PanZoomUtils.clampView(view(180, 40, 260, 80), { ...BOUNDS, canCenterEdges: true })).toEqual(
             view(160, 40, 240, 80),
         );
+    });
+});
+
+describe("warnIfNoControls", () => {
+    const warnCount = (hasGestures: boolean, hasControls: boolean) => {
+        const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+        PanZoomUtils.warnIfNoControls("Timeline", hasGestures, hasControls);
+
+        const calls = warn.mock.calls.length;
+
+        warn.mockRestore();
+
+        return calls;
+    };
+
+    it("warns once when a gesture is on and the consumer holds neither the view nor the controller", () => {
+        expect(warnCount(true, false)).toBe(1);
+    });
+
+    it("says nothing when the consumer holds either, or when no gesture is on", () => {
+        expect(warnCount(true, true)).toBe(0);
+        expect(warnCount(false, false)).toBe(0);
     });
 });

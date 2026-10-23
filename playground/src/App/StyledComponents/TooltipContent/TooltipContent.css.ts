@@ -3,12 +3,11 @@ import { style, styleVariants } from "@vanilla-extract/css";
 import { themeVars } from "../../Theme.css";
 
 const SHADOW_REACH = "32px";
-const ARROWED_SHADOW = "drop-shadow(0 2px 1px rgba(0, 0, 0, 0.8)) drop-shadow(0 4px 4px rgba(0, 0, 0, 0.65))";
+const SHADOW = "drop-shadow(0 2px 1px rgba(0, 0, 0, 0.8)) drop-shadow(0 4px 4px rgba(0, 0, 0, 0.65))";
 
 export const isVisible = style({});
 
 export const tooltipVisibility = style({
-    boxShadow: themeVars.shadow.medium,
     opacity: 0,
 
     selectors: {
@@ -18,12 +17,8 @@ export const tooltipVisibility = style({
     },
 });
 
-export const tooltipArrowed = style({
-    boxShadow: "none",
-});
-
-export const tooltipArrowShadow = style({
-    filter: ARROWED_SHADOW,
+export const tooltipShadow = style({
+    filter: SHADOW,
 });
 
 export const tooltipRevealVariants = styleVariants({

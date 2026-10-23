@@ -35,7 +35,7 @@ const computePoints = (size: Size2d) =>
 </script>
 
 <template>
-    <div :class="tooltipStyles.tooltipArrowShadow">
+    <div :class="tooltipStyles.tooltipShadow">
         <Shape :compute-points="computePoints" :compute-fill-defs="computeFillDefs">
             <template #renderChildren>
                 <div :class="styles.arrowBedLabel">{{ label }}</div>

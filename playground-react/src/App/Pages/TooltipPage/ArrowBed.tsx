@@ -34,7 +34,7 @@ export const useArrowBed = () => {
     const [shape, setShape] = useState<ArrowBedShape>(TooltipKnobs.STARTING_ARROW_BED_SHAPE);
 
     const renderTooltip = (computeAim: (size: Size2d) => ShapeArrowAim | undefined, label: string) => (
-        <div className={tooltipStyles.tooltipArrowShadow}>
+        <div className={tooltipStyles.tooltipShadow}>
             <Shape
                 computePoints={(size) =>
                     ShapeUtils.attachArrow(

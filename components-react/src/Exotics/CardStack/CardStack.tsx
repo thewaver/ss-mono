@@ -100,6 +100,12 @@ export const CardStack = <T,>(props: CardStackProps<T>) => {
         subscribe: controlsStore.subscribe,
     }));
 
+    useEffect(
+        () =>
+            CardStackUtils.warnIfNoSendRoute(!isDisabled, props.topIndex !== undefined || props.onMount !== undefined),
+        [],
+    );
+
     useEffect(() => {
         props.onMount?.(controls);
     }, [controls]);

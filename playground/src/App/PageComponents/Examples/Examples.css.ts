@@ -38,7 +38,6 @@ export const exampleContainer = style({
 
     color: themeVars.color.surface.contrast,
     backgroundImage: `linear-gradient(315deg, ${themeVars.color.surface.dark}, ${themeVars.color.surface.light})`,
-    backdropFilter: "blur(10px)",
     boxShadow: themeVars.shadow.medium,
     borderRadius: themeVars.borderRadius.full,
     padding: themeVars.spacing.double,

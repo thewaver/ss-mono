@@ -13,7 +13,7 @@
     const TOP_DEPTH = 0;
     const FALLBACK_AXIS = "horizontal";
 
-    let { topIndex = $bindable(FIRST_INDEX), ...props }: CardStackProps<T> = $props();
+    let { topIndex: storedTopIndex = $bindable(), ...props }: CardStackProps<T> = $props();
 
     let pileElement = $state<HTMLDivElement>();
 
@@ -25,6 +25,7 @@
     const pileSide = $derived(props.pileSide ?? CARD_STACK_DEFAULTS.pileSide);
     const allowedDirections = $derived(props.allowedDirections ?? CARD_STACK_DEFAULTS.allowedDirections);
     const isDisabled = $derived(props.isDisabled ?? false);
+    const topIndex = $derived(storedTopIndex ?? FIRST_INDEX);
     const isEmpty = $derived(topIndex >= props.cards.length);
 
     const pileExtentPx = $derived(CardStackUtils.getPileExtentPx(mountedCount, cardGap));
@@ -35,7 +36,7 @@
         getCards: () => props.cards,
         getTopIndex: () => topIndex,
         setTopIndex: (index) => {
-            topIndex = index;
+            storedTopIndex = index;
         },
         getIsDisabled: () => isDisabled,
         getAllowedDirections: () => allowedDirections,
@@ -80,6 +81,12 @@
         recall: pile.recall,
         deal: pile.deal,
     };
+
+    $effect(() =>
+        untrack(() =>
+            CardStackUtils.warnIfNoSendRoute(!isDisabled, storedTopIndex !== undefined || props.onMount !== undefined),
+        ),
+    );
 
     $effect(() => untrack(() => props.onMount?.(controls)));
 

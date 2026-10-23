@@ -27,6 +27,10 @@ const PRIMARY_BUTTON = 0;
 /** The middle of a box, as a ratio across and down it. */
 const MIDDLE: Point2d = { x: HALF, y: HALF };
 
+/** What the library prints when nothing a button could move a gesture-driven window with was handed out. */
+const NO_CONTROLS_WARNING =
+    "panning and zooming are on, but neither view nor onMount was given, so no button can have been built to move the view. Dragging and pinching then have no single-pointer route, which WCAG 2.5.7 Dragging Movements and 2.5.1 Pointer Gestures ask for — share the view or take the controller in onMount and wire it to buttons, or turn the gestures off.";
+
 /** A point with the directions that do not count set to zero. */
 const project = (point: Point2d, axes: PanZoomAxes): Point2d => ({
     x: axes.x ? point.x : NOTHING,
@@ -417,5 +421,22 @@ export namespace PanZoomUtils {
                 }, WHEEL_SETTLE_MS);
             },
         };
+    };
+
+    /**
+     * Warns, in the console, that a window moved by gestures has nothing a button could move it with.
+     *
+     * Call it once per component, when it is set up. A drag that pans and a pinch that zooms each need a way to do the
+     * same with a single pointer and no dragging, and only controls the consumer draws can give one — built on the
+     * controller from `onMount`, or writing a view the consumer shares. So when a gesture is on and the consumer
+     * holds neither, the route cannot exist. A consumer who holds one and builds nothing from it is not caught, and a
+     * component whose gestures only run once a view is shared never warns. Nothing is blocked or filled in.
+     *
+     * @param component The component's name, for the message.
+     * @param hasGestures Whether panning or zooming by gesture is on.
+     * @param hasControls Whether the consumer gave `onMount` or shares the view.
+     */
+    export const warnIfNoControls = (component: string, hasGestures: boolean, hasControls: boolean) => {
+        if (hasGestures && !hasControls) console.warn(`${component}: ${NO_CONTROLS_WARNING}`);
     };
 }

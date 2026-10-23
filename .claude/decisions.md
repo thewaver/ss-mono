@@ -2423,6 +2423,35 @@ which the function is never told, so a translucent color is measured as though i
 **The ratio itself is not exported.** `toLuminance` and `toContrastRatio` are module-private, because what was
 asked for was one function.
 
+### What the verification suite cannot see
+
+A green `verify:dom` reads as broader coverage than it is, so the shape of its blind spots is kept here.
+
+- **Appearance.** Nothing checks how anything looks, by the user's decision — the accepted limit on screenshot
+  baselines in `backlog.md`. So the `aria-disabled` parity rule (disabled and disabled-but-reachable look identical)
+  and the two motion components, `CellAnimation` and `ScanlineAnimation`, are checked by eye and only by eye.
+- **A callback the page never consumes.** A suite that drives the page sees only what the page shows, so reaching a
+  callback or an `onMount` handoff means giving the page a reason to consume it first — a readout, through
+  `ExampleDefs.readout`, as `ImageSwitcher`'s `onLoad` got, with the spec asserting both that a load is reported and
+  that the swaps without one report nothing. A component that renders nothing is reached by recording calls on a
+  prototype before the app runs: `audioSwitcher.spec.ts` records `play` and `pause`, the trick
+  `noAnimationFrames.spec.ts` uses on `requestAnimationFrame`.
+- **Covered only through a consumer**, which decides whether a spec of its own is worth writing: `Popover` through
+  `Select` and `Menu`, `Radio` through `radioGroup.spec.ts`, `Checkbox` through `binarySwitch.spec.ts`, `MultiSelect`
+  through `select.spec.ts`, `CornerHighlight` and `Viewport` through whatever page mounts them, `InteractionWrapper`
+  through every control.
+- **A page that stops painting.** `noAnimationFrames.spec.ts` replaces `requestAnimationFrame` with a function that
+  never calls back, before any application code runs; a frozen clock cannot express this, since Playwright fakes
+  frames as a 16ms timer and advancing time to reach a fallback fires the frame first. It shows that
+  `ElementFader`'s 100ms fallback is real (a `Modal` reaches its visible target with no frames) and that the
+  positioner needs no frame to open a layer or follow a scroll. It does not show whether the per-frame poll has
+  another job: the poll is the only thing watching an anchor that moves with no event to announce it.
+- **Time.** Playwright's clock (`install`, `pauseAt`, `fastForward`, `runFor`) fakes `Date`, the timers,
+  `requestAnimationFrame`, `requestIdleCallback`, `performance` and `Event.timeStamp`; `install` freezes time until
+  it is advanced, so a duration becomes a stepped quantity. `toasts.spec.ts` uses it in one describe block, the
+  pattern for anything of that shape. It does not reach motion driven by CSS, nor the absence of frames, which needs
+  the stub above — the two look interchangeable and are not.
+
 ### Commands
 
 ```bash
@@ -5039,9 +5068,17 @@ handed one content function per section index kept across renders — `Listbox`'
 `<component :is>`. Svelte keys its sections by position, not by `from`, since an empty group shares its `from` with
 the next section and a duplicate key stops Svelte.
 
+### A menu paints its first item highlighted the moment it opens
+
+On a wheel this makes one item look picked while the pointer is still on the opener, and hiding the paint until
+the pointer or a key engages was weighed. The user turned it down on the decisive point: on open, keyboard focus is
+on the first item (the menu pattern: "When a `menu` opens … keyboard focus is placed on the first item"), so Enter
+or Space runs it. The paint is the truth; hidden, a person who opened by clicking and pressed Enter would run an item
+they never saw.
+
 ### Arbitrary item placement: `Abstracts/Placement`, and `Menu` as the first consumer
 
-The first half of `backlog.md` item 17. A control's items can be placed anywhere rather than along a line, and
+The first half of `backlog.md` item 14. A control's items can be placed anywhere rather than along a line, and
 the vocabulary for saying where lives in an abstract so the next control can use the same one.
 
 **A placement is a center, a size, an optional turn and an optional depth, all in fractions of the container's
@@ -5115,7 +5152,7 @@ its own chrome, or gets neither.
 
 ### Concentric submenus: `computeLayout` learns where it is, and a submenu borrows its parent's anchor
 
-The second piece of `backlog.md` item 17. A submenu of a laid-out menu is drawn as a wider ring round the
+The second piece of `backlog.md` item 14. A submenu of a laid-out menu is drawn as a wider ring round the
 same center rather than hanging off the item that opened it, so a wheel stays one wheel however deep it goes.
 
 **`computeLayout` takes one object rather than a run of arguments, and the reason is the third one.**
@@ -5644,7 +5681,7 @@ all eleven, which is what lets a consumer offer the whole set by key.
 
 ### `Paginator` takes a layout, and the placed box moves into the abstract
 
-The proving pass of `backlog.md` item 17, against the control the item named as the strongest candidate. A
+The proving pass of `backlog.md` item 14, against the control the item named as the strongest candidate. A
 paginator is arithmetic over a flat list, so a layout is the only thing that changes: the steps, the pages and
 the ellipses go round a dial in the order they already had, and nothing about the counting, the addresses or
 the labels is touched.
@@ -5696,7 +5733,7 @@ the box. So the sector is vocabulary a layout offers and a painter may decline, 
 control has to understand.
 
 **What the pass did not strain, which is worth knowing before the next consumer.** `PlacementUtils.pickIndex`
-still has no caller — a paginator has no gesture that picks by direction, so the loose end item 17 records is
+still has no caller — a paginator has no gesture that picks by direction, so the loose end item 14 records is
 untouched. Nor did anything about levels move: a paginator is one level and always will be, so the concentric
 machinery went unexercised.
 
@@ -5796,7 +5833,7 @@ arrangement is drawn from it — and both suites assert the walk rather than any
 
 ### Every layout sample lives in one place, and none of them is a menu's
 
-The user's call, taken while `backlog.md` item 17's proving pass was still open. `Samples/Menu/Layouts` was
+The user's call, taken while `backlog.md` item 14's proving pass was still open. `Samples/Menu/Layouts` was
 named when a menu was the only thing that had ever asked for a layout; by the end of the pass it held a
 honeycomb and a radial tree, and eleven consumers imported it of which three were menus. It is now
 `Samples/Placement/Layouts`, and the arrangements that came in with `Formation` are in it too.
@@ -6956,7 +6993,7 @@ element and sorts only then.
 
 ### Five more controls take a layout, and each one broke something different
 
-The rest of `backlog.md` item 17's proving pass, run against `Stepper`, `Toolbar`, `Sortable` and `Tree` after
+The rest of `backlog.md` item 14's proving pass, run against `Stepper`, `Toolbar`, `Sortable` and `Tree` after
 `Paginator`, `RadioGroup` and `Tabs`. The reason to keep going past the first was that each control was
 expected to strain a different part of the abstract, and each did.
 
@@ -12647,7 +12684,7 @@ turn a list of keyframe stops into the evaluation function `CellAnimation` asks 
 keyframes rather than a formula writes their own. That is real, and it is still not the library's: the
 component's contract is already the smaller and more general thing — a function from timeline to result — and a
 stop list with `at`, `depth` and origin keys is one **opinion about how to author** such a function. Shipping it
-would freeze that opinion as API for a consumer nobody has met, which is the layer item 5 in `backlog.md`
+would freeze that opinion as API for a consumer nobody has met, which is the layer item 4 in `backlog.md`
 plans. The matrix half is a different case: it needs only the language to work, which is the `ss-utils` test,
 and that package has `Vec2d` and `Vec4d` but no matrix — noted as a candidate rather than moved, because one
 consumer is a thin case for an export in another repo.
@@ -12855,7 +12892,7 @@ page behind is then outside what the layer can see. It is the same trap as `isol
 is why each layer carries its own clip rather than sharing one.
 
 **The fringe this section used to blame on a disagreement between the two backdrop layers is postponed, not
-fixed — see item 16 in `backlog.md` for the current standing.** The margin explanation did not survive a
+fixed — see item 13 in `backlog.md` for the current standing.** The margin explanation did not survive a
 direct test: pushing the margin far past what either layer needs changes nothing, and shrinking it to nearly
 zero changes nothing either. Folding the blur into the ripple filter was tried, looked clean, and was reverted
 anyway — not because it cost Firefox and Safari their blur, though it does, but because "clean" turned out to
@@ -12864,7 +12901,7 @@ building a `feImage` / `feComposite` mask into the filter, so the pane never nee
 ancestor `overflow: hidden` at all, also looked clean under that same software path and also failed once
 checked against a real GPU-accelerated window. Neither fix is in the tree. What each attempt actually ruled
 out is real and kept below; what it did not do is find a fix that survives real rendering, and nothing further
-should be attempted here without a way to check against GPU rendering from the start — see item 16.
+should be attempted here without a way to check against GPU rendering from the start — see item 13.
 
 **The Playground's pane is dragged with `left` and `top`, never with `transform`.** A transform on an
 ancestor creates a stacking context and changes the containing block, and given how readily this arrangement
@@ -12959,7 +12996,7 @@ nothing" trap the backdrop layers above are already written to avoid. Skipping t
 nothing for one.
 
 **The ripple layer's edge is postponed, not fixed, and the investigation is recorded here so it is not repeated
-blind — see item 16 in `backlog.md` for what this means for now.** Found on the Playground's tooltip once
+blind — see item 13 in `backlog.md` for what this means for now.** Found on the Playground's tooltip once
 moved onto `GlassSurface`: a patch of whatever sat behind it rendered sharp and barely warped instead of
 frosted. Chased with a standalone sandbox — raw `feTurbulence` / `feDisplacementMap`, no library code — every
 test run in the browser this session had, which turned out to be headless Chromium and headless Edge, both of
@@ -13009,6 +13046,12 @@ holds everywhere it was checked: this combination is unreliable across the ecosy
 this codebase. Re-open when the platform actually supports it — the W3C issue above is the thing to watch —
 and do not re-attempt a CSS-only or filter-internal workaround in the meantime; every shape that one could take
 has already been tried once.
+
+### The Playground does not use `GlassSurface` outside its own page
+
+It was commissioned to replace the Playground's example boxes and left navigation, and for a while drew the
+tooltips. The user dropped all of it: heavy, busy and buggy. The boxes and the navigation paint a plain opaque
+gradient, and every tooltip is a `Shape`, arrowed or not. The component keeps its page.
 
 ### The glass effect is a type in `Abstracts`, and the sheen stopped being a sample
 
@@ -16822,7 +16865,7 @@ can know.
 **The cost is stated rather than mitigated: a library that renders no button cannot promise one is reachable or
 named.** A consumer who wires up no control has a wheel that can only be driven from elsewhere through
 `targetIndex`, exactly as a `Carousel` whose consumer builds no buttons on its controller has no keyboard route. That is the same exposure
-item 9 records for `Scroller` and it is now the wheel's too.
+item 8 records for `Scroller` and it is now the wheel's too.
 
 **No slot survives either, and the one that briefly did was kept for a bad reason.** A `renderHub` was left on
 the overhead wheel out of deference to an earlier choice — that an overhead wheel has one control slot and it is the
@@ -17799,6 +17842,21 @@ From Skiper UI's knockout bracket, which shows a window of the tree and pages th
 **PatchBoard can be laid out wider than its window, with `boardWidth`.** The user's call, sealed by Bracket working that way already. Every PatchBoard size is a fraction of the board's width, while a consumer's node content is sized in pixels — a label's font, a node's padding — so a patch drawn for a 1120px board, laid out at a 460px window, came out with its labels about 2.4 times too large for their boxes at every zoom, since zooming scales box and text together. Given `boardWidth`, the board is laid out at that width and scaled into the window; left out, it is laid out at the window's own width. Rejected: shrinking the content in the example with CSS `zoom`, which leaves every consumer with a dense board to find the same trick, and redrawing the patch with fewer, larger nodes, which loses the complexity the example is there to carry.
 
 **The Playground's PatchBoard Zoom and Pan examples are one example**, on the user's call once both became the same mechanism. It keeps the Pan example's longer recording chain, laid out at its own 1120px with `boardWidth` and opening at that size, since the Zoom example's short chain was the simpler of the two and less likely to catch a fault. The zoom and arrow buttons sit below the board, as the Bracket example's do.
+
+### A gesture with no single-pointer route warns when the consumer holds nothing to build one on
+
+The user's call, applying _"An accessibility mistake the library can detect is warned about"_. Panning by drag,
+zooming by pinch and sending a card by swipe each need a single-pointer route that is not a drag (2.5.7, 2.5.1), and
+the settled route is buttons the consumer draws. A button can be built on the controller handed out through `onMount`
+or by writing a value the consumer shares — `Bracket`'s family example moves its view with buttons and never takes the
+controller. So the warning fires only when a gesture is on and the consumer holds **neither**:
+`PanZoomUtils.warnIfNoControls` for `Timeline` (no `view`, no `onMount`) and `CardStackUtils.warnIfNoSendRoute` for
+`CardStack` (no `topIndex`, no `onMount`), called once at setup. `Bracket` and `PatchBoard` never warn, since their
+window and gestures exist only once a view is shared. A consumer who holds either and builds no buttons is not
+caught; that is an accepted limit in `backlog.md`.
+
+**Svelte's `CardStack` binds `topIndex` with no fallback** and applies `0` where it reads it, the shape `Timeline`
+already has for `view`: with `$bindable(0)` an unbound prop and a bound one cannot be told apart.
 
 ### `Bracket`: round headers make each layer its own list
 

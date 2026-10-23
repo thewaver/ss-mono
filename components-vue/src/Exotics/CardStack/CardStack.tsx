@@ -72,6 +72,8 @@ export const CardStack = defineComponent(
             deal: pile.deal,
         };
 
+        CardStackUtils.warnIfNoSendRoute(!getIsDisabled(), props.topIndex !== undefined || props.onMount !== undefined);
+
         watchAfterRender([], () => {
             props.onMount?.(controls);
         });

@@ -10,6 +10,10 @@ import {
 import type { InteractionDragRatio } from "../../Abstracts/InteractionTracker/InteractionTracker.types";
 import type { CardStackMotion, CardStackPileDefs, CardStackPileSide } from "./CardStack.types";
 
+/** What the library prints when nothing a button could move a swiped stack with was handed out. */
+const NO_SEND_ROUTE_WARNING =
+    "CardStack: a card is sent by swiping, but neither topIndex nor onMount was given, so no button can have been built to move the pile on. A swipe has no single-pointer route then, which WCAG 2.5.7 Dragging Movements and 2.5.1 Pointer Gestures ask for — take the controls in onMount and wire send to buttons.";
+
 /** The top card's depth. */
 const TOP_DEPTH = 0;
 /** One card, or one step down the pile. */
@@ -345,5 +349,21 @@ export namespace CardStackUtils {
                 motion.set({ travel: NO_TRAVEL, leavingTo: undefined, returningFrom: undefined });
             },
         };
+    };
+
+    /**
+     * Warns, in the console, that a stack sent by swiping has nothing a button could move it on with.
+     *
+     * Call it once per stack, when it is set up. A swipe needs a way to send a card with a single pointer and no
+     * dragging, and only controls the consumer draws can give one — built on `send` from `onMount`, or writing a
+     * `topIndex` the consumer shares. So when the stack can be swiped and the consumer holds neither, the route
+     * cannot exist. A consumer who holds one and builds nothing from it is not caught. Nothing is blocked or filled
+     * in.
+     *
+     * @param isSwipeable Whether the stack takes swipes, which it does unless disabled.
+     * @param hasControls Whether the consumer gave `onMount` or shares `topIndex`.
+     */
+    export const warnIfNoSendRoute = (isSwipeable: boolean, hasControls: boolean) => {
+        if (isSwipeable && !hasControls) console.warn(NO_SEND_ROUTE_WARNING);
     };
 }

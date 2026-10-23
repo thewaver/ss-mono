@@ -126,6 +126,8 @@ export const CardStack = <T,>(props: CardStackProps<T>) => {
         e.preventDefault();
     };
 
+    CardStackUtils.warnIfNoSendRoute(!getIsDisabled(), props.topIndex !== undefined || props.onMount !== undefined);
+
     onMount(() => {
         props.onMount?.(controls);
     });

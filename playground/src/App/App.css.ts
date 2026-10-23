@@ -33,7 +33,6 @@ export const leftMenu = style({
     boxSizing: "border-box",
     color: themeVars.color.surface.contrast,
     backgroundImage: `linear-gradient(45deg, ${themeVars.color.surface.dark}, ${themeVars.color.surface.light})`,
-    backdropFilter: "blur(10px)",
     boxShadow: themeVars.shadow.large,
     width: "100%",
     height: "100%",
