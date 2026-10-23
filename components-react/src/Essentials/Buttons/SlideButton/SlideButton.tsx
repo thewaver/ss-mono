@@ -38,6 +38,7 @@ const SlideButtonElement = (props: SlideButtonElementProps) => {
             getMode: () => latest.current.mode,
             getThumbSize: () => latest.current.thumbSize,
             getHoldDurationMs: () => latest.current.holdDurationMs,
+            getCompletionRatio: () => latest.current.completionRatio,
             getTrackWidth: () => trackRef.current?.clientWidth ?? 0,
             getProgressRatio: () => progressRef.current,
             setProgressRatio: (ratio) => {
@@ -135,6 +136,7 @@ export const SlideButton = (props: SlideButtonProps) => {
                     ariaLabel={props.ariaLabel}
                     thumbSize={props.thumbSize ?? SLIDE_BUTTON_DEFAULTS.thumbSize}
                     holdDurationMs={props.holdDurationMs ?? SLIDE_BUTTON_DEFAULTS.holdDurationMs}
+                    completionRatio={props.completionRatio ?? SLIDE_BUTTON_DEFAULTS.completionRatio}
                     mode={props.mode ?? SLIDE_BUTTON_DEFAULTS.mode}
                     flags={flags}
                     progressRatio={progressRatio}

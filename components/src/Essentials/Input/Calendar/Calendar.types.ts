@@ -1,5 +1,6 @@
 import type {
     DateValue,
+    DateValueMinDaysInFirstWeek,
     DateValueWeekStart,
     DateValueWeekdayWidth,
 } from "../../../Abstracts/DateValue/DateValue.types";
@@ -47,6 +48,22 @@ export type BaseCalendarValues = {
     locale?: string;
     /** Which day begins a week, which decides the order of the column headings. */
     weekStartsOn?: DateValueWeekStart;
+    /**
+     * How many days of the new year the first week of the year must hold, which decides the week numbers. `4` with
+     * weeks starting on Monday is ISO 8601, which most of Europe uses; `1` with weeks starting on Sunday is the
+     * United States', where the week holding the first of January is week one. Read only while week numbers are
+     * drawn.
+     */
+    minDaysInFirstWeek?: DateValueMinDaysInFirstWeek;
+    /**
+     * How many months are shown side by side, the first being `month`. The arrow keys walk from one month into the
+     * next, the page keys step all of them at once, and a walk past the last month shown brings the next ones into
+     * view. A day belonging to a neighboring month is left blank, since the month beside it already shows it. Only
+     * the day view shows several months, so it is refused alongside `precision`.
+     */
+    monthCount?: number;
+    /** The space between months while several are shown. */
+    monthGap?: number;
     /** How long the weekday headings are written — a letter, three letters, or the whole word. */
     weekdayWidth?: DateValueWeekdayWidth;
     /** Which day counts as today, so a consumer can hold it still rather than letting it follow the clock. */
@@ -89,3 +106,5 @@ export type BaseCalendarPrecisionValues = {
      */
     precision?: CalendarPrecision;
 };
+
+export type CalendarMonthCountExcludesPrecision = { precision?: undefined } | { monthCount?: undefined };

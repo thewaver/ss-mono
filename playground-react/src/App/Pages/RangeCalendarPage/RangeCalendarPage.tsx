@@ -23,6 +23,7 @@ import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { BoundedExample } from "./Examples/Bounded";
 import { DefaultExample } from "./Examples/Default";
 import { RightToLeftExample } from "./Examples/RightToLeft";
+import { TwoMonthsExample } from "./Examples/TwoMonths";
 
 const describe = (value: DateValueRange | undefined) =>
     value ? `${DateValueUtils.toIso(value.start)} to ${DateValueUtils.toIso(value.end)}` : "none";
@@ -42,10 +43,12 @@ export const RangeCalendarPage = () => {
     const defaultValue = useState<DateValueRange | undefined>();
     const boundedValue = useState<DateValueRange | undefined>();
     const rightToLeftValue = useState<DateValueRange | undefined>();
+    const twoMonthsValue = useState<DateValueRange | undefined>();
 
     const defaultMonth = useMonthState(calendarId);
     const boundedMonth = useMonthState(calendarId);
     const rightToLeftMonth = useMonthState(calendarId);
+    const twoMonthsMonth = useMonthState(calendarId);
 
     const examples = [
         {
@@ -62,6 +65,16 @@ export const RangeCalendarPage = () => {
                 `min ${DateValueUtils.toIso(MIN_DATE)}, max ${DateValueUtils.toIso(MAX_DATE)} — value: ${describe(boundedValue[0])}`,
             component: () => <BoundedExample value={boundedValue} month={boundedMonth} weekStartsOn={weekStartsOn} />,
             path: `${EXAMPLES_ROOT}/Bounded.tsx`,
+        },
+        {
+            key: "twoMonths",
+            name: EXAMPLE_NAMES.twoMonths,
+            readout: () =>
+                `value: ${describe(twoMonthsValue[0])} — a range can start in one month and end in the other; the arrow keys walk across, and the page keys step both`,
+            component: () => (
+                <TwoMonthsExample value={twoMonthsValue} month={twoMonthsMonth} weekStartsOn={weekStartsOn} />
+            ),
+            path: `${EXAMPLES_ROOT}/TwoMonths.tsx`,
         },
         {
             key: "rightToLeft",

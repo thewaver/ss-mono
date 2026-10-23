@@ -45,6 +45,8 @@ export const RangeCalendar = defineComponent(
                     {
                         renderDay: slots.renderDay,
                         renderWeekday: slots.renderWeekday,
+                        renderWeekNumber: slots.renderWeekNumber,
+                        renderMonthHeader: slots.renderMonthHeader,
                     } satisfies Partial<CalendarSlots>
                 }
             </CalendarComposite>
@@ -58,6 +60,9 @@ export const RangeCalendar = defineComponent(
             "locale": null,
             "weekStartsOn": null,
             "weekdayWidth": null,
+            "minDaysInFirstWeek": null,
+            "monthCount": null,
+            "monthGap": null,
             "today": null,
             "minValue": null,
             "maxValue": null,

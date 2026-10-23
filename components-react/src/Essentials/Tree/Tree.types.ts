@@ -3,6 +3,8 @@ import type { AnchorHTMLAttributes, ComponentType, ReactNode, Ref } from "react"
 import type {
     BaseTreeProps,
     InteractionFlags,
+    TreeConnectorDefs,
+    TreeConnectorNeedsLayout,
     TreeNodeRecord,
     TreeNodeRenderProps,
     TreeRecordRow,
@@ -74,4 +76,10 @@ export type TreeProps<T> = BaseTreeProps<T> & {
     renderNode: (node: TreeNode<T>, renderProps: InteractionFlags<TreeNodeRenderProps<T>>) => ReactNode;
     /** Draws what stands in for a branch's children while they are still being fetched. */
     renderPendingChildren?: (node: TreeNode<T>, depth: number) => ReactNode;
-};
+    /**
+     * Draws the line from a node up to its parent, across the whole box the tree is laid out in, under the nodes.
+     * It is handed both nodes' placements, so it can draw the line between them. Refused without `computeLayout`,
+     * since an indented tree has no placements to draw between.
+     */
+    renderConnector?: (defs: TreeConnectorDefs<T>) => ReactNode;
+} & TreeConnectorNeedsLayout;

@@ -44,7 +44,7 @@ const setValue = (value: T | undefined) => {
             }}</PageSelectContent>
         </template>
 
-        <template #renderGroup="{ group }">
+        <template #renderGroupHeader="{ group }">
             <PageSelectGroupContent>{{ group.label }}</PageSelectGroupContent>
         </template>
 

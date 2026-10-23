@@ -62,7 +62,9 @@
         { isBeforeRender: true },
     );
 
-    const entries = $derived(MenuUtils.computeEntries(props.items, props.openerItem, props.submenuMode));
+    const entries = $derived(
+        MenuUtils.computeEntries(MenuUtils.flattenNodes(props.items), props.openerItem, props.submenuMode),
+    );
 
     const navigable = $derived(MenuUtils.computeNavigableIndexes(entries));
 

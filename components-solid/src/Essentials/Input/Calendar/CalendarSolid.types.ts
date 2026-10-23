@@ -4,6 +4,7 @@ import type {
     BaseCalendarCbs,
     BaseCalendarPrecisionValues,
     BaseCalendarValues,
+    CalendarMonthCountExcludesPrecision,
     CalendarRenderProps,
     DateValue,
     DateValueRange,
@@ -19,6 +20,10 @@ export type CalendarDayRenderer = (
 ) => JSX.Element;
 
 export type CalendarWeekdayRenderer = (name: string, index: number) => JSX.Element;
+
+export type CalendarWeekNumberRenderer = (weekNumber: number) => JSX.Element;
+
+export type CalendarMonthHeaderRenderer = (getMonth: Accessor<DateValue>, index: number) => JSX.Element;
 
 export type CalendarDayProps = AccessorProps<
     Omit<InteractionControlProps<CalendarRenderProps>, "renderContent"> & {
@@ -39,6 +44,16 @@ export type CalendarBaseProps = AccessorValues<BaseCalendarValues> &
         renderDay: CalendarDayRenderer;
         /** Draws one weekday heading. */
         renderWeekday?: CalendarWeekdayRenderer;
+        /**
+         * Draws the number of one week, in a column before the days. The column is drawn only while this is given, and
+         * only in the day view; `minDaysInFirstWeek` decides how the weeks are counted.
+         */
+        renderWeekNumber?: CalendarWeekNumberRenderer;
+        /**
+         * Draws the heading over one month while several are shown, handed that month's first day and its place among
+         * them, so the first can carry a previous button and the last a next one.
+         */
+        renderMonthHeader?: CalendarMonthHeaderRenderer;
     };
 
 export type CalendarPrecisionProps = AccessorValues<BaseCalendarPrecisionValues>;
@@ -62,7 +77,7 @@ export type CalendarProps = CalendarBaseProps &
     CalendarPrecisionProps & {
         /** Which day is picked. It is the only thing that picks one. */
         value: SignalSource<DateValue | undefined>;
-    };
+    } & CalendarMonthCountExcludesPrecision;
 
 export type RangeCalendarProps = CalendarBaseProps & {
     /** Which range is picked. It is the only thing that picks one. */

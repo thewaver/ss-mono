@@ -64,6 +64,7 @@ const openMs = shallowRef<number>();
 const filterQuery = shallowRef("");
 const filterValue = shallowRef<Airport | undefined>();
 const groupedValue = shallowRef<string | undefined>();
+const groupBoxesValue = shallowRef<string | undefined>();
 const defaultValue = shallowRef<string | undefined>();
 const preselectedValue = shallowRef<string | undefined>("Portugal");
 const disabledOptionValue = shallowRef<string | undefined>();
@@ -226,6 +227,13 @@ const examples: ExampleDefs[] = [
         path: `${EXAMPLES_ROOT}/Countries.vue`,
     },
     {
+        key: "groupBoxes",
+        name: EXAMPLE_NAMES.groupBoxes,
+        readout: () =>
+            `value: ${groupBoxesValue.value ?? "undefined"} — renderGroupBox draws the tinted box around each group's heading and options`,
+        path: `${EXAMPLES_ROOT}/Countries.vue`,
+    },
+    {
         key: "disabledOptions",
         name: EXAMPLE_NAMES.disabledOptions,
         readout: () => `value: ${disabledOptionValue.value ?? "undefined"} — arrows skip Denmark and Finland`,
@@ -342,6 +350,10 @@ const examples: ExampleDefs[] = [
 
         <template #optionGroups>
             <CountriesExample v-model:value="groupedValue" :options="GROUPED_COUNTRIES" has-groups />
+        </template>
+
+        <template #groupBoxes>
+            <CountriesExample v-model:value="groupBoxesValue" :options="GROUPED_COUNTRIES" has-groups has-group-boxes />
         </template>
 
         <template #disabledOptions>

@@ -1,4 +1,4 @@
-import type { DateValue, DateValueWeekStart } from "@thewaver/ss-components-vue";
+import type { DateValue, DateValueMinDaysInFirstWeek, DateValueWeekStart } from "@thewaver/ss-components-vue";
 
 export type CalendarExampleProps = {
     "weekStartsOn": DateValueWeekStart;
@@ -13,4 +13,8 @@ export type CalendarPrecisionExampleProps = {
     "onUpdate:value"?: (value: DateValue | undefined) => void;
     "month": DateValue;
     "onUpdate:month"?: (month: DateValue) => void;
+};
+
+export type CalendarWeekNumbersExampleProps = CalendarExampleProps & {
+    minDaysInFirstWeek: DateValueMinDaysInFirstWeek;
 };

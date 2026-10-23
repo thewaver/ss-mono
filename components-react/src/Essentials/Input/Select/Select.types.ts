@@ -9,6 +9,7 @@ import type {
     SelectRowRecord as CoreSelectRow,
     InteractionFlags,
     SelectFlags,
+    SelectGroupBoxExcludesWindowing,
     SelectGroupFlags,
     SelectOptionFlags,
 } from "@thewaver/ss-components";
@@ -111,17 +112,28 @@ export type SelectCompositeProps<T> = Omit<InteractionWrapperProps<SelectFlags>,
         /** Draws one option. */
         renderOption: (option: SelectOption<T>, flags: InteractionFlags<SelectOptionFlags>) => ReactNode;
         /** Draws one group heading. */
-        renderGroup?: (group: SelectOptionGroup<T>, flags: SelectGroupFlags) => ReactNode;
+        renderGroupHeader?: (group: SelectOptionGroup<T>, flags: SelectGroupFlags) => ReactNode;
+        /**
+         * Draws the box a group sits in, around its heading and its options, which are handed in to be placed inside it.
+         * Refused alongside `computeEstimatedOptionHeight`, since a list that only draws what is on screen places each row
+         * on its own and a group has no box there.
+         */
+        renderGroupBox?: (
+            renderContent: () => ReactNode,
+            group: SelectOptionGroup<T>,
+            flags: SelectGroupFlags,
+        ) => ReactNode;
         /** Runs when an option is picked. */
         onPick: (value: T) => void;
         /** Runs when the clear control is pressed, to empty whatever is picked. */
         onClear: () => void;
-    };
+    } & SelectGroupBoxExcludesWindowing;
 
 export type SelectPresetProps<T> = Omit<
     SelectCompositeProps<T>,
     "selectedOptions" | "isMultiple" | "computeIsSelected" | "renderContent" | "onPick" | "onClear"
->;
+> &
+    SelectGroupBoxExcludesWindowing;
 
 export type SelectProps<T> = SelectPresetProps<T> & {
     /** Which option is picked, and how to change it. It is the only thing that picks one. */

@@ -16,7 +16,9 @@ export const GroupedExample = (props: Props) => (
             values={props.values}
             options={GROUPED_COUNTRIES}
             ariaLabel={"Countries to ship to"}
-            renderGroup={(group, flags) => <PageSelectGroupContent flags={flags}>{group.label}</PageSelectGroupContent>}
+            renderGroupHeader={(group, flags) => (
+                <PageSelectGroupContent flags={flags}>{group.label}</PageSelectGroupContent>
+            )}
             renderOption={(option, flags) => (
                 <PageSelectOptionContent isGliding flags={flags}>
                     {option.value}

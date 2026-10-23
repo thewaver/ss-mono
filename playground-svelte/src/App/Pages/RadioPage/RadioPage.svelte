@@ -60,13 +60,6 @@
             path: `${EXAMPLES_ROOT}/Rating.svelte`,
         },
         {
-            key: "arc",
-            name: EXAMPLE_NAMES.arc,
-            readout: () => `value: ${arcValue} — the same radios, placed by a layout instead of laid in a row`,
-            component: arcExample,
-            path: `${EXAMPLES_ROOT}/Arc.svelte`,
-        },
-        {
             key: "decorated",
             name: EXAMPLE_NAMES.decorated,
             readout: () => `value: ${decoratedValue}`,
@@ -93,6 +86,13 @@
             readout: () => `value: ${erroredValue}`,
             component: erroredExample,
             path: `${EXAMPLES_ROOT}/Errored.svelte`,
+        },
+        {
+            key: "arc",
+            name: EXAMPLE_NAMES.arc,
+            readout: () => `value: ${arcValue} — the same radios, placed by a layout instead of laid in a row`,
+            component: arcExample,
+            path: `${EXAMPLES_ROOT}/Arc.svelte`,
         },
     ];
 </script>

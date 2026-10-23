@@ -12,3 +12,5 @@ export const EXAMPLE_NAMES = {
 export const EXAMPLES_ROOT = "/src/App/Pages/SlideButtonPage/Examples";
 
 export const PERCENT = 100;
+
+export const FIELD_WIDTH = 110;

@@ -23,6 +23,8 @@ import type { CalendarCompositeProps, CalendarDayProps, CalendarProps, CalendarS
 
 const toCellId = (gridId: string, day: DateValue) => `${gridId}-day-${DateValueUtils.toIso(day)}`;
 
+type CalendarPage = { start: DateValue; cells: DateValue[] };
+
 const CalendarDay = defineComponent(
     (props: CalendarDayProps, { slots }: SlotsContext<InteractionControlSlots<CalendarRenderProps>>) =>
         () => {
@@ -74,15 +76,53 @@ export const CalendarComposite = defineComponent(
 
         const getPrecision = () => props.precision ?? CALENDAR_DEFAULTS.precision;
         const getWeekStartsOn = () => props.weekStartsOn ?? CALENDAR_DEFAULTS.weekStartsOn;
+        const getMinDaysInFirstWeek = () => props.minDaysInFirstWeek ?? CALENDAR_DEFAULTS.minDaysInFirstWeek;
+        const getMonthCount = () => (getPrecision() === "day" ? (props.monthCount ?? CALENDAR_DEFAULTS.monthCount) : 1);
+        const getIsMultiMonth = () => getMonthCount() > 1;
+
+        watchAfterRender([() => props.precision, () => props.monthCount], ([precision, monthCount]) =>
+            CalendarUtils.warnIfMonthCountIgnored(precision, monthCount),
+        );
 
         const pageStart = computed(() => CalendarUtils.getPageStart(month.value, getPrecision()));
         const today = computed(() => CalendarUtils.resolveToday(props.today, month.value));
-        const cells = computed(() => CalendarUtils.getCells(month.value, getPrecision(), getWeekStartsOn()));
+        const pages = computed<CalendarPage[]>(() =>
+            getMonthCount() === 1
+                ? [
+                      {
+                          start: pageStart.value,
+                          cells: CalendarUtils.getCells(month.value, getPrecision(), getWeekStartsOn()),
+                      },
+                  ]
+                : CalendarUtils.getMonthStarts(month.value, getMonthCount()).map((start) => ({
+                      start,
+                      cells: CalendarUtils.getCells(start, getPrecision(), getWeekStartsOn()),
+                  })),
+        );
+        const cells = computed(() =>
+            getIsMultiMonth()
+                ? pages.value.flatMap((page) => CalendarUtils.getOwnDays(page.cells, page.start))
+                : pages.value[0].cells,
+        );
         const currentEraId = computed(() => CalendarUtils.getCurrentEraId(month.value, props.locale));
+        const weekFieldName = computed(() => CalendarUtils.getWeekFieldName(props.locale));
 
         const labelCell = computed(() =>
-            CalendarUtils.createCellLabeler(cells.value[0], getPrecision(), currentEraId.value, props.locale),
+            CalendarUtils.createCellLabeler(pages.value[0].cells[0], getPrecision(), currentEraId.value, props.locale),
         );
+
+        const computeMonthLabel = (page: CalendarPage) =>
+            CalendarUtils.formatPage(page.start, page.cells, getPrecision(), currentEraId.value, props.locale);
+
+        const computePageLabel = () =>
+            getIsMultiMonth()
+                ? CalendarUtils.formatMonthSpan(
+                      pages.value[0].start,
+                      pages.value[pages.value.length - 1].start,
+                      currentEraId.value,
+                      props.locale,
+                  )
+                : computeMonthLabel(pages.value[0]);
 
         const weekdayNames = computed(() =>
             DateValueUtils.getWeekdayNames(
@@ -124,6 +164,7 @@ export const CalendarComposite = defineComponent(
                 pageStart.value,
                 props.minValue,
                 props.maxValue,
+                getMonthCount(),
             );
 
             highlighted.value = move.day;
@@ -153,9 +194,7 @@ export const CalendarComposite = defineComponent(
 
             if (!previous || DateValueUtils.isSame(previous, start)) return;
 
-            LiveAnnouncerUtils.announce(
-                CalendarUtils.formatPage(start, cells.value, getPrecision(), currentEraId.value, props.locale),
-            );
+            LiveAnnouncerUtils.announce(computePageLabel());
         });
 
         watchAfterRender([rovingCellId], ([cellId]) => {
@@ -166,15 +205,20 @@ export const CalendarComposite = defineComponent(
             document.getElementById(cellId)?.focus();
         });
 
+        const getRovingPage = () =>
+            pages.value.find((page) => CalendarUtils.getIsSameCell(page.start, rovingDay.value, "month")) ??
+            pages.value[0];
+
         const handleKeyDown = (e: KeyboardEvent) => {
             const precision = getPrecision();
 
             const action = CalendarUtils.computeKeyAction(e.key, e.shiftKey, {
                 roving: rovingDay.value,
                 precision,
-                cells: cells.value,
+                cells: getIsMultiMonth() ? getRovingPage().cells : cells.value,
                 shape: CalendarUtils.getGridShape(month.value, precision),
                 direction: direction.value,
+                monthCount: getMonthCount(),
             });
 
             if (!action) return;
@@ -188,26 +232,89 @@ export const CalendarComposite = defineComponent(
         return () => {
             const precision = getPrecision();
             const shape = CalendarUtils.getGridShape(month.value, precision);
-            const rows = CalendarUtils.getRows(cells.value, shape.colCount);
             const paintedRange = props.computeRange?.(rovingDay.value);
-            const rowStyle = { gridColumn: `span ${shape.colCount}` };
+            const isMultiMonth = getIsMultiMonth();
+            const hasWeekNumbers = precision === "day" && slots.renderWeekNumber !== undefined;
+            const columnCount = shape.colCount + (hasWeekNumbers ? 1 : 0);
+            const rowStyle = { gridColumn: `span ${columnCount}` };
+            const weekStartsOn = getWeekStartsOn();
+            const minDaysInFirstWeek = getMinDaysInFirstWeek();
 
-            return (
-                <div
-                    ref={rootRef}
-                    id={gridId}
-                    class={CalendarStyles.calendarRoot}
-                    style={{
-                        gridTemplateColumns: `repeat(${shape.colCount}, 1fr)`,
-                        gap: `${props.gap ?? CALENDAR_DEFAULTS.gap}px`,
-                    }}
-                    role="grid"
-                    aria-label={props.ariaLabel}
-                    aria-disabled={props.isDisabled || undefined}
-                    onKeydown={handleKeyDown}
-                >
+            const gridStyle = {
+                gridTemplateColumns: hasWeekNumbers
+                    ? `auto repeat(${shape.colCount}, 1fr)`
+                    : `repeat(${shape.colCount}, 1fr)`,
+                gap: `${props.gap ?? CALENDAR_DEFAULTS.gap}px`,
+            };
+
+            const renderDay = (page: CalendarPage, day: DateValue, key: number) =>
+                !isMultiMonth || CalendarUtils.getIsSameCell(page.start, day, "month") ? (
+                    <InteractionWrapper
+                        key={key}
+                        sizing={"fill"}
+                        isDisabled={getIsDayDisabled(day)}
+                        isFocusableWhenDisabled={!(props.isDisabled ?? false)}
+                        isTabbable={CalendarUtils.getIsSameCell(day, rovingDay.value, precision)}
+                        extraFlags={CalendarUtils.computeCellFlags(day, {
+                            precision,
+                            month: page.start,
+                            roving: rovingDay.value,
+                            today: today.value,
+                            isSelected: props.computeIsSelected(day),
+                            range: paintedRange,
+                        })}
+                    >
+                        {
+                            {
+                                renderControl: ({ setElementRef, flags }) => (
+                                    <CalendarDay
+                                        ref={setElementRef}
+                                        id={toCellId(gridId, day)}
+                                        flags={flags}
+                                        ariaLabel={labelCell.value(day)}
+                                        onSelect={() => pickDay(day)}
+                                    >
+                                        {
+                                            {
+                                                renderContent: (dayFlags) =>
+                                                    callSlot(slots.renderDay, { day, flags: dayFlags }),
+                                            } satisfies InteractionControlSlots<CalendarRenderProps>
+                                        }
+                                    </CalendarDay>
+                                ),
+                            } satisfies Partial<InteractionWrapperSlots<CalendarRenderProps>>
+                        }
+                    </InteractionWrapper>
+                ) : (
+                    <div key={key} role="gridcell" />
+                );
+
+            const renderWeekNumber = (row: DateValue[]) => {
+                const weekNumber = DateValueUtils.getWeekNumber(row[0], weekStartsOn, minDaysInFirstWeek);
+
+                return (
+                    <div
+                        class={CalendarStyles.calendarWeekNumber}
+                        role="rowheader"
+                        aria-label={CalendarUtils.formatWeekLabel(weekFieldName.value, weekNumber)}
+                    >
+                        {callSlot(slots.renderWeekNumber, { weekNumber })}
+                    </div>
+                );
+            };
+
+            const renderRows = (page: CalendarPage) => (
+                <>
                     {precision === "day" && (
                         <div class={CalendarStyles.calendarRow} style={rowStyle} role="row">
+                            {hasWeekNumbers && (
+                                <div
+                                    class={CalendarStyles.calendarWeekNumber}
+                                    role="columnheader"
+                                    aria-label={weekFieldName.value}
+                                />
+                            )}
+
                             {weekdayNames.value.map((name, index) => (
                                 <div
                                     key={index}
@@ -221,46 +328,56 @@ export const CalendarComposite = defineComponent(
                         </div>
                     )}
 
-                    {rows.map((row, rowIndex) => (
+                    {CalendarUtils.getRows(page.cells, shape.colCount).map((row, rowIndex) => (
                         <div key={rowIndex} class={CalendarStyles.calendarRow} style={rowStyle} role="row">
-                            {row.map((day, colIndex) => (
-                                <InteractionWrapper
-                                    key={colIndex}
-                                    sizing={"fill"}
-                                    isDisabled={getIsDayDisabled(day)}
-                                    isFocusableWhenDisabled={!(props.isDisabled ?? false)}
-                                    isTabbable={CalendarUtils.getIsSameCell(day, rovingDay.value, precision)}
-                                    extraFlags={CalendarUtils.computeCellFlags(day, {
-                                        precision,
-                                        month: month.value,
-                                        roving: rovingDay.value,
-                                        today: today.value,
-                                        isSelected: props.computeIsSelected(day),
-                                        range: paintedRange,
-                                    })}
-                                >
-                                    {
-                                        {
-                                            renderControl: ({ setElementRef, flags }) => (
-                                                <CalendarDay
-                                                    ref={setElementRef}
-                                                    id={toCellId(gridId, day)}
-                                                    flags={flags}
-                                                    ariaLabel={labelCell.value(day)}
-                                                    onSelect={() => pickDay(day)}
-                                                >
-                                                    {
-                                                        {
-                                                            renderContent: (dayFlags) =>
-                                                                callSlot(slots.renderDay, { day, flags: dayFlags }),
-                                                        } satisfies InteractionControlSlots<CalendarRenderProps>
-                                                    }
-                                                </CalendarDay>
-                                            ),
-                                        } satisfies Partial<InteractionWrapperSlots<CalendarRenderProps>>
-                                    }
-                                </InteractionWrapper>
-                            ))}
+                            {hasWeekNumbers && renderWeekNumber(row)}
+
+                            {row.map((day, colIndex) => renderDay(page, day, colIndex))}
+                        </div>
+                    ))}
+                </>
+            );
+
+            if (!isMultiMonth) {
+                return (
+                    <div
+                        ref={rootRef}
+                        id={gridId}
+                        class={CalendarStyles.calendarRoot}
+                        style={gridStyle}
+                        role="grid"
+                        aria-label={props.ariaLabel}
+                        aria-disabled={props.isDisabled || undefined}
+                        onKeydown={handleKeyDown}
+                    >
+                        {renderRows(pages.value[0])}
+                    </div>
+                );
+            }
+
+            return (
+                <div
+                    ref={rootRef}
+                    id={gridId}
+                    class={CalendarStyles.calendarMonths}
+                    style={{ gap: `${props.monthGap ?? CALENDAR_DEFAULTS.monthGap}px` }}
+                    role="group"
+                    aria-label={props.ariaLabel}
+                    aria-disabled={props.isDisabled || undefined}
+                    onKeydown={handleKeyDown}
+                >
+                    {pages.value.map((page, index) => (
+                        <div key={index} class={CalendarStyles.calendarMonth}>
+                            {callSlot(slots.renderMonthHeader, { month: page.start, index })}
+
+                            <div
+                                class={CalendarStyles.calendarRoot}
+                                style={gridStyle}
+                                role="grid"
+                                aria-label={computeMonthLabel(page)}
+                            >
+                                {renderRows(page)}
+                            </div>
                         </div>
                     ))}
                 </div>
@@ -275,6 +392,9 @@ export const CalendarComposite = defineComponent(
             "locale": null,
             "weekStartsOn": null,
             "weekdayWidth": null,
+            "minDaysInFirstWeek": null,
+            "monthCount": null,
+            "monthGap": null,
             "today": null,
             "minValue": null,
             "maxValue": null,
@@ -320,6 +440,8 @@ export const Calendar = defineComponent(
                         {
                             renderDay: slots.renderDay,
                             renderWeekday: slots.renderWeekday,
+                            renderWeekNumber: slots.renderWeekNumber,
+                            renderMonthHeader: slots.renderMonthHeader,
                         } satisfies Partial<CalendarSlots>
                     }
                 </CalendarComposite>
@@ -334,6 +456,9 @@ export const Calendar = defineComponent(
             "locale": null,
             "weekStartsOn": null,
             "weekdayWidth": null,
+            "minDaysInFirstWeek": null,
+            "monthCount": null,
+            "monthGap": null,
             "today": null,
             "minValue": null,
             "maxValue": null,

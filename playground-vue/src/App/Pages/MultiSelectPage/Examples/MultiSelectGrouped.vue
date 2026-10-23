@@ -43,7 +43,7 @@ const query = useModel(props, "query");
             }}</PageSelectContent>
         </template>
 
-        <template #renderGroup="{ group, flags }">
+        <template #renderGroupHeader="{ group, flags }">
             <PageSelectGroupContent :flags="flags">{{ group.label }}</PageSelectGroupContent>
         </template>
 

@@ -2,6 +2,7 @@ import type { Tab } from "@thewaver/ss-components";
 
 export type BaseScrollerExampleValues = {
     labels: string[];
+    overlapCount?: number;
 };
 
 export type BaseScrollerExampleProps = BaseScrollerExampleValues;

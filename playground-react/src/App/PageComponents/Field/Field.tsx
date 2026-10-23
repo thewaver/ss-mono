@@ -1,8 +1,9 @@
 import type { ReactNode } from "react";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
 import type { AnchorPlacement } from "@thewaver/ss-components-react";
 import {
+    Button,
     ColorInput,
     FileInput,
     NumberInput,
@@ -27,6 +28,7 @@ import { PageColorInputContent } from "../../StyledComponents/ColorInputContent/
 import { PageFileInputContent } from "../../StyledComponents/FileInputContent/FileInputContent";
 import { renderPageHighlightFloater } from "../../StyledComponents/GlideFloater/GlideFloater";
 import { PagePopoverSurface } from "../../StyledComponents/PopoverSurface/PopoverSurface";
+import { PageSelectClear } from "../../StyledComponents/SelectClear/SelectClear";
 import { PageSelectContent } from "../../StyledComponents/SelectContent/SelectContent";
 import { PageSelectGroupContent } from "../../StyledComponents/SelectGroupContent/SelectGroupContent";
 import { PageSelectOptionContent } from "../../StyledComponents/SelectOptionContent/SelectOptionContent";
@@ -94,10 +96,20 @@ export const PageNumberField = (props: PageNumberFieldProps) => {
 };
 
 export const PageTextField = (props: PageTextFieldProps) => {
+    const fieldRef = useRef<HTMLElement | null>(null);
+
     useFieldReset(props.value, (value) => props.onInput(value));
+
+    const clear = () => {
+        props.onInput(EMPTY_TEXT);
+        fieldRef.current?.focus();
+    };
 
     return (
         <TextInput
+            ref={(element) => {
+                fieldRef.current = element;
+            }}
             value={[props.value, props.onInput]}
             isDisabled={props.isDisabled}
             ariaLabel={props.ariaLabel}
@@ -109,6 +121,18 @@ export const PageTextField = (props: PageTextFieldProps) => {
                 props.placeholder === undefined
                     ? undefined
                     : (flags) => <PageTextFieldPlaceholder flags={flags}>{props.placeholder}</PageTextFieldPlaceholder>
+            }
+            renderTrailing={
+                props.clearAriaLabel === undefined
+                    ? undefined
+                    : () =>
+                          props.value !== EMPTY_TEXT && (
+                              <Button
+                                  ariaLabel={props.clearAriaLabel}
+                                  renderContent={(flags) => <PageSelectClear flags={flags} />}
+                                  onClick={clear}
+                              />
+                          )
             }
         />
     );
@@ -179,7 +203,7 @@ export const PageGroupedSelectField = <T,>(props: PageGroupedSelectFieldProps<T>
                         : EMPTY_TEXT}
                 </PageSelectContent>
             )}
-            renderGroup={(group) => <PageSelectGroupContent>{group.label}</PageSelectGroupContent>}
+            renderGroupHeader={(group) => <PageSelectGroupContent>{group.label}</PageSelectGroupContent>}
             renderOption={(option, flags) => (
                 <PageSelectOptionContent isGliding flags={flags}>
                     {props.computeLabel?.(option.value) ?? String(option.value)}

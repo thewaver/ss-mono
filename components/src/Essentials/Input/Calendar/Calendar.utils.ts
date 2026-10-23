@@ -5,6 +5,7 @@ import type { DateValue, DateValueRange, DateValueWeekStart } from "../../../Abs
 import { DateValueUtils } from "../../../Abstracts/DateValue/DateValue.utils";
 import type { NavigatorDirection, NavigatorGrid } from "../../../Abstracts/Navigator/Navigator.types";
 import { NavigatorUtils } from "../../../Abstracts/Navigator/Navigator.utils";
+import { CALENDAR_DEFAULTS } from "./Calendar.const";
 import type { CalendarDayMatcher, CalendarKeyAction, CalendarPrecision, CalendarRenderProps } from "./Calendar.types";
 
 /** Days in a week, which is the width of the day grid. */
@@ -37,6 +38,13 @@ const PAGE_ANNOUNCE_OPTIONS: Record<CalendarPrecision, Intl.DateTimeFormatOption
     month: { year: "numeric" },
     year: { year: "numeric" },
 };
+
+/** The field a week number is named by, as `Intl.DisplayNames` knows it. */
+const WEEK_FIELD = "weekOfYear";
+
+/** What the library prints when a calendar is handed several months and a view that cannot show them. */
+const IGNORED_MONTH_COUNT_WARNING =
+    'Calendar: monthCount is ignored unless precision is "day". Only the day view shows several months side by side — drop one of them.';
 
 /** The same options with the era written out, for a date that is not in the current era. */
 const withEra = (options: Intl.DateTimeFormatOptions): Intl.DateTimeFormatOptions => ({ ...options, era: "short" });
@@ -375,8 +383,10 @@ export namespace CalendarUtils {
      * @param pageStart The first day of the page now shown.
      * @param minValue The earliest day allowed, if there is one.
      * @param maxValue The latest day allowed, if there is one.
-     * @returns `day`, the aim pulled inside the bounds; and `month`, the first of the month to show when that day
-     * is on another page, or `undefined` when the page stays.
+     * @param monthCount How many months the day view shows at once. A day past them moves the view by as many
+     * months at a time, so the months shown keep their grouping.
+     * @returns `day`, the aim pulled inside the bounds; and `month`, the first of the month to show first when that
+     * day is on another page, or `undefined` when the page stays.
      */
     export const computeMove = (
         day: DateValue,
@@ -384,11 +394,25 @@ export namespace CalendarUtils {
         pageStart: DateValue,
         minValue?: DateValue,
         maxValue?: DateValue,
+        monthCount = CALENDAR_DEFAULTS.monthCount,
     ) => {
         const clamped = DateValueUtils.clamp(day, minValue, maxValue);
-        const isSamePage = DateValueUtils.isSame(getPageStart(clamped, precision), pageStart);
 
-        return { day: clamped, month: isSamePage ? undefined : DateValueUtils.getStartOfMonth(clamped) };
+        if (precision !== "day") {
+            const isSamePage = DateValueUtils.isSame(getPageStart(clamped, precision), pageStart);
+
+            return { day: clamped, month: isSamePage ? undefined : DateValueUtils.getStartOfMonth(clamped) };
+        }
+
+        let start = pageStart;
+
+        while (DateValueUtils.compare(clamped, start) < 0) start = DateValueUtils.addMonths(start, -monthCount);
+
+        while (DateValueUtils.compare(clamped, DateValueUtils.addMonths(start, monthCount)) >= 0) {
+            start = DateValueUtils.addMonths(start, monthCount);
+        }
+
+        return { day: clamped, month: DateValueUtils.isSame(start, pageStart) ? undefined : start };
     };
 
     /**
@@ -416,6 +440,7 @@ export namespace CalendarUtils {
      * @param opts.cells Every cell on the page.
      * @param opts.shape The page's shape, from {@link CalendarUtils.getGridShape}.
      * @param opts.direction Which way the grid's text runs. Under `rtl` the horizontal arrows trade places.
+     * @param opts.monthCount How many months the day view shows at once, which is how far the page keys move it.
      * @returns What to do, or `undefined` when the key is not the grid's.
      */
     export const computeKeyAction = (
@@ -427,9 +452,12 @@ export namespace CalendarUtils {
             cells: DateValue[];
             shape: NavigatorGrid;
             direction: NavigatorDirection;
+            monthCount?: number;
         },
     ): CalendarKeyAction | undefined => {
         const { roving, precision, cells, shape } = opts;
+        const pageStep =
+            precision === "day" ? PAGE_STEP * (opts.monthCount ?? CALENDAR_DEFAULTS.monthCount) : PAGE_STEP;
 
         if (NavigatorUtils.getIsActivationKey(key)) return { kind: "pick", day: roving };
 
@@ -440,7 +468,7 @@ export namespace CalendarUtils {
                 kind: "move",
                 day: isShiftHeld
                     ? stepLeap(roving, precision, direction * LEAP_STEP)
-                    : stepPage(roving, precision, direction * PAGE_STEP),
+                    : stepPage(roving, precision, direction * pageStep),
             };
         }
 
@@ -558,4 +586,79 @@ export namespace CalendarUtils {
 
         return formatSpan(cells[0], cells[cells.length - 1], options, locale);
     };
+
+    /**
+     * Warns, in the console, that a calendar's month count is being ignored.
+     *
+     * Call it once per calendar, when it is set up. It says nothing unless a month count was given under a precision
+     * other than `day`, since only the day view shows months side by side.
+     *
+     * @param precision The precision the calendar was given, if any.
+     * @param monthCount The month count it was given, if any.
+     */
+    export const warnIfMonthCountIgnored = (
+        precision: CalendarPrecision | undefined,
+        monthCount: number | undefined,
+    ) => {
+        if (monthCount !== undefined && (precision ?? CALENDAR_DEFAULTS.precision) !== "day") {
+            console.warn(IGNORED_MONTH_COUNT_WARNING);
+        }
+    };
+
+    /**
+     * The first day of every month the day view shows.
+     *
+     * @param month Any day of the first month shown.
+     * @param monthCount How many months are shown.
+     * @returns The first of each month, in order.
+     */
+    export const getMonthStarts = (month: DateValue, monthCount: number) =>
+        Array.from({ length: monthCount }, (_, index) =>
+            DateValueUtils.addMonths(DateValueUtils.getStartOfMonth(month), index),
+        );
+
+    /**
+     * The days that belong to one month, out of the cells of its page.
+     *
+     * Where several months are shown, these are what each grid offers to the keyboard and to a pick, since the
+     * leading and trailing days are already shown by the months beside it.
+     *
+     * @param cells The month's cells, as {@link CalendarUtils.getCells} answers them at `day` precision.
+     * @param month Any day of the month.
+     */
+    export const getOwnDays = (cells: DateValue[], month: DateValue) =>
+        cells.filter((cell) => cell.month === month.month);
+
+    /**
+     * What paging announces about several months shown at once.
+     *
+     * @param first The first of the first month shown.
+     * @param last The first of the last month shown.
+     * @param currentEraId What {@link CalendarUtils.getCurrentEraId} answered.
+     * @param locale The locale to write in.
+     * @returns The span from one month to the other, written the locale's way, with the era written out when the
+     * months are in a past era.
+     */
+    export const formatMonthSpan = (first: DateValue, last: DateValue, currentEraId: string, locale?: string) => {
+        const baseOptions = PAGE_ANNOUNCE_OPTIONS.day;
+
+        return formatSpan(first, last, first.era === currentEraId ? baseOptions : withEra(baseOptions), locale);
+    };
+
+    /**
+     * The word a locale names a week of the year by, for the heading over the week numbers.
+     *
+     * @param locale The locale to write in. The platform's default is used when omitted.
+     * @returns The word, such as "week" in English or "Woche" in German.
+     */
+    export const getWeekFieldName = (locale?: string) =>
+        new Intl.DisplayNames(locale, { type: "dateTimeField" }).of(WEEK_FIELD) ?? WEEK_FIELD;
+
+    /**
+     * Names one week number for assistive technology, since the painter often draws only the number.
+     *
+     * @param fieldName What {@link CalendarUtils.getWeekFieldName} answered.
+     * @param weekNumber The week's number.
+     */
+    export const formatWeekLabel = (fieldName: string, weekNumber: number) => `${fieldName} ${weekNumber}`;
 }

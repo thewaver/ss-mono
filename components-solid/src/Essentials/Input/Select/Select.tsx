@@ -1,5 +1,5 @@
 import type { JSX } from "solid-js";
-import { Show, createEffect, createMemo, createSignal, createUniqueId } from "solid-js";
+import { Show, batch, createEffect, createMemo, createSignal, createUniqueId, onCleanup } from "solid-js";
 
 import {
     ListboxUtils,
@@ -31,14 +31,42 @@ const SelectField = (props: SelectFieldProps) => {
     const getAriaDescribedBy = FormFieldSolidUtils.resolveAriaDescribedBy();
 
     const [getElementRef, setElementRef] = createSignal<HTMLInputElement>();
+    const [getContentRef, setContentRef] = createSignal<HTMLElement>();
+    const [getPaintedText, setPaintedText] = createSignal(SelectConst.EMPTY_QUERY);
 
     const getIsDisabled = () => access(props.flags).isDisabled ?? false;
 
+    const getIsEditing = () => access(props.isEditing);
+
+    createEffect(() => {
+        const element = getContentRef();
+        const isFilterable = access(props.isFilterable);
+
+        if (!element || !isFilterable) return;
+
+        const read = () => setPaintedText(SelectUtils.computePaintedText(element));
+        const observer = new MutationObserver(read);
+
+        read();
+        observer.observe(element, { childList: true, subtree: true, characterData: true });
+
+        onCleanup(() => observer.disconnect());
+    });
+
+    const getValueText = () =>
+        access(props.flags).isEmpty ? SelectConst.EMPTY_QUERY : (access(props.valueText) ?? getPaintedText());
+
     const { handleInput, handleCompositionStart, handleCompositionEnd } = TextSyncSolidUtils.createValueSync(
         getElementRef,
-        () => access(props.query),
+        () => (getIsEditing() ? access(props.query) : getValueText()),
         { onInput: props.onQueryInput },
     );
+
+    const selectValueText = (element: HTMLInputElement) => {
+        if (getIsEditing()) return;
+
+        element.select();
+    };
 
     const getComboboxAttributes = createMemo(() =>
         ListboxUtils.computeComboboxAttributes({
@@ -89,7 +117,9 @@ const SelectField = (props: SelectFieldProps) => {
                 </button>
             }
         >
-            {props.renderContent(() => access(props.flags))}
+            <span ref={setContentRef} class={styles.selectFieldContent}>
+                {props.renderContent(() => access(props.flags))}
+            </span>
 
             <input
                 id={access(props.id)}
@@ -99,14 +129,17 @@ const SelectField = (props: SelectFieldProps) => {
                 }}
                 type="text"
                 class={styles.selectFilterField}
+                classList={{ [styles.selectFilterFieldShowsValue]: !getIsEditing() }}
                 style={{ ...access(props.textInset), ...props.computeTextStyle?.(() => access(props.flags)) }}
                 autocomplete="off"
                 readOnly={getIsDisabled()}
                 {...commonProps}
                 {...getComboboxAttributes()}
-                onClick={() => {
+                onFocus={(e) => selectValueText(e.currentTarget)}
+                onClick={(e) => {
                     if (getIsDisabled()) return;
 
+                    selectValueText(e.currentTarget);
                     props.onToggle();
                 }}
                 onInput={(e) => handleInput(e.currentTarget)}
@@ -130,6 +163,7 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
     const [getFieldRef, setFieldRef] = createSignal<HTMLElement>();
     const [getIsOpen, setIsOpen] = SignalMirrorSolidUtils.createOptional(() => props.visibility, false);
     const [getHasPopoverSettled, setHasPopoverSettled] = createSignal(true);
+    const [getIsEditing, setIsEditing] = createSignal(false);
 
     const getIsDisabled = createMemo(() => access(props.isDisabled) ?? false);
 
@@ -160,6 +194,20 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
 
     const close = () => {
         setIsOpen(false);
+    };
+
+    createEffect(() => {
+        if (getIsOpen()) return;
+
+        setIsEditing(false);
+    });
+
+    const getValueText = () => {
+        if (getIsMultiple()) return SelectConst.EMPTY_QUERY;
+
+        const picked = access(props.selectedOptions)[0];
+
+        return picked === undefined ? undefined : props.computeCustomText?.(picked);
     };
 
     const cursor = ListboxSolidUtils.createCursor<T>({
@@ -206,7 +254,8 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
             computeEstimatedGroupHeight={props.computeEstimatedGroupHeight}
             computeIsSelected={props.computeIsSelected}
             renderOption={props.renderOption}
-            renderGroup={props.renderGroup}
+            renderGroupHeader={props.renderGroupHeader}
+            renderGroupBox={props.renderGroupBox}
             floaterTransitionDurationMs={() =>
                 access(props.floaterTransitionDurationMs) ?? SELECT_DEFAULTS.floaterTransitionDurationMs
             }
@@ -239,6 +288,8 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
                         activeOptionId={cursor.getActiveOptionId}
                         isFilterable={getIsFilterable}
                         query={getQuery}
+                        isEditing={getIsEditing}
+                        valueText={getValueText}
                         textInset={getTextInset}
                         flags={getFlags}
                         computeTextStyle={props.computeTextStyle}
@@ -247,12 +298,15 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
                         }
                         onToggle={() => (getIsOpen() && !getIsFilterable() ? close() : open())}
                         onKeyDown={cursor.handleKeyDown}
-                        onQueryInput={(query) => {
-                            open();
-                            cursor.highlight(undefined);
+                        onQueryInput={(query) =>
+                            batch(() => {
+                                setIsEditing(true);
+                                open();
+                                cursor.highlight(undefined);
 
-                            props.query?.[1](query);
-                        }}
+                                props.query?.[1](query);
+                            })
+                        }
                     />
 
                     <Show when={props.renderClear && access(props.selectedOptions).length > 0}>

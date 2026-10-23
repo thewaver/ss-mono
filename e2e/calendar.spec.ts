@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { demo, prop, readout, tabIndex } from "./helpers";
+import { attributesOf, demo, prop, readout, tabIndex } from "./helpers";
 
 const DEFAULT = demo("default");
 const BOUNDED = demo("bounded");
@@ -438,4 +438,49 @@ test.describe("a year picker", () => {
             /2029\D+2040/,
         );
     });
+});
+
+/**
+ * Week numbers are a column of row headings rather than an eighth day, so a screen reader moving along a row hears
+ * which week it is in. What the number is depends on two things the consumer sets — which day starts a week and how
+ * many days of the new year the first week must hold — and the second decides which week of a year is week one.
+ * January 2027 is where the two common rules part: it begins on a Friday, so the row holding the first has three days
+ * of the new year, which is week one under the United States' count and the last week of 2026 under ISO's.
+ */
+const WEEK_NUMBERS = demo("weekNumbers");
+
+const weekNumbersOf = async (page: import("@playwright/test").Page) =>
+    (await attributesOf(page, `${WEEK_NUMBERS} [role="rowheader"]`, "aria-label")).map((label) =>
+        Number(label?.match(/\d+/)?.[0]),
+    );
+
+test("every week carries a row heading with its number, and the weeks of a month count up by one", async ({ page }) => {
+    await expect(
+        page.locator(`${WEEK_NUMBERS} [role="columnheader"]`).first(),
+        "the column has a named heading",
+    ).toHaveAttribute("aria-label", /.+/);
+
+    const numbers = await weekNumbersOf(page);
+
+    expect(numbers.length, "one heading per row of days").toBe(
+        await page.locator(`${WEEK_NUMBERS} [role="row"]:has([role="gridcell"])`).count(),
+    );
+    expect(
+        numbers.slice(1).map((number, index) => number - numbers[index]),
+        "and within one year each row is the week after the one above it",
+    ).toEqual(numbers.slice(1).map(() => 1));
+});
+
+test("how many days the first week must hold decides which week is week one", async ({ page }) => {
+    for (let month = 0; month < 5; month++) await page.locator("#weekNumbersNextMonth").click();
+
+    await chooseProp(page, "minDaysInFirstWeek", "4 days");
+    await expect.poll(async () => (await weekNumbersOf(page))[0], { message: "ISO's count" }).not.toBe(1);
+
+    await chooseProp(page, "minDaysInFirstWeek", "1 day");
+    await expect
+        .poll(async () => (await weekNumbersOf(page))[0], {
+            message: "with one day enough, the row holding 1 January is week one",
+        })
+        .toBe(1);
 });

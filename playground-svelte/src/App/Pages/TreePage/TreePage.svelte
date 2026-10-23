@@ -152,6 +152,14 @@
             path: `${EXAMPLES_ROOT}/Virtualized.svelte`,
         },
         {
+            key: "recordValues",
+            name: EXAMPLE_NAMES.recordValues,
+            readout: () =>
+                `value: ${recordValue?.name ?? "undefined"} | expanded: ${recordExpanded.length} branch(es) — the value is the record itself, not a name`,
+            component: recordValuesExample,
+            path: `${EXAMPLES_ROOT}/RecordValues.svelte`,
+        },
+        {
             key: "leaning",
             name: EXAMPLE_NAMES.leaning,
             readout: () =>
@@ -167,14 +175,6 @@
                 `value: ${radialValue ?? "undefined"} — the layout is told which node each node hangs from, so children share the slice their parent was given, and every rank sits a ring further out whoever it hangs from`,
             component: radialExample,
             path: `${EXAMPLES_ROOT}/Radial.svelte`,
-        },
-        {
-            key: "recordValues",
-            name: EXAMPLE_NAMES.recordValues,
-            readout: () =>
-                `value: ${recordValue?.name ?? "undefined"} | expanded: ${recordExpanded.length} branch(es) — the value is the record itself, not a name`,
-            component: recordValuesExample,
-            path: `${EXAMPLES_ROOT}/RecordValues.svelte`,
         },
     ];
 </script>

@@ -5,6 +5,7 @@ import { Select } from "@thewaver/ss-components-vue";
 
 import PageGlideFloater from "../../../StyledComponents/GlideFloater/PageGlideFloater.vue";
 import PageSelectContent from "../../../StyledComponents/SelectContent/SelectContent.vue";
+import PageSelectGroupBox from "../../../StyledComponents/SelectGroupContent/PageSelectGroupBox.vue";
 import PageSelectGroupContent from "../../../StyledComponents/SelectGroupContent/SelectGroupContent.vue";
 import PageSelectOptionContent from "../../../StyledComponents/SelectOptionContent/SelectOptionContent.vue";
 import type { SelectExampleProps } from "../SelectPage.types";
@@ -15,6 +16,7 @@ type Props = SelectExampleProps & {
     isDisabled?: boolean;
     hasError?: boolean;
     hasGroups?: boolean;
+    hasGroupBoxes?: boolean;
 };
 
 const props = defineProps<Props>();
@@ -34,8 +36,12 @@ const value = useModel(props, "value");
             <PageSelectContent :flags="flags">{{ selectedOption?.value ?? PLACEHOLDER }}</PageSelectContent>
         </template>
 
-        <template v-if="hasGroups" #renderGroup="{ group }">
+        <template v-if="hasGroups" #renderGroupHeader="{ group }">
             <PageSelectGroupContent>{{ group.label }}</PageSelectGroupContent>
+        </template>
+
+        <template v-if="hasGroupBoxes" #renderGroupBox="{ renderContent }">
+            <PageSelectGroupBox><component :is="renderContent" /></PageSelectGroupBox>
         </template>
 
         <template #renderOption="{ option, flags }">

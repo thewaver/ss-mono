@@ -501,6 +501,7 @@ export function AppContent(props: RouteSectionProps & { viewportAnchor: SignalPa
                                                 width={SEARCH_FIELD_WIDTH}
                                                 placeholder={"Search"}
                                                 ariaLabel={"Search components"}
+                                                clearAriaLabel={"Clear search"}
                                                 onInput={setSearchTerm}
                                             />
                                         </div>

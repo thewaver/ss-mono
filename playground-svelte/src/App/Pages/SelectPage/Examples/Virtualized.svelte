@@ -29,7 +29,7 @@
         computeCustomText={(option) => option.value.name}
         renderPopup={renderSelectPopup}
     >
-        {#snippet renderGroup(group)}
+        {#snippet renderGroupHeader(group)}
             <PageSelectGroupContent>{group.label}</PageSelectGroupContent>
         {/snippet}
 

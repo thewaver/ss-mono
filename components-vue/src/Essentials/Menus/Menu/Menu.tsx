@@ -318,7 +318,9 @@ const MenuLevel = defineComponent(
             },
         );
 
-        const entries = computed(() => MenuUtils.computeEntries(props.items, props.openerItem, props.submenuMode));
+        const entries = computed(() =>
+            MenuUtils.computeEntries(MenuUtils.flattenNodes(props.items), props.openerItem, props.submenuMode),
+        );
 
         const openingHover = MenuUtils.createOpeningHoverGuard();
 

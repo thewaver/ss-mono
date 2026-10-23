@@ -81,3 +81,6 @@ export type BaseSelectCbs = {
 };
 
 export type BaseSelectProps = BaseSelectValues & BaseSelectCbs;
+
+export type SelectGroupBoxExcludesWindowing =
+    { computeEstimatedOptionHeight?: undefined } | { renderGroupBox?: undefined };

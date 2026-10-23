@@ -5,6 +5,7 @@ import { Dynamic } from "solid-js/web";
 import {
     FlattenerUtils,
     InteractionTrackerUtils,
+    SelectionUtils,
     TREE_DEFAULTS,
     TreeUtils,
     TypeaheadUtils,
@@ -23,7 +24,7 @@ import { PlacementBox } from "../../Primitives/PlacementBox/PlacementBox";
 import { PlacementItem } from "../../Primitives/PlacementItem/PlacementItem";
 import { access } from "../../Utils/propUtils";
 import { TooltipSolidUtils } from "../Overlays/Tooltip/TooltipSolid.utils";
-import type { TreeNodeItemProps, TreeProps, TreeRow } from "./TreeSolid.types";
+import type { MultiTreeProps, TreeCompositeProps, TreeNodeItemProps, TreeProps, TreeRow } from "./TreeSolid.types";
 
 const TreeNodeItem = (props: TreeNodeItemProps) => {
     const getIsDisabled = () => access(props.flags).isDisabled ?? false;
@@ -34,7 +35,7 @@ const TreeNodeItem = (props: TreeNodeItemProps) => {
             return;
         }
 
-        props.onActivate();
+        props.onActivate(e);
     };
 
     const commonProps: Omit<JSX.HTMLAttributes<HTMLElement>, "ref"> = {
@@ -47,7 +48,10 @@ const TreeNodeItem = (props: TreeNodeItemProps) => {
             return getIsDisabled() || undefined;
         },
         get "aria-selected"() {
-            return access(props.flags).isSelected;
+            return access(props.isMultiple) ? undefined : access(props.flags).isSelected;
+        },
+        get "aria-checked"() {
+            return access(props.isMultiple) ? access(props.flags).checkedState : undefined;
         },
         get "aria-expanded"() {
             return access(props.flags).isBranch ? access(props.flags).isExpanded : undefined;
@@ -88,8 +92,11 @@ const TreeNodeItem = (props: TreeNodeItemProps) => {
     );
 };
 
-export const Tree = <T,>(props: TreeProps<T>) => {
+const TreeComposite = <T,>(props: TreeCompositeProps<T>) => {
+    TreeUtils.warnIfConnectorIgnored(props.computeLayout !== undefined, props.renderConnector !== undefined);
+
     const valueSignal = SignalMirrorSolidUtils.createOptional<T | undefined>(() => props.value, undefined);
+    const checkedSignal = SignalMirrorSolidUtils.createOptional<T[]>(() => props.checked, []);
     const expandedSignal = SignalMirrorSolidUtils.createOptional<T[]>(() => props.expanded, []);
 
     const treeId = createUniqueId();
@@ -119,8 +126,22 @@ export const Tree = <T,>(props: TreeProps<T>) => {
     const getHasPendingPaint = (row: TreeRow<T>) =>
         TreeUtils.computeIsPending(row) && props.renderPendingChildren !== undefined;
 
+    const getBranchDefs = createMemo(() => TreeUtils.createBranchDefs(access(props.nodes)));
+
+    const getCheckedState = (value: T) =>
+        props.isMultiple
+            ? SelectionUtils.getBranchState(value, checkedSignal[0](), getBranchDefs())
+            : value === valueSignal[0]();
+
+    const getFirstCheckedValue = () =>
+        getNavigableRows().find((row) => getCheckedState(row.node.value) === true)?.node.value;
+
     const getRovingRow = createMemo(() =>
-        TreeUtils.computeRovingRow(getNavigableRows(), getFocusedValue(), valueSignal[0]()),
+        TreeUtils.computeRovingRow(
+            getNavigableRows(),
+            getFocusedValue(),
+            props.isMultiple ? getFirstCheckedValue() : valueSignal[0](),
+        ),
     );
 
     const [getSizerRef, setSizerRef] = createSignal<HTMLElement>();
@@ -211,12 +232,96 @@ export const Tree = <T,>(props: TreeProps<T>) => {
         void props.onSelectionChange?.(value);
     };
 
+    let checkAnchor: T | undefined;
+
+    const writeChecked = (next: T[]) => {
+        checkedSignal[1](() => next);
+
+        props.onCheckedChange?.(next);
+    };
+
+    const check = (row: TreeRow<T>) => {
+        if (row.node.isDisabled) return;
+
+        checkAnchor = row.node.value;
+
+        writeChecked(SelectionUtils.getBranchSelection(row.node.value, checkedSignal[0](), getBranchDefs()));
+    };
+
+    const checkRows = (rows: TreeRow<T>[]) =>
+        writeChecked(
+            SelectionUtils.getMerged(
+                checkedSignal[0](),
+                rows
+                    .filter((row) => !row.node.isDisabled)
+                    .flatMap((row) => SelectionUtils.getBranchItems(row.node.value, getBranchDefs())),
+            ),
+        );
+
+    const checkAll = () => {
+        const all = TreeUtils.getCheckableValues(access(props.nodes));
+        const isAllChecked = all.every((value) => checkedSignal[0]().includes(value));
+
+        writeChecked(isAllChecked ? [] : all);
+    };
+
     const activate = (row: TreeRow<T>) => {
         if (row.node.isDisabled) return;
 
+        const isBranch = TreeUtils.getIsBranch(row.node);
+
+        if (props.isMultiple) {
+            if (isBranch) toggle(row);
+            else check(row);
+
+            return;
+        }
+
         select(row.node.value);
 
-        if (TreeUtils.getIsBranch(row.node)) toggle(row);
+        if (isBranch) toggle(row);
+    };
+
+    const press = (row: TreeRow<T>, expander: HTMLElement | undefined, e: MouseEvent) => {
+        if (row.node.isDisabled) return;
+
+        const isBranch = TreeUtils.getIsBranch(row.node);
+
+        if (expander !== undefined && e.target instanceof Node && expander.contains(e.target)) {
+            if (isBranch) toggle(row);
+
+            return;
+        }
+
+        if (props.isMultiple) check(row);
+        else select(row.node.value);
+
+        if (expander === undefined && isBranch) toggle(row);
+    };
+
+    const handleMultiKeyDown = (e: KeyboardEvent, current: TreeRow<T>, navigable: TreeRow<T>[]) => {
+        const action = TreeUtils.computeMultiKeyAction(
+            e.key,
+            { isShiftHeld: e.shiftKey, isControlHeld: e.ctrlKey || e.metaKey },
+            current,
+            { navigable, anchor: navigable.find((row) => row.node.value === checkAnchor) },
+        );
+
+        if (action === undefined) return false;
+
+        e.preventDefault();
+
+        if (action.kind === "check") check(action.row);
+        if (action.kind === "check_all") checkAll();
+        if (action.kind === "check_range") checkRows(action.rows);
+        if (action.kind === "check_range" && action.focus) focusRow(action.focus);
+
+        if (action.kind === "focus_check") {
+            focusRow(action.row);
+            check(action.row);
+        }
+
+        return true;
     };
 
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -227,6 +332,8 @@ export const Tree = <T,>(props: TreeProps<T>) => {
         const current = findRowById(document.activeElement?.id) ?? getRovingRow();
 
         if (!current) return;
+
+        if (props.isMultiple && handleMultiKeyDown(e, current, navigable)) return;
 
         const action = TreeUtils.computeKeyAction(e.key, current, {
             flatRows: getFlatRows(),
@@ -257,21 +364,29 @@ export const Tree = <T,>(props: TreeProps<T>) => {
 
     const getPlacementAt = (index: number) => getLayout()?.placements[index];
 
+    const getConnectorDefs = (row: TreeRow<T>) =>
+        props.renderConnector === undefined || getLayout() === undefined
+            ? undefined
+            : TreeUtils.computeConnectorDefs(getFlatRows(), row, getLayout());
+
     const [getNodeRefs, setNodeRefs] = createSignal<Map<T, HTMLElement>>(new Map(), { equals: false });
     const [getHoveredValue, setHoveredValue] = createSignal<T>();
     const [getFocusVisibleValue, setFocusVisibleValue] = createSignal<T>();
 
-    const recordNodeRef = (value: T, element: HTMLElement) => {
-        setNodeRefs((refs) => refs.set(value, element));
+    const recordNodeRef = (getValue: () => T, element: HTMLElement) =>
+        createEffect(() => {
+            const value = getValue();
 
-        onCleanup(() =>
-            setNodeRefs((refs) => {
-                if (refs.get(value) === element) refs.delete(value);
+            setNodeRefs((refs) => refs.set(value, element));
 
-                return refs;
-            }),
-        );
-    };
+            onCleanup(() =>
+                setNodeRefs((refs) => {
+                    if (refs.get(value) === element) refs.delete(value);
+
+                    return refs;
+                }),
+            );
+        });
 
     const getFloaterTransitionDurationMs = createMemo(
         () => access(props.floaterTransitionDurationMs) ?? TREE_DEFAULTS.floaterTransitionDurationMs,
@@ -303,7 +418,7 @@ export const Tree = <T,>(props: TreeProps<T>) => {
     };
 
     const selectionFloater = createFloater(
-        () => props.renderSelectionFloater !== undefined,
+        () => props.renderSelectionFloater !== undefined && !props.isMultiple,
         () => valueSignal[0](),
     );
 
@@ -357,8 +472,10 @@ export const Tree = <T,>(props: TreeProps<T>) => {
         </Show>
     );
 
-    const renderRow = (getRow: Accessor<TreeRow<T>>): JSX.Element =>
-        renderPlaced(
+    const renderRow = (getRow: Accessor<TreeRow<T>>): JSX.Element => {
+        let expander: HTMLElement | undefined;
+
+        return renderPlaced(
             getRow,
             <InteractionWrapper
                 sizing={"fill"}
@@ -371,14 +488,15 @@ export const Tree = <T,>(props: TreeProps<T>) => {
                     isBranch: TreeUtils.getIsBranch(getRow().node),
                     isExpanded: getRow().isExpanded,
                     isPending: TreeUtils.computeIsPending(getRow()),
-                    isSelected: getRow().node.value === valueSignal[0](),
+                    isSelected: getCheckedState(getRow().node.value) === true,
+                    checkedState: getCheckedState(getRow().node.value),
                     depth: getRow().depth,
                 })}
                 renderControl={(setElementRef, getRenderProps) => (
                     <TreeNodeItem
                         ref={(element) => {
                             setElementRef(element);
-                            recordNodeRef(getRow().node.value, element);
+                            recordNodeRef(() => getRow().node.value, element);
                         }}
                         id={() => getRowId(getRow())}
                         href={() => getRow().node.href}
@@ -387,17 +505,35 @@ export const Tree = <T,>(props: TreeProps<T>) => {
                         setSize={() => getRow().setSize}
                         flags={getRenderProps}
                         linkComponent={props.linkComponent}
-                        renderContent={() => props.renderNode(() => getRow().node, getRenderProps)}
-                        onActivate={() => activate(getRow())}
+                        isMultiple={props.isMultiple}
+                        renderContent={() =>
+                            props.renderNode(
+                                () => getRow().node,
+                                getRenderProps,
+                                (element) => {
+                                    expander = element;
+                                },
+                            )
+                        }
+                        onActivate={(e) => press(getRow(), expander, e)}
                     />
                 )}
             />,
         );
+    };
 
     const renderRows = (getLevelRows: Accessor<TreeRow<T>[]>): JSX.Element => (
         <Index each={getLevelRows()}>
             {(getRow) => (
                 <>
+                    <Show when={getConnectorDefs(getRow())}>
+                        {(getDefs) => (
+                            <span class={styles.treeConnector} aria-hidden="true">
+                                {props.renderConnector!(getDefs)}
+                            </span>
+                        )}
+                    </Show>
+
                     {renderRow(getRow)}
 
                     <Show when={getRow().rows.length > 0 || getHasPendingPaint(getRow())}>
@@ -469,6 +605,7 @@ export const Tree = <T,>(props: TreeProps<T>) => {
             class={styles.treeRoot}
             role="tree"
             aria-label={access(props.ariaLabel)}
+            aria-multiselectable={props.isMultiple || undefined}
             onKeyDown={(e) => {
                 handleKeyDown(e);
 
@@ -497,3 +634,7 @@ export const Tree = <T,>(props: TreeProps<T>) => {
         </div>
     );
 };
+
+export const Tree = <T,>(props: TreeProps<T>) => <TreeComposite {...props} isMultiple={false} />;
+
+export const MultiTree = <T,>(props: MultiTreeProps<T>) => <TreeComposite {...props} isMultiple={true} />;

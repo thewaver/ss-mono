@@ -3,6 +3,7 @@ import type { AnchorHTMLAttributes, Component, VNodeChild } from "vue";
 import type {
     BaseTreeProps,
     InteractionFlags,
+    TreeConnectorDefs,
     TreeNodeRecord,
     TreeNodeRenderProps,
     TreeRecordRow,
@@ -82,4 +83,10 @@ export type TreeSlots<T> = {
      * selection's marker where both are given. It fades out while neither is on a node.
      */
     renderHighlightFloater?: (props: { visibilityTarget: 0 | 1; transitionDurationMs: number }) => VNodeChild;
+    /**
+     * Draws the line from a node up to its parent, across the whole box the tree is laid out in, under the nodes.
+     * It is handed both nodes' placements, so it can draw the line between them. Refused without `computeLayout`,
+     * since an indented tree has no placements to draw between.
+     */
+    renderConnector?: (defs: TreeConnectorDefs<T>) => VNodeChild;
 };

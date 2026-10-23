@@ -47,6 +47,9 @@
     const hasMoreOptions = $derived(props.hasMoreOptions ?? false);
     const isHorizontal = $derived(cursor.getOrientation() === "horizontal");
     const isVirtualized = $derived(props.computeEstimatedOptionHeight !== undefined && !isHorizontal);
+    const hasGroupBox = $derived(props.renderGroupBox !== undefined);
+
+    $effect(() => SelectUtils.warnIfGroupBoxIgnored(isVirtualized, hasGroupBox));
 
     const getIsAtEnd = ElementObserverSvelteUtils.createViewportIntersectionObserver(
         () => endMarker,
@@ -190,7 +193,27 @@
 </script>
 
 {#snippet groupHeading(group: SelectOptionGroup<T>)}
-    {@render props.renderGroup?.(group, ListboxUtils.computeGroupFlags(group, props.computeIsSelected))}
+    {@render props.renderGroupHeader?.(group, ListboxUtils.computeGroupFlags(group, props.computeIsSelected))}
+{/snippet}
+
+{#snippet groupContent(group: SelectOptionGroup<T>, offset: number)}
+    {@render groupHeading(group)}
+
+    {#each group.options as option, groupIndex (groupIndex)}
+        {@render optionSlot(option, offset + groupIndex)}
+    {/each}
+{/snippet}
+
+{#snippet groupBox(group: SelectOptionGroup<T>, offset: number)}
+    {#snippet boxContent()}
+        {@render groupContent(group, offset)}
+    {/snippet}
+
+    {#if props.renderGroupBox}
+        {@render props.renderGroupBox(boxContent, group, ListboxUtils.computeGroupFlags(group, props.computeIsSelected))}
+    {:else}
+        {@render boxContent()}
+    {/if}
 {/snippet}
 
 {#snippet optionSlot(option: SelectOption<T>, flatIndex: number)}
@@ -287,11 +310,7 @@
         {#each cursor.getOptions() as item, index (index)}
             {#if SelectUtils.getIsGroup(item)}
                 <div role="group" aria-label={item.label}>
-                    {@render groupHeading(item)}
-
-                    {#each item.options as option, groupIndex (groupIndex)}
-                        {@render optionSlot(option, cursor.getItemRows()[index].entryOffset + groupIndex)}
-                    {/each}
+                    {@render groupBox(item, cursor.getItemRows()[index].entryOffset)}
                 </div>
             {:else}
                 {@render optionSlot(item, cursor.getItemRows()[index].entryOffset)}

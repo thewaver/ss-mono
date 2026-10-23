@@ -35,7 +35,7 @@ const visibility = useModel(props, "visibility");
             :compute-estimated-group-height="() => STRESS_GROUP_HEIGHT"
             :compute-custom-text="(option: SelectOption<Delivery>) => option.value.name"
         >
-            <template #renderGroup="{ group }">
+            <template #renderGroupHeader="{ group }">
                 <PageSelectGroupContent>{{ group.label }}</PageSelectGroupContent>
             </template>
 

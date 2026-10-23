@@ -9,6 +9,10 @@ import type {
 /** Nothing typed into the field. */
 const EMPTY_QUERY = "";
 
+/** What the library prints when a windowed list is handed a group box painter. */
+const IGNORED_GROUP_BOX_WARNING =
+    "Select: renderGroupBox is ignored while computeEstimatedOptionHeight windows the list. A windowed list places each row on its own, so a group has no box to paint — drop one of them.";
+
 /** Flattens a select's options and groups into the rows its list draws. */
 export namespace SelectUtils {
     /** Whether an item is a group of options rather than an option. */
@@ -90,4 +94,29 @@ export namespace SelectUtils {
      */
     export const getIsQueryClearDue = (isOpen: boolean, hasPopupSettled: boolean, query: string) =>
         !isOpen && hasPopupSettled && query !== EMPTY_QUERY;
+
+    /**
+     * Warns, in the console, that a list's group box painter is being ignored.
+     *
+     * Call it once per list, when it is set up. It says nothing unless a box painter was given to a list that only draws
+     * the rows on screen, where each row is placed on its own and a group has no box around it.
+     *
+     * @param isWindowed Whether the list was given `computeEstimatedOptionHeight` and lays out vertically.
+     * @param hasGroupBox Whether it was given `renderGroupBox`.
+     */
+    export const warnIfGroupBoxIgnored = (isWindowed: boolean, hasGroupBox: boolean) => {
+        if (isWindowed && hasGroupBox) console.warn(IGNORED_GROUP_BOX_WARNING);
+    };
+
+    /**
+     * The text a consumer painted for what is picked, as a typed-into field holds it.
+     *
+     * Every piece of text inside the painted content is taken, hidden or not, since the paint is usually hidden from
+     * screen readers precisely because the field is meant to carry the value. Runs of whitespace collapse to one space,
+     * so text split across elements reads as written.
+     *
+     * @param element The element holding the consumer's paint for the field.
+     * @returns The text, trimmed. Empty when nothing was painted.
+     */
+    export const computePaintedText = (element: Element) => (element.textContent ?? "").replace(/\s+/g, " ").trim();
 }

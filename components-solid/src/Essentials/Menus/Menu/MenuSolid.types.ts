@@ -8,6 +8,8 @@ import type {
     BaseMenuValues,
     InteractionFlags,
     MenuFlags,
+    MenuGroupPaintExcludesLayout,
+    MenuGroupRecord,
     MenuHighlightPosition,
     MenuItemFlags,
     MenuItemKind,
@@ -32,7 +34,7 @@ export type MenuItem<T> = {
     value: T;
     ariaLabel?: string;
     kind?: MenuItemKind;
-    items?: MenuItem<T>[];
+    items?: MenuNode<T>[];
     isDisabled?: boolean;
     /**
      * Keeps this item in the arrow-key walk while it is disabled, so the highlight can land on it and a reader hears
@@ -96,6 +98,14 @@ export type MenuRenderItem<T> = (
     getPlacement: () => PlacementRect | undefined,
 ) => JSX.Element;
 
+export type MenuGroup<T> = MenuGroupRecord<MenuItem<T>>;
+
+export type MenuNode<T> = MenuItem<T> | MenuGroup<T>;
+
+export type MenuRenderGroupHeader<T> = (getGroup: Accessor<MenuGroup<T>>) => JSX.Element;
+
+export type MenuRenderGroupBox<T> = (renderContent: () => JSX.Element, getGroup: Accessor<MenuGroup<T>>) => JSX.Element;
+
 export type MenuRenderPopup = (
     renderItems: () => JSX.Element,
     getVisibilityTarget: () => 0 | 1,
@@ -155,8 +165,8 @@ export type MenuLevelProps<T> = AccessorProps<{
 }> & {
     /** The item that opened this level, where one did. */
     openerItem?: MaybeAccessor<MenuItem<T> | undefined>;
-    /** The items on this level, in the order they are shown. */
-    items: MaybeAccessor<MenuItem<T>[]>;
+    /** The items on this level, in the order they are shown, with any groups among them. */
+    items: MaybeAccessor<MenuNode<T>[]>;
     /** Which values are currently checked, for the checkbox and radio items among them. */
     checkedValues: MaybeAccessor<T[]>;
     /** Arranges this level's items, for a menu that is something other than a vertical list. */
@@ -167,6 +177,10 @@ export type MenuLevelProps<T> = AccessorProps<{
     computeCustomText?: (item: MenuItem<T>) => string;
     /** Draws one item. */
     renderItem: MenuRenderItem<T>;
+    /** Draws one group's heading, on this level and every submenu. */
+    renderGroupHeader?: MenuRenderGroupHeader<T>;
+    /** Draws the box a group sits in, around its heading and its items, on this level and every submenu. */
+    renderGroupBox?: MenuRenderGroupBox<T>;
     /**
      * Runs when an item on this level is picked, and is told the radio group's values so a consumer can keep them in
      * step.
@@ -233,15 +247,30 @@ export type MenuProps<T> = Omit<InteractionWrapperProps<MenuFlags>, "renderContr
         /** The element the menu is positioned against, where that is not the trigger itself. */
         anchorRef?: HTMLElement;
     }> & {
-        /** The items, in the order they are shown. Items carrying children are what make submenus. */
-        items: MaybeAccessor<MenuItem<T>[]>;
+        /**
+         * The items, in the order they are shown. Items carrying children are what make submenus, and an entry carrying
+         * a `label` and `items` but no value is a group of them.
+         */
+        items: MaybeAccessor<MenuNode<T>[]>;
         /** Which values are currently checked, for the checkbox and radio items among them. */
         checked?: SignalSource<T[]>;
         /** The text an item is found by when the reader types, where that is not its visible text. */
         computeCustomText?: (item: MenuItem<T>) => string;
         /** Draws one item. */
         renderItem: MenuRenderItem<T>;
-    };
+        /**
+         * Draws a group's heading, above its items. A group is an entry in `items` carrying a `label` and its own
+         * `items` and no value; the heading is never reached by the arrow keys. Refused alongside `computeLayout`,
+         * since a laid-out menu places each item on its own and has no heading row.
+         */
+        renderGroupHeader?: MenuRenderGroupHeader<T>;
+        /**
+         * Draws the box a group sits in, around its heading and its items, which are handed in to be placed inside
+         * it — a background, a border, a line under the group, an indent. Refused alongside `computeLayout`, for the
+         * same reason.
+         */
+        renderGroupBox?: MenuRenderGroupBox<T>;
+    } & MenuGroupPaintExcludesLayout;
 
 export type ContextMenuProps<T> = AccessorValues<BaseContextMenuValues> &
     BaseContextMenuCbs<T> &
@@ -269,12 +298,24 @@ export type ContextMenuProps<T> = AccessorValues<BaseContextMenuValues> &
          * Everything drawn inside it is the consumer's.
          */
         renderRegion: () => JSX.Element;
-        /** The items, in the order they are shown. */
-        items: MaybeAccessor<MenuItem<T>[]>;
+        /** The items, in the order they are shown, and an entry carrying a `label` and `items` but no value is a group. */
+        items: MaybeAccessor<MenuNode<T>[]>;
         /** Which values are currently checked, for the checkbox and radio items among them. */
         checked?: SignalSource<T[]>;
         /** The text an item is found by when the reader types, where that is not its visible text. */
         computeCustomText?: (item: MenuItem<T>) => string;
         /** Draws one item. */
         renderItem: MenuRenderItem<T>;
-    };
+        /**
+         * Draws a group's heading, above its items. A group is an entry in `items` carrying a `label` and its own
+         * `items` and no value; the heading is never reached by the arrow keys. Refused alongside `computeLayout`,
+         * since a laid-out menu places each item on its own and has no heading row.
+         */
+        renderGroupHeader?: MenuRenderGroupHeader<T>;
+        /**
+         * Draws the box a group sits in, around its heading and its items, which are handed in to be placed inside
+         * it — a background, a border, a line under the group, an indent. Refused alongside `computeLayout`, for the
+         * same reason.
+         */
+        renderGroupBox?: MenuRenderGroupBox<T>;
+    } & MenuGroupPaintExcludesLayout;

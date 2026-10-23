@@ -9,6 +9,12 @@ import * as styles from "@thewaver/ss-playground/App/StyledComponents/SelectGrou
 import { useLayerClass } from "../Layer/Layer.context";
 import type { SelectGroupContentProps } from "./SelectGroupContentReact.types";
 
+export const PageSelectGroupBox = (props: PropsWithChildren) => {
+    const layerClass = useLayerClass();
+
+    return <div className={[styles.selectGroupBox, layerClass].join(" ")}>{props.children}</div>;
+};
+
 export const PageSelectGroupContent = (props: PropsWithChildren<SelectGroupContentProps>) => {
     const layerClass = useLayerClass();
 

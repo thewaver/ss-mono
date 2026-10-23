@@ -20,7 +20,7 @@ const values = useModel(props, "values");
 <template>
     <PageListboxSurface>
         <MultiListbox v-model:values="values" :options="GROUPED_COUNTRIES" ariaLabel="Countries to ship to">
-            <template #renderGroup="{ group, flags }">
+            <template #renderGroupHeader="{ group, flags }">
                 <PageSelectGroupContent :flags="flags">{{ group.label }}</PageSelectGroupContent>
             </template>
 

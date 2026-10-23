@@ -105,6 +105,10 @@ export const ListboxOptions = <T,>(props: ListboxOptionsProps<T>) => {
     const hasMoreOptions = props.hasMoreOptions ?? false;
     const isHorizontal = cursor.orientation === "horizontal";
     const isVirtualized = props.computeEstimatedOptionHeight !== undefined && !isHorizontal;
+    const hasGroupBox = props.renderGroupBox !== undefined;
+
+    useEffect(() => SelectUtils.warnIfGroupBoxIgnored(isVirtualized, hasGroupBox), [isVirtualized, hasGroupBox]);
+
     const rows = cursor.rows;
 
     const isAtEnd = ElementObserverReactUtils.useViewportIntersection(endMarkerRef, !isLive);
@@ -228,7 +232,16 @@ export const ListboxOptions = <T,>(props: ListboxOptionsProps<T>) => {
     optionIndicesRef.current = new Map();
 
     const renderGroupHeading = (group: SelectOptionGroup<T>) =>
-        props.renderGroup?.(group, ListboxUtils.computeGroupFlags(group, props.computeIsSelected));
+        props.renderGroupHeader?.(group, ListboxUtils.computeGroupFlags(group, props.computeIsSelected));
+
+    const renderGroupBox = (group: SelectOptionGroup<T>, renderContent: () => ReactNode) =>
+        props.renderGroupBox === undefined
+            ? renderContent()
+            : props.renderGroupBox(
+                  renderContent,
+                  group,
+                  ListboxUtils.computeGroupFlags(group, props.computeIsSelected),
+              );
 
     const renderOptionSlot = (option: SelectOption<T>, flatIndex: number, key: string | number) => {
         optionIndicesRef.current.set(cursor.getOptionId(flatIndex), flatIndex);
@@ -291,11 +304,15 @@ export const ListboxOptions = <T,>(props: ListboxOptionsProps<T>) => {
 
                 return (
                     <div key={index} role="group" aria-label={item.label}>
-                        {renderGroupHeading(item)}
+                        {renderGroupBox(item, () => (
+                            <>
+                                {renderGroupHeading(item)}
 
-                        {item.options.map((option, groupIndex) =>
-                            renderOptionSlot(option, offset + groupIndex, groupIndex),
-                        )}
+                                {item.options.map((option, groupIndex) =>
+                                    renderOptionSlot(option, offset + groupIndex, groupIndex),
+                                )}
+                            </>
+                        ))}
                     </div>
                 );
             })}
@@ -409,7 +426,8 @@ export const ListboxComposite = <T,>(props: ListboxCompositeProps<T>) => {
                 computeEstimatedGroupHeight={props.computeEstimatedGroupHeight}
                 computeIsSelected={props.computeIsSelected}
                 renderOption={props.renderOption}
-                renderGroup={props.renderGroup}
+                renderGroupHeader={props.renderGroupHeader}
+                renderGroupBox={props.renderGroupBox}
                 floaterTransitionDurationMs={props.floaterTransitionDurationMs}
                 renderSelectionFloater={props.renderSelectionFloater}
                 renderHighlightFloater={props.renderHighlightFloater}

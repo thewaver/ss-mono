@@ -1,7 +1,12 @@
 <script setup lang="ts">
 import { type Ref, computed, shallowRef } from "vue";
 
-import type { DateValue, DateValueCalendarId, DateValueWeekStart } from "@thewaver/ss-components-vue";
+import type {
+    DateValue,
+    DateValueCalendarId,
+    DateValueMinDaysInFirstWeek,
+    DateValueWeekStart,
+} from "@thewaver/ss-components-vue";
 import { CALENDAR_DEFAULTS, DateValueUtils } from "@thewaver/ss-components-vue";
 import { CalendarKnobs } from "@thewaver/ss-playground/App/Knobs/Calendars.const";
 import {
@@ -27,10 +32,13 @@ import BoundedExample from "./Examples/Bounded.vue";
 import DefaultExample from "./Examples/Default.vue";
 import MonthPickerExample from "./Examples/MonthPicker.vue";
 import RightToLeftExample from "./Examples/RightToLeft.vue";
+import WeekNumbersExample from "./Examples/WeekNumbers.vue";
 import WeekdaysExample from "./Examples/Weekdays.vue";
 import YearPickerExample from "./Examples/YearPicker.vue";
 
 const computeWeekStartLabel = (day: DateValueWeekStart) => WEEK_START_LABELS[day];
+
+const computeMinDaysLabel = (days: DateValueMinDaysInFirstWeek) => `${days} ${days === 1 ? "day" : "days"}`;
 
 const describe = (value: DateValue | undefined) => (value ? DateValueUtils.toIso(value) : "none");
 
@@ -47,16 +55,19 @@ const useMonthState = (calendarId: Ref<DateValueCalendarId>) => {
 
 const calendarId = shallowRef<DateValueCalendarId>(CalendarKnobs.STARTING_CALENDAR);
 const weekStartsOn = shallowRef<DateValueWeekStart>(CALENDAR_DEFAULTS.weekStartsOn);
+const minDaysInFirstWeek = shallowRef<DateValueMinDaysInFirstWeek>(CALENDAR_DEFAULTS.minDaysInFirstWeek);
 
 const defaultValue = shallowRef<DateValue | undefined>(TODAY);
 const rangedValue = shallowRef<DateValue | undefined>();
 const weekdaysValue = shallowRef<DateValue | undefined>();
 const rightToLeftValue = shallowRef<DateValue | undefined>(TODAY);
+const weekNumbersValue = shallowRef<DateValue | undefined>(TODAY);
 
 const defaultMonth = useMonthState(calendarId);
 const rangedMonth = useMonthState(calendarId);
 const weekdaysMonth = useMonthState(calendarId);
 const rightToLeftMonth = useMonthState(calendarId);
+const weekNumbersMonth = useMonthState(calendarId);
 
 const monthPickerValue = shallowRef<DateValue | undefined>();
 const yearPickerValue = shallowRef<DateValue | undefined>();
@@ -82,6 +93,13 @@ const examples: ExampleDefs[] = [
         readout: () =>
             `week starts on ${WEEK_START_LABELS[weekStartsOn.value]} — value: ${describe(weekdaysValue.value)}`,
         path: `${EXAMPLES_ROOT}/Weekdays.vue`,
+    },
+    {
+        key: "weekNumbers",
+        name: EXAMPLE_NAMES.weekNumbers,
+        readout: () =>
+            `week starts on ${WEEK_START_LABELS[weekStartsOn.value]}, week one holds at least ${minDaysInFirstWeek.value} days of the new year — value: ${describe(weekNumbersValue.value)}`,
+        path: `${EXAMPLES_ROOT}/WeekNumbers.vue`,
     },
     {
         key: "rightToLeft",
@@ -138,6 +156,21 @@ const examples: ExampleDefs[] = [
                 @change="(day: DateValueWeekStart) => (weekStartsOn = day)"
             />
         </PageProp>
+
+        <PageProp
+            item-key="minDaysInFirstWeek"
+            controls="Sets CalendarProps.minDaysInFirstWeek"
+            label="First week holds"
+            hint="How many days of the new year the first week must hold, which decides the week numbers. 4 is ISO 8601, used across most of Europe; 1 is the United States' count."
+        >
+            <PageSelectField
+                :value="minDaysInFirstWeek"
+                :values="CalendarKnobs.MIN_DAYS_IN_FIRST_WEEK"
+                ariaLabel="First week holds"
+                :compute-label="computeMinDaysLabel"
+                @change="(days: DateValueMinDaysInFirstWeek) => (minDaysInFirstWeek = days)"
+            />
+        </PageProp>
     </PagePropsPanel>
 
     <PageExamples :items="examples" :min-column-width="400">
@@ -154,6 +187,15 @@ const examples: ExampleDefs[] = [
                 v-model:value="weekdaysValue"
                 v-model:month="weekdaysMonth"
                 :week-starts-on="weekStartsOn"
+            />
+        </template>
+
+        <template #weekNumbers>
+            <WeekNumbersExample
+                v-model:value="weekNumbersValue"
+                v-model:month="weekNumbersMonth"
+                :week-starts-on="weekStartsOn"
+                :min-days-in-first-week="minDaysInFirstWeek"
             />
         </template>
 

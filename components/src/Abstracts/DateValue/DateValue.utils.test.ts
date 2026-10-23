@@ -406,3 +406,22 @@ describe("orderRange, isSameRange and getIsWithin", () => {
         expect(DateValueUtils.isSameRange(undefined, undefined)).toBe(true);
     });
 });
+
+describe("getWeekNumber", () => {
+    const week = (iso: string, weekStartsOn: 0 | 1, minDays: 1 | 4) =>
+        DateValueUtils.getWeekNumber(DateValueUtils.fromIso(iso)!, weekStartsOn, minDays);
+
+    it("counts ISO weeks, where week one holds the year's first Thursday", () => {
+        expect(week("2026-01-01", 1, 4)).toBe(1);
+        expect(week("2025-12-29", 1, 4)).toBe(1);
+        expect(week("2026-12-31", 1, 4)).toBe(53);
+        expect(week("2027-01-01", 1, 4)).toBe(53);
+        expect(week("2027-01-04", 1, 4)).toBe(1);
+    });
+
+    it("counts United States weeks, where week one holds the first of January", () => {
+        expect(week("2027-01-01", 0, 1)).toBe(1);
+        expect(week("2026-12-27", 0, 1)).toBe(1);
+        expect(week("2026-12-26", 0, 1)).toBe(52);
+    });
+});

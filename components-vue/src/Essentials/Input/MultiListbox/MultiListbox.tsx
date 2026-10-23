@@ -35,7 +35,8 @@ export const MultiListbox = defineComponent(
                 {
                     {
                         renderOption: slots.renderOption,
-                        renderGroup: slots.renderGroup,
+                        renderGroupHeader: slots.renderGroupHeader,
+                        renderGroupBox: slots.renderGroupBox,
                         renderSelectionFloater: slots.renderSelectionFloater,
                         renderHighlightFloater: slots.renderHighlightFloater,
                     } satisfies Partial<ListboxCompositeSlots<T>>

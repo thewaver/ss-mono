@@ -2,11 +2,38 @@ import type { NavigatorDirection } from "../../Abstracts/Navigator/Navigator.typ
 import { NavigatorUtils } from "../../Abstracts/Navigator/Navigator.utils";
 import type { Tab, TabsKeyStep, TabsOrientation } from "./Tabs.types";
 
+/** What the library prints when tabs that switch in place are not wired to their panels. */
+const UNPAIRED_WARNING =
+    "a tab switching in place needs an id and a panelId, and a TabPanel carrying the other end of the pair, or a screen reader is never told which panel a tab opens.";
+
 /**
  * The part of a tab strip that is not about drawing it: which tab is selected, which one holds the tab stop, where
  * an arrow key goes, and where the selected marker sits.
  */
 export namespace TabsUtils {
+    /**
+     * Warns, in the console, that tabs are not wired to their panels.
+     *
+     * Call it once per tab strip, when it is set up. A tab that switches in place must name the panel it opens
+     * (`panelId`) and be named back by it (`id`); without both, assistive technology cannot tell which panel a tab
+     * controls. A tab with an `href` is left out, since it navigates to a page of its own rather than opening a panel
+     * beside the strip. Nothing is blocked or filled in, and the warning is printed once however many tabs are
+     * missing the pairing.
+     *
+     * @param tabs The tabs, in the order they are shown.
+     */
+    export const warnIfUnpaired = <T>(tabs: Tab<T>[]) => {
+        const unpaired = tabs.flatMap((tab, index) =>
+            tab.href === undefined && (tab.id === undefined || tab.panelId === undefined) ? [index] : [],
+        );
+
+        if (unpaired.length < 1) return;
+
+        console.warn(
+            `Tabs: the tabs at position ${unpaired.join(", ")} are not wired to a panel — ${UNPAIRED_WARNING}`,
+        );
+    };
+
     /**
      * Where the selected tab sits in the list.
      *

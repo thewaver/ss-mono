@@ -9,6 +9,7 @@
     import * as styles from "@thewaver/ss-playground/App/Pages/TreePage/TreePage.css";
     import { AngleUtils } from "@thewaver/ss-utils";
 
+    import PageTreeConnector from "../../../StyledComponents/TreeNodeContent/PageTreeConnector.svelte";
     import PageTreeRadialNode from "../../../StyledComponents/TreeNodeContent/PageTreeRadialNode.svelte";
     import { RANKS } from "../TreePage.const.svelte";
     import type { TreeExampleProps } from "../TreePage.types";
@@ -112,6 +113,10 @@
 
     <div style:width={stageWidth}>
         <Tree nodes={RANKS} bind:value bind:expanded ariaLabel={"Ranks"} computeLayout={RADIAL_LAYOUT}>
+            {#snippet renderConnector(defs)}
+                <PageTreeConnector {defs} />
+            {/snippet}
+
             {#snippet renderNode(node, renderProps)}
                 <PageTreeRadialNode {renderProps}>{node.value}</PageTreeRadialNode>
             {/snippet}

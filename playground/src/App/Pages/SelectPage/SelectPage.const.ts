@@ -5,6 +5,7 @@ export const EXAMPLE_NAMES = {
     recordValues: "Record values",
     titleDescription: "Title and description",
     optionGroups: "Option groups",
+    groupBoxes: "Group boxes",
     disabledOptions: "Disabled options",
     disabledOptionsReachable: "Disabled options + reachable",
     scrollingList: "Scrolling list",

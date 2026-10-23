@@ -1,5 +1,6 @@
 import { MathUtils } from "@thewaver/ss-utils";
 
+import { SCROLLER_DEFAULTS } from "./Scroller.const";
 import type { ScrollerButtonPlacement, ScrollerMetrics, ScrollerStep } from "./Scroller.types";
 
 /** How close to an end, in pixels, counts as being at it, so a fractional scroll position still reads as arrived. */
@@ -141,30 +142,66 @@ export namespace ScrollerUtils {
     };
 
     /**
+     * Where one step lands, from where the items start.
+     *
+     * A step goes about one view in its direction and lands on an item boundary: forward, on the furthest item start
+     * still within the next view; back, on the nearest item start within the previous one. Where there is no boundary
+     * inside the page — a track holding one item — it goes a full view.
+     *
+     * Each item of overlap pulls the landing one boundary back towards where the step began, so that item of the
+     * view just left is still in view afterwards. The landing never comes back past the first boundary the step
+     * crosses, so a step moves by at least one item whatever the overlap.
+     *
+     * @param offsets Where each item starts along the track, in order.
+     * @param visible How much of the track is in view.
+     * @param step Which way.
+     * @param start Where the step is measured from.
+     * @param overlapCount How many items of the view just left stay in view. Negative or fractional counts are held
+     * to a whole number from zero.
+     * @returns The scroll position to go to, which the caller holds within the track's range.
+     */
+    export const computeStepLanding = (
+        offsets: number[],
+        visible: number,
+        step: ScrollerStep,
+        start: number,
+        overlapCount = SCROLLER_DEFAULTS.overlapCount,
+    ) => {
+        const overlap = Number.isFinite(overlapCount) ? Math.max(Math.floor(overlapCount), 0) : 0;
+
+        if (step === "next") {
+            const limit = start + visible;
+            const candidates = offsets.filter((offset) => offset > start + SCROLL_EPSILON && offset <= limit);
+
+            return candidates[Math.max(candidates.length - 1 - overlap, 0)] ?? limit;
+        }
+
+        const limit = start - visible;
+        const candidates = offsets.filter((offset) => offset < start - SCROLL_EPSILON && offset >= limit);
+
+        return candidates[Math.min(overlap, candidates.length - 1)] ?? limit;
+    };
+
+    /**
      * Where one step of a track lands.
      *
-     * A step goes about one view in its direction and lands on an item boundary: forward, on the furthest child
-     * start still within the next view; back, on the nearest child start within the previous one. Where there is no
-     * boundary inside the page — a track holding one child — it goes a full view.
+     * Reads the track's items and view, and hands them to {@link computeStepLanding}.
      *
      * @param track The scrolling track.
      * @param step Which way.
      * @param start Where to measure the step from. Defaults to where the track is scrolled to now.
+     * @param overlapCount How many items of the view just left stay in view.
      * @returns The scroll position to go to.
      */
-    export const computeStepTarget = (track: HTMLElement, step: ScrollerStep, start = track.scrollLeft) => {
-        const { visible } = readMetrics(track);
+    export const computeStepTarget = (
+        track: HTMLElement,
+        step: ScrollerStep,
+        start = track.scrollLeft,
+        overlapCount = SCROLLER_DEFAULTS.overlapCount,
+    ) => {
         const offsets = [...track.children].map((child) => (child as HTMLElement).offsetLeft);
 
-        if (step === "next") {
-            const limit = start + visible;
-
-            return offsets.filter((offset) => offset > start + SCROLL_EPSILON && offset <= limit).pop() ?? limit;
-        }
-
-        const limit = start - visible;
-
-        return offsets.filter((offset) => offset < start - SCROLL_EPSILON && offset >= limit).shift() ?? limit;
+        return computeStepLanding(offsets, readMetrics(track).visible, step, start, overlapCount);
     };
 
     /**
@@ -176,9 +213,14 @@ export namespace ScrollerUtils {
      *
      * @param track The scrolling track, once it exists.
      * @param step Which way.
+     * @param overlapCount How many items of the view just left stay in view.
      * @returns `true` when it scrolled, `false` at the matching end or with no track.
      */
-    export const stepTo = (track: HTMLElement | undefined, step: ScrollerStep) => {
+    export const stepTo = (
+        track: HTMLElement | undefined,
+        step: ScrollerStep,
+        overlapCount = SCROLLER_DEFAULTS.overlapCount,
+    ) => {
         if (!track) return false;
 
         const origin = computeStepOrigin(track);
@@ -186,7 +228,11 @@ export namespace ScrollerUtils {
 
         if (step === "previous" ? getIsAtStart(metrics) : getIsAtEnd(metrics)) return false;
 
-        const target = MathUtils.clamp(computeStepTarget(track, step, origin), 0, computeScrollRange(metrics));
+        const target = MathUtils.clamp(
+            computeStepTarget(track, step, origin, overlapCount),
+            0,
+            computeScrollRange(metrics),
+        );
 
         stepsInFlight.set(track, { from: track.scrollLeft, to: target });
         track.scrollTo({ left: target });

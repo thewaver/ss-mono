@@ -24,6 +24,7 @@
         getMode: () => props.mode,
         getThumbSize: () => props.thumbSize,
         getHoldDurationMs: () => props.holdDurationMs,
+        getCompletionRatio: () => props.completionRatio,
         getTrackWidth: () => track?.clientWidth ?? 0,
         getProgressRatio: () => props.progressRatio,
         setProgressRatio: (ratio) => props.setProgressRatio(ratio),

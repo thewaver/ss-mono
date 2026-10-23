@@ -13,6 +13,7 @@ export const EXAMPLE_NAMES = {
     leaning: "Leaning toward the pointer",
     radial: "A tree drawn outward",
     recordValues: "Record values",
+    checkboxes: "Ticking several",
 };
 
 export const EXAMPLES_ROOT = "/src/App/Pages/TreePage/Examples";

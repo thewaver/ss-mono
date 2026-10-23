@@ -20,7 +20,7 @@
         options={GROUPED_COUNTRIES}
         ariaLabel={"Countries to ship to"}
     >
-        {#snippet renderGroup(group, flags)}
+        {#snippet renderGroupHeader(group, flags)}
             <PageSelectGroupContent {flags}>{group.label}</PageSelectGroupContent>
         {/snippet}
 

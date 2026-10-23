@@ -41,3 +41,9 @@ export const PageSelectGroupContent = (props: ParentProps<SelectGroupContentProp
         </div>
     );
 };
+
+export const PageSelectGroupBox = (props: ParentProps) => {
+    const getLayerClass = useLayerClass();
+
+    return <div class={[styles.selectGroupBox, getLayerClass()].join(" ")}>{props.children}</div>;
+};

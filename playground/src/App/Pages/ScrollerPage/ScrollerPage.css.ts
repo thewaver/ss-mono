@@ -14,6 +14,15 @@ export const demo = style({
     maxWidth: "100%",
 });
 
+export const tabbedDemo = style([
+    demo,
+    {
+        display: "flex",
+        flexDirection: "column",
+        gap: themeVars.spacing.full,
+    },
+]);
+
 export const item = style({
     display: "flex",
     flexShrink: 0,

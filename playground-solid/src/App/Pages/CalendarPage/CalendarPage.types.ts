@@ -1,6 +1,11 @@
 import type { Signal } from "solid-js";
 
-import type { AccessorProps, DateValue, DateValueWeekStart } from "@thewaver/ss-components-solid";
+import type {
+    AccessorProps,
+    DateValue,
+    DateValueMinDaysInFirstWeek,
+    DateValueWeekStart,
+} from "@thewaver/ss-components-solid";
 
 export type CalendarExampleProps = AccessorProps<{
     weekStartsOn: DateValueWeekStart;
@@ -12,3 +17,6 @@ export type CalendarPrecisionExampleProps = {
     value: Signal<DateValue | undefined>;
     month: Signal<DateValue>;
 };
+
+export type CalendarWeekNumbersExampleProps = CalendarExampleProps &
+    AccessorProps<{ minDaysInFirstWeek: DateValueMinDaysInFirstWeek }>;

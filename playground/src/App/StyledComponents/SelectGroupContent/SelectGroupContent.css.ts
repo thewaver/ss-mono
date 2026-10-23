@@ -39,3 +39,10 @@ export const selectGroupMark = style({
         },
     },
 });
+
+export const selectGroupBox = style({
+    margin: themeVars.spacing.half,
+    paddingBottom: themeVars.spacing.half,
+    borderRadius: themeVars.borderRadius.full,
+    backgroundColor: `rgb(from ${layerVars.contrast} r g b / 5%)`,
+});

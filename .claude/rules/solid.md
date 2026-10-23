@@ -22,6 +22,16 @@ callback. A string-valued memo is safe, since an equal string notifies nobody; o
 whenever the row object is rebuilt and destroys whatever held focus. Narrow the read to what the callback needs — a
 `createMemo` yielding the string — so it is called again only when that changes.
 
+### Under `<Index>` an element outlives the item it was drawn for, so anything keyed by the item follows it
+
+`<Index>` keeps the element at each position and swaps the item under it, so when a list is filtered or reordered
+the element that showed one item goes on to show another. A `ref` callback runs once, at creation, so a record
+written there under the item's value (`refs.set(value, element)`) keeps the value of the first item forever: after a
+filter, looking an item up finds the wrong element or none, and `Tree`'s highlight marker slid to the wrong row of
+the Playground's menu. **Write the record in an effect that reads the item through its accessor**, clearing the old
+entry in the effect's cleanup only if it still points at this element. A record keyed by position (`Menu`'s index
+map) or by the element itself (`Listbox`'s element-to-accessor map) is unaffected.
+
 ### Solid delegates events at the document, and that changes what stopping one does
 
 For common events (`click`, `pointerover`, `keydown`) Solid attaches one listener to the document and walks up from

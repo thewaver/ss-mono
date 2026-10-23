@@ -192,6 +192,14 @@ export const TreePage = () => {
             path: `${EXAMPLES_ROOT}/Virtualized.tsx`,
         },
         {
+            key: "recordValues",
+            name: EXAMPLE_NAMES.recordValues,
+            readout: () =>
+                `value: ${recordState[0]?.name ?? "undefined"} | expanded: ${recordExpandedState[0].length} branch(es) — the value is the record itself, not a name`,
+            component: () => <RecordValuesExample value={recordState} expanded={recordExpandedState} />,
+            path: `${EXAMPLES_ROOT}/RecordValues.tsx`,
+        },
+        {
             key: "leaning",
             name: EXAMPLE_NAMES.leaning,
             readout: () =>
@@ -207,14 +215,6 @@ export const TreePage = () => {
                 `value: ${radialState[0] ?? "undefined"} — the layout is told which node each node hangs from, so children share the slice their parent was given, and every rank sits a ring further out whoever it hangs from`,
             component: () => <RadialExample value={radialState} expanded={radialExpandedState} />,
             path: `${EXAMPLES_ROOT}/Radial.tsx`,
-        },
-        {
-            key: "recordValues",
-            name: EXAMPLE_NAMES.recordValues,
-            readout: () =>
-                `value: ${recordState[0]?.name ?? "undefined"} | expanded: ${recordExpandedState[0].length} branch(es) — the value is the record itself, not a name`,
-            component: () => <RecordValuesExample value={recordState} expanded={recordExpandedState} />,
-            path: `${EXAMPLES_ROOT}/RecordValues.tsx`,
         },
     ];
 

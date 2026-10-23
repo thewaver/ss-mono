@@ -183,6 +183,7 @@ const computeNodeText = (node: TreeNode<MenuNodeConfig>) => node.value.name;
                                             :width="SEARCH_FIELD_WIDTH"
                                             placeholder="Search"
                                             ariaLabel="Search components"
+                                            clearAriaLabel="Clear search"
                                             @input="(value: string) => (searchTerm = value)"
                                         />
                                     </div>

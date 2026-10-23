@@ -78,6 +78,8 @@ const TabsItem = <T,>(props: TabsItemProps<T>) => {
 };
 
 export const Tabs = <T,>(props: TabsProps<T>) => {
+    TabsUtils.warnIfUnpaired(access(props.tabs));
+
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
     const [getItemRefs, setItemRefs] = createSignal<(HTMLElement | undefined)[]>([]);
     const [getFocusedValue, setFocusedValue] = createSignal<T | undefined>();

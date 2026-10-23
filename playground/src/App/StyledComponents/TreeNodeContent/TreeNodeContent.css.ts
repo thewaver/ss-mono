@@ -121,3 +121,22 @@ export const treeRadialNode = style({
 globalStyle(`[role="treeitem"]:has(> ${treeRadialNode})`, {
     borderRadius: "50%",
 });
+
+export const treeConnector = style({
+    position: "absolute",
+    insetBlockStart: 0,
+    insetInlineStart: 0,
+    width: "100cqw",
+    height: "100cqw",
+    overflow: "visible",
+    pointerEvents: "none",
+});
+
+export const treeConnectorPath = style({
+    fill: "none",
+    stroke: layerVars.contrast,
+    strokeWidth: 2,
+    strokeOpacity: 0.35,
+    strokeLinecap: "round",
+    vectorEffect: "non-scaling-stroke",
+});

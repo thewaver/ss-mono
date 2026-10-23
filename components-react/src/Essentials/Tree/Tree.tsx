@@ -86,6 +86,11 @@ const TreeNodeItem = (props: TreeNodeItemProps) => {
 };
 
 export const Tree = <T,>(props: TreeProps<T>) => {
+    const hasLayout = props.computeLayout !== undefined;
+    const hasConnector = props.renderConnector !== undefined;
+
+    useEffect(() => TreeUtils.warnIfConnectorIgnored(hasLayout, hasConnector), [hasLayout, hasConnector]);
+
     const [value, setValue] = SignalMirrorReactUtils.useOptionalState<T | undefined>(props.value, undefined);
     const [expanded, setExpanded] = SignalMirrorReactUtils.useOptionalState<T[]>(props.expanded, []);
 
@@ -349,6 +354,21 @@ export const Tree = <T,>(props: TreeProps<T>) => {
         setFocusVisibleValue(() => readFocusVisibleValue(e.target));
     };
 
+    const renderConnector = (row: TreeRow<T>) => {
+        const defs =
+            props.renderConnector === undefined || layout === undefined
+                ? undefined
+                : TreeUtils.computeConnectorDefs(flatRows, row, layout);
+
+        if (defs === undefined) return null;
+
+        return (
+            <span className={TreeStyles.treeConnector} aria-hidden="true">
+                {props.renderConnector?.(defs)}
+            </span>
+        );
+    };
+
     const hasPendingPaint = (row: TreeRow<T>) =>
         TreeUtils.computeIsPending(row) && props.renderPendingChildren !== undefined;
 
@@ -368,6 +388,7 @@ export const Tree = <T,>(props: TreeProps<T>) => {
                     isExpanded: row.isExpanded,
                     isPending: TreeUtils.computeIsPending(row),
                     isSelected: row.node.value === value,
+                    checkedState: row.node.value === value,
                     depth: row.depth,
                 }}
                 renderControl={(setElementRef, renderProps) => (
@@ -393,6 +414,8 @@ export const Tree = <T,>(props: TreeProps<T>) => {
     const renderRows = (levelRows: TreeRow<T>[]): ReactNode =>
         levelRows.map((row, index) => (
             <Fragment key={index}>
+                {renderConnector(row)}
+
                 {renderRow(row)}
 
                 {(row.rows.length > 0 || hasPendingPaint(row)) && (

@@ -59,12 +59,6 @@ const examples: ExampleDefs[] = [
         path: `${EXAMPLES_ROOT}/Rating.vue`,
     },
     {
-        key: "arc",
-        name: EXAMPLE_NAMES.arc,
-        readout: () => `value: ${arcValue.value} — the same radios, placed by a layout instead of laid in a row`,
-        path: `${EXAMPLES_ROOT}/Arc.vue`,
-    },
-    {
         key: "decorated",
         name: EXAMPLE_NAMES.decorated,
         readout: () => `value: ${decoratedValue.value}`,
@@ -87,6 +81,12 @@ const examples: ExampleDefs[] = [
         name: EXAMPLE_NAMES.errored,
         readout: () => `value: ${erroredValue.value}`,
         path: `${EXAMPLES_ROOT}/Errored.vue`,
+    },
+    {
+        key: "arc",
+        name: EXAMPLE_NAMES.arc,
+        readout: () => `value: ${arcValue.value} — the same radios, placed by a layout instead of laid in a row`,
+        path: `${EXAMPLES_ROOT}/Arc.vue`,
     },
 ];
 </script>

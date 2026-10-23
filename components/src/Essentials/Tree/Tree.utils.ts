@@ -2,8 +2,14 @@ import { FlattenerUtils } from "../../Abstracts/Flattener/Flattener.utils";
 import { InteractionTrackerUtils } from "../../Abstracts/InteractionTracker/InteractionTracker.utils";
 import type { NavigatorDirection } from "../../Abstracts/Navigator/Navigator.types";
 import { NavigatorUtils } from "../../Abstracts/Navigator/Navigator.utils";
+import type { PlacementLayout } from "../../Abstracts/Placement/Placement.types";
+import type { SelectionBranchDefs } from "../../Abstracts/Selection/Selection.types";
 import { TypeaheadUtils } from "../../Abstracts/Typeahead/Typeahead.utils";
-import type { TreeKeyAction, TreeNodeRecord, TreeRecordRow } from "./Tree.types";
+import type { TreeConnectorDefs, TreeKeyAction, TreeMultiKeyAction, TreeNodeRecord, TreeRecordRow } from "./Tree.types";
+
+/** What the library prints when a tree is handed a connector painter and no layout. */
+const IGNORED_CONNECTOR_WARNING =
+    "Tree: renderConnector is ignored without computeLayout. An indented tree has no placements for a connector to run between — pass a layout or drop the painter.";
 
 /** The key the tree pattern gives to opening every branch beside the focused one. */
 const EXPAND_SIBLINGS_KEY = "*";
@@ -16,6 +22,26 @@ const INWARD_KEY = "ArrowRight";
 
 /** The arrow that comes back out of one. */
 const OUTWARD_KEY = "ArrowLeft";
+
+/** The key that ticks the focused node in a tree that ticks several. */
+const CHECK_KEY = " ";
+
+/** The key that, with Control held, ticks everything. */
+const CHECK_ALL_KEY = "a";
+
+/** The arrows that, with Shift held, move and tick as they go. */
+const NEXT_KEY = "ArrowDown";
+const PREVIOUS_KEY = "ArrowUp";
+
+/** The keys that, with Control and Shift held, tick from the focused node to an end. */
+const FIRST_KEY = "Home";
+const LAST_KEY = "End";
+
+/** No children, for a node whose children are not there. */
+const NO_CHILDREN: never[] = [];
+
+/** What `indexOf` answers for something not in the list. */
+const NOT_FOUND = -1;
 
 /**
  * Flattens a tree's nodes into the rows it draws, and decides what the keyboard does to them.
@@ -271,5 +297,145 @@ export namespace TreeUtils {
         if (position === undefined) return;
 
         return { kind: "focus", row: navigable[position] };
+    };
+
+    /**
+     * Warns, in the console, that a tree's connector painter is being ignored.
+     *
+     * Call it once per tree, when it is set up. It says nothing unless a connector painter was given without a layout,
+     * since only a laid-out tree knows where its nodes sit.
+     *
+     * @param hasLayout Whether the tree was given `computeLayout`.
+     * @param hasConnector Whether it was given `renderConnector`.
+     */
+    export const warnIfConnectorIgnored = (hasLayout: boolean, hasConnector: boolean) => {
+        if (!hasLayout && hasConnector) console.warn(IGNORED_CONNECTOR_WARNING);
+    };
+
+    /**
+     * What the connector reaching one node from its parent is told about the line it has to draw.
+     *
+     * It is handed the placements of both ends, plus the layout's center and radii, so a radial tree can bend its
+     * connectors round the middle rather than cut straight across.
+     *
+     * @param flatRows Every row the tree draws, in order, which is what `parentIndex` counts into.
+     * @param row The node the connector reaches.
+     * @param layout The layout the nodes were placed by.
+     * @returns The connector's defs, or `undefined` for a root, which has no parent to reach.
+     */
+    export const computeConnectorDefs = <T, TTooltipDefs>(
+        flatRows: TreeRecordRow<T, TTooltipDefs>[],
+        row: TreeRecordRow<T, TTooltipDefs>,
+        layout: PlacementLayout | undefined,
+    ): TreeConnectorDefs<T> | undefined => {
+        const parent = row.parentIndex === undefined ? undefined : flatRows[row.parentIndex];
+
+        if (!parent) return undefined;
+
+        return {
+            value: row.node.value,
+            parentValue: parent.node.value,
+            from: layout?.placements[parent.index],
+            to: layout?.placements[row.index],
+            origin: layout?.origin,
+            radii: layout?.radii,
+        };
+    };
+
+    /**
+     * What a tree that ticks several needs to tick a folder and everything in it, and to tell whether a folder is
+     * fully, partly or not ticked.
+     *
+     * A disabled node is left out of every folder, so ticking a folder never changes it and it never counts toward the
+     * folder's state; it can still hold a tick of its own from before.
+     *
+     * @param nodes The tree's roots, with everything under them.
+     * @returns Defs for `SelectionUtils.getBranchState` and `SelectionUtils.getBranchSelection`, keyed by value.
+     */
+    export const createBranchDefs = <T, TTooltipDefs>(
+        nodes: TreeNodeRecord<T, TTooltipDefs>[],
+    ): SelectionBranchDefs<T> => {
+        const children = new Map<T, T[]>();
+
+        const walk = (list: TreeNodeRecord<T, TTooltipDefs>[]) =>
+            list.forEach((node) => {
+                const own = node.children ?? NO_CHILDREN;
+
+                children.set(
+                    node.value,
+                    own.filter((child) => !child.isDisabled).map((child) => child.value),
+                );
+                walk(own);
+            });
+
+        walk(nodes);
+
+        return { computeChildren: (value) => children.get(value) };
+    };
+
+    /**
+     * Every value in the tree that can be ticked, opened or not, in walking order.
+     *
+     * @param nodes The tree's roots, with everything under them.
+     * @returns The value of every node that is not disabled.
+     */
+    export const getCheckableValues = <T, TTooltipDefs>(nodes: TreeNodeRecord<T, TTooltipDefs>[]): T[] =>
+        nodes.flatMap((node) => [
+            ...(node.isDisabled ? NO_CHILDREN : [node.value]),
+            ...getCheckableValues(node.children ?? NO_CHILDREN),
+        ]);
+
+    /**
+     * What a key does in a tree that ticks several, for the keys that tick.
+     *
+     * The published tree pattern's recommended model: Space ticks or unticks the focused node; Shift with Space ticks
+     * every node from the last one ticked to this one; Shift with an arrow moves and ticks the node it lands on;
+     * Control with Shift and Home or End ticks from this node to the first or last; Control with A ticks everything.
+     * Every other key — the walk, opening and closing, typing to find — is {@link TreeUtils.computeKeyAction}'s.
+     *
+     * @param key The `key` of the keyboard event.
+     * @param modifiers Which of Shift and Control (or Command) were held.
+     * @param current The row the key was pressed on.
+     * @param opts.navigable The rows focus can rest on, in walking order.
+     * @param opts.anchor The row last ticked by a single press, which a range starts from. Missing, the range starts
+     * at the current row.
+     * @returns What to do, or `undefined` when the key is not one of these and should go on to the ordinary handling.
+     */
+    export const computeMultiKeyAction = <T, TTooltipDefs>(
+        key: string,
+        modifiers: { isShiftHeld: boolean; isControlHeld: boolean },
+        current: TreeRecordRow<T, TTooltipDefs>,
+        opts: {
+            navigable: TreeRecordRow<T, TTooltipDefs>[];
+            anchor: TreeRecordRow<T, TTooltipDefs> | undefined;
+        },
+    ): TreeMultiKeyAction<T, TTooltipDefs> | undefined => {
+        const { navigable } = opts;
+        const position = navigable.indexOf(current);
+        const between = (from: number, to: number) => navigable.slice(Math.min(from, to), Math.max(from, to) + 1);
+
+        if (key === CHECK_KEY) {
+            if (!modifiers.isShiftHeld) return { kind: "check", row: current };
+
+            const anchorPosition = opts.anchor === undefined ? NOT_FOUND : navigable.indexOf(opts.anchor);
+
+            return { kind: "check_range", rows: between(anchorPosition < 0 ? position : anchorPosition, position) };
+        }
+
+        if (modifiers.isControlHeld && key.toLowerCase() === CHECK_ALL_KEY) return { kind: "check_all" };
+
+        if (modifiers.isControlHeld && modifiers.isShiftHeld && (key === FIRST_KEY || key === LAST_KEY)) {
+            const end = key === FIRST_KEY ? 0 : navigable.length - 1;
+
+            return { kind: "check_range", rows: between(position, end), focus: navigable[end] };
+        }
+
+        if (modifiers.isShiftHeld && (key === NEXT_KEY || key === PREVIOUS_KEY)) {
+            const next = navigable[position + (key === NEXT_KEY ? 1 : -1)];
+
+            return next === undefined ? undefined : { kind: "focus_check", row: next };
+        }
+
+        return undefined;
     };
 }

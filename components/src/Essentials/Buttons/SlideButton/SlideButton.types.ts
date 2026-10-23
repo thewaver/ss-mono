@@ -45,6 +45,15 @@ export type SlideButtonState = {
      * requires.
      */
     mode?: SlideButtonMode;
+    /**
+     * How far along the track the thumb has to be when it is let go for the slide to complete, from `0.1` to `1`; a
+     * value outside that range is held to its nearest end. At `1` the thumb has to reach the end of the track, and a
+     * smaller value completes the slide part-way along. Letting go short of it puts the thumb back and does nothing.
+     *
+     * It governs a dragged thumb and nothing else: the hold fills completely before it confirms, and a held Enter or
+     * Space and a click from assistive technology confirm at once, under every value.
+     */
+    completionRatio?: number;
 };
 
 export type SlideButtonPress = {
@@ -61,6 +70,7 @@ export type SlideButtonGestureDefs = {
     getMode: () => SlideButtonMode;
     getThumbSize: () => number;
     getHoldDurationMs: () => number;
+    getCompletionRatio: () => number;
     getTrackWidth: () => number;
     getProgressRatio: () => number;
     setProgressRatio: (ratio: number) => void;

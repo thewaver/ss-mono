@@ -9,6 +9,7 @@ import type {
     SelectRowRecord as CoreSelectRow,
     InteractionFlags,
     SelectFlags,
+    SelectGroupBoxExcludesWindowing,
     SelectGroupFlags,
     SelectOptionFlags,
 } from "@thewaver/ss-components";
@@ -119,17 +120,25 @@ export type SelectCompositeProps<T> = Omit<InteractionWrapperProps<SelectFlags>,
         /** Draws one option. */
         renderOption: Snippet<[option: SelectOption<T>, flags: InteractionFlags<SelectOptionFlags>]>;
         /** Draws one group heading. */
-        renderGroup?: Snippet<[group: SelectOptionGroup<T>, flags: SelectGroupFlags]>;
+        renderGroupHeader?: Snippet<[group: SelectOptionGroup<T>, flags: SelectGroupFlags]>;
+        /**
+         * Draws the box a group sits in, around its heading and its options. They are handed in as a snippet rather than
+         * built, so the consumer decides what surrounds them, and draws them with `{@render renderContent()}`. Refused
+         * alongside `computeEstimatedOptionHeight`, since a list that only draws what is on screen places each row on its
+         * own and a group has no box there.
+         */
+        renderGroupBox?: Snippet<[renderContent: Snippet, group: SelectOptionGroup<T>, flags: SelectGroupFlags]>;
         /** Runs when an option is picked. */
         onPick: (value: T) => void;
         /** Runs when the clear control is pressed, to empty whatever is picked. */
         onClear: () => void;
-    };
+    } & SelectGroupBoxExcludesWindowing;
 
 export type SelectPresetProps<T> = Omit<
     SelectCompositeProps<T>,
     "selectedOptions" | "isMultiple" | "computeIsSelected" | "renderContent" | "onPick" | "onClear"
->;
+> &
+    SelectGroupBoxExcludesWindowing;
 
 export type SelectProps<T> = SelectPresetProps<T> & {
     /** Which option is picked. Bind it with `bind:value`; it is the only thing that picks one. */

@@ -1,9 +1,11 @@
-import type { JSX } from "solid-js";
+import type { Accessor, JSX } from "solid-js";
 import { For, Index, Show, createEffect, createMemo, createSignal, createUniqueId, onCleanup, untrack } from "solid-js";
 
 import {
     MENU_DEFAULTS,
     type MenuHighlightPosition,
+    type MenuRun,
+    type MenuSection,
     MenuUtils,
     TypeaheadUtils,
     FloaterStyles as floaterStyles,
@@ -25,9 +27,11 @@ import { access } from "../../../Utils/propUtils";
 import { LabelSolidUtils } from "../../Input/Label/LabelSolid.utils";
 import type {
     ContextMenuProps,
+    MenuGroup,
     MenuItem,
     MenuItemViewProps,
     MenuLevelProps,
+    MenuNode,
     MenuProps,
     MenuTriggerProps,
 } from "./MenuSolid.types";
@@ -131,9 +135,13 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
 
     const getIsBackAt = (index: number) => MenuUtils.getIsBackAt(getHasBackEntry(), index);
 
-    const getEntries = createMemo(() =>
-        MenuUtils.computeEntries(access(props.items), access(props.openerItem), access(props.submenuMode)),
+    const getNodes = createMemo(() =>
+        MenuUtils.computeEntries<MenuNode<T>>(access(props.items), access(props.openerItem), access(props.submenuMode)),
     );
+
+    const getEntries = createMemo(() => MenuUtils.flattenNodes(getNodes()));
+
+    const getSections = createMemo(() => MenuUtils.getSections<T, MenuItem<T>>(getNodes()));
 
     const getNavigableIndexes = createMemo(() => MenuUtils.computeNavigableIndexes(getEntries()));
 
@@ -285,7 +293,12 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
     };
 
     const activateIndex = (index: number) => {
-        const activation = MenuUtils.computeActivation<T, MenuItem<T>>(getEntries(), index, getHasBackEntry());
+        const activation = MenuUtils.computeActivation<T, MenuItem<T>>(
+            getEntries(),
+            index,
+            getHasBackEntry(),
+            getSections().flatMap((section) => section.runs),
+        );
 
         if (activation.type === "back") {
             props.onClose();
@@ -450,6 +463,8 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
                                 computeEffect={props.computeEffect}
                                 computeCustomText={props.computeCustomText}
                                 renderItem={props.renderItem}
+                                renderGroupHeader={props.renderGroupHeader}
+                                renderGroupBox={props.renderGroupBox}
                                 renderPopup={props.renderPopup}
                                 floaterTransitionDurationMs={props.floaterTransitionDurationMs}
                                 renderHighlightFloater={props.renderHighlightFloater}
@@ -481,26 +496,48 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
         );
     };
 
+    const renderRun = (run: MenuRun<MenuItem<T>>) => (
+        <Show
+            when={run.isRadioGroup}
+            fallback={
+                <Index each={run.items}>
+                    {(getItem, index) => renderPlaced(run.from + index, renderItemAt(getItem, run.from + index))}
+                </Index>
+            }
+        >
+            <div role="group" class={getLayout() ? styles.menuLayoutGroup : undefined}>
+                <Index each={run.items}>
+                    {(getItem, index) => renderPlaced(run.from + index, renderItemAt(getItem, run.from + index))}
+                </Index>
+            </div>
+        </Show>
+    );
+
+    const renderSectionRuns = (section: MenuSection<MenuItem<T>>) => <For each={section.runs}>{renderRun}</For>;
+
+    const renderGroupBox = (getGroup: Accessor<MenuGroup<T>>, renderContent: () => JSX.Element) =>
+        props.renderGroupBox === undefined || getLayout() !== undefined
+            ? renderContent()
+            : props.renderGroupBox(renderContent, getGroup);
+
     const renderRuns = () => (
-        <For each={MenuUtils.getRuns(getEntries())}>
-            {(run) => (
-                <Show
-                    when={run.isRadioGroup}
-                    fallback={
-                        <Index each={run.items}>
-                            {(getItem, index) =>
-                                renderPlaced(run.from + index, renderItemAt(getItem, run.from + index))
-                            }
-                        </Index>
-                    }
-                >
-                    <div role="group" class={getLayout() ? styles.menuLayoutGroup : undefined}>
-                        <Index each={run.items}>
-                            {(getItem, index) =>
-                                renderPlaced(run.from + index, renderItemAt(getItem, run.from + index))
-                            }
-                        </Index>
-                    </div>
+        <For each={getSections()}>
+            {(section) => (
+                <Show when={section.group} fallback={renderSectionRuns(section)}>
+                    {(getGroup) => (
+                        <div
+                            role="group"
+                            aria-label={getGroup().label}
+                            class={getLayout() ? styles.menuLayoutGroup : undefined}
+                        >
+                            {renderGroupBox(getGroup, () => (
+                                <>
+                                    <Show when={getLayout() === undefined}>{props.renderGroupHeader?.(getGroup)}</Show>
+                                    {renderSectionRuns(section)}
+                                </>
+                            ))}
+                        </div>
+                    )}
                 </Show>
             )}
         </For>
@@ -559,6 +596,11 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
 };
 
 export const Menu = <T,>(props: MenuProps<T>) => {
+    MenuUtils.warnIfGroupPaintIgnored(
+        props.computeLayout !== undefined,
+        props.renderGroupHeader !== undefined || props.renderGroupBox !== undefined,
+    );
+
     const fallbackTriggerId = createUniqueId();
     const menuId = createUniqueId();
 
@@ -711,6 +753,8 @@ export const Menu = <T,>(props: MenuProps<T>) => {
                         computeCustomText={props.computeCustomText}
                         flickOrigin={getFlickOrigin}
                         renderItem={props.renderItem}
+                        renderGroupHeader={props.renderGroupHeader}
+                        renderGroupBox={props.renderGroupBox}
                         renderPopup={props.renderPopup}
                         floaterTransitionDurationMs={props.floaterTransitionDurationMs}
                         renderHighlightFloater={props.renderHighlightFloater}
@@ -730,6 +774,11 @@ export const Menu = <T,>(props: MenuProps<T>) => {
 };
 
 export const ContextMenu = <T,>(props: ContextMenuProps<T>) => {
+    MenuUtils.warnIfGroupPaintIgnored(
+        props.computeLayout !== undefined,
+        props.renderGroupHeader !== undefined || props.renderGroupBox !== undefined,
+    );
+
     const viewportContext = useViewportContext();
     const menuId = createUniqueId();
 
@@ -837,6 +886,8 @@ export const ContextMenu = <T,>(props: ContextMenuProps<T>) => {
                 computeEffect={props.computeEffect}
                 computeCustomText={props.computeCustomText}
                 renderItem={props.renderItem}
+                renderGroupHeader={props.renderGroupHeader}
+                renderGroupBox={props.renderGroupBox}
                 renderPopup={props.renderPopup}
                 floaterTransitionDurationMs={props.floaterTransitionDurationMs}
                 renderHighlightFloater={props.renderHighlightFloater}

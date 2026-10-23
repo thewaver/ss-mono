@@ -190,3 +190,65 @@ describe("computeKeyAction", () => {
         expect(TreeUtils.computeKeyAction(" ", flatRows[0], opts)?.kind).toBe("click");
     });
 });
+
+describe("createBranchDefs", () => {
+    const withDisabled: TreeNode<string>[] = [
+        { value: "src", children: [{ value: "index.ts" }, { value: "secret.ts", isDisabled: true }] },
+    ];
+
+    it("hands each folder its children by value, leaving disabled ones out", () => {
+        const defs = TreeUtils.createBranchDefs(withDisabled);
+
+        expect(defs.computeChildren("src")).toEqual(["index.ts"]);
+        expect(defs.computeChildren("index.ts")).toEqual([]);
+    });
+
+    it("lists every node that can be ticked, opened or not", () => {
+        expect(TreeUtils.getCheckableValues(withDisabled)).toEqual(["src", "index.ts"]);
+    });
+});
+
+describe("computeMultiKeyAction", () => {
+    const navigable = FlattenerUtils.getFlatRows(TreeUtils.getVisibleRows(NODES, expandAll));
+    const plain = { isShiftHeld: false, isControlHeld: false };
+    const shift = { isShiftHeld: true, isControlHeld: false };
+    const control = { isShiftHeld: false, isControlHeld: true };
+    const values = (rows: { node: TreeNode<string> }[]) => rows.map((row) => row.node.value);
+
+    it("ticks the focused node on Space", () => {
+        expect(TreeUtils.computeMultiKeyAction(" ", plain, navigable[1], { navigable, anchor: undefined })).toEqual({
+            kind: "check",
+            row: navigable[1],
+        });
+    });
+
+    it("ticks a run from the last node ticked on Shift with Space, in either direction", () => {
+        const action = TreeUtils.computeMultiKeyAction(" ", shift, navigable[3], { navigable, anchor: navigable[1] });
+
+        expect(action?.kind === "check_range" && values(action.rows)).toEqual(["index.ts", "Lib", "Tree.tsx"]);
+    });
+
+    it("moves and ticks on Shift with an arrow, and stops at the ends", () => {
+        expect(
+            TreeUtils.computeMultiKeyAction("ArrowDown", shift, navigable[0], { navigable, anchor: undefined }),
+        ).toEqual({
+            kind: "focus_check",
+            row: navigable[1],
+        });
+        expect(
+            TreeUtils.computeMultiKeyAction("ArrowUp", shift, navigable[0], { navigable, anchor: undefined }),
+        ).toBeUndefined();
+    });
+
+    it("ticks everything on Control with A, and leaves every other key to the ordinary handling", () => {
+        expect(TreeUtils.computeMultiKeyAction("a", control, navigable[0], { navigable, anchor: undefined })).toEqual({
+            kind: "check_all",
+        });
+        expect(
+            TreeUtils.computeMultiKeyAction("ArrowDown", plain, navigable[0], { navigable, anchor: undefined }),
+        ).toBeUndefined();
+        expect(
+            TreeUtils.computeMultiKeyAction("Enter", plain, navigable[0], { navigable, anchor: undefined }),
+        ).toBeUndefined();
+    });
+});

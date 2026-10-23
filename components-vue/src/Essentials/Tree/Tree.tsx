@@ -111,6 +111,11 @@ const TreeNodeItem = defineComponent(
 
 export const Tree = defineComponent(
     <T,>(props: TreeProps<T>, { slots }: SlotsContext<TreeSlots<T>>) => {
+        watchAfterRender(
+            [() => props.computeLayout !== undefined, () => slots.renderConnector !== undefined],
+            ([hasLayout, hasConnector]) => TreeUtils.warnIfConnectorIgnored(hasLayout, hasConnector),
+        );
+
         const value = useTwoWay(props, "value");
         const expanded = useTwoWay(props, "expanded", []);
 
@@ -414,6 +419,7 @@ export const Tree = defineComponent(
                             isExpanded: row.isExpanded,
                             isPending: TreeUtils.computeIsPending(row),
                             isSelected: row.node.value === currentValue,
+                            checkedState: row.node.value === currentValue,
                             depth: row.depth,
                         }}
                     >
@@ -459,13 +465,29 @@ export const Tree = defineComponent(
                 );
             };
 
+            const renderConnector = (row: TreeRow<T>) => {
+                const defs =
+                    slots.renderConnector === undefined || currentLayout === undefined
+                        ? undefined
+                        : TreeUtils.computeConnectorDefs(flatRows.value, row, currentLayout);
+
+                if (defs === undefined) return null;
+
+                return (
+                    <span class={TreeStyles.treeConnector} aria-hidden="true">
+                        {callSlot(slots.renderConnector, defs)}
+                    </span>
+                );
+            };
+
             const renderRows = (levelRows: TreeRow<T>[]): VNodeChild[] =>
                 levelRows.flatMap((row, index) => {
                     const hasGroup = row.rows.length > 0 || hasPendingPaint(row);
 
-                    if (!hasGroup) return [renderRow(row, `row-${index}`)];
+                    if (!hasGroup) return [renderConnector(row), renderRow(row, `row-${index}`)];
 
                     return [
+                        renderConnector(row),
                         renderRow(row, `row-${index}`),
                         <div key={`group-${index}`} role="group">
                             {TreeUtils.computeIsPending(row)

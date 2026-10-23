@@ -60,13 +60,6 @@ const examples: ExampleDefs[] = [
         path: `${EXAMPLES_ROOT}/RightToLeft.vue`,
     },
     {
-        key: "ring",
-        name: EXAMPLE_NAMES.ring,
-        readout: () =>
-            `order: ${names(ring.value)} — dropping picks the nearest place rather than comparing one axis, because a ring has no axis to compare`,
-        path: `${EXAMPLES_ROOT}/Ring.vue`,
-    },
-    {
         key: "pair",
         name: EXAMPLE_NAMES.pair,
         readout: () => `hand: ${names(hand.value)} | board: ${names(board.value)}`,
@@ -91,6 +84,13 @@ const examples: ExampleDefs[] = [
         name: EXAMPLE_NAMES.disabled,
         readout: () => `order: ${names(disabled.value)} — nothing moves, by pointer or by key`,
         path: `${EXAMPLES_ROOT}/Cards.vue`,
+    },
+    {
+        key: "ring",
+        name: EXAMPLE_NAMES.ring,
+        readout: () =>
+            `order: ${names(ring.value)} — dropping picks the nearest place rather than comparing one axis, because a ring has no axis to compare`,
+        path: `${EXAMPLES_ROOT}/Ring.vue`,
     },
 ];
 </script>

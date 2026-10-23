@@ -64,6 +64,7 @@
     let filterQuery = $state("");
     let filterValue = $state.raw<Airport | undefined>();
     let groupedValue = $state<string | undefined>();
+    let groupBoxesValue = $state<string | undefined>();
     let defaultValue = $state<string | undefined>();
     let preselectedValue = $state<string | undefined>("Portugal");
     let disabledOptionValue = $state<string | undefined>();
@@ -223,6 +224,14 @@
             path: `${EXAMPLES_ROOT}/Countries.svelte`,
         },
         {
+            key: "groupBoxes",
+            name: EXAMPLE_NAMES.groupBoxes,
+            readout: () =>
+                `value: ${groupBoxesValue ?? "undefined"} — renderGroupBox draws the tinted box around each group's heading and options`,
+            component: groupBoxesExample,
+            path: `${EXAMPLES_ROOT}/Countries.svelte`,
+        },
+        {
             key: "disabledOptions",
             name: EXAMPLE_NAMES.disabledOptions,
             readout: () => `value: ${disabledOptionValue ?? "undefined"} — arrows skip Denmark and Finland`,
@@ -351,6 +360,15 @@
 
 {#snippet optionGroupsExample()}
     <CountriesExample bind:value={groupedValue} options={GROUPED_COUNTRIES} hasGroups={true} />
+{/snippet}
+
+{#snippet groupBoxesExample()}
+    <CountriesExample
+        bind:value={groupBoxesValue}
+        options={GROUPED_COUNTRIES}
+        hasGroups={true}
+        hasGroupBoxes={true}
+    />
 {/snippet}
 
 {#snippet disabledOptionsExample()}

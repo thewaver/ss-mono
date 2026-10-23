@@ -429,6 +429,18 @@ test("a radial tree keeps its nesting, its levels and one box per open node", as
     expect(levels[0], "the root being the first of them").toBe("1");
 });
 
+test("a radial tree draws one connector for every node that hangs from another, hidden from a reader", async ({
+    page,
+}) => {
+    const levels = await attributesOf(page, `${RADIAL} [role="treeitem"]`, "aria-level");
+    const roots = levels.filter((level) => level === "1").length;
+
+    await expect(
+        page.locator(`${RADIAL} [role="tree"] [aria-hidden="true"]:has(> svg path)`),
+        "a connector for each node but the roots",
+    ).toHaveCount(levels.length - roots);
+});
+
 test("a placed node is reached and chosen the same way as a row", async ({ page }) => {
     const items = page.locator(`${RADIAL} [role="treeitem"]`);
 
@@ -440,4 +452,48 @@ test("a placed node is reached and chosen the same way as a row", async ({ page 
         await readout(page, "radial"),
         "the walk still reaches the next node and Enter still takes it",
     ).not.toContain("value: undefined");
+});
+
+/**
+ * A tree whose nodes change reuses the elements it already drew, so the element that showed one node goes on to
+ * show another. The highlight marker finds its node's element through a record kept beside the rows, and that record
+ * has to follow the element to whatever it shows now — when it kept the node the element was first drawn for, a
+ * filtered list sent the marker to the wrong row, or to none.
+ *
+ * The Playground's own menu is the tree that filters, so it is the one driven here: narrow it with the search, then
+ * hover every row left and check the marker lands on the row the pointer is over.
+ */
+const MENU = '[role="tree"][aria-label="Library"]';
+const MENU_MARKER = `${MENU} > div[style*="transition-duration"]`;
+
+test("after the menu is filtered, the highlight marker lands on the row under the pointer", async ({ page }) => {
+    const search = page.getByRole("textbox", { name: "Search components" });
+
+    await search.click();
+    await page.keyboard.type("Sel");
+    await search.click();
+    await page.keyboard.press("ControlOrMeta+A");
+    await page.keyboard.type("Tree");
+
+    const rows = page.locator(`${MENU} [role="treeitem"]`);
+
+    await expect(rows.first()).toBeVisible();
+
+    for (let index = 0; index < (await rows.count()); index++) {
+        const row = rows.nth(index);
+
+        await row.hover();
+
+        await expect
+            .poll(
+                async () => {
+                    const rowBox = await row.boundingBox();
+                    const markerBox = await page.locator(MENU_MARKER).boundingBox();
+
+                    return markerBox === null || rowBox === null ? undefined : Math.abs(markerBox.y - rowBox.y);
+                },
+                { message: `the marker sits on row ${index}` },
+            )
+            .toBeLessThan(1);
+    }
 });

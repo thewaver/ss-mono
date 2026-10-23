@@ -30,7 +30,9 @@ export const MultiSelectGroupedExample = (props: Props) => {
                     {selectedOptions.length ? `${selectedOptions.length} selected` : PLACEHOLDER}
                 </PageSelectContent>
             )}
-            renderGroup={(group, flags) => <PageSelectGroupContent flags={flags}>{group.label}</PageSelectGroupContent>}
+            renderGroupHeader={(group, flags) => (
+                <PageSelectGroupContent flags={flags}>{group.label}</PageSelectGroupContent>
+            )}
             renderOption={(option, flags) => (
                 <PageSelectOptionContent isGliding flags={flags}>
                     {option.value}

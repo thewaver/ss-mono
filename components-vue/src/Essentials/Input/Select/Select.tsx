@@ -226,7 +226,8 @@ export const SelectComposite = defineComponent(
                 {
                     {
                         renderOption: slots.renderOption,
-                        renderGroup: slots.renderGroup,
+                        renderGroupHeader: slots.renderGroupHeader,
+                        renderGroupBox: slots.renderGroupBox,
                         renderSelectionFloater: slots.renderSelectionFloater,
                         renderHighlightFloater: slots.renderHighlightFloater,
                     } satisfies Partial<ListboxOptionsSlots<T>>
@@ -446,7 +447,8 @@ export const Select = defineComponent(
                         renderPopup: slots.renderPopup,
                         renderClear: slots.renderClear,
                         renderOption: slots.renderOption,
-                        renderGroup: slots.renderGroup,
+                        renderGroupHeader: slots.renderGroupHeader,
+                        renderGroupBox: slots.renderGroupBox,
                         renderSelectionFloater: slots.renderSelectionFloater,
                         renderHighlightFloater: slots.renderHighlightFloater,
                         renderDecoration: slots.renderDecoration,

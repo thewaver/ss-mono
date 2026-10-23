@@ -6,6 +6,7 @@ import type {
     InteractionFlags,
     ListboxFocusModel,
     ListboxOrientation,
+    SelectGroupBoxExcludesWindowing,
     SelectGroupFlags,
     SelectOptionFlags,
 } from "@thewaver/ss-components";
@@ -101,7 +102,17 @@ export type ListboxOptionsProps<T> = AccessorValues<
             getFlags: () => InteractionFlags<SelectOptionFlags>,
         ) => JSX.Element;
         /** Draws one group heading. */
-        renderGroup?: (getGroup: Accessor<SelectOptionGroup<T>>, getFlags: () => SelectGroupFlags) => JSX.Element;
+        renderGroupHeader?: (getGroup: Accessor<SelectOptionGroup<T>>, getFlags: () => SelectGroupFlags) => JSX.Element;
+        /**
+         * Draws the box a group sits in, around its heading and its options, which are handed in to be placed inside it.
+         * Refused alongside `computeEstimatedOptionHeight`, since a list that only draws what is on screen places each row
+         * on its own and a group has no box there.
+         */
+        renderGroupBox?: (
+            renderContent: () => JSX.Element,
+            getGroup: Accessor<SelectOptionGroup<T>>,
+            getFlags: () => SelectGroupFlags,
+        ) => JSX.Element;
     };
 
 export type ListboxCompositeProps<T> = AccessorValues<BaseListboxValues> &
@@ -150,15 +161,26 @@ export type ListboxCompositeProps<T> = AccessorValues<BaseListboxValues> &
             getFlags: () => InteractionFlags<SelectOptionFlags>,
         ) => JSX.Element;
         /** Draws one group heading. */
-        renderGroup?: (getGroup: Accessor<SelectOptionGroup<T>>, getFlags: () => SelectGroupFlags) => JSX.Element;
+        renderGroupHeader?: (getGroup: Accessor<SelectOptionGroup<T>>, getFlags: () => SelectGroupFlags) => JSX.Element;
+        /**
+         * Draws the box a group sits in, around its heading and its options, which are handed in to be placed inside it.
+         * Refused alongside `computeEstimatedOptionHeight`, since a list that only draws what is on screen places each row
+         * on its own and a group has no box there.
+         */
+        renderGroupBox?: (
+            renderContent: () => JSX.Element,
+            getGroup: Accessor<SelectOptionGroup<T>>,
+            getFlags: () => SelectGroupFlags,
+        ) => JSX.Element;
         /** Runs when an option is picked. */
         onPick: (value: T) => void;
-    };
+    } & SelectGroupBoxExcludesWindowing;
 
 export type ListboxPresetProps<T> = Omit<
     ListboxCompositeProps<T>,
     "selectedOptions" | "isMultiple" | "computeIsSelected" | "onPick"
->;
+> &
+    SelectGroupBoxExcludesWindowing;
 
 export type ListboxProps<T> = ListboxPresetProps<T> & {
     /** Which option is picked. It is the only thing that picks one. */

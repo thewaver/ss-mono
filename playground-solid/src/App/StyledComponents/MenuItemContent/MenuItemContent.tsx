@@ -47,3 +47,9 @@ export const PageMenuItemContent = (props: ParentProps<MenuItemContentProps>) =>
         </div>
     );
 };
+
+export const PageMenuGroupBox = (props: ParentProps) => {
+    const getLayerClass = useLayerClass();
+
+    return <div class={[styles.menuGroupBox, getLayerClass()].join(" ")}>{props.children}</div>;
+};

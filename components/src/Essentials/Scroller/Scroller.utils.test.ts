@@ -37,3 +37,42 @@ describe("ScrollerUtils.computeProgressRatio", () => {
         expect(ScrollerUtils.computeProgressRatio({ start: 0, visible: 100, total: 80 })).toBe(0);
     });
 });
+
+describe("ScrollerUtils.computeStepLanding", () => {
+    const ITEMS = [0, 100, 200, 300, 400, 500, 600, 700, 800, 900];
+    const VISIBLE = 350;
+
+    it("lands on the furthest item start within the next view, and the nearest within the previous", () => {
+        expect(ScrollerUtils.computeStepLanding(ITEMS, VISIBLE, "next", 0)).toBe(300);
+        expect(ScrollerUtils.computeStepLanding(ITEMS, VISIBLE, "previous", 700)).toBe(400);
+    });
+
+    it("keeps one more item of the view just left for each of overlap, going forward", () => {
+        expect(ScrollerUtils.computeStepLanding(ITEMS, VISIBLE, "next", 0, 1)).toBe(200);
+        expect(ScrollerUtils.computeStepLanding(ITEMS, VISIBLE, "next", 0, 2)).toBe(100);
+    });
+
+    it("keeps one more item of the view just left for each of overlap, going back", () => {
+        expect(ScrollerUtils.computeStepLanding(ITEMS, VISIBLE, "previous", 700, 1)).toBe(500);
+        expect(ScrollerUtils.computeStepLanding(ITEMS, VISIBLE, "previous", 700, 2)).toBe(600);
+    });
+
+    it("still moves by one item however much overlap is asked for", () => {
+        expect(ScrollerUtils.computeStepLanding(ITEMS, VISIBLE, "next", 0, 50)).toBe(100);
+        expect(ScrollerUtils.computeStepLanding(ITEMS, VISIBLE, "previous", 700, 50)).toBe(600);
+    });
+
+    it("treats a negative, fractional or unreadable overlap as a whole number from zero", () => {
+        const plain = ScrollerUtils.computeStepLanding(ITEMS, VISIBLE, "next", 0);
+
+        expect(ScrollerUtils.computeStepLanding(ITEMS, VISIBLE, "next", 0, -3)).toBe(plain);
+        expect(ScrollerUtils.computeStepLanding(ITEMS, VISIBLE, "next", 0, 0.9)).toBe(plain);
+        expect(ScrollerUtils.computeStepLanding(ITEMS, VISIBLE, "next", 0, Number.NaN)).toBe(plain);
+        expect(ScrollerUtils.computeStepLanding(ITEMS, VISIBLE, "next", 0, 1.9)).toBe(200);
+    });
+
+    it("goes a full view where there is no item start inside it, whatever the overlap", () => {
+        expect(ScrollerUtils.computeStepLanding([0], VISIBLE, "next", 0, 2)).toBe(VISIBLE);
+        expect(ScrollerUtils.computeStepLanding([0], VISIBLE, "previous", 500, 2)).toBe(150);
+    });
+});

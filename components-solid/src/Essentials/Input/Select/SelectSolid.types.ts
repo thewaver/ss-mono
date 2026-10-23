@@ -7,6 +7,7 @@ import type {
     ButtonFlags,
     InteractionFlags,
     SelectFlags,
+    SelectGroupBoxExcludesWindowing,
     SelectGroupFlags,
     SelectItemRecord,
     SelectOptionFlags,
@@ -51,6 +52,16 @@ export type SelectFieldProps = AccessorValues<Pick<BaseSelectValues, "ariaLabel"
             isFilterable: boolean;
             /** What the reader has typed to narrow the list by. */
             query: string;
+            /**
+             * Whether the reader is typing, so the field holds what they typed. Otherwise it holds the text of what is
+             * picked, which is what a screen reader reads as the field's value.
+             */
+            isEditing: boolean;
+            /**
+             * The text of what is picked, where the consumer gave one. Without it the field takes the text the consumer
+             * painted for the picked option; an empty string keeps the field empty.
+             */
+            valueText: string | undefined;
             /** How far the field's text is inset, so it clears whatever the consumer has drawn inside the field. */
             textInset: JSX.CSSProperties;
             /** Styles the field's text against its current state. */
@@ -134,17 +145,28 @@ export type SelectCompositeProps<T> = Omit<InteractionWrapperProps<SelectFlags>,
             getFlags: () => InteractionFlags<SelectOptionFlags>,
         ) => JSX.Element;
         /** Draws one group heading. */
-        renderGroup?: (getGroup: Accessor<SelectOptionGroup<T>>, getFlags: () => SelectGroupFlags) => JSX.Element;
+        renderGroupHeader?: (getGroup: Accessor<SelectOptionGroup<T>>, getFlags: () => SelectGroupFlags) => JSX.Element;
+        /**
+         * Draws the box a group sits in, around its heading and its options, which are handed in to be placed inside it.
+         * Refused alongside `computeEstimatedOptionHeight`, since a list that only draws what is on screen places each row
+         * on its own and a group has no box there.
+         */
+        renderGroupBox?: (
+            renderContent: () => JSX.Element,
+            getGroup: Accessor<SelectOptionGroup<T>>,
+            getFlags: () => SelectGroupFlags,
+        ) => JSX.Element;
         /** Runs when an option is picked. */
         onPick: (value: T) => void;
         /** Runs when the clear control is pressed, to empty whatever is picked. */
         onClear: () => void;
-    };
+    } & SelectGroupBoxExcludesWindowing;
 
 export type SelectPresetProps<T> = Omit<
     SelectCompositeProps<T>,
     "selectedOptions" | "isMultiple" | "computeIsSelected" | "renderContent" | "onPick" | "onClear"
->;
+> &
+    SelectGroupBoxExcludesWindowing;
 
 export type SelectProps<T> = SelectPresetProps<T> & {
     /** Which option is picked. It is the only thing that picks one. */

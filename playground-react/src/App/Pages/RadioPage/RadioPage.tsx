@@ -62,13 +62,6 @@ export const RadioPage = () => {
             path: `${EXAMPLES_ROOT}/Rating.tsx`,
         },
         {
-            key: "arc",
-            name: EXAMPLE_NAMES.arc,
-            readout: () => `value: ${arcState[0]} — the same radios, placed by a layout instead of laid in a row`,
-            component: () => <ArcExample value={arcState} hovered={hoveredArcState} />,
-            path: `${EXAMPLES_ROOT}/Arc.tsx`,
-        },
-        {
             key: "decorated",
             name: EXAMPLE_NAMES.decorated,
             readout: () => `value: ${decoratedState[0]}`,
@@ -95,6 +88,13 @@ export const RadioPage = () => {
             readout: () => `value: ${erroredState[0]}`,
             component: () => <ErroredExample value={erroredState} />,
             path: `${EXAMPLES_ROOT}/Errored.tsx`,
+        },
+        {
+            key: "arc",
+            name: EXAMPLE_NAMES.arc,
+            readout: () => `value: ${arcState[0]} — the same radios, placed by a layout instead of laid in a row`,
+            component: () => <ArcExample value={arcState} hovered={hoveredArcState} />,
+            path: `${EXAMPLES_ROOT}/Arc.tsx`,
         },
     ];
 

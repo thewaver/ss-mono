@@ -3442,6 +3442,14 @@ value and moves focus; automatic activation reports that value through `onSelect
 selection still travels the one road, and a consumer who ignores the callback still gets the focus walk.
 Nothing new is announced, because the selection change is what a screen reader is already told about.
 
+### `Tabs` warns about a tab nobody wired to a panel
+
+`TabsUtils.warnIfUnpaired` prints one warning naming the tabs that lack `id` or `panelId`, once at setup, by the house
+rule that an accessibility mistake the library can detect is warned about. **A tab with an `href` is not counted**: its
+panel may be a routed page mounted elsewhere, and `tabs.spec.ts` pins that the link examples write no `aria-controls`.
+A disabled tab still counts, since it needs its panel the moment it is enabled. The Playground examples that warned
+were wired with real panels rather than excused.
+
 ### `TabPanel`: the pairing is written on the record, and read from both ends
 
 A tab must name the panel it opens and the panel must name the tab back, and the
@@ -4844,12 +4852,19 @@ the ends of the whole list. The one piece of bookkeeping is `getItemOffsets`, ma
 where its options start in the flat list, which lets a nested `<Index>` hand each slot its flat index.
 
 **The library owns `role="group"` and its name; the consumer paints the header.** The wrapper is a bare
-`<div role="group" aria-label={label}>` and `renderGroup(getGroup)` fills in the visible header. Two
+`<div role="group" aria-label={label}>` and `renderGroupHeader(getGroup)` fills in the visible header. Two
 rejections: `display: contents`, because Chromium has historically dropped such elements from the
-accessibility tree and the role is the point of the element; and a `renderGroup(getGroup, renderOptions)`
-thunk in `renderPopup`'s shape, which would put the ARIA role in consumer markup. The cost is that a
-consumer cannot style the group box itself, only its header — recorded rather than solved, since the thunk
-form is available later.
+accessibility tree and the role is the point of the element; and a thunk handing the consumer the group element
+itself, which would put the ARIA role in consumer markup.
+
+**The box around a group is a second painter, `renderGroupBox`, inside the library's group element.** It is handed
+the heading and options as a thunk, in `renderPopup`'s shape, and wraps them in whatever it draws; the role stays
+on the library's element outside it, so the rejection above still holds. The user chose a separate prop over
+widening the header painter's signature, which would have changed every existing header, and renamed
+`renderGroup` to `renderGroupHeader` in the same change so the two names say which part each draws. **It is
+refused for a windowed list** (`SelectGroupBoxExcludesWindowing`, plus `SelectUtils.warnIfGroupBoxIgnored`):
+there each row is absolutely placed on its own, the group element has no height, and a box drawn around it would
+cover nothing — the `Stepper` pattern of a type refusing the pair and a warning for whatever slips past.
 
 **Option refs are gone, and each option scrolls itself into view.** An array keyed by index cannot survive a
 tree, since a flat index shifts when a preceding group is filtered. `SelectOptionItem` watches its own
@@ -4873,7 +4888,7 @@ selected_ option. `aria-multiselectable="true"` goes on the listbox, and `isSele
 boolean — an option is selected or it is not. The three-way value belongs to the group header, below.
 
 **A group header is told how much of its group is selected, through a second argument rather than a new prop.**
-`renderGroup` was `(getGroup) => JSX.Element` and is now `(getGroup, getFlags) => JSX.Element`, where
+`renderGroupHeader` (then `renderGroup`) was `(getGroup) => JSX.Element` and is now `(getGroup, getFlags) => JSX.Element`, where
 `SelectGroupFlags` carries one field, `checkedState`. Adding an argument rather than a prop keeps every
 existing header working untouched — a consumer who does not want the state simply never names the second
 parameter — and it matches `renderOption`, which has taken `(getOption, getFlags)` all along. The field is
@@ -4912,6 +4927,26 @@ clicking an option leaves `document.activeElement` on the field; a disabled fiel
 focus while its reachable twin stays at `tabIndex 0`; the arrow walk skips a disabled option _inside_ a group
 and crosses into the next; a multi list stays open across a pick and moves its highlight to the row picked;
 and a closing popup lets a click through.
+
+### `Select`: a typed-into field carries the picked text
+
+**A screen reader read nothing as an autocomplete's value.** After a pick the field showed "Lisbon", but the text box
+was empty and "Lisbon" was the consumer's paint beside it, hidden from assistive technology — so the combobox
+announced its name and no value, which fails WCAG 4.1.2 (Name, Role, Value). The non-typing `Select` was always right,
+since its value is its button's own text. The fix is the one the backlog had recorded as a taste question — restore the
+picked option's text on Escape — which turned out to be the accessibility fix.
+
+**Where the text comes from was the user's choice among three**: `computeCustomText` when given, otherwise the text the
+consumer painted for the picked option, read off the paint with `SelectUtils.computePaintedText` (every text node,
+hidden ones included, since the paint is usually hidden precisely because the field is meant to carry the value).
+Rejected: making `computeCustomText` required for a typed-into field, and a warning for non-text values.
+
+**The field shows what was typed only while the reader is typing.** `isEditing` turns on with the first input and off
+whenever the popup closes; otherwise the box holds the picked text in transparent ink, so the paint is what is seen and
+the box is what is read. Opening still shows every option — the query, which the consumer filters on, is untouched by
+the picked text, as in React Aria's combobox. Focus or a click selects the box's text so a keystroke replaces it.
+**The two writes on input are one update**: written separately, the box resynced to the empty query between them and
+the caret jumped to the start ("Por" typed as "orP"). A multi-select keeps an empty box.
 
 ### Controls: `Popover` extracted, and `Menu` as the second consumer
 
@@ -4984,9 +5019,24 @@ no document listener — while `Modal`'s is a different mechanism (document keyd
 explicit restore). Two identical siblings and one that does not fit is not the shape that wants an
 `Abstract`; the thing genuinely shared with `Modal` was `FocusManagerUtils.autoFocus`, which existed.
 
+### `Menu` sections are `Select`'s groups again
+
+The user's call: a menu is split into sections with exactly the mechanism `Select` groups use — a group entry
+`{ label, items }` with no value, `renderGroupHeader` for its heading and `renderGroupBox` for whatever surrounds it — on
+the grounds that one modular slot covers a boxed section, a line under a section, spacing and indents alike, so no
+separator role or separator record was added. The heading is never reached by the arrows, as in `Select`.
+
+**Everything that walks a level works on the flattened list**, `MenuUtils.flattenNodes`; only drawing reads
+`MenuUtils.getSections`. **Radio runs are worked out per section**, and the activation is handed those runs, because
+radio items used to group by adjacency alone and two sections of radio items side by side would have become one group.
+**A laid-out menu draws neither painter** — each item is placed on its own — so `MenuGroupPaintExcludesLayout` refuses
+the pair and `MenuUtils.warnIfGroupPaintIgnored` catches the rest, the `Stepper` pattern again; `FanMenu` and
+`WheelMenu`, always laid out, leave both out of their props. A laid-out menu still wraps a group in its named
+`role="group"`.
+
 ### Arbitrary item placement: `Abstracts/Placement`, and `Menu` as the first consumer
 
-The first half of `backlog.md` item 21. A control's items can be placed anywhere rather than along a line, and
+The first half of `backlog.md` item 17. A control's items can be placed anywhere rather than along a line, and
 the vocabulary for saying where lives in an abstract so the next control can use the same one.
 
 **A placement is a center, a size, an optional turn and an optional depth, all in fractions of the container's
@@ -5060,7 +5110,7 @@ its own chrome, or gets neither.
 
 ### Concentric submenus: `computeLayout` learns where it is, and a submenu borrows its parent's anchor
 
-The second piece of `backlog.md` item 21. A submenu of a laid-out menu is drawn as a wider ring round the
+The second piece of `backlog.md` item 17. A submenu of a laid-out menu is drawn as a wider ring round the
 same center rather than hanging off the item that opened it, so a wheel stays one wheel however deep it goes.
 
 **`computeLayout` takes one object rather than a run of arguments, and the reason is the third one.**
@@ -5589,7 +5639,7 @@ all eleven, which is what lets a consumer offer the whole set by key.
 
 ### `Paginator` takes a layout, and the placed box moves into the abstract
 
-The proving pass of `backlog.md` item 21, against the control the item named as the strongest candidate. A
+The proving pass of `backlog.md` item 17, against the control the item named as the strongest candidate. A
 paginator is arithmetic over a flat list, so a layout is the only thing that changes: the steps, the pages and
 the ellipses go round a dial in the order they already had, and nothing about the counting, the addresses or
 the labels is touched.
@@ -5641,7 +5691,7 @@ the box. So the sector is vocabulary a layout offers and a painter may decline, 
 control has to understand.
 
 **What the pass did not strain, which is worth knowing before the next consumer.** `PlacementUtils.pickIndex`
-still has no caller — a paginator has no gesture that picks by direction, so the loose end item 21 records is
+still has no caller — a paginator has no gesture that picks by direction, so the loose end item 17 records is
 untouched. Nor did anything about levels move: a paginator is one level and always will be, so the concentric
 machinery went unexercised.
 
@@ -5741,7 +5791,7 @@ arrangement is drawn from it — and both suites assert the walk rather than any
 
 ### Every layout sample lives in one place, and none of them is a menu's
 
-The user's call, taken while `backlog.md` item 21's proving pass was still open. `Samples/Menu/Layouts` was
+The user's call, taken while `backlog.md` item 17's proving pass was still open. `Samples/Menu/Layouts` was
 named when a menu was the only thing that had ever asked for a layout; by the end of the pass it held a
 honeycomb and a radial tree, and eleven consumers imported it of which three were menus. It is now
 `Samples/Placement/Layouts`, and the arrangements that came in with `Formation` are in it too.
@@ -6068,6 +6118,14 @@ fault that a snapped arc could not nest — there is nothing left to snap.
 handed a `PlacementRect` rather than the layout, so a wedge drawn about the middle of the box would be drawn
 about the wrong point whenever the box is not centered on the circle. `getSectorPath` prefers an explicit
 argument, then the sector's own, then the middle.
+
+### The two copies of the placement center are kept in step by a test
+
+`PlacementLayout.origin` and `PlacementSector.origin` hold the same number, deliberately — a wedge painter is handed a
+`PlacementRect` and never sees the layout — and nothing kept the two in step. Rather than remove the duplication,
+`PlacementLayouts.const.test.ts` checks every layout sample at a range of item counts and fails if a sector's origin
+ever differs from its layout's, with a second case making sure at least one sample carries both, so the first cannot
+pass on nothing.
 
 ### The arc can be flattened or stretched, and spaces its items along the curve
 
@@ -6893,7 +6951,7 @@ element and sorts only then.
 
 ### Five more controls take a layout, and each one broke something different
 
-The rest of `backlog.md` item 21's proving pass, run against `Stepper`, `Toolbar`, `Sortable` and `Tree` after
+The rest of `backlog.md` item 17's proving pass, run against `Stepper`, `Toolbar`, `Sortable` and `Tree` after
 `Paginator`, `RadioGroup` and `Tabs`. The reason to keep going past the first was that each control was
 expected to strain a different part of the abstract, and each did.
 
@@ -8978,6 +9036,14 @@ Pausing freezes the animation where it is, which is what scrubbing needs.
 
 **There is no `ScreenWiper`, owner's call: CellAnimation already carries weights and samples, so a separate wiper had nothing of its own.** The CellAnimation page reproduces it: a solid-color SVG source at the viewport's size, portaled into the viewport layer and fixed over it, one `pipe` iteration with a hold (in, hold, out, the part covered first uncovered first) and `finalFrame="nothing"`, unmounted on `onAnimationEnd`. The order of the cells is whichever weight sample the page has selected. **The lozenge is a square turned 45° and scaled past √2**, the least that covers its own cell, because CellAnimation only transforms and filters rectangular cuts. **The circle has no equivalent** for the same reason: a transform cannot round a corner. Under reduced motion the leg is 0ms, so the cover cuts in, holds and cuts out.
 
+### The scanline page stays a gallery of effects
+
+Collapsing the page's eleven registry-effect examples into one picture with an effect picker and a panel that
+follows it was a backlog item the user had promoted from an aside, and the user dropped it once its cost was laid
+out: the gallery is what lets two effects be compared side by side, each box's readout describes its own effect,
+and the picker, the changing readout and where the knobs sit would all have needed designing. Do not propose it
+again as cleanup.
+
 ### `ScanlineAnimation`: `orientation`, and why the defs are not transposed
 
 **`orientation` picks rows or columns, `horizontal` by default.** `vertical` hands CellAnimation `{ row: 1, col: lineCount }`. The evaluation defs stay the grid's own, so a vertical line's place is `pos.col`. Transposing them would make the index agree with the rows while every transform still moved along the screen's own axes, so the samples would be no more correct on columns, only harder to reason about. The shipped keyframe samples are row-shaped (`Horizontal*`) and have no column versions.
@@ -10159,6 +10225,37 @@ alongside `isSelected` and `isOutsideMonth`.
 `InteractionWrapper` owning its own root. `Select` already made this trade between `role="listbox"` and
 `role="option"`; it is in `backlog.md` now that a second component has hit it, a grid's row/cell relationship
 being the stricter of the two.
+
+### `Calendar` shows several months at once, and numbers its weeks
+
+The two gaps `backlog.md` used to record for `Calendar`, built together. Both were put to the user as choices.
+
+**Several months are a mode of `Calendar`, `monthCount`, rather than two calendars side by side.** The user's choice,
+for the keyboard: two composed calendars cannot walk from the 31st of one into the 1st of the other — an arrow at the
+end of the first would page it instead — and the consumer cannot fix that from outside. So one calendar draws a
+`role="group"` named by `ariaLabel`, holding a `role="grid"` per month named by the month, with one tab stop across
+all of them. **Only the day view has it**: `CalendarMonthCountExcludesPrecision` refuses `monthCount` beside
+`precision`, and `CalendarUtils.warnIfMonthCountIgnored` catches the rest. With one month the markup is exactly what
+it was. `RangeCalendar` gets it through the shared composite, and its page is where the two-month example lives —
+the user's call, since a range across a month boundary is the case that needs both months on screen.
+
+- **A day belonging to a neighboring month is blank** in the several-months view: the month beside it already shows
+  it, and drawing it twice would put one date in the grid twice with the same name.
+- **The page keys step by `monthCount`, and a walk past the months shown moves them by whole groups** —
+  `computeMove` steps the first month by `monthCount` until the day is in view, so August and September become
+  October and November, never September and October. With one month this is the old behavior exactly.
+- **`renderMonthHeader(month, index)`** draws a title over each grid, since without it nothing says which grid is
+  which month; **`monthGap`** spaces them. Both were added without being asked for, and reported.
+
+**Week numbers are a column of row headings, counted by the consumer's rule.** Countries disagree about week one:
+ISO 8601 starts weeks on Monday and wants four days of the new year in the first week; the United States starts on
+Sunday and calls the week holding 1 January week one. The user chose a second setting beside `weekStartsOn`,
+`minDaysInFirstWeek` (date-fns calls it `firstWeekContainsDate`), over deriving the rule from the start day — which
+would leave a Monday-start, one-day country wrong with no way out — and over ISO always, which numbers a Sunday-start
+row wrongly one day in seven. The default, Monday with four, is ISO. `DateValueUtils.getWeekNumber` does the counting
+in the date's own calendar. The column appears while `renderWeekNumber` is given; each row's heading is a
+`rowheader` and the column's a `columnheader`, named through `Intl.DisplayNames`' `weekOfYear` field so the word is
+the reader's language rather than an English string the library ships.
 
 ### `Calendar`: disabled days described rather than computed
 
@@ -12064,6 +12161,33 @@ Wrapping is what `Select`, `Menu`, `Tabs` and `RadioGroup` all do through `compu
 that stopped would be the one list here behaving differently — consistency inside the library won over the
 published behavior, recorded here rather than being discoverable only by pressing `ArrowUp` on the first row.
 
+### `Tree`: the arrow opens, the name selects
+
+One press on a folder used to both select it and open it, because the arrow is the consumer's paint and the tree
+could not tell a press on it from a press on the name. The user chose, over a press handler for a tick box and over a
+library-drawn arrow slot (which would break the rule that a component draws no controls), to hand the painter a
+`setExpanderRef` as `renderNode`'s third argument: a press inside that element opens or closes the folder and does
+nothing else, a press elsewhere selects. **With no expander registered, a press does both, exactly as before**, so no
+consumer's behavior changes until they opt in — and the library cannot tell an unwired arrow from a tree with none, so
+there is nothing to warn about. The element is held per row, not keyed by value, which is what keeps it right under
+`<Index>`.
+
+### `MultiTree` is a checkbox tree
+
+The user chose a checkbox tree over a plain multi-select and over offering both: ticking a folder ticks everything
+inside it, and a folder whose contents are partly ticked reads `"mixed"`, because the half-ticked folder is the reason
+to put multi-select in a tree at all. So the state is `aria-checked`, the only one with a mixed value, and the tree is
+`aria-multiselectable`. **It is a preset beside `Tree`, not a mode**, for the reason `MultiSelect` is: the value's type
+changes, from one value to a list (`checked`). The arithmetic is `Abstracts/Selection`'s; `TreeUtils.createBranchDefs`
+keys it by value and leaves disabled nodes out of every folder, so ticking a folder never changes one and it never counts
+toward the folder's state.
+
+**The keys are the published tree pattern's recommended multi-select model** — Space ticks, Shift with an arrow moves
+and ticks, Shift with Space ticks a run from the last node ticked, Control with Shift and Home or End ticks to an end,
+Control with A ticks everything (or clears it all when everything already is) — in `TreeUtils.computeMultiKeyAction`,
+which runs before the ordinary handling. Enter keeps its pattern meaning, the node's own action: a folder opens or
+closes, a leaf ticks. The selection marker is not drawn, since there is no one selected node.
+
 ### A branch whose children have not arrived: `hasMoreChildren`, and where the waiting is painted
 
 The gap this closes was recorded as hard for two reasons, and only one of them survived contact.
@@ -12150,6 +12274,24 @@ element itself, so the two keys stay interchangeable.
 `preventDefault` before returning, which is `TabsItem`'s arrangement and is not optional here: on a `div` an
 early return is enough, while an anchor would have followed its `href` regardless.
 
+### A placed `Tree` draws the line to each node's parent through `renderConnector`
+
+Recorded in `backlog.md` as the one gap left by the radial tree: a child sat inside its parent's angular slice, which
+is enough to see and not enough to state. `Stepper` already had both halves — a connector slot and
+`PlacementUtils.getLinkPath` — so this is the same answer given to a second control.
+
+**Only a laid-out tree draws connectors.** An indented tree has no placements to run a line between, and its guide
+lines, if a consumer wants them, are a painter's business from `depth`. So `renderConnector` without `computeLayout`
+is refused by `TreeConnectorNeedsLayout` and warned about by `TreeUtils.warnIfConnectorIgnored` — `Stepper`'s pattern
+of a type that refuses the pair plus a warning for whatever slips past it.
+
+**One connector per node that has a parent, drawn across the whole box, behind everything.** Each is an
+`aria-hidden` span stretched over the placement box, handed `TreeConnectorDefs`: the two nodes' values, both
+placements, and the layout's `origin` and `radii`, so a consumer can draw a straight line or bend it round the
+middle. **It sits at `z-index: -2` inside the tree's own stacking context**, below the selection and highlight
+markers at `-1`. The first build relied on document order, which put each connector after its parent's row and so
+over the parent node; the user asked for them underneath.
+
 ### A placed `Tree` can be given rings without `Tree` knowing, and what that costs
 
 The user's question: can a consumer already draw the rings a radial tree implies, or does everything that is
@@ -12173,8 +12315,9 @@ the document so they paint behind it.
 **What it costs is that the page restates the radius rule.** `innerRadiusPx + ringGapPx * depth` is the
 layout's formula and the example now spells it a second time, along with a walk of its own data to work out
 which depths are showing — because a ring must disappear when its generation collapses, and only the layout
-knows that today. So the escape hatch is real and the duplication is real with it, which is the argument for
-the slot recorded against item 21 rather than a reason to think nothing is missing.
+knows that today. So the escape hatch is real and the duplication is real with it, which is the argument for a
+slot for such decorations rather than a reason to think nothing is missing. `renderConnector` (below) answered the
+links between nodes; the rings still have none.
 
 **The user's stated position on where this should land**, taken as their framing rather than as a rule
 anything has been changed to follow: a thing that belongs in a particular place should have a render slot of
@@ -12358,6 +12501,14 @@ on for a press anywhere on the track, including one the hit test refused, so the
 signal and a live grab together. A painter keyed on the raw one would drop its transition on a press that moves
 nothing.
 
+### `SlideButton` completes part-way along
+
+`completionRatio`, defaulting to `1`, which is the old behavior exactly: how far along the track a released thumb has
+to be for the slide to complete. It governs the drag alone — the hold, a held Enter or Space and a click from assistive
+technology confirm as before. `SlideButtonUtils.computeCompletionRatio` holds it between `0.1` and `1`; **the `0.1`
+floor keeps a barely moved thumb from ever completing, so that `0` cannot turn the slide into a plain press; it
+started as a guess and the user kept it.**
+
 ### `SlideButton`'s `mode` closes a pointer route, and never the keyboard one
 
 **The user's design, and the second form of it rather than the first.** Asked for as `"slide" | "hold" | "both"`,
@@ -12481,7 +12632,7 @@ turn a list of keyframe stops into the evaluation function `CellAnimation` asks 
 keyframes rather than a formula writes their own. That is real, and it is still not the library's: the
 component's contract is already the smaller and more general thing — a function from timeline to result — and a
 stop list with `at`, `depth` and origin keys is one **opinion about how to author** such a function. Shipping it
-would freeze that opinion as API for a consumer nobody has met, which is the layer item 6 in `backlog.md`
+would freeze that opinion as API for a consumer nobody has met, which is the layer item 5 in `backlog.md`
 plans. The matrix half is a different case: it needs only the language to work, which is the `ss-utils` test,
 and that package has `Vec2d` and `Vec4d` but no matrix — noted as a candidate rather than moved, because one
 consumer is a thin case for an export in another repo.
@@ -12689,7 +12840,7 @@ page behind is then outside what the layer can see. It is the same trap as `isol
 is why each layer carries its own clip rather than sharing one.
 
 **The fringe this section used to blame on a disagreement between the two backdrop layers is postponed, not
-fixed — see item 20 in `backlog.md` for the current standing.** The margin explanation did not survive a
+fixed — see item 16 in `backlog.md` for the current standing.** The margin explanation did not survive a
 direct test: pushing the margin far past what either layer needs changes nothing, and shrinking it to nearly
 zero changes nothing either. Folding the blur into the ripple filter was tried, looked clean, and was reverted
 anyway — not because it cost Firefox and Safari their blur, though it does, but because "clean" turned out to
@@ -12698,7 +12849,7 @@ building a `feImage` / `feComposite` mask into the filter, so the pane never nee
 ancestor `overflow: hidden` at all, also looked clean under that same software path and also failed once
 checked against a real GPU-accelerated window. Neither fix is in the tree. What each attempt actually ruled
 out is real and kept below; what it did not do is find a fix that survives real rendering, and nothing further
-should be attempted here without a way to check against GPU rendering from the start — see item 20.
+should be attempted here without a way to check against GPU rendering from the start — see item 16.
 
 **The Playground's pane is dragged with `left` and `top`, never with `transform`.** A transform on an
 ancestor creates a stacking context and changes the containing block, and given how readily this arrangement
@@ -12793,7 +12944,7 @@ nothing" trap the backdrop layers above are already written to avoid. Skipping t
 nothing for one.
 
 **The ripple layer's edge is postponed, not fixed, and the investigation is recorded here so it is not repeated
-blind — see item 20 in `backlog.md` for what this means for now.** Found on the Playground's tooltip once
+blind — see item 16 in `backlog.md` for what this means for now.** Found on the Playground's tooltip once
 moved onto `GlassSurface`: a patch of whatever sat behind it rendered sharp and barely warped instead of
 frosted. Chased with a standalone sandbox — raw `feTurbulence` / `feDisplacementMap`, no library code — every
 test run in the browser this session had, which turned out to be headless Chromium and headless Edge, both of
@@ -14550,6 +14701,13 @@ read at the next press. It lives in the framework-free utilities because all fou
 **Horizontal only.** The axis is one variable rather than a redesign, but nothing has asked for a column and
 `SlideButton`'s precedent is to build the axis that exists.
 
+### `Scroller` can keep some of the last view
+
+`overlapCount`, defaulting to `0`, which is the old behavior exactly: how many fully visible items of the view just
+left stay in view after a step. `ScrollerUtils.computeStepLanding` pulls the landing back one item boundary per unit
+of overlap, never past the first boundary the step crosses, so a step always moves at least one item; a negative,
+fractional or missing count is read as a whole number from zero.
+
 ### `EdgeFader`: a mask on the content, fixed or following the scroll
 
 A wrapper whose chosen sides fade to nothing. The consumer picks any mix of `top`, `right`, `bottom` and `left`,
@@ -15874,6 +16032,16 @@ allocates a zero-width implicit track and the gap before it is still spent. Halv
 entirely — checked at container widths from 280px up, the row now overflows by nothing at any of them, and the
 column count at ordinary widths is unchanged.
 
+### Examples with a non-standard layout come last on their page
+
+The user's rule. An example whose control is drawn in an arrangement other than its ordinary one — a `Tree` drawn
+outward or leaning, `Tabs` as a honeycomb, a `Sortable` ring, a `RadioGroup` bent into an arc — sits after every
+example of the control in its ordinary shape. A reader learns what the control is from the plain examples first,
+and the laid-out ones then read as variations on something already understood. In practice that means any example
+handing the control a `computeLayout`; a page whose control is always laid out (`Bracket`, `Formation`) has no
+ordinary shape and is outside the rule. The order is the same in all four Playgrounds, like everything else on a
+page.
+
 ### `PageExamples` takes one layout switch, because the two questions turned out to be one
 
 Settled with the user after the grid had been running for a while. The grid fixed what it was brought in for —
@@ -16639,7 +16807,7 @@ can know.
 **The cost is stated rather than mitigated: a library that renders no button cannot promise one is reachable or
 named.** A consumer who wires up no control has a wheel that can only be driven from elsewhere through
 `targetIndex`, exactly as a `Carousel` whose consumer builds no buttons on its controller has no keyboard route. That is the same exposure
-item 13 records for `Scroller` and it is now the wheel's too.
+item 9 records for `Scroller` and it is now the wheel's too.
 
 **No slot survives either, and the one that briefly did was kept for a bad reason.** A `renderHub` was left on
 the overhead wheel out of deference to an earlier choice — that an overhead wheel has one control slot and it is the

@@ -31,6 +31,11 @@
 
     let { value = $bindable(), expanded = $bindable([]), ...props }: TreeProps<T> = $props();
 
+    const hasLayout = $derived(props.computeLayout !== undefined);
+    const hasConnector = $derived(props.renderConnector !== undefined);
+
+    $effect(() => TreeUtils.warnIfConnectorIgnored(hasLayout, hasConnector));
+
     const treeId = $props.id();
 
     const [getValue, setValue] = createHeldValue([
@@ -285,6 +290,11 @@
         focusVisibleValue = readFocusVisibleValue(e.target);
     };
 
+    const getConnectorDefs = (row: TreeRow<T>) =>
+        props.renderConnector === undefined || layout === undefined
+            ? undefined
+            : TreeUtils.computeConnectorDefs(flatRows, row, layout);
+
     const hasPendingPaint = (row: TreeRow<T>) =>
         TreeUtils.computeIsPending(row) && props.renderPendingChildren !== undefined;
 </script>
@@ -304,6 +314,7 @@
                 isExpanded: row.isExpanded,
                 isPending: TreeUtils.computeIsPending(row),
                 isSelected: row.node.value === getValue(),
+                checkedState: row.node.value === getValue(),
                 depth: row.depth,
             }}
         >
@@ -345,6 +356,13 @@
 
 {#snippet renderRows(levelRows: TreeRow<T>[])}
     {#each levelRows as row, index (index)}
+        {@const connectorDefs = getConnectorDefs(row)}
+        {#if connectorDefs}
+            <span class={styles.treeConnector} aria-hidden="true">
+                {@render props.renderConnector?.(connectorDefs)}
+            </span>
+        {/if}
+
         {@render renderRow(row)}
 
         {#if row.rows.length > 0 || hasPendingPaint(row)}

@@ -126,17 +126,6 @@ export const TabsPage = () => {
             path: `${EXAMPLES_ROOT}/SwitchedDirection.tsx`,
         },
         {
-            key: "honeycomb",
-            span: 2,
-            name: EXAMPLE_NAMES.honeycomb,
-            readout: () =>
-                `selected: ${getHoneycombValue()} — the same tab list, placed by a layout that has no angle in it at all`,
-            component: () => (
-                <HoneycombExample selectedValue={getHoneycombValue} onSelectionChange={setHoneycombValue} />
-            ),
-            path: `${EXAMPLES_ROOT}/Honeycomb.tsx`,
-        },
-        {
             key: "links",
             name: EXAMPLE_NAMES.links,
             readout: () => `selected: ${getLinkValue()} — every tab carries an href, so each one is an anchor`,
@@ -175,6 +164,17 @@ export const TabsPage = () => {
                 <AllDisabledExample selectedValue={getDisabledValue} onSelectionChange={setDisabledValue} />
             ),
             path: `${EXAMPLES_ROOT}/AllDisabled.tsx`,
+        },
+        {
+            key: "honeycomb",
+            span: 2,
+            name: EXAMPLE_NAMES.honeycomb,
+            readout: () =>
+                `selected: ${getHoneycombValue()} — the same tab list, placed by a layout that has no angle in it at all`,
+            component: () => (
+                <HoneycombExample selectedValue={getHoneycombValue} onSelectionChange={setHoneycombValue} />
+            ),
+            path: `${EXAMPLES_ROOT}/Honeycomb.tsx`,
         },
     ]);
 

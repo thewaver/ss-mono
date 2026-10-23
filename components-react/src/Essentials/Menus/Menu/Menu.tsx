@@ -242,7 +242,7 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>) => {
     }
 
     const entries = useMemo(
-        () => MenuUtils.computeEntries(props.items, props.openerItem, props.submenuMode),
+        () => MenuUtils.computeEntries(MenuUtils.flattenNodes(props.items), props.openerItem, props.submenuMode),
         [props.items, props.openerItem, props.submenuMode],
     );
 

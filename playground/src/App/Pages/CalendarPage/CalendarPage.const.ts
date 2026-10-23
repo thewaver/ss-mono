@@ -25,6 +25,7 @@ export const EXAMPLE_NAMES = {
     default: "Default",
     bounded: "Bounded",
     weekdays: "Weekdays only",
+    weekNumbers: "Week numbers",
     rightToLeft: "In a right-to-left box",
     monthPicker: "Month picker",
     yearPicker: "Year picker",

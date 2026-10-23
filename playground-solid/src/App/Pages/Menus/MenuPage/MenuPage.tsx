@@ -14,6 +14,7 @@ import { PlacedAboveExample } from "./Examples/PlacedAbove";
 import { ReachableExample } from "./Examples/Reachable";
 import { RightToLeftExample } from "./Examples/RightToLeft";
 import { RightToLeftPlacedExample } from "./Examples/RightToLeftPlaced";
+import { SectionsExample } from "./Examples/Sections";
 import { StatefulExample } from "./Examples/Stateful";
 import { SubmenusExample } from "./Examples/Submenus";
 import {
@@ -55,6 +56,8 @@ export const MenuPage = () => {
 
     const drivenVisibility = createSignal(false);
     const viewSignal = createSignal(VIEW_DEFAULTS);
+    const sectionsSignal = createSignal(VIEW_DEFAULTS);
+    const [getLastSectionsAction, setLastSectionsAction] = createSignal(NOTHING_RUN);
     const [getLastViewAction, setLastViewAction] = createSignal(NOTHING_RUN);
 
     const getExamples = createMemo(() => [
@@ -203,6 +206,23 @@ export const MenuPage = () => {
                 />
             ),
             path: `${EXAMPLES_ROOT}/Stateful.tsx`,
+        },
+        {
+            key: "sections",
+            name: EXAMPLE_NAMES.sections,
+            readout: () =>
+                `${getLastSectionsAction()} — ticked: [${sectionsSignal[0]()
+                    .map((action) => action.name)
+                    .join(
+                        ", ",
+                    )}]; each group is named, the arrows walk straight through the headings, and the radio choice stays inside its own group`,
+            component: () => (
+                <SectionsExample
+                    checked={sectionsSignal}
+                    onActivate={(action) => setLastSectionsAction(`ran ${action.name}`)}
+                />
+            ),
+            path: `${EXAMPLES_ROOT}/Sections.tsx`,
         },
         {
             key: "disabled",

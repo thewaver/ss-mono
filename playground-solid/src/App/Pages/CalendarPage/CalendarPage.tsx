@@ -1,7 +1,12 @@
 import type { Signal } from "solid-js";
 import { createMemo, createSignal } from "solid-js";
 
-import type { DateValue, DateValueCalendarId, DateValueWeekStart } from "@thewaver/ss-components-solid";
+import type {
+    DateValue,
+    DateValueCalendarId,
+    DateValueMinDaysInFirstWeek,
+    DateValueWeekStart,
+} from "@thewaver/ss-components-solid";
 import { CALENDAR_DEFAULTS, DateValueUtils } from "@thewaver/ss-components-solid";
 import { CalendarKnobs } from "@thewaver/ss-playground/App/Knobs/Calendars.const";
 import {
@@ -24,6 +29,7 @@ import { BoundedExample } from "./Examples/Bounded";
 import { DefaultExample } from "./Examples/Default";
 import { MonthPickerExample } from "./Examples/MonthPicker";
 import { RightToLeftExample } from "./Examples/RightToLeft";
+import { WeekNumbersExample } from "./Examples/WeekNumbers";
 import { WeekdaysExample } from "./Examples/Weekdays";
 import { YearPickerExample } from "./Examples/YearPicker";
 
@@ -32,11 +38,15 @@ const describe = (value: DateValue | undefined) => (value ? DateValueUtils.toIso
 export const CalendarPage = () => {
     const [getCalendarId, setCalendarId] = createSignal<DateValueCalendarId>(CalendarKnobs.STARTING_CALENDAR);
     const [getWeekStartsOn, setWeekStartsOn] = createSignal<DateValueWeekStart>(CALENDAR_DEFAULTS.weekStartsOn);
+    const [getMinDaysInFirstWeek, setMinDaysInFirstWeek] = createSignal<DateValueMinDaysInFirstWeek>(
+        CALENDAR_DEFAULTS.minDaysInFirstWeek,
+    );
 
     const defaultValue = createSignal<DateValue | undefined>(TODAY);
     const rangedValue = createSignal<DateValue | undefined>();
     const weekdaysValue = createSignal<DateValue | undefined>();
     const rightToLeftValue = createSignal<DateValue | undefined>(TODAY);
+    const weekNumbersValue = createSignal<DateValue | undefined>(TODAY);
 
     const makeMonthSignal = (): Signal<DateValue> => {
         const signal = createSignal<DateValue>(DateValueUtils.getStartOfMonth(TODAY));
@@ -48,6 +58,7 @@ export const CalendarPage = () => {
     const rangedMonth = makeMonthSignal();
     const weekdaysMonth = makeMonthSignal();
     const rightToLeftMonth = makeMonthSignal();
+    const weekNumbersMonth = makeMonthSignal();
 
     const monthPickerValue = createSignal<DateValue | undefined>();
     const yearPickerValue = createSignal<DateValue | undefined>();
@@ -81,6 +92,21 @@ export const CalendarPage = () => {
                 <WeekdaysExample value={weekdaysValue} month={weekdaysMonth} weekStartsOn={getWeekStartsOn} />
             ),
             path: `${EXAMPLES_ROOT}/Weekdays.tsx`,
+        },
+        {
+            key: "weekNumbers",
+            name: EXAMPLE_NAMES.weekNumbers,
+            readout: () =>
+                `week starts on ${WEEK_START_LABELS[getWeekStartsOn()]}, week one holds at least ${getMinDaysInFirstWeek()} days of the new year — value: ${describe(weekNumbersValue[0]())}`,
+            component: () => (
+                <WeekNumbersExample
+                    value={weekNumbersValue}
+                    month={weekNumbersMonth}
+                    weekStartsOn={getWeekStartsOn}
+                    minDaysInFirstWeek={getMinDaysInFirstWeek}
+                />
+            ),
+            path: `${EXAMPLES_ROOT}/WeekNumbers.tsx`,
         },
         {
             key: "rightToLeft",
@@ -140,6 +166,23 @@ export const CalendarPage = () => {
                         ariaLabel={"Week starts on"}
                         computeLabel={(day) => WEEK_START_LABELS[day]}
                         onChange={(day) => setWeekStartsOn(() => day)}
+                    />
+                </PageProp>
+
+                <PageProp
+                    key={"minDaysInFirstWeek"}
+                    label={"First week holds"}
+                    hint={
+                        "How many days of the new year the first week must hold, which decides the week numbers. 4 is ISO 8601, used across most of Europe; 1 is the United States' count."
+                    }
+                    controls={"Sets CalendarProps.minDaysInFirstWeek"}
+                >
+                    <PageSelectField
+                        value={getMinDaysInFirstWeek}
+                        values={() => [...CalendarKnobs.MIN_DAYS_IN_FIRST_WEEK]}
+                        ariaLabel={"First week holds"}
+                        computeLabel={(days) => `${days} ${days === 1 ? "day" : "days"}`}
+                        onChange={(days) => setMinDaysInFirstWeek(() => days)}
                     />
                 </PageProp>
             </PagePropsPanel>

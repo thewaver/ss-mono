@@ -14,6 +14,7 @@ export const EXAMPLE_NAMES = {
     placedAbove: "Placed above",
     scrollingList: "Scrolling list",
     stateful: "Rows that hold a state",
+    sections: "Sections",
     disabled: "Disabled",
     reachable: "Disabled + reachable",
 };

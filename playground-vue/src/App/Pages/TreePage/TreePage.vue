@@ -144,6 +144,13 @@ const examples: ExampleDefs[] = [
         path: `${EXAMPLES_ROOT}/Virtualized.vue`,
     },
     {
+        key: "recordValues",
+        name: EXAMPLE_NAMES.recordValues,
+        readout: () =>
+            `value: ${recordValue.value?.name ?? "undefined"} | expanded: ${recordExpanded.value.length} branch(es) — the value is the record itself, not a name`,
+        path: `${EXAMPLES_ROOT}/RecordValues.vue`,
+    },
+    {
         key: "leaning",
         name: EXAMPLE_NAMES.leaning,
         readout: () =>
@@ -157,13 +164,6 @@ const examples: ExampleDefs[] = [
         readout: () =>
             `value: ${radialValue.value ?? "undefined"} — the layout is told which node each node hangs from, so children share the slice their parent was given, and every rank sits a ring further out whoever it hangs from`,
         path: `${EXAMPLES_ROOT}/Radial.vue`,
-    },
-    {
-        key: "recordValues",
-        name: EXAMPLE_NAMES.recordValues,
-        readout: () =>
-            `value: ${recordValue.value?.name ?? "undefined"} | expanded: ${recordExpanded.value.length} branch(es) — the value is the record itself, not a name`,
-        path: `${EXAMPLES_ROOT}/RecordValues.vue`,
     },
 ];
 </script>

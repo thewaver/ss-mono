@@ -39,7 +39,7 @@
         </PageSelectContent>
     {/snippet}
 
-    {#snippet renderGroup(group, flags)}
+    {#snippet renderGroupHeader(group, flags)}
         <PageSelectGroupContent {flags}>{group.label}</PageSelectGroupContent>
     {/snippet}
 

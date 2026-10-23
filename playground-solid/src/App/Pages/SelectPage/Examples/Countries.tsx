@@ -3,7 +3,10 @@ import type { MaybeAccessor } from "@thewaver/ss-components-solid";
 
 import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater";
 import { PageSelectContent } from "../../../StyledComponents/SelectContent/SelectContent";
-import { PageSelectGroupContent } from "../../../StyledComponents/SelectGroupContent/SelectGroupContent";
+import {
+    PageSelectGroupBox,
+    PageSelectGroupContent,
+} from "../../../StyledComponents/SelectGroupContent/SelectGroupContent";
 import { PageSelectOptionContent } from "../../../StyledComponents/SelectOptionContent/SelectOptionContent";
 import type { SelectExampleProps } from "../SelectPage.types";
 import { COUNTRIES, PLACEHOLDER, renderSelectPopup } from "../SelectPageSolid.const";
@@ -12,6 +15,7 @@ type Props = SelectExampleProps & {
     isDisabled?: MaybeAccessor<boolean>;
     hasError?: MaybeAccessor<boolean>;
     hasGroups?: MaybeAccessor<boolean>;
+    hasGroupBoxes?: MaybeAccessor<boolean>;
 };
 
 export const CountriesExample = (props: Props) => {
@@ -26,9 +30,14 @@ export const CountriesExample = (props: Props) => {
             renderContent={(getSelectedOption, getFlags) => (
                 <PageSelectContent flags={getFlags}>{getSelectedOption()?.value ?? PLACEHOLDER}</PageSelectContent>
             )}
-            renderGroup={
+            renderGroupHeader={
                 access(props.hasGroups)
                     ? (getGroup) => <PageSelectGroupContent>{getGroup().label}</PageSelectGroupContent>
+                    : undefined
+            }
+            renderGroupBox={
+                access(props.hasGroupBoxes)
+                    ? (renderContent) => <PageSelectGroupBox>{renderContent()}</PageSelectGroupBox>
                     : undefined
             }
             renderOption={(getOption, getFlags) => (

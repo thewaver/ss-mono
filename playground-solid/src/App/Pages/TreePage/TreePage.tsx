@@ -7,6 +7,7 @@ import { PageExampleKnobs } from "../../PageComponents/ExampleKnobs/ExampleKnobs
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageSelectField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
+import { CheckboxesExample } from "./Examples/Checkboxes";
 import { FilesExample } from "./Examples/Files";
 import { LazyExample } from "./Examples/Lazy";
 import { LeaningExample } from "./Examples/Leaning";
@@ -93,6 +94,8 @@ export const TreePage = () => {
     const radialSignal = createSignal<string | undefined>();
     const radialExpandedSignal = createSignal<string[]>(RANK_ROOTS);
 
+    const checkboxesSignal = createSignal<string[]>([]);
+    const checkboxesExpandedSignal = createSignal<string[]>([]);
     const recordSignal = createSignal<Asset | undefined>();
     const recordExpandedSignal = createSignal<Asset[]>([]);
 
@@ -192,6 +195,22 @@ export const TreePage = () => {
             path: `${EXAMPLES_ROOT}/Virtualized.tsx`,
         },
         {
+            key: "recordValues",
+            name: EXAMPLE_NAMES.recordValues,
+            readout: () =>
+                `value: ${recordSignal[0]()?.name ?? "undefined"} | expanded: ${recordExpandedSignal[0]().length} branch(es) — the value is the record itself, not a name`,
+            component: () => <RecordValuesExample value={recordSignal} expanded={recordExpandedSignal} />,
+            path: `${EXAMPLES_ROOT}/RecordValues.tsx`,
+        },
+        {
+            key: "checkboxes",
+            name: EXAMPLE_NAMES.checkboxes,
+            readout: () =>
+                `ticked: [${checkboxesSignal[0]().join(", ")}] — pressing a folder's arrow opens it and pressing its name ticks it with everything inside; Space ticks, Shift with Space ticks a run, Control with A ticks everything`,
+            component: () => <CheckboxesExample checked={checkboxesSignal} expanded={checkboxesExpandedSignal} />,
+            path: `${EXAMPLES_ROOT}/Checkboxes.tsx`,
+        },
+        {
             key: "leaning",
             name: EXAMPLE_NAMES.leaning,
             readout: () =>
@@ -207,14 +226,6 @@ export const TreePage = () => {
                 `value: ${radialSignal[0]() ?? "undefined"} — the layout is told which node each node hangs from, so children share the slice their parent was given, and every rank sits a ring further out whoever it hangs from`,
             component: () => <RadialExample value={radialSignal} expanded={radialExpandedSignal} />,
             path: `${EXAMPLES_ROOT}/Radial.tsx`,
-        },
-        {
-            key: "recordValues",
-            name: EXAMPLE_NAMES.recordValues,
-            readout: () =>
-                `value: ${recordSignal[0]()?.name ?? "undefined"} | expanded: ${recordExpandedSignal[0]().length} branch(es) — the value is the record itself, not a name`,
-            component: () => <RecordValuesExample value={recordSignal} expanded={recordExpandedSignal} />,
-            path: `${EXAMPLES_ROOT}/RecordValues.tsx`,
         },
     ]);
 

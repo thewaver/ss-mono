@@ -77,13 +77,13 @@ export const LINK_TABS: Tab<string>[] = [
     { value: "Blog", href: "#tabs-blog" },
 ];
 
-export const CLEARABLE_TABS: Tab<string>[] = [{ value: "One" }, { value: "Two" }, { value: "Three" }];
+export const CLEARABLE_TABS = withIds("clearable", [{ value: "One" }, { value: "Two" }, { value: "Three" }]);
 
-export const DISABLED_TABS: Tab<string>[] = [
+export const DISABLED_TABS = withIds("disabled", [
     { value: "Draft", isDisabled: true },
     { value: "Review", isDisabled: true },
     { value: "Publish", isDisabled: true },
-];
+]);
 
 export const PANEL_BODIES: Record<string, string> = {
     Layers: "A honeycomb is a tab list too, and this is the panel behind one cell of it.",
@@ -99,6 +99,12 @@ export const PANEL_BODIES: Record<string, string> = {
     Details: "The long version, which is why this list is a column rather than a row.",
     History: "Disabled, so nothing reaches this panel.",
     Settings: "The knobs, which nobody reads until something goes wrong.",
+    One: "The first of three, and the one the list starts on.",
+    Two: "Clearing the selection leaves the strip with no panel at all.",
+    Three: "Choosing any tab again brings its panel back.",
+    Draft: "Disabled, so nothing can reach this panel; it is wired so that enabling the tab would not leave it unpaired.",
+    Review: "Disabled as well, and wired for the same reason.",
+    Publish: "Disabled as well, and wired for the same reason.",
 };
 
 export const EXAMPLE_NAMES = {

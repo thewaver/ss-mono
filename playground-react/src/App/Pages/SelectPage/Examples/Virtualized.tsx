@@ -24,7 +24,7 @@ export const VirtualizedExample = (props: Props) => {
                 ariaLabel={"Route"}
                 computeEstimatedOptionHeight={() => STRESS_OPTION_HEIGHT}
                 computeEstimatedGroupHeight={() => STRESS_GROUP_HEIGHT}
-                renderGroup={(group) => <PageSelectGroupContent>{group.label}</PageSelectGroupContent>}
+                renderGroupHeader={(group) => <PageSelectGroupContent>{group.label}</PageSelectGroupContent>}
                 computeCustomText={(option) => option.value.name}
                 renderContent={(selectedOption, flags) => (
                     <PageSelectContent flags={flags}>{selectedOption?.value.name ?? PLACEHOLDER}</PageSelectContent>

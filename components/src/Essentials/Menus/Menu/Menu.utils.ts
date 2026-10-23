@@ -15,6 +15,7 @@ import type {
     MenuContextRequestDefs,
     MenuFlickDefs,
     MenuFlickHandlers,
+    MenuGroupRecord,
     MenuHighlightDefs,
     MenuHighlightPosition,
     MenuItemKind,
@@ -23,6 +24,7 @@ import type {
     MenuLevelKeyDefs,
     MenuLevelKeyStep,
     MenuRun,
+    MenuSection,
     MenuSubmenuMode,
 } from "./Menu.types";
 
@@ -53,6 +55,10 @@ const toSubmenuKeyDirection = (
 
 /** An item that does not say otherwise is a plain command. */
 const DEFAULT_MENU_ITEM_KIND: MenuItemKind = "command";
+
+/** What the library prints when a laid-out menu is handed a group heading or box painter. */
+const IGNORED_GROUP_PAINT_WARNING =
+    "Menu: renderGroupHeader and renderGroupBox are ignored when computeLayout is given. A laid-out menu places each item on its own, so a group has no heading row and no box — drop one of them.";
 
 /** The role each kind of item announces. */
 const MENU_ITEM_ROLES: Record<MenuItemKind, MenuItemRole> = {
@@ -407,16 +413,26 @@ export namespace MenuUtils {
      * @param entries The level's entries.
      * @param index The entry being activated.
      * @param hasBackEntry Whether the level has a back entry.
+     * @param runs The level's runs, from {@link MenuUtils.getSections}, for a level split into groups: a radio group
+     * then ends where its group does. Without them, adjacent radio items make one group.
      */
     export const computeActivation = <T, TItem extends MenuItemRecord<T>>(
         entries: TItem[],
         index: number,
         hasBackEntry: boolean,
+        runs?: MenuRun<TItem>[],
     ): MenuActivation<T, TItem> => {
         if (getIsBackAt(hasBackEntry, index)) return { type: "back" };
         if (getHasSubmenu(entries, index, hasBackEntry)) return { type: "open" };
 
-        return { type: "pick", item: entries[index], radioGroupValues: getRadioGroupValues(entries, index) };
+        return {
+            type: "pick",
+            item: entries[index],
+            radioGroupValues:
+                runs === undefined
+                    ? getRadioGroupValues(entries, index)
+                    : getRunRadioGroupValues<T, TItem>(runs, index),
+        };
     };
 
     /**
@@ -802,5 +818,104 @@ export namespace MenuUtils {
             region.removeEventListener("contextmenu", handleContextMenu);
             region.removeEventListener("keydown", handleKeyDown);
         };
+    };
+
+    /**
+     * Whether an entry in a menu's list is a group of items rather than an item.
+     *
+     * A group carries a label and its items, and no value of its own, which is what tells the two apart.
+     */
+    export const getIsGroup = <TItem>(node: TItem | MenuGroupRecord<TItem>): node is MenuGroupRecord<TItem> =>
+        typeof node === "object" && node !== null && !("value" in node);
+
+    /**
+     * A menu's items with their groups opened out, in order.
+     *
+     * Everything that walks a level — the highlight, the keyboard, typing to find an item, the ids — works on this
+     * list, so a group changes how a level is drawn and nothing about how it is used.
+     *
+     * @param nodes The level's items and groups. Groups do not nest.
+     */
+    export const flattenNodes = <TItem>(nodes: (TItem | MenuGroupRecord<TItem>)[]): TItem[] =>
+        nodes.flatMap((node) => (getIsGroup(node) ? node.items : [node]));
+
+    /**
+     * Splits a level into the sections it is drawn in: each group on its own, and each stretch of items outside a
+     * group as one more.
+     *
+     * Each section carries its runs from {@link MenuUtils.getRuns}, worked out inside the section, so a radio group
+     * never reaches across the edge of a group even when the items either side are radio items too.
+     *
+     * @param nodes The level's items and groups, in order.
+     * @returns The sections in order. Every `from`, the section's and its runs', counts in the list
+     * {@link MenuUtils.flattenNodes} gives.
+     */
+    export const getSections = <T, TItem extends MenuItemRecord<T>>(
+        nodes: (TItem | MenuGroupRecord<TItem>)[],
+    ): MenuSection<TItem>[] => {
+        const sections: MenuSection<TItem>[] = [];
+        const shift = (runs: MenuRun<TItem>[], offset: number) =>
+            runs.map((run) => ({ ...run, from: run.from + offset }));
+
+        let index = 0;
+        let loose: TItem[] = [];
+        let looseFrom = 0;
+
+        const closeLoose = () => {
+            if (loose.length === 0) return;
+
+            sections.push({ from: looseFrom, group: undefined, runs: shift(getRuns<T, TItem>(loose), looseFrom) });
+            loose = [];
+        };
+
+        nodes.forEach((node) => {
+            if (getIsGroup(node)) {
+                closeLoose();
+                sections.push({ from: index, group: node, runs: shift(getRuns<T, TItem>(node.items), index) });
+                index += node.items.length;
+
+                return;
+            }
+
+            if (loose.length === 0) looseFrom = index;
+
+            loose.push(node);
+            index += 1;
+        });
+
+        closeLoose();
+
+        return sections;
+    };
+
+    /**
+     * The values of the radio group an entry belongs to, read off a level's runs.
+     *
+     * @param runs Every run of the level, in order.
+     * @param index The entry to ask about, counted in the flattened list.
+     * @returns The values of the radio run holding the entry, or an empty list when it is not in one.
+     */
+    export const getRunRadioGroupValues = <T, TItem extends MenuItemRecord<T>>(
+        runs: MenuRun<TItem>[],
+        index: number,
+    ) => {
+        const run = runs.find(
+            (candidate) => index >= candidate.from && index < candidate.from + candidate.items.length,
+        );
+
+        return run?.isRadioGroup ? run.items.map((item) => item.value) : [];
+    };
+
+    /**
+     * Warns, in the console, that a menu's group heading or box painter is being ignored.
+     *
+     * Call it once per menu, when it is set up. It says nothing unless a group painter was given alongside a layout,
+     * since a laid-out menu places each item on its own and has no heading row or box to draw.
+     *
+     * @param hasLayout Whether the menu was given `computeLayout`.
+     * @param hasGroupPaint Whether it was given `renderGroupHeader` or `renderGroupBox`.
+     */
+    export const warnIfGroupPaintIgnored = (hasLayout: boolean, hasGroupPaint: boolean) => {
+        if (hasLayout && hasGroupPaint) console.warn(IGNORED_GROUP_PAINT_WARNING);
     };
 }

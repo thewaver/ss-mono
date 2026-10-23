@@ -19,13 +19,15 @@ export const Scroller = (props: ScrollerProps) => {
 
     const getPadding = createMemo(() => access(props.padding) ?? SCROLLER_DEFAULTS.padding);
 
+    const getOverlapCount = createMemo(() => access(props.overlapCount) ?? SCROLLER_DEFAULTS.overlapCount);
+
     const getButtonPlacement = createMemo(() => access(props.buttonPlacement) ?? SCROLLER_DEFAULTS.buttonPlacement);
 
     const stepper: ScrollerStepper = {
         getIsAtStart: () => ScrollerUtils.getIsAtStart(getMetrics()),
         getIsAtEnd: () => ScrollerUtils.getIsAtEnd(getMetrics()),
-        stepToPrevious: () => ScrollerUtils.stepTo(getTrackRef(), "previous"),
-        stepToNext: () => ScrollerUtils.stepTo(getTrackRef(), "next"),
+        stepToPrevious: () => ScrollerUtils.stepTo(getTrackRef(), "previous", getOverlapCount()),
+        stepToNext: () => ScrollerUtils.stepTo(getTrackRef(), "next", getOverlapCount()),
     };
 
     const getIsScrollable = createMemo(() => ScrollerUtils.getIsScrollable(getMetrics()));

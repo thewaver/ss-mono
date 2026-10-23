@@ -105,6 +105,7 @@ export const SelectPage = () => {
     const filterQuerySignal = createSignal("");
     const filterSignal = createSignal<Airport | undefined>();
     const groupedSignal = createSignal<string | undefined>();
+    const groupBoxesSignal = createSignal<string | undefined>();
     const defaultSignal = createSignal<string | undefined>();
     const preselectedSignal = createSignal<string | undefined>("Portugal");
     const disabledOptionSignal = createSignal<string | undefined>();
@@ -255,6 +256,21 @@ export const SelectPage = () => {
             readout: () =>
                 `value: ${groupedSignal[0]() ?? "undefined"} — arrows cross group boundaries and skip Finland`,
             component: () => <CountriesExample value={groupedSignal} options={GROUPED_COUNTRIES} hasGroups={true} />,
+            path: `${EXAMPLES_ROOT}/Countries.tsx`,
+        },
+        {
+            key: "groupBoxes",
+            name: EXAMPLE_NAMES.groupBoxes,
+            readout: () =>
+                `value: ${groupBoxesSignal[0]() ?? "undefined"} — renderGroupBox draws the tinted box around each group's heading and options`,
+            component: () => (
+                <CountriesExample
+                    value={groupBoxesSignal}
+                    options={GROUPED_COUNTRIES}
+                    hasGroups={true}
+                    hasGroupBoxes={true}
+                />
+            ),
             path: `${EXAMPLES_ROOT}/Countries.tsx`,
         },
         {

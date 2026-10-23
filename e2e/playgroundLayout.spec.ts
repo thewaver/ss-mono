@@ -85,3 +85,20 @@ test("the page links above the menu share one highlight that follows the pointer
 
     await expect(highlight, "leaving the links lets it play out and go").toHaveCount(0);
 });
+
+test("the menu search clears from its own button, which is there only while there is something to clear", async ({
+    page,
+}) => {
+    const search = page.getByRole("textbox", { name: "Search components" });
+    const clear = page.getByRole("button", { name: "Clear search" });
+
+    await expect(clear, "an empty search has nothing to clear").toHaveCount(0);
+
+    await search.click();
+    await page.keyboard.type("Tree");
+    await clear.click();
+
+    await expect(search, "pressing it empties the search").toHaveValue("");
+    await expect(search, "and hands focus back to it").toBeFocused();
+    await expect(clear, "and the button goes with the text").toHaveCount(0);
+});

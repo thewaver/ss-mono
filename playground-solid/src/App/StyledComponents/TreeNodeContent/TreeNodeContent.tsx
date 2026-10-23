@@ -1,7 +1,12 @@
 import type { ParentProps } from "solid-js";
 import { Show } from "solid-js";
 
-import { access } from "@thewaver/ss-components-solid";
+import { PlacementUtils, access } from "@thewaver/ss-components-solid";
+import {
+    CHECKED_MARK,
+    MIXED_MARK,
+} from "@thewaver/ss-playground/App/StyledComponents/SelectGroupContent/SelectGroupContent.const";
+import * as markStyles from "@thewaver/ss-playground/App/StyledComponents/SelectGroupContent/SelectGroupContent.css";
 import {
     BRANCH_MARKER,
     DESCRIPTION_ONLY_MARKER,
@@ -14,7 +19,7 @@ import * as styles from "@thewaver/ss-playground/App/StyledComponents/TreeNodeCo
 import { themeVars } from "@thewaver/ss-playground/App/Theme.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { TreeNodeContentProps, TreeNodePendingProps } from "./TreeNodeContentSolid.types";
+import type { TreeConnectorProps, TreeNodeContentProps, TreeNodePendingProps } from "./TreeNodeContentSolid.types";
 
 export const PageTreeNodeContent = (props: ParentProps<TreeNodeContentProps>) => {
     const getLayerClass = useLayerClass();
@@ -35,13 +40,26 @@ export const PageTreeNodeContent = (props: ParentProps<TreeNodeContentProps>) =>
                 [styles.isCategory]: access(props.renderProps).depth === 0,
             }}
         >
-            <div class={styles.treeNodeMarker} aria-hidden="true">
+            <div ref={(element) => props.setExpanderRef?.(element)} class={styles.treeNodeMarker} aria-hidden="true">
                 {access(props.renderProps).isBranch
                     ? BRANCH_MARKER
                     : (access(props.hasExamples) ?? true)
                       ? LEAF_MARKER
                       : DESCRIPTION_ONLY_MARKER}
             </div>
+
+            <Show when={access(props.hasCheckbox)}>
+                <div
+                    class={markStyles.selectGroupMark}
+                    classList={{
+                        [markStyles.isChecked]: access(props.renderProps).checkedState === true,
+                        [markStyles.isMixed]: access(props.renderProps).checkedState === "mixed",
+                    }}
+                    aria-hidden="true"
+                >
+                    {access(props.renderProps).checkedState === "mixed" ? MIXED_MARK : CHECKED_MARK}
+                </div>
+            </Show>
 
             <div>{props.children}</div>
 
@@ -88,5 +106,27 @@ export const PageTreeRadialNode = (props: ParentProps<TreeNodeContentProps>) => 
         >
             {props.children}
         </div>
+    );
+};
+
+export const PageTreeConnector = (props: TreeConnectorProps) => {
+    const getLayerClass = useLayerClass();
+
+    const getLine = () => {
+        const defs = access(props.defs);
+
+        return defs.from === undefined || defs.to === undefined
+            ? undefined
+            : PlacementUtils.getLinkPath(defs.from, defs.to);
+    };
+
+    return (
+        <Show when={getLine()}>
+            {(getPath) => (
+                <svg class={[styles.treeConnector, getLayerClass()].join(" ")} viewBox={"0 0 1 1"} aria-hidden={"true"}>
+                    <path class={styles.treeConnectorPath} d={getPath()} />
+                </svg>
+            )}
+        </Show>
     );
 };

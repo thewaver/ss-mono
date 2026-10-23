@@ -90,14 +90,6 @@ const examples: ExampleDefs[] = [
         path: `${EXAMPLES_ROOT}/SwitchedDirection.vue`,
     },
     {
-        key: "honeycomb",
-        span: 2,
-        name: EXAMPLE_NAMES.honeycomb,
-        readout: () =>
-            `selected: ${honeycombValue.value} — the same tab list, placed by a layout that has no angle in it at all`,
-        path: `${EXAMPLES_ROOT}/Honeycomb.vue`,
-    },
-    {
         key: "links",
         name: EXAMPLE_NAMES.links,
         readout: () => `selected: ${linkValue.value} — every tab carries an href, so each one is an anchor`,
@@ -121,6 +113,14 @@ const examples: ExampleDefs[] = [
         name: EXAMPLE_NAMES.disabled,
         readout: () => `selected: ${disabledValue.value} — nothing can move it, so no tab holds the tab stop`,
         path: `${EXAMPLES_ROOT}/AllDisabled.vue`,
+    },
+    {
+        key: "honeycomb",
+        span: 2,
+        name: EXAMPLE_NAMES.honeycomb,
+        readout: () =>
+            `selected: ${honeycombValue.value} — the same tab list, placed by a layout that has no angle in it at all`,
+        path: `${EXAMPLES_ROOT}/Honeycomb.vue`,
     },
 ];
 </script>

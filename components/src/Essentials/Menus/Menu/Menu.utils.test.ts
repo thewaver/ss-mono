@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { MENU_DEFAULTS } from "./Menu.const";
-import type { MenuItemRecord as MenuItem } from "./Menu.types";
+import type { MenuGroupRecord, MenuItemRecord as MenuItem } from "./Menu.types";
 import { MenuUtils } from "./Menu.utils";
 
 const items: MenuItem<string>[] = [
@@ -146,7 +146,7 @@ describe("computeHighlightedIndex", () => {
     });
 
     it("starts below the back entry rather than on it", () => {
-        const entries = MenuUtils.computeEntries(nested[0].items!, nested[0], "replace");
+        const entries = MenuUtils.computeEntries(MenuUtils.flattenNodes(nested[0].items!), nested[0], "replace");
 
         expect(
             MenuUtils.computeHighlightedIndex({
@@ -165,7 +165,7 @@ describe("computeHighlightedIndex", () => {
 
 describe("computeActivation", () => {
     it("steps back from the back entry, opens a branch and picks a leaf", () => {
-        const entries = MenuUtils.computeEntries(nested[0].items!, nested[0], "replace");
+        const entries = MenuUtils.computeEntries(MenuUtils.flattenNodes(nested[0].items!), nested[0], "replace");
 
         expect(MenuUtils.computeActivation(entries, 0, true)).toEqual({ type: "back" });
         expect(MenuUtils.computeActivation(nested, 0, false)).toEqual({ type: "open" });
@@ -351,5 +351,62 @@ describe("computeLayoutWidth and computeLayoutShift", () => {
         expect(MenuUtils.computeLayoutShift({ placements: [], heightRatio: 1, origin: { x: 0, y: 0.5 } })).toBe(
             "translate(50%, 0%)",
         );
+    });
+});
+
+describe("getSections", () => {
+    const grouped: (MenuItem<string> | MenuGroupRecord<MenuItem<string>>)[] = [
+        { value: "new" },
+        {
+            label: "Size",
+            items: [
+                { value: "small", kind: "radio" },
+                { value: "large", kind: "radio" },
+            ],
+        },
+        {
+            label: "Weight",
+            items: [
+                { value: "light", kind: "radio" },
+                { value: "bold", kind: "radio" },
+            ],
+        },
+        { value: "quit" },
+    ];
+
+    it("opens groups out in order for everything that walks the level", () => {
+        expect(MenuUtils.flattenNodes(grouped).map((item) => item.value)).toEqual([
+            "new",
+            "small",
+            "large",
+            "light",
+            "bold",
+            "quit",
+        ]);
+    });
+
+    it("gives each group a section and each stretch of loose items another, counted in the flat list", () => {
+        expect(
+            MenuUtils.getSections(grouped).map((section) => [section.from, section.group?.label, section.runs.length]),
+        ).toEqual([
+            [0, undefined, 1],
+            [1, "Size", 1],
+            [3, "Weight", 1],
+            [5, undefined, 1],
+        ]);
+    });
+
+    it("ends a radio group at the edge of its group, even when the next group's items are radio items too", () => {
+        const entries = MenuUtils.flattenNodes(grouped);
+        const runs = MenuUtils.getSections(grouped).flatMap((section) => section.runs);
+
+        expect(MenuUtils.computeActivation(entries, 2, false, runs)).toEqual({
+            type: "pick",
+            item: entries[2],
+            radioGroupValues: ["small", "large"],
+        });
+        expect(MenuUtils.computeActivation(entries, 3, false, runs)).toMatchObject({
+            radioGroupValues: ["light", "bold"],
+        });
     });
 });

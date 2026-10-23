@@ -5,6 +5,7 @@ import type {
     InteractionFlags,
     ListboxFocusModel,
     ListboxOrientation,
+    SelectGroupBoxExcludesWindowing,
     SelectGroupFlags,
     SelectOptionFlags,
 } from "@thewaver/ss-components";
@@ -92,7 +93,14 @@ export type ListboxOptionsProps<T> = {
     /** Draws one option. */
     renderOption: Snippet<[option: SelectOption<T>, flags: InteractionFlags<SelectOptionFlags>]>;
     /** Draws one group heading. */
-    renderGroup?: Snippet<[group: SelectOptionGroup<T>, flags: SelectGroupFlags]>;
+    renderGroupHeader?: Snippet<[group: SelectOptionGroup<T>, flags: SelectGroupFlags]>;
+    /**
+     * Draws the box a group sits in, around its heading and its options. They are handed in as a snippet rather than
+     * built, so the consumer decides what surrounds them, and draws them with `{@render renderContent()}`. Refused
+     * alongside `computeEstimatedOptionHeight`, since a list that only draws what is on screen places each row on its
+     * own and a group has no box there.
+     */
+    renderGroupBox?: Snippet<[renderContent: Snippet, group: SelectOptionGroup<T>, flags: SelectGroupFlags]>;
 };
 
 export type ListboxCompositeProps<T> = BaseListboxProps & {
@@ -129,15 +137,23 @@ export type ListboxCompositeProps<T> = BaseListboxProps & {
      */
     renderOption: Snippet<[option: SelectOption<T>, flags: InteractionFlags<SelectOptionFlags>]>;
     /** Draws one group heading. */
-    renderGroup?: Snippet<[group: SelectOptionGroup<T>, flags: SelectGroupFlags]>;
+    renderGroupHeader?: Snippet<[group: SelectOptionGroup<T>, flags: SelectGroupFlags]>;
+    /**
+     * Draws the box a group sits in, around its heading and its options. They are handed in as a snippet rather than
+     * built, so the consumer decides what surrounds them, and draws them with `{@render renderContent()}`. Refused
+     * alongside `computeEstimatedOptionHeight`, since a list that only draws what is on screen places each row on its
+     * own and a group has no box there.
+     */
+    renderGroupBox?: Snippet<[renderContent: Snippet, group: SelectOptionGroup<T>, flags: SelectGroupFlags]>;
     /** Runs when an option is picked. */
     onPick: (value: T) => void;
-};
+} & SelectGroupBoxExcludesWindowing;
 
 export type ListboxPresetProps<T> = Omit<
     ListboxCompositeProps<T>,
     "selectedOptions" | "isMultiple" | "computeIsSelected" | "onPick"
->;
+> &
+    SelectGroupBoxExcludesWindowing;
 
 export type ListboxProps<T> = ListboxPresetProps<T> & {
     /** Which option is picked. Bind it with `bind:value`; it is the only thing that picks one. */

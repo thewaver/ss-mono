@@ -25,6 +25,7 @@ import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
 import BoundedExample from "./Examples/Bounded.vue";
 import DefaultExample from "./Examples/Default.vue";
 import RightToLeftExample from "./Examples/RightToLeft.vue";
+import TwoMonthsExample from "./Examples/TwoMonths.vue";
 
 const computeWeekStartLabel = (day: DateValueWeekStart) => WEEK_START_LABELS[day];
 
@@ -48,10 +49,12 @@ const weekStartsOn = shallowRef<DateValueWeekStart>(CALENDAR_DEFAULTS.weekStarts
 const defaultValue = shallowRef<DateValueRange | undefined>();
 const boundedValue = shallowRef<DateValueRange | undefined>();
 const rightToLeftValue = shallowRef<DateValueRange | undefined>();
+const twoMonthsValue = shallowRef<DateValueRange | undefined>();
 
 const defaultMonth = useMonthState(calendarId);
 const boundedMonth = useMonthState(calendarId);
 const rightToLeftMonth = useMonthState(calendarId);
+const twoMonthsMonth = useMonthState(calendarId);
 
 const examples: ExampleDefs[] = [
     {
@@ -66,6 +69,13 @@ const examples: ExampleDefs[] = [
         readout: () =>
             `min ${DateValueUtils.toIso(MIN_DATE)}, max ${DateValueUtils.toIso(MAX_DATE)} — value: ${describe(boundedValue.value)}`,
         path: `${EXAMPLES_ROOT}/Bounded.vue`,
+    },
+    {
+        key: "twoMonths",
+        name: EXAMPLE_NAMES.twoMonths,
+        readout: () =>
+            `value: ${describe(twoMonthsValue.value)} — a range can start in one month and end in the other; the arrow keys walk across, and the page keys step both`,
+        path: `${EXAMPLES_ROOT}/TwoMonths.vue`,
     },
     {
         key: "rightToLeft",
@@ -117,6 +127,14 @@ const examples: ExampleDefs[] = [
 
         <template #bounded>
             <BoundedExample v-model:value="boundedValue" v-model:month="boundedMonth" :week-starts-on="weekStartsOn" />
+        </template>
+
+        <template #twoMonths>
+            <TwoMonthsExample
+                v-model:value="twoMonthsValue"
+                v-model:month="twoMonthsMonth"
+                :week-starts-on="weekStartsOn"
+            />
         </template>
 
         <template #rightToLeft>

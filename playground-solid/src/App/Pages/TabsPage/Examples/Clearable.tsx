@@ -1,7 +1,16 @@
+import { Show } from "solid-js";
+
 import { Button, Tabs, access } from "@thewaver/ss-components-solid";
-import { CLEARABLE_TABS, ROW_TAB_GAP } from "@thewaver/ss-playground/App/Pages/TabsPage/TabsPage.const";
+import {
+    CLEARABLE_TABS,
+    PANEL_BODIES,
+    ROW_TAB_GAP,
+    getPanelId,
+    getTabId,
+} from "@thewaver/ss-playground/App/Pages/TabsPage/TabsPage.const";
 
 import { PageControlColumn } from "../../../PageComponents/ControlRow/ControlRow";
+import { PageTabPanel } from "../../../PageComponents/TabPanel/TabPanel";
 import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import { PageTabContent, PageTabFloater, PageTabGutter } from "../../../StyledComponents/TabContent/TabContent";
 import type { TabsExampleProps } from "../TabsPageSolid.types";
@@ -39,6 +48,17 @@ export const ClearableExample = (props: Props) => {
                     </PageTabContent>
                 )}
             />
+
+            <Show when={access(props.selectedValue)}>
+                {(getValue) => (
+                    <PageTabPanel
+                        id={() => getPanelId("clearable", getValue())}
+                        tabId={() => getTabId("clearable", getValue())}
+                    >
+                        {PANEL_BODIES[getValue()]}
+                    </PageTabPanel>
+                )}
+            </Show>
 
             <Button
                 ariaLabel={"Clear the selection"}

@@ -22,6 +22,7 @@
             ariaLabel={props.ariaLabel}
             thumbSize={props.thumbSize ?? SLIDE_BUTTON_DEFAULTS.thumbSize}
             holdDurationMs={props.holdDurationMs ?? SLIDE_BUTTON_DEFAULTS.holdDurationMs}
+            completionRatio={props.completionRatio ?? SLIDE_BUTTON_DEFAULTS.completionRatio}
             mode={props.mode ?? SLIDE_BUTTON_DEFAULTS.mode}
             {flags}
             progressRatio={progress}

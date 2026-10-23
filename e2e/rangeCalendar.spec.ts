@@ -99,3 +99,50 @@ test("a bounded calendar refuses both ends outside its range", async ({ page }) 
         .poll(() => readout(page, "bounded"), { message: "a day past the maximum cannot finish one either" })
         .toContain("none");
 });
+
+/**
+ * Two months shown at once are one calendar, not two: one tab stop, an arrow walk that runs off the end of one month
+ * into the next grid, and page keys that move both. Each day is drawn once — the trailing days of the first month's
+ * grid are left blank, since the second grid already shows them — which is also what keeps every day's name, and so
+ * every locator here, unique.
+ */
+const TWO_MONTHS = demo("twoMonths");
+
+const gridLabels = (page: import("@playwright/test").Page) =>
+    page
+        .locator(`${TWO_MONTHS} [role="grid"]`)
+        .evaluateAll((grids) => grids.map((grid) => grid.getAttribute("aria-label")));
+
+test("two months sit side by side, and each day is drawn in its own month only", async ({ page }) => {
+    await expect(page.locator(`${TWO_MONTHS} [role="grid"]`)).toHaveCount(2);
+
+    const labels = await page
+        .locator(`${cell(TWO_MONTHS)}[aria-label]`)
+        .evaluateAll((cells) => cells.map((cell) => cell.getAttribute("aria-label")));
+
+    expect(new Set(labels).size, "no day appears twice across the two grids").toBe(labels.length);
+});
+
+test("the arrow walk runs from the end of the first month into the second grid", async ({ page }) => {
+    const before = await gridLabels(page);
+
+    await page.locator(day(TWO_MONTHS, "31 August 2026")).click();
+    await page.keyboard.press("ArrowRight");
+
+    await expect(
+        page.locator(`${TWO_MONTHS} [role="grid"]`).nth(1).locator(":focus"),
+        "the next day is focused in the second grid",
+    ).toHaveCount(1);
+    expect(await gridLabels(page), "and neither grid moved, since that day was already shown").toEqual(before);
+});
+
+test("the page keys step both months at once", async ({ page }) => {
+    const before = await gridLabels(page);
+
+    await page.locator(day(TWO_MONTHS, "10 August 2026")).click();
+    await page.keyboard.press("PageDown");
+
+    await expect.poll(() => gridLabels(page)).not.toEqual(before);
+
+    expect((await gridLabels(page))[0], "the first grid does not just take the second one's month").not.toBe(before[1]);
+});

@@ -3,7 +3,7 @@ import type { PlacementLayoutDefs, PlacementLayoutFn, PlacementRect, TreeNode } 
 import * as styles from "@thewaver/ss-playground/App/Pages/TreePage/TreePage.css";
 import { AngleUtils } from "@thewaver/ss-utils";
 
-import { PageTreeRadialNode } from "../../../StyledComponents/TreeNodeContent/TreeNodeContent";
+import { PageTreeConnector, PageTreeRadialNode } from "../../../StyledComponents/TreeNodeContent/TreeNodeContent";
 import type { TreeExampleProps } from "../TreePage.types";
 import { RANKS } from "../TreePageReact.const";
 
@@ -108,6 +108,7 @@ export const RadialExample = (props: Props) => {
                     expanded={props.expanded}
                     ariaLabel={"Ranks"}
                     computeLayout={RADIAL_LAYOUT}
+                    renderConnector={(defs) => <PageTreeConnector defs={defs} />}
                     renderNode={(node, renderProps) => (
                         <PageTreeRadialNode renderProps={renderProps}>{node.value}</PageTreeRadialNode>
                     )}

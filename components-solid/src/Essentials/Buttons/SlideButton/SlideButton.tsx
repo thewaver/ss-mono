@@ -33,6 +33,7 @@ const SlideButtonElement = (props: SlideButtonElementProps) => {
         getMode: () => access(props.mode),
         getThumbSize: () => access(props.thumbSize),
         getHoldDurationMs: () => access(props.holdDurationMs),
+        getCompletionRatio: () => access(props.completionRatio),
         getTrackWidth: () => getTrackRef()?.clientWidth ?? 0,
         getProgressRatio: () => access(props.progressRatio),
         setProgressRatio: (ratio) => props.setProgressRatio(ratio),
@@ -117,6 +118,8 @@ export const SlideButton = (props: SlideButtonProps) => {
 
     const getMode = createMemo(() => access(props.mode) ?? SLIDE_BUTTON_DEFAULTS.mode);
 
+    const getCompletionRatio = createMemo(() => access(props.completionRatio) ?? SLIDE_BUTTON_DEFAULTS.completionRatio);
+
     return (
         <InteractionWrapper
             {...props}
@@ -133,6 +136,7 @@ export const SlideButton = (props: SlideButtonProps) => {
                     thumbSize={getThumbSize}
                     holdDurationMs={getHoldDurationMs}
                     mode={getMode}
+                    completionRatio={getCompletionRatio}
                     flags={getRenderProps}
                     progressRatio={getProgressRatio}
                     renderContent={props.renderContent}

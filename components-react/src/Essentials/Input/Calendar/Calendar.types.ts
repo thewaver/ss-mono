@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import type {
     BaseCalendarPrecisionValues,
     BaseCalendarProps,
+    CalendarMonthCountExcludesPrecision,
     CalendarRenderProps,
     DateValue,
     DateValueRange,
@@ -14,6 +15,10 @@ import type { InteractionControlProps } from "../../../Primitives/InteractionWra
 export type CalendarDayRenderer = (day: DateValue, flags: InteractionFlags<CalendarRenderProps>) => ReactNode;
 
 export type CalendarWeekdayRenderer = (name: string, index: number) => ReactNode;
+
+export type CalendarWeekNumberRenderer = (weekNumber: number) => ReactNode;
+
+export type CalendarMonthHeaderRenderer = (month: DateValue, index: number) => ReactNode;
 
 export type CalendarDayProps = Omit<InteractionControlProps<CalendarRenderProps>, "ariaLabel"> & {
     /** Names the day for assistive technology, since the cell often shows only its number. Required here: a bare number is not a date. */
@@ -29,6 +34,16 @@ export type CalendarBaseProps = BaseCalendarProps & {
     renderDay: CalendarDayRenderer;
     /** Draws one weekday heading. */
     renderWeekday?: CalendarWeekdayRenderer;
+    /**
+     * Draws the number of one week, in a column before the days. The column is drawn only while this is given, and
+     * only in the day view; `minDaysInFirstWeek` decides how the weeks are counted.
+     */
+    renderWeekNumber?: CalendarWeekNumberRenderer;
+    /**
+     * Draws the heading over one month while several are shown, handed that month's first day and its place among
+     * them, so the first can carry a previous button and the last a next one.
+     */
+    renderMonthHeader?: CalendarMonthHeaderRenderer;
 };
 
 export type CalendarPrecisionProps = BaseCalendarPrecisionValues;
@@ -52,7 +67,7 @@ export type CalendarProps = CalendarBaseProps &
     CalendarPrecisionProps & {
         /** Which day is picked, and how to change it. It is the only thing that picks one. */
         value: readonly [DateValue | undefined, (value: DateValue | undefined) => void];
-    };
+    } & CalendarMonthCountExcludesPrecision;
 
 export type RangeCalendarProps = CalendarBaseProps & {
     /** Which range is picked, and how to change it. It is the only thing that picks one. */

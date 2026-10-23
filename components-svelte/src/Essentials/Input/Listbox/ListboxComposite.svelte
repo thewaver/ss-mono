@@ -63,7 +63,8 @@
         computeEstimatedGroupHeight={props.computeEstimatedGroupHeight}
         computeIsSelected={props.computeIsSelected}
         renderOption={props.renderOption}
-        renderGroup={props.renderGroup}
+        renderGroupHeader={props.renderGroupHeader}
+        renderGroupBox={props.renderGroupBox}
         floaterTransitionDurationMs={props.floaterTransitionDurationMs}
         renderSelectionFloater={props.renderSelectionFloater}
         renderHighlightFloater={props.renderHighlightFloater}

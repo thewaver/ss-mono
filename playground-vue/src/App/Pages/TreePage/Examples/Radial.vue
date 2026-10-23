@@ -6,6 +6,7 @@ import type { PlacementLayoutDefs, PlacementLayoutFn, PlacementRect, TreeNode } 
 import * as styles from "@thewaver/ss-playground/App/Pages/TreePage/TreePage.css";
 import { AngleUtils } from "@thewaver/ss-utils";
 
+import PageTreeConnector from "../../../StyledComponents/TreeNodeContent/PageTreeConnector.vue";
 import PageTreeRadialNode from "../../../StyledComponents/TreeNodeContent/PageTreeRadialNode.vue";
 import type { TreeExampleProps } from "../TreePage.types";
 import { RANKS } from "../TreePageVue.const";
@@ -118,6 +119,10 @@ const stageWidth = computed(() => `${(Math.max(...rankRadii.value, ROOT_DEPTH) +
                 ariaLabel="Ranks"
                 :compute-layout="RADIAL_LAYOUT"
             >
+                <template #renderConnector="defs">
+                    <PageTreeConnector :defs="defs" />
+                </template>
+
                 <template #renderNode="{ node, renderProps }">
                     <PageTreeRadialNode :render-props="renderProps">{{ node.value }}</PageTreeRadialNode>
                 </template>

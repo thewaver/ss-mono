@@ -108,7 +108,18 @@ export type ListboxOptionsSlots<T> = {
     /** Draws one option. */
     renderOption: (props: { option: SelectOption<T>; flags: InteractionFlags<SelectOptionFlags> }) => VNodeChild;
     /** Draws one group heading. */
-    renderGroup?: (props: { group: SelectOptionGroup<T>; flags: SelectGroupFlags }) => VNodeChild;
+    renderGroupHeader?: (props: { group: SelectOptionGroup<T>; flags: SelectGroupFlags }) => VNodeChild;
+    /**
+     * Draws the box a group sits in, around its heading and its options. They are handed in rather than built, so the
+     * consumer decides what surrounds them: `renderContent` draws them, from a template as
+     * `<component :is="renderContent" />`. Refused alongside `computeEstimatedOptionHeight`, since a list that only
+     * draws what is on screen places each row on its own and a group has no box there.
+     */
+    renderGroupBox?: (props: {
+        renderContent: () => VNodeChild;
+        group: SelectOptionGroup<T>;
+        flags: SelectGroupFlags;
+    }) => VNodeChild;
     /**
      * Draws the marker that slides to the selected option, behind it. The fade is handed in rather than applied: the
      * marker fades out when nothing is selected, and in a list that only draws what is on screen it fades out while
@@ -150,7 +161,18 @@ export type ListboxCompositeSlots<T> = {
      */
     renderOption: (props: { option: SelectOption<T>; flags: InteractionFlags<SelectOptionFlags> }) => VNodeChild;
     /** Draws one group heading. */
-    renderGroup?: (props: { group: SelectOptionGroup<T>; flags: SelectGroupFlags }) => VNodeChild;
+    renderGroupHeader?: (props: { group: SelectOptionGroup<T>; flags: SelectGroupFlags }) => VNodeChild;
+    /**
+     * Draws the box a group sits in, around its heading and its options. They are handed in rather than built, so the
+     * consumer decides what surrounds them: `renderContent` draws them, from a template as
+     * `<component :is="renderContent" />`. Refused alongside `computeEstimatedOptionHeight`, since a list that only
+     * draws what is on screen places each row on its own and a group has no box there.
+     */
+    renderGroupBox?: (props: {
+        renderContent: () => VNodeChild;
+        group: SelectOptionGroup<T>;
+        flags: SelectGroupFlags;
+    }) => VNodeChild;
     /**
      * Draws the marker that slides to the selected option, behind it. The fade is handed in rather than applied: the
      * marker fades out when nothing is selected, and in a list that only draws what is on screen it fades out while

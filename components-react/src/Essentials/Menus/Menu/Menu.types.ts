@@ -6,6 +6,7 @@ import type {
     BaseMenuProps,
     InteractionFlags,
     MenuFlags,
+    MenuGroupRecord,
     MenuHighlightPosition,
     MenuItemFlags,
     MenuItemKind,
@@ -36,7 +37,7 @@ export type MenuItem<T> = {
      */
     kind?: MenuItemKind;
     /** The items of this item's submenu. An item carrying them opens a submenu rather than being picked. */
-    items?: MenuItem<T>[];
+    items?: (MenuItem<T> | MenuGroupRecord<MenuItem<T>>)[];
     /** Whether the item can be picked. A disabled item is left out of the arrow-key walk unless kept reachable. */
     isDisabled?: boolean;
     /**
@@ -161,7 +162,7 @@ export type MenuLevelProps<T> = {
     /** The item that opened this level, where one did. */
     openerItem?: MenuItem<T>;
     /** The items on this level, in the order they are shown. */
-    items: MenuItem<T>[];
+    items: (MenuItem<T> | MenuGroupRecord<MenuItem<T>>)[];
     /** Which values are currently checked, for the checkbox and radio items among them. */
     checkedValues: T[];
     /** Arranges this level's items, for a menu that is something other than a vertical list. */
@@ -250,7 +251,7 @@ export type MenuProps<T> = Omit<InteractionWrapperProps<MenuFlags>, "renderContr
         /** The element the menu is positioned against, where that is not the trigger itself. */
         anchorRef?: HTMLElement;
         /** The items, in the order they are shown. Items carrying children are what make submenus. */
-        items: MenuItem<T>[];
+        items: (MenuItem<T> | MenuGroupRecord<MenuItem<T>>)[];
         /** Which values are currently checked, with its setter, for the checkbox and radio items among them. */
         checked?: readonly [T[], (checked: T[]) => void];
         /** The text an item is found by when the reader types, where that is not its visible text. */
@@ -285,7 +286,7 @@ export type ContextMenuProps<T> = BaseContextMenuProps<T> & {
      */
     renderRegion: () => ReactNode;
     /** The items, in the order they are shown. */
-    items: MenuItem<T>[];
+    items: (MenuItem<T> | MenuGroupRecord<MenuItem<T>>)[];
     /** Which values are currently checked, with its setter, for the checkbox and radio items among them. */
     checked?: readonly [T[], (checked: T[]) => void];
     /** The text an item is found by when the reader types, where that is not its visible text. */

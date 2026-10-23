@@ -4,6 +4,8 @@ import type { HTMLAnchorAttributes } from "svelte/elements";
 import type {
     BaseTreeProps,
     InteractionFlags,
+    TreeConnectorDefs,
+    TreeConnectorNeedsLayout,
     TreeNodeRecord,
     TreeNodeRenderProps,
     TreeRecordRow,
@@ -76,4 +78,10 @@ export type TreeProps<T> = BaseTreeProps<T> & {
     renderNode: Snippet<[node: TreeNode<T>, renderProps: InteractionFlags<TreeNodeRenderProps<T>>]>;
     /** Draws what stands in for a branch's children while they are still being fetched. */
     renderPendingChildren?: Snippet<[node: TreeNode<T>, depth: number]>;
-};
+    /**
+     * Draws the line from a node up to its parent, across the whole box the tree is laid out in, under the nodes.
+     * It is handed both nodes' placements, so it can draw the line between them. Refused without `computeLayout`,
+     * since an indented tree has no placements to draw between.
+     */
+    renderConnector?: Snippet<[defs: TreeConnectorDefs<T>]>;
+} & TreeConnectorNeedsLayout;

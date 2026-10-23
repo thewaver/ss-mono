@@ -95,15 +95,6 @@
             path: `${EXAMPLES_ROOT}/SwitchedDirection.svelte`,
         },
         {
-            key: "honeycomb",
-            span: 2,
-            name: EXAMPLE_NAMES.honeycomb,
-            readout: () =>
-                `selected: ${honeycombValue} — the same tab list, placed by a layout that has no angle in it at all`,
-            component: honeycombExample,
-            path: `${EXAMPLES_ROOT}/Honeycomb.svelte`,
-        },
-        {
             key: "links",
             name: EXAMPLE_NAMES.links,
             readout: () => `selected: ${linkValue} — every tab carries an href, so each one is an anchor`,
@@ -131,6 +122,15 @@
             readout: () => `selected: ${disabledValue} — nothing can move it, so no tab holds the tab stop`,
             component: allDisabledExample,
             path: `${EXAMPLES_ROOT}/AllDisabled.svelte`,
+        },
+        {
+            key: "honeycomb",
+            span: 2,
+            name: EXAMPLE_NAMES.honeycomb,
+            readout: () =>
+                `selected: ${honeycombValue} — the same tab list, placed by a layout that has no angle in it at all`,
+            component: honeycombExample,
+            path: `${EXAMPLES_ROOT}/Honeycomb.svelte`,
         },
     ];
 </script>

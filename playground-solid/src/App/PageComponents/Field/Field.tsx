@@ -1,8 +1,9 @@
 import type { JSX } from "solid-js";
-import { createSignal } from "solid-js";
+import { Show, createSignal } from "solid-js";
 
 import type { AnchorPlacement } from "@thewaver/ss-components-solid";
 import {
+    Button,
     ColorInput,
     FileInput,
     NumberInput,
@@ -28,6 +29,7 @@ import { PageColorInputContent } from "../../StyledComponents/ColorInputContent/
 import { PageFileInputContent } from "../../StyledComponents/FileInputContent/FileInputContent";
 import { renderPageHighlightFloater } from "../../StyledComponents/GlideFloater/GlideFloater";
 import { PagePopoverSurface } from "../../StyledComponents/PopoverSurface/PopoverSurface";
+import { PageSelectClear } from "../../StyledComponents/SelectClear/SelectClear";
 import { PageSelectContent } from "../../StyledComponents/SelectContent/SelectContent";
 import { PageSelectGroupContent } from "../../StyledComponents/SelectGroupContent/SelectGroupContent";
 import { PageSelectOptionContent } from "../../StyledComponents/SelectOptionContent/SelectOptionContent";
@@ -105,13 +107,21 @@ export const PageNumberField = (props: PageNumberFieldProps) => {
 };
 
 export const PageTextField = (props: PageTextFieldProps) => {
+    const [getFieldRef, setFieldRef] = createSignal<HTMLElement>();
+
     useFieldReset(
         () => access(props.value),
         (value) => props.onInput(value),
     );
 
+    const clear = () => {
+        props.onInput(EMPTY_TEXT);
+        getFieldRef()?.focus();
+    };
+
     return (
         <TextInput
+            ref={setFieldRef}
             value={[() => access(props.value), props.onInput]}
             isDisabled={props.isDisabled}
             ariaLabel={props.ariaLabel}
@@ -126,6 +136,19 @@ export const PageTextField = (props: PageTextFieldProps) => {
                           <PageTextFieldPlaceholder flags={getFlags}>
                               {access(props.placeholder)}
                           </PageTextFieldPlaceholder>
+                      )
+            }
+            renderTrailing={
+                access(props.clearAriaLabel) === undefined
+                    ? undefined
+                    : () => (
+                          <Show when={access(props.value) !== EMPTY_TEXT}>
+                              <Button
+                                  ariaLabel={() => access(props.clearAriaLabel)}
+                                  renderContent={(getFlags) => <PageSelectClear flags={getFlags} />}
+                                  onClick={clear}
+                              />
+                          </Show>
                       )
             }
         />
@@ -196,7 +219,7 @@ export const PageGroupedSelectField = <T,>(props: PageGroupedSelectFieldProps<T>
                         : EMPTY_TEXT}
                 </PageSelectContent>
             )}
-            renderGroup={(getGroup) => <PageSelectGroupContent>{getGroup().label}</PageSelectGroupContent>}
+            renderGroupHeader={(getGroup) => <PageSelectGroupContent>{getGroup().label}</PageSelectGroupContent>}
             renderOption={(getOption, getFlags) => (
                 <PageSelectOptionContent isGliding flags={getFlags}>
                     {props.computeLabel?.(getOption().value) ?? String(getOption().value)}

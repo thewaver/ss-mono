@@ -38,6 +38,8 @@ export type DateValueRange = {
 
 export type DateValueWeekStart = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
+export type DateValueMinDaysInFirstWeek = 1 | 2 | 3 | 4 | 5 | 6 | 7;
+
 export type DateValueWeekdayWidth = "narrow" | "short" | "long";
 
 export type DateValueMonthGrid = {

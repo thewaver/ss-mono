@@ -20,3 +20,8 @@ export type TreeRecordExampleProps = {
     value: Signal<Asset | undefined>;
     expanded: Signal<Asset[]>;
 };
+
+export type TreeCheckboxExampleProps = {
+    checked: Signal<string[]>;
+    expanded: Signal<string[]>;
+};

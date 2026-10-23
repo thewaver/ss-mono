@@ -1,5 +1,10 @@
 <script lang="ts">
-    import type { DateValue, DateValueCalendarId, DateValueWeekStart } from "@thewaver/ss-components-svelte";
+    import type {
+        DateValue,
+        DateValueCalendarId,
+        DateValueMinDaysInFirstWeek,
+        DateValueWeekStart,
+    } from "@thewaver/ss-components-svelte";
     import { CALENDAR_DEFAULTS, DateValueUtils } from "@thewaver/ss-components-svelte";
     import { CalendarKnobs } from "@thewaver/ss-playground/App/Knobs/Calendars.const";
     import {
@@ -25,6 +30,7 @@
     import DefaultExample from "./Examples/Default.svelte";
     import MonthPickerExample from "./Examples/MonthPicker.svelte";
     import RightToLeftExample from "./Examples/RightToLeft.svelte";
+    import WeekNumbersExample from "./Examples/WeekNumbers.svelte";
     import WeekdaysExample from "./Examples/Weekdays.svelte";
     import YearPickerExample from "./Examples/YearPicker.svelte";
 
@@ -32,6 +38,7 @@
 
     let calendarId = $state<DateValueCalendarId>(CalendarKnobs.STARTING_CALENDAR);
     let weekStartsOn = $state<DateValueWeekStart>(CALENDAR_DEFAULTS.weekStartsOn);
+    let minDaysInFirstWeek = $state<DateValueMinDaysInFirstWeek>(CALENDAR_DEFAULTS.minDaysInFirstWeek);
 
     const createMonthState = () => {
         let month = $state.raw<DateValue>(DateValueUtils.getStartOfMonth(TODAY));
@@ -48,11 +55,13 @@
     let rangedValue = $state.raw<DateValue | undefined>();
     let weekdaysValue = $state.raw<DateValue | undefined>();
     let rightToLeftValue = $state.raw<DateValue | undefined>(TODAY);
+    let weekNumbersValue = $state.raw<DateValue | undefined>(TODAY);
 
     const defaultMonth = createMonthState();
     const rangedMonth = createMonthState();
     const weekdaysMonth = createMonthState();
     const rightToLeftMonth = createMonthState();
+    const weekNumbersMonth = createMonthState();
 
     let monthPickerValue = $state.raw<DateValue | undefined>();
     let yearPickerValue = $state.raw<DateValue | undefined>();
@@ -80,6 +89,14 @@
             readout: () => `week starts on ${WEEK_START_LABELS[weekStartsOn]} — value: ${describe(weekdaysValue)}`,
             component: weekdaysExample,
             path: `${EXAMPLES_ROOT}/Weekdays.svelte`,
+        },
+        {
+            key: "weekNumbers",
+            name: EXAMPLE_NAMES.weekNumbers,
+            readout: () =>
+                `week starts on ${WEEK_START_LABELS[weekStartsOn]}, week one holds at least ${minDaysInFirstWeek} days of the new year — value: ${describe(weekNumbersValue)}`,
+            component: weekNumbersExample,
+            path: `${EXAMPLES_ROOT}/WeekNumbers.svelte`,
         },
         {
             key: "rightToLeft",
@@ -118,6 +135,15 @@
 
 {#snippet weekdaysExample()}
     <WeekdaysExample bind:value={weekdaysValue} bind:month={weekdaysMonth.get, weekdaysMonth.set} {weekStartsOn} />
+{/snippet}
+
+{#snippet weekNumbersExample()}
+    <WeekNumbersExample
+        bind:value={weekNumbersValue}
+        bind:month={weekNumbersMonth.get, weekNumbersMonth.set}
+        {weekStartsOn}
+        {minDaysInFirstWeek}
+    />
 {/snippet}
 
 {#snippet rightToLeftExample()}
@@ -167,6 +193,23 @@
             computeLabel={(day) => WEEK_START_LABELS[day]}
             onChange={(day) => {
                 weekStartsOn = day;
+            }}
+        />
+    </PageProp>
+
+    <PageProp
+        itemKey={"minDaysInFirstWeek"}
+        controls={"Sets CalendarProps.minDaysInFirstWeek"}
+        label={"First week holds"}
+        hint={"How many days of the new year the first week must hold, which decides the week numbers. 4 is ISO 8601, used across most of Europe; 1 is the United States' count."}
+    >
+        <PageSelectField
+            value={minDaysInFirstWeek}
+            values={CalendarKnobs.MIN_DAYS_IN_FIRST_WEEK}
+            ariaLabel={"First week holds"}
+            computeLabel={(days) => `${days} ${days === 1 ? "day" : "days"}`}
+            onChange={(days) => {
+                minDaysInFirstWeek = days;
             }}
         />
     </PageProp>

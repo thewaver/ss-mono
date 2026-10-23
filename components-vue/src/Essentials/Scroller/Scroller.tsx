@@ -97,6 +97,7 @@ export const Scroller = defineComponent(
             "gap": null,
             "padding": null,
             "buttonPlacement": null,
+            "overlapCount": null,
             "progress": null,
             "onUpdate:progress": null,
         }),

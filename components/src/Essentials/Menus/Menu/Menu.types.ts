@@ -32,7 +32,7 @@ export type MenuItemRecord<T> = {
     value: T;
     ariaLabel?: string;
     kind?: MenuItemKind;
-    items?: MenuItemRecord<T>[];
+    items?: (MenuItemRecord<T> | MenuGroupRecord<MenuItemRecord<T>>)[];
     isDisabled?: boolean;
     isReachableWhenDisabled?: boolean;
     staysOpenOnPick?: boolean;
@@ -95,6 +95,17 @@ export type MenuRun<TItem> = {
     from: number;
     items: TItem[];
     isRadioGroup: boolean;
+};
+
+export type MenuGroupRecord<TItem> = {
+    label: string;
+    items: TItem[];
+};
+
+export type MenuSection<TItem> = {
+    from: number;
+    group: MenuGroupRecord<TItem> | undefined;
+    runs: MenuRun<TItem>[];
 };
 
 export type BaseMenuValues = {
@@ -205,3 +216,6 @@ export type BaseContextMenuCbs<T> = {
 };
 
 export type BaseContextMenuProps<T> = BaseContextMenuValues & BaseContextMenuCbs<T>;
+
+export type MenuGroupPaintExcludesLayout =
+    { computeLayout?: undefined } | { renderGroupHeader?: undefined; renderGroupBox?: undefined };

@@ -216,6 +216,17 @@ describe("computeMove and computePick", () => {
         expect(clamped.month).toBeUndefined();
     });
 
+    it("moves several months shown at once by as many months, whichever way the day leaves them", () => {
+        const pageStart = date("2026-08-01");
+        const within = CalendarUtils.computeMove(date("2026-09-30"), "day", pageStart, undefined, undefined, 2);
+        const forward = CalendarUtils.computeMove(date("2026-10-01"), "day", pageStart, undefined, undefined, 2);
+        const backward = CalendarUtils.computeMove(date("2026-07-31"), "day", pageStart, undefined, undefined, 2);
+
+        expect(within.month).toBeUndefined();
+        expect(iso(forward.month!)).toBe("2026-10-01");
+        expect(iso(backward.month!)).toBe("2026-06-01");
+    });
+
     it("picks the first day of a coarse cell, pulled inside the bounds", () => {
         expect(iso(CalendarUtils.computePick(date("2026-03-20"), "month"))).toBe("2026-03-01");
         expect(iso(CalendarUtils.computePick(date("2019-06-01"), "year", date("2019-03-15")))).toBe("2019-03-15");

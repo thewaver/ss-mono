@@ -77,18 +77,6 @@ export const SortablePage = () => {
             path: `${EXAMPLES_ROOT}/RightToLeft.tsx`,
         },
         {
-            key: "ring",
-            name: EXAMPLE_NAMES.ring,
-            readout: () =>
-                `order: ${names(ringState[0])} — dropping picks the nearest place rather than comparing one axis, because a ring has no axis to compare`,
-            component: () => (
-                <PageSortableRoom>
-                    <RingExample items={ringState} />
-                </PageSortableRoom>
-            ),
-            path: `${EXAMPLES_ROOT}/Ring.tsx`,
-        },
-        {
             key: "pair",
             name: EXAMPLE_NAMES.pair,
             readout: () => `hand: ${names(handState[0])} | board: ${names(boardState[0])}`,
@@ -136,6 +124,18 @@ export const SortablePage = () => {
                 </PageSortableRoom>
             ),
             path: `${EXAMPLES_ROOT}/Cards.tsx`,
+        },
+        {
+            key: "ring",
+            name: EXAMPLE_NAMES.ring,
+            readout: () =>
+                `order: ${names(ringState[0])} — dropping picks the nearest place rather than comparing one axis, because a ring has no axis to compare`,
+            component: () => (
+                <PageSortableRoom>
+                    <RingExample items={ringState} />
+                </PageSortableRoom>
+            ),
+            path: `${EXAMPLES_ROOT}/Ring.tsx`,
         },
     ];
 

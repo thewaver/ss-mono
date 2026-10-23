@@ -1,4 +1,4 @@
-import type { DateValue, DateValueWeekStart } from "@thewaver/ss-components-svelte";
+import type { DateValue, DateValueMinDaysInFirstWeek, DateValueWeekStart } from "@thewaver/ss-components-svelte";
 
 export type CalendarExampleProps = {
     weekStartsOn: DateValueWeekStart;
@@ -9,4 +9,8 @@ export type CalendarExampleProps = {
 export type CalendarPrecisionExampleProps = {
     value: DateValue | undefined;
     month: DateValue;
+};
+
+export type CalendarWeekNumbersExampleProps = CalendarExampleProps & {
+    minDaysInFirstWeek: DateValueMinDaysInFirstWeek;
 };

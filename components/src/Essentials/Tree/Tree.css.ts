@@ -19,6 +19,13 @@ export const treeNode = style({
     },
 });
 
+export const treeConnector = style({
+    position: "absolute",
+    inset: 0,
+    zIndex: -2,
+    pointerEvents: "none",
+});
+
 export const treeSizer = style({
     position: "relative",
     isolation: "isolate",

@@ -6,6 +6,7 @@ import type {
     BaseMenuProps,
     InteractionFlags,
     MenuFlags,
+    MenuGroupRecord,
     MenuHighlightPosition,
     MenuItemFlags,
     MenuItemKind,
@@ -37,7 +38,7 @@ export type MenuItem<T> = {
      */
     kind?: MenuItemKind;
     /** The items of this item's submenu. An item carrying them opens a submenu rather than being picked. */
-    items?: MenuItem<T>[];
+    items?: (MenuItem<T> | MenuGroupRecord<MenuItem<T>>)[];
     /** Whether the item can be picked. A disabled item is left out of the arrow-key walk unless kept reachable. */
     isDisabled?: boolean;
     /**
@@ -177,7 +178,7 @@ export type MenuLevelProps<T> = {
     /** The item that opened this level, where one did. */
     openerItem?: MenuItem<T>;
     /** The items on this level, in the order they are shown. */
-    items: MenuItem<T>[];
+    items: (MenuItem<T> | MenuGroupRecord<MenuItem<T>>)[];
     /** Which values are currently checked, for the checkbox and radio items among them. */
     checkedValues: T[];
     /** Arranges this level's items, for a menu that is something other than a vertical list. */

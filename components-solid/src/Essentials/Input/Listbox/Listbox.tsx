@@ -1,4 +1,4 @@
-import type { Accessor } from "solid-js";
+import type { Accessor, JSX } from "solid-js";
 import {
     For,
     Index,
@@ -115,6 +115,8 @@ export const ListboxOptions = <T,>(props: ListboxOptionsProps<T>) => {
     const getIsHorizontal = createMemo(() => cursor.getOrientation() === "horizontal");
 
     const getIsVirtualized = createMemo(() => props.computeEstimatedOptionHeight !== undefined && !getIsHorizontal());
+
+    SelectUtils.warnIfGroupBoxIgnored(getIsVirtualized(), props.renderGroupBox !== undefined);
 
     const getIsAtEnd = ElementObserverSolidUtils.createViewportIntersectionObserver(
         getEndMarkerRef,
@@ -288,6 +290,11 @@ export const ListboxOptions = <T,>(props: ListboxOptionsProps<T>) => {
         </Show>
     );
 
+    const renderGroupBox = (getGroup: Accessor<SelectOptionGroup<T>>, renderContent: () => JSX.Element) =>
+        props.renderGroupBox === undefined
+            ? renderContent()
+            : props.renderGroupBox(renderContent, getGroup, () => computeGroupFlags(getGroup()));
+
     const renderMountedOptions = () => (
         <div
             ref={setOptionsRef}
@@ -308,19 +315,26 @@ export const ListboxOptions = <T,>(props: ListboxOptionsProps<T>) => {
                         )}
                     >
                         <div role="group" aria-label={(getItem() as SelectOptionGroup<T>).label}>
-                            {props.renderGroup?.(
+                            {renderGroupBox(
                                 () => getItem() as SelectOptionGroup<T>,
-                                () => computeGroupFlags(getItem() as SelectOptionGroup<T>),
-                            )}
+                                () => (
+                                    <>
+                                        {props.renderGroupHeader?.(
+                                            () => getItem() as SelectOptionGroup<T>,
+                                            () => computeGroupFlags(getItem() as SelectOptionGroup<T>),
+                                        )}
 
-                            <Index each={(getItem() as SelectOptionGroup<T>).options}>
-                                {(getOption, groupIndex) =>
-                                    renderOptionSlot(
-                                        getOption,
-                                        () => cursor.getItemRows()[index].entryOffset + groupIndex,
-                                    )
-                                }
-                            </Index>
+                                        <Index each={(getItem() as SelectOptionGroup<T>).options}>
+                                            {(getOption, groupIndex) =>
+                                                renderOptionSlot(
+                                                    getOption,
+                                                    () => cursor.getItemRows()[index].entryOffset + groupIndex,
+                                                )
+                                            }
+                                        </Index>
+                                    </>
+                                ),
+                            )}
                         </div>
                     </Show>
                 )}
@@ -341,7 +355,7 @@ export const ListboxOptions = <T,>(props: ListboxOptionsProps<T>) => {
             >
                 <Show
                     when={getRow().isEntry}
-                    fallback={props.renderGroup?.(
+                    fallback={props.renderGroupHeader?.(
                         () => getRow().node as SelectOptionGroup<T>,
                         () => computeGroupFlags(getRow().node as SelectOptionGroup<T>),
                     )}
@@ -473,7 +487,8 @@ export const ListboxComposite = <T,>(props: ListboxCompositeProps<T>) => {
                 computeEstimatedGroupHeight={props.computeEstimatedGroupHeight}
                 computeIsSelected={props.computeIsSelected}
                 renderOption={props.renderOption}
-                renderGroup={props.renderGroup}
+                renderGroupHeader={props.renderGroupHeader}
+                renderGroupBox={props.renderGroupBox}
                 floaterTransitionDurationMs={props.floaterTransitionDurationMs}
                 renderSelectionFloater={props.renderSelectionFloater}
                 renderHighlightFloater={props.renderHighlightFloater}

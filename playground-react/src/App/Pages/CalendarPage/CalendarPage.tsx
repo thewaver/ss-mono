@@ -1,6 +1,11 @@
 import { useState } from "react";
 
-import type { DateValue, DateValueCalendarId, DateValueWeekStart } from "@thewaver/ss-components-react";
+import type {
+    DateValue,
+    DateValueCalendarId,
+    DateValueMinDaysInFirstWeek,
+    DateValueWeekStart,
+} from "@thewaver/ss-components-react";
 import { CALENDAR_DEFAULTS, DateValueUtils } from "@thewaver/ss-components-react";
 import { CalendarKnobs } from "@thewaver/ss-playground/App/Knobs/Calendars.const";
 import {
@@ -25,6 +30,7 @@ import { BoundedExample } from "./Examples/Bounded";
 import { DefaultExample } from "./Examples/Default";
 import { MonthPickerExample } from "./Examples/MonthPicker";
 import { RightToLeftExample } from "./Examples/RightToLeft";
+import { WeekNumbersExample } from "./Examples/WeekNumbers";
 import { WeekdaysExample } from "./Examples/Weekdays";
 import { YearPickerExample } from "./Examples/YearPicker";
 
@@ -40,15 +46,21 @@ export const CalendarPage = () => {
     const [calendarId, setCalendarId] = useState<DateValueCalendarId>(CalendarKnobs.STARTING_CALENDAR);
     const [weekStartsOn, setWeekStartsOn] = useState<DateValueWeekStart>(CALENDAR_DEFAULTS.weekStartsOn);
 
+    const [minDaysInFirstWeek, setMinDaysInFirstWeek] = useState<DateValueMinDaysInFirstWeek>(
+        CALENDAR_DEFAULTS.minDaysInFirstWeek,
+    );
+
     const defaultValue = useState<DateValue | undefined>(TODAY);
     const rangedValue = useState<DateValue | undefined>();
     const weekdaysValue = useState<DateValue | undefined>();
     const rightToLeftValue = useState<DateValue | undefined>(TODAY);
+    const weekNumbersValue = useState<DateValue | undefined>(TODAY);
 
     const defaultMonth = useMonthState(calendarId);
     const rangedMonth = useMonthState(calendarId);
     const weekdaysMonth = useMonthState(calendarId);
     const rightToLeftMonth = useMonthState(calendarId);
+    const weekNumbersMonth = useMonthState(calendarId);
 
     const monthPickerValue = useState<DateValue | undefined>();
     const yearPickerValue = useState<DateValue | undefined>();
@@ -78,6 +90,21 @@ export const CalendarPage = () => {
                 <WeekdaysExample value={weekdaysValue} month={weekdaysMonth} weekStartsOn={weekStartsOn} />
             ),
             path: `${EXAMPLES_ROOT}/Weekdays.tsx`,
+        },
+        {
+            key: "weekNumbers",
+            name: EXAMPLE_NAMES.weekNumbers,
+            readout: () =>
+                `week starts on ${WEEK_START_LABELS[weekStartsOn]}, week one holds at least ${minDaysInFirstWeek} days of the new year — value: ${describe(weekNumbersValue[0])}`,
+            component: () => (
+                <WeekNumbersExample
+                    value={weekNumbersValue}
+                    month={weekNumbersMonth}
+                    weekStartsOn={weekStartsOn}
+                    minDaysInFirstWeek={minDaysInFirstWeek}
+                />
+            ),
+            path: `${EXAMPLES_ROOT}/WeekNumbers.tsx`,
         },
         {
             key: "rightToLeft",
@@ -137,6 +164,23 @@ export const CalendarPage = () => {
                         ariaLabel={"Week starts on"}
                         computeLabel={(day) => WEEK_START_LABELS[day]}
                         onChange={(day) => setWeekStartsOn(day)}
+                    />
+                </PageProp>
+
+                <PageProp
+                    itemKey={"minDaysInFirstWeek"}
+                    label={"First week holds"}
+                    hint={
+                        "How many days of the new year the first week must hold, which decides the week numbers. 4 is ISO 8601, used across most of Europe; 1 is the United States' count."
+                    }
+                    controls={"Sets CalendarProps.minDaysInFirstWeek"}
+                >
+                    <PageSelectField
+                        value={minDaysInFirstWeek}
+                        values={CalendarKnobs.MIN_DAYS_IN_FIRST_WEEK}
+                        ariaLabel={"First week holds"}
+                        computeLabel={(days) => `${days} ${days === 1 ? "day" : "days"}`}
+                        onChange={(days) => setMinDaysInFirstWeek(days)}
                     />
                 </PageProp>
             </PagePropsPanel>

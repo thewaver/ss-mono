@@ -146,6 +146,36 @@ test("a grouped list owns its group roles and the walk crosses them", async ({ p
     ).toBe("Belgium");
 });
 
+/**
+ * A group's box is the consumer's, drawn inside the group element the library owns, so the role and its name never
+ * end up in consumer markup. What proves the box is there is the structure: with it, the group holds one child that
+ * holds the heading and every option; without it, the heading and the options sit in the group directly.
+ */
+test("a group box wraps its heading and every option, inside the group the library names", async ({ page }) => {
+    await openedWithHighlight(page, "groupBoxes");
+
+    const groups = page.locator(`${LISTBOX} [role="group"]`);
+
+    await expect(groups.first()).toBeVisible();
+
+    for (let index = 0; index < (await groups.count()); index++) {
+        const group = groups.nth(index);
+        const box = group.locator(":scope > *");
+
+        await expect(box, "the group holds the box and nothing else").toHaveCount(1);
+        await expect(box, "the box holds the group's heading").toContainText((await group.getAttribute("aria-label"))!);
+        expect(await box.locator('[role="option"]').count(), "and every option of the group").toBe(
+            await group.locator('[role="option"]').count(),
+        );
+    }
+});
+
+test("without a box painter, the heading and options sit in the group directly", async ({ page }) => {
+    await openedWithHighlight(page, "optionGroups");
+
+    expect(await page.locator(`${LISTBOX} [role="group"]`).first().locator(":scope > *").count()).toBeGreaterThan(1);
+});
+
 test("a multi list stays open, accumulates and toggles back out", async ({ page }) => {
     await openMultiSelect(page);
     await page.locator(field("multiSelect")).click();
@@ -486,7 +516,33 @@ test("an autocomplete field filters through the consumer's matcher", async ({ pa
     await expect(page.locator(LISTBOX)).toHaveCount(0);
     expect(await readout(page, "autocomplete"), "Enter picks the highlighted match").toContain("value: LIS");
     expect(await readout(page, "autocomplete"), "and closing clears the query").toContain('query: ""');
-    expect(await inputValue(page.locator(field("autocomplete"))), "leaving the field's own text empty").toBe("");
+});
+
+/**
+ * A field the reader types into holds the text of what is picked whenever the reader is not typing, because its
+ * text is what a screen reader reads as the combobox's value (WCAG 4.1.2); the consumer's painted copy beside it is
+ * hidden. So after a pick the field's own text is the picked option's, and typing then Escape puts it back.
+ */
+test("after a pick the field's own text is what was picked, and Escape puts it back @solid", async ({ page }) => {
+    const input = page.locator(field("autocomplete"));
+
+    await input.focus();
+    await page.keyboard.type("lis");
+    await expect(page.locator(OPTION)).toHaveCount(1);
+    await page.keyboard.press("Enter");
+    await expect(page.locator(LISTBOX)).toHaveCount(0);
+
+    const fieldText = await inputValue(input);
+
+    expect(fieldText, "the field carries text once something is picked").not.toBe("");
+    expect("Lisbon (LIS)", "and it is the text of the option that was picked").toContain(fieldText);
+
+    await input.click();
+    await page.keyboard.type("osl");
+    await expect.poll(() => inputValue(input), { message: "typing replaces it rather than adding to it" }).toBe("osl");
+
+    await page.keyboard.press("Escape");
+    await expect.poll(() => inputValue(input), { message: "and Escape puts the picked text back" }).toBe(fieldText);
 });
 
 /**

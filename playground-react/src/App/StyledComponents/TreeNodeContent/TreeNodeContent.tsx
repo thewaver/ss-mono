@@ -1,5 +1,6 @@
 import type { PropsWithChildren } from "react";
 
+import { PlacementUtils } from "@thewaver/ss-components-react";
 import {
     BRANCH_MARKER,
     DESCRIPTION_ONLY_MARKER,
@@ -12,7 +13,7 @@ import * as styles from "@thewaver/ss-playground/App/StyledComponents/TreeNodeCo
 import { themeVars } from "@thewaver/ss-playground/App/Theme.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { TreeNodeContentProps, TreeNodePendingProps } from "./TreeNodeContentReact.types";
+import type { TreeConnectorProps, TreeNodeContentProps, TreeNodePendingProps } from "./TreeNodeContentReact.types";
 
 export const PageTreeNodeContent = (props: PropsWithChildren<TreeNodeContentProps>) => {
     const layerClass = useLayerClass();
@@ -89,4 +90,19 @@ export const PageTreeRadialNode = (props: PropsWithChildren<TreeNodeContentProps
             {props.children}
         </div>
     );
+};
+
+export const PageTreeConnector = (props: TreeConnectorProps) => {
+    const layerClass = useLayerClass();
+
+    const line =
+        props.defs.from === undefined || props.defs.to === undefined
+            ? undefined
+            : PlacementUtils.getLinkPath(props.defs.from, props.defs.to);
+
+    return line ? (
+        <svg className={[styles.treeConnector, layerClass].join(" ")} viewBox={"0 0 1 1"} aria-hidden={"true"}>
+            <path className={styles.treeConnectorPath} d={line} />
+        </svg>
+    ) : null;
 };

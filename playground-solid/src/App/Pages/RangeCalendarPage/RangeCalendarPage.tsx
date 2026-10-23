@@ -23,6 +23,7 @@ import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { BoundedExample } from "./Examples/Bounded";
 import { DefaultExample } from "./Examples/Default";
 import { RightToLeftExample } from "./Examples/RightToLeft";
+import { TwoMonthsExample } from "./Examples/TwoMonths";
 
 const describe = (value: DateValueRange | undefined) =>
     value ? `${DateValueUtils.toIso(value.start)} to ${DateValueUtils.toIso(value.end)}` : "none";
@@ -34,6 +35,7 @@ export const RangeCalendarPage = () => {
     const defaultValue = createSignal<DateValueRange | undefined>();
     const boundedValue = createSignal<DateValueRange | undefined>();
     const rightToLeftValue = createSignal<DateValueRange | undefined>();
+    const twoMonthsValue = createSignal<DateValueRange | undefined>();
 
     const makeMonthSignal = (): Signal<DateValue> => {
         const signal = createSignal<DateValue>(DateValueUtils.getStartOfMonth(TODAY));
@@ -44,6 +46,7 @@ export const RangeCalendarPage = () => {
     const defaultMonth = makeMonthSignal();
     const boundedMonth = makeMonthSignal();
     const rightToLeftMonth = makeMonthSignal();
+    const twoMonthsMonth = makeMonthSignal();
 
     const getExamples = createMemo(() => [
         {
@@ -64,6 +67,16 @@ export const RangeCalendarPage = () => {
                 <BoundedExample value={boundedValue} month={boundedMonth} weekStartsOn={getWeekStartsOn} />
             ),
             path: `${EXAMPLES_ROOT}/Bounded.tsx`,
+        },
+        {
+            key: "twoMonths",
+            name: EXAMPLE_NAMES.twoMonths,
+            readout: () =>
+                `value: ${describe(twoMonthsValue[0]())} — a range can start in one month and end in the other; the arrow keys walk across, and the page keys step both`,
+            component: () => (
+                <TwoMonthsExample value={twoMonthsValue} month={twoMonthsMonth} weekStartsOn={getWeekStartsOn} />
+            ),
+            path: `${EXAMPLES_ROOT}/TwoMonths.tsx`,
         },
         {
             key: "rightToLeft",

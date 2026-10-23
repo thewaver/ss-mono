@@ -22,6 +22,7 @@ export type BasePageTextFieldValues = {
     isDisabled?: boolean;
     ariaLabel?: string;
     placeholder?: string;
+    clearAriaLabel?: string;
 };
 
 export type BasePageTextFieldCbs = {

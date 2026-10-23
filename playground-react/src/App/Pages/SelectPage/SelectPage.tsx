@@ -98,6 +98,7 @@ export const SelectPage = () => {
     const filterQueryState = useState("");
     const filterState = useState<Airport | undefined>();
     const groupedState = useState<string | undefined>();
+    const groupBoxesState = useState<string | undefined>();
     const defaultState = useState<string | undefined>();
     const preselectedState = useState<string | undefined>("Portugal");
     const disabledOptionState = useState<string | undefined>();
@@ -262,6 +263,21 @@ export const SelectPage = () => {
             name: EXAMPLE_NAMES.optionGroups,
             readout: () => `value: ${groupedState[0] ?? "undefined"} — arrows cross group boundaries and skip Finland`,
             component: () => <CountriesExample value={groupedState} options={GROUPED_COUNTRIES} hasGroups={true} />,
+            path: `${EXAMPLES_ROOT}/Countries.tsx`,
+        },
+        {
+            key: "groupBoxes",
+            name: EXAMPLE_NAMES.groupBoxes,
+            readout: () =>
+                `value: ${groupBoxesState[0] ?? "undefined"} — renderGroupBox draws the tinted box around each group's heading and options`,
+            component: () => (
+                <CountriesExample
+                    value={groupBoxesState}
+                    options={GROUPED_COUNTRIES}
+                    hasGroups={true}
+                    hasGroupBoxes={true}
+                />
+            ),
             path: `${EXAMPLES_ROOT}/Countries.tsx`,
         },
         {

@@ -1,4 +1,4 @@
-import type { MenuItemRecord } from "@thewaver/ss-components";
+import type { MenuGroupRecord, MenuItemRecord } from "@thewaver/ss-components";
 
 import type { Action, Destination } from "./MenuActions.types";
 
@@ -22,6 +22,12 @@ export const VIEW_OPTIONS: MenuItemRecord<Action>[] = [
     { value: { name: "Medium" }, kind: "radio" },
     { value: { name: "Large" }, kind: "radio" },
     { value: { name: "Reset view" } },
+];
+
+export const SECTIONED_VIEW_OPTIONS: (MenuItemRecord<Action> | MenuGroupRecord<MenuItemRecord<Action>>)[] = [
+    { label: "Editor", items: VIEW_OPTIONS.slice(0, 3) },
+    { label: "Text size", items: VIEW_OPTIONS.slice(3, 6) },
+    VIEW_OPTIONS[6],
 ];
 
 export const ZOOM_ACTIONS: MenuItemRecord<Action>[] = [

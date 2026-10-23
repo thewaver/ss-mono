@@ -5,7 +5,7 @@ import { themeVars } from "../../Theme.css";
 export const column = style({
     display: "flex",
     flexDirection: "column",
-    alignItems: "center",
+    alignItems: "flex-start",
     gap: themeVars.spacing.full,
     width: "100%",
 });

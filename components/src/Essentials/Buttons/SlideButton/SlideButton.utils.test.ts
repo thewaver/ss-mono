@@ -88,6 +88,7 @@ describe("createGesture click", () => {
             getMode: () => "both",
             getThumbSize: () => 40,
             getHoldDurationMs: () => 1000,
+            getCompletionRatio: () => 1,
             getTrackWidth: () => 200,
             getProgressRatio: () => progressRatio,
             setProgressRatio: (ratio) => {
@@ -139,5 +140,68 @@ describe("createGesture click", () => {
         gesture.click();
 
         expect(onActivate).toHaveBeenCalledTimes(1);
+    });
+});
+
+describe("computeCompletionRatio", () => {
+    it("passes a share within the track through", () => {
+        expect(SlideButtonUtils.computeCompletionRatio(0.8)).toBe(0.8);
+        expect(SlideButtonUtils.computeCompletionRatio(1)).toBe(1);
+    });
+
+    it("asks for no more than the end of the track", () => {
+        expect(SlideButtonUtils.computeCompletionRatio(3)).toBe(1);
+    });
+
+    it("never completes a thumb that has barely moved", () => {
+        expect(SlideButtonUtils.computeCompletionRatio(0)).toBeGreaterThan(0);
+        expect(SlideButtonUtils.computeCompletionRatio(-1)).toBeGreaterThan(0);
+    });
+});
+
+describe("createGesture completion", () => {
+    beforeEach(() => {
+        vi.useFakeTimers();
+        vi.stubGlobal("requestAnimationFrame", () => 1);
+        vi.stubGlobal("cancelAnimationFrame", () => undefined);
+    });
+
+    afterEach(() => {
+        vi.useRealTimers();
+        vi.unstubAllGlobals();
+    });
+
+    const slideTo = (completionRatio: number, pointerRatio: number) => {
+        const onActivate = vi.fn();
+        let progressRatio = 0;
+
+        const gesture = SlideButtonUtils.createGesture({
+            getMode: () => "slide",
+            getThumbSize: () => 40,
+            getHoldDurationMs: () => 1000,
+            getCompletionRatio: () => completionRatio,
+            getTrackWidth: () => 200,
+            getProgressRatio: () => progressRatio,
+            setProgressRatio: (ratio) => {
+                progressRatio = ratio;
+            },
+            onActivate,
+        });
+
+        gesture.drag(0.1);
+        gesture.drag(0.1 + pointerRatio);
+        gesture.dragEnd("release");
+
+        return onActivate;
+    };
+
+    it("completes only at the end of the track by default", () => {
+        expect(slideTo(1, 0.7)).not.toHaveBeenCalled();
+        expect(slideTo(1, 0.8)).toHaveBeenCalledTimes(1);
+    });
+
+    it("completes part-way along when asked to, and not before", () => {
+        expect(slideTo(0.5, 0.3)).not.toHaveBeenCalled();
+        expect(slideTo(0.5, 0.5)).toHaveBeenCalledTimes(1);
     });
 });

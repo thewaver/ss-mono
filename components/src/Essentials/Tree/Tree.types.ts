@@ -1,5 +1,8 @@
+import type { Point2d } from "@thewaver/ss-utils";
+
+import type { CheckedState } from "../../Abstracts/CheckedState/CheckedState.types";
 import type { FlatRow } from "../../Abstracts/Flattener/Flattener.types";
-import type { PlacementLayoutFn } from "../../Abstracts/Placement/Placement.types";
+import type { PlacementLayoutFn, PlacementRect } from "../../Abstracts/Placement/Placement.types";
 import type { ProximityEffectFn } from "../../Abstracts/Proximity/Proximity.types";
 
 export type TreeNodeRenderProps<T = unknown> = {
@@ -16,8 +19,13 @@ export type TreeNodeRenderProps<T = unknown> = {
     isExpanded: boolean;
     /** Whether this node's children are still being fetched. */
     isPending: boolean;
-    /** Whether this node is the selected one. */
+    /** Whether this node is the selected one, or in a `MultiTree`, whether it is ticked. */
     isSelected: boolean;
+    /**
+     * Whether this node is ticked, untouched, or — for a folder in a `MultiTree` — `"mixed"`, when some of what is
+     * inside it is ticked and some is not. In a `Tree` it follows `isSelected`.
+     */
+    checkedState: CheckedState;
     /** How deep this node sits, counting from the roots, so a consumer can indent it. */
     depth: number;
 };
@@ -33,6 +41,27 @@ export type TreeNodeRecord<T, TTooltipDefs> = {
 };
 
 export type TreeRecordRow<T, TTooltipDefs> = FlatRow<TreeNodeRecord<T, TTooltipDefs>>;
+
+export type TreeConnectorDefs<T> = {
+    /** The node the connector reaches. */
+    value: T;
+    /** The node it leaves, which is the first one's parent. */
+    parentValue: T;
+    /** Where the parent was placed. */
+    from?: PlacementRect;
+    /** Where the child was placed. */
+    to?: PlacementRect;
+    /** The point the layout turns about, for a connector that bends round it. */
+    origin?: Point2d;
+    /** The radii of the curve the layout places on, for a connector that follows it. */
+    radii?: Point2d;
+};
+
+export type TreeMultiKeyAction<T, TTooltipDefs> =
+    | { kind: "check"; row: TreeRecordRow<T, TTooltipDefs> }
+    | { kind: "focus_check"; row: TreeRecordRow<T, TTooltipDefs> }
+    | { kind: "check_range"; rows: TreeRecordRow<T, TTooltipDefs>[]; focus?: TreeRecordRow<T, TTooltipDefs> }
+    | { kind: "check_all" };
 
 export type TreeKeyAction<T, TTooltipDefs> =
     | { kind: "claim" }
@@ -63,8 +92,20 @@ export type BaseTreeCbs<T> = {
      * screen.
      */
     computeEstimatedNodeHeight?: (index: number) => number;
+};
+
+export type BaseSingleTreeCbs<T> = {
     /** Runs when a different node is selected. */
     onSelectionChange?: (value: T) => void;
 };
 
-export type BaseTreeProps<T> = BaseTreeValues & BaseTreeCbs<T>;
+export type BaseTreeProps<T> = BaseTreeValues & BaseTreeCbs<T> & BaseSingleTreeCbs<T>;
+
+export type TreeConnectorNeedsLayout = { computeLayout: PlacementLayoutFn } | { renderConnector?: undefined };
+
+export type BaseMultiTreeCbs<T> = {
+    /** Runs when what is ticked changes, with every ticked value. */
+    onCheckedChange?: (values: T[]) => void;
+};
+
+export type BaseMultiTreeProps<T> = BaseTreeValues & BaseTreeCbs<T> & BaseMultiTreeCbs<T>;

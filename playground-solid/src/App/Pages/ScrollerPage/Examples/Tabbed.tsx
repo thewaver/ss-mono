@@ -1,8 +1,10 @@
 import { Scroller, Tabs, access } from "@thewaver/ss-components-solid";
+import { getMonthPanelId, getMonthTabId } from "@thewaver/ss-playground/App/Pages/ScrollerPage/ScrollerPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ScrollerPage/ScrollerPage.css";
 import { FOCUS_RING_WIDTH } from "@thewaver/ss-playground/App/Theme.css";
 
 import { PageScrollerButton } from "../../../PageComponents/ScrollerButton/ScrollerButton";
+import { PageTabPanel } from "../../../PageComponents/TabPanel/TabPanel";
 import { PageTabContent, PageTabFloater, PageTabGutter } from "../../../StyledComponents/TabContent/TabContent";
 import type { ScrollerTabbedExampleProps } from "../ScrollerPageSolid.types";
 
@@ -13,7 +15,7 @@ type Props = ScrollerTabbedExampleProps;
 
 export const TabbedExample = (props: Props) => {
     return (
-        <div class={styles.demo}>
+        <div class={styles.tabbedDemo}>
             <Scroller
                 gap={SCROLLER_GAP}
                 padding={FOCUS_RING_WIDTH}
@@ -45,6 +47,13 @@ export const TabbedExample = (props: Props) => {
                     )}
                 />
             </Scroller>
+
+            <PageTabPanel
+                id={() => getMonthPanelId(access(props.selectedValue))}
+                tabId={() => getMonthTabId(access(props.selectedValue))}
+            >
+                {access(props.selectedValue)}
+            </PageTabPanel>
         </div>
     );
 };

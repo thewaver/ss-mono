@@ -33,35 +33,31 @@ reading.
 ### Index
 
 1. Neither animation component can reveal its own children — _postponed until the platform catches up_
-2. `Select` — three things deliberately not built — _open_
-3. `Menu` — one thing deliberately not built — _open_
-4. Other core controls the library does not have — _open, ordered by the user_
-5. What the verification suite still cannot see — _open_
-6. Planned: a consumer-facing layer of controls above the library — _deferred to a session of its own_
-7. `Calendar` — one thing deliberately not built — _open_
-8. `ColorInput` — two things deliberately not built — _open_
-9. `Tabs` — a pairing the consumer can still skip — _open_
-10. `Tree` — two things deliberately not built — _open_
-11. `SlideButton` — three things deliberately not built — _open_
-12. `Spotlight` — one thing deliberately not built — _open_
-13. `Scroller` — three things deliberately not built — _open_
-14. `Paginator` — one thing deliberately not built — _open_
-15. `Carousel` — two things deliberately not built — _open_
-16. The four components ported from React — what did not settle — _open_
-17. An anchored layer trails its anchor during a scroll — _postponed until the platform catches up_
-18. `Table` — six things deliberately not built — _open_
-19. `Timeline` — the pointer routes the library cannot promise — _open_
-20. `GlassSurface` — what is built and what is not — _open, one item postponed until the platform catches up_
-21. Arbitrary placement across controls, and the picking that has to come with it — _open_
-22. The scanline page is twelve examples of one example — _open_
-23. `CardStack` — the pointer route the library cannot promise — _open_
-24. The submit story — what a native submit carries, and what `Form` hands `onSubmit` — _pending decision_
-25. `Die`'s step buttons and arrow keys fall into a loop of two or three faces — _open, no fix chosen_
-26. The Playground's painters in Windows high-contrast mode — _open, decided, not yet built_
+2. `Select` — one thing deliberately not built — _open_
+3. Other core controls the library does not have — _open, ordered by the user_
+4. What the verification suite still cannot see — _open_
+5. Planned: a consumer-facing layer of controls above the library — _deferred to a session of its own_
+6. `ColorInput` — two things deliberately not built — _open_
+7. `SlideButton` — two things deliberately not built — _open_
+8. `Spotlight` — one thing deliberately not built — _open_
+9. `Scroller` — two things deliberately not built — _open_
+10. `Paginator` — one thing deliberately not built — _open_
+11. `Carousel` — two things deliberately not built — _open_
+12. The four components ported from React — what did not settle — _open_
+13. An anchored layer trails its anchor during a scroll — _postponed until the platform catches up_
+14. `Table` — six things deliberately not built — _open_
+15. `Timeline` — the pointer routes the library cannot promise — _open_
+16. `GlassSurface` — what is built and what is not — _open, one item postponed until the platform catches up_
+17. Arbitrary placement across controls, and the picking that has to come with it — _open_
+18. `CardStack` — the pointer route the library cannot promise — _open_
+19. The submit story — what a native submit carries, and what `Form` hands `onSubmit` — _pending decision_
+20. `Die`'s step buttons and arrow keys fall into a loop of two or three faces — _open, no fix chosen_
+21. The Playground's painters in Windows high-contrast mode — _open, decided, not yet built_
+22. Port the Solid work on `Select`, `Menu`, `Tree`, `Tabs`, `SlideButton` and `Scroller` to React, Vue and Svelte — _decided, not yet built_
 
 ### Build order
 
-Covers the unbuilt controls in item 4. The ordering principle is **how much of the existing base
+Covers the unbuilt controls in item 3. The ordering principle is **how much of the existing base
 a thing reuses**: anything that is a preset or a composition of what already works comes before anything
 that needs a new primitive, and anything blocked on an architectural decision comes last, so the
 decision is made once with several consumers in view rather than inferred from the first one.
@@ -128,21 +124,14 @@ the one both components have.
 
 ---
 
-## 2. `Select` — three things deliberately not built
+## 2. `Select` — one thing deliberately not built
 
 The decisions behind what exists are in `decisions.md` under the three `Select` headings. These are
 the gaps, each with the reason it is still a gap.
 
-- **The group box is not paintable, only its header is.** The library owns
-  `<div role="group" aria-label>` so the role cannot end up in consumer markup; the consumer fills the
-  header via `renderGroup`. Handing it a `renderOptions` thunk in `renderPopup`'s shape would give it
-  the whole box, and is available if something needs it.
 - **What the stress variant reports is the cost of mounting options**, which is a separate cost from painting
   them. Windowing removed the mounting cost for lists that opt in; nothing addresses the painting half, and the
   cheap answer to it was `content-visibility` on the option paint, which is gone — see `decisions.md`.
-- **Dismissal does not restore the query.** Escape and blur clear it rather than restoring the selected option's
-  text, because restoring it would need the per-option string this design does not have. The open state itself is
-  no longer private — `visibility` ships; see `decisions.md`.
 
 **_Elsewhere._** Checked against Radix, React Aria and Kobalte, which is the SolidJS one.
 
@@ -157,11 +146,6 @@ the gaps, each with the reason it is still a gap.
   so the injected-non-matching-option case cannot arise there; and where a library does own the filter
   it necessarily knows which options matched, which is the knowledge this design trades away by
   choice.
-- **The group box is styleable everywhere else because everything is styleable everywhere else.**
-  Radix's `Select.Group` and React Aria's `Section` are library elements that carry the role and accept
-  the consumer's class name; neither hands over a thunk. That route is closed here by the rule that the
-  library accepts no class names, so the thunk really is the only shape left — worth stating, because
-  from outside the omission reads as an oversight rather than a consequence.
 - **Virtualization is nobody's library code.** Kobalte's select has a `virtualized` boolean and a docs
   example handing the list to `@tanstack/solid-virtual` with a hundred thousand options; React Aria has
   a `Virtualizer` wrapper; Radix has neither, and its docs cover long lists only with scroll buttons.
@@ -173,38 +157,7 @@ the gaps, each with the reason it is still a gap.
 
 ---
 
-## 3. `Menu` — one thing deliberately not built
-
-The decisions behind what exists are in `decisions.md` under _"`Popover` extracted, and `Menu` as the
-second consumer"_ and _"`Menu` submenus: a level per popup, focus moving between them"_. These are the
-gaps, each with the reason it is still a gap.
-
-- **There are no groups and no separators.** `SelectItem<T>`'s discriminated record would carry them
-  unchanged, and the walk that would number them is no longer a thing to write: `Abstracts/Flattener` owns it
-  and `Select` and `Tree` both read it, so a grouped menu is a `computeChildren` and a `computeIsEntry` rather
-  than a third copy. What that does **not** decide is the paint and the keyboard — whether a separator is a
-  row the walk emits or a thing the painter draws between runs, and whether a group header is reachable.
-  A consumer that needs sections today paints them into `renderPopup` around a flat list.
-
-**_Elsewhere._**
-
-- **Groups, separators and stateful items all live inside the menu component.** Radix ships `Group`,
-  `Label` and `Separator`, plus `CheckboxItem` and `RadioGroup` / `RadioItem` — which is where the stateful
-  rows landed here too, on the user's call. The separators and labels are the first bullet above and are
-  still missing.
-- **Radix does not do the `Tab` behavior APG asks for, and this library now does.** Radix's menu does nothing at
-  all on `Tab`, filed against it as a spec-compliance bug (radix#1934) which is still open. Here Tab closes the
-  menu and moves on to the stop after the trigger; see `decisions.md`.
-- **Right-click is a separate opener, never a separate menu.** Radix ships a whole `ContextMenu`
-  component with the same menu inside it; Ark UI and Zag instead add a `ContextTrigger` part to the
-  same menu, and open it on a roughly 700ms long press when the pointer is pen or touch. Both keep one
-  menu and vary the opener, which is the shape `ContextMenu` took here — see `decisions.md`. The long
-  press for pen and touch is the half nobody has asked for yet: a `contextmenu` event is all that is
-  listened for, so a touch device gets whatever its browser synthesises.
-
----
-
-## 4. Other core controls the library does not have
+## 3. Other core controls the library does not have
 
 `Essentials/Input` covers `TextInput`, `TextArea`, `NumberInput`, `CurrencyInput`, `Checkbox`, `Toggle`, `Radio`,
 `RadioGroup`, `Select`, `MultiSelect`, `FileInput`, `ColorInput`, `Label`, `Calendar`, `DateInput`,
@@ -306,7 +259,7 @@ outstanding.
 
 ---
 
-## 5. What the verification suite still cannot see
+## 4. What the verification suite still cannot see
 
 `e2e/` drives real clicks and keystrokes in a real browser through Playwright, and `npm run verify:dom`
 runs it. What is worth stating is the shape of its blind spots, because a green run reads as broader
@@ -374,7 +327,7 @@ stub above rather than a fake clock — the two look interchangeable and are not
 
 ---
 
-## 6. Planned: a consumer-facing layer of controls above the library — _deferred to a session of its own_
+## 5. Planned: a consumer-facing layer of controls above the library — _deferred to a session of its own_
 
 **Deferred to a near-future session of its own**, by the user, because bundling it with the components then in
 progress would have been awkward. It is no longer deferred indefinitely. The packaging question inside it is a
@@ -433,45 +386,7 @@ same example.
 
 ---
 
-## 7. `Calendar` — one thing deliberately not built
-
-Item 4 covers the missing components. These are `Calendar`'s own gaps, each with the reason it is still
-one. The decisions behind what exists are in `decisions.md` under _"Controls: `Calendar`, and the date
-value the library owns"_.
-
-- **No week numbers and no multi-month view.** Both are extra columns or extra grids around the same
-  `DateValueUtils.getMonthGrid`, so neither needs new library machinery; they need a decision about
-  whether `Calendar` grows a mode or a consumer composes two of them.
-
-**_Elsewhere._**
-
-- **A range is a second component or a mode, and both ship.** React Aria has a separate `RangeCalendar`;
-  react-day-picker has `mode="range"` on the same component. Both shapes were weighed before `RangeCalendar`
-  was built; see `decisions.md`.
-- **Month and year jumping is a caption layout, not a keyboard shortcut.** react-day-picker's
-  `captionLayout` takes `"dropdown"`, `"dropdown-months"` or `"dropdown-years"`, with `startMonth` and
-  `endMonth` bounding the lists and defaulting to a hundred years back. Selects inside the header are
-  what everyone ships; `Shift+PageUp` is nobody's headline feature, which is why it stayed unbuilt for as
-  long as it did. It is built now — the caption is still where the field goes, and the key costs three
-  lines beside the month step it already had.
-- **Week numbers and multiple months are props on the same component**, not a second one:
-  `showWeekNumber` and `numberOfMonths`, plus a callback for a click on the week number itself.
-- **The per-cell predicate is answered by widening the input rather than memoising the call.**
-  react-day-picker's `disabled` accepts a matcher or an array of them — a single date, an interval, a
-  day-of-week set, a before/after bound — and a function is only one of the accepted forms. So the
-  common cases never call anything forty-two times, and the expensive form is visibly the expensive one.
-- **The month announcement belongs to a shared announcer that is nobody's component**, which is the shape
-  this library settled on. React Aria announces a visible-range change through `@react-aria/live-announcer`:
-  a live region created on first use, appended outside the component tree, with the message cleared after a
-  timeout. `LiveAnnouncer` is that, and `Calendar` was its first consumer — the announcer belongs to neither
-  the consumer's title nor the calendar. Nothing here is outstanding.
-- **One real focusable element per day is normal**, so forty-two of something was never the anomaly:
-  react-day-picker renders a `<button>` per day and MUI a day component per day. What this library adds on top
-  is its own wrapper per cell, and that has now been measured — see `decisions.md`.
-
----
-
-## 8. `ColorInput` — two things deliberately not built
+## 6. `ColorInput` — two things deliberately not built
 
 `ColorInput` is the custom picker now; the decisions are in `decisions.md` under the `ColorArea` heading.
 These are the gaps.
@@ -526,100 +441,12 @@ every other layer and takes a `visibility` prop like every other popup; both are
 
 ---
 
-## 9. `Tabs` — a pairing the consumer can still skip
-
-The decisions behind what exists are in `decisions.md` under _"Controls: `Tabs` as records"_ and
-_"`TabPanel`: the pairing is written on the record"_.
-
-- **Nothing makes a consumer wire the panel.** `id` and `panelId` are optional fields, so a tab list with
-  no pairing at all is still a valid one. The cost is that the omission is silent: a consumer who paints
-  their own panel box and never reaches for `TabPanel` gets no warning, the way one who nests a
-  `getAriaLabel` inside a `Label` does. The Playground's own left menu was that consumer for four months
-  and nothing said so; it is wired now, which removes the example rather than the gap.
-
-**_Elsewhere_**, read off the two libraries' own documentation on **2026-08-11**.
-
-- **The panel is part of the component in both, and it is mandatory.** Radix has `Tabs.Root` / `List` /
-  `Trigger` / `Content`, where `Trigger` and `Content` carry the same `value`; React Aria has `Tabs` /
-  `TabList` / `Tab` / `TabPanels` / `TabPanel`, matched on `id`, and a panel per tab is required. Both
-  enclose the panels in the root, which is what lets the ids be generated privately — and what this
-  library cannot do while a panel may be a routed page mounted elsewhere in the tree. Writing the pair of
-  ids on the record is the price of that, and the optional-ness in the first bullet is its tail.
-- **Automatic activation is the default in both**, spelled `activationMode="automatic"` in Radix and
-  `keyboardActivation="automatic"` in React Aria. Both modes now exist here under `hasAutoActivation`, with
-  manual still the default — the inversion is deliberate and the reasoning is in `decisions.md`.
-
----
-
----
-
-## 10. `Tree` — two things deliberately not built
-
-The decisions behind what exists are in `decisions.md` under _"Controls: `Tree`, and the group box that
-could not be a child"_. These are the gaps, each with the reason it is still one.
-
-- **The marker cannot own the toggle.** One press both selects a node and opens it, because the branch
-  marker is drawn inside `renderNode` and the component cannot tell a press on it from a press on the label.
-  A consumer who wants the published desktop behavior — the chevron opens, the label selects — has no route
-  to it. Giving them one means either a second render slot the library positions, or a flag saying where the
-  press landed, and neither has been argued.
-- **One selected value, and no checkboxes.** `value` is `Signal<T | undefined>`, so there is no
-  `aria-multiselectable`, no `Shift`-extended range, and no tri-state parent following its children. **None
-  of the three is arithmetic any more**: `Abstracts/Selection` holds the toggle, the anchored range and
-  `getBranchItems` / `getBranchState` / `getBranchSelection` for a folder that follows its contents, and
-  `Table` drives its whole selection through it. What is left here is the API question the abstract
-  deliberately does not answer — whether `value` widens to a list, whether that is a breaking change
-  worth making or a second prop, and where a tick box would be drawn given that `renderNode` is the
-  consumer's. See `decisions.md` under _"`Abstracts/Selection`"_.
-
-**The focus rescue was wired to a function nothing could reach, and is now a guard over the visible rows.**
-It used to sit inside `collapse`, checking whether focus was on a descendant before removing the subtree — but
-both routes into `collapse` act on the branch itself, which is already the focused element and stays mounted,
-so the check was never true. A **consumer** writing `expanded` from their own code, which is the only
-way to collapse a branch out from under a focused row, never passes through `collapse` at all. The guard now
-watches the visible rows and fires when a remembered focused row leaves the set while focus has fallen to the
-document body; `tree.spec.ts` drives it through a Playground button that defers the collapse, since a button
-that collapsed on the spot would be holding focus itself.
-
-**_Elsewhere_**, read off the published documentation on **2026-08-13**.
-
-- **Typeahead is in the pattern itself, not just in the libraries.** The published tree pattern lists it as a
-  keyboard requirement — type a character, focus moves to the next node whose name starts with it. Ark UI has
-  it on by **default** behind a `typeahead` prop; React Aria drives it off the same `textValue` its lists use.
-  This is what made the tree the strongest of the three arguments for building it.
-- **Lazy branches are a named feature with a completion callback.** Ark UI takes `loadChildren` plus
-  `onLoadChildrenComplete`; React Aria has a `TreeLoadMoreItem` element and a `renderEmptyState` for the
-  spinner. Both answered the half this item called hard — where "loading" is painted — by making it an element
-  the consumer supplies, and that is the shape the group box grew. Built as `hasMoreChildren` plus
-  `renderPendingChildren`, with no load callback, because `expanded` is the consumer's already; see
-  `decisions.md`.
-- **Multi-select and checkboxes are one feature, and both libraries ship it.** `selectionMode="multiple"` in
-  each, with Ark UI adding `NodeCheckbox` and a `checkedValue` list carrying `indeterminate`. So the tri-state
-  parent is not an extra: it is what a multi-select tree is expected to include.
-- **A windowed tree is done by handing the visible list out.** Ark UI virtualizes through `getVisibleNodes()`
-  plus a `scrollToIndexFn`, which is precisely `getVisibleRows` and `scrollToRow` — the same two pieces this
-  library already has, arranged so the consumer owns the window. React Aria's tree documents no virtualization
-  at all. Worth knowing before the group-box boundary above is treated as the only way in.
-- **The indent guide is a part in one of them.** Ark UI ships `BranchIndentGuide` alongside `BranchControl`,
-  `BranchIndicator` and `BranchText`, so the depth line a consumer draws here from the `depth` flag is
-  something at least one library thought worth owning.
-- **Drag and drop is React Aria's, and nobody else's.** It arrives through the same `useDragAndDrop` hook its
-  lists use rather than as anything tree-specific. Nothing here has asked for it, and it is recorded so the
-  omission is not re-derived as an oversight.
-
----
-
-## 11. `SlideButton` — three things deliberately not built
+## 7. `SlideButton` — two things deliberately not built
 
 The decisions behind what exists are in `decisions.md` under _"Controls: `SlideButton`, and why the gesture
 is the only thing it owns"_, including which WCAG criteria were read and what they decided. These are the
 gaps, each with the reason it is still one.
 
-- **The thumb has to reach the end, and there is no threshold.** Overshooting clamps, so a drag past the end
-  is enough and reaching it is easy — but a consumer who wants a hair-trigger at 90%, or a longer travel than
-  the paint suggests, has nothing to set. It is not a prop because a tuned value with no consumer behind it is
-  a guess, and the rule about measured values says those are the user's to set rather than the library's to
-  invent.
 - **Horizontal only.** `Range` grew an `orientation` and this did not: the hit test and the progress
   arithmetic both read one axis, and the painter's `calc` does too. A vertical slide-to-activate is a real
   shape on a phone lock screen and nowhere else, which is why it was not built rather than why it could not
@@ -652,7 +479,7 @@ gaps, each with the reason it is still one.
 
 ---
 
-## 12. `Spotlight` — one thing deliberately not built
+## 8. `Spotlight` — one thing deliberately not built
 
 The decisions behind what exists are in `decisions.md` under _"Controls: `Spotlight`, and three presets
 because a mode cannot move at runtime"_. These are the gaps, each with the reason it is still one.
@@ -665,7 +492,7 @@ because a mode cannot move at runtime"_. These are the gaps, each with the reaso
 
 ---
 
-## 13. `Scroller` — three things deliberately not built
+## 9. `Scroller` — two things deliberately not built
 
 The decisions behind what exists are in `decisions.md` under _"Controls: `Scroller`, and why it renders no
 button of its own"_. These are the gaps, each with the reason it is still one.
@@ -674,10 +501,6 @@ button of its own"_. These are the gaps, each with the reason it is still one.
   `offsetLeft` — and a vertical twin is those three swapped plus a direction prop, which is `Accordion`'s
   recorded position on its own axis question. Nothing has asked for a column, and the Playground's own left
   menu, which is the obvious candidate, scrolls natively today and nobody has complained.
-- **The step is a page, and there is no way to ask for less.** Paging lands on the last item boundary inside
-  the next page, so the step is "as much as fits" rather than a tuned fraction. A consumer wanting a lingering
-  item of overlap for context has nothing to set. It is not a prop because the overlap would be a measured
-  value with no consumer behind it, and the rule about tuned numbers says those are the user's to set.
 - **The buttons are the consumer's, so their keyboard story is too.** The component renders no button, which
   means it cannot guarantee one is reachable, named, or in the tab order — a consumer who paints them as bare
   divs gets a control no keyboard can reach. The library's answer is that the scrolling itself is still
@@ -686,7 +509,7 @@ button of its own"_. These are the gaps, each with the reason it is still one.
 
 ---
 
-## 14. `Paginator` — one thing deliberately not built
+## 10. `Paginator` — one thing deliberately not built
 
 The decisions behind what exists are in `decisions.md` under _"Controls: `Paginator`, where the arithmetic
 is the component"_ and _"`Paginator` is a root and pieces, with the ready-made row on top"_.
@@ -701,7 +524,7 @@ is the component"_ and _"`Paginator` is a root and pieces, with the ready-made r
 
 ---
 
-## 15. `Carousel` — two things deliberately not built
+## 11. `Carousel` — two things deliberately not built
 
 The decisions behind what exists are in `decisions.md` under _"Controls: `Carousel`, and the first component
 that acts without being asked"_ and _"`Carousel`: one component, and how a slide sits is a placement rule"_. These
@@ -719,7 +542,7 @@ are the gaps, each with the reason it is still one.
 
 ---
 
-## 16. The four components ported from React — what did not settle
+## 12. The four components ported from React — what did not settle
 
 `Satellite`, `Staircase`, `Formation`, `OverheadWheel` and `DrumWheel` came in from a React codebase; what the port
 settled is in `decisions.md`. What did not settle is below, and both entries are decisions taken rather than
@@ -732,7 +555,7 @@ original codebase were accounted for by those two fixes.
 
 **An overhead wheel has one slot for its controls and it is the hub, chosen by the user over two alternatives.** A
 drum's controls sit under the barrel; an overhead wheel's sit in the middle of it, and there is no second slot. The
-cost is the one item 13 already records for `Scroller`: a consumer who wants the control somewhere else renders
+cost is the one item 9 already records for `Scroller`: a consumer who wants the control somewhere else renders
 their own button, and a library that renders no button cannot promise it is named or reachable. The two
 alternatives were a second slot beneath the wheel, rejected because the overhead wheel is a square and anything
 under it changes the box it reserves, and a slot with a position prop, rejected because `Toasts` had already
@@ -740,7 +563,7 @@ settled that a component does not fully delegate position. Recorded so it is not
 
 ---
 
-## 17. An anchored layer trails its anchor during a scroll — _postponed until the platform catches up_
+## 13. An anchored layer trails its anchor during a scroll — _postponed until the platform catches up_
 
 **While something is moving, the position an anchored layer paints at is the position its anchor was in one
 frame ago.** At rest the last frame catches up, so it looks settled and only moves when something else does.
@@ -826,7 +649,7 @@ neither was tried.
 
 ---
 
-## 18. `Table` — six things deliberately not built
+## 14. `Table` — six things deliberately not built
 
 The decisions behind what exists are in `decisions.md` under _"Controls: `Table`, a grid rather than a
 table, and why the markup could not be `<table>`"_. These are the gaps, each with the reason it is still one.
@@ -852,7 +675,7 @@ _Accepted limits_ instead.
 
 ---
 
-## 19. `Timeline` — the pointer routes the library cannot promise
+## 15. `Timeline` — the pointer routes the library cannot promise
 
 The component takes the gestures itself: a drag moves the window, the wheel and a pinch zoom it, and both can
 be switched off. The reasoning, the evidence for the wheel behaving as it does and the press-versus-drag rule
@@ -877,7 +700,7 @@ are in `decisions.md` under _"`Timeline`: a window over a range"_. What is outst
 
 ---
 
-## 20. `GlassSurface` — what is built and what is not
+## 16. `GlassSurface` — what is built and what is not
 
 The component is built and works: two backdrop layers, the tint, and a specular sheen that follows the
 pointer, with a draggable pane on its page. `GlassDefs` names the four groups of settings, and the ripple and
@@ -911,7 +734,7 @@ what decides visibility by design, so the page not being in the menu is not a ga
 
 ---
 
-## 21. Arbitrary placement across controls, and the picking that has to come with it
+## 17. Arbitrary placement across controls, and the picking that has to come with it
 
 **The user's proposal, and the direction the library is going next.** A control's items should be placeable
 anywhere rather than only along a line: a `Menu` as a closed ring or a wide fan; a `Paginator` drawn
@@ -969,10 +792,6 @@ is what turned up the origin-placed item it scored as pointing due east.
   for the room. In a page's flow the same thing bites differently: a placed `Toolbar` has
   nothing to collapse into, so a layout that outgrows its column spills rather than adapting. What should
   happen in either case has not been decided.
-- **`Tree` has no connector slot, so a radial tree's structure reads only from the angles.** A child sits
-  inside the angular slice its parent was given, which is enough to see but not enough to state. `Stepper` now
-  has both the slot and the geometry — `PlacementUtils.getLinkPath` — so the work is small; what it costs is
-  new API on a control that has none.
 
 ### Loose ends left deliberately, recorded at the user's request
 
@@ -988,38 +807,12 @@ is what turned up the origin-placed item it scored as pointing due east.
 - **`fan` places boxes rather than wedges, and that has never been argued either way.** The wedge vocabulary
   is on `PlacementRect` and any layout may use it; the fan is the one layout whose items are tilted along the
   arc rather than sitting in a band, so cards may well be right for it. It takes `ArcDefs` like the others now.
-- **`PlacementLayout.origin` and `PlacementSector.origin` hold the same number.** One is what the picking
-  measures directions from and the other is what a wedge painter turns its arc about, and a layout sets both
-  from the same value. The duplication is deliberate — a painter is handed a `PlacementRect` and never sees
-  the layout — but it is a fact stated twice and nothing keeps the two in step.
 
 ---
 
 ---
 
-## 22. The scanline page is twelve examples of one example
-
-**The user's aside when the per-sample defs work was proposed, promoted to an item by them once that work
-closed.** The page should stop being a gallery of entries and become a single example with knobs that follow
-the effect picked — one image, a picker, and the panel changing under it.
-
-**The knob half is already built.** Each effect's knobs are described in the Playground's
-`Knobs/ScanlineAnimationKeyframes.const.ts`, the page renders them through the generic panel, and none of it is
-written in the page itself. What is left is the twelve example boxes.
-
-**Eleven of the twelve differ only by which compute function and which knobs**, so eleven boxes are showing
-the same example over and over with a different function passed in. `Glitch` is the exception and would stay
-its own example either way, being a page-local composite built in the page rather than a registry sample.
-
-**What the collapse costs, and it is not nothing.** A gallery is what makes two effects comparable at a
-glance, and each box carries its own readout describing the effect under it — twelve sentences that would
-have to become one that changes with the picker, or be dropped. The page is 777 lines and would lose most of
-the wrapper components; the picker, the readout and where the breakpoint controls sit are the parts that
-actually need designing.
-
-**Nothing is blocked on it** and the shape of the picker has not been argued.
-
-## 23. `CardStack` — the pointer route the library cannot promise
+## 18. `CardStack` — the pointer route the library cannot promise
 
 **The same gap `Timeline` and `Scroller` already carry, and it arrived with the component.** A card is sent by
 a swipe, which is both a path-based gesture and a drag, so **2.5.1 Pointer Gestures** (Level A) and **2.5.7
@@ -1038,7 +831,7 @@ a consumer cannot ask for the gesture without also supplying the route. That tri
 that draws the controls itself, which the user ruled this one must not. The Playground's deck is what
 discharging it looks like: four buttons beside the pile, each calling `send`.
 
-## 24. The submit story — what a native submit carries, and what `Form` hands `onSubmit`
+## 19. The submit story — what a native submit carries, and what `Form` hands `onSubmit`
 
 Three findings from the survey against the reference libraries were lofted here rather than settled one by one,
 because they are one question. **The user's word: lofted, not discarded.**
@@ -1058,7 +851,7 @@ who wants values takes. _"The form story"_ in `decisions.md` says the library ne
 that entry is what this item would revisit. Focus moving to the first field in error on submit was built
 separately and does not depend on this.
 
-## 25. `Die`'s step buttons and arrow keys fall into a loop of two or three faces
+## 20. `Die`'s step buttons and arrow keys fall into a loop of two or three faces
 
 Reachable on the Die page's icon cloud: pick the d20 and press down a few times. The die goes back and forth
 between the same two faces. Every shape does it — a d20 pressed right goes between faces 1 and 2 from the first
@@ -1085,7 +878,7 @@ every face upright cannot both hold, so each option gives one up:
 `Cuboid`'s upright mode has the same tension and accepted it, since a box has only six resting orientations
 (`decisions.md`, _"`Cuboid`: upright mode keeps an orientation"_); a d20 has many more faces for the loop to skip.
 
-## 26. The Playground's painters in Windows high-contrast mode
+## 21. The Playground's painters in Windows high-contrast mode
 
 Reachable on the Range page with Windows' high-contrast mode on, or with Chrome's DevTools emulating
 `forced-colors: active`: the track and the filled part of the range turn white on the white page, and only the
@@ -1102,6 +895,152 @@ active)` rule drawing its shapes in system colors (`CanvasText` for a track or a
 selected or filled part), with `forced-color-adjust` left alone unless a part has to keep its own color. **The
 normal theme does not change**: this is the user's styling, and the rules apply only while high-contrast mode is
 on.
+
+## 22. Port the Solid work on `Select`, `Menu`, `Tree`, `Tabs`, `SlideButton` and `Scroller` to React, Vue and Svelte — _decided, not yet built_
+
+Built and tested in Solid: the core (`components/src`) and the shared Playground half (`playground/src`) are finished
+for all of it, so the port touches `components-react`, `components-vue`, `components-svelte` and the three
+Playgrounds only. **The Solid code is the reference** — copy its behavior and its shape, never redesign. The reasoning
+is in `decisions.md` under each heading named below. Everything here was settled with the user; there is nothing to
+ask before starting.
+
+**How to port, the same as every port before it.** One prop name in every framework; a `render*` painter becomes a
+Vue slot or a Svelte snippet under the same name, passed the way that framework's existing painters already are (a
+plain value where Solid passes an accessor). Copy the Solid `/** */` blocks word for word. A `warnIf…` call runs once,
+the way each framework already calls `StepperUtils.warnIfBodyIgnored` — React `useEffect`, Vue `watchAfterRender`,
+Svelte `$effect`. A type that refuses a pair of props cannot be expressed against a Vue slot; Vue skips those and keeps
+the warning, as it already does for `TreeConnectorNeedsLayout`. **In Vue, a function handed to `<component :is>` must
+keep the same identity from one render to the next** — one created fresh each render is a new component every time,
+remounts on every update, and crashed the tab when `Select`'s group box was first ported; the fix is the stable
+per-index content function in `components-vue/src/Essentials/Input/Listbox/Listbox.tsx` (`getGroupContent`). Run
+`npm run typecheck` in all six packages, and the specs named under each part in all four Playgrounds.
+
+**Temporary scaffolding to replace, not keep.** To keep the three frameworks compiling while only Solid had these, a
+few stand-ins went in: their `MenuItem` types accept groups and their menu levels flatten them
+(`MenuUtils.flattenNodes`), so groups are drawn as plain items; their `Tree`s set `checkedState` to the same value as
+`isSelected`; Vue declares `overlapCount` on `Scroller` without passing it on. Each is superseded by the part below.
+
+### A. `Select`: a field you type into holds the picked option's text
+
+Reference: `SelectField` and `SelectComposite` in `components-solid/src/Essentials/Input/Select/Select.tsx`. Core
+pieces already there: `SelectUtils.computePaintedText`, and the styles `selectFieldContent` and
+`selectFilterFieldShowsValue`. `decisions.md`: _"`Select`: a typed-into field carries the picked text"_.
+
+- The composite holds `isEditing`, `false` to start. It turns `true` on every input, **in the same update as the query
+  write** — in Solid that is one `batch`; written separately, the field rewrites itself between the two writes and the
+  caret jumps to the start, so typing "Por" gave "orP". It turns `false` whenever the popup is closed, from an effect
+  on the open state.
+- `valueText` is `""` for a multi-select (the field stays empty, as now); otherwise `computeCustomText(picked)` when
+  given, else `undefined`.
+- The field wraps the consumer's paint in `<span class={selectFieldContent}>` and, while the field is filterable,
+  watches it with a `MutationObserver` (`childList`, `subtree`, `characterData`) to keep `paintedText` from
+  `computePaintedText`.
+- The input's text is `isEditing ? query : (isEmpty ? "" : valueText ?? paintedText)`. While not editing it carries
+  `selectFilterFieldShowsValue` (transparent text, so the paint shows and only assistive technology reads the input),
+  and on focus and on click — before the toggle — it selects all its text, so a keystroke replaces it.
+- Spec: remove the `@solid` tag from _"after a pick the field's own text is what was picked, and Escape puts it back"_
+  in `e2e/select.spec.ts`.
+
+### B. `Tabs` warns about a tab with no panel
+
+Core: `TabsUtils.warnIfUnpaired(tabs)`; a tab with an `href` is not counted. Call it once at setup. `decisions.md`:
+_"`Tabs` warns about a tab nobody wired to a panel"_.
+
+- Playground, Tabs page: the Clearable and AllDisabled examples now render a panel each (Solid:
+  `playground-solid/src/App/Pages/TabsPage/Examples/Clearable.tsx` and `AllDisabled.tsx`); the ids are already in the
+  shared `TabsPage.const.ts`.
+- Playground, Scroller page: the Tabbed example has ids and a panel (Solid: `ScrollerPage/Examples/Tabbed.tsx`);
+  `getMonthTabId`, `getMonthPanelId`, the new `PANEL_BODIES` entries and the `tabbedDemo` style are already shared.
+- Specs: `tabs.spec.ts` and `scroller.spec.ts` as they stand.
+
+### C. `SlideButton`'s `completionRatio`
+
+The library half is already wired in all three (the prop with its default, `getCompletionRatio` in the gesture defs,
+and Vue's declaration). Left is the Playground: the SlideButton page's global props panel with the one "Completion
+ratio" knob, wired to the Default example (Solid: `SlideButtonPage.tsx`, `Examples/Default.tsx`; shared:
+`Knobs/SlideButtons.const.ts`, `FIELD_WIDTH` in `SlideButtonPage.const.ts`). `decisions.md`: _"`SlideButton`
+completes part-way along"_. Spec: `slideButton.spec.ts` as it stands.
+
+### D. `Scroller`'s `overlapCount`
+
+`ScrollerUtils.stepTo(track, direction, overlapCount)` takes it as a third argument. Resolve
+`props.overlapCount ?? SCROLLER_DEFAULTS.overlapCount` and pass it to both `stepTo` calls (Vue's prop is already
+declared). Playground: the "Overlap count" knob (`Knobs/Scrollers.const.ts`) on the Scroller page, wired to the three
+Chips examples and FocusableChildren but not Tabbed (Solid: `ScrollerPage.tsx`, `Examples/Chips.tsx`,
+`Examples/FocusableChildren.tsx`). `decisions.md`: _"`Scroller` can keep some of the last view"_. Spec:
+`scroller.spec.ts` as it stands.
+
+### E. Nothing to port
+
+The placement-origin check is a unit test in the core.
+
+### F. `Menu`: sections
+
+Reference: `MenuLevel`, `Menu` and `ContextMenu` in `components-solid/src/Essentials/Menus/Menu/Menu.tsx` and its
+types. Core already there: `MenuGroupRecord`, `MenuSection`, `MenuGroupPaintExcludesLayout`, `MenuUtils.getIsGroup`,
+`flattenNodes`, `getSections`, `getRunRadioGroupValues`, `warnIfGroupPaintIgnored`, and `computeActivation`'s fourth
+argument. `decisions.md`: _"`Menu` sections are `Select`'s groups again"_.
+
+- Types: `MenuGroup<T> = MenuGroupRecord<MenuItem<T>>` and `MenuNode<T> = MenuItem<T> | MenuGroup<T>`; `items` on
+  `Menu`, `ContextMenu`, the level and a submenu item take `MenuNode<T>[]`. Painters `renderGroupHeader(group)` and
+  `renderGroupBox(renderContent, group)` on `Menu`, `ContextMenu` and the level, passed down to every submenu.
+  `MenuProps` and `ContextMenuProps` intersect `MenuGroupPaintExcludesLayout`; `FanMenu` and `WheelMenu` leave both
+  painters out of their props.
+- A level keeps three lists: `nodes = computeEntries(items, opener, mode)` (the back entry first, groups intact),
+  `entries = flattenNodes(nodes)` for everything that walks the level, and `sections = getSections(nodes)` for drawing.
+  An activation passes `sections.flatMap((section) => section.runs)`, so a radio group ends at its group's edge.
+- Drawing, per section: a loose section is its runs, as today. A grouped section is
+  `<div role="group" aria-label={label} class={laidOut ? menuLayoutGroup : undefined}>` around
+  `renderGroupBox(content)`, where `content` is the heading (left out when laid out) then the runs; with no box painter,
+  or when laid out, it is `content` alone. A radio run inside a section keeps its own inner `role="group"`.
+- `warnIfGroupPaintIgnored(hasLayout, hasHeaderOrBox)` once, in `Menu` and in `ContextMenu`.
+- Playground, Menu page: the "Sections" example, key `sections`, right after `stateful` (Solid:
+  `Menus/MenuPage/Examples/Sections.tsx` and its entry in `MenuPage.tsx`); the data `SECTIONED_VIEW_OPTIONS` and the
+  style `menuGroupBox` are shared; the heading reuses `PageSelectGroupContent`, the box is a new `PageMenuGroupBox`.
+
+### G. `Tree`: the arrow's press handler, and `MultiTree`
+
+Reference: `TreeComposite`, `Tree` and `MultiTree` in `components-solid/src/Essentials/Tree/Tree.tsx` and its types.
+Core already there: `BaseSingleTreeCbs`, `BaseMultiTreeCbs`, `BaseMultiTreeProps`, `checkedState` on
+`TreeNodeRenderProps`, `TreeUtils.createBranchDefs`, `getCheckableValues`, `computeMultiKeyAction` and
+`TreeMultiKeyAction`. `decisions.md`: _"`Tree`: the arrow opens, the name selects"_ and _"`MultiTree` is a checkbox
+tree"_.
+
+- One internal composite with `isMultiple`, and two presets over it: `Tree` (`value`, `onSelectionChange`,
+  `renderSelectionFloater`) and `MultiTree` (`checked`, a two-way list the tree keeps itself when left out, and
+  `onCheckedChange`).
+- `checkedState`: in a `MultiTree`, `SelectionUtils.getBranchState(value, checked, createBranchDefs(nodes))`; in a
+  `Tree`, whether the node is the selected one. `isSelected` is `checkedState === true` in both.
+- Ticking: one node with `SelectionUtils.getBranchSelection`, remembering it as the anchor for a range; a range merges
+  every row's `getBranchItems`; select-all ticks `getCheckableValues(nodes)`, or clears when everything already is.
+- Keys in a `MultiTree`: `computeMultiKeyAction` runs first (Shift; Control or Command) — `check`, `focus_check`
+  (focus, then tick), `check_range` (tick, then focus where it says), `check_all`; anything it does not claim goes to
+  the ordinary handling. Enter on a folder opens or closes it, and on a leaf ticks it. The roving tab stop starts on
+  the first ticked node that is showing.
+- The press: `renderNode` gets a third argument, `setExpanderRef`, held per row — never keyed by value. A press inside
+  that element opens or closes the folder and nothing else; anywhere else it ticks (`MultiTree`) or selects (`Tree`),
+  and with no expander registered a folder also opens or closes, which is today's behavior unchanged. The node element
+  hands the click event to the tree for that.
+- ARIA: `aria-multiselectable="true"` on a `MultiTree`; each node carries `aria-checked` (`true`, `false` or
+  `"mixed"`) there and `aria-selected` only in a `Tree`. The selection marker is not drawn in a `MultiTree`.
+- Playground, Tree page: the "Ticking several" example, key `checkboxes`, right before `leaning` (Solid:
+  `TreePage/Examples/Checkboxes.tsx` and its entry in `TreePage.tsx`); `PageTreeNodeContent` takes the shared
+  `hasCheckbox` (drawn with `SelectGroupContent`'s mark styles and glyphs) and an expander ref on its marker.
+
+### Specs to write once all four have it
+
+None exists yet for this new behavior, by the rule that specs follow the user's testing; they are part of this item.
+Put each in the spec of the route it drives, keyed by the example keys above.
+
+- `menu.spec.ts`: each group is named; the arrows walk straight past the headings; picking a radio item leaves the
+  other group's radio choice alone; the box holds the heading and the group's items.
+- `tree.spec.ts`: pressing an arrow opens a folder without selecting it, pressing a name selects it; in the
+  `checkboxes` example the tree is multi-select, pressing a folder's name ticks everything in it, a partly ticked
+  folder reports `mixed`, and Space, Shift with Space and Control with A each tick as the pattern says.
+- `slideButton.spec.ts` and `scroller.spec.ts`: the new knob does what its hint says, asserted against the knob's own
+  value rather than a written-down number.
+
+---
 
 ## Accepted limits
 

@@ -132,6 +132,10 @@ export const ListboxOptions = defineComponent(
         const getIsVirtualized = () =>
             props.computeEstimatedOptionHeight !== undefined && props.cursor.orientation.value !== "horizontal";
 
+        watchAfterRender([getIsVirtualized, () => slots.renderGroupBox !== undefined], ([isVirtualized, hasGroupBox]) =>
+            SelectUtils.warnIfGroupBoxIgnored(isVirtualized, hasGroupBox),
+        );
+
         const isAtEnd = ElementObserverVueUtils.useViewportIntersection(endMarkerRef, () => !props.isLive);
 
         watch(
@@ -266,6 +270,22 @@ export const ListboxOptions = defineComponent(
             ListboxUtils.focusOption(props.cursor.listboxId.value, index);
         });
 
+        let renderGroupContentAt: (index: number) => VNodeChild = () => null;
+
+        const groupContents = new Map<number, () => VNodeChild>();
+
+        const getGroupContent = (index: number) => {
+            const existing = groupContents.get(index);
+
+            if (existing) return existing;
+
+            const content = () => renderGroupContentAt(index);
+
+            groupContents.set(index, content);
+
+            return content;
+        };
+
         return () => {
             const cursor = props.cursor;
             const isRoving = cursor.focusModel === "roving";
@@ -310,10 +330,19 @@ export const ListboxOptions = defineComponent(
                 );
 
             const renderGroupHeading = (group: SelectOptionGroup<T>) =>
-                callSlot(slots.renderGroup, {
+                callSlot(slots.renderGroupHeader, {
                     group,
                     flags: ListboxUtils.computeGroupFlags(group, props.computeIsSelected),
                 });
+
+            const renderGroupBox = (group: SelectOptionGroup<T>, renderContent: () => VNodeChild) =>
+                slots.renderGroupBox === undefined
+                    ? renderContent()
+                    : callSlot(slots.renderGroupBox, {
+                          renderContent,
+                          group,
+                          flags: ListboxUtils.computeGroupFlags(group, props.computeIsSelected),
+                      });
 
             const renderOptionSlot = (option: SelectOption<T>, flatIndex: number, key: string | number) => (
                 <InteractionWrapper
@@ -358,6 +387,19 @@ export const ListboxOptions = defineComponent(
                 </InteractionWrapper>
             );
 
+            renderGroupContentAt = (index) => {
+                const item = cursor.options.value[index];
+
+                if (!item || !SelectUtils.getIsGroup(item)) return null;
+
+                const offset = cursor.itemRows.value[index].entryOffset;
+
+                return [
+                    renderGroupHeading(item),
+                    item.options.map((option, groupIndex) => renderOptionSlot(option, offset + groupIndex, groupIndex)),
+                ];
+            };
+
             const renderMountedOptions = () => (
                 <div
                     ref={optionsRef}
@@ -375,11 +417,7 @@ export const ListboxOptions = defineComponent(
 
                         return (
                             <div key={index} role="group" aria-label={item.label}>
-                                {renderGroupHeading(item)}
-
-                                {item.options.map((option, groupIndex) =>
-                                    renderOptionSlot(option, offset + groupIndex, groupIndex),
-                                )}
+                                {renderGroupBox(item, getGroupContent(index))}
                             </div>
                         );
                     })}
@@ -516,7 +554,8 @@ export const ListboxComposite = defineComponent(
                         {
                             {
                                 renderOption: slots.renderOption,
-                                renderGroup: slots.renderGroup,
+                                renderGroupHeader: slots.renderGroupHeader,
+                                renderGroupBox: slots.renderGroupBox,
                                 renderSelectionFloater: slots.renderSelectionFloater,
                                 renderHighlightFloater: slots.renderHighlightFloater,
                             } satisfies Partial<ListboxOptionsSlots<T>>
@@ -579,7 +618,8 @@ export const Listbox = defineComponent(
                 {
                     {
                         renderOption: slots.renderOption,
-                        renderGroup: slots.renderGroup,
+                        renderGroupHeader: slots.renderGroupHeader,
+                        renderGroupBox: slots.renderGroupBox,
                         renderSelectionFloater: slots.renderSelectionFloater,
                         renderHighlightFloater: slots.renderHighlightFloater,
                     } satisfies Partial<ListboxCompositeSlots<T>>

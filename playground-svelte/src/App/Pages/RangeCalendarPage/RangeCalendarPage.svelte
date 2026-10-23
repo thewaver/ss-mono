@@ -22,6 +22,7 @@
     import BoundedExample from "./Examples/Bounded.svelte";
     import DefaultExample from "./Examples/Default.svelte";
     import RightToLeftExample from "./Examples/RightToLeft.svelte";
+    import TwoMonthsExample from "./Examples/TwoMonths.svelte";
     import {
     CALENDAR_FIELD_WIDTH,
     CALENDAR_IDS,
@@ -38,14 +39,17 @@
     let defaultValue = $state.raw<DateValueRange | undefined>();
     let boundedValue = $state.raw<DateValueRange | undefined>();
     let rightToLeftValue = $state.raw<DateValueRange | undefined>();
+    let twoMonthsValue = $state.raw<DateValueRange | undefined>();
 
     let defaultMonth = $state.raw<DateValue>(DateValueUtils.getStartOfMonth(TODAY));
     let boundedMonth = $state.raw<DateValue>(DateValueUtils.getStartOfMonth(TODAY));
     let rightToLeftMonth = $state.raw<DateValue>(DateValueUtils.getStartOfMonth(TODAY));
+    let twoMonthsMonth = $state.raw<DateValue>(DateValueUtils.getStartOfMonth(TODAY));
 
     const defaultCalendarMonth = $derived(DateValueUtils.withCalendar(defaultMonth, calendarId));
     const boundedCalendarMonth = $derived(DateValueUtils.withCalendar(boundedMonth, calendarId));
     const rightToLeftCalendarMonth = $derived(DateValueUtils.withCalendar(rightToLeftMonth, calendarId));
+    const twoMonthsCalendarMonth = $derived(DateValueUtils.withCalendar(twoMonthsMonth, calendarId));
 
     const examples: ExampleDefs[] = [
         {
@@ -62,6 +66,14 @@
                 `min ${DateValueUtils.toIso(MIN_DATE)}, max ${DateValueUtils.toIso(MAX_DATE)} — value: ${describe(boundedValue)}`,
             component: boundedExample,
             path: `${EXAMPLES_ROOT}/Bounded.svelte`,
+        },
+        {
+            key: "twoMonths",
+            name: EXAMPLE_NAMES.twoMonths,
+            readout: () =>
+                `value: ${describe(twoMonthsValue)} — a range can start in one month and end in the other; the arrow keys walk across, and the page keys step both`,
+            component: twoMonthsExample,
+            path: `${EXAMPLES_ROOT}/TwoMonths.svelte`,
         },
         {
             key: "rightToLeft",
@@ -86,6 +98,14 @@
     <BoundedExample
         bind:value={boundedValue}
         bind:month={() => boundedCalendarMonth, (next) => (boundedMonth = next)}
+        {weekStartsOn}
+    />
+{/snippet}
+
+{#snippet twoMonthsExample()}
+    <TwoMonthsExample
+        bind:value={twoMonthsValue}
+        bind:month={() => twoMonthsCalendarMonth, (next) => (twoMonthsMonth = next)}
         {weekStartsOn}
     />
 {/snippet}

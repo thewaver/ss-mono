@@ -7,6 +7,8 @@ import type { SlideButtonGestureDefs, SlideButtonGestureState, SlideButtonPress 
 const RATIO_MIN = 0;
 /** The end of the track. */
 const RATIO_MAX = 1;
+/** The least progress a release may ask for before it completes the slide, so a thumb barely moved never does. */
+const COMPLETION_RATIO_MIN = 0.1;
 /** How far a press on the thumb has to travel before it is a drag rather than a wobble, in pixels. */
 const DRAG_THRESHOLD_PX = 4;
 /** The keys a hold answers to, which are the keys that press a button. */
@@ -81,6 +83,16 @@ export namespace SlideButtonUtils {
     };
 
     /**
+     * How far along the track a released thumb has to be for the slide to complete.
+     *
+     * @param completionRatio The share the consumer asked for.
+     * @returns That share, held between a tenth of the track and the whole of it. Asking for more than the track
+     * has is the same as asking for its end.
+     */
+    export const computeCompletionRatio = (completionRatio: number) =>
+        MathUtils.clamp(completionRatio, COMPLETION_RATIO_MIN, RATIO_MAX);
+
+    /**
      * How far through a press-and-hold the user is.
      *
      * @param elapsedMs How long the press has lasted.
@@ -100,7 +112,7 @@ export namespace SlideButtonUtils {
      *
      * A press is judged once, where it lands. Under every mode but `"hold"` a press on the thumb that then travels
      * past a few pixels picks the thumb up, and the thumb follows the pointer from the point it was grabbed; letting
-     * go at the end of the track activates, and letting go anywhere else, or the system cancelling the gesture,
+     * go at the completion ratio along the track, the end by default, activates, and letting go anywhere short of it, or the system cancelling the gesture,
      * puts it back. Under every mode but `"slide"` a press also starts a hold, which fills over the hold duration and
      * activates when it is full — and a grab cancels it, since the two cannot both be the gesture. A held Enter or
      * Space runs the same hold under every mode, so no setting can leave the button without a keyboard route. The
@@ -116,7 +128,7 @@ export namespace SlideButtonUtils {
      *
      * The store says whether a hold is running and whether the thumb has been picked up. The functions in `defs` are
      * read when they are needed, so they may answer differently over time; `getProgressRatio` is read at release to
-     * decide whether the thumb reached the end, so it has to answer with what `setProgressRatio` last wrote.
+     * decide whether the thumb reached the completion ratio, so it has to answer with what `setProgressRatio` last wrote.
      *
      * @param defs How to read the button and write its progress.
      * @returns The store, and the commands to feed it: `drag` and `dragEnd` from a drag tracker over the track,
@@ -226,7 +238,8 @@ export namespace SlideButtonUtils {
 
             if (!wasGrabbed) return;
 
-            if (reason === "release" && defs.getProgressRatio() >= RATIO_MAX) defs.onActivate();
+            if (reason === "release" && defs.getProgressRatio() >= computeCompletionRatio(defs.getCompletionRatio()))
+                defs.onActivate();
 
             setGrabRatio(undefined);
             defs.setProgressRatio(RATIO_MIN);

@@ -61,14 +61,6 @@
             path: `${EXAMPLES_ROOT}/RightToLeft.svelte`,
         },
         {
-            key: "ring",
-            name: EXAMPLE_NAMES.ring,
-            readout: () =>
-                `order: ${names(ring)} — dropping picks the nearest place rather than comparing one axis, because a ring has no axis to compare`,
-            component: ringExample,
-            path: `${EXAMPLES_ROOT}/Ring.svelte`,
-        },
-        {
             key: "pair",
             name: EXAMPLE_NAMES.pair,
             readout: () => `hand: ${names(hand)} | board: ${names(board)}`,
@@ -97,6 +89,14 @@
             readout: () => `order: ${names(disabled)} — nothing moves, by pointer or by key`,
             component: disabledExample,
             path: `${EXAMPLES_ROOT}/Cards.svelte`,
+        },
+        {
+            key: "ring",
+            name: EXAMPLE_NAMES.ring,
+            readout: () =>
+                `order: ${names(ring)} — dropping picks the nearest place rather than comparing one axis, because a ring has no axis to compare`,
+            component: ringExample,
+            path: `${EXAMPLES_ROOT}/Ring.svelte`,
         },
     ];
 </script>

@@ -60,3 +60,9 @@ export const menuItemMark = style({
 globalStyle(`${menuItemMark} + div`, {
     flex: 1,
 });
+
+export const menuGroupBox = style({
+    paddingBottom: themeVars.spacing.half,
+    marginBottom: themeVars.spacing.half,
+    borderBottom: `1px solid rgb(from ${layerVars.contrast} r g b / 15%)`,
+});

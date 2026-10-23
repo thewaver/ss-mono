@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import type { Tab } from "./Tabs.types";
 import { TabsUtils } from "./Tabs.utils";
@@ -75,5 +75,46 @@ describe("computeKeyStep", () => {
             value: "three",
             isSelecting: false,
         });
+    });
+});
+
+describe("warnIfUnpaired", () => {
+    const warnWith = (tabs: Tab<string>[]) => {
+        const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+        TabsUtils.warnIfUnpaired(tabs);
+
+        const calls = warn.mock.calls.length;
+        const message = String(warn.mock.calls[0]?.[0] ?? "");
+
+        warn.mockRestore();
+
+        return { calls, message };
+    };
+
+    it("says nothing when every tab names its panel and is named back", () => {
+        expect(warnWith(TABS.map((tab) => ({ ...tab, id: `t-${tab.value}`, panelId: `p-${tab.value}` }))).calls).toBe(
+            0,
+        );
+    });
+
+    it("warns once, naming the positions of the tabs missing either half of the pair", () => {
+        const { calls, message } = warnWith([
+            { value: "one", id: "t1", panelId: "p1" },
+            { value: "two", id: "t2" },
+            { value: "three", panelId: "p3" },
+            { value: "four" },
+        ]);
+
+        expect(calls).toBe(1);
+        expect(message).toContain("1, 2, 3");
+    });
+
+    it("leaves out a tab that navigates by href", () => {
+        expect(warnWith([{ value: "docs", href: "#docs" }]).calls).toBe(0);
+    });
+
+    it("still counts a disabled tab, which will need its panel the moment it is enabled", () => {
+        expect(warnWith([{ value: "one", isDisabled: true }]).calls).toBe(1);
     });
 });

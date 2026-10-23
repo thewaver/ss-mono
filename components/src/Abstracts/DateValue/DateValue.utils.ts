@@ -14,6 +14,7 @@ import type {
     DateValue,
     DateValueCalendarId,
     DateValueEra,
+    DateValueMinDaysInFirstWeek,
     DateValueMonthGrid,
     DateValueParts,
     DateValueRange,
@@ -27,6 +28,8 @@ const DAYS_PER_WEEK = 7;
 const GRID_WEEKS = 6;
 /** Pushes a date to noon before handing it to `Intl`, so a time-zone shift of a few hours cannot move it onto the day before or after. */
 const MIDDAY_MS = 12 * 60 * 60 * 1000;
+/** The length of a day, for counting the days between two middays. */
+const DAY_MS = 24 * 60 * 60 * 1000;
 /** The calendar used when a caller does not name one. */
 const DEFAULT_CALENDAR_ID: DateValueCalendarId = "gregory";
 /** `YYYY-MM-DD`, with the expanded `±YYYYYY` form for years outside four digits. */
@@ -302,6 +305,51 @@ export namespace DateValueUtils {
      */
     export const getWeekdayOffset = (value: DateValue, weekStartsOn: DateValueWeekStart) =>
         (toIntlDate(value).getDay() - weekStartsOn + DAYS_PER_WEEK) % DAYS_PER_WEEK;
+
+    /**
+     * The first day of the week a date falls in.
+     *
+     * @param value Any day of the week.
+     * @param weekStartsOn `0` for Sunday through to `6` for Saturday.
+     * @returns The day on or before `value` that begins its week.
+     */
+    export const getStartOfWeek = (value: DateValue, weekStartsOn: DateValueWeekStart) =>
+        addDays(value, -getWeekdayOffset(value, weekStartsOn));
+
+    /**
+     * The number of the week a date falls in, counted within its year.
+     *
+     * Countries disagree about which week is the first. Week one is the first week holding at least
+     * `minDaysInFirstWeek` days of the new year: ISO 8601 starts weeks on Monday and asks for four, while the
+     * United States starts them on Sunday and asks for one, so the week holding the first of the year is the
+     * first. A week straddling two years therefore belongs to whichever one the rule gives it, and the last days
+     * of December can fall in week one of the next year, or the first days of January in the last week of the
+     * one before. Years are those of the calendar the date carries.
+     *
+     * @param value Any day of the week.
+     * @param weekStartsOn `0` for Sunday through to `6` for Saturday.
+     * @param minDaysInFirstWeek How many days of the new year the first week must hold, from `1` to `7`.
+     * @returns The week's number, from `1`.
+     */
+    export const getWeekNumber = (
+        value: DateValue,
+        weekStartsOn: DateValueWeekStart,
+        minDaysInFirstWeek: DateValueMinDaysInFirstWeek,
+    ) => {
+        const getFirstWeekStart = (yearDay: DateValue) =>
+            getStartOfWeek(yearDay.set({ month: 1, day: minDaysInFirstWeek }) as DateValue, weekStartsOn);
+
+        const weekStart = getStartOfWeek(value, weekStartsOn);
+        const nextYear = getFirstWeekStart(addYears(value, 1));
+        const ownYear = getFirstWeekStart(value);
+        const lastYear = getFirstWeekStart(addYears(value, -1));
+
+        const yearStart =
+            compare(weekStart, nextYear) >= 0 ? nextYear : compare(weekStart, ownYear) >= 0 ? ownYear : lastYear;
+        const days = Math.round((toIntlDate(weekStart).getTime() - toIntlDate(yearStart).getTime()) / DAY_MS);
+
+        return Math.round(days / DAYS_PER_WEEK) + 1;
+    };
 
     /**
      * Builds the six-by-seven grid a month view draws.

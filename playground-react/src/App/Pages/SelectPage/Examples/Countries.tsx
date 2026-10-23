@@ -2,7 +2,10 @@ import { Select } from "@thewaver/ss-components-react";
 
 import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater";
 import { PageSelectContent } from "../../../StyledComponents/SelectContent/SelectContent";
-import { PageSelectGroupContent } from "../../../StyledComponents/SelectGroupContent/SelectGroupContent";
+import {
+    PageSelectGroupBox,
+    PageSelectGroupContent,
+} from "../../../StyledComponents/SelectGroupContent/SelectGroupContent";
 import { PageSelectOptionContent } from "../../../StyledComponents/SelectOptionContent/SelectOptionContent";
 import type { SelectExampleProps } from "../SelectPage.types";
 import { COUNTRIES, PLACEHOLDER, renderSelectPopup } from "../SelectPageReact.const";
@@ -11,6 +14,7 @@ type Props = SelectExampleProps & {
     isDisabled?: boolean;
     hasError?: boolean;
     hasGroups?: boolean;
+    hasGroupBoxes?: boolean;
 };
 
 export const CountriesExample = (props: Props) => {
@@ -25,8 +29,13 @@ export const CountriesExample = (props: Props) => {
             renderContent={(selectedOption, flags) => (
                 <PageSelectContent flags={flags}>{selectedOption?.value ?? PLACEHOLDER}</PageSelectContent>
             )}
-            renderGroup={
+            renderGroupHeader={
                 props.hasGroups ? (group) => <PageSelectGroupContent>{group.label}</PageSelectGroupContent> : undefined
+            }
+            renderGroupBox={
+                props.hasGroupBoxes
+                    ? (renderContent) => <PageSelectGroupBox>{renderContent()}</PageSelectGroupBox>
+                    : undefined
             }
             renderOption={(option, flags) => (
                 <PageSelectOptionContent isGliding flags={flags}>

@@ -48,6 +48,14 @@ export const selectFilterField = style({
     },
 });
 
+export const selectFieldContent = style({
+    display: "contents",
+});
+
+export const selectFilterFieldShowsValue = style({
+    color: "transparent !important",
+});
+
 export const selectClear = style({
     position: "absolute",
     top: 0,

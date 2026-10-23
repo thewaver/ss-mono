@@ -15,7 +15,10 @@ export type WheelMenuCloserDefs = {
     renderContent: (getFlags: () => InteractionFlags<MenuItemFlags>) => JSX.Element;
 };
 
-export type WheelMenuProps<T> = Omit<MenuProps<T>, "items" | "checked" | "computeLayout"> &
+export type WheelMenuProps<T> = Omit<
+    MenuProps<T>,
+    "items" | "checked" | "computeLayout" | "renderGroupHeader" | "renderGroupBox"
+> &
     AccessorValues<BaseWheelMenuValues> & {
         /** The items, in the order they sit round the wheel. */
         items: MaybeAccessor<WheelMenuItem<T>[]>;
