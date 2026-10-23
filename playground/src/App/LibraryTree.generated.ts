@@ -57,7 +57,7 @@ export const LIBRARY: TreemapNode<string> = branch(
         branch("Accordions", leaf("Accordion", 438), leaf("Collapsible", 410)),
         leaf("Breadcrumbs", 216),
         branch("Buttons", leaf("Button", 199), leaf("SlideButton", 679)),
-        leaf("Carousel", 1703),
+        leaf("Carousel", 1721),
         leaf("EdgeFader", 288),
         leaf("Form", 163),
         branch(
@@ -122,7 +122,7 @@ export const LIBRARY: TreemapNode<string> = branch(
         leaf("Sortable", 1296),
         leaf("SplitPane", 633),
         leaf("Stepper", 382),
-        leaf("Table", 2302),
+        leaf("Table", 2307),
         leaf("TableOfContents", 460),
         leaf("Tabs", 598),
         leaf("Toolbar", 745),
@@ -177,7 +177,7 @@ export const LIBRARY: TreemapNode<string> = branch(
     ),
     branch(
         "Generators",
-        leaf("CarouselPlacements", 871),
+        leaf("CarouselPlacements", 874),
         leaf("CellAnimationBreakpoints", 99),
         leaf("CellAnimationKeyframes", 231),
         leaf("CellAnimationPlayback", 134),

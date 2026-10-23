@@ -1,7 +1,7 @@
 {
     "name": "@thewaver/ss-components-solid",
     "type": "module",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "description": "SolidJS components for building shaped UI.",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
@@ -126,15 +126,15 @@
     },
     "dependencies": {
         "@tanstack/virtual-core": "^3.18.0",
-        "@thewaver/ss-components": "^0.0.5"
+        "@thewaver/ss-components": "^0.0.6"
     },
     "peerDependencies": {
-        "@thewaver/ss-utils": "^0.0.26",
+        "@thewaver/ss-utils": "^0.0.27",
         "solid-js": "^1.9.15"
     },
     "devDependencies": {
         "@internationalized/date": "^3.12.4",
-        "@thewaver/ss-utils": "^0.0.26",
+        "@thewaver/ss-utils": "^0.0.27",
         "@vanilla-extract/dynamic": "^2.1.5",
         "@vanilla-extract/vite-plugin": "^5.2.6",
         "solid-js": "^1.9.17",

@@ -129,6 +129,15 @@ root `package.json` is `private` and exists only to hold the workspace list, the
 scripts. `playground` is a third workspace, also private, so that its dependencies are declared rather than
 borrowed from whatever the library happened to install.
 
+**A release is prepared by `npm run pre-publish`** (`:minor`, `:major`; patch by default), in
+`scripts/prePublish.mjs`. It steps all six published packages together, rewrites the `^` ranges between them,
+refreshes the lockfile and runs `npm run build`, and stops there: the user asked for no publish commands to be
+printed, and the publishing itself is theirs. **The new version counts up from what npm holds, not from the manifest** —
+the user's call — so running it twice before publishing lands on the same versions, at the price of needing the
+network; a package npm has never seen keeps its manifest version. Three scripts rather than a flag because
+`npm run x --minor` is read by npm as its own config, not passed to the script. Every package is stepped, not only
+changed ones, since at `0.0.x` a new core already forces new versions of the four framework packages.
+
 **Npm workspaces and nothing else.** No pnpm, no Lerna, no Nx, no Turborepo: npm links each package into
 the root `node_modules` by itself, and the build order is one `&&` in one script. A task runner earns its
 place when the graph is too big to write down, and three packages in a line is not that.
