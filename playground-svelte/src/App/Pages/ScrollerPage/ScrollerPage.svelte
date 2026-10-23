@@ -1,17 +1,23 @@
 <script lang="ts">
-    import { SCROLLER_DEFAULTS } from "@thewaver/ss-components-svelte";
-    import type { Tab } from "@thewaver/ss-components-svelte";
+    import { SCROLLER_DEFAULTS, SCROLLER_OVERFLOWS, ScrollerUtils } from "@thewaver/ss-components-svelte";
+    import type { ScrollerOverflow, ScrollerProgress, Tab } from "@thewaver/ss-components-svelte";
     import { ScrollerKnobs } from "@thewaver/ss-playground/App/Knobs/Scrollers.const";
     import * as styles from "@thewaver/ss-playground/App/Pages/ScrollerPage/ScrollerPage.css";
 
     import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../PageComponents/Examples/PageExamples.svelte";
+    import PageCheckField from "../../PageComponents/Field/PageCheckField.svelte";
     import PageNumberField from "../../PageComponents/Field/PageNumberField.svelte";
+    import PageSelectField from "../../PageComponents/Field/PageSelectField.svelte";
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
     import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
+    import ArchedExample from "./Examples/Arched.svelte";
+    import BothWaysExample from "./Examples/BothWays.svelte";
     import ChipsExample from "./Examples/Chips.svelte";
     import FocusableChildrenExample from "./Examples/FocusableChildren.svelte";
+    import ShortTrackExample from "./Examples/ShortTrack.svelte";
     import TabbedExample from "./Examples/Tabbed.svelte";
+    import VerticalStripExample from "./Examples/VerticalStrip.svelte";
     import {
         EXAMPLE_NAMES,
         EXAMPLES_ROOT,
@@ -24,7 +30,12 @@
     let itemCount = $state(ScrollerKnobs.STARTING_ITEM_COUNT);
     let selectedMonth = $state(MONTHS[0]);
     let overlapCount = $state(SCROLLER_DEFAULTS.overlapCount);
-    let progress = $state(0);
+    let overflowX = $state<ScrollerOverflow>(SCROLLER_DEFAULTS.overflowX);
+    let overflowY = $state<ScrollerOverflow>("auto");
+    let isAutoHiding = $state(SCROLLER_DEFAULTS.isAutoHiding);
+    let isBarOverlaid = $state(SCROLLER_DEFAULTS.isBarOverlaid);
+    let hideDelayMs = $state(SCROLLER_DEFAULTS.hideDelayMs);
+    let progress = $state<ScrollerProgress>(ScrollerUtils.NO_PROGRESS);
 
     const labels = $derived(Array.from({ length: itemCount }, (_, index) => `Item ${index + 1}`));
 
@@ -41,7 +52,7 @@
             key: "split",
             name: EXAMPLE_NAMES.split,
             readout: () =>
-                `${itemCount} items, ${Math.round(progress * PERCENT)}% along — the buttons stop at the ends rather than wrapping round, and leave altogether once everything fits`,
+                `${itemCount} items, ${Math.round(progress.x * PERCENT)}% along — the buttons stop at the ends rather than wrapping round, and leave altogether once everything fits`,
             component: splitExample,
             path: `${EXAMPLES_ROOT}/Chips.svelte`,
         },
@@ -74,6 +85,46 @@
             component: focusableChildrenExample,
             path: `${EXAMPLES_ROOT}/FocusableChildren.svelte`,
         },
+        {
+            key: "verticalStrip",
+            name: EXAMPLE_NAMES.verticalStrip,
+            readout: () =>
+                "scrolls down only, so the children stack in a column, the step buttons sit above and below, and the drawn bar keeps a strip of its own on the inline end",
+            component: verticalStripExample,
+            path: `${EXAMPLES_ROOT}/VerticalStrip.svelte`,
+        },
+        {
+            key: "bothWays",
+            name: EXAMPLE_NAMES.bothWays,
+            readout: () =>
+                `across: ${overflowX}, down: ${overflowY} — one pair of step buttons and one bar per direction, with the corner where the bars meet left empty`,
+            component: bothWaysExample,
+            path: `${EXAMPLES_ROOT}/BothWays.svelte`,
+        },
+        {
+            key: "overlaidAutoHiding",
+            name: EXAMPLE_NAMES.overlaidAutoHiding,
+            readout: () =>
+                `the bar floats over the content's edge and fades ${hideDelayMs}ms after scrolling stops, coming back while the pointer moves over the box`,
+            component: overlaidAutoHidingExample,
+            path: `${EXAMPLES_ROOT}/VerticalStrip.svelte`,
+        },
+        {
+            key: "shortTrack",
+            name: EXAMPLE_NAMES.shortTrack,
+            readout: () =>
+                "the painter draws a short track; a press on it pages towards the press and keeps paging while held, and with Alt (Option on a Mac) it jumps there instead",
+            component: shortTrackExample,
+            path: `${EXAMPLES_ROOT}/ShortTrack.svelte`,
+        },
+        {
+            key: "arched",
+            name: EXAMPLE_NAMES.arched,
+            readout: () =>
+                "the track is an arc, and computeProgressAtPoint reads the pointer by its angle, so the thumb follows the pointer round the curve",
+            component: archedExample,
+            path: `${EXAMPLES_ROOT}/Arched.svelte`,
+        },
     ];
 </script>
 
@@ -101,6 +152,26 @@
 
 {#snippet focusableChildrenExample()}
     <FocusableChildrenExample {labels} {overlapCount} />
+{/snippet}
+
+{#snippet verticalStripExample()}
+    <VerticalStripExample {labels} {overlapCount} />
+{/snippet}
+
+{#snippet bothWaysExample()}
+    <BothWaysExample {labels} {overflowX} {overflowY} {isAutoHiding} {hideDelayMs} {isBarOverlaid} />
+{/snippet}
+
+{#snippet overlaidAutoHidingExample()}
+    <VerticalStripExample {labels} {overlapCount} isAutoHiding={true} {hideDelayMs} isBarOverlaid={true} />
+{/snippet}
+
+{#snippet shortTrackExample()}
+    <ShortTrackExample {labels} {overlapCount} />
+{/snippet}
+
+{#snippet archedExample()}
+    <ArchedExample {labels} {overlapCount} />
 {/snippet}
 
 <div class={styles.root}>
@@ -145,13 +216,93 @@
             hint={"How far through its run the first strip is scrolled, as a percentage."}
         >
             <PageNumberField
-                value={Math.round(progress * PERCENT)}
+                value={Math.round(progress.x * PERCENT)}
                 min={ScrollerKnobs.MIN_POSITION}
                 max={PERCENT}
                 step={ScrollerKnobs.POSITION_STEP}
                 ariaLabel={"First strip position"}
                 onInput={(value) => {
-                    progress = value / PERCENT;
+                    progress = { ...progress, x: value / PERCENT };
+                }}
+            />
+        </PageProp>
+
+        <PageProp
+            itemKey={"overflowX"}
+            controls={ScrollerKnobs.OVERFLOW_X.controls}
+            label={ScrollerKnobs.OVERFLOW_X.label}
+            hint={ScrollerKnobs.OVERFLOW_X.hint}
+        >
+            <PageSelectField
+                value={overflowX}
+                values={SCROLLER_OVERFLOWS}
+                ariaLabel={ScrollerKnobs.OVERFLOW_X.label}
+                onChange={(value) => {
+                    overflowX = value;
+                }}
+            />
+        </PageProp>
+
+        <PageProp
+            itemKey={"overflowY"}
+            controls={ScrollerKnobs.OVERFLOW_Y.controls}
+            label={ScrollerKnobs.OVERFLOW_Y.label}
+            hint={ScrollerKnobs.OVERFLOW_Y.hint}
+        >
+            <PageSelectField
+                value={overflowY}
+                values={SCROLLER_OVERFLOWS}
+                ariaLabel={ScrollerKnobs.OVERFLOW_Y.label}
+                onChange={(value) => {
+                    overflowY = value;
+                }}
+            />
+        </PageProp>
+
+        <PageProp
+            itemKey={"isAutoHiding"}
+            controls={ScrollerKnobs.IS_AUTO_HIDING.controls}
+            label={ScrollerKnobs.IS_AUTO_HIDING.label}
+            hint={ScrollerKnobs.IS_AUTO_HIDING.hint}
+        >
+            <PageCheckField
+                value={isAutoHiding}
+                ariaLabel={ScrollerKnobs.IS_AUTO_HIDING.label}
+                onChange={(value) => {
+                    isAutoHiding = value;
+                }}
+            />
+        </PageProp>
+
+        <PageProp
+            itemKey={"isBarOverlaid"}
+            controls={ScrollerKnobs.IS_BAR_OVERLAID.controls}
+            label={ScrollerKnobs.IS_BAR_OVERLAID.label}
+            hint={ScrollerKnobs.IS_BAR_OVERLAID.hint}
+        >
+            <PageCheckField
+                value={isBarOverlaid}
+                ariaLabel={ScrollerKnobs.IS_BAR_OVERLAID.label}
+                onChange={(value) => {
+                    isBarOverlaid = value;
+                }}
+            />
+        </PageProp>
+
+        <PageProp
+            itemKey={"hideDelayMs"}
+            controls={ScrollerKnobs.HIDE_DELAY_MS.controls}
+            label={ScrollerKnobs.HIDE_DELAY_MS.label}
+            hint={ScrollerKnobs.HIDE_DELAY_MS.hint}
+        >
+            <PageNumberField
+                value={hideDelayMs}
+                min={ScrollerKnobs.HIDE_DELAY_MS.min}
+                max={ScrollerKnobs.HIDE_DELAY_MS.max}
+                step={ScrollerKnobs.HIDE_DELAY_MS.step}
+                ariaLabel={ScrollerKnobs.HIDE_DELAY_MS.label}
+                onInput={(value) => {
+                    hideDelayMs = value;
                 }}
             />
         </PageProp>

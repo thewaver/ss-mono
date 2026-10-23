@@ -40,6 +40,7 @@ export * from "./Abstracts/Roller/RollerSvelte.utils.svelte.js";
 export type * from "./Abstracts/Rotator/RotatorSvelte.types.js";
 export * from "./Abstracts/Rotator/RotatorSvelte.utils.svelte.js";
 export * from "./Abstracts/Selection/SelectionSvelte.utils.js";
+export * from "./Abstracts/Shortcut/ShortcutSvelte.utils.svelte.js";
 export * from "./Abstracts/SignalMirror/SignalMirrorSvelte.utils.svelte.js";
 export * from "./Abstracts/Smoother/SmootherSvelte.utils.svelte.js";
 export * from "./Abstracts/TextSync/TextSyncSvelte.utils.svelte.js";
@@ -173,6 +174,8 @@ export { default as GlassSurface } from "./Composites/GlassSurface/GlassSurface.
 export type * from "./Composites/GlassSurface/GlassSurface.types.js";
 export { default as SplitPane } from "./Essentials/SplitPane/SplitPane.svelte";
 export type * from "./Essentials/SplitPane/SplitPane.types.js";
+export { default as CommandPalette } from "./Essentials/Menus/CommandPalette/CommandPalette.svelte";
+export type * from "./Essentials/Menus/CommandPalette/CommandPalette.types.js";
 export { default as Menu } from "./Essentials/Menus/Menu/Menu.svelte";
 export { default as ContextMenu } from "./Essentials/Menus/Menu/ContextMenu.svelte";
 export type * from "./Essentials/Menus/Menu/Menu.types.js";

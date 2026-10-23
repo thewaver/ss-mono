@@ -89,6 +89,7 @@
     DismisserSvelteUtils.createLayer(
         () => isPeeking,
         {
+            isPassive: true,
             getRoots: () => [root],
             onDismiss: collapseHover,
         },

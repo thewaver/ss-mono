@@ -121,6 +121,17 @@ export namespace DismisserUtils {
     export const getIsWithinOwnedLayer = computeIsWithinOwnedLayer;
 
     /**
+     * The topmost open layer that takes input of its own, or `undefined` while none is open.
+     *
+     * A layer registered as passive — one that only shows something, such as a tooltip — is skipped, so a page's
+     * keyboard shortcuts keep working while it is on screen. It is still dismissed like any other layer, Escape
+     * included.
+     *
+     * @returns The layer, as it was handed to {@link addLayer}.
+     */
+    export const getTopLayer = () => layers.findLast((layer) => !layer.isPassive);
+
+    /**
      * Registers an open layer, to be dismissed until the returned function is called.
      *
      * The layer goes on top of the stack. Document listeners are attached with the first layer and removed with
@@ -128,7 +139,7 @@ export namespace DismisserUtils {
      *
      * @param defs The layer's own elements, and what to do when it is dismissed. The reason is passed
      * on, since a layer often wants to return focus to its trigger after Escape but not after a press
-     * elsewhere.
+     * elsewhere. `isPassive` marks a layer that takes no input of its own, which {@link getTopLayer} skips.
      * @returns The function that takes the layer off the stack again, for when it closes.
      */
     export const addLayer = (defs: DismisserLayerDefs) => {

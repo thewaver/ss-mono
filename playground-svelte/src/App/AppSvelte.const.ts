@@ -57,6 +57,7 @@ const ImageSwitcherPage = () => import("./Pages/ImageSwitcherPage/ImageSwitcherP
 const LabelPage = () => import("./Pages/LabelPage/LabelPage.svelte");
 const ListboxPage = () => import("./Pages/ListboxPage/ListboxPage.svelte");
 const MenubarPage = () => import("./Pages/MenubarPage/MenubarPage.svelte");
+const CommandPalettePage = () => import("./Pages/Menus/CommandPalettePage/CommandPalettePage.svelte");
 const FanMenuPage = () => import("./Pages/Menus/FanMenuPage/FanMenuPage.svelte");
 const FlyoutMenuPage = () => import("./Pages/Menus/FlyoutMenuPage/FlyoutMenuPage.svelte");
 const MenuPage = () => import("./Pages/Menus/MenuPage/MenuPage.svelte");
@@ -215,6 +216,9 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
             {
                 name: "ShapeReveal",
                 component: ShapeRevealPage,
+            },
+            {
+                name: "Shortcut",
             },
             {
                 name: "SignalMirror",
@@ -436,6 +440,10 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
             {
                 name: "Menus",
                 children: [
+                    {
+                        name: "CommandPalette",
+                        component: CommandPalettePage,
+                    },
                     {
                         name: "FanMenu",
                         component: FanMenuPage,

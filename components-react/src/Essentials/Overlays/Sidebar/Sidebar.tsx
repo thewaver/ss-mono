@@ -78,6 +78,7 @@ export const Sidebar = (props: SidebarProps) => {
     const latestCollapseHover = useLatest(collapseHover);
 
     DismisserReactUtils.useLayer(isPeeking, {
+        isPassive: true,
         getRoots: () => [rootRef.current],
         onDismiss: collapseHover,
     });

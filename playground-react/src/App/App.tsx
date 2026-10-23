@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Fragment, Suspense, lazy, useEffect, useMemo, useState } from "react";
-import { BrowserRouter, Link, Navigate, Outlet, Route, Routes, useLocation } from "react-router";
+import { BrowserRouter, Link, Navigate, Outlet, Route, Routes, useLocation, useNavigate } from "react-router";
 import COMPONENT_DEPENDENCIES from "virtual:component-dependencies";
 import type { DependencyNames } from "virtual:component-dependencies";
 
@@ -57,6 +57,7 @@ import {
     PREVIEW_EXCLUDED_PAGES,
     SEARCH_FIELD_WIDTH,
 } from "./AppReact.const";
+import { PageAppCommands } from "./PageComponents/AppCommands/AppCommands";
 import { PageBuildProgress } from "./PageComponents/BuildProgress/BuildProgress";
 import { PageTextField } from "./PageComponents/Field/Field";
 import { PageFrameworkMenu } from "./PageComponents/FrameworkMenu/FrameworkMenu";
@@ -181,6 +182,10 @@ const MENU_NODES_BY_VIEW = Object.fromEntries(
 ) as Record<PageViewKey, TreeNode<MenuNodeConfig>[]>;
 
 const COMPONENT_CONFIGS = flattenConfigs(MENU_CONFIGS);
+
+const VISIBLE_COMPONENT_CONFIGS = flattenConfigs(VISIBLE_MENU_CONFIGS);
+
+const VISIBLE_PAGE_NAMES = VISIBLE_COMPONENT_CONFIGS.map((config) => config.name);
 
 const ANCESTORS_BY_CONFIG = new Map<MenuNodeConfig, MenuBranchConfig[]>();
 
@@ -403,6 +408,14 @@ export function AppContent(props: { viewportAnchor: readonly [ViewportAnchor, (v
 
     const selectedState = [selectedConfig as MenuNodeConfig | undefined, () => undefined] as const;
 
+    const navigate = useNavigate();
+
+    const goToPage = (pageName: string) => {
+        const config = VISIBLE_COMPONENT_CONFIGS.find((candidate) => candidate.name === pageName);
+
+        if (config) navigate(toPageHref(config, pageView));
+    };
+
     const viewportContext = useViewportContext();
 
     const menuGutter = Math.max(0, (viewportContext.getSize().width - LAYOUT.pageMaxWidth) / 2);
@@ -417,6 +430,14 @@ export function AppContent(props: { viewportAnchor: readonly [ViewportAnchor, (v
 
     return (
         <div className={styles.appFrame}>
+            <PageAppCommands
+                pageNames={VISIBLE_PAGE_NAMES}
+                onGoToAbout={() => navigate("/")}
+                onGoToPage={goToPage}
+                onExpandAll={() => expandedState[1](collectBranchValues(filteredNodes))}
+                onCollapseAll={() => expandedState[1]([])}
+            />
+
             {IS_BUILD_PROGRESS_SHOWN && <PageBuildProgress />}
 
             <div className={styles.appContent}>

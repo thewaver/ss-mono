@@ -34,21 +34,20 @@ reading.
 
 1. Neither animation component can reveal its own children — _postponed until the platform catches up_
 2. `Select` — one thing deliberately not built — _open_
-3. Other core controls the library does not have — _open, ordered by the user_
-4. Planned: a consumer-facing layer of controls above the library — _deferred to a session of its own_
-5. `ColorInput` — two things deliberately not built — _open_
-6. `SlideButton` — two things deliberately not built — _open_
-7. `Spotlight` — one thing deliberately not built — _open_
-8. `Scroller` — two things deliberately not built — _open_
-9. `Paginator` — one thing deliberately not built — _open_
-10. `Carousel` — two things deliberately not built — _open_
-11. An anchored layer trails its anchor during a scroll — _postponed until the platform catches up_
-12. `Table` — six things deliberately not built — _open_
-13. `GlassSurface`'s ripple layer shows a defect at its edge — _postponed until the platform catches up_
-14. Arbitrary placement across controls, and the picking that has to come with it — _open_
-15. The submit story — what a native submit carries, and what `Form` hands `onSubmit` — _pending decision_
-16. `Die`'s step buttons and arrow keys fall into a loop of two or three faces — _open, no fix chosen_
-17. The Playground's painters in Windows high-contrast mode — _open, decided, not yet built_
+3. Planned: a consumer-facing layer of controls above the library — _deferred to a session of its own_
+4. `ColorInput` — two things deliberately not built — _open, one item postponed until the platform catches up_
+5. `SlideButton` — two things deliberately not built — _open_
+6. `Spotlight` — one thing deliberately not built — _open_
+7. `Scroller` — one thing deliberately not built — _open_
+8. `Paginator` — one thing deliberately not built — _open_
+9. `Carousel` — two things deliberately not built — _open_
+10. An anchored layer trails its anchor during a scroll — _postponed until the platform catches up_
+11. `Table` — six things deliberately not built — _open_
+12. `GlassSurface`'s ripple layer shows a defect at its edge — _postponed until the platform catches up_
+13. Arbitrary placement — the gaps the trials left — _open_
+14. The submit story — what a native submit carries, and what `Form` hands `onSubmit` — _pending decision_
+15. `Die`'s step buttons and arrow keys fall into a loop of two or three faces — _open, no fix chosen_
+16. The Playground's painters in Windows high-contrast mode — _open, decided, not yet built_
 
 ---
 
@@ -125,88 +124,7 @@ the gaps, each with the reason it is still a gap.
 
 ---
 
-## 3. Other core controls the library does not have
-
-What is missing from `Essentials`. **The order below is the user's, taken after reading a worked example of
-each**; the old ordering by architectural cost still explains what a thing would need, but it no longer decides
-what comes first.
-
-**This list cannot be inferred from the Playground**, and reading it as the evidence for what is missing
-is the trap: every control on every page and in every props panel is now a library control, so the
-Playground has nothing left to say about what the library lacks.
-
-**The library is the HTML layer, and that is what decides whether a thing belongs here at all.** The user's
-statement of scope: accessibility, layout and structure — the half that Canvas and WebGL game engines neglect.
-Anything that wants a drawing surface is the consumer's, and which one they reach for is theirs to choose. So a
-sprite sheet, a particle system and a renderer are all out of scope by construction rather than by priority,
-and a proposal that begins "the library could draw…" has already answered itself.
-
-**Dropped by the user, so not re-proposed:** a segmented control and a rating input, each now a variant on the
-Radio page, which is the whole of what it was; and the pure-paint family of `Skeleton`, `Avatar`, `Badge`, `Card`
-and `Icon`, which was never a component question — the Playground already builds three of them as `Surface`
-examples. None of these is an accepted limit, because none is a fault; they are simply not wanted.
-
-### Next up, in the user's order
-
-**Nothing is queued here.**
-
-What the built controls left behind as gaps is recorded in `decisions.md` rather than reopened as items: a
-breadcrumb trail cannot collapse when it is too long, a tag input has no cap, no in-place editing, no
-paste-a-delimited-list and no reordering, a split pane cannot collapse a pane or reset on a double-click, and a stepper draws no connector of its own
-and does not enforce that a linear flow stays linear.
-
-### Bottom of the list
-
-Placed last by the user, after the difference between each and its nearest existing control had been argued.
-Neither is dropped; neither is next.
-
-- **A command palette.** Mostly assembled already: `Listbox` stands alone, `TextInput` opens a list of
-  suggestions with the combobox wiring, `Modal` seals the page behind it, and a grouped list can be windowed, so
-  results from several sources can be shown in labeled groups however many there are. What separates it from
-  `Menu` is that it is opened by a shortcut rather than by a button, and holds every action in the application
-  rather than the few that relate to one element. The one piece missing is a document-level hotkey, which wants
-  the register-and-stack shape `Dismisser` has rather than a listener per consumer.
-
-- **A scroll area with custom scrollbars.** Radix, Ark, Mantine and PrimeReact each ship one: the native bar hidden,
-  the content and viewport measured, a thumb drawn to mirror the scroll, dragged and clicked. Nothing here draws a
-  thumb, so it would be new machinery rather than a prop, and it is every reference library's longest-lived source
-  of bugs: overlay bars on macOS, touch scrolling on iOS, `scrollbar-gutter`, right-to-left, nested areas. Placed
-  last by the user because CSS now covers the reason it existed: `scrollbar-color` and `scrollbar-width` style
-  the native bar in every current browser, and the expectation is that the platform's customization only grows.
-  What CSS still cannot give is an overlay bar that fades when idle; that is the one thing a consumer would come
-  here for, and the one thing this item would build.
-
-**_Elsewhere._** Ark UI's set is the widest of the headless libraries and is the most useful scope check
-available: it has a tree view, a pagination component, a **segment group** — a segmented control as its
-own component, distinct from both tabs and toggle group — and a `Field` plus a `Fieldset`. It has no
-table and no data grid. TanStack Table is what that gap gets filled with, and it is a separate project
-with its own release cycle, which is this item's call arrived at independently — the reasoning that put the
-table last, kept here because it is the scope check for what a data grid is, not because the table is still
-outstanding.
-
-- **Breadcrumbs is owned by at least one of them:** React Aria ships `Breadcrumbs`.
-- **Pagination is owned because it is arithmetic, not paint.** Ark UI's takes `page`, `pageSize`,
-  `count`, `siblingCount` and `boundaryCount`, computes the visible page range and where the gaps fall,
-  and switches between buttons and links with a `type` prop. That is more than a composition of `Button`,
-  which is the argument this item lost — `Paginator` is built, and where it departs from that shape is in
-  `decisions.md`.
-- **Worked examples of each, read on 2026-08-15**, which is what the user's ordering above was taken from:
-  [TanStack Table](https://tanstack.com/table/latest/docs/overview),
-  [React Aria Breadcrumbs](https://react-aria.adobe.com/Breadcrumbs/useBreadcrumbs.html),
-  [Ark UI Segment Group](https://ark-ui.com/docs/components/segment-group),
-  [Ark UI Splitter](https://ark-ui.com/docs/components/splitter),
-  [cmdk](https://cmdk.paco.me),
-  [Ark UI Tags Input](https://ark-ui.com/docs/components/tags-input),
-  [Ark UI Rating Group](https://ark-ui.com/docs/components/rating-group) and
-  [Ark UI Steps](https://ark-ui.com/docs/components/steps). Ark UI carries five of the eight, which is the
-  scope check this item already leaned on. Two details from those pages are worth keeping: the splitter
-  admits non-panel children such as toolbars and status bars inside its root, so it is not simply two boxes
-  and a drag; and the tags input sets the mobile keyboard's Enter key to read "Done", which is the kind of
-  thing only found by using one on a phone.
-
----
-
-## 4. Planned: a consumer-facing layer of controls above the library — _deferred to a session of its own_
+## 3. Planned: a consumer-facing layer of controls above the library — _deferred to a session of its own_
 
 **Deferred to a near-future session of its own**, by the user, because bundling it with the components then in
 progress would have been awkward. It is no longer deferred indefinitely. The packaging question inside it is a
@@ -256,7 +174,7 @@ same example.
 
 ---
 
-## 5. `ColorInput` — two things deliberately not built
+## 4. `ColorInput` — two things deliberately not built
 
 `ColorInput` is the custom picker now; the decisions are in `decisions.md` under the `ColorArea` heading.
 These are the gaps.
@@ -308,7 +226,7 @@ These are the gaps.
 
 ---
 
-## 6. `SlideButton` — two things deliberately not built
+## 5. `SlideButton` — two things deliberately not built
 
 The decisions behind what exists are in `decisions.md` under _"Controls: `SlideButton`, and why the gesture
 is the only thing it owns"_, including which WCAG criteria were read and what they decided. These are the
@@ -346,7 +264,7 @@ gaps, each with the reason it is still one.
 
 ---
 
-## 7. `Spotlight` — one thing deliberately not built
+## 6. `Spotlight` — one thing deliberately not built
 
 The decisions behind what exists are in `decisions.md` under _"Controls: `Spotlight`, and three presets
 because a mode cannot move at runtime"_. These are the gaps, each with the reason it is still one.
@@ -359,15 +277,11 @@ because a mode cannot move at runtime"_. These are the gaps, each with the reaso
 
 ---
 
-## 8. `Scroller` — two things deliberately not built
+## 7. `Scroller` — one thing deliberately not built
 
 The decisions behind what exists are in `decisions.md` under _"Controls: `Scroller`, and why it renders no
-button of its own"_. These are the gaps, each with the reason it is still one.
+button of its own"_. The gap, with the reason it is still one.
 
-- **Horizontal only.** The whole component is one axis of arithmetic — `scrollLeft`, `clientWidth`,
-  `offsetLeft` — and a vertical twin is those three swapped plus a direction prop, which is `Accordion`'s
-  recorded position on its own axis question. Nothing has asked for a column, and the Playground's own left
-  menu, which is the obvious candidate, scrolls natively today and nobody has complained.
 - **The buttons are the consumer's, so their keyboard story is too.** The component renders no button, which
   means it cannot guarantee one is reachable, named, or in the tab order — a consumer who paints them as bare
   divs gets a control no keyboard can reach. The library's answer is that the scrolling itself is still
@@ -376,7 +290,7 @@ button of its own"_. These are the gaps, each with the reason it is still one.
 
 ---
 
-## 9. `Paginator` — one thing deliberately not built
+## 8. `Paginator` — one thing deliberately not built
 
 The decisions behind what exists are in `decisions.md` under _"Controls: `Paginator`, where the arithmetic
 is the component"_ and _"`Paginator` is a root and pieces, with the ready-made row on top"_.
@@ -391,7 +305,7 @@ is the component"_ and _"`Paginator` is a root and pieces, with the ready-made r
 
 ---
 
-## 10. `Carousel` — two things deliberately not built
+## 9. `Carousel` — two things deliberately not built
 
 The decisions behind what exists are in `decisions.md` under _"Controls: `Carousel`, and the first component
 that acts without being asked"_ and _"`Carousel`: one component, and how a slide sits is a placement rule"_. These
@@ -409,7 +323,7 @@ are the gaps, each with the reason it is still one.
 
 ---
 
-## 11. An anchored layer trails its anchor during a scroll — _postponed until the platform catches up_
+## 10. An anchored layer trails its anchor during a scroll — _postponed until the platform catches up_
 
 **While something is moving, the position an anchored layer paints at is the position its anchor was in one
 frame ago.** At rest the last frame catches up, so it looks settled and only moves when something else does.
@@ -495,7 +409,7 @@ neither was tried.
 
 ---
 
-## 12. `Table` — six things deliberately not built
+## 11. `Table` — six things deliberately not built
 
 The decisions behind what exists are in `decisions.md` under _"Controls: `Table`, a grid rather than a
 table, and why the markup could not be `<table>`"_. These are the gaps, each with the reason it is still one.
@@ -521,7 +435,7 @@ _Accepted limits_ instead.
 
 ---
 
-## 13. `GlassSurface`'s ripple layer shows a defect at its edge — _postponed until the platform catches up_
+## 12. `GlassSurface`'s ripple layer shows a defect at its edge — _postponed until the platform catches up_
 
 The component is built and works; the reasoning is in `decisions.md` under _"`GlassSurface`, and the two things
 that decide its shape"_. `GlassSurface` sits under `Composites`, which the Playground hides behind
@@ -541,47 +455,16 @@ the platform actually supports this, which the W3C issue above is the thing to w
 
 ---
 
-## 14. Arbitrary placement across controls, and the picking that has to come with it
+## 13. Arbitrary placement — the gaps the trials left
 
-**The user's proposal, and the direction the library is going next.** A control's items should be placeable
-anywhere rather than only along a line: a `Menu` as a closed ring or a wide fan; a `Paginator` drawn
-round a dial instead of along a row; `Tabs` as a honeycomb, or as page marks scattered down the edge of a
-dossier; a `RadioGroup`'s stars bent into a semicircle. **The list of controls is deliberately open** — the
-user named these as examples of the flexibility wanted, not as the set.
-
-The approach is bottom-up and was chosen over building the abstraction first: `Menu` goes first, the picking
-sits in its own abstract from the start, and the second consumer corrects the abstract's signature.
-
-### What is built
-
-`Abstracts/Placement` holds the vocabulary, the picking and the sector, link and gap builders, with the placed
-box itself in `Primitives/PlacementBox` and `Primitives/PlacementItem`, and has a Playground page of its own where the band family's knobs build one set of measurements
-that a `WheelMenu` and an `OverheadWheel` are both handed. Every layout sample is in
-`Samples/Placement/Layouts`, none of them named for a consumer, and every one is an entry naming its family
-that `PlacementLayoutUtils.toLayoutFn` turns into a `PlacementLayoutFn` — so any of them can be handed to any
-placed control. The exception is the radial tree, which needs each item's
-parent rather than only a count, and therefore lives in the one page that can supply it.
-
-Ten controls take an optional `computeLayout` and are unchanged without one: `Menu` (with `WheelMenu` and
-`FanMenu` built over it), the overhead `Wheel`, `Paginator`, `RadioGroup`, `Tabs`, `Stepper`, `Toolbar`,
-`Sortable`, `Tree` and `TableOfContents`; `Formation` requires one. The reasoning behind every decision taken is in `decisions.md` under
+Built and in use: a control's items can be placed anywhere rather than along a line, through a layout it is handed —
+a menu as a ring, page numbers round a dial, tabs as a honeycomb. The reasoning is in `decisions.md` under
 _"Arbitrary item placement"_, _"Concentric submenus"_, _"A wheel of wedges"_, _"The wheel as the ring's second
 consumer"_, _"`WheelMenu`: the wheel becomes a component"_, _"`Paginator` takes a layout"_, _"`RadioGroup` and
-`Tabs` take a layout too"_, _"Every layout sample lives in one place"_, _"`Formation` is the abstract's"_,
-_"The band and the arc are two placers"_, _"The arc can be flattened or stretched"_, _"A hover the pointer
-did not cause"_, _"A
-placed menu walks on all four arrows"_, _"A group's radios are ordered by the document"_, _"Five more
-controls take a layout"_ and _"Hold and flick"_.
-
-The hold-and-flick gesture is built, as `Menu`'s `opensOnHold`: the press opens the menu, a short move in an
-item's direction highlights it, and release runs it, with the pointer never traveling as far as the thing it
-picks. It ships with the click-open mode underneath it and the keyboard walk beside it, which is what 2.5.1
-Pointer Gestures and 2.5.7 Dragging Movements require of a path-based, dragging gesture; and the pick lands on
-release with a return toward the middle aborting it, which is the clause of 2.5.2 Pointer Cancellation that a
-menu opening on the down-event is left with. It is the first caller `PlacementUtils.pickIndex` has had, which
-is what turned up the origin-placed item it scored as pointing due east.
-
-### Faults the proving pass found and left open
+`Tabs` take a layout too"_, _"Every layout sample lives in one place"_, _"`Formation` is the abstract's"_, _"The band
+and the arc are two placers"_, _"The arc can be flattened or stretched"_, _"The fan places tilted boxes"_, _"A hover
+the pointer did not cause"_, _"A placed menu walks on all four arrows"_, _"A group's radios are ordered by the
+document"_, _"Five more controls take a layout"_ and _"Hold and flick"_. What the trials left open:
 
 - **A placed item's box is guessed rather than measured.** A layout picks each item's size from numbers it is
   given — `itemMaxWidthRatio`, `itemWidthRatio` — while the painter's content has an intrinsic width the
@@ -591,7 +474,7 @@ is what turned up the origin-placed item it scored as pointing due east.
   demo's tuning. One case of it is closed: a nested band's wedge is no longer allowed to be narrower than the
   item box the same layout says it will draw, which is a layout disagreeing with itself rather than with its
   content.
-- **A laid-out control can overflow its container, and it is no longer only popups.** A ring is centerd on its
+- **A laid-out control can overflow its container, and it is no longer only popups.** A ring is centered on its
   invoker and is as large as the box its consumer gave it, so nothing stops it reaching past the edge of the
   screen — pinning deliberately turned off the clamping that would have moved it, and concentric submenus make
   it louder, each level enclosing the one above it. **The mechanism changed** — a layout no longer sizes
@@ -599,20 +482,14 @@ is what turned up the origin-placed item it scored as pointing due east.
   for the room. In a page's flow the same thing bites differently: a placed `Toolbar` has
   nothing to collapse into, so a layout that outgrows its column spills rather than adapting. What should
   happen in either case has not been decided.
-
-### Loose ends left deliberately, recorded at the user's request
-
 - **The flick's travel threshold is a guess, not a measurement.** `FLICK_TRAVEL_RATIO` is 0.1 of the layout's
   own width — about 30px on the demo wheel, and proportionally more on a bigger one. It reads well enough to
   build on, but every other tuned constant in the repo is the user's, backed by something they measured, and
   this one is not.
-- **`fan` places boxes rather than wedges, and that has never been argued either way.** The wedge vocabulary
-  is on `PlacementRect` and any layout may use it; the fan is the one layout whose items are tilted along the
-  arc rather than sitting in a band, so cards may well be right for it. It takes `ArcDefs` like the others now.
 
 ---
 
-## 15. The submit story — what a native submit carries, and what `Form` hands `onSubmit`
+## 14. The submit story — what a native submit carries, and what `Form` hands `onSubmit`
 
 Three findings from the survey against the reference libraries were lofted here rather than settled one by one,
 because they are one question. **The user's word: lofted, not discarded.**
@@ -634,7 +511,7 @@ separately and does not depend on this.
 
 ---
 
-## 16. `Die`'s step buttons and arrow keys fall into a loop of two or three faces
+## 15. `Die`'s step buttons and arrow keys fall into a loop of two or three faces
 
 Reachable on the Die page's icon cloud: pick the d20 and press down a few times. The die goes back and forth
 between the same two faces. Every shape does it — a d20 pressed right goes between faces 1 and 2 from the first
@@ -663,7 +540,7 @@ every face upright cannot both hold, so each option gives one up:
 
 ---
 
-## 17. The Playground's painters in Windows high-contrast mode
+## 16. The Playground's painters in Windows high-contrast mode
 
 Reachable on the Range page with Windows' high-contrast mode on, or with Chrome's DevTools emulating
 `forced-colors: active`: the track and the filled part of the range turn white on the white page, and only the

@@ -2,7 +2,7 @@ import { Index, type JSX, Show, createEffect, createMemo, createSignal, lazy, on
 import COMPONENT_DEPENDENCIES from "virtual:component-dependencies";
 import type { DependencyNames } from "virtual:component-dependencies";
 
-import { A, Navigate, Route, type RouteSectionProps, Router } from "@solidjs/router";
+import { A, Navigate, Route, type RouteSectionProps, Router, useNavigate } from "@solidjs/router";
 import {
     Collapsible,
     SharedTooltip,
@@ -58,6 +58,7 @@ import {
     PREVIEW_EXCLUDED_PAGES,
     SEARCH_FIELD_WIDTH,
 } from "./AppSolid.const";
+import { PageAppCommands } from "./PageComponents/AppCommands/AppCommands";
 import { PageBuildProgress } from "./PageComponents/BuildProgress/BuildProgress";
 import { PageTextField } from "./PageComponents/Field/Field";
 import { PageFrameworkMenu } from "./PageComponents/FrameworkMenu/FrameworkMenu";
@@ -183,6 +184,10 @@ const MENU_NODES_BY_VIEW = Object.fromEntries(
 ) as Record<PageViewKey, TreeNode<MenuNodeConfig>[]>;
 
 const COMPONENT_CONFIGS = flattenConfigs(MENU_CONFIGS);
+
+const VISIBLE_COMPONENT_CONFIGS = flattenConfigs(VISIBLE_MENU_CONFIGS);
+
+const VISIBLE_PAGE_NAMES = VISIBLE_COMPONENT_CONFIGS.map((config) => config.name);
 
 const ANCESTORS_BY_CONFIG = new Map<MenuNodeConfig, MenuBranchConfig[]>();
 
@@ -418,6 +423,14 @@ export function AppContent(props: RouteSectionProps & { viewportAnchor: SignalPa
 
     const selectedSignal: SignalPair<MenuNodeConfig | undefined> = [getSelectedConfig, () => undefined];
 
+    const navigate = useNavigate();
+
+    const goToPage = (pageName: string) => {
+        const config = VISIBLE_COMPONENT_CONFIGS.find((candidate) => candidate.name === pageName);
+
+        if (config) navigate(toPageHref(config, pageViewSignal[0]()));
+    };
+
     const viewportContext = useViewportContext();
 
     const getMenuGutter = createMemo(() => Math.max(0, (viewportContext.getSize().width - LAYOUT.pageMaxWidth) / 2));
@@ -433,6 +446,14 @@ export function AppContent(props: RouteSectionProps & { viewportAnchor: SignalPa
 
     return (
         <div class={styles.appFrame}>
+            <PageAppCommands
+                pageNames={VISIBLE_PAGE_NAMES}
+                onGoToAbout={() => navigate("/")}
+                onGoToPage={goToPage}
+                onExpandAll={() => expandedSignal[1](collectBranchValues(getFilteredNodes()))}
+                onCollapseAll={() => expandedSignal[1]([])}
+            />
+
             <Show when={IS_BUILD_PROGRESS_SHOWN}>
                 <PageBuildProgress />
             </Show>

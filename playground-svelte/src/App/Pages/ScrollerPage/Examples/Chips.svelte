@@ -1,6 +1,6 @@
 <script lang="ts">
     import { Scroller, ScrollerUtils } from "@thewaver/ss-components-svelte";
-    import type { ScrollerButtonPlacement } from "@thewaver/ss-components-svelte";
+    import type { ScrollerButtonPlacement, ScrollerProgress } from "@thewaver/ss-components-svelte";
     import * as styles from "@thewaver/ss-playground/App/Pages/ScrollerPage/ScrollerPage.css";
     import { FOCUS_RING_WIDTH } from "@thewaver/ss-playground/App/Theme.css";
 
@@ -11,10 +11,10 @@
 
     type Props = ScrollerExampleProps & {
         buttonPlacement?: ScrollerButtonPlacement;
-        progress?: number;
+        progress?: ScrollerProgress;
     };
 
-    let { progress = $bindable(ScrollerUtils.RATIO_MIN), ...props }: Props = $props();
+    let { progress = $bindable(ScrollerUtils.NO_PROGRESS), ...props }: Props = $props();
 </script>
 
 <div class={styles.demo}>

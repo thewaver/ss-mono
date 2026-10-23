@@ -1,7 +1,7 @@
 import type { Signal } from "solid-js";
 
 import { Scroller, access } from "@thewaver/ss-components-solid";
-import type { MaybeAccessor, ScrollerButtonPlacement } from "@thewaver/ss-components-solid";
+import type { MaybeAccessor, ScrollerButtonPlacement, ScrollerProgress } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/Pages/ScrollerPage/ScrollerPage.css";
 import { FOCUS_RING_WIDTH } from "@thewaver/ss-playground/App/Theme.css";
 
@@ -12,7 +12,7 @@ const SCROLLER_GAP = 10;
 
 type Props = ScrollerExampleProps & {
     buttonPlacement?: MaybeAccessor<ScrollerButtonPlacement>;
-    progress?: Signal<number>;
+    progress?: Signal<ScrollerProgress>;
 };
 
 export const ChipsExample = (props: Props) => {

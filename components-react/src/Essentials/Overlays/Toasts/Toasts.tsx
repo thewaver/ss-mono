@@ -15,6 +15,7 @@ import { CSSUtils, GestureUtils } from "@thewaver/ss-utils";
 import { ElementFaderReactUtils } from "../../../Abstracts/ElementFader/ElementFaderReact.utils";
 import { ElementObserverReactUtils } from "../../../Abstracts/ElementObserver/ElementObserverReact.utils";
 import { InteractionTrackerReactUtils } from "../../../Abstracts/InteractionTracker/InteractionTrackerReact.utils";
+import { ShortcutReactUtils } from "../../../Abstracts/Shortcut/ShortcutReact.utils";
 import { useViewportContext } from "../../../Abstracts/Viewport/Viewport.context";
 import { useElement, useLatest } from "../../../Utils/refUtils";
 import type { ToastsItemProps, ToastsProps } from "./Toasts.types";
@@ -125,7 +126,7 @@ export const Toasts = <T,>(props: ToastsProps<T>) => {
     const dir = props.dir ?? TOASTS_DEFAULTS.dir;
     const overflow = props.overflow ?? TOASTS_DEFAULTS.overflow;
     const margins = props.margins ?? ToastsConst.DEFAULT_MARGINS;
-    const hotkey = props.hotkey ?? TOASTS_DEFAULTS.hotkey;
+    const hotkey = props.hotkey === undefined ? TOASTS_DEFAULTS.hotkey : props.hotkey;
     const politeness = props.ariaLive ?? TOASTS_DEFAULTS.ariaLive;
     const stackAlignment = ToastUtils.computeStackAlignment(alignment, dir);
     const swipeDirection =
@@ -168,7 +169,22 @@ export const Toasts = <T,>(props: ToastsProps<T>) => {
         ToastUtils.announceArrivals(previous, entryIds, admitted, computeAnnouncement, politeness);
     }, [entryIds]);
 
-    useEffect(() => (root ? ToastUtils.observeHotkey(root, hotkey) : undefined), [root, hotkey]);
+    const focusRouteRef = useRef<ReturnType<typeof ToastUtils.createFocusRoute>>(undefined);
+
+    useEffect(() => {
+        if (!root) return undefined;
+
+        const route = ToastUtils.createFocusRoute(root);
+
+        focusRouteRef.current = route;
+
+        return () => {
+            route.stop();
+            focusRouteRef.current = undefined;
+        };
+    }, [root]);
+
+    ShortcutReactUtils.useBinding(hotkey ?? undefined, false, () => focusRouteRef.current?.enter());
 
     useEffect(() => {
         const trimmed = ToastUtils.computeOverflowTrim(toasts, props.limit, overflow);

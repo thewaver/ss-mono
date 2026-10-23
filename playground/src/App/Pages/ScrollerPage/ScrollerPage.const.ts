@@ -4,11 +4,25 @@ export const EXAMPLE_NAMES = {
     bothButtonsStart: "Both buttons at the start",
     tabbed: "Focus reveals what it lands on",
     focusableChildren: "Focusable children of any kind",
+    verticalStrip: "A column scrolling down",
+    bothWays: "A box scrolling both ways",
+    overlaidAutoHiding: "A bar over the content that fades",
+    shortTrack: "A short track between the step buttons",
+    arched: "An arched bar",
 };
 
 export const EXAMPLES_ROOT = "/src/App/Pages/ScrollerPage/Examples";
 
 export const PERCENT = 100;
+
+export const GRID_SIZE = 12;
+
+export const SHORT_TRACK_LENGTH = 120;
+
+const FIRST_COLUMN_LETTER = 65;
+
+export const getGridCellLabel = (row: number, column: number) =>
+    `${String.fromCharCode(FIRST_COLUMN_LETTER + column)}${row + 1}`;
 
 export const getMonthTabId = (month: string) => `scroller-tab-${month.toLocaleLowerCase()}`;
 

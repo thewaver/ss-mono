@@ -29,5 +29,11 @@
         {/if}
     </div>
 
-    <div class={styles.selectOptionMark} aria-hidden="true">✓</div>
+    {#if props.shortcut}
+        <div class={styles.selectOptionShortcut}>{props.shortcut}</div>
+    {/if}
+
+    {#if props.hasMark ?? true}
+        <div class={styles.selectOptionMark} aria-hidden="true">✓</div>
+    {/if}
 </div>

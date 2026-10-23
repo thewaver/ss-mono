@@ -50,6 +50,12 @@ export const selectOptionDescription = style({
     opacity: 0.75,
 });
 
+export const selectOptionShortcut = style({
+    marginLeft: "auto",
+    opacity: 0.5,
+    fontSize: themeVars.fontSize.xSmall,
+});
+
 export const selectOptionMark = style({
     opacity: 0,
 

@@ -1,3 +1,4 @@
+import type { Shortcut } from "../../../Abstracts/Shortcut/Shortcut.types";
 import type { ToastsAlignment, ToastsAriaLive, ToastsDir, ToastsOverflow } from "./Toasts.types";
 
 export const TOASTS_DEFAULTS = {
@@ -5,7 +6,7 @@ export const TOASTS_DEFAULTS = {
     alignment: "bottom_right" as ToastsAlignment,
     dir: "column" as ToastsDir,
     overflow: "dismiss_oldest" as ToastsOverflow,
-    hotkey: "F8",
+    hotkey: { key: "F8" } as Shortcut,
     ariaLive: "polite" as ToastsAriaLive,
     gap: 10,
     isDismissableOnSwipe: true,

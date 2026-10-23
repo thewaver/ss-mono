@@ -35,6 +35,9 @@ const isReachable = (element: HTMLElement) => {
 /** How many focus restores are in flight. A counter rather than a flag, since nested layers can close together. */
 let restoreDepth = 0;
 
+/** The attributes whose change can make something inside a subtree focusable or stop it being so. */
+const FOCUS_ATTRIBUTES = ["tabindex", "disabled", "href", "contenteditable", "inert", "hidden", "aria-hidden"];
+
 /**
  * Finds what can be focused inside an element, traps Tab within it, and puts focus back afterwards.
  *
@@ -91,6 +94,27 @@ export namespace FocusManagerUtils {
      */
     export const getFirstFocusableChild = (root?: HTMLElement): HTMLElement | null =>
         getFocusableChildren(root)[0] ?? null;
+
+    /**
+     * Watches whether anything inside an element can be tabbed to.
+     *
+     * Children arriving or leaving and any change to an attribute that affects focusability, anywhere in the subtree,
+     * are heard, so a box that scrolls can tell whether a keyboard user has something inside it to focus. The callback
+     * runs once at the start and again on every such change.
+     *
+     * @param root The element to watch.
+     * @param onChange Receives whether anything inside can take focus.
+     * @returns A function that stops watching.
+     */
+    export const observeHasFocusable = (root: HTMLElement, onChange: (hasFocusable: boolean) => void) => {
+        const update = () => onChange(getFirstFocusableChild(root) !== null);
+        const observer = new MutationObserver(update);
+
+        observer.observe(root, { childList: true, subtree: true, attributes: true, attributeFilter: FOCUS_ATTRIBUTES });
+        update();
+
+        return () => observer.disconnect();
+    };
 
     /**
      * The last thing inside an element that can be tabbed to.

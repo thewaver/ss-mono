@@ -4,7 +4,7 @@ import * as styles from "@thewaver/ss-playground/App/StyledComponents/SelectOpti
 import { useLayerClass } from "../Layer/Layer.context";
 import type { SelectOptionContentProps } from "./SelectOptionContentVue.types";
 
-defineProps<SelectOptionContentProps>();
+withDefaults(defineProps<SelectOptionContentProps>(), { hasMark: true });
 
 const layerClass = useLayerClass();
 </script>
@@ -26,6 +26,8 @@ const layerClass = useLayerClass();
             <div v-if="description" :class="styles.selectOptionDescription">{{ description }}</div>
         </div>
 
-        <div :class="styles.selectOptionMark" aria-hidden="true">✓</div>
+        <div v-if="shortcut" :class="styles.selectOptionShortcut">{{ shortcut }}</div>
+
+        <div v-if="hasMark" :class="styles.selectOptionMark" aria-hidden="true">✓</div>
     </div>
 </template>

@@ -29,9 +29,15 @@ export const PageSelectOptionContent = (props: ParentProps<SelectOptionContentPr
                 </Show>
             </div>
 
-            <div class={styles.selectOptionMark} aria-hidden="true">
-                ✓
-            </div>
+            <Show when={access(props.shortcut)}>
+                {(getShortcut) => <div class={styles.selectOptionShortcut}>{getShortcut()}</div>}
+            </Show>
+
+            <Show when={access(props.hasMark) ?? true}>
+                <div class={styles.selectOptionMark} aria-hidden="true">
+                    ✓
+                </div>
+            </Show>
         </div>
     );
 };

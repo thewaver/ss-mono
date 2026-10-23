@@ -233,40 +233,35 @@ export namespace ToastUtils {
     /**
      * Gives the stack a keyboard route in and one back out.
      *
-     * The hotkey, pressed anywhere outside the stack, moves focus onto it — which nothing could otherwise tab to,
-     * since it is portaled to the end of the document. Escape pressed inside hands focus back to where the hotkey
-     * found it.
+     * `enter`, called when the hotkey fires, moves focus onto the stack — which nothing could otherwise tab to, since
+     * it is portaled to the end of the document — and remembers where it was. Escape pressed inside hands focus back
+     * there. Entering while focus is already inside does nothing.
      *
      * @param root The stack's region, which must be focusable.
-     * @param hotkey The key, as `KeyboardEvent.key` names it. An empty string listens for nothing.
-     * @returns The function that stops listening.
+     * @returns `enter`, and `stop`, which stops listening for Escape.
      */
-    export const observeHotkey = (root: HTMLElement, hotkey: string) => {
-        if (hotkey.length === 0) return () => {};
-
+    export const createFocusRoute = (root: HTMLElement) => {
         let restoreRef: HTMLElement | undefined;
 
         const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === hotkey) {
-                if (root.contains(document.activeElement)) return;
-
-                e.preventDefault();
-                restoreRef = document.activeElement instanceof HTMLElement ? document.activeElement : undefined;
-                root.focus();
-
-                return;
-            }
-
-            if (e.key !== ESCAPE_KEY || !root.contains(document.activeElement)) return;
+            if (e.key !== ESCAPE_KEY || !restoreRef) return;
 
             e.preventDefault();
-            restoreRef?.focus();
+            restoreRef.focus();
             restoreRef = undefined;
         };
 
-        document.addEventListener("keydown", handleKeyDown);
+        root.addEventListener("keydown", handleKeyDown);
 
-        return () => document.removeEventListener("keydown", handleKeyDown);
+        return {
+            enter: () => {
+                if (root.contains(document.activeElement)) return;
+
+                restoreRef = document.activeElement instanceof HTMLElement ? document.activeElement : undefined;
+                root.focus();
+            },
+            stop: () => root.removeEventListener("keydown", handleKeyDown),
+        };
     };
 
     /**

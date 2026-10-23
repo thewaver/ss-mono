@@ -11,9 +11,6 @@ type MaskLayer = {
 /** A mask layer that keeps everything it covers, laid over each scrollbar strip. */
 const SOLID = "linear-gradient(#000, #000)";
 
-/** The attributes whose change can make something inside the box focusable or stop it being so. */
-const FOCUS_ATTRIBUTES = ["tabindex", "disabled", "href", "contenteditable", "inert", "hidden", "aria-hidden"];
-
 const computeAxisGradient = (direction: string, start: number, end: number) =>
     `linear-gradient(${direction}, transparent, #000 ${start}px, #000 calc(100% - ${end}px), transparent)`;
 
@@ -144,33 +141,28 @@ export namespace EdgeFaderUtils {
         cbs: { onMetrics: (metrics: EdgeFaderMetrics) => void; onHasFocusable: (hasFocusable: boolean) => void },
     ) => {
         const update = () => cbs.onMetrics(readMetrics(root));
-        const updateHasFocusable = () => cbs.onHasFocusable(FocusManagerUtils.getFirstFocusableChild(root) !== null);
         const sizeObserver = new ResizeObserver(update);
         const childObserver = new MutationObserver(() => {
             for (const child of root.children) sizeObserver.observe(child);
 
             update();
-            updateHasFocusable();
         });
 
         sizeObserver.observe(root);
 
         for (const child of root.children) sizeObserver.observe(child);
 
-        childObserver.observe(root, {
-            childList: true,
-            subtree: true,
-            attributes: true,
-            attributeFilter: FOCUS_ATTRIBUTES,
-        });
+        childObserver.observe(root, { childList: true });
         root.addEventListener("scroll", update, { passive: true });
 
         update();
-        updateHasFocusable();
+
+        const stopFocusWatch = FocusManagerUtils.observeHasFocusable(root, cbs.onHasFocusable);
 
         return () => {
             sizeObserver.disconnect();
             childObserver.disconnect();
+            stopFocusWatch();
             root.removeEventListener("scroll", update);
         };
     };

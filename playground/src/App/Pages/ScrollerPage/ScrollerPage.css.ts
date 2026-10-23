@@ -1,5 +1,7 @@
 import { style } from "@vanilla-extract/css";
 
+import { GRID_SIZE } from "./ScrollerPage.const";
+
 import { layerVars } from "../../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../../Theme.css";
 
@@ -23,6 +25,26 @@ export const tabbedDemo = style([
     },
 ]);
 
+export const verticalDemo = style({
+    width: 240,
+    maxWidth: "100%",
+    height: 260,
+});
+
+export const bothWaysDemo = style([
+    demo,
+    {
+        height: 300,
+    },
+]);
+
+export const cellGrid = style({
+    display: "grid",
+    gridTemplateColumns: `repeat(${GRID_SIZE}, auto)`,
+    gap: themeVars.spacing.half,
+    flexShrink: 0,
+});
+
 export const item = style({
     display: "flex",
     flexShrink: 0,
@@ -41,3 +63,11 @@ export const chip = style({
     fontSize: themeVars.fontSize.small,
     whiteSpace: "nowrap",
 });
+
+export const row = style([
+    chip,
+    {
+        justifyContent: "flex-start",
+        marginBlockEnd: themeVars.spacing.half,
+    },
+]);

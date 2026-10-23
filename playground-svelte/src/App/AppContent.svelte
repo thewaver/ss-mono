@@ -31,10 +31,12 @@
         flattenConfigs,
         getHasPreview,
         getIsBranchConfig,
+        navigate,
         route,
         toPageHref,
     } from "./App.router";
-    import type { ComponentConfig, MenuBranchConfig, MenuNodeConfig } from "./App.types";
+    import type { ComponentConfig, MenuBranchConfig, MenuNodeConfig, RoutePath } from "./App.types";
+    import PageAppCommands from "./PageComponents/AppCommands/AppCommands.svelte";
     import PageTextField from "./PageComponents/Field/PageTextField.svelte";
     import PageBuildProgress from "./PageComponents/BuildProgress/PageBuildProgress.svelte";
     import PageFrameworkMenu from "./PageComponents/FrameworkMenu/FrameworkMenu.svelte";
@@ -113,6 +115,10 @@
         PAGE_VIEW_KEYS.map((view) => [view, VISIBLE_MENU_CONFIGS.map(toTreeNode(view))]),
     ) as Record<PageViewKey, TreeNode<MenuNodeConfig>[]>;
 
+    const VISIBLE_COMPONENT_CONFIGS = flattenConfigs(VISIBLE_MENU_CONFIGS);
+
+    const VISIBLE_PAGE_NAMES = VISIBLE_COMPONENT_CONFIGS.map((config) => config.name);
+
     const ANCESTORS_BY_CONFIG = new Map<MenuNodeConfig, MenuBranchConfig[]>();
 
     collectAncestors(VISIBLE_MENU_CONFIGS, [], ANCESTORS_BY_CONFIG);
@@ -177,6 +183,17 @@
         });
     });
 
+    const setExpanded = (next: MenuNodeConfig[]) => {
+        if (isSearching) searchExpanded = next;
+        else browseExpanded = next;
+    };
+
+    const goToPage = (pageName: string) => {
+        const config = VISIBLE_COMPONENT_CONFIGS.find((candidate) => candidate.name === pageName);
+
+        if (config) void navigate(toPageHref(config, pageView) as RoutePath);
+    };
+
     const viewportContext = getViewportContext();
 
     const menuGutter = $derived(Math.max(0, (viewportContext.getSize().width - LAYOUT.pageMaxWidth) / 2));
@@ -213,6 +230,14 @@
 {/snippet}
 
 <div class={styles.appFrame}>
+    <PageAppCommands
+        pageNames={VISIBLE_PAGE_NAMES}
+        onGoToAbout={() => void navigate("/")}
+        onGoToPage={goToPage}
+        onExpandAll={() => setExpanded(collectBranchValues(filteredNodes))}
+        onCollapseAll={() => setExpanded([])}
+    />
+
     {#if IS_BUILD_PROGRESS_SHOWN}
         <PageBuildProgress />
     {/if}
@@ -329,10 +354,7 @@
                                         bind:value={() => selectedConfig as MenuNodeConfig | undefined, () => undefined}
                                         bind:expanded={
                                             () => (isSearching ? searchExpanded : browseExpanded),
-                                            (next) => {
-                                                if (isSearching) searchExpanded = next ?? [];
-                                                else browseExpanded = next ?? [];
-                                            }
+                                            (next) => setExpanded(next ?? [])
                                         }
                                         ariaLabel={"Library"}
                                         linkComponent={PageRouterLink}

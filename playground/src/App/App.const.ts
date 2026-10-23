@@ -22,7 +22,7 @@ export const MENU_ID = "library-menu";
 
 export const MENU_EDGE = "left";
 
-export const PREVIEW_EXCLUDED_PAGES = ["AudioSwitcher", "ImageSwitcher", "ViewportWrapper"];
+export const PREVIEW_EXCLUDED_PAGES = ["AudioSwitcher", "CommandPalette", "ImageSwitcher", "ViewportWrapper"];
 
 export const SCREEN_HEIGHT = window.screen.height;
 

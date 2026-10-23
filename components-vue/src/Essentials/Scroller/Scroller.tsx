@@ -1,93 +1,369 @@
-import { Fragment, type SlotsType, defineComponent, shallowRef } from "vue";
+import {
+    type ComponentPublicInstance,
+    Fragment,
+    type SlotsType,
+    computed,
+    defineComponent,
+    onScopeDispose,
+    shallowRef,
+    useId,
+    watch,
+} from "vue";
 
-import type { ScrollerMetrics, ScrollerStep, ScrollerStepper } from "@thewaver/ss-components";
-import { SCROLLER_DEFAULTS, ScrollerStyles, ScrollerUtils } from "@thewaver/ss-components";
+import {
+    FocusManagerUtils,
+    SCROLLER_AXES,
+    SCROLLER_DEFAULTS,
+    type ScrollerAxis,
+    type ScrollerAxisSteps,
+    type ScrollerBarRenderProps,
+    type ScrollerStep,
+    type ScrollerStepper,
+    ScrollerStyles,
+    ScrollerUtils,
+} from "@thewaver/ss-components";
+import { FunctionUtils } from "@thewaver/ss-utils";
 
 import { watchAfterRender } from "../../Utils/effectUtils";
 import { callSlot, declareProps, useTwoWay } from "../../Utils/propUtils";
+import { toElement } from "../../Utils/refUtils";
 import type { SlotsContext } from "../../Utils/typeUtils";
-import type { ScrollerProps, ScrollerSlots } from "./Scroller.types";
+import type { ScrollerBarProps, ScrollerBarSlots, ScrollerProps, ScrollerSlots } from "./Scroller.types";
 
-const getIsSameMetrics = (a: ScrollerMetrics, b: ScrollerMetrics) =>
-    a.start === b.start && a.visible === b.visible && a.total === b.total;
+const ARIA_VALUE_MAX = 100;
+const ARIA_VALUE_THROTTLE_MS = 100;
+
+const ARIA_ORIENTATIONS: Record<ScrollerAxis, "horizontal" | "vertical"> = { x: "horizontal", y: "vertical" };
+
+const STEP_AREAS: Record<ScrollerAxis, Record<keyof ScrollerAxisSteps, string>> = {
+    x: { leading: ScrollerUtils.AREAS.xLeading, trailing: ScrollerUtils.AREAS.xTrailing },
+    y: { leading: ScrollerUtils.AREAS.yLeading, trailing: ScrollerUtils.AREAS.yTrailing },
+};
+
+const ScrollerBar = defineComponent(
+    (props: ScrollerBarProps, { slots }: SlotsContext<ScrollerBarSlots>) => {
+        const trackRef = shallowRef<HTMLElement>();
+        const thumbRef = shallowRef<HTMLElement>();
+        const trackLength = shallowRef(0);
+        const isDragging = shallowRef(false);
+        const ariaValue = shallowRef(0);
+
+        const bar = ScrollerUtils.createBar({
+            axis: props.axis,
+            getBox: () => props.boxRef,
+            getTrack: () => trackRef.value,
+            getThumb: () => thumbRef.value,
+            getOverlapCount: () => props.overlapCount,
+            getComputeProgressAtPoint: () => props.computeProgressAtPoint,
+            onDraggingChange: (next) => {
+                isDragging.value = next;
+            },
+        });
+
+        onScopeDispose(bar.stop);
+
+        const setTrackRef = (target: Element | ComponentPublicInstance | null) => {
+            trackRef.value = toElement(target);
+        };
+
+        const setThumbRef = (target: Element | ComponentPublicInstance | null) => {
+            thumbRef.value = toElement(target);
+        };
+
+        watchAfterRender([trackRef, () => props.axis], ([track, axis]) => {
+            if (!track) return;
+
+            return ScrollerUtils.observeTrackLength(track, axis, (length) => {
+                trackLength.value = length;
+            });
+        });
+
+        watchAfterRender([() => props.rootRef], ([root]) => {
+            if (!root) return;
+
+            root.addEventListener("click", bar.swallowClick, true);
+
+            return () => root.removeEventListener("click", bar.swallowClick, true);
+        });
+
+        const ratio = computed(() => ScrollerUtils.computeProgressRatio(props.metrics));
+
+        const thumbLength = computed(() => ScrollerUtils.computeThumbLength(props.metrics, trackLength.value));
+
+        const reportAriaValue = FunctionUtils.trailingThrottle((next: number) => {
+            ariaValue.value = Math.round(next * ARIA_VALUE_MAX);
+        }, ARIA_VALUE_THROTTLE_MS);
+
+        onScopeDispose(reportAriaValue.cancel);
+
+        watch(ratio, (next) => reportAriaValue(next), { immediate: true });
+
+        const renderProps = computed((): ScrollerBarRenderProps => {
+            const isScrolling = props.isAutoHiding && props.isScrolling;
+            const isHovered = props.isAutoHiding && props.isHovered;
+
+            return {
+                axis: props.axis,
+                ratio: ratio.value,
+                thumbLength: thumbLength.value,
+                thumbOffset: ScrollerUtils.computeThumbOffset(ratio.value, trackLength.value, thumbLength.value),
+                isDragging: isDragging.value,
+                isScrolling,
+                isHovered,
+                isShown: !props.isAutoHiding || isScrolling || isHovered || isDragging.value,
+            };
+        });
+
+        return () => {
+            const axis = props.axis;
+
+            return (
+                <div
+                    role="scrollbar"
+                    aria-controls={props.boxId}
+                    aria-orientation={ARIA_ORIENTATIONS[axis]}
+                    aria-valuemin={0}
+                    aria-valuemax={ARIA_VALUE_MAX}
+                    aria-valuenow={ariaValue.value}
+                    class={[
+                        ScrollerStyles.scrollerBar,
+                        ScrollerStyles.scrollerBarVariants[axis],
+                        props.isOverlaid
+                            ? ScrollerStyles.scrollerBarOverlaidVariants[axis]
+                            : ScrollerStyles.scrollerBarKeptVariants[axis],
+                    ]}
+                    style={props.isOverlaid ? { [axis === "x" ? "alignSelf" : "justifySelf"]: props.side } : undefined}
+                    onPointerdown={(e) => bar.press(e)}
+                >
+                    {callSlot(slots.renderBar, { renderProps: renderProps.value, setTrackRef, setThumbRef })}
+                </div>
+            );
+        };
+    },
+    {
+        name: "ScrollerBar",
+        slots: Object as SlotsType<ScrollerBarSlots>,
+        props: declareProps<ScrollerBarProps>({
+            axis: null,
+            boxId: null,
+            boxRef: null,
+            rootRef: null,
+            metrics: null,
+            isOverlaid: Boolean,
+            side: null,
+            isAutoHiding: Boolean,
+            isScrolling: Boolean,
+            isHovered: Boolean,
+            overlapCount: null,
+            computeProgressAtPoint: null,
+        }),
+    },
+);
 
 export const Scroller = defineComponent(
     (props: ScrollerProps, { slots }: SlotsContext<ScrollerSlots>) => {
-        const trackRef = shallowRef<HTMLDivElement>();
+        const generatedId = useId();
 
-        const metrics = shallowRef(ScrollerUtils.NO_METRICS);
-        const progressRatio = useTwoWay(props, "progress", ScrollerUtils.RATIO_MIN);
+        const rootRef = shallowRef<HTMLDivElement>();
+        const boxRef = shallowRef<HTMLDivElement>();
+        const metrics = shallowRef(ScrollerUtils.NO_BOX_METRICS);
+        const isScrolling = shallowRef(false);
+        const isHovered = shallowRef(false);
+        const hasFocusable = shallowRef(false);
 
-        let reportedRatio = ScrollerUtils.RATIO_MIN;
+        const progress = useTwoWay(props, "progress", ScrollerUtils.NO_PROGRESS);
 
         const getOverlapCount = () => props.overlapCount ?? SCROLLER_DEFAULTS.overlapCount;
+        const getPadding = () => props.padding ?? SCROLLER_DEFAULTS.padding;
+        const getIsAutoHiding = () => props.isAutoHiding ?? SCROLLER_DEFAULTS.isAutoHiding;
+        const getHideDelayMs = () => props.hideDelayMs ?? SCROLLER_DEFAULTS.hideDelayMs;
 
-        const stepper: ScrollerStepper = {
-            getIsAtStart: () => ScrollerUtils.getIsAtStart(metrics.value),
-            getIsAtEnd: () => ScrollerUtils.getIsAtEnd(metrics.value),
-            stepToPrevious: () => ScrollerUtils.stepTo(trackRef.value, "previous", getOverlapCount()),
-            stepToNext: () => ScrollerUtils.stepTo(trackRef.value, "next", getOverlapCount()),
-        };
+        const overflow = computed(() => ({
+            x: props.overflowX ?? SCROLLER_DEFAULTS.overflowX,
+            y: props.overflowY ?? SCROLLER_DEFAULTS.overflowY,
+        }));
 
-        watchAfterRender([trackRef], ([track]) => {
-            if (!track) return undefined;
+        const barSides = computed(() => ({
+            x: props.barSideX ?? SCROLLER_DEFAULTS.barSideX,
+            y: props.barSideY ?? SCROLLER_DEFAULTS.barSideY,
+        }));
 
-            return ScrollerUtils.observe(track, (next) => {
-                if (!getIsSameMetrics(metrics.value, next)) metrics.value = next;
-            });
+        const scrollingAxes = computed(() => SCROLLER_AXES.filter((axis) => overflow.value[axis] !== "hidden"));
+
+        const createStepper = (axis: ScrollerAxis): ScrollerStepper => ({
+            getIsAtStart: () => ScrollerUtils.getIsAtStart(metrics.value[axis]),
+            getIsAtEnd: () => ScrollerUtils.getIsAtEnd(metrics.value[axis]),
+            stepToPrevious: () => ScrollerUtils.stepTo(boxRef.value, "previous", axis, getOverlapCount()),
+            stepToNext: () => ScrollerUtils.stepTo(boxRef.value, "next", axis, getOverlapCount()),
         });
+
+        const steppers = { x: createStepper("x"), y: createStepper("y") };
+
+        let reportedProgress = ScrollerUtils.NO_PROGRESS;
 
         watchAfterRender([metrics], ([current]) => {
-            reportedRatio = ScrollerUtils.computeProgressRatio(current);
+            const next = ScrollerUtils.computeProgress(current);
 
-            progressRatio.value = reportedRatio;
+            if (ScrollerUtils.getIsSameProgress(next, reportedProgress)) return;
+
+            reportedProgress = next;
+
+            progress.value = next;
         });
 
-        watchAfterRender([trackRef, progressRatio], ([track, ratio]) => {
-            if (!track || ratio === reportedRatio) return;
+        watchAfterRender([progress, boxRef], ([current, box]) => {
+            if (!box) return;
 
-            track.scrollTo({ left: ratio * ScrollerUtils.computeScrollRange(ScrollerUtils.readMetrics(track)) });
+            ScrollerUtils.scrollToRatios(box, {
+                x: current.x === reportedProgress.x ? undefined : current.x,
+                y: current.y === reportedProgress.y ? undefined : current.y,
+            });
         });
 
-        const handleFocus = (e: FocusEvent) => {
-            const track = trackRef.value;
+        watchAfterRender([boxRef], ([box]) => {
+            if (!box) return;
+
+            return ScrollerUtils.observe(box, (next) => {
+                if (!ScrollerUtils.getIsSameBoxMetrics(metrics.value, next)) metrics.value = next;
+            });
+        });
+
+        watchAfterRender([boxRef], ([box]) => {
+            if (!box) return;
+
+            return FocusManagerUtils.observeHasFocusable(box, (next) => {
+                hasFocusable.value = next;
+            });
+        });
+
+        watchAfterRender([rootRef, boxRef, getIsAutoHiding], ([root, box, isAutoHiding]) => {
+            if (!root || !box || !isAutoHiding) return;
+
+            return ScrollerUtils.observeActivity(root, box, {
+                getHideDelayMs,
+                onScrollingChange: (next) => {
+                    isScrolling.value = next;
+                },
+                onHoveredChange: (next) => {
+                    isHovered.value = next;
+                },
+            });
+        });
+
+        const handleFocusIn = (e: FocusEvent) => {
+            const box = boxRef.value;
             const target = e.target as HTMLElement | null;
 
-            if (!track || !target || target === track) return;
+            if (!box || !target || target === box) return;
 
-            track.scrollTo({
-                left: ScrollerUtils.computeRevealTarget(track, target, props.padding ?? SCROLLER_DEFAULTS.padding),
-            });
+            ScrollerUtils.reveal(box, target, getPadding(), scrollingAxes.value);
         };
 
-        const renderButton = (step: ScrollerStep, index: number) => (
-            <Fragment key={index}>{callSlot(slots.renderButton, { step, stepper })}</Fragment>
-        );
-
         return () => {
+            const id = props.id ?? generatedId;
             const gap = props.gap ?? SCROLLER_DEFAULTS.gap;
-            const padding = props.padding ?? SCROLLER_DEFAULTS.padding;
-            const steps = ScrollerUtils.getSteps(
+            const padding = getPadding();
+            const isAutoHiding = getIsAutoHiding();
+            const isBarOverlaid = props.isBarOverlaid ?? SCROLLER_DEFAULTS.isBarOverlaid;
+            const steps = ScrollerUtils.getBoxSteps(
                 props.buttonPlacement ?? SCROLLER_DEFAULTS.buttonPlacement,
-                ScrollerUtils.getIsScrollable(metrics.value),
+                overflow.value,
+                metrics.value,
+            );
+            const template = ScrollerUtils.computeGridTemplate(steps);
+            const areaTemplate = ScrollerUtils.computeAreaTemplate(barSides.value);
+            const runAxis = ScrollerUtils.getRunAxis(overflow.value.x, overflow.value.y);
+            const isBoxTabStop =
+                !hasFocusable.value &&
+                scrollingAxes.value.some((axis) => ScrollerUtils.getIsScrollable(metrics.value[axis]));
+
+            const renderButton = (axis: ScrollerAxis) => (step: ScrollerStep, index: number) => (
+                <Fragment key={index}>{callSlot(slots.renderButton, { step, stepper: steppers[axis], axis })}</Fragment>
             );
 
+            const renderSteps = (axis: ScrollerAxis, side: keyof ScrollerAxisSteps) =>
+                steps[axis][side].length > 0 ? (
+                    <div
+                        class={[ScrollerStyles.scrollerSteps, ScrollerStyles.scrollerStepsVariants[axis]]}
+                        style={{ gridArea: STEP_AREAS[axis][side], gap: `${gap}px` }}
+                    >
+                        {steps[axis][side].map(renderButton(axis))}
+                    </div>
+                ) : null;
+
+            const renderBar = (axis: ScrollerAxis) =>
+                slots.renderBar !== undefined && ScrollerUtils.getHasBar(overflow.value[axis], metrics.value[axis]) ? (
+                    <ScrollerBar
+                        key={axis}
+                        axis={axis}
+                        boxId={id}
+                        boxRef={boxRef.value}
+                        rootRef={rootRef.value}
+                        metrics={metrics.value[axis]}
+                        isOverlaid={isBarOverlaid}
+                        side={barSides.value[axis]}
+                        isAutoHiding={isAutoHiding}
+                        isScrolling={isScrolling.value}
+                        isHovered={isHovered.value}
+                        overlapCount={getOverlapCount()}
+                        computeProgressAtPoint={props.computeProgressAtPoint}
+                    >
+                        {{ renderBar: slots.renderBar } satisfies ScrollerBarSlots}
+                    </ScrollerBar>
+                ) : null;
+
             return (
-                <div class={ScrollerStyles.scrollerRoot} style={{ gap: `${gap}px` }}>
-                    {steps.leading.map(renderButton)}
+                <div
+                    ref={rootRef}
+                    class={ScrollerStyles.scrollerRoot}
+                    style={{
+                        gap: `${gap}px`,
+                        gridTemplateAreas: template.areas,
+                        gridTemplateColumns: template.columns,
+                        gridTemplateRows: template.rows,
+                    }}
+                >
+                    {renderSteps("y", "leading")}
+                    {renderSteps("x", "leading")}
 
                     <div
-                        ref={trackRef}
-                        class={ScrollerStyles.scrollerTrack}
-                        style={{ paddingBlock: `${padding}px`, paddingInlineStart: `${padding}px` }}
-                        onFocusin={handleFocus}
+                        class={ScrollerStyles.scrollerArea}
+                        style={{
+                            gridArea: ScrollerUtils.AREAS.area,
+                            gridTemplateAreas: areaTemplate.areas,
+                            gridTemplateColumns: areaTemplate.columns,
+                            gridTemplateRows: areaTemplate.rows,
+                        }}
                     >
-                        {slots.default?.()}
+                        <div
+                            id={id}
+                            ref={boxRef}
+                            tabindex={isBoxTabStop ? 0 : undefined}
+                            class={[
+                                ScrollerStyles.scrollerBox,
+                                ScrollerStyles.scrollerBoxVariants[runAxis],
+                                scrollingAxes.value.length > 1 && ScrollerStyles.scrollerBoxBothWays,
+                            ]}
+                            style={{
+                                overflowX: overflow.value.x,
+                                overflowY: overflow.value.y,
+                                ...(runAxis === "x"
+                                    ? { paddingBlock: `${padding}px`, paddingInlineStart: `${padding}px` }
+                                    : { paddingBlockStart: `${padding}px`, paddingInline: `${padding}px` }),
+                            }}
+                            onFocusin={handleFocusIn}
+                        >
+                            {slots.default?.()}
 
-                        <div class={ScrollerStyles.scrollerTrackEnd} style={{ flexBasis: `${padding}px` }} />
+                            <div class={ScrollerStyles.scrollerBoxEnd} style={{ flexBasis: `${padding}px` }} />
+                        </div>
+
+                        {renderBar("x")}
+                        {renderBar("y")}
                     </div>
 
-                    {steps.trailing.map(renderButton)}
+                    {renderSteps("x", "trailing")}
+                    {renderSteps("y", "trailing")}
                 </div>
             );
         };
@@ -96,10 +372,19 @@ export const Scroller = defineComponent(
         name: "Scroller",
         slots: Object as SlotsType<ScrollerSlots>,
         props: declareProps<ScrollerProps>({
+            "id": null,
             "gap": null,
             "padding": null,
             "buttonPlacement": null,
             "overlapCount": null,
+            "overflowX": null,
+            "overflowY": null,
+            "barSideX": null,
+            "barSideY": null,
+            "isAutoHiding": Boolean,
+            "hideDelayMs": null,
+            "isBarOverlaid": Boolean,
+            "computeProgressAtPoint": null,
             "progress": null,
             "onUpdate:progress": null,
         }),

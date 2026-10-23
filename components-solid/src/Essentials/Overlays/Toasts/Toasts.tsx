@@ -14,6 +14,7 @@ import { CSSUtils, GestureUtils, StringUtils } from "@thewaver/ss-utils";
 import { ElementFaderSolidUtils } from "../../../Abstracts/ElementFader/ElementFaderSolid.utils";
 import { ElementObserverSolidUtils } from "../../../Abstracts/ElementObserver/ElementObserverSolid.utils";
 import { InteractionTrackerSolidUtils } from "../../../Abstracts/InteractionTracker/InteractionTrackerSolid.utils";
+import { ShortcutSolidUtils } from "../../../Abstracts/Shortcut/ShortcutSolid.utils";
 import { useViewportContext } from "../../../Abstracts/Viewport/Viewport.context";
 import { access, accessSignal } from "../../../Utils/propUtils";
 import type { ToastsItemProps, ToastsProps } from "./ToastsSolid.types";
@@ -149,7 +150,11 @@ export const Toasts = <T,>(props: ToastsProps<T>) => {
         setEntryRefs((prev) => (prev[id] === element ? prev : { ...prev, [id]: element }));
     };
 
-    const getHotkey = createMemo(() => access(props.hotkey) ?? TOASTS_DEFAULTS.hotkey);
+    const getHotkey = createMemo(() => {
+        const hotkey = access(props.hotkey);
+
+        return hotkey === undefined ? TOASTS_DEFAULTS.hotkey : hotkey;
+    });
 
     const getAnnouncementPoliteness = createMemo(() => access(props.ariaLive) ?? TOASTS_DEFAULTS.ariaLive);
 
@@ -206,14 +211,28 @@ export const Toasts = <T,>(props: ToastsProps<T>) => {
         return entryIds;
     }, []);
 
+    let focusRoute: ReturnType<typeof ToastUtils.createFocusRoute> | undefined;
+
     createEffect(() => {
-        const hotkey = getHotkey();
         const root = getRootRef();
 
         if (!root) return;
 
-        onCleanup(ToastUtils.observeHotkey(root, hotkey));
+        const route = ToastUtils.createFocusRoute(root);
+
+        focusRoute = route;
+
+        onCleanup(() => {
+            route.stop();
+            focusRoute = undefined;
+        });
     });
+
+    ShortcutSolidUtils.createBinding(
+        () => getHotkey() ?? undefined,
+        () => false,
+        () => focusRoute?.enter(),
+    );
 
     createEffect(() => {
         const [getToasts, setToasts] = toastsSignal;

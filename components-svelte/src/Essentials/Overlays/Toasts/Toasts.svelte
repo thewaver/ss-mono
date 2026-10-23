@@ -12,6 +12,7 @@
 
     import { ElementObserverSvelteUtils } from "../../../Abstracts/ElementObserver/ElementObserverSvelte.utils.svelte.js";
     import { InteractionTrackerSvelteUtils } from "../../../Abstracts/InteractionTracker/InteractionTrackerSvelte.utils.svelte.js";
+    import { ShortcutSvelteUtils } from "../../../Abstracts/Shortcut/ShortcutSvelte.utils.svelte.js";
     import { getViewportContext } from "../../../Abstracts/Viewport/Viewport.context.js";
     import { attachPortal } from "../../../Utils/portalUtils.js";
     import { toStyle } from "../../../Utils/styleUtils.js";
@@ -36,7 +37,7 @@
     const dir = $derived(props.dir ?? TOASTS_DEFAULTS.dir);
     const overflow = $derived(props.overflow ?? TOASTS_DEFAULTS.overflow);
     const margins = $derived(props.margins ?? DEFAULT_MARGINS);
-    const hotkey = $derived(props.hotkey ?? TOASTS_DEFAULTS.hotkey);
+    const hotkey = $derived(props.hotkey === undefined ? TOASTS_DEFAULTS.hotkey : props.hotkey);
     const politeness = $derived(props.ariaLive ?? TOASTS_DEFAULTS.ariaLive);
     const stackAlignment = $derived(ToastUtils.computeStackAlignment(alignment, dir));
     const swipeDirection = $derived(
@@ -92,14 +93,28 @@
         });
     });
 
+    let focusRoute: ReturnType<typeof ToastUtils.createFocusRoute> | undefined;
+
     $effect(() => {
         const element = root;
-        const key = hotkey;
 
         if (!element) return;
 
-        return untrack(() => ToastUtils.observeHotkey(element, key));
+        const route = untrack(() => ToastUtils.createFocusRoute(element));
+
+        focusRoute = route;
+
+        return () => {
+            route.stop();
+            focusRoute = undefined;
+        };
     });
+
+    ShortcutSvelteUtils.createBinding(
+        () => hotkey ?? undefined,
+        () => false,
+        () => focusRoute?.enter(),
+    );
 
     $effect(() => {
         const trimmed = ToastUtils.computeOverflowTrim(toasts, props.limit, overflow);

@@ -2,7 +2,7 @@
 import { useModel } from "vue";
 
 import { Scroller } from "@thewaver/ss-components-vue";
-import type { ScrollerButtonPlacement } from "@thewaver/ss-components-vue";
+import type { ScrollerButtonPlacement, ScrollerProgress } from "@thewaver/ss-components-vue";
 import * as styles from "@thewaver/ss-playground/App/Pages/ScrollerPage/ScrollerPage.css";
 import { FOCUS_RING_WIDTH } from "@thewaver/ss-playground/App/Theme.css";
 
@@ -13,8 +13,8 @@ const SCROLLER_GAP = 10;
 
 type Props = ScrollerExampleProps & {
     "buttonPlacement"?: ScrollerButtonPlacement;
-    "progress"?: number;
-    "onUpdate:progress"?: (ratio: number) => void;
+    "progress"?: ScrollerProgress;
+    "onUpdate:progress"?: (progress: ScrollerProgress) => void;
 };
 
 const props = defineProps<Props>();

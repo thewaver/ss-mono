@@ -50,6 +50,7 @@ export const Tooltip = defineComponent(
         );
 
         DismisserVueUtils.useLayer(isShown, {
+            isPassive: true,
             getRoots: () => [props.anchorRef, contentRef.value],
             onDismiss: () => {
                 hoverIntent.cancel();

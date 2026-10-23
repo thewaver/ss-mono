@@ -1,8 +1,13 @@
-import type { Tab } from "@thewaver/ss-components";
+import type { ScrollerOverflow, Tab } from "@thewaver/ss-components";
 
 export type BaseScrollerExampleValues = {
     labels: string[];
     overlapCount?: number;
+    overflowX?: ScrollerOverflow;
+    overflowY?: ScrollerOverflow;
+    isAutoHiding?: boolean;
+    hideDelayMs?: number;
+    isBarOverlaid?: boolean;
 };
 
 export type BaseScrollerExampleProps = BaseScrollerExampleValues;

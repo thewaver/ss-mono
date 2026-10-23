@@ -54,6 +54,7 @@ export const Tooltip = (props: TooltipProps) => {
     const getBridge = createMemo(() => HoverIntentUtils.computeBridgeInsets(getPlacement(), access(props.offset)));
 
     DismisserSolidUtils.createLayer(getShouldShow, {
+        isPassive: true,
         getRoots: () => [access(props.anchorRef), getContentRef()],
         onDismiss: () => {
             hoverIntent.cancel();

@@ -14,6 +14,7 @@ import { CSSUtils, GestureUtils } from "@thewaver/ss-utils";
 import { ElementFaderVueUtils } from "../../../Abstracts/ElementFader/ElementFaderVue.utils";
 import { ElementObserverVueUtils } from "../../../Abstracts/ElementObserver/ElementObserverVue.utils";
 import { InteractionTrackerVueUtils } from "../../../Abstracts/InteractionTracker/InteractionTrackerVue.utils";
+import { ShortcutVueUtils } from "../../../Abstracts/Shortcut/ShortcutVue.utils";
 import { useViewportContext } from "../../../Abstracts/Viewport/Viewport.context";
 import { watchAfterRender } from "../../../Utils/effectUtils";
 import { callSlot, declareProps, useTwoWay } from "../../../Utils/propUtils";
@@ -174,8 +175,25 @@ export const Toasts = defineComponent(
             ToastUtils.announceArrivals(previous, ids, admitted.value, computeAnnouncement, getPoliteness());
         });
 
-        watchAfterRender([rootRef, () => props.hotkey ?? TOASTS_DEFAULTS.hotkey], ([root, hotkey]) =>
-            root ? ToastUtils.observeHotkey(root, hotkey) : undefined,
+        let focusRoute: ReturnType<typeof ToastUtils.createFocusRoute> | undefined;
+
+        watchAfterRender([rootRef], ([root]) => {
+            if (!root) return;
+
+            const route = ToastUtils.createFocusRoute(root);
+
+            focusRoute = route;
+
+            return () => {
+                route.stop();
+                focusRoute = undefined;
+            };
+        });
+
+        ShortcutVueUtils.useBinding(
+            () => (props.hotkey === undefined ? TOASTS_DEFAULTS.hotkey : (props.hotkey ?? undefined)),
+            false,
+            () => focusRoute?.enter(),
         );
 
         watchAfterRender([toasts, () => props.limit, getOverflow], ([list, limit, overflow]) => {

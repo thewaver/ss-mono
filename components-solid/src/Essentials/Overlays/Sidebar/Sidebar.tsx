@@ -92,6 +92,7 @@ export const Sidebar = (props: SidebarProps) => {
     });
 
     DismisserSolidUtils.createLayer(getIsPeeking, {
+        isPassive: true,
         getRoots: () => [getRootRef()],
         onDismiss: collapseHover,
     });

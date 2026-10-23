@@ -83,6 +83,31 @@ test("the stack has a keyboard route into it, and one back out", async ({ page }
     await expect(page.locator("#raiseInfo"), "Escape hands the focus back where it came from").toBeFocused();
 });
 
+/**
+ * The hotkey is a page shortcut like any other, so it belongs to the page and stays quiet while a dialog sits on top.
+ * The Playground's own command palette is a dialog every page has: with it open, the hotkey leaves focus in the
+ * palette's search field rather than pulling it out from under the dialog into a stack the dialog has sealed off.
+ */
+test("the hotkey stays quiet while a modal is open", async ({ page }) => {
+    const dialog = page.locator('[role="dialog"]');
+    const field = page.locator('[role="dialog"] [role="combobox"]');
+
+    await page.locator("#raiseInfo").click();
+    await expect(page.locator(TOASTS)).toHaveCount(1);
+
+    await page.keyboard.press("ControlOrMeta+K");
+    await expect(dialog, "the palette opens").toBeVisible();
+    await expect(field, "with focus in its search field").toBeFocused();
+
+    await page.keyboard.press("F8");
+
+    await expect(field, "the hotkey leaves focus where the dialog put it").toBeFocused();
+    expect(
+        await page.evaluate((selector) => document.activeElement?.matches(selector) ?? false, REGION),
+        "rather than on the stack beneath the dialog",
+    ).toBe(false);
+});
+
 test("the owner is told when a toast starts arriving and when it starts leaving", async ({ page }) => {
     await expect(page.locator(QUEUED)).toContainText("shown: 0");
 

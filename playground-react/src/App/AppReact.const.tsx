@@ -73,6 +73,10 @@ const InfiniteCorridorPage = lazyPage(
 const LabelPage = lazyPage(() => import("./Pages/LabelPage/LabelPage"), "LabelPage");
 const ListboxPage = lazyPage(() => import("./Pages/ListboxPage/ListboxPage"), "ListboxPage");
 const MenubarPage = lazyPage(() => import("./Pages/MenubarPage/MenubarPage"), "MenubarPage");
+const CommandPalettePage = lazyPage(
+    () => import("./Pages/Menus/CommandPalettePage/CommandPalettePage"),
+    "CommandPalettePage",
+);
 const FanMenuPage = lazyPage(() => import("./Pages/Menus/FanMenuPage/FanMenuPage"), "FanMenuPage");
 const FlyoutMenuPage = lazyPage(() => import("./Pages/Menus/FlyoutMenuPage/FlyoutMenuPage"), "FlyoutMenuPage");
 const MenuPage = lazyPage(() => import("./Pages/Menus/MenuPage/MenuPage"), "MenuPage");
@@ -282,6 +286,9 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
             {
                 name: "ShapeReveal",
                 component: () => <ShapeRevealPage />,
+            },
+            {
+                name: "Shortcut",
             },
             {
                 name: "SignalMirror",
@@ -503,6 +510,10 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
             {
                 name: "Menus",
                 children: [
+                    {
+                        name: "CommandPalette",
+                        component: () => <CommandPalettePage />,
+                    },
                     {
                         name: "FanMenu",
                         component: () => <FanMenuPage />,

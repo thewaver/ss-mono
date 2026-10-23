@@ -1,20 +1,46 @@
-import { globalStyle, style } from "@vanilla-extract/css";
+import { globalStyle, style, styleVariants } from "@vanilla-extract/css";
 
 export const scrollerRoot = style({
-    display: "flex",
-    flexDirection: "row",
+    display: "grid",
     alignItems: "center",
+    justifyItems: "center",
     minWidth: 0,
     maxWidth: "100%",
+    maxHeight: "100%",
+    isolation: "isolate",
 });
 
-export const scrollerTrack = style({
+export const scrollerSteps = style({
+    display: "flex",
+    alignItems: "center",
+});
+
+export const scrollerStepsVariants = styleVariants({
+    x: {
+        flexDirection: "row",
+    },
+    y: {
+        flexDirection: "column",
+    },
+});
+
+export const scrollerArea = style({
+    display: "grid",
+    gridTemplateAreas: `"box yBar" "xBar corner"`,
+    gridTemplateColumns: "minmax(0, 1fr) auto",
+    gridTemplateRows: "minmax(0, 1fr) auto",
+    justifySelf: "stretch",
+    minWidth: 0,
+    minHeight: 0,
+    maxHeight: "100%",
+});
+
+export const scrollerBox = style({
+    "gridArea": "box",
     "position": "relative",
     "display": "flex",
-    "flexGrow": 1,
     "minWidth": 0,
-    "overflowX": "auto",
-    "overflowY": "hidden",
+    "minHeight": 0,
     "scrollbarWidth": "none",
     "scrollBehavior": "smooth",
 
@@ -25,11 +51,64 @@ export const scrollerTrack = style({
     },
 });
 
-globalStyle(`${scrollerTrack}::-webkit-scrollbar`, {
+globalStyle(`${scrollerBox}::-webkit-scrollbar`, {
     display: "none",
 });
 
-export const scrollerTrackEnd = style({
+export const scrollerBoxVariants = styleVariants({
+    x: {
+        flexDirection: "row",
+    },
+    y: {
+        flexDirection: "column",
+    },
+});
+
+export const scrollerBoxBothWays = style({
+    alignItems: "flex-start",
+});
+
+export const scrollerBoxEnd = style({
     flexGrow: 0,
     flexShrink: 0,
+});
+
+export const scrollerBar = style({
+    position: "relative",
+    zIndex: 1,
+    display: "flex",
+    minWidth: 0,
+    minHeight: 0,
+    touchAction: "none",
+    userSelect: "none",
+    WebkitUserSelect: "none",
+});
+
+export const scrollerBarVariants = styleVariants({
+    x: {
+        flexDirection: "row",
+    },
+    y: {
+        flexDirection: "column",
+    },
+});
+
+export const scrollerBarKeptVariants = styleVariants({
+    x: {
+        gridArea: "xBar",
+    },
+    y: {
+        gridArea: "yBar",
+    },
+});
+
+export const scrollerBarOverlaidVariants = styleVariants({
+    x: {
+        gridArea: "box",
+        alignSelf: "end",
+    },
+    y: {
+        gridArea: "box",
+        justifySelf: "end",
+    },
 });

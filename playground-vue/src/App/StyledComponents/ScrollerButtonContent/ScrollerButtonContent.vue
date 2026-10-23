@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import {
+    SCROLLER_GLYPH_POINTS,
+    SCROLLER_GLYPH_VIEW_BOX,
+} from "@thewaver/ss-playground/App/StyledComponents/ScrollerButtonContent/ScrollerButtonContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/ScrollerButtonContent/ScrollerButtonContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
@@ -20,6 +24,11 @@ const layerClass = useLayerClass();
         ]"
         aria-hidden="true"
     >
-        {{ step === "previous" ? "‹" : "›" }}
+        <svg
+            :class="[styles.scrollerButtonGlyph, styles.scrollerButtonGlyphVariants[axis ?? 'x'][step]]"
+            :viewBox="SCROLLER_GLYPH_VIEW_BOX"
+        >
+            <polyline :points="SCROLLER_GLYPH_POINTS" />
+        </svg>
     </div>
 </template>

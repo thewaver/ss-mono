@@ -87,6 +87,7 @@ export const Sidebar = defineComponent(
         });
 
         DismisserVueUtils.useLayer(isPeeking, {
+            isPassive: true,
             getRoots: () => [rootRef.value],
             onDismiss: collapseHover,
         });

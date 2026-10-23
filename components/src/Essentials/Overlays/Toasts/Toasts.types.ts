@@ -1,5 +1,7 @@
 import type { CSSMargin, Size2d, SwipeDirection } from "@thewaver/ss-utils";
 
+import type { Shortcut } from "../../../Abstracts/Shortcut/Shortcut.types";
+
 export type ToastsVerticalAlignment = "top" | "middle" | "bottom";
 
 export type ToastsHorizontalAlignment = "left" | "center" | "right";
@@ -55,8 +57,12 @@ export type BaseToastsValues = {
     ariaLabel: string;
     /** How insistently new toasts are announced — politely, after whatever is being read, or immediately. */
     ariaLive?: ToastsAriaLive;
-    /** A key that moves focus into the toast region, so a reader can reach a toast without hunting for it. */
-    hotkey?: string;
+    /**
+     * A shortcut that moves focus into the toast region from anywhere on the page, so a reader can reach a toast
+     * without hunting for it; Escape inside hands focus back. F8 by default, and `null` listens for nothing. It goes
+     * through the page-wide shortcut register, so it is quiet while a layer such as a `Modal` sits on top.
+     */
+    hotkey?: Shortcut | null;
     /** Which corner or edge of the screen the toasts gather at. */
     alignment?: ToastsAlignment;
     /** Which way the stack grows, and so whether a new toast joins at the near end or the far one. */

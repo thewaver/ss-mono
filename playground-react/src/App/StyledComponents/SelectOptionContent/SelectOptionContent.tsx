@@ -27,9 +27,13 @@ export const PageSelectOptionContent = (props: PropsWithChildren<SelectOptionCon
                 {props.description ? <div className={styles.selectOptionDescription}>{props.description}</div> : null}
             </div>
 
-            <div className={styles.selectOptionMark} aria-hidden="true">
-                ✓
-            </div>
+            {props.shortcut ? <div className={styles.selectOptionShortcut}>{props.shortcut}</div> : null}
+
+            {(props.hasMark ?? true) ? (
+                <div className={styles.selectOptionMark} aria-hidden="true">
+                    ✓
+                </div>
+            ) : null}
         </div>
     );
 };

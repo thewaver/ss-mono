@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, shallowRef, watch } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 
 import { SharedTooltip, Sidebar, Tree, useViewportContext } from "@thewaver/ss-components-vue";
 import type { TreeNode } from "@thewaver/ss-components-vue";
@@ -12,6 +12,7 @@ import { DEFAULT_PAGE_VIEW, toBaseRoute } from "@thewaver/ss-playground/App/Page
 import type { ComponentConfig, MenuNodeConfig } from "./App.types";
 import { AppUtils } from "./App.utils";
 import { GALLERY_ROUTE, GETTING_STARTED_ROUTE, MENU_EDGE, MENU_ID, SEARCH_FIELD_WIDTH } from "./AppVue.const";
+import PageAppCommands from "./PageComponents/AppCommands/PageAppCommands.vue";
 import PageBuildProgress from "./PageComponents/BuildProgress/PageBuildProgress.vue";
 import PageTextField from "./PageComponents/Field/PageTextField.vue";
 import PageFrameworkMenu from "./PageComponents/FrameworkMenu/FrameworkMenu.vue";
@@ -28,9 +29,14 @@ import PageDependencies from "./PageDependencies.vue";
 import PageGlideFloater from "./StyledComponents/GlideFloater/PageGlideFloater.vue";
 import PageTreeNodeContent from "./StyledComponents/TreeNodeContent/PageTreeNodeContent.vue";
 
+const VISIBLE_COMPONENT_CONFIGS = AppUtils.flattenConfigs(AppUtils.VISIBLE_MENU_CONFIGS);
+
+const VISIBLE_PAGE_NAMES = VISIBLE_COMPONENT_CONFIGS.map((config) => config.name);
+
 const viewportAnchor = defineModel<ViewportAnchor>("viewportAnchor", { required: true });
 
 const route = useRoute();
+const router = useRouter();
 
 const searchTerm = shallowRef("");
 const showsDescriptionOnly = shallowRef(false);
@@ -114,6 +120,12 @@ const setExpanded = (next: unknown[]) => {
     else browseExpanded.value = next as MenuNodeConfig[];
 };
 
+const goToPage = (pageName: string) => {
+    const config = VISIBLE_COMPONENT_CONFIGS.find((candidate) => candidate.name === pageName);
+
+    if (config) void router.push(AppUtils.toPageHref(config, pageView.value));
+};
+
 const refuseSelection = () => undefined;
 
 const computeNodeText = (node: TreeNode<MenuNodeConfig>) => node.value.name;
@@ -121,6 +133,14 @@ const computeNodeText = (node: TreeNode<MenuNodeConfig>) => node.value.name;
 
 <template>
     <div :class="styles.appFrame">
+        <PageAppCommands
+            :page-names="VISIBLE_PAGE_NAMES"
+            @go-to-about="() => void router.push('/')"
+            @go-to-page="goToPage"
+            @expand-all="() => setExpanded(AppUtils.collectBranchValues(filteredNodes))"
+            @collapse-all="() => setExpanded([])"
+        />
+
         <PageBuildProgress v-if="IS_BUILD_PROGRESS_SHOWN" />
 
         <div :class="styles.appContent">

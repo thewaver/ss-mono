@@ -286,9 +286,10 @@ This file, the rules and `decisions.md` are written for Claude; `backlog.md` and
   into or out of either is the user's decision. **An idea or sketch goes in _Open discussion_**, never in the rules or
   `decisions.md`, where it would read as settled — including one carrying the user's verdict, so it is not put to them
   twice.
-- **`brief.md`** — the same outstanding work, one line per fault, grouped by kind (missing components, pending
-  abstractions, blockers, things not built, accessibility gaps, planned projects), each line pointing at a numbered
-  `backlog.md` item. **Every fault**, not a selection, and no reasoning.
+- **`brief.md`** — the same outstanding work, one line per fault, grouped by kind (missing components, blockers,
+  things not built, accessibility gaps, planned projects, waiting on browser support), each line pointing at a
+  numbered `backlog.md` item. **A fault waiting on browser support goes in that section whatever its kind**, so the
+  backlog's _"postponed until the platform catches up"_ items and the section hold the same set. **Every fault**, not a selection, and no reasoning.
 
 **`backlog.md` and `brief.md` change together, always**; where they differ, `backlog.md` is the truth and the brief is
 corrected. **A closed or dropped item is deleted outright** and the rest renumbered; a decision it settled moves to the

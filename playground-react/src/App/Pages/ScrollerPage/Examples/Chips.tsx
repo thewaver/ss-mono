@@ -1,5 +1,5 @@
 import { Scroller } from "@thewaver/ss-components-react";
-import type { ScrollerButtonPlacement } from "@thewaver/ss-components-react";
+import type { ScrollerButtonPlacement, ScrollerProgress } from "@thewaver/ss-components-react";
 import * as styles from "@thewaver/ss-playground/App/Pages/ScrollerPage/ScrollerPage.css";
 import { FOCUS_RING_WIDTH } from "@thewaver/ss-playground/App/Theme.css";
 
@@ -10,7 +10,7 @@ const SCROLLER_GAP = 10;
 
 type Props = ScrollerExampleProps & {
     buttonPlacement?: ScrollerButtonPlacement;
-    progress?: readonly [number, (ratio: number) => void];
+    progress?: readonly [ScrollerProgress, (progress: ScrollerProgress) => void];
 };
 
 export const ChipsExample = (props: Props) => {

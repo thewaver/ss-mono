@@ -97,6 +97,7 @@
     DismisserSvelteUtils.createLayer(
         () => isShown,
         {
+            isPassive: true,
             getRoots: () => [props.anchorRef, contentRef],
             onDismiss: () => {
                 hoverIntent.cancel();

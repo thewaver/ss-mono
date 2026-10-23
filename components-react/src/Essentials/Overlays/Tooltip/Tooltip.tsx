@@ -49,6 +49,7 @@ export const Tooltip = (props: TooltipProps) => {
     const bridge = HoverIntentUtils.computeBridgeInsets(placement, props.offset);
 
     DismisserReactUtils.useLayer(isShown, {
+        isPassive: true,
         getRoots: () => [props.anchorRef, contentRef.current],
         onDismiss: () => {
             hoverIntent.cancel();

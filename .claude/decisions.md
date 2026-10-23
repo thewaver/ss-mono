@@ -2423,6 +2423,146 @@ which the function is never told, so a translucent color is measured as though i
 **The ratio itself is not exported.** `toLuminance` and `toContrastRatio` are module-private, because what was
 asked for was one function.
 
+### What the library covers, and the controls it will not get
+
+**What the library lacks cannot be inferred from the Playground**, and reading it as the evidence for what is missing
+is the trap: every control on every page and in every props panel is now a library control, so the
+Playground has nothing left to say about what the library lacks.
+
+**The library is the HTML layer, and that is what decides whether a thing belongs here at all.** The user's
+statement of scope: accessibility, layout and structure — the half that Canvas and WebGL game engines neglect.
+Anything that wants a drawing surface is the consumer's, and which one they reach for is theirs to choose. So a
+sprite sheet, a particle system and a renderer are all out of scope by construction rather than by priority,
+and a proposal that begins "the library could draw…" has already answered itself.
+
+**Dropped by the user, so not re-proposed:** a segmented control and a rating input, each now a variant on the
+Radio page, which is the whole of what it was; and the pure-paint family of `Skeleton`, `Avatar`, `Badge`, `Card`
+and `Icon`, which was never a component question — the Playground already builds three of them as `Surface`
+examples. None of these is an accepted limit, because none is a fault; they are simply not wanted.
+
+What the built controls left behind as gaps is recorded in `decisions.md` rather than reopened as items: a
+breadcrumb trail cannot collapse when it is too long, a tag input has no cap, no in-place editing, no
+paste-a-delimited-list and no reordering, a split pane cannot collapse a pane or reset on a double-click, and a stepper draws no connector of its own
+and does not enforce that a linear flow stays linear.
+
+**_Elsewhere._** Ark UI's set is the widest of the headless libraries and is the most useful scope check
+available: it has a tree view, a pagination component, a **segment group** — a segmented control as its
+own component, distinct from both tabs and toggle group — and a `Field` plus a `Fieldset`. It has no
+table and no data grid. TanStack Table is what that gap gets filled with, and it is a separate project
+with its own release cycle, the scope check for what a data grid is.
+
+- **Breadcrumbs is owned by at least one of them:** React Aria ships `Breadcrumbs`.
+- **Pagination is owned because it is arithmetic, not paint.** Ark UI's takes `page`, `pageSize`,
+  `count`, `siblingCount` and `boundaryCount`, computes the visible page range and where the gaps fall,
+  and switches between buttons and links with a `type` prop. That is more than a composition of `Button`,
+  which is the argument the list lost — `Paginator` is built, and where it departs from that shape is in
+  `decisions.md`.
+- **Worked examples of each, read on 2026-08-15**, which is what the user's ordering above was taken from:
+  [TanStack Table](https://tanstack.com/table/latest/docs/overview),
+  [React Aria Breadcrumbs](https://react-aria.adobe.com/Breadcrumbs/useBreadcrumbs.html),
+  [Ark UI Segment Group](https://ark-ui.com/docs/components/segment-group),
+  [Ark UI Splitter](https://ark-ui.com/docs/components/splitter),
+  [cmdk](https://cmdk.paco.me),
+  [Ark UI Tags Input](https://ark-ui.com/docs/components/tags-input),
+  [Ark UI Rating Group](https://ark-ui.com/docs/components/rating-group) and
+  [Ark UI Steps](https://ark-ui.com/docs/components/steps). Ark UI carries five of the eight, which is the
+  scope check this item already leaned on. Two details from those pages are worth keeping: the splitter
+  admits non-panel children such as toolbars and status bars inside its root, so it is not simply two boxes
+  and a drag; and the tags input sets the mobile keyboard's Enter key to read "Done", which is the kind of
+  thing only found by using one on a phone.
+
+### The shortcut register: a binding belongs to a layer
+
+Built for `CommandPalette`, in `Abstracts/Shortcut`. A shortcut is data — `{ key, modifiers? }`
+— and one document `keydown` listener serves every binding, attached with the first and removed with the last.
+
+- **A binding belongs to the `Dismisser` layer on top when its owner's first effect runs**, and keeps it. Read at
+  setup it would miss a `Modal`'s layer, since a modal's content is created before the modal adds its layer; kept for
+  good so a list re-registering while another layer is open stays on its own. It fires only while its layer is on
+  top, so page shortcuts are quiet under a `Modal` — including the palette's own while it is open.
+- **Tooltips are passive layers** (`isPassive`, skipped by `DismisserUtils.getTopLayer`), or every shortcut would go
+  dead while any tooltip showed, keyboard-focus tooltips included. A peeking `Sidebar` is not passive yet.
+- **Matching**: the key without regard to letter case and the modifiers exactly, except that Shift is not compared
+  for a symbol or digit unless asked for, since the layout decides whether typing it needs Shift. When the key
+  pressed types no plain ASCII character (Option+K gives ˚, a Cyrillic layout gives л) a letter or digit is matched by
+  its physical key; ASCII layouts such as AZERTY keep their own letters. A binding does not fire on an event already
+  `preventDefault`ed or during IME composition, and prevents the browser's action when it does. Two bindings of one
+  shortcut on one layer: the later one fires.
+- **WCAG 2.1.4 covers single characters only** — no modifier but Shift — which never fire in an editable field and
+  warn on registration. Named keys such as F8 are not characters, and `Toasts`' F8 must keep working in a field.
+- **Warnings print once per message**, since re-registration would otherwise repeat them, and on every build, as
+  `Select`'s do.
+- **Which layer a binding takes, per framework.** Solid and Vue read it on the owner's first effect after mounting.
+  React runs a child's effects before its parent's, so a binding inside a `Modal` opened in the same render would read
+  the layer below; React defers the first read to a microtask, after every effect of that render. Vue's
+  `DismisserVueUtils.useLayer` registers one stable layer object per component (it used to build a new one on each
+  opening), since bindings compare layers by identity. React re-registers only when the list of shortcuts changes and
+  reads what each does from the latest render.
+- **`Toasts`' `hotkey` is a `Shortcut | null` on the register** (default `{ key: "F8" }`, `null` for none), so it is
+  quiet under a `Modal` like every page shortcut — it used to move focus out of a modal's trap. The Escape back is
+  `ToastUtils.createFocusRoute`, listening on the stack itself.
+
+### The Playground frame has its own command palette
+
+The user's request, so the shortcuts can be tried from any page. `PageAppCommands` is mounted in the frame and owns
+`mod+K`; the CommandPalette page's Default example therefore opens from its button only, since two bindings of one
+shortcut on one layer warn and only the later fires. Its commands: Go to About (Alt+Shift+H), switch to the next theme
+(Alt+Shift+T), expand and collapse every menu folder (Alt+Shift+E, Alt+Shift+C), and a "Go to …" per visible page with
+no shortcut. Alt+Shift was chosen on purpose: on a Mac it types a special character, which exercises the register's
+physical-key fallback. The page's "Clear the notes" moved to Alt+Shift+X to keep Alt+Shift+C for the frame.
+
+### `CommandPalette`: `Modal`, a `TextField` and a library-owned listbox
+
+A search over every action in the application, opened by a shortcut, and a library component
+rather than a Playground recipe — the `Button` precedent: making consumers assemble the wiring themselves was tried
+and reverted. It composes what exists: `Modal` seals the page, `TextInput` carries the combobox wiring, and a grouped
+list that can be windowed shows results from several sources under labels. What separates it from `Menu` is that a
+shortcut opens it and it holds every action rather than the few belonging to one element.
+
+The user's design, settled point by point before it was built:
+
+- **Actions are `Select`'s records plus a shortcut**: `SelectOptionRecord<T>` with an optional `shortcut`, grouped
+  with `SelectOptionGroupRecord`. Picking one calls `onActivate(value)`, as `Menu` does. Filtering is the consumer's,
+  the split `Select` already makes: they narrow the actions from the query, the palette shows what it is given.
+- **Open state is the usual two-way `visibility`**, so anything can open it.
+- **A `shortcut` prop opens it, and each action's `shortcut` runs that action** — while the palette is on the page,
+  open or not; that is the point of listing them. Both go through a new page-wide shortcut register in `Abstracts`,
+  built the way `Dismisser` keeps its stack: a shortcut belongs to the layer it was registered from and fires only
+  while that layer is on top, so page shortcuts stay quiet under a `Modal`. Two registrations of one shortcut warn in
+  development.
+- **A shortcut is data, not a string**: `{ key, modifiers? }`, `key` as `KeyboardEvent.key` names it (matched without
+  regard to letter case), `modifiers` from `"mod" | "ctrl" | "alt" | "shift" | "meta"`, `"mod"` meaning Command on
+  Apple platforms and Control elsewhere. Data because the palette draws each action's shortcut, and the painter needs
+  the parts to write them in its own words (`⌘⇧K`, `Ctrl+Shift+K`) — the library ships no English.
+- **WCAG 2.1.4 Character Key Shortcuts**: a shortcut with no modifier but Shift never fires while focus is in an
+  editable field, and the library warns in development when one is registered, since such a shortcut must be possible
+  to turn off or remap.
+- **No key sequences** (G then I) in this version.
+- **`Toasts`' `hotkey` moves onto the register**, taking the same shortcut data instead of a bare key — a breaking
+  change, free before 0.1.0.
+
+What the build added on its own account:
+
+- **`TextField`, not `TextInput`**: `TextInput`'s suggestions open in a popover and highlight nothing until the reader
+  moves into them; a palette highlights the first action so Enter runs it. The list is a library-owned
+  `role="listbox"` around `ListboxOptions` with an `"active_descendant"` cursor.
+- **Three required names** — the dialog, the combobox and the listbox — and a single `ariaLabel` for the dialog
+  rather than `Modal`'s `ariaLabel`-or-`ariaLabelledBy` pair.
+- **The option painter is handed the action's shortcut resolved for the platform**, in a `*RenderProps` object since
+  it carries a payload; group headers get no flags, since nothing is ever selected. `aria-keyshortcuts` is not
+  written yet: it needs option-level attributes in `ListboxOptions`, and until then a screen reader hears the painted
+  shortcut as part of the option's name.
+- **Tab stays with the `Modal`'s focus trap** rather than closing the palette, as the list cursor's Tab would.
+- **The query empties once the closing fade has finished.** React, Vue and Svelte mark the modal unsettled in the
+  update that closes the palette, `Select`'s guard, because there the palette's effect runs before the `Modal` reports
+  its fade has begun and would otherwise empty the query first.
+- **Per framework**: Vue's slots hand over `{ action, renderProps }`, `{ group }`, `{ renderContent, group }` and
+  `{ renderField, renderOptions, visibilityTarget, transitionDurationMs }`, the last two made once so they keep their
+  identity for `<component :is>`. Svelte cannot return a snippet from a function, so the Playground's shared panel
+  painter there takes a fifth `hasActions` argument and each palette wraps it.
+- **The Playground leaves it out of the navigation's hover previews**, which sit in a passive tooltip and would
+  register live shortcuts while the menu entry is hovered.
+
 ### What the verification suite cannot see
 
 A green `verify:dom` reads as broader coverage than it is, so the shape of its blind spots is kept here.
@@ -5078,7 +5218,7 @@ they never saw.
 
 ### Arbitrary item placement: `Abstracts/Placement`, and `Menu` as the first consumer
 
-The first half of `backlog.md` item 14. A control's items can be placed anywhere rather than along a line, and
+The first half of `backlog.md` item 13. A control's items can be placed anywhere rather than along a line, and
 the vocabulary for saying where lives in an abstract so the next control can use the same one.
 
 **A placement is a center, a size, an optional turn and an optional depth, all in fractions of the container's
@@ -5152,7 +5292,7 @@ its own chrome, or gets neither.
 
 ### Concentric submenus: `computeLayout` learns where it is, and a submenu borrows its parent's anchor
 
-The second piece of `backlog.md` item 14. A submenu of a laid-out menu is drawn as a wider ring round the
+The second piece of `backlog.md` item 13. A submenu of a laid-out menu is drawn as a wider ring round the
 same center rather than hanging off the item that opened it, so a wheel stays one wheel however deep it goes.
 
 **`computeLayout` takes one object rather than a run of arguments, and the reason is the third one.**
@@ -5681,7 +5821,7 @@ all eleven, which is what lets a consumer offer the whole set by key.
 
 ### `Paginator` takes a layout, and the placed box moves into the abstract
 
-The proving pass of `backlog.md` item 14, against the control the item named as the strongest candidate. A
+The proving pass of `backlog.md` item 13, against the control the item named as the strongest candidate. A
 paginator is arithmetic over a flat list, so a layout is the only thing that changes: the steps, the pages and
 the ellipses go round a dial in the order they already had, and nothing about the counting, the addresses or
 the labels is touched.
@@ -5733,7 +5873,7 @@ the box. So the sector is vocabulary a layout offers and a painter may decline, 
 control has to understand.
 
 **What the pass did not strain, which is worth knowing before the next consumer.** `PlacementUtils.pickIndex`
-still has no caller — a paginator has no gesture that picks by direction, so the loose end item 14 records is
+still has no caller — a paginator has no gesture that picks by direction, so the loose end item 13 records is
 untouched. Nor did anything about levels move: a paginator is one level and always will be, so the concentric
 machinery went unexercised.
 
@@ -5833,7 +5973,7 @@ arrangement is drawn from it — and both suites assert the walk rather than any
 
 ### Every layout sample lives in one place, and none of them is a menu's
 
-The user's call, taken while `backlog.md` item 14's proving pass was still open. `Samples/Menu/Layouts` was
+The user's call, taken while `backlog.md` item 13's proving pass was still open. `Samples/Menu/Layouts` was
 named when a menu was the only thing that had ever asked for a layout; by the end of the pass it held a
 honeycomb and a radial tree, and eleven consumers imported it of which three were menus. It is now
 `Samples/Placement/Layouts`, and the arrangements that came in with `Formation` are in it too.
@@ -6201,6 +6341,11 @@ emits an elliptical arc when it is given one and behaves exactly as before when 
 every wedge painter goes through `getSectorPath`, so only that function and the sector type would move — but
 a band of constant thickness round an ellipse is not the gap between two concentric ellipses, so the wedges
 would read as uneven in a way they never do on a circle.
+
+### The fan places tilted boxes, not wedges
+
+The user's call. The wedge vocabulary is on `PlacementRect` and any layout may use it, but the fan's items are cards
+tilted along the arc rather than slices of a band, and that is the look it is meant to have.
 
 ### A hover the pointer did not cause no longer moves the highlight
 
@@ -6993,7 +7138,7 @@ element and sorts only then.
 
 ### Five more controls take a layout, and each one broke something different
 
-The rest of `backlog.md` item 14's proving pass, run against `Stepper`, `Toolbar`, `Sortable` and `Tree` after
+The rest of `backlog.md` item 13's proving pass, run against `Stepper`, `Toolbar`, `Sortable` and `Tree` after
 `Paginator`, `RadioGroup` and `Tabs`. The reason to keep going past the first was that each control was
 expected to strain a different part of the abstract, and each did.
 
@@ -12684,7 +12829,7 @@ turn a list of keyframe stops into the evaluation function `CellAnimation` asks 
 keyframes rather than a formula writes their own. That is real, and it is still not the library's: the
 component's contract is already the smaller and more general thing — a function from timeline to result — and a
 stop list with `at`, `depth` and origin keys is one **opinion about how to author** such a function. Shipping it
-would freeze that opinion as API for a consumer nobody has met, which is the layer item 4 in `backlog.md`
+would freeze that opinion as API for a consumer nobody has met, which is the layer item 3 in `backlog.md`
 plans. The matrix half is a different case: it needs only the language to work, which is the `ss-utils` test,
 and that package has `Vec2d` and `Vec4d` but no matrix — noted as a candidate rather than moved, because one
 consumer is a thin case for an export in another repo.
@@ -12892,7 +13037,7 @@ page behind is then outside what the layer can see. It is the same trap as `isol
 is why each layer carries its own clip rather than sharing one.
 
 **The fringe this section used to blame on a disagreement between the two backdrop layers is postponed, not
-fixed — see item 13 in `backlog.md` for the current standing.** The margin explanation did not survive a
+fixed — see item 12 in `backlog.md` for the current standing.** The margin explanation did not survive a
 direct test: pushing the margin far past what either layer needs changes nothing, and shrinking it to nearly
 zero changes nothing either. Folding the blur into the ripple filter was tried, looked clean, and was reverted
 anyway — not because it cost Firefox and Safari their blur, though it does, but because "clean" turned out to
@@ -12901,7 +13046,7 @@ building a `feImage` / `feComposite` mask into the filter, so the pane never nee
 ancestor `overflow: hidden` at all, also looked clean under that same software path and also failed once
 checked against a real GPU-accelerated window. Neither fix is in the tree. What each attempt actually ruled
 out is real and kept below; what it did not do is find a fix that survives real rendering, and nothing further
-should be attempted here without a way to check against GPU rendering from the start — see item 13.
+should be attempted here without a way to check against GPU rendering from the start — see item 12.
 
 **The Playground's pane is dragged with `left` and `top`, never with `transform`.** A transform on an
 ancestor creates a stacking context and changes the containing block, and given how readily this arrangement
@@ -12996,7 +13141,7 @@ nothing" trap the backdrop layers above are already written to avoid. Skipping t
 nothing for one.
 
 **The ripple layer's edge is postponed, not fixed, and the investigation is recorded here so it is not repeated
-blind — see item 13 in `backlog.md` for what this means for now.** Found on the Playground's tooltip once
+blind — see item 12 in `backlog.md` for what this means for now.** Found on the Playground's tooltip once
 moved onto `GlassSurface`: a patch of whatever sat behind it rendered sharp and barely warped instead of
 frosted. Chased with a standalone sandbox — raw `feTurbulence` / `feDisplacementMap`, no library code — every
 test run in the browser this session had, which turned out to be headless Chromium and headless Edge, both of
@@ -14756,8 +14901,90 @@ stretch by a wheel, a drag or a focus reveal, drops the memory, so nothing has t
 read at the next press. It lives in the framework-free utilities because all four views already step through them.
 `scroller.spec.ts` compares two quick presses with two slow ones on a fresh page.
 
-**Horizontal only.** The axis is one variable rather than a redesign, but nothing has asked for a column and
-`SlideButton`'s precedent is to build the axis that exists.
+**Both directions, and a drawn scrollbar.** CSS can theme the browser's own bar only with two plain colors and a
+`thin` width everywhere; a width in pixels, a gradient or a grip icon on the thumb works through `::-webkit-scrollbar`
+in Chrome, Edge and desktop Safari and nowhere else (Firefox and iOS honor only hiding it), and setting a size there
+turns a Mac's floating bar into a permanent one. So `Scroller` grows into the scroll area: the browser's bars are hidden
+with `scrollbar-width: none`, the content keeps its native scrolling — wheel, touch, keyboard, right-to-left all stay
+the browser's — and a bar the consumer paints mirrors the position and adds dragging and track presses. A separate
+`ScrollArea` was weighed and rejected: the step buttons and the bar are two controls over one position, and the user's
+example — a short track between `<` and `>` — is one component.
+
+The user's design, settled point by point before it was built:
+
+- **Directions, as CSS writes them.** `overflowX` and `overflowY`, each `"auto" | "scroll" | "hidden"` — CSS's own
+  values, written straight to the box's `overflow-x` and `overflow-y`. `visible` and `clip` are left out of the type,
+  since the box would not scroll. Defaults `overflowX: "auto"`, `overflowY: "hidden"`, which is today's behavior.
+  `"auto"` shows a direction's bar only while it overflows, `"scroll"` always, `"hidden"` never. Both directions at
+  once is required — one wide-and-tall box keeps both bars pinned to its edges, which nesting two `Scroller`s cannot
+  do. Nesting still works for separate regions.
+- **The position is `progress: { x, y }`**, each 0 to 1, two-way as today. The single number it replaces is a breaking
+  change, free before 0.1.0.
+- **The bar is painted**: track and thumb, placed and sized however the painter likes — a short track between the
+  step buttons, an arc. The painter hands the library its track element; the thumb's length is the visible share of
+  the measured track.
+- **Dragging is straight by default**, and `computeProgressAtPoint(axis, point, rect)` turns a pointer into how far
+  along for any other shape — the pattern `Range`'s `computeValueAtPoint` set; an arc uses
+  `RangeUtils.computeAngularValue`. Pointer capture only past the usual small movement, and the click that ends a
+  drag is swallowed, per `conventions.md`.
+- **A press on the track** moves one view toward the press, repeating while held as the step buttons do; with Alt
+  (Option on a Mac) held it jumps to the spot pressed instead — Windows' behavior by default, macOS's switch on the
+  same modifier. Either is the single-pointer, no-drag route WCAG 2.5.7 asks of the thumb's drag.
+- **Screen readers**: each drawn bar is `role="scrollbar"` with `aria-controls` naming the box (an id generated when
+  the consumer gives none), `aria-valuenow` and `aria-orientation`, the value throttled per _"What a component reports
+  runs at its own rate"_. Not focusable: the keyboard scrolls the box, as Windows' standard scrollbar works. WCAG
+  4.1.2 rules out hiding it, since a person operates it.
+- **Fading**: `isAutoHiding`, default `false`. When on, the painter gets `isScrolling` — true while scrolling and for
+  `hideDelayMs` after it stops, default 600 — and whether the pointer is over the box (hover counted from real pointer
+  movement only), plus one shown flag worked out from both. A faded bar stays in the page.
+- **Space**: `isBarOverlaid`, default `false` — the bar keeps its own strip beside the content and never covers it;
+  overlaid, it floats over the content's edge. Independent of `isAutoHiding`. With both bars in their own strips, the
+  corner square where they meet is left empty.
+- **Each bar sits on the end side by default** — the across bar below the content, the down bar on the inline end
+  (the left on a right-to-left page) — and `barSideX` / `barSideY` (`"start" | "end"`) move it to the other side, as
+  the arched example does to put its curve above the content.
+- **Step buttons** gain the direction they step in: one pair per scrolling direction, `buttonPlacement` applying to
+  each.
+- **Target size**: WCAG 2.5.8 asks for 24 by 24 CSS pixels unless an exception applies; the browser's own bar is
+  exempt as a user-agent control, a drawn one is not. The library holds the thumb's length at 24 or more; its
+  thickness is the painter's and the props documentation says so. Nothing warns, since the spacing exception cannot be
+  judged from inside.
+
+What the build added on its own account:
+
+- **The axis is `"x" | "y"`**, matching `progress` and `overflowX`/`overflowY`; only `aria-orientation` carries ARIA's
+  words. `renderButton` takes the axis as a third argument and each pair's stepper is bound to it.
+- **The bar painter gets two refs**, the track and the thumb: the track is measured and takes presses, the thumb is
+  what decides a drag from a page, whatever the bar's shape. `role="scrollbar"` sits on the library's strip around
+  the painter, not on the painter's track. `aria-valuenow` is reported at most every 100ms, `ScratchCard`'s rate.
+- **A track press repeats after 400ms, every 100ms** — guesses, private constants, the user's to tune. An Alt press
+  jumps and then carries on as a drag if the pointer keeps moving, as macOS does.
+- **The fading flag stays on while a thumb is held**, or a drag held still past the delay would fade its own bar.
+- **Two grids.** The root's tracks are written only where step buttons are, so its `gap` never surrounds an empty
+  track; the inner area has no gap, so a kept bar sits flush against the box and the corner stays empty. An overlaid
+  bar shares the box's cell. One class for a kept strip and one for an overlaid bar, never both, since two classes
+  setting `grid-area` would be decided by stylesheet order.
+- **A box scrolling down only lays its children in a column**; scrolling both ways it keeps a row.
+- **The bar painter's refs, per framework**: React's painters turn the `null` a ref callback hands them into
+  `undefined` (inside a `useCallback`); Vue hands `setTrackRef` and `setThumbRef` as separate slot members typed for a
+  template `:ref`, as `Tree`'s `setExpanderRef` is; Svelte's painters set them from an `{@attach}` and clear them on
+  teardown.
+- **A step never lands on the first item while the box has not scrolled past its start.** Leading padding puts that
+  start a little way in, so a box holding one child stepped 2px on its first press; it now goes a full view, as the
+  step's own rule says for a box with no boundary inside the page.
+- **React and Vue write only the padding keys a direction uses.** A style object holding `paddingBlock` and also
+  `paddingBlockStart: undefined` makes both frameworks clear `padding-block-start` after setting the shorthand, which
+  wiped the box's top padding — the room a focus ring needs — and put every reveal 2px off. The keys are spread in per
+  direction instead.
+- **`barSideX` and `barSideY` choose the side each bar's strip sits on**, added when the user asked for the arched
+  example's curve above its content. `ScrollerUtils.computeAreaTemplate` writes the inner grid from them; an overlaid
+  bar aligns to the same side. Named per axis like `overflowX` / `overflowY`.
+- **A starting `progress` from the consumer is honored**; the first measurement used to overwrite it with 0.
+- **Right-to-left works on the horizontal axis.** `scrollLeft` is never above 0 there, so the position is read as its
+  magnitude and written negated; before this the back button was always dead and progress always read 0.
+- **The box is a tab stop while it overflows and holds nothing focusable**, through
+  `FocusManagerUtils.observeHasFocusable`, which `EdgeFader` now shares — the conventions' rule, since only recent
+  Chrome makes such a box focusable by itself.
 
 ### `Scroller` can keep some of the last view
 
@@ -16865,7 +17092,7 @@ can know.
 **The cost is stated rather than mitigated: a library that renders no button cannot promise one is reachable or
 named.** A consumer who wires up no control has a wheel that can only be driven from elsewhere through
 `targetIndex`, exactly as a `Carousel` whose consumer builds no buttons on its controller has no keyboard route. That is the same exposure
-item 8 records for `Scroller` and it is now the wheel's too.
+item 7 records for `Scroller` and it is now the wheel's too.
 
 **No slot survives either, and the one that briefly did was kept for a bad reason.** A `renderHub` was left on
 the overhead wheel out of deference to an earlier choice — that an overhead wheel has one control slot and it is the
