@@ -15,7 +15,7 @@
 </script>
 
 <div class={styles.demo}>
-    <Scroller gap={SCROLLER_GAP} padding={FOCUS_RING_WIDTH}>
+    <Scroller gap={SCROLLER_GAP} padding={FOCUS_RING_WIDTH} overlapCount={props.overlapCount}>
         {#snippet renderButton(step, stepper)}
             <PageScrollerButton {step} {stepper} />
         {/snippet}

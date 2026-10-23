@@ -12,6 +12,7 @@
     import ReachableExample from "./Examples/Reachable.svelte";
     import RightToLeftExample from "./Examples/RightToLeft.svelte";
     import RightToLeftPlacedExample from "./Examples/RightToLeftPlaced.svelte";
+    import SectionsExample from "./Examples/Sections.svelte";
     import StatefulExample from "./Examples/Stateful.svelte";
     import SubmenusExample from "./Examples/Submenus.svelte";
     import {
@@ -54,6 +55,8 @@
     let drivenVisibility = $state(false);
     let viewChecked = $state.raw<Action[]>(VIEW_DEFAULTS);
     let lastViewAction = $state(NOTHING_RUN);
+    let sectionsChecked = $state.raw<Action[]>(VIEW_DEFAULTS);
+    let lastSectionsAction = $state(NOTHING_RUN);
 
     const examples: ExampleDefs[] = [
         {
@@ -168,6 +171,14 @@
             readout: () => `${lastViewAction} — ticked: [${viewChecked.map((action) => action.name).join(", ")}]`,
             component: statefulExample,
             path: `${EXAMPLES_ROOT}/Stateful.svelte`,
+        },
+        {
+            key: "sections",
+            name: EXAMPLE_NAMES.sections,
+            readout: () =>
+                `${lastSectionsAction} — ticked: [${sectionsChecked.map((action) => action.name).join(", ")}]; each group is named, the arrows walk straight through the headings, and the radio choice stays inside its own group`,
+            component: sectionsExample,
+            path: `${EXAMPLES_ROOT}/Sections.svelte`,
         },
         {
             key: "disabled",
@@ -300,6 +311,15 @@
         bind:checked={viewChecked}
         onActivate={(action) => {
             lastViewAction = `ran ${action.name}`;
+        }}
+    />
+{/snippet}
+
+{#snippet sectionsExample()}
+    <SectionsExample
+        bind:checked={sectionsChecked}
+        onActivate={(action) => {
+            lastSectionsAction = `ran ${action.name}`;
         }}
     />
 {/snippet}

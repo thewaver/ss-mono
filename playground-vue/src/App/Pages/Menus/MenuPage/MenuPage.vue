@@ -16,6 +16,7 @@ import PlacedAboveExample from "./Examples/PlacedAbove.vue";
 import ReachableExample from "./Examples/Reachable.vue";
 import RightToLeftExample from "./Examples/RightToLeft.vue";
 import RightToLeftPlacedExample from "./Examples/RightToLeftPlaced.vue";
+import SectionsExample from "./Examples/Sections.vue";
 import StatefulExample from "./Examples/Stateful.vue";
 import SubmenusExample from "./Examples/Submenus.vue";
 import {
@@ -57,6 +58,8 @@ const applyZoom = (action: Action) => {
 const drivenVisibility = shallowRef(false);
 const view = shallowRef(VIEW_DEFAULTS);
 const lastViewAction = shallowRef(NOTHING_RUN);
+const sections = shallowRef(VIEW_DEFAULTS);
+const lastSectionsAction = shallowRef(NOTHING_RUN);
 
 const examples: ExampleDefs[] = [
     {
@@ -158,6 +161,17 @@ const examples: ExampleDefs[] = [
         path: `${EXAMPLES_ROOT}/Stateful.vue`,
     },
     {
+        key: "sections",
+        name: EXAMPLE_NAMES.sections,
+        readout: () =>
+            `${lastSectionsAction.value} — ticked: [${sections.value
+                .map((action) => action.name)
+                .join(
+                    ", ",
+                )}]; each group is named, the arrows walk straight through the headings, and the radio choice stays inside its own group`,
+        path: `${EXAMPLES_ROOT}/Sections.vue`,
+    },
+    {
         key: "disabled",
         name: EXAMPLE_NAMES.disabled,
         readout: () => "the trigger neither opens nor takes focus",
@@ -247,6 +261,13 @@ const examples: ExampleDefs[] = [
             <StatefulExample
                 v-model:checked="view"
                 @activate="(action: Action) => (lastViewAction = `ran ${action.name}`)"
+            />
+        </template>
+
+        <template #sections>
+            <SectionsExample
+                v-model:checked="sections"
+                @activate="(action: Action) => (lastSectionsAction = `ran ${action.name}`)"
             />
         </template>
 

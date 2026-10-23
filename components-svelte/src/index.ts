@@ -151,6 +151,7 @@ export type * from "./Essentials/Scroller/Scroller.types.js";
 export { default as HoverCard } from "./Essentials/Overlays/HoverCard/HoverCard.svelte";
 export type * from "./Essentials/Overlays/HoverCard/HoverCard.types.js";
 export { default as Tree } from "./Essentials/Tree/Tree.svelte";
+export { default as MultiTree } from "./Essentials/Tree/MultiTree.svelte";
 export type * from "./Essentials/Tree/Tree.types.js";
 export type * from "./Generators/SVGDefs/SVGDefs.types.js";
 export * from "./Generators/SVGDefs/SVGAnimations/SVGAnimationDefsSvelte.utils.svelte.js";

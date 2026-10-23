@@ -4,9 +4,16 @@ export const CLEARABLE_TRANSITION_DURATION_MS = 600;
 
 <script setup lang="ts">
 import { Button, Tabs } from "@thewaver/ss-components-vue";
-import { CLEARABLE_TABS, ROW_TAB_GAP } from "@thewaver/ss-playground/App/Pages/TabsPage/TabsPage.const";
+import {
+    CLEARABLE_TABS,
+    PANEL_BODIES,
+    ROW_TAB_GAP,
+    getPanelId,
+    getTabId,
+} from "@thewaver/ss-playground/App/Pages/TabsPage/TabsPage.const";
 
 import PageControlColumn from "../../../PageComponents/ControlRow/PageControlColumn.vue";
+import PageTabPanel from "../../../PageComponents/TabPanel/TabPanel.vue";
 import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
 import PageTabContent from "../../../StyledComponents/TabContent/PageTabContent.vue";
 import PageTabFloater from "../../../StyledComponents/TabContent/PageTabFloater.vue";
@@ -47,6 +54,13 @@ const props = defineProps<Props>();
                 }}</PageTabContent>
             </template>
         </Tabs>
+
+        <PageTabPanel
+            v-if="selectedValue"
+            :id="getPanelId('clearable', selectedValue)"
+            :tab-id="getTabId('clearable', selectedValue)"
+            >{{ PANEL_BODIES[selectedValue] }}</PageTabPanel
+        >
 
         <Button ariaLabel="Clear the selection" @click="async () => props.onClear()">
             <template #renderContent="flags">

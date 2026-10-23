@@ -1,6 +1,7 @@
 <script lang="ts">
     import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../PageComponents/Examples/PageExamples.svelte";
+    import CheckboxesExample from "./Examples/Checkboxes.svelte";
     import FilesExample from "./Examples/Files.svelte";
     import LazyExample from "./Examples/Lazy.svelte";
     import LinkComponentExample from "./Examples/LinkComponent.svelte";
@@ -58,6 +59,9 @@
 
     let radialValue = $state<string>();
     let radialExpanded = $state.raw<string[]>(RANK_ROOTS);
+
+    let checkboxesChecked = $state.raw<string[]>([]);
+    let checkboxesExpanded = $state.raw<string[]>([]);
 
     let recordValue = $state.raw<Asset>();
     let recordExpanded = $state.raw<Asset[]>([]);
@@ -160,6 +164,14 @@
             path: `${EXAMPLES_ROOT}/RecordValues.svelte`,
         },
         {
+            key: "checkboxes",
+            name: EXAMPLE_NAMES.checkboxes,
+            readout: () =>
+                `ticked: [${checkboxesChecked.join(", ")}] — pressing a folder's arrow opens it and pressing its name ticks it with everything inside; Space ticks, Shift with Space ticks a run, Control with A ticks everything`,
+            component: checkboxesExample,
+            path: `${EXAMPLES_ROOT}/Checkboxes.svelte`,
+        },
+        {
             key: "leaning",
             name: EXAMPLE_NAMES.leaning,
             readout: () =>
@@ -229,6 +241,10 @@
 
 {#snippet radialExample()}
     <RadialExample bind:value={radialValue} bind:expanded={radialExpanded} />
+{/snippet}
+
+{#snippet checkboxesExample()}
+    <CheckboxesExample bind:checked={checkboxesChecked} bind:expanded={checkboxesExpanded} />
 {/snippet}
 
 {#snippet recordValuesExample()}

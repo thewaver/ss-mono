@@ -19,6 +19,7 @@ export const ChipsExample = (props: Props) => {
             <Scroller
                 gap={SCROLLER_GAP}
                 padding={FOCUS_RING_WIDTH}
+                overlapCount={props.overlapCount}
                 buttonPlacement={props.buttonPlacement}
                 progress={props.progress}
                 renderButton={(step, stepper) => <PageScrollerButton step={step} stepper={stepper} />}

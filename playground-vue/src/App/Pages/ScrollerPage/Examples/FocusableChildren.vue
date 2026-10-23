@@ -16,7 +16,7 @@ defineProps<Props>();
 
 <template>
     <div :class="styles.demo">
-        <Scroller :gap="SCROLLER_GAP" :padding="FOCUS_RING_WIDTH">
+        <Scroller :gap="SCROLLER_GAP" :padding="FOCUS_RING_WIDTH" :overlap-count="overlapCount">
             <template #renderButton="{ step, stepper }">
                 <PageScrollerButton :step="step" :stepper="stepper" />
             </template>

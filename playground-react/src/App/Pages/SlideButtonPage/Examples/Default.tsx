@@ -4,12 +4,16 @@ import { SLIDE_BUTTON_THUMB_SIZE } from "@thewaver/ss-playground/App/StyledCompo
 import { PageSlideButtonContent } from "../../../StyledComponents/SlideButtonContent/SlideButtonContent";
 import type { SlideButtonExampleProps } from "../SlideButtonPageReact.types";
 
-type Props = SlideButtonExampleProps & { progress?: readonly [number, (ratio: number) => void] };
+type Props = SlideButtonExampleProps & {
+    progress?: readonly [number, (ratio: number) => void];
+    completionRatio?: number;
+};
 
 export const DefaultExample = (props: Props) => (
     <SlideButton
         thumbSize={SLIDE_BUTTON_THUMB_SIZE}
         progress={props.progress}
+        completionRatio={props.completionRatio}
         renderContent={(renderProps) => (
             <PageSlideButtonContent renderProps={renderProps}>Slide or hold to send</PageSlideButtonContent>
         )}

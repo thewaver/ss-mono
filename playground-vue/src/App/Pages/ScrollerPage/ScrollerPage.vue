@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, shallowRef } from "vue";
 
+import { SCROLLER_DEFAULTS } from "@thewaver/ss-components-vue";
 import type { Tab } from "@thewaver/ss-components-vue";
 import { ScrollerKnobs } from "@thewaver/ss-playground/App/Knobs/Scrollers.const";
 import {
@@ -8,6 +9,8 @@ import {
     EXAMPLE_NAMES,
     MONTHS,
     PERCENT,
+    getMonthPanelId,
+    getMonthTabId,
 } from "@thewaver/ss-playground/App/Pages/ScrollerPage/ScrollerPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ScrollerPage/ScrollerPage.css";
 
@@ -22,11 +25,18 @@ import TabbedExample from "./Examples/Tabbed.vue";
 
 const itemCount = shallowRef(ScrollerKnobs.STARTING_ITEM_COUNT);
 const selectedMonth = shallowRef(MONTHS[0]);
+const overlapCount = shallowRef(SCROLLER_DEFAULTS.overlapCount);
 const progress = shallowRef(0);
 
 const labels = computed(() => Array.from({ length: itemCount.value }, (_, index) => `Item ${index + 1}`));
 
-const monthTabs = computed((): Tab<string>[] => MONTHS.slice(0, itemCount.value).map((month) => ({ value: month })));
+const monthTabs = computed((): Tab<string>[] =>
+    MONTHS.slice(0, itemCount.value).map((month) => ({
+        value: month,
+        id: getMonthTabId(month),
+        panelId: getMonthPanelId(month),
+    })),
+);
 
 const examples: ExampleDefs[] = [
     {
@@ -84,6 +94,22 @@ const examples: ExampleDefs[] = [
             </PageProp>
 
             <PageProp
+                item-key="overlapCount"
+                controls="Sets ScrollerProps.overlapCount"
+                label="Overlap count"
+                hint="How many of the items in view stay in view after a press of a step button. At 0 a press moves on by as much as fits; a press always moves by at least one item."
+            >
+                <PageNumberField
+                    :value="overlapCount"
+                    :min="ScrollerKnobs.MIN_OVERLAP_COUNT"
+                    :max="ScrollerKnobs.MAX_OVERLAP_COUNT"
+                    :step="ScrollerKnobs.OVERLAP_COUNT_STEP"
+                    ariaLabel="Overlap count"
+                    @input="(value: number) => (overlapCount = value)"
+                />
+            </PageProp>
+
+            <PageProp
                 item-key="position"
                 controls="Sets ScrollerProps.progress, shown as a percentage"
                 label="First strip (%)"
@@ -102,15 +128,15 @@ const examples: ExampleDefs[] = [
 
         <PageExamples :items="examples" :min-column-width="400">
             <template #split>
-                <ChipsExample v-model:progress="progress" :labels="labels" />
+                <ChipsExample v-model:progress="progress" :labels="labels" :overlap-count="overlapCount" />
             </template>
 
             <template #bothButtonsEnd>
-                <ChipsExample :labels="labels" button-placement="end" />
+                <ChipsExample :labels="labels" :overlap-count="overlapCount" button-placement="end" />
             </template>
 
             <template #bothButtonsStart>
-                <ChipsExample :labels="labels" button-placement="start" />
+                <ChipsExample :labels="labels" :overlap-count="overlapCount" button-placement="start" />
             </template>
 
             <template #tabbed>
@@ -122,7 +148,7 @@ const examples: ExampleDefs[] = [
             </template>
 
             <template #focusableChildren>
-                <FocusableChildrenExample :labels="labels" />
+                <FocusableChildrenExample :labels="labels" :overlap-count="overlapCount" />
             </template>
         </PageExamples>
     </div>

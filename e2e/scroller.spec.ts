@@ -276,3 +276,46 @@ test("a focused child is never flush against the edge, so its ring has somewhere
         )
         .toBeGreaterThan(0);
 });
+
+/**
+ * The overlap count is how many items of the view just left stay in view after a step. The knob is set, its own
+ * value read back, and the items wholly in view before a step forward are counted again after it: exactly that many
+ * of them are still wholly in view. Positions are read in layout space, off the track's own children.
+ */
+test("a step keeps as many of the items just in view as the overlap count says", async ({ page }) => {
+    const knob = page.locator(`${prop("overlapCount")} input`);
+
+    await knob.click();
+    await page.keyboard.press("ControlOrMeta+A");
+    await page.keyboard.type("1");
+    await page.keyboard.press("Enter");
+
+    const overlapCount = Number(await knob.inputValue());
+    const wholeInView = () =>
+        page.evaluate((selector) => {
+            const track = [...document.querySelectorAll(`${selector} div`)].find(
+                (element) => element.scrollWidth > element.clientWidth,
+            ) as HTMLElement;
+
+            return [...track.children]
+                .map((child, index) => ({ child: child as HTMLElement, index }))
+                .filter(
+                    ({ child }) =>
+                        child.offsetLeft >= track.scrollLeft &&
+                        child.offsetLeft + child.offsetWidth <= track.scrollLeft + track.clientWidth,
+                )
+                .map(({ index }) => index);
+        }, SPLIT);
+
+    const before = await wholeInView();
+
+    await page.locator(`${SPLIT} button`).last().click();
+    await waitForRest(page, SPLIT);
+
+    const after = await wholeInView();
+
+    expect(
+        before.filter((index) => after.includes(index)),
+        "the last of the items in view before the step are still in view",
+    ).toEqual(before.slice(before.length - overlapCount));
+});

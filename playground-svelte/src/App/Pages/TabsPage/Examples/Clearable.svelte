@@ -4,9 +4,16 @@
 
 <script lang="ts">
     import { Button, Tabs } from "@thewaver/ss-components-svelte";
-    import { CLEARABLE_TABS, ROW_TAB_GAP } from "@thewaver/ss-playground/App/Pages/TabsPage/TabsPage.const";
+    import {
+        CLEARABLE_TABS,
+        PANEL_BODIES,
+        ROW_TAB_GAP,
+        getPanelId,
+        getTabId,
+    } from "@thewaver/ss-playground/App/Pages/TabsPage/TabsPage.const";
 
     import PageControlColumn from "../../../PageComponents/ControlRow/PageControlColumn.svelte";
+    import PageTabPanel from "../../../PageComponents/TabPanel/TabPanel.svelte";
     import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
     import PageTabContent from "../../../StyledComponents/TabContent/PageTabContent.svelte";
     import PageTabFloater from "../../../StyledComponents/TabContent/PageTabFloater.svelte";
@@ -42,6 +49,12 @@
             </PageTabContent>
         {/snippet}
     </Tabs>
+
+    {#if props.selectedValue}
+        <PageTabPanel id={getPanelId("clearable", props.selectedValue)} tabId={getTabId("clearable", props.selectedValue)}>
+            {PANEL_BODIES[props.selectedValue]}
+        </PageTabPanel>
+    {/if}
 
     <Button ariaLabel={"Clear the selection"} onClick={async () => props.onClear()}>
         {#snippet renderContent(flags)}

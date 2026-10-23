@@ -19,6 +19,11 @@
 
     let { visibility = $bindable(false), checked = $bindable(), ref = $bindable(), ...props }: MenuProps<T> = $props();
 
+    const hasLayout = $derived(props.computeLayout !== undefined);
+    const hasGroupPaint = $derived(props.renderGroupHeader !== undefined || props.renderGroupBox !== undefined);
+
+    $effect(() => MenuUtils.warnIfGroupPaintIgnored(hasLayout, hasGroupPaint));
+
     const uid = $props.id();
     const menuId = `${uid}-menu`;
 
@@ -178,6 +183,8 @@
             computeCustomText={props.computeCustomText}
             {flickOrigin}
             renderItem={props.renderItem}
+            renderGroupHeader={props.renderGroupHeader}
+            renderGroupBox={props.renderGroupBox}
             renderPopup={props.renderPopup}
             floaterTransitionDurationMs={props.floaterTransitionDurationMs}
             renderHighlightFloater={props.renderHighlightFloater}

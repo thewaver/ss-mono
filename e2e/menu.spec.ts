@@ -644,3 +644,90 @@ test("a gliding marker sits on whichever item is highlighted, by arrow or by poi
     await last.hover();
     await expect.poll(() => centerDistance(marker, last)).toBeLessThan(2);
 });
+
+/**
+ * A menu may be split into named groups, the way `Select`'s options are. Each group is a `role="group"` named by its
+ * label; the heading drawn above it is paint and hidden from a reader, who hears the group's name instead, so the
+ * arrows have nothing to stop on there. A radio run ends where its group does.
+ */
+test.describe("a menu split into sections", () => {
+    const group = (page: Page, name: string) => page.locator(`${MENU} [role="group"][aria-label="${name}"]`);
+
+    test("each group is named, and its box holds the heading and the group's items", async ({ page }) => {
+        await openedWithHighlight(page, "sections");
+
+        for (const name of ["Editor", "Text size"]) {
+            const box = group(page, name).locator("> *");
+
+            await expect(box, `the ${name} group draws one box`).toHaveCount(1);
+            await expect(box.locator('[aria-hidden="true"]').first(), "whose first part is the heading").toHaveText(
+                name,
+            );
+            await expect(box.locator('[role^="menuitem"]').first(), "and which holds the group's items").toBeVisible();
+        }
+
+        await expect(
+            page.locator(`${MENU} [role="menuitem"]`).filter({ hasText: "Reset view" }),
+            "an item outside any group stays outside one",
+        ).toHaveCount(1);
+        expect(
+            await page
+                .locator(`${MENU} [role="menuitem"]`)
+                .filter({ hasText: "Reset view" })
+                .evaluate((item) => item.closest('[role="group"][aria-label]') === null),
+        ).toBe(true);
+    });
+
+    test("the arrows walk straight past the headings", async ({ page }) => {
+        await openedWithHighlight(page, "sections");
+
+        const lastOfEditor = group(page, "Editor").locator('[role^="menuitem"]').last();
+        const firstOfTextSize = group(page, "Text size").locator('[role^="menuitem"]').first();
+
+        await page.keyboard.press("Home");
+
+        for (let step = 1; step < (await group(page, "Editor").locator('[role^="menuitem"]').count()); step++) {
+            await page.keyboard.press("ArrowDown");
+        }
+
+        expect(await page.locator(MENU).getAttribute("aria-activedescendant")).toBe(
+            await lastOfEditor.getAttribute("id"),
+        );
+
+        await page.keyboard.press("ArrowDown");
+
+        expect(
+            await page.locator(MENU).getAttribute("aria-activedescendant"),
+            "one press goes from the last item of one group to the first of the next",
+        ).toBe(await firstOfTextSize.getAttribute("id"));
+    });
+
+    test("picking a radio item moves the choice within its group and leaves the other group alone", async ({
+        page,
+    }) => {
+        await openedWithHighlight(page, "sections");
+
+        const editorStates = () =>
+            group(page, "Editor")
+                .locator('[role="menuitemcheckbox"]')
+                .evaluateAll((items) => items.map((item) => item.getAttribute("aria-checked")));
+        const before = await editorStates();
+        const radios = group(page, "Text size").locator('[role="menuitemradio"]');
+        const unpicked = radios.and(page.locator('[aria-checked="false"]')).last();
+        const pickedId = await radios.and(page.locator('[aria-checked="true"]')).getAttribute("id");
+        const unpickedId = await unpicked.getAttribute("id");
+
+        await unpicked.click();
+        await openedWithHighlight(page, "sections");
+
+        await expect(page.locator(`#${unpickedId}`), "the pressed radio item is now the choice").toHaveAttribute(
+            "aria-checked",
+            "true",
+        );
+        await expect(page.locator(`#${pickedId}`), "and the one it replaced in its group is not").toHaveAttribute(
+            "aria-checked",
+            "false",
+        );
+        expect(await editorStates(), "while the other group's items are as they were").toEqual(before);
+    });
+});

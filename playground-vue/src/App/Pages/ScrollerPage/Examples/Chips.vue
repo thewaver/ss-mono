@@ -28,6 +28,7 @@ const progress = useModel(props, "progress");
             v-model:progress="progress"
             :gap="SCROLLER_GAP"
             :padding="FOCUS_RING_WIDTH"
+            :overlap-count="overlapCount"
             :button-placement="buttonPlacement"
         >
             <template #renderButton="{ step, stepper }">

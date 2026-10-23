@@ -5034,6 +5034,11 @@ the pair and `MenuUtils.warnIfGroupPaintIgnored` catches the rest, the `Stepper`
 `WheelMenu`, always laid out, leave both out of their props. A laid-out menu still wraps a group in its named
 `role="group"`.
 
+Per framework: Vue cannot express the refused pair against slots, so it keeps only the warning, and its box painter is
+handed one content function per section index kept across renders — `Listbox`'s `getGroupContent` rule for
+`<component :is>`. Svelte keys its sections by position, not by `from`, since an empty group shares its `from` with
+the next section and a duplicate key stops Svelte.
+
 ### Arbitrary item placement: `Abstracts/Placement`, and `Menu` as the first consumer
 
 The first half of `backlog.md` item 17. A control's items can be placed anywhere rather than along a line, and
@@ -12170,7 +12175,17 @@ library-drawn arrow slot (which would break the rule that a component draws no c
 nothing else, a press elsewhere selects. **With no expander registered, a press does both, exactly as before**, so no
 consumer's behavior changes until they opt in — and the library cannot tell an unwired arrow from a tree with none, so
 there is nothing to warn about. The element is held per row, not keyed by value, which is what keeps it right under
-`<Index>`.
+`<Index>`. How each framework holds it:
+
+- Solid: a `let` inside the row's render, set by the callback.
+- React: the same `let` inside `renderRow`. The callback is a new function each render, so React re-attaches it on
+  every commit; a consumer wrapping it in a `useCallback` that never re-runs would leave the row with no expander, and
+  a press would select and toggle. Typed `(element: HTMLElement | null) => void` so it can be a `ref` as it is.
+- Vue: a closure made fresh each time a row is drawn; Vue calls the old ref with `null` and the new one with the
+  element on each update, and the press reads the latest render's closure. Typed like `setElementRef`, so it can be a
+  template `:ref`.
+- Svelte: `{@const expander = createExpanderHold()}` in the row snippet compiles to a derived value with no
+  dependencies, built once per row; the painter attaches it with `{@attach setExpanderRef}`.
 
 ### `MultiTree` is a checkbox tree
 

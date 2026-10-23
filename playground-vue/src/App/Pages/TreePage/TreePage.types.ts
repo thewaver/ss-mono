@@ -14,6 +14,13 @@ export type TreeLeaningExampleProps = TreeExampleProps & {
     falloff: TreeFalloff;
 };
 
+export type TreeCheckboxExampleProps = {
+    "checked": string[];
+    "onUpdate:checked"?: (value: string[]) => void;
+    "expanded": string[];
+    "onUpdate:expanded"?: (value: string[]) => void;
+};
+
 export type TreeRecordExampleProps = {
     "value": Asset | undefined;
     "onUpdate:value"?: (value: Asset | undefined) => void;

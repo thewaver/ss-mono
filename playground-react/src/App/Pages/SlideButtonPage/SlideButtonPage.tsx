@@ -1,13 +1,19 @@
 import { useState } from "react";
 
+import { SLIDE_BUTTON_DEFAULTS } from "@thewaver/ss-components-react";
+import { SlideButtonKnobs } from "@thewaver/ss-playground/App/Knobs/SlideButtons.const";
 import {
     EXAMPLES_ROOT,
     EXAMPLE_NAMES,
+    FIELD_WIDTH,
     PERCENT,
 } from "@thewaver/ss-playground/App/Pages/SlideButtonPage/SlideButtonPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/SlideButtonPage/SlideButtonPage.css";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
+import { PageNumberField } from "../../PageComponents/Field/Field";
+import { PageProp } from "../../PageComponents/Prop/Prop";
+import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { DefaultExample } from "./Examples/Default";
 import { DescribedExample } from "./Examples/Described";
 import { DisabledExample } from "./Examples/Disabled";
@@ -20,6 +26,7 @@ import { SlideOnlyExample } from "./Examples/SlideOnly";
 export const SlideButtonPage = () => {
     const [sends, setSends] = useState(0);
     const progressState = useState(0);
+    const [completionRatio, setCompletionRatio] = useState(SLIDE_BUTTON_DEFAULTS.completionRatio);
     const [isArmed, setIsArmed] = useState(false);
     const [describedSends, setDescribedSends] = useState(0);
     const [disabledSends, setDisabledSends] = useState(0);
@@ -38,6 +45,7 @@ export const SlideButtonPage = () => {
                 <div className={styles.stage}>
                     <DefaultExample
                         progress={progressState}
+                        completionRatio={completionRatio}
                         onActivate={() => {
                             setSends((prev) => prev + 1);
                         }}
@@ -159,5 +167,30 @@ export const SlideButtonPage = () => {
         },
     ];
 
-    return <PageExamples items={examples} />;
+    return (
+        <>
+            <PagePropsPanel scope={"global"}>
+                <PageProp
+                    itemKey={"completionRatio"}
+                    label={"Completion ratio"}
+                    hint={
+                        "How far along the track the thumb has to be when let go for the slide to complete. At 1 it has to reach the end; short of it, it springs back."
+                    }
+                    controls={"Sets SlideButtonProps.completionRatio on the default example"}
+                >
+                    <PageNumberField
+                        value={completionRatio}
+                        min={SlideButtonKnobs.MIN_COMPLETION_RATIO}
+                        max={SlideButtonKnobs.MAX_COMPLETION_RATIO}
+                        step={SlideButtonKnobs.COMPLETION_RATIO_STEP}
+                        width={FIELD_WIDTH}
+                        ariaLabel={"Completion ratio"}
+                        onInput={setCompletionRatio}
+                    />
+                </PageProp>
+            </PagePropsPanel>
+
+            <PageExamples items={examples} />
+        </>
+    );
 };

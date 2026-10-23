@@ -98,6 +98,8 @@
                 computeEffect={level.computeEffect}
                 computeCustomText={level.computeCustomText}
                 renderItem={level.renderItem}
+                renderGroupHeader={level.renderGroupHeader}
+                renderGroupBox={level.renderGroupBox}
                 renderPopup={level.renderPopup}
                 floaterTransitionDurationMs={level.floaterTransitionDurationMs}
                 renderHighlightFloater={level.renderHighlightFloater}

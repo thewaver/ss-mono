@@ -5,6 +5,8 @@
     import {
         FloaterStyles as floaterStyles,
         MENU_DEFAULTS,
+        type MenuRun,
+        type MenuSection,
         MenuUtils,
         TypeaheadUtils,
         MenuStyles as styles,
@@ -18,7 +20,7 @@
     import Popover from "../../../Primitives/Popover/Popover.svelte";
     import { watchChange } from "../../../Utils/effectUtils.svelte.js";
     import { toStyle } from "../../../Utils/styleUtils.js";
-    import type { MenuItem, MenuLevelProps } from "./Menu.types.js";
+    import type { MenuGroup, MenuItem, MenuLevelProps, MenuNode } from "./Menu.types.js";
     import MenuEntry from "./MenuEntry.svelte";
 
     const NO_PARENT_EXTENT = 0;
@@ -62,9 +64,13 @@
         { isBeforeRender: true },
     );
 
-    const entries = $derived(
-        MenuUtils.computeEntries(MenuUtils.flattenNodes(props.items), props.openerItem, props.submenuMode),
+    const nodes = $derived(
+        MenuUtils.computeEntries<MenuNode<T>>(props.items, props.openerItem, props.submenuMode),
     );
+
+    const entries = $derived(MenuUtils.flattenNodes(nodes));
+
+    const sections = $derived(MenuUtils.getSections<T, MenuItem<T>>(nodes));
 
     const navigable = $derived(MenuUtils.computeNavigableIndexes(entries));
 
@@ -145,7 +151,12 @@
     };
 
     const activateIndex = (index: number) => {
-        const activation = MenuUtils.computeActivation<T, MenuItem<T>>(entries, index, hasBackEntry);
+        const activation = MenuUtils.computeActivation<T, MenuItem<T>>(
+            entries,
+            index,
+            hasBackEntry,
+            sections.flatMap((section) => section.runs),
+        );
 
         if (activation.type === "back") {
             props.onClose();
@@ -223,8 +234,6 @@
         }
     };
 
-    const runs = $derived(MenuUtils.getRuns<T, MenuItem<T>>(entries));
-
     const recordItemRef = (index: number, element: HTMLElement) => {
         untrack(() => itemRefs.set(index, element));
 
@@ -282,18 +291,49 @@
     {/if}
 {/snippet}
 
-{#snippet renderRuns()}
-    {#each runs as run (run.from)}
-        {#if run.isRadioGroup}
-            <div role="group" class={isLaidOut ? styles.menuLayoutGroup : undefined}>
-                {#each run.items as item, offset (offset)}
-                    {@render entry(item, run.from + offset)}
-                {/each}
-            </div>
-        {:else}
+{#snippet renderRun(run: MenuRun<MenuItem<T>>)}
+    {#if run.isRadioGroup}
+        <div role="group" class={isLaidOut ? styles.menuLayoutGroup : undefined}>
             {#each run.items as item, offset (offset)}
                 {@render entry(item, run.from + offset)}
             {/each}
+        </div>
+    {:else}
+        {#each run.items as item, offset (offset)}
+            {@render entry(item, run.from + offset)}
+        {/each}
+    {/if}
+{/snippet}
+
+{#snippet renderSectionRuns(section: MenuSection<MenuItem<T>>)}
+    {#each section.runs as run (run.from)}
+        {@render renderRun(run)}
+    {/each}
+{/snippet}
+
+{#snippet groupBox(group: MenuGroup<T>, section: MenuSection<MenuItem<T>>)}
+    {#snippet boxContent()}
+        {#if !isLaidOut}
+            {@render props.renderGroupHeader?.(group)}
+        {/if}
+        {@render renderSectionRuns(section)}
+    {/snippet}
+
+    {#if props.renderGroupBox && !isLaidOut}
+        {@render props.renderGroupBox(boxContent, group)}
+    {:else}
+        {@render boxContent()}
+    {/if}
+{/snippet}
+
+{#snippet renderRuns()}
+    {#each sections as section, sectionIndex (sectionIndex)}
+        {#if section.group}
+            <div role="group" aria-label={section.group.label} class={isLaidOut ? styles.menuLayoutGroup : undefined}>
+                {@render groupBox(section.group, section)}
+            </div>
+        {:else}
+            {@render renderSectionRuns(section)}
         {/if}
     {/each}
 {/snippet}

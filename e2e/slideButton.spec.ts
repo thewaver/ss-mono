@@ -1,6 +1,6 @@
 import { type Locator, type Page, expect, test } from "@playwright/test";
 
-import { activeMatches, demo, readout, tabIndex } from "./helpers";
+import { activeMatches, demo, prop, readout, tabIndex } from "./helpers";
 
 const DEFAULT = demo("default");
 const HELD = demo("held");
@@ -366,4 +366,38 @@ test("focus leaving the control abandons a hold it was in the middle of", async 
         await readout(page, "default"),
         "the keyup would otherwise never arrive and the hold would run on unattended",
     ).toContain("activations: 0");
+});
+
+/**
+ * The completion ratio is how far along the thumb has to be when it is let go. The knob is set, its own value read
+ * back, and two slides are made either side of it — one stopping well short, one going well past — so no ratio is
+ * written down here. Progress is the thumb's travel over the distance it can travel, which is the track less the
+ * thumb, so a pointer target is worked out from the thumb's share of the track.
+ */
+test("the thumb completes once let go past the completion ratio, and not short of it", async ({ page }) => {
+    const MARGIN = 0.15;
+    const knob = page.locator(`${prop("completionRatio")} input`);
+
+    await knob.click();
+    await page.keyboard.press("ControlOrMeta+A");
+    await page.keyboard.type("0.5");
+    await page.keyboard.press("Enter");
+
+    const ratio = Number(await knob.inputValue());
+    const { start, center } = await thumbSpan(page, DEFAULT);
+    const thumbShare = (center - start) * 2;
+    const pointerAt = (progress: number) => thumbShare * 0.5 + progress * (1 - thumbShare);
+
+    await slide(page, page.locator(track(DEFAULT)), center, pointerAt(ratio - MARGIN));
+
+    expect(await readout(page, "default"), "let go short of the ratio, the slide springs back").toContain(
+        "activations: 0",
+    );
+
+    await expect.poll(async () => (await thumbSpan(page, DEFAULT)).start).toBeLessThan(0.01);
+    await slide(page, page.locator(track(DEFAULT)), center, pointerAt(ratio + MARGIN));
+
+    expect(await readout(page, "default"), "let go past it, it completes without reaching the end").toContain(
+        "activations: 1",
+    );
 });

@@ -523,7 +523,7 @@ test("an autocomplete field filters through the consumer's matcher", async ({ pa
  * text is what a screen reader reads as the combobox's value (WCAG 4.1.2); the consumer's painted copy beside it is
  * hidden. So after a pick the field's own text is the picked option's, and typing then Escape puts it back.
  */
-test("after a pick the field's own text is what was picked, and Escape puts it back @solid", async ({ page }) => {
+test("after a pick the field's own text is what was picked, and Escape puts it back", async ({ page }) => {
     const input = page.locator(field("autocomplete"));
 
     await input.focus();

@@ -93,6 +93,8 @@ const TabsItem = defineComponent(
 
 export const Tabs = defineComponent(
     <T,>(props: TabsProps<T>, { slots }: SlotsContext<TabsSlots<T>>) => {
+        TabsUtils.warnIfUnpaired(props.tabs);
+
         const rootRef = shallowRef<HTMLDivElement>();
 
         const itemElements = shallowRef<(HTMLElement | undefined)[]>([]);

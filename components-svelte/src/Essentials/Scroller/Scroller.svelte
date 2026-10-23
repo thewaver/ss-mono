@@ -23,6 +23,7 @@
 
     const gap = $derived(props.gap ?? SCROLLER_DEFAULTS.gap);
     const padding = $derived(props.padding ?? SCROLLER_DEFAULTS.padding);
+    const overlapCount = $derived(props.overlapCount ?? SCROLLER_DEFAULTS.overlapCount);
 
     const steps = $derived(
         ScrollerUtils.getSteps(
@@ -34,8 +35,8 @@
     const stepper: ScrollerStepper = {
         getIsAtStart: () => ScrollerUtils.getIsAtStart(metrics),
         getIsAtEnd: () => ScrollerUtils.getIsAtEnd(metrics),
-        stepToPrevious: () => ScrollerUtils.stepTo(track ?? undefined, "previous"),
-        stepToNext: () => ScrollerUtils.stepTo(track ?? undefined, "next"),
+        stepToPrevious: () => ScrollerUtils.stepTo(track ?? undefined, "previous", overlapCount),
+        stepToNext: () => ScrollerUtils.stepTo(track ?? undefined, "next", overlapCount),
     };
 
     $effect(() => {

@@ -1,4 +1,13 @@
-import { Fragment, type KeyboardEvent, type MouseEvent, useCallback, useMemo, useRef, useState } from "react";
+import {
+    Fragment,
+    type KeyboardEvent,
+    type MouseEvent,
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from "react";
 
 import { FloaterStyles, InteractionTrackerUtils, TABS_DEFAULTS, TabsStyles, TabsUtils } from "@thewaver/ss-components";
 
@@ -56,6 +65,8 @@ const TabsItem = <T,>(props: TabsItemProps<T>) => {
 };
 
 export const Tabs = <T,>(props: TabsProps<T>) => {
+    useEffect(() => TabsUtils.warnIfUnpaired(props.tabs), []);
+
     const rootRef = useRef<HTMLDivElement | null>(null);
 
     const [itemElements, setItemElements] = useState<(HTMLElement | undefined)[]>([]);

@@ -16,6 +16,7 @@ import {
     FlattenerUtils,
     FloaterStyles,
     InteractionTrackerUtils,
+    SelectionUtils,
     TREE_DEFAULTS,
     TreeStyles,
     TreeUtils,
@@ -33,7 +34,7 @@ import { PlacementBox } from "../../Primitives/PlacementBox/PlacementBox";
 import { PlacementItem } from "../../Primitives/PlacementItem/PlacementItem";
 import { useElement } from "../../Utils/refUtils";
 import { TooltipReactUtils } from "../Overlays/Tooltip/TooltipReact.utils";
-import type { TreeNodeItemProps, TreeProps, TreeRow } from "./Tree.types";
+import type { MultiTreeProps, TreeCompositeProps, TreeNodeItemProps, TreeProps, TreeRow } from "./Tree.types";
 
 const TREE_ITEM_SELECTOR = '[role="treeitem"]';
 
@@ -52,7 +53,7 @@ const TreeNodeItem = (props: TreeNodeItemProps) => {
             return;
         }
 
-        props.onActivate();
+        props.onActivate(e);
     };
 
     const commonProps = {
@@ -60,7 +61,8 @@ const TreeNodeItem = (props: TreeNodeItemProps) => {
         "role": "treeitem",
         "id": props.id,
         "aria-disabled": isDisabled || undefined,
-        "aria-selected": props.flags.isSelected,
+        "aria-selected": props.isMultiple ? undefined : props.flags.isSelected,
+        "aria-checked": props.isMultiple ? props.flags.checkedState : undefined,
         "aria-expanded": props.flags.isBranch ? props.flags.isExpanded : undefined,
         "aria-busy": props.flags.isPending || undefined,
         "aria-level": props.level,
@@ -85,13 +87,14 @@ const TreeNodeItem = (props: TreeNodeItemProps) => {
     );
 };
 
-export const Tree = <T,>(props: TreeProps<T>) => {
+const TreeComposite = <T,>(props: TreeCompositeProps<T>) => {
     const hasLayout = props.computeLayout !== undefined;
     const hasConnector = props.renderConnector !== undefined;
 
     useEffect(() => TreeUtils.warnIfConnectorIgnored(hasLayout, hasConnector), [hasLayout, hasConnector]);
 
     const [value, setValue] = SignalMirrorReactUtils.useOptionalState<T | undefined>(props.value, undefined);
+    const [checked, setChecked] = SignalMirrorReactUtils.useOptionalState<T[]>(props.checked, []);
     const [expanded, setExpanded] = SignalMirrorReactUtils.useOptionalState<T[]>(props.expanded, []);
 
     const treeId = useId();
@@ -101,6 +104,7 @@ export const Tree = <T,>(props: TreeProps<T>) => {
     const lastFocusedValueRef = useRef<T | undefined>(undefined);
     const lastExpandedRef = useRef<T[]>([]);
     const pendingFocusIdRef = useRef<string | undefined>(undefined);
+    const checkAnchorRef = useRef<T | undefined>(undefined);
 
     const direction = NavigatorReactUtils.useDirection(rootRef);
     const typeahead = TypeaheadReactUtils.useBuffer();
@@ -124,7 +128,20 @@ export const Tree = <T,>(props: TreeProps<T>) => {
     const navigableRows = useMemo(() => flatRows.filter(TreeUtils.computeIsNavigable), [flatRows]);
 
     const isVirtualized = props.computeEstimatedNodeHeight !== undefined && props.computeLayout === undefined;
-    const rovingRow = TreeUtils.computeRovingRow(navigableRows, focusedValue, value);
+
+    const branchDefs = useMemo(() => TreeUtils.createBranchDefs(nodes), [nodes]);
+
+    const computeCheckedState = (rowValue: T) =>
+        props.isMultiple ? SelectionUtils.getBranchState(rowValue, checked, branchDefs) : rowValue === value;
+
+    const computeFirstCheckedValue = () =>
+        navigableRows.find((row) => computeCheckedState(row.node.value) === true)?.node.value;
+
+    const rovingRow = TreeUtils.computeRovingRow(
+        navigableRows,
+        focusedValue,
+        props.isMultiple ? computeFirstCheckedValue() : value,
+    );
 
     const rowWindow = VirtualizerReactUtils.useRowWindow(sizerRef, flatRows.length, {
         isDisabled: !isVirtualized,
@@ -197,9 +214,17 @@ export const Tree = <T,>(props: TreeProps<T>) => {
         if (next !== expanded) setExpanded(next);
     };
 
-    const expand = (row: TreeRow<T>) => writeExpanded(TreeUtils.expand(expanded, row.node));
+    const expand = (row: TreeRow<T>) => {
+        if (row.node.isDisabled) return;
 
-    const collapse = (row: TreeRow<T>) => writeExpanded(TreeUtils.collapse(expanded, row.node));
+        writeExpanded(TreeUtils.expand(expanded, row.node));
+    };
+
+    const collapse = (row: TreeRow<T>) => {
+        if (row.node.isDisabled) return;
+
+        writeExpanded(TreeUtils.collapse(expanded, row.node));
+    };
 
     const toggle = (row: TreeRow<T>) => {
         if (row.isExpanded) {
@@ -222,12 +247,97 @@ export const Tree = <T,>(props: TreeProps<T>) => {
         props.onSelectionChange?.(next);
     };
 
+    const writeChecked = (next: T[]) => {
+        setChecked(next);
+
+        props.onCheckedChange?.(next);
+    };
+
+    const check = (row: TreeRow<T>) => {
+        if (row.node.isDisabled) return;
+
+        checkAnchorRef.current = row.node.value;
+
+        writeChecked(SelectionUtils.getBranchSelection(row.node.value, checked, branchDefs));
+    };
+
+    const checkRows = (checkedRows: TreeRow<T>[]) =>
+        writeChecked(
+            SelectionUtils.getMerged(
+                checked,
+                checkedRows
+                    .filter((row) => !row.node.isDisabled)
+                    .flatMap((row) => SelectionUtils.getBranchItems(row.node.value, branchDefs)),
+            ),
+        );
+
+    const checkAll = () => {
+        const all = TreeUtils.getCheckableValues(nodes);
+        const isAllChecked = all.every((entry) => checked.includes(entry));
+
+        writeChecked(isAllChecked ? [] : all);
+    };
+
     const activate = (row: TreeRow<T>) => {
         if (row.node.isDisabled) return;
 
+        const isBranch = TreeUtils.getIsBranch(row.node);
+
+        if (props.isMultiple) {
+            if (isBranch) toggle(row);
+            else check(row);
+
+            return;
+        }
+
         select(row.node.value);
 
-        if (TreeUtils.getIsBranch(row.node)) toggle(row);
+        if (isBranch) toggle(row);
+    };
+
+    const press = (row: TreeRow<T>, expander: HTMLElement | undefined, e: MouseEvent<HTMLElement>) => {
+        if (row.node.isDisabled) return;
+
+        const isBranch = TreeUtils.getIsBranch(row.node);
+
+        if (expander !== undefined && e.target instanceof Node && expander.contains(e.target)) {
+            if (isBranch) toggle(row);
+
+            return;
+        }
+
+        if (props.isMultiple) check(row);
+        else select(row.node.value);
+
+        if (expander === undefined && isBranch) toggle(row);
+    };
+
+    const handleMultiKeyDown = (e: KeyboardEvent<HTMLDivElement>, current: TreeRow<T>) => {
+        const action = TreeUtils.computeMultiKeyAction(
+            e.key,
+            { isShiftHeld: e.shiftKey, isControlHeld: e.ctrlKey || e.metaKey },
+            current,
+            {
+                navigable: navigableRows,
+                anchor: navigableRows.find((row) => row.node.value === checkAnchorRef.current),
+            },
+        );
+
+        if (action === undefined) return false;
+
+        e.preventDefault();
+
+        if (action.kind === "check") check(action.row);
+        if (action.kind === "check_all") checkAll();
+        if (action.kind === "check_range") checkRows(action.rows);
+        if (action.kind === "check_range" && action.focus) focusRow(action.focus);
+
+        if (action.kind === "focus_check") {
+            focusRow(action.row);
+            check(action.row);
+        }
+
+        return true;
     };
 
     const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
@@ -236,6 +346,8 @@ export const Tree = <T,>(props: TreeProps<T>) => {
         const current = findRowById(document.activeElement?.id) ?? rovingRow;
 
         if (!current) return;
+
+        if (props.isMultiple && handleMultiKeyDown(e, current)) return;
 
         const action = TreeUtils.computeKeyAction(e.key, current, {
             flatRows,
@@ -308,7 +420,7 @@ export const Tree = <T,>(props: TreeProps<T>) => {
         });
 
     const selectionFloater = useNodeFloater(
-        props.renderSelectionFloater !== undefined,
+        props.renderSelectionFloater !== undefined && !props.isMultiple,
         floaterTargets.selection,
         selectedRow,
     );
@@ -374,6 +486,9 @@ export const Tree = <T,>(props: TreeProps<T>) => {
 
     const renderRow = (row: TreeRow<T>) => {
         const placement = layout?.placements[row.index];
+        const checkedState = computeCheckedState(row.node.value);
+
+        let expander: HTMLElement | undefined;
 
         const element = (
             <InteractionWrapper
@@ -387,8 +502,8 @@ export const Tree = <T,>(props: TreeProps<T>) => {
                     isBranch: TreeUtils.getIsBranch(row.node),
                     isExpanded: row.isExpanded,
                     isPending: TreeUtils.computeIsPending(row),
-                    isSelected: row.node.value === value,
-                    checkedState: row.node.value === value,
+                    isSelected: checkedState === true,
+                    checkedState,
                     depth: row.depth,
                 }}
                 renderControl={(setElementRef, renderProps) => (
@@ -401,8 +516,13 @@ export const Tree = <T,>(props: TreeProps<T>) => {
                         setSize={row.setSize}
                         flags={renderProps}
                         linkComponent={props.linkComponent}
-                        renderContent={() => props.renderNode(row.node, renderProps)}
-                        onActivate={() => activate(row)}
+                        isMultiple={props.isMultiple}
+                        renderContent={() =>
+                            props.renderNode(row.node, renderProps, (element) => {
+                                expander = element ?? undefined;
+                            })
+                        }
+                        onActivate={(e) => press(row, expander, e)}
                     />
                 )}
             />
@@ -474,6 +594,7 @@ export const Tree = <T,>(props: TreeProps<T>) => {
             className={TreeStyles.treeRoot}
             role="tree"
             aria-label={props.ariaLabel}
+            aria-multiselectable={props.isMultiple || undefined}
             onKeyDown={(e) => {
                 handleKeyDown(e);
 
@@ -498,3 +619,7 @@ export const Tree = <T,>(props: TreeProps<T>) => {
         </div>
     );
 };
+
+export const Tree = <T,>(props: TreeProps<T>) => <TreeComposite {...props} isMultiple={false} />;
+
+export const MultiTree = <T,>(props: MultiTreeProps<T>) => <TreeComposite {...props} isMultiple={true} />;

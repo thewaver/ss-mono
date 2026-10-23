@@ -14,6 +14,7 @@ import { PlacedAboveExample } from "./Examples/PlacedAbove";
 import { ReachableExample } from "./Examples/Reachable";
 import { RightToLeftExample } from "./Examples/RightToLeft";
 import { RightToLeftPlacedExample } from "./Examples/RightToLeftPlaced";
+import { SectionsExample } from "./Examples/Sections";
 import { StatefulExample } from "./Examples/Stateful";
 import { SubmenusExample } from "./Examples/Submenus";
 import {
@@ -55,6 +56,8 @@ export const MenuPage = () => {
 
     const drivenVisibility = useState(false);
     const viewState = useState(VIEW_DEFAULTS);
+    const sectionsState = useState(VIEW_DEFAULTS);
+    const [lastSectionsAction, setLastSectionsAction] = useState(NOTHING_RUN);
     const [lastViewAction, setLastViewAction] = useState(NOTHING_RUN);
 
     const examples = [
@@ -197,6 +200,23 @@ export const MenuPage = () => {
                 <StatefulExample checked={viewState} onActivate={(action) => setLastViewAction(`ran ${action.name}`)} />
             ),
             path: `${EXAMPLES_ROOT}/Stateful.tsx`,
+        },
+        {
+            key: "sections",
+            name: EXAMPLE_NAMES.sections,
+            readout: () =>
+                `${lastSectionsAction} — ticked: [${sectionsState[0]
+                    .map((action) => action.name)
+                    .join(
+                        ", ",
+                    )}]; each group is named, the arrows walk straight through the headings, and the radio choice stays inside its own group`,
+            component: () => (
+                <SectionsExample
+                    checked={sectionsState}
+                    onActivate={(action) => setLastSectionsAction(`ran ${action.name}`)}
+                />
+            ),
+            path: `${EXAMPLES_ROOT}/Sections.tsx`,
         },
         {
             key: "disabled",

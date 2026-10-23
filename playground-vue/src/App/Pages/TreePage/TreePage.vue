@@ -5,6 +5,7 @@ import { EXAMPLES_ROOT, EXAMPLE_NAMES } from "@thewaver/ss-playground/App/Pages/
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
+import CheckboxesExample from "./Examples/Checkboxes.vue";
 import FilesExample from "./Examples/Files.vue";
 import LazyExample from "./Examples/Lazy.vue";
 import LinkComponentExample from "./Examples/LinkComponent.vue";
@@ -64,6 +65,9 @@ const radialExpanded = shallowRef<string[]>(RANK_ROOTS);
 
 const recordValue = shallowRef<Asset | undefined>();
 const recordExpanded = shallowRef<Asset[]>([]);
+
+const checkboxesChecked = shallowRef<string[]>([]);
+const checkboxesExpanded = shallowRef<string[]>([]);
 
 const examples: ExampleDefs[] = [
     {
@@ -151,6 +155,13 @@ const examples: ExampleDefs[] = [
         path: `${EXAMPLES_ROOT}/RecordValues.vue`,
     },
     {
+        key: "checkboxes",
+        name: EXAMPLE_NAMES.checkboxes,
+        readout: () =>
+            `ticked: [${checkboxesChecked.value.join(", ")}] — pressing a folder's arrow opens it and pressing its name ticks it with everything inside; Space ticks, Shift with Space ticks a run, Control with A ticks everything`,
+        path: `${EXAMPLES_ROOT}/Checkboxes.vue`,
+    },
+    {
         key: "leaning",
         name: EXAMPLE_NAMES.leaning,
         readout: () =>
@@ -232,6 +243,10 @@ const examples: ExampleDefs[] = [
 
         <template #recordValues>
             <RecordValuesExample v-model:value="recordValue" v-model:expanded="recordExpanded" />
+        </template>
+
+        <template #checkboxes>
+            <CheckboxesExample v-model:checked="checkboxesChecked" v-model:expanded="checkboxesExpanded" />
         </template>
     </PageExamples>
 </template>

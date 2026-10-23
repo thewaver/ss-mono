@@ -20,11 +20,13 @@ export const Scroller = defineComponent(
 
         let reportedRatio = ScrollerUtils.RATIO_MIN;
 
+        const getOverlapCount = () => props.overlapCount ?? SCROLLER_DEFAULTS.overlapCount;
+
         const stepper: ScrollerStepper = {
             getIsAtStart: () => ScrollerUtils.getIsAtStart(metrics.value),
             getIsAtEnd: () => ScrollerUtils.getIsAtEnd(metrics.value),
-            stepToPrevious: () => ScrollerUtils.stepTo(trackRef.value, "previous"),
-            stepToNext: () => ScrollerUtils.stepTo(trackRef.value, "next"),
+            stepToPrevious: () => ScrollerUtils.stepTo(trackRef.value, "previous", getOverlapCount()),
+            stepToNext: () => ScrollerUtils.stepTo(trackRef.value, "next", getOverlapCount()),
         };
 
         watchAfterRender([trackRef], ([track]) => {

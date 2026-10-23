@@ -6,6 +6,8 @@ import {
     type MenuFlags,
     type MenuHighlightPosition,
     type MenuItemFlags,
+    type MenuRun,
+    type MenuSection,
     MenuStyles,
     MenuUtils,
     TypeaheadUtils,
@@ -35,10 +37,13 @@ import type {
     ContextMenuProps,
     ContextMenuSlots,
     MenuEntryProps,
+    MenuGroup,
+    MenuGroupSlots,
     MenuItem,
     MenuItemViewProps,
     MenuItemsSlots,
     MenuLevelProps,
+    MenuNode,
     MenuProps,
     MenuSlots,
     MenuTriggerProps,
@@ -147,7 +152,7 @@ const MenuItemView = defineComponent(
 );
 
 const MenuEntry = defineComponent(
-    <T,>(props: MenuEntryProps<T>, { slots }: SlotsContext<MenuItemsSlots<T>>) => {
+    <T,>(props: MenuEntryProps<T>, { slots }: SlotsContext<MenuItemsSlots<T> & MenuGroupSlots<T>>) => {
         const itemElement = shallowRef<HTMLElement>();
 
         const getItemId = () => `${props.level.id}-item-${props.index}`;
@@ -252,6 +257,8 @@ const MenuEntry = defineComponent(
                                     >
                                         {{
                                             renderItem: slots.renderItem,
+                                            renderGroupHeader: slots.renderGroupHeader,
+                                            renderGroupBox: slots.renderGroupBox,
                                             renderPopup: slots.renderPopup,
                                             renderHighlightFloater: slots.renderHighlightFloater,
                                         }}
@@ -266,7 +273,7 @@ const MenuEntry = defineComponent(
     },
     {
         name: "MenuEntry",
-        slots: Object as SlotsType<MenuItemsSlots<any>>,
+        slots: Object as SlotsType<MenuItemsSlots<any> & MenuGroupSlots<any>>,
         props: declareProps<MenuEntryProps<unknown>>({
             level: null,
             item: null,
@@ -289,7 +296,7 @@ const MenuEntry = defineComponent(
 );
 
 const MenuLevel = defineComponent(
-    <T,>(props: MenuLevelProps<T>, { slots }: SlotsContext<MenuItemsSlots<T>>) => {
+    <T,>(props: MenuLevelProps<T>, { slots }: SlotsContext<MenuItemsSlots<T> & MenuGroupSlots<T>>) => {
         const highlightedValue = shallowRef<T>();
         const openValue = shallowRef<T>();
         const isCoveredWhileClosing = shallowRef(false);
@@ -318,9 +325,13 @@ const MenuLevel = defineComponent(
             },
         );
 
-        const entries = computed(() =>
-            MenuUtils.computeEntries(MenuUtils.flattenNodes(props.items), props.openerItem, props.submenuMode),
+        const nodes = computed(() =>
+            MenuUtils.computeEntries<MenuNode<T>>(props.items, props.openerItem, props.submenuMode),
         );
+
+        const entries = computed(() => MenuUtils.flattenNodes(nodes.value));
+
+        const sections = computed(() => MenuUtils.getSections<T, MenuItem<T>>(nodes.value));
 
         const openingHover = MenuUtils.createOpeningHoverGuard();
 
@@ -472,7 +483,12 @@ const MenuLevel = defineComponent(
         };
 
         const activateIndex = (index: number) => {
-            const activation = MenuUtils.computeActivation<T, MenuItem<T>>(entries.value, index, hasBackEntry.value);
+            const activation = MenuUtils.computeActivation<T, MenuItem<T>>(
+                entries.value,
+                index,
+                hasBackEntry.value,
+                sections.value.flatMap((section) => section.runs),
+            );
 
             if (activation.type === "back") {
                 props.onClose();
@@ -579,6 +595,8 @@ const MenuLevel = defineComponent(
                 >
                     {{
                         renderItem: slots.renderItem,
+                        renderGroupHeader: slots.renderGroupHeader,
+                        renderGroupBox: slots.renderGroupBox,
                         renderPopup: slots.renderPopup,
                         renderHighlightFloater: slots.renderHighlightFloater,
                     }}
@@ -598,21 +616,68 @@ const MenuLevel = defineComponent(
             );
         };
 
-        const renderRuns = () =>
-            MenuUtils.getRuns<T, MenuItem<T>>(entries.value).flatMap((run) => {
-                const children = run.items.map((item, offset) => renderEntry(item, run.from + offset));
+        const renderRun = (run: MenuRun<MenuItem<T>>): VNodeChild[] => {
+            const children = run.items.map((item, offset) => renderEntry(item, run.from + offset));
 
-                return run.isRadioGroup
-                    ? [
-                          <div
-                              key={`group-${run.from}`}
-                              role="group"
-                              class={layout.value !== undefined ? MenuStyles.menuLayoutGroup : undefined}
-                          >
-                              {children}
-                          </div>,
-                      ]
-                    : children;
+            return run.isRadioGroup
+                ? [
+                      <div
+                          key={`group-${run.from}`}
+                          role="group"
+                          class={layout.value !== undefined ? MenuStyles.menuLayoutGroup : undefined}
+                      >
+                          {children}
+                      </div>,
+                  ]
+                : children;
+        };
+
+        const renderSectionRuns = (section: MenuSection<MenuItem<T>>) => section.runs.flatMap(renderRun);
+
+        const renderSectionContentAt = (index: number): VNodeChild => {
+            const section = sections.value[index];
+
+            if (!section?.group) return null;
+
+            return [
+                layout.value === undefined && callSlot(slots.renderGroupHeader, { group: section.group }),
+                renderSectionRuns(section),
+            ];
+        };
+
+        const sectionContents = new Map<number, () => VNodeChild>();
+
+        const getSectionContent = (index: number) => {
+            const existing = sectionContents.get(index);
+
+            if (existing) return existing;
+
+            const content = () => renderSectionContentAt(index);
+
+            sectionContents.set(index, content);
+
+            return content;
+        };
+
+        const renderGroupBox = (group: MenuGroup<T>, renderContent: () => VNodeChild) =>
+            slots.renderGroupBox === undefined || layout.value !== undefined
+                ? renderContent()
+                : callSlot(slots.renderGroupBox, { renderContent, group });
+
+        const renderRuns = () =>
+            sections.value.flatMap((section, index) => {
+                if (!section.group) return renderSectionRuns(section);
+
+                return [
+                    <div
+                        key={`section-${section.from}`}
+                        role="group"
+                        aria-label={section.group.label}
+                        class={layout.value !== undefined ? MenuStyles.menuLayoutGroup : undefined}
+                    >
+                        {renderGroupBox(section.group, getSectionContent(index))}
+                    </div>,
+                ];
             });
 
         const renderItems = (): VNodeChild => {
@@ -698,7 +763,7 @@ const MenuLevel = defineComponent(
     },
     {
         name: "MenuLevel",
-        slots: Object as SlotsType<MenuItemsSlots<any>>,
+        slots: Object as SlotsType<MenuItemsSlots<any> & MenuGroupSlots<any>>,
         props: declareProps<MenuLevelProps<unknown>>({
             id: null,
             labelledBy: null,
@@ -740,6 +805,14 @@ const MenuLevel = defineComponent(
 
 export const Menu = defineComponent(
     <T,>(props: MenuProps<T>, { slots, expose }: SlotsContext<MenuSlots<T>>) => {
+        watchAfterRender(
+            [
+                () => props.computeLayout !== undefined,
+                () => slots.renderGroupHeader !== undefined || slots.renderGroupBox !== undefined,
+            ],
+            ([hasLayout, hasGroupPaint]) => MenuUtils.warnIfGroupPaintIgnored(hasLayout, hasGroupPaint),
+        );
+
         const fallbackTriggerId = useId();
         const menuId = useId();
 
@@ -910,6 +983,8 @@ export const Menu = defineComponent(
                                 >
                                     {{
                                         renderItem: slots.renderItem,
+                                        renderGroupHeader: slots.renderGroupHeader,
+                                        renderGroupBox: slots.renderGroupBox,
                                         renderPopup: slots.renderPopup,
                                         renderHighlightFloater: slots.renderHighlightFloater,
                                     }}
@@ -968,6 +1043,14 @@ export const Menu = defineComponent(
 
 export const ContextMenu = defineComponent(
     <T,>(props: ContextMenuProps<T>, { slots }: SlotsContext<ContextMenuSlots<T>>) => {
+        watchAfterRender(
+            [
+                () => props.computeLayout !== undefined,
+                () => slots.renderGroupHeader !== undefined || slots.renderGroupBox !== undefined,
+            ],
+            ([hasLayout, hasGroupPaint]) => MenuUtils.warnIfGroupPaintIgnored(hasLayout, hasGroupPaint),
+        );
+
         const viewportContext = useViewportContext();
         const menuId = useId();
 
@@ -1079,6 +1162,8 @@ export const ContextMenu = defineComponent(
                     >
                         {{
                             renderItem: slots.renderItem,
+                            renderGroupHeader: slots.renderGroupHeader,
+                            renderGroupBox: slots.renderGroupBox,
                             renderPopup: slots.renderPopup,
                             renderHighlightFloater: slots.renderHighlightFloater,
                         }}

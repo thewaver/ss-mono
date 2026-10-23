@@ -45,6 +45,16 @@ export type SelectFieldProps = InteractionControlProps<SelectFlags> & {
     isFilterable: boolean;
     /** What the reader has typed to narrow the list by. */
     query: string;
+    /**
+     * Whether the reader is typing, so the field holds what they typed. Otherwise it holds the text of what is
+     * picked, which is what a screen reader reads as the field's value.
+     */
+    isEditing: boolean;
+    /**
+     * The text of what is picked, where the consumer gave one. Without it the field takes the text the consumer
+     * painted for the picked option; an empty string keeps the field empty.
+     */
+    valueText: string | undefined;
     /** How far the field's text is inset, as a style, so it clears whatever the consumer has drawn inside the field. */
     textInset: string;
     /** Styles the field's text against its current state. */

@@ -1,5 +1,10 @@
 <script setup lang="ts">
 import {
+    CHECKED_MARK,
+    MIXED_MARK,
+} from "@thewaver/ss-playground/App/StyledComponents/SelectGroupContent/SelectGroupContent.const";
+import * as markStyles from "@thewaver/ss-playground/App/StyledComponents/SelectGroupContent/SelectGroupContent.css";
+import {
     BRANCH_MARKER,
     DESCRIPTION_ONLY_MARKER,
     INDENT_PER_DEPTH,
@@ -32,8 +37,20 @@ const layerClass = useLayerClass();
             paddingLeft: `calc(${themeVars.spacing.half} + ${renderProps.depth * INDENT_PER_DEPTH}px)`,
         }"
     >
-        <div :class="styles.treeNodeMarker" aria-hidden="true">
+        <div :ref="setExpanderRef" :class="styles.treeNodeMarker" aria-hidden="true">
             {{ renderProps.isBranch ? BRANCH_MARKER : hasExamples ? LEAF_MARKER : DESCRIPTION_ONLY_MARKER }}
+        </div>
+
+        <div
+            v-if="hasCheckbox"
+            :class="[
+                markStyles.selectGroupMark,
+                renderProps.checkedState === true && markStyles.isChecked,
+                renderProps.checkedState === 'mixed' && markStyles.isMixed,
+            ]"
+            aria-hidden="true"
+        >
+            {{ renderProps.checkedState === "mixed" ? MIXED_MARK : CHECKED_MARK }}
         </div>
 
         <div><slot /></div>

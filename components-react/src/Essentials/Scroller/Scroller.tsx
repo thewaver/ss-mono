@@ -24,6 +24,7 @@ export const Scroller = (props: ScrollerProps) => {
 
     const gap = props.gap ?? SCROLLER_DEFAULTS.gap;
     const padding = props.padding ?? SCROLLER_DEFAULTS.padding;
+    const overlapCount = props.overlapCount ?? SCROLLER_DEFAULTS.overlapCount;
     const steps = ScrollerUtils.getSteps(
         props.buttonPlacement ?? SCROLLER_DEFAULTS.buttonPlacement,
         ScrollerUtils.getIsScrollable(metrics),
@@ -32,8 +33,8 @@ export const Scroller = (props: ScrollerProps) => {
     const stepper: ScrollerStepper = {
         getIsAtStart: () => ScrollerUtils.getIsAtStart(metrics),
         getIsAtEnd: () => ScrollerUtils.getIsAtEnd(metrics),
-        stepToPrevious: () => ScrollerUtils.stepTo(trackRef.current ?? undefined, "previous"),
-        stepToNext: () => ScrollerUtils.stepTo(trackRef.current ?? undefined, "next"),
+        stepToPrevious: () => ScrollerUtils.stepTo(trackRef.current ?? undefined, "previous", overlapCount),
+        stepToNext: () => ScrollerUtils.stepTo(trackRef.current ?? undefined, "next", overlapCount),
     };
 
     useLayoutEffect(() => {

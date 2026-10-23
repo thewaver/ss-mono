@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { type Page, expect, test } from "@playwright/test";
 
 import { activeMatches, activeText, attributesOf, demo, readout, tabIndex } from "./helpers";
 
@@ -496,4 +496,98 @@ test("after the menu is filtered, the highlight marker lands on the row under th
             )
             .toBeLessThan(1);
     }
+});
+
+/**
+ * A tree that ticks several. Each row's marker is the arrow that opens it, registered with the tree, so a press on the
+ * arrow and a press on the name are two different requests: the arrow only opens and closes, the name ticks. The
+ * marker is the Playground's paint, the first decorative part of the row, so it is found by position in the row.
+ */
+test.describe("a tree that ticks several", () => {
+    const CHECKBOXES = demo("checkboxes");
+
+    const row = (page: Page, name: string) =>
+        page
+            .locator(node(CHECKBOXES))
+            .filter({ has: page.getByText(name, { exact: true }) })
+            .first();
+    const arrowOf = (page: Page, name: string) => row(page, name).locator('[aria-hidden="true"]').first();
+    const nameOf = (page: Page, name: string) => row(page, name).getByText(name, { exact: true });
+
+    test("it says it ticks several, and every row states whether it is ticked", async ({ page }) => {
+        await expect(page.locator(`${CHECKBOXES} [role="tree"]`)).toHaveAttribute("aria-multiselectable", "true");
+
+        for (const item of await page.locator(node(CHECKBOXES)).all()) {
+            await expect(item).toHaveAttribute("aria-checked", "false");
+            await expect(item, "and none says it is selected, since ticking is the selection").not.toHaveAttribute(
+                "aria-selected",
+                /.*/,
+            );
+        }
+    });
+
+    test("pressing a folder's arrow opens it without ticking it", async ({ page }) => {
+        await arrowOf(page, "src").click();
+
+        await expect(row(page, "src"), "the arrow opens the folder").toHaveAttribute("aria-expanded", "true");
+        await expect(row(page, "src"), "and ticks nothing").toHaveAttribute("aria-checked", "false");
+        expect(await readout(page, "checkboxes")).toContain("ticked: []");
+
+        await arrowOf(page, "src").click();
+
+        await expect(row(page, "src"), "and a second press closes it again").toHaveAttribute("aria-expanded", "false");
+    });
+
+    test("pressing a folder's name ticks it with everything inside, and leaves it as it was", async ({ page }) => {
+        await nameOf(page, "src").click();
+
+        await expect(row(page, "src"), "the name ticks the folder").toHaveAttribute("aria-checked", "true");
+        await expect(row(page, "src"), "without opening it").toHaveAttribute("aria-expanded", "false");
+
+        await arrowOf(page, "src").click();
+
+        for (const item of await page.locator(`${CHECKBOXES} [role="group"] [role="treeitem"]`).all()) {
+            await expect(item, "and everything inside it is ticked with it").toHaveAttribute("aria-checked", "true");
+        }
+    });
+
+    test("a folder with only some of its contents ticked says it is partly ticked", async ({ page }) => {
+        await arrowOf(page, "src").click();
+        await nameOf(page, "index.ts").click();
+
+        await expect(row(page, "index.ts")).toHaveAttribute("aria-checked", "true");
+        await expect(row(page, "src"), "the folder holding it is neither ticked nor not").toHaveAttribute(
+            "aria-checked",
+            "mixed",
+        );
+    });
+
+    test("Space ticks the focused row, Shift with Space ticks the run to it, Control with A ticks everything", async ({
+        page,
+    }) => {
+        const rows = page.locator(node(CHECKBOXES));
+
+        await rows.first().focus();
+        await page.keyboard.press("ArrowDown");
+        await page.keyboard.press("Space");
+
+        await expect(rows.nth(1), "Space ticks the focused row").toHaveAttribute("aria-checked", "true");
+        await expect(rows.first(), "and only it").toHaveAttribute("aria-checked", "false");
+
+        await page.keyboard.press("ArrowDown");
+        await page.keyboard.press("Shift+Space");
+
+        await expect(rows.nth(2), "Shift with Space ticks from the last row ticked").toHaveAttribute(
+            "aria-checked",
+            "true",
+        );
+        await expect(rows.nth(1), "to this one").toHaveAttribute("aria-checked", "true");
+        await expect(rows.first(), "and nothing before the run").toHaveAttribute("aria-checked", "false");
+
+        await page.keyboard.press("ControlOrMeta+A");
+
+        for (const item of await rows.all()) {
+            await expect(item, "Control with A ticks every row").toHaveAttribute("aria-checked", "true");
+        }
+    });
 });

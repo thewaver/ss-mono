@@ -6,6 +6,7 @@ import type {
     BaseMenuProps,
     InteractionFlags,
     MenuFlags,
+    MenuGroupPaintExcludesLayout,
     MenuGroupRecord,
     MenuHighlightPosition,
     MenuItemFlags,
@@ -37,7 +38,7 @@ export type MenuItem<T> = {
      */
     kind?: MenuItemKind;
     /** The items of this item's submenu. An item carrying them opens a submenu rather than being picked. */
-    items?: (MenuItem<T> | MenuGroupRecord<MenuItem<T>>)[];
+    items?: MenuNode<T>[];
     /** Whether the item can be picked. A disabled item is left out of the arrow-key walk unless kept reachable. */
     isDisabled?: boolean;
     /**
@@ -94,6 +95,14 @@ export type MenuItemViewProps = InteractionControlProps<MenuItemFlags> & {
 export type MenuRenderItem<T> = Snippet<
     [item: MenuItem<T>, flags: InteractionFlags<MenuItemFlags>, placement: PlacementRect | undefined]
 >;
+
+export type MenuGroup<T> = MenuGroupRecord<MenuItem<T>>;
+
+export type MenuNode<T> = MenuItem<T> | MenuGroup<T>;
+
+export type MenuRenderGroupHeader<T> = Snippet<[group: MenuGroup<T>]>;
+
+export type MenuRenderGroupBox<T> = Snippet<[renderContent: Snippet, group: MenuGroup<T>]>;
 
 export type MenuRenderPopup = Snippet<
     [
@@ -161,8 +170,8 @@ export type MenuLevelProps<T> = {
     parentPlacement?: PlacementRect;
     /** The item that opened this level, where one did. */
     openerItem?: MenuItem<T>;
-    /** The items on this level, in the order they are shown. */
-    items: (MenuItem<T> | MenuGroupRecord<MenuItem<T>>)[];
+    /** The items on this level, in the order they are shown, with any groups among them. */
+    items: MenuNode<T>[];
     /** Which values are currently checked, for the checkbox and radio items among them. */
     checkedValues: T[];
     /** Arranges this level's items, for a menu that is something other than a vertical list. */
@@ -175,6 +184,10 @@ export type MenuLevelProps<T> = {
     flickOrigin?: Point2d;
     /** Draws one item. */
     renderItem: MenuRenderItem<T>;
+    /** Draws one group's heading, on this level and every submenu. */
+    renderGroupHeader?: MenuRenderGroupHeader<T>;
+    /** Draws the box a group sits in, around its heading and its items, on this level and every submenu. */
+    renderGroupBox?: MenuRenderGroupBox<T>;
     /** Draws the surface this level's items sit on. */
     renderPopup: MenuRenderPopup;
     /** How long the highlight's marker takes to slide from one item to the next, and to fade. */
@@ -255,8 +268,11 @@ export type MenuProps<T> = Omit<InteractionWrapperProps<MenuFlags>, "renderContr
         visibility?: boolean;
         /** The element the menu is positioned against, where that is not the trigger itself. */
         anchorRef?: HTMLElement;
-        /** The items, in the order they are shown. Items carrying children are what make submenus. */
-        items: (MenuItem<T> | MenuGroupRecord<MenuItem<T>>)[];
+        /**
+         * The items, in the order they are shown. Items carrying children are what make submenus, and an entry carrying
+         * a `label` and `items` but no value is a group of them.
+         */
+        items: MenuNode<T>[];
         /**
          * Which values are currently checked, for the checkbox and radio items among them. Bind it with `bind:checked`;
          * the menu writes it when a checkbox or radio item is picked. Left out, nothing is checked and nothing is written.
@@ -276,7 +292,19 @@ export type MenuProps<T> = Omit<InteractionWrapperProps<MenuFlags>, "renderContr
         renderHighlightFloater?: Snippet<[visibilityTarget: 0 | 1, transitionDurationMs: number]>;
         /** Draws one item. */
         renderItem: MenuRenderItem<T>;
-    };
+        /**
+         * Draws a group's heading, above its items. A group is an entry in `items` carrying a `label` and its own
+         * `items` and no value; the heading is never reached by the arrow keys. Refused alongside `computeLayout`,
+         * since a laid-out menu places each item on its own and has no heading row.
+         */
+        renderGroupHeader?: MenuRenderGroupHeader<T>;
+        /**
+         * Draws the box a group sits in, around its heading and its items, which are handed in to be placed inside
+         * it — a background, a border, a line under the group, an indent. Refused alongside `computeLayout`, for the
+         * same reason.
+         */
+        renderGroupBox?: MenuRenderGroupBox<T>;
+    } & MenuGroupPaintExcludesLayout;
 
 export type ContextMenuProps<T> = BaseContextMenuProps<T> & {
     /**
@@ -293,8 +321,8 @@ export type ContextMenuProps<T> = BaseContextMenuProps<T> & {
      * Everything drawn inside it is the consumer's.
      */
     renderRegion: Snippet;
-    /** The items, in the order they are shown. */
-    items: (MenuItem<T> | MenuGroupRecord<MenuItem<T>>)[];
+    /** The items, in the order they are shown, and an entry carrying a `label` and `items` but no value is a group. */
+    items: MenuNode<T>[];
     /**
      * Which values are currently checked, for the checkbox and radio items among them. Bind it with `bind:checked`;
      * the menu writes it when a checkbox or radio item is picked. Left out, nothing is checked and nothing is written.
@@ -312,4 +340,16 @@ export type ContextMenuProps<T> = BaseContextMenuProps<T> & {
     renderHighlightFloater?: Snippet<[visibilityTarget: 0 | 1, transitionDurationMs: number]>;
     /** Draws one item. */
     renderItem: MenuRenderItem<T>;
-};
+    /**
+     * Draws a group's heading, above its items. A group is an entry in `items` carrying a `label` and its own
+     * `items` and no value; the heading is never reached by the arrow keys. Refused alongside `computeLayout`,
+     * since a laid-out menu places each item on its own and has no heading row.
+     */
+    renderGroupHeader?: MenuRenderGroupHeader<T>;
+    /**
+     * Draws the box a group sits in, around its heading and its items, which are handed in to be placed inside
+     * it — a background, a border, a line under the group, an indent. Refused alongside `computeLayout`, for the
+     * same reason.
+     */
+    renderGroupBox?: MenuRenderGroupBox<T>;
+} & MenuGroupPaintExcludesLayout;

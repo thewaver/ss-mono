@@ -46,14 +46,39 @@ const SelectField = defineComponent(
 
         const buttonRef = shallowRef<HTMLButtonElement>();
         const inputRef = shallowRef<HTMLInputElement>();
+        const contentRef = shallowRef<HTMLElement>();
+        const paintedText = shallowRef(SelectConst.EMPTY_QUERY);
 
         exposeElement(expose, () => (props.isFilterable ? inputRef.value : buttonRef.value));
 
+        watchAfterRender([contentRef, () => props.isFilterable], ([element, isFilterable]) => {
+            if (!element || !isFilterable) return;
+
+            const read = () => {
+                paintedText.value = SelectUtils.computePaintedText(element);
+            };
+            const observer = new MutationObserver(read);
+
+            read();
+            observer.observe(element, { childList: true, subtree: true, characterData: true });
+
+            return () => observer.disconnect();
+        });
+
+        const getValueText = () =>
+            props.flags.isEmpty ? SelectConst.EMPTY_QUERY : (props.valueText ?? paintedText.value);
+
         const { handleInput, handleCompositionStart, handleCompositionEnd } = TextSyncVueUtils.useValueSync(
             inputRef,
-            () => props.query,
+            () => (props.isEditing ? props.query : getValueText()),
             { onInput: (query) => props.onQueryInput(query) },
         );
+
+        const selectValueText = (element: HTMLInputElement) => {
+            if (props.isEditing) return;
+
+            element.select();
+        };
 
         return () => {
             const isDisabled = props.flags.isDisabled ?? false;
@@ -96,19 +121,30 @@ const SelectField = defineComponent(
 
             return (
                 <>
-                    {callSlot(slots.renderContent, props.flags)}
+                    <span ref={contentRef} class={SelectStyles.selectFieldContent}>
+                        {callSlot(slots.renderContent, props.flags)}
+                    </span>
 
                     <input
                         id={props.id}
                         ref={inputRef}
                         type="text"
-                        class={SelectStyles.selectFilterField}
+                        class={[
+                            SelectStyles.selectFilterField,
+                            !props.isEditing && SelectStyles.selectFilterFieldShowsValue,
+                        ]}
                         style={[props.textInset, props.computeTextStyle?.(props.flags)]}
                         autocomplete="off"
                         readonly={isDisabled}
                         {...commonProps}
                         onKeydown={(e) => props.onKeyDown(e)}
-                        onClick={handleClick}
+                        onFocus={(e) => selectValueText(e.currentTarget as HTMLInputElement)}
+                        onClick={(e) => {
+                            if (isDisabled) return;
+
+                            selectValueText(e.currentTarget as HTMLInputElement);
+                            props.onToggle();
+                        }}
                         onInput={(e) => handleInput(e.currentTarget as HTMLInputElement)}
                         onCompositionstart={() => handleCompositionStart()}
                         onCompositionend={(e) => handleCompositionEnd(e.currentTarget as HTMLInputElement)}
@@ -129,6 +165,8 @@ const SelectField = defineComponent(
             activeOptionId: null,
             isFilterable: Boolean,
             query: null,
+            isEditing: Boolean,
+            valueText: null,
             textInset: null,
             computeTextStyle: null,
             onToggle: null,
@@ -147,6 +185,7 @@ export const SelectComposite = defineComponent(
 
         const fieldRef = shallowRef<HTMLElement>();
         const hasPopoverSettled = shallowRef(true);
+        const isEditing = shallowRef(false);
 
         const isOpen = useTwoWay(props, "visibility", false);
         const query = useTwoWay(props, "query", undefined, { keepsOwnValue: false });
@@ -158,6 +197,20 @@ export const SelectComposite = defineComponent(
         watch(isOpen, (isShown) => {
             if (!isShown) hasPopoverSettled.value = false;
         });
+
+        watch(isOpen, (isShown) => {
+            if (isShown) return;
+
+            isEditing.value = false;
+        });
+
+        const getValueText = () => {
+            if (props.isMultiple ?? false) return SelectConst.EMPTY_QUERY;
+
+            const picked = props.selectedOptions[0];
+
+            return picked === undefined ? undefined : props.computeCustomText?.(picked);
+        };
 
         const open = () => {
             if (getIsDisabled()) return;
@@ -268,12 +321,15 @@ export const SelectComposite = defineComponent(
                                         activeOptionId={cursor.activeOptionId.value}
                                         isFilterable={isFilterable}
                                         query={getQuery()}
+                                        isEditing={isEditing.value}
+                                        valueText={getValueText()}
                                         textInset={textInset}
                                         flags={flags}
                                         computeTextStyle={props.computeTextStyle}
                                         onToggle={() => (isOpen.value && !isFilterable ? close() : open())}
                                         onKeyDown={cursor.handleKeyDown}
                                         onQueryInput={(next) => {
+                                            isEditing.value = true;
                                             open();
                                             cursor.highlight(undefined);
 

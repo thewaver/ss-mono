@@ -38,7 +38,7 @@ export type MenuItem<T> = {
      */
     kind?: MenuItemKind;
     /** The items of this item's submenu. An item carrying them opens a submenu rather than being picked. */
-    items?: (MenuItem<T> | MenuGroupRecord<MenuItem<T>>)[];
+    items?: MenuNode<T>[];
     /** Whether the item can be picked. A disabled item is left out of the arrow-key walk unless kept reachable. */
     isDisabled?: boolean;
     /**
@@ -56,6 +56,10 @@ export type MenuItem<T> = {
     /** A tooltip for the item, anchored to it and handed its flags. */
     tooltipDefs?: InteractionTooltipDefs<MenuItemFlags>;
 };
+
+export type MenuGroup<T> = MenuGroupRecord<MenuItem<T>>;
+
+export type MenuNode<T> = MenuItem<T> | MenuGroup<T>;
 
 export type MenuTriggerProps = InteractionControlProps<MenuFlags> & {
     /** Identifies the menu this trigger opens, so the trigger can point at it. */
@@ -119,6 +123,21 @@ export type MenuItemsSlots<T> = {
     renderHighlightFloater?: (props: { visibilityTarget: 0 | 1; transitionDurationMs: number }) => VNodeChild;
 };
 
+export type MenuGroupSlots<T> = {
+    /**
+     * Draws a group's heading, above its items. A group is an entry in `items` carrying a `label` and its own `items`
+     * and no value; the heading is never reached by the arrow keys. Refused alongside `computeLayout`, since a
+     * laid-out menu places each item on its own and has no heading row.
+     */
+    renderGroupHeader?: (props: { group: MenuGroup<T> }) => VNodeChild;
+    /**
+     * Draws the box a group sits in, around its heading and its items, which are handed in to be placed inside it — a
+     * background, a border, a line under the group, an indent. `renderContent` draws them, from a template as
+     * `<component :is="renderContent" />`. Refused alongside `computeLayout`, for the same reason.
+     */
+    renderGroupBox?: (props: { renderContent: () => VNodeChild; group: MenuGroup<T> }) => VNodeChild;
+};
+
 export type MenuLevelProps<T> = {
     /** Identifies this level of the menu, so its items and its parent can point at it. */
     id: string;
@@ -177,8 +196,8 @@ export type MenuLevelProps<T> = {
     parentPlacement?: PlacementRect;
     /** The item that opened this level, where one did. */
     openerItem?: MenuItem<T>;
-    /** The items on this level, in the order they are shown. */
-    items: (MenuItem<T> | MenuGroupRecord<MenuItem<T>>)[];
+    /** The items on this level, in the order they are shown, with any groups among them. */
+    items: MenuNode<T>[];
     /** Which values are currently checked, for the checkbox and radio items among them. */
     checkedValues: T[];
     /** Arranges this level's items, for a menu that is something other than a vertical list. */
@@ -261,8 +280,11 @@ export type MenuProps<T> = Omit<InteractionWrapperProps<MenuFlags>, "extraFlags"
         "onUpdate:visibility"?: (isOpen: boolean) => void;
         /** The element the menu is positioned against, where that is not the trigger itself. */
         "anchorRef"?: HTMLElement;
-        /** The items, in the order they are shown. Items carrying children are what make submenus. */
-        "items": MenuItem<T>[];
+        /**
+         * The items, in the order they are shown. Items carrying children are what make submenus, and an entry carrying
+         * a `label` and `items` but no value is a group of them.
+         */
+        "items": MenuNode<T>[];
         /**
          * Which values are currently checked, for the checkbox and radio items among them. Left out, no item is ever
          * checked.
@@ -275,7 +297,8 @@ export type MenuProps<T> = Omit<InteractionWrapperProps<MenuFlags>, "extraFlags"
     };
 
 export type MenuSlots<T> = Pick<InteractionWrapperSlots<MenuFlags>, "renderDecoration"> &
-    MenuItemsSlots<T> & {
+    MenuItemsSlots<T> &
+    MenuGroupSlots<T> & {
         /** Draws the trigger. It is handed the interaction state, including whether the menu it opens is showing. */
         renderContent: (flags: InteractionFlags<MenuFlags>) => VNodeChild;
     };
@@ -285,8 +308,8 @@ export type ContextMenuProps<T> = BaseContextMenuProps<T> & {
     "visibility"?: boolean;
     /** Receives the menu opening or closing itself, which is what `v-model:visibility` binds. */
     "onUpdate:visibility"?: (isOpen: boolean) => void;
-    /** The items, in the order they are shown. */
-    "items": MenuItem<T>[];
+    /** The items, in the order they are shown, and an entry carrying a `label` and `items` but no value is a group. */
+    "items": MenuNode<T>[];
     /**
      * Which values are currently checked, for the checkbox and radio items among them. Left out, no item is ever
      * checked.
@@ -298,14 +321,15 @@ export type ContextMenuProps<T> = BaseContextMenuProps<T> & {
     "computeCustomText"?: (item: MenuItem<T>) => string;
 };
 
-export type ContextMenuSlots<T> = MenuItemsSlots<T> & {
-    /**
-     * Draws the region a right-click opens the menu over.
-     *
-     * The component renders the element itself rather than taking a ref to the consumer's, because it has to
-     * put a `tabindex` and a role on it: a region with no focusable content can never receive the ContextMenu
-     * key, so before this a plain box of text had no keyboard route to its own menu at all (2.1.1, Level A).
-     * Everything drawn inside it is the consumer's.
-     */
-    renderRegion: () => VNodeChild;
-};
+export type ContextMenuSlots<T> = MenuItemsSlots<T> &
+    MenuGroupSlots<T> & {
+        /**
+         * Draws the region a right-click opens the menu over.
+         *
+         * The component renders the element itself rather than taking a ref to the consumer's, because it has to
+         * put a `tabindex` and a role on it: a region with no focusable content can never receive the ContextMenu
+         * key, so before this a plain box of text had no keyboard route to its own menu at all (2.1.1, Level A).
+         * Everything drawn inside it is the consumer's.
+         */
+        renderRegion: () => VNodeChild;
+    };

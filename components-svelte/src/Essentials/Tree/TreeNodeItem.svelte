@@ -10,6 +10,8 @@
     const isDisabled = $derived(props.flags.isDisabled ?? false);
     const ariaExpanded = $derived(props.flags.isBranch ? props.flags.isExpanded : undefined);
     const ariaBusy = $derived(props.flags.isPending || undefined);
+    const ariaSelected = $derived(props.isMultiple ? undefined : props.flags.isSelected);
+    const ariaChecked = $derived(props.isMultiple ? props.flags.checkedState : undefined);
 
     const handleClick = (e: MouseEvent) => {
         if (isDisabled) {
@@ -18,7 +20,7 @@
             return;
         }
 
-        props.onActivate();
+        props.onActivate(e);
     };
 </script>
 
@@ -30,7 +32,8 @@
         role="treeitem"
         id={props.id}
         aria-disabled={isDisabled || undefined}
-        aria-selected={props.flags.isSelected}
+        aria-selected={ariaSelected}
+        aria-checked={ariaChecked}
         aria-expanded={ariaExpanded}
         aria-busy={ariaBusy}
         aria-level={props.level}
@@ -47,7 +50,8 @@
         role="treeitem"
         id={props.id}
         aria-disabled={isDisabled || undefined}
-        aria-selected={props.flags.isSelected}
+        aria-selected={ariaSelected}
+        aria-checked={ariaChecked}
         aria-expanded={ariaExpanded}
         aria-busy={ariaBusy}
         aria-level={props.level}
@@ -65,7 +69,8 @@
         role="treeitem"
         id={props.id}
         aria-disabled={isDisabled || undefined}
-        aria-selected={props.flags.isSelected}
+        aria-selected={ariaSelected}
+        aria-checked={ariaChecked}
         aria-expanded={ariaExpanded}
         aria-busy={ariaBusy}
         aria-level={props.level}

@@ -1,4 +1,5 @@
 import {
+    type ComponentPublicInstance,
     type SlotsType,
     type VNodeChild,
     computed,
@@ -15,6 +16,7 @@ import {
     FlattenerUtils,
     FloaterStyles,
     InteractionTrackerUtils,
+    SelectionUtils,
     TREE_DEFAULTS,
     type TreeNodeRenderProps,
     TreeStyles,
@@ -35,11 +37,19 @@ import type {
 import { PlacementBox } from "../../Primitives/PlacementBox/PlacementBox";
 import { PlacementItem } from "../../Primitives/PlacementItem/PlacementItem";
 import { watchAfterRender } from "../../Utils/effectUtils";
-import { callSlot, declareProps, useTwoWay } from "../../Utils/propUtils";
+import { callSlot, declareProps, forwardProps, useTwoWay } from "../../Utils/propUtils";
 import { toElement } from "../../Utils/refUtils";
 import type { SlotsContext } from "../../Utils/typeUtils";
 import { TooltipVueUtils } from "../Overlays/Tooltip/TooltipVue.utils";
-import type { TreeNodeItemProps, TreeProps, TreeRow, TreeSlots } from "./Tree.types";
+import type {
+    MultiTreeProps,
+    MultiTreeSlots,
+    TreeCompositeProps,
+    TreeNodeItemProps,
+    TreeProps,
+    TreeRow,
+    TreeSlots,
+} from "./Tree.types";
 
 const TreeNodeItem = defineComponent(
     (props: TreeNodeItemProps, { slots }: SlotsContext<InteractionControlSlots<TreeNodeRenderProps>>) =>
@@ -53,7 +63,7 @@ const TreeNodeItem = defineComponent(
                     return;
                 }
 
-                props.onActivate();
+                props.onActivate(e);
             };
 
             const commonProps = {
@@ -61,7 +71,8 @@ const TreeNodeItem = defineComponent(
                 "role": "treeitem",
                 "id": props.id,
                 "aria-disabled": isDisabled || undefined,
-                "aria-selected": props.flags.isSelected,
+                "aria-selected": props.isMultiple ? undefined : props.flags.isSelected,
+                "aria-checked": props.isMultiple ? props.flags.checkedState : undefined,
                 "aria-expanded": props.flags.isBranch ? props.flags.isExpanded : undefined,
                 "aria-busy": props.flags.isPending || undefined,
                 "aria-level": props.level,
@@ -104,19 +115,21 @@ const TreeNodeItem = defineComponent(
             setSize: null,
             href: null,
             linkComponent: null,
+            isMultiple: Boolean,
             onActivate: null,
         }),
     },
 );
 
-export const Tree = defineComponent(
-    <T,>(props: TreeProps<T>, { slots }: SlotsContext<TreeSlots<T>>) => {
+const TreeComposite = defineComponent(
+    <T,>(props: TreeCompositeProps<T>, { slots }: SlotsContext<TreeSlots<T>>) => {
         watchAfterRender(
             [() => props.computeLayout !== undefined, () => slots.renderConnector !== undefined],
             ([hasLayout, hasConnector]) => TreeUtils.warnIfConnectorIgnored(hasLayout, hasConnector),
         );
 
         const value = useTwoWay(props, "value");
+        const checked = useTwoWay(props, "checked", []);
         const expanded = useTwoWay(props, "expanded", []);
 
         const treeId = useId();
@@ -144,8 +157,22 @@ export const Tree = defineComponent(
         const getIsVirtualized = () =>
             props.computeEstimatedNodeHeight !== undefined && props.computeLayout === undefined;
 
+        const branchDefs = computed(() => TreeUtils.createBranchDefs(props.nodes));
+
+        const getCheckedState = (nodeValue: T) =>
+            props.isMultiple
+                ? SelectionUtils.getBranchState(nodeValue, checked.value, branchDefs.value)
+                : nodeValue === value.value;
+
+        const getFirstCheckedValue = () =>
+            navigableRows.value.find((row) => getCheckedState(row.node.value) === true)?.node.value;
+
         const rovingRow = computed(() =>
-            TreeUtils.computeRovingRow(navigableRows.value, focusedValue.value, value.value),
+            TreeUtils.computeRovingRow(
+                navigableRows.value,
+                focusedValue.value,
+                props.isMultiple ? getFirstCheckedValue() : value.value,
+            ),
         );
 
         const rowWindow = VirtualizerVueUtils.useRowWindow(sizerRef, () => flatRows.value.length, {
@@ -218,9 +245,17 @@ export const Tree = defineComponent(
             if (next !== expanded.value) expanded.value = next;
         };
 
-        const expand = (row: TreeRow<T>) => writeExpanded(TreeUtils.expand(expanded.value, row.node));
+        const expand = (row: TreeRow<T>) => {
+            if (row.node.isDisabled) return;
 
-        const collapse = (row: TreeRow<T>) => writeExpanded(TreeUtils.collapse(expanded.value, row.node));
+            writeExpanded(TreeUtils.expand(expanded.value, row.node));
+        };
+
+        const collapse = (row: TreeRow<T>) => {
+            if (row.node.isDisabled) return;
+
+            writeExpanded(TreeUtils.collapse(expanded.value, row.node));
+        };
 
         const toggle = (row: TreeRow<T>) => {
             if (row.isExpanded) {
@@ -247,24 +282,112 @@ export const Tree = defineComponent(
             props.onSelectionChange?.(next);
         };
 
+        let checkAnchor: T | undefined;
+
+        const writeChecked = (next: T[]) => {
+            checked.value = next;
+
+            props.onCheckedChange?.(next);
+        };
+
+        const check = (row: TreeRow<T>) => {
+            if (row.node.isDisabled) return;
+
+            checkAnchor = row.node.value;
+
+            writeChecked(SelectionUtils.getBranchSelection(row.node.value, checked.value, branchDefs.value));
+        };
+
+        const checkRows = (checkedRows: TreeRow<T>[]) =>
+            writeChecked(
+                SelectionUtils.getMerged(
+                    checked.value,
+                    checkedRows
+                        .filter((row) => !row.node.isDisabled)
+                        .flatMap((row) => SelectionUtils.getBranchItems(row.node.value, branchDefs.value)),
+                ),
+            );
+
+        const checkAll = () => {
+            const all = TreeUtils.getCheckableValues(props.nodes);
+            const isAllChecked = all.every((entry) => checked.value.includes(entry));
+
+            writeChecked(isAllChecked ? [] : all);
+        };
+
         const activate = (row: TreeRow<T>) => {
             if (row.node.isDisabled) return;
 
+            const isBranch = TreeUtils.getIsBranch(row.node);
+
+            if (props.isMultiple) {
+                if (isBranch) toggle(row);
+                else check(row);
+
+                return;
+            }
+
             select(row.node.value);
 
-            if (TreeUtils.getIsBranch(row.node)) toggle(row);
+            if (isBranch) toggle(row);
+        };
+
+        const press = (row: TreeRow<T>, expander: HTMLElement | undefined, e: MouseEvent) => {
+            if (row.node.isDisabled) return;
+
+            const isBranch = TreeUtils.getIsBranch(row.node);
+
+            if (expander !== undefined && e.target instanceof Node && expander.contains(e.target)) {
+                if (isBranch) toggle(row);
+
+                return;
+            }
+
+            if (props.isMultiple) check(row);
+            else select(row.node.value);
+
+            if (expander === undefined && isBranch) toggle(row);
+        };
+
+        const handleMultiKeyDown = (e: KeyboardEvent, current: TreeRow<T>, navigable: TreeRow<T>[]) => {
+            const action = TreeUtils.computeMultiKeyAction(
+                e.key,
+                { isShiftHeld: e.shiftKey, isControlHeld: e.ctrlKey || e.metaKey },
+                current,
+                { navigable, anchor: navigable.find((row) => row.node.value === checkAnchor) },
+            );
+
+            if (action === undefined) return false;
+
+            e.preventDefault();
+
+            if (action.kind === "check") check(action.row);
+            if (action.kind === "check_all") checkAll();
+            if (action.kind === "check_range") checkRows(action.rows);
+            if (action.kind === "check_range" && action.focus) focusRow(action.focus);
+
+            if (action.kind === "focus_check") {
+                focusRow(action.row);
+                check(action.row);
+            }
+
+            return true;
         };
 
         const handleKeyDown = (e: KeyboardEvent) => {
-            if (navigableRows.value.length < 1) return;
+            const navigable = navigableRows.value;
+
+            if (navigable.length < 1) return;
 
             const current = findRowById(document.activeElement?.id) ?? rovingRow.value;
 
             if (!current) return;
 
+            if (props.isMultiple && handleMultiKeyDown(e, current, navigable)) return;
+
             const action = TreeUtils.computeKeyAction(e.key, current, {
                 flatRows: flatRows.value,
-                navigable: navigableRows.value,
+                navigable,
                 direction: direction.value,
                 pushQuery: () => typeahead.push(e),
                 computeRowText,
@@ -336,7 +459,7 @@ export const Tree = defineComponent(
         };
 
         const selectionFloater = useNodeFloater(
-            () => slots.renderSelectionFloater !== undefined,
+            () => slots.renderSelectionFloater !== undefined && !props.isMultiple,
             () => value.value,
         );
 
@@ -374,7 +497,6 @@ export const Tree = defineComponent(
 
         return () => {
             const currentLayout = layout.value;
-            const currentValue = value.value;
             const rovingValue = rovingRow.value?.node.value;
             const floaterTransitionDurationMs = getFloaterTransitionDurationMs();
 
@@ -403,7 +525,14 @@ export const Tree = defineComponent(
             const renderRow = (row: TreeRow<T>, key: string | number) => {
                 const placement = currentLayout?.placements[row.index];
 
+                const checkedState = getCheckedState(row.node.value);
+
                 let recorded: HTMLElement | undefined;
+                let expander: HTMLElement | undefined;
+
+                const setExpanderRef = (target: Element | ComponentPublicInstance | null) => {
+                    expander = toElement(target);
+                };
 
                 const element = (
                     <InteractionWrapper
@@ -418,8 +547,8 @@ export const Tree = defineComponent(
                             isBranch: TreeUtils.getIsBranch(row.node),
                             isExpanded: row.isExpanded,
                             isPending: TreeUtils.computeIsPending(row),
-                            isSelected: row.node.value === currentValue,
-                            checkedState: row.node.value === currentValue,
+                            isSelected: checkedState === true,
+                            checkedState,
                             depth: row.depth,
                         }}
                     >
@@ -438,7 +567,8 @@ export const Tree = defineComponent(
                                         setSize={row.setSize}
                                         flags={renderProps}
                                         linkComponent={props.linkComponent}
-                                        onActivate={() => activate(row)}
+                                        isMultiple={props.isMultiple}
+                                        onActivate={(e: MouseEvent) => press(row, expander, e)}
                                     >
                                         {
                                             {
@@ -446,6 +576,7 @@ export const Tree = defineComponent(
                                                     callSlot(slots.renderNode, {
                                                         node: row.node,
                                                         renderProps,
+                                                        setExpanderRef,
                                                     }),
                                             } satisfies InteractionControlSlots<TreeNodeRenderProps>
                                         }
@@ -540,6 +671,7 @@ export const Tree = defineComponent(
                     class={TreeStyles.treeRoot}
                     role="tree"
                     aria-label={props.ariaLabel}
+                    aria-multiselectable={props.isMultiple || undefined}
                     onKeydown={(e) => {
                         handleKeyDown(e);
                         focusVisibleValue.value = readFocusVisibleValue(document.activeElement);
@@ -565,6 +697,64 @@ export const Tree = defineComponent(
         };
     },
     {
+        name: "TreeComposite",
+        slots: Object as SlotsType<TreeSlots<any>>,
+        props: declareProps<TreeCompositeProps<unknown>>({
+            "ariaLabel": null,
+            "linkComponent": null,
+            "computeEstimatedNodeHeight": null,
+            "floaterTransitionDurationMs": null,
+            "nodes": null,
+            "computeLayout": null,
+            "computeEffect": null,
+            "value": null,
+            "onUpdate:value": null,
+            "checked": null,
+            "onUpdate:checked": null,
+            "expanded": null,
+            "onUpdate:expanded": null,
+            "computeCustomText": null,
+            "onSelectionChange": null,
+            "onCheckedChange": null,
+            "isMultiple": Boolean,
+        }),
+    },
+);
+
+export const Tree = defineComponent(
+    <T,>(props: TreeProps<T>, { slots }: SlotsContext<TreeSlots<T>>) => {
+        const value = useTwoWay(props, "value");
+        const expanded = useTwoWay(props, "expanded", []);
+
+        return () => (
+            <TreeComposite
+                {...{
+                    ...forwardProps(props, TreeComposite),
+                    "value": value.value,
+                    "onUpdate:value": (next: T | undefined) => {
+                        value.value = next;
+                    },
+                    "expanded": expanded.value,
+                    "onUpdate:expanded": (next: T[]) => {
+                        expanded.value = next;
+                    },
+                }}
+                nodes={props.nodes}
+                isMultiple={false}
+            >
+                {
+                    {
+                        renderNode: slots.renderNode,
+                        renderPendingChildren: slots.renderPendingChildren,
+                        renderSelectionFloater: slots.renderSelectionFloater,
+                        renderHighlightFloater: slots.renderHighlightFloater,
+                        renderConnector: slots.renderConnector,
+                    } satisfies Partial<TreeSlots<T>>
+                }
+            </TreeComposite>
+        );
+    },
+    {
         name: "Tree",
         slots: Object as SlotsType<TreeSlots<any>>,
         props: declareProps<TreeProps<unknown>>({
@@ -581,6 +771,59 @@ export const Tree = defineComponent(
             "onUpdate:expanded": null,
             "computeCustomText": null,
             "onSelectionChange": null,
+        }),
+    },
+);
+
+export const MultiTree = defineComponent(
+    <T,>(props: MultiTreeProps<T>, { slots }: SlotsContext<MultiTreeSlots<T>>) => {
+        const checked = useTwoWay(props, "checked", []);
+        const expanded = useTwoWay(props, "expanded", []);
+
+        return () => (
+            <TreeComposite
+                {...{
+                    ...forwardProps(props, TreeComposite),
+                    "checked": checked.value,
+                    "onUpdate:checked": (next: T[]) => {
+                        checked.value = next;
+                    },
+                    "expanded": expanded.value,
+                    "onUpdate:expanded": (next: T[]) => {
+                        expanded.value = next;
+                    },
+                }}
+                nodes={props.nodes}
+                isMultiple={true}
+            >
+                {
+                    {
+                        renderNode: slots.renderNode,
+                        renderPendingChildren: slots.renderPendingChildren,
+                        renderHighlightFloater: slots.renderHighlightFloater,
+                        renderConnector: slots.renderConnector,
+                    } satisfies Partial<TreeSlots<T>>
+                }
+            </TreeComposite>
+        );
+    },
+    {
+        name: "MultiTree",
+        slots: Object as SlotsType<MultiTreeSlots<any>>,
+        props: declareProps<MultiTreeProps<unknown>>({
+            "ariaLabel": null,
+            "linkComponent": null,
+            "computeEstimatedNodeHeight": null,
+            "floaterTransitionDurationMs": null,
+            "nodes": null,
+            "computeLayout": null,
+            "computeEffect": null,
+            "checked": null,
+            "onUpdate:checked": null,
+            "expanded": null,
+            "onUpdate:expanded": null,
+            "computeCustomText": null,
+            "onCheckedChange": null,
         }),
     },
 );

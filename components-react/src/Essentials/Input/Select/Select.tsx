@@ -30,14 +30,36 @@ const SelectField = (props: SelectFieldProps) => {
 
     const inputRef = useRef<HTMLInputElement | null>(null);
     const latestRef = useLatest(props.ref);
+    const [contentElement, setContentElement] = useState<HTMLElement | null>(null);
+    const [paintedText, setPaintedText] = useState(SelectConst.EMPTY_QUERY);
 
     const isDisabled = props.flags.isDisabled ?? false;
 
+    useEffect(() => {
+        if (!contentElement || !props.isFilterable) return;
+
+        const read = () => setPaintedText(SelectUtils.computePaintedText(contentElement));
+        const observer = new MutationObserver(read);
+
+        read();
+        observer.observe(contentElement, { childList: true, subtree: true, characterData: true });
+
+        return () => observer.disconnect();
+    }, [contentElement, props.isFilterable]);
+
+    const valueText = props.flags.isEmpty ? SelectConst.EMPTY_QUERY : (props.valueText ?? paintedText);
+
     const { handleInput, handleCompositionStart, handleCompositionEnd } = TextSyncReactUtils.useValueSync(
         inputRef,
-        props.query,
+        props.isEditing ? props.query : valueText,
         { onInput: (query) => props.onQueryInput(query) },
     );
+
+    const selectValueText = (element: HTMLInputElement) => {
+        if (props.isEditing) return;
+
+        element.select();
+    };
 
     const setInputRef = useCallback(
         (element: HTMLInputElement | null) => {
@@ -67,6 +89,13 @@ const SelectField = (props: SelectFieldProps) => {
         props.onToggle();
     };
 
+    const handleInputClick = (element: HTMLInputElement) => {
+        if (isDisabled) return;
+
+        selectValueText(element);
+        props.onToggle();
+    };
+
     if (!props.isFilterable) {
         return (
             <button
@@ -85,19 +114,27 @@ const SelectField = (props: SelectFieldProps) => {
 
     return (
         <>
-            {props.renderContent(props.flags)}
+            <span ref={setContentElement} className={SelectStyles.selectFieldContent}>
+                {props.renderContent(props.flags)}
+            </span>
 
             <input
                 id={props.id}
                 ref={setInputRef}
                 type="text"
-                className={SelectStyles.selectFilterField}
+                className={[
+                    SelectStyles.selectFilterField,
+                    props.isEditing ? undefined : SelectStyles.selectFilterFieldShowsValue,
+                ]
+                    .filter(Boolean)
+                    .join(" ")}
                 style={{ ...props.textInset, ...props.computeTextStyle?.(props.flags) }}
                 autoComplete="off"
                 readOnly={isDisabled}
                 {...commonProps}
                 onKeyDown={(e) => props.onKeyDown(e.nativeEvent)}
-                onClick={handleClick}
+                onFocus={(e) => selectValueText(e.currentTarget)}
+                onClick={(e) => handleInputClick(e.currentTarget)}
                 onInput={(e) => handleInput(e.currentTarget)}
                 onCompositionStart={handleCompositionStart}
                 onCompositionEnd={(e) => handleCompositionEnd(e.currentTarget)}
@@ -119,6 +156,7 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
     const [isOpen, setIsOpen] = SignalMirrorReactUtils.useOptionalState(props.visibility, false);
     const [hasPopoverSettled, setHasPopoverSettled] = useState(true);
     const [wasOpen, setWasOpen] = useState(isOpen);
+    const [isEditing, setIsEditing] = useState(false);
 
     const fieldId = props.id ?? fallbackFieldId;
     const isDisabled = props.isDisabled ?? false;
@@ -130,7 +168,10 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
     if (wasOpen !== isOpen) {
         setWasOpen(isOpen);
 
-        if (!isOpen) setHasPopoverSettled(false);
+        if (!isOpen) {
+            setHasPopoverSettled(false);
+            setIsEditing(false);
+        }
     }
 
     const spreadPadding = TextFieldUtils.resolvePadding(props.padding ?? SELECT_DEFAULTS.padding);
@@ -151,6 +192,14 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
 
         setIsOpen(false);
     }, [isOpen, isDisabled, setIsOpen]);
+
+    const computeValueText = () => {
+        if (isMultiple) return SelectConst.EMPTY_QUERY;
+
+        const picked = props.selectedOptions[0];
+
+        return picked === undefined ? undefined : props.computeCustomText?.(picked);
+    };
 
     const cursor = ListboxReactUtils.useCursor<T>({
         focusModel: "active_descendant",
@@ -240,6 +289,8 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
                         activeOptionId={cursor.activeOptionId}
                         isFilterable={isFilterable}
                         query={query}
+                        isEditing={isEditing}
+                        valueText={computeValueText()}
                         textInset={textInset}
                         flags={flags}
                         computeTextStyle={props.computeTextStyle}
@@ -247,6 +298,7 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
                         onToggle={() => (isOpen && !isFilterable ? close() : open())}
                         onKeyDown={cursor.handleKeyDown}
                         onQueryInput={(next) => {
+                            setIsEditing(true);
                             open();
                             cursor.highlight(undefined);
 

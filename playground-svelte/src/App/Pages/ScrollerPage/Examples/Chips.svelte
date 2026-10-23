@@ -18,7 +18,7 @@
 </script>
 
 <div class={styles.demo}>
-    <Scroller gap={SCROLLER_GAP} padding={FOCUS_RING_WIDTH} buttonPlacement={props.buttonPlacement} bind:progress>
+    <Scroller gap={SCROLLER_GAP} padding={FOCUS_RING_WIDTH} overlapCount={props.overlapCount} buttonPlacement={props.buttonPlacement} bind:progress>
         {#snippet renderButton(step, stepper)}
             <PageScrollerButton {step} {stepper} />
         {/snippet}

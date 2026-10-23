@@ -18,3 +18,8 @@ export type TreeRecordExampleProps = {
     value: readonly [Asset | undefined, (value: Asset | undefined) => void];
     expanded: readonly [Asset[], (value: Asset[]) => void];
 };
+
+export type TreeCheckboxExampleProps = {
+    checked: readonly [string[], (checked: string[]) => void];
+    expanded: readonly [string[], (value: string[]) => void];
+};

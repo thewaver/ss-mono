@@ -1,7 +1,14 @@
 import { Button, Tabs } from "@thewaver/ss-components-react";
-import { CLEARABLE_TABS, ROW_TAB_GAP } from "@thewaver/ss-playground/App/Pages/TabsPage/TabsPage.const";
+import {
+    CLEARABLE_TABS,
+    PANEL_BODIES,
+    ROW_TAB_GAP,
+    getPanelId,
+    getTabId,
+} from "@thewaver/ss-playground/App/Pages/TabsPage/TabsPage.const";
 
 import { PageControlColumn } from "../../../PageComponents/ControlRow/ControlRow";
+import { PageTabPanel } from "../../../PageComponents/TabPanel/TabPanel";
 import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import { PageTabContent, PageTabFloater, PageTabGutter } from "../../../StyledComponents/TabContent/TabContent";
 import type { TabsExampleProps } from "../TabsPageReact.types";
@@ -39,6 +46,15 @@ export const ClearableExample = (props: Props) => {
                     </PageTabContent>
                 )}
             />
+
+            {props.selectedValue && (
+                <PageTabPanel
+                    id={getPanelId("clearable", props.selectedValue)}
+                    tabId={getTabId("clearable", props.selectedValue)}
+                >
+                    {PANEL_BODIES[props.selectedValue]}
+                </PageTabPanel>
+            )}
 
             <Button
                 ariaLabel={"Clear the selection"}

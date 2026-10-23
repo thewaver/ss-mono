@@ -16,3 +16,8 @@ export type TreeRecordExampleProps = {
     value: Asset | undefined;
     expanded: Asset[];
 };
+
+export type TreeCheckboxExampleProps = {
+    checked: string[];
+    expanded: string[];
+};

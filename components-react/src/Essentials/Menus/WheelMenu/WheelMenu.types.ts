@@ -21,7 +21,10 @@ export type WheelMenuCloserDefs = {
     renderContent: (flags: InteractionFlags<MenuItemFlags>) => ReactNode;
 };
 
-export type WheelMenuProps<T> = Omit<MenuProps<T>, "items" | "checked" | "computeLayout"> &
+export type WheelMenuProps<T> = Omit<
+    MenuProps<T>,
+    "items" | "checked" | "computeLayout" | "renderGroupHeader" | "renderGroupBox"
+> &
     BaseWheelMenuProps & {
         /** The items, in the order they sit round the wheel. */
         items: WheelMenuItem<T>[];

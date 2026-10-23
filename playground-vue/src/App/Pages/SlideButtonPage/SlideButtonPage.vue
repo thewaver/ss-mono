@@ -1,15 +1,21 @@
 <script setup lang="ts">
 import { shallowRef } from "vue";
 
+import { SLIDE_BUTTON_DEFAULTS } from "@thewaver/ss-components-vue";
+import { SlideButtonKnobs } from "@thewaver/ss-playground/App/Knobs/SlideButtons.const";
 import {
     EXAMPLES_ROOT,
     EXAMPLE_NAMES,
+    FIELD_WIDTH,
     PERCENT,
 } from "@thewaver/ss-playground/App/Pages/SlideButtonPage/SlideButtonPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/SlideButtonPage/SlideButtonPage.css";
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
+import PageNumberField from "../../PageComponents/Field/PageNumberField.vue";
+import PageProp from "../../PageComponents/Prop/Prop.vue";
+import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
 import DefaultExample from "./Examples/Default.vue";
 import DescribedExample from "./Examples/Described.vue";
 import DisabledExample from "./Examples/Disabled.vue";
@@ -21,6 +27,7 @@ import SlideOnlyExample from "./Examples/SlideOnly.vue";
 
 const sends = shallowRef(0);
 const progress = shallowRef(0);
+const completionRatio = shallowRef(SLIDE_BUTTON_DEFAULTS.completionRatio);
 const isArmed = shallowRef(false);
 const describedSends = shallowRef(0);
 const disabledSends = shallowRef(0);
@@ -86,10 +93,29 @@ const examples: ExampleDefs[] = [
 </script>
 
 <template>
+    <PagePropsPanel scope="global">
+        <PageProp
+            item-key="completionRatio"
+            controls="Sets SlideButtonProps.completionRatio on the default example"
+            label="Completion ratio"
+            hint="How far along the track the thumb has to be when let go for the slide to complete. At 1 it has to reach the end; short of it, it springs back."
+        >
+            <PageNumberField
+                :value="completionRatio"
+                :min="SlideButtonKnobs.MIN_COMPLETION_RATIO"
+                :max="SlideButtonKnobs.MAX_COMPLETION_RATIO"
+                :step="SlideButtonKnobs.COMPLETION_RATIO_STEP"
+                :width="FIELD_WIDTH"
+                ariaLabel="Completion ratio"
+                @input="(value: number) => (completionRatio = value)"
+            />
+        </PageProp>
+    </PagePropsPanel>
+
     <PageExamples :items="examples">
         <template #default>
             <div :class="styles.stage">
-                <DefaultExample v-model:progress="progress" @activate="sends++" />
+                <DefaultExample v-model:progress="progress" :completion-ratio="completionRatio" @activate="sends++" />
             </div>
         </template>
 

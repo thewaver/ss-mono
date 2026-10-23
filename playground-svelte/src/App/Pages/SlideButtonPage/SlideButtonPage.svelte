@@ -1,7 +1,12 @@
 <script lang="ts">
+    import { SLIDE_BUTTON_DEFAULTS } from "@thewaver/ss-components-svelte";
+    import { SlideButtonKnobs } from "@thewaver/ss-playground/App/Knobs/SlideButtons.const";
     import * as styles from "@thewaver/ss-playground/App/Pages/SlideButtonPage/SlideButtonPage.css";
     import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../PageComponents/Examples/PageExamples.svelte";
+    import PageNumberField from "../../PageComponents/Field/PageNumberField.svelte";
+    import PageProp from "../../PageComponents/Prop/Prop.svelte";
+    import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
     import DefaultExample from "./Examples/Default.svelte";
     import DescribedExample from "./Examples/Described.svelte";
     import DisabledExample from "./Examples/Disabled.svelte";
@@ -13,11 +18,13 @@
     import {
     EXAMPLE_NAMES,
     EXAMPLES_ROOT,
+    FIELD_WIDTH,
     PERCENT,
 } from "@thewaver/ss-playground/App/Pages/SlideButtonPage/SlideButtonPage.const";
 
     let sends = $state(0);
     let progress = $state(0);
+    let completionRatio = $state(SLIDE_BUTTON_DEFAULTS.completionRatio);
     let isArmed = $state(false);
     let describedSends = $state(0);
     let disabledSends = $state(0);
@@ -94,6 +101,7 @@
     <div class={styles.stage}>
         <DefaultExample
             bind:progress
+            {completionRatio}
             onActivate={() => {
                 sends += 1;
             }}
@@ -173,5 +181,28 @@
         />
     </div>
 {/snippet}
+
+<PagePropsPanel scope={"global"}>
+    <PageProp
+        itemKey={"completionRatio"}
+        controls={"Sets SlideButtonProps.completionRatio on the default example"}
+        label={"Completion ratio"}
+        hint={
+            "How far along the track the thumb has to be when let go for the slide to complete. At 1 it has to reach the end; short of it, it springs back."
+        }
+    >
+        <PageNumberField
+            value={completionRatio}
+            min={SlideButtonKnobs.MIN_COMPLETION_RATIO}
+            max={SlideButtonKnobs.MAX_COMPLETION_RATIO}
+            step={SlideButtonKnobs.COMPLETION_RATIO_STEP}
+            width={FIELD_WIDTH}
+            ariaLabel={"Completion ratio"}
+            onInput={(value) => {
+                completionRatio = value;
+            }}
+        />
+    </PageProp>
+</PagePropsPanel>
 
 <PageExamples items={examples} />

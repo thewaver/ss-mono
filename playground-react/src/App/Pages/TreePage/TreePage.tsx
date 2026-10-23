@@ -7,6 +7,7 @@ import { PageExampleKnobs } from "../../PageComponents/ExampleKnobs/ExampleKnobs
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageSelectField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
+import { CheckboxesExample } from "./Examples/Checkboxes";
 import { FilesExample } from "./Examples/Files";
 import { LazyExample } from "./Examples/Lazy";
 import { LeaningExample } from "./Examples/Leaning";
@@ -93,6 +94,8 @@ export const TreePage = () => {
     const radialState = useState<string | undefined>();
     const radialExpandedState = useState<string[]>(RANK_ROOTS);
 
+    const checkboxesState = useState<string[]>([]);
+    const checkboxesExpandedState = useState<string[]>([]);
     const recordState = useState<Asset | undefined>();
     const recordExpandedState = useState<Asset[]>([]);
 
@@ -198,6 +201,14 @@ export const TreePage = () => {
                 `value: ${recordState[0]?.name ?? "undefined"} | expanded: ${recordExpandedState[0].length} branch(es) — the value is the record itself, not a name`,
             component: () => <RecordValuesExample value={recordState} expanded={recordExpandedState} />,
             path: `${EXAMPLES_ROOT}/RecordValues.tsx`,
+        },
+        {
+            key: "checkboxes",
+            name: EXAMPLE_NAMES.checkboxes,
+            readout: () =>
+                `ticked: [${checkboxesState[0].join(", ")}] — pressing a folder's arrow opens it and pressing its name ticks it with everything inside; Space ticks, Shift with Space ticks a run, Control with A ticks everything`,
+            component: () => <CheckboxesExample checked={checkboxesState} expanded={checkboxesExpandedState} />,
+            path: `${EXAMPLES_ROOT}/Checkboxes.tsx`,
         },
         {
             key: "leaning",

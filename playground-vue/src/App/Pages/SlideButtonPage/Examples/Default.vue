@@ -10,6 +10,7 @@ import type { SlideButtonExampleProps } from "../SlideButtonPageVue.types";
 type Props = SlideButtonExampleProps & {
     "progress"?: number;
     "onUpdate:progress"?: (ratio: number) => void;
+    "completionRatio"?: number;
 };
 
 const props = defineProps<Props>();
@@ -18,7 +19,12 @@ const progress = useModel(props, "progress");
 </script>
 
 <template>
-    <SlideButton :thumb-size="SLIDE_BUTTON_THUMB_SIZE" v-model:progress="progress" @activate="props.onActivate">
+    <SlideButton
+        :thumb-size="SLIDE_BUTTON_THUMB_SIZE"
+        v-model:progress="progress"
+        :completion-ratio="completionRatio"
+        @activate="props.onActivate"
+    >
         <template #renderContent="renderProps">
             <PageSlideButtonContent :render-props="renderProps">Slide or hold to send</PageSlideButtonContent>
         </template>

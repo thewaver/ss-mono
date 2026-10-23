@@ -2,6 +2,11 @@ import type { PropsWithChildren } from "react";
 
 import { PlacementUtils } from "@thewaver/ss-components-react";
 import {
+    CHECKED_MARK,
+    MIXED_MARK,
+} from "@thewaver/ss-playground/App/StyledComponents/SelectGroupContent/SelectGroupContent.const";
+import * as markStyles from "@thewaver/ss-playground/App/StyledComponents/SelectGroupContent/SelectGroupContent.css";
+import {
     BRANCH_MARKER,
     DESCRIPTION_ONLY_MARKER,
     INDENT_PER_DEPTH,
@@ -36,13 +41,28 @@ export const PageTreeNodeContent = (props: PropsWithChildren<TreeNodeContentProp
                 paddingLeft: `calc(${themeVars.spacing.half} + ${props.renderProps.depth * INDENT_PER_DEPTH}px)`,
             }}
         >
-            <div className={styles.treeNodeMarker} aria-hidden="true">
+            <div ref={props.setExpanderRef} className={styles.treeNodeMarker} aria-hidden="true">
                 {props.renderProps.isBranch
                     ? BRANCH_MARKER
                     : (props.hasExamples ?? true)
                       ? LEAF_MARKER
                       : DESCRIPTION_ONLY_MARKER}
             </div>
+
+            {props.hasCheckbox && (
+                <div
+                    className={[
+                        markStyles.selectGroupMark,
+                        props.renderProps.checkedState === true && markStyles.isChecked,
+                        props.renderProps.checkedState === "mixed" && markStyles.isMixed,
+                    ]
+                        .filter(Boolean)
+                        .join(" ")}
+                    aria-hidden="true"
+                >
+                    {props.renderProps.checkedState === "mixed" ? MIXED_MARK : CHECKED_MARK}
+                </div>
+            )}
 
             <div>{props.children}</div>
 

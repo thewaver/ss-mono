@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { SCROLLER_DEFAULTS } from "@thewaver/ss-components-svelte";
     import type { Tab } from "@thewaver/ss-components-svelte";
     import { ScrollerKnobs } from "@thewaver/ss-playground/App/Knobs/Scrollers.const";
     import * as styles from "@thewaver/ss-playground/App/Pages/ScrollerPage/ScrollerPage.css";
@@ -12,33 +13,28 @@
     import FocusableChildrenExample from "./Examples/FocusableChildren.svelte";
     import TabbedExample from "./Examples/Tabbed.svelte";
     import {
-    EXAMPLE_NAMES,
-    EXAMPLES_ROOT,
-    PERCENT,
-} from "@thewaver/ss-playground/App/Pages/ScrollerPage/ScrollerPage.const";
-
-    const MONTHS = [
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December",
-    ];
+        EXAMPLE_NAMES,
+        EXAMPLES_ROOT,
+        MONTHS,
+        PERCENT,
+        getMonthPanelId,
+        getMonthTabId,
+    } from "@thewaver/ss-playground/App/Pages/ScrollerPage/ScrollerPage.const";
 
     let itemCount = $state(ScrollerKnobs.STARTING_ITEM_COUNT);
     let selectedMonth = $state(MONTHS[0]);
+    let overlapCount = $state(SCROLLER_DEFAULTS.overlapCount);
     let progress = $state(0);
 
     const labels = $derived(Array.from({ length: itemCount }, (_, index) => `Item ${index + 1}`));
 
-    const monthTabs = $derived<Tab<string>[]>(MONTHS.slice(0, itemCount).map((month) => ({ value: month })));
+    const monthTabs = $derived<Tab<string>[]>(
+        MONTHS.slice(0, itemCount).map((month) => ({
+            value: month,
+            id: getMonthTabId(month),
+            panelId: getMonthPanelId(month),
+        })),
+    );
 
     const examples: ExampleDefs[] = [
         {
@@ -82,15 +78,15 @@
 </script>
 
 {#snippet splitExample()}
-    <ChipsExample {labels} bind:progress />
+    <ChipsExample {labels} {overlapCount} bind:progress />
 {/snippet}
 
 {#snippet bothButtonsEndExample()}
-    <ChipsExample {labels} buttonPlacement={"end"} />
+    <ChipsExample {labels} {overlapCount} buttonPlacement={"end"} />
 {/snippet}
 
 {#snippet bothButtonsStartExample()}
-    <ChipsExample {labels} buttonPlacement={"start"} />
+    <ChipsExample {labels} {overlapCount} buttonPlacement={"start"} />
 {/snippet}
 
 {#snippet tabbedExample()}
@@ -104,7 +100,7 @@
 {/snippet}
 
 {#snippet focusableChildrenExample()}
-    <FocusableChildrenExample {labels} />
+    <FocusableChildrenExample {labels} {overlapCount} />
 {/snippet}
 
 <div class={styles.root}>
@@ -118,6 +114,26 @@
                 ariaLabel={"Item count"}
                 onInput={(value) => {
                     itemCount = value;
+                }}
+            />
+        </PageProp>
+
+        <PageProp
+            itemKey={"overlapCount"}
+            controls={"Sets ScrollerProps.overlapCount"}
+            label={"Overlap count"}
+            hint={
+                "How many of the items in view stay in view after a press of a step button. At 0 a press moves on by as much as fits; a press always moves by at least one item."
+            }
+        >
+            <PageNumberField
+                value={overlapCount}
+                min={ScrollerKnobs.MIN_OVERLAP_COUNT}
+                max={ScrollerKnobs.MAX_OVERLAP_COUNT}
+                step={ScrollerKnobs.OVERLAP_COUNT_STEP}
+                ariaLabel={"Overlap count"}
+                onInput={(value) => {
+                    overlapCount = value;
                 }}
             />
         </PageProp>

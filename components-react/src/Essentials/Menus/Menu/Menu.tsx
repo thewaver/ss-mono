@@ -17,6 +17,8 @@ import {
     type MenuFlags,
     type MenuHighlightPosition,
     type MenuItemFlags,
+    type MenuRun,
+    type MenuSection,
     MenuStyles,
     MenuUtils,
     TypeaheadUtils,
@@ -38,9 +40,11 @@ import { LabelReactUtils } from "../../Input/Label/LabelReact.utils";
 import type {
     ContextMenuProps,
     MenuEntryProps,
+    MenuGroup,
     MenuItem,
     MenuItemViewProps,
     MenuLevelProps,
+    MenuNode,
     MenuProps,
     MenuTriggerProps,
 } from "./Menu.types";
@@ -201,6 +205,8 @@ const MenuEntry = <T,>(props: MenuEntryProps<T>) => {
                             computeEffect={level.computeEffect}
                             computeCustomText={level.computeCustomText}
                             renderItem={level.renderItem}
+                            renderGroupHeader={level.renderGroupHeader}
+                            renderGroupBox={level.renderGroupBox}
                             renderPopup={level.renderPopup}
                             floaterTransitionDurationMs={level.floaterTransitionDurationMs}
                             renderHighlightFloater={level.renderHighlightFloater}
@@ -241,10 +247,14 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>) => {
         }
     }
 
-    const entries = useMemo(
-        () => MenuUtils.computeEntries(MenuUtils.flattenNodes(props.items), props.openerItem, props.submenuMode),
+    const nodes = useMemo(
+        () => MenuUtils.computeEntries<MenuNode<T>>(props.items, props.openerItem, props.submenuMode),
         [props.items, props.openerItem, props.submenuMode],
     );
+
+    const entries = useMemo(() => MenuUtils.flattenNodes(nodes), [nodes]);
+
+    const sections = useMemo(() => MenuUtils.getSections<T, MenuItem<T>>(nodes), [nodes]);
 
     const navigable = useMemo(() => MenuUtils.computeNavigableIndexes(entries), [entries]);
 
@@ -368,7 +378,12 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>) => {
     };
 
     const activateIndex = (index: number) => {
-        const activation = MenuUtils.computeActivation<T, MenuItem<T>>(entries, index, hasBackEntry);
+        const activation = MenuUtils.computeActivation<T, MenuItem<T>>(
+            entries,
+            index,
+            hasBackEntry,
+            sections.flatMap((section) => section.runs),
+        );
 
         if (activation.type === "back") {
             props.onClose();
@@ -483,16 +498,43 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>) => {
         );
     };
 
-    const renderRuns = () =>
-        MenuUtils.getRuns<T, MenuItem<T>>(entries).map((run) => {
-            const children = run.items.map((item, offset) => renderEntry(item, run.from + offset));
+    const renderRun = (run: MenuRun<MenuItem<T>>) => {
+        const children = run.items.map((item, offset) => renderEntry(item, run.from + offset));
 
-            return run.isRadioGroup ? (
-                <div key={run.from} role="group" className={isLaidOut ? MenuStyles.menuLayoutGroup : undefined}>
-                    {children}
+        return run.isRadioGroup ? (
+            <div key={run.from} role="group" className={isLaidOut ? MenuStyles.menuLayoutGroup : undefined}>
+                {children}
+            </div>
+        ) : (
+            <Fragment key={run.from}>{children}</Fragment>
+        );
+    };
+
+    const renderSectionRuns = (section: MenuSection<MenuItem<T>>) => section.runs.map(renderRun);
+
+    const renderGroupBox = (group: MenuGroup<T>, renderContent: () => ReactNode) =>
+        props.renderGroupBox === undefined || isLaidOut ? renderContent() : props.renderGroupBox(renderContent, group);
+
+    const renderRuns = () =>
+        sections.map((section) => {
+            const group = section.group;
+
+            if (group === undefined) return <Fragment key={section.from}>{renderSectionRuns(section)}</Fragment>;
+
+            return (
+                <div
+                    key={section.from}
+                    role="group"
+                    aria-label={group.label}
+                    className={isLaidOut ? MenuStyles.menuLayoutGroup : undefined}
+                >
+                    {renderGroupBox(group, () => (
+                        <>
+                            {!isLaidOut && props.renderGroupHeader?.(group)}
+                            {renderSectionRuns(section)}
+                        </>
+                    ))}
                 </div>
-            ) : (
-                <Fragment key={run.from}>{children}</Fragment>
             );
         });
 
@@ -552,6 +594,11 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>) => {
 };
 
 export const Menu = <T,>(props: MenuProps<T>) => {
+    const hasLayout = props.computeLayout !== undefined;
+    const hasGroupPaint = props.renderGroupHeader !== undefined || props.renderGroupBox !== undefined;
+
+    useEffect(() => MenuUtils.warnIfGroupPaintIgnored(hasLayout, hasGroupPaint), [hasLayout, hasGroupPaint]);
+
     const fallbackTriggerId = useId();
     const menuId = useId();
 
@@ -710,6 +757,8 @@ export const Menu = <T,>(props: MenuProps<T>) => {
                         computeCustomText={props.computeCustomText}
                         flickOrigin={flickOrigin}
                         renderItem={props.renderItem}
+                        renderGroupHeader={props.renderGroupHeader}
+                        renderGroupBox={props.renderGroupBox}
                         renderPopup={props.renderPopup}
                         floaterTransitionDurationMs={props.floaterTransitionDurationMs}
                         renderHighlightFloater={props.renderHighlightFloater}
@@ -731,6 +780,11 @@ export const Menu = <T,>(props: MenuProps<T>) => {
 };
 
 export const ContextMenu = <T,>(props: ContextMenuProps<T>) => {
+    const hasLayout = props.computeLayout !== undefined;
+    const hasGroupPaint = props.renderGroupHeader !== undefined || props.renderGroupBox !== undefined;
+
+    useEffect(() => MenuUtils.warnIfGroupPaintIgnored(hasLayout, hasGroupPaint), [hasLayout, hasGroupPaint]);
+
     const viewportContext = useViewportContext();
     const menuId = useId();
 
@@ -845,6 +899,8 @@ export const ContextMenu = <T,>(props: ContextMenuProps<T>) => {
                 computeEffect={props.computeEffect}
                 computeCustomText={props.computeCustomText}
                 renderItem={props.renderItem}
+                renderGroupHeader={props.renderGroupHeader}
+                renderGroupBox={props.renderGroupBox}
                 renderPopup={props.renderPopup}
                 floaterTransitionDurationMs={props.floaterTransitionDurationMs}
                 renderHighlightFloater={props.renderHighlightFloater}

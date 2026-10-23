@@ -25,6 +25,8 @@
 
     let props: TabsProps<T> = $props();
 
+    $effect(() => untrack(() => TabsUtils.warnIfUnpaired(props.tabs)));
+
     let root = $state<HTMLDivElement>();
     let itemElements = $state.raw<(HTMLElement | undefined)[]>([]);
     let focusedValue = $state.raw<T>();

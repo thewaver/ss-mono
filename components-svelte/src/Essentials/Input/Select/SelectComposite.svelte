@@ -38,6 +38,7 @@
     const labelContext = getLabelContext();
 
     let hasPopoverSettled = $state(true);
+    let isEditing = $state(false);
 
     const fieldId = $derived(props.id ?? fallbackFieldId);
     const isDisabled = $derived(props.isDisabled ?? false);
@@ -71,6 +72,20 @@
         if (!visibility || !isDisabled) return;
 
         visibility = false;
+    });
+
+    $effect(() => {
+        if (visibility) return;
+
+        isEditing = false;
+    });
+
+    const valueText = $derived.by(() => {
+        if (isMultiple) return EMPTY_QUERY;
+
+        const picked = props.selectedOptions[0];
+
+        return picked === undefined ? undefined : props.computeCustomText?.(picked);
     });
 
     const cursor = ListboxSvelteUtils.createCursor<T>({
@@ -152,6 +167,8 @@
             activeOptionId={cursor.getActiveOptionId()}
             {isFilterable}
             query={currentQuery}
+            {isEditing}
+            {valueText}
             {textInset}
             {flags}
             computeTextStyle={props.computeTextStyle}
@@ -159,6 +176,7 @@
             onToggle={() => (visibility && !isFilterable ? close() : open())}
             onKeyDown={cursor.handleKeyDown}
             onQueryInput={(next) => {
+                isEditing = true;
                 open();
                 cursor.highlight(undefined);
 

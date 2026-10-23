@@ -17,6 +17,11 @@
 
     let { visibility = $bindable(false), checked = $bindable(), ...props }: ContextMenuProps<T> = $props();
 
+    const hasLayout = $derived(props.computeLayout !== undefined);
+    const hasGroupPaint = $derived(props.renderGroupHeader !== undefined || props.renderGroupBox !== undefined);
+
+    $effect(() => MenuUtils.warnIfGroupPaintIgnored(hasLayout, hasGroupPaint));
+
     const viewportContext = getViewportContext();
     const menuId = $props.id();
 
@@ -125,6 +130,8 @@
     computeEffect={props.computeEffect}
     computeCustomText={props.computeCustomText}
     renderItem={props.renderItem}
+    renderGroupHeader={props.renderGroupHeader}
+    renderGroupBox={props.renderGroupBox}
     renderPopup={props.renderPopup}
     floaterTransitionDurationMs={props.floaterTransitionDurationMs}
     renderHighlightFloater={props.renderHighlightFloater}

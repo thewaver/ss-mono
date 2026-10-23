@@ -36,4 +36,4 @@ export type WheelMenuProps<T> = Omit<MenuProps<T>, "items" | "checked" | "onUpda
         "closerDefs"?: WheelMenuCloserDefs;
     };
 
-export type WheelMenuSlots<T> = MenuSlots<T>;
+export type WheelMenuSlots<T> = Omit<MenuSlots<T>, "renderGroupHeader" | "renderGroupBox">;

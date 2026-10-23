@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 
+import { SCROLLER_DEFAULTS } from "@thewaver/ss-components-react";
 import type { Tab } from "@thewaver/ss-components-react";
 import { ScrollerKnobs } from "@thewaver/ss-playground/App/Knobs/Scrollers.const";
 import {
@@ -7,6 +8,8 @@ import {
     EXAMPLE_NAMES,
     MONTHS,
     PERCENT,
+    getMonthPanelId,
+    getMonthTabId,
 } from "@thewaver/ss-playground/App/Pages/ScrollerPage/ScrollerPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ScrollerPage/ScrollerPage.css";
 
@@ -21,12 +24,18 @@ import { TabbedExample } from "./Examples/Tabbed";
 export const ScrollerPage = () => {
     const [itemCount, setItemCount] = useState(ScrollerKnobs.STARTING_ITEM_COUNT);
     const [selectedMonth, setSelectedMonth] = useState(MONTHS[0]);
+    const [overlapCount, setOverlapCount] = useState(SCROLLER_DEFAULTS.overlapCount);
     const progressState = useState(0);
 
     const labels = useMemo(() => Array.from({ length: itemCount }, (_, index) => `Item ${index + 1}`), [itemCount]);
 
     const monthTabs = useMemo(
-        (): Tab<string>[] => MONTHS.slice(0, itemCount).map((month) => ({ value: month })),
+        (): Tab<string>[] =>
+            MONTHS.slice(0, itemCount).map((month) => ({
+                value: month,
+                id: getMonthTabId(month),
+                panelId: getMonthPanelId(month),
+            })),
         [itemCount],
     );
 
@@ -36,21 +45,21 @@ export const ScrollerPage = () => {
             name: EXAMPLE_NAMES.split,
             readout: () =>
                 `${itemCount} items, ${Math.round(progressState[0] * PERCENT)}% along — the buttons stop at the ends rather than wrapping round, and leave altogether once everything fits`,
-            component: () => <ChipsExample labels={labels} progress={progressState} />,
+            component: () => <ChipsExample labels={labels} overlapCount={overlapCount} progress={progressState} />,
             path: `${EXAMPLES_ROOT}/Chips.tsx`,
         },
         {
             key: "bothButtonsEnd",
             name: EXAMPLE_NAMES.bothButtonsEnd,
             readout: () => "the same control with its buttons together instead of split",
-            component: () => <ChipsExample labels={labels} buttonPlacement={"end"} />,
+            component: () => <ChipsExample labels={labels} overlapCount={overlapCount} buttonPlacement={"end"} />,
             path: `${EXAMPLES_ROOT}/Chips.tsx`,
         },
         {
             key: "bothButtonsStart",
             name: EXAMPLE_NAMES.bothButtonsStart,
             readout: () => "and the same pair on the other side",
-            component: () => <ChipsExample labels={labels} buttonPlacement={"start"} />,
+            component: () => <ChipsExample labels={labels} overlapCount={overlapCount} buttonPlacement={"start"} />,
             path: `${EXAMPLES_ROOT}/Chips.tsx`,
         },
         {
@@ -67,7 +76,7 @@ export const ScrollerPage = () => {
             key: "focusableChildren",
             name: EXAMPLE_NAMES.focusableChildren,
             readout: () => "the track holds whatever it is given, and tabbing through pulls the strip along",
-            component: () => <FocusableChildrenExample labels={labels} />,
+            component: () => <FocusableChildrenExample labels={labels} overlapCount={overlapCount} />,
             path: `${EXAMPLES_ROOT}/FocusableChildren.tsx`,
         },
     ];
@@ -88,6 +97,24 @@ export const ScrollerPage = () => {
                         step={ScrollerKnobs.ITEM_COUNT_STEP}
                         ariaLabel={"Item count"}
                         onInput={setItemCount}
+                    />
+                </PageProp>
+
+                <PageProp
+                    itemKey={"overlapCount"}
+                    label={"Overlap count"}
+                    hint={
+                        "How many of the items in view stay in view after a press of a step button. At 0 a press moves on by as much as fits; a press always moves by at least one item."
+                    }
+                    controls={"Sets ScrollerProps.overlapCount"}
+                >
+                    <PageNumberField
+                        value={overlapCount}
+                        min={ScrollerKnobs.MIN_OVERLAP_COUNT}
+                        max={ScrollerKnobs.MAX_OVERLAP_COUNT}
+                        step={ScrollerKnobs.OVERLAP_COUNT_STEP}
+                        ariaLabel={"Overlap count"}
+                        onInput={setOverlapCount}
                     />
                 </PageProp>
 
