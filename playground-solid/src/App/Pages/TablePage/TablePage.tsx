@@ -6,7 +6,9 @@ import { EXAMPLES_ROOT, EXAMPLE_NAMES } from "@thewaver/ss-playground/App/Pages/
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { ConsumerSortedExample } from "./Examples/ConsumerSorted";
 import { DisabledExample } from "./Examples/Disabled";
+import { ExpandableExample } from "./Examples/Expandable";
 import { PartsExample } from "./Examples/Parts";
+import { PinnedExample } from "./Examples/Pinned";
 import { ReorderableExample } from "./Examples/Reorderable";
 import { ResizableExample } from "./Examples/Resizable";
 import { RightToLeftExample } from "./Examples/RightToLeft";
@@ -46,6 +48,15 @@ export const TablePage = () => {
     const stressSortSignal = createSignal<TableSort | undefined>();
     const stressSelectionSignal = createSignal<Part[]>([]);
     const stressParts = createStressParts();
+
+    const pinnedSortSignal = createSignal<TableSort | undefined>();
+    const pinnedSelectionSignal = createSignal<Part[]>([]);
+    const pinnedWidthsSignal = createSignal<Record<string, number>>({});
+    const pinnedOrderSignal = createSignal<string[]>([]);
+
+    const expandableSortSignal = createSignal<TableSort | undefined>();
+    const expandableSelectionSignal = createSignal<Part[]>([]);
+    const expandableExpandedSignal = createSignal<Part[]>([]);
 
     const disabledSortSignal = createSignal<TableSort | undefined>();
     const disabledSelectionSignal = createSignal<Part[]>([]);
@@ -136,6 +147,36 @@ export const TablePage = () => {
                 />
             ),
             path: `${EXAMPLES_ROOT}/Virtualized.tsx`,
+        },
+        {
+            key: "pinned",
+            name: EXAMPLE_NAMES.pinned,
+            readout: () =>
+                `widths: ${JSON.stringify(pinnedWidthsSignal[0]())} | order: ${pinnedOrderSignal[0]().join(", ") || "as declared"} — SKU is held at the start and Price at the end while the rest scroll sideways; resize SKU and the scrolling columns slide under it, and a pinned column only moves among its own kind`,
+            component: () => (
+                <PinnedExample
+                    sort={pinnedSortSignal}
+                    selection={pinnedSelectionSignal}
+                    widths={pinnedWidthsSignal}
+                    order={pinnedOrderSignal}
+                />
+            ),
+            path: `${EXAMPLES_ROOT}/Pinned.tsx`,
+        },
+        {
+            key: "expandable",
+            span: 2,
+            name: EXAMPLE_NAMES.expandable,
+            readout: () =>
+                `open: ${spellSelection(expandableExpandedSignal[0]())} | selected: ${spellSelection(expandableSelectionSignal[0]())} — press the arrow by a SKU, or Enter on a row's first cell, to open its detail; the down arrow walks into it. Parts out of stock have nothing to open`,
+            component: () => (
+                <ExpandableExample
+                    sort={expandableSortSignal}
+                    selection={expandableSelectionSignal}
+                    expanded={expandableExpandedSignal}
+                />
+            ),
+            path: `${EXAMPLES_ROOT}/Expandable.tsx`,
         },
         {
             key: "disabled",

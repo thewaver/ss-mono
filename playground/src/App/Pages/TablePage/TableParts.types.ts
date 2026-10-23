@@ -9,4 +9,6 @@ export type Part = {
 export type PartColumnDefs = {
     isResizable?: boolean;
     isReorderable?: boolean;
+    isPinned?: boolean;
+    isExpandable?: boolean;
 };

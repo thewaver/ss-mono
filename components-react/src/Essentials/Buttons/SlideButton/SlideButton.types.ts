@@ -1,6 +1,6 @@
 import type { MouseEvent } from "react";
 
-import type { SlideButtonRenderProps, SlideButtonState } from "@thewaver/ss-components";
+import type { NavigatorDirection, SlideButtonRenderProps, SlideButtonState } from "@thewaver/ss-components";
 
 import type {
     InteractionControlProps,
@@ -27,6 +27,8 @@ export type SlideButtonElementProps = SlideButtonCbs &
         setIsDragging: (isDragging: boolean) => void;
         /** Says whether the button is being held. */
         setIsHolding: (isHolding: boolean) => void;
+        /** Says which way text runs around the button. */
+        setDirection: (direction: NavigatorDirection) => void;
     };
 
 export type SlideButtonProps = Omit<InteractionWrapperProps<SlideButtonRenderProps>, "renderControl" | "extraFlags"> &

@@ -6,7 +6,7 @@
     import { getLayerClass } from "../Layer/Layer.context";
     import type { SlideButtonContentProps } from "./SlideButtonContentSvelte.types";
     import {
-        DEFAULT_SLIDE_BUTTON_CONTENT_WIDTH,
+        DEFAULT_SLIDE_BUTTON_CONTENT_LENGTH,
     } from "@thewaver/ss-playground/App/StyledComponents/SlideButtonContent/SlideButtonContent.const";
 
     const travel = (ratio: number) => `calc(${ratio} * (100% - ${styles.SLIDE_BUTTON_THUMB_SIZE}px))`;
@@ -18,7 +18,11 @@
 
     const layerClass = $derived.by(getLayerClass());
 
-    const width = $derived(props.width ?? DEFAULT_SLIDE_BUTTON_CONTENT_WIDTH);
+    const length = $derived(props.length ?? DEFAULT_SLIDE_BUTTON_CONTENT_LENGTH);
+
+    const isVertical = $derived(props.renderProps.orientation === "vertical");
+
+    const isRightToLeft = $derived(!isVertical && props.renderProps.direction === "rtl");
 
     const ratio = $derived(props.renderProps.isPressed ? 1 : props.renderProps.progressRatio);
 
@@ -29,12 +33,19 @@
     class={[
         styles.slideButtonContent,
         layerClass,
+        isVertical && styles.isVertical,
+        isRightToLeft && styles.isRightToLeft,
         props.renderProps.isDisabled && styles.isDisabled,
         props.renderProps.hasError && styles.hasError,
     ]}
-    style:width={`${width}px`}
+    style:width={isVertical ? undefined : `${length}px`}
+    style:height={isVertical ? `${length}px` : undefined}
 >
-    <div class={[styles.slideButtonFill, isTracking && styles.isTracking]} style:width={covered(ratio)}></div>
+    <div
+        class={[styles.slideButtonFill, isTracking && styles.isTracking]}
+        style:width={isVertical ? undefined : covered(ratio)}
+        style:height={isVertical ? covered(ratio) : undefined}
+    ></div>
 
     <div class={styles.slideButtonHint} style:opacity={1 - ratio}>
         {@render props.children?.()}
@@ -46,7 +57,9 @@
             isTracking && styles.isTracking,
             props.renderProps.isFocusVisible && styles.isFocused,
         ]}
-        style:left={travel(ratio)}
+        style:left={isVertical || isRightToLeft ? undefined : travel(ratio)}
+        style:right={isRightToLeft ? travel(ratio) : undefined}
+        style:bottom={isVertical ? travel(ratio) : undefined}
     >
         <svg class={styles.slideButtonArrow} viewBox="0 0 24 24" aria-hidden="true">
             <path d="M5 12 H19 M13 6 L19 12 L13 18" />

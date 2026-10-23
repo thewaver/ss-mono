@@ -2,7 +2,7 @@ import type { InteractionFlags, SlideButtonRenderProps } from "@thewaver/ss-comp
 
 export type BaseSlideButtonContentValues = {
     renderProps: InteractionFlags<SlideButtonRenderProps>;
-    width?: number;
+    length?: number;
 };
 
 export type BaseSlideButtonContentProps = BaseSlideButtonContentValues;

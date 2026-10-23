@@ -21,7 +21,9 @@ import { ErroredExample } from "./Examples/Errored";
 import { HeldExample } from "./Examples/Held";
 import { HoldOnlyExample } from "./Examples/HoldOnly";
 import { ReachableExample } from "./Examples/Reachable";
+import { RightToLeftExample } from "./Examples/RightToLeft";
 import { SlideOnlyExample } from "./Examples/SlideOnly";
+import { VerticalExample } from "./Examples/Vertical";
 
 export const SlideButtonPage = () => {
     const [getSends, setSends] = createSignal(0);
@@ -34,6 +36,8 @@ export const SlideButtonPage = () => {
     const [getHasError, setHasError] = createSignal(true);
     const [getSlideOnlySends, setSlideOnlySends] = createSignal(0);
     const [getHoldOnlySends, setHoldOnlySends] = createSignal(0);
+    const [getVerticalSends, setVerticalSends] = createSignal(0);
+    const [getRightToLeftSends, setRightToLeftSends] = createSignal(0);
 
     const getExamples = createMemo(() => [
         {
@@ -99,6 +103,38 @@ export const SlideButtonPage = () => {
                 </div>
             ),
             path: `${EXAMPLES_ROOT}/HoldOnly.tsx`,
+        },
+        {
+            key: "vertical",
+            name: EXAMPLE_NAMES.vertical,
+            readout: () =>
+                `activations: ${getVerticalSends()} — the thumb rests at the bottom and slides up, and a held press or a held Enter fill it the same way`,
+            component: () => (
+                <div class={styles.stage}>
+                    <VerticalExample
+                        onActivate={() => {
+                            setVerticalSends((prev) => prev + 1);
+                        }}
+                    />
+                </div>
+            ),
+            path: `${EXAMPLES_ROOT}/Vertical.tsx`,
+        },
+        {
+            key: "rightToLeft",
+            name: EXAMPLE_NAMES.rightToLeft,
+            readout: () =>
+                `activations: ${getRightToLeftSends()} — the box around the button sets dir="rtl", so the thumb rests at the right and slides leftward`,
+            component: () => (
+                <div class={styles.stage}>
+                    <RightToLeftExample
+                        onActivate={() => {
+                            setRightToLeftSends((prev) => prev + 1);
+                        }}
+                    />
+                </div>
+            ),
+            path: `${EXAMPLES_ROOT}/RightToLeft.tsx`,
         },
         {
             key: "held",

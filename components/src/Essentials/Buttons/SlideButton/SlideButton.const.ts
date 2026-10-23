@@ -1,6 +1,7 @@
-import type { SlideButtonMode } from "./SlideButton.types";
+import type { SlideButtonMode, SlideButtonOrientation } from "./SlideButton.types";
 
 export const SLIDE_BUTTON_DEFAULTS = {
+    orientation: "horizontal" as SlideButtonOrientation,
     thumbSize: 40,
     holdDurationMs: 1000,
     completionRatio: 1,

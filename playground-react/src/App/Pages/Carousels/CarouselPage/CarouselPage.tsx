@@ -1,16 +1,21 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import {
     EXAMPLES_ROOT,
     EXAMPLE_NAMES,
     WINDOWED_SLIDE_COUNT,
 } from "@thewaver/ss-playground/App/Pages/Carousels/CarouselPage/CarouselPage.const";
+import {
+    computePairs,
+    toPairableSlides,
+} from "@thewaver/ss-playground/App/Pages/Carousels/CarouselPage/CarouselPage.utils";
 
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
 import { PageCarouselBox } from "../../../StyledComponents/CarouselContent/CarouselContent";
 import { useCarouselsControls } from "../Carousels.utils";
 import { PageCarouselsPanel } from "../CarouselsPanel";
 import { NoControlsExample } from "./Examples/NoControls";
+import { PairsExample } from "./Examples/Pairs";
 import { RotatingExample } from "./Examples/Rotating";
 import { ScrolledExample } from "./Examples/Scrolled";
 import { SteppedExample } from "./Examples/Stepped";
@@ -26,8 +31,14 @@ export const CarouselPage = () => {
     const scrolledIndexState = useState(0);
     const windowedIndexState = useState(0);
     const [builtCount, setBuiltCount] = useState(0);
+    const pairsIndexState = useState(0);
 
     const [isLooping] = controls.isLooping;
+
+    const pairCount = useMemo(
+        () => computePairs(toPairableSlides(controls.sharedProps.slides).length).length,
+        [controls.sharedProps.slides],
+    );
 
     const examples = [
         {
@@ -100,6 +111,18 @@ export const CarouselPage = () => {
                 );
             },
             path: `${EXAMPLES_ROOT}/Windowed.tsx`,
+        },
+        {
+            key: "pairs",
+            name: EXAMPLE_NAMES.pairs,
+            readout: () =>
+                `pair ${pairsIndexState[0] + 1} of ${pairCount} — the slides two at a time, 1 and 2, then 3 and 4, each pair resting side by side in the room of one slide wherever the placement rests a slide; an odd number of slides is doubled so every pair is whole`,
+            component: () => (
+                <PageCarouselBox>
+                    <PairsExample {...controls.sharedProps} isLooping={isLooping} index={pairsIndexState} />
+                </PageCarouselBox>
+            ),
+            path: `${EXAMPLES_ROOT}/Pairs.tsx`,
         },
     ];
 

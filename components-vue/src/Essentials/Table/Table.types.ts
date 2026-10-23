@@ -6,6 +6,7 @@ import type {
     TableCellRenderProps,
     TableColumnDefs,
     TableColumnRenderProps,
+    TableDetailRenderProps,
     TableSort,
 } from "@thewaver/ss-components";
 
@@ -16,7 +17,11 @@ export type TableColumn<T> = TableColumnDefs<T> & {
      * reordered by dragging, and the table warns about it.
      */
     renderHeader: (renderProps: TableColumnRenderProps) => VNodeChild;
-    /** Draws one of the column's cells, and is handed its row and where the cell sits. */
+    /**
+     * Draws one of the column's cells, and is handed its row and where the cell sits. In a table whose rows open a
+     * detail, a `TableRowExpander` goes in one of the row's cells, usually the first; without one a pointer cannot
+     * open a detail, and the table warns about it.
+     */
     renderCell: (props: { row: T; renderProps: TableCellRenderProps }) => VNodeChild;
 };
 
@@ -55,13 +60,30 @@ export type TableProps<T> = TableOrderProps &
         "selection"?: T[];
         /** Receives the rows the reader selects, which is what `v-model:selection` binds. */
         "onUpdate:selection"?: (rows: T[]) => void;
+        /**
+         * Which rows have their detail open. Both sides write it: the table when a reader opens or closes a row, the
+         * consumer to open or close rows from outside. Leave it out and the table keeps the state itself, starting
+         * with every row closed.
+         */
+        "expanded"?: T[];
+        /**
+         * Receives the rows whose detail is open as a reader opens or closes one, which is what `v-model:expanded`
+         * binds.
+         */
+        "onUpdate:expanded"?: (rows: T[]) => void;
     };
 
-export type TableSlots = {
+export type TableSlots<T> = {
     /** Draws the grab handle between two columns. */
     renderResizer?: (renderProps: TableColumnRenderProps) => VNodeChild;
     /** Draws the line showing where a dragged column would land. */
     renderMarker?: () => VNodeChild;
+    /**
+     * Draws the detail a row opens beneath it, as wide as the row. Giving it is what lets rows open, and makes the
+     * table a tree grid, whose rows say whether they are open. A reader opens and closes a row with Enter on its
+     * first cell, which then no longer activates the row, and walks down into the open detail with the down arrow.
+     */
+    renderDetail?: (props: { row: T; renderProps: TableDetailRenderProps }) => VNodeChild;
 };
 
 export type TableHeaderControlSlots = {
@@ -90,3 +112,16 @@ export type TableHeaderSortSlots = TableHeaderControlSlots;
  * and renders nothing in a column that is not reorderable.
  */
 export type TableHeaderReorderSlots = TableHeaderControlSlots;
+
+/**
+ * The control that opens and closes a row's detail, placed by the consumer anywhere inside one of the row's cells.
+ *
+ * It is the pointer's way to open a detail; a keyboard opens one with Enter on the row's first cell. It focuses its
+ * own cell before acting and stays out of the tab order and hidden from screen readers, since the cell is the tab
+ * stop and the row says whether it is open. 2.5.8 Target Size wants it at least 24 CSS pixels across, or with room
+ * around it. It renders nothing in a row that cannot open.
+ */
+export type TableRowExpanderSlots = {
+    /** Draws what sits inside the control, from the state of the cell it is in, which says whether the row is open. */
+    renderContent: (renderProps: TableCellRenderProps) => VNodeChild;
+};

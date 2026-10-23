@@ -8,7 +8,9 @@ import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
 import ConsumerSortedExample from "./Examples/ConsumerSorted.vue";
 import DisabledExample from "./Examples/Disabled.vue";
+import ExpandableExample from "./Examples/Expandable.vue";
 import PartsExample from "./Examples/Parts.vue";
+import PinnedExample from "./Examples/Pinned.vue";
 import ReorderableExample from "./Examples/Reorderable.vue";
 import ResizableExample from "./Examples/Resizable.vue";
 import RightToLeftExample from "./Examples/RightToLeft.vue";
@@ -47,6 +49,15 @@ const consumerSelection = shallowRef<Part[]>([]);
 const stressSort = shallowRef<TableSort | undefined>();
 const stressSelection = shallowRef<Part[]>([]);
 const stressParts = createStressParts();
+
+const pinnedSort = shallowRef<TableSort | undefined>();
+const pinnedSelection = shallowRef<Part[]>([]);
+const pinnedWidths = shallowRef<Record<string, number>>({});
+const pinnedOrder = shallowRef<string[]>([]);
+
+const expandableSort = shallowRef<TableSort | undefined>();
+const expandableSelection = shallowRef<Part[]>([]);
+const expandableExpanded = shallowRef<Part[]>([]);
 
 const disabledSort = shallowRef<TableSort | undefined>();
 const disabledSelection = shallowRef<Part[]>([]);
@@ -107,6 +118,21 @@ const examples: ExampleDefs[] = [
         path: `${EXAMPLES_ROOT}/Virtualized.vue`,
     },
     {
+        key: "pinned",
+        name: EXAMPLE_NAMES.pinned,
+        readout: () =>
+            `widths: ${JSON.stringify(pinnedWidths.value)} | order: ${pinnedOrder.value.join(", ") || "as declared"} — SKU is held at the start and Price at the end while the rest scroll sideways; resize SKU and the scrolling columns slide under it, and a pinned column only moves among its own kind`,
+        path: `${EXAMPLES_ROOT}/Pinned.vue`,
+    },
+    {
+        key: "expandable",
+        span: 2,
+        name: EXAMPLE_NAMES.expandable,
+        readout: () =>
+            `open: ${spellSelection(expandableExpanded.value)} | selected: ${spellSelection(expandableSelection.value)} — press the arrow by a SKU, or Enter on a row's first cell, to open its detail; the down arrow walks into it. Parts out of stock have nothing to open`,
+        path: `${EXAMPLES_ROOT}/Expandable.vue`,
+    },
+    {
         key: "disabled",
         name: EXAMPLE_NAMES.disabled,
         readout: () =>
@@ -157,6 +183,23 @@ const examples: ExampleDefs[] = [
 
         <template #virtualized>
             <VirtualizedExample v-model:sort="stressSort" v-model:selection="stressSelection" :rows="stressParts" />
+        </template>
+
+        <template #pinned>
+            <PinnedExample
+                v-model:sort="pinnedSort"
+                v-model:selection="pinnedSelection"
+                v-model:widths="pinnedWidths"
+                v-model:order="pinnedOrder"
+            />
+        </template>
+
+        <template #expandable>
+            <ExpandableExample
+                v-model:sort="expandableSort"
+                v-model:selection="expandableSelection"
+                v-model:expanded="expandableExpanded"
+            />
         </template>
 
         <template #disabled>

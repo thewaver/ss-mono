@@ -1,6 +1,7 @@
 import { type SlotsType, defineComponent, onScopeDispose, shallowRef } from "vue";
 
 import {
+    type NavigatorDirection,
     SLIDE_BUTTON_DEFAULTS,
     type SlideButtonRenderProps,
     SlideButtonStyles,
@@ -9,6 +10,7 @@ import {
 import { SlideButtonConst } from "@thewaver/ss-components/internal";
 
 import { InteractionTrackerVueUtils } from "../../../Abstracts/InteractionTracker/InteractionTrackerVue.utils";
+import { NavigatorVueUtils } from "../../../Abstracts/Navigator/NavigatorVue.utils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import type {
     InteractionControlSlots,
@@ -34,6 +36,8 @@ const SlideButtonElement = defineComponent(
 
         FormFieldVueUtils.useRegisterControl(trackRef);
 
+        const direction = NavigatorVueUtils.useDirection(trackRef);
+
         watchAfterRender([() => props.progressRatio], ([ratio]) => {
             progress = ratio;
         });
@@ -42,10 +46,15 @@ const SlideButtonElement = defineComponent(
 
         const gesture = SlideButtonUtils.createGesture({
             getMode: () => props.mode,
+            getOrientation: () => props.orientation,
+            getDirection: () => direction.value,
             getThumbSize: () => props.thumbSize,
             getHoldDurationMs: () => props.holdDurationMs,
             getCompletionRatio: () => props.completionRatio,
-            getTrackWidth: () => trackRef.value?.clientWidth ?? 0,
+            getTrackSize: () => ({
+                width: trackRef.value?.clientWidth ?? 0,
+                height: trackRef.value?.clientHeight ?? 0,
+            }),
             getProgressRatio: () => progress,
             setProgressRatio: (ratio) => {
                 progress = ratio;
@@ -60,13 +69,15 @@ const SlideButtonElement = defineComponent(
         const isGrabbed = useStore(gesture, (state) => state.isGrabbed);
 
         const { isDragging } = InteractionTrackerVueUtils.useDrag(trackRef, getIsDisabled, {
-            onDrag: (ratio) => gesture.drag(ratio.x),
+            onDrag: (ratio) => gesture.drag(ratio),
             onDragEnd: (reason) => gesture.dragEnd(reason),
         });
 
         watchAfterRender([() => isDragging.value && isGrabbed.value], ([isSliding]) => props.setIsDragging(isSliding));
 
         watchAfterRender([isHolding], ([isHeld]) => props.setIsHolding(isHeld));
+
+        watchAfterRender([direction], ([textDirection]) => props.setDirection(textDirection));
 
         watchAfterRender([getIsDisabled], ([isOff]) => {
             if (isOff) gesture.reset();
@@ -121,6 +132,7 @@ const SlideButtonElement = defineComponent(
             id: null,
             ariaLabel: null,
             flags: null,
+            orientation: null,
             thumbSize: null,
             holdDurationMs: null,
             completionRatio: null,
@@ -129,6 +141,7 @@ const SlideButtonElement = defineComponent(
             setProgressRatio: null,
             setIsDragging: null,
             setIsHolding: null,
+            setDirection: null,
         }),
     },
 );
@@ -140,11 +153,14 @@ export const SlideButton = defineComponent(
         const controlRef = shallowRef<HTMLElement>();
         const isDragging = shallowRef(false);
         const isHolding = shallowRef(false);
+        const direction = shallowRef<NavigatorDirection>("ltr");
 
         exposeElement(expose, () => controlRef.value);
 
         return () => {
             const extraFlags: SlideButtonRenderProps = {
+                orientation: props.orientation ?? SLIDE_BUTTON_DEFAULTS.orientation,
+                direction: direction.value,
                 progressRatio: progressRatio.value,
                 isDragging: isDragging.value,
                 isHolding: isHolding.value,
@@ -162,6 +178,7 @@ export const SlideButton = defineComponent(
                                     }}
                                     id={props.id}
                                     ariaLabel={props.ariaLabel}
+                                    orientation={props.orientation ?? SLIDE_BUTTON_DEFAULTS.orientation}
                                     thumbSize={props.thumbSize ?? SLIDE_BUTTON_DEFAULTS.thumbSize}
                                     holdDurationMs={props.holdDurationMs ?? SLIDE_BUTTON_DEFAULTS.holdDurationMs}
                                     completionRatio={props.completionRatio ?? SLIDE_BUTTON_DEFAULTS.completionRatio}
@@ -176,6 +193,9 @@ export const SlideButton = defineComponent(
                                     }}
                                     setIsHolding={(isHeld) => {
                                         isHolding.value = isHeld;
+                                    }}
+                                    setDirection={(textDirection) => {
+                                        direction.value = textDirection;
                                     }}
                                     onActivate={props.onActivate}
                                     onMouseEnter={props.onMouseEnter}
@@ -212,6 +232,7 @@ export const SlideButton = defineComponent(
             "onMouseLeave": null,
             "id": null,
             "ariaLabel": null,
+            "orientation": null,
             "thumbSize": null,
             "holdDurationMs": null,
             "completionRatio": null,

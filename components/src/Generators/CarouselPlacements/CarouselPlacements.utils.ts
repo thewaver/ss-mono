@@ -58,6 +58,110 @@ const toTurn = (defs: CarouselPlacementDefs, degrees: number) =>
 const toVisibility = (distance: number, visibleDistance: number) =>
     MathUtils.clamp01(visibleDistance + WHOLE - Math.abs(distance)) * PERCENT;
 
+/** Whether the slide is alone in its group, so the rule's placement of the group is the slide's own. */
+const getIsAlone = (defs: CarouselPlacementDefs) => defs.group.size === WHOLE;
+
+/**
+ * How much a slide is shrunk so its group fits in the room of one slide, side by side along the way the carousel runs,
+ * with `gapRatio` of a slide between neighbors.
+ */
+const toGroupScale = (defs: CarouselPlacementDefs, gapRatio = 0) =>
+    WHOLE / (defs.group.size + (defs.group.size - WHOLE) * gapRatio);
+
+/**
+ * How far a slide sits from its group's middle along the way the carousel runs, in pixels, with the group's slides
+ * shrunk by {@link toGroupScale} and laid side by side across `roomPx`.
+ */
+const toCenteredSlotPx = (defs: CarouselPlacementDefs, roomPx: number, gapRatio = 0) =>
+    (defs.group.slot - (defs.group.size - WHOLE) * HALF) * toGroupScale(defs, gapRatio) * (WHOLE + gapRatio) * roomPx;
+
+/** A point's offset from the middle of the carousel's box, in pixels, from where it sits as a fraction across it. */
+const toOffsetPx = (defs: CarouselPlacementDefs, point: { x: number; y: number } | undefined) =>
+    point
+        ? { x: (point.x - HALF) * defs.size.width, y: (point.y - HALF) * defs.size.height, z: 0 }
+        : { x: 0, y: 0, z: 0 };
+
+/** A point turned the way CSS's `rotateY` turns it. */
+const turnAboutY = (point: { x: number; y: number; z: number }, degrees: number) => {
+    const radians = AngleUtils.toRadians(degrees);
+
+    return {
+        x: point.x * Math.cos(radians) + point.z * Math.sin(radians),
+        y: point.y,
+        z: -point.x * Math.sin(radians) + point.z * Math.cos(radians),
+    };
+};
+
+/** A point turned the way CSS's `rotateX` turns it. */
+const turnAboutX = (point: { x: number; y: number; z: number }, degrees: number) => {
+    const radians = AngleUtils.toRadians(degrees);
+
+    return {
+        x: point.x,
+        y: point.y * Math.cos(radians) - point.z * Math.sin(radians),
+        z: point.y * Math.sin(radians) + point.z * Math.cos(radians),
+    };
+};
+
+/**
+ * Puts one slide of a group in its slot, given where the rule placed the whole group as though it were one slide.
+ *
+ * The slide is shrunk by `scale` and moved `slotPx` along the way the carousel runs, inside the group: the move is
+ * turned and scaled with the group, and made about the group's own `origin`, so a group turning over or swinging round
+ * carries its slides with it as one flat piece. A slide alone in its group is placed as the rule placed it.
+ */
+const toSlotPlacement = (
+    defs: CarouselPlacementDefs,
+    placement: CarouselPlacement,
+    slotPx: number,
+    scale: number,
+): CarouselPlacement => {
+    if (getIsAlone(defs)) return placement;
+
+    const { effect } = placement;
+    const { width, height } = defs.size;
+    const isAcross = defs.orientation === "horizontal";
+    const origin = toOffsetPx(defs, placement.origin);
+    const [scaleX, scaleY] = effect.scale === undefined ? [PERCENT, PERCENT] : [effect.scale].flat();
+    const groupScaleX = scaleX / PERCENT;
+    const groupScaleY = (scaleY ?? scaleX) / PERCENT;
+    const shift = {
+        x: ((isAcross ? slotPx : 0) - (WHOLE - scale) * origin.x) * groupScaleX,
+        y: ((isAcross ? 0 : slotPx) - (WHOLE - scale) * origin.y) * groupScaleY,
+        z: 0,
+    };
+    const turned = turnAboutX(
+        turnAboutY(shift, (effect.rotateY as number | undefined) ?? 0),
+        (effect.rotateX as number | undefined) ?? 0,
+    );
+    const [alongX, alongY, depth] =
+        effect.translate3d === undefined
+            ? [(effect.translateX as number | undefined) ?? 0, (effect.translateY as number | undefined) ?? 0, 0]
+            : [effect.translate3d].flat();
+    const { translateX: _translateX, translateY: _translateY, ...rest } = effect;
+
+    return {
+        ...placement,
+        effect: {
+            ...rest,
+            translate3d: [
+                alongX + (width > 0 ? (turned.x / width) * PERCENT : 0),
+                alongY + (height > 0 ? (turned.y / height) * PERCENT : 0),
+                depth + turned.z,
+            ],
+            scale: [scaleX * scale, (scaleY ?? scaleX) * scale],
+        },
+    };
+};
+
+/** {@link toSlotPlacement} for a group laid side by side across `roomPx`, centered on the group's middle. */
+const toCenteredSlotPlacement = (
+    defs: CarouselPlacementDefs,
+    placement: CarouselPlacement,
+    roomPx: number,
+    gapRatio = 0,
+) => toSlotPlacement(defs, placement, toCenteredSlotPx(defs, roomPx, gapRatio), toGroupScale(defs, gapRatio));
+
 /**
  * The placement rules this library ships for `Carousel`, as factories a consumer can tune or take as they are.
  *
@@ -66,6 +170,12 @@ const toVisibility = (distance: number, visibleDistance: number) =>
  * works across and up and down. Distances arrive fractional while the carousel moves, so every rule is continuous in
  * them. Each says how far either side of the slide showing it draws, so a looping carousel with too few slides repeats
  * them until that many fit; the paddle wheel spreads however many slides there are round its turn, so it says nothing.
+ *
+ * On a carousel with `computeGroups`, every rule places a group where it would place one slide, by the group's distance,
+ * and lays the group's slides side by side inside it along the way the carousel runs, each shrunk so the group takes
+ * the room of one slide: a pair at rest stands where a single slide would rest, and the groups either side stand,
+ * turn and fade where single slides would. A group that turns, swings or folds carries its slides with it as one flat
+ * piece. Without groups, every slide is placed exactly as it would be by itself.
  */
 export namespace CarouselPlacementUtils {
     /**
@@ -80,11 +190,17 @@ export namespace CarouselPlacementUtils {
         return {
             reach: WHOLE,
             place: (placementDefs) => {
-                const along = placementDefs.distance * (WHOLE + gapRatio) * PERCENT;
+                const along = placementDefs.group.distance * (WHOLE + gapRatio) * PERCENT;
 
-                return {
-                    effect: placementDefs.orientation === "horizontal" ? { translateX: along } : { translateY: along },
-                };
+                return toCenteredSlotPlacement(
+                    placementDefs,
+                    {
+                        effect:
+                            placementDefs.orientation === "horizontal" ? { translateX: along } : { translateY: along },
+                    },
+                    getAlong(placementDefs),
+                    gapRatio,
+                );
             },
         };
     };
@@ -118,24 +234,33 @@ export namespace CarouselPlacementUtils {
         return {
             reach: faceCount > 0 ? Math.floor(faceCount * HALF) : WHOLE,
             place: (placementDefs) => {
+                const { group } = placementDefs;
                 const along = getAlong(placementDefs);
                 const isFixed = faceCount > 0;
-                const count = Math.max(isFixed ? faceCount : placementDefs.count, SMALLEST_RING);
-                const angle = (placementDefs.distance * FULL_TURN_DEGREES) / count;
+                const count = Math.max(isFixed ? faceCount : group.count, SMALLEST_RING);
+                const angle = (group.distance * FULL_TURN_DEGREES) / count;
                 const radius = (along * faceRatio * HALF) / Math.tan(Math.PI / count);
                 const radians = AngleUtils.toRadians(angle);
                 const alongPercent = along > 0 ? ((radius * Math.sin(radians)) / along) * PERCENT : 0;
-                const isPastHalfTurn = isFixed && Math.abs(placementDefs.distance) > count * HALF;
+                const isPastHalfTurn = isFixed && Math.abs(group.distance) > count * HALF;
 
-                return {
-                    effect: {
-                        perspective: perspectivePx,
-                        translate3d: toTranslation(placementDefs, alongPercent, radius * (Math.cos(radians) - WHOLE)),
-                        ...toTurn(placementDefs, angle),
-                        ...(isPastHalfTurn ? { opacity: 0 } : {}),
+                return toCenteredSlotPlacement(
+                    placementDefs,
+                    {
+                        effect: {
+                            perspective: perspectivePx,
+                            translate3d: toTranslation(
+                                placementDefs,
+                                alongPercent,
+                                radius * (Math.cos(radians) - WHOLE),
+                            ),
+                            ...toTurn(placementDefs, angle),
+                            ...(isPastHalfTurn ? { opacity: 0 } : {}),
+                        },
+                        layer: Math.cos(radians),
                     },
-                    layer: Math.cos(radians),
-                };
+                    along * faceRatio,
+                );
             },
         };
     };
@@ -149,7 +274,9 @@ export namespace CarouselPlacementUtils {
      *
      * @param defs `spacingRatio` between side slides and `gapRatio` beside the one showing, both shares of the box;
      * `angleDegrees` the side slides turn by; `depthPx` how far back they stand; `perspectivePx` how far away the
-     * viewer sits; `visibleDistance` how many slides either side stay drawn before the rest fade.
+     * viewer sits; `visibleDistance` how many slides either side stay drawn before the rest fade; `faceRatio`, how long
+     * the slide's own content is as a share of the box, which is how far apart the slides of a group stand so they meet
+     * edge to edge — size the content to match, since the rule does not shrink it.
      * @returns The rule, ready to hand to `placement`.
      */
     export const createCoverFlow = (defs?: CoverFlowPlacementDefs): CarouselPlacementRule => {
@@ -160,22 +287,27 @@ export namespace CarouselPlacementUtils {
         const depthPx = defs?.depthPx ?? base.depthPx;
         const perspectivePx = defs?.perspectivePx ?? base.perspectivePx;
         const visibleDistance = defs?.visibleDistance ?? base.visibleDistance;
+        const faceRatio = defs?.faceRatio ?? base.faceRatio;
 
         return {
             reach: Math.ceil(visibleDistance) + WHOLE,
             place: (placementDefs) => {
-                const { distance } = placementDefs;
+                const { distance } = placementDefs.group;
                 const near = MathUtils.clamp(distance, -WHOLE, WHOLE);
                 const alongPercent = (distance * spacingRatio + near * gapRatio) * PERCENT;
 
-                return {
-                    effect: {
-                        perspective: perspectivePx,
-                        translate3d: toTranslation(placementDefs, alongPercent, -Math.abs(near) * depthPx),
-                        ...toTurn(placementDefs, -near * angleDegrees),
-                        opacity: toVisibility(distance, visibleDistance),
+                return toCenteredSlotPlacement(
+                    placementDefs,
+                    {
+                        effect: {
+                            perspective: perspectivePx,
+                            translate3d: toTranslation(placementDefs, alongPercent, -Math.abs(near) * depthPx),
+                            ...toTurn(placementDefs, -near * angleDegrees),
+                            opacity: toVisibility(distance, visibleDistance),
+                        },
                     },
-                };
+                    getAlong(placementDefs) * faceRatio,
+                );
             },
         };
     };
@@ -189,7 +321,9 @@ export namespace CarouselPlacementUtils {
      *
      * @param defs `spacingRatio` between slides as a share of the box; `depthPx` how far back each step sinks;
      * `tiltDegrees` how far each step turns; `perspectivePx` how far away the viewer sits; `visibleDistance` how many
-     * slides either side stay drawn.
+     * slides either side stay drawn; `faceRatio`, how long the slide's own content is as a share of the box, which is
+     * how far apart the slides of a group stand so they meet edge to edge — size the content to match, since the rule
+     * does not shrink it.
      * @returns The rule, ready to hand to `placement`.
      */
     export const createDepthWave = (defs?: DepthWavePlacementDefs): CarouselPlacementRule => {
@@ -199,24 +333,29 @@ export namespace CarouselPlacementUtils {
         const tiltDegrees = defs?.tiltDegrees ?? base.tiltDegrees;
         const perspectivePx = defs?.perspectivePx ?? base.perspectivePx;
         const visibleDistance = defs?.visibleDistance ?? base.visibleDistance;
+        const faceRatio = defs?.faceRatio ?? base.faceRatio;
 
         return {
             reach: Math.ceil(visibleDistance) + WHOLE,
             place: (placementDefs) => {
-                const { distance } = placementDefs;
+                const { distance } = placementDefs.group;
 
-                return {
-                    effect: {
-                        perspective: perspectivePx,
-                        translate3d: toTranslation(
-                            placementDefs,
-                            distance * spacingRatio * PERCENT,
-                            -Math.abs(distance) * depthPx,
-                        ),
-                        ...toTurn(placementDefs, -distance * tiltDegrees),
-                        opacity: toVisibility(distance, visibleDistance),
+                return toCenteredSlotPlacement(
+                    placementDefs,
+                    {
+                        effect: {
+                            perspective: perspectivePx,
+                            translate3d: toTranslation(
+                                placementDefs,
+                                distance * spacingRatio * PERCENT,
+                                -Math.abs(distance) * depthPx,
+                            ),
+                            ...toTurn(placementDefs, -distance * tiltDegrees),
+                            opacity: toVisibility(distance, visibleDistance),
+                        },
                     },
-                };
+                    getAlong(placementDefs) * faceRatio,
+                );
             },
         };
     };
@@ -242,21 +381,30 @@ export namespace CarouselPlacementUtils {
         return {
             reach: Math.ceil(QUARTER_TURN_DEGREES / stepDegrees),
             place: (placementDefs) => {
+                const { distance } = placementDefs.group;
                 const along = getAlong(placementDefs);
-                const angle = placementDefs.distance * stepDegrees;
+                const angle = distance * stepDegrees;
                 const radians = AngleUtils.toRadians(angle);
                 const radius = (along * HALF) / Math.sin(AngleUtils.toRadians(stepDegrees) * HALF);
                 const alongPercent = along > 0 ? ((radius * Math.sin(radians)) / along) * PERCENT : 0;
 
-                return {
-                    effect: {
-                        perspective: perspectivePx,
-                        translate3d: toTranslation(placementDefs, alongPercent, radius * (WHOLE - Math.cos(radians))),
-                        ...toTurn(placementDefs, -angle),
-                        opacity: Math.abs(angle) < QUARTER_TURN_DEGREES ? PERCENT : 0,
+                return toCenteredSlotPlacement(
+                    placementDefs,
+                    {
+                        effect: {
+                            perspective: perspectivePx,
+                            translate3d: toTranslation(
+                                placementDefs,
+                                alongPercent,
+                                radius * (WHOLE - Math.cos(radians)),
+                            ),
+                            ...toTurn(placementDefs, -angle),
+                            opacity: Math.abs(angle) < QUARTER_TURN_DEGREES ? PERCENT : 0,
+                        },
+                        layer: -Math.abs(distance),
                     },
-                    layer: -Math.abs(placementDefs.distance),
-                };
+                    along,
+                );
             },
         };
     };
@@ -284,32 +432,45 @@ export namespace CarouselPlacementUtils {
         return {
             reach: Math.ceil(visibleDistance) + WHOLE,
             place: (placementDefs): CarouselPlacement => {
-                const { distance, count, isLooping } = placementDefs;
+                const { distance, count } = placementDefs.group;
+                const room = getAlong(placementDefs);
 
                 if (distance < 0 && distance > -WHOLE) {
-                    return {
-                        effect: {
-                            translate3d: toStackTranslation(placementDefs, distance * LEAVING_DROP_RATIO * PERCENT, 0),
-                            opacity: (WHOLE + distance) * PERCENT,
+                    return toCenteredSlotPlacement(
+                        placementDefs,
+                        {
+                            effect: {
+                                translate3d: toStackTranslation(
+                                    placementDefs,
+                                    distance * LEAVING_DROP_RATIO * PERCENT,
+                                    0,
+                                ),
+                                opacity: (WHOLE + distance) * PERCENT,
+                            },
+                            layer: WHOLE,
                         },
-                        layer: WHOLE,
-                    };
+                        room,
+                    );
                 }
 
-                const behind = distance < 0 && isLooping ? distance + count : distance;
+                const behind = distance < 0 && placementDefs.isLooping ? distance + count : distance;
 
                 if (behind < 0) return { effect: { opacity: 0 } };
 
                 const scale = Math.max(WHOLE - behind * scaleStep, 0) * PERCENT;
 
-                return {
-                    effect: {
-                        translate3d: toStackTranslation(placementDefs, behind * offsetRatio * PERCENT, 0),
-                        scale: [scale, scale],
-                        opacity: toVisibility(behind, visibleDistance),
+                return toCenteredSlotPlacement(
+                    placementDefs,
+                    {
+                        effect: {
+                            translate3d: toStackTranslation(placementDefs, behind * offsetRatio * PERCENT, 0),
+                            scale: [scale, scale],
+                            opacity: toVisibility(behind, visibleDistance),
+                        },
+                        layer: -behind,
                     },
-                    layer: -behind,
-                };
+                    room,
+                );
             },
         };
     };
@@ -341,37 +502,47 @@ export namespace CarouselPlacementUtils {
         return {
             reach: Math.max(Math.ceil(visibleDistance) + WHOLE, FLIPPED_FADE_DISTANCE),
             place: (placementDefs): CarouselPlacement => {
-                const { distance, index, count, orientation } = placementDefs;
+                const { distance, index, count } = placementDefs.group;
+                const { orientation } = placementDefs;
                 const axis = orientation === "horizontal" ? "row" : "column";
                 const origin = orientation === "horizontal" ? LEFT_EDGE : BOTTOM_EDGE;
+                const room = getAlong(placementDefs);
 
                 if (distance < 0) {
-                    return {
-                        effect: {
-                            perspective: perspectivePx,
-                            ...SpineUtils.getTurn(axis, SpineUtils.leaves({ distance, index, count })),
-                            opacity: MathUtils.clamp01(FLIPPED_FADE_DISTANCE + distance) * PERCENT,
+                    return toCenteredSlotPlacement(
+                        placementDefs,
+                        {
+                            effect: {
+                                perspective: perspectivePx,
+                                ...SpineUtils.getTurn(axis, SpineUtils.leaves({ distance, index, count })),
+                                opacity: MathUtils.clamp01(FLIPPED_FADE_DISTANCE + distance) * PERCENT,
+                            },
+                            origin,
+                            layer: WHOLE + distance,
+                            axis,
                         },
-                        origin,
-                        layer: WHOLE + distance,
-                        axis,
-                    };
+                        room,
+                    );
                 }
 
-                return {
-                    effect: {
-                        perspective: perspectivePx,
-                        translate3d: toStackTranslation(
-                            placementDefs,
-                            distance * offsetRatio * PERCENT,
-                            -distance * depthPx,
-                        ),
-                        opacity: toVisibility(distance, visibleDistance),
+                return toCenteredSlotPlacement(
+                    placementDefs,
+                    {
+                        effect: {
+                            perspective: perspectivePx,
+                            translate3d: toStackTranslation(
+                                placementDefs,
+                                distance * offsetRatio * PERCENT,
+                                -distance * depthPx,
+                            ),
+                            opacity: toVisibility(distance, visibleDistance),
+                        },
+                        origin,
+                        layer: -distance,
+                        axis,
                     },
-                    origin,
-                    layer: -distance,
-                    axis,
-                };
+                    room,
+                );
             },
         };
     };
@@ -416,7 +587,7 @@ export namespace CarouselPlacementUtils {
         return {
             reach: Math.ceil(visibleDistance) + WHOLE,
             place: (placementDefs): CarouselPlacement => {
-                const { distance, index, count } = placementDefs;
+                const { distance, index, count } = placementDefs.group;
                 const along = getAlong(placementDefs);
                 const face = along * faceRatio;
                 const steps = Math.round(distance);
@@ -446,16 +617,24 @@ export namespace CarouselPlacementUtils {
                     depthPx -= share * face * Math.sin(radians);
                 }
 
-                return {
-                    effect: {
-                        perspective: perspectivePx,
-                        translate3d: toTranslation(placementDefs, along > 0 ? (alongPx / along) * PERCENT : 0, depthPx),
-                        ...toTurn(placementDefs, toFoldDegrees(distance, index, count)),
-                        scale: [scale, scale],
-                        opacity: toVisibility(distance, visibleDistance),
+                return toCenteredSlotPlacement(
+                    placementDefs,
+                    {
+                        effect: {
+                            perspective: perspectivePx,
+                            translate3d: toTranslation(
+                                placementDefs,
+                                along > 0 ? (alongPx / along) * PERCENT : 0,
+                                depthPx,
+                            ),
+                            ...toTurn(placementDefs, toFoldDegrees(distance, index, count)),
+                            scale: [scale, scale],
+                            opacity: toVisibility(distance, visibleDistance),
+                        },
+                        layer: face > 0 ? depthPx / face : 0,
                     },
-                    layer: face > 0 ? depthPx / face : 0,
-                };
+                    along,
+                );
             },
         };
     };
@@ -471,7 +650,9 @@ export namespace CarouselPlacementUtils {
      * right half on a carousel running across, the top half on one running up and down — and its back the other half,
      * leaving a gap at the spine if the wheel should have a hollow core. The slides lying flat on either side face the viewer
      * widest, the ones pointing at the viewer are seen edge-on, and the perspective draws the far ones smaller. The
-     * painted halves never cross, so the nearer one is stacked over the further.
+     * painted halves never cross, so the nearer one is stacked over the further. A group's slides share one paddle,
+     * side by side along its painted half outward from the spine, the first nearest it across and furthest from it up
+     * and down, so they read in order either way.
      *
      * @param defs `spanDegrees`, how far round the wheel the slides reach between them; `perspectivePx` how far away the
      * viewer sits.
@@ -483,15 +664,23 @@ export namespace CarouselPlacementUtils {
         const computeAngle = SpineUtils.createRadial({ spanDegrees: defs?.spanDegrees ?? base.spanDegrees });
 
         return {
-            place: ({ distance, index, count, orientation }): CarouselPlacement => {
+            place: (placementDefs): CarouselPlacement => {
+                const { group, orientation } = placementDefs;
                 const axis = orientation === "horizontal" ? "row" : "column";
-                const angle = computeAngle({ distance, index, count });
+                const angle = computeAngle({ distance: group.distance, index: group.index, count: group.count });
+                const scale = toGroupScale(placementDefs);
+                const fromSpine = orientation === "horizontal" ? group.slot : group.slot + WHOLE - group.size;
 
-                return {
-                    effect: { perspective: perspectivePx, ...SpineUtils.getTurn(axis, angle) },
-                    layer: SpineUtils.getLeadDepth(angle),
-                    axis,
-                };
+                return toSlotPlacement(
+                    placementDefs,
+                    {
+                        effect: { perspective: perspectivePx, ...SpineUtils.getTurn(axis, angle) },
+                        layer: SpineUtils.getLeadDepth(angle),
+                        axis,
+                    },
+                    fromSpine * scale * getAlong(placementDefs) * HALF,
+                    scale,
+                );
             },
         };
     };

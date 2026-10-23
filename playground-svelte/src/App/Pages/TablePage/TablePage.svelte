@@ -5,7 +5,9 @@
     import PageExamples from "../../PageComponents/Examples/PageExamples.svelte";
     import ConsumerSortedExample from "./Examples/ConsumerSorted.svelte";
     import DisabledExample from "./Examples/Disabled.svelte";
+    import ExpandableExample from "./Examples/Expandable.svelte";
     import PartsExample from "./Examples/Parts.svelte";
+    import PinnedExample from "./Examples/Pinned.svelte";
     import ReorderableExample from "./Examples/Reorderable.svelte";
     import ResizableExample from "./Examples/Resizable.svelte";
     import RightToLeftExample from "./Examples/RightToLeft.svelte";
@@ -46,6 +48,15 @@
     let stressSort = $state<TableSort | undefined>();
     let stressSelection = $state.raw<Part[]>([]);
     const stressParts = createStressParts();
+
+    let pinnedSort = $state<TableSort | undefined>();
+    let pinnedSelection = $state.raw<Part[]>([]);
+    let pinnedWidths = $state<Record<string, number>>({});
+    let pinnedOrder = $state<string[]>([]);
+
+    let expandableSort = $state<TableSort | undefined>();
+    let expandableSelection = $state.raw<Part[]>([]);
+    let expandableExpanded = $state.raw<Part[]>([]);
 
     let disabledSort = $state<TableSort | undefined>();
     let disabledSelection = $state.raw<Part[]>([]);
@@ -113,6 +124,23 @@
             path: `${EXAMPLES_ROOT}/Virtualized.svelte`,
         },
         {
+            key: "pinned",
+            name: EXAMPLE_NAMES.pinned,
+            readout: () =>
+                `widths: ${JSON.stringify(pinnedWidths)} | order: ${pinnedOrder.join(", ") || "as declared"} — SKU is held at the start and Price at the end while the rest scroll sideways; resize SKU and the scrolling columns slide under it, and a pinned column only moves among its own kind`,
+            component: pinnedExample,
+            path: `${EXAMPLES_ROOT}/Pinned.svelte`,
+        },
+        {
+            key: "expandable",
+            span: 2,
+            name: EXAMPLE_NAMES.expandable,
+            readout: () =>
+                `open: ${spellSelection(expandableExpanded)} | selected: ${spellSelection(expandableSelection)} — press the arrow by a SKU, or Enter on a row's first cell, to open its detail; the down arrow walks into it. Parts out of stock have nothing to open`,
+            component: expandableExample,
+            path: `${EXAMPLES_ROOT}/Expandable.svelte`,
+        },
+        {
             key: "disabled",
             name: EXAMPLE_NAMES.disabled,
             readout: () =>
@@ -158,6 +186,23 @@
 
 {#snippet virtualizedExample()}
     <VirtualizedExample rows={stressParts} bind:sort={stressSort} bind:selection={stressSelection} />
+{/snippet}
+
+{#snippet pinnedExample()}
+    <PinnedExample
+        bind:sort={pinnedSort}
+        bind:selection={pinnedSelection}
+        bind:widths={pinnedWidths}
+        bind:order={pinnedOrder}
+    />
+{/snippet}
+
+{#snippet expandableExample()}
+    <ExpandableExample
+        bind:sort={expandableSort}
+        bind:selection={expandableSelection}
+        bind:expanded={expandableExpanded}
+    />
 {/snippet}
 
 {#snippet disabledExample()}

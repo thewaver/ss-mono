@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { activeMatches, demo, readout, tabIndex } from "./helpers";
+import { activeMatches, activeText, demo, readout, tabIndex, waitUntilStill } from "./helpers";
 
 const DEFAULT = demo("default");
 const SINGLE = demo("singleSelection");
@@ -437,4 +437,228 @@ test("a table with no order signal ignores the reorder key entirely", async ({ p
     await page.keyboard.press("Shift+ArrowRight");
 
     await expect(page.locator(header(DEFAULT)).nth(0)).toHaveText(before);
+});
+
+const PINNED = demo("pinned");
+const EXPANDABLE = demo("expandable");
+
+/**
+ * The pinned example's frame is narrower than its columns, so the frame scrolls sideways and the table inside it does
+ * not — the frame is the grid's parent, the box the Playground gave it. SKU is pinned at the start and Price at the
+ * end; the three between them scroll.
+ */
+const frameOf = (page: import("@playwright/test").Page, scope: string) => page.locator(grid(scope)).locator("xpath=..");
+
+const leftOf = async (locator: import("@playwright/test").Locator) => (await locator.boundingBox())!.x;
+
+test("a pinned column stays put at either edge while the columns between them scroll sideways", async ({ page }) => {
+    const frame = frameOf(page, PINNED);
+    const pinnedStart = [page.locator(header(PINNED)).first(), page.locator(at(PINNED, 2, 1))];
+    const pinnedEnd = [page.locator(header(PINNED)).last(), page.locator(at(PINNED, 2, 5))];
+    const scrolling = page.locator(at(PINNED, 2, 2));
+
+    await frame.scrollIntoViewIfNeeded();
+
+    expect(
+        await frame.evaluate((element) => element.scrollWidth > element.clientWidth),
+        "the columns are wider than the frame, so there is something to scroll",
+    ).toBe(true);
+
+    const before = await Promise.all([...pinnedStart, ...pinnedEnd, scrolling].map(leftOf));
+
+    await frame.evaluate((element) => {
+        element.scrollLeft = element.scrollWidth;
+    });
+    await waitUntilStill(scrolling);
+
+    const after = await Promise.all([...pinnedStart, ...pinnedEnd, scrolling].map(leftOf));
+
+    for (let index = 0; index < pinnedStart.length + pinnedEnd.length; index++) {
+        expect(after[index], "a pinned header or body cell has not moved").toBeCloseTo(before[index], 0);
+    }
+
+    expect(after.at(-1), "while a column between the pins went with the scroll").toBeLessThan(before.at(-1)! - 1);
+});
+
+/**
+ * Pinned columns gather at their edge whatever the order says, and reorder only among their own kind. The keyboard
+ * route is driven because it is one press per question: Shift with an arrow either moves the focused column one
+ * place or does nothing. The last move is the control — a column between the pins does move, so the refusals before
+ * it are refusals and not a key that was never wired up.
+ */
+test("a column reordered by the keyboard never crosses a pin boundary", async ({ page }) => {
+    const headers = page.locator(header(PINNED));
+    const order = () => headers.evaluateAll((cells) => cells.map((cell) => cell.textContent ?? ""));
+    const declared = await order();
+
+    expect(declared[0], "SKU is the start pin").toContain("SKU");
+    expect(declared.at(-1), "and Price the end pin").toContain("Price");
+
+    await headers.first().click();
+    await page.keyboard.press("Shift+ArrowRight");
+
+    expect(await order(), "the start pin cannot step out among the scrolling columns").toEqual(declared);
+
+    await page.keyboard.press("ArrowRight");
+    await page.keyboard.press("Shift+ArrowLeft");
+
+    expect(await order(), "nor can the first scrolling column step in front of it").toEqual(declared);
+
+    await page.keyboard.press("End");
+    await page.keyboard.press("Shift+ArrowLeft");
+
+    expect(await order(), "the end pin cannot step in among them").toEqual(declared);
+
+    await page.keyboard.press("ArrowLeft");
+    await page.keyboard.press("Shift+ArrowRight");
+
+    expect(await order(), "nor the last scrolling column step past it").toEqual(declared);
+
+    await page.keyboard.press("Shift+ArrowLeft");
+
+    const moved = await order();
+
+    expect(moved, "while between the pins a column moves as it always does").not.toEqual(declared);
+    expect(moved[0]).toContain("SKU");
+    expect(moved.at(-1)).toContain("Price");
+});
+
+/**
+ * ARIA 1.2 forbids `aria-expanded` on a row of a plain `grid`, so a table whose rows open is a `treegrid`: every row
+ * says it is level 1, a row that can open says whether it is, and its detail is level 2. Which rows can open is the
+ * example's rule (a part out of stock has nothing to show), so the spec reads it off the rows rather than naming them.
+ */
+test("an expandable table is a treegrid whose openable rows say whether they are open", async ({ page }) => {
+    await expect(page.locator(`${EXPANDABLE} [role="treegrid"]`)).toHaveCount(1);
+    await expect(page.locator(grid(EXPANDABLE)), "and not a plain grid").toHaveCount(0);
+
+    const rows = page.locator(`${EXPANDABLE} [role="row"]:has([role="gridcell"])`);
+    const levels = await rows.evaluateAll((elements) => elements.map((element) => element.getAttribute("aria-level")));
+
+    expect(levels.length, "some rows are drawn").toBeGreaterThan(0);
+    expect(new Set(levels), "every body row is level 1 while nothing is open").toEqual(new Set(["1"]));
+
+    await expect(
+        page.locator(`${EXPANDABLE} [role="row"][aria-level="1"][aria-expanded="false"]`).first(),
+        "rows that can open say they are shut",
+    ).toBeAttached();
+});
+
+test("a row that cannot open has no expander, and every row that can has one", async ({ page }) => {
+    const shut = page.locator(`${EXPANDABLE} [role="row"][aria-level="1"]:not([aria-expanded])`);
+    const openable = page.locator(`${EXPANDABLE} [role="row"][aria-expanded]`);
+
+    expect(await shut.count(), "the example has a row that cannot open in view").toBeGreaterThan(0);
+    await expect(shut.first().locator("button"), "and it draws nothing to press").toHaveCount(0);
+
+    const expanderCounts = await openable.evaluateAll((elements) =>
+        elements.map((element) => element.querySelectorAll("button").length),
+    );
+
+    expect(new Set(expanderCounts), "while each row that can open carries exactly one expander").toEqual(new Set([1]));
+});
+
+/**
+ * The APG treegrid's cell-only focus: Enter on a row's first cell opens and shuts it, and Enter anywhere else is the
+ * ordinary activation, which opens nothing. The first cell is reached by Home from a cell beside it, so the click that
+ * puts focus in the grid never lands on the expander.
+ */
+test("Enter on a row's first cell opens and shuts its detail, and Enter elsewhere does not", async ({ page }) => {
+    const firstRow = page.locator(`${EXPANDABLE} [role="row"][aria-rowindex="2"]`);
+    const details = page.locator(`${EXPANDABLE} [role="row"][aria-level="2"]`);
+
+    await expect(firstRow, "the first part can open").toHaveAttribute("aria-expanded", "false");
+
+    await page.locator(at(EXPANDABLE, 2, 2)).click();
+    await page.keyboard.press("Enter");
+
+    await expect(firstRow, "Enter on the second cell is not the toggle").toHaveAttribute("aria-expanded", "false");
+    await expect(details).toHaveCount(0);
+
+    await page.keyboard.press("Home");
+    await page.keyboard.press("Enter");
+
+    await expect(firstRow, "Enter on the first cell opens the row").toHaveAttribute("aria-expanded", "true");
+    await expect(details, "and draws its detail").toHaveCount(1);
+
+    await page.keyboard.press("Enter");
+
+    await expect(firstRow, "and the same key shuts it").toHaveAttribute("aria-expanded", "false");
+    await expect(details).toHaveCount(0);
+});
+
+/**
+ * An open detail is a row of its own in the walk, one cell spanning every column, so the down arrow steps into it
+ * from its row and out of it onto the next row, and the up arrow retraces the way.
+ */
+test("the arrows walk down into an open detail and back out of it", async ({ page }) => {
+    const detailCell = `${EXPANDABLE} [role="row"][aria-level="2"] [role="gridcell"]`;
+    const openRowFirstCell = `${EXPANDABLE} [role="row"][aria-expanded="true"] [aria-colindex="1"]`;
+
+    await page.locator(at(EXPANDABLE, 2, 2)).click();
+    await page.keyboard.press("Home");
+    await page.keyboard.press("Enter");
+    await expect(page.locator(detailCell)).toHaveCount(1);
+
+    const nextRowText = await page
+        .locator(`${EXPANDABLE} [role="row"][aria-level="2"] + [role="row"] [aria-colindex="1"]`)
+        .textContent();
+
+    await page.keyboard.press("ArrowDown");
+    await expect(page.locator(detailCell), "down from the open row is its detail").toBeFocused();
+
+    await page.keyboard.press("ArrowDown");
+    expect(await activeText(page), "down again leaves it for the row after").toBe((nextRowText ?? "").trim());
+
+    await page.keyboard.press("ArrowUp");
+    await expect(page.locator(detailCell), "up comes back into the detail").toBeFocused();
+
+    await page.keyboard.press("ArrowUp");
+    expect(await activeMatches(page, openRowFirstCell), "and up again is the row that opened it").toBe(true);
+});
+
+test("the expander opens its row by pointer, and focus lands on the row it opened", async ({ page }) => {
+    const firstRow = page.locator(`${EXPANDABLE} [role="row"][aria-rowindex="2"]`);
+
+    await firstRow.locator("button").click();
+
+    await expect(firstRow).toHaveAttribute("aria-expanded", "true");
+    await expect(page.locator(`${EXPANDABLE} [role="row"][aria-level="2"]`)).toHaveCount(1);
+    expect(
+        await activeMatches(page, `${EXPANDABLE} [role="row"][aria-rowindex="2"] [aria-colindex="1"]`),
+        "the expander takes no tab stop of its own, so focus goes to its cell",
+    ).toBe(true);
+
+    await firstRow.locator("button").click();
+
+    await expect(firstRow, "and a second press shuts it").toHaveAttribute("aria-expanded", "false");
+});
+
+/**
+ * Focus is on the detail when its row is shut, so the element holding focus leaves the document. Left to the
+ * browser, focus would fall to the page body and the next key would go nowhere (WCAG 2.4.3); the grid hands it to the
+ * row the detail belonged to instead. The page has no control that shuts a row from outside the grid, so it is shut
+ * by its own expander, pressed while the detail holds focus.
+ */
+test("a detail shut while it holds focus hands focus back to its row", async ({ page }) => {
+    const firstRow = page.locator(`${EXPANDABLE} [role="row"][aria-rowindex="2"]`);
+    const detailCell = page.locator(`${EXPANDABLE} [role="row"][aria-level="2"] [role="gridcell"]`);
+
+    await firstRow.locator("button").click();
+    await page.keyboard.press("ArrowDown");
+    await expect(detailCell, "focus is on the detail").toBeFocused();
+
+    await firstRow.locator("button").click();
+
+    await expect(detailCell, "the detail is gone").toHaveCount(0);
+    expect(
+        await activeMatches(page, `${EXPANDABLE} [role="row"][aria-rowindex="2"] [aria-colindex="1"]`),
+        "and focus is on its row rather than on the page body",
+    ).toBe(true);
+
+    await page.keyboard.press("ArrowDown");
+    expect(
+        await activeMatches(page, `${EXPANDABLE} [role="row"][aria-rowindex="3"] [aria-colindex="1"]`),
+        "so the next key still walks the grid",
+    ).toBe(true);
 });

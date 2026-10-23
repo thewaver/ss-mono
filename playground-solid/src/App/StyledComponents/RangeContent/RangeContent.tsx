@@ -39,7 +39,7 @@ export const PageRangeContent = (props: RangeContentProps) => {
                 style={
                     getOrientation() === "vertical"
                         ? { bottom: center(access(props.renderProps).fill.start), height: getFillSpan() }
-                        : { left: center(access(props.renderProps).fill.start), width: getFillSpan() }
+                        : { "inset-inline-start": center(access(props.renderProps).fill.start), "width": getFillSpan() }
                 }
             />
 
@@ -51,7 +51,11 @@ export const PageRangeContent = (props: RangeContentProps) => {
                             [styles.isFocused]: access(props.renderProps).focusVisibleThumb === getIndex(),
                             [styles.hasError]: access(props.renderProps).hasError,
                         }}
-                        style={getOrientation() === "vertical" ? { bottom: travel(ratio) } : { left: travel(ratio) }}
+                        style={
+                            getOrientation() === "vertical"
+                                ? { bottom: travel(ratio) }
+                                : { "inset-inline-start": travel(ratio) }
+                        }
                     />
                 )}
             </For>

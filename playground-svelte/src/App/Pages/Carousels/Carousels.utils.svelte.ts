@@ -1,8 +1,9 @@
-import { CAROUSEL_DEFAULTS, CarouselPlacementUtils, CarouselPlacements } from "@thewaver/ss-components-svelte";
+import { CAROUSEL_DEFAULTS, CarouselPlacementUtils, type CarouselPlacements } from "@thewaver/ss-components-svelte";
 import type { CarouselOrientation } from "@thewaver/ss-components-svelte";
 import { CarouselKnobs } from "@thewaver/ss-playground/App/Knobs/Carousels.const";
 import { PLACEMENT_FRAMES, TITLES } from "@thewaver/ss-playground/App/Pages/Carousels/Carousels.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/Carousels/Carousels.css";
+import { toFramedPlacement } from "@thewaver/ss-playground/App/Pages/Carousels/Carousels.utils";
 
 import type { CarouselsControls } from "./Carousels.types";
 
@@ -15,9 +16,7 @@ export const createCarouselsControls = (): CarouselsControls => {
     let isLooping = $state(CAROUSEL_DEFAULTS.isLooping);
     let placement = $state<CarouselPlacements.SampleKey>(CarouselKnobs.STARTING_PLACEMENT);
 
-    const placementRule = $derived(
-        CarouselPlacementUtils.toPlacementRule(CarouselPlacements.SAMPLE_PLACEMENTS[placement]),
-    );
+    const placementRule = $derived(CarouselPlacementUtils.toPlacementRule(toFramedPlacement(placement, orientation)));
 
     const slides = $derived(TITLES.slice(0, slideCount));
 

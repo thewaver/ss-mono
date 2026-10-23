@@ -288,6 +288,7 @@ export type * from "./Essentials/Input/DateTimePicker/DateTimePicker.types.js";
 export { default as Table } from "./Essentials/Table/Table.svelte";
 export { default as TableHeaderSort } from "./Essentials/Table/TableHeaderSort.svelte";
 export { default as TableHeaderReorder } from "./Essentials/Table/TableHeaderReorder.svelte";
+export { default as TableRowExpander } from "./Essentials/Table/TableRowExpander.svelte";
 export * from "./Essentials/Table/Table.context.js";
 export type * from "./Essentials/Table/Table.types.js";
 export { default as ScratchCard } from "./Exotics/Reveals/ScratchCard/ScratchCard.svelte";

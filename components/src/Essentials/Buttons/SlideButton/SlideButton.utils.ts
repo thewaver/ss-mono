@@ -1,7 +1,16 @@
-import { MathUtils, StoreUtils } from "@thewaver/ss-utils";
+import { MathUtils, type Size2d, StoreUtils } from "@thewaver/ss-utils";
 
-import type { InteractionDragEndReason } from "../../../Abstracts/InteractionTracker/InteractionTracker.types";
-import type { SlideButtonGestureDefs, SlideButtonGestureState, SlideButtonPress } from "./SlideButton.types";
+import type {
+    InteractionDragEndReason,
+    InteractionDragRatio,
+} from "../../../Abstracts/InteractionTracker/InteractionTracker.types";
+import type { NavigatorDirection } from "../../../Abstracts/Navigator/Navigator.types";
+import type {
+    SlideButtonGestureDefs,
+    SlideButtonGestureState,
+    SlideButtonOrientation,
+    SlideButtonPress,
+} from "./SlideButton.types";
 
 /** The start of the track. */
 const RATIO_MIN = 0;
@@ -14,27 +23,60 @@ const DRAG_THRESHOLD_PX = 4;
 /** The keys a hold answers to, which are the keys that press a button. */
 const HOLD_KEYS = ["Enter", " "];
 
-/** Where the thumb's leading edge sits for a given progress. The thumb's own width is not travel, so the progress is scaled by what is left. */
+/** Where the thumb's edge facing the start of the track sits for a given progress. The thumb's own length is not travel, so the progress is scaled by what is left. */
 const computeThumbStart = (progressRatio: number, thumbRatio: number) => progressRatio * (RATIO_MAX - thumbRatio);
 
 /**
  * The arithmetic behind a slide-to-confirm button.
  *
  * Everything is a fraction of the track rather than a pixel measurement, so the same numbers work
- * at any width. The one thing to keep in mind is that the thumb occupies part of the track, so full
- * progress is the thumb reaching the far end rather than traveling the track's whole length.
+ * at any length and along either axis. The one thing to keep in mind is that the thumb occupies part of the track,
+ * so full progress is the thumb reaching the far end rather than traveling the track's whole length.
  */
 export namespace SlideButtonUtils {
     /**
-     * A pixel width as a fraction of the track.
+     * How long the track is along the axis the thumb travels.
      *
-     * @param trackWidth The track's width in pixels.
-     * @param widthPx The width to convert.
-     * @returns The fraction, capped at the whole track. A track of no width reports `1`, which stops
+     * @param trackSize The track's size in pixels.
+     * @param orientation Which way the track runs.
+     * @returns The width of a horizontal track, the height of a vertical one.
+     */
+    export const computeTrackLength = (trackSize: Size2d, orientation: SlideButtonOrientation) =>
+        orientation === "vertical" ? trackSize.height : trackSize.width;
+
+    /**
+     * Where a pointer sits along the track, from where it sits across the track's box.
+     *
+     * A horizontal track counts from the edge its text starts on — the left, or the right under `"rtl"` — and a
+     * vertical one from its bottom edge whatever the text, so on either axis `0` is where the thumb rests and `1` is
+     * where the slide ends.
+     *
+     * @param dragRatio The pointer's position across the track's box, as a drag tracker reports it, counted from the
+     * left and from the top.
+     * @param orientation Which way the track runs.
+     * @param direction Which way text runs around the track.
+     * @returns The position along the track, from `0` to `1`.
+     */
+    export const computePointerRatio = (
+        dragRatio: InteractionDragRatio,
+        orientation: SlideButtonOrientation,
+        direction: NavigatorDirection,
+    ) => {
+        if (orientation === "vertical") return RATIO_MAX - dragRatio.y;
+
+        return direction === "rtl" ? RATIO_MAX - dragRatio.x : dragRatio.x;
+    };
+
+    /**
+     * A pixel length along the track as a fraction of the track.
+     *
+     * @param trackLength The track's length in pixels, from {@link SlideButtonUtils.computeTrackLength}.
+     * @param lengthPx The length to convert.
+     * @returns The fraction, capped at the whole track. A track of no length reports `1`, which stops
      * anything dividing by it.
      */
-    export const computeWidthRatio = (trackWidth: number, widthPx: number) =>
-        trackWidth > 0 ? Math.min(widthPx / trackWidth, RATIO_MAX) : RATIO_MAX;
+    export const computeLengthRatio = (trackLength: number, lengthPx: number) =>
+        trackLength > 0 ? Math.min(lengthPx / trackLength, RATIO_MAX) : RATIO_MAX;
 
     /**
      * Where along the thumb the user took hold of it.
@@ -44,9 +86,9 @@ export namespace SlideButtonUtils {
      *
      * @param pointerRatio The pointer's position along the track.
      * @param progressRatio How far the thumb has traveled.
-     * @param thumbRatio The thumb's width as a fraction of the track.
-     * @returns The offset from the thumb's leading edge. Negative or past the thumb's width means the
-     * pointer is not on the thumb.
+     * @param thumbRatio The thumb's length as a fraction of the track.
+     * @returns The offset from the thumb's edge facing the start of the track. Negative or past the thumb's
+     * length means the pointer is not on the thumb.
      */
     export const computeGrabRatio = (pointerRatio: number, progressRatio: number, thumbRatio: number) =>
         pointerRatio - computeThumbStart(progressRatio, thumbRatio);
@@ -56,7 +98,7 @@ export namespace SlideButtonUtils {
      *
      * @param pointerRatio The pointer's position along the track.
      * @param progressRatio How far the thumb has traveled.
-     * @param thumbRatio The thumb's width as a fraction of the track.
+     * @param thumbRatio The thumb's length as a fraction of the track.
      */
     export const computeIsOnThumb = (pointerRatio: number, progressRatio: number, thumbRatio: number) => {
         const grabRatio = computeGrabRatio(pointerRatio, progressRatio, thumbRatio);
@@ -70,7 +112,7 @@ export namespace SlideButtonUtils {
      * @param pointerRatio The pointer's position along the track.
      * @param grabRatio Where along the thumb it was grabbed, from
      * {@link SlideButtonUtils.computeGrabRatio}.
-     * @param thumbRatio The thumb's width as a fraction of the track.
+     * @param thumbRatio The thumb's length as a fraction of the track.
      * @returns The progress from `0` to `1`. A thumb as wide as its track has nowhere to travel and
      * reports `0`.
      */
@@ -110,7 +152,8 @@ export namespace SlideButtonUtils {
      * Runs a slide button's two routes to its action: carrying the thumb to the end of the track, and holding the
      * button down until the hold fills.
      *
-     * A press is judged once, where it lands. Under every mode but `"hold"` a press on the thumb that then travels
+     * Every position is measured along the axis `getOrientation` names: a horizontal thumb travels away from the edge
+     * the text starts on, which `getDirection` says, and a vertical one upward. A press is judged once, where it lands. Under every mode but `"hold"` a press on the thumb that then travels
      * past a few pixels picks the thumb up, and the thumb follows the pointer from the point it was grabbed; letting
      * go at the completion ratio along the track, the end by default, activates, and letting go anywhere short of it, or the system cancelling the gesture,
      * puts it back. Under every mode but `"slide"` a press also starts a hold, which fills over the hold duration and
@@ -131,9 +174,10 @@ export namespace SlideButtonUtils {
      * decide whether the thumb reached the completion ratio, so it has to answer with what `setProgressRatio` last wrote.
      *
      * @param defs How to read the button and write its progress.
-     * @returns The store, and the commands to feed it: `drag` and `dragEnd` from a drag tracker over the track,
-     * `pressKey` and `releaseKey` from the button's key events, `click` from its click event, `stopHold` for focus
-     * leaving or the owner going away, and `reset` for the button becoming disabled, which drops everything under way.
+     * @returns The store, and the commands to feed it: `drag` and `dragEnd` from a drag tracker over the track, `drag`
+     * taking the tracker's ratio on both axes as it comes, `pressKey` and `releaseKey` from the button's key events,
+     * `click` from its click event, `stopHold` for focus leaving or the owner going away, and `reset` for the button
+     * becoming disabled, which drops everything under way.
      */
     export const createGesture = (defs: SlideButtonGestureDefs) => {
         const store = StoreUtils.create<SlideButtonGestureState>(
@@ -158,7 +202,9 @@ export namespace SlideButtonUtils {
             store.update((current) => ({ ...current, isGrabbed: ratio !== undefined }));
         };
 
-        const getThumbRatio = () => computeWidthRatio(defs.getTrackWidth(), defs.getThumbSize());
+        const getTrackLength = () => computeTrackLength(defs.getTrackSize(), defs.getOrientation());
+
+        const getThumbRatio = () => computeLengthRatio(getTrackLength(), defs.getThumbSize());
 
         const stopHold = () => {
             if (holdFrame !== undefined) cancelAnimationFrame(holdFrame);
@@ -196,7 +242,8 @@ export namespace SlideButtonUtils {
             step();
         };
 
-        const drag = (pointerRatio: number) => {
+        const drag = (dragRatio: InteractionDragRatio) => {
+            const pointerRatio = computePointerRatio(dragRatio, defs.getOrientation(), defs.getDirection());
             const thumbRatio = getThumbRatio();
             const mode = defs.getMode();
 
@@ -219,8 +266,7 @@ export namespace SlideButtonUtils {
             }
 
             if (mode === "hold" || !press.isOnThumb) return;
-            if (Math.abs(pointerRatio - press.ratio) < computeWidthRatio(defs.getTrackWidth(), DRAG_THRESHOLD_PX))
-                return;
+            if (Math.abs(pointerRatio - press.ratio) < computeLengthRatio(getTrackLength(), DRAG_THRESHOLD_PX)) return;
 
             const nextGrabRatio = computeGrabRatio(press.ratio, RATIO_MIN, thumbRatio);
 

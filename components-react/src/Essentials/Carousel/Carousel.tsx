@@ -1,9 +1,10 @@
-import { type CSSProperties, type MouseEvent, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { type CSSProperties, type MouseEvent, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import {
     CAROUSEL_DEFAULTS,
     type CarouselFace,
     type CarouselPlacement,
+    type CarouselPlacementGroup,
     type CarouselSlideState,
     type CarouselStep,
     CarouselStyles,
@@ -60,7 +61,15 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
     );
 
     const count = props.slides.length;
-    const currentIndex = CarouselUtils.wrapIndex(index, count);
+
+    const computeGroups = props.computeGroups;
+    const groups = useMemo(() => CarouselUtils.resolveGroups(computeGroups?.(count), count), [computeGroups, count]);
+    const groupCount = groups.length;
+    const rests = useMemo(() => groups.map(CarouselUtils.getGroupRest), [groups]);
+    const memberships = useMemo(() => CarouselUtils.getGroupMemberships(groups, count), [groups, count]);
+
+    const currentIndex = CarouselUtils.wrapIndex(index, groupCount);
+    const currentGroup = groups[currentIndex];
     const isDisabled = props.isDisabled ?? false;
     const isLooping = props.isLooping ?? CAROUSEL_DEFAULTS.isLooping;
     const isWindowed = props.isWindowed ?? CAROUSEL_DEFAULTS.isWindowed;
@@ -83,21 +92,33 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
     const isGlidingRef = useRef(false);
     const writtenProgressRef = useRef<number | undefined>(undefined);
 
-    const position = CarouselUtils.toPosition(progress, count, isLooping);
+    const position = CarouselUtils.toGroupPosition(progress, rests, count, isLooping);
     const drawnPosition = position - swipeRatio;
 
-    const copies = CarouselUtils.getCopyCount(count, props.placement.reach, isLooping);
+    const copies = CarouselUtils.getCopyCount(groupCount, props.placement.reach, isLooping);
     const ringCount = count * copies;
     const [followedRing, setFollowedRing] = useState<number | undefined>(undefined);
     const ringPosition = CarouselUtils.followCopies(followedRing, drawnPosition, count, copies);
 
     if (ringPosition !== followedRing) setFollowedRing(ringPosition);
 
-    const currentPlace = CarouselUtils.getNearestCopy(currentIndex, ringPosition, count, copies);
+    const ringRests = useMemo(
+        () => Array.from({ length: copies }, (_, copy) => rests.map((rest) => rest + copy * count)).flat(),
+        [copies, rests, count],
+    );
+
+    const groupPosition = CarouselUtils.toGroupCoordinate(ringPosition, ringRests, ringCount, isLooping);
+
+    const currentPlace = currentGroup ? CarouselUtils.getGroupPlace(currentGroup, ringPosition, count, copies) : 0;
+
+    const getIsCurrentPlace = (place: number) =>
+        currentGroup !== undefined &&
+        CarouselUtils.getIsInGroupPlace(place, currentPlace, currentGroup.end - currentGroup.start, ringCount);
+
     const ringPlaces = Array.from({ length: ringCount }, (_, place) => place);
     const toIndex = (place: number) => place % Math.max(count, 1);
 
-    const isPressDisabled = CarouselUtils.getIsSwipeDisabled(props.progress !== undefined, isDisabled, count);
+    const isPressDisabled = CarouselUtils.getIsSwipeDisabled(props.progress !== undefined, isDisabled, groupCount);
 
     const setSwipeRatio = (value: number) => {
         swipeRatioRef.current = value;
@@ -110,22 +131,30 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
         setProgressState(value);
     };
 
-    const latest = useLatest({ count, isLooping, transitionDurationMs, writeProgress, setSwipeRatio });
+    const latest = useLatest({ count, rests, isLooping, transitionDurationMs, writeProgress, setSwipeRatio });
 
     const glideTo = (target: number) => {
-        const { count: slideCount, isLooping: isLoopingNow, transitionDurationMs: durationMs } = latest.current;
-        const from = CarouselUtils.toPosition(progressRef.current, slideCount, isLoopingNow) - swipeRatioRef.current;
+        const {
+            count: slideCount,
+            rests: groupRests,
+            isLooping: isLoopingNow,
+            transitionDurationMs: durationMs,
+        } = latest.current;
+        const from =
+            CarouselUtils.toGroupPosition(progressRef.current, groupRests, slideCount, isLoopingNow) -
+            swipeRatioRef.current;
 
         stopGlideRef.current?.();
-        latest.current.writeProgress(CarouselUtils.toProgress(from, slideCount, isLoopingNow));
+        latest.current.writeProgress(CarouselUtils.toGroupProgress(from, groupRests, slideCount, isLoopingNow));
         latest.current.setSwipeRatio(0);
         isGlidingRef.current = true;
 
         stopGlideRef.current = CarouselUtils.glide({
             from,
-            to: CarouselUtils.getGlideTarget(from, target, slideCount, isLoopingNow),
+            to: CarouselUtils.getGlideTarget(from, groupRests[target] ?? 0, slideCount, isLoopingNow),
             durationMs,
-            onFrame: (next) => latest.current.writeProgress(CarouselUtils.toProgress(next, slideCount, isLoopingNow)),
+            onFrame: (next) =>
+                latest.current.writeProgress(CarouselUtils.toGroupProgress(next, groupRests, slideCount, isLoopingNow)),
             onEnd: () => {
                 isGlidingRef.current = false;
             },
@@ -135,7 +164,7 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
     useEffect(() => () => stopGlideRef.current?.(), []);
 
     const goTo = (target: number) => {
-        const next = CarouselUtils.resolveIndex(target, count, isLooping);
+        const next = CarouselUtils.resolveIndex(target, groupCount, isLooping);
 
         if (next === undefined || next === currentIndex) return;
 
@@ -158,7 +187,7 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
                     ? undefined
                     : CarouselUtils.resolveIndex(
                           currentIndex + CarouselUtils.getSwipeStep(direction),
-                          count,
+                          groupCount,
                           isLooping,
                       );
 
@@ -178,29 +207,52 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
         isHeld,
         isSwiping,
         isDisabled,
-        count,
+        count: groupCount,
     });
 
     const getSlideLabel = (slideIndex: number) => props.computeSlideLabel(slideIndex, count);
 
+    const getAnnouncement = (groupIndex: number) => {
+        const group = groups[groupIndex];
+
+        if (!group || !props.computeGroupLabel) return getSlideLabel(groupIndex);
+
+        return props.computeGroupLabel(group.start, group.end, count);
+    };
+
     const getDistance = (place: number) => CarouselUtils.getDistance(place, ringPosition, ringCount, isLooping);
+
+    const getPlacementGroup = (place: number): CarouselPlacementGroup =>
+        props.computeGroups === undefined
+            ? CarouselUtils.toSlideGroup(getDistance(place), place, ringCount)
+            : CarouselUtils.getPlacementGroup({
+                  place,
+                  groupPosition,
+                  memberships,
+                  rests: ringRests,
+                  count,
+                  groupCount,
+                  copies,
+                  isLooping,
+              });
 
     const getSlideState = (place: number, face: CarouselFace): CarouselSlideState => ({
         index: toIndex(place),
         count,
         distance: getDistance(place),
         face,
-        isCurrent: place === currentPlace,
+        isCurrent: getIsCurrentPlace(place),
     });
 
     const previousIndexRef = useRef<number | undefined>(undefined);
 
     useEffect(() => {
         const previous = previousIndexRef.current;
-        const { count: slideCount, isLooping: isLoopingNow } = latest.current;
+        const { count: slideCount, rests: groupRests, isLooping: isLoopingNow } = latest.current;
         const isThere =
-            CarouselUtils.getNearestIndex(
-                CarouselUtils.toPosition(progressRef.current, slideCount, isLoopingNow),
+            CarouselUtils.getNearestGroup(
+                CarouselUtils.toGroupPosition(progressRef.current, groupRests, slideCount, isLoopingNow),
+                groupRests,
                 slideCount,
                 isLoopingNow,
             ) === currentIndex;
@@ -209,7 +261,9 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
 
         if (previous === undefined) {
             if (!isThere) {
-                latest.current.writeProgress(CarouselUtils.toProgress(currentIndex, slideCount, isLoopingNow));
+                latest.current.writeProgress(
+                    CarouselUtils.toGroupProgress(groupRests[currentIndex] ?? 0, groupRests, slideCount, isLoopingNow),
+                );
             }
 
             return;
@@ -238,9 +292,10 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
             isGlidingRef.current = false;
         }
 
-        const { count: slideCount, isLooping: isLoopingNow } = latest.current;
-        const nearest = CarouselUtils.getNearestIndex(
-            CarouselUtils.toPosition(progress, slideCount, isLoopingNow),
+        const { count: slideCount, rests: groupRests, isLooping: isLoopingNow } = latest.current;
+        const nearest = CarouselUtils.getNearestGroup(
+            CarouselUtils.toGroupPosition(progress, groupRests, slideCount, isLoopingNow),
+            groupRests,
             slideCount,
             isLoopingNow,
         );
@@ -264,10 +319,11 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
 
     const announcedIndexRef = useRef<number | undefined>(undefined);
     const isRotatingRef = useLatest(isRotating);
+    const getAnnouncementRef = useLatest(getAnnouncement);
 
     useEffect(() => {
         if (CarouselUtils.getIsAnnounced(announcedIndexRef.current, currentIndex, isRotatingRef.current)) {
-            LiveAnnouncerUtils.announce(props.computeSlideLabel(currentIndex, count));
+            LiveAnnouncerUtils.announce(getAnnouncementRef.current(currentIndex));
         }
 
         announcedIndexRef.current = currentIndex;
@@ -278,7 +334,7 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
         autoplayDelayMs,
         isPlaying,
         isDisabled,
-        count,
+        count: groupCount,
         index: currentIndex,
     });
 
@@ -286,18 +342,21 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
         if (isPlaybackAtEnd) setIsPlaying(false);
     }, [isPlaybackAtEnd]);
 
-    const placements: (CarouselPlacement | undefined)[] = ringPlaces.map((place) =>
-        CarouselUtils.getIsBuilt(getDistance(place), props.placement.reach, isWindowed)
+    const placements: (CarouselPlacement | undefined)[] = ringPlaces.map((place) => {
+        const group = getPlacementGroup(place);
+
+        return CarouselUtils.getIsBuilt(group.distance, props.placement.reach, isWindowed)
             ? props.placement.place({
                   distance: getDistance(place),
+                  group,
                   index: place,
                   count: ringCount,
                   size,
                   orientation,
                   isLooping,
               })
-            : undefined,
-    );
+            : undefined;
+    });
 
     const handleViewportClick = (e: MouseEvent<HTMLDivElement>) => {
         if (isPressDisabled) return;
@@ -308,10 +367,12 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
             return face?.firstElementChild ?? face;
         };
 
-        if (getDrawn(currentPlace)?.contains(e.target as Node)) return;
+        if (ringPlaces.some((place) => getIsCurrentPlace(place) && getDrawn(place)?.contains(e.target as Node))) {
+            return;
+        }
 
         const rects = ringPlaces.map((place) =>
-            place !== currentPlace &&
+            !getIsCurrentPlace(place) &&
             placements[place] !== undefined &&
             placements[place].effect.opacity !== CarouselConst.HIDDEN_OPACITY
                 ? getDrawn(place)?.getBoundingClientRect()
@@ -319,10 +380,21 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
         );
         const hit = CarouselUtils.computeHitIndex(rects, { x: e.clientX, y: e.clientY });
 
-        if (hit !== undefined) goTo(toIndex(hit));
+        if (hit === undefined) return;
+
+        const group = CarouselUtils.getNearestGroupHolding(toIndex(hit), groups, position, count, isLooping);
+
+        if (group !== undefined) goTo(group);
     };
 
-    const snapshot: ControlsSnapshot = { index: currentIndex, count, isPlaying, isHeld, isLooping, isDisabled };
+    const snapshot: ControlsSnapshot = {
+        index: currentIndex,
+        count: groupCount,
+        isPlaying,
+        isHeld,
+        isLooping,
+        isDisabled,
+    };
 
     const [controlsStore] = useState(() => StoreUtils.create(snapshot, { isEqual: getIsSameSnapshot }));
 
@@ -391,7 +463,7 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
                 {ringPlaces.map((place) => {
                     const slide = props.slides[toIndex(place)];
                     const placement = placements[place];
-                    const isCurrent = place === currentPlace;
+                    const isCurrent = getIsCurrentPlace(place);
 
                     if (placement === undefined) return null;
 

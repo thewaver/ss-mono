@@ -1,16 +1,23 @@
-import type { ParentProps } from "solid-js";
+import { type ParentProps, Show } from "solid-js";
 
 import type { TableSortDirection } from "@thewaver/ss-components-solid";
 import { access } from "@thewaver/ss-components-solid";
 import {
     DEFAULT_ALIGN,
+    EXPANDER_MARKERS,
     SORT_MARKERS,
     UNSORTED_MARKER,
 } from "@thewaver/ss-playground/App/StyledComponents/TableContent/TableContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/TableContent/TableContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { TableCellContentProps, TableHeaderContentProps, TableResizerProps } from "./TableContentSolid.types";
+import type {
+    TableCellContentProps,
+    TableDetailContentProps,
+    TableExpanderProps,
+    TableHeaderContentProps,
+    TableResizerProps,
+} from "./TableContentSolid.types";
 
 const getSortMarker = (direction: TableSortDirection | undefined) =>
     direction === undefined ? UNSORTED_MARKER : SORT_MARKERS[direction];
@@ -28,6 +35,8 @@ export const PageTableHeaderContent = (props: ParentProps<TableHeaderContentProp
                 [styles.isSorted]: access(props.renderProps).sortDirection !== undefined,
                 [styles.isHovered]: access(props.renderProps).isHovered,
                 [styles.isDisabled]: access(props.renderProps).isDisabled,
+                [styles.isPinnedStart]: access(props.renderProps).pin === "start",
+                [styles.isPinnedEnd]: access(props.renderProps).pin === "end",
             }}
         >
             {props.children}
@@ -64,9 +73,43 @@ export const PageTableCellContent = (props: ParentProps<TableCellContentProps>) 
                 [styles.isHovered]: access(props.renderProps).isHovered,
                 [styles.isSelected]: access(props.renderProps).isSelected,
                 [styles.isDisabled]: access(props.renderProps).isDisabled,
+                [styles.isPinnedStart]: access(props.renderProps).pin === "start",
+                [styles.isPinnedEnd]: access(props.renderProps).pin === "end",
+                [styles.isExpanded]: access(props.renderProps).isExpanded,
             }}
         >
+            <Show when={props.leading !== undefined}>
+                <div class={styles.tableCellLeading}>{props.leading}</div>
+            </Show>
+
             <div class={styles.tableText}>{props.children}</div>
+        </div>
+    );
+};
+
+export const PageTableRowExpander = (props: TableExpanderProps) => {
+    const getLayerClass = useLayerClass();
+
+    return (
+        <div class={[styles.tableRowExpander, getLayerClass()].join(" ")}>
+            {access(props.renderProps).isExpanded ? EXPANDER_MARKERS.open : EXPANDER_MARKERS.closed}
+        </div>
+    );
+};
+
+export const PageTableDetailContent = (props: ParentProps<TableDetailContentProps>) => {
+    const getLayerClass = useLayerClass();
+
+    return (
+        <div
+            class={styles.tableDetailContent}
+            classList={{
+                [getLayerClass()]: true,
+                [styles.isSelected]: access(props.renderProps).isSelected,
+                [styles.isDisabled]: access(props.renderProps).isDisabled,
+            }}
+        >
+            {props.children}
         </div>
     );
 };

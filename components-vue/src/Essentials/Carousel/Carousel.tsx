@@ -4,6 +4,7 @@ import {
     CAROUSEL_DEFAULTS,
     type CarouselFace,
     type CarouselPlacement,
+    type CarouselPlacementGroup,
     type CarouselSlideState,
     type CarouselStep,
     CarouselStyles,
@@ -36,7 +37,12 @@ export const Carousel = defineComponent(
         const placements: (CarouselPlacement | undefined)[] = [];
 
         const count = computed(() => props.slides.length);
-        const currentIndex = computed(() => CarouselUtils.wrapIndex(index.value, count.value));
+        const groups = computed(() => CarouselUtils.resolveGroups(props.computeGroups?.(count.value), count.value));
+        const groupCount = computed(() => groups.value.length);
+        const rests = computed(() => groups.value.map(CarouselUtils.getGroupRest));
+        const memberships = computed(() => CarouselUtils.getGroupMemberships(groups.value, count.value));
+        const currentIndex = computed(() => CarouselUtils.wrapIndex(index.value, groupCount.value));
+        const getCurrentGroup = () => groups.value[currentIndex.value];
         const getIsDisabled = () => props.isDisabled ?? false;
         const getIsLooping = () => props.isLooping ?? CAROUSEL_DEFAULTS.isLooping;
         const getIsWindowed = () => props.isWindowed ?? CAROUSEL_DEFAULTS.isWindowed;
@@ -51,11 +57,15 @@ export const Carousel = defineComponent(
 
         const size = ElementObserverVueUtils.useBorderBoxSize(viewportRef);
 
-        const position = computed(() => CarouselUtils.toPosition(progress.value, count.value, getIsLooping()));
+        const position = computed(() =>
+            CarouselUtils.toGroupPosition(progress.value, rests.value, count.value, getIsLooping()),
+        );
 
         const getDrawnPosition = () => position.value - swipeRatio.value;
 
-        const copies = computed(() => CarouselUtils.getCopyCount(count.value, props.placement.reach, getIsLooping()));
+        const copies = computed(() =>
+            CarouselUtils.getCopyCount(groupCount.value, props.placement.reach, getIsLooping()),
+        );
 
         const ringCount = computed(() => count.value * copies.value);
 
@@ -63,14 +73,35 @@ export const Carousel = defineComponent(
             CarouselUtils.followCopies(previous, getDrawnPosition(), count.value, copies.value),
         );
 
-        const currentPlace = computed(() =>
-            CarouselUtils.getNearestCopy(currentIndex.value, ringPosition.value, count.value, copies.value),
+        const ringRests = computed(() =>
+            Array.from({ length: copies.value }, (_, copy) =>
+                rests.value.map((rest) => rest + copy * count.value),
+            ).flat(),
         );
+
+        const groupPosition = computed(() =>
+            CarouselUtils.toGroupCoordinate(ringPosition.value, ringRests.value, ringCount.value, getIsLooping()),
+        );
+
+        const currentPlace = computed(() => {
+            const group = getCurrentGroup();
+
+            return group ? CarouselUtils.getGroupPlace(group, ringPosition.value, count.value, copies.value) : 0;
+        });
+
+        const getIsCurrentPlace = (place: number) => {
+            const group = getCurrentGroup();
+
+            return (
+                group !== undefined &&
+                CarouselUtils.getIsInGroupPlace(place, currentPlace.value, group.end - group.start, ringCount.value)
+            );
+        };
 
         const toIndex = (place: number) => place % Math.max(count.value, 1);
 
         const getIsPressDisabled = () =>
-            CarouselUtils.getIsSwipeDisabled(props.progress !== undefined, getIsDisabled(), count.value);
+            CarouselUtils.getIsSwipeDisabled(props.progress !== undefined, getIsDisabled(), groupCount.value);
 
         let stopGlide: (() => void) | undefined;
         let writtenProgress: number | undefined;
@@ -82,19 +113,21 @@ export const Carousel = defineComponent(
 
         const glideTo = (target: number) => {
             const slideCount = count.value;
+            const groupRests = rests.value;
             const isLooping = getIsLooping();
             const from = getDrawnPosition();
 
             stopGlide?.();
-            writeProgress(CarouselUtils.toProgress(from, slideCount, isLooping));
+            writeProgress(CarouselUtils.toGroupProgress(from, groupRests, slideCount, isLooping));
             swipeRatio.value = 0;
             isGliding.value = true;
 
             stopGlide = CarouselUtils.glide({
                 from,
-                to: CarouselUtils.getGlideTarget(from, target, slideCount, isLooping),
+                to: CarouselUtils.getGlideTarget(from, groupRests[target] ?? 0, slideCount, isLooping),
                 durationMs: getTransitionDurationMs(),
-                onFrame: (next) => writeProgress(CarouselUtils.toProgress(next, slideCount, isLooping)),
+                onFrame: (next) =>
+                    writeProgress(CarouselUtils.toGroupProgress(next, groupRests, slideCount, isLooping)),
                 onEnd: () => {
                     isGliding.value = false;
                 },
@@ -104,7 +137,7 @@ export const Carousel = defineComponent(
         onScopeDispose(() => stopGlide?.());
 
         const goTo = (target: number) => {
-            const next = CarouselUtils.resolveIndex(target, count.value, getIsLooping());
+            const next = CarouselUtils.resolveIndex(target, groupCount.value, getIsLooping());
 
             if (next === undefined || next === currentIndex.value) return;
 
@@ -126,7 +159,7 @@ export const Carousel = defineComponent(
                         ? undefined
                         : CarouselUtils.resolveIndex(
                               current + CarouselUtils.getSwipeStep(direction),
-                              count.value,
+                              groupCount.value,
                               getIsLooping(),
                           );
 
@@ -140,12 +173,22 @@ export const Carousel = defineComponent(
             },
         });
 
-        if (CarouselUtils.getNearestIndex(position.value, count.value, getIsLooping()) !== currentIndex.value) {
-            writeProgress(CarouselUtils.toProgress(currentIndex.value, count.value, getIsLooping()));
+        const getNearestGroup = (at: number) =>
+            CarouselUtils.getNearestGroup(at, rests.value, count.value, getIsLooping());
+
+        if (getNearestGroup(position.value) !== currentIndex.value) {
+            writeProgress(
+                CarouselUtils.toGroupProgress(
+                    rests.value[currentIndex.value] ?? 0,
+                    rests.value,
+                    count.value,
+                    getIsLooping(),
+                ),
+            );
         }
 
         watch(currentIndex, (current) => {
-            const isThere = CarouselUtils.getNearestIndex(position.value, count.value, getIsLooping()) === current;
+            const isThere = getNearestGroup(position.value) === current;
 
             if (isThere && !isGliding.value) return;
 
@@ -162,10 +205,8 @@ export const Carousel = defineComponent(
                     isGliding.value = false;
                 }
 
-                const nearest = CarouselUtils.getNearestIndex(
-                    CarouselUtils.toPosition(next, count.value, getIsLooping()),
-                    count.value,
-                    getIsLooping(),
+                const nearest = getNearestGroup(
+                    CarouselUtils.toGroupPosition(next, rests.value, count.value, getIsLooping()),
                 );
 
                 if (nearest === currentIndex.value) return;
@@ -183,7 +224,7 @@ export const Carousel = defineComponent(
                 isHeld: isHeld.value,
                 isSwiping: isSwiping.value,
                 isDisabled: getIsDisabled(),
-                count: count.value,
+                count: groupCount.value,
             }),
         );
 
@@ -200,11 +241,21 @@ export const Carousel = defineComponent(
             },
         );
 
+        const getSlideLabel = (slideIndex: number) => props.computeSlideLabel(slideIndex, count.value);
+
+        const getAnnouncement = (groupIndex: number) => {
+            const group = groups.value[groupIndex];
+
+            if (!group || !props.computeGroupLabel) return getSlideLabel(groupIndex);
+
+            return props.computeGroupLabel(group.start, group.end, count.value);
+        };
+
         let announcedIndex: number | undefined;
 
         watchAfterRender([currentIndex], ([current]) => {
             if (CarouselUtils.getIsAnnounced(announcedIndex, current, isRotating.value)) {
-                LiveAnnouncerUtils.announce(props.computeSlideLabel(current, count.value));
+                LiveAnnouncerUtils.announce(getAnnouncement(current));
             }
 
             announcedIndex = current;
@@ -216,7 +267,7 @@ export const Carousel = defineComponent(
                 autoplayDelayMs: props.autoplayDelayMs,
                 isPlaying: isPlaying.value,
                 isDisabled: getIsDisabled(),
-                count: count.value,
+                count: groupCount.value,
                 index: currentIndex.value,
             }),
         );
@@ -225,37 +276,60 @@ export const Carousel = defineComponent(
             if (isAtEnd) isPlaying.value = false;
         });
 
-        const getSlideLabel = (slideIndex: number) => props.computeSlideLabel(slideIndex, count.value);
-
         const getDistance = (place: number) =>
             CarouselUtils.getDistance(place, ringPosition.value, ringCount.value, getIsLooping());
+
+        const getPlacementGroup = (place: number): CarouselPlacementGroup =>
+            props.computeGroups === undefined
+                ? CarouselUtils.toSlideGroup(getDistance(place), place, ringCount.value)
+                : CarouselUtils.getPlacementGroup({
+                      place,
+                      groupPosition: groupPosition.value,
+                      memberships: memberships.value,
+                      rests: ringRests.value,
+                      count: count.value,
+                      groupCount: groupCount.value,
+                      copies: copies.value,
+                      isLooping: getIsLooping(),
+                  });
 
         const getSlideState = (place: number, face: CarouselFace): CarouselSlideState => ({
             index: toIndex(place),
             count: count.value,
             distance: getDistance(place),
             face,
-            isCurrent: place === currentPlace.value,
+            isCurrent: getIsCurrentPlace(place),
         });
 
         const getIsStepRefused = (step: CarouselStep) =>
-            CarouselUtils.getIsStepDisabled(step, currentIndex.value, count.value, getIsLooping(), getIsDisabled());
+            CarouselUtils.getIsStepDisabled(
+                step,
+                currentIndex.value,
+                groupCount.value,
+                getIsLooping(),
+                getIsDisabled(),
+            );
 
         const controls: CarouselControls = {
             getIndex: () => currentIndex.value,
-            getCount: () => count.value,
+            getCount: () => groupCount.value,
             getIsPlaying: () => isPlaying.value,
             getIsHeld: () => isHeld.value,
             getCanStep: (step) => !getIsStepRefused(step),
             step: (step) => {
                 if (getIsStepRefused(step)) return false;
 
-                goTo(CarouselUtils.getStepTarget(step, currentIndex.value, count.value, getIsLooping()));
+                goTo(CarouselUtils.getStepTarget(step, currentIndex.value, groupCount.value, getIsLooping()));
 
                 return true;
             },
             pick: (pickIndex) => {
-                if (getIsDisabled() || pickIndex < 0 || pickIndex >= count.value || pickIndex === currentIndex.value) {
+                if (
+                    getIsDisabled() ||
+                    pickIndex < 0 ||
+                    pickIndex >= groupCount.value ||
+                    pickIndex === currentIndex.value
+                ) {
                     return false;
                 }
 
@@ -286,19 +360,32 @@ export const Carousel = defineComponent(
         const handleViewportClick = (e: MouseEvent) => {
             if (getIsPressDisabled()) return;
 
-            const current = currentPlace.value;
             const getDrawn = (place: number) => faceRefs[place]?.firstElementChild ?? faceRefs[place];
 
-            if (getDrawn(current)?.contains(e.target as Node)) return;
+            if (
+                faceRefs.some((_face, place) => getIsCurrentPlace(place) && getDrawn(place)?.contains(e.target as Node))
+            ) {
+                return;
+            }
 
             const rects = faceRefs.map((_face, place) =>
-                place !== current && placements[place]?.effect.opacity !== CarouselConst.HIDDEN_OPACITY
+                !getIsCurrentPlace(place) && placements[place]?.effect.opacity !== CarouselConst.HIDDEN_OPACITY
                     ? getDrawn(place)?.getBoundingClientRect()
                     : undefined,
             );
             const hit = CarouselUtils.computeHitIndex(rects, { x: e.clientX, y: e.clientY });
 
-            if (hit !== undefined) goTo(toIndex(hit));
+            if (hit === undefined) return;
+
+            const group = CarouselUtils.getNearestGroupHolding(
+                toIndex(hit),
+                groups.value,
+                position.value,
+                count.value,
+                getIsLooping(),
+            );
+
+            if (group !== undefined) goTo(group);
         };
 
         return () => {
@@ -309,8 +396,9 @@ export const Carousel = defineComponent(
 
             const renderSlide = (place: number) => {
                 const distance = getDistance(place);
+                const group = getPlacementGroup(place);
 
-                if (!CarouselUtils.getIsBuilt(distance, props.placement.reach, isWindowed)) {
+                if (!CarouselUtils.getIsBuilt(group.distance, props.placement.reach, isWindowed)) {
                     faceRefs[place] = undefined;
                     placements[place] = undefined;
 
@@ -320,13 +408,14 @@ export const Carousel = defineComponent(
                 const slide = props.slides[toIndex(place)];
                 const placement = props.placement.place({
                     distance,
+                    group,
                     index: place,
                     count: ringCount.value,
                     size: size.value,
                     orientation,
                     isLooping: getIsLooping(),
                 });
-                const isCurrent = place === currentPlace.value;
+                const isCurrent = getIsCurrentPlace(place);
 
                 placements[place] = placement;
 
@@ -398,6 +487,8 @@ export const Carousel = defineComponent(
             "isWindowed": Boolean,
             "ariaLabel": null,
             "computeSlideLabel": null,
+            "computeGroups": null,
+            "computeGroupLabel": null,
             "roleDescription": null,
             "slideRoleDescription": null,
             "slides": null,

@@ -253,3 +253,180 @@ describe("TableUtils.clampCell", () => {
         expect(TableUtils.clampCell({ row: 9, col: -2 }, { rowCount: 4, colCount: 3 })).toEqual({ row: 3, col: 0 });
     });
 });
+
+describe("TableUtils.getPinnedOrder", () => {
+    const START: TableColumn<Person> = { id: "start", header: "Start", pin: "start", widthPx: 80 };
+    const END: TableColumn<Person> = { id: "end", header: "End", pin: "end", widthPx: 60 };
+
+    it("gathers pinned columns at their edges, keeping each kind's own order", () => {
+        expect(TableUtils.getPinnedOrder([END, NAME, START, SIZED], undefined)).toEqual([2, 1, 3, 0]);
+    });
+
+    it("applies on top of a reader's order", () => {
+        expect(TableUtils.getPinnedOrder([START, NAME, SIZED, END], [3, 2, 1, 0])).toEqual([0, 2, 1, 3]);
+    });
+
+    it("gives nothing when the result is the declared order, and the order back unchanged with no pin", () => {
+        expect(TableUtils.getPinnedOrder([START, NAME, END], undefined)).toBeUndefined();
+        expect(TableUtils.getPinnedOrder([NAME, SIZED], [1, 0])).toEqual([1, 0]);
+    });
+});
+
+describe("TableUtils.computePinOffsets", () => {
+    const FIRST: TableColumn<Person> = { id: "first", header: "First", pin: "start", widthPx: 80 };
+    const SECOND: TableColumn<Person> = { id: "second", header: "Second", pin: "start", widthPx: 50 };
+    const LAST: TableColumn<Person> = { id: "last", header: "Last", pin: "end", widthPx: 60 };
+    const BEFORE_LAST: TableColumn<Person> = { id: "beforeLast", header: "Before last", pin: "end", widthPx: 40 };
+
+    it("adds up the widths of the pinned columns between each one and its edge", () => {
+        expect(TableUtils.computePinOffsets([FIRST, SECOND, NAME, BEFORE_LAST, LAST], {})).toEqual([
+            0,
+            80,
+            undefined,
+            60,
+            0,
+        ]);
+    });
+
+    it("follows a width the reader has set", () => {
+        expect(TableUtils.computePinOffsets([FIRST, SECOND], { first: 120 })).toEqual([0, 120]);
+    });
+});
+
+describe("TableUtils.clampToPinGroup", () => {
+    const START: TableColumn<Person> = { id: "start", header: "Start", pin: "start", widthPx: 80 };
+    const END: TableColumn<Person> = { id: "end", header: "End", pin: "end", widthPx: 60 };
+    const COLUMNS = [START, NAME, SIZED, UNCOMPARED, END];
+
+    it("keeps a scrolling column among the scrolling ones", () => {
+        expect(TableUtils.clampToPinGroup(COLUMNS, 2, 0)).toBe(1);
+        expect(TableUtils.clampToPinGroup(COLUMNS, 2, 4)).toBe(3);
+        expect(TableUtils.clampToPinGroup(COLUMNS, 2, 3)).toBe(3);
+    });
+
+    it("keeps a pinned column where it is when it is the only one at its edge", () => {
+        expect(TableUtils.clampToPinGroup(COLUMNS, 0, 2)).toBe(0);
+        expect(TableUtils.clampToPinGroup(COLUMNS, 4, 1)).toBe(4);
+    });
+});
+
+describe("TableUtils.computeMinTableWidth", () => {
+    it("adds every fixed width and every other column's minimum", () => {
+        expect(TableUtils.computeMinTableWidth([SIZED, NAME, { ...UNCOMPARED, minWidthPx: 40 }], {})).toBe(160);
+        expect(TableUtils.computeMinTableWidth([SIZED], { sized: 90 })).toBe(90);
+    });
+});
+
+describe("TableUtils entries", () => {
+    const EXPANDED = [1, 3];
+
+    it("lists the open rows by screen position, skipping rows that cannot open", () => {
+        expect(TableUtils.getExpandedRows(ROWS, [ROWS[2], ROWS[0]], undefined)).toEqual([0, 2]);
+        expect(TableUtils.getExpandedRows(ROWS, [ROWS[2], ROWS[0]], (row) => row.age > 40)).toEqual([2]);
+    });
+
+    it("answers with the same empty list whenever nothing is open", () => {
+        expect(TableUtils.getExpandedRows(ROWS, [], undefined)).toBe(
+            TableUtils.getExpandedRows([], [ROWS[0]], undefined),
+        );
+    });
+
+    it("opens and closes a row", () => {
+        expect(TableUtils.getToggledExpanded([ROWS[0]], ROWS[1])).toEqual([ROWS[0], ROWS[1]]);
+        expect(TableUtils.getToggledExpanded([ROWS[0], ROWS[1]], ROWS[0])).toEqual([ROWS[1]]);
+    });
+
+    it("counts each open detail as an entry of its own, after its row", () => {
+        expect(TableUtils.getEntryCount(5, EXPANDED)).toBe(7);
+        expect([0, 1, 2, 3, 4].map((row) => TableUtils.getEntryIndex(row, EXPANDED))).toEqual([0, 1, 3, 4, 6]);
+        expect([0, 1, 2, 3, 4, 5, 6].map((entry) => TableUtils.getEntry(entry, EXPANDED))).toEqual([
+            { kind: "row", layoutRow: 0 },
+            { kind: "row", layoutRow: 1 },
+            { kind: "detail", layoutRow: 1 },
+            { kind: "row", layoutRow: 2 },
+            { kind: "row", layoutRow: 3 },
+            { kind: "detail", layoutRow: 3 },
+            { kind: "row", layoutRow: 4 },
+        ]);
+    });
+
+    it("turns a held cell into the walk and back", () => {
+        const onDetail = { cell: { row: 4, col: 2 }, isDetail: true };
+        const walkCell = TableUtils.computeWalkCell(onDetail, EXPANDED);
+
+        expect(walkCell).toEqual({ row: 6, col: 2 });
+        expect(TableUtils.computeFocus(walkCell, EXPANDED)).toEqual(onDetail);
+        expect(TableUtils.computeWalkCell({ cell: { row: 0, col: 1 }, isDetail: false }, EXPANDED)).toEqual({
+            row: 0,
+            col: 1,
+        });
+    });
+
+    it("hands focus on a closed detail back to its row", () => {
+        expect(TableUtils.computeWalkCell({ cell: { row: 3, col: 0 }, isDetail: true }, EXPANDED)).toEqual({
+            row: 4,
+            col: 0,
+        });
+    });
+});
+
+describe("TableUtils.computeKeyCommand with details", () => {
+    const GRID = { rowCount: 5, colCount: 3 };
+    const OPTS = {
+        direction: "ltr" as const,
+        pageRows: 10,
+        expandedRows: [0],
+        computeIsExpandable: (layoutRow: number) => layoutRow !== 2,
+    };
+    const press = (key: string, mods: Partial<{ ctrlKey: boolean; metaKey: boolean; shiftKey: boolean }> = {}) => ({
+        key,
+        ctrlKey: false,
+        metaKey: false,
+        shiftKey: false,
+        ...mods,
+    });
+
+    it("opens and closes a row with Enter on its first cell, and activates it from any other", () => {
+        expect(TableUtils.computeKeyCommand(press("Enter"), { row: 1, col: 0 }, GRID, OPTS)).toEqual({
+            kind: "toggle_row",
+            rowIndex: 0,
+        });
+        expect(TableUtils.computeKeyCommand(press("Enter"), { row: 1, col: 1 }, GRID, OPTS)).toEqual({
+            kind: "activate_row",
+            rowIndex: 0,
+        });
+        expect(TableUtils.computeKeyCommand(press("Enter"), { row: 4, col: 0 }, GRID, OPTS)).toEqual({
+            kind: "activate_row",
+            rowIndex: 2,
+        });
+    });
+
+    it("names rows by screen position once an open detail sits above them", () => {
+        expect(TableUtils.computeKeyCommand(press(" "), { row: 3, col: 1 }, GRID, OPTS)).toEqual({
+            kind: "pick_row",
+            rowIndex: 1,
+            gesture: { isToggling: true, isExtending: false },
+        });
+    });
+
+    it("walks into an open detail and out of it, leaving the sideways keys alone there", () => {
+        expect(TableUtils.computeKeyCommand(press("ArrowDown"), { row: 1, col: 2 }, GRID, OPTS)).toEqual({
+            kind: "focus",
+            cell: { row: 2, col: 2 },
+            isExtending: false,
+        });
+        expect(TableUtils.computeKeyCommand(press("ArrowDown"), { row: 2, col: 2 }, GRID, OPTS)).toEqual({
+            kind: "focus",
+            cell: { row: 3, col: 2 },
+            isExtending: false,
+        });
+        expect(TableUtils.computeKeyCommand(press("ArrowRight"), { row: 2, col: 0 }, GRID, OPTS)).toBeUndefined();
+        expect(TableUtils.computeKeyCommand(press("Enter"), { row: 2, col: 0 }, GRID, OPTS)).toBeUndefined();
+    });
+
+    it("does not extend the selection onto a detail", () => {
+        expect(
+            TableUtils.computeKeyCommand(press("ArrowDown", { shiftKey: true }), { row: 1, col: 0 }, GRID, OPTS),
+        ).toEqual({ kind: "focus", cell: { row: 2, col: 0 }, isExtending: false });
+    });
+});

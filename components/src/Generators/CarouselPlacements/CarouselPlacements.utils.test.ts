@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { CarouselPlacementDefs } from "../../Essentials/Carousel/Carousel.types";
+import { CarouselUtils } from "../../Essentials/Carousel/Carousel.utils";
 import { CarouselPlacements } from "../../Samples/Carousel/Placements/CarouselPlacements.const";
 import { CarouselPlacementUtils } from "./CarouselPlacements.utils";
 
@@ -11,9 +12,14 @@ const BASE: CarouselPlacementDefs = {
     size: { width: 300, height: 200 },
     orientation: "horizontal",
     isLooping: true,
+    group: CarouselUtils.toSlideGroup(0, 0, 6),
 };
 
-const at = (distance: number, overrides?: Partial<CarouselPlacementDefs>) => ({ ...BASE, ...overrides, distance });
+const at = (distance: number, overrides?: Partial<CarouselPlacementDefs>): CarouselPlacementDefs => {
+    const defs = { ...BASE, ...overrides, distance };
+
+    return { ...defs, group: overrides?.group ?? CarouselUtils.toSlideGroup(distance, defs.index, defs.count) };
+};
 
 const RULES = CarouselPlacements.SAMPLE_KEYS.map(
     (key) => [key, CarouselPlacementUtils.toPlacementRule(CarouselPlacements.SAMPLE_PLACEMENTS[key]).place] as const,

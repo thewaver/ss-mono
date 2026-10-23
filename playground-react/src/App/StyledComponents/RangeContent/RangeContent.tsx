@@ -45,7 +45,7 @@ export const PageRangeContent = (props: RangeContentProps) => {
                 style={
                     orientation === "vertical"
                         ? { bottom: center(fill.start), height: fillSpan }
-                        : { left: center(fill.start), width: fillSpan }
+                        : { insetInlineStart: center(fill.start), width: fillSpan }
                 }
             />
 
@@ -60,7 +60,7 @@ export const PageRangeContent = (props: RangeContentProps) => {
                     ]
                         .filter(Boolean)
                         .join(" ")}
-                    style={orientation === "vertical" ? { bottom: travel(ratio) } : { left: travel(ratio) }}
+                    style={orientation === "vertical" ? { bottom: travel(ratio) } : { insetInlineStart: travel(ratio) }}
                 />
             ))}
         </div>

@@ -20,6 +20,9 @@ const startSentence = (text: string) => text.charAt(0).toUpperCase() + text.slic
 
 export const computePositionLabel = (index: number, count: number) => `${index + 1} of ${count}`;
 
+export const computeGroupPositionLabel = (start: number, end: number, count: number) =>
+    end - start > 1 ? `${start + 1}–${end} of ${count}` : computePositionLabel(start, count);
+
 const CARRIER_ANNOUNCEMENTS: CarrierAnnouncements = {
     computePickedUp: (itemLabel, zoneLabel) => `${itemLabel} picked up from ${zoneLabel}.`,
     computePickedUpByKey: (itemLabel, zoneLabel, placeLabel, keyHint) =>

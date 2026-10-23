@@ -46,7 +46,7 @@
         style={toStyle(
             orientation === "vertical"
                 ? { bottom: center(fill.start), height: fillSpan }
-                : { left: center(fill.start), width: fillSpan },
+                : { insetInlineStart: center(fill.start), width: fillSpan },
         )}
     ></div>
 
@@ -58,7 +58,7 @@
                 props.renderProps.focusVisibleThumb === index && styles.isFocused,
                 props.renderProps.hasError && styles.hasError,
             ]}
-            style={toStyle(orientation === "vertical" ? { bottom: travel(ratio) } : { left: travel(ratio) })}
+            style={toStyle(orientation === "vertical" ? { bottom: travel(ratio) } : { insetInlineStart: travel(ratio) })}
         ></div>
     {/each}
 </div>

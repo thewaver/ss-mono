@@ -23,7 +23,9 @@ import ErroredExample from "./Examples/Errored.vue";
 import HeldExample from "./Examples/Held.vue";
 import HoldOnlyExample from "./Examples/HoldOnly.vue";
 import ReachableExample from "./Examples/Reachable.vue";
+import RightToLeftExample from "./Examples/RightToLeft.vue";
 import SlideOnlyExample from "./Examples/SlideOnly.vue";
+import VerticalExample from "./Examples/Vertical.vue";
 
 const sends = shallowRef(0);
 const progress = shallowRef(0);
@@ -35,6 +37,8 @@ const reachableSends = shallowRef(0);
 const hasError = shallowRef(true);
 const slideOnlySends = shallowRef(0);
 const holdOnlySends = shallowRef(0);
+const verticalSends = shallowRef(0);
+const rightToLeftSends = shallowRef(0);
 
 const examples: ExampleDefs[] = [
     {
@@ -64,6 +68,20 @@ const examples: ExampleDefs[] = [
         readout: () =>
             `activations: ${holdOnlySends.value} — dragging the thumb does nothing here, so a stray drag cannot reach the action, and a held press or a held Enter both can`,
         path: `${EXAMPLES_ROOT}/HoldOnly.vue`,
+    },
+    {
+        key: "vertical",
+        name: EXAMPLE_NAMES.vertical,
+        readout: () =>
+            `activations: ${verticalSends.value} — the thumb rests at the bottom and slides up, and a held press or a held Enter fill it the same way`,
+        path: `${EXAMPLES_ROOT}/Vertical.vue`,
+    },
+    {
+        key: "rightToLeft",
+        name: EXAMPLE_NAMES.rightToLeft,
+        readout: () =>
+            `activations: ${rightToLeftSends.value} — the box around the button sets dir="rtl", so the thumb rests at the right and slides leftward`,
+        path: `${EXAMPLES_ROOT}/RightToLeft.vue`,
     },
     {
         key: "held",
@@ -132,6 +150,18 @@ const examples: ExampleDefs[] = [
         <template #holdOnly>
             <div :class="styles.stage">
                 <HoldOnlyExample @activate="holdOnlySends++" />
+            </div>
+        </template>
+
+        <template #vertical>
+            <div :class="styles.stage">
+                <VerticalExample @activate="verticalSends++" />
+            </div>
+        </template>
+
+        <template #rightToLeft>
+            <div :class="styles.stage">
+                <RightToLeftExample @activate="rightToLeftSends++" />
             </div>
         </template>
 

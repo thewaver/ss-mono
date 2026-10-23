@@ -48,7 +48,8 @@
 <div
     {@attach (element) => on(element, "click", props.onClick)}
     id={props.cellId}
-    class={styles.tableCell}
+    class={[styles.tableCell, props.pinClass]}
+    style={props.pinStyle}
     role="columnheader"
     aria-colindex={props.columnIndex + FIRST_ARIA_INDEX}
     aria-sort={TableUtils.computeAriaSort(props.column, props.renderProps.sortDirection)}

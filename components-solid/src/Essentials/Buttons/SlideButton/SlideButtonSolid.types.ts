@@ -1,4 +1,9 @@
-import type { SlideButtonCbs, SlideButtonRenderProps, SlideButtonState } from "@thewaver/ss-components";
+import type {
+    NavigatorDirection,
+    SlideButtonCbs,
+    SlideButtonRenderProps,
+    SlideButtonState,
+} from "@thewaver/ss-components";
 
 import type {
     InteractionControlProps,
@@ -18,6 +23,8 @@ export type SlideButtonElementProps = AccessorProps<
             setIsDragging: (isDragging: boolean) => void;
             /** Says whether the button is being held. */
             setIsHolding: (isHolding: boolean) => void;
+            /** Says which way text runs around the button. */
+            setDirection: (direction: NavigatorDirection) => void;
         }
 >;
 

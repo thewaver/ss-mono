@@ -261,3 +261,100 @@ test("dragging round the knob turns it, and the browser's own thumb never wins",
     expect(await valueOf(input), "letting go keeps the value the drag ended on").toBe(17);
     expect(await readout(page, "knob")).toContain("value: 17");
 });
+
+const RIGHT_TO_LEFT = demo("rightToLeft");
+
+/**
+ * The thumbs the Playground's painter draws, as screen boxes. They are the painter's, with no hook of their own, so
+ * they are found by where they sit — the painted layer beside the two native inputs, after its track and fill — and
+ * which value each stands for is never assumed from its place in the markup: the tests below move one value and see
+ * which drawn thumb follows.
+ */
+const drawnThumbs = (page: Page, scope: string) =>
+    page
+        .locator(`${scope} div:has(> input[type="range"]) > div:first-child > div:nth-child(n+3)`)
+        .evaluateAll((thumbs) =>
+            thumbs.map((thumb) => {
+                const rect = thumb.getBoundingClientRect();
+
+                return { x: rect.x + rect.width * 0.5, y: rect.y + rect.height * 0.5 };
+            }),
+        );
+
+/**
+ * In a right-to-left box the track runs from the right, so the lower value is the thumb on the right. Raising the
+ * lower value by the keyboard is how the spec learns which drawn thumb is the lower one: the thumb that moves is it,
+ * and it has to move leftward, toward the higher one, and still sit to the right of it. The up arrow raises a native
+ * range in either direction, where the right arrow follows the screen and lowers it here.
+ */
+test("in a right-to-left range the thumb drawn for the lower value sits to the right of the higher one", async ({
+    page,
+}) => {
+    const low = page.locator(thumbs(RIGHT_TO_LEFT)).first();
+
+    await low.scrollIntoViewIfNeeded();
+
+    const before = await drawnThumbs(page, RIGHT_TO_LEFT);
+
+    expect(before, "the painter draws a thumb for each value").toHaveLength(2);
+
+    const high = page.locator(thumbs(RIGHT_TO_LEFT)).last();
+    const lowBefore = await valueOf(low);
+    const highBefore = await valueOf(high);
+
+    await low.focus();
+    for (let press = 0; press < 5; press++) await page.keyboard.press("ArrowUp");
+
+    expect(await valueOf(low), "the up arrow raises the lower value whatever the direction").toBeGreaterThan(lowBefore);
+    expect(await valueOf(high), "and leaves the higher one alone").toBe(highBefore);
+
+    const after = await drawnThumbs(page, RIGHT_TO_LEFT);
+    const movedIndex = after.findIndex((point, index) => Math.abs(point.x - before[index].x) > 1);
+    const otherIndex = 1 - movedIndex;
+
+    expect(movedIndex, "exactly one drawn thumb moved").toBeGreaterThanOrEqual(0);
+    expect(after[otherIndex].x, "the other stayed where it was").toBeCloseTo(before[otherIndex].x, 0);
+    expect(after[movedIndex].x, "a higher value is further left").toBeLessThan(before[movedIndex].x);
+    expect(after[movedIndex].x, "and the lower value's thumb is still the one on the right").toBeGreaterThan(
+        after[otherIndex].x,
+    );
+});
+
+/**
+ * The drawn thumbs and the native inputs must agree on where each value sits, or pressing the thumb that looks low
+ * moves the high one — which the symmetric starting values (20 and 80) would hide if only one end were pressed. So
+ * each drawn thumb is pressed on its middle and nudged a little toward the other, and only the value it was drawn for
+ * may change.
+ */
+test("in a right-to-left range, pressing a drawn thumb moves that thumb's value and not the other", async ({
+    page,
+}) => {
+    const low = page.locator(thumbs(RIGHT_TO_LEFT)).first();
+    const high = page.locator(thumbs(RIGHT_TO_LEFT)).last();
+    const NUDGE_PX = 20;
+
+    await low.scrollIntoViewIfNeeded();
+
+    const nudge = async (from: { x: number; y: number }, dx: number) => {
+        await page.mouse.move(from.x, from.y);
+        await page.mouse.down();
+        await page.mouse.move(from.x + dx, from.y, { steps: 5 });
+        await page.mouse.up();
+    };
+
+    const [rightmost, leftmost] = (await drawnThumbs(page, RIGHT_TO_LEFT)).toSorted((a, b) => b.x - a.x);
+    const lowBefore = await valueOf(low);
+    const highBefore = await valueOf(high);
+
+    await nudge(rightmost, -NUDGE_PX);
+
+    expect(await valueOf(low), "the thumb drawn on the right is the lower value, and it moved").not.toBe(lowBefore);
+    expect(await valueOf(high), "while the higher value did not").toBe(highBefore);
+
+    const lowAfter = await valueOf(low);
+
+    await nudge(leftmost, NUDGE_PX);
+
+    expect(await valueOf(high), "the thumb drawn on the left is the higher value, and it moved").not.toBe(highBefore);
+    expect(await valueOf(low), "while the lower value did not").toBe(lowAfter);
+});

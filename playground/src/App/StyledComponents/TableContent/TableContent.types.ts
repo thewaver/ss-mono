@@ -1,4 +1,4 @@
-import type { TableCellRenderProps, TableColumnRenderProps } from "@thewaver/ss-components";
+import type { TableCellRenderProps, TableColumnRenderProps, TableDetailRenderProps } from "@thewaver/ss-components";
 
 export type TableAlign = "start" | "end";
 
@@ -21,3 +21,15 @@ export type BaseTableResizerValues = {
 };
 
 export type BaseTableResizerProps = BaseTableResizerValues;
+
+export type BaseTableExpanderValues = {
+    renderProps: TableCellRenderProps;
+};
+
+export type BaseTableExpanderProps = BaseTableExpanderValues;
+
+export type BaseTableDetailContentValues = {
+    renderProps: TableDetailRenderProps;
+};
+
+export type BaseTableDetailContentProps = BaseTableDetailContentValues;

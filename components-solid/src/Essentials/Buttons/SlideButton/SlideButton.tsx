@@ -1,6 +1,7 @@
 import { createMemo, createRenderEffect, createSignal, onCleanup } from "solid-js";
 
 import {
+    type NavigatorDirection,
     SLIDE_BUTTON_DEFAULTS,
     type SlideButtonRenderProps,
     SlideButtonUtils,
@@ -9,6 +10,7 @@ import {
 import { SlideButtonConst } from "@thewaver/ss-components/internal";
 
 import { InteractionTrackerSolidUtils } from "../../../Abstracts/InteractionTracker/InteractionTrackerSolid.utils";
+import { NavigatorSolidUtils } from "../../../Abstracts/Navigator/NavigatorSolid.utils";
 import { SignalMirrorSolidUtils } from "../../../Abstracts/SignalMirror/SignalMirrorSolid.utils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import { access } from "../../../Utils/propUtils";
@@ -27,14 +29,18 @@ const SlideButtonElement = (props: SlideButtonElementProps) => {
 
     FormFieldSolidUtils.registerControl(getTrackRef);
 
+    const getDirection = NavigatorSolidUtils.createDirectionSignal(getTrackRef);
+
     const getIsDisabled = createMemo(() => access(props.flags).isDisabled ?? false);
 
     const gesture = SlideButtonUtils.createGesture({
         getMode: () => access(props.mode),
+        getOrientation: () => access(props.orientation),
+        getDirection,
         getThumbSize: () => access(props.thumbSize),
         getHoldDurationMs: () => access(props.holdDurationMs),
         getCompletionRatio: () => access(props.completionRatio),
-        getTrackWidth: () => getTrackRef()?.clientWidth ?? 0,
+        getTrackSize: () => ({ width: getTrackRef()?.clientWidth ?? 0, height: getTrackRef()?.clientHeight ?? 0 }),
         getProgressRatio: () => access(props.progressRatio),
         setProgressRatio: (ratio) => props.setProgressRatio(ratio),
         onActivate: () => void props.onActivate?.(),
@@ -46,7 +52,7 @@ const SlideButtonElement = (props: SlideButtonElementProps) => {
     const getIsGrabbed = accessStore(gesture, (state) => state.isGrabbed);
 
     const { getIsDragging } = InteractionTrackerSolidUtils.trackDrag(getTrackRef, getIsDisabled, {
-        onDrag: (ratio) => gesture.drag(ratio.x),
+        onDrag: (ratio) => gesture.drag(ratio),
         onDragEnd: (reason) => gesture.dragEnd(reason),
     });
 
@@ -56,6 +62,10 @@ const SlideButtonElement = (props: SlideButtonElementProps) => {
 
     createRenderEffect(() => {
         props.setIsHolding(getIsHolding());
+    });
+
+    createRenderEffect(() => {
+        props.setDirection(getDirection());
     });
 
     createRenderEffect(() => {
@@ -111,6 +121,9 @@ export const SlideButton = (props: SlideButtonProps) => {
     );
     const [getIsDragging, setIsDragging] = createSignal(false);
     const [getIsHolding, setIsHolding] = createSignal(false);
+    const [getDirection, setDirection] = createSignal<NavigatorDirection>("ltr");
+
+    const getOrientation = createMemo(() => access(props.orientation) ?? SLIDE_BUTTON_DEFAULTS.orientation);
 
     const getThumbSize = createMemo(() => access(props.thumbSize) ?? SLIDE_BUTTON_DEFAULTS.thumbSize);
 
@@ -124,6 +137,8 @@ export const SlideButton = (props: SlideButtonProps) => {
         <InteractionWrapper
             {...props}
             extraFlags={(): SlideButtonRenderProps => ({
+                orientation: getOrientation(),
+                direction: getDirection(),
                 progressRatio: getProgressRatio(),
                 isDragging: getIsDragging(),
                 isHolding: getIsHolding(),
@@ -133,6 +148,7 @@ export const SlideButton = (props: SlideButtonProps) => {
                     ref={setElementRef}
                     id={props.id}
                     ariaLabel={props.ariaLabel}
+                    orientation={getOrientation}
                     thumbSize={getThumbSize}
                     holdDurationMs={getHoldDurationMs}
                     mode={getMode}
@@ -143,6 +159,7 @@ export const SlideButton = (props: SlideButtonProps) => {
                     setProgressRatio={setProgressRatio}
                     setIsDragging={setIsDragging}
                     setIsHolding={setIsHolding}
+                    setDirection={setDirection}
                     onActivate={props.onActivate}
                     onMouseEnter={props.onMouseEnter}
                     onMouseLeave={props.onMouseLeave}

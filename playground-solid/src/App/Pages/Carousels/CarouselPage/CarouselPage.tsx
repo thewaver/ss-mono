@@ -1,16 +1,22 @@
 import { createMemo, createSignal } from "solid-js";
 
+import { access } from "@thewaver/ss-components-solid";
 import {
     EXAMPLES_ROOT,
     EXAMPLE_NAMES,
     WINDOWED_SLIDE_COUNT,
 } from "@thewaver/ss-playground/App/Pages/Carousels/CarouselPage/CarouselPage.const";
+import {
+    computePairs,
+    toPairableSlides,
+} from "@thewaver/ss-playground/App/Pages/Carousels/CarouselPage/CarouselPage.utils";
 
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
 import { PageCarouselBox } from "../../../StyledComponents/CarouselContent/CarouselContent";
 import { createCarouselsControls } from "../Carousels.utils";
 import { PageCarouselsPanel } from "../CarouselsPanel";
 import { NoControlsExample } from "./Examples/NoControls";
+import { PairsExample } from "./Examples/Pairs";
 import { RotatingExample } from "./Examples/Rotating";
 import { ScrolledExample } from "./Examples/Scrolled";
 import { SteppedExample } from "./Examples/Stepped";
@@ -26,6 +32,11 @@ export const CarouselPage = () => {
     const scrolledIndexSignal = createSignal(0);
     const windowedIndexSignal = createSignal(0);
     const [getBuiltCount, setBuiltCount] = createSignal(0);
+    const pairsIndexSignal = createSignal(0);
+
+    const getPairCount = createMemo(
+        () => computePairs(toPairableSlides(access(controls.getSharedProps().slides)).length).length,
+    );
 
     const getExamples = createMemo(() => [
         {
@@ -102,6 +113,22 @@ export const CarouselPage = () => {
                 );
             },
             path: `${EXAMPLES_ROOT}/Windowed.tsx`,
+        },
+        {
+            key: "pairs",
+            name: EXAMPLE_NAMES.pairs,
+            readout: () =>
+                `pair ${pairsIndexSignal[0]() + 1} of ${getPairCount()} — the slides two at a time, 1 and 2, then 3 and 4, each pair resting side by side in the room of one slide wherever the placement rests a slide; an odd number of slides is doubled so every pair is whole`,
+            component: () => (
+                <PageCarouselBox>
+                    <PairsExample
+                        {...controls.getSharedProps()}
+                        isLooping={controls.isLooping[0]}
+                        index={pairsIndexSignal}
+                    />
+                </PageCarouselBox>
+            ),
+            path: `${EXAMPLES_ROOT}/Pairs.tsx`,
         },
     ]);
 

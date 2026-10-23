@@ -6,6 +6,11 @@ export const DEFAULT_ALIGN: TableAlign = "start";
 
 export const UNSORTED_MARKER = "↕";
 
+export const EXPANDER_MARKERS = {
+    open: "▾",
+    closed: "▸",
+};
+
 export const SORT_MARKERS: Record<TableSortDirection, string> = {
     ascending: "▲",
     descending: "▼",

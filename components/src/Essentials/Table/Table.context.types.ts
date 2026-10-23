@@ -1,4 +1,4 @@
-import type { TableColumnRenderProps } from "./Table.types";
+import type { TableCellRenderProps, TableColumnRenderProps } from "./Table.types";
 
 export type TableHeaderContextType = {
     getRenderProps: () => TableColumnRenderProps;
@@ -6,4 +6,10 @@ export type TableHeaderContextType = {
     pickUp: () => void;
     registerSort: () => void;
     registerReorder: () => void;
+};
+
+export type TableCellContextType = {
+    getRenderProps: () => TableCellRenderProps;
+    toggle: () => void;
+    registerExpander: () => void;
 };

@@ -12,6 +12,20 @@ export type TableSort = {
 
 export type TableSelectionMode = SelectionMode;
 
+export type TableColumnPin = "start" | "end";
+
+export type TableEntryKind = "row" | "detail";
+
+export type TableEntry = {
+    kind: TableEntryKind;
+    layoutRow: number;
+};
+
+export type TableFocus = {
+    cell: Index2d;
+    isDetail: boolean;
+};
+
 export type TableAnnouncements = CarrierAnnouncements & {
     /**
      * Describes every reorderable column header while nothing is picked up, telling a keyboard user that Shift with
@@ -63,6 +77,8 @@ export type TableColumnRenderProps = {
     isHovered: boolean;
     /** Whether this column is turned off. */
     isDisabled: boolean;
+    /** Which edge this column is held at while the rest scroll sideways, or nothing if it scrolls with them. */
+    pin: TableColumnPin | undefined;
 };
 
 export type TableCellRenderProps = {
@@ -74,7 +90,7 @@ export type TableCellRenderProps = {
     layoutCol: number;
     /** Where this cell's row sits in the data. */
     dataRow: number;
-    /** Where this cell's row sits on screen. */
+    /** Where this cell's row sits on screen, counting rows only and not the details open between them. */
     layoutRow: number;
     /** Whether this cell's row is selected. */
     isSelected: boolean;
@@ -84,17 +100,67 @@ export type TableCellRenderProps = {
     isHovered: boolean;
     /** Whether this cell is turned off. */
     isDisabled: boolean;
+    /** Which edge this cell's column is held at while the rest scroll sideways, or nothing if it scrolls with them. */
+    pin: TableColumnPin | undefined;
+    /** Whether this cell's row can open a detail beneath it. */
+    isExpandable: boolean;
+    /** Whether this cell's row has its detail open. */
+    isExpanded: boolean;
 };
 
-export type TableColumnDefs<T> = {
+export type TableDetailRenderProps = {
+    /** Where the detail's row sits in the data. */
+    dataRow: number;
+    /** Where the detail's row sits on screen, counting rows only and not the details open between them. */
+    layoutRow: number;
+    /** Whether the detail's row is selected. */
+    isSelected: boolean;
+    /** Whether the detail holds focus. */
+    isFocused: boolean;
+    /** Whether the table is turned off. */
+    isDisabled: boolean;
+};
+
+export type TableColumnPinDefs =
+    | {
+          /**
+           * Holds the column still at the start or the end of the row while the other columns scroll sideways.
+           * Pinned columns gather at their edge whatever `order` says, and a reader can reorder them only among
+           * themselves. A pinned column needs `widthPx`, since where each pinned column is held is the sum of the
+           * widths of the pinned columns before it.
+           */
+          pin: TableColumnPin;
+          /** How wide the column is, in pixels. A width the reader sets by resizing wins over it. */
+          widthPx: number;
+      }
+    | {
+          pin?: undefined;
+          /**
+           * How wide the column is, in pixels. A width the reader sets by resizing wins over it. Without either, the
+           * column shares out the room left over, between its minimum and maximum.
+           */
+          widthPx?: number;
+      };
+
+export type TableColumnDefs<T> = TableColumnPinDefs & {
+    /** Names the column. It is what `sort`, `widths` and `order` refer to it by, so it is unique in the table. */
     id: string;
+    /** The column's name in words, which is what a reader hears when the column is moved. */
     header: string;
-    widthPx?: number;
+    /** The narrowest the column can be, in pixels, by resizing or by sharing out room. Zero when left out. */
     minWidthPx?: number;
+    /** The widest the column can be, in pixels, by resizing or by sharing out room. */
     maxWidthPx?: number;
+    /** Whether the column can be sorted by. */
     isSortable?: boolean;
+    /** Whether the column can be resized, which also needs the table's `widths`. */
     isResizable?: boolean;
+    /** Whether the column can be moved, which also needs the table's `order`. */
     isReorderable?: boolean;
+    /**
+     * Orders two rows for this column, ascending. With it the table sorts the rows itself; without it a sortable
+     * column only reports the sort, and the rows are left for the consumer to order.
+     */
     compare?: (a: T, b: T) => number;
 };
 
@@ -110,6 +176,7 @@ export type TableKeyCommand =
     | { kind: "resize"; step: -1 | 1 }
     | { kind: "move_column"; to: number }
     | { kind: "activate_row"; rowIndex: number }
+    | { kind: "toggle_row"; rowIndex: number }
     | { kind: "pick_row"; rowIndex: number; gesture: SelectionGesture };
 
 export type BaseTableValues<T> = {
@@ -129,7 +196,7 @@ export type BaseTableValues<T> = {
      * than the line that is drawn.
      */
     resizerWidthPx?: number;
-    /** Turns the table off, so nothing in it sorts, resizes, reorders or selects. */
+    /** Turns the table off, so nothing in it sorts, resizes, reorders, selects, or opens or closes a detail. */
     isDisabled?: boolean;
     /** The rows, in the order they are shown. */
     rows: T[];
@@ -138,6 +205,7 @@ export type BaseTableValues<T> = {
 export type BaseTableCbs<T> = {
     /**
      * Guesses how tall a row will be before it is drawn, which is what lets a long table render only what is on screen.
+     * An open detail is guessed at its row's height until it has been drawn and measured.
      */
     computeEstimatedRowHeight?: (index: number) => number;
     /** Runs when the reader sorts by a different column, or reverses the one it is sorted by. */
@@ -150,6 +218,13 @@ export type BaseTableCbs<T> = {
     onRowActivate?: (row: T, index: number) => void;
     /** Runs when the selection changes. */
     onSelectionChange?: (rows: T[]) => void;
+    /**
+     * Whether a row can open a detail beneath it. Every row can when it is left out, as long as the table draws
+     * details at all.
+     */
+    computeIsExpandable?: (row: T) => boolean;
+    /** Runs when a row's detail is opened or closed, with every row whose detail is now open. */
+    onExpandedChange?: (rows: T[]) => void;
 };
 
 export type BaseTableProps<T> = BaseTableValues<T> & BaseTableCbs<T>;

@@ -25,6 +25,8 @@ const thumb = (scope: string) => `${scope} button > div > div:last-of-type`;
  * `from` the thumb does not cover — which is the case the hit test is there to refuse.
  */
 const slide = async (page: Page, locator: Locator, from: number, to: number) => {
+    await locator.scrollIntoViewIfNeeded();
+
     const box = (await locator.boundingBox())!;
     const y = box.y + box.height * 0.5;
 
@@ -400,4 +402,116 @@ test("the thumb completes once let go past the completion ratio, and not short o
     expect(await readout(page, "default"), "let go past it, it completes without reaching the end").toContain(
         "activations: 1",
     );
+});
+
+const VERTICAL = demo("vertical");
+const RIGHT_TO_LEFT = demo("rightToLeft");
+
+/**
+ * The thumb and the track as screen boxes, for the two examples whose thumb does not rest at the left. Both come
+ * out of one `boundingBox` call each, so the `Viewport` scale is the same on both and every comparison below is
+ * between two numbers in one space.
+ */
+const restingBoxes = async (page: Page, scope: string) => {
+    await page.locator(track(scope)).scrollIntoViewIfNeeded();
+
+    return {
+        track: (await page.locator(track(scope)).boundingBox())!,
+        thumb: (await page.locator(thumb(scope)).boundingBox())!,
+    };
+};
+
+/**
+ * A slide written in screen points rather than fractions of the width, because the two examples here travel up the
+ * track and leftward along it — the press starts on the thumb's middle wherever it rests, and ends at a point named
+ * on the track's own edges.
+ */
+const slideBetween = async (page: Page, from: { x: number; y: number }, to: { x: number; y: number }) => {
+    await page.mouse.move(from.x, from.y);
+    await page.mouse.down();
+    await page.mouse.move(to.x, to.y, { steps: 10 });
+    await page.mouse.up();
+};
+
+const middleOf = (box: { x: number; y: number; width: number; height: number }) => ({
+    x: box.x + box.width * 0.5,
+    y: box.y + box.height * 0.5,
+});
+
+/**
+ * A vertical button rests its thumb at the bottom and slides it up, as a lock screen does. The thumb's resting place
+ * is read against the track's own edges — its bottom edge on the track's, its top edge well below the track's — and
+ * the wrong way is asserted as well as the right one: a gesture still measuring from the top would take the downward
+ * drag as the one that completes.
+ */
+test("a vertical button rests at the bottom and completes by sliding up, never down", async ({ page }) => {
+    const { track: trackBox, thumb: thumbBox } = await restingBoxes(page, VERTICAL);
+    const start = middleOf(thumbBox);
+
+    expect(thumbBox.y + thumbBox.height, "the thumb sits on the track's bottom edge").toBeCloseTo(
+        trackBox.y + trackBox.height,
+        0,
+    );
+    expect(thumbBox.y, "and nowhere near its top").toBeGreaterThan(trackBox.y + trackBox.height * 0.5);
+
+    await slideBetween(page, start, { x: start.x, y: trackBox.y + trackBox.height + thumbBox.height });
+
+    expect(await readout(page, "vertical"), "pulling the thumb downward does nothing").toContain("activations: 0");
+
+    await slideBetween(page, start, { x: start.x, y: trackBox.y });
+
+    expect(await readout(page, "vertical"), "and carrying it to the top is the slide").toContain("activations: 1");
+
+    await expect
+        .poll(async () => (await page.locator(thumb(VERTICAL)).boundingBox())!.y, {
+            message: "after which it drops back to the bottom",
+        })
+        .toBeCloseTo(thumbBox.y, 0);
+});
+
+/**
+ * Inside a right-to-left box a horizontal button turns round: the thumb rests at the right and slides leftward. The
+ * rightward drag is asserted too, because a gesture still running left to right would never see a press at the right
+ * as a press on the thumb, and a painter still drawing from the left would put the thumb where the gesture is not.
+ */
+test("a right-to-left button rests at the right and completes by sliding leftward", async ({ page }) => {
+    const { track: trackBox, thumb: thumbBox } = await restingBoxes(page, RIGHT_TO_LEFT);
+    const start = middleOf(thumbBox);
+
+    expect(thumbBox.x + thumbBox.width, "the thumb sits on the track's right edge").toBeCloseTo(
+        trackBox.x + trackBox.width,
+        0,
+    );
+    expect(thumbBox.x, "and nowhere near its left").toBeGreaterThan(trackBox.x + trackBox.width * 0.5);
+
+    await slideBetween(page, start, { x: trackBox.x + trackBox.width + thumbBox.width, y: start.y });
+
+    expect(await readout(page, "rightToLeft"), "pushing the thumb rightward does nothing").toContain("activations: 0");
+
+    await slideBetween(page, start, { x: trackBox.x, y: start.y });
+
+    expect(await readout(page, "rightToLeft"), "and carrying it to the left end is the slide").toContain(
+        "activations: 1",
+    );
+
+    await expect
+        .poll(async () => (await page.locator(thumb(RIGHT_TO_LEFT)).boundingBox())!.x, {
+            message: "after which it returns to the right",
+        })
+        .toBeCloseTo(thumbBox.x, 0);
+});
+
+/**
+ * The keyboard route is a held Enter whatever the axis or the direction, since `role="button"` has no orientation to
+ * state and there is no arrow walk along the track to turn round. Both turned examples are held in turn.
+ */
+test("a held Enter confirms a vertical button and a right-to-left one alike", async ({ page }) => {
+    for (const key of ["vertical", "rightToLeft"]) {
+        await page.locator(track(demo(key))).focus();
+        await page.keyboard.down("Enter");
+        await page.waitForTimeout(HOLD_DURATION_MS + HOLD_SLACK_MS);
+        await page.keyboard.up("Enter");
+
+        expect(await readout(page, key), `holding Enter on the ${key} button confirms it`).toContain("activations: 1");
+    }
 });

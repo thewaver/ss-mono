@@ -1,4 +1,17 @@
+import type { Size2d } from "@thewaver/ss-utils";
+
+import type { NavigatorDirection } from "../../../Abstracts/Navigator/Navigator.types";
+
+export type SlideButtonOrientation = "horizontal" | "vertical";
+
 export type SlideButtonRenderProps = {
+    /** Whether the track runs across the page or up it, which is what the painter positions the thumb along. */
+    orientation: SlideButtonOrientation;
+    /**
+     * Which way text runs around the button. On a horizontal track the thumb rests at the right and travels leftward
+     * under `"rtl"`, so the painter places it from the right edge; on a vertical track it changes nothing.
+     */
+    direction: NavigatorDirection;
     /** How far the thumb has been slid, as a share of its travel. */
     progressRatio: number;
     /** Whether the thumb is being dragged right now. */
@@ -19,7 +32,17 @@ export type SlideButtonCbs = {
 export type SlideButtonMode = "slide" | "hold" | "both";
 
 export type SlideButtonState = {
-    /** How large the thumb is. The track reserves room for it so the far end stays reachable. */
+    /**
+     * Whether the track runs across the page or up it. A horizontal button slides from the side the text starts on —
+     * left to right, or right to left in a right-to-left page; a vertical one slides upward, from the bottom of the
+     * track to the top, whichever way the text runs.
+     *
+     * The thumb is found and followed along this axis, and the painter receives it among the flags to draw the thumb
+     * along the same one. The hold, a held Enter or Space and a click from assistive technology work the same way on
+     * both.
+     */
+    orientation?: SlideButtonOrientation;
+    /** How long the thumb is along the track. The track reserves room for it so the far end stays reachable. */
     thumbSize?: number;
     /**
      * How long the button has to be held to confirm without sliding, which is the keyboard and assistive route to the
@@ -68,10 +91,12 @@ export type SlideButtonGestureState = {
 
 export type SlideButtonGestureDefs = {
     getMode: () => SlideButtonMode;
+    getOrientation: () => SlideButtonOrientation;
+    getDirection: () => NavigatorDirection;
     getThumbSize: () => number;
     getHoldDurationMs: () => number;
     getCompletionRatio: () => number;
-    getTrackWidth: () => number;
+    getTrackSize: () => Size2d;
     getProgressRatio: () => number;
     setProgressRatio: (ratio: number) => void;
     onActivate: () => void;

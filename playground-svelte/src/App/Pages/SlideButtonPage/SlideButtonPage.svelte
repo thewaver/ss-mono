@@ -14,7 +14,9 @@
     import HeldExample from "./Examples/Held.svelte";
     import HoldOnlyExample from "./Examples/HoldOnly.svelte";
     import ReachableExample from "./Examples/Reachable.svelte";
+    import RightToLeftExample from "./Examples/RightToLeft.svelte";
     import SlideOnlyExample from "./Examples/SlideOnly.svelte";
+    import VerticalExample from "./Examples/Vertical.svelte";
     import {
     EXAMPLE_NAMES,
     EXAMPLES_ROOT,
@@ -32,6 +34,8 @@
     let hasError = $state(true);
     let slideOnlySends = $state(0);
     let holdOnlySends = $state(0);
+    let verticalSends = $state(0);
+    let rightToLeftSends = $state(0);
 
     const examples: ExampleDefs[] = [
         {
@@ -65,6 +69,22 @@
                 `activations: ${holdOnlySends} — dragging the thumb does nothing here, so a stray drag cannot reach the action, and a held press or a held Enter both can`,
             component: holdOnlyExample,
             path: `${EXAMPLES_ROOT}/HoldOnly.svelte`,
+        },
+        {
+            key: "vertical",
+            name: EXAMPLE_NAMES.vertical,
+            readout: () =>
+                `activations: ${verticalSends} — the thumb rests at the bottom and slides up, and a held press or a held Enter fill it the same way`,
+            component: verticalExample,
+            path: `${EXAMPLES_ROOT}/Vertical.svelte`,
+        },
+        {
+            key: "rightToLeft",
+            name: EXAMPLE_NAMES.rightToLeft,
+            readout: () =>
+                `activations: ${rightToLeftSends} — the box around the button sets dir="rtl", so the thumb rests at the right and slides leftward`,
+            component: rightToLeftExample,
+            path: `${EXAMPLES_ROOT}/RightToLeft.svelte`,
         },
         {
             key: "held",
@@ -132,6 +152,26 @@
         <HoldOnlyExample
             onActivate={() => {
                 holdOnlySends += 1;
+            }}
+        />
+    </div>
+{/snippet}
+
+{#snippet verticalExample()}
+    <div class={styles.stage}>
+        <VerticalExample
+            onActivate={() => {
+                verticalSends += 1;
+            }}
+        />
+    </div>
+{/snippet}
+
+{#snippet rightToLeftExample()}
+    <div class={styles.stage}>
+        <RightToLeftExample
+            onActivate={() => {
+                rightToLeftSends += 1;
             }}
         />
     </div>

@@ -14,7 +14,10 @@ import type {
     CarryPlace,
     SelectionGesture,
     TableCellRenderProps,
+    TableColumnPin,
     TableColumnRenderProps,
+    TableDetailRenderProps,
+    TableFocus,
     TableHeaderContextType,
     VirtualizerRow,
 } from "@thewaver/ss-components";
@@ -30,8 +33,28 @@ import { VirtualizerVueUtils } from "../../Abstracts/Virtualizer/VirtualizerVue.
 import { watchAfterRender } from "../../Utils/effectUtils";
 import { callSlot, declareProps, useTwoWay } from "../../Utils/propUtils";
 import type { SlotsContext } from "../../Utils/typeUtils";
-import { provideTableHeaderContext, useTableHeaderContext } from "./Table.context";
-import type { TableColumn, TableHeaderReorderSlots, TableHeaderSortSlots, TableProps, TableSlots } from "./Table.types";
+import {
+    provideTableCellContext,
+    provideTableHeaderContext,
+    useTableCellContext,
+    useTableHeaderContext,
+} from "./Table.context";
+import type {
+    TableColumn,
+    TableHeaderReorderSlots,
+    TableHeaderSortSlots,
+    TableProps,
+    TableRowExpanderSlots,
+    TableSlots,
+} from "./Table.types";
+
+const getPinClass = (pin: TableColumnPin | undefined) => ({
+    [TableStyles.tablePinnedStart]: pin === "start",
+    [TableStyles.tablePinnedEnd]: pin === "end",
+});
+
+const getPinStyle = (offset: number | undefined) =>
+    offset === undefined ? undefined : assignInlineVars({ [TableStyles.tablePinOffsetVar]: `${offset}px` });
 
 type TableHeaderCellProps<T> = {
     column: TableColumn<T>;
@@ -42,6 +65,7 @@ type TableHeaderCellProps<T> = {
     isDisabled: boolean;
     isReorderable: boolean;
     hintId: string | undefined;
+    pinOffset: number | undefined;
     landingCol: number | undefined;
     columnCount: number;
     renderProps: TableColumnRenderProps;
@@ -93,7 +117,8 @@ const TableHeaderCell = defineComponent(
         return () => (
             <div
                 id={props.cellId}
-                class={TableStyles.tableCell}
+                class={[TableStyles.tableCell, getPinClass(props.renderProps.pin)]}
+                style={getPinStyle(props.pinOffset)}
                 role="columnheader"
                 aria-colindex={props.columnIndex + TableConst.FIRST_ARIA_INDEX}
                 aria-sort={TableUtils.computeAriaSort(props.column, props.renderProps.sortDirection)}
@@ -126,6 +151,7 @@ const TableHeaderCell = defineComponent(
             isDisabled: Boolean,
             isReorderable: Boolean,
             hintId: null,
+            pinOffset: null,
             landingCol: null,
             columnCount: null,
             renderProps: null,
@@ -140,8 +166,61 @@ const TableHeaderCell = defineComponent(
     },
 );
 
+type TableBodyCellProps = {
+    cellId: string;
+    columnIndex: number;
+    isRoving: boolean;
+    isDisabled: boolean;
+    pinOffset: number | undefined;
+    renderProps: TableCellRenderProps;
+    renderContent: () => VNodeChild;
+    onClick: (e: MouseEvent) => void;
+    onToggle: () => void;
+    onRegisterExpander: () => void;
+};
+
+const TableBodyCell = defineComponent(
+    (props: TableBodyCellProps) => {
+        provideTableCellContext({
+            getRenderProps: () => props.renderProps,
+            toggle: () => props.onToggle(),
+            registerExpander: () => props.onRegisterExpander(),
+        });
+
+        return () => (
+            <div
+                id={props.cellId}
+                class={[TableStyles.tableCell, getPinClass(props.renderProps.pin)]}
+                style={getPinStyle(props.pinOffset)}
+                role="gridcell"
+                aria-colindex={props.columnIndex + TableConst.FIRST_ARIA_INDEX}
+                aria-disabled={props.isDisabled || undefined}
+                tabindex={props.isRoving ? 0 : -1}
+                onClick={props.onClick}
+            >
+                {props.renderContent()}
+            </div>
+        );
+    },
+    {
+        name: "TableBodyCell",
+        props: declareProps<TableBodyCellProps>({
+            cellId: null,
+            columnIndex: null,
+            isRoving: Boolean,
+            isDisabled: Boolean,
+            pinOffset: null,
+            renderProps: null,
+            renderContent: null,
+            onClick: null,
+            onToggle: null,
+            onRegisterExpander: null,
+        }),
+    },
+);
+
 export const Table = defineComponent(
-    <T,>(props: TableProps<T>, { slots }: SlotsContext<TableSlots>) => {
+    <T,>(props: TableProps<T>, { slots }: SlotsContext<TableSlots<T>>) => {
         const tableId = useId();
         const hintId = useId();
 
@@ -153,7 +232,7 @@ export const Table = defineComponent(
         let resizeStart = { x: 0, width: 0, hasDragged: false };
         let hasCarriedClick = false;
 
-        const focusedCell = shallowRef<Index2d>({ row: TableConst.HEADER_ROW_INDEX, col: 0 });
+        const focus = shallowRef<TableFocus>({ cell: { row: TableConst.HEADER_ROW_INDEX, col: 0 }, isDetail: false });
         const hoveredRow = shallowRef<number>();
         const hoveredColumn = shallowRef<number>();
         const resizingColumnId = shallowRef(TableConst.NO_RESIZING);
@@ -162,6 +241,7 @@ export const Table = defineComponent(
         const storedWidths = useTwoWay(props, "widths", undefined, { keepsOwnValue: false });
         const storedOrder = useTwoWay(props, "order", undefined, { keepsOwnValue: false });
         const storedSelection = useTwoWay(props, "selection", undefined, { keepsOwnValue: false });
+        const storedExpanded = useTwoWay(props, "expanded", []);
 
         watchAfterRender([], () => LiveAnnouncerUtils.reserve("polite"));
 
@@ -180,10 +260,15 @@ export const Table = defineComponent(
         );
 
         const columnOrder = computed(() =>
-            TableUtils.getColumnOrder(props.columns, storedOrder.value ?? TableConst.EMPTY_ORDER),
+            TableUtils.getPinnedOrder(
+                props.columns,
+                TableUtils.getColumnOrder(props.columns, storedOrder.value ?? TableConst.EMPTY_ORDER),
+            ),
         );
 
         const columns = computed(() => TableUtils.getReordered(props.columns, columnOrder.value));
+
+        const pinOffsets = computed(() => TableUtils.computePinOffsets(columns.value, widths.value));
 
         const sortedColumn = computed(() => {
             const sort = storedSort.value;
@@ -197,9 +282,30 @@ export const Table = defineComponent(
 
         const selectedRows = computed(() => new Set(selected.value));
 
-        const grid = computed(() => ({ rowCount: rows.value.length + 1, colCount: columns.value.length }));
+        const getIsExpandable = () => slots.renderDetail !== undefined;
 
-        const rovingCell = computed(() => TableUtils.clampCell(focusedCell.value, grid.value));
+        const getIsRowExpandable = (row: T | undefined) =>
+            row !== undefined && getIsExpandable() && (props.computeIsExpandable?.(row) ?? true);
+
+        const expandedRows = computed(() =>
+            getIsExpandable()
+                ? TableUtils.getExpandedRows(rows.value, storedExpanded.value, props.computeIsExpandable)
+                : TableConst.EMPTY_EXPANDED_ROWS,
+        );
+
+        const expandedRowSet = computed(() => new Set(expandedRows.value));
+
+        const getWalkRow = (layoutRow: number) => TableUtils.getEntryIndex(layoutRow, expandedRows.value) + 1;
+
+        const entryCount = computed(() => TableUtils.getEntryCount(rows.value.length, expandedRows.value));
+
+        const grid = computed(() => ({ rowCount: entryCount.value + 1, colCount: columns.value.length }));
+
+        const rovingCell = computed(() =>
+            TableUtils.clampCell(TableUtils.computeWalkCell(focus.value, expandedRows.value), grid.value),
+        );
+
+        const rovingFocus = computed(() => TableUtils.computeFocus(rovingCell.value, expandedRows.value));
 
         const rovingRow = computed(() => rovingCell.value.row);
 
@@ -210,22 +316,39 @@ export const Table = defineComponent(
             rovingRow.value === TableConst.HEADER_ROW_INDEX ? TableConst.EMPTY_PINNED_ROWS : [rovingRow.value - 1],
         );
 
-        const rowWindow = VirtualizerVueUtils.useRowWindow(bodyRef, () => rows.value.length, {
+        const rowWindow = VirtualizerVueUtils.useRowWindow(bodyRef, entryCount, {
             isDisabled: () => !getIsVirtualized(),
-            computeEstimatedSize: (index) => props.computeEstimatedRowHeight?.(index) ?? 0,
+            computeEstimatedSize: (index) =>
+                props.computeEstimatedRowHeight?.(TableUtils.getEntry(index, expandedRows.value).layoutRow) ?? 0,
             pinnedRows,
         });
 
         const getCellId = (cell: Index2d) => TableUtils.getCellId(tableId, cell);
 
-        const getIsRoving = (cell: Index2d) => rovingCell.value.row === cell.row && rovingCell.value.col === cell.col;
+        const getDetailId = (layoutRow: number) => TableUtils.getDetailId(tableId, layoutRow);
 
-        const focusCell = (cell: Index2d) => {
-            focusedCell.value = cell;
+        const getIsRoving = (cell: Index2d) => {
+            const roving = rovingFocus.value;
 
-            if (cell.row > TableConst.HEADER_ROW_INDEX && rowWindow.isLive.value) rowWindow.scrollToRow(cell.row - 1);
+            return !roving.isDetail && roving.cell.row === cell.row && roving.cell.col === cell.col;
+        };
 
-            const id = getCellId(cell);
+        const getIsDetailRoving = (layoutRow: number) => {
+            const roving = rovingFocus.value;
+
+            return roving.isDetail && roving.cell.row === layoutRow + 1;
+        };
+
+        const focusAt = (next: TableFocus) => {
+            focus.value = next;
+
+            const walkCell = TableUtils.computeWalkCell(next, expandedRows.value);
+
+            if (walkCell.row > TableConst.HEADER_ROW_INDEX && rowWindow.isLive.value) {
+                rowWindow.scrollToRow(walkCell.row - 1);
+            }
+
+            const id = next.isDetail ? getDetailId(next.cell.row - 1) : getCellId(next.cell);
             const element = document.getElementById(id);
 
             if (element) {
@@ -246,9 +369,48 @@ export const Table = defineComponent(
             element.focus();
         };
 
-        onMounted(focusPending);
+        const focusCell = (cell: Index2d) => focusAt({ cell, isDetail: false });
 
-        onUpdated(focusPending);
+        let hasExpander = false;
+        let hasWarnedExpander = false;
+        let hasRenderedExpandableRow = false;
+
+        const warnIfExpanderMissing = () => {
+            if (hasExpander || hasWarnedExpander || !hasRenderedExpandableRow) return;
+
+            hasWarnedExpander = true;
+
+            TableUtils.warnIfExpanderMissing();
+        };
+
+        onMounted(() => {
+            focusPending();
+            warnIfExpanderMissing();
+        });
+
+        onUpdated(() => {
+            focusPending();
+            warnIfExpanderMissing();
+        });
+
+        const toggleExpanded = (layoutRow: number) => {
+            const row = rows.value[layoutRow];
+
+            if (getIsDisabled() || !getIsRowExpandable(row)) return;
+
+            const next = TableUtils.getToggledExpanded(storedExpanded.value, row);
+
+            storedExpanded.value = next;
+            props.onExpandedChange?.(next);
+        };
+
+        watchAfterRender([focus, expandedRowSet], ([current, openRows]) => {
+            if (!current.isDetail || openRows.has(current.cell.row - 1)) return;
+
+            focus.value = { cell: current.cell, isDetail: false };
+
+            if (document.activeElement === document.body) document.getElementById(getCellId(current.cell))?.focus();
+        });
 
         const toggleSort = (column: TableColumn<T> | undefined) => {
             if (!column || column.isSortable !== true || getIsDisabled()) return;
@@ -343,6 +505,7 @@ export const Table = defineComponent(
         const moveColumn = (fromIndex: number, toIndex: number) => {
             if (!getIsReorderable(columns.value[fromIndex]) || getIsDisabled()) return false;
             if (toIndex < 0 || toIndex >= columns.value.length) return false;
+            if (TableUtils.clampToPinGroup(columns.value, fromIndex, toIndex) !== toIndex) return false;
 
             const next = ObjectUtils.moveArrayElement(
                 columns.value.map((column) => column.id),
@@ -383,15 +546,22 @@ export const Table = defineComponent(
             getKeyHint: () => props.announcements!.keyHint,
             getAnnouncements: () => props.announcements!,
             computeCanAccept: () => !getIsDisabled() && getIsOrdered(),
-            computePlaceAtPoint: (point) =>
-                TableUtils.computeColumnPlaceAtPoint(
-                    getHeaderRects(),
-                    point,
-                    getSourceColumnIndex() ?? 0,
-                    direction.value,
-                ),
-            computeNudgedPlace: (place, nudge) =>
-                TableUtils.computeColumnNudgedPlace(place, nudge, columns.value.length),
+            computePlaceAtPoint: (point) => {
+                const source = getSourceColumnIndex() ?? 0;
+
+                return TableUtils.clampToPinGroup(
+                    columns.value,
+                    source,
+                    TableUtils.computeColumnPlaceAtPoint(getHeaderRects(), point, source, direction.value),
+                );
+            },
+            computeNudgedPlace: (place, nudge) => {
+                const nudged = TableUtils.computeColumnNudgedPlace(place, nudge, columns.value.length);
+
+                return nudged === undefined
+                    ? undefined
+                    : TableUtils.clampToPinGroup(columns.value, getSourceColumnIndex() ?? 0, nudged);
+            },
             computeEntryPlace: () => getSourceColumnIndex() ?? 0,
             computeIsSamePlace: (a, b) => a === b,
             computeIsPlaceAllowed: () => true,
@@ -469,11 +639,17 @@ export const Table = defineComponent(
         };
 
         const handleKeyDown = (e: KeyboardEvent) => {
+            if (TableUtils.getIsInsideDetail(e.target, e.currentTarget as HTMLElement)) return;
+
             const from = rovingCell.value;
             const column = columns.value[from.col];
             const command = TableUtils.computeKeyCommand(e, from, grid.value, {
                 direction: direction.value,
                 pageRows: props.pageRows ?? TABLE_DEFAULTS.pageRows,
+                expandedRows: expandedRows.value,
+                computeIsExpandable: getIsExpandable()
+                    ? (layoutRow) => getIsRowExpandable(rows.value[layoutRow])
+                    : undefined,
             });
 
             if (command === undefined) return;
@@ -510,6 +686,12 @@ export const Table = defineComponent(
                 return;
             }
 
+            if (command.kind === "toggle_row") {
+                toggleExpanded(command.rowIndex);
+
+                return;
+            }
+
             if (command.kind === "activate_row") {
                 if (!getIsDisabled()) props.onRowActivate?.(rows.value[command.rowIndex], command.rowIndex);
 
@@ -522,9 +704,11 @@ export const Table = defineComponent(
                 return;
             }
 
-            focusCell(command.cell);
+            const next = TableUtils.computeFocus(command.cell, expandedRows.value);
 
-            if (command.isExtending) selectRow(command.cell.row - 1, { isExtending: true });
+            focusAt(next);
+
+            if (command.isExtending) selectRow(next.cell.row - 1, { isExtending: true });
         };
 
         const handleCellClick = (e: MouseEvent, cell: Index2d) => {
@@ -555,18 +739,32 @@ export const Table = defineComponent(
             });
         };
 
-        const getCellRenderProps = (layoutCol: number, layoutRow: number): TableCellRenderProps =>
-            TableUtils.computeCellRenderProps({
+        const getCellRenderProps = (layoutCol: number, layoutRow: number): TableCellRenderProps => {
+            const roving = rovingFocus.value;
+
+            return TableUtils.computeCellRenderProps({
                 columnId: columns.value[layoutCol].id,
                 dataCol: getDataCol(layoutCol),
                 layoutCol,
                 dataRow: getDataRow(layoutRow),
                 layoutRow,
                 isSelected: selectedRows.value.has(rows.value[layoutRow]),
-                roving: rovingCell.value,
+                roving: roving.isDetail ? TableConst.NO_CELL : roving.cell,
                 hoveredRow: hoveredRow.value,
                 isDisabled: getIsDisabled(),
+                pin: columns.value[layoutCol].pin,
+                isExpandable: getIsRowExpandable(rows.value[layoutRow]),
+                isExpanded: expandedRowSet.value.has(layoutRow),
             });
+        };
+
+        const getDetailRenderProps = (layoutRow: number): TableDetailRenderProps => ({
+            dataRow: getDataRow(layoutRow),
+            layoutRow,
+            isSelected: selectedRows.value.has(rows.value[layoutRow]),
+            isFocused: getIsDetailRoving(layoutRow),
+            isDisabled: getIsDisabled(),
+        });
 
         const renderResizer = (column: TableColumn<T>, columnIndex: number, renderProps: TableColumnRenderProps) => (
             <div
@@ -584,43 +782,110 @@ export const Table = defineComponent(
             </div>
         );
 
-        const renderRow = (row: T, rowIndex: number, virtualRow?: VirtualizerRow) => (
-            <div
-                key={rowIndex}
-                class={virtualRow ? [TableStyles.tableRow, TableStyles.tableWindowedRow] : TableStyles.tableRow}
-                role="row"
-                aria-rowindex={rowIndex + 1 + TableConst.FIRST_ARIA_INDEX}
-                aria-selected={selectionMode.value === "none" ? undefined : selectedRows.value.has(row)}
-                aria-label={props.computeRowAriaLabel?.(row, rowIndex)}
-                style={virtualRow ? { transform: `translateY(${rowWindow.getRowStart(virtualRow)}px)` } : undefined}
-                ref={virtualRow ? rowWindow.measureRow(virtualRow.index) : undefined}
-                onPointerenter={() => {
-                    hoveredRow.value = rowIndex;
-                }}
-                onPointerleave={() => {
-                    hoveredRow.value = undefined;
-                }}
-            >
-                {columns.value.map((column, columnIndex) => {
-                    const cell = { row: rowIndex + 1, col: columnIndex };
+        const getRowClass = (virtualRow: VirtualizerRow | undefined) =>
+            virtualRow ? [TableStyles.tableRow, TableStyles.tableWindowedRow] : TableStyles.tableRow;
 
-                    return (
-                        <div
-                            key={columnIndex}
-                            id={getCellId(cell)}
-                            class={TableStyles.tableCell}
-                            role="gridcell"
-                            aria-colindex={columnIndex + TableConst.FIRST_ARIA_INDEX}
-                            aria-disabled={getIsDisabled() || undefined}
-                            tabindex={getIsRoving(cell) ? 0 : -1}
-                            onClick={(e) => handleCellClick(e, cell)}
-                        >
-                            {column.renderCell({ row, renderProps: getCellRenderProps(columnIndex, rowIndex) })}
-                        </div>
-                    );
-                })}
+        const getRowStyle = (virtualRow: VirtualizerRow | undefined) =>
+            virtualRow ? { transform: `translateY(${rowWindow.getRowStart(virtualRow)}px)` } : undefined;
+
+        const renderRow = (row: T, rowIndex: number, virtualRow?: VirtualizerRow) => {
+            const isRowExpandable = getIsRowExpandable(row);
+
+            if (isRowExpandable) hasRenderedExpandableRow = true;
+
+            return (
+                <div
+                    key={`row-${rowIndex}`}
+                    class={getRowClass(virtualRow)}
+                    role="row"
+                    aria-rowindex={getWalkRow(rowIndex) + TableConst.FIRST_ARIA_INDEX}
+                    aria-level={getIsExpandable() ? TableConst.ROW_LEVEL : undefined}
+                    aria-expanded={isRowExpandable ? expandedRowSet.value.has(rowIndex) : undefined}
+                    aria-selected={selectionMode.value === "none" ? undefined : selectedRows.value.has(row)}
+                    aria-label={props.computeRowAriaLabel?.(row, rowIndex)}
+                    style={getRowStyle(virtualRow)}
+                    ref={virtualRow ? rowWindow.measureRow(virtualRow.index) : undefined}
+                    onPointerenter={() => {
+                        hoveredRow.value = rowIndex;
+                    }}
+                    onPointerleave={() => {
+                        hoveredRow.value = undefined;
+                    }}
+                >
+                    {columns.value.map((column, columnIndex) => {
+                        const cell = { row: rowIndex + 1, col: columnIndex };
+                        const renderProps = getCellRenderProps(columnIndex, rowIndex);
+
+                        return (
+                            <TableBodyCell
+                                key={columnIndex}
+                                cellId={getCellId(cell)}
+                                columnIndex={columnIndex}
+                                isRoving={getIsRoving(cell)}
+                                isDisabled={getIsDisabled()}
+                                pinOffset={pinOffsets.value[columnIndex]}
+                                renderProps={renderProps}
+                                renderContent={() => column.renderCell({ row, renderProps })}
+                                onClick={(e) => handleCellClick(e, cell)}
+                                onToggle={() => {
+                                    focusCell(cell);
+                                    toggleExpanded(rowIndex);
+                                }}
+                                onRegisterExpander={() => {
+                                    hasExpander = true;
+                                }}
+                            />
+                        );
+                    })}
+                </div>
+            );
+        };
+
+        const handleDetailClick = (e: MouseEvent, layoutRow: number) => {
+            if (TableUtils.getIsInteractiveInCell(e.target, e.currentTarget as HTMLElement)) return;
+
+            focusAt({ cell: { row: layoutRow + 1, col: rovingCell.value.col }, isDetail: true });
+        };
+
+        const renderDetailRow = (row: T, layoutRow: number, virtualRow?: VirtualizerRow) => (
+            <div
+                key={`detail-${layoutRow}`}
+                class={getRowClass(virtualRow)}
+                role="row"
+                aria-rowindex={getWalkRow(layoutRow) + 1 + TableConst.FIRST_ARIA_INDEX}
+                aria-level={TableConst.DETAIL_LEVEL}
+                style={getRowStyle(virtualRow)}
+                ref={virtualRow ? rowWindow.measureRow(virtualRow.index) : undefined}
+            >
+                <div
+                    {...{ [TableUtils.DETAIL_ATTRIBUTE]: "true" }}
+                    id={getDetailId(layoutRow)}
+                    class={TableStyles.tableDetailCell}
+                    role="gridcell"
+                    aria-colindex={TableConst.FIRST_ARIA_INDEX}
+                    aria-colspan={columns.value.length}
+                    aria-disabled={getIsDisabled() || undefined}
+                    tabindex={getIsDetailRoving(layoutRow) ? 0 : -1}
+                    onClick={(e) => handleDetailClick(e, layoutRow)}
+                >
+                    {callSlot(slots.renderDetail, { row, renderProps: getDetailRenderProps(layoutRow) })}
+                </div>
             </div>
         );
+
+        const renderEntries = (row: T, rowIndex: number) =>
+            expandedRowSet.value.has(rowIndex)
+                ? [renderRow(row, rowIndex), renderDetailRow(row, rowIndex)]
+                : [renderRow(row, rowIndex)];
+
+        const renderWindowedEntry = (virtualRow: VirtualizerRow) => {
+            const entry = TableUtils.getEntry(virtualRow.index, expandedRows.value);
+            const row = rows.value[entry.layoutRow];
+
+            return entry.kind === "detail"
+                ? renderDetailRow(row, entry.layoutRow, virtualRow)
+                : renderRow(row, entry.layoutRow, virtualRow);
+        };
 
         const renderHeaderCell = (column: TableColumn<T>, columnIndex: number) => {
             const cell = { row: TableConst.HEADER_ROW_INDEX, col: columnIndex };
@@ -638,6 +903,7 @@ export const Table = defineComponent(
                     isDisabled={getIsDisabled()}
                     isReorderable={getIsReorderable(column)}
                     hintId={getIsOrdered() ? hintId : undefined}
+                    pinOffset={pinOffsets.value[columnIndex]}
                     landingCol={landingCol.value}
                     columnCount={columnCount}
                     renderProps={renderProps}
@@ -681,18 +947,21 @@ export const Table = defineComponent(
         };
 
         return () => {
+            hasRenderedExpandableRow = false;
+
             const isDisabled = getIsDisabled();
             const isWindowed = getIsVirtualized() && !rowWindow.hasNoScroller.value;
 
             const rootStyle = assignInlineVars({
                 [TableStyles.tableTemplateVar]: TableUtils.getColumnTemplate(columns.value, widths.value),
                 [TableStyles.tableResizerWidthVar]: `${props.resizerWidthPx ?? TABLE_DEFAULTS.resizerWidthPx}px`,
+                [TableStyles.tableMinWidthVar]: `${TableUtils.computeMinTableWidth(columns.value, widths.value)}px`,
             });
 
             return (
                 <div
                     class={TableStyles.tableRoot}
-                    role="grid"
+                    role={getIsExpandable() ? "treegrid" : "grid"}
                     aria-label={props.ariaLabel}
                     aria-rowcount={grid.value.rowCount}
                     aria-colcount={grid.value.colCount}
@@ -719,11 +988,7 @@ export const Table = defineComponent(
                         role="rowgroup"
                         style={{ height: isWindowed ? `${rowWindow.totalSize.value}px` : undefined }}
                     >
-                        {isWindowed
-                            ? rowWindow.rows.value.map((virtualRow) =>
-                                  renderRow(rows.value[virtualRow.index], virtualRow.index, virtualRow),
-                              )
-                            : rows.value.map((row, rowIndex) => renderRow(row, rowIndex))}
+                        {isWindowed ? rowWindow.rows.value.map(renderWindowedEntry) : rows.value.flatMap(renderEntries)}
                     </div>
                 </div>
             );
@@ -731,7 +996,7 @@ export const Table = defineComponent(
     },
     {
         name: "Table",
-        slots: Object as SlotsType<TableSlots>,
+        slots: Object as SlotsType<TableSlots<any>>,
         props: declareProps<TableProps<unknown>>({
             "announcements": null,
             "order": null,
@@ -756,6 +1021,10 @@ export const Table = defineComponent(
             "computeRowAriaLabel": null,
             "onRowActivate": null,
             "onSelectionChange": null,
+            "expanded": null,
+            "onUpdate:expanded": null,
+            "computeIsExpandable": null,
+            "onExpandedChange": null,
         }),
     },
 );
@@ -818,4 +1087,33 @@ export const TableHeaderReorder = defineComponent(
         };
     },
     { name: "TableHeaderReorder", slots: Object as SlotsType<TableHeaderReorderSlots> },
+);
+
+export const TableRowExpander = defineComponent(
+    (_props: object, { slots }: SlotsContext<TableRowExpanderSlots>) => {
+        const context = useTableCellContext("TableRowExpander");
+
+        return () => {
+            context?.registerExpander();
+
+            if (!context?.getRenderProps().isExpandable) return null;
+
+            return (
+                <button
+                    type="button"
+                    class={TableStyles.tableRowExpander}
+                    tabindex={-1}
+                    aria-hidden="true"
+                    onClick={(e) => {
+                        e.stopPropagation();
+
+                        context.toggle();
+                    }}
+                >
+                    {callSlot(slots.renderContent, context.getRenderProps())}
+                </button>
+            );
+        };
+    },
+    { name: "TableRowExpander", slots: Object as SlotsType<TableRowExpanderSlots> },
 );

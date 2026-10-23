@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import {
+    type NavigatorDirection,
     SLIDE_BUTTON_DEFAULTS,
     type SlideButtonRenderProps,
     SlideButtonStyles,
@@ -9,6 +10,7 @@ import {
 import { SlideButtonConst } from "@thewaver/ss-components/internal";
 
 import { InteractionTrackerReactUtils } from "../../../Abstracts/InteractionTracker/InteractionTrackerReact.utils";
+import { NavigatorReactUtils } from "../../../Abstracts/Navigator/NavigatorReact.utils";
 import { SignalMirrorReactUtils } from "../../../Abstracts/SignalMirror/SignalMirrorReact.utils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import { useLatest } from "../../../Utils/refUtils";
@@ -27,6 +29,9 @@ const SlideButtonElement = (props: SlideButtonElementProps) => {
 
     FormFieldReactUtils.useRegisterControl(trackRef);
 
+    const direction = NavigatorReactUtils.useDirection(trackRef);
+    const directionRef = useLatest(direction);
+
     useLayoutEffect(() => {
         progressRef.current = props.progressRatio;
     });
@@ -36,10 +41,15 @@ const SlideButtonElement = (props: SlideButtonElementProps) => {
     const [gesture] = useState(() =>
         SlideButtonUtils.createGesture({
             getMode: () => latest.current.mode,
+            getOrientation: () => latest.current.orientation,
+            getDirection: () => directionRef.current,
             getThumbSize: () => latest.current.thumbSize,
             getHoldDurationMs: () => latest.current.holdDurationMs,
             getCompletionRatio: () => latest.current.completionRatio,
-            getTrackWidth: () => trackRef.current?.clientWidth ?? 0,
+            getTrackSize: () => ({
+                width: trackRef.current?.clientWidth ?? 0,
+                height: trackRef.current?.clientHeight ?? 0,
+            }),
             getProgressRatio: () => progressRef.current,
             setProgressRatio: (ratio) => {
                 progressRef.current = ratio;
@@ -55,16 +65,19 @@ const SlideButtonElement = (props: SlideButtonElementProps) => {
     const isGrabbed = useStore(gesture, (state) => state.isGrabbed);
 
     const { isDragging } = InteractionTrackerReactUtils.useDrag(trackRef, isDisabled, {
-        onDrag: (ratio) => gesture.drag(ratio.x),
+        onDrag: (ratio) => gesture.drag(ratio),
         onDragEnd: (reason) => gesture.dragEnd(reason),
     });
 
     const setIsDragging = props.setIsDragging;
     const setIsHolding = props.setIsHolding;
+    const setDirection = props.setDirection;
 
     useLayoutEffect(() => setIsDragging(isDragging && isGrabbed), [setIsDragging, isDragging, isGrabbed]);
 
     useLayoutEffect(() => setIsHolding(isHolding), [setIsHolding, isHolding]);
+
+    useLayoutEffect(() => setDirection(direction), [setDirection, direction]);
 
     useLayoutEffect(() => {
         if (isDisabled) gesture.reset();
@@ -122,8 +135,17 @@ export const SlideButton = (props: SlideButtonProps) => {
     );
     const [isDragging, setIsDragging] = useState(false);
     const [isHolding, setIsHolding] = useState(false);
+    const [direction, setDirection] = useState<NavigatorDirection>("ltr");
 
-    const extraFlags: SlideButtonRenderProps = { progressRatio, isDragging, isHolding };
+    const orientation = props.orientation ?? SLIDE_BUTTON_DEFAULTS.orientation;
+
+    const extraFlags: SlideButtonRenderProps = {
+        orientation,
+        direction,
+        progressRatio,
+        isDragging,
+        isHolding,
+    };
 
     return (
         <InteractionWrapper<SlideButtonRenderProps>
@@ -134,6 +156,7 @@ export const SlideButton = (props: SlideButtonProps) => {
                     ref={setElementRef}
                     id={props.id}
                     ariaLabel={props.ariaLabel}
+                    orientation={orientation}
                     thumbSize={props.thumbSize ?? SLIDE_BUTTON_DEFAULTS.thumbSize}
                     holdDurationMs={props.holdDurationMs ?? SLIDE_BUTTON_DEFAULTS.holdDurationMs}
                     completionRatio={props.completionRatio ?? SLIDE_BUTTON_DEFAULTS.completionRatio}
@@ -144,6 +167,7 @@ export const SlideButton = (props: SlideButtonProps) => {
                     setProgressRatio={setProgressRatio}
                     setIsDragging={setIsDragging}
                     setIsHolding={setIsHolding}
+                    setDirection={setDirection}
                     onActivate={props.onActivate}
                     onMouseEnter={props.onMouseEnter}
                     onMouseLeave={props.onMouseLeave}

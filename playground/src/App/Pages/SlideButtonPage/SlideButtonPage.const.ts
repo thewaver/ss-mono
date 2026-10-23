@@ -3,6 +3,8 @@ export const EXAMPLE_NAMES = {
     described: "Described by its field",
     slideOnly: "Slide only",
     holdOnly: "Hold only",
+    vertical: "Vertical",
+    rightToLeft: "In a right-to-left box",
     held: "Held at the end by the owner",
     disabled: "Disabled",
     reachable: "Disabled + reachable",

@@ -28,6 +28,7 @@ export namespace CarouselPlacementDefaults {
         depthPx: 180,
         perspectivePx: 800,
         visibleDistance: 4,
+        faceRatio: 1,
     };
 
     export const DEPTH_WAVE_DEFAULTS: Required<DepthWavePlacementDefs> = {
@@ -36,6 +37,7 @@ export namespace CarouselPlacementDefaults {
         tiltDegrees: 12,
         perspectivePx: 900,
         visibleDistance: 4,
+        faceRatio: 1,
     };
 
     export const CYLINDER_DEFAULTS: Required<CylinderPlacementDefs> = {

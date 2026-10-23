@@ -1,6 +1,12 @@
-import { CSSUtils, EasingUtils, MathUtils, type Point2d, type SwipeDirection } from "@thewaver/ss-utils";
+import { CSSUtils, EasingUtils, MathUtils, type Point2d, type Span, type SwipeDirection } from "@thewaver/ss-utils";
 
-import type { CarouselAxis, CarouselOrientation, CarouselPlacement, CarouselStep } from "./Carousel.types";
+import type {
+    CarouselAxis,
+    CarouselOrientation,
+    CarouselPlacement,
+    CarouselPlacementGroup,
+    CarouselStep,
+} from "./Carousel.types";
 
 /** Halfway, for comparing a turn against half the item count. */
 const HALF = 0.5;
@@ -18,6 +24,20 @@ const PERCENT = 100;
 
 /** The furthest a swipe is allowed to drag the slides, as a share of one slide. */
 const SWIPE_RATIO_LIMIT = 1;
+
+/** What the library prints when the groups a consumer handed over had to be fixed before they could be used. */
+const FIXED_GROUPS_WARNING = "Carousel: the ranges computeGroups returned had to be fixed —";
+
+/** What the library prints when nothing usable was left of the groups a consumer handed over. */
+const FALLBACK_GROUPS_WARNING =
+    "Carousel: computeGroups returned no range holding a slide, so every slide is its own group.";
+
+/** One group per slide, which is how a carousel without groups moves. */
+const toSingleGroups = (count: number): Span[] =>
+    Array.from({ length: Math.max(count, 0) }, (_, index) => ({ start: index, end: index + 1 }));
+
+/** Orders groups by their start, and a tie by their end, so every pair compares the same way each time. */
+const compareGroups = (a: Span, b: Span) => a.start - b.start || a.end - b.end;
 
 /** Moves a carousel's index around, taking the shorter way round. */
 export namespace CarouselUtils {
@@ -229,45 +249,6 @@ export namespace CarouselUtils {
         previousIndex !== undefined && previousIndex !== index && !isRotating;
 
     /**
-     * How many slides one whole run of `progress` covers: the whole ring on a looping carousel, so `0` to `1` is one
-     * lap and `1` is back at the first slide, and first to last on one that stops at its ends.
-     *
-     * @param count How many slides there are.
-     * @param isLooping Whether the carousel comes round from its last slide to its first.
-     */
-    export const getLapLength = (count: number, isLooping: boolean) => Math.max(isLooping ? count : count - 1, 0);
-
-    /**
-     * Where a progress puts the carousel, in slides.
-     *
-     * @param progress How far along, `0` to `1` — see {@link getLapLength}.
-     * @param count How many slides there are.
-     * @param isLooping Whether the carousel loops.
-     * @returns A position counted in slides from the first, fractional between two of them.
-     */
-    export const toPosition = (progress: number, count: number, isLooping: boolean) =>
-        MathUtils.clamp01(progress) * getLapLength(count, isLooping);
-
-    /**
-     * The progress that describes a position, the reverse of {@link toPosition}.
-     *
-     * A looping carousel's position may have run past either end while it moved the short way round; it is brought
-     * back into the lap first. One that stops at its ends is held between them.
-     *
-     * @param position A position counted in slides from the first.
-     * @param count How many slides there are.
-     * @param isLooping Whether the carousel loops.
-     * @returns `0` to `1`, and `0` with fewer than two slides.
-     */
-    export const toProgress = (position: number, count: number, isLooping: boolean) => {
-        const lap = getLapLength(count, isLooping);
-
-        if (lap <= 0) return 0;
-
-        return isLooping ? MathUtils.wrap(position, lap) / lap : MathUtils.clamp01(position / lap);
-    };
-
-    /**
      * Whether a slide is built, for a carousel that builds only what its placement draws.
      *
      * @param distance How far the slide is from where the carousel is, from {@link getDistance}.
@@ -287,7 +268,7 @@ export namespace CarouselUtils {
      * in between.
      *
      * @param index The slide.
-     * @param position Where the carousel is, from {@link toPosition}.
+     * @param position Where the carousel is, from {@link toGroupPosition}.
      * @param count How many slides there are.
      * @param isLooping Whether the carousel loops.
      * @returns The signed distance: positive for a slide still to come, negative for one already passed.
@@ -329,7 +310,7 @@ export namespace CarouselUtils {
      * position comes round a lap instead of jumping back to its first copy.
      *
      * @param previous Where the ring was, or `undefined` before it had been placed.
-     * @param position Where the carousel is, from {@link toPosition}, as it is drawn.
+     * @param position Where the carousel is, from {@link toGroupPosition}, as it is drawn.
      * @param count How many slides there are.
      * @param copies How many times the list is drawn, from {@link getCopyCount}.
      * @returns A position counted in slides round the ring of `count × copies`.
@@ -384,16 +365,6 @@ export namespace CarouselUtils {
     };
 
     /**
-     * Which slide a position is nearest to, which is the slide counted as showing.
-     *
-     * @param position Where the carousel is, from {@link toPosition}.
-     * @param count How many slides there are.
-     * @param isLooping Whether the carousel loops.
-     */
-    export const getNearestIndex = (position: number, count: number, isLooping: boolean) =>
-        isLooping ? wrapIndex(Math.round(position), count) : MathUtils.clamp(Math.round(position), 0, count - 1);
-
-    /**
      * Where to glide to so that a slide is the one showing, starting from a position.
      *
      * @param position Where the carousel is now.
@@ -404,6 +375,358 @@ export namespace CarouselUtils {
      */
     export const getGlideTarget = (position: number, index: number, count: number, isLooping: boolean) =>
         isLooping ? position + getDistance(index, position, count, isLooping) : index;
+
+    /**
+     * The groups a carousel moves between, made safe to use.
+     *
+     * Without `computeGroups` every slide is its own group, which is how a carousel moves when it has none. What a
+     * consumer's `computeGroups` returned is held inside the list and to whole slides, empty ranges are dropped and
+     * the rest put in order of their start; overlapping and repeated ranges are kept. A console warning names what
+     * had to be fixed, and when nothing usable is left the carousel falls back to one group per slide, with a
+     * warning of its own. An empty list has no groups and warns about nothing.
+     *
+     * @param groups What `computeGroups` returned, or `undefined` when the carousel has none.
+     * @param count How many slides there are.
+     * @returns The groups, each a range of slide indices with `end` excluded, in order of their start.
+     */
+    export const resolveGroups = (groups: readonly Span[] | undefined, count: number): Span[] => {
+        if (groups === undefined || count <= 0) return toSingleGroups(count);
+
+        const held = groups.map((group) => ({
+            start: MathUtils.clamp(Math.round(group.start), 0, count),
+            end: MathUtils.clamp(Math.round(group.end), 0, count),
+        }));
+        const kept = held.filter((group) => group.end > group.start);
+
+        if (kept.length < 1) {
+            console.warn(FALLBACK_GROUPS_WARNING);
+
+            return toSingleGroups(count);
+        }
+
+        const ordered = [...kept].sort(compareGroups);
+        const fixes = [
+            held.some((group, index) => group.start !== groups[index].start || group.end !== groups[index].end)
+                ? "held inside the list, to whole slides"
+                : undefined,
+            kept.length < held.length ? "empty ones dropped" : undefined,
+            ordered.some((group, index) => group !== kept[index]) ? "put in order of their start" : undefined,
+        ].filter((fix) => fix !== undefined);
+
+        if (fixes.length > 0) console.warn(`${FIXED_GROUPS_WARNING} ${fixes.join(", ")}.`);
+
+        return ordered;
+    };
+
+    /**
+     * Where the carousel rests while a group shows, in slides: the middle of the group's slides.
+     *
+     * A group of one rests on its slide, so a carousel without groups rests where it always did; a pair rests
+     * halfway between its two slides, which is what puts them at `-0.5` and `0.5` from where the carousel is.
+     *
+     * @param group A range of slide indices, `end` excluded.
+     */
+    export const getGroupRest = (group: Span) => (group.start + group.end - 1) * HALF;
+
+    /**
+     * How many slides one whole run of `progress` covers when the carousel moves between groups: the whole ring on a
+     * looping carousel, and from where the first group rests to where the last one does on one that stops at its
+     * ends. With one group per slide it is the slide count on a looping carousel and one fewer on one that stops.
+     *
+     * @param rests Where each group rests, from {@link getGroupRest}, in order.
+     * @param count How many slides there are.
+     * @param isLooping Whether the carousel comes round from its last group to its first.
+     */
+    export const getGroupLapLength = (rests: readonly number[], count: number, isLooping: boolean) =>
+        Math.max(isLooping ? count : (rests.at(-1) ?? 0) - (rests[0] ?? 0), 0);
+
+    /**
+     * Where a progress puts a carousel that moves between groups, in slides. `0` is the first group at rest; on one
+     * that stops at its ends `1` is the last group at rest, and on a looping one it is a whole lap round to the first
+     * again. With one group per slide, a progress is that share of the lap counted in slides.
+     *
+     * @param progress How far along, `0` to `1`.
+     * @param rests Where each group rests, from {@link getGroupRest}, in order.
+     * @param count How many slides there are.
+     * @param isLooping Whether the carousel loops.
+     * @returns A position counted in slides from the first, fractional between two of them.
+     */
+    export const toGroupPosition = (progress: number, rests: readonly number[], count: number, isLooping: boolean) =>
+        (rests[0] ?? 0) + MathUtils.clamp01(progress) * getGroupLapLength(rests, count, isLooping);
+
+    /**
+     * The progress that describes a position, the reverse of {@link toGroupPosition}.
+     *
+     * @param position A position counted in slides from the first, which on a looping carousel may have run past
+     * either end of the lap.
+     * @param rests Where each group rests, from {@link getGroupRest}, in order.
+     * @param count How many slides there are.
+     * @param isLooping Whether the carousel loops.
+     * @returns `0` to `1`, and `0` when there is nothing to move between.
+     */
+    export const toGroupProgress = (position: number, rests: readonly number[], count: number, isLooping: boolean) => {
+        const lap = getGroupLapLength(rests, count, isLooping);
+        const offset = position - (rests[0] ?? 0);
+
+        if (lap <= 0) return 0;
+
+        return isLooping ? MathUtils.wrap(offset, lap) / lap : MathUtils.clamp01(offset / lap);
+    };
+
+    /**
+     * Which group a position is nearest to, which is the group counted as showing.
+     *
+     * Nearest is measured to where each group rests, the short way round on a looping carousel; between two equally
+     * near, the one still to come wins, as rounding a position up does. With one group per slide it is the
+     * nearest slide.
+     *
+     * @param position Where the carousel is, from {@link toGroupPosition}.
+     * @param rests Where each group rests, from {@link getGroupRest}, in order.
+     * @param count How many slides there are.
+     * @param isLooping Whether the carousel loops.
+     * @returns The group's index, or `0` when there are none.
+     */
+    export const getNearestGroup = (position: number, rests: readonly number[], count: number, isLooping: boolean) => {
+        let nearest = 0;
+        let nearestDistance = Infinity;
+
+        rests.forEach((rest, group) => {
+            const distance = getDistance(rest, position, count, isLooping);
+            const gap = Math.abs(distance);
+            const nearestGap = Math.abs(nearestDistance);
+
+            if (gap < nearestGap || (gap === nearestGap && distance > nearestDistance)) {
+                nearest = group;
+                nearestDistance = distance;
+            }
+        });
+
+        return nearest;
+    };
+
+    /**
+     * Which group a press on a slide brings up: of the groups holding the slide, the one resting nearest where the
+     * carousel is, so the carousel moves as little as it can to show the slide.
+     *
+     * @param index The slide pressed.
+     * @param groups The groups, from {@link resolveGroups}.
+     * @param position Where the carousel is.
+     * @param count How many slides there are.
+     * @param isLooping Whether the carousel loops.
+     * @returns The group's index, or `undefined` when no group holds the slide.
+     */
+    export const getNearestGroupHolding = (
+        index: number,
+        groups: readonly Span[],
+        position: number,
+        count: number,
+        isLooping: boolean,
+    ) => {
+        let nearest: number | undefined;
+        let nearestGap = Infinity;
+
+        groups.forEach((group, groupIndex) => {
+            if (index < group.start || index >= group.end) return;
+
+            const gap = Math.abs(getDistance(getGroupRest(group), position, count, isLooping));
+
+            if (gap < nearestGap) {
+                nearest = groupIndex;
+                nearestGap = gap;
+            }
+        });
+
+        return nearest;
+    };
+
+    /**
+     * Which place round the ring of copies holds the first slide of a group, when the slides are drawn more than
+     * once: the copy whose middle is nearest where the ring is. With the slides drawn once it is the group's start.
+     *
+     * @param group A range of slide indices, `end` excluded.
+     * @param ringPosition Where the ring is, from {@link followCopies}.
+     * @param count How many slides there are.
+     * @param copies How many times the list is drawn, from {@link getCopyCount}.
+     * @returns The place round the ring, which the group's slides follow one after another.
+     */
+    export const getGroupPlace = (group: Span, ringPosition: number, count: number, copies: number) => {
+        const rest = getGroupRest(group);
+
+        return getNearestCopy(rest, ringPosition, count, copies) - (rest - group.start);
+    };
+
+    /**
+     * Whether a place round the ring holds one of a group's slides.
+     *
+     * @param place The place, from `0` to `ringCount - 1`.
+     * @param groupPlace Where the group's first slide is, from {@link getGroupPlace}.
+     * @param size How many slides the group holds.
+     * @param ringCount How many places the ring has: the slide count times the copies.
+     */
+    export const getIsInGroupPlace = (place: number, groupPlace: number, size: number, ringCount: number) =>
+        MathUtils.wrap(place - groupPlace, ringCount) < size;
+
+    /**
+     * A slide as a group of one, which is how every slide is placed on a carousel without groups.
+     *
+     * @param distance The slide's distance, from {@link getDistance}.
+     * @param index The slide's place, counting from zero round a looping carousel's ring.
+     * @param count How many places there are.
+     * @returns The group a placement rule is handed: the slide's own distance, index and count, alone in its group.
+     */
+    export const toSlideGroup = (distance: number, index: number, count: number): CarouselPlacementGroup => ({
+        distance,
+        index,
+        count,
+        slot: 0,
+        size: 1,
+    });
+
+    /**
+     * Which groups hold each slide, and where in each it sits, worked out once so placing a slide on every frame does
+     * not search the groups again.
+     *
+     * @param groups The groups, from {@link resolveGroups}.
+     * @param count How many slides there are.
+     * @returns For each slide, every group holding it, in the groups' order: the group's index, the slide's slot in it
+     * and the group's size. A slide no group holds has none.
+     */
+    export const getGroupMemberships = (groups: readonly Span[], count: number) => {
+        const memberships = Array.from(
+            { length: Math.max(count, 0) },
+            () => [] as Pick<CarouselPlacementGroup, "index" | "slot" | "size">[],
+        );
+
+        groups.forEach((group, index) => {
+            for (let slide = group.start; slide < group.end; slide++) {
+                memberships[slide]?.push({ index, slot: slide - group.start, size: group.end - group.start });
+            }
+        });
+
+        return memberships;
+    };
+
+    /**
+     * Where a position is counted in groups rather than slides: `2` while the third group rests, `2.5` halfway from it
+     * to the fourth, however many slides apart the two rest.
+     *
+     * Between two groups it runs evenly from one to the other; on a looping carousel the last group runs on to the
+     * first. Past either end of one that stops, it carries on at the rate of the nearest two groups, or a group a
+     * slide while there is only one. Where groups nest, so that one rests before the group listed ahead of it, there
+     * is no even run between them and the position counts as the nearest group.
+     *
+     * @param position Where the carousel is, in slides.
+     * @param rests Where each group rests, from {@link getGroupRest}, in order.
+     * @param count How many slides there are.
+     * @param isLooping Whether the carousel loops.
+     * @returns A position counted in groups from the first, fractional between two of them; `0` with no groups.
+     */
+    export const toGroupCoordinate = (
+        position: number,
+        rests: readonly number[],
+        count: number,
+        isLooping: boolean,
+    ) => {
+        const last = rests.length - 1;
+
+        if (last < 0) return 0;
+
+        const ends = isLooping ? [...rests, rests[0] + count] : rests;
+        const at = isLooping && count > 0 ? rests[0] + MathUtils.wrap(position - rests[0], count) : position;
+
+        for (let group = 0; group < ends.length - 1; group++) {
+            const gap = ends[group + 1] - ends[group];
+
+            if (gap > 0 && at >= ends[group] && at <= ends[group + 1]) return group + (at - ends[group]) / gap;
+        }
+
+        if (!isLooping && (at < rests[0] || at > rests[last])) {
+            const isBefore = at < rests[0];
+            const gap = isBefore
+                ? (rests[1] ?? rests[0] + 1) - rests[0]
+                : rests[last] - (rests[last - 1] ?? rests[last] - 1);
+            const from = isBefore ? 0 : last;
+
+            if (gap > 0) return from + (at - rests[from]) / gap;
+        }
+
+        return getNearestGroup(position, rests, count, isLooping);
+    };
+
+    /**
+     * The group a placement rule is handed for one slide: which group it is drawn in, how far that group is from where
+     * the carousel is, and the slide's slot in it.
+     *
+     * A slide held by one group is drawn in it. One held by several is drawn in the group nearest where the carousel
+     * is, and while the carousel is between two of them it moves from its slot in one to its slot in the other as the
+     * carousel does, so it never jumps: its distance, slot and size are each that far from one to the other, and it
+     * counts as the nearer of the two. At rest on a group that holds it, that group is the one. A slide no group holds
+     * is drawn alone, at the distance in groups of where it would rest.
+     *
+     * @param defs.place The slide's place round the ring, from `0` to `count × copies - 1`.
+     * @param defs.groupPosition Where the carousel is round the ring, in groups, from {@link toGroupCoordinate}.
+     * @param defs.memberships Which groups hold each real slide, from {@link getGroupMemberships}.
+     * @param defs.rests Where each group round the ring rests, in slides, for a slide no group holds.
+     * @param defs.count How many real slides there are.
+     * @param defs.groupCount How many real groups there are.
+     * @param defs.copies How many times the list is drawn, from {@link getCopyCount}.
+     * @param defs.isLooping Whether the carousel loops.
+     */
+    export const getPlacementGroup = (defs: {
+        place: number;
+        groupPosition: number;
+        memberships: readonly (readonly Pick<CarouselPlacementGroup, "index" | "slot" | "size">[])[];
+        rests: readonly number[];
+        count: number;
+        groupCount: number;
+        copies: number;
+        isLooping: boolean;
+    }): CarouselPlacementGroup => {
+        const ringGroupCount = defs.groupCount * defs.copies;
+        const copy = defs.count > 0 ? Math.floor(defs.place / defs.count) : 0;
+        const held = defs.memberships[defs.count > 0 ? defs.place % defs.count : 0] ?? [];
+        const toDistance = (index: number) => getDistance(index, defs.groupPosition, ringGroupCount, defs.isLooping);
+
+        if (held.length < 1) {
+            const coordinate = toGroupCoordinate(defs.place, defs.rests, defs.count * defs.copies, defs.isLooping);
+
+            return {
+                distance: toDistance(coordinate),
+                index: Math.round(coordinate),
+                count: ringGroupCount,
+                slot: 0,
+                size: 1,
+            };
+        }
+
+        const placed = held.map((membership) => {
+            const index = membership.index + copy * defs.groupCount;
+
+            return { ...membership, index, count: ringGroupCount, distance: toDistance(index) };
+        });
+
+        let before: CarouselPlacementGroup | undefined;
+        let after: CarouselPlacementGroup | undefined;
+        let nearest = placed[0];
+
+        for (const group of placed) {
+            if (group.distance <= 0 && (before === undefined || group.distance > before.distance)) before = group;
+            if (group.distance >= 0 && (after === undefined || group.distance < after.distance)) after = group;
+            if (Math.abs(group.distance) < Math.abs(nearest.distance)) nearest = group;
+        }
+
+        if (before === undefined || after === undefined || before.distance === after.distance) return nearest;
+
+        const ratio = -before.distance / (after.distance - before.distance);
+
+        return {
+            distance: 0,
+            index: ratio < HALF ? before.index : after.index,
+            count: ringGroupCount,
+            slot: MathUtils.lerp(before.slot, after.slot, ratio),
+            size: MathUtils.lerp(before.size, after.size, ratio),
+        };
+    };
 
     /**
      * Moves a position from one place to another over a time, on every animation frame, easing in and out.

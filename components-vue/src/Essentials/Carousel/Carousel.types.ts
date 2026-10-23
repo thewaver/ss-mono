@@ -5,9 +5,9 @@ import type { BaseCarouselProps, CarouselSlideState, CarouselState, CarouselStep
 export type { CarouselState };
 
 export type CarouselControls = {
-    /** Which slide is showing, counting from zero. */
+    /** Which slide is showing, counting from zero — with `computeGroups`, which group. */
     getIndex: () => number;
-    /** How many slides there are. */
+    /** How many slides there are — with `computeGroups`, how many groups, which is how many pickers to draw. */
     getCount: () => number;
     /** Whether the carousel is advancing by itself. */
     getIsPlaying: () => boolean;
@@ -21,7 +21,7 @@ export type CarouselControls = {
      */
     getCanStep: (step: CarouselStep) => boolean;
     /**
-     * Moves one slide on or back, as a swipe would.
+     * Moves one slide on or back, as a swipe would — with `computeGroups`, one group.
      *
      * @param step Which way to move.
      * @returns `false` when the step is refused — see {@link CarouselControls.getCanStep}.
@@ -30,7 +30,7 @@ export type CarouselControls = {
     /**
      * Brings one slide up, gliding the short way round on a carousel that loops.
      *
-     * @param index The slide, counting from zero.
+     * @param index The slide, counting from zero — with `computeGroups`, the group.
      * @returns `false` when the carousel is disabled, the slide does not exist, or it is already showing.
      */
     pick: (index: number) => boolean;
@@ -55,7 +55,8 @@ export type CarouselControls = {
 export type CarouselContentProps<T> = {
     /**
      * Which slide is showing. Writing it moves the carousel there, gliding the short way round on one that loops.
-     * While `progress` is written from outside, it follows whichever slide is nearest.
+     * While `progress` is written from outside, it follows whichever slide is nearest. With `computeGroups` it counts
+     * groups, since a slide in two overlapping groups cannot say which of them is showing.
      */
     "index"?: number;
     /** Receives the carousel's own moves, which is what `v-model:index` binds. */
@@ -63,8 +64,9 @@ export type CarouselContentProps<T> = {
     /**
      * Where the carousel is, `0` to `1`, for driving it from outside — from a scroll position or a pointer, say. On a
      * looping carousel `0` to `1` is one whole lap, so `1` is the first slide again; on one that stops at its ends it
-     * runs from the first slide to the last. The carousel writes it as it glides, so it can also be read. A carousel
-     * driven this way is moved by the page, so its swipes and presses are left to the page.
+     * runs from the first slide to the last. With `computeGroups`, `0` is the first group at rest and the far end the
+     * last group at rest, or the first again on a looping carousel. The carousel writes it as it glides, so it can
+     * also be read. A carousel driven this way is moved by the page, so its swipes and presses are left to the page.
      */
     "progress"?: number;
     /** Receives the carousel's position as it glides, which is what `v-model:progress` binds. */

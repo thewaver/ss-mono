@@ -20,7 +20,14 @@
         props.renderProps.isHovered && styles.isHovered,
         props.renderProps.isSelected && styles.isSelected,
         props.renderProps.isDisabled && styles.isDisabled,
+        props.renderProps.pin === "start" && styles.isPinnedStart,
+        props.renderProps.pin === "end" && styles.isPinnedEnd,
+        props.renderProps.isExpanded && styles.isExpanded,
     ]}
 >
+    {#if props.leading !== undefined}
+        <div class={styles.tableCellLeading}>{@render props.leading()}</div>
+    {/if}
+
     <div class={styles.tableText}>{@render props.children?.()}</div>
 </div>

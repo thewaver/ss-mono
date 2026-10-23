@@ -33,21 +33,19 @@ reading.
 ### Index
 
 1. Neither animation component can reveal its own children — _postponed until the platform catches up_
-2. `Select` — one thing deliberately not built — _open_
-3. Planned: a consumer-facing layer of controls above the library — _deferred to a session of its own_
-4. `ColorInput` — two things deliberately not built — _open, one item postponed until the platform catches up_
-5. `SlideButton` — two things deliberately not built — _open_
-6. `Spotlight` — one thing deliberately not built — _open_
-7. `Scroller` — one thing deliberately not built — _open_
-8. `Paginator` — one thing deliberately not built — _open_
-9. `Carousel` — two things deliberately not built — _open_
-10. An anchored layer trails its anchor during a scroll — _postponed until the platform catches up_
-11. `Table` — six things deliberately not built — _open_
-12. `GlassSurface`'s ripple layer shows a defect at its edge — _postponed until the platform catches up_
-13. Arbitrary placement — the gaps the trials left — _open_
-14. The submit story — what a native submit carries, and what `Form` hands `onSubmit` — _pending decision_
-15. `Die`'s step buttons and arrow keys fall into a loop of two or three faces — _open, no fix chosen_
-16. The Playground's painters in Windows high-contrast mode — _open, decided, not yet built_
+2. Planned: a consumer-facing layer of controls above the library — _deferred to a session of its own_
+3. `ColorInput` — the eyedropper — _postponed until the platform catches up_
+4. `Spotlight` — one thing deliberately not built — _open_
+5. `Scroller` — one thing deliberately not built — _open_
+6. `Carousel` — one thing deliberately not built — _open_
+7. An anchored layer trails its anchor during a scroll — _postponed until the platform catches up_
+8. `Table` — two things deliberately not built — _open_
+9. `GlassSurface`'s ripple layer shows a defect at its edge — _postponed until the platform catches up_
+10. Arbitrary placement — the gaps the trials left — _open_
+11. The submit story — what a native submit carries, and what `Form` hands `onSubmit` — _pending decision_
+12. `Die`'s step buttons and arrow keys fall into a loop of two or three faces — _open, no fix chosen_
+13. The Playground's painters in Windows high-contrast mode — _open, decided, not yet built_
+14. A long `Select` list costs as much to draw as its options do — _open, no fix known_
 
 ---
 
@@ -91,40 +89,7 @@ the one both components have.
 
 ---
 
-## 2. `Select` — one thing deliberately not built
-
-The decisions behind what exists are in `decisions.md` under the three `Select` headings. These are
-the gaps, each with the reason it is still a gap.
-
-- **What the stress variant reports is the cost of mounting options**, which is a separate cost from painting
-  them. Windowing removed the mounting cost for lists that opt in; nothing addresses the painting half, and the
-  cheap answer to it was `content-visibility` on the option paint, which is gone — see `decisions.md`.
-
-**_Elsewhere._** Checked against Radix, React Aria and Kobalte, which is the SolidJS one.
-
-- **Typeahead is a string per option in all three, and two of them derive it rather than asking.**
-  Radix's `Select.Item` takes an optional `textValue`, and when it is absent typeahead uses the item's
-  own rendered text content. React Aria's list items take `textValue` and require it only when the
-  children are not plain text. Kobalte takes `optionTextValue`, a field name or getter on the option
-  record, documented as being for typeahead. This is the reading that closed the gap: the option element
-  is the library's here, so its text is reachable without a prop, and `computeCustomText` is the way out
-  for the cases that need one. See `decisions.md`.
-- **A filterable list is a separate component everywhere.** Radix has no autocomplete primitive at all,
-  so the injected-non-matching-option case cannot arise there; and where a library does own the filter
-  it necessarily knows which options matched, which is the knowledge this design trades away by
-  choice.
-- **Virtualization is nobody's library code.** Kobalte's select has a `virtualized` boolean and a docs
-  example handing the list to `@tanstack/solid-virtual` with a hundred thousand options; React Aria has
-  a `Virtualizer` wrapper; Radix has neither, and its docs cover long lists only with scroll buttons.
-  So the seam is a flag plus a documented integration rather than an `Abstract`, and the flag exists
-  precisely so the library stops managing its own scrolling — which is the loose end this bullet names.
-- **Open state is controlled-or-uncontrolled in all three**, under the same three names: `open`,
-  `defaultOpen`, `onOpenChange`. The consumer can always close it programmatically and the library
-  still owns the default.
-
----
-
-## 3. Planned: a consumer-facing layer of controls above the library — _deferred to a session of its own_
+## 2. Planned: a consumer-facing layer of controls above the library — _deferred to a session of its own_
 
 **Deferred to a near-future session of its own**, by the user, because bundling it with the components then in
 progress would have been awkward. It is no longer deferred indefinitely. The packaging question inside it is a
@@ -174,13 +139,12 @@ same example.
 
 ---
 
-## 4. `ColorInput` — two things deliberately not built
+## 3. `ColorInput` — the eyedropper — _postponed until the platform catches up_
 
 `ColorInput` is the custom picker now; the decisions are in `decisions.md` under the `ColorArea` heading.
-These are the gaps.
+Its form value is part of item 11, the submit story; having no system color picker to fall back on is the cost
+of owning the surface, recorded in `decisions.md`.
 
-- **No native color input anywhere, so no form value and no OS picker.** Deliberate, and the cost of
-  owning the surface. A consumer who wants the OS dialog has nothing to fall back on.
 - **No eyedropper — _postponed until the platform catches up_, decided by the user.** Swatch
   presets and recent colors were dropped the same day and are not coming back. The eyedropper is not
   declined, it is waiting: the work is trivial and the support is not there. **Do not propose building it,
@@ -206,8 +170,7 @@ These are the gaps.
 - **Owning the surface is the mainstream trade.** React Aria's color suite — `ColorArea`,
   `ColorSlider`, `ColorWheel`, `ColorField`, `ColorSwatch` and `ColorSwatchPicker`, synchronized by a
   `ColorPicker` around one color value object — has no native `<input type="color">` path either, and
-  Ark UI's is custom too. Nobody keeps the OS dialog as a fallback, so the cost recorded in the first
-  bullet is the cost everyone pays.
+  Ark UI's is custom too. Nobody keeps the OS dialog as a fallback, so having none is the cost everyone pays.
 - **The eyedropper is absent because the platform is, and re-checked on 2026-08-15 rather than assumed.**
   `EyeDropper` is Chromium-only: Chrome and Edge from 95, Opera from 81, no Firefox, no Safari, **26.83%
   global support**. MDN marks it experimental and explicitly not Baseline, needing a secure context and a
@@ -226,45 +189,7 @@ These are the gaps.
 
 ---
 
-## 5. `SlideButton` — two things deliberately not built
-
-The decisions behind what exists are in `decisions.md` under _"Controls: `SlideButton`, and why the gesture
-is the only thing it owns"_, including which WCAG criteria were read and what they decided. These are the
-gaps, each with the reason it is still one.
-
-- **Horizontal only.** `Range` grew an `orientation` and this did not: the hit test and the progress
-  arithmetic both read one axis, and the painter's `calc` does too. A vertical slide-to-activate is a real
-  shape on a phone lock screen and nowhere else, which is why it was not built rather than why it could not
-  be.
-- **The hold duration is one number for everyone.** `getHoldDurationMs` defaults to 1000 and a consumer can
-  change it, which is the right shape — but there is no route to a duration that follows the person rather
-  than the control, and `prefers-reduced-motion` is not the signal for it either. Recorded because a fixed
-  hold is itself a dexterity assumption, and the control exists partly to avoid one.
-
-**_Elsewhere_**, read on **2026-08-13**, after the keyboard decision had already been taken.
-
-- **No headless library ships one, so there is nothing to copy either way.** Radix's thirty-odd primitives,
-  Base UI's thirty-five at its December 2025 stable release, React Aria and Ark UI all have a slider and a
-  button and nothing between them. That is the same finding as the animation components in item 1: the
-  omission is the field's, not this library's.
-- **The packages that do ship one have no keyboard route at all**, which is worse than the decision taken here
-  rather than different from it. `react-swipeable-button`'s whole documented surface is `onSuccess`,
-  `onFailure` and colors — no role, no `tabindex`, no key handling; `react-slide-button` is built on
-  `react-swipeable`, which is pointer-only by construction.
-- **Apple, whose lock screen is where the pattern comes from, answers exactly the decision taken here.** Asked
-  on the developer forum whether a swipe-to-confirm harms VoiceOver users, the guidance is to override
-  `accessibilityActivate` so that a single activation runs the same confirm logic **without** the swipe, or to
-  expose the confirmation as an `accessibilityCustomActions` entry. The lock screen itself behaves that way:
-  a VoiceOver user selects the caption and double-taps, and the gesture collapses to one activation. So "the
-  assistive route is a plain activation, not a reproduced gesture" is the platform's own answer and not a
-  convenience.
-- **The standard that decides it is 2.5.7 Dragging Movements, and it is newer than the pattern**, which is
-  most likely why none of the packages above answer it. What it asks for — a single-pointer route that is not
-  a drag — is what the hold is; see `decisions.md`.
-
----
-
-## 6. `Spotlight` — one thing deliberately not built
+## 4. `Spotlight` — one thing deliberately not built
 
 The decisions behind what exists are in `decisions.md` under _"Controls: `Spotlight`, and three presets
 because a mode cannot move at runtime"_. These are the gaps, each with the reason it is still one.
@@ -277,7 +202,7 @@ because a mode cannot move at runtime"_. These are the gaps, each with the reaso
 
 ---
 
-## 7. `Scroller` — one thing deliberately not built
+## 5. `Scroller` — one thing deliberately not built
 
 The decisions behind what exists are in `decisions.md` under _"Controls: `Scroller`, and why it renders no
 button of its own"_. The gap, with the reason it is still one.
@@ -290,32 +215,12 @@ button of its own"_. The gap, with the reason it is still one.
 
 ---
 
-## 8. `Paginator` — one thing deliberately not built
-
-The decisions behind what exists are in `decisions.md` under _"Controls: `Paginator`, where the arithmetic
-is the component"_ and _"`Paginator` is a root and pieces, with the ready-made row on top"_.
-
-### Still deliberately not built
-
-- **The whole row is in the tab order, and there is no way to ask for one stop.** Every page and every step is
-  its own tab stop, which is the accordion's rule and is defended in `decisions.md`. A paginator with a wide
-  window and both end jumps is fifteen tab stops in a row, which is a lot to walk past to reach the content it
-  pages. Nothing has asked, and the alternative — a roving order over a list of independent destinations —
-  contradicts the reasoning rather than extending it.
-
----
-
-## 9. `Carousel` — two things deliberately not built
+## 6. `Carousel` — one thing deliberately not built
 
 The decisions behind what exists are in `decisions.md` under _"Controls: `Carousel`, and the first component
-that acts without being asked"_ and _"`Carousel`: one component, and how a slide sits is a placement rule"_. These
-are the gaps, each with the reason it is still one.
+that acts without being asked"_ and _"`Carousel`: one component, and how a slide sits is a placement rule"_. The gap, with
+the reason it is still one.
 
-- **One slide is current at a time; a page of several is not built.** A placement can show several slides at once,
-  but only one is ever the current one — the one the controls step from, the one announced, the one not `inert`. A
-  page of several current slides needs the arithmetic to start asking how many fit, which is `Scroller`'s question
-  and the boundary the two were separated along. Building it would also make the picker ambiguous — a dot per slide
-  or a dot per page — and that is a design question rather than a missing line.
 - **The keyboard is whatever buttons the consumer builds.** There is no arrow-key handling on the region, and the
   carousel draws no controls of its own, so a consumer who builds no buttons on its controller has a carousel the
   keyboard cannot reach. The published pattern puts the arrows on the buttons rather than on the region, so this
@@ -323,7 +228,7 @@ are the gaps, each with the reason it is still one.
 
 ---
 
-## 10. An anchored layer trails its anchor during a scroll — _postponed until the platform catches up_
+## 7. An anchored layer trails its anchor during a scroll — _postponed until the platform catches up_
 
 **While something is moving, the position an anchored layer paints at is the position its anchor was in one
 frame ago.** At rest the last frame catches up, so it looks settled and only moves when something else does.
@@ -409,25 +314,15 @@ neither was tried.
 
 ---
 
-## 11. `Table` — six things deliberately not built
+## 8. `Table` — two things deliberately not built
 
 The decisions behind what exists are in `decisions.md` under _"Controls: `Table`, a grid rather than a
 table, and why the markup could not be `<table>`"_. These are the gaps, each with the reason it is still one.
 The resizer's discoverability is **not** here: the user weighed it and chose to leave it, so it sits under
 _Accepted limits_ instead.
 
-- **A column cannot be pinned.** Holding a column still while the rest scrolls needs a resolved pixel width
-  for every pinned column, so the sticky offsets can be added up. Without one, a pin silently does nothing on
-  an unsized column — the "looks supported and is not" failure this repo has refused twice already. It was
-  also outside the scope the user set for the component.
 - **Rows cannot be grouped, and there are no aggregate rows.** A run of rows under a heading, with a totals
   row beneath them, is a second row kind the flattener and the roving cell would both have to know about.
-- **A row cannot expand.** Nothing opens beneath a row to hold detail, which is the other shape a second row
-  kind would take.
-- **A cell cannot be edited in place.** Editing is the consumer's, in whatever they paint into the cell; the
-  grid has no notion of a cell entering an editing state and no key that starts one.
-- **There is no filtering.** Sorting is the component's and filtering is not, so a consumer narrows the rows
-  themselves before handing them over — the same split `Select` makes with its query.
 - **A cell holding more than one control cannot be stepped into, and this one has an accessibility cost.**
   The grid is a single tab stop with a roving cell, so a cell containing two buttons can be reached but there
   is no defined key that moves _inside_ it to choose between them. The published answer is an `F2`-style
@@ -435,7 +330,7 @@ _Accepted limits_ instead.
 
 ---
 
-## 12. `GlassSurface`'s ripple layer shows a defect at its edge — _postponed until the platform catches up_
+## 9. `GlassSurface`'s ripple layer shows a defect at its edge — _postponed until the platform catches up_
 
 The component is built and works; the reasoning is in `decisions.md` under _"`GlassSurface`, and the two things
 that decide its shape"_. `GlassSurface` sits under `Composites`, which the Playground hides behind
@@ -455,7 +350,7 @@ the platform actually supports this, which the W3C issue above is the thing to w
 
 ---
 
-## 13. Arbitrary placement — the gaps the trials left
+## 10. Arbitrary placement — the gaps the trials left
 
 Built and in use: a control's items can be placed anywhere rather than along a line, through a layout it is handed —
 a menu as a ring, page numbers round a dial, tabs as a honeycomb. The reasoning is in `decisions.md` under
@@ -489,13 +384,13 @@ document"_, _"Five more controls take a layout"_ and _"Hold and flick"_. What th
 
 ---
 
-## 14. The submit story — what a native submit carries, and what `Form` hands `onSubmit`
+## 11. The submit story — what a native submit carries, and what `Form` hands `onSubmit`
 
 Three findings from the survey against the reference libraries were lofted here rather than settled one by one,
 because they are one question. **The user's word: lofted, not discarded.**
 
-- `Select` and `MultiSelect` have no `name` and render no native element, so a plain `<form>` around them submits
-  nothing. Radix, Kobalte and Ark render a hidden native input so `name` submits. `Checkbox` and `Toggle` got their
+- `Select`, `MultiSelect` and `ColorInput` have no `name` and render no native element, so a plain `<form>` around
+  them submits nothing. Radix, Kobalte and Ark render a hidden native input so `name` submits. `Checkbox` and `Toggle` got their
   `name` back separately, since they already render a native input.
 - `DateInput`, `DatePicker` and `TimeInput` put `name` on the visible field, so a native submit sends the display
   text, `23/09/2026` or `09/23/2026` by format, rather than a value a server can parse. React Aria sends ISO through
@@ -511,7 +406,7 @@ separately and does not depend on this.
 
 ---
 
-## 15. `Die`'s step buttons and arrow keys fall into a loop of two or three faces
+## 12. `Die`'s step buttons and arrow keys fall into a loop of two or three faces
 
 Reachable on the Die page's icon cloud: pick the d20 and press down a few times. The die goes back and forth
 between the same two faces. Every shape does it — a d20 pressed right goes between faces 1 and 2 from the first
@@ -540,7 +435,7 @@ every face upright cannot both hold, so each option gives one up:
 
 ---
 
-## 16. The Playground's painters in Windows high-contrast mode
+## 13. The Playground's painters in Windows high-contrast mode
 
 Reachable on the Range page with Windows' high-contrast mode on, or with Chrome's DevTools emulating
 `forced-colors: active`: the track and the filled part of the range turn white on the white page, and only the
@@ -560,6 +455,17 @@ on.
 
 ---
 
+## 14. A long `Select` list costs as much to draw as its options do
+
+Reachable on the Select page's stress example. Windowing removed the cost of creating options for a list that opts
+in; nothing reduces the cost of painting the options on screen. The one cheap answer, letting the browser skip
+painting off-screen options with `content-visibility`, was tried and removed: the options are not one height, so
+the moment End forced the skipped rows to be laid out for real, every height above the highlight was corrected at
+once and the highlighted option ended up below the visible box. See `decisions.md` under the `Select` headings. No
+other answer is known; this stays open in case one turns up.
+
+---
+
 ## Accepted limits
 
 Faults that have been looked at and consciously left alone. Not outstanding work, not numbered, and not part
@@ -567,6 +473,12 @@ of the answer to "what is left" — see the note at the top of this file. Each o
 reach it, and why it was accepted, so that nobody has to re-derive the argument in order to leave it alone
 again. An entry moves back up into the numbered items only if the user says so, or if something changes that
 makes the reasoning wrong.
+
+**A `SlideButton`'s hold time is one number for everyone.** A fixed hold is itself an assumption about dexterity,
+in a control that exists partly to avoid one, and no browser signal says how long a particular person needs —
+`prefers-reduced-motion` is not it. Reachable on any `SlideButton` by holding it. Accepted by the user: a consumer
+who knows their reader can already pass `holdDurationMs` from their own settings, so nothing is left for the
+library to build.
 
 **A `Timeline`, `Bracket`, `PatchBoard` or `CardStack` whose consumer draws no buttons can fail WCAG 2.5.7 and 2.5.1
 without a warning.** Dragging to pan, pinching to zoom and swiping a card each need a way to do the same with one

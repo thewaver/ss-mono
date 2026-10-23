@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { demo, prop, readout } from "./helpers";
+import { demo, prop, readout, waitUntilStill } from "./helpers";
 
 /**
  * The rotation delay is a panel knob, so the spec turns it down to its floor rather than waiting out the
@@ -429,24 +429,143 @@ const countsOf = async (page: import("@playwright/test").Page) => {
     };
 };
 
-test("a windowed carousel builds only the slides its placement draws, and keeps it so as it moves", async ({
-    page,
-}) => {
-    const before = await countsOf(page);
+test(
+    "a windowed carousel builds only the slides its placement draws, and keeps it so as it moves",
+    { tag: "@solo" },
+    async ({ page }) => {
+        const before = await countsOf(page);
 
-    expect(before.built, "a handful are built").toBeGreaterThan(0);
-    expect(before.built, "rather than the whole list").toBeLessThan(before.total);
-    await expect(page.locator(slide(WINDOWED)), "and the count is what is in the document").toHaveCount(before.built);
+        expect(before.built, "a handful are built").toBeGreaterThan(0);
+        expect(before.built, "rather than the whole list").toBeLessThan(before.total);
+        await expect(page.locator(slide(WINDOWED)), "and the count is what is in the document").toHaveCount(
+            before.built,
+        );
 
-    for (let step = 0; step < 3; step++) {
-        await page.locator(control(WINDOWED, "Next slide")).click();
-    }
+        for (let step = 0; step < 3; step++) {
+            await page.locator(control(WINDOWED, "Next slide")).click();
+        }
 
-    await page.waitForTimeout(SETTLE_MS);
+        await page.waitForTimeout(SETTLE_MS);
 
-    expect((await countsOf(page)).built, "stepping on builds the newcomers and drops the ones left behind").toBe(
-        before.built,
+        expect((await countsOf(page)).built, "stepping on builds the newcomers and drops the ones left behind").toBe(
+            before.built,
+        );
+        await expect(page.locator(slide(WINDOWED))).toHaveCount(before.built);
+        expect(await currentSlide(page, WINDOWED), "and the carousel really did move").toBe(`4 of ${before.total}`);
+    },
+);
+
+/**
+ * The pairs example hands the carousel a grouping of two slides to a stop, so a dot, a step and the slide counted
+ * as current are all about a pair. The page's starting slide count is even, so every pair is whole; how many pairs
+ * there are is read off the slides' own labels rather than written down.
+ */
+const PAIRS = demo("pairs");
+const ANNOUNCER = 'body > [role="log"][aria-live="polite"]';
+
+const currentSlides = (page: import("@playwright/test").Page, scope: string) =>
+    page
+        .locator(`${slide(scope)}:not([aria-hidden="true"])`)
+        .evaluateAll((slides) => slides.map((element) => element.getAttribute("aria-label")));
+
+const slideCountOf = async (page: import("@playwright/test").Page, scope: string) => {
+    const labels = await page
+        .locator(slide(scope))
+        .evaluateAll((slides) => slides.map((element) => element.getAttribute("aria-label")));
+
+    return new Set(labels).size;
+};
+
+const picksOf = (scope: string) => `${scope} button[aria-label]:not([aria-label$=" slide"])`;
+
+test("the dots of a paired carousel count pairs, not slides", async ({ page }) => {
+    const slideCount = await slideCountOf(page, PAIRS);
+
+    expect(slideCount % 2, "the page starts with an even number of slides").toBe(0);
+    await expect(page.locator(picksOf(PAIRS)), "one dot for every two slides").toHaveCount(slideCount * 0.5);
+    await expect(page.locator(picksOf(PAIRS)).first(), "and each dot is named as one of the pairs").toHaveAttribute(
+        "aria-label",
+        `1 of ${slideCount * 0.5}`,
     );
-    await expect(page.locator(slide(WINDOWED))).toHaveCount(before.built);
-    expect(await currentSlide(page, WINDOWED), "and the carousel really did move").toBe(`4 of ${before.total}`);
+});
+
+test("a step moves a whole pair, and both slides of the pair showing are current", async ({ page }) => {
+    const slideCount = await slideCountOf(page, PAIRS);
+
+    expect(await currentSlides(page, PAIRS), "the first pair is the two slides at the front").toEqual([
+        `1 of ${slideCount}`,
+        `2 of ${slideCount}`,
+    ]);
+    await expect(
+        page.locator(`${slide(PAIRS)}[aria-label="3 of ${slideCount}"]`).first(),
+        "while the next pair's slides are out of reach",
+    ).toHaveAttribute("inert", "");
+
+    await page.locator(control(PAIRS, "Next slide")).click();
+
+    expect(await currentSlides(page, PAIRS), "one step lands on the next pair, both its slides").toEqual([
+        `3 of ${slideCount}`,
+        `4 of ${slideCount}`,
+    ]);
+    await expect(page.locator(`${slide(PAIRS)}:not([aria-hidden="true"])`).first()).not.toHaveAttribute("inert");
+    await expect(page.locator(`${slide(PAIRS)}:not([aria-hidden="true"])`).last()).not.toHaveAttribute("inert");
+    await expect(page.locator(picksOf(PAIRS)).nth(1), "and the second dot is the current one").toHaveAttribute(
+        "aria-current",
+        "true",
+    );
+    expect(await readout(page, "pairs")).toContain(`pair 2 of ${slideCount * 0.5}`);
+});
+
+/**
+ * What a step announces is the group it landed on, named by the page's `computeGroupLabel` from the first and last
+ * slide it holds, through the live region on the body that belongs to no component.
+ */
+test("a step announces the pair it landed on", async ({ page }) => {
+    const slideCount = await slideCountOf(page, PAIRS);
+
+    await page.locator(control(PAIRS, "Next slide")).click();
+    await expect(page.locator(ANNOUNCER), "the pair is named by its two slides").toContainText(`3–4 of ${slideCount}`);
+
+    await page.locator(control(PAIRS, "Previous slide")).click();
+    await expect(page.locator(ANNOUNCER), "and stepping back names the first pair").toContainText(
+        `1–2 of ${slideCount}`,
+    );
+});
+
+/**
+ * Every shipped placement lays a resting pair out as one unit, the two slides side by side in the room of one. The
+ * painted card inside each slide is measured, not the slide's own box: a narrow-framed placement draws its card
+ * narrower than the box, and the cards are what has to sit edge to edge. Three placements of different families are
+ * picked — a flat strip, the page's starting cover flow, and a turning drum — and in each the two current cards share
+ * a middle across the axis and meet along it, read from their boxes and not from any number written down.
+ */
+const cardBoxes = (page: import("@playwright/test").Page, scope: string) =>
+    page
+        .locator(`${slide(scope)}:not([aria-hidden="true"]) > div:not([aria-hidden="true"]) > div`)
+        .evaluateAll((cards) => cards.map((card) => card.getBoundingClientRect().toJSON() as DOMRect));
+
+test("switching the placement keeps the pair together, side by side along the axis", async ({ page }) => {
+    for (const placement of ["track", "cover_flow", "drum"]) {
+        await pickOption(page, "placement", placement);
+        await page.mouse.move(0, 0);
+        await page.locator(viewport(PAIRS)).scrollIntoViewIfNeeded();
+        await waitUntilStill(page.locator(`${slide(PAIRS)}:not([aria-hidden="true"])`).first());
+
+        expect(await currentSlides(page, PAIRS), `under ${placement} both slides of the pair are current`).toHaveLength(
+            2,
+        );
+
+        const [first, second] = await cardBoxes(page, PAIRS);
+        const tolerance = Math.min(first.width, second.width) * 0.05;
+
+        expect(second.left, `under ${placement} the second card comes after the first`).toBeGreaterThan(first.left);
+        expect(
+            Math.abs(second.left - first.right),
+            `under ${placement} the two cards meet edge to edge rather than overlapping or parting`,
+        ).toBeLessThan(tolerance);
+        expect(
+            Math.abs(second.top + second.height * 0.5 - (first.top + first.height * 0.5)),
+            `under ${placement} they share a middle across the axis`,
+        ).toBeLessThan(tolerance);
+    }
 });

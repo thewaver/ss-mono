@@ -2,16 +2,20 @@ import { createVar, style } from "@vanilla-extract/css";
 
 export const tableTemplateVar = createVar();
 export const tableResizerWidthVar = createVar();
+export const tableMinWidthVar = createVar();
+export const tablePinOffsetVar = createVar();
 
 export const tableRoot = style({
     display: "block",
     width: "100%",
+    minWidth: tableMinWidthVar,
+    isolation: "isolate",
 });
 
 export const tableHeader = style({
     position: "sticky",
     top: 0,
-    zIndex: 1,
+    zIndex: 2,
 });
 
 export const tableBody = style({
@@ -33,6 +37,24 @@ export const tableWindowedRow = style({
 
 export const tableCell = style({
     position: "relative",
+    minWidth: 0,
+});
+
+export const tablePinnedStart = style({
+    position: "sticky",
+    insetInlineStart: tablePinOffsetVar,
+    zIndex: 1,
+});
+
+export const tablePinnedEnd = style({
+    position: "sticky",
+    insetInlineEnd: tablePinOffsetVar,
+    zIndex: 1,
+});
+
+export const tableDetailCell = style({
+    position: "relative",
+    gridColumn: "1 / -1",
     minWidth: 0,
 });
 
@@ -62,6 +84,16 @@ export const tableResizer = style({
 });
 
 export const tableSortControl = style({
+    display: "flex",
+    border: "none",
+    padding: 0,
+    background: "none",
+    font: "inherit",
+    color: "inherit",
+    cursor: "pointer",
+});
+
+export const tableRowExpander = style({
     display: "flex",
     border: "none",
     padding: 0,

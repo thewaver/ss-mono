@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from "react";
 
-import { DEFAULT_SLIDE_BUTTON_CONTENT_WIDTH } from "@thewaver/ss-playground/App/StyledComponents/SlideButtonContent/SlideButtonContent.const";
+import { DEFAULT_SLIDE_BUTTON_CONTENT_LENGTH } from "@thewaver/ss-playground/App/StyledComponents/SlideButtonContent/SlideButtonContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/SlideButtonContent/SlideButtonContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
@@ -14,27 +14,37 @@ const covered = (ratio: number) =>
 export const PageSlideButtonContent = (props: PropsWithChildren<SlideButtonContentProps>) => {
     const layerClass = useLayerClass();
 
-    const width = props.width ?? DEFAULT_SLIDE_BUTTON_CONTENT_WIDTH;
+    const length = props.length ?? DEFAULT_SLIDE_BUTTON_CONTENT_LENGTH;
+
+    const isVertical = props.renderProps.orientation === "vertical";
+
+    const isRightToLeft = !isVertical && props.renderProps.direction === "rtl";
 
     const ratio = props.renderProps.isPressed ? 1 : props.renderProps.progressRatio;
 
     const isTracking = props.renderProps.isDragging || props.renderProps.isHolding;
+
+    const offset = travel(ratio);
+
+    const thumbStyle = isVertical ? { bottom: offset } : isRightToLeft ? { right: offset } : { left: offset };
 
     return (
         <div
             className={[
                 styles.slideButtonContent,
                 layerClass,
+                isVertical && styles.isVertical,
+                isRightToLeft && styles.isRightToLeft,
                 props.renderProps.isDisabled && styles.isDisabled,
                 props.renderProps.hasError && styles.hasError,
             ]
                 .filter(Boolean)
                 .join(" ")}
-            style={{ width: `${width}px` }}
+            style={isVertical ? { height: `${length}px` } : { width: `${length}px` }}
         >
             <div
                 className={[styles.slideButtonFill, isTracking && styles.isTracking].filter(Boolean).join(" ")}
-                style={{ width: covered(ratio) }}
+                style={isVertical ? { height: covered(ratio) } : { width: covered(ratio) }}
             />
 
             <div className={styles.slideButtonHint} style={{ opacity: 1 - ratio }}>
@@ -49,7 +59,7 @@ export const PageSlideButtonContent = (props: PropsWithChildren<SlideButtonConte
                 ]
                     .filter(Boolean)
                     .join(" ")}
-                style={{ left: travel(ratio) }}
+                style={thumbStyle}
             >
                 <svg className={styles.slideButtonArrow} viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M5 12 H19 M13 6 L19 12 L13 18" />

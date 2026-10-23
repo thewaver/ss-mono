@@ -5,6 +5,7 @@
     import { createCarouselsControls } from "../Carousels.utils.svelte";
     import PageCarouselsPanel from "../CarouselsPanel.svelte";
     import NoControlsExample from "./Examples/NoControls.svelte";
+    import PairsExample from "./Examples/Pairs.svelte";
     import RotatingExample from "./Examples/Rotating.svelte";
     import ScrolledExample from "./Examples/Scrolled.svelte";
     import SteppedExample from "./Examples/Stepped.svelte";
@@ -14,6 +15,10 @@
     EXAMPLES_ROOT,
     WINDOWED_SLIDE_COUNT,
 } from "@thewaver/ss-playground/App/Pages/Carousels/CarouselPage/CarouselPage.const";
+    import {
+        computePairs,
+        toPairableSlides,
+    } from "@thewaver/ss-playground/App/Pages/Carousels/CarouselPage/CarouselPage.utils";
 
     const controls = createCarouselsControls();
 
@@ -24,6 +29,7 @@
     let scrolledIndex = $state(0);
     let windowedIndex = $state(0);
     let builtCount = $state(0);
+    let pairsIndex = $state(0);
 
     let builtTally = 0;
 
@@ -33,6 +39,8 @@
     };
 
     const isLooping = $derived(controls.isLooping);
+
+    const pairCount = $derived(computePairs(toPairableSlides(controls.sharedProps.slides).length).length);
 
     const examples: ExampleDefs[] = [
         {
@@ -75,6 +83,14 @@
             component: windowedExample,
             path: `${EXAMPLES_ROOT}/Windowed.svelte`,
         },
+        {
+            key: "pairs",
+            name: EXAMPLE_NAMES.pairs,
+            readout: () =>
+                `pair ${pairsIndex + 1} of ${pairCount} — the slides two at a time, 1 and 2, then 3 and 4, each pair resting side by side in the room of one slide wherever the placement rests a slide; an odd number of slides is doubled so every pair is whole`,
+            component: pairsExample,
+            path: `${EXAMPLES_ROOT}/Pairs.svelte`,
+        },
     ];
 </script>
 
@@ -111,6 +127,12 @@
             bind:index={windowedIndex}
             onBuiltChange={changeBuiltCount}
         />
+    </PageCarouselBox>
+{/snippet}
+
+{#snippet pairsExample()}
+    <PageCarouselBox>
+        <PairsExample {...controls.sharedProps} {isLooping} bind:index={pairsIndex} />
     </PageCarouselBox>
 {/snippet}
 

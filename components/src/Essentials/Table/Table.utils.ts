@@ -8,7 +8,10 @@ import type { SelectionMode } from "../../Abstracts/Selection/Selection.types";
 import type {
     TableCellRenderProps,
     TableColumnDefs,
+    TableColumnPin,
     TableColumnRenderProps,
+    TableEntry,
+    TableFocus,
     TableGrid,
     TableKeyCommand,
     TableSort,
@@ -19,6 +22,26 @@ import type {
 const CANCEL_KEY = "Escape";
 /** What a repeated press of a column header steps through: up, down, then unsorted. */
 const SORT_CYCLE: (TableSortDirection | undefined)[] = ["ascending", "descending", undefined];
+/** The open rows when none is open, one array so an unchanged answer is the same array. */
+const NO_EXPANDED_ROWS: number[] = [];
+
+/** How many of a sorted list of rows come before a row. */
+const countBefore = (sortedRows: number[], row: number) => {
+    let low = 0;
+    let high = sortedRows.length;
+
+    while (low < high) {
+        const middle = (low + high) >>> 1;
+
+        if (sortedRows[middle] < row) low = middle + 1;
+        else high = middle;
+    }
+
+    return low;
+};
+
+/** The order a column's pin puts it in: held at the start first, then scrolling, then held at the end. */
+const getPinRank = (pin: TableColumnPin | undefined) => (pin === "start" ? 0 : pin === "end" ? 2 : 1);
 
 /**
  * Sorting, column ordering and sizing for a table.
@@ -75,6 +98,236 @@ export namespace TableUtils {
             );
 
         return placed.every((value, index) => value === index) ? undefined : placed;
+    };
+
+    /**
+     * The column order once pinned columns are gathered at their edges.
+     *
+     * Columns held at the start come first and columns held at the end come last, each keeping the order it had
+     * among its own kind, so a pinned column can never sit among the scrolling ones.
+     *
+     * @param columns The columns as declared.
+     * @param order The column indices in order, as {@link getColumnOrder} gives them; `undefined` is the declared
+     * order.
+     * @returns The column indices in order, or `undefined` when that would be the declared order anyway. With no
+     * pinned column, `order` comes back as it was.
+     */
+    export const getPinnedOrder = <T>(columns: TableColumnDefs<T>[], order: number[] | undefined) => {
+        if (!columns.some((column) => column.pin !== undefined)) return order;
+
+        const placed = (order ?? columns.map((_unused, index) => index))
+            .map((index, position) => ({ index, position, rank: getPinRank(columns[index].pin) }))
+            .sort((a, b) => a.rank - b.rank || a.position - b.position)
+            .map((entry) => entry.index);
+
+        return placed.every((value, index) => value === index) ? undefined : placed;
+    };
+
+    /**
+     * Where each column is held while the rest scroll sideways.
+     *
+     * A column held at the start sits after the start-pinned columns before it, and one held at the end before the
+     * end-pinned columns after it, so the offset is the sum of their widths.
+     *
+     * @param columns The columns, in the order they are drawn, pinned ones already gathered at their edges.
+     * @param widths Widths set by dragging, by column id.
+     * @returns For each column, its distance in pixels from the edge it is held at, or `undefined` for a column that
+     * scrolls.
+     */
+    export const computePinOffsets = <T>(columns: TableColumnDefs<T>[], widths: Record<string, number>) => {
+        const offsets: (number | undefined)[] = columns.map(() => undefined);
+
+        let start = 0;
+
+        columns.forEach((column, index) => {
+            if (column.pin !== "start") return;
+
+            offsets[index] = start;
+            start += getColumnWidth(column, widths) ?? 0;
+        });
+
+        let end = 0;
+
+        for (let index = columns.length - 1; index >= 0; index--) {
+            if (columns[index].pin !== "end") continue;
+
+            offsets[index] = end;
+            end += getColumnWidth(columns[index], widths) ?? 0;
+        }
+
+        return offsets;
+    };
+
+    /**
+     * Holds a column's new place among the columns pinned the way it is, which is as far as it can be moved.
+     *
+     * @param columns The columns, in the order they are drawn, pinned ones already gathered at their edges.
+     * @param sourceIndex Where the moving column sits now.
+     * @param place Where it is asked to go.
+     * @returns The nearest place inside its own run of columns: the start-pinned, the scrolling or the end-pinned.
+     */
+    export const clampToPinGroup = <T>(columns: TableColumnDefs<T>[], sourceIndex: number, place: number) => {
+        const pin = columns[sourceIndex]?.pin;
+
+        let first = sourceIndex;
+        let last = sourceIndex;
+
+        while (first > 0 && columns[first - 1].pin === pin) first--;
+        while (last < columns.length - 1 && columns[last + 1].pin === pin) last++;
+
+        return MathUtils.clamp(place, first, last);
+    };
+
+    /**
+     * The narrowest a table can be before its columns overflow it: every fixed width, and every other column's
+     * minimum.
+     *
+     * Holding the table at least this wide keeps each row as wide as its columns, which is what lets a pinned column
+     * stay held across the whole of a sideways scroll rather than only the width of the scroller.
+     *
+     * @param columns The columns.
+     * @param widths Widths set by dragging, by column id.
+     */
+    export const computeMinTableWidth = <T>(columns: TableColumnDefs<T>[], widths: Record<string, number>) =>
+        columns.reduce((sum, column) => sum + (getColumnWidth(column, widths) ?? column.minWidthPx ?? 0), 0);
+
+    /**
+     * The rows whose detail is open, by where they sit on screen.
+     *
+     * @param rows The rows, in the order they are drawn.
+     * @param expanded The rows whose detail the consumer or reader has opened.
+     * @param computeIsExpandable Whether a row can open a detail; a row that cannot is never open, whatever
+     * `expanded` holds.
+     * @returns The positions, ascending — the same empty array whenever nothing is open, so a table with no open
+     * detail does no work for one.
+     */
+    export const getExpandedRows = <T>(
+        rows: T[],
+        expanded: T[],
+        computeIsExpandable: ((row: T) => boolean) | undefined,
+    ) => {
+        if (expanded.length < 1) return NO_EXPANDED_ROWS;
+
+        const open = new Set(expanded);
+        const found = rows.reduce<number[]>((acc, row, index) => {
+            if (open.has(row) && (computeIsExpandable?.(row) ?? true)) acc.push(index);
+
+            return acc;
+        }, []);
+
+        return found.length < 1 ? NO_EXPANDED_ROWS : found;
+    };
+
+    /**
+     * The open list with one row's detail opened or closed.
+     *
+     * @param expanded The rows open now.
+     * @param row The row to open or close.
+     * @returns A new list.
+     */
+    export const getToggledExpanded = <T>(expanded: T[], row: T) =>
+        expanded.includes(row) ? expanded.filter((value) => value !== row) : [...expanded, row];
+
+    /**
+     * How many entries the body draws: every row, and a detail under each open one.
+     *
+     * @param rowCount How many rows there are.
+     * @param expandedRows The open rows, from {@link getExpandedRows}.
+     */
+    export const getEntryCount = (rowCount: number, expandedRows: number[]) => rowCount + expandedRows.length;
+
+    /**
+     * Where a row sits among the body's entries, once the details open above it are counted.
+     *
+     * @param layoutRow Where the row sits among the rows.
+     * @param expandedRows The open rows, from {@link getExpandedRows}.
+     */
+    export const getEntryIndex = (layoutRow: number, expandedRows: number[]) =>
+        layoutRow + countBefore(expandedRows, layoutRow);
+
+    /**
+     * What the body draws at a place among its entries: a row, or the detail under one.
+     *
+     * @param entryIndex The place, counting from zero below the header.
+     * @param expandedRows The open rows, from {@link getExpandedRows}.
+     * @returns The kind of entry and the row it belongs to. A place past the end answers with a row past the end,
+     * which the caller holds inside the table.
+     */
+    export const getEntry = (entryIndex: number, expandedRows: number[]): TableEntry => {
+        let low = 0;
+        let high = expandedRows.length;
+
+        while (low < high) {
+            const middle = (low + high) >>> 1;
+
+            if (expandedRows[middle] + middle + 1 <= entryIndex) low = middle + 1;
+            else high = middle;
+        }
+
+        if (low > 0 && expandedRows[low - 1] + low === entryIndex) {
+            return { kind: "detail", layoutRow: expandedRows[low - 1] };
+        }
+
+        return { kind: "row", layoutRow: entryIndex - low };
+    };
+
+    /**
+     * The cell the roving walk stands on, from the cell focus is held on.
+     *
+     * Focus is held by row rather than by place in the walk, so opening or closing a detail above it does not move
+     * it to another row. A detail that has closed hands focus back to its row.
+     *
+     * @param focus The held cell, with the header as row zero and each row counted once, and whether it is the
+     * detail under that row.
+     * @param expandedRows The open rows, from {@link getExpandedRows}.
+     * @returns The cell in the walk, where an open detail counts as a row of its own.
+     */
+    export const computeWalkCell = (focus: TableFocus, expandedRows: number[]): Index2d => {
+        if (focus.cell.row === HEADER_ROW_INDEX) return focus.cell;
+
+        const layoutRow = focus.cell.row - 1;
+        const isDetail = focus.isDetail && expandedRows[countBefore(expandedRows, layoutRow)] === layoutRow;
+
+        return { row: getEntryIndex(layoutRow, expandedRows) + (isDetail ? 1 : 0) + 1, col: focus.cell.col };
+    };
+
+    /**
+     * The cell focus is held on, from a cell in the roving walk. The inverse of {@link computeWalkCell}.
+     *
+     * @param cell The cell in the walk, with the header as row zero.
+     * @param expandedRows The open rows, from {@link getExpandedRows}.
+     */
+    export const computeFocus = (cell: Index2d, expandedRows: number[]): TableFocus => {
+        if (cell.row === HEADER_ROW_INDEX) return { cell, isDetail: false };
+
+        const entry = getEntry(cell.row - 1, expandedRows);
+
+        return { cell: { row: entry.layoutRow + 1, col: cell.col }, isDetail: entry.kind === "detail" };
+    };
+
+    /**
+     * The id a detail's cell carries, so the grid can move focus to it.
+     *
+     * @param tableId The table's own id.
+     * @param layoutRow Where the detail's row sits among the rows.
+     */
+    export const getDetailId = (tableId: string, layoutRow: number) => `${tableId}-detail-${layoutRow}`;
+
+    /** The attribute every detail's cell carries, so a key pressed inside one can be told apart. */
+    export const DETAIL_ATTRIBUTE = "data-table-detail";
+
+    /**
+     * Whether a key was pressed on something inside one of this table's details rather than on the detail's cell,
+     * which the grid then leaves to whatever has focus — a field, a link, a table of its own.
+     *
+     * @param target The element the key was pressed on.
+     * @param root The table's own element. A detail of a table nested inside it is that table's business.
+     */
+    export const getIsInsideDetail = (target: EventTarget | null, root: HTMLElement) => {
+        const element = target as HTMLElement | null;
+        const detail = element?.closest?.(`[${DETAIL_ATTRIBUTE}]`);
+
+        return detail != null && detail !== element && root.contains(detail);
     };
 
     /**
@@ -198,16 +451,20 @@ export namespace TableUtils {
      *
      * The decision tree, in the order it is checked: Ctrl or Cmd with A selects every row; Ctrl with Home or End
      * goes to the grid's first or last cell. On the header row, Enter or Space sorts, Ctrl with Left or Right
-     * resizes, and Shift with Left or Right moves the column. On a body row, Enter activates the row and Space picks
-     * it — toggling it, or extending the run with Shift. Anything else goes through the arrow, page and edge walk,
-     * held inside the grid, and a Shift-held walk into the body extends the selection to the row it lands on. Left
-     * and right are read in reading order.
+     * resizes, and Shift with Left or Right moves the column. On a body row, Enter on the first cell of a row that
+     * can open a detail opens or closes it, Enter anywhere else activates the row, and Space picks it — toggling it,
+     * or extending the run with Shift. On an open detail, which is one cell as wide as the row, only the walk up and
+     * down applies. Anything else goes through the arrow, page and edge walk, held inside the grid, and a Shift-held
+     * walk onto a row extends the selection to it. Left and right are read in reading order.
      *
      * @param e The key and the modifiers held with it.
-     * @param from The roving cell, with the header row as row zero.
-     * @param grid How many rows, the header row included, and columns there are.
+     * @param from The roving cell, with the header row as row zero and each open detail a row of its own.
+     * @param grid How many rows, the header row and open details included, and columns there are.
      * @param opts.direction The layout direction.
      * @param opts.pageRows How many rows Page Up and Page Down move by.
+     * @param opts.expandedRows The open rows, from {@link getExpandedRows}. Leave it out when nothing can open.
+     * @param opts.computeIsExpandable Whether the row at a screen position can open a detail. Leave it out when
+     * nothing can, and Enter always activates.
      * @returns The command, or `undefined` for a key the grid leaves alone. Whether a command is allowed — the table
      * disabled, the column not sortable — is the caller's to decide.
      */
@@ -215,9 +472,16 @@ export namespace TableUtils {
         e: { key: string; ctrlKey: boolean; metaKey: boolean; shiftKey: boolean },
         from: Index2d,
         grid: TableGrid,
-        opts: { direction: NavigatorDirection | undefined; pageRows: number },
+        opts: {
+            direction: NavigatorDirection | undefined;
+            pageRows: number;
+            expandedRows?: number[];
+            computeIsExpandable?: (layoutRow: number) => boolean;
+        },
     ): TableKeyCommand | undefined => {
         if (grid.colCount < 1) return undefined;
+
+        const expandedRows = opts.expandedRows ?? NO_EXPANDED_ROWS;
 
         if (e.key === "a" && (e.ctrlKey || e.metaKey)) return { kind: "select_all" };
 
@@ -242,13 +506,25 @@ export namespace TableUtils {
                 return { kind: "move_column", to: from.col + (logicalKey === "ArrowLeft" ? -1 : 1) };
             }
         } else {
-            if (e.key === "Enter") return { kind: "activate_row", rowIndex: from.row - 1 };
-            if (e.key === " ") {
-                return {
-                    kind: "pick_row",
-                    rowIndex: from.row - 1,
-                    gesture: { isToggling: !e.shiftKey, isExtending: e.shiftKey },
-                };
+            const entry = getEntry(from.row - 1, expandedRows);
+
+            if (entry.kind === "detail") {
+                if (isHorizontalArrow || e.key === "Home" || e.key === "End") return undefined;
+                if (NavigatorUtils.getIsActivationKey(e.key)) return undefined;
+            } else {
+                if (e.key === "Enter") {
+                    return from.col === 0 && opts.computeIsExpandable?.(entry.layoutRow) === true
+                        ? { kind: "toggle_row", rowIndex: entry.layoutRow }
+                        : { kind: "activate_row", rowIndex: entry.layoutRow };
+                }
+
+                if (e.key === " ") {
+                    return {
+                        kind: "pick_row",
+                        rowIndex: entry.layoutRow,
+                        gesture: { isToggling: !e.shiftKey, isExtending: e.shiftKey },
+                    };
+                }
             }
         }
 
@@ -261,7 +537,9 @@ export namespace TableUtils {
 
         const cell = clampCell(next, grid);
 
-        return { kind: "focus", cell, isExtending: e.shiftKey && cell.row > HEADER_ROW_INDEX };
+        const isOnRow = cell.row > HEADER_ROW_INDEX && getEntry(cell.row - 1, expandedRows).kind === "row";
+
+        return { kind: "focus", cell, isExtending: e.shiftKey && isOnRow };
     };
 
     /**
@@ -429,6 +707,7 @@ export namespace TableUtils {
             isFocused: roving.row === HEADER_ROW_INDEX && roving.col === layoutCol,
             isHovered: params.hoveredColumn === layoutCol,
             isDisabled: params.isDisabled,
+            pin: column.pin,
         };
     };
 
@@ -436,7 +715,9 @@ export namespace TableUtils {
      * What a body cell's painter is told about its cell.
      *
      * @param params The column's id, where the cell's column and row sit in the data and on screen, whether its row
-     * is selected, the roving cell, the hovered row, and whether the table is disabled.
+     * is selected, the roving cell, the hovered row, whether the table is disabled, the edge the column is pinned
+     * to, and whether the row can open a detail and has. `roving` names the cell by row, each row counted once, so
+     * a detail open above it does not shift it; a roving detail is not a cell, and is left out of it.
      */
     export const computeCellRenderProps = (params: {
         columnId: string;
@@ -448,6 +729,9 @@ export namespace TableUtils {
         roving: Index2d;
         hoveredRow: number | undefined;
         isDisabled: boolean;
+        pin?: TableColumnPin;
+        isExpandable?: boolean;
+        isExpanded?: boolean;
     }): TableCellRenderProps => ({
         columnId: params.columnId,
         dataCol: params.dataCol,
@@ -458,6 +742,9 @@ export namespace TableUtils {
         isFocused: params.roving.row === params.layoutRow + 1 && params.roving.col === params.layoutCol,
         isHovered: params.hoveredRow === params.layoutRow,
         isDisabled: params.isDisabled,
+        pin: params.pin,
+        isExpandable: params.isExpandable ?? false,
+        isExpanded: params.isExpanded ?? false,
     });
 
     /**
@@ -484,6 +771,27 @@ export namespace TableUtils {
                 `Table: column "${column.id}" is reorderable but its header renders no TableHeaderReorder, so the only pointer route is dragging, which fails WCAG 2.5.7 Dragging Movements.`,
             );
         }
+    };
+
+    /**
+     * Warns about a table whose rows can open a detail while none of them renders a `TableRowExpander`, so a pointer
+     * cannot open one and only Enter on a row's first cell can.
+     */
+    export const warnIfExpanderMissing = () => {
+        console.warn(
+            "Table: its rows can open a detail but no row renders a TableRowExpander, so a pointer cannot open one — only Enter on a row's first cell can.",
+        );
+    };
+
+    /**
+     * Warns about a row control rendered outside any body cell, where it has no row to act on.
+     *
+     * @param control The control's name, for the message.
+     */
+    export const warnOutsideCell = (control: string) => {
+        console.warn(
+            `${control}: no Table body cell around it — it has no row to act on and renders nothing. Render it from a column's renderCell.`,
+        );
     };
 
     /**

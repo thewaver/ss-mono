@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { SLIDE_BUTTON_DEFAULTS, type SlideButtonRenderProps } from "@thewaver/ss-components";
+    import { type NavigatorDirection, SLIDE_BUTTON_DEFAULTS, type SlideButtonRenderProps } from "@thewaver/ss-components";
     import { SlideButtonConst } from "@thewaver/ss-components/internal";
 
     import InteractionWrapper from "../../../Primitives/InteractionWrapper/InteractionWrapper.svelte";
@@ -10,8 +10,17 @@
 
     let isDragging = $state(false);
     let isHolding = $state(false);
+    let direction = $state<NavigatorDirection>("ltr");
 
-    const extraFlags: SlideButtonRenderProps = $derived({ progressRatio: progress, isDragging, isHolding });
+    const orientation = $derived(props.orientation ?? SLIDE_BUTTON_DEFAULTS.orientation);
+
+    const extraFlags: SlideButtonRenderProps = $derived({
+        orientation,
+        direction,
+        progressRatio: progress,
+        isDragging,
+        isHolding,
+    });
 </script>
 
 <InteractionWrapper {...props} bind:ref {extraFlags}>
@@ -20,6 +29,7 @@
             {attachElement}
             id={props.id}
             ariaLabel={props.ariaLabel}
+            {orientation}
             thumbSize={props.thumbSize ?? SLIDE_BUTTON_DEFAULTS.thumbSize}
             holdDurationMs={props.holdDurationMs ?? SLIDE_BUTTON_DEFAULTS.holdDurationMs}
             completionRatio={props.completionRatio ?? SLIDE_BUTTON_DEFAULTS.completionRatio}
@@ -35,6 +45,9 @@
             }}
             setIsHolding={(next) => {
                 isHolding = next;
+            }}
+            setDirection={(next) => {
+                direction = next;
             }}
             onActivate={props.onActivate}
             onMouseEnter={props.onMouseEnter}

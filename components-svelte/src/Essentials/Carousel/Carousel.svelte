@@ -5,6 +5,7 @@
     import {
         CAROUSEL_DEFAULTS,
         type CarouselFace,
+        type CarouselPlacementGroup,
         type CarouselSlideState,
         CarouselUtils,
         LiveAnnouncerUtils,
@@ -40,7 +41,12 @@
     const faceRefs: (HTMLElement | undefined)[] = [];
 
     const count = $derived(props.slides.length);
-    const currentIndex = $derived(CarouselUtils.wrapIndex(index, count));
+    const groups = $derived(CarouselUtils.resolveGroups(props.computeGroups?.(count), count));
+    const groupCount = $derived(groups.length);
+    const rests = $derived(groups.map(CarouselUtils.getGroupRest));
+    const memberships = $derived(CarouselUtils.getGroupMemberships(groups, count));
+    const currentIndex = $derived(CarouselUtils.wrapIndex(index, groupCount));
+    const currentGroup = $derived(groups[currentIndex]);
     const isDisabled = $derived(props.isDisabled ?? false);
     const isLooping = $derived(props.isLooping ?? CAROUSEL_DEFAULTS.isLooping);
     const isWindowed = $derived(props.isWindowed ?? CAROUSEL_DEFAULTS.isWindowed);
@@ -57,11 +63,11 @@
 
     const getSize = ElementObserverSvelteUtils.createBorderBoxSizeObserver(() => viewport ?? undefined);
 
-    const position = $derived(CarouselUtils.toPosition(progress ?? NO_PROGRESS, count, isLooping));
+    const position = $derived(CarouselUtils.toGroupPosition(progress ?? NO_PROGRESS, rests, count, isLooping));
     const drawnPosition = $derived(position - swipeRatio);
-    const isPressDisabled = $derived(CarouselUtils.getIsSwipeDisabled(isDrivenFromOutside, isDisabled, count));
+    const isPressDisabled = $derived(CarouselUtils.getIsSwipeDisabled(isDrivenFromOutside, isDisabled, groupCount));
 
-    const copies = $derived(CarouselUtils.getCopyCount(count, props.placement.reach, isLooping));
+    const copies = $derived(CarouselUtils.getCopyCount(groupCount, props.placement.reach, isLooping));
     const ringCount = $derived(count * copies);
     const ringPlaces = $derived(Array.from({ length: ringCount }, (_, place) => place));
 
@@ -73,14 +79,42 @@
         return followedRing;
     });
 
-    const currentPlace = $derived(CarouselUtils.getNearestCopy(currentIndex, ringPosition, count, copies));
+    const ringRests = $derived(
+        Array.from({ length: copies }, (_, copy) => rests.map((rest) => rest + copy * count)).flat(),
+    );
+
+    const groupPosition = $derived(CarouselUtils.toGroupCoordinate(ringPosition, ringRests, ringCount, isLooping));
+
+    const currentPlace = $derived(
+        currentGroup ? CarouselUtils.getGroupPlace(currentGroup, ringPosition, count, copies) : 0,
+    );
+
+    const getIsCurrentPlace = (place: number) =>
+        currentGroup !== undefined &&
+        CarouselUtils.getIsInGroupPlace(place, currentPlace, currentGroup.end - currentGroup.start, ringCount);
 
     const toIndex = (place: number) => place % Math.max(count, 1);
 
     const getDistance = (place: number) => CarouselUtils.getDistance(place, ringPosition, ringCount, isLooping);
 
+    const getPlacementGroup = (place: number): CarouselPlacementGroup =>
+        props.computeGroups === undefined
+            ? CarouselUtils.toSlideGroup(getDistance(place), place, ringCount)
+            : CarouselUtils.getPlacementGroup({
+                  place,
+                  groupPosition,
+                  memberships,
+                  rests: ringRests,
+                  count,
+                  groupCount,
+                  copies,
+                  isLooping,
+              });
+
+    const placementGroups = $derived(ringPlaces.map(getPlacementGroup));
+
     const getIsBuiltAt = (place: number) =>
-        CarouselUtils.getIsBuilt(getDistance(place), props.placement.reach, isWindowed);
+        CarouselUtils.getIsBuilt(placementGroups[place].distance, props.placement.reach, isWindowed);
 
     const builtPlaces = $derived(ringPlaces.filter(getIsBuiltAt));
 
@@ -89,6 +123,7 @@
             getIsBuiltAt(place)
                 ? props.placement.place({
                       distance: getDistance(place),
+                      group: placementGroups[place],
                       index: place,
                       count: ringCount,
                       size: getSize(),
@@ -110,18 +145,20 @@
     const glideTo = (target: number) => {
         const from = drawnPosition;
         const glideCount = count;
+        const glideRests = rests;
         const glideIsLooping = isLooping;
 
         stopGlide?.();
-        writeProgress(CarouselUtils.toProgress(from, glideCount, glideIsLooping));
+        writeProgress(CarouselUtils.toGroupProgress(from, glideRests, glideCount, glideIsLooping));
         swipeRatio = 0;
         isGliding = true;
 
         stopGlide = CarouselUtils.glide({
             from,
-            to: CarouselUtils.getGlideTarget(from, target, glideCount, glideIsLooping),
+            to: CarouselUtils.getGlideTarget(from, glideRests[target] ?? 0, glideCount, glideIsLooping),
             durationMs: transitionDurationMs,
-            onFrame: (next) => writeProgress(CarouselUtils.toProgress(next, glideCount, glideIsLooping)),
+            onFrame: (next) =>
+                writeProgress(CarouselUtils.toGroupProgress(next, glideRests, glideCount, glideIsLooping)),
             onEnd: () => {
                 isGliding = false;
             },
@@ -131,7 +168,7 @@
     $effect(() => () => stopGlide?.());
 
     const goTo = (target: number) => {
-        const next = CarouselUtils.resolveIndex(target, count, isLooping);
+        const next = CarouselUtils.resolveIndex(target, groupCount, isLooping);
 
         if (next === undefined || next === currentIndex) return;
 
@@ -154,7 +191,11 @@
                 const target =
                     direction === undefined
                         ? undefined
-                        : CarouselUtils.resolveIndex(current + CarouselUtils.getSwipeStep(direction), count, isLooping);
+                        : CarouselUtils.resolveIndex(
+                              current + CarouselUtils.getSwipeStep(direction),
+                              groupCount,
+                              isLooping,
+                          );
 
                 if (target === undefined || target === current) {
                     glideTo(current);
@@ -174,18 +215,26 @@
             isHeld: getIsHeld(),
             isSwiping: getIsSwiping(),
             isDisabled,
-            count,
+            count: groupCount,
         }),
     );
 
     const getSlideLabel = (slideIndex: number) => props.computeSlideLabel(slideIndex, count);
+
+    const getAnnouncement = (groupIndex: number) => {
+        const group = groups[groupIndex];
+
+        if (!group || !props.computeGroupLabel) return getSlideLabel(groupIndex);
+
+        return props.computeGroupLabel(group.start, group.end, count);
+    };
 
     const getSlideState = (place: number, face: CarouselFace): CarouselSlideState => ({
         index: toIndex(place),
         count,
         distance: getDistance(place),
         face,
-        isCurrent: place === currentPlace,
+        isCurrent: getIsCurrentPlace(place),
     });
 
     let placedIndex: number | undefined;
@@ -195,12 +244,12 @@
 
         untrack(() => {
             const previous = placedIndex;
-            const isThere = CarouselUtils.getNearestIndex(position, count, isLooping) === target;
+            const isThere = CarouselUtils.getNearestGroup(position, rests, count, isLooping) === target;
 
             placedIndex = target;
 
             if (previous === undefined) {
-                if (!isThere) writeProgress(CarouselUtils.toProgress(target, count, isLooping));
+                if (!isThere) writeProgress(CarouselUtils.toGroupProgress(rests[target] ?? 0, rests, count, isLooping));
 
                 return;
             }
@@ -221,8 +270,9 @@
                 isGliding = false;
             }
 
-            const nearest = CarouselUtils.getNearestIndex(
-                CarouselUtils.toPosition(next, count, isLooping),
+            const nearest = CarouselUtils.getNearestGroup(
+                CarouselUtils.toGroupPosition(next, rests, count, isLooping),
+                rests,
                 count,
                 isLooping,
             );
@@ -253,7 +303,7 @@
 
         untrack(() => {
             if (CarouselUtils.getIsAnnounced(announcedIndex, shownIndex, isRotating)) {
-                LiveAnnouncerUtils.announce(props.computeSlideLabel(shownIndex, count));
+                LiveAnnouncerUtils.announce(getAnnouncement(shownIndex));
             }
         });
 
@@ -266,7 +316,7 @@
             autoplayDelayMs,
             isPlaying: playback,
             isDisabled,
-            count,
+            count: groupCount,
             index: currentIndex,
         }),
     );
@@ -278,19 +328,24 @@
     const handleViewportClick = (e: MouseEvent) => {
         if (isPressDisabled) return;
 
-        const shownPlace = currentPlace;
         const getDrawn = (place: number) => faceRefs[place]?.firstElementChild ?? faceRefs[place];
 
-        if (getDrawn(shownPlace)?.contains(e.target as Node)) return;
+        if (faceRefs.some((_face, place) => getIsCurrentPlace(place) && getDrawn(place)?.contains(e.target as Node))) {
+            return;
+        }
 
         const rects = faceRefs.map((_face, place) =>
-            place !== shownPlace && placements[place]?.effect.opacity !== HIDDEN_OPACITY
+            !getIsCurrentPlace(place) && placements[place]?.effect.opacity !== HIDDEN_OPACITY
                 ? getDrawn(place)?.getBoundingClientRect()
                 : undefined,
         );
         const hit = CarouselUtils.computeHitIndex(rects, { x: e.clientX, y: e.clientY });
 
-        if (hit !== undefined) goTo(toIndex(hit));
+        if (hit === undefined) return;
+
+        const group = CarouselUtils.getNearestGroupHolding(toIndex(hit), groups, position, count, isLooping);
+
+        if (group !== undefined) goTo(group);
     };
 
     const setStyle = (element: HTMLElement, style: Record<string, string>) => {
@@ -323,19 +378,20 @@
 
     const controls: CarouselControls = {
         getIndex: () => currentIndex,
-        getCount: () => count,
+        getCount: () => groupCount,
         getIsPlaying: () => playback,
         getIsHeld,
-        getCanStep: (step) => !CarouselUtils.getIsStepDisabled(step, currentIndex, count, isLooping, isDisabled),
+        getCanStep: (step) =>
+            !CarouselUtils.getIsStepDisabled(step, currentIndex, groupCount, isLooping, isDisabled),
         step: (step) => {
-            if (CarouselUtils.getIsStepDisabled(step, currentIndex, count, isLooping, isDisabled)) return false;
+            if (CarouselUtils.getIsStepDisabled(step, currentIndex, groupCount, isLooping, isDisabled)) return false;
 
-            goTo(CarouselUtils.getStepTarget(step, currentIndex, count, isLooping));
+            goTo(CarouselUtils.getStepTarget(step, currentIndex, groupCount, isLooping));
 
             return true;
         },
         pick: (pickIndex) => {
-            if (isDisabled || pickIndex < 0 || pickIndex >= count || pickIndex === currentIndex) return false;
+            if (isDisabled || pickIndex < 0 || pickIndex >= groupCount || pickIndex === currentIndex) return false;
 
             goTo(pickIndex);
 
@@ -380,8 +436,8 @@
                 role="group"
                 aria-roledescription={slideRoleDescription}
                 aria-label={getSlideLabel(toIndex(place))}
-                aria-hidden={place !== currentPlace ? "true" : undefined}
-                inert={place !== currentPlace}
+                aria-hidden={getIsCurrentPlace(place) ? undefined : "true"}
+                inert={!getIsCurrentPlace(place)}
             >
                 <div
                     {@attach attachFace(place)}

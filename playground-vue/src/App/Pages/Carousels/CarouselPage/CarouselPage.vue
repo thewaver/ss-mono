@@ -6,6 +6,10 @@ import {
     EXAMPLE_NAMES,
     WINDOWED_SLIDE_COUNT,
 } from "@thewaver/ss-playground/App/Pages/Carousels/CarouselPage/CarouselPage.const";
+import {
+    computePairs,
+    toPairableSlides,
+} from "@thewaver/ss-playground/App/Pages/Carousels/CarouselPage/CarouselPage.utils";
 
 import type { ExampleDefs } from "../../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../../PageComponents/Examples/PageExamples.vue";
@@ -13,6 +17,7 @@ import PageCarouselBox from "../../../StyledComponents/CarouselContent/PageCarou
 import { useCarouselsControls } from "../Carousels.utils";
 import PageCarouselsPanel from "../PageCarouselsPanel.vue";
 import NoControlsExample from "./Examples/NoControls.vue";
+import PairsExample from "./Examples/Pairs.vue";
 import RotatingExample from "./Examples/Rotating.vue";
 import ScrolledExample from "./Examples/Scrolled.vue";
 import SteppedExample from "./Examples/Stepped.vue";
@@ -29,6 +34,9 @@ const barelessIndex = shallowRef(0);
 const scrolledIndex = shallowRef(0);
 const windowedIndex = shallowRef(0);
 const builtCount = shallowRef(0);
+const pairsIndex = shallowRef(0);
+
+const pairCount = computed(() => computePairs(toPairableSlides(sharedProps.value.slides).length).length);
 
 const windowedProps = computed(() => {
     const { slides: _slides, ...rest } = sharedProps.value;
@@ -71,6 +79,13 @@ const examples: ExampleDefs[] = [
         readout: () =>
             `slide ${windowedIndex.value + 1} of ${WINDOWED_SLIDE_COUNT} | ${builtCount.value} built — only the slides the placement can draw exist, so the rest cost nothing, and a slide that comes back is built afresh`,
         path: `${EXAMPLES_ROOT}/Windowed.vue`,
+    },
+    {
+        key: "pairs",
+        name: EXAMPLE_NAMES.pairs,
+        readout: () =>
+            `pair ${pairsIndex.value + 1} of ${pairCount.value} — the slides two at a time, 1 and 2, then 3 and 4, each pair resting side by side in the room of one slide wherever the placement rests a slide; an odd number of slides is doubled so every pair is whole`,
+        path: `${EXAMPLES_ROOT}/Pairs.vue`,
     },
 ];
 </script>
@@ -115,6 +130,12 @@ const examples: ExampleDefs[] = [
                     :is-looping="isLooping"
                     @built-change="(change: number) => (builtCount += change)"
                 />
+            </PageCarouselBox>
+        </template>
+
+        <template #pairs>
+            <PageCarouselBox>
+                <PairsExample v-bind="sharedProps" v-model:index="pairsIndex" :is-looping="isLooping" />
             </PageCarouselBox>
         </template>
     </PageExamples>

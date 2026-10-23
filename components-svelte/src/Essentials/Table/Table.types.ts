@@ -3,9 +3,11 @@ import type { Snippet } from "svelte";
 import type {
     BaseTableProps,
     TableAnnouncements,
+    TableCellContextType,
     TableCellRenderProps,
     TableColumnDefs,
     TableColumnRenderProps,
+    TableDetailRenderProps,
     TableHeaderContextType,
     TableSort,
 } from "@thewaver/ss-components";
@@ -17,7 +19,10 @@ export type TableColumn<T> = TableColumnDefs<T> & {
      * reordered by dragging, and the table warns about it.
      */
     renderHeader: Snippet<[renderProps: TableColumnRenderProps]>;
-    /** Draws one of the column's cells, and is handed its row and where the cell sits. */
+    /**
+     * Draws one of the column's cells. In a table whose rows open a detail, a `TableRowExpander` goes in one of the
+     * row's cells, usually the first; without one a pointer cannot open a detail, and the table warns about it.
+     */
     renderCell: Snippet<[row: T, renderProps: TableCellRenderProps]>;
 };
 
@@ -63,6 +68,19 @@ export type TableProps<T> = TableOrderProps &
          * without it selects nothing unless `selectionMode` says otherwise, in which case it keeps its own.
          */
         selection?: T[];
+        /**
+         * Draws the detail a row opens beneath it, as wide as the row. Giving it is what lets rows open, and makes
+         * the table a tree grid, whose rows say whether they are open. A reader opens and closes a row with Enter on
+         * its first cell, which then no longer activates the row, and walks down into the open detail with the down
+         * arrow.
+         */
+        renderDetail?: Snippet<[row: T, renderProps: TableDetailRenderProps]>;
+        /**
+         * Which rows have their detail open. Both sides write it: the table when a reader opens or closes a row, the
+         * consumer to open or close rows from outside. Bind it with `bind:expanded`; leave it out and the table keeps
+         * the state itself, starting with every row closed.
+         */
+        expanded?: T[];
     };
 
 export type TableHeaderCellProps<T> = {
@@ -86,6 +104,10 @@ export type TableHeaderCellProps<T> = {
     landingCol: number | undefined;
     /** How many columns there are. */
     columnCount: number;
+    /** The class that holds the column at its edge, when it is pinned. */
+    pinClass: string | undefined;
+    /** Where the column is held from its edge, when it is pinned. */
+    pinStyle: string | undefined;
     /** The column's state, handed to what the header draws. */
     renderProps: TableColumnRenderProps;
     /** What the header's sort and reorder controls call. */
@@ -102,6 +124,31 @@ export type TableHeaderCellProps<T> = {
     onPointerEnter: () => void;
     /** Runs as the pointer leaves the header. */
     onPointerLeave: () => void;
+};
+
+export type TableCellProps<T> = {
+    /** The column the cell is in. */
+    column: TableColumn<T>;
+    /** The row the cell is in. */
+    row: T;
+    /** The cell's id, which is how the table focuses it. */
+    cellId: string;
+    /** Where the column sits, counting on screen from the start. */
+    columnIndex: number;
+    /** Whether this cell is the grid's one tab stop. */
+    isRoving: boolean;
+    /** Whether the table is turned off. */
+    isDisabled: boolean;
+    /** The class that holds the column at its edge, when it is pinned. */
+    pinClass: string | undefined;
+    /** Where the column is held from its edge, when it is pinned. */
+    pinStyle: string | undefined;
+    /** The cell's state, handed to what the cell draws. */
+    renderProps: TableCellRenderProps;
+    /** What the row expander in the cell calls. */
+    context: Omit<TableCellContextType, "getRenderProps">;
+    /** Runs when the cell is clicked. */
+    onClick: (e: MouseEvent & { currentTarget: HTMLElement }) => void;
 };
 
 export type TableHeaderControlProps = {
@@ -130,3 +177,16 @@ export type TableHeaderSortProps = TableHeaderControlProps;
  * and renders nothing in a column that is not reorderable.
  */
 export type TableHeaderReorderProps = TableHeaderControlProps;
+
+/**
+ * The control that opens and closes a row's detail, placed by the consumer anywhere inside one of the row's cells.
+ *
+ * It is the pointer's way to open a detail; a keyboard opens one with Enter on the row's first cell. It focuses its
+ * own cell before acting and stays out of the tab order and hidden from screen readers, since the cell is the tab
+ * stop and the row says whether it is open. 2.5.8 Target Size wants it at least 24 CSS pixels across, or with room
+ * around it. It renders nothing in a row that cannot open.
+ */
+export type TableRowExpanderProps = {
+    /** Draws what sits inside the control, from the state of the cell it is in, which says whether the row is open. */
+    renderContent: Snippet<[renderProps: TableCellRenderProps]>;
+};

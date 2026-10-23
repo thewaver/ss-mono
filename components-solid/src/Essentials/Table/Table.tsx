@@ -8,8 +8,12 @@ import {
     LiveAnnouncerUtils,
     type SelectionGesture,
     TABLE_DEFAULTS,
+    type TableCellContextType,
     type TableCellRenderProps,
     type TableColumnRenderProps,
+    type TableDetailRenderProps,
+    type TableEntry,
+    type TableFocus,
     type TableHeaderContextType,
     TableUtils,
     type VirtualizerRow,
@@ -22,10 +26,22 @@ import { assignInlineVars } from "@vanilla-extract/dynamic";
 import { CarrierSolidUtils } from "../../Abstracts/Carrier/CarrierSolid.utils";
 import { NavigatorSolidUtils } from "../../Abstracts/Navigator/NavigatorSolid.utils";
 import { SelectionSolidUtils } from "../../Abstracts/Selection/SelectionSolid.utils";
+import { SignalMirrorSolidUtils } from "../../Abstracts/SignalMirror/SignalMirrorSolid.utils";
 import { VirtualizerSolidUtils } from "../../Abstracts/Virtualizer/VirtualizerSolid.utils";
 import { access } from "../../Utils/propUtils";
-import { TableHeaderContextProvider, useTableHeaderContext } from "./Table.context";
-import type { TableColumn, TableHeaderReorderProps, TableHeaderSortProps, TableProps } from "./TableSolid.types";
+import {
+    TableCellContextProvider,
+    TableHeaderContextProvider,
+    useTableCellContext,
+    useTableHeaderContext,
+} from "./Table.context";
+import type {
+    TableColumn,
+    TableHeaderReorderProps,
+    TableHeaderSortProps,
+    TableProps,
+    TableRowExpanderProps,
+} from "./TableSolid.types";
 
 export const Table = <T,>(props: TableProps<T>) => {
     onMount(() => LiveAnnouncerUtils.reserve("polite"));
@@ -37,7 +53,10 @@ export const Table = <T,>(props: TableProps<T>) => {
 
     const [getBodyRef, setBodyRef] = createSignal<HTMLElement>();
     const [getHeaderRef, setHeaderRef] = createSignal<HTMLElement>();
-    const [getFocusedCell, setFocusedCell] = createSignal<Index2d>({ row: TableConst.HEADER_ROW_INDEX, col: 0 });
+    const [getFocus, setFocus] = createSignal<TableFocus>({
+        cell: { row: TableConst.HEADER_ROW_INDEX, col: 0 },
+        isDetail: false,
+    });
     const [getHoveredRow, setHoveredRow] = createSignal<number>();
     const [getHoveredColumn, setHoveredColumn] = createSignal<number>();
     const [getResizingColumnId, setResizingColumnId] = createSignal(TableConst.NO_RESIZING);
@@ -47,7 +66,10 @@ export const Table = <T,>(props: TableProps<T>) => {
     const getDeclaredColumns = createMemo(() => access(props.columns));
 
     const getColumnOrder = createMemo(() =>
-        TableUtils.getColumnOrder(getDeclaredColumns(), props.order?.[0]() ?? TableConst.EMPTY_ORDER),
+        TableUtils.getPinnedOrder(
+            getDeclaredColumns(),
+            TableUtils.getColumnOrder(getDeclaredColumns(), props.order?.[0]() ?? TableConst.EMPTY_ORDER),
+        ),
     );
 
     const getColumns = createMemo(() => TableUtils.getReordered(getDeclaredColumns(), getColumnOrder()));
@@ -57,6 +79,8 @@ export const Table = <T,>(props: TableProps<T>) => {
     const getIsDisabled = createMemo(() => access(props.isDisabled) ?? false);
 
     const getWidths = createMemo(() => props.widths?.[0]() ?? TableConst.EMPTY_WIDTHS);
+
+    const getPinOffsets = createMemo(() => TableUtils.computePinOffsets(getColumns(), getWidths()));
 
     const getSort = createMemo(() => props.sort?.[0]());
 
@@ -84,37 +108,102 @@ export const Table = <T,>(props: TableProps<T>) => {
 
     const getIsVirtualized = createMemo(() => props.computeEstimatedRowHeight !== undefined);
 
-    const getGrid = createMemo(() => ({ rowCount: getRows().length + 1, colCount: getColumns().length }));
+    const getIsExpandable = createMemo(() => props.renderDetail !== undefined);
 
-    const getRovingCell = createMemo(() => TableUtils.clampCell(getFocusedCell(), getGrid()));
+    const expandedSignal = SignalMirrorSolidUtils.createOptional<T[]>(() => props.expanded, []);
 
-    const rowWindow = VirtualizerSolidUtils.createRowWindow(getBodyRef, () => getRows().length, {
-        getIsDisabled: () => !getIsVirtualized(),
-        computeEstimatedSize: (index) => props.computeEstimatedRowHeight?.(index) ?? 0,
-        getPinnedRows: () => {
-            const cell = getRovingCell();
+    const getIsRowExpandable = (row: T | undefined) =>
+        row !== undefined && getIsExpandable() && (props.computeIsExpandable?.(row) ?? true);
 
-            return cell.row === TableConst.HEADER_ROW_INDEX ? TableConst.EMPTY_PINNED_ROWS : [cell.row - 1];
+    const getExpandedRows = createMemo(() =>
+        getIsExpandable()
+            ? TableUtils.getExpandedRows(getRows(), expandedSignal[0](), props.computeIsExpandable)
+            : TableConst.EMPTY_EXPANDED_ROWS,
+    );
+
+    const getExpandedRowSet = createMemo(() => new Set(getExpandedRows()));
+
+    const getWalkRow = (layoutRow: number) => TableUtils.getEntryIndex(layoutRow, getExpandedRows()) + 1;
+
+    const getGrid = createMemo(() => ({
+        rowCount: TableUtils.getEntryCount(getRows().length, getExpandedRows()) + 1,
+        colCount: getColumns().length,
+    }));
+
+    const getRovingCell = createMemo(() =>
+        TableUtils.clampCell(TableUtils.computeWalkCell(getFocus(), getExpandedRows()), getGrid()),
+    );
+
+    const getRovingFocus = createMemo(() => TableUtils.computeFocus(getRovingCell(), getExpandedRows()));
+
+    const rowWindow = VirtualizerSolidUtils.createRowWindow(
+        getBodyRef,
+        () => TableUtils.getEntryCount(getRows().length, getExpandedRows()),
+        {
+            getIsDisabled: () => !getIsVirtualized(),
+            computeEstimatedSize: (index) =>
+                props.computeEstimatedRowHeight?.(TableUtils.getEntry(index, getExpandedRows()).layoutRow) ?? 0,
+            getPinnedRows: () => {
+                const cell = getRovingCell();
+
+                return cell.row === TableConst.HEADER_ROW_INDEX ? TableConst.EMPTY_PINNED_ROWS : [cell.row - 1];
+            },
         },
-    });
+    );
 
     const getIsWindowed = createMemo(() => getIsVirtualized() && !rowWindow.getHasNoScroller());
 
     const getCellId = (cell: Index2d) => TableUtils.getCellId(tableId, cell);
 
+    const getDetailId = (layoutRow: number) => TableUtils.getDetailId(tableId, layoutRow);
+
     const getIsRoving = (cell: Index2d) => {
-        const roving = getRovingCell();
+        const roving = getRovingFocus();
 
-        return roving.col === cell.col && roving.row === cell.row;
+        return !roving.isDetail && roving.cell.col === cell.col && roving.cell.row === cell.row;
     };
 
-    const focusCell = (cell: Index2d) => {
-        setFocusedCell(cell);
+    const getIsDetailRoving = (layoutRow: number) => {
+        const roving = getRovingFocus();
 
-        if (cell.row > TableConst.HEADER_ROW_INDEX && rowWindow.getIsLive()) rowWindow.scrollToRow(cell.row - 1);
-
-        document.getElementById(getCellId(cell))?.focus();
+        return roving.isDetail && roving.cell.row === layoutRow + 1;
     };
+
+    const focusAt = (focus: TableFocus) => {
+        setFocus(focus);
+
+        const walkCell = TableUtils.computeWalkCell(focus, getExpandedRows());
+
+        if (walkCell.row > TableConst.HEADER_ROW_INDEX && rowWindow.getIsLive())
+            rowWindow.scrollToRow(walkCell.row - 1);
+
+        document.getElementById(focus.isDetail ? getDetailId(focus.cell.row - 1) : getCellId(focus.cell))?.focus();
+    };
+
+    const focusCell = (cell: Index2d) => focusAt({ cell, isDetail: false });
+
+    const toggleExpanded = (layoutRow: number) => {
+        const row = getRows()[layoutRow];
+
+        if (getIsDisabled() || !getIsRowExpandable(row)) return;
+
+        const next = TableUtils.getToggledExpanded(expandedSignal[0](), row);
+
+        expandedSignal[1](() => next);
+
+        void props.onExpandedChange?.(next);
+    };
+
+    createEffect(() => {
+        const focus = getFocus();
+        const expandedRowSet = getExpandedRowSet();
+
+        if (!focus.isDetail || expandedRowSet.has(focus.cell.row - 1)) return;
+
+        setFocus({ cell: focus.cell, isDetail: false });
+
+        if (document.activeElement === document.body) document.getElementById(getCellId(focus.cell))?.focus();
+    });
 
     const toggleSort = (column: TableColumn<T> | undefined) => {
         if (!column || column.isSortable !== true || getIsDisabled()) return;
@@ -226,6 +315,7 @@ export const Table = <T,>(props: TableProps<T>) => {
 
         if (!getIsReorderable(columns[fromIndex]) || getIsDisabled()) return false;
         if (toIndex < 0 || toIndex >= columns.length) return false;
+        if (TableUtils.clampToPinGroup(columns, fromIndex, toIndex) !== toIndex) return false;
 
         const next = ObjectUtils.moveArrayElement(
             columns.map((column) => column.id),
@@ -265,9 +355,22 @@ export const Table = <T,>(props: TableProps<T>) => {
         getKeyHint: () => getAnnouncements().keyHint,
         getAnnouncements,
         computeCanAccept: () => !getIsDisabled() && props.order !== undefined,
-        computePlaceAtPoint: (point) =>
-            TableUtils.computeColumnPlaceAtPoint(getHeaderRects(), point, getSourceColumnIndex() ?? 0, getDirection()),
-        computeNudgedPlace: (place, nudge) => TableUtils.computeColumnNudgedPlace(place, nudge, getColumns().length),
+        computePlaceAtPoint: (point) => {
+            const source = getSourceColumnIndex() ?? 0;
+
+            return TableUtils.clampToPinGroup(
+                getColumns(),
+                source,
+                TableUtils.computeColumnPlaceAtPoint(getHeaderRects(), point, source, getDirection()),
+            );
+        },
+        computeNudgedPlace: (place, nudge) => {
+            const nudged = TableUtils.computeColumnNudgedPlace(place, nudge, getColumns().length);
+
+            return nudged === undefined
+                ? undefined
+                : TableUtils.clampToPinGroup(getColumns(), getSourceColumnIndex() ?? 0, nudged);
+        },
         computeEntryPlace: () => getSourceColumnIndex() ?? 0,
         computeIsSamePlace: (a, b) => a === b,
         computeIsPlaceAllowed: () => true,
@@ -323,11 +426,17 @@ export const Table = <T,>(props: TableProps<T>) => {
     };
 
     const handleKeyDown = (e: KeyboardEvent) => {
+        if (TableUtils.getIsInsideDetail(e.target, e.currentTarget as HTMLElement)) return;
+
         const from = getRovingCell();
         const column = getColumns()[from.col];
         const command = TableUtils.computeKeyCommand(e, from, getGrid(), {
             direction: getDirection(),
             pageRows: access(props.pageRows) ?? TABLE_DEFAULTS.pageRows,
+            expandedRows: getExpandedRows(),
+            computeIsExpandable: getIsExpandable()
+                ? (layoutRow) => getIsRowExpandable(getRows()[layoutRow])
+                : undefined,
         });
 
         if (command === undefined) return;
@@ -366,6 +475,12 @@ export const Table = <T,>(props: TableProps<T>) => {
             return;
         }
 
+        if (command.kind === "toggle_row") {
+            toggleExpanded(command.rowIndex);
+
+            return;
+        }
+
         if (command.kind === "activate_row") {
             if (!getIsDisabled()) void props.onRowActivate?.(getRows()[command.rowIndex], command.rowIndex);
 
@@ -378,9 +493,11 @@ export const Table = <T,>(props: TableProps<T>) => {
             return;
         }
 
-        focusCell(command.cell);
+        const focus = TableUtils.computeFocus(command.cell, getExpandedRows());
 
-        if (command.isExtending) selectRow(command.cell.row - 1, { isExtending: true });
+        focusAt(focus);
+
+        if (command.isExtending) selectRow(focus.cell.row - 1, { isExtending: true });
     };
 
     const handleCellClick = (e: MouseEvent, cell: Index2d) => {
@@ -411,18 +528,44 @@ export const Table = <T,>(props: TableProps<T>) => {
         });
     };
 
-    const getCellRenderProps = (layoutCol: number, layoutRow: number): TableCellRenderProps =>
-        TableUtils.computeCellRenderProps({
+    const getCellRenderProps = (layoutCol: number, layoutRow: number): TableCellRenderProps => {
+        const roving = getRovingFocus();
+
+        return TableUtils.computeCellRenderProps({
             columnId: getColumns()[layoutCol].id,
             dataCol: getDataCol(layoutCol),
             layoutCol,
             dataRow: getDataRow(layoutRow),
             layoutRow,
             isSelected: getSelectedRows().has(getRows()[layoutRow]),
-            roving: getRovingCell(),
+            roving: roving.isDetail ? TableConst.NO_CELL : roving.cell,
             hoveredRow: getHoveredRow(),
             isDisabled: getIsDisabled(),
+            pin: getColumns()[layoutCol].pin,
+            isExpandable: getIsRowExpandable(getRows()[layoutRow]),
+            isExpanded: getExpandedRowSet().has(layoutRow),
         });
+    };
+
+    const getDetailRenderProps = (layoutRow: number): TableDetailRenderProps => ({
+        dataRow: getDataRow(layoutRow),
+        layoutRow,
+        isSelected: getSelectedRows().has(getRows()[layoutRow]),
+        isFocused: getIsDetailRoving(layoutRow),
+        isDisabled: getIsDisabled(),
+    });
+
+    const getPinClassList = (layoutCol: number) => {
+        const pin = getColumns()[layoutCol]?.pin;
+
+        return { [styles.tablePinnedStart]: pin === "start", [styles.tablePinnedEnd]: pin === "end" };
+    };
+
+    const getPinStyle = (layoutCol: number) => {
+        const offset = getPinOffsets()[layoutCol];
+
+        return offset === undefined ? undefined : assignInlineVars({ [styles.tablePinOffsetVar]: `${offset}px` });
+    };
 
     const renderResizer = (getColumn: Accessor<TableColumn<T>>, columnIndex: number) => (
         <div
@@ -521,6 +664,8 @@ export const Table = <T,>(props: TableProps<T>) => {
             <div
                 id={getCellId(cell)}
                 class={styles.tableCell}
+                classList={getPinClassList(columnIndex)}
+                style={getPinStyle(columnIndex)}
                 role="columnheader"
                 aria-colindex={columnIndex + TableConst.FIRST_ARIA_INDEX}
                 aria-sort={TableUtils.computeAriaSort(getColumn(), getRenderProps().sortDirection)}
@@ -553,6 +698,9 @@ export const Table = <T,>(props: TableProps<T>) => {
         );
     };
 
+    let hasExpander = false;
+    let hasWarnedExpander = false;
+
     const renderCell = (
         getColumn: Accessor<TableColumn<T>>,
         getRow: Accessor<T>,
@@ -560,54 +708,147 @@ export const Table = <T,>(props: TableProps<T>) => {
         rowIndex: number,
     ) => {
         const cell = { row: rowIndex + 1, col: columnIndex };
+        const getRenderProps = () => getCellRenderProps(columnIndex, rowIndex);
+
+        const cellContext: TableCellContextType = {
+            getRenderProps,
+            toggle: () => {
+                focusCell(cell);
+                toggleExpanded(rowIndex);
+            },
+            registerExpander: () => {
+                hasExpander = true;
+            },
+        };
 
         return (
             <div
                 id={getCellId(cell)}
                 class={styles.tableCell}
+                classList={getPinClassList(columnIndex)}
+                style={getPinStyle(columnIndex)}
                 role="gridcell"
                 aria-colindex={columnIndex + TableConst.FIRST_ARIA_INDEX}
                 aria-disabled={getIsDisabled() || undefined}
                 tabindex={getIsRoving(cell) ? 0 : -1}
                 onClick={(e) => handleCellClick(e, cell)}
             >
-                {getColumn().renderCell(getRow, () => getCellRenderProps(columnIndex, rowIndex))}
+                <TableCellContextProvider value={cellContext}>
+                    {getColumn().renderCell(getRow, getRenderProps)}
+                </TableCellContextProvider>
             </div>
         );
     };
 
-    const renderRow = (getRow: Accessor<T>, rowIndex: number, virtualRow?: VirtualizerRow) => (
+    const getRowClass = (virtualRow: VirtualizerRow | undefined) =>
+        virtualRow ? [styles.tableRow, styles.tableWindowedRow].join(" ") : styles.tableRow;
+
+    const getRowStyle = (virtualRow: VirtualizerRow | undefined) =>
+        virtualRow ? { transform: `translateY(${rowWindow.getRowStart(virtualRow)}px)` } : undefined;
+
+    const renderRow = (getRow: Accessor<T>, rowIndex: number, virtualRow?: VirtualizerRow) => {
+        onMount(() => {
+            if (hasExpander || hasWarnedExpander || !getIsRowExpandable(getRow())) return;
+
+            hasWarnedExpander = true;
+
+            TableUtils.warnIfExpanderMissing();
+        });
+
+        return (
+            <div
+                class={getRowClass(virtualRow)}
+                role="row"
+                aria-rowindex={getWalkRow(rowIndex) + TableConst.FIRST_ARIA_INDEX}
+                aria-level={getIsExpandable() ? TableConst.ROW_LEVEL : undefined}
+                aria-expanded={getIsRowExpandable(getRow()) ? getExpandedRowSet().has(rowIndex) : undefined}
+                aria-selected={getSelectionMode() === "none" ? undefined : getSelectedRows().has(getRow())}
+                aria-label={props.computeRowAriaLabel?.(getRow(), rowIndex)}
+                style={getRowStyle(virtualRow)}
+                ref={(element: HTMLElement) => {
+                    if (virtualRow) rowWindow.measureRow(element, virtualRow.index);
+                }}
+                onPointerEnter={() => setHoveredRow(rowIndex)}
+                onPointerLeave={() => setHoveredRow(undefined)}
+            >
+                <Index each={getColumns()}>
+                    {(getColumn, columnIndex) => renderCell(getColumn, getRow, columnIndex, rowIndex)}
+                </Index>
+            </div>
+        );
+    };
+
+    const handleDetailClick = (e: MouseEvent, layoutRow: number) => {
+        if (TableUtils.getIsInteractiveInCell(e.target, e.currentTarget as HTMLElement)) return;
+
+        focusAt({ cell: { row: layoutRow + 1, col: getRovingCell().col }, isDetail: true });
+    };
+
+    const renderDetailRow = (getRow: Accessor<T>, layoutRow: number, virtualRow?: VirtualizerRow) => (
         <div
-            class={virtualRow ? [styles.tableRow, styles.tableWindowedRow].join(" ") : styles.tableRow}
+            class={getRowClass(virtualRow)}
             role="row"
-            aria-rowindex={rowIndex + 1 + TableConst.FIRST_ARIA_INDEX}
-            aria-selected={getSelectionMode() === "none" ? undefined : getSelectedRows().has(getRow())}
-            aria-label={props.computeRowAriaLabel?.(getRow(), rowIndex)}
-            style={virtualRow ? { transform: `translateY(${rowWindow.getRowStart(virtualRow)}px)` } : undefined}
+            aria-rowindex={getWalkRow(layoutRow) + 1 + TableConst.FIRST_ARIA_INDEX}
+            aria-level={TableConst.DETAIL_LEVEL}
+            style={getRowStyle(virtualRow)}
             ref={(element: HTMLElement) => {
                 if (virtualRow) rowWindow.measureRow(element, virtualRow.index);
             }}
-            onPointerEnter={() => setHoveredRow(rowIndex)}
-            onPointerLeave={() => setHoveredRow(undefined)}
         >
-            <Index each={getColumns()}>
-                {(getColumn, columnIndex) => renderCell(getColumn, getRow, columnIndex, rowIndex)}
-            </Index>
+            <div
+                {...{ [TableUtils.DETAIL_ATTRIBUTE]: "true" }}
+                id={getDetailId(layoutRow)}
+                class={styles.tableDetailCell}
+                role="gridcell"
+                aria-colindex={TableConst.FIRST_ARIA_INDEX}
+                aria-colspan={getColumns().length}
+                aria-disabled={getIsDisabled() || undefined}
+                tabindex={getIsDetailRoving(layoutRow) ? 0 : -1}
+                onClick={(e) => handleDetailClick(e, layoutRow)}
+            >
+                {props.renderDetail?.(getRow, () => getDetailRenderProps(layoutRow))}
+            </div>
         </div>
     );
 
-    const renderRows = () => <Index each={getRows()}>{(getRow, rowIndex) => renderRow(getRow, rowIndex)}</Index>;
+    const renderRows = () => (
+        <Index each={getRows()}>
+            {(getRow, rowIndex) => (
+                <>
+                    {renderRow(getRow, rowIndex)}
 
-    const renderWindowedRows = () => (
-        <For each={rowWindow.getRows()}>
-            {(virtualRow) => renderRow(() => getRows()[virtualRow.index], virtualRow.index, virtualRow)}
-        </For>
+                    <Show when={getExpandedRowSet().has(rowIndex)}>{renderDetailRow(getRow, rowIndex)}</Show>
+                </>
+            )}
+        </Index>
     );
+
+    const renderWindowedEntry = (virtualRow: VirtualizerRow) => {
+        const getEntry = createMemo(
+            (): TableEntry => TableUtils.getEntry(virtualRow.index, getExpandedRows()),
+            undefined,
+            {
+                equals: (a, b) => a.kind === b.kind && a.layoutRow === b.layoutRow,
+            },
+        );
+
+        return (
+            <Show when={getEntry()} keyed>
+                {(entry) =>
+                    entry.kind === "detail"
+                        ? renderDetailRow(() => getRows()[entry.layoutRow], entry.layoutRow, virtualRow)
+                        : renderRow(() => getRows()[entry.layoutRow], entry.layoutRow, virtualRow)
+                }
+            </Show>
+        );
+    };
+
+    const renderWindowedRows = () => <For each={rowWindow.getRows()}>{renderWindowedEntry}</For>;
 
     return (
         <div
             class={styles.tableRoot}
-            role="grid"
+            role={getIsExpandable() ? "treegrid" : "grid"}
             aria-label={access(props.ariaLabel)}
             aria-rowcount={getGrid().rowCount}
             aria-colcount={getGrid().colCount}
@@ -616,6 +857,7 @@ export const Table = <T,>(props: TableProps<T>) => {
             style={assignInlineVars({
                 [styles.tableTemplateVar]: getTemplate(),
                 [styles.tableResizerWidthVar]: `${access(props.resizerWidthPx) ?? TABLE_DEFAULTS.resizerWidthPx}px`,
+                [styles.tableMinWidthVar]: `${TableUtils.computeMinTableWidth(getColumns(), getWidths())}px`,
             })}
             onKeyDown={handleKeyDown}
         >
@@ -687,6 +929,30 @@ export const TableHeaderReorder = (props: TableHeaderReorderProps) => {
                     e.stopPropagation();
 
                     context!.pickUp();
+                }}
+            >
+                {props.renderContent(context!.getRenderProps)}
+            </button>
+        </Show>
+    );
+};
+
+export const TableRowExpander = (props: TableRowExpanderProps) => {
+    const context = useTableCellContext("TableRowExpander");
+
+    context?.registerExpander();
+
+    return (
+        <Show when={context?.getRenderProps().isExpandable}>
+            <button
+                type="button"
+                class={styles.tableRowExpander}
+                tabindex={-1}
+                aria-hidden="true"
+                onClick={(e) => {
+                    e.stopPropagation();
+
+                    context!.toggle();
                 }}
             >
                 {props.renderContent(context!.getRenderProps)}

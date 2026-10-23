@@ -6,7 +6,9 @@ import { EXAMPLES_ROOT, EXAMPLE_NAMES } from "@thewaver/ss-playground/App/Pages/
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { ConsumerSortedExample } from "./Examples/ConsumerSorted";
 import { DisabledExample } from "./Examples/Disabled";
+import { ExpandableExample } from "./Examples/Expandable";
 import { PartsExample } from "./Examples/Parts";
+import { PinnedExample } from "./Examples/Pinned";
 import { ReorderableExample } from "./Examples/Reorderable";
 import { ResizableExample } from "./Examples/Resizable";
 import { RightToLeftExample } from "./Examples/RightToLeft";
@@ -46,6 +48,15 @@ export const TablePage = () => {
     const stressSortState = useState<TableSort | undefined>();
     const stressSelectionState = useState<Part[]>([]);
     const [stressParts] = useState(createStressParts);
+
+    const pinnedSortState = useState<TableSort | undefined>();
+    const pinnedSelectionState = useState<Part[]>([]);
+    const pinnedWidthsState = useState<Record<string, number>>({});
+    const pinnedOrderState = useState<string[]>([]);
+
+    const expandableSortState = useState<TableSort | undefined>();
+    const expandableSelectionState = useState<Part[]>([]);
+    const expandableExpandedState = useState<Part[]>([]);
 
     const disabledSortState = useState<TableSort | undefined>();
     const disabledSelectionState = useState<Part[]>([]);
@@ -132,6 +143,36 @@ export const TablePage = () => {
                 <VirtualizedExample rows={stressParts} sort={stressSortState} selection={stressSelectionState} />
             ),
             path: `${EXAMPLES_ROOT}/Virtualized.tsx`,
+        },
+        {
+            key: "pinned",
+            name: EXAMPLE_NAMES.pinned,
+            readout: () =>
+                `widths: ${JSON.stringify(pinnedWidthsState[0])} | order: ${pinnedOrderState[0].join(", ") || "as declared"} — SKU is held at the start and Price at the end while the rest scroll sideways; resize SKU and the scrolling columns slide under it, and a pinned column only moves among its own kind`,
+            component: () => (
+                <PinnedExample
+                    sort={pinnedSortState}
+                    selection={pinnedSelectionState}
+                    widths={pinnedWidthsState}
+                    order={pinnedOrderState}
+                />
+            ),
+            path: `${EXAMPLES_ROOT}/Pinned.tsx`,
+        },
+        {
+            key: "expandable",
+            span: 2,
+            name: EXAMPLE_NAMES.expandable,
+            readout: () =>
+                `open: ${spellSelection(expandableExpandedState[0])} | selected: ${spellSelection(expandableSelectionState[0])} — press the arrow by a SKU, or Enter on a row's first cell, to open its detail; the down arrow walks into it. Parts out of stock have nothing to open`,
+            component: () => (
+                <ExpandableExample
+                    sort={expandableSortState}
+                    selection={expandableSelectionState}
+                    expanded={expandableExpandedState}
+                />
+            ),
+            path: `${EXAMPLES_ROOT}/Expandable.tsx`,
         },
         {
             key: "disabled",

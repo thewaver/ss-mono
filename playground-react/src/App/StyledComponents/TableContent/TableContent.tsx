@@ -3,13 +3,20 @@ import type { PropsWithChildren } from "react";
 import type { TableSortDirection } from "@thewaver/ss-components-react";
 import {
     DEFAULT_ALIGN,
+    EXPANDER_MARKERS,
     SORT_MARKERS,
     UNSORTED_MARKER,
 } from "@thewaver/ss-playground/App/StyledComponents/TableContent/TableContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/TableContent/TableContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { TableCellContentProps, TableHeaderContentProps, TableResizerProps } from "./TableContentReact.types";
+import type {
+    TableCellContentProps,
+    TableDetailContentProps,
+    TableExpanderProps,
+    TableHeaderContentProps,
+    TableResizerProps,
+} from "./TableContentReact.types";
 
 const getSortMarker = (direction: TableSortDirection | undefined) =>
     direction === undefined ? UNSORTED_MARKER : SORT_MARKERS[direction];
@@ -28,6 +35,8 @@ export const PageTableHeaderContent = (props: PropsWithChildren<TableHeaderConte
                 props.renderProps.sortDirection !== undefined && styles.isSorted,
                 props.renderProps.isHovered && styles.isHovered,
                 props.renderProps.isDisabled && styles.isDisabled,
+                props.renderProps.pin === "start" && styles.isPinnedStart,
+                props.renderProps.pin === "end" && styles.isPinnedEnd,
             ]
                 .filter(Boolean)
                 .join(" ")}
@@ -69,11 +78,45 @@ export const PageTableCellContent = (props: PropsWithChildren<TableCellContentPr
                 props.renderProps.isHovered && styles.isHovered,
                 props.renderProps.isSelected && styles.isSelected,
                 props.renderProps.isDisabled && styles.isDisabled,
+                props.renderProps.pin === "start" && styles.isPinnedStart,
+                props.renderProps.pin === "end" && styles.isPinnedEnd,
+                props.renderProps.isExpanded && styles.isExpanded,
             ]
                 .filter(Boolean)
                 .join(" ")}
         >
+            {props.leading !== undefined && <div className={styles.tableCellLeading}>{props.leading}</div>}
+
             <div className={styles.tableText}>{props.children}</div>
+        </div>
+    );
+};
+
+export const PageTableRowExpander = (props: TableExpanderProps) => {
+    const layerClass = useLayerClass();
+
+    return (
+        <div className={[styles.tableRowExpander, layerClass].join(" ")}>
+            {props.renderProps.isExpanded ? EXPANDER_MARKERS.open : EXPANDER_MARKERS.closed}
+        </div>
+    );
+};
+
+export const PageTableDetailContent = (props: PropsWithChildren<TableDetailContentProps>) => {
+    const layerClass = useLayerClass();
+
+    return (
+        <div
+            className={[
+                styles.tableDetailContent,
+                layerClass,
+                props.renderProps.isSelected && styles.isSelected,
+                props.renderProps.isDisabled && styles.isDisabled,
+            ]
+                .filter(Boolean)
+                .join(" ")}
+        >
+            {props.children}
         </div>
     );
 };

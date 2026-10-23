@@ -1,10 +1,11 @@
 import { h } from "vue";
 
-import type { TableColumn } from "@thewaver/ss-components-vue";
+import { type TableCellRenderProps, type TableColumn, TableRowExpander } from "@thewaver/ss-components-vue";
 import { formatPrice } from "@thewaver/ss-playground/App/Pages/TablePage/TableParts.const";
 
 import PageTableHeader from "../../PageComponents/TableHeader/TableHeader.vue";
 import PageTableCellContent from "../../StyledComponents/TableContent/PageTableCellContent.vue";
+import PageTableRowExpander from "../../StyledComponents/TableContent/PageTableRowExpander.vue";
 import type { Part, PartColumnDefs } from "./TablePage.types";
 
 export * from "@thewaver/ss-playground/App/Pages/TablePage/TableParts.const";
@@ -13,6 +14,7 @@ export const createPartColumns = (defs: PartColumnDefs): TableColumn<Part>[] => 
     {
         id: "sku",
         header: "SKU",
+        pin: defs.isPinned ? "start" : undefined,
         widthPx: 110,
         minWidthPx: 80,
         maxWidthPx: 260,
@@ -21,12 +23,26 @@ export const createPartColumns = (defs: PartColumnDefs): TableColumn<Part>[] => 
         isReorderable: defs.isReorderable,
         compare: (a, b) => a.sku.localeCompare(b.sku),
         renderHeader: (renderProps) => h(PageTableHeader, { renderProps }, () => "SKU"),
-        renderCell: ({ row, renderProps }) => h(PageTableCellContent, { renderProps }, () => row.sku),
+        renderCell: ({ row, renderProps }) =>
+            h(
+                PageTableCellContent,
+                { renderProps },
+                {
+                    default: () => row.sku,
+                    leading: () =>
+                        defs.isExpandable
+                            ? h(TableRowExpander, null, {
+                                  renderContent: (expanderProps: TableCellRenderProps) =>
+                                      h(PageTableRowExpander, { renderProps: expanderProps }),
+                              })
+                            : null,
+                },
+            ),
     },
     {
         id: "name",
         header: "Name",
-        minWidthPx: 140,
+        minWidthPx: defs.isPinned ? 320 : 140,
         isSortable: true,
         isResizable: defs.isResizable,
         isReorderable: defs.isReorderable,
@@ -64,6 +80,7 @@ export const createPartColumns = (defs: PartColumnDefs): TableColumn<Part>[] => 
     {
         id: "price",
         header: "Price",
+        pin: defs.isPinned ? "end" : undefined,
         widthPx: 110,
         minWidthPx: 80,
         maxWidthPx: 220,

@@ -1,5 +1,6 @@
 import { globalStyle, style } from "@vanilla-extract/css";
 
+import { NARROW_FRAME_RATIO } from "./Carousels.const";
 import type { SlideFrame, SlideFrameSet } from "./Carousels.types";
 
 import { CAROUSEL_SLIDE_HEIGHT } from "../../StyledComponents/CarouselContent/CarouselContent.css";
@@ -16,7 +17,7 @@ export const slideFrame = style({
 export const slideFrameNarrow = style([
     slideFrame,
     {
-        width: "55%",
+        width: `${NARROW_FRAME_RATIO * 100}%`,
         justifySelf: "center",
     },
 ]);

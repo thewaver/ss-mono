@@ -42,7 +42,7 @@ const fillSpan = computed(() => travel(fill.value.end - fill.value.start));
             :style="
                 orientation === 'vertical'
                     ? { bottom: center(fill.start), height: fillSpan }
-                    : { left: center(fill.start), width: fillSpan }
+                    : { insetInlineStart: center(fill.start), width: fillSpan }
             "
         />
 
@@ -55,7 +55,7 @@ const fillSpan = computed(() => travel(fill.value.end - fill.value.start));
                 renderProps.focusVisibleThumb === index && styles.isFocused,
                 renderProps.hasError && styles.hasError,
             ]"
-            :style="orientation === 'vertical' ? { bottom: travel(ratio) } : { left: travel(ratio) }"
+            :style="orientation === 'vertical' ? { bottom: travel(ratio) } : { insetInlineStart: travel(ratio) }"
         />
     </div>
 </template>

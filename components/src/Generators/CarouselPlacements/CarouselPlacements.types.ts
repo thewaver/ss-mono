@@ -15,6 +15,7 @@ export type CoverFlowPlacementDefs = {
     depthPx?: number;
     perspectivePx?: number;
     visibleDistance?: number;
+    faceRatio?: number;
 };
 
 export type DepthWavePlacementDefs = {
@@ -23,6 +24,7 @@ export type DepthWavePlacementDefs = {
     tiltDegrees?: number;
     perspectivePx?: number;
     visibleDistance?: number;
+    faceRatio?: number;
 };
 
 export type CylinderPlacementDefs = {

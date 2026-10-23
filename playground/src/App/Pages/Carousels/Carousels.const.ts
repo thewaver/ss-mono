@@ -9,6 +9,14 @@ export const TITLES = ["Aurora", "Basalt", "Cinder", "Drift", "Ember", "Fathom",
 
 export const PLACEMENT_FIELD_WIDTH = 150;
 
+export const NARROW_FRAME_RATIO = 0.55;
+
+export const FRAME_FACE_RATIOS: Record<SlideFrame, Record<CarouselOrientation, number>> = {
+    whole: { horizontal: 1, vertical: 1 },
+    narrow: { horizontal: NARROW_FRAME_RATIO, vertical: 1 },
+    paddle: { horizontal: 1, vertical: 1 },
+};
+
 export const PLACEMENT_FRAMES: Partial<Record<CarouselPlacements.SampleKey, SlideFrame>> = {
     cover_flow: "narrow",
     depth_wave: "narrow",

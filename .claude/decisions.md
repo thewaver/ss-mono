@@ -5117,6 +5117,30 @@ the picked text, as in React Aria's combobox. Focus or a click selects the box's
 **The two writes on input are one update**: written separately, the box resynced to the empty query between them and
 the caret jumped to the start ("Por" typed as "orP"). A multi-select keeps an empty box.
 
+### `Select`: what the reference libraries do
+
+Checked against Radix, React Aria and Kobalte, which is the SolidJS one.
+
+- **Typeahead is a string per option in all three, and two of them derive it rather than asking.**
+  Radix's `Select.Item` takes an optional `textValue`, and when it is absent typeahead uses the item's
+  own rendered text content. React Aria's list items take `textValue` and require it only when the
+  children are not plain text. Kobalte takes `optionTextValue`, a field name or getter on the option
+  record, documented as being for typeahead. This is the reading that closed the gap: the option element
+  is the library's here, so its text is reachable without a prop, and `computeCustomText` is the way out
+  for the cases that need one. See `decisions.md`.
+- **A filterable list is a separate component everywhere.** Radix has no autocomplete primitive at all,
+  so the injected-non-matching-option case cannot arise there; and where a library does own the filter
+  it necessarily knows which options matched, which is the knowledge this design trades away by
+  choice.
+- **Virtualization is nobody's library code.** Kobalte's select has a `virtualized` boolean and a docs
+  example handing the list to `@tanstack/solid-virtual` with a hundred thousand options; React Aria has
+  a `Virtualizer` wrapper; Radix has neither, and its docs cover long lists only with scroll buttons.
+  So the seam is a flag plus a documented integration rather than an `Abstract`, and the flag exists
+  precisely so the library stops managing its own scrolling — which is the loose end this bullet names.
+- **Open state is controlled-or-uncontrolled in all three**, under the same three names: `open`,
+  `defaultOpen`, `onOpenChange`. The consumer can always close it programmatically and the library
+  still owns the default.
+
 ### Controls: `Popover` extracted, and `Menu` as the second consumer
 
 The standing "private until a second consumer" rule fired: `Select`'s floating layer
@@ -5218,7 +5242,7 @@ they never saw.
 
 ### Arbitrary item placement: `Abstracts/Placement`, and `Menu` as the first consumer
 
-The first half of `backlog.md` item 13. A control's items can be placed anywhere rather than along a line, and
+The first half of `backlog.md` item 10. A control's items can be placed anywhere rather than along a line, and
 the vocabulary for saying where lives in an abstract so the next control can use the same one.
 
 **A placement is a center, a size, an optional turn and an optional depth, all in fractions of the container's
@@ -5292,7 +5316,7 @@ its own chrome, or gets neither.
 
 ### Concentric submenus: `computeLayout` learns where it is, and a submenu borrows its parent's anchor
 
-The second piece of `backlog.md` item 13. A submenu of a laid-out menu is drawn as a wider ring round the
+The second piece of `backlog.md` item 10. A submenu of a laid-out menu is drawn as a wider ring round the
 same center rather than hanging off the item that opened it, so a wheel stays one wheel however deep it goes.
 
 **`computeLayout` takes one object rather than a run of arguments, and the reason is the third one.**
@@ -5821,7 +5845,7 @@ all eleven, which is what lets a consumer offer the whole set by key.
 
 ### `Paginator` takes a layout, and the placed box moves into the abstract
 
-The proving pass of `backlog.md` item 13, against the control the item named as the strongest candidate. A
+The proving pass of `backlog.md` item 10, against the control the item named as the strongest candidate. A
 paginator is arithmetic over a flat list, so a layout is the only thing that changes: the steps, the pages and
 the ellipses go round a dial in the order they already had, and nothing about the counting, the addresses or
 the labels is touched.
@@ -5873,7 +5897,7 @@ the box. So the sector is vocabulary a layout offers and a painter may decline, 
 control has to understand.
 
 **What the pass did not strain, which is worth knowing before the next consumer.** `PlacementUtils.pickIndex`
-still has no caller — a paginator has no gesture that picks by direction, so the loose end item 13 records is
+still has no caller — a paginator has no gesture that picks by direction, so the loose end item 10 records is
 untouched. Nor did anything about levels move: a paginator is one level and always will be, so the concentric
 machinery went unexercised.
 
@@ -5973,7 +5997,7 @@ arrangement is drawn from it — and both suites assert the walk rather than any
 
 ### Every layout sample lives in one place, and none of them is a menu's
 
-The user's call, taken while `backlog.md` item 13's proving pass was still open. `Samples/Menu/Layouts` was
+The user's call, taken while `backlog.md` item 10's proving pass was still open. `Samples/Menu/Layouts` was
 named when a menu was the only thing that had ever asked for a layout; by the end of the pass it held a
 honeycomb and a radial tree, and eleven consumers imported it of which three were menus. It is now
 `Samples/Placement/Layouts`, and the arrangements that came in with `Formation` are in it too.
@@ -7138,7 +7162,7 @@ element and sorts only then.
 
 ### Five more controls take a layout, and each one broke something different
 
-The rest of `backlog.md` item 13's proving pass, run against `Stepper`, `Toolbar`, `Sortable` and `Tree` after
+The rest of `backlog.md` item 10's proving pass, run against `Stepper`, `Toolbar`, `Sortable` and `Tree` after
 `Paginator`, `RadioGroup` and `Tabs`. The reason to keep going past the first was that each control was
 expected to strain a different part of the abstract, and each did.
 
@@ -10780,6 +10804,12 @@ character after the first is inserted one position early. The picker's hex field
 with a signal it owns. Worth recording because the wrapper is used on nine other pages and works fine — the
 difference is only that their values are not converted on the way through.
 
+### `ColorInput` owns its picker, so there is no system color dialog to fall back on
+
+Deliberate: there is no native `<input type="color">` anywhere in it, so no system picker, which is the cost of owning
+the surface — React Aria's color suite and Ark UI's are custom the same way, and none keeps the system dialog as a
+fallback. Its missing form value is not part of this; that is the submit story in `backlog.md`.
+
 ### Controls: `DateInput` and `DatePicker`, without the mask
 
 Both ship; the mask `backlog.md` named as their blocker turned out not to be one for
@@ -11986,7 +12016,7 @@ description is not — so the moment a jump to the end forces the skipped rows t
 height above the highlight is corrected at once and the scroll offset no longer points where it did. `End` then
 leaves the highlighted option below the visible box. The user removed the switch. What it
 bought was the cost of _painting_ options, which is a different and smaller cost than _mounting_ them;
-`backlog.md` item 2 holds what is left.
+The painting cost left over is item 14 in `backlog.md`, a known issue.
 
 **The marker is keyed on the options array, and that is load-bearing.** An intersection observer reports only
 _changes_, so a batch too small to push the marker off screen would deliver no callback and the list would
@@ -12698,6 +12728,45 @@ on for a press anywhere on the track, including one the hit test refused, so the
 signal and a live grab together. A painter keyed on the raw one would drop its transition on a press that moves
 nothing.
 
+### `SlideButton` takes an `orientation`
+
+The user's call, following `Range`: `"horizontal" | "vertical"`, default `"horizontal"`, and a vertical button slides
+upward, the lock screen's direction. All the axis handling is in the core — `SlideButtonUtils.computePointerRatio`
+reads `x`, or `1 - y` when vertical, and `computeTrackLength` reads the track's width or height — so each framework
+passes the drag tracker's `{ x, y }` and the track's size straight through. No `aria-orientation`: `role="button"`
+does not support it, and the keyboard route, a held Enter or Space, is the same on both axes. **A horizontal button
+turns round on a right-to-left page**, the user's call, as `Range` does: the thumb rests at the right and slides
+leftward. A vertical one slides upward whatever the direction, as `Range`'s vertical counts up from the bottom. The
+painter is told the `direction` in its flags rather than left to logical CSS, so its drawing can never disagree with
+a gesture that is still left to right, as the other frameworks' stand-ins were for a while. `Range`'s Playground
+painter goes the other way and places its thumbs and fill by `inset-inline-start`: it used `left` until the
+SlideButton work turned up that the right-to-left example drew the value 20 at 20% from the left while the slider
+measured from the right, so pressing the thumb that looked low moved the high one — invisible on the example only
+because its values sit symmetrically. The Playground painter's long side is `length`, since it
+is the height when vertical.
+
+### `SlideButton`: what the reference libraries do
+
+Read on **2026-08-13**, after the keyboard decision had already been taken.
+
+- **No headless library ships one, so there is nothing to copy either way.** Radix's thirty-odd primitives,
+  Base UI's thirty-five at its December 2025 stable release, React Aria and Ark UI all have a slider and a
+  button and nothing between them. The omission is the field's, not this library's.
+- **The packages that do ship one have no keyboard route at all**, which is worse than the decision taken here
+  rather than different from it. `react-swipeable-button`'s whole documented surface is `onSuccess`,
+  `onFailure` and colors — no role, no `tabindex`, no key handling; `react-slide-button` is built on
+  `react-swipeable`, which is pointer-only by construction.
+- **Apple, whose lock screen is where the pattern comes from, answers exactly the decision taken here.** Asked
+  on the developer forum whether a swipe-to-confirm harms VoiceOver users, the guidance is to override
+  `accessibilityActivate` so that a single activation runs the same confirm logic **without** the swipe, or to
+  expose the confirmation as an `accessibilityCustomActions` entry. The lock screen itself behaves that way:
+  a VoiceOver user selects the caption and double-taps, and the gesture collapses to one activation. So "the
+  assistive route is a plain activation, not a reproduced gesture" is the platform's own answer and not a
+  convenience.
+- **The standard that decides it is 2.5.7 Dragging Movements, and it is newer than the pattern**, which is
+  most likely why none of the packages above answer it. What it asks for — a single-pointer route that is not
+  a drag — is what the hold is; see `decisions.md`.
+
 ### `SlideButton` completes part-way along
 
 `completionRatio`, defaulting to `1`, which is the old behavior exactly: how far along the track a released thumb has
@@ -12829,7 +12898,7 @@ turn a list of keyframe stops into the evaluation function `CellAnimation` asks 
 keyframes rather than a formula writes their own. That is real, and it is still not the library's: the
 component's contract is already the smaller and more general thing — a function from timeline to result — and a
 stop list with `at`, `depth` and origin keys is one **opinion about how to author** such a function. Shipping it
-would freeze that opinion as API for a consumer nobody has met, which is the layer item 3 in `backlog.md`
+would freeze that opinion as API for a consumer nobody has met, which is the layer item 2 in `backlog.md`
 plans. The matrix half is a different case: it needs only the language to work, which is the `ss-utils` test,
 and that package has `Vec2d` and `Vec4d` but no matrix — noted as a candidate rather than moved, because one
 consumer is a thin case for an export in another repo.
@@ -13037,7 +13106,7 @@ page behind is then outside what the layer can see. It is the same trap as `isol
 is why each layer carries its own clip rather than sharing one.
 
 **The fringe this section used to blame on a disagreement between the two backdrop layers is postponed, not
-fixed — see item 12 in `backlog.md` for the current standing.** The margin explanation did not survive a
+fixed — see item 9 in `backlog.md` for the current standing.** The margin explanation did not survive a
 direct test: pushing the margin far past what either layer needs changes nothing, and shrinking it to nearly
 zero changes nothing either. Folding the blur into the ripple filter was tried, looked clean, and was reverted
 anyway — not because it cost Firefox and Safari their blur, though it does, but because "clean" turned out to
@@ -13046,7 +13115,7 @@ building a `feImage` / `feComposite` mask into the filter, so the pane never nee
 ancestor `overflow: hidden` at all, also looked clean under that same software path and also failed once
 checked against a real GPU-accelerated window. Neither fix is in the tree. What each attempt actually ruled
 out is real and kept below; what it did not do is find a fix that survives real rendering, and nothing further
-should be attempted here without a way to check against GPU rendering from the start — see item 12.
+should be attempted here without a way to check against GPU rendering from the start — see item 9.
 
 **The Playground's pane is dragged with `left` and `top`, never with `transform`.** A transform on an
 ancestor creates a stacking context and changes the containing block, and given how readily this arrangement
@@ -13141,7 +13210,7 @@ nothing" trap the backdrop layers above are already written to avoid. Skipping t
 nothing for one.
 
 **The ripple layer's edge is postponed, not fixed, and the investigation is recorded here so it is not repeated
-blind — see item 12 in `backlog.md` for what this means for now.** Found on the Playground's tooltip once
+blind — see item 9 in `backlog.md` for what this means for now.** Found on the Playground's tooltip once
 moved onto `GlassSurface`: a patch of whatever sat behind it rendered sharp and barely warped instead of
 frosted. Chased with a standalone sandbox — raw `feTurbulence` / `feDisplacementMap`, no library code — every
 test run in the browser this session had, which turned out to be headless Chromium and headless Edge, both of
@@ -14423,6 +14492,15 @@ the dial going against every other round control in the Playground. A ring's box
 pulled into that half by a negative margin of half the dial's width and stacked above it, and its minimum height
 is the dial's, so the flat edge is never taller than what it meets.
 
+### `Paginator`: every page is its own Tab stop, and stays that way
+
+Weighed when a fifteen-stop row looked like a lot to walk past, and settled by checking rather than arguing. Each
+page is a separate destination, which is why each is a stop, and the references agree: MUI's documentation says
+"The pagination items are in tab order, with a tabindex of "0""; GOV.UK's design system marks pagination up as a
+`<nav>` of ordinary links; Ark UI renders each page as a `<button>` with no roving focus documented. WCAG has no
+criterion asking for one stop, and the published patterns have no pagination pattern; what applies is 2.4.1 Bypass
+Blocks, which the `<nav>` landmark meets. No opt-in single stop is built.
+
 ### `Paginator` is a root and pieces, with the ready-made row on top
 
 Built from the plan `backlog.md` carried for it, to give a page a layout the single component could not draw —
@@ -14618,12 +14696,11 @@ same test the platform uses to decide what a click is for.
 and their tab stop, so the table still reads; sorting, selection and resizing all return early. Same mechanism
 as everywhere else here.
 
-**What was deliberately left out.** No column pinning — it needs a resolved pixel width per pinned column to
-compute the sticky offsets, and a pin that silently does nothing on an unsized column is the "looks supported
-and is not" failure this repo has refused twice already; it was also not in the scope the user set. No
-grouping or aggregate rows, no expandable rows, no inline cell editing, no filtering, and no `F2`-style
-interaction mode for a cell whose contents are focusable. The last of these is the one with an accessibility
-cost: a cell containing several controls can be reached, but there is no defined key that steps _into_ it.
+**What was deliberately left out.** No grouping or aggregate rows, and no `F2`-style interaction mode for a cell
+whose contents are focusable — the one with an accessibility cost: a cell containing several controls can be
+reached, but there is no defined key that steps _into_ it; controls inside an open detail row sit in the normal
+tab order, outside the grid's management, for the same reason. Pinned columns and expandable rows were left out at
+first and later built, below; filtering and editing in place are the consumer's, below.
 
 **The one gap inside the built scope is the resizer's discoverability, and the user chose to keep it.** The
 handle is `aria-hidden`, so nothing announces that a column can be resized; a reader who does not already know
@@ -14633,6 +14710,52 @@ without writing into content the consumer paints, and React Aria's visually-hidd
 announcement at the price of one extra tab stop per resizable column — the exact cost the single-tab-stop grid
 exists to avoid. **Their call was to leave it**, on the grounds that 2.1.1 is met and the tab order stays one
 stop. It is recorded in `backlog.md` under _"Accepted limits"_ so it is not rediscovered as an oversight.
+
+### `Table` pinned columns
+
+The user widened the scope to take them. A column is `{ pin: "start" | "end"; widthPx: number }` or unpinned, a union,
+so a pinned column without a set width fails to compile — the offsets are the sum of the pinned widths before it, and
+a pin on an unsized column would silently do nothing. Pinned columns gather at their edge whatever `order` says and
+reorder only among their own kind, by drag, carry or Shift+arrow; they stick by `inset-inline-*`, so right-to-left
+holds, and follow resizing. **The table is held at least as wide as its columns** (`computeMinTableWidth`: every set
+width plus every other column's minimum), on every table, since without it a pinned column stops sticking after one
+screen of scroll. **The root isolates its stacking**, the sticky header sits at 2 and pinned body cells at 1, so they
+pass under it; the header's `z-index` used to escape. Render props carry `pin` for the painter's opaque base and edge.
+
+### `Table` expandable rows
+
+The user widened the scope to take them. `renderDetail` turns them on; `expanded` is the usual optional two-way list
+of row values; `computeIsExpandable` and `onExpandedChange` sit beside them. **The table becomes a `treegrid`**: ARIA
+1.2's row role says "authors MUST NOT apply aria-expanded … to a row that descends from a table or grid", and a
+cell's `aria-expanded` "is not a proxy for the container row". Rows carry `aria-level=1` and `aria-expanded` where
+they can open; details are `aria-level=2`, one cell spanning every column. **Keys follow the APG treegrid's cell-only
+focus**: Enter on the first on-screen cell of a row that can open toggles it (and no longer runs `onRowActivate`
+there), Enter elsewhere activates; the arrows keep walking cells, Down into and out of an open detail; on a detail,
+Left, Right, Home and End do nothing in the grid ("If focus is on the right-most cell in a row, focus does not move")
+and are left to the browser, and keys pressed on something inside a detail are the content's. A detail is not
+selectable. **Focus is held by row**, so opening a detail above it moves nothing, and a detail closed from outside
+while holding focus hands it back to its row (2.4.3). **`TableRowExpander`** is a builtin the consumer places in any
+cell, as `TableHeaderSort` is; it takes no tab stop, focuses its own cell before acting, draws nothing in a row that
+cannot open, and its doc asks for a 24px target (2.5.8); a table whose rows never render one warns once. Under
+windowing, details are entries of their own, guessed at their row's height until measured.
+
+**Per framework, for expandable rows.** A context can only be handed down by a component in Vue and Svelte, so each
+body cell is a small private component there (`TableBodyCell` in Vue, `TableCell.svelte`), the counterpart of
+`TableHeaderCell`, and it is how `TableRowExpander` finds its row. The missing-expander warning is checked as each row
+mounts in Solid, after the table renders in React and Vue, and from an attachment in `untrack` in Svelte — at most once
+per table everywhere. Vue's `renderDetail` is a slot taking `{ row, renderProps }`, and expandability keys on the slot
+being present, which Vue does not track after the first render. React keys window slots `row-N` / `detail-N` so a slot
+turning from a row into a detail is rebuilt, as Solid's keyed entries are. Svelte's `expanded` is a `$bindable` with no
+fallback, read through `createHeldValue` like `selection`, so rows still match by identity.
+
+### `Table` leaves filtering and in-place editing to the consumer
+
+The user's calls. **Filtering**: sorting is the component's and filtering is not, so a consumer narrows the rows
+before handing them over — the split `Select` makes with its query. **Editing in place**: "It's a table, not a
+spreadsheet." A cell's content is the consumer's paint, and a piece of text that turns into a field when clicked is
+already something a consumer builds without the grid's help; the grid has no editing state and no key that starts
+one. Neither is a gap. A cell holding two controls is a separate matter — the keyboard reaching inside a cell — and
+stays open in `backlog.md`.
 
 ### `Table` columns reorder, and the carry engine became `Abstracts/Carrier` to do it
 
@@ -15211,6 +15334,44 @@ which way a swipe scrolls (Apple's natural-scrolling toggle), and would rather t
 **`Carousel` lives in `Essentials/`.** With no presets built on it, the layering rule puts it there rather than in
 `Primitives/`; the two presets and their Playground pages were deleted, and its page-less entry in the Playground's
 `Primitives` section went, since it has a page of its own and the two collided on one route.
+
+### `Carousel`: groups of items, and a group rests on its middle
+
+The user's design: a dot stands for a group of items resting on screen together — a book's spreads, overlapping
+sliding pairs. `computeGroups(count)` returns `Span`s (end exclusive, overlap allowed), and `computeGroupLabel(start,
+end, count)` names a group in the announcement; `CarouselGroupProps` is a union so the two come together or not at
+all, shaped like `ModalNameProps`. **Safeguarded**, at the user's request: `CarouselUtils.resolveGroups` rounds ranges
+to whole slides, holds them inside the list, drops empty and non-numeric ones and orders the rest by start, warns
+when it fixed anything, and falls back to one group per slide. **`index`, stepping, the dots, looping, swipes and the
+controller's `getIndex`/`getCount` count groups**, since an item in two overlapping groups cannot say which is current;
+every slide of the current group is current, in the repeated copies a loop draws too, and pressing a side slide brings
+up the nearest group holding it. Without `computeGroups` every slide is its own group and every formula gives the old
+answer — unit-tested against the one-slide functions, ties and wrapping included; those older functions go once
+React, Vue and Svelte are ported.
+
+**Positions are still counted in slides, and a group rests at the middle of its slides**, `(start + end − 1) / 2`, so a
+pair at rest sits at −0.5 and +0.5 and a group of one where it always did. **Every shipped placement rule lays a resting group out as one unit**, the user's call over leaving the rules
+tuned for one slide. A rule places a group by its distance counted in groups, as it places a slide, and lays the
+group's slides side by side inside it, shrunk to share one slide's room; the slot offset is worked through the group's
+scale, turn and turning point, so a group that turns, swings or folds moves as one flat piece, in the fixed
+translate-rotate-scale order with no `matrix3d`. The placement input carries it as `group: { distance, index, count,
+slot, size }`; without groups it is `{ distance, index, count, slot: 0, size: 1 }` (`CarouselUtils.toSlideGroup`), a
+slide alone skips the slot step, and a frozen copy of the old rules
+(`CarouselPlacements.ungrouped.test.ts`) pins every family's ungrouped output and `reach` as unchanged. `reach`, the
+repeated copies and windowing count groups. **A slide in two groups** is drawn, at rest, in the group showing when
+that group holds it, otherwise in the nearest group holding it; between two groups that both hold it, it stays at
+distance 0 while its slot and size blend, so nothing jumps along a glide. A slide no group holds is drawn alone.
+**Cover flow and depth wave gained `faceRatio`** (default `1`): a group needs the content's length to put slides
+edge to edge, which those rules never knew; the Playground passes its narrow frame's 0.55 across and 1 up and down
+(`toFramedPlacement`). The paddle wheel keeps a group on one paddle, in reading order. The vertical cover flow and
+depth wave crowd behind the group, as their single-slide vertical look already does with the narrow frame.
+`progress` `0` is the first group at rest; `1` is the last group at rest on a
+carousel that stops at its ends, and a full lap of slides on a looping one. A position exactly between two groups
+resolves to the one ahead, as `Math.round` did. Sliding pairs end on the last slide alone, mirroring the start.
+
+**No ready-made groupings ship.** Book spreads, sliding pairs and fixed pages were built as named exports and then
+dropped by the user: a grouping is a few lines of arithmetic the consumer writes, as the Playground's Pairs example
+does — two to a stop, its list doubled when the count is odd so every pair is whole.
 
 ### `Carousel`: building only what the placement draws
 
@@ -17092,7 +17253,7 @@ can know.
 **The cost is stated rather than mitigated: a library that renders no button cannot promise one is reachable or
 named.** A consumer who wires up no control has a wheel that can only be driven from elsewhere through
 `targetIndex`, exactly as a `Carousel` whose consumer builds no buttons on its controller has no keyboard route. That is the same exposure
-item 7 records for `Scroller` and it is now the wheel's too.
+item 5 records for `Scroller` and it is now the wheel's too.
 
 **No slot survives either, and the one that briefly did was kept for a bad reason.** A `renderHub` was left on
 the overhead wheel out of deference to an earlier choice — that an overhead wheel has one control slot and it is the

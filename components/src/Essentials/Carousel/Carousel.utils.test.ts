@@ -1,6 +1,26 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { CarouselUtils } from "./Carousel.utils";
+
+const singles = (count: number) => Array.from({ length: count }, (_, index) => index);
+
+const frozenLap = (count: number, isLooping: boolean) => Math.max(isLooping ? count : count - 1, 0);
+
+const frozenPosition = (progress: number, count: number, isLooping: boolean) =>
+    Math.min(Math.max(progress, 0), 1) * frozenLap(count, isLooping);
+
+const frozenProgress = (position: number, count: number, isLooping: boolean) => {
+    const lap = frozenLap(count, isLooping);
+
+    if (lap <= 0) return 0;
+
+    return isLooping ? (((position % lap) + lap) % lap) / lap : Math.min(Math.max(position / lap, 0), 1);
+};
+
+const frozenNearest = (position: number, count: number, isLooping: boolean) =>
+    isLooping
+        ? ((Math.round(position) % count) + count) % count
+        : Math.min(Math.max(Math.round(position), 0), count - 1);
 
 describe("wrapIndex", () => {
     it("leaves an index inside the range alone", () => {
@@ -211,24 +231,24 @@ describe("getIsAnnounced", () => {
 
 describe("position and progress", () => {
     it("takes a whole lap for a looping carousel and first to last for one that stops", () => {
-        expect(CarouselUtils.toPosition(0.5, 4, true)).toBe(2);
-        expect(CarouselUtils.toPosition(0.5, 5, false)).toBe(2);
-        expect(CarouselUtils.toProgress(2, 4, true)).toBe(0.5);
-        expect(CarouselUtils.toProgress(2, 5, false)).toBe(0.5);
+        expect(CarouselUtils.toGroupPosition(0.5, singles(4), 4, true)).toBe(2);
+        expect(CarouselUtils.toGroupPosition(0.5, singles(5), 5, false)).toBe(2);
+        expect(CarouselUtils.toGroupProgress(2, singles(4), 4, true)).toBe(0.5);
+        expect(CarouselUtils.toGroupProgress(2, singles(5), 5, false)).toBe(0.5);
     });
 
     it("brings a looping position that ran past either end back into the lap", () => {
-        expect(CarouselUtils.toProgress(-1, 4, true)).toBe(0.75);
-        expect(CarouselUtils.toProgress(5, 4, true)).toBe(0.25);
+        expect(CarouselUtils.toGroupProgress(-1, singles(4), 4, true)).toBe(0.75);
+        expect(CarouselUtils.toGroupProgress(5, singles(4), 4, true)).toBe(0.25);
     });
 
     it("holds a position that stops at its ends between them", () => {
-        expect(CarouselUtils.toProgress(-1, 5, false)).toBe(0);
-        expect(CarouselUtils.toProgress(9, 5, false)).toBe(1);
+        expect(CarouselUtils.toGroupProgress(-1, singles(5), 5, false)).toBe(0);
+        expect(CarouselUtils.toGroupProgress(9, singles(5), 5, false)).toBe(1);
     });
 
     it("has no lap with fewer than two slides", () => {
-        expect(CarouselUtils.toProgress(1, 1, false)).toBe(0);
+        expect(CarouselUtils.toGroupProgress(1, singles(1), 1, false)).toBe(0);
     });
 });
 
@@ -244,10 +264,10 @@ describe("getDistance", () => {
     });
 });
 
-describe("getNearestIndex and getGlideTarget", () => {
+describe("getNearestGroup and getGlideTarget", () => {
     it("rounds to the nearest slide, wrapping or holding at the ends", () => {
-        expect(CarouselUtils.getNearestIndex(3.6, 4, true)).toBe(0);
-        expect(CarouselUtils.getNearestIndex(3.6, 4, false)).toBe(3);
+        expect(CarouselUtils.getNearestGroup(3.6, singles(4), 4, true)).toBe(0);
+        expect(CarouselUtils.getNearestGroup(3.6, singles(4), 4, false)).toBe(3);
     });
 
     it("glides the short way round on a looping carousel", () => {
@@ -332,5 +352,326 @@ describe("getIsBuilt", () => {
 
     it("builds everything when the rule cannot say how far it draws", () => {
         expect(CarouselUtils.getIsBuilt(40, undefined, true)).toBe(true);
+    });
+});
+
+describe("resolveGroups", () => {
+    afterEach(() => {
+        vi.restoreAllMocks();
+    });
+
+    it("makes every slide its own group when there is no grouping, and says nothing", () => {
+        const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+        expect(CarouselUtils.resolveGroups(undefined, 3)).toEqual([
+            { start: 0, end: 1 },
+            { start: 1, end: 2 },
+            { start: 2, end: 3 },
+        ]);
+        expect(warn).not.toHaveBeenCalled();
+    });
+
+    it("keeps sound groups as they are, overlaps included, without a warning", () => {
+        const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+        const groups = [
+            { start: 0, end: 1 },
+            { start: 0, end: 2 },
+            { start: 1, end: 3 },
+        ];
+
+        expect(CarouselUtils.resolveGroups(groups, 3)).toEqual(groups);
+        expect(warn).not.toHaveBeenCalled();
+    });
+
+    it("holds each range inside the list and to whole slides, and warns", () => {
+        const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+        expect(
+            CarouselUtils.resolveGroups(
+                [
+                    { start: -2, end: 1.2 },
+                    { start: 1, end: 9 },
+                ],
+                4,
+            ),
+        ).toEqual([
+            { start: 0, end: 1 },
+            { start: 1, end: 4 },
+        ]);
+        expect(warn).toHaveBeenCalledTimes(1);
+    });
+
+    it("drops empty ranges, those left empty once held inside the list among them, and warns", () => {
+        const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+        expect(
+            CarouselUtils.resolveGroups(
+                [
+                    { start: 1, end: 1 },
+                    { start: 3, end: 2 },
+                    { start: 5, end: 8 },
+                    { start: Number.NaN, end: 2 },
+                    { start: 0, end: 2 },
+                ],
+                4,
+            ),
+        ).toEqual([{ start: 0, end: 2 }]);
+        expect(warn).toHaveBeenCalledTimes(1);
+    });
+
+    it("puts the groups in order of their start, a tie by their end, and warns", () => {
+        const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+        expect(
+            CarouselUtils.resolveGroups(
+                [
+                    { start: 2, end: 4 },
+                    { start: 0, end: 2 },
+                    { start: 0, end: 1 },
+                ],
+                4,
+            ),
+        ).toEqual([
+            { start: 0, end: 1 },
+            { start: 0, end: 2 },
+            { start: 2, end: 4 },
+        ]);
+        expect(warn).toHaveBeenCalledTimes(1);
+    });
+
+    it("falls back to one group per slide when nothing usable is left, with a warning", () => {
+        const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+        expect(CarouselUtils.resolveGroups([{ start: 4, end: 6 }], 3)).toEqual([
+            { start: 0, end: 1 },
+            { start: 1, end: 2 },
+            { start: 2, end: 3 },
+        ]);
+        expect(CarouselUtils.resolveGroups([], 2)).toHaveLength(2);
+        expect(warn).toHaveBeenCalledTimes(2);
+    });
+
+    it("has no groups for an empty list, and does not warn about it", () => {
+        const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+        expect(CarouselUtils.resolveGroups([{ start: 0, end: 2 }], 0)).toEqual([]);
+        expect(warn).not.toHaveBeenCalled();
+    });
+});
+
+describe("getGroupRest", () => {
+    it("rests on the slide of a group of one, so a carousel without groups rests where it always did", () => {
+        expect(CarouselUtils.getGroupRest({ start: 3, end: 4 })).toBe(3);
+    });
+
+    it("rests a pair halfway between its slides, and a longer group on its middle", () => {
+        expect(CarouselUtils.getGroupRest({ start: 1, end: 3 })).toBe(1.5);
+        expect(CarouselUtils.getGroupRest({ start: 3, end: 6 })).toBe(4);
+    });
+});
+
+describe("group position and progress", () => {
+    const singleRests = [0, 1, 2, 3, 4];
+    const spreadRests = [0, 1.5, 3.5, 5.5];
+
+    it("is the item position and progress exactly when every slide is its own group", () => {
+        [0, 0.3, 0.5, 1].forEach((progress) => {
+            expect(CarouselUtils.toGroupPosition(progress, singleRests, 5, true)).toBe(
+                frozenPosition(progress, 5, true),
+            );
+            expect(CarouselUtils.toGroupPosition(progress, singleRests, 5, false)).toBe(
+                frozenPosition(progress, 5, false),
+            );
+        });
+        [-1, 0, 2.5, 4, 6].forEach((position) => {
+            expect(CarouselUtils.toGroupProgress(position, singleRests, 5, true)).toBe(
+                frozenProgress(position, 5, true),
+            );
+            expect(CarouselUtils.toGroupProgress(position, singleRests, 5, false)).toBe(
+                frozenProgress(position, 5, false),
+            );
+        });
+    });
+
+    it("runs from the first group at rest to the last on a carousel that stops at its ends", () => {
+        expect(CarouselUtils.toGroupPosition(0, spreadRests, 7, false)).toBe(0);
+        expect(CarouselUtils.toGroupPosition(1, spreadRests, 7, false)).toBe(5.5);
+        expect(CarouselUtils.toGroupProgress(5.5, spreadRests, 7, false)).toBe(1);
+    });
+
+    it("starts the lap with the first group at rest on a looping carousel", () => {
+        const pageRests = [1, 4];
+
+        expect(CarouselUtils.toGroupPosition(0, pageRests, 6, true)).toBe(1);
+        expect(CarouselUtils.toGroupProgress(1, pageRests, 6, true)).toBe(0);
+        expect(CarouselUtils.toGroupProgress(4, pageRests, 6, true)).toBe(0.5);
+        expect(CarouselUtils.toGroupProgress(0, pageRests, 6, true)).toBeCloseTo(5 / 6);
+    });
+
+    it("has no lap with a single group", () => {
+        expect(CarouselUtils.toGroupProgress(3, [1.5], 4, false)).toBe(0);
+    });
+});
+
+describe("getNearestGroup", () => {
+    it("agrees with the nearest slide when every slide is its own group, ties and wrapping included", () => {
+        const rests = [0, 1, 2, 3];
+
+        [-0.5, 0.2, 0.5, 1.5, 2.5, 3.4, 3.5, 3.6].forEach((position) => {
+            expect(CarouselUtils.getNearestGroup(position, rests, 4, true)).toBe(frozenNearest(position, 4, true));
+            expect(CarouselUtils.getNearestGroup(position, rests, 4, false)).toBe(frozenNearest(position, 4, false));
+        });
+    });
+
+    it("measures to where each group rests", () => {
+        const pairRests = [0, 0.5, 1.5, 2.5, 3];
+
+        expect(CarouselUtils.getNearestGroup(0.4, pairRests, 4, false)).toBe(1);
+        expect(CarouselUtils.getNearestGroup(1.4, pairRests, 4, false)).toBe(2);
+        expect(CarouselUtils.getNearestGroup(2.9, pairRests, 4, false)).toBe(4);
+    });
+});
+
+describe("getNearestGroupHolding", () => {
+    const pairs = [
+        { start: 0, end: 1 },
+        { start: 0, end: 2 },
+        { start: 1, end: 3 },
+        { start: 2, end: 4 },
+        { start: 3, end: 4 },
+    ];
+
+    it("picks, of the groups holding a slide, the one resting nearest where the carousel is", () => {
+        expect(CarouselUtils.getNearestGroupHolding(2, pairs, 0.5, 4, false)).toBe(2);
+        expect(CarouselUtils.getNearestGroupHolding(1, pairs, 2.5, 4, false)).toBe(2);
+    });
+
+    it("has nothing to pick for a slide no group holds", () => {
+        expect(CarouselUtils.getNearestGroupHolding(2, [{ start: 0, end: 2 }], 0.5, 4, false)).toBeUndefined();
+    });
+});
+
+describe("getGroupPlace and getIsInGroupPlace", () => {
+    it("is the group's start when the slides are drawn once", () => {
+        expect(CarouselUtils.getGroupPlace({ start: 1, end: 3 }, 1.5, 4, 1)).toBe(1);
+    });
+
+    it("follows the copy whose middle is nearest where the ring is", () => {
+        expect(CarouselUtils.getGroupPlace({ start: 0, end: 2 }, 2.6, 2, 3)).toBe(2);
+    });
+
+    it("holds the group's slides one after another, round the seam of the ring", () => {
+        expect(CarouselUtils.getIsInGroupPlace(1, 1, 2, 4)).toBe(true);
+        expect(CarouselUtils.getIsInGroupPlace(2, 1, 2, 4)).toBe(true);
+        expect(CarouselUtils.getIsInGroupPlace(3, 1, 2, 4)).toBe(false);
+        expect(CarouselUtils.getIsInGroupPlace(0, 1, 2, 4)).toBe(false);
+        expect(CarouselUtils.getIsInGroupPlace(0, 5, 2, 6)).toBe(true);
+    });
+});
+
+describe("toGroupCoordinate", () => {
+    const pairs = [0.5, 2.5, 4.5];
+    const sliding = [0, 0.5, 1.5, 2.5];
+
+    it("counts a group at rest as its own index, and runs evenly between two groups", () => {
+        expect(CarouselUtils.toGroupCoordinate(2.5, pairs, 6, false)).toBe(1);
+        expect(CarouselUtils.toGroupCoordinate(3.5, pairs, 6, false)).toBe(1.5);
+        expect(CarouselUtils.toGroupCoordinate(0.25, sliding, 3, false)).toBe(0.5);
+        expect(CarouselUtils.toGroupCoordinate(1, sliding, 3, false)).toBe(1.5);
+    });
+
+    it("runs from the last group on to the first round a looping carousel", () => {
+        expect(CarouselUtils.toGroupCoordinate(5.5, pairs, 6, true)).toBe(2.5);
+        expect(CarouselUtils.toGroupCoordinate(-0.5, pairs, 6, true)).toBe(2.5);
+    });
+
+    it("carries on past either end of a carousel that stops, at the rate of the nearest two groups", () => {
+        expect(CarouselUtils.toGroupCoordinate(-0.5, pairs, 6, false)).toBe(-0.5);
+        expect(CarouselUtils.toGroupCoordinate(5.5, pairs, 6, false)).toBe(2.5);
+    });
+
+    it("is the slide's own position without groups", () => {
+        expect(CarouselUtils.toGroupCoordinate(2.25, [0, 1, 2, 3], 4, true)).toBe(2.25);
+    });
+});
+
+describe("getPlacementGroup", () => {
+    const placeIn = (groups: { start: number; end: number }[], count: number, position: number, place: number) => {
+        const rests = groups.map(CarouselUtils.getGroupRest);
+
+        return CarouselUtils.getPlacementGroup({
+            place,
+            groupPosition: CarouselUtils.toGroupCoordinate(position, rests, count, false),
+            memberships: CarouselUtils.getGroupMemberships(groups, count),
+            rests,
+            count,
+            groupCount: groups.length,
+            copies: 1,
+            isLooping: false,
+        });
+    };
+
+    const pairs = [
+        { start: 0, end: 2 },
+        { start: 2, end: 4 },
+    ];
+    const sliding = [
+        { start: 0, end: 1 },
+        { start: 0, end: 2 },
+        { start: 1, end: 3 },
+        { start: 2, end: 3 },
+    ];
+
+    it("puts every slide of the group at rest at a distance of nothing, each in its own slot", () => {
+        expect(placeIn(pairs, 4, 2.5, 2)).toMatchObject({ distance: 0, slot: 0, size: 2, index: 1 });
+        expect(placeIn(pairs, 4, 2.5, 3)).toMatchObject({ distance: 0, slot: 1, size: 2, index: 1 });
+        expect(placeIn(pairs, 4, 2.5, 0)).toMatchObject({ distance: -1, slot: 0, size: 2, index: 0 });
+    });
+
+    it("draws a slide held by two groups in the group at rest whenever that group holds it", () => {
+        expect(placeIn(sliding, 3, 1.5, 1)).toMatchObject({ distance: 0, slot: 0, index: 2 });
+        expect(placeIn(sliding, 3, 0.5, 1)).toMatchObject({ distance: 0, slot: 1, index: 1 });
+    });
+
+    it("moves a slide held by two groups from its slot in one to its slot in the other, with no jump", () => {
+        const halfway = placeIn(sliding, 3, 1, 1);
+
+        expect(halfway.distance).toBe(0);
+        expect(halfway.slot).toBe(0.5);
+
+        let previous = placeIn(sliding, 3, 0.5, 1);
+
+        for (let position = 0.55; position <= 1.5; position += 0.05) {
+            const next = placeIn(sliding, 3, position, 1);
+
+            expect(Math.abs(next.slot - previous.slot)).toBeLessThan(0.11);
+            expect(Math.abs(next.distance - previous.distance)).toBeLessThan(0.11);
+            previous = next;
+        }
+    });
+
+    it("grows a slide's group from one to two as the carousel leaves a single first slide for a pair", () => {
+        expect(placeIn(sliding, 3, 0, 0).size).toBe(1);
+        expect(placeIn(sliding, 3, 0.25, 0).size).toBe(1.5);
+        expect(placeIn(sliding, 3, 0.5, 0).size).toBe(2);
+    });
+
+    it("draws a slide no group holds alone, where it would rest", () => {
+        const gapped = [
+            { start: 0, end: 1 },
+            { start: 2, end: 3 },
+        ];
+
+        expect(placeIn(gapped, 3, 0, 1)).toMatchObject({ distance: 0.5, slot: 0, size: 1 });
+    });
+
+    it("is the slide alone at its own distance without groups", () => {
+        expect(CarouselUtils.toSlideGroup(-1.5, 4, 8)).toEqual({
+            distance: -1.5,
+            index: 4,
+            count: 8,
+            slot: 0,
+            size: 1,
+        });
     });
 });

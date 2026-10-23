@@ -4,8 +4,10 @@ import { themeVars } from "../../Theme.css";
 import { layerVars } from "../Layer/Layer.css";
 
 export const SLIDE_BUTTON_THUMB_SIZE = 44;
-export const SLIDE_BUTTON_WIDTH = 300;
+export const SLIDE_BUTTON_LENGTH = 300;
 
+export const isVertical = style({});
+export const isRightToLeft = style({});
 export const isTracking = style({});
 export const isFocused = style({});
 export const isDisabled = style({});
@@ -23,6 +25,10 @@ export const slideButtonContent = style({
     transition: `filter ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}`,
 
     selectors: {
+        [`&.${isVertical}`]: {
+            flexDirection: "column",
+            width: SLIDE_BUTTON_THUMB_SIZE,
+        },
         [`&.${isDisabled}`]: {
             filter: themeVars.disabled.filter,
             opacity: themeVars.disabled.opacity,
@@ -39,6 +45,15 @@ export const slideButtonFill = style({
     transition: `width ${themeVars.animation.duration}`,
 
     selectors: {
+        [`.${isVertical} &`]: {
+            top: "auto",
+            right: 0,
+            transition: `height ${themeVars.animation.duration}`,
+        },
+        [`.${isRightToLeft} &`]: {
+            left: "auto",
+            right: 0,
+        },
         [`&.${isTracking}`]: {
             transition: "none",
         },
@@ -55,6 +70,14 @@ export const slideButtonHint = style({
     paddingInline: SLIDE_BUTTON_THUMB_SIZE,
     fontWeight: "bold",
     whiteSpace: "nowrap",
+
+    selectors: {
+        [`.${isVertical} &`]: {
+            writingMode: "vertical-rl",
+            textOrientation: "upright",
+            letterSpacing: "-0.25em",
+        },
+    },
 });
 
 export const slideButtonThumb = style({
@@ -71,6 +94,16 @@ export const slideButtonThumb = style({
     transition: `left ${themeVars.animation.duration}, transform ${themeVars.animation.duration}`,
 
     selectors: {
+        [`.${isVertical} &`]: {
+            top: "auto",
+            bottom: 0,
+            transition: `bottom ${themeVars.animation.duration}, transform ${themeVars.animation.duration}`,
+        },
+        [`.${isRightToLeft} &`]: {
+            left: "auto",
+            right: 0,
+            transition: `right ${themeVars.animation.duration}, transform ${themeVars.animation.duration}`,
+        },
         [`&.${isTracking}`]: {
             transition: `transform ${themeVars.animation.duration}`,
             cursor: "grabbing",
@@ -95,6 +128,12 @@ export const slideButtonArrow = style({
     strokeLinejoin: "round",
 
     selectors: {
+        [`.${isVertical} &`]: {
+            transform: "rotate(-90deg)",
+        },
+        [`.${isRightToLeft} &`]: {
+            transform: "rotate(180deg)",
+        },
         [`.${hasError} &`]: {
             stroke: themeVars.color.error.main,
         },

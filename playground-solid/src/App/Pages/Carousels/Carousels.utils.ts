@@ -1,10 +1,11 @@
 import { createMemo, createSignal } from "solid-js";
 
-import { CAROUSEL_DEFAULTS, CarouselPlacementUtils, CarouselPlacements } from "@thewaver/ss-components-solid";
+import { CAROUSEL_DEFAULTS, CarouselPlacementUtils, type CarouselPlacements } from "@thewaver/ss-components-solid";
 import type { CarouselOrientation } from "@thewaver/ss-components-solid";
 import { CarouselKnobs } from "@thewaver/ss-playground/App/Knobs/Carousels.const";
 import { PLACEMENT_FRAMES, TITLES } from "@thewaver/ss-playground/App/Pages/Carousels/Carousels.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/Carousels/Carousels.css";
+import { toFramedPlacement } from "@thewaver/ss-playground/App/Pages/Carousels/Carousels.utils";
 
 import type { CarouselsControls } from "./Carousels.types";
 
@@ -18,7 +19,7 @@ export const createCarouselsControls = (): CarouselsControls => {
     const placementSignal = createSignal<CarouselPlacements.SampleKey>(CarouselKnobs.STARTING_PLACEMENT);
 
     const getPlacement = createMemo(() =>
-        CarouselPlacementUtils.toPlacementRule(CarouselPlacements.SAMPLE_PLACEMENTS[placementSignal[0]()]),
+        CarouselPlacementUtils.toPlacementRule(toFramedPlacement(placementSignal[0](), orientationSignal[0]())),
     );
 
     const getSlides = createMemo(() => TITLES.slice(0, slideCountSignal[0]()));

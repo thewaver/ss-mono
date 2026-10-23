@@ -1,9 +1,15 @@
 <script lang="ts" module>
-    import type { TableCellRenderProps, TableColumn, TableColumnRenderProps } from "@thewaver/ss-components-svelte";
+    import {
+        type TableCellRenderProps,
+        type TableColumn,
+        type TableColumnRenderProps,
+        TableRowExpander,
+    } from "@thewaver/ss-components-svelte";
     import { formatPrice } from "@thewaver/ss-playground/App/Pages/TablePage/TableParts.const";
 
     import PageTableHeader from "../../PageComponents/TableHeader/TableHeader.svelte";
     import PageTableCellContent from "../../StyledComponents/TableContent/PageTableCellContent.svelte";
+    import PageTableRowExpander from "../../StyledComponents/TableContent/PageTableRowExpander.svelte";
     import type { Part, PartColumnDefs } from "./TablePage.types";
 
     export * from "@thewaver/ss-playground/App/Pages/TablePage/TableParts.const";
@@ -12,6 +18,7 @@
         {
             id: "sku",
             header: "SKU",
+            pin: defs.isPinned ? "start" : undefined,
             widthPx: 110,
             minWidthPx: 80,
             maxWidthPx: 260,
@@ -20,12 +27,12 @@
             isReorderable: defs.isReorderable,
             compare: (a, b) => a.sku.localeCompare(b.sku),
             renderHeader: skuHeader,
-            renderCell: skuCell,
+            renderCell: defs.isExpandable ? expandableSkuCell : skuCell,
         },
         {
             id: "name",
             header: "Name",
-            minWidthPx: 140,
+            minWidthPx: defs.isPinned ? 320 : 140,
             isSortable: true,
             isResizable: defs.isResizable,
             isReorderable: defs.isReorderable,
@@ -62,6 +69,7 @@
         {
             id: "price",
             header: "Price",
+            pin: defs.isPinned ? "end" : undefined,
             widthPx: 110,
             minWidthPx: 80,
             maxWidthPx: 220,
@@ -81,6 +89,18 @@
 
 {#snippet skuCell(part: Part, renderProps: TableCellRenderProps)}
     <PageTableCellContent {renderProps}>{part.sku}</PageTableCellContent>
+{/snippet}
+
+{#snippet expandableSkuCell(part: Part, renderProps: TableCellRenderProps)}
+    <PageTableCellContent {renderProps} leading={rowExpander}>{part.sku}</PageTableCellContent>
+{/snippet}
+
+{#snippet rowExpander()}
+    <TableRowExpander>
+        {#snippet renderContent(expanderProps)}
+            <PageTableRowExpander renderProps={expanderProps} />
+        {/snippet}
+    </TableRowExpander>
 {/snippet}
 
 {#snippet nameHeader(renderProps: TableColumnRenderProps)}

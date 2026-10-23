@@ -22,6 +22,8 @@
         props.renderProps.sortDirection !== undefined && styles.isSorted,
         props.renderProps.isHovered && styles.isHovered,
         props.renderProps.isDisabled && styles.isDisabled,
+        props.renderProps.pin === "start" && styles.isPinnedStart,
+        props.renderProps.pin === "end" && styles.isPinnedEnd,
     ]}
 >
     {@render props.children?.()}

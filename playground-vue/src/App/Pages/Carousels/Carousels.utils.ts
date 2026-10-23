@@ -1,10 +1,11 @@
 import { computed, shallowRef } from "vue";
 
-import { CAROUSEL_DEFAULTS, CarouselPlacementUtils, CarouselPlacements } from "@thewaver/ss-components-vue";
+import { CAROUSEL_DEFAULTS, CarouselPlacementUtils, type CarouselPlacements } from "@thewaver/ss-components-vue";
 import type { CarouselOrientation } from "@thewaver/ss-components-vue";
 import { CarouselKnobs } from "@thewaver/ss-playground/App/Knobs/Carousels.const";
 import { PLACEMENT_FRAMES, TITLES } from "@thewaver/ss-playground/App/Pages/Carousels/Carousels.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/Carousels/Carousels.css";
+import { toFramedPlacement } from "@thewaver/ss-playground/App/Pages/Carousels/Carousels.utils";
 
 import type { CarouselsControls } from "./Carousels.types";
 
@@ -18,7 +19,7 @@ export const useCarouselsControls = (): CarouselsControls => {
     const placement = shallowRef<CarouselPlacements.SampleKey>(CarouselKnobs.STARTING_PLACEMENT);
 
     const placementRule = computed(() =>
-        CarouselPlacementUtils.toPlacementRule(CarouselPlacements.SAMPLE_PLACEMENTS[placement.value]),
+        CarouselPlacementUtils.toPlacementRule(toFramedPlacement(placement.value, orientation.value)),
     );
 
     const slides = computed(() => TITLES.slice(0, slideCount.value));

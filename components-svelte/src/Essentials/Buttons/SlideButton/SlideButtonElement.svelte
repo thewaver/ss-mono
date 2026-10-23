@@ -4,6 +4,7 @@
     import { SlideButtonUtils, SlideButtonStyles as styles } from "@thewaver/ss-components";
 
     import { InteractionTrackerSvelteUtils } from "../../../Abstracts/InteractionTracker/InteractionTrackerSvelte.utils.svelte.js";
+    import { NavigatorSvelteUtils } from "../../../Abstracts/Navigator/NavigatorSvelte.utils.svelte.js";
     import { readStore } from "../../../Utils/storeUtils.js";
     import { FormFieldSvelteUtils } from "../../Input/FormField/FormFieldSvelte.utils.svelte.js";
     import { LabelSvelteUtils } from "../../Input/Label/LabelSvelte.utils.svelte.js";
@@ -18,14 +19,18 @@
 
     FormFieldSvelteUtils.registerControl(() => track ?? undefined);
 
+    const getDirection = NavigatorSvelteUtils.createDirection(() => track ?? undefined);
+
     const isDisabled = $derived(props.flags.isDisabled ?? false);
 
     const gesture = SlideButtonUtils.createGesture({
         getMode: () => props.mode,
+        getOrientation: () => props.orientation,
+        getDirection,
         getThumbSize: () => props.thumbSize,
         getHoldDurationMs: () => props.holdDurationMs,
         getCompletionRatio: () => props.completionRatio,
-        getTrackWidth: () => track?.clientWidth ?? 0,
+        getTrackSize: () => ({ width: track?.clientWidth ?? 0, height: track?.clientHeight ?? 0 }),
         getProgressRatio: () => props.progressRatio,
         setProgressRatio: (ratio) => props.setProgressRatio(ratio),
         onActivate: () => props.onActivate?.(),
@@ -40,7 +45,7 @@
         () => track ?? undefined,
         () => isDisabled,
         {
-            onDrag: (ratio) => gesture.drag(ratio.x),
+            onDrag: (ratio) => gesture.drag(ratio),
             onDragEnd: (reason) => gesture.dragEnd(reason),
         },
     );
@@ -55,6 +60,12 @@
         const isHolding = getIsHolding();
 
         untrack(() => props.setIsHolding(isHolding));
+    });
+
+    $effect(() => {
+        const direction = getDirection();
+
+        untrack(() => props.setDirection(direction));
     });
 
     $effect(() => {
