@@ -6,9 +6,12 @@ import { toDocsSectionId } from "@thewaver/ss-playground/App/PageComponents/Docs
 import * as styles from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.css";
 
 import { useDocsViewContext } from "../DocsView/DocsView.context";
+import { useIsPreview } from "../Preview/Preview.context";
 import type { PageDocsSectionProps } from "./DocsSectionSolid.types";
 
 export const PageDocsSection = (props: ParentProps<PageDocsSectionProps>) => {
+    if (useIsPreview()) return null;
+
     const docsView = useDocsViewContext();
 
     return (

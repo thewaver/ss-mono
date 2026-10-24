@@ -1,7 +1,13 @@
 import { type InjectionKey, inject, provide } from "vue";
 
-const PREVIEW_CONTEXT_KEY: InjectionKey<boolean> = Symbol("PreviewContext");
+export type PreviewContextType = {
+    claimDemo: () => boolean;
+};
 
-export const providePreviewContext = (value: boolean) => provide(PREVIEW_CONTEXT_KEY, value);
+const PREVIEW_CONTEXT_KEY: InjectionKey<PreviewContextType> = Symbol("PreviewContext");
 
-export const useIsPreview = () => inject(PREVIEW_CONTEXT_KEY, false);
+export const providePreviewContext = (value: PreviewContextType) => provide(PREVIEW_CONTEXT_KEY, value);
+
+export const usePreviewContext = () => inject(PREVIEW_CONTEXT_KEY, undefined);
+
+export const useIsPreview = () => usePreviewContext() !== undefined;

@@ -10,4 +10,5 @@ export type PageApiTableProps = {
     headingId: string;
     unit: string;
     attachHeading: Attachment<HTMLElement>;
+    onFragmentClick: (e: MouseEvent, href: string) => void;
 };

@@ -29,11 +29,11 @@
         GETTING_STARTED_ROUTE,
         componentToRouteName,
         flattenConfigs,
-        getHasPreview,
         getIsBranchConfig,
         navigate,
         route,
         toPageHref,
+        toPreview,
     } from "./App.router";
     import type { ComponentConfig, MenuBranchConfig, MenuNodeConfig, RoutePath } from "./App.types";
     import PageAppCommands from "./PageComponents/AppCommands/AppCommands.svelte";
@@ -72,7 +72,7 @@
                 : {
                       value: node,
                       href: toPageHref(node, view),
-                      tooltipDefs: getHasPreview(node) ? NAV_PREVIEW_TOOLTIP_DEFS : undefined,
+                      tooltipDefs: toPreview(node) ? NAV_PREVIEW_TOOLTIP_DEFS : undefined,
                   };
 
     const collectAncestors = (
@@ -212,7 +212,9 @@
     flags: InteractionFlags<TreeNodeRenderProps<MenuNodeConfig>>,
     arrowAim: ShapeArrowAim | undefined,
 )}
-    {#if !getIsBranchConfig(flags.value) && flags.value.component}
+    {@const preview = getIsBranchConfig(flags.value) ? undefined : toPreview(flags.value)}
+
+    {#if preview}
         <PageTooltipContent
             {visibilityTarget}
             {transitionDurationMs}
@@ -222,7 +224,7 @@
         >
             <div class={styles.navPreview} aria-hidden="true" inert>
                 <PageLayer level={1}>
-                    <PagePreview component={flags.value.component} />
+                    <PagePreview component={preview} />
                 </PageLayer>
             </div>
         </PageTooltipContent>
@@ -364,7 +366,7 @@
                                             <PageTreeNodeContent
                                                 {renderProps}
                                                 hasExamples={getIsBranchConfig(node.value) ||
-                                                    node.value.component !== undefined}
+                                                    node.value.component !== undefined || node.value.docs !== undefined}
                                                 detail={getIsBranchConfig(node.value)
                                                     ? `${flattenConfigs(node.value.children).length}`
                                                     : ""}

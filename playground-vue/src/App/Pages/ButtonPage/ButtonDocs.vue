@@ -23,19 +23,6 @@ const isReachableWhenDisabled = shallowRef(false);
 
         <template #renderKnobs>
             <PageProp
-                item-key="isDisabled"
-                label="Disabled"
-                hint="Turns the button off: it ignores presses and hover, and the Tab key skips it."
-                controls="Sets Button.isDisabled"
-            >
-                <PageCheckField
-                    :value="isDisabled"
-                    ariaLabel="Disabled"
-                    @change="(value: boolean) => (isDisabled = value)"
-                />
-            </PageProp>
-
-            <PageProp
                 item-key="hasError"
                 label="Error"
                 hint="Puts the button in its error look. It changes nothing about what the button accepts or does."
@@ -56,6 +43,19 @@ const isReachableWhenDisabled = shallowRef(false);
                     @change="(value: boolean) => (isPressed = value)"
                 />
             </PageProp>
+
+            <PageProp
+                item-key="isDisabled"
+                label="Disabled"
+                hint="Turns the button off: it ignores presses and hover, and the Tab key skips it."
+                controls="Sets Button.isDisabled"
+            >
+                <PageCheckField
+                    :value="isDisabled"
+                    ariaLabel="Disabled"
+                    @change="(value: boolean) => (isDisabled = value)"
+                />
+            </PageProp>
         </template>
     </PageDocsExample>
 
@@ -70,19 +70,6 @@ const isReachableWhenDisabled = shallowRef(false);
 
         <template #renderKnobs>
             <PageProp
-                item-key="tooltipIsDisabled"
-                label="Disabled"
-                hint="Turns the button off: it ignores presses and hover, and the Tab key skips it."
-                controls="Sets Button.isDisabled"
-            >
-                <PageCheckField
-                    :value="isTooltipDisabled"
-                    ariaLabel="Disabled"
-                    @change="(value: boolean) => (isTooltipDisabled = value)"
-                />
-            </PageProp>
-
-            <PageProp
                 item-key="tooltipIsReachableWhenDisabled"
                 label="Reachable when disabled"
                 hint="Keeps a disabled button's tooltip available: the Tab key can stop on it and hovering it shows the tooltip. Without it a disabled button shows no tooltip at all. It only matters while Disabled is on."
@@ -92,6 +79,19 @@ const isReachableWhenDisabled = shallowRef(false);
                     :value="isReachableWhenDisabled"
                     ariaLabel="Reachable when disabled"
                     @change="(value: boolean) => (isReachableWhenDisabled = value)"
+                />
+            </PageProp>
+
+            <PageProp
+                item-key="tooltipIsDisabled"
+                label="Disabled"
+                hint="Turns the button off: it ignores presses and hover, and the Tab key skips it."
+                controls="Sets Button.isDisabled"
+            >
+                <PageCheckField
+                    :value="isTooltipDisabled"
+                    ariaLabel="Disabled"
+                    @change="(value: boolean) => (isTooltipDisabled = value)"
                 />
             </PageProp>
         </template>

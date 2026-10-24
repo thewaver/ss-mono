@@ -21374,6 +21374,18 @@ its knob signals start as they would on the page, and the page components that r
 draw nothing. Nothing is written per page, so the order of a page's examples decides its tile. `PREVIEW_EXCLUDED_PAGES`
 in `App.const.tsx` leaves a page out of the gallery and the nav preview without touching its page; it holds `ViewportWrapper`, which is too tall to read at tile size, and both media switchers, `AudioSwitcher` and `ImageSwitcher` — all three the user's call. `TableOfContents` was on it until its page's examples became one outline in a 320-high scrolling box, which fits a tile. The list was kept, at their request, after it first carried `ShapeReveal`.
 
+**A page with a Docs page is previewed by the first live example there, even when it also has an Examples page** —
+the user's call, made once pages began moving their examples into their docs and some were left with nothing to
+preview. The menu and the gallery both take `config.docs ?? config.component` (`toPreview`). Under the preview context
+a Docs page strips itself the same way `PageExamples` does: `PageDocsSection` and `PageDocsAlert` draw nothing, and
+each `PageDocsExample` asks the preview's `claimDemo`, which answers yes to the first caller only, so the first
+example draws its demo bare and the rest draw nothing — no knobs, no code, and no source file fetched. React keys the
+claim to the instance's `useId`, so a second render in strict mode gets the same answer; the other three run a
+component's setup once, in render order, so a flag is enough. **A docs demo carries its source `path` as its
+`data-testid`**, on the page and in the preview, so the gallery spec can match a tile to its page's first docs
+example the way it matches an example by key. A Docs page with no live example would preview as an empty tile; none
+exists today, and the gallery spec fails on one.
+
 **A tile mounts only while on screen**, and is taken down when it leaves, so its state resets on the way back.
 
 **Each tile is a nested `ViewportWrapper`, so a preview is a real scaled viewport rather than a CSS shrink**: pointer
@@ -21430,6 +21442,29 @@ flags it built itself rather than the copy its row hands back, which is the same
 **The tile's title is the text color in both link states**, declaring `:visited` itself as `dependencyLink` does,
 since the theme's `a:visited` rule outranks a single class.
 
+### The API page's address follows the section being read
+
+Asked for by the user, after two faults on the API view: scrolling away from a section left its `#…` in the address,
+so a copied address opened on the section last clicked, and clicking an "Also has everything in …" link a second time
+did nothing, because the address had not changed and the router ignored a navigation to where it thought it already
+was. **The table of contents' `onCurrentChange` replaces the address's hash with the current section**, or drops it
+above the first, and **an in-page include link handles its own plain click**: it pushes its hash, as an anchor would,
+and scrolls with `TableOfContentsUtils.goToTarget`, so a second click always scrolls whatever the address says. A
+modified click (new tab, new window) is left to the browser.
+
+**After such a click the address holds the clicked section until the reader next scrolls, presses or types**, by the
+same `observeNextReaderInput` the table of contents uses for its own pressed links, and then catches up with the last
+section reported. Without the hold, a link to a short table near the end of its group showed the next heading's hash,
+since the line that decides the current section had already reached it.
+
+**Solid writes the address with `history.replaceState`/`pushState`, behind its router; the other three go through
+theirs.** `@solidjs/router` scrolls to the element a hash names on every navigation, `scroll: false` only turning off
+the fall-back scroll to the top, so each replace snapped the section under the reader to the top of the page. The
+Playground already writes the address behind the router once (`restoreRootSlash`). React's router never scrolls, Vue's
+has no `scrollBehavior`, and Svelte's navigates with `scrollToTop: false`; Svelte's `navigate` is asynchronous and a
+newer navigation cancels an older one, so its click waits for the push before scrolling. The Docs view's table of
+contents does not write the address; the user asked about the API page only.
+
 ### The focus ring stays above a painter's hover and press filter
 
 A wrapped control's ring is the `:focus-visible` outline of its focusable element, and its painted box is a child of that element. The painters darken that box on hover and press with `filter`, and a filter makes the box a layer of its own, which the browser paints after the element's outline. So with the ring showing, a press draws the box's drop shadow over the ring's bottom edge, and the ring looks thicker on top and thinner below, as if the button sank a pixel. It is a painting order, not a layout shift: nothing moves.
@@ -21446,9 +21481,33 @@ Three shapes were weighed. **A string prop** won, over a fixed English phrase in
 
 **It is rendered as the button's own visually hidden text, and the button points at it with `aria-describedby`**, joined to the form field's description when there is one, so both are read. The text is clipped rather than `display: none`, per _"Text meant only for screen readers is transparent or visually hidden"_, and its id is generated, per _"A component generates the id a relationship attribute needs"_. The `aria-description` attribute was not used; its support was not checked.
 
-Only Solid carries it so far. The other three frameworks' `SlideButton` takes no description yet, and each adds `BaseSlideButtonValues` to its props and renders the same hidden text when ported. The Playground's examples describe the keyboard route only ("Hold Enter or Space to send."), since that is true under every mode and the Mode knob changes which pointer gestures work.
+The Playground's examples describe the keyboard route only ("Hold Enter or Space to send."), since that is true under every mode and the Mode knob changes which pointer gestures work.
 
-**It also says when it is held at the end.** The page keeps a confirmed button at its end through `isPressed`, and until now that state was drawn and never announced. WCAG 4.1.2 asks that states set by the user be programmatically determinable, with "notification of changes to these items … available to user agents, including assistive technologies", so the element writes `aria-pressed` from the flag, as `Button` does: present only when the consumer passes `isPressed`. Solid only so far; the other three add the same attribute when ported.
+**It also says when it is held at the end.** The page keeps a confirmed button at its end through `isPressed`, and until now that state was drawn and never announced. WCAG 4.1.2 asks that states set by the user be programmatically determinable, with "notification of changes to these items … available to user agents, including assistive technologies", so the element writes `aria-pressed` from the flag, as `Button` does: present only when the consumer passes `isPressed`.
+
+### A docs example's code sits below its box, and the accordion examples share one width
+
+**The "Show code" accordion is drawn below the example box, not inside it.** The example is a column
+(`docsExampleStack`, 10px between its children): first the box with the demo and its knobs, carrying `docsExample`
+and the `data-docs-example` marker; then the accordion on its own, at the same layer level as the box so it keeps
+its colors, inside a `docsExampleCode` box that gives it the box's shadow and the header's rounding. Specs find an
+example by the marker on the box, so the code — which repeats an example's text — can never match a locator built
+from that text.
+
+**Every accordion and collapsible in the Docs examples sits in a box capped at 480px** (the shared `docsAccordion`
+class; Collapsible's Side example composes it into `sideExample`, which also centers), and takes the shared
+`DOCS_GAP` as its gap, except Accordion's Basic, whose gap is a knob. A readout beside an accordion (Deferred's
+"Built so far") sits outside the capped box, so the demo's own spacing separates the two.
+
+**Accordion's Orientation example has no branching in its code.** The look is all in the shared `Accordions.css.ts`,
+driven by two attributes: the box around the accordion carries `data-orientation`, each panel carries `data-move`
+set to the move direction `renderPanel` is handed, and each header and panel has one fixed class. The stylesheet
+turns the attributes into an axis and a move, and one animation slides the panel from them — sideways when
+horizontal, from above or below when vertical — so the code a visitor reads is the same for both.
+
+**`SlideButton`'s "Arm all three" example writes its two CSS variables through `assignInlineVars`** (or each
+framework's equivalent). Written raw as a style key, a vanilla-extract variable's name is `var(--…)`, which the
+browser drops without a word.
 
 ### A docs example puts its own controls below the component
 
@@ -21464,4 +21523,4 @@ The user left the choice to Claude ("your guess is as good as mine"), after sayi
 
 ### On a docs demo, the Disabled knob is last
 
-The user's rule, given while the Breadcrumbs examples were being built: in a docs example's knob column, `isDisabled` goes after every other knob. Applied at once to the three pages built so far: `Button`'s two examples (in the Tooltip one, "Reachable when disabled" now sits above "Disabled", though its hint says it only matters while Disabled is on, which is the one place the literal reading cuts against the natural order), `SlideButton`'s first example (after Error) and `Breadcrumbs`' first (after Separators). The ports copy the Solid order, which backlog items 15, 18 and 19 already tell them to do.
+The user's rule, given while the Breadcrumbs examples were being built: in a docs example's knob column, `isDisabled` goes after every other knob. Applied at once to the three pages built so far: `Button`'s two examples (in the Tooltip one, "Reachable when disabled" now sits above "Disabled", though its hint says it only matters while Disabled is on, which is the one place the literal reading cuts against the natural order), `SlideButton`'s first example (after Error) and `Breadcrumbs`' first (after Separators). All four Playgrounds follow it.

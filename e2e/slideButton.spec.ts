@@ -6,8 +6,7 @@ import { activeMatches, demo, prop, readout, tabIndex } from "./helpers";
  * The control has no examples of its own: its page is the Docs view, whose first live example takes the knobs for the
  * gesture (mode, completion ratio, disabled, error) and whose second takes the two for direction (orientation and the
  * direction of the box around it). Each example finds itself by the key of a knob it holds, and shows how many times
- * it has been confirmed in its own caption, in brackets at the end. The Docs view is in the Solid Playground only so
- * far, which is what the `@solid` tag on every test keeps the other three from running against.
+ * it has been confirmed in its own caption, in brackets at the end.
  */
 const BASIC = `[data-docs-example]:has(${prop("mode")}) [data-demo]`;
 const DIRECTIONS = `[data-docs-example]:has(${prop("orientation")}) [data-demo]`;
@@ -66,7 +65,7 @@ test.beforeEach(async ({ page }) => {
     await expect(page.locator(track(BASIC))).toBeVisible();
 });
 
-test("a slide that reaches the end activates once, and the thumb returns to rest @solid", async ({ page }) => {
+test("a slide that reaches the end activates once, and the thumb returns to rest", async ({ page }) => {
     const element = page.locator(track(BASIC));
 
     expect(await activations(page, BASIC), "nothing has happened yet").toBe(0);
@@ -82,7 +81,7 @@ test("a slide that reaches the end activates once, and the thumb returns to rest
         .toBeLessThan(0.01);
 });
 
-test("a slide that stops short of the end activates nothing @solid", async ({ page }) => {
+test("a slide that stops short of the end activates nothing", async ({ page }) => {
     const element = page.locator(track(BASIC));
 
     await slide(page, element, (await thumbSpan(page, BASIC)).center, 0.6);
@@ -102,7 +101,7 @@ test("a slide that stops short of the end activates nothing @solid", async ({ pa
  * pointer does nothing under `"slide"`, so the only thing that can move the thumb there is a grab, and the reading
  * has one meaning.
  */
-test("a press on the track away from the thumb is not a grab @solid", async ({ page }) => {
+test("a press on the track away from the thumb is not a grab", async ({ page }) => {
     await chooseOption(page, "mode", "slide");
 
     const box = (await page.locator(track(BASIC)).boundingBox())!;
@@ -134,24 +133,20 @@ test("a press on the track away from the thumb is not a grab @solid", async ({ p
  * Under `"hold"` a press is a hold, so a drag that took longer than the hold duration on a loaded machine would
  * confirm the action and read as the drag having been let through — which is why this one runs alone.
  */
-test(
-    "a hold-only button ignores the drag, and still answers the keyboard @solid",
-    { tag: "@solo" },
-    async ({ page }) => {
-        await chooseOption(page, "mode", "hold");
+test("a hold-only button ignores the drag, and still answers the keyboard", { tag: "@solo" }, async ({ page }) => {
+    await chooseOption(page, "mode", "hold");
 
-        await slide(page, page.locator(track(BASIC)).first(), 0.1, 1);
+    await slide(page, page.locator(track(BASIC)).first(), 0.1, 1);
 
-        expect(await activations(page, BASIC), "carrying the thumb the whole way does nothing").toBe(0);
+    expect(await activations(page, BASIC), "carrying the thumb the whole way does nothing").toBe(0);
 
-        await page.locator(track(BASIC)).first().focus();
-        await page.keyboard.down("Enter");
-        await page.waitForTimeout(HOLD_DURATION_MS + HOLD_SLACK_MS);
-        await page.keyboard.up("Enter");
+    await page.locator(track(BASIC)).first().focus();
+    await page.keyboard.down("Enter");
+    await page.waitForTimeout(HOLD_DURATION_MS + HOLD_SLACK_MS);
+    await page.keyboard.up("Enter");
 
-        expect(await activations(page, BASIC), "but holding it down does").toBe(1);
-    },
-);
+    expect(await activations(page, BASIC), "but holding it down does").toBe(1);
+});
 
 /**
  * The two conditions a slide has to meet, asserted one each. The press must start on the thumb, which the test
@@ -159,7 +154,7 @@ test(
  * stays there is not a slide, and under `mode="slide"` there is no hold for it to fall back to either. Together
  * they are what "hold the thumb and drag it" means, and neither on its own is enough.
  */
-test("a press that lands on the thumb and never moves is not a slide @solid", async ({ page }) => {
+test("a press that lands on the thumb and never moves is not a slide", async ({ page }) => {
     await chooseOption(page, "mode", "slide");
 
     const box = (await page.locator(track(BASIC)).boundingBox())!;
@@ -178,7 +173,7 @@ test("a press that lands on the thumb and never moves is not a slide @solid", as
     expect(await activations(page, BASIC), "and letting go confirms nothing").toBe(0);
 });
 
-test("a slide-only button ignores a held press, and still answers the keyboard @solid", async ({ page }) => {
+test("a slide-only button ignores a held press, and still answers the keyboard", async ({ page }) => {
     await chooseOption(page, "mode", "slide");
 
     const box = (await page.locator(track(BASIC)).boundingBox())!;
@@ -201,7 +196,7 @@ test("a slide-only button ignores a held press, and still answers the keyboard @
 /**
  * A plain disabled button is not an example of its own: it is the live example with its Disabled knob turned on.
  */
-test("a disabled slide button refuses the drag, and the focus with it @solid", async ({ page }) => {
+test("a disabled slide button refuses the drag, and the focus with it", async ({ page }) => {
     const element = page.locator(track(BASIC));
 
     await page.locator(`${prop("isDisabled")} input`).click();
@@ -224,7 +219,7 @@ test("a disabled slide button refuses the drag, and the focus with it @solid", a
  * press — so a press held anywhere on the control runs the same confirmation the drag does. Held over the
  * empty track here, which is also the case that must not be a grab.
  */
-test("a press held on the track confirms without any dragging at all @solid", async ({ page }) => {
+test("a press held on the track confirms without any dragging at all", async ({ page }) => {
     const box = (await page.locator(track(BASIC)).boundingBox())!;
 
     await page.mouse.move(box.x + box.width * 0.6, box.y + box.height * 0.5);
@@ -235,7 +230,7 @@ test("a press held on the track confirms without any dragging at all @solid", as
     expect(await activations(page, BASIC), "holding still is the whole gesture").toBe(1);
 });
 
-test("a press let go before the hold completes confirms nothing @solid", async ({ page }) => {
+test("a press let go before the hold completes confirms nothing", async ({ page }) => {
     const box = (await page.locator(track(BASIC)).boundingBox())!;
 
     await page.mouse.move(box.x + box.width * 0.6, box.y + box.height * 0.5);
@@ -250,7 +245,7 @@ test("a press let go before the hold completes confirms nothing @solid", async (
  * The keyboard cannot reproduce a drag, so it gets the hold instead of a plain press — a tap of `Enter`
  * must do nothing at all, which is the half a held press cannot show on its own.
  */
-test("the keyboard route is a held Enter, and a tap of it does nothing @solid", async ({ page }) => {
+test("the keyboard route is a held Enter, and a tap of it does nothing", async ({ page }) => {
     const element = page.locator(track(BASIC));
 
     await element.focus();
@@ -271,7 +266,7 @@ test("the keyboard route is a held Enter, and a tap of it does nothing @solid", 
     expect(await activations(page, BASIC), "and Space is the same key as far as this is concerned").toBe(2);
 });
 
-test("focus leaving the control abandons a hold it was in the middle of @solid", async ({ page }) => {
+test("focus leaving the control abandons a hold it was in the middle of", async ({ page }) => {
     const element = page.locator(track(BASIC));
 
     await element.focus();
@@ -293,7 +288,7 @@ test("focus leaving the control abandons a hold it was in the middle of @solid",
  * written down here. Progress is the thumb's travel over the distance it can travel, which is the track less the
  * thumb, so a pointer target is worked out from the thumb's share of the track.
  */
-test("the thumb completes once let go past the completion ratio, and not short of it @solid", async ({ page }) => {
+test("the thumb completes once let go past the completion ratio, and not short of it", async ({ page }) => {
     const MARGIN = 0.15;
     const knob = page.locator(`${prop("completionRatio")} input`);
 
@@ -354,7 +349,7 @@ const middleOf = (box: { x: number; y: number; width: number; height: number }) 
  * the wrong way is asserted as well as the right one: a gesture still measuring from the top would take the downward
  * drag as the one that completes.
  */
-test("a vertical button rests at the bottom and completes by sliding up, never down @solid", async ({ page }) => {
+test("a vertical button rests at the bottom and completes by sliding up, never down", async ({ page }) => {
     await chooseOption(page, "orientation", "vertical");
 
     const { track: trackBox, thumb: thumbBox } = await restingBoxes(page, DIRECTIONS);
@@ -386,7 +381,7 @@ test("a vertical button rests at the bottom and completes by sliding up, never d
  * rightward drag is asserted too, because a gesture still running left to right would never see a press at the right
  * as a press on the thumb, and a painter still drawing from the left would put the thumb where the gesture is not.
  */
-test("a right-to-left button rests at the right and completes by sliding leftward @solid", async ({ page }) => {
+test("a right-to-left button rests at the right and completes by sliding leftward", async ({ page }) => {
     await chooseOption(page, "direction", "rtl");
 
     const { track: trackBox, thumb: thumbBox } = await restingBoxes(page, DIRECTIONS);
@@ -417,7 +412,7 @@ test("a right-to-left button rests at the right and completes by sliding leftwar
  * The keyboard route is a held Enter whatever the axis or the direction, since `role="button"` has no orientation to
  * state and there is no arrow walk along the track to turn round. Both turned buttons are held in turn.
  */
-test("a held Enter confirms a vertical button and a right-to-left one alike @solid", async ({ page }) => {
+test("a held Enter confirms a vertical button and a right-to-left one alike", async ({ page }) => {
     let expected = 0;
 
     for (const [key, name] of [
@@ -444,7 +439,7 @@ test("a held Enter confirms a vertical button and a right-to-left one alike @sol
  * `aria-describedby` to text the button renders itself, so no form field has to be wrapped round it. The words are
  * the consumer's, so what is asserted is that there is a description, not what it says.
  */
-test("the button carries the description it was given, with no form field around it @solid", async ({ page }) => {
+test("the button carries the description it was given, with no form field around it", async ({ page }) => {
     await expect(page.locator(track(BASIC))).toHaveAccessibleDescription(/\S/);
 });
 
@@ -452,7 +447,7 @@ test("the button carries the description it was given, with no form field around
  * The description matters enough that the page says so in a note before the first example. It is a note, not an
  * alert: nothing has gone wrong, so it is not announced the moment the page opens.
  */
-test("the page asks for a description in a note, before any example @solid", async ({ page }) => {
+test("the page asks for a description in a note, before any example", async ({ page }) => {
     const note = page.locator("[data-docs-alert]");
 
     await expect(note).toHaveAttribute("role", "note");
@@ -474,13 +469,11 @@ test("the page asks for a description in a note, before any example @solid", asy
  */
 const HELD = `[data-docs-example]:has(button[aria-label="Reset"]) [data-demo]`;
 
-test("a button that holds no state claims none @solid", async ({ page }) => {
+test("a button that holds no state claims none", async ({ page }) => {
     await expect(page.locator(track(BASIC))).not.toHaveAttribute("aria-pressed");
 });
 
-test("a button held at its end is announced as pressed, and released when the page lets go @solid", async ({
-    page,
-}) => {
+test("a button held at its end is announced as pressed, and released when the page lets go", async ({ page }) => {
     const element = page.locator(track(HELD)).first();
 
     await expect(element, "before anything happens it is not held").toHaveAttribute("aria-pressed", "false");
@@ -510,7 +503,7 @@ const ARMING = demo("arming");
 const LOCKS = ["Lock 1", "Lock 2", "Lock 3"];
 const FINALE_TIMEOUT_MS = 5_000;
 
-test("arming every lock runs the finale and then resets them all @solid", async ({ page }) => {
+test("arming every lock runs the finale and then resets them all", async ({ page }) => {
     await page.goto("/slide-button");
 
     const lock = (name: string) => page.locator(ARMING).getByRole("button", { name });

@@ -25,8 +25,8 @@ export const PageBreadcrumbContent = (props: PropsWithChildren<BreadcrumbContent
     );
 };
 
-export const PageBreadcrumbSeparator = () => {
+export const PageBreadcrumbSeparator = (props: PropsWithChildren) => {
     const layerClass = useLayerClass();
 
-    return <span className={[styles.breadcrumbSeparator, layerClass].join(" ")}>/</span>;
+    return <span className={[styles.breadcrumbSeparator, layerClass].join(" ")}>{props.children ?? "/"}</span>;
 };

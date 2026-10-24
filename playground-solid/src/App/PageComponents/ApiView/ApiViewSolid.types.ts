@@ -11,4 +11,5 @@ export type PageApiTableProps = AccessorProps<{
     unit: string;
 }> & {
     headingRef: (element: HTMLElement) => void;
+    onFragmentClick: (e: MouseEvent, href: string) => void;
 };

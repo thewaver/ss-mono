@@ -5,9 +5,11 @@ import { toDocsSectionId } from "@thewaver/ss-playground/App/PageComponents/Docs
 import * as styles from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.css";
 
 import { useDocsViewContext } from "../DocsView/DocsView.context";
+import { useIsPreview } from "../Preview/Preview.context";
 import type { PageDocsSectionProps } from "./DocsSectionReact.types";
 
 export const PageDocsSection = (props: PropsWithChildren<PageDocsSectionProps>) => {
+    const isPreview = useIsPreview();
     const docsView = useDocsViewContext();
     const [heading, setHeading] = useState<HTMLElement | null>(null);
 
@@ -16,6 +18,8 @@ export const PageDocsSection = (props: PropsWithChildren<PageDocsSectionProps>) 
 
         return docsView.register({ title: props.title, element: heading });
     }, [docsView, heading, props.title]);
+
+    if (isPreview) return null;
 
     return (
         <section className={styles.docsGroup} data-docs-section>

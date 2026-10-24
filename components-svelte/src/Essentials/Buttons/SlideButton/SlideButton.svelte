@@ -29,6 +29,7 @@
             {attachElement}
             id={props.id}
             ariaLabel={props.ariaLabel}
+            ariaDescription={props.ariaDescription}
             {orientation}
             thumbSize={props.thumbSize ?? SLIDE_BUTTON_DEFAULTS.thumbSize}
             holdDurationMs={props.holdDurationMs ?? SLIDE_BUTTON_DEFAULTS.holdDurationMs}

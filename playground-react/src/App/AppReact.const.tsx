@@ -19,8 +19,11 @@ export {
 const lazyPage = <K extends string>(load: () => Promise<Record<K, ComponentType>>, key: K) =>
     lazy(() => load().then((module) => ({ default: module[key] })));
 
+const AccordionDocs = lazyPage(() => import("./Pages/Accordions/AccordionPage/AccordionDocs"), "AccordionDocs");
+const CollapsibleDocs = lazyPage(() => import("./Pages/Accordions/CollapsiblePage/CollapsibleDocs"), "CollapsibleDocs");
 const AudioSwitcherPage = lazyPage(() => import("./Pages/AudioSwitcherPage/AudioSwitcherPage"), "AudioSwitcherPage");
 const BracketPage = lazyPage(() => import("./Pages/BracketPage/BracketPage"), "BracketPage");
+const BreadcrumbsDocs = lazyPage(() => import("./Pages/BreadcrumbsPage/BreadcrumbsDocs"), "BreadcrumbsDocs");
 const ButtonPage = lazyPage(() => import("./Pages/ButtonPage/ButtonPage"), "ButtonPage");
 const ButtonDocs = lazyPage(() => import("./Pages/ButtonPage/ButtonDocs"), "ButtonDocs");
 const CalendarPage = lazyPage(() => import("./Pages/CalendarPage/CalendarPage"), "CalendarPage");
@@ -153,6 +156,8 @@ const SelectPage = lazyPage(() => import("./Pages/SelectPage/SelectPage"), "Sele
 const ShapePage = lazyPage(() => import("./Pages/ShapePage/ShapePage"), "ShapePage");
 const ShapeRevealPage = lazyPage(() => import("./Pages/ShapeRevealPage/ShapeRevealPage"), "ShapeRevealPage");
 const SidebarPage = lazyPage(() => import("./Pages/SidebarPage/SidebarPage"), "SidebarPage");
+const SlideButtonPage = lazyPage(() => import("./Pages/SlideButtonPage/SlideButtonPage"), "SlideButtonPage");
+const SlideButtonDocs = lazyPage(() => import("./Pages/SlideButtonPage/SlideButtonDocs"), "SlideButtonDocs");
 const SortableGridPage = lazyPage(() => import("./Pages/SortableGridPage/SortableGridPage"), "SortableGridPage");
 const SortablePage = lazyPage(() => import("./Pages/SortablePage/SortablePage"), "SortablePage");
 const SplitPanePage = lazyPage(() => import("./Pages/SplitPanePage/SplitPanePage"), "SplitPanePage");
@@ -329,14 +334,17 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                 children: [
                     {
                         name: "Accordion",
+                        docs: () => <AccordionDocs />,
                     },
                     {
                         name: "Collapsible",
+                        docs: () => <CollapsibleDocs />,
                     },
                 ],
             },
             {
                 name: "Breadcrumbs",
+                docs: () => <BreadcrumbsDocs />,
             },
             {
                 name: "Buttons",
@@ -348,6 +356,8 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                     },
                     {
                         name: "SlideButton",
+                        component: () => <SlideButtonPage />,
+                        docs: () => <SlideButtonDocs />,
                     },
                 ],
             },

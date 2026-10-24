@@ -19,7 +19,7 @@ const TABLE_COLUMNS: Record<ApiTableKind, [name: string, type: string]> = {
     fields: ["Field", "Type"],
 };
 
-defineProps<PageApiTableProps>();
+const props = defineProps<PageApiTableProps>();
 </script>
 
 <template>
@@ -34,7 +34,10 @@ defineProps<PageApiTableProps>();
             {{ DOCS_INCLUDES_LEAD
             }}<template v-for="(include, index) in table.includes" :key="include.text"
                 >{{ index ? DOCS_INCLUDES_SEPARATOR : ""
-                }}<a v-if="toDocsIncludeHref(include, unit)" :href="toDocsIncludeHref(include, unit)"
+                }}<a
+                    v-if="toDocsIncludeHref(include, unit)"
+                    :href="toDocsIncludeHref(include, unit)"
+                    @click="(e: MouseEvent) => props.onFragmentClick(e, toDocsIncludeHref(include, unit)!)"
                     ><code>{{ include.text }}</code></a
                 ><code v-else>{{ include.text }}</code></template
             >

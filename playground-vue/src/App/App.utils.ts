@@ -40,26 +40,29 @@ export namespace AppUtils {
     const NAV_PREVIEW_OFFSET = { x: 10, y: 0 };
     const NAV_PREVIEW_ARROW = "triangle";
 
-    type PreviewableConfig = ComponentConfig & Required<Pick<ComponentConfig, "component">>;
+    type PageLoader = NonNullable<ComponentConfig["component"]>;
 
-    const PREVIEW_COMPONENTS = new Map<PreviewableConfig, Component>();
+    const PREVIEW_COMPONENTS = new Map<PageLoader, Component>();
 
-    const getHasPreview = (config: ComponentConfig): config is PreviewableConfig =>
-        config.component !== undefined && !PREVIEW_EXCLUDED_PAGES.includes(config.name);
-
-    const getPreviewComponent = (config: PreviewableConfig) => {
-        const cached = PREVIEW_COMPONENTS.get(config);
+    const toPreviewComponent = (loader: PageLoader) => {
+        const cached = PREVIEW_COMPONENTS.get(loader);
 
         if (cached) return cached;
 
-        const component = defineAsyncComponent(config.component);
+        const component = defineAsyncComponent(loader);
 
-        PREVIEW_COMPONENTS.set(config, component);
+        PREVIEW_COMPONENTS.set(loader, component);
 
         return component;
     };
 
-    const toPreviewTooltipDefs = (config: PreviewableConfig): InteractionTooltipDefs<TreeNodeRenderProps> => ({
+    const toPreview = (config: ComponentConfig) => {
+        const loader = PREVIEW_EXCLUDED_PAGES.includes(config.name) ? undefined : (config.docs ?? config.component);
+
+        return loader ? toPreviewComponent(loader) : undefined;
+    };
+
+    const toPreviewTooltipDefs = (component: Component): InteractionTooltipDefs<TreeNodeRenderProps> => ({
         placement: NAV_PREVIEW_PLACEMENT,
         offset: NAV_PREVIEW_OFFSET,
         renderContent: ({ visibilityTarget, transitionDurationMs, arrowAim }) =>
@@ -68,21 +71,27 @@ export namespace AppUtils {
                 { visibilityTarget, transitionDurationMs, arrow: NAV_PREVIEW_ARROW, arrowAim, isWide: true },
                 () =>
                     h("div", { "class": styles.navPreview, "aria-hidden": "true", "inert": true }, [
-                        h(PageLayer, { level: 1 }, () => h(PagePreview, { component: getPreviewComponent(config) })),
+                        h(PageLayer, { level: 1 }, () => h(PagePreview, { component })),
                     ]),
             ),
     });
+
+    const toLeafNode = (config: ComponentConfig, view: PageViewKey): TreeNode<MenuNodeConfig> => {
+        const preview = toPreview(config);
+
+        return {
+            value: config,
+            href: toPageHref(config, view),
+            tooltipDefs: preview ? toPreviewTooltipDefs(preview) : undefined,
+        };
+    };
 
     const toTreeNode =
         (view: PageViewKey) =>
         (node: MenuNodeConfig): TreeNode<MenuNodeConfig> =>
             getIsBranchConfig(node)
                 ? { value: node, children: node.children.map(toTreeNode(view)) }
-                : {
-                      value: node,
-                      href: toPageHref(node, view),
-                      tooltipDefs: getHasPreview(node) ? toPreviewTooltipDefs(node) : undefined,
-                  };
+                : toLeafNode(node, view);
 
     const collectAncestors = (
         nodes: MenuNodeConfig[],
@@ -141,17 +150,13 @@ export namespace AppUtils {
     export const GALLERY_SECTIONS: GallerySection[] = VISIBLE_MENU_CONFIGS.map((category) => ({
         name: category.name,
         description: MENU_DESCRIPTIONS[category.name],
-        items: flattenConfigs([category]).flatMap((config) =>
-            getHasPreview(config)
-                ? [
-                      {
-                          name: toGalleryName(config),
-                          href: componentToRouteName(config.name),
-                          component: getPreviewComponent(config),
-                      },
-                  ]
-                : [],
-        ),
+        items: flattenConfigs([category]).flatMap((config) => {
+            const preview = toPreview(config);
+
+            return preview
+                ? [{ name: toGalleryName(config), href: componentToRouteName(config.name), component: preview }]
+                : [];
+        }),
     })).filter((section) => section.items.length > 0);
 
     export const COMPONENT_CONFIGS_BY_ROUTE: Record<string, ComponentConfig | undefined> = Object.fromEntries(

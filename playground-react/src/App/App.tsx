@@ -105,8 +105,8 @@ const flattenConfigs = (nodes: MenuNodeConfig[]): ComponentConfig[] =>
 const toPageHref = (config: ComponentConfig, view: PageViewKey) =>
     toPageViewRoute(componentToRouteName(config.name), config.component === undefined ? "docs" : view);
 
-const getHasPreview = (config: ComponentConfig): config is Required<ComponentConfig> =>
-    config.component !== undefined && !PREVIEW_EXCLUDED_PAGES.includes(config.name);
+const toPreview = (config: ComponentConfig) =>
+    PREVIEW_EXCLUDED_PAGES.includes(config.name) ? undefined : (config.docs ?? config.component);
 
 const toPreviewTooltipDefs = (component: () => ReactNode): InteractionTooltipDefs<TreeNodeRenderProps> => ({
     placement: NAV_PREVIEW_PLACEMENT,
@@ -128,16 +128,22 @@ const toPreviewTooltipDefs = (component: () => ReactNode): InteractionTooltipDef
     ),
 });
 
+const toLeafNode = (config: ComponentConfig, view: PageViewKey): TreeNode<MenuNodeConfig> => {
+    const preview = toPreview(config);
+
+    return {
+        value: config,
+        href: toPageHref(config, view),
+        tooltipDefs: preview ? toPreviewTooltipDefs(preview) : undefined,
+    };
+};
+
 const toTreeNode =
     (view: PageViewKey) =>
     (node: MenuNodeConfig): TreeNode<MenuNodeConfig> =>
         getIsBranchConfig(node)
             ? { value: node, children: node.children.map(toTreeNode(view)) }
-            : {
-                  value: node,
-                  href: toPageHref(node, view),
-                  tooltipDefs: getHasPreview(node) ? toPreviewTooltipDefs(node.component) : undefined,
-              };
+            : toLeafNode(node, view);
 
 const collectAncestors = (
     nodes: MenuNodeConfig[],
@@ -198,11 +204,13 @@ const toGalleryName = (config: ComponentConfig) =>
 const GALLERY_SECTIONS: GallerySection[] = VISIBLE_MENU_CONFIGS.map((category) => ({
     name: category.name,
     description: MENU_DESCRIPTIONS[category.name],
-    items: flattenConfigs([category]).flatMap((config) =>
-        getHasPreview(config)
-            ? [{ name: toGalleryName(config), href: componentToRouteName(config.name), component: config.component }]
-            : [],
-    ),
+    items: flattenConfigs([category]).flatMap((config) => {
+        const preview = toPreview(config);
+
+        return preview
+            ? [{ name: toGalleryName(config), href: componentToRouteName(config.name), component: preview }]
+            : [];
+    }),
 })).filter((section) => section.items.length > 0);
 
 const COMPONENT_CONFIGS_BY_ROUTE: Record<string, ComponentConfig | undefined> = Object.fromEntries(
@@ -567,7 +575,8 @@ export function AppContent(props: { viewportAnchor: readonly [ViewportAnchor, (v
                                                         renderProps={renderProps}
                                                         hasExamples={
                                                             getIsBranchConfig(node.value) ||
-                                                            node.value.component !== undefined
+                                                            node.value.component !== undefined ||
+                                                            node.value.docs !== undefined
                                                         }
                                                         detail={
                                                             getIsBranchConfig(node.value)

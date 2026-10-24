@@ -1,6 +1,11 @@
 import type { MouseEvent } from "react";
 
-import type { NavigatorDirection, SlideButtonRenderProps, SlideButtonState } from "@thewaver/ss-components";
+import type {
+    BaseSlideButtonValues,
+    NavigatorDirection,
+    SlideButtonRenderProps,
+    SlideButtonState,
+} from "@thewaver/ss-components";
 
 import type {
     InteractionControlProps,
@@ -16,7 +21,8 @@ export type SlideButtonCbs = {
     onMouseLeave?: (e: MouseEvent<HTMLButtonElement>) => void;
 };
 
-export type SlideButtonElementProps = SlideButtonCbs &
+export type SlideButtonElementProps = BaseSlideButtonValues &
+    SlideButtonCbs &
     InteractionControlProps<SlideButtonRenderProps> &
     Required<SlideButtonState> & {
         /** How far the thumb has been slid, as a share of its travel. */
@@ -32,6 +38,7 @@ export type SlideButtonElementProps = SlideButtonCbs &
     };
 
 export type SlideButtonProps = Omit<InteractionWrapperProps<SlideButtonRenderProps>, "renderControl" | "extraFlags"> &
+    BaseSlideButtonValues &
     SlideButtonCbs &
     Pick<InteractionControlProps<SlideButtonRenderProps>, "id" | "ariaLabel" | "renderContent"> &
     SlideButtonState & {

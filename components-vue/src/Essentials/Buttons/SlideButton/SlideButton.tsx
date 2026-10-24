@@ -1,4 +1,4 @@
-import { type SlotsType, defineComponent, onScopeDispose, shallowRef } from "vue";
+import { type SlotsType, defineComponent, onScopeDispose, shallowRef, useId } from "vue";
 
 import {
     type NavigatorDirection,
@@ -26,11 +26,19 @@ import { LabelVueUtils } from "../../Input/Label/LabelVue.utils";
 import type { SlideButtonElementProps, SlideButtonProps, SlideButtonSlots } from "./SlideButton.types";
 
 const SlideButtonElement = defineComponent(
-    (props: SlideButtonElementProps, { slots }: SlotsContext<InteractionControlSlots<SlideButtonRenderProps>>) => {
+    (
+        props: SlideButtonElementProps,
+        { slots, expose }: SlotsContext<InteractionControlSlots<SlideButtonRenderProps>>,
+    ) => {
         const ariaLabel = LabelVueUtils.useAriaLabel(() => props.ariaLabel);
-        const ariaDescribedBy = FormFieldVueUtils.useAriaDescribedBy();
+        const fieldDescribedBy = FormFieldVueUtils.useAriaDescribedBy();
+        const descriptionId = useId();
+
+        SlideButtonUtils.warnIfUndescribed(props.ariaDescription, "ariaDescription");
 
         const trackRef = shallowRef<HTMLButtonElement>();
+
+        exposeElement(expose, () => trackRef.value);
 
         let progress = props.progressRatio;
 
@@ -85,41 +93,54 @@ const SlideButtonElement = defineComponent(
 
         return () => {
             const isDisabled = getIsDisabled();
+            const hasDescription = !!props.ariaDescription;
+            const ariaDescribedBy =
+                [fieldDescribedBy.value, hasDescription ? descriptionId : undefined].filter(Boolean).join(" ") ||
+                undefined;
 
             return (
-                <button
-                    id={props.id}
-                    ref={trackRef}
-                    type="button"
-                    class={SlideButtonStyles.slideButtonElement}
-                    aria-label={ariaLabel.value}
-                    aria-describedby={ariaDescribedBy.value}
-                    aria-disabled={isDisabled || undefined}
-                    onKeydown={(e) => {
-                        if (isDisabled) return;
+                <>
+                    <button
+                        id={props.id}
+                        ref={trackRef}
+                        type="button"
+                        class={SlideButtonStyles.slideButtonElement}
+                        aria-label={ariaLabel.value}
+                        aria-describedby={ariaDescribedBy}
+                        aria-pressed={props.flags.isPressed}
+                        aria-disabled={isDisabled || undefined}
+                        onKeydown={(e) => {
+                            if (isDisabled) return;
 
-                        gesture.pressKey(e.key, e.repeat);
-                    }}
-                    onKeyup={(e) => gesture.releaseKey(e.key)}
-                    onClick={() => {
-                        if (isDisabled) return;
+                            gesture.pressKey(e.key, e.repeat);
+                        }}
+                        onKeyup={(e) => gesture.releaseKey(e.key)}
+                        onClick={() => {
+                            if (isDisabled) return;
 
-                        gesture.click();
-                    }}
-                    onBlur={() => gesture.stopHold()}
-                    onMouseenter={(e) => {
-                        if (isDisabled) return;
+                            gesture.click();
+                        }}
+                        onBlur={() => gesture.stopHold()}
+                        onMouseenter={(e) => {
+                            if (isDisabled) return;
 
-                        props.onMouseEnter?.(e);
-                    }}
-                    onMouseleave={(e) => {
-                        if (isDisabled) return;
+                            props.onMouseEnter?.(e);
+                        }}
+                        onMouseleave={(e) => {
+                            if (isDisabled) return;
 
-                        props.onMouseLeave?.(e);
-                    }}
-                >
-                    {callSlot(slots.renderContent, props.flags)}
-                </button>
+                            props.onMouseLeave?.(e);
+                        }}
+                    >
+                        {callSlot(slots.renderContent, props.flags)}
+                    </button>
+
+                    {hasDescription && (
+                        <span id={descriptionId} class={SlideButtonStyles.slideButtonDescription}>
+                            {props.ariaDescription}
+                        </span>
+                    )}
+                </>
             );
         };
     },
@@ -131,6 +152,7 @@ const SlideButtonElement = defineComponent(
             onMouseLeave: null,
             id: null,
             ariaLabel: null,
+            ariaDescription: null,
             flags: null,
             orientation: null,
             thumbSize: null,
@@ -178,6 +200,7 @@ export const SlideButton = defineComponent(
                                     }}
                                     id={props.id}
                                     ariaLabel={props.ariaLabel}
+                                    ariaDescription={props.ariaDescription}
                                     orientation={props.orientation ?? SLIDE_BUTTON_DEFAULTS.orientation}
                                     thumbSize={props.thumbSize ?? SLIDE_BUTTON_DEFAULTS.thumbSize}
                                     holdDurationMs={props.holdDurationMs ?? SLIDE_BUTTON_DEFAULTS.holdDurationMs}
@@ -232,6 +255,7 @@ export const SlideButton = defineComponent(
             "onMouseLeave": null,
             "id": null,
             "ariaLabel": null,
+            "ariaDescription": null,
             "orientation": null,
             "thumbSize": null,
             "holdDurationMs": null,

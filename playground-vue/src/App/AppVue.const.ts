@@ -16,8 +16,10 @@ export {
     FIXED_ANCHOR_RATIO,
 } from "@thewaver/ss-playground/App/App.const";
 
+const AccordionDocs = () => import("./Pages/Accordions/AccordionPage/AccordionDocs.vue");
 const AudioSwitcherPage = () => import("./Pages/AudioSwitcherPage/AudioSwitcherPage.vue");
 const BracketPage = () => import("./Pages/BracketPage/BracketPage.vue");
+const BreadcrumbsDocs = () => import("./Pages/BreadcrumbsPage/BreadcrumbsDocs.vue");
 const ButtonPage = () => import("./Pages/ButtonPage/ButtonPage.vue");
 const ButtonDocs = () => import("./Pages/ButtonPage/ButtonDocs.vue");
 const CalendarPage = () => import("./Pages/CalendarPage/CalendarPage.vue");
@@ -28,6 +30,7 @@ const CheckboxGroupPage = () => import("./Pages/CheckboxGroupPage/CheckboxGroupP
 const CheckboxPage = () => import("./Pages/CheckboxPage/CheckboxPage.vue");
 const CirclePackingPage = () => import("./Pages/CirclePackingPage/CirclePackingPage.vue");
 const ClockPage = () => import("./Pages/ClockPage/ClockPage.vue");
+const CollapsibleDocs = () => import("./Pages/Accordions/CollapsiblePage/CollapsibleDocs.vue");
 const ColorAreaPage = () => import("./Pages/ColorAreaPage/ColorAreaPage.vue");
 const ColorInputPage = () => import("./Pages/ColorInputPage/ColorInputPage.vue");
 const CornerHighlightPage = () => import("./Pages/CornerHighlightPage/CornerHighlightPage.vue");
@@ -102,6 +105,8 @@ const SelectPage = () => import("./Pages/SelectPage/SelectPage.vue");
 const ShapePage = () => import("./Pages/ShapePage/ShapePage.vue");
 const ShapeRevealPage = () => import("./Pages/ShapeRevealPage/ShapeRevealPage.vue");
 const SidebarPage = () => import("./Pages/SidebarPage/SidebarPage.vue");
+const SlideButtonPage = () => import("./Pages/SlideButtonPage/SlideButtonPage.vue");
+const SlideButtonDocs = () => import("./Pages/SlideButtonPage/SlideButtonDocs.vue");
 const SortableGridPage = () => import("./Pages/SortableGridPage/SortableGridPage.vue");
 const SortablePage = () => import("./Pages/SortablePage/SortablePage.vue");
 const SplitPanePage = () => import("./Pages/SplitPanePage/SplitPanePage.vue");
@@ -260,14 +265,17 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                 children: [
                     {
                         name: "Accordion",
+                        docs: AccordionDocs,
                     },
                     {
                         name: "Collapsible",
+                        docs: CollapsibleDocs,
                     },
                 ],
             },
             {
                 name: "Breadcrumbs",
+                docs: BreadcrumbsDocs,
             },
             {
                 name: "Buttons",
@@ -279,6 +287,8 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                     },
                     {
                         name: "SlideButton",
+                        component: SlideButtonPage,
+                        docs: SlideButtonDocs,
                     },
                 ],
             },

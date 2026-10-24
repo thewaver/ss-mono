@@ -3,7 +3,8 @@ import { type Locator, type Page, expect, test } from "@playwright/test";
 import { centerDistance } from "./helpers";
 
 /**
- * The gallery draws every page's first example as a tile, and the menu shows the same drawing beside a row the
+ * The gallery draws one live demo of every page as a tile — the first live example on its Docs page, or, for a page
+ * without a Docs page, the first example on its Examples page — and the menu shows the same drawing beside a row the
  * pointer rests on. Both are found here by route — a tile carries its page's route in `data-testid`, a menu row
  * in its `href` — and what a tile should hold is read off the page it stands for, never written down here, so a
  * page reordering its examples changes what the tile shows without changing whether the spec passes.
@@ -46,19 +47,41 @@ test.beforeEach(async ({ page }) => {
     await expect(page.locator(TILE).first()).toBeVisible();
 });
 
-test("a tile draws its page's first example and nothing else of the page", async ({ page }) => {
+/**
+ * Whether a page has live examples in its docs is only known once its Docs page has loaded, and that page arrives in
+ * a chunk of its own, so the check waits for the network to go quiet before counting them.
+ */
+test("a tile draws its page's first live example and nothing else of the page", async ({ page }) => {
     const tile = page.locator(TILE).first();
     const route = (await tile.getAttribute("data-testid"))!;
 
     await expect(tile.locator("[data-demo]"), "one demo is drawn").toHaveCount(1);
-    await expect(tile.locator("[data-example]"), "without the card an example sits in on its page").toHaveCount(0);
+    await expect(
+        tile.locator("[data-example], [data-docs-example]"),
+        "without the card an example sits in on its page",
+    ).toHaveCount(0);
+    await expect(tile.locator("[data-docs-section], [data-docs-alert]"), "without the docs' text").toHaveCount(0);
     await expect(tile.locator("[data-panel]"), "and without the page's controls").toHaveCount(0);
 
     const drawn = await tile.locator("[data-demo]").getAttribute("data-testid");
 
+    await page.goto(`${route}/docs`);
+    await page.waitForLoadState("networkidle");
+
+    const docsDemo = page.locator("[data-docs-example] [data-demo]").first();
+
+    if (await docsDemo.count()) {
+        await expect(docsDemo, "it is the first live example in the page's docs").toHaveAttribute(
+            "data-testid",
+            drawn!,
+        );
+
+        return;
+    }
+
     await page.goto(route);
 
-    await expect(page.locator("[data-example]").first(), "it is the page's first example").toHaveAttribute(
+    await expect(page.locator("[data-example]").first(), "or, with no docs, the page's first example").toHaveAttribute(
         "data-testid",
         drawn!,
     );
@@ -122,7 +145,7 @@ test("a tile is named for its page, with the menu branches above it", async ({ p
  * description stays empty, since the preview inside is hidden from assistive technology, and nothing in it can
  * take focus. Which row is tried is chosen by the gallery — the first row whose page has a tile.
  */
-test("resting on a menu row shows its page's first example beside it, as a picture", async ({ page }) => {
+test("resting on a menu row shows its page's tile drawing beside it, as a picture", async ({ page }) => {
     const rows = menu(page).locator('[role="treeitem"][href]');
     const routes = await page.locator(TILE).evaluateAll((tiles) => tiles.map((tile) => tile.dataset.testid!));
     let row: Locator | undefined;
@@ -143,7 +166,7 @@ test("resting on a menu row shows its page's first example beside it, as a pictu
 
     const tooltip = page.locator('[role="tooltip"]');
 
-    await expect(tooltip.locator("[data-demo]"), "the row's page's first example is drawn beside it").toHaveAttribute(
+    await expect(tooltip.locator("[data-demo]"), "the row's page's tile drawing is drawn beside it").toHaveAttribute(
         "data-testid",
         drawn!,
     );

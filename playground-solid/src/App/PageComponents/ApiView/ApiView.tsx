@@ -1,7 +1,7 @@
-import { For, Show, createMemo, createResource, createSignal } from "solid-js";
+import { For, Show, createMemo, createResource, createSignal, onCleanup } from "solid-js";
 import type { ApiGroupKind, ApiTableKind } from "virtual:component-api";
 
-import { TableOfContents, access } from "@thewaver/ss-components-solid";
+import { TableOfContents, TableOfContentsUtils, access } from "@thewaver/ss-components-solid";
 import type { TableOfContentsLink } from "@thewaver/ss-components-solid";
 import {
     MIN_TABLE_OF_CONTENTS_LINKS,
@@ -42,6 +42,10 @@ const TABLE_COLUMNS: Record<ApiTableKind, [name: string, type: string]> = {
     fields: ["Field", "Type"],
 };
 
+const toAddress = (hash: string) => `${window.location.pathname}${window.location.search}${hash}`;
+
+const getIsPlainClick = (e: MouseEvent) => e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey;
+
 const PageApiTable = (props: PageApiTableProps) => {
     const getTable = () => access(props.table);
 
@@ -69,7 +73,7 @@ const PageApiTable = (props: PageApiTableProps) => {
                                     fallback={<code>{include.text}</code>}
                                 >
                                     {(getHref) => (
-                                        <a href={getHref()}>
+                                        <a href={getHref()} on:click={(e) => props.onFragmentClick(e, getHref())}>
                                             <code>{include.text}</code>
                                         </a>
                                     )}
@@ -129,6 +133,35 @@ const PageApiTable = (props: PageApiTableProps) => {
 };
 
 export const PageApiView = (props: PageApiViewProps) => {
+    let currentEntry: DocsTableOfContentsEntry | undefined;
+    let stopHashHold: (() => void) | undefined;
+
+    onCleanup(() => stopHashHold?.());
+
+    const replaceHash = (entry: DocsTableOfContentsEntry | undefined) =>
+        window.history.replaceState(window.history.state, "", toAddress(entry ? `#${entry.id}` : ""));
+
+    const handleFragmentClick = (e: MouseEvent, href: string) => {
+        const target = href.startsWith("#") ? document.getElementById(href.slice(1)) : null;
+
+        if (!target || !getIsPlainClick(e)) return;
+
+        e.preventDefault();
+        stopHashHold?.();
+        stopHashHold = TableOfContentsUtils.observeNextReaderInput(() => {
+            stopHashHold = undefined;
+            replaceHash(currentEntry);
+        });
+        window.history.pushState(window.history.state, "", toAddress(href));
+        TableOfContentsUtils.goToTarget(target);
+    };
+
+    const handleCurrentChange = (entry: DocsTableOfContentsEntry | undefined) => {
+        currentEntry = entry;
+
+        if (!stopHashHold) replaceHash(entry);
+    };
+
     const [getGroups] = createResource(() => access(props.name), loadApiGroups);
     const [getHeadingRefs, setHeadingRefs] = createSignal<Record<string, HTMLElement>>({});
 
@@ -175,6 +208,7 @@ export const PageApiView = (props: PageApiViewProps) => {
                                                     unit={access(props.name)}
                                                     headingId={toDocsTableId(group.kind, table.name)}
                                                     headingRef={setHeadingRef(toDocsTableId(group.kind, table.name))}
+                                                    onFragmentClick={handleFragmentClick}
                                                 />
                                             )}
                                         </For>
@@ -192,6 +226,7 @@ export const PageApiView = (props: PageApiViewProps) => {
                         links={getLinks}
                         gap={TABLE_OF_CONTENTS_GAP}
                         ariaLabel={TABLE_OF_CONTENTS_LABEL}
+                        onCurrentChange={handleCurrentChange}
                         renderLink={(getLink, getFlags) => (
                             <PageTableOfContentsContent flags={getFlags} depth={() => getLink().value.depth}>
                                 {getLink().value.title}

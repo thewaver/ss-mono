@@ -1,7 +1,13 @@
 import { createContext, useContext } from "solid-js";
 
-const PreviewContext = createContext(false);
+type PreviewContextValue = {
+    claimDemo: () => boolean;
+};
+
+const PreviewContext = createContext<PreviewContextValue>();
 
 export const PreviewContextProvider = PreviewContext.Provider;
 
-export const useIsPreview = () => useContext(PreviewContext);
+export const usePreviewContext = () => useContext(PreviewContext);
+
+export const useIsPreview = () => usePreviewContext() !== undefined;

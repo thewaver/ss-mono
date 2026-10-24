@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 
 import {
     type NavigatorDirection,
@@ -21,7 +21,15 @@ import type { SlideButtonElementProps, SlideButtonProps } from "./SlideButton.ty
 
 const SlideButtonElement = (props: SlideButtonElementProps) => {
     const ariaLabel = LabelReactUtils.useAriaLabel(props.ariaLabel);
-    const ariaDescribedBy = FormFieldReactUtils.useAriaDescribedBy();
+    const fieldDescribedBy = FormFieldReactUtils.useAriaDescribedBy();
+    const descriptionId = useId();
+
+    useEffect(() => SlideButtonUtils.warnIfUndescribed(props.ariaDescription, "ariaDescription"), []);
+
+    const hasDescription = !!props.ariaDescription;
+
+    const ariaDescribedBy =
+        [fieldDescribedBy, hasDescription ? descriptionId : undefined].filter(Boolean).join(" ") || undefined;
 
     const trackRef = useRef<HTMLButtonElement | null>(null);
     const progressRef = useRef(props.progressRatio);
@@ -92,39 +100,48 @@ const SlideButtonElement = (props: SlideButtonElementProps) => {
     );
 
     return (
-        <button
-            id={props.id}
-            ref={setRef}
-            type="button"
-            className={SlideButtonStyles.slideButtonElement}
-            aria-label={ariaLabel}
-            aria-describedby={ariaDescribedBy}
-            aria-disabled={isDisabled || undefined}
-            onKeyDown={(e) => {
-                if (isDisabled) return;
+        <>
+            <button
+                id={props.id}
+                ref={setRef}
+                type="button"
+                className={SlideButtonStyles.slideButtonElement}
+                aria-label={ariaLabel}
+                aria-describedby={ariaDescribedBy}
+                aria-pressed={props.flags.isPressed}
+                aria-disabled={isDisabled || undefined}
+                onKeyDown={(e) => {
+                    if (isDisabled) return;
 
-                gesture.pressKey(e.key, e.repeat);
-            }}
-            onKeyUp={(e) => gesture.releaseKey(e.key)}
-            onClick={() => {
-                if (isDisabled) return;
+                    gesture.pressKey(e.key, e.repeat);
+                }}
+                onKeyUp={(e) => gesture.releaseKey(e.key)}
+                onClick={() => {
+                    if (isDisabled) return;
 
-                gesture.click();
-            }}
-            onBlur={() => gesture.stopHold()}
-            onMouseEnter={(e) => {
-                if (isDisabled) return;
+                    gesture.click();
+                }}
+                onBlur={() => gesture.stopHold()}
+                onMouseEnter={(e) => {
+                    if (isDisabled) return;
 
-                props.onMouseEnter?.(e);
-            }}
-            onMouseLeave={(e) => {
-                if (isDisabled) return;
+                    props.onMouseEnter?.(e);
+                }}
+                onMouseLeave={(e) => {
+                    if (isDisabled) return;
 
-                props.onMouseLeave?.(e);
-            }}
-        >
-            {props.renderContent(props.flags)}
-        </button>
+                    props.onMouseLeave?.(e);
+                }}
+            >
+                {props.renderContent(props.flags)}
+            </button>
+
+            {hasDescription && (
+                <span id={descriptionId} className={SlideButtonStyles.slideButtonDescription}>
+                    {props.ariaDescription}
+                </span>
+            )}
+        </>
     );
 };
 
@@ -156,6 +173,7 @@ export const SlideButton = (props: SlideButtonProps) => {
                     ref={setElementRef}
                     id={props.id}
                     ariaLabel={props.ariaLabel}
+                    ariaDescription={props.ariaDescription}
                     orientation={orientation}
                     thumbSize={props.thumbSize ?? SLIDE_BUTTON_DEFAULTS.thumbSize}
                     holdDurationMs={props.holdDurationMs ?? SLIDE_BUTTON_DEFAULTS.holdDurationMs}

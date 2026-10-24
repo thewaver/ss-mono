@@ -1,4 +1,4 @@
-import type { Routes } from "sv-router";
+import type { LazyRouteComponent, Routes } from "sv-router";
 import { createRouter } from "sv-router";
 
 import { GALLERY_NAME_SEPARATOR, GALLERY_ROUTE, GETTING_STARTED_ROUTE } from "@thewaver/ss-playground/App/App.const";
@@ -27,19 +27,21 @@ export const toPageHref = (config: ComponentConfig, view: PageViewKey) =>
 
 export const COMPONENT_CONFIGS = flattenConfigs(MENU_CONFIGS);
 
-export const getHasPreview = (config: ComponentConfig): config is Required<ComponentConfig> =>
-    config.component !== undefined && !PREVIEW_EXCLUDED_PAGES.includes(config.name);
+export const toPreview = (config: ComponentConfig): LazyRouteComponent | undefined =>
+    PREVIEW_EXCLUDED_PAGES.includes(config.name) ? undefined : (config.docs ?? config.component);
 
 const toGalleryItems = (nodes: MenuNodeConfig[], trail: string[]): GalleryItem[] =>
     nodes.flatMap((node) => {
         if (getIsBranchConfig(node)) return toGalleryItems(node.children, [...trail, node.name]);
 
-        return getHasPreview(node)
+        const preview = toPreview(node);
+
+        return preview
             ? [
                   {
                       name: [...trail, node.name].join(GALLERY_NAME_SEPARATOR),
                       href: componentToRouteName(node.name),
-                      component: node.component,
+                      component: preview,
                   },
               ]
             : [];

@@ -265,7 +265,8 @@ const computeNodeText = (node: TreeNode<MenuNodeConfig>) => node.value.name;
                                                     :render-props="renderProps"
                                                     :has-examples="
                                                         AppUtils.getIsBranchConfig(node.value) ||
-                                                        node.value.component !== undefined
+                                                        node.value.component !== undefined ||
+                                                        node.value.docs !== undefined
                                                     "
                                                     :detail="
                                                         AppUtils.getIsBranchConfig(node.value)

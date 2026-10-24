@@ -1,7 +1,13 @@
 import { createContext } from "svelte";
 
-const [getContext, setContext, hasContext] = createContext<boolean>();
+type PreviewContextValue = {
+    claimDemo: () => boolean;
+};
 
-export const setPreviewContext = (isPreview: boolean) => setContext(isPreview);
+const [getContext, setContext, hasContext] = createContext<PreviewContextValue>();
 
-export const getIsPreview = () => (hasContext() ? getContext() : false);
+export const setPreviewContext = (context: PreviewContextValue) => setContext(context);
+
+export const getPreviewContext = () => (hasContext() ? getContext() : undefined);
+
+export const getIsPreview = () => getPreviewContext() !== undefined;

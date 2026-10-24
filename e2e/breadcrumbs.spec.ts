@@ -5,15 +5,14 @@ import { attributesOf, prop, tagName } from "./helpers";
 /**
  * The Breadcrumbs page is the Docs view: its first live example takes the knobs for the trail (separator,
  * disabled), and its second is the same trail as links, with a knob for the link component. Each is found by the
- * key of a knob it holds. The Docs view is in the Solid Playground only so far, which is what the `@solid` in the title
- * keeps the other three from running against.
+ * key of a knob it holds.
  */
 const BASIC = `[data-docs-example]:has(${prop("separator")}) [data-demo]`;
 const LINKS = `[data-docs-example]:has(${prop("hasLinkComponent")}) [data-demo]`;
 
 const crumb = (scope: string) => `${scope} nav[aria-label] ol > li`;
 
-test.describe("the Breadcrumbs' docs @solid", () => {
+test.describe("the Breadcrumbs' docs", () => {
     test.beforeEach(async ({ page }) => {
         await page.goto("/breadcrumbs/docs");
         await expect(page.locator(`${BASIC} nav`)).toBeVisible();

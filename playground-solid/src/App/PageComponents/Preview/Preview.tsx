@@ -11,6 +11,16 @@ export const PagePreview = (props: PagePreviewProps) => {
 
     const getBodySize = ElementObserverSolidUtils.createBorderBoxSizeObserver(getBodyRef);
 
+    let isDemoClaimed = false;
+
+    const claimDemo = () => {
+        if (isDemoClaimed) return false;
+
+        isDemoClaimed = true;
+
+        return true;
+    };
+
     const getSize = () => ({
         width: styles.PREVIEW_WIDTH,
         height: Math.max(styles.PREVIEW_MIN_HEIGHT, getBodySize().height + styles.PREVIEW_PADDING * 2),
@@ -18,7 +28,7 @@ export const PagePreview = (props: PagePreviewProps) => {
 
     return (
         <ViewportWrapper size={getSize}>
-            <PreviewContextProvider value={true}>
+            <PreviewContextProvider value={{ claimDemo }}>
                 <div class={styles.previewContent}>
                     <div ref={setBodyRef} class={styles.previewBody}>
                         {props.component()}

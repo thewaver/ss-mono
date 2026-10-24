@@ -1,7 +1,13 @@
 import { createContext, useContext } from "react";
 
-const PreviewContext = createContext(false);
+type PreviewContextValue = {
+    claimDemo: (claimantId: string) => boolean;
+};
+
+const PreviewContext = createContext<PreviewContextValue | undefined>(undefined);
 
 export const PreviewContextProvider = PreviewContext.Provider;
 
-export const useIsPreview = () => useContext(PreviewContext);
+export const usePreviewContext = () => useContext(PreviewContext);
+
+export const useIsPreview = () => usePreviewContext() !== undefined;

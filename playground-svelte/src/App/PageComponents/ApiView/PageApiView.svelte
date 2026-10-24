@@ -1,8 +1,8 @@
 <script lang="ts">
-    import { untrack } from "svelte";
+    import { onDestroy, untrack } from "svelte";
     import type { ApiGroup, ApiGroupKind } from "virtual:component-api";
 
-    import { TableOfContents } from "@thewaver/ss-components-svelte";
+    import { TableOfContents, TableOfContentsUtils } from "@thewaver/ss-components-svelte";
     import type { TableOfContentsLink } from "@thewaver/ss-components-svelte";
     import * as styles from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.css";
     import type { DocsTableOfContentsEntry } from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.types";
@@ -13,6 +13,8 @@
         toDocsTableId,
     } from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.utils";
 
+    import { navigate, route } from "../../App.router";
+    import type { RoutePath } from "../../App.types";
     import PageTableOfContentsContent from "../../StyledComponents/TableOfContentsContent/TableOfContentsContent.svelte";
     import type { PageApiViewProps } from "./ApiViewSvelte.types";
     import PageApiTable from "./PageApiTable.svelte";
@@ -31,7 +33,14 @@
         types: "Types",
     };
 
+    const getIsPlainClick = (e: MouseEvent) => e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey;
+
     let props: PageApiViewProps = $props();
+
+    let currentEntry: DocsTableOfContentsEntry | undefined;
+    let stopHashHold: (() => void) | undefined;
+
+    onDestroy(() => stopHashHold?.());
 
     let groups = $state.raw<ApiGroup[]>();
     let headingRefs = $state<Record<string, HTMLElement>>({});
@@ -64,6 +73,36 @@
         ),
     );
 
+    const replaceHash = (entry: DocsTableOfContentsEntry | undefined) =>
+        void navigate(route.pathname as RoutePath, {
+            replace: true,
+            search: route.search,
+            hash: entry ? `#${entry.id}` : undefined,
+            scrollToTop: false,
+        });
+
+    const handleFragmentClick = (e: MouseEvent, href: string) => {
+        const target = href.startsWith("#") ? document.getElementById(href.slice(1)) : null;
+
+        if (!target || !getIsPlainClick(e)) return;
+
+        e.preventDefault();
+        stopHashHold?.();
+        stopHashHold = TableOfContentsUtils.observeNextReaderInput(() => {
+            stopHashHold = undefined;
+            replaceHash(currentEntry);
+        });
+        void navigate(route.pathname as RoutePath, { search: route.search, hash: href, scrollToTop: false }).then(() =>
+            TableOfContentsUtils.goToTarget(target),
+        );
+    };
+
+    const handleCurrentChange = (entry: DocsTableOfContentsEntry | undefined) => {
+        currentEntry = entry;
+
+        if (!stopHashHold) replaceHash(entry);
+    };
+
     const attachHeading = (id: string) => (element: HTMLElement) => {
         untrack(() => {
             headingRefs[id] = element;
@@ -91,6 +130,7 @@
                                 unit={props.name}
                                 headingId={toDocsTableId(group.kind, table.name)}
                                 attachHeading={attachHeading(toDocsTableId(group.kind, table.name))}
+                                onFragmentClick={handleFragmentClick}
                             />
                         {/each}
                     </section>
@@ -105,7 +145,12 @@
 
     {#if links.length >= MIN_TABLE_OF_CONTENTS_LINKS}
         <aside class={styles.docsTableOfContents}>
-            <TableOfContents {links} gap={TABLE_OF_CONTENTS_GAP} ariaLabel={TABLE_OF_CONTENTS_LABEL}>
+            <TableOfContents
+                {links}
+                gap={TABLE_OF_CONTENTS_GAP}
+                ariaLabel={TABLE_OF_CONTENTS_LABEL}
+                onCurrentChange={handleCurrentChange}
+            >
                 {#snippet renderLink(link, flags)}
                     <PageTableOfContentsContent {flags} depth={link.value.depth}>
                         {link.value.title}

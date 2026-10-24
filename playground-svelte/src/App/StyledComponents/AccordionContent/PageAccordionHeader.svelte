@@ -22,5 +22,5 @@
 >
     <div>{@render props.children?.()}</div>
 
-    <div class={styles.accordionMarker} aria-hidden="true">▶</div>
+    <div class={styles.accordionMarker} data-side={props.side} aria-hidden="true">▶</div>
 </div>

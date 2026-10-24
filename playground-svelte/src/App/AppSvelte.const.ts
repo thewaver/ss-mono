@@ -15,8 +15,10 @@ export {
     FIXED_ANCHOR_RATIO,
 } from "@thewaver/ss-playground/App/App.const";
 
+const AccordionDocs = () => import("./Pages/Accordions/AccordionPage/AccordionDocs.svelte");
 const AudioSwitcherPage = () => import("./Pages/AudioSwitcherPage/AudioSwitcherPage.svelte");
 const BracketPage = () => import("./Pages/BracketPage/BracketPage.svelte");
+const BreadcrumbsDocs = () => import("./Pages/BreadcrumbsPage/BreadcrumbsDocs.svelte");
 const ButtonPage = () => import("./Pages/ButtonPage/ButtonPage.svelte");
 const ButtonDocs = () => import("./Pages/ButtonPage/ButtonDocs.svelte");
 const CalendarPage = () => import("./Pages/CalendarPage/CalendarPage.svelte");
@@ -27,6 +29,7 @@ const CheckboxGroupPage = () => import("./Pages/CheckboxGroupPage/CheckboxGroupP
 const CheckboxPage = () => import("./Pages/CheckboxPage/CheckboxPage.svelte");
 const CirclePackingPage = () => import("./Pages/CirclePackingPage/CirclePackingPage.svelte");
 const ClockPage = () => import("./Pages/ClockPage/ClockPage.svelte");
+const CollapsibleDocs = () => import("./Pages/Accordions/CollapsiblePage/CollapsibleDocs.svelte");
 const ColorAreaPage = () => import("./Pages/ColorAreaPage/ColorAreaPage.svelte");
 const ColorInputPage = () => import("./Pages/ColorInputPage/ColorInputPage.svelte");
 const CornerHighlightPage = () => import("./Pages/CornerHighlightPage/CornerHighlightPage.svelte");
@@ -101,6 +104,8 @@ const SelectPage = () => import("./Pages/SelectPage/SelectPage.svelte");
 const ShapePage = () => import("./Pages/ShapePage/ShapePage.svelte");
 const ShapeRevealPage = () => import("./Pages/ShapeRevealPage/ShapeRevealPage.svelte");
 const SidebarPage = () => import("./Pages/SidebarPage/SidebarPage.svelte");
+const SlideButtonDocs = () => import("./Pages/SlideButtonPage/SlideButtonDocs.svelte");
+const SlideButtonPage = () => import("./Pages/SlideButtonPage/SlideButtonPage.svelte");
 const SortableGridPage = () => import("./Pages/SortableGridPage/SortableGridPage.svelte");
 const SortablePage = () => import("./Pages/SortablePage/SortablePage.svelte");
 const SplitPanePage = () => import("./Pages/SplitPanePage/SplitPanePage.svelte");
@@ -259,14 +264,17 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                 children: [
                     {
                         name: "Accordion",
+                        docs: AccordionDocs,
                     },
                     {
                         name: "Collapsible",
+                        docs: CollapsibleDocs,
                     },
                 ],
             },
             {
                 name: "Breadcrumbs",
+                docs: BreadcrumbsDocs,
             },
             {
                 name: "Buttons",
@@ -278,6 +286,8 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                     },
                     {
                         name: "SlideButton",
+                        component: SlideButtonPage,
+                        docs: SlideButtonDocs,
                     },
                 ],
             },

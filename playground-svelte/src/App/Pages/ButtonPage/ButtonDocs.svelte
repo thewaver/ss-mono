@@ -20,21 +20,6 @@
 
     {#snippet renderKnobs()}
         <PageProp
-            itemKey={"isDisabled"}
-            label={"Disabled"}
-            hint={"Turns the button off: it ignores presses and hover, and the Tab key skips it."}
-            controls={"Sets Button.isDisabled"}
-        >
-            <PageCheckField
-                value={isDisabled}
-                ariaLabel={"Disabled"}
-                onChange={(value) => {
-                    isDisabled = value;
-                }}
-            />
-        </PageProp>
-
-        <PageProp
             itemKey={"hasError"}
             label={"Error"}
             hint={"Puts the button in its error look. It changes nothing about what the button accepts or does."}
@@ -63,6 +48,21 @@
                 }}
             />
         </PageProp>
+
+        <PageProp
+            itemKey={"isDisabled"}
+            label={"Disabled"}
+            hint={"Turns the button off: it ignores presses and hover, and the Tab key skips it."}
+            controls={"Sets Button.isDisabled"}
+        >
+            <PageCheckField
+                value={isDisabled}
+                ariaLabel={"Disabled"}
+                onChange={(value) => {
+                    isDisabled = value;
+                }}
+            />
+        </PageProp>
     {/snippet}
 </PageDocsExample>
 
@@ -75,21 +75,6 @@
 
     {#snippet renderKnobs()}
         <PageProp
-            itemKey={"tooltipIsDisabled"}
-            label={"Disabled"}
-            hint={"Turns the button off: it ignores presses and hover, and the Tab key skips it."}
-            controls={"Sets Button.isDisabled"}
-        >
-            <PageCheckField
-                value={isTooltipDisabled}
-                ariaLabel={"Disabled"}
-                onChange={(value) => {
-                    isTooltipDisabled = value;
-                }}
-            />
-        </PageProp>
-
-        <PageProp
             itemKey={"tooltipIsReachableWhenDisabled"}
             label={"Reachable when disabled"}
             hint={"Keeps a disabled button's tooltip available: the Tab key can stop on it and hovering it shows the tooltip. Without it a disabled button shows no tooltip at all. It only matters while Disabled is on."}
@@ -100,6 +85,21 @@
                 ariaLabel={"Reachable when disabled"}
                 onChange={(value) => {
                     isReachableWhenDisabled = value;
+                }}
+            />
+        </PageProp>
+
+        <PageProp
+            itemKey={"tooltipIsDisabled"}
+            label={"Disabled"}
+            hint={"Turns the button off: it ignores presses and hover, and the Tab key skips it."}
+            controls={"Sets Button.isDisabled"}
+        >
+            <PageCheckField
+                value={isTooltipDisabled}
+                ariaLabel={"Disabled"}
+                onChange={(value) => {
+                    isTooltipDisabled = value;
                 }}
             />
         </PageProp>

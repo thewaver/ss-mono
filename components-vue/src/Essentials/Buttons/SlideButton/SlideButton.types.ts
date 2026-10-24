@@ -1,4 +1,5 @@
 import type {
+    BaseSlideButtonValues,
     NavigatorDirection,
     SlideButtonCbs,
     SlideButtonRenderProps,
@@ -14,7 +15,8 @@ import type {
 
 export type { SlideButtonCbs };
 
-export type SlideButtonElementProps = SlideButtonCbs &
+export type SlideButtonElementProps = BaseSlideButtonValues &
+    SlideButtonCbs &
     InteractionControlProps<SlideButtonRenderProps> &
     Required<SlideButtonState> & {
         /** How far the thumb has been slid, as a share of its travel. */
@@ -30,6 +32,7 @@ export type SlideButtonElementProps = SlideButtonCbs &
     };
 
 export type SlideButtonProps = Omit<InteractionWrapperProps<SlideButtonRenderProps>, "extraFlags"> &
+    BaseSlideButtonValues &
     SlideButtonCbs &
     Pick<InteractionControlProps<SlideButtonRenderProps>, "id" | "ariaLabel"> &
     SlideButtonState & {

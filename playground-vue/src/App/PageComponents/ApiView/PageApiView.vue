@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import type { ApiGroup, ApiGroupKind } from "virtual:component-api";
-import { type ComponentPublicInstance, computed, shallowRef, watch } from "vue";
+import { type ComponentPublicInstance, computed, onBeforeUnmount, shallowRef, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
 
-import { TableOfContents } from "@thewaver/ss-components-vue";
+import { TableOfContents, TableOfContentsUtils } from "@thewaver/ss-components-vue";
 import type { TableOfContentsLink } from "@thewaver/ss-components-vue";
 import {
     MIN_TABLE_OF_CONTENTS_LINKS,
@@ -31,7 +32,12 @@ const GROUP_TITLES: Record<ApiGroupKind, string> = {
     types: "Types",
 };
 
+const getIsPlainClick = (e: MouseEvent) => e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey;
+
 const props = defineProps<PageApiViewProps>();
+
+const route = useRoute();
+const router = useRouter();
 
 const groups = shallowRef<ApiGroup[]>();
 const headingRefs = shallowRef<Record<string, HTMLElement>>({});
@@ -51,6 +57,36 @@ const setHeadingRef = (id: string) => (element: Element | ComponentPublicInstanc
     if (headingRefs.value[id] === element) return;
 
     headingRefs.value = { ...headingRefs.value, [id]: element };
+};
+
+let currentEntry: DocsTableOfContentsEntry | undefined;
+let stopHashHold: (() => void) | undefined;
+
+onBeforeUnmount(() => stopHashHold?.());
+
+const replaceHash = (entry: DocsTableOfContentsEntry | undefined) => {
+    void router.replace({ path: route.path, query: route.query, hash: entry ? `#${entry.id}` : "" });
+};
+
+const handleFragmentClick = (e: MouseEvent, href: string) => {
+    const target = href.startsWith("#") ? document.getElementById(href.slice(1)) : null;
+
+    if (!target || !getIsPlainClick(e)) return;
+
+    e.preventDefault();
+    stopHashHold?.();
+    stopHashHold = TableOfContentsUtils.observeNextReaderInput(() => {
+        stopHashHold = undefined;
+        replaceHash(currentEntry);
+    });
+    void router.push({ path: route.path, query: route.query, hash: href });
+    TableOfContentsUtils.goToTarget(target);
+};
+
+const handleCurrentChange = (entry: DocsTableOfContentsEntry | undefined) => {
+    currentEntry = entry;
+
+    if (!stopHashHold) replaceHash(entry);
 };
 
 watch(
@@ -98,6 +134,7 @@ watch(
                         :unit="name"
                         :heading-id="toDocsTableId(group.kind, table.name)"
                         :heading-ref="setHeadingRef(toDocsTableId(group.kind, table.name))"
+                        @fragment-click="handleFragmentClick"
                     />
                 </section>
             </template>
@@ -108,7 +145,12 @@ watch(
         </div>
 
         <aside v-if="links.length >= MIN_TABLE_OF_CONTENTS_LINKS" :class="styles.docsTableOfContents">
-            <TableOfContents :links="links" :gap="TABLE_OF_CONTENTS_GAP" :ariaLabel="TABLE_OF_CONTENTS_LABEL">
+            <TableOfContents
+                :links="links"
+                :gap="TABLE_OF_CONTENTS_GAP"
+                :ariaLabel="TABLE_OF_CONTENTS_LABEL"
+                @current-change="handleCurrentChange"
+            >
                 <template #renderLink="{ link, flags }">
                     <PageTableOfContentsContent :flags="flags" :depth="link.value.depth">{{
                         link.value.title

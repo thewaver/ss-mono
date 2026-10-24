@@ -5,11 +5,14 @@ import { toDocsSectionId } from "@thewaver/ss-playground/App/PageComponents/Docs
 import * as styles from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.css";
 
 import { useDocsViewContext } from "../DocsView/DocsView.context";
+import { useIsPreview } from "../Preview/Preview.context";
 import type { PageDocsSectionProps, PageDocsSectionSlots } from "./DocsSectionVue.types";
 
 const props = defineProps<PageDocsSectionProps>();
 
 defineSlots<PageDocsSectionSlots>();
+
+const isPreview = useIsPreview();
 
 const docsView = useDocsViewContext();
 
@@ -27,7 +30,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <section :class="styles.docsGroup" data-docs-section="">
+    <section v-if="!isPreview" :class="styles.docsGroup" data-docs-section="">
         <h2 ref="heading" :id="toDocsSectionId(title)" :class="styles.docsGroupTitle">{{ title }}</h2>
 
         <p :class="styles.docsLead"><slot /></p>

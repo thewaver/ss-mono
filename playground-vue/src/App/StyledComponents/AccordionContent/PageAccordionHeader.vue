@@ -21,6 +21,6 @@ const layerClass = useLayerClass();
     >
         <div><slot /></div>
 
-        <div :class="styles.accordionMarker" aria-hidden="true">▶</div>
+        <div :class="styles.accordionMarker" :data-side="side" aria-hidden="true">▶</div>
     </div>
 </template>

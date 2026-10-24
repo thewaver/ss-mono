@@ -11,14 +11,13 @@ import { activeText, offsetHeight, prop } from "./helpers";
  *
  * The Collapsible has no examples of its own: its page is the Docs view. The first live example takes the knob for
  * the transition; the others are found by something only they hold — the button that writes the open state from
- * outside, and the line saying whether the panel has been built. The Docs view is in the Solid Playground only so
- * far, which is what the `@solid` in the title keeps the other three from running against.
+ * outside, and the line saying whether the panel has been built.
  */
 const BASIC = `[data-docs-example]:has(${prop("transitionDurationMs")}) [data-demo]`;
 const CONTROLLED = '[data-docs-example]:has-text("Toggle from here") [data-demo]';
 const DEFERRED = '[data-docs-example]:has-text("Panel built") [data-demo]';
 
-test.describe("the Collapsible's docs @solid", () => {
+test.describe("the Collapsible's docs", () => {
     test.beforeEach(async ({ page }) => {
         await page.goto("/collapsible/docs");
         await expect(page.locator(`${BASIC} button`)).toBeVisible();

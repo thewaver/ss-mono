@@ -37,8 +37,9 @@
         <p class={styles.docsDescription} data-api-includes>
             {DOCS_INCLUDES_LEAD}{#each table.includes as include, index (include.text)}{index
                     ? DOCS_INCLUDES_SEPARATOR
-                    : ""}{#if toDocsIncludeHref(include, props.unit)}<a href={toDocsIncludeHref(include, props.unit)}
-                        ><code>{include.text}</code></a
+                    : ""}{@const href = toDocsIncludeHref(include, props.unit)}{#if href}<a
+                        {href}
+                        onclick={(e) => props.onFragmentClick(e, href)}><code>{include.text}</code></a
                     >{:else}<code>{include.text}</code>{/if}{/each}
         </p>
     {/if}

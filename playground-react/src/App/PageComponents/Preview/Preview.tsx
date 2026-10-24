@@ -1,4 +1,4 @@
-import { Suspense, useRef } from "react";
+import { Suspense, useRef, useState } from "react";
 
 import { ElementObserverReactUtils, ViewportWrapper } from "@thewaver/ss-components-react";
 import * as styles from "@thewaver/ss-playground/App/PageComponents/Preview/Preview.css";
@@ -11,6 +11,18 @@ export const PagePreview = (props: PagePreviewProps) => {
 
     const bodySize = ElementObserverReactUtils.useBorderBoxSize(bodyRef);
 
+    const [previewContext] = useState(() => {
+        let demoClaimantId: string | undefined;
+
+        return {
+            claimDemo: (claimantId: string) => {
+                demoClaimantId ??= claimantId;
+
+                return demoClaimantId === claimantId;
+            },
+        };
+    });
+
     const size = {
         width: styles.PREVIEW_WIDTH,
         height: Math.max(styles.PREVIEW_MIN_HEIGHT, bodySize.height + styles.PREVIEW_PADDING * 2),
@@ -18,7 +30,7 @@ export const PagePreview = (props: PagePreviewProps) => {
 
     return (
         <ViewportWrapper size={size}>
-            <PreviewContextProvider value={true}>
+            <PreviewContextProvider value={previewContext}>
                 <div className={styles.previewContent}>
                     <div ref={bodyRef} className={styles.previewBody}>
                         <Suspense>{props.component()}</Suspense>

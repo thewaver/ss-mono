@@ -7,5 +7,5 @@ const layerClass = useLayerClass();
 </script>
 
 <template>
-    <span :class="[styles.breadcrumbSeparator, layerClass]">/</span>
+    <span :class="[styles.breadcrumbSeparator, layerClass]"><slot>/</slot></span>
 </template>

@@ -5,9 +5,7 @@ import { activeText, isScrolling, offsetHeight, prop, scrollTop, tabIndex, waitU
 /**
  * The Accordion has no examples of its own: its page is the Docs view, where each behavior has a live example. The
  * first takes the knobs for how many sections may be open; the others are found by something only they hold — the
- * "Add a line" button, the line saying what has been built, the box that scrolls, the sections side by side. The Docs
- * view is in the Solid Playground only so far, which is what the `@solid` in the title keeps the other three from
- * running against.
+ * "Add a line" button, the line saying what has been built, the box that scrolls, the sections side by side.
  */
 const BASIC = `[data-docs-example]:has(${prop("policy")}) [data-demo]`;
 const GROWING = "[data-docs-example]:has(#addALine) [data-demo]";
@@ -37,7 +35,7 @@ const offsetWidthOf = (page: Page, selector: string, index: number) =>
         .nth(index)
         .evaluate((element) => (element as HTMLElement).offsetWidth);
 
-test.describe("the Accordion's docs @solid", () => {
+test.describe("the Accordion's docs", () => {
     test.beforeEach(async ({ page }) => {
         await page.goto("/accordion/docs");
         await expect(page.locator(header(BASIC)).first()).toBeVisible();

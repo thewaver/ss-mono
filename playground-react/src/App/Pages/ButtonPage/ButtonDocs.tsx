@@ -23,15 +23,6 @@ export const ButtonDocs = () => {
                 renderKnobs={() => (
                     <>
                         <PageProp
-                            itemKey={"isDisabled"}
-                            label={"Disabled"}
-                            hint={"Turns the button off: it ignores presses and hover, and the Tab key skips it."}
-                            controls={"Sets Button.isDisabled"}
-                        >
-                            <PageCheckField value={isDisabled} ariaLabel={"Disabled"} onChange={setIsDisabled} />
-                        </PageProp>
-
-                        <PageProp
                             itemKey={"hasError"}
                             label={"Error"}
                             hint={
@@ -52,6 +43,15 @@ export const ButtonDocs = () => {
                         >
                             <PageCheckField value={isPressed} ariaLabel={"Pressed"} onChange={setIsPressed} />
                         </PageProp>
+
+                        <PageProp
+                            itemKey={"isDisabled"}
+                            label={"Disabled"}
+                            hint={"Turns the button off: it ignores presses and hover, and the Tab key skips it."}
+                            controls={"Sets Button.isDisabled"}
+                        >
+                            <PageCheckField value={isDisabled} ariaLabel={"Disabled"} onChange={setIsDisabled} />
+                        </PageProp>
                     </>
                 )}
             >
@@ -69,19 +69,6 @@ export const ButtonDocs = () => {
                 renderKnobs={() => (
                     <>
                         <PageProp
-                            itemKey={"tooltipIsDisabled"}
-                            label={"Disabled"}
-                            hint={"Turns the button off: it ignores presses and hover, and the Tab key skips it."}
-                            controls={"Sets Button.isDisabled"}
-                        >
-                            <PageCheckField
-                                value={isTooltipDisabled}
-                                ariaLabel={"Disabled"}
-                                onChange={setIsTooltipDisabled}
-                            />
-                        </PageProp>
-
-                        <PageProp
                             itemKey={"tooltipIsReachableWhenDisabled"}
                             label={"Reachable when disabled"}
                             hint={
@@ -93,6 +80,19 @@ export const ButtonDocs = () => {
                                 value={isReachableWhenDisabled}
                                 ariaLabel={"Reachable when disabled"}
                                 onChange={setIsReachableWhenDisabled}
+                            />
+                        </PageProp>
+
+                        <PageProp
+                            itemKey={"tooltipIsDisabled"}
+                            label={"Disabled"}
+                            hint={"Turns the button off: it ignores presses and hover, and the Tab key skips it."}
+                            controls={"Sets Button.isDisabled"}
+                        >
+                            <PageCheckField
+                                value={isTooltipDisabled}
+                                ariaLabel={"Disabled"}
+                                onChange={setIsTooltipDisabled}
                             />
                         </PageProp>
                     </>

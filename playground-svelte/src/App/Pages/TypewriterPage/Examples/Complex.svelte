@@ -33,7 +33,7 @@
                 style:width={"100%"}
                 style:height={"0.5em"}
                 style:border-bottom={"2px solid currentColor"}
-            ></div>{"and has\nescaped "}<img src={knight} height={24} style:vertical-align={"middle"} /><a
+            ></div>{"and has\nescaped "}<img src={knight} alt="" height={24} style:vertical-align={"middle"} /><a
                 href="http://www.google.com">characters.</a
             >
         </Typewriter>

@@ -13,7 +13,16 @@
     let props: SlideButtonElementProps = $props();
 
     const getAriaLabel = LabelSvelteUtils.resolveAriaLabel(() => props.ariaLabel);
-    const getAriaDescribedBy = FormFieldSvelteUtils.resolveAriaDescribedBy();
+    const getFieldDescribedBy = FormFieldSvelteUtils.resolveAriaDescribedBy();
+    const descriptionId = $props.id();
+
+    $effect(() => untrack(() => SlideButtonUtils.warnIfUndescribed(props.ariaDescription, "ariaDescription")));
+
+    const hasDescription = $derived(!!props.ariaDescription);
+
+    const ariaDescribedBy = $derived(
+        [getFieldDescribedBy(), hasDescription ? descriptionId : undefined].filter(Boolean).join(" ") || undefined,
+    );
 
     let track = $state<HTMLButtonElement>();
 
@@ -80,7 +89,8 @@
     type="button"
     class={styles.slideButtonElement}
     aria-label={getAriaLabel()}
-    aria-describedby={getAriaDescribedBy()}
+    aria-describedby={ariaDescribedBy}
+    aria-pressed={props.flags.isPressed}
     aria-disabled={isDisabled || undefined}
     onkeydown={(e) => {
         if (isDisabled) return;
@@ -107,3 +117,7 @@
 >
     {@render props.renderContent(props.flags)}
 </button>
+
+{#if hasDescription}
+    <span id={descriptionId} class={styles.slideButtonDescription}>{props.ariaDescription}</span>
+{/if}

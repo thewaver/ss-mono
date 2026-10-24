@@ -9,7 +9,17 @@ import type { PagePreviewProps } from "./Preview.types";
 
 defineProps<PagePreviewProps>();
 
-providePreviewContext(true);
+let isDemoClaimed = false;
+
+const claimDemo = () => {
+    if (isDemoClaimed) return false;
+
+    isDemoClaimed = true;
+
+    return true;
+};
+
+providePreviewContext({ claimDemo });
 
 const bodyRef = shallowRef<HTMLElement>();
 

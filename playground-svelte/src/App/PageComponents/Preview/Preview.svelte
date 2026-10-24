@@ -11,7 +11,17 @@
 
     let body = $state<HTMLElement>();
 
-    setPreviewContext(true);
+    let isDemoClaimed = false;
+
+    const claimDemo = () => {
+        if (isDemoClaimed) return false;
+
+        isDemoClaimed = true;
+
+        return true;
+    };
+
+    setPreviewContext({ claimDemo });
 
     const getBodySize = ElementObserverSvelteUtils.createBorderBoxSizeObserver(() => body);
 

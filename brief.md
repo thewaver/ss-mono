@@ -11,9 +11,9 @@ purpose: it answers "what is outstanding", and neither of them is.
 
 | Section                                                   | Count |
 | --------------------------------------------------------- | ----: |
-| [Blockers and known issues](#blockers-and-known-issues)   |    11 |
+| [Blockers and known issues](#blockers-and-known-issues)   |     6 |
 | [Deliberately not built](#deliberately-not-built)         |     1 |
-| [Accessibility gaps](#accessibility-gaps)                 |     6 |
+| [Accessibility gaps](#accessibility-gaps)                 |     5 |
 | [Planned projects](#planned-projects)                     |     1 |
 | [Waiting on browser support](#waiting-on-browser-support) |     4 |
 
@@ -23,19 +23,14 @@ purpose: it answers "what is outstanding", and neither of them is.
 
 Something that misbehaves, or a cost nobody has paid down.
 
-| #   | Where                                 | What happens                                                                                                                                                                                                  |
-| --- | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 11  | **Native form submit**                | **Pending decision.** `Select`, `MultiSelect` and `ColorInput` submit nothing, the date and time fields submit their display text, and `Form` hands `onSubmit` no values. One question, lofted, not discarded |
-| 10  | **Any placed control**                | A layout guesses each item's box, so content wider than the guess overflows it and, on a ring, overlaps a neighbor                                                                                            |
-| 10  | **Any placed control**                | Nothing stops a layout outgrowing the room it is in — a ring can reach past the screen, and a placed toolbar has nothing to collapse into                                                                     |
-| 10  | **`Menu`, hold and flick**            | How far a flick must travel to pick an item is a guess — about 30px on the demo wheel — not a measured number                                                                                                 |
-| 12  | **`Die`, stepping**                   | Pressing the same arrow a few times sends the die back and forth between two or three faces, because each step spins the new face upright. No fix chosen; the three put were judged inadequate                |
-| 14  | **`Select`, long lists**              | Drawing the options on screen costs as much as it ever did; windowing only removed the cost of creating them. No fix known                                                                                    |
-| 15  | **`SlideButton`, React, Vue, Svelte** | Not ported yet: the page has no Docs page and no example there, so the menu hides it                                                                                                                          |
-| 16  | **`Accordion`, React, Vue, Svelte**   | Not ported yet: the page has no Docs page and no example there, so the menu hides it                                                                                                                          |
-| 17  | **Docs examples, React, Vue, Svelte** | The code accordion is still drawn inside the example box, not below it                                                                                                                                        |
-| 18  | **`Collapsible`, React, Vue, Svelte** | Not ported yet: the page has no Docs page and no example there, so the menu hides it                                                                                                                          |
-| 19  | **`Breadcrumbs`, React, Vue, Svelte** | Not ported yet: the page has no Docs page and no example there, so the menu hides it                                                                                                                          |
+| #   | Where                      | What happens                                                                                                                                                                                                  |
+| --- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 11  | **Native form submit**     | **Pending decision.** `Select`, `MultiSelect` and `ColorInput` submit nothing, the date and time fields submit their display text, and `Form` hands `onSubmit` no values. One question, lofted, not discarded |
+| 10  | **Any placed control**     | A layout guesses each item's box, so content wider than the guess overflows it and, on a ring, overlaps a neighbor                                                                                            |
+| 10  | **Any placed control**     | Nothing stops a layout outgrowing the room it is in — a ring can reach past the screen, and a placed toolbar has nothing to collapse into                                                                     |
+| 10  | **`Menu`, hold and flick** | How far a flick must travel to pick an item is a guess — about 30px on the demo wheel — not a measured number                                                                                                 |
+| 12  | **`Die`, stepping**        | Pressing the same arrow a few times sends the die back and forth between two or three faces, because each step spins the new face upright. No fix chosen; the three put were judged inadequate                |
+| 14  | **`Select`, long lists**   | Drawing the options on screen costs as much as it ever did; windowing only removed the cost of creating them. No fix known                                                                                    |
 
 ## Deliberately not built
 
@@ -49,14 +44,13 @@ A capability a built control does not have, where the reason it does not is sett
 
 They cluster, and no single item owns them.
 
-| #   | Where                                 | What is missing                                                                                                                 |
-| --- | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| 4   | **`Spotlight`**                       | A prompt cannot hide the rest of the page from a screen reader: `inert` marks a subtree and cannot be lifted off one part of it |
-| 6   | **`Carousel`**                        | A carousel whose consumer builds no buttons on its controller has no keyboard route into it whatsoever                          |
-| 8   | **`Table`**                           | A cell holding two controls can be reached but not stepped into — there is no key that moves between them                       |
-| 5   | **`Scroller`**                        | The buttons are the consumer's, so the library cannot promise one is named, reachable or in the tab order                       |
-| 13  | **Playground**                        | In Windows high-contrast mode, painters drawn only in background colors vanish — Range's track and fill go white on white       |
-| 15  | **`SlideButton`, React, Vue, Svelte** | Says nothing to a screen reader about how to confirm it, and does not announce being held at its end                            |
+| #   | Where           | What is missing                                                                                                                 |
+| --- | --------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| 4   | **`Spotlight`** | A prompt cannot hide the rest of the page from a screen reader: `inert` marks a subtree and cannot be lifted off one part of it |
+| 6   | **`Carousel`**  | A carousel whose consumer builds no buttons on its controller has no keyboard route into it whatsoever                          |
+| 8   | **`Table`**     | A cell holding two controls can be reached but not stepped into — there is no key that moves between them                       |
+| 5   | **`Scroller`**  | The buttons are the consumer's, so the library cannot promise one is named, reachable or in the tab order                       |
+| 13  | **Playground**  | In Windows high-contrast mode, painters drawn only in background colors vanish — Range's track and fill go white on white       |
 
 ## Planned projects
 
