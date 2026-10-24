@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 export type ComponentConfig = {
     name: string;
     component?: () => ReactNode;
+    docs?: () => ReactNode;
 };
 
 export type MenuBranchConfig = {

@@ -42,6 +42,7 @@ export type * from "./Abstracts/MaskedField/MaskedField.types";
 export * from "./Abstracts/MaskedField/MaskedField.utils";
 export type * from "./Abstracts/MediaQueryMonitor/MediaQueryMonitor.types";
 export * from "./Abstracts/MediaQueryMonitor/MediaQueryMonitor.utils";
+export * from "./Abstracts/Navigator/Navigator.const";
 export type * from "./Abstracts/Navigator/Navigator.types";
 export * from "./Abstracts/Navigator/Navigator.utils";
 export type * from "./Abstracts/Overflow/Overflow.types";

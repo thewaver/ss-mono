@@ -1,12 +1,4 @@
-import { For } from "solid-js";
-
-import {
-    MediaQueryMonitorSolidUtils,
-    Radio,
-    RadioGroup,
-    SHAPE_REVEAL_DEFAULTS,
-    Toggle,
-} from "@thewaver/ss-components-solid";
+import { MediaQueryMonitorSolidUtils, SHAPE_REVEAL_DEFAULTS, Toggle } from "@thewaver/ss-components-solid";
 import {
     PAGE_VIEW_OPTIONS,
     THEME_FIELD_ID,
@@ -15,24 +7,19 @@ import {
 } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
 import { NO_MOTION_DURATION_MS } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
 import { EXAMPLES_ONLY_PROP } from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.const";
-
 import {
-    PageRadioSegmentContent,
-    PageRadioSegmentFloater,
-    PageRadioSegmentGroup,
-} from "../../StyledComponents/RadioSegmentContent/RadioSegmentContent";
+    DEFAULT_PAGE_VIEW,
+    PAGE_VIEW_LABELS,
+} from "@thewaver/ss-playground/App/PageComponents/ViewTabs/ViewTabs.const";
+
 import { PageToggleContent } from "../../StyledComponents/ToggleContent/ToggleContent";
 import { PageExampleKnobsButton } from "../ExampleKnobs/ExampleKnobs";
 import { PageSelectField } from "../Field/Field";
 import { OWN_FRAMEWORK } from "../FrameworkMenu/FrameworkMenu.const";
 import { PageProp } from "../Prop/Prop";
 import { getAppliedTheme, revealTheme } from "../Theme/ThemeSolid.const";
-import type {
-    PageNavSettingsChoiceProps,
-    PageNavSettingsProps,
-    PlaygroundTheme,
-    ViewportAnchor,
-} from "./NavSettingsSolid.types";
+import type { PageViewKey } from "../ViewTabs/ViewTabsSolid.types";
+import type { PageNavSettingsProps, PlaygroundTheme, ViewportAnchor } from "./NavSettingsSolid.types";
 
 const computeViewportAnchorLabel = (anchor: ViewportAnchor) =>
     VIEWPORT_ANCHOR_OPTIONS.find((option) => option.value === anchor)?.label ?? String(anchor);
@@ -40,34 +27,7 @@ const computeViewportAnchorLabel = (anchor: ViewportAnchor) =>
 const computeThemeLabel = (theme: PlaygroundTheme) =>
     THEME_OPTIONS.find((option) => option.value === theme)?.label ?? theme;
 
-const PageNavSettingsChoice = <T,>(props: PageNavSettingsChoiceProps<T>) => (
-    <PageRadioSegmentGroup>
-        <RadioGroup
-            value={props.value}
-            ariaLabel={props.ariaLabel}
-            orientation={"horizontal"}
-            gap={0}
-            renderSelectionFloater={(getVisibilityTarget, getTransitionDurationMs) => (
-                <PageRadioSegmentFloater
-                    visibilityTarget={getVisibilityTarget}
-                    transitionDurationMs={getTransitionDurationMs}
-                />
-            )}
-        >
-            <For each={props.options}>
-                {(option) => (
-                    <Radio
-                        value={() => option.value}
-                        ariaLabel={() => option.label}
-                        renderContent={(getFlags) => (
-                            <PageRadioSegmentContent flags={getFlags}>{option.label}</PageRadioSegmentContent>
-                        )}
-                    />
-                )}
-            </For>
-        </RadioGroup>
-    </PageRadioSegmentGroup>
-);
+const computePageViewLabel = (view: PageViewKey) => PAGE_VIEW_LABELS[view];
 
 export const PageNavSettings = (props: PageNavSettingsProps) => {
     const getPrefersReducedMotion = MediaQueryMonitorSolidUtils.createReducedMotion();
@@ -88,7 +48,9 @@ export const PageNavSettings = (props: PageNavSettingsProps) => {
                     <PageProp
                         key={"showsDescriptionOnly"}
                         label={"Show pages without examples"}
-                        hint={"Lists the pages that have docs but no examples yet, which are hidden otherwise."}
+                        hint={
+                            "Lists the pages with no live examples anywhere, only a description and the API, which are hidden otherwise."
+                        }
                         controls={EXAMPLES_ONLY_PROP}
                         defaultValue={false}
                     >
@@ -106,12 +68,14 @@ export const PageNavSettings = (props: PageNavSettingsProps) => {
                             "Which tab a page opens on when it is picked from the list. A page with no examples always opens on its docs."
                         }
                         controls={EXAMPLES_ONLY_PROP}
-                        defaultValue={"Examples"}
+                        defaultValue={computePageViewLabel(DEFAULT_PAGE_VIEW)}
                     >
-                        <PageNavSettingsChoice
+                        <PageSelectField
+                            value={props.pageView[0]}
+                            values={PAGE_VIEW_OPTIONS.map((option) => option.value)}
+                            computeLabel={computePageViewLabel}
                             ariaLabel={"Open pages on"}
-                            options={PAGE_VIEW_OPTIONS}
-                            value={props.pageView}
+                            onChange={props.pageView[1]}
                         />
                     </PageProp>
 

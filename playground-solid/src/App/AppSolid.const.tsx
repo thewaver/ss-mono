@@ -19,12 +19,13 @@ export {
 const lazyPage = <K extends string>(load: () => Promise<Record<K, Component>>, key: K) =>
     lazy(() => load().then((module) => ({ default: module[key] })));
 
-const AccordionPage = lazyPage(() => import("./Pages/Accordions/AccordionPage/AccordionPage"), "AccordionPage");
-const CollapsiblePage = lazyPage(() => import("./Pages/Accordions/CollapsiblePage/CollapsiblePage"), "CollapsiblePage");
+const AccordionDocs = lazyPage(() => import("./Pages/Accordions/AccordionPage/AccordionDocs"), "AccordionDocs");
+const CollapsibleDocs = lazyPage(() => import("./Pages/Accordions/CollapsiblePage/CollapsibleDocs"), "CollapsibleDocs");
 const AudioSwitcherPage = lazyPage(() => import("./Pages/AudioSwitcherPage/AudioSwitcherPage"), "AudioSwitcherPage");
 const BracketPage = lazyPage(() => import("./Pages/BracketPage/BracketPage"), "BracketPage");
-const BreadcrumbsPage = lazyPage(() => import("./Pages/BreadcrumbsPage/BreadcrumbsPage"), "BreadcrumbsPage");
+const BreadcrumbsDocs = lazyPage(() => import("./Pages/BreadcrumbsPage/BreadcrumbsDocs"), "BreadcrumbsDocs");
 const ButtonPage = lazyPage(() => import("./Pages/ButtonPage/ButtonPage"), "ButtonPage");
+const ButtonDocs = lazyPage(() => import("./Pages/ButtonPage/ButtonDocs"), "ButtonDocs");
 const CalendarPage = lazyPage(() => import("./Pages/CalendarPage/CalendarPage"), "CalendarPage");
 const CardStackPage = lazyPage(() => import("./Pages/CardStackPage/CardStackPage"), "CardStackPage");
 const CarouselPage = lazyPage(() => import("./Pages/Carousels/CarouselPage/CarouselPage"), "CarouselPage");
@@ -156,6 +157,7 @@ const ShapePage = lazyPage(() => import("./Pages/ShapePage/ShapePage"), "ShapePa
 const ShapeRevealPage = lazyPage(() => import("./Pages/ShapeRevealPage/ShapeRevealPage"), "ShapeRevealPage");
 const SidebarPage = lazyPage(() => import("./Pages/SidebarPage/SidebarPage"), "SidebarPage");
 const SlideButtonPage = lazyPage(() => import("./Pages/SlideButtonPage/SlideButtonPage"), "SlideButtonPage");
+const SlideButtonDocs = lazyPage(() => import("./Pages/SlideButtonPage/SlideButtonDocs"), "SlideButtonDocs");
 const SortableGridPage = lazyPage(() => import("./Pages/SortableGridPage/SortableGridPage"), "SortableGridPage");
 const SortablePage = lazyPage(() => import("./Pages/SortablePage/SortablePage"), "SortablePage");
 const SplitPanePage = lazyPage(() => import("./Pages/SplitPanePage/SplitPanePage"), "SplitPanePage");
@@ -332,17 +334,17 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                 children: [
                     {
                         name: "Accordion",
-                        component: () => <AccordionPage />,
+                        docs: () => <AccordionDocs />,
                     },
                     {
                         name: "Collapsible",
-                        component: () => <CollapsiblePage />,
+                        docs: () => <CollapsibleDocs />,
                     },
                 ],
             },
             {
                 name: "Breadcrumbs",
-                component: () => <BreadcrumbsPage />,
+                docs: () => <BreadcrumbsDocs />,
             },
             {
                 name: "Buttons",
@@ -350,10 +352,12 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                     {
                         name: "Button",
                         component: () => <ButtonPage />,
+                        docs: () => <ButtonDocs />,
                     },
                     {
                         name: "SlideButton",
                         component: () => <SlideButtonPage />,
+                        docs: () => <SlideButtonDocs />,
                     },
                 ],
             },

@@ -21,7 +21,7 @@ export const PageAccordionHeader = (props: ParentProps<AccordionHeaderProps>) =>
         >
             <div>{props.children}</div>
 
-            <div class={styles.accordionMarker} aria-hidden="true">
+            <div class={styles.accordionMarker} data-side={access(props.side)} aria-hidden="true">
                 ▶
             </div>
         </div>

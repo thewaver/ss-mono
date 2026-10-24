@@ -10,11 +10,26 @@ export type BaseButtonPressedExampleValues = {
 
 export type BaseButtonPressedExampleProps = BaseButtonExampleProps & BaseButtonPressedExampleValues;
 
-export type BaseButtonErroredExampleValues = {
-    hasError: boolean;
+export type BaseButtonCounterExampleValues = {
+    count: number;
 };
 
-export type BaseButtonErroredExampleProps = BaseButtonExampleProps & BaseButtonErroredExampleValues;
+export type BaseButtonCounterExampleCbs = {
+    onStep: (step: number) => void;
+};
+
+export type BaseButtonCounterExampleProps = BaseButtonCounterExampleValues & BaseButtonCounterExampleCbs;
+
+export type BaseButtonDocsExampleValues = {
+    isDisabled: boolean;
+    hasError: boolean;
+    isPressed: boolean;
+};
+
+export type BaseButtonTooltipDocsExampleValues = {
+    isDisabled: boolean;
+    isReachableWhenDisabled: boolean;
+};
 
 export type ButtonCopyExampleProps = {
     text: string;

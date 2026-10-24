@@ -99,6 +99,15 @@ globalStyle(":focus-visible", {
     outline: `${FOCUS_RING_WIDTH}px solid ${themeVars.color.outline.main}`,
 });
 
+globalStyle("[role='presentation'] > :focus-visible:has(> :only-child)", {
+    isolation: "isolate",
+});
+
+globalStyle("[role='presentation'] > :focus-visible > :only-child", {
+    position: "relative",
+    zIndex: -1,
+});
+
 globalStyle(":disabled, [aria-disabled='true']", {
     cursor: "not-allowed",
 });

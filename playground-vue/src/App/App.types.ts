@@ -3,6 +3,7 @@ import type { Component } from "vue";
 export type ComponentConfig = {
     name: string;
     component?: () => Promise<{ default: Component }>;
+    docs?: () => Promise<{ default: Component }>;
 };
 
 export type MenuBranchConfig = {

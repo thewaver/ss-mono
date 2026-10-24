@@ -9,12 +9,15 @@
     import PageProp from "../Prop/Prop.svelte";
     import { getAppliedTheme, revealTheme } from "../Theme/ThemeSvelte.const.svelte";
     import { PAGE_VIEW_OPTIONS, THEME_FIELD_ID, THEME_OPTIONS, VIEWPORT_ANCHOR_OPTIONS } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
+    import { DEFAULT_PAGE_VIEW, PAGE_VIEW_LABELS } from "@thewaver/ss-playground/App/PageComponents/ViewTabs/ViewTabs.const";
+    import type { PageViewKey } from "../ViewTabs/ViewTabsSvelte.types";
     import type { PageNavSettingsProps, PlaygroundTheme, ViewportAnchor } from "./NavSettingsSvelte.types";
-    import PageNavSettingsChoice from "./PageNavSettingsChoice.svelte";
     import { NO_MOTION_DURATION_MS } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
 
     const computeViewportAnchorLabel = (anchor: ViewportAnchor) =>
         VIEWPORT_ANCHOR_OPTIONS.find((option) => option.value === anchor)?.label ?? String(anchor);
+
+    const computePageViewLabel = (view: PageViewKey) => PAGE_VIEW_LABELS[view];
 
     const computeThemeLabel = (theme: PlaygroundTheme) =>
         THEME_OPTIONS.find((option) => option.value === theme)?.label ?? theme;
@@ -42,7 +45,7 @@
         itemKey={"showsDescriptionOnly"}
         controls={EXAMPLES_ONLY_PROP}
         label={"Show pages without examples"}
-        hint={"Lists the pages that have docs but no examples yet, which are hidden otherwise."}
+        hint={"Lists the pages with no live examples anywhere, only a description and the API, which are hidden otherwise."}
         defaultValue={false}
     >
         <Toggle bind:checked={showsDescriptionOnly} ariaLabel={"Show pages without examples"}>
@@ -57,9 +60,17 @@
         controls={EXAMPLES_ONLY_PROP}
         label={"Open pages on"}
         hint={"Which tab a page opens on when it is picked from the list. A page with no examples always opens on its docs."}
-        defaultValue={"Examples"}
+        defaultValue={computePageViewLabel(DEFAULT_PAGE_VIEW)}
     >
-        <PageNavSettingsChoice ariaLabel={"Open pages on"} options={PAGE_VIEW_OPTIONS} bind:value={pageView} />
+        <PageSelectField
+            value={pageView}
+            values={PAGE_VIEW_OPTIONS.map((option) => option.value)}
+            computeLabel={computePageViewLabel}
+            ariaLabel={"Open pages on"}
+            onChange={(value) => {
+                pageView = value;
+            }}
+        />
     </PageProp>
 
     <PageProp

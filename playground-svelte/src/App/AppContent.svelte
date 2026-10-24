@@ -159,7 +159,7 @@
 
             if (isSearching) return config.name.toLocaleLowerCase().includes(term);
 
-            return showsDescriptionOnly || config.component !== undefined;
+            return showsDescriptionOnly || config.component !== undefined || config.docs !== undefined;
         };
 
         return menuNodes

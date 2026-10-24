@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { Button } from "@thewaver/ss-components-react";
 import { EXAMPLES_ONLY_PROP } from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.const";
 import {
+    DEFAULT_HAS_RESET,
     NOTHING_TO_RESET,
     SAMPLE_SELECTOR_ALONE,
 } from "@thewaver/ss-playground/App/PageComponents/PropsPanel/PropsPanel.const";
@@ -48,7 +49,7 @@ const PagePropsPanelContent = (props: PropsWithChildren<PagePropsPanelProps>) =>
                 <PropsPanelContextProvider value={scopeContext}>
                     {props.children}
 
-                    {resets.length > leastToReset && (
+                    {(props.hasReset ?? DEFAULT_HAS_RESET) && resets.length > leastToReset && (
                         <PageProp
                             itemKey={"resetPanel"}
                             label={"These controls"}

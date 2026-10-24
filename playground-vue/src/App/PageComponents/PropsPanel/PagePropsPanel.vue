@@ -4,6 +4,7 @@ import { computed, shallowRef } from "vue";
 import { Button } from "@thewaver/ss-components-vue";
 import { EXAMPLES_ONLY_PROP } from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.const";
 import {
+    DEFAULT_HAS_RESET,
     NOTHING_TO_RESET,
     SAMPLE_SELECTOR_ALONE,
 } from "@thewaver/ss-playground/App/PageComponents/PropsPanel/PropsPanel.const";
@@ -16,7 +17,7 @@ import PageProp from "../Prop/Prop.vue";
 import { providePropsPanelContext } from "./PropsPanel.context";
 import type { PagePropsPanelProps } from "./PropsPanelVue.types";
 
-const props = defineProps<PagePropsPanelProps>();
+const props = withDefaults(defineProps<PagePropsPanelProps>(), { hasReset: DEFAULT_HAS_RESET });
 
 const isPreview = useIsPreview();
 
@@ -54,7 +55,7 @@ const resetAll = () => {
         <slot />
 
         <PageProp
-            v-if="resets.length > leastToReset"
+            v-if="hasReset && resets.length > leastToReset"
             item-key="resetPanel"
             :controls="EXAMPLES_ONLY_PROP"
             label="These controls"

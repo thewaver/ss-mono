@@ -59,6 +59,7 @@ import {
 } from "./AppReact.const";
 import { PageAppCommands } from "./PageComponents/AppCommands/AppCommands";
 import { PageBuildProgress } from "./PageComponents/BuildProgress/BuildProgress";
+import { PageDocsView } from "./PageComponents/DocsView/DocsView";
 import { PageTextField } from "./PageComponents/Field/Field";
 import { PageFrameworkMenu } from "./PageComponents/FrameworkMenu/FrameworkMenu";
 import { PageLayer } from "./PageComponents/Layer/Layer";
@@ -76,8 +77,8 @@ import { useLayerClass } from "./StyledComponents/Layer/Layer.context";
 import { PageTooltipContent } from "./StyledComponents/TooltipContent/TooltipContent";
 import { PageTreeNodeContent } from "./StyledComponents/TreeNodeContent/TreeNodeContent";
 
-const PageDocsView = lazy(() =>
-    import("./PageComponents/DocsView/DocsView").then((module) => ({ default: module.PageDocsView })),
+const PageApiView = lazy(() =>
+    import("./PageComponents/ApiView/ApiView").then((module) => ({ default: module.PageApiView })),
 );
 
 const PageAboutPage = lazy(() =>
@@ -364,7 +365,7 @@ export function AppContent(props: { viewportAnchor: readonly [ViewportAnchor, (v
 
             if (isSearching) return config.name.toLocaleLowerCase().includes(term);
 
-            return showsDescriptionOnly || config.component !== undefined;
+            return showsDescriptionOnly || config.component !== undefined || config.docs !== undefined;
         };
 
         return menuNodes
@@ -684,9 +685,12 @@ export function App() {
                                 <Route
                                     path={"docs"}
                                     element={
-                                        <PageDocsView name={config.name} description={MENU_DESCRIPTIONS[config.name]} />
+                                        <PageDocsView description={MENU_DESCRIPTIONS[config.name]}>
+                                            {config.docs?.()}
+                                        </PageDocsView>
                                     }
                                 />
+                                <Route path={"api"} element={<PageApiView name={config.name} />} />
                             </Route>
                         ))}
                     </Route>

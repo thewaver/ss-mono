@@ -123,8 +123,8 @@ test("every row's hint says what the row controls", async ({ page }) => {
  * A long prop path is allowed to break after each dot, so it wraps inside the tooltip instead of running out of it.
  * Read as the line's content never being wider than the line itself.
  */
-test("a long prop path wraps inside the hint rather than running out of it", async ({ page }) => {
-    await page.goto("/accordion");
+test("a long prop path wraps inside the hint rather than running out of it @solid", async ({ page }) => {
+    await page.goto("/accordion/docs");
 
     const button = page.locator('[data-prop][data-testid="transitionDurationMs"] button[aria-label^="About "]');
 

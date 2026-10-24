@@ -46,6 +46,11 @@ reading.
 12. `Die`'s step buttons and arrow keys fall into a loop of two or three faces — _open, no fix chosen_
 13. The Playground's painters in Windows high-contrast mode — _open, decided, not yet built_
 14. A long `Select` list costs as much to draw as its options do — _open, no fix known_
+15. `SlideButton`'s docs, its example and two accessibility fixes exist in Solid only — _decided, not yet built_
+16. `Accordion`'s docs exist in Solid only — _decided, not yet built_
+17. The docs example's code accordion sits below its box in Solid only — _decided, not yet built_
+18. `Collapsible`'s docs exist in Solid only — _decided, not yet built_
+19. `Breadcrumbs`' docs exist in Solid only — _decided, not yet built_
 
 ---
 
@@ -463,6 +468,199 @@ painting off-screen options with `content-visibility`, was tried and removed: th
 the moment End forced the skipped rows to be laid out for real, every height above the highlight was corrected at
 once and the highlighted option ended up below the visible box. See `decisions.md` under the `Select` headings. No
 other answer is known; this stays open in case one turns up.
+
+---
+
+## 15. `SlideButton`'s docs, its example and two accessibility fixes exist in Solid only
+
+Reachable in the React, Vue and Svelte Playgrounds. The `SlideButton` page there has neither a Docs page nor an
+example, so the left menu hides it unless "Show pages without examples" is on. And their `SlideButton` neither tells
+a screen reader how to confirm it nor announces being held at its end. All of it is built in Solid, and everything
+shared is already in the core and in `playground/`; what is left is the framework half of each piece. The Solid
+files named below are the reference, and `decisions.md` holds the reasoning under the `SlideButton` headings.
+
+**Decided, not yet built.** Each step is done in all three of `components-react`/`playground-react`,
+`components-vue`/`playground-vue` and `components-svelte`/`playground-svelte`.
+
+**Library**
+
+- **`ariaDescription`.** Add the core's `BaseSlideButtonValues` (an optional `ariaDescription: string`, already
+  documented) to the framework's `SlideButton` props. When it is a non-empty string, render it next to the
+  `<button>` in a `<span>` with a generated id and the core class `SlideButtonStyles.slideButtonDescription`
+  (visually hidden, still read). The button's `aria-describedby` is the enclosing form field's description id and
+  that id, space-separated, and is left off when there is neither. Call
+  `SlideButtonUtils.warnIfUndescribed(ariaDescription, "ariaDescription")` once, when the button is set up.
+  Reference: `components-solid/src/Essentials/Buttons/SlideButton/SlideButton.tsx`.
+- **`aria-pressed`.** Write it on the `<button>` from the flags' `isPressed`, exactly as `Button` does: present
+  only when the consumer passes `isPressed`.
+
+**Playground**
+
+- **`PageDocsAlert`.** The framework's version of `playground-solid/src/App/PageComponents/DocsAlert/DocsAlert.tsx`,
+  copying its markup as it stands: the shared `DocsAlert.css.ts` classes, `role="note"` and `data-docs-alert` on
+  the root.
+- **The Docs page.** `SlideButtonDocs` with `Docs/Basic`, `Docs/Directions` and `Docs/Held`, as in
+  `playground-solid/src/App/Pages/SlideButtonPage/`, plus a `docs` entry on `SlideButton` in the menu config. Copy
+  the order, the knobs (Mode, Completion ratio, Hold duration, Disabled, Error; Orientation, Direction), their keys,
+  hints and `controls` strings, the section titles and text, and each example's `ariaDescription`, word for word.
+  The pickers' lists are the core's `SLIDE_BUTTON_MODES`, `SLIDE_BUTTON_ORIENTATIONS` and `NAVIGATOR_DIRECTIONS`;
+  the number ranges are the shared `SlideButtonKnobs`; the types are in the shared `SlideButtonPage.types.ts`.
+- **The Examples page.** "Arm all three" (`Examples/Arming`) as the page's only example, the page component, and a
+  `component` entry on `SlideButton` in the menu config. Its constants and styles are shared: `LOCK_COUNT`,
+  `TURN_DEG`, `FINALE_CYCLE_MS`, `FINALE_PAUSE_MS`, and `lock`, `isArmed`, `isFinale`, `turnVar`, `liftVar`. What it
+  does:
+    - each lock's progress sets `turnVar` to progress × `TURN_DEG`, and an armed lock stays at `TURN_DEG` with the
+      `isArmed` class, which glows;
+    - an armed lock ignores further gestures, and so does every lock during the finale;
+    - when the last lock arms, the `isFinale` class goes on and, unless the reader prefers reduced motion, a
+      frame-driven ratio runs from 0 to 1 over `FINALE_CYCLE_MS` and is written to `liftVar`. The reset follows on a
+      timer after the cycle and `FINALE_PAUSE_MS`, or after the pause alone under reduced motion;
+    - the locks are named "Lock 1" to "Lock 3", each described "Hold Enter or Space to arm.", and the readout is
+      "armed: N of 3";
+    - **the two variables must be set through `assignInlineVars` or the framework's equivalent**: written raw as a
+      style key, a variable's name is `var(--…)`, which the browser drops without a word.
+
+**Specs**
+
+Every test in `e2e/slideButton.spec.ts` is tagged `@solid`, because the page it drives existed only in Solid. Once
+all three frameworks are ported, take the tag off every test there and run the file in all four Playgrounds. The
+file has not been run since it was rewritten around the Docs page, so its first run is also its first check.
+
+---
+
+## 16. `Accordion`'s docs exist in Solid only
+
+Reachable in the React, Vue and Svelte Playgrounds. The Accordion page there has neither a Docs page nor an example:
+its page file and examples were removed in all four frameworks, and only Solid has the Docs page that replaces them, so
+the other three list nothing under `Accordion` and the menu hides it. The page is built in Solid and everything shared
+is already in `playground/`; what is left is the framework half. The Solid files in
+`playground-solid/src/App/Pages/Accordions/AccordionPage/` are the reference, and `Collapsible`'s own page, which
+shares `Accordions.css.ts` and each framework's `Accordions.types.ts`, was not touched.
+
+**Decided, not yet built**, in each of `playground-react`, `playground-vue` and `playground-svelte`:
+
+- **The Docs page.** `AccordionDocs` and a `docs` entry on `Accordion` in the menu config, with six examples under
+  `Docs/`: `Basic`, `Controlled`, `Growing`, `Deferred`, `Scrolled` and `Sideways`. Copy the order, the section titles
+  and text, the knobs' keys, hints and `controls` strings, word for word.
+- **Basic** takes the sections Shipping, Returns, Warranty and a disabled one. It has three knobs: **Policy**, a picker
+  over the shared `ACCORDION_POLICIES` (`many`, `single`, `single_required`), which the page turns into `isSingleExpand`
+  and `isExpandRequired` through the shared `AccordionPageUtils`; **Gap** and **Transition duration**, from
+  `AccordionKnobs`. It holds no `expanded` list of its own, so it starts with every section closed.
+- **Controlled** holds the list itself, starting with Shipping open, and has "Open all" and "Close all" buttons below
+  the accordion that write it.
+- **Growing** keeps its "Add a line" and "Clear lines" buttons inside the panel, with the ids `addALine` and
+  `clearLines`, and counts the added lines in its own state.
+- **Deferred** builds its panels on first open, records each one built, and shows the line "Built so far: …" under
+  the accordion. Each line of a built panel carries `data-built` with its section's name.
+- **Scrolled** sits in the scrolling box (`data-scroll-box`) and has one knob, **Scroll into view**, a toggle on by
+  default that sets `isScrolledIntoViewOnExpand`.
+- **Orientation** is one example with a knob, **Orientation**, a picker over the core's `ACCORDION_ORIENTATIONS`
+  (horizontal, the starting value, and vertical). It holds its own `expanded` list starting on Mountains, keeps one
+  section open at all times, and takes `sizing` fit-content when horizontal and the library's own width when vertical. The look is all in the shared `Accordions.css.ts`, driven by
+  two attributes, so the example's code has no branching: the box around the accordion carries
+  `data-orientation` (the `orientationExample` class, which also holds the 480px cap), each panel carries
+  `data-move` set to the move direction `renderPanel` is handed, and each header and panel has one fixed class
+  (`orientationStrip`, `orientationLabel`, `orientationPanel`). The panel also takes the `isEntering` class while its
+  visibility target is 1. The stylesheet turns the attributes into two variables, the axis and the move, and one
+  animation does the slide from them: sideways when horizontal, from above or below when vertical. Horizontal draws
+  the tall strips with rotated labels and the fixed-width panel; vertical draws ordinary full-width bars.
+- **Width.** Every accordion in these examples, the horizontal one included, sits in a box capped at 480px, the shared
+  `docsAccordion` class: wrap the accordion in it, or put it on the box that scrolls in the Scrolled example.
+- **Gap.** Every accordion in these examples takes the shared `DOCS_GAP` (5) as its gap, except Basic, whose gap is
+  its knob. **Deferred's readout** sits beside the capped box, not inside it, so the demo's own spacing separates the
+  two.
+- The intro is already in the shared `MenuDescriptions.const.ts`; the policy list, helper and types are in the shared
+  `AccordionPage.const.ts`, `AccordionPage.utils.ts` and `AccordionPage.types.ts`.
+
+**Specs.** The Accordion tests in `e2e/accordion.spec.ts` sit in one block whose title carries `@solid`, and the "a long
+prop path wraps inside the hint" test in `e2e/playgroundPanels.spec.ts` carries it too. Once all three frameworks are
+ported, take the tag off both and run the files in all four Playgrounds. Neither has been run since it was rewritten
+around the Docs page, so the first run is also the first check.
+
+---
+
+## 17. The docs example's code accordion sits below its box in Solid only
+
+Reachable in the React, Vue and Svelte Playgrounds, on every Docs page that has a live example (Button and SlideButton
+there). Their copy of the docs example component still draws the "Show code" accordion inside the example box; Solid
+draws it below. The shared stylesheet already has what it needs, so this is the component half only, in each of
+`playground-react`, `playground-vue` and `playground-svelte`. The Solid reference is
+`playground-solid/src/App/PageComponents/DocsExample/DocsExample.tsx`.
+
+**Decided, not yet built.** Wrap the example in a stack (`docsExampleStack`, a column with 10px between its children).
+The first child is the box exactly as it is now but without the accordion, carrying `docsExample` and the
+`data-docs-example` marker. The second is the accordion on its own, inside the same layer level the box uses (so it
+keeps the colors it had) and inside a box carrying `docsExampleCode`, which gives it the box's shadow and the header's
+corner rounding. The specs find an example by the marker on the box and none of them reads the code, so none needs to
+change.
+
+---
+
+## 18. `Collapsible`'s docs exist in Solid only
+
+Reachable in the React, Vue and Svelte Playgrounds. The Collapsible page there has neither a Docs page nor an example:
+its page file, examples and the shared example types were removed in all four frameworks, and only Solid has the Docs
+page that replaces them, so the other three list nothing under `Collapsible` and the menu hides it. The Solid files in
+`playground-solid/src/App/Pages/Accordions/CollapsiblePage/` are the reference; everything shared is already in
+`playground/` and the core.
+
+**Decided, not yet built**, in each of `playground-react`, `playground-vue` and `playground-svelte`: `CollapsibleDocs`
+and a `docs` entry on `Collapsible` in the menu config, with four examples under `Docs/`. Copy the order, the section
+titles and text, the knobs' keys, hints and `controls` strings, word for word.
+
+- **Basic** is a line of text above a "Show more" collapsible sized to its content, with one knob, **Transition
+  duration**, from `AccordionKnobs`. It holds no `expanded` of its own.
+- **Controlled** holds the boolean itself, passed as `expanded`, and has a "Toggle from here" button below the
+  collapsible that writes it.
+- **Deferred** builds its panel on first open, sized to fill, and shows the line "Panel built: not yet" or "Panel
+  built: yes" below the collapsible in the shared readout style (`exampleReadout`).
+- **Side** has one knob, **Side**, a picker over the core's `COLLAPSIBLE_SIDES`, starting on right. The collapsible
+  sits in the shared `sideExample` box, which centers it, and its panel holds contents given their own width. Its
+  header is passed `side`, so the arrow turns with it (the shared `AccordionContent.css.ts` and `…types.ts` already
+  carry the rule; each framework's `PageAccordionHeader` writes `data-side` on the marker from the new `side` prop).
+- Every collapsible is in a box capped at 480px: the shared `docsAccordion` class, which Side's `sideExample` box
+  composes and adds the centering to.
+- The intro is already in the shared `MenuDescriptions.const.ts`, and the types are in the shared
+  `CollapsiblePage.types.ts`.
+
+**Specs.** The Collapsible tests moved out of `e2e/accordion.spec.ts` into `e2e/collapsible.spec.ts`, in one block
+whose title carries `@solid`. Once all three frameworks are ported, take the tag off and run the file in all four
+Playgrounds. It has not been run since it was written, so the first run is also the first check.
+
+---
+
+## 19. `Breadcrumbs`' docs exist in Solid only
+
+Reachable in the React, Vue and Svelte Playgrounds. The Breadcrumbs page there has neither a Docs page nor an example:
+its page file and examples were removed in all four frameworks, and only Solid has the Docs page that replaces them,
+so the other three list nothing under `Breadcrumbs` and the menu hides it. The Solid files in
+`playground-solid/src/App/Pages/BreadcrumbsPage/` are the reference; everything shared is already in `playground/`.
+
+**Decided, not yet built**, in each of `playground-react`, `playground-vue` and `playground-svelte`: `BreadcrumbsDocs`
+and a `docs` entry on `Breadcrumbs` in the menu config, with two examples under `Docs/`. Copy the order, the section
+title and text, the knobs' keys, hints and `controls` strings, word for word.
+
+- **The state**: the Docs page holds only the knobs' flags (disabled, separators, link component). Each example owns
+  its own depth, starting at the whole shared `TRAIL` (four crumbs), and builds its crumbs by slicing the trail to it.
+  Pressing a crumb sets the depth to that crumb's place, so the crumbs after it leave the trail.
+- **Basic** is the trail named "Trail", with two knobs: **Separator** (a picker over `BREADCRUMB_SEPARATORS` from the
+  shared const, `/`, `>`, `-` and `none`, starting on `/`; `none` passes no separator slot at all, the rest pass the
+  glyph as the children of `PageBreadcrumbSeparator`, which draws `/` when given none) and **Disabled** (sets
+  `isDisabled` on every crumb, last, per the docs rule). Below the trail, a restore
+  button (id `basicReset`, aria label "Restore the trail", the `replay` glyph from `CONTROL_GLYPHS`, disabled while the
+  trail is whole) sets the depth back to the whole trail.
+- **Links** is the same trail named "Linked trail" with a separator, each crumb given an `href` of
+  `#breadcrumb-<value>`, the same restore button (id `linksReset`), and one knob, **Custom link component**, off by default.
+  When on, the crumbs are drawn with a small custom link component of the example's own (named `CustomBreadcrumbLink`) that
+  adds `data-link-component` to an anchor; when off, the native HTML anchor element is used.
+- Each framework's `PageBreadcrumbSeparator` painter takes the glyph as its children (a slot or snippet in Vue and
+  Svelte) and draws `/` when given none; today they draw a fixed `/`.
+- The intro is already in the shared `MenuDescriptions.const.ts`, and the types are in the shared
+  `BreadcrumbsPage.types.ts`.
+
+**Specs.** `e2e/breadcrumbs.spec.ts` was rewritten around the Docs page, in one block whose title carries `@solid`.
+Once all three frameworks are ported, take the tag off and run it in all four Playgrounds. It has not been run since it
+was rewritten, so the first run is also the first check.
 
 ---
 

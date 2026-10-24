@@ -233,19 +233,19 @@ test.describe("a table of contents following its own scrolling box", () => {
  * mark until the reader does something of their own, since the end rule alone would hand a press of the
  * second-to-last link to the last one.
  *
- * The Playground's Breadcrumbs Docs page is the case: it ends on short tables, and its table of contents is the library's own
+ * The Playground's Breadcrumbs API page is the case: it ends on short tables, and its table of contents is the library's own
  * table of contents. Each test checks that the page really does end short before it relies on it, so a page that
  * grows past the problem fails with that said rather than passing for the wrong reason.
  */
 test.describe("a table of contents on a page whose last sections are short", () => {
-    const DOCS = '[data-view="docs"]';
-    const LINKS = `${DOCS} nav a`;
+    const API = '[data-view="api"]';
+    const LINKS = `${API} nav a`;
     const MARKED = `${LINKS}[aria-current="location"]`;
     const WHEEL_STEP = 120;
 
     const scrollerOf = (page: Page) =>
         page
-            .locator(`${DOCS} [data-api-group]`)
+            .locator(`${API} [data-api-group]`)
             .first()
             .evaluateHandle((element) => {
                 let node = element.parentElement;
@@ -283,7 +283,7 @@ test.describe("a table of contents on a page whose last sections are short", () 
     };
 
     test.beforeEach(async ({ page }) => {
-        await page.goto("/breadcrumbs/docs");
+        await page.goto("/breadcrumbs/api");
         await expect(page.locator(LINKS).first()).toBeVisible();
     });
 
@@ -295,7 +295,7 @@ test.describe("a table of contents on a page whose last sections are short", () 
         await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
         await page.mouse.wheel(0, 100_000);
         await expect.poll(() => isAtEnd(scroller), "the page reaches its end").toBe(true);
-        await waitUntilStill(page.locator(`${DOCS} [data-api-group]`).first());
+        await waitUntilStill(page.locator(`${API} [data-api-group]`).first());
 
         await expect(links.last(), "the last link is the current one").toHaveAttribute("aria-current", "location");
         await expect(page.locator(MARKED), "and no other is").toHaveCount(1);

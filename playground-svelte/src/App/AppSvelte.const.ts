@@ -15,12 +15,10 @@ export {
     FIXED_ANCHOR_RATIO,
 } from "@thewaver/ss-playground/App/App.const";
 
-const AccordionPage = () => import("./Pages/Accordions/AccordionPage/AccordionPage.svelte");
-const CollapsiblePage = () => import("./Pages/Accordions/CollapsiblePage/CollapsiblePage.svelte");
 const AudioSwitcherPage = () => import("./Pages/AudioSwitcherPage/AudioSwitcherPage.svelte");
 const BracketPage = () => import("./Pages/BracketPage/BracketPage.svelte");
-const BreadcrumbsPage = () => import("./Pages/BreadcrumbsPage/BreadcrumbsPage.svelte");
 const ButtonPage = () => import("./Pages/ButtonPage/ButtonPage.svelte");
+const ButtonDocs = () => import("./Pages/ButtonPage/ButtonDocs.svelte");
 const CalendarPage = () => import("./Pages/CalendarPage/CalendarPage.svelte");
 const CardStackPage = () => import("./Pages/CardStackPage/CardStackPage.svelte");
 const CarouselPage = () => import("./Pages/Carousels/CarouselPage/CarouselPage.svelte");
@@ -103,7 +101,6 @@ const SelectPage = () => import("./Pages/SelectPage/SelectPage.svelte");
 const ShapePage = () => import("./Pages/ShapePage/ShapePage.svelte");
 const ShapeRevealPage = () => import("./Pages/ShapeRevealPage/ShapeRevealPage.svelte");
 const SidebarPage = () => import("./Pages/SidebarPage/SidebarPage.svelte");
-const SlideButtonPage = () => import("./Pages/SlideButtonPage/SlideButtonPage.svelte");
 const SortableGridPage = () => import("./Pages/SortableGridPage/SortableGridPage.svelte");
 const SortablePage = () => import("./Pages/SortablePage/SortablePage.svelte");
 const SplitPanePage = () => import("./Pages/SplitPanePage/SplitPanePage.svelte");
@@ -262,17 +259,14 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                 children: [
                     {
                         name: "Accordion",
-                        component: AccordionPage,
                     },
                     {
                         name: "Collapsible",
-                        component: CollapsiblePage,
                     },
                 ],
             },
             {
                 name: "Breadcrumbs",
-                component: BreadcrumbsPage,
             },
             {
                 name: "Buttons",
@@ -280,10 +274,10 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                     {
                         name: "Button",
                         component: ButtonPage,
+                        docs: ButtonDocs,
                     },
                     {
                         name: "SlideButton",
-                        component: SlideButtonPage,
                     },
                 ],
             },

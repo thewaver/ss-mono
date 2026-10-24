@@ -67,7 +67,7 @@ const filteredNodes = computed(() => {
 
         if (isSearching.value) return config.name.toLocaleLowerCase().includes(term);
 
-        return showsDescriptionOnly.value || config.component !== undefined;
+        return showsDescriptionOnly.value || config.component !== undefined || config.docs !== undefined;
     };
 
     return menuNodes
@@ -120,6 +120,10 @@ const setExpanded = (next: unknown[]) => {
     else browseExpanded.value = next as MenuNodeConfig[];
 };
 
+const expandAll = () => {
+    setExpanded(AppUtils.collectBranchValues(filteredNodes.value));
+};
+
 const goToPage = (pageName: string) => {
     const config = VISIBLE_COMPONENT_CONFIGS.find((candidate) => candidate.name === pageName);
 
@@ -137,7 +141,7 @@ const computeNodeText = (node: TreeNode<MenuNodeConfig>) => node.value.name;
             :page-names="VISIBLE_PAGE_NAMES"
             @go-to-about="() => void router.push('/')"
             @go-to-page="goToPage"
-            @expand-all="() => setExpanded(AppUtils.collectBranchValues(filteredNodes))"
+            @expand-all="expandAll"
             @collapse-all="() => setExpanded([])"
         />
 

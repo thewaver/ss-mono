@@ -1,18 +1,17 @@
 export const EXAMPLE_NAMES = {
-    default: "Default",
-    described: "Described by its field",
-    slideOnly: "Slide only",
-    holdOnly: "Hold only",
-    vertical: "Vertical",
-    rightToLeft: "In a right-to-left box",
-    held: "Held at the end by the owner",
-    disabled: "Disabled",
-    reachable: "Disabled + reachable",
-    errored: "Error",
+    arming: "Arm all three",
 };
 
 export const EXAMPLES_ROOT = "/src/App/Pages/SlideButtonPage/Examples";
 
-export const PERCENT = 100;
+export const DOCS_ROOT = "/src/App/Pages/SlideButtonPage/Docs";
 
 export const FIELD_WIDTH = 110;
+
+export const LOCK_COUNT = 3;
+
+export const TURN_DEG = 180;
+
+export const FINALE_CYCLE_MS = 500;
+
+export const FINALE_PAUSE_MS = 500;

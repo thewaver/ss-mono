@@ -45,7 +45,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 test("the spine's own page lists its two angle rules among its exports", async ({ page }) => {
-    await page.goto("/spine/docs");
+    await page.goto("/spine/api");
 
     await expect(page.locator('[data-api-table="SpineUtils"] [data-api-row="radial"]')).toBeVisible();
     await expect(page.locator('[data-api-table="SpineUtils"] [data-api-row="leaves"]')).toBeVisible();

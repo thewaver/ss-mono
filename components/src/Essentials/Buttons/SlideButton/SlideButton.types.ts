@@ -20,6 +20,16 @@ export type SlideButtonRenderProps = {
     isHolding: boolean;
 };
 
+export type BaseSlideButtonValues = {
+    /**
+     * What a screen reader says about how to use the button, read after its name: how to confirm it without sliding,
+     * such as which key to hold. Nothing else tells somebody who cannot see the thumb that a plain press does nothing,
+     * so a button given none warns in the console when it is set up. It is the consumer's own text, in the page's
+     * language, and a description from an enclosing form field is read as well.
+     */
+    ariaDescription?: string;
+};
+
 export type SlideButtonCbs = {
     /** Runs once the slide or the hold has been completed. */
     onActivate?: () => void;

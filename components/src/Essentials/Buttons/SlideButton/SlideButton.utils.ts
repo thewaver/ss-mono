@@ -33,7 +33,23 @@ const computeThumbStart = (progressRatio: number, thumbRatio: number) => progres
  * at any length and along either axis. The one thing to keep in mind is that the thumb occupies part of the track,
  * so full progress is the thumb reaching the far end rather than traveling the track's whole length.
  */
+const computeUndescribedWarning = (propName: string) =>
+    `SlideButton: no ${propName} was given. Nothing else tells a screen reader user that a plain press does nothing and how to confirm the button instead, such as which key to hold — add one.`;
+
 export namespace SlideButtonUtils {
+    /**
+     * Warns, in the console, that a slide button has no description of how to confirm it.
+     *
+     * Call it once per button, when it is set up. It says nothing when a description was given, and an empty one
+     * counts as none, since a reader would hear nothing.
+     *
+     * @param ariaDescription What the caller gave the button, if anything.
+     * @param propName What the caller's framework calls the prop, so the warning names what they actually wrote.
+     */
+    export const warnIfUndescribed = (ariaDescription: string | undefined, propName: string) => {
+        if (!ariaDescription) console.warn(computeUndescribedWarning(propName));
+    };
+
     /**
      * How long the track is along the axis the thumb travels.
      *

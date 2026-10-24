@@ -9,5 +9,11 @@
 </script>
 
 {#if config}
-    <PageDocsView name={config.name} description={MENU_DESCRIPTIONS[config.name]} />
+    <PageDocsView description={MENU_DESCRIPTIONS[config.name]}>
+        {#if config.docs}
+            {#await config.docs() then { default: Docs }}
+                <Docs />
+            {/await}
+        {/if}
+    </PageDocsView>
 {/if}

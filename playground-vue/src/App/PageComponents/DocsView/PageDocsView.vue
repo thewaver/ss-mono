@@ -1,112 +1,66 @@
 <script setup lang="ts">
-import type { ApiGroup, ApiGroupKind } from "virtual:component-api";
-import { type ComponentPublicInstance, computed, shallowRef, watch } from "vue";
+import { computed, shallowRef } from "vue";
 
 import { TableOfContents } from "@thewaver/ss-components-vue";
 import type { TableOfContentsLink } from "@thewaver/ss-components-vue";
+import { toDocsSectionId } from "@thewaver/ss-playground/App/PageComponents/DocsSection/DocsSection.utils";
 import {
+    DOCS_INTRO_TITLE,
     MIN_TABLE_OF_CONTENTS_LINKS,
     TABLE_OF_CONTENTS_GAP,
     TABLE_OF_CONTENTS_LABEL,
 } from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.const";
 import * as styles from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.css";
-import type { DocsTableOfContentsEntry } from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.types";
-import {
-    loadApiGroups,
-    toDocsGroupId,
-    toDocsTableId,
-    toDocsTableOfContents,
-} from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.utils";
+import type {
+    DocsSectionRegistration,
+    DocsTableOfContentsEntry,
+} from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.types";
 
 import PageTableOfContentsContent from "../../StyledComponents/TableOfContentsContent/TableOfContentsContent.vue";
-import type { PageDocsViewProps } from "./DocsViewVue.types";
-import PageDocsTable from "./PageDocsTable.vue";
+import { provideDocsViewContext } from "./DocsView.context";
+import type { PageDocsViewProps, PageDocsViewSlots } from "./DocsViewVue.types";
 
-const GROUP_TITLES: Record<ApiGroupKind, string> = {
-    props: "Props",
-    components: "Components",
-    context: "Context",
-    utilities: "Utilities",
-    classes: "Classes",
-    types: "Types",
-};
+const SECTION_DEPTH = 0;
 
-const props = defineProps<PageDocsViewProps>();
+defineProps<PageDocsViewProps>();
 
-const groups = shallowRef<ApiGroup[]>();
-const headingRefs = shallowRef<Record<string, HTMLElement>>({});
+defineSlots<PageDocsViewSlots>();
+
+const intro = shallowRef<HTMLElement>();
+const sections = shallowRef<DocsSectionRegistration[]>([]);
+
+provideDocsViewContext({
+    register: (section) => {
+        sections.value = [...sections.value, section];
+
+        return () => {
+            sections.value = sections.value.filter((candidate) => candidate !== section);
+        };
+    },
+});
 
 const links = computed((): TableOfContentsLink<DocsTableOfContentsEntry>[] =>
-    toDocsTableOfContents(groups.value ?? [], GROUP_TITLES).map((entry) => ({
-        value: entry,
-        target: headingRefs.value[entry.id],
-        href: `#${entry.id}`,
-        depth: entry.depth,
-    })),
-);
+    [...(intro.value ? [{ title: DOCS_INTRO_TITLE, element: intro.value }] : []), ...sections.value].map(
+        ({ title, element }) => {
+            const id = toDocsSectionId(title);
 
-const setHeadingRef = (id: string) => (element: Element | ComponentPublicInstance | null) => {
-    if (!(element instanceof HTMLElement)) return;
-
-    if (headingRefs.value[id] === element) return;
-
-    headingRefs.value = { ...headingRefs.value, [id]: element };
-};
-
-watch(
-    () => props.name,
-    (name, _previous, onCleanup) => {
-        let isCurrent = true;
-
-        onCleanup(() => {
-            isCurrent = false;
-        });
-
-        groups.value = undefined;
-        loadApiGroups(name).then((loaded) => {
-            if (isCurrent) groups.value = loaded;
-        });
-    },
-    { immediate: true },
+            return {
+                value: { id, title, depth: SECTION_DEPTH },
+                target: element,
+                href: `#${id}`,
+                depth: SECTION_DEPTH,
+            };
+        },
+    ),
 );
 </script>
 
 <template>
     <div :class="styles.docsLayout" data-view="docs">
         <div :class="styles.docsView">
-            <p :class="styles.docsLead">{{ description }}</p>
+            <p ref="intro" :id="toDocsSectionId(DOCS_INTRO_TITLE)" :class="styles.docsLead">{{ description }}</p>
 
-            <template v-if="groups === undefined" />
-
-            <template v-else-if="groups.length">
-                <section
-                    v-for="group in groups"
-                    :key="group.kind"
-                    :class="styles.docsGroup"
-                    :data-api-group="group.kind"
-                >
-                    <h2
-                        :id="toDocsGroupId(group.kind)"
-                        :ref="setHeadingRef(toDocsGroupId(group.kind))"
-                        :class="styles.docsGroupTitle"
-                    >
-                        {{ GROUP_TITLES[group.kind] }}
-                    </h2>
-
-                    <PageDocsTable
-                        v-for="(table, index) in group.tables"
-                        :key="`${table.name}-${index}`"
-                        :table="table"
-                        :unit="name"
-                        :heading-id="toDocsTableId(group.kind, table.name)"
-                        :heading-ref="setHeadingRef(toDocsTableId(group.kind, table.name))"
-                    />
-                </section>
-            </template>
-
-            <p v-else :class="styles.docsEmpty">
-                {{ `${name} exports nothing of its own, so there is nothing to list.` }}
-            </p>
+            <slot />
         </div>
 
         <aside v-if="links.length >= MIN_TABLE_OF_CONTENTS_LINKS" :class="styles.docsTableOfContents">

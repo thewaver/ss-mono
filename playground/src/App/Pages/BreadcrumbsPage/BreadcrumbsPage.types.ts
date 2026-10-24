@@ -1,13 +1,11 @@
-import type { Breadcrumb } from "@thewaver/ss-components";
+export type BreadcrumbSeparatorKey = "/" | ">" | "-" | "none";
 
-import type { CrumbValue } from "./BreadcrumbTrail.types";
-
-export type BaseBreadcrumbsExampleValues = {
-    crumbs: Breadcrumb<CrumbValue>[];
+export type BaseBreadcrumbsBasicDocsExampleValues = {
+    isDisabled: boolean;
+    separator: BreadcrumbSeparatorKey;
 };
 
-export type BaseBreadcrumbsExampleCbs = {
-    onSelect?: (value: CrumbValue) => void;
+export type BaseBreadcrumbsLinksDocsExampleValues = {
+    isDisabled: boolean;
+    hasLinkComponent: boolean;
 };
-
-export type BaseBreadcrumbsExampleProps = BaseBreadcrumbsExampleValues & BaseBreadcrumbsExampleCbs;

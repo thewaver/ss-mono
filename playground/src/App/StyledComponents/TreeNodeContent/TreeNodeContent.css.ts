@@ -24,7 +24,7 @@ export const treeNodeContent = style({
         [`&.${isCategory}`]: {
             textTransform: "uppercase",
             fontWeight: "bold",
-            color: `hsl(from ${layerVars.contrast} h 50% 75%)`,
+            filter: "saturate(200%) brightness(75%)",
         },
         [`&.${isHovered}`]: {
             backgroundColor: `rgb(from ${layerVars.contrast} r g b / 25%)`,

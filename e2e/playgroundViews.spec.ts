@@ -2,10 +2,11 @@ import { type Locator, type Page, expect, test } from "@playwright/test";
 
 const VIEW_TABS = "[data-view-tabs]";
 const DOCS = '[data-view="docs"]';
+const API = '[data-view="api"]';
 const TABS_PROPS = '[data-api-table="TabsProps"]';
 
 /**
- * Every component page is two views over one component — what it is and what it takes, then what it looks
+ * Every component page is three views over one component — what it is, what it takes, then what it looks
  * like working — and which one you are on is in the URL rather than in component state, so a view can be
  * linked to and the back button walks them. Examples is the index rather than a segment of its own: it is
  * what the pages already were, every link and every spec in this suite already points at it, and a tab
@@ -28,14 +29,29 @@ test("each tab carries its view into the URL, and a deep link lands on it", asyn
     await page.locator(VIEW_TABS).getByRole("tab", { name: "Docs" }).click();
     await expect(page).toHaveURL(/\/tabs\/docs$/);
     await expect(page.locator(DOCS), "Docs holds the page's own description").toBeVisible();
-    await expect(page.locator(TABS_PROPS), "and the props table under it").toBeVisible();
+
+    await page.locator(VIEW_TABS).getByRole("tab", { name: "API" }).click();
+    await expect(page).toHaveURL(/\/tabs\/api$/);
+    await expect(page.locator(API), "API holds the tables").toBeVisible();
+    await expect(page.locator(TABS_PROPS), "starting with the props table").toBeVisible();
 
     await page.locator(VIEW_TABS).getByRole("tab", { name: "Examples" }).click();
     await expect(page).toHaveURL(/\/tabs$/);
 
-    await page.goto("/tabs/docs");
+    await page.goto("/tabs/api");
     await expect(page.locator(TABS_PROPS), "and the same address reached cold lands on the same view").toBeVisible();
+    await expect(page.locator(VIEW_TABS).getByRole("tab", { name: "API" })).toHaveAttribute("aria-selected", "true");
+
+    await page.goto("/tabs/docs");
     await expect(page.locator(VIEW_TABS).getByRole("tab", { name: "Docs" })).toHaveAttribute("aria-selected", "true");
+});
+
+test("Docs is the description alone, and the tables are on the API view", async ({ page }) => {
+    await page.goto("/tabs/docs");
+    await expect(page.locator(DOCS)).toBeVisible();
+    await expect(page.locator(`${DOCS} table`), "the Docs view draws no table").toHaveCount(0);
+    await expect(page.locator("[data-api-table]"), "and carries none of the export tables").toHaveCount(0);
+    await expect(page.locator(`${DOCS} nav`), "nor the table of contents, which belongs to the tables").toHaveCount(0);
 });
 
 /**
@@ -72,7 +88,7 @@ const findDeclaredRow = async (page: Page, table: string, prop: string, depth = 
  * would go red for that without anything being wrong.
  */
 test("the props table is the published type, not a transcription of it @solid", async ({ page }) => {
-    await page.goto("/tabs/docs");
+    await page.goto("/tabs/api");
     await expect(page.locator(TABS_PROPS)).toBeVisible();
 
     const required = page.locator(TABS_PROPS).locator('[data-api-row="renderTab"]');
@@ -100,7 +116,7 @@ test("the props table is the published type, not a transcription of it @solid", 
  * `ReactNode`, and a prop carries its value as it is, so there is no accessor anywhere in the row.
  */
 test("the props table is the published type, not a transcription of it @react", async ({ page }) => {
-    await page.goto("/tabs/docs");
+    await page.goto("/tabs/api");
     await expect(page.locator(TABS_PROPS)).toBeVisible();
 
     const required = page.locator(TABS_PROPS).locator('[data-api-row="renderTab"]');
@@ -126,7 +142,7 @@ test("the props table is the published type, not a transcription of it @react", 
  * snippet, so its type is a `Snippet` of the arguments it is handed, and a prop carries its value as it is.
  */
 test("the props table is the published type, not a transcription of it @svelte", async ({ page }) => {
-    await page.goto("/tabs/docs");
+    await page.goto("/tabs/api");
     await expect(page.locator(TABS_PROPS)).toBeVisible();
 
     const required = page.locator(TABS_PROPS).locator('[data-api-row="renderTab"]');
@@ -153,7 +169,7 @@ test("the props table is the published type, not a transcription of it @svelte",
  * and a prop carries its value as it is.
  */
 test("the props table is the published type, not a transcription of it @vue", async ({ page }) => {
-    await page.goto("/tabs/docs");
+    await page.goto("/tabs/api");
     await expect(page.locator(TABS_PROPS)).toBeVisible();
 
     const required = page.locator('[data-api-table="TabsSlots"]').locator('[data-api-row="renderTab"]');
@@ -180,7 +196,7 @@ test("the props table is the published type, not a transcription of it @vue", as
  * declares rather than against a count, for the same reason as above.
  */
 test("a page lists every export of its unit, not only the props of its main component", async ({ page }) => {
-    await page.goto("/tabs/docs");
+    await page.goto("/tabs/api");
     await expect(
         page.locator('[data-api-table="TabPanelProps"]'),
         "a second component in the same folder has its props drawn on this page",
@@ -190,7 +206,7 @@ test("a page lists every export of its unit, not only the props of its main comp
         "and the component itself is listed with its signature",
     ).toContainText("TabPanelProps");
 
-    await page.goto("/anchor/docs");
+    await page.goto("/anchor/api");
     await expect(page.locator('[data-api-group="props"]'), "an abstract has no props section").toHaveCount(0);
     await expect(
         page.locator('[data-api-table="AnchorUtils"] [data-api-row="getHPlacementShift"]'),
@@ -199,28 +215,28 @@ test("a page lists every export of its unit, not only the props of its main comp
 });
 
 test("a page whose unit exports nothing says so rather than drawing empty tables", async ({ page }) => {
-    await page.goto("/timed-gradients/docs");
-    await expect(page.locator(`${DOCS} table`), "no table is drawn").toHaveCount(0);
-    await expect(page.locator(DOCS), "and the view says why").toContainText("exports nothing");
+    await page.goto("/timed-gradients/api");
+    await expect(page.locator(`${API} table`), "no table is drawn").toHaveCount(0);
+    await expect(page.locator(API), "and the view says why").toContainText("exports nothing");
 });
 
 /**
- * Every Docs page carries a table of contents, drawn by the library's own `TableOfContents`: one link per group and
+ * Every API page carries a table of contents, drawn by the library's own `TableOfContents`: one link per group and
  * one per table that has a heading. What it promises is a relationship between two lists — the links and the
  * headings — so the check is that they are the same list in the same order, read off the page rather than counted.
  * Breadcrumbs is used because its page has several groups and several headed tables.
  */
-test.describe("the table of contents beside a Docs page", () => {
-    const TABLE_OF_CONTENTS = `${DOCS} nav`;
+test.describe("the table of contents beside an API page", () => {
+    const TABLE_OF_CONTENTS = `${API} nav`;
     const LINKS = `${TABLE_OF_CONTENTS} a`;
-    const HEADINGS = `${DOCS} [data-api-group] h2, ${DOCS} [data-api-group] h3`;
+    const HEADINGS = `${API} [data-api-group] h2, ${API} [data-api-group] h3`;
     const MARKED = `${LINKS}[aria-current="location"]`;
 
     const targetOf = async (page: Page, index: number) =>
         page.locator(`[id="${((await page.locator(LINKS).nth(index).getAttribute("href")) ?? "").replace(/^#/, "")}"]`);
 
     test.beforeEach(async ({ page }) => {
-        await page.goto("/breadcrumbs/docs");
+        await page.goto("/breadcrumbs/api");
         await expect(page.locator(LINKS).first()).toBeVisible();
     });
 
@@ -275,8 +291,37 @@ test.describe("the table of contents beside a Docs page", () => {
 
     /** A table of contents of one link would only repeat the page's title, so a page that would get fewer has none. */
     test("is left out of a page with too few sections", async ({ page }) => {
-        await page.goto("/timed-gradients/docs");
-        await expect(page.locator(DOCS), "the docs view is up").toContainText("exports nothing");
+        await page.goto("/timed-gradients/api");
+        await expect(page.locator(API), "the API view is up").toContainText("exports nothing");
         await expect(page.locator(TABLE_OF_CONTENTS), "and carries no table of contents").toHaveCount(0);
     });
+});
+
+/**
+ * The Docs view has a table of contents of its own, built from what the page holds: the introduction first, which
+ * has no heading and is linked by its paragraph, then each section by its heading. The check is that the links and
+ * those targets are the same list in the same order, read off the page rather than counted.
+ */
+test("the Docs view's table of contents lists the introduction, then each section, in reading order", async ({
+    page,
+}) => {
+    await page.goto("/button/docs");
+
+    const links = page.locator(`${DOCS} nav a`);
+
+    await expect(links.first()).toBeVisible();
+
+    const targets = await links.evaluateAll((items) =>
+        items.map((link) => (link.getAttribute("href") ?? "").replace(/^#/, "")),
+    );
+    const intro = await page.locator(`${DOCS} p`).first().getAttribute("id");
+    const sections = await page
+        .locator(`${DOCS} [data-docs-section] h2`)
+        .evaluateAll((headings) => headings.map((heading) => heading.id));
+
+    expect(sections.length, "the page has sections to list").toBeGreaterThan(0);
+    expect(targets, "the introduction, then every section, in the order the page shows them").toEqual([
+        intro,
+        ...sections,
+    ]);
 });

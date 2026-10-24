@@ -369,3 +369,26 @@ describe("createGesture along a vertical track", () => {
         expect(onActivate).toHaveBeenCalledTimes(1);
     });
 });
+
+describe("warnIfUndescribed", () => {
+    const warnCount = (ariaDescription: string | undefined) => {
+        const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+        SlideButtonUtils.warnIfUndescribed(ariaDescription, "ariaDescription");
+
+        const calls = warn.mock.calls.length;
+
+        warn.mockRestore();
+
+        return calls;
+    };
+
+    it("warns once when the button was given no description, or an empty one", () => {
+        expect(warnCount(undefined)).toBe(1);
+        expect(warnCount("")).toBe(1);
+    });
+
+    it("says nothing when it was given one", () => {
+        expect(warnCount("Hold Enter or Space to send.")).toBe(0);
+    });
+});

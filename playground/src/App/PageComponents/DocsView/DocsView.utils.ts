@@ -36,7 +36,7 @@ export const toDocsIncludeHref = (include: ApiInclude, unit: string) => {
 
     if (include.target.unit.toLowerCase() === unit.toLowerCase()) return fragment;
 
-    const route = toPageViewRoute(`/${StringUtils.camelToKebabCase(include.target.unit)}`, "docs");
+    const route = toPageViewRoute(`/${StringUtils.camelToKebabCase(include.target.unit)}`, "api");
 
     return toOwnAppHref(`${route}${fragment}`);
 };

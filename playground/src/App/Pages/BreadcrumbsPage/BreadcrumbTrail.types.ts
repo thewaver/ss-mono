@@ -1,1 +1,1 @@
-export type CrumbValue = "home" | "library" | "inputs" | "text" | "field";
+export type CrumbValue = "home" | "library" | "inputs" | "text";

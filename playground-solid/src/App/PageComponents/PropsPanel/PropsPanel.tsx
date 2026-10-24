@@ -4,6 +4,7 @@ import { Show, createSignal } from "solid-js";
 import { Button, access } from "@thewaver/ss-components-solid";
 import { EXAMPLES_ONLY_PROP } from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.const";
 import {
+    DEFAULT_HAS_RESET,
     NOTHING_TO_RESET,
     SAMPLE_SELECTOR_ALONE,
 } from "@thewaver/ss-playground/App/PageComponents/PropsPanel/PropsPanel.const";
@@ -45,7 +46,9 @@ export const PagePropsPanel = (props: ParentProps<PagePropsPanelProps>) => {
                 <PropsPanelContextProvider value={{ scope: props.scope }}>
                     {props.children}
 
-                    <Show when={getResets().length > getLeastToReset()}>
+                    <Show
+                        when={(access(props.hasReset) ?? DEFAULT_HAS_RESET) && getResets().length > getLeastToReset()}
+                    >
                         <PageProp
                             key={"resetPanel"}
                             label={"These controls"}

@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 import { demo } from "./helpers";
 
 const ANCHOR = `${demo("decorated")} button`;
-const OTHER = `${demo("default")} button`;
+const OTHER = `${demo("pending")} button`;
 const TOOLTIP = '[role="tooltip"]';
 
 /** Comfortably past the 200ms fade, so a tooltip that had been withdrawn is unmounted rather than fading. */

@@ -19,12 +19,10 @@ export {
 const lazyPage = <K extends string>(load: () => Promise<Record<K, ComponentType>>, key: K) =>
     lazy(() => load().then((module) => ({ default: module[key] })));
 
-const AccordionPage = lazyPage(() => import("./Pages/Accordions/AccordionPage/AccordionPage"), "AccordionPage");
-const CollapsiblePage = lazyPage(() => import("./Pages/Accordions/CollapsiblePage/CollapsiblePage"), "CollapsiblePage");
 const AudioSwitcherPage = lazyPage(() => import("./Pages/AudioSwitcherPage/AudioSwitcherPage"), "AudioSwitcherPage");
 const BracketPage = lazyPage(() => import("./Pages/BracketPage/BracketPage"), "BracketPage");
-const BreadcrumbsPage = lazyPage(() => import("./Pages/BreadcrumbsPage/BreadcrumbsPage"), "BreadcrumbsPage");
 const ButtonPage = lazyPage(() => import("./Pages/ButtonPage/ButtonPage"), "ButtonPage");
+const ButtonDocs = lazyPage(() => import("./Pages/ButtonPage/ButtonDocs"), "ButtonDocs");
 const CalendarPage = lazyPage(() => import("./Pages/CalendarPage/CalendarPage"), "CalendarPage");
 const CardStackPage = lazyPage(() => import("./Pages/CardStackPage/CardStackPage"), "CardStackPage");
 const CarouselPage = lazyPage(() => import("./Pages/Carousels/CarouselPage/CarouselPage"), "CarouselPage");
@@ -155,7 +153,6 @@ const SelectPage = lazyPage(() => import("./Pages/SelectPage/SelectPage"), "Sele
 const ShapePage = lazyPage(() => import("./Pages/ShapePage/ShapePage"), "ShapePage");
 const ShapeRevealPage = lazyPage(() => import("./Pages/ShapeRevealPage/ShapeRevealPage"), "ShapeRevealPage");
 const SidebarPage = lazyPage(() => import("./Pages/SidebarPage/SidebarPage"), "SidebarPage");
-const SlideButtonPage = lazyPage(() => import("./Pages/SlideButtonPage/SlideButtonPage"), "SlideButtonPage");
 const SortableGridPage = lazyPage(() => import("./Pages/SortableGridPage/SortableGridPage"), "SortableGridPage");
 const SortablePage = lazyPage(() => import("./Pages/SortablePage/SortablePage"), "SortablePage");
 const SplitPanePage = lazyPage(() => import("./Pages/SplitPanePage/SplitPanePage"), "SplitPanePage");
@@ -332,17 +329,14 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                 children: [
                     {
                         name: "Accordion",
-                        component: () => <AccordionPage />,
                     },
                     {
                         name: "Collapsible",
-                        component: () => <CollapsiblePage />,
                     },
                 ],
             },
             {
                 name: "Breadcrumbs",
-                component: () => <BreadcrumbsPage />,
             },
             {
                 name: "Buttons",
@@ -350,10 +344,10 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                     {
                         name: "Button",
                         component: () => <ButtonPage />,
+                        docs: () => <ButtonDocs />,
                     },
                     {
                         name: "SlideButton",
-                        component: () => <SlideButtonPage />,
                     },
                 ],
             },

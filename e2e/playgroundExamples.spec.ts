@@ -11,7 +11,7 @@ import { type Page, expect, test } from "@playwright/test";
  * The readout is kept out of the sizing by being laid out at zero width with a minimum of the full box, so
  * it renders across the box it is given and contributes nothing to working out how wide that box should be.
  */
-const PAGES_WITH_READOUTS = ["/drum-wheel", "/accordion", "/button"];
+const PAGES_WITH_READOUTS = ["/drum-wheel", "/button"];
 
 const SAMPLE_COUNT = 12;
 const SAMPLE_GAP_MS = 150;

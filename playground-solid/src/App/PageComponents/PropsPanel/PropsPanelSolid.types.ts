@@ -5,4 +5,5 @@ export type { PagePropsPanelScope } from "@thewaver/ss-playground/App/PageCompon
 
 export type PagePropsPanelProps = AccessorProps<{
     scope: PagePropsPanelScope;
+    hasReset?: boolean;
 }>;

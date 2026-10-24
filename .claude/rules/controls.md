@@ -61,6 +61,11 @@ longer excluded from form submission. What used to lean on the attribute:
   skips disabled items hides the set's shape from a screen-reader user, and a composite whose current item is
   disabled would otherwise have no tab stop at all. It needs no tooltip guard, since a roving item is `tabindex="-1"`
   unless current. Set it only on such an item, gated on the composite itself being enabled.
+- **A disabled control that is not reachable shows no tooltip, by pointer or by keyboard** — the user's call, so
+  there is no gap between the two (WCAG 2.1.1: "All functionality of the content is operable through a keyboard
+  interface"; a reason for the disabling that only a hovering pointer can read is the gap). While `isDisabled` and
+  not reachable, `InteractionWrapper` offers no tooltip props, and the tooltip's own listeners then have no anchor.
+  The opt-in that brings the tooltip back is the same one that brings the keyboard back: `isReachableWhenDisabled`.
 - **A control reachable while disabled keeps its focus ring.**
 
 **Disabled and reachable looks exactly like disabled.** A control that looks actionable and does nothing is worse

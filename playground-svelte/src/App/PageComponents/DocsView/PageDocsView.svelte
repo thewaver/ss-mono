@@ -1,108 +1,68 @@
 <script lang="ts">
     import { untrack } from "svelte";
-    import type { ApiGroup, ApiGroupKind } from "virtual:component-api";
 
     import { TableOfContents } from "@thewaver/ss-components-svelte";
     import type { TableOfContentsLink } from "@thewaver/ss-components-svelte";
-    import * as styles from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.css";
-    import type { DocsTableOfContentsEntry } from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.types";
+    import { toDocsSectionId } from "@thewaver/ss-playground/App/PageComponents/DocsSection/DocsSection.utils";
     import {
-        loadApiGroups,
-        toDocsGroupId,
-        toDocsTableOfContents,
-        toDocsTableId,
-    } from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.utils";
-
-    import PageTableOfContentsContent from "../../StyledComponents/TableOfContentsContent/TableOfContentsContent.svelte";
-    import type { PageDocsViewProps } from "./DocsViewSvelte.types";
-    import PageDocsTable from "./PageDocsTable.svelte";
-    import {
+        DOCS_INTRO_TITLE,
         MIN_TABLE_OF_CONTENTS_LINKS,
         TABLE_OF_CONTENTS_GAP,
         TABLE_OF_CONTENTS_LABEL,
     } from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.const";
+    import * as styles from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.css";
+    import type {
+        DocsSectionRegistration,
+        DocsTableOfContentsEntry,
+    } from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.types";
 
-    const GROUP_TITLES: Record<ApiGroupKind, string> = {
-        props: "Props",
-        components: "Components",
-        context: "Context",
-        utilities: "Utilities",
-        classes: "Classes",
-        types: "Types",
-    };
+    import PageTableOfContentsContent from "../../StyledComponents/TableOfContentsContent/TableOfContentsContent.svelte";
+    import { setDocsViewContext } from "./DocsView.context";
+    import type { PageDocsViewProps } from "./DocsViewSvelte.types";
+
+    const SECTION_DEPTH = 0;
 
     let props: PageDocsViewProps = $props();
 
-    let groups = $state.raw<ApiGroup[]>();
-    let headingRefs = $state<Record<string, HTMLElement>>({});
-    let loadToken = 0;
+    let intro = $state.raw<HTMLElement>();
+    let sections = $state.raw<DocsSectionRegistration[]>([]);
 
-    $effect(() => {
-        const name = props.name;
-
-        untrack(() => {
-            const token = ++loadToken;
-
-            groups = undefined;
-
-            void loadApiGroups(name).then((loaded) => {
-                if (token !== loadToken) return;
-
-                groups = loaded;
+    setDocsViewContext({
+        register: (section) => {
+            untrack(() => {
+                sections = [...sections, section];
             });
-        });
+
+            return () => {
+                sections = sections.filter((candidate) => candidate !== section);
+            };
+        },
     });
 
     const links = $derived(
-        toDocsTableOfContents(groups ?? [], GROUP_TITLES).map(
-            (entry): TableOfContentsLink<DocsTableOfContentsEntry> => ({
-                value: entry,
-                target: headingRefs[entry.id],
-                href: `#${entry.id}`,
-                depth: entry.depth,
-            }),
+        [...(intro ? [{ title: DOCS_INTRO_TITLE, element: intro }] : []), ...sections].map(
+            ({ title, element }): TableOfContentsLink<DocsTableOfContentsEntry> => {
+                const id = toDocsSectionId(title);
+
+                return { value: { id, title, depth: SECTION_DEPTH }, target: element, href: `#${id}`, depth: SECTION_DEPTH };
+            },
         ),
     );
 
-    const attachHeading = (id: string) => (element: HTMLElement) => {
-        untrack(() => {
-            headingRefs[id] = element;
-        });
+    const attachIntro = (element: HTMLElement) => {
+        intro = element;
+
+        return () => {
+            intro = undefined;
+        };
     };
 </script>
 
 <div class={styles.docsLayout} data-view={"docs"}>
     <div class={styles.docsView}>
-        <p class={styles.docsLead}>{props.description}</p>
+        <p {@attach attachIntro} id={toDocsSectionId(DOCS_INTRO_TITLE)} class={styles.docsLead}>{props.description}</p>
 
-        {#if groups}
-            {#if groups.length}
-                {#each groups as group (group.kind)}
-                    <section class={styles.docsGroup} data-api-group={group.kind}>
-                        <h2
-                            {@attach attachHeading(toDocsGroupId(group.kind))}
-                            id={toDocsGroupId(group.kind)}
-                            class={styles.docsGroupTitle}
-                        >
-                            {GROUP_TITLES[group.kind]}
-                        </h2>
-
-                        {#each group.tables as table, index (`${table.name}-${index}`)}
-                            <PageDocsTable
-                                {table}
-                                unit={props.name}
-                                headingId={toDocsTableId(group.kind, table.name)}
-                                attachHeading={attachHeading(toDocsTableId(group.kind, table.name))}
-                            />
-                        {/each}
-                    </section>
-                {/each}
-            {:else}
-                <p class={styles.docsEmpty}>
-                    {`${props.name} exports nothing of its own, so there is nothing to list.`}
-                </p>
-            {/if}
-        {/if}
+        {@render props.children?.()}
     </div>
 
     {#if links.length >= MIN_TABLE_OF_CONTENTS_LINKS}

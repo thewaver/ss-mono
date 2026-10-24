@@ -4,36 +4,17 @@ import { COPY_TEXT, EXAMPLES_ROOT, EXAMPLE_NAMES } from "@thewaver/ss-playground
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { CopyExample } from "./Examples/Copy";
+import { CounterExample } from "./Examples/Counter";
 import { DecoratedExample } from "./Examples/Decorated";
-import { DefaultExample } from "./Examples/Default";
-import { DisabledExample } from "./Examples/Disabled";
-import { ErroredExample } from "./Examples/Errored";
 import { PendingExample } from "./Examples/Pending";
-import { ReachableExample } from "./Examples/Reachable";
 
 export const ButtonPage = () => {
-    const [clicks, setClicks] = useState(0);
     const [toggleOn, setToggleOn] = useState(false);
-    const [disabledClicks, setDisabledClicks] = useState(0);
-    const [reachableClicks, setReachableClicks] = useState(0);
-    const [hasError, setHasError] = useState(true);
+    const [count, setCount] = useState(0);
     const [saves, setSaves] = useState(0);
     const [copies, setCopies] = useState(0);
 
     const examples = [
-        {
-            key: "default",
-            name: EXAMPLE_NAMES.default,
-            readout: () => `clicks: ${clicks}`,
-            component: () => (
-                <DefaultExample
-                    onClick={() => {
-                        setClicks((prev) => prev + 1);
-                    }}
-                />
-            ),
-            path: `${EXAMPLES_ROOT}/Default.tsx`,
-        },
         {
             key: "decorated",
             name: EXAMPLE_NAMES.decorated,
@@ -47,46 +28,6 @@ export const ButtonPage = () => {
                 />
             ),
             path: `${EXAMPLES_ROOT}/Decorated.tsx`,
-        },
-        {
-            key: "disabled",
-            name: EXAMPLE_NAMES.disabled,
-            readout: () => `clicks: ${disabledClicks}`,
-            component: () => (
-                <DisabledExample
-                    onClick={() => {
-                        setDisabledClicks((prev) => prev + 1);
-                    }}
-                />
-            ),
-            path: `${EXAMPLES_ROOT}/Disabled.tsx`,
-        },
-        {
-            key: "reachable",
-            name: EXAMPLE_NAMES.reachable,
-            readout: () => `clicks: ${reachableClicks}`,
-            component: () => (
-                <ReachableExample
-                    onClick={() => {
-                        setReachableClicks((prev) => prev + 1);
-                    }}
-                />
-            ),
-            path: `${EXAMPLES_ROOT}/Reachable.tsx`,
-        },
-        {
-            key: "errored",
-            name: EXAMPLE_NAMES.errored,
-            readout: () => `hasError: ${hasError}`,
-            component: () => (
-                <ErroredExample
-                    hasError={hasError}
-                    onClick={() => {
-                        setHasError((prev) => !prev);
-                    }}
-                />
-            ),
-            path: `${EXAMPLES_ROOT}/Errored.tsx`,
         },
         {
             key: "pending",
@@ -116,6 +57,20 @@ export const ButtonPage = () => {
                 />
             ),
             path: `${EXAMPLES_ROOT}/Copy.tsx`,
+        },
+        {
+            key: "counter",
+            name: EXAMPLE_NAMES.counter,
+            readout: () => `count: ${count}`,
+            component: () => (
+                <CounterExample
+                    count={count}
+                    onStep={(step) => {
+                        setCount((prev) => prev + step);
+                    }}
+                />
+            ),
+            path: `${EXAMPLES_ROOT}/Counter.tsx`,
         },
     ];
 

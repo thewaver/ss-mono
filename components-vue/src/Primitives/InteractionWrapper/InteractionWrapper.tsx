@@ -30,13 +30,15 @@ export const InteractionWrapper = defineComponent(
 
         const getIsDisabled = () => props.isDisabled ?? false;
 
+        const getIsReachable = () =>
+            InteractionTrackerUtils.computeIsReachable(
+                getIsDisabled(),
+                props.isReachableWhenDisabled ?? false,
+                props.isFocusableWhenDisabled ?? false,
+            );
+
         const internalFlags = InteractionTrackerVueUtils.useElementFlags(element, getIsDisabled, {
-            isReachable: () =>
-                InteractionTrackerUtils.computeIsReachable(
-                    getIsDisabled(),
-                    props.isReachableWhenDisabled ?? false,
-                    props.isFocusableWhenDisabled ?? false,
-                ),
+            isReachable: getIsReachable,
             isTabbable: () => props.isTabbable,
         });
 
@@ -61,7 +63,7 @@ export const InteractionWrapper = defineComponent(
         const getTooltipDefs = (): SharedTooltipDefs | undefined => {
             const tooltipDefs = props.tooltipDefs;
 
-            if (!tooltipDefs) return undefined;
+            if (!tooltipDefs || (getIsDisabled() && !getIsReachable())) return undefined;
 
             const { renderContent, ...tooltipProps } = tooltipDefs;
 
@@ -77,7 +79,7 @@ export const InteractionWrapper = defineComponent(
                 if (!target) return;
 
                 const claim = () => {
-                    if (props.tooltipDefs) sharedTooltip.claim({ anchorRef: target, getTooltipDefs });
+                    if (getTooltipDefs()) sharedTooltip.claim({ anchorRef: target, getTooltipDefs });
                 };
 
                 target.addEventListener("mouseenter", claim);

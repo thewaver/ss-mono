@@ -1,4 +1,4 @@
-import { keyframes, style } from "@vanilla-extract/css";
+import { createVar, keyframes, style } from "@vanilla-extract/css";
 
 import { layerVars } from "../../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../../Theme.css";
@@ -14,29 +14,11 @@ export const scrollBox = style({
     overflowY: "auto",
 });
 
-export const ROW_HEIGHT = 200;
-export const ROW_PANEL_WIDTH = 240;
+export const ACCORDION_DOCS_MAX_WIDTH = 480;
 
-const slideFromStart = keyframes({
-    "0%": {
-        opacity: 0,
-        transform: "translateX(-40px)",
-    },
-    "100%": {
-        opacity: 1,
-        transform: "none",
-    },
-});
-
-const slideFromEnd = keyframes({
-    "0%": {
-        opacity: 0,
-        transform: "translateX(40px)",
-    },
-    "100%": {
-        opacity: 1,
-        transform: "none",
-    },
+export const docsAccordion = style({
+    width: "100%",
+    maxWidth: ACCORDION_DOCS_MAX_WIDTH,
 });
 
 export const growingButtons = style({
@@ -44,47 +26,110 @@ export const growingButtons = style({
     gap: themeVars.spacing.full,
 });
 
-export const rowStrip = style({
+export const sideExample = style([
+    docsAccordion,
+    {
+        display: "flex",
+        justifyContent: "center",
+    },
+]);
+
+export const ROW_HEIGHT = 200;
+export const ROW_PANEL_WIDTH = 240;
+
+const SLIDE_DISTANCE = 40;
+
+const axisVar = createVar();
+const moveVar = createVar();
+
+const slideIn = keyframes({
+    "0%": {
+        opacity: 0,
+        transform: `translate(calc(${moveVar} * ${axisVar} * ${SLIDE_DISTANCE}px), calc(${moveVar} * (1 - ${axisVar}) * ${SLIDE_DISTANCE}px))`,
+    },
+    "100%": {
+        opacity: 1,
+        transform: "none",
+    },
+});
+
+export const orientationExample = style([
+    docsAccordion,
+    {
+        selectors: {
+            '&[data-orientation="horizontal"]': {
+                vars: { [axisVar]: "1" },
+            },
+            '&[data-orientation="vertical"]': {
+                vars: { [axisVar]: "0" },
+            },
+        },
+    },
+]);
+
+const whenHorizontal = `${orientationExample}[data-orientation="horizontal"] &`;
+const whenVertical = `${orientationExample}[data-orientation="vertical"] &`;
+
+export const orientationStrip = style({
     display: "flex",
     alignItems: "center",
-    justifyContent: "center",
-    height: ROW_HEIGHT,
     padding: themeVars.spacing.full,
     borderRadius: themeVars.borderRadius.half,
     backgroundColor: layerVars.main,
-    transition: `filter ${themeVars.animation.duration}`,
-});
-
-export const rowStripHovered = style({
-    filter: themeVars.hover.filter,
-});
-
-export const rowStripLabel = style({
-    writingMode: "vertical-rl",
-    transform: "rotate(180deg)",
     fontSize: themeVars.fontSize.medium,
-    whiteSpace: "nowrap",
+    transition: `filter ${themeVars.animation.duration}`,
+
+    selectors: {
+        "&:hover": {
+            filter: themeVars.hover.filter,
+        },
+        [whenHorizontal]: {
+            justifyContent: "center",
+            height: ROW_HEIGHT,
+        },
+        [whenVertical]: {
+            width: "100%",
+        },
+    },
 });
 
-export const rowPanel = style({
+export const orientationLabel = style({
+    selectors: {
+        [whenHorizontal]: {
+            writingMode: "vertical-rl",
+            transform: "rotate(180deg)",
+            whiteSpace: "nowrap",
+        },
+    },
+});
+
+export const isEntering = style({});
+
+export const orientationPanel = style({
+    vars: { [moveVar]: "0" },
     display: "flex",
     flexDirection: "column",
-    justifyContent: "center",
     gap: themeVars.spacing.full,
-    width: ROW_PANEL_WIDTH,
-    height: ROW_HEIGHT,
     padding: themeVars.spacing.double,
     borderRadius: themeVars.borderRadius.half,
     backgroundColor: layerVars.main,
     fontSize: themeVars.fontSize.small,
-});
 
-export const rowPanelEnterBackward = style({
-    animationName: slideFromStart,
-    animationFillMode: "both",
-});
-
-export const rowPanelEnterForward = style({
-    animationName: slideFromEnd,
-    animationFillMode: "both",
+    selectors: {
+        [whenHorizontal]: {
+            justifyContent: "center",
+            width: ROW_PANEL_WIDTH,
+            height: ROW_HEIGHT,
+        },
+        '&[data-move="forward"]': {
+            vars: { [moveVar]: "1" },
+        },
+        '&[data-move="backward"]': {
+            vars: { [moveVar]: "-1" },
+        },
+        [`&.${isEntering}[data-move]`]: {
+            animationName: slideIn,
+            animationFillMode: "both",
+        },
+    },
 });

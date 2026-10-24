@@ -60,7 +60,7 @@
     const tooltipProps = $derived.by((): Omit<TooltipProps, "anchorRef"> | undefined => {
         const defs = props.tooltipDefs;
 
-        if (!defs) return undefined;
+        if (!defs || (isDisabled && !isReachable)) return undefined;
 
         return { ...defs, renderContent: tooltipContent };
     });

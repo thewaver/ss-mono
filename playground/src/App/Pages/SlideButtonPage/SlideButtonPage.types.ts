@@ -1,24 +1,18 @@
-export type SlideButtonExampleProps = {
-    onActivate: () => void;
-};
+import type { NavigatorDirection, SlideButtonMode, SlideButtonOrientation } from "@thewaver/ss-components";
 
-export type BaseSlideButtonHeldExampleValues = {
-    isArmed: boolean;
-};
-
-export type BaseSlideButtonHeldExampleCbs = {
-    onActivate: () => void;
-    onReset: () => void;
-};
-
-export type BaseSlideButtonHeldExampleProps = BaseSlideButtonHeldExampleValues & BaseSlideButtonHeldExampleCbs;
-
-export type BaseSlideButtonErroredExampleValues = {
+export type BaseSlideButtonDocsExampleValues = {
+    mode: SlideButtonMode;
+    completionRatio: number;
+    holdDurationMs: number;
+    isDisabled: boolean;
     hasError: boolean;
 };
 
-export type BaseSlideButtonErroredExampleCbs = {
-    onActivate: () => void;
+export type BaseSlideButtonDirectionsDocsExampleValues = {
+    orientation: SlideButtonOrientation;
+    direction: NavigatorDirection;
 };
 
-export type BaseSlideButtonErroredExampleProps = BaseSlideButtonErroredExampleValues & BaseSlideButtonErroredExampleCbs;
+export type BaseSlideButtonArmingExampleCbs = {
+    onArmedCountChange: (count: number) => void;
+};

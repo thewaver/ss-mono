@@ -1,13 +1,27 @@
-import { expect, test } from "@playwright/test";
+import { type Locator, type Page, expect, test } from "@playwright/test";
 
-import { activeMatches, demo, readout, tabIndex } from "./helpers";
+import { activeMatches, demo, prop, readout, tabIndex } from "./helpers";
 
-const DEFAULT = `${demo("default")} button`;
 const DECORATED = `${demo("decorated")} button`;
-const DISABLED = `${demo("disabled")} button`;
-const REACHABLE = `${demo("reachable")} button`;
-const ERROR = `${demo("errored")} button`;
+const PENDING = `${demo("pending")} button`;
 const TOOLTIP = '[role="tooltip"]';
+
+/**
+ * A plain button, a disabled one, a reachable disabled one and an errored one are not examples of their own: they
+ * are the Docs view's live examples, each state behind a knob. So the specs that drive those states drive the knobs
+ * there, and find the example by the key of a knob it holds. The Docs view is in the Solid Playground only so far,
+ * which is what the `@solid` tag keeps the other three from running against.
+ */
+const BASIC = `[data-docs-example]:has(${prop("isDisabled")}) [data-demo] button`;
+const TOOLTIP_BUTTON = `[data-docs-example]:has(${prop("tooltipIsReachableWhenDisabled")}) [data-demo] button`;
+
+const basicButton = (page: Page) => page.locator(BASIC);
+
+const tooltipButton = (page: Page) => page.locator(TOOLTIP_BUTTON);
+
+const knob = (page: Page, key: string): Locator => page.locator(`${prop(key)} input`);
+
+const HOVER_SHOW_DELAY_MARGIN_MS = 1500;
 
 test.beforeEach(async ({ page }) => {
     await page.goto("/button");
@@ -19,20 +33,24 @@ test("no control uses the native disabled attribute", async ({ page }) => {
 });
 
 test("a plain button activates by pointer and by both keys", async ({ page }) => {
-    await page.locator(DEFAULT).click();
-    expect(await readout(page, "default"), "a click reaches the handler").toContain("clicks: 1");
+    await page.goto("/button/docs");
 
-    await page.locator(DEFAULT).focus();
+    const button = basicButton(page);
+
+    await button.click();
+    await expect(button, "a click reaches the handler").toHaveText(/\b1$/);
+
+    await button.focus();
     await page.keyboard.press("Enter");
-    expect(await readout(page, "default"), "Enter activates it as a native button does").toContain("clicks: 2");
+    await expect(button, "Enter activates it as a native button does").toHaveText(/\b2$/);
 
     await page.keyboard.press(" ");
-    expect(await readout(page, "default"), "and so does Space").toContain("clicks: 3");
+    await expect(button, "and so does Space").toHaveText(/\b3$/);
 });
 
 test("pressed state is announced only by a button that has one", async ({ page }) => {
     await expect(
-        page.locator(DEFAULT),
+        page.locator(PENDING),
         "a button with no pressed state omits aria-pressed rather than claiming it is unpressed",
     ).not.toHaveAttribute("aria-pressed");
 
@@ -54,49 +72,64 @@ test("a button with a tooltip reveals and announces it", async ({ page }) => {
 });
 
 test("a disabled button is disabled through ARIA and gated in JS", async ({ page }) => {
-    await expect(page.locator(DISABLED), "a disabled button says so through ARIA").toHaveAttribute(
-        "aria-disabled",
-        "true",
-    );
-    await expect(page.locator(DISABLED), "and never through the native attribute").not.toHaveAttribute("disabled");
-    expect(await tabIndex(page.locator(DISABLED)), "it is out of the tab order").toBe(-1);
+    await page.goto("/button/docs");
 
-    await page.locator(DISABLED).click({ force: true });
-    expect(await readout(page, "disabled"), "clicking it does not reach the handler").toContain("clicks: 0");
-    expect(await activeMatches(page, DISABLED), "and does not even focus it").toBe(false);
+    const button = basicButton(page);
+
+    await knob(page, "isDisabled").click();
+
+    await expect(button, "a disabled button says so through ARIA").toHaveAttribute("aria-disabled", "true");
+    await expect(button, "and never through the native attribute").not.toHaveAttribute("disabled");
+    expect(await tabIndex(button), "it is out of the tab order").toBe(-1);
+
+    await button.click({ force: true });
+    await expect(button, "clicking it does not reach the handler").toHaveText(/\b0$/);
+    expect(await activeMatches(page, BASIC), "and does not even focus it").toBe(false);
 });
 
-test("a reachable disabled button is identical to a disabled one but for its tab stop", async ({ page }) => {
-    await expect(
-        page.locator(REACHABLE),
-        "a reachable disabled button carries the same attribute as a plain disabled one",
-    ).toHaveAttribute("aria-disabled", "true");
-    await expect(
-        page.locator(REACHABLE),
-        "which is what makes the two states structurally identical rather than merely styled alike",
-    ).not.toHaveAttribute("disabled");
-    expect(await tabIndex(page.locator(REACHABLE)), "what differs is that it keeps its tab stop").toBe(0);
+test("a disabled button shows its tooltip only when it is kept reachable", async ({ page }) => {
+    await page.goto("/button/docs");
 
-    await page.locator(REACHABLE).focus();
-    expect(await activeMatches(page, REACHABLE), "so it can be focused and its tooltip read").toBe(true);
+    const button = tooltipButton(page);
 
-    await page.keyboard.press("Enter");
-    expect(
-        await readout(page, "reachable"),
-        "Enter on it still reaches nothing — gating is in JS, not in the native attribute",
-    ).toContain("clicks: 0");
+    await knob(page, "tooltipIsDisabled").click();
 
-    await page.locator(REACHABLE).hover();
-    await expect(page.locator(TOOLTIP), "and the shell hands the painter the flag that explains why").toContainText(
-        "isDisabled: true",
-    );
+    await expect(button, "a disabled button says so through ARIA").toHaveAttribute("aria-disabled", "true");
+    await expect(button, "and never through the native attribute").not.toHaveAttribute("disabled");
+    expect(await tabIndex(button), "left alone it is out of the tab order").toBe(-1);
+
+    await button.hover();
+    await page.waitForTimeout(HOVER_SHOW_DELAY_MARGIN_MS);
+    await expect(page.locator(TOOLTIP), "and shows no tooltip by pointer either").toHaveCount(0);
+
+    await knob(page, "tooltipIsReachableWhenDisabled").click();
+
+    await expect(button, "kept reachable it carries the same ARIA state").toHaveAttribute("aria-disabled", "true");
+    expect(await tabIndex(button), "what differs is that it keeps its tab stop").toBe(0);
+
+    await page.keyboard.press("Shift");
+    await button.focus();
+    expect(await activeMatches(page, TOOLTIP_BUTTON), "so it can be focused").toBe(true);
+    await expect(page.locator(TOOLTIP), "and its tooltip is read by keyboard").toBeVisible();
+
+    await page.keyboard.press("Escape");
+    await expect(page.locator(TOOLTIP), "Escape puts it away").toHaveCount(0);
+
+    await button.blur();
+    await page.mouse.move(0, 0);
+    await button.hover();
+    await expect(page.locator(TOOLTIP), "and by pointer").toBeVisible();
 });
 
 test("an errored button still activates", async ({ page }) => {
-    expect(await readout(page, "errored"), "an errored button starts errored").toContain("hasError: true");
+    await page.goto("/button/docs");
 
-    await page.locator(ERROR).click();
-    expect(await readout(page, "errored"), "and an ordinary click clears it").toContain("hasError: false");
+    const button = basicButton(page);
+
+    await knob(page, "hasError").click();
+    await button.click();
+
+    await expect(button, "an ordinary click reaches the handler of a button in its error look").toHaveText(/\b1$/);
 });
 
 /**
@@ -198,4 +231,48 @@ test.describe("a copy button", () => {
         expect(await readout(page, "copy"), "the owner hears of no copy").toContain("copies: 0");
         await expect(page.locator(COPY), "and the button does not confirm one").toHaveText(caption);
     });
+});
+
+/**
+ * "Hold to repeat": two icon buttons and a count between them. The arrows draw only a glyph, so their names come from
+ * `ariaLabel`, and finding them by those names is the assertion that they have them. A key press steps once; a held
+ * pointer steps once and then repeats until it lets go, and the click a pointer press ends with is not counted again.
+ */
+const COUNTER = demo("counter");
+const REPEAT_HOLD_MS = 1_000;
+const AFTER_RELEASE_MS = 400;
+
+const counted = async (page: Page) => Number(/count: (-?\d+)/.exec(await readout(page, "counter"))?.[1]);
+
+test("the counter's arrows are named, and each key press steps once", async ({ page }) => {
+    const increase = page.locator(COUNTER).getByRole("button", { name: "Increase" });
+    const decrease = page.locator(COUNTER).getByRole("button", { name: "Decrease" });
+
+    await increase.focus();
+    await page.keyboard.press("Enter");
+    await page.keyboard.press(" ");
+
+    expect(await counted(page), "Enter and Space each step up once").toBe(2);
+
+    await decrease.focus();
+    await page.keyboard.press("Enter");
+
+    expect(await counted(page), "and the other arrow steps down").toBe(1);
+});
+
+test("holding an arrow down repeats, and letting go stops it", async ({ page }) => {
+    const box = (await page.locator(COUNTER).getByRole("button", { name: "Increase" }).boundingBox())!;
+
+    await page.mouse.move(box.x + box.width * 0.5, box.y + box.height * 0.5);
+    await page.mouse.down();
+    await page.waitForTimeout(REPEAT_HOLD_MS);
+    await page.mouse.up();
+
+    const released = await counted(page);
+
+    expect(released, "a held press steps more than once").toBeGreaterThan(2);
+
+    await page.waitForTimeout(AFTER_RELEASE_MS);
+
+    expect(await counted(page), "and nothing more arrives once it is let go").toBe(released);
 });

@@ -64,7 +64,11 @@ const ROUTES: Routes = {
     ...Object.fromEntries(
         COMPONENT_CONFIGS.map((config) => [
             componentToRouteName(config.name),
-            { "/": config.component ?? DocsRedirect, "/docs": () => import("./DocsRoute.svelte") },
+            {
+                "/": config.component ?? DocsRedirect,
+                "/docs": () => import("./DocsRoute.svelte"),
+                "/api": () => import("./ApiRoute.svelte"),
+            },
         ]),
     ),
 };

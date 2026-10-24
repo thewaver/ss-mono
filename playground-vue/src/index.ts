@@ -19,8 +19,13 @@ const PAGE_ROUTES: RouteRecordRaw[] = AppUtils.COMPONENT_CONFIGS.flatMap((config
             : { path: route, redirect: toPageViewRoute(route, "docs") },
         {
             path: toPageViewRoute(route, "docs"),
-            component: () => import("./App/PageComponents/DocsView/PageDocsView.vue"),
-            props: { name: config.name, description: MENU_DESCRIPTIONS[config.name] },
+            component: () => import("./App/DocsRoute.vue"),
+            props: { description: MENU_DESCRIPTIONS[config.name], docs: config.docs },
+        },
+        {
+            path: toPageViewRoute(route, "api"),
+            component: () => import("./App/PageComponents/ApiView/PageApiView.vue"),
+            props: { name: config.name },
         },
     ];
 });

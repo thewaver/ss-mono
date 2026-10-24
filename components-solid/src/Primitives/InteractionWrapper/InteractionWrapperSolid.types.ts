@@ -53,7 +53,8 @@ export type InteractionWrapperProps<TExtra extends object = {}> = AccessorValues
         ref?: (element: HTMLElement) => void;
         /**
          * A tooltip for the control, anchored and shown by the wrapper. On a disabled control kept reachable, it is
-         * where the reason for the disabling can be read.
+         * where the reason for the disabling can be read. A disabled control that is not kept reachable shows no
+         * tooltip, by pointer or by keyboard.
          */
         tooltipDefs?: MaybeAccessor<InteractionTooltipDefs<TExtra> | undefined>;
         /**

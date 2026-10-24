@@ -1,15 +1,12 @@
 import type { AccessorValues } from "@thewaver/ss-components-solid";
 import type {
-    BaseSlideButtonErroredExampleCbs,
-    BaseSlideButtonErroredExampleValues,
-    BaseSlideButtonHeldExampleCbs,
-    BaseSlideButtonHeldExampleValues,
+    BaseSlideButtonArmingExampleCbs,
+    BaseSlideButtonDirectionsDocsExampleValues,
+    BaseSlideButtonDocsExampleValues,
 } from "@thewaver/ss-playground/App/Pages/SlideButtonPage/SlideButtonPage.types";
 
-export type { SlideButtonExampleProps } from "@thewaver/ss-playground/App/Pages/SlideButtonPage/SlideButtonPage.types";
+export type SlideButtonDocsExampleProps = AccessorValues<BaseSlideButtonDocsExampleValues>;
 
-export type SlideButtonHeldExampleProps = AccessorValues<BaseSlideButtonHeldExampleValues> &
-    BaseSlideButtonHeldExampleCbs;
+export type SlideButtonDirectionsDocsExampleProps = AccessorValues<BaseSlideButtonDirectionsDocsExampleValues>;
 
-export type SlideButtonErroredExampleProps = AccessorValues<BaseSlideButtonErroredExampleValues> &
-    BaseSlideButtonErroredExampleCbs;
+export type SlideButtonArmingExampleProps = BaseSlideButtonArmingExampleCbs;

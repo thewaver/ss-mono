@@ -4,8 +4,12 @@ export type DocsTableOfContentsEntry = {
     depth: number;
 };
 
+export type DocsSectionRegistration = {
+    title: string;
+    element: HTMLElement;
+};
+
 export type BasePageDocsViewValues = {
-    name: string;
     description: string;
 };
 

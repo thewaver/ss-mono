@@ -1,1 +1,1 @@
-export type PageViewKey = "docs" | "examples";
+export type PageViewKey = "docs" | "api" | "examples";

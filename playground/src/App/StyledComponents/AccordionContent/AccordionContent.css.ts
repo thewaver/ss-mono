@@ -38,6 +38,24 @@ export const accordionMarker = style({
         [`${accordionHeader}.${isExpanded} &`]: {
             transform: "rotate(90deg)",
         },
+        [`&[data-side="top"]`]: {
+            transform: "rotate(-180deg)",
+        },
+        [`&[data-side="right"]`]: {
+            transform: "rotate(-90deg)",
+        },
+        [`&[data-side="left"]`]: {
+            transform: "rotate(90deg)",
+        },
+        [`${accordionHeader}.${isExpanded} &[data-side="top"]`]: {
+            transform: "rotate(-90deg)",
+        },
+        [`${accordionHeader}.${isExpanded} &[data-side="right"]`]: {
+            transform: "rotate(0deg)",
+        },
+        [`${accordionHeader}.${isExpanded} &[data-side="left"]`]: {
+            transform: "rotate(180deg)",
+        },
     },
 });
 

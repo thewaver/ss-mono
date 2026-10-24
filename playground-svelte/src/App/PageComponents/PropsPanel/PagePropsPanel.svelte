@@ -10,6 +10,7 @@
     import { setPropsPanelContext } from "./PropsPanel.context";
     import type { PagePropsPanelProps } from "./PropsPanelSvelte.types";
     import {
+        DEFAULT_HAS_RESET,
         NOTHING_TO_RESET,
         SAMPLE_SELECTOR_ALONE,
     } from "@thewaver/ss-playground/App/PageComponents/PropsPanel/PropsPanel.const";
@@ -47,7 +48,7 @@
     <div class={styles.propsPanelScopeVariants[props.scope]} data-panel={props.scope}>
         {@render props.children?.()}
 
-        {#if resets.length > leastToReset}
+        {#if (props.hasReset ?? DEFAULT_HAS_RESET) && resets.length > leastToReset}
             <PageProp
                 itemKey={"resetPanel"}
                 controls={EXAMPLES_ONLY_PROP}

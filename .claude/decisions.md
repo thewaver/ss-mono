@@ -3886,17 +3886,23 @@ change that moved nothing.
 Each component page is Docs and Examples, and which one you are on is a URL rather than component state, so a
 view can be linked to and the back button walks them.
 
-**Docs and API were two tabs at first, and are one now.** The first build had a Docs tab holding
-only the description and an API tab holding the export tables. Once the tables carried the documentation
-blocks of props, utilities and types, most of what a reader learns about a unit was on the API tab and the
-Docs tab was one paragraph. The user's call: one tab, named Docs at `/docs`, with the description as its
-lead paragraph and the tables under it. The name covers both halves where "API" would have put the plain
-description under a reference heading, and pages without examples already forwarded to `/docs`. The
-`data-api-*` attributes on groups, tables and rows keep their name, since they mark the export tables
-wherever those are drawn, and `virtual:component-api` keeps its name for the same reason.
+**There are three views again: Docs, API and Examples.** They were two tabs at first (Docs the description,
+API the export tables), then merged into one Docs tab holding both, because the tables had become most of what a
+reader learns and the Docs tab was one paragraph. The user reversed that when starting the documentation refactor
+with `Button`: Docs at `/docs` is the description alone, API at `/api` is every table plus "On this page". The tab
+order is Docs, API, Examples; a page with no examples still has only Docs and API, and still opens on `/docs`.
+Cross-page links in "Also has everything in …" now point at `/api`. The `data-api-*` attributes keep their
+name, `virtual:component-api` too, and the shared files (`DocsView.css.ts`, `.const.ts`, `.utils.ts`) keep the
+`DocsView` name for now although the API view is what uses most of them; the tables are `ApiView` in Solid, with
+its own `BasePageApiViewValues` in the shared half. The other three frameworks still have the merged Docs view
+until ported.
 
-**Examples is the index rather than a segment of its own.** `/button` is the Examples view and only `/docs` is
-added. Giving Examples a segment would have renamed every address in the Playground and every
+**The setting that picks the tab a page opens on is a select and defaults to Docs.** It was a segmented control
+defaulting to Examples; three entries and a default of Docs are the user's call. Its options come from
+`PAGE_VIEW_KEYS`, so a view added later appears in it.
+
+**Examples is the index rather than a segment of its own.** `/button` is the Examples view and `/docs` and `/api`
+are added. Giving Examples a segment would have renamed every address in the Playground and every
 locator in the suite for no gain, and the bare route is what the pages already were.
 
 **The tab bar lives in the shell, not in the pages.** `AppContent` already renders the title and the
@@ -21423,3 +21429,39 @@ flags it built itself rather than the copy its row hands back, which is the same
 
 **The tile's title is the text color in both link states**, declaring `:visited` itself as `dependencyLink` does,
 since the theme's `a:visited` rule outranks a single class.
+
+### The focus ring stays above a painter's hover and press filter
+
+A wrapped control's ring is the `:focus-visible` outline of its focusable element, and its painted box is a child of that element. The painters darken that box on hover and press with `filter`, and a filter makes the box a layer of its own, which the browser paints after the element's outline. So with the ring showing, a press draws the box's drop shadow over the ring's bottom edge, and the ring looks thicker on top and thinner below, as if the button sank a pixel. It is a painting order, not a layout shift: nothing moves.
+
+Three ways out were tried or weighed. **Moving the outline to the wrapper** does nothing, since an element's outline is painted before the layers inside it, whichever element carries it (measured: the ring's bottom rows still went dark). **Darkening with an overlay instead of a filter** was refused as a per-painter fix, and **drawing the ring as an element of our own** as too much work and a loss in Windows High Contrast. What worked is the reverse order: while the element has focus-visible it becomes a stacking context (`isolation: isolate`) and its painted box takes `z-index: -1`, and a negative layer paints before the element's own outline, so the ring is on top whatever the box does. Measured in headless Chromium at 125% display scale with Space held: the ring's bottom edge is identical to its resting state.
+
+It is two rules in `Theme.css.ts`, shared by the four Playgrounds, keyed on `:focus-visible` so nothing changes while the ring is not drawn. **The wrapper is recognized by `role='presentation'`**, its default, because the library's own class cannot be imported into a stylesheet (the package has no stylesheet subpath, and importing its index would evaluate the whole library at build time). A wrapper whose `role` was overridden is not matched. **The box is reached as the focused element's only child**, so a leaf holding many children is left alone: the rule forces `position: relative` on what it matches, which would override a stylesheet-set `position: absolute`. It does not help where the focused element sits inside the painter (text fields), since a filter on an ancestor dims the ring itself, which is a different flaw. Which controls it covers has not been surveyed; the user is checking them by hand.
+
+### `SlideButton` describes its own gesture, through `ariaDescription` and a warning when it is missing
+
+A slide-to-confirm button is operated by holding Enter or Space from the keyboard, and a plain tap of either does nothing. Nothing on the control said so to somebody who cannot see the thumb: it carried a name and a disabled state, and a description only when an enclosing `FormField` happened to supply one. The first Docs plan for it was a section on wiring a `FormField` hint to the button. The user refused it: a component should be self-sufficient through ARIA, not depend on being inside a form.
+
+Three shapes were weighed. **A string prop** won, over a fixed English phrase inside the library (read in the wrong language on a non-English page, which breaks _"The library says what a component is, and nothing else a reader hears"_). The prop is `ariaDescription`, beside `ariaLabel`, written once in the core as `BaseSlideButtonValues`. **It was chosen required, and the user then made it optional with a console warning** (`SlideButtonUtils.warnIfUndescribed`, called once when the button is set up, the way `Label` warns), under _"An accessibility mistake the library can detect is warned about, never blocked or filled in"_. The Docs page also carries a box in the theme's alert colors under the intro saying so, since a warning in the console is only seen by somebody who opens it.
+
+**It is rendered as the button's own visually hidden text, and the button points at it with `aria-describedby`**, joined to the form field's description when there is one, so both are read. The text is clipped rather than `display: none`, per _"Text meant only for screen readers is transparent or visually hidden"_, and its id is generated, per _"A component generates the id a relationship attribute needs"_. The `aria-description` attribute was not used; its support was not checked.
+
+Only Solid carries it so far. The other three frameworks' `SlideButton` takes no description yet, and each adds `BaseSlideButtonValues` to its props and renders the same hidden text when ported. The Playground's examples describe the keyboard route only ("Hold Enter or Space to send."), since that is true under every mode and the Mode knob changes which pointer gestures work.
+
+**It also says when it is held at the end.** The page keeps a confirmed button at its end through `isPressed`, and until now that state was drawn and never announced. WCAG 4.1.2 asks that states set by the user be programmatically determinable, with "notification of changes to these items … available to user agents, including assistive technologies", so the element writes `aria-pressed` from the flag, as `Button` does: present only when the consumer passes `isPressed`. Solid only so far; the other three add the same attribute when ported.
+
+### A docs example puts its own controls below the component
+
+The user's rule, stated as "always": when a Docs example carries controls of its own — the "Open all" and "Close all" buttons that write an accordion's list, say — they sit below the component, never above or beside it. The first draft of the accordion's controlled example had them above. This is about controls that belong to the example itself and show in its code. The knobs are a separate thing: they are the column beside the demo, at the user's 60 to 40 split. A control that is part of the component's own markup, such as the "Add a line" buttons inside a growing panel, stays where the component puts it. The one placement the user chose by hand, `SlideButton`'s reset to the right of the button in its held example, was set before the rule and has not been revisited.
+
+### A docs example has no knob that exists only for the Playground
+
+The user's rule, "for now, at least", given together with the exclusion of a reset button: a knob whose only purpose is to let a visitor put the demo into a state is not wanted in a docs example. A knob stays when it sets a real prop of the component (`isDisabled`, `renderSeparator`, `linkComponent`) and goes when it only adjusts the fixture. The case that set the rule was Breadcrumbs' **Depth**, a number field that cut the example trail to a given length, and that the trail itself also set by shortening when a crumb was pressed. Now the examples always start from the whole constant trail, trimmed to four crumbs (`TRAIL` in `BreadcrumbsPage.const.ts`). Pressing a crumb still shortens the trail, because that is what a real app does and the example's code should read like one: each example keeps its own depth and slices the trail to it, with a restore button below (the `replay` glyph, as in `SlideButton`'s held example) that brings the crumbs back. The user chose this over a readout that left the trail alone, accepting a restore button as the one control the example needs, which is not the Playground-only kind this rule is about. Not a standing ban on fixture-sized controls elsewhere; the user's wording was "for now, at least".
+
+### The open/closed arrow follows the side the panel opens on
+
+The user left the choice to Claude ("your guess is as good as mine"), after saying the arrow should depend on orientation. The rule chosen: **the arrow of an open header points at the panel, and a closed one is that arrow turned a quarter turn counterclockwise**, so opening is always a quarter turn clockwise. For the usual panel below, that is the familiar disclosure triangle (closed `▶`, open `▼`), unchanged. For a panel above: closed `◀`, open `▲`. To the right: closed `▲`, open `▶`. To the left: closed `▼`, open `◀`. The other reading weighed was "an arrow points where the panel will go when closed and back when open" (closed `▼` below, open `▲`), which suits a drawer but would have changed every accordion header in the Playground. Only the Collapsible's Side example passes `side` to `PageAccordionHeader`; the Accordion's horizontal orientation draws no arrow, and everything else keeps the bottom behavior. The right and left cases read oddly (a closed arrow pointing up) and are the first thing to revisit if the user dislikes it; their word was that either guess is as good as the other.
+
+### On a docs demo, the Disabled knob is last
+
+The user's rule, given while the Breadcrumbs examples were being built: in a docs example's knob column, `isDisabled` goes after every other knob. Applied at once to the three pages built so far: `Button`'s two examples (in the Tooltip one, "Reachable when disabled" now sits above "Disabled", though its hint says it only matters while Disabled is on, which is the one place the literal reading cuts against the natural order), `SlideButton`'s first example (after Error) and `Breadcrumbs`' first (after Separators). The ports copy the Solid order, which backlog items 15, 18 and 19 already tell them to do.

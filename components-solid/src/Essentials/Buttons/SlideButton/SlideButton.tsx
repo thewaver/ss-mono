@@ -1,4 +1,4 @@
-import { createMemo, createRenderEffect, createSignal, onCleanup } from "solid-js";
+import { Show, createMemo, createRenderEffect, createSignal, createUniqueId, onCleanup } from "solid-js";
 
 import {
     type NavigatorDirection,
@@ -23,7 +23,15 @@ const SlideButtonElement = (props: SlideButtonElementProps) => {
     const getAriaLabel = LabelSolidUtils.resolveAriaLabel(
         props.ariaLabel === undefined ? undefined : () => access(props.ariaLabel)!,
     );
-    const getAriaDescribedBy = FormFieldSolidUtils.resolveAriaDescribedBy();
+    const getFieldDescribedBy = FormFieldSolidUtils.resolveAriaDescribedBy();
+    const descriptionId = createUniqueId();
+
+    SlideButtonUtils.warnIfUndescribed(access(props.ariaDescription), "ariaDescription");
+
+    const getHasDescription = () => !!access(props.ariaDescription);
+
+    const getAriaDescribedBy = () =>
+        [getFieldDescribedBy(), getHasDescription() ? descriptionId : undefined].filter(Boolean).join(" ") || undefined;
 
     const [getTrackRef, setTrackRef] = createSignal<HTMLElement>();
 
@@ -75,42 +83,51 @@ const SlideButtonElement = (props: SlideButtonElementProps) => {
     });
 
     return (
-        <button
-            id={access(props.id)}
-            ref={(element) => {
-                setTrackRef(element);
-                props.ref?.(element);
-            }}
-            type="button"
-            class={styles.slideButtonElement}
-            aria-label={getAriaLabel()}
-            aria-describedby={getAriaDescribedBy()}
-            aria-disabled={getIsDisabled() || undefined}
-            onKeyDown={(e) => {
-                if (getIsDisabled()) return;
+        <>
+            <button
+                id={access(props.id)}
+                ref={(element) => {
+                    setTrackRef(element);
+                    props.ref?.(element);
+                }}
+                type="button"
+                class={styles.slideButtonElement}
+                aria-label={getAriaLabel()}
+                aria-describedby={getAriaDescribedBy()}
+                aria-pressed={access(props.flags).isPressed}
+                aria-disabled={getIsDisabled() || undefined}
+                onKeyDown={(e) => {
+                    if (getIsDisabled()) return;
 
-                gesture.pressKey(e.key, e.repeat);
-            }}
-            onKeyUp={(e) => gesture.releaseKey(e.key)}
-            onClick={() => {
-                if (getIsDisabled()) return;
+                    gesture.pressKey(e.key, e.repeat);
+                }}
+                onKeyUp={(e) => gesture.releaseKey(e.key)}
+                onClick={() => {
+                    if (getIsDisabled()) return;
 
-                gesture.click();
-            }}
-            onBlur={() => gesture.stopHold()}
-            onMouseEnter={(e) => {
-                if (getIsDisabled()) return;
+                    gesture.click();
+                }}
+                onBlur={() => gesture.stopHold()}
+                onMouseEnter={(e) => {
+                    if (getIsDisabled()) return;
 
-                void props.onMouseEnter?.(e);
-            }}
-            onMouseLeave={(e) => {
-                if (getIsDisabled()) return;
+                    void props.onMouseEnter?.(e);
+                }}
+                onMouseLeave={(e) => {
+                    if (getIsDisabled()) return;
 
-                void props.onMouseLeave?.(e);
-            }}
-        >
-            {props.renderContent(() => access(props.flags))}
-        </button>
+                    void props.onMouseLeave?.(e);
+                }}
+            >
+                {props.renderContent(() => access(props.flags))}
+            </button>
+
+            <Show when={getHasDescription()}>
+                <span id={descriptionId} class={styles.slideButtonDescription}>
+                    {access(props.ariaDescription)}
+                </span>
+            </Show>
+        </>
     );
 };
 
@@ -148,6 +165,7 @@ export const SlideButton = (props: SlideButtonProps) => {
                     ref={setElementRef}
                     id={props.id}
                     ariaLabel={props.ariaLabel}
+                    ariaDescription={props.ariaDescription}
                     orientation={getOrientation}
                     thumbSize={getThumbSize}
                     holdDurationMs={getHoldDurationMs}

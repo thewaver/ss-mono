@@ -128,6 +128,8 @@ const toFile = async (path: string): Promise<SourceFile> => {
 };
 
 export namespace SourceViewUtils {
+    export const loadFile = (path: string): Promise<SourceFile> => toFile(path);
+
     export const loadGroups = async (entryPath: string): Promise<SourceGroup[]> => {
         const importedPaths = await collectImportedPaths(entryPath);
         const pathsByStem = new Map<string, string[]>();

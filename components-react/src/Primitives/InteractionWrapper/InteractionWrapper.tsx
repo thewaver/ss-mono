@@ -66,7 +66,7 @@ export const InteractionWrapper = <TExtra extends object = {}>(props: Interactio
         .filter(Boolean)
         .join(" ");
 
-    const tooltipDefs = props.tooltipDefs;
+    const tooltipDefs = isDisabled && !isReachable ? undefined : props.tooltipDefs;
 
     const tooltipProps: Omit<TooltipProps, "anchorRef"> | undefined = tooltipDefs && {
         ...tooltipDefs,

@@ -17,7 +17,8 @@ export type BaseInteractionWrapperValues<TExtra extends object = {}> = ExternalI
     minHeight?: number;
     /**
      * Keeps a disabled control reachable by keyboard, so a reader learns it exists, hears that it is disabled, and
-     * reads its tooltip if it has one. Only means anything while the control is disabled.
+     * reads its tooltip if it has one. It is also what lets a disabled control show its tooltip on hover: without
+     * it a disabled control shows no tooltip at all. Only means anything while the control is disabled.
      */
     isReachableWhenDisabled?: boolean;
     /**

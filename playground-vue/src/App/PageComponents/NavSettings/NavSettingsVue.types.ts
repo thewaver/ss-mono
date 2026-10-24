@@ -1,7 +1,4 @@
-import type {
-    NavSettingsOption,
-    ViewportAnchor,
-} from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.types";
+import type { ViewportAnchor } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.types";
 
 import type { PageViewKey } from "../ViewTabs/ViewTabsVue.types";
 
@@ -18,11 +15,4 @@ export type PageNavSettingsProps = {
     "onUpdate:pageView"?: (value: PageViewKey) => void;
     "viewportAnchor": ViewportAnchor;
     "onUpdate:viewportAnchor"?: (value: ViewportAnchor) => void;
-};
-
-export type PageNavSettingsChoiceProps<T> = {
-    "ariaLabel": string;
-    "options": NavSettingsOption<T>[];
-    "value": T;
-    "onUpdate:value"?: (value: T) => void;
 };

@@ -1,5 +1,7 @@
 import type { AccordionOrientation, AccordionSizing } from "./Accordion.types";
 
+export const ACCORDION_ORIENTATIONS: AccordionOrientation[] = ["horizontal", "vertical"];
+
 export const ACCORDION_DEFAULTS = {
     headingLevel: 3,
     sizing: "fill" as AccordionSizing,

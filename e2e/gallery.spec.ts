@@ -14,7 +14,19 @@ const tileFor = (route: string) => `${TILE}[data-testid="${route}"]`;
 
 const menu = (page: Page) => page.getByRole("navigation", { name: "Library" }).getByRole("tree");
 
-const toRoute = (href: string) => `/${href.split("/").filter(Boolean).at(-1)}`;
+/**
+ * A menu row's link ends in the tab pages open on (Docs by default), so the page's own route is the segment before it
+ * when the last one names a tab. Examples is the index and adds no segment.
+ */
+const TAB_SEGMENTS = ["docs", "api"];
+
+const toRoute = (href: string) => {
+    const segments = href.split("/").filter(Boolean);
+
+    if (TAB_SEGMENTS.includes(segments.at(-1)!)) segments.pop();
+
+    return `/${segments.at(-1)}`;
+};
 
 /**
  * A menu row's own name, without the marker drawn beside it — that marker is hidden from assistive technology, so

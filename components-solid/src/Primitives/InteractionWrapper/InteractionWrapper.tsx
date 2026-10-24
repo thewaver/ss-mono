@@ -53,7 +53,7 @@ export const InteractionWrapper = <TExtra extends object = {}>(props: Interactio
     const getTooltipProps = createMemo((): Omit<TooltipProps, "anchorRef"> | undefined => {
         const defs = getTooltipDefs();
 
-        if (!defs) return undefined;
+        if (!defs || (getIsDisabled() && !getIsReachable())) return undefined;
 
         return {
             ...defs,

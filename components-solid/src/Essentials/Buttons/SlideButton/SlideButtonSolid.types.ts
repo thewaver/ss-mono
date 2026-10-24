@@ -1,4 +1,5 @@
 import type {
+    BaseSlideButtonValues,
     NavigatorDirection,
     SlideButtonCbs,
     SlideButtonRenderProps,
@@ -9,26 +10,28 @@ import type {
     InteractionControlProps,
     InteractionWrapperProps,
 } from "../../../Primitives/InteractionWrapper/InteractionWrapperSolid.types";
-import type { AccessorProps, SignalSource } from "../../../Utils/typeUtils";
+import type { AccessorProps, AccessorValues, SignalSource } from "../../../Utils/typeUtils";
 
-export type SlideButtonElementProps = AccessorProps<
-    SlideButtonCbs &
-        InteractionControlProps<SlideButtonRenderProps> &
-        Required<SlideButtonState> & {
-            /** How far the thumb has been slid, as a share of its travel. */
-            progressRatio: number;
-            /** Moves the thumb to a share of its travel. */
-            setProgressRatio: (ratio: number) => void;
-            /** Says whether the thumb is being dragged. */
-            setIsDragging: (isDragging: boolean) => void;
-            /** Says whether the button is being held. */
-            setIsHolding: (isHolding: boolean) => void;
-            /** Says which way text runs around the button. */
-            setDirection: (direction: NavigatorDirection) => void;
-        }
->;
+export type SlideButtonElementProps = AccessorValues<BaseSlideButtonValues> &
+    AccessorProps<
+        SlideButtonCbs &
+            InteractionControlProps<SlideButtonRenderProps> &
+            Required<SlideButtonState> & {
+                /** How far the thumb has been slid, as a share of its travel. */
+                progressRatio: number;
+                /** Moves the thumb to a share of its travel. */
+                setProgressRatio: (ratio: number) => void;
+                /** Says whether the thumb is being dragged. */
+                setIsDragging: (isDragging: boolean) => void;
+                /** Says whether the button is being held. */
+                setIsHolding: (isHolding: boolean) => void;
+                /** Says which way text runs around the button. */
+                setDirection: (direction: NavigatorDirection) => void;
+            }
+    >;
 
 export type SlideButtonProps = Omit<InteractionWrapperProps<SlideButtonRenderProps>, "renderControl" | "extraFlags"> &
+    AccessorValues<BaseSlideButtonValues> &
     AccessorProps<
         SlideButtonCbs &
             Pick<InteractionControlProps<SlideButtonRenderProps>, "id" | "ariaLabel" | "renderContent"> &

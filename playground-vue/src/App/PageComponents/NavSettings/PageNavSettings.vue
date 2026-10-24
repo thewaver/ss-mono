@@ -10,6 +10,10 @@ import {
 } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
 import { NO_MOTION_DURATION_MS } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
 import { EXAMPLES_ONLY_PROP } from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.const";
+import {
+    DEFAULT_PAGE_VIEW,
+    PAGE_VIEW_LABELS,
+} from "@thewaver/ss-playground/App/PageComponents/ViewTabs/ViewTabs.const";
 
 import PageToggleContent from "../../StyledComponents/ToggleContent/ToggleContent.vue";
 import PageExampleKnobsButton from "../ExampleKnobs/PageExampleKnobsButton.vue";
@@ -17,11 +21,13 @@ import PageSelectField from "../Field/PageSelectField.vue";
 import { OWN_FRAMEWORK } from "../FrameworkMenu/FrameworkMenu.const";
 import PageProp from "../Prop/Prop.vue";
 import { appliedTheme, revealTheme } from "../Theme/ThemeVue.const";
+import type { PageViewKey } from "../ViewTabs/ViewTabsVue.types";
 import type { PageNavSettingsProps, PlaygroundTheme, ViewportAnchor } from "./NavSettingsVue.types";
-import PageNavSettingsChoice from "./PageNavSettingsChoice.vue";
 
 const computeViewportAnchorLabel = (anchor: ViewportAnchor) =>
     VIEWPORT_ANCHOR_OPTIONS.find((option) => option.value === anchor)?.label ?? String(anchor);
+
+const computePageViewLabel = (view: PageViewKey) => PAGE_VIEW_LABELS[view];
 
 const computeThemeLabel = (theme: PlaygroundTheme) =>
     THEME_OPTIONS.find((option) => option.value === theme)?.label ?? theme;
@@ -41,6 +47,10 @@ const pickTheme = (nextTheme: PlaygroundTheme) => {
     });
 };
 
+const setPageView = (view: PageViewKey) => {
+    pageView.value = view;
+};
+
 const setViewportAnchor = (anchor: ViewportAnchor) => {
     viewportAnchor.value = anchor;
 };
@@ -53,7 +63,7 @@ const setViewportAnchor = (anchor: ViewportAnchor) => {
                 item-key="showsDescriptionOnly"
                 :controls="EXAMPLES_ONLY_PROP"
                 label="Show pages without examples"
-                hint="Lists the pages that have docs but no examples yet, which are hidden otherwise."
+                hint="Lists the pages with no live examples anywhere, only a description and the API, which are hidden otherwise."
                 :default-value="false"
             >
                 <Toggle v-model:checked="showsDescriptionOnly" ariaLabel="Show pages without examples">
@@ -68,12 +78,14 @@ const setViewportAnchor = (anchor: ViewportAnchor) => {
                 :controls="EXAMPLES_ONLY_PROP"
                 label="Open pages on"
                 hint="Which tab a page opens on when it is picked from the list. A page with no examples always opens on its docs."
-                default-value="Examples"
+                :default-value="computePageViewLabel(DEFAULT_PAGE_VIEW)"
             >
-                <PageNavSettingsChoice
-                    v-model:value="pageView"
+                <PageSelectField
+                    :value="pageView"
+                    :values="PAGE_VIEW_OPTIONS.map((option) => option.value)"
+                    :compute-label="computePageViewLabel"
                     ariaLabel="Open pages on"
-                    :options="PAGE_VIEW_OPTIONS"
+                    @change="setPageView"
                 />
             </PageProp>
 
