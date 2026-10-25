@@ -1,6 +1,6 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { demo, prop, revealProp } from "./helpers";
+import { docsDemo, docsSettled, prop, revealProp } from "./helpers";
 
 /**
  * The Tooltip page's Arrow setting draws the tooltip body with `Shape` and grows an arrow out of it with
@@ -11,7 +11,9 @@ import { demo, prop, revealProp } from "./helpers";
  * Nothing is compared with a number written down here: the tip is checked against the side it should leave,
  * against the anchor it should line up with, and against the two size settings that were typed in.
  */
-const ANCHOR = `${demo("default")} button`;
+const DOCS = "/src/App/Pages/TooltipPage/Docs";
+
+const ANCHOR = `${docsDemo(DOCS, "Basic")} button`;
 const TOOLTIP = '[role="tooltip"]';
 const SETTLE_MS = 600;
 const TOLERANCE_PX = 0.5;
@@ -80,8 +82,9 @@ const findTip = ({ vertices, size }: ArrowReading) =>
     vertices.reduce((best, vertex) => (outside(vertex, size) > outside(best, size) ? vertex : best));
 
 test.beforeEach(async ({ page }) => {
-    await page.goto("/tooltip");
-    await expect(page.locator("[data-example]").first()).toBeVisible();
+    await page.goto("/tooltip/docs");
+    await expect(page.locator(ANCHOR)).toBeVisible();
+    await docsSettled(page);
 });
 
 test("with no arrow picked, nothing is painted outside the tooltip's box", async ({ page }) => {
@@ -213,7 +216,7 @@ test("the lightning bolt keeps its lean: its tip on the anchor, its base wholly 
  * at least twice as wide as it is long vanished. With the sharp box picked the painted contour is straight lines only,
  * so every number pair in the path is a corner of it, and each corner tooltip is read in its own pixels.
  */
-const ARROW_BED = demo("arrows");
+const ARROW_BED = docsDemo(DOCS, "Arrows");
 
 const readArrowBed = (page: Page) =>
     page.locator(`${ARROW_BED} svg`).evaluateAll((svgs) =>
@@ -238,7 +241,7 @@ test("a corner arrow is drawn however wide it is, and its base starts half its w
     const width = 30;
     const length = 10;
 
-    await revealProp(page, "arrowBedShape", "arrows");
+    await revealProp(page, "arrowBedShape");
     await pick(page, "arrowBedShape", "box");
     await type(page, "arrowBedWidth", width);
     await type(page, "arrowBedLength", length);
@@ -283,7 +286,7 @@ test("a corner arrow is drawn however wide it is, and its base starts half its w
  * every position — the middle of each side, each corner, and everywhere between — can be reached. Wherever the slider
  * is, an arrow is drawn, and it leaves on the side the slider's angle faces.
  */
-const CIRCLING = demo("circling");
+const CIRCLING = docsDemo(DOCS, "Circling");
 
 test("the arrow going round is drawn at every position, on the side its angle faces", async ({ page }) => {
     const slider = page.locator(`${CIRCLING} input[type="range"]`);

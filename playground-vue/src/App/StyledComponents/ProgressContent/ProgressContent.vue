@@ -19,11 +19,16 @@ const layerClass = useLayerClass();
                 state.hasError && styles.hasError,
             ]"
         >
-            <div :class="styles.progressFill" :style="{ width: `${(state.ratio ?? 0) * PERCENT}%` }" />
+            <div
+                :class="styles.progressFill"
+                :style="{ width: state.ratio === undefined ? undefined : `${state.ratio * PERCENT}%` }"
+            />
         </div>
 
         <div :class="styles.progressReadout" aria-hidden="true">
-            {{ state.ratio === undefined ? "working…" : `${Math.round(state.ratio * PERCENT)}% of ${state.max}` }}
+            <bdi>{{
+                state.ratio === undefined ? "working…" : `${Math.round(state.ratio * PERCENT)}% of ${state.max}`
+            }}</bdi>
         </div>
     </div>
 </template>

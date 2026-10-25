@@ -9,6 +9,7 @@ export const isHovered = style({});
 export const isSelected = style({});
 export const isDisabled = style({});
 export const isCategory = style({});
+export const isRightToLeft = style({});
 
 export const treeNodeContent = style({
     display: "flex",
@@ -52,6 +53,12 @@ export const treeNodeMarker = style({
         },
         [`${treeNodeContent}.${isExpanded} &`]: {
             transform: "rotate(90deg)",
+        },
+        [`${treeNodeContent}.${isRightToLeft} &`]: {
+            transform: "scaleX(-1) rotate(0deg)",
+        },
+        [`${treeNodeContent}.${isExpanded}.${isRightToLeft} &`]: {
+            transform: "scaleX(-1) rotate(90deg)",
         },
     },
 });

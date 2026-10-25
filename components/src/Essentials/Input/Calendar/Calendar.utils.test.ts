@@ -142,6 +142,15 @@ describe("getIsDayMatched and disabledDays", () => {
         expect(CalendarUtils.getIsCellDisabled(date("2026-08-12"), "day", opts)).toBe(true);
         expect(CalendarUtils.getIsCellDisabled(date("2026-08-11"), "day", opts)).toBe(false);
     });
+
+    it("leaves the earliest and latest day out of what the consumer refuses", () => {
+        const opts = { disabledDays: [{ before: date("2026-08-10") }] };
+
+        expect(CalendarUtils.getIsDayRefused(date("2026-08-09"), opts)).toBe(true);
+        expect(CalendarUtils.getIsDayRefused(date("2026-08-10"), opts)).toBe(false);
+        expect(CalendarUtils.getIsDayRefused(date("2026-08-10"), {})).toBe(false);
+        expect(CalendarUtils.getIsCellDisabled(date("2026-08-10"), "day", { minValue: date("2026-08-11") })).toBe(true);
+    });
 });
 
 describe("stepPage and stepLeap", () => {

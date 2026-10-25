@@ -24,8 +24,8 @@ export const PARTS: Part[] = [
     { sku: "BK-6077", name: "Shelf rail 300mm", category: "Bracket", stock: 63, pricePence: 812 },
 ];
 
-export const createStressParts = (): Part[] =>
-    Array.from({ length: STRESS_PART_COUNT }, (_, index) => ({
+export const createStressParts = (partCount = STRESS_PART_COUNT): Part[] =>
+    Array.from({ length: partCount }, (_, index) => ({
         sku: `PT-${String(index).padStart(6, "0")}`,
         name: `Part ${index.toLocaleString("en-GB")}`,
         category: CATEGORIES[index % CATEGORIES.length],

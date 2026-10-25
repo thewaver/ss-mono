@@ -1,4 +1,4 @@
-import { type MaybeRefOrGetter, toValue } from "vue";
+import { type MaybeRefOrGetter, toValue, watch } from "vue";
 
 import { FocusManagerUtils } from "@thewaver/ss-components";
 
@@ -18,16 +18,38 @@ export namespace FocusManagerVueUtils {
      * @param isVisible Whether it is currently shown.
      * @param opts.initialRef What to focus instead of the first focusable child — a text field rather than a close
      * button, say. Read once, when focus moves in, so a later change does not steal focus from the user.
+     * @param opts.isOpen Whether the layer is open, for one that can be hidden and shown again while it stays
+     * open — covered for a while by another layer, say. Each time it hides, focus goes back to what first opened
+     * it, and so it does when it closes, rather than to wherever focus was when it last showed. Without it, focus
+     * goes back to wherever it was when the element last appeared.
      */
     export const useAutoFocus = (
         ref: MaybeRefOrGetter<HTMLElement | null | undefined>,
         isVisible: MaybeRefOrGetter<boolean>,
-        opts?: { initialRef?: MaybeRefOrGetter<HTMLElement | null | undefined> },
+        opts?: {
+            initialRef?: MaybeRefOrGetter<HTMLElement | null | undefined>;
+            isOpen?: MaybeRefOrGetter<boolean>;
+        },
     ) => {
+        const originKeeper = FocusManagerUtils.createOriginKeeper();
+        const isOpen = opts?.isOpen;
+
+        if (isOpen !== undefined) {
+            watch(
+                () => toValue(isOpen),
+                (isNowOpen) => {
+                    if (!isNowOpen) originKeeper.forget();
+                },
+            );
+        }
+
         watchAfterRender([() => toValue(ref), () => toValue(isVisible)], ([element, isShown]) => {
             if (!element || !isShown) return;
 
-            return FocusManagerUtils.focusInto(element, { initialRef: toValue(opts?.initialRef) ?? undefined });
+            return FocusManagerUtils.focusInto(element, {
+                initialRef: toValue(opts?.initialRef) ?? undefined,
+                origin: isOpen === undefined ? undefined : originKeeper.take(),
+            });
         });
     };
 }

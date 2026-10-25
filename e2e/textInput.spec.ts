@@ -1,45 +1,66 @@
-import { type Page, expect, test } from "@playwright/test";
+import { type Locator, type Page, expect, test } from "@playwright/test";
 
 import {
+    accessibleText,
     activeDescendantText,
     attributesOf,
     computedStyle,
-    demo,
+    docsDemo,
+    docsSettled,
     inputValue,
     isReadOnly,
-    readout,
+    prop,
     selectionRange,
     setSelectionRange,
 } from "./helpers";
 
-const DEFAULT = `${demo("default")} input`;
-const COUPON = `${demo("transformingSetter")} input`;
-const PIN = `${demo("refusingSetter")} input`;
-const NUMBER = `${demo("number")} input`;
-const READ_ONLY = `${demo("readOnly")} input`;
-const DISABLED = `${demo("disabled")} input`;
-const EMAIL = `${demo("errored")} input`;
+const DOCS = "/src/App/Pages/TextInputPage/Docs";
 
+const BASIC = `${docsDemo(DOCS, "Basic")} input`;
+const COUPON = `${docsDemo(DOCS, "Rewriting")} input`;
+const PIN = `${docsDemo(DOCS, "Refusing")} input`;
+const NUMBER = `${docsDemo(DOCS, "Number")} input`;
+const ADORNED = docsDemo(DOCS, "Adornments");
+
+const knob = (page: Page, key: string) => page.locator(`${prop(key)} input`);
+
+/**
+ * The upper-casing example writes, in the line under it, the text its owner holds, in double quotes. A value is
+ * checked by whether the line holds it whole, quotes and all, so "AB" is not found in "ABxy".
+ */
+const ownerHolds = (page: Page, text: string, message: string) =>
+    expect(page.locator(`${docsDemo(DOCS, "Rewriting")} [data-readout]`), message).toContainText(`"${text}"`);
+
+/**
+ * No example shows its value in words, and every one writes what it holds back into the field, so the field's own
+ * text is what the owner holds once a keystroke has settled.
+ */
 test.beforeEach(async ({ page }) => {
-    await page.goto("/text-input");
-    await expect(page.locator("[data-example]").first()).toBeVisible();
+    await page.goto("/text-input/docs");
+    await expect(page.locator(BASIC)).toBeVisible();
+    await docsSettled(page);
 });
 
 test("no field uses the native disabled attribute", async ({ page }) => {
+    await knob(page, "isDisabled").click();
+    await knob(page, "tooltipIsDisabled").click();
+
     await expect(page.locator("input[disabled]"), "no field carries the native disabled attribute").toHaveCount(0);
 });
 
-test("typing reports each keystroke", async ({ page }) => {
-    await page.locator(DEFAULT).focus();
+test("typing lands each keystroke", async ({ page }) => {
+    await page.locator(BASIC).click();
     await page.keyboard.type("Ada");
-    expect(await readout(page, "default"), "typing reports each keystroke").toContain('value: "Ada"');
+    expect(await inputValue(page.locator(BASIC)), "every keystroke lands in what the field holds").toBe("Ada");
 });
 
 test("a transforming setter rewrites the value and keeps the caret", async ({ page }) => {
-    await page.locator(COUPON).focus();
+    await page.locator(COUPON).click();
     await page.keyboard.type("ab");
-    expect(await readout(page, "transformingSetter"), "a transforming setter is applied").toContain('value: "AB"');
-    expect(await inputValue(page.locator(COUPON)), "and the DOM is corrected to match it").toBe("AB");
+    await ownerHolds(page, "AB", "the owner holds what its setter made of the keystrokes");
+    expect(await inputValue(page.locator(COUPON)), "a transforming setter is applied, and the DOM follows it").toBe(
+        "AB",
+    );
 
     await setSelectionRange(page.locator(COUPON), 1, 1);
     await page.keyboard.type("c");
@@ -50,65 +71,93 @@ test("a transforming setter rewrites the value and keeps the caret", async ({ pa
     ).toEqual({ start: 2, end: 2 });
 });
 
+/**
+ * The refusing example keeps digits only and stops at a fixed length. The length is the page's, so the spec types
+ * well past any length a PIN could have and asks only that what is kept is a prefix of the digits typed.
+ */
 test("a refusing setter drops what it will not take", async ({ page }) => {
-    await page.locator(PIN).focus();
+    await page.locator(PIN).click();
     await page.keyboard.type("12ab34");
     expect(await inputValue(page.locator(PIN)), "a refusing setter drops what it will not take").toBe("1234");
 
-    await page.keyboard.type("567");
-    expect(await inputValue(page.locator(PIN)), "and truncation clamps the caret rather than throwing").toBe("123456");
+    const digits = "1234567890123456";
+
+    await page.keyboard.type(digits.slice(4));
+
+    const kept = await inputValue(page.locator(PIN));
+
+    expect(digits.startsWith(kept), "and truncation keeps the digits typed first, in order").toBe(true);
+    expect(kept.length, "stopping short of everything typed rather than throwing").toBeLessThan(digits.length);
+    expect(kept.length, "having still taken what fitted").toBeGreaterThan(4);
 });
 
+/**
+ * A number input has no selection API — `selectionStart` answers null rather than throwing — so the example's
+ * starting value reaching the element at all is what shows the initial sync survives it.
+ */
 test("a number field is a type rather than a component", async ({ page }) => {
-    await expect(page.locator(NUMBER), "a number field is a type, not a component").toHaveAttribute("type", "number");
-    await expect(page.locator(NUMBER), "and carries its stepping attributes").toHaveAttribute("step", "5");
+    const field = page.locator(NUMBER);
+    const step = Number(await field.getAttribute("step"));
+    const start = Number(await inputValue(field));
 
-    await page.locator(NUMBER).focus();
+    await expect(field, "a number field is a type, not a component").toHaveAttribute("type", "number");
+    expect(step, "and carries its stepping attributes").toBeGreaterThan(0);
+    expect(await inputValue(field), "its starting value survives a selection API that answers null").not.toBe("");
+
+    await field.click();
     await page.keyboard.press("ArrowUp");
-    expect(await readout(page, "number"), "so an arrow steps by the step").toContain('value: "15"');
+    expect(Number(await inputValue(field)), "so an arrow steps by the step").toBe(start + step);
 });
 
 test("a read-only field refuses a keystroke and a paste alike", async ({ page }) => {
-    expect(await isReadOnly(page.locator(READ_ONLY)), "a read-only field is readonly").toBe(true);
-    await expect(page.locator(READ_ONLY), "and says so").toHaveAttribute("aria-readonly", "true");
-    await expect(page.locator(READ_ONLY), "without claiming to be disabled").not.toHaveAttribute("aria-disabled");
+    await page.locator(BASIC).click();
+    await page.keyboard.type("Ada");
+    await knob(page, "isReadOnly").click();
 
-    const before = await inputValue(page.locator(READ_ONLY));
+    expect(await isReadOnly(page.locator(BASIC)), "a read-only field is readonly").toBe(true);
+    await expect(page.locator(BASIC), "and says so").toHaveAttribute("aria-readonly", "true");
+    await expect(page.locator(BASIC), "without claiming to be disabled").not.toHaveAttribute("aria-disabled");
 
-    await page.locator(READ_ONLY).focus();
+    const before = await inputValue(page.locator(BASIC));
+
+    await page.locator(BASIC).click();
     await page.keyboard.type("x");
     await page.keyboard.insertText("pasted");
     expect(
-        await inputValue(page.locator(READ_ONLY)),
+        await inputValue(page.locator(BASIC)),
         "and refuses both a keystroke and a paste, which no keystroke guard would have caught",
     ).toBe(before);
 });
 
 test("a disabled field shuts every write path and suppresses its caret", async ({ page }) => {
-    expect(await isReadOnly(page.locator(DISABLED)), "disabled is readonly, so every write path is shut").toBe(true);
-    await expect(page.locator(DISABLED), "while ARIA carries the disabled meaning").toHaveAttribute(
+    await knob(page, "isDisabled").click();
+
+    expect(await isReadOnly(page.locator(BASIC)), "disabled is readonly, so every write path is shut").toBe(true);
+    await expect(page.locator(BASIC), "while ARIA carries the disabled meaning").toHaveAttribute(
         "aria-disabled",
         "true",
     );
     expect(
-        await computedStyle(page.locator(DISABLED), "caret-color"),
+        await computedStyle(page.locator(BASIC), "caret-color"),
         "and the caret is suppressed, so a focusable disabled field does not invite typing",
     ).toBe("rgba(0, 0, 0, 0)");
 
-    const before = await inputValue(page.locator(DISABLED));
+    const before = await inputValue(page.locator(BASIC));
 
-    await page.locator(DISABLED).focus();
+    await page.locator(BASIC).focus();
     await page.keyboard.insertText("pasted");
-    expect(await inputValue(page.locator(DISABLED)), "a disabled field takes nothing").toBe(before);
+    expect(await inputValue(page.locator(BASIC)), "a disabled field takes nothing").toBe(before);
 });
 
 test("an errored field announces itself invalid", async ({ page }) => {
-    await expect(page.locator(EMAIL), "the error variant is an email field").toHaveAttribute("type", "email");
-    expect(
-        await inputValue(page.locator(EMAIL)),
-        "whose initial sync survives a selection API that reports null instead of throwing",
-    ).toBe("not-an-email");
-    await expect(page.locator(EMAIL), "and an errored field is announced invalid").toHaveAttribute(
+    await expect(page.locator(BASIC), "a field in its plain state is not invalid").not.toHaveAttribute(
+        "aria-invalid",
+        "true",
+    );
+
+    await knob(page, "hasError").click();
+
+    await expect(page.locator(BASIC), "and an errored field is announced invalid").toHaveAttribute(
         "aria-invalid",
         "true",
     );
@@ -117,34 +166,67 @@ test("an errored field announces itself invalid", async ({ page }) => {
 /**
  * Playwright has no IME API of its own, so the composition is driven straight over the DevTools
  * Protocol — the one place this suite still reaches past the library it is built on.
+ *
+ * It runs on the upper-casing field, because there a value reported mid-composition shows: its owner would write
+ * the half-composed letters back upper-cased, into the middle of the IME's own buffer.
  */
 test("a composition is left alone until it is committed", async ({ page }) => {
     const session = await page.context().newCDPSession(page);
 
-    await page.locator(DEFAULT).focus();
-    await page.keyboard.type("Ada");
+    await page.locator(COUPON).click();
+    await page.keyboard.type("ab");
 
     await session.send("Input.imeSetComposition", {
-        text: "にほ",
+        text: "xy",
         selectionStart: 2,
         selectionEnd: 2,
     });
     expect(
-        await readout(page, "default"),
-        "a value mid-composition is not reported, so the IME's own buffer is left alone",
-    ).toContain('value: "Ada"');
+        await inputValue(page.locator(COUPON)),
+        "a value mid-composition is not reported, so the owner never rewrites the IME's own buffer",
+    ).toBe("ABxy");
+    await ownerHolds(page, "AB", "the owner still holds what it held before the composition began");
 
     await session.send("Input.insertText", { text: "日本" });
-    expect(await readout(page, "default"), "committing the composition reports it").toContain("Ada日本");
     expect(
-        await inputValue(page.locator(DEFAULT)),
-        "and the resync that follows does not write stale state over what the IME just committed",
-    ).toBe("Ada日本");
+        await inputValue(page.locator(COUPON)),
+        "committing the composition reports it, and the resync that follows does not write stale state over it",
+    ).toBe("AB日本");
+    await ownerHolds(page, "AB日本", "and is told of the committed text");
 });
 
-const CITY = `${demo("suggestions")} [role="combobox"]`;
+/**
+ * The leading slot sits where the text starts and the trailing one where it ends, so under right-to-left the two
+ * trade sides. No page is right-to-left, so the spec turns the whole document over itself. The leading slot holds a
+ * glyph and the trailing one the clear button, and the two are compared with each other rather than with numbers.
+ */
+test("the leading and trailing slots follow the reading direction", async ({ page }) => {
+    const leading = page.locator(`${ADORNED} span[aria-hidden="true"]`);
+    const trailing = page.locator(`${ADORNED} button`);
+    const centerX = async (locator: Locator) => {
+        const box = (await locator.boundingBox())!;
+
+        return box.x + box.width * 0.5;
+    };
+
+    expect(await centerX(leading), "left to right, the leading slot is on the left").toBeLessThan(
+        await centerX(trailing),
+    );
+
+    await page.evaluate(() => {
+        document.documentElement.dir = "rtl";
+    });
+
+    await expect
+        .poll(async () => (await centerX(leading)) > (await centerX(trailing)), {
+            message: "right to left, it moves to the right, where the text starts",
+        })
+        .toBe(true);
+});
+
+const CITY = `${docsDemo(DOCS, "Suggestions")} [role="combobox"]`;
 const SUGGESTION = '[role="listbox"] [role="option"]';
-const EDITABLE = demo("editable");
+const EDITABLE = docsDemo(DOCS, "Editable");
 
 /**
  * The suggestion list's id is minted per mount, so the list is reached through the field's own
@@ -180,7 +262,7 @@ test("a field with suggestions is a combobox that starts closed and keeps the br
  * autocomplete — so Enter on typed text has to leave the text exactly as typed.
  */
 test("typing opens the list with nothing highlighted, and Enter keeps the typed text", async ({ page }) => {
-    await page.locator(CITY).focus();
+    await page.locator(CITY).click();
     await page.keyboard.type("b");
 
     await expect(page.locator(CITY), "typing opens the list").toHaveAttribute("aria-expanded", "true");
@@ -205,11 +287,10 @@ test("typing opens the list with nothing highlighted, and Enter keeps the typed 
         "false",
     );
     expect(await inputValue(page.locator(CITY)), "and leaves the typed text alone").toBe("b");
-    expect(await readout(page, "suggestions"), "which is what the owner holds").toContain('value: "b"');
 });
 
 test("the arrows walk the list and Enter writes the highlighted suggestion", async ({ page }) => {
-    await page.locator(CITY).focus();
+    await page.locator(CITY).click();
     await page.keyboard.type("br");
     await expect(page.locator(SUGGESTION), "two cities start with the typed text").toHaveCount(2);
 
@@ -228,13 +309,12 @@ test("the arrows walk the list and Enter writes the highlighted suggestion", asy
     expect(await inputValue(page.locator(CITY)), "Enter writes the suggestion's own text, not its description").toBe(
         "Bruges",
     );
-    expect(await readout(page, "suggestions"), "and the owner holds it").toContain('value: "Bruges"');
     await expect(page.locator(CITY), "the pick closes the list").toHaveAttribute("aria-expanded", "false");
     await expect(page.locator(CITY), "and focus never left the field").toBeFocused();
 });
 
 test("the up arrow on a closed list opens it on the last suggestion", async ({ page }) => {
-    await page.locator(CITY).focus();
+    await page.locator(CITY).click();
     await page.keyboard.type("t");
     await page.keyboard.press("Escape");
     await expect(page.locator(CITY)).toHaveAttribute("aria-expanded", "false");
@@ -247,7 +327,7 @@ test("the up arrow on a closed list opens it on the last suggestion", async ({ p
 });
 
 test("a suggestion can be picked with the pointer", async ({ page }) => {
-    await page.locator(CITY).focus();
+    await page.locator(CITY).click();
     await page.keyboard.type("po");
     await page.locator(SUGGESTION, { hasText: "Porto" }).first().click();
 
@@ -256,7 +336,7 @@ test("a suggestion can be picked with the pointer", async ({ page }) => {
 });
 
 test("Escape closes the list without touching the text, and an empty filter keeps it shut", async ({ page }) => {
-    await page.locator(CITY).focus();
+    await page.locator(CITY).click();
     await page.keyboard.type("Lis");
     await expect(page.locator(CITY)).toHaveAttribute("aria-expanded", "true");
 
@@ -267,9 +347,7 @@ test("Escape closes the list without touching the text, and an empty filter keep
 
     await page.keyboard.type("zzz");
 
-    expect(await readout(page, "suggestions"), "any text is kept, even text nothing matches").toContain(
-        'value: "Liszzz"',
-    );
+    expect(await inputValue(page.locator(CITY)), "any text is kept, even text nothing matches").toBe("Liszzz");
     await expect(page.locator(CITY), "while the filter returns nothing the list stays shut").toHaveAttribute(
         "aria-expanded",
         "false",
@@ -283,55 +361,64 @@ test("Escape closes the list without touching the text, and an empty filter keep
     );
 });
 
-test("edit in place swaps a button for a focused field holding the current text", async ({ page }) => {
-    const button = page.locator(`${EDITABLE} button`);
+/**
+ * Edit in place is a button showing the text, swapped for a focused field while editing. The button is named after
+ * what it edits followed by the text itself. Its pencil is decoration, so the text it shows is read the way a screen
+ * reader reads it.
+ */
+const editButton = (page: Page) => page.locator(`${EDITABLE} button`);
+const editField = (page: Page) => page.locator(`${EDITABLE} input`);
 
-    await expect(button, "the resting state is a button named after what it edits").toHaveAttribute(
+const typeOver = async (page: Page, text: string) => {
+    await editField(page).click();
+    await page.keyboard.press("ControlOrMeta+a");
+    await page.keyboard.type(text);
+};
+
+test("edit in place swaps a button for a focused field holding the current text", async ({ page }) => {
+    const shown = await accessibleText(editButton(page));
+
+    expect(shown, "the resting state is a button showing the text").not.toBe("");
+    await expect(editButton(page), "named after what it edits, its text included").toHaveAttribute(
         "aria-label",
-        "Edit name, Ada Lovelace",
+        new RegExp(`${shown}$`),
     );
 
-    await button.click();
+    await editButton(page).click();
 
-    await expect(page.locator(`${EDITABLE} input`), "pressing it opens a field").toBeFocused();
-    expect(
-        await inputValue(page.locator(`${EDITABLE} input`)),
-        "which starts from the current text rather than empty",
-    ).toBe("Ada Lovelace");
-    await expect(page.locator(`${EDITABLE} button`), "and the button is gone while editing").toHaveCount(0);
-    expect(await readout(page, "editable")).toContain("editing: true");
+    await expect(editField(page), "pressing it opens a field").toBeFocused();
+    expect(await inputValue(editField(page)), "which starts from the current text rather than empty").toBe(shown);
+    await expect(editButton(page), "and the button is gone while editing").toHaveCount(0);
 });
 
 test("Enter keeps the edit and hands focus back to the button", async ({ page }) => {
-    await page.locator(`${EDITABLE} button`).click();
-    await page.locator(`${EDITABLE} input`).fill("Grace Hopper");
+    await editButton(page).click();
+    await typeOver(page, "Grace Hopper");
     await page.keyboard.press("Enter");
 
-    expect(await readout(page, "editable"), "Enter keeps the edit").toContain('value: "Grace Hopper" | editing: false');
-    await expect(page.locator(`${EDITABLE} button`), "and focus returns to the button, not to the page").toBeFocused();
-    await expect(page.locator(`${EDITABLE} button`), "whose name follows the new text").toHaveAttribute(
-        "aria-label",
-        "Edit name, Grace Hopper",
-    );
+    await expect(editField(page), "Enter ends the edit").toHaveCount(0);
+    await expect.poll(() => accessibleText(editButton(page)), { message: "keeping it" }).toBe("Grace Hopper");
+    await expect(editButton(page), "and focus returns to the button, not to the page").toBeFocused();
+    await expect(editButton(page), "whose name follows the new text").toHaveAttribute("aria-label", /Grace Hopper$/);
 });
 
 test("Escape puts the old text back", async ({ page }) => {
-    await page.locator(`${EDITABLE} button`).click();
-    await page.locator(`${EDITABLE} input`).fill("Someone else");
+    const shown = await accessibleText(editButton(page));
+
+    await editButton(page).click();
+    await typeOver(page, "Someone else");
     await page.keyboard.press("Escape");
 
-    expect(await readout(page, "editable"), "Escape throws the draft away").toContain(
-        'value: "Ada Lovelace" | editing: false',
-    );
-    await expect(page.locator(`${EDITABLE} button`), "and focus returns to the button").toBeFocused();
+    await expect.poll(() => accessibleText(editButton(page)), { message: "Escape throws the draft away" }).toBe(shown);
+    await expect(editButton(page), "and focus returns to the button").toBeFocused();
 });
 
 test("leaving the field keeps the edit", async ({ page }) => {
-    await page.locator(`${EDITABLE} button`).click();
-    await page.locator(`${EDITABLE} input`).fill("Alan Turing");
+    await editButton(page).click();
+    await typeOver(page, "Alan Turing");
     await page.keyboard.press("Tab");
 
-    expect(await readout(page, "editable"), "focus leaving commits, the same as Enter").toContain(
-        'value: "Alan Turing" | editing: false',
-    );
+    await expect
+        .poll(() => accessibleText(editButton(page)), { message: "focus leaving commits, the same as Enter" })
+        .toBe("Alan Turing");
 });

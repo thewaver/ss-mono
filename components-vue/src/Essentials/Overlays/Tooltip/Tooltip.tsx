@@ -32,6 +32,7 @@ export const Tooltip = defineComponent(
             skipDelayWindowMs: () => props.skipDelayWindowMs ?? TOOLTIP_DEFAULTS.skipDelayWindowMs,
             focusShowDelayMs: () => props.focusShowDelayMs ?? TOOLTIP_DEFAULTS.focusShowDelayMs,
             isHiddenOnAnchorBlur: true,
+            isFocusWithin: props.isAnchorGroup ?? false,
         });
 
         const fader = ElementFaderVueUtils.useFader(isShown, {
@@ -93,6 +94,25 @@ export const Tooltip = defineComponent(
             anchor && isVisible ? TooltipUtils.describe(anchor, tooltipId) : undefined,
         );
 
+        const focusedControl = shallowRef<HTMLElement>();
+
+        watchAfterRender([() => props.anchorRef, () => props.isAnchorGroup ?? false], ([anchor, isAnchorGroup]) => {
+            if (!anchor || !isAnchorGroup) return;
+
+            const stop = TooltipUtils.followFocusWithin(anchor, (focused) => {
+                focusedControl.value = focused;
+            });
+
+            return () => {
+                stop();
+                focusedControl.value = undefined;
+            };
+        });
+
+        watchAfterRender([focusedControl, fader.isVisible], ([focused, isVisible]) =>
+            focused && isVisible ? TooltipUtils.describe(focused, tooltipId) : undefined,
+        );
+
         return () => {
             if (!fader.isVisible.value) return null;
 
@@ -147,6 +167,7 @@ export const Tooltip = defineComponent(
             focusShowDelayMs: null,
             hoverShowDelayMs: null,
             skipDelayWindowMs: null,
+            isAnchorGroup: Boolean,
             anchorRef: null,
         }),
     },

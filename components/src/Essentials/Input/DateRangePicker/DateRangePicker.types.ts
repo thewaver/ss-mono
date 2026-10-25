@@ -1,8 +1,7 @@
 import type { Point2d } from "@thewaver/ss-utils";
 
 import type { AnchorPlacement } from "../../../Abstracts/Anchor/Anchor.types";
-import type { DateValue, DateValueWeekStart } from "../../../Abstracts/DateValue/DateValue.types";
-import type { CalendarDayMatcher } from "../Calendar/Calendar.types";
+import type { DateValueWeekStart } from "../../../Abstracts/DateValue/DateValue.types";
 
 export type BaseDateRangePickerValues = {
     /**
@@ -12,7 +11,11 @@ export type BaseDateRangePickerValues = {
     id?: string;
     /** The fields' name when they are submitted as part of a form. They submit as `<name>-start` and `<name>-end`. */
     name?: string;
-    /** Where the calendar sits against the fields. */
+    /**
+     * Where the calendar sits against the fields. Left out, it hangs below the fields lined up with the edge the
+     * text starts from: the left, or the right where the fields sit in right-to-left text. Given, it is used as it
+     * stands in either direction.
+     */
     placement?: AnchorPlacement;
     /** How far the calendar is held clear of the fields. */
     offset?: Point2d;
@@ -33,15 +36,11 @@ export type BaseDateRangePickerValues = {
      * owns the trigger.
      */
     triggerId?: string;
-    /** Names the control that opens the calendar. */
+    /**
+     * Names the control that opens the calendar. It is kept inside a `Label` too, since the caption names the field
+     * and the control is a second one with a name of its own.
+     */
     triggerAriaLabel: string;
-    /** Days the calendar refuses, described rather than computed — see the calendar's own `disabledDays`. */
-    disabledDays?: CalendarDayMatcher[];
 };
 
-export type BaseDateRangePickerCbs = {
-    /** Whether one day can be picked, for rules neither a plain earliest and latest nor `disabledDays` can express. */
-    computeIsDayDisabled?: (day: DateValue) => boolean;
-};
-
-export type BaseDateRangePickerProps = BaseDateRangePickerValues & BaseDateRangePickerCbs;
+export type BaseDateRangePickerProps = BaseDateRangePickerValues;

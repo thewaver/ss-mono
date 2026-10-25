@@ -11,6 +11,11 @@ const sweep = keyframes({
     "100%": { transform: "translateX(300%)" },
 });
 
+const sweepFromRight = keyframes({
+    "0%": { transform: "translateX(100%)" },
+    "100%": { transform: "translateX(-300%)" },
+});
+
 export const progressTrack = style({
     position: "relative",
     overflow: "hidden",
@@ -39,10 +44,19 @@ export const progressFill = style({
         [`${progressTrack}.${hasError} &`]: {
             backgroundImage: `linear-gradient(90deg, ${themeVars.color.error.dark}, ${themeVars.color.error.light})`,
         },
+        [`&:dir(rtl)`]: {
+            backgroundImage: `linear-gradient(270deg, ${themeVars.color.primary.dark}, ${themeVars.color.primary.light})`,
+        },
+        [`${progressTrack}.${hasError} &:dir(rtl)`]: {
+            backgroundImage: `linear-gradient(270deg, ${themeVars.color.error.dark}, ${themeVars.color.error.light})`,
+        },
         [`${progressTrack}.${isIndeterminate} &`]: {
             width: "33%",
             animation: `${sweep} 1.2s linear infinite`,
             transition: "none",
+        },
+        [`${progressTrack}.${isIndeterminate} &:dir(rtl)`]: {
+            animationName: sweepFromRight,
         },
     },
 });

@@ -1,8 +1,8 @@
 <script lang="ts">
     import type { Snippet } from "svelte";
 
-    import type { AnchorPlacement, SelectOption, Toast } from "@thewaver/ss-components-svelte";
-    import { Button, Range, Select, Toasts, ViewportWrapper } from "@thewaver/ss-components-svelte";
+    import type { AnchorPlacement, SelectOption, Toast, ToastState } from "@thewaver/ss-components-svelte";
+    import { Button, Range, Select, ToastUtils, Toasts, ViewportWrapper } from "@thewaver/ss-components-svelte";
     import { ViewportWrapperKnobs } from "@thewaver/ss-playground/App/Knobs/ViewportWrappers.const";
     import * as styles from "@thewaver/ss-playground/App/Pages/ViewportWrapperPage/ViewportWrapperPage.css";
     import { RANGE_THUMB_SIZE } from "@thewaver/ss-playground/App/StyledComponents/RangeContent/RangeContent.css";
@@ -61,8 +61,6 @@
 
         return { width: side, height: side };
     });
-
-    let toastCount = 0;
 
     const items: VariantDefs[] = [
         {
@@ -182,14 +180,10 @@
                         id={"raiseInnerToast"}
                         ariaLabel={"Notify inside the viewport"}
                         onClick={() => {
-                            toastCount += 1;
-
-                            const id = `innerToast${toastCount}`;
-
-                            innerToasts = [
-                                ...innerToasts,
-                                { id, value: { kind: "info", message: INNER_TOAST_MESSAGE } },
-                            ];
+                            innerToasts = ToastUtils.withRequestedToast(innerToasts, {
+                                value: { kind: "info", message: INNER_TOAST_MESSAGE },
+                                announcement: INNER_TOAST_MESSAGE,
+                            }).toasts;
                         }}
                     >
                         {#snippet renderContent(flags)}
@@ -209,19 +203,23 @@
                         marginLeft: INNER_TOAST_MARGIN,
                     }}
                 >
-                    {#snippet renderToast(toast, visibilityTarget, transitionDurationMs, state)}
+                    {#snippet renderToast(
+                        toast: Toast<ToastDefs>,
+                        visibilityTarget: 0 | 1,
+                        transitionDurationMs: number,
+                        state: ToastState,
+                        dismiss: () => boolean,
+                    )}
                         <PageToastContent
                             {toast}
                             {state}
                             animation={"fade"}
                             stacking={"flow"}
-                            dir={"column"}
+                            flexDirection={"column"}
                             gap={INNER_TOAST_GAP}
                             {visibilityTarget}
                             {transitionDurationMs}
-                            onDismiss={() => {
-                                innerToasts = innerToasts.filter((candidate) => candidate.id !== toast.id);
-                            }}
+                            onDismiss={dismiss}
                         />
                     {/snippet}
                 </Toasts>

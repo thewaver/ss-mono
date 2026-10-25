@@ -22,10 +22,15 @@ declare module "virtual:component-api" {
 
     export type ApiTableKind = "props" | "values" | "aliases" | "fields";
 
+    export type ApiTextPart =
+        { kind: "text"; text: string } | { kind: "prop"; text: string } | { kind: "link"; text: string; href: string };
+
+    export type ApiText = ApiTextPart[];
+
     export type ApiEntry = {
         name: string;
         type: string;
-        description: string;
+        description: ApiText;
         isOptional: boolean;
         isAccessor: boolean;
     };
@@ -39,7 +44,7 @@ declare module "virtual:component-api" {
         kind: ApiTableKind;
         name: string;
         heading: string;
-        description: string;
+        description: ApiText;
         isDocumented: boolean;
         entries: ApiEntry[];
         includes: ApiInclude[];

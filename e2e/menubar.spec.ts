@@ -1,13 +1,22 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { activeDescendantText, activeMatches, demo, prop, readout } from "./helpers";
+import { activeDescendantText, activeMatches, docsDemo, docsSettled, prop } from "./helpers";
 
-const BAR = `${demo("default")} [role="menubar"]`;
-const WORD = `${BAR} > div:not([aria-hidden]) [role="menuitem"][aria-haspopup="menu"]:not([aria-label])`;
-const OVERFLOW = `${BAR} > div [role="menuitem"][aria-label]`;
+const DOCS = "/src/App/Pages/MenubarPage/Docs";
+
+const barOf = (name: string) => `${docsDemo(DOCS, name)} [role="menubar"]`;
+const wordsOf = (name: string) =>
+    `${barOf(name)} > div:not([aria-hidden]) [role="menuitem"][aria-haspopup="menu"]:not([aria-label])`;
+
+const BAR = barOf("Basic");
+const WORD = wordsOf("Basic");
+const NARROW_WORD = wordsOf("Overflow");
+const OVERFLOW = `${barOf("Overflow")} > div [role="menuitem"][aria-label]`;
 const MENU = '[role="menu"]';
 
-const NARROW_PX = "80";
+/** Every example reads out the last item picked, under its bar. */
+const readout = async (page: Page, name: string) =>
+    ((await page.locator(`${docsDemo(DOCS, name)} [data-readout]`).textContent()) ?? "").trim();
 
 /**
  * The overflow trigger is a menuitem that opens a menu as well, and is told apart from the words by the name
@@ -53,14 +62,24 @@ const tabStops = (page: Page) =>
         WORD,
     );
 
+/**
+ * The overflow example's width is a knob, typed the way a person would. The value typed is far past either end of
+ * the knob's range, so the field settles it on the nearest end when Tab leaves it, and the spec never names the range.
+ */
 const setBarWidth = async (page: Page, value: string) => {
-    await page.locator(`${prop("barWidth")} input`).fill(value);
-    await page.locator(`${prop("barWidth")} input`).blur();
+    await page.locator(`${prop("barWidth")} input`).click();
+    await page.keyboard.press("ControlOrMeta+a");
+    await page.keyboard.type(value);
+    await page.keyboard.press("Tab");
 };
 
+const WIDEST_PX = "100000";
+const NARROWEST_PX = "1";
+
 test.beforeEach(async ({ page }) => {
-    await page.goto("/menubar");
+    await page.goto("/menubar/docs");
     await expect(page.locator(WORD).first()).toBeVisible();
+    await docsSettled(page);
 });
 
 test("the bar is a named menubar of words, each a menuitem that opens a menu", async ({ page }) => {
@@ -200,25 +219,29 @@ test("picking an item runs it, closes the menu and puts focus back on its word",
     await openedByClick(page, 1);
     const menuSelector = `#${await (await menuOf(page, 1)).getAttribute("id")}`;
     const highlighted = (await activeDescendantText(page, menuSelector)) ?? "";
-    const before = await readout(page, "default");
+    const before = await readout(page, "Basic");
 
     await page.keyboard.press("Enter");
 
     await expect(page.locator(MENU), "Enter closes the menu").toHaveCount(0);
 
-    const after = await readout(page, "default");
-    const picked = /last picked: (.+?) —/.exec(after)?.[1] ?? "";
+    const after = await readout(page, "Basic");
+    const picked = /: (.+)$/.exec(after)?.[1] ?? "";
 
     expect(after, "something ran").not.toBe(before);
     expect(highlighted.startsWith(picked) && picked.length > 0, "and it was the item the highlight was on").toBe(true);
     await expect(word(page, 1), "with focus back on the word the menu belonged to").toBeFocused();
 });
 
+/**
+ * The overflow example is the same bar in a box whose width is a knob. The wide example above it shows every word,
+ * so its count is the whole set, read off the page rather than written down here.
+ */
 test("a word pushed out of the row becomes a submenu of the overflow menu", async ({ page }) => {
     const all = await wordCount(page);
 
-    await setBarWidth(page, NARROW_PX);
-    await expect.poll(() => wordCount(page), "a narrow bar shows fewer words").toBeLessThan(all);
+    await setBarWidth(page, NARROWEST_PX);
+    await expect.poll(() => page.locator(NARROW_WORD).count(), "a narrow bar shows fewer words").toBeLessThan(all);
 
     const overflow = page.locator(OVERFLOW);
 
@@ -230,10 +253,22 @@ test("a word pushed out of the row becomes a submenu of the overflow menu", asyn
     await overflow.click();
     await expect(page.locator(MENU)).toHaveCount(1);
 
-    const inRow = await wordCount(page);
+    const inRow = await page.locator(NARROW_WORD).count();
 
     await expect(
         page.locator(`${MENU} [role="menuitem"][aria-haspopup="menu"]`),
         "every word that left the row is in the overflow menu, each as a submenu",
     ).toHaveCount(all - inRow);
+});
+
+test("widening the bar brings every word back into the row", async ({ page }) => {
+    const all = await wordCount(page);
+
+    await setBarWidth(page, WIDEST_PX);
+
+    await expect.poll(() => page.locator(NARROW_WORD).count(), "a wide enough bar shows every word").toBe(all);
+    expect(
+        await page.locator(OVERFLOW).evaluate((trigger) => trigger.closest('[aria-hidden="true"]') !== null),
+        "and has nothing left to put in an overflow menu, so its trigger is out of the reading order",
+    ).toBe(true);
 });

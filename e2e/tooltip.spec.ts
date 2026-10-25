@@ -1,22 +1,24 @@
 import { expect, test } from "@playwright/test";
 
-import { demo } from "./helpers";
+import { docsDemo, docsSettled } from "./helpers";
 
-const ANCHOR = `${demo("decorated")} button`;
-const OTHER = `${demo("pending")} button`;
+const BUTTON_DOCS = "/src/App/Pages/ButtonPage/Docs";
+const ANCHOR = `${docsDemo(BUTTON_DOCS, "Tooltip")} button`;
+const OTHER = `${docsDemo(BUTTON_DOCS, "Basic")} button`;
 const TOOLTIP = '[role="tooltip"]';
 
 /** Comfortably past the 200ms fade, so a tooltip that had been withdrawn is unmounted rather than fading. */
 const FADE_SETTLED_MS = 600;
 
 /**
- * `Tooltip` now has a page of its own, but this run stays on the `Button` page: what is under test here
- * is the `tooltipDefs` route into it, where a control asks for a tooltip rather than being handed one, and
- * the `Button` page is where both a plain tooltip and a disabled control's explanation live.
+ * `Tooltip` now has a page of its own, but this run stays on `Button`'s Docs view: what is under test here
+ * is the `tooltipDefs` route into it, where a control asks for a tooltip rather than being handed one. The anchor is
+ * the tooltip example's button, placed `top_out`, and the button somewhere else to move to is the basic one.
  */
 test.beforeEach(async ({ page }) => {
-    await page.goto("/button");
-    await expect(page.locator("[data-example]").first()).toBeVisible();
+    await page.goto("/button/docs");
+    await expect(page.locator(ANCHOR)).toBeVisible();
+    await docsSettled(page);
 });
 
 test("nothing is announced before anything is hovered", async ({ page }) => {

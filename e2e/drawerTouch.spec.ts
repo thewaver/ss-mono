@@ -1,6 +1,6 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { demo } from "./helpers";
+import { docsSettled } from "./helpers";
 
 /**
  * A swipe behaves differently under a finger than under a mouse, and the difference is invisible from a
@@ -13,7 +13,8 @@ import { demo } from "./helpers";
  *
  * The case that matters is a sheet whose own content scrolls. Pushing it down while the content sits at the
  * top must move the sheet, because there is nothing above to scroll to; pushing it down after scrolling must
- * scroll the content back instead, because the person is reading rather than dismissing.
+ * scroll the content back instead, because the person is reading rather than dismissing. That sheet is the Docs
+ * page's swiping example.
  */
 const DIALOG = '[aria-modal="true"]';
 const PANEL = `${DIALOG} > *`;
@@ -63,7 +64,7 @@ const hasPanelSettled = async (page: Page) => {
 };
 
 const openSheet = async (page: Page) => {
-    await page.locator(demo("bottom")).getByText("Open bottom").click();
+    await page.locator("#openSheet").click();
     await expect(page.locator(DIALOG)).toBeVisible();
     await expect.poll(() => hasPanelSettled(page)).toBe(true);
 };
@@ -71,8 +72,9 @@ const openSheet = async (page: Page) => {
 test.use({ hasTouch: true });
 
 test.beforeEach(async ({ page }) => {
-    await page.goto("/drawer");
-    await expect(page.locator(demo("bottom")).getByText("Open bottom")).toBeVisible();
+    await page.goto("/drawer/docs");
+    await expect(page.locator("#openSheet")).toBeVisible();
+    await docsSettled(page);
 });
 
 test("a sheet whose content overflows is one that really does scroll", async ({ page }) => {

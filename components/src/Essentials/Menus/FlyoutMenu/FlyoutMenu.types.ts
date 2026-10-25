@@ -46,7 +46,9 @@ export type BaseFlyoutMenuValues = {
     gap?: number;
     /**
      * Where the panel sits against the entry that opened it, as one choice across and one down. A placement that will
-     * not fit falls back within its own family.
+     * not fit falls back within its own family. Left out, it hangs below the entry lined up with the edge the text
+     * starts from: the left, or the right where the menu sits in right-to-left text. Given, it is used as it stands
+     * in either direction.
      */
     placement?: AnchorPlacement;
     /**

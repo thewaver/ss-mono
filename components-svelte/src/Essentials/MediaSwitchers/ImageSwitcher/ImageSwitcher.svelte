@@ -20,9 +20,11 @@
 
     $effect(() => {
         const src = props.src;
+        const alt = props.alt;
 
         return untrack(() =>
             switcher.show(src, {
+                alt,
                 onLoad: function (e) {
                     return props.onLoad?.call(this, e);
                 },
@@ -40,7 +42,8 @@
             style:transition-duration={`${transitionDurationMs}ms`}
             style:visibility={layer.src ? undefined : "hidden"}
             src={layer.src}
-            alt={props.alt ?? ""}
+            alt={layer.alt ?? ""}
+            aria-hidden={layer.isShown ? undefined : "true"}
         />
     {/each}
 </div>

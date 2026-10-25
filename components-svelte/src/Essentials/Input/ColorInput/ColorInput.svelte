@@ -1,9 +1,15 @@
 <script lang="ts">
     import { untrack } from "svelte";
 
-    import { COLOR_INPUT_DEFAULTS, type ColorInputRenderProps, ColorInputUtils } from "@thewaver/ss-components";
+    import {
+        COLOR_INPUT_DEFAULTS,
+        type ColorInputRenderProps,
+        ColorInputUtils,
+        ColorInputStyles as styles,
+    } from "@thewaver/ss-components";
     import type { Color } from "@thewaver/ss-utils";
 
+    import { NavigatorSvelteUtils } from "../../../Abstracts/Navigator/NavigatorSvelte.utils.svelte.js";
     import InteractionWrapper from "../../../Primitives/InteractionWrapper/InteractionWrapper.svelte";
     import Popover from "../../../Primitives/Popover/Popover.svelte";
     import type { ValuePair } from "../../../Utils/typeUtils.js";
@@ -23,6 +29,11 @@
     let isUnreadable = $state(startingState.isUnreadable);
 
     const isDisabled = $derived(props.isDisabled ?? false);
+
+    const getDirection = NavigatorSvelteUtils.createDirection(
+        () => ref ?? undefined,
+        () => !visibility,
+    );
 
     $effect(() => {
         if (visibility && isDisabled) visibility = false;
@@ -84,15 +95,17 @@
         renderContent={props.renderArea}
     />
 
-    <Range
-        bind:value={() => hsv.h, (hue) => (hsv = { ...hsv, h: hue ?? hsv.h })}
-        sizing="fill"
-        {isDisabled}
-        max={ColorInputUtils.HUE_MAX}
-        step={ColorInputUtils.HUE_STEP}
-        ariaLabel={props.hueLabel}
-        renderContent={props.renderHue}
-    />
+    <div class={styles.colorInputHue} dir="ltr">
+        <Range
+            bind:value={() => hsv.h, (hue) => (hsv = { ...hsv, h: hue ?? hsv.h })}
+            sizing="fill"
+            {isDisabled}
+            max={ColorInputUtils.HUE_MAX}
+            step={ColorInputUtils.HUE_STEP}
+            ariaLabel={props.hueLabel}
+            renderContent={props.renderHue}
+        />
+    </div>
 {/snippet}
 
 <InteractionWrapper {...props} bind:ref hasError={(props.hasError ?? false) || isUnreadable} {extraFlags}>
@@ -105,6 +118,7 @@
             isOpen={visibility}
             {flags}
             renderContent={props.renderContent}
+            computeValueText={props.computeValueText}
             onToggle={() => (visibility ? (visibility = false) : open())}
             onMouseEnter={props.onMouseEnter}
             onMouseLeave={props.onMouseLeave}
@@ -118,7 +132,7 @@
     ariaAttributes={{ "aria-label": props.pickerLabel }}
     isOpen={visibility}
     anchorRef={ref}
-    placement={props.placement ?? COLOR_INPUT_DEFAULTS.placement}
+    placement={props.placement ?? COLOR_INPUT_DEFAULTS.placement[getDirection()]}
     offset={props.offset}
     transitionDurationMs={props.transitionDurationMs}
     hasAutoFocus={true}

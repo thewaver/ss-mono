@@ -16,10 +16,12 @@ import { LabelSolidUtils } from "../Label/LabelSolid.utils";
 import type { TagInputProps } from "./TagInputSolid.types";
 
 export const TagInput = (props: TagInputProps) => {
-    const getAriaLabel = LabelSolidUtils.resolveAriaLabel(
+    const { getAriaLabel, getAriaLabelledBy } = FormFieldSolidUtils.resolveAriaName(
         props.ariaLabel === undefined ? undefined : () => access(props.ariaLabel)!,
     );
     const getAriaDescribedBy = FormFieldSolidUtils.resolveAriaDescribedBy();
+
+    TagInputUtils.warnIfTagsUnnamed(props.computeTagAriaLabel, "computeTagAriaLabel");
 
     const valueSignal = accessSignal(() => props.value);
 
@@ -126,7 +128,8 @@ export const TagInput = (props: TagInputProps) => {
                             padding: `${access(props.padding) ?? TAG_INPUT_DEFAULTS.padding}px`,
                         }}
                         role="group"
-                        aria-label={access(props.ariaLabel)}
+                        aria-label={getAriaLabelledBy() === undefined ? access(props.ariaLabel) : undefined}
+                        aria-labelledby={getAriaLabelledBy()}
                         onPointerDown={(e) => {
                             if (e.target !== e.currentTarget || getIsDisabled()) return;
 
@@ -186,6 +189,7 @@ export const TagInput = (props: TagInputProps) => {
                             value={textSignal[0]()}
                             readOnly={getFlags().isDisabled}
                             aria-label={getAriaLabel()}
+                            aria-labelledby={getAriaLabelledBy()}
                             aria-describedby={getAriaDescribedBy()}
                             aria-disabled={getFlags().isDisabled || undefined}
                             onInput={(e) => textSignal[1](e.currentTarget.value)}

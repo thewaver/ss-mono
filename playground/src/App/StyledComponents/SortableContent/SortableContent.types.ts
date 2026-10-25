@@ -3,7 +3,7 @@ import type { InteractionFlags, SortableFlags, SortableItemFlags, SortableOrient
 export type BaseSortableItemContentValues = {
     flags: InteractionFlags<SortableItemFlags>;
     detail?: string;
-    isCenterd?: boolean;
+    isCentered?: boolean;
 };
 
 export type BaseSortableItemContentProps = BaseSortableItemContentValues;

@@ -1,6 +1,6 @@
 import { type Locator, type Page, expect, test } from "@playwright/test";
 
-import { accessibleText, activeText, attributesOf, demo, example, prop, readout } from "./helpers";
+import { accessibleText, activeText, attributesOf, docsDemo, docsSettled, prop } from "./helpers";
 
 /**
  * The toolbar decides what fits by measuring, so nothing here writes down a width or a number of buttons:
@@ -10,23 +10,60 @@ import { accessibleText, activeText, attributesOf, demo, example, prop, readout 
  *
  * Every action is rendered whether or not it fits — the ones that do not are taken out of the flow so they
  * can still be measured — so "in the row" is read off `aria-hidden` rather than off what is in the DOM.
+ *
+ * Only the first example has a width knob. Every other example's bar sits in a box the reader resizes by dragging its
+ * corner, so the spec drags that corner as a person would: all the way in for the narrowest the box goes, all the way
+ * out for the widest the page leaves it.
  */
-const DEFAULT = example("default");
-const REFUSING = example("refusing");
+const DOCS = "/src/App/Pages/ToolbarPage/Docs";
+const DEFAULT = docsDemo(DOCS, "Basic");
+const REFUSING = docsDemo(DOCS, "Refusing");
 const TOOLBAR = '[role="toolbar"]';
 const MENU_ITEM = '[role="menu"] [role="menuitem"]';
 
 const WIDE_PX = "700";
-const WIDEST_PX = "760";
 const NARROW_PX = "320";
-const TIGHT_PX = "150";
 const SETTLE_MS = 250;
 
+const FAR_PX = 2000;
+const CORNER_INSET_PX = 6;
+
 const setBarWidth = async (page: Page, value: string) => {
-    await page.locator(`${prop("barWidth")} input`).fill(value);
-    await page.locator(`${prop("barWidth")} input`).blur();
+    await page.locator(`${prop("barWidth")} input`).click();
+    await page.keyboard.press("ControlOrMeta+a");
+    await page.keyboard.type(value);
+    await page.keyboard.press("Tab");
     await page.waitForTimeout(SETTLE_MS);
 };
+
+/**
+ * Drags the corner of the resizable box around an example's bar sideways by `dx` pixels. A drag made by coordinates
+ * does not scroll the page, so the bar is brought on screen first.
+ */
+const dragBarCorner = async (page: Page, scope: string, dx: number) => {
+    await page.locator(`${scope} ${TOOLBAR}`).scrollIntoViewIfNeeded();
+
+    const corner = await page.locator(scope).evaluate((root) => {
+        let box = root.querySelector('[role="toolbar"]') as HTMLElement | null;
+
+        while (box && getComputedStyle(box).resize !== "horizontal") box = box.parentElement;
+
+        const rect = box!.getBoundingClientRect();
+
+        return { x: rect.right, y: rect.bottom };
+    });
+
+    await page.mouse.move(corner.x - CORNER_INSET_PX, corner.y - CORNER_INSET_PX);
+    await page.mouse.down();
+    await page.mouse.move(corner.x - CORNER_INSET_PX + dx, corner.y - CORNER_INSET_PX, { steps: 10 });
+    await page.mouse.up();
+    await page.mouse.move(0, 0);
+    await page.waitForTimeout(SETTLE_MS);
+};
+
+const narrowest = (page: Page, scope: string) => dragBarCorner(page, scope, -FAR_PX);
+
+const widest = (page: Page, scope: string) => dragBarCorner(page, scope, FAR_PX);
 
 const readRow = (page: Page, scope: string) =>
     page.evaluate((value) => {
@@ -55,12 +92,23 @@ const readMenu = async (page: Page) => (await page.locator(MENU_ITEM).allTextCon
 
 const focusedText = (page: Page) => page.evaluate(() => (document.activeElement?.textContent ?? "").trim());
 
+/**
+ * Tabs into a toolbar from whatever comes before it on the page: focus its tab stop, step back out with Shift+Tab,
+ * and press Tab again, so the landing is the browser's tab order and not a focus call aimed at a button.
+ */
+const tabIntoToolbar = async (page: Page, scope: string) => {
+    await page.locator(`${scope} ${TOOLBAR} [tabindex="0"]`).first().focus();
+    await page.keyboard.press("Shift+Tab");
+    await page.keyboard.press("Tab");
+};
+
 const isInsideToolbar = (page: Page, scope: string) =>
     page.evaluate((value) => !!document.activeElement?.closest(`${value} [role="toolbar"]`), scope);
 
 test.beforeEach(async ({ page }) => {
-    await page.goto("/toolbar");
+    await page.goto("/toolbar/docs");
     await expect(page.locator(DEFAULT)).toBeVisible();
+    await docsSettled(page);
     await page.waitForTimeout(SETTLE_MS);
 });
 
@@ -107,8 +155,7 @@ test("the row is one tab stop, and the arrows walk it", async ({ page }) => {
 
     const row = await readRow(page, DEFAULT);
 
-    await page.locator(`${DEFAULT} button`).first().focus();
-    await page.keyboard.press("Tab");
+    await tabIntoToolbar(page, DEFAULT);
 
     expect(await focusedText(page), "tabbing in lands on the first action rather than anywhere in the row").toBe(
         row[0],
@@ -148,8 +195,7 @@ test("an action that has left the row has left the walk with it", async ({ page 
     const collapsed = await readCollapsed(page, DEFAULT);
     const row = await readRow(page, DEFAULT);
 
-    await page.locator(`${DEFAULT} button`).first().focus();
-    await page.keyboard.press("Tab");
+    await tabIntoToolbar(page, DEFAULT);
 
     const visited = [await focusedText(page)];
 
@@ -167,8 +213,7 @@ test("an action that has left the row has left the walk with it", async ({ page 
 test("tabbing again leaves the toolbar rather than moving along it", async ({ page }) => {
     await setBarWidth(page, NARROW_PX);
 
-    await page.locator(`${DEFAULT} button`).first().focus();
-    await page.keyboard.press("Tab");
+    await tabIntoToolbar(page, DEFAULT);
 
     expect(await isInsideToolbar(page, DEFAULT), "focus went in").toBe(true);
 
@@ -179,7 +224,7 @@ test("tabbing again leaves the toolbar rather than moving along it", async ({ pa
 });
 
 test("an action that refuses to collapse is the last one standing", async ({ page }) => {
-    await setBarWidth(page, TIGHT_PX);
+    await narrowest(page, REFUSING);
 
     const row = await readRow(page, REFUSING);
 
@@ -188,7 +233,7 @@ test("an action that refuses to collapse is the last one standing", async ({ pag
 });
 
 test("an action that always collapses is never in the row, however much room there is", async ({ page }) => {
-    await setBarWidth(page, WIDEST_PX);
+    await widest(page, REFUSING);
 
     const row = await readRow(page, REFUSING);
     const collapsed = await readCollapsed(page, REFUSING);
@@ -228,12 +273,15 @@ test("the same action runs whether it is pressed in the row or picked in the men
  * this pass where a layout removes a behavior rather than relocating one. What has to survive is
  * everything else the toolbar is: the role, the single tab stop and the roving walk.
  */
-const PALETTE = demo("palette");
+const PALETTE = docsDemo(DOCS, "Ring");
 
 const placedBox = (scope: string) => `${scope} [role="presentation"][style*="left"]`;
 
 test("a ring of tools shows every action and collapses none of them", async ({ page }) => {
-    await expect(page.locator(`${PALETTE} [role="toolbar"]`)).toHaveAttribute("aria-label", "Tools");
+    await expect(page.locator(`${PALETTE} [role="toolbar"]`), "the ring is still a named toolbar").toHaveAttribute(
+        "aria-label",
+        /.+/,
+    );
 
     const buttons = page.locator(`${PALETTE} button`);
     const placed = page.locator(placedBox(PALETTE));
@@ -275,21 +323,23 @@ test("a ring keeps the single tab stop, and both pairs of arrows walk it", async
  * announce plain buttons as something they are not), a press that flips it and the owner's list together,
  * the same single tab stop, and a collapsed action that turns up as a checked checkbox in the menu. Which
  * actions are pressed is read back from the page's readout by the action's own text, never a written-down
- * name. What the painter draws for "pressed" is nobody's business here; that it hears the state is, and that
+ * name, and an empty list is a readout naming none of them. What the painter draws for "pressed" is nobody's business here; that it hears the state is, and that
  * is read as its mark's class coming back different from an unpressed neighbor's and then the same again.
  */
-const PRESSED = example("pressed");
+const PRESSED = docsDemo(DOCS, "Pressed");
 const PRESSED_ACTION = `${PRESSED} ${TOOLBAR} > div:not([aria-hidden]) button:not([aria-haspopup])`;
 const CHECKBOX_ITEM = '[role="menu"] [role="menuitemcheckbox"]';
+
+const pressedReadout = async (page: Page) =>
+    ((await page.locator(`${PRESSED} [data-readout]`).textContent()) ?? "").trim();
+
+const actionNames = async (page: Page) =>
+    (await page.locator(PRESSED_ACTION).allTextContents()).map((text) => text.trim());
 
 const markClass = (page: Page, index: number) =>
     page.locator(PRESSED_ACTION).nth(index).locator("span").first().getAttribute("class");
 
 test.describe("a toolbar of pressed actions", () => {
-    test.beforeEach(async ({ page }) => {
-        await setBarWidth(page, WIDE_PX);
-    });
-
     test("every action is a toggle button, and none starts pressed", async ({ page }) => {
         const pressed = await attributesOf(page, PRESSED_ACTION, "aria-pressed");
 
@@ -297,7 +347,12 @@ test.describe("a toolbar of pressed actions", () => {
         expect(pressed, "each says it is not pressed rather than leaving the attribute off").toEqual(
             pressed.map(() => "false"),
         );
-        expect(await readout(page, "pressed"), "and the owner's list is empty").toContain("pressed: nothing");
+        const text = await pressedReadout(page);
+
+        expect(
+            (await actionNames(page)).filter((name) => text.includes(name)),
+            "and the owner's list is empty",
+        ).toEqual([]);
     });
 
     test("a press holds the action down until it is pressed again, and the owner's list follows", async ({ page }) => {
@@ -312,13 +367,13 @@ test.describe("a toolbar of pressed actions", () => {
             "aria-pressed",
             "false",
         );
-        expect(await readout(page, "pressed"), "the owner's list holds the pressed action").toContain(name);
+        expect(await pressedReadout(page), "the owner's list holds the pressed action").toContain(name);
         expect(await markClass(page, 0), "and the painter hears the state").not.toBe(unpressedMark);
 
         await first.click();
 
         await expect(first, "a second press lets it back up").toHaveAttribute("aria-pressed", "false");
-        expect(await readout(page, "pressed"), "and takes it out of the list").toContain("pressed: nothing");
+        expect(await pressedReadout(page), "and takes it out of the list").not.toContain(name);
         expect(await markClass(page, 0), "the painter draws it as its neighbors again").toBe(unpressedMark);
     });
 
@@ -334,7 +389,7 @@ test.describe("a toolbar of pressed actions", () => {
         ).toHaveAttribute("aria-pressed", "true");
         await expect(page.locator(PRESSED_ACTION).nth(1)).toHaveAttribute("aria-pressed", "true");
 
-        const text = await readout(page, "pressed");
+        const text = await pressedReadout(page);
 
         expect(text, "the list holds both").toContain(names[0]);
         expect(text).toContain(names[1]);
@@ -370,7 +425,7 @@ test.describe("a toolbar of pressed actions", () => {
         const name = ((await page.locator(PRESSED_ACTION).first().textContent()) ?? "").trim();
 
         await page.locator(PRESSED_ACTION).first().click();
-        await setBarWidth(page, TIGHT_PX);
+        await narrowest(page, PRESSED);
 
         const collapsed = await readCollapsed(page, PRESSED);
 
@@ -400,12 +455,10 @@ test.describe("a toolbar of pressed actions", () => {
 
         await items.filter({ hasText: other }).click();
 
-        expect(await readout(page, "pressed"), "checking it in the menu presses it in the owner's list").toContain(
-            other,
-        );
+        expect(await pressedReadout(page), "checking it in the menu presses it in the owner's list").toContain(other);
 
         await page.keyboard.press("Escape");
-        await setBarWidth(page, WIDE_PX);
+        await widest(page, PRESSED);
 
         await expect(
             page.locator(PRESSED_ACTION).filter({ hasText: other }),
@@ -420,13 +473,11 @@ test.describe("a toolbar of pressed actions", () => {
  * the next hands the tooltip a new anchor while it is showing, so it must stay up the whole way — never hiding and
  * reappearing — and the description must move with it, since `aria-describedby` is how the tooltip is announced.
  */
-const SHARED = demo("sharedTooltip");
+const SHARED = docsDemo(DOCS, "Tooltip");
 
 test("a tooltip shared along the row stays up as the pointer moves on, and describes the action it reached", async ({
     page,
 }) => {
-    await page.goto("/toolbar");
-
     const actions = page.locator(`${SHARED} ${TOOLBAR} button:visible:not([aria-haspopup]):not([aria-disabled])`);
     const tooltip = page.locator('[role="tooltip"]');
 
@@ -475,34 +526,31 @@ const sampleVisibility = async (tooltip: Locator) => {
 const sharedRow = (page: Page) =>
     page.locator(`${SHARED} ${TOOLBAR} > :not([aria-hidden]) button:not([aria-haspopup])`);
 
-/** The action with no tooltip of its own, and the enabled actions on either side of it, found by position. */
+/**
+ * The action with no tooltip of its own, and the enabled action before it, found by position. The
+ * example's Disabled knob makes one: a disabled action that is not reachable shows no tooltip, by pointer or by key.
+ */
 const aroundGap = async (page: Page) => {
+    await page.locator(`${prop("tooltipIsDisabled")} input`).click();
+    await expect(sharedRow(page).and(page.locator('[aria-disabled="true"]'))).toHaveCount(1);
+
     const row = sharedRow(page);
     const gapIndex = await row.evaluateAll((buttons) =>
         buttons.findIndex((button) => button.getAttribute("aria-disabled") === "true"),
     );
 
-    return { before: row.nth(gapIndex - 1), gap: row.nth(gapIndex), after: row.nth(gapIndex + 1) };
+    return { before: row.nth(gapIndex - 1), gap: row.nth(gapIndex) };
 };
 
 /**
  * The keyboard carries the tooltip the way the pointer does. Only the first opening waits; arrowing on from an action
- * whose tooltip is showing moves it to the next one at once, so it never drops out on the way. The disabled action in
- * the middle is not a stop, so the arrows skip it and the tooltip goes straight on to the action after it.
+ * whose tooltip is showing moves it to the next one at once, so it never drops out on the way.
  */
 test("arrowing along the row carries the shared tooltip with the focus", async ({ page }) => {
     const tooltip = page.locator('[role="tooltip"]');
-    await setBarWidth(page, WIDEST_PX);
+    const row = sharedRow(page);
 
-    const { before, after } = await aroundGap(page);
-    const beforeText = ((await before.textContent()) ?? "").trim();
-
-    await sharedRow(page).first().focus();
-
-    for (let step = 0; step < (await sharedRow(page).count()) && (await focusedText(page)) !== beforeText; step++) {
-        await page.keyboard.press("ArrowRight");
-    }
-
+    await row.first().focus();
     await expect(tooltip, "a keyboard focus opens it").toBeVisible();
 
     const tooltipId = await tooltip.getAttribute("id");
@@ -511,27 +559,58 @@ test("arrowing along the row carries the shared tooltip with the focus", async (
 
     const samples = await sampleVisibility(tooltip);
 
-    expect(await focusedText(page), "the disabled action is stepped over").toBe(
-        ((await after.textContent()) ?? "").trim(),
+    expect(await focusedText(page), "focus moved on to the next action").toBe(
+        ((await row.nth(1).textContent()) ?? "").trim(),
     );
     expect(samples, "the tooltip never went away as focus moved on").not.toContain(false);
-    await expect(after, "and it describes the action focus reached").toHaveAttribute(
+    await expect(row.nth(1), "and it describes the action focus reached").toHaveAttribute(
         "aria-describedby",
         new RegExp(tooltipId!),
     );
-    await expect(before, "not the one focus left").not.toHaveAttribute("aria-describedby", new RegExp(tooltipId!));
+    await expect(row.first(), "not the one focus left").not.toHaveAttribute("aria-describedby", new RegExp(tooltipId!));
+});
+
+/**
+ * The disabled action in the middle is not a stop, so the arrows skip it, and the shared tooltip never describes it.
+ * What comes after it in the walk depends on how much of the row fits the page — another action, or the overflow
+ * trigger — so the spec asks only that focus went past it.
+ */
+test("arrowing along the row steps over a disabled action and never describes it", async ({ page }) => {
+    const tooltip = page.locator('[role="tooltip"]');
+    const { before, gap } = await aroundGap(page);
+    const beforeText = ((await before.textContent()) ?? "").trim();
+
+    await tabIntoToolbar(page, SHARED);
+
+    for (let step = 0; step < (await sharedRow(page).count()) && (await focusedText(page)) !== beforeText; step++) {
+        await page.keyboard.press("ArrowRight");
+    }
+
+    await expect(tooltip, "a keyboard focus on the action before it shows the tooltip").toBeVisible();
+
+    const tooltipId = await tooltip.getAttribute("id");
+
+    await page.keyboard.press("ArrowRight");
+
+    expect(await focusedText(page), "the walk does not stop on the disabled action").not.toBe(
+        ((await gap.textContent()) ?? "").trim(),
+    );
+    expect(
+        await page.evaluate((selector) => !!document.activeElement?.closest(selector), `${SHARED} ${TOOLBAR}`),
+        "and it stays inside the toolbar",
+    ).toBe(true);
+    await expect(gap, "the tooltip never describes it").not.toHaveAttribute("aria-describedby", new RegExp(tooltipId!));
 });
 
 /**
  * An action with no tooltip of its own is a gap in the shared one: resting on it shows nothing and describes nothing,
- * and the next action that has one picks the tooltip back up.
+ * and an action that has one picks the tooltip back up — here the first action, which is never the disabled one.
  */
 test("an action without a tooltip of its own is a gap the shared tooltip closes over", async ({ page }) => {
     const tooltip = page.locator('[role="tooltip"]');
 
-    await setBarWidth(page, WIDEST_PX);
-
-    const { before, gap, after } = await aroundGap(page);
+    const { before, gap } = await aroundGap(page);
+    const other = sharedRow(page).first();
 
     await before.hover();
     await expect(tooltip).toBeVisible();
@@ -540,9 +619,9 @@ test("an action without a tooltip of its own is a gap the shared tooltip closes 
     await expect(tooltip, "it closes over the action that has none").toBeHidden();
     await expect(gap, "and that action is described by nothing").not.toHaveAttribute("aria-describedby", /.+/);
 
-    await after.hover();
-    await expect(tooltip, "the next action with a tooltip picks it back up").toBeVisible();
-    await expect(after).toHaveAttribute("aria-describedby", new RegExp((await tooltip.getAttribute("id"))!));
+    await other.hover();
+    await expect(tooltip, "another action with a tooltip picks it back up").toBeVisible();
+    await expect(other).toHaveAttribute("aria-describedby", new RegExp((await tooltip.getAttribute("id"))!));
 });
 
 /**
@@ -551,8 +630,6 @@ test("an action without a tooltip of its own is a gap the shared tooltip closes 
  */
 test("an action collapsed into the overflow menu keeps its tooltip there", async ({ page }) => {
     const tooltip = page.locator('[role="tooltip"]');
-
-    await setBarWidth(page, WIDEST_PX);
 
     const last = sharedRow(page).and(page.locator(":not([aria-disabled])")).last();
     const name = ((await last.textContent()) ?? "").trim();
@@ -564,7 +641,7 @@ test("an action collapsed into the overflow menu keeps its tooltip there", async
 
     await page.mouse.move(0, 0);
     await expect(tooltip).toBeHidden();
-    await setBarWidth(page, NARROW_PX);
+    await narrowest(page, SHARED);
 
     expect(await readCollapsed(page, SHARED), "the action has moved into the menu").toContain(name);
 
@@ -572,4 +649,43 @@ test("an action collapsed into the overflow menu keeps its tooltip there", async
     await page.locator(MENU_ITEM).filter({ hasText: name }).hover();
 
     await expect(tooltip, "its menu item shows the tooltip it had in the row").toHaveText(said);
+});
+
+/**
+ * The other half of the Tooltip example's knobs: kept reachable while disabled, the disabled action is a stop in the
+ * walk again and shows its tooltip, while pressing it still runs nothing.
+ */
+test("a disabled action kept reachable stays in the walk and shows its tooltip", async ({ page }) => {
+    const tooltip = page.locator('[role="tooltip"]');
+
+    await page.locator(`${prop("tooltipIsReachableWhenDisabled")} input`).click();
+    await page.locator(`${prop("tooltipIsDisabled")} input`).click();
+
+    const disabled = sharedRow(page).and(page.locator('[aria-disabled="true"]'));
+
+    await expect(disabled).toHaveCount(1);
+
+    const index = await sharedRow(page).evaluateAll((buttons) =>
+        buttons.findIndex((button) => button.getAttribute("aria-disabled") === "true"),
+    );
+
+    await sharedRow(page)
+        .nth(index - 1)
+        .focus();
+    await page.keyboard.press("ArrowRight");
+
+    await expect(disabled, "the arrows stop on the disabled action").toBeFocused();
+    await expect(tooltip, "which shows its tooltip").toBeVisible();
+    await expect(disabled, "and is described by it").toHaveAttribute(
+        "aria-describedby",
+        new RegExp((await tooltip.getAttribute("id"))!),
+    );
+
+    const before = ((await page.locator(`${SHARED} [data-readout]`).textContent()) ?? "").trim();
+
+    await page.keyboard.press("Enter");
+    expect(
+        ((await page.locator(`${SHARED} [data-readout]`).textContent()) ?? "").trim(),
+        "while pressing it still runs nothing",
+    ).toBe(before);
 });

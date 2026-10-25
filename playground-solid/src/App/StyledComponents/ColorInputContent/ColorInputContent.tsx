@@ -23,7 +23,9 @@ export const PageColorInputContent = (props: ColorInputContentProps) => {
             <div class={styles.colorInputSwatch} style={{ "background-color": access(props.renderProps).value }} />
 
             <Show when={!access(props.isCompact)}>
-                <div class={styles.colorInputValue}>{access(props.renderProps).value}</div>
+                <div class={styles.colorInputValue} dir="ltr">
+                    {access(props.renderProps).value}
+                </div>
             </Show>
         </div>
     );

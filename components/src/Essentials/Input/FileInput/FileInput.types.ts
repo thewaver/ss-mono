@@ -30,10 +30,11 @@ export type FileInputRenderProps = {
      * here. Files dropped anywhere on the control arrive exactly as a pick from the dialog does, checked against
      * the same limits. It is never true while the control is disabled, since a disabled control refuses the drop.
      *
-     * The drop is a second way in beside pressing the control to open the dialog, never a replacement for it: a
-     * drag is not something every reader can make, and WCAG 2.5.7 requires a single press to reach the same
-     * result. So a consumer may not hide the picker behind the drop area — covering the control, or painting it
-     * as a place to drop with nothing saying it can also be pressed.
+     * The drop is a second way in beside pressing the control to open the dialog, never a replacement for it: a drag is
+     * not something every reader can make, and
+     * {@link https://www.w3.org/WAI/WCAG22/Understanding/dragging-movements.html WCAG 2.5.7} requires a single press to
+     * reach the same result. So a consumer may not hide the picker behind the drop area — covering the control, or
+     * painting it as a place to drop with nothing saying it can also be pressed.
      */
     isDragOver: boolean;
 };

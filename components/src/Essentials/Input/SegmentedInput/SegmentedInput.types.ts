@@ -25,7 +25,11 @@ export type SegmentedInputCellRenderProps = InteractionFlags<TextFieldFlags & Se
 };
 
 export type BaseSegmentedInputValues = {
-    /** How many cells the field has, which is also the most characters its value can hold. */
+    /**
+     * How many cells the field has, which is also the most characters its value can hold. The cells run left to
+     * right whatever the direction of the text around the field, and so do the caret and the arrow keys, since a code
+     * of digits and Latin letters is never read the other way.
+     */
     cellCount: number;
     /** The space between two cells, in pixels. */
     gap?: number;

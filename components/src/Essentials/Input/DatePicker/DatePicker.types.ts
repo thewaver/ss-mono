@@ -1,11 +1,15 @@
 import type { Point2d } from "@thewaver/ss-utils";
 
 import type { AnchorPlacement } from "../../../Abstracts/Anchor/Anchor.types";
-import type { DateValue, DateValueWeekStart } from "../../../Abstracts/DateValue/DateValue.types";
-import type { CalendarDayMatcher, CalendarPrecision } from "../Calendar/Calendar.types";
+import type { DateValueWeekStart } from "../../../Abstracts/DateValue/DateValue.types";
+import type { CalendarPrecision } from "../Calendar/Calendar.types";
 
 export type BaseDatePickerValues = {
-    /** Where the calendar sits against the field. */
+    /**
+     * Where the calendar sits against the field. Left out, it hangs below the field lined up with the edge the text
+     * starts from: the left, or the right where the field sits in right-to-left text. Given, it is used as it stands
+     * in either direction.
+     */
     placement?: AnchorPlacement;
     /** How far the calendar is held clear of the field. */
     offset?: Point2d;
@@ -27,15 +31,11 @@ export type BaseDatePickerValues = {
      * owns the trigger.
      */
     triggerId?: string;
-    /** Names the control that opens the calendar. */
+    /**
+     * Names the control that opens the calendar. It is kept inside a `Label` too, since the caption names the field
+     * and the control is a second one with a name of its own.
+     */
     triggerAriaLabel: string;
-    /** Days the calendar refuses, described rather than computed — see the calendar's own `disabledDays`. */
-    disabledDays?: CalendarDayMatcher[];
 };
 
-export type BaseDatePickerCbs = {
-    /** Whether one day can be picked, for rules neither a plain earliest and latest nor `disabledDays` can express. */
-    computeIsDayDisabled?: (day: DateValue) => boolean;
-};
-
-export type BaseDatePickerProps = BaseDatePickerValues & BaseDatePickerCbs;
+export type BaseDatePickerProps = BaseDatePickerValues;

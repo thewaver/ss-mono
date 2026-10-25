@@ -123,7 +123,7 @@ export const BasicDocsExample = () => {
                         />
                     </PageFormButtons>
 
-                    <div class={exampleStyles.exampleReadout}>
+                    <div class={exampleStyles.exampleReadout} data-readout>
                         {`${getState().isValid ? "Ready to send." : "Some fields need attention."} ${getOutcome()}`}
                     </div>
                 </PageFormStack>

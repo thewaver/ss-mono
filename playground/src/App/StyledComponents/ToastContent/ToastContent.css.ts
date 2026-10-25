@@ -16,7 +16,7 @@ export const toastCard = style({
     gap: themeVars.spacing.full,
     width: 300,
     borderRadius: themeVars.borderRadius.half,
-    borderLeft: "4px solid currentColor",
+    borderInlineStart: "4px solid currentColor",
     padding: themeVars.spacing.full,
     color: themeVars.color.surface.contrast,
     backgroundImage: `linear-gradient(215deg, ${themeVars.color.surface.light}, ${themeVars.color.surface.dark})`,
@@ -63,7 +63,7 @@ export const toastMeta = style({
 export const toastCountdown = style({
     position: "absolute",
     bottom: 0,
-    left: 0,
+    insetInlineStart: 0,
 
     height: 2,
     backgroundColor: "currentColor",

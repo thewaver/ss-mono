@@ -15,6 +15,7 @@ import type { FormFieldProps } from "./FormField.types";
 
 export const FormField = (props: FormFieldProps) => {
     const messageId = useId();
+    const captionId = useId();
     const formContext = useFormContext();
 
     const controlRef = useRef<HTMLElement | undefined>(undefined);
@@ -54,10 +55,15 @@ export const FormField = (props: FormFieldProps) => {
     useLayoutEffect(() => reportChange?.(), [reportChange, hasError]);
 
     const descriptionId = hasMessage ? messageId : undefined;
+    const fieldCaptionId = props.renderCaption ? captionId : undefined;
 
     const fieldContext = useMemo(
-        (): FormFieldContextType => ({ getDescriptionId: () => descriptionId, ...control }),
-        [descriptionId, control],
+        (): FormFieldContextType => ({
+            getDescriptionId: () => descriptionId,
+            getCaptionId: () => fieldCaptionId,
+            ...control,
+        }),
+        [descriptionId, fieldCaptionId, control],
     );
 
     const state: FormFieldState = { hasError, hasMessage, isRequired };
@@ -71,7 +77,7 @@ export const FormField = (props: FormFieldProps) => {
                 gap: `${props.gap ?? FORM_FIELD_DEFAULTS.gap}px`,
             }}
         >
-            {props.renderCaption?.(state)}
+            {props.renderCaption && <div id={captionId}>{props.renderCaption(state)}</div>}
 
             <FormFieldContextProvider value={fieldContext}>{props.renderControl(state)}</FormFieldContextProvider>
 

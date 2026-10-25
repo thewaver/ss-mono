@@ -16,7 +16,7 @@ export const BasicDocsExample = (props: Props) => {
             hasError={props.hasError}
             isDisabled={props.isDisabled}
             ariaLabel={"Default checkbox"}
-            renderContent={(getFlags) => <PageCheckboxContent flags={getFlags} />}
+            renderContent={(getFlags) => <PageCheckboxContent flags={getFlags}>Default checkbox</PageCheckboxContent>}
         />
     );
 };

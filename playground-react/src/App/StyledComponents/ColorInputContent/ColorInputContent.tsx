@@ -21,7 +21,11 @@ export const PageColorInputContent = (props: ColorInputContentProps) => {
         >
             <div className={styles.colorInputSwatch} style={{ backgroundColor: props.renderProps.value }} />
 
-            {!props.isCompact && <div className={styles.colorInputValue}>{props.renderProps.value}</div>}
+            {!props.isCompact && (
+                <div className={styles.colorInputValue} dir="ltr">
+                    {props.renderProps.value}
+                </div>
+            )}
         </div>
     );
 };

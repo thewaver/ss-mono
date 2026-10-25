@@ -23,14 +23,11 @@ const computeFillDefs = () => [{ color: themeVars.color.surface.dark }];
 const computePoints = (size: Size2d) =>
     ShapeUtils.attachArrow(
         {
-            points: computeArrowBedPoints(props.controls.shape.value, size),
-            joinRadii: props.controls.shape.value === "rounded_box" ? ROUNDED_RADII : SHARP_RADII,
+            points: computeArrowBedPoints(props.shape, size),
+            joinRadii: props.shape === "rounded_box" ? ROUNDED_RADII : SHARP_RADII,
         },
         props.computeAim(size),
-        TOOLTIP_ARROW_TEMPLATES[props.controls.arrow.value](
-            props.controls.arrowWidth.value,
-            props.controls.arrowLength.value,
-        ),
+        TOOLTIP_ARROW_TEMPLATES[props.arrow](props.arrowWidth, props.arrowLength),
     );
 </script>
 

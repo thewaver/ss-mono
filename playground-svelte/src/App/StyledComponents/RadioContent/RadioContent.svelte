@@ -20,6 +20,7 @@
         props.flags.isDisabled && styles.isDisabled,
         props.flags.hasError && styles.hasError,
     ]}
+    aria-hidden="true"
 >
     <div class={styles.radioMarker}>
         <div class={styles.radioDot}></div>

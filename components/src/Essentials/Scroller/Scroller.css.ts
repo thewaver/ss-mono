@@ -2,37 +2,14 @@ import { globalStyle, style, styleVariants } from "@vanilla-extract/css";
 
 export const scrollerRoot = style({
     display: "grid",
-    alignItems: "center",
-    justifyItems: "center",
-    minWidth: 0,
-    maxWidth: "100%",
-    maxHeight: "100%",
-    isolation: "isolate",
-});
-
-export const scrollerSteps = style({
-    display: "flex",
-    alignItems: "center",
-});
-
-export const scrollerStepsVariants = styleVariants({
-    x: {
-        flexDirection: "row",
-    },
-    y: {
-        flexDirection: "column",
-    },
-});
-
-export const scrollerArea = style({
-    display: "grid",
     gridTemplateAreas: `"box yBar" "xBar corner"`,
     gridTemplateColumns: "minmax(0, 1fr) auto",
     gridTemplateRows: "minmax(0, 1fr) auto",
-    justifySelf: "stretch",
     minWidth: 0,
     minHeight: 0,
+    maxWidth: "100%",
     maxHeight: "100%",
+    isolation: "isolate",
 });
 
 export const scrollerBox = style({

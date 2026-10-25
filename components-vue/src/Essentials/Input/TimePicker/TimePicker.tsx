@@ -3,6 +3,7 @@ import { type SlotsType, defineComponent, nextTick, shallowRef, useId } from "vu
 import { type PopupTriggerFlags, TIME_PICKER_DEFAULTS } from "@thewaver/ss-components";
 import type { TimeValue } from "@thewaver/ss-utils";
 
+import { NavigatorVueUtils } from "../../../Abstracts/Navigator/NavigatorVue.utils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import type {
     InteractionControlSlots,
@@ -29,9 +30,11 @@ export const TimePicker = defineComponent(
 
         const rootRef = shallowRef<HTMLDivElement>();
 
+        const direction = NavigatorVueUtils.useDirection(rootRef);
+
         let isFocusReturned = false;
 
-        const getIsDisabled = () => props.isDisabled ?? false;
+        const getIsLocked = () => (props.isDisabled ?? false) || (props.isReadOnly ?? false);
 
         const dismiss = () => {
             if (!isOpen.value) return;
@@ -41,13 +44,13 @@ export const TimePicker = defineComponent(
         };
 
         const open = () => {
-            if (getIsDisabled()) return;
+            if (getIsLocked()) return;
 
             isOpen.value = true;
         };
 
-        watchAfterRender([isOpen, getIsDisabled], ([isShown, isDisabled]) => {
-            if (isShown && isDisabled) isOpen.value = false;
+        watchAfterRender([isOpen, getIsLocked], ([isShown, isLocked]) => {
+            if (isShown && isLocked) isOpen.value = false;
         });
 
         watchAfterRender([isOpen], ([isShown]) => {
@@ -86,7 +89,7 @@ export const TimePicker = defineComponent(
         );
 
         return () => {
-            const isDisabled = getIsDisabled();
+            const isLocked = getIsLocked();
 
             const forwarded = {
                 ...forwardProps(props, TimeInput),
@@ -99,7 +102,7 @@ export const TimePicker = defineComponent(
 
             const renderTrigger = (meridiem: TimeInputMeridiem) => (
                 <InteractionWrapper
-                    isDisabled={isDisabled}
+                    isDisabled={isLocked}
                     extraFlags={{ isOpen: isOpen.value } satisfies PopupTriggerFlags}
                 >
                     {
@@ -153,7 +156,7 @@ export const TimePicker = defineComponent(
                         ariaAttributes={{ "aria-label": props.clockLabel }}
                         isOpen={isOpen.value}
                         anchorRef={rootRef.value}
-                        placement={props.placement ?? TIME_PICKER_DEFAULTS.placement}
+                        placement={props.placement ?? TIME_PICKER_DEFAULTS.placement[direction.value]}
                         offset={props.offset}
                         transitionDurationMs={props.popupTransitionDurationMs}
                         hasAutoFocus={true}
@@ -201,6 +204,7 @@ export const TimePicker = defineComponent(
             "isRequired": Boolean,
             "autoComplete": null,
             "isConcealed": Boolean,
+            "isLeftToRight": Boolean,
             "padding": null,
             "gap": null,
             "ariaAttributes": null,

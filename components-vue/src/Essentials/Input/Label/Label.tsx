@@ -13,6 +13,7 @@ export const Label = defineComponent(
         const labelId = useId();
         const isNested = context.getIsLabeled();
         const registeredControlId = shallowRef<string>();
+        const registeredCaptionId = shallowRef<string>();
 
         provideLabelContext({
             getIsLabeled: () => true,
@@ -25,6 +26,16 @@ export const Label = defineComponent(
                 }
 
                 registeredControlId.value = id;
+            },
+            getCaptionId: () => (isNested ? context.getCaptionId() : registeredCaptionId.value),
+            setCaptionId: (id) => {
+                if (isNested) {
+                    context.setCaptionId(id);
+
+                    return;
+                }
+
+                registeredCaptionId.value = id;
             },
         });
 

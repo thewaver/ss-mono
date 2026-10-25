@@ -10,6 +10,7 @@
     } from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.utils";
 
     import type { PageApiTableProps } from "./ApiViewSvelte.types";
+    import PageApiText from "./PageApiText.svelte";
     import { NO_DESCRIPTION, USE_COLUMN } from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.const";
 
     const TABLE_COLUMNS: Record<ApiTableKind, [name: string, type: string]> = {
@@ -29,8 +30,8 @@
         <h3 {@attach props.attachHeading} id={props.headingId} class={styles.docsTableTitle}>{table.heading}</h3>
     {/if}
 
-    {#if table.description}
-        <p class={styles.docsDescription}>{table.description}</p>
+    {#if table.description.length}
+        <p class={styles.docsDescription}><PageApiText text={table.description} /></p>
     {/if}
 
     {#if table.includes.length}
@@ -69,8 +70,8 @@
 
                         {#if table.isDocumented}
                             <td class={styles.docsCell}>
-                                {#if entry.description}
-                                    {entry.description}
+                                {#if entry.description.length}
+                                    <PageApiText text={entry.description} />
                                 {:else}
                                     <span class={styles.docsPending}>{NO_DESCRIPTION}</span>
                                 {/if}

@@ -15,7 +15,7 @@
 
 <div
     class={[styles.treeNodePending, layerClass]}
-    style:padding-left={`calc(${themeVars.spacing.half} + ${props.depth * INDENT_PER_DEPTH}px)`}
+    style:padding-inline-start={`calc(${themeVars.spacing.half} + ${props.depth * INDENT_PER_DEPTH}px)`}
 >
     <div class={styles.treeNodeMarker} aria-hidden="true">
         {LEAF_MARKER}

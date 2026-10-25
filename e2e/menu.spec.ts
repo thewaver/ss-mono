@@ -1,12 +1,29 @@
 import { type Locator, type Page, expect, test } from "@playwright/test";
 
-import { activeDescendantText, activeMatches, centerDistance, demo, readout, tabIndex, tagName } from "./helpers";
+import {
+    activeDescendantText,
+    activeMatches,
+    centerDistance,
+    docsDemo,
+    docsSettled,
+    prop,
+    tabIndex,
+    tagName,
+} from "./helpers";
+
+const DOCS = "/src/App/Pages/Menus/MenuPage/Docs";
 
 const MENU = '[role="menu"]';
 const ITEM_ROLE = '[role="menuitem"]';
 const ITEM = `${MENU} ${ITEM_ROLE}`;
 
-const trigger = (key: string) => `${demo(key)} [aria-haspopup="menu"]`;
+const trigger = (name: string) => `${docsDemo(DOCS, name)} [aria-haspopup="menu"]`;
+
+const knob = (page: Page, key: string) => page.locator(`${prop(key)} input`);
+
+/** Every example that runs commands reads out the last one it ran, under the menu. */
+const readout = async (page: Page, name: string) =>
+    ((await page.locator(`${docsDemo(DOCS, name)} [data-readout]`).textContent()) ?? "").trim();
 
 /**
  * Opening is not instant, and the two things that have to land do so in either order: the menu points at
@@ -14,8 +31,8 @@ const trigger = (key: string) => `${demo(key)} [aria-haspopup="menu"]`;
  * and is silently lost, so waiting on the highlight alone is not enough — every keyboard case waits on
  * both.
  */
-const openedWithHighlight = async (page: Page, key: string) => {
-    await page.locator(trigger(key)).click();
+const openedWithHighlight = async (page: Page, name: string) => {
+    await page.locator(trigger(name)).click();
     await expect(page.locator(MENU)).toHaveAttribute("aria-activedescendant", /.+/);
     await expect(page.locator(MENU)).toBeFocused();
 };
@@ -34,32 +51,30 @@ const itemAt = (page: Page, depth: number, name: string) =>
     page.locator(MENU).nth(depth).locator(ITEM_ROLE).filter({ hasText: name }).first();
 
 test.beforeEach(async ({ page }) => {
-    await page.goto("/menu");
-    await expect(page.locator("[data-example]").first()).toBeVisible();
+    await page.goto("/menu/docs");
+    await expect(page.locator(trigger("Basic"))).toBeVisible();
+    await docsSettled(page);
 });
 
 test("the trigger is a real button that starts closed", async ({ page }) => {
-    expect(await tagName(page.locator(trigger("default"))), "the trigger is a real button").toBe("BUTTON");
-    await expect(page.locator(trigger("default")), "and starts closed").toHaveAttribute("aria-expanded", "false");
+    expect(await tagName(page.locator(trigger("Basic"))), "the trigger is a real button").toBe("BUTTON");
+    await expect(page.locator(trigger("Basic")), "and starts closed").toHaveAttribute("aria-expanded", "false");
     await expect(page.locator(MENU), "with no menu in the tree at all").toHaveCount(0);
 });
 
 test("opening wires the menu to its trigger and takes focus itself", async ({ page }) => {
-    await openedWithHighlight(page, "default");
+    await openedWithHighlight(page, "Basic");
 
-    await expect(page.locator(trigger("default")), "clicking it opens the menu").toHaveAttribute(
-        "aria-expanded",
-        "true",
-    );
+    await expect(page.locator(trigger("Basic")), "clicking it opens the menu").toHaveAttribute("aria-expanded", "true");
     await expect(page.locator(ITEM), "which renders one menuitem per record").toHaveCount(5);
     expect(
-        await page.locator(trigger("default")).getAttribute("aria-controls"),
+        await page.locator(trigger("Basic")).getAttribute("aria-controls"),
         "and points at the menu it controls",
     ).toBe(await page.locator(MENU).getAttribute("id"));
     expect(
         await page.locator(MENU).getAttribute("aria-labelledby"),
         "while the menu takes its name from the trigger",
-    ).toBe(await page.locator(trigger("default")).getAttribute("id"));
+    ).toBe(await page.locator(trigger("Basic")).getAttribute("id"));
 
     expect(
         await activeMatches(page, MENU),
@@ -73,7 +88,7 @@ test("opening wires the menu to its trigger and takes focus itself", async ({ pa
 });
 
 test("the arrows and edge keys move the highlight", async ({ page }) => {
-    await openedWithHighlight(page, "default");
+    await openedWithHighlight(page, "Basic");
 
     await page.keyboard.press("ArrowDown");
     expect(await activeDescendantText(page, MENU), "arrows move the highlight").toBe("CopyCtrl+C");
@@ -86,13 +101,11 @@ test("the arrows and edge keys move the highlight", async ({ page }) => {
 });
 
 test("Escape closes and hands focus back, and ArrowUp reopens onto the last item", async ({ page }) => {
-    await openedWithHighlight(page, "default");
+    await openedWithHighlight(page, "Basic");
 
     await page.keyboard.press("Escape");
     await expect(page.locator(MENU), "Escape closes the menu").toHaveCount(0);
-    expect(await activeMatches(page, trigger("default")), "and hands focus back to the trigger it came from").toBe(
-        true,
-    );
+    expect(await activeMatches(page, trigger("Basic")), "and hands focus back to the trigger it came from").toBe(true);
 
     await page.keyboard.press("ArrowUp");
     await expect(
@@ -105,8 +118,8 @@ test("Escape closes and hands focus back, and ArrowUp reopens onto the last item
 
     await page.keyboard.press("Enter");
     await expect(page.locator(MENU), "and a menu closes on activation, unlike a multi-select list").toHaveCount(0);
-    expect(await readout(page, "default"), "Enter activates the highlighted item").toContain("Delete");
-    expect(await activeMatches(page, trigger("default")), "returning focus to the trigger").toBe(true);
+    expect(await readout(page, "Basic"), "Enter activates the highlighted item").toContain("Delete");
+    expect(await activeMatches(page, trigger("Basic")), "returning focus to the trigger").toBe(true);
 });
 
 /**
@@ -118,11 +131,11 @@ test("Escape closes and hands focus back, and ArrowUp reopens onto the last item
 test("Tab leaves the menu for whatever follows its trigger, and Shift+Tab goes back to the trigger", async ({
     page,
 }) => {
-    await page.locator(trigger("default")).focus();
+    await page.locator(trigger("Basic")).focus();
     await page.keyboard.press("Tab");
     await page.evaluate(() => document.activeElement?.setAttribute("data-after-trigger", ""));
 
-    await openedWithHighlight(page, "default");
+    await openedWithHighlight(page, "Basic");
     await page.keyboard.press("Tab");
 
     await expect(page.locator(MENU), "Tab closes the menu").toHaveCount(0);
@@ -131,35 +144,43 @@ test("Tab leaves the menu for whatever follows its trigger, and Shift+Tab goes b
         "and lands where Tab from the closed trigger would have, not back on the trigger",
     ).toBe(true);
 
-    await openedWithHighlight(page, "default");
+    await openedWithHighlight(page, "Basic");
     await page.keyboard.press("Shift+Tab");
 
     await expect(page.locator(MENU), "Shift+Tab closes it too").toHaveCount(0);
-    expect(await activeMatches(page, trigger("default")), "and hands focus back to the trigger").toBe(true);
+    expect(await activeMatches(page, trigger("Basic")), "and hands focus back to the trigger").toBe(true);
 });
 
 test("clicking an item activates it and keeps focus in the menu long enough to resolve", async ({ page }) => {
-    await page.locator(trigger("default")).click();
+    await page.locator(trigger("Basic")).click();
     await page.locator(ITEM, { hasText: "Paste" }).first().click();
 
     await expect(page.locator(MENU)).toHaveCount(0);
-    expect(await readout(page, "default"), "clicking an item activates it too").toContain("Paste");
+    expect(await readout(page, "Basic"), "clicking an item activates it too").toContain("Paste");
     expect(
-        await activeMatches(page, trigger("default")),
+        await activeMatches(page, trigger("Basic")),
         "and the mousedown refusal kept focus inside the menu long enough for the click to resolve",
     ).toBe(true);
 });
 
 test("the trigger reopens after a pick and toggles closed on a second click", async ({ page }) => {
-    await page.locator(trigger("default")).click();
+    await page.locator(trigger("Basic")).click();
+    await page.locator(ITEM, { hasText: "Copy" }).first().click();
+    await expect(page.locator(MENU)).toHaveCount(0);
+
+    await page.locator(trigger("Basic")).click();
     await expect(page.locator(MENU), "the trigger reopens after a pick").toHaveCount(1);
 
-    await page.locator(trigger("default")).click();
+    await page.locator(trigger("Basic")).click();
     await expect(page.locator(MENU), "and clicking it again closes rather than reopening").toHaveCount(0);
 });
 
+/**
+ * One example, two lists: Paste and Duplicate are disabled either way, and the Reachable knob swaps in the same list
+ * with both of them kept reachable and given a tooltip, so the knob changes reachability and nothing else.
+ */
 test("the walk steps over disabled items and stops on a reachable one", async ({ page }) => {
-    await openedWithHighlight(page, "disabledItems");
+    await openedWithHighlight(page, "DisabledItems");
     await page.keyboard.press("ArrowDown");
     await page.keyboard.press("ArrowDown");
     expect(await activeDescendantText(page, MENU), "the walk steps over disabled items with nothing to explain").toBe(
@@ -169,7 +190,11 @@ test("the walk steps over disabled items and stops on a reachable one", async ({
     await page.keyboard.press("Escape");
     await expect(page.locator(MENU)).toHaveCount(0);
 
-    await openedWithHighlight(page, "disabledItemsReachable");
+    await knob(page, "isReachable").click();
+
+    const before = await readout(page, "DisabledItems");
+
+    await openedWithHighlight(page, "DisabledItems");
     await page.keyboard.press("ArrowDown");
     await page.keyboard.press("ArrowDown");
     expect(await activeDescendantText(page, MENU), "and stops on a disabled item that has a tooltip to reveal").toBe(
@@ -177,14 +202,12 @@ test("the walk steps over disabled items and stops on a reachable one", async ({
     );
 
     await page.keyboard.press("Enter");
-    expect(await readout(page, "disabledItemsReachable"), "Enter on a reachable disabled item runs nothing").toContain(
-        "nothing run yet",
-    );
+    expect(await readout(page, "DisabledItems"), "Enter on a reachable disabled item runs nothing").toBe(before);
     await expect(page.locator(MENU), "and leaves the menu open").toHaveCount(1);
 });
 
 test("an item that owns a submenu says so, and the submenu is named by it", async ({ page }) => {
-    await openedWithHighlight(page, "submenus");
+    await openedWithHighlight(page, "Submenus");
 
     const parent = itemAt(page, 0, "New");
 
@@ -206,7 +229,7 @@ test("an item that owns a submenu says so, and the submenu is named by it", asyn
 });
 
 test("the arrows step into a submenu and back out of it", async ({ page }) => {
-    await openedWithHighlight(page, "submenus");
+    await openedWithHighlight(page, "Submenus");
     expect(await highlightAt(page, 0)).toBe("New");
 
     await page.keyboard.press("ArrowRight");
@@ -228,23 +251,23 @@ test("the arrows step into a submenu and back out of it", async ({ page }) => {
 
     await page.keyboard.press("Escape");
     await expect(page.locator(MENU), "and Escape at the top closes the menu itself").toHaveCount(0);
-    expect(await activeMatches(page, trigger("submenus")), "handing focus back to the trigger").toBe(true);
+    expect(await activeMatches(page, trigger("Submenus")), "handing focus back to the trigger").toBe(true);
 });
 
 test("activating a leaf closes every level at once", async ({ page }) => {
-    await openedWithHighlight(page, "submenus");
+    await openedWithHighlight(page, "Submenus");
 
     await page.keyboard.press("ArrowRight");
     await openedLevel(page, 1);
     await page.keyboard.press("Enter");
 
     await expect(page.locator(MENU)).toHaveCount(0);
-    expect(await readout(page, "submenus"), "the value that arrives is the leaf's own").toContain("Project");
-    expect(await activeMatches(page, trigger("submenus")), "and focus returns to the trigger").toBe(true);
+    expect(await readout(page, "Submenus"), "the value that arrives is the leaf's own").toContain("Project");
+    expect(await activeMatches(page, trigger("Submenus")), "and focus returns to the trigger").toBe(true);
 });
 
 test("hovering a level opens the submenu under the pointer and drops the others", async ({ page }) => {
-    await openedWithHighlight(page, "submenus");
+    await openedWithHighlight(page, "Submenus");
 
     await itemAt(page, 0, "Share").hover();
     await openedLevel(page, 1);
@@ -256,19 +279,30 @@ test("hovering a level opens the submenu under the pointer and drops the others"
     await expect(page.locator(MENU), "hovering a leaf above drops every level below it").toHaveCount(1);
 
     await itemAt(page, 0, "Open").click();
-    expect(await readout(page, "submenus"), "and the menu still activates from the pointer").toContain("Open");
+    expect(await readout(page, "Submenus"), "and the menu still activates from the pointer").toContain("Open");
 });
 
+/**
+ * Basic's Disabled knob turns its menu off outright; the Tooltip example's two knobs give the reachable twin, whose
+ * button keeps its tab stop so its tooltip can say why.
+ */
 test("a disabled trigger opens nothing by pointer or by key", async ({ page }) => {
-    expect(await tabIndex(page.locator(trigger("disabled"))), "a disabled trigger is out of the tab order").toBe(-1);
+    await knob(page, "isDisabled").click();
+    await expect(page.locator(trigger("Basic"))).toHaveAttribute("aria-disabled", "true");
 
-    await page.locator(trigger("disabled")).click({ force: true });
+    expect(await tabIndex(page.locator(trigger("Basic"))), "a disabled trigger is out of the tab order").toBe(-1);
+
+    await page.locator(trigger("Basic")).click({ force: true });
     await expect(page.locator(MENU), "clicking it does not open the menu").toHaveCount(0);
-    expect(await activeMatches(page, trigger("disabled")), "and does not focus it either").toBe(false);
+    expect(await activeMatches(page, trigger("Basic")), "and does not focus it either").toBe(false);
 
-    expect(await tabIndex(page.locator(trigger("reachable"))), "while its reachable twin keeps its tab stop").toBe(0);
+    await knob(page, "tooltipIsReachableWhenDisabled").click();
+    await knob(page, "tooltipIsDisabled").click();
+    await expect(page.locator(trigger("Tooltip"))).toHaveAttribute("aria-disabled", "true");
 
-    await page.locator(trigger("reachable")).focus();
+    expect(await tabIndex(page.locator(trigger("Tooltip"))), "while its reachable twin keeps its tab stop").toBe(0);
+
+    await page.locator(trigger("Tooltip")).focus();
     await page.keyboard.press("Enter");
     await expect(page.locator(MENU), "Enter on a reachable disabled trigger still opens nothing").toHaveCount(0);
 });
@@ -276,20 +310,24 @@ test("a disabled trigger opens nothing by pointer or by key", async ({ page }) =
 /**
  * The open state is the menu's own until a consumer hands it a signal, and then it is one variable both of them
  * write. These drive it from the consumer's side: a button that is not the menu's trigger and knows nothing about
- * it, and a readout that can say whether the popup is open — neither of which was reachable while the state was
- * private.
+ * it, and whose own words come from that variable — the one place the page shows what the owner holds. The spec
+ * reads the words only to compare them with themselves: the button says one thing while the owner holds "closed"
+ * and another while it holds "open".
  */
 test.describe("an open state the consumer owns", () => {
     const toggleButton = "#menuToggle";
 
+    const toggleText = async (page: Page) => ((await page.locator(toggleButton).textContent()) ?? "").trim();
+
     test("a button that is not the trigger opens the menu", async ({ page }) => {
         await expect(page.locator(MENU), "nothing is portaled to begin with").toHaveCount(0);
-        expect(await readout(page, "driven")).toContain("the menu is closed");
+
+        const closedText = await toggleText(page);
 
         await page.locator(toggleButton).click();
 
         await expect(page.locator(MENU)).toHaveCount(1);
-        expect(await readout(page, "driven"), "and the owner's own variable says so").toContain("the menu is open");
+        expect(await toggleText(page), "and the owner's own variable says so").not.toBe(closedText);
     });
 
     /**
@@ -298,43 +336,50 @@ test.describe("an open state the consumer owns", () => {
      * and the toggle handler immediately re-opens it, and the button appears not to close.
      */
     test("the same button closes it again, because it is the anchor", async ({ page }) => {
+        const closedText = await toggleText(page);
+
         await page.locator(toggleButton).click();
         await expect(page.locator(MENU)).toHaveCount(1);
 
         await page.locator(toggleButton).click();
 
         await expect(page.locator(MENU)).toHaveCount(0);
-        expect(await readout(page, "driven")).toContain("the menu is closed");
+        expect(await toggleText(page)).toBe(closedText);
     });
 
     test("the menu writes its own dismissal back into the consumer's variable", async ({ page }) => {
+        const closedText = await toggleText(page);
+
         await page.locator(toggleButton).click();
         await expect(page.locator(MENU)).toHaveCount(1);
 
         await page.keyboard.press("Escape");
 
         await expect(page.locator(MENU)).toHaveCount(0);
-        expect(
-            await readout(page, "driven"),
-            "one variable, both sides write — so Escape is visible to the owner",
-        ).toContain("the menu is closed");
+        expect(await toggleText(page), "one variable, both sides write — so Escape is visible to the owner").toBe(
+            closedText,
+        );
     });
 
     test("activating an item closes it and reaches the owner too", async ({ page }) => {
+        const closedText = await toggleText(page);
+
         await page.locator(toggleButton).click();
         await expect(page.locator(MENU)).toHaveCount(1);
 
         await page.locator(ITEM).filter({ hasText: "Copy" }).first().click();
 
         await expect(page.locator(MENU)).toHaveCount(0);
-        expect(await readout(page, "driven")).toContain("Copy");
-        expect(await readout(page, "driven")).toContain("the menu is closed");
+        expect(await readout(page, "Driven")).toContain("Copy");
+        expect(await toggleText(page)).toBe(closedText);
     });
 
     test("the menu's own trigger still works, and the owner sees that too", async ({ page }) => {
-        await openedWithHighlight(page, "driven");
+        const closedText = await toggleText(page);
 
-        expect(await readout(page, "driven"), "the trigger writes the same variable").toContain("the menu is open");
+        await openedWithHighlight(page, "Driven");
+
+        expect(await toggleText(page), "the trigger writes the same variable").not.toBe(closedText);
     });
 });
 
@@ -346,7 +391,7 @@ test.describe("an open state the consumer owns", () => {
  */
 test.describe("typeahead", () => {
     test("moves the highlight to the next item starting with what was typed", async ({ page }) => {
-        await openedWithHighlight(page, "default");
+        await openedWithHighlight(page, "Basic");
 
         await page.keyboard.press("p");
 
@@ -354,7 +399,7 @@ test.describe("typeahead", () => {
     });
 
     test("cycles through the items sharing a letter when the letter is repeated", async ({ page }) => {
-        await openedWithHighlight(page, "default");
+        await openedWithHighlight(page, "Basic");
 
         await page.keyboard.press("c");
         expect(await highlightAt(page, 0), "Cut is already highlighted, so c moves on to Copy").toContain("Copy");
@@ -368,13 +413,15 @@ test.describe("typeahead", () => {
      * dangerous half: a space typed mid-query must not run the item the highlight happens to be on.
      */
     test("takes a space into the query rather than activating", async ({ page }) => {
-        await openedWithHighlight(page, "default");
+        const before = await readout(page, "Basic");
+
+        await openedWithHighlight(page, "Basic");
 
         await page.keyboard.press("d");
         await page.keyboard.press("Space");
 
         await expect(page.locator(MENU), "the menu is still open, so nothing was activated").toHaveCount(1);
-        expect(await readout(page, "default"), "and nothing reached the owner").toContain("nothing run yet");
+        expect(await readout(page, "Basic"), "and nothing reached the owner").toBe(before);
     });
 });
 
@@ -385,16 +432,28 @@ test.describe("typeahead", () => {
  * Everything else — the items, the keyboard, dismissal — is the machinery already under `Menu`.
  */
 test.describe("a menu opened by a right-click", () => {
-    const REGION = `${demo("context")} div:not([role])`;
+    const REGION = `${docsDemo(DOCS, "Context")} div:not([role])`;
     const CORNER_INSET = 5;
     const MOVE_MARGIN = 20;
     const PLACEMENT_TOLERANCE = 4;
 
+    /**
+     * The region sits far down the Docs page, and a press made by coordinates does not scroll the page the way a
+     * press on a located element does, so the region is brought on screen before its box is read.
+     */
+    const regionBox = async (page: Page) => {
+        await page.locator(REGION).first().scrollIntoViewIfNeeded();
+
+        return (await page.locator(REGION).first().boundingBox())!;
+    };
+
     test("has no trigger anywhere, and opens at the pointer", async ({ page }) => {
-        await expect(page.locator(`${demo("context")} button`), "nothing is rendered to press").toHaveCount(0);
+        await expect(page.locator(`${docsDemo(DOCS, "Context")} button`), "nothing is rendered to press").toHaveCount(
+            0,
+        );
         await expect(page.locator(MENU), "and nothing is open yet").toHaveCount(0);
 
-        const box = (await page.locator(REGION).first().boundingBox())!;
+        const box = await regionBox(page);
         const x = box.x + box.width * 0.4;
         const y = box.y + box.height * 0.4;
 
@@ -404,7 +463,8 @@ test.describe("a menu opened by a right-click", () => {
         await expect(
             page.locator(MENU),
             "the menu is named by its own label, having no trigger to borrow",
-        ).toHaveAttribute("aria-label", "Edit actions");
+        ).toHaveAttribute("aria-label", /.+/);
+        expect(await page.locator(MENU).getAttribute("aria-labelledby"), "and borrows no other name").toBe(null);
 
         await expect
             .poll(
@@ -427,7 +487,7 @@ test.describe("a menu opened by a right-click", () => {
      * on the menu itself, where a right-click rightly does nothing.
      */
     test("moves to the next point rather than staying where it was", async ({ page }) => {
-        const box = (await page.locator(REGION).first().boundingBox())!;
+        const box = await regionBox(page);
         const near = box.x + box.width * 0.2;
         const far = box.x + box.width * 0.6;
 
@@ -446,14 +506,14 @@ test.describe("a menu opened by a right-click", () => {
     });
 
     test("runs an item and closes, and a plain click outside dismisses it", async ({ page }) => {
-        const box = (await page.locator(REGION).first().boundingBox())!;
+        const box = await regionBox(page);
 
         await page.mouse.click(box.x + box.width * 0.4, box.y + box.height * 0.4, { button: "right" });
         await expect(page.locator(MENU)).toBeFocused();
         await page.locator(ITEM).filter({ hasText: "Copy" }).first().click();
 
         await expect(page.locator(MENU), "activating closes it").toHaveCount(0);
-        expect(await readout(page, "context")).toContain("Copy");
+        expect(await readout(page, "Context")).toContain("Copy");
 
         await page.mouse.click(box.x + box.width * 0.4, box.y + box.height * 0.4, { button: "right" });
         await expect(page.locator(MENU)).toHaveCount(1);
@@ -486,7 +546,7 @@ const enterWithoutMoving = (page: Page, item: Locator, at: { x: number; y: numbe
     }, at);
 
 test("a hover nothing caused leaves the highlight where it is", async ({ page }) => {
-    await openedWithHighlight(page, "default");
+    await openedWithHighlight(page, "Basic");
 
     const hovered = itemAt(page, 0, "Copy");
     const other = itemAt(page, 0, "Duplicate");
@@ -515,7 +575,7 @@ test("a hover nothing caused leaves the highlight where it is", async ({ page })
  * step, which is what a slow hand on a high-resolution mouse produces.
  */
 test("a pointer creeping onto the next item takes the highlight with it", async ({ page }) => {
-    await openedWithHighlight(page, "default");
+    await openedWithHighlight(page, "Basic");
 
     const from = (await itemAt(page, 0, "Copy").boundingBox())!;
     const to = (await itemAt(page, 0, "Paste").boundingBox())!;
@@ -535,38 +595,39 @@ test("a pointer creeping onto the next item takes the highlight with it", async 
  * all the submenu cases above; what is new is the contract the example layers over it. Only a leaf is a
  * choice — a branch opens the next level and writes nothing — and the path that arrives is the whole route
  * to the leaf, which the trigger then names so a screen reader hears the current value on the button itself.
+ * The example has no readout: the trigger's name is where the page shows the path, so the spec reads it there.
  * Names are the records' own, which is why they are safe to key on here.
  */
 test.describe("a cascader built on nested items", () => {
-    const pathReadout = async (page: Page) => /path: \[(.*?)\]/.exec(await readout(page, "cascader"))?.[1] ?? null;
+    const triggerName = (page: Page) => page.locator(trigger("Cascader")).getAttribute("aria-label");
 
     test("a branch opens the next level and writes nothing, and only a leaf is picked", async ({ page }) => {
-        expect(await pathReadout(page), "nothing is chosen to begin with").toBe("");
+        const before = await triggerName(page);
 
-        await openedWithHighlight(page, "cascader");
+        await openedWithHighlight(page, "Cascader");
         expect(await highlightAt(page, 0)).toBe("Europe");
 
         await page.keyboard.press("Enter");
         await openedLevel(page, 1);
-        expect(await pathReadout(page), "Enter on a branch opens it rather than choosing it").toBe("");
+        expect(await triggerName(page), "Enter on a branch opens it rather than choosing it").toBe(before);
         expect(await highlightAt(page, 1)).toBe("France");
 
         await page.keyboard.press("Enter");
         await openedLevel(page, 2);
-        expect(await pathReadout(page), "and so on down").toBe("");
+        expect(await triggerName(page), "and so on down").toBe(before);
 
         await page.keyboard.press("ArrowDown");
         await page.keyboard.press("Enter");
 
         await expect(page.locator(MENU), "a leaf closes every level").toHaveCount(0);
-        expect(await pathReadout(page), "and writes the whole route to itself").toBe("Europe, France, Lyon");
-        expect(await activeMatches(page, trigger("cascader")), "handing focus back to the trigger").toBe(true);
+        expect(await triggerName(page), "and writes the whole route to itself").toMatch(/Europe.*France.*Lyon/);
+        expect(await activeMatches(page, trigger("Cascader")), "handing focus back to the trigger").toBe(true);
     });
 
     test("the trigger's name carries the path picked so far", async ({ page }) => {
-        const before = await page.locator(trigger("cascader")).getAttribute("aria-label");
+        const before = await triggerName(page);
 
-        await page.locator(trigger("cascader")).click();
+        await page.locator(trigger("Cascader")).click();
         await itemAt(page, 0, "Asia").click();
         await openedLevel(page, 1);
         await itemAt(page, 1, "Japan").click();
@@ -574,28 +635,29 @@ test.describe("a cascader built on nested items", () => {
         await itemAt(page, 2, "Kyoto").click();
 
         await expect(page.locator(MENU)).toHaveCount(0);
-        expect(await pathReadout(page), "the pointer reaches a leaf the same way").toBe("Asia, Japan, Kyoto");
 
-        const after = await page.locator(trigger("cascader")).getAttribute("aria-label");
+        const after = await triggerName(page);
 
         expect(after, "the name changed with the choice").not.toBe(before);
-        expect(after, "and names every step of it, in order").toMatch(/Asia.*Japan.*Kyoto/);
-        await expect(page.locator(trigger("cascader")), "which is also what the button shows").toContainText(
+        expect(after, "and names every step of it, in order, reached by the pointer too").toMatch(/Asia.*Japan.*Kyoto/);
+        await expect(page.locator(trigger("Cascader")), "which is also what the button shows").toContainText(
             /Asia.*Japan.*Kyoto/,
         );
     });
 
     test("a second pick replaces the first, and backing out keeps it", async ({ page }) => {
-        await openedWithHighlight(page, "cascader");
+        await openedWithHighlight(page, "Cascader");
         await page.keyboard.press("Enter");
         await openedLevel(page, 1);
         await page.keyboard.press("Enter");
         await openedLevel(page, 2);
         await page.keyboard.press("Enter");
         await expect(page.locator(MENU)).toHaveCount(0);
-        expect(await pathReadout(page)).toBe("Europe, France, Paris");
+        expect(await triggerName(page)).toMatch(/Europe.*France.*Paris/);
 
-        await openedWithHighlight(page, "cascader");
+        const firstPick = await triggerName(page);
+
+        await openedWithHighlight(page, "Cascader");
         await page.keyboard.press("End");
         await page.keyboard.press("ArrowRight");
         await openedLevel(page, 1);
@@ -604,11 +666,9 @@ test.describe("a cascader built on nested items", () => {
         await page.keyboard.press("Escape");
 
         await expect(page.locator(MENU)).toHaveCount(0);
-        expect(await pathReadout(page), "leaving without reaching a leaf changes nothing").toBe(
-            "Europe, France, Paris",
-        );
+        expect(await triggerName(page), "leaving without reaching a leaf changes nothing").toBe(firstPick);
 
-        await openedWithHighlight(page, "cascader");
+        await openedWithHighlight(page, "Cascader");
         await page.keyboard.press("End");
         await page.keyboard.press("ArrowRight");
         await openedLevel(page, 1);
@@ -617,17 +677,21 @@ test.describe("a cascader built on nested items", () => {
         await page.keyboard.press("Enter");
 
         await expect(page.locator(MENU)).toHaveCount(0);
-        expect(await pathReadout(page), "and a new leaf replaces the whole route").toBe("South America, Peru, Lima");
+
+        const secondPick = await triggerName(page);
+
+        expect(secondPick, "and a new leaf replaces the whole route").toMatch(/South America.*Peru.*Lima/);
+        expect(secondPick, "leaving nothing of the first").not.toMatch(/Europe|France|Paris/);
     });
 });
 
 /**
- * A menu has no selection, so it takes the highlight marker only. The items in this example paint no highlight of
- * their own, which makes the marker the one thing showing where the arrows are, so it has to land on the item the
- * menu names as its active descendant, and follow the pointer there too.
+ * A menu has no selection, so it takes the highlight marker only. With the Gliding highlight knob on, as it starts,
+ * the items paint no highlight of their own, which makes the marker the one thing showing where the arrows are, so
+ * it has to land on the item the menu names as its active descendant, and follow the pointer there too.
  */
 test("a gliding marker sits on whichever item is highlighted, by arrow or by pointer", async ({ page }) => {
-    await openedWithHighlight(page, "glide");
+    await openedWithHighlight(page, "Glide");
 
     const menu = page.locator(MENU);
     const marker = menu.locator('[data-floater="highlight"]').locator("..");
@@ -645,6 +709,13 @@ test("a gliding marker sits on whichever item is highlighted, by arrow or by poi
     await expect.poll(() => centerDistance(marker, last)).toBeLessThan(2);
 });
 
+test("with the gliding highlight turned off, the menu draws no marker", async ({ page }) => {
+    await knob(page, "isGliding").click();
+    await openedWithHighlight(page, "Glide");
+
+    await expect(page.locator(`${MENU} [data-floater="highlight"]`), "no marker without the floater").toHaveCount(0);
+});
+
 /**
  * A menu may be split into named groups, the way `Select`'s options are. Each group is a `role="group"` named by its
  * label; the heading drawn above it is paint and hidden from a reader, who hears the group's name instead, so the
@@ -654,7 +725,7 @@ test.describe("a menu split into sections", () => {
     const group = (page: Page, name: string) => page.locator(`${MENU} [role="group"][aria-label="${name}"]`);
 
     test("each group is named, and its box holds the heading and the group's items", async ({ page }) => {
-        await openedWithHighlight(page, "sections");
+        await openedWithHighlight(page, "Sections");
 
         for (const name of ["Editor", "Text size"]) {
             const box = group(page, name).locator("> *");
@@ -679,7 +750,7 @@ test.describe("a menu split into sections", () => {
     });
 
     test("the arrows walk straight past the headings", async ({ page }) => {
-        await openedWithHighlight(page, "sections");
+        await openedWithHighlight(page, "Sections");
 
         const lastOfEditor = group(page, "Editor").locator('[role^="menuitem"]').last();
         const firstOfTextSize = group(page, "Text size").locator('[role^="menuitem"]').first();
@@ -705,7 +776,7 @@ test.describe("a menu split into sections", () => {
     test("picking a radio item moves the choice within its group and leaves the other group alone", async ({
         page,
     }) => {
-        await openedWithHighlight(page, "sections");
+        await openedWithHighlight(page, "Sections");
 
         const editorStates = () =>
             group(page, "Editor")
@@ -718,7 +789,7 @@ test.describe("a menu split into sections", () => {
         const unpickedId = await unpicked.getAttribute("id");
 
         await unpicked.click();
-        await openedWithHighlight(page, "sections");
+        await openedWithHighlight(page, "Sections");
 
         await expect(page.locator(`#${unpickedId}`), "the pressed radio item is now the choice").toHaveAttribute(
             "aria-checked",
@@ -730,4 +801,30 @@ test.describe("a menu split into sections", () => {
         );
         expect(await editorStates(), "while the other group's items are as they were").toEqual(before);
     });
+});
+
+/**
+ * A command marked to stay open runs and leaves the menu up for the next press, while one that is not closes it as
+ * usual. The readout is the zoom the commands have built up, compared only with itself.
+ */
+test("a command worth repeating runs and keeps the menu open", async ({ page }) => {
+    const before = await readout(page, "Repeating");
+
+    await openedWithHighlight(page, "Repeating");
+    await page.keyboard.press("Enter");
+
+    await expect(page.locator(MENU), "the repeatable command leaves the menu open").toHaveCount(1);
+
+    const afterOne = await readout(page, "Repeating");
+
+    expect(afterOne, "and it ran").not.toBe(before);
+
+    await page.keyboard.press("Enter");
+    expect(await readout(page, "Repeating"), "so it can run again straight away").not.toBe(afterOne);
+
+    await page.keyboard.press("End");
+    await page.keyboard.press("Enter");
+
+    await expect(page.locator(MENU), "while an ordinary command still closes it").toHaveCount(0);
+    expect(await readout(page, "Repeating"), "having run, which here puts the zoom back").toBe(before);
 });

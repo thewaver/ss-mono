@@ -6,11 +6,11 @@ export const modalAlignmentVariants = styleVariants({
         alignItems: "center",
     },
     left: {
-        justifyItems: "start",
+        justifyItems: "left",
         alignItems: "stretch",
     },
     right: {
-        justifyItems: "end",
+        justifyItems: "right",
         alignItems: "stretch",
     },
     top: {

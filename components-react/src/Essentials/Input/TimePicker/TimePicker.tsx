@@ -2,6 +2,7 @@ import { useCallback, useEffect, useId, useRef, useState } from "react";
 
 import { type PopupTriggerFlags, TIME_PICKER_DEFAULTS } from "@thewaver/ss-components";
 
+import { NavigatorReactUtils } from "../../../Abstracts/Navigator/NavigatorReact.utils";
 import { SignalMirrorReactUtils } from "../../../Abstracts/SignalMirror/SignalMirrorReact.utils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import { Popover } from "../../../Primitives/Popover/Popover";
@@ -18,7 +19,9 @@ export const TimePicker = (props: TimePickerProps) => {
     const [root, setRoot] = useState<HTMLDivElement>();
     const [isOpen, setIsOpen] = SignalMirrorReactUtils.useOptionalState(props.visibility, false);
 
-    const isDisabled = props.isDisabled ?? false;
+    const direction = NavigatorReactUtils.useDirection(rootRef);
+
+    const isLocked = (props.isDisabled ?? false) || (props.isReadOnly ?? false);
 
     const setRootRef = useCallback((element: HTMLDivElement | null) => {
         rootRef.current = element;
@@ -33,14 +36,14 @@ export const TimePicker = (props: TimePickerProps) => {
     };
 
     const open = () => {
-        if (isDisabled) return;
+        if (isLocked) return;
 
         setIsOpen(true);
     };
 
     useEffect(() => {
-        if (isOpen && isDisabled) setIsOpen(false);
-    }, [isOpen, isDisabled]);
+        if (isOpen && isLocked) setIsOpen(false);
+    }, [isOpen, isLocked]);
 
     useEffect(() => {
         if (isOpen || !isFocusReturnedRef.current) return;
@@ -77,7 +80,7 @@ export const TimePicker = (props: TimePickerProps) => {
                         {props.renderTrailing?.(fieldFlags, meridiem)}
 
                         <InteractionWrapper<PopupTriggerFlags>
-                            isDisabled={isDisabled}
+                            isDisabled={isLocked}
                             extraFlags={{ isOpen }}
                             renderControl={(setElementRef, flags) => (
                                 <PopupTrigger
@@ -102,7 +105,7 @@ export const TimePicker = (props: TimePickerProps) => {
                 ariaAttributes={{ "aria-label": props.clockLabel }}
                 isOpen={isOpen}
                 anchorRef={root}
-                placement={props.placement ?? TIME_PICKER_DEFAULTS.placement}
+                placement={props.placement ?? TIME_PICKER_DEFAULTS.placement[direction]}
                 offset={props.offset}
                 transitionDurationMs={props.popupTransitionDurationMs}
                 hasAutoFocus={true}

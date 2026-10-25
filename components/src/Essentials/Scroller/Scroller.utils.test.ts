@@ -2,18 +2,6 @@ import { describe, expect, it } from "vitest";
 
 import { ScrollerUtils } from "./Scroller.utils";
 
-describe("ScrollerUtils.getSteps", () => {
-    it("splits the buttons, or puts both on one side", () => {
-        expect(ScrollerUtils.getSteps("split", true)).toEqual({ leading: ["previous"], trailing: ["next"] });
-        expect(ScrollerUtils.getSteps("start", true)).toEqual({ leading: ["previous", "next"], trailing: [] });
-        expect(ScrollerUtils.getSteps("end", true)).toEqual({ leading: [], trailing: ["previous", "next"] });
-    });
-
-    it("renders none when there is nothing to scroll", () => {
-        expect(ScrollerUtils.getSteps("split", false)).toEqual({ leading: [], trailing: [] });
-    });
-});
-
 describe("ScrollerUtils reading the ends", () => {
     it("counts a pixel from either end as arrived", () => {
         expect(ScrollerUtils.getIsAtStart({ start: 1, visible: 100, total: 300 })).toBe(true);
@@ -55,6 +43,13 @@ describe("ScrollerUtils.computeStepLanding", () => {
         const padded = ITEMS.map((offset) => offset + 2);
 
         expect(ScrollerUtils.computeStepLanding(padded, VISIBLE, "next", 0, ITEMS.length)).toBe(padded[1]);
+    });
+
+    it("goes back all the way to the start, padding and all, when the step lands on the first item", () => {
+        const padded = ITEMS.map((offset) => offset + 2);
+
+        expect(ScrollerUtils.computeStepLanding(padded, VISIBLE, "previous", padded[3])).toBe(0);
+        expect(ScrollerUtils.computeStepLanding(padded, VISIBLE, "previous", padded[6])).toBe(padded[3]);
     });
 
     it("keeps one more item of the view just left for each of overlap, going forward", () => {
@@ -126,54 +121,19 @@ describe("ScrollerUtils.getHasBar", () => {
     });
 });
 
-describe("ScrollerUtils.getBoxSteps", () => {
-    const OVERFLOWING = { start: 0, visible: 100, total: 300 };
+describe("ScrollerUtils.getCanStep", () => {
+    const MIDWAY = { start: 100, visible: 100, total: 300 };
+    const AT_START = { start: 0, visible: 100, total: 300 };
 
-    it("gives each scrolling axis its own pair, placed alike", () => {
-        const steps = ScrollerUtils.getBoxSteps("split", { x: "auto", y: "auto" }, { x: OVERFLOWING, y: OVERFLOWING });
-
-        expect(steps.x).toEqual(ScrollerUtils.getSteps("split", true));
-        expect(steps.y).toEqual(steps.x);
+    it("steps either way from the middle, and not back from the start", () => {
+        expect(ScrollerUtils.getCanStep("auto", MIDWAY, "previous")).toBe(true);
+        expect(ScrollerUtils.getCanStep("auto", MIDWAY, "next")).toBe(true);
+        expect(ScrollerUtils.getCanStep("auto", AT_START, "previous")).toBe(false);
     });
 
-    it("gives a hidden axis none, however far its content overruns", () => {
-        const steps = ScrollerUtils.getBoxSteps(
-            "split",
-            { x: "auto", y: "hidden" },
-            { x: OVERFLOWING, y: OVERFLOWING },
-        );
-
-        expect(steps.y).toEqual(ScrollerUtils.getSteps("split", false));
-    });
-});
-
-describe("ScrollerUtils.computeGridTemplate", () => {
-    const NONE = ScrollerUtils.getSteps("split", false);
-    const SPLIT = ScrollerUtils.getSteps("split", true);
-    const AT_END = ScrollerUtils.getSteps("end", true);
-    const { area, xLeading, xTrailing, yLeading, yTrailing } = ScrollerUtils.AREAS;
-
-    it("is the box's cell alone when there are no buttons, so no gap is left around an empty track", () => {
-        expect(ScrollerUtils.computeGridTemplate({ x: NONE, y: NONE })).toEqual({
-            areas: `"${area}"`,
-            columns: "minmax(0, 1fr)",
-            rows: "minmax(0, 1fr)",
-        });
-    });
-
-    it("writes a column only on the side that holds buttons", () => {
-        const template = ScrollerUtils.computeGridTemplate({ x: AT_END, y: NONE });
-
-        expect(template.areas).toBe(`"${area} ${xTrailing}"`);
-        expect(template.columns).toBe(`${ScrollerUtils.computeGridTemplate({ x: NONE, y: NONE }).columns} auto`);
-    });
-
-    it("puts the buttons stepping down above and below the box, in its column", () => {
-        const template = ScrollerUtils.computeGridTemplate({ x: SPLIT, y: SPLIT });
-
-        expect(template.areas).toBe(
-            [`". ${yLeading} ."`, `"${xLeading} ${area} ${xTrailing}"`, `". ${yTrailing} ."`].join(" "),
-        );
+    it("never steps a direction that does not scroll, however far the content runs", () => {
+        expect(ScrollerUtils.getCanStep("hidden", MIDWAY, "previous")).toBe(false);
+        expect(ScrollerUtils.getCanStep("hidden", AT_START, "next")).toBe(false);
     });
 });
 

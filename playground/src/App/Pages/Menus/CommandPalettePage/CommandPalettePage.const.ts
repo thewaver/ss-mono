@@ -1,12 +1,6 @@
 import type { CommandPaletteItemRecord, Shortcut, ShortcutKeyModifier } from "@thewaver/ss-components";
 
-export const EXAMPLE_NAMES = {
-    default: "Opened by a shortcut",
-    actionShortcuts: "Actions with shortcuts of their own",
-    bareLetter: "A bare-letter shortcut",
-};
-
-export const EXAMPLES_ROOT = "/src/App/Pages/Menus/CommandPalettePage/Examples";
+export const DOCS_ROOT = "/src/App/Pages/Menus/CommandPalettePage/Docs";
 
 export const NOTHING_RUN = "nothing yet";
 

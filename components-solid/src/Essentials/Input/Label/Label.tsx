@@ -13,11 +13,14 @@ export const Label = (props: LabelProps) => {
     const labelId = createUniqueId();
 
     const [getRegisteredControlId, setRegisteredControlId] = createSignal<string>();
+    const [getRegisteredCaptionId, setRegisteredCaptionId] = createSignal<string>();
 
     const innerContext: LabelContextType = {
         getIsLabeled: () => true,
         getLabelId: () => (context.getIsLabeled() ? context.getLabelId() : labelId),
         setControlId: (id) => (context.getIsLabeled() ? context.setControlId(id) : setRegisteredControlId(id)),
+        getCaptionId: () => (context.getIsLabeled() ? context.getCaptionId() : getRegisteredCaptionId()),
+        setCaptionId: (id) => (context.getIsLabeled() ? context.setCaptionId(id) : setRegisteredCaptionId(id)),
     };
 
     const getOrientation = createMemo(() => access(props.orientation) ?? LABEL_DEFAULTS.orientation);

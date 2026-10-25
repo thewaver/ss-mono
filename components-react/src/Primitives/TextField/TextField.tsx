@@ -12,7 +12,6 @@ import { CSSUtils } from "@thewaver/ss-utils";
 import { ElementObserverReactUtils } from "../../Abstracts/ElementObserver/ElementObserverReact.utils";
 import { TextSyncReactUtils } from "../../Abstracts/TextSync/TextSyncReact.utils";
 import { FormFieldReactUtils } from "../../Essentials/Input/FormField/FormFieldReact.utils";
-import { LabelReactUtils } from "../../Essentials/Input/Label/LabelReact.utils";
 import { useElement, useLatest } from "../../Utils/refUtils";
 import { InteractionWrapper } from "../InteractionWrapper/InteractionWrapper";
 import type { TextFieldElementProps, TextFieldProps } from "./TextField.types";
@@ -49,7 +48,7 @@ const useAutoHeight = (
 };
 
 const TextFieldElement = (props: TextFieldElementProps) => {
-    const ariaLabel = LabelReactUtils.useAriaLabel(props.ariaLabel);
+    const { ariaLabel, ariaLabelledBy } = FormFieldReactUtils.useAriaName(props.ariaLabel);
     const ariaDescribedBy = FormFieldReactUtils.useAriaDescribedBy();
 
     const elementRef = useRef<TextSyncElement | null>(null);
@@ -107,6 +106,7 @@ const TextFieldElement = (props: TextFieldElementProps) => {
                 id={props.id}
                 ref={setRef}
                 type={type}
+                dir={props.isLeftToRight ? "ltr" : undefined}
                 rows={isAutoSizing ? 1 : undefined}
                 name={props.name}
                 className={className}
@@ -123,6 +123,7 @@ const TextFieldElement = (props: TextFieldElementProps) => {
                 readOnly={isDisabled || isReadOnly}
                 role={isSpinButton ? "spinbutton" : undefined}
                 aria-label={ariaLabel}
+                aria-labelledby={ariaLabelledBy}
                 aria-describedby={ariaDescribedBy}
                 aria-valuenow={valueNow}
                 aria-valuemin={isSpinButton ? props.min : undefined}
@@ -161,7 +162,7 @@ const TextFieldElement = (props: TextFieldElementProps) => {
                 <div
                     ref={props.setLeadingRef}
                     className={TextFieldStyles.textFieldAdornment}
-                    style={{ left: `${props.spreadPadding.paddingLeft}px` }}
+                    style={{ insetInlineStart: `${props.spreadPadding.paddingInlineStart}px` }}
                 >
                     {props.renderLeading(props.flags)}
                 </div>
@@ -171,7 +172,7 @@ const TextFieldElement = (props: TextFieldElementProps) => {
                 <div
                     ref={props.setTrailingRef}
                     className={TextFieldStyles.textFieldAdornment}
-                    style={{ right: `${props.spreadPadding.paddingRight}px` }}
+                    style={{ insetInlineEnd: `${props.spreadPadding.paddingInlineEnd}px` }}
                 >
                     {props.renderTrailing(props.flags)}
                 </div>
@@ -199,18 +200,18 @@ export const TextField = (props: TextFieldProps) => {
     const gap = props.gap ?? TEXT_FIELD_DEFAULTS.gap;
 
     const leadingInset = TextFieldUtils.computeInset(
-        spreadPadding.paddingLeft,
+        spreadPadding.paddingInlineStart,
         props.renderLeading ? leadingSize.width : 0,
         gap,
     );
     const trailingInset = TextFieldUtils.computeInset(
-        spreadPadding.paddingRight,
+        spreadPadding.paddingInlineEnd,
         props.renderTrailing ? trailingSize.width : 0,
         gap,
     );
 
     const textInset = CSSUtils.spreadableToStyle(
-        { ...spreadPadding, paddingLeft: leadingInset, paddingRight: trailingInset },
+        { ...spreadPadding, paddingInlineStart: leadingInset, paddingInlineEnd: trailingInset },
         String,
     ) as CSSProperties;
 
@@ -255,6 +256,7 @@ export const TextField = (props: TextFieldProps) => {
                     minRows={minRows}
                     maxRows={props.maxRows}
                     isConcealed={props.isConcealed}
+                    isLeftToRight={props.isLeftToRight}
                     flags={flags}
                     value={value}
                     textInset={textInset}

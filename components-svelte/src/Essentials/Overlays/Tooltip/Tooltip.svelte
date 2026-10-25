@@ -45,6 +45,7 @@
             getSkipDelayWindowMs: () => props.skipDelayWindowMs ?? TOOLTIP_DEFAULTS.skipDelayWindowMs,
             getFocusShowDelayMs: () => props.focusShowDelayMs ?? TOOLTIP_DEFAULTS.focusShowDelayMs,
             isHiddenOnAnchorBlur: true,
+            isFocusWithin: untrack(() => props.isAnchorGroup) ?? false,
         },
     );
 
@@ -112,6 +113,34 @@
         if (!anchorRef || !fader.getIsVisible()) return;
 
         return untrack(() => TooltipUtils.describe(anchorRef, tooltipId));
+    });
+
+    let focusedControl = $state<HTMLElement>();
+
+    $effect(() => {
+        const anchorRef = props.anchorRef;
+        const isAnchorGroup = props.isAnchorGroup ?? false;
+
+        if (!anchorRef || !isAnchorGroup) return;
+
+        const stop = untrack(() =>
+            TooltipUtils.followFocusWithin(anchorRef, (focused) => {
+                focusedControl = focused;
+            }),
+        );
+
+        return () => {
+            stop();
+            focusedControl = undefined;
+        };
+    });
+
+    $effect(() => {
+        const control = focusedControl;
+
+        if (!control || !fader.getIsVisible()) return;
+
+        return untrack(() => TooltipUtils.describe(control, tooltipId));
     });
 
     const style = $derived(

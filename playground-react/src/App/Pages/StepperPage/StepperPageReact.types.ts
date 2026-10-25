@@ -1,3 +1,8 @@
-import type { BaseStepperExampleProps } from "@thewaver/ss-playground/App/Pages/StepperPage/StepperPage.types";
+import type {
+    BaseStepperBasicDocsExampleValues,
+    BaseStepperDocsExampleValues,
+} from "@thewaver/ss-playground/App/Pages/StepperPage/StepperPage.types";
 
-export type StepperExampleProps = BaseStepperExampleProps;
+export type StepperBasicDocsExampleProps = BaseStepperBasicDocsExampleValues;
+
+export type StepperDocsExampleProps = BaseStepperDocsExampleValues;

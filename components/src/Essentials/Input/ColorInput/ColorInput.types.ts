@@ -30,6 +30,16 @@ export type ColorInputRenderProps = {
 export type BaseColorInputCbs = {
     /** Runs as the color changes, with the value written in the notation the field was handed. */
     onInput?: (value: string) => void;
+    /**
+     * Words for the current color, which a screen reader reads after the field's name, since the field's name says
+     * what the color is for and the painted swatch says nothing to someone who cannot see it. It is handed the value
+     * as written and the same color as hue, saturation, value and alpha, and answers in the page's language — a
+     * color's name, or its channels spelled out.
+     *
+     * Left out, the value itself is read as written, such as `#3366ff`. An empty value, or an empty answer, adds
+     * nothing. A description from an enclosing form field is read as well.
+     */
+    computeValueText?: (value: string, hsv: Color.HSVA) => string;
 };
 
 export type ColorInputCbs = BaseColorInputCbs & {
@@ -55,7 +65,11 @@ export type BaseColorInputValues = {
     areaAxisLabels: Record<ColorAreaAxis, string>;
     /** Names the hue slider, which has no visible label of its own. */
     hueLabel: string;
-    /** Where the picker sits against the field. */
+    /**
+     * Where the picker sits against the field. Left out, it hangs below the field lined up with the edge the text
+     * starts from: the left, or the right where the field sits in right-to-left text. Given, it is used as it
+     * stands in either direction.
+     */
     placement?: AnchorPlacement;
     /** How far the picker is held clear of the field. */
     offset?: Point2d;

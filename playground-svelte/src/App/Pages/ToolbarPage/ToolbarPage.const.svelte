@@ -7,8 +7,6 @@
     import PageMenuItemContent from "../../StyledComponents/MenuItemContent/MenuItemContent.svelte";
     import PagePopoverSurface from "../../StyledComponents/PopoverSurface/PopoverSurface.svelte";
 
-    export const NOTHING_RUN = "nothing run yet";
-
     export { renderToolbarOverflowItem, renderToolbarPopup };
 </script>
 

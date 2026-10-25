@@ -17,7 +17,9 @@ export const TooltipDocsExample = (props: Props) => {
             ariaLabel={"Checkbox with a tooltip"}
             isDisabled={props.isDisabled}
             isReachableWhenDisabled={props.isReachableWhenDisabled}
-            renderContent={(getFlags) => <PageCheckboxContent flags={getFlags} />}
+            renderContent={(getFlags) => (
+                <PageCheckboxContent flags={getFlags}>Checkbox with a tooltip</PageCheckboxContent>
+            )}
             tooltipDefs={() => ({
                 placement: () => ({ x: "center", y: "top_out" }),
                 offset: () => ({ x: 0, y: 10 }),

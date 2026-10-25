@@ -17,7 +17,9 @@ export type BasePopoverValues = {
     role: PopoverRole;
     /**
      * Where the popup sits against its anchor, as one choice across and one down. A placement that will not fit falls
-     * back within its own family.
+     * back within its own family. Left out, it hangs below the anchor lined up with the edge the text starts from:
+     * the left, or the right where the anchor sits in right-to-left text. Given, it is used as it stands in either
+     * direction.
      */
     placement?: AnchorPlacement;
     /** How far the popup is held clear of its anchor, in pixels. */

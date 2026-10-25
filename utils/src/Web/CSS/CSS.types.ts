@@ -1,5 +1,7 @@
 type Side = "top" | "right" | "bottom" | "left";
 
+type LogicalSide = "blockStart" | "inlineEnd" | "blockEnd" | "inlineStart";
+
 type Corner = "topLeft" | "topRight" | "bottomLeft" | "bottomRight";
 
 /** Margin on all four sides, as plain numbers in pixels. */
@@ -7,9 +9,19 @@ export type CSSMargin = {
     [k in `margin${Capitalize<Side>}`]: number;
 };
 
-/** Padding on all four sides, as plain numbers in pixels. */
-export type CSSPadding = {
+/** Padding on all four sides of the screen, as plain numbers in pixels. */
+export type CSSPhysicalPadding = {
     [k in `padding${Capitalize<Side>}`]: number;
+};
+
+/**
+ * Padding on all four sides of the text, as plain numbers in pixels.
+ *
+ * The sides follow the text rather than the screen, as CSS's `padding-inline-start` and its siblings do: in
+ * right-to-left text the inline start is on the right, so the browser puts each side where the text needs it.
+ */
+export type CSSLogicalPadding = {
+    [k in `padding${Capitalize<LogicalSide>}`]: number;
 };
 
 /** Border width on all four sides, as plain numbers in pixels. */

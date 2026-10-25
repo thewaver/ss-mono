@@ -9,6 +9,7 @@ import type { FormFieldProps } from "./FormFieldSolid.types";
 
 export const FormField = (props: FormFieldProps) => {
     const messageId = createUniqueId();
+    const captionId = createUniqueId();
     const formContext = useFormContext();
 
     const [getControlRef, setControlRef] = createSignal<HTMLElement>();
@@ -42,11 +43,14 @@ export const FormField = (props: FormFieldProps) => {
                 "gap": `${access(props.gap) ?? FORM_FIELD_DEFAULTS.gap}px`,
             }}
         >
-            {props.renderCaption?.(getState)}
+            <Show when={props.renderCaption}>
+                <div id={captionId}>{props.renderCaption?.(getState)}</div>
+            </Show>
 
             <FormFieldContextProvider
                 value={{
                     getDescriptionId: () => (getHasMessage() ? messageId : undefined),
+                    getCaptionId: () => (props.renderCaption ? captionId : undefined),
                     registerControl: (element) => setControlRef(element),
                     unregisterControl: (element) => {
                         if (getControlRef() === element) setControlRef(undefined);

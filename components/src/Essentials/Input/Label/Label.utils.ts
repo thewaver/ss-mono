@@ -7,9 +7,10 @@ export namespace LabelUtils {
     /**
      * The `aria-label` a control should carry, given whether it sits inside a `Label`.
      *
-     * An `aria-label` replaces the accessible name entirely, so a control inside a labeled field would be announced
-     * by the label rather than by the caption the user can see — and the two then disagree, which is a failure of
-     * WCAG 2.5.3 Label in Name. The caption wins.
+     * An `aria-label` replaces the accessible name entirely, so a control inside a labeled field would be announced by
+     * the label rather than by the caption the user can see — and the two then disagree, which is a failure of
+     * {@link https://www.w3.org/WAI/WCAG22/Understanding/label-in-name.html WCAG 2.5.3 Label in Name}. The caption
+     * wins.
      *
      * @param isLabeled Whether the control sits inside a `Label`.
      * @param ariaLabel The caller's own value, if any.

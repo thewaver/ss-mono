@@ -73,12 +73,19 @@ export const ASSETS: TreeNodeRecord<Asset, never>[] = [
 export const STRESS_BRANCH_COUNT = 200;
 export const STRESS_LEAF_COUNT = 50;
 
-export const createStressFiles = (): TreeNodeRecord<string, never>[] =>
-    Array.from({ length: STRESS_BRANCH_COUNT }, (_unused, branchIndex) => ({
+const STRESS_PACKAGE_SIZE = STRESS_LEAF_COUNT + 1;
+
+export const createStressFiles = (
+    nodeCount = STRESS_BRANCH_COUNT * STRESS_PACKAGE_SIZE,
+): TreeNodeRecord<string, never>[] =>
+    Array.from({ length: Math.ceil(nodeCount / STRESS_PACKAGE_SIZE) }, (_unused, branchIndex) => ({
         value: `package-${branchIndex + 1}`,
-        children: Array.from({ length: STRESS_LEAF_COUNT }, (_leafUnused, leafIndex) => ({
-            value: `package-${branchIndex + 1}/file-${leafIndex + 1}.ts`,
-        })),
+        children: Array.from(
+            { length: Math.min(STRESS_LEAF_COUNT, nodeCount - branchIndex * STRESS_PACKAGE_SIZE - 1) },
+            (_leafUnused, leafIndex) => ({
+                value: `package-${branchIndex + 1}/file-${leafIndex + 1}.ts`,
+            }),
+        ),
     }));
 
 export const REMOTE_LOAD_DELAY_MS = 600;

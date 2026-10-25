@@ -17,6 +17,7 @@ import type {
 } from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.types";
 
 import PageTableOfContentsContent from "../../StyledComponents/TableOfContentsContent/TableOfContentsContent.vue";
+import PageDocsProse from "../DocsProse/PageDocsProse.vue";
 import { provideDocsViewContext } from "./DocsView.context";
 import type { PageDocsViewProps, PageDocsViewSlots } from "./DocsViewVue.types";
 
@@ -58,7 +59,9 @@ const links = computed((): TableOfContentsLink<DocsTableOfContentsEntry>[] =>
 <template>
     <div :class="styles.docsLayout" data-view="docs">
         <div :class="styles.docsView">
-            <p ref="intro" :id="toDocsSectionId(DOCS_INTRO_TITLE)" :class="styles.docsLead">{{ description }}</p>
+            <p ref="intro" :id="toDocsSectionId(DOCS_INTRO_TITLE)" :class="styles.docsLead">
+                <PageDocsProse :content="description" />
+            </p>
 
             <slot />
         </div>

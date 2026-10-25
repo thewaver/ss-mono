@@ -3,6 +3,7 @@ import { TooltipKnobs } from "@thewaver/ss-playground/App/Knobs/Tooltips.const";
 import {
     ARROW_BED_ARROWS,
     ARROW_BED_SHAPES,
+    type ArrowBedArrow,
     type ArrowBedShape,
     FIELD_WIDTH,
 } from "@thewaver/ss-playground/App/Pages/TooltipPage/TooltipPage.const";
@@ -11,7 +12,7 @@ import { TOOLTIP_ARROW_LABELS } from "@thewaver/ss-playground/App/StyledComponen
 import PageNumberField from "../../PageComponents/Field/PageNumberField.vue";
 import PageSelectField from "../../PageComponents/Field/PageSelectField.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
-import type { ArrowBedArrow, ArrowBedKnobsProps } from "./TooltipPageVue.types";
+import type { ArrowBedKnobsProps } from "./TooltipPageVue.types";
 
 type Props = ArrowBedKnobsProps;
 
@@ -22,7 +23,7 @@ const computeArrowLabel = (next: ArrowBedArrow) => TOOLTIP_ARROW_LABELS[next];
 
 <template>
     <PageProp
-        item-key="arrowBedArrow"
+        :item-key="`${keyPrefix}Arrow`"
         controls="Picks the template handed to ShapeUtils.attachArrow"
         label="Arrow"
         hint="Which arrow every tooltip here grows."
@@ -38,7 +39,7 @@ const computeArrowLabel = (next: ArrowBedArrow) => TOOLTIP_ARROW_LABELS[next];
     </PageProp>
 
     <PageProp
-        item-key="arrowBedWidth"
+        :item-key="`${keyPrefix}Width`"
         controls="Sets the arrow width handed to the template"
         label="Arrow width (px)"
         hint="How wide every arrow is across its base. Past twice the length, a corner arrow's sides lean 45° or more."
@@ -55,7 +56,7 @@ const computeArrowLabel = (next: ArrowBedArrow) => TOOLTIP_ARROW_LABELS[next];
     </PageProp>
 
     <PageProp
-        item-key="arrowBedLength"
+        :item-key="`${keyPrefix}Length`"
         controls="Sets the arrow length handed to the template"
         label="Arrow length (px)"
         hint="How far every arrow's tip stands off its tooltip."
@@ -72,7 +73,7 @@ const computeArrowLabel = (next: ArrowBedArrow) => TOOLTIP_ARROW_LABELS[next];
     </PageProp>
 
     <PageProp
-        item-key="arrowBedShape"
+        :item-key="`${keyPrefix}Shape`"
         controls="Picks the contour handed to ShapeUtils.attachArrow"
         label="Shape"
         hint="The contour every tooltip here is cut to, which is what each arrow's base is walked along from where it attaches."

@@ -30,6 +30,9 @@ const ButtonElement = defineComponent(
                     aria-label={ariaLabel.value}
                     aria-disabled={isDisabled || undefined}
                     aria-pressed={props.flags.isPressed}
+                    aria-haspopup={props.ariaHasPopup}
+                    aria-expanded={props.ariaExpanded}
+                    aria-controls={props.ariaControls}
                     aria-busy={isPending || undefined}
                     onClick={(e) => {
                         if (isRefusing) {
@@ -83,6 +86,9 @@ const ButtonElement = defineComponent(
             ariaLabel: null,
             flags: null,
             type: null,
+            ariaHasPopup: null,
+            ariaExpanded: Boolean,
+            ariaControls: null,
         }),
     },
 );
@@ -133,6 +139,9 @@ export const Button = defineComponent(
                                     }}
                                     ariaLabel={props.ariaLabel}
                                     type={props.type}
+                                    ariaHasPopup={props.ariaHasPopup}
+                                    ariaExpanded={props.ariaExpanded}
+                                    ariaControls={props.ariaControls}
                                     id={props.id}
                                     flags={flags}
                                     onClick={handleClick}
@@ -175,6 +184,9 @@ export const Button = defineComponent(
             id: null,
             ariaLabel: null,
             type: null,
+            ariaHasPopup: null,
+            ariaExpanded: Boolean,
+            ariaControls: null,
         }),
     },
 );

@@ -1,8 +1,16 @@
 import type { Signal } from "solid-js";
-import { createEffect, createMemo, createSignal, createUniqueId, untrack } from "solid-js";
+import { createEffect, createMemo, createSignal, createUniqueId, on, untrack } from "solid-js";
 
-import { DATE_PICKER_DEFAULTS, type DateValue, DateValueUtils, type PopupTriggerFlags } from "@thewaver/ss-components";
+import {
+    DATE_INPUT_DEFAULTS,
+    DATE_PICKER_DEFAULTS,
+    type DateValue,
+    type DateValueCalendarId,
+    DateValueUtils,
+    type PopupTriggerFlags,
+} from "@thewaver/ss-components";
 
+import { NavigatorSolidUtils } from "../../../Abstracts/Navigator/NavigatorSolid.utils";
 import { SignalMirrorSolidUtils } from "../../../Abstracts/SignalMirror/SignalMirrorSolid.utils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import { Popover } from "../../../Primitives/Popover/Popover";
@@ -12,7 +20,8 @@ import { Calendar } from "../Calendar/Calendar";
 import { DateInput } from "../DateInput/DateInput";
 import type { DatePickerProps } from "./DatePickerSolid.types";
 
-const toMonth = (value: DateValue): DateValue => DateValueUtils.getStartOfMonth(value);
+const toMonth = (value: DateValue, calendar: DateValueCalendarId): DateValue =>
+    DateValueUtils.getStartOfMonth(DateValueUtils.withCalendar(value, calendar));
 
 export const DatePicker = (props: DatePickerProps) => {
     const popupId = createUniqueId();
@@ -20,8 +29,12 @@ export const DatePicker = (props: DatePickerProps) => {
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
     const [getIsOpen, setIsOpen] = SignalMirrorSolidUtils.createOptional(() => props.visibility, false);
 
+    const getDirection = NavigatorSolidUtils.createDirectionSignal(getRootRef);
+
+    const getCalendar = createMemo(() => access(props.calendar) ?? DATE_INPUT_DEFAULTS.calendar);
+
     const monthSignal: Signal<DateValue> = createSignal(
-        toMonth(untrack(() => props.value[0]()) ?? DateValueUtils.fromDate(new Date())),
+        toMonth(untrack(() => props.value[0]()) ?? DateValueUtils.fromDate(new Date()), untrack(getCalendar)),
     );
 
     const dismiss = () => {
@@ -31,16 +44,19 @@ export const DatePicker = (props: DatePickerProps) => {
         getRootRef()?.querySelector("input")?.focus();
     };
 
-    const getIsDisabled = createMemo(() => access(props.isDisabled) ?? false);
+    const getIsLocked = createMemo(() => (access(props.isDisabled) ?? false) || (access(props.isReadOnly) ?? false));
 
     const open = () => {
-        if (getIsDisabled()) return;
+        if (getIsLocked()) return;
 
         setIsOpen(true);
     };
 
     createEffect(() => {
-        if (!getIsOpen() || !getIsDisabled()) return;
+        const isOpen = getIsOpen();
+        const isLocked = getIsLocked();
+
+        if (!isOpen || !isLocked) return;
 
         setIsOpen(false);
     });
@@ -50,8 +66,10 @@ export const DatePicker = (props: DatePickerProps) => {
 
         const value = untrack(() => props.value[0]());
 
-        if (value) monthSignal[1](() => toMonth(value));
+        if (value) monthSignal[1](() => toMonth(value, untrack(getCalendar)));
     });
+
+    createEffect(on(getCalendar, (calendar) => monthSignal[1]((month) => toMonth(month, calendar)), { defer: true }));
 
     const renderCalendar = () => (
         <Calendar
@@ -77,7 +95,7 @@ export const DatePicker = (props: DatePickerProps) => {
                 {...props}
                 renderTrailing={() => (
                     <InteractionWrapper<PopupTriggerFlags>
-                        isDisabled={getIsDisabled}
+                        isDisabled={getIsLocked}
                         extraFlags={() => ({ isOpen: getIsOpen() })}
                         renderControl={(setElementRef, getRenderProps) => (
                             <PopupTrigger
@@ -103,7 +121,7 @@ export const DatePicker = (props: DatePickerProps) => {
                 })}
                 isOpen={getIsOpen}
                 anchorRef={getRootRef}
-                placement={() => access(props.placement) ?? DATE_PICKER_DEFAULTS.placement}
+                placement={() => access(props.placement) ?? DATE_PICKER_DEFAULTS.placement[getDirection()]}
                 offset={props.offset}
                 transitionDurationMs={props.popupTransitionDurationMs}
                 hasAutoFocus={true}

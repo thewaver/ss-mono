@@ -46,8 +46,10 @@ export type FlipbookProps<T> = BaseFlipbookProps<T> & {
      *
      * **Anything that turns a page without a drag has to be built on these.** The book draws its pages and nothing
      * else, so the buttons belong to whoever is drawing the page and may sit anywhere on it. That matters beyond
-     * layout: dragging a page is a dragging movement, so WCAG 2.5.7 asks for a single-pointer route that is not a
-     * drag, and the arrow keys do not satisfy it. `turn` is that route, and wiring it up is the consumer's to do.
+     * layout: dragging a page is a dragging movement, so
+     * {@link https://www.w3.org/WAI/WCAG22/Understanding/dragging-movements.html WCAG 2.5.7} asks for a single-pointer
+     * route that is not a drag, and the arrow keys do not satisfy it. `turn` is that route, and wiring it up is the
+     * consumer's to do.
      */
     onMount?: (controls: FlipbookControls) => void;
 };

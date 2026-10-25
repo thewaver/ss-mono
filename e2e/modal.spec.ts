@@ -1,10 +1,14 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { activeText, demo, readout } from "./helpers";
+import { activeText, docsDemo, docsSettled, prop } from "./helpers";
+
+const MODAL_DOCS = "/src/App/Pages/ModalPage/Docs";
 
 const DIALOG = '[role="dialog"]';
 const ALERT = '[role="alertdialog"]';
 const OVERLAY_INSET = 4;
+
+const ALERT_DEMO = docsDemo(MODAL_DOCS, "Alert");
 
 /** The overlay's center is under the dialog for a centered one, so a corner is the only reliable point. */
 const clickOverlayCorner = async (page: Page) => {
@@ -18,10 +22,25 @@ const clickOverlayCorner = async (page: Page) => {
     await page.mouse.click(box.right - OVERLAY_INSET, box.bottom - OVERLAY_INSET);
 };
 
+/** A knob that is a picker opens its own list, found through the picker's `aria-controls`. */
+const pickOption = async (page: Page, key: string, name: string) => {
+    const picker = page.locator(`${prop(key)} [role="combobox"]`);
+
+    await picker.click();
+    await page
+        .locator(`[id="${await picker.getAttribute("aria-controls")}"]`)
+        .getByRole("option", { name, exact: true })
+        .click();
+};
+
+const alertReadout = async (page: Page) =>
+    ((await page.locator(`${ALERT_DEMO} [data-readout]`).textContent()) ?? "").trim();
+
 test.describe("Modal", () => {
     test.beforeEach(async ({ page }) => {
-        await page.goto("/modal");
+        await page.goto("/modal/docs");
         await expect(page.locator("#openModal")).toBeVisible();
+        await docsSettled(page);
     });
 
     test("a closed modal is not in the tree", async ({ page }) => {
@@ -32,10 +51,15 @@ test.describe("Modal", () => {
         await page.locator("#openModal").click();
 
         await expect(page.locator(DIALOG), "opening one mounts a modal dialog").toHaveAttribute("aria-modal", "true");
-        await expect(
-            page.locator(DIALOG),
-            "named by the consumer's own heading rather than by a label the library invented",
-        ).toHaveAttribute("aria-labelledby", "modal-page-title");
+
+        expect(
+            await page.locator(DIALOG).evaluate((dialog) => {
+                const name = document.getElementById(dialog.getAttribute("aria-labelledby") ?? "");
+
+                return !!name && dialog.contains(name) && (name.textContent ?? "").trim().length > 0;
+            }),
+            "named by the consumer's own heading inside it rather than by a label the library invented",
+        ).toBe(true);
     });
 
     test("focus is trapped and wraps both ways", async ({ page }) => {
@@ -66,10 +90,10 @@ test.describe("Modal", () => {
 
         await page.keyboard.press("Escape");
         await expect(page.locator(DIALOG), "Escape closes it").toHaveCount(0);
-        expect(
-            await activeText(page),
+        await expect(
+            page.locator("#openModal"),
             "and focus returns to the trigger rather than being dropped on the body",
-        ).toContain("Open Modal");
+        ).toBeFocused();
     });
 });
 
@@ -80,15 +104,14 @@ test.describe("Modal", () => {
  * what `initialFocusRef`'s documentation promises.
  */
 test.describe("Modal with nothing focusable inside", () => {
-    const TRIGGER = `${demo("textOnly")} button`;
-
     test.beforeEach(async ({ page }) => {
-        await page.goto("/modal");
-        await expect(page.locator(TRIGGER)).toBeVisible();
+        await page.goto("/modal/docs");
+        await expect(page.locator("#openNotice")).toBeVisible();
+        await docsSettled(page);
     });
 
     test("the dialog takes focus itself, so Tab does not walk the page behind it", async ({ page }) => {
-        await page.locator(TRIGGER).click();
+        await page.locator("#openNotice").click();
         await expect(page.locator(DIALOG)).toBeVisible();
 
         await expect(page.locator(DIALOG), "with no child to focus, the dialog is the one holding focus").toBeFocused();
@@ -106,36 +129,19 @@ test.describe("Modal with nothing focusable inside", () => {
 
         await page.keyboard.press("Escape");
         await expect(page.locator(DIALOG), "Escape still closes it").toHaveCount(0);
-        await expect(page.locator(TRIGGER), "and focus goes back to the trigger").toBeFocused();
+        await expect(page.locator("#openNotice"), "and focus goes back to the trigger").toBeFocused();
     });
 });
 
+/**
+ * The drawer is a `Modal` with an edge, and its Docs example has one Edge knob in place of the four drawers the old
+ * page drew, so each test sets the edge and then opens the one drawer.
+ */
 test.describe("Drawer", () => {
-    const TRIGGER = `${demo("left")} button`;
-
     test.beforeEach(async ({ page }) => {
-        await page.goto("/drawer");
-        await expect(page.locator("[data-example]").first()).toBeVisible();
-    });
-
-    test("a closed drawer is not in the tree", async ({ page }) => {
-        await expect(page.locator(DIALOG), "a closed drawer is not in the tree").toHaveCount(0);
-    });
-
-    test("an edge drawer sits against its edge and stretches the cross axis", async ({ page }) => {
-        await page.locator(TRIGGER).click();
-
-        await expect(page.locator(DIALOG), "opening one mounts a modal dialog").toHaveAttribute("aria-modal", "true");
-        await expect(page.locator(DIALOG), "named by the consumer").toHaveAttribute("aria-label", "left drawer");
-
-        const box = (await page.locator(DIALOG).boundingBox())!;
-
-        expect(Math.round(box.x), "a left drawer sits against the left edge rather than being centered").toBe(0);
-        expect(box.height > 600, "and stretches down the cross axis, which is the placement the library owns").toBe(
-            true,
-        );
-
-        expect(await activeText(page), "focus lands on the first focusable child by default").toContain("First");
+        await page.goto("/drawer/docs");
+        await expect(page.locator("#openDrawer")).toBeVisible();
+        await docsSettled(page);
     });
 
     /**
@@ -159,6 +165,32 @@ test.describe("Drawer", () => {
             };
         });
 
+    const openAt = async (page: Page, edge: string) => {
+        await pickOption(page, "edge", edge);
+        await page.locator("#openDrawer").click();
+        await expect(page.locator(DIALOG)).toBeVisible();
+    };
+
+    test("a closed drawer is not in the tree", async ({ page }) => {
+        await expect(page.locator(DIALOG), "a closed drawer is not in the tree").toHaveCount(0);
+    });
+
+    test("an edge drawer sits against its edge and stretches the cross axis", async ({ page }) => {
+        await openAt(page, "left");
+
+        await expect(page.locator(DIALOG), "opening one mounts a modal dialog").toHaveAttribute("aria-modal", "true");
+        await expect(page.locator(DIALOG), "named by the consumer").toHaveAttribute("aria-label", /.+/);
+
+        const box = await layoutBox(page);
+
+        expect(box.left, "a left drawer sits against the left edge rather than being centered").toBe(0);
+        expect(box.height, "and stretches down the cross axis, which is the placement the library owns").toBe(
+            box.rootHeight,
+        );
+
+        expect(await activeText(page), "focus lands on the first focusable child by default").toContain("First");
+    });
+
     /**
      * `modalRoot` is a grid rather than a flex row precisely so both axes can state "stretch"
      * independently, and a left drawer cannot show that — sticking to the left and filling the height is
@@ -166,9 +198,7 @@ test.describe("Drawer", () => {
      * stick to the top *and* fill the width, so it is the one worth driving.
      */
     test("a top drawer sticks to its edge and fills the other axis", async ({ page }) => {
-        await page.locator(`${demo("top")} button`).click();
-
-        await expect(page.locator(DIALOG)).toHaveAttribute("aria-label", "top drawer");
+        await openAt(page, "top");
 
         const box = await layoutBox(page);
 
@@ -180,7 +210,7 @@ test.describe("Drawer", () => {
     });
 
     test("the far edges are honored too, so all four are the same grid stating different corners", async ({ page }) => {
-        await page.locator(`${demo("right")} button`).click();
+        await openAt(page, "right");
 
         const right = await layoutBox(page);
 
@@ -190,7 +220,7 @@ test.describe("Drawer", () => {
         await page.keyboard.press("Escape");
         await expect(page.locator(DIALOG)).toHaveCount(0);
 
-        await page.locator(`${demo("bottom")} button`).click();
+        await openAt(page, "bottom");
 
         const bottom = await layoutBox(page);
 
@@ -199,30 +229,33 @@ test.describe("Drawer", () => {
     });
 
     test("Escape and an overlay click both close it", async ({ page }) => {
-        await page.locator(TRIGGER).click();
+        await page.locator("#openDrawer").click();
         await expect(page.locator(DIALOG)).toBeVisible();
 
         await page.keyboard.press("Escape");
         await expect(page.locator(DIALOG), "Escape closes it").toHaveCount(0);
-        expect(await readout(page, "left"), "and the owner's signal says so").toContain("open: false");
+        await expect(page.locator("#openDrawer"), "and the owner's button has focus back").toBeFocused();
 
-        await page.locator(TRIGGER).click();
+        await page.locator("#openDrawer").click();
         await expect(page.locator(DIALOG)).toBeVisible();
         await clickOverlayCorner(page);
         await expect(page.locator(DIALOG), "a click on the overlay closes it too").toHaveCount(0);
     });
 });
 
+/**
+ * The alert example's two dismissal knobs start off, which is the case the section is about: an alert must be
+ * answered. Turning them on is what shows the knobs reach the dialog.
+ */
 test.describe("Modal in its alert mode", () => {
-    const TRIGGER = `${demo("destructiveConfirmation")} button`;
-
     test.beforeEach(async ({ page }) => {
-        await page.goto("/modal");
-        await expect(page.locator("[data-example]").first()).toBeVisible();
+        await page.goto("/modal/docs");
+        await expect(page.locator("#openAlert")).toBeVisible();
+        await docsSettled(page);
     });
 
     test("it takes the alertdialog role and describes the decision", async ({ page }) => {
-        await page.locator(TRIGGER).click();
+        await page.locator("#openAlert").click();
 
         await expect(page.locator(ALERT), "an alert dialog carries role=alertdialog, not role=dialog").toHaveCount(1);
         await expect(page.locator(ALERT), "and points at the text explaining the decision").toHaveAttribute(
@@ -236,7 +269,9 @@ test.describe("Modal in its alert mode", () => {
     });
 
     test("neither an overlay click nor Escape can dismiss it", async ({ page }) => {
-        await page.locator(TRIGGER).click();
+        const before = await alertReadout(page);
+
+        await page.locator("#openAlert").click();
         await expect(page.locator(ALERT)).toBeVisible();
 
         await clickOverlayCorner(page);
@@ -246,22 +281,34 @@ test.describe("Modal in its alert mode", () => {
         ).toHaveCount(1);
 
         await page.keyboard.press("Escape");
-        await expect(
-            page.locator(ALERT),
-            "Escape is refused too, because this demo turns isDismissableOnEscape off — a stray key is not an answer",
-        ).toHaveCount(1);
-        expect(await readout(page, "destructiveConfirmation"), "with no outcome").toContain("nothing decided yet");
+        await expect(page.locator(ALERT), "Escape is refused too, since a stray key is not an answer").toHaveCount(1);
+        expect(await alertReadout(page), "with no outcome").toBe(before);
+    });
+
+    test("with its dismissal knobs on, Escape and the overlay close it again", async ({ page }) => {
+        await page.locator(`${prop("isDismissableOnOverlayClick")} input`).click();
+        await page.locator(`${prop("isDismissableOnEscape")} input`).click();
+
+        await page.locator("#openAlert").click();
+        await expect(page.locator(ALERT)).toBeVisible();
+        await page.keyboard.press("Escape");
+        await expect(page.locator(ALERT), "Escape closes it once allowed").toHaveCount(0);
+
+        await page.locator("#openAlert").click();
+        await expect(page.locator(ALERT)).toBeVisible();
+        await clickOverlayCorner(page);
+        await expect(page.locator(ALERT), "and so does the overlay").toHaveCount(0);
     });
 
     test("the initial focus target can be activated straight away", async ({ page }) => {
-        await page.locator(TRIGGER).click();
+        const before = await alertReadout(page);
+
+        await page.locator("#openAlert").click();
         await expect(page.locator(ALERT)).toBeVisible();
 
         await page.keyboard.press("Enter");
         await expect(page.locator(ALERT), "the initial focus target can be activated straight away").toHaveCount(0);
-        expect(await readout(page, "destructiveConfirmation"), "and reports what was answered").toContain(
-            "outcome: canceled",
-        );
+        expect(await alertReadout(page), "and reports what was answered").not.toBe(before);
     });
 });
 
@@ -269,25 +316,27 @@ test.describe("Modal in its alert mode", () => {
  * A layer opened from inside another one is the case a single dismissal listener per control cannot get
  * right: every control used to handle `Escape` on its own and let the key travel on, so the modal
  * listening at the document heard the same press and closed underneath the popup that had just consumed
- * it.
+ * it. One Escape closes one layer, the top one.
  */
 test.describe("A popup inside a modal", () => {
     const LISTBOX = '[role="listbox"]';
+    const COMBOBOX = `${DIALOG} [role="combobox"]`;
 
     const openBoth = async (page: Page) => {
         await page.locator("#openLayers").click();
         await expect(page.locator(DIALOG)).toBeVisible();
 
-        await page.locator(`${DIALOG} [role="combobox"]`).click();
+        await page.locator(COMBOBOX).click();
         await expect(page.locator(LISTBOX)).toBeVisible();
     };
 
     test.beforeEach(async ({ page }) => {
-        await page.goto("/modal");
+        await page.goto("/modal/docs");
         await expect(page.locator("#openLayers")).toBeVisible();
+        await docsSettled(page);
     });
 
-    test("Escape closes the innermost layer and leaves the one around it", async ({ page }) => {
+    test("one Escape closes only the top layer", async ({ page }) => {
         await openBoth(page);
 
         await page.keyboard.press("Escape");
@@ -301,7 +350,7 @@ test.describe("A popup inside a modal", () => {
     test("pressing inside the modal closes only the list", async ({ page }) => {
         await openBoth(page);
 
-        await page.locator(`#${"modal-page-layered-title"}`).click();
+        await page.locator(`[id="${await page.locator(DIALOG).getAttribute("aria-labelledby")}"]`).click();
         await expect(page.locator(LISTBOX), "a press outside the list dismisses it").toHaveCount(0);
         await expect(page.locator(DIALOG), "while a press inside the modal is not outside the modal").toHaveCount(1);
     });
@@ -315,6 +364,6 @@ test.describe("A popup inside a modal", () => {
         await expect(page.locator(DIALOG), "picking from a list inside a modal does not dismiss the modal").toHaveCount(
             1,
         );
-        expect(await readout(page, "layered")).toContain("country: Portugal");
+        await expect(page.locator(COMBOBOX), "and the pick lands in the field").toContainText("Portugal");
     });
 });

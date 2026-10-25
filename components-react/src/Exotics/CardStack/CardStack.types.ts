@@ -52,9 +52,11 @@ export type CardStackProps<T> = BaseCardStackProps<T> & {
      *
      * **Anything that sends a card without a drag has to be built on these.** The stack renders the pile and nothing
      * else, so the buttons belong to whoever is drawing the page and may sit anywhere on it. That matters beyond
-     * layout: a swipe is a path-based gesture, so WCAG 2.5.1 and, because it is a drag, 2.5.7 both ask for a route
-     * that is a single pointer and not a drag, and a keyboard does not satisfy either — both are about pointers.
-     * `send` is that route, and wiring it up is the consumer's to do.
+     * layout: a swipe is a path-based gesture, so
+     * {@link https://www.w3.org/WAI/WCAG22/Understanding/pointer-gestures.html WCAG 2.5.1} and, because it is a drag,
+     * {@link https://www.w3.org/WAI/WCAG22/Understanding/dragging-movements.html 2.5.7} both ask for a route that is a
+     * single pointer and not a drag, and a keyboard does not satisfy either — both are about pointers. `send` is that
+     * route, and wiring it up is the consumer's to do.
      */
     onMount?: (controls: CardStackControls) => void;
 };

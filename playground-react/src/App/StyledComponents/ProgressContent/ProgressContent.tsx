@@ -18,13 +18,18 @@ export const PageProgressContent = (props: ProgressContentProps) => {
                     .filter(Boolean)
                     .join(" ")}
             >
-                <div className={styles.progressFill} style={{ width: `${(props.state.ratio ?? 0) * PERCENT}%` }} />
+                <div
+                    className={styles.progressFill}
+                    style={{ width: props.state.ratio === undefined ? undefined : `${props.state.ratio * PERCENT}%` }}
+                />
             </div>
 
             <div className={styles.progressReadout} aria-hidden="true">
-                {props.state.ratio === undefined
-                    ? "working…"
-                    : `${Math.round(props.state.ratio * PERCENT)}% of ${props.state.max}`}
+                <bdi>
+                    {props.state.ratio === undefined
+                        ? "working…"
+                        : `${Math.round(props.state.ratio * PERCENT)}% of ${props.state.max}`}
+                </bdi>
             </div>
         </div>
     );

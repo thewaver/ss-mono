@@ -2,6 +2,7 @@ import { type ClockSteps, DateValueUtils } from "@thewaver/ss-components";
 import type { TimeValue } from "@thewaver/ss-utils";
 
 export const FIELD_WIDTH = 220;
+export const PAIR_FIELD_WIDTH = 160;
 export const LOCALE = "en-GB";
 
 export const TODAY = DateValueUtils.fromIso("2026-08-10")!;
@@ -30,3 +31,5 @@ export const WEEK_STARTS_ON_MONDAY = 1;
 export const WEEKEND_OFFSET = 5;
 
 export const EXAMPLES_ROOT = "/src/App/Pages/DatePickerPage/Examples";
+
+export const DOCS_ROOT = "/src/App/Pages/DatePickerPage/Docs";

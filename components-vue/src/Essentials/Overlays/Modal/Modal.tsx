@@ -1,4 +1,4 @@
-import { type SlotsType, Teleport, defineComponent, shallowRef } from "vue";
+import { type SlotsType, Teleport, defineComponent, shallowRef, watch } from "vue";
 
 import { FocusManagerUtils, MODAL_DEFAULTS, ModalStyles, ModalUtils } from "@thewaver/ss-components";
 import { ModalConst } from "@thewaver/ss-components/internal";
@@ -8,6 +8,7 @@ import { DismisserVueUtils } from "../../../Abstracts/Dismisser/DismisserVue.uti
 import { ElementFaderVueUtils } from "../../../Abstracts/ElementFader/ElementFaderVue.utils";
 import { FocusManagerVueUtils } from "../../../Abstracts/FocusManager/FocusManagerVue.utils";
 import { InteractionTrackerVueUtils } from "../../../Abstracts/InteractionTracker/InteractionTrackerVue.utils";
+import { NavigatorVueUtils } from "../../../Abstracts/Navigator/NavigatorVue.utils";
 import { useViewportContext } from "../../../Abstracts/Viewport/Viewport.context";
 import { watchAfterRender } from "../../../Utils/effectUtils";
 import { callSlot, declareProps, useTwoWay } from "../../../Utils/propUtils";
@@ -35,6 +36,18 @@ export const Modal = defineComponent(
             onShow: () => props.onShow?.(),
             onHide: () => props.onHide?.(),
         });
+
+        const opener = shallowRef<HTMLElement>();
+
+        watch(
+            isOpen,
+            (isShown) => {
+                opener.value = isShown ? FocusManagerUtils.getFocusOrigin() : undefined;
+            },
+            { immediate: true, flush: "sync" },
+        );
+
+        const direction = NavigatorVueUtils.useDirection(opener, () => !fader.isVisible.value);
 
         watchAfterRender([fader.isVisible, rootRef], ([isVisible, root]) => {
             if (!isVisible || !root) return;
@@ -127,7 +140,7 @@ export const Modal = defineComponent(
                             )
                         }
                     >
-                        <div class={ModalStyles.modalOverlay} onClick={handleOverlayClick}>
+                        <div class={ModalStyles.modalOverlay} dir={direction.value} onClick={handleOverlayClick}>
                             {callSlot(slots.renderOverlay, { visibilityTarget, transitionDurationMs })}
                         </div>
                         <div
@@ -141,6 +154,7 @@ export const Modal = defineComponent(
                                 transitionProperty: "transform",
                                 transitionDuration: `${isSwiping.value ? 0 : transitionDurationMs}ms`,
                             }}
+                            dir={direction.value}
                             tabindex={-1}
                             role={props.role ?? MODAL_DEFAULTS.role}
                             aria-modal="true"

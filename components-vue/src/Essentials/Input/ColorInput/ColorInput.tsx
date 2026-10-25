@@ -1,4 +1,4 @@
-import { type SlotsType, defineComponent, shallowRef, useId } from "vue";
+import { type SlotsType, computed, defineComponent, shallowRef, useId } from "vue";
 
 import {
     COLOR_INPUT_DEFAULTS,
@@ -8,6 +8,7 @@ import {
 } from "@thewaver/ss-components";
 import type { Color } from "@thewaver/ss-utils";
 
+import { NavigatorVueUtils } from "../../../Abstracts/Navigator/NavigatorVue.utils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import type {
     InteractionControlSlots,
@@ -21,29 +22,44 @@ import { exposeElement, toElement } from "../../../Utils/refUtils";
 import type { SlotsContext } from "../../../Utils/typeUtils";
 import { ColorArea } from "../ColorArea/ColorArea";
 import { FormFieldVueUtils } from "../FormField/FormFieldVue.utils";
-import { LabelVueUtils } from "../Label/LabelVue.utils";
 import { Range } from "../Range/Range";
 import type { ColorInputFieldProps, ColorInputProps, ColorInputSlots } from "./ColorInput.types";
 
 const ColorInputField = defineComponent(
-    (props: ColorInputFieldProps, { slots }: SlotsContext<InteractionControlSlots<ColorInputRenderProps>>) => {
-        const ariaLabel = LabelVueUtils.useAriaLabel(() => props.ariaLabel);
-        const ariaDescribedBy = FormFieldVueUtils.useAriaDescribedBy();
+    (props: ColorInputFieldProps, { slots, expose }: SlotsContext<InteractionControlSlots<ColorInputRenderProps>>) => {
+        const { ariaLabel, ariaLabelledBy } = FormFieldVueUtils.useAriaName(() => props.ariaLabel);
+        const fieldDescribedBy = FormFieldVueUtils.useAriaDescribedBy();
+        const descriptionId = useId();
 
         const elementRef = shallowRef<HTMLButtonElement>();
 
+        exposeElement(expose, () => elementRef.value);
+
         FormFieldVueUtils.useRegisterControl(elementRef);
+
+        const valueText = computed(() =>
+            props.flags.value
+                ? (props.computeValueText ?? COLOR_INPUT_DEFAULTS.computeValueText)(props.flags.value, props.flags.hsv)
+                : "",
+        );
+
+        const ariaDescribedBy = computed(
+            () =>
+                [fieldDescribedBy.value, valueText.value ? descriptionId : undefined].filter(Boolean).join(" ") ||
+                undefined,
+        );
 
         return () => {
             const isDisabled = props.flags.isDisabled ?? false;
 
-            return (
+            return [
                 <button
                     id={props.id}
                     ref={elementRef}
                     type="button"
                     class={ColorInputStyles.colorInputField}
                     aria-label={ariaLabel.value}
+                    aria-labelledby={ariaLabelledBy.value}
                     aria-describedby={ariaDescribedBy.value}
                     aria-haspopup="dialog"
                     aria-expanded={props.isOpen}
@@ -67,14 +83,21 @@ const ColorInputField = defineComponent(
                     }}
                 >
                     {callSlot(slots.renderContent, props.flags)}
-                </button>
-            );
+                </button>,
+
+                valueText.value ? (
+                    <span id={descriptionId} class={ColorInputStyles.colorInputDescription} aria-hidden="true">
+                        {valueText.value}
+                    </span>
+                ) : null,
+            ];
         };
     },
     {
         name: "ColorInputField",
         props: declareProps<ColorInputFieldProps>({
             onInput: null,
+            computeValueText: null,
             onMouseEnter: null,
             onMouseLeave: null,
             id: null,
@@ -95,6 +118,8 @@ export const ColorInput = defineComponent(
         const isOpen = useTwoWay(props, "visibility", false);
 
         const fieldElement = shallowRef<HTMLElement>();
+
+        const direction = NavigatorVueUtils.useDirection(fieldElement, () => !isOpen.value);
 
         exposeElement(expose, () => fieldElement.value);
 
@@ -156,19 +181,21 @@ export const ColorInput = defineComponent(
                 {{ renderContent: slots.renderArea }}
             </ColorArea>,
 
-            <Range
-                value={hsv.value.h}
-                onUpdate:value={(hue: number) => {
-                    hsv.value = { ...hsv.value, h: hue };
-                }}
-                sizing={"fill"}
-                isDisabled={getIsDisabled()}
-                max={ColorInputUtils.HUE_MAX}
-                step={ColorInputUtils.HUE_STEP}
-                ariaLabel={props.hueLabel}
-            >
-                {{ renderContent: slots.renderHue }}
-            </Range>,
+            <div class={ColorInputStyles.colorInputHue} dir="ltr">
+                <Range
+                    value={hsv.value.h}
+                    onUpdate:value={(hue: number) => {
+                        hsv.value = { ...hsv.value, h: hue };
+                    }}
+                    sizing={"fill"}
+                    isDisabled={getIsDisabled()}
+                    max={ColorInputUtils.HUE_MAX}
+                    step={ColorInputUtils.HUE_STEP}
+                    ariaLabel={props.hueLabel}
+                >
+                    {{ renderContent: slots.renderHue }}
+                </Range>
+            </div>,
         ];
 
         return () => {
@@ -199,6 +226,7 @@ export const ColorInput = defineComponent(
                                         popupId={popupId}
                                         isOpen={isOpen.value}
                                         flags={flags}
+                                        computeValueText={props.computeValueText}
                                         onToggle={() => {
                                             if (isOpen.value) isOpen.value = false;
                                             else open();
@@ -220,7 +248,7 @@ export const ColorInput = defineComponent(
                         ariaAttributes={{ "aria-label": props.pickerLabel }}
                         isOpen={isOpen.value}
                         anchorRef={fieldElement.value}
-                        placement={props.placement ?? COLOR_INPUT_DEFAULTS.placement}
+                        placement={props.placement ?? COLOR_INPUT_DEFAULTS.placement[direction.value]}
                         offset={props.offset}
                         transitionDurationMs={props.transitionDurationMs}
                         hasAutoFocus={true}
@@ -263,6 +291,7 @@ export const ColorInput = defineComponent(
             "onActivation": null,
             "tooltipDefs": null,
             "onInput": null,
+            "computeValueText": null,
             "onMouseEnter": null,
             "onMouseLeave": null,
             "id": null,

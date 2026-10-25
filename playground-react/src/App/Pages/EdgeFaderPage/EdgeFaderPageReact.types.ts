@@ -1,3 +1,11 @@
-import type { BaseEdgeFaderExampleProps } from "@thewaver/ss-playground/App/Pages/EdgeFaderPage/EdgeFaderPage.types";
+import type {
+    BaseEdgeFaderBasicDocsExampleValues,
+    BaseEdgeFaderScrollAwareDocsExampleValues,
+    BaseEdgeFaderSidesDocsExampleValues,
+} from "@thewaver/ss-playground/App/Pages/EdgeFaderPage/EdgeFaderPage.types";
 
-export type EdgeFaderExampleProps = BaseEdgeFaderExampleProps;
+export type EdgeFaderBasicDocsExampleProps = BaseEdgeFaderBasicDocsExampleValues;
+
+export type EdgeFaderSidesDocsExampleProps = BaseEdgeFaderSidesDocsExampleValues;
+
+export type EdgeFaderScrollAwareDocsExampleProps = BaseEdgeFaderScrollAwareDocsExampleValues;

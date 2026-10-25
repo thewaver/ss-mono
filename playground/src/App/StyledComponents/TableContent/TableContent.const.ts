@@ -9,6 +9,7 @@ export const UNSORTED_MARKER = "↕";
 export const EXPANDER_MARKERS = {
     open: "▾",
     closed: "▸",
+    closedRightToLeft: "◂",
 };
 
 export const SORT_MARKERS: Record<TableSortDirection, string> = {

@@ -5,12 +5,9 @@ import { SCROLLER_AXES, SCROLLER_DEFAULTS } from "./Scroller.const";
 import type {
     ScrollerActivityDefs,
     ScrollerAxis,
-    ScrollerAxisSteps,
     ScrollerBarDefs,
     ScrollerBarSide,
     ScrollerBoxMetrics,
-    ScrollerBoxSteps,
-    ScrollerButtonPlacement,
     ScrollerGridTemplate,
     ScrollerMetrics,
     ScrollerOverflow,
@@ -20,7 +17,11 @@ import type {
 
 /** How close to an end, in pixels, counts as being at it, so a fractional scroll position still reads as arrived. */
 const SCROLL_EPSILON = 1;
-/** The shortest a thumb is drawn, in pixels: the 24-pixel target size WCAG 2.5.8 asks of anything a person drags. */
+/**
+ * The shortest a thumb is drawn, in pixels: the 24-pixel target size
+ * {@link https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html WCAG 2.5.8} asks of anything a person
+ * drags.
+ */
 const MIN_THUMB_LENGTH_PX = 24;
 /** How far a press on a thumb must travel, in pixels, before it takes pointer capture and swallows its click. */
 const DRAG_THRESHOLD_PX = 4;
@@ -36,23 +37,10 @@ const TRACK_PRESS_INTERVAL_MS = 100;
 const HALF = 0.5;
 /** The `direction` a right-to-left box computes to. */
 const RIGHT_TO_LEFT = "rtl";
-/** The size given to the grid track the box sits in, which takes whatever room the step buttons leave. */
+/** The size given to the grid track the box sits in, which takes whatever room its bars leave. */
 const AREA_TRACK = "minmax(0, 1fr)";
-/** The size given to a grid track holding step buttons. */
-const STEPS_TRACK = "auto";
-/** An empty cell in a grid template. */
-const EMPTY_CELL = ".";
 /** The track a bar's strip takes in the area: as thick as the painter draws it. */
 const BAR_TRACK = "auto";
-
-/** The names of the grid cells a scroller lays itself out in. */
-const GRID_AREAS = {
-    area: "area",
-    xLeading: "xLeading",
-    xTrailing: "xTrailing",
-    yLeading: "yLeading",
-    yTrailing: "yTrailing",
-} as const;
 
 /**
  * Where each box's latest step on each axis began and where it is heading, kept until the box arrives or is moved
@@ -156,9 +144,6 @@ export namespace ScrollerUtils {
 
     /** The reading of a box that has not been measured yet. */
     export const NO_BOX_METRICS: ScrollerBoxMetrics = { x: NO_METRICS, y: NO_METRICS };
-
-    /** The names of the cells {@link computeGridTemplate} lays a scroller out in, to give each part its `grid-area`. */
-    export const AREAS = GRID_AREAS;
 
     /**
      * Measures a box along one axis.
@@ -369,7 +354,8 @@ export namespace ScrollerUtils {
      * still within the next view; back, on the nearest item start within the previous one. Where there is no boundary
      * inside the page — a box holding one item — it goes a full view. Before the box has scrolled past the first
      * item's start, which leading padding puts a little way in, that item already counts as lined up, so a step never
-     * lands on it.
+     * lands on it; for the same reason a step back that would land on it goes all the way to the start, padding and
+     * all, so the box arrives at its start rather than a few pixels short.
      *
      * Each item of overlap pulls the landing one boundary back towards where the step began, so that item of the
      * view just left is still in view afterwards. The landing never comes back past the first boundary the step
@@ -403,8 +389,10 @@ export namespace ScrollerUtils {
 
         const limit = start - visible;
         const candidates = offsets.filter((offset) => offset < start - SCROLL_EPSILON && offset >= limit);
+        const landing = candidates[Math.min(overlap, candidates.length - 1)] ?? limit;
+        const firstOffset = offsets[0];
 
-        return candidates[Math.min(overlap, candidates.length - 1)] ?? limit;
+        return firstOffset !== undefined && landing <= firstOffset ? 0 : landing;
     };
 
     /**
@@ -431,6 +419,20 @@ export namespace ScrollerUtils {
 
         return computeStepLanding(offsets, readMetrics(box, axis).visible, step, start, overlapCount);
     };
+
+    /**
+     * Whether a step one way along an axis has anywhere to go.
+     *
+     * A direction set to `hidden` never steps, even where content runs past the box, because the box was asked not to
+     * scroll that way; otherwise a step can go unless the box is already at the end it goes towards.
+     *
+     * @param overflow How the axis was asked to scroll.
+     * @param metrics The axis's reading.
+     * @param step Which way.
+     * @returns `true` while the step would move the box.
+     */
+    export const getCanStep = (overflow: ScrollerOverflow, metrics: ScrollerMetrics, step: ScrollerStep) =>
+        overflow !== "hidden" && (step === "previous" ? !getIsAtStart(metrics) : !getIsAtEnd(metrics));
 
     /**
      * Scrolls a box one step along an axis, unless it is already at the end that step goes towards.
@@ -471,83 +473,13 @@ export namespace ScrollerUtils {
     };
 
     /**
-     * Which step buttons go before the box and which after it, along one axis.
-     *
-     * `split` puts one on each side, `start` and `end` put both on that side, and an axis with nothing to scroll gets
-     * none at all.
-     *
-     * @param placement Where the buttons sit.
-     * @param isScrollable Whether the axis has anything to scroll.
-     * @returns The steps to render before the box, and after it.
-     */
-    export const getSteps = (placement: ScrollerButtonPlacement, isScrollable: boolean): ScrollerAxisSteps => {
-        if (!isScrollable) return { leading: [], trailing: [] };
-        if (placement === "start") return { leading: ["previous", "next"], trailing: [] };
-        if (placement === "end") return { leading: [], trailing: ["previous", "next"] };
-
-        return { leading: ["previous"], trailing: ["next"] };
-    };
-
-    /**
-     * Which step buttons each axis shows: {@link getSteps} for an axis that scrolls, and none for a `hidden` one.
-     *
-     * @param placement Where the buttons sit, for both axes alike.
-     * @param overflow How each axis was asked to scroll.
-     * @param metrics The box's reading.
-     * @returns The steps to render before and after the box, per axis.
-     */
-    export const getBoxSteps = (
-        placement: ScrollerButtonPlacement,
-        overflow: Record<ScrollerAxis, ScrollerOverflow>,
-        metrics: ScrollerBoxMetrics,
-    ): ScrollerBoxSteps => ({
-        x: getSteps(placement, overflow.x !== "hidden" && getIsScrollable(metrics.x)),
-        y: getSteps(placement, overflow.y !== "hidden" && getIsScrollable(metrics.y)),
-    });
-
-    /**
-     * The grid a scroller lays itself out in: the box's cell in the middle, a column before and after it for the
-     * buttons stepping across, and a row above and below for those stepping down.
-     *
-     * Only the rows and columns that hold buttons are written, so a gap is never left around an empty one.
-     *
-     * @param steps The buttons each axis shows, from {@link getBoxSteps}.
-     * @returns The `grid-template-areas`, `grid-template-columns` and `grid-template-rows`, naming the cells
-     * {@link AREAS} lists.
-     */
-    export const computeGridTemplate = (steps: ScrollerBoxSteps): ScrollerGridTemplate => {
-        const columns = [
-            ...(steps.x.leading.length > 0 ? [GRID_AREAS.xLeading] : []),
-            GRID_AREAS.area,
-            ...(steps.x.trailing.length > 0 ? [GRID_AREAS.xTrailing] : []),
-        ];
-        const rows = [
-            ...(steps.y.leading.length > 0 ? [GRID_AREAS.yLeading] : []),
-            GRID_AREAS.area,
-            ...(steps.y.trailing.length > 0 ? [GRID_AREAS.yTrailing] : []),
-        ];
-        const toTrack = (name: string) => (name === GRID_AREAS.area ? AREA_TRACK : STEPS_TRACK);
-        const toCell = (row: string, column: string) => {
-            if (row === GRID_AREAS.area) return column;
-
-            return column === GRID_AREAS.area ? row : EMPTY_CELL;
-        };
-
-        return {
-            areas: rows.map((row) => `"${columns.map((column) => toCell(row, column)).join(" ")}"`).join(" "),
-            columns: columns.map(toTrack).join(" "),
-            rows: rows.map(toTrack).join(" "),
-        };
-    };
-
-    /**
-     * The layout of the box and its two bars inside the scroller's area.
+     * The layout of the box and its two bars, written on the scroller's root.
      *
      * Each bar's strip sits on the side asked for, so the across bar goes above or below the box and the down bar
      * before or after it in reading order; the corner where the two strips meet stays empty.
      *
      * @param sides Which side each bar sits on.
-     * @returns The `grid-template-areas`, `grid-template-columns` and `grid-template-rows` for the area.
+     * @returns The `grid-template-areas`, `grid-template-columns` and `grid-template-rows` for the root.
      */
     export const computeAreaTemplate = (sides: Record<ScrollerAxis, ScrollerBarSide>): ScrollerGridTemplate => {
         const isYBarFirst = sides.y === "start";

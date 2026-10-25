@@ -1,6 +1,10 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { inputValue, prop, readout } from "./helpers";
+import { docsDemo, docsSettled, inputValue, prop } from "./helpers";
+
+const DOCS = "/src/App/Pages/AudioSwitcherPage/Docs";
+
+const BASIC = docsDemo(DOCS, "Basic");
 
 /**
  * `AudioSwitcher` renders nothing and holds its two `Audio` elements in a variable rather than in the
@@ -97,11 +101,11 @@ const askedVolume = async (page: Page) => Number(await inputValue(page.locator(`
 const pauseCalls = async (page: Page) =>
     (await mediaCalls(page)).filter((call) => call.startsWith("pause:") && call !== "pause:");
 
-const playControl = (page: Page) => page.getByRole("button", { name: "Play", exact: true });
+const playControl = (page: Page) => page.locator(BASIC).getByRole("button", { name: "Play", exact: true });
 
-const pauseControl = (page: Page) => page.getByRole("button", { name: "Pause", exact: true });
+const pauseControl = (page: Page) => page.locator(BASIC).getByRole("button", { name: "Pause", exact: true });
 
-const startOverControl = (page: Page) => page.getByRole("button", { name: "Start over", exact: true });
+const startOverControl = (page: Page) => page.locator(BASIC).getByRole("button", { name: "Start over", exact: true });
 
 /**
  * The caption is the whole of what a visitor can tell about playback, so it is read as one answer rather
@@ -110,22 +114,25 @@ const startOverControl = (page: Page) => page.getByRole("button", { name: "Start
 const playbackCaption = async (page: Page) => ((await pauseControl(page).count()) ? "Pause" : "Play");
 
 const pickTrack = async (page: Page, name: string) => {
-    await page.getByRole("combobox", { name: "Track" }).click();
+    await page.locator(`${prop("track")} [role="combobox"]`).click();
     await page.getByRole("option", { name }).click();
 };
 
 test.beforeEach(async ({ page }) => {
     await page.addInitScript(recordMediaCalls);
-    await page.goto("/audio-switcher");
+    await page.goto("/audio-switcher/docs");
     await expect(playControl(page)).toBeVisible();
-    await page.locator(`${prop("crossfadeMs")} input`).fill(FAST_CROSSFADE_MS);
-    await page.locator(`${prop("crossfadeMs")} input`).blur();
+    await docsSettled(page);
+    await page.locator(`${prop("crossfadeMs")} input`).click();
+    await page.keyboard.press("ControlOrMeta+a");
+    await page.keyboard.type(FAST_CROSSFADE_MS);
+    await page.keyboard.press("Tab");
+    await expect(page.locator(`${prop("crossfadeMs")} input`)).toHaveValue(FAST_CROSSFADE_MS);
 });
 
 test("a source that arrives at mount is not played, and is not even attempted", async ({ page }) => {
     expect(await playCalls(page), "nothing is asked to play before anybody has asked for anything").toEqual([]);
     expect(await playbackCaption(page), "so the control offers to start it").toBe("Play");
-    expect(await readout(page, "default")).toContain("stopped");
 });
 
 test("pressing play starts it, and the caption follows the component rather than the press", async ({ page }) => {
@@ -135,7 +142,6 @@ test("pressing play starts it, and the caption follows the component rather than
     expect(await playCalls(page), "the first source is what plays").toHaveLength(1);
     expect((await playCalls(page))[0]).toContain("lofi");
     expect(await playbackCaption(page), "and the control now offers to pause it").toBe("Pause");
-    expect(await readout(page, "default")).toContain("playing");
 });
 
 /**
@@ -201,6 +207,7 @@ test("a stop pressed while the sound is still starting wins over the start", asy
     await page.addInitScript(slowPlayback);
     await page.reload();
     await expect(playControl(page)).toBeVisible();
+    await docsSettled(page);
 
     await playControl(page).click();
     await pauseControl(page).click();
@@ -210,5 +217,4 @@ test("a stop pressed while the sound is still starting wins over the start", asy
         .poll(() => pauseCalls(page), "and the component answered it by pausing, not by playing")
         .toHaveLength(1);
     expect(await playbackCaption(page), "so the control still offers to start it").toBe("Play");
-    expect(await readout(page, "default")).toContain("stopped");
 });

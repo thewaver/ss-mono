@@ -5,6 +5,8 @@ import type {
 } from "../../../Abstracts/DateValue/DateValue.types";
 import type { CalendarPrecision } from "./Calendar.types";
 
+export const CALENDAR_PRECISIONS: readonly CalendarPrecision[] = ["day", "month", "year"];
+
 export const CALENDAR_DEFAULTS = {
     precision: "day" as CalendarPrecision,
     weekStartsOn: 1 as DateValueWeekStart,

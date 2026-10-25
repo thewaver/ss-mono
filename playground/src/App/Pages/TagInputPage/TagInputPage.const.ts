@@ -26,3 +26,5 @@ export const CROWDED_TAGS = [
     "signals",
     "stores",
 ];
+
+export const DOCS_ROOT = "/src/App/Pages/TagInputPage/Docs";

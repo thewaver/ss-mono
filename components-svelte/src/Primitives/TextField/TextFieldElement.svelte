@@ -3,13 +3,12 @@
 
     import { TextSyncSvelteUtils } from "../../Abstracts/TextSync/TextSyncSvelte.utils.svelte.js";
     import { FormFieldSvelteUtils } from "../../Essentials/Input/FormField/FormFieldSvelte.utils.svelte.js";
-    import { LabelSvelteUtils } from "../../Essentials/Input/Label/LabelSvelte.utils.svelte.js";
     import { toStyle } from "../../Utils/styleUtils.js";
     import type { TextFieldElementProps } from "./TextField.types.js";
 
     let props: TextFieldElementProps = $props();
 
-    const getAriaLabel = LabelSvelteUtils.resolveAriaLabel(() => props.ariaLabel);
+    const { getAriaLabel, getAriaLabelledBy } = FormFieldSvelteUtils.resolveAriaName(() => props.ariaLabel);
     const getAriaDescribedBy = FormFieldSvelteUtils.resolveAriaDescribedBy();
 
     let element = $state<TextSyncElement>();
@@ -63,6 +62,7 @@
     {@attach props.attachControl}
     id={props.id}
     {type}
+    dir={props.isLeftToRight ? "ltr" : undefined}
     rows={isAutoSizing ? 1 : undefined}
     name={props.name}
     class={[
@@ -79,6 +79,7 @@
     readonly={isDisabled || isReadOnly}
     role={isSpinButton ? "spinbutton" : undefined}
     aria-label={getAriaLabel()}
+    aria-labelledby={getAriaLabelledBy()}
     aria-describedby={getAriaDescribedBy()}
     aria-valuenow={valueNow}
     aria-valuemin={isSpinButton ? props.min : undefined}
@@ -117,7 +118,7 @@
     <div
         {@attach props.attachLeading}
         class={styles.textFieldAdornment}
-        style:left={`${props.spreadPadding.paddingLeft}px`}
+        style:inset-inline-start={`${props.spreadPadding.paddingInlineStart}px`}
     >
         {@render props.renderLeading(props.flags)}
     </div>
@@ -127,7 +128,7 @@
     <div
         {@attach props.attachTrailing}
         class={styles.textFieldAdornment}
-        style:right={`${props.spreadPadding.paddingRight}px`}
+        style:inset-inline-end={`${props.spreadPadding.paddingInlineEnd}px`}
     >
         {@render props.renderTrailing(props.flags)}
     </div>

@@ -1,11 +1,17 @@
 import type { Accessor } from "solid-js";
 import { createEffect, createMemo, createSignal, onCleanup } from "solid-js";
 
-import { type AnchorPlacement, AnchorUtils, ElementObserverUtils } from "@thewaver/ss-components";
+import {
+    type AnchorPlacement,
+    AnchorUtils,
+    ElementObserverUtils,
+    type NavigatorDirection,
+} from "@thewaver/ss-components";
 import { type Point2d, Rect, Size2d } from "@thewaver/ss-utils";
 
 import { ElementObserverSolidUtils } from "../ElementObserver/ElementObserverSolid.utils";
 import { ElevationSolidUtils } from "../Elevation/ElevationSolid.utils";
+import { NavigatorSolidUtils } from "../Navigator/NavigatorSolid.utils";
 import { useViewportContext } from "../Viewport/Viewport.context";
 
 /** The Solid side of {@link AnchorUtils}: the positioning cycle for portaled content, as reactive accessors. */
@@ -20,11 +26,17 @@ export namespace AnchorSolidUtils {
      * down while the content is hidden so a closed popup costs nothing. The arithmetic is
      * {@link AnchorUtils.computePortalPlacement}, {@link AnchorUtils.computePortalPosition} and their neighbors.
      *
+     * The content also takes the direction text runs in at the anchor, written as `dir` on the element handed
+     * to `setContentRef` and kept current while it is shown, since content moved to the end of the document
+     * would otherwise lay itself out in the document's direction rather than its anchor's.
+     *
      * Must run inside a component or another reactive owner.
      *
-     * @param getAnchorRef The element to position against.
+     * @param getAnchorRef The element to position against, and whose direction the content takes. Content
+     * given only `opts.getAnchorRect` and no element runs left to right.
      * @param getIsVisible Whether the content is currently shown. Measuring stops when it is not.
-     * @param opts.getPlacement The placement to aim for.
+     * @param opts.getPlacement The placement to aim for, given the direction text runs in at the anchor, so a
+     * default can line the content up with the edge the text starts from.
      * @param opts.getOffset The gap to hold between anchor and content.
      * @param opts.getReservedScreenSize A margin to keep clear at the screen edges.
      * @param opts.getAnchorRect Supplies the anchor rectangle directly, for content anchored to
@@ -32,7 +44,8 @@ export namespace AnchorSolidUtils {
      * no element is observed.
      * @param opts.getIsPinned Keeps the placement the caller asked for and skips clamping, for content
      * that should be allowed to run off screen rather than move.
-     * @returns `getAnchorRect` and `getIsAnchorOnScreen` for deciding whether to draw at all,
+     * @returns `getAnchorRect` and `getIsAnchorOnScreen` for deciding whether to draw at all, `getDirection`
+     * for the direction the content was given,
      * `getPlacement` for styling that depends on which way the content opened, `getPosition` for where
      * to put it, `getArrowAim` for where an arrow pointing at the anchor leaves the content (see
      * {@link AnchorUtils.computeArrowAim}), `getZIndex`, and `setContentRef`, which must be attached to the content's own element
@@ -43,7 +56,7 @@ export namespace AnchorSolidUtils {
         getAnchorRef: Accessor<HTMLElement | undefined>,
         getIsVisible: Accessor<boolean>,
         opts: {
-            getPlacement: Accessor<AnchorPlacement>;
+            getPlacement: (direction: NavigatorDirection) => AnchorPlacement;
             getOffset?: () => Point2d;
             getReservedScreenSize?: () => Size2d;
             getAnchorRect?: () => Rect | undefined;
@@ -62,6 +75,8 @@ export namespace AnchorSolidUtils {
 
         const getAnchorRect = createMemo(() => opts.getAnchorRect?.() ?? getObservedRect());
 
+        const getDirection = NavigatorSolidUtils.createDirectionSignal(getAnchorRef, () => !getIsVisible());
+
         const getLayoutOpts = () => ({
             offset: opts.getOffset?.(),
             reservedScreenSize: opts.getReservedScreenSize?.(),
@@ -70,7 +85,7 @@ export namespace AnchorSolidUtils {
 
         const getPlacement = createMemo(() =>
             AnchorUtils.computePortalPlacement(
-                opts.getPlacement(),
+                opts.getPlacement(getDirection()),
                 getAnchorRect(),
                 getContentSize(),
                 viewportContext.getSize(),
@@ -125,12 +140,22 @@ export namespace AnchorSolidUtils {
             onCleanup(ElementObserverUtils.observeBorderBoxSize(contentRef, setContentSize, false));
         });
 
+        createEffect(() => {
+            const contentRef = getContentRef();
+            const direction = getDirection();
+
+            if (!contentRef) return;
+
+            contentRef.dir = direction;
+        });
+
         return {
             getAnchorRect,
             getIsAnchorOnScreen,
             getPlacement,
             getPosition,
             getArrowAim,
+            getDirection,
             getZIndex,
             setContentRef,
         };

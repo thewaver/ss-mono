@@ -1,5 +1,5 @@
 import type { Attachment } from "svelte/attachments";
-import type { ApiTable } from "virtual:component-api";
+import type { ApiTable, ApiText } from "virtual:component-api";
 
 import type { BasePageApiViewProps } from "@thewaver/ss-playground/App/PageComponents/ApiView/ApiView.types";
 
@@ -11,4 +11,8 @@ export type PageApiTableProps = {
     unit: string;
     attachHeading: Attachment<HTMLElement>;
     onFragmentClick: (e: MouseEvent, href: string) => void;
+};
+
+export type PageApiTextProps = {
+    text: ApiText;
 };

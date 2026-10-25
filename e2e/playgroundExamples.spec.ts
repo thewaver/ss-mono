@@ -11,7 +11,13 @@ import { type Page, expect, test } from "@playwright/test";
  * The readout is kept out of the sizing by being laid out at zero width with a minimum of the full box, so
  * it renders across the box it is given and contributes nothing to working out how wide that box should be.
  */
-const PAGES_WITH_READOUTS = ["/drum-wheel", "/button"];
+const PAGES_WITH_READOUTS = ["/drum-wheel", "/split-pane/docs", "/select/docs"];
+
+/**
+ * An example is the card on an Examples view, and on a Docs view the demo column beside the knobs, which is
+ * where a Docs example's readout sits; either is keyed by `data-testid`.
+ */
+const EXAMPLES = "[data-example], [data-docs-example] [data-demo]";
 
 const SAMPLE_COUNT = 12;
 const SAMPLE_GAP_MS = 150;
@@ -23,24 +29,26 @@ const SAMPLE_GAP_MS = 150;
  * any particular control.
  */
 const widthsWithAndWithoutReadout = (page: Page) =>
-    page.evaluate(() =>
-        [...document.querySelectorAll("[data-example]")].map((element) => {
-            const readout = element.querySelector("[data-readout]") as HTMLElement | null;
-            const key = element.getAttribute("data-testid");
-            const withReadout = (element as HTMLElement).offsetWidth;
+    page.evaluate(
+        (selector) =>
+            [...document.querySelectorAll(selector)].map((element) => {
+                const readout = element.querySelector("[data-readout]") as HTMLElement | null;
+                const key = element.getAttribute("data-testid");
+                const withReadout = (element as HTMLElement).offsetWidth;
 
-            if (!readout) return { key, withReadout, withoutReadout: withReadout };
+                if (!readout) return { key, withReadout, withoutReadout: withReadout };
 
-            const previousDisplay = readout.style.display;
+                const previousDisplay = readout.style.display;
 
-            readout.style.display = "none";
+                readout.style.display = "none";
 
-            const withoutReadout = (element as HTMLElement).offsetWidth;
+                const withoutReadout = (element as HTMLElement).offsetWidth;
 
-            readout.style.display = previousDisplay;
+                readout.style.display = previousDisplay;
 
-            return { key, withReadout, withoutReadout };
-        }),
+                return { key, withReadout, withoutReadout };
+            }),
+        EXAMPLES,
     );
 
 const exampleWidths = (page: Page) =>
@@ -53,7 +61,7 @@ const exampleWidths = (page: Page) =>
 for (const path of PAGES_WITH_READOUTS) {
     test(`a readout does not decide how wide its example is, on ${path}`, async ({ page }) => {
         await page.goto(path);
-        await expect(page.locator("[data-example]").first()).toBeVisible();
+        await expect(page.locator(EXAMPLES).first()).toBeVisible();
 
         const measured = await widthsWithAndWithoutReadout(page);
 

@@ -1,4 +1,4 @@
-import { type KeyboardEvent, useCallback, useId, useRef } from "react";
+import { type KeyboardEvent, useCallback, useEffect, useId, useRef } from "react";
 
 import {
     TAG_INPUT_DEFAULTS,
@@ -38,6 +38,7 @@ const TagInputFieldElement = (props: TagInputFieldElementProps) => {
             value={props.value}
             readOnly={props.isDisabled}
             aria-label={props.ariaLabel}
+            aria-labelledby={props.ariaLabelledBy}
             aria-describedby={props.ariaDescribedBy}
             aria-disabled={props.isDisabled || undefined}
             onChange={(e) => props.onChange(e.currentTarget.value)}
@@ -47,8 +48,10 @@ const TagInputFieldElement = (props: TagInputFieldElementProps) => {
 };
 
 export const TagInput = (props: TagInputProps) => {
-    const ariaLabel = LabelReactUtils.useAriaLabel(props.ariaLabel);
+    const { ariaLabel, ariaLabelledBy } = FormFieldReactUtils.useAriaName(props.ariaLabel);
     const ariaDescribedBy = FormFieldReactUtils.useAriaDescribedBy();
+
+    useEffect(() => TagInputUtils.warnIfTagsUnnamed(props.computeTagAriaLabel, "computeTagAriaLabel"), []);
 
     const [tags, setTagsState] = props.value;
 
@@ -128,7 +131,8 @@ export const TagInput = (props: TagInputProps) => {
                             padding: `${props.padding ?? TAG_INPUT_DEFAULTS.padding}px`,
                         }}
                         role="group"
-                        aria-label={props.ariaLabel}
+                        aria-label={ariaLabelledBy === undefined ? props.ariaLabel : undefined}
+                        aria-labelledby={ariaLabelledBy}
                         onPointerDown={(e) => {
                             if (e.target !== e.currentTarget || isDisabled) return;
 
@@ -193,6 +197,7 @@ export const TagInput = (props: TagInputProps) => {
                             value={text}
                             isDisabled={flags.isDisabled ?? false}
                             ariaLabel={ariaLabel}
+                            ariaLabelledBy={ariaLabelledBy}
                             ariaDescribedBy={ariaDescribedBy}
                             onChange={setText}
                             onKeyDown={(e) => {

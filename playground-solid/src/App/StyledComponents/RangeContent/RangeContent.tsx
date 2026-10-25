@@ -10,7 +10,7 @@ import type { RangeContentProps } from "./RangeContentSolid.types";
 const travel = (ratio: number) => `calc(${ratio} * (100% - ${styles.RANGE_THUMB_SIZE}px))`;
 
 const center = (ratio: number) =>
-    `calc(${ratio} * (100% - ${styles.RANGE_THUMB_SIZE}px) + ${styles.RANGE_THUMB_SIZE / 2}px)`;
+    `calc(${ratio} * (100% - ${styles.RANGE_THUMB_SIZE}px) + ${styles.RANGE_THUMB_SIZE * 0.5}px)`;
 
 export const PageRangeContent = (props: RangeContentProps) => {
     const getLayerClass = useLayerClass();
@@ -27,15 +27,22 @@ export const PageRangeContent = (props: RangeContentProps) => {
 
     return (
         <div
-            class={[styles.rangeContent, styles.rangeContentVariants[getOrientation()]].join(" ")}
+            class={styles.rangeContent}
             style={getOrientation() === "vertical" ? { height: `${getLength()}px` } : { width: `${getLength()}px` }}
-            classList={{ [getLayerClass()]: true, [styles.isDisabled]: access(props.renderProps).isDisabled }}
+            classList={{
+                [styles.rangeContentVariants[getOrientation()]]: true,
+                [getLayerClass()]: true,
+                [styles.isDisabled]: access(props.renderProps).isDisabled,
+            }}
         >
             <div class={[styles.rangeTrack, styles.rangeTrackVariants[getOrientation()]].join(" ")} />
 
             <div
-                class={[styles.rangeFill, styles.rangeFillVariants[getOrientation()]].join(" ")}
-                classList={{ [styles.hasError]: access(props.renderProps).hasError }}
+                class={styles.rangeFill}
+                classList={{
+                    [styles.rangeFillVariants[getOrientation()]]: true,
+                    [styles.hasError]: access(props.renderProps).hasError,
+                }}
                 style={
                     getOrientation() === "vertical"
                         ? { bottom: center(access(props.renderProps).fill.start), height: getFillSpan() }
@@ -46,8 +53,9 @@ export const PageRangeContent = (props: RangeContentProps) => {
             <For each={access(props.renderProps).ratios}>
                 {(ratio, getIndex) => (
                     <div
-                        class={[styles.rangeThumb, styles.rangeThumbVariants[getOrientation()]].join(" ")}
+                        class={styles.rangeThumb}
                         classList={{
+                            [styles.rangeThumbVariants[getOrientation()]]: true,
                             [styles.isFocused]: access(props.renderProps).focusVisibleThumb === getIndex(),
                             [styles.hasError]: access(props.renderProps).hasError,
                         }}

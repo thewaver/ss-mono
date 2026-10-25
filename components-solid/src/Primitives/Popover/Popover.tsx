@@ -30,7 +30,7 @@ export const Popover = (props: PopoverProps) => {
 
     const { getAnchorRect, getIsAnchorOnScreen, getPlacement, getPosition, getArrowAim, getZIndex, setContentRef } =
         AnchorSolidUtils.createPortalPosition(() => access(props.anchorRef), getIsVisible, {
-            getPlacement: () => access(props.placement) ?? POPOVER_DEFAULTS.placement,
+            getPlacement: (direction) => access(props.placement) ?? POPOVER_DEFAULTS.placement[direction],
             getOffset: props.offset === undefined ? undefined : () => access(props.offset)!,
             getReservedScreenSize:
                 props.reservedScreenSize === undefined ? undefined : () => access(props.reservedScreenSize)!,

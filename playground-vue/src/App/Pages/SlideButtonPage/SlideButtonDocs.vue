@@ -9,7 +9,8 @@ import {
 } from "@thewaver/ss-components-vue";
 import type { NavigatorDirection, SlideButtonMode, SlideButtonOrientation } from "@thewaver/ss-components-vue";
 import { SlideButtonKnobs } from "@thewaver/ss-playground/App/Knobs/SlideButtons.const";
-import { WCAG_URLS } from "@thewaver/ss-playground/App/PageComponents/DocsAlert/DocsAlert.const";
+import { WCAG_URLS } from "@thewaver/ss-playground/App/PageComponents/DocsProse/DocsProse.const";
+import * as docsStyles from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.css";
 import { DOCS_ROOT, FIELD_WIDTH } from "@thewaver/ss-playground/App/Pages/SlideButtonPage/SlideButtonPage.const";
 
 import PageDocsAlert from "../../PageComponents/DocsAlert/PageDocsAlert.vue";
@@ -34,10 +35,10 @@ const direction = shallowRef<NavigatorDirection>(NAVIGATOR_DIRECTIONS[0]);
 
 <template>
     <PageDocsAlert severity="alert">
-        Give every SlideButton an ariaDescription that says how to confirm it without sliding, such as which key to
-        hold. Holding Enter or Space is the keyboard route <a :href="WCAG_URLS['2.1.1']">WCAG 2.1.1</a> requires, and
-        nothing else tells a screen reader user that it exists or that a plain press does nothing. A button without one
-        warns in the console.
+        Give every SlideButton an <span :class="docsStyles.docsPropName">ariaDescription</span> that says how to confirm
+        it without sliding, such as which key to hold. Holding Enter or Space is the keyboard route
+        <a :href="WCAG_URLS['2.1.1']">WCAG 2.1.1</a> requires, and nothing else tells a screen reader user that it
+        exists or that a plain press does nothing. A button without one warns in the console.
     </PageDocsAlert>
 
     <PageDocsExample :path="`${DOCS_ROOT}/Basic.vue`">
@@ -122,11 +123,10 @@ const direction = shallowRef<NavigatorDirection>(NAVIGATOR_DIRECTIONS[0]);
         </template>
     </PageDocsExample>
 
-    <PageDocsSection title="Orientation and direction">
-        A horizontal button slides from the side the text starts on: left to right, or right to left in a right-to-left
-        page. A vertical one slides up from the bottom of the track, whichever way the text runs. The hold, a held Enter
-        or Space and a click from assistive technology work the same in every direction.
-    </PageDocsSection>
+    <PageDocsSection
+        title="Orientation and direction"
+        content="A horizontal button slides from the side the text starts on: left to right, or right to left in a right-to-left page. A vertical one slides up from the bottom of the track, whichever way the text runs. The hold, a held Enter or Space and a click from assistive technology work the same in every direction."
+    />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Directions.vue`">
         <DirectionsDocsExample :orientation="orientation" :direction="direction" />
@@ -162,11 +162,10 @@ const direction = shallowRef<NavigatorDirection>(NAVIGATOR_DIRECTIONS[0]);
         </template>
     </PageDocsExample>
 
-    <PageDocsSection title="Holding the thumb at the end">
-        To keep the thumb at the end after a successful slide, mark the button pressed until you reset it. The
-        Playground's painter draws a pressed button with its thumb at the end; what a pressed button looks like is up to
-        your painter.
-    </PageDocsSection>
+    <PageDocsSection
+        title="Holding the thumb at the end"
+        content="To keep the thumb at the end after a successful slide, mark the button pressed until you reset it. The Playground's painter draws a pressed button with its thumb at the end; what a pressed button looks like is up to your painter."
+    />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Held.vue`">
         <HeldDocsExample />

@@ -13,3 +13,15 @@ export const MESSAGES: Record<ToastKind, string> = {
 };
 
 export const TOAST_ID_PREFIX = "toast";
+
+export const DOCS_ROOT = "/src/App/Pages/ToastsPage/Docs";
+
+export const FIELD_WIDTH = 140;
+
+export const DRAFT_DELETED_MESSAGE = "Draft deleted.";
+
+export const RIGHT_TO_LEFT_MESSAGE = "Your changes were published.";
+
+export const FAR_DOWN_MESSAGE = "Profile saved.";
+
+export const OUTSIDE_MESSAGE = "A sync finished in the background.";

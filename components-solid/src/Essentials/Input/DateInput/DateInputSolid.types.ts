@@ -1,6 +1,7 @@
 import type { JSX } from "solid-js";
 
 import type {
+    BaseDateInputCbs,
     BaseDateInputValues,
     DateInputEra,
     DateValue,
@@ -31,7 +32,8 @@ export type DateInputProps = Omit<
     | "onInput"
     | "onBlur"
 > &
-    AccessorValues<BaseDateInputValues> & {
+    AccessorValues<BaseDateInputValues> &
+    BaseDateInputCbs & {
         /** The date. It is the only thing that changes it. */
         value: SignalSource<DateValue | undefined>;
         /** Draws whatever sits before the field's text, inside the field. */

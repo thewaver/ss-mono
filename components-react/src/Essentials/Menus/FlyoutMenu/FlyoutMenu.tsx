@@ -178,7 +178,7 @@ export const FlyoutMenu = <T,>(props: FlyoutMenuProps<T>) => {
         anchorRef,
         fader.isVisible,
         {
-            placement: props.placement ?? FLYOUT_MENU_DEFAULTS.placement,
+            computePlacement: (direction) => props.placement ?? FLYOUT_MENU_DEFAULTS.placement[direction],
             offset: props.offset,
         },
     );

@@ -5,15 +5,17 @@ const DOCS = '[data-view="docs"]';
 const API = '[data-view="api"]';
 const TABS_PROPS = '[data-api-table="TabsProps"]';
 
+const DRUM_WHEEL_PROPS = '[data-api-table="DrumWheelProps"]';
+
 /**
- * Every component page is three views over one component — what it is, what it takes, then what it looks
+ * A component page is up to three views over one component — what it is, what it takes, then what it looks
  * like working — and which one you are on is in the URL rather than in component state, so a view can be
- * linked to and the back button walks them. Examples is the index rather than a segment of its own: it is
- * what the pages already were, every link and every spec in this suite already points at it, and a tab
- * that changed those URLs would have been a rename of the whole Playground for no gain.
+ * linked to and the back button walks them. On a page that still has an Examples view, Examples is the index
+ * rather than a segment of its own. The drum wheel's page is one such page; a page whose examples moved into
+ * its Docs view has no Examples view at all, and its bare route is its Docs view.
  */
 test.beforeEach(async ({ page }) => {
-    await page.goto("/tabs");
+    await page.goto("/drum-wheel");
     await expect(page.locator(VIEW_TABS)).toBeVisible();
 });
 
@@ -27,31 +29,50 @@ test("the bare component route is the Examples view, and the tab agrees", async 
 
 test("each tab carries its view into the URL, and a deep link lands on it", async ({ page }) => {
     await page.locator(VIEW_TABS).getByRole("tab", { name: "Docs" }).click();
-    await expect(page).toHaveURL(/\/tabs\/docs$/);
+    await expect(page).toHaveURL(/\/drum-wheel\/docs$/);
     await expect(page.locator(DOCS), "Docs holds the page's own description").toBeVisible();
 
     await page.locator(VIEW_TABS).getByRole("tab", { name: "API" }).click();
-    await expect(page).toHaveURL(/\/tabs\/api$/);
+    await expect(page).toHaveURL(/\/drum-wheel\/api$/);
     await expect(page.locator(API), "API holds the tables").toBeVisible();
-    await expect(page.locator(TABS_PROPS), "starting with the props table").toBeVisible();
+    await expect(page.locator(DRUM_WHEEL_PROPS), "starting with the props table").toBeVisible();
 
     await page.locator(VIEW_TABS).getByRole("tab", { name: "Examples" }).click();
-    await expect(page).toHaveURL(/\/tabs$/);
+    await expect(page).toHaveURL(/\/drum-wheel$/);
 
-    await page.goto("/tabs/api");
-    await expect(page.locator(TABS_PROPS), "and the same address reached cold lands on the same view").toBeVisible();
+    await page.goto("/drum-wheel/api");
+    await expect(
+        page.locator(DRUM_WHEEL_PROPS),
+        "and the same address reached cold lands on the same view",
+    ).toBeVisible();
     await expect(page.locator(VIEW_TABS).getByRole("tab", { name: "API" })).toHaveAttribute("aria-selected", "true");
 
-    await page.goto("/tabs/docs");
+    await page.goto("/drum-wheel/docs");
     await expect(page.locator(VIEW_TABS).getByRole("tab", { name: "Docs" })).toHaveAttribute("aria-selected", "true");
 });
 
-test("Docs is the description alone, and the tables are on the API view", async ({ page }) => {
-    await page.goto("/tabs/docs");
+/**
+ * A page whose examples live in its Docs view offers no Examples tab, and its bare route — the address every older
+ * link points at — still reaches the page, landing on the Docs view with its examples.
+ */
+test("a page whose examples moved into Docs has no Examples view, and its bare route lands on Docs", async ({
+    page,
+}) => {
+    await page.goto("/tabs");
+    await expect(page).toHaveURL(/\/tabs\/docs$/);
+    await expect(page.locator(VIEW_TABS).getByRole("tab", { name: "Docs" })).toHaveAttribute("aria-selected", "true");
+    await expect(
+        page.locator(VIEW_TABS).getByRole("tab", { name: "Examples" }),
+        "there is no Examples tab",
+    ).toHaveCount(0);
+    await expect(page.locator("[data-docs-example]").first(), "and the examples are on the Docs view").toBeVisible();
+});
+
+test("Docs draws no tables, which are on the API view", async ({ page }) => {
+    await page.goto("/drum-wheel/docs");
     await expect(page.locator(DOCS)).toBeVisible();
     await expect(page.locator(`${DOCS} table`), "the Docs view draws no table").toHaveCount(0);
     await expect(page.locator("[data-api-table]"), "and carries none of the export tables").toHaveCount(0);
-    await expect(page.locator(`${DOCS} nav`), "nor the table of contents, which belongs to the tables").toHaveCount(0);
 });
 
 /**

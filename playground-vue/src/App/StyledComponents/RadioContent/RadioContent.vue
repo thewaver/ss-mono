@@ -19,6 +19,7 @@ const layerClass = useLayerClass();
             flags.isDisabled && styles.isDisabled,
             flags.hasError && styles.hasError,
         ]"
+        aria-hidden="true"
     >
         <div :class="styles.radioMarker">
             <div :class="styles.radioDot" />

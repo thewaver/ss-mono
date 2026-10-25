@@ -1,4 +1,4 @@
-import { type CSSProperties, useEffect, useRef, useState } from "react";
+import { type CSSProperties, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { FocusManagerUtils, MODAL_DEFAULTS, ModalStyles, ModalUtils } from "@thewaver/ss-components";
@@ -9,6 +9,7 @@ import { DismisserReactUtils } from "../../../Abstracts/Dismisser/DismisserReact
 import { ElementFaderReactUtils } from "../../../Abstracts/ElementFader/ElementFaderReact.utils";
 import { FocusManagerReactUtils } from "../../../Abstracts/FocusManager/FocusManagerReact.utils";
 import { InteractionTrackerReactUtils } from "../../../Abstracts/InteractionTracker/InteractionTrackerReact.utils";
+import { NavigatorReactUtils } from "../../../Abstracts/Navigator/NavigatorReact.utils";
 import { useViewportContext } from "../../../Abstracts/Viewport/Viewport.context";
 import { useElement, useLatest } from "../../../Utils/refUtils";
 import type { ModalProps } from "./Modal.types";
@@ -18,6 +19,7 @@ export const Modal = (props: ModalProps) => {
 
     const rootRef = useRef<HTMLDivElement | null>(null);
     const containerRef = useRef<HTMLDivElement | null>(null);
+    const openerRef = useRef<HTMLElement | null>(null);
     const root = useElement(rootRef);
     const initialFocusRef = useLatest(props.initialFocusRef ?? null);
     const latest = useLatest(props);
@@ -35,6 +37,12 @@ export const Modal = (props: ModalProps) => {
         onShow: props.onShow,
         onHide: props.onHide,
     });
+
+    useLayoutEffect(() => {
+        openerRef.current = isOpen ? FocusManagerUtils.getFocusOrigin() : null;
+    }, [isOpen]);
+
+    const textDirection = NavigatorReactUtils.useDirection(openerRef, !fader.isVisible);
 
     useEffect(() => {
         if (!fader.isVisible || !root) return;
@@ -132,13 +140,14 @@ export const Modal = (props: ModalProps) => {
                 )
             }
         >
-            <div className={ModalStyles.modalOverlay} onClick={handleOverlayClick}>
+            <div className={ModalStyles.modalOverlay} dir={textDirection} onClick={handleOverlayClick}>
                 {props.renderOverlay(fader.transitionTarget, transitionDurationMs)}
             </div>
             <div
                 ref={containerRef}
                 className={ModalStyles.modalContainer}
                 style={containerStyle}
+                dir={textDirection}
                 tabIndex={-1}
                 role={props.role ?? MODAL_DEFAULTS.role}
                 aria-modal="true"

@@ -8,7 +8,6 @@
     import { NavigatorSvelteUtils } from "../../../Abstracts/Navigator/NavigatorSvelte.utils.svelte.js";
     import { toStyle } from "../../../Utils/styleUtils.js";
     import { FormFieldSvelteUtils } from "../FormField/FormFieldSvelte.utils.svelte.js";
-    import { LabelSvelteUtils } from "../Label/LabelSvelte.utils.svelte.js";
     import type { RangeElementProps } from "./Range.types.js";
 
     const readFocusVisibleThumb = (element: HTMLElement, index: number) =>
@@ -16,7 +15,7 @@
 
     let props: RangeElementProps = $props();
 
-    const getAriaLabel = LabelSvelteUtils.resolveAriaLabel(() => props.ariaLabel);
+    const { getAriaLabel, getAriaLabelledBy } = FormFieldSvelteUtils.resolveAriaName(() => props.ariaLabel);
     const getAriaDescribedBy = FormFieldSvelteUtils.resolveAriaDescribedBy();
 
     let elements = $state<(HTMLInputElement | null | undefined)[]>([]);
@@ -94,6 +93,7 @@
         max={bounds.max}
         step={props.step}
         aria-label={props.thumbLabels?.[index] ?? getAriaLabel()}
+        aria-labelledby={props.thumbLabels?.[index] === undefined ? getAriaLabelledBy() : undefined}
         aria-valuetext={props.computeValueText?.(value, index)}
         aria-describedby={getAriaDescribedBy()}
         aria-orientation={props.orientation === "vertical" ? "vertical" : undefined}

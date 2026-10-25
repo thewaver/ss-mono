@@ -1,9 +1,16 @@
-import { expect, test } from "@playwright/test";
+import { type Page, expect, test } from "@playwright/test";
 
-import { demo, readout } from "./helpers";
+import { docsDemo, docsSettled } from "./helpers";
 
-const DEFAULT = demo("default");
-const BOUNDED = demo("bounded");
+/**
+ * The range calendar's page is its Docs view. The basic example shows its value in a line under the grid; the
+ * bounded and two-month ones show none, so what they hold is read off the band the painter draws.
+ */
+const DOCS = "/src/App/Pages/RangeCalendarPage/Docs";
+
+const BASIC = docsDemo(DOCS, "Basic");
+const BOUNDED = docsDemo(DOCS, "Bounded");
+const TWO_MONTHS = docsDemo(DOCS, "TwoMonths");
 
 /**
  * Days are located by their accessible name rather than by their text, for the reason `calendar.spec.ts`
@@ -20,9 +27,15 @@ const day = (scope: string, label: string) => `${cell(scope)}[aria-label="${labe
  */
 const banded = (scope: string) => `${cell(scope)} [data-in-range]`;
 
+const readout = (page: Page, scope: string) => page.locator(`${scope} [data-readout]`);
+
+/** The span the basic example's line states, as its two ends in the order written. */
+const SPAN = /(\d{4}-\d{2}-\d{2}) to (\d{4}-\d{2}-\d{2})/;
+
 test.beforeEach(async ({ page }) => {
-    await page.goto("/range-calendar");
-    await expect(page.locator(`${DEFAULT} [role="grid"]`)).toBeVisible();
+    await page.goto("/range-calendar/docs");
+    await expect(page.locator(`${BASIC} [role="grid"]`)).toBeVisible();
+    await docsSettled(page);
 });
 
 /**
@@ -31,28 +44,27 @@ test.beforeEach(async ({ page }) => {
  * there isn't one yet — while still showing the reader that a pick is under way.
  */
 test("one press starts a span without reporting one, because half a range is not a range", async ({ page }) => {
-    await expect(page.locator(banded(DEFAULT)), "nothing is banded before the first press").toHaveCount(0);
+    await expect(page.locator(banded(BASIC)), "nothing is banded before the first press").toHaveCount(0);
 
-    await page.locator(day(DEFAULT, "10 August 2026")).click();
+    await page.locator(day(BASIC, "10 August 2026")).click();
 
-    await expect
-        .poll(() => readout(page, "default"), { message: "a half-entered span is not reported to the consumer" })
-        .toContain("none");
-
-    await expect(page.locator(banded(DEFAULT)), "the started end is still marked on the grid").toHaveCount(1);
+    await expect(page.locator(banded(BASIC)), "the started end is marked on the grid").toHaveCount(1);
+    await expect(readout(page, BASIC), "but a half-entered span is not reported to the consumer").not.toContainText(
+        SPAN,
+    );
 });
 
 test("the second press completes the span and reports it as one value", async ({ page }) => {
-    await page.locator(day(DEFAULT, "10 August 2026")).click();
-    await page.locator(day(DEFAULT, "14 August 2026")).click();
+    await page.locator(day(BASIC, "10 August 2026")).click();
+    await page.locator(day(BASIC, "14 August 2026")).click();
 
-    await expect
-        .poll(() => readout(page, "default"), { message: "the pair arrives as one value, both ends at once" })
-        .toContain("2026-08-10 to 2026-08-14");
+    await expect(readout(page, BASIC), "the pair arrives as one value, both ends at once").toContainText(
+        "2026-08-10 to 2026-08-14",
+    );
 
-    await expect(page.locator(banded(DEFAULT)), "both ends and the days between them are banded").toHaveCount(5);
-    await expect(page.locator(`${cell(DEFAULT)} [data-range-start]`), "and the ends are marked apart").toHaveCount(1);
-    await expect(page.locator(`${cell(DEFAULT)} [data-range-end]`)).toHaveCount(1);
+    await expect(page.locator(banded(BASIC)), "both ends and the days between them are banded").toHaveCount(5);
+    await expect(page.locator(`${cell(BASIC)} [data-range-start]`), "and the ends are marked apart").toHaveCount(1);
+    await expect(page.locator(`${cell(BASIC)} [data-range-end]`)).toHaveCount(1);
 });
 
 /**
@@ -60,44 +72,45 @@ test("the second press completes the span and reports it as one value", async ({
  * component rather than by whoever reads it. The span is the same span either way round.
  */
 test("picking the far end first gives the same span, because the value is ordered on the way out", async ({ page }) => {
-    await page.locator(day(DEFAULT, "14 August 2026")).click();
-    await page.locator(day(DEFAULT, "10 August 2026")).click();
+    await page.locator(day(BASIC, "14 August 2026")).click();
+    await page.locator(day(BASIC, "10 August 2026")).click();
 
-    await expect.poll(() => readout(page, "default")).toContain("2026-08-10 to 2026-08-14");
+    await expect(readout(page, BASIC)).toContainText("2026-08-10 to 2026-08-14");
 });
 
 test("a third press starts again rather than extending what is already there", async ({ page }) => {
-    await page.locator(day(DEFAULT, "10 August 2026")).click();
-    await page.locator(day(DEFAULT, "14 August 2026")).click();
-    await page.locator(day(DEFAULT, "18 August 2026")).click();
+    await page.locator(day(BASIC, "10 August 2026")).click();
+    await page.locator(day(BASIC, "14 August 2026")).click();
 
-    await expect
-        .poll(() => readout(page, "default"), { message: "the completed span is dropped, not extended" })
-        .toContain("none");
+    await expect(readout(page, BASIC)).toContainText("2026-08-10 to 2026-08-14");
 
-    await expect(page.locator(banded(DEFAULT)), "only the newly started end is marked").toHaveCount(1);
+    await page.locator(day(BASIC, "18 August 2026")).click();
+
+    await expect(readout(page, BASIC), "the completed span is dropped, not extended").not.toContainText(SPAN);
+    await expect(page.locator(banded(BASIC)), "only the newly started end is marked").toHaveCount(1);
 });
 
 /**
- * The bounds are the calendar's own, so a range cannot be started or finished outside them. This is the
- * bounded variant rather than the default one, and it is checked because a span has two chances to escape
- * a bound where a single date has one.
+ * The bounds are the calendar's own, so a range cannot be started or finished outside them. A span has two chances
+ * to escape a bound where a single date has one, so both ends are tried; the example shows no value, so what it
+ * holds is read off the band.
  */
 test("a bounded calendar refuses both ends outside its range", async ({ page }) => {
     await page.locator(day(BOUNDED, "3 August 2026")).dispatchEvent("click");
 
-    await expect
-        .poll(() => readout(page, "bounded"), { message: "a day before the minimum cannot start a span" })
-        .toContain("none");
-
-    await expect(page.locator(banded(BOUNDED)), "and nothing is marked as started").toHaveCount(0);
+    await expect(page.locator(banded(BOUNDED)), "a day before the minimum starts nothing").toHaveCount(0);
 
     await page.locator(day(BOUNDED, "6 August 2026")).click();
+
+    await expect(page.locator(banded(BOUNDED)), "a day inside it does").toHaveCount(1);
+
     await page.locator(day(BOUNDED, "25 August 2026")).dispatchEvent("click");
 
-    await expect
-        .poll(() => readout(page, "bounded"), { message: "a day past the maximum cannot finish one either" })
-        .toContain("none");
+    await expect(
+        page.locator(`${day(BOUNDED, "25 August 2026")} [data-in-range]`),
+        "and a day past the maximum cannot finish the span",
+    ).toHaveCount(0);
+    await expect(page.locator(banded(BOUNDED)), "which is still only started").toHaveCount(1);
 });
 
 /**
@@ -106,9 +119,7 @@ test("a bounded calendar refuses both ends outside its range", async ({ page }) 
  * grid are left blank, since the second grid already shows them — which is also what keeps every day's name, and so
  * every locator here, unique.
  */
-const TWO_MONTHS = demo("twoMonths");
-
-const gridLabels = (page: import("@playwright/test").Page) =>
+const gridLabels = (page: Page) =>
     page
         .locator(`${TWO_MONTHS} [role="grid"]`)
         .evaluateAll((grids) => grids.map((grid) => grid.getAttribute("aria-label")));

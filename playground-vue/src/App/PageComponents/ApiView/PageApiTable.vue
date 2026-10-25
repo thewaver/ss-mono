@@ -11,6 +11,7 @@ import {
 } from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.utils";
 
 import type { PageApiTableProps } from "./ApiViewVue.types";
+import PageApiText from "./PageApiText.vue";
 
 const TABLE_COLUMNS: Record<ApiTableKind, [name: string, type: string]> = {
     props: ["Prop", "Type"],
@@ -28,7 +29,7 @@ const props = defineProps<PageApiTableProps>();
             {{ table.heading }}
         </h3>
 
-        <p v-if="table.description" :class="styles.docsDescription">{{ table.description }}</p>
+        <p v-if="table.description.length" :class="styles.docsDescription"><PageApiText :text="table.description" /></p>
 
         <p v-if="table.includes.length" :class="styles.docsDescription" data-api-includes>
             {{ DOCS_INCLUDES_LEAD
@@ -63,7 +64,7 @@ const props = defineProps<PageApiTableProps>();
                         <td :class="styles.docsTypeCell" v-html="toHighlightedType(entry.type)" />
 
                         <td v-if="table.isDocumented" :class="styles.docsCell">
-                            <template v-if="entry.description">{{ entry.description }}</template>
+                            <PageApiText v-if="entry.description.length" :text="entry.description" />
                             <span v-else :class="styles.docsPending">{{ NO_DESCRIPTION }}</span>
                         </td>
                     </tr>

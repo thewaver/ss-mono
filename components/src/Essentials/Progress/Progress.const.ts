@@ -6,3 +6,5 @@ export const PROGRESS_DEFAULTS = {
     min: 0,
     max: 1,
 };
+
+export const PROGRESS_SIZINGS: readonly ProgressSizing[] = ["fill", "fit-content"];

@@ -17,3 +17,9 @@ export const EXAMPLE_NAMES = {
 };
 
 export const EXAMPLES_ROOT = "/src/App/Pages/TreePage/Examples";
+
+export const DOCS_ROOT = "/src/App/Pages/TreePage/Docs";
+
+export const STRESS_COUNT_FIELD_WIDTH = 120;
+
+export const RADIAL_DEFS = { innerRadius: 88, ringGap: 96, itemWidth: 88, itemHeight: 88, spreadDegrees: 360 };

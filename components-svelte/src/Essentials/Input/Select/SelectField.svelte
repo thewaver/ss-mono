@@ -5,12 +5,11 @@
     import { TextSyncSvelteUtils } from "../../../Abstracts/TextSync/TextSyncSvelte.utils.svelte.js";
     import { toStyle } from "../../../Utils/styleUtils.js";
     import { FormFieldSvelteUtils } from "../FormField/FormFieldSvelte.utils.svelte.js";
-    import { LabelSvelteUtils } from "../Label/LabelSvelte.utils.svelte.js";
     import type { SelectFieldProps } from "./Select.types.js";
 
     let props: SelectFieldProps = $props();
 
-    const getAriaLabel = LabelSvelteUtils.resolveAriaLabel(() => props.ariaLabel);
+    const { getAriaLabel, getAriaLabelledBy } = FormFieldSvelteUtils.resolveAriaName(() => props.ariaLabel);
     const getAriaDescribedBy = FormFieldSvelteUtils.resolveAriaDescribedBy();
 
     let input = $state<HTMLInputElement>();
@@ -83,6 +82,7 @@
         {role}
         aria-describedby={getAriaDescribedBy()}
         aria-label={getAriaLabel()}
+        aria-labelledby={getAriaLabelledBy()}
         aria-disabled={isDisabled || undefined}
         aria-required={props.isRequired || undefined}
         aria-invalid={props.flags.hasError || undefined}
@@ -109,6 +109,7 @@
         {role}
         aria-describedby={getAriaDescribedBy()}
         aria-label={getAriaLabel()}
+        aria-labelledby={getAriaLabelledBy()}
         aria-disabled={isDisabled || undefined}
         aria-required={props.isRequired || undefined}
         aria-invalid={props.flags.hasError || undefined}

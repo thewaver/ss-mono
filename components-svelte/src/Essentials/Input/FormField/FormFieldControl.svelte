@@ -6,6 +6,7 @@
 
     setFormFieldContext({
         getDescriptionId: () => props.context.getDescriptionId(),
+        getCaptionId: () => props.context.getCaptionId(),
         registerControl: (element) => props.context.registerControl(element),
         unregisterControl: (element) => props.context.unregisterControl(element),
     });

@@ -136,7 +136,7 @@
     });
 
     const position = AnchorSvelteUtils.createPortalPosition(getAnchorRef, fader.getIsVisible, {
-        getPlacement: () => props.placement ?? FLYOUT_MENU_DEFAULTS.placement,
+        getPlacement: (direction) => props.placement ?? FLYOUT_MENU_DEFAULTS.placement[direction],
         getOffset: () => props.offset,
     });
 

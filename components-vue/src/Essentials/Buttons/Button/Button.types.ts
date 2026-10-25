@@ -1,4 +1,4 @@
-import type { BaseButtonProps, ButtonCbs, ButtonFlags, ButtonType } from "@thewaver/ss-components";
+import type { BaseButtonProps, BaseButtonValues, ButtonCbs, ButtonFlags } from "@thewaver/ss-components";
 
 import type {
     InteractionControlProps,
@@ -9,11 +9,7 @@ import type {
 
 export type { ButtonCbs };
 
-export type ButtonElementProps = ButtonCbs &
-    InteractionControlProps<ButtonFlags> & {
-        /** What the button does inside a form: nothing, submit it, or reset it. */
-        type?: ButtonType;
-    };
+export type ButtonElementProps = ButtonCbs & InteractionControlProps<ButtonFlags> & BaseButtonValues;
 
 export type ButtonProps = Omit<InteractionWrapperProps<ButtonFlags>, "extraFlags"> &
     BaseButtonProps &

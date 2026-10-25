@@ -49,11 +49,12 @@ export const EdgeFaderDocs = () => {
                 <BasicDocsExample size={getSize} />
             </PageDocsExample>
 
-            <PageDocsSection title={"Any mix of sides"}>
-                {
-                    "Pass edges any mix of top, right, bottom and left; left out, all four fade. Where two faded sides meet, their fades meet in the corner."
+            <PageDocsSection
+                title={"Any mix of sides"}
+                content={
+                    "Pass [prop]edges[/prop] any mix of top, right, bottom and left; left out, all four fade. Where two faded sides meet, their fades meet in the corner."
                 }
-            </PageDocsSection>
+            />
 
             <PageDocsExample
                 path={`${DOCS_ROOT}/Sides.tsx`}
@@ -79,11 +80,12 @@ export const EdgeFaderDocs = () => {
                 <SidesDocsExample edges={getEdges} />
             </PageDocsExample>
 
-            <PageDocsSection title={"Fading only what is out of view"}>
-                {
-                    "Set isScrollAware and a side fades only while there is more to scroll to past it. The fade shrinks as that end comes into view and is gone once it is reached, so a box whose content fits shows no fade at all."
+            <PageDocsSection
+                title={"Fading only what is out of view"}
+                content={
+                    "Set [prop]isScrollAware[/prop] and a side fades only while there is more to scroll to past it. The fade shrinks as that end comes into view and is gone once it is reached, so a box whose content fits shows no fade at all."
                 }
-            </PageDocsSection>
+            />
 
             <PageDocsExample
                 path={`${DOCS_ROOT}/ScrollAware.tsx`}
@@ -105,11 +107,12 @@ export const EdgeFaderDocs = () => {
                 <ScrollAwareDocsExample isScrollAware={getIsScrollAware} />
             </PageDocsExample>
 
-            <PageDocsSection title={"Around something that does not scroll"}>
-                {
+            <PageDocsSection
+                title={"Around something that does not scroll"}
+                content={
                     "Left fixed, the default, the chosen sides fade whether or not anything scrolls, so the fade can soften the edges of any content."
                 }
-            </PageDocsSection>
+            />
 
             <PageDocsExample path={`${DOCS_ROOT}/Unscrolled.tsx`}>
                 <UnscrolledDocsExample />

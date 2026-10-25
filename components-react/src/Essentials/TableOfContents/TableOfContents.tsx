@@ -79,7 +79,7 @@ export const TableOfContents = <T,>(props: TableOfContentsProps<T>) => {
 
     const currentValue = TableOfContentsUtils.computeCurrentValue(links, currentIndex);
     const latestOnCurrentChange = useLatest(props.onCurrentChange);
-    const reportedValueRef = useRef(currentValue);
+    const reportedValueRef = useRef<T | undefined>(undefined);
 
     useEffect(() => {
         if (reportedValueRef.current === currentValue) return;

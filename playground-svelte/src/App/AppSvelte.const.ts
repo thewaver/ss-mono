@@ -16,63 +16,62 @@ export {
 } from "@thewaver/ss-playground/App/App.const";
 
 const AccordionDocs = () => import("./Pages/Accordions/AccordionPage/AccordionDocs.svelte");
-const AudioSwitcherPage = () => import("./Pages/AudioSwitcherPage/AudioSwitcherPage.svelte");
+const AudioSwitcherDocs = () => import("./Pages/AudioSwitcherPage/AudioSwitcherDocs.svelte");
 const BracketPage = () => import("./Pages/BracketPage/BracketPage.svelte");
 const BreadcrumbsDocs = () => import("./Pages/BreadcrumbsPage/BreadcrumbsDocs.svelte");
-const ButtonPage = () => import("./Pages/ButtonPage/ButtonPage.svelte");
 const ButtonDocs = () => import("./Pages/ButtonPage/ButtonDocs.svelte");
-const CalendarPage = () => import("./Pages/CalendarPage/CalendarPage.svelte");
+const CalendarDocs = () => import("./Pages/CalendarPage/CalendarDocs.svelte");
 const CardStackPage = () => import("./Pages/CardStackPage/CardStackPage.svelte");
-const CarouselPage = () => import("./Pages/Carousels/CarouselPage/CarouselPage.svelte");
+const CarouselDocs = () => import("./Pages/Carousels/CarouselPage/CarouselDocs.svelte");
 const CellAnimationPage = () => import("./Pages/CellAnimationPage/CellAnimationPage.svelte");
-const CheckboxGroupPage = () => import("./Pages/CheckboxGroupPage/CheckboxGroupPage.svelte");
-const CheckboxPage = () => import("./Pages/CheckboxPage/CheckboxPage.svelte");
+const CheckboxGroupDocs = () => import("./Pages/CheckboxGroupPage/CheckboxGroupDocs.svelte");
+const CheckboxDocs = () => import("./Pages/CheckboxPage/CheckboxDocs.svelte");
 const CirclePackingPage = () => import("./Pages/CirclePackingPage/CirclePackingPage.svelte");
-const ClockPage = () => import("./Pages/ClockPage/ClockPage.svelte");
+const ClockDocs = () => import("./Pages/ClockPage/ClockDocs.svelte");
 const CollapsibleDocs = () => import("./Pages/Accordions/CollapsiblePage/CollapsibleDocs.svelte");
-const ColorAreaPage = () => import("./Pages/ColorAreaPage/ColorAreaPage.svelte");
-const ColorInputPage = () => import("./Pages/ColorInputPage/ColorInputPage.svelte");
+const ColorAreaDocs = () => import("./Pages/ColorAreaPage/ColorAreaDocs.svelte");
+const ColorInputDocs = () => import("./Pages/ColorInputPage/ColorInputDocs.svelte");
 const CornerHighlightPage = () => import("./Pages/CornerHighlightPage/CornerHighlightPage.svelte");
 const CornerPinPage = () => import("./Pages/CornerPinPage/CornerPinPage.svelte");
 const CuboidPage = () => import("./Pages/CuboidPage/CuboidPage.svelte");
-const CurrencyInputPage = () => import("./Pages/CurrencyInputPage/CurrencyInputPage.svelte");
-const DateInputPage = () => import("./Pages/DateInputPage/DateInputPage.svelte");
-const DatePickerPage = () => import("./Pages/DatePickerPage/DatePickerPage.svelte");
-const DateRangePickerPage = () => import("./Pages/DateRangePickerPage/DateRangePickerPage.svelte");
-const DateTimePickerPage = () => import("./Pages/DateTimePickerPage/DateTimePickerPage.svelte");
+const CurrencyInputDocs = () => import("./Pages/CurrencyInputPage/CurrencyInputDocs.svelte");
+const DateInputDocs = () => import("./Pages/DateInputPage/DateInputDocs.svelte");
+const DatePickerDocs = () => import("./Pages/DatePickerPage/DatePickerDocs.svelte");
+const DateRangePickerDocs = () => import("./Pages/DateRangePickerPage/DateRangePickerDocs.svelte");
+const DateTimePickerDocs = () => import("./Pages/DateTimePickerPage/DateTimePickerDocs.svelte");
 const DiePage = () => import("./Pages/DiePage/DiePage.svelte");
-const DrawerPage = () => import("./Pages/DrawerPage/DrawerPage.svelte");
-const EdgeFaderPage = () => import("./Pages/EdgeFaderPage/EdgeFaderPage.svelte");
-const FileInputPage = () => import("./Pages/FileInputPage/FileInputPage.svelte");
+const DrawerDocs = () => import("./Pages/DrawerPage/DrawerDocs.svelte");
+const EdgeFaderDocs = () => import("./Pages/EdgeFaderPage/EdgeFaderDocs.svelte");
+const FileInputDocs = () => import("./Pages/FileInputPage/FileInputDocs.svelte");
 const FlipCardPage = () => import("./Pages/FlipCardPage/FlipCardPage.svelte");
 const FlipbookPage = () => import("./Pages/FlipbookPage/FlipbookPage.svelte");
 const InfiniteCorridorPage = () => import("./Pages/InfiniteCorridorPage/InfiniteCorridorPage.svelte");
-const FormFieldPage = () => import("./Pages/FormFieldPage/FormFieldPage.svelte");
-const FormPage = () => import("./Pages/FormPage/FormPage.svelte");
-const FormSectionPage = () => import("./Pages/FormSectionPage/FormSectionPage.svelte");
+const FormFieldDocs = () => import("./Pages/FormFieldPage/FormFieldDocs.svelte");
+const FormDocs = () => import("./Pages/FormPage/FormDocs.svelte");
+const FormSectionDocs = () => import("./Pages/FormSectionPage/FormSectionDocs.svelte");
 const FormationPage = () => import("./Pages/FormationPage/FormationPage.svelte");
 const GlassSurfacePage = () => import("./Pages/GlassSurfacePage/GlassSurfacePage.svelte");
-const HoverCardPage = () => import("./Pages/HoverCardPage/HoverCardPage.svelte");
+const HoverCardDocs = () => import("./Pages/HoverCardPage/HoverCardDocs.svelte");
 const IciclePage = () => import("./Pages/IciclePage/IciclePage.svelte");
-const ImageSwitcherPage = () => import("./Pages/ImageSwitcherPage/ImageSwitcherPage.svelte");
-const LabelPage = () => import("./Pages/LabelPage/LabelPage.svelte");
-const ListboxPage = () => import("./Pages/ListboxPage/ListboxPage.svelte");
-const MenubarPage = () => import("./Pages/MenubarPage/MenubarPage.svelte");
-const CommandPalettePage = () => import("./Pages/Menus/CommandPalettePage/CommandPalettePage.svelte");
-const FanMenuPage = () => import("./Pages/Menus/FanMenuPage/FanMenuPage.svelte");
-const FlyoutMenuPage = () => import("./Pages/Menus/FlyoutMenuPage/FlyoutMenuPage.svelte");
-const MenuPage = () => import("./Pages/Menus/MenuPage/MenuPage.svelte");
-const WheelMenuPage = () => import("./Pages/Menus/WheelMenuPage/WheelMenuPage.svelte");
-const ModalPage = () => import("./Pages/ModalPage/ModalPage.svelte");
+const ImageSwitcherDocs = () => import("./Pages/ImageSwitcherPage/ImageSwitcherDocs.svelte");
+const LabelDocs = () => import("./Pages/LabelPage/LabelDocs.svelte");
+const ListboxDocs = () => import("./Pages/ListboxPage/ListboxDocs.svelte");
+const MenubarDocs = () => import("./Pages/MenubarPage/MenubarDocs.svelte");
+const CommandPaletteDocs = () => import("./Pages/Menus/CommandPalettePage/CommandPaletteDocs.svelte");
+const FanMenuDocs = () => import("./Pages/Menus/FanMenuPage/FanMenuDocs.svelte");
+const FlyoutMenuDocs = () => import("./Pages/Menus/FlyoutMenuPage/FlyoutMenuDocs.svelte");
+const MenuDocs = () => import("./Pages/Menus/MenuPage/MenuDocs.svelte");
+const WheelMenuDocs = () => import("./Pages/Menus/WheelMenuPage/WheelMenuDocs.svelte");
+const ModalDocs = () => import("./Pages/ModalPage/ModalDocs.svelte");
 const ElementMosaicPage = () => import("./Pages/Mosaics/ElementMosaicPage/ElementMosaicPage.svelte");
 const ImageMosaicPage = () => import("./Pages/Mosaics/ImageMosaicPage/ImageMosaicPage.svelte");
-const MultiSelectPage = () => import("./Pages/MultiSelectPage/MultiSelectPage.svelte");
-const NumberInputPage = () => import("./Pages/NumberInputPage/NumberInputPage.svelte");
+const MultiSelectDocs = () => import("./Pages/MultiSelectPage/MultiSelectDocs.svelte");
+const NumberInputDocs = () => import("./Pages/NumberInputPage/NumberInputDocs.svelte");
 const FittedTextPage = () => import("./Pages/FittedTextPage/FittedTextPage.svelte");
 const MorphTextPage = () => import("./Pages/MorphTextPage/MorphTextPage.svelte");
 const SlotTextPage = () => import("./Pages/SlotTextPage/SlotTextPage.svelte");
 const PaintedTextPage = () => import("./Pages/PaintedTextPage/PaintedTextPage.svelte");
-const PaginatorPage = () => import("./Pages/PaginatorPage/PaginatorPage.svelte");
+const PaginatorDocs = () => import("./Pages/PaginatorPage/PaginatorDocs.svelte");
 const ProximityTextPage = () => import("./Pages/ProximityTextPage/ProximityTextPage.svelte");
 const ParticleFieldPage = () => import("./Pages/ParticleFieldPage/ParticleFieldPage.svelte");
 const ParticleSpawnerPage = () => import("./Pages/ParticleSpawnerPage/ParticleSpawnerPage.svelte");
@@ -81,11 +80,11 @@ const LightCatcherPage = () => import("./Pages/PointerEffects/LightCatcherPage/L
 const RGBSplitterPage = () => import("./Pages/PointerEffects/RGBSplitterPage/RGBSplitterPage.svelte");
 const ShadowCasterPage = () => import("./Pages/PointerEffects/ShadowCasterPage/ShadowCasterPage.svelte");
 const TilterPage = () => import("./Pages/PointerEffects/TilterPage/TilterPage.svelte");
-const PreviewPage = () => import("./Pages/PreviewPage/PreviewPage.svelte");
-const ProgressPage = () => import("./Pages/ProgressPage/ProgressPage.svelte");
-const RadioPage = () => import("./Pages/RadioPage/RadioPage.svelte");
-const RangeCalendarPage = () => import("./Pages/RangeCalendarPage/RangeCalendarPage.svelte");
-const RangePage = () => import("./Pages/RangePage/RangePage.svelte");
+const PreviewDocs = () => import("./Pages/PreviewPage/PreviewDocs.svelte");
+const ProgressDocs = () => import("./Pages/ProgressPage/ProgressDocs.svelte");
+const RadioDocs = () => import("./Pages/RadioPage/RadioDocs.svelte");
+const RangeCalendarDocs = () => import("./Pages/RangeCalendarPage/RangeCalendarDocs.svelte");
+const RangeDocs = () => import("./Pages/RangePage/RangeDocs.svelte");
 const LensPage = () => import("./Pages/Reveals/LensPage/LensPage.svelte");
 const RevealPage = () => import("./Pages/Reveals/RevealPage/RevealPage.svelte");
 const ScratchCardPage = () => import("./Pages/Reveals/ScratchCardPage/ScratchCardPage.svelte");
@@ -98,40 +97,40 @@ const TrackedPatternsPage = () => import("./Pages/SVGPatterns/TrackedPatternsPag
 const SatellitePage = () => import("./Pages/SatellitePage/SatellitePage.svelte");
 const ScanlineAnimationPage = () => import("./Pages/ScanLineAnimationPage/ScanLineAnimationPage.svelte");
 const ScrambleTextPage = () => import("./Pages/ScrambleTextPage/ScrambleTextPage.svelte");
-const ScrollerPage = () => import("./Pages/ScrollerPage/ScrollerPage.svelte");
-const SegmentedInputPage = () => import("./Pages/SegmentedInputPage/SegmentedInputPage.svelte");
-const SelectPage = () => import("./Pages/SelectPage/SelectPage.svelte");
+const ScrollerDocs = () => import("./Pages/ScrollerPage/ScrollerDocs.svelte");
+const SegmentedInputDocs = () => import("./Pages/SegmentedInputPage/SegmentedInputDocs.svelte");
+const SelectDocs = () => import("./Pages/SelectPage/SelectDocs.svelte");
 const ShapePage = () => import("./Pages/ShapePage/ShapePage.svelte");
 const ShapeRevealPage = () => import("./Pages/ShapeRevealPage/ShapeRevealPage.svelte");
-const SidebarPage = () => import("./Pages/SidebarPage/SidebarPage.svelte");
+const SidebarDocs = () => import("./Pages/SidebarPage/SidebarDocs.svelte");
 const SlideButtonDocs = () => import("./Pages/SlideButtonPage/SlideButtonDocs.svelte");
 const SortableGridPage = () => import("./Pages/SortableGridPage/SortableGridPage.svelte");
-const SortablePage = () => import("./Pages/SortablePage/SortablePage.svelte");
-const SplitPanePage = () => import("./Pages/SplitPanePage/SplitPanePage.svelte");
-const SpotlightGuidePage = () => import("./Pages/Spotlights/SpotlightGuidePage/SpotlightGuidePage.svelte");
-const SpotlightHintPage = () => import("./Pages/Spotlights/SpotlightHintPage/SpotlightHintPage.svelte");
-const SpotlightPromptPage = () => import("./Pages/Spotlights/SpotlightPromptPage/SpotlightPromptPage.svelte");
+const SortableDocs = () => import("./Pages/SortablePage/SortableDocs.svelte");
+const SplitPaneDocs = () => import("./Pages/SplitPanePage/SplitPaneDocs.svelte");
+const SpotlightGuideDocs = () => import("./Pages/Spotlights/SpotlightGuidePage/SpotlightGuideDocs.svelte");
+const SpotlightHintDocs = () => import("./Pages/Spotlights/SpotlightHintPage/SpotlightHintDocs.svelte");
+const SpotlightPromptDocs = () => import("./Pages/Spotlights/SpotlightPromptPage/SpotlightPromptDocs.svelte");
 const StaircasePage = () => import("./Pages/StaircasePage/StaircasePage.svelte");
-const StepperPage = () => import("./Pages/StepperPage/StepperPage.svelte");
+const StepperDocs = () => import("./Pages/StepperPage/StepperDocs.svelte");
 const SunburstPage = () => import("./Pages/SunburstPage/SunburstPage.svelte");
 const SurfacePage = () => import("./Pages/SurfacePage/SurfacePage.svelte");
-const TableOfContentsPage = () => import("./Pages/TableOfContentsPage/TableOfContentsPage.svelte");
-const TablePage = () => import("./Pages/TablePage/TablePage.svelte");
-const TabsPage = () => import("./Pages/TabsPage/TabsPage.svelte");
-const TagInputPage = () => import("./Pages/TagInputPage/TagInputPage.svelte");
-const TextAreaPage = () => import("./Pages/TextAreaPage/TextAreaPage.svelte");
-const TextInputPage = () => import("./Pages/TextInputPage/TextInputPage.svelte");
+const TableOfContentsDocs = () => import("./Pages/TableOfContentsPage/TableOfContentsDocs.svelte");
+const TableDocs = () => import("./Pages/TablePage/TableDocs.svelte");
+const TabsDocs = () => import("./Pages/TabsPage/TabsDocs.svelte");
+const TagInputDocs = () => import("./Pages/TagInputPage/TagInputDocs.svelte");
+const TextAreaDocs = () => import("./Pages/TextAreaPage/TextAreaDocs.svelte");
+const TextInputDocs = () => import("./Pages/TextInputPage/TextInputDocs.svelte");
 const TileBoardPage = () => import("./Pages/TileBoardPage/TileBoardPage.svelte");
-const TimeInputPage = () => import("./Pages/TimeInputPage/TimeInputPage.svelte");
-const TimePickerPage = () => import("./Pages/TimePickerPage/TimePickerPage.svelte");
+const TimeInputDocs = () => import("./Pages/TimeInputPage/TimeInputDocs.svelte");
+const TimePickerDocs = () => import("./Pages/TimePickerPage/TimePickerDocs.svelte");
 const TimelinePage = () => import("./Pages/TimelinePage/TimelinePage.svelte");
-const ToastsPage = () => import("./Pages/ToastsPage/ToastsPage.svelte");
-const TogglePage = () => import("./Pages/TogglePage/TogglePage.svelte");
-const ToolbarPage = () => import("./Pages/ToolbarPage/ToolbarPage.svelte");
-const TooltipPage = () => import("./Pages/TooltipPage/TooltipPage.svelte");
+const ToastsDocs = () => import("./Pages/ToastsPage/ToastsDocs.svelte");
+const ToggleDocs = () => import("./Pages/TogglePage/ToggleDocs.svelte");
+const ToolbarDocs = () => import("./Pages/ToolbarPage/ToolbarDocs.svelte");
+const TooltipDocs = () => import("./Pages/TooltipPage/TooltipDocs.svelte");
 const TrailPage = () => import("./Pages/TrailPage/TrailPage.svelte");
 const WraparoundPage = () => import("./Pages/WraparoundPage/WraparoundPage.svelte");
-const TreePage = () => import("./Pages/TreePage/TreePage.svelte");
+const TreeDocs = () => import("./Pages/TreePage/TreeDocs.svelte");
 const TreemapPage = () => import("./Pages/TreemapPage/TreemapPage.svelte");
 const TypewriterPage = () => import("./Pages/TypewriterPage/TypewriterPage.svelte");
 const ViewportWrapperPage = () => import("./Pages/ViewportWrapperPage/ViewportWrapperPage.svelte");
@@ -280,7 +279,6 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                 children: [
                     {
                         name: "Button",
-                        component: ButtonPage,
                         docs: ButtonDocs,
                     },
                     {
@@ -291,134 +289,134 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
             },
             {
                 name: "Carousel",
-                component: CarouselPage,
+                docs: CarouselDocs,
             },
             {
                 name: "EdgeFader",
-                component: EdgeFaderPage,
+                docs: EdgeFaderDocs,
             },
             {
                 name: "Form",
-                component: FormPage,
+                docs: FormDocs,
             },
             {
                 name: "Input",
                 children: [
                     {
                         name: "Calendar",
-                        component: CalendarPage,
+                        docs: CalendarDocs,
                     },
                     {
                         name: "Checkbox",
-                        component: CheckboxPage,
+                        docs: CheckboxDocs,
                     },
                     {
                         name: "CheckboxGroup",
-                        component: CheckboxGroupPage,
+                        docs: CheckboxGroupDocs,
                     },
                     {
                         name: "Clock",
-                        component: ClockPage,
+                        docs: ClockDocs,
                     },
                     {
                         name: "ColorArea",
-                        component: ColorAreaPage,
+                        docs: ColorAreaDocs,
                     },
                     {
                         name: "ColorInput",
-                        component: ColorInputPage,
+                        docs: ColorInputDocs,
                     },
                     {
                         name: "CurrencyInput",
-                        component: CurrencyInputPage,
+                        docs: CurrencyInputDocs,
                     },
                     {
                         name: "DateInput",
-                        component: DateInputPage,
+                        docs: DateInputDocs,
                     },
                     {
                         name: "DatePicker",
-                        component: DatePickerPage,
+                        docs: DatePickerDocs,
                     },
                     {
                         name: "DateRangePicker",
-                        component: DateRangePickerPage,
+                        docs: DateRangePickerDocs,
                     },
                     {
                         name: "DateTimePicker",
-                        component: DateTimePickerPage,
+                        docs: DateTimePickerDocs,
                     },
                     {
                         name: "FileInput",
-                        component: FileInputPage,
+                        docs: FileInputDocs,
                     },
                     {
                         name: "FormField",
-                        component: FormFieldPage,
+                        docs: FormFieldDocs,
                     },
                     {
                         name: "FormSection",
-                        component: FormSectionPage,
+                        docs: FormSectionDocs,
                     },
                     {
                         name: "Label",
-                        component: LabelPage,
+                        docs: LabelDocs,
                     },
                     {
                         name: "Listbox",
-                        component: ListboxPage,
+                        docs: ListboxDocs,
                     },
                     {
                         name: "MultiSelect",
-                        component: MultiSelectPage,
+                        docs: MultiSelectDocs,
                     },
                     {
                         name: "NumberInput",
-                        component: NumberInputPage,
+                        docs: NumberInputDocs,
                     },
                     {
                         name: "Radio",
-                        component: RadioPage,
+                        docs: RadioDocs,
                     },
                     {
                         name: "Range",
-                        component: RangePage,
+                        docs: RangeDocs,
                     },
                     {
                         name: "RangeCalendar",
-                        component: RangeCalendarPage,
+                        docs: RangeCalendarDocs,
                     },
                     {
                         name: "SegmentedInput",
-                        component: SegmentedInputPage,
+                        docs: SegmentedInputDocs,
                     },
                     {
                         name: "Select",
-                        component: SelectPage,
+                        docs: SelectDocs,
                     },
                     {
                         name: "TagInput",
-                        component: TagInputPage,
+                        docs: TagInputDocs,
                     },
                     {
                         name: "TextArea",
-                        component: TextAreaPage,
+                        docs: TextAreaDocs,
                     },
                     {
                         name: "TextInput",
-                        component: TextInputPage,
+                        docs: TextInputDocs,
                     },
                     {
                         name: "TimeInput",
-                        component: TimeInputPage,
+                        docs: TimeInputDocs,
                     },
                     {
                         name: "TimePicker",
-                        component: TimePickerPage,
+                        docs: TimePickerDocs,
                     },
                     {
                         name: "Toggle",
-                        component: TogglePage,
+                        docs: ToggleDocs,
                     },
                 ],
             },
@@ -427,40 +425,40 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                 children: [
                     {
                         name: "AudioSwitcher",
-                        component: AudioSwitcherPage,
+                        docs: AudioSwitcherDocs,
                     },
                     {
                         name: "ImageSwitcher",
-                        component: ImageSwitcherPage,
+                        docs: ImageSwitcherDocs,
                     },
                 ],
             },
             {
                 name: "Menubar",
-                component: MenubarPage,
+                docs: MenubarDocs,
             },
             {
                 name: "Menus",
                 children: [
                     {
                         name: "CommandPalette",
-                        component: CommandPalettePage,
+                        docs: CommandPaletteDocs,
                     },
                     {
                         name: "FanMenu",
-                        component: FanMenuPage,
+                        docs: FanMenuDocs,
                     },
                     {
                         name: "FlyoutMenu",
-                        component: FlyoutMenuPage,
+                        docs: FlyoutMenuDocs,
                     },
                     {
                         name: "Menu",
-                        component: MenuPage,
+                        docs: MenuDocs,
                     },
                     {
                         name: "WheelMenu",
-                        component: WheelMenuPage,
+                        docs: WheelMenuDocs,
                     },
                 ],
             },
@@ -469,98 +467,94 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                 children: [
                     {
                         name: "Drawer",
-                        component: DrawerPage,
+                        docs: DrawerDocs,
                     },
                     {
                         name: "HoverCard",
-                        component: HoverCardPage,
+                        docs: HoverCardDocs,
                     },
                     {
                         name: "Modal",
-                        component: ModalPage,
+                        docs: ModalDocs,
                     },
                     {
                         name: "Sidebar",
-                        component: SidebarPage,
+                        docs: SidebarDocs,
                     },
                     {
                         name: "Spotlights",
                         children: [
                             {
                                 name: "SpotlightGuide",
-                                component: SpotlightGuidePage,
+                                docs: SpotlightGuideDocs,
                             },
                             {
                                 name: "SpotlightHint",
-                                component: SpotlightHintPage,
+                                docs: SpotlightHintDocs,
                             },
                             {
                                 name: "SpotlightPrompt",
-                                component: SpotlightPromptPage,
+                                docs: SpotlightPromptDocs,
                             },
                         ],
                     },
                     {
                         name: "Toasts",
-                        component: ToastsPage,
+                        docs: ToastsDocs,
                     },
                     {
                         name: "Tooltip",
-                        component: TooltipPage,
+                        docs: TooltipDocs,
                     },
                 ],
             },
             {
                 name: "Paginator",
-                component: PaginatorPage,
+                docs: PaginatorDocs,
             },
             {
                 name: "Preview",
-                component: PreviewPage,
+                docs: PreviewDocs,
             },
             {
                 name: "Progress",
-                component: ProgressPage,
+                docs: ProgressDocs,
             },
             {
                 name: "Scroller",
-                component: ScrollerPage,
+                docs: ScrollerDocs,
             },
             {
                 name: "Sortable",
-                component: SortablePage,
+                docs: SortableDocs,
             },
             {
                 name: "SplitPane",
-                component: SplitPanePage,
+                docs: SplitPaneDocs,
             },
             {
                 name: "Stepper",
-                component: StepperPage,
+                docs: StepperDocs,
             },
             {
                 name: "Table",
-                component: TablePage,
+                docs: TableDocs,
             },
             {
                 name: "TableOfContents",
-                component: TableOfContentsPage,
+                docs: TableOfContentsDocs,
             },
             {
                 name: "Tabs",
-                component: TabsPage,
+                docs: TabsDocs,
             },
             {
                 name: "Toolbar",
-                component: ToolbarPage,
+                docs: ToolbarDocs,
             },
             {
                 name: "Tree",
-                component: TreePage,
-            },
-            {
-                name: "ViewportWrapper",
-                component: ViewportWrapperPage,
+                docs: TreeDocs,
             },
         ],
     },
@@ -801,6 +795,10 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                         component: OverheadWheelPage,
                     },
                 ],
+            },
+            {
+                name: "ViewportWrapper",
+                component: ViewportWrapperPage,
             },
             {
                 name: "Wraparound",

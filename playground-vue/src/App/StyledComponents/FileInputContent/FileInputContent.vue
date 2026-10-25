@@ -27,7 +27,12 @@ const layerClass = useLayerClass();
         <div :class="styles.fileInputPrompt">{{ PICK_FILE_MARK }}</div>
 
         <div :class="[styles.fileInputNames, !renderProps.files.length && styles.isEmpty]">
-            {{ renderProps.files.length ? renderProps.files.map((file) => file.name).join(", ") : NO_FILES }}
+            <template v-if="renderProps.files.length">
+                <template v-for="(file, index) in renderProps.files" :key="index"
+                    >{{ index > 0 ? ", " : "" }}<bdi>{{ file.name }}</bdi></template
+                >
+            </template>
+            <template v-else>{{ NO_FILES }}</template>
         </div>
     </div>
 </template>

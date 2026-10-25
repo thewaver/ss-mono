@@ -6,6 +6,7 @@
 <script lang="ts">
     import type { Snippet } from "svelte";
 
+    import { NavigatorSvelteUtils } from "@thewaver/ss-components-svelte";
     import {
         CHECKED_MARK,
         MIXED_MARK,
@@ -24,9 +25,14 @@
     let props: TreeNodeContentProps & { children?: Snippet } = $props();
 
     const layerClass = $derived.by(getLayerClass());
+
+    let element = $state<HTMLDivElement>();
+
+    const getDirection = NavigatorSvelteUtils.createDirection(() => element);
 </script>
 
 <div
+    bind:this={element}
     class={[
         styles.treeNodeContent,
         layerClass,
@@ -36,8 +42,9 @@
         props.renderProps.isSelected && styles.isSelected,
         props.renderProps.isDisabled && styles.isDisabled,
         props.renderProps.depth === 0 && styles.isCategory,
+        getDirection() === "rtl" && styles.isRightToLeft,
     ]}
-    style:padding-left={`calc(${themeVars.spacing.half} + ${props.renderProps.depth * INDENT_PER_DEPTH}px)`}
+    style:padding-inline-start={`calc(${themeVars.spacing.half} + ${props.renderProps.depth * INDENT_PER_DEPTH}px)`}
 >
     <div {@attach (element) => props.setExpanderRef?.(element)} class={styles.treeNodeMarker} aria-hidden="true">
         {props.renderProps.isBranch

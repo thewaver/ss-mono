@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import * as styles from "@thewaver/ss-playground/App/Pages/Spotlights/Spotlights.css";
 
-import type { SpotlightOverlayProps } from "./Spotlights.types";
+import type { SpotlightOverlayProps } from "./SpotlightsVue.types";
 
 defineProps<SpotlightOverlayProps>();
 </script>

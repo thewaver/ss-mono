@@ -37,7 +37,7 @@ export const ClearableDocsExample = () => {
                 onSelectionChange={(value) => setLastChange(value ?? "cleared")}
             />
 
-            <div class={exampleStyles.exampleReadout}>{`Last change: ${getLastChange()}`}</div>
+            <div class={exampleStyles.exampleReadout} data-readout>{`Last change: ${getLastChange()}`}</div>
         </>
     );
 };

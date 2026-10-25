@@ -27,15 +27,19 @@ export type BaseModalValues = ModalNameProps & {
     ariaDescribedBy?: string;
     /** Whether this is an ordinary dialog or one that interrupts, which decides how insistently it is announced. */
     role?: ModalRole;
-    /** Where the dialog sits on the screen. */
+    /**
+     * Where the dialog sits on the screen. `"left"` and `"right"` are the screen's own sides, whichever way the text
+     * around the dialog runs.
+     */
     alignment?: ModalAlignment;
     /**
      * Whether clicking the backdrop closes the dialog. Switch it off for a dialog that must be answered rather than
      * dismissed.
      *
      * On a drawer it also governs swiping the panel away, and the two cannot be separated: a swipe is a dragging
-     * gesture, and WCAG 2.5.7 needs a single-pointer way to do what it does. The backdrop tap is the only one the
-     * library can promise, so switching it off switches the swipe off too.
+     * gesture, and {@link https://www.w3.org/WAI/WCAG22/Understanding/dragging-movements.html WCAG 2.5.7} needs a
+     * single-pointer way to do what it does. The backdrop tap is the only one the library can promise, so switching it
+     * off switches the swipe off too.
      */
     isDismissableOnOverlayClick?: boolean;
     /**

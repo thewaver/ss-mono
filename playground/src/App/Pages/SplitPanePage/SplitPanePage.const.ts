@@ -60,3 +60,5 @@ export const STARTING_TRIPLE = [0.25, 0.5, 0.25];
 export const STARTING_COLUMN = [0.4, 0.6];
 
 export const STARTING_COMPARE = [0.5, 0.5];
+
+export const DOCS_ROOT = "/src/App/Pages/SplitPanePage/Docs";

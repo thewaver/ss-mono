@@ -7,6 +7,7 @@
         type TextFieldFlags,
     } from "@thewaver/ss-components";
 
+    import { NavigatorSvelteUtils } from "../../../Abstracts/Navigator/NavigatorSvelte.utils.svelte.js";
     import InteractionWrapper from "../../../Primitives/InteractionWrapper/InteractionWrapper.svelte";
     import Popover from "../../../Primitives/Popover/Popover.svelte";
     import PopupTrigger from "../../../Primitives/PopupTrigger/PopupTrigger.svelte";
@@ -22,7 +23,9 @@
     let root = $state<HTMLDivElement>();
     let isFocusReturned = false;
 
-    const isDisabled = $derived(props.isDisabled ?? false);
+    const getDirection = NavigatorSvelteUtils.createDirection(() => root);
+
+    const isLocked = $derived((props.isDisabled ?? false) || (props.isReadOnly ?? false));
 
     const dismiss = () => {
         if (!visibility) return;
@@ -32,7 +35,7 @@
     };
 
     const open = () => {
-        if (isDisabled) return;
+        if (isLocked) return;
 
         visibility = true;
     };
@@ -43,7 +46,7 @@
     };
 
     $effect(() => {
-        if (visibility && isDisabled) visibility = false;
+        if (visibility && isLocked) visibility = false;
     });
 
     $effect(() => {
@@ -77,7 +80,7 @@
 {#snippet trailing(fieldFlags: InteractionFlags<TextFieldFlags>, meridiem: TimeInputMeridiem)}
     {@render props.renderTrailing?.(fieldFlags, meridiem)}
 
-    <InteractionWrapper {isDisabled} extraFlags={{ isOpen: visibility }}>
+    <InteractionWrapper isDisabled={isLocked} extraFlags={{ isOpen: visibility }}>
         {#snippet renderControl(attachElement, flags)}
             {#snippet triggerContent(triggerFlags: InteractionFlags<PopupTriggerFlags>)}
                 {@render props.renderTrigger(triggerFlags, meridiem)}
@@ -109,7 +112,7 @@
         ariaAttributes={{ "aria-label": props.clockLabel }}
         isOpen={visibility}
         anchorRef={root}
-        placement={props.placement ?? TIME_PICKER_DEFAULTS.placement}
+        placement={props.placement ?? TIME_PICKER_DEFAULTS.placement[getDirection()]}
         offset={props.offset}
         transitionDurationMs={props.popupTransitionDurationMs}
         hasAutoFocus={true}

@@ -10,6 +10,18 @@ export const EXAMPLE_NAMES = {
 
 export const EXAMPLES_ROOT = "/src/App/Pages/Menus/WheelMenuPage/Examples";
 
+export const DOCS_ROOT = "/src/App/Pages/Menus/WheelMenuPage/Docs";
+
+export const FIELD_WIDTH = 110;
+
 export const HALF_TURN_DEGREES = 180;
+
+export const HOLE_RADIUS = 64;
+
+export const BAND_WIDTH = 84;
+
+export const LEVEL_GAP = 8;
+
+export const LAYOUT_SIZE = "368px";
 
 export const NOTHING_RUN = "nothing run yet";

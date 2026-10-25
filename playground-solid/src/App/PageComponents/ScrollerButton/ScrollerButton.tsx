@@ -1,3 +1,5 @@
+import { Show } from "solid-js";
+
 import { Button, type ScrollerAxis, type ScrollerStep, access } from "@thewaver/ss-components-solid";
 
 import { PageScrollerButtonContent } from "../../StyledComponents/ScrollerButtonContent/ScrollerButtonContent";
@@ -9,20 +11,32 @@ const ARIA_LABELS: Record<ScrollerAxis, Record<ScrollerStep, string>> = {
 };
 
 export const PageScrollerButton = (props: ScrollerButtonProps) => {
+    const getAxis = () => access(props.axis) ?? "x";
+
     const getIsPrevious = () => access(props.step) === "previous";
 
     return (
-        <Button
-            isDisabled={() =>
-                getIsPrevious() ? access(props.stepper).getIsAtStart() : access(props.stepper).getIsAtEnd()
-            }
-            ariaLabel={() => ARIA_LABELS[access(props.axis) ?? "x"][access(props.step)]}
-            onClick={() =>
-                void (getIsPrevious() ? access(props.stepper).stepToPrevious() : access(props.stepper).stepToNext())
-            }
-            renderContent={(getFlags) => (
-                <PageScrollerButtonContent flags={getFlags} step={props.step} axis={props.axis} />
+        <Show when={access(props.controller)}>
+            {(getController) => (
+                <Button
+                    id={props.id}
+                    isDisabled={() =>
+                        getIsPrevious()
+                            ? getController()[getAxis()].getIsAtStart()
+                            : getController()[getAxis()].getIsAtEnd()
+                    }
+                    ariaLabel={() => ARIA_LABELS[getAxis()][access(props.step)]}
+                    ariaControls={() => getController().getBoxId()}
+                    onClick={() =>
+                        void (getIsPrevious()
+                            ? getController()[getAxis()].stepToPrevious()
+                            : getController()[getAxis()].stepToNext())
+                    }
+                    renderContent={(getFlags) => (
+                        <PageScrollerButtonContent flags={getFlags} step={props.step} axis={getAxis} />
+                    )}
+                />
             )}
-        />
+        </Show>
     );
 };

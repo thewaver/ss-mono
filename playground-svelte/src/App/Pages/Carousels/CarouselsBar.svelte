@@ -14,7 +14,7 @@
 
     type Props = {
         controls: CarouselControls;
-        isDisabled: boolean;
+        isDisabled?: boolean;
         hasPicks?: boolean;
         hasRotation?: boolean;
     };
@@ -51,7 +51,7 @@
     {#if props.hasRotation}
         <Button
             ariaLabel={computeCarouselRotationLabel(isPlaying)}
-            isDisabled={props.isDisabled}
+            isDisabled={props.isDisabled ?? false}
             onClick={() => {
                 props.controls.setIsPlaying(!props.controls.getIsPlaying());
             }}
@@ -67,7 +67,7 @@
     {#if props.hasPicks}
         {#each picks as index (index)}
             {@const isCurrent = index === props.controls.getIndex()}
-            <InteractionWrapper isDisabled={props.isDisabled}>
+            <InteractionWrapper isDisabled={props.isDisabled ?? false}>
                 {#snippet renderControl(attachElement, flags)}
                     <button
                         {@attach attachElement}

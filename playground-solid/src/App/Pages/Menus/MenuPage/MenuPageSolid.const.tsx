@@ -30,7 +30,23 @@ export const ACTIONS_WITH_REACHABLE: MenuItem<Action>[] = [
             ),
         },
     },
-    { value: { name: "Duplicate" } },
+    {
+        value: { name: "Duplicate" },
+        isDisabled: true,
+        isReachableWhenDisabled: true,
+        tooltipDefs: {
+            placement: () => ({ x: "right_out", y: "center" }),
+            offset: () => ({ x: 10, y: 0 }),
+            renderContent: (getVisibilityTarget, getTransitionDurationMs) => (
+                <PageTooltipContent
+                    visibilityTarget={getVisibilityTarget}
+                    transitionDurationMs={getTransitionDurationMs}
+                >
+                    Nothing is selected to duplicate.
+                </PageTooltipContent>
+            ),
+        },
+    },
     { value: { name: "Delete", shortcut: "Del" } },
 ];
 

@@ -10,6 +10,7 @@
     import { ElementFaderSvelteUtils } from "../../../Abstracts/ElementFader/ElementFaderSvelte.utils.svelte.js";
     import { FocusManagerSvelteUtils } from "../../../Abstracts/FocusManager/FocusManagerSvelte.utils.svelte.js";
     import { InteractionTrackerSvelteUtils } from "../../../Abstracts/InteractionTracker/InteractionTrackerSvelte.utils.svelte.js";
+    import { NavigatorSvelteUtils } from "../../../Abstracts/Navigator/NavigatorSvelte.utils.svelte.js";
     import { getViewportContext } from "../../../Abstracts/Viewport/Viewport.context.js";
     import { attachPortal } from "../../../Utils/portalUtils.js";
     import { toStyle } from "../../../Utils/styleUtils.js";
@@ -50,6 +51,13 @@
             unseal();
         };
     });
+
+    const opener = $derived(visibility ? FocusManagerUtils.getFocusOrigin() : undefined);
+
+    const getDirection = NavigatorSvelteUtils.createDirection(
+        () => opener,
+        () => !fader.getIsVisible(),
+    );
 
     FocusManagerSvelteUtils.autoFocus(() => container ?? undefined, fader.getIsVisible, {
         getInitialRef: () => props.initialFocusRef,
@@ -140,13 +148,14 @@
             )}
         class={[styles.modalRoot, styles.modalAlignmentVariants[alignment]]}
     >
-        <div {@attach (element) => on(element, "click", handleOverlayClick)} class={styles.modalOverlay}>
+        <div {@attach (element) => on(element, "click", handleOverlayClick)} class={styles.modalOverlay} dir={getDirection()}>
             {@render props.renderOverlay(fader.getTransitionTarget(), transitionDurationMs)}
         </div>
         <div
             bind:this={container}
             class={styles.modalContainer}
             style={containerStyle}
+            dir={getDirection()}
             tabindex="-1"
             role={props.role ?? MODAL_DEFAULTS.role}
             aria-modal="true"

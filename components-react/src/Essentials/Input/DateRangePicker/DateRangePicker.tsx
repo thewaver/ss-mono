@@ -1,26 +1,52 @@
 import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 
 import {
+    DATE_INPUT_DEFAULTS,
     DATE_RANGE_PICKER_DEFAULTS,
     DateRangePickerStyles,
     DateRangePickerUtils,
     type DateValue,
+    type DateValueCalendarId,
     type DateValueRange,
     DateValueUtils,
+    type InteractionFlags,
+    InteractionTrackerUtils,
     type PopupTriggerFlags,
+    type TextFieldFlags,
+    TextFieldUtils,
 } from "@thewaver/ss-components";
+import { StoreUtils } from "@thewaver/ss-utils";
 
+import { NavigatorReactUtils } from "../../../Abstracts/Navigator/NavigatorReact.utils";
 import { SignalMirrorReactUtils } from "../../../Abstracts/SignalMirror/SignalMirrorReact.utils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import { Popover } from "../../../Primitives/Popover/Popover";
 import { PopupTrigger } from "../../../Primitives/PopupTrigger/PopupTrigger";
+import { Tooltip } from "../../Overlays/Tooltip/Tooltip";
+import type { TooltipProps } from "../../Overlays/Tooltip/Tooltip.types";
 import { DateInput } from "../DateInput/DateInput";
 import { RangeCalendar } from "../RangeCalendar/RangeCalendar";
 import type { DateRangePickerProps } from "./DateRangePicker.types";
 
-const toMonth = (value: DateValue): DateValue => DateValueUtils.getStartOfMonth(value);
+type FieldFlags = InteractionFlags<TextFieldFlags>;
+
+const toMonth = (value: DateValue, calendar: DateValueCalendarId): DateValue =>
+    DateValueUtils.getStartOfMonth(DateValueUtils.withCalendar(value, calendar));
+
+const keepFlags = (previous: FieldFlags | undefined, next: FieldFlags) =>
+    previous && StoreUtils.getIsShallowEqual(previous, next) ? previous : next;
+
+const FlagsReport = (props: { flags: FieldFlags; onChange: (flags: FieldFlags) => void }) => {
+    const { flags, onChange } = props;
+
+    useLayoutEffect(() => onChange(flags), [flags, onChange]);
+
+    return null;
+};
 
 export const DateRangePicker = (props: DateRangePickerProps) => {
+    const { tooltipDefs, ...fieldProps } = props;
+
     const [range] = props.value;
 
     const popupId = useId();
@@ -32,7 +58,13 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
     const isFocusReturnedRef = useRef(false);
     const [root, setRoot] = useState<HTMLDivElement>();
     const [isOpen, setIsOpen] = SignalMirrorReactUtils.useOptionalState(props.visibility, false);
-    const monthState = useState(() => toMonth(range?.start ?? DateValueUtils.fromDate(new Date())));
+
+    const direction = NavigatorReactUtils.useDirection(rootRef);
+
+    const calendar = props.calendar ?? DATE_INPUT_DEFAULTS.calendar;
+    const calendarRef = useRef(calendar);
+
+    const monthState = useState(() => toMonth(range?.start ?? DateValueUtils.fromDate(new Date()), calendar));
     const [, setMonth] = monthState;
 
     const { first: startState, second: endState } = SignalMirrorReactUtils.useSplit<
@@ -42,6 +74,37 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
     >(props.value, DateRangePickerUtils.SPLIT_DEFS);
 
     const isDisabled = props.isDisabled ?? false;
+    const isLocked = isDisabled || (props.isReadOnly ?? false);
+
+    const [startFlags, setStartFlags] = useState<FieldFlags>();
+    const [endFlags, setEndFlags] = useState<FieldFlags>();
+
+    const reportStartFlags = useCallback(
+        (flags: FieldFlags) => setStartFlags((previous) => keepFlags(previous, flags)),
+        [],
+    );
+    const reportEndFlags = useCallback(
+        (flags: FieldFlags) => setEndFlags((previous) => keepFlags(previous, flags)),
+        [],
+    );
+
+    const pairFlags = TextFieldUtils.mergeFlags([startFlags, endFlags].flatMap((flags) => (flags ? [flags] : [])));
+
+    const isReachable = InteractionTrackerUtils.computeIsReachable(isDisabled, props.isReachableWhenDisabled ?? false);
+    const shownTooltipDefs = tooltipDefs && (!isDisabled || isReachable) ? tooltipDefs : undefined;
+
+    const tooltipProps: Omit<TooltipProps, "anchorRef"> | undefined = shownTooltipDefs && {
+        ...shownTooltipDefs,
+        isAnchorGroup: true,
+        renderContent: (visibilityTarget, transitionDurationMs, placement, arrowAim) =>
+            shownTooltipDefs.renderContent(visibilityTarget, transitionDurationMs, placement, pairFlags, arrowAim),
+    };
+
+    const lastTooltipPropsRef = useRef(tooltipProps);
+
+    if (tooltipProps) lastTooltipPropsRef.current = tooltipProps;
+
+    const shownTooltipProps = tooltipProps ?? lastTooltipPropsRef.current;
 
     const setRootRef = useCallback((element: HTMLDivElement | null) => {
         rootRef.current = element;
@@ -49,7 +112,7 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
     }, []);
 
     const open = () => {
-        if (isDisabled) return;
+        if (isLocked) return;
 
         setIsOpen(true);
     };
@@ -62,12 +125,19 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
     };
 
     useEffect(() => {
-        if (isOpen && isDisabled) setIsOpen(false);
-    }, [isOpen, isDisabled]);
+        if (isOpen && isLocked) setIsOpen(false);
+    }, [isOpen, isLocked]);
 
     useLayoutEffect(() => {
-        if (isOpen && range?.start) setMonth(toMonth(range.start));
+        if (isOpen && range?.start) setMonth(toMonth(range.start, calendar));
     }, [isOpen]);
+
+    useLayoutEffect(() => {
+        if (calendarRef.current === calendar) return;
+
+        calendarRef.current = calendar;
+        setMonth((month) => toMonth(month, calendar));
+    }, [calendar]);
 
     useEffect(() => {
         if (isOpen || !isFocusReturnedRef.current) return;
@@ -96,24 +166,36 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
     return (
         <div ref={setRootRef} className={DateRangePickerStyles.dateRangePickerRoot}>
             <DateInput
-                {...props}
+                {...fieldProps}
                 value={startState}
                 id={props.id && `${props.id}-start`}
                 name={props.name && `${props.name}-start`}
                 ariaLabel={props.startLabel}
+                renderContent={(flags) => (
+                    <>
+                        {props.renderContent(flags)}
+                        <FlagsReport flags={flags} onChange={reportStartFlags} />
+                    </>
+                )}
             />
 
             {props.renderSeparator?.()}
 
             <DateInput
-                {...props}
+                {...fieldProps}
                 value={endState}
                 id={endFieldId}
                 name={props.name && `${props.name}-end`}
                 ariaLabel={props.endLabel}
+                renderContent={(flags) => (
+                    <>
+                        {props.renderContent(flags)}
+                        <FlagsReport flags={flags} onChange={reportEndFlags} />
+                    </>
+                )}
                 renderTrailing={() => (
                     <InteractionWrapper<PopupTriggerFlags>
-                        isDisabled={isDisabled}
+                        isDisabled={isLocked}
                         extraFlags={{ isOpen }}
                         renderControl={(setElementRef, flags) => (
                             <PopupTrigger
@@ -137,7 +219,7 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
                 ariaAttributes={{ "aria-label": props.calendarLabel }}
                 isOpen={isOpen}
                 anchorRef={root}
-                placement={props.placement ?? DATE_RANGE_PICKER_DEFAULTS.placement}
+                placement={props.placement ?? DATE_RANGE_PICKER_DEFAULTS.placement[direction]}
                 offset={props.offset}
                 transitionDurationMs={props.popupTransitionDurationMs}
                 hasAutoFocus={true}
@@ -146,6 +228,8 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
                     props.renderPopup(renderCalendar, monthState, visibilityTarget, transitionDurationMs)
                 }
             />
+
+            {shownTooltipProps && <Tooltip {...shownTooltipProps} anchorRef={tooltipProps ? root : undefined} />}
         </div>
     );
 };

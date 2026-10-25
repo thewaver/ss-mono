@@ -451,6 +451,7 @@
     <div
         {@attach attachPortal(viewportContext.getPortalRef() ?? document.body)}
         class={styles.sortableCarried}
+        dir={getDirection()}
         style:transform={`translate(${carriedPoint.x - grabOffset.x}px, ${carriedPoint.y - grabOffset.y}px)`}
         style:width={`${carriedSize?.width ?? 0}px`}
         style:height={`${carriedSize?.height ?? 0}px`}

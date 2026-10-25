@@ -93,38 +93,37 @@ const orientation = shallowRef<AccordionOrientation>("horizontal");
         </template>
     </PageDocsExample>
 
-    <PageDocsSection title="Opening and closing from outside">
-        The accordion keeps track of which sections are open by itself. To open or close them from elsewhere on the
-        page, hold the list and pass it in as expanded: both sides write it, so a header press updates your list and
-        writing your list opens or closes sections.
-    </PageDocsSection>
+    <PageDocsSection
+        title="Opening and closing from outside"
+        content="The accordion keeps track of which sections are open by itself. To open or close them from elsewhere on the page, hold the list and pass it in as [prop]expanded[/prop]: both sides write it, so a header press updates your list and writing your list opens or closes sections."
+    />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Controlled.vue`">
         <ControlledDocsExample />
     </PageDocsExample>
 
-    <PageDocsSection title="Panels that follow their content">
-        A panel opens to its content's own height and keeps following it. Content that appears after the panel is open
-        makes the panel grow, with no reopening and no height to guess.
-    </PageDocsSection>
+    <PageDocsSection
+        title="Panels that follow their content"
+        content="A panel opens to its content's own height and keeps following it. Content that appears after the panel is open makes the panel grow, with no reopening and no height to guess."
+    />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Growing.vue`">
         <GrowingDocsExample />
     </PageDocsExample>
 
-    <PageDocsSection title="Built on first open">
-        Set isPanelBuiltOnExpand and a panel's content is not built until its section is first opened, and it stays
-        built afterwards. Use it for panels that are costly to build.
-    </PageDocsSection>
+    <PageDocsSection
+        title="Built on first open"
+        content="Set [prop]isPanelBuiltOnExpand[/prop] and a panel's content is not built until its section is first opened, and it stays built afterwards. Use it for panels that are costly to build."
+    />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Deferred.vue`">
         <DeferredDocsExample />
     </PageDocsExample>
 
-    <PageDocsSection title="Scrolled into view">
-        Set isScrolledIntoViewOnExpand and a section is brought into view once it has finished opening, which matters
-        when the accordion sits in a box that scrolls: opening a section below the fold brings it up.
-    </PageDocsSection>
+    <PageDocsSection
+        title="Scrolled into view"
+        content="Set [prop]isScrolledIntoViewOnExpand[/prop] and a section is brought into view once it has finished opening, which matters when the accordion sits in a box that scrolls: opening a section below the fold brings it up."
+    />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Scrolled.vue`">
         <ScrolledDocsExample :is-scrolled-into-view-on-expand="isScrolledIntoView" />
@@ -145,12 +144,10 @@ const orientation = shallowRef<AccordionOrientation>("horizontal");
         </template>
     </PageDocsExample>
 
-    <PageDocsSection title="Orientation">
-        Set orientation to horizontal and the sections sit side by side, each panel opening beside its header and
-        growing in width; vertical, the default, stacks them. The arrow keys that walk the headers follow it: up and
-        down for a column, left and right for a row, reversed in right-to-left text. The panel is also told which way
-        the person moved, forward or backward, so its content can slide in from that side; the motion is yours.
-    </PageDocsSection>
+    <PageDocsSection
+        title="Orientation"
+        content="Set [prop]orientation[/prop] to horizontal and the sections sit side by side, each panel opening beside its header and growing in width; vertical, the default, stacks them. The arrow keys that walk the headers follow it: up and down for a column, left and right for a row, reversed in right-to-left text. The panel is also told which way the person moved, forward or backward, so its content can slide in from that side; the motion is yours."
+    />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Orientation.vue`">
         <OrientationDocsExample :orientation="orientation" />

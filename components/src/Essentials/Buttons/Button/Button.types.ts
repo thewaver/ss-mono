@@ -1,5 +1,7 @@
 export type ButtonType = "button" | "submit" | "reset";
 
+export type ButtonPopupRole = "menu" | "listbox" | "tree" | "grid" | "dialog";
+
 export type ButtonFlags = {
     /**
      * Whether the promise the last press's `onClick` answered with is still running. The button is announced
@@ -33,6 +35,24 @@ export type BaseButtonValues = {
      * accident. A disabled or pending button neither submits nor resets.
      */
     type?: ButtonType;
+    /**
+     * What kind of popup pressing the button opens, for a button that opens one: a menu, a list to pick from, a
+     * tree, a grid or a dialog. A screen reader then says so before the button is pressed. Leave it out for a button
+     * that opens nothing. Pair it with `ariaExpanded`, so the reader also hears whether the popup is open.
+     */
+    ariaHasPopup?: ButtonPopupRole;
+    /**
+     * Whether what the button opens or shows is open right now — a popup, or a section it expands. Hand it the same
+     * state the popup is drawn from, so the two never disagree. Leave it out for a button that opens nothing, since
+     * `false` announces a button that can be expanded.
+     */
+    ariaExpanded?: boolean;
+    /**
+     * The id of the element the button acts on, for a button that changes something drawn elsewhere — a box it
+     * scrolls, a carousel it steps. A screen reader can then take the reader from the button to that element. Leave
+     * it out for a button that acts on nothing in the page.
+     */
+    ariaControls?: string;
 };
 
 export type BaseButtonProps = BaseButtonValues & ButtonCbs;

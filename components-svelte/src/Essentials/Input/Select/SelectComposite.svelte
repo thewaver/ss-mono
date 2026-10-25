@@ -5,8 +5,8 @@
         SELECT_DEFAULTS,
         type SelectFlags,
         SelectUtils,
-        TextFieldUtils,
         SelectStyles as styles,
+        TextFieldUtils,
     } from "@thewaver/ss-components";
     import { CSSUtils } from "@thewaver/ss-utils";
 
@@ -36,6 +36,7 @@
     const fallbackFieldId = `${uid}-field`;
 
     const labelContext = getLabelContext();
+    const getCaptionId = FormFieldSvelteUtils.resolveAriaLabelledBy();
 
     let hasPopoverSettled = $state(true);
     let isEditing = $state(false);
@@ -185,7 +186,7 @@
         />
 
         {#if props.renderClear && props.selectedOptions.length > 0}
-            <div class={styles.selectClear} style:right={`${spreadPadding.paddingRight}px`}>
+            <div class={styles.selectClear} style:inset-inline-end={`${spreadPadding.paddingInlineEnd}px`}>
                 <Button
                     {isDisabled}
                     ariaLabel={props.clearAriaLabel}
@@ -200,7 +201,7 @@
             role={"listbox"}
             ariaAttributes={SelectUtils.computeListAriaAttributes({
                 listAriaLabel: props.listAriaLabel,
-                labelId: labelContext.getLabelId(),
+                labelId: getCaptionId() ?? labelContext.getLabelId(),
                 fieldId,
                 isMultiple,
             })}

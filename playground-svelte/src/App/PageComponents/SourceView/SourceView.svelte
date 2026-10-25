@@ -2,7 +2,7 @@
     import { untrack } from "svelte";
 
     import { Accordion, Scroller, Tabs, getViewportContext } from "@thewaver/ss-components-svelte";
-    import type { AccordionItem, Tab } from "@thewaver/ss-components-svelte";
+    import type { AccordionItem, ScrollerController, Tab } from "@thewaver/ss-components-svelte";
     import * as styles from "@thewaver/ss-playground/App/PageComponents/SourceView/SourceView.css";
     import { FOCUS_RING_WIDTH } from "@thewaver/ss-playground/App/Theme.css";
 
@@ -35,6 +35,13 @@
     let groups = $state.raw<SourceGroup[]>([]);
     let selectedGroup = $state.raw<SourceGroup>();
     let expandedNames = $state.raw<string[]>([]);
+    let tabsController = $state.raw<ScrollerController>();
+
+    const isTabsScrollable = $derived.by(() => {
+        const stepper = tabsController?.x;
+
+        return stepper !== undefined && !(stepper.getIsAtStart() && stepper.getIsAtEnd());
+    });
 
     const selectGroup = (group: SourceGroup | undefined) => {
         selectedGroup = group;
@@ -77,34 +84,47 @@
         style:max-height={`${viewportContext.getSize().height - MODAL_MARGIN_HEIGHT}px`}
     >
         <div class={styles.sourceViewTabs}>
-            <Scroller gap={TAB_GAP} padding={FOCUS_RING_WIDTH}>
-                {#snippet renderButton(step, stepper)}
-                    <PageScrollerButton {step} {stepper} />
-                {/snippet}
+            <div class={styles.sourceViewTabsRow}>
+                {#if isTabsScrollable}
+                    <PageScrollerButton controller={tabsController} step={"previous"} />
+                {/if}
 
-                <Tabs
-                    orientation={"horizontal"}
-                    tabGap={TAB_GAP}
-                    ariaLabel={"Source files"}
-                    {tabs}
-                    selectedValue={selectedGroup}
-                    onSelectionChange={selectGroup}
-                >
-                    {#snippet renderGutter()}
-                        <PageTabGutter orientation={"horizontal"} />
-                    {/snippet}
+                <div class={styles.sourceViewTabsCell}>
+                    <Scroller
+                        padding={FOCUS_RING_WIDTH}
+                        onMount={(controller) => {
+                            tabsController = controller;
+                        }}
+                    >
+                        <Tabs
+                            orientation={"horizontal"}
+                            tabGap={TAB_GAP}
+                            ariaLabel={"Source files"}
+                            {tabs}
+                            selectedValue={selectedGroup}
+                            onSelectionChange={selectGroup}
+                        >
+                            {#snippet renderGutter()}
+                                <PageTabGutter orientation={"horizontal"} />
+                            {/snippet}
 
-                    {#snippet renderSelectionFloater(visibilityTarget, transitionDurationMs)}
-                        <PageTabFloater orientation={"horizontal"} {visibilityTarget} {transitionDurationMs} />
-                    {/snippet}
+                            {#snippet renderSelectionFloater(visibilityTarget, transitionDurationMs)}
+                                <PageTabFloater orientation={"horizontal"} {visibilityTarget} {transitionDurationMs} />
+                            {/snippet}
 
-                    {#snippet renderTab(tab, flags)}
-                        <PageTabContent {flags} orientation={"horizontal"} isSelected={tab.value === selectedGroup}>
-                            {tab.value.name}
-                        </PageTabContent>
-                    {/snippet}
-                </Tabs>
-            </Scroller>
+                            {#snippet renderTab(tab, flags)}
+                                <PageTabContent {flags} orientation={"horizontal"} isSelected={tab.value === selectedGroup}>
+                                    {tab.value.name}
+                                </PageTabContent>
+                            {/snippet}
+                        </Tabs>
+                    </Scroller>
+                </div>
+
+                {#if isTabsScrollable}
+                    <PageScrollerButton controller={tabsController} step={"next"} />
+                {/if}
+            </div>
         </div>
 
         <div class={styles.sourceViewPanel}>

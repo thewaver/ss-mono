@@ -1,8 +1,11 @@
+import type { ParentProps } from "solid-js";
 import { Show, createMemo } from "solid-js";
 
-import type { ToastState, ToastsDir } from "@thewaver/ss-components-solid";
-import { Button, access } from "@thewaver/ss-components-solid";
+import type { ToastState, ToastsFlexDirection } from "@thewaver/ss-components-solid";
+import { Button, TOASTS_DEFAULTS, access } from "@thewaver/ss-components-solid";
 import {
+    DEFAULT_ANIMATION,
+    DEFAULT_STACKING,
     PERCENT,
     PILE_MIN_SCALE,
     PILE_PEEK,
@@ -15,9 +18,9 @@ import { PageLayer } from "../../PageComponents/Layer/Layer";
 import { PageButtonContent } from "../ButtonContent/ButtonContent";
 import type { ToastContentProps } from "./ToastContentSolid.types";
 
-const computePileShift = (state: ToastState, dir: ToastsDir, gap: number) => {
-    const isColumn = dir === "column" || dir === "column-reverse";
-    const sign = dir === "column-reverse" || dir === "row-reverse" ? -1 : 1;
+const computePileShift = (state: ToastState, flexDirection: ToastsFlexDirection, gap: number) => {
+    const isColumn = flexDirection === "column" || flexDirection === "column-reverse";
+    const sign = flexDirection === "column-reverse" || flexDirection === "row-reverse" ? -1 : 1;
     const extents = state.sizes.map((size) => (isColumn ? size.height : size.width));
 
     const computeFlowStart = (index: number) =>
@@ -44,10 +47,14 @@ const computeSwipeShift = (state: ToastState) => {
     return direction === "left" || direction === "right" ? `translateX(${distance}%)` : `translateY(${distance}%)`;
 };
 
-export const PageToastContent = (props: ToastContentProps) => {
+export const PageToastContent = (props: ParentProps<ToastContentProps>) => {
     const getPile = createMemo(() =>
-        access(props.stacking) === "pile"
-            ? computePileShift(access(props.state), access(props.dir), access(props.gap))
+        (access(props.stacking) ?? DEFAULT_STACKING) === "pile"
+            ? computePileShift(
+                  access(props.state),
+                  access(props.flexDirection) ?? TOASTS_DEFAULTS.flexDirection,
+                  access(props.gap) ?? TOASTS_DEFAULTS.gap,
+              )
             : undefined,
     );
 
@@ -76,7 +83,7 @@ export const PageToastContent = (props: ToastContentProps) => {
                         styles.toastKindVariants[access(props.toast).value.kind],
                         access(props.visibilityTarget) === 1
                             ? styles.toastAnimationOn
-                            : styles.toastAnimationOffVariants[access(props.animation)],
+                            : styles.toastAnimationOffVariants[access(props.animation) ?? DEFAULT_ANIMATION],
                     ].join(" ")}
                     style={{
                         transition: `transform ${access(props.transitionDurationMs)}ms, opacity ${access(props.transitionDurationMs)}ms`,
@@ -90,6 +97,8 @@ export const PageToastContent = (props: ToastContentProps) => {
                             {access(props.toast).durationMs === undefined && " · stays until dismissed"}
                             {access(props.state).isPaused && " · paused"}
                         </div>
+
+                        {props.children}
                     </div>
 
                     <Button

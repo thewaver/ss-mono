@@ -6,27 +6,33 @@ import PageTooltipContent from "../../StyledComponents/TooltipContent/TooltipCon
 
 export * from "@thewaver/ss-playground/App/Pages/TreePage/TreeNodes.const";
 
-export const FILES_WITH_REACHABLE: TreeNode<string>[] = [
+const toDisabledNode = (
+    value: string,
+    reason: string,
+    isReachable: boolean,
+    children?: TreeNode<string>[],
+): TreeNode<string> => ({
+    value,
+    children,
+    isDisabled: true,
+    isReachableWhenDisabled: isReachable,
+    tooltipDefs: {
+        placement: { x: "right_out", y: "center" },
+        offset: { x: 10, y: 0 },
+        renderContent: ({ visibilityTarget, transitionDurationMs }) =>
+            h(PageTooltipContent, { visibilityTarget, transitionDurationMs }, () => reason),
+    },
+});
+
+export const createFilesWithDisabled = (isReachable: boolean): TreeNode<string>[] => [
     {
         value: "src",
         children: [
-            { value: "index.ts" },
-            {
-                value: "node_modules",
-                isDisabled: true,
-                isReachableWhenDisabled: true,
-                tooltipDefs: {
-                    placement: { x: "right_out", y: "center" },
-                    offset: { x: 10, y: 0 },
-                    renderContent: ({ visibilityTarget, transitionDurationMs }) =>
-                        h(
-                            PageTooltipContent,
-                            { visibilityTarget, transitionDurationMs },
-                            () => "Not indexed, so this one cannot be opened.",
-                        ),
-                },
-                children: [{ value: "solid-js" }],
-            },
+            toDisabledNode("index.ts", "Generated on build, so it cannot be picked.", isReachable),
+            toDisabledNode("Lib", "Locked while a release is cut. What is inside stays open to browse.", isReachable, [
+                { value: "Tree.tsx" },
+                { value: "Tree.utils.ts" },
+            ]),
             { value: "Playground", children: [{ value: "App.tsx" }] },
         ],
     },

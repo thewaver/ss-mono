@@ -35,6 +35,13 @@ export type BaseTooltipValues = {
      * keyboard — shows the next straight away. Only opening waits.
      */
     skipDelayWindowMs?: number;
+    /**
+     * Whether the anchor groups several controls rather than being one — a pair of date fields. Keyboard focus on
+     * any control inside it then shows the tooltip as focus on the anchor would, moving focus between those controls
+     * keeps it up, and the control holding focus is described by it, so a screen reader announces it from whichever
+     * control the reader is on. It is read when the tooltip is set up.
+     */
+    isAnchorGroup?: boolean;
 };
 
 export type BaseTooltipProps = BaseTooltipValues;

@@ -1,19 +1,34 @@
 import { type Locator, type Page, expect, test } from "@playwright/test";
 
-import { activeMatches, attributesOf, demo, inputValue, readout, tabIndex, turnDegrees } from "./helpers";
+import { activeMatches, attributesOf, docsDemo, docsSettled, inputValue, prop, tabIndex, turnDegrees } from "./helpers";
 
-const DEFAULT = demo("default");
-const STEPPED = demo("stepped");
-const PAIR = demo("pair");
-const DISABLED = demo("disabled");
-const DISABLED_PAIR = demo("disabledPair");
-const REACHABLE = demo("reachable");
-const ERRORED = demo("errored");
-const KNOB = demo("knob");
+const DOCS = "/src/App/Pages/RangePage/Docs";
+
+const DEFAULT = docsDemo(DOCS, "Basic");
+const STEPPED = docsDemo(DOCS, "Stepping");
+const PAIR = docsDemo(DOCS, "Pair");
+const TOOLTIP = docsDemo(DOCS, "Tooltip");
+const KNOB = docsDemo(DOCS, "Knob");
+const RIGHT_TO_LEFT = docsDemo(DOCS, "RightToLeft");
 
 const thumbs = (scope: string) => `${scope} input[type="range"]`;
 
 const valueOf = async (locator: Locator) => Number(await inputValue(locator));
+
+const knob = (page: Page, key: string) => page.locator(`${prop(key)} input`);
+
+/** The example's own readout, which shows what the owner holds. */
+const readoutOf = async (page: Page, scope: string) =>
+    ((await page.locator(`${scope} [data-readout]`).textContent()) ?? "").trim();
+
+/** The numbers a readout shows, in order. */
+const numbersIn = async (page: Page, scope: string) =>
+    ((await readoutOf(page, scope)).match(/-?\d+(\.\d+)?/g) ?? []).map(Number);
+
+const chooseOrientation = async (page: Page, name: string) => {
+    await page.locator(`${prop("orientation")} [role="combobox"]`).click();
+    await page.locator('[role="listbox"]').getByRole("option", { name, exact: true }).click();
+};
 
 /**
  * A pair of thumbs is two native inputs stacked over one painter, so nothing in the markup says which one
@@ -32,85 +47,112 @@ const dragFrom = async (page: Page, locator: Locator, from: number, to: number) 
 };
 
 test.beforeEach(async ({ page }) => {
-    await page.goto("/range");
+    await page.goto("/range/docs");
     await expect(page.locator(thumbs(DEFAULT))).toBeVisible();
+    await docsSettled(page);
 });
 
 test("one thumb is one native input and a pair is two, each naming itself", async ({ page }) => {
     await expect(page.locator(thumbs(DEFAULT)), "a single value is one input").toHaveCount(1);
     await expect(page.locator(thumbs(PAIR)), "and a pair is the same case rendered twice").toHaveCount(2);
 
-    expect(await attributesOf(page, thumbs(PAIR), "aria-label"), "each thumb carries its own name").toEqual([
-        "Lowest price",
-        "Highest price",
-    ]);
+    const pairNames = await attributesOf(page, thumbs(PAIR), "aria-label");
+
+    expect(pairNames[0], "each thumb carries a name").toBeTruthy();
+    expect(pairNames[1]).toBeTruthy();
+    expect(pairNames[0], "of its own").not.toBe(pairNames[1]);
     expect(
-        await attributesOf(page, thumbs(DEFAULT), "aria-label"),
+        (await attributesOf(page, thumbs(DEFAULT), "aria-label"))[0],
         "while a single thumb falls back to the control's",
-    ).toEqual(["Volume"]);
+    ).toBeTruthy();
 });
 
 test("no range uses the native disabled attribute, and only the reachable one keeps its tab stop", async ({ page }) => {
+    await knob(page, "isDisabled").click();
+    await knob(page, "tooltipIsReachableWhenDisabled").click();
+    await knob(page, "tooltipIsDisabled").click();
+
     await expect(page.locator("input[disabled]"), "disabled is aria-disabled here and never the attribute").toHaveCount(
         0,
     );
-    await expect(page.locator(thumbs(DISABLED))).toHaveAttribute("aria-disabled", "true");
+    await expect(page.locator(thumbs(DEFAULT))).toHaveAttribute("aria-disabled", "true");
+    await expect(page.locator(thumbs(TOOLTIP))).toHaveAttribute("aria-disabled", "true");
 
-    expect(await tabIndex(page.locator(thumbs(DISABLED))), "a disabled range is out of the tab order").toBe(-1);
+    expect(await tabIndex(page.locator(thumbs(DEFAULT))), "a disabled range is out of the tab order").toBe(-1);
     expect(
-        await tabIndex(page.locator(thumbs(REACHABLE))),
+        await tabIndex(page.locator(thumbs(TOOLTIP))),
         "while a reachable one stays in it, so its tooltip can be read",
     ).toBe(0);
+
+    await page.locator(thumbs(TOOLTIP)).hover({ force: true });
+    await expect(page.locator('[role="tooltip"]'), "and hovering it shows that tooltip").toBeVisible();
 });
 
 test("crossing is prevented by the inputs' own bounds rather than by a guard", async ({ page }) => {
     const low = page.locator(thumbs(PAIR)).first();
     const high = page.locator(thumbs(PAIR)).last();
 
-    await expect(low, "the low thumb's ceiling is the high thumb's current value").toHaveAttribute("max", "80");
-    await expect(high, "and the high thumb's floor is the low thumb's").toHaveAttribute("min", "20");
+    const lowValue = await inputValue(low);
+    const highValue = await inputValue(high);
+
+    await expect(low, "the low thumb's ceiling is the high thumb's current value").toHaveAttribute("max", highValue);
+    await expect(high, "and the high thumb's floor is the low thumb's").toHaveAttribute("min", lowValue);
 
     await low.focus();
     await page.keyboard.press("End");
 
-    expect(await valueOf(low), "so End stops at the neighbor rather than at the end of the scale").toBe(80);
-    expect(await readout(page, "pair"), "and the owner sees the clamped value").toContain("start: 80 | end: 80");
-    await expect(high, "with the neighbor's floor following it up").toHaveAttribute("min", "80");
+    expect(await valueOf(low), "so End stops at the neighbor rather than at the end of the scale").toBe(
+        Number(highValue),
+    );
+    expect(await numbersIn(page, PAIR), "and the owner sees the clamped value").toEqual([
+        Number(highValue),
+        Number(highValue),
+    ]);
+    await expect(high, "with the neighbor's floor following it up").toHaveAttribute("min", highValue);
 });
 
 test("two thumbs on the same value are not stuck, because the pointer's side breaks the tie", async ({ page }) => {
     const low = page.locator(thumbs(PAIR)).first();
     const high = page.locator(thumbs(PAIR)).last();
 
+    const pile = await valueOf(high);
+
     await low.focus();
     await page.keyboard.press("End");
-    expect(await readout(page, "pair"), "drive both thumbs onto one value").toContain("start: 80 | end: 80");
+    expect(await valueOf(low), "drive both thumbs onto one value").toBe(pile);
 
     await dragFrom(page, high, 0.4, 0.2);
 
-    expect(await valueOf(low), "pressing below the pile and dragging left frees the low thumb").toBeLessThan(80);
-    expect(await valueOf(high), "and leaves the high one where it was").toBe(80);
+    expect(await valueOf(low), "pressing below the pile and dragging left frees the low thumb").toBeLessThan(pile);
+    expect(await valueOf(high), "and leaves the high one where it was").toBe(pile);
 });
 
 test("stepping honors the step and stops at both ends of the scale", async ({ page }) => {
     const input = page.locator(thumbs(STEPPED));
+    const min = Number(await input.getAttribute("min"));
+    const max = Number(await input.getAttribute("max"));
+    const step = Number(await input.getAttribute("step"));
+
+    expect(max, "the example's scale has room for more than one step").toBeGreaterThan(min + step);
 
     await input.focus();
     await page.keyboard.press("Home");
 
-    expect(await valueOf(input), "Home is the floor").toBe(1);
-    expect(await readout(page, "stepped"), "which the owner sees in its own units").toContain("value: 1 of 5");
+    expect(await valueOf(input), "Home is the floor").toBe(min);
+    expect(await numbersIn(page, STEPPED), "which the owner sees").toEqual([min]);
 
     await page.keyboard.press("ArrowRight");
-    expect(await valueOf(input), "one press moves one step, not one unit of the scale").toBe(2);
+    expect(await valueOf(input), "one press moves one step").toBe(min + step);
 
     await page.keyboard.press("End");
     await page.keyboard.press("ArrowRight");
-    expect(await valueOf(input), "and the ceiling is a wall rather than a wrap").toBe(5);
+    expect(await valueOf(input), "and the ceiling is a wall rather than a wrap").toBe(max);
 });
 
 test("a vertical range puts the low value at the bottom", async ({ page }) => {
-    const input = page.locator("#verticalVolume");
+    await chooseOrientation(page, "vertical");
+
+    const input = page.locator(thumbs(DEFAULT));
 
     await input.focus();
 
@@ -128,7 +170,11 @@ test("a vertical range puts the low value at the bottom", async ({ page }) => {
 });
 
 test("a disabled range refuses both the write and the focus", async ({ page }) => {
-    const input = page.locator(thumbs(DISABLED));
+    await knob(page, "isDisabled").click();
+
+    const input = page.locator(thumbs(DEFAULT));
+    const before = await valueOf(input);
+    const heard = await readoutOf(page, DEFAULT);
     const box = (await input.boundingBox())!;
 
     await page.mouse.click(box.x + box.width * 0.9, box.y + box.height * 0.5);
@@ -136,9 +182,9 @@ test("a disabled range refuses both the write and the focus", async ({ page }) =
     expect(
         await valueOf(input),
         "the browser moves a range before it reports, so the sync writes state back over it",
-    ).toBe(25);
-    expect(await readout(page, "disabled"), "and the owner never hears about it").toContain("value: 25");
-    expect(await activeMatches(page, thumbs(DISABLED)), "the mousedown refusal also keeps focus off it").toBe(false);
+    ).toBe(before);
+    expect(await readoutOf(page, DEFAULT), "and the owner never hears about it").toBe(heard);
+    expect(await activeMatches(page, thumbs(DEFAULT)), "the mousedown refusal also keeps focus off it").toBe(false);
 });
 
 /**
@@ -149,8 +195,11 @@ test("a disabled range refuses both the write and the focus", async ({ page }) =
  * one no other variant on the page can show.
  */
 test("a disabled pair takes both of its thumbs out of the tab order, not just the wrapper's own", async ({ page }) => {
-    const low = page.locator(thumbs(DISABLED_PAIR)).first();
-    const high = page.locator(thumbs(DISABLED_PAIR)).last();
+    await knob(page, "pairIsDisabled").click();
+
+    const low = page.locator(thumbs(PAIR)).first();
+    const high = page.locator(thumbs(PAIR)).last();
+    const before = await readoutOf(page, PAIR);
 
     expect(await tabIndex(low), "the thumb the wrapper holds is skipped").toBe(-1);
     expect(await tabIndex(high), "and so is the one it never saw").toBe(-1);
@@ -159,27 +208,25 @@ test("a disabled pair takes both of its thumbs out of the tab order, not just th
 
     await page.mouse.click(box.x + box.width * 0.9, box.y + box.height * 0.5);
 
-    expect(await activeMatches(page, thumbs(DISABLED_PAIR)), "neither thumb takes focus from a click").toBe(false);
-    expect(await readout(page, "disabledPair"), "and the value is where it started").toContain("start: 35 | end: 65");
+    expect(await activeMatches(page, thumbs(PAIR)), "neither thumb takes focus from a click").toBe(false);
+    expect(await readoutOf(page, PAIR), "and the value is where it started").toBe(before);
 });
 
-test("the owner's error reaches the element as ARIA, and leaves when the owner's rule stops holding", async ({
-    page,
-}) => {
-    const input = page.locator(thumbs(ERRORED));
+test("the owner's error reaches the element as ARIA, and leaves when the owner clears it", async ({ page }) => {
+    const input = page.locator(thumbs(DEFAULT));
+
+    await expect(input, "no error is claimed before the owner sets one").not.toHaveAttribute("aria-invalid", "true");
+
+    await knob(page, "hasError").click();
 
     await expect(input, "the error state is published rather than only painted").toHaveAttribute(
         "aria-invalid",
         "true",
     );
 
-    await input.focus();
-    await page.keyboard.press("Home");
+    await knob(page, "hasError").click();
 
-    await expect(input, "and it clears when the value stops breaking the consumer's rule").not.toHaveAttribute(
-        "aria-invalid",
-        "true",
-    );
+    await expect(input, "and it clears when the owner clears it").not.toHaveAttribute("aria-invalid", "true");
 });
 
 /**
@@ -187,9 +234,12 @@ test("the owner's error reaches the element as ARIA, and leaves when the owner's
  * right and angles growing clockwise) and 270° of sweep from there, so straight up is the middle of the
  * scale and straight right is five sixths of it. A point is named by where it sits on the knob's box, and
  * the box is read from the native input, which is laid over the knob edge to edge and is the rectangle the
- * component itself measures.
+ * component itself measures. The knob sits far down the Docs page, so it is scrolled on screen first: a mouse
+ * press below the window lands nowhere.
  */
 const knobPoint = async (page: Page, where: "top" | "right" | "left") => {
+    await page.locator(thumbs(KNOB)).scrollIntoViewIfNeeded();
+
     const box = (await page.locator(thumbs(KNOB)).boundingBox())!;
     const center = { x: box.x + box.width * 0.5, y: box.y + box.height * 0.5 };
     const reach = Math.min(box.width, box.height) * 0.4;
@@ -201,18 +251,25 @@ const knobPoint = async (page: Page, where: "top" | "right" | "left") => {
 
 const KNOB_POINTER = `${KNOB} [style*="rotate("]`;
 
+/** The knob prints its own value, and that print is hidden from screen readers, which hear the input's value. */
+const knobPrint = async (page: Page) =>
+    Number(((await page.locator(`${KNOB} [aria-hidden="true"]`).last().textContent()) ?? "").trim());
+
 test("the knob is still one named slider the keyboard steps", async ({ page }) => {
     const input = page.locator(thumbs(KNOB));
 
     await expect(input, "a knob is the same native range input underneath").toHaveCount(1);
-    await expect(input, "named for a screen reader").toHaveAttribute("aria-label", "Gain");
-    expect(await valueOf(input), "starting where the owner put it").toBe(30);
+    expect(await input.getAttribute("aria-label"), "named for a screen reader").toBeTruthy();
+
+    const before = await valueOf(input);
+
+    expect(await knobPrint(page), "the knob prints the value the input holds").toBe(before);
 
     await input.focus();
     await page.keyboard.press("ArrowRight");
 
-    expect(await valueOf(input), "and the arrow keys still step it").toBe(31);
-    expect(await readout(page, "knob"), "which the owner hears").toContain("value: 31");
+    expect(await valueOf(input), "and the arrow keys still step it").toBe(before + 1);
+    expect(await knobPrint(page), "which the knob shows").toBe(before + 1);
 });
 
 /**
@@ -229,7 +286,7 @@ test("pressing the knob reads the pointer's angle, not the native thumb's positi
     await page.mouse.down();
 
     expect(await valueOf(input), "a press at the right reads five sixths of the way round").toBe(83);
-    expect(await readout(page, "knob"), "and the owner is told at once").toContain("value: 83");
+    expect(await knobPrint(page), "and the knob shows it at once").toBe(83);
     await expect(input, "the press takes focus, so the keyboard carries on from there").toBeFocused();
 
     await page.mouse.up();
@@ -254,15 +311,13 @@ test("dragging round the knob turns it, and the browser's own thumb never wins",
     await page.mouse.move(left.x, left.y, { steps: 8 });
 
     expect(await valueOf(input), "dragging anticlockwise to the left turns it down to one sixth").toBe(17);
-    expect(await readout(page, "knob"), "and the owner follows every move").toContain("value: 17");
+    expect(await knobPrint(page), "and the knob follows every move").toBe(17);
 
     await page.mouse.up();
 
     expect(await valueOf(input), "letting go keeps the value the drag ended on").toBe(17);
-    expect(await readout(page, "knob")).toContain("value: 17");
+    expect(await knobPrint(page)).toBe(17);
 });
-
-const RIGHT_TO_LEFT = demo("rightToLeft");
 
 /**
  * The thumbs the Playground's painter draws, as screen boxes. They are the painter's, with no hook of their own, so

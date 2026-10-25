@@ -38,6 +38,7 @@
     let props: PageApiViewProps = $props();
 
     let currentEntry: DocsTableOfContentsEntry | undefined;
+    let hasOpened = false;
     let stopHashHold: (() => void) | undefined;
 
     onDestroy(() => stopHashHold?.());
@@ -99,6 +100,12 @@
 
     const handleCurrentChange = (entry: DocsTableOfContentsEntry | undefined) => {
         currentEntry = entry;
+
+        if (!hasOpened) {
+            hasOpened = true;
+
+            return;
+        }
 
         if (!stopHashHold) replaceHash(entry);
     };

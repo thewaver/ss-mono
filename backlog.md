@@ -46,10 +46,8 @@ reading.
 12. `Die`'s step buttons and arrow keys fall into a loop of two or three faces — _open, no fix chosen_
 13. The Playground's painters in Windows high-contrast mode — _open, decided, not yet built_
 14. A long `Select` list costs as much to draw as its options do — _open, no fix known_
-15. The docs' text names WCAG criteria and props as plain text — _open, decided, not yet built_
-16. Docs pages built in Solid only, waiting for their ports and specs — _open, decided, not yet built_
-17. A text field's leading and trailing slots ignore the reading direction — _open, decided, not yet built_
-18. Checkbox and Toggle draw only their box, so they need a Label to show any text — _open, decided, not yet built_
+15. Specs for the Essentials Docs pages — _one spec left_
+16. A sweep of page-wide behaviors that could earn a setting — _planned, not yet scoped_
 
 ---
 
@@ -470,104 +468,21 @@ other answer is known; this stays open in case one turns up.
 
 ---
 
-## 15. The docs' text names WCAG criteria and props as plain text
+## 15. Specs for the Essentials Docs pages
 
-The Docs pages' alerts link each WCAG criterion they name to W3C's explanation page for it — Carousel's and
-SlideButton's, through `WCAG_URLS` in `playground/src/App/PageComponents/DocsAlert/DocsAlert.const.ts`. Everywhere
-else in the docs a criterion is named as plain text, so a reader who wants to know what it asks has to look it up.
-
-**Decided by the user: every mention in the docs gets a link**, to the same kind of page — W3C's explanation
-page, `https://www.w3.org/WAI/WCAG22/Understanding/<name>.html`, which quotes the rule before explaining it. Two
-places are left:
-
-- **A page's intro.** The intros in `MenuDescriptions.const.ts` are plain strings, shown at the top of each Docs
-  view in all four Playgrounds, so they cannot hold a link. One mentions WCAG today: `KeyboardShortcuts`', naming
-  2.1.4. The intros need a form that can carry a link, and every Docs view a way to draw it.
-- **The API tables.** About twenty documentation blocks in `components/src` and the framework packages name a
-  criterion, and the `Use` column shows each block as plain text. The table builder, `playground/vite/componentApi.ts`,
-  has to turn a link written in a block (`{@link url text}`) into a real link, and each block naming a criterion
-  is rewritten to carry one. A block cannot import `WCAG_URLS`, so it writes the address out.
-
-**Decided by the user, alongside: every prop name in the docs' prose is highlighted**, through one shared class so
-the look can change in one place. The class is `docsPropName` in
-`playground/src/App/PageComponents/DocsView/DocsView.css.ts`, `fontWeight: "bold"` for now; the user will restyle
-it. It covers the same prose as the links: section text, which `PageDocsSection` takes as a plain string today and so
-needs the same change as the intros; the intros; and the alert and info boxes, which already take markup. A prop is
-marked where it is named — `onInput`, `isLooping`, `setIsHeldByPage` — and a component's name is not.
-
-**The API tables' `Use` column highlights prop names too**, the user's call: the builder gives a prop named in a
-documentation block the same `docsPropName` class.
-
-**Intros and section text stay strings, carrying `RichText` tags**, the user leaving the choice between that and
-passing elements to Claude. One mechanism for both, and the reason is the ports: a string is copied between the four
-Playgrounds unchanged, where an element would be rewritten in each framework's syntax. Two tags, mapped through
-`RichText`'s own options: `[prop]onInput[/prop]`, drawn with `docsPropName`, and `[wcag id="2.5.7"]WCAG 2.5.7[/wcag]`,
-with `id` its one allowed attribute, drawn as a link to `WCAG_URLS[id]`. The text is the Playground's own, so
-nothing from outside reaches it. `PageDocsSection` and the Docs view's intro render their string through `RichText`;
-the alert and info boxes, which already take markup, use `docsPropName` and plain links directly.
-
-**Not in scope as asked:** the console warnings
-that name a criterion (`PanZoom`, `Shortcut`, `Label` and others), and the Command Palette example's readout, which
-is on an Examples page rather than in the docs.
+Every Essentials page's spec now runs against its Docs page in all four frameworks. One behavior made alongside the
+conversion still has no spec of its own: pressing Escape while dragging something inside a dialog should cancel the
+drag and leave the dialog open (`decisions.md`, the entry on an Escape already handled). No page holds a draggable
+control inside a dialog yet, so the spec needs one added to a Docs example first.
 
 ---
 
-## 16. Docs pages built in Solid only, waiting for their ports and specs
+## 16. A sweep of page-wide behaviors that could earn a setting
 
-The user's plan for the docs rework: each page is built in Solid and reviewed one at a time, and a later session ports
-the finished pages to React, Vue and Svelte and rewrites their specs. Each page below has its Docs view in Solid and
-still has its old Examples page in the other three; its `decisions.md` entry records what was decided.
-
-- **`Carousel`** — `carousel.spec.ts` and `spine.spec.ts` open the old Examples page and its shared panel.
-- **`EdgeFader`** — no spec.
-- **`Form`** — `form.spec.ts` opens the old page and asserts the disabled submit button, which the Docs page
-  replaced with a status line.
-- **`TextInput`** — `textInput.spec.ts` opens the old page and reads its readouts.
-- **`TextArea`** — `textArea.spec.ts` opens the old page and reads its readouts.
-- **`NumberInput`** and **`CurrencyInput`** — their specs open the old pages and read their readouts.
-- **`Select`** — `select.spec.ts` opens the old page, its examples' keys and its readouts; its new windowed-highlight
-  test drives the old `virtualized` example.
-- **`MultiSelect`**, **`Checkbox`**, **`Toggle`** and **`Radio`** — their specs open the old pages and read their
-  readouts.
-- **`Button`** — its Examples page is gone in Solid: Decorated and Hold to repeat moved to Docs, Pending and Copy were
-  removed. `button.spec.ts` still reads the old `decorated` readout and the removed examples.
-
-A port follows the Solid page as it stands, including the shared constants and types already in the shared
-Playground package. A spec is rewritten to the Docs page's routes and examples, asserting relationships rather than
-written-down values, per `rules/testing.md`.
-
----
-
-## 17. A text field's leading and trailing slots ignore the reading direction
-
-In right-to-left text, the typed text starts on the right, but a field's leading slot stays pinned to the left edge and
-its trailing slot to the right, and the placeholder stays aligned left. So a prefix such as "USD" or 👤︎ sits on the
-far side from where reading starts, and NumberInput's stepper sits at the start. Every text field shares this:
-TextInput, TextArea, NumberInput, CurrencyInput, DateInput, TimeInput.
-
-**Decided by the user: the slots follow the reading direction**, the way CSS's `inline-start` and `inline-end` do —
-leading at the start of the text, trailing at its end, and the placeholder aligned with the start. The work, in all four
-frameworks: the leading and trailing slots are positioned with `left` and `right` from `spreadPadding.paddingLeft` and
-`paddingRight` (Solid's `Primitives/TextField/TextField.tsx`, around its line 193 and 203); the text's inset is computed
-into `paddingLeft` and `paddingRight` (`TextFieldUtils.computeInset`); the placeholder is `textAlign: "left"` in
-`TextField.css.ts`. Moving all three onto inline-start and inline-end lets the browser do the flipping, with no need to
-read the direction in code. Check it in a real window in both directions, with a prefix, a trailing button and a
-placeholder. The `decisions.md` note that a field's sides are physical "because nothing else in the library is
-right-to-left aware" is out of date — fifteen components read the direction — and is corrected when this lands.
-
----
-
-## 18. Checkbox and Toggle draw only their box, so they need a Label to show any text
-
-Radio's Playground painter draws the option's text beside the radio, so a radio shows its own words; Checkbox's and
-Toggle's painters draw only the box or switch, which is why their Docs pages each needed a "Named by a Label" section.
-The library treats the three alike; the difference is the painters.
-
-**Decided by the user: Checkbox and Toggle draw their text as Radio does**, for consistency. The work: give
-`PageCheckboxContent` and `PageToggleContent` the text as children, laid out as `PageRadioContent` lays out its own, in
-all four Playgrounds; pass the text in every Checkbox and Toggle example; remove the "Named by a Label" sections from
-the two Docs pages (their `Docs/Labeled` files). A right-to-left example then shows the text swapping sides, as Radio's
-does.
+The user's plan: gather the behaviors the library fixes for the whole page and decide together which earn a way to
+change them, rather than one at a time. The first found: the shortcut that moves focus into the toast stacks is fixed at
+F8 and Shift+F8 since the stacks share one register, where a `hotkey` prop on each `Toasts` used to let a consumer
+change or switch it off — an app already using F8 now has no way out. Others are to be found in the sweep.
 
 ---
 

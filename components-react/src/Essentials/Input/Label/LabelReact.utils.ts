@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect } from "react";
+import { useEffect, useId, useLayoutEffect } from "react";
 
 import { LabelUtils } from "@thewaver/ss-components";
 
@@ -43,5 +43,34 @@ export namespace LabelReactUtils {
 
             return () => setControlId(undefined);
         }, [setControlId, id]);
+    };
+
+    /**
+     * Gives a caption inside a `Label` an id and tells the `Label` it is the caption, so the control is named by the
+     * caption's words alone.
+     *
+     * A `<label>` names its control from all the text inside it, so a control drawing a named button of its own — a
+     * date picker's calendar button — would be announced with the button's name folded in. Once a caption registers
+     * here, the controls inside point `aria-labelledby` at it instead; the `<label>` element stays, so pressing the
+     * caption still focuses the control. A caption that never registers leaves the `<label>` to name the control as a
+     * native one does. Outside a `Label` it does nothing, and the caption is withdrawn when it unmounts.
+     *
+     * @param id The caption's own id, if it has one. Left out, an id is generated.
+     * @returns The id to put on the caption's element, or the caller's own id outside a `Label`.
+     */
+    export const useCaptionId = (id?: string) => {
+        const labelContext = useLabelContext();
+        const fallbackId = useId();
+        const { setCaptionId } = labelContext;
+
+        const captionId = labelContext.getIsLabeled() ? (id ?? fallbackId) : id;
+
+        useLayoutEffect(() => {
+            setCaptionId(captionId);
+
+            return () => setCaptionId(undefined);
+        }, [setCaptionId, captionId]);
+
+        return captionId;
     };
 }

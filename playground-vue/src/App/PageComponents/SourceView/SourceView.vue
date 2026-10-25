@@ -2,7 +2,7 @@
 import { computed, shallowRef, watch } from "vue";
 
 import { Accordion, Scroller, Tabs, useViewportContext } from "@thewaver/ss-components-vue";
-import type { AccordionItem, Tab } from "@thewaver/ss-components-vue";
+import type { AccordionItem, ScrollerController, Tab } from "@thewaver/ss-components-vue";
 import {
     MODAL_MARGIN_HEIGHT,
     SECTION_GAP,
@@ -35,6 +35,17 @@ let loadToken = 0;
 const groups = shallowRef<SourceGroup[]>([]);
 const selectedGroup = shallowRef<SourceGroup>();
 const expandedNames = shallowRef<string[]>([]);
+const tabsController = shallowRef<ScrollerController>();
+
+const isTabsScrollable = computed(() => {
+    const stepper = tabsController.value?.x;
+
+    return stepper !== undefined && !(stepper.getIsAtStart() && stepper.getIsAtEnd());
+});
+
+const setTabsController = (controller: ScrollerController) => {
+    tabsController.value = controller;
+};
 
 const selectGroup = (group: SourceGroup | undefined) => {
     selectedGroup.value = group;
@@ -78,41 +89,45 @@ watch(
         :style="{ maxHeight: `${viewportContext.getSize().height - MODAL_MARGIN_HEIGHT}px` }"
     >
         <div :class="styles.sourceViewTabs">
-            <Scroller :gap="TAB_GAP" :padding="FOCUS_RING_WIDTH">
-                <template #renderButton="{ step, stepper }">
-                    <PageScrollerButton :step="step" :stepper="stepper" />
-                </template>
+            <div :class="styles.sourceViewTabsRow">
+                <PageScrollerButton v-if="isTabsScrollable" :controller="tabsController" step="previous" />
 
-                <Tabs
-                    orientation="horizontal"
-                    :tab-gap="TAB_GAP"
-                    ariaLabel="Source files"
-                    :tabs="tabs"
-                    :selected-value="selectedGroup"
-                    @selection-change="selectGroup"
-                >
-                    <template #renderGutter>
-                        <PageTabGutter orientation="horizontal" />
-                    </template>
-
-                    <template #renderSelectionFloater="{ visibilityTarget, transitionDurationMs }">
-                        <PageTabFloater
+                <div :class="styles.sourceViewTabsCell">
+                    <Scroller :padding="FOCUS_RING_WIDTH" @mount="setTabsController">
+                        <Tabs
                             orientation="horizontal"
-                            :visibility-target="visibilityTarget"
-                            :transition-duration-ms="transitionDurationMs"
-                        />
-                    </template>
-
-                    <template #renderTab="{ tab, flags }">
-                        <PageTabContent
-                            :flags="flags"
-                            orientation="horizontal"
-                            :is-selected="tab.value === selectedGroup"
-                            >{{ tab.value.name }}</PageTabContent
+                            :tab-gap="TAB_GAP"
+                            ariaLabel="Source files"
+                            :tabs="tabs"
+                            :selected-value="selectedGroup"
+                            @selection-change="selectGroup"
                         >
-                    </template>
-                </Tabs>
-            </Scroller>
+                            <template #renderGutter>
+                                <PageTabGutter orientation="horizontal" />
+                            </template>
+
+                            <template #renderSelectionFloater="{ visibilityTarget, transitionDurationMs }">
+                                <PageTabFloater
+                                    orientation="horizontal"
+                                    :visibility-target="visibilityTarget"
+                                    :transition-duration-ms="transitionDurationMs"
+                                />
+                            </template>
+
+                            <template #renderTab="{ tab, flags }">
+                                <PageTabContent
+                                    :flags="flags"
+                                    orientation="horizontal"
+                                    :is-selected="tab.value === selectedGroup"
+                                    >{{ tab.value.name }}</PageTabContent
+                                >
+                            </template>
+                        </Tabs>
+                    </Scroller>
+                </div>
+
+                <PageScrollerButton v-if="isTabsScrollable" :controller="tabsController" step="next" />
+            </div>
         </div>
 
         <div :class="styles.sourceViewPanel">

@@ -1,7 +1,4 @@
-import type { AccessorProps, FlyoutMenuEntryRecord } from "@thewaver/ss-components-solid";
+import type { AccessorValues } from "@thewaver/ss-components-solid";
+import type { BaseFlyoutMenuBasicDocsExampleValues } from "@thewaver/ss-playground/App/Pages/Menus/FlyoutMenuPage/FlyoutMenuPage.types";
 
-export type FlyoutMenuExampleProps = AccessorProps<{
-    entries: FlyoutMenuEntryRecord<string>[];
-    hoverShowDelayMs: number;
-    transitionDurationMs: number;
-}>;
+export type FlyoutMenuBasicDocsExampleProps = AccessorValues<BaseFlyoutMenuBasicDocsExampleValues>;

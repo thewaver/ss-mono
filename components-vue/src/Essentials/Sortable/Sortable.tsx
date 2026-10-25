@@ -552,6 +552,7 @@ export const Sortable = defineComponent(
                         <Teleport to={viewportContext.getPortalRef() ?? document.body}>
                             <div
                                 class={SortableStyles.sortableCarried}
+                                dir={direction.value}
                                 style={{
                                     transform: `translate(${carriedPoint.value.x - grabOffset.x}px, ${carriedPoint.value.y - grabOffset.y}px)`,
                                     width: `${carriedSize.value?.width ?? 0}px`,

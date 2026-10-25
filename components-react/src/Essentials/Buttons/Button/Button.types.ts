@@ -1,6 +1,6 @@
 import type { KeyboardEvent, MouseEvent, PointerEvent } from "react";
 
-import type { BaseButtonValues, ButtonFlags, ButtonType } from "@thewaver/ss-components";
+import type { BaseButtonValues, ButtonFlags } from "@thewaver/ss-components";
 
 import type {
     InteractionControlProps,
@@ -24,11 +24,7 @@ export type ButtonCbs = {
     onMouseLeave?: (e: MouseEvent<HTMLButtonElement>) => void;
 };
 
-export type ButtonElementProps = ButtonCbs &
-    InteractionControlProps<ButtonFlags> & {
-        /** What the button does inside a form: nothing, submit it, or reset it. */
-        type?: ButtonType;
-    };
+export type ButtonElementProps = ButtonCbs & InteractionControlProps<ButtonFlags> & BaseButtonValues;
 
 export type ButtonProps = Omit<InteractionWrapperProps<ButtonFlags>, "renderControl" | "extraFlags"> &
     ButtonCbs &

@@ -21,6 +21,20 @@ export const ACTIONS_WITH_REACHABLE: MenuItem<Action>[] = [
                 h(PageTooltipContent, { visibilityTarget, transitionDurationMs }, () => "The clipboard is empty."),
         },
     },
-    { value: { name: "Duplicate" } },
+    {
+        value: { name: "Duplicate" },
+        isDisabled: true,
+        isReachableWhenDisabled: true,
+        tooltipDefs: {
+            placement: { x: "right_out", y: "center" },
+            offset: { x: 10, y: 0 },
+            renderContent: ({ visibilityTarget, transitionDurationMs }) =>
+                h(
+                    PageTooltipContent,
+                    { visibilityTarget, transitionDurationMs },
+                    () => "Nothing is selected to duplicate.",
+                ),
+        },
+    },
     { value: { name: "Delete", shortcut: "Del" } },
 ];

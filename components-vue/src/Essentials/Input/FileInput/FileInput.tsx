@@ -18,12 +18,11 @@ import { exposeElement, toElement } from "../../../Utils/refUtils";
 import { useStore } from "../../../Utils/storeUtils";
 import type { SlotsContext } from "../../../Utils/typeUtils";
 import { FormFieldVueUtils } from "../FormField/FormFieldVue.utils";
-import { LabelVueUtils } from "../Label/LabelVue.utils";
 import type { FileInputElementProps, FileInputProps, FileInputSlots } from "./FileInput.types";
 
 const FileInputElement = defineComponent(
     (props: FileInputElementProps, { slots, expose }: SlotsContext<InteractionControlSlots<FileInputRenderProps>>) => {
-        const ariaLabel = LabelVueUtils.useAriaLabel(() => props.ariaLabel);
+        const { ariaLabel, ariaLabelledBy } = FormFieldVueUtils.useAriaName(() => props.ariaLabel);
         const ariaDescribedBy = FormFieldVueUtils.useAriaDescribedBy();
 
         const elementRef = shallowRef<HTMLInputElement>();
@@ -57,6 +56,7 @@ const FileInputElement = defineComponent(
                         accept={props.accept}
                         multiple={props.isMultiple ?? FILE_INPUT_DEFAULTS.isMultiple}
                         aria-label={ariaLabel.value}
+                        aria-labelledby={ariaLabelledBy.value}
                         aria-describedby={ariaDescribedBy.value}
                         aria-disabled={isDisabled || undefined}
                         aria-invalid={props.flags.hasError || undefined}

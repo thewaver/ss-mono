@@ -17,6 +17,7 @@ import type {
 } from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.types";
 
 import { PageTableOfContentsContent } from "../../StyledComponents/TableOfContentsContent/TableOfContentsContent";
+import { PageDocsProse } from "../DocsProse/DocsProse";
 import { DocsViewContextProvider } from "./DocsView.context";
 import type { PageDocsViewProps } from "./DocsViewReact.types";
 
@@ -53,7 +54,7 @@ export const PageDocsView = (props: PropsWithChildren<PageDocsViewProps>) => {
         <div className={styles.docsLayout} data-view={"docs"}>
             <div className={styles.docsView}>
                 <p ref={setIntro} id={toDocsSectionId(DOCS_INTRO_TITLE)} className={styles.docsLead}>
-                    {props.description}
+                    <PageDocsProse content={props.description} />
                 </p>
 
                 <DocsViewContextProvider value={registration}>{props.children}</DocsViewContextProvider>

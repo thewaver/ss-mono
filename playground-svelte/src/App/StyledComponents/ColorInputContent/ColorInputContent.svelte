@@ -22,6 +22,6 @@
     <div class={styles.colorInputSwatch} style:background-color={props.renderProps.value}></div>
 
     {#if !props.isCompact}
-        <div class={styles.colorInputValue}>{props.renderProps.value}</div>
+        <div class={styles.colorInputValue} dir="ltr">{props.renderProps.value}</div>
     {/if}
 </div>

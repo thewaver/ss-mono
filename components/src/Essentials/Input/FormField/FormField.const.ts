@@ -10,6 +10,7 @@ export const FORM_FIELD_ORIENTATIONS: readonly FormFieldOrientation[] = ["vertic
 
 export const UNDESCRIBED_CONTEXT: FormFieldContextType = {
     getDescriptionId: () => undefined,
+    getCaptionId: () => undefined,
     registerControl: () => undefined,
     unregisterControl: () => undefined,
 };

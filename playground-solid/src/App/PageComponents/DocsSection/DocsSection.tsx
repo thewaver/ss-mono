@@ -1,15 +1,15 @@
-import type { ParentProps } from "solid-js";
 import { onCleanup } from "solid-js";
 
 import { access } from "@thewaver/ss-components-solid";
 import { toDocsSectionId } from "@thewaver/ss-playground/App/PageComponents/DocsSection/DocsSection.utils";
 import * as styles from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.css";
 
+import { PageDocsProse } from "../DocsProse/DocsProse";
 import { useDocsViewContext } from "../DocsView/DocsView.context";
 import { useIsPreview } from "../Preview/Preview.context";
 import type { PageDocsSectionProps } from "./DocsSectionSolid.types";
 
-export const PageDocsSection = (props: ParentProps<PageDocsSectionProps>) => {
+export const PageDocsSection = (props: PageDocsSectionProps) => {
     if (useIsPreview()) return null;
 
     const docsView = useDocsViewContext();
@@ -28,7 +28,9 @@ export const PageDocsSection = (props: ParentProps<PageDocsSectionProps>) => {
                 {access(props.title)}
             </h2>
 
-            <p class={styles.docsLead}>{props.children}</p>
+            <p class={styles.docsLead}>
+                <PageDocsProse content={props.content} />
+            </p>
         </section>
     );
 };

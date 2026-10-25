@@ -8,18 +8,11 @@ import type {
     MenuItemFlags,
 } from "@thewaver/ss-components-vue";
 import type { MenubarEntry } from "@thewaver/ss-playground/App/Pages/MenubarPage/MenubarEntry.types";
+import type { BaseMenubarOverflowDocsExampleValues } from "@thewaver/ss-playground/App/Pages/MenubarPage/MenubarPage.types";
 
 export type { MenubarEntry } from "@thewaver/ss-playground/App/Pages/MenubarPage/MenubarEntry.types";
 
-export type MenubarExampleProps = {
-    "checked": MenubarEntry[];
-    "onUpdate:checked"?: (checked: MenubarEntry[]) => void;
-    "onActivate": (entry: MenubarEntry) => void;
-};
-
-export type MenubarFrameProps = {
-    width: number;
-};
+export type MenubarOverflowDocsExampleProps = BaseMenubarOverflowDocsExampleValues;
 
 export type MenubarPopupProps = {
     renderItems: () => VNodeChild;

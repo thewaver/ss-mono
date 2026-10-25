@@ -95,9 +95,11 @@ export type CarouselSlots<T> = {
      *
      * **Anything that moves a slide without a swipe, and anything that stops it rotating, has to be built on these.**
      * The carousel draws its slides and nothing else, so the buttons belong to whoever is drawing the page and may sit
-     * anywhere on it. That matters beyond layout: a swipe is a dragging movement, so WCAG 2.5.7 asks for a
-     * single-pointer route that is not a drag — `step` and `pick` are it — and a carousel that advances by itself needs
-     * a way to pause it under WCAG 2.2.2, which `setIsPlaying` is. Wiring them up is the consumer's to do.
+     * anywhere on it. That matters beyond layout: a swipe is a dragging movement, so
+     * {@link https://www.w3.org/WAI/WCAG22/Understanding/dragging-movements.html WCAG 2.5.7} asks for a single-pointer
+     * route that is not a drag — `step` and `pick` are it — and a carousel that advances by itself needs a way to pause
+     * it under {@link https://www.w3.org/WAI/WCAG22/Understanding/pause-stop-hide.html WCAG 2.2.2}, which
+     * `setIsPlaying` is. Wiring them up is the consumer's to do.
      */
     onMount?: (controls: CarouselControls) => void;
 };

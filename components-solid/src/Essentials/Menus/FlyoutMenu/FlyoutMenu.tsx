@@ -152,7 +152,7 @@ export const FlyoutMenu = <T,>(props: FlyoutMenuProps<T>) => {
         getAnchorRef,
         getIsVisible,
         {
-            getPlacement: () => access(props.placement) ?? FLYOUT_MENU_DEFAULTS.placement,
+            getPlacement: (direction) => access(props.placement) ?? FLYOUT_MENU_DEFAULTS.placement[direction],
             getOffset: props.offset === undefined ? undefined : () => access(props.offset)!,
         },
     );

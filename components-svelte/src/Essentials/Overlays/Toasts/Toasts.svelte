@@ -1,10 +1,12 @@
 <script lang="ts" generics="T">
-    import { untrack } from "svelte";
+    import { onMount, untrack } from "svelte";
 
     import {
         LiveAnnouncerUtils,
+        type NavigatorDirection,
         TOASTS_DEFAULTS,
-        type Toast,
+        type ToastRequest,
+        type ToastsContextType,
         ToastUtils,
         ToastsStyles as styles,
     } from "@thewaver/ss-components";
@@ -12,19 +14,23 @@
 
     import { ElementObserverSvelteUtils } from "../../../Abstracts/ElementObserver/ElementObserverSvelte.utils.svelte.js";
     import { InteractionTrackerSvelteUtils } from "../../../Abstracts/InteractionTracker/InteractionTrackerSvelte.utils.svelte.js";
-    import { ShortcutSvelteUtils } from "../../../Abstracts/Shortcut/ShortcutSvelte.utils.svelte.js";
     import { getViewportContext } from "../../../Abstracts/Viewport/Viewport.context.js";
     import { attachPortal } from "../../../Utils/portalUtils.js";
     import { toStyle } from "../../../Utils/styleUtils.js";
-    import type { ToastsProps } from "./Toasts.types.js";
+    import { setToastsContext } from "./Toasts.context.js";
+    import type { Toast, ToastsProps } from "./Toasts.types.js";
     import ToastsItem from "./ToastsItem.svelte";
 
     const DEFAULT_MARGINS = CSSUtils.spreadMargin(0);
 
-    let { toasts = $bindable(), ...props }: ToastsProps<T> = $props();
+    let { toasts = $bindable([]), children, ...props }: ToastsProps<T> = $props();
 
     const viewportContext = getViewportContext();
     const portalTarget = $derived(viewportContext.getPortalRef() ?? document.body);
+
+    const registerOwner = {};
+
+    const directions = new Map<string, NavigatorDirection>();
 
     const lastSeen = new Map<string, Toast<T>>();
 
@@ -34,18 +40,15 @@
 
     const transitionDurationMs = $derived(props.transitionDurationMs ?? TOASTS_DEFAULTS.transitionDurationMs);
     const alignment = $derived(props.alignment ?? TOASTS_DEFAULTS.alignment);
-    const dir = $derived(props.dir ?? TOASTS_DEFAULTS.dir);
+    const flexDirection = $derived(props.flexDirection ?? TOASTS_DEFAULTS.flexDirection);
     const overflow = $derived(props.overflow ?? TOASTS_DEFAULTS.overflow);
     const margins = $derived(props.margins ?? DEFAULT_MARGINS);
-    const hotkey = $derived(props.hotkey === undefined ? TOASTS_DEFAULTS.hotkey : props.hotkey);
-    const politeness = $derived(props.ariaLive ?? TOASTS_DEFAULTS.ariaLive);
-    const stackAlignment = $derived(ToastUtils.computeStackAlignment(alignment, dir));
+    const stackAlignment = $derived(ToastUtils.computeStackAlignment(alignment, flexDirection));
     const swipeDirection = $derived(
         (props.isDismissableOnSwipe ?? TOASTS_DEFAULTS.isDismissableOnSwipe)
             ? ToastUtils.computeSwipeDirection(alignment)
             : undefined,
     );
-    const hasAnnouncer = $derived(props.computeAnnouncement !== undefined);
 
     const getIsPaused = InteractionTrackerSvelteUtils.trackHold(() => root ?? undefined);
 
@@ -61,14 +64,54 @@
         return next;
     });
 
-    $effect(() => {
-        if (!hasAnnouncer) return;
-
-        untrack(() => {
-            LiveAnnouncerUtils.reserve("polite");
-            LiveAnnouncerUtils.reserve("assertive");
-        });
+    onMount(() => {
+        LiveAnnouncerUtils.reserve("polite");
+        LiveAnnouncerUtils.reserve("assertive");
     });
+
+    $effect(() => {
+        const region = root;
+        const scope = portalTarget;
+        const stackAlignmentKey = alignment;
+
+        if (!region) return;
+
+        return untrack(() =>
+            ToastUtils.registerStack(registerOwner, {
+                region,
+                scope,
+                alignment: stackAlignmentKey,
+                getHasToasts: () => untrack(() => admitted).length > 0,
+            }),
+        );
+    });
+
+    const show = (toast: ToastRequest<Toast<T>>) => {
+        const prev = untrack(() => toasts);
+        const { toasts: next, id } = ToastUtils.withRequestedToast(prev, toast);
+
+        if (id === undefined) return undefined;
+
+        directions.set(id, ToastUtils.readRaiserDirection());
+        toasts = next;
+
+        return id;
+    };
+
+    const dismiss = (id: string) => {
+        const prev = untrack(() => toasts);
+        const next = ToastUtils.withoutToast(prev, id);
+
+        if (next === prev) return false;
+
+        toasts = next;
+
+        return true;
+    };
+
+    const context: ToastsContextType<Toast<T>> = { show, dismiss };
+
+    setToastsContext(context as ToastsContextType<Toast<unknown>>);
 
     $effect(() => {
         const next = admitted;
@@ -83,38 +126,12 @@
 
         untrack(() => {
             const previous = announcedIds;
-            const computeAnnouncement = props.computeAnnouncement;
 
             announcedIds = ids;
 
-            if (!computeAnnouncement) return;
-
-            ToastUtils.announceArrivals(previous, ids, admitted, computeAnnouncement, politeness);
+            ToastUtils.announceArrivals(previous, ids, admitted);
         });
     });
-
-    let focusRoute: ReturnType<typeof ToastUtils.createFocusRoute> | undefined;
-
-    $effect(() => {
-        const element = root;
-
-        if (!element) return;
-
-        const route = untrack(() => ToastUtils.createFocusRoute(element));
-
-        focusRoute = route;
-
-        return () => {
-            route.stop();
-            focusRoute = undefined;
-        };
-    });
-
-    ShortcutSvelteUtils.createBinding(
-        () => hotkey ?? undefined,
-        () => false,
-        () => focusRoute?.enter(),
-    );
 
     $effect(() => {
         const trimmed = ToastUtils.computeOverflowTrim(toasts, props.limit, overflow);
@@ -122,16 +139,11 @@
         if (trimmed) untrack(() => (toasts = trimmed));
     });
 
-    const dismiss = (id: string) => {
-        const next = ToastUtils.withoutToast(toasts, id);
-
-        if (next !== toasts) toasts = next;
-    };
-
     const handleExitEnd = (id: string) => {
         if (admitted.some((toast) => toast.id === id)) return;
 
         lastSeen.delete(id);
+        directions.delete(id);
         entryIds = entryIds.filter((entryId) => entryId !== id);
 
         if (!(id in entryRefs)) return;
@@ -153,7 +165,7 @@
     const style = $derived(
         toStyle({
             ...CSSUtils.spreadableToStyle(margins, (key) => key),
-            flexDirection: dir,
+            flexDirection,
             justifyContent: stackAlignment.justifyContent,
             alignItems: stackAlignment.alignItems,
             gap: `${props.gap ?? TOASTS_DEFAULTS.gap}px`,
@@ -162,15 +174,17 @@
     );
 </script>
 
+{@render children?.()}
+
 {#if portalTarget}
     <div
         bind:this={root}
         {@attach attachPortal(portalTarget)}
         class={styles.toastsRegion}
         {style}
+        dir="ltr"
         role="region"
         tabindex="-1"
-        aria-live={hasAnnouncer ? undefined : politeness}
         aria-label={props.ariaLabel}
     >
         {#each entryIds as id, index (id)}
@@ -186,9 +200,11 @@
                     {transitionDurationMs}
                     sizes={getEntrySizes()}
                     {swipeDirection}
-                    renderToast={props.renderToast}
+                    direction={directions.get(id) ?? ToastUtils.readPageDirection()}
+                    renderDefaultToast={props.renderToast}
                     onElapse={() => dismiss(id)}
                     onSwipeDismiss={() => dismiss(id)}
+                    onDismiss={() => dismiss(id)}
                     onExitEnd={() => handleExitEnd(id)}
                 />
             {/if}

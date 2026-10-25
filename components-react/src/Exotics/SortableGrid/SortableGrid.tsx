@@ -30,6 +30,7 @@ import { type Point2d, StoreUtils } from "@thewaver/ss-utils";
 
 import { CarrierReactUtils } from "../../Abstracts/Carrier/CarrierReact.utils";
 import { ElevationReactUtils } from "../../Abstracts/Elevation/ElevationReact.utils";
+import { NavigatorReactUtils } from "../../Abstracts/Navigator/NavigatorReact.utils";
 import { useViewportContext } from "../../Abstracts/Viewport/Viewport.context";
 import { LabelReactUtils } from "../../Essentials/Input/Label/LabelReact.utils";
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
@@ -158,6 +159,8 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
     const isSource = carryState !== undefined && carryState.from === zone;
     const isReceiving = carryState !== undefined && carryState.to === zone;
     const carriedKey = isSource ? carryState.carry.key : undefined;
+
+    const carriedDirection = NavigatorReactUtils.useDirection(rootRef, !props.renderCarried || !isSource);
 
     const latest = useLatest({ writeItems, blockedSpots, isTurnable, isSource, isReceiving });
 
@@ -528,6 +531,7 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
                 createPortal(
                     <div
                         className={SortableGridStyles.sortableGridCarried}
+                        dir={carriedDirection}
                         style={{
                             transform: `translate(${carriedPoint.x - grabOffsetRef.current.x}px, ${carriedPoint.y - grabOffsetRef.current.y}px)`,
                             width: `${getSpan(carriedGeometry?.size.colCount ?? 1)}px`,

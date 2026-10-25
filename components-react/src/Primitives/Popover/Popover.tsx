@@ -26,7 +26,7 @@ export const Popover = (props: PopoverProps) => {
 
     const { anchorRect, isAnchorOnScreen, placement, position, arrowAim, zIndex, setContentRef } =
         AnchorReactUtils.usePortalPosition(anchorRef, fader.isVisible, {
-            placement: props.placement ?? POPOVER_DEFAULTS.placement,
+            computePlacement: (direction) => props.placement ?? POPOVER_DEFAULTS.placement[direction],
             offset: props.offset,
             reservedScreenSize: props.reservedScreenSize,
             isPinned,

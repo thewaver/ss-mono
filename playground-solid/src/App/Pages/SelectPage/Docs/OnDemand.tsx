@@ -67,7 +67,7 @@ export const OnDemandDocsExample = () => {
                 onReachEnd={() => void fetchNext()}
             />
 
-            <div class={exampleStyles.exampleReadout}>
+            <div class={exampleStyles.exampleReadout} data-readout>
                 {`${getRoutes().length} of ${PAGED_TOTAL} routes fetched${getIsFetching() ? ", more on the way" : ""}`}
             </div>
         </>

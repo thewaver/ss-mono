@@ -5,15 +5,15 @@ import { TextFieldUtils } from "./TextField.utils";
 describe("resolvePadding", () => {
     it("spreads one number over every side", () => {
         expect(TextFieldUtils.resolvePadding(4)).toEqual({
-            paddingTop: 4,
-            paddingRight: 4,
-            paddingBottom: 4,
-            paddingLeft: 4,
+            paddingBlockStart: 4,
+            paddingInlineEnd: 4,
+            paddingBlockEnd: 4,
+            paddingInlineStart: 4,
         });
     });
 
     it("keeps four sides as given", () => {
-        const padding = { paddingTop: 1, paddingRight: 2, paddingBottom: 3, paddingLeft: 4 };
+        const padding = { paddingBlockStart: 1, paddingInlineEnd: 2, paddingBlockEnd: 3, paddingInlineStart: 4 };
 
         expect(TextFieldUtils.resolvePadding(padding)).toEqual(padding);
     });
@@ -75,5 +75,27 @@ describe("computeOverflowY", () => {
     it("scrolls a fixed textarea, and one that has reached its ceiling", () => {
         expect(TextFieldUtils.computeOverflowY("textarea", false, undefined)).toBe("auto");
         expect(TextFieldUtils.computeOverflowY("textarea", true, 5)).toBe("auto");
+    });
+});
+
+describe("mergeFlags", () => {
+    const field = { isEmpty: true, isReadOnly: false };
+
+    it("puts the group in any state one of its fields is in", () => {
+        const merged = TextFieldUtils.mergeFlags([
+            { ...field, isHovered: true },
+            { ...field, isFocusVisible: true, hasError: true },
+        ]);
+
+        expect(merged).toMatchObject({ isHovered: true, isFocusVisible: true, hasError: true, isDisabled: false });
+    });
+
+    it("calls the group empty only while every field is", () => {
+        expect(TextFieldUtils.mergeFlags([field, field]).isEmpty).toBe(true);
+        expect(TextFieldUtils.mergeFlags([field, { ...field, isEmpty: false }]).isEmpty).toBe(false);
+    });
+
+    it("answers a group of no fields with no state", () => {
+        expect(TextFieldUtils.mergeFlags([])).toMatchObject({ isHovered: false, isReadOnly: false, isEmpty: true });
     });
 });

@@ -4,7 +4,11 @@ import type { AnchorPlacement } from "../../../Abstracts/Anchor/Anchor.types";
 import type { ClockSteps } from "../Clock/Clock.types";
 
 export type BaseTimePickerValues = {
-    /** Where the clock sits against the field. */
+    /**
+     * Where the clock sits against the field. Left out, it hangs below the field lined up with the edge the text
+     * starts from: the left, or the right where the field sits in right-to-left text. Given, it is used as it stands
+     * in either direction.
+     */
     placement?: AnchorPlacement;
     /** How far the clock is held clear of the field. */
     offset?: Point2d;
@@ -25,7 +29,10 @@ export type BaseTimePickerValues = {
      * owns the trigger.
      */
     triggerId?: string;
-    /** Names the control that opens the clock. */
+    /**
+     * Names the control that opens the clock. It is kept inside a `Label` too, since the caption names the field and
+     * the control is a second one with a name of its own.
+     */
     triggerAriaLabel: string;
 };
 

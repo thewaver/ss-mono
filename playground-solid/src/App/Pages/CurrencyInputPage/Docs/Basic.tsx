@@ -1,6 +1,7 @@
 import { createSignal } from "solid-js";
 
 import { CurrencyInput } from "@thewaver/ss-components-solid";
+import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
 import { STARTING_PRICE } from "@thewaver/ss-playground/App/Pages/CurrencyInputPage/CurrencyInputPage.const";
 import {
     FIELD_GAP,
@@ -22,19 +23,25 @@ export const BasicDocsExample = (props: Props) => {
     const valueSignal = createSignal<number | undefined>(STARTING_PRICE);
 
     return (
-        <CurrencyInput
-            value={valueSignal}
-            isReadOnly={props.isReadOnly}
-            hasError={props.hasError}
-            isDisabled={props.isDisabled}
-            padding={FIELD_STEPPER_PADDING}
-            gap={FIELD_GAP}
-            ariaLabel={"Price"}
-            computeTextStyle={computePageTextFieldTextStyle}
-            renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} width={FIELD_WIDTH} />}
-            renderPlaceholder={(getFlags, hint) => (
-                <PageTextFieldPlaceholder flags={getFlags}>{hint}</PageTextFieldPlaceholder>
-            )}
-        />
+        <>
+            <CurrencyInput
+                value={valueSignal}
+                isReadOnly={props.isReadOnly}
+                hasError={props.hasError}
+                isDisabled={props.isDisabled}
+                padding={FIELD_STEPPER_PADDING}
+                gap={FIELD_GAP}
+                ariaLabel={"Price"}
+                computeTextStyle={computePageTextFieldTextStyle}
+                renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} width={FIELD_WIDTH} />}
+                renderPlaceholder={(getFlags, hint) => (
+                    <PageTextFieldPlaceholder flags={getFlags}>{hint}</PageTextFieldPlaceholder>
+                )}
+            />
+
+            <div class={exampleStyles.exampleReadout} data-readout>
+                {`Value: ${valueSignal[0]() ?? "nothing"}`}
+            </div>
+        </>
     );
 };

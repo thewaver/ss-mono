@@ -3135,16 +3135,27 @@ They do not go through `renderDecoration` because that slot is one full-box over
 control, while these are positional, text-specific and drive the input's padding. Nor are they one prop
 taking a side — _"one slot, not layered slots"_ was about stacking, and these reserve opposite ends.
 
-Named leading/trailing for **role, not axis**. They were briefly positioned with `inset-inline-start` /
-`inset-inline-end` on the argument that following the writing direction costs only a property name; that
-argument is withdrawn. Adopting `CSSPadding` made it incoherent, since `paddingLeft` is physical and
-feeding it into a logical property is a lie the moment anything is RTL. Physical throughout is honest
-while nothing else in the library is RTL-aware — `getDir` on `Label` and `RadioGroup` means flex
-direction, not writing direction. Going RTL later means changing the CSS, not the prop names.
+Named leading/trailing for **role, not axis**, and **placed by the reading direction** — the user's call, reversing
+an earlier "sides are physical" choice whose reason (nothing else in the library was right-to-left aware) stopped
+holding. The leading slot sits at `inset-inline-start`, the trailing one at `inset-inline-end`, and the text's inset is
+`padding-inline-start` / `padding-inline-end`, so the browser does the flipping and no code reads the direction. In
+right-to-left text a prefix sits on the right, where reading starts, and `NumberInput`'s stepper on the left.
+
+**The `padding` prop is logical too, on all four sides** — `CSSLogicalPadding`, `{ paddingBlockStart,
+paddingInlineEnd, paddingBlockEnd, paddingInlineStart }`, CSS's own names. The user's call, over three others weighed
+together: keeping `paddingLeft`/`paddingRight` and mapping them inside (a name pointing at the wrong side in
+right-to-left text), React Native's `paddingStart`/`paddingEnd` (rejected as "the worst of both worlds": new vocabulary
+that does not map directly to CSS), and keeping the names physical while reading the direction in code (the backlog
+item had ruled that out). The Playground's stepper fields are why it matters: they set 5 on the trailing side for the
+stepper, and that 5 must travel with it. **`CSSPadding` became `CSSPhysicalPadding`** (and `spreadPadding`
+`spreadPhysicalPadding`) in the same change, under _"When a function grows a sibling, both names get the distinguishing
+word"_. `CommandPalette`'s `fieldPadding` feeds a `TextField` and is logical. **`Select`'s `padding` is logical as well**, the
+user's call once its clear button was found pinned to the physical right in right-to-left text: the button sits at
+`inset-inline-end`, and the Playground's Select painter aligns its value to `start`.
 
 **The field's inset is measured, not declared.** `getPadding` and `getGap` are what the consumer states;
-everything else is derived. `getPadding` takes `CSSPadding | number`, normalized through
-`CSSUtils.spreadPadding`, so one number spreads to four sides and per-side control needs no second prop.
+everything else is derived. `getPadding` takes `CSSLogicalPadding | number`, normalized
+through `CSSUtils.spreadLogicalPadding`, so one number spreads to four sides and per-side control needs no second prop.
 `CSSUtils.spreadableToStyle` renames the keys and adds the `px`, so no template strings are built by
 hand. It briefly took a bare `number`, and briefly used `Bounds` — the right shape for
 `createViewportRectObserver`, which measures _edges_, while `CSSPadding` arrives keyed by CSS property.
@@ -7301,7 +7312,7 @@ library was correct throughout — box, wrapper and `listitem` were all exactly 
 what made it hard to see: every measurement of the library's own geometry came back symmetric while the
 screen was visibly not.
 
-**Centerd, not stretched, on the user's call.** `margin-inline: auto` on the chip, which centers a flex item
+**Centered, not stretched, on the user's call.** `margin-inline: auto` on the chip, which centers a flex item
 along the main axis, so a card keeps its own width and sits on its point. Making it `flex: 1 1 auto` instead
 also fixed the geometry and was tried first; the user preferred the cards to stay their own size. It changes
 the column demo too, where the three shorter cards now center in the width of the longest rather than lining
@@ -11535,7 +11546,7 @@ message without the consumer wiring anything.
 ### The viewport split in two, and only the wrapper is a component
 
 **The context and the arithmetic are `Abstracts/Viewport`; the element that establishes one is
-`Essentials/ViewportWrapper`.** The split was forced by the dependency graph: five units below `Essentials`
+`Exotics/ViewportWrapper`.** The split was forced by the dependency graph: five units below `Essentials`
 were reaching up into an `Exotic` for the context — `Anchor`, `ElementObserver` and `PointerTracker` in
 `Abstracts`, `Popover` and `Spotlight` in `Primitives` — and `ElementObserver` and `PointerTracker` were
 reaching for `ViewportUtils` as well. The context imports nothing but solid-js, its own type and `Size2d`, and
@@ -11557,8 +11568,10 @@ aperture. **`Wrapper` won on being ordinary**: it is standard component vocabula
 is already the library's suffix for a component whose whole job is to go round something and give it a
 property.
 
-**The wrapper is an `Essential` rather than an `Exotic`.** It renders, it has a page, and what it needs
-inside it is content rather than a host, which is the page test. The page moved with it and its route is
+**The wrapper is a component, and an `Exotic`.** It renders, it has a page, and what it needs inside it is content
+rather than a host, which is the page test. It first sat in Essentials and moved to Exotics on the user's call:
+Essentials are what an interface needs and Exotics what one might want, and scaling a whole app to one design size is
+the second — every Essential reading the viewport works without a wrapper, through the abstract's fallback. The page moved with it and its route is
 `/viewport-wrapper`; the abstract took a menu entry of its own under `Abstracts`, with no page, since
 everything it does is already visible through the wrapper.
 
@@ -15180,9 +15193,9 @@ where an outline is drawn, and would fade an inset one at the edges anyway — W
 sets `mask-image: none !important`, which outranks the inline mask. The person operating the box sees all of it
 for as long as they are.
 
-**Sides are physical**, as `Drawer`'s edges are, and for the reason recorded under _"Controls: `TextInput`"_:
-nothing else in the library is right-to-left aware, so a logical name would promise something the rest does not
-keep.
+**Sides are physical**, as `Drawer`'s edges are — the user's call "for now", taken again once the text fields went
+logical and the first reason given (nothing else in the library was right-to-left aware) stopped holding. So its
+Docs page has no right-to-left example, by decision rather than oversight.
 
 ### Controls: `Carousel`, and the first component that acts without being asked
 
@@ -16904,8 +16917,9 @@ fields all of them use. The e2e spec asserts the two staircases on the page are 
 the property that arrangement buys.
 
 **Indents are physical padding on a wrapper, not a logical property.** `padding-left` and `padding-right`
-rather than `padding-inline`, per the field convention: the value is symmetric so the two are equivalent
-today, and physical throughout stays honest while nothing else here is RTL-aware.
+rather than `padding-inline`, per what was then the field convention: the value is symmetric so the two are
+equivalent today. The text fields have since gone logical, which removes the convention this leaned on; it has not
+been revisited.
 
 ### `Formation`: positions written as fractions of the width, and nothing measured
 
@@ -21718,14 +21732,413 @@ Pending and Copy were dropped. Checkbox and Toggle each gained a "Named by a Lab
 disabled option, where Medium is off and a Reachable when disabled knob brings back its tooltip. No Label section: each
 radio shows its own text and the group takes the name.
 
-### Two decisions taken at the end of the Input docs session, both not yet built
+### Checkbox and Toggle draw their own text, as Radio does
 
-**A text field's leading and trailing slots follow the reading direction** — the user's call, reversing the earlier
-"sides are physical" choice recorded for `TextInput` (and echoed under `EdgeFader`): its reason, that nothing else in
-the library was right-to-left aware, no longer holds. `backlog.md` item 17 has the work. **Checkbox and Toggle draw
-their own text, as Radio does** — the user's call, for consistency, removing their "Named by a Label" sections;
-`backlog.md` item 18.
+The user's call, for consistency: Radio's painter drew the option's words beside the radio and Checkbox's and Toggle's
+drew only the box, which is why their Docs pages each needed a "Named by a Label" section. Now `PageCheckboxContent`
+and `PageToggleContent` take children and lay them out as `PageRadioContent` does — a row of the box (or track) and the
+text, with hover and disabled dimming the whole row — every Checkbox and Toggle Docs example passes its `ariaLabel`'s
+words as that text (so the name contains the visible label, WCAG 2.5.3), and the two "Named by a Label" sections went.
+Painters used inside a `Label` elsewhere pass no children and look as before.
 
-**A right-to-left section goes on a Docs page only where the component itself behaves differently** — proposed, not
-yet confirmed by the user: Radio, SlideButton and Accordion's horizontal layout among the pages built; Calendar, Clock,
-Range, TagInput and a horizontal Listbox among those to come. Ask before applying it.
+**All three painters are `aria-hidden="true"` at the root**, per _"Painted text is `aria-hidden`"_ in the controls
+rules: the native input carries the name, and Radio's visible text was being read a second time in browse mode.
+
+**The toggle's handle follows the reading direction** — Claude's call, reported to the user as reversible: an "on"
+switch's handle sits at the end of the text's direction, so in right-to-left text it slides left, next to its words.
+It moves by `inset-inline-start` rather than a transform, since a transform cannot flip with the direction. Material's
+bidirectionality guidance mirrors progress the same way ("A progress bar shows 0% on the right, and 100% on the left").
+
+**A Docs page shows a right-to-left example unless nothing changes** — the user's rule, CSS included: if the
+component's look or behavior differs in right-to-left text in any way, by its own code or by the browser's, the page
+shows it. Where nothing changes, that is not the end of it but a question to raise — should something change, is the
+library blind there? — since the text fields' slots and Checkbox's and Toggle's text were both found exactly that way,
+while writing their Docs pages. A component with nothing direction-dependent about it, such as `Button`, needs neither.
+
+### Docs prose: prop names and WCAG criteria are marked, through `RichText` tags and the API builder
+
+Intros (`MenuDescriptions.const.ts`) and section text stay strings carrying two `RichText` tags, as `backlog.md`'s item
+recorded: `[prop]onInput[/prop]`, drawn with `docsPropName`, and `[wcag id="2.5.7"]WCAG 2.5.7[/wcag]`, a link to
+`WCAG_URLS[id]`. The wiring is `PageDocsProse` (each Playground) over the shared `DocsProse/` folder: the allowed
+attributes, the class map adding `prop`, and `toWcagHref`, which looks the id up as an own key. `WCAG_URLS` moved there
+from `DocsAlert`, since prose uses it now. `PageDocsSection` takes its text as a `content` string, declared once in the shared
+`BasePageDocsSectionValues` — not as children, which Vue and Svelte cannot type as a string — and the Docs view draws
+the intro through it. Alert and info boxes keep markup and wrap prop names in `docsPropName` themselves. A prop is marked
+where the text names the prop itself (`Set [prop]side[/prop] to choose…`), not where an ordinary word happens to match
+one ("the placement vocabulary"); a component's or namespace's name is never marked. Two alert sentences that opened
+with a prop name were reworded on the way, under _"A docs section's text never opens with a prop name"_.
+
+**The API tables get parts, not tagged strings.** `componentApiBuild.ts` hands each description over as `ApiText`, an
+array of text, prop and link parts, and the API view draws them. Tags were rejected for this column because a
+documentation block can quote markup — `RichText`'s own docs show `[a href="…"]` — and the renderer would have parsed
+it. **A backticked name becomes a prop part only if it names an entry in one of that page's own tables**, leaving out
+the component list and the type-alias table, so `` `filter` `` meaning the CSS property, `` `div` `` and a component's
+name stay plain; anything else keeps its backticks as before. `{@link Name}` shows as `` `Name` `` and is marked the
+same way.
+
+**A criterion in a documentation block is written `{@link https://www.w3.org/WAI/WCAG22/Understanding/<slug>.html WCAG
+2.5.7}`, and the whole tag stays on one line**: TypeScript ends a link's text at the line break, so a wrapped link
+loses its closing words. Console warnings naming a criterion are left as plain text, as the item scoped them.
+
+### Six calls taken at the end of the Essentials Docs conversion
+
+The user's answers, given one at a time once the five conversion agents had reported:
+
+- **A popup carries its anchor's direction, and its default placement follows it.** Popups are portalled to the end of
+  the document, so one opened from a right-to-left box laid itself out left to right (a calendar's week ran from the
+  left), and only `Menu` chose its default placement by direction. Now every portalled layer — `Select`'s list,
+  `ColorInput`'s picker, the date and time pickers, `HoverCard`, `FlyoutMenu`'s panel, a `Modal`'s contents, the fan's
+  and wheel's items — writes the direction of the element it belongs to, and every anchored default placement is
+  chosen per direction, as `MENU_DEFAULTS.placement[direction]` already is.
+- **`ColorArea`'s axes stay left to right.** The surface is a picture and does not mirror; its two hidden axis inputs
+  are `dir="ltr"`, so the right arrow always moves the handle right, as it did on screen, rather than following the
+  text and working against the picture.
+- **`SegmentedInput`'s cells always run left to right.** One-time and recovery codes are digits and Latin letters, and
+  in right-to-left text the cells had filled from the right, so "123" read "321".
+- **A typed date the calendar refuses is an error, not a value.** `DateInput` takes the same refused-day option the
+  calendar does; a typed refused day is kept as typed, marked as an error, and does not move the value — a refused
+  weekday has no nearest bound, so it is enforced like a format, under _"A field keeps the text it shows apart from
+  the value it holds"_.
+- **`ImageSwitcher` keeps the old picture when the new one fails**, as its intro promised, and reports the failure
+  through `onError`.
+- **A two-field picker shows one tooltip**: `DateRangePicker` and `DateTimePicker` anchor a single tooltip on the
+  pair, shown while either field is hovered or focused, rather than one copy per field.
+
+**A `Modal` reads its direction from whatever opened it** — the user's call, over a marker left where it is written
+(an empty text node in Solid, a hidden element in React, which can disturb a consumer's `:last-child`) and over a
+prop: the element that held focus when it opened, the one focus returns to on closing, so nothing is added to the
+consumer's markup and all four frameworks behave alike. A modal opened with nothing focused takes the document's
+direction, which is right on a page that is right to left throughout — the real-world case, since a right-to-left
+site sets `dir` on `<html>`.
+
+**`Label` names its control by the caption alone** — the user's call, once a picker's calendar button gained its own
+name and the `<label>` element folded it into the field's ("Arrival Open the calendar"). The caption gets a
+generated id and the control `aria-labelledby` pointing at it, which overrides the name a `<label>` computes from all
+its text; the `<label>` element stays, so pressing the caption still focuses the control. It is the same mechanism
+`FormField`'s caption uses.
+
+### The Essentials Docs conversion: what each page settled
+
+Thirty-four Essentials pages became Docs pages in Solid, by five agents working from the playbook above; every page
+holds its own state, the old global panels became knobs on the examples they change, and readouts appear only where
+the example holds something the screen does not show (`data-readout` on each, so specs find them). Per page, what is
+not obvious from the code:
+
+- **Dates and times.** The old Calendar, Week starts on and First week holds knobs moved onto the examples they
+  change; "Other calendar systems" is a section on every page that had the knob, starting on `hebrew`
+  (`OTHER_CALENDAR`). DateRangePicker and DateTimePicker draw their fields at `PAIR_FIELD_WIDTH` (160) to fit the demo
+  column. DateInput's day-first section carries a Format knob over the exported `DATE_INPUT_FORMATS`. Calendar keeps
+  month and year picking as two sections although both are values of `precision` (`CALENDAR_PRECISIONS`).
+- **ColorInput**: a swatch alone, with a value readout; a correcting setter. **ColorArea**: the surface with a
+  readout of the HSV numbers, then a picker built around it, closing through `Popover`'s `onDismiss`; its trigger
+  states `ariaHasPopup="dialog"` and `ariaExpanded`. A press without movement moves the handle, which is the
+  single-pointer route WCAG 2.5.7 asks of the drag. **FileInput**: one section per way files arrive; the 2.5.7 alert
+  sits in the drop section, since only the drop is a drag; "Refusing a pick" refuses a name with a space, a rule only
+  the consumer can make, since type, size and count need no code. **SegmentedInput** and **TagInput** gained the field
+  template's knobs, tooltip and Label sections; TagInput's examples name each tag "word, remove" through
+  `computeTagAriaLabel` (WCAG 2.4.6, with the word first per 2.5.3).
+- **CheckboxGroup**: the boxes draw their own words. **Label**: the one page where controls draw no words and a
+  `PageLabelCaption` sits beside them; Orientation is a knob over `LABEL_ORIENTATIONS`. **FormField** and
+  **FormSection**: every submit button stays enabled, with a status line reading `isValid`, as on Form's page;
+  FormField's Required knob starts off, at the library default.
+- **Modal**: four sections; "A dialog that must be answered" has its two dismissal props as knobs starting off and a
+  WCAG 2.1.2 alert, since with both off only the consumer's own control lets a keyboard user out; Alignment is a knob
+  over `MODAL_ALIGNMENTS`. **Drawer**: one example with an Edge knob, and swiping cites 2.5.7 inline rather than in an
+  alert, because the overlay tap the library always provides is the alternative. **Sidebar**: push, overlay and
+  hover as three sections, the hover readout showing `expanded` stays false while hovering opens the panel.
+  **HoverCard**: Basic only, without a Skip window knob, since one card has nothing to skip between.
+- **Menubar** and **Toolbar** take a width knob for the overflow, under the Select precedent: the size is what the
+  section shows. **FanMenu** and **WheelMenu** keep their painters in the page's `Solid.const.tsx`; WheelMenu's half
+  wheel and tuning became knobs, its hole and band starting at the page's 64 and 84.
+- **Progress**: Value and Error knobs on Basic, every bar filling its container; the live examples read out the
+  spoken value text. **Preview**: the held example became "Opening and closing from outside" with a toggle below,
+  as on Collapsible. **TableOfContents** builds its heading ids per instance, since a second outline shares the page.
+  **AudioSwitcher** carries a WCAG 1.4.2 alert for auto-played sound. **Sortable**: an info box, since the three
+  routes are built in; Orientation is a knob over `SORTABLE_ORIENTATIONS`; lists that can empty keep
+  `LIST_MIN_WIDTH`. The ring's `itemHeightRatio` (0.3692) is the card's height over its slot width, re-measured once
+  the locked card's label lost "— locked" (the user's call: it is drawn disabled already) and the ring stopped
+  overflowing by a pixel. **SplitPane**: an alert for unnamed dividers, which also warn in development; Orientation
+  is a knob over `SPLIT_PANE_ORIENTATIONS`; ratio readouts stay, since a share is not readable off the screen.
+
+### The sweep after the conversion: names, direction and the gaps the pages exposed
+
+- **A portalled layer takes the direction of the element it belongs to.** `AnchorSolidUtils.createPortalPosition`
+  reads the anchor's direction through `NavigatorSolidUtils.createDirectionSignal`, only while visible, and writes
+  it as `dir` on the content, so `Popover` and everything on it, `Tooltip`, `FlyoutMenu`'s panel and `Spotlight`'s
+  popup inherit it. `Modal` reads `FocusManagerUtils.getFocusOrigin()` before focus moves in, and writes `dir` on its
+  overlay and container, never its root, whose alignment must stay physical for `Drawer`. The carried copies of
+  `Sortable` and `SortableGrid` take their list's direction. The direction watcher keeps the last direction it read
+  once it stops, so a closing popup keeps its side through the fade. Every non-centered anchored default is keyed by
+  direction: `POPOVER_DEFAULTS`, `COLOR_INPUT_DEFAULTS`, `FLYOUT_MENU_DEFAULTS` and the date and time pickers'.
+  Toasts and Spotlight's overlay are left alone: neither belongs to an element. Checked against WCAG 1.3.2.
+- **Pictures, not text, stay left to right**: `ColorArea`'s axis inputs, and `ColorInput`'s hue `Range`, wrapped in a
+  `display: contents` box with `dir="ltr"` so the slider's own direction reading and its painter agree.
+  `SegmentedInput` sets `TextField`'s internal `isLeftToRight` (kept out of the preset props) and a `ltr` cell row.
+- **A name is the caption's words alone.** `FormField` publishes `getCaptionId` beside `getDescriptionId`, and every
+  registered control writes `aria-labelledby` through `FormFieldSolidUtils.resolveAriaName`; a control's own
+  `ariaLabel` under a caption is dropped and warned about, as inside a `Label`; inside a `Label`, the Label's caption
+  wins as the nearer one; a `Range` thumb with its own `thumbLabels` entry keeps it; `Select`'s listbox points at the
+  caption directly, since ARIA does not follow `aria-labelledby` twice. A `Label` learns its caption because the
+  caption registers itself (`LabelSolidUtils.registerCaptionId`); one that does not leaves the `<label>` to name the
+  control natively. `PopupTrigger` keeps its own `triggerAriaLabel` inside a Label (WCAG 4.1.2).
+- **`ColorInput` says its color through a description**: a visually hidden, `aria-hidden` span pointed at by
+  `aria-describedby`, with words from `computeValueText(value, hsv)` and the value as written by default — React Aria
+  names a swatch with a generated color name instead, which a library shipping no words cannot do.
+- **`Button` states the popup it opens** with `ariaHasPopup` (the ARIA popup roles) and `ariaExpanded`, independently.
+- **`ImageSwitcher`'s text travels with its picture**: the store carries each layer's `alt`, so the picture left on
+  screen after a failure or during a load is read with its own words (WCAG 1.1.1); the leaving layer is hidden.
+- **The date pickers**: `DateInput` takes `disabledDays` and `computeIsDayDisabled`, and `parseDigits` answers
+  `undefined` for a day `CalendarUtils.getIsDayRefused` refuses (WCAG 3.3.1); the pickers inherit both rather than
+  redeclaring them. A read-only picker's trigger is disabled, as React Aria's is, since `aria-readonly` is not allowed
+  on a button. The popup's month is converted with `withCalendar` when the picker starts, opens, or changes calendar.
+  A two-field picker draws one `Tooltip` with `isAnchorGroup` on its root — focus anywhere inside counts, and the
+  focused control is the one described — and hands the painter `TextFieldUtils.mergeFlags` of both fields.
+- **Warnings added under the warn-don't-block rule**: `SplitPaneUtils.warnIfGutterUnnamed` (4.1.2) and
+  `TagInputUtils.warnIfTagsUnnamed` (2.4.6).
+- **`TableOfContents` reports a section already current on load, once**, and never `undefined` before anything has
+  been current; the Playground's API view skips that first report so it does not overwrite a deep link.
+- **`Drawer`'s `left` and `right` are `justify-items: left` and `right`**, so its edges stay physical in
+  right-to-left text.
+
+### The last Essentials pages: how their examples map, settled before building
+
+The user's calls and the playbook's, for Menu, Tree, Range, Tabs, Paginator, Scroller and the three Spotlights.
+**Scroller's three plain button layouts** (one at each end, both at the end, both at the start) are one example, a
+button at each end, with the text saying the buttons are the consumer's to place anywhere — the user's call, on the
+condition that the unusual layouts keep sections of their own: the short track between the step buttons and the
+arched bar. Elsewhere the playbook decides: state examples become knobs on Basic; "Links" and "Links through a
+component" become one section with a component knob, as on Breadcrumbs; placement examples become a Placement knob;
+the shared panels move onto the examples they change, a count that sizes the data staying where the size is what the
+section shows (Tree's virtualized example, Paginator's item count); Tree's "Everything collapsed" folds into
+"Collapsed from outside"; Tabs' "A direction switched while on screen" becomes a button under its right-to-left
+example. Toasts, ViewportWrapper and CommandPalette are left for a session of their own, and Table stays last.
+
+**`Scroller` draws no buttons and places none: it hands over a controller** — the user's call, reversing
+`renderButton` and `buttonPlacement`, which were a slot drawing controls inside the component's box and the layout
+decision that slot forced, against _"A component hands out a controller and renders no controls of its own"_. A box
+scrolling both ways showed the cost: two fixed positions per direction had nowhere sensible for four buttons. Now
+`onMount` hands one stepper per direction — at the start, at the end, step back, step forward, each step reporting
+whether it acted — and the consumer lays the buttons out wherever, pointing them at the box with `aria-controls`, as
+`Carousel`'s consumer does. The Docs page carries the same alert as Carousel's: a strip given no buttons has no
+keyboard route (WCAG 2.1.1).
+
+### The last Essentials Docs pages: what each settled
+
+- **Menu**: eighteen examples into Basic and thirteen sections. Disabled is Basic's only knob (Menu has no error
+  look); Disabled with Reachable when disabled sits on a Tooltip section, as on Button. "Placed above" and "Submenus
+  placed on the right, right to left" became one Placement example over `ANCHOR_H_PLACEMENTS` and
+  `ANCHOR_V_PLACEMENTS`, down starting on `top_out`. The two disabled-item examples became one with a Reachable knob;
+  Paste and Duplicate are both disabled, so the knob changes reachability alone. "A gliding highlight" gained a knob
+  passing or leaving out `renderHighlightFloater`, as Select's Group boxes knob does. The cascader writes the path on
+  every `onActivate`, since a branch only opens its submenu. **Right to left keeps two examples**, the button's menu
+  and the right-click region, because each picks its default side differently: one hangs from its button's right
+  edge, the other spreads left from the pointer. Every example running commands reads out its last run. Props no old
+  example showed (`submenuOpensOn`, `opensOnHold`, `submenuMode`, `triggerRole`) are left to the API tables.
+- **Tree**: Basic is the unheld tree, the shortest code to copy. "Default" and "Everything collapsed" folded into
+  "Opening and closing from outside", starting on `src` and Lib, with Expand all, Collapse all and a delayed
+  collapse below it; the delayed one is the only way a reader sees focus move off a branch closed from outside.
+  Disabled and reachable are one example over `createFilesWithDisabled(isReachable)`, so the knob never changes the
+  tree's shape. The windowed tree keeps a Node count knob under Select's precedent, through
+  `createStressFiles(nodeCount)`. The painter indents with `padding-inline-start`, or depth vanished in right-to-left
+  text, and **mirrors its branch arrow there** (◀ closed, ▼ open) — Claude's call, after Material's guidance that
+  arrows pointing a direction are mirrored. The painter reads each row's direction through
+  `NavigatorSolidUtils.createDirectionSignal` rather than `:dir(rtl)`: in Chromium the `role="group"` box a tree
+  inserts when a branch opens did not match `:dir(rtl)` under a right-to-left ancestor although its computed
+  direction was `rtl`. The cost is one reader per mounted row, sharing one observer.
+- **Range**: Basic with Orientation (over `RANGE_ORIENTATIONS`), Error and Disabled; stepping and limits with Min,
+  Max and Step; two thumbs, the disabled pair as its Disabled knob; right to left; read as prices, keeping the
+  `onChangeEnd` readout; drawn as a knob, where a press sets the value, which meets 2.5.7 without a separate
+  control; the tooltip. Readouts stay except on the knob, which prints its value.
+- **Tabs**: Basic with Orientation (over `TABS_ORIENTATIONS`) and Disabled, every tab enabled on its own
+  `BASIC_TABS`, as on Radio; right to left with a button below switching the box's direction; automatic activation
+  as a section, since the prop needs its reason told; the hover marker; a disabled tab with a Reachable knob; links
+  with a component knob; clearing; the honeycomb.
+- **Paginator**: Basic carries the old panel's knobs — Item count, since the count is what a paginator shows, Page
+  size, Sibling count, Boundary count, Disabled last. Ends, the counted arrows, the go-to-page field and the dial are
+  fixed at 60 items, 3 to a page. Links are one section with a component knob. No alert: every name the paginator
+  needs is a required prop.
+- **The Spotlights**: each preset is its own page, each Basic carrying knobs for its real props (padding starting at
+  the Playground's 20). Each page's alert names what only a screen reader shows: the guide's asks for `announcement`
+  (4.1.3), the hint's says a hint is only drawn, so what it points at must be said in text (1.3.1), and the prompt's
+  carries backlog item 4's gap and asks for a lit control whose name states the question (2.4.6). Hint and prompt
+  show no right-to-left example: each draws a hole at a measured rectangle and nothing with a direction.
+  **`SpotlightGuide` requires `ariaLabel`**, its popup being a dialog (4.1.2), while the base `Spotlight` keeps it
+  optional for the two with no popup; **a guide shown with no `announcement` warns once**
+  (`SpotlightUtils.warnIfUnannounced`). `onShow` and `onHide` fire when the fade begins, as everywhere built on
+  `ElementFader`, so the tour's hand-overs between guide and prompt are written in `batch`.
+
+**What the Scroller controller settled in building.** `ScrollerController` is `getBoxId` plus an `x` and a `y`
+`ScrollerStepper`; a `hidden` direction reads as at both ends and refuses its steps (`ScrollerUtils.getCanStep`).
+**`gap` went with the buttons**: it only ever spaced them from the box, whatever its doc block said; spacing between
+items would be new work. **Buttons no longer leave when everything fits** — they are the consumer's, so hiding them is
+the consumer's choice: the Docs examples show them disabled, and the site's source viewer hides its pair while its
+stepper is at both ends, as it looked before. `Button` gained `ariaControls` so a button built on the controller can
+name the box. **A step back that would land on the first item goes all the way to the start**, padding included,
+mirroring the forward rule; it used to stop two pixels short and leave the back button live. This supersedes the
+"It renders no `<button>`" paragraph and `getButtonPlacement` under _"Controls: `Scroller`"_.
+
+### `Table`'s Docs page: ten examples into Basic and seven sections
+
+Selection is one prop with a list of values, so "One row at a time" became Basic's Selection knob over
+`TABLE_SELECTION_MODES` (exported from the core for it), starting on `multiple`; Disabled is Basic's other knob, last.
+Resizable, reorderable, right to left, sorted by the page, many rows, pinned and expandable are a section each, in the
+old page's order — right to left after reordering, since its example relies on both. "Many rows" keeps a Row count
+knob under Select's precedent (`TableKnobs`, starting at the old 50,000) through `createStressParts(count)`, and shows
+no timing, since the old page had none. "Reorderable columns" carries a WCAG 2.5.7 alert asking for a
+`TableHeaderReorder` in every movable header. No example has a readout: sort, selection, widths, order and open rows
+all show on screen. The pinned example sits in a box capped at 480px (`tableFrameCapped`, composing `docsAccordion`),
+so its columns overflow and the pinned ones visibly hold. In a reorderable header Category is 140px and In stock 130px,
+against 120 and 100 elsewhere: the grip, sort marker, gaps and padding take 71px around titles drawing at 61 and 53px,
+rounded up to the next ten. The closed row expander mirrors in right-to-left text (◂), read through
+`NavigatorSolidUtils.createDirectionSignal` as Tree's arrow is.
+
+### `Toasts` becomes a provider, and each toast brings its own painter — decided, not yet built
+
+The user's design, settled once Toasts' Docs page showed that two `Toasts` in one corner overlap and claim the same
+shortcut — a gap for any page with two independent widgets, not only the Docs. **A provider, declared like
+`ViewportWrapper`, wraps the app or any subtree** and holds where its stack sits and how it stacks: alignment,
+growth direction, limit, overflow, gap, margins, the shortcut into the region, and an optional default painter.
+**Anything inside raises toasts through the nearest provider**, by a `show` and `dismiss` pair that each report whether
+they acted, so nesting is the context's ordinary nearest-ancestor rule. **A provider warns** when another is mounted
+at the same alignment; two at one alignment stay possible, the consumer's to choose.
+
+**Each queued toast carries its own render function**, its duration, its urgency and the sentence it is announced with
+— the user's call over a record painted by the provider, since a toast raised far down the tree, far away in the code,
+should decide its own look, and a deliberate difference between toasts is the consumer's to make. It is a render
+function rather than a finished element because the painter is handed live state the raiser cannot know: its place
+in the stack, its paused countdown, its swipe distance, its transitions. The announcement travels with the toast
+because the library ships no words and a painted element is not reliably read. In each framework the painter is that
+framework's render form: a function returning JSX in Solid and React, a render function in Vue, a snippet in Svelte.
+
+**The queue stays the consumer's when they want it**: private to the provider unless passed in, as a popup's open
+state is, so code outside any component can still raise a toast and a page can still read the list. This keeps what
+_"Controls: `Toasts`, and a queue the consumer owns"_ argued for, and replaces its single-instance shape.
+
+### `CommandPalette`'s Docs page
+
+The three examples became Basic and two sections, plus right to left. Basic is opened by its button, with a "Last run"
+readout, and carries no shortcut of its own: the frame's palette owns `mod+K`, and registering one shortcut twice warns
+and fires only the later — the actions section says so. "Actions with shortcuts of their own" keeps Alt+Shift+N, R and
+X live page-wide, with a notes readout. "A bare-letter shortcut" registers G, which warns in the console on purpose,
+as Label's "The caption wins" example does, under an alert citing WCAG 2.1.4. **Its off switch is a "Turn G off"
+button below the palette, not a knob** — Claude's call: a knob would only set the example's own state, which the
+rule against Playground-only knobs forbids, and the button is the very mechanism 2.1.4 asks the consumer to build, so
+it belongs in the code a reader sees. Right to left is shown with the actions that have no shortcuts, so nothing is
+registered twice; the dialog takes the direction of the button that opened it.
+
+### Spotlights stack like modals: only the top one acts
+
+Found while settling Toasts: every `Spotlight` acted as if it were alone — a document-wide Escape closed every
+spotlight and any `Modal` above one, two prompts pulled focus back and forth forever, a second guide sealed the first
+guide's popup, and two overlays dimmed the page twice. The user's call: a spotlight demands the reader's whole
+attention, so the model is `Modal`'s stack.
+
+**The order is the dismissal stack's own, not a second registry.** Escape is already routed by that stack, and a
+separate list of spotlights could disagree with it about who opened last. `Dismisser`'s layers became a store
+(`DismisserUtils.openLayers`), a layer may carry a `group`, and `getTopLayerInGroup` answers which member opened last.
+`SpotlightUtils.createLayer` puts every spotlight in one group; `getIsOnTop` is the test.
+
+**A spotlight is registered while open or still fading out; it draws while open and on top; it acts while drawn and
+on top.** One covered by a newer spotlight fades away but stays open (`visibility` stays `true`) and keeps its place
+in the stack; when the one above has finished leaving, it fades back in and its effects re-arm — focus into the popup,
+seal, hold, lift. Coming back counts as a first show, so the step is not announced; the popup takes focus and is read
+there. `onShow` and `onHide` report opening and closing only, never being covered.
+
+**Escape is the stack's; a hint's other keys answer only while no layer that takes input sits above it**
+(`DismisserUtils.getIsTopForInput`). A hint registers as passive, so page shortcuts keep working while it shows; a
+prompt and a guide take the keyboard as a dialog does. Checked against WCAG 2.1.2 (each Escape closes one layer, so
+nothing traps) and 2.4.3 (focus follows the stack). A spotlight under a `Modal` still counts as the top spotlight,
+harmlessly, since the Modal seals the page.
+
+### An Escape something already answered does not also close the layer above it
+
+A Table carry canceled inside a `Modal`, or Escape handing focus back out of the Toasts region, used to close the
+Modal too, because the stack's document listener ignored whether the key had been used. **The stack now skips an
+Escape whose default is prevented (`getIsUnansweredEscape`), and every handler that uses Escape for its own purpose
+calls `preventDefault`** — only when it did something, so an Escape with nothing to cancel still reaches the stack
+(`CornerPin` gained the call). A handler on the document must run before the stack: `TableUtils.observeCarryCancel`
+listens in the capture phase; handlers on elements already run first. Solid's delegated handlers sit on the document
+too and still run first, because the stack removes its listener when the last layer closes and adds it again when one
+opens.
+
+### `Toasts` as a provider: what building it settled
+
+The provider keeps the name `Toasts` and wraps children; `useToastsContext()` hands out `show` and `dismiss`, outside
+any provider answering inertly through `ToastUtils.UNPROVIDED_CONTEXT`. The core's record is `BaseToast<T>` (`id`,
+`value`, a required `announcement`, `durationMs`, `ariaLive`, `onShow`, `onHide`), and each framework adds its own
+`renderToast` as `Toast<T>`, since every framework package re-exports the core and cannot export a second `Toast`.
+`announcement` is required under _"The library says what a component is"_, so the region carries no `aria-live` and
+the provider-wide `computeAnnouncement` and `ariaLive` went. The stack's flow prop is **`flexDirection`**, with CSS's
+own values, not `dir`, which is text direction (`orientation` does not apply: nothing walks a toast stack with arrows).
+
+**`show` returns the toast's id, or `undefined` when it refused** — the user's choice between that and returning a
+dismiss function, Claude picking: one name for a toast across `show`, `dismiss(id)`, the shared queue and the painter;
+a page can close it from elsewhere; and the answer still says whether it acted. A consumer may pass their own id, so
+one "Saved" cannot stack twice. A raiser's painter closes its toast with the `dismiss` it got when raising. **The
+provider's default painter is handed a `dismiss` for the toast it draws**, since it is given to the provider from
+outside and has no raiser to borrow from — only the default painter gets one.
+
+**One shortcut reaches every stack** — the user's call: F8 cycles through the stacks that hold toasts, Shift+F8 back,
+Escape returning focus to where it came from. The page-wide record each provider already joins for the same-alignment
+warning keeps the stacks in order and holds the one binding, so providers no longer bind the key themselves.
+
+**Each toast reads in the direction of what raised it** — the user's call, as `Modal` reads its opener: the element
+focused when `show` was called, or the page's direction with nothing focused. The stack's placement stays as
+configured; only each toast's own content takes the direction.
+
+**The SpotlightGuide tour opens its prompt over the guide** — the user's call, now that spotlights stack: Escape on
+the prompt returns to the guide rather than pausing the tour, and the `batch` hand-over goes. **A spotlight that comes
+back from under another returns focus, on closing, to what first opened it**, not to wherever focus was when it came
+back (WCAG 2.4.3).
+
+**Focus goes back to what first opened a spotlight, not to where it was when the spotlight came back** (WCAG 2.4.3).
+A spotlight covered by another loses focus and regains it on its return, by which time focus sits wherever the layer
+above left it — "Add to basket", for the tour's prompt. So `autoFocus` takes the layer's open state (`getIsOpen` in
+Solid and Svelte, `isOpen` in React and Vue), and while the layer stays open it keeps the first origin through
+`FocusManagerUtils.createOriginKeeper`, handing it to `focusInto` as `origin`.
+
+**The register is `ToastUtils.registerStack`**, which replaced `claimAlignment` and `createFocusRoute`. A stack's place
+is the order its provider first joined, keyed by an owner object the provider keeps for life, so joining again under a
+new alignment, region or portal keeps the place. The register binds F8 and Shift+F8 once, on the page itself, with the
+first stack, and unbinds them with the last, so a stack inside an open `Modal` is out of reach until the modal closes.
+Escape is listened for on each region, hands focus back to the element focused before the first F8, and only then
+calls `preventDefault`. `computeCycleTarget` is the pure step, and `cycleFocus` is exported for a consumer's own
+control. **The keys are fixed at F8 and Shift+F8 for now** (`HOTKEY_FORWARD`, `HOTKEY_BACK`); the per-provider `hotkey`
+prop went with the register. The user left a way to change them for a later sweep of page-wide behaviors that could
+earn a setting, rather than deciding this one alone. **Direction is read once, at `show`**
+(`NavigatorUtils.readDirection(FocusManagerUtils.getFocusOrigin())`), since the raiser may be gone afterwards; a toast
+written straight into a shared queue takes the page's. **`show` generates ids** (`toast-N`, skipping queued ones)
+through `withRequestedToast`. Per framework: React and Vue keep a copy of the queue updated on every write, so several
+`show` calls in one handler each see the earlier ones; React and Vue read the default painter on every render, Solid
+and Svelte at mount; Vue's default painter is a `renderToast` slot; Vue and Svelte examples keep their raising buttons
+in separate files, since a context is read only during a component's setup. Safari does not focus a clicked button,
+so there a toast raised by a click takes the page's direction, as `Modal`'s opener does.
+
+**The toast stack is always laid out left to right; each toast takes the direction of whatever raised it.** The region
+carries `dir="ltr"`, because flexbox measures start and end from the text's direction: on a right-to-left page
+`flex-start` is the right-hand side, so `middle_left` would have drawn on the right. `alignment` names the screen's
+sides and must not mirror; each toast's own `dir` overrides the region's for its content.
+
+**React's fader reports each fade once, even in development.** React runs every mount effect twice there, with a
+cleanup between, and the cleanup's `fader.cancel()` reset the pending target, so the second `show()` began the same
+fade again and `onShow` ran twice — every React fader user saw it, `Modal` included. `ElementFaderReactUtils.useFader`
+now remembers the last target it reported and passes `onShow` or `onHide` on only when it changes; the core fader is
+unchanged, since only React runs effects twice.
+
+### `Listbox`, `Tooltip` and `Stepper` Docs pages
+
+The three pages the Essentials sorting first missed. **Listbox**: Basic is the countries list with Disabled; groups are
+shown with MultiListbox; the old sizes row became "Horizontal, right to left" with an Orientation knob over
+`LISTBOX_ORIENTATIONS`, kept off Basic because six countries across overflow the demo column; "Markers that glide"
+passes `renderSelectionFloater` and `renderHighlightFloater` together or leaves both out, painted by the ordinary option
+painter, so `PageGlideLabel` went. **Tooltip**: Basic carries the old panel's knobs that set real props, less Skip
+window, which one tooltip cannot show (as on HoverCard); the word example carries a WCAG 2.1.1 alert for its
+`tabindex`; the arrow bed's knobs are keyed `circling…` and `arrowBed…`, and its labels wrap within the anchor box's
+width (the user tuned its sizes so the bed fits its column). **Stepper**: Basic has Orientation over
+`STEPPER_ORIENTATIONS` and Free navigation; every example holds its own current step and has its own Free navigation
+knob, since a linear strip cannot move forward once stepped back; a failed step is a section, since a step's state is
+the consumer's word, not a prop; the arc stays physical in right-to-left text, as the fan and the wheel do; Reset
+went; step ids are built from the example and the step (`basicDetails`). **The arc sits in a frame of fixed
+width (`ARC_WIDTH`), as Radio's and Toolbar's arcs do** — the user's call. An arc is drawn to its own proportions
+and then scaled to fill its box's width, so in a frame as wide as the column, every setting that narrows the drawing
+(a smaller item width, a sideways sliver of curve) made the whole Stepper taller and its steps wider.

@@ -1,19 +1,42 @@
-import { expect, test } from "@playwright/test";
+import { type Page, expect, test } from "@playwright/test";
 
-import { demo, inlineStyle, prop, readout } from "./helpers";
+import { docsDemo, docsSettled, inlineStyle, prop } from "./helpers";
 
-const PAIR = demo("pair");
-const BOUNDED = demo("bounded");
-const TRIPLE = demo("triple");
-const STACKED = demo("stacked");
-const CRAMPED = demo("cramped");
+const DOCS = "/src/App/Pages/SplitPanePage/Docs";
+
+const BASIC = docsDemo(DOCS, "Basic");
+const BOUNDED = docsDemo(DOCS, "Bounded");
+const TRIPLE = docsDemo(DOCS, "Triple");
+const CRAMPED = docsDemo(DOCS, "Cramped");
 
 const root = (scope: string) => `${scope} [role="group"]`;
 const gutter = (scope: string) => `${scope} [role="separator"]`;
 
+/**
+ * Every example but the cramped one prints its ratios beneath it, in whole percents, because a share is not
+ * something a reader can measure off the screen. The spec reads them back as numbers so it can ask how they moved
+ * rather than what they are.
+ */
+const ratiosOf = async (page: Page, scope: string) => {
+    const text = (await page.locator(`${scope} [data-readout]`).textContent()) ?? "";
+
+    return [...text.matchAll(/(\d+)%/g)].map((match) => Number(match[1]));
+};
+
+const chooseProp = async (page: Page, key: string, name: string) => {
+    const picker = page.locator(`${prop(key)} [role="combobox"]`);
+
+    await picker.click();
+
+    const list = page.locator(`[id="${await picker.getAttribute("aria-controls")}"]`);
+
+    await list.getByRole("option", { name, exact: true }).click();
+};
+
 test.beforeEach(async ({ page }) => {
-    await page.goto("/split-pane");
-    await expect(page.locator("[data-example]").first()).toBeVisible();
+    await page.goto("/split-pane/docs");
+    await expect(page.locator(root(BASIC))).toBeVisible();
+    await docsSettled(page);
 });
 
 /**
@@ -23,17 +46,24 @@ test.beforeEach(async ({ page }) => {
  * ratios never move.
  */
 test("the split is a grid template built from the ratios", async ({ page }) => {
-    const template = await inlineStyle(page.locator(root(PAIR)), "grid-template-columns");
+    const [first] = await ratiosOf(page, BASIC);
+    const gutterSize = await page.locator(`${prop("gutterSize")} input`).inputValue();
+    const template = await inlineStyle(page.locator(root(BASIC)), "grid-template-columns");
 
-    expect(template, "the ratio becomes a share of the container minus its gutters").toContain("30%");
-    expect(template, "and the gutter is a fixed track between the panes").toContain("8px");
+    expect(template, "the ratio becomes a share of the container minus its gutters").toContain(`${first}%`);
+    expect(template, "and the gutter is a fixed track between the panes, as wide as the knob says").toContain(
+        `${gutterSize}px`,
+    );
 
+    await chooseProp(page, "orientation", "vertical");
+
+    await expect
+        .poll(() => inlineStyle(page.locator(root(BASIC)), "grid-template-rows"), {
+            message: "the other axis writes rows instead of columns",
+        })
+        .not.toBe("");
     expect(
-        await inlineStyle(page.locator(root(STACKED)), "grid-template-rows"),
-        "the other axis writes rows instead of columns",
-    ).not.toBe("");
-    expect(
-        await inlineStyle(page.locator(root(STACKED)), "grid-template-columns"),
+        await inlineStyle(page.locator(root(BASIC)), "grid-template-columns"),
         "and writes nothing on the axis it is not using",
     ).toBe("");
 });
@@ -41,8 +71,9 @@ test("the split is a grid template built from the ratios", async ({ page }) => {
 test("a bounded pane is a clamp around its share", async ({ page }) => {
     const template = await inlineStyle(page.locator(root(BOUNDED)), "grid-template-columns");
 
-    expect(template, "both bounds land in the track").toContain("clamp(120px");
-    expect(template, "with the maximum as the ceiling").toContain("220px");
+    expect(template, "both bounds land in the track, the minimum first and the maximum as the ceiling").toMatch(
+        /clamp\(\d+px, .+, \d+px\)/,
+    );
 });
 
 /**
@@ -51,34 +82,49 @@ test("a bounded pane is a clamp around its share", async ({ page }) => {
  * a pointer, which is the half a drag-only implementation leaves out.
  */
 test("a gutter is a separator with a value, and arrows move it", async ({ page }) => {
-    const first = page.locator(gutter(PAIR));
+    const first = page.locator(gutter(BASIC));
+    const [start] = await ratiosOf(page, BASIC);
 
     await expect(first, "the separator states which way it splits").toHaveAttribute("aria-orientation", "vertical");
-    await expect(first, "and where it currently sits").toHaveAttribute("aria-valuenow", "30");
+    await expect(first, "and where it currently sits, which is the first pane's share").toHaveAttribute(
+        "aria-valuenow",
+        String(start),
+    );
     await expect(first).toHaveAttribute("aria-valuemin", "0");
     await expect(first).toHaveAttribute("aria-valuemax", "100");
 
     await first.focus();
     await page.keyboard.press("ArrowRight");
 
-    expect(await readout(page, "pair"), "an arrow moves the boundary by a step").toContain("ratios: 32% / 68%");
+    const [grown, rest] = await ratiosOf(page, BASIC);
+    const step = grown - start;
+
+    expect(step, "an arrow moves the boundary by a step").toBeGreaterThan(0);
+    expect(grown + rest, "and the two panes trade what one gains").toBe(100);
 
     await page.keyboard.press("ArrowLeft");
     await page.keyboard.press("ArrowLeft");
-    expect(await readout(page, "pair"), "and back the other way").toContain("ratios: 28% / 72%");
+
+    const [shrunk] = await ratiosOf(page, BASIC);
+
+    expect(shrunk, "and back the other way, by the same step").toBe(start - step);
 });
 
 test("a stacked split takes the other pair of arrows", async ({ page }) => {
-    const first = page.locator(gutter(STACKED));
+    await chooseProp(page, "orientation", "vertical");
 
-    await expect(first, "a column split separates horizontally").toHaveAttribute("aria-orientation", "horizontal");
+    const first = page.locator(gutter(BASIC));
+
+    await expect(first, "a stacked split separates horizontally").toHaveAttribute("aria-orientation", "horizontal");
+
+    const [start] = await ratiosOf(page, BASIC);
 
     await first.focus();
     await page.keyboard.press("ArrowRight");
-    expect(await readout(page, "stacked"), "the cross-axis arrows do nothing").toContain("ratios: 40% / 60%");
+    expect((await ratiosOf(page, BASIC))[0], "the cross-axis arrows do nothing").toBe(start);
 
     await page.keyboard.press("ArrowDown");
-    expect(await readout(page, "stacked"), "and its own axis moves it").toContain("ratios: 42% / 58%");
+    expect((await ratiosOf(page, BASIC))[0], "and its own axis moves it").toBeGreaterThan(start);
 });
 
 /**
@@ -89,18 +135,22 @@ test("a stacked split takes the other pair of arrows", async ({ page }) => {
 test("a gutter moves its two neighbors and leaves the rest alone", async ({ page }) => {
     await expect(page.locator(gutter(TRIPLE)), "two separators for three panes").toHaveCount(2);
 
+    const before = await ratiosOf(page, TRIPLE);
+
     await page.locator(gutter(TRIPLE)).first().focus();
     await page.keyboard.press("ArrowRight");
 
-    expect(await readout(page, "triple"), "the first pair trade and the third is untouched").toContain(
-        "ratios: 27% / 48% / 25%",
-    );
+    const after = await ratiosOf(page, TRIPLE);
+
+    expect(after[0], "the first pane grows").toBeGreaterThan(before[0]);
+    expect(after[0] + after[1], "by what its neighbor gives up").toBe(before[0] + before[1]);
+    expect(after[2], "and the third is untouched").toBe(before[2]);
 });
 
 test("a disabled split is out of the tab order and refuses the keyboard", async ({ page }) => {
-    await page.locator(`${prop("isDisabled")} input`).check();
+    await page.locator(`${prop("isDisabled")} input`).click();
 
-    const first = page.locator(gutter(PAIR));
+    const first = page.locator(gutter(BASIC));
 
     await expect(first, "the separator says it is disabled without the native attribute").toHaveAttribute(
         "aria-disabled",
@@ -111,16 +161,17 @@ test("a disabled split is out of the tab order and refuses the keyboard", async 
         "-1",
     );
 
+    const before = await ratiosOf(page, BASIC);
+
     await first.evaluate((element) => (element as HTMLElement).focus());
     await page.keyboard.press("ArrowRight");
-    expect(await readout(page, "pair"), "so the arrows move nothing").toContain("ratios: 30% / 70%");
+    expect(await ratiosOf(page, BASIC), "so the arrows move nothing").toEqual(before);
 });
 
 /**
- * The accepted behavior, pinned so that a later change has to break it deliberately. Two minimums of
- * 250px and 400px cannot both fit inside 600px, and this control does not arbitrate: grid honors both
- * floors and the row overflows its container. That is inherited rather than designed, and the decision
- * was to inherit it whole.
+ * The accepted behavior, pinned so that a later change has to break it deliberately. Two minimums that
+ * cannot both fit inside the box are not arbitrated: grid honors both floors and the row overflows its
+ * container. That is inherited rather than designed, and the decision was to inherit it whole.
  */
 test("minimums that cannot fit overflow rather than shrink", async ({ page }) => {
     const overflow = await page.locator(root(CRAMPED)).evaluate((element) => ({
@@ -141,12 +192,20 @@ test("minimums that cannot fit overflow rather than shrink", async ({ page }) =>
  * tracks added up to more than the container. Converting each bound into a ratio against the measured
  * container and clamping the drag there keeps the stored value inside what CSS will honor, so the panes
  * always add up to the box.
+ *
+ * The floors are the fixtures' own `minPx` — 80px for each of the three panes, 160px for the bounded content
+ * pane — read here as data, as an option's name would be.
  */
 const OVERSHOOT_PX = 2000;
+const TRIPLE_FLOOR_PX = 80;
+const BOUNDED_CONTENT_FLOOR_PX = 160;
 
 test("a drag stops where the pixel bounds do, rather than writing past them", async ({ page }) => {
     const drag = async (scope: string, index: number, dx: number) => {
         const handle = page.locator(gutter(scope)).nth(index);
+
+        await handle.scrollIntoViewIfNeeded();
+
         const box = (await handle.boundingBox())!;
 
         await page.mouse.move(box.x + box.width * 0.5, box.y + box.height * 0.5);
@@ -160,7 +219,7 @@ test("a drag stops where the pixel bounds do, rather than writing past them", as
             box: (element as HTMLElement).offsetWidth,
             sum: Array.from(element.children).reduce((total, child) => total + (child as HTMLElement).offsetWidth, 0),
             panes: Array.from(element.children)
-                .filter((child) => child.tagName === "DIV")
+                .filter((child) => child.getAttribute("role") !== "separator")
                 .map((child) => (child as HTMLElement).offsetWidth),
         }));
 
@@ -168,13 +227,15 @@ test("a drag stops where the pixel bounds do, rather than writing past them", as
 
     const triple = await tracks(TRIPLE);
 
-    expect(triple.panes[1], "the middle pane stops on its 80px floor").toBe(80);
+    expect(triple.panes[1], "the middle pane stops on its floor").toBe(TRIPLE_FLOOR_PX);
     expect(triple.sum, "and the tracks still add up to the container rather than spilling out of it").toBe(triple.box);
 
     await drag(BOUNDED, 0, OVERSHOOT_PX);
 
     const bounded = await tracks(BOUNDED);
 
-    expect(bounded.panes[1], "a drag the other way stops on the neighbor's floor instead").toBe(160);
+    expect(bounded.panes[1], "a drag the other way stops on the neighbor's floor instead").toBe(
+        BOUNDED_CONTENT_FLOOR_PX,
+    );
     expect(bounded.sum).toBe(bounded.box);
 });

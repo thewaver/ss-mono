@@ -5,6 +5,7 @@
         DOCS_ROOT,
     } from "@thewaver/ss-playground/App/Pages/BreadcrumbsPage/BreadcrumbsPage.const";
     import type { BreadcrumbSeparatorKey } from "@thewaver/ss-playground/App/Pages/BreadcrumbsPage/BreadcrumbsPage.types";
+    import * as docsStyles from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.css";
 
     import PageDocsAlert from "../../PageComponents/DocsAlert/PageDocsAlert.svelte";
     import PageDocsExample from "../../PageComponents/DocsExample/PageDocsExample.svelte";
@@ -14,6 +15,7 @@
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
     import BasicDocsExample from "./Docs/Basic.svelte";
     import LinksDocsExample from "./Docs/Links.svelte";
+    import RightToLeftDocsExample from "./Docs/RightToLeft.svelte";
 
     let isDisabled = $state(BreadcrumbKnobs.STARTING_IS_DISABLED);
     let separator = $state<BreadcrumbSeparatorKey>("/");
@@ -21,8 +23,9 @@
 </script>
 
 <PageDocsAlert severity="info">
-    The separators here are only examples. renderSeparator draws whatever you return, so what sits between the
-    crumbs is entirely yours: text, an icon, any markup.
+    The separators here are only examples. Whatever you return from <span class={docsStyles.docsPropName}
+        >renderSeparator</span
+    > is drawn, so what sits between the crumbs is entirely yours: text, an icon, any markup.
 </PageDocsAlert>
 
 <PageDocsExample path={`${DOCS_ROOT}/Basic.svelte`}>
@@ -62,9 +65,19 @@
     {/snippet}
 </PageDocsExample>
 
-<PageDocsSection title={"Links"}>
-    Give a crumb an href and it is drawn as a native HTML anchor element, with the address passed through untouched. In a routed app, pass linkComponent, a custom link component such as your router's, and the crumbs are drawn with it instead.
-</PageDocsSection>
+<PageDocsSection
+    title={"Right to left"}
+    content={"Inside a box whose text runs right to left, the trail starts from the right, with the first crumb rightmost. A separator that points, such as the > here, is drawn mirrored by the browser, so it still points along the trail; a slash or a dash is drawn as it is, so pick one that reads either way."}
+/>
+
+<PageDocsExample path={`${DOCS_ROOT}/RightToLeft.svelte`}>
+    <RightToLeftDocsExample />
+</PageDocsExample>
+
+<PageDocsSection
+    title={"Links"}
+    content={"Give a crumb an [prop]href[/prop] and it is drawn as a native HTML anchor element, with the address passed through untouched. In a routed app, pass [prop]linkComponent[/prop], a custom link component such as your router's, and the crumbs are drawn with it instead."}
+/>
 
 <PageDocsExample path={`${DOCS_ROOT}/Links.svelte`}>
     <LinksDocsExample {isDisabled} {hasLinkComponent} />

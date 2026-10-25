@@ -6,6 +6,8 @@ export const EXAMPLE_NAMES = {
 
 export const EXAMPLES_ROOT = "/src/App/Pages/FormFieldPage/Examples";
 
+export const DOCS_ROOT = "/src/App/Pages/FormFieldPage/Docs";
+
 export const FIELD_WIDTH = 110;
 
 export const MESSAGE_WIDTH = 240;

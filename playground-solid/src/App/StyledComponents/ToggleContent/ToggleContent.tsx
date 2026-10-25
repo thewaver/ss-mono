@@ -1,10 +1,12 @@
+import type { ParentProps } from "solid-js";
+
 import { access } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/ToggleContent/ToggleContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type { ToggleContentProps } from "./ToggleContentSolid.types";
 
-export const PageToggleContent = (props: ToggleContentProps) => {
+export const PageToggleContent = (props: ParentProps<ToggleContentProps>) => {
     const getLayerClass = useLayerClass();
 
     return (
@@ -18,8 +20,13 @@ export const PageToggleContent = (props: ToggleContentProps) => {
                 [styles.isDisabled]: access(props.flags).isDisabled,
                 [styles.hasError]: access(props.flags).hasError,
             }}
+            aria-hidden="true"
         >
-            <div class={styles.toggleHandle} />
+            <div class={styles.toggleTrack}>
+                <div class={styles.toggleHandle} />
+            </div>
+
+            {props.children}
         </div>
     );
 };

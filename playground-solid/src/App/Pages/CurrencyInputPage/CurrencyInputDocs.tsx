@@ -16,6 +16,7 @@ import { PageProp } from "../../PageComponents/Prop/Prop";
 import { BasicDocsExample } from "./Docs/Basic";
 import { BoundedDocsExample } from "./Docs/Bounded";
 import { LocaleDocsExample } from "./Docs/Locale";
+import { RightToLeftDocsExample } from "./Docs/RightToLeft";
 import { SignedDocsExample } from "./Docs/Signed";
 import { SymbolDocsExample } from "./Docs/Symbol";
 
@@ -72,11 +73,23 @@ export const CurrencyInputDocs = () => {
                 <BasicDocsExample isReadOnly={getIsReadOnly} hasError={getHasError} isDisabled={getIsDisabled} />
             </PageDocsExample>
 
-            <PageDocsSection title={"Written the local way"}>
-                {
-                    "Give it a locale and the amount is written the way that place writes money: which separators, and in which groups. The decimals say how many digits follow the separator, and groupSizes overrides the locale's grouping, such as the Indian pattern of a group of three and then groups of two. However many groups the amount needs, it gets."
+            <PageDocsSection
+                title={"Right to left"}
+                content={
+                    "Inside a box whose text runs right to left, the leading slot, here the symbol, sits on the right and the amount starts beside it, while the digits keep their own order."
                 }
-            </PageDocsSection>
+            />
+
+            <PageDocsExample path={`${DOCS_ROOT}/RightToLeft.tsx`}>
+                <RightToLeftDocsExample />
+            </PageDocsExample>
+
+            <PageDocsSection
+                title={"Written the local way"}
+                content={
+                    "Give it a [prop]locale[/prop] and the amount is written the way that place writes money: which separators, and in which groups. The [prop]decimals[/prop] say how many digits follow the separator, and [prop]groupSizes[/prop] overrides the locale's grouping, such as the Indian pattern of a group of three and then groups of two. However many groups the amount needs, it gets."
+                }
+            />
 
             <PageDocsExample
                 path={`${DOCS_ROOT}/Locale.tsx`}
@@ -133,19 +146,23 @@ export const CurrencyInputDocs = () => {
                 <LocaleDocsExample locale={getLocale} decimals={getDecimals} groupSizes={getGrouping} />
             </PageDocsExample>
 
-            <PageDocsSection title={"With a symbol"}>
-                {
+            <PageDocsSection
+                title={"With a symbol"}
+                content={
                     "The field keeps no list of currencies, so the symbol is yours to draw, in the leading or the trailing slot, on whichever side your locale puts it."
                 }
-            </PageDocsSection>
+            />
 
             <PageDocsExample path={`${DOCS_ROOT}/Symbol.tsx`}>
                 <SymbolDocsExample />
             </PageDocsExample>
 
-            <PageDocsSection title={"A limit"}>
-                {"Give it a max and any amount above it is refused as it is typed, so the field never holds more."}
-            </PageDocsSection>
+            <PageDocsSection
+                title={"A limit"}
+                content={
+                    "Give it a [prop]max[/prop] and any amount above it is refused as it is typed, so the field never holds more."
+                }
+            />
 
             <PageDocsExample
                 path={`${DOCS_ROOT}/Bounded.tsx`}
@@ -170,11 +187,12 @@ export const CurrencyInputDocs = () => {
                 <BoundedDocsExample max={getMax} />
             </PageDocsExample>
 
-            <PageDocsSection title={"Negative amounts"}>
-                {
-                    "With hasSign on, a minus can be typed and the amount can go below zero. Off, the default, a minus is refused."
+            <PageDocsSection
+                title={"Negative amounts"}
+                content={
+                    "With [prop]hasSign[/prop] on, a minus can be typed and the amount can go below zero. Off, the default, a minus is refused."
                 }
-            </PageDocsSection>
+            />
 
             <PageDocsExample
                 path={`${DOCS_ROOT}/Signed.tsx`}

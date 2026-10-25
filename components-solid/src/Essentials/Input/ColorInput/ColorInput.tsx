@@ -1,5 +1,5 @@
 import type { Signal } from "solid-js";
-import { createEffect, createMemo, createSignal, createUniqueId, untrack } from "solid-js";
+import { Show, createEffect, createMemo, createSignal, createUniqueId, untrack } from "solid-js";
 
 import {
     COLOR_INPUT_DEFAULTS,
@@ -9,21 +9,33 @@ import {
 } from "@thewaver/ss-components";
 import type { Color } from "@thewaver/ss-utils";
 
+import { NavigatorSolidUtils } from "../../../Abstracts/Navigator/NavigatorSolid.utils";
 import { SignalMirrorSolidUtils } from "../../../Abstracts/SignalMirror/SignalMirrorSolid.utils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import { Popover } from "../../../Primitives/Popover/Popover";
 import { access } from "../../../Utils/propUtils";
 import { ColorArea } from "../ColorArea/ColorArea";
 import { FormFieldSolidUtils } from "../FormField/FormFieldSolid.utils";
-import { LabelSolidUtils } from "../Label/LabelSolid.utils";
 import { Range } from "../Range/Range";
 import type { ColorInputFieldProps, ColorInputProps } from "./ColorInputSolid.types";
 
 const ColorInputField = (props: ColorInputFieldProps) => {
-    const getAriaLabel = LabelSolidUtils.resolveAriaLabel(
+    const { getAriaLabel, getAriaLabelledBy } = FormFieldSolidUtils.resolveAriaName(
         props.ariaLabel === undefined ? undefined : () => access(props.ariaLabel)!,
     );
-    const getAriaDescribedBy = FormFieldSolidUtils.resolveAriaDescribedBy();
+    const getFieldDescribedBy = FormFieldSolidUtils.resolveAriaDescribedBy();
+    const descriptionId = createUniqueId();
+
+    const getValueText = () => {
+        const flags = access(props.flags);
+
+        if (!flags.value) return "";
+
+        return (props.computeValueText ?? COLOR_INPUT_DEFAULTS.computeValueText)(flags.value, flags.hsv);
+    };
+
+    const getAriaDescribedBy = () =>
+        [getFieldDescribedBy(), getValueText() ? descriptionId : undefined].filter(Boolean).join(" ") || undefined;
 
     const [getElementRef, setElementRef] = createSignal<HTMLElement>();
 
@@ -32,39 +44,48 @@ const ColorInputField = (props: ColorInputFieldProps) => {
     const getIsDisabled = () => access(props.flags).isDisabled ?? false;
 
     return (
-        <button
-            id={access(props.id)}
-            ref={(element) => {
-                setElementRef(element);
-                props.ref?.(element);
-            }}
-            type="button"
-            class={styles.colorInputField}
-            aria-label={getAriaLabel()}
-            aria-describedby={getAriaDescribedBy()}
-            aria-haspopup="dialog"
-            aria-expanded={access(props.isOpen)}
-            aria-controls={access(props.isOpen) ? access(props.popupId) : undefined}
-            aria-disabled={getIsDisabled() || undefined}
-            aria-invalid={access(props.flags).hasError || undefined}
-            onClick={() => {
-                if (getIsDisabled()) return;
+        <>
+            <button
+                id={access(props.id)}
+                ref={(element) => {
+                    setElementRef(element);
+                    props.ref?.(element);
+                }}
+                type="button"
+                class={styles.colorInputField}
+                aria-label={getAriaLabel()}
+                aria-labelledby={getAriaLabelledBy()}
+                aria-describedby={getAriaDescribedBy()}
+                aria-haspopup="dialog"
+                aria-expanded={access(props.isOpen)}
+                aria-controls={access(props.isOpen) ? access(props.popupId) : undefined}
+                aria-disabled={getIsDisabled() || undefined}
+                aria-invalid={access(props.flags).hasError || undefined}
+                onClick={() => {
+                    if (getIsDisabled()) return;
 
-                props.onToggle();
-            }}
-            onMouseEnter={(e) => {
-                if (getIsDisabled()) return;
+                    props.onToggle();
+                }}
+                onMouseEnter={(e) => {
+                    if (getIsDisabled()) return;
 
-                void props.onMouseEnter?.(e);
-            }}
-            onMouseLeave={(e) => {
-                if (getIsDisabled()) return;
+                    void props.onMouseEnter?.(e);
+                }}
+                onMouseLeave={(e) => {
+                    if (getIsDisabled()) return;
 
-                void props.onMouseLeave?.(e);
-            }}
-        >
-            {props.renderContent(() => access(props.flags))}
-        </button>
+                    void props.onMouseLeave?.(e);
+                }}
+            >
+                {props.renderContent(() => access(props.flags))}
+            </button>
+
+            <Show when={getValueText()}>
+                <span id={descriptionId} class={styles.colorInputDescription} aria-hidden="true">
+                    {getValueText()}
+                </span>
+            </Show>
+        </>
     );
 };
 
@@ -73,6 +94,7 @@ export const ColorInput = (props: ColorInputProps) => {
 
     const [getFieldRef, setFieldRef] = createSignal<HTMLElement>();
     const [getIsOpen, setIsOpen] = SignalMirrorSolidUtils.createOptional(() => props.visibility, false);
+    const getDirection = NavigatorSolidUtils.createDirectionSignal(getFieldRef, () => !getIsOpen());
     const startingState = ColorInputUtils.computeStartingState(props.value[0]());
 
     const [getHsv, setHsv] = createSignal<Color.HSVA>(startingState.hsv);
@@ -145,15 +167,17 @@ export const ColorInput = (props: ColorInputProps) => {
                 renderContent={props.renderArea}
             />
 
-            <Range
-                value={hueSignal}
-                sizing={"fill"}
-                isDisabled={getIsDisabled}
-                max={ColorInputUtils.HUE_MAX}
-                step={ColorInputUtils.HUE_STEP}
-                ariaLabel={props.hueLabel}
-                renderContent={props.renderHue}
-            />
+            <div class={styles.colorInputHue} dir="ltr">
+                <Range
+                    value={hueSignal}
+                    sizing={"fill"}
+                    isDisabled={getIsDisabled}
+                    max={ColorInputUtils.HUE_MAX}
+                    step={ColorInputUtils.HUE_STEP}
+                    ariaLabel={props.hueLabel}
+                    renderContent={props.renderHue}
+                />
+            </div>
         </>
     );
 
@@ -181,6 +205,7 @@ export const ColorInput = (props: ColorInputProps) => {
                         isOpen={getIsOpen}
                         flags={getRenderProps}
                         renderContent={props.renderContent}
+                        computeValueText={props.computeValueText}
                         onToggle={() => (getIsOpen() ? setIsOpen(false) : open())}
                         onMouseEnter={props.onMouseEnter}
                         onMouseLeave={props.onMouseLeave}
@@ -196,7 +221,7 @@ export const ColorInput = (props: ColorInputProps) => {
                 })}
                 isOpen={getIsOpen}
                 anchorRef={getFieldRef}
-                placement={() => access(props.placement) ?? COLOR_INPUT_DEFAULTS.placement}
+                placement={() => access(props.placement) ?? COLOR_INPUT_DEFAULTS.placement[getDirection()]}
                 offset={props.offset}
                 transitionDurationMs={props.transitionDurationMs}
                 hasAutoFocus={true}

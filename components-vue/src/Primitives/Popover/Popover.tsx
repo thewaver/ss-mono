@@ -31,7 +31,7 @@ export const Popover = defineComponent(
 
         const { anchorRect, isAnchorOnScreen, placement, position, arrowAim, zIndex, setContentRef } =
             AnchorVueUtils.usePortalPosition(() => props.anchorRef, fader.isVisible, {
-                placement: () => props.placement ?? POPOVER_DEFAULTS.placement,
+                placement: (direction) => props.placement ?? POPOVER_DEFAULTS.placement[direction],
                 offset: () => props.offset,
                 reservedScreenSize: () => props.reservedScreenSize,
                 isPinned: getIsPinned,

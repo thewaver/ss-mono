@@ -20,8 +20,8 @@ const TOUCH_POINTER_TYPE = "touch";
 /** A gap from an offset, where a missing or negative offset opens no gap at all. */
 const toGap = (value: number | undefined) => Math.max(value ?? NO_GAP, NO_GAP);
 
-/** Whether a pointer leaving one element is arriving in another, read off the event rather than timed. */
-const getIsMovingInto = (e: MouseEvent, element: HTMLElement | undefined) =>
+/** Whether a pointer or focus leaving one element is arriving in another, read off the event rather than timed. */
+const getIsMovingInto = (e: MouseEvent | FocusEvent, element: HTMLElement | undefined) =>
     e.relatedTarget instanceof Node && element !== undefined && element.contains(e.relatedTarget);
 
 /**
@@ -127,6 +127,9 @@ export namespace HoverIntentUtils {
      * @param defs.isTouchIgnored Treats a touch as no hover at all. A touch screen reports a tap as the pointer
      * arriving and staying, so without this a tap opens the panel after the delay; switch it on where a press
      * does something of its own.
+     * @param defs.isFocusWithin Treats keyboard focus on anything inside the anchor as focus on the anchor, for an
+     * anchor that groups several controls. Moving focus from one of them to another is not a blur. Off by default,
+     * so only focus on the anchor element itself counts.
      * @returns The controller: `getIsPointerInside` for whether the pointer is over the anchor or the panel right
      * now, `cancel` to drop a pending open, the two `observe*` functions, `reportShown` and `stop`.
      */
@@ -227,15 +230,19 @@ export namespace HoverIntentUtils {
             hide();
         };
 
-        const handleAnchorFocus = () => {
+        const handleAnchorFocus = (e?: FocusEvent) => {
+            const focused = e?.target instanceof Element ? e.target : anchorRef?.ownerDocument.activeElement;
+
             if (!defs.getFocusShowDelayMs) return;
             if (FocusManagerUtils.getIsRestoringFocus()) return;
-            if (anchorRef && !anchorRef.matches(":focus-visible")) return;
+            if (focused && !focused.matches(":focus-visible")) return;
 
             showAfter(defs.getFocusShowDelayMs());
         };
 
-        const handleAnchorBlur = () => {
+        const handleAnchorBlur = (e: FocusEvent) => {
+            if (defs.isFocusWithin && getIsMovingInto(e, anchorRef)) return;
+
             cancel();
 
             if (defs.isHiddenOnAnchorBlur) setIsShown(false);
@@ -246,11 +253,14 @@ export namespace HoverIntentUtils {
 
             anchorRef = element;
 
+            const focusEvent = defs.isFocusWithin ? "focusin" : "focus";
+            const blurEvent = defs.isFocusWithin ? "focusout" : "blur";
+
             element.addEventListener("pointerover", handlePointerOver);
             element.addEventListener("mouseenter", handleAnchorMouseEnter);
             element.addEventListener("mouseleave", handleAnchorMouseLeave);
-            element.addEventListener("focus", handleAnchorFocus);
-            element.addEventListener("blur", handleAnchorBlur);
+            element.addEventListener(focusEvent, handleAnchorFocus);
+            element.addEventListener(blurEvent, handleAnchorBlur);
 
             const stop = () => {
                 if (stopAnchor !== stop) return;
@@ -262,14 +272,16 @@ export namespace HoverIntentUtils {
                 element.removeEventListener("pointerover", handlePointerOver);
                 element.removeEventListener("mouseenter", handleAnchorMouseEnter);
                 element.removeEventListener("mouseleave", handleAnchorMouseLeave);
-                element.removeEventListener("focus", handleAnchorFocus);
-                element.removeEventListener("blur", handleAnchorBlur);
+                element.removeEventListener(focusEvent, handleAnchorFocus);
+                element.removeEventListener(blurEvent, handleAnchorBlur);
             };
 
             stopAnchor = stop;
 
             if (element.matches(":hover")) handleAnchorMouseEnter();
-            if (element === element.ownerDocument.activeElement) handleAnchorFocus();
+            const activeElement = element.ownerDocument.activeElement;
+
+            if (defs.isFocusWithin ? element.contains(activeElement) : element === activeElement) handleAnchorFocus();
 
             return stop;
         };

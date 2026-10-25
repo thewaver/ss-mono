@@ -1,3 +1,5 @@
+import type { PropsWithChildren } from "react";
+
 import {
     CHECKED_MARK,
     MIXED_MARK,
@@ -7,7 +9,7 @@ import * as styles from "@thewaver/ss-playground/App/StyledComponents/CheckboxCo
 import { useLayerClass } from "../Layer/Layer.context";
 import type { CheckboxContentProps } from "./CheckboxContentReact.types";
 
-export const PageCheckboxContent = (props: CheckboxContentProps) => {
+export const PageCheckboxContent = (props: PropsWithChildren<CheckboxContentProps>) => {
     const layerClass = useLayerClass();
 
     return (
@@ -23,10 +25,15 @@ export const PageCheckboxContent = (props: CheckboxContentProps) => {
             ]
                 .filter(Boolean)
                 .join(" ")}
+            aria-hidden="true"
         >
-            <div className={styles.checkboxMark} aria-hidden="true">
-                {props.flags.checkedState === "mixed" ? MIXED_MARK : CHECKED_MARK}
+            <div className={styles.checkboxBox}>
+                <div className={styles.checkboxMark}>
+                    {props.flags.checkedState === "mixed" ? MIXED_MARK : CHECKED_MARK}
+                </div>
             </div>
+
+            {props.children}
         </div>
     );
 };

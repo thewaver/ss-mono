@@ -3,13 +3,12 @@ import { createRenderEffect, createSignal } from "solid-js";
 import { type BinarySwitchFlags, BinarySwitchUtils, BinarySwitchStyles as styles } from "@thewaver/ss-components";
 
 import { FormFieldSolidUtils } from "../../Essentials/Input/FormField/FormFieldSolid.utils";
-import { LabelSolidUtils } from "../../Essentials/Input/Label/LabelSolid.utils";
 import { access } from "../../Utils/propUtils";
 import { InteractionWrapper } from "../InteractionWrapper/InteractionWrapper";
 import type { BinarySwitchElementProps, BinarySwitchProps } from "./BinarySwitchSolid.types";
 
 const BinarySwitchElement = (props: BinarySwitchElementProps) => {
-    const getAriaLabel = LabelSolidUtils.resolveAriaLabel(
+    const { getAriaLabel, getAriaLabelledBy } = FormFieldSolidUtils.resolveAriaName(
         props.ariaLabel === undefined ? undefined : () => access(props.ariaLabel)!,
     );
     const getAriaDescribedBy = FormFieldSolidUtils.resolveAriaDescribedBy();
@@ -50,6 +49,7 @@ const BinarySwitchElement = (props: BinarySwitchElementProps) => {
                 role={getRole()}
                 class={styles.binarySwitchElement}
                 aria-label={getAriaLabel()}
+                aria-labelledby={getAriaLabelledBy()}
                 aria-describedby={getAriaDescribedBy()}
                 aria-disabled={getIsDisabled() || undefined}
                 aria-required={access(props.isRequired) || undefined}

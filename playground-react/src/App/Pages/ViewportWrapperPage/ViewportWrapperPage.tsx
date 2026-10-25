@@ -1,8 +1,16 @@
 import type { ReactNode } from "react";
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 
 import type { AnchorPlacement, Toast } from "@thewaver/ss-components-react";
-import { Button, Range, Select, Toasts, ViewportWrapper, useViewportContext } from "@thewaver/ss-components-react";
+import {
+    Button,
+    Range,
+    Select,
+    ToastUtils,
+    Toasts,
+    ViewportWrapper,
+    useViewportContext,
+} from "@thewaver/ss-components-react";
 import { ViewportWrapperKnobs } from "@thewaver/ss-playground/App/Knobs/ViewportWrappers.const";
 import {
     COUNTRIES,
@@ -75,8 +83,6 @@ export const ViewportWrapperPage = () => {
 
         return { width: side, height: side };
     }, [scalePercent]);
-
-    const toastCountRef = useRef(0);
 
     return (
         <PageVariants
@@ -170,19 +176,18 @@ export const ViewportWrapperPage = () => {
                                                 <PageButtonContent flags={flags}>Notify</PageButtonContent>
                                             )}
                                             onClick={() => {
-                                                toastCountRef.current += 1;
-
-                                                const id = `innerToast${toastCountRef.current}`;
-
-                                                innerToasts[1]((prev) => [
-                                                    ...prev,
-                                                    { id, value: { kind: "info", message: INNER_TOAST_MESSAGE } },
-                                                ]);
+                                                innerToasts[1](
+                                                    (prev) =>
+                                                        ToastUtils.withRequestedToast(prev, {
+                                                            value: { kind: "info", message: INNER_TOAST_MESSAGE },
+                                                            announcement: INNER_TOAST_MESSAGE,
+                                                        }).toasts,
+                                                );
                                             }}
                                         />
                                     </div>
 
-                                    <Toasts
+                                    <Toasts<ToastDefs>
                                         toasts={innerToasts}
                                         ariaLabel={"Viewport notifications"}
                                         alignment={"bottom_center"}
@@ -192,21 +197,23 @@ export const ViewportWrapperPage = () => {
                                             marginBottom: INNER_TOAST_MARGIN,
                                             marginLeft: INNER_TOAST_MARGIN,
                                         }}
-                                        renderToast={(toast, visibilityTarget, transitionDurationMs, state) => (
+                                        renderToast={(
+                                            toast,
+                                            visibilityTarget,
+                                            transitionDurationMs,
+                                            state,
+                                            dismiss,
+                                        ) => (
                                             <PageToastContent
                                                 toast={toast}
                                                 state={state}
                                                 animation={"fade"}
                                                 stacking={"flow"}
-                                                dir={"column"}
+                                                flexDirection={"column"}
                                                 gap={INNER_TOAST_GAP}
                                                 visibilityTarget={visibilityTarget}
                                                 transitionDurationMs={transitionDurationMs}
-                                                onDismiss={() => {
-                                                    innerToasts[1]((prev) =>
-                                                        prev.filter((candidate) => candidate.id !== toast.id),
-                                                    );
-                                                }}
+                                                onDismiss={dismiss}
                                             />
                                         )}
                                     />

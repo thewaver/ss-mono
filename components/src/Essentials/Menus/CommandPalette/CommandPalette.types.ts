@@ -1,4 +1,4 @@
-import type { CSSMargin, CSSPadding } from "@thewaver/ss-utils";
+import type { CSSLogicalPadding, CSSMargin } from "@thewaver/ss-utils";
 
 import type { InteractionFlags } from "../../../Abstracts/InteractionTracker/InteractionTracker.types";
 import type { ResolvedShortcut, Shortcut } from "../../../Abstracts/Shortcut/Shortcut.types";
@@ -55,8 +55,11 @@ export type BaseCommandPaletteValues = {
     isDismissableOnOverlayClick?: boolean;
     /** How long the palette and its backdrop take to fade in and out. */
     transitionDurationMs?: number;
-    /** How much room is left inside the search field, around its text. */
-    fieldPadding?: CSSPadding | number;
+    /**
+     * How much room is left inside the search field, around its text. Its sides follow the text, as CSS's
+     * `padding-inline-start` and its siblings do.
+     */
+    fieldPadding?: CSSLogicalPadding | number;
     /** The space between the search field's text and whatever sits before or after it. */
     fieldGap?: number;
     /** Whether there are more actions to come, so the list can say so rather than looking finished. */

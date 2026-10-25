@@ -53,6 +53,8 @@
                 format,
                 calendar,
                 era: fieldValue?.era ?? era,
+                disabledDays: props.disabledDays,
+                computeIsDayDisabled: props.computeIsDayDisabled,
             }),
         getHasImpossibleDigits: (digits) => DateInputUtils.getHasImpossiblePart(digits, format, bounds),
         getIsSame: DateValueUtils.isSame,
@@ -65,7 +67,11 @@
         if (next) era = next.era;
     });
 
+    const isWritable = $derived(!(props.isDisabled ?? false) && !(props.isReadOnly ?? false));
+
     const setEra = (next: string) => {
+        if (!isWritable) return;
+
         era = next;
 
         const current = untrack(() => fieldValue);

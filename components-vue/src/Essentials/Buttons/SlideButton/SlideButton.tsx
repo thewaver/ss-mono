@@ -22,7 +22,6 @@ import { exposeElement, toElement } from "../../../Utils/refUtils";
 import { useStore } from "../../../Utils/storeUtils";
 import type { SlotsContext } from "../../../Utils/typeUtils";
 import { FormFieldVueUtils } from "../../Input/FormField/FormFieldVue.utils";
-import { LabelVueUtils } from "../../Input/Label/LabelVue.utils";
 import type { SlideButtonElementProps, SlideButtonProps, SlideButtonSlots } from "./SlideButton.types";
 
 const SlideButtonElement = defineComponent(
@@ -30,7 +29,7 @@ const SlideButtonElement = defineComponent(
         props: SlideButtonElementProps,
         { slots, expose }: SlotsContext<InteractionControlSlots<SlideButtonRenderProps>>,
     ) => {
-        const ariaLabel = LabelVueUtils.useAriaLabel(() => props.ariaLabel);
+        const { ariaLabel, ariaLabelledBy } = FormFieldVueUtils.useAriaName(() => props.ariaLabel);
         const fieldDescribedBy = FormFieldVueUtils.useAriaDescribedBy();
         const descriptionId = useId();
 
@@ -106,6 +105,7 @@ const SlideButtonElement = defineComponent(
                         type="button"
                         class={SlideButtonStyles.slideButtonElement}
                         aria-label={ariaLabel.value}
+                        aria-labelledby={ariaLabelledBy.value}
                         aria-describedby={ariaDescribedBy}
                         aria-pressed={props.flags.isPressed}
                         aria-disabled={isDisabled || undefined}

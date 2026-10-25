@@ -1,26 +1,35 @@
 <script lang="ts" module>
+    import type { Snippet } from "svelte";
+
     import type { TreeNode } from "@thewaver/ss-components-svelte";
 
     import PageTooltipContent from "../../StyledComponents/TooltipContent/TooltipContent.svelte";
 
     export * from "@thewaver/ss-playground/App/Pages/TreePage/TreeNodes.const";
 
-    export const FILES_WITH_REACHABLE: TreeNode<string>[] = [
+    const toDisabledNode = (
+        value: string,
+        renderReason: Snippet<[visibilityTarget: 0 | 1, transitionDurationMs: number]>,
+        isReachable: boolean,
+        children?: TreeNode<string>[],
+    ): TreeNode<string> => ({
+        value,
+        children,
+        isDisabled: true,
+        isReachableWhenDisabled: isReachable,
+        tooltipDefs: {
+            placement: { x: "right_out", y: "center" },
+            offset: { x: 10, y: 0 },
+            renderContent: renderReason,
+        },
+    });
+
+    export const createFilesWithDisabled = (isReachable: boolean): TreeNode<string>[] => [
         {
             value: "src",
             children: [
-                { value: "index.ts" },
-                {
-                    value: "node_modules",
-                    isDisabled: true,
-                    isReachableWhenDisabled: true,
-                    tooltipDefs: {
-                        placement: { x: "right_out", y: "center" },
-                        offset: { x: 10, y: 0 },
-                        renderContent: nodeModulesTooltip,
-                    },
-                    children: [{ value: "solid-js" }],
-                },
+                toDisabledNode("index.ts", indexTooltip, isReachable),
+                toDisabledNode("Lib", libTooltip, isReachable, [{ value: "Tree.tsx" }, { value: "Tree.utils.ts" }]),
                 { value: "Playground", children: [{ value: "App.tsx" }] },
             ],
         },
@@ -28,8 +37,14 @@
     ];
 </script>
 
-{#snippet nodeModulesTooltip(visibilityTarget: 0 | 1, transitionDurationMs: number)}
+{#snippet indexTooltip(visibilityTarget: 0 | 1, transitionDurationMs: number)}
     <PageTooltipContent {visibilityTarget} {transitionDurationMs}>
-        Not indexed, so this one cannot be opened.
+        Generated on build, so it cannot be picked.
+    </PageTooltipContent>
+{/snippet}
+
+{#snippet libTooltip(visibilityTarget: 0 | 1, transitionDurationMs: number)}
+    <PageTooltipContent {visibilityTarget} {transitionDurationMs}>
+        Locked while a release is cut. What is inside stays open to browse.
     </PageTooltipContent>
 {/snippet}

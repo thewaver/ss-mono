@@ -76,7 +76,9 @@ const surfaceTopLeft = (page: Page) =>
         const matrix = new DOMMatrix(getComputedStyle(surface).transform);
         const mapped = matrix.transformPoint(new DOMPoint(0, 0, 0, 1));
 
-        return { x: mapped.x / mapped.w / root.offsetWidth, y: mapped.y / mapped.w / root.offsetHeight };
+        const box = root as HTMLElement;
+
+        return { x: mapped.x / mapped.w / box.offsetWidth, y: mapped.y / mapped.w / box.offsetHeight };
     });
 
 const gripFractionOf = async (page: Page, corner: Corner) => {

@@ -26,6 +26,12 @@
     <div class={styles.fileInputPrompt}>{PICK_FILE_MARK}</div>
 
     <div class={[styles.fileInputNames, !props.renderProps.files.length && styles.isEmpty]}>
-        {props.renderProps.files.length ? props.renderProps.files.map((file) => file.name).join(", ") : NO_FILES}
+        {#if props.renderProps.files.length}
+            {#each props.renderProps.files as file, index (index)}
+                {index > 0 ? ", " : ""}<bdi>{file.name}</bdi>
+            {/each}
+        {:else}
+            {NO_FILES}
+        {/if}
     </div>
 </div>

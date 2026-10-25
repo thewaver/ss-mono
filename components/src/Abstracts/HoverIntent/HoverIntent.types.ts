@@ -24,6 +24,7 @@ export type HoverIntentControllerDefs = {
     getIsHeld?: () => boolean;
     isHiddenOnAnchorBlur?: boolean;
     isTouchIgnored?: boolean;
+    isFocusWithin?: boolean;
 };
 
 export type HoverIntentDefs = HoverIntentControllerDefs & {

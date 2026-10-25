@@ -3,10 +3,67 @@ import { type MaybeRefOrGetter, computed, toValue } from "vue";
 import { FormFieldUtils } from "@thewaver/ss-components";
 
 import { watchAfterRender } from "../../../Utils/effectUtils";
+import { useLabelContext } from "../Label/Label.context";
+import { LabelVueUtils } from "../Label/LabelVue.utils";
 import { useFormFieldContext } from "./FormField.context";
 
 /** The Vue side of `FormFieldUtils`: a control connected to the field around it. */
 export namespace FormFieldVueUtils {
+    /**
+     * The id of the caption that names the control, from the nearest `Label` or field.
+     *
+     * `FormFieldUtils.resolveAriaLabelledBy` against the nearest `Label` and `FormField`: the `Label`'s caption when
+     * the control sits inside one, and the field's caption otherwise. A control of your own puts the answer in its
+     * `aria-labelledby` and drops any `aria-label` while there is one, since the caption is then its name.
+     *
+     * Must run inside a component's `setup`.
+     *
+     * @returns A computed ref of the caption's id, or `undefined` when there is no caption to point at, including
+     * inside a `Label` whose caption registered no id.
+     */
+    export const useAriaLabelledBy = () => {
+        const labelContext = useLabelContext();
+        const fieldContext = useFormFieldContext();
+
+        return computed(() =>
+            FormFieldUtils.resolveAriaLabelledBy(
+                labelContext.getIsLabeled(),
+                labelContext.getCaptionId(),
+                fieldContext.getCaptionId(),
+            ),
+        );
+    };
+
+    /**
+     * The name a library control carries: its own `aria-label`, or the caption of the `Label` or field around it.
+     *
+     * Either caption names the control through `aria-labelledby` (see {@link useAriaLabelledBy}); either way the
+     * caller's `aria-label` is dropped, since it would replace the caption the reader can see, and the dropped value is
+     * warned about once so the caller can remove one of the two.
+     *
+     * Must run inside a component's `setup`.
+     *
+     * @param ariaLabel The caller's own value, if any.
+     * @returns Computed refs of the `aria-label` and the `aria-labelledby` to write, either `undefined` when it should
+     * be left off.
+     */
+    export const useAriaName = (ariaLabel: MaybeRefOrGetter<string | undefined>) => {
+        const labelContext = useLabelContext();
+        const ownAriaLabel = LabelVueUtils.useAriaLabel(ariaLabel);
+        const ariaLabelledBy = useAriaLabelledBy();
+
+        FormFieldUtils.warnIfShadowed(
+            !labelContext.getIsLabeled() && ariaLabelledBy.value !== undefined,
+            toValue(ariaLabel) !== undefined,
+            "ariaLabel",
+        );
+
+        return {
+            ariaLabel: computed(() => (ariaLabelledBy.value === undefined ? ownAriaLabel.value : undefined)),
+            ariaLabelledBy,
+        };
+    };
+
     /**
      * Combines the caller's `aria-describedby` with the description of the nearest field.
      *

@@ -2,8 +2,6 @@ import type { Point2d } from "@thewaver/ss-utils";
 
 export type ScrollerStep = "previous" | "next";
 
-export type ScrollerButtonPlacement = "split" | "start" | "end";
-
 export type ScrollerAxis = "x" | "y";
 
 export type ScrollerOverflow = "auto" | "scroll" | "hidden";
@@ -28,6 +26,25 @@ export type ScrollerStepper = {
     stepToNext: () => boolean;
 };
 
+export type ScrollerController = {
+    /**
+     * The id of the scrolling box: the one passed as `id`, or the one generated when none was. Point every button
+     * built on this controller at it with `aria-controls`, so a screen reader can tell what the button scrolls.
+     */
+    getBoxId: () => string;
+    /**
+     * Steps the box across the page, from its inline start to its end — the right on a left-to-right page, the left
+     * on a right-to-left one. While `overflowX` is `hidden` it reads as at both ends, and its steps answer `false` and do
+     * nothing.
+     */
+    x: ScrollerStepper;
+    /**
+     * Steps the box down the page and back up. While `overflowY` is `hidden` it reads as at both ends, and its steps
+     * answer `false` and do nothing.
+     */
+    y: ScrollerStepper;
+};
+
 export type ScrollerMetrics = {
     start: number;
     visible: number;
@@ -35,10 +52,6 @@ export type ScrollerMetrics = {
 };
 
 export type ScrollerBoxMetrics = Record<ScrollerAxis, ScrollerMetrics>;
-
-export type ScrollerAxisSteps = { leading: ScrollerStep[]; trailing: ScrollerStep[] };
-
-export type ScrollerBoxSteps = Record<ScrollerAxis, ScrollerAxisSteps>;
 
 export type ScrollerGridTemplate = { areas: string; columns: string; rows: string };
 
@@ -93,12 +106,10 @@ export type ScrollerActivityDefs = {
 
 export type BaseScrollerValues = {
     /**
-     * The id of the scrolling box, which each drawn bar names in its `aria-controls`. Leave it out and one is
-     * generated.
+     * The id of the scrolling box, which each drawn bar names in its `aria-controls` and the controller hands back for
+     * the buttons to name. Leave it out and one is generated.
      */
     id?: string;
-    /** The space between items. */
-    gap?: number;
     /** How much room is left at the ends of the run, so the first and last items are not flush against the edge. */
     padding?: number;
     /**
@@ -108,8 +119,6 @@ export type BaseScrollerValues = {
      * however large this is, so it can never leave a press doing nothing.
      */
     overlapCount?: number;
-    /** Where the scroll controls sit. Each scrolling direction has its own pair, placed the same way. */
-    buttonPlacement?: ScrollerButtonPlacement;
     /**
      * Whether the box scrolls across the page, written to its `overflow-x`: `auto` scrolls and shows the bar only while
      * the content overflows, `scroll` always shows the bar, and `hidden` neither scrolls nor shows it.
@@ -157,6 +166,19 @@ export type BaseScrollerCbs = {
      * of `1` is the formula for an arc.
      */
     computeProgressAtPoint?: (axis: ScrollerAxis, point: Point2d, rect: DOMRect) => number;
+};
+
+export type ScrollerCbs = BaseScrollerCbs & {
+    /**
+     * Hands over the controller once the scroller is in the page: one stepper per direction, saying whether the box
+     * is at either end and stepping it about a view either way, plus the box's id.
+     *
+     * **The scroller draws no buttons, so any are built on this, wherever the page wants them.** Point each at
+     * {@link ScrollerController.getBoxId} with `aria-controls`, name it by the way it scrolls, and disable it while
+     * its stepper says the box is already at that end. Wheel, touch and the box's own keyboard scrolling stay the
+     * browser's whether or not buttons are built.
+     */
+    onMount?: (controller: ScrollerController) => void;
 };
 
 export type BaseScrollerProps = BaseScrollerValues & BaseScrollerCbs;

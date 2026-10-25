@@ -48,6 +48,8 @@ export type TagInputFieldElementProps = {
     isDisabled: boolean;
     /** The field's accessible name, already resolved against any surrounding label. */
     ariaLabel?: string;
+    /** The id of the caption naming the field, already resolved against any surrounding label or form field. */
+    ariaLabelledBy?: string;
     /** The ids describing the field, already combined with any surrounding form field's. */
     ariaDescribedBy?: string;
     /** Runs with the new text as it is typed. */

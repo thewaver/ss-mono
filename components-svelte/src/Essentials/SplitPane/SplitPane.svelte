@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { untrack } from "svelte";
+
     import {
         SPLIT_PANE_DEFAULTS,
         type SplitPaneCollapsedBoundaries,
@@ -17,6 +19,8 @@
     let { ratios: storedRatios = $bindable(), ...props }: SplitPaneProps = $props();
 
     const paneIdPrefix = $props.id();
+
+    $effect(() => untrack(() => SplitPaneUtils.warnIfGutterUnnamed(props.panes, "gutterAriaLabel")));
 
     let root = $state<HTMLDivElement>();
     let draggingIndex = $state(SplitPaneConst.NO_GUTTER_DRAGGING);

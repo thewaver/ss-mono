@@ -1,4 +1,4 @@
-import { For, Show, createMemo, createResource, createSignal, onCleanup } from "solid-js";
+import { For, Match, Show, Switch, createMemo, createResource, createSignal, onCleanup } from "solid-js";
 import type { ApiGroupKind, ApiTableKind } from "virtual:component-api";
 
 import { TableOfContents, TableOfContentsUtils, access } from "@thewaver/ss-components-solid";
@@ -24,7 +24,7 @@ import {
 } from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.utils";
 
 import { PageTableOfContentsContent } from "../../StyledComponents/TableOfContentsContent/TableOfContentsContent";
-import type { PageApiTableProps, PageApiViewProps } from "./ApiViewSolid.types";
+import type { PageApiTableProps, PageApiTextProps, PageApiViewProps } from "./ApiViewSolid.types";
 
 const GROUP_TITLES: Record<ApiGroupKind, string> = {
     props: "Props",
@@ -46,6 +46,21 @@ const toAddress = (hash: string) => `${window.location.pathname}${window.locatio
 
 const getIsPlainClick = (e: MouseEvent) => e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey;
 
+const PageApiText = (props: PageApiTextProps) => (
+    <For each={props.text}>
+        {(part) => (
+            <Switch fallback={part.text}>
+                <Match when={part.kind === "prop"}>
+                    <span class={styles.docsPropName}>{part.text}</span>
+                </Match>
+                <Match when={part.kind === "link" && part}>
+                    {(getLink) => <a href={getLink().href}>{getLink().text}</a>}
+                </Match>
+            </Switch>
+        )}
+    </For>
+);
+
 const PageApiTable = (props: PageApiTableProps) => {
     const getTable = () => access(props.table);
 
@@ -57,8 +72,10 @@ const PageApiTable = (props: PageApiTableProps) => {
                 </h3>
             </Show>
 
-            <Show when={getTable().description}>
-                <p class={styles.docsDescription}>{getTable().description}</p>
+            <Show when={getTable().description.length}>
+                <p class={styles.docsDescription}>
+                    <PageApiText text={getTable().description} />
+                </p>
             </Show>
 
             <Show when={getTable().includes.length}>
@@ -114,10 +131,10 @@ const PageApiTable = (props: PageApiTableProps) => {
                                         <Show when={getTable().isDocumented}>
                                             <td class={styles.docsCell}>
                                                 <Show
-                                                    when={entry.description}
+                                                    when={entry.description.length}
                                                     fallback={<span class={styles.docsPending}>{NO_DESCRIPTION}</span>}
                                                 >
-                                                    {entry.description}
+                                                    <PageApiText text={entry.description} />
                                                 </Show>
                                             </td>
                                         </Show>
@@ -134,6 +151,7 @@ const PageApiTable = (props: PageApiTableProps) => {
 
 export const PageApiView = (props: PageApiViewProps) => {
     let currentEntry: DocsTableOfContentsEntry | undefined;
+    let hasOpened = false;
     let stopHashHold: (() => void) | undefined;
 
     onCleanup(() => stopHashHold?.());
@@ -158,6 +176,12 @@ export const PageApiView = (props: PageApiViewProps) => {
 
     const handleCurrentChange = (entry: DocsTableOfContentsEntry | undefined) => {
         currentEntry = entry;
+
+        if (!hasOpened) {
+            hasOpened = true;
+
+            return;
+        }
 
         if (!stopHashHold) replaceHash(entry);
     };

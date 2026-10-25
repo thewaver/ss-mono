@@ -114,10 +114,10 @@ The reasoning that would have gone into paragraphs goes into the documents, wher
   running, after the report of what was done — a question in the middle of agent reports scrolls out of sight. One
   that blocks all remaining work still goes last in the reply, never above a report.
 
-**When asked what work is outstanding, answer in their recorded order, not by size.** `backlog.md` carries the order:
-an item may say not to list it, and the **_Bottom of the list_** section (`Table` / data grid, the command palette)
-was placed last after argument. A question about what is left is about what to do next, so deprioritized work is left
-out or named as such, never ranked above live work.
+**When asked what work is outstanding, answer in their recorded order, not by size.** `backlog.md` carries the order,
+and what it says about an item's priority is the only source for it: an item may say not to list it, or that it was
+placed last. A question about what is left is about what to do next, so deprioritized work is left out or named as
+such, never ranked above live work.
 
 ## Arguing a position
 

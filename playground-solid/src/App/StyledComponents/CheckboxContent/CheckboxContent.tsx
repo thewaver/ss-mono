@@ -1,3 +1,5 @@
+import type { ParentProps } from "solid-js";
+
 import { access } from "@thewaver/ss-components-solid";
 import {
     CHECKED_MARK,
@@ -8,7 +10,7 @@ import * as styles from "@thewaver/ss-playground/App/StyledComponents/CheckboxCo
 import { useLayerClass } from "../Layer/Layer.context";
 import type { CheckboxContentProps } from "./CheckboxContentSolid.types";
 
-export const PageCheckboxContent = (props: CheckboxContentProps) => {
+export const PageCheckboxContent = (props: ParentProps<CheckboxContentProps>) => {
     const getLayerClass = useLayerClass();
 
     return (
@@ -22,10 +24,15 @@ export const PageCheckboxContent = (props: CheckboxContentProps) => {
                 [styles.isDisabled]: access(props.flags).isDisabled,
                 [styles.hasError]: access(props.flags).hasError,
             }}
+            aria-hidden="true"
         >
-            <div class={styles.checkboxMark} aria-hidden="true">
-                {access(props.flags).checkedState === "mixed" ? MIXED_MARK : CHECKED_MARK}
+            <div class={styles.checkboxBox}>
+                <div class={styles.checkboxMark}>
+                    {access(props.flags).checkedState === "mixed" ? MIXED_MARK : CHECKED_MARK}
+                </div>
             </div>
+
+            {props.children}
         </div>
     );
 };

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import PagePopoverSurface from "../../StyledComponents/PopoverSurface/PopoverSurface.vue";
-import type { SelectPopupProps } from "./SelectPage.types";
+import type { SelectPopupProps } from "./SelectPageVue.types";
 
 defineProps<SelectPopupProps>();
 </script>

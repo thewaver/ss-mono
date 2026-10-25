@@ -1,23 +1,11 @@
 import { For, createSignal } from "solid-js";
 
-import { PlacementLayoutUtils, Radio, RadioGroup } from "@thewaver/ss-components-solid";
-import type { ArcDefs } from "@thewaver/ss-components-solid";
-import { STARTING_RATING } from "@thewaver/ss-playground/App/Pages/RadioPage/RadioPage.const";
+import { Radio, RadioGroup } from "@thewaver/ss-components-solid";
+import { ARC_LAYOUT, ARC_WIDTH, STARTING_RATING } from "@thewaver/ss-playground/App/Pages/RadioPage/RadioPage.const";
 
 import { PageRadioStarCell, PageRadioStarContent } from "../../../StyledComponents/RadioStarContent/RadioStarContent";
 
 const RATING_OPTIONS = [1, 2, 3, 4, 5];
-
-const ARC_DEFS: ArcDefs = {
-    curveHeightRatio: 0.3867,
-    spreadDegrees: 160,
-    itemWidthRatio: 0.11,
-    itemHeightRatio: 1.0909,
-};
-
-const ARC_LAYOUT = PlacementLayoutUtils.createArc(ARC_DEFS);
-
-const ARC_WIDTH = "300px";
 
 export const ArcDocsExample = () => {
     const valueSignal = createSignal(STARTING_RATING);

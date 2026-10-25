@@ -1,9 +1,45 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { demo, readout, turnDegrees } from "./helpers";
+import { docsDemo, docsSettled, prop, turnDegrees } from "./helpers";
 
-const list = (key: string, label: string) => `${demo(key)} [role="list"][aria-label="${label}"]`;
-const item = (key: string, label: string) => `${demo(key)} [role="listitem"][aria-label="${label}"]`;
+const DOCS = "/src/App/Pages/SortablePage/Docs";
+
+const BASIC = docsDemo(DOCS, "Basic");
+const PAIR = docsDemo(DOCS, "Pair");
+const PICKY = docsDemo(DOCS, "Picky");
+const RING = docsDemo(DOCS, "Ring");
+
+const list = (scope: string, label?: string) =>
+    `${scope} [role="list"]${label === undefined ? "" : `[aria-label="${label}"]`}`;
+const item = (scope: string, label: string) => `${scope} [role="listitem"][aria-label="${label}"]`;
+
+/**
+ * No example prints its lists, so the order a list holds is read off the items themselves: each is a
+ * `listitem` named by its card, in the order the list draws them.
+ */
+const orderOf = (page: Page, scope: string, label?: string) =>
+    page
+        .locator(`${list(scope, label)} [role="listitem"]`)
+        .evaluateAll((elements) => elements.map((element) => element.getAttribute("aria-label") ?? ""));
+
+/** The order a list should hold once the card at `from` has been taken out and put back in at `to`. */
+const moved = (order: string[], from: number, to: number) => {
+    const next = order.filter((_, index) => index !== from);
+
+    next.splice(to, 0, order[from]);
+
+    return next;
+};
+
+const chooseProp = async (page: Page, key: string, name: string) => {
+    const picker = page.locator(`${prop(key)} [role="combobox"]`);
+
+    await picker.click();
+
+    const options = page.locator(`[id="${await picker.getAttribute("aria-controls")}"]`);
+
+    await options.getByRole("option", { name, exact: true }).click();
+};
 
 /**
  * The three ways in are the point of the control, so each is driven separately rather than through one
@@ -35,63 +71,64 @@ const dragBetween = async (page: Page, source: string, target: string, offsetFro
  * The marker is the only child of a list that is not one of its items, so counting those says whether
  * something is being carried without reading a class name off the consumer's paint.
  */
-const carriedCount = (page: Page, key: string) =>
+const carriedCount = (page: Page, scope: string) =>
     page.evaluate(
         (selector) =>
             [...document.querySelectorAll(`${selector} [role="list"]`)].reduce(
                 (count, list) => count + [...list.children].filter((child) => !child.getAttribute("role")).length,
                 0,
             ),
-        demo(key),
+        scope,
     );
 
-const markerTop = (page: Page, key: string) =>
+const markerTop = (page: Page, scope: string) =>
     page.evaluate((selector) => {
         const list = document.querySelector(`${selector} [role="list"]`) as HTMLElement;
         const marker = [...list.children].find((child) => !child.getAttribute("role"));
 
         return marker ? Math.round(marker.getBoundingClientRect().top) : -1;
-    }, demo(key));
+    }, scope);
 
-const itemTops = (page: Page, key: string) =>
+const itemTops = (page: Page, scope: string) =>
     page.evaluate(
         (selector) =>
             [...document.querySelectorAll(`${selector} [role="listitem"]`)].map((element) =>
                 Math.round(element.getBoundingClientRect().top),
             ),
-        demo(key),
+        scope,
     );
 
 test.beforeEach(async ({ page }) => {
-    await page.goto("/sortable");
-    await expect(page.locator("[data-example]").first()).toBeVisible();
+    await page.goto("/sortable/docs");
+    await expect(page.locator(list(BASIC))).toBeVisible();
+    await docsSettled(page);
 });
 
 test("a list owns its role and its items carry their place in it", async ({ page }) => {
-    await expect(page.locator(`${demo("reorder")} [role="list"]`), "the library owns the list role").toHaveCount(1);
-    await expect(page.locator(`${demo("reorder")} [role="listitem"]`), "one item per record").toHaveCount(4);
+    await expect(page.locator(list(BASIC)), "the library owns the list role").toHaveCount(1);
+    await expect(page.locator(`${BASIC} [role="listitem"]`), "one item per record").toHaveCount(4);
 
-    await expect(page.locator(item("reorder", "First")), "and each says where it sits").toHaveAttribute(
+    await expect(page.locator(item(BASIC, "First")), "and each says where it sits").toHaveAttribute(
         "aria-posinset",
         "1",
     );
-    await expect(page.locator(item("reorder", "First")), "out of how many").toHaveAttribute("aria-setsize", "4");
+    await expect(page.locator(item(BASIC, "First")), "out of how many").toHaveAttribute("aria-setsize", "4");
 });
 
 test("a list is one tab stop, and the arrows walk it", async ({ page }) => {
-    await page.locator(item("reorder", "First")).focus();
+    await page.locator(item(BASIC, "First")).focus();
 
     expect(
-        await page.locator(item("reorder", "First")).evaluate((element) => (element as HTMLElement).tabIndex),
+        await page.locator(item(BASIC, "First")).evaluate((element) => (element as HTMLElement).tabIndex),
         "the item focus is on is the one tab stop",
     ).toBe(0);
     expect(
-        await page.locator(item("reorder", "Third")).evaluate((element) => (element as HTMLElement).tabIndex),
+        await page.locator(item(BASIC, "Third")).evaluate((element) => (element as HTMLElement).tabIndex),
         "and every other item is out of the tab order",
     ).toBe(-1);
 
     await page.keyboard.press("ArrowDown");
-    await expect(page.locator(item("reorder", "Third")), "the walk skips the disabled second item").toBeFocused();
+    await expect(page.locator(item(BASIC, "Third")), "the walk skips the disabled second item").toBeFocused();
 });
 
 /**
@@ -102,53 +139,65 @@ test("a list is one tab stop, and the arrows walk it", async ({ page }) => {
  * when the drop commits.
  */
 test("keyboard: a pick, two moves and a drop land two places along", async ({ page }) => {
-    await page.locator(item("reorder", "First")).focus();
+    const before = await orderOf(page, BASIC);
+
+    await page.locator(item(BASIC, "First")).focus();
 
     await page.keyboard.press("Enter");
     await page.keyboard.press("ArrowDown");
     await page.keyboard.press("ArrowDown");
     await page.keyboard.press("Enter");
 
-    expect(await readout(page, "reorder"), "the first item has passed two of its neighbors").toContain(
-        "Second — locked, Third, First, Fourth",
-    );
+    await expect
+        .poll(() => orderOf(page, BASIC), { message: "the first item has passed two of its neighbors" })
+        .toEqual(moved(before, 0, 2));
 });
 
 test("keyboard: Escape puts the item back where it was", async ({ page }) => {
-    await page.locator(item("row", "Ember Sprite")).focus();
+    await chooseProp(page, "orientation", "horizontal");
+
+    const before = await orderOf(page, BASIC);
+
+    await page.locator(item(BASIC, "First")).focus();
 
     await page.keyboard.press("Enter");
     await page.keyboard.press("ArrowRight");
     await page.keyboard.press("Escape");
 
-    expect(await readout(page, "row"), "a canceled carry changes nothing").toContain(
-        "Ember Sprite, Gale Warden, Tide Caller",
-    );
+    expect(await orderOf(page, BASIC), "a canceled carry changes nothing").toEqual(before);
 });
 
 test("keyboard: Tab moves the carried item to the other list", async ({ page }) => {
-    await page.locator(item("pair", "Ember Sprite")).focus();
+    const hand = await orderOf(page, PAIR, "Hand");
+    const board = await orderOf(page, PAIR, "Board");
+
+    await page.locator(item(PAIR, "Ember Sprite")).focus();
 
     await page.keyboard.press("Enter");
     await page.keyboard.press("Tab");
     await page.keyboard.press("Enter");
 
-    expect(await readout(page, "pair"), "it left the hand").toContain("hand: Gale Warden, Tide Caller");
-    expect(await readout(page, "pair"), "and arrived at the end of the board").toContain("board: Root Golem, Ember");
+    await expect
+        .poll(() => orderOf(page, PAIR, "Hand"), { message: "it left the hand" })
+        .toEqual(hand.filter((label) => label !== "Ember Sprite"));
+    expect(await orderOf(page, PAIR, "Board"), "and arrived at the end of the board").toEqual([
+        ...board,
+        "Ember Sprite",
+    ]);
 });
 
 test("pointer: a drag carries an item into the other list", async ({ page }) => {
-    await dragBetween(page, item("pair", "Gale Warden"), list("pair", "Board"));
+    const hand = await orderOf(page, PAIR, "Hand");
+    const board = await orderOf(page, PAIR, "Board");
 
-    expect(await readout(page, "pair"), "it left the hand").toContain("hand: Ember Sprite, Tide Caller");
-    expect(await readout(page, "pair"), "and landed on the board").toContain("board: Root Golem, Gale Warden");
+    await dragBetween(page, item(PAIR, "Gale Warden"), list(PAIR, "Board"));
+
+    await expect
+        .poll(() => orderOf(page, PAIR, "Hand"), { message: "it left the hand" })
+        .toEqual(hand.filter((label) => label !== "Gale Warden"));
+    expect(await orderOf(page, PAIR, "Board"), "and landed on the board").toEqual([...board, "Gale Warden"]);
 });
 
-/**
- * The single-pointer route 2.5.7 asks for. A press that never moves far enough to be a drag is a click,
- * and a click picks up; the next click places. The two are one state machine with the keyboard route,
- * which is why canceling works the same way for both.
- */
 /**
  * A tap-carry is not a drag with the button up: nothing is holding the pointer, so the moves arrive at the
  * document rather than at the item. The first build listened for them only to move the copy under the
@@ -156,34 +205,45 @@ test("pointer: a drag carries an item into the other list", async ({ page }) => 
  * been picked up — the drop then landed somewhere the page had never marked.
  */
 test("pointer: a tap-carry re-aims as the pointer moves, with no button held", async ({ page }) => {
-    await page.locator(item("reorder", "First")).click();
+    const before = await orderOf(page, BASIC);
 
-    const list = await page.locator(`${demo("reorder")} [role="list"]`).boundingBox();
+    await page.locator(item(BASIC, "First")).click();
 
-    if (!list) throw new Error("the list has to be somewhere");
+    const box = await page.locator(list(BASIC)).boundingBox();
 
-    await page.mouse.move(list.x + list.width * 0.5, list.y + list.height * 0.3, { steps: 3 });
+    if (!box) throw new Error("the list has to be somewhere");
 
-    const near = await markerTop(page, "reorder");
+    await page.mouse.move(box.x + box.width * 0.5, box.y + box.height * 0.3, { steps: 3 });
 
-    await page.mouse.move(list.x + list.width * 0.5, list.y + list.height * 0.8, { steps: 3 });
+    const near = await markerTop(page, BASIC);
 
-    expect(await markerTop(page, "reorder"), "the landing place tracks the pointer").not.toBe(near);
+    await page.mouse.move(box.x + box.width * 0.5, box.y + box.height * 0.8, { steps: 3 });
+
+    expect(await markerTop(page, BASIC), "the landing place tracks the pointer").not.toBe(near);
 
     await page.mouse.down();
     await page.mouse.up();
 
-    expect(await readout(page, "reorder"), "and the drop lands where it was marked").toContain(
-        "Second — locked, Third, First, Fourth",
-    );
+    await expect
+        .poll(() => orderOf(page, BASIC), { message: "and the drop lands where it was marked" })
+        .toEqual(moved(before, 0, 2));
 });
 
+/**
+ * The single-pointer route 2.5.7 asks for. A press that never moves far enough to be a drag is a click,
+ * and a click picks up; the next click places. The two are one state machine with the keyboard route,
+ * which is why canceling works the same way for both.
+ */
 test("pointer: a tap picks up and a second tap places, with no dragging at all", async ({ page }) => {
-    await page.locator(item("pair", "Tide Caller")).click();
-    await page.locator(item("pair", "Root Golem")).click();
+    const hand = await orderOf(page, PAIR, "Hand");
 
-    expect(await readout(page, "pair"), "it left the hand").toContain("hand: Ember Sprite, Gale Warden");
-    expect(await readout(page, "pair"), "and landed on the board").toContain("board:");
+    await page.locator(item(PAIR, "Tide Caller")).click();
+    await page.locator(item(PAIR, "Root Golem")).click();
+
+    await expect
+        .poll(() => orderOf(page, PAIR, "Hand"), { message: "it left the hand" })
+        .toEqual(hand.filter((label) => label !== "Tide Caller"));
+    expect(await orderOf(page, PAIR, "Board"), "and landed on the board").toContain("Tide Caller");
 });
 
 /**
@@ -194,16 +254,18 @@ test("pointer: a tap picks up and a second tap places, with no dragging at all",
  * phase, the way the swipe gesture already does it.
  */
 test("a drag that has finished leaves nothing being carried", async ({ page }) => {
-    await dragBetween(page, item("reorder", "First"), item("reorder", "Third"));
+    const before = await orderOf(page, BASIC);
 
-    expect(await carriedCount(page, "reorder"), "nothing is still in hand after the release").toBe(0);
-    expect(await readout(page, "reorder"), "and the move committed once, not twice and not at all").toContain(
-        "Second — locked, Third, First, Fourth",
-    );
+    await dragBetween(page, item(BASIC, "First"), item(BASIC, "Third"));
 
-    await dragBetween(page, item("reorder", "Third"), item("reorder", "Fourth"));
+    expect(await carriedCount(page, BASIC), "nothing is still in hand after the release").toBe(0);
+    await expect
+        .poll(() => orderOf(page, BASIC), { message: "and the move committed once, not twice and not at all" })
+        .toEqual(moved(before, 0, 2));
 
-    expect(await carriedCount(page, "reorder"), "and the same holds for a second drag").toBe(0);
+    await dragBetween(page, item(BASIC, "Third"), item(BASIC, "Fourth"));
+
+    expect(await carriedCount(page, BASIC), "and the same holds for a second drag").toBe(0);
 });
 
 /**
@@ -213,8 +275,8 @@ test("a drag that has finished leaves nothing being carried", async ({ page }) =
  * drag oscillating instead of pointing anywhere. Out of flow, the geometry the drag reads is fixed.
  */
 test("carrying an item does not move the items being dragged past", async ({ page }) => {
-    const source = await page.locator(item("reorder", "First")).boundingBox();
-    const target = await page.locator(item("reorder", "Fourth")).boundingBox();
+    const source = await page.locator(item(BASIC, "First")).boundingBox();
+    const target = await page.locator(item(BASIC, "Fourth")).boundingBox();
 
     if (!source || !target) throw new Error("a drag needs both boxes to exist");
 
@@ -223,13 +285,13 @@ test("carrying an item does not move the items being dragged past", async ({ pag
     await page.mouse.move(source.x + source.width * 0.5, source.y + source.height * 0.5 + 8, { steps: 4 });
     await page.mouse.move(target.x + target.width * 0.5, target.y + target.height - 2, { steps: 10 });
 
-    expect(await carriedCount(page, "reorder"), "the destination is marked while the carry is live").toBe(1);
+    expect(await carriedCount(page, BASIC), "the destination is marked while the carry is live").toBe(1);
 
-    const before = await itemTops(page, "reorder");
+    const before = await itemTops(page, BASIC);
 
     await page.mouse.move(target.x + target.width * 0.5, target.y + target.height - 4, { steps: 2 });
 
-    expect(await itemTops(page, "reorder"), "and the list does not shuffle under the pointer").toEqual(before);
+    expect(await itemTops(page, BASIC), "and the list does not shuffle under the pointer").toEqual(before);
 
     await page.mouse.up();
 });
@@ -242,15 +304,17 @@ test("carrying an item does not move the items being dragged past", async ({ pag
  * card. Sizes are the consumer's business, so this asserts the span, the containment and the clearance,
  * never a thickness — and it walks the whole list, because only the two ends were ever wrong.
  */
-for (const [key, label, axis] of [
-    ["reorder", "First", "column"],
-    ["row", "Ember Sprite", "row"],
+for (const [orientation, axis] of [
+    ["vertical", "column"],
+    ["horizontal", "row"],
 ] as const) {
     test(`the ${axis} marker spans its list, stays inside it and clears every card`, async ({ page }) => {
-        const source = await page.locator(item(key, label)).boundingBox();
-        const list = await page.locator(`${demo(key)} [role="list"]`).boundingBox();
+        if (orientation === "horizontal") await chooseProp(page, "orientation", orientation);
 
-        if (!source || !list) throw new Error("a drag needs both boxes to exist");
+        const source = await page.locator(item(BASIC, "First")).boundingBox();
+        const box = await page.locator(list(BASIC)).boundingBox();
+
+        if (!source || !box) throw new Error("a drag needs both boxes to exist");
 
         await page.mouse.move(source.x + source.width * 0.5, source.y + source.height * 0.5);
         await page.mouse.down();
@@ -259,8 +323,8 @@ for (const [key, label, axis] of [
         // Every landing place the list has, the two ends included — those were the only ones that failed.
         for (const along of [0.01, 0.3, 0.55, 0.8, 0.99]) {
             await page.mouse.move(
-                axis === "row" ? list.x + list.width * along : list.x + list.width * 0.5,
-                axis === "row" ? list.y + list.height * 0.5 : list.y + list.height * along,
+                axis === "row" ? box.x + box.width * along : box.x + box.width * 0.5,
+                axis === "row" ? box.y + box.height * 0.5 : box.y + box.height * along,
                 { steps: 2 },
             );
 
@@ -296,7 +360,7 @@ for (const [key, label, axis] of [
                         markerRect.right <= listRect.right + 0.5,
                     cardsCovered: overlaps.length,
                 };
-            }, demo(key));
+            }, BASIC);
 
             expect(fit, `the marker is whole and clear of every card at ${along} along the list`).toEqual({
                 spansAcross: true,
@@ -323,17 +387,18 @@ test("the landing place is right when the viewport is scaled", async ({ page }) 
         Object.defineProperty(window.screen, "width", { value: 2400, configurable: true });
     });
     await page.setViewportSize({ width: 1200, height: 700 });
-    await page.goto("/sortable");
-    await expect(page.locator("[data-example]").first()).toBeVisible();
+    await page.goto("/sortable/docs");
+    await expect(page.locator(list(BASIC))).toBeVisible();
+    await docsSettled(page);
 
-    await page.locator(item("reorder", "First")).click();
+    await page.locator(item(BASIC, "First")).click();
 
-    const list = await page.locator(`${demo("reorder")} [role="list"]`).boundingBox();
+    const box = await page.locator(list(BASIC)).boundingBox();
 
-    if (!list) throw new Error("the list has to be somewhere");
+    if (!box) throw new Error("the list has to be somewhere");
 
     for (const along of [0.3, 0.55, 0.8]) {
-        await page.mouse.move(list.x + list.width * 0.5, list.y + list.height * along, { steps: 3 });
+        await page.mouse.move(box.x + box.width * 0.5, box.y + box.height * along, { steps: 3 });
 
         const placed = await page.evaluate((selector) => {
             const list = document.querySelector(`${selector} [role="list"]`) as HTMLElement;
@@ -352,7 +417,7 @@ test("the landing place is right when the viewport is scaled", async ({ page }) 
                     return markerRect.bottom > rect.top + 0.5 && markerRect.top < rect.bottom - 0.5;
                 }),
             };
-        }, demo("reorder"));
+        }, BASIC);
 
         expect(placed, `scaled, and clear of every card at ${along} along the list`).toEqual({
             isScaled: true,
@@ -364,76 +429,82 @@ test("the landing place is right when the viewport is scaled", async ({ page }) 
 /**
  * A list that refuses a card is refused at every route, not only at the drop. `Tab` skips it entirely
  * while carrying something it will not take, so a keyboard user never arrives somewhere that cannot
- * accept them and then finds out on pressing Enter.
+ * accept them and then finds out on pressing Enter. Which cards the board refuses is the example's data —
+ * the hand's dearest card is refused and its cheapest taken.
  */
 test("a list that refuses an item is not offered as a destination", async ({ page }) => {
-    await page.locator(item("picky", "Tide Caller")).focus();
+    const hand = await orderOf(page, PICKY, "Hand");
+
+    await page.locator(item(PICKY, "Tide Caller")).focus();
 
     await page.keyboard.press("Enter");
     await page.keyboard.press("Tab");
     await page.keyboard.press("Enter");
 
-    expect(await readout(page, "picky"), "the expensive card is still in the hand").toContain(
-        "hand: Ember Sprite, Gale Warden, Tide Caller",
-    );
-    expect(await readout(page, "picky"), "and the board is still empty").toContain("board: empty");
+    expect(await orderOf(page, PICKY, "Hand"), "the expensive card is still in the hand").toEqual(hand);
+    expect(await orderOf(page, PICKY, "Board"), "and the board is still empty").toEqual([]);
 
-    await page.locator(item("picky", "Ember Sprite")).focus();
+    await page.locator(item(PICKY, "Ember Sprite")).focus();
 
     await page.keyboard.press("Enter");
     await page.keyboard.press("Tab");
     await page.keyboard.press("Enter");
 
-    expect(await readout(page, "picky"), "while a cheap one crosses").toContain("board: Ember Sprite");
+    await expect
+        .poll(() => orderOf(page, PICKY, "Board"), { message: "while a cheap one crosses" })
+        .toEqual(["Ember Sprite"]);
 });
 
 test("a locked list can still be reordered from inside", async ({ page }) => {
-    await page.locator(item("locked", "Root Golem")).focus();
+    await page.locator(`${prop("isBoardLocked")} input`).click();
+
+    const hand = await orderOf(page, PAIR, "Hand");
+    const board = await orderOf(page, PAIR, "Board");
+
+    await page.locator(item(PAIR, "Root Golem")).focus();
 
     await page.keyboard.press("Enter");
     await page.keyboard.press("Escape");
 
-    expect(await readout(page, "locked"), "nothing crossed into it").toContain("board: Root Golem");
+    expect(await orderOf(page, PAIR, "Board"), "nothing crossed into it").toEqual(board);
 
-    await dragBetween(page, item("locked", "Ember Sprite"), list("locked", "Board"));
+    await dragBetween(page, item(PAIR, "Ember Sprite"), list(PAIR, "Board"));
 
-    expect(await readout(page, "locked"), "and a drag into it is refused as well").toContain(
-        "hand: Ember Sprite, Gale Warden, Tide Caller",
-    );
+    expect(await orderOf(page, PAIR, "Hand"), "and a drag into it is refused as well").toEqual(hand);
+    expect(await orderOf(page, PAIR, "Board"), "leaving the board as it was").toEqual(board);
 });
 
 test("a disabled list moves nothing, by pointer or by key", async ({ page }) => {
-    await expect(page.locator(list("disabled", "Disabled list")), "the list says it is disabled").toHaveAttribute(
-        "aria-disabled",
-        "true",
-    );
+    await page.locator(`${prop("isDisabled")} input`).click();
 
-    await page.locator(item("disabled", "Ember Sprite")).focus();
+    await expect(page.locator(list(BASIC)), "the list says it is disabled").toHaveAttribute("aria-disabled", "true");
+
+    const before = await orderOf(page, BASIC);
+
+    await page.locator(item(BASIC, "First")).focus();
     await page.keyboard.press("Enter");
     await page.keyboard.press("ArrowDown");
     await page.keyboard.press("Enter");
 
-    expect(await readout(page, "disabled"), "the keyboard route is inert").toContain(
-        "Ember Sprite, Gale Warden, Tide Caller",
-    );
+    expect(await orderOf(page, BASIC), "the keyboard route is inert").toEqual(before);
 
-    await dragBetween(page, item("disabled", "Ember Sprite"), list("disabled", "Disabled list"));
+    await dragBetween(page, item(BASIC, "First"), list(BASIC));
 
-    expect(await readout(page, "disabled"), "and so is the drag").toContain("Ember Sprite, Gale Warden, Tide Caller");
+    expect(await orderOf(page, BASIC), "and so is the drag").toEqual(before);
 });
 
 test("a disabled item cannot be picked up, by any route", async ({ page }) => {
-    await page.locator(item("reorder", "First")).focus();
+    const before = await orderOf(page, BASIC);
+
+    await page.locator(item(BASIC, "First")).focus();
     await page.keyboard.press("ArrowDown");
 
-    await expect(page.locator(item("reorder", "Third")), "the arrows never land on it").toBeFocused();
+    await expect(page.locator(item(BASIC, "Third")), "the arrows never land on it").toBeFocused();
 
-    await page.locator(item("reorder", "Second — locked")).click();
-    await page.locator(item("reorder", "Fourth")).click();
+    await page.locator(item(BASIC, "Second")).click();
+    await page.locator(item(BASIC, "Fourth")).click();
 
-    expect(await readout(page, "reorder"), "and a tap on it starts nothing").toContain(
-        "First, Second — locked, Third, Fourth",
-    );
+    expect(await orderOf(page, BASIC), "and a tap on it starts nothing").toEqual(before);
 });
 
 /**
@@ -445,10 +516,7 @@ test("a disabled item cannot be picked up, by any route", async ({ page }) => {
  * The check is a relationship rather than a position: drag the first card to where the third one is drawn
  * and the third card's place is what it should take. Nothing here writes down a coordinate.
  */
-const RING = demo("ring");
-
-const ringCards = (page: Page) =>
-    page.locator(`${RING} [role="listitem"]`).evaluateAll((elements) => elements.map((element) => element.ariaLabel));
+const ringCards = (page: Page) => orderOf(page, RING);
 
 test("a ring picks the nearest place to drop into, having no axis to compare", async ({ page }) => {
     const before = await ringCards(page);
@@ -486,7 +554,7 @@ test("a ring marks the gap it would land in, turned to lie across it", async ({ 
 
     await expect(marker, "nothing is marked while nothing is being carried").toHaveCount(0);
 
-    await page.locator(`${RING} [role="list"]`).scrollIntoViewIfNeeded();
+    await page.locator(list(RING)).scrollIntoViewIfNeeded();
 
     const from = (await cards.nth(0).boundingBox())!;
     const to = (await cards.nth(2).boundingBox())!;
@@ -522,9 +590,9 @@ test("a ring marks the gap it would land in, turned to lie across it", async ({ 
  * obvious the moment the four are compared.
  */
 test("the four gaps of a ring are a quarter turn apart, the last one included", async ({ page }) => {
-    await page.locator(`${RING} [role="list"]`).scrollIntoViewIfNeeded();
+    await page.locator(list(RING)).scrollIntoViewIfNeeded();
 
-    const box = (await page.locator(`${RING} [role="list"]`).boundingBox())!;
+    const box = (await page.locator(list(RING)).boundingBox())!;
     const cards = page.locator(`${RING} [role="listitem"]`);
     const first = (await cards.nth(0).boundingBox())!;
     const center = { x: box.x + box.width * 0.5, y: box.y + box.height * 0.5 };

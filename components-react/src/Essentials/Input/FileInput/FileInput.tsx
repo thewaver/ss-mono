@@ -11,11 +11,10 @@ import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/Inter
 import { useElement, useLatest } from "../../../Utils/refUtils";
 import { useStore } from "../../../Utils/storeUtils";
 import { FormFieldReactUtils } from "../FormField/FormFieldReact.utils";
-import { LabelReactUtils } from "../Label/LabelReact.utils";
 import type { FileInputElementProps, FileInputProps } from "./FileInput.types";
 
 const FileInputElement = (props: FileInputElementProps) => {
-    const ariaLabel = LabelReactUtils.useAriaLabel(props.ariaLabel);
+    const { ariaLabel, ariaLabelledBy } = FormFieldReactUtils.useAriaName(props.ariaLabel);
     const ariaDescribedBy = FormFieldReactUtils.useAriaDescribedBy();
 
     const elementRef = useRef<HTMLInputElement | null>(null);
@@ -55,6 +54,7 @@ const FileInputElement = (props: FileInputElementProps) => {
                 accept={props.accept}
                 multiple={props.isMultiple ?? FILE_INPUT_DEFAULTS.isMultiple}
                 aria-label={ariaLabel}
+                aria-labelledby={ariaLabelledBy}
                 aria-describedby={ariaDescribedBy}
                 aria-disabled={isDisabled || undefined}
                 aria-invalid={props.flags.hasError || undefined}

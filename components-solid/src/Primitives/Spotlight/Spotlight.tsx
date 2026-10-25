@@ -1,9 +1,10 @@
-import { Show, createEffect, createMemo, createSignal, onCleanup, onMount } from "solid-js";
+import { Show, createEffect, createMemo, createSignal, on, onCleanup, onMount } from "solid-js";
 import type { JSX } from "solid-js";
 import { Portal } from "solid-js/web";
 
 import {
     CutoutUtils,
+    DismisserUtils,
     FocusManagerUtils,
     LiveAnnouncerUtils,
     SPOTLIGHT_DEFAULTS,
@@ -13,12 +14,14 @@ import {
 import { Rect } from "@thewaver/ss-utils";
 
 import { AnchorSolidUtils } from "../../Abstracts/Anchor/AnchorSolid.utils";
+import { DismisserSolidUtils } from "../../Abstracts/Dismisser/DismisserSolid.utils";
 import { ElementFaderSolidUtils } from "../../Abstracts/ElementFader/ElementFaderSolid.utils";
 import { ElementObserverSolidUtils } from "../../Abstracts/ElementObserver/ElementObserverSolid.utils";
 import { ElevationSolidUtils } from "../../Abstracts/Elevation/ElevationSolid.utils";
 import { FocusManagerSolidUtils } from "../../Abstracts/FocusManager/FocusManagerSolid.utils";
 import { useViewportContext } from "../../Abstracts/Viewport/Viewport.context";
 import { access } from "../../Utils/propUtils";
+import { accessStore } from "../../Utils/storeUtils";
 import type { SpotlightProps } from "./SpotlightSolid.types";
 
 export const Spotlight = (props: SpotlightProps) => {
@@ -36,12 +39,31 @@ export const Spotlight = (props: SpotlightProps) => {
 
     const getPadding = createMemo(() => access(props.padding) ?? SPOTLIGHT_DEFAULTS.padding);
 
-    const { getIsVisible, getTransitionTarget } = ElementFaderSolidUtils.createFader(() => props.visibility[0](), {
-        getTransitionDurationMs,
-        getRef: getPortalRef,
-        onShow: props.onShow,
-        onHide: props.onHide,
-    });
+    const getIsOpen = () => props.visibility[0]();
+
+    const dismiss = () => {
+        props.visibility[1](false);
+    };
+
+    const layer = SpotlightUtils.createLayer(() => access(props.mode), dismiss);
+
+    const getIsOnTop = accessStore(DismisserUtils.openLayers, () => SpotlightUtils.getIsOnTop(layer));
+
+    const { getIsVisible, getTransitionTarget } = ElementFaderSolidUtils.createFader(
+        () => getIsOpen() && getIsOnTop(),
+        { getTransitionDurationMs, getRef: getPortalRef },
+    );
+
+    DismisserSolidUtils.createLayer(() => getIsOpen() || getIsVisible(), layer);
+
+    const getIsActing = createMemo(() => getIsVisible() && getIsOnTop());
+
+    createEffect(
+        on(getIsOpen, (isOpen, wasOpen) => {
+            if (isOpen) props.onShow?.();
+            else if (wasOpen) props.onHide?.();
+        }),
+    );
 
     const getHasPopup = createMemo(() => access(props.mode) === "guide" && props.renderPopup !== undefined);
 
@@ -52,7 +74,7 @@ export const Spotlight = (props: SpotlightProps) => {
 
     ElevationSolidUtils.createElevation(
         () => access(props.elementRef),
-        getIsVisible,
+        getIsActing,
         () => styles.SPOTLIGHT_Z_INDEX,
     );
 
@@ -86,28 +108,26 @@ export const Spotlight = (props: SpotlightProps) => {
         return rect ? SpotlightUtils.getHoleClipPath(rect) : undefined;
     });
 
-    const dismiss = () => {
-        props.visibility[1](false);
-    };
-
     createEffect(() => {
-        if (!getIsVisible()) return;
+        if (!getIsActing()) return;
 
-        onCleanup(SpotlightUtils.observeDismissKeys(() => access(props.mode), dismiss));
+        onCleanup(SpotlightUtils.observeDismissKeys(layer, () => access(props.mode), dismiss));
     });
 
     createEffect(() => {
         const element = access(props.elementRef);
+        const isActing = getIsActing();
 
-        if (!getIsVisible() || access(props.mode) !== "prompt" || !element) return;
+        if (!isActing || access(props.mode) !== "prompt" || !element) return;
 
         onCleanup(SpotlightUtils.holdFocus(element));
     });
 
     createEffect(() => {
         const portal = getPortalRef();
+        const isActing = getIsActing();
 
-        if (!getIsVisible() || access(props.mode) !== "guide" || !portal) return;
+        if (!isActing || access(props.mode) !== "guide" || !portal) return;
 
         onCleanup(FocusManagerUtils.sealAround(portal));
     });
@@ -121,25 +141,38 @@ export const Spotlight = (props: SpotlightProps) => {
     createEffect<string | undefined>((previous) => {
         const announcement = access(props.announcement);
 
-        if (!getIsVisible()) return previous;
+        if (!getIsActing()) return undefined;
         if (SpotlightUtils.getIsAnnouncementDue(previous, announcement)) LiveAnnouncerUtils.announce(announcement!);
 
         return announcement;
     });
 
+    let hasWarnedUnannounced = false;
+
+    createEffect(() => {
+        const announcement = access(props.announcement);
+        const isGuideShowing = getIsVisible() && access(props.mode) === "guide";
+
+        if (hasWarnedUnannounced || !isGuideShowing) return;
+
+        hasWarnedUnannounced = SpotlightUtils.warnIfUnannounced(announcement, "announcement");
+    });
+
     const [getHasPlaced, setHasPlaced] = createSignal(false);
 
     createEffect(() => {
-        if (!getIsVisible() || !getHasPopup()) {
+        const position = getPosition();
+
+        if (!getIsActing() || !getHasPopup()) {
             setHasPlaced(false);
 
             return;
         }
 
-        if (getPosition()) setHasPlaced(true);
+        if (position) setHasPlaced(true);
     });
 
-    FocusManagerSolidUtils.autoFocus(getPopupRef, getHasPlaced);
+    FocusManagerSolidUtils.autoFocus(getPopupRef, getHasPlaced, { getIsOpen });
 
     return (
         <Show when={getIsVisible() && getElementRect()}>

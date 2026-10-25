@@ -48,6 +48,8 @@ export const DateInput = (props: DateInputProps) => {
             format: untrack(getFormat),
             calendar: untrack(getCalendar),
             era: untrack(getFieldValue)?.era ?? untrack(getEra),
+            disabledDays: untrack(() => access(props.disabledDays)),
+            computeIsDayDisabled: props.computeIsDayDisabled,
         });
 
     const field = MaskedFieldSolidUtils.createField<DateValue>({
@@ -68,10 +70,14 @@ export const DateInput = (props: DateInputProps) => {
         if (value) setEra(value.era);
     });
 
+    const getIsWritable = () => !(access(props.isDisabled) ?? false) && !(access(props.isReadOnly) ?? false);
+
     const era: DateInputEra = {
         getValue: getEra,
         getOptions: getEraOptions,
         set: (next) => {
+            if (!getIsWritable()) return;
+
             setEra(next);
 
             const value = untrack(getFieldValue);

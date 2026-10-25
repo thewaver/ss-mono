@@ -65,6 +65,7 @@ export const SegmentedInput = (props: SegmentedInputProps) => {
             element={"input"}
             type={"text"}
             isConcealed={true}
+            isLeftToRight={true}
             inputMode={props.inputMode ?? SEGMENTED_INPUT_DEFAULTS.inputMode}
             ref={setRef}
             computeMaskedText={(_previous, next, caret) =>
@@ -79,6 +80,7 @@ export const SegmentedInput = (props: SegmentedInputProps) => {
                 <div
                     className={SegmentedInputStyles.segmentedInputCells}
                     style={{ gap: `${props.gap ?? SEGMENTED_INPUT_DEFAULTS.gap}px` }}
+                    dir="ltr"
                     aria-hidden="true"
                 >
                     {indices.map((index) => (

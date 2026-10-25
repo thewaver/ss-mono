@@ -10,12 +10,11 @@ import {
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import { access } from "../../../Utils/propUtils";
 import { FormFieldSolidUtils } from "../FormField/FormFieldSolid.utils";
-import { LabelSolidUtils } from "../Label/LabelSolid.utils";
 import type { FileInputElementProps, FileInputProps } from "./FileInputSolid.types";
 import { FileInputSolidUtils } from "./FileInputSolid.utils";
 
 const FileInputElement = (props: FileInputElementProps) => {
-    const getAriaLabel = LabelSolidUtils.resolveAriaLabel(
+    const { getAriaLabel, getAriaLabelledBy } = FormFieldSolidUtils.resolveAriaName(
         props.ariaLabel === undefined ? undefined : () => access(props.ariaLabel)!,
     );
     const getAriaDescribedBy = FormFieldSolidUtils.resolveAriaDescribedBy();
@@ -52,6 +51,7 @@ const FileInputElement = (props: FileInputElementProps) => {
                 accept={access(props.accept)}
                 multiple={access(props.isMultiple) ?? FILE_INPUT_DEFAULTS.isMultiple}
                 aria-label={getAriaLabel()}
+                aria-labelledby={getAriaLabelledBy()}
                 aria-describedby={getAriaDescribedBy()}
                 aria-disabled={getIsDisabled() || undefined}
                 aria-invalid={access(props.flags).hasError || undefined}

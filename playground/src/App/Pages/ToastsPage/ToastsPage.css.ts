@@ -23,3 +23,10 @@ export const note = style({
     fontSize: themeVars.fontSize.small,
     opacity: 0.75,
 });
+
+export const example = style({
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: themeVars.spacing.full,
+});

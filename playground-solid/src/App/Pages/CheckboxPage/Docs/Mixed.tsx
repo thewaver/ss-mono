@@ -23,7 +23,7 @@ export const MixedDocsExample = () => {
                 isMixed={getIsMixed}
                 id={"selectAll"}
                 ariaLabel={"Select all"}
-                renderContent={(getFlags) => <PageCheckboxContent flags={getFlags} />}
+                renderContent={(getFlags) => <PageCheckboxContent flags={getFlags}>Select all</PageCheckboxContent>}
                 onChange={(isChecked) => {
                     firstSignal[1](isChecked);
                     secondSignal[1](isChecked);
@@ -36,13 +36,13 @@ export const MixedDocsExample = () => {
                 checked={firstSignal}
                 id={"firstChild"}
                 ariaLabel={"First child"}
-                renderContent={(getFlags) => <PageCheckboxContent flags={getFlags} />}
+                renderContent={(getFlags) => <PageCheckboxContent flags={getFlags}>First child</PageCheckboxContent>}
             />
 
             <Checkbox
                 checked={secondSignal}
                 ariaLabel={"Second child"}
-                renderContent={(getFlags) => <PageCheckboxContent flags={getFlags} />}
+                renderContent={(getFlags) => <PageCheckboxContent flags={getFlags}>Second child</PageCheckboxContent>}
             />
         </PageControlRow>
     );

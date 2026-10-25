@@ -1,21 +1,23 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { accessibleText, demo, prop, readout, tagName } from "./helpers";
+import { accessibleText, docsDemo, docsSettled, prop, tagName } from "./helpers";
 
 /**
- * Every list on the page reads the same knobs — item count, page size, sibling count and boundary count —
- * so the arithmetic under test is the panel's rather than each variant's. The page starts at 60 items, 3 to
- * a page, which is 20 pages. What separates the variants is which step controls they ask for, whether their
- * pages are links, and — for the last two — which pieces the page arranged itself.
+ * The Basic example carries the knobs — item count, page size, sibling count, boundary count and disabled — and
+ * starts at 60 items, 3 to a page, which is 20 pages. Every other example is fixed at that same 60 and 3. What
+ * separates them is which step controls they ask for, whether their pages are links, and — for the count and the
+ * field — which pieces the page arranged itself. No example reads out its page in words, so the current page is the
+ * one marked `aria-current`, which is what a screen reader goes by.
  *
  * The painter draws a bare number and marks it `aria-hidden`, exactly as the calendar's day cells do, so
  * the visible text and the accessible name are deliberately different things here: `accessibleText` on a
  * page item is empty, and the name a screen reader would read comes from `aria-label`.
  */
-const STEPS = demo("steps");
-const ENDS = demo("ends");
-const LINKS = demo("links");
-const LINK_COMPONENT = demo("linkComponent");
+const DOCS = "/src/App/Pages/PaginatorPage/Docs";
+
+const STEPS = docsDemo(DOCS, "Basic");
+const ENDS = docsDemo(DOCS, "Ends");
+const LINKS = docsDemo(DOCS, "Links");
 
 const nav = (scope: string) => `${scope} nav`;
 const item = (scope: string) => `${scope} nav a, ${scope} nav button`;
@@ -25,13 +27,25 @@ const gap = (scope: string) => `${scope} nav [aria-hidden="true"] [title]`;
 
 const field = (key: string) => `${prop(key)} input`;
 
+/** The page a list marks as current, by the name it gives that page. */
+const currentPage = (scope: string) => `${scope} nav [aria-current="page"]`;
+
+/** Types a knob's value the way a person would, and leaves the field so it settles. */
+const typeInto = async (page: Page, selector: string, value: string) => {
+    await page.locator(selector).click();
+    await page.keyboard.press("ControlOrMeta+a");
+    await page.keyboard.type(value);
+    await page.keyboard.press("Tab");
+};
+
 test.beforeEach(async ({ page: browserPage }) => {
-    await browserPage.goto("/paginator");
+    await browserPage.goto("/paginator/docs");
     await expect(browserPage.locator(pageItem(STEPS, 1))).toBeVisible();
+    await docsSettled(browserPage);
 });
 
 test("the list names itself, and every page carries a name the painted number does not give it", async ({ page }) => {
-    await expect(page.locator(nav(STEPS))).toHaveAttribute("aria-label", "Results");
+    await expect(page.locator(nav(STEPS))).toHaveAttribute("aria-label", /.+/);
 
     expect(
         await accessibleText(page.locator(pageItem(STEPS, 1))),
@@ -72,10 +86,13 @@ test("stepping stops at each end rather than wrapping, and says so before it is 
     await expect(page.locator(step(STEPS, "Next"))).not.toHaveAttribute("aria-disabled");
 
     await page.locator(step(STEPS, "Previous")).click({ force: true });
-    expect(await readout(page, "steps"), "and pressing it does nothing").toContain("page 1 of 20");
+    await expect(page.locator(currentPage(STEPS)), "and pressing it does nothing").toHaveAttribute(
+        "aria-label",
+        "Page 1",
+    );
 
     await page.locator(step(STEPS, "Next")).click();
-    expect(await readout(page, "steps")).toContain("page 2 of 20");
+    await expect(page.locator(currentPage(STEPS))).toHaveAttribute("aria-label", "Page 2");
 });
 
 test("the end jumps are a separate pair, and go quiet alongside their neighbors", async ({ page }) => {
@@ -83,7 +100,7 @@ test("the end jumps are a separate pair, and go quiet alongside their neighbors"
     await expect(page.locator(step(ENDS, "Last"))).not.toHaveAttribute("aria-disabled");
 
     await page.locator(step(ENDS, "Last")).click();
-    expect(await readout(page, "ends")).toContain("page 20 of 20");
+    await expect(page.locator(currentPage(ENDS))).toHaveAttribute("aria-label", "Page 20");
 
     await expect(page.locator(step(ENDS, "Last")), "which is where that pair falls silent").toHaveAttribute(
         "aria-disabled",
@@ -96,15 +113,13 @@ test("the end jumps are a separate pair, and go quiet alongside their neighbors"
 test("the sibling and boundary knobs widen the window and pin the ends", async ({ page }) => {
     const before = await page.locator(item(STEPS)).count();
 
-    await page.locator(field("siblingCount")).fill("3");
-    await page.locator(field("siblingCount")).blur();
+    await typeInto(page, field("siblingCount"), "3");
 
     await expect
         .poll(() => page.locator(item(STEPS)).count(), { message: "more siblings means more pages on show" })
         .toBeGreaterThan(before);
 
-    await page.locator(field("boundaryCount")).fill("3");
-    await page.locator(field("boundaryCount")).blur();
+    await typeInto(page, field("boundaryCount"), "3");
 
     await expect(page.locator(pageItem(STEPS, 18)), "three pinned at the end means page 18 is one of them").toHaveCount(
         1,
@@ -117,9 +132,17 @@ test("an href makes a page an anchor, and a link component replaces the element"
     await expect(page.locator(pageItem(LINKS, 2))).toHaveAttribute("href", "#paginator-page-2");
 
     await expect(
-        page.locator(`${LINK_COMPONENT} nav a[data-link-component]`),
+        page.locator(`${LINKS} nav a[data-link-component]`),
+        "the native anchor is used until a link component is given",
+    ).toHaveCount(0);
+
+    await page.locator(field("hasLinkComponent")).click();
+
+    await expect(
+        page.locator(`${LINKS} nav a[data-link-component]`),
         "the consumer's own component renders every page when one is given",
-    ).toHaveCount(await page.locator(`${LINK_COMPONENT} nav a`).count());
+    ).toHaveCount(await page.locator(`${LINKS} nav a`).count());
+    expect(await page.locator(`${LINKS} nav a`).count(), "and there are pages for it to render").toBeGreaterThan(0);
 
     await expect(
         page.locator(step(LINKS, "Previous")),
@@ -127,29 +150,30 @@ test("an href makes a page an anchor, and a link component replaces the element"
     ).not.toHaveAttribute("href");
 });
 
-test("the disabled knob reaches every control in every list", async ({ page }) => {
+test("the disabled knob reaches every control in the list", async ({ page }) => {
     await page.locator(field("isDisabled")).click();
 
     await expect(page.locator(`${STEPS} nav [aria-disabled="true"]`)).toHaveCount(
         await page.locator(item(STEPS)).count(),
     );
-    await expect(page.locator(`${LINKS} nav [aria-disabled="true"]`)).toHaveCount(
-        await page.locator(item(LINKS)).count(),
-    );
 
     await page.locator(pageItem(STEPS, 3)).click({ force: true });
-    expect(await readout(page, "steps"), "and nothing moves the page").toContain("page 1 of 20");
+    await expect(page.locator(currentPage(STEPS)), "and nothing moves the page").toHaveAttribute(
+        "aria-label",
+        "Page 1",
+    );
 });
 
 test("the page count is worked out from the items and the page size, and the last page holds the remainder", async ({
     page,
 }) => {
-    await page.locator(field("pageSize")).fill("7");
-    await page.locator(field("pageSize")).blur();
+    await typeInto(page, field("pageSize"), "7");
 
-    await expect
-        .poll(() => readout(page, "steps"), { message: "60 items at 7 a page is 9 pages, the ninth holding 4" })
-        .toContain("page 1 of 9");
+    await expect(
+        page.locator(pageItem(STEPS, 9)),
+        "60 items at 7 a page is 9 pages, so the ninth is the last one shown",
+    ).toHaveCount(1);
+    await expect(page.locator(pageItem(STEPS, 10)), "and there is no tenth").toHaveCount(0);
 
     await page.locator(pageItem(STEPS, 9)).click();
 
@@ -157,8 +181,7 @@ test("the page count is worked out from the items and the page size, and the las
 });
 
 test("an empty list has no pages, and every step goes quiet", async ({ page }) => {
-    await page.locator(field("itemCount")).fill("0");
-    await page.locator(field("itemCount")).blur();
+    await typeInto(page, field("itemCount"), "0");
 
     await expect(page.locator(`${STEPS} nav [aria-label^="Page "]`)).toHaveCount(0);
     await expect(page.locator(`${STEPS} nav [aria-disabled="true"]`)).toHaveCount(
@@ -172,8 +195,8 @@ test("an empty list has no pages, and every step goes quiet", async ({ page }) =
  * page's own "3 of 20" in its slot and no number row, and the usual row with a field beside it that writes
  * the same page signal. What they prove is that the pieces read one root, whatever sits between them.
  */
-const COUNT = demo("count");
-const JUMP = demo("jump");
+const COUNT = docsDemo(DOCS, "Count");
+const JUMP = docsDemo(DOCS, "Jump");
 
 test("the steps piece puts whatever the page gives it between the leading and the trailing steps", async ({ page }) => {
     await expect(page.locator(`${COUNT} nav [aria-label^="Page "]`), "no number row was asked for").toHaveCount(0);
@@ -196,8 +219,10 @@ test("the steps piece puts whatever the page gives it between the leading and th
 
     await page.locator(step(COUNT, "Next")).click();
 
-    expect(await readout(page, "count")).toContain("page 2 of 20");
     await expect(page.locator(`${COUNT} nav`), "and the text follows the page it reads").toContainText("2 of 20");
+    await expect(page.locator(`${COUNT} [role="status"]`), "as does the list of results").toHaveText(
+        "showing 4 to 6 of 60",
+    );
 
     await page.locator(step(COUNT, "Last")).click();
 
@@ -208,11 +233,10 @@ test("the steps piece puts whatever the page gives it between the leading and th
 });
 
 test("a field the page puts beside the row moves the same page the row shows", async ({ page }) => {
-    await page.locator(`${JUMP} input`).fill("7");
-    await page.locator(`${JUMP} input`).blur();
+    await typeInto(page, "#goToPage", "7");
 
     await expect(page.locator(pageItem(JUMP, 7))).toHaveAttribute("aria-current", "page");
-    expect(await readout(page, "jump")).toContain("page 7 of 20");
+    await expect(page.locator(currentPage(JUMP)), "and it is the only page marked").toHaveCount(1);
 });
 
 /**
@@ -220,7 +244,7 @@ test("a field the page puts beside the row moves the same page the row shows", a
  * so what separates the two is the layout function and nothing else — which is what makes them comparable
  * name for name.
  */
-const DIAL = demo("dial");
+const DIAL = docsDemo(DOCS, "Dial");
 
 const placedBox = (scope: string) => `${scope} nav [role="presentation"][style*="left"]`;
 
@@ -290,7 +314,7 @@ test("the page moves from a wedge the same as from a cell, and the wedge that is
 
     await page.locator(step(DIAL, "Last")).click();
 
-    expect(await readout(page, "dial"), "the end jump reaches the last page from a wedge").toContain("page 20 of 20");
+    await expect(page.locator(currentPage(DIAL)), "the end jump reaches the last page from a wedge").toHaveCount(1);
     await expect(page.locator(pageItem(DIAL, 20)), "and the mark moves with it").toHaveAttribute(
         "aria-current",
         "page",

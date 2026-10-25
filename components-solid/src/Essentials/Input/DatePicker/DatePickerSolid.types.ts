@@ -1,12 +1,6 @@
 import type { JSX, Signal } from "solid-js";
 
-import type {
-    BaseDatePickerCbs,
-    BaseDatePickerValues,
-    DateValue,
-    InteractionFlags,
-    PopupTriggerFlags,
-} from "@thewaver/ss-components";
+import type { BaseDatePickerValues, DateValue, InteractionFlags, PopupTriggerFlags } from "@thewaver/ss-components";
 
 import type { AccessorProps, AccessorValues, SignalSource } from "../../../Utils/typeUtils";
 import type { CalendarDayRenderer, CalendarWeekdayRenderer } from "../Calendar/CalendarSolid.types";
@@ -14,7 +8,6 @@ import type { DateInputProps } from "../DateInput/DateInputSolid.types";
 
 export type DatePickerProps = Omit<DateInputProps, "renderTrailing"> &
     AccessorValues<BaseDatePickerValues> &
-    BaseDatePickerCbs &
     AccessorProps<{
         /** Whether the calendar is open. It is the only thing that opens or closes it. */
         visibility?: SignalSource<boolean>;

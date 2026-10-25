@@ -1,12 +1,10 @@
-import type { Shortcut } from "../../../Abstracts/Shortcut/Shortcut.types";
-import type { ToastsAlignment, ToastsAriaLive, ToastsDir, ToastsOverflow } from "./Toasts.types";
+import type { ToastsAlignment, ToastsAriaLive, ToastsFlexDirection, ToastsOverflow } from "./Toasts.types";
 
 export const TOASTS_DEFAULTS = {
     transitionDurationMs: 300,
     alignment: "bottom_right" as ToastsAlignment,
-    dir: "column" as ToastsDir,
+    flexDirection: "column" as ToastsFlexDirection,
     overflow: "dismiss_oldest" as ToastsOverflow,
-    hotkey: { key: "F8" } as Shortcut,
     ariaLive: "polite" as ToastsAriaLive,
     gap: 10,
     isDismissableOnSwipe: true,
@@ -24,6 +22,11 @@ export const TOASTS_ALIGNMENTS: readonly ToastsAlignment[] = [
     "bottom_right",
 ];
 
-export const TOASTS_DIRS: readonly ToastsDir[] = ["column", "column-reverse", "row", "row-reverse"];
+export const TOASTS_FLEX_DIRECTIONS: readonly ToastsFlexDirection[] = [
+    "column",
+    "column-reverse",
+    "row",
+    "row-reverse",
+];
 
 export const TOASTS_OVERFLOWS: readonly ToastsOverflow[] = ["dismiss_oldest", "hold_newest"];

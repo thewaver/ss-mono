@@ -1,5 +1,4 @@
 import {
-    Index,
     type ParentProps,
     Show,
     createEffect,
@@ -7,6 +6,7 @@ import {
     createSignal,
     createUniqueId,
     onCleanup,
+    onMount,
     untrack,
 } from "solid-js";
 
@@ -17,6 +17,7 @@ import {
     type ScrollerAxis,
     type ScrollerBarRefs,
     type ScrollerBarRenderProps,
+    type ScrollerController,
     type ScrollerStepper,
     ScrollerUtils,
     ScrollerStyles as styles,
@@ -31,11 +32,6 @@ const ARIA_VALUE_MAX = 100;
 const ARIA_VALUE_THROTTLE_MS = 100;
 
 const ARIA_ORIENTATIONS: Record<ScrollerAxis, "horizontal" | "vertical"> = { x: "horizontal", y: "vertical" };
-
-const STEP_AREAS: Record<ScrollerAxis, Record<"leading" | "trailing", string>> = {
-    x: { leading: ScrollerUtils.AREAS.xLeading, trailing: ScrollerUtils.AREAS.xTrailing },
-    y: { leading: ScrollerUtils.AREAS.yLeading, trailing: ScrollerUtils.AREAS.yTrailing },
-};
 
 const ScrollerBar = (props: ScrollerBarProps) => {
     const [getTrackRef, setTrackRef] = createSignal<HTMLElement>();
@@ -148,13 +144,9 @@ export const Scroller = (props: ParentProps<ScrollerProps>) => {
 
     const getId = createMemo(() => access(props.id) ?? generatedId);
 
-    const getGap = createMemo(() => access(props.gap) ?? SCROLLER_DEFAULTS.gap);
-
     const getPadding = createMemo(() => access(props.padding) ?? SCROLLER_DEFAULTS.padding);
 
     const getOverlapCount = createMemo(() => access(props.overlapCount) ?? SCROLLER_DEFAULTS.overlapCount);
-
-    const getButtonPlacement = createMemo(() => access(props.buttonPlacement) ?? SCROLLER_DEFAULTS.buttonPlacement);
 
     const getOverflow = createMemo(() => ({
         x: access(props.overflowX) ?? SCROLLER_DEFAULTS.overflowX,
@@ -179,13 +171,21 @@ export const Scroller = (props: ParentProps<ScrollerProps>) => {
     const getScrollingAxes = createMemo(() => SCROLLER_AXES.filter((axis) => getOverflow()[axis] !== "hidden"));
 
     const createStepper = (axis: ScrollerAxis): ScrollerStepper => ({
-        getIsAtStart: () => ScrollerUtils.getIsAtStart(getMetrics()[axis]),
-        getIsAtEnd: () => ScrollerUtils.getIsAtEnd(getMetrics()[axis]),
-        stepToPrevious: () => ScrollerUtils.stepTo(getBoxRef(), "previous", axis, getOverlapCount()),
-        stepToNext: () => ScrollerUtils.stepTo(getBoxRef(), "next", axis, getOverlapCount()),
+        getIsAtStart: () => !ScrollerUtils.getCanStep(getOverflow()[axis], getMetrics()[axis], "previous"),
+        getIsAtEnd: () => !ScrollerUtils.getCanStep(getOverflow()[axis], getMetrics()[axis], "next"),
+        stepToPrevious: () =>
+            getOverflow()[axis] !== "hidden" && ScrollerUtils.stepTo(getBoxRef(), "previous", axis, getOverlapCount()),
+        stepToNext: () =>
+            getOverflow()[axis] !== "hidden" && ScrollerUtils.stepTo(getBoxRef(), "next", axis, getOverlapCount()),
     });
 
-    const steppers = { x: createStepper("x"), y: createStepper("y") };
+    const controller: ScrollerController = {
+        getBoxId: getId,
+        x: createStepper("x"),
+        y: createStepper("y"),
+    };
+
+    onMount(() => props.onMount?.(controller));
 
     const [getProgress, setProgress] = SignalMirrorSolidUtils.createOptional(
         () => props.progress,
@@ -215,10 +215,6 @@ export const Scroller = (props: ParentProps<ScrollerProps>) => {
             y: progress.y === reportedProgress.y ? undefined : progress.y,
         });
     });
-
-    const getSteps = createMemo(() => ScrollerUtils.getBoxSteps(getButtonPlacement(), getOverflow(), getMetrics()));
-
-    const getGridTemplate = createMemo(() => ScrollerUtils.computeGridTemplate(getSteps()));
 
     const getHasBar = (axis: ScrollerAxis) =>
         props.renderBar !== undefined && ScrollerUtils.getHasBar(getOverflow()[axis], getMetrics()[axis]);
@@ -267,22 +263,6 @@ export const Scroller = (props: ParentProps<ScrollerProps>) => {
         ScrollerUtils.reveal(box, target, getPadding(), getScrollingAxes());
     };
 
-    const renderSteps = (axis: ScrollerAxis, side: "leading" | "trailing") => (
-        <Show when={getSteps()[axis][side].length > 0}>
-            <div
-                class={[styles.scrollerSteps, styles.scrollerStepsVariants[axis]].join(" ")}
-                style={{
-                    "grid-area": STEP_AREAS[axis][side],
-                    "gap": `${getGap()}px`,
-                }}
-            >
-                <Index each={getSteps()[axis][side]}>
-                    {(getStep) => props.renderButton(getStep, steppers[axis], axis)}
-                </Index>
-            </div>
-        </Show>
-    );
-
     const renderBar = (axis: ScrollerAxis) => (
         <Show when={getHasBar(axis)}>
             <ScrollerBar
@@ -308,54 +288,37 @@ export const Scroller = (props: ParentProps<ScrollerProps>) => {
             ref={setRootRef}
             class={styles.scrollerRoot}
             style={{
-                "gap": `${getGap()}px`,
-                "grid-template-areas": getGridTemplate().areas,
-                "grid-template-columns": getGridTemplate().columns,
-                "grid-template-rows": getGridTemplate().rows,
+                "grid-template-areas": getAreaTemplate().areas,
+                "grid-template-columns": getAreaTemplate().columns,
+                "grid-template-rows": getAreaTemplate().rows,
             }}
         >
-            {renderSteps("y", "leading")}
-            {renderSteps("x", "leading")}
-
             <div
-                class={styles.scrollerArea}
+                id={getId()}
+                ref={setBoxRef}
+                tabIndex={getIsBoxTabStop() ? 0 : undefined}
+                class={[
+                    styles.scrollerBox,
+                    styles.scrollerBoxVariants[getRunAxis()],
+                    getScrollingAxes().length > 1 ? styles.scrollerBoxBothWays : "",
+                ].join(" ")}
                 style={{
-                    "grid-area": ScrollerUtils.AREAS.area,
-                    "grid-template-areas": getAreaTemplate().areas,
-                    "grid-template-columns": getAreaTemplate().columns,
-                    "grid-template-rows": getAreaTemplate().rows,
+                    "overflow-x": getOverflow().x,
+                    "overflow-y": getOverflow().y,
+                    "padding-block": getRunAxis() === "x" ? `${getPadding()}px` : undefined,
+                    "padding-block-start": getRunAxis() === "y" ? `${getPadding()}px` : undefined,
+                    "padding-inline": getRunAxis() === "y" ? `${getPadding()}px` : undefined,
+                    "padding-inline-start": getRunAxis() === "x" ? `${getPadding()}px` : undefined,
                 }}
+                onFocusIn={handleFocusIn}
             >
-                <div
-                    id={getId()}
-                    ref={setBoxRef}
-                    tabIndex={getIsBoxTabStop() ? 0 : undefined}
-                    class={[
-                        styles.scrollerBox,
-                        styles.scrollerBoxVariants[getRunAxis()],
-                        getScrollingAxes().length > 1 ? styles.scrollerBoxBothWays : "",
-                    ].join(" ")}
-                    style={{
-                        "overflow-x": getOverflow().x,
-                        "overflow-y": getOverflow().y,
-                        "padding-block": getRunAxis() === "x" ? `${getPadding()}px` : undefined,
-                        "padding-block-start": getRunAxis() === "y" ? `${getPadding()}px` : undefined,
-                        "padding-inline": getRunAxis() === "y" ? `${getPadding()}px` : undefined,
-                        "padding-inline-start": getRunAxis() === "x" ? `${getPadding()}px` : undefined,
-                    }}
-                    onFocusIn={handleFocusIn}
-                >
-                    {props.children}
+                {props.children}
 
-                    <div class={styles.scrollerBoxEnd} style={{ "flex-basis": `${getPadding()}px` }} />
-                </div>
-
-                {renderBar("x")}
-                {renderBar("y")}
+                <div class={styles.scrollerBoxEnd} style={{ "flex-basis": `${getPadding()}px` }} />
             </div>
 
-            {renderSteps("x", "trailing")}
-            {renderSteps("y", "trailing")}
+            {renderBar("x")}
+            {renderBar("y")}
         </div>
     );
 };

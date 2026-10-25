@@ -1,11 +1,13 @@
-import { type SlotsType, Teleport, computed, defineComponent, shallowRef } from "vue";
+import { type SlotsType, Teleport, computed, defineComponent, nextTick, shallowRef } from "vue";
 
 import {
     LiveAnnouncerUtils,
+    type NavigatorDirection,
     TOASTS_DEFAULTS,
-    type Toast,
+    type ToastRequest,
     type ToastState,
     ToastUtils,
+    type ToastsContextType,
     ToastsStyles,
 } from "@thewaver/ss-components";
 import { ToastsConst } from "@thewaver/ss-components/internal";
@@ -14,16 +16,16 @@ import { CSSUtils, GestureUtils } from "@thewaver/ss-utils";
 import { ElementFaderVueUtils } from "../../../Abstracts/ElementFader/ElementFaderVue.utils";
 import { ElementObserverVueUtils } from "../../../Abstracts/ElementObserver/ElementObserverVue.utils";
 import { InteractionTrackerVueUtils } from "../../../Abstracts/InteractionTracker/InteractionTrackerVue.utils";
-import { ShortcutVueUtils } from "../../../Abstracts/Shortcut/ShortcutVue.utils";
 import { useViewportContext } from "../../../Abstracts/Viewport/Viewport.context";
 import { watchAfterRender } from "../../../Utils/effectUtils";
-import { callSlot, declareProps, useTwoWay } from "../../../Utils/propUtils";
+import { declareProps, useTwoWay } from "../../../Utils/propUtils";
 import { toElement } from "../../../Utils/refUtils";
 import type { SlotsContext } from "../../../Utils/typeUtils";
-import type { ToastsItemProps, ToastsProps, ToastsSlots } from "./Toasts.types";
+import { provideToastsContext } from "./Toasts.context";
+import type { Toast, ToastRenderer, ToastsItemProps, ToastsProps, ToastsSlots } from "./Toasts.types";
 
 const ToastsItem = defineComponent(
-    <T,>(props: ToastsItemProps<T>, { slots }: SlotsContext<ToastsSlots<T>>) => {
+    <T,>(props: ToastsItemProps<T>) => {
         const itemRef = shallowRef<HTMLDivElement>();
         const swipeOffsetRatio = shallowRef(0);
 
@@ -97,8 +99,8 @@ const ToastsItem = defineComponent(
             };
 
             return (
-                <div class={ToastsStyles.toastsItem} ref={itemRef}>
-                    {callSlot(slots.renderToast, {
+                <div class={ToastsStyles.toastsItem} dir={props.direction} ref={itemRef}>
+                    {props.renderToast?.({
                         toast: props.toast,
                         visibilityTarget: fader.transitionTarget.value,
                         transitionDurationMs: props.transitionDurationMs,
@@ -110,7 +112,6 @@ const ToastsItem = defineComponent(
     },
     {
         name: "ToastsItem",
-        slots: Object as SlotsType<ToastsSlots<any>>,
         props: declareProps<ToastsItemProps<unknown>>({
             toast: null,
             index: null,
@@ -120,6 +121,8 @@ const ToastsItem = defineComponent(
             transitionDurationMs: null,
             sizes: null,
             swipeDirection: null,
+            direction: null,
+            renderToast: null,
             onElapse: null,
             onSwipeDismiss: null,
             onExitEnd: null,
@@ -133,17 +136,21 @@ export const Toasts = defineComponent(
 
         const toasts = useTwoWay(props, "toasts", []);
 
+        const registerOwner = {};
+
         const rootRef = shallowRef<HTMLDivElement>();
         const lastSeen = new Map<string, Toast<T>>();
+        const ownPainters = new Map<string, ToastRenderer<T> | undefined>();
+        const directions = new Map<string, NavigatorDirection>();
 
         let announcedIds: string[] = [];
+        let pendingToasts: Toast<T>[] | undefined;
 
         const entryIds = shallowRef<string[]>([]);
         const entryRefs = shallowRef<Record<string, HTMLElement>>({});
 
+        const getAlignment = () => props.alignment ?? TOASTS_DEFAULTS.alignment;
         const getOverflow = () => props.overflow ?? TOASTS_DEFAULTS.overflow;
-        const getPoliteness = () => props.ariaLive ?? TOASTS_DEFAULTS.ariaLive;
-        const getHasAnnouncer = () => props.computeAnnouncement !== undefined;
 
         const isPaused = InteractionTrackerVueUtils.useHold(rootRef);
 
@@ -153,12 +160,24 @@ export const Toasts = defineComponent(
 
         const admitted = computed(() => ToastUtils.computeAdmitted(toasts.value, props.limit, getOverflow()));
 
-        watchAfterRender([getHasAnnouncer], ([hasAnnouncer]) => {
-            if (!hasAnnouncer) return;
-
+        watchAfterRender([], () => {
             LiveAnnouncerUtils.reserve("polite");
             LiveAnnouncerUtils.reserve("assertive");
         });
+
+        watchAfterRender(
+            [rootRef, () => viewportContext.getPortalRef() ?? document.body, getAlignment],
+            ([region, scope, alignment]) => {
+                if (!region) return;
+
+                return ToastUtils.registerStack(registerOwner, {
+                    region,
+                    scope,
+                    alignment,
+                    getHasToasts: () => admitted.value.length > 0,
+                });
+            },
+        );
 
         watchAfterRender([admitted], ([list]) => {
             entryIds.value = ToastUtils.computeEntryIds(entryIds.value, list);
@@ -166,53 +185,62 @@ export const Toasts = defineComponent(
 
         watchAfterRender([entryIds], ([ids]) => {
             const previous = announcedIds;
-            const computeAnnouncement = props.computeAnnouncement;
 
             announcedIds = ids;
 
-            if (!computeAnnouncement) return;
-
-            ToastUtils.announceArrivals(previous, ids, admitted.value, computeAnnouncement, getPoliteness());
+            ToastUtils.announceArrivals(previous, ids, admitted.value);
         });
 
-        let focusRoute: ReturnType<typeof ToastUtils.createFocusRoute> | undefined;
+        const readToasts = () => pendingToasts ?? toasts.value;
 
-        watchAfterRender([rootRef], ([root]) => {
-            if (!root) return;
+        const writeToasts = (next: Toast<T>[]) => {
+            pendingToasts = next;
+            toasts.value = next;
 
-            const route = ToastUtils.createFocusRoute(root);
-
-            focusRoute = route;
-
-            return () => {
-                route.stop();
-                focusRoute = undefined;
-            };
-        });
-
-        ShortcutVueUtils.useBinding(
-            () => (props.hotkey === undefined ? TOASTS_DEFAULTS.hotkey : (props.hotkey ?? undefined)),
-            false,
-            () => focusRoute?.enter(),
-        );
+            void nextTick(() => {
+                pendingToasts = undefined;
+            });
+        };
 
         watchAfterRender([toasts, () => props.limit, getOverflow], ([list, limit, overflow]) => {
             const trimmed = ToastUtils.computeOverflowTrim(list, limit, overflow);
 
-            if (trimmed) toasts.value = trimmed;
+            if (trimmed) writeToasts(trimmed);
         });
 
-        const dismiss = (id: string) => {
-            const current = toasts.value;
-            const next = ToastUtils.withoutToast(current, id);
+        const show = (toast: ToastRequest<Toast<T>>) => {
+            const prev = readToasts();
+            const { toasts: next, id } = ToastUtils.withRequestedToast(prev, toast);
 
-            if (next !== current) toasts.value = next;
+            if (id === undefined) return undefined;
+
+            directions.set(id, ToastUtils.readRaiserDirection());
+            writeToasts(next);
+
+            return id;
         };
+
+        const dismiss = (id: string) => {
+            const prev = readToasts();
+            const next = ToastUtils.withoutToast(prev, id);
+
+            if (next === prev) return false;
+
+            writeToasts(next);
+
+            return true;
+        };
+
+        const context: ToastsContextType<Toast<T>> = { show, dismiss };
+
+        provideToastsContext(context as ToastsContextType<Toast<unknown>>);
 
         const handleExitEnd = (id: string) => {
             if (admitted.value.some((toast) => toast.id === id)) return;
 
             lastSeen.delete(id);
+            ownPainters.delete(id);
+            directions.delete(id);
             entryIds.value = entryIds.value.filter((entryId) => entryId !== id);
 
             if (!(id in entryRefs.value)) return;
@@ -230,12 +258,29 @@ export const Toasts = defineComponent(
             entryRefs.value = { ...entryRefs.value, [id]: element };
         };
 
+        const resolvePainter = (id: string, toast: Toast<T>): ToastRenderer<T> | undefined => {
+            if (!ownPainters.has(id)) {
+                ownPainters.set(id, toast.renderToast);
+                ToastUtils.warnIfUnpainted(toast.renderToast !== undefined || slots.renderToast !== undefined);
+            }
+
+            const ownPainter = ownPainters.get(id);
+
+            if (ownPainter) return ownPainter;
+
+            const renderDefault = slots.renderToast;
+
+            return renderDefault === undefined
+                ? undefined
+                : (renderProps) => renderDefault({ ...renderProps, dismiss: () => dismiss(id) });
+        };
+
         return () => {
-            const alignment = props.alignment ?? TOASTS_DEFAULTS.alignment;
-            const dir = props.dir ?? TOASTS_DEFAULTS.dir;
+            const alignment = getAlignment();
+            const flexDirection = props.flexDirection ?? TOASTS_DEFAULTS.flexDirection;
             const margins = props.margins ?? ToastsConst.DEFAULT_MARGINS;
             const transitionDurationMs = props.transitionDurationMs ?? TOASTS_DEFAULTS.transitionDurationMs;
-            const stackAlignment = ToastUtils.computeStackAlignment(alignment, dir);
+            const stackAlignment = ToastUtils.computeStackAlignment(alignment, flexDirection);
             const swipeDirection =
                 (props.isDismissableOnSwipe ?? TOASTS_DEFAULTS.isDismissableOnSwipe)
                     ? ToastUtils.computeSwipeDirection(alignment)
@@ -246,50 +291,54 @@ export const Toasts = defineComponent(
             for (const toast of admittedToasts) lastSeen.set(toast.id, toast);
 
             return (
-                <Teleport to={viewportContext.getPortalRef() ?? document.body}>
-                    <div
-                        ref={rootRef}
-                        class={ToastsStyles.toastsRegion}
-                        style={{
-                            ...CSSUtils.spreadableToStyle(margins, (key) => key),
-                            flexDirection: dir,
-                            justifyContent: stackAlignment.justifyContent,
-                            alignItems: stackAlignment.alignItems,
-                            gap: `${props.gap ?? TOASTS_DEFAULTS.gap}px`,
-                            zIndex: ToastUtils.Z_INDEX,
-                        }}
-                        role="region"
-                        tabindex={-1}
-                        aria-live={getHasAnnouncer() ? undefined : getPoliteness()}
-                        aria-label={props.ariaLabel}
-                    >
-                        {ids.map((id, index) => {
-                            const toast = admittedToasts.find((entry) => entry.id === id) ?? lastSeen.get(id);
+                <>
+                    {slots.default?.()}
 
-                            if (!toast) return null;
+                    <Teleport to={viewportContext.getPortalRef() ?? document.body}>
+                        <div
+                            ref={rootRef}
+                            class={ToastsStyles.toastsRegion}
+                            style={{
+                                ...CSSUtils.spreadableToStyle(margins, (key) => key),
+                                flexDirection,
+                                justifyContent: stackAlignment.justifyContent,
+                                alignItems: stackAlignment.alignItems,
+                                gap: `${props.gap ?? TOASTS_DEFAULTS.gap}px`,
+                                zIndex: ToastUtils.Z_INDEX,
+                            }}
+                            dir="ltr"
+                            role="region"
+                            tabindex={-1}
+                            aria-label={props.ariaLabel}
+                        >
+                            {ids.map((id, index) => {
+                                const toast = admittedToasts.find((entry) => entry.id === id) ?? lastSeen.get(id);
 
-                            return (
-                                <ToastsItem
-                                    key={id}
-                                    ref={(target) => setEntryRef(id, toElement(target))}
-                                    toast={toast}
-                                    index={index}
-                                    count={ids.length}
-                                    isExiting={!admittedToasts.some((entry) => entry.id === id)}
-                                    isPaused={isPaused.value}
-                                    transitionDurationMs={transitionDurationMs}
-                                    sizes={entrySizes.value}
-                                    swipeDirection={swipeDirection}
-                                    onElapse={() => dismiss(id)}
-                                    onSwipeDismiss={() => dismiss(id)}
-                                    onExitEnd={() => handleExitEnd(id)}
-                                >
-                                    {{ renderToast: slots.renderToast }}
-                                </ToastsItem>
-                            );
-                        })}
-                    </div>
-                </Teleport>
+                                if (!toast) return null;
+
+                                return (
+                                    <ToastsItem
+                                        key={id}
+                                        ref={(target) => setEntryRef(id, toElement(target))}
+                                        toast={toast}
+                                        index={index}
+                                        count={ids.length}
+                                        isExiting={!admittedToasts.some((entry) => entry.id === id)}
+                                        isPaused={isPaused.value}
+                                        transitionDurationMs={transitionDurationMs}
+                                        sizes={entrySizes.value}
+                                        swipeDirection={swipeDirection}
+                                        direction={directions.get(id) ?? ToastUtils.readPageDirection()}
+                                        renderToast={resolvePainter(id, toast)}
+                                        onElapse={() => dismiss(id)}
+                                        onSwipeDismiss={() => dismiss(id)}
+                                        onExitEnd={() => handleExitEnd(id)}
+                                    />
+                                );
+                            })}
+                        </div>
+                    </Teleport>
+                </>
             );
         };
     },
@@ -299,10 +348,8 @@ export const Toasts = defineComponent(
         slots: Object as SlotsType<ToastsSlots<any>>,
         props: declareProps<ToastsProps<unknown>>({
             "ariaLabel": null,
-            "ariaLive": null,
-            "hotkey": null,
             "alignment": null,
-            "dir": null,
+            "flexDirection": null,
             "gap": null,
             "margins": null,
             "overflow": null,
@@ -311,7 +358,6 @@ export const Toasts = defineComponent(
             "limit": null,
             "toasts": null,
             "onUpdate:toasts": null,
-            "computeAnnouncement": null,
         }),
     },
 );

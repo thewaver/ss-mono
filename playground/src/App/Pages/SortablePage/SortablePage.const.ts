@@ -1,4 +1,4 @@
-import type { SortableItemRecord } from "@thewaver/ss-components";
+import { type ArcDefs, PlacementLayoutUtils, type SortableItemRecord } from "@thewaver/ss-components";
 
 import type { Card } from "./SortablePage.types";
 
@@ -22,7 +22,7 @@ export const BOARD: CardItem[] = [card("root", "Root Golem", 4)];
 
 export const QUEUE: CardItem[] = [
     card("one", "First", 1),
-    { ...card("two", "Second — locked", 2), isDisabled: true },
+    { ...card("two", "Second", 2), isDisabled: true },
     card("three", "Third", 3),
     card("four", "Fourth", 4),
 ];
@@ -41,3 +41,21 @@ export const EXAMPLE_NAMES = {
 };
 
 export const EXAMPLES_ROOT = "/src/App/Pages/SortablePage/Examples";
+
+export const DOCS_ROOT = "/src/App/Pages/SortablePage/Docs";
+
+export const LIST_MIN_HEIGHT = 72;
+
+export const LIST_MIN_WIDTH = 180;
+
+export const RING_DEFS: ArcDefs = {
+    curveHeightRatio: 1,
+    spreadDegrees: 360,
+    facingDegrees: 45,
+    itemWidthRatio: 0.6512,
+    itemHeightRatio: 0.3692,
+};
+
+export const RING_LAYOUT = PlacementLayoutUtils.createArc(RING_DEFS);
+
+export const RING_WIDTH = "324px";

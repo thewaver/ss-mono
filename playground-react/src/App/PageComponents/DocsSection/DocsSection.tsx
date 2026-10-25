@@ -1,14 +1,14 @@
-import type { PropsWithChildren } from "react";
 import { useEffect, useState } from "react";
 
 import { toDocsSectionId } from "@thewaver/ss-playground/App/PageComponents/DocsSection/DocsSection.utils";
 import * as styles from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.css";
 
+import { PageDocsProse } from "../DocsProse/DocsProse";
 import { useDocsViewContext } from "../DocsView/DocsView.context";
 import { useIsPreview } from "../Preview/Preview.context";
 import type { PageDocsSectionProps } from "./DocsSectionReact.types";
 
-export const PageDocsSection = (props: PropsWithChildren<PageDocsSectionProps>) => {
+export const PageDocsSection = (props: PageDocsSectionProps) => {
     const isPreview = useIsPreview();
     const docsView = useDocsViewContext();
     const [heading, setHeading] = useState<HTMLElement | null>(null);
@@ -27,7 +27,9 @@ export const PageDocsSection = (props: PropsWithChildren<PageDocsSectionProps>) 
                 {props.title}
             </h2>
 
-            <p className={styles.docsLead}>{props.children}</p>
+            <p className={styles.docsLead}>
+                <PageDocsProse content={props.content} />
+            </p>
         </section>
     );
 };

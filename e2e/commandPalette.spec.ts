@@ -1,6 +1,8 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { activeDescendantText, demo, inputValue, readout } from "./helpers";
+import { activeDescendantText, docsDemo, docsSettled, inputValue } from "./helpers";
+
+const DOCS = "/src/App/Pages/Menus/CommandPalettePage/Docs";
 
 const DIALOG = '[role="dialog"]';
 const FIELD = `${DIALOG} [role="combobox"]`;
@@ -29,34 +31,40 @@ const waitUntilOpen = async (page: Page) => {
     await expect(page.locator(FIELD), "with focus in its search field").toBeFocused();
 };
 
-/** Each palette example's opener carries the id `<example key>OpenPalette`. */
+/** Each palette example's opener carries the id `<example>OpenPalette`, the example's file name in camel case. */
 const openFromButton = async (page: Page, key: string) => {
     await page.locator(`#${key}OpenPalette`).click();
     await waitUntilOpen(page);
 };
 
+const readout = async (page: Page, name: string) =>
+    ((await page.locator(`${docsDemo(DOCS, name)} [data-readout]`).textContent()) ?? "").trim();
+
 /**
  * Each example says how many times its actions have run, and that number is the only thing a shortcut changes; a
  * count read before a key and again after it is how a spec tells a shortcut that fired from one that stayed quiet.
+ * The label is matched without regard to case, so only the number is read.
  */
-const readCount = async (page: Page, key: string, label: string) =>
-    Number(new RegExp(`${label}: (\\d+)`).exec(await readout(page, key))?.[1]);
+const readCount = async (page: Page, name: string, label: string) =>
+    Number(new RegExp(`${label}: (\\d+)`, "i").exec(await readout(page, name))?.[1]);
 
 /**
- * The action an example last ran, as its readout names it. An option draws its shortcut beside its name, so the
- * option's text holds the action's name rather than equaling it, and that is what a pick is checked by.
+ * The action an example last ran, as its readout names it — everything after "last run", up to the next part of the
+ * readout if there is one. An option draws its shortcut beside its name, so the option's text holds the action's
+ * name rather than equaling it, and that is what a pick is checked by.
  */
-const lastRunOf = async (page: Page, key: string) =>
-    /last run: (.+?) —/.exec(await readout(page, key))?.[1] ?? "(no readout)";
+const lastRunOf = async (page: Page, name: string) =>
+    /last run: (.+?)(?: \||$)/i.exec(await readout(page, name))?.[1] ?? "(no readout)";
 
-const notesOf = (page: Page) => readCount(page, "actionShortcuts", "notes");
+const notesOf = (page: Page) => readCount(page, "ActionShortcuts", "notes");
 
-const greetingsOf = (page: Page) => readCount(page, "bareLetter", "greetings");
+const greetingsOf = (page: Page) => readCount(page, "BareLetter", "greetings");
 
 test.describe("on its own page", () => {
     test.beforeEach(async ({ page }) => {
-        await page.goto("/command-palette");
-        await expect(page.locator("[data-example]").first()).toBeVisible();
+        await page.goto("/command-palette/docs");
+        await expect(page.locator("#basicOpenPalette")).toBeVisible();
+        await docsSettled(page);
     });
 
     test("a closed palette is not in the tree", async ({ page }) => {
@@ -92,7 +100,7 @@ test.describe("on its own page", () => {
     test("page shortcuts stay quiet while a modal is open", async ({ page }) => {
         const before = await notesOf(page);
 
-        await openFromButton(page, "default");
+        await openFromButton(page, "basic");
 
         await page.keyboard.press(ADD_NOTE);
         await page.keyboard.press(OPEN_APP_PALETTE);
@@ -117,7 +125,7 @@ test.describe("on its own page", () => {
      * and nothing more.
      */
     test("a bare-letter shortcut stays quiet in a text field", async ({ page }) => {
-        const field = page.locator(`${demo("bareLetter")} input`);
+        const field = page.locator(`${docsDemo(DOCS, "BareLetter")} input`);
         const before = await greetingsOf(page);
 
         await page.keyboard.press(BARE_LETTER);
@@ -130,7 +138,11 @@ test.describe("on its own page", () => {
         expect(await greetingsOf(page), "and the action did not run").toBe(before + 1);
     });
 
-    /** The other half of WCAG 2.1.4: a single-character shortcut can be turned off, and then nothing answers it. */
+    /**
+     * The other half of WCAG 2.1.4: a single-character shortcut can be turned off, and then nothing answers it. The
+     * example's off switch is a button below the palette, since it is the mechanism the criterion asks the consumer
+     * to build; pressing it again turns the shortcut back on.
+     */
     test("a bare-letter shortcut turned off does nothing", async ({ page }) => {
         const before = await greetingsOf(page);
 
@@ -139,10 +151,16 @@ test.describe("on its own page", () => {
         await page.keyboard.press(BARE_LETTER);
 
         expect(await greetingsOf(page), "the letter runs nothing once its shortcut is off").toBe(before);
+
+        await page.locator("#bareLetterToggleShortcut").click();
+        await page.locator("main").click({ position: { x: 1, y: 1 } });
+        await page.keyboard.press(BARE_LETTER);
+
+        await expect.poll(() => greetingsOf(page), "and runs its action again once it is back on").toBe(before + 1);
     });
 
     test("picking a result with the pointer runs it and closes the palette", async ({ page }) => {
-        await openFromButton(page, "default");
+        await openFromButton(page, "basic");
 
         const option = page.locator(OPTION).first();
         const picked = ((await option.textContent()) ?? "").trim();
@@ -150,7 +168,7 @@ test.describe("on its own page", () => {
         await option.click();
 
         await expect(page.locator(DIALOG), "picking closes the palette").toHaveCount(0);
-        expect(picked, "and the action picked is the one that ran").toContain(await lastRunOf(page, "default"));
+        expect(picked, "and the action picked is the one that ran").toContain(await lastRunOf(page, "Basic"));
     });
 
     /**
@@ -175,7 +193,7 @@ test.describe("on its own page", () => {
         await page.keyboard.press("Enter");
 
         await expect(page.locator(DIALOG), "Enter closes the palette").toHaveCount(0);
-        expect(highlighted, "and runs the highlighted action").toContain(await lastRunOf(page, "actionShortcuts"));
+        expect(highlighted, "and runs the highlighted action").toContain(await lastRunOf(page, "ActionShortcuts"));
         expect(await notesOf(page), "once").toBe(before + 1);
     });
 });
@@ -187,8 +205,9 @@ test.describe("on its own page", () => {
  */
 test.describe("the Playground's own palette", () => {
     test.beforeEach(async ({ page }) => {
-        await page.goto("/tabs");
-        await expect(page.locator("[data-example]").first()).toBeVisible();
+        await page.goto("/tabs/docs");
+        await expect(page.locator("[data-docs-example]").first()).toBeVisible();
+        await docsSettled(page);
     });
 
     test("its shortcut opens it on any page", async ({ page }) => {
@@ -267,8 +286,8 @@ test.describe("the register's warnings", () => {
     test("the palette page warns about its bare letter and nothing else", async ({ page }) => {
         const warnings = listenForShortcutWarnings(page);
 
-        await page.goto("/command-palette");
-        await expect(page.locator("[data-example]").first()).toBeVisible();
+        await page.goto("/command-palette/docs");
+        await expect(page.locator("[data-docs-example]").first()).toBeVisible();
         await expect
             .poll(() => warnings.length, "the bare-letter example's shortcut is warned about")
             .toBeGreaterThan(0);
@@ -280,8 +299,8 @@ test.describe("the register's warnings", () => {
     test("the Playground's own palette registers nothing a warning is owed for", async ({ page }) => {
         const warnings = listenForShortcutWarnings(page);
 
-        await page.goto("/tabs");
-        await expect(page.locator("[data-example]").first()).toBeVisible();
+        await page.goto("/tabs/docs");
+        await expect(page.locator("[data-docs-example]").first()).toBeVisible();
         await page.keyboard.press(OPEN_APP_PALETTE);
         await waitUntilOpen(page);
 

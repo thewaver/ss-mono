@@ -14,7 +14,7 @@ const layerClass = useLayerClass();
         :class="[
             styles.sortableItemContent,
             layerClass,
-            isCenterd === true && styles.sortableItemCenterd,
+            isCentered === true && styles.sortableItemCentered,
             flags.isCarried && styles.isCarried,
             flags.isHovered && styles.isHovered,
             flags.isDisabled && styles.isDisabled,

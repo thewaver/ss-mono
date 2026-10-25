@@ -1,4 +1,4 @@
-import { type MaybeRefOrGetter, computed, onUnmounted, toValue, watch } from "vue";
+import { type MaybeRefOrGetter, computed, onUnmounted, toValue, useId, watch } from "vue";
 
 import { LabelUtils } from "@thewaver/ss-components";
 
@@ -52,5 +52,33 @@ export namespace LabelVueUtils {
         );
 
         onUnmounted(() => labelContext.setControlId(undefined));
+    };
+
+    /**
+     * Gives a caption inside a `Label` an id and tells the `Label` it is the caption, so the control is named by the
+     * caption's words alone.
+     *
+     * A `<label>` names its control from all the text inside it, so a control drawing a named button of its own — a
+     * date picker's calendar button — would be announced with the button's name folded in. Once a caption registers
+     * here, the controls inside point `aria-labelledby` at it instead; the `<label>` element stays, so pressing the
+     * caption still focuses the control. A caption that never registers leaves the `<label>` to name the control as a
+     * native one does. Outside a `Label` it does nothing, and the caption is withdrawn when it unmounts.
+     *
+     * Must run inside a component's `setup`.
+     *
+     * @param id The caption's own id, if it has one. Left out, or reading `undefined`, an id is generated.
+     * @returns A computed ref of the id to put on the caption's element, or the caller's own id outside a `Label`.
+     */
+    export const useCaptionId = (id?: MaybeRefOrGetter<string | undefined>) => {
+        const labelContext = useLabelContext();
+        const fallbackId = useId();
+
+        const captionId = computed(() => (labelContext.getIsLabeled() ? (toValue(id) ?? fallbackId) : toValue(id)));
+
+        watch(captionId, (next) => labelContext.setCaptionId(next), { immediate: true });
+
+        onUnmounted(() => labelContext.setCaptionId(undefined));
+
+        return captionId;
     };
 }

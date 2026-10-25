@@ -30,7 +30,11 @@ export type BaseColorAreaValues = {
     ariaLabel?: string;
     /** Names each axis separately, since the square carries two values a reader has to tell apart. */
     axisLabels: Record<ColorAreaAxis, string>;
-    /** How far one press of an arrow key moves the handle, in the same `0`–`100` percent the axes carry. */
+    /**
+     * How far one press of an arrow key moves the handle, in the same `0`–`100` percent the axes carry. The square
+     * is a picture and does not mirror in right-to-left text, so the right and up arrows always raise a value, as
+     * they move the handle right and up on screen.
+     */
     step?: number;
 };
 

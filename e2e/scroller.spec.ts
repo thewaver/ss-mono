@@ -1,9 +1,29 @@
 import { type Locator, type Page, expect, test } from "@playwright/test";
 
-import { demo, prop, readout, waitUntilStill } from "./helpers";
+import { docsDemo, docsSettled, inputValue, prop, waitUntilStill } from "./helpers";
 
-const SPLIT = demo("split");
-const TABBED = demo("tabbed");
+/**
+ * The scroller draws no buttons: each Docs example builds its own pair on the controller the scroller hands over,
+ * and every such button carries an id named for its example and its direction (`basicBack`, `basicForward`,
+ * `bothWaysDown`), so a spec finds a button without reading its label. A button with nowhere to go is disabled,
+ * never taken away.
+ */
+const DOCS = "/src/App/Pages/ScrollerPage/Docs";
+
+const SPLIT = docsDemo(DOCS, "Basic");
+const TABBED = docsDemo(DOCS, "Tabbed");
+const DRIVEN = docsDemo(DOCS, "Driven");
+
+const BACK = "#basicBack";
+const FORWARD = "#basicForward";
+
+/** Types a knob's value the way a person would, and presses Enter so it settles. */
+const typeInto = async (page: Page, selector: string, value: string) => {
+    await page.locator(selector).click();
+    await page.keyboard.press("ControlOrMeta+a");
+    await page.keyboard.type(value);
+    await page.keyboard.press("Enter");
+};
 
 /**
  * The `Scroller` owns one number — how far its track is scrolled — and everything observable about it is a
@@ -21,42 +41,64 @@ const scrollOf = (page: Page, scope: string) =>
     }, scope);
 
 test.beforeEach(async ({ page }) => {
-    await page.goto("/scroller");
-    await expect(page.locator("[data-example]").first()).toBeVisible();
+    await page.goto("/scroller/docs");
+    await expect(page.locator(FORWARD)).toBeVisible();
+    await docsSettled(page);
 });
 
 test("the buttons report the ends rather than wrapping round", async ({ page }) => {
-    const buttons = page.locator(`${SPLIT} button`);
-
-    await expect(buttons.first(), "nothing is scrolled off the start yet, so the back button is dead").toHaveAttribute(
-        "aria-disabled",
-        "true",
-    );
-    await expect(buttons.last(), "but there is more to come, so the forward button is live").not.toHaveAttribute(
+    await expect(
+        page.locator(BACK),
+        "nothing is scrolled off the start yet, so the back button is dead",
+    ).toHaveAttribute("aria-disabled", "true");
+    await expect(page.locator(FORWARD), "but there is more to come, so the forward button is live").not.toHaveAttribute(
         "aria-disabled",
         "true",
     );
 });
 
-test("the buttons leave entirely when everything fits", async ({ page }) => {
-    const buttons = page.locator(`${SPLIT} button`);
-    const itemCount = page.locator(`${prop("itemCount")} input`);
+/**
+ * WCAG 4.1.2 asks the page's buttons to say what they control: each one built on the controller points at the box
+ * through `aria-controls`, with the id the controller hands back, and that box is the one that scrolls.
+ */
+test("a button built on the controller names the box it scrolls", async ({ page }) => {
+    const boxId = await page.locator(FORWARD).getAttribute("aria-controls");
 
-    await expect(buttons, "twelve items overrun the strip, so both buttons are there").toHaveCount(2);
+    expect(boxId, "the forward button names a box").toBeTruthy();
+    expect(await page.locator(BACK).getAttribute("aria-controls"), "and the back button names the same one").toBe(
+        boxId,
+    );
+    expect(
+        await page.locator(`#${boxId}`).evaluate((box) => box.scrollWidth > box.clientWidth),
+        "which is the box that overflows",
+    ).toBe(true);
+});
 
-    await itemCount.fill("3");
-    await itemCount.press("Enter");
+/**
+ * The buttons are the page's, so the scroller never takes them away; with nothing to scroll, both have nowhere to
+ * go and both are disabled.
+ */
+test("with everything in view both buttons are dead, and they come back to life when there is somewhere to go", async ({
+    page,
+}) => {
+    await typeInto(page, `${prop("itemCount")} input`, "1");
 
-    await expect(buttons, "three fit, so the pair goes rather than sitting there dead").toHaveCount(0);
+    await expect(page.locator(BACK), "one item fits, so there is nowhere back").toHaveAttribute(
+        "aria-disabled",
+        "true",
+    );
+    await expect(page.locator(FORWARD), "and nowhere forward").toHaveAttribute("aria-disabled", "true");
 
-    await itemCount.fill("30");
-    await itemCount.press("Enter");
+    await typeInto(page, `${prop("itemCount")} input`, "40");
 
-    await expect(buttons, "and comes back when there is somewhere to go again").toHaveCount(2);
+    await expect(page.locator(FORWARD), "and forward comes back when there is somewhere to go").not.toHaveAttribute(
+        "aria-disabled",
+        "true",
+    );
 });
 
 test("a step moves the track forward and brings the back button to life", async ({ page }) => {
-    const buttons = page.locator(`${SPLIT} button`);
+    const buttons = page.locator(`${BACK}, ${FORWARD}`);
     const before = await scrollOf(page, SPLIT);
 
     await buttons.last().click();
@@ -120,7 +162,7 @@ const waitForRest = (page: Page, scope: string) =>
  * loaded afresh between the two — the same two pages either way, with no distance written down.
  */
 test("two quick presses go as far as two slow ones", async ({ page }) => {
-    const buttons = page.locator(`${SPLIT} button`);
+    const buttons = page.locator(`${BACK}, ${FORWARD}`);
 
     await buttons.last().click();
     await waitForRest(page, SPLIT);
@@ -131,6 +173,7 @@ test("two quick presses go as far as two slow ones", async ({ page }) => {
 
     await page.reload();
     await expect(buttons.last()).toBeVisible();
+    await docsSettled(page);
     expect((await scrollOf(page, SPLIT)).left, "the track starts over at the start").toBe(0);
 
     await buttons.last().click();
@@ -141,7 +184,7 @@ test("two quick presses go as far as two slow ones", async ({ page }) => {
 });
 
 test("stepping to the far end kills the forward button and not the other one", async ({ page }) => {
-    const buttons = page.locator(`${SPLIT} button`);
+    const buttons = page.locator(`${BACK}, ${FORWARD}`);
 
     for (let step = 0; step < 20; step++) {
         if ((await buttons.last().getAttribute("aria-disabled")) === "true") break;
@@ -155,44 +198,61 @@ test("stepping to the far end kills the forward button and not the other one", a
 });
 
 /**
- * The position goes both ways, which is the whole of the `*Signal` bargain: the strip reports where it is,
- * and a number written from outside moves it. The page's own field is the second half — a page dots row or a
- * "3 of 12" readout is the consumer this exists for, and neither can be painted from inside the track.
+ * A step back that would land on the first item goes all the way to the start, padding included, so the back button
+ * dies rather than staying live a couple of pixels short of the start.
+ */
+test("stepping back to the first item reaches the very start and kills the back button", async ({ page }) => {
+    await page.locator(FORWARD).click();
+    await waitForRest(page, SPLIT);
+    await expect(page.locator(BACK)).not.toHaveAttribute("aria-disabled", "true");
+
+    await page.locator(BACK).click();
+    await waitForRest(page, SPLIT);
+
+    expect((await scrollOf(page, SPLIT)).left, "the track is back at the very start").toBe(0);
+    await expect(page.locator(BACK), "so the back button has nowhere left to go").toHaveAttribute(
+        "aria-disabled",
+        "true",
+    );
+});
+
+/**
+ * The position goes both ways, which is the whole of the `progress` bargain: the strip reports where it is,
+ * and a number written from outside moves it. The driven example's Position knob is both halves — a page dots row
+ * or a "3 of 12" line is the consumer this exists for, and neither can be painted from inside the track.
  */
 test.describe("the position is the owner's as well as the track's", () => {
+    const position = `${prop("position")} input`;
+
     test("reports how far along the strip is as it moves", async ({ page }) => {
-        const buttons = page.locator(`${SPLIT} button`);
+        expect(Number(await inputValue(page.locator(position))), "nothing is scrolled off yet").toBe(0);
 
-        expect(await readout(page, "split"), "nothing is scrolled off yet").toContain("0% along");
+        await page.locator("#drivenForward").click();
+        await waitForRest(page, DRIVEN);
 
-        await buttons.last().click();
-        await waitForRest(page, SPLIT);
-
-        const reported = Number(/(\d+)% along/.exec(await readout(page, "split"))?.[1]);
-
-        expect(reported, `a page forward is some way along, and the readout said ${reported}%`).toBeGreaterThan(0);
+        await expect
+            .poll(async () => Number(await inputValue(page.locator(position))), {
+                message: "a page forward is some way along, and the knob says so",
+            })
+            .toBeGreaterThan(0);
     });
 
     test("a position written from outside scrolls the strip to it", async ({ page }) => {
-        const position = page.locator(`${prop("position")} input`);
+        await typeInto(page, position, "100");
+        await waitForRest(page, DRIVEN);
 
-        await position.fill("100");
-        await position.press("Enter");
-        await waitForRest(page, SPLIT);
-
-        const { left, visible, total } = await scrollOf(page, SPLIT);
+        const { left, visible, total } = await scrollOf(page, DRIVEN);
 
         expect(left, "the whole way along is the end of the track").toBeGreaterThan(total - visible - 2);
-        await expect(
-            page.locator(`${SPLIT} button`).last(),
-            "so the forward button has nothing left to reach",
-        ).toHaveAttribute("aria-disabled", "true");
+        await expect(page.locator("#drivenForward"), "so the forward button has nothing left to reach").toHaveAttribute(
+            "aria-disabled",
+            "true",
+        );
 
-        await position.fill("0");
-        await position.press("Enter");
-        await waitForRest(page, SPLIT);
+        await typeInto(page, position, "0");
+        await waitForRest(page, DRIVEN);
 
-        expect((await scrollOf(page, SPLIT)).left, "and zero is back at the start").toBeLessThan(2);
+        expect((await scrollOf(page, DRIVEN)).left, "and zero is back at the start").toBeLessThan(2);
     });
 });
 
@@ -285,10 +345,7 @@ test("a focused child is never flush against the edge, so its ring has somewhere
 test("a step keeps as many of the items just in view as the overlap count says", async ({ page }) => {
     const knob = page.locator(`${prop("overlapCount")} input`);
 
-    await knob.click();
-    await page.keyboard.press("ControlOrMeta+A");
-    await page.keyboard.type("1");
-    await page.keyboard.press("Enter");
+    await typeInto(page, `${prop("overlapCount")} input`, "1");
 
     const overlapCount = Number(await knob.inputValue());
     const wholeInView = () =>
@@ -309,7 +366,7 @@ test("a step keeps as many of the items just in view as the overlap count says",
 
     const before = await wholeInView();
 
-    await page.locator(`${SPLIT} button`).last().click();
+    await page.locator(FORWARD).click();
     await waitForRest(page, SPLIT);
 
     const after = await wholeInView();
@@ -327,8 +384,8 @@ test("a step keeps as many of the items just in view as the overlap count says",
  * Inside it is the Playground's painter: a root, the track it handed the library, and the thumb inside the track.
  * The painter is the only one of its kind in each demo, so the two are found by that structure.
  */
-const bar = (key: string, orientation?: "horizontal" | "vertical") =>
-    `${demo(key)} [role="scrollbar"]${orientation ? `[aria-orientation="${orientation}"]` : ""}`;
+const bar = (name: string, orientation?: "horizontal" | "vertical") =>
+    `${docsDemo(DOCS, name)} [role="scrollbar"]${orientation ? `[aria-orientation="${orientation}"]` : ""}`;
 
 const painterOf = (scrollbar: string) => `${scrollbar} > *`;
 
@@ -338,14 +395,6 @@ const thumbOf = (scrollbar: string) => `${scrollbar} > * > * > *`;
 
 const boxOf = async (page: Page, scrollbar: string) =>
     page.locator(`#${await page.locator(scrollbar).first().getAttribute("aria-controls")}`);
-
-/**
- * A step button found by the grid area the scroller places its group in. The area names are the library's own
- * (`xLeading`, `xTrailing`, `yLeading`, `yTrailing`), so the lookup says which direction a button steps without
- * reading its label.
- */
-const stepButton = (key: string, area: "xLeading" | "xTrailing" | "yLeading" | "yTrailing") =>
-    `${demo(key)} [style*="grid-area: ${area}"] button`;
 
 /** How far a box is scrolled, as a share of how far it can go on each axis, plus the raw numbers behind it. */
 const readBox = (box: Locator) =>
@@ -377,8 +426,8 @@ const center = (rect: { x: number; y: number; width: number; height: number }) =
  * maximum, read off the bar rather than written down.
  */
 test("a drawn bar is a scrollbar naming the box it scrolls, and its value follows the box", async ({ page }) => {
-    const scrollbar = page.locator(bar("verticalStrip"));
-    const box = await boxOf(page, bar("verticalStrip"));
+    const scrollbar = page.locator(bar("Column"));
+    const box = await boxOf(page, bar("Column"));
 
     await expect(scrollbar, "the column's bar runs down").toHaveAttribute("aria-orientation", "vertical");
     await expect(box, "and names a box that is there").toHaveCount(1);
@@ -406,9 +455,9 @@ test("a drawn bar is a scrollbar naming the box it scrolls, and its value follow
 test("a box scrolling both ways has a bar and a pair of steps per direction, each moving only its own", async ({
     page,
 }) => {
-    const across = page.locator(bar("bothWays", "horizontal"));
-    const down = page.locator(bar("bothWays", "vertical"));
-    const box = await boxOf(page, bar("bothWays"));
+    const across = page.locator(bar("BothWays", "horizontal"));
+    const down = page.locator(bar("BothWays", "vertical"));
+    const box = await boxOf(page, bar("BothWays"));
 
     await expect(across, "there is a bar across").toHaveCount(1);
     await expect(down, "and one down").toHaveCount(1);
@@ -416,7 +465,7 @@ test("a box scrolling both ways has a bar and a pair of steps per direction, eac
         await across.getAttribute("aria-controls"),
     );
 
-    await page.locator(stepButton("bothWays", "xTrailing")).click();
+    await page.locator("#bothWaysForward").click();
     await waitUntilStill(box);
 
     const afterAcross = await readBox(box);
@@ -428,7 +477,7 @@ test("a box scrolling both ways has a bar and a pair of steps per direction, eac
     await expect(across, "the bar across reports it").not.toHaveAttribute("aria-valuenow", "0");
     await expect(down, "and the bar down does not").toHaveAttribute("aria-valuenow", "0");
 
-    await page.locator(stepButton("bothWays", "yTrailing")).click();
+    await page.locator("#bothWaysDown").click();
     await waitUntilStill(box);
 
     const afterDown = await readBox(box);
@@ -444,7 +493,7 @@ test("a box scrolling both ways has a bar and a pair of steps per direction, eac
  * pixels, so the `Viewport` scale cancels out of the share.
  */
 test("dragging the thumb scrolls the box by the share of the track it moved", async ({ page }) => {
-    const scrollbar = bar("verticalStrip");
+    const scrollbar = bar("Column");
     const thumb = page.locator(thumbOf(scrollbar));
     const box = await boxOf(page, scrollbar);
 
@@ -490,7 +539,7 @@ test("dragging the thumb scrolls the box by the share of the track it moved", as
  * down. The track's far end is pressed, so a press that jumped to the spot would land at the end instead.
  */
 test("a press on the track pages one view toward the press, as a step does", async ({ page }) => {
-    const scrollbar = bar("shortTrack");
+    const scrollbar = bar("ShortTrack");
     const box = await boxOf(page, scrollbar);
     const track = page.locator(trackOf(scrollbar));
 
@@ -507,11 +556,12 @@ test("a press on the track pages one view toward the press, as a step does", asy
     expect(pressed.left, "but not all the way to the end").toBeLessThan(pressed.rangeX);
 
     await page.reload();
-    await expect(page.locator(stepButton("shortTrack", "xTrailing"))).toBeVisible();
+    await expect(page.locator("#shortTrackForward")).toBeVisible();
+    await docsSettled(page);
 
     const reloadedBox = await boxOf(page, scrollbar);
 
-    await page.locator(stepButton("shortTrack", "xTrailing")).click();
+    await page.locator("#shortTrackForward").click();
     await waitUntilStill(reloadedBox);
 
     expect(
@@ -526,7 +576,7 @@ test("a press on the track pages one view toward the press, as a step does", asy
  * takes more than one page.
  */
 test("a press held on the track keeps paging until the thumb reaches it", async ({ page }) => {
-    const scrollbar = bar("shortTrack");
+    const scrollbar = bar("ShortTrack");
     const box = await boxOf(page, scrollbar);
     const track = page.locator(trackOf(scrollbar));
 
@@ -560,7 +610,7 @@ test("a press held on the track keeps paging until the thumb reaches it", async 
  * spot. The track's middle is pressed, which on a straight track is half the box's run whatever the thumb's length.
  */
 test("a press on the track with Alt held jumps to the spot", async ({ page }) => {
-    const scrollbar = bar("shortTrack");
+    const scrollbar = bar("ShortTrack");
     const box = await boxOf(page, scrollbar);
     const track = page.locator(trackOf(scrollbar));
 
@@ -587,7 +637,7 @@ test("a press on the track with Alt held jumps to the spot", async ({ page }) =>
  * must be at least the delay the page's own knob holds.
  */
 test("a fading bar shows while the box scrolls and fades the hide delay after it stops", async ({ page }) => {
-    const scrollbar = bar("overlaidAutoHiding");
+    const scrollbar = bar("Fading");
     const painter = page.locator(painterOf(scrollbar));
     const box = await boxOf(page, scrollbar);
     const hideDelayMs = Number(await page.locator(`${prop("hideDelayMs")} input`).inputValue());
@@ -642,7 +692,7 @@ test("a fading bar shows while the box scrolls and fades the hide delay after it
 
 /** Hovering counts from real pointer movement, so moving over the box shows a faded bar and leaving fades it. */
 test("a fading bar shows while the pointer moves over the box", async ({ page }) => {
-    const scrollbar = bar("overlaidAutoHiding");
+    const scrollbar = bar("Fading");
     const painter = page.locator(painterOf(scrollbar));
     const box = await boxOf(page, scrollbar);
 
@@ -660,12 +710,13 @@ test("a fading bar shows while the pointer moves over the box", async ({ page })
 
 /**
  * A kept bar has a strip of its own beside the content and never covers it; an overlaid one floats over the content's
- * edge. The two are the same demo either side of its knob, compared by whether each bar's box meets the scrolling
- * box's — measured in the window's pixels, where the `Viewport` scale applies to both alike.
+ * edge. The two are the fading example either side of its overlay knob, which starts on, compared by whether the
+ * bar's box meets the scrolling box's — measured in the window's pixels, where the `Viewport` scale applies to both
+ * alike.
  */
 test("a kept bar sits beside the content, and an overlaid one over its edge", async ({ page }) => {
-    const scrollbars = page.locator(bar("bothWays"));
-    const box = await boxOf(page, bar("bothWays"));
+    const scrollbars = page.locator(bar("Fading"));
+    const box = await boxOf(page, bar("Fading"));
 
     const overlaps = async () => {
         const boxRect = (await box.boundingBox())!;
@@ -685,14 +736,12 @@ test("a kept bar sits beside the content, and an overlaid one over its edge", as
 
     await box.scrollIntoViewIfNeeded();
 
-    const keptCount = await scrollbars.count();
+    expect(await scrollbars.count(), "the column scrolls one way, so it has one bar").toBe(1);
+    await expect.poll(overlaps, { message: "overlaid, the bar floats over the box's edge" }).toEqual([true]);
 
-    expect(keptCount, "the demo scrolls both ways, so it has a bar each way").toBe(2);
-    expect(await overlaps(), "kept, neither bar covers the box").toEqual([false, false]);
+    await page.locator(`${prop("isBarOverlaid")} input`).click();
 
-    await page.locator(`${prop("isBarOverlaid")} input`).check();
-
-    await expect.poll(overlaps, { message: "overlaid, both bars float over the box's edge" }).toEqual([true, true]);
+    await expect.poll(overlaps, { message: "kept, the bar does not cover the box" }).toEqual([false]);
 });
 
 /**
@@ -703,7 +752,7 @@ test("a kept bar sits beside the content, and an overlaid one over its edge", as
  * down here.
  */
 test("dragging a curved bar's thumb follows the pointer round the arc", async ({ page }) => {
-    const scrollbar = bar("arched");
+    const scrollbar = bar("Arched");
     const thumb = page.locator(`${trackOf(scrollbar)} > div`);
     const box = await boxOf(page, scrollbar);
 
@@ -745,7 +794,7 @@ test("dragging a curved bar's thumb follows the pointer round the arc", async ({
  * on the way.
  */
 test("the click that ends a drag is swallowed, and a press that never moved still clicks", async ({ page }) => {
-    const scrollbar = bar("verticalStrip");
+    const scrollbar = bar("Column");
     const thumb = page.locator(thumbOf(scrollbar));
 
     await thumb.scrollIntoViewIfNeeded();

@@ -1,9 +1,7 @@
-import type { PropsWithChildren } from "react";
-
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/GlideFloater/GlideFloater.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { GlideFloaterProps, GlideLabelProps } from "./GlideFloaterReact.types";
+import type { GlideFloaterProps } from "./GlideFloaterReact.types";
 
 export const PageGlideFloater = (props: GlideFloaterProps) => {
     const layerClass = useLayerClass();
@@ -38,22 +36,3 @@ export const renderPageSelectionFloater = (visibilityTarget: 0 | 1, transitionDu
         transitionDurationMs={transitionDurationMs}
     />
 );
-
-export const PageGlideLabel = (props: PropsWithChildren<GlideLabelProps>) => {
-    const layerClass = useLayerClass();
-
-    return (
-        <div
-            className={[
-                styles.glideLabel,
-                layerClass,
-                props.isSelected && styles.isSelected,
-                (props.isDisabled ?? false) && styles.isDisabled,
-            ]
-                .filter(Boolean)
-                .join(" ")}
-        >
-            {props.children}
-        </div>
-    );
-};

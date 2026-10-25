@@ -1,5 +1,7 @@
 import type { Rect } from "@thewaver/ss-utils";
 
+import type { DismisserLayerDefs } from "../../Abstracts/Dismisser/Dismisser.types";
+import { DismisserUtils } from "../../Abstracts/Dismisser/Dismisser.utils";
 import type { SpotlightMode } from "./Spotlight.types";
 
 /** The key every mode answers, which is what keeps even the insistent ones out of a keyboard trap. */
@@ -8,11 +10,37 @@ const ESCAPE_KEY = "Escape";
 /** Keys that are held rather than pressed for their own sake, which a hint does not take as the reader moving on. */
 const MODIFIER_KEYS = new Set(["Shift", "Control", "Alt", "Meta", "CapsLock", "NumLock", "ScrollLock", "AltGraph"]);
 
+/** The dismissal-stack group every spotlight joins, so only the one opened last acts. */
+const SPOTLIGHT_LAYER_GROUP = "spotlight";
+
+const computeUnannouncedWarning = (propName: string) =>
+    `SpotlightGuide: a step was shown with no ${propName}. Focus stays in the popup while a step changes, so nothing else tells a screen reader user what the new step is (WCAG 4.1.3) — add one.`;
+
 /**
  * Cuts a rectangular hole in a covering overlay, and holds the rest of a spotlight that is not about drawing it: which
- * keys dismiss it, how a prompt keeps focus on the one live control, and when a move is announced.
+ * keys dismiss it, how it takes its place among other open layers, how a prompt keeps focus on the one live control,
+ * and when a move is announced.
  */
 export namespace SpotlightUtils {
+    /**
+     * Warns, in the console, that a guide is showing a step with nothing to announce.
+     *
+     * Call it while a guide shows. It says nothing when there is an announcement, and an empty one counts as none,
+     * since a reader would hear nothing. It reports whether it warned, so a caller warning once per guide can stop
+     * asking after the first time.
+     *
+     * @param announcement What the caller gave for the step showing, if anything.
+     * @param propName What the caller's framework calls the prop, so the warning names what they actually wrote.
+     * @returns Whether it warned.
+     */
+    export const warnIfUnannounced = (announcement: string | undefined, propName: string) => {
+        if (announcement) return false;
+
+        console.warn(computeUnannouncedWarning(propName));
+
+        return true;
+    };
+
     /**
      * The clip path for an overlay with a hole in it.
      *
@@ -55,15 +83,68 @@ export namespace SpotlightUtils {
     };
 
     /**
-     * Dismisses the spotlight on the keys {@link getIsDismissedByKey} names, for as long as it listens.
+     * The spotlight's entry in the dismissal stack, made once per spotlight and registered while it is open.
      *
+     * Registered with {@link DismisserUtils.addLayer}, it is how Escape reaches the spotlight: only the topmost
+     * layer hears it, so a `Modal` or a popup open above the spotlight takes the key instead, and a spotlight opened
+     * above another takes it first. A press or a focus move elsewhere is ignored, since no mode closes on those
+     * through the stack. A hint is passive, so a page's shortcuts keep working while one shows; the other modes take
+     * the keyboard, as a dialog does. Every spotlight joins one group, so {@link getIsOnTop} can tell which of them
+     * was opened last.
+     *
+     * @param getMode Reads the mode whenever the stack asks.
+     * @param onDismiss Called on Escape.
+     * @returns The layer. Keep the same object for the spotlight's whole life, since the stack knows it by identity.
+     */
+    export const createLayer = (getMode: () => SpotlightMode, onDismiss: () => void): DismisserLayerDefs => ({
+        group: SPOTLIGHT_LAYER_GROUP,
+        get isPassive() {
+            return getMode() === "hint";
+        },
+        getRoots: () => [],
+        onDismiss: (reason) => {
+            if (reason === "escape") onDismiss();
+        },
+    });
+
+    /**
+     * Whether a spotlight is the one that acts: the open spotlight opened last.
+     *
+     * Only that one draws its overlay, holds focus, seals the page and lifts the element it lights. One opened while
+     * another is open goes on top, and the one beneath waits, still open, until the one above has gone. A layer
+     * of any other kind open above it makes no difference here.
+     *
+     * Read it again whenever {@link DismisserUtils.openLayers} changes.
+     *
+     * @param layer The spotlight's layer, from {@link createLayer}.
+     * @returns `false` while the layer is not registered.
+     */
+    export const getIsOnTop = (layer: DismisserLayerDefs) =>
+        DismisserUtils.getTopLayerInGroup(SPOTLIGHT_LAYER_GROUP) === layer;
+
+    /**
+     * Dismisses the spotlight on the keys other than Escape that {@link getIsDismissedByKey} names, for as long as it
+     * listens.
+     *
+     * Escape is the dismissal stack's, through {@link createLayer}. The other keys — a hint's "anything but a bare
+     * modifier" — are heard only while no layer that takes input sits above the spotlight, so typing into a dialog
+     * opened over a hint does not dismiss the hint.
+     *
+     * @param layer The spotlight's layer, from {@link createLayer}.
      * @param getMode Reads the mode at the moment a key is pressed.
      * @param onDismiss Called for a key that dismisses.
      * @returns The function that stops listening.
      */
-    export const observeDismissKeys = (getMode: () => SpotlightMode, onDismiss: () => void) => {
+    export const observeDismissKeys = (
+        layer: DismisserLayerDefs,
+        getMode: () => SpotlightMode,
+        onDismiss: () => void,
+    ) => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            if (getIsDismissedByKey(e.key, getMode())) onDismiss();
+            if (e.key === ESCAPE_KEY || !getIsDismissedByKey(e.key, getMode())) return;
+            if (!DismisserUtils.getIsTopForInput(layer)) return;
+
+            onDismiss();
         };
 
         document.addEventListener("keydown", handleKeyDown);

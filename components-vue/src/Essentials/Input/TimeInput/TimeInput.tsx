@@ -149,6 +149,7 @@ export const TimeInput = defineComponent(
             "isRequired": Boolean,
             "autoComplete": null,
             "isConcealed": Boolean,
+            "isLeftToRight": Boolean,
             "padding": null,
             "gap": null,
             "ariaAttributes": null,

@@ -22,6 +22,7 @@
 
     import { CarrierSvelteUtils } from "../../Abstracts/Carrier/CarrierSvelte.utils.svelte.js";
     import { ElevationSvelteUtils } from "../../Abstracts/Elevation/ElevationSvelte.utils.svelte.js";
+    import { NavigatorSvelteUtils } from "../../Abstracts/Navigator/NavigatorSvelte.utils.svelte.js";
     import { getViewportContext } from "../../Abstracts/Viewport/Viewport.context.js";
     import { LabelSvelteUtils } from "../../Essentials/Input/Label/LabelSvelte.utils.svelte.js";
     import InteractionWrapper from "../../Primitives/InteractionWrapper/InteractionWrapper.svelte";
@@ -97,6 +98,11 @@
     const carry = $derived(CarrierSvelteUtils.getCarry());
     const isSource = $derived(carry !== undefined && CarrierSvelteUtils.getSourceZone() === zone);
     const isReceiving = $derived(carry !== undefined && CarrierSvelteUtils.getTargetZone() === zone);
+    const getCarriedDirection = NavigatorSvelteUtils.createDirection(
+        () => root,
+        () => !props.renderCarried || !isSource,
+    );
+
     const carriedKey = $derived(isSource ? carry?.key : undefined);
 
     const turn = (step: number) => {
@@ -446,6 +452,7 @@
     <div
         {@attach attachPortal(viewportContext.getPortalRef() ?? document.body)}
         class={styles.sortableGridCarried}
+        dir={getCarriedDirection()}
         style:transform={`translate(${carriedPoint.x - grabOffset.x}px, ${carriedPoint.y - grabOffset.y}px)`}
         style:width={`${getSpan(carriedGeometry?.size.colCount ?? 1)}px`}
         style:height={`${getSpan(carriedGeometry?.size.rowCount ?? 1)}px`}

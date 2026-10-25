@@ -1,7 +1,14 @@
-import type { BaseToolbarExampleProps } from "@thewaver/ss-playground/App/Pages/ToolbarPage/ToolbarPage.types";
+import type {
+    BaseToolbarBasicDocsExampleCbs,
+    BaseToolbarBasicDocsExampleValues,
+    BaseToolbarTooltipDocsExampleValues,
+} from "@thewaver/ss-playground/App/Pages/ToolbarPage/ToolbarPage.types";
 
-export type ToolbarExampleProps = BaseToolbarExampleProps;
+export type ToolbarBasicDocsExampleProps = BaseToolbarBasicDocsExampleValues & BaseToolbarBasicDocsExampleCbs;
 
-export type ToolbarPressedExampleProps = ToolbarExampleProps & {
-    pressedValues: readonly [string[], (values: string[]) => void];
+export type ToolbarTooltipDocsExampleProps = BaseToolbarTooltipDocsExampleValues;
+
+export type ResizableBarProps = {
+    width?: number;
+    onResize?: (width: number) => void;
 };

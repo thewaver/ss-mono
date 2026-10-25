@@ -1,7 +1,7 @@
 import { Show, createEffect, createMemo, createSignal } from "solid-js";
 
 import { Accordion, Scroller, Tabs, access, useViewportContext } from "@thewaver/ss-components-solid";
-import type { AccordionItem, Tab } from "@thewaver/ss-components-solid";
+import type { AccordionItem, ScrollerController, Tab } from "@thewaver/ss-components-solid";
 import {
     MODAL_MARGIN_HEIGHT,
     SECTION_GAP,
@@ -29,6 +29,13 @@ export const PageSourceView = (props: SourceViewProps) => {
 
     const [getGroups, setGroups] = createSignal<SourceGroup[]>([]);
     const [getSelectedGroup, setSelectedGroup] = createSignal<SourceGroup>();
+    const [getTabsController, setTabsController] = createSignal<ScrollerController>();
+
+    const getIsTabsScrollable = () => {
+        const stepper = getTabsController()?.x;
+
+        return stepper !== undefined && !(stepper.getIsAtStart() && stepper.getIsAtEnd());
+    };
 
     const expandedSignal = createSignal<string[]>([]);
     const [, setExpandedNames] = expandedSignal;
@@ -71,37 +78,45 @@ export const PageSourceView = (props: SourceViewProps) => {
                 style={{ "max-height": `${viewportContext.getSize().height - MODAL_MARGIN_HEIGHT}px` }}
             >
                 <div class={styles.sourceViewTabs}>
-                    <Scroller
-                        gap={TAB_GAP}
-                        padding={FOCUS_RING_WIDTH}
-                        renderButton={(getStep, stepper) => <PageScrollerButton step={getStep} stepper={stepper} />}
-                    >
-                        <Tabs
-                            orientation={"horizontal"}
-                            tabGap={TAB_GAP}
-                            ariaLabel={"Source files"}
-                            tabs={getTabs}
-                            selectedValue={getSelectedGroup}
-                            onSelectionChange={selectGroup}
-                            renderGutter={() => <PageTabGutter orientation={"horizontal"} />}
-                            renderSelectionFloater={(getVisibilityTarget, getTransitionDurationMs) => (
-                                <PageTabFloater
+                    <div class={styles.sourceViewTabsRow}>
+                        <Show when={getIsTabsScrollable()}>
+                            <PageScrollerButton controller={getTabsController} step={"previous"} />
+                        </Show>
+
+                        <div class={styles.sourceViewTabsCell}>
+                            <Scroller padding={FOCUS_RING_WIDTH} onMount={setTabsController}>
+                                <Tabs
                                     orientation={"horizontal"}
-                                    visibilityTarget={getVisibilityTarget}
-                                    transitionDurationMs={getTransitionDurationMs}
+                                    tabGap={TAB_GAP}
+                                    ariaLabel={"Source files"}
+                                    tabs={getTabs}
+                                    selectedValue={getSelectedGroup}
+                                    onSelectionChange={selectGroup}
+                                    renderGutter={() => <PageTabGutter orientation={"horizontal"} />}
+                                    renderSelectionFloater={(getVisibilityTarget, getTransitionDurationMs) => (
+                                        <PageTabFloater
+                                            orientation={"horizontal"}
+                                            visibilityTarget={getVisibilityTarget}
+                                            transitionDurationMs={getTransitionDurationMs}
+                                        />
+                                    )}
+                                    renderTab={(getTab, getFlags) => (
+                                        <PageTabContent
+                                            flags={getFlags}
+                                            orientation={"horizontal"}
+                                            isSelected={() => getTab().value === getSelectedGroup()}
+                                        >
+                                            {getTab().value.name}
+                                        </PageTabContent>
+                                    )}
                                 />
-                            )}
-                            renderTab={(getTab, getFlags) => (
-                                <PageTabContent
-                                    flags={getFlags}
-                                    orientation={"horizontal"}
-                                    isSelected={() => getTab().value === getSelectedGroup()}
-                                >
-                                    {getTab().value.name}
-                                </PageTabContent>
-                            )}
-                        />
-                    </Scroller>
+                            </Scroller>
+                        </div>
+
+                        <Show when={getIsTabsScrollable()}>
+                            <PageScrollerButton controller={getTabsController} step={"next"} />
+                        </Show>
+                    </div>
                 </div>
 
                 <div class={styles.sourceViewPanel}>

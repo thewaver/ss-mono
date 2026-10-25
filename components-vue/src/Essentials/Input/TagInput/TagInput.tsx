@@ -22,8 +22,10 @@ import type { TagInputProps, TagInputSlots } from "./TagInput.types";
 
 export const TagInput = defineComponent(
     (props: TagInputProps, { slots, expose }: SlotsContext<TagInputSlots>) => {
-        const ariaLabel = LabelVueUtils.useAriaLabel(() => props.ariaLabel);
+        const { ariaLabel, ariaLabelledBy } = FormFieldVueUtils.useAriaName(() => props.ariaLabel);
         const ariaDescribedBy = FormFieldVueUtils.useAriaDescribedBy();
+
+        TagInputUtils.warnIfTagsUnnamed(props.computeTagAriaLabel, "computeTagAriaLabel");
 
         const tags = useTwoWay(props, "value", []);
         const text = useTwoWay(props, "text", TagInputConst.EMPTY_TEXT);
@@ -115,7 +117,8 @@ export const TagInput = defineComponent(
                                         padding: `${props.padding ?? TAG_INPUT_DEFAULTS.padding}px`,
                                     }}
                                     role="group"
-                                    aria-label={props.ariaLabel}
+                                    aria-label={ariaLabelledBy.value === undefined ? props.ariaLabel : undefined}
+                                    aria-labelledby={ariaLabelledBy.value}
                                     onPointerdown={(e) => {
                                         if (e.target !== e.currentTarget || isDisabled) return;
 
@@ -189,6 +192,7 @@ export const TagInput = defineComponent(
                                         value={text.value}
                                         readonly={flags.isDisabled ?? false}
                                         aria-label={ariaLabel.value}
+                                        aria-labelledby={ariaLabelledBy.value}
                                         aria-describedby={ariaDescribedBy.value}
                                         aria-disabled={flags.isDisabled || undefined}
                                         onInput={(e) => {

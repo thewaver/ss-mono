@@ -70,3 +70,5 @@ export const EXAMPLE_NAMES = {
 export const EXAMPLES_ROOT = "/src/App/Pages/TableOfContentsPage/Examples";
 
 export const PERCENT = 100;
+
+export const DOCS_ROOT = "/src/App/Pages/TableOfContentsPage/Docs";

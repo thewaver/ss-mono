@@ -26,6 +26,8 @@ export namespace HoverIntentVueUtils {
      * @param defs.isHeld Read when the pointer leaves; while it answers `true` the leave closes nothing.
      * @param defs.isHiddenOnAnchorBlur Closes the panel when the anchor loses focus.
      * @param defs.isTouchIgnored Treats a touch as no hover at all.
+     * @param defs.isFocusWithin Treats keyboard focus on anything inside the anchor as focus on the anchor, for an
+     * anchor that groups several controls. It is read when the anchor is observed.
      * @returns `getIsPointerInside` for whether the pointer is over the anchor or the panel right now, and `cancel`
      * to drop a pending open.
      */
@@ -41,6 +43,7 @@ export namespace HoverIntentVueUtils {
             isHeld?: () => boolean;
             isHiddenOnAnchorBlur?: MaybeRefOrGetter<boolean | undefined>;
             isTouchIgnored?: MaybeRefOrGetter<boolean | undefined>;
+            isFocusWithin?: MaybeRefOrGetter<boolean | undefined>;
         },
     ) => {
         const controller = HoverIntentUtils.create(
@@ -65,6 +68,9 @@ export namespace HoverIntentVueUtils {
                 },
                 get isTouchIgnored() {
                     return toValue(defs.isTouchIgnored);
+                },
+                get isFocusWithin() {
+                    return toValue(defs.isFocusWithin);
                 },
             },
         );

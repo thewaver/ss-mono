@@ -22,7 +22,10 @@ export type SpotlightOverlayRenderer = (
 ) => JSX.Element;
 
 export type SpotlightState = {
-    /** Whether the spotlight is showing. It is the only thing that shows or hides it. */
+    /**
+     * Whether the spotlight is open. It is the only thing that opens or closes it. An open spotlight shows unless one
+     * opened after it is open too; then it waits beneath, still open, and shows again once that one closes.
+     */
     visibility: SignalSource<boolean>;
 };
 

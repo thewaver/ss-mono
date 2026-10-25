@@ -9,3 +9,9 @@ export const root = style({
     alignItems: "start",
     gap: themeVars.spacing.quad,
 });
+
+export const docsFrame = style({
+    width: "100%",
+    maxWidth: 480,
+    aspectRatio: "1",
+});

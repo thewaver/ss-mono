@@ -63,11 +63,11 @@
     const gap = $derived(props.gap ?? TEXT_FIELD_DEFAULTS.gap);
 
     const leadingInset = $derived(
-        TextFieldUtils.computeInset(spreadPadding.paddingLeft, props.renderLeading ? getLeadingSize().width : 0, gap),
+        TextFieldUtils.computeInset(spreadPadding.paddingInlineStart, props.renderLeading ? getLeadingSize().width : 0, gap),
     );
     const trailingInset = $derived(
         TextFieldUtils.computeInset(
-            spreadPadding.paddingRight,
+            spreadPadding.paddingInlineEnd,
             props.renderTrailing ? getTrailingSize().width : 0,
             gap,
         ),
@@ -76,7 +76,7 @@
     const textInset = $derived(
         toStyle(
             CSSUtils.spreadableToStyle(
-                { ...spreadPadding, paddingLeft: leadingInset, paddingRight: trailingInset },
+                { ...spreadPadding, paddingInlineStart: leadingInset, paddingInlineEnd: trailingInset },
                 String,
             ),
         ),
@@ -135,6 +135,7 @@
             {minRows}
             maxRows={props.maxRows}
             isConcealed={props.isConcealed}
+            isLeftToRight={props.isLeftToRight}
             {flags}
             {value}
             {textInset}

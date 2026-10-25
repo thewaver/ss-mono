@@ -16,3 +16,5 @@ export const SOURCE_ALTS: Record<SourceType, string | undefined> = {
 };
 
 export const DEFAULT_EXAMPLE_PATH = "/src/App/Pages/ImageSwitcherPage/Examples/Default.tsx";
+
+export const DOCS_ROOT = "/src/App/Pages/ImageSwitcherPage/Docs";

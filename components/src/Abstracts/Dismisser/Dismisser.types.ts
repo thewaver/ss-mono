@@ -4,4 +4,5 @@ export type DismisserLayerDefs = {
     getRoots: () => (HTMLElement | null | undefined)[];
     onDismiss: (reason: DismisserReason) => void;
     isPassive?: boolean;
+    group?: string;
 };

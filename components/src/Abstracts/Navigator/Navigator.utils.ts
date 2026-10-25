@@ -29,7 +29,7 @@ const directionReaders = new Set<() => void>();
 let directionObserver: MutationObserver | undefined;
 
 /** Which way text runs at an element, from its computed style. */
-const readDirection = (element: HTMLElement): NavigatorDirection =>
+const readElementDirection = (element: HTMLElement): NavigatorDirection =>
     getComputedStyle(element).direction === "rtl" ? "rtl" : DEFAULT_NAVIGATION_DIRECTION;
 
 /** Adds a reader to the shared observer, starting it for the first; the returned function removes it again. */
@@ -114,15 +114,28 @@ export namespace NavigatorUtils {
         direction === "rtl" ? (MIRRORED_KEYS[key] ?? key) : key;
 
     /**
+     * Which way text runs at an element right now, read once from its computed style.
+     *
+     * For a caller that needs the direction at one moment and not as it changes later; to follow it, use
+     * {@link createDirectionWatcher}. A detached element has no computed direction and reads as `"ltr"`.
+     *
+     * @param element The element to read.
+     * @returns `"rtl"` or `"ltr"`.
+     */
+    export const readDirection = readElementDirection;
+
+    /**
      * Keeps track of which way text runs at one element at a time, as the page changes.
      *
      * The watcher is a store: read it with `get`, hear about a change with `subscribe`. It says `"ltr"` until
-     * `observe` is handed an element, and again once that element stops being observed. While one is observed
-     * the value is the element's computed `direction`, so a `dir` set on the element itself, on any ancestor or
-     * through a stylesheet is all seen. It is read when observing starts and again whenever a `dir` attribute
-     * changes anywhere in the document; a stylesheet that flips `direction` without any `dir` attribute changing
-     * is only picked up at the next such change. One observer serves every watcher on the page and is dropped
-     * when the last one stops.
+     * `observe` is first handed an element. While one is observed the value is the element's computed
+     * `direction`, so a `dir` set on the element itself, on any ancestor or through a stylesheet is all seen. It
+     * is read when observing starts and again whenever a `dir` attribute changes anywhere in the document; a
+     * stylesheet that flips `direction` without any `dir` attribute changing is only picked up at the next such
+     * change. Once observing stops, the value stays at the last direction read, so a caller that watches only
+     * while something is shown keeps its direction while that thing fades out, and swapping one element for
+     * another reports no change unless the two differ. One observer serves every watcher on the page and is
+     * dropped when the last one stops.
      *
      * Hand `observe` an element that is already in the document: a detached element has no computed direction,
      * and reads as `"ltr"` until the next `dir` change anywhere prompts a re-read.
@@ -139,7 +152,7 @@ export namespace NavigatorUtils {
         const observe = (element: HTMLElement) => {
             stopCurrent?.();
 
-            const reread = () => store.set(readDirection(element));
+            const reread = () => store.set(readElementDirection(element));
             const removeReader = addDirectionReader(reread);
 
             const stop = () => {
@@ -147,7 +160,6 @@ export namespace NavigatorUtils {
 
                 stopCurrent = undefined;
                 removeReader();
-                store.set(DEFAULT_NAVIGATION_DIRECTION);
             };
 
             stopCurrent = stop;

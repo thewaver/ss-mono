@@ -498,6 +498,7 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
                 createPortal(
                     <div
                         className={SortableStyles.sortableCarried}
+                        dir={direction}
                         style={{
                             transform: `translate(${carriedPoint.x - grabOffsetRef.current.x}px, ${carriedPoint.y - grabOffsetRef.current.y}px)`,
                             width: `${carriedSize?.width ?? 0}px`,

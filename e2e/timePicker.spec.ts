@@ -1,13 +1,26 @@
-import { expect, test } from "@playwright/test";
+import { type Page, expect, test } from "@playwright/test";
 
-import { demo, readout } from "./helpers";
+import { docsDemo, docsSettled } from "./helpers";
 
-const CLOCKED = demo("clocked");
-const TWELVE = demo("clockedTwelve");
+/**
+ * The time picker's page is its Docs view. The basic example shows no value under its field, so what it holds is
+ * read off the field, which spells the 24-hour value it holds; the twelve-hour and limits examples show theirs in a
+ * line under the field, matched by the value it ends with, never by the words before it.
+ */
+const DOCS = "/src/App/Pages/TimePickerPage/Docs";
+
+const CLOCKED = docsDemo(DOCS, "Basic");
+const TWELVE = docsDemo(DOCS, "TwelveHour");
+const BOOKING = docsDemo(DOCS, "Limits");
 const POPUP = '[role="dialog"]';
 
 const field = (scope: string) => `${scope} input`;
 const trigger = (key: string) => `#${key}Trigger`;
+
+const readout = (page: Page, scope: string) => page.locator(`${scope} [data-readout]`);
+
+/** The line under a field says it holds exactly this value: the value is the last thing on the line. */
+const holds = (value: string) => new RegExp(`(?:^|\\s)${value}\\s*$`);
 
 /**
  * A column is found by the name the library gave it, which comes from `Intl.DisplayNames` for the page's
@@ -18,14 +31,15 @@ const column = (name: string) => `${POPUP} [role="listbox"][aria-label="${name}"
 
 const option = (name: string, label: string) => `${column(name)} [role="option"][aria-label="${label}"]`;
 
-const openClock = async (page: import("@playwright/test").Page, key: string) => {
+const openClock = async (page: Page, key: string) => {
     await page.locator(trigger(key)).click();
     await expect(page.locator(POPUP)).toBeVisible();
 };
 
 test.beforeEach(async ({ page }) => {
-    await page.goto("/time-picker");
+    await page.goto("/time-picker/docs");
     await expect(page.locator(field(CLOCKED))).toBeVisible();
+    await docsSettled(page);
 });
 
 /**
@@ -36,7 +50,7 @@ test.beforeEach(async ({ page }) => {
  */
 test.describe("the clock's columns", () => {
     test("are one per unit the field shows", async ({ page }) => {
-        await openClock(page, "clocked");
+        await openClock(page, "basic");
 
         await expect(page.locator(`${POPUP} [role="listbox"]`), "a plain field is hours and minutes").toHaveCount(2);
         await expect(page.locator(column("hour"))).toBeVisible();
@@ -44,7 +58,7 @@ test.describe("the clock's columns", () => {
     });
 
     test("gain an am/pm column when the field reads twelve-hour", async ({ page }) => {
-        await openClock(page, "clockedTwelve");
+        await openClock(page, "twelveHour");
 
         await expect(page.locator(`${POPUP} [role="listbox"]`)).toHaveCount(3);
         await expect(page.locator(column("am/pm")), "named by Intl, not by the painter").toBeVisible();
@@ -55,7 +69,7 @@ test.describe("the clock's columns", () => {
      * hours actually fall in, since twelve am is midnight. Listing 01 … 12 would put midnight at the bottom.
      */
     test("run from twelve when the field reads twelve-hour", async ({ page }) => {
-        await openClock(page, "clockedTwelve");
+        await openClock(page, "twelveHour");
 
         const labels = await page
             .locator(`${column("hour")} [role="option"]`)
@@ -71,15 +85,19 @@ test.describe("the clock's columns", () => {
  * makes a column per unit worth the extra keyboard walk.
  */
 test("picking a unit changes that unit and leaves the rest", async ({ page }) => {
-    await openClock(page, "clocked");
+    await openClock(page, "basic");
+
+    const [, minute] = (await page.locator(field(CLOCKED)).inputValue()).split(":");
 
     await page.locator(option("hour", "11")).click();
 
-    expect(await readout(page, "clocked"), "the minute the field already held survives").toContain("value: 11:30");
+    await expect(page.locator(field(CLOCKED)), "the minute the field already held survives").toHaveValue(
+        `11:${minute}`,
+    );
 
     await page.locator(option("minute", "45")).click();
 
-    expect(await readout(page, "clocked")).toContain("value: 11:45");
+    await expect(page.locator(field(CLOCKED))).toHaveValue("11:45");
 });
 
 /**
@@ -89,12 +107,14 @@ test("picking a unit changes that unit and leaves the rest", async ({ page }) =>
  */
 test("the am/pm control and the clock trigger share the trailing slot", async ({ page }) => {
     await expect(page.locator(`${TWELVE} [aria-label^="Before or after noon"]`)).toBeVisible();
-    await expect(page.locator(trigger("clockedTwelve"))).toBeVisible();
+    await expect(page.locator(trigger("twelveHour"))).toBeVisible();
 
-    await openClock(page, "clockedTwelve");
+    await expect(readout(page, TWELVE), "the example starts in the afternoon").toHaveText(holds("14:30"));
+
+    await openClock(page, "twelveHour");
     await page.locator(option("am/pm", "am")).click();
 
-    expect(await readout(page, "clockedTwelve"), "14:30 read as pm becomes 02:30 am").toContain("value: 02:30");
+    await expect(readout(page, TWELVE), "14:30 read as pm becomes 02:30 am").toHaveText(holds("02:30"));
 });
 
 /**
@@ -104,7 +124,7 @@ test("the am/pm control and the clock trigger share the trailing slot", async ({
  */
 test.describe("a stepped and bounded clock", () => {
     test("offers only the minutes it was given", async ({ page }) => {
-        await openClock(page, "booking");
+        await openClock(page, "limits");
 
         const labels = await page
             .locator(`${column("minute")} [role="option"]`)
@@ -114,14 +134,14 @@ test.describe("a stepped and bounded clock", () => {
     });
 
     test("refuses an hour that would land outside the bounds", async ({ page }) => {
-        await openClock(page, "booking");
+        await openClock(page, "limits");
 
         await expect(page.locator(option("hour", "08")), "before opening").toHaveAttribute("aria-disabled", "true");
         await expect(page.locator(option("hour", "10")), "inside opening hours").not.toHaveAttribute("aria-disabled");
 
         await page.locator(option("hour", "08")).click({ force: true });
 
-        expect(await readout(page, "booking"), "a disabled option does nothing at all").toContain("value: 10:15");
+        await expect(readout(page, BOOKING), "a disabled option does nothing at all").toHaveText(holds("10:15"));
     });
 });
 
@@ -131,22 +151,22 @@ test.describe("a stepped and bounded clock", () => {
  * columns does not write three times.
  */
 test("walks with the arrows and commits on Enter", async ({ page }) => {
-    await openClock(page, "clocked");
+    await openClock(page, "basic");
 
     await page.keyboard.press("Tab");
     await expect(page.locator(`${column("hour")} [role="option"][aria-label="09"]`)).toBeFocused();
 
     await page.keyboard.press("ArrowDown");
 
-    expect(await readout(page, "clocked"), "moving the highlight writes nothing").toContain("value: 09:30");
+    await expect(page.locator(field(CLOCKED)), "moving the highlight writes nothing").toHaveValue("09:30");
 
     await page.keyboard.press("Enter");
 
-    expect(await readout(page, "clocked")).toContain("value: 10:30");
+    await expect(page.locator(field(CLOCKED))).toHaveValue("10:30");
 
     await page.keyboard.press("ArrowRight");
     await page.keyboard.press("ArrowDown");
     await page.keyboard.press("Enter");
 
-    expect(await readout(page, "clocked"), "the second column commits its own unit").toContain("value: 10:31");
+    await expect(page.locator(field(CLOCKED)), "the second column commits its own unit").toHaveValue("10:31");
 });

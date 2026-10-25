@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import type { SplitPaneEntry } from "./SplitPane.types";
 import { SplitPaneUtils } from "./SplitPane.utils";
@@ -102,5 +102,36 @@ describe("SplitPaneUtils.pruneCollapsed", () => {
         const collapsed = { 0: { restore: 0.3, collapsedAt: 0 }, 1: { restore: 0.6, collapsedAt: 0.3 } };
 
         expect(SplitPaneUtils.forgetCollapsed(collapsed, 0)).toEqual({ 1: { restore: 0.6, collapsedAt: 0.3 } });
+    });
+});
+
+describe("SplitPaneUtils.findUnnamedGutters", () => {
+    it("asks only for the dividers, so the last pane's label is never wanted", () => {
+        expect(SplitPaneUtils.findUnnamedGutters([{ gutterAriaLabel: "Resize the list" }, {}])).toEqual([]);
+    });
+
+    it("finds each divider whose pane before it has no label, an empty one included", () => {
+        expect(
+            SplitPaneUtils.findUnnamedGutters([{}, { gutterAriaLabel: "" }, { gutterAriaLabel: "Resize" }, {}]),
+        ).toEqual([0, 1]);
+    });
+
+    it("finds nothing to name in a single pane", () => {
+        expect(SplitPaneUtils.findUnnamedGutters([{}])).toEqual([]);
+    });
+});
+
+describe("SplitPaneUtils.warnIfGutterUnnamed", () => {
+    it("warns once, naming each unnamed divider by the pane before it, counted from one", () => {
+        const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+
+        SplitPaneUtils.warnIfGutterUnnamed([{ gutterAriaLabel: "Resize" }, {}], "gutterAriaLabel");
+        expect(warn).not.toHaveBeenCalled();
+
+        SplitPaneUtils.warnIfGutterUnnamed([{}, {}, {}], "gutterAriaLabel");
+        expect(warn).toHaveBeenCalledTimes(1);
+        expect(warn.mock.calls[0][0]).toContain("pane 1, 2");
+
+        warn.mockRestore();
     });
 });

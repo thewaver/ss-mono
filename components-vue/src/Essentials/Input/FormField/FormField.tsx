@@ -26,6 +26,7 @@ const FormFieldControl = defineComponent(
 export const FormField = defineComponent(
     (props: FormFieldProps, { slots }: SlotsContext<FormFieldSlots>) => {
         const messageId = useId();
+        const captionId = useId();
         const formContext = useFormContext();
 
         let controlElement: HTMLElement | undefined;
@@ -43,6 +44,7 @@ export const FormField = defineComponent(
 
         const fieldContext: FormFieldContextType = {
             getDescriptionId: () => (getHasMessage() ? messageId : undefined),
+            getCaptionId: () => (slots.renderCaption ? captionId : undefined),
             registerControl: (element) => {
                 controlElement = element;
             },
@@ -66,7 +68,7 @@ export const FormField = defineComponent(
                         gap: `${props.gap ?? FORM_FIELD_DEFAULTS.gap}px`,
                     }}
                 >
-                    {callSlot(slots.renderCaption, state)}
+                    {slots.renderCaption && <div id={captionId}>{callSlot(slots.renderCaption, state)}</div>}
 
                     <FormFieldControl context={fieldContext}>
                         {{ default: () => callSlot(slots.renderControl, state) }}

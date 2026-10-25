@@ -2,12 +2,11 @@
     import { BinarySwitchUtils, BinarySwitchStyles as styles } from "@thewaver/ss-components";
 
     import { FormFieldSvelteUtils } from "../../Essentials/Input/FormField/FormFieldSvelte.utils.svelte.js";
-    import { LabelSvelteUtils } from "../../Essentials/Input/Label/LabelSvelte.utils.svelte.js";
     import type { BinarySwitchElementProps } from "./BinarySwitch.types.js";
 
     let props: BinarySwitchElementProps = $props();
 
-    const getAriaLabel = LabelSvelteUtils.resolveAriaLabel(() => props.ariaLabel);
+    const { getAriaLabel, getAriaLabelledBy } = FormFieldSvelteUtils.resolveAriaName(() => props.ariaLabel);
     const getAriaDescribedBy = FormFieldSvelteUtils.resolveAriaDescribedBy();
 
     let element = $state<HTMLInputElement>();
@@ -33,6 +32,7 @@
     role={BinarySwitchUtils.computeRole(props.isSwitch ?? false, isMixed)}
     class={styles.binarySwitchElement}
     aria-label={getAriaLabel()}
+    aria-labelledby={getAriaLabelledBy()}
     aria-describedby={getAriaDescribedBy()}
     aria-disabled={isDisabled || undefined}
     aria-required={props.isRequired || undefined}

@@ -30,6 +30,7 @@ import type { Point2d } from "@thewaver/ss-utils";
 
 import { CarrierVueUtils } from "../../Abstracts/Carrier/CarrierVue.utils";
 import { ElevationVueUtils } from "../../Abstracts/Elevation/ElevationVue.utils";
+import { NavigatorVueUtils } from "../../Abstracts/Navigator/NavigatorVue.utils";
 import { useViewportContext } from "../../Abstracts/Viewport/Viewport.context";
 import { LabelVueUtils } from "../../Essentials/Input/Label/LabelVue.utils";
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
@@ -185,6 +186,8 @@ export const SortableGrid = defineComponent(
 
         const isSource = computed(() => carryState.value !== undefined && carryState.value.from === zone);
         const isReceiving = computed(() => carryState.value !== undefined && carryState.value.to === zone);
+
+        const carriedDirection = NavigatorVueUtils.useDirection(rootRef, () => !slots.renderCarried || !isSource.value);
 
         const turn = (step: number) => {
             if (!getIsTurnable() || !isSource.value) return false;
@@ -559,6 +562,7 @@ export const SortableGrid = defineComponent(
                 <Teleport to={viewportContext.getPortalRef() ?? document.body}>
                     <div
                         class={SortableGridStyles.sortableGridCarried}
+                        dir={carriedDirection.value}
                         style={{
                             transform: `translate(${point.x - grabOffset.x}px, ${point.y - grabOffset.y}px)`,
                             width: `${getSpan(carriedGeometry.size.colCount)}px`,

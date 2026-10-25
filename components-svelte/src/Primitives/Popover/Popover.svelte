@@ -26,7 +26,7 @@
     });
 
     const position = AnchorSvelteUtils.createPortalPosition(() => props.anchorRef, fader.getIsVisible, {
-        getPlacement: () => props.placement ?? POPOVER_DEFAULTS.placement,
+        getPlacement: (direction) => props.placement ?? POPOVER_DEFAULTS.placement[direction],
         getOffset: () => props.offset,
         getReservedScreenSize: () => props.reservedScreenSize,
         getIsPinned: () => isPinned,

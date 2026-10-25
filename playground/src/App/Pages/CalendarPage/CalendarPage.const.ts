@@ -1,4 +1,4 @@
-import { DateValueUtils, type DateValueWeekStart } from "@thewaver/ss-components";
+import { type DateValueCalendarId, DateValueUtils, type DateValueWeekStart } from "@thewaver/ss-components";
 
 import { CalendarKnobs } from "../../Knobs/Calendars.const";
 
@@ -38,3 +38,7 @@ export const EXAMPLES_ROOT = "/src/App/Pages/CalendarPage/Examples";
 export const CALENDAR_IDS = DateValueUtils.getCalendarIds();
 
 export const WEEK_STARTS: DateValueWeekStart[] = [...CalendarKnobs.WEEK_STARTS];
+
+export const DOCS_ROOT = "/src/App/Pages/CalendarPage/Docs";
+
+export const OTHER_CALENDAR: DateValueCalendarId = "hebrew";

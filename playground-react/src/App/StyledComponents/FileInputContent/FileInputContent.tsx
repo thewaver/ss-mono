@@ -1,3 +1,5 @@
+import { Fragment } from "react";
+
 import {
     NO_FILES,
     PICK_FILE_MARK,
@@ -31,7 +33,12 @@ export const PageFileInputContent = (props: FileInputContentProps) => {
                     .join(" ")}
             >
                 {props.renderProps.files.length
-                    ? props.renderProps.files.map((file) => file.name).join(", ")
+                    ? props.renderProps.files.map((file, index) => (
+                          <Fragment key={index}>
+                              {index > 0 && ", "}
+                              <bdi>{file.name}</bdi>
+                          </Fragment>
+                      ))
                     : NO_FILES}
             </div>
         </div>

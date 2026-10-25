@@ -1,14 +1,16 @@
-import type { Signal } from "solid-js";
-
 import type { AccessorProps, AccessorValues } from "@thewaver/ss-components-solid";
 import type {
-    BaseToolbarExampleCbs,
-    BaseToolbarExampleValues,
+    BaseToolbarBasicDocsExampleCbs,
+    BaseToolbarBasicDocsExampleValues,
+    BaseToolbarTooltipDocsExampleValues,
 } from "@thewaver/ss-playground/App/Pages/ToolbarPage/ToolbarPage.types";
 
-export type ToolbarExampleProps = AccessorValues<BaseToolbarExampleValues> & BaseToolbarExampleCbs;
+export type ToolbarBasicDocsExampleProps = AccessorValues<BaseToolbarBasicDocsExampleValues> &
+    BaseToolbarBasicDocsExampleCbs;
 
-export type ToolbarPressedExampleProps = ToolbarExampleProps &
-    AccessorProps<{
-        pressedValues: Signal<string[]>;
-    }>;
+export type ToolbarTooltipDocsExampleProps = AccessorValues<BaseToolbarTooltipDocsExampleValues>;
+
+export type ResizableBarProps = AccessorProps<{
+    width?: number;
+    onResize?: (width: number) => void;
+}>;

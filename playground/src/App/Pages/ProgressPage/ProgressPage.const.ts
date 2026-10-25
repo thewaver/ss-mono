@@ -16,3 +16,7 @@ export const UPLOAD_TICK_MS = 50;
 export const UPLOAD_TICK_BYTES = 24_000;
 
 export const EXAMPLES_ROOT = "/src/App/Pages/ProgressPage/Examples";
+
+export const DOCS_ROOT = "/src/App/Pages/ProgressPage/Docs";
+
+export const BYTES_PER_KB = 1000;

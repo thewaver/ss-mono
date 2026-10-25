@@ -59,7 +59,6 @@ export const SubmittedDocsExample = () => {
                                     renderHighlightFloater={renderPageHighlightFloater}
                                     value={planSignal}
                                     options={PLANS}
-                                    ariaLabel={"Plan"}
                                     isRequired={true}
                                     hasError={() => getFieldState().hasError}
                                     renderContent={(getSelectedOption, getFlags) => (
@@ -89,7 +88,6 @@ export const SubmittedDocsExample = () => {
                                     renderHighlightFloater={renderPageHighlightFloater}
                                     values={topicsSignal}
                                     options={TOPICS}
-                                    ariaLabel={"Topics"}
                                     isRequired={true}
                                     hasError={() => getFieldState().hasError}
                                     renderContent={(getSelectedOptions, getFlags) => (
@@ -127,7 +125,9 @@ export const SubmittedDocsExample = () => {
                             />
                         </PageFormButtons>
 
-                        <div class={exampleStyles.exampleReadout}>{getOutcome()}</div>
+                        <div class={exampleStyles.exampleReadout} data-readout>
+                            {getOutcome()}
+                        </div>
                     </PageFormStack>
                 );
             }}

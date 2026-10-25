@@ -1,13 +1,4 @@
-import type { Signal } from "solid-js";
+import type { AccessorValues } from "@thewaver/ss-components-solid";
+import type { BaseLabelBasicDocsExampleValues } from "@thewaver/ss-playground/App/Pages/LabelPage/LabelPage.types";
 
-import type { PlanValue } from "@thewaver/ss-playground/App/Pages/LabelPage/LabelPage.types";
-
-export type { PlanValue } from "@thewaver/ss-playground/App/Pages/LabelPage/LabelPage.types";
-
-export type LabelExampleProps = {
-    checked: Signal<boolean>;
-};
-
-export type LabelRadioExampleProps = {
-    value: Signal<PlanValue>;
-};
+export type LabelBasicDocsExampleProps = AccessorValues<BaseLabelBasicDocsExampleValues>;

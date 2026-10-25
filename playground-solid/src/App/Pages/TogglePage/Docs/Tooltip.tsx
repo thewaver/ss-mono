@@ -17,7 +17,7 @@ export const TooltipDocsExample = (props: Props) => {
             ariaLabel={"Toggle with a tooltip"}
             isDisabled={props.isDisabled}
             isReachableWhenDisabled={props.isReachableWhenDisabled}
-            renderContent={(getFlags) => <PageToggleContent flags={getFlags} />}
+            renderContent={(getFlags) => <PageToggleContent flags={getFlags}>Toggle with a tooltip</PageToggleContent>}
             tooltipDefs={() => ({
                 placement: () => ({ x: "center", y: "top_out" }),
                 offset: () => ({ x: 0, y: 10 }),

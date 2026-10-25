@@ -1,20 +1,33 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { activeText, centerDistance, computedStyle, demo, inlineStyle, readout, tabIndex, tagName } from "./helpers";
+import {
+    activeText,
+    centerDistance,
+    computedStyle,
+    docsDemo,
+    docsSettled,
+    inlineStyle,
+    prop,
+    tabIndex,
+    tagName,
+} from "./helpers";
 
 /**
- * The page carries one tab list per variant, so every locator is scoped to its own variant box. Each
- * list holds a disabled entry in the middle rather than at an edge, which is the case a walk can get
- * wrong in both directions at once.
+ * Every example on the Docs page holds its own selection and shows it only by which tab is selected, so the
+ * selection is read off `aria-selected` — the same thing a screen reader goes by. Every locator is scoped to its own
+ * example. The disabled-tab example holds a disabled entry in the middle rather than at an edge, which is the case a
+ * walk can get wrong in both directions at once; the Basic example's tabs are all enabled, as the page's own words
+ * say, and its knobs turn it into a column or disable all of it.
  */
-const ROW = demo("row");
-const COLUMN = demo("column");
-const LINKS = demo("links");
-const LINK_COMPONENT = demo("linkComponent");
-const CLEARABLE = demo("clearable");
-const DISABLED = demo("disabled");
-const AUTOMATIC = demo("automatic");
-const HOVER_PILL = demo("hoverPill");
+const DOCS = "/src/App/Pages/TabsPage/Docs";
+
+const BASIC = docsDemo(DOCS, "Basic");
+const DISABLED_TAB = docsDemo(DOCS, "DisabledTab");
+const LINKS = docsDemo(DOCS, "Links");
+const CLEARABLE = docsDemo(DOCS, "Clearable");
+const AUTOMATIC = docsDemo(DOCS, "Automatic");
+const HOVER_PILL = docsDemo(DOCS, "HoverPill");
+const HONEYCOMB = docsDemo(DOCS, "Honeycomb");
 
 const list = (scope: string) => `${scope} [role="tablist"]`;
 const tab = (scope: string) => `${scope} [role="tab"]`;
@@ -24,25 +37,36 @@ const floater = (scope: string) => `${scope} [data-floater]`;
 
 const FLOATER_TIMEOUT_MS = 5_000;
 
+const selectedText = async (page: Page, scope: string) =>
+    ((await page.locator(`${tab(scope)}[aria-selected="true"]`).textContent()) ?? "").trim();
+
+const knob = (page: Page, key: string) => page.locator(`${prop(key)} input`);
+
+const pickKnobOption = async (page: Page, key: string, option: string) => {
+    await page.locator(`${prop(key)} [role="combobox"]`).click();
+    await page.locator('[role="listbox"] [role="option"]', { hasText: option }).first().click();
+};
+
 test.beforeEach(async ({ page }) => {
-    await page.goto("/tabs");
-    await expect(page.locator(tab(ROW)).first()).toBeVisible();
+    await page.goto("/tabs/docs");
+    await expect(page.locator(tab(BASIC)).first()).toBeVisible();
+    await docsSettled(page);
 });
 
 test("a tab list is one tab stop, and it sits on the selected tab", async ({ page }) => {
-    await expect(page.locator(tab(ROW)), "the disabled tab is still rendered and still a tab").toHaveCount(4);
-    await expect(page.locator(`${tab(ROW)}[aria-disabled="true"]`), "and it says so with aria").toHaveCount(1);
+    await expect(page.locator(tab(DISABLED_TAB)), "the disabled tab is still rendered and still a tab").toHaveCount(4);
+    await expect(page.locator(`${tab(DISABLED_TAB)}[aria-disabled="true"]`), "and it says so with aria").toHaveCount(1);
 
-    await expect(page.locator(`${tab(ROW)}[tabindex="0"]`), "exactly one tab holds the tab stop").toHaveCount(1);
-    await expect(page.locator(`${tab(ROW)}[tabindex="0"]`), "which is the selected one").toHaveAttribute(
+    await expect(page.locator(`${tab(BASIC)}[tabindex="0"]`), "exactly one tab holds the tab stop").toHaveCount(1);
+    await expect(page.locator(`${tab(BASIC)}[tabindex="0"]`), "which is the selected one").toHaveAttribute(
         "aria-selected",
         "true",
     );
-    expect(await tabIndex(page.locator(tab(ROW)).nth(1)), "every other tab is reachable only by arrow").toBe(-1);
+    expect(await tabIndex(page.locator(tab(BASIC)).nth(1)), "every other tab is reachable only by arrow").toBe(-1);
 });
 
 test("the keyboard walks the row and steps over the disabled tab", async ({ page }) => {
-    await page.locator(`${tab(ROW)}[tabindex="0"]`).focus();
+    await page.locator(`${tab(DISABLED_TAB)}[tabindex="0"]`).focus();
     expect(await activeText(page), "focus starts on the selected tab").toBe("Render");
 
     await page.keyboard.press("ArrowRight");
@@ -69,53 +93,51 @@ test("the keyboard walks the row and steps over the disabled tab", async ({ page
 
 test("a column list declares its orientation and takes the other pair of arrows", async ({ page }) => {
     await expect(
-        page.locator(list(COLUMN)),
-        "a stacked list has to say so, since a tab list is horizontal by default",
-    ).toHaveAttribute("aria-orientation", "vertical");
-    await expect(
-        page.locator(list(ROW)),
-        "and a row says so as well, since the orientation prop is written through as given",
+        page.locator(list(BASIC)),
+        "a row says so, since the orientation prop is written through as given",
     ).toHaveAttribute("aria-orientation", "horizontal");
 
-    await page.locator(`${tab(COLUMN)}[tabindex="0"]`).focus();
-    expect(await activeText(page)).toBe("Overview");
+    await pickKnobOption(page, "orientation", "vertical");
+
+    await expect(
+        page.locator(list(BASIC)),
+        "a stacked list has to say so, since a tab list is horizontal by default",
+    ).toHaveAttribute("aria-orientation", "vertical");
+
+    await page.locator(`${tab(BASIC)}[tabindex="0"]`).focus();
+    expect(await activeText(page)).toBe("Render");
 
     await page.keyboard.press("ArrowDown");
-    expect(await activeText(page), "ArrowDown walks a column forward").toBe("Details");
-
-    await page.keyboard.press("ArrowDown");
-    expect(await activeText(page), "over the disabled entry").toBe("Settings");
+    expect(await activeText(page), "ArrowDown walks a column forward").toBe("Source");
 
     await page.keyboard.press("ArrowRight");
-    expect(await activeText(page), "while the cross-axis arrows do nothing in a column").toBe("Settings");
-});
+    expect(await activeText(page), "while the cross-axis arrows do nothing in a column").toBe("Source");
 
-test("each list carries its own name, so several on a page stay distinguishable", async ({ page }) => {
-    await expect(page.locator(list(ROW))).toHaveAttribute("aria-label", "Example views");
-    await expect(page.locator(list(COLUMN))).toHaveAttribute("aria-label", "Example sections");
+    await page.keyboard.press("ArrowUp");
+    expect(await activeText(page), "and ArrowUp walks it back").toBe("Render");
 });
 
 test("moving the focus does not move the selection, and the tab itself does the selecting", async ({ page }) => {
-    await page.locator(`${tab(ROW)}[tabindex="0"]`).focus();
+    await page.locator(`${tab(BASIC)}[tabindex="0"]`).focus();
     await page.keyboard.press("ArrowRight");
 
-    expect(await readout(page, "row"), "an arrow moves the focus and nothing else").toBe("selected: Render");
-    await expect(page.locator(`${tab(ROW)}[aria-selected="true"]`)).toHaveText("Render");
+    expect(await selectedText(page, BASIC), "an arrow moves the focus and nothing else").toBe("Render");
 
     await page.keyboard.press("Enter");
-    expect(await readout(page, "row"), "and the focused tab selects when it is activated").toBe("selected: Source");
+    expect(await selectedText(page, BASIC), "and the focused tab selects when it is activated").toBe("Source");
 
-    await page.locator(tab(ROW)).nth(3).click();
-    expect(await readout(page, "row"), "a click does the same thing").toBe("selected: Export");
+    await page.locator(tab(BASIC)).nth(2).click();
+    expect(await selectedText(page, BASIC), "a click does the same thing").toBe("Export");
 
-    await page.locator(tab(ROW)).nth(2).click({ force: true });
-    expect(await readout(page, "row"), "and a disabled tab refuses both").toBe("selected: Export");
+    await page.locator(tab(DISABLED_TAB)).nth(3).click();
+    await page.locator(tab(DISABLED_TAB)).nth(2).click({ force: true });
+    expect(await selectedText(page, DISABLED_TAB), "and a disabled tab refuses both").toBe("Export");
 });
 
 /**
  * The other half of the published pattern: arrowing onto a tab selects it as it lands. Manual is still the
- * default here, because a panel that costs something to build should not be built on the way past — this is
- * the opt-in for the case where the panel is already there.
+ * default, because a panel that costs something to build should not be built on the way past — this is the opt-in
+ * for the case where the panel is already there, and the section's knob starts on it.
  */
 test("automatic activation takes the selection along with the focus", async ({ page }) => {
     await page.locator(`${tab(AUTOMATIC)}[tabindex="0"]`).focus();
@@ -124,33 +146,43 @@ test("automatic activation takes the selection along with the focus", async ({ p
     await page.keyboard.press("ArrowRight");
 
     expect(await activeText(page), "the focus moves as it always did").toBe("Source");
-    expect(await readout(page, "automatic"), "and the selection comes with it, unasked").toContain("selected: Source");
+    expect(await selectedText(page, AUTOMATIC), "and the selection comes with it, unasked").toBe("Source");
 
     await page.keyboard.press("ArrowRight");
 
-    expect(await readout(page, "automatic"), "the disabled tab is skipped by both").toContain("selected: Export");
+    expect(await selectedText(page, AUTOMATIC), "the disabled tab is skipped by both").toBe("Export");
 
     await page.keyboard.press("ArrowRight");
 
-    expect(await readout(page, "automatic"), "and the wrap selects the first tab again").toContain("selected: Render");
+    expect(await selectedText(page, AUTOMATIC), "and the wrap selects the first tab again").toBe("Render");
 
-    expect(await readout(page, "row"), "the manual list beside it is untouched").toBe("selected: Render");
+    expect(await selectedText(page, BASIC), "the manual list above it is untouched").toBe("Render");
+});
+
+test("with automatic activation turned off, the arrows move the focus alone", async ({ page }) => {
+    await knob(page, "hasAutoActivation").click();
+
+    await page.locator(`${tab(AUTOMATIC)}[tabindex="0"]`).focus();
+    await page.keyboard.press("ArrowRight");
+
+    expect(await activeText(page), "the focus moves").toBe("Source");
+    expect(await selectedText(page, AUTOMATIC), "and the selection stays where it was").toBe("Render");
 });
 
 test("a tab and its panel point at each other, and the pair moves with the selection", async ({ page }) => {
-    const controls = await page.locator(`${tab(ROW)}[aria-selected="true"]`).getAttribute("aria-controls");
+    const controls = await page.locator(`${tab(BASIC)}[aria-selected="true"]`).getAttribute("aria-controls");
     const panel = page.locator(`#${controls}`);
 
     expect(await panel.getAttribute("role"), "the selected tab points at a real panel").toBe("tabpanel");
     expect(
         await panel.getAttribute("aria-labelledby"),
         "and the panel points back at the tab, so a reader arriving in it knows which one they are in",
-    ).toBe(await page.locator(`${tab(ROW)}[aria-selected="true"]`).getAttribute("id"));
+    ).toBe(await page.locator(`${tab(BASIC)}[aria-selected="true"]`).getAttribute("id"));
     expect(await tabIndex(panel), "a panel of plain prose is focusable, since nothing inside it can be").toBe(0);
 
-    await page.locator(tab(ROW)).nth(3).click();
+    await page.locator(tab(BASIC)).nth(2).click();
 
-    const next = await page.locator(`${tab(ROW)}[aria-selected="true"]`).getAttribute("aria-controls");
+    const next = await page.locator(`${tab(BASIC)}[aria-selected="true"]`).getAttribute("aria-controls");
 
     expect(next, "selecting another tab swaps in that tab's panel").not.toBe(controls);
     await expect(page.locator(`#${next}`)).toHaveAttribute("role", "tabpanel");
@@ -162,16 +194,17 @@ test("a tab and its panel point at each other, and the pair moves with the selec
 });
 
 test("the floater follows the selected tab, over a gutter that spans the list", async ({ page }) => {
-    await expect(page.locator(`${list(ROW)} [data-gutter]`), "the gutter is painted once behind the list").toHaveCount(
-        1,
-    );
+    await expect(
+        page.locator(`${list(BASIC)} [data-gutter]`),
+        "the gutter is painted once behind the list",
+    ).toHaveCount(1);
 
-    const box = page.locator(floater(ROW)).locator("..");
+    const box = page.locator(floater(BASIC)).locator("..");
     const before = await inlineStyle(box, "left");
 
     expect(before, "the floater is placed off a real measurement rather than left at zero").not.toBe("");
 
-    await page.locator(tab(ROW)).nth(3).click();
+    await page.locator(tab(BASIC)).nth(2).click();
 
     await expect.poll(() => inlineStyle(box, "left"), { timeout: FLOATER_TIMEOUT_MS }).not.toBe(before);
 });
@@ -179,7 +212,7 @@ test("the floater follows the selected tab, over a gutter that spans the list", 
 /**
  * Losing the selection is not the same as losing the floater: the painter is handed a target of `0` and
  * has to be given the time it was promised to reach it, so the element stays in the document while the
- * transition runs and goes only once it has. That variant sets a deliberately long duration, which is
+ * transition runs and goes only once it has. That example sets a deliberately long duration, which is
  * what makes the middle of it observable rather than a race.
  *
  * The class the painter toggles is hashed by the stylesheet compiler, so the state is read off the
@@ -202,13 +235,14 @@ test("the floater plays itself out before it goes, and back in when a selection 
     await expect(painted, "a list with a selection paints one").toHaveCount(1);
     await expect.poll(() => computedStyle(painted, "transform"), { timeout: FLOATER_TIMEOUT_MS }).toBe(SHOWN_TRANSFORM);
 
-    await page.locator(`${CLEARABLE} button:not([role="tab"])`).click();
+    await page.locator("#clearSelection").click();
 
     await expect
         .poll(() => computedStyle(painted, "transform"), {
             message: "clearing the selection aims the painter at hidden while it is still in the document",
         })
         .not.toBe(SHOWN_TRANSFORM);
+    await expect(page.locator(`${tab(CLEARABLE)}[aria-selected="true"]`), "and no tab is selected").toHaveCount(0);
 
     await expect(painted, "and it leaves once the transition it was promised has run").toHaveCount(0, {
         timeout: FLOATER_TIMEOUT_MS,
@@ -227,32 +261,59 @@ test("the floater plays itself out before it goes, and back in when a selection 
     ).toBeLessThan(RETURN_TOLERANCE_PX);
 
     await expect.poll(() => computedStyle(painted, "transform")).toBe(SHOWN_TRANSFORM);
-    expect(await readout(page, "clearable")).toContain("selected: Three");
+    expect(await selectedText(page, CLEARABLE)).toBe("Three");
 });
 
 test("an href makes the tab an anchor, and a link component replaces the element", async ({ page }) => {
     expect(await tagName(page.locator(tab(LINKS)).first()), "a tab with an href is a link, not a button").toBe("A");
-    expect(await tagName(page.locator(tab(ROW)).first()), "and one without stays a button").toBe("BUTTON");
+    expect(await tagName(page.locator(tab(BASIC)).first()), "and one without stays a button").toBe("BUTTON");
     await expect(page.locator(tab(LINKS)).first()).toHaveAttribute("href", "#tabs-docs");
+    await expect(
+        page.locator(`${tab(LINKS)}[data-link-component]`),
+        "the native anchor is used until a link component is given",
+    ).toHaveCount(0);
+
+    await knob(page, "hasLinkComponent").click();
 
     await expect(
-        page.locator(`${tab(LINK_COMPONENT)}[data-link-component]`),
+        page.locator(`${tab(LINKS)}[data-link-component]`),
         "the consumer's own component renders every tab when one is given",
     ).toHaveCount(3);
 
-    await page.locator(tab(LINK_COMPONENT)).nth(1).click();
-    expect(await readout(page, "linkComponent"), "and it still reports the selection").toContain("selected: Guides");
+    await page.locator(tab(LINKS)).nth(1).click();
+    expect(await selectedText(page, LINKS), "and it still reports the selection").toBe("Guides");
 });
 
 test("a list with nothing enabled holds no tab stop at all", async ({ page }) => {
-    await expect(page.locator(`${tab(DISABLED)}[aria-disabled="true"]`)).toHaveCount(3);
+    await knob(page, "isDisabled").click();
+
+    await expect(page.locator(`${tab(BASIC)}[aria-disabled="true"]`)).toHaveCount(3);
     await expect(
-        page.locator(`${tab(DISABLED)}[tabindex="0"]`),
+        page.locator(`${tab(BASIC)}[tabindex="0"]`),
         "with nowhere for the roving stop to land, the list drops out of the tab order",
     ).toHaveCount(0);
 
-    await page.locator(tab(DISABLED)).nth(1).click({ force: true });
-    expect(await readout(page, "disabled"), "and clicking changes nothing").toContain("selected: Draft");
+    const before = await selectedText(page, BASIC);
+
+    await page.locator(tab(BASIC)).nth(1).click({ force: true });
+    expect(await selectedText(page, BASIC), "and clicking changes nothing").toBe(before);
+});
+
+/**
+ * The disabled-tab example's knob keeps Metrics reachable: the arrows then stop on it, so a screen reader names it
+ * and says it is unavailable, and it still cannot be selected.
+ */
+test("a disabled tab kept reachable is a stop in the walk that selects nothing", async ({ page }) => {
+    await knob(page, "isReachableWhenDisabled").click();
+
+    await page.locator(`${tab(DISABLED_TAB)}[tabindex="0"]`).focus();
+    await page.keyboard.press("ArrowRight");
+    await page.keyboard.press("ArrowRight");
+
+    await expect(page.locator(tab(DISABLED_TAB)).nth(2), "the walk stops on the disabled tab").toBeFocused();
+
+    await page.keyboard.press("Enter");
+    expect(await selectedText(page, DISABLED_TAB), "and activating it selects nothing").toBe("Render");
 });
 
 /**
@@ -261,8 +322,6 @@ test("a list with nothing enabled holds no tab stop at all", async ({ page }) =>
  * the list is still a list: the pairing, the roving walk and the floater all belong to `Tabs` rather than
  * to the row it used to be drawn as, so none of them should notice.
  */
-const HONEYCOMB = demo("honeycomb");
-
 const placedBox = (scope: string) => `${scope} [role="presentation"][style*="left"]`;
 
 /**
@@ -283,7 +342,7 @@ const placedOffsets = (page: Page, scope: string) =>
 
 test("a honeycomb is a box per tab, and the rows interlock rather than stacking", async ({ page }) => {
     await expect(page.locator(placedBox(HONEYCOMB))).toHaveCount(await page.locator(tab(HONEYCOMB)).count());
-    await expect(page.locator(placedBox(ROW)), "while a row places nothing").toHaveCount(0);
+    await expect(page.locator(placedBox(BASIC)), "while a row places nothing").toHaveCount(0);
 
     const offsets = await placedOffsets(page, HONEYCOMB);
     const firstRow = offsets.filter((offset) => offset.top === offsets[0].top);
@@ -348,11 +407,14 @@ test("a press in the notch between two cells lands on the one it looks like", as
     const cells = page.locator(tab(HONEYCOMB));
     const upper = cells.first();
     const elsewhere = cells.last();
+    const elsewhereText = ((await elsewhere.textContent()) ?? "").trim();
 
     await elsewhere.click();
-    expect(await readout(page, "honeycomb"), "start from a cell other than the one being aimed past").toContain(
-        `selected: ${await elsewhere.textContent()}`,
+    expect(await selectedText(page, HONEYCOMB), "start from a cell other than the one being aimed past").toBe(
+        elsewhereText,
     );
+
+    await upper.scrollIntoViewIfNeeded();
 
     const box = await upper.boundingBox();
 
@@ -361,9 +423,9 @@ test("a press in the notch between two cells lands on the one it looks like", as
     await page.mouse.click(box!.x + box!.width * CORNER_ACROSS, box!.y + box!.height * CORNER_DOWN);
 
     expect(
-        await readout(page, "honeycomb"),
+        await selectedText(page, HONEYCOMB),
         "the bottom-left corner of the first cell's rectangle is outside its hexagon, so nothing there selects it",
-    ).toContain(`selected: ${await elsewhere.textContent()}`);
+    ).toBe(elsewhereText);
 });
 
 /**

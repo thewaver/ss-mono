@@ -1,7 +1,7 @@
-import { type ParentProps, Show } from "solid-js";
+import { type ParentProps, Show, createSignal } from "solid-js";
 
 import type { TableSortDirection } from "@thewaver/ss-components-solid";
-import { access } from "@thewaver/ss-components-solid";
+import { NavigatorSolidUtils, access } from "@thewaver/ss-components-solid";
 import {
     DEFAULT_ALIGN,
     EXPANDER_MARKERS,
@@ -90,9 +90,18 @@ export const PageTableCellContent = (props: ParentProps<TableCellContentProps>) 
 export const PageTableRowExpander = (props: TableExpanderProps) => {
     const getLayerClass = useLayerClass();
 
+    const [getRef, setRef] = createSignal<HTMLElement>();
+    const getDirection = NavigatorSolidUtils.createDirectionSignal(getRef);
+
+    const getMarker = () => {
+        if (access(props.renderProps).isExpanded) return EXPANDER_MARKERS.open;
+
+        return getDirection() === "rtl" ? EXPANDER_MARKERS.closedRightToLeft : EXPANDER_MARKERS.closed;
+    };
+
     return (
-        <div class={[styles.tableRowExpander, getLayerClass()].join(" ")}>
-            {access(props.renderProps).isExpanded ? EXPANDER_MARKERS.open : EXPANDER_MARKERS.closed}
+        <div ref={setRef} class={[styles.tableRowExpander, getLayerClass()].join(" ")}>
+            {getMarker()}
         </div>
     );
 };

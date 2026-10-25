@@ -1,4 +1,4 @@
-import type { CSSPadding } from "@thewaver/ss-utils";
+import type { CSSLogicalPadding } from "@thewaver/ss-utils";
 
 import type { TextSyncMaskResult } from "../../Abstracts/TextSync/TextSync.types";
 
@@ -53,11 +53,21 @@ export type BaseTextFieldFieldValues = {
      * show a second, misplaced copy.
      */
     isConcealed?: boolean;
+    /**
+     * Whether the text runs left to right whatever the direction of the text around the field, so the caret, the
+     * arrow keys and the characters keep that order in right-to-left text too. For a value written in Latin letters
+     * and digits that is never read the other way, such as a one-time code.
+     */
+    isLeftToRight?: boolean;
 };
 
 export type BaseTextFieldLayoutValues = {
-    /** How much room is left inside the field, around its text. */
-    padding?: CSSPadding | number;
+    /**
+     * How much room is left inside the field, around its text. Its sides follow the text, as CSS's
+     * `padding-inline-start` and its siblings do: in right-to-left text the inline start is on the right, and the
+     * leading and trailing slots move with it.
+     */
+    padding?: CSSLogicalPadding | number;
     /** The space between the text and whatever sits before or after it. */
     gap?: number;
 };

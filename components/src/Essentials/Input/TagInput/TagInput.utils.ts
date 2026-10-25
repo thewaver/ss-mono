@@ -11,6 +11,9 @@ const ADD_KEY = "Enter";
 /** The key that, in an empty field, steps back onto the last tag. */
 const STEP_BACK_KEY = "Backspace";
 
+const computeUnnamedTagsWarning = (propName: string) =>
+    `TagInput: no ${propName} was given. Each tag is a button that removes it when pressed, and a screen reader hears only the tag's word, not what pressing it does — add one that names both, such as "solid, remove".`;
+
 /**
  * What a tag field does with the keys pressed in it, and where focus goes as tags come and go.
  *
@@ -18,6 +21,21 @@ const STEP_BACK_KEY = "Backspace";
  * the arrows, reading which way is back from the direction the text runs, so a right-to-left page walks mirrored.
  */
 export namespace TagInputUtils {
+    /**
+     * Warns, in the console, that a tag field has no way to name its tags.
+     *
+     * A tag is a button whose press removes it, and its word alone does not say so, which fails
+     * {@link https://www.w3.org/WAI/WCAG22/Understanding/headings-and-labels.html WCAG 2.4.6}: labels describe topic or purpose.
+     * Call it once per field, when it is set up. It says nothing when a namer was given, and nothing stops the field
+     * from working without one.
+     *
+     * @param computeTagAriaLabel What the caller gave the field, if anything.
+     * @param propName What the caller's framework calls the prop, so the warning names what they actually wrote.
+     */
+    export const warnIfTagsUnnamed = (computeTagAriaLabel: ((tag: string) => string) | undefined, propName: string) => {
+        if (!computeTagAriaLabel) console.warn(computeUnnamedTagsWarning(propName));
+    };
+
     /**
      * The tag typed text becomes, if it becomes one.
      *

@@ -1,3 +1,5 @@
+import { ScrollerKnobs } from "../../Knobs/Scrollers.const";
+
 export const EXAMPLE_NAMES = {
     split: "One button at each end",
     bothButtonsEnd: "Both buttons at the end",
@@ -13,7 +15,13 @@ export const EXAMPLE_NAMES = {
 
 export const EXAMPLES_ROOT = "/src/App/Pages/ScrollerPage/Examples";
 
+export const DOCS_ROOT = "/src/App/Pages/ScrollerPage/Docs";
+
 export const PERCENT = 100;
+
+export const toItemLabels = (count: number) => Array.from({ length: count }, (_, index) => `Item ${index + 1}`);
+
+export const ITEM_LABELS = toItemLabels(ScrollerKnobs.STARTING_ITEM_COUNT);
 
 export const GRID_SIZE = 12;
 

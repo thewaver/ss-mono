@@ -5,10 +5,3 @@ export type BaseGlideFloaterValues = {
 };
 
 export type BaseGlideFloaterProps = BaseGlideFloaterValues;
-
-export type BaseGlideLabelValues = {
-    isSelected: boolean;
-    isDisabled?: boolean;
-};
-
-export type BaseGlideLabelProps = BaseGlideLabelValues;

@@ -1,6 +1,6 @@
-import type { PropsWithChildren } from "react";
+import { type PropsWithChildren, useRef } from "react";
 
-import type { TableSortDirection } from "@thewaver/ss-components-react";
+import { NavigatorReactUtils, type TableSortDirection } from "@thewaver/ss-components-react";
 import {
     DEFAULT_ALIGN,
     EXPANDER_MARKERS,
@@ -95,9 +95,14 @@ export const PageTableCellContent = (props: PropsWithChildren<TableCellContentPr
 export const PageTableRowExpander = (props: TableExpanderProps) => {
     const layerClass = useLayerClass();
 
+    const ref = useRef<HTMLDivElement | null>(null);
+    const direction = NavigatorReactUtils.useDirection(ref);
+
+    const closedMarker = direction === "rtl" ? EXPANDER_MARKERS.closedRightToLeft : EXPANDER_MARKERS.closed;
+
     return (
-        <div className={[styles.tableRowExpander, layerClass].join(" ")}>
-            {props.renderProps.isExpanded ? EXPANDER_MARKERS.open : EXPANDER_MARKERS.closed}
+        <div ref={ref} className={[styles.tableRowExpander, layerClass].join(" ")}>
+            {props.renderProps.isExpanded ? EXPANDER_MARKERS.open : closedMarker}
         </div>
     );
 };

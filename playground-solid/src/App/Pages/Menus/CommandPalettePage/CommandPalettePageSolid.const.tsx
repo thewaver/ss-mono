@@ -22,11 +22,6 @@ import { PageTextFieldPlaceholder } from "../../../StyledComponents/TextFieldPla
 
 export * from "@thewaver/ss-playground/App/Pages/Menus/CommandPalettePage/CommandPalettePage.const";
 
-export const formatPageShortcut = (shortcut: CommandPaletteAction<string>["shortcut"]) =>
-    shortcut === undefined
-        ? undefined
-        : CommandPalettePageUtils.formatShortcut(ShortcutUtils.resolve(shortcut), ShortcutUtils.getIsApplePlatform());
-
 export const renderPaletteOverlay = (getVisibilityTarget: () => 0 | 1, getTransitionDurationMs: () => number) => (
     <PageModalOverlay visibilityTarget={getVisibilityTarget} transitionDurationMs={getTransitionDurationMs} />
 );

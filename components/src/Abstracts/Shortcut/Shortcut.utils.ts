@@ -187,7 +187,9 @@ export namespace ShortcutUtils {
         computeIsShortcutMatch(shortcut, e, isApple);
 
     /**
-     * Whether a shortcut is one WCAG 2.1.4 governs: a single character, with no modifier but Shift.
+     * Whether a shortcut is one
+     * {@link https://www.w3.org/WAI/WCAG22/Understanding/character-key-shortcuts.html WCAG 2.1.4} governs: a single
+     * character, with no modifier but Shift.
      *
      * The criterion asks that such a shortcut can be turned off or remapped. The register keeps it quiet while focus
      * is in an editable field and warns when one is registered.
@@ -228,8 +230,9 @@ export namespace ShortcutUtils {
      * prevented, so the browser's own shortcut on the same keys does not run as well. A character key shortcut stays
      * quiet while focus is in an editable field.
      *
-     * Warns once in the console, for a character key shortcut, since WCAG 2.1.4 asks that it can be turned off or
-     * remapped, and for a shortcut already registered on the same layer, where only the later one fires.
+     * Warns once in the console, for a character key shortcut, since
+     * {@link https://www.w3.org/WAI/WCAG22/Understanding/character-key-shortcuts.html WCAG 2.1.4} asks that it can be
+     * turned off or remapped, and for a shortcut already registered on the same layer, where only the later one fires.
      *
      * @param defs The shortcut, what it does, and the layer it belongs to: {@link DismisserUtils.getTopLayer} read
      * when its owner appeared, or `undefined` for the page itself.

@@ -10,10 +10,16 @@ export const LABEL_CONTEXT: LabelContextType = {
     getIsLabeled: () => true,
     getLabelId: () => undefined,
     setControlId: () => undefined,
+    getCaptionId: () => undefined,
+    setCaptionId: () => undefined,
 };
 
 export const UNLABELED_CONTEXT: LabelContextType = {
     getIsLabeled: () => false,
     getLabelId: () => undefined,
     setControlId: () => undefined,
+    getCaptionId: () => undefined,
+    setCaptionId: () => undefined,
 };
+
+export const LABEL_ORIENTATIONS: readonly LabelOrientation[] = ["horizontal", "vertical"];

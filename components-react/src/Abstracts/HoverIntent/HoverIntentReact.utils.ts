@@ -24,6 +24,8 @@ export namespace HoverIntentReactUtils {
      * @param defs.isHeld Read when the pointer leaves; while it answers `true` the leave closes nothing.
      * @param defs.isHiddenOnAnchorBlur Closes the panel when the anchor loses focus.
      * @param defs.isTouchIgnored Treats a touch as no hover at all.
+     * @param defs.isFocusWithin Treats keyboard focus on anything inside the anchor as focus on the anchor, for an
+     * anchor that groups several controls. Read whenever the anchor is attached.
      * @returns `getIsPointerInside` for whether the pointer is over the anchor or the panel right now, and `cancel`
      * to drop a pending open.
      */
@@ -39,6 +41,7 @@ export namespace HoverIntentReactUtils {
             isHeld?: () => boolean;
             isHiddenOnAnchorBlur?: boolean;
             isTouchIgnored?: boolean;
+            isFocusWithin?: boolean;
         },
     ) => {
         const latest = useLatest({ shownState, ...defs });
@@ -63,6 +66,9 @@ export namespace HoverIntentReactUtils {
                     },
                     get isTouchIgnored() {
                         return latest.current.isTouchIgnored;
+                    },
+                    get isFocusWithin() {
+                        return latest.current.isFocusWithin;
                     },
                 },
             ),

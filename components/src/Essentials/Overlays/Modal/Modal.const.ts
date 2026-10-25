@@ -7,3 +7,5 @@ export const MODAL_DEFAULTS = {
     isDismissableOnOverlayClick: true,
     isDismissableOnEscape: true,
 };
+
+export const MODAL_ALIGNMENTS: readonly ModalAlignment[] = ["center", "left", "right", "top", "bottom"];

@@ -60,6 +60,7 @@ const setHeadingRef = (id: string) => (element: Element | ComponentPublicInstanc
 };
 
 let currentEntry: DocsTableOfContentsEntry | undefined;
+let hasOpened = false;
 let stopHashHold: (() => void) | undefined;
 
 onBeforeUnmount(() => stopHashHold?.());
@@ -85,6 +86,12 @@ const handleFragmentClick = (e: MouseEvent, href: string) => {
 
 const handleCurrentChange = (entry: DocsTableOfContentsEntry | undefined) => {
     currentEntry = entry;
+
+    if (!hasOpened) {
+        hasOpened = true;
+
+        return;
+    }
 
     if (!stopHashHold) replaceHash(entry);
 };

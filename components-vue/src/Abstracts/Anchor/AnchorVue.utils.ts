@@ -1,12 +1,19 @@
 import { type ComponentPublicInstance, type MaybeRefOrGetter, computed, shallowRef, toValue } from "vue";
 
-import { type AnchorPlacement, AnchorUtils, ElementObserverUtils, ElevationUtils } from "@thewaver/ss-components";
+import {
+    type AnchorPlacement,
+    AnchorUtils,
+    ElementObserverUtils,
+    ElevationUtils,
+    type NavigatorDirection,
+} from "@thewaver/ss-components";
 import { type Point2d, type Rect, Size2d } from "@thewaver/ss-utils";
 
 import { watchAfterRender } from "../../Utils/effectUtils";
 import { toElement } from "../../Utils/refUtils";
 import { useStore } from "../../Utils/storeUtils";
 import { ElementObserverVueUtils } from "../ElementObserver/ElementObserverVue.utils";
+import { NavigatorVueUtils } from "../Navigator/NavigatorVue.utils";
 import { useViewportContext } from "../Viewport/Viewport.context";
 
 /** The Vue side of `AnchorUtils`: the positioning cycle for portaled content, as refs. */
@@ -20,17 +27,24 @@ export namespace AnchorVueUtils {
      * the content is hidden, so a closed popup costs nothing. The arithmetic is `AnchorUtils.computePortalPlacement`,
      * `AnchorUtils.computePortalPosition` and their neighbors.
      *
+     * The content also takes the direction text runs in at the anchor, written as `dir` on the element handed to
+     * `setContentRef` and kept current while it is shown, since content moved to the end of the document would
+     * otherwise lay itself out in the document's direction rather than its anchor's.
+     *
      * Must run inside a component's `setup`.
      *
-     * @param anchorRef The element to position against.
+     * @param anchorRef The element to position against, and whose direction the content takes. Content given only
+     * `opts.anchorRect` and no element runs left to right.
      * @param isVisible Whether the content is currently shown.
-     * @param opts.placement The placement to aim for.
+     * @param opts.placement The placement to aim for, given the direction text runs in at the anchor, so a default
+     * can line the content up with the edge the text starts from.
      * @param opts.offset The gap to hold between anchor and content.
      * @param opts.reservedScreenSize A margin to keep clear at the screen edges.
      * @param opts.anchorRect Supplies the anchor rectangle directly, for content anchored to something that is not
      * an element. Given this, no element is observed.
      * @param opts.isPinned Keeps the placement asked for and skips clamping.
-     * @returns Computed refs: `anchorRect` and `isAnchorOnScreen` for deciding whether to draw at all, `placement`
+     * @returns Computed refs: `anchorRect` and `isAnchorOnScreen` for deciding whether to draw at all, `direction`
+     * for the direction the content was given, `placement`
      * for styling that depends on which way the content opened, `position` for where to put it, `arrowAim` for where
      * an arrow pointing at the anchor leaves the content (see {@link AnchorUtils.computeArrowAim}), and `zIndex`; and
      * `setContentRef`, a function ref for the content's own element, without which nothing has a size to work with.
@@ -40,7 +54,7 @@ export namespace AnchorVueUtils {
         anchorRef: MaybeRefOrGetter<HTMLElement | null | undefined>,
         isVisible: MaybeRefOrGetter<boolean>,
         opts: {
-            placement: MaybeRefOrGetter<AnchorPlacement>;
+            placement: (direction: NavigatorDirection) => AnchorPlacement;
             offset?: MaybeRefOrGetter<Point2d | undefined>;
             reservedScreenSize?: MaybeRefOrGetter<Size2d | undefined>;
             anchorRect?: MaybeRefOrGetter<Rect | undefined>;
@@ -59,6 +73,8 @@ export namespace AnchorVueUtils {
 
         const anchorRect = computed(() => toValue(opts.anchorRect) ?? observedRect.value);
 
+        const direction = NavigatorVueUtils.useDirection(anchorRef, () => !toValue(isVisible));
+
         const getLayoutOpts = () => ({
             offset: toValue(opts.offset),
             reservedScreenSize: toValue(opts.reservedScreenSize),
@@ -67,7 +83,7 @@ export namespace AnchorVueUtils {
 
         const placement = computed(() =>
             AnchorUtils.computePortalPlacement(
-                toValue(opts.placement),
+                opts.placement(direction.value),
                 anchorRect.value,
                 contentSize.value,
                 viewportContext.getSize(),
@@ -120,12 +136,19 @@ export namespace AnchorVueUtils {
             };
         });
 
+        watchAfterRender([contentElement, direction], ([content, contentDirection]) => {
+            if (!content) return;
+
+            content.dir = contentDirection;
+        });
+
         return {
             anchorRect,
             isAnchorOnScreen,
             placement,
             position,
             arrowAim,
+            direction,
             zIndex,
             setContentRef: (target: Element | ComponentPublicInstance | null) => {
                 contentElement.value = toElement(target);

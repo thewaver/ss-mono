@@ -45,6 +45,6 @@ export const formSectionBody = style({
     flexDirection: "column",
     alignItems: "start",
     gap: themeVars.spacing.full,
-    paddingLeft: themeVars.spacing.full,
-    borderLeft: `1px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
+    paddingInlineStart: themeVars.spacing.full,
+    borderInlineStart: `1px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
 });

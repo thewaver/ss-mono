@@ -36,3 +36,14 @@ export const pressedMark = style({
         },
     },
 });
+
+export const docsResizer = style([
+    resizer,
+    {
+        width: "100%",
+    },
+]);
+
+export const docsDirectionBox = style({
+    width: "100%",
+});

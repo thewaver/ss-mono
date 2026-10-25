@@ -1,6 +1,7 @@
 import { createSignal } from "solid-js";
 
 import { TextArea } from "@thewaver/ss-components-solid";
+import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
 import { FIELD_WIDTH, LONG_TEXT, MIN_ROWS } from "@thewaver/ss-playground/App/Pages/TextAreaPage/TextAreaPage.const";
 import {
     FIELD_GAP,
@@ -19,18 +20,24 @@ export const GrowingDocsExample = (props: Props) => {
     const valueSignal = createSignal(LONG_TEXT);
 
     return (
-        <TextArea
-            value={valueSignal}
-            isAutoSizing={true}
-            minRows={MIN_ROWS}
-            maxRows={props.maxRows}
-            padding={FIELD_PADDING}
-            gap={FIELD_GAP}
-            ariaLabel={"Message"}
-            computeTextStyle={computePageTextFieldTextStyle}
-            renderContent={(getFlags) => (
-                <PageTextFieldContent flags={getFlags} width={FIELD_WIDTH} isStretched={true} />
-            )}
-        />
+        <>
+            <TextArea
+                value={valueSignal}
+                isAutoSizing={true}
+                minRows={MIN_ROWS}
+                maxRows={props.maxRows}
+                padding={FIELD_PADDING}
+                gap={FIELD_GAP}
+                ariaLabel={"Message"}
+                computeTextStyle={computePageTextFieldTextStyle}
+                renderContent={(getFlags) => (
+                    <PageTextFieldContent flags={getFlags} width={FIELD_WIDTH} isStretched={true} />
+                )}
+            />
+
+            <div class={exampleStyles.exampleReadout} data-readout>
+                {`Length: ${valueSignal[0]().length}`}
+            </div>
+        </>
     );
 };

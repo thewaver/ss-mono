@@ -16,3 +16,5 @@ export const LONG_PARAGRAPHS = [
 ];
 
 export const SHORT_PARAGRAPHS = ["The east tower leans, and has done for four hundred years."];
+
+export const DOCS_ROOT = "/src/App/Pages/PreviewPage/Docs";

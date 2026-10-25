@@ -1,4 +1,4 @@
-import { style } from "@vanilla-extract/css";
+import { style, styleVariants } from "@vanilla-extract/css";
 
 import { GRID_SIZE } from "./ScrollerPage.const";
 
@@ -71,3 +71,68 @@ export const row = style([
         marginBlockEnd: themeVars.spacing.half,
     },
 ]);
+
+export const scrollerCell = style({
+    flex: "1 1 0",
+    alignSelf: "stretch",
+    display: "grid",
+    gridTemplateColumns: "minmax(0, 1fr)",
+    gridTemplateRows: "minmax(0, 1fr)",
+    minWidth: 0,
+    minHeight: 0,
+});
+
+export const stripLayout = style([
+    demo,
+    {
+        display: "flex",
+        alignItems: "center",
+        gap: themeVars.spacing.full,
+    },
+]);
+
+export const tabbedStripLayout = style({
+    display: "flex",
+    alignItems: "center",
+    gap: themeVars.spacing.full,
+});
+
+export const columnLayout = style([
+    verticalDemo,
+    {
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: themeVars.spacing.full,
+    },
+]);
+
+export const bothWaysLayout = style([
+    bothWaysDemo,
+    {
+        display: "grid",
+        gridTemplateAreas: `". up ." "back box next" ". down ."`,
+        gridTemplateColumns: "auto minmax(0, 1fr) auto",
+        gridTemplateRows: "auto minmax(0, 1fr) auto",
+        alignItems: "center",
+        justifyItems: "center",
+        gap: themeVars.spacing.full,
+    },
+]);
+
+export const bothWaysCell = styleVariants({
+    up: { gridArea: "up" },
+    back: { gridArea: "back" },
+    next: { gridArea: "next" },
+    down: { gridArea: "down" },
+    box: {
+        gridArea: "box",
+        display: "grid",
+        gridTemplateColumns: "minmax(0, 1fr)",
+        gridTemplateRows: "minmax(0, 1fr)",
+        alignSelf: "stretch",
+        justifySelf: "stretch",
+        minWidth: 0,
+        minHeight: 0,
+    },
+});

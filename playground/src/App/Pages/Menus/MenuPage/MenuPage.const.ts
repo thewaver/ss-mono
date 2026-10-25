@@ -20,3 +20,7 @@ export const EXAMPLE_NAMES = {
 };
 
 export const EXAMPLES_ROOT = "/src/App/Pages/Menus/MenuPage/Examples";
+
+export const DOCS_ROOT = "/src/App/Pages/Menus/MenuPage/Docs";
+
+export const FIELD_WIDTH = 110;

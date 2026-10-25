@@ -25,7 +25,12 @@ const layerClass = useLayerClass();
         <div :class="styles.fileDropZonePrompt">{{ prompt }}</div>
 
         <div :class="[styles.fileDropZoneNames, !renderProps.files.length && styles.isEmpty]">
-            {{ renderProps.files.length ? renderProps.files.map((file) => file.name).join(", ") : NO_FILES }}
+            <template v-if="renderProps.files.length">
+                <template v-for="(file, index) in renderProps.files" :key="index"
+                    >{{ index > 0 ? ", " : "" }}<bdi>{{ file.name }}</bdi></template
+                >
+            </template>
+            <template v-else>{{ NO_FILES }}</template>
         </div>
     </div>
 </template>

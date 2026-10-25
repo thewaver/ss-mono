@@ -1,6 +1,8 @@
 import type { DateValue, DateValueCalendarId, DateValueEra } from "../../../Abstracts/DateValue/DateValue.types";
 import { DateValueUtils } from "../../../Abstracts/DateValue/DateValue.utils";
 import { TextSyncUtils } from "../../../Abstracts/TextSync/TextSync.utils";
+import type { CalendarDayMatcher } from "../Calendar/Calendar.types";
+import { CalendarUtils } from "../Calendar/Calendar.utils";
 import type { DateInputFormat, DateInputPart } from "./DateInput.types";
 
 /** Digits in the year part. */
@@ -142,7 +144,8 @@ export namespace DateInputUtils {
      * Reads a complete run of digits as a date.
      *
      * The date itself decides whether it exists, so 31 February is refused in every order rather than once per
-     * order.
+     * order. A day the consumer refuses is refused here too, as the calendar refuses it, so typing cannot reach a
+     * day picking cannot.
      *
      * @param digits The digits typed.
      * @param opts.format The order the parts are written in.
@@ -150,8 +153,10 @@ export namespace DateInputUtils {
      * @param opts.era The era the year is counted within.
      * @param opts.minValue The earliest date accepted, if there is one.
      * @param opts.maxValue The latest date accepted, if there is one.
-     * @returns The date, or `undefined` when the digits are incomplete, do not name a real day, or fall outside the
-     * bounds.
+     * @param opts.disabledDays The consumer's descriptions of refused days, as the calendar takes them.
+     * @param opts.computeIsDayDisabled The consumer's own rule for refusing a day.
+     * @returns The date, or `undefined` when the digits are incomplete, do not name a real day, fall outside the
+     * bounds, or name a refused day.
      */
     export const parseDigits = (
         digits: string,
@@ -161,6 +166,8 @@ export namespace DateInputUtils {
             era: string;
             minValue?: DateValue;
             maxValue?: DateValue;
+            disabledDays?: CalendarDayMatcher[];
+            computeIsDayDisabled?: (day: DateValue) => boolean;
         },
     ) => {
         if (digits.length !== DIGIT_COUNT) return undefined;
@@ -174,7 +181,9 @@ export namespace DateInputUtils {
             day: parts.day!,
         });
 
-        return parsed && DateValueUtils.getIsInRange(parsed, opts.minValue, opts.maxValue) ? parsed : undefined;
+        if (!parsed || !DateValueUtils.getIsInRange(parsed, opts.minValue, opts.maxValue)) return undefined;
+
+        return CalendarUtils.getIsDayRefused(parsed, opts) ? undefined : parsed;
     };
 
     /**

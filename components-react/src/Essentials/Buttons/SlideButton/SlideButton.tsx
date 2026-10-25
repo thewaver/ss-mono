@@ -16,11 +16,10 @@ import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/Inter
 import { useLatest } from "../../../Utils/refUtils";
 import { useStore } from "../../../Utils/storeUtils";
 import { FormFieldReactUtils } from "../../Input/FormField/FormFieldReact.utils";
-import { LabelReactUtils } from "../../Input/Label/LabelReact.utils";
 import type { SlideButtonElementProps, SlideButtonProps } from "./SlideButton.types";
 
 const SlideButtonElement = (props: SlideButtonElementProps) => {
-    const ariaLabel = LabelReactUtils.useAriaLabel(props.ariaLabel);
+    const { ariaLabel, ariaLabelledBy } = FormFieldReactUtils.useAriaName(props.ariaLabel);
     const fieldDescribedBy = FormFieldReactUtils.useAriaDescribedBy();
     const descriptionId = useId();
 
@@ -107,6 +106,7 @@ const SlideButtonElement = (props: SlideButtonElementProps) => {
                 type="button"
                 className={SlideButtonStyles.slideButtonElement}
                 aria-label={ariaLabel}
+                aria-labelledby={ariaLabelledBy}
                 aria-describedby={ariaDescribedBy}
                 aria-pressed={props.flags.isPressed}
                 aria-disabled={isDisabled || undefined}

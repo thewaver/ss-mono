@@ -3,7 +3,6 @@ import { type SlotsType, defineComponent, onMounted, onUpdated, shallowRef } fro
 import { type BinarySwitchFlags, BinarySwitchStyles, BinarySwitchUtils } from "@thewaver/ss-components";
 
 import { FormFieldVueUtils } from "../../Essentials/Input/FormField/FormFieldVue.utils";
-import { LabelVueUtils } from "../../Essentials/Input/Label/LabelVue.utils";
 import { callSlot, declareProps, forwardProps } from "../../Utils/propUtils";
 import { exposeElement, toElement } from "../../Utils/refUtils";
 import type { SlotsContext } from "../../Utils/typeUtils";
@@ -13,7 +12,7 @@ import type { BinarySwitchElementProps, BinarySwitchProps, BinarySwitchSlots } f
 
 const BinarySwitchElement = defineComponent(
     (props: BinarySwitchElementProps, { slots, expose }: SlotsContext<InteractionControlSlots<BinarySwitchFlags>>) => {
-        const ariaLabel = LabelVueUtils.useAriaLabel(() => props.ariaLabel);
+        const { ariaLabel, ariaLabelledBy } = FormFieldVueUtils.useAriaName(() => props.ariaLabel);
         const ariaDescribedBy = FormFieldVueUtils.useAriaDescribedBy();
 
         const elementRef = shallowRef<HTMLInputElement>();
@@ -50,6 +49,7 @@ const BinarySwitchElement = defineComponent(
                         role={BinarySwitchUtils.computeRole(props.isSwitch ?? false, isMixed)}
                         class={BinarySwitchStyles.binarySwitchElement}
                         aria-label={ariaLabel.value}
+                        aria-labelledby={ariaLabelledBy.value}
                         aria-describedby={ariaDescribedBy.value}
                         aria-disabled={isDisabled || undefined}
                         aria-required={props.isRequired || undefined}

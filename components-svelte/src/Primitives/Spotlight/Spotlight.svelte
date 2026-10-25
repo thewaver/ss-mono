@@ -4,6 +4,7 @@
 
     import {
         CutoutUtils,
+        DismisserUtils,
         FocusManagerUtils,
         LiveAnnouncerUtils,
         SPOTLIGHT_DEFAULTS,
@@ -13,12 +14,14 @@
     import { Rect } from "@thewaver/ss-utils";
 
     import { AnchorSvelteUtils } from "../../Abstracts/Anchor/AnchorSvelte.utils.svelte.js";
+    import { DismisserSvelteUtils } from "../../Abstracts/Dismisser/DismisserSvelte.utils.svelte.js";
     import { ElementFaderSvelteUtils } from "../../Abstracts/ElementFader/ElementFaderSvelte.utils.svelte.js";
     import { ElementObserverSvelteUtils } from "../../Abstracts/ElementObserver/ElementObserverSvelte.utils.svelte.js";
     import { ElevationSvelteUtils } from "../../Abstracts/Elevation/ElevationSvelte.utils.svelte.js";
     import { FocusManagerSvelteUtils } from "../../Abstracts/FocusManager/FocusManagerSvelte.utils.svelte.js";
     import { getViewportContext } from "../../Abstracts/Viewport/Viewport.context.js";
     import { attachPortal } from "../../Utils/portalUtils.js";
+    import { readStore } from "../../Utils/storeUtils.js";
     import { toStyle } from "../../Utils/styleUtils.js";
     import type { SpotlightProps } from "./Spotlight.types.js";
 
@@ -34,11 +37,33 @@
     const padding = $derived(props.padding ?? SPOTLIGHT_DEFAULTS.padding);
     const hasPopup = $derived(props.mode === "guide" && props.renderPopup !== undefined);
 
-    const fader = ElementFaderSvelteUtils.createFader(() => visibility, {
+    const dismiss = () => {
+        visibility = false;
+    };
+
+    const layer = SpotlightUtils.createLayer(() => props.mode, dismiss);
+
+    const getIsOnTop = readStore(DismisserUtils.openLayers, () => SpotlightUtils.getIsOnTop(layer));
+
+    const fader = ElementFaderSvelteUtils.createFader(() => !!visibility && getIsOnTop(), {
         getTransitionDurationMs: () => transitionDurationMs,
         getRef: () => portal ?? undefined,
-        onShow: () => props.onShow?.(),
-        onHide: () => props.onHide?.(),
+    });
+
+    DismisserSvelteUtils.createLayer(() => !!visibility || fader.getIsVisible(), layer);
+
+    const getIsActing = () => fader.getIsVisible() && getIsOnTop();
+
+    let wasOpen = false;
+
+    $effect(() => {
+        const isOpen = !!visibility;
+
+        if (isOpen === wasOpen) return;
+
+        wasOpen = isOpen;
+
+        untrack(() => (isOpen ? props.onShow : props.onHide)?.());
     });
 
     ElementObserverSvelteUtils.createViewportRectObserver(() => props.elementRef, fader.getIsVisible, {
@@ -50,7 +75,7 @@
 
     ElevationSvelteUtils.createElevation(
         () => props.elementRef,
-        fader.getIsVisible,
+        getIsActing,
         () => styles.SPOTLIGHT_Z_INDEX,
     );
 
@@ -76,28 +101,26 @@
 
     const clipPath = $derived(rect ? SpotlightUtils.getHoleClipPath(rect) : undefined);
 
-    const dismiss = () => {
-        visibility = false;
-    };
-
     $effect(() => {
-        if (!fader.getIsVisible()) return;
+        if (!getIsActing()) return;
 
-        return untrack(() => SpotlightUtils.observeDismissKeys(() => props.mode, dismiss));
+        return untrack(() => SpotlightUtils.observeDismissKeys(layer, () => props.mode, dismiss));
     });
 
     $effect(() => {
         const element = props.elementRef;
+        const isActing = getIsActing();
 
-        if (!fader.getIsVisible() || props.mode !== "prompt" || !element) return;
+        if (!isActing || props.mode !== "prompt" || !element) return;
 
         return untrack(() => SpotlightUtils.holdFocus(element));
     });
 
     $effect(() => {
         const element = portal;
+        const isActing = getIsActing();
 
-        if (!fader.getIsVisible() || props.mode !== "guide" || !element) return;
+        if (!isActing || props.mode !== "guide" || !element) return;
 
         return untrack(() => FocusManagerUtils.sealAround(element));
     });
@@ -113,7 +136,11 @@
     $effect(() => {
         const announcement = props.announcement;
 
-        if (!fader.getIsVisible()) return;
+        if (!getIsActing()) {
+            announced = undefined;
+
+            return;
+        }
 
         untrack(() => {
             if (SpotlightUtils.getIsAnnouncementDue(announced, announcement)) {
@@ -124,21 +151,35 @@
         announced = announcement;
     });
 
+    let hasWarnedUnannounced = false;
+
+    $effect(() => {
+        const announcement = props.announcement;
+        const isGuideShowing = fader.getIsVisible() && props.mode === "guide";
+
+        if (hasWarnedUnannounced || !isGuideShowing) return;
+
+        hasWarnedUnannounced = untrack(() => SpotlightUtils.warnIfUnannounced(announcement, "announcement"));
+    });
+
     let hasPlaced = $state(false);
 
     $effect.pre(() => {
-        if (!fader.getIsVisible() || !hasPopup) {
+        const isPositioned = position.getPosition() !== undefined;
+
+        if (!getIsActing() || !hasPopup) {
             hasPlaced = false;
 
             return;
         }
 
-        if (position.getPosition()) hasPlaced = true;
+        if (isPositioned) hasPlaced = true;
     });
 
     FocusManagerSvelteUtils.autoFocus(
         () => popup ?? undefined,
         () => hasPlaced,
+        { getIsOpen: () => !!visibility },
     );
 </script>
 

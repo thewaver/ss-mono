@@ -12,3 +12,7 @@ export const EXAMPLE_NAMES = {
 };
 
 export const EXAMPLES_ROOT = "/src/App/Pages/TablePage/Examples";
+
+export const DOCS_ROOT = "/src/App/Pages/TablePage/Docs";
+
+export const STRESS_COUNT_FIELD_WIDTH = 120;

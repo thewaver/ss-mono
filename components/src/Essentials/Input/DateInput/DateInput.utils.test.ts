@@ -44,6 +44,38 @@ describe("DateInputUtils.parseDigits", () => {
             }),
         ).toBeUndefined();
     });
+
+    it("refuses a day the consumer refuses, by description or by rule, and reads the days beside it", () => {
+        const opts = {
+            format: "iso" as const,
+            calendar: "gregory" as const,
+            era: "AD",
+            disabledDays: [{ daysOfWeek: [0, 6] }],
+            computeIsDayDisabled: (day: ReturnType<typeof date>) => DateValueUtils.toIso(day) === "2026-08-12",
+        };
+
+        expect(DateInputUtils.parseDigits("20260809", opts)).toBeUndefined();
+        expect(DateInputUtils.parseDigits("20260812", opts)).toBeUndefined();
+        expect(DateValueUtils.toIso(DateInputUtils.parseDigits("20260811", opts)!)).toBe("2026-08-11");
+    });
+
+    it("refuses the same day whichever calendar it is typed in", () => {
+        const refused = date("2026-08-11");
+        const hebrew = DateValueUtils.withCalendar(refused, "hebrew");
+        const digits = DateInputUtils.toDigits(hebrew, "iso");
+
+        expect(
+            DateInputUtils.parseDigits(digits, { format: "iso", calendar: "hebrew", era: hebrew.era }),
+        ).toBeDefined();
+        expect(
+            DateInputUtils.parseDigits(digits, {
+                format: "iso",
+                calendar: "hebrew",
+                era: hebrew.era,
+                disabledDays: [refused],
+            }),
+        ).toBeUndefined();
+    });
 });
 
 describe("DateInputUtils.getHasImpossiblePart", () => {

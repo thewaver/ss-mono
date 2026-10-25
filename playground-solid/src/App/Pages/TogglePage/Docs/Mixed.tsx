@@ -23,7 +23,7 @@ export const MixedDocsExample = () => {
                 isMixed={getIsMixed}
                 id={"allSettings"}
                 ariaLabel={"All settings"}
-                renderContent={(getFlags) => <PageToggleContent flags={getFlags} />}
+                renderContent={(getFlags) => <PageToggleContent flags={getFlags}>All settings</PageToggleContent>}
                 onChange={(isChecked) => {
                     firstSignal[1](isChecked);
                     secondSignal[1](isChecked);
@@ -36,13 +36,13 @@ export const MixedDocsExample = () => {
                 checked={firstSignal}
                 id={"firstSetting"}
                 ariaLabel={"First setting"}
-                renderContent={(getFlags) => <PageToggleContent flags={getFlags} />}
+                renderContent={(getFlags) => <PageToggleContent flags={getFlags}>First setting</PageToggleContent>}
             />
 
             <Toggle
                 checked={secondSignal}
                 ariaLabel={"Second setting"}
-                renderContent={(getFlags) => <PageToggleContent flags={getFlags} />}
+                renderContent={(getFlags) => <PageToggleContent flags={getFlags}>Second setting</PageToggleContent>}
             />
         </PageControlRow>
     );

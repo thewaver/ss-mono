@@ -1,3 +1,5 @@
+import { Fragment } from "react";
+
 import { NO_FILES } from "@thewaver/ss-playground/App/StyledComponents/FileDropZoneContent/FileDropZoneContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/FileDropZoneContent/FileDropZoneContent.css";
 
@@ -29,7 +31,12 @@ export const PageFileDropZoneContent = (props: FileDropZoneContentProps) => {
                     .join(" ")}
             >
                 {props.renderProps.files.length
-                    ? props.renderProps.files.map((file) => file.name).join(", ")
+                    ? props.renderProps.files.map((file, index) => (
+                          <Fragment key={index}>
+                              {index > 0 && ", "}
+                              <bdi>{file.name}</bdi>
+                          </Fragment>
+                      ))
                     : NO_FILES}
             </div>
         </div>

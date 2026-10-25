@@ -89,7 +89,16 @@ export const TableOfContents = <T,>(props: TableOfContentsProps<T>) => {
         TableOfContentsUtils.computeCurrentValue(access(props.links), getCurrentIndex()),
     );
 
-    createEffect(on(getCurrentValue, (value) => props.onCurrentChange?.(value), { defer: true }));
+    let reportedValue: T | undefined;
+
+    createEffect(
+        on(getCurrentValue, (value) => {
+            if (value === reportedValue) return;
+
+            reportedValue = value;
+            props.onCurrentChange?.(value);
+        }),
+    );
 
     createEffect(() => {
         onCleanup(TableOfContentsUtils.makeTargetsFocusable(getTargets()));

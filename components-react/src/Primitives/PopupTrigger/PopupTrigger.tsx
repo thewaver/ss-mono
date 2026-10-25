@@ -1,11 +1,8 @@
 import { PopupTriggerStyles } from "@thewaver/ss-components";
 
-import { LabelReactUtils } from "../../Essentials/Input/Label/LabelReact.utils";
 import type { PopupTriggerProps } from "./PopupTrigger.types";
 
 export const PopupTrigger = (props: PopupTriggerProps) => {
-    const ariaLabel = LabelReactUtils.useAriaLabel(props.ariaLabel);
-
     const isDisabled = props.flags.isDisabled ?? false;
 
     return (
@@ -14,7 +11,7 @@ export const PopupTrigger = (props: PopupTriggerProps) => {
             ref={props.ref}
             type="button"
             className={PopupTriggerStyles.popupTrigger}
-            aria-label={ariaLabel}
+            aria-label={props.ariaLabel}
             aria-haspopup="dialog"
             aria-expanded={props.isOpen}
             aria-controls={props.isOpen ? props.popupId : undefined}

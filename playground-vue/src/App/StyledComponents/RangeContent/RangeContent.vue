@@ -10,7 +10,7 @@ import type { RangeContentProps } from "./RangeContentVue.types";
 const travel = (ratio: number) => `calc(${ratio} * (100% - ${styles.RANGE_THUMB_SIZE}px))`;
 
 const center = (ratio: number) =>
-    `calc(${ratio} * (100% - ${styles.RANGE_THUMB_SIZE}px) + ${styles.RANGE_THUMB_SIZE / 2}px)`;
+    `calc(${ratio} * (100% - ${styles.RANGE_THUMB_SIZE}px) + ${styles.RANGE_THUMB_SIZE * 0.5}px)`;
 
 const props = defineProps<RangeContentProps>();
 

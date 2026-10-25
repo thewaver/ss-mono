@@ -14,14 +14,13 @@ import { NavigatorSolidUtils } from "../../../Abstracts/Navigator/NavigatorSolid
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import { access } from "../../../Utils/propUtils";
 import { FormFieldSolidUtils } from "../FormField/FormFieldSolid.utils";
-import { LabelSolidUtils } from "../Label/LabelSolid.utils";
 import type { RangeElementProps, RangeProps } from "./RangeSolid.types";
 
 const readFocusVisibleThumb = (element: HTMLElement, index: number) =>
     InteractionTrackerUtils.computeIsFocusVisible(element) ? index : undefined;
 
 const RangeElement = (props: RangeElementProps) => {
-    const getAriaLabel = LabelSolidUtils.resolveAriaLabel(
+    const { getAriaLabel, getAriaLabelledBy } = FormFieldSolidUtils.resolveAriaName(
         props.ariaLabel === undefined ? undefined : () => access(props.ariaLabel)!,
     );
     const getAriaDescribedBy = FormFieldSolidUtils.resolveAriaDescribedBy();
@@ -98,6 +97,9 @@ const RangeElement = (props: RangeElementProps) => {
                         max={getThumbBounds(index).max}
                         step={access(props.step)}
                         aria-label={access(props.thumbLabels)?.[index] ?? getAriaLabel()}
+                        aria-labelledby={
+                            access(props.thumbLabels)?.[index] === undefined ? getAriaLabelledBy() : undefined
+                        }
                         aria-valuetext={props.computeValueText?.(access(props.values)[index], index)}
                         aria-describedby={getAriaDescribedBy()}
                         aria-orientation={access(props.orientation) === "vertical" ? "vertical" : undefined}

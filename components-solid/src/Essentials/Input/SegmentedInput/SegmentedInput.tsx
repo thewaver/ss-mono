@@ -58,6 +58,7 @@ export const SegmentedInput = (props: SegmentedInputProps) => {
             element={"input"}
             type={"text"}
             isConcealed={true}
+            isLeftToRight={true}
             inputMode={props.inputMode ?? SEGMENTED_INPUT_DEFAULTS.inputMode}
             ref={(element) => {
                 setElement(element as HTMLInputElement);
@@ -75,6 +76,7 @@ export const SegmentedInput = (props: SegmentedInputProps) => {
                 <div
                     class={styles.segmentedInputCells}
                     style={{ gap: `${access(props.gap) ?? SEGMENTED_INPUT_DEFAULTS.gap}px` }}
+                    dir="ltr"
                     aria-hidden="true"
                 >
                     <Index each={getIndices()}>

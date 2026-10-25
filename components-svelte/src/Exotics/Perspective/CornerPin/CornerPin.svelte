@@ -151,7 +151,10 @@
     aria-roledescription={props.roleDescription ?? CORNER_PIN_DEFAULTS.roleDescription}
     aria-label={props.ariaLabel}
     onkeydown={(e) => {
-        if (e.key === "Escape") picked = undefined;
+        if (e.key !== "Escape" || picked === undefined) return;
+
+        e.preventDefault();
+        picked = undefined;
     }}
 >
     <div class={styles.cornerPinSurface} style:transform>

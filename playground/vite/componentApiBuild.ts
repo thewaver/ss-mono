@@ -18,6 +18,9 @@ const SVELTE_SCRIPT_PATTERN = /<script\b([^>]*)>([\s\S]*?)<\/script>/g;
 const SVELTE_MODULE_PATTERN = /\bmodule\b|context\s*=\s*["']module["']/;
 const SVELTE_GENERICS_PATTERN = /\bgenerics\s*=\s*"([^"]*)"/;
 const PROPS_RUNE = "$props";
+const CODE_PATTERN = /`([^`]+)`/;
+const URL_PATTERN = /^https?:\/\//;
+const WHITESPACE_PATTERN = /\s+/g;
 const EXCLUDED_LAYERS = new Set(["Samples", "Utils"]);
 const EXCLUDED_FILE_KINDS = new Set(["const"]);
 const CONSTRUCTOR_NAME = "constructor";
@@ -31,10 +34,16 @@ export type ApiGroupKind = "props" | "components" | "context" | "utilities" | "c
 
 export type ApiTableKind = "props" | "values" | "aliases" | "fields";
 
+export type ApiTextPart =
+    { kind: "text"; text: string } | { kind: "prop"; text: string } | { kind: "link"; text: string; href: string };
+
+/** A documentation block as runs of text, prop names and links, in reading order. */
+export type ApiText = ApiTextPart[];
+
 export type ApiEntry = {
     name: string;
     type: string;
-    description: string;
+    description: ApiText;
     isOptional: boolean;
     isAccessor: boolean;
 };
@@ -50,7 +59,7 @@ export type ApiTable = {
     kind: ApiTableKind;
     name: string;
     heading: string;
-    description: string;
+    description: ApiText;
     isDocumented: boolean;
     entries: ApiEntry[];
     /** The named types this one is built from, whose members are listed in their own tables rather than here. */
@@ -182,8 +191,88 @@ const toWrittenType = (declaration: ts.Declaration | undefined) => {
     return written === undefined ? undefined : normalize(written);
 };
 
-const toDescription = (symbol: ts.Symbol, checker: ts.TypeChecker) =>
-    normalize(ts.displayPartsToString(symbol.getDocumentationComment(checker)));
+const toLinkPart = (linkText: string): ApiTextPart => {
+    const [href, ...words] = linkText.split(" ");
+
+    return { kind: "link", href, text: words.join(" ") || href };
+};
+
+const mergeText = (parts: ApiText) =>
+    parts.reduce<ApiText>((merged, part) => {
+        const last = merged[merged.length - 1];
+
+        if (part.kind === "text" && !part.text) return merged;
+        if (part.kind === "text" && last?.kind === "text")
+            merged[merged.length - 1] = { ...last, text: last.text + part.text };
+        else merged.push(part);
+
+        return merged;
+    }, []);
+
+const trimText = (parts: ApiText): ApiText => {
+    const first = parts[0];
+    const last = parts[parts.length - 1];
+
+    if (first?.kind === "text") parts[0] = { ...first, text: first.text.trimStart() };
+    if (last?.kind === "text") parts[parts.length - 1] = { ...last, text: last.text.trimEnd() };
+
+    return mergeText(parts);
+};
+
+const toText = (displayParts: ts.SymbolDisplayPart[]): ApiText => {
+    const parts: ApiText = [];
+    let pendingName: string | undefined;
+
+    for (const { kind, text } of displayParts) {
+        if (kind === "linkName") {
+            pendingName = text;
+            continue;
+        }
+
+        if (kind === "linkText") {
+            const linkText = text.replace(WHITESPACE_PATTERN, " ").trim();
+
+            parts.push(
+                pendingName === undefined && URL_PATTERN.test(linkText)
+                    ? toLinkPart(linkText)
+                    : { kind: "text", text: linkText },
+            );
+            pendingName = undefined;
+            continue;
+        }
+
+        if (kind === "link") {
+            if (text === "}" && pendingName !== undefined) parts.push({ kind: "text", text: `\`${pendingName}\`` });
+            if (text === "}") pendingName = undefined;
+            continue;
+        }
+
+        parts.push({ kind: "text", text: text.replace(WHITESPACE_PATTERN, " ") });
+    }
+
+    return trimText(mergeText(parts));
+};
+
+const toDescription = (symbol: ts.Symbol, checker: ts.TypeChecker) => toText(symbol.getDocumentationComment(checker));
+
+const markNames = (text: ApiText, names: ReadonlySet<string>) =>
+    mergeText(
+        text.flatMap((part): ApiText => {
+            if (part.kind !== "text") return [part];
+
+            return part.text
+                .split(CODE_PATTERN)
+                .map((piece, index) =>
+                    index % 2 === 0
+                        ? { kind: "text", text: piece }
+                        : names.has(piece)
+                          ? { kind: "prop", text: piece }
+                          : { kind: "text", text: `\`${piece}\`` },
+                );
+        }),
+    );
+
+const getIsNamingTable = (kind: ApiGroupKind, table: ApiTable) => kind !== "components" && table.kind !== "aliases";
 
 const toTypeParameters = (declaration: ts.Declaration) => {
     const parameters = (declaration as ts.DeclarationWithTypeParameterChildren).typeParameters;
@@ -399,7 +488,7 @@ const createApiReader = (
         kind: ApiTableKind,
         name: string,
         heading: string,
-        description: string,
+        description: ApiText,
         entries: ApiEntry[],
         includes: ApiInclude[] = [],
     ): ApiTable => ({
@@ -409,7 +498,7 @@ const createApiReader = (
         description,
         entries,
         includes,
-        isDocumented: kind === "props" || entries.some((entry) => entry.description),
+        isDocumented: kind === "props" || entries.some((entry) => entry.description.length),
     });
 
     const records: ExportRecord[] = [];
@@ -556,7 +645,7 @@ const createApiReader = (
                     )
                     .map((signature) => ({
                         name: CONSTRUCTOR_NAME,
-                        description: normalize(ts.displayPartsToString(signature.getDocumentationComment(checker))),
+                        description: toText(signature.getDocumentationComment(checker)),
                         type: checker.signatureToString(signature, declaration, TYPE_FORMAT_FLAGS),
                         isOptional: false,
                         isAccessor: false,
@@ -636,9 +725,30 @@ const createApiReader = (
         }
 
         for (const [kind, entries] of valuesByKind)
-            addTable(kind, toTable("values", kind, "", "", entries.sort(byPrimary(unit))));
+            addTable(kind, toTable("values", kind, "", [], entries.sort(byPrimary(unit))));
 
-        if (aliases.length) addTable("types", toTable("aliases", "aliases", "", "", aliases.sort(byName)));
+        if (aliases.length) addTable("types", toTable("aliases", "aliases", "", [], aliases.sort(byName)));
+
+        const names = new Set(
+            [...tablesByKind].flatMap(([kind, tables]) =>
+                tables
+                    .filter((table) => getIsNamingTable(kind, table))
+                    .flatMap((table) => table.entries.map((entry) => entry.name)),
+            ),
+        );
+
+        for (const tables of tablesByKind.values()) {
+            for (const [index, table] of tables.entries()) {
+                tables[index] = {
+                    ...table,
+                    description: markNames(table.description, names),
+                    entries: table.entries.map((entry) => ({
+                        ...entry,
+                        description: markNames(entry.description, names),
+                    })),
+                };
+            }
+        }
 
         return GROUP_ORDER.flatMap((kind) => {
             const tables = tablesByKind.get(kind);

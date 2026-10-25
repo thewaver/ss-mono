@@ -1,11 +1,3 @@
-import type { Point2d } from "@thewaver/ss-utils";
+import type { BaseHoverCardBasicDocsExampleValues } from "@thewaver/ss-playground/App/Pages/HoverCardPage/HoverCardPage.types";
 
-export type HoverCardExampleProps = {
-    offset: Point2d;
-    transitionDurationMs: number;
-    focusShowDelayMs: number;
-    hoverShowDelayMs: number;
-    skipDelayWindowMs: number;
-    visibility: boolean;
-    following: boolean;
-};
+export type HoverCardBasicDocsExampleProps = BaseHoverCardBasicDocsExampleValues;

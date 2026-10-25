@@ -17,6 +17,7 @@
     } from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.types";
 
     import PageTableOfContentsContent from "../../StyledComponents/TableOfContentsContent/TableOfContentsContent.svelte";
+    import PageDocsProse from "../DocsProse/PageDocsProse.svelte";
     import { setDocsViewContext } from "./DocsView.context";
     import type { PageDocsViewProps } from "./DocsViewSvelte.types";
 
@@ -60,7 +61,9 @@
 
 <div class={styles.docsLayout} data-view={"docs"}>
     <div class={styles.docsView}>
-        <p {@attach attachIntro} id={toDocsSectionId(DOCS_INTRO_TITLE)} class={styles.docsLead}>{props.description}</p>
+        <p {@attach attachIntro} id={toDocsSectionId(DOCS_INTRO_TITLE)} class={styles.docsLead}>
+            <PageDocsProse content={props.description} />
+        </p>
 
         {@render props.children?.()}
     </div>

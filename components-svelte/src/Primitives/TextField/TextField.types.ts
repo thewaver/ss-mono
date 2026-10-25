@@ -10,7 +10,7 @@ import type {
     TextFieldFlags,
     TextSyncElement,
 } from "@thewaver/ss-components";
-import type { CSSPadding } from "@thewaver/ss-utils";
+import type { CSSLogicalPadding } from "@thewaver/ss-utils";
 
 import type {
     InteractionControlProps,
@@ -73,7 +73,7 @@ export type TextFieldElementProps = TextFieldCbs &
         /** How far the text is inset, as a style, so it clears whatever is drawn before and after it. */
         textInset: string;
         /** The padding to spread over the field's parts, so the consumer sets it once rather than per part. */
-        spreadPadding: CSSPadding;
+        spreadPadding: CSSLogicalPadding;
         /** Hands the leading element over once it exists, so the field can measure it and inset the text past it. */
         attachLeading: Attachment<HTMLDivElement>;
         /** Hands the trailing element over once it exists, for the same reason. */
@@ -110,6 +110,7 @@ export type TextFieldPresetProps = Omit<
     | "minRows"
     | "maxRows"
     | "isConcealed"
+    | "isLeftToRight"
     | "onKeyDown"
     | "onBlur"
     | "ariaAttributes"

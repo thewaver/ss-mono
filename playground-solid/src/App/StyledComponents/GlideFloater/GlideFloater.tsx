@@ -1,10 +1,8 @@
-import type { ParentProps } from "solid-js";
-
 import { access } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/GlideFloater/GlideFloater.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { GlideFloaterProps, GlideLabelProps } from "./GlideFloaterSolid.types";
+import type { GlideFloaterProps } from "./GlideFloaterSolid.types";
 
 export const PageGlideFloater = (props: GlideFloaterProps) => {
     const getLayerClass = useLayerClass();
@@ -34,20 +32,3 @@ export const renderPageSelectionFloater = (getVisibilityTarget: () => 0 | 1, get
         transitionDurationMs={getTransitionDurationMs}
     />
 );
-
-export const PageGlideLabel = (props: ParentProps<GlideLabelProps>) => {
-    const getLayerClass = useLayerClass();
-
-    return (
-        <div
-            class={styles.glideLabel}
-            classList={{
-                [getLayerClass()]: true,
-                [styles.isSelected]: access(props.isSelected),
-                [styles.isDisabled]: access(props.isDisabled) ?? false,
-            }}
-        >
-            {props.children}
-        </div>
-    );
-};

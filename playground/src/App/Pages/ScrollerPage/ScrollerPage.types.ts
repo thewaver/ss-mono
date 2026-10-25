@@ -22,3 +22,19 @@ export type BaseScrollerTabbedExampleCbs = {
 };
 
 export type BaseScrollerTabbedExampleProps = BaseScrollerTabbedExampleValues & BaseScrollerTabbedExampleCbs;
+
+export type BaseScrollerBasicDocsExampleValues = {
+    itemCount: number;
+    overlapCount: number;
+};
+
+export type BaseScrollerBothWaysDocsExampleValues = {
+    overflowX: ScrollerOverflow;
+    overflowY: ScrollerOverflow;
+};
+
+export type BaseScrollerFadingDocsExampleValues = {
+    isAutoHiding: boolean;
+    isBarOverlaid: boolean;
+    hideDelayMs: number;
+};

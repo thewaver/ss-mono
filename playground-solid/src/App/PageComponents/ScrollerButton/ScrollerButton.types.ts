@@ -1,14 +1,8 @@
-import type {
-    AccessorProps,
-    MaybeAccessor,
-    ScrollerAxis,
-    ScrollerStep,
-    ScrollerStepper,
-} from "@thewaver/ss-components-solid";
+import type { AccessorProps, ScrollerAxis, ScrollerController, ScrollerStep } from "@thewaver/ss-components-solid";
 
 export type ScrollerButtonProps = AccessorProps<{
+    controller: ScrollerController | undefined;
     step: ScrollerStep;
     axis?: ScrollerAxis;
-}> & {
-    stepper: MaybeAccessor<ScrollerStepper>;
-};
+    id?: string;
+}>;

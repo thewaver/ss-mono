@@ -11,6 +11,7 @@
     const isNested = context.getIsLabeled();
 
     let registeredControlId = $state<string>();
+    let registeredCaptionId = $state<string>();
 
     setLabelContext({
         getIsLabeled: () => true,
@@ -23,6 +24,16 @@
             }
 
             registeredControlId = id;
+        },
+        getCaptionId: () => (isNested ? context.getCaptionId() : registeredCaptionId),
+        setCaptionId: (id) => {
+            if (isNested) {
+                context.setCaptionId(id);
+
+                return;
+            }
+
+            registeredCaptionId = id;
         },
     });
 

@@ -16,7 +16,7 @@ export const tocArticle = style({
     display: "flex",
     flexDirection: "column",
     gap: themeVars.spacing.double,
-    paddingRight: themeVars.spacing.double,
+    paddingInlineEnd: themeVars.spacing.double,
     height: 320,
     overflowY: "auto",
 });

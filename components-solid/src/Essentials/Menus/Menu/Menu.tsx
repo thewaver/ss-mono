@@ -202,6 +202,7 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
     );
 
     const getIsLaidOut = () => getLayout() !== undefined;
+    const getSubmenuAnchorRect = () => (getIsLaidOut() ? props.anchorRect : undefined);
 
     const getRootExtent = () => MenuUtils.computeRootExtent(access(props.rootExtent), getLayout());
 
@@ -445,11 +446,13 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
                                 rootExtent={() => getRootExtent()}
                                 layoutSize={props.layoutSize}
                                 parentPlacement={getRect}
-                                anchorRef={getIsLaidOut() ? props.anchorRef : getItemRef}
-                                anchorRect={getIsLaidOut() ? props.anchorRect : undefined}
+                                anchorRef={() => (getIsLaidOut() ? access(props.anchorRef) : getItemRef())}
+                                anchorRect={getSubmenuAnchorRect()}
                                 triggerRef={props.triggerRef}
-                                placement={getIsLaidOut() ? props.placement : props.submenuPlacement}
-                                offset={getIsLaidOut() ? props.offset : props.submenuOffset}
+                                placement={() =>
+                                    getIsLaidOut() ? access(props.placement) : access(props.submenuPlacement)
+                                }
+                                offset={() => (getIsLaidOut() ? access(props.offset) : access(props.submenuOffset))}
                                 submenuPlacement={props.submenuPlacement}
                                 submenuOffset={props.submenuOffset}
                                 submenuMode={props.submenuMode}

@@ -1,12 +1,5 @@
 import type { SelectOptionRecord } from "@thewaver/ss-components";
 
-export const EXAMPLE_NAMES = {
-    single: "One value",
-    multiple: "Several values, in groups",
-    horizontalRightToLeft: "Horizontal, right to left",
-    glide: "Gliding markers",
-};
-
 export const SIZES: SelectOptionRecord<string, never>[] = [
     { value: "XS" },
     { value: "S" },
@@ -15,4 +8,4 @@ export const SIZES: SelectOptionRecord<string, never>[] = [
     { value: "XL" },
 ];
 
-export const EXAMPLES_ROOT = "/src/App/Pages/ListboxPage/Examples";
+export const DOCS_ROOT = "/src/App/Pages/ListboxPage/Docs";

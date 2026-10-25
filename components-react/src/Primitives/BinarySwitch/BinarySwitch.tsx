@@ -3,13 +3,12 @@ import { useCallback, useLayoutEffect, useRef } from "react";
 import { type BinarySwitchFlags, BinarySwitchStyles, BinarySwitchUtils } from "@thewaver/ss-components";
 
 import { FormFieldReactUtils } from "../../Essentials/Input/FormField/FormFieldReact.utils";
-import { LabelReactUtils } from "../../Essentials/Input/Label/LabelReact.utils";
 import { useLatest } from "../../Utils/refUtils";
 import { InteractionWrapper } from "../InteractionWrapper/InteractionWrapper";
 import type { BinarySwitchElementProps, BinarySwitchProps } from "./BinarySwitch.types";
 
 const BinarySwitchElement = (props: BinarySwitchElementProps) => {
-    const ariaLabel = LabelReactUtils.useAriaLabel(props.ariaLabel);
+    const { ariaLabel, ariaLabelledBy } = FormFieldReactUtils.useAriaName(props.ariaLabel);
     const ariaDescribedBy = FormFieldReactUtils.useAriaDescribedBy();
 
     const elementRef = useRef<HTMLInputElement | null>(null);
@@ -44,6 +43,7 @@ const BinarySwitchElement = (props: BinarySwitchElementProps) => {
                 role={BinarySwitchUtils.computeRole(props.isSwitch ?? false, isMixed)}
                 className={BinarySwitchStyles.binarySwitchElement}
                 aria-label={ariaLabel}
+                aria-labelledby={ariaLabelledBy}
                 aria-describedby={ariaDescribedBy}
                 aria-disabled={isDisabled || undefined}
                 aria-required={props.isRequired || undefined}

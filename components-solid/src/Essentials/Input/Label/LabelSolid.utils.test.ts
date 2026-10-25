@@ -80,3 +80,65 @@ describe("resolveAriaLabel", () => {
         expect(warn).not.toHaveBeenCalled();
     });
 });
+
+describe("registerCaptionId", () => {
+    it("tells the Label around it which id its caption carries, generating one when the caption has none", () => {
+        const registered: (string | undefined)[] = [];
+        let getCaptionId!: () => string | undefined;
+
+        const dispose = createRoot((disposeRoot) => {
+            LabelContextProvider({
+                value: { ...LABEL_CONTEXT, setCaptionId: (id) => registered.push(id) },
+                get children() {
+                    getCaptionId = LabelSolidUtils.registerCaptionId();
+
+                    return null;
+                },
+            });
+
+            return disposeRoot;
+        });
+
+        expect(getCaptionId()).toBeDefined();
+        expect(registered).toEqual([getCaptionId()]);
+
+        dispose();
+
+        expect(registered.at(-1), "the caption is withdrawn when it goes away").toBeUndefined();
+    });
+
+    it("keeps the caption's own id", () => {
+        let getCaptionId!: () => string | undefined;
+
+        const dispose = createRoot((disposeRoot) => {
+            LabelContextProvider({
+                value: LABEL_CONTEXT,
+                get children() {
+                    getCaptionId = LabelSolidUtils.registerCaptionId(() => "own-caption");
+
+                    return null;
+                },
+            });
+
+            return disposeRoot;
+        });
+
+        expect(getCaptionId()).toBe("own-caption");
+
+        dispose();
+    });
+
+    it("adds no id outside a Label", () => {
+        let getCaptionId!: () => string | undefined;
+
+        const dispose = createRoot((disposeRoot) => {
+            getCaptionId = LabelSolidUtils.registerCaptionId();
+
+            return disposeRoot;
+        });
+
+        expect(getCaptionId()).toBeUndefined();
+
+        dispose();
+    });
+});

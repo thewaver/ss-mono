@@ -93,6 +93,7 @@
         <input
             bind:this={axisElements[axis]}
             type="range"
+            dir="ltr"
             name={props.name && `${props.name}-${axis}`}
             class={styles.colorAreaAxis}
             min={ColorAreaUtils.AXIS_MIN}

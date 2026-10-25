@@ -20,7 +20,6 @@ import { CSSUtils } from "@thewaver/ss-utils";
 import { ElementObserverVueUtils } from "../../Abstracts/ElementObserver/ElementObserverVue.utils";
 import { TextSyncVueUtils } from "../../Abstracts/TextSync/TextSyncVue.utils";
 import { FormFieldVueUtils } from "../../Essentials/Input/FormField/FormFieldVue.utils";
-import { LabelVueUtils } from "../../Essentials/Input/Label/LabelVue.utils";
 import { watchAfterRender } from "../../Utils/effectUtils";
 import { callSlot, declareProps, forwardProps, useTwoWay } from "../../Utils/propUtils";
 import { exposeElement, toElement } from "../../Utils/refUtils";
@@ -69,7 +68,7 @@ const useAutoHeight = (
 
 const TextFieldElement = defineComponent(
     (props: TextFieldElementProps, { slots, expose }: SlotsContext<TextFieldElementSlots>) => {
-        const ariaLabel = LabelVueUtils.useAriaLabel(() => props.ariaLabel);
+        const { ariaLabel, ariaLabelledBy } = FormFieldVueUtils.useAriaName(() => props.ariaLabel);
         const ariaDescribedBy = FormFieldVueUtils.useAriaDescribedBy();
 
         const elementRef = shallowRef<TextSyncElement>();
@@ -105,6 +104,7 @@ const TextFieldElement = defineComponent(
                     elementRef.value = toElement<TextSyncElement>(target);
                 },
                 "type": type,
+                "dir": props.isLeftToRight ? "ltr" : undefined,
                 "rows": isAutoSizing ? 1 : undefined,
                 "name": props.name,
                 "class": [
@@ -131,6 +131,7 @@ const TextFieldElement = defineComponent(
                 "readonly": isDisabled || isReadOnly,
                 "role": isSpinButton ? "spinbutton" : undefined,
                 "aria-label": ariaLabel.value,
+                "aria-labelledby": ariaLabelledBy.value,
                 "aria-describedby": ariaDescribedBy.value,
                 "aria-valuenow": valueNow,
                 "aria-valuemin": isSpinButton ? props.min : undefined,
@@ -181,7 +182,7 @@ const TextFieldElement = defineComponent(
                         <div
                             ref={(target) => props.setLeadingRef(toElement(target))}
                             class={TextFieldStyles.textFieldAdornment}
-                            style={{ left: `${props.spreadPadding.paddingLeft}px` }}
+                            style={{ insetInlineStart: `${props.spreadPadding.paddingInlineStart}px` }}
                         >
                             {callSlot(slots.renderLeading, props.flags)}
                         </div>
@@ -191,7 +192,7 @@ const TextFieldElement = defineComponent(
                         <div
                             ref={(target) => props.setTrailingRef(toElement(target))}
                             class={TextFieldStyles.textFieldAdornment}
-                            style={{ right: `${props.spreadPadding.paddingRight}px` }}
+                            style={{ insetInlineEnd: `${props.spreadPadding.paddingInlineEnd}px` }}
                         >
                             {callSlot(slots.renderTrailing, props.flags)}
                         </div>
@@ -230,6 +231,7 @@ const TextFieldElement = defineComponent(
             minRows: null,
             maxRows: null,
             isConcealed: Boolean,
+            isLeftToRight: Boolean,
             value: null,
             textInset: null,
             spreadPadding: null,
@@ -277,18 +279,18 @@ export const TextField = defineComponent(
             const gap = props.gap ?? TEXT_FIELD_DEFAULTS.gap;
 
             const leadingInset = TextFieldUtils.computeInset(
-                spreadPadding.paddingLeft,
+                spreadPadding.paddingInlineStart,
                 slots.renderLeading ? leadingSize.value.width : 0,
                 gap,
             );
             const trailingInset = TextFieldUtils.computeInset(
-                spreadPadding.paddingRight,
+                spreadPadding.paddingInlineEnd,
                 slots.renderTrailing ? trailingSize.value.width : 0,
                 gap,
             );
 
             const textInset = CSSUtils.spreadableToStyle(
-                { ...spreadPadding, paddingLeft: leadingInset, paddingRight: trailingInset },
+                { ...spreadPadding, paddingInlineStart: leadingInset, paddingInlineEnd: trailingInset },
                 String,
             );
 
@@ -328,6 +330,7 @@ export const TextField = defineComponent(
                                     minRows={getMinRows()}
                                     maxRows={props.maxRows}
                                     isConcealed={props.isConcealed}
+                                    isLeftToRight={props.isLeftToRight}
                                     flags={flags}
                                     value={value.value}
                                     textInset={textInset}
@@ -403,6 +406,7 @@ export const TextField = defineComponent(
             "minRows": null,
             "maxRows": null,
             "isConcealed": Boolean,
+            "isLeftToRight": Boolean,
             "padding": null,
             "gap": null,
             "value": null,

@@ -17,13 +17,15 @@ export namespace DismisserVueUtils {
      * @param isOpen Whether the layer is currently open. Nothing is listened for while it is closed.
      * @param defs The layer's own elements, and what to do when it is dismissed. Read when a press, a focus move or
      * Escape arrives, so they should read the component's current state rather than a copy of it. `isPassive` marks a
-     * layer that takes no input of its own, which `DismisserUtils.getTopLayer` skips; it is read once.
+     * layer that takes no input of its own, which `DismisserUtils.getTopLayer` skips, and `group` names a set of
+     * layers of which only the topmost should act; both are read once.
      */
     export const useLayer = (isOpen: MaybeRefOrGetter<boolean>, defs: DismisserLayerDefs) => {
         const layer: DismisserLayerDefs = {
             getRoots: () => defs.getRoots(),
             onDismiss: (reason) => defs.onDismiss(reason),
             isPassive: defs.isPassive,
+            group: defs.group,
         };
 
         watchAfterRender([() => toValue(isOpen)], ([isShown]) => {

@@ -9,9 +9,21 @@ const FRAME_HEIGHT = 240;
 export const sidebarFrameVariants = styleVariants({
     left: {
         flexDirection: "row",
+
+        selectors: {
+            "&:dir(rtl)": {
+                flexDirection: "row-reverse",
+            },
+        },
     },
     right: {
         flexDirection: "row-reverse",
+
+        selectors: {
+            "&:dir(rtl)": {
+                flexDirection: "row",
+            },
+        },
     },
     top: {
         flexDirection: "column",

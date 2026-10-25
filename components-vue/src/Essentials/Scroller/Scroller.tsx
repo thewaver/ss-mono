@@ -1,6 +1,5 @@
 import {
     type ComponentPublicInstance,
-    Fragment,
     type SlotsType,
     computed,
     defineComponent,
@@ -15,9 +14,8 @@ import {
     SCROLLER_AXES,
     SCROLLER_DEFAULTS,
     type ScrollerAxis,
-    type ScrollerAxisSteps,
     type ScrollerBarRenderProps,
-    type ScrollerStep,
+    type ScrollerController,
     type ScrollerStepper,
     ScrollerStyles,
     ScrollerUtils,
@@ -34,11 +32,6 @@ const ARIA_VALUE_MAX = 100;
 const ARIA_VALUE_THROTTLE_MS = 100;
 
 const ARIA_ORIENTATIONS: Record<ScrollerAxis, "horizontal" | "vertical"> = { x: "horizontal", y: "vertical" };
-
-const STEP_AREAS: Record<ScrollerAxis, Record<keyof ScrollerAxisSteps, string>> = {
-    x: { leading: ScrollerUtils.AREAS.xLeading, trailing: ScrollerUtils.AREAS.xTrailing },
-    y: { leading: ScrollerUtils.AREAS.yLeading, trailing: ScrollerUtils.AREAS.yTrailing },
-};
 
 const ScrollerBar = defineComponent(
     (props: ScrollerBarProps, { slots }: SlotsContext<ScrollerBarSlots>) => {
@@ -191,13 +184,25 @@ export const Scroller = defineComponent(
         const scrollingAxes = computed(() => SCROLLER_AXES.filter((axis) => overflow.value[axis] !== "hidden"));
 
         const createStepper = (axis: ScrollerAxis): ScrollerStepper => ({
-            getIsAtStart: () => ScrollerUtils.getIsAtStart(metrics.value[axis]),
-            getIsAtEnd: () => ScrollerUtils.getIsAtEnd(metrics.value[axis]),
-            stepToPrevious: () => ScrollerUtils.stepTo(boxRef.value, "previous", axis, getOverlapCount()),
-            stepToNext: () => ScrollerUtils.stepTo(boxRef.value, "next", axis, getOverlapCount()),
+            getIsAtStart: () => !ScrollerUtils.getCanStep(overflow.value[axis], metrics.value[axis], "previous"),
+            getIsAtEnd: () => !ScrollerUtils.getCanStep(overflow.value[axis], metrics.value[axis], "next"),
+            stepToPrevious: () =>
+                overflow.value[axis] !== "hidden" &&
+                ScrollerUtils.stepTo(boxRef.value, "previous", axis, getOverlapCount()),
+            stepToNext: () =>
+                overflow.value[axis] !== "hidden" &&
+                ScrollerUtils.stepTo(boxRef.value, "next", axis, getOverlapCount()),
         });
 
-        const steppers = { x: createStepper("x"), y: createStepper("y") };
+        const controller: ScrollerController = {
+            getBoxId: () => props.id ?? generatedId,
+            x: createStepper("x"),
+            y: createStepper("y"),
+        };
+
+        watchAfterRender([], () => {
+            props.onMount?.(controller);
+        });
 
         let reportedProgress = ScrollerUtils.NO_PROGRESS;
 
@@ -261,35 +266,14 @@ export const Scroller = defineComponent(
 
         return () => {
             const id = props.id ?? generatedId;
-            const gap = props.gap ?? SCROLLER_DEFAULTS.gap;
             const padding = getPadding();
             const isAutoHiding = getIsAutoHiding();
             const isBarOverlaid = props.isBarOverlaid ?? SCROLLER_DEFAULTS.isBarOverlaid;
-            const steps = ScrollerUtils.getBoxSteps(
-                props.buttonPlacement ?? SCROLLER_DEFAULTS.buttonPlacement,
-                overflow.value,
-                metrics.value,
-            );
-            const template = ScrollerUtils.computeGridTemplate(steps);
             const areaTemplate = ScrollerUtils.computeAreaTemplate(barSides.value);
             const runAxis = ScrollerUtils.getRunAxis(overflow.value.x, overflow.value.y);
             const isBoxTabStop =
                 !hasFocusable.value &&
                 scrollingAxes.value.some((axis) => ScrollerUtils.getIsScrollable(metrics.value[axis]));
-
-            const renderButton = (axis: ScrollerAxis) => (step: ScrollerStep, index: number) => (
-                <Fragment key={index}>{callSlot(slots.renderButton, { step, stepper: steppers[axis], axis })}</Fragment>
-            );
-
-            const renderSteps = (axis: ScrollerAxis, side: keyof ScrollerAxisSteps) =>
-                steps[axis][side].length > 0 ? (
-                    <div
-                        class={[ScrollerStyles.scrollerSteps, ScrollerStyles.scrollerStepsVariants[axis]]}
-                        style={{ gridArea: STEP_AREAS[axis][side], gap: `${gap}px` }}
-                    >
-                        {steps[axis][side].map(renderButton(axis))}
-                    </div>
-                ) : null;
 
             const renderBar = (axis: ScrollerAxis) =>
                 slots.renderBar !== undefined && ScrollerUtils.getHasBar(overflow.value[axis], metrics.value[axis]) ? (
@@ -317,53 +301,36 @@ export const Scroller = defineComponent(
                     ref={rootRef}
                     class={ScrollerStyles.scrollerRoot}
                     style={{
-                        gap: `${gap}px`,
-                        gridTemplateAreas: template.areas,
-                        gridTemplateColumns: template.columns,
-                        gridTemplateRows: template.rows,
+                        gridTemplateAreas: areaTemplate.areas,
+                        gridTemplateColumns: areaTemplate.columns,
+                        gridTemplateRows: areaTemplate.rows,
                     }}
                 >
-                    {renderSteps("y", "leading")}
-                    {renderSteps("x", "leading")}
-
                     <div
-                        class={ScrollerStyles.scrollerArea}
+                        id={id}
+                        ref={boxRef}
+                        tabindex={isBoxTabStop ? 0 : undefined}
+                        class={[
+                            ScrollerStyles.scrollerBox,
+                            ScrollerStyles.scrollerBoxVariants[runAxis],
+                            scrollingAxes.value.length > 1 && ScrollerStyles.scrollerBoxBothWays,
+                        ]}
                         style={{
-                            gridArea: ScrollerUtils.AREAS.area,
-                            gridTemplateAreas: areaTemplate.areas,
-                            gridTemplateColumns: areaTemplate.columns,
-                            gridTemplateRows: areaTemplate.rows,
+                            overflowX: overflow.value.x,
+                            overflowY: overflow.value.y,
+                            ...(runAxis === "x"
+                                ? { paddingBlock: `${padding}px`, paddingInlineStart: `${padding}px` }
+                                : { paddingBlockStart: `${padding}px`, paddingInline: `${padding}px` }),
                         }}
+                        onFocusin={handleFocusIn}
                     >
-                        <div
-                            id={id}
-                            ref={boxRef}
-                            tabindex={isBoxTabStop ? 0 : undefined}
-                            class={[
-                                ScrollerStyles.scrollerBox,
-                                ScrollerStyles.scrollerBoxVariants[runAxis],
-                                scrollingAxes.value.length > 1 && ScrollerStyles.scrollerBoxBothWays,
-                            ]}
-                            style={{
-                                overflowX: overflow.value.x,
-                                overflowY: overflow.value.y,
-                                ...(runAxis === "x"
-                                    ? { paddingBlock: `${padding}px`, paddingInlineStart: `${padding}px` }
-                                    : { paddingBlockStart: `${padding}px`, paddingInline: `${padding}px` }),
-                            }}
-                            onFocusin={handleFocusIn}
-                        >
-                            {slots.default?.()}
+                        {slots.default?.()}
 
-                            <div class={ScrollerStyles.scrollerBoxEnd} style={{ flexBasis: `${padding}px` }} />
-                        </div>
-
-                        {renderBar("x")}
-                        {renderBar("y")}
+                        <div class={ScrollerStyles.scrollerBoxEnd} style={{ flexBasis: `${padding}px` }} />
                     </div>
 
-                    {renderSteps("x", "trailing")}
-                    {renderSteps("y", "trailing")}
+                    {renderBar("x")}
+                    {renderBar("y")}
                 </div>
             );
         };
@@ -373,9 +340,7 @@ export const Scroller = defineComponent(
         slots: Object as SlotsType<ScrollerSlots>,
         props: declareProps<ScrollerProps>({
             "id": null,
-            "gap": null,
             "padding": null,
-            "buttonPlacement": null,
             "overlapCount": null,
             "overflowX": null,
             "overflowY": null,
@@ -384,6 +349,7 @@ export const Scroller = defineComponent(
             "isAutoHiding": Boolean,
             "hideDelayMs": null,
             "isBarOverlaid": Boolean,
+            "onMount": null,
             "computeProgressAtPoint": null,
             "progress": null,
             "onUpdate:progress": null,

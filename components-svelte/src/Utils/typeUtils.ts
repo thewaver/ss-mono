@@ -50,3 +50,11 @@ export type MarkupProps = {
     /** What to draw. A list is drawn in order, and anything empty draws nothing. */
     markup: SvelteMarkup;
 };
+
+/** The props of the `ValueReport` component. */
+export type ValueReportProps<T> = {
+    /** The value to report, read from wherever the component is placed, such as a snippet's argument. */
+    value: T;
+    /** Called with the value once it is first rendered and again each time it changes, after the page updates. */
+    onChange: (value: T) => void;
+};

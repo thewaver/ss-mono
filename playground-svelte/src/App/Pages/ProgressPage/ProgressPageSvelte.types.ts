@@ -1,3 +1,3 @@
-import type { BaseProgressExampleProps } from "@thewaver/ss-playground/App/Pages/ProgressPage/ProgressPage.types";
+import type { BaseProgressBasicDocsExampleValues } from "@thewaver/ss-playground/App/Pages/ProgressPage/ProgressPage.types";
 
-export type ProgressExampleProps = BaseProgressExampleProps;
+export type ProgressBasicDocsExampleProps = BaseProgressBasicDocsExampleValues;

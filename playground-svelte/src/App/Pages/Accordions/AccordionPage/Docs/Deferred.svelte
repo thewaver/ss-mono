@@ -43,4 +43,4 @@
     </Accordion>
 </div>
 
-<div class={styles.exampleReadout}>{`Built so far: ${built.length ? built.join(", ") : "nothing"}`}</div>
+<div class={styles.exampleReadout} data-readout>{`Built so far: ${built.length ? built.join(", ") : "nothing"}`}</div>

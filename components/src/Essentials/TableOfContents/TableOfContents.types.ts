@@ -74,8 +74,9 @@ export type BaseTableOfContentsCbs<T> = {
     /** What the links do as the pointer nears them. */
     computeEffect?: ProximityEffectFn;
     /**
-     * Runs when a different section becomes current, as the reader scrolls or presses a link. It is told `undefined`
-     * when the reader scrolls back above the first section.
+     * Runs when a different section becomes current, as the reader scrolls or presses a link, and once when the page
+     * opens with a section already current. It is told `undefined` when the reader scrolls back above the first
+     * section, and never told `undefined` while nothing has been current yet.
      */
     onCurrentChange?: (value: T | undefined) => void;
 };

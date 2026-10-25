@@ -1,3 +1,14 @@
-import type { BaseTabsExampleProps } from "@thewaver/ss-playground/App/Pages/TabsPage/TabsPage.types";
+import type {
+    BaseTabsAutomaticDocsExampleValues,
+    BaseTabsBasicDocsExampleValues,
+    BaseTabsDisabledTabDocsExampleValues,
+    BaseTabsLinksDocsExampleValues,
+} from "@thewaver/ss-playground/App/Pages/TabsPage/TabsPage.types";
 
-export type TabsExampleProps = BaseTabsExampleProps;
+export type TabsBasicDocsExampleProps = BaseTabsBasicDocsExampleValues;
+
+export type TabsAutomaticDocsExampleProps = BaseTabsAutomaticDocsExampleValues;
+
+export type TabsDisabledTabDocsExampleProps = BaseTabsDisabledTabDocsExampleValues;
+
+export type TabsLinksDocsExampleProps = BaseTabsLinksDocsExampleValues;

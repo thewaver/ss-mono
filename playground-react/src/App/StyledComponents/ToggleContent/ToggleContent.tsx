@@ -1,9 +1,11 @@
+import type { PropsWithChildren } from "react";
+
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/ToggleContent/ToggleContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type { ToggleContentProps } from "./ToggleContentReact.types";
 
-export const PageToggleContent = (props: ToggleContentProps) => {
+export const PageToggleContent = (props: PropsWithChildren<ToggleContentProps>) => {
     const layerClass = useLayerClass();
 
     return (
@@ -19,8 +21,13 @@ export const PageToggleContent = (props: ToggleContentProps) => {
             ]
                 .filter(Boolean)
                 .join(" ")}
+            aria-hidden="true"
         >
-            <div className={styles.toggleHandle} />
+            <div className={styles.toggleTrack}>
+                <div className={styles.toggleHandle} />
+            </div>
+
+            {props.children}
         </div>
     );
 };

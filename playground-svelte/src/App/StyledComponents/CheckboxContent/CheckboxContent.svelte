@@ -1,4 +1,6 @@
 <script lang="ts">
+    import type { Snippet } from "svelte";
+
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/CheckboxContent/CheckboxContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
@@ -8,7 +10,7 @@
         MIXED_MARK,
     } from "@thewaver/ss-playground/App/StyledComponents/CheckboxContent/CheckboxContent.const";
 
-    let props: CheckboxContentProps = $props();
+    let props: CheckboxContentProps & { children?: Snippet } = $props();
 
     const layerClass = $derived.by(getLayerClass());
 </script>
@@ -23,8 +25,13 @@
         props.flags.isDisabled && styles.isDisabled,
         props.flags.hasError && styles.hasError,
     ]}
+    aria-hidden="true"
 >
-    <div class={styles.checkboxMark} aria-hidden="true">
-        {props.flags.checkedState === "mixed" ? MIXED_MARK : CHECKED_MARK}
+    <div class={styles.checkboxBox}>
+        <div class={styles.checkboxMark}>
+            {props.flags.checkedState === "mixed" ? MIXED_MARK : CHECKED_MARK}
+        </div>
     </div>
+
+    {@render props.children?.()}
 </div>

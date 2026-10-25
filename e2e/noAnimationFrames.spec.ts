@@ -46,7 +46,7 @@ test.beforeEach(async ({ page }) => {
  * fallback exists — take it out and the dialog never opens.
  */
 test("a transition still commits when no frame ever arrives", async ({ page }) => {
-    await page.goto("/modal");
+    await page.goto("/modal/docs");
     await page.locator("#openModal").click();
 
     await expect(page.locator(DIALOG), "the fallback timer commits what the frame was going to").toBeVisible();

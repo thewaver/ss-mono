@@ -12,3 +12,15 @@ export type BasePaginatorExampleCbs = {
 };
 
 export type BasePaginatorExampleProps = BasePaginatorExampleValues & BasePaginatorExampleCbs;
+
+export type BasePaginatorBasicDocsExampleValues = {
+    itemCount: number;
+    pageSize: number;
+    siblingCount: number;
+    boundaryCount: number;
+    isDisabled: boolean;
+};
+
+export type BasePaginatorLinksDocsExampleValues = {
+    hasLinkComponent: boolean;
+};

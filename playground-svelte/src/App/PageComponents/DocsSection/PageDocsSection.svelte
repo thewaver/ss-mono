@@ -2,6 +2,7 @@
     import { toDocsSectionId } from "@thewaver/ss-playground/App/PageComponents/DocsSection/DocsSection.utils";
     import * as styles from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.css";
 
+    import PageDocsProse from "../DocsProse/PageDocsProse.svelte";
     import { getDocsViewContext } from "../DocsView/DocsView.context";
     import { getIsPreview } from "../Preview/Preview.context";
     import type { PageDocsSectionProps } from "./DocsSectionSvelte.types";
@@ -19,6 +20,6 @@
     <section class={styles.docsGroup} data-docs-section="">
         <h2 {@attach attachHeading} id={toDocsSectionId(props.title)} class={styles.docsGroupTitle}>{props.title}</h2>
 
-        <p class={styles.docsLead}>{@render props.children?.()}</p>
+        <p class={styles.docsLead}><PageDocsProse content={props.content} /></p>
     </section>
 {/if}

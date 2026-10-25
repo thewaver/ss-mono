@@ -19,12 +19,13 @@ export const ImageSwitcher = (props: ImageSwitcherProps) => {
     useEffect(
         () =>
             switcher.show(props.src, {
+                alt: props.alt,
                 onLoad: function (e) {
                     return latest.current.onLoad?.call(this, e);
                 },
                 onError: (e) => latest.current.onError?.(e),
             }),
-        [switcher, props.src],
+        [switcher, props.src, props.alt],
     );
 
     return (
@@ -39,7 +40,8 @@ export const ImageSwitcher = (props: ImageSwitcherProps) => {
                         visibility: layer.src ? undefined : "hidden",
                     }}
                     src={layer.src}
-                    alt={props.alt ?? ""}
+                    alt={layer.alt ?? ""}
+                    aria-hidden={layer.isShown ? undefined : "true"}
                 />
             ))}
         </div>

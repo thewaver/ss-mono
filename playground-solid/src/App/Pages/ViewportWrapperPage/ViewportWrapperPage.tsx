@@ -1,8 +1,16 @@
 import type { JSX } from "solid-js";
-import { createMemo, createSignal, createUniqueId } from "solid-js";
+import { createMemo, createSignal } from "solid-js";
 
 import type { AnchorPlacement, Toast } from "@thewaver/ss-components-solid";
-import { Button, Range, Select, Toasts, ViewportWrapper, useViewportContext } from "@thewaver/ss-components-solid";
+import {
+    Button,
+    Range,
+    Select,
+    ToastUtils,
+    Toasts,
+    ViewportWrapper,
+    useViewportContext,
+} from "@thewaver/ss-components-solid";
 import { ViewportWrapperKnobs } from "@thewaver/ss-playground/App/Knobs/ViewportWrappers.const";
 import {
     COUNTRIES,
@@ -174,18 +182,18 @@ export const ViewportWrapperPage = () => {
                                                 <PageButtonContent flags={getFlags}>Notify</PageButtonContent>
                                             )}
                                             onClick={() => {
-                                                innerToasts[1]((prev) => [
-                                                    ...prev,
-                                                    {
-                                                        id: createUniqueId(),
-                                                        value: { kind: "info", message: INNER_TOAST_MESSAGE },
-                                                    },
-                                                ]);
+                                                innerToasts[1](
+                                                    (prev) =>
+                                                        ToastUtils.withRequestedToast(prev, {
+                                                            value: { kind: "info", message: INNER_TOAST_MESSAGE },
+                                                            announcement: INNER_TOAST_MESSAGE,
+                                                        }).toasts,
+                                                );
                                             }}
                                         />
                                     </div>
 
-                                    <Toasts
+                                    <Toasts<ToastDefs>
                                         toasts={innerToasts}
                                         ariaLabel={"Viewport notifications"}
                                         alignment={"bottom_center"}
@@ -200,21 +208,18 @@ export const ViewportWrapperPage = () => {
                                             getVisibilityTarget,
                                             getTransitionDurationMs,
                                             getState,
+                                            dismiss,
                                         ) => (
                                             <PageToastContent
                                                 toast={getToast}
                                                 state={getState}
                                                 animation={"fade"}
                                                 stacking={"flow"}
-                                                dir={"column"}
+                                                flexDirection={"column"}
                                                 gap={INNER_TOAST_GAP}
                                                 visibilityTarget={getVisibilityTarget}
                                                 transitionDurationMs={getTransitionDurationMs}
-                                                onDismiss={() => {
-                                                    innerToasts[1]((prev) =>
-                                                        prev.filter((toast) => toast.id !== getToast().id),
-                                                    );
-                                                }}
+                                                onDismiss={dismiss}
                                             />
                                         )}
                                     />

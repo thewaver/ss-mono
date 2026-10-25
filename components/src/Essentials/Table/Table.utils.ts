@@ -548,7 +548,9 @@ export namespace TableUtils {
      * The grid's own keys never see a carry through: a column picked up by its grip leaves focus on its header
      * cell, but one being dragged may have left focus anywhere, so the key is listened for on the document. Only a
      * carry that began in `zone` is canceled, which returns the column to where it was and is announced in the
-     * zone's own words, as every other carrier's cancel is; any other Escape is left alone.
+     * zone's own words, as every other carrier's cancel is; any other Escape is left alone. The key is heard on its
+     * way down to its target, before anything else on the page, and marked with `preventDefault`, so the same
+     * Escape does not also close a dialog the table sits in.
      *
      * @param zone The table's carry zone.
      * @returns A function that stops listening. Listen while a carry from this table is in flight, and stop when it
@@ -562,9 +564,9 @@ export namespace TableUtils {
             CarrierUtils.end("cancel");
         };
 
-        document.addEventListener("keydown", cancelOnEscape);
+        document.addEventListener("keydown", cancelOnEscape, { capture: true });
 
-        return () => document.removeEventListener("keydown", cancelOnEscape);
+        return () => document.removeEventListener("keydown", cancelOnEscape, { capture: true });
     };
 
     /**
@@ -582,8 +584,9 @@ export namespace TableUtils {
     ) => startWidth + (direction === "rtl" ? -travel : travel);
 
     /**
-     * The width a press on a resizer asks for when it ends without a drag: one step towards the half of the handle
-     * it landed on, which is the single-pointer route WCAG 2.5.7 asks for.
+     * The width a press on a resizer asks for when it ends without a drag: one step towards the half of the handle it
+     * landed on, which is the single-pointer route
+     * {@link https://www.w3.org/WAI/WCAG22/Understanding/dragging-movements.html WCAG 2.5.7} asks for.
      *
      * @param params Where the press landed, the handle's client rect, the column's width, the step, and the layout
      * direction.
@@ -751,7 +754,8 @@ export namespace TableUtils {
      * Warns about a header that gives a pointer no way to do what its column allows.
      *
      * A sortable column with no `TableHeaderSort` can only be sorted with Enter, and a reorderable one with no
-     * `TableHeaderReorder` can only be reordered by dragging, which fails WCAG 2.5.7.
+     * `TableHeaderReorder` can only be reordered by dragging, which fails
+     * {@link https://www.w3.org/WAI/WCAG22/Understanding/dragging-movements.html WCAG 2.5.7}.
      *
      * @param column The column.
      * @param found Whether the column is reorderable, and which of the two controls its header rendered.

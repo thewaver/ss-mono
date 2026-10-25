@@ -5,3 +5,5 @@ export const EXAMPLE_NAMES = {
 export const EXAMPLES_ROOT = "/src/App/Pages/HoverCardPage/Examples";
 
 export const FIELD_WIDTH = 110;
+
+export const DOCS_ROOT = "/src/App/Pages/HoverCardPage/Docs";

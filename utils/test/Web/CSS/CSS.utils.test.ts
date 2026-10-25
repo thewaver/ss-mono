@@ -78,11 +78,17 @@ describe("CSSUtils spread helpers", () => {
             borderBottomWidth: 1,
             borderLeftWidth: 1,
         });
-        expect(CSSUtils.spreadPadding(4)).toEqual({
+        expect(CSSUtils.spreadPhysicalPadding(4)).toEqual({
             paddingTop: 4,
             paddingRight: 4,
             paddingBottom: 4,
             paddingLeft: 4,
+        });
+        expect(CSSUtils.spreadLogicalPadding(4)).toEqual({
+            paddingBlockStart: 4,
+            paddingInlineEnd: 4,
+            paddingBlockEnd: 4,
+            paddingInlineStart: 4,
         });
         expect(CSSUtils.spreadMargin(-2)).toEqual({
             marginTop: -2,
@@ -96,7 +102,7 @@ describe("CSSUtils spread helpers", () => {
 describe("CSSUtils.spreadableToStyle", () => {
     it("adds px units and renames the keys", () => {
         expect(
-            CSSUtils.spreadableToStyle(CSSUtils.spreadPadding(4), (key) => StringUtils.camelToKebabCase(key)),
+            CSSUtils.spreadableToStyle(CSSUtils.spreadPhysicalPadding(4), (key) => StringUtils.camelToKebabCase(key)),
         ).toEqual({
             "padding-top": "4px",
             "padding-right": "4px",
@@ -105,9 +111,20 @@ describe("CSSUtils.spreadableToStyle", () => {
         });
     });
 
+    it("writes logical sides as their CSS properties", () => {
+        expect(
+            CSSUtils.spreadableToStyle(CSSUtils.spreadLogicalPadding(4), (key) => StringUtils.camelToKebabCase(key)),
+        ).toEqual({
+            "padding-block-start": "4px",
+            "padding-inline-end": "4px",
+            "padding-block-end": "4px",
+            "padding-inline-start": "4px",
+        });
+    });
+
     it("lets one set of numbers feed a different property", () => {
         expect(
-            CSSUtils.spreadableToStyle(CSSUtils.spreadPadding(1), (key) =>
+            CSSUtils.spreadableToStyle(CSSUtils.spreadPhysicalPadding(1), (key) =>
                 StringUtils.camelToKebabCase(key).replace("padding", "inset"),
             ),
         ).toEqual({

@@ -18,6 +18,8 @@ export const SplitPane = (props: SplitPaneProps) => {
 
     const paneIdPrefix = createUniqueId();
 
+    SplitPaneUtils.warnIfGutterUnnamed(access(props.panes), "gutterAriaLabel");
+
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
     const [getDraggingIndex, setDraggingIndex] = createSignal(SplitPaneConst.NO_GUTTER_DRAGGING);
     const [getCollapsedBoundaries, setCollapsedBoundaries] = createSignal<SplitPaneCollapsedBoundaries>({});

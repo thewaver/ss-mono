@@ -1,4 +1,4 @@
-import { type FocusEvent, Fragment, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
+import { type FocusEvent, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 
 import {
     FocusManagerUtils,
@@ -8,25 +8,29 @@ import {
     type ScrollerBarRefs,
     type ScrollerBarRenderProps,
     type ScrollerProgress,
+    type ScrollerStep,
     type ScrollerStepper,
     ScrollerStyles,
     ScrollerUtils,
 } from "@thewaver/ss-components";
-import { FunctionUtils } from "@thewaver/ss-utils";
+import { FunctionUtils, StoreUtils } from "@thewaver/ss-utils";
 
 import { SignalMirrorReactUtils } from "../../Abstracts/SignalMirror/SignalMirrorReact.utils";
 import { useElement, useLatest } from "../../Utils/refUtils";
-import type { ScrollerBarProps, ScrollerProps } from "./Scroller.types";
+import type { ScrollerBarProps, ScrollerController, ScrollerProps } from "./Scroller.types";
+
+type StepperSnapshot = { isAtStart: boolean; isAtEnd: boolean };
+
+type ControllerSnapshot = Record<ScrollerAxis, StepperSnapshot> & { boxId: string };
 
 const ARIA_VALUE_MAX = 100;
 const ARIA_VALUE_THROTTLE_MS = 100;
 
 const ARIA_ORIENTATIONS: Record<ScrollerAxis, "horizontal" | "vertical"> = { x: "horizontal", y: "vertical" };
 
-const STEP_AREAS: Record<ScrollerAxis, Record<"leading" | "trailing", string>> = {
-    x: { leading: ScrollerUtils.AREAS.xLeading, trailing: ScrollerUtils.AREAS.xTrailing },
-    y: { leading: ScrollerUtils.AREAS.yLeading, trailing: ScrollerUtils.AREAS.yTrailing },
-};
+const getIsSameSnapshot = (a: ControllerSnapshot, b: ControllerSnapshot) =>
+    a.boxId === b.boxId &&
+    SCROLLER_AXES.every((axis) => a[axis].isAtStart === b[axis].isAtStart && a[axis].isAtEnd === b[axis].isAtEnd);
 
 const ScrollerBar = (props: ScrollerBarProps) => {
     const [track, setTrack] = useState<HTMLElement>();
@@ -139,10 +143,8 @@ export const Scroller = (props: ScrollerProps) => {
     const reportedProgressRef = useRef<ScrollerProgress>(ScrollerUtils.NO_PROGRESS);
 
     const id = props.id ?? generatedId;
-    const gap = props.gap ?? SCROLLER_DEFAULTS.gap;
     const padding = props.padding ?? SCROLLER_DEFAULTS.padding;
     const overlapCount = props.overlapCount ?? SCROLLER_DEFAULTS.overlapCount;
-    const buttonPlacement = props.buttonPlacement ?? SCROLLER_DEFAULTS.buttonPlacement;
     const overflowX = props.overflowX ?? SCROLLER_DEFAULTS.overflowX;
     const overflowY = props.overflowY ?? SCROLLER_DEFAULTS.overflowY;
     const isAutoHiding = props.isAutoHiding ?? SCROLLER_DEFAULTS.isAutoHiding;
@@ -155,17 +157,52 @@ export const Scroller = (props: ScrollerProps) => {
     const areaTemplate = ScrollerUtils.computeAreaTemplate(barSides);
     const runAxis = ScrollerUtils.getRunAxis(overflowX, overflowY);
     const scrollingAxes = SCROLLER_AXES.filter((axis) => overflow[axis] !== "hidden");
-    const steps = ScrollerUtils.getBoxSteps(buttonPlacement, overflow, metrics);
-    const gridTemplate = ScrollerUtils.computeGridTemplate(steps);
 
-    const createStepper = (axis: ScrollerAxis): ScrollerStepper => ({
-        getIsAtStart: () => ScrollerUtils.getIsAtStart(metrics[axis]),
-        getIsAtEnd: () => ScrollerUtils.getIsAtEnd(metrics[axis]),
-        stepToPrevious: () => ScrollerUtils.stepTo(boxRef.current ?? undefined, "previous", axis, overlapCount),
-        stepToNext: () => ScrollerUtils.stepTo(boxRef.current ?? undefined, "next", axis, overlapCount),
+    const computeStepperSnapshot = (axis: ScrollerAxis): StepperSnapshot => ({
+        isAtStart: !ScrollerUtils.getCanStep(overflow[axis], metrics[axis], "previous"),
+        isAtEnd: !ScrollerUtils.getCanStep(overflow[axis], metrics[axis], "next"),
     });
 
-    const steppers = { x: createStepper("x"), y: createStepper("y") };
+    const snapshot: ControllerSnapshot = { boxId: id, x: computeStepperSnapshot("x"), y: computeStepperSnapshot("y") };
+
+    const [controllerStore] = useState(() => StoreUtils.create(snapshot, { isEqual: getIsSameSnapshot }));
+
+    useLayoutEffect(() => {
+        controllerStore.set(snapshot);
+    });
+
+    const latestStepping = useLatest({ overflow, overlapCount });
+
+    const [controller] = useState((): ScrollerController => {
+        const createStepper = (axis: ScrollerAxis): ScrollerStepper => {
+            const stepTo = (step: ScrollerStep) => {
+                const current = latestStepping.current;
+
+                return (
+                    current.overflow[axis] !== "hidden" &&
+                    ScrollerUtils.stepTo(boxRef.current ?? undefined, step, axis, current.overlapCount)
+                );
+            };
+
+            return {
+                getIsAtStart: () => controllerStore.get()[axis].isAtStart,
+                getIsAtEnd: () => controllerStore.get()[axis].isAtEnd,
+                stepToPrevious: () => stepTo("previous"),
+                stepToNext: () => stepTo("next"),
+            };
+        };
+
+        return {
+            getBoxId: () => controllerStore.get().boxId,
+            x: createStepper("x"),
+            y: createStepper("y"),
+            subscribe: controllerStore.subscribe,
+        };
+    });
+
+    useEffect(() => {
+        props.onMount?.(controller);
+    }, [controller]);
 
     useLayoutEffect(() => {
         if (!box) return undefined;
@@ -220,18 +257,6 @@ export const Scroller = (props: ScrollerProps) => {
         ScrollerUtils.reveal(box, target, padding, scrollingAxes);
     };
 
-    const renderSteps = (axis: ScrollerAxis, side: "leading" | "trailing") =>
-        steps[axis][side].length > 0 && (
-            <div
-                className={[ScrollerStyles.scrollerSteps, ScrollerStyles.scrollerStepsVariants[axis]].join(" ")}
-                style={{ gridArea: STEP_AREAS[axis][side], gap: `${gap}px` }}
-            >
-                {steps[axis][side].map((step, index) => (
-                    <Fragment key={index}>{props.renderButton(step, steppers[axis], axis)}</Fragment>
-                ))}
-            </div>
-        );
-
     const renderBar = (axis: ScrollerAxis) =>
         props.renderBar !== undefined &&
         ScrollerUtils.getHasBar(overflow[axis], metrics[axis]) && (
@@ -257,53 +282,36 @@ export const Scroller = (props: ScrollerProps) => {
             ref={rootRef}
             className={ScrollerStyles.scrollerRoot}
             style={{
-                gap: `${gap}px`,
-                gridTemplateAreas: gridTemplate.areas,
-                gridTemplateColumns: gridTemplate.columns,
-                gridTemplateRows: gridTemplate.rows,
+                gridTemplateAreas: areaTemplate.areas,
+                gridTemplateColumns: areaTemplate.columns,
+                gridTemplateRows: areaTemplate.rows,
             }}
         >
-            {renderSteps("y", "leading")}
-            {renderSteps("x", "leading")}
-
             <div
-                className={ScrollerStyles.scrollerArea}
+                id={id}
+                ref={boxRef}
+                tabIndex={isBoxTabStop ? 0 : undefined}
+                className={[
+                    ScrollerStyles.scrollerBox,
+                    ScrollerStyles.scrollerBoxVariants[runAxis],
+                    scrollingAxes.length > 1 ? ScrollerStyles.scrollerBoxBothWays : "",
+                ].join(" ")}
                 style={{
-                    gridArea: ScrollerUtils.AREAS.area,
-                    gridTemplateAreas: areaTemplate.areas,
-                    gridTemplateColumns: areaTemplate.columns,
-                    gridTemplateRows: areaTemplate.rows,
+                    overflowX,
+                    overflowY,
+                    ...(runAxis === "x"
+                        ? { paddingBlock: `${padding}px`, paddingInlineStart: `${padding}px` }
+                        : { paddingBlockStart: `${padding}px`, paddingInline: `${padding}px` }),
                 }}
+                onFocus={handleFocus}
             >
-                <div
-                    id={id}
-                    ref={boxRef}
-                    tabIndex={isBoxTabStop ? 0 : undefined}
-                    className={[
-                        ScrollerStyles.scrollerBox,
-                        ScrollerStyles.scrollerBoxVariants[runAxis],
-                        scrollingAxes.length > 1 ? ScrollerStyles.scrollerBoxBothWays : "",
-                    ].join(" ")}
-                    style={{
-                        overflowX,
-                        overflowY,
-                        ...(runAxis === "x"
-                            ? { paddingBlock: `${padding}px`, paddingInlineStart: `${padding}px` }
-                            : { paddingBlockStart: `${padding}px`, paddingInline: `${padding}px` }),
-                    }}
-                    onFocus={handleFocus}
-                >
-                    {props.children}
+                {props.children}
 
-                    <div className={ScrollerStyles.scrollerBoxEnd} style={{ flexBasis: `${padding}px` }} />
-                </div>
-
-                {renderBar("x")}
-                {renderBar("y")}
+                <div className={ScrollerStyles.scrollerBoxEnd} style={{ flexBasis: `${padding}px` }} />
             </div>
 
-            {renderSteps("x", "trailing")}
-            {renderSteps("y", "trailing")}
+            {renderBar("x")}
+            {renderBar("y")}
         </div>
     );
 };

@@ -18,7 +18,11 @@ export const ImageSwitcher = (props: ImageSwitcherProps) => {
     );
 
     createEffect(() => {
-        const cancel = switcher.show(access(props.src), { onLoad: props.onLoad, onError: props.onError });
+        const cancel = switcher.show(access(props.src), {
+            alt: access(props.alt),
+            onLoad: props.onLoad,
+            onError: props.onError,
+        });
 
         if (cancel) onCleanup(cancel);
     });
@@ -34,7 +38,8 @@ export const ImageSwitcher = (props: ImageSwitcherProps) => {
                         "visibility": getLayers()[index].src ? undefined : "hidden",
                     }}
                     src={getLayers()[index].src}
-                    alt={access(props.alt) ?? ""}
+                    alt={getLayers()[index].alt ?? ""}
+                    aria-hidden={getLayers()[index].isShown ? undefined : "true"}
                 />
             ))}
         </div>

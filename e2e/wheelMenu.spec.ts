@@ -1,12 +1,27 @@
 import { type Locator, type Page, expect, test } from "@playwright/test";
 
-import { activeDescendantText, activeMatches, demo, readout } from "./helpers";
+import { activeDescendantText, activeMatches, docsDemo, docsSettled, prop } from "./helpers";
+
+const DOCS = "/src/App/Pages/Menus/WheelMenuPage/Docs";
 
 const MENU = '[role="menu"]';
 const ITEM_ROLE = '[role="menuitem"]';
-const NOTHING_RUN = "nothing run yet";
 
-const trigger = (key: string) => `${demo(key)} [aria-haspopup="menu"]`;
+const HALF_TURN_DEGREES = "180";
+
+const trigger = (name: string) => `${docsDemo(DOCS, name)} [aria-haspopup="menu"]`;
+
+/** Every example reads out the last command it ran, under its wheel. */
+const readout = async (page: Page, name: string) =>
+    ((await page.locator(`${docsDemo(DOCS, name)} [data-readout]`).textContent()) ?? "").trim();
+
+/** The bands example's spread is a knob, typed the way a person would; a half wheel is half the turn. */
+const setBandsSpread = async (page: Page, degrees: string) => {
+    await page.locator(`${prop("bandsSpreadDegrees")} input`).click();
+    await page.keyboard.press("ControlOrMeta+a");
+    await page.keyboard.type(degrees);
+    await page.keyboard.press("Tab");
+};
 
 /** The same open-and-focus race the ordinary menu spec waits on: a level is ready once it holds focus. */
 const openedLevel = async (page: Page, depth: number) => {
@@ -42,12 +57,13 @@ const boxOf = (locator: Locator) =>
     });
 
 test.beforeEach(async ({ page }) => {
-    await page.goto("/wheel-menu");
-    await expect(page.locator("[data-example]").first()).toBeVisible();
+    await page.goto("/wheel-menu/docs");
+    await expect(page.locator(trigger("Basic"))).toBeVisible();
+    await docsSettled(page);
 });
 
 test("a submenu is a wider band round the center its parent already had", async ({ page }) => {
-    await page.locator(trigger("concentric")).click();
+    await page.locator(trigger("Bands")).click();
     await openedLevel(page, 0);
 
     await itemAt(page, 0, "New").hover();
@@ -71,7 +87,8 @@ test("a submenu is a wider band round the center its parent already had", async 
 });
 
 test("a half wheel nests the same way, one wider arc round the last", async ({ page }) => {
-    await page.locator(trigger("concentricHalves")).click();
+    await setBandsSpread(page, HALF_TURN_DEGREES);
+    await page.locator(trigger("Bands")).click();
     await openedLevel(page, 0);
 
     await itemAt(page, 0, "New").hover();
@@ -85,7 +102,7 @@ test("a half wheel nests the same way, one wider arc round the last", async ({ p
 });
 
 test("the hole holds a close control the walk reaches, and it has a name of its own", async ({ page }) => {
-    await page.locator(trigger("wheel")).click();
+    await page.locator(trigger("Basic")).click();
     await openedLevel(page, 0);
 
     await expect(closerOf(page, 0), "one close control, and only one").toHaveCount(1);
@@ -113,14 +130,16 @@ test("the hole holds a close control the walk reaches, and it has a name of its 
 });
 
 test("clicking the close control shuts the wheel and runs nothing", async ({ page }) => {
-    await page.locator(trigger("wheel")).click();
+    const before = await readout(page, "Basic");
+
+    await page.locator(trigger("Basic")).click();
     await openedLevel(page, 0);
 
     await closerOf(page, 0).click();
 
     await expect(page.locator(MENU)).toHaveCount(0);
-    expect(await readout(page, "wheel")).toContain(NOTHING_RUN);
-    expect(await activeMatches(page, trigger("wheel")), "and focus goes back to the opener it covered").toBe(true);
+    expect(await readout(page, "Basic"), "and nothing ran").toBe(before);
+    expect(await activeMatches(page, trigger("Basic")), "and focus goes back to the opener it covered").toBe(true);
 });
 
 /**
@@ -133,7 +152,7 @@ test("clicking the close control shuts the wheel and runs nothing", async ({ pag
 test("the close control the wheel opens under waits for the pointer to leave it before it takes the hover", async ({
     page,
 }) => {
-    const box = (await page.locator(trigger("wheel")).boundingBox())!;
+    const box = (await page.locator(trigger("Basic")).boundingBox())!;
     const center = { x: box.x + box.width * 0.5, y: box.y + box.height * 0.5 };
 
     await page.mouse.click(center.x, center.y);
@@ -155,7 +174,8 @@ test("the close control the wheel opens under waits for the pointer to leave it 
 });
 
 test("pressing the close control the wheel opened under closes it without a hover first", async ({ page }) => {
-    const box = (await page.locator(trigger("wheel")).boundingBox())!;
+    const before = await readout(page, "Basic");
+    const box = (await page.locator(trigger("Basic")).boundingBox())!;
     const center = { x: box.x + box.width * 0.5, y: box.y + box.height * 0.5 };
 
     await page.mouse.click(center.x, center.y);
@@ -164,13 +184,13 @@ test("pressing the close control the wheel opened under closes it without a hove
     await page.mouse.click(center.x + 1, center.y);
 
     await expect(page.locator(MENU)).toHaveCount(0);
-    expect(await readout(page, "wheel")).toContain(NOTHING_RUN);
+    expect(await readout(page, "Basic"), "and nothing ran").toBe(before);
 });
 
 test("hovering the hole drops the bands below it, the same as hovering a wedge with nothing under it", async ({
     page,
 }) => {
-    await page.locator(trigger("concentric")).click();
+    await page.locator(trigger("Bands")).click();
     await openedLevel(page, 0);
 
     await itemAt(page, 0, "New").hover();
@@ -189,7 +209,7 @@ test("hovering the hole drops the bands below it, the same as hovering a wedge w
 });
 
 test("a deeper band brings no second closer, so the hole keeps holding one", async ({ page }) => {
-    await page.locator(trigger("concentric")).click();
+    await page.locator(trigger("Bands")).click();
     await openedLevel(page, 0);
 
     await itemAt(page, 0, "New").hover();
@@ -205,7 +225,7 @@ test("a deeper band brings no second closer, so the hole keeps holding one", asy
  * left by `Escape`, which steps out one band at a time rather than dropping the whole wheel at once.
  */
 test("all four arrows walk the ring, and a band is entered and left without them", async ({ page }) => {
-    await page.locator(trigger("concentric")).click();
+    await page.locator(trigger("Bands")).click();
     await openedLevel(page, 0);
 
     const first = await highlightAt(page, 0);
@@ -225,7 +245,7 @@ test("all four arrows walk the ring, and a band is entered and left without them
 });
 
 test("a band is entered by activating its wedge and left one at a time with Escape", async ({ page }) => {
-    await page.locator(trigger("concentric")).click();
+    await page.locator(trigger("Bands")).click();
     await openedLevel(page, 0);
 
     await page.keyboard.press("Enter");

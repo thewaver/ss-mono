@@ -8,6 +8,10 @@ export const EXAMPLE_NAMES = {
 
 export const CALENDAR_FIELD_WIDTH = 180;
 
+export const FORMAT_FIELD_WIDTH = 180;
+
 export const CALENDAR_IDS = DateValueUtils.getCalendarIds();
 
 export const EXAMPLES_ROOT = "/src/App/Pages/DateInputPage/Examples";
+
+export const DOCS_ROOT = "/src/App/Pages/DateInputPage/Docs";

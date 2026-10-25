@@ -55,6 +55,7 @@ export const DeferredDocsExample = () => {
 
             <div
                 class={styles.exampleReadout}
+                data-readout
             >{`Built so far: ${getBuilt().length ? getBuilt().join(", ") : "nothing"}`}</div>
         </>
     );

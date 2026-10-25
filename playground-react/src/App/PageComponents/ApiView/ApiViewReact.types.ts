@@ -1,5 +1,5 @@
 import type { MouseEvent } from "react";
-import type { ApiTable } from "virtual:component-api";
+import type { ApiTable, ApiText } from "virtual:component-api";
 
 import type { BasePageApiViewProps } from "@thewaver/ss-playground/App/PageComponents/ApiView/ApiView.types";
 
@@ -11,4 +11,8 @@ export type PageApiTableProps = {
     unit: string;
     headingRef: (element: HTMLElement | null) => void;
     onFragmentClick: (e: MouseEvent, href: string) => void;
+};
+
+export type PageApiTextProps = {
+    text: ApiText;
 };

@@ -1,0 +1,39 @@
+<script lang="ts">
+    import { Stepper } from "@thewaver/ss-components-svelte";
+    import { STARTING_LINEAR } from "@thewaver/ss-playground/App/Pages/StepperPage/StepperPage.const";
+    import { StepperPageUtils } from "@thewaver/ss-playground/App/Pages/StepperPage/StepperPage.utils";
+    import { LABELS, ORDER, STEPPER_GAP } from "@thewaver/ss-playground/App/Pages/StepperPage/StepperSteps.const";
+    import type { StepValue } from "@thewaver/ss-playground/App/Pages/StepperPage/StepperSteps.types";
+
+    import PageStepConnector from "../../../StyledComponents/StepContent/PageStepConnector.svelte";
+    import PageStepContent from "../../../StyledComponents/StepContent/PageStepContent.svelte";
+    import type { StepperBasicDocsExampleProps } from "../StepperPageSvelte.types";
+
+    type Props = StepperBasicDocsExampleProps;
+
+    let props: Props = $props();
+
+    let current = $state<StepValue>(STARTING_LINEAR);
+</script>
+
+<Stepper
+    steps={StepperPageUtils.buildSteps("basic", current, props.isFreeNavigation)}
+    currentValue={current}
+    orientation={props.orientation}
+    gap={STEPPER_GAP}
+    ariaLabel={"Checkout"}
+    computeStepAriaLabel={StepperPageUtils.describeStep}
+    onCurrentChange={(value) => {
+        current = value;
+    }}
+>
+    {#snippet renderStep(step, flags)}
+        <PageStepContent {flags} state={step.state} ordinal={ORDER.indexOf(step.value) + 1} orientation={props.orientation}>
+            {LABELS[step.value]}
+        </PageStepContent>
+    {/snippet}
+
+    {#snippet renderConnector()}
+        <PageStepConnector orientation={props.orientation} />
+    {/snippet}
+</Stepper>

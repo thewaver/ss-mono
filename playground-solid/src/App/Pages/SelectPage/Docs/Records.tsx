@@ -32,7 +32,10 @@ export const RecordsDocsExample = () => {
                 renderPopup={renderSelectPopup}
             />
 
-            <div class={exampleStyles.exampleReadout}>{`Value: ${JSON.stringify(valueSignal[0]()) ?? "none"}`}</div>
+            <div
+                class={exampleStyles.exampleReadout}
+                data-readout
+            >{`Value: ${JSON.stringify(valueSignal[0]()) ?? "none"}`}</div>
         </>
     );
 };

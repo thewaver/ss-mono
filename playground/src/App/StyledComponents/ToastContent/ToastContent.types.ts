@@ -1,4 +1,4 @@
-import type { Toast, ToastState, ToastsDir } from "@thewaver/ss-components";
+import type { BaseToast, ToastState, ToastsFlexDirection } from "@thewaver/ss-components";
 
 import type { ToastAnimation, ToastStacking } from "./ToastOptions.types";
 
@@ -10,12 +10,12 @@ export type ToastDefs = {
 };
 
 export type BaseToastContentValues = {
-    toast: Toast<ToastDefs>;
+    toast: BaseToast<ToastDefs>;
     state: ToastState;
-    animation: ToastAnimation;
-    stacking: ToastStacking;
-    dir: ToastsDir;
-    gap: number;
+    animation?: ToastAnimation;
+    stacking?: ToastStacking;
+    flexDirection?: ToastsFlexDirection;
+    gap?: number;
     visibilityTarget: 0 | 1;
     transitionDurationMs: number;
 };

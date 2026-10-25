@@ -19,6 +19,7 @@ export const PageRadioContent = (props: ParentProps<RadioContentProps>) => {
                 [styles.isDisabled]: access(props.flags).isDisabled,
                 [styles.hasError]: access(props.flags).hasError,
             }}
+            aria-hidden="true"
         >
             <div class={styles.radioMarker}>
                 <div class={styles.radioDot} />

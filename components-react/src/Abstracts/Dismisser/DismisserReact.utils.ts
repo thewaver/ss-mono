@@ -15,7 +15,7 @@ export namespace DismisserReactUtils {
      * @param isOpen Whether the layer is currently open. Nothing is listened for while it is closed.
      * @param defs The layer's own elements, and what to do when it is dismissed. Read when a press, a focus move
      * or Escape arrives, so this render's are always the ones used. `isPassive`, for a layer that takes no input of
-     * its own, is read when the layer opens.
+     * its own, and `group`, for layers of which only the topmost should act, are read when the layer opens.
      */
     export const useLayer = (isOpen: boolean, defs: DismisserLayerDefs) => {
         const latest = useLatest(defs);
@@ -25,6 +25,7 @@ export namespace DismisserReactUtils {
 
             return DismisserUtils.addLayer({
                 isPassive: latest.current.isPassive,
+                group: latest.current.group,
                 getRoots: () => latest.current.getRoots(),
                 onDismiss: (reason) => latest.current.onDismiss(reason),
             });

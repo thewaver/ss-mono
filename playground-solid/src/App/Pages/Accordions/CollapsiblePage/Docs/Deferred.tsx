@@ -40,7 +40,7 @@ export const DeferredDocsExample = () => {
                 />
             </div>
 
-            <div class={styles.exampleReadout}>{`Panel built: ${getIsBuilt() ? "yes" : "not yet"}`}</div>
+            <div class={styles.exampleReadout} data-readout>{`Panel built: ${getIsBuilt() ? "yes" : "not yet"}`}</div>
         </>
     );
 };

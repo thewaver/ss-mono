@@ -28,3 +28,14 @@ export const sourceViewPanel = style({
     paddingInline: themeVars.spacing.double,
     paddingBlockEnd: themeVars.spacing.double,
 });
+
+export const sourceViewTabsRow = style({
+    display: "flex",
+    alignItems: "center",
+    gap: themeVars.spacing.full,
+});
+
+export const sourceViewTabsCell = style({
+    flex: "1 1 0",
+    minWidth: 0,
+});

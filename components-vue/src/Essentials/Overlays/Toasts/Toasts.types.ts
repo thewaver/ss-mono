@@ -1,6 +1,6 @@
 import type { VNodeChild } from "vue";
 
-import type { BaseToastsProps, Toast, ToastState } from "@thewaver/ss-components";
+import type { BaseToast, BaseToastsProps, NavigatorDirection, ToastState } from "@thewaver/ss-components";
 import type { Size2d, SwipeDirection } from "@thewaver/ss-utils";
 
 export type ToastRenderer<T> = (props: {
@@ -10,10 +10,27 @@ export type ToastRenderer<T> = (props: {
     state: ToastState;
 }) => VNodeChild;
 
+export type DefaultToastRenderer<T> = (props: {
+    toast: Toast<T>;
+    visibilityTarget: 0 | 1;
+    transitionDurationMs: number;
+    state: ToastState;
+    dismiss: () => boolean;
+}) => VNodeChild;
+
+export type Toast<T> = BaseToast<T> & {
+    /**
+     * Draws this toast, in place of the provider's `renderToast` slot. It is read once, when the toast mounts:
+     * replacing the toast in the queue under the same `id` changes the `toast` it is handed, not which painter draws
+     * it. It closes its toast through the `dismiss` it was raised with.
+     */
+    renderToast?: ToastRenderer<T>;
+};
+
 export type ToastsItemProps<T> = {
     /** The toast this item stands for. */
     toast: Toast<T>;
-    /** Where this toast sits in the stack, counting from the newest. */
+    /** Where this toast sits in the stack, counting from the oldest. */
     index: number;
     /** How many toasts are on screen, so a piled toast can tell how deep it is buried. */
     count: number;
@@ -33,6 +50,10 @@ export type ToastsItemProps<T> = {
     sizes: Size2d[];
     /** Which way a swipe dismisses this toast, or `undefined` when a swipe does nothing. */
     swipeDirection: SwipeDirection | undefined;
+    /** Which way this toast's text runs: that of whatever raised it. */
+    direction: NavigatorDirection;
+    /** Draws the toast body: the toast's own painter, or the provider's. */
+    renderToast: ToastRenderer<T> | undefined;
     /** Runs when this toast's time is up. */
     onElapse: () => void;
     /** Runs when a swipe carries this toast far enough to dismiss it. */
@@ -41,17 +62,24 @@ export type ToastsItemProps<T> = {
     onExitEnd: () => void;
 };
 
-export type ToastsProps<T> = BaseToastsProps<T> & {
-    /** The toasts on screen. It is the only thing that adds or removes one. */
-    "toasts": Toast<T>[];
+export type ToastsProps<T> = BaseToastsProps & {
     /**
-     * Receives the toasts left once one has timed out, been swiped away or been trimmed past the limit, which is what
-     * `v-model:toasts` binds.
+     * The queue, oldest first, when the consumer wants to hold it — to raise toasts from code outside any component,
+     * or to read what is queued. Left out, the provider keeps its own, and toasts are raised through
+     * `useToastsContext`. Either way the provider writes to it: it removes a toast whose time is up, one swiped away,
+     * and those past the limit under `"dismiss_oldest"`.
      */
+    "toasts"?: Toast<T>[];
+    /** Receives the queue whenever the provider writes to it, which is what `v-model:toasts` binds. */
     "onUpdate:toasts"?: (toasts: Toast<T>[]) => void;
 };
 
 export type ToastsSlots<T> = {
-    /** Draws one toast. */
-    renderToast: ToastRenderer<T>;
+    /**
+     * Draws every toast that brings no painter of its own. It is handed a `dismiss` for the toast it draws, since it
+     * has no raiser's to borrow.
+     */
+    renderToast: DefaultToastRenderer<T>;
+    /** What the provider wraps: everything that may raise a toast through `useToastsContext`. */
+    default: () => VNodeChild;
 };

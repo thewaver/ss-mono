@@ -1,17 +1,24 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { demo, readout } from "./helpers";
+import { docsDemo, docsSettled } from "./helpers";
+
+const DOCS = "/src/App/Pages/Menus/MenuPage/Docs";
 
 const MENU = '[role="menu"]';
 const ROW = '[role="menu"] [role^="menuitem"]';
+const TRIGGER = `${docsDemo(DOCS, "Stateful")} [aria-haspopup="menu"]`;
 
 const open = async (page: Page) => {
-    await page.locator(`${demo("stateful")} button`).click();
+    await page.locator(TRIGGER).click();
     await expect(page.locator(MENU)).toHaveCount(1);
 };
 
-/** The readout names the action that ran as well as the list, so the list is read out of the brackets. */
-const ticked = async (page: Page) => (await readout(page, "stateful")).split("ticked: ")[1] ?? "";
+/**
+ * The example holds its checked list in a signal it hands the menu and shows nowhere else, so the open menu's rows
+ * are where the owner's list is read: a row is ticked exactly when its `aria-checked` says so.
+ */
+const isTicked = async (page: Page, name: string) =>
+    (await page.locator(ROW).filter({ hasText: name }).first().getAttribute("aria-checked")) === "true";
 
 const rows = (page: Page) =>
     page.evaluate(() =>
@@ -23,8 +30,9 @@ const rows = (page: Page) =>
     );
 
 test.beforeEach(async ({ page }) => {
-    await page.goto("/menu");
-    await expect(page.locator("[data-example]").first()).toBeVisible();
+    await page.goto("/menu/docs");
+    await expect(page.locator(TRIGGER)).toBeVisible();
+    await docsSettled(page);
 });
 
 /**
@@ -71,10 +79,12 @@ test("adjacent radio rows are one group, and the rows around them are not in it"
 test("a tick keeps the menu open, and a pick closes it", async ({ page }) => {
     await open(page);
 
+    expect(await isTicked(page, "Minimap"), "minimap starts unticked").toBe(false);
+
     await page.locator('[role="menuitemcheckbox"]', { hasText: "Minimap" }).click();
 
     await expect(page.locator(MENU), "ticking leaves the menu up to tick again").toHaveCount(1);
-    expect(await ticked(page), "and the tick is in the owner's list").toContain("Minimap");
+    expect(await isTicked(page, "Minimap"), "and the tick is in the owner's list").toBe(true);
 
     await page.locator('[role="menuitemradio"]', { hasText: "Large" }).click();
 
@@ -84,29 +94,31 @@ test("a tick keeps the menu open, and a pick closes it", async ({ page }) => {
 test("ticking is a toggle, and the owner's list is what says so", async ({ page }) => {
     await open(page);
 
-    expect(await ticked(page), "word wrap starts ticked").toContain("Word wrap");
+    expect(await isTicked(page, "Word wrap"), "word wrap starts ticked").toBe(true);
 
     await page.locator('[role="menuitemcheckbox"]', { hasText: "Word wrap" }).click();
 
-    expect(await ticked(page), "and ticking it again takes it out").not.toContain("Word wrap");
+    expect(await isTicked(page, "Word wrap"), "and ticking it again takes it out").toBe(false);
 });
 
 /**
  * The one behavior a radio row has that a checkbox does not: picking it clears whichever of its own run was
- * picked before, and leaves every tick outside that run alone.
+ * picked before, and leaves every tick outside that run alone. Picking closes the menu, so the rows are read again
+ * once it has been reopened.
  */
 test("picking a radio clears its own run and nothing else", async ({ page }) => {
     await open(page);
 
-    expect(await ticked(page), "medium starts picked, word wrap starts ticked").toContain("Word wrap, Medium");
+    expect(await isTicked(page, "Medium"), "medium starts picked").toBe(true);
+    expect(await isTicked(page, "Word wrap"), "and word wrap starts ticked").toBe(true);
 
     await page.locator('[role="menuitemradio"]', { hasText: "Small" }).click();
+    await expect(page.locator(MENU)).toHaveCount(0);
+    await open(page);
 
-    const after = await ticked(page);
-
-    expect(after, "the size that was picked is gone").not.toContain("Medium");
-    expect(after, "the newly picked one is in").toContain("Small");
-    expect(after, "and the tick outside the run is untouched").toContain("Word wrap");
+    expect(await isTicked(page, "Medium"), "the size that was picked is gone").toBe(false);
+    expect(await isTicked(page, "Small"), "the newly picked one is in").toBe(true);
+    expect(await isTicked(page, "Word wrap"), "and the tick outside the run is untouched").toBe(true);
 });
 
 /**
@@ -114,15 +126,17 @@ test("picking a radio clears its own run and nothing else", async ({ page }) => 
  * before that lands nowhere. Same wait `select.spec.ts` records for the same reason.
  */
 test("the keyboard reaches a stateful row the same as any other", async ({ page }) => {
-    await page.locator(`${demo("stateful")} button`).focus();
+    await page.locator(TRIGGER).focus();
     await page.keyboard.press("Enter");
     await expect(page.locator(MENU)).toHaveAttribute("aria-activedescendant", /.+/);
     await expect(page.locator(MENU), "and the keys only reach it once focus has moved into it").toBeFocused();
+
+    expect(await isTicked(page, "Show whitespace")).toBe(false);
 
     // Opening already highlights the first row, so one press reaches the second.
     await page.keyboard.press("ArrowDown");
     await page.keyboard.press("Enter");
 
-    expect(await ticked(page), "the second row was ticked from the keyboard").toContain("Show whitespace");
+    expect(await isTicked(page, "Show whitespace"), "the second row was ticked from the keyboard").toBe(true);
     await expect(page.locator(MENU), "and ticking from the keyboard leaves it open too").toHaveCount(1);
 });

@@ -1,8 +1,9 @@
-import { type CSSPadding, CSSUtils, MathUtils } from "@thewaver/ss-utils";
+import { type CSSLogicalPadding, CSSUtils, MathUtils } from "@thewaver/ss-utils";
 
 import { ElementObserverUtils } from "../../Abstracts/ElementObserver/ElementObserver.utils";
+import type { InteractionFlags } from "../../Abstracts/InteractionTracker/InteractionTracker.types";
 import { TEXT_FIELD_DEFAULTS } from "./TextField.const";
-import type { TextFieldElementType, TextFieldType } from "./TextField.types";
+import type { TextFieldElementType, TextFieldFlags, TextFieldType } from "./TextField.types";
 
 /** The line height assumed, as a multiple of the font size, when the computed style gives none in pixels. */
 const FALLBACK_LINE_HEIGHT_RATIO = 1.2;
@@ -16,10 +17,10 @@ export namespace TextFieldUtils {
      * The padding as four numbers, from either one number or four.
      *
      * @param padding One number for every side, or the four sides spelled out.
-     * @returns The four sides.
+     * @returns The four sides, named for where the text starts and ends rather than for the screen.
      */
-    export const resolvePadding = (padding: CSSPadding | number): CSSPadding =>
-        typeof padding === "number" ? CSSUtils.spreadPadding(padding) : padding;
+    export const resolvePadding = (padding: CSSLogicalPadding | number): CSSLogicalPadding =>
+        typeof padding === "number" ? CSSUtils.spreadLogicalPadding(padding) : padding;
 
     /**
      * How far the text sits from one edge of the field.
@@ -147,4 +148,26 @@ export namespace TextFieldUtils {
             lastWidth = width;
         });
     };
+
+    /**
+     * The state of several fields read as one control, for a painter drawing something that belongs to all of them —
+     * a tooltip on a pair of date fields.
+     *
+     * A state any one field is in, the group is in: hovered, focused, pressed, in error, disabled, read-only. The group
+     * is empty only while every field is.
+     *
+     * @param flags Each field's own state.
+     * @returns The group's state; with no fields, a group in none of the states and empty.
+     */
+    export const mergeFlags = (flags: InteractionFlags<TextFieldFlags>[]): InteractionFlags<TextFieldFlags> => ({
+        isHovered: flags.some((field) => field.isHovered ?? false),
+        isActive: flags.some((field) => field.isActive ?? false),
+        isFocused: flags.some((field) => field.isFocused ?? false),
+        isFocusVisible: flags.some((field) => field.isFocusVisible ?? false),
+        isDisabled: flags.some((field) => field.isDisabled ?? false),
+        isPressed: flags.some((field) => field.isPressed ?? false),
+        hasError: flags.some((field) => field.hasError ?? false),
+        isReadOnly: flags.some((field) => field.isReadOnly),
+        isEmpty: flags.every((field) => field.isEmpty),
+    });
 }

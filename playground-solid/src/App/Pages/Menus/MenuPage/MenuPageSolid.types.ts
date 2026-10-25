@@ -1,15 +1,20 @@
-import type { Signal } from "solid-js";
-
-import type { MenuExampleProps } from "@thewaver/ss-playground/App/Pages/Menus/MenuPage/MenuPage.types";
-
-export type { MenuExampleProps } from "@thewaver/ss-playground/App/Pages/Menus/MenuPage/MenuPage.types";
+import type { AccessorValues } from "@thewaver/ss-components-solid";
+import type {
+    BaseMenuBasicDocsExampleValues,
+    BaseMenuDisabledItemsDocsExampleValues,
+    BaseMenuGlideDocsExampleValues,
+    BaseMenuPlacementDocsExampleValues,
+    BaseMenuTooltipDocsExampleValues,
+} from "@thewaver/ss-playground/App/Pages/Menus/MenuPage/MenuPage.types";
 
 export type { Action, Destination } from "@thewaver/ss-playground/App/Pages/Menus/MenuPage/MenuActions.types";
 
-export type MenuDrivenExampleProps = MenuExampleProps & {
-    visibility: Signal<boolean>;
-};
+export type MenuBasicDocsExampleProps = AccessorValues<BaseMenuBasicDocsExampleValues>;
 
-export type MenuCascaderExampleProps = {
-    path: Signal<string[]>;
-};
+export type MenuGlideDocsExampleProps = AccessorValues<BaseMenuGlideDocsExampleValues>;
+
+export type MenuDisabledItemsDocsExampleProps = AccessorValues<BaseMenuDisabledItemsDocsExampleValues>;
+
+export type MenuPlacementDocsExampleProps = AccessorValues<BaseMenuPlacementDocsExampleValues>;
+
+export type MenuTooltipDocsExampleProps = AccessorValues<BaseMenuTooltipDocsExampleValues>;

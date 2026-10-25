@@ -17,18 +17,37 @@ export namespace FocusManagerSolidUtils {
      * @param opts.getInitialRef What to focus instead of the first focusable child — a text field
      * rather than a close button, say. Read once, when focus moves in, so a later change does not steal
      * focus from the user.
+     * @param opts.getIsOpen Whether the layer is open, for one that can be hidden and shown again while it stays
+     * open — covered for a while by another layer, say. Each time it hides, focus goes back to what first opened
+     * it, and so it does when it closes, rather than to wherever focus was when it last showed. Without it, focus
+     * goes back to wherever it was when the element last appeared.
      */
     export const autoFocus = (
         getRef: () => HTMLElement | undefined,
         getIsVisible: () => boolean,
-        opts?: { getInitialRef?: () => HTMLElement | undefined },
-    ) =>
+        opts?: { getInitialRef?: () => HTMLElement | undefined; getIsOpen?: () => boolean },
+    ) => {
+        const originKeeper = FocusManagerUtils.createOriginKeeper();
+        const getIsOpen = opts?.getIsOpen;
+
+        if (getIsOpen) {
+            createEffect(() => {
+                if (!getIsOpen()) originKeeper.forget();
+            });
+        }
+
         createEffect(() => {
             const ref = getRef();
             const isVisible = getIsVisible();
 
             if (!ref || !isVisible) return;
 
-            onCleanup(FocusManagerUtils.focusInto(ref, { initialRef: untrack(() => opts?.getInitialRef?.()) }));
+            onCleanup(
+                FocusManagerUtils.focusInto(ref, {
+                    initialRef: untrack(() => opts?.getInitialRef?.()),
+                    origin: getIsOpen ? originKeeper.take() : undefined,
+                }),
+            );
         });
+    };
 }

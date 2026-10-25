@@ -30,5 +30,5 @@ const isBuilt = shallowRef(false);
         </Collapsible>
     </div>
 
-    <div :class="styles.exampleReadout">{{ `Panel built: ${isBuilt ? "yes" : "not yet"}` }}</div>
+    <div :class="styles.exampleReadout" data-readout>{{ `Panel built: ${isBuilt ? "yes" : "not yet"}` }}</div>
 </template>

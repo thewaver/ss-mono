@@ -1,8 +1,16 @@
+import type { ScrollerProgress } from "@thewaver/ss-components-svelte";
 import type {
-    BaseScrollerExampleProps,
-    BaseScrollerTabbedExampleProps,
+    BaseScrollerBasicDocsExampleValues,
+    BaseScrollerBothWaysDocsExampleValues,
+    BaseScrollerFadingDocsExampleValues,
 } from "@thewaver/ss-playground/App/Pages/ScrollerPage/ScrollerPage.types";
 
-export type ScrollerExampleProps = BaseScrollerExampleProps;
+export type ScrollerBasicDocsExampleProps = BaseScrollerBasicDocsExampleValues;
 
-export type ScrollerTabbedExampleProps = BaseScrollerTabbedExampleProps;
+export type ScrollerDrivenDocsExampleProps = {
+    progress: ScrollerProgress;
+};
+
+export type ScrollerBothWaysDocsExampleProps = BaseScrollerBothWaysDocsExampleValues;
+
+export type ScrollerFadingDocsExampleProps = BaseScrollerFadingDocsExampleValues;

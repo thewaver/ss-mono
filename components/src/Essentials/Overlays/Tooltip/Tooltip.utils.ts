@@ -54,6 +54,39 @@ export namespace TooltipUtils {
     };
 
     /**
+     * Reports which element inside an anchor holds focus, as focus moves in, around and out.
+     *
+     * For a tooltip whose anchor groups several controls: the control the reader is on is the one that has to be
+     * described, since a screen reader announces the description of whatever holds focus, never of a group around it.
+     * Called at once with the element focused now, or `undefined` when focus is elsewhere.
+     *
+     * @param anchor The element grouping the controls.
+     * @param onChange Called with the focused element inside `anchor`, or `undefined` once focus has left it.
+     * @returns The function that stops watching.
+     */
+    export const followFocusWithin = (anchor: HTMLElement, onChange: (focused: HTMLElement | undefined) => void) => {
+        const handleFocusIn = (e: FocusEvent) => {
+            if (e.target instanceof HTMLElement) onChange(e.target);
+        };
+
+        const handleFocusOut = (e: FocusEvent) => {
+            if (!getIsInside(anchor, e.relatedTarget)) onChange(undefined);
+        };
+
+        anchor.addEventListener("focusin", handleFocusIn);
+        anchor.addEventListener("focusout", handleFocusOut);
+
+        const activeElement = anchor.ownerDocument.activeElement;
+
+        onChange(activeElement instanceof HTMLElement && anchor.contains(activeElement) ? activeElement : undefined);
+
+        return () => {
+            anchor.removeEventListener("focusin", handleFocusIn);
+            anchor.removeEventListener("focusout", handleFocusOut);
+        };
+    };
+
+    /**
      * The tooltip describing `anchor` that `target` sits in, if there is one.
      *
      * A control that tracks which of its items the pointer is over loses the pointer the moment it crosses onto an

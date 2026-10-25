@@ -1,3 +1,5 @@
+import { type ArcDefs, PlacementLayoutUtils } from "@thewaver/ss-components";
+
 export const EXAMPLE_NAMES = {
     default: "Default",
     refusing: "Refusing",
@@ -13,3 +15,17 @@ export const EXAMPLES_ROOT = "/src/App/Pages/ToolbarPage/Examples";
 export const NO_WIDTH = 0;
 
 export const WIDE_SPAN = 2;
+
+export const DOCS_ROOT = "/src/App/Pages/ToolbarPage/Docs";
+
+export const PALETTE_DEFS: ArcDefs = {
+    curveHeightRatio: 1,
+    spreadDegrees: 360,
+    facingDegrees: 67.5,
+    itemWidthRatio: 0.3542,
+    itemHeightRatio: 0.4706,
+};
+
+export const PALETTE_LAYOUT = PlacementLayoutUtils.createArc(PALETTE_DEFS);
+
+export const PALETTE_WIDTH = "390px";

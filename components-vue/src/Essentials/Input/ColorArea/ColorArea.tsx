@@ -108,6 +108,7 @@ const ColorAreaElement = defineComponent(
                             key={axis}
                             ref={(target) => setAxisElement(axis, toElement<HTMLInputElement>(target))}
                             type="range"
+                            dir="ltr"
                             name={props.name && `${props.name}-${axis}`}
                             class={ColorAreaStyles.colorAreaAxis}
                             min={ColorAreaUtils.AXIS_MIN}

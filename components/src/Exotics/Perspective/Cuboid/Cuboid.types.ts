@@ -54,8 +54,9 @@ export type BaseCuboidValues = {
      * nearest quarter turns and writes them to the two counts, so a drag is recorded exactly as presses would
      * be. Dragging the front rightwards brings the left face round, whichever way up the box is.
      *
-     * A drag is never the only way to turn it: WCAG 2.5.7 asks for a single-pointer route that is not a drag,
-     * and that route is the two counts and `turnTo`, wired to controls the consumer draws.
+     * A drag is never the only way to turn it:
+     * {@link https://www.w3.org/WAI/WCAG22/Understanding/dragging-movements.html WCAG 2.5.7} asks for a single-pointer
+     * route that is not a drag, and that route is the two counts and `turnTo`, wired to controls the consumer draws.
      */
     isDraggable?: boolean;
 };

@@ -14,3 +14,5 @@ export const CALENDAR_FIELD_WIDTH = 180;
 export const EXAMPLES_ROOT = "/src/App/Pages/RangeCalendarPage/Examples";
 
 export const MONTH_HEADER_OPTIONS: Intl.DateTimeFormatOptions = { month: "long", year: "numeric" };
+
+export const DOCS_ROOT = "/src/App/Pages/RangeCalendarPage/Docs";

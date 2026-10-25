@@ -1,3 +1,5 @@
+export type FormSectionOrientation = "horizontal" | "vertical";
+
 export type FormSectionState = {
     isValid: boolean;
     hasError: boolean;
@@ -6,7 +8,7 @@ export type FormSectionState = {
 
 export type BaseFormSectionValues = {
     /** Whether the caption sits above the content or beside it. */
-    orientation?: "horizontal" | "vertical";
+    orientation?: FormSectionOrientation;
     /** The space between the caption, the content and the message. */
     gap?: number;
     /** Names the section for assistive technology. */

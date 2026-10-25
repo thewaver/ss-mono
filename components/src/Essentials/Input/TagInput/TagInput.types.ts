@@ -15,7 +15,10 @@ export type BaseTagInputCbs = {
      * and rejecting duplicates live.
      */
     computeTag?: (text: string) => string | undefined;
-    /** Names one tag for assistive technology, so a reader hears what removing it would do. */
+    /**
+     * Names one tag for assistive technology, so a reader hears what pressing it does, which is remove it. Left out,
+     * a tag is named by its word alone, and the field warns in the console when it is set up.
+     */
     computeTagAriaLabel?: (tag: string) => string;
     /** Runs when a tag is added or removed. */
     onTagsChange?: (tags: string[]) => void;

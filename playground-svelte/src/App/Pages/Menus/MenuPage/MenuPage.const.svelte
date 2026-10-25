@@ -24,7 +24,16 @@
                 renderContent: pasteTooltip,
             },
         },
-        { value: { name: "Duplicate" } },
+        {
+            value: { name: "Duplicate" },
+            isDisabled: true,
+            isReachableWhenDisabled: true,
+            tooltipDefs: {
+                placement: { x: "right_out", y: "center" },
+                offset: { x: 10, y: 0 },
+                renderContent: duplicateTooltip,
+            },
+        },
         { value: { name: "Delete", shortcut: "Del" } },
     ];
 
@@ -33,6 +42,10 @@
 
 {#snippet pasteTooltip(visibilityTarget: 0 | 1, transitionDurationMs: number)}
     <PageTooltipContent {visibilityTarget} {transitionDurationMs}>The clipboard is empty.</PageTooltipContent>
+{/snippet}
+
+{#snippet duplicateTooltip(visibilityTarget: 0 | 1, transitionDurationMs: number)}
+    <PageTooltipContent {visibilityTarget} {transitionDurationMs}>Nothing is selected to duplicate.</PageTooltipContent>
 {/snippet}
 
 {#snippet renderMenuPopup(

@@ -1,8 +1,9 @@
-import { type CSSProperties, useEffect, useRef, useState } from "react";
+import { type CSSProperties, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import {
     CutoutUtils,
+    DismisserUtils,
     FocusManagerUtils,
     LiveAnnouncerUtils,
     SPOTLIGHT_DEFAULTS,
@@ -18,6 +19,7 @@ import { ElevationReactUtils } from "../../Abstracts/Elevation/ElevationReact.ut
 import { FocusManagerReactUtils } from "../../Abstracts/FocusManager/FocusManagerReact.utils";
 import { useViewportContext } from "../../Abstracts/Viewport/Viewport.context";
 import { useLatest } from "../../Utils/refUtils";
+import { useStore } from "../../Utils/storeUtils";
 import type { SpotlightProps } from "./Spotlight.types";
 
 const toReactStyle = (style: Record<string, string>) =>
@@ -28,7 +30,7 @@ const toReactStyle = (style: Record<string, string>) =>
 export const Spotlight = (props: SpotlightProps) => {
     const viewportContext = useViewportContext();
 
-    const isShown = props.visibility[0];
+    const isOpen = props.visibility[0];
 
     const elementRef = useLatest(props.elementRef ?? null);
     const portalRef = useRef<HTMLDivElement | null>(null);
@@ -43,18 +45,39 @@ export const Spotlight = (props: SpotlightProps) => {
     const padding = props.padding ?? SPOTLIGHT_DEFAULTS.padding;
     const hasPopup = props.mode === "guide" && props.renderPopup !== undefined;
 
-    const fader = ElementFaderReactUtils.useFader(isShown, {
-        transitionDurationMs,
-        ref: portalRef,
-        onShow: props.onShow,
-        onHide: props.onHide,
-    });
+    const layer = useMemo(
+        () =>
+            SpotlightUtils.createLayer(
+                () => latest.current.mode,
+                () => latest.current.visibility[1](false),
+            ),
+        [latest],
+    );
+
+    const isOnTop = useStore(DismisserUtils.openLayers, () => SpotlightUtils.getIsOnTop(layer));
+
+    const fader = ElementFaderReactUtils.useFader(isOpen && isOnTop, { transitionDurationMs, ref: portalRef });
 
     const isVisible = fader.isVisible;
+    const isRegistered = isOpen || isVisible;
+    const isActing = isVisible && isOnTop;
+
+    useEffect(() => (isRegistered ? DismisserUtils.addLayer(layer) : undefined), [isRegistered, layer]);
+
+    const wasOpenRef = useRef(false);
+
+    useEffect(() => {
+        if (isOpen === wasOpenRef.current) return;
+
+        wasOpenRef.current = isOpen;
+
+        if (isOpen) latest.current.onShow?.();
+        else latest.current.onHide?.();
+    }, [isOpen, latest]);
 
     const rect = ElementObserverReactUtils.useViewportRect(elementRef, isVisible, { padding });
 
-    ElevationReactUtils.useElevation(elementRef, isVisible, SpotlightStyles.SPOTLIGHT_Z_INDEX);
+    ElevationReactUtils.useElevation(elementRef, isActing, SpotlightStyles.SPOTLIGHT_Z_INDEX);
 
     useEffect(() => {
         if (!isVisible || !props.elementRef) return;
@@ -66,7 +89,7 @@ export const Spotlight = (props: SpotlightProps) => {
         elementRef,
         isVisible && hasPopup,
         {
-            placement: props.popupPlacement ?? SPOTLIGHT_DEFAULTS.popupPlacement,
+            computePlacement: () => props.popupPlacement ?? SPOTLIGHT_DEFAULTS.popupPlacement,
             offset: props.popupOffset ?? SPOTLIGHT_DEFAULTS.popupOffset,
             anchorRect: rect,
         },
@@ -77,25 +100,26 @@ export const Spotlight = (props: SpotlightProps) => {
     };
 
     useEffect(() => {
-        if (!isVisible) return;
+        if (!isActing) return;
 
         return SpotlightUtils.observeDismissKeys(
+            layer,
             () => latest.current.mode,
             () => latest.current.visibility[1](false),
         );
-    }, [isVisible, latest]);
+    }, [isActing, layer, latest]);
 
     useEffect(() => {
-        if (!isVisible || props.mode !== "prompt" || !props.elementRef) return;
+        if (!isActing || props.mode !== "prompt" || !props.elementRef) return;
 
         return SpotlightUtils.holdFocus(props.elementRef);
-    }, [isVisible, props.mode, props.elementRef]);
+    }, [isActing, props.mode, props.elementRef]);
 
     useEffect(() => {
-        if (!isVisible || props.mode !== "guide" || !portal) return;
+        if (!isActing || props.mode !== "guide" || !portal) return;
 
         return FocusManagerUtils.sealAround(portal);
-    }, [isVisible, props.mode, portal]);
+    }, [isActing, props.mode, portal]);
 
     const hasAnnouncement = props.announcement !== undefined;
 
@@ -106,21 +130,34 @@ export const Spotlight = (props: SpotlightProps) => {
     }, [hasAnnouncement]);
 
     useEffect(() => {
-        if (!isVisible) return;
+        if (!isActing) {
+            announcedRef.current = undefined;
+
+            return;
+        }
 
         if (SpotlightUtils.getIsAnnouncementDue(announcedRef.current, props.announcement)) {
             LiveAnnouncerUtils.announce(props.announcement!);
         }
 
         announcedRef.current = props.announcement;
-    }, [isVisible, props.announcement]);
+    }, [isActing, props.announcement]);
 
-    const isPlacing = isVisible && hasPopup;
+    const hasWarnedUnannouncedRef = useRef(false);
+    const isGuideShowing = isVisible && props.mode === "guide";
+
+    useEffect(() => {
+        if (hasWarnedUnannouncedRef.current || !isGuideShowing) return;
+
+        hasWarnedUnannouncedRef.current = SpotlightUtils.warnIfUnannounced(props.announcement, "announcement");
+    }, [isGuideShowing, props.announcement]);
+
+    const isPlacing = isActing && hasPopup;
 
     if (!isPlacing && hasPlaced) setHasPlaced(false);
     if (isPlacing && position && !hasPlaced) setHasPlaced(true);
 
-    FocusManagerReactUtils.useAutoFocus(popupRef, hasPlaced);
+    FocusManagerReactUtils.useAutoFocus(popupRef, hasPlaced, { isOpen });
 
     if (!isVisible || !rect) return null;
 

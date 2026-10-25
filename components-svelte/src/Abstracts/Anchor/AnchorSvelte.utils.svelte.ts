@@ -1,11 +1,17 @@
 import { untrack } from "svelte";
 import type { Attachment } from "svelte/attachments";
 
-import { type AnchorPlacement, AnchorUtils, ElementObserverUtils } from "@thewaver/ss-components";
+import {
+    type AnchorPlacement,
+    AnchorUtils,
+    ElementObserverUtils,
+    type NavigatorDirection,
+} from "@thewaver/ss-components";
 import { type Point2d, Rect, Size2d } from "@thewaver/ss-utils";
 
 import { ElementObserverSvelteUtils } from "../ElementObserver/ElementObserverSvelte.utils.svelte.js";
 import { ElevationSvelteUtils } from "../Elevation/ElevationSvelte.utils.svelte.js";
+import { NavigatorSvelteUtils } from "../Navigator/NavigatorSvelte.utils.svelte.js";
 import { getViewportContext } from "../Viewport/Viewport.context.js";
 
 /** The Svelte side of {@link AnchorUtils}: the positioning cycle for portaled content, as getters. */
@@ -20,11 +26,17 @@ export namespace AnchorSvelteUtils {
      * nothing. The arithmetic is {@link AnchorUtils.computePortalPlacement}, {@link AnchorUtils.computePortalPosition}
      * and their neighbors.
      *
+     * The content also takes the direction text runs in at the anchor, written as `dir` on the element attached with
+     * `attachContent` and kept current while it is shown, since content moved to the end of the document would
+     * otherwise lay itself out in the document's direction rather than its anchor's.
+     *
      * Must run while a component is being set up.
      *
-     * @param getAnchorRef The element to position against.
+     * @param getAnchorRef The element to position against, and whose direction the content takes. Content given only
+     * `opts.getAnchorRect` and no element runs left to right.
      * @param getIsVisible Whether the content is currently shown. Measuring stops when it is not.
-     * @param opts.getPlacement The placement to aim for.
+     * @param opts.getPlacement The placement to aim for, given the direction text runs in at the anchor, so a default
+     * can line the content up with the edge the text starts from.
      * @param opts.getOffset The gap to hold between anchor and content.
      * @param opts.getReservedScreenSize A margin to keep clear at the screen edges.
      * @param opts.getAnchorRect Supplies the anchor rectangle directly, for content anchored to something that is
@@ -32,7 +44,8 @@ export namespace AnchorSvelteUtils {
      * observed.
      * @param opts.getIsPinned Keeps the placement the caller asked for and skips clamping, for content that should
      * be allowed to run off screen rather than move.
-     * @returns `getAnchorRect` and `getIsAnchorOnScreen` for deciding whether to draw at all, `getPlacement` for
+     * @returns `getAnchorRect` and `getIsAnchorOnScreen` for deciding whether to draw at all, `getDirection` for the
+     * direction the content was given, `getPlacement` for
      * styling that depends on which way the content opened, `getPosition` for where to put it, `getArrowAim` for
      * where an arrow pointing at the anchor leaves the content (see {@link AnchorUtils.computeArrowAim}), `getZIndex`,
      * and `attachContent`, which must be attached to the content's own element with `{@attach}` for any of the rest
@@ -42,7 +55,7 @@ export namespace AnchorSvelteUtils {
         getAnchorRef: () => HTMLElement | undefined,
         getIsVisible: () => boolean,
         opts: {
-            getPlacement: () => AnchorPlacement;
+            getPlacement: (direction: NavigatorDirection) => AnchorPlacement;
             getOffset?: () => Point2d | undefined;
             getReservedScreenSize?: () => Size2d | undefined;
             getAnchorRect?: () => Rect | undefined;
@@ -57,6 +70,8 @@ export namespace AnchorSvelteUtils {
 
         const anchorRect = $derived(opts.getAnchorRect?.() ?? observedRect);
 
+        const getDirection = NavigatorSvelteUtils.createDirection(getAnchorRef, () => !getIsVisible());
+
         const getLayoutOpts = () => ({
             offset: opts.getOffset?.(),
             reservedScreenSize: opts.getReservedScreenSize?.(),
@@ -65,7 +80,7 @@ export namespace AnchorSvelteUtils {
 
         const placement = $derived(
             AnchorUtils.computePortalPlacement(
-                opts.getPlacement(),
+                opts.getPlacement(getDirection()),
                 anchorRect,
                 contentSize,
                 viewportContext.getSize(),
@@ -126,6 +141,15 @@ export namespace AnchorSvelteUtils {
             };
         });
 
+        $effect(() => {
+            const content = contentRef;
+            const direction = getDirection();
+
+            if (!content) return;
+
+            content.dir = direction;
+        });
+
         const attachContent: Attachment<HTMLElement> = (element) => {
             contentRef = element;
 
@@ -140,6 +164,7 @@ export namespace AnchorSvelteUtils {
             getPlacement: () => placement,
             getPosition: () => position,
             getArrowAim: () => arrowAim,
+            getDirection,
             getZIndex: () => zIndex,
             attachContent,
         };

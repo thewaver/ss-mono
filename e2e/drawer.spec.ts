@@ -1,6 +1,6 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { demo } from "./helpers";
+import { docsSettled, prop } from "./helpers";
 
 /**
  * The drawer is the first consumer of the swipe, so what is checked here is the gesture rather than the
@@ -12,6 +12,9 @@ import { demo } from "./helpers";
  *
  * Opening waits for the panel to finish sliding in, because a panel measured mid-slide reports a box the
  * pointer would never land in — its children sit off the side of the screen until the transition settles.
+ *
+ * The Docs page's first example has one drawer and an Edge knob, so each test sets the edge before opening it;
+ * the swiping example is a bottom sheet with its own overlay-click knob, which also governs the swipe.
  */
 const DIALOG = '[aria-modal="true"]';
 const DRAG_STEPS = 10;
@@ -24,10 +27,25 @@ const hasPanelSettled = async (page: Page) => {
     return Math.abs(dialog.x - panel.x) < SETTLED_PX && Math.abs(dialog.y - panel.y) < SETTLED_PX;
 };
 
-const openDrawer = async (page: Page, edge: string) => {
-    await page.locator(demo(edge)).getByText(`Open ${edge}`).click();
+const pickEdge = async (page: Page, edge: string) => {
+    const picker = page.locator(`${prop("edge")} [role="combobox"]`);
+
+    await picker.click();
+    await page
+        .locator(`[id="${await picker.getAttribute("aria-controls")}"]`)
+        .getByRole("option", { name: edge, exact: true })
+        .click();
+};
+
+const openFrom = async (page: Page, trigger: string) => {
+    await page.locator(trigger).click();
     await expect(page.locator(DIALOG)).toBeVisible();
     await expect.poll(() => hasPanelSettled(page)).toBe(true);
+};
+
+const openDrawer = async (page: Page, edge: string) => {
+    await pickEdge(page, edge);
+    await openFrom(page, "#openDrawer");
 };
 
 const pushDrawer = async (page: Page, from: [number, number], to: [number, number]) => {
@@ -40,8 +58,9 @@ const pushDrawer = async (page: Page, from: [number, number], to: [number, numbe
 };
 
 test.beforeEach(async ({ page }) => {
-    await page.goto("/drawer");
-    await expect(page.locator(demo("left")).getByText("Open left")).toBeVisible();
+    await page.goto("/drawer/docs");
+    await expect(page.locator("#openDrawer")).toBeVisible();
+    await docsSettled(page);
 });
 
 test("pushing a drawer towards its own edge closes it", async ({ page }) => {
@@ -120,4 +139,22 @@ test("a swipe that starts on a control inside the drawer does not press it", asy
         page.locator(DIALOG),
         "the drag reads as a swipe the wrong way rather than as a press on the control it began over",
     ).toBeVisible();
+});
+
+/**
+ * A swipe is a drag, and WCAG 2.5.7 asks for a single-pointer way to do the same, which is the press on the
+ * overlay. So the two share one switch: with overlay clicks turned off, a push that would have closed the sheet
+ * leaves it where it is.
+ */
+test("turning off the overlay click turns the swipe off with it", async ({ page }) => {
+    await openFrom(page, "#openSheet");
+    await pushDrawer(page, [0.5, 0.2], [0.5, 0.95]);
+    await expect(page.locator(DIALOG), "with the switch on, a push down dismisses the sheet").toHaveCount(0);
+
+    await page.locator(`${prop("isDismissableOnOverlayClick")} input`).click();
+
+    await openFrom(page, "#openSheet");
+    await pushDrawer(page, [0.5, 0.2], [0.5, 0.95]);
+
+    await expect(page.locator(DIALOG), "with it off, the same push leaves the sheet open").toBeVisible();
 });

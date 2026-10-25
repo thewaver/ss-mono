@@ -1,11 +1,17 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { activeDescendantText, demo, readout } from "./helpers";
+import { activeDescendantText, docsDemo, docsSettled } from "./helpers";
+
+const DOCS = "/src/App/Pages/Menus/FanMenuPage/Docs";
 
 const MENU = '[role="menu"]';
 const ITEM_ROLE = '[role="menuitem"]';
 
-const trigger = (key: string) => `${demo(key)} [aria-haspopup="menu"]`;
+const trigger = (name: string) => `${docsDemo(DOCS, name)} [aria-haspopup="menu"]`;
+
+/** Each example reads out the last command it ran, under its fan. */
+const readout = async (page: Page, name: string) =>
+    ((await page.locator(`${docsDemo(DOCS, name)} [data-readout]`).textContent()) ?? "").trim();
 
 const openedLevel = async (page: Page, depth: number) => {
     await expect(page.locator(MENU)).toHaveCount(depth + 1);
@@ -19,12 +25,13 @@ const highlightAt = async (page: Page, depth: number) =>
 const firstItemOf = (page: Page, depth: number) => page.locator(MENU).nth(depth).locator(ITEM_ROLE).first();
 
 test.beforeEach(async ({ page }) => {
-    await page.goto("/fan-menu");
-    await expect(page.locator("[data-example]").first()).toBeVisible();
+    await page.goto("/fan-menu/docs");
+    await expect(page.locator(trigger("Submenus"))).toBeVisible();
+    await docsSettled(page);
 });
 
 test("a level replaces the one it came from rather than standing beside it", async ({ page }) => {
-    await page.locator(trigger("submenus")).click();
+    await page.locator(trigger("Submenus")).click();
     await openedLevel(page, 0);
     await expect(firstItemOf(page, 0), "the first arc is on screen").toBeVisible();
 
@@ -39,7 +46,9 @@ test("a level replaces the one it came from rather than standing beside it", asy
 });
 
 test("the head of a new arc is the item you came in through, and it takes you back", async ({ page }) => {
-    await page.locator(trigger("submenus")).click();
+    const before = await readout(page, "Submenus");
+
+    await page.locator(trigger("Submenus")).click();
     await openedLevel(page, 0);
     expect(await highlightAt(page, 0), "a fan opens onto its first card").toContain("New");
 
@@ -54,13 +63,13 @@ test("the head of a new arc is the item you came in through, and it takes you ba
     await page.keyboard.press("Enter");
     await expect(page.locator(MENU), "and taking it steps back out rather than closing the fan").toHaveCount(1);
     await expect(firstItemOf(page, 0)).toBeVisible();
-    expect(await readout(page, "submenus"), "with nothing run on the way").toContain("nothing run yet");
+    expect(await readout(page, "Submenus"), "with nothing run on the way").toBe(before);
 });
 
 test("a fan drills on a press and never on a hover, since a pointer sweeping it would fall through levels", async ({
     page,
 }) => {
-    await page.locator(trigger("submenus")).click();
+    await page.locator(trigger("Submenus")).click();
     await openedLevel(page, 0);
 
     await firstItemOf(page, 0).hover();
@@ -73,7 +82,7 @@ test("a fan drills on a press and never on a hover, since a pointer sweeping it 
 });
 
 test("a card with nothing under it still runs and closes the whole fan", async ({ page }) => {
-    await page.locator(trigger("submenus")).click();
+    await page.locator(trigger("Submenus")).click();
     await openedLevel(page, 0);
 
     await page.keyboard.press("Enter");
@@ -81,7 +90,7 @@ test("a card with nothing under it still runs and closes the whole fan", async (
 
     await page.keyboard.press("Enter");
     await expect(page.locator(MENU)).toHaveCount(0);
-    expect(await readout(page, "submenus")).toContain("Project");
+    expect(await readout(page, "Submenus")).toContain("Project");
 });
 
 /**
@@ -90,7 +99,7 @@ test("a card with nothing under it still runs and closes the whole fan", async (
  * route a pointer takes.
  */
 test("Escape steps back out one level, leaving the arrows to walk the arc", async ({ page }) => {
-    await page.locator(trigger("submenus")).click();
+    await page.locator(trigger("Submenus")).click();
     await openedLevel(page, 0);
 
     await page.keyboard.press("Enter");

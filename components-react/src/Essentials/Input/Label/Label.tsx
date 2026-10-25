@@ -10,11 +10,14 @@ export const Label = (props: LabelProps) => {
     const labelId = useId();
     const isNested = context.getIsLabeled();
     const [registeredControlId, setRegisteredControlId] = useState<string>();
+    const [registeredCaptionId, setRegisteredCaptionId] = useState<string>();
 
     const innerContext: LabelContextType = {
         getIsLabeled: () => true,
         getLabelId: () => (isNested ? context.getLabelId() : labelId),
         setControlId: isNested ? context.setControlId : setRegisteredControlId,
+        getCaptionId: () => (isNested ? context.getCaptionId() : registeredCaptionId),
+        setCaptionId: isNested ? context.setCaptionId : setRegisteredCaptionId,
     };
 
     const Element = isNested ? "div" : "label";

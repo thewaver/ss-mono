@@ -13,8 +13,9 @@ export const ImageSwitcher = defineComponent(
 
         const state = useStore(switcher.store);
 
-        watchAfterRender([() => props.src], ([src]) =>
+        watchAfterRender([() => props.src, () => props.alt], ([src, alt]) =>
             switcher.show(src, {
+                alt,
                 onLoad: function (e) {
                     return props.onLoad?.call(this, e);
                 },
@@ -38,7 +39,8 @@ export const ImageSwitcher = defineComponent(
                                 visibility: layer.src ? undefined : "hidden",
                             }}
                             src={layer.src}
-                            alt={props.alt ?? ""}
+                            alt={layer.alt ?? ""}
+                            aria-hidden={layer.isShown ? undefined : "true"}
                         />
                     ))}
                 </div>

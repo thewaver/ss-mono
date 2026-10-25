@@ -1,7 +1,8 @@
-import type { ScrollerAxis, ScrollerStep, ScrollerStepper } from "@thewaver/ss-components-react";
+import type { ScrollerAxis, ScrollerController, ScrollerStep } from "@thewaver/ss-components-react";
 
 export type ScrollerButtonProps = {
+    controller: ScrollerController | undefined;
     step: ScrollerStep;
     axis?: ScrollerAxis;
-    stepper: ScrollerStepper;
+    id?: string;
 };

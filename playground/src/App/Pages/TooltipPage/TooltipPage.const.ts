@@ -1,13 +1,5 @@
 import type { AnchorPlacement } from "@thewaver/ss-components";
 
-export const EXAMPLE_NAMES = {
-    default: "On a control of your own",
-    word: "On something that is not a control",
-    rich: "More than a line",
-    circling: "An arrow going round",
-    arrows: "Every arrow at once",
-};
-
 export const ARROW_BED_PLACEMENTS: AnchorPlacement[] = [
     { x: "left_out", y: "top_out" },
     { x: "center", y: "top_out" },
@@ -25,13 +17,15 @@ export type ArrowBedShape = (typeof ARROW_BED_SHAPES)[number];
 
 export const ARROW_BED_ARROWS = ["triangle", "bolt"] as const;
 
+export type ArrowBedArrow = (typeof ARROW_BED_ARROWS)[number];
+
 export const ARROW_BED_BOX_SIZE = { width: 120, height: 60 };
 
-export const ARROW_BED_GAP = 50;
+export const ARROW_BED_GAP = 40;
 
 export const ARROW_BED_CHAMFER_RATIO = 0.25;
 
-export const EXAMPLES_ROOT = "/src/App/Pages/TooltipPage/Examples";
+export const DOCS_ROOT = "/src/App/Pages/TooltipPage/Docs";
 
 export const FIELD_WIDTH = 110;
 

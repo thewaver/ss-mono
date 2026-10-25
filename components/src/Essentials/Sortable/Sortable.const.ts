@@ -5,3 +5,5 @@ export const SORTABLE_DEFAULTS = {
     gap: 0,
     itemRoleDescription: "sortable item",
 };
+
+export const SORTABLE_ORIENTATIONS: readonly SortableOrientation[] = ["vertical", "horizontal"];

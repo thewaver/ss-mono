@@ -27,7 +27,6 @@ import { Button } from "../../Buttons/Button/Button";
 import type { ButtonSlots } from "../../Buttons/Button/Button.types";
 import { FormFieldVueUtils } from "../FormField/FormFieldVue.utils";
 import { useLabelContext } from "../Label/Label.context";
-import { LabelVueUtils } from "../Label/LabelVue.utils";
 import { ListboxOptions } from "../Listbox/Listbox";
 import type { ListboxOptionsSlots } from "../Listbox/Listbox.types";
 import { ListboxVueUtils } from "../Listbox/ListboxVue.utils";
@@ -41,7 +40,7 @@ import type {
 
 const SelectField = defineComponent(
     (props: SelectFieldProps, { slots, expose }: SlotsContext<InteractionControlSlots<SelectFlags>>) => {
-        const ariaLabel = LabelVueUtils.useAriaLabel(() => props.ariaLabel);
+        const { ariaLabel, ariaLabelledBy } = FormFieldVueUtils.useAriaName(() => props.ariaLabel);
         const ariaDescribedBy = FormFieldVueUtils.useAriaDescribedBy();
 
         const buttonRef = shallowRef<HTMLButtonElement>();
@@ -86,6 +85,7 @@ const SelectField = defineComponent(
             const commonProps = {
                 "aria-describedby": ariaDescribedBy.value,
                 "aria-label": ariaLabel.value,
+                "aria-labelledby": ariaLabelledBy.value,
                 "aria-disabled": isDisabled || undefined,
                 "aria-required": props.isRequired || undefined,
                 "aria-invalid": props.flags.hasError || undefined,
@@ -182,6 +182,7 @@ export const SelectComposite = defineComponent(
         const fallbackFieldId = useId();
 
         const labelContext = useLabelContext();
+        const captionId = FormFieldVueUtils.useAriaLabelledBy();
 
         const fieldRef = shallowRef<HTMLElement>();
         const hasPopoverSettled = shallowRef(true);
@@ -350,7 +351,7 @@ export const SelectComposite = defineComponent(
                                     {slots.renderClear && props.selectedOptions.length > 0 && (
                                         <div
                                             class={SelectStyles.selectClear}
-                                            style={{ right: `${spreadPadding.paddingRight}px` }}
+                                            style={{ insetInlineEnd: `${spreadPadding.paddingInlineEnd}px` }}
                                         >
                                             <Button
                                                 isDisabled={isDisabled}
@@ -372,7 +373,7 @@ export const SelectComposite = defineComponent(
                                         role={"listbox"}
                                         ariaAttributes={SelectUtils.computeListAriaAttributes({
                                             listAriaLabel: props.listAriaLabel,
-                                            labelId: labelContext.getLabelId(),
+                                            labelId: captionId.value ?? labelContext.getLabelId(),
                                             fieldId,
                                             isMultiple,
                                         })}

@@ -6,7 +6,7 @@ import { formatPrice } from "@thewaver/ss-playground/App/Pages/TablePage/TablePa
 import PageTableHeader from "../../PageComponents/TableHeader/TableHeader.vue";
 import PageTableCellContent from "../../StyledComponents/TableContent/PageTableCellContent.vue";
 import PageTableRowExpander from "../../StyledComponents/TableContent/PageTableRowExpander.vue";
-import type { Part, PartColumnDefs } from "./TablePage.types";
+import type { Part, PartColumnDefs } from "./TablePageVue.types";
 
 export * from "@thewaver/ss-playground/App/Pages/TablePage/TableParts.const";
 
@@ -53,7 +53,7 @@ export const createPartColumns = (defs: PartColumnDefs): TableColumn<Part>[] => 
     {
         id: "category",
         header: "Category",
-        widthPx: 120,
+        widthPx: defs.isReorderable ? 140 : 120,
         minWidthPx: 90,
         maxWidthPx: 240,
         isSortable: true,
@@ -66,7 +66,7 @@ export const createPartColumns = (defs: PartColumnDefs): TableColumn<Part>[] => 
     {
         id: "stock",
         header: "In stock",
-        widthPx: 100,
+        widthPx: defs.isReorderable ? 130 : 100,
         minWidthPx: 70,
         maxWidthPx: 200,
         isSortable: true,

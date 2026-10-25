@@ -8,9 +8,9 @@ import { PageCheckField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { BasicDocsExample } from "./Docs/Basic";
 import { DecoratedDocsExample } from "./Docs/Decorated";
-import { LabeledDocsExample } from "./Docs/Labeled";
 import { MixedDocsExample } from "./Docs/Mixed";
 import { RefusingDocsExample } from "./Docs/Refusing";
+import { RightToLeftDocsExample } from "./Docs/RightToLeft";
 import { TooltipDocsExample } from "./Docs/Tooltip";
 
 export const CheckboxDocs = () => {
@@ -50,41 +50,54 @@ export const CheckboxDocs = () => {
                 <BasicDocsExample hasError={getHasError} isDisabled={getIsDisabled} />
             </PageDocsExample>
 
-            <PageDocsSection title={"Mixed"}>
-                {
-                    "A checkbox can be neither on nor off. Set isMixed and it reads as mixed, to a screen reader as well as on screen, which is what a box summarizing others shows while they disagree. Pressing it sets a value, so here it turns both of the boxes it controls on or off."
+            <PageDocsSection
+                title={"Right to left"}
+                content={"Inside a box whose text runs right to left, the box sits to the right of its words."}
+            />
+
+            <PageDocsExample path={`${DOCS_ROOT}/RightToLeft.tsx`}>
+                <RightToLeftDocsExample />
+            </PageDocsExample>
+
+            <PageDocsSection
+                title={"Mixed"}
+                content={
+                    "A checkbox can be neither on nor off. Set [prop]isMixed[/prop] and it reads as mixed, to a screen reader as well as on screen, which is what a box summarizing others shows while they disagree. Pressing it sets a value, so here it turns both of the boxes it controls on or off."
                 }
-            </PageDocsSection>
+            />
 
             <PageDocsExample path={`${DOCS_ROOT}/Mixed.tsx`}>
                 <MixedDocsExample />
             </PageDocsExample>
 
-            <PageDocsSection title={"Refusing a change"}>
-                {
-                    "The checkbox reports a press through onChange and shows whatever its value then holds, so a change can be refused by writing the old value back. Here at least one way to be reached must stay on: whichever box is the last one on refuses to go off."
+            <PageDocsSection
+                title={"Refusing a change"}
+                content={
+                    "The checkbox reports a press through [prop]onChange[/prop] and shows whatever its value then holds, so a change can be refused by writing the old value back. Here at least one way to be reached must stay on: whichever box is the last one on refuses to go off."
                 }
-            </PageDocsSection>
+            />
 
             <PageDocsExample path={`${DOCS_ROOT}/Refusing.tsx`}>
                 <RefusingDocsExample />
             </PageDocsExample>
 
-            <PageDocsSection title={"Decoration"}>
-                {
-                    "Anything drawn over the box goes through renderDecoration, which is handed the checkbox's state like the painter is: here a corner highlight shows while it is pressed."
+            <PageDocsSection
+                title={"Decoration"}
+                content={
+                    "Anything drawn over the box goes through [prop]renderDecoration[/prop], which is handed the checkbox's state like the painter is: here a corner highlight shows while it is pressed."
                 }
-            </PageDocsSection>
+            />
 
             <PageDocsExample path={`${DOCS_ROOT}/Decorated.tsx`}>
                 <DecoratedDocsExample />
             </PageDocsExample>
 
-            <PageDocsSection title={"Tooltip"}>
-                {
-                    "Give a checkbox tooltipDefs and it shows a tooltip on hover and on keyboard focus, read by screen readers as the checkbox's description. A disabled checkbox shows no tooltip unless you also keep it reachable when disabled; it can then be focused to read why it is off, and pressing it still changes nothing."
+            <PageDocsSection
+                title={"Tooltip"}
+                content={
+                    "Give a checkbox [prop]tooltipDefs[/prop] and it shows a tooltip on hover and on keyboard focus, read by screen readers as the checkbox's description. A disabled checkbox shows no tooltip unless you also keep it reachable when disabled; it can then be focused to read why it is off, and pressing it still changes nothing."
                 }
-            </PageDocsSection>
+            />
 
             <PageDocsExample
                 path={`${DOCS_ROOT}/Tooltip.tsx`}
@@ -126,16 +139,6 @@ export const CheckboxDocs = () => {
                     isDisabled={getIsTooltipDisabled}
                     isReachableWhenDisabled={getIsReachableWhenDisabled}
                 />
-            </PageDocsExample>
-
-            <PageDocsSection title={"Named by a Label"}>
-                {
-                    "Inside a Label, the checkbox takes its name from the label's text, so it needs no ariaLabel, and pressing the text checks it too."
-                }
-            </PageDocsSection>
-
-            <PageDocsExample path={`${DOCS_ROOT}/Labeled.tsx`}>
-                <LabeledDocsExample />
             </PageDocsExample>
         </>
     );

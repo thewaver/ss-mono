@@ -39,7 +39,10 @@ export type BaseDateTimePickerValues = {
     clockGap?: number;
     /** The clock trigger's own element id. */
     timeTriggerId?: string;
-    /** Names the control that opens the clock. */
+    /**
+     * Names the control that opens the clock. It is kept inside a `Label` too, since the caption names the field and
+     * the control is a second one with a name of its own.
+     */
     timeTriggerAriaLabel: string;
 };
 

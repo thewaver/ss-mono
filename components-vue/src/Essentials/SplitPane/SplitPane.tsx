@@ -16,6 +16,8 @@ export const SplitPane = defineComponent(
 
         const paneIdPrefix = useId();
 
+        SplitPaneUtils.warnIfGutterUnnamed(props.panes, "gutterAriaLabel");
+
         const rootRef = shallowRef<HTMLDivElement>();
 
         let hasDragged = false;

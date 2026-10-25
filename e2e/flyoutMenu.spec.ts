@@ -1,6 +1,8 @@
 import { type Locator, type Page, expect, test } from "@playwright/test";
 
-import { demo } from "./helpers";
+import { docsDemo, docsSettled } from "./helpers";
+
+const DOCS = "/src/App/Pages/Menus/FlyoutMenuPage/Docs";
 
 /**
  * `FlyoutMenu` follows the W3C's fly-out menu tutorial: every entry is a link to its own page, and an entry with pages
@@ -11,8 +13,8 @@ import { demo } from "./helpers";
  * Entries and links are found by the text the page gives them and toggles by the name the library gives them, since
  * the toggle's name is what a screen reader hears; nothing here reads a colour or a size.
  */
-const SHOP = demo("shop");
-const NARROW = demo("narrow");
+const SHOP = docsDemo(DOCS, "Basic");
+const NARROW = docsDemo(DOCS, "Narrow");
 
 const linkIn = (page: Page, scope: string, name: string) =>
     page
@@ -44,8 +46,9 @@ const covers = async (outer: Locator, inner: Locator) => {
 };
 
 test.beforeEach(async ({ page }) => {
-    await page.goto("/flyout-menu");
+    await page.goto("/flyout-menu/docs");
     await expect(linkIn(page, SHOP, "Clothing")).toBeVisible();
+    await docsSettled(page);
 });
 
 test("every entry is a link, and only an entry with pages under it has a toggle, named after it", async ({ page }) => {

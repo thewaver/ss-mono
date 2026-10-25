@@ -8,6 +8,7 @@ import { DismisserSolidUtils } from "../../../Abstracts/Dismisser/DismisserSolid
 import { ElementFaderSolidUtils } from "../../../Abstracts/ElementFader/ElementFaderSolid.utils";
 import { FocusManagerSolidUtils } from "../../../Abstracts/FocusManager/FocusManagerSolid.utils";
 import { InteractionTrackerSolidUtils } from "../../../Abstracts/InteractionTracker/InteractionTrackerSolid.utils";
+import { NavigatorSolidUtils } from "../../../Abstracts/Navigator/NavigatorSolid.utils";
 import { useViewportContext } from "../../../Abstracts/Viewport/Viewport.context";
 import { access } from "../../../Utils/propUtils";
 import type { ModalProps } from "./ModalSolid.types";
@@ -36,6 +37,10 @@ export const Modal = (props: ModalProps) => {
         () => props.visibility[0](),
         { getTransitionDurationMs, getRef: getRootRef, onShow: props.onShow, onHide: props.onHide },
     );
+
+    const getOpener = createMemo(() => (props.visibility[0]() ? FocusManagerUtils.getFocusOrigin() : undefined));
+
+    const getDirection = NavigatorSolidUtils.createDirectionSignal(getOpener, () => !getIsVisible());
 
     FocusManagerSolidUtils.autoFocus(getContainerRef, getIsVisible, {
         getInitialRef: () => access(props.initialFocusRef),
@@ -131,7 +136,7 @@ export const Modal = (props: ModalProps) => {
                     class={[styles.modalRoot, styles.modalAlignmentVariants[getAlignment()]].join(" ")}
                     onKeyDown={(e) => FocusManagerUtils.focusTrapKeyDown(e, getContainerRef())}
                 >
-                    <div class={styles.modalOverlay} onClick={handleOverlayClick}>
+                    <div class={styles.modalOverlay} dir={getDirection()} onClick={handleOverlayClick}>
                         {props.renderOverlay(getTransitionTarget, getTransitionDurationMs)}
                     </div>
                     <div
@@ -145,6 +150,7 @@ export const Modal = (props: ModalProps) => {
                             "transition-property": "transform",
                             "transition-duration": `${getIsSwiping() ? 0 : getTransitionDurationMs()}ms`,
                         }}
+                        dir={getDirection()}
                         tabIndex={-1}
                         role={access(props.role) ?? MODAL_DEFAULTS.role}
                         aria-modal="true"

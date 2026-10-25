@@ -171,3 +171,49 @@ test("every source button is named for the example it belongs to", async ({ page
         );
     }
 });
+
+/**
+ * The tab strip scrolls when its tabs overrun it, and the pair of step buttons beside it is built on the strip's
+ * controller and shown only while there is somewhere to scroll — a pair that could do nothing is left out rather than
+ * drawn dead. Each step button names the box it scrolls through `aria-controls`, which is how it is told from the tabs
+ * and the section headers, whose `aria-controls` name panels. Whether a given example's tabs overrun depends on how
+ * many files it imports, so every source button on the page is opened and the pair is checked against the strip's own
+ * overflow each time, never against a written-down answer.
+ */
+test("the tab strip's step buttons are there exactly while the strip has somewhere to scroll", async ({ page }) => {
+    await page.goto("/shape");
+    await expect(page.locator("[data-example]").first()).toBeVisible();
+
+    const keys = await page
+        .locator('[data-example] [id$="Source"]')
+        .evaluateAll((buttons) => buttons.map((button) => button.id.replace(/Source$/, "")));
+
+    expect(keys.length, "the page has source buttons to open").toBeGreaterThan(0);
+
+    for (const key of keys) {
+        await openSource(page, key);
+
+        const strip = await page.locator(DIALOG).evaluate((dialog) => {
+            const tablist = dialog.querySelector('[role="tablist"]')!;
+            let box = tablist.parentElement;
+
+            while (box && box !== dialog && getComputedStyle(box).overflowX === "visible") box = box.parentElement;
+
+            const steppers = [...dialog.querySelectorAll("button[aria-controls]")].filter((button) =>
+                document.getElementById(button.getAttribute("aria-controls") ?? "")?.contains(tablist),
+            );
+
+            return {
+                overflows: box !== null && box.scrollWidth > box.clientWidth,
+                stepperCount: steppers.length,
+            };
+        });
+
+        expect(strip.stepperCount, `in ${key}'s source, a pair while the strip scrolls and none while it fits`).toBe(
+            strip.overflows ? 2 : 0,
+        );
+
+        await page.keyboard.press("Escape");
+        await expect(page.locator(DIALOG)).toHaveCount(0);
+    }
+});

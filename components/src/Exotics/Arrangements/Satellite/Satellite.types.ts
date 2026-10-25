@@ -1,4 +1,4 @@
-import type { CSSPadding, Point2d, Size2d } from "@thewaver/ss-utils";
+import type { CSSPhysicalPadding, Point2d, Size2d } from "@thewaver/ss-utils";
 
 import type { AnchorPlacement } from "../../../Abstracts/Anchor/Anchor.types";
 
@@ -9,6 +9,6 @@ export type SatelliteLayoutEntry = {
 };
 
 export type SatelliteLayout = {
-    padding: CSSPadding;
+    padding: CSSPhysicalPadding;
     satelliteOffsets: Point2d[];
 };

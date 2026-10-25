@@ -37,7 +37,9 @@ export type PaintedTextProps = BasePaintedTextProps & {
     /**
      * Whether the text slides along its path, a lap every `lapDurationMs`, going round for as long as it is on. Off
      * when left out, so text on a path stands still until asked to move. Anything moving for more than five seconds
-     * needs a way to pause it under WCAG 2.2.2, which is a control writing this.
+     * needs a way to pause it under
+     * {@link https://www.w3.org/WAI/WCAG22/Understanding/pause-stop-hide.html WCAG 2.2.2}, which is a control writing
+     * this.
      */
     "playback"?: boolean;
     /** Receives a change of playback, which is what `v-model:playback` binds. */

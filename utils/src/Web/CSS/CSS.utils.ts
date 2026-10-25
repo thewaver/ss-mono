@@ -6,8 +6,9 @@ import {
     type CSSBorderRadius,
     type CSSBorderWidth,
     type CSSCornerShape,
+    type CSSLogicalPadding,
     type CSSMargin,
-    type CSSPadding,
+    type CSSPhysicalPadding,
     type CSSTransformKey,
     CSS_FILTER_KEYS,
 } from "./CSS.types.js";
@@ -175,13 +176,22 @@ export namespace CSSUtils {
         borderLeftWidth: width,
     });
 
-    /** Applies one padding to all four sides. */
+    /** Applies one padding to all four sides of the screen. */
 
-    export const spreadPadding = (width: number): CSSPadding => ({
+    export const spreadPhysicalPadding = (width: number): CSSPhysicalPadding => ({
         paddingTop: width,
         paddingRight: width,
         paddingBottom: width,
         paddingLeft: width,
+    });
+
+    /** Applies one padding to all four sides of the text. See {@link CSSLogicalPadding}. */
+
+    export const spreadLogicalPadding = (width: number): CSSLogicalPadding => ({
+        paddingBlockStart: width,
+        paddingInlineEnd: width,
+        paddingBlockEnd: width,
+        paddingInlineStart: width,
     });
 
     /** Applies one margin to all four sides. */
@@ -200,12 +210,14 @@ export namespace CSSUtils {
      * Lets one set of numbers feed several CSS properties — the same four values can
      * become `padding-*` on one element and `inset-*` on another.
      *
-     * @param entries The numbers, such as the result of {@link spreadPadding}.
+     * @param entries The numbers, such as the result of {@link spreadPhysicalPadding}.
      * @param mapKey Turns each key into the CSS property name you want.
      * @returns A style object whose values all carry `px`.
      */
 
-    export const spreadableToStyle = <T extends CSSBorderRadius | CSSBorderWidth | CSSPadding | CSSMargin>(
+    export const spreadableToStyle = <
+        T extends CSSBorderRadius | CSSBorderWidth | CSSPhysicalPadding | CSSLogicalPadding | CSSMargin,
+    >(
         entries: T,
         mapKey: (key: keyof T) => string,
     ) => Object.fromEntries(Object.entries(entries).map(([key, value]) => [mapKey(key as keyof T), `${value}px`]));

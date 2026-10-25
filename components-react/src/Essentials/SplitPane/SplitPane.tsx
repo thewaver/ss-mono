@@ -1,4 +1,4 @@
-import { Fragment, type KeyboardEvent, type PointerEvent, useId, useMemo, useRef, useState } from "react";
+import { Fragment, type KeyboardEvent, type PointerEvent, useEffect, useId, useMemo, useRef, useState } from "react";
 
 import type { SplitPaneCollapsedBoundaries } from "@thewaver/ss-components";
 import { SPLIT_PANE_DEFAULTS, SplitPaneStyles, SplitPaneUtils } from "@thewaver/ss-components";
@@ -12,6 +12,8 @@ export const SplitPane = (props: SplitPaneProps) => {
     const [storedRatios, setRatios] = props.ratios;
 
     const paneIdPrefix = useId();
+
+    useEffect(() => SplitPaneUtils.warnIfGutterUnnamed(props.panes, "gutterAriaLabel"), []);
 
     const rootRef = useRef<HTMLDivElement | null>(null);
     const hasDraggedRef = useRef(false);

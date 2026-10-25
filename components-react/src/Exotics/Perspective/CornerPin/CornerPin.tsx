@@ -149,7 +149,10 @@ export const CornerPin = (props: CornerPinProps) => {
             aria-roledescription={props.roleDescription ?? CORNER_PIN_DEFAULTS.roleDescription}
             aria-label={props.ariaLabel}
             onKeyDown={(e) => {
-                if (e.key === "Escape") setPicked(undefined);
+                if (e.key !== "Escape" || picked === undefined) return;
+
+                e.preventDefault();
+                setPicked(undefined);
             }}
         >
             <div className={styles.cornerPinSurface} style={{ transform }}>

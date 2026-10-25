@@ -1,4 +1,4 @@
-import { type Accessor, createRenderEffect, onCleanup } from "solid-js";
+import { type Accessor, createRenderEffect, createUniqueId, onCleanup } from "solid-js";
 
 import { LabelUtils } from "@thewaver/ss-components";
 
@@ -21,7 +21,7 @@ export namespace LabelSolidUtils {
     export const resolveAriaLabel = (getAriaLabel?: () => string) => {
         const labelContext = useLabelContext();
 
-        LabelUtils.warnIfShadowed(labelContext.getIsLabeled(), getAriaLabel !== undefined, "getAriaLabel");
+        LabelUtils.warnIfShadowed(labelContext.getIsLabeled(), getAriaLabel !== undefined, "ariaLabel");
 
         return () => LabelUtils.resolveAriaLabel(labelContext.getIsLabeled(), getAriaLabel?.());
     };
@@ -45,5 +45,33 @@ export namespace LabelSolidUtils {
         createRenderEffect(() => labelContext.setControlId(getId()));
 
         onCleanup(() => labelContext.setControlId(undefined));
+    };
+
+    /**
+     * Gives a caption inside a `Label` an id and tells the `Label` it is the caption, so the control is named by the
+     * caption's words alone.
+     *
+     * A `<label>` names its control from all the text inside it, so a control drawing a named button of its own — a
+     * date picker's calendar button — would be announced with the button's name folded in. Once a caption registers
+     * here, the controls inside point `aria-labelledby` at it instead; the `<label>` element stays, so pressing the
+     * caption still focuses the control. A caption that never registers leaves the `<label>` to name the control as a
+     * native one does. Outside a `Label` it does nothing, and the caption is withdrawn when it goes away.
+     *
+     * Must run inside a component.
+     *
+     * @param getId The caption's own id, if it has one. Left out, or answering `undefined`, an id is generated.
+     * @returns An accessor giving the id to put on the caption's element, or the caller's own id outside a `Label`.
+     */
+    export const registerCaptionId = (getId?: Accessor<string | undefined>) => {
+        const labelContext = useLabelContext();
+        const fallbackId = createUniqueId();
+
+        const getCaptionId = () => (labelContext.getIsLabeled() ? (getId?.() ?? fallbackId) : getId?.());
+
+        createRenderEffect(() => labelContext.setCaptionId(getCaptionId()));
+
+        onCleanup(() => labelContext.setCaptionId(undefined));
+
+        return getCaptionId;
     };
 }

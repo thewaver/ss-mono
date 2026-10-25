@@ -1,15 +1,22 @@
-import { type SlotsType, defineComponent, nextTick, shallowRef, useId } from "vue";
+import { type SlotsType, computed, defineComponent, nextTick, shallowRef, useId, watch } from "vue";
 
 import {
+    DATE_INPUT_DEFAULTS,
     DATE_RANGE_PICKER_DEFAULTS,
     DateRangePickerStyles,
     DateRangePickerUtils,
     type DateValue,
+    type DateValueCalendarId,
     type DateValueRange,
     DateValueUtils,
+    type InteractionFlags,
+    InteractionTrackerUtils,
     type PopupTriggerFlags,
+    type TextFieldFlags,
+    TextFieldUtils,
 } from "@thewaver/ss-components";
 
+import { NavigatorVueUtils } from "../../../Abstracts/Navigator/NavigatorVue.utils";
 import { SignalMirrorVueUtils } from "../../../Abstracts/SignalMirror/SignalMirrorVue.utils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import type {
@@ -22,13 +29,16 @@ import { PopupTrigger } from "../../../Primitives/PopupTrigger/PopupTrigger";
 import { watchAfterRender } from "../../../Utils/effectUtils";
 import { callSlot, declareProps, forwardProps, useTwoWay } from "../../../Utils/propUtils";
 import type { SlotsContext } from "../../../Utils/typeUtils";
+import { Tooltip } from "../../Overlays/Tooltip/Tooltip";
+import type { TooltipSlots } from "../../Overlays/Tooltip/Tooltip.types";
 import type { CalendarSlots } from "../Calendar/Calendar.types";
 import { DateInput } from "../DateInput/DateInput";
 import type { DateInputSlots } from "../DateInput/DateInput.types";
 import { RangeCalendar } from "../RangeCalendar/RangeCalendar";
 import type { DateRangePickerProps, DateRangePickerSlots } from "./DateRangePicker.types";
 
-const toMonth = (value: DateValue): DateValue => DateValueUtils.getStartOfMonth(value);
+const toMonth = (value: DateValue, calendar: DateValueCalendarId): DateValue =>
+    DateValueUtils.getStartOfMonth(DateValueUtils.withCalendar(value, calendar));
 
 export const DateRangePicker = defineComponent(
     (props: DateRangePickerProps, { slots }: SlotsContext<DateRangePickerSlots>) => {
@@ -39,7 +49,12 @@ export const DateRangePicker = defineComponent(
         const fallbackFieldId = useId();
 
         const rootRef = shallowRef<HTMLDivElement>();
-        const month = shallowRef(toMonth(range.value?.start ?? DateValueUtils.fromDate(new Date())));
+
+        const direction = NavigatorVueUtils.useDirection(rootRef);
+
+        const getCalendar = () => props.calendar ?? DATE_INPUT_DEFAULTS.calendar;
+
+        const month = shallowRef(toMonth(range.value?.start ?? DateValueUtils.fromDate(new Date()), getCalendar()));
 
         let isFocusReturned = false;
 
@@ -49,10 +64,11 @@ export const DateRangePicker = defineComponent(
         );
 
         const getIsDisabled = () => props.isDisabled ?? false;
+        const getIsLocked = () => getIsDisabled() || (props.isReadOnly ?? false);
         const getEndFieldId = () => `${props.id ?? fallbackFieldId}-end`;
 
         const open = () => {
-            if (getIsDisabled()) return;
+            if (getIsLocked()) return;
 
             isOpen.value = true;
         };
@@ -64,13 +80,36 @@ export const DateRangePicker = defineComponent(
             isOpen.value = false;
         };
 
-        watchAfterRender([isOpen, getIsDisabled], ([isShown, isDisabled]) => {
-            if (isShown && isDisabled) isOpen.value = false;
+        watchAfterRender([isOpen, getIsLocked], ([isShown, isLocked]) => {
+            if (isShown && isLocked) isOpen.value = false;
         });
 
         watchAfterRender([isOpen], ([isShown]) => {
-            if (isShown && range.value?.start) month.value = toMonth(range.value.start);
+            if (isShown && range.value?.start) month.value = toMonth(range.value.start, getCalendar());
         });
+
+        watch(getCalendar, (calendar) => {
+            month.value = toMonth(month.value, calendar);
+        });
+
+        const startFlags = shallowRef<InteractionFlags<TextFieldFlags>>();
+        const endFlags = shallowRef<InteractionFlags<TextFieldFlags>>();
+
+        const getPairFlags = () =>
+            TextFieldUtils.mergeFlags([startFlags.value, endFlags.value].flatMap((flags) => (flags ? [flags] : [])));
+
+        const tooltipDefs = computed(() => {
+            const defs = props.tooltipDefs;
+            const isDisabled = getIsDisabled();
+            const isReachable = InteractionTrackerUtils.computeIsReachable(
+                isDisabled,
+                props.isReachableWhenDisabled ?? false,
+            );
+
+            return defs && (!isDisabled || isReachable) ? defs : undefined;
+        });
+
+        const lastTooltipDefs = computed<typeof tooltipDefs.value>((previous) => tooltipDefs.value ?? previous);
 
         watchAfterRender([isOpen], ([isShown]) => {
             if (isShown || !isFocusReturned) return;
@@ -111,10 +150,15 @@ export const DateRangePicker = defineComponent(
         );
 
         return () => {
-            const isDisabled = getIsDisabled();
+            const isLocked = getIsLocked();
+
+            const renderFieldContent = (flagsRef: typeof startFlags) => (flags: InteractionFlags<TextFieldFlags>) => {
+                flagsRef.value = flags;
+
+                return callSlot(slots.renderContent, flags);
+            };
 
             const fieldSlots = {
-                renderContent: slots.renderContent,
                 renderPlaceholder: slots.renderPlaceholder,
                 renderLeading: slots.renderLeading,
                 renderDecoration: slots.renderDecoration,
@@ -130,6 +174,7 @@ export const DateRangePicker = defineComponent(
                 "id": props.id && `${props.id}-start`,
                 "name": props.name && `${props.name}-start`,
                 "ariaLabel": props.startLabel,
+                "tooltipDefs": undefined,
             };
 
             const endField = {
@@ -142,11 +187,12 @@ export const DateRangePicker = defineComponent(
                 "id": getEndFieldId(),
                 "name": props.name && `${props.name}-end`,
                 "ariaLabel": props.endLabel,
+                "tooltipDefs": undefined,
             };
 
             const renderTrigger = () => (
                 <InteractionWrapper
-                    isDisabled={isDisabled}
+                    isDisabled={isLocked}
                     extraFlags={{ isOpen: isOpen.value } satisfies PopupTriggerFlags}
                 >
                     {
@@ -175,7 +221,14 @@ export const DateRangePicker = defineComponent(
 
             return (
                 <div ref={rootRef} class={DateRangePickerStyles.dateRangePickerRoot}>
-                    <DateInput {...startField}>{fieldSlots}</DateInput>
+                    <DateInput {...startField}>
+                        {
+                            {
+                                ...fieldSlots,
+                                renderContent: renderFieldContent(startFlags),
+                            } satisfies Partial<DateInputSlots>
+                        }
+                    </DateInput>
 
                     {callSlot(slots.renderSeparator, undefined)}
 
@@ -183,6 +236,7 @@ export const DateRangePicker = defineComponent(
                         {
                             {
                                 ...fieldSlots,
+                                renderContent: renderFieldContent(endFlags),
                                 renderTrailing: renderTrigger,
                             } satisfies Partial<DateInputSlots>
                         }
@@ -194,7 +248,7 @@ export const DateRangePicker = defineComponent(
                         ariaAttributes={{ "aria-label": props.calendarLabel }}
                         isOpen={isOpen.value}
                         anchorRef={rootRef.value}
-                        placement={props.placement ?? DATE_RANGE_PICKER_DEFAULTS.placement}
+                        placement={props.placement ?? DATE_RANGE_PICKER_DEFAULTS.placement[direction.value]}
                         offset={props.offset}
                         transitionDurationMs={props.popupTransitionDurationMs}
                         hasAutoFocus={true}
@@ -215,6 +269,26 @@ export const DateRangePicker = defineComponent(
                             } satisfies PopoverSlots
                         }
                     </Popover>
+
+                    {lastTooltipDefs.value &&
+                        (() => {
+                            const { renderContent, ...tooltipProps } = lastTooltipDefs.value;
+
+                            return (
+                                <Tooltip
+                                    {...tooltipProps}
+                                    isAnchorGroup={true}
+                                    anchorRef={tooltipDefs.value ? rootRef.value : undefined}
+                                >
+                                    {
+                                        {
+                                            renderContent: (content) =>
+                                                renderContent({ ...content, flags: getPairFlags() }),
+                                        } satisfies TooltipSlots
+                                    }
+                                </Tooltip>
+                            );
+                        })()}
                 </div>
             );
         };
@@ -243,6 +317,7 @@ export const DateRangePicker = defineComponent(
             "isRequired": Boolean,
             "autoComplete": null,
             "isConcealed": Boolean,
+            "isLeftToRight": Boolean,
             "padding": null,
             "gap": null,
             "ariaAttributes": null,

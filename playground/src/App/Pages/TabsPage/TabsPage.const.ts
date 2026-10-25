@@ -1,4 +1,4 @@
-import type { Tab } from "@thewaver/ss-components";
+import { type HoneycombDefs, PlacementLayoutUtils, type Tab } from "@thewaver/ss-components";
 
 export const ROW_TAB_GAP = 10;
 
@@ -123,3 +123,13 @@ export const EXAMPLE_NAMES = {
 };
 
 export const EXAMPLES_ROOT = "/src/App/Pages/TabsPage/Examples";
+
+export const DOCS_ROOT = "/src/App/Pages/TabsPage/Docs";
+
+export const BASIC_TABS = withIds("basic", [{ value: "Render" }, { value: "Source" }, { value: "Export" }]);
+
+export const HONEYCOMB_DEFS: HoneycombDefs = { perRow: 3, gapRatio: 0 };
+
+export const HONEYCOMB_LAYOUT = PlacementLayoutUtils.createHoneycomb(HONEYCOMB_DEFS);
+
+export const HONEYCOMB_WIDTH = "294px";

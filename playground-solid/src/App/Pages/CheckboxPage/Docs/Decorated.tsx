@@ -15,7 +15,7 @@ export const DecoratedDocsExample = () => {
             checked={checkedSignal}
             ariaLabel={"Decorated checkbox"}
             isPressed={checkedSignal[0]}
-            renderContent={(getFlags) => <PageCheckboxContent flags={getFlags} />}
+            renderContent={(getFlags) => <PageCheckboxContent flags={getFlags}>Decorated checkbox</PageCheckboxContent>}
             renderDecoration={(getFlags) => (
                 <CornerHighlight
                     color={() => (getFlags().isPressed ? "yellow" : "transparent")}

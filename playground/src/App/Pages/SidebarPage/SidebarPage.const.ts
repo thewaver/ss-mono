@@ -41,3 +41,13 @@ export const VARIANTS: {
         note: "resting on it expands it without touching the state; the button still pins it open",
     },
 ];
+
+export const DOCS_ROOT = "/src/App/Pages/SidebarPage/Docs";
+
+export const FIELD_WIDTH = 110;
+
+export const COLLAPSED_SIZE = 48;
+
+export const EXPANDED_SIZE = 200;
+
+export const MAILBOXES = ["Inbox", "Drafts", "Sent", "Archive", "Spam"];

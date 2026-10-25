@@ -1,11 +1,17 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { accessibleText, activeMatches, attributesOf, centerDistance, demo } from "./helpers";
+import { accessibleText, activeMatches, attributesOf, centerDistance, docsDemo, docsSettled } from "./helpers";
 
-const SINGLE = demo("single");
-const MULTIPLE = demo("multiple");
-const HORIZONTAL = demo("horizontalRightToLeft");
-const GLIDE = demo("glide");
+/**
+ * The one-value list is the Basic example, the several-value list with groups is Groups, the right-to-left list
+ * starts horizontal and holds nothing picked, and Glide starts with its markers on.
+ */
+const DOCS = "/src/App/Pages/ListboxPage/Docs";
+
+const SINGLE = docsDemo(DOCS, "Basic");
+const MULTIPLE = docsDemo(DOCS, "Groups");
+const HORIZONTAL = docsDemo(DOCS, "RightToLeft");
+const GLIDE = docsDemo(DOCS, "Glide");
 
 const LISTBOX = '[role="listbox"]';
 const GROUP_HEADER = '[role="group"] [data-checked-state]';
@@ -40,8 +46,9 @@ const disabledIndexes = (page: Page, scope: string) =>
 const QUERY_TIMEOUT_MS = 1_200;
 
 test.beforeEach(async ({ page }) => {
-    await page.goto("/listbox");
-    await expect(page.locator("[data-example]").first()).toBeVisible();
+    await page.goto("/listbox/docs");
+    await expect(page.locator(options(SINGLE)).first()).toBeVisible();
+    await docsSettled(page);
 });
 
 test("each list is a named listbox that says its orientation, and whether it holds several values", async ({
@@ -75,7 +82,7 @@ test("each list is a named listbox that says its orientation, and whether it hol
 /**
  * The options take focus themselves, so the list is one tab stop: the picked option carries it, and a list with
  * nothing picked puts it on the first option. Tab goes in onto that option, and the next Tab leaves the list
- * rather than walking along it.
+ * rather than walking along it, and Shift+Tab leaves it the other way.
  */
 test("the list is one tab stop, on the picked option or on the first when nothing is picked", async ({ page }) => {
     const selected = await selectedFlags(page, SINGLE);
@@ -90,7 +97,14 @@ test("the list is one tab stop, on the picked option or on the first when nothin
         unpicked.map((_stop, index) => (index === 0 ? "0" : "-1")),
     );
 
-    await page.locator("#singleSource").focus();
+    await option(page, SINGLE, selected.indexOf(true)).focus();
+    await page.keyboard.press("Shift+Tab");
+
+    expect(
+        await page.evaluate((selector) => !!document.activeElement?.closest(selector), `${SINGLE} ${LISTBOX}`),
+        "Shift+Tab leaves the list rather than walking back along it",
+    ).toBe(false);
+
     await page.keyboard.press("Tab");
 
     expect(await focusedIndex(page, SINGLE), "Tab goes in onto the picked option").toBe(selected.indexOf(true));

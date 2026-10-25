@@ -21,6 +21,7 @@ export const Tooltip = (props: TooltipProps) => {
     const [isShown, setIsShown] = shownState;
 
     const anchorRef = useLatest(props.anchorRef ?? null);
+    const [isAnchorGroup] = useState(props.isAnchorGroup ?? false);
     const contentRef = useRef<HTMLDivElement | null>(null);
 
     const transitionDurationMs = props.transitionDurationMs ?? TOOLTIP_DEFAULTS.transitionDurationMs;
@@ -32,6 +33,7 @@ export const Tooltip = (props: TooltipProps) => {
         skipDelayWindowMs: props.skipDelayWindowMs ?? TOOLTIP_DEFAULTS.skipDelayWindowMs,
         focusShowDelayMs: props.focusShowDelayMs ?? TOOLTIP_DEFAULTS.focusShowDelayMs,
         isHiddenOnAnchorBlur: true,
+        isFocusWithin: isAnchorGroup,
     });
 
     const fader = ElementFaderReactUtils.useFader(isShown, { transitionDurationMs, ref: contentRef });
@@ -40,7 +42,7 @@ export const Tooltip = (props: TooltipProps) => {
         anchorRef,
         fader.isVisible,
         {
-            placement: props.placement,
+            computePlacement: () => props.placement,
             offset: props.offset,
             reservedScreenSize: props.reservedScreenSize,
         },
@@ -89,6 +91,24 @@ export const Tooltip = (props: TooltipProps) => {
     useEffect(
         () => (props.anchorRef && fader.isVisible ? TooltipUtils.describe(props.anchorRef, tooltipId) : undefined),
         [props.anchorRef, fader.isVisible, tooltipId],
+    );
+
+    const [focusedControl, setFocusedControl] = useState<HTMLElement>();
+
+    useEffect(() => {
+        if (!props.anchorRef || !isAnchorGroup) return;
+
+        const stop = TooltipUtils.followFocusWithin(props.anchorRef, setFocusedControl);
+
+        return () => {
+            stop();
+            setFocusedControl(undefined);
+        };
+    }, [props.anchorRef, isAnchorGroup]);
+
+    useEffect(
+        () => (focusedControl && fader.isVisible ? TooltipUtils.describe(focusedControl, tooltipId) : undefined),
+        [focusedControl, fader.isVisible, tooltipId],
     );
 
     if (!fader.isVisible) return null;

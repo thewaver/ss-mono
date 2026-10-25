@@ -1,3 +1,5 @@
+import { For, Show } from "solid-js";
+
 import { access } from "@thewaver/ss-components-solid";
 import { NO_FILES } from "@thewaver/ss-playground/App/StyledComponents/FileDropZoneContent/FileDropZoneContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/FileDropZoneContent/FileDropZoneContent.css";
@@ -26,11 +28,16 @@ export const PageFileDropZoneContent = (props: FileDropZoneContentProps) => {
                 class={styles.fileDropZoneNames}
                 classList={{ [styles.isEmpty]: !access(props.renderProps).files.length }}
             >
-                {access(props.renderProps).files.length
-                    ? access(props.renderProps)
-                          .files.map((file) => file.name)
-                          .join(", ")
-                    : NO_FILES}
+                <Show when={access(props.renderProps).files.length} fallback={NO_FILES}>
+                    <For each={access(props.renderProps).files}>
+                        {(file, getIndex) => (
+                            <>
+                                {getIndex() > 0 && ", "}
+                                <bdi>{file.name}</bdi>
+                            </>
+                        )}
+                    </For>
+                </Show>
             </div>
         </div>
     );

@@ -7,6 +7,8 @@ export const EXAMPLE_NAMES = {
 
 export const EXAMPLES_ROOT = "/src/App/Pages/Menus/FlyoutMenuPage/Examples";
 
+export const DOCS_ROOT = "/src/App/Pages/Menus/FlyoutMenuPage/Docs";
+
 export const FIELD_WIDTH = 110;
 
 export const NOTHING_FOLLOWED = "no link followed yet";

@@ -25,6 +25,35 @@ export const prop = (key: string) => `[data-prop][data-testid="${key}"]`;
 export const demo = (key: string) => `${example(key)} [data-demo]`;
 
 /**
+ * A Docs view's live example, found by the file its code is read from. The demo carries that file's path as its key,
+ * and the path is the same in all four Playgrounds but for the extension, so the match stops at the dot: `Basic`
+ * finds `Basic.tsx`, `Basic.vue` and `Basic.svelte`, and never `BasicGrouped.tsx`. `root` is the page's
+ * `DOCS_ROOT`. A file renamed is a key renamed, and moves with the spec's locators in the same change.
+ */
+export const docsDemo = (root: string, name: string) =>
+    `[data-docs-example] [data-demo][data-testid^="${root}/${name}."]`;
+
+/**
+ * Waits until every live example on a Docs view has its "Show code" box under it. Each box arrives only once its
+ * source file has loaded, after the page has drawn, and each one pushes everything below it down the page — so a
+ * pointer aimed at a control before then can land where the control used to be, and a hover is lost. A spec that
+ * points at anything on a Docs view waits for this first.
+ */
+export const docsSettled = (page: Page) =>
+    page.waitForFunction(() => {
+        const examples = [...document.querySelectorAll("[data-docs-example]")];
+
+        return examples.length > 0 && examples.every((example) => example.nextElementSibling !== null);
+    });
+
+/**
+ * The whole box of a Docs view's live example — the demo and the knobs beside it — for a knob whose key another
+ * example on the same page also uses, such as two examples each with an orientation.
+ */
+export const docsExample = (root: string, name: string) =>
+    `[data-docs-example]:has([data-demo][data-testid^="${root}/${name}."])`;
+
+/**
  * An example's own knobs sit in a popup its card opens from a settings button, so a props row belonging to
  * one example is not in the document until that popup is open. This opens it when the row is not already on
  * screen — the named example's popup when one is given, otherwise each card's in turn until the row appears.

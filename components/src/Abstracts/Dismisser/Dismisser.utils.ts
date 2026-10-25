@@ -1,7 +1,9 @@
+import { type Store, StoreUtils } from "@thewaver/ss-utils";
+
 import type { DismisserLayerDefs } from "./Dismisser.types";
 
-/** Every open layer, oldest first, so the last entry is the topmost. */
-const layers: DismisserLayerDefs[] = [];
+/** Every open layer, oldest first, so the last entry is the topmost. Replaced rather than edited on each change. */
+const layers = StoreUtils.create<readonly DismisserLayerDefs[]>([]);
 
 /**
  * Tests whether a node belongs to a layer, following ownership as well as nesting.
@@ -51,7 +53,7 @@ const getIsOutside = (layer: DismisserLayerDefs, target: Node | null) =>
 const dismissOutside = (target: Node | null, reason: "press" | "focus") => {
     if (!target) return;
 
-    for (const layer of [...layers].reverse()) {
+    for (const layer of [...layers.get()].reverse()) {
         if (getIsOutside(layer, target)) layer.onDismiss(reason);
     }
 };
@@ -66,11 +68,15 @@ const handleFocusOut = (e: FocusEvent) => {
     dismissOutside(e.relatedTarget as Node | null, "focus");
 };
 
+/** Whether a key press is an Escape nothing has answered yet. One whose default something already prevented was used for that thing's own purpose. */
+const getIsUnansweredEscape = (e: Pick<KeyboardEvent, "key" | "defaultPrevented">) =>
+    e.key === "Escape" && !e.defaultPrevented;
+
 /** Escape closes only the topmost layer, so nested layers unwind one at a time. */
 const handleKeyDown = (e: KeyboardEvent) => {
-    if (e.key !== "Escape") return;
+    if (!getIsUnansweredEscape(e)) return;
 
-    const top = layers[layers.length - 1];
+    const top = layers.get().at(-1);
 
     if (!top) return;
 
@@ -99,7 +105,9 @@ const detach = () => {
  * All open layers share one set of document listeners, attached when the first opens and removed
  * when the last closes, so a page with nothing open pays nothing. Layers form a stack: a press
  * outside closes every layer it fell outside of, topmost first, which unwinds a submenu and its
- * parent together; Escape closes only the topmost, which unwinds them one step at a time.
+ * parent together; Escape closes only the topmost, which unwinds them one step at a time. An Escape
+ * something already answered — a drag it canceled, focus it handed back — calls `preventDefault`,
+ * and the stack then leaves it alone.
  */
 export namespace DismisserUtils {
     /**
@@ -129,7 +137,46 @@ export namespace DismisserUtils {
      *
      * @returns The layer, as it was handed to {@link addLayer}.
      */
-    export const getTopLayer = () => layers.findLast((layer) => !layer.isPassive);
+    export const getTopLayer = () => layers.get().findLast((layer) => !layer.isPassive);
+
+    /**
+     * Every open layer, oldest first, as a store.
+     *
+     * The list is replaced rather than edited on each change, so a reader following it hears about every layer
+     * added or removed — which is how a layer learns that one opened above it, or that the one above it closed.
+     * Read {@link getTopLayerInGroup} or {@link getIsTopForInput} for the questions most callers are asking.
+     */
+    export const openLayers: Store<readonly DismisserLayerDefs[]> = { get: layers.get, subscribe: layers.subscribe };
+
+    /**
+     * The topmost open layer of a group, or `undefined` while none of the group is open.
+     *
+     * Layers of one kind that must not act at the same time — two spotlights, each wanting the reader's whole
+     * attention — share a `group`, and only the one this returns acts. Passive layers count, unlike in
+     * {@link getTopLayer}, since the question is which of the group was opened last, not where input goes. A layer
+     * of another group or of none, open above or below, makes no difference.
+     *
+     * @param group The name the layers were registered under.
+     * @returns The layer, as it was handed to {@link addLayer}.
+     */
+    export const getTopLayerInGroup = (group: string) => layers.get().findLast((layer) => layer.group === group);
+
+    /**
+     * Whether a key pressed now is a layer's to answer: it is open, and nothing above it takes input of its own.
+     *
+     * For a layer that takes input this is the same as being {@link getTopLayer}. A passive layer has no such
+     * answer, so for one this says whether it sits above every layer that does — a passive layer under a dialog
+     * is not answering keys meant for the dialog.
+     *
+     * @param layer The layer, as it was handed to {@link addLayer}.
+     * @returns `false` while the layer is not open.
+     */
+    export const getIsTopForInput = (layer: DismisserLayerDefs) => {
+        const open = layers.get();
+        const index = open.indexOf(layer);
+
+        return index >= 0 && open.slice(index + 1).every((above) => above.isPassive);
+    };
 
     /**
      * Registers an open layer, to be dismissed until the returned function is called.
@@ -139,22 +186,22 @@ export namespace DismisserUtils {
      *
      * @param defs The layer's own elements, and what to do when it is dismissed. The reason is passed
      * on, since a layer often wants to return focus to its trigger after Escape but not after a press
-     * elsewhere. `isPassive` marks a layer that takes no input of its own, which {@link getTopLayer} skips.
+     * elsewhere. `isPassive` marks a layer that takes no input of its own, which {@link getTopLayer} skips, and is
+     * read whenever the stack is asked, so a getter may answer it. `group` names a set of layers of which only the
+     * topmost should act, for {@link getTopLayerInGroup}.
      * @returns The function that takes the layer off the stack again, for when it closes.
      */
     export const addLayer = (defs: DismisserLayerDefs) => {
-        layers.push(defs);
+        layers.update((current) => [...current, defs]);
 
-        if (layers.length === 1) attach();
+        if (layers.get().length === 1) attach();
 
         return () => {
-            const index = layers.indexOf(defs);
+            if (!layers.get().includes(defs)) return;
 
-            if (index < 0) return;
+            layers.update((current) => current.filter((layer) => layer !== defs));
 
-            layers.splice(index, 1);
-
-            if (layers.length === 0) detach();
+            if (layers.get().length === 0) detach();
         };
     };
 }

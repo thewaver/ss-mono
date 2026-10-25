@@ -24,9 +24,14 @@ const layerClass = useLayerClass();
             flags.isDisabled && styles.isDisabled,
             flags.hasError && styles.hasError,
         ]"
+        aria-hidden="true"
     >
-        <div :class="styles.checkboxMark" aria-hidden="true">
-            {{ flags.checkedState === "mixed" ? MIXED_MARK : CHECKED_MARK }}
+        <div :class="styles.checkboxBox">
+            <div :class="styles.checkboxMark">
+                {{ flags.checkedState === "mixed" ? MIXED_MARK : CHECKED_MARK }}
+            </div>
         </div>
+
+        <slot />
     </div>
 </template>

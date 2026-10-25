@@ -7,10 +7,9 @@ import type {
     ScrollerBarRefs,
     ScrollerBarRenderProps,
     ScrollerBarSide,
+    ScrollerCbs,
     ScrollerMetrics,
     ScrollerProgress,
-    ScrollerStep,
-    ScrollerStepper,
 } from "@thewaver/ss-components";
 
 export type ScrollerBarProps = BaseScrollerCbs & {
@@ -40,28 +39,25 @@ export type ScrollerBarProps = BaseScrollerCbs & {
     renderBar: Snippet<[renderProps: ScrollerBarRenderProps, refs: ScrollerBarRefs]>;
 };
 
-export type ScrollerProps = BaseScrollerProps & {
-    /**
-     * How far the box is scrolled across and down, each from `0` to `1`. It is the only thing that scrolls it: the
-     * box writes its position as it moves, and a value written from outside scrolls it there, on whichever axis
-     * changed. Bind it with `bind:progress` to drive or follow it; left unbound, the box keeps its own.
-     */
-    progress?: ScrollerProgress;
-    /**
-     * Draws one scroll control. It is handed which step it is, a stepper bound to its direction for holding it
-     * down to keep scrolling, and that direction: `x` for the pair stepping across, `y` for the pair stepping
-     * down.
-     */
-    renderButton: Snippet<[step: ScrollerStep, stepper: ScrollerStepper, axis: ScrollerAxis]>;
-    /**
-     * Draws the bar for one scrolling direction, which the box then keeps in step with its position. Leave it out
-     * and no bar is drawn; the browser's own is hidden either way. The painter is handed the bar's state and two
-     * refs: the track, which the thumb's length is measured against and which takes presses, and the thumb, which
-     * a press drags. Track and thumb are placed and sized however the painter likes; the thumb's thickness is the
-     * painter's to keep at 24 pixels or more, as WCAG 2.5.8 asks of a target. The library draws the bar's role,
-     * its value and its link to the box, and the bar takes no focus: the keyboard scrolls the box itself.
-     */
-    renderBar?: Snippet<[renderProps: ScrollerBarRenderProps, refs: ScrollerBarRefs]>;
-    /** The run of items the strip scrolls. They are rendered as they are, inside the track. */
-    children?: Snippet;
-};
+export type ScrollerProps = BaseScrollerProps &
+    ScrollerCbs & {
+        /**
+         * How far the box is scrolled across and down, each from `0` to `1`. It is the only thing that scrolls it: the
+         * box writes its position as it moves, and a value written from outside scrolls it there, on whichever axis
+         * changed. Bind it with `bind:progress` to drive or follow it; left unbound, the box keeps its own.
+         */
+        progress?: ScrollerProgress;
+        /**
+         * Draws the bar for one scrolling direction, which the box then keeps in step with its position. Leave it out
+         * and no bar is drawn; the browser's own is hidden either way. The painter is handed the bar's state and two
+         * refs: the track, which the thumb's length is measured against and which takes presses, and the thumb, which a
+         * press drags. Track and thumb are placed and sized however the painter likes; the thumb's thickness is the
+         * painter's to keep at 24 pixels or more, as
+         * {@link https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html WCAG 2.5.8} asks of a target. The
+         * library draws the bar's role, its value and its link to the box, and the bar takes no focus: the keyboard
+         * scrolls the box itself.
+         */
+        renderBar?: Snippet<[renderProps: ScrollerBarRenderProps, refs: ScrollerBarRefs]>;
+        /** The run of items the strip scrolls. They are rendered as they are, inside the track. */
+        children?: Snippet;
+    };

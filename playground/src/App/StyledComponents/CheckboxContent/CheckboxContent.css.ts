@@ -11,26 +11,37 @@ export const hasError = style({});
 
 export const checkboxContent = style({
     display: "flex",
-    justifyContent: "center",
     alignItems: "center",
-    width: 20,
-    height: 20,
-    boxShadow: themeVars.shadow.small,
-    border: `2px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
-    borderRadius: themeVars.borderRadius.half,
-    backgroundColor: layerVars.main,
-    transition: `filter ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}, border-color ${themeVars.animation.duration}`,
+    gap: themeVars.spacing.full,
+    transition: `filter ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}`,
 
     selectors: {
-        [`&.${hasError}`]: {
-            borderColor: themeVars.color.error.main,
-        },
         [`&.${isHovered}`]: {
             filter: themeVars.hover.filter,
         },
         [`&.${isDisabled}`]: {
             filter: themeVars.disabled.filter,
             opacity: themeVars.disabled.opacity,
+        },
+    },
+});
+
+export const checkboxBox = style({
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    flexShrink: 0,
+    width: 20,
+    height: 20,
+    boxShadow: themeVars.shadow.small,
+    border: `2px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
+    borderRadius: themeVars.borderRadius.half,
+    backgroundColor: layerVars.main,
+    transition: `border-color ${themeVars.animation.duration}`,
+
+    selectors: {
+        [`${checkboxContent}.${hasError} &`]: {
+            borderColor: themeVars.color.error.main,
         },
     },
 });

@@ -1,13 +1,21 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { demo, readout } from "./helpers";
+import { docsDemo, docsSettled, prop } from "./helpers";
 
-const PUSH = "push";
-const OVERLAY = "overlay";
-const HOVER = "hover";
+/**
+ * The Docs page draws one sidebar per section, each with its own id: the first example pushes its neighbor
+ * aside, the second is right to left, the third grows over its neighbor (its Layout knob starts on overlay) and
+ * the fourth expands on hover. Each example's toggle is the owner's button, found by the `aria-controls` that
+ * points it at its sidebar.
+ */
+const DOCS = "/src/App/Pages/SidebarPage/Docs";
+
+const PUSH = "Basic";
+const OVERLAY = "Overlay";
+const HOVER = "Hover";
 const SETTLE_MS = 500;
 
-const toggle = (page: Page, key: string) => page.locator(`${demo(key)} button[aria-controls]`);
+const toggle = (page: Page, key: string) => page.locator(`${docsDemo(DOCS, key)} button[aria-controls]`);
 
 const sidebar = async (page: Page, key: string) =>
     page.locator(`[id="${await toggle(page, key).getAttribute("aria-controls")}"]`);
@@ -24,9 +32,13 @@ const neighborWidth = async (page: Page, key: string) =>
 const panelWidth = async (page: Page, key: string) =>
     (await sidebar(page, key)).evaluate((element) => (element.firstElementChild as HTMLElement).offsetWidth);
 
+const hoverReadout = async (page: Page) =>
+    ((await page.locator(`${docsDemo(DOCS, HOVER)} [data-readout]`).textContent()) ?? "").trim();
+
 test.beforeEach(async ({ page }) => {
-    await page.goto("/sidebar");
-    await expect(page.locator("[data-example]").first()).toBeVisible();
+    await page.goto("/sidebar/docs");
+    await expect(page.locator(docsDemo(DOCS, PUSH))).toBeVisible();
+    await docsSettled(page);
 });
 
 /**
@@ -69,7 +81,7 @@ test("an overlaid sidebar grows over its neighbor and keeps its place in the lay
 test("the contents are told when the sidebar has finished expanding", async ({ page }) => {
     await toggle(page, PUSH).click();
 
-    await expect(page.locator(demo(PUSH)).getByText("expanded", { exact: true })).toBeVisible();
+    await expect(page.locator(docsDemo(DOCS, PUSH)).getByText("expanded", { exact: true })).toBeVisible();
 });
 
 /**
@@ -79,16 +91,51 @@ test("the contents are told when the sidebar has finished expanding", async ({ p
  */
 test("hovering expands it without touching the owner's state, and Escape puts it back", async ({ page }) => {
     const collapsedWidth = await panelWidth(page, HOVER);
+    const readoutAtRest = await hoverReadout(page);
 
     await (await sidebar(page, HOVER)).hover();
 
     await expect.poll(() => panelWidth(page, HOVER), "resting on it expands it").toBeGreaterThan(collapsedWidth);
     await expect(toggle(page, HOVER), "the owner's state was not written").toHaveAttribute("aria-expanded", "false");
-    expect(await readout(page, HOVER)).toContain("expanded: false");
+    expect(await hoverReadout(page), "and the example's own reading of it has not moved").toBe(readoutAtRest);
 
     await page.keyboard.press("Escape");
 
     await expect.poll(() => panelWidth(page, HOVER), "Escape collapses it again").toBe(collapsedWidth);
+});
+
+test("with hover expansion switched off, resting on it expands nothing", async ({ page }) => {
+    const collapsedWidth = await panelWidth(page, HOVER);
+
+    await page.locator(`${prop("isExpandedOnHover")} input`).click();
+    await (await sidebar(page, HOVER)).hover();
+    await page.waitForTimeout(SETTLE_MS * 2);
+
+    expect(await panelWidth(page, HOVER), "the panel keeps its collapsed width").toBe(collapsedWidth);
+});
+
+/**
+ * The overlay example's Layout knob is the switch between the two layouts, so moving it to push makes the same
+ * sidebar take its room from the neighbor instead of growing over it.
+ */
+test("the same sidebar switched to push takes its room from the neighbor", async ({ page }) => {
+    const picker = page.locator(`${prop("layout")} [role="combobox"]`);
+
+    await picker.click();
+    await page
+        .locator(`[id="${await picker.getAttribute("aria-controls")}"]`)
+        .getByRole("option", { name: "push", exact: true })
+        .click();
+
+    const collapsedWidth = await layoutWidth(page, OVERLAY);
+    const neighborBefore = await neighborWidth(page, OVERLAY);
+
+    await toggle(page, OVERLAY).click();
+
+    await expect
+        .poll(() => layoutWidth(page, OVERLAY), "the box the layout sees grows")
+        .toBeGreaterThan(collapsedWidth);
+    await expect.poll(() => neighborWidth(page, OVERLAY), "and the neighbor narrows").toBeLessThan(neighborBefore);
 });
 
 /**
@@ -99,7 +146,7 @@ test("the owner's button keeps focus across the swap between layouts", async ({ 
     await toggle(page, PUSH).focus();
     await page.keyboard.press("Enter");
 
-    await expect(page.locator(demo(PUSH)).getByText("expanded", { exact: true })).toBeVisible();
+    await expect(page.locator(docsDemo(DOCS, PUSH)).getByText("expanded", { exact: true })).toBeVisible();
     await expect(toggle(page, PUSH)).toBeFocused();
 });
 

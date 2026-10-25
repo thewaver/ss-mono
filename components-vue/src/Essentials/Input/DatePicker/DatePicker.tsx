@@ -1,7 +1,15 @@
-import { type SlotsType, defineComponent, nextTick, shallowRef, useId } from "vue";
+import { type SlotsType, defineComponent, nextTick, shallowRef, useId, watch } from "vue";
 
-import { DATE_PICKER_DEFAULTS, type DateValue, DateValueUtils, type PopupTriggerFlags } from "@thewaver/ss-components";
+import {
+    DATE_INPUT_DEFAULTS,
+    DATE_PICKER_DEFAULTS,
+    type DateValue,
+    type DateValueCalendarId,
+    DateValueUtils,
+    type PopupTriggerFlags,
+} from "@thewaver/ss-components";
 
+import { NavigatorVueUtils } from "../../../Abstracts/Navigator/NavigatorVue.utils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import type {
     InteractionControlSlots,
@@ -19,7 +27,8 @@ import { DateInput } from "../DateInput/DateInput";
 import type { DateInputSlots } from "../DateInput/DateInput.types";
 import type { DatePickerProps, DatePickerSlots } from "./DatePicker.types";
 
-const toMonth = (value: DateValue): DateValue => DateValueUtils.getStartOfMonth(value);
+const toMonth = (value: DateValue, calendar: DateValueCalendarId): DateValue =>
+    DateValueUtils.getStartOfMonth(DateValueUtils.withCalendar(value, calendar));
 
 export const DatePicker = defineComponent(
     (props: DatePickerProps, { slots }: SlotsContext<DatePickerSlots>) => {
@@ -29,11 +38,16 @@ export const DatePicker = defineComponent(
         const popupId = useId();
 
         const rootRef = shallowRef<HTMLDivElement>();
-        const month = shallowRef(toMonth(value.value ?? DateValueUtils.fromDate(new Date())));
+
+        const direction = NavigatorVueUtils.useDirection(rootRef);
+
+        const getCalendar = () => props.calendar ?? DATE_INPUT_DEFAULTS.calendar;
+
+        const month = shallowRef(toMonth(value.value ?? DateValueUtils.fromDate(new Date()), getCalendar()));
 
         let isFocusReturned = false;
 
-        const getIsDisabled = () => props.isDisabled ?? false;
+        const getIsLocked = () => (props.isDisabled ?? false) || (props.isReadOnly ?? false);
 
         const dismiss = () => {
             if (!isOpen.value) return;
@@ -43,17 +57,21 @@ export const DatePicker = defineComponent(
         };
 
         const open = () => {
-            if (getIsDisabled()) return;
+            if (getIsLocked()) return;
 
             isOpen.value = true;
         };
 
-        watchAfterRender([isOpen, getIsDisabled], ([isShown, isDisabled]) => {
-            if (isShown && isDisabled) isOpen.value = false;
+        watchAfterRender([isOpen, getIsLocked], ([isShown, isLocked]) => {
+            if (isShown && isLocked) isOpen.value = false;
         });
 
         watchAfterRender([isOpen], ([isShown]) => {
-            if (isShown && value.value) month.value = toMonth(value.value);
+            if (isShown && value.value) month.value = toMonth(value.value, getCalendar());
+        });
+
+        watch(getCalendar, (calendar) => {
+            month.value = toMonth(month.value, calendar);
         });
 
         watchAfterRender([isOpen], ([isShown]) => {
@@ -94,7 +112,7 @@ export const DatePicker = defineComponent(
         );
 
         return () => {
-            const isDisabled = getIsDisabled();
+            const isLocked = getIsLocked();
 
             const forwarded = {
                 ...forwardProps(props, DateInput),
@@ -107,7 +125,7 @@ export const DatePicker = defineComponent(
 
             const renderTrigger = () => (
                 <InteractionWrapper
-                    isDisabled={isDisabled}
+                    isDisabled={isLocked}
                     extraFlags={{ isOpen: isOpen.value } satisfies PopupTriggerFlags}
                 >
                     {
@@ -154,7 +172,7 @@ export const DatePicker = defineComponent(
                         ariaAttributes={{ "aria-label": props.calendarLabel }}
                         isOpen={isOpen.value}
                         anchorRef={rootRef.value}
-                        placement={props.placement ?? DATE_PICKER_DEFAULTS.placement}
+                        placement={props.placement ?? DATE_PICKER_DEFAULTS.placement[direction.value]}
                         offset={props.offset}
                         transitionDurationMs={props.popupTransitionDurationMs}
                         hasAutoFocus={true}
@@ -204,6 +222,7 @@ export const DatePicker = defineComponent(
             "isRequired": Boolean,
             "autoComplete": null,
             "isConcealed": Boolean,
+            "isLeftToRight": Boolean,
             "padding": null,
             "gap": null,
             "ariaAttributes": null,

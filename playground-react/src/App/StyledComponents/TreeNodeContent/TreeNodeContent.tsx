@@ -1,6 +1,6 @@
-import type { PropsWithChildren } from "react";
+import { type PropsWithChildren, useRef } from "react";
 
-import { PlacementUtils } from "@thewaver/ss-components-react";
+import { NavigatorReactUtils, PlacementUtils } from "@thewaver/ss-components-react";
 import {
     CHECKED_MARK,
     MIXED_MARK,
@@ -23,8 +23,12 @@ import type { TreeConnectorProps, TreeNodeContentProps, TreeNodePendingProps } f
 export const PageTreeNodeContent = (props: PropsWithChildren<TreeNodeContentProps>) => {
     const layerClass = useLayerClass();
 
+    const ref = useRef<HTMLDivElement | null>(null);
+    const direction = NavigatorReactUtils.useDirection(ref);
+
     return (
         <div
+            ref={ref}
             className={[
                 styles.treeNodeContent,
                 layerClass,
@@ -34,11 +38,12 @@ export const PageTreeNodeContent = (props: PropsWithChildren<TreeNodeContentProp
                 props.renderProps.isSelected && styles.isSelected,
                 props.renderProps.isDisabled && styles.isDisabled,
                 props.renderProps.depth === 0 && styles.isCategory,
+                direction === "rtl" && styles.isRightToLeft,
             ]
                 .filter(Boolean)
                 .join(" ")}
             style={{
-                paddingLeft: `calc(${themeVars.spacing.half} + ${props.renderProps.depth * INDENT_PER_DEPTH}px)`,
+                paddingInlineStart: `calc(${themeVars.spacing.half} + ${props.renderProps.depth * INDENT_PER_DEPTH}px)`,
             }}
         >
             <div ref={props.setExpanderRef} className={styles.treeNodeMarker} aria-hidden="true">
@@ -78,7 +83,7 @@ export const PageTreeNodePending = (props: PropsWithChildren<TreeNodePendingProp
         <div
             className={[styles.treeNodePending, layerClass].join(" ")}
             style={{
-                paddingLeft: `calc(${themeVars.spacing.half} + ${props.depth * INDENT_PER_DEPTH}px)`,
+                paddingInlineStart: `calc(${themeVars.spacing.half} + ${props.depth * INDENT_PER_DEPTH}px)`,
             }}
         >
             <div className={styles.treeNodeMarker} aria-hidden="true">

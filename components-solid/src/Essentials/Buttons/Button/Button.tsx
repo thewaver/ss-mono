@@ -27,6 +27,9 @@ const ButtonElement = (props: ButtonElementProps) => {
             aria-label={getAriaLabel()}
             aria-disabled={getIsDisabled() || undefined}
             aria-pressed={access(props.flags).isPressed}
+            aria-haspopup={access(props.ariaHasPopup)}
+            aria-expanded={access(props.ariaExpanded)}
+            aria-controls={access(props.ariaControls)}
             aria-busy={getIsPending() || undefined}
             onClick={(e) => {
                 if (getIsRefusing()) {
@@ -98,6 +101,9 @@ export const Button = (props: ButtonProps) => {
                     ref={setElementRef}
                     ariaLabel={props.ariaLabel}
                     type={props.type}
+                    ariaHasPopup={props.ariaHasPopup}
+                    ariaExpanded={props.ariaExpanded}
+                    ariaControls={props.ariaControls}
                     id={props.id}
                     flags={getFlags}
                     renderContent={props.renderContent}

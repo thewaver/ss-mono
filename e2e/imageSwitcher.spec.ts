@@ -1,8 +1,11 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { computedStyle, example, inlineStyle, prop } from "./helpers";
+import { computedStyle, docsDemo, docsSettled, inlineStyle, inputValue, prop } from "./helpers";
 
-const IMAGES = `${example("default")} img`;
+const DOCS = "/src/App/Pages/ImageSwitcherPage/Docs";
+
+const BASIC = docsDemo(DOCS, "Basic");
+const IMAGES = `${BASIC} img`;
 const PROFILE = "knight_profile";
 const DATE = "knight_date";
 const MISSING = "missing_image.webp";
@@ -27,8 +30,34 @@ const sources = (page: Page) =>
         .locator(IMAGES)
         .evaluateAll((images) => images.map((image) => (image as HTMLImageElement).getAttribute("src")));
 
-const loadReadout = async (page: Page) =>
-    ((await page.locator(`${example("default")} [data-readout]`).textContent()) ?? "").trim();
+/** Each element's source, its text, and whether it is hidden from a screen reader, read together. */
+const layers = (page: Page) =>
+    page.locator(IMAGES).evaluateAll((images) =>
+        images.map((image) => ({
+            src: image.getAttribute("src"),
+            alt: image.getAttribute("alt"),
+            isHidden: image.getAttribute("aria-hidden") === "true",
+        })),
+    );
+
+const loadReadout = async (page: Page) => ((await page.locator(`${BASIC} [data-readout]`).textContent()) ?? "").trim();
+
+/** How many loads the example's `onLoad` has counted, read off its readout. */
+const loadCount = async (page: Page) => Number(/(\d+)/.exec(await loadReadout(page))?.[1] ?? Number.NaN);
+
+/**
+ * Whether the starting picture has begun to leave. Clearing leaves the pair holding the same sources as before — the
+ * old picture on one element and nothing on the other — so the swap shows only in which element is the one shown.
+ */
+const isStartGoing = (page: Page) => async () =>
+    (await layers(page)).some((layer) => layer.src?.includes(PROFILE) && layer.isHidden);
+
+/** Resolves once the switcher has said it could not preload a source, which is when it has finished deciding. */
+const preloadFailure = (page: Page) =>
+    page.waitForEvent(
+        "console",
+        (message) => message.type() === "warning" && message.text().includes("failed to preload"),
+    );
 
 /**
  * Readiness is "the starting image has landed on one of the two elements", not visibility: the element
@@ -36,10 +65,11 @@ const loadReadout = async (page: Page) =>
  * many swaps have happened — so waiting for the first one to be visible waits forever on a fresh page.
  */
 test.beforeEach(async ({ page }) => {
-    await page.goto("/image-switcher");
+    await page.goto("/image-switcher/docs");
 
     await expect(page.locator(IMAGES)).toHaveCount(2);
     await expect.poll(async () => (await sources(page)).filter((src) => src?.includes(PROFILE)).length).toBe(1);
+    await docsSettled(page);
 });
 
 test("both elements stay mounted, and the outgoing one keeps its image while it fades", async ({ page }) => {
@@ -75,6 +105,30 @@ test("both elements stay mounted, and the outgoing one keeps its image while it 
     expect(opacities.sort(), "one is on and one is off, which is the crossfade").toEqual(["0", "1"]);
 });
 
+/**
+ * The text travels with its picture: the element on screen is read with its own words, and the one fading out is
+ * hidden from a screen reader from the moment it starts to go, so the picture is announced once.
+ */
+test("each picture is read with its own text, and only the one on screen is read", async ({ page }) => {
+    const start = (await layers(page)).find((layer) => !layer.isHidden)!;
+
+    expect(start.src, "the element read out is the one holding the starting image").toContain(PROFILE);
+    expect(start.alt, "and it has words of its own").toBeTruthy();
+
+    await chooseSource(page, "date");
+    await expect.poll(async () => (await sources(page)).some((src) => src?.includes(DATE))).toBe(true);
+
+    const after = await layers(page);
+    const shown = after.filter((layer) => !layer.isHidden);
+    const outgoing = after.find((layer) => layer.src?.includes(PROFILE))!;
+
+    expect(shown, "one element is read").toHaveLength(1);
+    expect(shown[0].src, "the incoming one").toContain(DATE);
+    expect(shown[0].alt, "with words of its own, not the old picture's").not.toBe(start.alt);
+    expect(outgoing.isHidden, "while the outgoing one is hidden as it fades").toBe(true);
+    expect(outgoing.alt, "keeping its own words rather than borrowing the new ones").toBe(start.alt);
+});
+
 test("a new source is preloaded before either element changes", async ({ page }) => {
     await page.route(`**/*${DATE}*`, async (route) => {
         await new Promise((resolve) => setTimeout(resolve, PRELOAD_DELAY_MS));
@@ -98,35 +152,36 @@ test("a new source is preloaded before either element changes", async ({ page })
         .toBe(1);
 });
 
-test("a source that fails to load still swaps, rather than stranding the old image", async ({ page }) => {
-    const warnings: string[] = [];
-
-    page.on("console", (message) => {
-        if (message.type() === "warning") warnings.push(message.text());
-    });
+/**
+ * The user's call: a picture that cannot load is never swapped in, so the reader keeps looking at the last picture
+ * that did, read with that picture's own words, and the consumer hears about it.
+ */
+test("a source that fails to load keeps the old picture and its text, and says so", async ({ page }) => {
+    const before = await layers(page);
+    const failed = preloadFailure(page);
 
     await chooseSource(page, "missing_file");
+    await failed;
 
-    await expect
-        .poll(async () => (await sources(page)).some((src) => src?.includes(MISSING)), {
-            message: "the error path swaps too, so a broken source is not a stuck component",
-        })
-        .toBe(true);
-
+    expect(await layers(page), "neither element changed: the old picture and its words stay").toEqual(before);
     expect(
-        warnings.some((text) => text.includes("failed to preload")),
-        "and it says so rather than failing silently",
-    ).toBe(true);
+        (await sources(page)).some((src) => src?.includes(MISSING)),
+        "the broken source never reached either element",
+    ).toBe(false);
 });
 
 test("clearing the source swaps immediately and hides the element that has nothing to show", async ({ page }) => {
     await chooseSource(page, "none");
 
     await expect
-        .poll(async () => (await sources(page)).filter((src) => src?.includes(PROFILE)).length, {
+        .poll(isStartGoing(page), {
             message: "there is nothing to preload, so the swap does not wait for a load that will never come",
         })
-        .toBe(1);
+        .toBe(true);
+    expect(
+        (await sources(page)).filter((src) => src?.includes(PROFILE)),
+        "while the outgoing element keeps the old image to fade out",
+    ).toHaveLength(1);
 
     const visibilities = await Promise.all([
         computedStyle(page.locator(IMAGES).first(), "visibility"),
@@ -140,57 +195,55 @@ test("clearing the source swaps immediately and hides the element that has nothi
 });
 
 /**
- * `onLoad` was invisible to this suite until the page grew a readout to consume it — a callback nothing on
- * the page reads cannot be driven by a harness that drives the page. What it reports is the **preloader's**
- * load rather than either visible element's, which is why the count can be checked against the source that
- * was chosen rather than against what is on screen.
+ * `onLoad` is invisible to a suite unless the page shows what it consumed, so the example counts loads in a
+ * readout. What it reports is the **preloader's** load rather than either visible element's, which is why the
+ * count can be checked against the source that was chosen rather than against what is on screen.
  */
 test("each source that actually loads is reported once, and names itself", async ({ page }) => {
-    await expect
-        .poll(() => loadReadout(page), { message: "the starting image is a load like any other" })
-        .toContain("loads: 1");
+    await expect.poll(() => loadCount(page), { message: "the starting image is a load like any other" }).toBe(1);
     expect(await loadReadout(page), "and the consumer is told which one landed").toContain(PROFILE);
 
     await chooseSource(page, "date");
 
-    await expect.poll(() => loadReadout(page), { message: "a second source is a second load" }).toContain("loads: 2");
+    await expect.poll(() => loadCount(page), { message: "a second source is a second load" }).toBe(2);
     expect(await loadReadout(page), "named in its turn").toContain(DATE);
 });
 
 /**
- * The two paths that swap without a successful preload. Both are easy to get wrong in the same direction —
- * reporting a load that never happened — and neither is visible in the images themselves, since the swap
- * looks identical either way.
+ * The two paths that never complete a preload. Both are easy to get wrong in the same direction — reporting a load
+ * that never happened.
  */
-test("a source that fails and a source that is cleared both swap without reporting a load", async ({ page }) => {
-    await expect.poll(() => loadReadout(page)).toContain("loads: 1");
+test("a source that fails and a source that is cleared both go without reporting a load", async ({ page }) => {
+    await expect.poll(() => loadCount(page)).toBe(1);
+
+    const failed = preloadFailure(page);
 
     await chooseSource(page, "missing_file");
-    await expect
-        .poll(async () => (await sources(page)).some((src) => src?.includes(MISSING)), {
-            message: "the swap happens on the error path",
-        })
-        .toBe(true);
+    await failed;
 
-    expect(await loadReadout(page), "but nothing loaded, so nothing is reported").toContain("loads: 1");
+    expect(await loadCount(page), "nothing loaded, so nothing is reported").toBe(1);
 
     await chooseSource(page, "none");
-    await expect
-        .poll(async () => (await sources(page)).filter((src) => src?.includes(MISSING)).length, {
-            message: "clearing swaps immediately",
-        })
-        .toBe(1);
+    await expect.poll(isStartGoing(page), { message: "clearing swaps immediately" }).toBe(true);
 
-    expect(await loadReadout(page), "and there was nothing to preload either").toContain("loads: 1");
+    expect(await loadCount(page), "and there was nothing to preload either").toBe(1);
 });
 
 test("the transition duration the consumer sets reaches both elements", async ({ page }) => {
-    await page.locator(`${prop("transitionDurationMs")} input`).fill("250");
+    const knob = page.locator(`${prop("transitionDurationMs")} input`);
+    const before = await inputValue(knob);
 
+    await knob.click();
+    await page.keyboard.press("ArrowDown");
+    await page.keyboard.press("Tab");
+
+    const after = await inputValue(knob);
+
+    expect(after, "the knob stepped to a new duration").not.toBe(before);
     await expect
         .poll(() => inlineStyle(page.locator(IMAGES).first(), "transition-duration"), {
             message: "both halves of the crossfade run for the duration the consumer stated",
         })
-        .toBe("250ms");
-    expect(await inlineStyle(page.locator(IMAGES).last(), "transition-duration")).toBe("250ms");
+        .toBe(`${after}ms`);
+    expect(await inlineStyle(page.locator(IMAGES).last(), "transition-duration")).toBe(`${after}ms`);
 });

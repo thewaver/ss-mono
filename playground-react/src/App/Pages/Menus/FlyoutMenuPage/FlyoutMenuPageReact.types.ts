@@ -1,7 +1,3 @@
-import type { FlyoutMenuEntryRecord } from "@thewaver/ss-components-react";
+import type { BaseFlyoutMenuBasicDocsExampleValues } from "@thewaver/ss-playground/App/Pages/Menus/FlyoutMenuPage/FlyoutMenuPage.types";
 
-export type FlyoutMenuExampleProps = {
-    entries: FlyoutMenuEntryRecord<string>[];
-    hoverShowDelayMs: number;
-    transitionDurationMs: number;
-};
+export type FlyoutMenuBasicDocsExampleProps = BaseFlyoutMenuBasicDocsExampleValues;

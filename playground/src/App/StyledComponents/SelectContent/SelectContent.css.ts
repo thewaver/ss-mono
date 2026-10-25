@@ -35,7 +35,7 @@ export const selectContent = style({
     borderRadius: themeVars.borderRadius.half,
     backgroundColor: layerVars.main,
     fontSize: FIELD_FONT_SIZE,
-    textAlign: "left",
+    textAlign: "start",
     transition: `filter ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}, border-color ${themeVars.animation.duration}`,
 
     selectors: {
@@ -81,8 +81,8 @@ export const selectChevron = style({
     flexShrink: 0,
     width: 0,
     height: 0,
-    borderLeft: `${FIELD_CHEVRON_WIDTH / 2}px solid transparent`,
-    borderRight: `${FIELD_CHEVRON_WIDTH / 2}px solid transparent`,
+    borderLeft: `${FIELD_CHEVRON_WIDTH * 0.5}px solid transparent`,
+    borderRight: `${FIELD_CHEVRON_WIDTH * 0.5}px solid transparent`,
     borderTop: "6px solid currentColor",
     transition: `transform ${themeVars.animation.duration}`,
 

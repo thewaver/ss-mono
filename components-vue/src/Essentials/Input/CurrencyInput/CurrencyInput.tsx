@@ -115,6 +115,7 @@ export const CurrencyInput = defineComponent(
             "min": null,
             "max": null,
             "isConcealed": Boolean,
+            "isLeftToRight": Boolean,
             "padding": null,
             "gap": null,
             "ariaAttributes": null,

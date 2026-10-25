@@ -19,13 +19,12 @@ import { access, accessSignal } from "../../../Utils/propUtils";
 import { Button } from "../../Buttons/Button/Button";
 import { FormFieldSolidUtils } from "../FormField/FormFieldSolid.utils";
 import { useLabelContext } from "../Label/Label.context";
-import { LabelSolidUtils } from "../Label/LabelSolid.utils";
 import { ListboxOptions } from "../Listbox/Listbox";
 import { ListboxSolidUtils } from "../Listbox/ListboxSolid.utils";
 import type { SelectCompositeProps, SelectFieldProps, SelectProps } from "./SelectSolid.types";
 
 const SelectField = (props: SelectFieldProps) => {
-    const getAriaLabel = LabelSolidUtils.resolveAriaLabel(
+    const { getAriaLabel, getAriaLabelledBy } = FormFieldSolidUtils.resolveAriaName(
         props.ariaLabel === undefined ? undefined : () => access(props.ariaLabel)!,
     );
     const getAriaDescribedBy = FormFieldSolidUtils.resolveAriaDescribedBy();
@@ -83,6 +82,9 @@ const SelectField = (props: SelectFieldProps) => {
         },
         get "aria-label"() {
             return getAriaLabel();
+        },
+        get "aria-labelledby"() {
+            return getAriaLabelledBy();
         },
         get "aria-disabled"() {
             return getIsDisabled() || undefined;
@@ -155,6 +157,7 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
     const fallbackFieldId = createUniqueId();
 
     const labelContext = useLabelContext();
+    const getCaptionId = FormFieldSolidUtils.resolveAriaLabelledBy();
 
     const getFieldId = () => access(props.id) ?? fallbackFieldId;
 
@@ -310,7 +313,10 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
                     />
 
                     <Show when={props.renderClear && access(props.selectedOptions).length > 0}>
-                        <div class={styles.selectClear} style={{ right: `${getSpreadPadding().paddingRight}px` }}>
+                        <div
+                            class={styles.selectClear}
+                            style={{ "inset-inline-end": `${getSpreadPadding().paddingInlineEnd}px` }}
+                        >
                             <Button
                                 isDisabled={getIsDisabled}
                                 ariaLabel={props.clearAriaLabel}
@@ -326,7 +332,7 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
                         ariaAttributes={() =>
                             SelectUtils.computeListAriaAttributes({
                                 listAriaLabel: getListAriaLabel(),
-                                labelId: labelContext.getLabelId(),
+                                labelId: getCaptionId() ?? labelContext.getLabelId(),
                                 fieldId: getFieldId(),
                                 isMultiple: getIsMultiple(),
                             })

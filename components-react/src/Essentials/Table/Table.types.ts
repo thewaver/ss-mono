@@ -80,32 +80,35 @@ export type TableHeaderControlProps = {
 /**
  * The control that sorts a column, placed by the consumer anywhere inside the column's header.
  *
- * A header cell is not a target of its own: sorting and reordering each have their own control, so a tap can only
- * ever mean one of them. The control keeps a press from reaching the header, so it never starts a column drag,
- * focuses its own cell before acting, and stays out of the tab order and hidden from screen readers — the cell is
- * the one tab stop, and Enter on it sorts. Three targets can share a header cell, and 2.5.8 Target Size wants a 24
- * CSS pixel circle centered on each undersized one to clear the others, so painting each control at 24 pixels is
- * the simple way to meet it. It renders nothing in a column that is not sortable.
+ * A header cell is not a target of its own: sorting and reordering each have their own control, so a tap can only ever
+ * mean one of them. The control keeps a press from reaching the header, so it never starts a column drag, focuses its
+ * own cell before acting, and stays out of the tab order and hidden from screen readers — the cell is the one tab stop,
+ * and Enter on it sorts. Three targets can share a header cell, and
+ * {@link https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html 2.5.8 Target Size} wants a 24 CSS pixel
+ * circle centered on each undersized one to clear the others, so painting each control at 24 pixels is the simple way
+ * to meet it. It renders nothing in a column that is not sortable.
  */
 export type TableHeaderSortProps = TableHeaderControlProps;
 
 /**
  * The control that picks a column up to move it, placed by the consumer anywhere inside the column's header.
  *
- * Tapping it picks the column up; tapping another header drops it there. That is the single-pointer route 2.5.7
- * asks for, and it is why reordering needs a control of its own — a tap on the header could not mean both "sort"
- * and "pick up". Dragging from anywhere on the header still works. It follows the same rules as the sort control,
- * and renders nothing in a column that is not reorderable.
+ * Tapping it picks the column up; tapping another header drops it there. That is the single-pointer route
+ * {@link https://www.w3.org/WAI/WCAG22/Understanding/dragging-movements.html 2.5.7} asks for, and it is why reordering
+ * needs a control of its own — a tap on the header could not mean both "sort" and "pick up". Dragging from anywhere on
+ * the header still works. It follows the same rules as the sort control, and renders nothing in a column that is not
+ * reorderable.
  */
 export type TableHeaderReorderProps = TableHeaderControlProps;
 
 /**
  * The control that opens and closes a row's detail, placed by the consumer anywhere inside one of the row's cells.
  *
- * It is the pointer's way to open a detail; a keyboard opens one with Enter on the row's first cell. It focuses its
- * own cell before acting and stays out of the tab order and hidden from screen readers, since the cell is the tab
- * stop and the row says whether it is open. 2.5.8 Target Size wants it at least 24 CSS pixels across, or with room
- * around it. It renders nothing in a row that cannot open.
+ * It is the pointer's way to open a detail; a keyboard opens one with Enter on the row's first cell. It focuses its own
+ * cell before acting and stays out of the tab order and hidden from screen readers, since the cell is the tab stop and
+ * the row says whether it is open.
+ * {@link https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html 2.5.8 Target Size} wants it at least 24
+ * CSS pixels across, or with room around it. It renders nothing in a row that cannot open.
  */
 export type TableRowExpanderProps = {
     /** Draws what sits inside the control, from the state of the cell it is in, which says whether the row is open. */

@@ -2,10 +2,70 @@ import { untrack } from "svelte";
 
 import { FormFieldUtils } from "@thewaver/ss-components";
 
+import { getLabelContext } from "../Label/Label.context.js";
+import { LabelSvelteUtils } from "../Label/LabelSvelte.utils.svelte.js";
 import { getFormFieldContext } from "./FormField.context.js";
 
 /** The Svelte side of {@link FormFieldUtils}: a control connected to the field around it. */
 export namespace FormFieldSvelteUtils {
+    /**
+     * The id of the caption that names the control, from the nearest `Label` or field.
+     *
+     * {@link FormFieldUtils.resolveAriaLabelledBy} against the nearest `Label` and `FormField`: the `Label`'s caption
+     * when the control sits inside one, and the field's caption otherwise. A control of your own puts the answer in its
+     * `aria-labelledby` and drops any `aria-label` while there is one, since the caption is then its name.
+     *
+     * Must run while a component is being set up.
+     *
+     * @returns A getter giving the caption's id, or `undefined` when there is no caption to point at, including inside
+     * a `Label` whose caption registered no id.
+     */
+    export const resolveAriaLabelledBy = () => {
+        const labelContext = getLabelContext();
+        const fieldContext = getFormFieldContext();
+
+        return () =>
+            FormFieldUtils.resolveAriaLabelledBy(
+                labelContext.getIsLabeled(),
+                labelContext.getCaptionId(),
+                fieldContext.getCaptionId(),
+            );
+    };
+
+    /**
+     * The name a library control carries: its own `aria-label`, or the caption of the `Label` or field around it.
+     *
+     * Either caption names the control through `aria-labelledby` (see {@link resolveAriaLabelledBy}); either way the
+     * caller's `aria-label` is dropped, since it would replace the caption the reader can see, and the dropped value is
+     * warned about once so the caller can remove one of the two.
+     *
+     * Must run while a component is being set up.
+     *
+     * @param getAriaLabel The caller's own value, if any.
+     * @returns Getters giving the `aria-label` and the `aria-labelledby` to write, either `undefined` when it should be
+     * left off.
+     */
+    export const resolveAriaName = (getAriaLabel: () => string | undefined) => {
+        const labelContext = getLabelContext();
+        const getOwnAriaLabel = LabelSvelteUtils.resolveAriaLabel(getAriaLabel);
+        const getAriaLabelledBy = resolveAriaLabelledBy();
+
+        $effect(() =>
+            untrack(() =>
+                FormFieldUtils.warnIfShadowed(
+                    !labelContext.getIsLabeled() && getAriaLabelledBy() !== undefined,
+                    getAriaLabel() !== undefined,
+                    "ariaLabel",
+                ),
+            ),
+        );
+
+        return {
+            getAriaLabel: () => (getAriaLabelledBy() === undefined ? getOwnAriaLabel() : undefined),
+            getAriaLabelledBy,
+        };
+    };
+
     /**
      * Combines the caller's `aria-describedby` with the description of the nearest field.
      *

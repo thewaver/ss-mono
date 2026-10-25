@@ -21,6 +21,9 @@
     aria-label={getAriaLabel()}
     aria-disabled={isDisabled || undefined}
     aria-pressed={props.flags.isPressed}
+    aria-haspopup={props.ariaHasPopup}
+    aria-expanded={props.ariaExpanded}
+    aria-controls={props.ariaControls}
     aria-busy={isPending || undefined}
     onclick={(e) => {
         if (isRefusing) {

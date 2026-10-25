@@ -8,19 +8,27 @@ import {
 } from "@thewaver/ss-components";
 import type { Color } from "@thewaver/ss-utils";
 
+import { NavigatorReactUtils } from "../../../Abstracts/Navigator/NavigatorReact.utils";
 import { SignalMirrorReactUtils } from "../../../Abstracts/SignalMirror/SignalMirrorReact.utils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import { Popover } from "../../../Primitives/Popover/Popover";
 import { useLatest } from "../../../Utils/refUtils";
 import { ColorArea } from "../ColorArea/ColorArea";
 import { FormFieldReactUtils } from "../FormField/FormFieldReact.utils";
-import { LabelReactUtils } from "../Label/LabelReact.utils";
 import { Range } from "../Range/Range";
 import type { ColorInputFieldProps, ColorInputProps } from "./ColorInput.types";
 
 const ColorInputField = (props: ColorInputFieldProps) => {
-    const ariaLabel = LabelReactUtils.useAriaLabel(props.ariaLabel);
-    const ariaDescribedBy = FormFieldReactUtils.useAriaDescribedBy();
+    const { ariaLabel, ariaLabelledBy } = FormFieldReactUtils.useAriaName(props.ariaLabel);
+    const fieldDescribedBy = FormFieldReactUtils.useAriaDescribedBy();
+    const descriptionId = useId();
+
+    const valueText = props.flags.value
+        ? (props.computeValueText ?? COLOR_INPUT_DEFAULTS.computeValueText)(props.flags.value, props.flags.hsv)
+        : "";
+
+    const ariaDescribedBy =
+        [fieldDescribedBy, valueText ? descriptionId : undefined].filter(Boolean).join(" ") || undefined;
 
     const elementRef = useRef<HTMLButtonElement | null>(null);
     const latestRef = useLatest(props.ref);
@@ -38,44 +46,55 @@ const ColorInputField = (props: ColorInputFieldProps) => {
     );
 
     return (
-        <button
-            id={props.id}
-            ref={setRef}
-            type="button"
-            className={ColorInputStyles.colorInputField}
-            aria-label={ariaLabel}
-            aria-describedby={ariaDescribedBy}
-            aria-haspopup="dialog"
-            aria-expanded={props.isOpen}
-            aria-controls={props.isOpen ? props.popupId : undefined}
-            aria-disabled={isDisabled || undefined}
-            aria-invalid={props.flags.hasError || undefined}
-            onClick={() => {
-                if (isDisabled) return;
+        <>
+            <button
+                id={props.id}
+                ref={setRef}
+                type="button"
+                className={ColorInputStyles.colorInputField}
+                aria-label={ariaLabel}
+                aria-labelledby={ariaLabelledBy}
+                aria-describedby={ariaDescribedBy}
+                aria-haspopup="dialog"
+                aria-expanded={props.isOpen}
+                aria-controls={props.isOpen ? props.popupId : undefined}
+                aria-disabled={isDisabled || undefined}
+                aria-invalid={props.flags.hasError || undefined}
+                onClick={() => {
+                    if (isDisabled) return;
 
-                props.onToggle();
-            }}
-            onMouseEnter={(e) => {
-                if (isDisabled) return;
+                    props.onToggle();
+                }}
+                onMouseEnter={(e) => {
+                    if (isDisabled) return;
 
-                props.onMouseEnter?.(e);
-            }}
-            onMouseLeave={(e) => {
-                if (isDisabled) return;
+                    props.onMouseEnter?.(e);
+                }}
+                onMouseLeave={(e) => {
+                    if (isDisabled) return;
 
-                props.onMouseLeave?.(e);
-            }}
-        >
-            {props.renderContent(props.flags)}
-        </button>
+                    props.onMouseLeave?.(e);
+                }}
+            >
+                {props.renderContent(props.flags)}
+            </button>
+
+            {valueText && (
+                <span id={descriptionId} className={ColorInputStyles.colorInputDescription} aria-hidden="true">
+                    {valueText}
+                </span>
+            )}
+        </>
     );
 };
 
 export const ColorInput = (props: ColorInputProps) => {
     const popupId = useId();
 
+    const fieldRef = useRef<HTMLElement | null>(null);
     const [fieldElement, setFieldElement] = useState<HTMLElement>();
     const [isOpen, setIsOpen] = SignalMirrorReactUtils.useOptionalState(props.visibility, false);
+    const direction = NavigatorReactUtils.useDirection(fieldRef, !isOpen);
 
     const [value, setValue] = props.value;
 
@@ -128,6 +147,7 @@ export const ColorInput = (props: ColorInputProps) => {
 
     const setFieldRef = useCallback(
         (element: HTMLElement | null) => {
+            fieldRef.current = element;
             setFieldElement(element ?? undefined);
             latestRef.current?.(element);
         },
@@ -147,15 +167,17 @@ export const ColorInput = (props: ColorInputProps) => {
                 renderContent={props.renderArea}
             />
 
-            <Range
-                value={[hsv.h, (hue) => setHsv((previous) => ({ ...previous, h: hue }))]}
-                sizing={"fill"}
-                isDisabled={isDisabled}
-                max={ColorInputUtils.HUE_MAX}
-                step={ColorInputUtils.HUE_STEP}
-                ariaLabel={props.hueLabel}
-                renderContent={props.renderHue}
-            />
+            <div className={ColorInputStyles.colorInputHue} dir="ltr">
+                <Range
+                    value={[hsv.h, (hue) => setHsv((previous) => ({ ...previous, h: hue }))]}
+                    sizing={"fill"}
+                    isDisabled={isDisabled}
+                    max={ColorInputUtils.HUE_MAX}
+                    step={ColorInputUtils.HUE_STEP}
+                    ariaLabel={props.hueLabel}
+                    renderContent={props.renderHue}
+                />
+            </div>
         </>
     );
 
@@ -177,6 +199,7 @@ export const ColorInput = (props: ColorInputProps) => {
                         isOpen={isOpen}
                         flags={flags}
                         renderContent={props.renderContent}
+                        computeValueText={props.computeValueText}
                         onToggle={() => (isOpen ? setIsOpen(false) : open())}
                         onMouseEnter={props.onMouseEnter}
                         onMouseLeave={props.onMouseLeave}
@@ -190,7 +213,7 @@ export const ColorInput = (props: ColorInputProps) => {
                 ariaAttributes={{ "aria-label": props.pickerLabel }}
                 isOpen={isOpen}
                 anchorRef={fieldElement}
-                placement={props.placement ?? COLOR_INPUT_DEFAULTS.placement}
+                placement={props.placement ?? COLOR_INPUT_DEFAULTS.placement[direction]}
                 offset={props.offset}
                 transitionDurationMs={props.transitionDurationMs}
                 hasAutoFocus={true}

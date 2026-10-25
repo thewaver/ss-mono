@@ -99,12 +99,17 @@ export const TableOfContents = defineComponent(
 
         const currentValue = computed(() => TableOfContentsUtils.computeCurrentValue(props.links, currentIndex.value));
 
+        let reportedValue: T | undefined;
+
         watch(
             currentValue,
             (value) => {
+                if (value === reportedValue) return;
+
+                reportedValue = value;
                 props.onCurrentChange?.(value);
             },
-            { flush: "post" },
+            { flush: "post", immediate: true },
         );
 
         watchAfterRender([targets], ([list]) => TableOfContentsUtils.makeTargetsFocusable(list));

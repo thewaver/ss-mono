@@ -11,3 +11,7 @@ export const bar = style({
     borderRadius: themeVars.borderRadius.full,
     backgroundColor: layerVars.main,
 });
+
+export const wideBar = style({
+    width: "100%",
+});

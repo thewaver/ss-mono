@@ -304,6 +304,28 @@ export namespace CalendarUtils {
     };
 
     /**
+     * Tests whether the consumer refuses a day, by description or by their own rule.
+     *
+     * Only the consumer's refusals are asked: the earliest and latest day are not, since a field corrects a date
+     * outside them when it is left rather than refusing it. The descriptions are tested before the rule, so a day a
+     * description already refuses never reaches the rule.
+     *
+     * @param day The day to test.
+     * @param opts.disabledDays The consumer's descriptions of refused days, each tested with {@link getIsDayMatched}.
+     * @param opts.computeIsDayDisabled The consumer's own rule.
+     * @returns `true` when a description matches the day or the rule refuses it.
+     */
+    export const getIsDayRefused = (
+        day: DateValue,
+        opts: {
+            disabledDays?: CalendarDayMatcher[];
+            computeIsDayDisabled?: (day: DateValue) => boolean;
+        },
+    ) =>
+        (opts.disabledDays?.some((matcher) => getIsDayMatched(day, matcher)) ?? false) ||
+        (opts.computeIsDayDisabled?.(day) ?? false);
+
+    /**
      * Tests whether a cell can be picked.
      *
      * The consumer's described days are tested before their own rule, so a day a description already refuses never
@@ -331,8 +353,7 @@ export namespace CalendarUtils {
     ) =>
         (opts.isDisabled ?? false) ||
         !getIsCellInBounds(day, precision, opts.minValue, opts.maxValue) ||
-        (opts.disabledDays?.some((matcher) => getIsDayMatched(day, matcher)) ?? false) ||
-        (opts.computeIsDayDisabled?.(day) ?? false);
+        getIsDayRefused(day, opts);
 
     /**
      * The day counted as today, in the calendar the page is drawn in.

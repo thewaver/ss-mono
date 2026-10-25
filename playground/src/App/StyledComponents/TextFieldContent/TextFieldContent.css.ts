@@ -9,10 +9,10 @@ export const FIELD_BORDER = 2;
 
 export const FIELD_PADDING = 10 + FIELD_BORDER;
 export const FIELD_STEPPER_PADDING = {
-    paddingTop: FIELD_PADDING,
-    paddingRight: 5,
-    paddingBottom: FIELD_PADDING,
-    paddingLeft: FIELD_PADDING,
+    paddingBlockStart: FIELD_PADDING,
+    paddingInlineEnd: 5,
+    paddingBlockEnd: FIELD_PADDING,
+    paddingInlineStart: FIELD_PADDING,
 };
 export const FIELD_GAP = 5;
 export const FIELD_FONT_SIZE = themeVars.fontSize.medium;

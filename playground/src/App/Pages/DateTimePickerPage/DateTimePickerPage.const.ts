@@ -8,3 +8,5 @@ export const EXAMPLE_NAMES = {
 export const EXAMPLES_ROOT = "/src/App/Pages/DateTimePickerPage/Examples";
 
 export const NOON = { hour: 12, minute: 0 };
+
+export const DOCS_ROOT = "/src/App/Pages/DateTimePickerPage/Docs";

@@ -6,3 +6,5 @@ export const EXAMPLE_NAMES = {
 export const CALENDAR_FIELD_WIDTH = 180;
 
 export const EXAMPLES_ROOT = "/src/App/Pages/DateRangePickerPage/Examples";
+
+export const DOCS_ROOT = "/src/App/Pages/DateRangePickerPage/Docs";

@@ -32,6 +32,8 @@ const isReachable = (element: HTMLElement) => {
     return getComputedStyle(element).visibility !== "hidden";
 };
 
+const getFocusedElement = () => (document.activeElement as HTMLElement | null) ?? undefined;
+
 /** How many focus restores are in flight. A counter rather than a flag, since nested layers can close together. */
 let restoreDepth = 0;
 
@@ -231,6 +233,48 @@ export namespace FocusManagerUtils {
     };
 
     /**
+     * The element a layer opening now was opened from: the one holding focus, which {@link focusInto} returns
+     * focus to when the layer goes.
+     *
+     * Read it before focus moves into the layer. With nothing focused — focus on the body, or no active element
+     * at all — it answers with the document's root element, so a caller reading something inherited from it,
+     * such as the direction text runs in, gets the page's own.
+     *
+     * @returns The focused element, or `document.documentElement` when nothing is.
+     */
+    export const getFocusOrigin = (): HTMLElement => {
+        const active = document.activeElement;
+
+        return active instanceof HTMLElement && active !== document.body ? active : document.documentElement;
+    };
+
+    /**
+     * Remembers what a layer was first opened from, for a layer that can be hidden and shown again while it stays
+     * open — one covered for a while by another layer, say.
+     *
+     * Each time such a layer shows again, focus is somewhere new — on whatever the layer above left it — and
+     * returning focus there when the layer finally closes would strand the reader away from what they opened it
+     * with. Hand {@link focusInto} the origin this answers instead, and forget it once the layer closes.
+     *
+     * @returns `take`, which answers the element kept, while it is still in the document, and otherwise keeps and
+     * answers whatever holds focus now; and `forget`, which drops what is kept, for when the layer closes.
+     */
+    export const createOriginKeeper = () => {
+        let origin: HTMLElement | undefined;
+
+        return {
+            take: () => {
+                if (!origin?.isConnected) origin = getFocusedElement();
+
+                return origin;
+            },
+            forget: () => {
+                origin = undefined;
+            },
+        };
+    };
+
+    /**
      * Moves focus into an element, and hands back the function that puts it where it came from.
      *
      * Focusing is done with scrolling suppressed, so opening a layer does not jerk the page underneath
@@ -241,10 +285,12 @@ export namespace FocusManagerUtils {
      * @param ref The element to focus into.
      * @param opts.initialRef What to focus instead of the first focusable child — a text field rather than a
      * close button, say.
+     * @param opts.origin Where to put focus back, in place of whatever holds it now — for a layer showing again
+     * while it stays open, the origin {@link createOriginKeeper} kept from its first showing.
      * @returns The function that restores focus, for when the element goes.
      */
-    export const focusInto = (ref: HTMLElement, opts?: { initialRef?: HTMLElement }) => {
-        const previouslyFocused = (document.activeElement as HTMLElement | null) ?? undefined;
+    export const focusInto = (ref: HTMLElement, opts?: { initialRef?: HTMLElement; origin?: HTMLElement }) => {
+        const previouslyFocused = opts?.origin ?? getFocusedElement();
 
         (opts?.initialRef ?? getFirstFocusableChild(ref) ?? ref).focus({ preventScroll: true });
 

@@ -5,3 +5,5 @@ export const SPLIT_PANE_DEFAULTS = {
     gutterSize: 8,
     keyStep: 0.02,
 };
+
+export const SPLIT_PANE_ORIENTATIONS: readonly SplitPaneOrientation[] = ["horizontal", "vertical"];

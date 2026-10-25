@@ -16,11 +16,10 @@ import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/Inter
 import { access } from "../../../Utils/propUtils";
 import { accessStore } from "../../../Utils/storeUtils";
 import { FormFieldSolidUtils } from "../../Input/FormField/FormFieldSolid.utils";
-import { LabelSolidUtils } from "../../Input/Label/LabelSolid.utils";
 import type { SlideButtonElementProps, SlideButtonProps } from "./SlideButtonSolid.types";
 
 const SlideButtonElement = (props: SlideButtonElementProps) => {
-    const getAriaLabel = LabelSolidUtils.resolveAriaLabel(
+    const { getAriaLabel, getAriaLabelledBy } = FormFieldSolidUtils.resolveAriaName(
         props.ariaLabel === undefined ? undefined : () => access(props.ariaLabel)!,
     );
     const getFieldDescribedBy = FormFieldSolidUtils.resolveAriaDescribedBy();
@@ -93,6 +92,7 @@ const SlideButtonElement = (props: SlideButtonElementProps) => {
                 type="button"
                 class={styles.slideButtonElement}
                 aria-label={getAriaLabel()}
+                aria-labelledby={getAriaLabelledBy()}
                 aria-describedby={getAriaDescribedBy()}
                 aria-pressed={access(props.flags).isPressed}
                 aria-disabled={getIsDisabled() || undefined}

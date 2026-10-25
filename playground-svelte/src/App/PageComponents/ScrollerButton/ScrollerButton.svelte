@@ -11,15 +11,22 @@
 
     let props: ScrollerButtonProps = $props();
 
+    const axis = $derived(props.axis ?? "x");
     const isPrevious = $derived(props.step === "previous");
 </script>
 
-<Button
-    isDisabled={isPrevious ? props.stepper.getIsAtStart() : props.stepper.getIsAtEnd()}
-    ariaLabel={ARIA_LABELS[props.axis ?? "x"][props.step]}
-    onClick={() => void (isPrevious ? props.stepper.stepToPrevious() : props.stepper.stepToNext())}
->
-    {#snippet renderContent(flags)}
-        <PageScrollerButtonContent {flags} step={props.step} axis={props.axis} />
-    {/snippet}
-</Button>
+{#if props.controller}
+    {@const controller = props.controller}
+
+    <Button
+        id={props.id}
+        isDisabled={isPrevious ? controller[axis].getIsAtStart() : controller[axis].getIsAtEnd()}
+        ariaLabel={ARIA_LABELS[axis][props.step]}
+        ariaControls={controller.getBoxId()}
+        onClick={() => void (isPrevious ? controller[axis].stepToPrevious() : controller[axis].stepToNext())}
+    >
+        {#snippet renderContent(flags)}
+            <PageScrollerButtonContent {flags} step={props.step} {axis} />
+        {/snippet}
+    </Button>
+{/if}

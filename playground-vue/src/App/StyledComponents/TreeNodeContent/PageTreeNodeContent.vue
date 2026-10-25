@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { shallowRef } from "vue";
+
+import { NavigatorVueUtils } from "@thewaver/ss-components-vue";
 import {
     CHECKED_MARK,
     MIXED_MARK,
@@ -19,10 +22,14 @@ import type { TreeNodeContentProps } from "./TreeNodeContentVue.types";
 withDefaults(defineProps<TreeNodeContentProps>(), { hasExamples: true });
 
 const layerClass = useLayerClass();
+
+const root = shallowRef<HTMLElement>();
+const direction = NavigatorVueUtils.useDirection(root);
 </script>
 
 <template>
     <div
+        ref="root"
         :class="[
             styles.treeNodeContent,
             layerClass,
@@ -32,9 +39,10 @@ const layerClass = useLayerClass();
             renderProps.isSelected && styles.isSelected,
             renderProps.isDisabled && styles.isDisabled,
             renderProps.depth === 0 && styles.isCategory,
+            direction === 'rtl' && styles.isRightToLeft,
         ]"
         :style="{
-            paddingLeft: `calc(${themeVars.spacing.half} + ${renderProps.depth * INDENT_PER_DEPTH}px)`,
+            paddingInlineStart: `calc(${themeVars.spacing.half} + ${renderProps.depth * INDENT_PER_DEPTH}px)`,
         }"
     >
         <div :ref="setExpanderRef" :class="styles.treeNodeMarker" aria-hidden="true">

@@ -1,10 +1,13 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { demo, readout, waitUntilStill } from "./helpers";
+import { docsDemo, docsSettled, waitUntilStill } from "./helpers";
+
+const DOCS = "/src/App/Pages/TableOfContentsPage/Docs";
 
 test.beforeEach(async ({ page }) => {
-    await page.goto("/table-of-contents");
-    await expect(page.locator("[data-example]").first()).toBeVisible();
+    await page.goto("/table-of-contents/docs");
+    await expect(page.locator(`${docsDemo(DOCS, "Basic")} nav a`).first()).toBeVisible();
+    await docsSettled(page);
 });
 
 /**
@@ -14,11 +17,12 @@ test.beforeEach(async ({ page }) => {
  * never ask what the mark looks like. The token is `location` — the current place within a document — rather than
  * `page`, which would say the link is the page itself.
  *
- * The example's article is its own scrolling box, beside the links, so the box that moves is the article itself.
+ * Basic's article is its own scrolling box, beside the links, so the box that moves is the article itself.
  * Its sections are an outline: a sub-section's heading is one level below its parent's, and its link carries a depth.
  */
 test.describe("a table of contents following its own scrolling box", () => {
-    const TOC = demo("tableOfContents");
+    const TOC = docsDemo(DOCS, "Basic");
+    const READOUT = `${TOC} [data-readout]`;
     const LINKS = `${TOC} nav a`;
     const ARTICLE = `${TOC} article`;
     const HEADINGS = `${ARTICLE} :is(h1, h2, h3, h4, h5, h6)`;
@@ -51,7 +55,7 @@ test.describe("a table of contents following its own scrolling box", () => {
     const wheelOverBox = async (page: Page, deltaY: number) => {
         const box = (await page.locator(ARTICLE).boundingBox())!;
 
-        await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+        await page.mouse.move(box.x + box.width * 0.5, box.y + box.height * 0.5);
         await page.mouse.wheel(0, deltaY);
     };
 
@@ -81,6 +85,34 @@ test.describe("a table of contents following its own scrolling box", () => {
             expect(pair.tag, "every link's fragment names a heading on the page").toMatch(/^H[1-6]$/);
             expect(pair.focusable, "which can take focus without joining the tab order").toBe("-1");
             expect(pair.labels, "and names the section it opens").toBe(true);
+        }
+    });
+
+    /**
+     * The page holds a second outline over the same sections, in its right-to-left example. A link reaches the first
+     * element in the whole document carrying its fragment, so if the two built their heading ids alike, the second
+     * outline's links would all lead into the first one's article. Each outline's links must land inside its own
+     * example, on an id nothing else on the page carries.
+     */
+    test("a second outline on the same page points its links at its own headings", async ({ page }) => {
+        for (const scope of [TOC, docsDemo(DOCS, "RightToLeft")]) {
+            const landings = await page.locator(scope).evaluate((root) =>
+                [...root.querySelectorAll("nav a")].map((link) => {
+                    const id = (link.getAttribute("href") ?? "").replace(/^#/, "");
+
+                    return {
+                        isOwn: root.contains(document.getElementById(id)),
+                        carriers: document.querySelectorAll(`[id="${id}"]`).length,
+                    };
+                }),
+            );
+
+            expect(landings.length, "the outline has links").toBeGreaterThan(0);
+
+            for (const landing of landings) {
+                expect(landing.isOwn, "each link lands on a heading inside its own example").toBe(true);
+                expect(landing.carriers, "whose id nothing else on the page carries").toBe(1);
+            }
         }
     });
 
@@ -130,7 +162,7 @@ test.describe("a table of contents following its own scrolling box", () => {
             await expect(headings.nth(index), "which is on screen").toBeInViewport();
             await expect(links.nth(index), "that link is the current one").toHaveAttribute("aria-current", "location");
             await expect(page.locator(MARKED), "and no other is").toHaveCount(1);
-            expect(await readout(page, "tableOfContents"), "the page reports the same section").toContain(
+            await expect(page.locator(READOUT), "the page reports the same section").toContainText(
                 ((await links.nth(index).textContent()) ?? "").trim(),
             );
         }
@@ -145,13 +177,16 @@ test.describe("a table of contents following its own scrolling box", () => {
         await page.setViewportSize(SHORT_WINDOW);
         await page.reload();
         await expect(page.locator(LINKS).first()).toBeVisible();
+        await docsSettled(page);
+
+        const links = page.locator(LINKS);
+        const index = (await links.count()) - 1;
+
+        await links.nth(index).scrollIntoViewIfNeeded();
 
         const before = await pageScrollTop(page);
 
         expect(before, "the page itself scrolls at this window size, which is the case being tested").toBeDefined();
-
-        const links = page.locator(LINKS);
-        const index = (await links.count()) - 1;
 
         await links.nth(index).click();
         await expect(page.locator(HEADINGS).nth(index)).toBeFocused();
@@ -292,7 +327,7 @@ test.describe("a table of contents on a page whose last sections are short", () 
         const box = (await scroller.boundingBox())!;
         const links = page.locator(LINKS);
 
-        await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+        await page.mouse.move(box.x + box.width * 0.5, box.y + box.height * 0.5);
         await page.mouse.wheel(0, 100_000);
         await expect.poll(() => isAtEnd(scroller), "the page reaches its end").toBe(true);
         await waitUntilStill(page.locator(`${API} [data-api-group]`).first());

@@ -7,3 +7,5 @@ export const RANGE_DEFAULTS = {
     step: 1,
     thumbSize: 16,
 };
+
+export const RANGE_ORIENTATIONS: readonly RangeOrientation[] = ["horizontal", "vertical"];

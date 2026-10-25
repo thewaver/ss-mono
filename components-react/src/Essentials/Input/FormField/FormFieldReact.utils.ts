@@ -1,12 +1,60 @@
-import { type RefObject, useLayoutEffect } from "react";
+import { type RefObject, useEffect, useLayoutEffect } from "react";
 
 import { FormFieldUtils } from "@thewaver/ss-components";
 
 import { useElement } from "../../../Utils/refUtils";
+import { useLabelContext } from "../Label/Label.context";
+import { LabelReactUtils } from "../Label/LabelReact.utils";
 import { useFormFieldContext } from "./FormField.context";
 
 /** The React side of `FormFieldUtils`: a control connected to the field around it. */
 export namespace FormFieldReactUtils {
+    /**
+     * The id of the caption that names the control, from the nearest `Label` or field.
+     *
+     * `FormFieldUtils.resolveAriaLabelledBy` against the nearest `Label` and `FormField`: the `Label`'s caption when the
+     * control sits inside one, and the field's caption otherwise. A control of your own puts the answer in its
+     * `aria-labelledby` and drops any `aria-label` while there is one, since the caption is then its name.
+     *
+     * @returns The caption's id, or `undefined` when there is no caption to point at, including inside a `Label` whose
+     * caption registered no id.
+     */
+    export const useAriaLabelledBy = () => {
+        const labelContext = useLabelContext();
+        const fieldContext = useFormFieldContext();
+
+        return FormFieldUtils.resolveAriaLabelledBy(
+            labelContext.getIsLabeled(),
+            labelContext.getCaptionId(),
+            fieldContext.getCaptionId(),
+        );
+    };
+
+    /**
+     * The name a library control carries: its own `aria-label`, or the caption of the `Label` or field around it.
+     *
+     * Either caption names the control through `aria-labelledby` (see {@link useAriaLabelledBy}); either way the
+     * caller's `aria-label` is dropped, since it would replace the caption the reader can see, and the dropped value is
+     * warned about when the control mounts so the caller can remove one of the two.
+     *
+     * @param ariaLabel The caller's own value, if any.
+     * @returns The `ariaLabel` and the `ariaLabelledBy` to write, either `undefined` when it should be left off.
+     */
+    export const useAriaName = (ariaLabel: string | undefined) => {
+        const isLabeled = useLabelContext().getIsLabeled();
+        const ownAriaLabel = LabelReactUtils.useAriaLabel(ariaLabel);
+        const ariaLabelledBy = useAriaLabelledBy();
+        const isCaptioned = !isLabeled && ariaLabelledBy !== undefined;
+        const hasAriaLabel = ariaLabel !== undefined;
+
+        useEffect(
+            () => FormFieldUtils.warnIfShadowed(isCaptioned, hasAriaLabel, "ariaLabel"),
+            [isCaptioned, hasAriaLabel],
+        );
+
+        return { ariaLabel: ariaLabelledBy === undefined ? ownAriaLabel : undefined, ariaLabelledBy };
+    };
+
     /**
      * Combines the caller's `aria-describedby` with the description of the nearest field.
      *

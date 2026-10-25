@@ -10,7 +10,7 @@
     import PageTableHeader from "../../PageComponents/TableHeader/TableHeader.svelte";
     import PageTableCellContent from "../../StyledComponents/TableContent/PageTableCellContent.svelte";
     import PageTableRowExpander from "../../StyledComponents/TableContent/PageTableRowExpander.svelte";
-    import type { Part, PartColumnDefs } from "./TablePage.types";
+    import type { Part, PartColumnDefs } from "./TablePageSvelte.types";
 
     export * from "@thewaver/ss-playground/App/Pages/TablePage/TableParts.const";
 
@@ -43,7 +43,7 @@
         {
             id: "category",
             header: "Category",
-            widthPx: 120,
+            widthPx: defs.isReorderable ? 140 : 120,
             minWidthPx: 90,
             maxWidthPx: 240,
             isSortable: true,
@@ -56,7 +56,7 @@
         {
             id: "stock",
             header: "In stock",
-            widthPx: 100,
+            widthPx: defs.isReorderable ? 130 : 100,
             minWidthPx: 70,
             maxWidthPx: 200,
             isSortable: true,

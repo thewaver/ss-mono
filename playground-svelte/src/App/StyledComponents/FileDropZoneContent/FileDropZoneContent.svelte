@@ -24,6 +24,12 @@
     <div class={styles.fileDropZonePrompt}>{props.prompt}</div>
 
     <div class={[styles.fileDropZoneNames, !props.renderProps.files.length && styles.isEmpty]}>
-        {props.renderProps.files.length ? props.renderProps.files.map((file) => file.name).join(", ") : NO_FILES}
+        {#if props.renderProps.files.length}
+            {#each props.renderProps.files as file, index (index)}
+                {index > 0 ? ", " : ""}<bdi>{file.name}</bdi>
+            {/each}
+        {:else}
+            {NO_FILES}
+        {/if}
     </div>
 </div>

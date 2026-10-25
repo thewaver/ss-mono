@@ -13,7 +13,7 @@ export const PageSortableItemContent = (props: PropsWithChildren<SortableItemCon
             className={[
                 styles.sortableItemContent,
                 layerClass,
-                props.isCenterd === true && styles.sortableItemCenterd,
+                props.isCentered === true && styles.sortableItemCentered,
                 props.flags.isCarried && styles.isCarried,
                 props.flags.isHovered && styles.isHovered,
                 props.flags.isDisabled && styles.isDisabled,

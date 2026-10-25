@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { untrack } from "svelte";
+
     import {
         TAG_INPUT_DEFAULTS,
         type TagInputFlags,
@@ -17,8 +19,10 @@
 
     let { value = $bindable(), text = $bindable(TagInputConst.EMPTY_TEXT), ref = $bindable(), ...props }: TagInputProps = $props();
 
-    const getAriaLabel = LabelSvelteUtils.resolveAriaLabel(() => props.ariaLabel);
+    const { getAriaLabel, getAriaLabelledBy } = FormFieldSvelteUtils.resolveAriaName(() => props.ariaLabel);
     const getAriaDescribedBy = FormFieldSvelteUtils.resolveAriaDescribedBy();
+
+    $effect(() => untrack(() => TagInputUtils.warnIfTagsUnnamed(props.computeTagAriaLabel, "computeTagAriaLabel")));
 
     let tagElements = $state<(HTMLButtonElement | null | undefined)[]>([]);
 
@@ -92,7 +96,8 @@
             style:gap={`${props.gap ?? TAG_INPUT_DEFAULTS.gap}px`}
             style:padding={`${props.padding ?? TAG_INPUT_DEFAULTS.padding}px`}
             role="group"
-            aria-label={props.ariaLabel}
+            aria-label={getAriaLabelledBy() === undefined ? props.ariaLabel : undefined}
+            aria-labelledby={getAriaLabelledBy()}
             onpointerdown={(e) => {
                 if (e.target !== e.currentTarget || isDisabled) return;
 
@@ -154,6 +159,7 @@
                 value={text}
                 readonly={flags.isDisabled ?? false}
                 aria-label={getAriaLabel()}
+                aria-labelledby={getAriaLabelledBy()}
                 aria-describedby={getAriaDescribedBy()}
                 aria-disabled={flags.isDisabled || undefined}
                 oninput={(e) => {

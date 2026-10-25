@@ -2,6 +2,7 @@ import { type SlotsType, Teleport, computed, defineComponent, shallowRef, watch 
 
 import {
     CutoutUtils,
+    DismisserUtils,
     FocusManagerUtils,
     LiveAnnouncerUtils,
     SPOTLIGHT_DEFAULTS,
@@ -18,6 +19,7 @@ import { useViewportContext } from "../../Abstracts/Viewport/Viewport.context";
 import { watchAfterRender } from "../../Utils/effectUtils";
 import { callSlot, declareProps, useTwoWay } from "../../Utils/propUtils";
 import { toElement } from "../../Utils/refUtils";
+import { useStore } from "../../Utils/storeUtils";
 import type { SlotsContext } from "../../Utils/typeUtils";
 import type { SpotlightPopupSlot, SpotlightProps, SpotlightSlots } from "./Spotlight.types";
 
@@ -35,20 +37,42 @@ export const Spotlight = defineComponent(
         const getTransitionDurationMs = () => props.transitionDurationMs ?? SPOTLIGHT_DEFAULTS.transitionDurationMs;
         const getHasPopup = () => props.mode === "guide" && slots.renderPopup !== undefined;
 
-        const fader = ElementFaderVueUtils.useFader(visibility, {
+        const dismiss = () => {
+            visibility.value = false;
+        };
+
+        const layer = SpotlightUtils.createLayer(() => props.mode, dismiss);
+
+        const isOnTop = useStore(DismisserUtils.openLayers, () => SpotlightUtils.getIsOnTop(layer));
+
+        const fader = ElementFaderVueUtils.useFader(() => visibility.value && isOnTop.value, {
             transitionDurationMs: getTransitionDurationMs,
             ref: portalRef,
-            onShow: () => props.onShow?.(),
-            onHide: () => props.onHide?.(),
         });
 
         const isVisible = fader.isVisible;
+        const isActing = computed(() => isVisible.value && isOnTop.value);
+
+        watchAfterRender([() => visibility.value || isVisible.value], ([isRegistered]) => {
+            if (!isRegistered) return;
+
+            return DismisserUtils.addLayer(layer);
+        });
+
+        watch(
+            () => visibility.value,
+            (isOpen, wasOpen) => {
+                if (isOpen) props.onShow?.();
+                else if (wasOpen) props.onHide?.();
+            },
+            { immediate: true },
+        );
 
         const rect = ElementObserverVueUtils.useViewportRect(() => props.elementRef, isVisible, {
             padding: () => props.padding ?? SPOTLIGHT_DEFAULTS.padding,
         });
 
-        ElevationVueUtils.useElevation(() => props.elementRef, isVisible, SpotlightStyles.SPOTLIGHT_Z_INDEX);
+        ElevationVueUtils.useElevation(() => props.elementRef, isActing, SpotlightStyles.SPOTLIGHT_Z_INDEX);
 
         watchAfterRender([isVisible, () => props.elementRef], ([isShown, element]) => {
             if (!isShown || !element) return;
@@ -66,24 +90,20 @@ export const Spotlight = defineComponent(
             },
         );
 
-        const dismiss = () => {
-            visibility.value = false;
-        };
+        watchAfterRender([isActing], ([isOn]) => {
+            if (!isOn) return;
 
-        watchAfterRender([isVisible], ([isShown]) => {
-            if (!isShown) return;
-
-            return SpotlightUtils.observeDismissKeys(() => props.mode, dismiss);
+            return SpotlightUtils.observeDismissKeys(layer, () => props.mode, dismiss);
         });
 
-        watchAfterRender([isVisible, () => props.mode, () => props.elementRef], ([isShown, mode, element]) => {
-            if (!isShown || mode !== "prompt" || !element) return;
+        watchAfterRender([isActing, () => props.mode, () => props.elementRef], ([isOn, mode, element]) => {
+            if (!isOn || mode !== "prompt" || !element) return;
 
             return SpotlightUtils.holdFocus(element);
         });
 
-        watchAfterRender([isVisible, () => props.mode, portalRef], ([isShown, mode, portal]) => {
-            if (!isShown || mode !== "guide" || !portal) return;
+        watchAfterRender([isActing, () => props.mode, portalRef], ([isOn, mode, portal]) => {
+            if (!isOn || mode !== "guide" || !portal) return;
 
             return FocusManagerUtils.sealAround(portal);
         });
@@ -94,8 +114,12 @@ export const Spotlight = defineComponent(
             LiveAnnouncerUtils.reserve("polite");
         });
 
-        watchAfterRender([isVisible, () => props.announcement], ([isShown, announcement]) => {
-            if (!isShown) return;
+        watchAfterRender([isActing, () => props.announcement], ([isOn, announcement]) => {
+            if (!isOn) {
+                announced = undefined;
+
+                return;
+            }
 
             if (SpotlightUtils.getIsAnnouncementDue(announced, announcement)) {
                 LiveAnnouncerUtils.announce(announcement!);
@@ -104,7 +128,18 @@ export const Spotlight = defineComponent(
             announced = announcement;
         });
 
-        const isPlacing = computed(() => isVisible.value && getHasPopup());
+        let hasWarnedUnannounced = false;
+
+        watchAfterRender(
+            [() => props.announcement, () => isVisible.value && props.mode === "guide"],
+            ([announcement, isGuideShowing]) => {
+                if (hasWarnedUnannounced || !isGuideShowing) return;
+
+                hasWarnedUnannounced = SpotlightUtils.warnIfUnannounced(announcement, "announcement");
+            },
+        );
+
+        const isPlacing = computed(() => isActing.value && getHasPopup());
         const hasPlaced = shallowRef(false);
 
         watch(
@@ -119,7 +154,7 @@ export const Spotlight = defineComponent(
             { immediate: true },
         );
 
-        FocusManagerVueUtils.useAutoFocus(popupRef, hasPlaced);
+        FocusManagerVueUtils.useAutoFocus(popupRef, hasPlaced, { isOpen: () => visibility.value });
 
         return () => {
             const currentRect = rect.value;

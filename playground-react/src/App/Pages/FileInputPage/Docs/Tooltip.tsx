@@ -1,0 +1,33 @@
+import { useState } from "react";
+
+import { FileInput } from "@thewaver/ss-components-react";
+
+import { PageFileInputContent } from "../../../StyledComponents/FileInputContent/FileInputContent";
+import { PageTooltipContent } from "../../../StyledComponents/TooltipContent/TooltipContent";
+import type { FileInputTooltipDocsExampleProps } from "../FileInputPageReact.types";
+
+type Props = FileInputTooltipDocsExampleProps;
+
+export const TooltipDocsExample = (props: Props) => {
+    const filesState = useState<File[]>([]);
+
+    return (
+        <FileInput
+            files={filesState}
+            isDisabled={props.isDisabled}
+            isReachableWhenDisabled={props.isReachableWhenDisabled}
+            ariaLabel={"Disabled but reachable attachment"}
+            renderContent={(renderProps) => <PageFileInputContent renderProps={renderProps} />}
+            tooltipDefs={{
+                placement: { x: "center", y: "top_out" },
+                offset: { x: 0, y: 10 },
+                hoverShowDelayMs: 0,
+                renderContent: (visibilityTarget, transitionDurationMs) => (
+                    <PageTooltipContent visibilityTarget={visibilityTarget} transitionDurationMs={transitionDurationMs}>
+                        Focusable so this tooltip can be read, but the file dialog must not open.
+                    </PageTooltipContent>
+                ),
+            }}
+        />
+    );
+};

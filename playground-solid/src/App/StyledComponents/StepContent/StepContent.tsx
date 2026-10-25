@@ -12,8 +12,9 @@ export const PageStepContent = (props: ParentProps<StepContentProps>) => {
 
     return (
         <div
-            class={access(props.orientation) === "horizontal" ? styles.rowStep : styles.columnStep}
             classList={{
+                [styles.rowStep]: access(props.orientation) === "horizontal",
+                [styles.columnStep]: access(props.orientation) !== "horizontal",
                 [getLayerClass()]: true,
                 [styles.isCurrent]: access(props.flags).isCurrent,
                 [styles.isHovered]: access(props.flags).isHovered,

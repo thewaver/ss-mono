@@ -1,10 +1,15 @@
 import { type Locator, type Page, expect, test } from "@playwright/test";
 
-import { activeText, demo, readout, scrollTop, waitUntilStill } from "./helpers";
+import { activeMatches, docsDemo, docsSettled, scrollTop, waitUntilStill } from "./helpers";
 
-const HINT = demo("hint");
-const PROMPT = demo("prompt");
-const GUIDE = demo("guide");
+const GUIDE_DOCS = "/src/App/Pages/Spotlights/SpotlightGuidePage/Docs";
+const HINT_DOCS = "/src/App/Pages/Spotlights/SpotlightHintPage/Docs";
+const PROMPT_DOCS = "/src/App/Pages/Spotlights/SpotlightPromptPage/Docs";
+
+const HINT = docsDemo(HINT_DOCS, "Basic");
+const PROMPT = docsDemo(PROMPT_DOCS, "Basic");
+const GUIDE = docsDemo(GUIDE_DOCS, "Basic");
+const TOUR = docsDemo(GUIDE_DOCS, "Tour");
 
 const SETTLE_MS = 300;
 
@@ -20,14 +25,10 @@ const BLOCKER = 'div[style*="polygon(evenodd"]';
 const CORNERS = "svg polygon";
 const POPUP = '[role="dialog"]';
 const TOOLTIP = '[role="tooltip"]';
+const ANNOUNCER = '[role="log"][aria-live="polite"]';
 
 /** Every layer the spotlight paints sits here, so a tooltip that is to stay readable has to beat it. */
 const SPOTLIGHT_Z_INDEX = 10;
-
-const button = (scope: string, name: string) => `${scope} button:has-text("${name}")`;
-
-/** The popup is portaled out of its variant container, so its own buttons are scoped to the dialog. */
-const popupButton = (name: string) => `${POPUP} button:has-text("${name}")`;
 
 const isFocusInsidePopup = (page: Page) =>
     page.evaluate(() => {
@@ -36,13 +37,18 @@ const isFocusInsidePopup = (page: Page) =>
         return !!popup && !!document.activeElement && popup.contains(document.activeElement);
     });
 
+const isActive = (locator: Locator) => locator.evaluate((element) => document.activeElement === element);
+
+const readoutOf = async (page: Page, demo: string) =>
+    ((await page.locator(`${demo} [data-readout]`).textContent()) ?? "").trim();
+
 /**
  * The hint's own triggers sit inside a container running a looping CSS slide, so they never stop moving and
  * Playwright's stability check can never pass — a pointer click there waits out the full timeout. Focus and
  * Enter need no geometry, and a keyboard user reaching a moving button is the same journey.
  */
 const pressByKeyboard = async (page: Page, selector: string) => {
-    await page.locator(selector).first().focus();
+    await page.locator(selector).focus();
     await page.keyboard.press("Enter");
 };
 
@@ -58,19 +64,16 @@ const stopSliding = (page: Page) =>
         }
     });
 
-/**
- * The three presets now sit on pages of their own, so each test opens the one it is about. The first two
- * tests are about the overlay every preset lays down rather than about any one of them, and use the hint's
- * page because it is the smallest.
- */
+/** Each preset has a Docs page of its own, so each test opens the one it is about. */
 const open = async (page: Page, route: string, scope: string) => {
     await page.goto(route);
-    await expect(page.locator(scope).first()).toBeVisible();
+    await expect(page.locator(scope)).toBeVisible();
+    await docsSettled(page);
 };
 
-const openHint = (page: Page) => open(page, "/spotlight-hint", HINT);
-const openPrompt = (page: Page) => open(page, "/spotlight-prompt", PROMPT);
-const openGuide = (page: Page) => open(page, "/spotlight-guide", GUIDE);
+const openHint = (page: Page) => open(page, "/spotlight-hint/docs", HINT);
+const openPrompt = (page: Page) => open(page, "/spotlight-prompt/docs", PROMPT);
+const openGuide = (page: Page) => open(page, "/spotlight-guide/docs", GUIDE);
 
 test("nothing is portaled before anything is highlighted", async ({ page }) => {
     await openHint(page);
@@ -80,7 +83,7 @@ test("nothing is portaled before anything is highlighted", async ({ page }) => {
 
 test("opening lays one clipped layer over the page with the element cut out of it", async ({ page }) => {
     await openHint(page);
-    await pressByKeyboard(page, button(HINT, "Highlight Me"));
+    await pressByKeyboard(page, "#hintAcross");
 
     await expect(page.locator(BLOCKER), "one layer rather than a ring of boxes").toHaveCount(1);
     await expect(page.locator(CORNERS), "and the consumer's four corner marks").toHaveCount(4);
@@ -104,14 +107,14 @@ test("a tooltip on the highlighted element rises above the overlay, and only the
         page.locator(TOOLTIP).evaluate((element) => Number.parseInt(getComputedStyle(element).zIndex, 10));
 
     await stopSliding(page);
-    await page.locator(button(HINT, "Highlight Me")).first().hover();
+    await page.locator("#hintAcross").hover();
     await expect(page.locator(TOOLTIP)).toBeVisible();
 
     expect(await readTooltipZIndex(), "on the plain page it sits just above its own button").toBeLessThan(
         SPOTLIGHT_Z_INDEX,
     );
 
-    await pressByKeyboard(page, button(HINT, "Highlight Me"));
+    await pressByKeyboard(page, "#hintAcross");
     await expect(page.locator(BLOCKER)).toHaveCount(1);
     await expect(page.locator(TOOLTIP), "the tooltip is still the one opened before the spotlight").toBeVisible();
 
@@ -128,33 +131,37 @@ test("a tooltip on the highlighted element rises above the overlay, and only the
  */
 test("a hint is dismissed by a real key and survives a bare modifier", async ({ page }) => {
     await openHint(page);
-    await pressByKeyboard(page, button(HINT, "Highlight Me"));
-    expect(await readout(page, "hint")).toContain("open: true");
+    await pressByKeyboard(page, "#hintAcross");
+    await expect(page.locator(BLOCKER)).toHaveCount(1);
 
     await page.keyboard.down("Shift");
     await page.keyboard.up("Shift");
-    expect(await readout(page, "hint"), "holding Shift is not moving on").toContain("open: true");
+    await page.waitForTimeout(SETTLE_MS);
+    await expect(page.locator(BLOCKER), "holding Shift is not moving on").toHaveCount(1);
 
     await page.keyboard.press("a");
-    expect(await readout(page, "hint"), "but a key that means something is").toContain("open: false");
+    await expect(page.locator(BLOCKER), "but a key that means something is").toHaveCount(0);
 });
 
 test("a prompt refuses every other control until the highlighted one is used", async ({ page }) => {
     await openPrompt(page);
-    await page.locator(button(PROMPT, "Insist")).click();
+    const atRest = await readoutOf(page, PROMPT);
+
+    await page.locator("#promptInsist").click();
     await expect(page.locator(BLOCKER)).toHaveCount(1);
 
     await page
-        .locator(button(PROMPT, "Insist"))
+        .locator("#promptInsist")
         .click({ force: true, timeout: 2000 })
         .catch(() => undefined);
-    expect(await readout(page, "prompt"), "the trigger behind the overlay is unreachable").toContain("bought: 0");
+    expect(await readoutOf(page, PROMPT), "the trigger behind the overlay is unreachable").toBe(atRest);
 
     await page.keyboard.press("Tab");
-    expect(await activeText(page), "and focus is pulled back to the one live control").toContain("Buy the potato");
+    expect(await activeMatches(page, "#promptBuy"), "and focus is pulled back to the one live control").toBe(true);
 
-    await page.locator(button(PROMPT, "Buy the potato")).click();
-    expect(await readout(page, "prompt"), "using it is the way out").toContain("bought: 1");
+    await page.locator("#promptBuy").click();
+    expect(await readoutOf(page, PROMPT), "using it is the way out").not.toBe(atRest);
+    await expect(page.locator(BLOCKER)).toHaveCount(0);
 });
 
 /**
@@ -163,13 +170,15 @@ test("a prompt refuses every other control until the highlighted one is used", a
  */
 test("a prompt still answers Escape, which is what keeps it out of a keyboard trap", async ({ page }) => {
     await openPrompt(page);
-    await page.locator(button(PROMPT, "Insist")).click();
+    const atRest = await readoutOf(page, PROMPT);
+
+    await page.locator("#promptInsist").click();
     await expect(page.locator(BLOCKER)).toHaveCount(1);
 
     await page.keyboard.press("Escape");
 
     await expect(page.locator(BLOCKER), "the spotlight is gone").toHaveCount(0);
-    expect(await readout(page, "prompt"), "without the highlighted control ever being used").toContain("bought: 0");
+    expect(await readoutOf(page, PROMPT), "without the highlighted control ever being used").toBe(atRest);
 });
 
 /**
@@ -177,10 +186,9 @@ test("a prompt still answers Escape, which is what keeps it out of a keyboard tr
  * seals is not inside the demo — it is the whole page around it, and there is nothing narrower to point at.
  * What can be narrowed is the question: a bare count of `[inert]` over the document answers "did the guide
  * seal the page" and "is anything else on this page inert for its own reasons" at the same time, and the
- * second reading is live, because the page header's dependency lists are collapsed disclosures and a
- * collapsed disclosure is inert. Both assertions therefore compare against what was already inert before
- * the tour started, which leaves one question each: the guide sealed more than it found, and afterwards it
- * left exactly what it found.
+ * second reading is live, because collapsed disclosures on the page are inert. Both assertions therefore
+ * compare against what was already inert before the tour started, which leaves one question each: the guide
+ * sealed more than it found, and afterwards it left exactly what it found.
  */
 const inertCount = (page: Page) => page.locator("[inert]").count();
 
@@ -188,7 +196,7 @@ test("a guide seals the page and puts focus in its own popup", async ({ page }) 
     await openGuide(page);
     const alreadyInert = await inertCount(page);
 
-    await page.locator(button(GUIDE, "Take the tour")).click();
+    await page.locator("#guideStart").click();
     await expect(page.locator(POPUP)).toBeVisible();
     await page.waitForTimeout(SETTLE_MS);
 
@@ -201,30 +209,60 @@ test("a guide seals the page and puts focus in its own popup", async ({ page }) 
     ).toBeGreaterThan(alreadyInert);
 });
 
-test("a guide steps between elements and reports how it ended", async ({ page }) => {
+test("a guide steps between elements and hands the page back when it finishes", async ({ page }) => {
     await openGuide(page);
     const alreadyInert = await inertCount(page);
 
-    await page.locator(button(GUIDE, "Take the tour")).click();
+    await page.locator("#guideStart").click();
     await expect(page.locator(POPUP)).toBeVisible();
 
-    expect(await readout(page, "guide"), "it starts on the first step").toContain("step: 1 of 2");
-    await expect(page.locator(POPUP)).toContainText("This is a potato");
+    const firstStep = await page.locator(POPUP).textContent();
 
-    await page.locator(popupButton("Next")).click();
+    await page.locator("#guideNext").click();
 
-    expect(await readout(page, "guide"), "Next advances it").toContain("step: 2 of 2");
+    await expect(page.locator(POPUP), "Next moves the popup to the next element's text").not.toHaveText(
+        firstStep ?? "",
+    );
     expect(
-        await activeText(page),
+        await isActive(page.locator("#guideNext")),
         "and focus stays where the reader put it — a step change must not throw them onto Skip all",
-    ).toContain("Done");
-    await expect(page.locator(POPUP), "and the popup follows to the next element").toContainText("turnip");
+    ).toBe(true);
 
-    await page.locator(popupButton("Done")).click();
+    await page.locator("#guideNext").click();
 
     await expect(page.locator(POPUP), "finishing closes it").toHaveCount(0);
-    expect(await readout(page, "guide")).toContain("finished");
     await expect(page.locator("[inert]"), "and the page is handed back").toHaveCount(alreadyInert);
+});
+
+/**
+ * How the tour ended is the page's own statement in its readout, so the test asks that finishing and skipping
+ * report different things, each different from what it said while the tour ran.
+ */
+test("a guide reports how it ended, and finishing is not skipping", async ({ page }) => {
+    await openGuide(page);
+
+    await page.locator("#guideStart").click();
+    await expect(page.locator(POPUP)).toBeVisible();
+
+    const running = await readoutOf(page, GUIDE);
+
+    await page.locator("#guideNext").click();
+    await page.locator("#guideNext").click();
+    await expect(page.locator(POPUP)).toHaveCount(0);
+
+    const finished = await readoutOf(page, GUIDE);
+
+    expect(finished, "finishing is reported").not.toBe(running);
+
+    await page.locator("#guideStart").click();
+    await expect(page.locator(POPUP)).toBeVisible();
+    await page.locator("#guideSkip").click();
+    await expect(page.locator(POPUP)).toHaveCount(0);
+
+    const skipped = await readoutOf(page, GUIDE);
+
+    expect(skipped, "abandoning it is reported").not.toBe(running);
+    expect(skipped, "and differently from finishing").not.toBe(finished);
 });
 
 /**
@@ -235,20 +273,19 @@ test("a guide steps between elements and reports how it ended", async ({ page })
  */
 test("a step change is announced, and opening the tour is not announced twice", async ({ page }) => {
     await openGuide(page);
-    const announcer = '[role="log"][aria-live="polite"]';
 
-    await page.locator(button(GUIDE, "Take the tour")).click();
+    await page.locator("#guideStart").click();
     await expect(page.locator(POPUP)).toBeVisible();
 
     await expect(
-        page.locator(announcer),
+        page.locator(ANNOUNCER),
         "the popup took focus, so the reader is already on the first step",
-    ).not.toContainText("Step 1 of 2");
+    ).not.toContainText("Step 1 of");
 
-    await page.locator(popupButton("Next")).click();
+    await page.locator("#guideNext").click();
 
-    await expect(page.locator(announcer), "and the step that replaces it under held focus is spoken").toContainText(
-        "Step 2 of 2",
+    await expect(page.locator(ANNOUNCER), "and the step that replaces it under held focus is spoken").toContainText(
+        "Step 2 of",
     );
 });
 
@@ -259,22 +296,21 @@ test("a step change is announced, and opening the tour is not announced twice", 
  * until something scrolls to it, which is the situation a long page produces naturally.
  *
  * The reading at the first step is captured rather than asserted to be zero. The strip is padded and a step
- * is taller than the band left inside it, so `scrollIntoView({ block: "nearest" })` aligns the step's top
- * and that alone moves the strip by the padding — a fact about how the example is painted, which is not what
- * this test is for. What it is for is the travel between the two, so the second reading is compared against
- * the first.
+ * is taller than the band left inside it, so aligning the step's top alone moves the strip by the padding — a
+ * fact about how the example is painted, which is not what this test is for. What it is for is the travel
+ * between the two, so the second reading is compared against the first.
  */
 test("a guide scrolls a step that is out of sight into view", async ({ page }) => {
     await openGuide(page);
     const strip = page.locator(`${GUIDE} [data-scroll-box]`);
 
-    await page.locator(button(GUIDE, "Take the tour")).click();
+    await page.locator("#guideStart").click();
     await expect(page.locator(POPUP)).toBeVisible();
     await page.waitForTimeout(SETTLE_MS);
 
     const atFirstStep = await scrollTop(strip);
 
-    await page.locator(popupButton("Next")).click();
+    await page.locator("#guideNext").click();
     await page.waitForTimeout(SETTLE_MS);
 
     expect(await scrollTop(strip), "the second is reached rather than highlighted off-screen").toBeGreaterThan(
@@ -282,45 +318,35 @@ test("a guide scrolls a step that is out of sight into view", async ({ page }) =
     );
 });
 
-test("a guide can be abandoned, and says so", async ({ page }) => {
-    await openGuide(page);
-    await page.locator(button(GUIDE, "Take the tour")).click();
-    await expect(page.locator(POPUP)).toBeVisible();
-
-    await page.locator(popupButton("Skip all")).click();
-
-    await expect(page.locator(POPUP)).toHaveCount(0);
-    expect(await readout(page, "guide")).toContain("skipped");
-});
-
 /**
- * The shop tour is a guide with a step the reader performs rather than reads. A guide seals the whole page, so
- * it cannot also let the reader press the button it is pointing at; the example hands over instead — on the
- * waiting step the guide closes and a prompt lights the one control, and using that control reopens the guide
- * on the next step. These follow that relay end to end, and check that each half is the mode it claims to be
- * at the moment it is live.
+ * The shop tour is a guide with a step the reader performs rather than reads. A guide seals the whole page, so it
+ * cannot also let the reader press the button it is pointing at; on the waiting step a prompt opens over the guide
+ * and lights the one control. Spotlights stack the way modals do: the guide stays open beneath the prompt, fades
+ * out and stops acting while covered, and comes back when the prompt closes. Using the control brings the guide
+ * back on the next step; Escape on the prompt brings it back on the same one.
  *
- * The demo's add, checkout and start buttons are found by the ids the page gave them, and the popup's three
- * actions, which carry none, by where they sit rather than by what they say: skip, back and forward in that
- * order. The step and status are read from the
- * page's readout, which is the page's own statement of where the tour is.
+ * Every control carries an id the page gave it: start, add and checkout on the page, skip, back and forward in the
+ * popup. The step and the tour's status are read from the example's readout, `Step: N of M, status`, which is the
+ * page's own statement of where the tour is; a status is compared with another status, never with words.
  */
 test.describe("a tour with a step the reader does", () => {
-    const TOUR = demo("tour");
-    const STEP_COUNT = 4;
     const WAITING_STEP = 2;
 
     const addButton = (page: Page) => page.locator("#tourAdd");
     const checkoutButton = (page: Page) => page.locator("#tourCheckout");
     const startButton = (page: Page) => page.locator("#tourStart");
+    const skipAction = (page: Page) => page.locator("#tourSkip");
+    const backAction = (page: Page) => page.locator("#tourBack");
+    const forwardAction = (page: Page) => page.locator("#tourForward");
 
-    const skipAction = (page: Page) => page.locator(`${POPUP} button`).nth(0);
-    const backAction = (page: Page) => page.locator(`${POPUP} button`).nth(1);
-    const forwardAction = (page: Page) => page.locator(`${POPUP} button`).nth(2);
+    const readTour = async (page: Page) => {
+        const match = /(\d+) of (\d+), (.+)$/.exec(await readoutOf(page, TOUR));
 
-    const stepReadout = async (page: Page) => Number(/step: (\d+) of/.exec(await readout(page, "tour"))?.[1]);
+        return { step: Number(match?.[1]), count: Number(match?.[2]), status: match?.[3] ?? "" };
+    };
 
-    const isActive = (locator: Locator) => locator.evaluate((element) => document.activeElement === element);
+    const stepReadout = async (page: Page) => (await readTour(page)).step;
+    const statusReadout = async (page: Page) => (await readTour(page)).status;
 
     const blockerClip = (page: Page) =>
         page.locator(BLOCKER).evaluate((element) => (element as HTMLElement).style.clipPath);
@@ -338,6 +364,12 @@ test.describe("a tour with a step the reader does", () => {
         await expect.poll(() => stepReadout(page)).toBe(WAITING_STEP);
     };
 
+    const handOver = async (page: Page) => {
+        await reachWaitingStep(page);
+        await forwardAction(page).click();
+        await expect(page.locator(POPUP)).toHaveCount(0);
+    };
+
     test.beforeEach(async ({ page }) => {
         await openGuide(page);
         await expect(page.locator(TOUR)).toBeVisible();
@@ -350,7 +382,6 @@ test.describe("a tour with a step the reader does", () => {
         await waitUntilStill(page.locator(POPUP));
 
         expect(await stepReadout(page), "it starts at the beginning").toBe(1);
-        expect(await readout(page, "tour")).toContain(`of ${STEP_COUNT}`);
         await expect(page.locator(POPUP)).toHaveAttribute("aria-modal", "true");
         expect(await page.locator(POPUP).getAttribute("aria-label"), "and names itself").toBeTruthy();
         await expect.poll(() => isFocusInsidePopup(page), { message: "focus lands inside it" }).toBe(true);
@@ -384,56 +415,110 @@ test.describe("a tour with a step the reader does", () => {
     });
 
     /**
-     * The handover is the example's whole point, and every half of it is checked: the guide lets go of the page
-     * (nothing it sealed stays inert, or the button could not be pressed), the prompt takes over and pulls focus
-     * to the one live control, the other controls stay out of reach while it holds, and pressing the lit
-     * control does the real work and brings the guide back on the next step with focus inside it again.
+     * The guide is not closed to make room for the prompt: it stays open beneath it, so the tour's status does not
+     * move, and the one overlay on screen is the prompt's, around the button.
      */
-    test("the waiting step hands over to a prompt, and doing the step brings the guide back", async ({ page }) => {
-        const alreadyInert = await inertCount(page);
-
+    test("the tour opens its prompt over the guide, which stays open beneath it", async ({ page }) => {
         await reachWaitingStep(page);
+        const running = await statusReadout(page);
+
         await forwardAction(page).click();
 
-        await expect(page.locator(POPUP), "the guide closes rather than sealing the button away").toHaveCount(0);
-        await expect(page.locator(BLOCKER), "and one clipped layer is left, the prompt's").toHaveCount(1);
-        await expect(page.locator("[inert]"), "the guide has unsealed the page").toHaveCount(alreadyInert);
+        await expect(page.locator(POPUP), "the guide's popup fades out under the prompt").toHaveCount(0);
+        await expect(
+            page.locator(BLOCKER),
+            "one clipped layer is left, the prompt's, not one per spotlight",
+        ).toHaveCount(1);
         expect(await stepReadout(page), "the tour has not moved on by itself").toBe(WAITING_STEP);
-        expect(await readout(page, "tour"), "and nothing has been added yet").toContain("basket: 0");
+        expect(await statusReadout(page), "and the guide was never closed, so the tour is still running").toBe(running);
+    });
+
+    /**
+     * Only the spotlight on top acts. The covered guide neither seals the page nor holds focus in its popup — had it
+     * kept acting, the button the prompt lights could not be pressed, and the two would pull focus back and forth.
+     * The prompt does act: it pulls focus to its control and keeps the others out of reach.
+     */
+    test("spotlights stack, and only the top one acts", async ({ page }) => {
+        const alreadyInert = await inertCount(page);
+
+        await handOver(page);
+
+        await expect(page.locator("[inert]"), "the covered guide has let go of the page").toHaveCount(alreadyInert);
 
         await page.keyboard.press("Tab");
-        expect(await isActive(addButton(page)), "focus is pulled to the one control the step is about").toBe(true);
+        expect(await isActive(addButton(page)), "the prompt on top pulls focus to the one control it lights").toBe(
+            true,
+        );
+        expect(await isFocusInsidePopup(page), "and nothing pulls it back into the guide").toBe(false);
 
         await checkoutButton(page)
             .click({ force: true, timeout: 2000 })
             .catch(() => undefined);
-        expect(await isActive(checkoutButton(page)), "and the other controls stay out of reach").toBe(false);
+        expect(await isActive(checkoutButton(page)), "the other controls stay out of reach").toBe(false);
 
         await addButton(page).click();
 
-        expect(await readout(page, "tour"), "the button does its real job").toContain("basket: 1");
-        await expect(page.locator(POPUP), "and the guide comes back").toBeVisible();
+        await expect(page.locator(POPUP), "once the prompt has gone, the guide is on top and comes back").toBeVisible();
         expect(await stepReadout(page), "on the step after the one the reader did").toBe(WAITING_STEP + 1);
-        await expect.poll(() => isFocusInsidePopup(page), { message: "with focus back inside it" }).toBe(true);
-        await expect(page.locator(BLOCKER), "and only the guide's overlay is left").toHaveCount(1);
+        await expect.poll(() => isFocusInsidePopup(page), { message: "acting again, with focus inside it" }).toBe(true);
+        expect(await inertCount(page), "and sealing the page again").toBeGreaterThan(alreadyInert);
+        await expect(page.locator(BLOCKER), "with only the guide's overlay left").toHaveCount(1);
+    });
+
+    test("one Escape closes only the top layer", async ({ page }) => {
+        await handOver(page);
+        const running = await statusReadout(page);
+
+        await page.keyboard.press("Escape");
+
+        await expect(page.locator(POPUP), "the first Escape closes the prompt, and the guide comes back").toBeVisible();
+        expect(await stepReadout(page), "on the same step, since the reader did not do it").toBe(WAITING_STEP);
+        expect(await statusReadout(page), "with the tour still running").toBe(running);
+        await expect(page.locator(BLOCKER), "one overlay, the guide's").toHaveCount(1);
+
+        await page.keyboard.press("Escape");
+
+        await expect(page.locator(POPUP), "the second Escape closes the guide").toHaveCount(0);
+        await expect(page.locator(BLOCKER), "with no overlay left behind").toHaveCount(0);
+        expect(await statusReadout(page), "and the tour says it stopped").not.toBe(running);
+    });
+
+    /**
+     * WCAG 2.4.3. A guide covered by the prompt loses focus and gets it back on its return, by which time focus sits
+     * wherever the prompt left it — the button the reader pressed. Closing the guide afterwards must still return
+     * focus to what opened the tour, not to that button.
+     */
+    test("a spotlight returns focus to what first opened it", async ({ page }) => {
+        await handOver(page);
+        await addButton(page).click();
+        await expect(page.locator(POPUP)).toBeVisible();
+        await expect.poll(() => isFocusInsidePopup(page)).toBe(true);
+
+        await page.keyboard.press("Escape");
+        await expect(page.locator(POPUP)).toHaveCount(0);
+
+        await expect(startButton(page), "focus goes back to the button that started the tour").toBeFocused();
+        expect(await isActive(addButton(page)), "not to the one pressed while the guide was covered").toBe(false);
     });
 
     test("the last step finishes the tour and hands the page back", async ({ page }) => {
         const alreadyInert = await inertCount(page);
 
-        await reachWaitingStep(page);
-        await forwardAction(page).click();
-        await expect(page.locator(POPUP)).toHaveCount(0);
+        await handOver(page);
         await addButton(page).click();
         await expect(page.locator(POPUP)).toBeVisible();
 
-        while ((await stepReadout(page)) < STEP_COUNT) await forwardAction(page).click();
+        const { count } = await readTour(page);
+
+        while ((await stepReadout(page)) < count) await forwardAction(page).click();
+
+        const running = await statusReadout(page);
 
         await forwardAction(page).click();
 
         await expect(page.locator(POPUP), "finishing closes it").toHaveCount(0);
         await expect(page.locator(BLOCKER), "with no overlay left behind").toHaveCount(0);
-        expect(await readout(page, "tour")).toContain("finished");
+        expect(await statusReadout(page), "the tour says it ended").not.toBe(running);
         await expect(page.locator("[inert]"), "and the page is handed back").toHaveCount(alreadyInert);
     });
 
@@ -442,35 +527,35 @@ test.describe("a tour with a step the reader does", () => {
         await forwardAction(page).click();
         expect(await stepReadout(page)).toBe(2);
 
+        const running = await statusReadout(page);
+
         await skipAction(page).click();
 
         await expect(page.locator(POPUP)).toHaveCount(0);
         await expect(page.locator(BLOCKER)).toHaveCount(0);
-        expect(await readout(page, "tour")).toContain("skipped");
+        expect(await statusReadout(page)).not.toBe(running);
     });
 
     /**
      * The step is kept for the session, so a reader who reloads part-way is offered the tour where they left
      * it rather than from the start. Ending it — finished or skipped — clears the memory, which the second
-     * reload checks.
+     * reload checks against what a fresh page said.
      */
     test("a reload part-way offers to resume at the same step, and ending it forgets", async ({ page }) => {
-        await start(page);
-        await forwardAction(page).click();
-        await expect.poll(() => stepReadout(page)).toBe(2);
-        await forwardAction(page).click();
-        await expect(page.locator(POPUP)).toHaveCount(0);
+        const fresh = await statusReadout(page);
+
+        await handOver(page);
         await addButton(page).click();
-        await expect.poll(() => stepReadout(page)).toBe(3);
+        await expect.poll(() => stepReadout(page)).toBe(WAITING_STEP + 1);
 
         await page.reload();
         await expect(page.locator(TOUR)).toBeVisible();
 
-        expect(await readout(page, "tour"), "the page knows a tour was left part-way").toContain("paused");
+        expect(await statusReadout(page), "the page knows a tour was left part-way").not.toBe(fresh);
         await expect(page.locator(POPUP), "without opening it unasked").toHaveCount(0);
 
         await start(page);
-        expect(await stepReadout(page), "starting again resumes where it was left").toBe(3);
+        expect(await stepReadout(page), "starting again resumes where it was left").toBe(WAITING_STEP + 1);
 
         await skipAction(page).click();
         await expect(page.locator(POPUP)).toHaveCount(0);
@@ -478,7 +563,7 @@ test.describe("a tour with a step the reader does", () => {
         await page.reload();
         await expect(page.locator(TOUR)).toBeVisible();
 
-        expect(await readout(page, "tour"), "once ended, there is nothing to resume").toContain("not started");
+        expect(await statusReadout(page), "once ended, there is nothing to resume").toBe(fresh);
 
         await start(page);
         expect(await stepReadout(page), "and it starts from the beginning").toBe(1);

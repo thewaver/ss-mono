@@ -1,11 +1,21 @@
-import { type SlotsType, defineComponent } from "vue";
+import { type SlotsType, computed, defineComponent, shallowRef } from "vue";
 
-import { DateTimePickerStyles, DateTimePickerUtils, type DateValue } from "@thewaver/ss-components";
+import {
+    DateTimePickerStyles,
+    DateTimePickerUtils,
+    type DateValue,
+    type InteractionFlags,
+    InteractionTrackerUtils,
+    type TextFieldFlags,
+    TextFieldUtils,
+} from "@thewaver/ss-components";
 import type { TimeValue } from "@thewaver/ss-utils";
 
 import { DateTimeValueVueUtils } from "../../../Abstracts/DateTimeValue/DateTimeValueVue.utils";
 import { callSlot, declareProps, forwardProps, useTwoWay } from "../../../Utils/propUtils";
 import type { SlotsContext } from "../../../Utils/typeUtils";
+import { Tooltip } from "../../Overlays/Tooltip/Tooltip";
+import type { TooltipSlots } from "../../Overlays/Tooltip/Tooltip.types";
 import { DatePicker } from "../DatePicker/DatePicker";
 import type { DatePickerSlots } from "../DatePicker/DatePicker.types";
 import { TimePicker } from "../TimePicker/TimePicker";
@@ -19,6 +29,33 @@ export const DateTimePicker = defineComponent(
         const timeVisibility = useTwoWay(props, "timeVisibility", false);
 
         const { date, time } = DateTimeValueVueUtils.useSplit(value);
+
+        const rootRef = shallowRef<HTMLDivElement>();
+
+        const dateFlags = shallowRef<InteractionFlags<TextFieldFlags>>();
+        const timeFlags = shallowRef<InteractionFlags<TextFieldFlags>>();
+
+        const getPairFlags = () =>
+            TextFieldUtils.mergeFlags([dateFlags.value, timeFlags.value].flatMap((flags) => (flags ? [flags] : [])));
+
+        const tooltipDefs = computed(() => {
+            const defs = props.tooltipDefs;
+            const isDisabled = props.isDisabled ?? false;
+            const isReachable = InteractionTrackerUtils.computeIsReachable(
+                isDisabled,
+                props.isReachableWhenDisabled ?? false,
+            );
+
+            return defs && (!isDisabled || isReachable) ? defs : undefined;
+        });
+
+        const lastTooltipDefs = computed<typeof tooltipDefs.value>((previous) => tooltipDefs.value ?? previous);
+
+        const renderFieldContent = (flagsRef: typeof dateFlags) => (flags: InteractionFlags<TextFieldFlags>) => {
+            flagsRef.value = flags;
+
+            return callSlot(slots.renderContent, flags);
+        };
 
         return () => {
             const dateHalf = {
@@ -39,6 +76,7 @@ export const DateTimePicker = defineComponent(
                 "ariaLabel": props.dateLabel,
                 "minValue": props.minValue?.date,
                 "maxValue": props.maxValue?.date,
+                "tooltipDefs": undefined,
             };
 
             const timeHalf = {
@@ -60,14 +98,15 @@ export const DateTimePicker = defineComponent(
                 "maxValue": props.maxValue && DateTimePickerUtils.computeMaxTime(date.value, props.maxValue),
                 "triggerId": props.timeTriggerId,
                 "triggerAriaLabel": props.timeTriggerAriaLabel,
+                "tooltipDefs": undefined,
             };
 
             return (
-                <div class={DateTimePickerStyles.dateTimePickerRoot}>
+                <div ref={rootRef} class={DateTimePickerStyles.dateTimePickerRoot}>
                     <DatePicker {...dateHalf}>
                         {
                             {
-                                renderContent: slots.renderContent,
+                                renderContent: renderFieldContent(dateFlags),
                                 renderPlaceholder: slots.renderPlaceholder,
                                 renderLeading: slots.renderLeading,
                                 renderDecoration: slots.renderDecoration,
@@ -84,7 +123,7 @@ export const DateTimePicker = defineComponent(
                     <TimePicker {...timeHalf}>
                         {
                             {
-                                renderContent: slots.renderContent,
+                                renderContent: renderFieldContent(timeFlags),
                                 renderPlaceholder: slots.renderPlaceholder,
                                 renderDecoration: slots.renderDecoration,
                                 renderTrailing: slots.renderTimeTrailing,
@@ -96,6 +135,26 @@ export const DateTimePicker = defineComponent(
                             } satisfies Partial<TimePickerSlots>
                         }
                     </TimePicker>
+
+                    {lastTooltipDefs.value &&
+                        (() => {
+                            const { renderContent, ...tooltipProps } = lastTooltipDefs.value;
+
+                            return (
+                                <Tooltip
+                                    {...tooltipProps}
+                                    isAnchorGroup={true}
+                                    anchorRef={tooltipDefs.value ? rootRef.value : undefined}
+                                >
+                                    {
+                                        {
+                                            renderContent: (content) =>
+                                                renderContent({ ...content, flags: getPairFlags() }),
+                                        } satisfies TooltipSlots
+                                    }
+                                </Tooltip>
+                            );
+                        })()}
                 </div>
             );
         };
@@ -124,6 +183,7 @@ export const DateTimePicker = defineComponent(
             "isRequired": Boolean,
             "autoComplete": null,
             "isConcealed": Boolean,
+            "isLeftToRight": Boolean,
             "padding": null,
             "gap": null,
             "ariaAttributes": null,

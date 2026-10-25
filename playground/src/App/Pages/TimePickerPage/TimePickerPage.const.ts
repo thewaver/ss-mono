@@ -5,3 +5,5 @@ export const EXAMPLE_NAMES = {
 };
 
 export const EXAMPLES_ROOT = "/src/App/Pages/TimePickerPage/Examples";
+
+export const DOCS_ROOT = "/src/App/Pages/TimePickerPage/Docs";

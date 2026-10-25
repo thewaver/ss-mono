@@ -118,6 +118,7 @@ const ColorAreaElement = (props: ColorAreaElementProps) => {
                     key={axis}
                     ref={axisRefSetters[axis]}
                     type="range"
+                    dir="ltr"
                     name={props.name && `${props.name}-${axis}`}
                     className={ColorAreaStyles.colorAreaAxis}
                     min={ColorAreaUtils.AXIS_MIN}

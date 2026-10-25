@@ -59,10 +59,16 @@
 
     const currentValue = $derived(TableOfContentsUtils.computeCurrentValue(props.links, currentIndex));
 
-    watchChange(
-        () => currentValue,
-        (value) => props.onCurrentChange?.(value),
-    );
+    let reportedValue: typeof currentValue;
+
+    $effect(() => {
+        const value = currentValue;
+
+        if (value === reportedValue) return;
+
+        reportedValue = value;
+        untrack(() => props.onCurrentChange?.(value));
+    });
 
     $effect(() => {
         const list = targets;

@@ -1,6 +1,8 @@
-import type { ToastState, ToastsDir } from "@thewaver/ss-components-react";
-import { Button } from "@thewaver/ss-components-react";
+import type { ToastState, ToastsFlexDirection } from "@thewaver/ss-components-react";
+import { Button, TOASTS_DEFAULTS } from "@thewaver/ss-components-react";
 import {
+    DEFAULT_ANIMATION,
+    DEFAULT_STACKING,
     PERCENT,
     PILE_MIN_SCALE,
     PILE_PEEK,
@@ -13,9 +15,9 @@ import { PageLayer } from "../../PageComponents/Layer/Layer";
 import { PageButtonContent } from "../ButtonContent/ButtonContent";
 import type { ToastContentProps } from "./ToastContentReact.types";
 
-const computePileShift = (state: ToastState, dir: ToastsDir, gap: number) => {
-    const isColumn = dir === "column" || dir === "column-reverse";
-    const sign = dir === "column-reverse" || dir === "row-reverse" ? -1 : 1;
+const computePileShift = (state: ToastState, flexDirection: ToastsFlexDirection, gap: number) => {
+    const isColumn = flexDirection === "column" || flexDirection === "column-reverse";
+    const sign = flexDirection === "column-reverse" || flexDirection === "row-reverse" ? -1 : 1;
     const extents = state.sizes.map((size) => (isColumn ? size.height : size.width));
 
     const computeFlowStart = (index: number) =>
@@ -43,7 +45,14 @@ const computeSwipeShift = (state: ToastState) => {
 };
 
 const computeTransform = (props: ToastContentProps) => {
-    const pile = props.stacking === "pile" ? computePileShift(props.state, props.dir, props.gap) : undefined;
+    const pile =
+        (props.stacking ?? DEFAULT_STACKING) === "pile"
+            ? computePileShift(
+                  props.state,
+                  props.flexDirection ?? TOASTS_DEFAULTS.flexDirection,
+                  props.gap ?? TOASTS_DEFAULTS.gap,
+              )
+            : undefined;
     const transforms = [
         computeSwipeShift(props.state),
         pile && `translate${pile.isColumn ? "Y" : "X"}(${pile.shift}px) scale(${pile.scale})`,
@@ -68,7 +77,7 @@ export const PageToastContent = (props: ToastContentProps) => {
                         styles.toastKindVariants[props.toast.value.kind],
                         props.visibilityTarget === 1
                             ? styles.toastAnimationOn
-                            : styles.toastAnimationOffVariants[props.animation],
+                            : styles.toastAnimationOffVariants[props.animation ?? DEFAULT_ANIMATION],
                     ].join(" ")}
                     style={{
                         transition: `transform ${props.transitionDurationMs}ms, opacity ${props.transitionDurationMs}ms`,
@@ -82,6 +91,8 @@ export const PageToastContent = (props: ToastContentProps) => {
                             {props.toast.durationMs === undefined && " · stays until dismissed"}
                             {props.state.isPaused && " · paused"}
                         </div>
+
+                        {props.children}
                     </div>
 
                     <Button

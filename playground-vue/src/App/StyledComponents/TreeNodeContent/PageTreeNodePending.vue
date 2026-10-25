@@ -18,7 +18,7 @@ const layerClass = useLayerClass();
     <div
         :class="[styles.treeNodePending, layerClass]"
         :style="{
-            paddingLeft: `calc(${themeVars.spacing.half} + ${depth * INDENT_PER_DEPTH}px)`,
+            paddingInlineStart: `calc(${themeVars.spacing.half} + ${depth * INDENT_PER_DEPTH}px)`,
         }"
     >
         <div :class="styles.treeNodeMarker" aria-hidden="true">

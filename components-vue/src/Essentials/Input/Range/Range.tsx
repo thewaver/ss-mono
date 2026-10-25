@@ -21,7 +21,6 @@ import { callSlot, declareProps, forwardProps, useTwoWay } from "../../../Utils/
 import { exposeElement, toElement } from "../../../Utils/refUtils";
 import type { SlotsContext } from "../../../Utils/typeUtils";
 import { FormFieldVueUtils } from "../FormField/FormFieldVue.utils";
-import { LabelVueUtils } from "../Label/LabelVue.utils";
 import type { RangeElementProps, RangeProps, RangeSlots } from "./Range.types";
 
 const readFocusVisibleThumb = (element: HTMLElement, index: number) =>
@@ -29,7 +28,7 @@ const readFocusVisibleThumb = (element: HTMLElement, index: number) =>
 
 const RangeElement = defineComponent(
     (props: RangeElementProps, { slots, expose }: SlotsContext<InteractionControlSlots<RangeRenderProps>>) => {
-        const ariaLabel = LabelVueUtils.useAriaLabel(() => props.ariaLabel);
+        const { ariaLabel, ariaLabelledBy } = FormFieldVueUtils.useAriaName(() => props.ariaLabel);
         const ariaDescribedBy = FormFieldVueUtils.useAriaDescribedBy();
 
         const elements = shallowRef<(HTMLInputElement | undefined)[]>([]);
@@ -122,6 +121,9 @@ const RangeElement = defineComponent(
                                 max={bounds.max}
                                 step={props.step}
                                 aria-label={props.thumbLabels?.[index] ?? ariaLabel.value}
+                                aria-labelledby={
+                                    props.thumbLabels?.[index] === undefined ? ariaLabelledBy.value : undefined
+                                }
                                 aria-valuetext={props.computeValueText?.(value, index)}
                                 aria-describedby={ariaDescribedBy.value}
                                 aria-orientation={props.orientation === "vertical" ? "vertical" : undefined}

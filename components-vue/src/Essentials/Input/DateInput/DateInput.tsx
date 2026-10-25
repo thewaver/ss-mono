@@ -53,6 +53,8 @@ export const DateInput = defineComponent(
                     format: getFormat(),
                     calendar: getCalendar(),
                     era: fieldValue.value?.era ?? era.value,
+                    disabledDays: props.disabledDays,
+                    computeIsDayDisabled: props.computeIsDayDisabled,
                 }),
             getHasImpossibleDigits: (digits) => DateInputUtils.getHasImpossiblePart(digits, getFormat(), bounds.value),
             getIsSame: DateValueUtils.isSame,
@@ -72,6 +74,8 @@ export const DateInput = defineComponent(
                 value: era.value,
                 options: eraOptions.value,
                 set: (next) => {
+                    if ((props.isDisabled ?? false) || (props.isReadOnly ?? false)) return;
+
                     era.value = next;
 
                     if (!fieldValue.value) return;
@@ -141,6 +145,7 @@ export const DateInput = defineComponent(
             "isRequired": Boolean,
             "autoComplete": null,
             "isConcealed": Boolean,
+            "isLeftToRight": Boolean,
             "padding": null,
             "gap": null,
             "ariaAttributes": null,
@@ -150,6 +155,8 @@ export const DateInput = defineComponent(
             "calendar": null,
             "locale": null,
             "partHints": null,
+            "disabledDays": null,
+            "computeIsDayDisabled": null,
             "value": null,
             "onUpdate:value": null,
         }),

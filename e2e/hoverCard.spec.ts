@@ -1,10 +1,14 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { activeMatches, demo, readout } from "./helpers";
+import { activeMatches, docsDemo, docsSettled } from "./helpers";
 
-const ANCHOR = `${demo("profile")} button`;
-const BEFORE_ANCHOR = "#profileSource";
+const DOCS = "/src/App/Pages/HoverCardPage/Docs";
+const DEMO = docsDemo(DOCS, "Basic");
+const ANCHOR = "#profileAnchor";
 const CARD = '[role="dialog"]';
+
+const BEFORE_ID = "beforeProfileAnchor";
+const FOLLOWING_ID = "afterProfileAnchor";
 
 /**
  * Longer than the hover wait and the focus wait the page starts with, plus the fade. Only ever spent to show
@@ -22,12 +26,37 @@ const anchorAttributeNames = (page: Page) =>
     page.evaluate((selector) => document.querySelector(selector)!.getAttributeNames().sort(), ANCHOR);
 
 /**
+ * Puts a control straight before the name and one straight after it, inside the sentence. The sentence holds only
+ * the name, so without them there is nothing to Tab from and nothing definite for Tab past the card to go on to;
+ * what the page holds around the example is whatever the Playground happens to draw there.
+ */
+const placeControlsAroundAnchor = (page: Page) =>
+    page.evaluate(
+        ({ selector, before, after }) => {
+            const anchor = document.querySelector(selector)!;
+
+            for (const [id, place] of [
+                [before, "before"],
+                [after, "after"],
+            ] as const) {
+                const button = document.createElement("button");
+
+                button.id = id;
+                button.type = "button";
+                button.textContent = id;
+                anchor[place](button);
+            }
+        },
+        { selector: ANCHOR, before: BEFORE_ID, after: FOLLOWING_ID },
+    );
+
+/**
  * Keyboard focus is reached by Tab from the element before the anchor rather than by `focus()`, because the
  * card tells a keyboard focus from a pointer press by whether the anchor is `:focus-visible`, and a real Tab is
  * the one route that answers that the way a person's keyboard would.
  */
 const tabToAnchor = async (page: Page) => {
-    await page.locator(BEFORE_ANCHOR).focus();
+    await page.locator(`#${BEFORE_ID}`).focus();
     await page.keyboard.press("Tab");
     expect(await activeMatches(page, ANCHOR), "Tab from the element before it lands on the name").toBe(true);
 };
@@ -38,8 +67,10 @@ const openedByKeyboard = async (page: Page) => {
 };
 
 test.beforeEach(async ({ page }) => {
-    await page.goto("/hover-card");
-    await expect(page.locator("[data-example]").first()).toBeVisible();
+    await page.goto("/hover-card/docs");
+    await expect(page.locator(ANCHOR)).toBeVisible();
+    await docsSettled(page);
+    await placeControlsAroundAnchor(page);
 });
 
 /**
@@ -62,11 +93,10 @@ test("resting the pointer on the name opens a named dialog, portaled out of the 
     await page.locator(ANCHOR).hover();
 
     await expect(page.locator(CARD), "resting on the name opens the card").toBeVisible();
-    expect(await readout(page, "profile"), "and the page's own reading agrees").toContain("open: true");
     expect(
         await page.evaluate(
             (selectors) => !document.querySelector(selectors.demo)!.contains(document.querySelector(selectors.card)),
-            { demo: demo("profile"), card: CARD },
+            { demo: DEMO, card: CARD },
         ),
         "the card is portaled out of the sentence rather than nested in it",
     ).toBe(true);
@@ -82,7 +112,7 @@ test("resting the pointer on the name opens a named dialog, portaled out of the 
 });
 
 test("leaving the name before the wait is up opens nothing", async ({ page }) => {
-    const demoBox = (await page.locator(demo("profile")).boundingBox())!;
+    const demoBox = (await page.locator(DEMO).boundingBox())!;
 
     await page.locator(ANCHOR).hover();
     await page.mouse.move(demoBox.x + 2, demoBox.y + 2);
@@ -103,41 +133,22 @@ test("the pointer can cross the gap onto the card, and leaving both closes it", 
 
     const anchorBox = (await page.locator(ANCHOR).boundingBox())!;
     const cardBox = (await page.locator(CARD).boundingBox())!;
-    const demoBox = (await page.locator(demo("profile")).boundingBox())!;
+    const demoBox = (await page.locator(DEMO).boundingBox())!;
 
-    const midX = anchorBox.x + anchorBox.width / 2;
-    const gapMidY = (anchorBox.y + anchorBox.height + cardBox.y) / 2;
+    const midX = anchorBox.x + anchorBox.width * 0.5;
+    const gapMidY = (anchorBox.y + anchorBox.height + cardBox.y) * 0.5;
 
     await page.mouse.move(midX, gapMidY);
     await page.waitForTimeout(FADE_SETTLED_MS);
     await expect(page.locator(CARD), "resting in the gap between the two does not lose it").toHaveCount(1);
 
-    await page.mouse.move(cardBox.x + cardBox.width / 2, cardBox.y + cardBox.height / 2);
+    await page.mouse.move(cardBox.x + cardBox.width * 0.5, cardBox.y + cardBox.height * 0.5);
     await page.waitForTimeout(FADE_SETTLED_MS);
     await expect(page.locator(CARD), "and neither does arriving on the card itself").toHaveCount(1);
 
     await page.mouse.move(demoBox.x + 2, demoBox.y + 2);
     await expect(page.locator(CARD), "leaving both for good takes it away").toHaveCount(0);
 });
-
-const FOLLOWING_ID = "afterProfileExample";
-
-/**
- * Puts a control on the page straight after the profile example, so there is always something for Tab past the card
- * to go on to. The page's own content after the example is whatever the Playground happens to hold, and with nothing
- * there the browser wraps to the top of the page, from the name as much as from the card.
- */
-const placeControlAfterExample = (page: Page) =>
-    page.evaluate(
-        ({ selector, id }) => {
-            const button = document.createElement("button");
-
-            button.id = id;
-            button.textContent = id;
-            document.querySelector(selector)!.after(button);
-        },
-        { selector: demo("profile"), id: FOLLOWING_ID },
-    );
 
 /**
  * The card is portaled to the end of the document, so without help the next Tab after the anchor would land on
@@ -149,7 +160,6 @@ const placeControlAfterExample = (page: Page) =>
 test("Tab from the name moves into the card, through its controls, and on to what follows the name", async ({
     page,
 }) => {
-    await placeControlAfterExample(page);
     await openedByKeyboard(page);
 
     await page.keyboard.press("Tab");
@@ -205,12 +215,17 @@ test("Shift+Tab from the card's first control goes back to the name, and the car
 test("a control inside the card works from the keyboard", async ({ page }) => {
     await openedByKeyboard(page);
 
-    expect(await readout(page, "profile"), "nothing has been pressed yet").toContain("following: false");
-
     await page.keyboard.press("Tab");
+
+    const first = page.locator(`${CARD} button`).first();
+    const before = await first.textContent();
+
     await page.keyboard.press("Enter");
 
-    expect(await readout(page, "profile"), "Enter on the card's first control presses it").toContain("following: true");
+    await expect(
+        first,
+        "Enter on the card's first control presses it, and the example says so in its label",
+    ).not.toHaveText(before ?? "");
     await expect(page.locator(CARD), "and the card stays open around it").toHaveCount(1);
 });
 

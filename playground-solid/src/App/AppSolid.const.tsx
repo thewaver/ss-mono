@@ -21,20 +21,20 @@ const lazyPage = <K extends string>(load: () => Promise<Record<K, Component>>, k
 
 const AccordionDocs = lazyPage(() => import("./Pages/Accordions/AccordionPage/AccordionDocs"), "AccordionDocs");
 const CollapsibleDocs = lazyPage(() => import("./Pages/Accordions/CollapsiblePage/CollapsibleDocs"), "CollapsibleDocs");
-const AudioSwitcherPage = lazyPage(() => import("./Pages/AudioSwitcherPage/AudioSwitcherPage"), "AudioSwitcherPage");
+const AudioSwitcherDocs = lazyPage(() => import("./Pages/AudioSwitcherPage/AudioSwitcherDocs"), "AudioSwitcherDocs");
 const BracketPage = lazyPage(() => import("./Pages/BracketPage/BracketPage"), "BracketPage");
 const BreadcrumbsDocs = lazyPage(() => import("./Pages/BreadcrumbsPage/BreadcrumbsDocs"), "BreadcrumbsDocs");
 const ButtonDocs = lazyPage(() => import("./Pages/ButtonPage/ButtonDocs"), "ButtonDocs");
-const CalendarPage = lazyPage(() => import("./Pages/CalendarPage/CalendarPage"), "CalendarPage");
+const CalendarDocs = lazyPage(() => import("./Pages/CalendarPage/CalendarDocs"), "CalendarDocs");
 const CardStackPage = lazyPage(() => import("./Pages/CardStackPage/CardStackPage"), "CardStackPage");
 const CarouselDocs = lazyPage(() => import("./Pages/Carousels/CarouselPage/CarouselDocs"), "CarouselDocs");
 const CellAnimationPage = lazyPage(() => import("./Pages/CellAnimationPage/CellAnimationPage"), "CellAnimationPage");
-const CheckboxGroupPage = lazyPage(() => import("./Pages/CheckboxGroupPage/CheckboxGroupPage"), "CheckboxGroupPage");
+const CheckboxGroupDocs = lazyPage(() => import("./Pages/CheckboxGroupPage/CheckboxGroupDocs"), "CheckboxGroupDocs");
 const CheckboxDocs = lazyPage(() => import("./Pages/CheckboxPage/CheckboxDocs"), "CheckboxDocs");
 const CirclePackingPage = lazyPage(() => import("./Pages/CirclePackingPage/CirclePackingPage"), "CirclePackingPage");
-const ClockPage = lazyPage(() => import("./Pages/ClockPage/ClockPage"), "ClockPage");
-const ColorAreaPage = lazyPage(() => import("./Pages/ColorAreaPage/ColorAreaPage"), "ColorAreaPage");
-const ColorInputPage = lazyPage(() => import("./Pages/ColorInputPage/ColorInputPage"), "ColorInputPage");
+const ClockDocs = lazyPage(() => import("./Pages/ClockPage/ClockDocs"), "ClockDocs");
+const ColorAreaDocs = lazyPage(() => import("./Pages/ColorAreaPage/ColorAreaDocs"), "ColorAreaDocs");
+const ColorInputDocs = lazyPage(() => import("./Pages/ColorInputPage/ColorInputDocs"), "ColorInputDocs");
 const CornerHighlightPage = lazyPage(
     () => import("./Pages/CornerHighlightPage/CornerHighlightPage"),
     "CornerHighlightPage",
@@ -42,46 +42,46 @@ const CornerHighlightPage = lazyPage(
 const CornerPinPage = lazyPage(() => import("./Pages/CornerPinPage/CornerPinPage"), "CornerPinPage");
 const CuboidPage = lazyPage(() => import("./Pages/CuboidPage/CuboidPage"), "CuboidPage");
 const CurrencyInputDocs = lazyPage(() => import("./Pages/CurrencyInputPage/CurrencyInputDocs"), "CurrencyInputDocs");
-const DateInputPage = lazyPage(() => import("./Pages/DateInputPage/DateInputPage"), "DateInputPage");
-const DatePickerPage = lazyPage(() => import("./Pages/DatePickerPage/DatePickerPage"), "DatePickerPage");
-const DateRangePickerPage = lazyPage(
-    () => import("./Pages/DateRangePickerPage/DateRangePickerPage"),
-    "DateRangePickerPage",
+const DateInputDocs = lazyPage(() => import("./Pages/DateInputPage/DateInputDocs"), "DateInputDocs");
+const DatePickerDocs = lazyPage(() => import("./Pages/DatePickerPage/DatePickerDocs"), "DatePickerDocs");
+const DateRangePickerDocs = lazyPage(
+    () => import("./Pages/DateRangePickerPage/DateRangePickerDocs"),
+    "DateRangePickerDocs",
 );
-const DateTimePickerPage = lazyPage(
-    () => import("./Pages/DateTimePickerPage/DateTimePickerPage"),
-    "DateTimePickerPage",
+const DateTimePickerDocs = lazyPage(
+    () => import("./Pages/DateTimePickerPage/DateTimePickerDocs"),
+    "DateTimePickerDocs",
 );
 const DiePage = lazyPage(() => import("./Pages/DiePage/DiePage"), "DiePage");
-const DrawerPage = lazyPage(() => import("./Pages/DrawerPage/DrawerPage"), "DrawerPage");
+const DrawerDocs = lazyPage(() => import("./Pages/DrawerPage/DrawerDocs"), "DrawerDocs");
 const EdgeFaderDocs = lazyPage(() => import("./Pages/EdgeFaderPage/EdgeFaderDocs"), "EdgeFaderDocs");
-const FileInputPage = lazyPage(() => import("./Pages/FileInputPage/FileInputPage"), "FileInputPage");
+const FileInputDocs = lazyPage(() => import("./Pages/FileInputPage/FileInputDocs"), "FileInputDocs");
 const FlipCardPage = lazyPage(() => import("./Pages/FlipCardPage/FlipCardPage"), "FlipCardPage");
 const FlipbookPage = lazyPage(() => import("./Pages/FlipbookPage/FlipbookPage"), "FlipbookPage");
 const InfiniteCorridorPage = lazyPage(
     () => import("./Pages/InfiniteCorridorPage/InfiniteCorridorPage"),
     "InfiniteCorridorPage",
 );
-const FormFieldPage = lazyPage(() => import("./Pages/FormFieldPage/FormFieldPage"), "FormFieldPage");
+const FormFieldDocs = lazyPage(() => import("./Pages/FormFieldPage/FormFieldDocs"), "FormFieldDocs");
 const FormDocs = lazyPage(() => import("./Pages/FormPage/FormDocs"), "FormDocs");
-const FormSectionPage = lazyPage(() => import("./Pages/FormSectionPage/FormSectionPage"), "FormSectionPage");
+const FormSectionDocs = lazyPage(() => import("./Pages/FormSectionPage/FormSectionDocs"), "FormSectionDocs");
 const FormationPage = lazyPage(() => import("./Pages/FormationPage/FormationPage"), "FormationPage");
 const GlassSurfacePage = lazyPage(() => import("./Pages/GlassSurfacePage/GlassSurfacePage"), "GlassSurfacePage");
-const HoverCardPage = lazyPage(() => import("./Pages/HoverCardPage/HoverCardPage"), "HoverCardPage");
+const HoverCardDocs = lazyPage(() => import("./Pages/HoverCardPage/HoverCardDocs"), "HoverCardDocs");
 const IciclePage = lazyPage(() => import("./Pages/IciclePage/IciclePage"), "IciclePage");
-const ImageSwitcherPage = lazyPage(() => import("./Pages/ImageSwitcherPage/ImageSwitcherPage"), "ImageSwitcherPage");
-const LabelPage = lazyPage(() => import("./Pages/LabelPage/LabelPage"), "LabelPage");
-const ListboxPage = lazyPage(() => import("./Pages/ListboxPage/ListboxPage"), "ListboxPage");
-const MenubarPage = lazyPage(() => import("./Pages/MenubarPage/MenubarPage"), "MenubarPage");
-const CommandPalettePage = lazyPage(
-    () => import("./Pages/Menus/CommandPalettePage/CommandPalettePage"),
-    "CommandPalettePage",
+const ImageSwitcherDocs = lazyPage(() => import("./Pages/ImageSwitcherPage/ImageSwitcherDocs"), "ImageSwitcherDocs");
+const LabelDocs = lazyPage(() => import("./Pages/LabelPage/LabelDocs"), "LabelDocs");
+const ListboxDocs = lazyPage(() => import("./Pages/ListboxPage/ListboxDocs"), "ListboxDocs");
+const MenubarDocs = lazyPage(() => import("./Pages/MenubarPage/MenubarDocs"), "MenubarDocs");
+const CommandPaletteDocs = lazyPage(
+    () => import("./Pages/Menus/CommandPalettePage/CommandPaletteDocs"),
+    "CommandPaletteDocs",
 );
-const FanMenuPage = lazyPage(() => import("./Pages/Menus/FanMenuPage/FanMenuPage"), "FanMenuPage");
-const FlyoutMenuPage = lazyPage(() => import("./Pages/Menus/FlyoutMenuPage/FlyoutMenuPage"), "FlyoutMenuPage");
-const MenuPage = lazyPage(() => import("./Pages/Menus/MenuPage/MenuPage"), "MenuPage");
-const WheelMenuPage = lazyPage(() => import("./Pages/Menus/WheelMenuPage/WheelMenuPage"), "WheelMenuPage");
-const ModalPage = lazyPage(() => import("./Pages/ModalPage/ModalPage"), "ModalPage");
+const FanMenuDocs = lazyPage(() => import("./Pages/Menus/FanMenuPage/FanMenuDocs"), "FanMenuDocs");
+const FlyoutMenuDocs = lazyPage(() => import("./Pages/Menus/FlyoutMenuPage/FlyoutMenuDocs"), "FlyoutMenuDocs");
+const MenuDocs = lazyPage(() => import("./Pages/Menus/MenuPage/MenuDocs"), "MenuDocs");
+const WheelMenuDocs = lazyPage(() => import("./Pages/Menus/WheelMenuPage/WheelMenuDocs"), "WheelMenuDocs");
+const ModalDocs = lazyPage(() => import("./Pages/ModalPage/ModalDocs"), "ModalDocs");
 const ElementMosaicPage = lazyPage(
     () => import("./Pages/Mosaics/ElementMosaicPage/ElementMosaicPage"),
     "ElementMosaicPage",
@@ -92,7 +92,7 @@ const NumberInputDocs = lazyPage(() => import("./Pages/NumberInputPage/NumberInp
 const FittedTextPage = lazyPage(() => import("./Pages/FittedTextPage/FittedTextPage"), "FittedTextPage");
 const MorphTextPage = lazyPage(() => import("./Pages/MorphTextPage/MorphTextPage"), "MorphTextPage");
 const SlotTextPage = lazyPage(() => import("./Pages/SlotTextPage/SlotTextPage"), "SlotTextPage");
-const PaginatorPage = lazyPage(() => import("./Pages/PaginatorPage/PaginatorPage"), "PaginatorPage");
+const PaginatorDocs = lazyPage(() => import("./Pages/PaginatorPage/PaginatorDocs"), "PaginatorDocs");
 const PaintedTextPage = lazyPage(() => import("./Pages/PaintedTextPage/PaintedTextPage"), "PaintedTextPage");
 const ProximityTextPage = lazyPage(() => import("./Pages/ProximityTextPage/ProximityTextPage"), "ProximityTextPage");
 const ParticleFieldPage = lazyPage(() => import("./Pages/ParticleFieldPage/ParticleFieldPage"), "ParticleFieldPage");
@@ -114,11 +114,11 @@ const ShadowCasterPage = lazyPage(
     "ShadowCasterPage",
 );
 const TilterPage = lazyPage(() => import("./Pages/PointerEffects/TilterPage/TilterPage"), "TilterPage");
-const PreviewPage = lazyPage(() => import("./Pages/PreviewPage/PreviewPage"), "PreviewPage");
-const ProgressPage = lazyPage(() => import("./Pages/ProgressPage/ProgressPage"), "ProgressPage");
+const PreviewDocs = lazyPage(() => import("./Pages/PreviewPage/PreviewDocs"), "PreviewDocs");
+const ProgressDocs = lazyPage(() => import("./Pages/ProgressPage/ProgressDocs"), "ProgressDocs");
 const RadioDocs = lazyPage(() => import("./Pages/RadioPage/RadioDocs"), "RadioDocs");
-const RangeCalendarPage = lazyPage(() => import("./Pages/RangeCalendarPage/RangeCalendarPage"), "RangeCalendarPage");
-const RangePage = lazyPage(() => import("./Pages/RangePage/RangePage"), "RangePage");
+const RangeCalendarDocs = lazyPage(() => import("./Pages/RangeCalendarPage/RangeCalendarDocs"), "RangeCalendarDocs");
+const RangeDocs = lazyPage(() => import("./Pages/RangePage/RangeDocs"), "RangeDocs");
 const LensPage = lazyPage(() => import("./Pages/Reveals/LensPage/LensPage"), "LensPage");
 const RevealPage = lazyPage(() => import("./Pages/Reveals/RevealPage/RevealPage"), "RevealPage");
 const ScratchCardPage = lazyPage(() => import("./Pages/Reveals/ScratchCardPage/ScratchCardPage"), "ScratchCardPage");
@@ -146,55 +146,55 @@ const ScanlineAnimationPage = lazyPage(
     "ScanlineAnimationPage",
 );
 const ScrambleTextPage = lazyPage(() => import("./Pages/ScrambleTextPage/ScrambleTextPage"), "ScrambleTextPage");
-const ScrollerPage = lazyPage(() => import("./Pages/ScrollerPage/ScrollerPage"), "ScrollerPage");
-const SegmentedInputPage = lazyPage(
-    () => import("./Pages/SegmentedInputPage/SegmentedInputPage"),
-    "SegmentedInputPage",
+const ScrollerDocs = lazyPage(() => import("./Pages/ScrollerPage/ScrollerDocs"), "ScrollerDocs");
+const SegmentedInputDocs = lazyPage(
+    () => import("./Pages/SegmentedInputPage/SegmentedInputDocs"),
+    "SegmentedInputDocs",
 );
 const SelectDocs = lazyPage(() => import("./Pages/SelectPage/SelectDocs"), "SelectDocs");
 const ShapePage = lazyPage(() => import("./Pages/ShapePage/ShapePage"), "ShapePage");
 const ShapeRevealPage = lazyPage(() => import("./Pages/ShapeRevealPage/ShapeRevealPage"), "ShapeRevealPage");
-const SidebarPage = lazyPage(() => import("./Pages/SidebarPage/SidebarPage"), "SidebarPage");
+const SidebarDocs = lazyPage(() => import("./Pages/SidebarPage/SidebarDocs"), "SidebarDocs");
 const SlideButtonDocs = lazyPage(() => import("./Pages/SlideButtonPage/SlideButtonDocs"), "SlideButtonDocs");
 const SortableGridPage = lazyPage(() => import("./Pages/SortableGridPage/SortableGridPage"), "SortableGridPage");
-const SortablePage = lazyPage(() => import("./Pages/SortablePage/SortablePage"), "SortablePage");
-const SplitPanePage = lazyPage(() => import("./Pages/SplitPanePage/SplitPanePage"), "SplitPanePage");
-const SpotlightGuidePage = lazyPage(
-    () => import("./Pages/Spotlights/SpotlightGuidePage/SpotlightGuidePage"),
-    "SpotlightGuidePage",
+const SortableDocs = lazyPage(() => import("./Pages/SortablePage/SortableDocs"), "SortableDocs");
+const SplitPaneDocs = lazyPage(() => import("./Pages/SplitPanePage/SplitPaneDocs"), "SplitPaneDocs");
+const SpotlightGuideDocs = lazyPage(
+    () => import("./Pages/Spotlights/SpotlightGuidePage/SpotlightGuideDocs"),
+    "SpotlightGuideDocs",
 );
-const SpotlightHintPage = lazyPage(
-    () => import("./Pages/Spotlights/SpotlightHintPage/SpotlightHintPage"),
-    "SpotlightHintPage",
+const SpotlightHintDocs = lazyPage(
+    () => import("./Pages/Spotlights/SpotlightHintPage/SpotlightHintDocs"),
+    "SpotlightHintDocs",
 );
-const SpotlightPromptPage = lazyPage(
-    () => import("./Pages/Spotlights/SpotlightPromptPage/SpotlightPromptPage"),
-    "SpotlightPromptPage",
+const SpotlightPromptDocs = lazyPage(
+    () => import("./Pages/Spotlights/SpotlightPromptPage/SpotlightPromptDocs"),
+    "SpotlightPromptDocs",
 );
 const StaircasePage = lazyPage(() => import("./Pages/StaircasePage/StaircasePage"), "StaircasePage");
-const StepperPage = lazyPage(() => import("./Pages/StepperPage/StepperPage"), "StepperPage");
+const StepperDocs = lazyPage(() => import("./Pages/StepperPage/StepperDocs"), "StepperDocs");
 const SunburstPage = lazyPage(() => import("./Pages/SunburstPage/SunburstPage"), "SunburstPage");
 const SurfacePage = lazyPage(() => import("./Pages/SurfacePage/SurfacePage"), "SurfacePage");
-const TableOfContentsPage = lazyPage(
-    () => import("./Pages/TableOfContentsPage/TableOfContentsPage"),
-    "TableOfContentsPage",
+const TableOfContentsDocs = lazyPage(
+    () => import("./Pages/TableOfContentsPage/TableOfContentsDocs"),
+    "TableOfContentsDocs",
 );
-const TablePage = lazyPage(() => import("./Pages/TablePage/TablePage"), "TablePage");
-const TabsPage = lazyPage(() => import("./Pages/TabsPage/TabsPage"), "TabsPage");
-const TagInputPage = lazyPage(() => import("./Pages/TagInputPage/TagInputPage"), "TagInputPage");
+const TableDocs = lazyPage(() => import("./Pages/TablePage/TableDocs"), "TableDocs");
+const TabsDocs = lazyPage(() => import("./Pages/TabsPage/TabsDocs"), "TabsDocs");
+const TagInputDocs = lazyPage(() => import("./Pages/TagInputPage/TagInputDocs"), "TagInputDocs");
 const TextAreaDocs = lazyPage(() => import("./Pages/TextAreaPage/TextAreaDocs"), "TextAreaDocs");
 const TextInputDocs = lazyPage(() => import("./Pages/TextInputPage/TextInputDocs"), "TextInputDocs");
 const TileBoardPage = lazyPage(() => import("./Pages/TileBoardPage/TileBoardPage"), "TileBoardPage");
-const TimeInputPage = lazyPage(() => import("./Pages/TimeInputPage/TimeInputPage"), "TimeInputPage");
-const TimePickerPage = lazyPage(() => import("./Pages/TimePickerPage/TimePickerPage"), "TimePickerPage");
+const TimeInputDocs = lazyPage(() => import("./Pages/TimeInputPage/TimeInputDocs"), "TimeInputDocs");
+const TimePickerDocs = lazyPage(() => import("./Pages/TimePickerPage/TimePickerDocs"), "TimePickerDocs");
 const TimelinePage = lazyPage(() => import("./Pages/TimelinePage/TimelinePage"), "TimelinePage");
-const ToastsPage = lazyPage(() => import("./Pages/ToastsPage/ToastsPage"), "ToastsPage");
+const ToastsDocs = lazyPage(() => import("./Pages/ToastsPage/ToastsDocs"), "ToastsDocs");
 const ToggleDocs = lazyPage(() => import("./Pages/TogglePage/ToggleDocs"), "ToggleDocs");
-const ToolbarPage = lazyPage(() => import("./Pages/ToolbarPage/ToolbarPage"), "ToolbarPage");
-const TooltipPage = lazyPage(() => import("./Pages/TooltipPage/TooltipPage"), "TooltipPage");
+const ToolbarDocs = lazyPage(() => import("./Pages/ToolbarPage/ToolbarDocs"), "ToolbarDocs");
+const TooltipDocs = lazyPage(() => import("./Pages/TooltipPage/TooltipDocs"), "TooltipDocs");
 const TrailPage = lazyPage(() => import("./Pages/TrailPage/TrailPage"), "TrailPage");
 const WraparoundPage = lazyPage(() => import("./Pages/WraparoundPage/WraparoundPage"), "WraparoundPage");
-const TreePage = lazyPage(() => import("./Pages/TreePage/TreePage"), "TreePage");
+const TreeDocs = lazyPage(() => import("./Pages/TreePage/TreeDocs"), "TreeDocs");
 const TreemapPage = lazyPage(() => import("./Pages/TreemapPage/TreemapPage"), "TreemapPage");
 const TypewriterPage = lazyPage(() => import("./Pages/TypewriterPage/TypewriterPage"), "TypewriterPage");
 const ViewportWrapperPage = lazyPage(
@@ -374,7 +374,7 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                 children: [
                     {
                         name: "Calendar",
-                        component: () => <CalendarPage />,
+                        docs: () => <CalendarDocs />,
                     },
                     {
                         name: "Checkbox",
@@ -382,19 +382,19 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                     },
                     {
                         name: "CheckboxGroup",
-                        component: () => <CheckboxGroupPage />,
+                        docs: () => <CheckboxGroupDocs />,
                     },
                     {
                         name: "Clock",
-                        component: () => <ClockPage />,
+                        docs: () => <ClockDocs />,
                     },
                     {
                         name: "ColorArea",
-                        component: () => <ColorAreaPage />,
+                        docs: () => <ColorAreaDocs />,
                     },
                     {
                         name: "ColorInput",
-                        component: () => <ColorInputPage />,
+                        docs: () => <ColorInputDocs />,
                     },
                     {
                         name: "CurrencyInput",
@@ -402,39 +402,39 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                     },
                     {
                         name: "DateInput",
-                        component: () => <DateInputPage />,
+                        docs: () => <DateInputDocs />,
                     },
                     {
                         name: "DatePicker",
-                        component: () => <DatePickerPage />,
+                        docs: () => <DatePickerDocs />,
                     },
                     {
                         name: "DateRangePicker",
-                        component: () => <DateRangePickerPage />,
+                        docs: () => <DateRangePickerDocs />,
                     },
                     {
                         name: "DateTimePicker",
-                        component: () => <DateTimePickerPage />,
+                        docs: () => <DateTimePickerDocs />,
                     },
                     {
                         name: "FileInput",
-                        component: () => <FileInputPage />,
+                        docs: () => <FileInputDocs />,
                     },
                     {
                         name: "FormField",
-                        component: () => <FormFieldPage />,
+                        docs: () => <FormFieldDocs />,
                     },
                     {
                         name: "FormSection",
-                        component: () => <FormSectionPage />,
+                        docs: () => <FormSectionDocs />,
                     },
                     {
                         name: "Label",
-                        component: () => <LabelPage />,
+                        docs: () => <LabelDocs />,
                     },
                     {
                         name: "Listbox",
-                        component: () => <ListboxPage />,
+                        docs: () => <ListboxDocs />,
                     },
                     {
                         name: "MultiSelect",
@@ -450,15 +450,15 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                     },
                     {
                         name: "Range",
-                        component: () => <RangePage />,
+                        docs: () => <RangeDocs />,
                     },
                     {
                         name: "RangeCalendar",
-                        component: () => <RangeCalendarPage />,
+                        docs: () => <RangeCalendarDocs />,
                     },
                     {
                         name: "SegmentedInput",
-                        component: () => <SegmentedInputPage />,
+                        docs: () => <SegmentedInputDocs />,
                     },
                     {
                         name: "Select",
@@ -466,7 +466,7 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                     },
                     {
                         name: "TagInput",
-                        component: () => <TagInputPage />,
+                        docs: () => <TagInputDocs />,
                     },
                     {
                         name: "TextArea",
@@ -478,11 +478,11 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                     },
                     {
                         name: "TimeInput",
-                        component: () => <TimeInputPage />,
+                        docs: () => <TimeInputDocs />,
                     },
                     {
                         name: "TimePicker",
-                        component: () => <TimePickerPage />,
+                        docs: () => <TimePickerDocs />,
                     },
                     {
                         name: "Toggle",
@@ -495,40 +495,40 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                 children: [
                     {
                         name: "AudioSwitcher",
-                        component: () => <AudioSwitcherPage />,
+                        docs: () => <AudioSwitcherDocs />,
                     },
                     {
                         name: "ImageSwitcher",
-                        component: () => <ImageSwitcherPage />,
+                        docs: () => <ImageSwitcherDocs />,
                     },
                 ],
             },
             {
                 name: "Menubar",
-                component: () => <MenubarPage />,
+                docs: () => <MenubarDocs />,
             },
             {
                 name: "Menus",
                 children: [
                     {
                         name: "CommandPalette",
-                        component: () => <CommandPalettePage />,
+                        docs: () => <CommandPaletteDocs />,
                     },
                     {
                         name: "FanMenu",
-                        component: () => <FanMenuPage />,
+                        docs: () => <FanMenuDocs />,
                     },
                     {
                         name: "FlyoutMenu",
-                        component: () => <FlyoutMenuPage />,
+                        docs: () => <FlyoutMenuDocs />,
                     },
                     {
                         name: "Menu",
-                        component: () => <MenuPage />,
+                        docs: () => <MenuDocs />,
                     },
                     {
                         name: "WheelMenu",
-                        component: () => <WheelMenuPage />,
+                        docs: () => <WheelMenuDocs />,
                     },
                 ],
             },
@@ -537,98 +537,94 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                 children: [
                     {
                         name: "Drawer",
-                        component: () => <DrawerPage />,
+                        docs: () => <DrawerDocs />,
                     },
                     {
                         name: "HoverCard",
-                        component: () => <HoverCardPage />,
+                        docs: () => <HoverCardDocs />,
                     },
                     {
                         name: "Modal",
-                        component: () => <ModalPage />,
+                        docs: () => <ModalDocs />,
                     },
                     {
                         name: "Sidebar",
-                        component: () => <SidebarPage />,
+                        docs: () => <SidebarDocs />,
                     },
                     {
                         name: "Spotlights",
                         children: [
                             {
                                 name: "SpotlightGuide",
-                                component: () => <SpotlightGuidePage />,
+                                docs: () => <SpotlightGuideDocs />,
                             },
                             {
                                 name: "SpotlightHint",
-                                component: () => <SpotlightHintPage />,
+                                docs: () => <SpotlightHintDocs />,
                             },
                             {
                                 name: "SpotlightPrompt",
-                                component: () => <SpotlightPromptPage />,
+                                docs: () => <SpotlightPromptDocs />,
                             },
                         ],
                     },
                     {
                         name: "Toasts",
-                        component: () => <ToastsPage />,
+                        docs: () => <ToastsDocs />,
                     },
                     {
                         name: "Tooltip",
-                        component: () => <TooltipPage />,
+                        docs: () => <TooltipDocs />,
                     },
                 ],
             },
             {
                 name: "Paginator",
-                component: () => <PaginatorPage />,
+                docs: () => <PaginatorDocs />,
             },
             {
                 name: "Preview",
-                component: () => <PreviewPage />,
+                docs: () => <PreviewDocs />,
             },
             {
                 name: "Progress",
-                component: () => <ProgressPage />,
+                docs: () => <ProgressDocs />,
             },
             {
                 name: "Scroller",
-                component: () => <ScrollerPage />,
+                docs: () => <ScrollerDocs />,
             },
             {
                 name: "Sortable",
-                component: () => <SortablePage />,
+                docs: () => <SortableDocs />,
             },
             {
                 name: "SplitPane",
-                component: () => <SplitPanePage />,
+                docs: () => <SplitPaneDocs />,
             },
             {
                 name: "Stepper",
-                component: () => <StepperPage />,
+                docs: () => <StepperDocs />,
             },
             {
                 name: "Table",
-                component: () => <TablePage />,
+                docs: () => <TableDocs />,
             },
             {
                 name: "TableOfContents",
-                component: () => <TableOfContentsPage />,
+                docs: () => <TableOfContentsDocs />,
             },
             {
                 name: "Tabs",
-                component: () => <TabsPage />,
+                docs: () => <TabsDocs />,
             },
             {
                 name: "Toolbar",
-                component: () => <ToolbarPage />,
+                docs: () => <ToolbarDocs />,
             },
             {
                 name: "Tree",
-                component: () => <TreePage />,
-            },
-            {
-                name: "ViewportWrapper",
-                component: () => <ViewportWrapperPage />,
+                docs: () => <TreeDocs />,
             },
         ],
     },
@@ -869,6 +865,10 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                         component: () => <OverheadWheelPage />,
                     },
                 ],
+            },
+            {
+                name: "ViewportWrapper",
+                component: () => <ViewportWrapperPage />,
             },
             {
                 name: "Wraparound",

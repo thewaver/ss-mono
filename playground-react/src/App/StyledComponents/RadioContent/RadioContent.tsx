@@ -20,6 +20,7 @@ export const PageRadioContent = (props: PropsWithChildren<RadioContentProps>) =>
             ]
                 .filter(Boolean)
                 .join(" ")}
+            aria-hidden="true"
         >
             <div className={styles.radioMarker}>
                 <div className={styles.radioDot} />

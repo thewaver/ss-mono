@@ -20,7 +20,12 @@ const layerClass = useLayerClass();
             flags.isDisabled && styles.isDisabled,
             flags.hasError && styles.hasError,
         ]"
+        aria-hidden="true"
     >
-        <div :class="styles.toggleHandle" />
+        <div :class="styles.toggleTrack">
+            <div :class="styles.toggleHandle" />
+        </div>
+
+        <slot />
     </div>
 </template>

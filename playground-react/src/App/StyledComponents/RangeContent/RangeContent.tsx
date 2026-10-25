@@ -7,7 +7,7 @@ import type { RangeContentProps } from "./RangeContentReact.types";
 const travel = (ratio: number) => `calc(${ratio} * (100% - ${styles.RANGE_THUMB_SIZE}px))`;
 
 const center = (ratio: number) =>
-    `calc(${ratio} * (100% - ${styles.RANGE_THUMB_SIZE}px) + ${styles.RANGE_THUMB_SIZE / 2}px)`;
+    `calc(${ratio} * (100% - ${styles.RANGE_THUMB_SIZE}px) + ${styles.RANGE_THUMB_SIZE * 0.5}px)`;
 
 export const PageRangeContent = (props: RangeContentProps) => {
     const layerClass = useLayerClass();

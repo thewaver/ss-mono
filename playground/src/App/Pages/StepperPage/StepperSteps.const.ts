@@ -2,13 +2,14 @@ import type { StepValue } from "./StepperSteps.types";
 
 export const STEPPER_GAP = 5;
 
-export const ORDER: StepValue[] = ["details", "address", "payment", "review"];
+export const ORDER: StepValue[] = ["details", "address", "payment", "review", "done"];
 
 export const LABELS: Record<StepValue, string> = {
     details: "Details",
     address: "Address",
     payment: "Payment",
     review: "Review",
+    done: "Done",
 };
 
 export const BODIES: Record<StepValue, string> = {
@@ -18,4 +19,5 @@ export const BODIES: Record<StepValue, string> = {
     payment:
         "The card, and the small print nobody reads. Held until last so a mistyped digit costs one field rather than the whole form.",
     review: "Everything above, once more, in the order you filled it in. Press the button and it becomes somebody else's problem.",
+    done: "Process completed.",
 };

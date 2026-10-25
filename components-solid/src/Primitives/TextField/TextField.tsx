@@ -13,7 +13,6 @@ import { CSSUtils, StringUtils } from "@thewaver/ss-utils";
 
 import { TextSyncSolidUtils } from "../../Abstracts/TextSync/TextSyncSolid.utils";
 import { FormFieldSolidUtils } from "../../Essentials/Input/FormField/FormFieldSolid.utils";
-import { LabelSolidUtils } from "../../Essentials/Input/Label/LabelSolid.utils";
 import { access } from "../../Utils/propUtils";
 import { InteractionWrapper } from "../InteractionWrapper/InteractionWrapper";
 import type { TextFieldElementProps, TextFieldProps } from "./TextFieldSolid.types";
@@ -75,7 +74,7 @@ const createAutoHeight = (
 };
 
 const TextFieldElement = (props: TextFieldElementProps) => {
-    const getAriaLabel = LabelSolidUtils.resolveAriaLabel(
+    const { getAriaLabel, getAriaLabelledBy } = FormFieldSolidUtils.resolveAriaName(
         props.ariaLabel === undefined ? undefined : () => access(props.ariaLabel)!,
     );
     const getAriaDescribedBy = FormFieldSolidUtils.resolveAriaDescribedBy();
@@ -130,6 +129,7 @@ const TextFieldElement = (props: TextFieldElementProps) => {
                     props.ref?.(element);
                 }}
                 type={getType()}
+                dir={access(props.isLeftToRight) ? "ltr" : undefined}
                 rows={getIsAutoSizing() ? 1 : undefined}
                 name={access(props.name)}
                 class={styles.textFieldElement}
@@ -150,6 +150,7 @@ const TextFieldElement = (props: TextFieldElementProps) => {
                 readOnly={getIsDisabled() || getIsReadOnly()}
                 role={getIsSpinButton() ? "spinbutton" : undefined}
                 aria-label={getAriaLabel()}
+                aria-labelledby={getAriaLabelledBy()}
                 aria-describedby={getAriaDescribedBy()}
                 aria-valuenow={getIsSpinButton() ? getValueNow() : undefined}
                 aria-valuemin={getIsSpinButton() ? access(props.min) : undefined}
@@ -190,7 +191,7 @@ const TextFieldElement = (props: TextFieldElementProps) => {
                 <div
                     ref={props.setLeadingRef}
                     class={styles.textFieldAdornment}
-                    style={{ left: `${access(props.spreadPadding).paddingLeft}px` }}
+                    style={{ "inset-inline-start": `${access(props.spreadPadding).paddingInlineStart}px` }}
                 >
                     {props.renderLeading(() => access(props.flags))}
                 </div>
@@ -200,7 +201,7 @@ const TextFieldElement = (props: TextFieldElementProps) => {
                 <div
                     ref={props.setTrailingRef}
                     class={styles.textFieldAdornment}
-                    style={{ right: `${access(props.spreadPadding).paddingRight}px` }}
+                    style={{ "inset-inline-end": `${access(props.spreadPadding).paddingInlineEnd}px` }}
                 >
                     {props.renderTrailing(() => access(props.flags))}
                 </div>
@@ -240,16 +241,16 @@ export const TextField = (props: TextFieldProps) => {
     const getGap = () => access(props.gap) ?? TEXT_FIELD_DEFAULTS.gap;
 
     const getLeadingInset = createMemo(() =>
-        TextFieldUtils.computeInset(getSpreadPadding().paddingLeft, getLeadingWidth(), getGap()),
+        TextFieldUtils.computeInset(getSpreadPadding().paddingInlineStart, getLeadingWidth(), getGap()),
     );
 
     const getTrailingInset = createMemo(() =>
-        TextFieldUtils.computeInset(getSpreadPadding().paddingRight, getTrailingWidth(), getGap()),
+        TextFieldUtils.computeInset(getSpreadPadding().paddingInlineEnd, getTrailingWidth(), getGap()),
     );
 
     const getTextInset = createMemo(() =>
         CSSUtils.spreadableToStyle(
-            { ...getSpreadPadding(), paddingLeft: getLeadingInset(), paddingRight: getTrailingInset() },
+            { ...getSpreadPadding(), paddingInlineStart: getLeadingInset(), paddingInlineEnd: getTrailingInset() },
             StringUtils.camelToKebabCase,
         ),
     );
@@ -288,6 +289,7 @@ export const TextField = (props: TextFieldProps) => {
                     minRows={getMinRows}
                     maxRows={props.maxRows}
                     isConcealed={props.isConcealed}
+                    isLeftToRight={props.isLeftToRight}
                     flags={getFlags}
                     value={() => props.value[0]()}
                     textInset={getTextInset}

@@ -33,6 +33,7 @@ export const Tooltip = (props: TooltipProps) => {
         getSkipDelayWindowMs: () => access(props.skipDelayWindowMs) ?? TOOLTIP_DEFAULTS.skipDelayWindowMs,
         getFocusShowDelayMs: () => access(props.focusShowDelayMs) ?? TOOLTIP_DEFAULTS.focusShowDelayMs,
         isHiddenOnAnchorBlur: true,
+        isFocusWithin: untrack(() => access(props.isAnchorGroup)) ?? false,
     });
 
     const { getIsVisible, getTransitionTarget } = ElementFaderSolidUtils.createFader(getShouldShow, {
@@ -97,6 +98,27 @@ export const Tooltip = (props: TooltipProps) => {
         if (!anchorRef || !getIsVisible()) return;
 
         onCleanup(TooltipUtils.describe(anchorRef, tooltipId));
+    });
+
+    const [getFocusedControl, setFocusedControl] = createSignal<HTMLElement>();
+
+    createEffect(() => {
+        const anchorRef = access(props.anchorRef);
+        const isAnchorGroup = access(props.isAnchorGroup) ?? false;
+
+        if (!anchorRef || !isAnchorGroup) return;
+
+        onCleanup(TooltipUtils.followFocusWithin(anchorRef, setFocusedControl));
+        onCleanup(() => setFocusedControl(undefined));
+    });
+
+    createEffect(() => {
+        const focusedControl = getFocusedControl();
+        const isVisible = getIsVisible();
+
+        if (!focusedControl || !isVisible) return;
+
+        onCleanup(TooltipUtils.describe(focusedControl, tooltipId));
     });
 
     return (

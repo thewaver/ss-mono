@@ -1,10 +1,8 @@
-import type { ScrollerAxis, ScrollerBarSide, ScrollerButtonPlacement, ScrollerOverflow } from "./Scroller.types";
+import type { ScrollerAxis, ScrollerBarSide, ScrollerOverflow } from "./Scroller.types";
 
 export const SCROLLER_DEFAULTS = {
-    gap: 0,
     padding: 0,
     overlapCount: 0,
-    buttonPlacement: "split" as ScrollerButtonPlacement,
     overflowX: "auto" as ScrollerOverflow,
     overflowY: "hidden" as ScrollerOverflow,
     barSideX: "end" as ScrollerBarSide,

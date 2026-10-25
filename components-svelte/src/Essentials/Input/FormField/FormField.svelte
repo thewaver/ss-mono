@@ -15,7 +15,9 @@
 
     let props: FormFieldProps = $props();
 
-    const messageId = $props.id();
+    const fieldId = $props.id();
+    const messageId = `${fieldId}-message`;
+    const captionId = `${fieldId}-caption`;
     const formContext = getFormContext();
 
     let control = $state<HTMLElement>();
@@ -40,6 +42,7 @@
 
     const fieldContext: FormFieldContextType = {
         getDescriptionId: () => (hasMessage ? messageId : undefined),
+        getCaptionId: () => (props.renderCaption ? captionId : undefined),
         registerControl: (element) => {
             control = element;
         },
@@ -56,7 +59,9 @@
     style:flex-direction={orientation === "horizontal" ? "row" : "column"}
     style:gap={`${props.gap ?? FORM_FIELD_DEFAULTS.gap}px`}
 >
-    {@render props.renderCaption?.(fieldState)}
+    {#if props.renderCaption}
+        <div id={captionId}>{@render props.renderCaption(fieldState)}</div>
+    {/if}
 
     <FormFieldControl context={fieldContext}>
         {@render props.renderControl(fieldState)}

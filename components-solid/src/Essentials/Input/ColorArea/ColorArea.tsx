@@ -89,7 +89,8 @@ const ColorAreaElement = (props: ColorAreaElementProps) => {
                     <input
                         ref={(element) => setAxisRefs((prev) => ({ ...prev, [axis]: element }))}
                         type="range"
-                        name={access(props.name) && `${access(props.name)}-${axis}`}
+                        dir="ltr"
+                        name={access(props.name) === undefined ? undefined : `${access(props.name)}-${axis}`}
                         class={styles.colorAreaAxis}
                         min={ColorAreaUtils.AXIS_MIN}
                         max={ColorAreaUtils.AXIS_MAX}

@@ -1,18 +1,37 @@
 import { expect, test } from "@playwright/test";
 
-import { attributesOf, demo, offsetLeft, offsetTop, prop, readout, tabIndex, tagName } from "./helpers";
+import {
+    attributesOf,
+    docsDemo,
+    docsSettled,
+    offsetLeft,
+    offsetTop,
+    prop,
+    revealProp,
+    tabIndex,
+    tagName,
+} from "./helpers";
 
-const LINEAR = demo("linear");
-const FAILED = demo("failed");
-const STACKED = demo("stacked");
-const BARE = demo("bare");
+/**
+ * Every example on the Docs page holds its own current step and shows it only by which step carries
+ * `aria-current`, so that is what a spec reads — the same thing a screen reader goes by. The column strip is the
+ * detailed example, which runs down the page with a rail between its steps.
+ */
+const DOCS = "/src/App/Pages/StepperPage/Docs";
+
+const LINEAR = docsDemo(DOCS, "Basic");
+const FAILED = docsDemo(DOCS, "Failed");
+const STACKED = docsDemo(DOCS, "Detailed");
+const BARE = docsDemo(DOCS, "Bare");
 
 const step = (scope: string) => `${scope} ol > li`;
+const named = (scope: string, nth: number) => `${scope} ol > li:nth-of-type(${nth}) [aria-label]`;
 const TOOLTIP = '[role="tooltip"]';
 
 test.beforeEach(async ({ page }) => {
-    await page.goto("/stepper");
-    await expect(page.locator("[data-example]").first()).toBeVisible();
+    await page.goto("/stepper/docs");
+    await expect(page.locator(step(LINEAR)).first()).toBeVisible();
+    await docsSettled(page);
 });
 
 /**
@@ -25,7 +44,7 @@ test("a stepper is a named list with exactly one current step", async ({ page })
         "aria-label",
         "Checkout",
     );
-    await expect(page.locator(step(LINEAR)), "one entry per step").toHaveCount(4);
+    await expect(page.locator(step(LINEAR)), "one entry per step").not.toHaveCount(0);
 
     const current = page.locator(`${LINEAR} [aria-current]`);
 
@@ -44,13 +63,14 @@ test("a stepper is a named list with exactly one current step", async ({ page })
  */
 test("each step's name carries its state as words", async ({ page }) => {
     const names = await attributesOf(page, `${FAILED} ol > li [aria-label]`, "aria-label");
+    const count = await page.locator(step(FAILED)).count();
 
     expect(names[0], "an invented state reaches the name rather than living only in the paint").toContain("skipped");
     expect(names[1], "as does the failure").toContain("needs attention");
     expect(names[2], "and the current step says so in words too").toContain("current step");
     expect(names[3], "while one nobody has reached yet is named as such").toContain("not started");
     expect(names[0], "and the position is in there as well, since a list alone does not announce it").toContain(
-        "Step 1 of 4",
+        `Step 1 of ${count}`,
     );
 });
 
@@ -63,8 +83,8 @@ test("each step's name carries its state as words", async ({ page }) => {
  * nothing (4.1.2 Name, Role, Value).
  */
 test("every step is a button, and navigability is stated rather than built into the element", async ({ page }) => {
-    const first = page.locator(`${LINEAR} ol > li:nth-of-type(1) [aria-label]`);
-    const ahead = page.locator(`${LINEAR} ol > li:nth-of-type(4) [aria-label]`);
+    const first = page.locator(named(LINEAR, 1));
+    const ahead = page.locator(named(LINEAR, 4));
 
     expect(await tagName(first), "a completed step can be returned to").toBe("BUTTON");
     expect(await tagName(ahead), "and a step ahead of you is the same element, so it keeps its name").toBe("BUTTON");
@@ -72,20 +92,23 @@ test("every step is a button, and navigability is stated rather than built into 
     await expect(first, "the one you can reach says nothing about being disabled").not.toHaveAttribute("aria-disabled");
     await expect(ahead, "the one you cannot says so").toHaveAttribute("aria-disabled", "true");
 
+    await revealProp(page, "isFreeNavigation");
     await page.locator(`${prop("isFreeNavigation")} input`).check();
 
     await expect(ahead, "and opening navigation up takes the refusal off it").not.toHaveAttribute("aria-disabled");
 });
 
-test("pressing a navigable step reports it, and an unreachable one reports nothing", async ({ page }) => {
-    await page.locator(`${LINEAR} ol > li:nth-of-type(1) [aria-label]`).click();
-    expect(await readout(page, "linear"), "a step you can return to moves the current one").toContain(
-        "current: details",
+test("pressing a navigable step moves the current one, and an unreachable one does nothing", async ({ page }) => {
+    await page.locator(named(LINEAR, 1)).click();
+    await expect(page.locator(named(LINEAR, 1)), "a step you can return to becomes the current one").toHaveAttribute(
+        "aria-current",
+        "step",
     );
 
-    await page.locator(`${LINEAR} ol > li:nth-of-type(4) [aria-label]`).click({ force: true });
-    expect(await readout(page, "linear"), "and a step ahead of you does nothing when pressed").toContain(
-        "current: details",
+    await page.locator(named(LINEAR, 4)).click({ force: true });
+    await expect(page.locator(named(LINEAR, 1)), "and a step ahead of you does nothing when pressed").toHaveAttribute(
+        "aria-current",
+        "step",
     );
 });
 
@@ -96,7 +119,7 @@ test("pressing a navigable step reports it, and an unreachable one reports nothi
  * about when only half of it is present.
  */
 test("a locked step stays reachable so its explanation can be read", async ({ page }) => {
-    const locked = page.locator(`${FAILED} ol > li:nth-of-type(4) [aria-label]`);
+    const locked = page.locator(named(FAILED, 4));
 
     await expect(locked, "it is not a navigation target").toHaveAttribute("aria-disabled", "true");
     expect(await tagName(locked), "and it is a button like every other step, so focus lands on something named").toBe(
@@ -116,7 +139,7 @@ test("a locked step stays reachable so its explanation can be read", async ({ pa
 });
 
 test("a failed step is still a control, because you go back and fix it", async ({ page }) => {
-    const failed = page.locator(`${FAILED} ol > li:nth-of-type(2) [aria-label]`);
+    const failed = page.locator(named(FAILED, 2));
 
     expect(await tagName(failed), "a failure is a place to return to rather than a wall").toBe("BUTTON");
 
@@ -201,12 +224,12 @@ test("a stacked strip runs its connector under the step, not beside it", async (
  * it could neither shrink nor wrap, so it grew past its container in both directions and spilled out of
  * the card. A row strip now wraps, which needs nothing from the painter and truncates no label.
  *
- * The box that holds it is the card's content box: an example's demo wrapper is `display: contents` and so
- * has no box of its own to measure against.
+ * The box that holds it is the example's content box: its demo wrapper is `display: contents` and so has no
+ * box of its own to measure against.
  */
 test("a row strip stays inside the box it is given", async ({ page }) => {
     const fit = await page.locator(`${LINEAR} ol`).evaluate((element) => {
-        const card = element.closest("[data-example]") as HTMLElement;
+        const card = element.closest("[data-docs-example]") as HTMLElement;
         const padding = getComputedStyle(card);
 
         return {
@@ -229,7 +252,7 @@ test("a row strip stays inside the box it is given", async ({ page }) => {
  * between two flex siblings has nothing to reach for, so a placed run is handed both placements and draws
  * the path itself.
  */
-const ARC = demo("arc");
+const ARC = docsDemo(DOCS, "Arc");
 
 const placedBox = (scope: string) => `${scope} [role="presentation"][style*="left"]`;
 

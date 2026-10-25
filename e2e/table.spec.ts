@@ -1,14 +1,16 @@
-import { expect, test } from "@playwright/test";
+import { type Locator, type Page, expect, test } from "@playwright/test";
 
-import { activeMatches, activeText, demo, readout, tabIndex, waitUntilStill } from "./helpers";
+import { activeMatches, activeText, docsDemo, docsSettled, prop, tabIndex, waitUntilStill } from "./helpers";
 
-const DEFAULT = demo("default");
-const SINGLE = demo("singleSelection");
-const RESIZABLE = demo("resizable");
-const REORDERABLE = demo("reorderable");
-const CONSUMER_SORTED = demo("consumerSorted");
-const VIRTUALIZED = demo("virtualized");
-const DISABLED = demo("disabled");
+const DOCS = "/src/App/Pages/TablePage/Docs";
+
+const BASIC = docsDemo(DOCS, "Basic");
+const RESIZABLE = docsDemo(DOCS, "Resizable");
+const REORDERABLE = docsDemo(DOCS, "Reorderable");
+const CONSUMER_SORTED = docsDemo(DOCS, "ConsumerSorted");
+const VIRTUALIZED = docsDemo(DOCS, "Virtualized");
+const PINNED = docsDemo(DOCS, "Pinned");
+const EXPANDABLE = docsDemo(DOCS, "Expandable");
 
 const grid = (scope: string) => `${scope} [role="grid"]`;
 
@@ -39,9 +41,46 @@ const reorderGrip = (scope: string, columnIndex: number) => `${header(scope)} >>
 const at = (scope: string, rowIndex: number, columnIndex: number) =>
     `${scope} [role="row"][aria-rowindex="${rowIndex}"] [aria-colindex="${columnIndex}"]`;
 
+/**
+ * No example prints its sort, selection or widths: each shows on screen, so each is read back the way a reader
+ * meets it — a column's cells top to bottom, the rows that say they are selected, the width a header is drawn at.
+ */
+const columnTexts = (page: Page, scope: string, columnIndex: number) =>
+    page.locator(`${scope} [role="row"]:has([role="gridcell"])`).evaluateAll(
+        (rows, index) =>
+            rows
+                .map((element) => ({
+                    at: Number(element.getAttribute("aria-rowindex")),
+                    text: (element.querySelector(`[aria-colindex="${index}"]`)?.textContent ?? "").trim(),
+                }))
+                .sort((a, b) => a.at - b.at)
+                .map((entry) => entry.text),
+        columnIndex,
+    );
+
+const selectedRows = (page: Page, scope: string) =>
+    page
+        .locator(`${scope} [role="row"][aria-selected="true"]`)
+        .evaluateAll((rows) => rows.map((element) => Number(element.getAttribute("aria-rowindex"))));
+
+const widthOf = (locator: Locator) => locator.evaluate((element) => (element as HTMLElement).offsetWidth);
+
+const sortedText = (texts: string[]) => [...texts].sort((a, b) => a.localeCompare(b));
+
+const chooseProp = async (page: Page, key: string, name: string) => {
+    const picker = page.locator(`${prop(key)} [role="combobox"]`);
+
+    await picker.click();
+
+    const options = page.locator(`[id="${await picker.getAttribute("aria-controls")}"]`);
+
+    await options.getByRole("option", { name, exact: true }).click();
+};
+
 test.beforeEach(async ({ page }) => {
-    await page.goto("/table");
-    await expect(page.locator(cell(DEFAULT)).first()).toBeVisible();
+    await page.goto("/table/docs");
+    await expect(page.locator(cell(BASIC)).first()).toBeVisible();
+    await docsSettled(page);
 });
 
 /**
@@ -50,21 +89,20 @@ test.beforeEach(async ({ page }) => {
  * so a disagreement between the published count and the real one is visible without virtualization in play.
  */
 test("the grid publishes its size, and every cell says where it sits", async ({ page }) => {
-    const root = page.locator(grid(DEFAULT));
+    const root = page.locator(grid(BASIC));
+    const rowCount = await page.locator(row(BASIC)).count();
+    const columnCount = await page.locator(header(BASIC)).count();
 
     await expect(root).toHaveAttribute("aria-label", "Parts");
-    await expect(root, "twelve parts and the header row above them").toHaveAttribute("aria-rowcount", "13");
-    await expect(root).toHaveAttribute("aria-colcount", "5");
+    await expect(root, "every part and the header row above them").toHaveAttribute("aria-rowcount", String(rowCount));
+    await expect(root).toHaveAttribute("aria-colcount", String(columnCount));
     await expect(root, "a selection may hold more than one row").toHaveAttribute("aria-multiselectable", "true");
 
-    await expect(page.locator(row(DEFAULT)).first(), "the header is row one").toHaveAttribute("aria-rowindex", "1");
-    await expect(page.locator(row(DEFAULT)).nth(1), "so the first part is row two").toHaveAttribute(
-        "aria-rowindex",
-        "2",
-    );
+    await expect(page.locator(row(BASIC)).first(), "the header is row one").toHaveAttribute("aria-rowindex", "1");
+    await expect(page.locator(row(BASIC)).nth(1), "so the first part is row two").toHaveAttribute("aria-rowindex", "2");
 
-    await expect(page.locator(header(DEFAULT)).first()).toHaveAttribute("aria-colindex", "1");
-    await expect(page.locator(header(DEFAULT)).last()).toHaveAttribute("aria-colindex", "5");
+    await expect(page.locator(header(BASIC)).first()).toHaveAttribute("aria-colindex", "1");
+    await expect(page.locator(header(BASIC)).last()).toHaveAttribute("aria-colindex", String(columnCount));
 });
 
 /**
@@ -72,21 +110,23 @@ test("the grid publishes its size, and every cell says where it sits", async ({ 
  * `aria-hidden`, so a spec that read the arrow would be checking the Playground rather than the component.
  */
 test("a sortable header cycles ascending, descending, then back to no sort at all", async ({ page }) => {
-    const sku = page.locator(header(DEFAULT)).first();
-    const skuSort = page.locator(sortControl(DEFAULT)).first();
+    const sku = page.locator(header(BASIC)).first();
+    const skuSort = page.locator(sortControl(BASIC)).first();
+    const arrival = await columnTexts(page, BASIC, 1);
 
     await expect(sku, "sortable but not yet sorted").toHaveAttribute("aria-sort", "none");
-    expect(await readout(page, "default")).toContain("sort: unsorted");
 
     await skuSort.click();
 
     await expect(sku).toHaveAttribute("aria-sort", "ascending");
-    await expect(page.locator(at(DEFAULT, 2, 1)), "BK-6015 is first alphabetically").toHaveText("BK-6015");
+    expect(await columnTexts(page, BASIC, 1), "the rows run from the first code alphabetically").toEqual(
+        sortedText(arrival),
+    );
 
     await skuSort.click();
 
     await expect(sku).toHaveAttribute("aria-sort", "descending");
-    await expect(page.locator(at(DEFAULT, 2, 1)), "and SP-5199 is last").toHaveText("SP-5199");
+    expect(await columnTexts(page, BASIC, 1), "and then from the last").toEqual(sortedText(arrival).reverse());
 
     await skuSort.click();
 
@@ -94,14 +134,23 @@ test("a sortable header cycles ascending, descending, then back to no sort at al
         "aria-sort",
         "none",
     );
-    await expect(page.locator(at(DEFAULT, 2, 1))).toHaveText("FS-1042");
+    expect(await columnTexts(page, BASIC, 1)).toEqual(arrival);
 });
 
 test("sorting a number column orders by the number rather than by how it reads", async ({ page }) => {
-    await page.locator(header(DEFAULT)).nth(3).locator("button").first().click();
+    await page.locator(header(BASIC)).nth(3).locator("button").first().click();
+    await expect(page.locator(header(BASIC)).nth(3)).toHaveAttribute("aria-sort", "ascending");
 
-    await expect(page.locator(at(DEFAULT, 2, 4)), "zero, not 1,502, which sorts first as text").toHaveText("0");
-    await expect(page.locator(at(DEFAULT, 13, 4))).toHaveText("1,840");
+    const texts = await columnTexts(page, BASIC, 4);
+    const numbers = texts.map((text) => Number(text.replace(/,/g, "")));
+
+    expect(
+        numbers,
+        "each count is no smaller than the one above it, which a sort by the written text would break",
+    ).toEqual([...numbers].sort((a, b) => a - b));
+    expect(texts, "and the written text is out of its own order, so the two sorts really differ").not.toEqual(
+        sortedText(texts),
+    );
 });
 
 /**
@@ -109,9 +158,9 @@ test("sorting a number column orders by the number rather than by how it reads",
  * cells in the tab order would take sixty presses of Tab to walk past.
  */
 test("exactly one cell is in the tab order, and moving focus moves it", async ({ page }) => {
-    const cells = page.locator(`${DEFAULT} [role="columnheader"], ${DEFAULT} [role="gridcell"]`);
+    const cells = page.locator(`${BASIC} [role="columnheader"], ${BASIC} [role="gridcell"]`);
 
-    expect(await tabIndex(page.locator(header(DEFAULT)).first()), "the first header cell starts as the stop").toBe(0);
+    expect(await tabIndex(page.locator(header(BASIC)).first()), "the first header cell starts as the stop").toBe(0);
 
     const tabbable = await cells.evaluateAll(
         (elements) => elements.filter((element) => (element as HTMLElement).tabIndex === 0).length,
@@ -119,10 +168,10 @@ test("exactly one cell is in the tab order, and moving focus moves it", async ({
 
     expect(tabbable).toBe(1);
 
-    await page.locator(at(DEFAULT, 4, 2)).click();
+    await page.locator(at(BASIC, 4, 2)).click();
 
-    expect(await tabIndex(page.locator(at(DEFAULT, 4, 2))), "clicking a cell hands it the stop").toBe(0);
-    expect(await tabIndex(page.locator(header(DEFAULT)).first()), "and takes it off the old one").toBe(-1);
+    expect(await tabIndex(page.locator(at(BASIC, 4, 2))), "clicking a cell hands it the stop").toBe(0);
+    expect(await tabIndex(page.locator(header(BASIC)).first()), "and takes it off the old one").toBe(-1);
 });
 
 /**
@@ -130,37 +179,34 @@ test("exactly one cell is in the tab order, and moving focus moves it", async ({
  * with one key. The header is row one of that walk, which is what makes a sort reachable without a mouse.
  */
 test("arrows walk cell to cell, and carry from one row's end to the next row's start", async ({ page }) => {
-    await page.locator(at(DEFAULT, 2, 1)).click();
+    const lastColumn = await page.locator(header(BASIC)).count();
+
+    await page.locator(at(BASIC, 2, 1)).click();
 
     await page.keyboard.press("ArrowRight");
-    expect(await activeMatches(page, `[aria-rowindex="2"] [aria-colindex="2"]`)).toBe(true);
+    expect(await activeMatches(page, at(BASIC, 2, 2))).toBe(true);
 
     await page.keyboard.press("End");
-    expect(await activeMatches(page, `[aria-rowindex="2"] [aria-colindex="5"]`), "End is the row's last cell").toBe(
-        true,
-    );
+    expect(await activeMatches(page, at(BASIC, 2, lastColumn)), "End is the row's last cell").toBe(true);
 
     await page.keyboard.press("ArrowRight");
-    expect(
-        await activeMatches(page, `[aria-rowindex="3"] [aria-colindex="1"]`),
-        "past the last column is the next row's first",
-    ).toBe(true);
+    expect(await activeMatches(page, at(BASIC, 3, 1)), "past the last column is the next row's first").toBe(true);
 
     await page.keyboard.press("ArrowUp");
     await page.keyboard.press("ArrowUp");
     expect(
-        await activeMatches(page, `[role="columnheader"][aria-colindex="1"]`),
+        await activeMatches(page, `${BASIC} [role="columnheader"][aria-colindex="1"]`),
         "and up from row one is the header",
     ).toBe(true);
 });
 
 test("Enter on a header cell sorts it, so the mouse is not the only way in", async ({ page }) => {
-    await page.locator(sortControl(DEFAULT)).first().click();
-    await expect(page.locator(header(DEFAULT)).first()).toHaveAttribute("aria-sort", "ascending");
+    await page.locator(sortControl(BASIC)).first().click();
+    await expect(page.locator(header(BASIC)).first()).toHaveAttribute("aria-sort", "ascending");
 
     await page.keyboard.press("Enter");
 
-    await expect(page.locator(header(DEFAULT)).first()).toHaveAttribute("aria-sort", "descending");
+    await expect(page.locator(header(BASIC)).first()).toHaveAttribute("aria-sort", "descending");
 });
 
 /**
@@ -168,86 +214,95 @@ test("Enter on a header cell sorts it, so the mouse is not the only way in", asy
  * only paint it. Space toggles, so a row picked by mistake is unpicked by the same key.
  */
 test("Space picks the focused row, and picking a second row keeps the first", async ({ page }) => {
-    await page.locator(at(DEFAULT, 3, 2)).click();
+    await page.locator(at(BASIC, 3, 2)).click();
 
-    expect(await readout(page, "default"), "a plain click already picks one").toContain("selected: BR-2201");
-    await expect(page.locator(row(DEFAULT)).nth(2)).toHaveAttribute("aria-selected", "true");
+    expect(await selectedRows(page, BASIC), "a plain click already picks one").toEqual([3]);
 
     await page.keyboard.press("ArrowDown");
     await page.keyboard.press(" ");
 
-    expect(await readout(page, "default")).toContain("selected: BR-2201, GK-3310");
+    expect(await selectedRows(page, BASIC)).toEqual([3, 4]);
 
     await page.keyboard.press(" ");
 
-    expect(await readout(page, "default"), "and the same key gives it back").toContain("selected: BR-2201");
+    expect(await selectedRows(page, BASIC), "and the same key gives it back").toEqual([3]);
 });
 
 test("Shift with an arrow extends the selection from where it was anchored", async ({ page }) => {
-    await page.locator(at(DEFAULT, 2, 1)).click();
+    await page.locator(at(BASIC, 2, 1)).click();
 
     await page.keyboard.press("Shift+ArrowDown");
     await page.keyboard.press("Shift+ArrowDown");
 
-    expect(await readout(page, "default")).toContain("selected: FS-1042, BR-2201, GK-3310");
+    expect(await selectedRows(page, BASIC)).toEqual([2, 3, 4]);
 });
 
 test("Control and A picks every row there is", async ({ page }) => {
-    await page.locator(at(DEFAULT, 2, 1)).click();
+    await page.locator(at(BASIC, 2, 1)).click();
 
     await page.keyboard.press("Control+a");
 
-    const selected = page.locator(`${DEFAULT} [role="row"][aria-selected="true"]`);
+    const selected = page.locator(`${BASIC} [role="row"][aria-selected="true"]`);
+    const bodyRows = await page.locator(`${BASIC} [role="row"]:has([role="gridcell"])`).count();
 
-    await expect(selected, "all twelve, and the header is not one of them").toHaveCount(12);
+    await expect(selected, "every part, and the header is not one of them").toHaveCount(bodyRows);
 });
 
 /**
- * The single-selection table is the same component with a different mode, so the interesting assertion is
- * not that one row is selected but that the previous one was dropped without anybody asking.
+ * Single selection is the same component with a different mode, so the interesting assertion is not that
+ * one row is selected but that the previous one was dropped without anybody asking.
  */
 test("a single-selection grid holds one row and says so", async ({ page }) => {
-    await expect(page.locator(grid(SINGLE)), "no multi-select claim to a reader").not.toHaveAttribute(
+    await chooseProp(page, "selectionMode", "single");
+
+    await expect(page.locator(grid(BASIC)), "no multi-select claim to a reader").not.toHaveAttribute(
         "aria-multiselectable",
         /.*/,
     );
 
-    await page.locator(at(SINGLE, 2, 1)).click();
-    expect(await readout(page, "singleSelection")).toContain("selected: FS-1042");
+    await page.locator(at(BASIC, 2, 1)).click();
+    expect(await selectedRows(page, BASIC)).toEqual([2]);
 
-    await page.locator(at(SINGLE, 3, 1)).click();
-    expect(await readout(page, "singleSelection"), "the second pick replaces the first").toContain("selected: BR-2201");
+    await page.locator(at(BASIC, 3, 1)).click();
+    expect(await selectedRows(page, BASIC), "the second pick replaces the first").toEqual([3]);
 });
 
 /**
- * The width lands in the consumer's own signal, which is what the readout reads back — the component holds
- * no width of its own, so a resize that only moved pixels would leave the readout untouched.
+ * The width lands in the consumer's own signal and the table draws what that signal holds, so the width the
+ * header is drawn at is the width the consumer was handed.
  */
-test("a column resizes from the keyboard, and the width goes to the consumer", async ({ page }) => {
+test("a column resizes from the keyboard, by the same step each way", async ({ page }) => {
     const sku = page.locator(header(RESIZABLE)).first();
+    const start = await widthOf(sku);
 
     await sku.click();
-
-    expect(await readout(page, "resizable"), "nothing is stored until something is dragged").toContain("widths: {}");
-
     await page.keyboard.press("Control+ArrowRight");
 
-    expect(await readout(page, "resizable"), "110 as declared, plus one step of 8").toContain('"sku":118');
+    await expect.poll(() => widthOf(sku), { message: "one step wider" }).toBeGreaterThan(start);
+
+    const step = (await widthOf(sku)) - start;
 
     await page.keyboard.press("Control+ArrowLeft");
     await page.keyboard.press("Control+ArrowLeft");
 
-    expect(await readout(page, "resizable")).toContain('"sku":102');
+    await expect.poll(() => widthOf(sku), { message: "and two steps back is one step narrower" }).toBe(start - step);
 });
 
 test("a resize stops at the column's own minimum rather than collapsing it", async ({ page }) => {
-    await page.locator(header(RESIZABLE)).first().click();
+    const sku = page.locator(header(RESIZABLE)).first();
+    const start = await widthOf(sku);
 
-    for (let press = 0; press < 8; press++) await page.keyboard.press("Control+ArrowLeft");
+    await sku.click();
 
-    expect(await readout(page, "resizable"), "eight steps down from 110 would be 46, and the floor is 80").toContain(
-        '"sku":80',
-    );
+    for (let press = 0; press < 20; press++) await page.keyboard.press("Control+ArrowLeft");
+
+    const floor = await widthOf(sku);
+
+    await page.keyboard.press("Control+ArrowLeft");
+
+    expect(floor, "the column did narrow").toBeLessThan(start);
+    expect(floor, "but stopped short of nothing").toBeGreaterThan(0);
+    expect(await widthOf(sku), "and a further press moves it no more").toBe(floor);
 });
 
 /**
@@ -256,21 +311,32 @@ test("a resize stops at the column's own minimum rather than collapsing it", asy
  */
 test("a column with no comparator leaves the order to the page", async ({ page }) => {
     const category = page.locator(header(CONSUMER_SORTED)).nth(2);
+    const arrival = await columnTexts(page, CONSUMER_SORTED, 1);
 
     await expect(category, "not offered as sortable at all").not.toHaveAttribute("aria-sort", /.*/);
 
     await page.locator(sortControl(CONSUMER_SORTED)).first().click();
 
-    expect(await readout(page, "consumerSorted")).toContain("sort: sku ascending");
-    await expect(page.locator(at(CONSUMER_SORTED, 2, 1)), "reordered by the page's own handler").toHaveText("BK-6015");
+    await expect(page.locator(header(CONSUMER_SORTED)).first(), "the sort is reported").toHaveAttribute(
+        "aria-sort",
+        "ascending",
+    );
+    await expect
+        .poll(() => columnTexts(page, CONSUMER_SORTED, 1), { message: "and the page's own handler reordered the rows" })
+        .toEqual(sortedText(arrival));
 });
 
 /**
- * Fifty thousand rows with thirty in the document is the whole point of the count being published rather
- * than counted: `aria-rowcount` is the only thing that still knows how long the table is.
+ * Tens of thousands of rows with thirty in the document is the whole point of the count being published
+ * rather than counted: `aria-rowcount` is the only thing that still knows how long the table is.
  */
 test("a virtualized grid mounts a window of rows but still states its real length", async ({ page }) => {
-    await expect(page.locator(grid(VIRTUALIZED))).toHaveAttribute("aria-rowcount", "50001");
+    const count = Number(((await page.locator(`${prop("count")} input`).inputValue()) ?? "").replace(/\D/g, ""));
+
+    await expect(page.locator(grid(VIRTUALIZED)), "every row the knob asks for, and the header").toHaveAttribute(
+        "aria-rowcount",
+        String(count + 1),
+    );
 
     const mounted = await page.locator(row(VIRTUALIZED)).count();
 
@@ -280,6 +346,9 @@ test("a virtualized grid mounts a window of rows but still states its real lengt
 
 test("the header stays put while the rows scroll under it", async ({ page }) => {
     const first = page.locator(header(VIRTUALIZED)).first();
+
+    await first.scrollIntoViewIfNeeded();
+
     const before = await first.boundingBox();
 
     await page
@@ -301,16 +370,17 @@ test("the header stays put while the rows scroll under it", async ({ page }) => 
  * does not.
  */
 test("a disabled grid reads out but does not act", async ({ page }) => {
-    await expect(page.locator(grid(DISABLED))).toHaveAttribute("aria-disabled", "true");
+    await page.locator(`${prop("isDisabled")} input`).click();
 
-    await page.locator(header(DISABLED)).first().click({ force: true });
+    await expect(page.locator(grid(BASIC))).toHaveAttribute("aria-disabled", "true");
 
-    await expect(page.locator(header(DISABLED)).first(), "the sort did not move").toHaveAttribute("aria-sort", "none");
-    expect(await readout(page, "disabled")).toContain("sort: unsorted");
+    await page.locator(header(BASIC)).first().click({ force: true });
 
-    await page.locator(at(DISABLED, 2, 1)).click({ force: true });
+    await expect(page.locator(header(BASIC)).first(), "the sort did not move").toHaveAttribute("aria-sort", "none");
 
-    await expect(page.locator(row(DISABLED)).nth(1)).toHaveAttribute("aria-selected", "false");
+    await page.locator(at(BASIC, 2, 1)).click({ force: true });
+
+    await expect(page.locator(row(BASIC)).nth(1)).toHaveAttribute("aria-selected", "false");
 });
 
 /**
@@ -319,9 +389,7 @@ test("a disabled grid reads out but does not act", async ({ page }) => {
  * Shift with an arrow on the focused header cell, chosen because the header already spends Enter and Space
  * on sorting and Ctrl with the arrows on resizing.
  *
- * Both assert the order through the header text rather than through the readout, because the order is the
- * thing being changed and reading it back off the page's own summary would only prove the summary agrees
- * with itself.
+ * Both assert the order through the header text, because the order is the thing being changed.
  */
 test("a header dragged past its neighbor's middle swaps the two columns", async ({ page }) => {
     const first = page.locator(header(REORDERABLE)).nth(0);
@@ -350,6 +418,8 @@ test("a drag that reorders does not also sort the column it started on", async (
     const first = page.locator(header(REORDERABLE)).nth(0);
 
     await expect(first).toHaveAttribute("aria-sort", "none");
+
+    await first.scrollIntoViewIfNeeded();
 
     const from = await first.boundingBox();
     const to = await page.locator(header(REORDERABLE)).nth(1).boundingBox();
@@ -411,6 +481,8 @@ test("Escape during a drag cancels it, so the release moves nothing", async ({ p
 
     await expect(first).toContainText("SKU");
 
+    await first.scrollIntoViewIfNeeded();
+
     const from = await first.boundingBox();
     const to = await second.boundingBox();
 
@@ -428,7 +500,7 @@ test("Escape during a drag cancels it, so the release moves nothing", async ({ p
 });
 
 test("a table with no order signal ignores the reorder key entirely", async ({ page }) => {
-    const first = page.locator(header(DEFAULT)).nth(0);
+    const first = page.locator(header(BASIC)).nth(0);
 
     await first.click();
 
@@ -436,25 +508,23 @@ test("a table with no order signal ignores the reorder key entirely", async ({ p
 
     await page.keyboard.press("Shift+ArrowRight");
 
-    await expect(page.locator(header(DEFAULT)).nth(0)).toHaveText(before);
+    await expect(page.locator(header(BASIC)).nth(0)).toHaveText(before);
 });
-
-const PINNED = demo("pinned");
-const EXPANDABLE = demo("expandable");
 
 /**
  * The pinned example's frame is narrower than its columns, so the frame scrolls sideways and the table inside it does
  * not — the frame is the grid's parent, the box the Playground gave it. SKU is pinned at the start and Price at the
  * end; the three between them scroll.
  */
-const frameOf = (page: import("@playwright/test").Page, scope: string) => page.locator(grid(scope)).locator("xpath=..");
+const frameOf = (page: Page, scope: string) => page.locator(grid(scope)).locator("xpath=..");
 
-const leftOf = async (locator: import("@playwright/test").Locator) => (await locator.boundingBox())!.x;
+const leftOf = async (locator: Locator) => (await locator.boundingBox())!.x;
 
 test("a pinned column stays put at either edge while the columns between them scroll sideways", async ({ page }) => {
     const frame = frameOf(page, PINNED);
+    const lastColumn = await page.locator(header(PINNED)).count();
     const pinnedStart = [page.locator(header(PINNED)).first(), page.locator(at(PINNED, 2, 1))];
-    const pinnedEnd = [page.locator(header(PINNED)).last(), page.locator(at(PINNED, 2, 5))];
+    const pinnedEnd = [page.locator(header(PINNED)).last(), page.locator(at(PINNED, 2, lastColumn))];
     const scrolling = page.locator(at(PINNED, 2, 2));
 
     await frame.scrollIntoViewIfNeeded();
@@ -625,7 +695,7 @@ test("the expander opens its row by pointer, and focus lands on the row it opene
     await expect(firstRow).toHaveAttribute("aria-expanded", "true");
     await expect(page.locator(`${EXPANDABLE} [role="row"][aria-level="2"]`)).toHaveCount(1);
     expect(
-        await activeMatches(page, `${EXPANDABLE} [role="row"][aria-rowindex="2"] [aria-colindex="1"]`),
+        await activeMatches(page, at(EXPANDABLE, 2, 1)),
         "the expander takes no tab stop of its own, so focus goes to its cell",
     ).toBe(true);
 
@@ -652,13 +722,10 @@ test("a detail shut while it holds focus hands focus back to its row", async ({ 
 
     await expect(detailCell, "the detail is gone").toHaveCount(0);
     expect(
-        await activeMatches(page, `${EXPANDABLE} [role="row"][aria-rowindex="2"] [aria-colindex="1"]`),
+        await activeMatches(page, at(EXPANDABLE, 2, 1)),
         "and focus is on its row rather than on the page body",
     ).toBe(true);
 
     await page.keyboard.press("ArrowDown");
-    expect(
-        await activeMatches(page, `${EXPANDABLE} [role="row"][aria-rowindex="3"] [aria-colindex="1"]`),
-        "so the next key still walks the grid",
-    ).toBe(true);
+    expect(await activeMatches(page, at(EXPANDABLE, 3, 1)), "so the next key still walks the grid").toBe(true);
 });

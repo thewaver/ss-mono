@@ -36,6 +36,9 @@
             {attachElement}
             ariaLabel={props.ariaLabel}
             type={props.type}
+            ariaHasPopup={props.ariaHasPopup}
+            ariaExpanded={props.ariaExpanded}
+            ariaControls={props.ariaControls}
             id={props.id}
             {flags}
             renderContent={props.renderContent}

@@ -13,6 +13,11 @@
     let item = $state<HTMLDivElement>();
     let swipeOffsetRatio = $state(0);
 
+    const renderOwnToast = untrack(() => props.toast.renderToast);
+    const renderDefaultToast = untrack(() => props.renderDefaultToast);
+
+    ToastUtils.warnIfUnpainted(renderOwnToast !== undefined || renderDefaultToast !== undefined);
+
     $effect(() => {
         ref = item ?? undefined;
     });
@@ -77,6 +82,16 @@
     });
 </script>
 
-<div bind:this={item} class={styles.toastsItem}>
-    {@render props.renderToast(props.toast, fader.getTransitionTarget(), props.transitionDurationMs, toastState)}
+<div bind:this={item} class={styles.toastsItem} dir={props.direction}>
+    {#if renderOwnToast}
+        {@render renderOwnToast(props.toast, fader.getTransitionTarget(), props.transitionDurationMs, toastState)}
+    {:else if renderDefaultToast}
+        {@render renderDefaultToast(
+            props.toast,
+            fader.getTransitionTarget(),
+            props.transitionDurationMs,
+            toastState,
+            props.onDismiss,
+        )}
+    {/if}
 </div>

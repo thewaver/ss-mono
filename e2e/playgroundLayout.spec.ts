@@ -1,10 +1,11 @@
 import { type Locator, expect, test } from "@playwright/test";
 
-import { centerDistance } from "./helpers";
+import { centerDistance, docsSettled } from "./helpers";
 
 test.beforeEach(async ({ page }) => {
-    await page.goto("/tabs");
-    await expect(page.locator("[data-example]").first()).toBeVisible();
+    await page.goto("/tabs/docs");
+    await expect(page.locator("[data-docs-example]").first()).toBeVisible();
+    await docsSettled(page);
 });
 
 /**

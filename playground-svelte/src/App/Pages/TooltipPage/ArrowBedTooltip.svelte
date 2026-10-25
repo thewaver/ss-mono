@@ -6,15 +6,11 @@
     import * as tooltipStyles from "@thewaver/ss-playground/App/StyledComponents/TooltipContent/TooltipContent.css";
     import { BORDER_RADIUS_FULL } from "@thewaver/ss-playground/App/Theme.const";
     import { themeVars } from "@thewaver/ss-playground/App/Theme.css";
-    import { type ShapeArrowAim, ShapeUtils, type Size2d } from "@thewaver/ss-utils";
+    import { ShapeUtils } from "@thewaver/ss-utils";
 
-    import type { ArrowBedControls } from "./TooltipPageSvelte.types";
+    import type { ArrowBedTooltipProps } from "./TooltipPageSvelte.types";
 
-    type Props = {
-        arrowBed: ArrowBedControls;
-        computeAim: (size: Size2d) => ShapeArrowAim | undefined;
-        label: string;
-    };
+    type Props = ArrowBedTooltipProps;
 
     const SHARP_RADII = [0];
 
@@ -28,11 +24,11 @@
         computePoints={(size) =>
             ShapeUtils.attachArrow(
                 {
-                    points: computeArrowBedPoints(props.arrowBed.shape, size),
-                    joinRadii: props.arrowBed.shape === "rounded_box" ? ROUNDED_RADII : SHARP_RADII,
+                    points: computeArrowBedPoints(props.shape, size),
+                    joinRadii: props.shape === "rounded_box" ? ROUNDED_RADII : SHARP_RADII,
                 },
                 props.computeAim(size),
-                TOOLTIP_ARROW_TEMPLATES[props.arrowBed.arrow](props.arrowBed.arrowWidth, props.arrowBed.arrowLength),
+                TOOLTIP_ARROW_TEMPLATES[props.arrow](props.arrowWidth, props.arrowLength),
             )}
         computeFillDefs={() => [{ color: themeVars.color.surface.dark }]}
     >

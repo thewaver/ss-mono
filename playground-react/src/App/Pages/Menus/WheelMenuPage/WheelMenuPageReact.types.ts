@@ -1,15 +1,17 @@
-import type { BandDefs, WheelMenuItem } from "@thewaver/ss-components-react";
-import type { WheelAction } from "@thewaver/ss-playground/App/Pages/Menus/WheelMenuPage/WheelMenuPage.types";
+import type {
+    BaseWheelMenuBandsDocsExampleValues,
+    BaseWheelMenuBasicDocsExampleValues,
+    BaseWheelMenuFlickDocsExampleValues,
+} from "@thewaver/ss-playground/App/Pages/Menus/WheelMenuPage/WheelMenuPage.types";
 
 export type { WheelAction } from "@thewaver/ss-playground/App/Pages/Menus/WheelMenuPage/WheelMenuPage.types";
 
-export type WheelMenuExampleProps = {
-    caption: string;
-    spreadDegrees?: number;
-    holeRadius?: number;
-    bandWidth?: number;
-    opensOnHold?: boolean;
-    items: WheelMenuItem<WheelAction>[];
-    layoutDefs?: BandDefs;
-    onActivate: (action: WheelAction) => void;
+export type WheelMenuBasicDocsExampleProps = BaseWheelMenuBasicDocsExampleValues;
+
+export type WheelMenuBandsDocsExampleProps = BaseWheelMenuBandsDocsExampleValues;
+
+export type WheelMenuFlickDocsExampleProps = BaseWheelMenuFlickDocsExampleValues;
+
+export type WheelGradientDefsProps = {
+    gradientId: string;
 };

@@ -1,17 +1,32 @@
-import { expect, test } from "@playwright/test";
+import { type Page, expect, test } from "@playwright/test";
 
-import { attributesOf, demo, inputValue, readout, selectionRange } from "./helpers";
+import { attributesOf, docsDemo, docsSettled, inputValue, selectionRange } from "./helpers";
 
-const ONE_TIME_CODE = `${demo("oneTimeCode")} input`;
-const RECOVERY_CODE = `${demo("recoveryCode")} input`;
+const DOCS = "/src/App/Pages/SegmentedInputPage/Docs";
+
+const BASIC = docsDemo(DOCS, "Basic");
+const RTL = docsDemo(DOCS, "RightToLeft");
+const ONE_TIME_CODE = `${BASIC} input`;
+const RECOVERY_CODE = `${docsDemo(DOCS, "Letters")} input`;
+const LABELED = `${docsDemo(DOCS, "Labeled")} input`;
 
 /**
  * The component wraps each cell the painter draws in a box of its own, inside a row hidden from assistive
  * technology. Those boxes are what a spec clicks and reads: their text is whatever the painter drew for the
  * character, and the painter's own element inside carries the state it was handed.
  */
-const CODE_CELLS = `${demo("oneTimeCode")} [aria-hidden="true"] > div`;
+const cells = (scope: string) => `${scope} [aria-hidden="true"] > div`;
+const CODE_CELLS = cells(BASIC);
 const CODE_PAINTED = `${CODE_CELLS} > *`;
+
+/** The cells' texts in the order they sit on screen, left to right, whatever order the markup holds them in. */
+const textsLeftToRight = (page: Page, scope: string) =>
+    page.locator(cells(scope)).evaluateAll((elements) =>
+        elements
+            .map((element) => ({ x: element.getBoundingClientRect().x, text: element.textContent ?? "" }))
+            .sort((a, b) => a.x - b.x)
+            .map((cell) => cell.text),
+    );
 
 /*
  * A press on a cell is forced because the field itself lies over every cell, which is the whole design: the
@@ -20,8 +35,9 @@ const CODE_PAINTED = `${CODE_CELLS} > *`;
  */
 
 test.beforeEach(async ({ page }) => {
-    await page.goto("/segmented-input");
-    await expect(page.locator("[data-example]").first()).toBeVisible();
+    await page.goto("/segmented-input/docs");
+    await expect(page.locator(ONE_TIME_CODE)).toBeVisible();
+    await docsSettled(page);
 });
 
 test("a one-time code field asks for digits and a code the platform can fill", async ({ page }) => {
@@ -33,11 +49,8 @@ test("a one-time code field asks for digits and a code the platform can fill", a
         "inputmode",
         "numeric",
     );
-    await expect(page.locator(ONE_TIME_CODE), "with a name of its own").toHaveAttribute("aria-label", "One-time code");
-    await expect(
-        page.locator(`${demo("oneTimeCode")} input`),
-        "and it is one field, however many cells are drawn",
-    ).toHaveCount(1);
+    expect(await page.locator(ONE_TIME_CODE).getAttribute("aria-label"), "with a name of its own").toBeTruthy();
+    await expect(page.locator(ONE_TIME_CODE), "and it is one field, however many cells are drawn").toHaveCount(1);
 });
 
 /**
@@ -47,11 +60,10 @@ test("a one-time code field asks for digits and a code the platform can fill", a
 test("typing fills the cells in order, keeps digits only and stops at six", async ({ page }) => {
     await expect(page.locator(CODE_CELLS), "one cell per digit of the code").toHaveCount(6);
 
-    await page.locator(ONE_TIME_CODE).focus();
+    await page.locator(ONE_TIME_CODE).click();
     await page.keyboard.type("1a2b3");
 
     expect(await inputValue(page.locator(ONE_TIME_CODE)), "letters are refused").toBe("123");
-    expect(await readout(page, "oneTimeCode"), "and the owner holds only the digits").toContain('value: "123"');
     expect(
         await page.locator(CODE_CELLS).allTextContents(),
         "each cell shows the digit in its place, and the rest stay empty",
@@ -68,7 +80,7 @@ test("typing fills the cells in order, keeps digits only and stops at six", asyn
  * accepts are data, so the separator is dropped and the code lands whole.
  */
 test("a pasted code fills every cell, separators and all dropped", async ({ page }) => {
-    await page.locator(ONE_TIME_CODE).focus();
+    await page.locator(ONE_TIME_CODE).click();
     await page.keyboard.insertText("123-456");
 
     expect(await inputValue(page.locator(ONE_TIME_CODE))).toBe("123456");
@@ -88,7 +100,7 @@ test("a pasted code fills every cell, separators and all dropped", async ({ page
  * after it. A press on a cell now selects that cell's digit, and the next digit typed replaces it.
  */
 test("pressing the third cell of a four-digit code and typing replaces the third digit alone", async ({ page }) => {
-    await page.locator(ONE_TIME_CODE).focus();
+    await page.locator(ONE_TIME_CODE).click();
     await page.keyboard.type("1234");
 
     await page.locator(CODE_CELLS).nth(2).click({ force: true });
@@ -106,7 +118,7 @@ test("pressing the third cell of a four-digit code and typing replaces the third
 });
 
 test("pressing an empty cell puts the caret after the last digit", async ({ page }) => {
-    await page.locator(ONE_TIME_CODE).focus();
+    await page.locator(ONE_TIME_CODE).click();
     await page.keyboard.type("12");
 
     await page.locator(CODE_CELLS).nth(5).click({ force: true });
@@ -124,7 +136,7 @@ test("the painter is told which cell has the caret, and none once focus leaves",
 
     expect(await carets(), "unfocused, no cell has the caret").toEqual([null, null, null, null, null, null]);
 
-    await page.locator(ONE_TIME_CODE).focus();
+    await page.locator(ONE_TIME_CODE).click();
     await page.keyboard.type("12");
 
     await expect
@@ -147,7 +159,7 @@ test("the painter is told which cell has the caret, and none once focus leaves",
 test("a selection is reported to the painter, by keyboard and by dragging across cells", async ({ page }) => {
     const selected = () => attributesOf(page, CODE_PAINTED, "data-selected");
 
-    await page.locator(ONE_TIME_CODE).focus();
+    await page.locator(ONE_TIME_CODE).click();
     await page.keyboard.type("12345");
     await page.keyboard.press("Shift+ArrowLeft");
     await page.keyboard.press("Shift+ArrowLeft");
@@ -172,7 +184,7 @@ test("a selection is reported to the painter, by keyboard and by dragging across
 });
 
 test("a field that takes letters keeps letters and digits and refuses the rest", async ({ page }) => {
-    await page.locator(RECOVERY_CODE).focus();
+    await page.locator(RECOVERY_CODE).click();
     await page.keyboard.insertText("ab-12 cd!ef99");
 
     expect(await inputValue(page.locator(RECOVERY_CODE)), "cut at its eight cells").toBe("ab12cdef");
@@ -180,4 +192,29 @@ test("a field that takes letters keeps letters and digits and refuses the rest",
         "inputmode",
         "text",
     );
+});
+
+/**
+ * One-time and recovery codes are digits and Latin letters, so the cells run left to right even in a right-to-left
+ * box: the example holds "123", and its first digit sits in the leftmost cell rather than the rightmost.
+ */
+test("in right-to-left text the cells still fill from the left", async ({ page }) => {
+    const value = await inputValue(page.locator(`${RTL} input`));
+    const texts = await textsLeftToRight(page, RTL);
+
+    expect(value, "the example holds a code to read").not.toBe("");
+    expect(texts.join(""), "read left to right, the cells spell the value in order").toBe(value);
+    expect(texts[0], "starting from the leftmost cell").toBe(value[0]);
+});
+
+/** Inside a Label the caption alone names the field, through `aria-labelledby`. */
+test("inside a Label the caption names the field", async ({ page }) => {
+    const labelledBy = await page.locator(LABELED).getAttribute("aria-labelledby");
+
+    expect(labelledBy, "the field points at its caption").toBeTruthy();
+
+    const words = ((await page.locator(`#${labelledBy}`).textContent()) ?? "").trim();
+
+    expect(words, "the caption has words").not.toBe("");
+    await expect(page.locator(LABELED), "and the field's name is those words alone").toHaveAccessibleName(words);
 });

@@ -112,10 +112,10 @@ export const stepBody = style({
 
 export const arcCell = style({
     display: "grid",
-    placeItems: "center",
+    placeItems: "center start",
     width: "100%",
     height: "100%",
-    borderRadius: themeVars.borderRadius.half,
+    borderRadius: 100,
     backgroundColor: layerVars.main,
     boxShadow: themeVars.shadow.small,
 });

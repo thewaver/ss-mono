@@ -1,34 +1,64 @@
-import { expect, test } from "@playwright/test";
+import { type Page, expect, test } from "@playwright/test";
 
-import { activeMatches, demo, isChecked, isIndeterminate, readout, tabIndex } from "./helpers";
+import { activeMatches, docsDemo, docsSettled, isChecked, isIndeterminate, prop, tabIndex } from "./helpers";
 
-const DEFAULT = `${demo("default")} input`;
+const DOCS = "/src/App/Pages/CheckboxPage/Docs";
+
+const BASIC = docsDemo(DOCS, "Basic");
+const MIXED = docsDemo(DOCS, "Mixed");
+const REFUSING = docsDemo(DOCS, "Refusing");
+const TOOLTIP = docsDemo(DOCS, "Tooltip");
+
+const BOX = `${BASIC} input`;
 const SUMMARY = "#selectAll";
 const FIRST_CHILD = "#firstChild";
 const EMAIL = "#email";
-const DISABLED = `${demo("disabled")} input`;
-const REACHABLE = `${demo("reachable")} input`;
+const TOOLTIP_BOX = `${TOOLTIP} input`;
+
+const knob = (page: Page, key: string) => page.locator(`${prop(key)} input`);
+
+/** Every box a demo holds, checked or not, in the order they are drawn. */
+const checkedStates = (page: Page, scope: string) =>
+    page.locator(`${scope} input`).evaluateAll((inputs) => inputs.map((input) => (input as HTMLInputElement).checked));
 
 test.beforeEach(async ({ page }) => {
-    await page.goto("/checkbox");
-    await expect(page.locator("[data-example]").first()).toBeVisible();
+    await page.goto("/checkbox/docs");
+    await expect(page.locator(BOX)).toBeVisible();
+    await docsSettled(page);
 });
 
 test("no control uses the native disabled attribute", async ({ page }) => {
-    await expect(page.locator(DEFAULT), "no control carries the native disabled attribute").not.toHaveAttribute(
+    await knob(page, "isDisabled").click();
+
+    await expect(page.locator(BOX), "a disabled box carries no native disabled attribute").not.toHaveAttribute(
         "disabled",
     );
-    await expect(page.locator("input[disabled]"), "not one input on the page has it").toHaveCount(0);
+    await expect(page.locator("input[disabled]"), "and not one input on the page has it").toHaveCount(0);
+});
+
+/**
+ * The painter draws the box and the words beside it, and is hidden from screen readers as a whole: the name comes
+ * from the native input, so a reader hears it once. What is checked is that the two say the same thing — the words
+ * on screen hold the input's name (WCAG 2.5.3, Label in Name) — rather than what either says.
+ */
+test("the painted words are hidden, and the input carries the same words as its name", async ({ page }) => {
+    const painter = page.locator(`${BASIC} [aria-hidden="true"]`).first();
+    const name = (await page.locator(BOX).getAttribute("aria-label")) ?? "";
+
+    expect(name, "the input is named").not.toBe("");
+    await expect(painter, "the painter is out of the accessibility tree").toHaveAttribute("aria-hidden", "true");
+    await expect(painter, "and shows the words the input is named by").toContainText(name);
 });
 
 test("a plain box toggles by pointer and by Space", async ({ page }) => {
-    await page.locator(DEFAULT).click();
-    expect(await readout(page, "default"), "clicking the box reports the change").toContain("checked: true");
-    expect(await isChecked(page.locator(DEFAULT)), "and the input agrees with the state").toBe(true);
+    const before = await isChecked(page.locator(BOX));
 
-    await page.locator(DEFAULT).focus();
+    await page.locator(BOX).click();
+    expect(await isChecked(page.locator(BOX)), "clicking the box changes it").toBe(!before);
+
+    await page.locator(BOX).focus();
     await page.keyboard.press(" ");
-    expect(await readout(page, "default"), "Space toggles it back").toContain("checked: false");
+    expect(await isChecked(page.locator(BOX)), "Space toggles it back").toBe(before);
 });
 
 test("a mixed summary box resolves to checked and follows its children", async ({ page }) => {
@@ -37,14 +67,13 @@ test("a mixed summary box resolves to checked and follows its children", async (
 
     await page.locator(SUMMARY).click();
     expect(
-        await readout(page, "mixed"),
-        "clicking a mixed box resolves it to checked and sets both children",
-    ).toContain("mixed: false | all: true | children: true, true");
+        await checkedStates(page, MIXED),
+        "clicking a mixed box resolves it to checked and sets every child with it",
+    ).not.toContain(false);
     expect(
         await isIndeterminate(page.locator(SUMMARY)),
         "the indeterminate property follows the resolution rather than the browser's clear",
     ).toBe(false);
-    expect(await isChecked(page.locator(SUMMARY)), "and checked follows it too").toBe(true);
 
     await page.locator(FIRST_CHILD).click();
     expect(
@@ -54,16 +83,17 @@ test("a mixed summary box resolves to checked and follows its children", async (
     expect(await isChecked(page.locator(SUMMARY)), "and drops its checkedness with it").toBe(false);
 });
 
+/**
+ * Of the two boxes, at least one must stay on, and the page starts with only Email on — so Email is the last one on,
+ * and its owner writes it back on whenever it is pressed.
+ */
 test("an owner that refuses a write leaves the control where it put it", async ({ page }) => {
-    expect(await readout(page, "refusedWrite"), "the guarded pair starts with Email on").toContain("email: true");
+    expect(await checkedStates(page, REFUSING), "only one of the pair starts on").toEqual([true, false]);
 
     await page.locator(EMAIL).click();
-    expect(await readout(page, "refusedWrite"), "a refused write leaves the state where the owner put it").toContain(
-        "email: true",
-    );
     expect(
         await isChecked(page.locator(EMAIL)),
-        "and the input is resynced rather than left holding the browser's pre-change flip",
+        "the input is resynced rather than left holding the browser's pre-change flip",
     ).toBe(true);
 
     await page.locator(EMAIL).click();
@@ -74,33 +104,38 @@ test("an owner that refuses a write leaves the control where it put it", async (
 });
 
 test("a disabled box refuses activation and focus", async ({ page }) => {
-    await expect(page.locator(DISABLED), "a disabled box says so through ARIA").toHaveAttribute(
-        "aria-disabled",
-        "true",
-    );
-    expect(await tabIndex(page.locator(DISABLED)), "and is out of the tab order").toBe(-1);
+    const before = await isChecked(page.locator(BOX));
 
-    await page.locator(DISABLED).click({ force: true });
-    expect(await readout(page, "disabled"), "clicking a disabled box changes nothing").toContain("checked: true");
-    expect(await isChecked(page.locator(DISABLED)), "and the canceled click leaves the input alone").toBe(true);
-    expect(await activeMatches(page, DISABLED), "clicking a disabled box does not even focus it").toBe(false);
+    await knob(page, "isDisabled").click();
+
+    await expect(page.locator(BOX), "a disabled box says so through ARIA").toHaveAttribute("aria-disabled", "true");
+    expect(await tabIndex(page.locator(BOX)), "and is out of the tab order").toBe(-1);
+
+    await page.locator(BOX).click({ force: true });
+    expect(await isChecked(page.locator(BOX)), "and the canceled click leaves the input alone").toBe(before);
+    expect(await activeMatches(page, BOX), "clicking a disabled box does not even focus it").toBe(false);
 });
 
 test("a reachable disabled box keeps its tab stop and explains itself", async ({ page }) => {
-    expect(await tabIndex(page.locator(REACHABLE)), "a reachable disabled box keeps its tab stop").toBe(0);
+    const before = await isChecked(page.locator(TOOLTIP_BOX));
 
-    await page.locator(REACHABLE).focus();
-    expect(await activeMatches(page, REACHABLE), "and can be focused so its tooltip can be read").toBe(true);
+    await knob(page, "tooltipIsDisabled").click();
+    await knob(page, "tooltipIsReachableWhenDisabled").click();
+
+    expect(await tabIndex(page.locator(TOOLTIP_BOX)), "a reachable disabled box keeps its tab stop").toBe(0);
+
+    await page.locator(TOOLTIP_BOX).focus();
+    expect(await activeMatches(page, TOOLTIP_BOX), "and can be focused so its tooltip can be read").toBe(true);
 
     await page.keyboard.press(" ");
-    expect(await readout(page, "reachable"), "Space on a reachable disabled box changes nothing").toContain(
-        "checked: true",
+    expect(await isChecked(page.locator(TOOLTIP_BOX)), "Space on a reachable disabled box changes nothing").toBe(
+        before,
     );
 
-    await page.locator(REACHABLE).hover({ force: true });
+    await page.locator(TOOLTIP_BOX).hover({ force: true });
     await expect(page.locator('[role="tooltip"]'), "hovering it reveals the tooltip that explains it").toBeVisible();
     await expect(
-        page.locator(REACHABLE),
+        page.locator(TOOLTIP_BOX),
         "and the tooltip wires itself up as the control's description",
     ).toHaveAttribute("aria-describedby", /.+/);
 });

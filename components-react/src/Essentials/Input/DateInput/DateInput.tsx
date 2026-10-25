@@ -45,6 +45,8 @@ export const DateInput = (props: DateInputProps) => {
                 format,
                 calendar,
                 era: fieldValue?.era ?? era,
+                disabledDays: props.disabledDays,
+                computeIsDayDisabled: props.computeIsDayDisabled,
             }),
         getHasImpossibleDigits: (digits) => DateInputUtils.getHasImpossiblePart(digits, format, bounds),
         getIsSame: DateValueUtils.isSame,
@@ -59,10 +61,14 @@ export const DateInput = (props: DateInputProps) => {
         field.refresh();
     }, [format, calendar]);
 
+    const isWritable = !(props.isDisabled ?? false) && !(props.isReadOnly ?? false);
+
     const eraControl: DateInputEra = {
         value: era,
         options: eraOptions,
         set: (next) => {
+            if (!isWritable) return;
+
             setEra(next);
 
             if (!fieldValue) return;

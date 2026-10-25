@@ -72,6 +72,7 @@ export const SegmentedInput = defineComponent(
                     element={"input"}
                     type={"text"}
                     isConcealed={true}
+                    isLeftToRight={true}
                     inputMode={props.inputMode ?? SEGMENTED_INPUT_DEFAULTS.inputMode}
                     computeMaskedText={(_previous, next, caret) =>
                         TextSyncUtils.applyFilter(
@@ -88,6 +89,7 @@ export const SegmentedInput = defineComponent(
                                 <div
                                     class={SegmentedInputStyles.segmentedInputCells}
                                     style={{ gap: `${props.gap ?? SEGMENTED_INPUT_DEFAULTS.gap}px` }}
+                                    dir="ltr"
                                     aria-hidden="true"
                                 >
                                     {indices.map((index) => (

@@ -120,6 +120,10 @@ export const docsOptional = style({
     opacity: 0.75,
 });
 
+export const docsPropName = style({
+    fontWeight: "bold",
+});
+
 export const docsPending = style({
     opacity: 0.5,
     fontStyle: "italic",

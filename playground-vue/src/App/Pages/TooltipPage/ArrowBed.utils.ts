@@ -1,9 +1,9 @@
 import { shallowRef } from "vue";
 
 import { TooltipKnobs } from "@thewaver/ss-playground/App/Knobs/Tooltips.const";
-import type { ArrowBedShape } from "@thewaver/ss-playground/App/Pages/TooltipPage/TooltipPage.const";
+import type { ArrowBedArrow, ArrowBedShape } from "@thewaver/ss-playground/App/Pages/TooltipPage/TooltipPage.const";
 
-import type { ArrowBedArrow, ArrowBedControls } from "./TooltipPageVue.types";
+import type { ArrowBedControls } from "./TooltipPageVue.types";
 
 export const useArrowBed = (): ArrowBedControls => {
     const arrow = shallowRef<ArrowBedArrow>(TooltipKnobs.STARTING_ARROW_BED_ARROW);

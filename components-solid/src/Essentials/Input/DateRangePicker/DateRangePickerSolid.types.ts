@@ -1,7 +1,6 @@
 import type { JSX, Signal } from "solid-js";
 
 import type {
-    BaseDateRangePickerCbs,
     BaseDateRangePickerValues,
     DateValue,
     DateValueRange,
@@ -15,7 +14,6 @@ import type { DateInputProps } from "../DateInput/DateInputSolid.types";
 
 export type DateRangePickerProps = Omit<DateInputProps, "renderTrailing" | "value" | "ariaLabel" | "id" | "name"> &
     AccessorValues<BaseDateRangePickerValues> &
-    BaseDateRangePickerCbs &
     AccessorProps<{
         /** The picked range. It is the only thing that picks one. */
         value: SignalSource<DateValueRange | undefined>;

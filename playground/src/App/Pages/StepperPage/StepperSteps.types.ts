@@ -1,1 +1,1 @@
-export type StepValue = "details" | "address" | "payment" | "review";
+export type StepValue = "details" | "address" | "payment" | "review" | "done";

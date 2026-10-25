@@ -2,31 +2,42 @@
     import { untrack } from "svelte";
 
     import {
+        DATE_INPUT_DEFAULTS,
         DATE_PICKER_DEFAULTS,
         type DateValue,
+        type DateValueCalendarId,
         DateValueUtils,
         type DismisserReason,
     } from "@thewaver/ss-components";
 
+    import { NavigatorSvelteUtils } from "../../../Abstracts/Navigator/NavigatorSvelte.utils.svelte.js";
+
     import InteractionWrapper from "../../../Primitives/InteractionWrapper/InteractionWrapper.svelte";
     import Popover from "../../../Primitives/Popover/Popover.svelte";
     import PopupTrigger from "../../../Primitives/PopupTrigger/PopupTrigger.svelte";
+    import { watchChange } from "../../../Utils/effectUtils.svelte.js";
     import type { ValuePair } from "../../../Utils/typeUtils.js";
     import Calendar from "../Calendar/Calendar.svelte";
     import DateInput from "../DateInput/DateInput.svelte";
     import type { DatePickerProps } from "./DatePicker.types.js";
 
-    const toMonth = (value: DateValue): DateValue => DateValueUtils.getStartOfMonth(value);
+    const toMonth = (value: DateValue, calendar: DateValueCalendarId): DateValue =>
+        DateValueUtils.getStartOfMonth(DateValueUtils.withCalendar(value, calendar));
 
     let { value = $bindable(), visibility = $bindable(false), ref = $bindable(), ...props }: DatePickerProps = $props();
 
     const popupId = $props.id();
 
     let root = $state<HTMLDivElement>();
-    let month = $state.raw(untrack(() => toMonth(value ?? DateValueUtils.fromDate(new Date()))));
+
+    const getDirection = NavigatorSvelteUtils.createDirection(() => root);
+
+    const calendar = $derived(props.calendar ?? DATE_INPUT_DEFAULTS.calendar);
+
+    let month = $state.raw(untrack(() => toMonth(value ?? DateValueUtils.fromDate(new Date()), calendar)));
     let isFocusReturned = false;
 
-    const isDisabled = $derived(props.isDisabled ?? false);
+    const isLocked = $derived((props.isDisabled ?? false) || (props.isReadOnly ?? false));
 
     const monthPair: ValuePair<DateValue> = [
         () => month,
@@ -43,7 +54,7 @@
     };
 
     const open = () => {
-        if (isDisabled) return;
+        if (isLocked) return;
 
         visibility = true;
     };
@@ -54,16 +65,23 @@
     };
 
     $effect(() => {
-        if (visibility && isDisabled) visibility = false;
+        if (visibility && isLocked) visibility = false;
     });
 
     $effect(() => {
         if (!visibility) return;
 
         untrack(() => {
-            if (value) month = toMonth(value);
+            if (value) month = toMonth(value, calendar);
         });
     });
+
+    watchChange(
+        () => calendar,
+        (next) => {
+            month = toMonth(month, next);
+        },
+    );
 
     $effect(() => {
         if (visibility || !isFocusReturned) return;
@@ -93,7 +111,7 @@
 {/snippet}
 
 {#snippet trailing()}
-    <InteractionWrapper {isDisabled} extraFlags={{ isOpen: visibility }}>
+    <InteractionWrapper isDisabled={isLocked} extraFlags={{ isOpen: visibility }}>
         {#snippet renderControl(attachElement, flags)}
             <PopupTrigger
                 {attachElement}
@@ -122,7 +140,7 @@
         ariaAttributes={{ "aria-label": props.calendarLabel }}
         isOpen={visibility}
         anchorRef={root}
-        placement={props.placement ?? DATE_PICKER_DEFAULTS.placement}
+        placement={props.placement ?? DATE_PICKER_DEFAULTS.placement[getDirection()]}
         offset={props.offset}
         transitionDurationMs={props.popupTransitionDurationMs}
         hasAutoFocus={true}

@@ -20,8 +20,9 @@ export namespace ElementFaderReactUtils {
      * backstop.
      * @param opts.ref The outermost element the library owns, whose animations — its own and its
      * descendants' — are what the transition is judged by.
-     * @param opts.onShow Called when a fade in begins.
-     * @param opts.onHide Called when a fade out begins.
+     * @param opts.onShow Called when a fade in begins, once per fade in: React's development mode, which runs every
+     * effect twice on mount, still reports one.
+     * @param opts.onHide Called when a fade out begins, once per fade out.
      * @returns `isVisible`, which stays `true` through the fade out and is what the caller should mount on;
      * `transitionTarget`, `0` or `1`, which is what the caller should drive opacity from;
      * `hasTransitionFinished` for anything that must wait for the animation to settle; and `show` and `hide`
@@ -42,12 +43,24 @@ export namespace ElementFaderReactUtils {
             optsRef.current = opts;
         });
 
+        const reportedTargetRef = useRef<0 | 1>(0);
+
         const [fader] = useState(() =>
             ElementFaderUtils.createFader({
                 getTransitionDurationMs: () => optsRef.current.transitionDurationMs,
                 getRef: () => optsRef.current.ref?.current ?? undefined,
-                onShow: () => optsRef.current.onShow?.(),
-                onHide: () => optsRef.current.onHide?.(),
+                onShow: () => {
+                    if (reportedTargetRef.current === 1) return;
+
+                    reportedTargetRef.current = 1;
+                    optsRef.current.onShow?.();
+                },
+                onHide: () => {
+                    if (reportedTargetRef.current === 0) return;
+
+                    reportedTargetRef.current = 0;
+                    optsRef.current.onHide?.();
+                },
             }),
         );
 

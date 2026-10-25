@@ -1,22 +1,38 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { activeMatches, activeText, attributesOf, demo, readout, tabIndex } from "./helpers";
+import { activeMatches, activeText, attributesOf, docsDemo, docsSettled, prop, tabIndex } from "./helpers";
 
-const DEFAULT = demo("default");
-const COLLAPSED = demo("collapsed");
-const DISABLED = demo("disabled");
-const REACHABLE = demo("reachable");
-const OUTSIDE = demo("outside");
-const LAZY = demo("lazy");
+/**
+ * No tree example on the Docs page reads out its value or its open branches, so the spec reads them where a screen
+ * reader does: `aria-selected` says which row is selected and `aria-expanded` which branches are open.
+ *
+ * The Basic tree holds no state of its own and starts with everything closed. The tree opened and closed from
+ * outside starts with `src` and `Lib` open, so it is the one whose walk crosses levels.
+ */
+const DOCS = "/src/App/Pages/TreePage/Docs";
 
-const OUTSIDE_COLLAPSE_DELAY_MS = 500;
+const BASIC = docsDemo(DOCS, "Basic");
+const CONTROLLED = docsDemo(DOCS, "Controlled");
+const DISABLED = docsDemo(DOCS, "Disabled");
+const LAZY = docsDemo(DOCS, "OnDemand");
+
 const REMOTE_LOAD_DELAY_MS = 600;
+const OUTSIDE_COLLAPSE_DELAY_MS = 500;
 
 const node = (scope: string) => `${scope} [role="treeitem"]`;
 
+const rowNamed = (page: Page, scope: string, name: string) =>
+    page
+        .locator(node(scope))
+        .filter({ has: page.getByText(name, { exact: true }) })
+        .first();
+
+const selectedRows = (scope: string) => `${node(scope)}[aria-selected="true"]`;
+
 test.beforeEach(async ({ page }) => {
-    await page.goto("/tree");
-    await expect(page.locator(node(DEFAULT)).first()).toBeVisible();
+    await page.goto("/tree/docs");
+    await expect(page.locator(node(BASIC)).first()).toBeVisible();
+    await docsSettled(page);
 });
 
 /**
@@ -25,62 +41,68 @@ test.beforeEach(async ({ page }) => {
  * outright, so one that does not is told. These assert both halves agree.
  */
 test("the tree is named, and every node says where it sits", async ({ page }) => {
-    await expect(page.locator(`${DEFAULT} [role="tree"]`)).toHaveAttribute("aria-label", "Repository");
+    await expect(page.locator(`${BASIC} [role="tree"]`)).toHaveAttribute("aria-label", /.+/);
 
-    const root = page.locator(node(DEFAULT)).first();
+    const root = page.locator(node(BASIC)).first();
 
     await expect(root, "the first node is at the top level").toHaveAttribute("aria-level", "1");
     await expect(root, "first of three things in the repository").toHaveAttribute("aria-posinset", "1");
     await expect(root).toHaveAttribute("aria-setsize", "3");
-    await expect(root, "and it is a branch that starts open").toHaveAttribute("aria-expanded", "true");
+    await expect(root, "and it is a branch that starts closed").toHaveAttribute("aria-expanded", "false");
 
-    const child = page.locator(`${DEFAULT} [role="group"] [role="treeitem"]`).first();
+    const child = page.locator(`${CONTROLLED} [role="group"] [role="treeitem"]`).first();
 
     await expect(child, "a child is one level in").toHaveAttribute("aria-level", "2");
     await expect(child, "and a leaf carries no expanded state at all").not.toHaveAttribute("aria-expanded", /.*/);
 });
 
 test("a collapsed branch's children are not in the document", async ({ page }) => {
-    await expect(page.locator(node(COLLAPSED)), "three top-level nodes and nothing under them").toHaveCount(3);
-    await expect(page.locator(`${COLLAPSED} [role="group"]`)).toHaveCount(0);
+    await expect(page.locator(node(BASIC)), "three top-level nodes and nothing under them").toHaveCount(3);
+    await expect(page.locator(`${BASIC} [role="group"]`)).toHaveCount(0);
 
-    await page.locator(node(COLLAPSED)).first().click();
+    await page.locator(node(BASIC)).first().click();
 
-    await expect(page.locator(node(COLLAPSED)), "opening src adds its three children").toHaveCount(6);
+    await expect(page.locator(node(BASIC)), "opening src adds its three children").toHaveCount(6);
 });
 
 test("clicking a branch opens it and selects it, and clicking it again closes it", async ({ page }) => {
-    const branch = page.locator(node(DEFAULT)).first();
+    const branch = page.locator(node(BASIC)).first();
 
     await branch.click();
 
-    await expect(branch, "the first click closes the branch, since it started open").toHaveAttribute(
+    await expect(branch, "the first click opens the branch, since it started closed").toHaveAttribute(
         "aria-expanded",
-        "false",
+        "true",
     );
-    expect(await readout(page, "default"), "and the same click selects it").toContain("value: src");
-    expect(await readout(page, "default")).toContain("expanded: []");
+    await expect(branch, "and the same click selects it").toHaveAttribute("aria-selected", "true");
+    await expect(page.locator(selectedRows(BASIC)), "and nothing else").toHaveCount(1);
 
     await branch.click();
 
-    await expect(branch).toHaveAttribute("aria-expanded", "true");
-    expect(await readout(page, "default")).toContain('expanded: ["src"]');
+    await expect(branch, "a second click closes it").toHaveAttribute("aria-expanded", "false");
+    await expect(branch, "and it stays selected").toHaveAttribute("aria-selected", "true");
 });
 
 test("only one node is in the tab order, and it is the selected one once there is a selection", async ({ page }) => {
-    const tabbable = page.locator(`${DEFAULT} [role="treeitem"][tabindex="0"]`);
+    const tabbable = page.locator(`${BASIC} [role="treeitem"][tabindex="0"]`);
 
     await expect(tabbable, "a tree is one tab stop, not one per node").toHaveCount(1);
-    expect(await tabIndex(page.locator(node(DEFAULT)).first()), "and the first node is where tabbing lands").toBe(0);
+    expect(await tabIndex(page.locator(node(BASIC)).first()), "and the first node is where tabbing lands").toBe(0);
 
-    await page.locator(node(DEFAULT)).nth(2).click();
+    await page.locator(node(BASIC)).nth(2).click();
 
     await expect(tabbable).toHaveCount(1);
-    expect(await tabIndex(page.locator(node(DEFAULT)).nth(2)), "the tab stop follows the selection").toBe(0);
+    expect(await tabIndex(page.locator(node(BASIC)).nth(2)), "the tab stop follows the selection").toBe(0);
 });
 
 test("the arrows walk what is visible, and the horizontal pair opens and climbs", async ({ page }) => {
-    await page.locator(node(DEFAULT)).first().focus();
+    await page.locator(node(BASIC)).first().focus();
+
+    await page.keyboard.press("ArrowRight");
+    await expect(page.locator(node(BASIC)).first(), "the first right opens a closed branch").toHaveAttribute(
+        "aria-expanded",
+        "true",
+    );
 
     await page.keyboard.press("ArrowDown");
     expect(await activeText(page), "the first child of the open branch").toContain("index.ts");
@@ -90,7 +112,7 @@ test("the arrows walk what is visible, and the horizontal pair opens and climbs"
 
     await page.keyboard.press("ArrowRight");
     expect(await activeText(page), "the first right opens the branch without moving").toContain("Lib");
-    await expect(page.locator(node(DEFAULT)).nth(2)).toHaveAttribute("aria-expanded", "true");
+    await expect(page.locator(node(BASIC)).nth(2)).toHaveAttribute("aria-expanded", "true");
 
     await page.keyboard.press("ArrowRight");
     expect(await activeText(page), "the second right moves to the first child").toContain("Tree.tsx");
@@ -100,11 +122,12 @@ test("the arrows walk what is visible, and the horizontal pair opens and climbs"
 
     await page.keyboard.press("ArrowLeft");
     expect(await activeText(page), "and left on an open branch closes it rather than climbing").toContain("Lib");
-    await expect(page.locator(node(DEFAULT)).nth(2)).toHaveAttribute("aria-expanded", "false");
+    await expect(page.locator(node(BASIC)).nth(2)).toHaveAttribute("aria-expanded", "false");
 });
 
 test("the edge keys reach the ends of the visible list, not of a level", async ({ page }) => {
-    await page.locator(node(DEFAULT)).first().focus();
+    await page.locator(node(CONTROLLED)).nth(3).focus();
+    expect(await activeText(page), "starting deep inside an open branch").toContain("Tree.tsx");
 
     await page.keyboard.press("End");
     expect(await activeText(page), "End is the last visible node anywhere in the tree").toContain("README.md");
@@ -120,21 +143,33 @@ test("the edge keys reach the ends of the visible list, not of a level", async (
 });
 
 test("the asterisk opens every branch at the level focus is on", async ({ page }) => {
-    await page.locator(node(COLLAPSED)).first().focus();
+    await page.locator(node(BASIC)).first().focus();
     await page.keyboard.press("*");
 
-    expect(await readout(page, "collapsed"), "src is the only branch at the top level").toContain('expanded: ["src"]');
+    await expect(rowNamed(page, BASIC, "src"), "src is the only branch at the top level").toHaveAttribute(
+        "aria-expanded",
+        "true",
+    );
 
     await page.keyboard.press("ArrowDown");
     await page.keyboard.press("ArrowDown");
     await page.keyboard.press("*");
 
-    expect(
-        await readout(page, "collapsed"),
-        "and inside src it opens Lib and Playground together, leaving the leaf alone",
-    ).toContain('["src","Lib","Playground"]');
+    await expect(rowNamed(page, BASIC, "Lib"), "and inside src it opens Lib").toHaveAttribute("aria-expanded", "true");
+    await expect(rowNamed(page, BASIC, "Playground"), "and Playground together").toHaveAttribute(
+        "aria-expanded",
+        "true",
+    );
+    await expect(rowNamed(page, BASIC, "Input"), "but not a branch a level further in").toHaveAttribute(
+        "aria-expanded",
+        "false",
+    );
 });
 
+/**
+ * The disabled-nodes example holds `src` and `Lib` open, with `index.ts` and `Lib` disabled. Its knob keeps both
+ * reachable, and that swaps in the same nodes rather than a different tree.
+ */
 test("a disabled node is skipped by the arrows while what is inside it stays reachable", async ({ page }) => {
     await expect(page.locator(`${DISABLED} [role="treeitem"][aria-disabled="true"]`)).toHaveCount(2);
 
@@ -145,35 +180,44 @@ test("a disabled node is skipped by the arrows while what is inside it stays rea
         "Tree.tsx",
     );
 
-    await page.locator(node(DISABLED)).nth(2).dispatchEvent("click");
+    await rowNamed(page, DISABLED, "Lib").dispatchEvent("click");
 
-    expect(await readout(page, "disabled"), "clicking the disabled branch selects nothing").toContain(
-        "value: undefined",
+    await expect(page.locator(selectedRows(DISABLED)), "clicking the disabled branch selects nothing").toHaveCount(0);
+    await expect(rowNamed(page, DISABLED, "Lib"), "and leaves it exactly as open as it already was").toHaveAttribute(
+        "aria-expanded",
+        "true",
     );
-    await expect(
-        page.locator(node(DISABLED)).nth(2),
-        "and leaves it exactly as open as it already was",
-    ).toHaveAttribute("aria-expanded", "true");
 });
 
-test("a reachable disabled node takes focus, explains itself and still refuses to open", async ({ page }) => {
-    await page.locator(node(REACHABLE)).first().focus();
+test("a reachable disabled node takes focus, explains itself and still refuses to be picked", async ({ page }) => {
+    await page.locator(`${prop("isReachable")} input`).click();
+
+    await page.locator(node(DISABLED)).first().focus();
 
     await page.keyboard.press("ArrowDown");
-    await page.keyboard.press("ArrowDown");
-    expect(await activeText(page), "the arrows stop on it rather than passing it").toContain("node_modules");
-
-    await page.keyboard.press("ArrowRight");
-    await expect(
-        page.locator(node(REACHABLE)).nth(2),
-        "and neither the arrow nor anything else opens a disabled branch",
-    ).toHaveAttribute("aria-expanded", "false");
+    expect(await activeText(page), "the arrows stop on it rather than passing it").toContain("index.ts");
 
     await page.keyboard.press("Enter");
-    expect(await readout(page, "reachable"), "nor does it become the selection").toContain("value: undefined");
+    await expect(page.locator(selectedRows(DISABLED)), "it does not become the selection").toHaveCount(0);
 
-    await page.locator(node(REACHABLE)).nth(2).hover();
-    await expect(page.locator('[role="tooltip"]'), "hovering it says why").toContainText("Not indexed");
+    await page.keyboard.press("ArrowDown");
+    expect(await activeText(page), "and the disabled branch is a stop as well").toContain("Lib");
+
+    await page.keyboard.press("Enter");
+    await expect(rowNamed(page, DISABLED, "Lib"), "which nothing closes").toHaveAttribute("aria-expanded", "true");
+    await expect(page.locator(selectedRows(DISABLED)), "or selects").toHaveCount(0);
+
+    const indexRow = rowNamed(page, DISABLED, "index.ts");
+
+    await indexRow.hover();
+    await expect(indexRow, "hovering it says why, in a tooltip it is described by").toHaveAttribute(
+        "aria-describedby",
+        /.+/,
+    );
+    await expect(
+        page.locator(`#${(await indexRow.getAttribute("aria-describedby"))!.split(" ")[0]}`),
+        "and that tooltip has something to say",
+    ).toHaveText(/.+/);
 });
 
 /**
@@ -184,9 +228,9 @@ test("a reachable disabled node takes focus, explains itself and still refuses t
  * collapsed on the spot would be holding focus itself and the row would never have been the focused element.
  */
 test("a branch collapsed from outside hands focus back rather than dropping it on the body", async ({ page }) => {
-    const rows = page.locator(node(OUTSIDE));
+    const rows = page.locator(node(CONTROLLED));
 
-    await page.locator(`${OUTSIDE} button`).click();
+    await page.locator("#controlledCollapseLibLater").click();
     await rows.nth(3).focus();
 
     expect(await activeText(page), "focus starts on a row inside the branch about to close").toContain("Tree.tsx");
@@ -202,10 +246,29 @@ test("a branch collapsed from outside hands focus back rather than dropping it o
     );
 });
 
+test("the open branches written from outside open and close the tree", async ({ page }) => {
+    const branches = page.locator(`${node(CONTROLLED)}[aria-expanded]`);
+
+    await page.locator("#controlledExpandAll").click();
+    await expect(
+        page.locator(`${node(CONTROLLED)}[aria-expanded="false"]`),
+        "expanding from outside leaves no branch closed",
+    ).toHaveCount(0);
+    expect(await branches.count(), "and there are branches to have opened").toBeGreaterThan(0);
+
+    await page.locator("#controlledCollapseAll").click();
+    await expect(
+        page.locator(`${node(CONTROLLED)}[aria-expanded="true"]`),
+        "collapsing from outside leaves none open",
+    ).toHaveCount(0);
+    await expect(page.locator(`${CONTROLLED} [role="group"]`), "and no children in the document").toHaveCount(0);
+});
+
 /**
  * The published tree pattern lists typeahead as a keyboard requirement rather than an extra, and a deep
  * tree is where arrowing is worst. Focus is real here — a tree row is a tab stop, not an
- * `aria-activedescendant` — so the check is which element holds focus.
+ * `aria-activedescendant` — so the check is which element holds focus. The tree held from outside starts with
+ * `src` open, so a name inside it is on screen.
  *
  * The default text source is the row's accessible text, which matters more here than anywhere else: the
  * painter draws a "▶" marker before the name and marks it `aria-hidden`, so reading raw text would leave
@@ -213,7 +276,7 @@ test("a branch collapsed from outside hands focus back rather than dropping it o
  */
 test.describe("typeahead", () => {
     test("moves focus to the next visible node starting with what was typed", async ({ page }) => {
-        await page.locator(node(DEFAULT)).first().focus();
+        await page.locator(node(CONTROLLED)).first().focus();
 
         await page.keyboard.press("p");
 
@@ -228,7 +291,7 @@ test.describe("typeahead", () => {
      * It also shows the second letter narrowing the query: `p` alone lands on Playground.
      */
     test("walks the rows that are shown, crossing out of an open branch", async ({ page }) => {
-        await page.locator(node(DEFAULT)).first().focus();
+        await page.locator(node(CONTROLLED)).first().focus();
 
         await page.keyboard.type("pa", { delay: 30 });
 
@@ -240,7 +303,7 @@ test.describe("typeahead", () => {
      * it has to be claimed before the query ever sees it, or the tree loses the shortcut the pattern names.
      */
     test("leaves the expand-siblings key alone", async ({ page }) => {
-        const rows = page.locator(node(COLLAPSED));
+        const rows = page.locator(node(BASIC));
         const before = await rows.count();
 
         await rows.first().focus();
@@ -258,14 +321,14 @@ test.describe("typeahead", () => {
  * reader is scrolling, every node states its level, position and set size. These check that they do.
  */
 test.describe("a windowed tree", () => {
-    const VIRTUALIZED = demo("virtualized");
+    const VIRTUALIZED = docsDemo(DOCS, "Virtualized");
     const tree = `${VIRTUALIZED} [role="tree"]`;
     const item = `${tree} [role="treeitem"]`;
 
     test("mounts a window rather than every row, and draws no group boxes", async ({ page }) => {
         const items = page.locator(item);
 
-        expect(await items.count(), "far fewer than the three hundred and fifty rows on show").toBeLessThan(40);
+        expect(await items.count(), "far fewer than the rows the open branches hold").toBeLessThan(40);
 
         await expect(
             page.locator(`${tree} [role="group"]`),
@@ -356,20 +419,28 @@ test("opening one reports itself as busy, and paints what the consumer put there
     await expect(
         page.locator(`${LAZY} [role="group"]`),
         "the group box exists so the placeholder sits where the children will",
-    ).toContainText("Fetching");
+    ).toHaveText(/.+/);
+    await expect(
+        page.locator(`${LAZY} [role="group"] [role="treeitem"]`),
+        "and what it holds is the placeholder, not a node",
+    ).toHaveCount(0);
 });
 
 test("and stops being busy once the children turn up", async ({ page }) => {
     const packages = page.locator(node(LAZY)).filter({ hasText: "packages" }).first();
 
     await packages.click();
+    await expect(page.locator(`${LAZY} [role="group"]`)).toHaveText(/.+/);
+
+    const placeholder = ((await page.locator(`${LAZY} [role="group"]`).textContent()) ?? "").trim();
+
     await expect(page.locator(node(LAZY)).filter({ hasText: "core" }), "the fetch lands").toBeVisible({
         timeout: REMOTE_LOAD_DELAY_MS * 4,
     });
 
     await expect(packages, "nothing is outstanding any more").not.toHaveAttribute("aria-busy");
     await expect(page.locator(`${LAZY} [role="group"]`).first(), "and the placeholder is gone").not.toContainText(
-        "Fetching",
+        placeholder,
     );
 });
 
@@ -404,7 +475,7 @@ test("a branch that arrives unfetched behaves like the one that delivered it", a
  * carries the groups, the level on each node, and the walk. Windowing is the one thing that cannot survive,
  * a window being a run of rows down a column.
  */
-const RADIAL = demo("radial");
+const RADIAL = docsDemo(DOCS, "Radial");
 
 const placedBox = (scope: string) => `${scope} [role="presentation"][style*="left"]`;
 
@@ -448,10 +519,14 @@ test("a placed node is reached and chosen the same way as a row", async ({ page 
     await page.keyboard.press("ArrowDown");
     await page.keyboard.press("Enter");
 
-    expect(
-        await readout(page, "radial"),
+    await expect(
+        page.locator(selectedRows(RADIAL)),
         "the walk still reaches the next node and Enter still takes it",
-    ).not.toContain("value: undefined");
+    ).toHaveCount(1);
+    expect(
+        await page.locator(selectedRows(RADIAL)).getAttribute("id"),
+        "and it is the node the walk reached, not the first",
+    ).toBe(await items.nth(1).getAttribute("id"));
 });
 
 /**
@@ -504,7 +579,7 @@ test("after the menu is filtered, the highlight marker lands on the row under th
  * marker is the Playground's paint, the first decorative part of the row, so it is found by position in the row.
  */
 test.describe("a tree that ticks several", () => {
-    const CHECKBOXES = demo("checkboxes");
+    const CHECKBOXES = docsDemo(DOCS, "Checkboxes");
 
     const row = (page: Page, name: string) =>
         page
@@ -531,7 +606,10 @@ test.describe("a tree that ticks several", () => {
 
         await expect(row(page, "src"), "the arrow opens the folder").toHaveAttribute("aria-expanded", "true");
         await expect(row(page, "src"), "and ticks nothing").toHaveAttribute("aria-checked", "false");
-        expect(await readout(page, "checkboxes")).toContain("ticked: []");
+        await expect(
+            page.locator(`${node(CHECKBOXES)}[aria-checked="true"], ${node(CHECKBOXES)}[aria-checked="mixed"]`),
+            "anywhere in the tree",
+        ).toHaveCount(0);
 
         await arrowOf(page, "src").click();
 

@@ -1,9 +1,12 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { attributesOf, demo, isChecked, isIndeterminate, readout } from "./helpers";
+import { attributesOf, docsDemo, docsSettled, isChecked, isIndeterminate } from "./helpers";
 
-const DEFAULT = demo("default");
-const SELECT_ALL = demo("selectAll");
+const DOCS = "/src/App/Pages/CheckboxGroupPage/Docs";
+
+const DEFAULT = docsDemo(DOCS, "Basic");
+const SELECT_ALL = docsDemo(DOCS, "SelectAll");
+const RTL = docsDemo(DOCS, "RightToLeft");
 
 const GROUP = '[role="group"]';
 const PARENT = "#allToppings";
@@ -26,15 +29,17 @@ const disabledFlags = (page: Page, scope: string) =>
     attributesOf(page, boxes(scope), "aria-disabled").then((values) => values.map((value) => value === "true"));
 
 /** The reading lists what the group's value holds, so its length is the count of ticked boxes. */
-const heldCount = async (page: Page, key: string) => {
-    const listed = /value: (.+?) —/.exec(await readout(page, key))?.[1] ?? "";
+const heldCount = async (page: Page, scope: string) => {
+    const text = ((await page.locator(`${scope} [data-readout]`).textContent()) ?? "").trim();
+    const listed = /: (.+)$/.exec(text)?.[1] ?? "";
 
     return listed === "none" ? 0 : listed.split(", ").length;
 };
 
 test.beforeEach(async ({ page }) => {
-    await page.goto("/checkbox-group");
-    await expect(page.locator("[data-example]").first()).toBeVisible();
+    await page.goto("/checkbox-group/docs");
+    await expect(page.locator(boxes(DEFAULT)).first()).toBeVisible();
+    await docsSettled(page);
 });
 
 test("the group is named on its own element, and every box answers to the list", async ({ page }) => {
@@ -46,7 +51,7 @@ test("the group is named on its own element, and every box answers to the list",
     const ticked = (await checkedFlags(page, DEFAULT)).filter(Boolean).length;
 
     expect(ticked, "some box starts ticked, from the list the page started with").toBeGreaterThan(0);
-    expect(await heldCount(page, "default"), "and exactly as many are ticked as the list holds").toBe(ticked);
+    expect(await heldCount(page, DEFAULT), "and exactly as many are ticked as the list holds").toBe(ticked);
 });
 
 /**
@@ -60,9 +65,9 @@ test("every box is its own tab stop, and the arrows do not walk the group", asyn
         Array.from({ length: count }, () => "0"),
     );
 
-    await page.locator("#defaultSource").focus();
+    await box(page, DEFAULT, 0).focus();
 
-    for (let index = 0; index < count; index++) {
+    for (let index = 1; index < count; index++) {
         await page.keyboard.press("Tab");
         expect(
             await page.evaluate(
@@ -88,12 +93,12 @@ test("every box is its own tab stop, and the arrows do not walk the group", asyn
 test("pressing a box adds its value to the list, and pressing it again takes it out", async ({ page }) => {
     const before = await checkedFlags(page, DEFAULT);
     const target = before.indexOf(false);
-    const held = await heldCount(page, "default");
+    const held = await heldCount(page, DEFAULT);
 
     await box(page, DEFAULT, target).click();
 
     expect(await isChecked(box(page, DEFAULT, target)), "clicking an empty box ticks it").toBe(true);
-    expect(await heldCount(page, "default"), "and adds one value to the list").toBe(held + 1);
+    expect(await heldCount(page, DEFAULT), "and adds one value to the list").toBe(held + 1);
     expect(await checkedFlags(page, DEFAULT), "leaving every other box as it was").toEqual(
         before.map((flag, index) => flag || index === target),
     );
@@ -101,7 +106,7 @@ test("pressing a box adds its value to the list, and pressing it again takes it 
     await box(page, DEFAULT, target).click();
 
     expect(await checkedFlags(page, DEFAULT), "clicking it again takes it back out").toEqual(before);
-    expect(await heldCount(page, "default"), "and the list is back where it started").toBe(held);
+    expect(await heldCount(page, DEFAULT), "and the list is back where it started").toBe(held);
 });
 
 test("Space toggles the focused box", async ({ page }) => {
@@ -192,4 +197,35 @@ test("ticking the last enabled box by hand turns the select-all box ticked", asy
     await box(page, SELECT_ALL, before.indexOf(true)).click();
 
     expect(await isIndeterminate(page.locator(PARENT)), "and clearing one box puts it back to mixed").toBe(true);
+});
+
+/**
+ * The boxes draw their own words, and the painter is hidden from screen readers so they are not read twice: the
+ * name comes from each input. What is checked is that the two agree (WCAG 2.5.3), not what either says.
+ */
+test("each box shows the words it is named by", async ({ page }) => {
+    const names = await attributesOf(page, boxes(DEFAULT), "aria-label");
+    const painted = await page
+        .locator(`${DEFAULT} ${GROUP} [aria-hidden="true"]`)
+        .evaluateAll((elements) => elements.map((element) => (element.textContent ?? "").trim()));
+
+    expect(names.length, "the group holds boxes").toBeGreaterThan(0);
+
+    for (const name of names) {
+        expect(name, "every box is named").toBeTruthy();
+        expect(
+            painted.some((text) => text.includes(name!)),
+            "and its words are on screen beside it",
+        ).toBe(true);
+    }
+});
+
+/** In right-to-left text a horizontal group runs from the right: its first box is the rightmost. */
+test("in right-to-left text a horizontal group runs from the right", async ({ page }) => {
+    const lefts = await page
+        .locator(boxes(RTL))
+        .evaluateAll((inputs) => inputs.map((input) => input.getBoundingClientRect().left));
+
+    expect(lefts.length, "the group holds several boxes").toBeGreaterThan(1);
+    expect(lefts[0], "the first box sits to the right of the last").toBeGreaterThan(lefts[lefts.length - 1]);
 });

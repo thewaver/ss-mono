@@ -2,7 +2,7 @@
 import { computed, h, shallowRef } from "vue";
 
 import type { InteractionTooltipDefs, SelectFlags, Toast } from "@thewaver/ss-components-vue";
-import { Button, Range, Select, Toasts, ViewportWrapper } from "@thewaver/ss-components-vue";
+import { Button, Range, Select, ToastUtils, Toasts, ViewportWrapper } from "@thewaver/ss-components-vue";
 import { ViewportWrapperKnobs } from "@thewaver/ss-playground/App/Knobs/ViewportWrappers.const";
 import {
     COUNTRIES,
@@ -69,18 +69,11 @@ const stageSize = computed(() => {
     return { width: side, height: side };
 });
 
-let toastCount = 0;
-
 const raiseInnerToast = () => {
-    toastCount += 1;
-
-    const id = `innerToast${toastCount}`;
-
-    innerToasts.value = [...innerToasts.value, { id, value: { kind: "info", message: INNER_TOAST_MESSAGE } }];
-};
-
-const dismissInnerToast = (id: string) => {
-    innerToasts.value = innerToasts.value.filter((candidate) => candidate.id !== id);
+    innerToasts.value = ToastUtils.withRequestedToast(innerToasts.value, {
+        value: { kind: "info", message: INNER_TOAST_MESSAGE },
+        announcement: INNER_TOAST_MESSAGE,
+    }).toasts;
 };
 </script>
 
@@ -206,17 +199,17 @@ const dismissInnerToast = (id: string) => {
                             alignment="bottom_center"
                             :margins="INNER_TOAST_MARGINS"
                         >
-                            <template #renderToast="{ toast, visibilityTarget, transitionDurationMs, state }">
+                            <template #renderToast="{ toast, visibilityTarget, transitionDurationMs, state, dismiss }">
                                 <PageToastContent
                                     :toast="toast"
                                     :state="state"
                                     animation="fade"
                                     stacking="flow"
-                                    dir="column"
+                                    flex-direction="column"
                                     :gap="INNER_TOAST_GAP"
                                     :visibility-target="visibilityTarget"
                                     :transition-duration-ms="transitionDurationMs"
-                                    @dismiss="dismissInnerToast(toast.id)"
+                                    @dismiss="dismiss"
                                 />
                             </template>
                         </Toasts>

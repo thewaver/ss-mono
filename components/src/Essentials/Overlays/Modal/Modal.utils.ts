@@ -57,8 +57,9 @@ export namespace ModalUtils {
      * Whether a dialog's swipe tracker should be switched off.
      *
      * A centered dialog has no direction to be swiped in. A dialog whose backdrop does not close it cannot be swiped
-     * either, because the two are one setting: a swipe is a dragging gesture, and WCAG 2.5.7 needs a single-pointer
-     * way to do the same thing, which the backdrop press is. Switching the press off switches the swipe off with it.
+     * either, because the two are one setting: a swipe is a dragging gesture, and
+     * {@link https://www.w3.org/WAI/WCAG22/Understanding/dragging-movements.html WCAG 2.5.7} needs a single-pointer way
+     * to do the same thing, which the backdrop press is. Switching the press off switches the swipe off with it.
      *
      * @param alignment Where the dialog sits.
      * @param isDismissableOnOverlayClick Whether a press on the backdrop closes the dialog.

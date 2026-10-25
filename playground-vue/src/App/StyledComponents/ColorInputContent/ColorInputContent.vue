@@ -22,6 +22,6 @@ const layerClass = useLayerClass();
     >
         <div :class="styles.colorInputSwatch" :style="{ backgroundColor: renderProps.value }" />
 
-        <div v-if="!isCompact" :class="styles.colorInputValue">{{ renderProps.value }}</div>
+        <div v-if="!isCompact" :class="styles.colorInputValue" dir="ltr">{{ renderProps.value }}</div>
     </div>
 </template>

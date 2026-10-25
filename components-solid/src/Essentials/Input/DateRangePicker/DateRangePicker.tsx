@@ -1,28 +1,39 @@
 import type { Signal } from "solid-js";
-import { createEffect, createMemo, createSignal, createUniqueId, untrack } from "solid-js";
+import { Show, createEffect, createMemo, createSignal, createUniqueId, on, splitProps, untrack } from "solid-js";
 
 import {
+    DATE_INPUT_DEFAULTS,
     DATE_RANGE_PICKER_DEFAULTS,
     DateRangePickerUtils,
     type DateValue,
+    type DateValueCalendarId,
     type DateValueRange,
     DateValueUtils,
+    type InteractionFlags,
+    InteractionTrackerUtils,
     type PopupTriggerFlags,
+    type TextFieldFlags,
+    TextFieldUtils,
     DateRangePickerStyles as styles,
 } from "@thewaver/ss-components";
 
+import { NavigatorSolidUtils } from "../../../Abstracts/Navigator/NavigatorSolid.utils";
 import { SignalMirrorSolidUtils } from "../../../Abstracts/SignalMirror/SignalMirrorSolid.utils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import { Popover } from "../../../Primitives/Popover/Popover";
 import { PopupTrigger } from "../../../Primitives/PopupTrigger/PopupTrigger";
 import { access, accessSignal } from "../../../Utils/propUtils";
+import { Tooltip } from "../../Overlays/Tooltip/Tooltip";
 import { DateInput } from "../DateInput/DateInput";
 import { RangeCalendar } from "../RangeCalendar/RangeCalendar";
 import type { DateRangePickerProps } from "./DateRangePickerSolid.types";
 
-const toMonth = (value: DateValue): DateValue => DateValueUtils.getStartOfMonth(value);
+const toMonth = (value: DateValue, calendar: DateValueCalendarId): DateValue =>
+    DateValueUtils.getStartOfMonth(DateValueUtils.withCalendar(value, calendar));
 
 export const DateRangePicker = (props: DateRangePickerProps) => {
+    const [, fieldProps] = splitProps(props, ["tooltipDefs"]);
+
     const valueSignal = accessSignal(() => props.value);
 
     const popupId = createUniqueId();
@@ -33,6 +44,10 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
     const [getIsOpen, setIsOpen] = SignalMirrorSolidUtils.createOptional(() => props.visibility, false);
 
+    const getDirection = NavigatorSolidUtils.createDirectionSignal(getRootRef);
+
+    const getCalendar = createMemo(() => access(props.calendar) ?? DATE_INPUT_DEFAULTS.calendar);
+
     const { first: startSignal, second: endSignal } = SignalMirrorSolidUtils.createSplit<
         DateValueRange,
         DateValue,
@@ -40,19 +55,24 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
     >(valueSignal, DateRangePickerUtils.SPLIT_DEFS);
 
     const monthSignal: Signal<DateValue> = createSignal(
-        toMonth(untrack(() => valueSignal[0]()?.start) ?? DateValueUtils.fromDate(new Date())),
+        toMonth(untrack(() => valueSignal[0]()?.start) ?? DateValueUtils.fromDate(new Date()), untrack(getCalendar)),
     );
 
     const getIsDisabled = createMemo(() => access(props.isDisabled) ?? false);
 
+    const getIsLocked = createMemo(() => getIsDisabled() || (access(props.isReadOnly) ?? false));
+
     const open = () => {
-        if (getIsDisabled()) return;
+        if (getIsLocked()) return;
 
         setIsOpen(true);
     };
 
     createEffect(() => {
-        if (!getIsOpen() || !getIsDisabled()) return;
+        const isOpen = getIsOpen();
+        const isLocked = getIsLocked();
+
+        if (!isOpen || !isLocked) return;
 
         setIsOpen(false);
     });
@@ -71,8 +91,32 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
 
         const start = untrack(() => valueSignal[0]()?.start);
 
-        if (start) monthSignal[1](() => toMonth(start));
+        if (start) monthSignal[1](() => toMonth(start, untrack(getCalendar)));
     });
+
+    createEffect(on(getCalendar, (calendar) => monthSignal[1]((month) => toMonth(month, calendar)), { defer: true }));
+
+    const [getStartFlags, setStartFlags] = createSignal<() => InteractionFlags<TextFieldFlags>>();
+    const [getEndFlags, setEndFlags] = createSignal<() => InteractionFlags<TextFieldFlags>>();
+
+    const getPairFlags = () =>
+        TextFieldUtils.mergeFlags(
+            [getStartFlags(), getEndFlags()].flatMap((getFlags) => (getFlags ? [getFlags()] : [])),
+        );
+
+    const getTooltipDefs = createMemo(() => {
+        const defs = access(props.tooltipDefs);
+        const isReachable = InteractionTrackerUtils.computeIsReachable(
+            getIsDisabled(),
+            access(props.isReachableWhenDisabled) ?? false,
+        );
+
+        return defs && (!getIsDisabled() || isReachable) ? defs : undefined;
+    });
+
+    const getLastTooltipDefs = createMemo<ReturnType<typeof getTooltipDefs>>(
+        (previous) => getTooltipDefs() ?? previous,
+    );
 
     const renderCalendar = () => (
         <RangeCalendar
@@ -94,24 +138,34 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
     return (
         <div ref={setRootRef} class={styles.dateRangePickerRoot}>
             <DateInput
-                {...props}
+                {...fieldProps}
                 value={startSignal}
-                id={access(props.id) && `${access(props.id)}-start`}
-                name={access(props.name) && `${access(props.name)}-start`}
+                id={access(props.id) === undefined ? undefined : `${access(props.id)}-start`}
+                name={access(props.name) === undefined ? undefined : `${access(props.name)}-start`}
                 ariaLabel={props.startLabel}
+                renderContent={(getFlags) => {
+                    setStartFlags(() => getFlags);
+
+                    return props.renderContent(getFlags);
+                }}
             />
 
             {props.renderSeparator?.()}
 
             <DateInput
-                {...props}
+                {...fieldProps}
                 value={endSignal}
                 id={getEndFieldId}
-                name={access(props.name) && `${access(props.name)}-end`}
+                name={access(props.name) === undefined ? undefined : `${access(props.name)}-end`}
                 ariaLabel={props.endLabel}
+                renderContent={(getFlags) => {
+                    setEndFlags(() => getFlags);
+
+                    return props.renderContent(getFlags);
+                }}
                 renderTrailing={() => (
                     <InteractionWrapper<PopupTriggerFlags>
-                        isDisabled={getIsDisabled}
+                        isDisabled={getIsLocked}
                         extraFlags={() => ({ isOpen: getIsOpen() })}
                         renderControl={(setElementRef, getRenderProps) => (
                             <PopupTrigger
@@ -137,7 +191,7 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
                 })}
                 isOpen={getIsOpen}
                 anchorRef={getRootRef}
-                placement={() => access(props.placement) ?? DATE_RANGE_PICKER_DEFAULTS.placement}
+                placement={() => access(props.placement) ?? DATE_RANGE_PICKER_DEFAULTS.placement[getDirection()]}
                 offset={props.offset}
                 transitionDurationMs={props.popupTransitionDurationMs}
                 hasAutoFocus={true}
@@ -146,6 +200,25 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
                     props.renderPopup(renderCalendar, monthSignal, getVisibilityTarget, getTransitionDurationMs)
                 }
             />
+
+            <Show when={getLastTooltipDefs()}>
+                {(getDefs) => (
+                    <Tooltip
+                        {...getDefs()}
+                        isAnchorGroup={true}
+                        anchorRef={() => (getTooltipDefs() ? getRootRef() : undefined)}
+                        renderContent={(getVisibilityTarget, getTransitionDurationMs, getPlacement, getArrowAim) =>
+                            getDefs().renderContent(
+                                getVisibilityTarget,
+                                getTransitionDurationMs,
+                                getPlacement,
+                                getPairFlags,
+                                getArrowAim,
+                            )
+                        }
+                    />
+                )}
+            </Show>
         </div>
     );
 };

@@ -8,8 +8,8 @@ import { PageCheckField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { BasicDocsExample } from "./Docs/Basic";
 import { DecoratedDocsExample } from "./Docs/Decorated";
-import { LabeledDocsExample } from "./Docs/Labeled";
 import { MixedDocsExample } from "./Docs/Mixed";
+import { RightToLeftDocsExample } from "./Docs/RightToLeft";
 import { TooltipDocsExample } from "./Docs/Tooltip";
 
 export const ToggleDocs = () => {
@@ -49,31 +49,45 @@ export const ToggleDocs = () => {
                 <BasicDocsExample hasError={getHasError} isDisabled={getIsDisabled} />
             </PageDocsExample>
 
-            <PageDocsSection title={"Mixed"}>
-                {
-                    "A toggle summarizing others can be neither on nor off: set isMixed while they disagree. A switch has no way to say mixed to a screen reader, so while mixed the toggle reads as a mixed checkbox instead, and as a switch again once it is on or off. Pressing it sets a value, so here it turns both of the toggles it controls on or off."
+            <PageDocsSection
+                title={"Right to left"}
+                content={
+                    "Inside a box whose text runs right to left, the track sits to the right of its words, and switching the toggle on slides the handle to the left, the end the text runs toward."
                 }
-            </PageDocsSection>
+            />
+
+            <PageDocsExample path={`${DOCS_ROOT}/RightToLeft.tsx`}>
+                <RightToLeftDocsExample />
+            </PageDocsExample>
+
+            <PageDocsSection
+                title={"Mixed"}
+                content={
+                    "A toggle summarizing others can be neither on nor off: set [prop]isMixed[/prop] while they disagree. A switch has no way to say mixed to a screen reader, so while mixed the toggle reads as a mixed checkbox instead, and as a switch again once it is on or off. Pressing it sets a value, so here it turns both of the toggles it controls on or off."
+                }
+            />
 
             <PageDocsExample path={`${DOCS_ROOT}/Mixed.tsx`}>
                 <MixedDocsExample />
             </PageDocsExample>
 
-            <PageDocsSection title={"Decoration"}>
-                {
-                    "Anything drawn over the toggle goes through renderDecoration, which is handed the toggle's state like the painter is: here a corner highlight shows while it is pressed."
+            <PageDocsSection
+                title={"Decoration"}
+                content={
+                    "Anything drawn over the toggle goes through [prop]renderDecoration[/prop], which is handed the toggle's state like the painter is: here a corner highlight shows while it is pressed."
                 }
-            </PageDocsSection>
+            />
 
             <PageDocsExample path={`${DOCS_ROOT}/Decorated.tsx`}>
                 <DecoratedDocsExample />
             </PageDocsExample>
 
-            <PageDocsSection title={"Tooltip"}>
-                {
-                    "Give a toggle tooltipDefs and it shows a tooltip on hover and on keyboard focus, read by screen readers as the toggle's description. A disabled toggle shows no tooltip unless you also keep it reachable when disabled; it can then be focused to read why it is off, and pressing it still changes nothing."
+            <PageDocsSection
+                title={"Tooltip"}
+                content={
+                    "Give a toggle [prop]tooltipDefs[/prop] and it shows a tooltip on hover and on keyboard focus, read by screen readers as the toggle's description. A disabled toggle shows no tooltip unless you also keep it reachable when disabled; it can then be focused to read why it is off, and pressing it still changes nothing."
                 }
-            </PageDocsSection>
+            />
 
             <PageDocsExample
                 path={`${DOCS_ROOT}/Tooltip.tsx`}
@@ -115,16 +129,6 @@ export const ToggleDocs = () => {
                     isDisabled={getIsTooltipDisabled}
                     isReachableWhenDisabled={getIsReachableWhenDisabled}
                 />
-            </PageDocsExample>
-
-            <PageDocsSection title={"Named by a Label"}>
-                {
-                    "Inside a Label, the toggle takes its name from the label's text, so it needs no ariaLabel, and pressing the text switches it too."
-                }
-            </PageDocsSection>
-
-            <PageDocsExample path={`${DOCS_ROOT}/Labeled.tsx`}>
-                <LabeledDocsExample />
             </PageDocsExample>
         </>
     );

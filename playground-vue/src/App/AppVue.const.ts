@@ -17,64 +17,63 @@ export {
 } from "@thewaver/ss-playground/App/App.const";
 
 const AccordionDocs = () => import("./Pages/Accordions/AccordionPage/AccordionDocs.vue");
-const AudioSwitcherPage = () => import("./Pages/AudioSwitcherPage/AudioSwitcherPage.vue");
+const AudioSwitcherDocs = () => import("./Pages/AudioSwitcherPage/AudioSwitcherDocs.vue");
 const BracketPage = () => import("./Pages/BracketPage/BracketPage.vue");
 const BreadcrumbsDocs = () => import("./Pages/BreadcrumbsPage/BreadcrumbsDocs.vue");
-const ButtonPage = () => import("./Pages/ButtonPage/ButtonPage.vue");
 const ButtonDocs = () => import("./Pages/ButtonPage/ButtonDocs.vue");
-const CalendarPage = () => import("./Pages/CalendarPage/CalendarPage.vue");
+const CalendarDocs = () => import("./Pages/CalendarPage/CalendarDocs.vue");
 const CardStackPage = () => import("./Pages/CardStackPage/CardStackPage.vue");
-const CarouselPage = () => import("./Pages/Carousels/CarouselPage/CarouselPage.vue");
+const CarouselDocs = () => import("./Pages/Carousels/CarouselPage/CarouselDocs.vue");
 const CellAnimationPage = () => import("./Pages/CellAnimationPage/CellAnimationPage.vue");
-const CheckboxGroupPage = () => import("./Pages/CheckboxGroupPage/CheckboxGroupPage.vue");
-const CheckboxPage = () => import("./Pages/CheckboxPage/CheckboxPage.vue");
+const CheckboxGroupDocs = () => import("./Pages/CheckboxGroupPage/CheckboxGroupDocs.vue");
+const CheckboxDocs = () => import("./Pages/CheckboxPage/CheckboxDocs.vue");
 const CirclePackingPage = () => import("./Pages/CirclePackingPage/CirclePackingPage.vue");
-const ClockPage = () => import("./Pages/ClockPage/ClockPage.vue");
+const ClockDocs = () => import("./Pages/ClockPage/ClockDocs.vue");
 const CollapsibleDocs = () => import("./Pages/Accordions/CollapsiblePage/CollapsibleDocs.vue");
-const ColorAreaPage = () => import("./Pages/ColorAreaPage/ColorAreaPage.vue");
-const ColorInputPage = () => import("./Pages/ColorInputPage/ColorInputPage.vue");
+const ColorAreaDocs = () => import("./Pages/ColorAreaPage/ColorAreaDocs.vue");
+const ColorInputDocs = () => import("./Pages/ColorInputPage/ColorInputDocs.vue");
 const CornerHighlightPage = () => import("./Pages/CornerHighlightPage/CornerHighlightPage.vue");
 const CornerPinPage = () => import("./Pages/CornerPinPage/CornerPinPage.vue");
 const CuboidPage = () => import("./Pages/CuboidPage/CuboidPage.vue");
-const CurrencyInputPage = () => import("./Pages/CurrencyInputPage/CurrencyInputPage.vue");
-const DateInputPage = () => import("./Pages/DateInputPage/DateInputPage.vue");
-const DatePickerPage = () => import("./Pages/DatePickerPage/DatePickerPage.vue");
-const DateRangePickerPage = () => import("./Pages/DateRangePickerPage/DateRangePickerPage.vue");
-const DateTimePickerPage = () => import("./Pages/DateTimePickerPage/DateTimePickerPage.vue");
+const CurrencyInputDocs = () => import("./Pages/CurrencyInputPage/CurrencyInputDocs.vue");
+const DateInputDocs = () => import("./Pages/DateInputPage/DateInputDocs.vue");
+const DatePickerDocs = () => import("./Pages/DatePickerPage/DatePickerDocs.vue");
+const DateRangePickerDocs = () => import("./Pages/DateRangePickerPage/DateRangePickerDocs.vue");
+const DateTimePickerDocs = () => import("./Pages/DateTimePickerPage/DateTimePickerDocs.vue");
 const DiePage = () => import("./Pages/DiePage/DiePage.vue");
-const DrawerPage = () => import("./Pages/DrawerPage/DrawerPage.vue");
-const EdgeFaderPage = () => import("./Pages/EdgeFaderPage/EdgeFaderPage.vue");
-const FileInputPage = () => import("./Pages/FileInputPage/FileInputPage.vue");
+const DrawerDocs = () => import("./Pages/DrawerPage/DrawerDocs.vue");
+const EdgeFaderDocs = () => import("./Pages/EdgeFaderPage/EdgeFaderDocs.vue");
+const FileInputDocs = () => import("./Pages/FileInputPage/FileInputDocs.vue");
 const FlipCardPage = () => import("./Pages/FlipCardPage/FlipCardPage.vue");
 const FlipbookPage = () => import("./Pages/FlipbookPage/FlipbookPage.vue");
 const InfiniteCorridorPage = () => import("./Pages/InfiniteCorridorPage/InfiniteCorridorPage.vue");
-const FormFieldPage = () => import("./Pages/FormFieldPage/FormFieldPage.vue");
-const FormPage = () => import("./Pages/FormPage/FormPage.vue");
-const FormSectionPage = () => import("./Pages/FormSectionPage/FormSectionPage.vue");
+const FormFieldDocs = () => import("./Pages/FormFieldPage/FormFieldDocs.vue");
+const FormDocs = () => import("./Pages/FormPage/FormDocs.vue");
+const FormSectionDocs = () => import("./Pages/FormSectionPage/FormSectionDocs.vue");
 const FormationPage = () => import("./Pages/FormationPage/FormationPage.vue");
 const GlassSurfacePage = () => import("./Pages/GlassSurfacePage/GlassSurfacePage.vue");
-const HoverCardPage = () => import("./Pages/HoverCardPage/HoverCardPage.vue");
+const HoverCardDocs = () => import("./Pages/HoverCardPage/HoverCardDocs.vue");
 const IciclePage = () => import("./Pages/IciclePage/IciclePage.vue");
-const ImageSwitcherPage = () => import("./Pages/ImageSwitcherPage/ImageSwitcherPage.vue");
-const LabelPage = () => import("./Pages/LabelPage/LabelPage.vue");
-const ListboxPage = () => import("./Pages/ListboxPage/ListboxPage.vue");
-const MenubarPage = () => import("./Pages/MenubarPage/MenubarPage.vue");
-const CommandPalettePage = () => import("./Pages/Menus/CommandPalettePage/CommandPalettePage.vue");
-const FanMenuPage = () => import("./Pages/Menus/FanMenuPage/FanMenuPage.vue");
-const FlyoutMenuPage = () => import("./Pages/Menus/FlyoutMenuPage/FlyoutMenuPage.vue");
-const MenuPage = () => import("./Pages/Menus/MenuPage/MenuPage.vue");
-const WheelMenuPage = () => import("./Pages/Menus/WheelMenuPage/WheelMenuPage.vue");
-const ModalPage = () => import("./Pages/ModalPage/ModalPage.vue");
+const ImageSwitcherDocs = () => import("./Pages/ImageSwitcherPage/ImageSwitcherDocs.vue");
+const LabelDocs = () => import("./Pages/LabelPage/LabelDocs.vue");
+const ListboxDocs = () => import("./Pages/ListboxPage/ListboxDocs.vue");
+const MenubarDocs = () => import("./Pages/MenubarPage/MenubarDocs.vue");
+const CommandPaletteDocs = () => import("./Pages/Menus/CommandPalettePage/CommandPaletteDocs.vue");
+const FanMenuDocs = () => import("./Pages/Menus/FanMenuPage/FanMenuDocs.vue");
+const FlyoutMenuDocs = () => import("./Pages/Menus/FlyoutMenuPage/FlyoutMenuDocs.vue");
+const MenuDocs = () => import("./Pages/Menus/MenuPage/MenuDocs.vue");
+const WheelMenuDocs = () => import("./Pages/Menus/WheelMenuPage/WheelMenuDocs.vue");
+const ModalDocs = () => import("./Pages/ModalPage/ModalDocs.vue");
 const ElementMosaicPage = () => import("./Pages/Mosaics/ElementMosaicPage/ElementMosaicPage.vue");
 const ImageMosaicPage = () => import("./Pages/Mosaics/ImageMosaicPage/ImageMosaicPage.vue");
-const MultiSelectPage = () => import("./Pages/MultiSelectPage/MultiSelectPage.vue");
-const NumberInputPage = () => import("./Pages/NumberInputPage/NumberInputPage.vue");
+const MultiSelectDocs = () => import("./Pages/MultiSelectPage/MultiSelectDocs.vue");
+const NumberInputDocs = () => import("./Pages/NumberInputPage/NumberInputDocs.vue");
 const FittedTextPage = () => import("./Pages/FittedTextPage/FittedTextPage.vue");
 const MorphTextPage = () => import("./Pages/MorphTextPage/MorphTextPage.vue");
 const SlotTextPage = () => import("./Pages/SlotTextPage/SlotTextPage.vue");
 const PaintedTextPage = () => import("./Pages/PaintedTextPage/PaintedTextPage.vue");
 const ProximityTextPage = () => import("./Pages/ProximityTextPage/ProximityTextPage.vue");
-const PaginatorPage = () => import("./Pages/PaginatorPage/PaginatorPage.vue");
+const PaginatorDocs = () => import("./Pages/PaginatorPage/PaginatorDocs.vue");
 const ParticleFieldPage = () => import("./Pages/ParticleFieldPage/ParticleFieldPage.vue");
 const ParticleSpawnerPage = () => import("./Pages/ParticleSpawnerPage/ParticleSpawnerPage.vue");
 const PatchBoardPage = () => import("./Pages/PatchBoardPage/PatchBoardPage.vue");
@@ -82,11 +81,11 @@ const LightCatcherPage = () => import("./Pages/PointerEffects/LightCatcherPage/L
 const RGBSplitterPage = () => import("./Pages/PointerEffects/RGBSplitterPage/RGBSplitterPage.vue");
 const ShadowCasterPage = () => import("./Pages/PointerEffects/ShadowCasterPage/ShadowCasterPage.vue");
 const TilterPage = () => import("./Pages/PointerEffects/TilterPage/TilterPage.vue");
-const PreviewPage = () => import("./Pages/PreviewPage/PreviewPage.vue");
-const ProgressPage = () => import("./Pages/ProgressPage/ProgressPage.vue");
-const RadioPage = () => import("./Pages/RadioPage/RadioPage.vue");
-const RangeCalendarPage = () => import("./Pages/RangeCalendarPage/RangeCalendarPage.vue");
-const RangePage = () => import("./Pages/RangePage/RangePage.vue");
+const PreviewDocs = () => import("./Pages/PreviewPage/PreviewDocs.vue");
+const ProgressDocs = () => import("./Pages/ProgressPage/ProgressDocs.vue");
+const RadioDocs = () => import("./Pages/RadioPage/RadioDocs.vue");
+const RangeCalendarDocs = () => import("./Pages/RangeCalendarPage/RangeCalendarDocs.vue");
+const RangeDocs = () => import("./Pages/RangePage/RangeDocs.vue");
 const LensPage = () => import("./Pages/Reveals/LensPage/LensPage.vue");
 const RevealPage = () => import("./Pages/Reveals/RevealPage/RevealPage.vue");
 const ScratchCardPage = () => import("./Pages/Reveals/ScratchCardPage/ScratchCardPage.vue");
@@ -99,40 +98,40 @@ const TrackedPatternsPage = () => import("./Pages/SVGPatterns/TrackedPatternsPag
 const SatellitePage = () => import("./Pages/SatellitePage/SatellitePage.vue");
 const ScanlineAnimationPage = () => import("./Pages/ScanLineAnimationPage/ScanLineAnimationPage.vue");
 const ScrambleTextPage = () => import("./Pages/ScrambleTextPage/ScrambleTextPage.vue");
-const ScrollerPage = () => import("./Pages/ScrollerPage/ScrollerPage.vue");
-const SegmentedInputPage = () => import("./Pages/SegmentedInputPage/SegmentedInputPage.vue");
-const SelectPage = () => import("./Pages/SelectPage/SelectPage.vue");
+const ScrollerDocs = () => import("./Pages/ScrollerPage/ScrollerDocs.vue");
+const SegmentedInputDocs = () => import("./Pages/SegmentedInputPage/SegmentedInputDocs.vue");
+const SelectDocs = () => import("./Pages/SelectPage/SelectDocs.vue");
 const ShapePage = () => import("./Pages/ShapePage/ShapePage.vue");
 const ShapeRevealPage = () => import("./Pages/ShapeRevealPage/ShapeRevealPage.vue");
-const SidebarPage = () => import("./Pages/SidebarPage/SidebarPage.vue");
+const SidebarDocs = () => import("./Pages/SidebarPage/SidebarDocs.vue");
 const SlideButtonDocs = () => import("./Pages/SlideButtonPage/SlideButtonDocs.vue");
 const SortableGridPage = () => import("./Pages/SortableGridPage/SortableGridPage.vue");
-const SortablePage = () => import("./Pages/SortablePage/SortablePage.vue");
-const SplitPanePage = () => import("./Pages/SplitPanePage/SplitPanePage.vue");
-const SpotlightGuidePage = () => import("./Pages/Spotlights/SpotlightGuidePage/SpotlightGuidePage.vue");
-const SpotlightHintPage = () => import("./Pages/Spotlights/SpotlightHintPage/SpotlightHintPage.vue");
-const SpotlightPromptPage = () => import("./Pages/Spotlights/SpotlightPromptPage/SpotlightPromptPage.vue");
+const SortableDocs = () => import("./Pages/SortablePage/SortableDocs.vue");
+const SplitPaneDocs = () => import("./Pages/SplitPanePage/SplitPaneDocs.vue");
+const SpotlightGuideDocs = () => import("./Pages/Spotlights/SpotlightGuidePage/SpotlightGuideDocs.vue");
+const SpotlightHintDocs = () => import("./Pages/Spotlights/SpotlightHintPage/SpotlightHintDocs.vue");
+const SpotlightPromptDocs = () => import("./Pages/Spotlights/SpotlightPromptPage/SpotlightPromptDocs.vue");
 const StaircasePage = () => import("./Pages/StaircasePage/StaircasePage.vue");
-const StepperPage = () => import("./Pages/StepperPage/StepperPage.vue");
+const StepperDocs = () => import("./Pages/StepperPage/StepperDocs.vue");
 const SunburstPage = () => import("./Pages/SunburstPage/SunburstPage.vue");
 const SurfacePage = () => import("./Pages/SurfacePage/SurfacePage.vue");
-const TableOfContentsPage = () => import("./Pages/TableOfContentsPage/TableOfContentsPage.vue");
-const TablePage = () => import("./Pages/TablePage/TablePage.vue");
-const TabsPage = () => import("./Pages/TabsPage/TabsPage.vue");
-const TagInputPage = () => import("./Pages/TagInputPage/TagInputPage.vue");
-const TextAreaPage = () => import("./Pages/TextAreaPage/TextAreaPage.vue");
-const TextInputPage = () => import("./Pages/TextInputPage/TextInputPage.vue");
+const TableOfContentsDocs = () => import("./Pages/TableOfContentsPage/TableOfContentsDocs.vue");
+const TableDocs = () => import("./Pages/TablePage/TableDocs.vue");
+const TabsDocs = () => import("./Pages/TabsPage/TabsDocs.vue");
+const TagInputDocs = () => import("./Pages/TagInputPage/TagInputDocs.vue");
+const TextAreaDocs = () => import("./Pages/TextAreaPage/TextAreaDocs.vue");
+const TextInputDocs = () => import("./Pages/TextInputPage/TextInputDocs.vue");
 const TileBoardPage = () => import("./Pages/TileBoardPage/TileBoardPage.vue");
-const TimeInputPage = () => import("./Pages/TimeInputPage/TimeInputPage.vue");
-const TimePickerPage = () => import("./Pages/TimePickerPage/TimePickerPage.vue");
+const TimeInputDocs = () => import("./Pages/TimeInputPage/TimeInputDocs.vue");
+const TimePickerDocs = () => import("./Pages/TimePickerPage/TimePickerDocs.vue");
 const TimelinePage = () => import("./Pages/TimelinePage/TimelinePage.vue");
-const ToastsPage = () => import("./Pages/ToastsPage/ToastsPage.vue");
-const TogglePage = () => import("./Pages/TogglePage/TogglePage.vue");
-const ToolbarPage = () => import("./Pages/ToolbarPage/ToolbarPage.vue");
-const TooltipPage = () => import("./Pages/TooltipPage/TooltipPage.vue");
+const ToastsDocs = () => import("./Pages/ToastsPage/ToastsDocs.vue");
+const ToggleDocs = () => import("./Pages/TogglePage/ToggleDocs.vue");
+const ToolbarDocs = () => import("./Pages/ToolbarPage/ToolbarDocs.vue");
+const TooltipDocs = () => import("./Pages/TooltipPage/TooltipDocs.vue");
 const TrailPage = () => import("./Pages/TrailPage/TrailPage.vue");
 const WraparoundPage = () => import("./Pages/WraparoundPage/WraparoundPage.vue");
-const TreePage = () => import("./Pages/TreePage/TreePage.vue");
+const TreeDocs = () => import("./Pages/TreePage/TreeDocs.vue");
 const TreemapPage = () => import("./Pages/TreemapPage/TreemapPage.vue");
 const TypewriterPage = () => import("./Pages/TypewriterPage/TypewriterPage.vue");
 const ViewportWrapperPage = () => import("./Pages/ViewportWrapperPage/ViewportWrapperPage.vue");
@@ -281,7 +280,6 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                 children: [
                     {
                         name: "Button",
-                        component: ButtonPage,
                         docs: ButtonDocs,
                     },
                     {
@@ -292,134 +290,134 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
             },
             {
                 name: "Carousel",
-                component: CarouselPage,
+                docs: CarouselDocs,
             },
             {
                 name: "EdgeFader",
-                component: EdgeFaderPage,
+                docs: EdgeFaderDocs,
             },
             {
                 name: "Form",
-                component: FormPage,
+                docs: FormDocs,
             },
             {
                 name: "Input",
                 children: [
                     {
                         name: "Calendar",
-                        component: CalendarPage,
+                        docs: CalendarDocs,
                     },
                     {
                         name: "Checkbox",
-                        component: CheckboxPage,
+                        docs: CheckboxDocs,
                     },
                     {
                         name: "CheckboxGroup",
-                        component: CheckboxGroupPage,
+                        docs: CheckboxGroupDocs,
                     },
                     {
                         name: "Clock",
-                        component: ClockPage,
+                        docs: ClockDocs,
                     },
                     {
                         name: "ColorArea",
-                        component: ColorAreaPage,
+                        docs: ColorAreaDocs,
                     },
                     {
                         name: "ColorInput",
-                        component: ColorInputPage,
+                        docs: ColorInputDocs,
                     },
                     {
                         name: "CurrencyInput",
-                        component: CurrencyInputPage,
+                        docs: CurrencyInputDocs,
                     },
                     {
                         name: "DateInput",
-                        component: DateInputPage,
+                        docs: DateInputDocs,
                     },
                     {
                         name: "DatePicker",
-                        component: DatePickerPage,
+                        docs: DatePickerDocs,
                     },
                     {
                         name: "DateRangePicker",
-                        component: DateRangePickerPage,
+                        docs: DateRangePickerDocs,
                     },
                     {
                         name: "DateTimePicker",
-                        component: DateTimePickerPage,
+                        docs: DateTimePickerDocs,
                     },
                     {
                         name: "FileInput",
-                        component: FileInputPage,
+                        docs: FileInputDocs,
                     },
                     {
                         name: "FormField",
-                        component: FormFieldPage,
+                        docs: FormFieldDocs,
                     },
                     {
                         name: "FormSection",
-                        component: FormSectionPage,
+                        docs: FormSectionDocs,
                     },
                     {
                         name: "Label",
-                        component: LabelPage,
+                        docs: LabelDocs,
                     },
                     {
                         name: "Listbox",
-                        component: ListboxPage,
+                        docs: ListboxDocs,
                     },
                     {
                         name: "MultiSelect",
-                        component: MultiSelectPage,
+                        docs: MultiSelectDocs,
                     },
                     {
                         name: "NumberInput",
-                        component: NumberInputPage,
+                        docs: NumberInputDocs,
                     },
                     {
                         name: "Radio",
-                        component: RadioPage,
+                        docs: RadioDocs,
                     },
                     {
                         name: "Range",
-                        component: RangePage,
+                        docs: RangeDocs,
                     },
                     {
                         name: "RangeCalendar",
-                        component: RangeCalendarPage,
+                        docs: RangeCalendarDocs,
                     },
                     {
                         name: "SegmentedInput",
-                        component: SegmentedInputPage,
+                        docs: SegmentedInputDocs,
                     },
                     {
                         name: "Select",
-                        component: SelectPage,
+                        docs: SelectDocs,
                     },
                     {
                         name: "TagInput",
-                        component: TagInputPage,
+                        docs: TagInputDocs,
                     },
                     {
                         name: "TextArea",
-                        component: TextAreaPage,
+                        docs: TextAreaDocs,
                     },
                     {
                         name: "TextInput",
-                        component: TextInputPage,
+                        docs: TextInputDocs,
                     },
                     {
                         name: "TimeInput",
-                        component: TimeInputPage,
+                        docs: TimeInputDocs,
                     },
                     {
                         name: "TimePicker",
-                        component: TimePickerPage,
+                        docs: TimePickerDocs,
                     },
                     {
                         name: "Toggle",
-                        component: TogglePage,
+                        docs: ToggleDocs,
                     },
                 ],
             },
@@ -428,40 +426,40 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                 children: [
                     {
                         name: "AudioSwitcher",
-                        component: AudioSwitcherPage,
+                        docs: AudioSwitcherDocs,
                     },
                     {
                         name: "ImageSwitcher",
-                        component: ImageSwitcherPage,
+                        docs: ImageSwitcherDocs,
                     },
                 ],
             },
             {
                 name: "Menubar",
-                component: MenubarPage,
+                docs: MenubarDocs,
             },
             {
                 name: "Menus",
                 children: [
                     {
                         name: "CommandPalette",
-                        component: CommandPalettePage,
+                        docs: CommandPaletteDocs,
                     },
                     {
                         name: "FanMenu",
-                        component: FanMenuPage,
+                        docs: FanMenuDocs,
                     },
                     {
                         name: "FlyoutMenu",
-                        component: FlyoutMenuPage,
+                        docs: FlyoutMenuDocs,
                     },
                     {
                         name: "Menu",
-                        component: MenuPage,
+                        docs: MenuDocs,
                     },
                     {
                         name: "WheelMenu",
-                        component: WheelMenuPage,
+                        docs: WheelMenuDocs,
                     },
                 ],
             },
@@ -470,98 +468,94 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                 children: [
                     {
                         name: "Drawer",
-                        component: DrawerPage,
+                        docs: DrawerDocs,
                     },
                     {
                         name: "HoverCard",
-                        component: HoverCardPage,
+                        docs: HoverCardDocs,
                     },
                     {
                         name: "Modal",
-                        component: ModalPage,
+                        docs: ModalDocs,
                     },
                     {
                         name: "Sidebar",
-                        component: SidebarPage,
+                        docs: SidebarDocs,
                     },
                     {
                         name: "Spotlights",
                         children: [
                             {
                                 name: "SpotlightGuide",
-                                component: SpotlightGuidePage,
+                                docs: SpotlightGuideDocs,
                             },
                             {
                                 name: "SpotlightHint",
-                                component: SpotlightHintPage,
+                                docs: SpotlightHintDocs,
                             },
                             {
                                 name: "SpotlightPrompt",
-                                component: SpotlightPromptPage,
+                                docs: SpotlightPromptDocs,
                             },
                         ],
                     },
                     {
                         name: "Toasts",
-                        component: ToastsPage,
+                        docs: ToastsDocs,
                     },
                     {
                         name: "Tooltip",
-                        component: TooltipPage,
+                        docs: TooltipDocs,
                     },
                 ],
             },
             {
                 name: "Paginator",
-                component: PaginatorPage,
+                docs: PaginatorDocs,
             },
             {
                 name: "Preview",
-                component: PreviewPage,
+                docs: PreviewDocs,
             },
             {
                 name: "Progress",
-                component: ProgressPage,
+                docs: ProgressDocs,
             },
             {
                 name: "Scroller",
-                component: ScrollerPage,
+                docs: ScrollerDocs,
             },
             {
                 name: "Sortable",
-                component: SortablePage,
+                docs: SortableDocs,
             },
             {
                 name: "SplitPane",
-                component: SplitPanePage,
+                docs: SplitPaneDocs,
             },
             {
                 name: "Stepper",
-                component: StepperPage,
+                docs: StepperDocs,
             },
             {
                 name: "Table",
-                component: TablePage,
+                docs: TableDocs,
             },
             {
                 name: "TableOfContents",
-                component: TableOfContentsPage,
+                docs: TableOfContentsDocs,
             },
             {
                 name: "Tabs",
-                component: TabsPage,
+                docs: TabsDocs,
             },
             {
                 name: "Toolbar",
-                component: ToolbarPage,
+                docs: ToolbarDocs,
             },
             {
                 name: "Tree",
-                component: TreePage,
-            },
-            {
-                name: "ViewportWrapper",
-                component: ViewportWrapperPage,
+                docs: TreeDocs,
             },
         ],
     },
@@ -802,6 +796,10 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                         component: OverheadWheelPage,
                     },
                 ],
+            },
+            {
+                name: "ViewportWrapper",
+                component: ViewportWrapperPage,
             },
             {
                 name: "Wraparound",

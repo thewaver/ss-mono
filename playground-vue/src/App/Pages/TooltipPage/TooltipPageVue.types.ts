@@ -1,18 +1,15 @@
 import type { Ref } from "vue";
 
-import type { ArrowBedShape } from "@thewaver/ss-playground/App/Pages/TooltipPage/TooltipPage.const";
-import type { BaseTooltipExampleProps } from "@thewaver/ss-playground/App/Pages/TooltipPage/TooltipPage.types";
-import type { TooltipArrow } from "@thewaver/ss-playground/App/StyledComponents/TooltipContent/TooltipContent.const";
+import type { ArrowBedArrow, ArrowBedShape } from "@thewaver/ss-playground/App/Pages/TooltipPage/TooltipPage.const";
+import type {
+    BaseArrowBedValues,
+    BaseTooltipBasicDocsExampleValues,
+} from "@thewaver/ss-playground/App/Pages/TooltipPage/TooltipPage.types";
 import type { ShapeArrowAim, Size2d } from "@thewaver/ss-utils";
 
-export type TooltipExampleProps = BaseTooltipExampleProps;
+export type TooltipBasicDocsExampleProps = BaseTooltipBasicDocsExampleValues;
 
-export type TooltipCirclingExampleProps = {
-    "degrees": number;
-    "onUpdate:degrees"?: (degrees: number) => void;
-};
-
-export type ArrowBedArrow = Exclude<TooltipArrow, "none">;
+export type ArrowBedDocsExampleProps = BaseArrowBedValues;
 
 export type ArrowBedControls = {
     arrow: Ref<ArrowBedArrow>;
@@ -22,11 +19,11 @@ export type ArrowBedControls = {
 };
 
 export type ArrowBedKnobsProps = {
+    keyPrefix: string;
     controls: ArrowBedControls;
 };
 
-export type ArrowBedTooltipProps = {
-    controls: ArrowBedControls;
+export type ArrowBedTooltipProps = ArrowBedDocsExampleProps & {
     computeAim: (size: Size2d) => ShapeArrowAim | undefined;
     label: string;
 };

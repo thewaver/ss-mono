@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { BreadcrumbKnobs } from "@thewaver/ss-playground/App/Knobs/Breadcrumbs.const";
+import * as docsStyles from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.css";
 import {
     BREADCRUMB_SEPARATORS,
     DOCS_ROOT,
@@ -14,6 +15,7 @@ import { PageCheckField, PageSelectField } from "../../PageComponents/Field/Fiel
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { BasicDocsExample } from "./Docs/Basic";
 import { LinksDocsExample } from "./Docs/Links";
+import { RightToLeftDocsExample } from "./Docs/RightToLeft";
 
 export const BreadcrumbsDocs = () => {
     const [isDisabled, setIsDisabled] = useState(BreadcrumbKnobs.STARTING_IS_DISABLED);
@@ -23,8 +25,9 @@ export const BreadcrumbsDocs = () => {
     return (
         <>
             <PageDocsAlert severity={"info"}>
-                The separators here are only examples. renderSeparator draws whatever you return, so what sits between
-                the crumbs is entirely yours: text, an icon, any markup.
+                The separators here are only examples. Whatever you return from{" "}
+                <span className={docsStyles.docsPropName}>renderSeparator</span> is drawn, so what sits between the
+                crumbs is entirely yours: text, an icon, any markup.
             </PageDocsAlert>
 
             <PageDocsExample
@@ -65,11 +68,23 @@ export const BreadcrumbsDocs = () => {
                 <BasicDocsExample isDisabled={isDisabled} separator={separator} />
             </PageDocsExample>
 
-            <PageDocsSection title={"Links"}>
-                {
-                    "Give a crumb an href and it is drawn as a native HTML anchor element, with the address passed through untouched. In a routed app, pass linkComponent, a custom link component such as your router's, and the crumbs are drawn with it instead."
+            <PageDocsSection
+                title={"Right to left"}
+                content={
+                    "Inside a box whose text runs right to left, the trail starts from the right, with the first crumb rightmost. A separator that points, such as the > here, is drawn mirrored by the browser, so it still points along the trail; a slash or a dash is drawn as it is, so pick one that reads either way."
                 }
-            </PageDocsSection>
+            />
+
+            <PageDocsExample path={`${DOCS_ROOT}/RightToLeft.tsx`}>
+                <RightToLeftDocsExample />
+            </PageDocsExample>
+
+            <PageDocsSection
+                title={"Links"}
+                content={
+                    "Give a crumb an [prop]href[/prop] and it is drawn as a native HTML anchor element, with the address passed through untouched. In a routed app, pass [prop]linkComponent[/prop], a custom link component such as your router's, and the crumbs are drawn with it instead."
+                }
+            />
 
             <PageDocsExample
                 path={`${DOCS_ROOT}/Links.tsx`}

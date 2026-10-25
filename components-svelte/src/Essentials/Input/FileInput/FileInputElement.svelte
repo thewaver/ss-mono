@@ -4,12 +4,11 @@
     import { FILE_INPUT_DEFAULTS, FileInputUtils, FileInputStyles as styles } from "@thewaver/ss-components";
 
     import { FormFieldSvelteUtils } from "../FormField/FormFieldSvelte.utils.svelte.js";
-    import { LabelSvelteUtils } from "../Label/LabelSvelte.utils.svelte.js";
     import type { FileInputElementProps } from "./FileInput.types.js";
 
     let props: FileInputElementProps = $props();
 
-    const getAriaLabel = LabelSvelteUtils.resolveAriaLabel(() => props.ariaLabel);
+    const { getAriaLabel, getAriaLabelledBy } = FormFieldSvelteUtils.resolveAriaName(() => props.ariaLabel);
     const getAriaDescribedBy = FormFieldSvelteUtils.resolveAriaDescribedBy();
 
     let element = $state<HTMLInputElement>();
@@ -43,6 +42,7 @@
     accept={props.accept}
     multiple={props.isMultiple ?? FILE_INPUT_DEFAULTS.isMultiple}
     aria-label={getAriaLabel()}
+    aria-labelledby={getAriaLabelledBy()}
     aria-describedby={getAriaDescribedBy()}
     aria-disabled={isDisabled || undefined}
     aria-invalid={props.flags.hasError || undefined}

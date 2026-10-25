@@ -18,12 +18,17 @@
             props.state.hasError && styles.hasError,
         ]}
     >
-        <div class={styles.progressFill} style:width={`${(props.state.ratio ?? 0) * PERCENT}%`}></div>
+        <div
+            class={styles.progressFill}
+            style:width={props.state.ratio === undefined ? undefined : `${props.state.ratio * PERCENT}%`}
+        ></div>
     </div>
 
     <div class={styles.progressReadout} aria-hidden="true">
-        {props.state.ratio === undefined
-            ? "working…"
-            : `${Math.round(props.state.ratio * PERCENT)}% of ${props.state.max}`}
+        <bdi>
+            {props.state.ratio === undefined
+                ? "working…"
+                : `${Math.round(props.state.ratio * PERCENT)}% of ${props.state.max}`}
+        </bdi>
     </div>
 </div>

@@ -14,14 +14,19 @@ const ARIA_LABELS: Record<ScrollerAxis, Record<ScrollerStep, string>> = {
 
 const props = defineProps<ScrollerButtonProps>();
 
+const axis = computed(() => props.axis ?? "x");
+
 const isPrevious = computed(() => props.step === "previous");
 </script>
 
 <template>
     <Button
-        :is-disabled="isPrevious ? stepper.getIsAtStart() : stepper.getIsAtEnd()"
-        :ariaLabel="ARIA_LABELS[axis ?? 'x'][step]"
-        @click="() => void (isPrevious ? stepper.stepToPrevious() : stepper.stepToNext())"
+        v-if="controller"
+        :id="id"
+        :is-disabled="isPrevious ? controller[axis].getIsAtStart() : controller[axis].getIsAtEnd()"
+        :ariaLabel="ARIA_LABELS[axis][step]"
+        :ariaControls="controller.getBoxId()"
+        @click="() => void (isPrevious ? controller?.[axis].stepToPrevious() : controller?.[axis].stepToNext())"
     >
         <template #renderContent="flags">
             <PageScrollerButtonContent :flags="flags" :step="step" :axis="axis" />

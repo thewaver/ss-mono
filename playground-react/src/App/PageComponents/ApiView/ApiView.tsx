@@ -26,7 +26,7 @@ import {
 } from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.utils";
 
 import { PageTableOfContentsContent } from "../../StyledComponents/TableOfContentsContent/TableOfContentsContent";
-import type { PageApiTableProps, PageApiViewProps } from "./ApiViewReact.types";
+import type { PageApiTableProps, PageApiTextProps, PageApiViewProps } from "./ApiViewReact.types";
 
 const GROUP_TITLES: Record<ApiGroupKind, string> = {
     props: "Props",
@@ -46,6 +46,19 @@ const TABLE_COLUMNS: Record<ApiTableKind, [name: string, type: string]> = {
 
 const getIsPlainClick = (e: MouseEvent) => e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey;
 
+const PageApiText = (props: PageApiTextProps) =>
+    props.text.map((part, index) => (
+        <Fragment key={index}>
+            {part.kind === "prop" ? (
+                <span className={styles.docsPropName}>{part.text}</span>
+            ) : part.kind === "link" ? (
+                <a href={part.href}>{part.text}</a>
+            ) : (
+                part.text
+            )}
+        </Fragment>
+    ));
+
 const PageApiTable = (props: PageApiTableProps) => {
     const table = props.table;
 
@@ -57,7 +70,11 @@ const PageApiTable = (props: PageApiTableProps) => {
                 </h3>
             )}
 
-            {table.description && <p className={styles.docsDescription}>{table.description}</p>}
+            {table.description.length > 0 && (
+                <p className={styles.docsDescription}>
+                    <PageApiText text={table.description} />
+                </p>
+            )}
 
             {table.includes.length > 0 && (
                 <p className={styles.docsDescription} data-api-includes>
@@ -110,7 +127,9 @@ const PageApiTable = (props: PageApiTableProps) => {
 
                                     {table.isDocumented && (
                                         <td className={styles.docsCell}>
-                                            {entry.description || (
+                                            {entry.description.length ? (
+                                                <PageApiText text={entry.description} />
+                                            ) : (
                                                 <span className={styles.docsPending}>{NO_DESCRIPTION}</span>
                                             )}
                                         </td>
@@ -131,6 +150,7 @@ export const PageApiView = (props: PageApiViewProps) => {
     const latestLocation = useLatest(location);
     const latestNavigate = useLatest(navigate);
     const currentEntryRef = useRef<DocsTableOfContentsEntry>(undefined);
+    const hasOpenedRef = useRef(false);
     const stopHashHoldRef = useRef<() => void>(undefined);
 
     useEffect(() => () => stopHashHoldRef.current?.(), []);
@@ -157,6 +177,12 @@ export const PageApiView = (props: PageApiViewProps) => {
 
     const handleCurrentChange = (entry: DocsTableOfContentsEntry | undefined) => {
         currentEntryRef.current = entry;
+
+        if (!hasOpenedRef.current) {
+            hasOpenedRef.current = true;
+
+            return;
+        }
 
         if (!stopHashHoldRef.current) replaceHash(entry);
     };

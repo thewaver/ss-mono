@@ -10,3 +10,7 @@ export type BaseTableOfContentsExampleCbs = {
 };
 
 export type BaseTableOfContentsExampleProps = BaseTableOfContentsExampleValues & BaseTableOfContentsExampleCbs;
+
+export type BaseTableOfContentsBasicDocsExampleValues = {
+    offsetRatio: number;
+};

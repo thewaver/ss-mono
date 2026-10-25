@@ -107,3 +107,25 @@ and the callee may subscribe later; **pass the plain value** when the parent alr
 cannot change during the call. Shortcut: if `fn(x())` would lose a subscription the callee needs, pass `x`.
 `Tooltip.renderContent`'s placement, `Shape.renderChildren`'s size and the SVG defs builders' size take accessors;
 `Tabs.renderTab`'s index and `computePoints`' size take plain values.
+
+### A prop is never written `a && b`
+
+Solid's compiler wraps the left side of `&&` in a boolean memo, so `name={props.name && `${props.name}-x`}` gives
+`false`, not `undefined`, when the name is unset, and an attribute set to `false` is written as the text "false" — a
+form submits a field called "false" and every instance shares `id="false"`. **Write `a === undefined ? undefined : b`.**
+Found on `DateRangePicker`, `DateTimePicker` and `ColorArea`.
+
+### An element's `class` never changes while it also uses `classList`
+
+When `class` changes, Solid writes the whole attribute again and the classes `classList` had toggled on are gone
+until each toggles again — `PageRangeContent` lost its colors and error look, and `PageTabContent` its selected
+marker, whenever the orientation knob switched. **Put the changing class into the `classList` object** and keep
+`class` fixed.
+
+### A conditional prop read outside a render is written as a function
+
+Solid compiles `prop={a ? b : c}` into a getter that builds a memo on every read. Read inside a component, that memo
+has an owner; read by an observer or a document listener, it does not, and each read leaks one with the warning
+"computations created outside a `createRoot` or `render` will never be disposed" — opening one `Menu` submenu
+leaked about thirty-six. **Pass a function that does the test inside itself**, unless the receiver checks the prop
+for presence (`anchorRect === undefined`), in which case call a named function at the prop instead.

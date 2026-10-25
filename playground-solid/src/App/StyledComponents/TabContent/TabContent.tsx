@@ -11,8 +11,8 @@ export const PageTabContent = (props: ParentProps<TabContentProps>) => {
 
     return (
         <div
-            class={access(props.orientation) === "horizontal" ? styles.rowTab : styles.columnTab}
             classList={{
+                [access(props.orientation) === "horizontal" ? styles.rowTab : styles.columnTab]: true,
                 [getLayerClass()]: true,
                 [styles.isSelected]: access(props.isSelected),
                 [styles.isHovered]: access(props.flags).isHovered,
@@ -86,8 +86,11 @@ export const PageTabFloater = (props: TabFloaterProps) => {
 
     return (
         <div
-            class={access(props.orientation) === "horizontal" ? styles.rowTabFloater : styles.columnTabFloater}
-            classList={{ [getLayerClass()]: true, [styles.isVisible]: access(props.visibilityTarget) === 1 }}
+            classList={{
+                [access(props.orientation) === "horizontal" ? styles.rowTabFloater : styles.columnTabFloater]: true,
+                [getLayerClass()]: true,
+                [styles.isVisible]: access(props.visibilityTarget) === 1,
+            }}
             style={{ "transition-duration": `${access(props.transitionDurationMs)}ms` }}
             data-floater
         />

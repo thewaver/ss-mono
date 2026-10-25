@@ -536,6 +536,7 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
                     <Portal mount={viewportContext.getPortalRef()}>
                         <div
                             class={styles.sortableCarried}
+                            dir={getDirection()}
                             style={{
                                 "transform": `translate(${getPoint().x - grabOffset.x}px, ${getPoint().y - grabOffset.y}px)`,
                                 "width": `${getCarriedSize()?.width ?? 0}px`,

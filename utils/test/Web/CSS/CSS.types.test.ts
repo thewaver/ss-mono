@@ -7,8 +7,9 @@ import type {
     CSSBorderWidth,
     CSSCornerShape,
     CSSFilterKey,
+    CSSLogicalPadding,
     CSSMargin,
-    CSSPadding,
+    CSSPhysicalPadding,
     CSSTransformKey,
 } from "../../../src/Web/CSS/CSS.types.js";
 import { CSS_FILTER_KEYS, CSS_TRANSFORM_KEYS } from "../../../src/Web/CSS/CSS.types.js";
@@ -44,8 +45,11 @@ describe("CSS side and corner shapes", () => {
     // Types only, so these are compile-time checks.
     it("name all four sides", () => {
         expectTypeOf<keyof CSSMargin>().toEqualTypeOf<"marginTop" | "marginRight" | "marginBottom" | "marginLeft">();
-        expectTypeOf<keyof CSSPadding>().toEqualTypeOf<
+        expectTypeOf<keyof CSSPhysicalPadding>().toEqualTypeOf<
             "paddingTop" | "paddingRight" | "paddingBottom" | "paddingLeft"
+        >();
+        expectTypeOf<keyof CSSLogicalPadding>().toEqualTypeOf<
+            "paddingBlockStart" | "paddingInlineEnd" | "paddingBlockEnd" | "paddingInlineStart"
         >();
         expectTypeOf<keyof CSSBorderWidth>().toEqualTypeOf<
             "borderTopWidth" | "borderRightWidth" | "borderBottomWidth" | "borderLeftWidth"

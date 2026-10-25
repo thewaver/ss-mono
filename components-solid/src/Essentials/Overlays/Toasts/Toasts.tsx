@@ -1,12 +1,15 @@
-import { For, createEffect, createMemo, createSignal, onCleanup, onMount } from "solid-js";
+import type { ParentProps } from "solid-js";
+import { For, createEffect, createMemo, createSignal, onCleanup, onMount, untrack } from "solid-js";
 import { Portal } from "solid-js/web";
 
 import {
     LiveAnnouncerUtils,
+    type NavigatorDirection,
     TOASTS_DEFAULTS,
-    type Toast,
+    type ToastRequest,
     type ToastState,
     ToastUtils,
+    type ToastsContextType,
     ToastsStyles as styles,
 } from "@thewaver/ss-components";
 import { CSSUtils, GestureUtils, StringUtils } from "@thewaver/ss-utils";
@@ -14,10 +17,11 @@ import { CSSUtils, GestureUtils, StringUtils } from "@thewaver/ss-utils";
 import { ElementFaderSolidUtils } from "../../../Abstracts/ElementFader/ElementFaderSolid.utils";
 import { ElementObserverSolidUtils } from "../../../Abstracts/ElementObserver/ElementObserverSolid.utils";
 import { InteractionTrackerSolidUtils } from "../../../Abstracts/InteractionTracker/InteractionTrackerSolid.utils";
-import { ShortcutSolidUtils } from "../../../Abstracts/Shortcut/ShortcutSolid.utils";
+import { SignalMirrorSolidUtils } from "../../../Abstracts/SignalMirror/SignalMirrorSolid.utils";
 import { useViewportContext } from "../../../Abstracts/Viewport/Viewport.context";
-import { access, accessSignal } from "../../../Utils/propUtils";
-import type { ToastsItemProps, ToastsProps } from "./ToastsSolid.types";
+import { access } from "../../../Utils/propUtils";
+import { ToastsContextProvider } from "./Toasts.context";
+import type { Toast, ToastRenderer, ToastsItemProps, ToastsProps } from "./ToastsSolid.types";
 
 const ToastsItem = <T,>(props: ToastsItemProps<T>) => {
     const [getItemRef, setItemRef] = createSignal<HTMLElement>();
@@ -96,12 +100,13 @@ const ToastsItem = <T,>(props: ToastsItemProps<T>) => {
     return (
         <div
             class={styles.toastsItem}
+            dir={access(props.direction)}
             ref={(element) => {
                 setItemRef(element);
                 props.ref(element);
             }}
         >
-            {props.renderToast(
+            {props.renderToast?.(
                 () => access(props.toast),
                 getTransitionTarget,
                 () => access(props.transitionDurationMs),
@@ -111,10 +116,14 @@ const ToastsItem = <T,>(props: ToastsItemProps<T>) => {
     );
 };
 
-export const Toasts = <T,>(props: ToastsProps<T>) => {
-    const toastsSignal = accessSignal(() => props.toasts);
+export const Toasts = <T,>(props: ParentProps<ToastsProps<T>>) => {
+    const [getToasts, setToasts] = SignalMirrorSolidUtils.createOptional<Toast<T>[]>(() => props.toasts, []);
 
     const viewportContext = useViewportContext();
+
+    const registerOwner = {};
+
+    const directions = new Map<string, NavigatorDirection>();
 
     const [getEntryIds, setEntryIds] = createSignal<string[]>([]);
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
@@ -126,13 +135,13 @@ export const Toasts = <T,>(props: ToastsProps<T>) => {
 
     const getAlignment = createMemo(() => access(props.alignment) ?? TOASTS_DEFAULTS.alignment);
 
-    const getDir = createMemo(() => access(props.dir) ?? TOASTS_DEFAULTS.dir);
+    const getFlexDirection = createMemo(() => access(props.flexDirection) ?? TOASTS_DEFAULTS.flexDirection);
 
     const getOverflow = createMemo(() => access(props.overflow) ?? TOASTS_DEFAULTS.overflow);
 
     const getMargins = createMemo(() => access(props.margins) ?? CSSUtils.spreadMargin(0));
 
-    const getStackAlignment = createMemo(() => ToastUtils.computeStackAlignment(getAlignment(), getDir()));
+    const getStackAlignment = createMemo(() => ToastUtils.computeStackAlignment(getAlignment(), getFlexDirection()));
 
     const getSwipeDirection = createMemo(() =>
         (access(props.isDismissableOnSwipe) ?? TOASTS_DEFAULTS.isDismissableOnSwipe)
@@ -150,32 +159,59 @@ export const Toasts = <T,>(props: ToastsProps<T>) => {
         setEntryRefs((prev) => (prev[id] === element ? prev : { ...prev, [id]: element }));
     };
 
-    const getHotkey = createMemo(() => {
-        const hotkey = access(props.hotkey);
-
-        return hotkey === undefined ? TOASTS_DEFAULTS.hotkey : hotkey;
-    });
-
-    const getAnnouncementPoliteness = createMemo(() => access(props.ariaLive) ?? TOASTS_DEFAULTS.ariaLive);
-
     onMount(() => {
-        if (props.computeAnnouncement === undefined) return;
-
         LiveAnnouncerUtils.reserve("polite");
         LiveAnnouncerUtils.reserve("assertive");
     });
 
-    const getAdmitted = createMemo(() =>
-        ToastUtils.computeAdmitted(toastsSignal[0](), access(props.limit), getOverflow()),
-    );
+    const getAdmitted = createMemo(() => ToastUtils.computeAdmitted(getToasts(), access(props.limit), getOverflow()));
+
+    createEffect(() => {
+        const region = getRootRef();
+        const scope = viewportContext.getPortalRef() ?? document.body;
+        const alignment = getAlignment();
+
+        if (!region) return;
+
+        onCleanup(
+            ToastUtils.registerStack(registerOwner, {
+                region,
+                scope,
+                alignment,
+                getHasToasts: () => untrack(getAdmitted).length > 0,
+            }),
+        );
+    });
+
+    const show = (toast: ToastRequest<Toast<T>>) => {
+        const prev = untrack(getToasts);
+        const { toasts: next, id } = ToastUtils.withRequestedToast(prev, toast);
+
+        if (id === undefined) return undefined;
+
+        directions.set(id, ToastUtils.readRaiserDirection());
+        setToasts(next);
+
+        return id;
+    };
 
     const dismiss = (id: string) => {
-        toastsSignal[1]((prev) => ToastUtils.withoutToast(prev, id));
+        const prev = untrack(getToasts);
+        const next = ToastUtils.withoutToast(prev, id);
+
+        if (next === prev) return false;
+
+        setToasts(next);
+
+        return true;
     };
+
+    const context: ToastsContextType<Toast<T>> = { show, dismiss };
 
     const handleExitEnd = (id: string) => {
         if (getAdmitted().some((toast) => toast.id === id)) return;
 
+        directions.delete(id);
         setEntryIds((prev) => prev.filter((entryId) => entryId !== id));
         setEntryRefs((prev) => {
             if (!(id in prev)) return prev;
@@ -196,46 +232,13 @@ export const Toasts = <T,>(props: ToastsProps<T>) => {
 
     createEffect<string[]>((previous) => {
         const entryIds = getEntryIds();
-        const computeAnnouncement = props.computeAnnouncement;
 
-        if (!computeAnnouncement) return entryIds;
-
-        ToastUtils.announceArrivals(
-            previous,
-            entryIds,
-            getAdmitted(),
-            computeAnnouncement,
-            getAnnouncementPoliteness(),
-        );
+        ToastUtils.announceArrivals(previous, entryIds, getAdmitted());
 
         return entryIds;
     }, []);
 
-    let focusRoute: ReturnType<typeof ToastUtils.createFocusRoute> | undefined;
-
     createEffect(() => {
-        const root = getRootRef();
-
-        if (!root) return;
-
-        const route = ToastUtils.createFocusRoute(root);
-
-        focusRoute = route;
-
-        onCleanup(() => {
-            route.stop();
-            focusRoute = undefined;
-        });
-    });
-
-    ShortcutSolidUtils.createBinding(
-        () => getHotkey() ?? undefined,
-        () => false,
-        () => focusRoute?.enter(),
-    );
-
-    createEffect(() => {
-        const [getToasts, setToasts] = toastsSignal;
         const trimmed = ToastUtils.computeOverflowTrim(getToasts(), access(props.limit), getOverflow());
 
         if (!trimmed) return;
@@ -244,53 +247,74 @@ export const Toasts = <T,>(props: ToastsProps<T>) => {
     });
 
     return (
-        <Portal
-            mount={viewportContext.getPortalRef()}
-            ref={(el) => {
-                el.style.display = "contents";
-            }}
-        >
-            <div
-                ref={setRootRef}
-                class={styles.toastsRegion}
-                style={{
-                    ...CSSUtils.spreadableToStyle(getMargins(), (key) => StringUtils.camelToKebabCase(key)),
-                    "flex-direction": getDir(),
-                    "justify-content": getStackAlignment().justifyContent,
-                    "align-items": getStackAlignment().alignItems,
-                    "gap": `${access(props.gap) ?? TOASTS_DEFAULTS.gap}px`,
-                    "z-index": ToastUtils.Z_INDEX,
-                }}
-                role="region"
-                tabindex={-1}
-                aria-live={props.computeAnnouncement === undefined ? getAnnouncementPoliteness() : undefined}
-                aria-label={access(props.ariaLabel)}
-            >
-                <For each={getEntryIds()}>
-                    {(id, getIndex) => {
-                        const findToast = () => getAdmitted().find((toast) => toast.id === id);
-                        const getToast = createMemo((prev: Toast<T>) => findToast() ?? prev, findToast()!);
+        <ToastsContextProvider value={context as ToastsContextType<Toast<unknown>>}>
+            {props.children}
 
-                        return (
-                            <ToastsItem
-                                toast={getToast}
-                                index={getIndex}
-                                count={() => getEntryIds().length}
-                                isExiting={() => findToast() === undefined}
-                                isPaused={getIsPaused}
-                                transitionDurationMs={getTransitionDurationMs}
-                                sizes={getEntrySizes}
-                                swipeDirection={getSwipeDirection}
-                                ref={(element) => setEntryRef(id, element)}
-                                renderToast={props.renderToast}
-                                onElapse={() => dismiss(id)}
-                                onSwipeDismiss={() => dismiss(id)}
-                                onExitEnd={() => handleExitEnd(id)}
-                            />
-                        );
+            <Portal
+                mount={viewportContext.getPortalRef()}
+                ref={(el) => {
+                    el.style.display = "contents";
+                }}
+            >
+                <div
+                    ref={setRootRef}
+                    class={styles.toastsRegion}
+                    style={{
+                        ...CSSUtils.spreadableToStyle(getMargins(), (key) => StringUtils.camelToKebabCase(key)),
+                        "flex-direction": getFlexDirection(),
+                        "justify-content": getStackAlignment().justifyContent,
+                        "align-items": getStackAlignment().alignItems,
+                        "gap": `${access(props.gap) ?? TOASTS_DEFAULTS.gap}px`,
+                        "z-index": ToastUtils.Z_INDEX,
                     }}
-                </For>
-            </div>
-        </Portal>
+                    dir="ltr"
+                    role="region"
+                    tabindex={-1}
+                    aria-label={access(props.ariaLabel)}
+                >
+                    <For each={getEntryIds()}>
+                        {(id, getIndex) => {
+                            const findToast = () => getAdmitted().find((toast) => toast.id === id);
+                            const getToast = createMemo((prev: Toast<T>) => findToast() ?? prev, findToast()!);
+                            const renderDefault = props.renderToast;
+                            const renderToast: ToastRenderer<T> | undefined =
+                                getToast().renderToast ??
+                                (renderDefault === undefined
+                                    ? undefined
+                                    : (getItemToast, getVisibilityTarget, getItemTransitionDurationMs, getState) =>
+                                          renderDefault(
+                                              getItemToast,
+                                              getVisibilityTarget,
+                                              getItemTransitionDurationMs,
+                                              getState,
+                                              () => dismiss(id),
+                                          ));
+                            const direction = directions.get(id) ?? ToastUtils.readPageDirection();
+
+                            ToastUtils.warnIfUnpainted(renderToast !== undefined);
+
+                            return (
+                                <ToastsItem
+                                    toast={getToast}
+                                    index={getIndex}
+                                    count={() => getEntryIds().length}
+                                    isExiting={() => findToast() === undefined}
+                                    isPaused={getIsPaused}
+                                    transitionDurationMs={getTransitionDurationMs}
+                                    sizes={getEntrySizes}
+                                    swipeDirection={getSwipeDirection}
+                                    direction={direction}
+                                    ref={(element) => setEntryRef(id, element)}
+                                    renderToast={renderToast}
+                                    onElapse={() => dismiss(id)}
+                                    onSwipeDismiss={() => dismiss(id)}
+                                    onExitEnd={() => handleExitEnd(id)}
+                                />
+                            );
+                        }}
+                    </For>
+                </div>
+            </Portal>
+        </ToastsContextProvider>
     );
 };

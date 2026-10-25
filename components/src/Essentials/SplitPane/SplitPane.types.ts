@@ -5,9 +5,19 @@ export type SplitPaneGutterFlags = {
 };
 
 export type SplitPaneEntry = {
+    /** The pane's id, which the divider before it points at. Left out, one is generated. */
     id?: string;
+    /**
+     * The smallest the pane may be, in pixels. A divider stops here, and a container too small for every pane's
+     * smallest size overflows.
+     */
     minPx?: number;
+    /** The largest the pane may be, in pixels. */
     maxPx?: number;
+    /**
+     * Names the divider after this pane for assistive technology, saying what moving it resizes. Every pane but the
+     * last needs one, and a missing one is warned about in the console; the last pane has no divider after it.
+     */
     gutterAriaLabel?: string;
 };
 

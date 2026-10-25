@@ -2,7 +2,6 @@ import { type SlotsType, defineComponent } from "vue";
 
 import { type PopupTriggerFlags, PopupTriggerStyles } from "@thewaver/ss-components";
 
-import { LabelVueUtils } from "../../Essentials/Input/Label/LabelVue.utils";
 import { callSlot, declareProps } from "../../Utils/propUtils";
 import type { SlotsContext } from "../../Utils/typeUtils";
 import type { InteractionControlSlots } from "../InteractionWrapper/InteractionWrapper.types";
@@ -10,8 +9,6 @@ import type { PopupTriggerProps } from "./PopupTrigger.types";
 
 export const PopupTrigger = defineComponent(
     (props: PopupTriggerProps, { slots }: SlotsContext<InteractionControlSlots<PopupTriggerFlags>>) => {
-        const ariaLabel = LabelVueUtils.useAriaLabel(() => props.ariaLabel);
-
         return () => {
             const isDisabled = props.flags.isDisabled ?? false;
 
@@ -20,7 +17,7 @@ export const PopupTrigger = defineComponent(
                     id={props.id}
                     type="button"
                     class={PopupTriggerStyles.popupTrigger}
-                    aria-label={ariaLabel.value}
+                    aria-label={props.ariaLabel}
                     aria-haspopup="dialog"
                     aria-expanded={props.isOpen}
                     aria-controls={props.isOpen ? props.popupId : undefined}

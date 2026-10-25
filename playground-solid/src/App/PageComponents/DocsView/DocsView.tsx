@@ -1,7 +1,7 @@
 import type { ParentProps } from "solid-js";
 import { Show, createMemo, createSignal } from "solid-js";
 
-import { TableOfContents, access } from "@thewaver/ss-components-solid";
+import { TableOfContents } from "@thewaver/ss-components-solid";
 import type { TableOfContentsLink } from "@thewaver/ss-components-solid";
 import { toDocsSectionId } from "@thewaver/ss-playground/App/PageComponents/DocsSection/DocsSection.utils";
 import {
@@ -17,6 +17,7 @@ import type {
 } from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.types";
 
 import { PageTableOfContentsContent } from "../../StyledComponents/TableOfContentsContent/TableOfContentsContent";
+import { PageDocsProse } from "../DocsProse/DocsProse";
 import { DocsViewContextProvider } from "./DocsView.context";
 import type { PageDocsViewProps } from "./DocsViewSolid.types";
 
@@ -53,7 +54,7 @@ export const PageDocsView = (props: ParentProps<PageDocsViewProps>) => {
         <div class={styles.docsLayout} data-view={"docs"}>
             <div class={styles.docsView}>
                 <p ref={setIntroRef} id={toDocsSectionId(DOCS_INTRO_TITLE)} class={styles.docsLead}>
-                    {access(props.description)}
+                    <PageDocsProse content={props.description} />
                 </p>
 
                 <DocsViewContextProvider value={{ register }}>{props.children}</DocsViewContextProvider>

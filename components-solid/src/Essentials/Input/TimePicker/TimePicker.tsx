@@ -2,6 +2,7 @@ import { createEffect, createMemo, createSignal, createUniqueId } from "solid-js
 
 import { type PopupTriggerFlags, TIME_PICKER_DEFAULTS } from "@thewaver/ss-components";
 
+import { NavigatorSolidUtils } from "../../../Abstracts/Navigator/NavigatorSolid.utils";
 import { SignalMirrorSolidUtils } from "../../../Abstracts/SignalMirror/SignalMirrorSolid.utils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import { Popover } from "../../../Primitives/Popover/Popover";
@@ -17,6 +18,8 @@ export const TimePicker = (props: TimePickerProps) => {
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
     const [getIsOpen, setIsOpen] = SignalMirrorSolidUtils.createOptional(() => props.visibility, false);
 
+    const getDirection = NavigatorSolidUtils.createDirectionSignal(getRootRef);
+
     const getClockLabel = () => access(props.clockLabel);
 
     const dismiss = () => {
@@ -26,16 +29,19 @@ export const TimePicker = (props: TimePickerProps) => {
         getRootRef()?.querySelector("input")?.focus();
     };
 
-    const getIsDisabled = createMemo(() => access(props.isDisabled) ?? false);
+    const getIsLocked = createMemo(() => (access(props.isDisabled) ?? false) || (access(props.isReadOnly) ?? false));
 
     const open = () => {
-        if (getIsDisabled()) return;
+        if (getIsLocked()) return;
 
         setIsOpen(true);
     };
 
     createEffect(() => {
-        if (!getIsOpen() || !getIsDisabled()) return;
+        const isOpen = getIsOpen();
+        const isLocked = getIsLocked();
+
+        if (!isOpen || !isLocked) return;
 
         setIsOpen(false);
     });
@@ -68,7 +74,7 @@ export const TimePicker = (props: TimePickerProps) => {
                         {props.renderTrailing?.(getFieldFlags, meridiem)}
 
                         <InteractionWrapper<PopupTriggerFlags>
-                            isDisabled={getIsDisabled}
+                            isDisabled={getIsLocked}
                             extraFlags={() => ({ isOpen: getIsOpen() })}
                             renderControl={(setElementRef, getRenderProps) => (
                                 <PopupTrigger
@@ -93,7 +99,7 @@ export const TimePicker = (props: TimePickerProps) => {
                 ariaAttributes={() => ({ "aria-label": getClockLabel() })}
                 isOpen={getIsOpen}
                 anchorRef={getRootRef}
-                placement={() => access(props.placement) ?? TIME_PICKER_DEFAULTS.placement}
+                placement={() => access(props.placement) ?? TIME_PICKER_DEFAULTS.placement[getDirection()]}
                 offset={props.offset}
                 transitionDurationMs={props.popupTransitionDurationMs}
                 hasAutoFocus={true}

@@ -1,8 +1,17 @@
+import type { ScrollerProgress } from "@thewaver/ss-components-vue";
 import type {
-    BaseScrollerExampleProps,
-    BaseScrollerTabbedExampleProps,
+    BaseScrollerBasicDocsExampleValues,
+    BaseScrollerBothWaysDocsExampleValues,
+    BaseScrollerFadingDocsExampleValues,
 } from "@thewaver/ss-playground/App/Pages/ScrollerPage/ScrollerPage.types";
 
-export type ScrollerExampleProps = BaseScrollerExampleProps;
+export type ScrollerBasicDocsExampleProps = BaseScrollerBasicDocsExampleValues;
 
-export type ScrollerTabbedExampleProps = BaseScrollerTabbedExampleProps;
+export type ScrollerDrivenDocsExampleProps = {
+    "progress": ScrollerProgress;
+    "onUpdate:progress"?: (progress: ScrollerProgress) => void;
+};
+
+export type ScrollerBothWaysDocsExampleProps = BaseScrollerBothWaysDocsExampleValues;
+
+export type ScrollerFadingDocsExampleProps = BaseScrollerFadingDocsExampleValues;

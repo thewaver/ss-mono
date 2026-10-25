@@ -1,9 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { Toast } from "./Toasts.types";
+import type { BaseToast } from "./Toasts.types";
 import { ToastUtils } from "./Toasts.utils";
 
-const toast = (id: string): Toast<string> => ({ id, value: id });
+const toast = (id: string): BaseToast<string> => ({ id, value: id, announcement: id });
 
 const FIVE = ["a", "b", "c", "d", "e"].map(toast);
 
@@ -108,6 +108,16 @@ describe("computeOverflowTrim", () => {
     });
 });
 
+describe("withToast", () => {
+    it("adds a toast at the end of the queue", () => {
+        expect(ToastUtils.withToast(FIVE.slice(0, 2), toast("z")).map((entry) => entry.id)).toEqual(["a", "b", "z"]);
+    });
+
+    it("answers the same queue for a toast already in it, so raising one twice writes nothing", () => {
+        expect(ToastUtils.withToast(FIVE, toast("c"))).toBe(FIVE);
+    });
+});
+
 describe("withoutToast", () => {
     it("takes one toast out", () => {
         expect(ToastUtils.withoutToast(FIVE, "b").map((entry) => entry.id)).toEqual(["a", "c", "d", "e"]);
@@ -192,5 +202,281 @@ describe("createCountdown", () => {
 
         vi.advanceTimersByTime(1);
         expect(onElapse).toHaveBeenCalledTimes(1);
+    });
+});
+
+describe("withRequestedToast", () => {
+    it("keeps the id a toast was raised with", () => {
+        const result = ToastUtils.withRequestedToast(FIVE.slice(0, 2), { value: "z", announcement: "z", id: "z" });
+
+        expect(result.id).toBe("z");
+        expect(result.toasts.map((entry) => entry.id)).toEqual(["a", "b", "z"]);
+    });
+
+    it("makes up an id no queued toast has for a toast raised without one", () => {
+        const first = ToastUtils.withRequestedToast<BaseToast<string>>([], { value: "x", announcement: "x" });
+        const second = ToastUtils.withRequestedToast(first.toasts, { value: "y", announcement: "y" });
+
+        expect(first.id).toBeDefined();
+        expect(second.id).toBeDefined();
+        expect(second.id).not.toBe(first.id);
+        expect(second.toasts.map((entry) => entry.id)).toEqual([first.id, second.id]);
+    });
+
+    it("refuses a toast whose id is already queued, answering no id and the same queue", () => {
+        const result = ToastUtils.withRequestedToast(FIVE, { value: "c", announcement: "c", id: "c" });
+
+        expect(result.id).toBeUndefined();
+        expect(result.toasts).toBe(FIVE);
+    });
+});
+
+describe("UNPROVIDED_CONTEXT", () => {
+    it("reports that neither raising nor dismissing acted", () => {
+        expect(ToastUtils.UNPROVIDED_CONTEXT.show(toast("a"))).toBeUndefined();
+        expect(ToastUtils.UNPROVIDED_CONTEXT.dismiss("a")).toBe(false);
+    });
+});
+
+describe("computeCycleTarget", () => {
+    it("goes from outside to the first stack holding toasts going forward, and the last going back", () => {
+        expect(ToastUtils.computeCycleTarget([false, true, true, false], -1, 1)).toBe(1);
+        expect(ToastUtils.computeCycleTarget([false, true, true, false], -1, -1)).toBe(2);
+    });
+
+    it("passes over empty stacks and wraps round the ends", () => {
+        expect(ToastUtils.computeCycleTarget([true, false, true], 0, 1)).toBe(2);
+        expect(ToastUtils.computeCycleTarget([true, false, true], 2, 1)).toBe(0);
+        expect(ToastUtils.computeCycleTarget([true, false, true], 0, -1)).toBe(2);
+    });
+
+    it("has nowhere to go when no other stack holds toasts, or none does", () => {
+        expect(ToastUtils.computeCycleTarget([false, true, false], 1, 1)).toBeUndefined();
+        expect(ToastUtils.computeCycleTarget([false, false], -1, 1)).toBeUndefined();
+        expect(ToastUtils.computeCycleTarget([], -1, -1)).toBeUndefined();
+    });
+});
+
+/**
+ * The register is driven with stand-ins for the document and the stack regions: what it asks of them — which element
+ * holds focus, whether a region contains it, focusing one, listening for a key — has no geometry, so a stand-in
+ * answers exactly what the browser would.
+ */
+describe("registerStack", () => {
+    type Listener = (e: unknown) => void;
+
+    class FakeElement {
+        isConnected = true;
+        listeners = new Map<string, Listener>();
+        children: FakeElement[] = [];
+
+        contains(node: unknown) {
+            return node === this || this.children.includes(node as FakeElement);
+        }
+
+        focus() {
+            fakeDocument.activeElement = this;
+        }
+
+        addEventListener(type: string, listener: Listener) {
+            this.listeners.set(type, listener);
+        }
+
+        removeEventListener(type: string) {
+            this.listeners.delete(type);
+        }
+    }
+
+    const fakeDocument = {
+        activeElement: undefined as unknown,
+        listeners: new Map<string, Listener>(),
+        addEventListener(type: string, listener: Listener) {
+            this.listeners.set(type, listener);
+        },
+        removeEventListener(type: string) {
+            this.listeners.delete(type);
+        },
+    };
+
+    const releases: (() => void)[] = [];
+
+    const register = (owner: object, region: FakeElement, opts?: { holds?: boolean; scope?: object }) => {
+        const release = ToastUtils.registerStack(owner, {
+            region: region as unknown as HTMLElement,
+            scope: opts?.scope ?? {},
+            alignment: "top_left",
+            getHasToasts: () => opts?.holds ?? true,
+        });
+
+        releases.push(release);
+
+        return release;
+    };
+
+    const press = (key: string, shiftKey = false) => {
+        const event = {
+            key,
+            code: key,
+            shiftKey,
+            ctrlKey: false,
+            altKey: false,
+            metaKey: false,
+            defaultPrevented: false,
+            isComposing: false,
+            composedPath: () => [fakeDocument.activeElement],
+            target: fakeDocument.activeElement,
+            preventDefault: vi.fn(),
+        };
+
+        fakeDocument.listeners.get("keydown")?.(event);
+
+        return event;
+    };
+
+    const pressEscapeIn = (region: FakeElement) => {
+        const event = { key: "Escape", preventDefault: vi.fn() };
+
+        region.listeners.get("keydown")?.(event);
+
+        return event;
+    };
+
+    beforeEach(() => {
+        vi.stubGlobal("document", fakeDocument);
+        vi.stubGlobal("HTMLElement", FakeElement);
+        vi.stubGlobal("HTMLInputElement", class {});
+        vi.stubGlobal("HTMLTextAreaElement", class {});
+        vi.stubGlobal("HTMLSelectElement", class {});
+        vi.spyOn(console, "warn").mockImplementation(() => undefined);
+        fakeDocument.activeElement = new FakeElement();
+    });
+
+    afterEach(() => {
+        for (const release of releases.splice(0)) release();
+
+        vi.unstubAllGlobals();
+        vi.restoreAllMocks();
+    });
+
+    it("binds the shortcut once for every stack, and unbinds it with the last", () => {
+        const first = register({}, new FakeElement());
+        const second = register({}, new FakeElement());
+
+        expect(fakeDocument.listeners.has("keydown"), "the page listens once a stack is registered").toBe(true);
+
+        first();
+        expect(fakeDocument.listeners.has("keydown"), "and keeps listening while one remains").toBe(true);
+
+        second();
+        expect(fakeDocument.listeners.has("keydown"), "and stops with the last").toBe(false);
+    });
+
+    it("takes F8 through the stacks in the order their providers joined, and Shift+F8 back", () => {
+        const regions = [new FakeElement(), new FakeElement(), new FakeElement()];
+
+        regions.forEach((region) => register({}, region));
+
+        press("F8");
+        expect(fakeDocument.activeElement).toBe(regions[0]);
+
+        press("F8");
+        expect(fakeDocument.activeElement, "one press moves one stack, however many stacks there are").toBe(regions[1]);
+
+        press("F8", true);
+        expect(fakeDocument.activeElement).toBe(regions[0]);
+
+        press("F8", true);
+        expect(fakeDocument.activeElement, "back from the first wraps to the last").toBe(regions[2]);
+    });
+
+    it("passes over a stack holding no toasts", () => {
+        const regions = [new FakeElement(), new FakeElement(), new FakeElement()];
+
+        register({}, regions[0]!);
+        register({}, regions[1]!, { holds: false });
+        register({}, regions[2]!);
+
+        press("F8");
+        press("F8");
+
+        expect(fakeDocument.activeElement).toBe(regions[2]);
+    });
+
+    it("keeps a provider's place when it joins again, and puts a new provider last", () => {
+        const owners = [{}, {}, {}];
+        const regions = [new FakeElement(), new FakeElement(), new FakeElement()];
+
+        register(owners[0]!, regions[0]!);
+        const releaseSecond = register(owners[1]!, regions[1]!);
+        register(owners[2]!, regions[2]!);
+
+        releaseSecond();
+        register(owners[1]!, regions[1]!);
+
+        press("F8");
+        press("F8");
+        expect(fakeDocument.activeElement, "the provider that joined again is still second").toBe(regions[1]);
+
+        const latecomer = new FakeElement();
+
+        register({}, latecomer);
+        press("F8", true);
+        press("F8", true);
+        expect(fakeDocument.activeElement, "and a provider joining later comes after every earlier one").toBe(
+            latecomer,
+        );
+    });
+
+    it("hands focus back with Escape to where it was before the first F8, from whichever stack it is in", () => {
+        const origin = fakeDocument.activeElement;
+        const regions = [new FakeElement(), new FakeElement()];
+
+        regions.forEach((region) => register({}, region));
+
+        press("F8");
+        press("F8");
+
+        const escape = pressEscapeIn(regions[1]!);
+
+        expect(fakeDocument.activeElement).toBe(origin);
+        expect(escape.preventDefault, "and claims the key, so no layer above closes as well").toHaveBeenCalled();
+    });
+
+    it("leaves Escape alone when focus did not come in by the shortcut", () => {
+        const region = new FakeElement();
+
+        register({}, region);
+
+        expect(pressEscapeIn(region).preventDefault).not.toHaveBeenCalled();
+    });
+
+    it("warns once a second provider draws at an alignment already taken in the same place, and not elsewhere", () => {
+        const scope = {};
+
+        register({}, new FakeElement(), { scope });
+        register({}, new FakeElement());
+        expect(console.warn, "another place is never a clash").not.toHaveBeenCalled();
+
+        register({}, new FakeElement(), { scope });
+        register({}, new FakeElement(), { scope });
+        expect(console.warn).toHaveBeenCalledTimes(1);
+        expect(vi.mocked(console.warn).mock.calls[0]?.[0]).toContain("top_left");
+    });
+});
+
+describe("warnIfUnpainted", () => {
+    afterEach(() => {
+        vi.restoreAllMocks();
+    });
+
+    it("says nothing when there is a painter, and warns once when there is none", () => {
+        const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+
+        ToastUtils.warnIfUnpainted(true);
+        expect(warn).not.toHaveBeenCalled();
+
+        ToastUtils.warnIfUnpainted(false);
+        ToastUtils.warnIfUnpainted(false);
+        expect(warn).toHaveBeenCalledTimes(1);
     });
 });

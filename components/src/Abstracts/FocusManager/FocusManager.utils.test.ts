@@ -60,3 +60,52 @@ describe("runFocusRestore", () => {
         expect(FocusManagerUtils.getIsRestoringFocus()).toBe(false);
     });
 });
+
+describe("createOriginKeeper", () => {
+    const createElement = (name: string) =>
+        ({ name, isConnected: true }) as unknown as HTMLElement & { isConnected: boolean };
+
+    const focus = (element: HTMLElement) => {
+        vi.stubGlobal("document", { activeElement: element });
+    };
+
+    afterEach(() => {
+        vi.unstubAllGlobals();
+    });
+
+    it("answers what held focus the first time, however often focus moves before the layer shows again", () => {
+        const opener = createElement("opener");
+        const keeper = FocusManagerUtils.createOriginKeeper();
+
+        focus(opener);
+        expect(keeper.take()).toBe(opener);
+
+        focus(createElement("the control a layer above left focus on"));
+        expect(keeper.take(), "the layer came back from under another").toBe(opener);
+    });
+
+    it("starts again from wherever focus is once forgotten, as when the layer closed in between", () => {
+        const keeper = FocusManagerUtils.createOriginKeeper();
+        const secondOpener = createElement("second opener");
+
+        focus(createElement("first opener"));
+        keeper.take();
+        keeper.forget();
+
+        focus(secondOpener);
+        expect(keeper.take()).toBe(secondOpener);
+    });
+
+    it("lets go of an origin that has left the document, since focus cannot go back to it", () => {
+        const opener = createElement("opener");
+        const keeper = FocusManagerUtils.createOriginKeeper();
+        const stillThere = createElement("still there");
+
+        focus(opener);
+        keeper.take();
+        opener.isConnected = false;
+
+        focus(stillThere);
+        expect(keeper.take()).toBe(stillThere);
+    });
+});

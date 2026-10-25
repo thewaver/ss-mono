@@ -15,7 +15,7 @@ export const RefusingDocsExample = () => {
                 checked={emailSignal}
                 id={"email"}
                 ariaLabel={"Email"}
-                renderContent={(getFlags) => <PageCheckboxContent flags={getFlags} />}
+                renderContent={(getFlags) => <PageCheckboxContent flags={getFlags}>Email</PageCheckboxContent>}
                 onChange={(isChecked) => {
                     if (isChecked || smsSignal[0]()) return;
 
@@ -28,7 +28,7 @@ export const RefusingDocsExample = () => {
             <Checkbox
                 checked={smsSignal}
                 ariaLabel={"SMS"}
-                renderContent={(getFlags) => <PageCheckboxContent flags={getFlags} />}
+                renderContent={(getFlags) => <PageCheckboxContent flags={getFlags}>SMS</PageCheckboxContent>}
                 onChange={(isChecked) => {
                     if (isChecked || emailSignal[0]()) return;
 

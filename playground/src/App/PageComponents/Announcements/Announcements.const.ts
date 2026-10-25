@@ -12,7 +12,7 @@ import type {
     SortableGridAnnouncements,
     TableAnnouncements,
 } from "@thewaver/ss-components";
-import type { TimeValueUnit } from "@thewaver/ss-utils";
+import { Color, type TimeValueUnit } from "@thewaver/ss-utils";
 
 const SINGLE = 1;
 
@@ -144,3 +144,12 @@ export const COLOR_INPUT_LABELS = {
     areaAxisLabels: COLOR_AREA_AXIS_LABELS,
     hueLabel: "Hue",
 };
+
+export const computeColorValueText = (_value: string, hsv: Color.HSVA) => {
+    const rgba = Color.HSVA.toRgba(hsv);
+    const channels = `red ${Math.round(rgba.r)}, green ${Math.round(rgba.g)}, blue ${Math.round(rgba.b)}`;
+
+    return rgba.a < 1 ? `${channels}, opacity ${Math.round(rgba.a * 100)}%` : channels;
+};
+
+export const computeTagAriaLabel = (tag: string) => `${tag}, remove`;

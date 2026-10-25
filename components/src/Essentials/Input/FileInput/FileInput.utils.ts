@@ -118,8 +118,9 @@ export namespace FileInputUtils {
      * value the caller already follows; a control shows the drag only while it is not disabled.
      *
      * The drop is a second way in, never the only one: a drag is not something every reader can make, and
-     * WCAG 2.5.7 requires a single press to reach the same result. Pair it with a control that can be pressed,
-     * and do not hide that control behind the drop area.
+     * {@link https://www.w3.org/WAI/WCAG22/Understanding/dragging-movements.html WCAG 2.5.7} requires a single press to
+     * reach the same result. Pair it with a control that can be pressed, and do not hide that control behind the drop
+     * area.
      *
      * @param defs.getIsDisabled Whether to refuse drops, read as each drag event arrives.
      * @param defs.onDrop Called with the dropped files, in the order the browser lists them.

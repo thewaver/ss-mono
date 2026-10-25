@@ -1,3 +1,5 @@
+import { type ArcDefs, PlacementLayoutUtils } from "@thewaver/ss-components";
+
 import type { SizeValue } from "./RadioPage.types";
 
 export const EXAMPLE_NAMES = {
@@ -25,3 +27,14 @@ export const STARTING_RATING = 3;
 export const EXAMPLES_ROOT = "/src/App/Pages/RadioPage/Examples";
 
 export const DOCS_ROOT = "/src/App/Pages/RadioPage/Docs";
+
+export const ARC_DEFS: ArcDefs = {
+    curveHeightRatio: 0.3867,
+    spreadDegrees: 160,
+    itemWidthRatio: 0.11,
+    itemHeightRatio: 1.0909,
+};
+
+export const ARC_LAYOUT = PlacementLayoutUtils.createArc(ARC_DEFS);
+
+export const ARC_WIDTH = "300px";

@@ -16,7 +16,7 @@ export const BasicDocsExample = (props: Props) => {
             hasError={props.hasError}
             isDisabled={props.isDisabled}
             ariaLabel={"Default toggle"}
-            renderContent={(getFlags) => <PageToggleContent flags={getFlags} />}
+            renderContent={(getFlags) => <PageToggleContent flags={getFlags}>Default toggle</PageToggleContent>}
         />
     );
 };

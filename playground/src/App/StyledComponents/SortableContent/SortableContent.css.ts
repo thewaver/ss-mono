@@ -48,8 +48,8 @@ export const sortableItemGrip = style({
 });
 
 export const sortableItemDetail = style({
-    marginLeft: "auto",
-    paddingLeft: themeVars.spacing.full,
+    marginInlineStart: "auto",
+    paddingInlineStart: themeVars.spacing.full,
     fontSize: themeVars.fontSize.small,
     opacity: 0.75,
 });
@@ -97,8 +97,10 @@ export const sortableMarkerRow = style([sortableMarker, { width: 3 }]);
 
 export const sortableMarkerColumn = style([sortableMarker, { height: 3 }]);
 
-export const sortableItemCenterd = style({
+export const sortableItemCentered = style({
+    maxWidth: "100%",
     marginInline: "auto",
+    whiteSpace: "normal",
 });
 
 export const sortableRingMarker = style({

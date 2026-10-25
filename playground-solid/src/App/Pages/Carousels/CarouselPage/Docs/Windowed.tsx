@@ -46,7 +46,10 @@ export const WindowedDocsExample = () => {
                 </PageCarouselBox>
             </div>
 
-            <div class={exampleStyles.exampleReadout}>{`Built: ${getBuiltCount()} of ${WINDOWED_SLIDE_COUNT}`}</div>
+            <div
+                class={exampleStyles.exampleReadout}
+                data-readout
+            >{`Built: ${getBuiltCount()} of ${WINDOWED_SLIDE_COUNT}`}</div>
         </>
     );
 };

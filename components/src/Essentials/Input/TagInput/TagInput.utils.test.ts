@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { TagInputUtils } from "./TagInput.utils";
 
@@ -98,5 +98,30 @@ describe("getIsKeyTaken", () => {
         expect(TagInputUtils.getIsKeyTaken({ kind: "add" })).toBe(true);
         expect(TagInputUtils.getIsKeyTaken({ kind: "focus_field", isTyping: false })).toBe(true);
         expect(TagInputUtils.getIsKeyTaken({ kind: "focus_field", isTyping: true })).toBe(false);
+    });
+});
+
+describe("warnIfTagsUnnamed", () => {
+    const warnings = (computeTagAriaLabel: ((tag: string) => string) | undefined) => {
+        const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+        TagInputUtils.warnIfTagsUnnamed(computeTagAriaLabel, "computeTagAriaLabel");
+
+        const messages = warn.mock.calls.map((call) => String(call[0]));
+
+        warn.mockRestore();
+
+        return messages;
+    };
+
+    it("warns once, naming the prop, when a field has no way to name its tags", () => {
+        const messages = warnings(undefined);
+
+        expect(messages).toHaveLength(1);
+        expect(messages[0]).toContain("computeTagAriaLabel");
+    });
+
+    it("says nothing when the field names its tags", () => {
+        expect(warnings((tag) => `${tag}, remove`)).toHaveLength(0);
     });
 });

@@ -22,11 +22,6 @@
 
     export * from "@thewaver/ss-playground/App/Pages/Menus/CommandPalettePage/CommandPalettePage.const";
 
-    export const formatPageShortcut = (shortcut: CommandPaletteAction<string>["shortcut"]) =>
-        shortcut === undefined
-            ? undefined
-            : CommandPalettePageUtils.formatShortcut(ShortcutUtils.resolve(shortcut), ShortcutUtils.getIsApplePlatform());
-
     const formatOptionShortcut = (renderProps: CommandPaletteOptionRenderProps) =>
         renderProps.shortcut === undefined
             ? undefined

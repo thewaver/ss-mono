@@ -10,6 +10,7 @@ import { PageProp } from "../../PageComponents/Prop/Prop";
 import { BasicDocsExample } from "./Docs/Basic";
 import { GrowingDocsExample } from "./Docs/Growing";
 import { LabeledDocsExample } from "./Docs/Labeled";
+import { RightToLeftDocsExample } from "./Docs/RightToLeft";
 import { TooltipDocsExample } from "./Docs/Tooltip";
 
 export const TextAreaDocs = () => {
@@ -60,11 +61,23 @@ export const TextAreaDocs = () => {
                 <BasicDocsExample isReadOnly={getIsReadOnly} hasError={getHasError} isDisabled={getIsDisabled} />
             </PageDocsExample>
 
-            <PageDocsSection title={"Growing with what is typed"}>
-                {
-                    "With isAutoSizing on, the box follows its own content: it starts minRows tall and grows a row at a time as lines are added, so nothing has to guess a height. At maxRows it stops growing and scrolls instead."
+            <PageDocsSection
+                title={"Right to left"}
+                content={
+                    "Inside a box whose text runs right to left, every line starts from the right of the box, and so does the placeholder. The sides of [prop]padding[/prop] are where the text starts and ends rather than the screen's left and right."
                 }
-            </PageDocsSection>
+            />
+
+            <PageDocsExample path={`${DOCS_ROOT}/RightToLeft.tsx`}>
+                <RightToLeftDocsExample />
+            </PageDocsExample>
+
+            <PageDocsSection
+                title={"Growing with what is typed"}
+                content={
+                    "With [prop]isAutoSizing[/prop] on, the box follows its own content: it starts [prop]minRows[/prop] tall and grows a row at a time as lines are added, so nothing has to guess a height. At [prop]maxRows[/prop] it stops growing and scrolls instead."
+                }
+            />
 
             <PageDocsExample
                 path={`${DOCS_ROOT}/Growing.tsx`}
@@ -89,11 +102,12 @@ export const TextAreaDocs = () => {
                 <GrowingDocsExample maxRows={getMaxRows} />
             </PageDocsExample>
 
-            <PageDocsSection title={"Tooltip"}>
-                {
-                    "Give a field tooltipDefs and it shows a tooltip on hover and on keyboard focus, read by screen readers as the field's description. A disabled field shows no tooltip unless you also keep it reachable when disabled; it can then be focused to read why it is off, and typing still changes nothing."
+            <PageDocsSection
+                title={"Tooltip"}
+                content={
+                    "Give a field [prop]tooltipDefs[/prop] and it shows a tooltip on hover and on keyboard focus, read by screen readers as the field's description. A disabled field shows no tooltip unless you also keep it reachable when disabled; it can then be focused to read why it is off, and typing still changes nothing."
                 }
-            </PageDocsSection>
+            />
 
             <PageDocsExample
                 path={`${DOCS_ROOT}/Tooltip.tsx`}
@@ -137,11 +151,12 @@ export const TextAreaDocs = () => {
                 />
             </PageDocsExample>
 
-            <PageDocsSection title={"Named by a Label"}>
-                {
-                    "Inside a Label, the field takes its name from the label's text, so it needs no ariaLabel, and pressing the text focuses the field."
+            <PageDocsSection
+                title={"Named by a Label"}
+                content={
+                    "Inside a Label, the field takes its name from the label's text, so it needs no [prop]ariaLabel[/prop], and pressing the text focuses the field."
                 }
-            </PageDocsSection>
+            />
 
             <PageDocsExample path={`${DOCS_ROOT}/Labeled.tsx`}>
                 <LabeledDocsExample />

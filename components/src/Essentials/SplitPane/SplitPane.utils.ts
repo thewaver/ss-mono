@@ -18,6 +18,10 @@ const computeRatioBounds = (pane: SplitPaneEntry, available: number) => {
     };
 };
 
+/** What the library prints when a divider has nothing to name it. */
+const computeUnnamedGutterWarning = (positions: number[], propName: string) =>
+    `SplitPane: the divider${positions.length > 1 ? "s" : ""} after pane ${positions.join(", ")} ${positions.length > 1 ? "have" : "has"} no ${propName}. A divider is a control a keyboard user can focus and move, and with no name a screen reader announces it only as a separator, which fails WCAG 4.1.2 — give each pane but the last a ${propName} saying what its divider resizes.`;
+
 /**
  * The parts of a split pane that are not about any framework: the grid template, where each boundary sits and how
  * far it may go, where a pointer lands, and what a key does.
@@ -31,6 +35,40 @@ export namespace SplitPaneUtils {
 
     /** Where End sends a boundary. */
     export const LARGEST_BOUNDARY = 1;
+
+    /**
+     * Which dividers have nothing to name them.
+     *
+     * A divider takes its name from the pane before it, so the last pane's `gutterAriaLabel` names nothing and is not
+     * asked for. An empty string counts as no name.
+     *
+     * @param panes The panes, in order.
+     * @returns The boundaries, counted from zero, whose divider has no name.
+     */
+    export const findUnnamedGutters = (panes: SplitPaneEntry[]) =>
+        panes.slice(0, -1).flatMap((pane, index) => (pane.gutterAriaLabel ? [] : [index]));
+
+    /**
+     * Warns, in the console, that some dividers have no accessible name.
+     *
+     * Call it once per split pane, when it is set up. It says nothing when every divider is named, and otherwise names
+     * the dividers by the pane before them, counted from one, as a reader of the page would count them.
+     *
+     * @param panes The panes, in order.
+     * @param propName What the caller's framework calls the pane's label, so the warning names what they actually
+     * write.
+     */
+    export const warnIfGutterUnnamed = (panes: SplitPaneEntry[], propName: string) => {
+        const unnamed = findUnnamedGutters(panes);
+
+        if (unnamed.length > 0)
+            console.warn(
+                computeUnnamedGutterWarning(
+                    unnamed.map((index) => index + 1),
+                    propName,
+                ),
+            );
+    };
 
     /**
      * How much room all the gutters take together.
@@ -195,8 +233,9 @@ export namespace SplitPaneUtils {
     };
 
     /**
-     * Where a press on a gutter that did not become a drag sends its boundary: one step towards the half of the
-     * gutter it landed on, which is the single-pointer route WCAG 2.5.7 asks for.
+     * Where a press on a gutter that did not become a drag sends its boundary: one step towards the half of the gutter
+     * it landed on, which is the single-pointer route
+     * {@link https://www.w3.org/WAI/WCAG22/Understanding/dragging-movements.html WCAG 2.5.7} asks for.
      *
      * @param params The pointer, the gutter's client rect, the orientation, the direction, the boundary's current
      * position, and the step.

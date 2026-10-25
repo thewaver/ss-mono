@@ -15,7 +15,7 @@ export const PageSortableItemContent = (props: ParentProps<SortableItemContentPr
             class={styles.sortableItemContent}
             classList={{
                 [getLayerClass()]: true,
-                [styles.sortableItemCenterd]: access(props.isCenterd) === true,
+                [styles.sortableItemCentered]: access(props.isCentered) === true,
                 [styles.isCarried]: access(props.flags).isCarried,
                 [styles.isHovered]: access(props.flags).isHovered,
                 [styles.isDisabled]: access(props.flags).isDisabled,

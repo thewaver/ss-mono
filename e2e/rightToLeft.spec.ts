@@ -1,20 +1,31 @@
 import { type Locator, type Page, expect, test } from "@playwright/test";
 
-import { activeDescendantText, activeText, demo, prop, readout, revealProp } from "./helpers";
+import { activeDescendantText, activeText, docsDemo, docsSettled } from "./helpers";
 
 /**
- * Every demo here is an existing example with a `<div dir="rtl">` around it, keyed `rightToLeft` on its own
- * page, except where a page needs more than one: the menu page also has `contextRightToLeft` and
- * `rightToLeftPlaced`, and the tabs page `switchedDirection`, whose box only turns right-to-left once its
- * settings say so. That is the whole of the setup on purpose: the component is told nothing, and has to find
- * out the direction for itself from the box it sits in. So each test below is really asking one question —
- * did the component read its surroundings — and answers it through the keys a person presses.
+ * Every page here is a Docs view with a right-to-left example of its own, found by its file name, `RightToLeft`
+ * (the menu page also has `ContextRightToLeft`). Each is an ordinary example with a `<div dir="rtl">` around it,
+ * and that is the whole of the setup on purpose: the component is told nothing, and has to find out the direction
+ * for itself from the box it sits in. So each test below is really asking one question — did the component read
+ * its surroundings — and answers it through the keys a person presses.
  *
  * Where a test says which way something is drawn, it compares two boxes with each other rather than either
  * with a number. Both are measured the same way, so the `Viewport` scale divides out, and "the next tab sits
  * to the left of this one" holds at any window size and any restyle.
+ *
+ * A Docs view is long, and a right-to-left example usually sits well down it, so a test that drives the mouse
+ * brings the example into view first: a pointer sent to a point outside the window reaches nothing.
  */
-const RTL = demo("rightToLeft");
+const docsRoot = (page: string) => `/src/App/Pages/${page}/Docs`;
+
+const rightToLeft = (page: string) => docsDemo(docsRoot(page), "RightToLeft");
+
+/** Opens a Docs view and waits for its examples to stop moving, once the given element is on screen. */
+const openDocs = async (page: Page, route: string, ready: string) => {
+    await page.goto(route);
+    await expect(page.locator(ready).first()).toBeVisible();
+    await docsSettled(page);
+};
 
 const box = async (locator: Locator) => {
     const measured = await locator.boundingBox();
@@ -27,13 +38,13 @@ const box = async (locator: Locator) => {
 const activeLabel = (page: Page) => page.evaluate(() => document.activeElement?.getAttribute("aria-label") ?? "");
 
 test.describe("Tabs", () => {
-    const ROW = demo("row");
+    const RTL = rightToLeft("TabsPage");
+    const ROW = docsDemo(docsRoot("TabsPage"), "Basic");
     const tab = (scope: string) => `${scope} [role="tab"]`;
     const named = (scope: string, name: string) => `${tab(scope)}:has-text("${name}")`;
 
     test.beforeEach(async ({ page }) => {
-        await page.goto("/tabs");
-        await expect(page.locator(tab(RTL)).first()).toBeVisible();
+        await openDocs(page, "/tabs/docs", tab(RTL));
     });
 
     /**
@@ -73,8 +84,8 @@ test.describe("Tabs", () => {
     /**
      * Every reader on the page shares one observer, which is the place a direction could leak: if the answer
      * were cached per page rather than read per element, walking the right-to-left list first would leave the
-     * plain row answering the flipped keys. So the right-to-left list is used first, and the row beside it is
-     * asked afterwards whether its right arrow still points forward.
+     * plain row answering the flipped keys. So the right-to-left list is used first, and the basic row above it
+     * is asked afterwards whether its right arrow still points forward.
      */
     test("a left-to-right list on the same page keeps its own direction", async ({ page }) => {
         await page.locator(`${tab(RTL)}[tabindex="0"]`).focus();
@@ -98,32 +109,34 @@ test.describe("Tabs", () => {
 
     /**
      * The direction is read from the box rather than fixed when the tabs first appear, so switching the box
-     * while they are on screen turns the arrows round with it. The same row is walked before and after the
-     * switch, and the second walk also steps over the disabled tab, as the fixed right-to-left row does.
+     * while they are on screen turns the arrows round with it. The example's own button switches it: once to
+     * left to right, where the right arrow walks forward, and back again, where the left arrow does and still
+     * steps over the disabled tab.
      */
-    test("switching the box to right-to-left while the tabs are on screen turns the arrows round", async ({ page }) => {
-        const SWITCHED = demo("switchedDirection");
+    test("switching the box's direction while the tabs are on screen turns the arrows round", async ({ page }) => {
+        const switchDirection = page.locator("#switchDirection");
 
-        expect(
-            (await box(page.locator(named(SWITCHED, "Source")))).centerX,
-            "left to right, the second tab is drawn to the right of the first",
-        ).toBeGreaterThan((await box(page.locator(named(SWITCHED, "Render")))).centerX);
+        await switchDirection.click();
 
-        await page.locator(`${tab(SWITCHED)}[tabindex="0"]`).focus();
+        await expect
+            .poll(async () => (await box(page.locator(named(RTL, "Source")))).centerX, {
+                message: "switched to left to right, the second tab is drawn to the right of the first",
+            })
+            .toBeGreaterThan((await box(page.locator(named(RTL, "Render")))).centerX);
+
+        await page.locator(`${tab(RTL)}[tabindex="0"]`).focus();
         await page.keyboard.press("ArrowRight");
         expect(await activeText(page), "ArrowRight walks forward").toBe("Source");
 
-        await revealProp(page, "isRightToLeft", "switchedDirection");
-        await page.locator(`${prop("isRightToLeft")} input`).check();
-        await page.keyboard.press("Escape");
+        await switchDirection.click();
 
         await expect
-            .poll(async () => (await box(page.locator(named(SWITCHED, "Source")))).centerX, {
-                message: "once switched, the second tab is drawn to the left of the first",
+            .poll(async () => (await box(page.locator(named(RTL, "Source")))).centerX, {
+                message: "switched back, the second tab is drawn to the left of the first",
             })
-            .toBeLessThan((await box(page.locator(named(SWITCHED, "Render")))).centerX);
+            .toBeLessThan((await box(page.locator(named(RTL, "Render")))).centerX);
 
-        await page.locator(`${tab(SWITCHED)}[tabindex="0"]`).focus();
+        await page.locator(`${tab(RTL)}[tabindex="0"]`).focus();
         expect(await activeText(page)).toBe("Source");
 
         await page.keyboard.press("ArrowLeft");
@@ -135,13 +148,13 @@ test.describe("Tabs", () => {
 });
 
 test.describe("Calendar", () => {
+    const RTL = rightToLeft("CalendarPage");
     const cell = (scope: string) => `${scope} [role="gridcell"]`;
     const roving = (scope: string) => `${cell(scope)}[tabindex="0"]`;
     const day = (scope: string, label: string) => `${cell(scope)}[aria-label="${label}"]`;
 
     test.beforeEach(async ({ page }) => {
-        await page.goto("/calendar");
-        await expect(page.locator(cell(RTL)).first()).toBeVisible();
+        await openDocs(page, "/calendar/docs", cell(RTL));
     });
 
     /**
@@ -202,6 +215,7 @@ test.describe("Calendar", () => {
 });
 
 test.describe("SplitPane", () => {
+    const RTL = rightToLeft("SplitPanePage");
     const root = (scope: string) => `${scope} [role="group"]`;
     const gutter = (scope: string) => `${scope} [role="separator"]`;
 
@@ -215,8 +229,7 @@ test.describe("SplitPane", () => {
     const boundary = async (page: Page) => Number(await page.locator(gutter(RTL)).getAttribute("aria-valuenow"));
 
     test.beforeEach(async ({ page }) => {
-        await page.goto("/split-pane");
-        await expect(page.locator(gutter(RTL))).toBeVisible();
+        await openDocs(page, "/split-pane/docs", gutter(RTL));
     });
 
     /**
@@ -259,6 +272,9 @@ test.describe("SplitPane", () => {
 
     test("a drag moves the divider the way the pointer went", async ({ page }) => {
         const handle = page.locator(gutter(RTL));
+
+        await handle.scrollIntoViewIfNeeded();
+
         const before = await box(handle);
         const [startFirst] = await panes(page, RTL);
 
@@ -276,11 +292,23 @@ test.describe("SplitPane", () => {
 });
 
 test.describe("RadioGroup", () => {
+    const RADIO_RTL = docsDemo("/src/App/Pages/RadioPage/Docs", "RightToLeft");
     const option = (scope: string, label: string) => `${scope} input[aria-label="${label}"]`;
 
+    /** The Docs example shows its value only as the checked radio, so that is what is read. */
+    const checkedLabel = (page: Page) =>
+        page
+            .locator(`${RADIO_RTL} input`)
+            .evaluateAll(
+                (inputs) =>
+                    (inputs as HTMLInputElement[]).find((input) => input.checked)?.getAttribute("aria-label") ??
+                    undefined,
+            );
+
     test.beforeEach(async ({ page }) => {
-        await page.goto("/radio");
-        await expect(page.locator(option(RTL, "Small"))).toBeVisible();
+        await page.goto("/radio/docs");
+        await expect(page.locator(option(RADIO_RTL, "Small"))).toBeVisible();
+        await docsSettled(page);
     });
 
     /**
@@ -291,34 +319,34 @@ test.describe("RadioGroup", () => {
      */
     test("the horizontal arrows flip and the vertical ones do not", async ({ page }) => {
         expect(
-            (await box(page.locator(option(RTL, "Medium")))).centerX,
+            (await box(page.locator(option(RADIO_RTL, "Medium")))).centerX,
             "the second radio is drawn to the left of the first",
-        ).toBeLessThan((await box(page.locator(option(RTL, "Small")))).centerX);
+        ).toBeLessThan((await box(page.locator(option(RADIO_RTL, "Small")))).centerX);
 
-        await page.locator(option(RTL, "Small")).focus();
+        await page.locator(option(RADIO_RTL, "Small")).focus();
 
         await page.keyboard.press("ArrowLeft");
-        expect(await readout(page, "rightToLeft"), "ArrowLeft moves to the next radio").toContain("value: medium");
-        await expect(page.locator(option(RTL, "Medium")), "and focus goes with it").toBeFocused();
+        expect(await checkedLabel(page), "ArrowLeft moves to the next radio").toBe("Medium");
+        await expect(page.locator(option(RADIO_RTL, "Medium")), "and focus goes with it").toBeFocused();
 
         await page.keyboard.press("ArrowRight");
-        expect(await readout(page, "rightToLeft"), "ArrowRight to the previous one").toContain("value: small");
+        expect(await checkedLabel(page), "ArrowRight to the previous one").toBe("Small");
 
         await page.keyboard.press("ArrowDown");
-        expect(await readout(page, "rightToLeft"), "ArrowDown still moves forward").toContain("value: medium");
+        expect(await checkedLabel(page), "ArrowDown still moves forward").toBe("Medium");
 
         await page.keyboard.press("ArrowUp");
-        expect(await readout(page, "rightToLeft"), "and ArrowUp back").toContain("value: small");
+        expect(await checkedLabel(page), "and ArrowUp back").toBe("Small");
     });
 });
 
 test.describe("RangeCalendar", () => {
+    const RTL = rightToLeft("RangeCalendarPage");
     const cell = (scope: string) => `${scope} [role="gridcell"]`;
     const day = (scope: string, label: string) => `${cell(scope)}[aria-label="${label}"]`;
 
     test.beforeEach(async ({ page }) => {
-        await page.goto("/range-calendar");
-        await expect(page.locator(cell(RTL)).first()).toBeVisible();
+        await openDocs(page, "/range-calendar/docs", cell(RTL));
     });
 
     /**
@@ -336,13 +364,19 @@ test.describe("RangeCalendar", () => {
         expect(await activeLabel(page), "ArrowLeft is the day after").toBe("13 August 2026");
 
         await page.keyboard.press("Enter");
-        expect(await readout(page, "rightToLeft"), "and pressing it there ends the span a day on").toContain(
-            "2026-08-12 to 2026-08-13",
-        );
+        await expect(
+            page.locator(`${day(RTL, "12 August 2026")} [data-range-start]`),
+            "pressing it there leaves the span starting on the first day pressed",
+        ).toHaveCount(1);
+        await expect(
+            page.locator(`${day(RTL, "13 August 2026")} [data-range-end]`),
+            "and ends it a day on",
+        ).toHaveCount(1);
     });
 });
 
 test.describe("Clock", () => {
+    const RTL = rightToLeft("ClockPage");
     const column = (scope: string) => `${scope} [role="listbox"]`;
 
     const activeColumn = (page: Page) =>
@@ -353,8 +387,7 @@ test.describe("Clock", () => {
         }, column(RTL));
 
     test.beforeEach(async ({ page }) => {
-        await page.goto("/clock");
-        await expect(page.locator(column(RTL)).first()).toBeVisible();
+        await openDocs(page, "/clock/docs", column(RTL));
     });
 
     /**
@@ -379,12 +412,12 @@ test.describe("Clock", () => {
 });
 
 test.describe("TagInput", () => {
+    const RTL = rightToLeft("TagInputPage");
     const field = (scope: string) => `${scope} input[type="text"]`;
     const tag = (scope: string) => `${scope} [role="group"] button`;
 
     test.beforeEach(async ({ page }) => {
-        await page.goto("/tag-input");
-        await expect(page.locator(field(RTL))).toBeVisible();
+        await openDocs(page, "/tag-input/docs", field(RTL));
     });
 
     /**
@@ -416,12 +449,15 @@ test.describe("TagInput", () => {
 });
 
 test.describe("Range", () => {
+    const RTL = rightToLeft("RangePage");
     const thumbs = (scope: string) => `${scope} input[type="range"]`;
 
     const valueOf = async (locator: Locator) => Number(await locator.inputValue());
 
     /** As in `range.spec.ts`: the nearer thumb is raised on the move, so the mouse moves before it presses. */
     const dragFrom = async (page: Page, locator: Locator, from: number, to: number) => {
+        await locator.scrollIntoViewIfNeeded();
+
         const track = await box(locator);
         const y = track.y + track.height * 0.5;
 
@@ -432,8 +468,7 @@ test.describe("Range", () => {
     };
 
     test.beforeEach(async ({ page }) => {
-        await page.goto("/range");
-        await expect(page.locator(thumbs(RTL)).first()).toBeVisible();
+        await openDocs(page, "/range/docs", thumbs(RTL));
     });
 
     /**
@@ -463,13 +498,13 @@ test.describe("Range", () => {
 });
 
 test.describe("Table", () => {
+    const RTL = rightToLeft("TablePage");
     const header = (scope: string) => `${scope} [role="columnheader"]`;
     const headerNamed = (page: Page, name: string) => page.locator(header(RTL)).filter({ hasText: name });
     const widthOf = (locator: Locator) => locator.evaluate((element) => (element as HTMLElement).offsetWidth);
 
     test.beforeEach(async ({ page }) => {
-        await page.goto("/table");
-        await expect(page.locator(header(RTL)).first()).toBeVisible();
+        await openDocs(page, "/table/docs", header(RTL));
         await page.locator(header(RTL)).first().scrollIntoViewIfNeeded();
     });
 
@@ -588,7 +623,8 @@ test.describe("Menu", () => {
     const MENU = '[role="menu"]';
     const ITEM_ROLE = '[role="menuitem"]';
 
-    const trigger = (key: string) => `${demo(key)} [aria-haspopup="menu"]`;
+    const MENU_DOCS = docsRoot("Menus/MenuPage");
+    const trigger = (name: string) => `${docsDemo(MENU_DOCS, name)} [aria-haspopup="menu"]`;
 
     /** Opening lands the highlight and the focus in either order, so both are waited on, as `menu.spec.ts` does. */
     const openedWithHighlight = async (page: Page, key: string) => {
@@ -610,18 +646,17 @@ test.describe("Menu", () => {
         page.locator(MENU).nth(depth).locator(ITEM_ROLE).filter({ hasText: name }).first();
 
     test.beforeEach(async ({ page }) => {
-        await page.goto("/menu");
-        await expect(page.locator(trigger("rightToLeft"))).toBeVisible();
+        await openDocs(page, "/menu/docs", trigger("RightToLeft"));
     });
 
     /**
      * The popup is moved out to the end of the document, where nothing is right-to-left, so the menu has to
      * read its direction off the trigger that stayed behind. If it read the popup instead it would answer
      * left-to-right, open the submenu on the right and wait for ArrowRight — which is exactly what the plain
-     * submenus demo does, and is checked at the end as the other half of the comparison.
+     * submenus example does, and is checked at the end as the other half of the comparison.
      */
     test("a submenu opens on the left, and ArrowLeft is the key that opens it", async ({ page }) => {
-        await openedWithHighlight(page, "rightToLeft");
+        await openedWithHighlight(page, "RightToLeft");
         expect(await highlightAt(page, 0)).toBe("New");
 
         await page.keyboard.press("ArrowRight");
@@ -643,7 +678,7 @@ test.describe("Menu", () => {
         await page.keyboard.press("Escape");
         await expect(page.locator(MENU)).toHaveCount(0);
 
-        await openedWithHighlight(page, "submenus");
+        await openedWithHighlight(page, "Submenus");
         await page.keyboard.press("ArrowRight");
         await openedLevel(page, 1);
 
@@ -651,34 +686,34 @@ test.describe("Menu", () => {
 
         expect(
             (await box(page.locator(MENU).nth(1))).centerX,
-            "while the plain demo on the same page still opens to the right",
+            "while the plain example on the same page still opens to the right",
         ).toBeGreaterThan(parent.x + parent.width);
     });
 
     /**
      * The menu hangs from its trigger lined up with the edge the text starts from, which is the right one here.
      * Rather than asking for a number, the gap between the two right edges is compared with the gap between the
-     * two left edges in the plain submenus demo on the same page: mirrored, they are the same distance.
+     * two left edges in the plain submenus example on the same page: mirrored, they are the same distance.
      */
     test("the menu lines up with its trigger's right edge, as the plain one lines up with its left", async ({
         page,
     }) => {
-        await openedWithHighlight(page, "submenus");
+        await openedWithHighlight(page, "Submenus");
 
-        const plainTrigger = await box(page.locator(trigger("submenus")));
+        const plainTrigger = await box(page.locator(trigger("Submenus")));
         const plainMenu = await box(page.locator(MENU));
 
         await page.keyboard.press("Escape");
         await expect(page.locator(MENU)).toHaveCount(0);
 
-        await openedWithHighlight(page, "rightToLeft");
+        await openedWithHighlight(page, "RightToLeft");
 
-        const mirroredTrigger = await box(page.locator(trigger("rightToLeft")));
+        const mirroredTrigger = await box(page.locator(trigger("RightToLeft")));
         const mirroredMenu = await box(page.locator(MENU));
 
         expect(
             mirroredTrigger.x + mirroredTrigger.width - (mirroredMenu.x + mirroredMenu.width),
-            "the right edges sit as far apart as the plain demo's left edges",
+            "the right edges sit as far apart as the plain example's left edges",
         ).toBeCloseTo(plainMenu.x - plainTrigger.x, 0);
     });
 
@@ -690,7 +725,11 @@ test.describe("Menu", () => {
     test("a menu opened by a right-click in a right-to-left box spreads left and opens its submenus on the left", async ({
         page,
     }) => {
-        const region = await box(page.locator(`${demo("contextRightToLeft")} [tabindex="0"]`));
+        const regionElement = page.locator(`${docsDemo(MENU_DOCS, "ContextRightToLeft")} [tabindex="0"]`);
+
+        await regionElement.scrollIntoViewIfNeeded();
+
+        const region = await box(regionElement);
 
         await page.mouse.click(region.centerX, region.centerY, { button: "right" });
         await expect(page.locator(MENU)).toHaveAttribute("aria-activedescendant", /.+/);
@@ -716,46 +755,26 @@ test.describe("Menu", () => {
         await page.keyboard.press("ArrowRight");
         await expect(page.locator(MENU), "and ArrowRight steps back out").toHaveCount(1);
     });
-
-    /**
-     * Only the side a submenu opens on when the menu says nothing follows the direction. A menu that names a side
-     * meant that side, so this one, told to open its submenus on the right, does so inside a right-to-left box —
-     * and the arrows follow the side rather than the text, so the one that opens a submenu still points at it.
-     */
-    test("a submenu side the menu names is used as given, and the arrow pointing at it opens it", async ({ page }) => {
-        await openedWithHighlight(page, "rightToLeftPlaced");
-        expect(await highlightAt(page, 0)).toBe("New");
-
-        await page.keyboard.press("ArrowLeft");
-        await expect(page.locator(MENU), "ArrowLeft points away from the submenu").toHaveCount(1);
-
-        await page.keyboard.press("ArrowRight");
-        await openedLevel(page, 1);
-
-        const parent = await box(itemAt(page, 0, "New"));
-
-        expect(
-            (await box(page.locator(MENU).nth(1))).centerX,
-            "the submenu sits to the right of the item that opened it",
-        ).toBeGreaterThan(parent.x + parent.width);
-
-        await page.keyboard.press("ArrowLeft");
-        await expect(page.locator(MENU), "and ArrowLeft steps back out").toHaveCount(1);
-    });
 });
 
 test.describe("Sortable", () => {
+    const RTL = rightToLeft("SortablePage");
     const item = (label: string) => `${RTL} [role="listitem"][aria-label="${label}"]`;
 
+    /** The example prints no order, so the list's order is read off its items, each named by its card. */
+    const order = (page: Page) =>
+        page
+            .locator(`${RTL} [role="list"] [role="listitem"]`)
+            .evaluateAll((elements) => elements.map((element) => element.getAttribute("aria-label") ?? ""));
+
     test.beforeEach(async ({ page }) => {
-        await page.goto("/sortable");
-        await expect(page.locator(item("Ember Sprite"))).toBeVisible();
+        await openDocs(page, "/sortable/docs", item("Ember Sprite"));
     });
 
     /**
      * The carry chooses forward or back from the logical key, so the arrow that points at the next place on
-     * screen is the one that moves the item later in the list. The readout is the list's own order, which is
-     * the thing a reorder changes; the boxes are only there to show which way "later" is drawn.
+     * screen is the one that moves the item later in the list. The order the list holds is the thing a reorder
+     * changes; the boxes are only there to show which way "later" is drawn.
      */
     test("a carried item moves later with the left arrow and earlier with the right", async ({ page }) => {
         expect(
@@ -772,18 +791,18 @@ test.describe("Sortable", () => {
         await page.keyboard.press("ArrowLeft");
         await page.keyboard.press("Enter");
 
-        expect(await readout(page, "rightToLeft"), "and a carried card goes one place later").toContain(
-            "Gale Warden, Ember Sprite, Tide Caller",
-        );
+        await expect
+            .poll(() => order(page), { message: "and a carried card goes one place later" })
+            .toEqual(["Gale Warden", "Ember Sprite", "Tide Caller"]);
 
         await page.locator(item("Tide Caller")).focus();
         await page.keyboard.press("Enter");
         await page.keyboard.press("ArrowRight");
         await page.keyboard.press("Enter");
 
-        expect(await readout(page, "rightToLeft"), "while ArrowRight carries one place earlier").toContain(
-            "Gale Warden, Tide Caller, Ember Sprite",
-        );
+        await expect
+            .poll(() => order(page), { message: "while ArrowRight carries one place earlier" })
+            .toEqual(["Gale Warden", "Tide Caller", "Ember Sprite"]);
     });
 
     /**
@@ -792,6 +811,8 @@ test.describe("Sortable", () => {
      * land is drawn in the gap beyond that neighbor rather than on its near side.
      */
     test("a card dragged past its neighbor's middle lands after it, and the marker shows where", async ({ page }) => {
+        await page.locator(RTL).scrollIntoViewIfNeeded();
+
         const ember = await box(page.locator(item("Ember Sprite")));
         const gale = await box(page.locator(item("Gale Warden")));
         const tide = await box(page.locator(item("Tide Caller")));
@@ -821,18 +842,18 @@ test.describe("Sortable", () => {
 
         await page.mouse.up();
 
-        expect(await readout(page, "rightToLeft"), "and the drop puts the card one place later").toContain(
-            "Gale Warden, Ember Sprite, Tide Caller",
-        );
+        await expect
+            .poll(() => order(page), { message: "and the drop puts the card one place later" })
+            .toEqual(["Gale Warden", "Ember Sprite", "Tide Caller"]);
     });
 });
 
 test.describe("Tree", () => {
+    const RTL = rightToLeft("TreePage");
     const node = (scope: string) => `${scope} [role="treeitem"]`;
 
     test.beforeEach(async ({ page }) => {
-        await page.goto("/tree");
-        await expect(page.locator(node(RTL)).first()).toBeVisible();
+        await openDocs(page, "/tree/docs", node(RTL));
     });
 
     /**

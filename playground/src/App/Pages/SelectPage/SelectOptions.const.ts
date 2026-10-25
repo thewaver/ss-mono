@@ -10,10 +10,10 @@ const HOUR_COUNT = 24;
 export const PLACEHOLDER = "Pick one";
 
 export const QUERY_PADDING = {
-    paddingTop: FIELD_PADDING,
-    paddingBottom: FIELD_PADDING,
-    paddingLeft: FIELD_PADDING,
-    paddingRight: FIELD_PADDING + FIELD_GAP + FIELD_CHEVRON_WIDTH,
+    paddingBlockStart: FIELD_PADDING,
+    paddingBlockEnd: FIELD_PADDING,
+    paddingInlineStart: FIELD_PADDING,
+    paddingInlineEnd: FIELD_PADDING + FIELD_GAP + FIELD_CHEVRON_WIDTH,
 };
 
 export const COUNTRIES: SelectOptionRecord<string, never>[] = [

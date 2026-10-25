@@ -1,14 +1,12 @@
 import type { CSSMargin, Size2d, SwipeDirection } from "@thewaver/ss-utils";
 
-import type { Shortcut } from "../../../Abstracts/Shortcut/Shortcut.types";
-
 export type ToastsVerticalAlignment = "top" | "middle" | "bottom";
 
 export type ToastsHorizontalAlignment = "left" | "center" | "right";
 
 export type ToastsAlignment = `${ToastsVerticalAlignment}_${ToastsHorizontalAlignment}`;
 
-export type ToastsDir = "column" | "column-reverse" | "row" | "row-reverse";
+export type ToastsFlexDirection = "column" | "column-reverse" | "row" | "row-reverse";
 
 export type ToastsAriaLive = "polite" | "assertive";
 
@@ -19,17 +17,36 @@ export type ToastsStackAlignment = {
     alignItems: "flex-start" | "center" | "flex-end";
 };
 
-export type Toast<T> = {
+export type BaseToast<T> = {
+    /** Tells this toast from every other in the queue, so two toasts saying the same thing stay two toasts. */
     id: string;
+    /** What the toast is about, for whichever painter draws it and for anything reading the queue. */
     value: T;
+    /**
+     * The sentence a screen reader hears when this toast arrives. The stack is not read out as it changes, so this is
+     * the only thing announced; an empty sentence announces nothing and is warned about.
+     */
+    announcement: string;
+    /** How long the toast stays before it dismisses itself. Leave it out and it waits to be dismissed. */
     durationMs?: number;
+    /** How insistently this toast is announced — politely, after whatever is being read, or at once. Polite by default. */
     ariaLive?: ToastsAriaLive;
+    /** Runs when the toast starts to arrive. */
     onShow?: () => void;
+    /** Runs when the toast starts to leave, however it was dismissed. */
     onHide?: () => void;
 };
 
+export type ToastRequest<TToast> = Omit<TToast, "id"> & {
+    /**
+     * Tells this toast from every other in the queue. Leave it out and one is made up; give one to keep a toast from
+     * stacking twice, since a toast whose id is already queued is refused.
+     */
+    id?: string;
+};
+
 export type ToastState = {
-    /** Where this toast sits in the stack, counting from the newest. */
+    /** Where this toast sits in the stack, counting from the oldest, which is `0`. */
     index: number;
     /** How many toasts are on screen. */
     count: number;
@@ -53,20 +70,25 @@ export type ToastState = {
 };
 
 export type BaseToastsValues = {
-    /** Names the toast region for assistive technology. */
-    ariaLabel: string;
-    /** How insistently new toasts are announced — politely, after whatever is being read, or immediately. */
-    ariaLive?: ToastsAriaLive;
     /**
-     * A shortcut that moves focus into the toast region from anywhere on the page, so a reader can reach a toast
-     * without hunting for it; Escape inside hands focus back. F8 by default, and `null` listens for nothing. It goes
-     * through the page-wide shortcut register, so it is quiet while a layer such as a `Modal` sits on top.
+     * Names the toast region for assistive technology, and so is what a screen reader hears when the keyboard lands
+     * on the stack. Nothing can tab to a stack, so one page-wide shortcut reaches every stack: F8 moves focus into
+     * each stack holding toasts in turn, in the order the providers mounted, Shift+F8 goes back, and Escape inside a
+     * stack hands focus back to where it was before the first F8. The shortcut is quiet while a layer such as a
+     * `Modal` sits on top.
      */
-    hotkey?: Shortcut | null;
-    /** Which corner or edge of the screen the toasts gather at. */
+    ariaLabel: string;
+    /**
+     * Which corner or edge of the screen the toasts gather at. It names the screen's sides, not the text's, so a
+     * stack at `"middle_left"` stays on the left of a right-to-left page. A second provider at the same alignment in the same
+     * viewport draws its stack over this one, and warns once in the console when it mounts.
+     */
     alignment?: ToastsAlignment;
-    /** Which way the stack grows, and so whether a new toast joins at the near end or the far one. */
-    dir?: ToastsDir;
+    /**
+     * Which way the stack grows, and so whether a new toast joins at the near end or the far one — CSS's own
+     * `flex-direction` values. The stack keeps this layout whatever direction its toasts' text runs in.
+     */
+    flexDirection?: ToastsFlexDirection;
     /** The space between one toast and the next. */
     gap?: number;
     /** How far the stack is held off the edges of the screen. */
@@ -78,23 +100,17 @@ export type BaseToastsValues = {
     /**
      * Whether a toast can be swiped off screen. Defaults to `true`. The swipe runs towards the edge the stack sits on
      * — sideways for a stack against the left or right, up or down for one centered along the top or bottom — and a
-     * stack in the middle of the screen cannot be swiped. A committed swipe removes the toast from `toasts`, as
+     * stack in the middle of the screen cannot be swiped. A committed swipe removes the toast from the queue, as
      * its timer does, and its countdown is held while the swipe is under way. The toast is not moved for you:
      * `ToastState` hands the painter the direction and the distance to draw.
      *
-     * A swipe is a drag, and WCAG 2.5.7 requires anything done by dragging to be possible with a single pointer
-     * without one. The close control the painter draws is that route, so a toast that can be swiped must paint one.
+     * A swipe is a drag, and {@link https://www.w3.org/WAI/WCAG22/Understanding/dragging-movements.html WCAG 2.5.7}
+     * requires anything done by dragging to be possible with a single pointer without one. The close control the
+     * painter draws is that route, so a toast that can be swiped must paint one.
      */
     isDismissableOnSwipe?: boolean;
     /** How many toasts may be on screen at once. Leave it out and they all show. */
     limit?: number;
 };
 
-export type BaseToastsCbs<T> = {
-    /**
-     * Builds the sentence a toast is announced with, for a toast whose visible text does not read well out of context.
-     */
-    computeAnnouncement?: (toast: Toast<T>) => string;
-};
-
-export type BaseToastsProps<T> = BaseToastsValues & BaseToastsCbs<T>;
+export type BaseToastsProps = BaseToastsValues;

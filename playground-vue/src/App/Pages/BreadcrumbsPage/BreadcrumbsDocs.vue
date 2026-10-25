@@ -2,6 +2,7 @@
 import { shallowRef } from "vue";
 
 import { BreadcrumbKnobs } from "@thewaver/ss-playground/App/Knobs/Breadcrumbs.const";
+import * as docsStyles from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.css";
 import {
     BREADCRUMB_SEPARATORS,
     DOCS_ROOT,
@@ -16,6 +17,7 @@ import PageSelectField from "../../PageComponents/Field/PageSelectField.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
 import BasicDocsExample from "./Docs/Basic.vue";
 import LinksDocsExample from "./Docs/Links.vue";
+import RightToLeftDocsExample from "./Docs/RightToLeft.vue";
 
 const isDisabled = shallowRef(BreadcrumbKnobs.STARTING_IS_DISABLED);
 const separator = shallowRef<BreadcrumbSeparatorKey>("/");
@@ -24,8 +26,9 @@ const hasLinkComponent = shallowRef(false);
 
 <template>
     <PageDocsAlert severity="info">
-        The separators here are only examples. renderSeparator draws whatever you return, so what sits between the
-        crumbs is entirely yours: text, an icon, any markup.
+        The separators here are only examples. Whatever you return from
+        <span :class="docsStyles.docsPropName">renderSeparator</span> is drawn, so what sits between the crumbs is
+        entirely yours: text, an icon, any markup.
     </PageDocsAlert>
 
     <PageDocsExample :path="`${DOCS_ROOT}/Basic.vue`">
@@ -61,11 +64,19 @@ const hasLinkComponent = shallowRef(false);
         </template>
     </PageDocsExample>
 
-    <PageDocsSection title="Links">
-        Give a crumb an href and it is drawn as a native HTML anchor element, with the address passed through untouched.
-        In a routed app, pass linkComponent, a custom link component such as your router's, and the crumbs are drawn
-        with it instead.
-    </PageDocsSection>
+    <PageDocsSection
+        title="Right to left"
+        content="Inside a box whose text runs right to left, the trail starts from the right, with the first crumb rightmost. A separator that points, such as the > here, is drawn mirrored by the browser, so it still points along the trail; a slash or a dash is drawn as it is, so pick one that reads either way."
+    />
+
+    <PageDocsExample :path="`${DOCS_ROOT}/RightToLeft.vue`">
+        <RightToLeftDocsExample />
+    </PageDocsExample>
+
+    <PageDocsSection
+        title="Links"
+        content="Give a crumb an [prop]href[/prop] and it is drawn as a native HTML anchor element, with the address passed through untouched. In a routed app, pass [prop]linkComponent[/prop], a custom link component such as your router's, and the crumbs are drawn with it instead."
+    />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Links.vue`">
         <LinksDocsExample :is-disabled="isDisabled" :has-link-component="hasLinkComponent" />

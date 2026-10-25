@@ -30,6 +30,7 @@ import type { Point2d } from "@thewaver/ss-utils";
 
 import { CarrierSolidUtils } from "../../Abstracts/Carrier/CarrierSolid.utils";
 import { ElevationSolidUtils } from "../../Abstracts/Elevation/ElevationSolid.utils";
+import { NavigatorSolidUtils } from "../../Abstracts/Navigator/NavigatorSolid.utils";
 import { useViewportContext } from "../../Abstracts/Viewport/Viewport.context";
 import { LabelSolidUtils } from "../../Essentials/Input/Label/LabelSolid.utils";
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
@@ -165,6 +166,11 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
     CarrierSolidUtils.registerZone(zone);
 
     const getIsSource = createMemo(() => CarrierSolidUtils.getSourceZone() === zone);
+
+    const getCarriedDirection = NavigatorSolidUtils.createDirectionSignal(
+        getRootRef,
+        () => !props.renderCarried || !getIsSource(),
+    );
 
     const getIsReceiving = createMemo(() => CarrierSolidUtils.getTargetZone() === zone);
 
@@ -573,6 +579,7 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
                     <Portal mount={viewportContext.getPortalRef()}>
                         <div
                             class={styles.sortableGridCarried}
+                            dir={getCarriedDirection()}
                             style={{
                                 "transform": `translate(${getPoint().x - grabOffset.x}px, ${getPoint().y - grabOffset.y}px)`,
                                 "width": `${getSpan(getCarriedGeometry()?.size.colCount ?? 1)}px`,

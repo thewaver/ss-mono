@@ -4,3 +4,8 @@ export type BaseProgressExampleValues = {
 };
 
 export type BaseProgressExampleProps = BaseProgressExampleValues;
+
+export type BaseProgressBasicDocsExampleValues = {
+    value: number;
+    hasError: boolean;
+};

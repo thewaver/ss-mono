@@ -292,9 +292,10 @@ export namespace ProximityEffectUtils {
     /**
      * Brightens and saturates the items nearest the pointer.
      *
-     * The one sample that is not motion under success criterion 2.3.3 — its own definition excludes a
-     * change of color that does not change perceived size, shape or position — so it is also the one
-     * that answers the reduced-motion preference by not changing.
+     * The one sample that is not motion under success criterion
+     * {@link https://www.w3.org/WAI/WCAG22/Understanding/animation-from-interactions.html 2.3.3} — its own definition
+     * excludes a change of color that does not change perceived size, shape or position — so it is also the one that
+     * answers the reduced-motion preference by not changing.
      *
      * @param defs How far the effect reaches, and how much the nearest item brightens and saturates.
      * @returns The effect function, ready to hand to a control's `computeEffect`.
@@ -322,11 +323,12 @@ export namespace ProximityEffectUtils {
     /**
      * Pushes what is far from the pointer back, by dimming it and blurring it.
      *
-     * The other way round from the rest: it picks an item out by taking the others away rather than by
-     * doing anything to it. The blur is in pixels because a blur radius is the one quantity here that a
-     * layout cannot state — everything else is a share of something the arrangement already knows.
-     * Under reduced motion the dimming stays and the blur goes, the erratum to success criterion 2.3.3
-     * having brought blurring inside it.
+     * The other way round from the rest: it picks an item out by taking the others away rather than by doing anything
+     * to it. The blur is in pixels because a blur radius is the one quantity here that a layout cannot state —
+     * everything else is a share of something the arrangement already knows. Under reduced motion the dimming stays and
+     * the blur goes, the erratum to success criterion
+     * {@link https://www.w3.org/WAI/WCAG22/Understanding/animation-from-interactions.html 2.3.3} having brought
+     * blurring inside it.
      *
      * @param defs How far the effect reaches, how much the farthest items dim, and how far they blur, in pixels.
      * @returns The effect function, ready to hand to a control's `computeEffect`.

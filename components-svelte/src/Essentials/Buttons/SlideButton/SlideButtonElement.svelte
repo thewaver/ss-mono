@@ -7,12 +7,11 @@
     import { NavigatorSvelteUtils } from "../../../Abstracts/Navigator/NavigatorSvelte.utils.svelte.js";
     import { readStore } from "../../../Utils/storeUtils.js";
     import { FormFieldSvelteUtils } from "../../Input/FormField/FormFieldSvelte.utils.svelte.js";
-    import { LabelSvelteUtils } from "../../Input/Label/LabelSvelte.utils.svelte.js";
     import type { SlideButtonElementProps } from "./SlideButton.types.js";
 
     let props: SlideButtonElementProps = $props();
 
-    const getAriaLabel = LabelSvelteUtils.resolveAriaLabel(() => props.ariaLabel);
+    const { getAriaLabel, getAriaLabelledBy } = FormFieldSvelteUtils.resolveAriaName(() => props.ariaLabel);
     const getFieldDescribedBy = FormFieldSvelteUtils.resolveAriaDescribedBy();
     const descriptionId = $props.id();
 
@@ -89,6 +88,7 @@
     type="button"
     class={styles.slideButtonElement}
     aria-label={getAriaLabel()}
+    aria-labelledby={getAriaLabelledBy()}
     aria-describedby={ariaDescribedBy}
     aria-pressed={props.flags.isPressed}
     aria-disabled={isDisabled || undefined}
