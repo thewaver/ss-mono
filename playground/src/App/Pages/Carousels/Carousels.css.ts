@@ -8,6 +8,13 @@ import { themeVars } from "../../Theme.css";
 
 export const SCROLL_BOX_HEIGHT = 240;
 
+export const CAROUSEL_DOCS_MAX_WIDTH = 480;
+
+export const docsCarousel = style({
+    width: "100%",
+    maxWidth: CAROUSEL_DOCS_MAX_WIDTH,
+});
+
 export const slideFrame = style({
     display: "grid",
     minWidth: 0,
@@ -91,9 +98,11 @@ export const slideFrames: Record<SlideFrame, SlideFrameSet> = {
 };
 
 export const scrollBox = style({
+    width: "100%",
     height: SCROLL_BOX_HEIGHT,
     overflowY: "scroll",
     overscrollBehavior: "contain",
+    paddingInline: themeVars.spacing.double,
 });
 
 export const scrollPinned = style({

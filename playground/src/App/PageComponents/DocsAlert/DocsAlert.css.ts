@@ -1,17 +1,21 @@
-import { style } from "@vanilla-extract/css";
+import { createVar, style } from "@vanilla-extract/css";
 
 import { layoutVars } from "../../Layout.css";
 import { themeVars } from "../../Theme.css";
+
+export const color = createVar();
+export const backgroundColor = createVar();
 
 export const docsAlertRoot = style({
     position: "relative",
     maxWidth: layoutVars.readingWidth,
     padding: `${themeVars.spacing.full} ${themeVars.spacing.double}`,
-    border: `2px solid ${themeVars.color.alert.main}`,
     borderRadius: themeVars.borderRadius.full,
     boxShadow: themeVars.shadow.medium,
-    color: themeVars.color.alert.main,
-    backgroundColor: themeVars.color.alert.contrast,
+    border: `2px solid ${color}`,
+    backgroundColor,
+    color,
+    fontWeight: 600,
 });
 
 export const docsAlertContent = style({
@@ -22,5 +26,6 @@ export const docsAlertContent = style({
 
 export const docsAlertLogo = style({
     fontSize: 48,
+    fontWeight: 400,
     lineHeight: 1,
 });

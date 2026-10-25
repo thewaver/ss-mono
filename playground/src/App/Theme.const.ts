@@ -13,28 +13,28 @@ const SHARED_THEME_VALUES = {
     scheme: "dark",
     color: {
         info: {
-            dark: "hsl(225, 50%, 40%)",
-            main: "hsl(225, 75%, 50%)",
-            light: "hsl(225, 50%, 50%)",
-            contrast: "hsl(225, 100%, 100%)",
+            dark: "hsl(210, 75%, 60%)",
+            main: "hsl(210, 100%, 60%)",
+            light: "hsl(210, 75%, 70%)",
+            contrast: "hsl(210, 100%, 0%)",
         },
         success: {
-            dark: "hsl(90, 50%, 50%)",
-            main: "hsl(90, 75%, 50%)",
-            light: "hsl(90, 50%, 60%)",
+            dark: "hsl(90, 75%, 50%)",
+            main: "hsl(90, 100%, 50%)",
+            light: "hsl(90, 75%, 60%)",
             contrast: "hsl(90, 100%, 0%)",
         },
         alert: {
-            dark: "hsl(45, 50%, 50%)",
-            main: "hsl(45, 75%, 50%)",
-            light: "hsl(45, 50%, 60%)",
+            dark: "hsl(45, 75%, 50%)",
+            main: "hsl(45, 100%, 50%)",
+            light: "hsl(45, 75%, 60%)",
             contrast: "hsl(45, 100%, 0%)",
         },
         error: {
-            dark: "hsl(0, 50%, 40%)",
-            main: "hsl(0, 75%, 50%)",
-            light: "hsl(0, 50%, 50%)",
-            contrast: "hsl(0, 100%, 100%)",
+            dark: "hsl(15, 75%, 60%)",
+            main: "hsl(15, 100%, 60%)",
+            light: "hsl(15, 75%, 70%)",
+            contrast: "hsl(15, 100%, 0%)",
         },
         outline: {
             main: "rgb(255, 0, 255)",
@@ -78,7 +78,7 @@ const SHARED_THEME_VALUES = {
 } as const;
 
 const DEFAULT_PRIMARY: ColorFamily = {
-    dark: { h: 0, s: 0, l: 75.29 },
+    dark: { h: 0, s: 0, l: 75 },
     main: { h: 0, s: 0, l: 100 },
     light: { h: 0, s: 0, l: 100 },
     contrast: { h: 0, s: 0, l: 0 },

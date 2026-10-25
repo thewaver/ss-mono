@@ -36,12 +36,11 @@ export const TimeInput = defineComponent(
                     segmentCount: getSegmentCount(),
                     isTwelveHour: getIsTwelveHour(),
                     meridiem: meridiem.value,
-                    minValue: props.minValue,
-                    maxValue: props.maxValue,
                 }),
             getHasImpossibleDigits: (digits) =>
                 TimeInputUtils.getHasImpossibleSegment(digits, getSegmentCount(), getIsTwelveHour()),
             getIsSame: TimeUtils.isSame,
+            settleValue: (value) => TimeUtils.clamp(value, props.minValue, props.maxValue),
         });
 
         watchAfterRender([value], ([next]) => {

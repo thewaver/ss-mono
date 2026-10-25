@@ -156,7 +156,6 @@ const SelectPage = lazyPage(() => import("./Pages/SelectPage/SelectPage"), "Sele
 const ShapePage = lazyPage(() => import("./Pages/ShapePage/ShapePage"), "ShapePage");
 const ShapeRevealPage = lazyPage(() => import("./Pages/ShapeRevealPage/ShapeRevealPage"), "ShapeRevealPage");
 const SidebarPage = lazyPage(() => import("./Pages/SidebarPage/SidebarPage"), "SidebarPage");
-const SlideButtonPage = lazyPage(() => import("./Pages/SlideButtonPage/SlideButtonPage"), "SlideButtonPage");
 const SlideButtonDocs = lazyPage(() => import("./Pages/SlideButtonPage/SlideButtonDocs"), "SlideButtonDocs");
 const SortableGridPage = lazyPage(() => import("./Pages/SortableGridPage/SortableGridPage"), "SortableGridPage");
 const SortablePage = lazyPage(() => import("./Pages/SortablePage/SortablePage"), "SortablePage");
@@ -356,7 +355,6 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                     },
                     {
                         name: "SlideButton",
-                        component: () => <SlideButtonPage />,
                         docs: () => <SlideButtonDocs />,
                     },
                 ],

@@ -36,11 +36,10 @@
                 segmentCount,
                 isTwelveHour,
                 meridiem,
-                minValue: props.minValue,
-                maxValue: props.maxValue,
             }),
         getHasImpossibleDigits: (digits) => TimeInputUtils.getHasImpossibleSegment(digits, segmentCount, isTwelveHour),
         getIsSame: TimeUtils.isSame,
+        settleValue: (value) => TimeUtils.clamp(value, props.minValue, props.maxValue),
     });
 
     $effect(() => {

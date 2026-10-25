@@ -9,15 +9,16 @@ export namespace MaskedFieldSolidUtils {
     /**
      * Wires one masked field's text and value together.
      *
-     * The rules are {@link MaskedFieldUtils}'. Typing updates the value only when the digits make a complete,
-     * possible value, so a half-finished entry leaves the last good value alone rather than clearing it. A value
-     * arriving from outside rewrites the text, unless the user is mid-edit with the value already cleared. And an
-     * incomplete entry is not called an error until the user leaves the field.
+     * The rules are {@link MaskedFieldUtils}'. Only the reader's typing commits a value, and only when the digits
+     * make a complete, possible value, so a half-finished entry leaves the last good value alone rather than
+     * clearing it. A value arriving from outside rewrites the text, unless the user is mid-edit with the value
+     * already cleared. An incomplete entry is not called an error until the user leaves the field, and a held value
+     * the field's settings no longer allow is shown as it is and called an error at once, never replaced.
      *
-     * The value is committed when the digits change and never when the rules do: a change of format rewrites the
-     * text from the value, and the digits that were on screen are not read again under the new rules, which would
-     * commit a value nobody typed. The rewrite follows the value as it is, so a field that started empty picks up a
-     * change of format made after something was typed into it.
+     * A change of format rewrites the text from the value and commits nothing, since nobody typed it. The rewrite
+     * follows the value as it is, so a field that started empty picks up a change of format made after something
+     * was typed into it. Leaving the field settles the value — pulls it inside its bounds, where the field has
+     * any — whether or not it was edited.
      *
      * Must run inside a component or another reactive owner.
      *
@@ -41,7 +42,11 @@ export namespace MaskedFieldSolidUtils {
 
         const getDigits = () => MaskedFieldUtils.readDigits(textSignal[0](), defs);
 
-        const getHasIssue = createMemo(() => MaskedFieldUtils.computeHasIssue(getDigits(), getHasLeft(), defs));
+        const getHasIssue = createMemo(
+            () =>
+                MaskedFieldUtils.computeHasIssue(getDigits(), getHasLeft(), defs) ||
+                MaskedFieldUtils.getIsUnheld(defs.getValue(), textSignal[0](), defs),
+        );
 
         const refresh = () => {
             if (untrack(defs.getValue) === undefined && untrack(getDigits).length > 0) return;
@@ -54,18 +59,6 @@ export namespace MaskedFieldSolidUtils {
 
             defs.setValue(next);
         };
-
-        createEffect(() => {
-            const digits = getDigits();
-
-            untrack(() => {
-                const typed = MaskedFieldUtils.computeTypedValue(digits, defs);
-
-                if (!typed) return;
-
-                commit(typed.value);
-            });
-        });
 
         createEffect(() => {
             const value = defs.getValue();
@@ -98,9 +91,18 @@ export namespace MaskedFieldSolidUtils {
             refresh,
             onInput: () => {
                 setHasLeft(false);
+
+                const typed = MaskedFieldUtils.computeTypedValue(untrack(getDigits), defs);
+
+                if (typed) commit(typed.value);
             },
             onBlur: () => {
                 setHasLeft(true);
+
+                const value = untrack(defs.getValue);
+
+                if (value !== undefined && defs.settleValue) commit(defs.settleValue(value));
+
                 refresh();
             },
         };

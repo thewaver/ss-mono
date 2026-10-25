@@ -18,7 +18,7 @@ export const carouselSlide = style({
     height: CAROUSEL_SLIDE_HEIGHT,
     minHeight: "100%",
     borderRadius: themeVars.borderRadius.half,
-    backgroundImage: `linear-gradient(135deg, rgb(from ${layerVars.main} r g b / 50%), rgb(from ${layerVars.main} r g b / 75%))`,
+    backgroundImage: `linear-gradient(315deg, hsl(from ${layerVars.main} h s calc(l - 5)), hsl(from ${layerVars.main} h s calc(l + 5)))`,
     color: layerVars.contrast,
     userSelect: "none",
 });

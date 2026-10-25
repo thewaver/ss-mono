@@ -350,7 +350,7 @@ export const ListboxOptions = <T,>(props: ListboxOptionsProps<T>) => {
         return (
             <div
                 class={styles.listboxSizerRow}
-                style={{ transform: `translateY(${rowWindow.getRowStart(row)}px)` }}
+                style={{ top: `${rowWindow.getRowStart(row)}px` }}
                 ref={(element) => rowWindow.measureRow(element, row.index)}
             >
                 <Show

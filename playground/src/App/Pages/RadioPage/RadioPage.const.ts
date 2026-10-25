@@ -23,3 +23,5 @@ export const SIZE_OPTIONS: { value: SizeValue; label: string }[] = [
 export const STARTING_RATING = 3;
 
 export const EXAMPLES_ROOT = "/src/App/Pages/RadioPage/Examples";
+
+export const DOCS_ROOT = "/src/App/Pages/RadioPage/Docs";

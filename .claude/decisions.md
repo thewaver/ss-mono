@@ -21130,7 +21130,7 @@ Settled by the user, after the field was found replacing a consumer's `"red"` wi
 calling `onInput` to report the change it had just invented.
 
 **A value the field cannot read is refused visibly**: nothing is written back, the error flag is raised, and
-the consumer's text survives. That is `conventions.md`'s _"A masked field never spells a value approximately"_
+the consumer's text survives. That is an early form of `conventions.md`'s _"A field keeps the text it shows apart from the value it holds"_
 applied to color — a control stating that it holds something it cannot show, rather than substituting a
 different well-formed value that would survive a round trip.
 
@@ -21505,9 +21505,9 @@ set to the move direction `renderPanel` is handed, and each header and panel has
 turns the attributes into an axis and a move, and one animation slides the panel from them — sideways when
 horizontal, from above or below when vertical — so the code a visitor reads is the same for both.
 
-**`SlideButton`'s "Arm all three" example writes its two CSS variables through `assignInlineVars`** (or each
-framework's equivalent). Written raw as a style key, a vanilla-extract variable's name is `var(--…)`, which the
-browser drops without a word.
+**A vanilla-extract variable set inline goes through `assignInlineVars`** (or each framework's equivalent), as
+`PageDocsAlert` sets its colors. Written raw as a style key, a vanilla-extract variable's name is `var(--…)`, which
+the browser drops without a word.
 
 ### A docs example puts its own controls below the component
 
@@ -21524,3 +21524,208 @@ The user left the choice to Claude ("your guess is as good as mine"), after sayi
 ### On a docs demo, the Disabled knob is last
 
 The user's rule, given while the Breadcrumbs examples were being built: in a docs example's knob column, `isDisabled` goes after every other knob. Applied at once to the three pages built so far: `Button`'s two examples (in the Tooltip one, "Reachable when disabled" now sits above "Disabled", though its hint says it only matters while Disabled is on, which is the one place the literal reading cuts against the natural order), `SlideButton`'s first example (after Error) and `Breadcrumbs`' first (after Separators). All four Playgrounds follow it.
+
+### `Carousel`'s Docs page: one shared bar, one picker for the looks, and no rule written by hand
+
+The user's calls, taken before the page was built. The carousel draws no controls, so every example needs buttons.
+**They are written once, in `CarouselsBar`, and every docs example imports it**, Basic included. How a reader gets to
+see that code is left open; the user will settle it later. **The nine ready-made placements are one example with a
+picker** (and an orientation knob, since every rule follows it), not nine carousels nor a gallery on an Examples
+page. Its code builds the rule from the library's own sample list through the Playground's `toFramedPlacement`,
+which adds the `faceRatio` for cover flow and depth wave. **There is no section on writing a placement rule by
+hand**: the API page's tables cover the rule's shape. **The WCAG warning box** (Previous/Next for 2.5.7, a pause
+button for 2.2.2, the bar's hover and focus passed to `setIsHeldByPage`) **sits above the first example, in
+`PageDocsAlert`**, as on `SlideButton`; the user means to restyle that box themselves.
+
+The shared settings panel and the Examples page went, as on Accordion: each example owns only the knobs for its own
+feature. The slide-count knob went with the panel, under _"A docs example has no knob that exists only for the
+Playground"_. Every example sits in a `docsCarousel` box capped at 480px, like the accordion examples (the user's
+call), and every one except Looks uses the plain `track` placement and draws `PageCarouselSlide` straight, with no
+frame. Looping and autoplay are one example, at the user's request, so turning looping off shows rotation stopping on
+the last slide; its Looping knob starts on, since looping is what the section shows (see _"A section's knob starts
+on the behavior the section is about"_). The bar's `isDisabled` became optional, so only Basic, the one example with a
+Disabled knob, passes it.
+
+### `EdgeFader`'s Docs page: one example per feature, a knob per side
+
+The four examples the page already had became the Docs page, one per section, and the shared panel and the
+Examples page went, as on Accordion and Carousel. **Basic** is the scrolling column, top and bottom faded, with the
+size knob. **Any mix of sides** is the grid with one checkbox knob per side, since `edges` is a real prop and there
+is no multi-pick field; the knobs write the list in `EDGE_FADER_DEFAULTS.edges`' order. **Fading only what is out
+of view** is the strip with the scroll-aware knob, starting on. **Around something that does not scroll** is the
+card, fixed, no knob.
+The intro no longer describes the two modes, which the sections do; it says what only it says — that the box is
+the scroll container, becomes a tab stop named by `ariaLabel`, and drops its fade under keyboard focus.
+
+### A section's knob starts on the behavior the section is about
+
+The user's rule, given after it was missed twice (Carousel's Looping knob, EdgeFader's Scroll-aware knob): in a
+docs example that illustrates one feature, the knob for that feature starts in the state that shows the feature,
+whatever the library's default is. A section about scroll-aware fading opens with the fade scroll-aware; a section
+about looping opens looping. Starting at the library's default was the wrong reading of the first correction — the
+default happened to be the showing state there and not here. Knobs that only tune a feature (a size, a duration)
+still start at the library's default.
+
+### `Form`'s Docs page: the submit button is never disabled, and a status line shows `isValid`
+
+**Form's page covers Form only**, the user's call over one page for Form, FormField and FormSection: its examples
+use FormField but each of the three keeps its own page.
+
+**Basic's Sign up button stays enabled; `getState().isValid` drives a status line instead** ("Ready to send." /
+"Some fields need attention."). The old example disabled the button while any field was in error. The user's gut was
+to keep that and the standards outweighed it: WCAG does not forbid it here, since every error is already in text
+(3.3.1), but the GOV.UK Design System says "Disabled buttons have poor contrast and can confuse some users, so avoid
+them if possible", and the library's own answer — submit, and focus lands on the first field in error — needs an
+enabled button. **Each example's submit handler checks its own completeness before "sending"**, since the handler
+runs whatever the fields report, and that is the consumer deciding, which is the point the info box makes. To keep
+the status line and the handler in agreement, an empty email is an error in Basic ("Enter your email."), and the
+hint "We only use it to sign you in." shows once the address looks right.
+
+**Each example has its own section, and the intro has none.** "Errors shown as you type" holds the sign-up form and
+says what both forms share — `isValid`, the handler running either way, focus moving to the first error — so
+"Errors shown once the form is sent" says only what `hasSubmitted` adds, and nothing is said twice. Each example holds its own signals and shows its outcome in a readout line under its buttons,
+in place of the Examples page's readouts. No knobs: nothing about Form is worth one.
+
+### A docs box's severity says what skipping it costs
+
+Settled with the user over Form's box. **`alert`** marks something whose neglect ships a fault the author will not see
+themselves — one only a screen reader, a keyboard user or the console shows (SlideButton's `ariaDescription`,
+Carousel's buttons). **`info`** marks scope: skipping it only leaves the reader knowing less (Breadcrumbs' and
+Carousel's "only examples", Form's "validates nothing" — a form with no checks shows it the first time it is tried).
+So the warning sign keeps one meaning: this fails someone you are not testing with.
+
+### `TextInput`'s Docs page: states as knobs, one section per use
+
+The user chose to rework the Input folder one page at a time, Solid only, pausing after each — token cost is a concern
+on their account, and the ports are left to a later session. TextInput came first since half the folder sits on it.
+Its thirteen examples became Basic plus nine sections, following Button's Docs page: the four examples that were one
+state each (read-only, disabled, disabled and reachable, error) became knobs — Read-only, Error and Disabled on
+Basic, Disabled last; Reachable when disabled and Disabled on a Tooltip section, as on Button. The rest are one
+section each: rewriting what is typed, refusing it, leading and trailing content, passwords, numbers, suggestions,
+the tooltip, naming by a Label, and editing in place last, since it is a composition rather than a use of a prop.
+Every example holds its own state; there are no readouts.
+
+**`onInput` does not replace the write.** The field writes what was typed into its value, then runs `onInput`; what
+`onInput` writes back wins, which is how both the rewriting and the refusing example work. The section text says so,
+and a type of number points at `NumberInput` for stepper buttons rather than at the trailing slot.
+
+### A docs section's text never opens with a prop name
+
+The user's rule, for every Docs page: a prop name is lower-case, so a paragraph starting with one reads as a sentence
+with no capital. Open with a word of the sentence and bring the prop in after it ("Every change also runs onInput",
+"Pass edges any mix of…", "Set side to choose…"). It applies to section text, alert and info boxes alike.
+
+### The in-field adornment painter: a label outside a button, a button's look inside one
+
+`PageTextFieldAdornment` draws both static content in a field's leading or trailing slot (👤︎, £, px) and the look of
+a small button there (Clear, Show), and the field hands it the field's own state either way. So the painter decides
+by where it sits: **inside `button` or `[role='button']`** it pads its sides, lights up on hover, and is small and
+uppercase; **anywhere else** it is a label, at the field's own text size (`FIELD_FONT_SIZE`), with no padding and no
+hover, and it still dims when disabled. The user's calls, one at a time, starting from the TextInput Docs page's
+username field, whose glyph lit up on hover, sat padded away from the text and looked small beside the placeholder.
+The sizing is provisional by the user's word: it is to be revisited once the other input pages are built.
+
+**`TextArea` follows the same template**: Basic is the fixed-height box with the three state knobs, then growing with
+what is typed — one example, at the user's request, with a Max rows knob starting at 8, the limit the old capped
+example used (knob range in `TextAreaKnobs`) — the tooltip and naming by a Label. Its intro points at TextInput's page rather
+than repeating what the two share.
+
+**`NumberInput` and `CurrencyInput` follow it too**, each example's knobs being real props, after the user's TextArea
+correction that a limit deserves a knob. NumberInput: Basic with the three state knobs; stepping and limits, with
+Min, Max and Step knobs (one example, where the old page had a whole-number and a fractional one); numbers written
+the local way, with a Locale knob starting on German; a unit beside the stepper; the tooltip; naming by a Label. A
+typed number outside the limits is corrected when the field is left — the code settles on blur only, not on Enter,
+and the section says so. CurrencyInput's shared panel of locale, decimals, grouping and sign was split by what each
+prop does: Basic with the state knobs; written the local way, with Locale, Decimals and Grouping on the large
+amount, so the grouping shows; with a symbol; a limit, with a Max knob; negative amounts, with Signed starting on.
+The old "empty" and "many groups" examples each showed one fact, now said in the intro and the locale section.
+
+### The masked field commits only what the reader typed, flags a value it cannot read back, and settles on blur
+
+Found on CurrencyInput's Docs page: a held −250 with Signed switched off became 250, and switching Signed back on
+had nothing to restore. The cause was in Solid's and Svelte's masked-field helpers, which committed whenever the
+digits changed — including when a change of settings made the field rewrite its own text, which they then read back
+as if typed. The user's model fixes it, recorded in `conventions.md` under _"A field keeps the text it shows apart
+from the value it holds"_.
+
+- **Only the reader's typing commits.** Solid commits from `onInput`, which `TextField` calls after writing the
+  reader's text; a rewrite of the text from the value commits nothing. Svelte's respelling writes the text directly
+  instead of through its typing path. React and Vue already committed only from their text setter, which only
+  `TextField`'s input reaches.
+- **A held value the settings no longer allow is shown and flagged.** `MaskedFieldUtils.getIsUnheld` asks whether the
+  field, reading its own spelling of the value back, gets a different value; every helper ORs it into the error.
+  CurrencyInput now spells a negative amount with its minus whether or not a sign may be typed (its `formatDigits`
+  formats with the sign allowed), so a held −250 shows "−250.00", flagged, and the consumer keeps −250.
+- **Limits correct on blur, edited or not.** `MaskedFieldDefs.settleValue` clamps the held value when the field is
+  left. CurrencyInput's `min`/`max`, DateInput's and TimeInput's `minValue`/`maxValue` moved out of their parsers
+  into it, so an out-of-range entry is kept as typed and pulled to the bound on leaving, as NumberInput's always was.
+  The parsers still accept bounds; the inputs no longer pass them.
+- **Not covered:** an amount with more decimals than the field keeps is still spelled rounded, though it is flagged as
+  unheld and kept. Range draws an out-of-range value at its end, unchanged and unflagged; whether it should mark it
+  is open.
+
+### A windowed row is placed with `top`, not a transform, because the highlight measures layout
+
+Found by the user on Select's virtualized example: the highlight that slides to the hovered option stayed at the top
+of the list. Listbox and Tree placed each windowed row absolutely at `top: 0` and moved it with
+`transform: translateY(…)`, and the floater measures its target by walking `offsetTop` up the offset parents
+(`Floater.utils.ts`'s `measureOffset`) — layout space, which a transform does not move. So every row read as the top
+of the list. **Rows are placed with `top` instead**, in all four frameworks, so the layout position is the drawn one;
+the rows are already out of the flow, so placing one moves nothing else. The floater's measurement was not changed to
+read transforms, since an item's own press or hover transform would then drag the highlight with it. Table keeps the
+transform: it draws no floater. Pinned by `select.spec.ts`'s _"in a windowed list, the highlight lands on the option
+under the pointer"_; Tree's own marker test drives the unwindowed menu.
+
+### `Select`'s Docs page: nineteen examples into twelve sections, and the large list keeps its count and its timing
+
+The old page's state examples became knobs (Error and Disabled on Basic; the tooltip section as on the text fields),
+"Preselected" became a sentence (an opening list highlights the pick), "Option groups" and "Group boxes" became one
+example with a Group boxes knob passing or leaving out `renderGroupBox`, and the two disabled-option examples one
+with a Reachable knob. The pretend server (`fetchRoutes`, `searchRoutes`) moved beside the sample builders in the
+shared `SelectOptions.const.ts`, so each on-demand example holds its own loading.
+
+**The large list keeps its Option count knob** — the user's call, against _"A docs example has no knob that exists
+only for the Playground"_: that rule is about knobs that only put a demo into a state a reader could reach by using
+it; a count is the claim virtualization makes, and the knob is how a reader tests it. **A knob that sizes the data
+stays where the size is what the section demonstrates.** **Its timing stays too, measured from outside the
+example** — also the user's call: the Docs page watches the list open through Select's own `visibility`, times two
+animation frames from there, and runs the frame-rate monitor while open, so the example's code is a plain Select.
+The old grouped variant of the large list was dropped; groups have their own section.
+
+**`Select` has no read-only mode, by the user's choice.** Raised while building its Docs page: ARIA defines
+`aria-readonly` for `combobox` and `listbox` as "not editable, but is otherwise operable", and the browser's own
+`<select>` has none. The user chose to leave it as it is, so it is not a gap to raise again.
+
+**The list's height is the popup's, not a Select setting** — the user's call "for now", over a most-options-shown
+setting like `<select size>`: the popup is the consumer's painter, and with options of different heights or groups a
+count of options has no single height. The Docs page's "A long list" section went with it; Home and End and the
+highlight on opening moved into the intro.
+
+### `MultiSelect`, `Checkbox` and `Toggle`: Docs pages on the settled patterns
+
+**MultiSelect**: Basic with Error and Disabled; groups and a query, where the example drops groups the query emptied;
+clearing every pick, with a last-change line. Its intro points at Select's page instead of repeating that groups, a
+query and loading on demand work the same. **Checkbox**: Basic with Error and Disabled; mixed; refusing a change (one
+of two boxes must stay on); decoration; the tooltip; naming by a Label. **Toggle**: the same less refusing, and its
+mixed section says that a mixed toggle reads as a mixed checkbox, since a switch cannot say "mixed".
+
+**A control's decoration is shown on its Docs page** — the user's call: Checkbox and Toggle showing
+`renderDecoration` meant Button should too, since all three take it through the shared wrapper. Button's Examples page
+then went entirely, also the user's call: Decorated and Hold to repeat (the counter) moved into Docs as sections, and
+Pending and Copy were dropped. Checkbox and Toggle each gained a "Named by a Label" section, as the text fields have.
+
+**Radio**: Basic with Error and Disabled; right to left; segmented; a rating; bent into an arc; decoration; a
+disabled option, where Medium is off and a Reachable when disabled knob brings back its tooltip. No Label section: each
+radio shows its own text and the group takes the name.
+
+### Two decisions taken at the end of the Input docs session, both not yet built
+
+**A text field's leading and trailing slots follow the reading direction** — the user's call, reversing the earlier
+"sides are physical" choice recorded for `TextInput` (and echoed under `EdgeFader`): its reason, that nothing else in
+the library was right-to-left aware, no longer holds. `backlog.md` item 17 has the work. **Checkbox and Toggle draw
+their own text, as Radio does** — the user's call, for consistency, removing their "Named by a Label" sections;
+`backlog.md` item 18.
+
+**A right-to-left section goes on a Docs page only where the component itself behaves differently** — proposed, not
+yet confirmed by the user: Radio, SlideButton and Accordion's horizontal layout among the pages built; Calendar, Clock,
+Range, TagInput and a horizontal Listbox among those to come. Ask before applying it.

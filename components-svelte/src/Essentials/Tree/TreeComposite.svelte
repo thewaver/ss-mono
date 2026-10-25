@@ -553,7 +553,7 @@
                         <div
                             {@attach rowWindow.measureRow(windowRow.index)}
                             class={styles.treeSizerRow}
-                            style:transform={`translateY(${rowWindow.getRowStart(windowRow)}px)`}
+                            style:top={`${rowWindow.getRowStart(windowRow)}px`}
                         >
                             {@render renderRow(row)}
 

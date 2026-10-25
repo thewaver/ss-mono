@@ -29,3 +29,5 @@ export const PAGE_DELAY_MS = 600;
 export const STRESS_COUNT_FIELD_WIDTH = 120;
 
 export const EXAMPLES_ROOT = "/src/App/Pages/SelectPage/Examples";
+
+export const DOCS_ROOT = "/src/App/Pages/SelectPage/Docs";

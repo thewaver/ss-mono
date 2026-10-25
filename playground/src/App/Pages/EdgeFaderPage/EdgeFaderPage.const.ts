@@ -1,3 +1,5 @@
+import type { EdgeFaderEdge } from "@thewaver/ss-components";
+
 export const COLUMN_ROWS = Array.from({ length: 16 }, (_, index) => `Row ${index + 1}`);
 
 export const STRIP_CHIPS = Array.from({ length: 20 }, (_, index) => `Item ${index + 1}`);
@@ -12,3 +14,12 @@ export const EXAMPLE_NAMES = {
 };
 
 export const EXAMPLES_ROOT = "/src/App/Pages/EdgeFaderPage/Examples";
+
+export const DOCS_ROOT = "/src/App/Pages/EdgeFaderPage/Docs";
+
+export const EDGE_LABELS: Record<EdgeFaderEdge, string> = {
+    top: "Top",
+    right: "Right",
+    bottom: "Bottom",
+    left: "Left",
+};

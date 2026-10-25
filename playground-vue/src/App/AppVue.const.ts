@@ -105,7 +105,6 @@ const SelectPage = () => import("./Pages/SelectPage/SelectPage.vue");
 const ShapePage = () => import("./Pages/ShapePage/ShapePage.vue");
 const ShapeRevealPage = () => import("./Pages/ShapeRevealPage/ShapeRevealPage.vue");
 const SidebarPage = () => import("./Pages/SidebarPage/SidebarPage.vue");
-const SlideButtonPage = () => import("./Pages/SlideButtonPage/SlideButtonPage.vue");
 const SlideButtonDocs = () => import("./Pages/SlideButtonPage/SlideButtonDocs.vue");
 const SortableGridPage = () => import("./Pages/SortableGridPage/SortableGridPage.vue");
 const SortablePage = () => import("./Pages/SortablePage/SortablePage.vue");
@@ -287,7 +286,6 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                     },
                     {
                         name: "SlideButton",
-                        component: SlideButtonPage,
                         docs: SlideButtonDocs,
                     },
                 ],

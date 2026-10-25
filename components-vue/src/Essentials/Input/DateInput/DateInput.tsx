@@ -53,11 +53,10 @@ export const DateInput = defineComponent(
                     format: getFormat(),
                     calendar: getCalendar(),
                     era: fieldValue.value?.era ?? era.value,
-                    minValue: props.minValue,
-                    maxValue: props.maxValue,
                 }),
             getHasImpossibleDigits: (digits) => DateInputUtils.getHasImpossiblePart(digits, getFormat(), bounds.value),
             getIsSame: DateValueUtils.isSame,
+            settleValue: (value) => DateValueUtils.clamp(value, props.minValue, props.maxValue),
         });
 
         watchAfterRender([fieldValue], ([next]) => {

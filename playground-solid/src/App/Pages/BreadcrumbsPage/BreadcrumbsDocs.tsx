@@ -7,6 +7,7 @@ import {
 } from "@thewaver/ss-playground/App/Pages/BreadcrumbsPage/BreadcrumbsPage.const";
 import type { BreadcrumbSeparatorKey } from "@thewaver/ss-playground/App/Pages/BreadcrumbsPage/BreadcrumbsPage.types";
 
+import { PageDocsAlert } from "../../PageComponents/DocsAlert/DocsAlert";
 import { PageDocsExample } from "../../PageComponents/DocsExample/DocsExample";
 import { PageDocsSection } from "../../PageComponents/DocsSection/DocsSection";
 import { PageCheckField, PageSelectField } from "../../PageComponents/Field/Field";
@@ -21,6 +22,11 @@ export const BreadcrumbsDocs = () => {
 
     return (
         <>
+            <PageDocsAlert severity={"info"}>
+                The separators here are only examples. renderSeparator draws whatever you return, so what sits between
+                the crumbs is entirely yours: text, an icon, any markup.
+            </PageDocsAlert>
+
             <PageDocsExample
                 path={`${DOCS_ROOT}/Basic.tsx`}
                 renderKnobs={() => (
@@ -29,7 +35,7 @@ export const BreadcrumbsDocs = () => {
                             key={"separator"}
                             label={"Separator"}
                             hint={
-                                'What is drawn between the crumbs. The slot is yours: any markup works, and these are four examples. Choosing "none" leaves the slot out, so nothing sits between the crumbs and no empty element is rendered. Where drawn, it is hidden from assistive technology.'
+                                'What is drawn between the crumbs. Choosing "none" leaves the slot out, so nothing sits between the crumbs and no empty element is rendered. Where drawn, it is hidden from assistive technology.'
                             }
                             controls={'Passes BreadcrumbsProps.renderSeparator, or omits it for "none"'}
                         >

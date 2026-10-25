@@ -7,6 +7,7 @@
     } from "@thewaver/ss-components-svelte";
     import type { NavigatorDirection, SlideButtonMode, SlideButtonOrientation } from "@thewaver/ss-components-svelte";
     import { SlideButtonKnobs } from "@thewaver/ss-playground/App/Knobs/SlideButtons.const";
+    import { WCAG_URLS } from "@thewaver/ss-playground/App/PageComponents/DocsAlert/DocsAlert.const";
     import { DOCS_ROOT, FIELD_WIDTH } from "@thewaver/ss-playground/App/Pages/SlideButtonPage/SlideButtonPage.const";
 
     import PageDocsAlert from "../../PageComponents/DocsAlert/PageDocsAlert.svelte";
@@ -29,8 +30,11 @@
     let direction = $state<NavigatorDirection>(NAVIGATOR_DIRECTIONS[0]);
 </script>
 
-<PageDocsAlert>
-    Give every SlideButton an ariaDescription that says how to confirm it without sliding, such as which key to hold. Nothing else tells a screen reader user that a plain press does nothing, and a button without one warns in the console.
+<PageDocsAlert severity="alert">
+    Give every SlideButton an ariaDescription that says how to confirm it without sliding, such as which key
+    to hold. Holding Enter or Space is the keyboard route <a href={WCAG_URLS["2.1.1"]}>WCAG 2.1.1</a> requires, and nothing
+    else tells a screen reader user that it exists or that a plain press does nothing. A button without one
+    warns in the console.
 </PageDocsAlert>
 
 <PageDocsExample path={`${DOCS_ROOT}/Basic.svelte`}>

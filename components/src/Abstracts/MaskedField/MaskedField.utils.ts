@@ -71,6 +71,28 @@ export namespace MaskedFieldUtils {
     };
 
     /**
+     * Whether the field shows a held value it may not hold under its current settings.
+     *
+     * A value handed in is shown as its own text even when the field's rules would not let anyone type it, such as
+     * a negative amount in a field that takes no sign. Reading that text back then gives a different value, and that
+     * is what marks it: the text is the value's own, yet the field does not read the value from it. Such a value is
+     * flagged and kept, never replaced by what the field would read instead; only the reader's edits move it.
+     *
+     * @param value The value held, if any.
+     * @param text What the field shows.
+     * @param defs How the field writes a value as text and reads digits back into a value.
+     */
+    export const getIsUnheld = <T>(
+        value: T | undefined,
+        text: string,
+        defs: Pick<MaskedFieldDefs<T>, "toDigits" | "formatDigits" | "readDigits" | "fromDigits" | "getIsSame">,
+    ) => {
+        if (value === undefined || text !== computeText(value, defs)) return false;
+
+        return !defs.getIsSame(defs.fromDigits(readDigits(text, defs)), value);
+    };
+
+    /**
      * The value that typing these digits commits, if typing them commits anything.
      *
      * A half-finished entry commits nothing, so the last good value is left alone rather than cleared; clearing

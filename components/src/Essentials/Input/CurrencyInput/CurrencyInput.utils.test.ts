@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 
+import { MaskedFieldUtils } from "../../../Abstracts/MaskedField/MaskedField.utils";
 import type { TextSyncGroupDefs } from "../../../Abstracts/TextSync/TextSync.types";
+import { TextSyncUtils } from "../../../Abstracts/TextSync/TextSync.utils";
 import { CurrencyInputUtils } from "./CurrencyInput.utils";
 
 const BRITISH = CurrencyInputUtils.computeGroupDefs({ locale: "en-GB", decimals: 2, hasSign: false });
@@ -68,17 +70,30 @@ describe("createFieldRules", () => {
         expect(rulesFor(BRITISH).readDigits!("-1,234.56")).toBe("123456");
         expect(rulesFor(SIGNED).fromDigits("-12345")).toBe(-123.45);
         expect(rulesFor(SIGNED).toDigits(-250.5)).toBe("-25050");
-        expect(rulesFor(BRITISH).toDigits(-250.5)).toBe("25050");
+        expect(rulesFor(BRITISH).toDigits(-250.5), "a held negative keeps its minus where none may be typed").toBe(
+            "-25050",
+        );
     });
 
-    it("makes no amount of digits outside the bounds, and calls them impossible", () => {
-        const rules = rulesFor(BRITISH, { max: 5000 });
+    it("shows a held negative where no sign is allowed, and reads it back as a different amount", () => {
+        const rules = rulesFor(BRITISH);
+        const text = MaskedFieldUtils.computeText(-250.5, rules);
 
-        expect(rules.fromDigits("600000")).toBeUndefined();
-        expect(rules.getHasImpossibleDigits("600000")).toBe(true);
-        expect(rules.fromDigits("400000")).toBe(4000);
-        expect(rules.getHasImpossibleDigits("400000")).toBe(false);
-        expect(rules.getHasImpossibleDigits("")).toBe(false);
+        expect(text.startsWith(TextSyncUtils.MASK_MINUS), "the minus is shown, not dropped").toBe(true);
+        expect(MaskedFieldUtils.getIsUnheld(-250.5, text, rules), "so the field marks it as wrong").toBe(true);
+        expect(MaskedFieldUtils.getIsUnheld(-250.5, text, rulesFor(SIGNED)), "and not where a sign is allowed").toBe(
+            false,
+        );
+    });
+
+    it("keeps an amount outside the bounds as typed, and settles it to the nearest bound", () => {
+        const rules = rulesFor(BRITISH, { min: 100, max: 5000 });
+
+        expect(rules.fromDigits("600000"), "a bound does not make an amount wrong").toBe(6000);
+        expect(rules.getHasImpossibleDigits("600000")).toBe(false);
+        expect(rules.settleValue!(6000), "leaving the field pulls it back to the bound").toBe(5000);
+        expect(rules.settleValue!(50)).toBe(100);
+        expect(rules.settleValue!(4000), "and leaves one inside the bounds alone").toBe(4000);
     });
 
     it("has no fixed length and compares amounts by value", () => {

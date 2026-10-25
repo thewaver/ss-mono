@@ -29,6 +29,10 @@ const crumbs = computed<Breadcrumb<CrumbValue>[]>(() =>
 const select = (value: CrumbValue) => {
     depth.value = TRAIL.findIndex((entry) => entry.value === value) + 1;
 };
+
+const restore = () => {
+    depth.value = TRAIL.length;
+};
 </script>
 
 <template>
@@ -42,12 +46,7 @@ const select = (value: CrumbValue) => {
         </template>
     </Breadcrumbs>
 
-    <Button
-        id="basicReset"
-        :is-disabled="depth === TRAIL.length"
-        ariaLabel="Restore the trail"
-        @click="() => void (depth = TRAIL.length)"
-    >
+    <Button id="basicReset" :is-disabled="depth === TRAIL.length" ariaLabel="Restore the trail" @click="restore">
         <template #renderContent="flags">
             <PageControlButtonContent :flags="flags" :glyph="CONTROL_GLYPHS.replay" />
         </template>

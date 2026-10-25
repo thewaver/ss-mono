@@ -8,4 +8,5 @@ export type MaskedFieldDefs<T> = {
     fromDigits: (digits: string) => T | undefined;
     getHasImpossibleDigits: (digits: string) => boolean;
     getIsSame: (a: T | undefined, b: T | undefined) => boolean;
+    settleValue?: (value: T) => T;
 };

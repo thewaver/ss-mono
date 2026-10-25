@@ -11,10 +11,10 @@ purpose: it answers "what is outstanding", and neither of them is.
 
 | Section                                                   | Count |
 | --------------------------------------------------------- | ----: |
-| [Blockers and known issues](#blockers-and-known-issues)   |     6 |
+| [Blockers and known issues](#blockers-and-known-issues)   |     7 |
 | [Deliberately not built](#deliberately-not-built)         |     1 |
 | [Accessibility gaps](#accessibility-gaps)                 |     5 |
-| [Planned projects](#planned-projects)                     |     1 |
+| [Planned projects](#planned-projects)                     |     4 |
 | [Waiting on browser support](#waiting-on-browser-support) |     4 |
 
 ---
@@ -30,6 +30,7 @@ Something that misbehaves, or a cost nobody has paid down.
 | 10  | **Any placed control**     | Nothing stops a layout outgrowing the room it is in — a ring can reach past the screen, and a placed toolbar has nothing to collapse into                                                                     |
 | 10  | **`Menu`, hold and flick** | How far a flick must travel to pick an item is a guess — about 30px on the demo wheel — not a measured number                                                                                                 |
 | 12  | **`Die`, stepping**        | Pressing the same arrow a few times sends the die back and forth between two or three faces, because each step spins the new face upright. No fix chosen; the three put were judged inadequate                |
+| 17  | **Every text field**       | In right-to-left text the leading and trailing slots stay on the physical left and right, the wrong way round                                                                                                 |
 | 14  | **`Select`, long lists**   | Drawing the options on screen costs as much as it ever did; windowing only removed the cost of creating them. No fix known                                                                                    |
 
 ## Deliberately not built
@@ -57,6 +58,9 @@ They cluster, and no single item owns them.
 | #   | What                                          | Standing                                                                                                      |
 | --- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
 | 2   | **A consumer-facing layer above the library** | **Deferred to a near-future session of its own.** Painted, ready-to-use controls, as Magic UI sells templates |
+| 18  | **Checkbox and Toggle text**                  | Their painters draw only the box; they should draw their text as Radio's does, and lose their Label sections  |
+| 16  | **Docs pages awaiting ports and specs**       | Carousel, EdgeFader, Form, five text fields and four choice inputs have Docs pages in Solid only; specs lag   |
+| 15  | **WCAG links and prop names in the docs**     | Intros, section text and the API tables name criteria and props as plain text; only the alerts link criteria  |
 
 ## Waiting on browser support
 

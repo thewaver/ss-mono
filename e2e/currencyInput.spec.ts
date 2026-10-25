@@ -90,23 +90,22 @@ test("an emptied field has no value rather than a zero", async ({ page }) => {
     );
 });
 
-test("a bound refuses a value as it is typed rather than nudging it", async ({ page }) => {
+test("a bound leaves a typed amount alone until the field is left, then pulls it back", async ({ page }) => {
     await typeInto(page, field(BOUNDED), "600000");
 
     expect(await inputValue(page.locator(field(BOUNDED))), "the text is what was typed").toBe("6,000.00");
-    expect(
-        await readout(page, "bounded"),
-        "while the owner keeps the last amount the bound allowed, which is what 600000 passed through on its way up",
-    ).toContain("value: 600 —");
+    expect(await readout(page, "bounded"), "and so, for now, is the value").toContain("value: 6000 —");
     await expect(
         page.locator(field(BOUNDED)),
-        "and the field says the figure it is showing is not the value",
-    ).toHaveAttribute("aria-invalid", "true");
+        "a bound is not a format, so nothing is marked wrong",
+    ).not.toHaveAttribute("aria-invalid", "true");
 
-    await typeInto(page, field(BOUNDED), "400000");
+    await page.keyboard.press("Tab");
 
-    expect(await readout(page, "bounded"), "and one inside it is").toContain("value: 4000 —");
-    await expect(page.locator(field(BOUNDED)), "with the mark gone again").not.toHaveAttribute("aria-invalid", "true");
+    expect(await readout(page, "bounded"), "leaving the field pulls the value back to the bound").toContain(
+        "value: 5000 —",
+    );
+    expect(await inputValue(page.locator(field(BOUNDED))), "and the text follows it").toBe("5,000.00");
 });
 
 test("reads a pasted amount in punctuation it does not use", async ({ page }) => {

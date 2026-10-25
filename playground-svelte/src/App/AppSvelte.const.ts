@@ -105,7 +105,6 @@ const ShapePage = () => import("./Pages/ShapePage/ShapePage.svelte");
 const ShapeRevealPage = () => import("./Pages/ShapeRevealPage/ShapeRevealPage.svelte");
 const SidebarPage = () => import("./Pages/SidebarPage/SidebarPage.svelte");
 const SlideButtonDocs = () => import("./Pages/SlideButtonPage/SlideButtonDocs.svelte");
-const SlideButtonPage = () => import("./Pages/SlideButtonPage/SlideButtonPage.svelte");
 const SortableGridPage = () => import("./Pages/SortableGridPage/SortableGridPage.svelte");
 const SortablePage = () => import("./Pages/SortablePage/SortablePage.svelte");
 const SplitPanePage = () => import("./Pages/SplitPanePage/SplitPanePage.svelte");
@@ -286,7 +285,6 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                     },
                     {
                         name: "SlideButton",
-                        component: SlideButtonPage,
                         docs: SlideButtonDocs,
                     },
                 ],

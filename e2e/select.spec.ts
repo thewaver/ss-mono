@@ -370,6 +370,42 @@ test("a windowed row's slot is exactly the height of the row inside it", async (
     expect(measured.widest, "and consecutive rows meet rather than leaving a hairline").toBeLessThan(0.05);
 });
 
+/**
+ * A windowed list places each row by how far down the list it is, and the highlight that slides to the option under
+ * the pointer finds that option by its position in the layout. Rows placed with a transform all report the top of the
+ * list there, so the highlight stayed at the top whatever was hovered. Hover several options and check the highlight
+ * sits on each.
+ */
+const HIGHLIGHT = `${LISTBOX} div[style*="transition-duration"]`;
+
+test("in a windowed list, the highlight lands on the option under the pointer", async ({ page }) => {
+    await page.locator(field("virtualized")).click();
+    await expect(page.locator(OPTION).first()).toBeVisible();
+
+    const options = page.locator(OPTION);
+    const count = Math.min(await options.count(), 4);
+
+    for (let index = 1; index < count; index++) {
+        const option = options.nth(index);
+
+        await option.hover();
+
+        await expect
+            .poll(
+                async () => {
+                    const optionBox = await option.boundingBox();
+                    const highlightBox = await page.locator(HIGHLIGHT).first().boundingBox();
+
+                    return optionBox === null || highlightBox === null
+                        ? undefined
+                        : Math.abs(highlightBox.y - optionBox.y);
+                },
+                { message: `the highlight sits on option ${index}` },
+            )
+            .toBeLessThan(1);
+    }
+});
+
 test("a list given an estimated height mounts a window rather than every option", async ({ page }) => {
     const stress = "virtualized";
 

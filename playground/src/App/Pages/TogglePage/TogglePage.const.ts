@@ -8,3 +8,5 @@ export const EXAMPLE_NAMES = {
 };
 
 export const EXAMPLES_ROOT = "/src/App/Pages/TogglePage/Examples";
+
+export const DOCS_ROOT = "/src/App/Pages/TogglePage/Docs";

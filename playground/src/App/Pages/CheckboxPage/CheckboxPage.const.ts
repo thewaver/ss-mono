@@ -9,3 +9,5 @@ export const EXAMPLE_NAMES = {
 };
 
 export const EXAMPLES_ROOT = "/src/App/Pages/CheckboxPage/Examples";
+
+export const DOCS_ROOT = "/src/App/Pages/CheckboxPage/Docs";

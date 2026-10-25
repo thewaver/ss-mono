@@ -4,3 +4,5 @@ export const EXAMPLE_NAMES = {
 };
 
 export const EXAMPLES_ROOT = "/src/App/Pages/FormPage/Examples";
+
+export const DOCS_ROOT = "/src/App/Pages/FormPage/Docs";

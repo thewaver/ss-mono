@@ -23,7 +23,7 @@ import {
 
 type Props = {
     controls: CarouselControls;
-    isDisabled: MaybeAccessor<boolean>;
+    isDisabled?: MaybeAccessor<boolean>;
     hasPicks?: boolean;
     hasRotation?: boolean;
 };
@@ -53,7 +53,7 @@ export const PageCarouselsBar = (props: Props) => {
 
         return (
             <InteractionWrapper
-                isDisabled={() => access(props.isDisabled)}
+                isDisabled={() => access(props.isDisabled) ?? false}
                 renderControl={(setElementRef, getFlags) => (
                     <button
                         ref={setElementRef}
@@ -80,7 +80,7 @@ export const PageCarouselsBar = (props: Props) => {
             <Show when={props.hasRotation}>
                 <Button
                     ariaLabel={() => computeCarouselRotationLabel(props.controls.getIsPlaying())}
-                    isDisabled={() => access(props.isDisabled)}
+                    isDisabled={() => access(props.isDisabled) ?? false}
                     renderContent={(getFlags) => (
                         <PageCarouselRotation flags={getFlags} isPlaying={props.controls.getIsPlaying} />
                     )}

@@ -67,13 +67,18 @@ export namespace MaskedFieldReactUtils {
         return {
             text: [text, type] as const,
             digits,
-            hasIssue: MaskedFieldUtils.computeHasIssue(digits, hasLeft, ruleDefs),
+            hasIssue:
+                MaskedFieldUtils.computeHasIssue(digits, hasLeft, ruleDefs) ||
+                MaskedFieldUtils.getIsUnheld(defs.value, text, defs),
             formatValue: (value: T) => MaskedFieldUtils.formatValue(value, defs),
             commit,
             refresh,
             onInput: () => setHasLeft(false),
             onBlur: () => {
                 setHasLeft(true);
+
+                if (defs.value !== undefined && defs.settleValue) commit(defs.settleValue(defs.value));
+
                 refresh();
             },
         };

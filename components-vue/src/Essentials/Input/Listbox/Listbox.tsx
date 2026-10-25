@@ -434,7 +434,7 @@ export const ListboxOptions = defineComponent(
                         key={row.index}
                         ref={rowWindow.measureRow(row.index)}
                         class={ListboxStyles.listboxSizerRow}
-                        style={{ transform: `translateY(${rowWindow.getRowStart(row)}px)` }}
+                        style={{ top: `${rowWindow.getRowStart(row)}px` }}
                     >
                         {source.isEntry
                             ? renderOptionSlot(source.node as SelectOption<T>, source.entryOffset, row.index)

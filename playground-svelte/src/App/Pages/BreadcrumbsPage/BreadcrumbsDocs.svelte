@@ -6,6 +6,7 @@
     } from "@thewaver/ss-playground/App/Pages/BreadcrumbsPage/BreadcrumbsPage.const";
     import type { BreadcrumbSeparatorKey } from "@thewaver/ss-playground/App/Pages/BreadcrumbsPage/BreadcrumbsPage.types";
 
+    import PageDocsAlert from "../../PageComponents/DocsAlert/PageDocsAlert.svelte";
     import PageDocsExample from "../../PageComponents/DocsExample/PageDocsExample.svelte";
     import PageDocsSection from "../../PageComponents/DocsSection/PageDocsSection.svelte";
     import PageCheckField from "../../PageComponents/Field/PageCheckField.svelte";
@@ -19,6 +20,11 @@
     let hasLinkComponent = $state(false);
 </script>
 
+<PageDocsAlert severity="info">
+    The separators here are only examples. renderSeparator draws whatever you return, so what sits between the
+    crumbs is entirely yours: text, an icon, any markup.
+</PageDocsAlert>
+
 <PageDocsExample path={`${DOCS_ROOT}/Basic.svelte`}>
     <BasicDocsExample {isDisabled} {separator} />
 
@@ -26,7 +32,7 @@
         <PageProp
             itemKey={"separator"}
             label={"Separator"}
-            hint={'What is drawn between the crumbs. The slot is yours: any markup works, and these are four examples. Choosing "none" leaves the slot out, so nothing sits between the crumbs and no empty element is rendered. Where drawn, it is hidden from assistive technology.'}
+            hint={'What is drawn between the crumbs. Choosing "none" leaves the slot out, so nothing sits between the crumbs and no empty element is rendered. Where drawn, it is hidden from assistive technology.'}
             controls={'Passes BreadcrumbsProps.renderSeparator, or omits it for "none"'}
         >
             <PageSelectField

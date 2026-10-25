@@ -42,7 +42,10 @@ export namespace MaskedFieldSvelteUtils {
 
         const digits = $derived(MaskedFieldUtils.readDigits(text, defs));
 
-        const hasIssue = $derived(MaskedFieldUtils.computeHasIssue(digits, hasLeft, defs));
+        const hasIssue = $derived(
+            MaskedFieldUtils.computeHasIssue(digits, hasLeft, defs) ||
+                MaskedFieldUtils.getIsUnheld(defs.getValue(), text, defs),
+        );
 
         const refresh = () => {
             untrack(() => {
@@ -93,7 +96,7 @@ export namespace MaskedFieldSvelteUtils {
 
                 if (!isRespelled || spelling === text) return;
 
-                type(spelling);
+                text = spelling;
             });
         });
 
@@ -109,6 +112,11 @@ export namespace MaskedFieldSvelteUtils {
             },
             onBlur: () => {
                 hasLeft = true;
+
+                const value = untrack(defs.getValue);
+
+                if (value !== undefined && defs.settleValue) commit(defs.settleValue(value));
+
                 refresh();
             },
         };

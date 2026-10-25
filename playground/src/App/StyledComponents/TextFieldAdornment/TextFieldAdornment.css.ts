@@ -2,6 +2,7 @@ import { style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
 import { layerVars } from "../Layer/Layer.css";
+import { FIELD_FONT_SIZE } from "../TextFieldContent/TextFieldContent.css";
 
 export const isHovered = style({});
 export const isDisabled = style({});
@@ -11,15 +12,18 @@ export const textFieldAdornment = style({
     justifyContent: "center",
     alignItems: "center",
     height: 26,
-    paddingInline: themeVars.spacing.full,
     borderRadius: themeVars.borderRadius.half,
     color: `rgb(from ${layerVars.contrast} r g b / 65%)`,
-    fontSize: themeVars.fontSize.xSmall,
-    textTransform: "uppercase",
+    fontSize: FIELD_FONT_SIZE,
     transition: `background-color ${themeVars.animation.duration}, color ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}`,
 
     selectors: {
-        [`&.${isHovered}`]: {
+        [`:is(button, [role='button']) &`]: {
+            paddingInline: themeVars.spacing.full,
+            fontSize: themeVars.fontSize.xSmall,
+            textTransform: "uppercase",
+        },
+        [`:is(button, [role='button']) &.${isHovered}`]: {
             color: layerVars.contrast,
             backgroundColor: `rgb(from ${layerVars.contrast} r g b / 10%)`,
         },

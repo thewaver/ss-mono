@@ -27,8 +27,6 @@ export const TimeInput = (props: TimeInputProps) => {
             segmentCount: getSegmentCount(),
             isTwelveHour: getIsTwelveHour(),
             meridiem: untrack(getMeridiem),
-            minValue: access(props.minValue),
-            maxValue: access(props.maxValue),
         });
 
     const field = MaskedFieldSolidUtils.createField<TimeValue>({
@@ -41,6 +39,7 @@ export const TimeInput = (props: TimeInputProps) => {
         getHasImpossibleDigits: (digits) =>
             TimeInputUtils.getHasImpossibleSegment(digits, getSegmentCount(), getIsTwelveHour()),
         getIsSame: TimeUtils.isSame,
+        settleValue: (value) => TimeUtils.clamp(value, access(props.minValue), access(props.maxValue)),
     });
 
     createEffect(() => {

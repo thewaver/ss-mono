@@ -48,8 +48,6 @@ export const DateInput = (props: DateInputProps) => {
             format: untrack(getFormat),
             calendar: untrack(getCalendar),
             era: untrack(getFieldValue)?.era ?? untrack(getEra),
-            minValue: access(props.minValue),
-            maxValue: access(props.maxValue),
         });
 
     const field = MaskedFieldSolidUtils.createField<DateValue>({
@@ -61,6 +59,7 @@ export const DateInput = (props: DateInputProps) => {
         fromDigits,
         getHasImpossibleDigits: (digits) => DateInputUtils.getHasImpossiblePart(digits, getFormat(), getBounds()),
         getIsSame: DateValueUtils.isSame,
+        settleValue: (value) => DateValueUtils.clamp(value, access(props.minValue), access(props.maxValue)),
     });
 
     createEffect(() => {

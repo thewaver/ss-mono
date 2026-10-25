@@ -260,7 +260,7 @@
     <div
         {@attach rowWindow.measureRow(row.index)}
         class={styles.listboxSizerRow}
-        style:transform={`translateY(${rowWindow.getRowStart(row)}px)`}
+        style:top={`${rowWindow.getRowStart(row)}px`}
     >
         {#if source.isEntry}
             {@render optionSlot(source.node as SelectOption<T>, source.entryOffset)}

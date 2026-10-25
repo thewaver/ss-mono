@@ -63,7 +63,12 @@ const buildField = (initial?: Time, isRuleReadUntracked = false) => {
         return disposeRoot;
     });
 
-    return { value, twelveHour, field, written, type: (text: string) => field.text[1](text), dispose };
+    const type = (text: string) => {
+        field.text[1](text);
+        field.onInput();
+    };
+
+    return { value, twelveHour, field, written, type, dispose };
 };
 
 describe("createField", () => {

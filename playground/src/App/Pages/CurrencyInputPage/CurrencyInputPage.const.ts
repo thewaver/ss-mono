@@ -22,3 +22,5 @@ export const STARTING_BUDGET = 4999.99;
 export const STARTING_BIG = 9876543210.12;
 
 export const STARTING_ADJUSTMENT = -250.5;
+
+export const DOCS_ROOT = "/src/App/Pages/CurrencyInputPage/Docs";

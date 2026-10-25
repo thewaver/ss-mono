@@ -68,7 +68,11 @@ export namespace MaskedFieldVueUtils {
         return {
             text,
             digits,
-            hasIssue: computed(() => MaskedFieldUtils.computeHasIssue(digits.value, hasLeft.value, defs)),
+            hasIssue: computed(
+                () =>
+                    MaskedFieldUtils.computeHasIssue(digits.value, hasLeft.value, defs) ||
+                    MaskedFieldUtils.getIsUnheld(defs.getValue(), textValue.value, defs),
+            ),
             formatValue: (value: T) => MaskedFieldUtils.formatValue(value, defs),
             commit,
             refresh,
@@ -77,6 +81,11 @@ export namespace MaskedFieldVueUtils {
             },
             onBlur: () => {
                 hasLeft.value = true;
+
+                const value = defs.getValue();
+
+                if (value !== undefined && defs.settleValue) commit(defs.settleValue(value));
+
                 refresh();
             },
         };

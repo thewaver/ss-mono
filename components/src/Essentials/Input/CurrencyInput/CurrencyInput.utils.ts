@@ -1,4 +1,4 @@
-import { DecimalUtils } from "@thewaver/ss-utils";
+import { DecimalUtils, MathUtils } from "@thewaver/ss-utils";
 
 import type { MaskedFieldDefs } from "../../../Abstracts/MaskedField/MaskedField.types";
 import type { TextSyncGroupDefs } from "../../../Abstracts/TextSync/TextSync.types";
@@ -53,9 +53,10 @@ export namespace CurrencyInputUtils {
      * Everything `MaskedFieldUtils` needs to know about an amount except where the amount is held.
      *
      * Digits become an amount by placing the decimal separator `decimals` from the right, with a leading minus
-     * read as the sign where the field takes one. An amount outside the bounds is no amount at all, so typing past
-     * a bound leaves the last amount inside it in place and marks what is shown as wrong, rather than nudging the
-     * figure back. A complete entry has no fixed length.
+     * read as the sign where the field takes one. A held negative amount is still written with its minus where the
+     * field takes no sign, so it is shown as it is and marked, never quietly turned positive. The bounds do not make
+     * an amount wrong: one outside them is kept as typed and pulled to the nearest bound when the field settles. A
+     * complete entry has no fixed length.
      *
      * Each rule reads only the getters it needs, every time it is called, so a change of locale, grouping or bounds
      * takes effect without the rules being made again — and a framework that follows what each rule reads is told
@@ -79,25 +80,20 @@ export namespace CurrencyInputUtils {
 
             if (magnitude === undefined) return undefined;
 
-            const parsed = isNegative ? -magnitude : magnitude;
-
-            const min = defs.getMin();
-            const max = defs.getMax();
-
-            return (min !== undefined && parsed < min) || (max !== undefined && parsed > max) ? undefined : parsed;
+            return isNegative ? -magnitude : magnitude;
         };
 
         return {
-            formatDigits: (digits) => TextSyncUtils.formatWithGroups(defs.getGroupDefs(), digits),
+            formatDigits: (digits) => TextSyncUtils.formatWithGroups({ ...defs.getGroupDefs(), hasSign: true }, digits),
             readDigits: (text) =>
                 defs.getHasSign() ? TextSyncUtils.readSignedDigits(text) : TextSyncUtils.getMaskedDigits(text),
             getDigitCount: () => undefined,
             toDigits: (value) =>
-                (value < 0 && defs.getHasSign() ? TextSyncUtils.MASK_MINUS : "") +
-                DecimalUtils.toDigits(value, defs.getDecimals()),
+                (value < 0 ? TextSyncUtils.MASK_MINUS : "") + DecimalUtils.toDigits(value, defs.getDecimals()),
             fromDigits,
             getHasImpossibleDigits: (digits) => digits.length > 0 && fromDigits(digits) === undefined,
             getIsSame: (a, b) => a === b,
+            settleValue: (value) => MathUtils.clamp(value, defs.getMin() ?? -Infinity, defs.getMax() ?? Infinity),
         };
     };
 }

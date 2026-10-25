@@ -67,8 +67,8 @@ const side = shallowRef<CollapsibleSide>("right");
     </PageDocsExample>
 
     <PageDocsSection title="Opening to a side">
-        side chooses which side of the trigger the panel opens on. Top and bottom grow the panel's height, left and
-        right its width; a sideways panel keeps its contents at their own width and uncovers them, so give them one.
+        Set side to choose which side of the trigger the panel opens on. Top and bottom grow the panel's height, left
+        and right its width; a sideways panel keeps its contents at their own width and uncovers them, so give them one.
     </PageDocsSection>
 
     <PageDocsExample :path="`${DOCS_ROOT}/Side.vue`">

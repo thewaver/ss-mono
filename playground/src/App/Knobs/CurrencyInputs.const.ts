@@ -5,4 +5,7 @@ export namespace CurrencyInputKnobs {
 
     export const STARTING_LOCALE = "en-GB";
     export const STARTING_HAS_SIGN = false;
+    export const MIN_MAX = 100;
+    export const MAX_MAX = 100_000;
+    export const MAX_STEP = 100;
 }

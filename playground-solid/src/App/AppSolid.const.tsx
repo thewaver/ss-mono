@@ -24,14 +24,13 @@ const CollapsibleDocs = lazyPage(() => import("./Pages/Accordions/CollapsiblePag
 const AudioSwitcherPage = lazyPage(() => import("./Pages/AudioSwitcherPage/AudioSwitcherPage"), "AudioSwitcherPage");
 const BracketPage = lazyPage(() => import("./Pages/BracketPage/BracketPage"), "BracketPage");
 const BreadcrumbsDocs = lazyPage(() => import("./Pages/BreadcrumbsPage/BreadcrumbsDocs"), "BreadcrumbsDocs");
-const ButtonPage = lazyPage(() => import("./Pages/ButtonPage/ButtonPage"), "ButtonPage");
 const ButtonDocs = lazyPage(() => import("./Pages/ButtonPage/ButtonDocs"), "ButtonDocs");
 const CalendarPage = lazyPage(() => import("./Pages/CalendarPage/CalendarPage"), "CalendarPage");
 const CardStackPage = lazyPage(() => import("./Pages/CardStackPage/CardStackPage"), "CardStackPage");
-const CarouselPage = lazyPage(() => import("./Pages/Carousels/CarouselPage/CarouselPage"), "CarouselPage");
+const CarouselDocs = lazyPage(() => import("./Pages/Carousels/CarouselPage/CarouselDocs"), "CarouselDocs");
 const CellAnimationPage = lazyPage(() => import("./Pages/CellAnimationPage/CellAnimationPage"), "CellAnimationPage");
 const CheckboxGroupPage = lazyPage(() => import("./Pages/CheckboxGroupPage/CheckboxGroupPage"), "CheckboxGroupPage");
-const CheckboxPage = lazyPage(() => import("./Pages/CheckboxPage/CheckboxPage"), "CheckboxPage");
+const CheckboxDocs = lazyPage(() => import("./Pages/CheckboxPage/CheckboxDocs"), "CheckboxDocs");
 const CirclePackingPage = lazyPage(() => import("./Pages/CirclePackingPage/CirclePackingPage"), "CirclePackingPage");
 const ClockPage = lazyPage(() => import("./Pages/ClockPage/ClockPage"), "ClockPage");
 const ColorAreaPage = lazyPage(() => import("./Pages/ColorAreaPage/ColorAreaPage"), "ColorAreaPage");
@@ -42,7 +41,7 @@ const CornerHighlightPage = lazyPage(
 );
 const CornerPinPage = lazyPage(() => import("./Pages/CornerPinPage/CornerPinPage"), "CornerPinPage");
 const CuboidPage = lazyPage(() => import("./Pages/CuboidPage/CuboidPage"), "CuboidPage");
-const CurrencyInputPage = lazyPage(() => import("./Pages/CurrencyInputPage/CurrencyInputPage"), "CurrencyInputPage");
+const CurrencyInputDocs = lazyPage(() => import("./Pages/CurrencyInputPage/CurrencyInputDocs"), "CurrencyInputDocs");
 const DateInputPage = lazyPage(() => import("./Pages/DateInputPage/DateInputPage"), "DateInputPage");
 const DatePickerPage = lazyPage(() => import("./Pages/DatePickerPage/DatePickerPage"), "DatePickerPage");
 const DateRangePickerPage = lazyPage(
@@ -55,7 +54,7 @@ const DateTimePickerPage = lazyPage(
 );
 const DiePage = lazyPage(() => import("./Pages/DiePage/DiePage"), "DiePage");
 const DrawerPage = lazyPage(() => import("./Pages/DrawerPage/DrawerPage"), "DrawerPage");
-const EdgeFaderPage = lazyPage(() => import("./Pages/EdgeFaderPage/EdgeFaderPage"), "EdgeFaderPage");
+const EdgeFaderDocs = lazyPage(() => import("./Pages/EdgeFaderPage/EdgeFaderDocs"), "EdgeFaderDocs");
 const FileInputPage = lazyPage(() => import("./Pages/FileInputPage/FileInputPage"), "FileInputPage");
 const FlipCardPage = lazyPage(() => import("./Pages/FlipCardPage/FlipCardPage"), "FlipCardPage");
 const FlipbookPage = lazyPage(() => import("./Pages/FlipbookPage/FlipbookPage"), "FlipbookPage");
@@ -64,7 +63,7 @@ const InfiniteCorridorPage = lazyPage(
     "InfiniteCorridorPage",
 );
 const FormFieldPage = lazyPage(() => import("./Pages/FormFieldPage/FormFieldPage"), "FormFieldPage");
-const FormPage = lazyPage(() => import("./Pages/FormPage/FormPage"), "FormPage");
+const FormDocs = lazyPage(() => import("./Pages/FormPage/FormDocs"), "FormDocs");
 const FormSectionPage = lazyPage(() => import("./Pages/FormSectionPage/FormSectionPage"), "FormSectionPage");
 const FormationPage = lazyPage(() => import("./Pages/FormationPage/FormationPage"), "FormationPage");
 const GlassSurfacePage = lazyPage(() => import("./Pages/GlassSurfacePage/GlassSurfacePage"), "GlassSurfacePage");
@@ -88,8 +87,8 @@ const ElementMosaicPage = lazyPage(
     "ElementMosaicPage",
 );
 const ImageMosaicPage = lazyPage(() => import("./Pages/Mosaics/ImageMosaicPage/ImageMosaicPage"), "ImageMosaicPage");
-const MultiSelectPage = lazyPage(() => import("./Pages/MultiSelectPage/MultiSelectPage"), "MultiSelectPage");
-const NumberInputPage = lazyPage(() => import("./Pages/NumberInputPage/NumberInputPage"), "NumberInputPage");
+const MultiSelectDocs = lazyPage(() => import("./Pages/MultiSelectPage/MultiSelectDocs"), "MultiSelectDocs");
+const NumberInputDocs = lazyPage(() => import("./Pages/NumberInputPage/NumberInputDocs"), "NumberInputDocs");
 const FittedTextPage = lazyPage(() => import("./Pages/FittedTextPage/FittedTextPage"), "FittedTextPage");
 const MorphTextPage = lazyPage(() => import("./Pages/MorphTextPage/MorphTextPage"), "MorphTextPage");
 const SlotTextPage = lazyPage(() => import("./Pages/SlotTextPage/SlotTextPage"), "SlotTextPage");
@@ -117,7 +116,7 @@ const ShadowCasterPage = lazyPage(
 const TilterPage = lazyPage(() => import("./Pages/PointerEffects/TilterPage/TilterPage"), "TilterPage");
 const PreviewPage = lazyPage(() => import("./Pages/PreviewPage/PreviewPage"), "PreviewPage");
 const ProgressPage = lazyPage(() => import("./Pages/ProgressPage/ProgressPage"), "ProgressPage");
-const RadioPage = lazyPage(() => import("./Pages/RadioPage/RadioPage"), "RadioPage");
+const RadioDocs = lazyPage(() => import("./Pages/RadioPage/RadioDocs"), "RadioDocs");
 const RangeCalendarPage = lazyPage(() => import("./Pages/RangeCalendarPage/RangeCalendarPage"), "RangeCalendarPage");
 const RangePage = lazyPage(() => import("./Pages/RangePage/RangePage"), "RangePage");
 const LensPage = lazyPage(() => import("./Pages/Reveals/LensPage/LensPage"), "LensPage");
@@ -152,11 +151,10 @@ const SegmentedInputPage = lazyPage(
     () => import("./Pages/SegmentedInputPage/SegmentedInputPage"),
     "SegmentedInputPage",
 );
-const SelectPage = lazyPage(() => import("./Pages/SelectPage/SelectPage"), "SelectPage");
+const SelectDocs = lazyPage(() => import("./Pages/SelectPage/SelectDocs"), "SelectDocs");
 const ShapePage = lazyPage(() => import("./Pages/ShapePage/ShapePage"), "ShapePage");
 const ShapeRevealPage = lazyPage(() => import("./Pages/ShapeRevealPage/ShapeRevealPage"), "ShapeRevealPage");
 const SidebarPage = lazyPage(() => import("./Pages/SidebarPage/SidebarPage"), "SidebarPage");
-const SlideButtonPage = lazyPage(() => import("./Pages/SlideButtonPage/SlideButtonPage"), "SlideButtonPage");
 const SlideButtonDocs = lazyPage(() => import("./Pages/SlideButtonPage/SlideButtonDocs"), "SlideButtonDocs");
 const SortableGridPage = lazyPage(() => import("./Pages/SortableGridPage/SortableGridPage"), "SortableGridPage");
 const SortablePage = lazyPage(() => import("./Pages/SortablePage/SortablePage"), "SortablePage");
@@ -184,14 +182,14 @@ const TableOfContentsPage = lazyPage(
 const TablePage = lazyPage(() => import("./Pages/TablePage/TablePage"), "TablePage");
 const TabsPage = lazyPage(() => import("./Pages/TabsPage/TabsPage"), "TabsPage");
 const TagInputPage = lazyPage(() => import("./Pages/TagInputPage/TagInputPage"), "TagInputPage");
-const TextAreaPage = lazyPage(() => import("./Pages/TextAreaPage/TextAreaPage"), "TextAreaPage");
-const TextInputPage = lazyPage(() => import("./Pages/TextInputPage/TextInputPage"), "TextInputPage");
+const TextAreaDocs = lazyPage(() => import("./Pages/TextAreaPage/TextAreaDocs"), "TextAreaDocs");
+const TextInputDocs = lazyPage(() => import("./Pages/TextInputPage/TextInputDocs"), "TextInputDocs");
 const TileBoardPage = lazyPage(() => import("./Pages/TileBoardPage/TileBoardPage"), "TileBoardPage");
 const TimeInputPage = lazyPage(() => import("./Pages/TimeInputPage/TimeInputPage"), "TimeInputPage");
 const TimePickerPage = lazyPage(() => import("./Pages/TimePickerPage/TimePickerPage"), "TimePickerPage");
 const TimelinePage = lazyPage(() => import("./Pages/TimelinePage/TimelinePage"), "TimelinePage");
 const ToastsPage = lazyPage(() => import("./Pages/ToastsPage/ToastsPage"), "ToastsPage");
-const TogglePage = lazyPage(() => import("./Pages/TogglePage/TogglePage"), "TogglePage");
+const ToggleDocs = lazyPage(() => import("./Pages/TogglePage/ToggleDocs"), "ToggleDocs");
 const ToolbarPage = lazyPage(() => import("./Pages/ToolbarPage/ToolbarPage"), "ToolbarPage");
 const TooltipPage = lazyPage(() => import("./Pages/TooltipPage/TooltipPage"), "TooltipPage");
 const TrailPage = lazyPage(() => import("./Pages/TrailPage/TrailPage"), "TrailPage");
@@ -351,27 +349,25 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                 children: [
                     {
                         name: "Button",
-                        component: () => <ButtonPage />,
                         docs: () => <ButtonDocs />,
                     },
                     {
                         name: "SlideButton",
-                        component: () => <SlideButtonPage />,
                         docs: () => <SlideButtonDocs />,
                     },
                 ],
             },
             {
                 name: "Carousel",
-                component: () => <CarouselPage />,
+                docs: () => <CarouselDocs />,
             },
             {
                 name: "EdgeFader",
-                component: () => <EdgeFaderPage />,
+                docs: () => <EdgeFaderDocs />,
             },
             {
                 name: "Form",
-                component: () => <FormPage />,
+                docs: () => <FormDocs />,
             },
             {
                 name: "Input",
@@ -382,7 +378,7 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                     },
                     {
                         name: "Checkbox",
-                        component: () => <CheckboxPage />,
+                        docs: () => <CheckboxDocs />,
                     },
                     {
                         name: "CheckboxGroup",
@@ -402,7 +398,7 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                     },
                     {
                         name: "CurrencyInput",
-                        component: () => <CurrencyInputPage />,
+                        docs: () => <CurrencyInputDocs />,
                     },
                     {
                         name: "DateInput",
@@ -442,15 +438,15 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                     },
                     {
                         name: "MultiSelect",
-                        component: () => <MultiSelectPage />,
+                        docs: () => <MultiSelectDocs />,
                     },
                     {
                         name: "NumberInput",
-                        component: () => <NumberInputPage />,
+                        docs: () => <NumberInputDocs />,
                     },
                     {
                         name: "Radio",
-                        component: () => <RadioPage />,
+                        docs: () => <RadioDocs />,
                     },
                     {
                         name: "Range",
@@ -466,7 +462,7 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                     },
                     {
                         name: "Select",
-                        component: () => <SelectPage />,
+                        docs: () => <SelectDocs />,
                     },
                     {
                         name: "TagInput",
@@ -474,11 +470,11 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                     },
                     {
                         name: "TextArea",
-                        component: () => <TextAreaPage />,
+                        docs: () => <TextAreaDocs />,
                     },
                     {
                         name: "TextInput",
-                        component: () => <TextInputPage />,
+                        docs: () => <TextInputDocs />,
                     },
                     {
                         name: "TimeInput",
@@ -490,7 +486,7 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                     },
                     {
                         name: "Toggle",
-                        component: () => <TogglePage />,
+                        docs: () => <ToggleDocs />,
                     },
                 ],
             },

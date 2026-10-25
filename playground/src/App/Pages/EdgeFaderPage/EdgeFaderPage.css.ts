@@ -78,3 +78,10 @@ export const cardTitle = style({
 export const cardText = style({
     margin: 0,
 });
+
+export const EDGE_FADER_DOCS_MAX_WIDTH = 480;
+
+export const docsCardFrame = style({
+    width: "100%",
+    maxWidth: EDGE_FADER_DOCS_MAX_WIDTH,
+});

@@ -45,11 +45,10 @@ export const DateInput = (props: DateInputProps) => {
                 format,
                 calendar,
                 era: fieldValue?.era ?? era,
-                minValue: props.minValue,
-                maxValue: props.maxValue,
             }),
         getHasImpossibleDigits: (digits) => DateInputUtils.getHasImpossiblePart(digits, format, bounds),
         getIsSame: DateValueUtils.isSame,
+        settleValue: (value) => DateValueUtils.clamp(value, props.minValue, props.maxValue),
     });
 
     useEffect(() => {

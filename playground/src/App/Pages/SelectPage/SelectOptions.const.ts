@@ -1,5 +1,6 @@
 import type { SelectItemRecord, SelectOptionRecord } from "@thewaver/ss-components";
 
+import { PAGED_TOTAL, PAGE_DELAY_MS, PAGE_SIZE } from "./SelectPage.const";
 import type { Airport, Delivery } from "./SelectRecords.types";
 
 import { FIELD_CHEVRON_WIDTH, FIELD_GAP, FIELD_PADDING } from "../../StyledComponents/SelectContent/SelectContent.css";
@@ -106,4 +107,26 @@ export const createStressDeliveryGroups = (count: number): SelectItemRecord<Deli
             label: `Depot ${groupIndex + 1}`,
             options: createStressDeliveries(Math.min(STRESS_GROUP_SIZE, count - offset), offset),
         };
+    });
+
+const SERVER_ROUTES = createStressDeliveries(PAGED_TOTAL);
+
+export const fetchRoutes = (offset: number) =>
+    new Promise<SelectOptionRecord<Delivery, never>[]>((resolve) => {
+        setTimeout(
+            () => resolve(createStressDeliveries(Math.min(PAGE_SIZE, PAGED_TOTAL - offset), offset)),
+            PAGE_DELAY_MS,
+        );
+    });
+
+export const searchRoutes = (query: string, offset: number) =>
+    new Promise<{ items: SelectOptionRecord<Delivery, never>[]; total: number }>((resolve) => {
+        setTimeout(() => {
+            const needle = query.toLocaleLowerCase();
+            const matched = needle
+                ? SERVER_ROUTES.filter((option) => option.value.name.toLocaleLowerCase().includes(needle))
+                : SERVER_ROUTES;
+
+            resolve({ items: matched.slice(offset, offset + PAGE_SIZE), total: matched.length });
+        }, PAGE_DELAY_MS);
     });

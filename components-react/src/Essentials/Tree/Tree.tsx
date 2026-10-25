@@ -567,7 +567,7 @@ const TreeComposite = <T,>(props: TreeCompositeProps<T>) => {
                           <div
                               key={windowRow.index}
                               className={TreeStyles.treeSizerRow}
-                              style={{ transform: `translateY(${rowWindow.getRowStart(windowRow)}px)` }}
+                              style={{ top: `${rowWindow.getRowStart(windowRow)}px` }}
                               ref={rowWindow.measureRow(windowRow.index)}
                           >
                               {renderRow(row)}

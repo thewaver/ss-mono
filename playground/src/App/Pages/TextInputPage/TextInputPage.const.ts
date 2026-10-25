@@ -41,3 +41,5 @@ export const EXAMPLE_NAMES = {
 };
 
 export const EXAMPLES_ROOT = "/src/App/Pages/TextInputPage/Examples";
+
+export const DOCS_ROOT = "/src/App/Pages/TextInputPage/Docs";

@@ -1,6 +1,6 @@
 import { type Locator, type Page, expect, test } from "@playwright/test";
 
-import { activeMatches, demo, prop, readout, tabIndex } from "./helpers";
+import { activeMatches, prop, tabIndex } from "./helpers";
 
 /**
  * The control has no examples of its own: its page is the Docs view, whose first live example takes the knobs for the
@@ -491,45 +491,4 @@ test("a button held at its end is announced as pressed, and released when the pa
     await expect
         .poll(async () => (await thumbSpan(page, HELD)).start, { message: "and the thumb drops back to the start" })
         .toBeLessThan(0.01);
-});
-
-/**
- * The Examples page's one example: three locks, each armed by confirming it and held at its end, and all three reset
- * together once the last is armed. They are armed with a held Enter, the route that takes the same time on every
- * machine, and each is found by the name it is given, one per lock. The hue and the finale's brightening are paint,
- * which a spec does not read.
- */
-const ARMING = demo("arming");
-const LOCKS = ["Lock 1", "Lock 2", "Lock 3"];
-const FINALE_TIMEOUT_MS = 5_000;
-
-test("arming every lock runs the finale and then resets them all", async ({ page }) => {
-    await page.goto("/slide-button");
-
-    const lock = (name: string) => page.locator(ARMING).getByRole("button", { name });
-
-    expect(await readout(page, "arming"), "nothing is armed to begin with").toContain("armed: 0 of 3");
-
-    for (const [index, name] of LOCKS.entries()) {
-        await lock(name).focus();
-        await page.keyboard.down("Enter");
-        await page.waitForTimeout(HOLD_DURATION_MS + HOLD_SLACK_MS);
-        await page.keyboard.up("Enter");
-
-        if (index === LOCKS.length - 1) break;
-
-        await expect(lock(name), "an armed lock is held, and says so").toHaveAttribute("aria-pressed", "true");
-        expect(await readout(page, "arming"), "and the page counts it").toContain(`armed: ${index + 1} of 3`);
-    }
-
-    await expect
-        .poll(() => readout(page, "arming"), {
-            message: "once the last is armed, the finale runs and every lock is reset",
-            timeout: FINALE_TIMEOUT_MS,
-        })
-        .toContain("armed: 0 of 3");
-
-    for (const name of LOCKS) {
-        await expect(lock(name), `${name} is released with the rest`).toHaveAttribute("aria-pressed", "false");
-    }
 });

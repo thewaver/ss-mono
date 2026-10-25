@@ -581,7 +581,7 @@ const TreeComposite = <T,>(props: TreeCompositeProps<T>) => {
                     {(row) => (
                         <div
                             class={styles.treeSizerRow}
-                            style={{ transform: `translateY(${rowWindow.getRowStart(row)}px)` }}
+                            style={{ top: `${rowWindow.getRowStart(row)}px` }}
                             ref={(element) => rowWindow.measureRow(element, row.index)}
                         >
                             {renderRow(() => getFlatRows()[row.index])}

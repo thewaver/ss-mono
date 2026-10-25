@@ -79,10 +79,10 @@ export const MENU_DESCRIPTIONS: Record<string, string> = {
     SlideButton:
         "A button you confirm on purpose, so a stray tap cannot trigger a big action. A person slides the thumb to the end of the track, or presses and holds the button until it fills; a held Enter or Space does the same from the keyboard, and a click from assistive technology confirms at once. Set the mode to slide or hold to accept only one of the two pointer gestures: slide gives up the press-and-hold route that people who cannot drag rely on, so offer another way to the action elsewhere on the page. You draw the track and thumb yourself from how far along the slide is, and it should be given an ariaDescription saying how to confirm, since nothing else tells a screen reader user.",
     Carousel:
-        "Slides stepped one at a time, each drawn by a placement rule from how far it is from the slide showing: in a strip, on a drum, in cover flow, as a depth wave, round a cylinder, as a stack of folders, flipping down on a hinge, or folded back and forth like a concertina. Stepping past either end comes round the short way, it can rotate on its own — holding while the pointer is over it, while anything inside it has focus, and while the tab is in the background — and a progress from outside can drive it, from a scroll or a clock. Every control it draws is optional, so a page that wants its own buttons drives it through the shared index instead.",
+        "Slides shown one at a time, each drawn by a placement rule from how far it is from the slide showing: in a strip, on a drum, in cover flow, as a depth wave, round a cylinder, as a stack of folders, flipping down on a hinge, folded back and forth like a concertina, or on a paddle wheel. It draws the slides and nothing else: it hands you a controller, and you build its buttons on that, wherever you want them. People can also swipe it. It can loop, move on by itself, or follow a progress from outside, such as a scroll. Name it with ariaLabel, and give each slide a name with computeSlideLabel.",
     EdgeFader:
-        "A box whose chosen sides fade to nothing, so content running past an edge trails off rather than being cut. The fade is a mask on the content itself, so it works over any background without being told what is behind it. Fixed, the sides are always faded; scroll-aware, a side fades only while there is more to scroll to that way, and the fade shrinks as that end arrives.",
-    Form: "Association and announcement, and nothing else. The library generates the ids and wires a control to its message; whether a value is valid is the consumer's to decide and to report.",
+        "A box whose chosen sides fade to nothing, so content running past an edge trails off rather than being cut. The fade is a mask on the content itself, so it works over any background without being told what is behind it. The box is also what scrolls: while it scrolls and holds nothing focusable, it becomes a tab stop, announced by its ariaLabel, and the fade lifts while it has keyboard focus so its edges and focus ring show in full.",
+    Form: "A real form element, drawn without the browser's own error bubbles, so Enter submits it and a reset button resets it, neither reloading the page. Its content is told whether any field inside reports an error, as isValid, and whether the form has been sent, as hasSubmitted. Name it with ariaLabel, or with ariaLabelledBy when it shows its own heading.",
     Calendar:
         "A month grid over a date value that carries its own calendar system, so first day, last day and era are asked of the value rather than assumed to be Gregorian.",
     Checkbox:
@@ -95,7 +95,7 @@ export const MENU_DESCRIPTIONS: Record<string, string> = {
     ColorInput:
         "A color field where the browser owns the picker itself. The component owns the trigger and the value, and nothing about what the dialog looks like.",
     CurrencyInput:
-        "A money field, and deliberately not a number field with grouping switched on: the currency decides the symbol, which side it sits on and how many decimals there are, so the mask follows from the locale.",
+        "A field for an amount of money. Digits fill in from the right, so the amount always has its decimals, and the separators are drawn by the field rather than typed; an empty field has no value at all.",
     DateInput:
         "A date typed into a mask rather than picked: the separators belong to the field, each segment is stepped by the arrows, and a half-typed or impossible date leaves the value alone rather than writing something nobody meant. It carries its calendar with it, so an era control appears in the leading slot when the calendar has eras to offer.",
     DatePicker:
@@ -114,20 +114,20 @@ export const MENU_DESCRIPTIONS: Record<string, string> = {
     Listbox:
         "Select's option list standing on its own in the page: no field and no popup, always open. The options take focus themselves, so the list is one tab stop and the arrows move focus from option to option. Groups, typeahead, reachable disabled options, windowing and a horizontal walk that follows the page's text direction all come from the same list Select draws in its popup.",
     MultiSelect:
-        "The same list as Select with more than one value held at once: picking does not close it, a picked option can be picked again to drop it, and the field shows what is chosen rather than one label. Groups, a query and options fetched on demand all work as they do for the single-value list, since both are the same shell with a different value.",
+        "The same list as Select with more than one value held at once: picking does not close it, a picked option can be picked again to drop it, and the field shows what is chosen rather than one label. It is built on the same list as Select, so what Select's page shows about records, groups, a query and options fetched on demand holds here too.",
     NumberInput:
-        "A number field with steppers that repeat while held, and the first field to take a codec — the thing that turns typed characters into a value and back.",
-    Radio: "The third preset over the shared binary switch, and the one whose group rather than whose item owns which is chosen.",
+        "A field whose value is a number. It reads what is typed as a number, writes the number back in the same form, and hands its trailing slot a stepper for buttons that repeat while held.",
+    Radio: "A set of options of which one is picked: a named group holding one radio per option. The group holds the value, not the radios; the Tab key stops on the group once, and the arrow keys move the pick along it.",
     Range: "A slider with one or two thumbs, on either axis. The drag arrives as a ratio along the track rather than as pixels.",
     RangeCalendar:
         "The same month grid over a span rather than a day. The value is one { start, end } signal, and the state while only the first end has been picked belongs to the component rather than to the consumer, so a half-entered range is never something a caller has to hold.",
     SegmentedInput:
         "A code drawn as a row of cells over one real field, so autofill, paste, the keyboard and a screen reader all meet a single input holding the whole code. The field draws none of its own text, caret, selection or focus ring; it hands each cell its character and whether the caret or the selection is in it, and a press on a cell puts the caret there.",
-    Select: "A list of options in a popup over one value or several. Filtering is the consumer's — autocomplete narrows what is shown, and the component never decides what counts as a match.",
+    Select: "A field that opens a list of options in a popup and holds the one picked. The arrow keys walk the list and Home and End jump to its ends, typing a few letters jumps to the option they begin, and Escape closes it without changing the pick. A list that opens over a picked option highlights it.",
     TagInput:
         "A field whose value is a list: type a word, press Enter, and it becomes a tag beside the caret. Backspace on an empty field steps back into the tags rather than deleting one outright.",
     TextArea:
-        "The multi-line preset over the shared text field, including auto-sizing that follows its own content between a minimum and a maximum number of rows.",
+        "A field for text across several lines, built on the same text field as TextInput, so what TextInput's page shows about states, tooltips and labels holds here too.",
     TextInput:
         "The single-line preset over the shared text field. The input itself is a blank slate laid over the painter, so the focus ring lands exactly around what was painted.",
     TimeInput:

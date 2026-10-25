@@ -12,7 +12,3 @@ export type BaseSlideButtonDirectionsDocsExampleValues = {
     orientation: SlideButtonOrientation;
     direction: NavigatorDirection;
 };
-
-export type BaseSlideButtonArmingExampleCbs = {
-    onArmedCountChange: (count: number) => void;
-};

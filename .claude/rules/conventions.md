@@ -541,14 +541,30 @@ blur, Enter — or not at all**; until then a refused half-typed value stays in 
 from an arrow key or a button is a whole gesture and is corrected at once. **A control that can be handed a value
 it refuses refuses it itself**, so no owner has to remember not to correct.
 
-### A masked field never spells a value approximately
+### A field keeps the text it shows apart from the value it holds, and only the reader moves the value
 
-Given a value its mask cannot hold, a field shows nothing and raises `hasError`. Truncating, clamping or dropping a
-sign would each produce a different well-formed value the field parses straight back, so the corruption survives a
-round trip. **The user widened it**: any conversion into a form that cannot hold the value — a storage format, a
-payload, a file, a serialized string — fails loudly rather than approximating. Only the control that built a
-pattern knows which digits are which, so the check lives there, and the text-to-value direction stands down while
-an unspellable value is held, or the blank text parses as "no value" and clears the consumer's. The one accepted
+The user's model, replacing an earlier "show nothing" rule that hid from the reader what was wrong. Every input holds
+two things: **the text it shows**, which the reader may edit into anything, invalid included ("#FFCCGG", "25:61"),
+and **the value it holds**, which changes only when the reader's edit makes the text valid — until then it stays at
+the last valid value, or none. Invalid text raises the error and nothing else.
+
+- **Only the reader's edits change the value.** A field never writes a value it produced itself: not by rewriting its
+  text under new settings and reading that text back, not by clamping, rounding, snapping to a step or picking the
+  nearest option on mount or when a prop changes — the one exception being a limit's correction on blur, below. Each of those turns a value nobody chose
+  into one that survives a round trip — `CurrencyInput` turned a held −250 into 250 when its sign was switched off.
+- **A value handed in that the field may not hold under its current settings is shown as its text, marked as an
+  error, and kept as it is**: −250 with no sign allowed shows "−250.00", flagged, and the consumer still holds −250.
+  The reader can edit it like any invalid text; the value moves only once the edit is valid. When the settings allow
+  it again, the same text is simply valid again — nothing is remembered or restored.
+- **A format is enforced by an error; a limit is enforced by a correction on blur** — the user's split. A format is
+  what the value is (a sign, a number of decimals, a date or time pattern, a colour notation): breaking it raises the
+  error and moves nothing. A limit is where the value sits (a `min` and `max`, an earliest and latest date or time):
+  a value outside one is kept as typed or as handed in, and pulled to the nearest bound when the field loses focus,
+  edited or not, as `NumberInput` always did. It holds for every input with a limit — `NumberInput`, `CurrencyInput`,
+  `DateInput`, `TimeInput`. The user took it with low certainty; it is to be revisited once lived with.
+
+**The user widened the old rule, and that part stands**: any conversion into a form that cannot hold the value — a
+storage format, a payload, a file, a serialized string — fails loudly rather than approximating. The one accepted
 exception is `DateValueUtils.withCalendar`, which clamps silently; it is in `backlog.md` under _"Accepted limits"_.
 
 ### A popup's open state is private until a consumer asks for it

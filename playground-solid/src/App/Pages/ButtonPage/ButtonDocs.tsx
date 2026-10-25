@@ -7,6 +7,8 @@ import { PageDocsSection } from "../../PageComponents/DocsSection/DocsSection";
 import { PageCheckField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { BasicDocsExample } from "./Docs/Basic";
+import { DecoratedDocsExample } from "./Docs/Decorated";
+import { RepeatingDocsExample } from "./Docs/Repeating";
 import { TooltipDocsExample } from "./Docs/Tooltip";
 
 export const ButtonDocs = () => {
@@ -102,6 +104,26 @@ export const ButtonDocs = () => {
                     isDisabled={getIsTooltipDisabled}
                     isReachableWhenDisabled={getIsReachableWhenDisabled}
                 />
+            </PageDocsExample>
+
+            <PageDocsSection title={"Decoration"}>
+                {
+                    "Anything drawn over the button goes through renderDecoration, which is handed the button's state like the painter is. Here a corner highlight shows while the button is pressed, and a ripple spreads from where it was pressed, which onActivation reports."
+                }
+            </PageDocsSection>
+
+            <PageDocsExample path={`${DOCS_ROOT}/Decorated.tsx`}>
+                <DecoratedDocsExample />
+            </PageDocsExample>
+
+            <PageDocsSection title={"Hold to repeat"}>
+                {
+                    "A button reports the pointer going down and up through onPointerDown and onPointerUp, which is enough to repeat an action while it is held: here a step happens at once, then again and again after a short wait until the pointer lifts or leaves. A press from the keyboard still steps once, through onClick."
+                }
+            </PageDocsSection>
+
+            <PageDocsExample path={`${DOCS_ROOT}/Repeating.tsx`}>
+                <RepeatingDocsExample />
             </PageDocsExample>
         </>
     );

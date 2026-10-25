@@ -22,3 +22,7 @@ export const EXAMPLE_NAMES = {
 };
 
 export const EXAMPLES_ROOT = "/src/App/Pages/NumberInputPage/Examples";
+
+export const DOCS_ROOT = "/src/App/Pages/NumberInputPage/Docs";
+
+export const NUMBER_LOCALES = ["en-US", GERMAN_LOCALE, "fr-FR", "hi-IN"];
