@@ -11,12 +11,12 @@ import type {
 
 export namespace PlacementLayoutDefaults {
     export const ARC_DEFAULTS: Required<ArcDefs> = {
-        curveHeightRatio: 1,
+        ovalHeightRatio: 1,
         spreadDegrees: 180,
         facingDegrees: -90,
         tiltRatio: 0,
         itemWidthRatio: 0.25,
-        itemHeightRatio: 1,
+        itemHeightRatio: 0.25,
     };
 
     export const CLIFF_DEFAULTS: Required<CliffDefs> = {

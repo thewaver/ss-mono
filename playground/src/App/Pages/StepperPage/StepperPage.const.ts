@@ -22,10 +22,10 @@ export const FAILED_OVERRIDES: Partial<Record<StepValue, PageStepState>> = { add
 export const DOCS_ROOT = "/src/App/Pages/StepperPage/Docs";
 
 export const ARC_DEFS: ArcDefs = {
-    curveHeightRatio: 0.5,
+    ovalHeightRatio: 1,
     facingDegrees: 0,
-    spreadDegrees: 45,
-    itemWidthRatio: 0.025,
+    spreadDegrees: 90,
+    itemWidthRatio: 0.3,
     itemHeightRatio: 0.1,
 };
 

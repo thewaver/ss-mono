@@ -30,13 +30,13 @@ export namespace FormationKnobs {
     export const STARTING_SHAPE_KIND: ShapeConst.DefaultShape = "lozenge";
     export const STARTING_IS_STACKED_IN_REVERSE = false;
     export const STARTING_WIDTHS: Record<PlacementLayouts.SampleKey, number> = {
-        arc: 380,
-        cliff: 260,
-        column: 100,
-        honeycomb: 300,
-        ring: 320,
-        row: 380,
-        whorl: 300,
+        arc: 360,
+        cliff: 240,
+        column: 120,
+        honeycomb: 360,
+        ring: 360,
+        row: 480,
+        whorl: 240,
         zigzag: 240,
     };
 }

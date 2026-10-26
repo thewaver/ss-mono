@@ -24,13 +24,13 @@ const NO_ITEMS = 0;
 const NOTHING = 0;
 const FULL_SHARE = 1;
 const AXIS_DEGREES = [-360, -270, -180, -90, 0, 90, 180, 270, 360];
-const NO_TILT = 0;
 const HEX_HEIGHT_RATIO = 2 / Math.sqrt(3);
 const HEX_ROW_STEP_RATIO = 0.75;
 const EVEN_ROW = 0;
 const ROW_PARITY = 2;
 const ARC_SAMPLES = 512;
-const CURVE_WIDTH = 1;
+const OVAL_WIDTH = 1;
+const UNSCALED = 1;
 const NO_SPREAD_DEGREES = 0;
 const NO_HOLE = 0;
 const WHOLE_RADIUS = 1;
@@ -70,36 +70,29 @@ const toTurnExtent = (outerRadius: number): ArcExtent => ({
     bottom: outerRadius,
 });
 
-const toArcExtent = (boxes: ArcBox[], fromAngle: number, toAngle: number, radiusX: number, radiusY: number) => {
-    const angles = [fromAngle, toAngle, ...AXIS_DEGREES.filter((angle) => angle > fromAngle && angle < toAngle)];
-    const xs: number[] = [];
-    const ys: number[] = [];
-
-    for (const angle of angles) {
-        const radians = angle * AngleUtils.RADIANS_PER_DEGREE;
-
-        xs.push(Math.cos(radians) * radiusX);
-        ys.push(Math.sin(radians) * radiusY);
-    }
-
-    for (const box of boxes) {
-        const radians = (box.tiltDegrees ?? NO_TILT) * AngleUtils.RADIANS_PER_DEGREE;
-        const cos = Math.abs(Math.cos(radians));
-        const sin = Math.abs(Math.sin(radians));
-        const halfWidth = (box.width * cos + box.height * sin) * HALF;
-        const halfHeight = (box.width * sin + box.height * cos) * HALF;
-
-        xs.push(box.x - halfWidth, box.x + halfWidth);
-        ys.push(box.y - halfHeight, box.y + halfHeight);
-    }
-
-    return {
-        left: Math.min(...xs),
-        top: Math.min(...ys),
-        right: Math.max(...xs),
-        bottom: Math.max(...ys),
-    };
+type ArcSpan = {
+    low: number;
+    high: number;
 };
+
+const toSpan = (values: number[]): ArcSpan => ({ low: Math.min(...values), high: Math.max(...values) });
+
+const toHalfSize = (width: number, height: number, tiltDegrees: number): Point2d => {
+    const radians = tiltDegrees * AngleUtils.RADIANS_PER_DEGREE;
+    const cos = Math.abs(Math.cos(radians));
+    const sin = Math.abs(Math.sin(radians));
+
+    return { x: (width * cos + height * sin) * HALF, y: (width * sin + height * cos) * HALF };
+};
+
+const toFillingScale = (room: number, span: ArcSpan) => {
+    const length = span.high - span.low;
+
+    return length > NOTHING ? (room * 2) / length : Number.POSITIVE_INFINITY;
+};
+
+const toFittingScale = (room: number, halfSize: number, reach: number) =>
+    halfSize > room || reach === NOTHING ? Number.POSITIVE_INFINITY : (room - halfSize) / Math.abs(reach);
 
 const toEllipsePoint = (radiusX: number, radiusY: number, degrees: number) => {
     const radians = degrees * AngleUtils.RADIANS_PER_DEGREE;
@@ -309,26 +302,33 @@ export namespace PlacementLayoutUtils {
     export const ring = createRing();
 
     /**
-     * Places items along a curve, evenly spaced by the distance walked rather than by angle.
+     * Places items along a piece of an oval, evenly spaced by the distance walked rather than by angle.
      *
-     * The difference matters once the curve is not a circle: stepping by angle bunches the items where an
-     * ellipse is flat. A height ratio away from one is what flattens or stretches it, and the items can
-     * be tilted to follow the curve or left upright.
+     * The box is the oval's: as wide as it is given, and `ovalHeightRatio` of that tall, whatever the items. Only
+     * the piece the spread covers is drawn, so the piece is then grown evenly until it meets the box on one side
+     * and centered on the other, and shrunk back evenly until every item fits inside the box. Items keep the size
+     * they were given throughout — only the curve and where the items sit on it are scaled — so changing an item's
+     * size never moves the box. An item too large for the box on its own is left as it is and reaches past it.
      *
-     * @param defs How far the curve sweeps, which way it faces, how round it is, and how large its items are.
+     * Stepping by distance rather than angle matters once the oval is not a circle, where equal angles bunch
+     * the items at its flat ends.
+     *
+     * @param defs How tall the oval is, how far the piece sweeps and which way it faces, and how large its items
+     * are.
      * @returns A layout function, sized — it states the width it was drawn at.
      */
     export const createArc = (defs?: ArcDefs): SizedLayoutFn => {
-        const curveHeightRatio = defs?.curveHeightRatio ?? PlacementLayoutDefaults.ARC_DEFAULTS.curveHeightRatio;
-        const spreadDegrees = defs?.spreadDegrees ?? PlacementLayoutDefaults.ARC_DEFAULTS.spreadDegrees;
-        const facingDegrees = defs?.facingDegrees ?? PlacementLayoutDefaults.ARC_DEFAULTS.facingDegrees;
-        const tiltRatio = defs?.tiltRatio ?? PlacementLayoutDefaults.ARC_DEFAULTS.tiltRatio;
-        const itemWidth = defs?.itemWidthRatio ?? PlacementLayoutDefaults.ARC_DEFAULTS.itemWidthRatio;
-        const itemHeight = itemWidth * (defs?.itemHeightRatio ?? PlacementLayoutDefaults.ARC_DEFAULTS.itemHeightRatio);
+        const base = PlacementLayoutDefaults.ARC_DEFAULTS;
+        const ovalHeightRatio = defs?.ovalHeightRatio ?? base.ovalHeightRatio;
+        const spreadDegrees = defs?.spreadDegrees ?? base.spreadDegrees;
+        const facingDegrees = defs?.facingDegrees ?? base.facingDegrees;
+        const tiltRatio = defs?.tiltRatio ?? base.tiltRatio;
+        const itemWidth = defs?.itemWidthRatio ?? base.itemWidthRatio;
+        const itemHeight = defs?.itemHeightRatio ?? base.itemHeightRatio;
+        const radiusX = OVAL_WIDTH * HALF;
+        const radiusY = ovalHeightRatio * HALF;
 
         return ({ itemCount }): SizedLayout => {
-            const radiusX = CURVE_WIDTH * HALF;
-            const radiusY = curveHeightRatio * HALF;
             const widestSpread =
                 (FULL_TURN_DEGREES * Math.max(itemCount - SINGLE_ITEM, NOTHING)) / Math.max(itemCount, SINGLE_ITEM);
             const spread = Math.min(Math.max(spreadDegrees, NO_SPREAD_DEGREES), widestSpread);
@@ -336,31 +336,59 @@ export namespace PlacementLayoutUtils {
             const toAngle = fromAngle + spread;
             const angles = toEvenArcAngles(itemCount, radiusX, radiusY, fromAngle, toAngle);
 
-            const boxes = angles.map<ArcBox>((angle) => {
-                const point = toEllipsePoint(radiusX, radiusY, angle);
+            const piece = [
+                fromAngle,
+                toAngle,
+                ...AXIS_DEGREES.filter((angle) => angle > fromAngle && angle < toAngle),
+            ].map((angle) => toEllipsePoint(radiusX, radiusY, angle));
+            const across = toSpan(piece.map((point) => point.x));
+            const down = toSpan(piece.map((point) => point.y));
+            const center = { x: (across.low + across.high) * HALF, y: (down.low + down.high) * HALF };
+            const filling = Math.min(toFillingScale(radiusX, across), toFillingScale(radiusY, down));
 
-                return { x: point.x, y: point.y, width: itemWidth, height: itemHeight, tiltDegrees: angle * tiltRatio };
+            const items = angles.map((angle) => {
+                const tiltDegrees = angle * tiltRatio;
+
+                return {
+                    point: toEllipsePoint(radiusX, radiusY, angle),
+                    halfSize: toHalfSize(itemWidth, itemHeight, tiltDegrees),
+                    tiltDegrees,
+                };
             });
 
-            const extent = toArcExtent(boxes, fromAngle, toAngle, radiusX, radiusY);
-            const width = extent.right - extent.left;
-            const height = extent.bottom - extent.top;
-            const origin = { x: -extent.left / width, y: -extent.top / width };
+            const scale = items.reduce(
+                (smallest, item) =>
+                    Math.min(
+                        smallest,
+                        toFittingScale(radiusX, item.halfSize.x, item.point.x - center.x),
+                        toFittingScale(radiusY, item.halfSize.y, item.point.y - center.y),
+                    ),
+                Number.isFinite(filling) ? filling : UNSCALED,
+            );
+
+            const toBoxPoint = (point: Point2d) => ({
+                x: radiusX + (point.x - center.x) * scale,
+                y: radiusY + (point.y - center.y) * scale,
+            });
 
             return {
-                placements: boxes.map<PlacementRect>((box) => ({
-                    leftShare: origin.x + box.x / width,
-                    topShare: origin.y + box.y / width,
-                    widthShare: box.width / width,
-                    heightShare: box.height / width,
-                    angle: box.tiltDegrees,
-                })),
-                extent: width,
-                heightRatio: height / width,
+                placements: items.map<PlacementRect>((item) => {
+                    const at = toBoxPoint(item.point);
+
+                    return {
+                        leftShare: at.x,
+                        topShare: at.y,
+                        widthShare: itemWidth,
+                        heightShare: itemHeight,
+                        angle: item.tiltDegrees,
+                    };
+                }),
+                extent: OVAL_WIDTH,
+                heightRatio: ovalHeightRatio,
                 pickRule: "angle",
                 reachRule: "arc",
-                origin,
-                radii: { x: radiusX / width, y: radiusY / width },
+                origin: toBoxPoint({ x: NOTHING, y: NOTHING }),
+                radii: { x: radiusX * scale, y: radiusY * scale },
             };
         };
     };

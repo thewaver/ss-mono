@@ -19,11 +19,11 @@ export const WIDE_SPAN = 2;
 export const DOCS_ROOT = "/src/App/Pages/ToolbarPage/Docs";
 
 export const PALETTE_DEFS: ArcDefs = {
-    curveHeightRatio: 1,
+    ovalHeightRatio: 1,
     spreadDegrees: 360,
     facingDegrees: 67.5,
     itemWidthRatio: 0.3542,
-    itemHeightRatio: 0.4706,
+    itemHeightRatio: 0.1667,
 };
 
 export const PALETTE_LAYOUT = PlacementLayoutUtils.createArc(PALETTE_DEFS);

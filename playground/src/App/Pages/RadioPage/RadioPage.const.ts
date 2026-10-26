@@ -29,10 +29,10 @@ export const EXAMPLES_ROOT = "/src/App/Pages/RadioPage/Examples";
 export const DOCS_ROOT = "/src/App/Pages/RadioPage/Docs";
 
 export const ARC_DEFS: ArcDefs = {
-    curveHeightRatio: 0.3867,
-    spreadDegrees: 160,
-    itemWidthRatio: 0.11,
-    itemHeightRatio: 1.0909,
+    ovalHeightRatio: 0.25,
+    spreadDegrees: 180,
+    itemWidthRatio: 0.1,
+    itemHeightRatio: 0.1,
 };
 
 export const ARC_LAYOUT = PlacementLayoutUtils.createArc(ARC_DEFS);

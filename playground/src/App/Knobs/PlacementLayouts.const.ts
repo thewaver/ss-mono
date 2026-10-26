@@ -13,11 +13,11 @@ import type { Knobs } from "../PageComponents/Knobs/KnobDefs.types";
 
 export namespace PlacementLayoutKnobs {
     export const ARC_KNOBS: Knobs<ArcDefs> = {
-        curveHeightRatio: {
+        ovalHeightRatio: {
             kind: "number",
-            label: "Curve height ratio",
-            hint: "How round the curve is. 1 is a circle, lower flattens it, higher stretches it tall.",
-            controls: "Sets ArcDefs.curveHeightRatio",
+            label: "Oval height ratio",
+            hint: "How tall the box and its oval are against the width. 1 is a circle in a square box, lower flattens both.",
+            controls: "Sets ArcDefs.ovalHeightRatio",
             min: 0.1,
             max: 2,
             step: 0.05,
@@ -52,7 +52,7 @@ export namespace PlacementLayoutKnobs {
         itemWidthRatio: {
             kind: "number",
             label: "Item width ratio",
-            hint: "How wide an item is against the whole arrangement.",
+            hint: "How wide an item is against the width. The curve shrinks to make room rather than the box growing.",
             controls: "Sets ArcDefs.itemWidthRatio",
             min: 0.05,
             max: 1,
@@ -61,10 +61,10 @@ export namespace PlacementLayoutKnobs {
         itemHeightRatio: {
             kind: "number",
             label: "Item height ratio",
-            hint: "How tall an item is against its own width. 1 keeps it square.",
+            hint: "How tall an item is against the width, the same measure as its width. Equal to the width ratio keeps it square.",
             controls: "Sets ArcDefs.itemHeightRatio",
-            min: 0.25,
-            max: 2,
+            min: 0.05,
+            max: 1,
             step: 0.05,
         },
     };

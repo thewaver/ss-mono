@@ -5673,10 +5673,29 @@ one turns an item fully with the radius, which is the fan's old behavior and giv
 outward. It reaches the three radial arrangements and stops there, since a honeycomb, a whorl and a zigzag
 give an item no angle to turn by — the same boundary as `pickRule: "angle"` and `sector`.
 
-**A turned box is wider than it is, and the extent has to know.** `toArcExtent` took its bounds from
-unrotated boxes, which was safe while nothing rotated. It now takes the turned footprint —
-`width·|cos| + height·|sin|` across, the other way down — or the outermost items of a tilted fan are clipped
-at exactly the point where the arrangement is widest.
+**A turned box is wider than it is, and the fit has to know.** The arc's zoom-out measures each item's turned
+footprint — `width·|cos| + height·|sin|` across, the other way down — or the outermost cards of a tilted fan
+reach past the box at exactly the point where the arrangement is widest.
+
+**A fan's spread follows its card count: fifteen degrees per card, unless the consumer sets one.** The user's call.
+A fixed spread stretched three cards across the same angle as eight. The count is only known when a level is laid
+out, so `FanMenuUtils.createLayout` works the spread out per call, and the consumer sets the angle per card
+(`spreadDegreesPerItem`) rather than a total — `FanLayoutDefs` leaves `spreadDegrees` out, so there is one setting for
+the spread and no question of which wins.
+
+**A fan is a part-ring now, not an arc.** The user's call, once the arc began filling its box: `Menu` pins a layout's
+center to the trigger, and an arc zooms its drawn piece to fill the box, so a narrower level drew a bigger curve and
+three cards sat 186px from the trigger where eight sat 62px. A ring's box is always the whole circle with the center
+in its middle, so every level sits the same distance from the trigger and its cards the same distance apart.
+`FanMenuProps.layoutDefs` is `FanLayoutDefs`, `BandDefs` without `computeItemArcs` (a values type takes no function).
+**The ring's wedges are dropped**, since `Menu` gives an item carrying a `sector` `pointer-events: none` for a wedge
+painter to take presses on its own shape, and a fan's cards are boxes. **The ring places the cards and the fan sizes
+them**: the ring holds each item to its wedge, about the radius times the angle per card, which at fifteen degrees made
+the page's cards 42px wide, and widening them that way pushed them hundreds of pixels from the trigger. So
+`createLayout` keeps the ring's positions and tilt and overwrites each card's size with `itemWidthRatio` and
+`itemHeightRatio`, both shares of the fan's width as on the arc, and cards overlap as a fan's should. The ring's
+own sizing settings (`itemMaxWidthRatio`, its `itemHeightRatio`, `wedgeGapDegrees`) do nothing to a card after that,
+so `FanLayoutDefs` picks only the ring settings that still place one: facing, hole, tilt and item radius.
 
 **The offset the fan used to smuggle in is now something the menu says.** A fan opens rightward, so its
 items only ever used the right half of the box it reserved; the empty left half was what made a
@@ -6362,9 +6381,10 @@ pass on nothing.
 ### The arc can be flattened or stretched, and spaces its items along the curve
 
 The user's proposal: an arc that can be flattened or stretched sideways, rather than one that is always a
-piece of a circle. It takes `curveHeightRatio`, the oval's height against its width, so the same call draws a
+piece of a circle. It takes `ovalHeightRatio`, the oval's height against its width, so the same call draws a
 circle, a wide shallow sweep, or anything between. It was two lengths at first, `width` and `height`, until
-the pair turned out to say nothing a single ratio does not.
+the pair turned out to say nothing a single ratio does not. The same number is now the box's proportion as well —
+see _"The arc fills the box the width sets, and its items never move the box"_.
 
 **Equal angles are equal distances on a circle and nowhere else.** On an ellipse a step of angle covers less
 ground near the narrow ends, so five stars bent across a wide flat arc would crowd at both tips and spread
@@ -6391,6 +6411,39 @@ emits an elliptical arc when it is given one and behaves exactly as before when 
 every wedge painter goes through `getSectorPath`, so only that function and the sector type would move — but
 a band of constant thickness round an ellipse is not the gap between two concentric ellipses, so the wedges
 would read as uneven in a way they never do on a circle.
+
+### The arc fills the box the width sets, and its items never move the box
+
+The user's model, worked out on a scratch bench before any code moved. The arc used to fit a box round the drawn
+piece and its items and stretch that box to the given width, so an item's size decided the zoom: narrowing a
+`Stepper` step by a fifth made its near-vertical curve a quarter taller. The user's rule from that: **an item takes
+a share of the box, it never decides the box.**
+
+**The box is the given width by `ovalHeightRatio`, and the oval fills it.** Only the piece the spread covers about
+the facing is kept, so the piece is zoomed evenly — "contain", never stretched — until it meets the box on one side
+and centered on the other, then zoomed back out evenly about its own center until every item, tilt included, fits
+inside the box. Items keep their size through both zooms: `itemWidthRatio` and `itemHeightRatio` are both shares of
+the given width — the height used to be a share of the item's own width, which tied it to `itemWidthRatio`, and the
+user removed that link. An item too large for the box on its own is left at its size and reaches past the box.
+
+**The layout reports the outer box** (`heightRatio` is `ovalHeightRatio`, `extent` is `1`). After the zoom-out, the
+drawn piece's own box depends on the items, so reporting it would let them move the control's height after all. This
+is the ring's answer too: a box that comes from the curve's settings alone, with empty space where the curve does not
+reach. Every arrangement measures items against the width and nothing else; a height anchor (`sizeAnchor`, as
+`Mosaic` has) was tried on the bench and dropped by the user, since every other arrangement is only ever given a
+width.
+
+**Accepted with it:**
+
+- **Spread and facing change the zoom.** The piece's box changes shape as it turns, so a sweep of `facingDegrees`
+  grows and shrinks the curve. Harmless for a fixed setting.
+- **One number sets two shapes.** `ovalHeightRatio` is both the box's proportion and the oval's, so a piece much
+  flatter or narrower than its oval leaves the box partly empty. The demos' numbers are the user's to retune on the
+  bench rather than converted, since no conversion keeps both the old box and the old curve.
+- **Every `FanMenu` level is the same width.** `Menu` sizes a level by its layout's `extent` against the first
+  level's, and the arc's `extent` is now always `1`.
+- **The degrees are positions on a squashed circle**, not angles a protractor at the center would read; the two agree
+  only at 0°, 90°, 180° and 270°. Raised, not changed.
 
 ### The fan places tilted boxes, not wedges
 

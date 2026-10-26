@@ -46,16 +46,16 @@ export const DOCS_ROOT = "/src/App/Pages/SortablePage/Docs";
 
 export const LIST_MIN_HEIGHT = 72;
 
-export const LIST_MIN_WIDTH = 180;
+export const LIST_MIN_WIDTH = 192;
 
 export const RING_DEFS: ArcDefs = {
-    curveHeightRatio: 1,
+    ovalHeightRatio: 1,
     spreadDegrees: 360,
     facingDegrees: 45,
-    itemWidthRatio: 0.6512,
-    itemHeightRatio: 0.3692,
+    itemWidthRatio: 0.375,
+    itemHeightRatio: 0.125,
 };
 
 export const RING_LAYOUT = PlacementLayoutUtils.createArc(RING_DEFS);
 
-export const RING_WIDTH = "324px";
+export const RING_WIDTH = "400px";

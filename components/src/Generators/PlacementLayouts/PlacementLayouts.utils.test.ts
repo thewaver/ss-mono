@@ -58,9 +58,27 @@ describe("createRing over half a turn", () => {
 });
 
 describe("createArc", () => {
-    const CIRCLE = { curveHeightRatio: 1, spreadDegrees: 180, itemWidthRatio: 0.1, itemHeightRatio: 1 };
-    const FLAT = { ...CIRCLE, curveHeightRatio: 0.4 };
-    const CURVE_WIDTH = 1;
+    const CIRCLE = { ovalHeightRatio: 1, spreadDegrees: 180, itemWidthRatio: 0.1, itemHeightRatio: 0.1 };
+    const FLAT = { ...CIRCLE, ovalHeightRatio: 0.4 };
+    const QUARTER_TURN = { ...CIRCLE, spreadDegrees: 90 };
+    const OVAL_WIDTH = 1;
+    const BOX_SLACK = 1e-9;
+
+    const reachesOf = (layout: SizedLayout) => {
+        const halves = layout.placements.map((placement) => ({
+            left: placement.leftShare - placement.widthShare * 0.5,
+            right: placement.leftShare + placement.widthShare * 0.5,
+            top: placement.topShare - placement.heightShare * 0.5,
+            bottom: placement.topShare + placement.heightShare * 0.5,
+        }));
+
+        return {
+            left: Math.min(...halves.map((half) => half.left)),
+            right: Math.max(...halves.map((half) => half.right)),
+            top: Math.min(...halves.map((half) => half.top)),
+            bottom: Math.max(...halves.map((half) => half.bottom)),
+        };
+    };
 
     const stepsOf = (layout: SizedLayout) =>
         layout.placements.slice(1).map((placement, index) => {
@@ -87,7 +105,7 @@ describe("createArc", () => {
             "a circle comes out exactly even",
         ).toBeCloseTo(1);
         expect(
-            spread(evenAngleSteps(CURVE_WIDTH * 0.5, CIRCLE.curveHeightRatio * 0.5)),
+            spread(evenAngleSteps(OVAL_WIDTH * 0.5, CIRCLE.ovalHeightRatio * 0.5)),
             "and equal angles agree with it there, which is why the fault hides until something is stretched",
         ).toBeCloseTo(1);
 
@@ -96,25 +114,54 @@ describe("createArc", () => {
         expect(
             unevenness(stepsOf(PlacementLayoutUtils.createArc(FLAT)(ROOT))),
             "flattened, what unevenness is left is a small fraction of what equal angles would leave",
-        ).toBeLessThan(unevenness(evenAngleSteps(CURVE_WIDTH * 0.5, FLAT.curveHeightRatio * 0.5)) / 5);
+        ).toBeLessThan(unevenness(evenAngleSteps(OVAL_WIDTH * 0.5, FLAT.ovalHeightRatio * 0.5)) / 5);
     });
 
-    it("stretches only the curve, never the items on it", () => {
-        const round = PlacementLayoutUtils.createArc(CIRCLE)(ROOT);
-        const flat = PlacementLayoutUtils.createArc(FLAT)(ROOT);
+    it("takes the oval's box whatever its items, and gives each item the share of the width it asked for", () => {
+        const small = PlacementLayoutUtils.createArc(FLAT)(ROOT);
+        const wide = PlacementLayoutUtils.createArc({ ...FLAT, itemWidthRatio: 0.3 })(ROOT);
+        const tall = PlacementLayoutUtils.createArc({ ...FLAT, itemHeightRatio: 0.3 })(ROOT);
 
-        expect(flat.heightRatio, "a flattened arc is a shallower box").toBeLessThan(round.heightRatio);
+        expect(small.heightRatio, "the box is as tall as the oval is asked to be").toBe(FLAT.ovalHeightRatio);
+        expect(wide.heightRatio, "and wider items leave it alone").toBe(small.heightRatio);
+        expect(tall.heightRatio, "as do taller ones").toBe(small.heightRatio);
+        expect(wide.placements[0].widthShare, "an item is as wide as the share it asked for").toBe(0.3);
         expect(
-            flat.placements[0].heightShare * flat.extent,
-            "while an item keeps the size it was given, in pixels",
-        ).toBeCloseTo(round.placements[0].heightShare * round.extent);
+            wide.placements[0].heightShare,
+            "and its height is its own share of the width, not a share of its own width",
+        ).toBe(small.placements[0].heightShare);
+    });
+
+    it("grows the drawn piece until it meets the box, and shrinks it back until every item fits inside", () => {
+        const quarter = PlacementLayoutUtils.createArc(QUARTER_TURN)(ROOT);
+        const reach = reachesOf(quarter);
+
+        expect(reach.left, "the piece runs out to the box's left edge").toBeCloseTo(0);
+        expect(reach.right, "and its right one, a quarter turn being wider than it is tall").toBeCloseTo(1);
+        expect(reach.top, "with room left above").toBeGreaterThan(0);
+        expect(reach.bottom, "and below").toBeLessThan(quarter.heightRatio);
+    });
+
+    it("shrinks the curve rather than the items or the box when the items need more room", () => {
+        const slim = PlacementLayoutUtils.createArc(QUARTER_TURN)(ROOT);
+        const bulky = PlacementLayoutUtils.createArc({ ...QUARTER_TURN, itemWidthRatio: 0.3, itemHeightRatio: 0.2 })(
+            ROOT,
+        );
+        const reach = reachesOf(bulky);
+
+        expect(bulky.radii!.x, "larger items leave a smaller curve").toBeLessThan(slim.radii!.x);
+        expect(bulky.placements[0].widthShare, "while the items keep their size").toBe(0.3);
+        expect(reach.left, "and every item stays inside the box").toBeGreaterThanOrEqual(-BOX_SLACK);
+        expect(reach.right).toBeLessThanOrEqual(1 + BOX_SLACK);
+        expect(reach.top).toBeGreaterThanOrEqual(-BOX_SLACK);
+        expect(reach.bottom).toBeLessThanOrEqual(bulky.heightRatio + BOX_SLACK);
     });
 
     it("hands a painter the curve rather than a radius, so a run between two items can follow it", () => {
         const flat = PlacementLayoutUtils.createArc(FLAT)(ROOT);
 
-        expect(flat.radii!.x / flat.radii!.y, "the two axes are as far apart as the arc was asked to be").toBeCloseTo(
-            CURVE_WIDTH / FLAT.curveHeightRatio,
+        expect(flat.radii!.x / flat.radii!.y, "the two axes are as far apart as the oval was asked to be").toBeCloseTo(
+            OVAL_WIDTH / FLAT.ovalHeightRatio,
         );
     });
 
