@@ -28,6 +28,7 @@ export const page = style({
     height: "100%",
     padding: themeVars.spacing.double,
     boxSizing: "border-box",
+    backgroundColor: themeVars.color.secondary.light,
     backgroundImage: `linear-gradient(215deg, ${themeVars.color.secondary.light}, ${themeVars.color.secondary.dark})`,
     color: themeVars.color.secondary.contrast,
 });
@@ -43,6 +44,7 @@ export const pageRight = style({
 export const cover = style({
     alignItems: "center",
     textAlign: "center",
+    backgroundColor: themeVars.color.primary.light,
     backgroundImage: `linear-gradient(215deg, ${themeVars.color.primary.light}, ${themeVars.color.primary.dark})`,
     color: themeVars.color.primary.contrast,
 });

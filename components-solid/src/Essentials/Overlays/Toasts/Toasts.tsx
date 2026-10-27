@@ -3,6 +3,7 @@ import { For, createEffect, createMemo, createSignal, onCleanup, onMount, untrac
 import { Portal } from "solid-js/web";
 
 import {
+    InteractionSettingsUtils,
     LiveAnnouncerUtils,
     type NavigatorDirection,
     TOASTS_DEFAULTS,
@@ -19,6 +20,7 @@ import { ElementObserverSolidUtils } from "../../../Abstracts/ElementObserver/El
 import { InteractionTrackerSolidUtils } from "../../../Abstracts/InteractionTracker/InteractionTrackerSolid.utils";
 import { SignalMirrorSolidUtils } from "../../../Abstracts/SignalMirror/SignalMirrorSolid.utils";
 import { useViewportContext } from "../../../Abstracts/Viewport/Viewport.context";
+import { useInteractionSettingsContext } from "../../../Primitives/InteractionSettings/InteractionSettings.context";
 import { access } from "../../../Utils/propUtils";
 import { ToastsContextProvider } from "./Toasts.context";
 import type { Toast, ToastRenderer, ToastsItemProps, ToastsProps } from "./ToastsSolid.types";
@@ -121,6 +123,8 @@ export const Toasts = <T,>(props: ParentProps<ToastsProps<T>>) => {
 
     const viewportContext = useViewportContext();
 
+    const interactionSettings = useInteractionSettingsContext();
+
     const registerOwner = {};
 
     const directions = new Map<string, NavigatorDirection>();
@@ -166,10 +170,15 @@ export const Toasts = <T,>(props: ParentProps<ToastsProps<T>>) => {
 
     const getAdmitted = createMemo(() => ToastUtils.computeAdmitted(getToasts(), access(props.limit), getOverflow()));
 
+    const getHotkeys = createMemo(() => interactionSettings.getSettings().toastHotkeys, undefined, {
+        equals: InteractionSettingsUtils.getAreHotkeysEqual,
+    });
+
     createEffect(() => {
         const region = getRootRef();
         const scope = viewportContext.getPortalRef() ?? document.body;
         const alignment = getAlignment();
+        const hotkeys = getHotkeys();
 
         if (!region) return;
 
@@ -178,6 +187,7 @@ export const Toasts = <T,>(props: ParentProps<ToastsProps<T>>) => {
                 region,
                 scope,
                 alignment,
+                hotkeys,
                 getHasToasts: () => untrack(getAdmitted).length > 0,
             }),
         );

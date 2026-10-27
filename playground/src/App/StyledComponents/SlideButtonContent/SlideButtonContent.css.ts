@@ -41,6 +41,7 @@ export const slideButtonFill = style({
     left: 0,
     top: 0,
     bottom: 0,
+    backgroundColor: themeVars.color.primary.light,
     backgroundImage: `linear-gradient(45deg, ${themeVars.color.primary.dark}, ${themeVars.color.primary.light})`,
     transition: `width ${themeVars.animation.duration}`,
 
@@ -58,6 +59,7 @@ export const slideButtonFill = style({
             transition: "none",
         },
         [`.${hasError} &`]: {
+            backgroundColor: themeVars.color.error.light,
             backgroundImage: `linear-gradient(45deg, ${themeVars.color.error.dark}, ${themeVars.color.error.light})`,
         },
     },

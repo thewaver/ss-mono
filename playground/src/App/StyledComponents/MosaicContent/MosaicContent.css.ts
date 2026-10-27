@@ -23,6 +23,7 @@ export const mosaicTileFamily = styleVariants(
         PAGE_MOSAIC_FAMILIES.map((family) => [
             family,
             {
+                backgroundColor: RAINBOW[family].light,
                 backgroundImage: `linear-gradient(45deg, ${RAINBOW[family].dark}, ${RAINBOW[family].light})`,
                 color: RAINBOW[family].contrast,
             },

@@ -44,6 +44,7 @@ export const segmentContent = style({
 
 export const segmentFloater = style({
     borderRadius: themeVars.borderRadius.half,
+    backgroundColor: themeVars.color.primary.light,
     backgroundImage: `linear-gradient(45deg, ${themeVars.color.primary.dark}, ${themeVars.color.primary.light})`,
     opacity: 0,
     transitionProperty: "opacity",

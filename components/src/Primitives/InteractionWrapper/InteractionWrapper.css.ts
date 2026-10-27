@@ -38,3 +38,7 @@ export const interactionDecorationWrapper = style({
 globalStyle(`${interactionRoot} > *`, {
     margin: "0 !important",
 });
+
+globalStyle(`${interactionSizingVariants.fill} > *`, {
+    flexGrow: 1,
+});

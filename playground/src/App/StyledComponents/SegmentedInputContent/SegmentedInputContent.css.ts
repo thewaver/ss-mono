@@ -24,6 +24,7 @@ export const segmentedInputCell = style([
                 outline: `${FOCUS_RING_WIDTH}px solid ${themeVars.color.outline.main}`,
             },
             [`&.${isSelected}`]: {
+                backgroundColor: themeVars.color.primary.light,
                 backgroundImage: `linear-gradient(215deg, ${themeVars.color.primary.light}, ${themeVars.color.primary.dark})`,
                 color: themeVars.color.primary.contrast,
             },

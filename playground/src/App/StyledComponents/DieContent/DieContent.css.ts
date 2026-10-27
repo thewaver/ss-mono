@@ -16,6 +16,7 @@ export const dieFace = style({
 });
 
 export const dieFaceShowing = style({
+    backgroundColor: themeVars.color.primary.light,
     backgroundImage: `radial-gradient(circle at 70% 30%, ${themeVars.color.primary.light}, ${themeVars.color.primary.dark})`,
     color: themeVars.color.primary.contrast,
 });

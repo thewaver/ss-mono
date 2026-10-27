@@ -50,6 +50,7 @@ export const marker = styleVariants({
     done: [
         {
             ...markerBase,
+            backgroundColor: themeVars.color.success.light,
             backgroundImage: `radial-gradient(circle at 70% 30%, ${themeVars.color.success.light}, ${themeVars.color.success.dark})`,
             color: themeVars.color.success.contrast,
         },
@@ -57,6 +58,7 @@ export const marker = styleVariants({
     current: [
         {
             ...markerBase,
+            backgroundColor: themeVars.color.primary.light,
             backgroundImage: `radial-gradient(circle at 70% 30%, ${themeVars.color.primary.light}, ${themeVars.color.primary.dark})`,
             color: themeVars.color.primary.contrast,
             boxShadow: `0 0 0 3px rgb(from ${themeVars.color.primary.main} r g b / 35%)`,
@@ -65,6 +67,7 @@ export const marker = styleVariants({
     failed: [
         {
             ...markerBase,
+            backgroundColor: themeVars.color.error.light,
             backgroundImage: `radial-gradient(circle at 70% 30%, ${themeVars.color.error.light}, ${themeVars.color.error.dark})`,
             color: themeVars.color.error.contrast,
         },
@@ -72,6 +75,7 @@ export const marker = styleVariants({
     skipped: [
         {
             ...markerBase,
+            backgroundColor: themeVars.color.alert.light,
             backgroundImage: `radial-gradient(circle at 70% 30%, ${themeVars.color.alert.light}, ${themeVars.color.alert.dark})`,
             color: themeVars.color.alert.contrast,
         },

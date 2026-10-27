@@ -80,7 +80,7 @@ const examples: ExampleDefs[] = [
         key: "outward",
         name: EXAMPLE_NAMES.outward,
         readout: () =>
-            "an animation per letter: the left half flies off to the left and the right half to the right, from the middle out, as the line crosses the middle of its box",
+            "an animation per letter, in reading order: the first half of the paragraph flies off to the left and the second half to the right, each line as it crosses the middle of its box",
         path: `${EXAMPLES_ROOT}/Outward.vue`,
     },
 ];

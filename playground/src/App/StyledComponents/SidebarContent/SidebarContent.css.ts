@@ -49,6 +49,7 @@ export const sidebarSurface = style({
     height: "100%",
     overflow: "hidden",
     color: themeVars.color.surface.contrast,
+    backgroundColor: themeVars.color.surface.light,
     backgroundImage: `linear-gradient(45deg, ${themeVars.color.surface.dark}, ${themeVars.color.surface.light})`,
     boxShadow: themeVars.shadow.medium,
 });

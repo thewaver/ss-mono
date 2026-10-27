@@ -158,6 +158,7 @@ export const wheelSpin = style([
         flexShrink: 0,
         width: SPIN_SIZE,
         height: SPIN_SIZE,
+        backgroundColor: themeVars.color.primary.light,
         backgroundImage: `radial-gradient(${themeVars.color.primary.light}, ${themeVars.color.primary.dark})`,
         border: `2px solid ${themeVars.color.primary.light}`,
         color: themeVars.color.primary.contrast,
@@ -185,6 +186,7 @@ export const wheelCard = style({
 
     selectors: {
         [`&.${isSelected}`]: {
+            backgroundColor: themeVars.color.primary.light,
             backgroundImage: `linear-gradient(215deg, ${themeVars.color.primary.light}, ${themeVars.color.primary.dark})`,
             borderColor: themeVars.color.primary.light,
             color: themeVars.color.primary.contrast,

@@ -300,11 +300,18 @@ describe("registerStack", () => {
 
     const releases: (() => void)[] = [];
 
-    const register = (owner: object, region: FakeElement, opts?: { holds?: boolean; scope?: object }) => {
+    const OTHER_HOTKEYS = { forward: { key: "F9" }, back: { key: "F9", modifiers: ["shift" as const] } };
+
+    const register = (
+        owner: object,
+        region: FakeElement,
+        opts?: { holds?: boolean; scope?: object; hotkeys?: typeof OTHER_HOTKEYS | null },
+    ) => {
         const release = ToastUtils.registerStack(owner, {
             region: region as unknown as HTMLElement,
             scope: opts?.scope ?? {},
             alignment: "top_left",
+            hotkeys: opts?.hotkeys,
             getHasToasts: () => opts?.holds ?? true,
         });
 
@@ -425,6 +432,73 @@ describe("registerStack", () => {
         expect(fakeDocument.activeElement, "and a provider joining later comes after every earlier one").toBe(
             latecomer,
         );
+    });
+
+    it("cycles each pair of shortcuts through the stacks that answer to it, and no others", () => {
+        const regions = [new FakeElement(), new FakeElement(), new FakeElement(), new FakeElement()];
+
+        register({}, regions[0]!);
+        register({}, regions[1]!, { hotkeys: OTHER_HOTKEYS });
+        register({}, regions[2]!);
+        register({}, regions[3]!, { hotkeys: OTHER_HOTKEYS });
+
+        press("F8");
+        press("F8");
+        expect(fakeDocument.activeElement, "F8 walks the stacks on the default pair").toBe(regions[2]);
+
+        press("F9");
+        expect(fakeDocument.activeElement, "F9 starts at the first stack on its own pair").toBe(regions[1]);
+
+        press("F9");
+        expect(fakeDocument.activeElement, "and walks on within it").toBe(regions[3]);
+
+        press("F8");
+        expect(fakeDocument.activeElement, "F8 from a stack on another pair starts again at its own first").toBe(
+            regions[0],
+        );
+    });
+
+    it("reaches a stack with no shortcuts through cycleFocus only", () => {
+        const regions = [new FakeElement(), new FakeElement()];
+
+        register({}, regions[0]!);
+        register({}, regions[1]!, { hotkeys: null });
+
+        press("F8");
+        press("F8");
+        expect(fakeDocument.activeElement, "no key reaches it").toBe(regions[0]);
+
+        expect(ToastUtils.cycleFocus(1)).toBe(true);
+        expect(fakeDocument.activeElement, "while cycleFocus goes through every stack").toBe(regions[1]);
+    });
+
+    it("unbinds a pair with the last stack that answered to it, and leaves the others bound", () => {
+        const regions = [new FakeElement(), new FakeElement()];
+
+        register({}, regions[0]!);
+        const releaseOther = register({}, regions[1]!, { hotkeys: OTHER_HOTKEYS });
+
+        releaseOther();
+        press("F9");
+        expect(fakeDocument.activeElement, "F9 does nothing once no stack answers to it").not.toBe(regions[1]);
+
+        press("F8");
+        expect(fakeDocument.activeElement, "while F8 still works").toBe(regions[0]);
+    });
+
+    it("hands focus back with Escape to where it was before the first shortcut, across pairs", () => {
+        const origin = fakeDocument.activeElement;
+        const regions = [new FakeElement(), new FakeElement()];
+
+        register({}, regions[0]!);
+        register({}, regions[1]!, { hotkeys: OTHER_HOTKEYS });
+
+        press("F8");
+        press("F9");
+        expect(fakeDocument.activeElement).toBe(regions[1]);
+
+        pressEscapeIn(regions[1]!);
+        expect(fakeDocument.activeElement, "it is not left on the stack the other pair came from").toBe(origin);
     });
 
     it("hands focus back with Escape to where it was before the first F8, from whichever stack it is in", () => {

@@ -367,3 +367,49 @@ test.describe("A popup inside a modal", () => {
         await expect(page.locator(COMBOBOX), "and the pick lands in the field").toContainText("Portugal");
     });
 });
+
+/**
+ * Escape pressed mid-drag belongs to the drag. The Table's cancel listens on the document and answers the key, and
+ * the dialog's dismissal stack skips an Escape that something already answered, so the column goes back and the
+ * dialog stays. Without that, one press would do both. The press after the drag is over has nothing left to
+ * cancel, so it reaches the stack and closes the dialog as usual.
+ */
+test.describe("A drag inside a modal", () => {
+    const DRAGGING_DEMO = docsDemo(MODAL_DOCS, "Dragging");
+    const HEADER = `${DIALOG} [role="columnheader"]`;
+
+    test.beforeEach(async ({ page }) => {
+        await page.goto("/modal/docs");
+        await expect(page.locator("#openDragging")).toBeVisible();
+        await docsSettled(page);
+
+        await page.locator(`${DRAGGING_DEMO} #openDragging`).click();
+        await expect(page.locator(DIALOG)).toBeVisible();
+    });
+
+    test("Escape during a drag cancels the drag and leaves the modal open", async ({ page }) => {
+        const first = page.locator(HEADER).nth(0);
+        const second = page.locator(HEADER).nth(1);
+        const firstTitle = (await first.textContent()) ?? "";
+
+        const from = await first.boundingBox();
+        const to = await second.boundingBox();
+
+        if (!from || !to) throw new Error("the dialog's table drew no header boxes");
+
+        await page.mouse.move(from.x + from.width * 0.5, from.y + from.height * 0.5);
+        await page.mouse.down();
+        await page.mouse.move(to.x + to.width * 0.75, to.y + to.height * 0.5, { steps: 12 });
+        await page.keyboard.press("Escape");
+        await page.mouse.up();
+
+        await expect(
+            page.locator(DIALOG),
+            "the Escape that cancelled the drag does not also close the dialog",
+        ).toHaveCount(1);
+        await expect(page.locator(HEADER).nth(0), "the release after Escape drops nothing").toHaveText(firstTitle);
+
+        await page.keyboard.press("Escape");
+        await expect(page.locator(DIALOG), "with the drag over, the next Escape closes the dialog").toHaveCount(0);
+    });
+});

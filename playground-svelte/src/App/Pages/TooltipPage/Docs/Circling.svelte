@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { ElementObserverSvelteUtils, Range } from "@thewaver/ss-components-svelte";
+    import { Range } from "@thewaver/ss-components-svelte";
     import {
         CIRCLING_MAX_DEGREES,
         CIRCLING_MIN_DEGREES,
@@ -19,10 +19,6 @@
     let props: Props = $props();
 
     let degrees = $state(STARTING_CIRCLING_DEGREES);
-
-    let sliderRef = $state<HTMLDivElement>();
-
-    const getSliderSize = ElementObserverSvelteUtils.createBorderBoxSizeObserver(() => sliderRef);
 </script>
 
 <div class={styles.circlingStage}>
@@ -35,7 +31,7 @@
         label={`${degrees}°`}
     />
 
-    <div bind:this={sliderRef} class={styles.circlingSlider}>
+    <div class={styles.circlingSlider}>
         <Range
             id={"circlingDegrees"}
             bind:value={degrees}
@@ -47,7 +43,7 @@
             ariaLabel={"Where the arrow sits round the tooltip"}
         >
             {#snippet renderContent(renderProps)}
-                <PageRangeContent {renderProps} length={getSliderSize().width} />
+                <PageRangeContent {renderProps} />
             {/snippet}
         </Range>
     </div>

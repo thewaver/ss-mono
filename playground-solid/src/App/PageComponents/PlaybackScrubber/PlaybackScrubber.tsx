@@ -1,6 +1,4 @@
-import { createSignal } from "solid-js";
-
-import { Button, ElementObserverSolidUtils, Range } from "@thewaver/ss-components-solid";
+import { Button, Range } from "@thewaver/ss-components-solid";
 import {
     PERCENT,
     SLIDER_STEP,
@@ -13,10 +11,6 @@ import { PageRangeContent } from "../../StyledComponents/RangeContent/RangeConte
 import type { PagePlaybackScrubberProps } from "./PlaybackScrubber.types";
 
 export const PagePlaybackScrubber = (props: PagePlaybackScrubberProps) => {
-    const [getSliderSlotRef, setSliderSlotRef] = createSignal<HTMLElement>();
-
-    const getSliderSlotSize = ElementObserverSolidUtils.createBorderBoxSizeObserver(getSliderSlotRef);
-
     return (
         <div class={styles.playbackRow}>
             <Button
@@ -33,7 +27,7 @@ export const PagePlaybackScrubber = (props: PagePlaybackScrubberProps) => {
                 }}
             />
 
-            <div ref={setSliderSlotRef} class={styles.sliderSlot}>
+            <div class={styles.sliderSlot}>
                 <Range
                     id={`${props.id}Progress`}
                     sizing={"fill"}
@@ -45,9 +39,7 @@ export const PagePlaybackScrubber = (props: PagePlaybackScrubberProps) => {
                         () => Math.round(props.progress[0]() * PERCENT),
                         (value: number) => props.progress[1](value / PERCENT),
                     ]}
-                    renderContent={(getRenderProps) => (
-                        <PageRangeContent renderProps={getRenderProps} length={() => getSliderSlotSize().width} />
-                    )}
+                    renderContent={(getRenderProps) => <PageRangeContent renderProps={getRenderProps} />}
                 />
             </div>
         </div>

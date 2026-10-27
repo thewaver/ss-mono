@@ -1,0 +1,52 @@
+import { createSignal } from "solid-js";
+
+import { Button, ParticleDissolve } from "@thewaver/ss-components-solid";
+import { computeAshAnimation } from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.const";
+import * as styles from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.css";
+import type { ParticleDissolveAngleExampleProps } from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.types";
+import knight from "@thewaver/ss-playground/App/knight.webp";
+
+import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
+import { AshParticle } from "../AshParticle";
+
+type Props = ParticleDissolveAngleExampleProps;
+
+export const ImageExample = (props: Props) => {
+    const [getIsDissolved, setIsDissolved] = createSignal(false);
+
+    return (
+        <div id={"particleDissolveImageStage"} class={styles.stack}>
+            <ParticleDissolve
+                isDissolved={getIsDissolved}
+                angleDegrees={props.angleDegrees}
+                durationMs={props.durationMs}
+                particleLifetimeMs={props.particleLifetimeMs}
+                featherShare={props.featherShare}
+                spawnChance={props.spawnChance}
+                particlesPerCell={props.particlesPerCell}
+                cellSize={props.cellSize}
+                computeParticleAnimation={computeAshAnimation}
+                renderParticle={(defs) => <AshParticle defs={defs} />}
+            >
+                <img class={styles.image} src={knight} alt={"A knight"} />
+            </ParticleDissolve>
+
+            <div class={styles.buttonRow}>
+                <Button
+                    id={"particleDissolveImageBurn"}
+                    renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Dissolve</PageButtonContent>}
+                    onClick={() => {
+                        setIsDissolved(true);
+                    }}
+                />
+                <Button
+                    id={"particleDissolveImageRebuild"}
+                    renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Rebuild</PageButtonContent>}
+                    onClick={() => {
+                        setIsDissolved(false);
+                    }}
+                />
+            </div>
+        </div>
+    );
+};

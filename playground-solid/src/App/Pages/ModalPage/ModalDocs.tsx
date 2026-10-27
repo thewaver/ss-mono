@@ -14,6 +14,7 @@ import { PageCheckField, PageNumberField, PageSelectField } from "../../PageComp
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { AlertDocsExample } from "./Docs/Alert";
 import { BasicDocsExample } from "./Docs/Basic";
+import { DraggingDocsExample } from "./Docs/Dragging";
 import { LayeredDocsExample } from "./Docs/Layered";
 import { TextOnlyDocsExample } from "./Docs/TextOnly";
 
@@ -131,6 +132,17 @@ export const ModalDocs = () => {
 
             <PageDocsExample path={`${DOCS_ROOT}/Layered.tsx`}>
                 <LayeredDocsExample />
+            </PageDocsExample>
+
+            <PageDocsSection
+                title={"A drag inside it"}
+                content={
+                    "Escape pressed while something inside the dialog is being dragged cancels the drag and leaves the dialog open. Try it here: start dragging a column header, press Escape, and the column goes back while the dialog stays. A second Escape then closes the dialog."
+                }
+            />
+
+            <PageDocsExample path={`${DOCS_ROOT}/Dragging.tsx`}>
+                <DraggingDocsExample />
             </PageDocsExample>
 
             <PageDocsSection

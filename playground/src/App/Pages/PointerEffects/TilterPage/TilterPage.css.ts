@@ -24,9 +24,8 @@ export const sheen = style({
 });
 
 export const photo = style({
+    display: "block",
     width: 220,
-    height: 150,
     borderRadius: themeVars.borderRadius.full,
-    objectFit: "cover",
     userSelect: "none",
 });

@@ -1,6 +1,4 @@
-import { useRef } from "react";
-
-import { Button, ElementObserverReactUtils, Range } from "@thewaver/ss-components-react";
+import { Button, Range } from "@thewaver/ss-components-react";
 import {
     PERCENT,
     SLIDER_STEP,
@@ -13,10 +11,6 @@ import { PageRangeContent } from "../../StyledComponents/RangeContent/RangeConte
 import type { PagePlaybackScrubberProps } from "./PlaybackScrubber.types";
 
 export const PagePlaybackScrubber = (props: PagePlaybackScrubberProps) => {
-    const sliderSlotRef = useRef<HTMLDivElement>(null);
-
-    const sliderSlotSize = ElementObserverReactUtils.useBorderBoxSize(sliderSlotRef);
-
     const [isPlaying, setIsPlaying] = props.playback;
     const [progress, setProgress] = props.progress;
 
@@ -36,7 +30,7 @@ export const PagePlaybackScrubber = (props: PagePlaybackScrubberProps) => {
                 }}
             />
 
-            <div ref={sliderSlotRef} className={styles.sliderSlot}>
+            <div className={styles.sliderSlot}>
                 <Range
                     id={`${props.id}Progress`}
                     sizing={"fill"}
@@ -45,9 +39,7 @@ export const PagePlaybackScrubber = (props: PagePlaybackScrubberProps) => {
                     max={PERCENT}
                     step={SLIDER_STEP}
                     value={[Math.round(progress * PERCENT), (value: number) => setProgress(value / PERCENT)]}
-                    renderContent={(renderProps) => (
-                        <PageRangeContent renderProps={renderProps} length={sliderSlotSize.width} />
-                    )}
+                    renderContent={(renderProps) => <PageRangeContent renderProps={renderProps} />}
                 />
             </div>
         </div>

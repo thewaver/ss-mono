@@ -42,6 +42,7 @@ export const paginatorPage = style([
         selectors: {
             [`&.${isCurrent}`]: {
                 color: themeVars.color.primary.contrast,
+                backgroundColor: themeVars.color.primary.light,
                 backgroundImage: `linear-gradient(215deg, ${themeVars.color.primary.light}, ${themeVars.color.primary.dark})`,
             },
         },

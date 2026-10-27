@@ -13,6 +13,7 @@ export const buttonContent = style({
     alignItems: "center",
     height: 40,
     color: themeVars.color.primary.contrast,
+    backgroundColor: themeVars.color.primary.light,
     backgroundImage: `linear-gradient(45deg, ${themeVars.color.primary.dark}, ${themeVars.color.primary.light})`,
     borderRadius: themeVars.borderRadius.half,
     paddingInline: themeVars.spacing.double,
@@ -23,6 +24,7 @@ export const buttonContent = style({
     selectors: {
         [`&.${hasError}`]: {
             color: themeVars.color.error.contrast,
+            backgroundColor: themeVars.color.error.light,
             backgroundImage: `linear-gradient(45deg, ${themeVars.color.error.dark}, ${themeVars.color.error.light})`,
         },
         [`&.${isHovered}`]: {

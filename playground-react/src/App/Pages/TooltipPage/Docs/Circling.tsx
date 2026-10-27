@@ -1,6 +1,6 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 
-import { ElementObserverReactUtils, Range } from "@thewaver/ss-components-react";
+import { Range } from "@thewaver/ss-components-react";
 import {
     CIRCLING_MAX_DEGREES,
     CIRCLING_MIN_DEGREES,
@@ -20,10 +20,6 @@ type Props = ArrowBedDocsExampleProps;
 export const CirclingDocsExample = (props: Props) => {
     const degrees = useState(STARTING_CIRCLING_DEGREES);
 
-    const sliderRef = useRef<HTMLDivElement>(null);
-
-    const sliderSize = ElementObserverReactUtils.useBorderBoxSize(sliderRef);
-
     return (
         <div className={styles.circlingStage}>
             <ArrowBedTooltip
@@ -35,7 +31,7 @@ export const CirclingDocsExample = (props: Props) => {
                 label={`${degrees[0]}°`}
             />
 
-            <div ref={sliderRef} className={styles.circlingSlider}>
+            <div className={styles.circlingSlider}>
                 <Range
                     id={"circlingDegrees"}
                     value={degrees}
@@ -45,9 +41,7 @@ export const CirclingDocsExample = (props: Props) => {
                     sizing={"fill"}
                     thumbSize={RANGE_THUMB_SIZE}
                     ariaLabel={"Where the arrow sits round the tooltip"}
-                    renderContent={(renderProps) => (
-                        <PageRangeContent renderProps={renderProps} length={sliderSize.width} />
-                    )}
+                    renderContent={(renderProps) => <PageRangeContent renderProps={renderProps} />}
                 />
             </div>
         </div>

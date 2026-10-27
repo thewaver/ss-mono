@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Button, ElementObserverSvelteUtils, Range } from "@thewaver/ss-components-svelte";
+    import { Button, Range } from "@thewaver/ss-components-svelte";
     import * as styles from "@thewaver/ss-playground/App/PageComponents/PlaybackScrubber/PlaybackScrubber.css";
     import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
@@ -12,10 +12,6 @@
     } from "@thewaver/ss-playground/App/PageComponents/PlaybackScrubber/PlaybackScrubber.const";
 
     let { playback = $bindable(), progress = $bindable(), ...props }: PagePlaybackScrubberProps = $props();
-
-    let sliderSlotRef = $state<HTMLDivElement>();
-
-    const getSliderSlotSize = ElementObserverSvelteUtils.createBorderBoxSizeObserver(() => sliderSlotRef);
 </script>
 
 <div class={styles.playbackRow}>
@@ -31,7 +27,7 @@
         {/snippet}
     </Button>
 
-    <div bind:this={sliderSlotRef} class={styles.sliderSlot}>
+    <div class={styles.sliderSlot}>
         <Range
             id={`${props.id}Progress`}
             sizing={"fill"}
@@ -42,7 +38,7 @@
             bind:value={() => Math.round(progress * PERCENT), (value: number) => (progress = value / PERCENT)}
         >
             {#snippet renderContent(renderProps)}
-                <PageRangeContent {renderProps} length={getSliderSlotSize().width} />
+                <PageRangeContent {renderProps} />
             {/snippet}
         </Range>
     </div>

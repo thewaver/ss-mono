@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { shallowRef } from "vue";
+import { computed, shallowRef } from "vue";
 
 import { FileInput } from "@thewaver/ss-components-vue";
 import type { FileInputRejection } from "@thewaver/ss-components-vue";
@@ -15,6 +15,15 @@ import PageFileDropZoneContent from "../../../StyledComponents/FileDropZoneConte
 
 const files = shallowRef<File[]>([]);
 const rejections = shallowRef<FileInputRejection[]>([]);
+
+const readout = computed(
+    () =>
+        `Refused: ${
+            rejections.value
+                .map((rejection) => `${rejection.file.name}, ${DROP_ZONE_REASON_TEXT[rejection.reason]}`)
+                .join("; ") || "nothing"
+        }`,
+);
 </script>
 
 <template>
@@ -37,12 +46,6 @@ const rejections = shallowRef<FileInputRejection[]>([]);
     </FileInput>
 
     <div :class="exampleStyles.exampleReadout" data-readout>
-        {{
-            `Refused: ${
-                rejections
-                    .map((rejection) => `${rejection.file.name}, ${DROP_ZONE_REASON_TEXT[rejection.reason]}`)
-                    .join("; ") || "nothing"
-            }`
-        }}
+        {{ readout }}
     </div>
 </template>

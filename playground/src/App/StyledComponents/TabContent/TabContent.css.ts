@@ -126,6 +126,7 @@ export const hexTabFloater = style({
     width: "100%",
     height: "100%",
     clipPath: HEX_CLIP,
+    backgroundColor: themeVars.color.primary.light,
     backgroundImage: `linear-gradient(215deg, ${themeVars.color.primary.light}, ${themeVars.color.primary.dark})`,
     opacity: 0,
     transitionProperty: "opacity",

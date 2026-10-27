@@ -1023,6 +1023,10 @@ other pages copy. Taken on Claude's judgment under the unsupervised port.
 - **A library component's `ariaLabel` is written `ariaLabel` in a template, not `aria-label`.** Vue hands either to the
   prop at runtime, but `vue-tsc` reads `aria-label` as the native attribute and refuses it where the prop is required
   (`Modal`, `Tree`), so one spelling is kept everywhere. A native element keeps `aria-label`.
+- **A template does not look an imported constant up by key; the script does.** `WEEK_START_LABELS[day]` inside a
+  template arrow, or `DROP_ZONE_REASON_TEXT[reason]` inside an interpolation, failed `vue-tsc` with "Property 'value'
+  does not exist on type 'Record<…>'", and the Vue build stopped on it (the type checker is part of the build). The
+  lookup moved into the script as a small function or a `computed`, and the template calls that.
 - **Vue turns a line break between text and a tag into a space**, so a caption and the control beside it, or a name and
   its `?`, are written with no gap (`{{ label }}<Button …>`). React's `onBlur` on a container is `@focusout`, since
   React's bubbles and the native `blur` does not.
@@ -1920,7 +1924,7 @@ the user chose the rest, member by member:
 - `Essentials/Overlays`: `Modal`, `Drawer`, `Tooltip`, `HoverCard`, `Toasts`, the `Spotlights` family whole,
   and `Sidebar`.
 - `Essentials/MediaSwitchers`: `AudioSwitcher`, `ImageSwitcher`.
-- `Exotics/Particles`: `ParticleField`, `ParticleSpawner`.
+- `Exotics/Particles`: `ParticleDissolve`, `ParticleField`, `ParticleSpawner`.
 - `Exotics/Charts`: `Treemap`, `Sunburst`, `Icicle`, `CirclePacking`.
 - `Exotics/Diagrams`: `Bracket`, `PatchBoard`, `Timeline`.
 - `Exotics/Perspective`: `FlipCard`, `Die`, `Cuboid`.
@@ -2507,9 +2511,9 @@ Built for `CommandPalette`, in `Abstracts/Shortcut`. A shortcut is data — `{ k
   `DismisserVueUtils.useLayer` registers one stable layer object per component (it used to build a new one on each
   opening), since bindings compare layers by identity. React re-registers only when the list of shortcuts changes and
   reads what each does from the latest render.
-- **`Toasts`' `hotkey` is a `Shortcut | null` on the register** (default `{ key: "F8" }`, `null` for none), so it is
-  quiet under a `Modal` like every page shortcut — it used to move focus out of a modal's trap. The Escape back is
-  `ToastUtils.createFocusRoute`, listening on the stack itself.
+- **`Toasts`' shortcuts sit on the register**, so they are quiet under a `Modal` like every page shortcut — they used
+  to move focus out of a modal's trap. The keys are `toastHotkeys` on an `InteractionSettings` wrapper; the Escape back
+  is listened for on each stack's region.
 
 ### The Playground frame has its own command palette
 
@@ -22152,13 +22156,13 @@ Solid and Svelte, `isOpen` in React and Vue), and while the layer stays open it 
 
 **The register is `ToastUtils.registerStack`**, which replaced `claimAlignment` and `createFocusRoute`. A stack's place
 is the order its provider first joined, keyed by an owner object the provider keeps for life, so joining again under a
-new alignment, region or portal keeps the place. The register binds F8 and Shift+F8 once, on the page itself, with the
-first stack, and unbinds them with the last, so a stack inside an open `Modal` is out of reach until the modal closes.
+new alignment, region or portal keeps the place. The register binds each pair of keys once, on the page itself, with the
+first stack that answers to it, and unbinds it with the last, so a stack inside an open `Modal` is out of reach until
+the modal closes.
 Escape is listened for on each region, hands focus back to the element focused before the first F8, and only then
 calls `preventDefault`. `computeCycleTarget` is the pure step, and `cycleFocus` is exported for a consumer's own
-control. **The keys are fixed at F8 and Shift+F8 for now** (`HOTKEY_FORWARD`, `HOTKEY_BACK`); the per-provider `hotkey`
-prop went with the register. The user left a way to change them for a later sweep of page-wide behaviors that could
-earn a setting, rather than deciding this one alone. **Direction is read once, at `show`**
+control. **The keys default to F8 and Shift+F8** (`HOTKEY_FORWARD`, `HOTKEY_BACK`) and are set through `InteractionSettings`,
+below. **Direction is read once, at `show`**
 (`NavigatorUtils.readDirection(FocusManagerUtils.getFocusOrigin())`), since the raiser may be gone afterwards; a toast
 written straight into a shared queue takes the page's. **`show` generates ids** (`toast-N`, skipping queued ones)
 through `withRequestedToast`. Per framework: React and Vue keep a copy of the queue updated on every write, so several
@@ -22195,3 +22199,68 @@ went; step ids are built from the example and the step (`basicDetails`). **The a
 width (`ARC_WIDTH`), as Radio's and Toolbar's arcs do** — the user's call. An arc is drawn to its own proportions
 and then scaled to fill its box's width, so in a frame as wide as the column, every setting that narrows the drawing
 (a smaller item width, a sideways sliver of curve) made the whole Stepper taller and its steps wider.
+
+### `InteractionSettings`: a wrapper whose settings nest, with the toast keys as its first
+
+**The user's call: one context wrapper for the page-wide behaviors the library fixes, and it nests by merge.** An inner
+wrapper starts from its parent's resolved settings and replaces only what it sets again: `undefined` inherits, `null` is
+a value (the toast keys off), and an object value replaces the parent's object whole, never merging inside it
+(`InteractionSettingsUtils.merge`). Chosen over a call made once at startup and over a `hotkey` prop on each provider:
+a wrapper is declarative, can change while the page runs, and nests like any other context. The sweep of page-wide
+behaviors found this one clear case and was closed on it; the weaker candidates it listed were not built. The name is the user's; a setting that is not an interaction, such as where the live
+announcer mounts, may want a wider one.
+
+**Where it lives.** `Primitives/InteractionSettings`: `BaseInteractionSettingsValues` (the wrapper's props, each
+documented once), `ResolvedInteractionSettings` (`Required` of it; a type and a component of one name break the barrel,
+so the type takes the `Resolved` prefix as `ResolvedShortcut` does), `INTERACTION_SETTINGS_DEFAULTS`, and
+`InteractionSettingsUtils` (`merge`, `UNPROVIDED_CONTEXT`, `computeHotkeysSignature`, `getAreHotkeysEqual`). Outside any
+wrapper a reader answers the defaults rather than throwing. Built in Solid first; React, Vue and Svelte still run the
+register with its default pair.
+
+**The toast keys are read per provider and grouped by pair.** My first framing, that one binding needs one winner among
+nested wrappers, was wrong: each `Toasts` reads the settings of its own nearest wrapper, so a stack answers to its own
+pair and nothing has to win. The register binds each distinct pair once, keyed by `computeHotkeysSignature` (so `mod`
+and letter case compare equal), while some stack answers to it, and the pair cycles only through the stacks of its
+group, in the order they joined. Stacks on the default pair behave as they always did. `null` puts a stack in no group:
+no key reaches it, and `ToastUtils.cycleFocus`, which goes through every stack, does. A forward key equal to another
+group's back key is caught by the shortcut register's own duplicate warning.
+
+**One restore point for the page.** Escape in any stack hands focus back to where it was before the first shortcut moved
+it into a stack, whichever pair did it; `cycleWithin` records the origin only when focus is in no stack at all. A
+restore point per group was the first plan, and one is simpler and gives the better result.
+
+**`registerStack`'s `hotkeys` is optional, and left out means the default pair**, so a framework not yet ported keeps
+working; `null` is the explicit none. `Toasts` passes its nearest wrapper's value through a memo compared by
+`getAreHotkeysEqual`, so a settings change that leaves the pair alone does not re-register the stack.
+
+**Checked against WCAG.** 2.1.1: "All functionality of the content is operable through a keyboard interface" — a
+switchable shortcut conforms as long as another keyboard route exists, and `cycleFocus` is that route; the library
+cannot tell whether a consumer who switched the keys off wired it, so the doc block on `toastHotkeys` says it is theirs
+to do. 2.1.4 covers shortcuts made only of letters, numbers, punctuation or symbols; F8 pairs are outside it, and the
+register already warns when a consumer's pair is a single character.
+
+### `ParticleDissolve`: a mask and a particle field on one progress, and where the particles may come from
+
+**What it is.** A wrapper in `Exotics/Particles`, beside the `ParticleField` it drives. The user named it `Dissolve`, over `Disintegrate` and `Burn`: it names what happens to the content, and the painter decides whether that is ash, smoke or sand. **Where it lives was the user's call, made twice.** It first went into `Reveals`, then into `PointerEffects`, though nothing about it follows the pointer: it is a wrapper that changes how its content looks, driven by a prop, and the user refused a new family for one member. They then moved it into `Particles` and renamed it `ParticleDissolve`. It grew out of an idea for a button burning into ash, whose point was that ash needs no picture of the content, so item 1's wait for the platform does not apply.
+
+**One progress drives both layers.** `ParticleDissolve` owns a `0`-to-`1` progress and hands it to a paused `ParticleField` as its scrubbed `progress`, and the mask is drawn from the same number. The field's own clock never runs. The edge reaches the end of the sweep when the last particle is released, so with `L` the lifetime as a share of the duration the edge is `progress / (1 - L)`, and a cell at position `s` along the sweep has weight `1 - s`, which `ParticleField` turns into a release at progress `s * (1 - L)`, exactly when the edge is at `s`. `computeLifetimeShare` holds `L` at 0.9 so the edge always has some of the duration. **A rebuild is the same scrub run backwards**, which `ParticleField` already supports, so the particles fly back to where they came from.
+
+**The trigger is a plain `isDissolved`, not a two-way value.** I proposed a two-way `dissolved` that the component keeps privately when unshared, and dropped it while building: nothing inside the component ever writes it, so a private copy would be a value nobody could change. It is data the consumer owns, like `isVisible`. A press-point burn is the consumer's own handler setting `originShare` and then `isDissolved`. A change part-way runs from the current progress, taking the matching part of the duration, and `onDissolveEnd` / `onRebuildEnd` report the end of a trip.
+
+**Two sweeps, both smooth gradient masks.** A straight one at an angle (CSS's own, so `90` goes right) and, when `originShare` is set, an outward one from a point as a share of the content's size. A function from any point to its moment (option C of the question) was refused because a smooth mask cannot follow an arbitrary function. The mask is a ramp whose start sits clear of the box at an edge of `0` and whose end sits clear of it at `1`, and it is not applied at all at `0`.
+
+**Particles come only from where the content is painted, from the first build.** `PaintedAreaUtils` (`Abstracts/PaintedArea`) reads the content when a transition begins, never ahead of time: the line boxes of text, the box of an element with a background or a border less its rounded corners, replaced elements and form fields as boxes, and every SVG shape with a fill or stroke tested through `isPointInFill` and `isPointInStroke`. Nine points are sampled per grid cell, so a thin line of text is found where one center point would miss it. A particle is placed at a painted sample and takes that region's color, and a cell with no painted sample draws nothing. It is named `PaintedArea` and is not the SVG `PaintArea` generator, which is unrelated.
+
+**Pictures are read pixel by pixel, for `<img>`, `<canvas>` and `<video>`** (the user chose this scope over also reading CSS `background-image: url()`, which would mean loading the image again asynchronously and redoing the browser's own `background-size`, `position` and `repeat` math; SVG `<image>` was left out for the same reason). `Abstracts/ImagePixels` draws the element into a canvas four times finer than a 96-cell grid, placed as `object-fit` and `object-position` place it, and averages each cell weighted by opacity; a cell under half opaque is not painted, so a cut-out picture sheds ash only from what it shows. The arithmetic is pure and unit-tested (`computeFit`, `computeCellAverages`, `computeColorAt`); only `read` needs a page. `PaintedRegion` gained `getColorAt`, and a picture's region is on top of the element's own background region. **A picture from another origin only gives up its pixels with `crossorigin` on the element and a server that sends `Access-Control-Allow-Origin`** (MDN, _CORS enabled image_: the canvas is tainted and reading it throws `SecurityError`). The reader never works around that: it falls back to the whole box in the element's color, quietly, and the menu description says so. `ColorExtractor` was not reusable, since it picks a dominant palette from a URL asynchronously.
+
+**Approximations, by agreement.** A gradient, a CSS background image, or a picture the browser will not hand the pixels of cannot show transparency, so its whole box counts, and its color is the element's `background-color`, or its text color when it has none. **The answer to a gradient is a fallback color, not code:** the user's call is that a Playground painter with a `backgroundImage` also sets a `backgroundColor`, which the image covers on screen and the particles take. A sweep added `backgroundColor` beside every opaque theme gradient in `playground/src` (56 declarations); translucent gradients, repeating patterns and ones that mix `transparent` were left alone, since a color under them would show. **A new painter with a `backgroundImage` sets one too.** A fringe of the fallback color at the antialiased edge of a rounded gradient is possible and was not looked for. The effect's supported cases are written in the page's menu description. `overflow` clipping, masks and `clip-path` on content are not read. `visibility: hidden` is **not** applied to fully dissolved content, because the next rebuild reads the content's paint and would find all of it hidden; the fully transparent mask hides it instead.
+
+**Out of reach while dissolved.** The content takes `inert` for as long as progress is above `0`, which also covers the rebuild, since a mask changes what is painted and not what can be clicked.
+
+**Reduced motion** skips the particles and the sweep, fades the content by opacity, and caps the duration at 200 ms. The particle layer is mounted only while the progress is strictly between `0` and `1`.
+
+**A cell can release several particles, and the spawn chance is rolled for each one** (the user's call). `particlesPerCell` is a whole number from 1 to 8, built as that many paused `ParticleField`s over the same box, each with its own roll sequence and its own record of which painted point each cell's particle took. `ParticleField` itself still holds one particle per cell, so nothing changed there.
+
+**The consumer paints the particle**, through `renderParticle` with the cell and the color it came from, and moves it through `computeParticleAnimation`; the library carries no colors. The grid is squares of `cellSize` pixels, capped at 80 across or down.
+
+**Defaults are mine and unmeasured:** 1200 ms, a 600 ms lifetime, a feather of 0.2, a spawn chance of 0.5, one particle per cell, and a 12 px cell. They are the user's to move. The Solid build is checked in a headless browser, which draws masks on the software path; a mask is a rendering matter, so it is unverified until seen in a real window.

@@ -15,6 +15,7 @@ export const exampleKnobsSurface = style({
     overflowY: "auto",
     padding: themeVars.spacing.full,
     color: themeVars.color.surface.contrast,
+    backgroundColor: themeVars.color.surface.light,
     backgroundImage: `linear-gradient(215deg, ${themeVars.color.surface.light}, ${themeVars.color.surface.dark})`,
     borderRadius: themeVars.borderRadius.full,
     boxShadow: themeVars.shadow.medium,

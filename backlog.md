@@ -46,8 +46,7 @@ reading.
 12. `Die`'s step buttons and arrow keys fall into a loop of two or three faces — _open, no fix chosen_
 13. The Playground's painters in Windows high-contrast mode — _open, decided, not yet built_
 14. A long `Select` list costs as much to draw as its options do — _open, no fix known_
-15. Specs for the Essentials Docs pages — _one spec left_
-16. A sweep of page-wide behaviors that could earn a setting — _planned, not yet scoped_
+15. Ports of `InteractionSettings`, `ParticleDissolve` and the Typewriter fade buttons to React, Vue and Svelte — _decided, built in Solid, not yet ported_
 
 ---
 
@@ -468,21 +467,58 @@ other answer is known; this stays open in case one turns up.
 
 ---
 
-## 15. Specs for the Essentials Docs pages
+## 15. Ports of `InteractionSettings`, `ParticleDissolve` and the Typewriter fade buttons to React, Vue and Svelte
 
-Every Essentials page's spec now runs against its Docs page in all four frameworks. One behavior made alongside the
-conversion still has no spec of its own: pressing Escape while dragging something inside a dialog should cancel the
-drag and leave the dialog open (`decisions.md`, the entry on an Escape already handled). No page holds a draggable
-control inside a dialog yet, so the spec needs one added to a Docs example first.
+All three were built and checked in Solid first, as the work is ordered, and nothing of them exists in the other three
+frameworks. Until it does, the specs written for them fail in the React, Vue and Svelte projects: the two hotkeys specs
+in `toasts.spec.ts`, all ten in `particleDissolve.spec.ts`, and the two Fade out specs in `typewriter.spec.ts`. The reasoning is in `decisions.md`, under
+_"`InteractionSettings`: a wrapper whose settings nest, with the toast keys as its first"_ and _"`ParticleDissolve`: a mask and
+a particle field on one progress, and where the particles may come from"_. The core is shared and needs nothing: `InteractionSettingsUtils`, `ParticleDissolveUtils`, `PaintedAreaUtils`,
+`ImagePixelsUtils` and their unit tests are done.
 
----
+**`InteractionSettings`, in each framework's package.**
 
-## 16. A sweep of page-wide behaviors that could earn a setting
+- The wrapper component and its context, with a reader that answers the defaults outside any wrapper. It merges the
+  settings it sets over its parent's, through `InteractionSettingsUtils.merge`, and takes its props from
+  `BaseInteractionSettingsValues`.
+- `Toasts` reads the nearest wrapper's `toastHotkeys` and hands it to `ToastUtils.registerStack` as `hotkeys`, held
+  steady by `InteractionSettingsUtils.getAreHotkeysEqual` so a change that leaves the keys alone does not
+  re-register the stack. Today the three other `Toasts` call `registerStack` without it, so they run on the defaults.
 
-The user's plan: gather the behaviors the library fixes for the whole page and decide together which earn a way to
-change them, rather than one at a time. The first found: the shortcut that moves focus into the toast stacks is fixed at
-F8 and Shift+F8 since the stacks share one register, where a `hotkey` prop on each `Toasts` used to let a consumer
-change or switch it off — an app already using F8 now has no way out. Others are to be found in the sweep.
+**`ParticleDissolve`, in each framework's package.**
+
+- The component, from `BaseParticleDissolveValues` and `BaseParticleDissolveCbs`, as the Solid one in
+  `components-solid/src/Exotics/Particles/ParticleDissolve` is: `isDissolved` is a plain value, the content takes `inert`
+  while the progress is above 0, the particle layer is mounted only while it is strictly between 0 and 1, and
+  `particlesPerCell` is that many paused `ParticleField`s over the same box, each with its own record of the point each
+  cell's particle took. `renderParticle` is a slot in Vue and a snippet in Svelte. Reduced motion skips the particles
+  and fades by opacity.
+
+**Playgrounds.**
+
+- Toasts Docs page: the `Hotkeys` example (`HOTKEYS_MESSAGE` and `OWN_HOTKEYS` are already shared), its section, and the
+  sentence in the F8 alert saying a page can change or switch off the keys.
+- A ParticleDissolve page under the Particles node, first in it, with the four examples (`Button`, `Card`, `Svg`,
+  `Image`), the shared `AshParticle` painter, and the knob wrappers in the page file. The example ids the specs use,
+  `particleDissolve<Name>Stage`, `particleDissolveCardTitle` and `particleDissolveCardBadge`, must match the Solid ones. The shared constants,
+  knobs, styles and menu description are done.
+- Run both specs in each framework, and check that `particleDissolve.spec.ts` can still fail there, as it was checked in Solid
+  by breaking `PaintedAreaUtils`.
+
+**The Typewriter page's first example, "Complex": a Fade in and a Fade out button.** Playground only; the library needs
+nothing, and the shared keyframes (`typewriterVanish`) and button row style (`complexControls`) in `TypewriterPage.css.ts`
+are done. The Solid `Complex.tsx` is the one to copy:
+
+- The single replay button becomes two text buttons side by side: "Fade in", keeping the id `typeItAgain` that
+  `typewriter.spec.ts` presses, and "Fade out", id `fadeItOut`.
+- The example holds whether the text is playing (`playback`, shared with the `Typewriter`) and whether it is fading out.
+  While it is fading out, every letter's animation is `typewriterVanish` instead of the effect picked on the page.
+- "Fade in" stops the fading out, then restarts the run. "Fade out" starts fading out, then restarts the run, so from
+  any state the whole text shows first and then fades away in the order the letters arrived.
+- When a fade-out run ends, the example turns playback off. That holds every letter at its last frame, hidden, where a
+  run that ends while still playing would show the text again.
+
+The Vue templates must not look an imported constant up by key; see `decisions.md`, under the Vue Playground.
 
 ---
 
@@ -661,31 +697,6 @@ answer to "what is next for development"** — see the note at the top of this f
 commitment, and an entry that already carries the user's verdict is recorded here so that the same sketch is
 not put to them twice. An entry leaves this section in one of two directions: upward into a numbered item, which is the user's
 decision to take, or into `conventions.md` / `decisions.md` if building it settles something.
-
-### A button that burns away into ash or smoke
-
-Raised by the user while looking at Framer's
-[Particle Button](https://www.framer.com/marketplace/components/particle-button/), which draws its button into a 2D
-canvas and scatters the pixels. Breaking a live element into pieces that look like it needs a picture of it, which is
-what item 1 is waiting on. **The user's point: if the pieces are ash or smoke, nothing needs to know what the original
-looks like.** So the effect becomes two layers, with no picture at all:
-
-- **The content fades away behind a moving edge**, a mask swept across it in a chosen direction, as `Reveal`,
-  `ShapeReveal` and the cell and scanline animations already sweep masks.
-- **Particles are released along that edge as it passes** and drift off, as `ParticleSpawner` and `ParticleField`
-  already release and move particles, with the moving edge as the place they come from.
-
-**Particles come only from where the content is painted**, the user's addition, so none rise out of a transparent
-corner. That too needs no picture, only the page's own structure: the browser reports the box of every line of text,
-an element with a visible background or border paints its box less its rounded corners, an element painting nothing
-is skipped, and an SVG shape can be asked whether a point lies inside its fill or stroke. It is approximate by
-agreement — inside an image or a gradient transparency cannot be seen, so the whole box counts as painted.
-
-What it leaves open: the particles are generic, taking at most a colour read from the content's computed style, so
-they suit ash and smoke but not pieces that keep the label's shape; rebuilding is the same played backwards, the mask
-closing and particles flying in to the edge; while dissolved the content has to be out of reach as well as out of
-sight, and under reduced motion the particles are skipped and it simply fades. It would be a component of its own, a
-wrapper, and item 1 still stands for effects that need the real picture. Nothing has been decided about building it.
 
 ### A scattered layout for `InfiniteCorridor`, done differently
 

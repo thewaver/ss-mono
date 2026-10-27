@@ -35,6 +35,7 @@ export const itemFloater = style({
     width: "100%",
     height: "100%",
     borderRadius: themeVars.borderRadius.full,
+    backgroundColor: themeVars.color.primary.light,
     backgroundImage: `linear-gradient(45deg, ${themeVars.color.primary.dark}, ${themeVars.color.primary.light})`,
     opacity: 0,
     transitionProperty: "opacity",

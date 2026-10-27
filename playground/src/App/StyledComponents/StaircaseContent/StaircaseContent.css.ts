@@ -9,6 +9,7 @@ export const staircaseStep = style({
     gap: themeVars.spacing.full,
     padding: `${themeVars.spacing.half} ${themeVars.spacing.full}`,
     borderRadius: themeVars.borderRadius.half,
+    backgroundColor: themeVars.color.primary.light,
     backgroundImage: `linear-gradient(45deg, ${themeVars.color.primary.dark}, ${themeVars.color.primary.light})`,
     color: themeVars.color.primary.contrast,
     boxShadow: themeVars.shadow.small,

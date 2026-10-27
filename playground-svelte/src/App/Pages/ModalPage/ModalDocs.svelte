@@ -15,6 +15,7 @@
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
     import AlertDocsExample from "./Docs/Alert.svelte";
     import BasicDocsExample from "./Docs/Basic.svelte";
+    import DraggingDocsExample from "./Docs/Dragging.svelte";
     import LayeredDocsExample from "./Docs/Layered.svelte";
     import TextOnlyDocsExample from "./Docs/TextOnly.svelte";
 
@@ -122,6 +123,15 @@
 
 <PageDocsExample path={`${DOCS_ROOT}/Layered.svelte`}>
     <LayeredDocsExample />
+</PageDocsExample>
+
+<PageDocsSection
+    title={"A drag inside it"}
+    content={"Escape pressed while something inside the dialog is being dragged cancels the drag and leaves the dialog open. Try it here: start dragging a column header, press Escape, and the column goes back while the dialog stays. A second Escape then closes the dialog."}
+/>
+
+<PageDocsExample path={`${DOCS_ROOT}/Dragging.svelte`}>
+    <DraggingDocsExample />
 </PageDocsExample>
 
 <PageDocsSection

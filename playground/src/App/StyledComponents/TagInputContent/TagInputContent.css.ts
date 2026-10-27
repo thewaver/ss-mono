@@ -23,6 +23,7 @@ export const tagContent = style({
     height: 24,
     paddingInline: themeVars.spacing.full,
     borderRadius: themeVars.borderRadius.half,
+    backgroundColor: themeVars.color.primary.light,
     backgroundImage: `linear-gradient(45deg, ${themeVars.color.primary.dark}, ${themeVars.color.primary.light})`,
     color: themeVars.color.primary.contrast,
     fontSize: themeVars.fontSize.xSmall,

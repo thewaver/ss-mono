@@ -37,17 +37,21 @@ export const progressTrack = style({
 export const progressFill = style({
     height: "100%",
     borderRadius: themeVars.borderRadius.half,
+    backgroundColor: themeVars.color.primary.light,
     backgroundImage: `linear-gradient(90deg, ${themeVars.color.primary.dark}, ${themeVars.color.primary.light})`,
     transition: `width ${themeVars.animation.duration}`,
 
     selectors: {
         [`${progressTrack}.${hasError} &`]: {
+            backgroundColor: themeVars.color.error.light,
             backgroundImage: `linear-gradient(90deg, ${themeVars.color.error.dark}, ${themeVars.color.error.light})`,
         },
         [`&:dir(rtl)`]: {
+            backgroundColor: themeVars.color.primary.light,
             backgroundImage: `linear-gradient(270deg, ${themeVars.color.primary.dark}, ${themeVars.color.primary.light})`,
         },
         [`${progressTrack}.${hasError} &:dir(rtl)`]: {
+            backgroundColor: themeVars.color.error.light,
             backgroundImage: `linear-gradient(270deg, ${themeVars.color.error.dark}, ${themeVars.color.error.light})`,
         },
         [`${progressTrack}.${isIndeterminate} &`]: {

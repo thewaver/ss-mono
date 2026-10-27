@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { shallowRef, useModel } from "vue";
+import { useModel } from "vue";
 
-import { Button, ElementObserverVueUtils, Range } from "@thewaver/ss-components-vue";
+import { Button, Range } from "@thewaver/ss-components-vue";
 import {
     PERCENT,
     SLIDER_STEP,
@@ -14,10 +14,6 @@ import PageRangeContent from "../../StyledComponents/RangeContent/RangeContent.v
 import type { PagePlaybackScrubberProps } from "./PlaybackScrubber.types";
 
 const props = defineProps<PagePlaybackScrubberProps>();
-
-const sliderSlotRef = shallowRef<HTMLDivElement>();
-
-const sliderSlotSize = ElementObserverVueUtils.useBorderBoxSize(sliderSlotRef);
 
 const isPlaying = useModel(props, "playback");
 const progress = useModel(props, "progress");
@@ -42,7 +38,7 @@ const setProgress = (value: number) => {
             </template>
         </Button>
 
-        <div ref="sliderSlotRef" :class="styles.sliderSlot">
+        <div :class="styles.sliderSlot">
             <Range
                 :id="`${id}Progress`"
                 sizing="fill"
@@ -54,7 +50,7 @@ const setProgress = (value: number) => {
                 @update:value="setProgress"
             >
                 <template #renderContent="renderProps">
-                    <PageRangeContent :render-props="renderProps" :length="sliderSlotSize.width" />
+                    <PageRangeContent :render-props="renderProps" />
                 </template>
             </Range>
         </div>

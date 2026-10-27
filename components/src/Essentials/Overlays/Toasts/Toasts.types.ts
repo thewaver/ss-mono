@@ -75,7 +75,7 @@ export type BaseToastsValues = {
      * on the stack. Nothing can tab to a stack, so one page-wide shortcut reaches every stack: F8 moves focus into
      * each stack holding toasts in turn, in the order the providers mounted, Shift+F8 goes back, and Escape inside a
      * stack hands focus back to where it was before the first F8. The shortcut is quiet while a layer such as a
-     * `Modal` sits on top.
+     * `Modal` sits on top. An `InteractionSettings` wrapper above the provider changes the keys or switches them off.
      */
     ariaLabel: string;
     /**

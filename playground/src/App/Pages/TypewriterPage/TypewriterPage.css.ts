@@ -88,6 +88,12 @@ export const complexStack = style({
     alignItems: "flex-start",
 });
 
+export const complexControls = style({
+    display: "flex",
+    gap: themeVars.spacing.full,
+    alignItems: "center",
+});
+
 export const textHighlight = style({
     textTransform: "uppercase",
     lineHeight: 2,
@@ -189,11 +195,22 @@ export const typewriterFadeOut = keyframes({
     },
 });
 
+export const typewriterVanish = keyframes({
+    "0%": {
+        opacity: 1,
+    },
+    "100%": {
+        opacity: 0,
+        visibility: "hidden",
+    },
+});
+
 export const SCROLL_BOX_HEIGHT = 220;
 
 export const scrollBox = style({
     height: SCROLL_BOX_HEIGHT,
     paddingInline: MEASURE_BOX_PADDING,
+    overflowX: "hidden",
     overflowY: "scroll",
     overscrollBehavior: "contain",
 });

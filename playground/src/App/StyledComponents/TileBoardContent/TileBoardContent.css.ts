@@ -39,6 +39,7 @@ export const tileBoardTileContent = style({
 
     selectors: {
         [`&.${isMarked}`]: {
+            backgroundColor: themeVars.color.primary.light,
             backgroundImage: `linear-gradient(215deg, ${themeVars.color.primary.light}, ${themeVars.color.primary.dark})`,
             color: themeVars.color.primary.contrast,
         },
@@ -61,6 +62,7 @@ export const tileBoardMeeple = style({
     aspectRatio: "1",
     transform: "translate(-50%, -100%)",
     borderRadius: "50%",
+    backgroundColor: themeVars.color.secondary.light,
     backgroundImage: `radial-gradient(circle at 70% 30%, ${themeVars.color.secondary.light}, ${themeVars.color.secondary.dark})`,
     boxShadow: themeVars.shadow.medium,
     filter: `drop-shadow(0 0 ${GLOW_NEAR} ${themeVars.color.secondary.main}) drop-shadow(0 0 ${GLOW_FAR} ${themeVars.color.secondary.main})`,

@@ -4,7 +4,6 @@ import { Button, Typewriter } from "@thewaver/ss-components-solid";
 import type { TypewriterController } from "@thewaver/ss-components-solid";
 import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 import * as styles from "@thewaver/ss-playground/App/Pages/TypewriterPage/TypewriterPage.css";
-import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 import knight from "@thewaver/ss-playground/App/knight.webp";
 
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
@@ -15,14 +14,23 @@ type Props = TypewriterComplexExampleProps;
 
 export const ComplexExample = (props: Props) => {
     const [getController, setController] = createSignal<TypewriterController>();
+    const [getIsPlaying, setIsPlaying] = createSignal(true);
+    const [getIsVanishing, setIsVanishing] = createSignal(false);
+
+    const computeAnimationName = (character: string, index: number, count: number) =>
+        getIsVanishing() ? styles.typewriterVanish : props.computeAnimationName(character, index, count);
 
     return (
         <div class={styles.complexStack}>
             <PageMeasureBox width={props.width} padding={MEASURE_BOX_PADDING}>
                 <Typewriter
-                    computeAnimationName={props.computeAnimationName}
+                    playback={[getIsPlaying, setIsPlaying]}
+                    computeAnimationName={computeAnimationName}
                     computeCharacterWeights={props.computeCharacterWeights}
                     onMount={setController}
+                    onAnimationEnd={() => {
+                        if (getIsVanishing()) setIsPlaying(false);
+                    }}
                 >
                     This is a bit of{" "}
                     <b>
@@ -42,16 +50,29 @@ export const ComplexExample = (props: Props) => {
                 </Typewriter>
             </PageMeasureBox>
 
-            <Button
-                id={"typeItAgain"}
-                ariaLabel={"Type it again"}
-                renderContent={(getFlags) => (
-                    <PageControlButtonContent flags={getFlags} glyph={CONTROL_GLYPHS.replay} />
-                )}
-                onClick={() => {
-                    getController()?.restartAnimation();
-                }}
-            />
+            <div class={styles.complexControls}>
+                <Button
+                    id={"typeItAgain"}
+                    renderContent={(getFlags) => (
+                        <PageControlButtonContent flags={getFlags}>Fade in</PageControlButtonContent>
+                    )}
+                    onClick={() => {
+                        setIsVanishing(false);
+                        getController()?.restartAnimation();
+                    }}
+                />
+
+                <Button
+                    id={"fadeItOut"}
+                    renderContent={(getFlags) => (
+                        <PageControlButtonContent flags={getFlags}>Fade out</PageControlButtonContent>
+                    )}
+                    onClick={() => {
+                        setIsVanishing(true);
+                        getController()?.restartAnimation();
+                    }}
+                />
+            </div>
         </div>
     );
 };

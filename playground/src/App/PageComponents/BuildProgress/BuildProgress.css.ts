@@ -19,6 +19,7 @@ export const buildProgressStrip = style({
     height: BUILD_PROGRESS_HEIGHT,
     fontSize: themeVars.fontSize.small,
     color: themeVars.color.info.contrast,
+    backgroundColor: themeVars.color.info.light,
     backgroundImage: `linear-gradient(45deg, ${themeVars.color.info.dark}, ${themeVars.color.info.light})`,
 
     selectors: {

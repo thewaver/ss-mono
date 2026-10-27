@@ -1,6 +1,6 @@
 import { createSignal } from "solid-js";
 
-import { ElementObserverSolidUtils, Range } from "@thewaver/ss-components-solid";
+import { Range } from "@thewaver/ss-components-solid";
 import {
     CIRCLING_MAX_DEGREES,
     CIRCLING_MIN_DEGREES,
@@ -20,10 +20,6 @@ type Props = ArrowBedDocsExampleProps;
 export const CirclingDocsExample = (props: Props) => {
     const degrees = createSignal(STARTING_CIRCLING_DEGREES);
 
-    const [getSliderRef, setSliderRef] = createSignal<HTMLElement>();
-
-    const getSliderSize = ElementObserverSolidUtils.createBorderBoxSizeObserver(getSliderRef);
-
     return (
         <div class={styles.circlingStage}>
             <ArrowBedTooltip
@@ -35,7 +31,7 @@ export const CirclingDocsExample = (props: Props) => {
                 label={() => `${degrees[0]()}°`}
             />
 
-            <div ref={setSliderRef} class={styles.circlingSlider}>
+            <div class={styles.circlingSlider}>
                 <Range
                     id={"circlingDegrees"}
                     value={degrees}
@@ -45,9 +41,7 @@ export const CirclingDocsExample = (props: Props) => {
                     sizing={"fill"}
                     thumbSize={RANGE_THUMB_SIZE}
                     ariaLabel={"Where the arrow sits round the tooltip"}
-                    renderContent={(getRenderProps) => (
-                        <PageRangeContent renderProps={getRenderProps} length={() => getSliderSize().width} />
-                    )}
+                    renderContent={(getRenderProps) => <PageRangeContent renderProps={getRenderProps} />}
                 />
             </div>
         </div>

@@ -30,6 +30,8 @@ const isDisabled = shallowRef(false);
 const numberedWeekStartsOn = shallowRef<DateValueWeekStart>(CALENDAR_DEFAULTS.weekStartsOn);
 const minDaysInFirstWeek = shallowRef<DateValueMinDaysInFirstWeek>(CALENDAR_DEFAULTS.minDaysInFirstWeek);
 const calendarId = shallowRef<DateValueCalendarId>(OTHER_CALENDAR);
+
+const computeWeekStartLabel = (day: DateValueWeekStart) => WEEK_START_LABELS[day];
 </script>
 
 <template>
@@ -47,7 +49,7 @@ const calendarId = shallowRef<DateValueCalendarId>(OTHER_CALENDAR);
                     :value="weekStartsOn"
                     :values="CalendarKnobs.WEEK_STARTS"
                     ariaLabel="Week starts on"
-                    :compute-label="(day: DateValueWeekStart) => WEEK_START_LABELS[day]"
+                    :compute-label="computeWeekStartLabel"
                     @change="(day: DateValueWeekStart) => (weekStartsOn = day)"
                 />
             </PageProp>
@@ -104,7 +106,7 @@ const calendarId = shallowRef<DateValueCalendarId>(OTHER_CALENDAR);
                     :value="numberedWeekStartsOn"
                     :values="CalendarKnobs.WEEK_STARTS"
                     ariaLabel="Week starts on"
-                    :compute-label="(day: DateValueWeekStart) => WEEK_START_LABELS[day]"
+                    :compute-label="computeWeekStartLabel"
                     @change="(day: DateValueWeekStart) => (numberedWeekStartsOn = day)"
                 />
             </PageProp>

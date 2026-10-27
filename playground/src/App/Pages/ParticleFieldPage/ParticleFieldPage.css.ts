@@ -22,6 +22,7 @@ export const particle = style({
     width: PARTICLE_SIZE_PX,
     height: PARTICLE_SIZE_PX,
     borderRadius: "50%",
+    backgroundColor: themeVars.color.success.light,
     backgroundImage: `radial-gradient(circle at 70% 30%, ${themeVars.color.success.light}, ${themeVars.color.success.dark})`,
 });
 

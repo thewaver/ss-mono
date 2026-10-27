@@ -92,6 +92,7 @@ export const closer = style({
 });
 
 export const closerHighlighted = style({
+    backgroundColor: themeVars.color.primary.light,
     backgroundImage: `linear-gradient(45deg, ${themeVars.color.primary.dark}, ${themeVars.color.primary.light})`,
     color: themeVars.color.primary.contrast,
 });

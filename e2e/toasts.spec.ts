@@ -66,6 +66,16 @@ const isFocusOnHoldingStack = (page: Page) =>
         STACK,
     );
 
+/** The place, among the page's stacks, of every stack holding a toast. */
+const holdingStacks = (page: Page) =>
+    page.evaluate(
+        (selector) =>
+            [...document.querySelectorAll(selector)].flatMap((stack, index) =>
+                stack.childElementCount > 0 ? [index] : [],
+            ),
+        STACK,
+    );
+
 test.beforeEach(async ({ page }) => {
     await page.goto("/toasts/docs");
     await expect(page.locator("#raiseInfo")).toBeVisible();
@@ -187,6 +197,66 @@ test("F8 stays quiet while a modal is open", async ({ page }) => {
 
     await expect(field, "F8 leaves focus where the dialog put it").toBeFocused();
     expect(await focusedStack(page), "rather than on a stack beneath the dialog").toBe(-1);
+});
+
+/**
+ * The last example sits under an `InteractionSettings` wrapper that sets the keys to F9 and Shift+F9, and nothing
+ * else on the page is under one. Its stack answers to F9 and no longer to F8, so with only that stack holding a toast
+ * F8 has nowhere to go.
+ */
+test("a wrapper's keys reach the stacks under it, and F8 no longer does", async ({ page }) => {
+    await page.locator("#hotkeysRaise").click();
+    await expect(page.locator(HOLDING)).toHaveCount(1);
+
+    await page.locator("#hotkeysRaise").focus();
+
+    await page.keyboard.press("F8");
+    expect(await focusedStack(page), "F8 does not reach a stack that answers to other keys").toBe(-1);
+
+    await page.keyboard.press("F9");
+    expect(await isFocusOnHoldingStack(page), "F9 does").toBe(true);
+
+    await page.keyboard.press("Escape");
+    await expect(page.locator("#hotkeysRaise"), "and Escape hands focus back").toBeFocused();
+
+    await page.keyboard.press("Shift+F9");
+    expect(await isFocusOnHoldingStack(page), "Shift+F9 reaches it from outside as well").toBe(true);
+});
+
+/**
+ * Two stacks hold toasts, one on each pair of keys. Each pair walks only the stacks that answer to it, so a second
+ * press of either stays where it is, and pressing the other pair's key from inside a stack starts that pair's walk.
+ * Escape still returns to the page: the control focused before any shortcut moved focus, not the stack the other pair
+ * came from.
+ */
+test("each pair of keys walks only its own stacks, and Escape returns to the page", async ({ page }) => {
+    await page.locator("#hotkeysRaise").click();
+    const [ownStack] = await holdingStacks(page);
+
+    await page.locator("#raiseInfo").click();
+    await expect(page.locator(HOLDING), "two stacks hold toasts").toHaveCount(2);
+
+    const [defaultStack] = (await holdingStacks(page)).filter((index) => index !== ownStack);
+
+    await page.locator("#hotkeysRaise").focus();
+
+    await page.keyboard.press("F9");
+    expect(await focusedStack(page), "F9 lands on the stack that answers to it").toBe(ownStack);
+
+    await page.keyboard.press("F9");
+    expect(await focusedStack(page), "and has no other stack to go on to").toBe(ownStack);
+
+    await page.keyboard.press("F8");
+    expect(await focusedStack(page), "F8 from there starts the default pair's walk").toBe(defaultStack);
+
+    await page.keyboard.press("F8");
+    expect(await focusedStack(page), "which has no other stack either").toBe(defaultStack);
+
+    await page.keyboard.press("Escape");
+    await expect(
+        page.locator("#hotkeysRaise"),
+        "Escape returns to where focus was before the first shortcut, across both pairs",
+    ).toBeFocused();
 });
 
 test("the owner is told when a toast starts arriving and when it starts leaving", async ({ page }) => {

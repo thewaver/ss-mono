@@ -18,6 +18,7 @@ export const variantContainer = style({
     minWidth: 0,
 
     color: themeVars.color.surface.contrast,
+    backgroundColor: themeVars.color.surface.light,
     backgroundImage: `linear-gradient(315deg, ${themeVars.color.surface.dark}, ${themeVars.color.surface.light})`,
     backdropFilter: "blur(10px)",
     boxShadow: themeVars.shadow.medium,

@@ -6,7 +6,12 @@ import type {
 export type InteractionSizing = "fit-content" | "fill";
 
 export type BaseInteractionWrapperValues<TExtra extends object = {}> = ExternalInteractionFlags & {
-    /** Whether the control takes only the room its content needs, or fills what it is given. */
+    /**
+     * Whether the control takes only the room its content needs, or fills what it is given.
+     *
+     * With `"fill"` the painted content is stretched across the room as well, so a width the painter declares is
+     * where it starts from rather than where it stops, and nothing has to measure the room to hand it back.
+     */
     sizing?: InteractionSizing;
     /**
      * The smallest width the control may shrink to. It exists so a control stays large enough to be hit accurately,

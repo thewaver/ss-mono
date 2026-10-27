@@ -32,6 +32,7 @@ export const appContent = style({
 export const leftMenu = style({
     boxSizing: "border-box",
     color: themeVars.color.surface.contrast,
+    backgroundColor: themeVars.color.surface.light,
     backgroundImage: `linear-gradient(45deg, ${themeVars.color.surface.dark}, ${themeVars.color.surface.light})`,
     boxShadow: themeVars.shadow.large,
     width: "100%",
@@ -203,8 +204,8 @@ export const dependencySummary = style({
     alignItems: "center",
     gap: themeVars.spacing.half,
     padding: `${themeVars.spacing.half} ${themeVars.spacing.full}`,
-    borderRadius: themeVars.borderRadius.half,
-    backgroundImage: `linear-gradient(45deg, rgb(from ${layerVars.main} r g b / 50%), rgb(from ${layerVars.main} r g b / 75%))`,
+    borderRadius: themeVars.borderRadius.full,
+    backgroundColor: `rgb(from ${layerVars.main} r g b / 75%)`,
     color: layerVars.contrast,
     fontFamily: "monospace",
     whiteSpace: "nowrap",

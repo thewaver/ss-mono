@@ -54,11 +54,10 @@ They cluster, and no single item owns them.
 
 ## Planned projects
 
-| #   | What                                          | Standing                                                                                                      |
-| --- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| 2   | **A consumer-facing layer above the library** | **Deferred to a near-future session of its own.** Painted, ready-to-use controls, as Magic UI sells templates |
-| 16  | **Page-wide settings sweep**                  | Gather the fixed page-wide behaviors (the toast stacks' F8 shortcut first) and decide which earn a setting    |
-| 15  | **Specs for the Essentials Docs pages**       | Escape during a drag inside a dialog has no spec yet                                                          |
+| #   | What                                                                                   | Standing                                                                                                      |
+| --- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| 2   | **A consumer-facing layer above the library**                                          | **Deferred to a near-future session of its own.** Painted, ready-to-use controls, as Magic UI sells templates |
+| 15  | **Ports of `InteractionSettings`, `ParticleDissolve` and the Typewriter fade buttons** | Built in Solid only, with specs; React, Vue and Svelte still to do, and those specs fail there until then     |
 
 ## Waiting on browser support
 

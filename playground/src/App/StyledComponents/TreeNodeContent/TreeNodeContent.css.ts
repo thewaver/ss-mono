@@ -104,10 +104,12 @@ export const treeRadialNode = style({
             color: themeVars.color.primary.main,
         },
         [`&.${isSelected}`]: {
+            backgroundColor: themeVars.color.primary.light,
             backgroundImage: `linear-gradient(45deg, ${themeVars.color.primary.dark}, ${themeVars.color.primary.light})`,
             color: themeVars.color.primary.contrast,
         },
         [`&.${isRootRank}`]: {
+            backgroundColor: themeVars.color.primary.light,
             backgroundImage: `radial-gradient(circle at 70% 30%, ${themeVars.color.primary.light}, ${themeVars.color.primary.dark})`,
             color: themeVars.color.primary.contrast,
             fontWeight: "bold",

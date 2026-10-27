@@ -1,3 +1,5 @@
+import type { InteractionSettingsHotkeys } from "@thewaver/ss-components";
+
 import type { ToastKind } from "../../StyledComponents/ToastContent/ToastContent.types";
 
 export const NO_LIMIT = 0;
@@ -25,3 +27,10 @@ export const RIGHT_TO_LEFT_MESSAGE = "Your changes were published.";
 export const FAR_DOWN_MESSAGE = "Profile saved.";
 
 export const OUTSIDE_MESSAGE = "A sync finished in the background.";
+
+export const HOTKEYS_MESSAGE = "You got here with F9. Escape takes you back.";
+
+export const OWN_HOTKEYS: InteractionSettingsHotkeys = {
+    forward: { key: "F9" },
+    back: { key: "F9", modifiers: ["shift"] },
+};

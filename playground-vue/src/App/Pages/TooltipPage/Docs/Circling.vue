@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { shallowRef } from "vue";
 
-import { ElementObserverVueUtils, Range } from "@thewaver/ss-components-vue";
+import { Range } from "@thewaver/ss-components-vue";
 import {
     CIRCLING_MAX_DEGREES,
     CIRCLING_MIN_DEGREES,
@@ -21,10 +21,6 @@ type Props = ArrowBedDocsExampleProps;
 defineProps<Props>();
 
 const degrees = shallowRef(STARTING_CIRCLING_DEGREES);
-
-const sliderRef = shallowRef<HTMLDivElement>();
-
-const sliderSize = ElementObserverVueUtils.useBorderBoxSize(sliderRef);
 </script>
 
 <template>
@@ -38,7 +34,7 @@ const sliderSize = ElementObserverVueUtils.useBorderBoxSize(sliderRef);
             :label="`${degrees}°`"
         />
 
-        <div ref="sliderRef" :class="styles.circlingSlider">
+        <div :class="styles.circlingSlider">
             <Range
                 id="circlingDegrees"
                 v-model:value="degrees"
@@ -50,7 +46,7 @@ const sliderSize = ElementObserverVueUtils.useBorderBoxSize(sliderRef);
                 ariaLabel="Where the arrow sits round the tooltip"
             >
                 <template #renderContent="renderProps">
-                    <PageRangeContent :render-props="renderProps" :length="sliderSize.width" />
+                    <PageRangeContent :render-props="renderProps" />
                 </template>
             </Range>
         </div>

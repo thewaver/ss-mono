@@ -17,6 +17,7 @@ import PageSelectField from "../../PageComponents/Field/PageSelectField.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
 import AlertDocsExample from "./Docs/Alert.vue";
 import BasicDocsExample from "./Docs/Basic.vue";
+import DraggingDocsExample from "./Docs/Dragging.vue";
 import LayeredDocsExample from "./Docs/Layered.vue";
 import TextOnlyDocsExample from "./Docs/TextOnly.vue";
 
@@ -121,6 +122,15 @@ const isDismissableOnEscape = shallowRef(false);
 
     <PageDocsExample :path="`${DOCS_ROOT}/Layered.vue`">
         <LayeredDocsExample />
+    </PageDocsExample>
+
+    <PageDocsSection
+        title="A drag inside it"
+        content="Escape pressed while something inside the dialog is being dragged cancels the drag and leaves the dialog open. Try it here: start dragging a column header, press Escape, and the column goes back while the dialog stays. A second Escape then closes the dialog."
+    />
+
+    <PageDocsExample :path="`${DOCS_ROOT}/Dragging.vue`">
+        <DraggingDocsExample />
     </PageDocsExample>
 
     <PageDocsSection

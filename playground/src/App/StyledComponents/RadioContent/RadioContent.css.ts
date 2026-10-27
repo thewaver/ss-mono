@@ -52,6 +52,7 @@ export const radioDot = style({
     width: 8,
     height: 8,
     borderRadius: "50%",
+    backgroundColor: themeVars.color.primary.light,
     backgroundImage: `linear-gradient(45deg, ${themeVars.color.primary.dark}, ${themeVars.color.primary.light})`,
     transform: "scale(0)",
     transition: `transform ${themeVars.animation.duration}`,

@@ -101,6 +101,13 @@ the root and the ring is drawn on the control, so the root is `display: flex` (n
 surface paint are the painter's; `margin`, `transform`, `position`, `float` and `inset` on the in-flow child are not,
 and only `margin` is defended. Spacing belongs outside the wrapper; a painter wanting inner space uses padding.
 
+**Under `sizing: "fill"` the in-flow child grows with the root** (`flex-grow: 1` on `fill > *`) — the user's pick.
+Before, the root stretched and a painter declaring its own width stayed at it, while a `Range`'s inputs, set over the
+whole root, took presses across the full width: the slider drew half its track and put the thumb where nobody had
+pressed. Every filling `Range` had to measure its slot and pass the width back to its painter, and the examples that
+forgot kept reappearing. A painter's declared width is now where it starts under `fill`, and a control whose in-flow
+element already filled (`Button`'s `<button>`, `Sortable`'s item) is unchanged.
+
 **A painter's declared width is a preference: `max-width: 100%` on `interactionRoot` makes it one.** Under
 `width: fit-content`, a flex item with a definite width sets the container's min-content size, so a 200px painter in
 190px of space overflows, and nothing inside the painter can fix it — `max-width: 100%` on the painter is circular,
@@ -152,3 +159,19 @@ The user's call. A component wrapping each item puts the wrapper's root between 
 to it. Valid because the root is neither focusable nor carries global ARIA. Not `aria-owns`, which states a
 relationship the DOM no longer shows; not hand-rolled items, which _"the composition is an implementation detail"_
 rules out. A consumer's own markup between a listbox and its items is theirs to mark.
+
+### An example that shows a picture gives it the picture's own proportions
+
+The user's rule, after two examples cropped a square picture into a landscape box. A Playground example sets the width
+and leaves the height `auto`, so the box is the picture's own shape; it never sets both sides to a ratio the picture does
+not have, and does not reach for `object-fit` to hide the mismatch. The same holds for a shape drawn into a box: a
+built-in shape stretches to fill its box, so the box is square unless the shape is meant to be oblong. A knob that
+exists only to show a crop or a stretch is not an example of the component.
+
+### An example's knobs live in the page, never in the example file
+
+The user's rule, given more than once. The example file under `Examples/` (or `Docs/`) is what the source view shows and
+what a consumer copies, so it holds only the component and the props it is given. Any knob that example needs, with its
+state and its `PageExampleKnobs`, sits in a wrapper component in the page file, as `ParticleFieldPage`'s
+`ShapedExampleWrapper` does, and reaches the example as accessors. State the example needs to demonstrate itself, such as
+a control that raises a toast or a button that dissolves, stays in the example.

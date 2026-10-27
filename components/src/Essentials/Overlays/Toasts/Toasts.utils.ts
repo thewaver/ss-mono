@@ -5,8 +5,10 @@ import { FocusManagerUtils } from "../../../Abstracts/FocusManager/FocusManager.
 import { LiveAnnouncerUtils } from "../../../Abstracts/LiveAnnouncer/LiveAnnouncer.utils";
 import type { NavigatorDirection } from "../../../Abstracts/Navigator/Navigator.types";
 import { NavigatorUtils } from "../../../Abstracts/Navigator/Navigator.utils";
-import type { Shortcut } from "../../../Abstracts/Shortcut/Shortcut.types";
 import { ShortcutUtils } from "../../../Abstracts/Shortcut/Shortcut.utils";
+import { INTERACTION_SETTINGS_DEFAULTS } from "../../../Primitives/InteractionSettings/InteractionSettings.const";
+import type { InteractionSettingsHotkeys } from "../../../Primitives/InteractionSettings/InteractionSettings.types";
+import { InteractionSettingsUtils } from "../../../Primitives/InteractionSettings/InteractionSettings.utils";
 import { TOASTS_DEFAULTS } from "./Toasts.const";
 import type { ToastsContextType } from "./Toasts.context.types";
 import type {
@@ -54,12 +56,6 @@ const ESCAPE_KEY = "Escape";
 /** The axis a toast's swipe tracker watches when the toast cannot be swiped at all, so it still has one. */
 const SWIPE_FALLBACK_AXIS: SwipeAxis = "horizontal";
 
-/** The shortcut that moves focus into the next stack holding toasts. */
-const HOTKEY: Shortcut = { key: "F8" };
-
-/** The shortcut that moves focus into the previous stack holding toasts. */
-const BACK_HOTKEY: Shortcut = { key: "F8", modifiers: ["shift"] };
-
 /** What a generated toast id starts with, followed by a number. */
 const GENERATED_ID_PREFIX = "toast-";
 
@@ -70,6 +66,7 @@ type RegisteredStack = {
     region: HTMLElement;
     scope: object;
     alignment: ToastsAlignment;
+    hotkeysSignature: string | undefined;
     getHasToasts: () => boolean;
 };
 
@@ -85,8 +82,8 @@ let nextJoinOrder = 0;
 /** Where focus was before the shortcut first moved it into a stack, which Escape inside any stack hands it back to. */
 let restoreRef: HTMLElement | undefined;
 
-/** Removes the shortcut's bindings, while at least one stack is registered. */
-let unbindHotkeys: (() => void) | undefined;
+/** For each pair of shortcuts some registered stack answers to, the function that removes its bindings. */
+const hotkeyBindings = new Map<string, () => void>();
 
 /** The number the next generated toast id ends with. */
 let nextGeneratedIdNumber = 0;
@@ -142,6 +139,48 @@ const handleStackKeyDown = (e: KeyboardEvent) => {
 
     e.preventDefault();
     target.focus();
+};
+
+/** Moves focus to the next or previous stack of the given ones that holds toasts. */
+const cycleWithin = (stacks: RegisteredStack[], step: 1 | -1) => {
+    const active = document.activeElement;
+    const currentIndex = stacks.findIndex((stack) => stack.region.contains(active));
+    const targetIndex = ToastUtils.computeCycleTarget(
+        stacks.map((stack) => stack.getHasToasts()),
+        currentIndex,
+        step,
+    );
+
+    if (targetIndex === undefined) return false;
+
+    if (!registeredStacks.some((stack) => stack.region.contains(active))) {
+        restoreRef = getIsFocusableElement(active) ? active : undefined;
+    }
+
+    stacks[targetIndex]?.region.focus();
+
+    return true;
+};
+
+/** Binds a pair of shortcuts to cycling through the registered stacks that answer to that pair. */
+const bindHotkeys = (hotkeys: InteractionSettingsHotkeys, signature: string) => {
+    const getGroup = () => registeredStacks.filter((stack) => stack.hotkeysSignature === signature);
+
+    const unbindForward = ShortcutUtils.addBinding({
+        shortcut: hotkeys.forward,
+        layer: undefined,
+        onTrigger: () => cycleWithin(getGroup(), 1),
+    });
+    const unbindBack = ShortcutUtils.addBinding({
+        shortcut: hotkeys.back,
+        layer: undefined,
+        onTrigger: () => cycleWithin(getGroup(), -1),
+    });
+
+    return () => {
+        unbindForward();
+        unbindBack();
+    };
 };
 
 /**
@@ -393,11 +432,14 @@ export namespace ToastUtils {
         dismiss: () => false,
     };
 
-    /** The shortcut that moves focus into the next stack holding toasts, from anywhere on the page. */
-    export const HOTKEY_FORWARD = HOTKEY;
+    /**
+     * The shortcut that moves focus into the next stack holding toasts, from anywhere on the page, until a wrapper
+     * sets another through `toastHotkeys`.
+     */
+    export const HOTKEY_FORWARD = INTERACTION_SETTINGS_DEFAULTS.toastHotkeys.forward;
 
-    /** The shortcut that moves focus into the previous stack holding toasts. */
-    export const HOTKEY_BACK = BACK_HOTKEY;
+    /** The shortcut that moves focus into the previous stack holding toasts, until a wrapper sets another. */
+    export const HOTKEY_BACK = INTERACTION_SETTINGS_DEFAULTS.toastHotkeys.back;
 
     /**
      * Which stack the shortcut moves focus to next, out of every stack registered.
@@ -430,42 +472,29 @@ export namespace ToastUtils {
     };
 
     /**
-     * Moves focus into the next or previous stack holding toasts — what the page-wide shortcut does.
+     * Moves focus into the next or previous stack holding toasts, out of every stack on the page whatever shortcuts
+     * each answers to.
      *
      * Coming from outside every stack, it remembers where focus was, and Escape pressed inside any stack hands it back
-     * there, however many stacks the shortcut has passed through since. A consumer may call it from a control of
-     * their own, such as a button that takes the reader to their notifications.
+     * there, however many stacks have been passed through since. It is what a consumer wires to a control of their
+     * own, such as a button that takes the reader to their notifications, and the way in for stacks whose shortcuts are
+     * switched off. The shortcuts themselves cycle only through the stacks that answer to the same pair.
      *
      * @param step `1` for forward, `-1` for back.
      * @returns `true` when focus moved, and `false` when there was nowhere to go.
      */
-    export const cycleFocus = (step: 1 | -1) => {
-        const active = document.activeElement;
-        const currentIndex = registeredStacks.findIndex((stack) => stack.region.contains(active));
-        const targetIndex = computeCycleTarget(
-            registeredStacks.map((stack) => stack.getHasToasts()),
-            currentIndex,
-            step,
-        );
-
-        if (targetIndex === undefined) return false;
-
-        if (currentIndex < 0) restoreRef = getIsFocusableElement(active) ? active : undefined;
-
-        registeredStacks[targetIndex]?.region.focus();
-
-        return true;
-    };
+    export const cycleFocus = (step: 1 | -1) => cycleWithin(registeredStacks, step);
 
     /**
-     * Enters a provider's stack in the page-wide register, which keeps every stack in order, holds the one shortcut
-     * that reaches them, and warns once when two stacks draw at one alignment in one place.
+     * Enters a provider's stack in the page-wide register, which keeps every stack in order, holds the shortcuts
+     * that reach them, and warns once when two stacks draw at one alignment in one place.
      *
-     * The order is the order providers first joined: a provider joining again — because its alignment, its region or
-     * the place it draws into changed — keeps its place, so hand the same `owner` every time. While a stack is
-     * registered, Escape pressed in its region hands focus back to where it was before the shortcut first moved it
-     * into a stack. The shortcut — {@link HOTKEY_FORWARD} and {@link HOTKEY_BACK} — is bound with the first stack and
-     * unbound with the last, on the page itself, so it is quiet while a layer such as a `Modal` sits on top.
+     * The order is the order providers first joined: a provider joining again — because its alignment, its region, its
+     * shortcuts or the place it draws into changed — keeps its place, so hand the same `owner` every time. While a stack
+     * is registered, Escape pressed in its region hands focus back to where it was before the shortcut first moved it
+     * into a stack. Each distinct pair of shortcuts is bound once on the page itself, while some stack answers to it,
+     * and cycles through the stacks that answer to that pair in the order they joined; it is quiet while a layer such
+     * as a `Modal` sits on top.
      *
      * Two stacks at one alignment in one place overlap, which is allowed but rarely meant. Stacks drawn into
      * different places — the page and a nested viewport, say — never meet, so only a shared place is warned about.
@@ -474,15 +503,25 @@ export namespace ToastUtils {
      * @param defs.region The stack's region, which must be focusable.
      * @param defs.scope Where the stack is drawn: the portal it is mounted into, or the document body without one.
      * @param defs.alignment Where in that place the stack sits.
+     * @param defs.hotkeys The pair of shortcuts the stack answers to, `null` for none. Left out, it is the pair
+     * {@link HOTKEY_FORWARD} and {@link HOTKEY_BACK}.
      * @param defs.getHasToasts Whether the stack holds any toast, read each time the shortcut is pressed.
      * @returns The function that takes the stack out of the register, for when the provider unmounts or any of
      * `defs` changes. Calling it twice is harmless.
      */
     export const registerStack = (
         owner: object,
-        defs: { region: HTMLElement; scope: object; alignment: ToastsAlignment; getHasToasts: () => boolean },
+        defs: {
+            region: HTMLElement;
+            scope: object;
+            alignment: ToastsAlignment;
+            hotkeys?: InteractionSettingsHotkeys | null;
+            getHasToasts: () => boolean;
+        },
     ) => {
         const order = joinOrders.get(owner) ?? nextJoinOrder++;
+        const hotkeys = defs.hotkeys === undefined ? INTERACTION_SETTINGS_DEFAULTS.toastHotkeys : defs.hotkeys;
+        const hotkeysSignature = InteractionSettingsUtils.computeHotkeysSignature(hotkeys);
 
         joinOrders.set(owner, order);
 
@@ -494,28 +533,22 @@ export namespace ToastUtils {
             warnOnce(computeSharedAlignmentWarning(defs.alignment));
         }
 
-        const entry: RegisteredStack = { owner, order, ...defs };
+        const entry: RegisteredStack = {
+            owner,
+            order,
+            region: defs.region,
+            scope: defs.scope,
+            alignment: defs.alignment,
+            hotkeysSignature,
+            getHasToasts: defs.getHasToasts,
+        };
         const insertAt = registeredStacks.findIndex((stack) => stack.order > order);
 
         registeredStacks.splice(insertAt < 0 ? registeredStacks.length : insertAt, 0, entry);
         defs.region.addEventListener("keydown", handleStackKeyDown);
 
-        if (!unbindHotkeys) {
-            const unbindForward = ShortcutUtils.addBinding({
-                shortcut: HOTKEY,
-                layer: undefined,
-                onTrigger: () => cycleFocus(1),
-            });
-            const unbindBack = ShortcutUtils.addBinding({
-                shortcut: BACK_HOTKEY,
-                layer: undefined,
-                onTrigger: () => cycleFocus(-1),
-            });
-
-            unbindHotkeys = () => {
-                unbindForward();
-                unbindBack();
-            };
+        if (hotkeys !== null && hotkeysSignature !== undefined && !hotkeyBindings.has(hotkeysSignature)) {
+            hotkeyBindings.set(hotkeysSignature, bindHotkeys(hotkeys, hotkeysSignature));
         }
 
         return () => {
@@ -526,10 +559,11 @@ export namespace ToastUtils {
             registeredStacks.splice(index, 1);
             defs.region.removeEventListener("keydown", handleStackKeyDown);
 
-            if (registeredStacks.length > 0) return;
+            if (hotkeysSignature === undefined) return;
+            if (registeredStacks.some((stack) => stack.hotkeysSignature === hotkeysSignature)) return;
 
-            unbindHotkeys?.();
-            unbindHotkeys = undefined;
+            hotkeyBindings.get(hotkeysSignature)?.();
+            hotkeyBindings.delete(hotkeysSignature);
         };
     };
 

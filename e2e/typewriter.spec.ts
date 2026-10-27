@@ -101,6 +101,94 @@ test("the button under the example types the text again from the start", async (
     await expect.poll(isPlaying, { message: "pressing the button starts a run again" }).toBe(true);
 });
 
+/**
+ * The Fade out button plays the letters away in the order they arrived, from the whole text showing. A letter
+ * that has not begun its fade yet is read for whether it shows at all, opacity included, so a fade-out that
+ * picked up from a half-typed text — its later letters still transparent — is caught on any frame.
+ */
+const fadeFrame = (page: Page) =>
+    page.evaluate(
+        (copySelector) =>
+            new Promise<{ characters: number; waitingShown: boolean[] }>((resolve) =>
+                requestAnimationFrame(() => {
+                    const output = document.querySelector(copySelector)!.nextElementSibling;
+                    const characters = output
+                        ? [...output.querySelectorAll("*")].filter((element) => element.getAnimations().length > 0)
+                        : [];
+                    const waiting = characters.filter((character) => {
+                        const animation = character.getAnimations()[0];
+
+                        return Number(animation.currentTime ?? -1) < Number(animation.effect!.getTiming().delay ?? 0);
+                    });
+
+                    resolve({
+                        characters: characters.length,
+                        waitingShown: waiting.map((character) =>
+                            character.checkVisibility({ opacityProperty: true, visibilityProperty: true }),
+                        ),
+                    });
+                }),
+            ),
+        MEASURE_COPY,
+    );
+
+/** The text a reader can see or hear: `innerText` leaves out whatever `visibility: hidden` has taken away. */
+const readableText = (page: Page) =>
+    page.locator(`${COMPLEX} [inert] + div`).evaluate((output) => (output as HTMLElement).innerText.trim());
+
+const FADED_WATCH_MS = 1_000;
+
+test("Fade out starts from the whole text showing, and the letters yet to fade are all still there", async ({
+    page,
+}) => {
+    await page.locator("#fadeItOut").click();
+
+    await expect
+        .poll(
+            async () => {
+                const { waitingShown } = await fadeFrame(page);
+
+                return waitingShown.length > 0 && !waitingShown.includes(false);
+            },
+            {
+                message: "a frame of the fade-out is caught with letters still to go, and every one of them shows",
+                timeout: 30_000,
+                intervals: [50],
+            },
+        )
+        .toBe(true);
+});
+
+/**
+ * A finished fade-out holds its last frame, where every letter is `visibility: hidden` — which also takes it out of
+ * what a screen reader reads. A run that came to rest instead would draw the text plainly and show it again.
+ */
+test("after Fade out the text stays gone, for a screen reader too, until Fade in brings it back", async ({ page }) => {
+    await page.locator("#fadeItOut").click();
+
+    await expect
+        .poll(() => readableText(page), { message: "the fade-out ends with nothing left to read", timeout: 30_000 })
+        .toBe("");
+
+    await page.waitForTimeout(FADED_WATCH_MS);
+
+    expect(await readableText(page), "and it stays that way rather than coming to rest showing").toBe("");
+    expect((await fadeFrame(page)).characters, "because the letters are held at their last frame").toBeGreaterThan(0);
+
+    await page.locator("#typeItAgain").click();
+
+    await expect
+        .poll(
+            async () =>
+                (await readableText(page)) !== "" &&
+                (await page
+                    .locator(`${COMPLEX} [inert] + div`)
+                    .evaluate((output) => !output.querySelector(":scope > span > span"))),
+            { message: "Fade in plays the text back and leaves it at rest, readable", timeout: 30_000 },
+        )
+        .toBe(true);
+});
+
 test("structure survives the split but presentation is flattened onto the spans", async ({ page }) => {
     const output = page.locator(`${COMPLEX} [inert] + div`);
 
@@ -490,4 +578,67 @@ test("playing writes the progress as it goes, so the slider sharing it moves on 
     await expect
         .poll(async () => Number(await scrubber.inputValue()), { message: "the shared progress climbs while it plays" })
         .toBeGreaterThan(before);
+});
+
+/**
+ * The slider fills its row, and its native input lies over the whole of it, taking presses everywhere. The drawing has
+ * to span the same width, or a press near the right end moves the value there while the thumb is drawn somewhere in
+ * the left part. So each press is checked against the thumb it leaves drawn: the point pressed is inside it. The thumb
+ * is the painter's, found by where it sits, as `range.spec.ts` finds it.
+ */
+const PRESS_SHARES = [0.25, 0.75];
+
+test("a slider filling its row is drawn across all of it, so the thumb lands where it is pressed", async ({ page }) => {
+    const scrubber = page.locator(KARAOKE_SCRUBBER);
+
+    await scrubber.scrollIntoViewIfNeeded();
+
+    const box = (await scrubber.boundingBox())!;
+    const thumb = page.locator(`${KARAOKE} div:has(> ${KARAOKE_SCRUBBER}) > div:first-child > div:nth-child(3)`);
+
+    for (const share of PRESS_SHARES) {
+        const x = box.x + box.width * share;
+
+        await page.mouse.click(x, box.y + box.height * 0.5);
+
+        await expect
+            .poll(
+                async () => {
+                    const drawn = (await thumb.boundingBox())!;
+
+                    return x >= drawn.x && x <= drawn.x + drawn.width;
+                },
+                { message: `pressed ${share * 100}% of the way along, the thumb is drawn under the pointer` },
+            )
+            .toBe(true);
+    }
+});
+
+/**
+ * The flying-outward example scrolls up and down, and its letters fly off sideways as they go. Flown letters reach
+ * past the box's sides, and the box must not offer that as something to scroll to: a sideways scroll once worked, and
+ * a horizontal scrollbar appeared under the text. Scrollbars are hidden in a headless browser, so the spec tries the
+ * sideways scroll itself, the way a trackpad would.
+ */
+const OUTWARD_BOX = "#outwardScrollBox";
+const WHEEL_PX = 2_000;
+const SIDEWAYS_WATCH_MS = 500;
+
+test("the flying-outward box never scrolls sideways, however far its letters fly", async ({ page }) => {
+    const box = page.locator(OUTWARD_BOX);
+
+    await box.scrollIntoViewIfNeeded();
+    await box.hover();
+    await page.mouse.wheel(0, WHEEL_PX);
+
+    await expect
+        .poll(() => box.evaluate((element) => element.scrollTop + element.clientHeight >= element.scrollHeight - 1), {
+            message: "the box scrolls to its end, past which every letter has flown",
+        })
+        .toBe(true);
+
+    await page.mouse.wheel(WHEEL_PX, 0);
+    await page.waitForTimeout(SIDEWAYS_WATCH_MS);
+
+    expect(await box.evaluate((element) => element.scrollLeft), "and a sideways scroll moves it nowhere").toBe(0);
 });
