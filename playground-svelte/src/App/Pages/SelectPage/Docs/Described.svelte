@@ -12,6 +12,7 @@
 
 <Select
     renderHighlightFloater={renderPageHighlightFloater}
+    name="delivery"
     bind:value
     options={DELIVERIES}
     ariaLabel={"Delivery"}

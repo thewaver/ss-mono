@@ -1,4 +1,4 @@
-import { createEffect, createMemo, createSignal, untrack } from "solid-js";
+import { createEffect, createMemo, createSignal, splitProps, untrack } from "solid-js";
 
 import {
     DATE_INPUT_DEFAULTS,
@@ -10,9 +10,12 @@ import {
 } from "@thewaver/ss-components";
 
 import { MaskedFieldSolidUtils } from "../../../Abstracts/MaskedField/MaskedFieldSolid.utils";
+import { FormValue } from "../../../Primitives/FormValue/FormValue";
 import { TextField } from "../../../Primitives/TextField/TextField";
 import { access, accessSignal } from "../../../Utils/propUtils";
 import type { DateInputProps } from "./DateInputSolid.types";
+
+const EMPTY_FORM_VALUE = "";
 
 export const DateInput = (props: DateInputProps) => {
     const valueSignal = accessSignal(() => props.value);
@@ -88,18 +91,31 @@ export const DateInput = (props: DateInputProps) => {
         },
     };
 
+    const [, fieldProps] = splitProps(props, ["name"]);
+
     return (
-        <TextField
-            {...props}
-            value={field.text}
-            element={"input"}
-            inputMode={"numeric"}
-            computeMaskedText={(previous, next, caret) => TextSyncUtils.applyMask(getMask(), previous, next, caret)}
-            placeholderHint={() => DateInputUtils.computeHint(getFormat(), access(props.partHints))}
-            hasError={() => (access(props.hasError) ?? false) || field.getHasIssue()}
-            renderLeading={props.renderLeading && ((getFlags) => props.renderLeading!(getFlags, era))}
-            onInput={field.onInput}
-            onBlur={field.onBlur}
-        />
+        <>
+            <TextField
+                {...fieldProps}
+                value={field.text}
+                element={"input"}
+                inputMode={"numeric"}
+                computeMaskedText={(previous, next, caret) => TextSyncUtils.applyMask(getMask(), previous, next, caret)}
+                placeholderHint={() => DateInputUtils.computeHint(getFormat(), access(props.partHints))}
+                hasError={() => (access(props.hasError) ?? false) || field.getHasIssue()}
+                renderLeading={props.renderLeading && ((getFlags) => props.renderLeading!(getFlags, era))}
+                onInput={field.onInput}
+                onBlur={field.onBlur}
+            />
+
+            <FormValue
+                name={props.name}
+                values={() => {
+                    const value = valueSignal[0]();
+
+                    return [value ? DateValueUtils.toIso(value) : EMPTY_FORM_VALUE];
+                }}
+            />
+        </>
     );
 };

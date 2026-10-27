@@ -4,12 +4,15 @@ import { type TextSyncElement, TextSyncUtils, TimeInputUtils } from "@thewaver/s
 import { TimeUtils, type TimeValue, type TimeValueMeridiem } from "@thewaver/ss-utils";
 
 import { MaskedFieldVueUtils } from "../../../Abstracts/MaskedField/MaskedFieldVue.utils";
+import { FormValue } from "../../../Primitives/FormValue/FormValue";
 import { TextField } from "../../../Primitives/TextField/TextField";
 import type { TextFieldSlots } from "../../../Primitives/TextField/TextField.types";
 import { watchAfterRender } from "../../../Utils/effectUtils";
 import { callSlot, declareProps, forwardProps, useTwoWay } from "../../../Utils/propUtils";
 import type { SlotsContext } from "../../../Utils/typeUtils";
 import type { TimeInputMeridiem, TimeInputProps, TimeInputSlots } from "./TimeInput.types";
+
+const EMPTY_FORM_VALUE = "";
 
 export const TimeInput = defineComponent(
     (props: TimeInputProps, { slots }: SlotsContext<TimeInputSlots>) => {
@@ -90,13 +93,14 @@ export const TimeInput = defineComponent(
 
             const forwarded = {
                 ...forwardProps(props, TextField),
+                "name": undefined,
                 "value": field.text.value,
                 "onUpdate:value": (text: string) => {
                     field.text.value = text;
                 },
             };
 
-            return (
+            const textField = (
                 <TextField
                     {...forwarded}
                     element={"input"}
@@ -122,6 +126,17 @@ export const TimeInput = defineComponent(
                         } satisfies Partial<TextFieldSlots>
                     }
                 </TextField>
+            );
+
+            return (
+                <>
+                    {textField}
+
+                    <FormValue
+                        name={props.name}
+                        values={[value.value ? TimeUtils.toIso(value.value) : EMPTY_FORM_VALUE]}
+                    />
+                </>
             );
         };
     },

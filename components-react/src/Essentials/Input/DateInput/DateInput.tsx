@@ -9,8 +9,11 @@ import {
 } from "@thewaver/ss-components";
 
 import { MaskedFieldReactUtils } from "../../../Abstracts/MaskedField/MaskedFieldReact.utils";
+import { FormValue } from "../../../Primitives/FormValue/FormValue";
 import { TextField } from "../../../Primitives/TextField/TextField";
 import type { DateInputEra, DateInputProps } from "./DateInput.types";
+
+const EMPTY_FORM_VALUE = "";
 
 export const DateInput = (props: DateInputProps) => {
     const [value, setValue] = props.value;
@@ -80,17 +83,22 @@ export const DateInput = (props: DateInputProps) => {
     const renderLeading = props.renderLeading;
 
     return (
-        <TextField
-            {...props}
-            value={field.text}
-            element={"input"}
-            inputMode={"numeric"}
-            computeMaskedText={(previous, next, caret) => TextSyncUtils.applyMask(mask, previous, next, caret)}
-            placeholderHint={DateInputUtils.computeHint(format, props.partHints)}
-            hasError={(props.hasError ?? false) || field.hasIssue}
-            renderLeading={renderLeading && ((flags) => renderLeading(flags, eraControl))}
-            onInput={field.onInput}
-            onBlur={field.onBlur}
-        />
+        <>
+            <TextField
+                {...props}
+                name={undefined}
+                value={field.text}
+                element={"input"}
+                inputMode={"numeric"}
+                computeMaskedText={(previous, next, caret) => TextSyncUtils.applyMask(mask, previous, next, caret)}
+                placeholderHint={DateInputUtils.computeHint(format, props.partHints)}
+                hasError={(props.hasError ?? false) || field.hasIssue}
+                renderLeading={renderLeading && ((flags) => renderLeading(flags, eraControl))}
+                onInput={field.onInput}
+                onBlur={field.onBlur}
+            />
+
+            <FormValue name={props.name} values={[value ? DateValueUtils.toIso(value) : EMPTY_FORM_VALUE]} />
+        </>
     );
 };

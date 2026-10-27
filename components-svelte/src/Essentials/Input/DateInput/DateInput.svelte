@@ -12,8 +12,11 @@
     } from "@thewaver/ss-components";
 
     import { MaskedFieldSvelteUtils } from "../../../Abstracts/MaskedField/MaskedFieldSvelte.utils.svelte.js";
+    import FormValue from "../../../Primitives/FormValue/FormValue.svelte";
     import TextField from "../../../Primitives/TextField/TextField.svelte";
     import type { DateInputEra, DateInputProps } from "./DateInput.types.js";
+
+    const EMPTY_FORM_VALUE = "";
 
     let { value = $bindable(), ref = $bindable(), ...props }: DateInputProps = $props();
 
@@ -90,6 +93,7 @@
 
 <TextField
     {...props}
+    name={undefined}
     bind:value={() => field.text[0](), (next) => field.text[1](next)}
     bind:ref
     element={"input"}
@@ -101,3 +105,5 @@
     onInput={field.onInput}
     onBlur={field.onBlur}
 />
+
+<FormValue name={props.name} values={[value ? DateValueUtils.toIso(value) : EMPTY_FORM_VALUE]} />

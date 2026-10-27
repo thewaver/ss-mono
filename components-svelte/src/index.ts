@@ -103,6 +103,8 @@ export { default as TextField } from "./Primitives/TextField/TextField.svelte";
 export type * from "./Primitives/TextField/TextField.types.js";
 export { default as BinarySwitch } from "./Primitives/BinarySwitch/BinarySwitch.svelte";
 export type * from "./Primitives/BinarySwitch/BinarySwitch.types.js";
+export { default as FormValue } from "./Primitives/FormValue/FormValue.svelte";
+export type * from "./Primitives/FormValue/FormValue.types.js";
 export { default as Checkbox } from "./Essentials/Input/Checkbox/Checkbox.svelte";
 export type * from "./Essentials/Input/Checkbox/Checkbox.types.js";
 export { default as CheckboxGroup } from "./Essentials/Input/CheckboxGroup/CheckboxGroup.svelte";

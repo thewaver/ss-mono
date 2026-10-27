@@ -21,6 +21,7 @@ export type DateInputEra = {
 
 export type DateInputProps = Omit<
     TextFieldProps,
+    | "name"
     | "value"
     | "element"
     | "type"

@@ -39,6 +39,12 @@ export type SelectRowRecord<T, TTooltipDefs = unknown> = FlatRow<SelectItemRecor
 export type BaseSelectValues = {
     /** Identifies the select, and is what the field and list compose their own ids from. */
     id?: string;
+    /**
+     * The select's name when it is submitted as part of a form. A single select submits its picked option under it,
+     * or an empty entry while nothing is picked; a multiple one submits one entry per picked option, as a native one
+     * does. Left out, nothing is submitted.
+     */
+    name?: string;
     /** Names the select for assistive technology. */
     ariaLabel?: string;
     /**

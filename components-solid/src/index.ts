@@ -41,6 +41,8 @@ export * from "./Generators/SVGDefs/SVGFilters/SVGFilterDefs.factory";
 export * from "./Primitives/Barrel/Barrel";
 export type * from "./Primitives/Barrel/BarrelSolid.types";
 export type * from "./Primitives/BinarySwitch/BinarySwitchSolid.types";
+export * from "./Primitives/FormValue/FormValue";
+export type * from "./Primitives/FormValue/FormValueSolid.types";
 export * from "./Primitives/InteractionSettings/InteractionSettings";
 export * from "./Primitives/InteractionSettings/InteractionSettings.context";
 export type * from "./Primitives/InteractionSettings/InteractionSettingsSolid.types";

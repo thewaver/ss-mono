@@ -50,7 +50,10 @@ export type ColorInputCbs = BaseColorInputCbs & {
 };
 
 export type BaseColorInputValues = {
-    /** The field's name when it is submitted as part of a form. */
+    /**
+     * The field's name when it is submitted as part of a form. The color is submitted as written, in whichever
+     * notation it holds. Left out, nothing is submitted.
+     */
     name?: string;
     /** Names the color input for assistive technology. */
     ariaLabel?: string;

@@ -12,6 +12,12 @@ export type DateInputEra = {
 };
 
 export type BaseDateInputValues = {
+    /**
+     * The field's name when it is submitted as part of a form. The date is submitted as `YYYY-MM-DD` in the Gregorian
+     * calendar whatever calendar and format the field shows, or as an empty entry while there is none. The text
+     * on screen is not submitted. Left out, nothing is submitted.
+     */
+    name?: string;
     /** The earliest date that can be entered. */
     minValue?: DateValue;
     /** The latest date that can be entered. */

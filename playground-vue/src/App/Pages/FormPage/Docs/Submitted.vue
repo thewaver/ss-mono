@@ -61,7 +61,13 @@ const computeTopicsMessage = (hasSubmitted: boolean) =>
                     </template>
 
                     <template #renderControl="fieldState">
-                        <Select v-model:value="plan" :options="PLANS" is-required :has-error="fieldState.hasError">
+                        <Select
+                            name="plan"
+                            v-model:value="plan"
+                            :options="PLANS"
+                            is-required
+                            :has-error="fieldState.hasError"
+                        >
                             <template #renderContent="{ selectedOption, flags }">
                                 <PageSelectContent :flags="flags">{{
                                     selectedOption?.value ?? PLACEHOLDER
@@ -101,6 +107,7 @@ const computeTopicsMessage = (hasSubmitted: boolean) =>
 
                     <template #renderControl="fieldState">
                         <MultiSelect
+                            name="topics"
                             v-model:values="topics"
                             :options="TOPICS"
                             is-required

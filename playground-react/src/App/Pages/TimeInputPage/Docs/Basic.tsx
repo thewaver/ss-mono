@@ -28,6 +28,7 @@ export const BasicDocsExample = (props: Props) => {
     return (
         <>
             <TimeInput
+                name={"time"}
                 value={valueState}
                 isReadOnly={props.isReadOnly}
                 hasError={props.hasError}

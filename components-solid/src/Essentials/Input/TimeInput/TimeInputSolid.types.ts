@@ -8,6 +8,7 @@ import type { AccessorValues, SignalSource } from "../../../Utils/typeUtils";
 
 export type TimeInputProps = Omit<
     TextFieldProps,
+    | "name"
     | "value"
     | "element"
     | "type"

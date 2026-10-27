@@ -1,6 +1,7 @@
 import { type SlotsType, computed, defineComponent, shallowRef, useId, watch } from "vue";
 
 import {
+    FormValueUtils,
     ListboxUtils,
     SELECT_DEFAULTS,
     type SelectFlags,
@@ -12,6 +13,7 @@ import { SelectConst } from "@thewaver/ss-components/internal";
 import { CSSUtils } from "@thewaver/ss-utils";
 
 import { TextSyncVueUtils } from "../../../Abstracts/TextSync/TextSyncVue.utils";
+import { FormValue } from "../../../Primitives/FormValue/FormValue";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import type {
     InteractionControlSlots,
@@ -176,6 +178,8 @@ const SelectField = defineComponent(
     },
 );
 
+const EMPTY_FORM_VALUE = "";
+
 export const SelectComposite = defineComponent(
     <T,>(props: SelectCompositeProps<T>, { slots }: SlotsContext<SelectCompositeSlots<T>>) => {
         const listboxId = useId();
@@ -295,6 +299,15 @@ export const SelectComposite = defineComponent(
             const isMultiple = props.isMultiple ?? false;
             const isFilterable = getIsFilterable();
 
+            const computeFormValues = () => {
+                const texts = FormValueUtils.computeTexts(
+                    props.selectedOptions.map((option) => option.value),
+                    props.computeFormValue,
+                );
+
+                return isMultiple || texts.length > 0 ? texts : [EMPTY_FORM_VALUE];
+            };
+
             const spreadPadding = TextFieldUtils.resolvePadding(props.padding ?? SELECT_DEFAULTS.padding);
             const textInset = CSSUtils.spreadableToStyle(spreadPadding, String);
 
@@ -368,6 +381,11 @@ export const SelectComposite = defineComponent(
                                         </div>
                                     )}
 
+                                    <FormValue
+                                        name={props.name}
+                                        values={props.name === undefined ? [] : computeFormValues()}
+                                    />
+
                                     <Popover
                                         id={listboxId}
                                         role={"listbox"}
@@ -414,6 +432,7 @@ export const SelectComposite = defineComponent(
             "hasError": Boolean,
             "role": null,
             "sizing": null,
+            "name": null,
             "minWidth": null,
             "minHeight": null,
             "isReachableWhenDisabled": Boolean,
@@ -446,6 +465,7 @@ export const SelectComposite = defineComponent(
             "selectedOptions": null,
             "computeIsSelected": null,
             "computeCustomText": null,
+            "computeFormValue": null,
             "onPick": null,
             "onClear": null,
         }),
@@ -523,6 +543,7 @@ export const Select = defineComponent(
             "hasError": Boolean,
             "role": null,
             "sizing": null,
+            "name": null,
             "minWidth": null,
             "minHeight": null,
             "isReachableWhenDisabled": Boolean,
@@ -552,6 +573,7 @@ export const Select = defineComponent(
             "clearAriaLabel": null,
             "options": null,
             "computeCustomText": null,
+            "computeFormValue": null,
             "value": null,
             "onUpdate:value": null,
             "onSelectionChange": null,

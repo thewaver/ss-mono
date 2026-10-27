@@ -23,12 +23,12 @@ purpose: it answers "what is outstanding", and neither of them is.
 
 Something that misbehaves, or a cost nobody has paid down.
 
-| #   | Where                      | What happens                                                                                                                                                                                                  |
-| --- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 11  | **Native form submit**     | **Pending decision.** `Select`, `MultiSelect` and `ColorInput` submit nothing, the date and time fields submit their display text, and `Form` hands `onSubmit` no values. One question, lofted, not discarded |
-| 10  | **Any placed control**     | A layout guesses each item's box, so content wider than the guess overflows it and, on a ring, overlaps a neighbor                                                                                            |
-| 10  | **Any placed control**     | Nothing stops a layout outgrowing the room it is in — a ring can reach past the screen, and a placed toolbar has nothing to collapse into                                                                     |
-| 10  | **`Menu`, hold and flick** | How far a flick must travel to pick an item is a guess — about 30px on the demo wheel — not a measured number                                                                                                 |
+| #   | Where                      | What happens                                                                                                                              |
+| --- | -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| 11  | **Native form submit**     | **Pending decision.** `Form` hands `onSubmit` no values. One question, lofted, not discarded                                              |
+| 10  | **Any placed control**     | A layout guesses each item's box, so content wider than the guess overflows it and, on a ring, overlaps a neighbor                        |
+| 10  | **Any placed control**     | Nothing stops a layout outgrowing the room it is in — a ring can reach past the screen, and a placed toolbar has nothing to collapse into |
+| 10  | **`Menu`, hold and flick** | How far a flick must travel to pick an item is a guess — about 30px on the demo wheel — not a measured number                             |
 
 ## Deliberately not built
 

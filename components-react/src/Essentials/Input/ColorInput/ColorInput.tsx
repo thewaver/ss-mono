@@ -10,6 +10,7 @@ import type { Color } from "@thewaver/ss-utils";
 
 import { NavigatorReactUtils } from "../../../Abstracts/Navigator/NavigatorReact.utils";
 import { SignalMirrorReactUtils } from "../../../Abstracts/SignalMirror/SignalMirrorReact.utils";
+import { FormValue } from "../../../Primitives/FormValue/FormValue";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import { Popover } from "../../../Primitives/Popover/Popover";
 import { useLatest } from "../../../Utils/refUtils";
@@ -206,6 +207,8 @@ export const ColorInput = (props: ColorInputProps) => {
                     />
                 )}
             />
+
+            <FormValue name={props.name} values={[value]} />
 
             <Popover
                 id={popupId}

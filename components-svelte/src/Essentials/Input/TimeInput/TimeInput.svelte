@@ -11,8 +11,11 @@
     import { TimeUtils, type TimeValue, type TimeValueMeridiem } from "@thewaver/ss-utils";
 
     import { MaskedFieldSvelteUtils } from "../../../Abstracts/MaskedField/MaskedFieldSvelte.utils.svelte.js";
+    import FormValue from "../../../Primitives/FormValue/FormValue.svelte";
     import TextField from "../../../Primitives/TextField/TextField.svelte";
     import type { TimeInputMeridiem, TimeInputProps } from "./TimeInput.types.js";
+
+    const EMPTY_FORM_VALUE = "";
 
     let { value = $bindable(), ref = $bindable(), ...props }: TimeInputProps = $props();
 
@@ -93,6 +96,7 @@
 
 <TextField
     {...props}
+    name={undefined}
     bind:value={() => field.text[0](), (next) => field.text[1](next)}
     bind:ref
     element={"input"}
@@ -105,3 +109,5 @@
     onKeyDown={handleKeyDown}
     onBlur={field.onBlur}
 />
+
+<FormValue name={props.name} values={[value ? TimeUtils.toIso(value) : EMPTY_FORM_VALUE]} />

@@ -42,7 +42,7 @@ reading.
 8. `Table` — two things deliberately not built — _open_
 9. `GlassSurface`'s ripple layer shows a defect at its edge — _postponed until the platform catches up_
 10. Arbitrary placement — the gaps the trials left — _open_
-11. The submit story — what a native submit carries, and what `Form` hands `onSubmit` — _pending decision_
+11. What `Form` hands `onSubmit` — _pending decision_
 12. The Playground's painters in Windows high-contrast mode — _open, decided, not yet built_
 
 ---
@@ -140,8 +140,7 @@ same example.
 ## 3. `ColorInput` — the eyedropper — _postponed until the platform catches up_
 
 `ColorInput` is the custom picker now; the decisions are in `decisions.md` under the `ColorArea` heading.
-Its form value is part of item 11, the submit story; having no system color picker to fall back on is the cost
-of owning the surface, recorded in `decisions.md`.
+Having no system color picker to fall back on is the cost of owning the surface, recorded in `decisions.md`.
 
 - **No eyedropper — _postponed until the platform catches up_, decided by the user.** Swatch
   presets and recent colors were dropped the same day and are not coming back. The eyedropper is not
@@ -382,25 +381,16 @@ document"_, _"Five more controls take a layout"_ and _"Hold and flick"_. What th
 
 ---
 
-## 11. The submit story — what a native submit carries, and what `Form` hands `onSubmit`
+## 11. What `Form` hands `onSubmit`
 
-Three findings from the survey against the reference libraries were lofted here rather than settled one by one,
-because they are one question. **The user's word: lofted, not discarded.**
-
-- `Select`, `MultiSelect` and `ColorInput` have no `name` and render no native element, so a plain `<form>` around
-  them submits nothing. Radix, Kobalte and Ark render a hidden native input so `name` submits. `Checkbox` and `Toggle` got their
-  `name` back separately, since they already render a native input.
-- `DateInput`, `DatePicker` and `TimeInput` put `name` on the visible field, so a native submit sends the display
-  text, `23/09/2026` or `09/23/2026` by format, rather than a value a server can parse. React Aria sends ISO through
-  a hidden input. Inferred from the shared `TextField`, not traced.
-- `Form` cancels the browser's own submit and hands `onSubmit` nothing, so today `name` matters only to a consumer
-  who reads the fields themselves or uses a plain `<form>` without `Form`.
-
-The first two are the same change, a hidden input carrying a machine-readable value, and both wait on the third:
-whether the library's `Form` is ever going to carry values, or whether the native submit is the route a consumer
-who wants values takes. _"The form story"_ in `decisions.md` says the library never computes a form's data, and
-that entry is what this item would revisit. Focus moving to the first field in error on submit was built
-separately and does not depend on this.
+`Form` cancels the browser's own submit and hands `onSubmit` nothing, so `name` matters only to a consumer who
+reads the fields themselves or uses a plain `<form>` without `Form`. Every field now submits a value a server can
+read through a native submit (_"A control with no native element submits through a hidden input"_ in
+`decisions.md`), so the open question is only whether the library's `Form` is ever going to carry those values to
+`onSubmit`, or whether the native submit is the route a consumer who wants values takes. _"The form story"_ in
+`decisions.md` says the library never computes a form's data, and that entry is what this item would revisit.
+Focus moving to the first field in error on submit was built separately and does not depend on this. **The user's
+word: lofted, not discarded.**
 
 ---
 

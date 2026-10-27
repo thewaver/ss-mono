@@ -11,6 +11,7 @@ import type { Color } from "@thewaver/ss-utils";
 
 import { NavigatorSolidUtils } from "../../../Abstracts/Navigator/NavigatorSolid.utils";
 import { SignalMirrorSolidUtils } from "../../../Abstracts/SignalMirror/SignalMirrorSolid.utils";
+import { FormValue } from "../../../Primitives/FormValue/FormValue";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import { Popover } from "../../../Primitives/Popover/Popover";
 import { access } from "../../../Utils/propUtils";
@@ -212,6 +213,8 @@ export const ColorInput = (props: ColorInputProps) => {
                     />
                 )}
             />
+
+            <FormValue name={props.name} values={() => [props.value[0]()]} />
 
             <Popover
                 id={() => popupId}

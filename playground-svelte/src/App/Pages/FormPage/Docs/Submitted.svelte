@@ -52,6 +52,7 @@
                 {#snippet renderControl(fieldState)}
                     <Select
                         renderHighlightFloater={renderPageHighlightFloater}
+                        name="plan"
                         bind:value={plan}
                         options={PLANS}
                         isRequired={true}
@@ -81,6 +82,7 @@
                 {#snippet renderControl(fieldState)}
                     <MultiSelect
                         renderHighlightFloater={renderPageHighlightFloater}
+                        name="topics"
                         bind:values={topics}
                         options={TOPICS}
                         isRequired={true}

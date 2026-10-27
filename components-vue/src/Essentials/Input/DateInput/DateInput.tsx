@@ -9,12 +9,15 @@ import {
 } from "@thewaver/ss-components";
 
 import { MaskedFieldVueUtils } from "../../../Abstracts/MaskedField/MaskedFieldVue.utils";
+import { FormValue } from "../../../Primitives/FormValue/FormValue";
 import { TextField } from "../../../Primitives/TextField/TextField";
 import type { TextFieldSlots } from "../../../Primitives/TextField/TextField.types";
 import { watchAfterRender } from "../../../Utils/effectUtils";
 import { callSlot, declareProps, forwardProps, useTwoWay } from "../../../Utils/propUtils";
 import type { SlotsContext } from "../../../Utils/typeUtils";
 import type { DateInputEra, DateInputProps, DateInputSlots } from "./DateInput.types";
+
+const EMPTY_FORM_VALUE = "";
 
 export const DateInput = defineComponent(
     (props: DateInputProps, { slots }: SlotsContext<DateInputSlots>) => {
@@ -86,13 +89,14 @@ export const DateInput = defineComponent(
 
             const forwarded = {
                 ...forwardProps(props, TextField),
+                "name": undefined,
                 "value": field.text.value,
                 "onUpdate:value": (text: string) => {
                     field.text.value = text;
                 },
             };
 
-            return (
+            const textField = (
                 <TextField
                     {...forwarded}
                     element={"input"}
@@ -117,6 +121,17 @@ export const DateInput = defineComponent(
                         } satisfies Partial<TextFieldSlots>
                     }
                 </TextField>
+            );
+
+            return (
+                <>
+                    {textField}
+
+                    <FormValue
+                        name={props.name}
+                        values={[value.value ? DateValueUtils.toIso(value.value) : EMPTY_FORM_VALUE]}
+                    />
+                </>
             );
         };
     },

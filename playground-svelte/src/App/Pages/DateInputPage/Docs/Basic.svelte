@@ -25,6 +25,7 @@
 </script>
 
 <DateInput
+    name="date"
     bind:value
     isReadOnly={props.isReadOnly}
     hasError={props.hasError}

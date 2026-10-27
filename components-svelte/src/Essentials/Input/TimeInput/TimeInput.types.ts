@@ -16,6 +16,7 @@ export type TimeInputMeridiem = {
 
 export type TimeInputProps = Omit<
     TextFieldProps,
+    | "name"
     | "value"
     | "element"
     | "type"

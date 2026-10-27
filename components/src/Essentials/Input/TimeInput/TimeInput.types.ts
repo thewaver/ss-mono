@@ -7,6 +7,12 @@ export type TimeInputMeridiem = {
 };
 
 export type BaseTimeInputValues = {
+    /**
+     * The field's name when it is submitted as part of a form. The time is submitted in twenty-four-hour form,
+     * `HH:MM`, or `HH:MM:SS` when the value carries seconds, or as an empty entry while there is none. The text on
+     * screen is not submitted. Left out, nothing is submitted.
+     */
+    name?: string;
     /** The earliest time that can be entered. */
     minValue?: TimeValue;
     /** The latest time that can be entered. */

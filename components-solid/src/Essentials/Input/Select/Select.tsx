@@ -2,6 +2,7 @@ import type { JSX } from "solid-js";
 import { Show, batch, createEffect, createMemo, createSignal, createUniqueId, onCleanup } from "solid-js";
 
 import {
+    FormValueUtils,
     ListboxUtils,
     SELECT_DEFAULTS,
     SelectUtils,
@@ -13,6 +14,7 @@ import { CSSUtils, StringUtils } from "@thewaver/ss-utils";
 
 import { SignalMirrorSolidUtils } from "../../../Abstracts/SignalMirror/SignalMirrorSolid.utils";
 import { TextSyncSolidUtils } from "../../../Abstracts/TextSync/TextSyncSolid.utils";
+import { FormValue } from "../../../Primitives/FormValue/FormValue";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import { Popover } from "../../../Primitives/Popover/Popover";
 import { access, accessSignal } from "../../../Utils/propUtils";
@@ -22,6 +24,8 @@ import { useLabelContext } from "../Label/Label.context";
 import { ListboxOptions } from "../Listbox/Listbox";
 import { ListboxSolidUtils } from "../Listbox/ListboxSolid.utils";
 import type { SelectCompositeProps, SelectFieldProps, SelectProps } from "./SelectSolid.types";
+
+const EMPTY_FORM_VALUE = "";
 
 const SelectField = (props: SelectFieldProps) => {
     const { getAriaLabel, getAriaLabelledBy } = FormFieldSolidUtils.resolveAriaName(
@@ -230,6 +234,15 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
         onPick: (value) => props.onPick(value),
     });
 
+    const getFormValues = () => {
+        const texts = FormValueUtils.computeTexts(
+            access(props.selectedOptions).map((option) => option.value),
+            props.computeFormValue,
+        );
+
+        return getIsMultiple() || texts.length > 0 ? texts : [EMPTY_FORM_VALUE];
+    };
+
     const clearValue = () => {
         if (getIsDisabled()) return;
 
@@ -325,6 +338,8 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
                             />
                         </div>
                     </Show>
+
+                    <FormValue name={props.name} values={getFormValues} />
 
                     <Popover
                         id={() => listboxId}

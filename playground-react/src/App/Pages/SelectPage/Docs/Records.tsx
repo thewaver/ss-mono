@@ -16,6 +16,8 @@ export const RecordsDocsExample = () => {
         <>
             <Select
                 renderHighlightFloater={renderPageHighlightFloater}
+                name={"airport"}
+                computeFormValue={(airport) => airport.code}
                 value={valueState}
                 options={AIRPORTS}
                 ariaLabel={"Airport"}

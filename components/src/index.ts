@@ -436,6 +436,7 @@ export type * from "./Primitives/Barrel/Barrel.types";
 export * from "./Primitives/Barrel/Barrel.utils";
 export * as BinarySwitchStyles from "./Primitives/BinarySwitch/BinarySwitch.css";
 export type * from "./Primitives/BinarySwitch/BinarySwitch.types";
+export * from "./Primitives/FormValue/FormValue.utils";
 export * from "./Primitives/InteractionSettings/InteractionSettings.const";
 export type * from "./Primitives/InteractionSettings/InteractionSettings.context.types";
 export type * from "./Primitives/InteractionSettings/InteractionSettings.types";

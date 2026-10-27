@@ -95,6 +95,13 @@ export type SelectCompositeProps<T> = Omit<InteractionWrapperProps<SelectFlags>,
         "computeIsSelected": (value: T) => boolean;
         /** The text an option is found by when the reader types, where that is not its visible text. */
         "computeCustomText"?: (option: SelectOption<T>) => string;
+        /**
+         * The text an option's value is submitted as, for a select given a `name`. Left out, a string goes as it is, a
+         * number or a boolean as its plain spelling, and anything else as JSON, which throws for a value JSON cannot
+         * write, such as a circular object. Pass it where the server wants something other than that, such as a
+         * record's id.
+         */
+        "computeFormValue"?: (value: T) => string;
         /** Runs when an option is picked. */
         "onPick": (value: T) => void;
         /** Runs when the clear control is pressed, to empty whatever is picked. */

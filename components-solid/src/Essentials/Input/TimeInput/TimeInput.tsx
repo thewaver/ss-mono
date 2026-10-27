@@ -1,13 +1,16 @@
-import { createEffect, createMemo, createSignal, untrack } from "solid-js";
+import { createEffect, createMemo, createSignal, splitProps, untrack } from "solid-js";
 
 import { TextSyncUtils, type TimeInputMeridiem, TimeInputUtils } from "@thewaver/ss-components";
 import { TimeUtils } from "@thewaver/ss-utils";
 import type { TimeValue, TimeValueMeridiem } from "@thewaver/ss-utils";
 
 import { MaskedFieldSolidUtils } from "../../../Abstracts/MaskedField/MaskedFieldSolid.utils";
+import { FormValue } from "../../../Primitives/FormValue/FormValue";
 import { TextField } from "../../../Primitives/TextField/TextField";
 import { access, accessSignal } from "../../../Utils/propUtils";
 import type { TimeInputProps } from "./TimeInputSolid.types";
+
+const EMPTY_FORM_VALUE = "";
 
 export const TimeInput = (props: TimeInputProps) => {
     const valueSignal = accessSignal(() => props.value);
@@ -92,19 +95,32 @@ export const TimeInput = (props: TimeInputProps) => {
         element.setSelectionRange(step.selectionStart, step.selectionEnd);
     };
 
+    const [, fieldProps] = splitProps(props, ["name"]);
+
     return (
-        <TextField
-            {...props}
-            value={field.text}
-            element={"input"}
-            inputMode={"numeric"}
-            computeMaskedText={(previous, next, caret) => TextSyncUtils.applyMask(getMask(), previous, next, caret)}
-            placeholderHint={() => TimeInputUtils.computeHint(getSegmentCount(), access(props.segmentHints))}
-            hasError={() => (access(props.hasError) ?? false) || field.getHasIssue()}
-            renderTrailing={props.renderTrailing && ((getFlags) => props.renderTrailing!(getFlags, meridiem))}
-            onInput={field.onInput}
-            onKeyDown={handleKeyDown}
-            onBlur={field.onBlur}
-        />
+        <>
+            <TextField
+                {...fieldProps}
+                value={field.text}
+                element={"input"}
+                inputMode={"numeric"}
+                computeMaskedText={(previous, next, caret) => TextSyncUtils.applyMask(getMask(), previous, next, caret)}
+                placeholderHint={() => TimeInputUtils.computeHint(getSegmentCount(), access(props.segmentHints))}
+                hasError={() => (access(props.hasError) ?? false) || field.getHasIssue()}
+                renderTrailing={props.renderTrailing && ((getFlags) => props.renderTrailing!(getFlags, meridiem))}
+                onInput={field.onInput}
+                onKeyDown={handleKeyDown}
+                onBlur={field.onBlur}
+            />
+
+            <FormValue
+                name={props.name}
+                values={() => {
+                    const value = valueSignal[0]();
+
+                    return [value ? TimeUtils.toIso(value) : EMPTY_FORM_VALUE];
+                }}
+            />
+        </>
     );
 };

@@ -57,6 +57,7 @@ export const SubmittedDocsExample = () => {
                             renderControl={(getFieldState) => (
                                 <Select
                                     renderHighlightFloater={renderPageHighlightFloater}
+                                    name={"plan"}
                                     value={planSignal}
                                     options={PLANS}
                                     isRequired={true}
@@ -86,6 +87,7 @@ export const SubmittedDocsExample = () => {
                             renderControl={(getFieldState) => (
                                 <MultiSelect
                                     renderHighlightFloater={renderPageHighlightFloater}
+                                    name={"topics"}
                                     values={topicsSignal}
                                     options={TOPICS}
                                     isRequired={true}

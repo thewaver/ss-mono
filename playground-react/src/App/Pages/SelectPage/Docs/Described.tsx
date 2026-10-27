@@ -14,6 +14,7 @@ export const DescribedDocsExample = () => {
     return (
         <Select
             renderHighlightFloater={renderPageHighlightFloater}
+            name={"delivery"}
             value={valueState}
             options={DELIVERIES}
             ariaLabel={"Delivery"}

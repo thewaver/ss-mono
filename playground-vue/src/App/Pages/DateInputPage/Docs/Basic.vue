@@ -28,6 +28,7 @@ const valueText = computed(() => (value.value ? DateValueUtils.toIso(value.value
 
 <template>
     <DateInput
+        name="date"
         v-model:value="value"
         :is-read-only="isReadOnly"
         :has-error="hasError"

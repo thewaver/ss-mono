@@ -19,6 +19,7 @@ const value = shallowRef("#3366ff");
 
 <template>
     <ColorInput
+        name="color"
         v-model:value="value"
         :has-error="hasError"
         :is-disabled="isDisabled"

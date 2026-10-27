@@ -15,7 +15,13 @@ const value = shallowRef<Airport | undefined>(undefined);
 </script>
 
 <template>
-    <Select v-model:value="value" :options="AIRPORTS" ariaLabel="Airport">
+    <Select
+        name="airport"
+        v-model:value="value"
+        :options="AIRPORTS"
+        :compute-form-value="(airport) => airport.code"
+        ariaLabel="Airport"
+    >
         <template #renderContent="{ selectedOption, flags }">
             <PageSelectContent :flags="flags">{{
                 selectedOption ? selectedOption.value.city : PLACEHOLDER

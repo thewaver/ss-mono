@@ -14,7 +14,7 @@ const value = shallowRef<Delivery | undefined>(undefined);
 </script>
 
 <template>
-    <Select v-model:value="value" :options="DELIVERIES" ariaLabel="Delivery">
+    <Select name="delivery" v-model:value="value" :options="DELIVERIES" ariaLabel="Delivery">
         <template #renderContent="{ selectedOption, flags }">
             <PageSelectContent :flags="flags">{{ selectedOption?.value.name ?? PLACEHOLDER }}</PageSelectContent>
         </template>

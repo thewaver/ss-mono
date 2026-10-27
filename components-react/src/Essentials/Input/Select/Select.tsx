@@ -1,6 +1,7 @@
 import { type CSSProperties, useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 
 import {
+    FormValueUtils,
     ListboxUtils,
     SELECT_DEFAULTS,
     type SelectFlags,
@@ -13,6 +14,7 @@ import { CSSUtils } from "@thewaver/ss-utils";
 
 import { SignalMirrorReactUtils } from "../../../Abstracts/SignalMirror/SignalMirrorReact.utils";
 import { TextSyncReactUtils } from "../../../Abstracts/TextSync/TextSyncReact.utils";
+import { FormValue } from "../../../Primitives/FormValue/FormValue";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import { Popover } from "../../../Primitives/Popover/Popover";
 import { useLatest } from "../../../Utils/refUtils";
@@ -22,6 +24,8 @@ import { useLabelContext } from "../Label/Label.context";
 import { ListboxOptions } from "../Listbox/Listbox";
 import { ListboxReactUtils } from "../Listbox/ListboxReact.utils";
 import type { SelectCompositeProps, SelectFieldProps, SelectProps } from "./Select.types";
+
+const EMPTY_FORM_VALUE = "";
 
 const SelectField = (props: SelectFieldProps) => {
     const { ariaLabel, ariaLabelledBy } = FormFieldReactUtils.useAriaName(props.ariaLabel);
@@ -274,6 +278,17 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
         isFiltering,
     };
 
+    const computeFormValues = () => {
+        const texts = FormValueUtils.computeTexts(
+            props.selectedOptions.map((option) => option.value),
+            props.computeFormValue,
+        );
+
+        return isMultiple || texts.length > 0 ? texts : [EMPTY_FORM_VALUE];
+    };
+
+    const formValues = props.name === undefined ? [] : computeFormValues();
+
     return (
         <InteractionWrapper<SelectFlags>
             {...props}
@@ -320,6 +335,8 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
                             />
                         </div>
                     )}
+
+                    <FormValue name={props.name} values={formValues} />
 
                     <Popover
                         id={listboxId}

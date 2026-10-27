@@ -10893,7 +10893,8 @@ difference is only that their values are not converted on the way through.
 
 Deliberate: there is no native `<input type="color">` anywhere in it, so no system picker, which is the cost of owning
 the surface — React Aria's color suite and Ark UI's are custom the same way, and none keeps the system dialog as a
-fallback. Its missing form value is not part of this; that is the submit story in `backlog.md`.
+fallback. Its form value is not part of this; it is submitted through a hidden input, see _"A control with no native
+element submits through a hidden input"_.
 
 ### Controls: `DateInput` and `DatePicker`, without the mask
 
@@ -11474,6 +11475,34 @@ omits it, since the group is the field), `Range`, and the `Select` family, each 
 element that carries the role. `FormField` takes it too and hands it out in `FormFieldState` beside `hasError`,
 so the caption and the control read one value. Nothing checks it: a required field left empty submits like any
 other, and the consumer's own validation says otherwise.
+
+### A control with no native element submits through a hidden input
+
+Settled, on the user's call, and it did not wait on whether `Form` ever carries values. A plain `<form>` around
+`Select`, `MultiSelect` or `ColorInput` sent nothing, since none renders a native field, and around `DateInput`,
+`DatePicker` and `TimeInput` it sent the text on screen (`23/09/2026`), which a server cannot parse. Both routes to
+a value for `Form` — reading the fields' entries, or leaving it to the native submit — need the same hidden input,
+so building it settled nothing the `Form` question still holds.
+
+- **`FormValue` draws one `<input type="hidden">` per text, under `name`, and nothing when `name` is unset**, so a
+  control nobody names pays nothing. `FormValueUtils.computeText` writes a value as submitted text.
+- **A single `Select` with nothing picked submits an empty entry; a `MultiSelect` with nothing picked submits none.**
+  Both are what a native select does.
+- **Option values are any type, so the text is the consumer's to name, with a default.** `computeFormValue` on the
+  select; left out, a string goes as it is, a number or boolean as its plain spelling, anything else as
+  `JSON.stringify`. Decided on the user's call over a warning with no fallback: the repo's own record options
+  (`Airport`, `Delivery`) are plain data JSON handles. A value JSON cannot write throws, which matches _"any
+  conversion into a form that cannot hold the value fails loudly"_.
+- **The date and time fields give their `name` to the hidden input and not to the visible field**, otherwise a
+  submit would carry both the ISO value and the display text under one name. The value is the one the field holds,
+  never the text on screen, so a half-typed or refused entry submits the last valid value, as _"a field keeps the
+  text it shows apart from the value it holds"_ says. A date goes through `DateValueUtils.toIso`, always Gregorian;
+  a time through `TimeUtils.toIso`, `HH:MM` or `HH:MM:SS` by the value's own shape.
+- **`ColorInput` submits its string as written**, in whichever notation it holds.
+- **A disabled control still submits**, consistent with _"disabled is one mechanism for every control"_ in
+  `controls.md`, which already accepts that `aria-disabled` controls are not left out of a submit.
+- **Composed pickers need nothing of their own**: `DatePicker`, `TimePicker` and the two-part pickers already hand
+  `name`, or `<name>-start` / `-end` / `-date` / `-time`, down to these fields.
 
 ### `FormSection`: the collecting stops at the nearest one
 

@@ -14,6 +14,7 @@ import type { AccessorValues, SignalSource } from "../../../Utils/typeUtils";
 
 export type DateInputProps = Omit<
     TextFieldProps,
+    | "name"
     | "value"
     | "element"
     | "type"

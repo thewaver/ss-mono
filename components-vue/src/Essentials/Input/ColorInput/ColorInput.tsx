@@ -9,6 +9,7 @@ import {
 import type { Color } from "@thewaver/ss-utils";
 
 import { NavigatorVueUtils } from "../../../Abstracts/Navigator/NavigatorVue.utils";
+import { FormValue } from "../../../Primitives/FormValue/FormValue";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import type {
     InteractionControlSlots,
@@ -241,6 +242,8 @@ export const ColorInput = defineComponent(
                             } satisfies Partial<InteractionWrapperSlots<ColorInputRenderProps>>
                         }
                     </InteractionWrapper>
+
+                    <FormValue name={props.name} values={[value.value]} />
 
                     <Popover
                         id={popupId}

@@ -26,6 +26,7 @@
 </script>
 
 <TimeInput
+    name="time"
     bind:value
     isReadOnly={props.isReadOnly}
     hasError={props.hasError}

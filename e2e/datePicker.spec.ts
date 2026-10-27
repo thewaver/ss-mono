@@ -27,7 +27,7 @@ const SHIFT = docsDemo(TIME_INPUT_DOCS, "Limits");
 
 const POPUP = '[role="dialog"]';
 
-const field = (scope: string) => `${scope} input`;
+const field = (scope: string) => `${scope} input:not([type="hidden"])`;
 const trigger = (key: string) => `#${key}Trigger`;
 const day = (label: string) => `${POPUP} [role="gridcell"][aria-label="${label}"]`;
 

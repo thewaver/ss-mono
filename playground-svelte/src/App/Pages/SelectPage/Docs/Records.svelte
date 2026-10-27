@@ -13,6 +13,8 @@
 
 <Select
     renderHighlightFloater={renderPageHighlightFloater}
+    name="airport"
+    computeFormValue={(airport) => airport.code}
     bind:value
     options={AIRPORTS}
     ariaLabel={"Airport"}

@@ -10,6 +10,7 @@
     import type { Color } from "@thewaver/ss-utils";
 
     import { NavigatorSvelteUtils } from "../../../Abstracts/Navigator/NavigatorSvelte.utils.svelte.js";
+    import FormValue from "../../../Primitives/FormValue/FormValue.svelte";
     import InteractionWrapper from "../../../Primitives/InteractionWrapper/InteractionWrapper.svelte";
     import Popover from "../../../Primitives/Popover/Popover.svelte";
     import type { ValuePair } from "../../../Utils/typeUtils.js";
@@ -125,6 +126,8 @@
         />
     {/snippet}
 </InteractionWrapper>
+
+<FormValue name={props.name} values={[value]} />
 
 <Popover
     id={popupId}

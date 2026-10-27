@@ -1,6 +1,7 @@
 <script lang="ts" generics="T">
     import {
         type AnchorPlacement,
+        FormValueUtils,
         type InteractionFlags,
         SELECT_DEFAULTS,
         type SelectFlags,
@@ -10,6 +11,7 @@
     } from "@thewaver/ss-components";
     import { CSSUtils } from "@thewaver/ss-utils";
 
+    import FormValue from "../../../Primitives/FormValue/FormValue.svelte";
     import InteractionWrapper from "../../../Primitives/InteractionWrapper/InteractionWrapper.svelte";
     import Popover from "../../../Primitives/Popover/Popover.svelte";
     import { watchChange } from "../../../Utils/effectUtils.svelte.js";
@@ -23,6 +25,7 @@
     import SelectField from "./SelectField.svelte";
 
     const EMPTY_QUERY = "";
+    const EMPTY_FORM_VALUE = "";
 
     let {
         ref = $bindable(),
@@ -126,6 +129,15 @@
         query = EMPTY_QUERY;
     });
 
+    const computeFormValues = () => {
+        const texts = FormValueUtils.computeTexts(
+            props.selectedOptions.map((option) => option.value),
+            props.computeFormValue,
+        );
+
+        return isMultiple || texts.length > 0 ? texts : [EMPTY_FORM_VALUE];
+    };
+
     const extraFlags: SelectFlags = $derived({
         isOpen: visibility,
         isEmpty: props.selectedOptions.length < 1,
@@ -195,6 +207,8 @@
                 />
             </div>
         {/if}
+
+        <FormValue name={props.name} values={props.name === undefined ? [] : computeFormValues()} />
 
         <Popover
             id={listboxId}

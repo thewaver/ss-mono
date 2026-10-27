@@ -4,8 +4,11 @@ import { type TextSyncElement, TextSyncUtils, TimeInputUtils } from "@thewaver/s
 import { TimeUtils, type TimeValue, type TimeValueMeridiem } from "@thewaver/ss-utils";
 
 import { MaskedFieldReactUtils } from "../../../Abstracts/MaskedField/MaskedFieldReact.utils";
+import { FormValue } from "../../../Primitives/FormValue/FormValue";
 import { TextField } from "../../../Primitives/TextField/TextField";
 import type { TimeInputMeridiem, TimeInputProps } from "./TimeInput.types";
+
+const EMPTY_FORM_VALUE = "";
 
 export const TimeInput = (props: TimeInputProps) => {
     const [value, setValue] = props.value;
@@ -81,18 +84,23 @@ export const TimeInput = (props: TimeInputProps) => {
     const renderTrailing = props.renderTrailing;
 
     return (
-        <TextField
-            {...props}
-            value={field.text}
-            element={"input"}
-            inputMode={"numeric"}
-            computeMaskedText={(previous, next, caret) => TextSyncUtils.applyMask(mask, previous, next, caret)}
-            placeholderHint={TimeInputUtils.computeHint(segmentCount, props.segmentHints)}
-            hasError={(props.hasError ?? false) || field.hasIssue}
-            renderTrailing={renderTrailing && ((flags) => renderTrailing(flags, meridiemControl))}
-            onInput={field.onInput}
-            onKeyDown={handleKeyDown}
-            onBlur={field.onBlur}
-        />
+        <>
+            <TextField
+                {...props}
+                name={undefined}
+                value={field.text}
+                element={"input"}
+                inputMode={"numeric"}
+                computeMaskedText={(previous, next, caret) => TextSyncUtils.applyMask(mask, previous, next, caret)}
+                placeholderHint={TimeInputUtils.computeHint(segmentCount, props.segmentHints)}
+                hasError={(props.hasError ?? false) || field.hasIssue}
+                renderTrailing={renderTrailing && ((flags) => renderTrailing(flags, meridiemControl))}
+                onInput={field.onInput}
+                onKeyDown={handleKeyDown}
+                onBlur={field.onBlur}
+            />
+
+            <FormValue name={props.name} values={[value ? TimeUtils.toIso(value) : EMPTY_FORM_VALUE]} />
+        </>
     );
 };

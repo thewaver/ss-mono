@@ -31,6 +31,7 @@ export const BasicDocsExample = (props: Props) => {
     return (
         <>
             <DateInput
+                name={"date"}
                 value={valueSignal}
                 isReadOnly={props.isReadOnly}
                 hasError={props.hasError}

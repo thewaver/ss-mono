@@ -29,6 +29,7 @@ const valueText = computed(() => (value.value ? TimeUtils.toIso(value.value) : "
 
 <template>
     <TimeInput
+        name="time"
         v-model:value="value"
         :is-read-only="isReadOnly"
         :has-error="hasError"

@@ -15,6 +15,7 @@ export const BasicDocsExample = (props: Props) => {
     return (
         <ColorInput
             {...pageColorPickerSlots}
+            name={"color"}
             value={valueSignal}
             hasError={props.hasError}
             isDisabled={props.isDisabled}

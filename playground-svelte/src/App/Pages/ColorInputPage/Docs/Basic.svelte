@@ -15,6 +15,7 @@
 
 <ColorInput
     {...pageColorPickerSlots}
+    name="color"
     bind:value
     hasError={props.hasError}
     isDisabled={props.isDisabled}
