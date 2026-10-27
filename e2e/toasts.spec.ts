@@ -231,6 +231,8 @@ test("a wrapper's keys reach the stacks under it, and F8 no longer does", async 
  */
 test("each pair of keys walks only its own stacks, and Escape returns to the page", async ({ page }) => {
     await page.locator("#hotkeysRaise").click();
+    await expect(page.locator(HOLDING), "one stack holds a toast").toHaveCount(1);
+
     const [ownStack] = await holdingStacks(page);
 
     await page.locator("#raiseInfo").click();

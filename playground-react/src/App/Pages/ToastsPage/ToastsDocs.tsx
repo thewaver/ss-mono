@@ -21,6 +21,7 @@ import { AnimationDocsExample } from "./Docs/Animation";
 import { BasicDocsExample } from "./Docs/Basic";
 import { DurationDocsExample } from "./Docs/Duration";
 import { FarDownDocsExample } from "./Docs/FarDown";
+import { HotkeysDocsExample } from "./Docs/Hotkeys";
 import { LimitDocsExample } from "./Docs/Limit";
 import { OwnPainterDocsExample } from "./Docs/OwnPainter";
 import { PlacementDocsExample } from "./Docs/Placement";
@@ -56,7 +57,8 @@ export const ToastsDocs = () => {
                 in: it moves focus to each stack holding toasts in turn, Shift+F8 goes back, and Escape hands focus back
                 to where it was. One shortcut reaches every stack on the page, so a keyboard user can always get to a
                 toast's controls (<a href={WCAG_URLS["2.1.1"]}>WCAG 2.1.1</a>). Raise toasts in two of the examples
-                below and press F8 twice to try it.
+                below and press F8 twice to try it. A page that needs F8 for itself can change the keys or switch them
+                off, as the last example shows.
             </PageDocsAlert>
 
             <PageDocsSection
@@ -331,6 +333,17 @@ export const ToastsDocs = () => {
 
             <PageDocsExample path={`${DOCS_ROOT}/RightToLeft.tsx`}>
                 <RightToLeftDocsExample />
+            </PageDocsExample>
+
+            <PageDocsSection
+                title={"Another shortcut"}
+                content={
+                    "The keys that reach the stacks belong to the whole page, so they are set by an InteractionSettings wrapper rather than by a provider. Its [prop]toastHotkeys[/prop] is a pair of shortcuts, forward and back, and the providers under it answer to that pair. Providers that answer to the same pair form a group that the pair cycles through, so this example's stack is reached by F9 and Shift+F9, while F8 still takes you through the other examples. Wrappers nest: an inner one keeps what it does not set and replaces what it does. Setting [prop]toastHotkeys[/prop] to null switches the keys off for the providers under it, and the page then reaches them through ToastUtils.cycleFocus from a control of its own."
+                }
+            />
+
+            <PageDocsExample path={`${DOCS_ROOT}/Hotkeys.tsx`}>
+                <HotkeysDocsExample />
             </PageDocsExample>
         </>
     );

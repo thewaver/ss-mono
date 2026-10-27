@@ -29,8 +29,6 @@ Something that misbehaves, or a cost nobody has paid down.
 | 10  | **Any placed control**     | A layout guesses each item's box, so content wider than the guess overflows it and, on a ring, overlaps a neighbor                                                                                            |
 | 10  | **Any placed control**     | Nothing stops a layout outgrowing the room it is in — a ring can reach past the screen, and a placed toolbar has nothing to collapse into                                                                     |
 | 10  | **`Menu`, hold and flick** | How far a flick must travel to pick an item is a guess — about 30px on the demo wheel — not a measured number                                                                                                 |
-| 12  | **`Die`, stepping**        | Pressing the same arrow a few times sends the die back and forth between two or three faces, because each step spins the new face upright. No fix chosen; the three put were judged inadequate                |
-| 14  | **`Select`, long lists**   | Drawing the options on screen costs as much as it ever did; windowing only removed the cost of creating them. No fix known                                                                                    |
 
 ## Deliberately not built
 
@@ -50,14 +48,13 @@ They cluster, and no single item owns them.
 | 6   | **`Carousel`**  | A carousel whose consumer builds no buttons on its controller has no keyboard route into it whatsoever                          |
 | 8   | **`Table`**     | A cell holding two controls can be reached but not stepped into — there is no key that moves between them                       |
 | 5   | **`Scroller`**  | The buttons are the consumer's, so the library cannot promise one is named, reachable or in the tab order                       |
-| 13  | **Playground**  | In Windows high-contrast mode, painters drawn only in background colors vanish — Range's track and fill go white on white       |
+| 12  | **Playground**  | In Windows high-contrast mode, painters drawn only in background colors vanish — Range's track and fill go white on white       |
 
 ## Planned projects
 
-| #   | What                                                                                   | Standing                                                                                                      |
-| --- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| 2   | **A consumer-facing layer above the library**                                          | **Deferred to a near-future session of its own.** Painted, ready-to-use controls, as Magic UI sells templates |
-| 15  | **Ports of `InteractionSettings`, `ParticleDissolve` and the Typewriter fade buttons** | Built in Solid only, with specs; React, Vue and Svelte still to do, and those specs fail there until then     |
+| #   | What                                          | Standing                                                                                                      |
+| --- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| 2   | **A consumer-facing layer above the library** | **Deferred to a near-future session of its own.** Painted, ready-to-use controls, as Magic UI sells templates |
 
 ## Waiting on browser support
 

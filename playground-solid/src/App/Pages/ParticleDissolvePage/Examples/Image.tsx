@@ -3,11 +3,11 @@ import { createSignal } from "solid-js";
 import { Button, ParticleDissolve } from "@thewaver/ss-components-solid";
 import { computeAshAnimation } from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.css";
-import type { ParticleDissolveAngleExampleProps } from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.types";
 import knight from "@thewaver/ss-playground/App/knight.webp";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
 import { AshParticle } from "../AshParticle";
+import type { ParticleDissolveAngleExampleProps } from "../ParticleDissolvePageSolid.types";
 
 type Props = ParticleDissolveAngleExampleProps;
 

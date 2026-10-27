@@ -1,5 +1,7 @@
 import {
     Matrix3dUtils,
+    type Point2d,
+    Point2dUtils,
     Point3d,
     Point3dUtils,
     type Quaternion,
@@ -20,6 +22,10 @@ const HALF = 0.5;
 const DOUBLE = 2;
 /** How far apart two corners may be, as a share of the die's radius, and still count as the same place. */
 const SYMMETRY_EPSILON = 1e-6;
+/** A full turn, in degrees. */
+const FULL_TURN_DEGREES = 360;
+/** The center of a face's contour. */
+const CONTOUR_CENTER: Point2d = { x: 0, y: 0 };
 
 /** The way a face points before it is known, straight at the viewer. */
 const FACING_NORMAL: Point3d = { x: 0, y: 0, z: 1 };
@@ -44,6 +50,15 @@ const computeNormal = (points: Point3d[]) =>
 
 const getIsCentrallySymmetric = (offsets: Point3d[], tolerance: number) =>
     offsets.every((offset) => offsets.some((other) => Point3dUtils.getLength(Point3d.add(offset, other)) <= tolerance));
+
+const getTurnSymmetry = (contour: Point2d[], tolerance: number) =>
+    contour.filter((_, turn) =>
+        contour.every((point) => {
+            const turned = Point2dUtils.rotateAbout(point, CONTOUR_CENTER, (FULL_TURN_DEGREES * turn) / contour.length);
+
+            return contour.some((other) => Point2dUtils.getDistance(turned, other) <= tolerance);
+        }),
+    ).length;
 
 /**
  * Builds the solids a die is made of, and the rotations that turn one face or another towards the viewer.
@@ -76,7 +91,9 @@ export namespace DieUtils {
      * read once the face is turned towards the viewer — its box, and its contour inside that box, measured from the
      * box's center. A face's top points at its first corner, except on a face that is the same turned half way round,
      * like a square, where it points at the middle of the first edge so the face shows square-on rather than as a
-     * diamond. Every face is turned to point outward whatever order its corners were given in.
+     * diamond. Every face is turned to point outward whatever order its corners were given in. Each face also says how
+     * many turns about its center leave its contour looking the same — three for an equilateral triangle, four for a
+     * square, one for a face that only a full turn leaves alone — which is how many ways it can land upright.
      */
     export const computeFaceGeometry = (shape: DieShape, radius: number): DieFaceGeometry[] =>
         shape.faces.map((face) => {
@@ -106,7 +123,9 @@ export namespace DieUtils {
                 height: Math.max(...contour.map((point) => Math.abs(point.y))) * DOUBLE,
             };
 
-            return { center, normal, right, down, size, contour };
+            const turnSymmetry = getTurnSymmetry(contour, radius * SYMMETRY_EPSILON);
+
+            return { center, normal, right, down, size, contour, turnSymmetry };
         });
 
     /**

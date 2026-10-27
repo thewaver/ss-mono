@@ -68,6 +68,9 @@ export type * from "./Essentials/Overlays/Tooltip/Tooltip.types.js";
 export { default as SharedTooltip } from "./Essentials/Overlays/SharedTooltip/SharedTooltip.svelte";
 export * from "./Essentials/Overlays/SharedTooltip/SharedTooltip.context.js";
 export type * from "./Essentials/Overlays/SharedTooltip/SharedTooltip.types.js";
+export { default as InteractionSettings } from "./Primitives/InteractionSettings/InteractionSettings.svelte";
+export * from "./Primitives/InteractionSettings/InteractionSettings.context.js";
+export type * from "./Primitives/InteractionSettings/InteractionSettings.types.js";
 export { default as InteractionWrapper } from "./Primitives/InteractionWrapper/InteractionWrapper.svelte";
 export type * from "./Primitives/InteractionWrapper/InteractionWrapper.types.js";
 export { default as PlacementBox } from "./Primitives/PlacementBox/PlacementBox.svelte";
@@ -335,6 +338,8 @@ export { default as PaintedText } from "./Exotics/Text/PaintedText/PaintedText.s
 export type * from "./Exotics/Text/PaintedText/PaintedText.types.js";
 export { default as Formation } from "./Exotics/Arrangements/Formation/Formation.svelte";
 export type * from "./Exotics/Arrangements/Formation/Formation.types.js";
+export { default as ParticleDissolve } from "./Exotics/Particles/ParticleDissolve/ParticleDissolve.svelte";
+export type * from "./Exotics/Particles/ParticleDissolve/ParticleDissolve.types.js";
 export { default as ParticleField } from "./Exotics/Particles/ParticleField/ParticleField.svelte";
 export type * from "./Exotics/Particles/ParticleField/ParticleField.types.js";
 export { default as SortableGrid } from "./Exotics/SortableGrid/SortableGrid.svelte";

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import {
+    InteractionSettingsUtils,
     LiveAnnouncerUtils,
     type NavigatorDirection,
     TOASTS_DEFAULTS,
@@ -19,6 +20,7 @@ import { ElementObserverReactUtils } from "../../../Abstracts/ElementObserver/El
 import { InteractionTrackerReactUtils } from "../../../Abstracts/InteractionTracker/InteractionTrackerReact.utils";
 import { SignalMirrorReactUtils } from "../../../Abstracts/SignalMirror/SignalMirrorReact.utils";
 import { useViewportContext } from "../../../Abstracts/Viewport/Viewport.context";
+import { useInteractionSettingsContext } from "../../../Primitives/InteractionSettings/InteractionSettings.context";
 import { useElement, useLatest } from "../../../Utils/refUtils";
 import { ToastsContextProvider } from "./Toasts.context";
 import type { Toast, ToastRenderer, ToastsItemProps, ToastsProps } from "./Toasts.types";
@@ -118,6 +120,8 @@ const ToastsItem = <T,>(props: ToastsItemProps<T>) => {
 export const Toasts = <T,>(props: ToastsProps<T>) => {
     const viewportContext = useViewportContext();
 
+    const interactionSettings = useInteractionSettingsContext();
+
     const [toasts, setToasts] = SignalMirrorReactUtils.useOptionalState<Toast<T>[]>(props.toasts, []);
 
     const rootRef = useRef<HTMLDivElement | null>(null);
@@ -147,6 +151,15 @@ export const Toasts = <T,>(props: ToastsProps<T>) => {
             ? ToastUtils.computeSwipeDirection(alignment)
             : undefined;
     const portalRef = viewportContext.getPortalRef();
+
+    const toastHotkeys = interactionSettings.getSettings().toastHotkeys;
+    const hotkeysRef = useRef(toastHotkeys);
+
+    if (!InteractionSettingsUtils.getAreHotkeysEqual(hotkeysRef.current, toastHotkeys)) {
+        hotkeysRef.current = toastHotkeys;
+    }
+
+    const hotkeys = hotkeysRef.current;
 
     const isPaused = InteractionTrackerReactUtils.useHold(rootRef);
 
@@ -206,9 +219,10 @@ export const Toasts = <T,>(props: ToastsProps<T>) => {
             region: root,
             scope: portalRef ?? document.body,
             alignment,
+            hotkeys,
             getHasToasts: () => admittedRef.current.length > 0,
         });
-    }, [root, portalRef, alignment, registerOwner, admittedRef]);
+    }, [root, portalRef, alignment, hotkeys, registerOwner, admittedRef]);
 
     useEffect(() => {
         setEntryIds((previous) => ToastUtils.computeEntryIds(previous, admitted));

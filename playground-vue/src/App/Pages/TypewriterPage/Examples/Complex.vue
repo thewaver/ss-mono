@@ -5,7 +5,6 @@ import { Button, Typewriter } from "@thewaver/ss-components-vue";
 import type { TypewriterController } from "@thewaver/ss-components-vue";
 import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 import * as styles from "@thewaver/ss-playground/App/Pages/TypewriterPage/TypewriterPage.css";
-import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 import knight from "@thewaver/ss-playground/App/knight.webp";
 
 import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.vue";
@@ -14,16 +13,31 @@ import type { TypewriterComplexExampleProps } from "../TypewriterPageVue.types";
 
 type Props = TypewriterComplexExampleProps;
 
-defineProps<Props>();
+const props = defineProps<Props>();
 
 const controller = shallowRef<TypewriterController>();
+const isPlaying = shallowRef(true);
+const isVanishing = shallowRef(false);
 
 const setController = (next: TypewriterController) => {
     controller.value = next;
 };
 
-const restart = () => {
+const computeAnimationName = (character: string, index: number, count: number) =>
+    isVanishing.value ? styles.typewriterVanish : props.computeAnimationName(character, index, count);
+
+const fadeIn = () => {
+    isVanishing.value = false;
     controller.value?.restartAnimation();
+};
+
+const fadeOut = () => {
+    isVanishing.value = true;
+    controller.value?.restartAnimation();
+};
+
+const stopIfVanishing = () => {
+    if (isVanishing.value) isPlaying.value = false;
 };
 </script>
 
@@ -31,9 +45,11 @@ const restart = () => {
     <div :class="styles.complexStack">
         <PageMeasureBox :width="width" :padding="MEASURE_BOX_PADDING">
             <Typewriter
+                v-model:playback="isPlaying"
                 :compute-animation-name="computeAnimationName"
                 :compute-character-weights="computeCharacterWeights"
                 @mount="setController"
+                @animation-end="stopIfVanishing"
                 >{{ "This is a bit of "
                 }}<b
                     >text that appears
@@ -50,10 +66,18 @@ const restart = () => {
             >
         </PageMeasureBox>
 
-        <Button id="typeItAgain" ariaLabel="Type it again" @click="restart">
-            <template #renderContent="flags">
-                <PageControlButtonContent :flags="flags" :glyph="CONTROL_GLYPHS.replay" />
-            </template>
-        </Button>
+        <div :class="styles.complexControls">
+            <Button id="typeItAgain" @click="fadeIn">
+                <template #renderContent="flags">
+                    <PageControlButtonContent :flags="flags">Fade in</PageControlButtonContent>
+                </template>
+            </Button>
+
+            <Button id="fadeItOut" @click="fadeOut">
+                <template #renderContent="flags">
+                    <PageControlButtonContent :flags="flags">Fade out</PageControlButtonContent>
+                </template>
+            </Button>
+        </div>
     </div>
 </template>

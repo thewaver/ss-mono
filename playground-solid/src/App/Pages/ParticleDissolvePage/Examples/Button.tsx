@@ -6,11 +6,11 @@ import {
     computeAshAnimation,
 } from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.css";
-import type { ParticleDissolveExampleProps } from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.types";
 import type { Point2d } from "@thewaver/ss-utils";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
 import { AshParticle } from "../AshParticle";
+import type { ParticleDissolveExampleProps } from "../ParticleDissolvePageSolid.types";
 
 type Props = ParticleDissolveExampleProps;
 

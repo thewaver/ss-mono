@@ -7,7 +7,6 @@ import {
     EXAMPLE_NAMES,
     FIELD_WIDTH,
 } from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.const";
-import type { ParticleDissolveExampleProps } from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.types";
 import { ShapeConst } from "@thewaver/ss-utils";
 
 import { PageExampleKnobs } from "../../PageComponents/ExampleKnobs/ExampleKnobs";
@@ -19,6 +18,7 @@ import { ButtonExample } from "./Examples/Button";
 import { CardExample } from "./Examples/Card";
 import { ImageExample } from "./Examples/Image";
 import { SvgExample } from "./Examples/Svg";
+import type { ParticleDissolveExampleProps } from "./ParticleDissolvePageSolid.types";
 
 const AngleKnob = (props: { value: () => number; onInput: (value: number) => void }) => (
     <PageProp

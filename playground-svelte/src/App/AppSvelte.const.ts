@@ -73,6 +73,7 @@ const SlotTextPage = () => import("./Pages/SlotTextPage/SlotTextPage.svelte");
 const PaintedTextPage = () => import("./Pages/PaintedTextPage/PaintedTextPage.svelte");
 const PaginatorDocs = () => import("./Pages/PaginatorPage/PaginatorDocs.svelte");
 const ProximityTextPage = () => import("./Pages/ProximityTextPage/ProximityTextPage.svelte");
+const ParticleDissolvePage = () => import("./Pages/ParticleDissolvePage/ParticleDissolvePage.svelte");
 const ParticleFieldPage = () => import("./Pages/ParticleFieldPage/ParticleFieldPage.svelte");
 const ParticleSpawnerPage = () => import("./Pages/ParticleSpawnerPage/ParticleSpawnerPage.svelte");
 const PatchBoardPage = () => import("./Pages/PatchBoardPage/PatchBoardPage.svelte");
@@ -653,6 +654,10 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
             {
                 name: "Particles",
                 children: [
+                    {
+                        name: "ParticleDissolve",
+                        component: ParticleDissolvePage,
+                    },
                     {
                         name: "ParticleField",
                         component: ParticleFieldPage,

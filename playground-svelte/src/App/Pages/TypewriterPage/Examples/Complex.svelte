@@ -3,7 +3,6 @@
     import type { TypewriterController } from "@thewaver/ss-components-svelte";
     import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
     import * as styles from "@thewaver/ss-playground/App/Pages/TypewriterPage/TypewriterPage.css";
-    import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
     import knight from "@thewaver/ss-playground/App/knight.webp";
 
     import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.svelte";
@@ -15,15 +14,25 @@
     let props: Props = $props();
 
     let controller: TypewriterController | undefined;
+
+    let isPlaying = $state(true);
+    let isVanishing = $state(false);
+
+    const computeAnimationName = (character: string, index: number, count: number) =>
+        isVanishing ? styles.typewriterVanish : props.computeAnimationName(character, index, count);
 </script>
 
 <div class={styles.complexStack}>
     <PageMeasureBox width={props.width} padding={MEASURE_BOX_PADDING}>
         <Typewriter
-            computeAnimationName={props.computeAnimationName}
+            bind:playback={isPlaying}
+            {computeAnimationName}
             computeCharacterWeights={props.computeCharacterWeights}
             onMount={(next) => {
                 controller = next;
+            }}
+            onAnimationEnd={() => {
+                if (isVanishing) isPlaying = false;
             }}
         >
             This is a bit of <b
@@ -39,15 +48,29 @@
         </Typewriter>
     </PageMeasureBox>
 
-    <Button
-        id={"typeItAgain"}
-        ariaLabel={"Type it again"}
-        onClick={() => {
-            controller?.restartAnimation();
-        }}
-    >
-        {#snippet renderContent(flags)}
-            <PageControlButtonContent {flags} glyph={CONTROL_GLYPHS.replay} />
-        {/snippet}
-    </Button>
+    <div class={styles.complexControls}>
+        <Button
+            id={"typeItAgain"}
+            onClick={() => {
+                isVanishing = false;
+                controller?.restartAnimation();
+            }}
+        >
+            {#snippet renderContent(flags)}
+                <PageControlButtonContent {flags}>Fade in</PageControlButtonContent>
+            {/snippet}
+        </Button>
+
+        <Button
+            id={"fadeItOut"}
+            onClick={() => {
+                isVanishing = true;
+                controller?.restartAnimation();
+            }}
+        >
+            {#snippet renderContent(flags)}
+                <PageControlButtonContent {flags}>Fade out</PageControlButtonContent>
+            {/snippet}
+        </Button>
+    </div>
 </div>

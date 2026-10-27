@@ -3,6 +3,7 @@ import type { Point3d, Quaternion, Store } from "@thewaver/ss-utils";
 export type RollerFace = {
     normal: Point3d;
     down: Point3d;
+    turnSymmetry?: number;
 };
 
 export type RollerPhase = "still" | "idling" | "rolling" | "settling" | "dragging" | "coasting";

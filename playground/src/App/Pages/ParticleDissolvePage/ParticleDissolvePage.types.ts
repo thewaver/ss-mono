@@ -1,18 +1,18 @@
 import type { ShapeConst } from "@thewaver/ss-utils";
 
-export type ParticleDissolveExampleProps = {
-    durationMs: () => number;
-    particleLifetimeMs: () => number;
-    featherShare: () => number;
-    spawnChance: () => number;
-    particlesPerCell: () => number;
-    cellSize: () => number;
+export type BaseParticleDissolveExampleValues = {
+    durationMs: number;
+    particleLifetimeMs: number;
+    featherShare: number;
+    spawnChance: number;
+    particlesPerCell: number;
+    cellSize: number;
 };
 
-export type ParticleDissolveAngleExampleProps = ParticleDissolveExampleProps & {
-    angleDegrees: () => number;
+export type BaseParticleDissolveAngleExampleValues = BaseParticleDissolveExampleValues & {
+    angleDegrees: number;
 };
 
-export type ParticleDissolveSvgExampleProps = ParticleDissolveAngleExampleProps & {
-    shapeKind: () => ShapeConst.DefaultShape;
+export type BaseParticleDissolveSvgExampleValues = BaseParticleDissolveAngleExampleValues & {
+    shapeKind: ShapeConst.DefaultShape;
 };

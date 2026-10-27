@@ -1,17 +1,17 @@
 import { createMemo, createSignal } from "solid-js";
 
-import { Button, ParticleDissolve } from "@thewaver/ss-components-solid";
+import { Button, ParticleDissolve, access } from "@thewaver/ss-components-solid";
 import {
     NO_EDGE_THICKNESSES,
     SVG_SIZE,
     computeAshAnimation,
 } from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.css";
-import type { ParticleDissolveSvgExampleProps } from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.types";
 import { ShapeConst, ShapeUtils } from "@thewaver/ss-utils";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
 import { AshParticle } from "../AshParticle";
+import type { ParticleDissolveSvgExampleProps } from "../ParticleDissolvePageSolid.types";
 
 type Props = ParticleDissolveSvgExampleProps;
 
@@ -20,8 +20,10 @@ export const SvgExample = (props: Props) => {
 
     const getPath = createMemo(
         () =>
-            ShapeUtils.getPaths(ShapeConst.getDefaultShapePoints(props.shapeKind(), SVG_SIZE), NO_EDGE_THICKNESSES)
-                .outerPath,
+            ShapeUtils.getPaths(
+                ShapeConst.getDefaultShapePoints(access(props.shapeKind), SVG_SIZE),
+                NO_EDGE_THICKNESSES,
+            ).outerPath,
     );
 
     return (

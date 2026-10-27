@@ -43,10 +43,7 @@ reading.
 9. `GlassSurface`'s ripple layer shows a defect at its edge — _postponed until the platform catches up_
 10. Arbitrary placement — the gaps the trials left — _open_
 11. The submit story — what a native submit carries, and what `Form` hands `onSubmit` — _pending decision_
-12. `Die`'s step buttons and arrow keys fall into a loop of two or three faces — _open, no fix chosen_
-13. The Playground's painters in Windows high-contrast mode — _open, decided, not yet built_
-14. A long `Select` list costs as much to draw as its options do — _open, no fix known_
-15. Ports of `InteractionSettings`, `ParticleDissolve` and the Typewriter fade buttons to React, Vue and Svelte — _decided, built in Solid, not yet ported_
+12. The Playground's painters in Windows high-contrast mode — _open, decided, not yet built_
 
 ---
 
@@ -407,36 +404,7 @@ separately and does not depend on this.
 
 ---
 
-## 12. `Die`'s step buttons and arrow keys fall into a loop of two or three faces
-
-Reachable on the Die page's icon cloud: pick the d20 and press down a few times. The die goes back and forth
-between the same two faces. Every shape does it — a d20 pressed right goes between faces 1 and 2 from the first
-press, and a cube pressed up visits three faces and repeats them, where a real cube rolled up visits four.
-
-**The cause is the righting spin at the end of a step.** A step rolls the die about the screen axis until the next
-face is in front, then settles that face the right way up (`getLandingQuaternion`, which depends only on the face).
-That spin changes which side of the die is on top, so the next press does not continue the roll. And because each
-face always lands the same way, the face a step reaches from a given face is fixed: pressing the same key repeats a
-fixed path that soon loops, and a two-face loop happens wherever B's "right way up" points back towards A.
-
-**No fix was taken; the user judged all three put to them inadequate.** Rolling straight across the die and landing
-every face upright cannot both hold, so each option gives one up:
-
-- **A step lands by the shortest roll, with no righting spin.** It rolls straight around the die like a real one,
-  but faces end up at an angle, so a number or an icon may read sideways; it breaks _"The solid never stops
-  crooked"_ (`decisions.md`, under _"`Roller`: the wheel's behavior with one more dimension"_) for steps.
-- **The die remembers which way it has been rolling, and keeps the righting spin.** Faces land upright, but after
-  the spin a press of up can move the front face sideways on screen, and the memory is extra state that a drag or
-  another key clears.
-- **A step never goes back to the face it came from.** Stops the two-face loop only; the cube's three-face loop and
-  longer ones remain.
-
-`Cuboid`'s upright mode has the same tension and accepted it, since a box has only six resting orientations
-(`decisions.md`, _"`Cuboid`: upright mode keeps an orientation"_); a d20 has many more faces for the loop to skip.
-
----
-
-## 13. The Playground's painters in Windows high-contrast mode
+## 12. The Playground's painters in Windows high-contrast mode
 
 Reachable on the Range page with Windows' high-contrast mode on, or with Chrome's DevTools emulating
 `forced-colors: active`: the track and the filled part of the range turn white on the white page, and only the
@@ -453,72 +421,6 @@ active)` rule drawing its shapes in system colors (`CanvasText` for a track or a
 selected or filled part), with `forced-color-adjust` left alone unless a part has to keep its own color. **The
 normal theme does not change**: this is the user's styling, and the rules apply only while high-contrast mode is
 on.
-
----
-
-## 14. A long `Select` list costs as much to draw as its options do
-
-Reachable on the Select page's stress example. Windowing removed the cost of creating options for a list that opts
-in; nothing reduces the cost of painting the options on screen. The one cheap answer, letting the browser skip
-painting off-screen options with `content-visibility`, was tried and removed: the options are not one height, so
-the moment End forced the skipped rows to be laid out for real, every height above the highlight was corrected at
-once and the highlighted option ended up below the visible box. See `decisions.md` under the `Select` headings. No
-other answer is known; this stays open in case one turns up.
-
----
-
-## 15. Ports of `InteractionSettings`, `ParticleDissolve` and the Typewriter fade buttons to React, Vue and Svelte
-
-All three were built and checked in Solid first, as the work is ordered, and nothing of them exists in the other three
-frameworks. Until it does, the specs written for them fail in the React, Vue and Svelte projects: the two hotkeys specs
-in `toasts.spec.ts`, all ten in `particleDissolve.spec.ts`, and the two Fade out specs in `typewriter.spec.ts`. The reasoning is in `decisions.md`, under
-_"`InteractionSettings`: a wrapper whose settings nest, with the toast keys as its first"_ and _"`ParticleDissolve`: a mask and
-a particle field on one progress, and where the particles may come from"_. The core is shared and needs nothing: `InteractionSettingsUtils`, `ParticleDissolveUtils`, `PaintedAreaUtils`,
-`ImagePixelsUtils` and their unit tests are done.
-
-**`InteractionSettings`, in each framework's package.**
-
-- The wrapper component and its context, with a reader that answers the defaults outside any wrapper. It merges the
-  settings it sets over its parent's, through `InteractionSettingsUtils.merge`, and takes its props from
-  `BaseInteractionSettingsValues`.
-- `Toasts` reads the nearest wrapper's `toastHotkeys` and hands it to `ToastUtils.registerStack` as `hotkeys`, held
-  steady by `InteractionSettingsUtils.getAreHotkeysEqual` so a change that leaves the keys alone does not
-  re-register the stack. Today the three other `Toasts` call `registerStack` without it, so they run on the defaults.
-
-**`ParticleDissolve`, in each framework's package.**
-
-- The component, from `BaseParticleDissolveValues` and `BaseParticleDissolveCbs`, as the Solid one in
-  `components-solid/src/Exotics/Particles/ParticleDissolve` is: `isDissolved` is a plain value, the content takes `inert`
-  while the progress is above 0, the particle layer is mounted only while it is strictly between 0 and 1, and
-  `particlesPerCell` is that many paused `ParticleField`s over the same box, each with its own record of the point each
-  cell's particle took. `renderParticle` is a slot in Vue and a snippet in Svelte. Reduced motion skips the particles
-  and fades by opacity.
-
-**Playgrounds.**
-
-- Toasts Docs page: the `Hotkeys` example (`HOTKEYS_MESSAGE` and `OWN_HOTKEYS` are already shared), its section, and the
-  sentence in the F8 alert saying a page can change or switch off the keys.
-- A ParticleDissolve page under the Particles node, first in it, with the four examples (`Button`, `Card`, `Svg`,
-  `Image`), the shared `AshParticle` painter, and the knob wrappers in the page file. The example ids the specs use,
-  `particleDissolve<Name>Stage`, `particleDissolveCardTitle` and `particleDissolveCardBadge`, must match the Solid ones. The shared constants,
-  knobs, styles and menu description are done.
-- Run both specs in each framework, and check that `particleDissolve.spec.ts` can still fail there, as it was checked in Solid
-  by breaking `PaintedAreaUtils`.
-
-**The Typewriter page's first example, "Complex": a Fade in and a Fade out button.** Playground only; the library needs
-nothing, and the shared keyframes (`typewriterVanish`) and button row style (`complexControls`) in `TypewriterPage.css.ts`
-are done. The Solid `Complex.tsx` is the one to copy:
-
-- The single replay button becomes two text buttons side by side: "Fade in", keeping the id `typeItAgain` that
-  `typewriter.spec.ts` presses, and "Fade out", id `fadeItOut`.
-- The example holds whether the text is playing (`playback`, shared with the `Typewriter`) and whether it is fading out.
-  While it is fading out, every letter's animation is `typewriterVanish` instead of the effect picked on the page.
-- "Fade in" stops the fading out, then restarts the run. "Fade out" starts fading out, then restarts the run, so from
-  any state the whole text shows first and then fades away in the order the letters arrived.
-- When a fade-out run ends, the example turns playback off. That holds every letter at its last frame, hidden, where a
-  run that ends while still playing would show the text again.
-
-The Vue templates must not look an imported constant up by key; see `decisions.md`, under the Vue Playground.
 
 ---
 
@@ -549,6 +451,13 @@ highlight goes to the first option shown rather than to the selection, because t
 _present_, not which ones _matched_. Reachable with a consumer filter that injects an option the query does not match.
 Accepted by the user: the fix belongs in the consumer's filter, and the trade-off is recorded in `decisions.md` under
 the `Select` headings.
+
+**A long `Select` list costs as much to draw as its options do.** Windowing removed the cost of creating options for a
+list that opts in; nothing reduces the cost of painting the ones on screen. Reachable on the Select page's stress
+example. The one cheap answer, letting the browser skip painting off-screen options with `content-visibility`, was
+tried and removed: the options are not one height, so the moment End forced the skipped rows to be laid out for real,
+every height above the highlight was corrected at once and the highlighted option ended up below the visible box.
+Accepted by the user: no other answer is known. The reasoning is in `decisions.md` under the `Select` headings.
 
 **A `Toasts` entry re-added while it is leaving fades back in** rather than restarting as a new entry, because the id
 never left the rendered list. Reachable by adding a toast, dismissing it, and adding the same id again before the fade

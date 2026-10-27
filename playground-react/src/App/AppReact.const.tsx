@@ -95,6 +95,10 @@ const SlotTextPage = lazyPage(() => import("./Pages/SlotTextPage/SlotTextPage"),
 const PaginatorDocs = lazyPage(() => import("./Pages/PaginatorPage/PaginatorDocs"), "PaginatorDocs");
 const PaintedTextPage = lazyPage(() => import("./Pages/PaintedTextPage/PaintedTextPage"), "PaintedTextPage");
 const ProximityTextPage = lazyPage(() => import("./Pages/ProximityTextPage/ProximityTextPage"), "ProximityTextPage");
+const ParticleDissolvePage = lazyPage(
+    () => import("./Pages/ParticleDissolvePage/ParticleDissolvePage"),
+    "ParticleDissolvePage",
+);
 const ParticleFieldPage = lazyPage(() => import("./Pages/ParticleFieldPage/ParticleFieldPage"), "ParticleFieldPage");
 const ParticleSpawnerPage = lazyPage(
     () => import("./Pages/ParticleSpawnerPage/ParticleSpawnerPage"),
@@ -723,6 +727,10 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
             {
                 name: "Particles",
                 children: [
+                    {
+                        name: "ParticleDissolve",
+                        component: () => <ParticleDissolvePage />,
+                    },
                     {
                         name: "ParticleField",
                         component: () => <ParticleFieldPage />,

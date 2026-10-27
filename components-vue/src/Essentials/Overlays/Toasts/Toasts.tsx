@@ -1,6 +1,8 @@
 import { type SlotsType, Teleport, computed, defineComponent, nextTick, shallowRef } from "vue";
 
 import {
+    type InteractionSettingsHotkeys,
+    InteractionSettingsUtils,
     LiveAnnouncerUtils,
     type NavigatorDirection,
     TOASTS_DEFAULTS,
@@ -17,6 +19,7 @@ import { ElementFaderVueUtils } from "../../../Abstracts/ElementFader/ElementFad
 import { ElementObserverVueUtils } from "../../../Abstracts/ElementObserver/ElementObserverVue.utils";
 import { InteractionTrackerVueUtils } from "../../../Abstracts/InteractionTracker/InteractionTrackerVue.utils";
 import { useViewportContext } from "../../../Abstracts/Viewport/Viewport.context";
+import { useInteractionSettingsContext } from "../../../Primitives/InteractionSettings/InteractionSettings.context";
 import { watchAfterRender } from "../../../Utils/effectUtils";
 import { declareProps, useTwoWay } from "../../../Utils/propUtils";
 import { toElement } from "../../../Utils/refUtils";
@@ -134,6 +137,8 @@ export const Toasts = defineComponent(
     <T,>(props: ToastsProps<T>, { slots }: SlotsContext<ToastsSlots<T>>) => {
         const viewportContext = useViewportContext();
 
+        const interactionSettings = useInteractionSettingsContext();
+
         const toasts = useTwoWay(props, "toasts", []);
 
         const registerOwner = {};
@@ -165,15 +170,24 @@ export const Toasts = defineComponent(
             LiveAnnouncerUtils.reserve("assertive");
         });
 
+        const hotkeys = computed((previous?: InteractionSettingsHotkeys | null) => {
+            const next = interactionSettings.getSettings().toastHotkeys;
+
+            return previous !== undefined && InteractionSettingsUtils.getAreHotkeysEqual(previous, next)
+                ? previous
+                : next;
+        });
+
         watchAfterRender(
-            [rootRef, () => viewportContext.getPortalRef() ?? document.body, getAlignment],
-            ([region, scope, alignment]) => {
+            [rootRef, () => viewportContext.getPortalRef() ?? document.body, getAlignment, hotkeys],
+            ([region, scope, alignment, pair]) => {
                 if (!region) return;
 
                 return ToastUtils.registerStack(registerOwner, {
                     region,
                     scope,
                     alignment,
+                    hotkeys: pair,
                     getHasToasts: () => admitted.value.length > 0,
                 });
             },

@@ -32,6 +32,12 @@ const SINGLE = 1;
 const HALF = 0.5;
 /** A full turn, in degrees. */
 const FULL_TURN_DEGREES = 360;
+/** The direction straight at the viewer. */
+const VIEWER: Point3d = { x: 0, y: 0, z: 1 };
+/** A turn axis for when any axis at right angles to the line of sight will do. */
+const ACROSS_SIGHT: Point3d = { x: 1, y: 0, z: 0 };
+/** Below this length a cross product is taken as zero: the two directions are parallel. */
+const PARALLEL_EPSILON = 1e-9;
 /** Fewer than two faces and there is nowhere to turn to. */
 const MIN_ROTATABLE_FACE_COUNT = 2;
 /** The first face, which a roller falls back on when it has to name one and has nothing better. */
@@ -83,6 +89,20 @@ type Press = {
 /** Eases a settle in and out, so it starts and stops rather than snapping to speed. */
 const SETTLE_EASING = EasingUtils.ease;
 
+/** The shortest turn that sends one unit direction onto another, about the axis at right angles to both. */
+const getTurnBetween = (from: Point3d, to: Point3d) => {
+    const axis = Point3dUtils.cross(from, to);
+    const cosine = Math.min(SINGLE, Math.max(-SINGLE, Point3dUtils.dot(from, to)));
+    const degrees = AngleUtils.fromRadians(Math.acos(cosine));
+
+    if (Point3dUtils.getLength(axis) > PARALLEL_EPSILON) return QuaternionUtils.fromAxisAngle(axis, degrees);
+
+    return cosine > NOTHING ? QuaternionUtils.IDENTITY : QuaternionUtils.fromAxisAngle(ACROSS_SIGHT, degrees);
+};
+
+/** How near two rotations are, from 0 for half a turn apart to 1 for the same; a quaternion and its negative agree. */
+const getCloseness = (a: Quaternion, b: Quaternion) => Math.abs(a.w * b.w + a.x * b.x + a.y * b.y + a.z * b.z);
+
 /** A random axis to tumble about, leaning towards the viewer so the tumble reads as a throw. */
 const pickTumbleAxis = () => ({ x: Math.random() - HALF, y: Math.random() - HALF, z: Math.random() * HALF });
 
@@ -98,15 +118,15 @@ const pickTumbleAxis = () => ({ x: Math.random() - HALF, y: Math.random() - HALF
  */
 export namespace RollerUtils {
     /**
-     * The landing for a face: the rotation that turns it towards the viewer the right way up.
+     * The upright landing for a face: the rotation that turns it towards the viewer the right way up.
      *
      * @param face The face, by the direction it points out of the solid and the direction that reads as down on it.
      * The two must be at right angles.
      * @returns The rotation that sends the face's direction straight at the viewer and its down straight down the
-     * screen. It depends only on the face, not on how the solid is turned now, so landing on a face always leaves it
-     * upright however the solid got there.
+     * screen. It depends only on the face, not on how the solid is turned now. {@link getNearestLanding} is the landing
+     * that depends on where the solid comes from.
      */
-    export const getLandingQuaternion = (face: RollerFace) => {
+    export const getUprightLanding = (face: RollerFace) => {
         const right = Point3dUtils.cross(face.down, face.normal);
 
         return QuaternionUtils.fromMatrix([
@@ -120,6 +140,48 @@ export namespace RollerUtils {
             face.normal.y,
             face.normal.z,
         ]);
+    };
+
+    /**
+     * The landing for a face nearest to how the solid is turned, stood upright by the smallest turn its contour allows.
+     *
+     * The face is brought to the front by the shortest turn from where the solid is, as a real solid would roll onto
+     * it, then turned about the line of sight by the least amount that leaves its contour as it stands upright. A face
+     * with a `turnSymmetry` of three, an equilateral triangle, turns at most a sixth of a circle, and what is painted on
+     * it may rest a third of a circle round; a square turns at most an eighth, and a face with no symmetry turns all the
+     * way to {@link getUprightLanding}. So a run of steps carries on across the solid instead of every face always
+     * landing one fixed way, which is what sends a run back and forth between the same few faces.
+     *
+     * @param face The face, with how many turns about its center leave its contour the same; left out, one.
+     * @param from How the solid is turned now.
+     * @returns The rotation that sends the face's direction straight at the viewer with its contour upright. On a tie
+     * between two upright turns the one turning the face the least way round from its upright landing wins.
+     */
+    export const getNearestLanding = (face: RollerFace, from: Quaternion) => {
+        const rolled = QuaternionUtils.multiply(
+            getTurnBetween(QuaternionUtils.rotate(from, face.normal), VIEWER),
+            from,
+        );
+        const upright = getUprightLanding(face);
+        const turnCount = Math.max(SINGLE, Math.round(face.turnSymmetry ?? SINGLE));
+
+        let landing = upright;
+        let landingCloseness = -Infinity;
+
+        for (let turn = NOTHING; turn < turnCount; turn++) {
+            const candidate = QuaternionUtils.multiply(
+                QuaternionUtils.fromAxisAngle(VIEWER, (FULL_TURN_DEGREES * turn) / turnCount),
+                upright,
+            );
+            const closeness = getCloseness(candidate, rolled);
+
+            if (closeness > landingCloseness) {
+                landing = candidate;
+                landingCloseness = closeness;
+            }
+        }
+
+        return landing;
     };
 
     /**
@@ -190,22 +252,35 @@ export namespace RollerUtils {
      * @param faces The solid's faces.
      * @param orientation How the solid is turned to begin with.
      * @param direction Which way to step.
+     * @param skippedFace A face to turn past as if it were not there, such as the one the last step in the same
+     * direction came from, so pressing the same way twice never goes back. When no other face comes round, it is the
+     * answer after all.
      * @returns The face, or `undefined` when no other face comes round within half a turn.
      */
-    export const getNextFace = (faces: RollerFace[], orientation: Quaternion, direction: RollerDirection) => {
+    export const getNextFace = (
+        faces: RollerFace[],
+        orientation: Quaternion,
+        direction: RollerDirection,
+        skippedFace?: number,
+    ) => {
         const start = getClosestFace(faces, orientation);
         const axis = DIRECTION_AXES[direction];
 
         if (start === undefined) return undefined;
 
+        let skipped: number | undefined;
+
         for (let degrees = STEP_SEARCH_DEGREES; degrees <= STEP_SEARCH_LIMIT_DEGREES; degrees += STEP_SEARCH_DEGREES) {
             const turned = QuaternionUtils.multiply(QuaternionUtils.fromAxisAngle(axis, degrees), orientation);
             const closest = getClosestFace(faces, turned);
 
-            if (closest !== start) return closest;
+            if (closest === start) continue;
+            if (closest !== skippedFace) return closest;
+
+            skipped = closest;
         }
 
-        return undefined;
+        return skipped;
     };
 
     /**
@@ -292,8 +367,10 @@ export namespace RollerUtils {
      * Drives one solid.
      *
      * The rotation is the single source of truth and the face nearest the viewer is read back out of it, whether the
-     * solid got there by rolling, drifting, being dragged or being stepped. Every landing is on a face, upright, and
-     * is announced, since a screen reader user cannot see the solid stop; a landing then rests before drift resumes.
+     * solid got there by rolling, drifting, being dragged or being stepped. Every landing is on a face, its contour
+     * upright, by {@link getNearestLanding}, and is announced, since a screen reader user cannot see the solid stop; a
+     * landing then rests before drift resumes. A step in the same direction as the one before never goes back to the
+     * face that one came from; anything else that turns the solid forgets it.
      *
      * The roller is a store of the rotation, the roll phase, whether a target is being waited on, whether it rests
      * after a landing, and the face it last came to rest on — `undefined` from the moment anything turns it again.
@@ -340,15 +417,23 @@ export namespace RollerUtils {
 
         let stopCoast: (() => void) | undefined;
         let press: Press | undefined;
+        let heading: Quaternion | undefined;
+        let lastStep: { from: number; direction: RollerDirection } | undefined;
 
         const write = (next: Partial<RollerState>) => store.update((current) => ({ ...current, ...next }));
 
         const getFaceCount = () => defs.getFaces().length;
 
-        const getLanding = (index: number) => {
+        const getUpright = (index: number) => {
             const face = defs.getFaces()[index];
 
-            return face ? getLandingQuaternion(face) : QuaternionUtils.IDENTITY;
+            return face ? getUprightLanding(face) : QuaternionUtils.IDENTITY;
+        };
+
+        const getLanding = (index: number, from: Quaternion) => {
+            const face = defs.getFaces()[index];
+
+            return face ? getNearestLanding(face, from) : QuaternionUtils.IDENTITY;
         };
 
         const getClampedTarget = () => clampFace(getTargetFace(), getFaceCount());
@@ -359,9 +444,9 @@ export namespace RollerUtils {
             stopCoast = undefined;
         };
 
-        const land = (index: number, isRoll: boolean) => {
+        const land = (index: number, isRoll: boolean, orientation: Quaternion) => {
             halt();
-            write({ orientation: getLanding(index), rollPhase: "still", isResting: true, restingFace: index });
+            write({ orientation, rollPhase: "still", isResting: true, restingFace: index });
             setTargetFace(index);
 
             LiveAnnouncerUtils.announce(defs.computeFaceLabel(index, getFaceCount()));
@@ -375,12 +460,14 @@ export namespace RollerUtils {
             setTargetFace(index);
 
             const from = store.get().orientation;
-            const to = getLanding(index);
+            const to = getLanding(index, from);
+
+            heading = to;
 
             tween.run(
                 defs.getSettleDurationMs(),
                 (ratio) => write({ orientation: QuaternionUtils.slerp(from, to, SETTLE_EASING(ratio)) }),
-                () => land(index, false),
+                () => land(index, false, to),
             );
         };
 
@@ -389,8 +476,11 @@ export namespace RollerUtils {
         const settleOntoClosest = () => settleOnto(getClosest());
 
         const rest = (index: number) => {
+            const upright = getUpright(index);
+
             halt();
-            write({ orientation: getLanding(index), rollPhase: "still", restingFace: index });
+            lastStep = undefined;
+            write({ orientation: upright, rollPhase: "still", restingFace: index });
         };
 
         const roll = () => {
@@ -406,11 +496,12 @@ export namespace RollerUtils {
                 (target) => {
                     const index = clampFace(target, getFaceCount());
                     const from = store.get().orientation;
-                    const to = getLanding(index);
+                    const to = getLanding(index, from);
                     const axis = pickTumbleAxis();
                     const tumbleCount = defs.getTumbleCount();
 
                     halt();
+                    lastStep = undefined;
                     write({ rollPhase: "rolling", isAwaitingTarget: false, restingFace: undefined });
                     setTargetFace(index);
 
@@ -430,7 +521,7 @@ export namespace RollerUtils {
                                 ),
                             });
                         },
-                        () => land(index, true),
+                        () => land(index, true, to),
                     );
                 },
                 () => write({ isAwaitingTarget: false }),
@@ -445,12 +536,15 @@ export namespace RollerUtils {
             if (!getIsRotatable(defs.getIsDisabled(), getFaceCount())) return false;
             if (state.isAwaitingTarget || state.rollPhase === "rolling" || state.rollPhase === "dragging") return false;
 
-            const base = state.rollPhase === "settling" ? getLanding(getClampedTarget()) : state.orientation;
-            const next = getNextFace(defs.getFaces(), base, direction);
+            const base = state.rollPhase === "settling" ? (heading ?? state.orientation) : state.orientation;
+            const from = getClosestFace(defs.getFaces(), base);
+            const skippedFace = lastStep?.direction === direction ? lastStep.from : undefined;
+            const next = getNextFace(defs.getFaces(), base, direction, skippedFace);
 
-            if (next === undefined) return false;
+            if (next === undefined || from === undefined) return false;
 
             settleOnto(next);
+            lastStep = { from, direction };
 
             return true;
         };
@@ -465,6 +559,7 @@ export namespace RollerUtils {
 
             if (clamped === state.restingFace) return;
 
+            lastStep = undefined;
             settleOnto(clamped);
         };
 
@@ -472,6 +567,8 @@ export namespace RollerUtils {
             const state = store.get();
 
             if (state.isAwaitingTarget) return;
+
+            lastStep = undefined;
 
             if (state.rollPhase === "settling") {
                 settleOnto(getClampedTarget());
@@ -497,6 +594,8 @@ export namespace RollerUtils {
             if (idleDelayMs === undefined || idleDelayMs <= NOTHING || stepAngle <= NOTHING) return () => {};
 
             const degreesPerMs = stepAngle / idleDelayMs;
+
+            lastStep = undefined;
 
             return TurnClockUtils.runFrames((elapsedMs) =>
                 store.update((current) => ({
@@ -555,7 +654,9 @@ export namespace RollerUtils {
                         ),
                     ),
                 });
-                land(getClosest(), false);
+                const closest = getClosest();
+
+                land(closest, false, getLanding(closest, store.get().orientation));
             }, expectedMs + FRAME_STARVATION_SLACK_MS);
 
             stopCoast = () => {
@@ -581,6 +682,7 @@ export namespace RollerUtils {
                 press.isDragging = true;
                 element.setPointerCapture(event.pointerId);
                 halt();
+                lastStep = undefined;
                 write({ rollPhase: "dragging", isResting: false, restingFace: undefined });
             };
 

@@ -74,6 +74,7 @@ const SlotTextPage = () => import("./Pages/SlotTextPage/SlotTextPage.vue");
 const PaintedTextPage = () => import("./Pages/PaintedTextPage/PaintedTextPage.vue");
 const ProximityTextPage = () => import("./Pages/ProximityTextPage/ProximityTextPage.vue");
 const PaginatorDocs = () => import("./Pages/PaginatorPage/PaginatorDocs.vue");
+const ParticleDissolvePage = () => import("./Pages/ParticleDissolvePage/ParticleDissolvePage.vue");
 const ParticleFieldPage = () => import("./Pages/ParticleFieldPage/ParticleFieldPage.vue");
 const ParticleSpawnerPage = () => import("./Pages/ParticleSpawnerPage/ParticleSpawnerPage.vue");
 const PatchBoardPage = () => import("./Pages/PatchBoardPage/PatchBoardPage.vue");
@@ -654,6 +655,10 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
             {
                 name: "Particles",
                 children: [
+                    {
+                        name: "ParticleDissolve",
+                        component: ParticleDissolvePage,
+                    },
                     {
                         name: "ParticleField",
                         component: ParticleFieldPage,

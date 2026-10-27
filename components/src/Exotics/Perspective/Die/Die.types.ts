@@ -12,6 +12,7 @@ export type DieFaceGeometry = {
     down: Point3d;
     size: Size2d;
     contour: { x: number; y: number }[];
+    turnSymmetry: number;
 };
 
 export type DieFaceState = {

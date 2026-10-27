@@ -46,6 +46,19 @@ describe("computeFaceGeometry", () => {
         expect(face.size.width).toBeCloseTo(edge, 6);
         expect(face.size.height).toBeCloseTo(edge, 6);
     });
+
+    it("counts the turns that leave each face looking the same, which a regular face has one of per corner", () => {
+        const regular = ["d4", "d6", "d8", "d12", "d20"] as const;
+
+        regular.forEach((key) =>
+            DieUtils.computeFaceGeometry(DieShapes.SAMPLE_SHAPES[key], RADIUS).forEach((face) =>
+                expect(face.turnSymmetry, key).toBe(face.contour.length),
+            ),
+        );
+        DieUtils.computeFaceGeometry(DieShapes.SAMPLE_SHAPES.d10, RADIUS).forEach((face) =>
+            expect(face.turnSymmetry, "a kite only looks the same after a whole turn").toBe(1),
+        );
+    });
 });
 
 describe("getFaceBox", () => {
@@ -61,6 +74,7 @@ describe("getFaceBox", () => {
                 { x: 20, y: -10 },
                 { x: 0, y: 10 },
             ],
+            turnSymmetry: 1,
         };
         const box = DieUtils.getFaceBox(face, 100);
 

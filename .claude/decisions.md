@@ -791,7 +791,9 @@ in `components-vue/src/Utils/` unless a folder is given.
   component writes `SlotsType<XSlots<any>>` there, since the options object cannot see the type parameter.
 - **A component hands slots to another as a children object, `{{ renderX: (value) => … } satisfies XSlots}`.** Vue's
   JSX types do not check children, and the `satisfies` is what types the arrows' parameters and checks the names.
-  Passing a consumer's slot on is `renderContent: slots.renderContent`; one left out arrives as absent.
+  Passing a consumer's slot on is `renderContent: slots.renderContent`; one left out arrives as absent. **The object
+  is written in place, never handed in as a variable** (`{layer.slots}`): the JSX transform then arrives at the child
+  as no slot at all, silently — `ParticleDissolve`'s particles rendered empty until it was inlined.
 - **A render function inside a defs prop is not a slot**, and takes one object in the shape of the slot it feeds:
   `InteractionTooltipDefs.renderContent` is handed `{ visibilityTarget, transitionDurationMs, placement, flags }`.
 - **Two-way state is `useTwoWay(props, "value", initial)`**, over Vue's own `useModel`: one writable ref, reading the
@@ -12101,7 +12103,7 @@ description is not — so the moment a jump to the end forces the skipped rows t
 height above the highlight is corrected at once and the scroll offset no longer points where it did. `End` then
 leaves the highlighted option below the visible box. The user removed the switch. What it
 bought was the cost of _painting_ options, which is a different and smaller cost than _mounting_ them;
-The painting cost left over is item 14 in `backlog.md`, a known issue.
+The painting cost left over is under _Accepted limits_ in `backlog.md`.
 
 **The marker is keyed on the options array, and that is load-bearing.** An intersection observer reports only
 _changes_, so a batch too small to push the marker off screen would deliver no callback and the list would
@@ -14997,7 +14999,7 @@ members before writing, which is _"Asking for a state a thing is already in does
 it, and a press that moves the folder and every descendant together. Two rules are fixed here rather than in
 whatever consumes it first: **a branch's own place in the selection is not read** when deciding what its box
 shows, because a folder follows its contents rather than competing with them, and **a half-ticked box fills
-rather than empties** on the first press. `backlog.md` #12 is the consumer this is waiting for, and building
+rather than empties** on the first press. A multi-select `Tree` is the consumer this is waiting for (no `backlog.md` item is open for it), and building
 it ahead of that was the user's call, taken on the grounds that the tri-state parent is the one part of a
 multi-select `Tree` with nothing left to argue about.
 
@@ -21109,11 +21111,18 @@ measurement shows. `LetterDriverUtils.measureLineWidth` reads the used width fro
 
 Asked for by the user as "a Roller is a Rotator with more dimensions", so that `Die` does what `Wheel` does wherever the two have an equivalent. `Rotator` holds one angle; `Roller` holds one rotation, kept as a quaternion, because two angles applied one after the other make a freely dragged solid feel wrong after a few drags. Everything else follows the wheel: it drifts while idle, a roll asks for its target and may wait for it, the target is written as soon as it is known, the landing is announced, and the solid rests before drift resumes. `Die` keeps only the solid's geometry and the drawing, and uses `Roller` as the wheels use `Rotator`.
 
-**A face, to a roller, is two directions**: the way it points out of the solid and the way that reads as down on it, which is all `getLandingQuaternion` needs to bring a face to the front the right way up. `getClosestFace` and `getOppositeFace`, asked for by the user, sit beside it.
+**A face, to a roller, is two directions and a count**: the way it points out of the solid, the way that reads as down on it, and optionally `turnSymmetry`, how many turns about its center leave its contour looking the same (3 for an equilateral triangle, 4 for a square, 5 for a pentagon, 1 for the d10's kites and the d100's uneven triangles). `DieUtils.computeFaceGeometry` counts it from the contour. `getUprightLanding` brings a face to the front exactly the right way up; `getNearestLanding` is what every landing uses. `getClosestFace` and `getOppositeFace`, asked for by the user, sit beside them.
 
-**The solid never stops crooked.** The user's call, taken from the wheel, over a prop choosing between coasting and settling: a drag that lets go coasts on its last moment's speed, slowing exponentially as `Wraparound`'s does, then settles onto the nearest face over `settleDurationMs`, eased — the wheel's spin and settle, overshooting or falling short and then easing in. A roll, a step and a write to the target land the same way, and pressing the solid while it coasts or settles grabs it at once.
+**The solid never stops crooked.** The user's call, taken from the wheel, over a prop choosing between coasting and settling: a drag that lets go coasts on its last moment's speed, slowing exponentially as `Wraparound`'s does, then settles onto the nearest face over `settleDurationMs`, eased — the wheel's spin and settle, overshooting or falling short and then easing in. A roll, a step and a write to the target land the same way, and pressing the solid while it coasts or settles grabs it at once. "Crooked" is about the outline: what is painted on a face may rest turned by one of its same-looking turns, below.
 
 **A step goes to whichever face turning that way brings round first.** `getNextFace` turns the solid a couple of degrees at a time about the screen axis a drag that way would use until a different face is nearest the viewer, so it works on any solid from d4 to d100, and a step right does what a drag right does.
+
+**A landing stands the outline upright, not the painting, and a repeated step never goes back.** Landing every face exactly the right way up sent steps round a fixed loop: each face always landed one way, so pressing the same arrow repeated a fixed path, and a d20 pressed down went back and forth between two faces from every start. The fix, chosen by the user from measurements, has two parts:
+
+- `getNearestLanding` brings the face to the front by the shortest turn from where the solid is, then turns it about the line of sight only as far as its contour needs to stand upright — at most half of one of its same-looking turns, so a sixth of a circle on a d20 and none when a cube rolls straight. What is painted on the face may rest a third, quarter or fifth of a circle round, as on a real die. A face with a `turnSymmetry` of 1 turns all the way upright, as before.
+- `step` remembers the face it left and the direction; a step in the same direction passes over that face (`getNextFace`'s `skippedFace`), while the opposite direction may go straight back. A roll, a drag, drift, a write to the target and a change of shape forget it.
+
+Measured over every face of every sample die, twelve presses each way: no face ever followed by the one two steps before it (the d20 did this from all 20 faces, the d100 from 87 of 100); the cube goes round all four faces of the way it is pressed; and the next face arrives from the pressed side as closely as before. **Rejected: remembering the roll without its upright turn and stepping from that.** It rolled straight across every die, but a press then followed the remembered die rather than the one on screen, so on a d20 the next face came in 57° off the pressed side on average against 22°, and on the d10 and d100 it could come from the opposite side. **Left as it was:** pressing the opposite arrow undoes a step only where the face left lies straight across an edge — always on the cube, about one time in four on the d20, much as before. On the d10, pressed down, steps still circle three or four faces, since its kites have no turn to choose from.
 
 **`idleDelayMs` keeps the wheel's meaning, adapted**: how long one face's share of a whole turn takes about the drift axis, as the wheel's is how long one wedge takes to pass; a page wanting one speed for every solid divides by the face count. Drift is switched by `autoSpin`, the wheel's name, as the user asked.
 
@@ -22214,8 +22223,7 @@ announcer mounts, may want a wider one.
 documented once), `ResolvedInteractionSettings` (`Required` of it; a type and a component of one name break the barrel,
 so the type takes the `Resolved` prefix as `ResolvedShortcut` does), `INTERACTION_SETTINGS_DEFAULTS`, and
 `InteractionSettingsUtils` (`merge`, `UNPROVIDED_CONTEXT`, `computeHotkeysSignature`, `getAreHotkeysEqual`). Outside any
-wrapper a reader answers the defaults rather than throwing. Built in Solid first; React, Vue and Svelte still run the
-register with its default pair.
+wrapper a reader answers the defaults rather than throwing. Built in all four frameworks.
 
 **The toast keys are read per provider and grouped by pair.** My first framing, that one binding needs one winner among
 nested wrappers, was wrong: each `Toasts` reads the settings of its own nearest wrapper, so a stack answers to its own
@@ -22229,9 +22237,16 @@ group's back key is caught by the shortcut register's own duplicate warning.
 it into a stack, whichever pair did it; `cycleWithin` records the origin only when focus is in no stack at all. A
 restore point per group was the first plan, and one is simpler and gives the better result.
 
-**`registerStack`'s `hotkeys` is optional, and left out means the default pair**, so a framework not yet ported keeps
-working; `null` is the explicit none. `Toasts` passes its nearest wrapper's value through a memo compared by
-`getAreHotkeysEqual`, so a settings change that leaves the pair alone does not re-register the stack.
+**`registerStack`'s `hotkeys` is optional, and left out means the default pair**; `null` is the explicit none. `Toasts`
+holds its nearest wrapper's value steady by `getAreHotkeysEqual`, so a settings change that leaves the pair alone (an
+equal pair written inline, say) does not re-register the stack. Each framework holds it its own way:
+
+- Solid: a `createMemo` with `equals: InteractionSettingsUtils.getAreHotkeysEqual`.
+- React: a ref holding the last pair, replaced only when the comparison says it differs, as `useStableList` does; the
+  ref's value is the registering effect's dependency.
+- Vue: a `computed` that hands back its previous value while the comparison says equal.
+- Svelte: `$derived` takes no equality, so the last pair is remembered and handed back when equal, as `ParticleField`
+  holds its cell count.
 
 **Checked against WCAG.** 2.1.1: "All functionality of the content is operable through a keyboard interface" — a
 switchable shortcut conforms as long as another keyboard route exists, and `cycleFocus` is that route; the library
@@ -22262,5 +22277,26 @@ register already warns when a consumer's pair is a single character.
 **A cell can release several particles, and the spawn chance is rolled for each one** (the user's call). `particlesPerCell` is a whole number from 1 to 8, built as that many paused `ParticleField`s over the same box, each with its own roll sequence and its own record of which painted point each cell's particle took. `ParticleField` itself still holds one particle per cell, so nothing changed there.
 
 **The consumer paints the particle**, through `renderParticle` with the cell and the color it came from, and moves it through `computeParticleAnimation`; the library carries no colors. The grid is squares of `cellSize` pixels, capped at 80 across or down.
+
+**Per framework, the layers and the scrubbed field.** Solid makes each `particlesPerCell` layer's record of sample
+points inside `<For>` and drops it on cleanup. The others cannot create state per item in markup:
+
+- React: each layer is a small private component (`ParticleDissolveLayer`) owning its record, which adds itself to the
+  parent's set on mount so a new transition can clear it. `computeCellWeights` is a `useCallback` on size and sweep,
+  since React's `ParticleField` lists it as a dependency.
+- Vue: each layer's record and the functions handed to its field are made once and kept in a `Map` by layer index. A
+  record outlives its layer until the next transition clears every record.
+- Svelte: a list of layer records that only grows, of which the first `particlesPerCell` are shown; each layer's
+  `renderParticle` snippet is declared inside the `{#each}` to see its own record.
+
+The field must never write its own progress. Solid hands it `[getProgress, () => undefined]`; Vue binds `progress` and
+`playback` with do-nothing `onUpdate:` listeners, so `useModel` treats them as bound; Svelte uses a function binding
+whose setter does nothing. **A transition starts on a change of `isDissolved`, not at mount**: Solid's `on(…, { defer:
+true })`, React's `useLayoutEffect` (it measures the content), Vue's `watchAfterRender` and Svelte's `$effect` reading
+only `isDissolved` all rely on the start and end progress being equal at mount, so the first run does nothing.
+
+**The page's example types are shared as values.** `ParticleDissolvePage.types.ts` holds
+`BaseParticleDissolveExampleValues` and its Angle and Svg extensions; Solid wraps them in `AccessorValues`, the others
+use them as they are, as `CardStackExamples.types.ts` is consumed.
 
 **Defaults are mine and unmeasured:** 1200 ms, a 600 ms lifetime, a feather of 0.2, a spawn chance of 0.5, one particle per cell, and a 12 px cell. They are the user's to move. The Solid build is checked in a headless browser, which draws masks on the software path; a mask is a rendering matter, so it is unverified until seen in a real window.

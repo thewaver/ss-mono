@@ -2,6 +2,8 @@
     import { onMount, untrack } from "svelte";
 
     import {
+        type InteractionSettingsHotkeys,
+        InteractionSettingsUtils,
         LiveAnnouncerUtils,
         type NavigatorDirection,
         TOASTS_DEFAULTS,
@@ -15,6 +17,7 @@
     import { ElementObserverSvelteUtils } from "../../../Abstracts/ElementObserver/ElementObserverSvelte.utils.svelte.js";
     import { InteractionTrackerSvelteUtils } from "../../../Abstracts/InteractionTracker/InteractionTrackerSvelte.utils.svelte.js";
     import { getViewportContext } from "../../../Abstracts/Viewport/Viewport.context.js";
+    import { getInteractionSettingsContext } from "../../../Primitives/InteractionSettings/InteractionSettings.context.js";
     import { attachPortal } from "../../../Utils/portalUtils.js";
     import { toStyle } from "../../../Utils/styleUtils.js";
     import { setToastsContext } from "./Toasts.context.js";
@@ -27,6 +30,8 @@
 
     const viewportContext = getViewportContext();
     const portalTarget = $derived(viewportContext.getPortalRef() ?? document.body);
+
+    const interactionSettings = getInteractionSettingsContext();
 
     const registerOwner = {};
 
@@ -64,6 +69,20 @@
         return next;
     });
 
+    let lastHotkeys: InteractionSettingsHotkeys | null | undefined;
+
+    const hotkeys = $derived.by(() => {
+        const next = interactionSettings.getSettings().toastHotkeys;
+
+        if (lastHotkeys !== undefined && InteractionSettingsUtils.getAreHotkeysEqual(lastHotkeys, next)) {
+            return lastHotkeys;
+        }
+
+        lastHotkeys = next;
+
+        return next;
+    });
+
     onMount(() => {
         LiveAnnouncerUtils.reserve("polite");
         LiveAnnouncerUtils.reserve("assertive");
@@ -73,6 +92,7 @@
         const region = root;
         const scope = portalTarget;
         const stackAlignmentKey = alignment;
+        const stackHotkeys = hotkeys;
 
         if (!region) return;
 
@@ -81,6 +101,7 @@
                 region,
                 scope,
                 alignment: stackAlignmentKey,
+                hotkeys: stackHotkeys,
                 getHasToasts: () => untrack(() => admitted).length > 0,
             }),
         );

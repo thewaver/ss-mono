@@ -45,13 +45,48 @@ const expectPoint = (actual: Point3d, expected: Point3d) => {
 
 const facesOf = (key: DieShapes.SampleKey) => DieUtils.computeFaceGeometry(DieShapes.SAMPLE_SHAPES[key], RADIUS);
 
-describe("getLandingQuaternion", () => {
+describe("getUprightLanding", () => {
     it("turns every face of every die towards the viewer, the right way up", () => {
         DieShapes.SAMPLE_KEYS.forEach((key) =>
             facesOf(key).forEach((face) => {
-                const landing = RollerUtils.getLandingQuaternion(face);
+                const landing = RollerUtils.getUprightLanding(face);
 
                 expectPoint(QuaternionUtils.rotate(landing, face.normal), { x: 0, y: 0, z: 1 });
+                expectPoint(QuaternionUtils.rotate(landing, face.down), { x: 0, y: 1, z: 0 });
+            }),
+        );
+    });
+});
+
+describe("getNearestLanding", () => {
+    const STARTS = [
+        NO_TURN,
+        QuaternionUtils.fromAxisAngle({ x: 1, y: 1, z: 0 }, 40),
+        QuaternionUtils.fromAxisAngle({ x: 0.3, y: -1, z: 0.5 }, 130),
+    ];
+
+    it("turns the face towards the viewer with its contour upright, on every die and from any turn", () => {
+        DieShapes.SAMPLE_KEYS.forEach((key) =>
+            facesOf(key).forEach((face) =>
+                STARTS.forEach((start) => {
+                    const landing = RollerUtils.getNearestLanding(face, start);
+                    const down = QuaternionUtils.rotate(landing, face.down);
+                    const turn = (Math.atan2(down.x, down.y) * 180) / Math.PI;
+                    const sameLooking = 360 / face.turnSymmetry;
+                    const offTurn = Math.abs(turn - Math.round(turn / sameLooking) * sameLooking);
+
+                    expectPoint(QuaternionUtils.rotate(landing, face.normal), { x: 0, y: 0, z: 1 });
+                    expect(offTurn, key).toBeCloseTo(0, 6);
+                }),
+            ),
+        );
+    });
+
+    it("is the upright landing for a face that looks the same only after a whole turn", () => {
+        STARTS.forEach((start) =>
+            CUBE.forEach((face) => {
+                const landing = RollerUtils.getNearestLanding(face, start);
+
                 expectPoint(QuaternionUtils.rotate(landing, face.down), { x: 0, y: 1, z: 0 });
             }),
         );
@@ -64,7 +99,7 @@ describe("getClosestFace", () => {
             const faces = facesOf(key);
 
             faces.forEach((face, index) =>
-                expect(RollerUtils.getClosestFace(faces, RollerUtils.getLandingQuaternion(face)), key).toBe(index),
+                expect(RollerUtils.getClosestFace(faces, RollerUtils.getUprightLanding(face)), key).toBe(index),
             );
         });
     });
@@ -121,13 +156,25 @@ describe("getNextFace", () => {
 
             faces.forEach((face, index) =>
                 (["left", "right", "up", "down"] as const).forEach((direction) => {
-                    const next = RollerUtils.getNextFace(faces, RollerUtils.getLandingQuaternion(face), direction);
+                    const next = RollerUtils.getNextFace(faces, RollerUtils.getUprightLanding(face), direction);
 
                     expect(next, `${key} ${index} ${direction}`).toBeDefined();
                     expect(next, `${key} ${index} ${direction}`).not.toBe(index);
                 }),
             );
         });
+    });
+});
+
+describe("getNextFace, passing over a face", () => {
+    it("turns past the face it is told to skip and on to the next", () => {
+        expect(RollerUtils.getNextFace(CUBE, NO_TURN, "up", BOTTOM)).toBe(BACK);
+    });
+
+    it("lands on the skipped face after all when no other comes round", () => {
+        const coin = CUBE.slice(FRONT, BACK + 1);
+
+        expect(RollerUtils.getNextFace(coin, NO_TURN, "up", BACK)).toBe(BACK);
     });
 });
 
@@ -188,6 +235,74 @@ describe("createRoller", () => {
     });
 
     afterEach(() => vi.unstubAllGlobals());
+
+    const createStepper = (faces: RollerFace[], start: number) => {
+        let targetFace = start;
+
+        const roller = RollerUtils.createRoller({
+            getIsDisabled: () => false,
+            getFaces: () => faces,
+            getRollDurationMs: () => 0,
+            getSettleDurationMs: () => 0,
+            getTumbleCount: () => 0,
+            getMomentumMs: () => 0,
+            getRadius: () => RADIUS,
+            getIsMovable: () => false,
+            targetFace: [() => targetFace, (value) => (targetFace = value)],
+            computeFaceLabel: (index) => String(index),
+        });
+
+        roller.rest(start);
+
+        return (direction: "left" | "right" | "up" | "down") => {
+            roller.step(direction);
+
+            return roller.get().restingFace;
+        };
+    };
+
+    it("never steps back to the face it came from when the same key is pressed again, on any die", () => {
+        DieShapes.SAMPLE_KEYS.forEach((key) => {
+            const faces = facesOf(key);
+
+            faces.forEach((_, start) =>
+                (["down", "right"] as const).forEach((direction) => {
+                    const step = createStepper(faces, start);
+                    const visited = [start, ...Array.from({ length: 12 }, () => step(direction))];
+
+                    visited.forEach((face, index) => {
+                        if (index >= 2) expect(face, `${key} from ${start}, ${direction}`).not.toBe(visited[index - 2]);
+                    });
+                }),
+            );
+        });
+    });
+
+    it("steps a cube back to the face it came from when the other key is pressed", () => {
+        const faces = facesOf("d6");
+
+        faces.forEach((_, start) =>
+            (
+                [
+                    ["down", "up"],
+                    ["right", "left"],
+                ] as const
+            ).forEach(([there, back]) => {
+                const step = createStepper(faces, start);
+
+                step(there);
+                expect(step(back), `from ${start}, ${there} then ${back}`).toBe(start);
+            }),
+        );
+    });
+
+    it("rolls a cube round all four faces of the way it is pressed, as a real one rolls", () => {
+        const step = createStepper(facesOf("d6"), FRONT);
+        const visited = [FRONT, step("up"), step("up"), step("up"), step("up")];
+
+        expect(new Set(visited.slice(0, 4)).size).toBe(4);
+        expect(visited[4]).toBe(FRONT);
+    });
 
     it("can roll again after a target function threw", async () => {
         let isThrowing = true;
