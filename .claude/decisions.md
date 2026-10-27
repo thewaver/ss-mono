@@ -11504,6 +11504,26 @@ so building it settled nothing the `Form` question still holds.
 - **Composed pickers need nothing of their own**: `DatePicker`, `TimePicker` and the two-part pickers already hand
   `name`, or `<name>-start` / `-end` / `-date` / `-time`, down to these fields.
 
+### `Form` hands `onSubmit` the browser's `FormData`
+
+Settled, on the user's call, once every field submitted a real value through a hidden input. `onSubmit` is
+`(data: FormData) => void`, and the data is `new FormData(form)` read at the moment of the submit. It closes the
+backlog item that asked whether `Form` should ever carry values.
+
+- **It does not revisit _"The form story: the library wires, the consumer validates"_.** The library still computes
+  nothing about a form's data: the browser collects the named fields, and the fields already write native values, so
+  `Form` forwards what the page would have sent. A decision to hand over an object of values would have been the
+  library choosing how repeated names collapse, which is the computing the story rules out.
+- **A multiple select sends one entry per pick under its one name**, so the consumer reads it with `getAll`. This is
+  why an object shape was not chosen: one pick and several picks are the same field, and a plain object cannot tell
+  them apart without the library deciding.
+- **A field with no `name` sends nothing**, and a disabled control still sends, the cost already accepted in
+  `controls.md` under _"Disabled is one mechanism for every control"_.
+- **The submit is still cancelled.** `Form` keeps calling `preventDefault`, so a consumer who wants the browser's own
+  submit leaves `Form` out and uses a plain `<form>`.
+- **The type changed in the shared core**, `BaseFormCbs`, so the four frameworks changed together; a callback taking
+  fewer arguments still fits, so existing call sites needed nothing.
+
 ### `FormSection`: the collecting stops at the nearest one
 
 The last piece of the form story. `Form` collected every field on the page and there was no way to

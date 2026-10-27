@@ -26,7 +26,7 @@ export const Form = (props: FormProps) => {
 
                 setHasSubmitted(true);
 
-                void props.onSubmit?.();
+                void props.onSubmit?.(new FormData(e.currentTarget));
 
                 FormUtils.findErrorFocusTarget(getEntries())?.focus();
             }}

@@ -5,6 +5,7 @@ import { PageDocsExample } from "../../PageComponents/DocsExample/DocsExample";
 import { PageDocsSection } from "../../PageComponents/DocsSection/DocsSection";
 import { BasicDocsExample } from "./Docs/Basic";
 import { SubmittedDocsExample } from "./Docs/Submitted";
+import { ValuesDocsExample } from "./Docs/Values";
 
 export const FormDocs = () => (
     <>
@@ -33,6 +34,17 @@ export const FormDocs = () => (
 
         <PageDocsExample path={`${DOCS_ROOT}/Submitted.tsx`}>
             <SubmittedDocsExample />
+        </PageDocsExample>
+
+        <PageDocsSection
+            title={"Reading what was sent"}
+            content={
+                "The submit handler is handed the form's entries, read the way the browser would have sent them: every field with a [prop]name[/prop], under that name. A date arrives as an ISO date whatever format the field shows, a multiple select as one entry per pick under its one name, so it is read with getAll, and a single select left empty as an empty entry. A field with no name sends nothing."
+            }
+        />
+
+        <PageDocsExample path={`${DOCS_ROOT}/Values.tsx`}>
+            <ValuesDocsExample />
         </PageDocsExample>
     </>
 );

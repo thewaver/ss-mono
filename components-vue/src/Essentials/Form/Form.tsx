@@ -49,7 +49,7 @@ export const Form = defineComponent(
                         hasSubmitted.value = true;
                         focusRequest.value += 1;
 
-                        props.onSubmit?.();
+                        props.onSubmit?.(new FormData(e.currentTarget as HTMLFormElement));
                     }}
                     onReset={(e) => {
                         e.preventDefault();

@@ -53,7 +53,7 @@ export const Form = (props: FormProps) => {
                 setHasSubmitted(true);
                 setFocusRequest((count) => count + 1);
 
-                props.onSubmit?.();
+                props.onSubmit?.(new FormData(e.currentTarget));
             }}
             onReset={(e) => {
                 e.preventDefault();

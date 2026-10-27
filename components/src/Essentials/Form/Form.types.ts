@@ -17,7 +17,11 @@ export type BaseFormValues = {
 export type BaseFormCbs = {
     /**
      * Runs when the form is submitted, whether or not any field reports an error — the library validates nothing, so
-     * it does not decide that a form may not be sent. Once the display the submit causes has been updated, focus moves
+     * it does not decide that a form may not be sent. It is handed the form's entries, read at the moment of the
+     * submit the way the browser would have sent them: every field in the form that has a `name`, under that name. A
+     * field picking several things, such as a multiple select, sends one entry each under its one name, so read it
+     * with `getAll`. A field with no `name` sends nothing, and a disabled control still sends, since a control is
+     * disabled with `aria-disabled` rather than the native attribute. Once the display the submit causes has been updated, focus moves
      * to the first field then reporting an error, in the order the fields were first drawn, so the reader lands on
      * what needs fixing. That update includes whatever this callback set and whatever the fields read from
      * `hasSubmitted`, so an error that only shows once the form has been sent still counts. Validation that arrives
@@ -25,7 +29,7 @@ export type BaseFormCbs = {
      * the first field in error has no control that handed it an element through the field's control registration,
      * focus stays where it was.
      */
-    onSubmit?: () => void;
+    onSubmit?: (data: FormData) => void;
     /** Runs when the form is reset. */
     onReset?: () => void;
 };

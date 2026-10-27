@@ -6,6 +6,7 @@ import PageDocsExample from "../../PageComponents/DocsExample/PageDocsExample.vu
 import PageDocsSection from "../../PageComponents/DocsSection/PageDocsSection.vue";
 import BasicDocsExample from "./Docs/Basic.vue";
 import SubmittedDocsExample from "./Docs/Submitted.vue";
+import ValuesDocsExample from "./Docs/Values.vue";
 </script>
 
 <template>
@@ -30,5 +31,14 @@ import SubmittedDocsExample from "./Docs/Submitted.vue";
 
     <PageDocsExample :path="`${DOCS_ROOT}/Submitted.vue`">
         <SubmittedDocsExample />
+    </PageDocsExample>
+
+    <PageDocsSection
+        title="Reading what was sent"
+        content="The submit handler is handed the form's entries, read the way the browser would have sent them: every field with a [prop]name[/prop], under that name. A date arrives as an ISO date whatever format the field shows, a multiple select as one entry per pick under its one name, so it is read with getAll, and a single select left empty as an empty entry. A field with no name sends nothing."
+    />
+
+    <PageDocsExample :path="`${DOCS_ROOT}/Values.vue`">
+        <ValuesDocsExample />
     </PageDocsExample>
 </template>

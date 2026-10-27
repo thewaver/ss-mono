@@ -97,6 +97,54 @@ test.describe("a form around a select", () => {
 });
 
 /**
+ * `Form` hands its submit handler the entries a native submit would have sent. The Values example prints what it was
+ * handed, so the handler is checked against what was picked and typed rather than against anything written down here.
+ */
+test.describe("a form's submit handler", () => {
+    const VALUES = `${docsDemo(FORM_DOCS, "Values")} form`;
+    const comboboxes = (page: Page) => page.locator(`${VALUES} [role="combobox"]`);
+
+    test.beforeEach(async ({ page }) => {
+        await openDocs(page, "/form/docs", VALUES);
+    });
+
+    test("is handed everything that was picked and typed", async ({ page }) => {
+        await comboboxes(page).nth(0).click();
+        await expect(page.locator(OPTION).first()).toBeVisible();
+        await page.locator(OPTION).first().click();
+
+        const plan = (await comboboxes(page).nth(0).textContent())?.trim();
+
+        await comboboxes(page).nth(1).click();
+        await expect(page.locator(OPTION).first()).toBeVisible();
+        await page.locator(OPTION).nth(0).click();
+        await page.locator(OPTION).nth(1).click();
+        await page.keyboard.press("Escape");
+
+        const topics = ((await comboboxes(page).nth(1).textContent()) ?? "").split(", ").map((topic) => topic.trim());
+
+        await typeInto(page, `${VALUES} input:not([type="hidden"])`, "11111111");
+        await page.locator(`${VALUES} button[type="submit"]`).click();
+
+        const sent = page.locator(readoutOf(VALUES));
+
+        await expect(sent, "the plan that was picked").toContainText(plan!);
+        for (const topic of topics) await expect(sent, "and each topic that was picked").toContainText(topic);
+        await expect(sent, "and the date as an ISO date").toContainText(ISO_DATE);
+    });
+
+    test("is handed an entry for a single field left empty and none for a multiple one", async ({ page }) => {
+        await page.locator(`${VALUES} button[type="submit"]`).click();
+
+        const sent = page.locator(readoutOf(VALUES));
+
+        await expect(sent, "a single select and a date still name themselves").toContainText(/plan:/);
+        await expect(sent).toContainText(/start:/);
+        await expect(sent, "a multiple select with nothing picked sends no entry").not.toContainText(/topics:/);
+    });
+});
+
+/**
  * Options hold records, not strings, so what a form sends needs a spelling. The Records example names the airport and
  * hands over a writer that sends its code; the Described example names the delivery and hands over nothing, so its
  * record goes as JSON. Each is compared with what the page shows rather than with a value written down here.

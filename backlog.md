@@ -42,8 +42,7 @@ reading.
 8. `Table` — two things deliberately not built — _open_
 9. `GlassSurface`'s ripple layer shows a defect at its edge — _postponed until the platform catches up_
 10. Arbitrary placement — the gaps the trials left — _open_
-11. What `Form` hands `onSubmit` — _pending decision_
-12. The Playground's painters in Windows high-contrast mode — _open, decided, not yet built_
+11. The Playground's painters in Windows high-contrast mode — _open, decided, not yet built_
 
 ---
 
@@ -381,20 +380,7 @@ document"_, _"Five more controls take a layout"_ and _"Hold and flick"_. What th
 
 ---
 
-## 11. What `Form` hands `onSubmit`
-
-`Form` cancels the browser's own submit and hands `onSubmit` nothing, so `name` matters only to a consumer who
-reads the fields themselves or uses a plain `<form>` without `Form`. Every field now submits a value a server can
-read through a native submit (_"A control with no native element submits through a hidden input"_ in
-`decisions.md`), so the open question is only whether the library's `Form` is ever going to carry those values to
-`onSubmit`, or whether the native submit is the route a consumer who wants values takes. _"The form story"_ in
-`decisions.md` says the library never computes a form's data, and that entry is what this item would revisit.
-Focus moving to the first field in error on submit was built separately and does not depend on this. **The user's
-word: lofted, not discarded.**
-
----
-
-## 12. The Playground's painters in Windows high-contrast mode
+## 11. The Playground's painters in Windows high-contrast mode
 
 Reachable on the Range page with Windows' high-contrast mode on, or with Chrome's DevTools emulating
 `forced-colors: active`: the track and the filled part of the range turn white on the white page, and only the

@@ -53,7 +53,7 @@
         hasSubmitted = true;
         focusRequest += 1;
 
-        props.onSubmit?.();
+        props.onSubmit?.(new FormData(e.currentTarget));
     }}
     onreset={(e) => {
         e.preventDefault();

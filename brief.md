@@ -25,7 +25,6 @@ Something that misbehaves, or a cost nobody has paid down.
 
 | #   | Where                      | What happens                                                                                                                              |
 | --- | -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| 11  | **Native form submit**     | **Pending decision.** `Form` hands `onSubmit` no values. One question, lofted, not discarded                                              |
 | 10  | **Any placed control**     | A layout guesses each item's box, so content wider than the guess overflows it and, on a ring, overlaps a neighbor                        |
 | 10  | **Any placed control**     | Nothing stops a layout outgrowing the room it is in — a ring can reach past the screen, and a placed toolbar has nothing to collapse into |
 | 10  | **`Menu`, hold and flick** | How far a flick must travel to pick an item is a guess — about 30px on the demo wheel — not a measured number                             |
@@ -48,7 +47,7 @@ They cluster, and no single item owns them.
 | 6   | **`Carousel`**  | A carousel whose consumer builds no buttons on its controller has no keyboard route into it whatsoever                          |
 | 8   | **`Table`**     | A cell holding two controls can be reached but not stepped into — there is no key that moves between them                       |
 | 5   | **`Scroller`**  | The buttons are the consumer's, so the library cannot promise one is named, reachable or in the tab order                       |
-| 12  | **Playground**  | In Windows high-contrast mode, painters drawn only in background colors vanish — Range's track and fill go white on white       |
+| 11  | **Playground**  | In Windows high-contrast mode, painters drawn only in background colors vanish — Range's track and fill go white on white       |
 
 ## Planned projects
 
