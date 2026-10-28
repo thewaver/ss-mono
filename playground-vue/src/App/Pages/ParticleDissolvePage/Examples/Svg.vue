@@ -4,6 +4,7 @@ import { computed, shallowRef } from "vue";
 import { Button, ParticleDissolve } from "@thewaver/ss-components-vue";
 import {
     NO_EDGE_THICKNESSES,
+    SVG_LABEL,
     SVG_SIZE,
     computeAshAnimation,
 } from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.const";
@@ -43,7 +44,6 @@ const path = computed(
             :particle-lifetime-ms="particleLifetimeMs"
             :feather-share="featherShare"
             :spawn-chance="spawnChance"
-            :particles-per-cell="particlesPerCell"
             :cell-size="cellSize"
             :compute-particle-animation="computeAshAnimation"
         >
@@ -55,6 +55,7 @@ const path = computed(
                 aria-label="The shape that dissolves"
             >
                 <path :class="styles.svgShapePath" :d="path" />
+                <text :class="styles.svgShapeText" x="50%" y="50%">{{ SVG_LABEL }}</text>
             </svg>
 
             <template #renderParticle="{ defs }">

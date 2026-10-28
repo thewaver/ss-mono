@@ -1,6 +1,17 @@
 import type { AccessorValues, InfiniteCorridorLayoutRule } from "@thewaver/ss-components-solid";
-import type { BaseInfiniteCorridorExampleValues } from "@thewaver/ss-playground/App/Pages/InfiniteCorridorPage/InfiniteCorridorPage.types";
+import type {
+    BaseInfiniteCorridorClockExampleValues,
+    BaseInfiniteCorridorExampleValues,
+    BaseInfiniteCorridorScrolledExampleValues,
+} from "@thewaver/ss-playground/App/Pages/InfiniteCorridorPage/InfiniteCorridorPage.types";
 
-export type InfiniteCorridorExampleProps = AccessorValues<BaseInfiniteCorridorExampleValues> & {
+type LayoutProps = {
     toLayout: (spinDegrees: number) => InfiniteCorridorLayoutRule;
 };
+
+export type InfiniteCorridorExampleProps = AccessorValues<BaseInfiniteCorridorExampleValues> & LayoutProps;
+
+export type InfiniteCorridorScrolledExampleProps = AccessorValues<BaseInfiniteCorridorScrolledExampleValues> &
+    LayoutProps;
+
+export type InfiniteCorridorClockExampleProps = AccessorValues<BaseInfiniteCorridorClockExampleValues> & LayoutProps;

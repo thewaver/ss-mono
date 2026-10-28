@@ -1,25 +1,50 @@
 <script setup lang="ts">
-import { reactive } from "vue";
+import { computed, reactive, shallowRef } from "vue";
 
 import { ScanlineAnimationKnobs } from "@thewaver/ss-playground/App/Knobs/ScanlineAnimations.const";
 import { IMAGE_CONTAINER_SIZE } from "@thewaver/ss-playground/App/Pages/ScanLineAnimationPage/ScanLineAnimationPage.const";
+import * as styles from "@thewaver/ss-playground/App/Pages/ScanLineAnimationPage/ScanlineAnimationPage.css";
 
 import PageExampleKnobs from "../../PageComponents/ExampleKnobs/PageExampleKnobs.vue";
 import PageNumberField from "../../PageComponents/Field/PageNumberField.vue";
 import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.vue";
+import PagePlaybackScrubber from "../../PageComponents/PlaybackScrubber/PlaybackScrubber.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
 import GlitchExample from "./Examples/Glitch.vue";
 import type { ScanlineAnimationExampleProps } from "./ScanlineAnimationPage.types";
 
 const props = defineProps<ScanlineAnimationExampleProps>();
 
+const playback = shallowRef(true);
+const progress = shallowRef(0);
+
+const sharedProps = computed(() => {
+    const { "playback": _playback, "onUpdate:playback": _setPlayback, ...shared } = props;
+
+    return shared;
+});
+
 const keyframeOpts = reactive({ ...ScanlineAnimationKnobs.STARTING_GLITCH_OPTS });
 </script>
 
 <template>
-    <PageMeasureBox :width="IMAGE_CONTAINER_SIZE">
-        <GlitchExample v-bind="props" :keyframe-opts="keyframeOpts" />
-    </PageMeasureBox>
+    <div :class="styles.stack">
+        <PageMeasureBox :width="IMAGE_CONTAINER_SIZE">
+            <GlitchExample
+                v-bind="sharedProps"
+                v-model:playback="playback"
+                v-model:progress="progress"
+                :keyframe-opts="keyframeOpts"
+            />
+        </PageMeasureBox>
+
+        <PagePlaybackScrubber
+            id="scanlineGlitch"
+            v-model:playback="playback"
+            v-model:progress="progress"
+            ariaLabel="Position in the pass"
+        />
+    </div>
 
     <PageExampleKnobs>
         <PageProp

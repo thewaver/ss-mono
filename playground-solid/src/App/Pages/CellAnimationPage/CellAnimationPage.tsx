@@ -113,6 +113,8 @@ const ImageExampleWrapper = (props: CellAnimationExampleProps & { progress: Sign
 };
 
 const GradientExampleWrapper = (props: CellAnimationExampleProps) => {
+    const playback = createSignal(true);
+    const progress = createSignal(0);
     const [getKey, setKey] = createSignal<SVGDefsSamples.Gradient.Timed.SampleKey>(
         CellAnimationKnobs.STARTING_GRADIENT_KEY,
     );
@@ -122,10 +124,12 @@ const GradientExampleWrapper = (props: CellAnimationExampleProps) => {
 
     return (
         <>
-            <div class={styles.exampleRoot}>
+            <div class={styles.stack}>
                 <PageMeasureBox width={() => computeContainerWidth(getSize())}>
                     <DefaultExample
                         {...props}
+                        playback={playback}
+                        progress={progress}
                         src={() =>
                             SVGDefsSources.computeGradientSource(
                                 getKey(),
@@ -139,6 +143,13 @@ const GradientExampleWrapper = (props: CellAnimationExampleProps) => {
                         }
                     />
                 </PageMeasureBox>
+
+                <PagePlaybackScrubber
+                    id={"cellAnimationGradient"}
+                    ariaLabel={"Position in the pass"}
+                    playback={playback}
+                    progress={progress}
+                />
             </div>
 
             <PageExampleKnobs>
@@ -177,6 +188,8 @@ const GradientExampleWrapper = (props: CellAnimationExampleProps) => {
 };
 
 const PatternExampleWrapper = (props: CellAnimationExampleProps) => {
+    const playback = createSignal(true);
+    const progress = createSignal(0);
     const [getKey, setKey] = createSignal<SVGDefsSamples.Pattern.Timed.SampleKey>(
         CellAnimationKnobs.STARTING_PATTERN_KEY,
     );
@@ -186,10 +199,12 @@ const PatternExampleWrapper = (props: CellAnimationExampleProps) => {
 
     return (
         <>
-            <div class={styles.exampleRoot}>
+            <div class={styles.stack}>
                 <PageMeasureBox width={() => computeContainerWidth(getSize())}>
                     <DefaultExample
                         {...props}
+                        playback={playback}
+                        progress={progress}
                         src={() =>
                             SVGDefsSources.computePatternSource(
                                 getKey(),
@@ -202,6 +217,13 @@ const PatternExampleWrapper = (props: CellAnimationExampleProps) => {
                         }
                     />
                 </PageMeasureBox>
+
+                <PagePlaybackScrubber
+                    id={"cellAnimationPattern"}
+                    ariaLabel={"Position in the pass"}
+                    playback={playback}
+                    progress={progress}
+                />
             </div>
 
             <PageExampleKnobs>

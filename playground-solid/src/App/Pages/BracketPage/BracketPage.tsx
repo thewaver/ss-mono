@@ -25,18 +25,40 @@ import {
     ROUTE_TO_COLOR,
 } from "@thewaver/ss-playground/App/Pages/BracketPage/BracketPage.css";
 
+import { PageExampleKnobs } from "../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageCheckField, PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { PageBeam } from "../../StyledComponents/Beam/Beam";
-import type { BracketExampleProps } from "./BracketPage.types";
+import type { BracketExampleProps, BracketFamilyExampleProps } from "./BracketPage.types";
 import { BEAM_PATHS, NOTHING_PICKED, computeRouteSpan, toConnectorBoard } from "./BracketPageSolid.const";
 import { FamilyExample } from "./Examples/Family";
 import { KnockoutExample } from "./Examples/Knockout";
 import { OrgChartExample } from "./Examples/OrgChart";
 import { SkillTreeExample } from "./Examples/SkillTree";
+
+const FamilyExampleWrapper = (props: Omit<BracketFamilyExampleProps, "isSnappingToFamily">) => {
+    const [getIsSnapping, setIsSnapping] = createSignal(BracketKnobs.STARTING_IS_SNAPPING_TO_FAMILY);
+
+    return (
+        <>
+            <FamilyExample {...props} isSnappingToFamily={getIsSnapping} />
+
+            <PageExampleKnobs>
+                <PageProp
+                    key={"isSnappingToFamily"}
+                    label={"Snap to family"}
+                    hint={"Glides the window to frame the family in it once a drag, a pinch or the wheel is over."}
+                    controls={"Sets BracketProps.isSnappingToFamily"}
+                >
+                    <PageCheckField value={getIsSnapping} ariaLabel={"Snap to family"} onChange={setIsSnapping} />
+                </PageProp>
+            </PageExampleKnobs>
+        </>
+    );
+};
 
 export const BracketPage = () => {
     const [getLayerGap, setLayerGap] = createSignal(BRACKET_DEFAULTS.layerGap);
@@ -144,7 +166,7 @@ export const BracketPage = () => {
                 readout: () =>
                     `showing: ${getFamily()} — the whole draw stays mounted and a camera frames one family at a time: what the focused node feeds, it with all its siblings, and what feeds them; walk on with the arrows, or page through with the buttons without leaving them, and the camera pans and zooms to fit; Zoom out fits the whole draw, and Zoom in goes back to the family`,
                 component: () => (
-                    <FamilyExample
+                    <FamilyExampleWrapper
                         {...commonProps}
                         transitionDurationMs={() =>
                             getPrefersReducedMotion() ? NO_MOTION_DURATION_MS : getTransitionDurationMs()

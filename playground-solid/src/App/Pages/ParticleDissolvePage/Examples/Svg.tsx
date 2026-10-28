@@ -3,6 +3,7 @@ import { createMemo, createSignal } from "solid-js";
 import { Button, ParticleDissolve, access } from "@thewaver/ss-components-solid";
 import {
     NO_EDGE_THICKNESSES,
+    SVG_LABEL,
     SVG_SIZE,
     computeAshAnimation,
 } from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.const";
@@ -35,7 +36,6 @@ export const SvgExample = (props: Props) => {
                 particleLifetimeMs={props.particleLifetimeMs}
                 featherShare={props.featherShare}
                 spawnChance={props.spawnChance}
-                particlesPerCell={props.particlesPerCell}
                 cellSize={props.cellSize}
                 computeParticleAnimation={computeAshAnimation}
                 renderParticle={(defs) => <AshParticle defs={defs} />}
@@ -48,6 +48,9 @@ export const SvgExample = (props: Props) => {
                     aria-label={"The shape that dissolves"}
                 >
                     <path class={styles.svgShapePath} d={getPath()} />
+                    <text class={styles.svgShapeText} x={"50%"} y={"50%"}>
+                        {SVG_LABEL}
+                    </text>
                 </svg>
             </ParticleDissolve>
 

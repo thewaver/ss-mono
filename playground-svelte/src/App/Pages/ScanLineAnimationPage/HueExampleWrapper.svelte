@@ -1,9 +1,11 @@
 <script lang="ts">
+    import * as styles from "@thewaver/ss-playground/App/Pages/ScanLineAnimationPage/ScanlineAnimationPage.css";
     import type { CellAnimationBreakpointOpts, ScanlineHorizontalHueOpts } from "@thewaver/ss-components-svelte";
     import { ScanlineAnimationKnobs } from "@thewaver/ss-playground/App/Knobs/ScanlineAnimations.const";
 
     import PageExampleKnobs from "../../PageComponents/ExampleKnobs/PageExampleKnobs.svelte";
     import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.svelte";
+    import PagePlaybackScrubber from "../../PageComponents/PlaybackScrubber/PlaybackScrubber.svelte";
     import DirInput from "./DirInput.svelte";
     import HueExample from "./Examples/Hue.svelte";
     import type { ScanlineAnimationExampleProps } from "./ScanlineAnimationPage.types";
@@ -12,7 +14,10 @@
         IMAGE_CONTAINER_SIZE,
     } from "@thewaver/ss-playground/App/Pages/ScanLineAnimationPage/ScanLineAnimationPage.const";
 
-    let { playback = $bindable(), ...props }: ScanlineAnimationExampleProps = $props();
+    let props: Omit<ScanlineAnimationExampleProps, "playback"> = $props();
+
+    let playback = $state(true);
+    let progress = $state(0);
 
     const keyframeOpts: ScanlineHorizontalHueOpts = {};
 
@@ -21,9 +26,13 @@
     });
 </script>
 
-<PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
-    <HueExample {...props} bind:playback {keyframeOpts} {breakpointOpts} />
-</PageMeasureBox>
+<div class={styles.stack}>
+    <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
+        <HueExample {...props} bind:playback bind:progress {keyframeOpts} {breakpointOpts} />
+    </PageMeasureBox>
+
+    <PagePlaybackScrubber id={"scanlineHue"} ariaLabel={"Position in the pass"} bind:playback bind:progress />
+</div>
 
 <PageExampleKnobs>
     <SmoothnessInput

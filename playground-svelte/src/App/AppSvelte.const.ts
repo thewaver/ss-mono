@@ -78,7 +78,7 @@ const ParticleFieldPage = () => import("./Pages/ParticleFieldPage/ParticleFieldP
 const ParticleSpawnerPage = () => import("./Pages/ParticleSpawnerPage/ParticleSpawnerPage.svelte");
 const PatchBoardPage = () => import("./Pages/PatchBoardPage/PatchBoardPage.svelte");
 const LightCatcherPage = () => import("./Pages/PointerEffects/LightCatcherPage/LightCatcherPage.svelte");
-const RGBSplitterPage = () => import("./Pages/PointerEffects/RGBSplitterPage/RGBSplitterPage.svelte");
+const RGBAnimationPage = () => import("./Pages/RGBAnimationPage/RGBAnimationPage.svelte");
 const ShadowCasterPage = () => import("./Pages/PointerEffects/ShadowCasterPage/ShadowCasterPage.svelte");
 const TilterPage = () => import("./Pages/PointerEffects/TilterPage/TilterPage.svelte");
 const PreviewDocs = () => import("./Pages/PreviewPage/PreviewDocs.svelte");
@@ -570,6 +570,10 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                         component: CellAnimationPage,
                     },
                     {
+                        name: "RGBAnimation",
+                        component: RGBAnimationPage,
+                    },
+                    {
                         name: "ScanlineAnimation",
                         component: ScanlineAnimationPage,
                     },
@@ -703,10 +707,6 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                     {
                         name: "LightCatcher",
                         component: LightCatcherPage,
-                    },
-                    {
-                        name: "RGBSplitter",
-                        component: RGBSplitterPage,
                     },
                     {
                         name: "ShadowCaster",

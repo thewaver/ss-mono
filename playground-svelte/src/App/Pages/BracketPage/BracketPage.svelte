@@ -27,10 +27,10 @@
     import PageBeam from "../../StyledComponents/Beam/PageBeam.svelte";
     import { BEAM_PATHS, NOTHING_PICKED, computeRouteSpan, toConnectorBoard } from "./BracketPageSvelte.const";
     import type { BracketExampleProps } from "./BracketPage.types";
-    import FamilyExample from "./Examples/Family.svelte";
     import KnockoutExample from "./Examples/Knockout.svelte";
     import OrgChartExample from "./Examples/OrgChart.svelte";
     import SkillTreeExample from "./Examples/SkillTree.svelte";
+    import FamilyExampleWrapper from "./FamilyExampleWrapper.svelte";
     import {
     CONNECTOR_RADIUS,
     CONNECTOR_WIDTH,
@@ -159,7 +159,7 @@
 {/snippet}
 
 {#snippet familyExample()}
-    <FamilyExample
+    <FamilyExampleWrapper
         {...commonProps}
         transitionDurationMs={getPrefersReducedMotion() ? NO_MOTION_DURATION_MS : transitionDurationMs}
         onFamilyChange={(next) => {

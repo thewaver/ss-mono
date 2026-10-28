@@ -9,3 +9,10 @@ export const root = style({
     alignItems: "start",
     gap: themeVars.spacing.quad,
 });
+
+export const stack = style({
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "stretch",
+    gap: themeVars.spacing.full,
+});

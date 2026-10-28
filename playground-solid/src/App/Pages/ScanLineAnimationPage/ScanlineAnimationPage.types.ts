@@ -10,4 +10,5 @@ export type ScanlineAnimationExampleProps = AccessorProps<{
     animationDurationMs: number;
     animationIterationDelayMs: number;
     playback: Signal<boolean>;
+    progress?: Signal<number>;
 }>;

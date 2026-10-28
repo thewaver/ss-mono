@@ -1,6 +1,16 @@
 import type { InfiniteCorridorLayoutRule } from "@thewaver/ss-components-vue";
-import type { BaseInfiniteCorridorExampleValues } from "@thewaver/ss-playground/App/Pages/InfiniteCorridorPage/InfiniteCorridorPage.types";
+import type {
+    BaseInfiniteCorridorClockExampleValues,
+    BaseInfiniteCorridorExampleValues,
+    BaseInfiniteCorridorScrolledExampleValues,
+} from "@thewaver/ss-playground/App/Pages/InfiniteCorridorPage/InfiniteCorridorPage.types";
 
-export type InfiniteCorridorExampleProps = BaseInfiniteCorridorExampleValues & {
+type LayoutProps = {
     toLayout: (spinDegrees: number) => InfiniteCorridorLayoutRule;
 };
+
+export type InfiniteCorridorExampleProps = BaseInfiniteCorridorExampleValues & LayoutProps;
+
+export type InfiniteCorridorScrolledExampleProps = BaseInfiniteCorridorScrolledExampleValues & LayoutProps;
+
+export type InfiniteCorridorClockExampleProps = BaseInfiniteCorridorClockExampleValues & LayoutProps;

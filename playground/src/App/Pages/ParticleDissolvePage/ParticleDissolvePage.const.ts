@@ -24,6 +24,14 @@ export const PARTICLE_SHARE = 0.6;
 
 export const SVG_SIZE = { width: 200, height: 200 };
 
+export const SVG_LABEL = "N∅THING";
+
+export const CARD_TEXT = {
+    title: "Quarterly report",
+    body: "Revenue grew in every region, and the notes below explain the two that did not.",
+    badge: "Approved",
+};
+
 export const NO_EDGE_THICKNESSES = [0];
 
 export const CENTER_SHARE = { x: 0.5, y: 0.5 };

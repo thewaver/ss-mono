@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive } from "vue";
+import { computed, reactive, shallowRef } from "vue";
 
 import type {
     CellAnimationBreakpointDirection,
@@ -8,15 +8,26 @@ import type {
 } from "@thewaver/ss-components-vue";
 import { ScanlineAnimationKnobs } from "@thewaver/ss-playground/App/Knobs/ScanlineAnimations.const";
 import { IMAGE_CONTAINER_SIZE } from "@thewaver/ss-playground/App/Pages/ScanLineAnimationPage/ScanLineAnimationPage.const";
+import * as styles from "@thewaver/ss-playground/App/Pages/ScanLineAnimationPage/ScanlineAnimationPage.css";
 
 import PageExampleKnobs from "../../PageComponents/ExampleKnobs/PageExampleKnobs.vue";
 import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.vue";
+import PagePlaybackScrubber from "../../PageComponents/PlaybackScrubber/PlaybackScrubber.vue";
 import DirInput from "./DirInput.vue";
 import BrightnessExample from "./Examples/Brightness.vue";
 import type { ScanlineAnimationExampleProps } from "./ScanlineAnimationPage.types";
 import SmoothnessInput from "./SmoothnessInput.vue";
 
 const props = defineProps<ScanlineAnimationExampleProps>();
+
+const playback = shallowRef(true);
+const progress = shallowRef(0);
+
+const sharedProps = computed(() => {
+    const { "playback": _playback, "onUpdate:playback": _setPlayback, ...shared } = props;
+
+    return shared;
+});
 
 const keyframeOpts: ScanlineHorizontalBrightnessOpts = {};
 const breakpointOpts = reactive<CellAnimationBreakpointOpts>({
@@ -25,9 +36,24 @@ const breakpointOpts = reactive<CellAnimationBreakpointOpts>({
 </script>
 
 <template>
-    <PageMeasureBox :width="IMAGE_CONTAINER_SIZE">
-        <BrightnessExample v-bind="props" :keyframe-opts="keyframeOpts" :breakpoint-opts="breakpointOpts" />
-    </PageMeasureBox>
+    <div :class="styles.stack">
+        <PageMeasureBox :width="IMAGE_CONTAINER_SIZE">
+            <BrightnessExample
+                v-bind="sharedProps"
+                v-model:playback="playback"
+                v-model:progress="progress"
+                :keyframe-opts="keyframeOpts"
+                :breakpoint-opts="breakpointOpts"
+            />
+        </PageMeasureBox>
+
+        <PagePlaybackScrubber
+            id="scanlineBrightness"
+            v-model:playback="playback"
+            v-model:progress="progress"
+            ariaLabel="Position in the pass"
+        />
+    </div>
 
     <PageExampleKnobs>
         <SmoothnessInput

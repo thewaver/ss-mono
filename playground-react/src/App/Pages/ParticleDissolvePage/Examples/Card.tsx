@@ -1,7 +1,10 @@
 import { useState } from "react";
 
 import { Button, ParticleDissolve } from "@thewaver/ss-components-react";
-import { computeAshAnimation } from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.const";
+import {
+    CARD_TEXT,
+    computeAshAnimation,
+} from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.css";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
@@ -22,18 +25,17 @@ export const CardExample = (props: Props) => {
                 particleLifetimeMs={props.particleLifetimeMs}
                 featherShare={props.featherShare}
                 spawnChance={props.spawnChance}
-                particlesPerCell={props.particlesPerCell}
                 cellSize={props.cellSize}
                 computeParticleAnimation={computeAshAnimation}
                 renderParticle={(defs) => <AshParticle defs={defs} />}
             >
                 <div className={styles.card}>
                     <span id={"particleDissolveCardTitle"} className={styles.cardTitle}>
-                        Quarterly report
+                        {CARD_TEXT.title}
                     </span>
-                    <span>Revenue grew in every region, and the notes below explain the two that did not.</span>
+                    <span>{CARD_TEXT.body}</span>
                     <span id={"particleDissolveCardBadge"} className={styles.badge}>
-                        Approved
+                        {CARD_TEXT.badge}
                     </span>
                 </div>
             </ParticleDissolve>

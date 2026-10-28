@@ -50,6 +50,7 @@ import {
 import { PageKnobs } from "../../PageComponents/Knobs/Knobs";
 import type { Knob } from "../../PageComponents/Knobs/Knobs.types";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
+import { PagePlaybackScrubber } from "../../PageComponents/PlaybackScrubber/PlaybackScrubber";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { StressTest } from "../../PageComponents/StressTest/StressTest";
@@ -195,13 +196,30 @@ const DirInput = (props: {
 };
 
 const GlitchExampleWrapper = (props: ScanlineAnimationExampleProps) => {
+    const playback = createSignal(true);
+    const progress = createSignal(0);
+
     const [keyframeOpts, setKeyframeOpts] = createStore({ ...ScanlineAnimationKnobs.STARTING_GLITCH_OPTS });
 
     return (
         <>
-            <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
-                <GlitchExample {...props} keyframeOpts={() => keyframeOpts} />
-            </PageMeasureBox>
+            <div class={styles.stack}>
+                <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
+                    <GlitchExample
+                        {...props}
+                        playback={playback}
+                        progress={progress}
+                        keyframeOpts={() => keyframeOpts}
+                    />
+                </PageMeasureBox>
+
+                <PagePlaybackScrubber
+                    id={"scanlineGlitch"}
+                    ariaLabel={"Position in the pass"}
+                    playback={playback}
+                    progress={progress}
+                />
+            </div>
 
             <PageExampleKnobs>
                 <PageProp
@@ -265,6 +283,9 @@ const GlitchExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 };
 
 const SurgeExampleWrapper = (props: ScanlineAnimationExampleProps) => {
+    const playback = createSignal(true);
+    const progress = createSignal(0);
+
     const [keyframeOpts, setKeyframeOpts] = createStore<Record<string, number | boolean>>({});
     const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpointOpts>({
         ...ScanlineAnimationKnobs.STARTING_SURGE_BREAKPOINT_OPTS,
@@ -272,13 +293,24 @@ const SurgeExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 
     return (
         <>
-            <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
-                <SurgeExample
-                    {...props}
-                    keyframeOpts={() => keyframeOpts as ScanlineHorizontalStretchOpts}
-                    breakpointOpts={() => breakpointOpts}
+            <div class={styles.stack}>
+                <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
+                    <SurgeExample
+                        {...props}
+                        playback={playback}
+                        progress={progress}
+                        keyframeOpts={() => keyframeOpts as ScanlineHorizontalStretchOpts}
+                        breakpointOpts={() => breakpointOpts}
+                    />
+                </PageMeasureBox>
+
+                <PagePlaybackScrubber
+                    id={"scanlineSurge"}
+                    ariaLabel={"Position in the pass"}
+                    playback={playback}
+                    progress={progress}
                 />
-            </PageMeasureBox>
+            </div>
 
             <PageExampleKnobs>
                 <PageKnobs
@@ -299,6 +331,9 @@ const SurgeExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 };
 
 const SnakeExampleWrapper = (props: ScanlineAnimationExampleProps) => {
+    const playback = createSignal(true);
+    const progress = createSignal(0);
+
     const [keyframeOpts, setKeyframeOpts] = createStore<Record<string, number | boolean>>({});
     const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpointOpts>({
         ...ScanlineAnimationKnobs.STARTING_SNAKE_BREAKPOINT_OPTS,
@@ -306,13 +341,24 @@ const SnakeExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 
     return (
         <>
-            <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
-                <SnakeExample
-                    {...props}
-                    keyframeOpts={() => keyframeOpts as ScanlineHorizontalSnakeOpts}
-                    breakpointOpts={() => breakpointOpts}
+            <div class={styles.stack}>
+                <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
+                    <SnakeExample
+                        {...props}
+                        playback={playback}
+                        progress={progress}
+                        keyframeOpts={() => keyframeOpts as ScanlineHorizontalSnakeOpts}
+                        breakpointOpts={() => breakpointOpts}
+                    />
+                </PageMeasureBox>
+
+                <PagePlaybackScrubber
+                    id={"scanlineSnake"}
+                    ariaLabel={"Position in the pass"}
+                    playback={playback}
+                    progress={progress}
                 />
-            </PageMeasureBox>
+            </div>
 
             <PageExampleKnobs>
                 <PageKnobs
@@ -333,6 +379,9 @@ const SnakeExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 };
 
 const SplitExampleWrapper = (props: ScanlineAnimationExampleProps) => {
+    const playback = createSignal(true);
+    const progress = createSignal(0);
+
     const [keyframeOpts, setKeyframeOpts] = createStore<Record<string, number | boolean>>({});
     const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpointOpts>({
         ...ScanlineAnimationKnobs.STARTING_SPLIT_BREAKPOINT_OPTS,
@@ -340,13 +389,24 @@ const SplitExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 
     return (
         <>
-            <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
-                <SplitExample
-                    {...props}
-                    keyframeOpts={() => keyframeOpts as ScanlineHorizontalSplitOpts}
-                    breakpointOpts={() => breakpointOpts}
+            <div class={styles.stack}>
+                <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
+                    <SplitExample
+                        {...props}
+                        playback={playback}
+                        progress={progress}
+                        keyframeOpts={() => keyframeOpts as ScanlineHorizontalSplitOpts}
+                        breakpointOpts={() => breakpointOpts}
+                    />
+                </PageMeasureBox>
+
+                <PagePlaybackScrubber
+                    id={"scanlineSplit"}
+                    ariaLabel={"Position in the pass"}
+                    playback={playback}
+                    progress={progress}
                 />
-            </PageMeasureBox>
+            </div>
 
             <PageExampleKnobs>
                 <PageKnobs
@@ -367,6 +427,9 @@ const SplitExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 };
 
 const BrightnessExampleWrapper = (props: ScanlineAnimationExampleProps) => {
+    const playback = createSignal(true);
+    const progress = createSignal(0);
+
     const [keyframeOpts] = createStore<ScanlineHorizontalBrightnessOpts>({});
     const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpointOpts>({
         ...ScanlineAnimationKnobs.STARTING_BRIGHTNESS_BREAKPOINT_OPTS,
@@ -374,9 +437,24 @@ const BrightnessExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 
     return (
         <>
-            <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
-                <BrightnessExample {...props} keyframeOpts={() => keyframeOpts} breakpointOpts={() => breakpointOpts} />
-            </PageMeasureBox>
+            <div class={styles.stack}>
+                <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
+                    <BrightnessExample
+                        {...props}
+                        playback={playback}
+                        progress={progress}
+                        keyframeOpts={() => keyframeOpts}
+                        breakpointOpts={() => breakpointOpts}
+                    />
+                </PageMeasureBox>
+
+                <PagePlaybackScrubber
+                    id={"scanlineBrightness"}
+                    ariaLabel={"Position in the pass"}
+                    playback={playback}
+                    progress={progress}
+                />
+            </div>
 
             <PageExampleKnobs>
                 <SmoothnessInput
@@ -390,6 +468,9 @@ const BrightnessExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 };
 
 const GrayscaleExampleWrapper = (props: ScanlineAnimationExampleProps) => {
+    const playback = createSignal(true);
+    const progress = createSignal(0);
+
     const [keyframeOpts] = createStore<ScanlineHorizontalGrayscaleOpts>({});
     const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpointOpts>({
         ...ScanlineAnimationKnobs.STARTING_GRAYSCALE_BREAKPOINT_OPTS,
@@ -397,9 +478,24 @@ const GrayscaleExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 
     return (
         <>
-            <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
-                <GrayscaleExample {...props} keyframeOpts={() => keyframeOpts} breakpointOpts={() => breakpointOpts} />
-            </PageMeasureBox>
+            <div class={styles.stack}>
+                <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
+                    <GrayscaleExample
+                        {...props}
+                        playback={playback}
+                        progress={progress}
+                        keyframeOpts={() => keyframeOpts}
+                        breakpointOpts={() => breakpointOpts}
+                    />
+                </PageMeasureBox>
+
+                <PagePlaybackScrubber
+                    id={"scanlineGrayscale"}
+                    ariaLabel={"Position in the pass"}
+                    playback={playback}
+                    progress={progress}
+                />
+            </div>
 
             <PageExampleKnobs>
                 <SmoothnessInput
@@ -413,6 +509,9 @@ const GrayscaleExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 };
 
 const HueExampleWrapper = (props: ScanlineAnimationExampleProps) => {
+    const playback = createSignal(true);
+    const progress = createSignal(0);
+
     const [keyframeOpts] = createStore<ScanlineHorizontalHueOpts>({});
     const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpointOpts>({
         ...ScanlineAnimationKnobs.STARTING_HUE_BREAKPOINT_OPTS,
@@ -420,9 +519,24 @@ const HueExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 
     return (
         <>
-            <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
-                <HueExample {...props} keyframeOpts={() => keyframeOpts} breakpointOpts={() => breakpointOpts} />
-            </PageMeasureBox>
+            <div class={styles.stack}>
+                <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
+                    <HueExample
+                        {...props}
+                        playback={playback}
+                        progress={progress}
+                        keyframeOpts={() => keyframeOpts}
+                        breakpointOpts={() => breakpointOpts}
+                    />
+                </PageMeasureBox>
+
+                <PagePlaybackScrubber
+                    id={"scanlineHue"}
+                    ariaLabel={"Position in the pass"}
+                    playback={playback}
+                    progress={progress}
+                />
+            </div>
 
             <PageExampleKnobs>
                 <SmoothnessInput
@@ -436,6 +550,9 @@ const HueExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 };
 
 const WaveExampleWrapper = (props: ScanlineAnimationExampleProps) => {
+    const playback = createSignal(true);
+    const progress = createSignal(0);
+
     const [keyframeOpts, setKeyframeOpts] = createStore<Record<string, number | boolean>>({});
     const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpointOpts>({
         ...ScanlineAnimationKnobs.STARTING_WAVE_BREAKPOINT_OPTS,
@@ -443,13 +560,24 @@ const WaveExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 
     return (
         <>
-            <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
-                <WaveExample
-                    {...props}
-                    keyframeOpts={() => keyframeOpts as _ScanlineHorizontalWaveOpts}
-                    breakpointOpts={() => breakpointOpts}
+            <div class={styles.stack}>
+                <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
+                    <WaveExample
+                        {...props}
+                        playback={playback}
+                        progress={progress}
+                        keyframeOpts={() => keyframeOpts as _ScanlineHorizontalWaveOpts}
+                        breakpointOpts={() => breakpointOpts}
+                    />
+                </PageMeasureBox>
+
+                <PagePlaybackScrubber
+                    id={"scanlineWave"}
+                    ariaLabel={"Position in the pass"}
+                    playback={playback}
+                    progress={progress}
                 />
-            </PageMeasureBox>
+            </div>
 
             <PageExampleKnobs>
                 <PageKnobs
@@ -470,6 +598,9 @@ const WaveExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 };
 
 const RollExampleWrapper = (props: ScanlineAnimationExampleProps) => {
+    const playback = createSignal(true);
+    const progress = createSignal(0);
+
     const [keyframeOpts, setKeyframeOpts] = createStore<Record<string, number | boolean>>({});
     const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpointOpts>({
         ...ScanlineAnimationKnobs.STARTING_ROLL_BREAKPOINT_OPTS,
@@ -477,13 +608,24 @@ const RollExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 
     return (
         <>
-            <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
-                <RollExample
-                    {...props}
-                    keyframeOpts={() => keyframeOpts as _ScanlineHorizontalRollOpts}
-                    breakpointOpts={() => breakpointOpts}
+            <div class={styles.stack}>
+                <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
+                    <RollExample
+                        {...props}
+                        playback={playback}
+                        progress={progress}
+                        keyframeOpts={() => keyframeOpts as _ScanlineHorizontalRollOpts}
+                        breakpointOpts={() => breakpointOpts}
+                    />
+                </PageMeasureBox>
+
+                <PagePlaybackScrubber
+                    id={"scanlineRoll"}
+                    ariaLabel={"Position in the pass"}
+                    playback={playback}
+                    progress={progress}
                 />
-            </PageMeasureBox>
+            </div>
 
             <PageExampleKnobs>
                 <PageKnobs
@@ -504,6 +646,9 @@ const RollExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 };
 
 const DropoutExampleWrapper = (props: ScanlineAnimationExampleProps) => {
+    const playback = createSignal(true);
+    const progress = createSignal(0);
+
     const [keyframeOpts, setKeyframeOpts] = createStore<Record<string, number | boolean>>({});
     const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpointOpts>({
         ...ScanlineAnimationKnobs.STARTING_DROPOUT_BREAKPOINT_OPTS,
@@ -511,13 +656,24 @@ const DropoutExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 
     return (
         <>
-            <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
-                <DropoutExample
-                    {...props}
-                    keyframeOpts={() => keyframeOpts as _ScanlineHorizontalDropoutOpts}
-                    breakpointOpts={() => breakpointOpts}
+            <div class={styles.stack}>
+                <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
+                    <DropoutExample
+                        {...props}
+                        playback={playback}
+                        progress={progress}
+                        keyframeOpts={() => keyframeOpts as _ScanlineHorizontalDropoutOpts}
+                        breakpointOpts={() => breakpointOpts}
+                    />
+                </PageMeasureBox>
+
+                <PagePlaybackScrubber
+                    id={"scanlineDropout"}
+                    ariaLabel={"Position in the pass"}
+                    playback={playback}
+                    progress={progress}
                 />
-            </PageMeasureBox>
+            </div>
 
             <PageExampleKnobs>
                 <PageKnobs
@@ -538,6 +694,9 @@ const DropoutExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 };
 
 const InterlaceExampleWrapper = (props: ScanlineAnimationExampleProps) => {
+    const playback = createSignal(true);
+    const progress = createSignal(0);
+
     const [keyframeOpts, setKeyframeOpts] = createStore<Record<string, number | boolean>>({});
     const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpointOpts>({
         ...ScanlineAnimationKnobs.STARTING_INTERLACE_BREAKPOINT_OPTS,
@@ -545,13 +704,24 @@ const InterlaceExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 
     return (
         <>
-            <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
-                <InterlaceExample
-                    {...props}
-                    keyframeOpts={() => keyframeOpts as _ScanlineHorizontalInterlaceOpts}
-                    breakpointOpts={() => breakpointOpts}
+            <div class={styles.stack}>
+                <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
+                    <InterlaceExample
+                        {...props}
+                        playback={playback}
+                        progress={progress}
+                        keyframeOpts={() => keyframeOpts as _ScanlineHorizontalInterlaceOpts}
+                        breakpointOpts={() => breakpointOpts}
+                    />
+                </PageMeasureBox>
+
+                <PagePlaybackScrubber
+                    id={"scanlineInterlace"}
+                    ariaLabel={"Position in the pass"}
+                    playback={playback}
+                    progress={progress}
                 />
-            </PageMeasureBox>
+            </div>
 
             <PageExampleKnobs>
                 <PageKnobs
@@ -572,6 +742,9 @@ const InterlaceExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 };
 
 const SkewExampleWrapper = (props: ScanlineAnimationExampleProps) => {
+    const playback = createSignal(true);
+    const progress = createSignal(0);
+
     const [keyframeOpts, setKeyframeOpts] = createStore<Record<string, number | boolean>>({});
     const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpointOpts>({
         ...ScanlineAnimationKnobs.STARTING_SKEW_BREAKPOINT_OPTS,
@@ -579,13 +752,24 @@ const SkewExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 
     return (
         <>
-            <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
-                <SkewExample
-                    {...props}
-                    keyframeOpts={() => keyframeOpts as _ScanlineHorizontalSkewOpts}
-                    breakpointOpts={() => breakpointOpts}
+            <div class={styles.stack}>
+                <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
+                    <SkewExample
+                        {...props}
+                        playback={playback}
+                        progress={progress}
+                        keyframeOpts={() => keyframeOpts as _ScanlineHorizontalSkewOpts}
+                        breakpointOpts={() => breakpointOpts}
+                    />
+                </PageMeasureBox>
+
+                <PagePlaybackScrubber
+                    id={"scanlineSkew"}
+                    ariaLabel={"Position in the pass"}
+                    playback={playback}
+                    progress={progress}
                 />
-            </PageMeasureBox>
+            </div>
 
             <PageExampleKnobs>
                 <PageKnobs

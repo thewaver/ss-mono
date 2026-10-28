@@ -479,8 +479,8 @@ while, then retired whole (_"The gallery is gone"_, above).
   `playground/src/App/Pages/AboutPage/AboutPage.utils.ts` and each app only draws the blocks, so the four cannot
   drift. It is lazy-loaded because it pulls in the highlighter. The link is a real link to "/" and is selected only
   on the root route, so it takes an exact match rather than the prefix match a router link defaults to.
-- **A page's text, header, docs and About content are all capped at one width, `PAGE_CONTENT_WIDTH` in `App.css.ts`,
-  720px.** The user's call, after About wrapped at 720 and Docs at 960: one number for everything, with code boxes
+- **A page's text, header, docs and About content are all capped at one width, `PAGE_CONTENT_WIDTH` in `App.css.ts`.**
+  The user's call, after About wrapped at 720 and Docs at 960: one number for everything, with code boxes
   scrolling sideways rather than widening the page, and the docs table losing its `Passing` column to fit. A root-relative link a page draws itself, such as the rich-text
   sample's, goes through `toOwnAppHref` so it stays inside its own app.
 - **The site is assembled by `npm run build:site`**: the Solid app built with base `/solid/` into `dist/solid`, the
@@ -1642,7 +1642,7 @@ the other pages copy. Taken on Claude's judgment under the unsupervised port.
 
 ### Porting: the animations, particles, trail, pointer effects and reveals
 
-- **`LightCatcher`, `RGBSplitter`, `ShadowCaster` and `Tilter` share one `PointerEffectsUtils`** in the parent `PointerEffects` folder,
+- **`LightCatcher`, `ShadowCaster` and `Tilter` share one `PointerEffectsUtils`** in the parent `PointerEffects` folder,
   which held no namespace of its own, since they share the resting rule and the edge falloff; its functions apply each
   component's defaults, so either view passes its props straight through. **`CellAnimationUtils.runPasses` is the one
   pass clock** that `CellAnimation` and `ParticleField` each used to carry a copy of; `TrailUtils.run`,
@@ -1930,7 +1930,7 @@ the user chose the rest, member by member:
 - `Exotics/Charts`: `Treemap`, `Sunburst`, `Icicle`, `CirclePacking`.
 - `Exotics/Diagrams`: `Bracket`, `PatchBoard`, `Timeline`.
 - `Exotics/Perspective`: `FlipCard`, `Die`, `Cuboid`.
-- `Exotics/Animations`: `CellAnimation`, `ScanlineAnimation`.
+- `Exotics/Animations`: `CellAnimation`, `ScanlineAnimation`, `RGBAnimation`.
 - `Exotics/Text`: `ScrambleText`, `Typewriter`, `Odometer`, `RichText`.
 - `Exotics/Arrangements`: `Formation`, `Staircase`, `Satellite`.
 
@@ -2598,7 +2598,7 @@ A green `verify:dom` reads as broader coverage than it is, so the shape of its b
 - **A page that stops painting.** `noAnimationFrames.spec.ts` replaces `requestAnimationFrame` with a function that
   never calls back, before any application code runs; a frozen clock cannot express this, since Playwright fakes
   frames as a 16ms timer and advancing time to reach a fallback fires the frame first. It shows that
-  `ElementFader`'s 100ms fallback is real (a `Modal` reaches its visible target with no frames) and that the
+  `ElementFader`'s timer fallback is real (a `Modal` reaches its visible target with no frames) and that the
   positioner needs no frame to open a layer or follow a scroll. It does not show whether the per-frame poll has
   another job: the poll is the only thing watching an anchor that moves with no event to announce it.
 - **Time.** Playwright's clock (`install`, `pauseAt`, `fastForward`, `runFor`) fakes `Date`, the timers,
@@ -3342,8 +3342,8 @@ elsewhere, but a `type="text"` field carrying them is a lie in the DOM, and `Num
 **Auto-growing height is opt-in, and the only thing that could not be inherited.** A fixed textarea leaves
 the settled arrangement untouched: the painter sizes the box, the element covers it, `rows` is beside the
 point. An auto-growing one inverts that — content decides the box — and the resolution keeps the inversion
-out of the overlay and puts it on the wrapper. `getIsAutoSizing` turns it on, `getMinRows` (default 2, the
-native default) is the floor, `getMaxRows` the optional ceiling.
+out of the overlay and puts it on the wrapper. `getIsAutoSizing` turns it on, `getMinRows` (defaulting to the
+native `<textarea>`'s) is the floor, `getMaxRows` the optional ceiling.
 
 The measurement mirrors `getMinWidth` one axis over. `InteractionWrapper` gained `getMinHeight`;
 `TextField` sets the element's `bottom` to `auto` for one frame, reads `scrollHeight`, restores it, and
@@ -3457,7 +3457,7 @@ effect whose job is one-directional must only depend on the direction it syncs f
 
 ### Controls: `NumberInput`'s page step, and numbers read and written by locale
 
-**PageUp and PageDown move `pageStep`, which defaults to ten times `step`.** The default is worked out in the
+**PageUp and PageDown move `pageStep`, which defaults to a multiple of `step`.** The default is worked out in the
 component from a private multiple, because a defaults object keyed by prop name cannot state a value that depends
 on another prop. It is the same arithmetic as one step over a longer distance: `computeStep` takes an optional
 `distance`. A value between steps first falls back to the step behind it, so ten from 13 with a step of 5 gives 20;
@@ -3673,15 +3673,15 @@ furniture — adding a page or renaming a category used to break the keyboard sp
 regression, which happened once. The page carries a row, a column, links, a consumer link component and an
 all-disabled list.
 
-### The Playground is one centered block, 1600px at most
+### The Playground is one centered block, no wider than its parts add up to
 
 The user's call, after the Docs table of contents made the old left-aligned page obvious: on a wide window the left menu,
-the page and the table of contents are centered together as one block no wider than `PAGE_MAX_WIDTH` (1600). The number is
-what the parts add up to at full size — menu 320, margin 40, docs 960, gap 40, table of contents 200, margin 40 — so nothing
+the page and the table of contents are centered together as one block no wider than `PAGE_MAX_WIDTH`. The number is
+what the parts add up to at full size — menu, margin, docs, gap, table of contents, margin — so nothing
 shrinks at the cap; 1440 was weighed and would have narrowed the docs to 800.
 
 **The dark menu panel still reaches the window's left edge.** The empty space left of the block, half of whatever
-the window has beyond 1600, is added to the `Sidebar`'s `collapsedSize` and `expandedSize` and given to the panel as
+the window has beyond the cap, is added to the `Sidebar`'s `collapsedSize` and `expandedSize` and given to the panel as
 left padding, so the panel grows into it and the menu's contents sit where the block starts. Painting the space with
 a separate element was rejected because the panel's background is a diagonal gradient that a second element cannot
 continue seamlessly.
@@ -3718,7 +3718,7 @@ variable. An override at a screen size has to change those two alongside it.
 width plus gap plus table of contents. The first version hid it at a hand-picked 900; the rule gives 960.
 
 **The page margin and the menu's side padding belong to the layout, not the theme.** They were
-`themeVars.spacing.quad` and `.double`, the same 40px and 20px, but the cap and the collapsed width are computed in
+`themeVars.spacing.quad` and `.double`, but the cap and the collapsed width are computed in
 code from them, and a theme is free to change its spacing without telling those sums.
 
 ### The left menu is one tree, and the categories are its top three branches
@@ -3768,7 +3768,7 @@ by it — so telling one level from another needed no library change, only a cla
 own painter. It is set there rather than in `PageTreeNodeContent` because that painter is the `Tree` page's
 too, and a file tree has no reason to shout its top row.
 
-**The menu is 320px rather than 240px**, at the user's request, because three levels of indent plus a
+**The menu was widened from its flat-list width**, at the user's request, because three levels of indent plus a
 marker leaves less room for a name like `MediaQueryMonitor` than the flat list needed.
 
 **The theme paints every anchor in the primary color, and the menu now overrides that.** Tree leaves are
@@ -3963,7 +3963,7 @@ readable: `role` resolves to the entire ARIA role union, some two thousand chara
 `AccessorProps` block carries its own `MaybeAccessor<…>` in the source, so taking the written text verbatim
 would have printed the wrapper on some rows and not others while all of them accept the same two things.
 The wrapper is unwrapped wherever it appears. A `Passing` column beside the type used to say `value or accessor`
-and `required`; the user dropped it when the page was capped at 720px (_"The left nav has an "About" link"_), so
+and `required`; the user dropped it when the page width was capped (_"The left nav has an "About" link"_), so
 the table no longer says which props take an accessor, and the `?` on the name is what marks an optional one.
 
 **Shiki highlights the type expression directly.** The first version wrapped each type in a throwaway
@@ -4076,7 +4076,7 @@ component is next. The Docs view shows its description straight away and its tab
 
 **A save re-reads only the files that changed.** The worker keeps every parsed file between builds and hands the
 previous program back to the compiler, so a rebuild skips the reading and pays for the type-checker and the
-tables. Changes are gathered for 100 milliseconds before a rebuild starts, so a save that touches several files, or
+tables. Changes are gathered for a short interval before a rebuild starts, so a save that touches several files, or
 a branch switch, is one rebuild rather than many; that number is a guess, not a measurement. A save marks every
 component's tables as stale, so the next request for one waits for its fresh version rather than showing the old
 one, and a component whose tables actually changed is pushed to a page already showing it.
@@ -4560,8 +4560,8 @@ timer only when it is about to start its own, a `:focus-visible` focus. Otherwis
 delay would have cancelled the tooltip for as long as the pointer stayed on the button. Playground demos that a spec
 hovers set `hoverShowDelayMs` to 0.
 
-**The Playground waits 300ms, the library 700.** The user found 700 far too long for a tooltip that is the only label
-an icon-only button or a "?" mark has, and chose to set the Playground's own tooltips to 300 from one constant,
+**The Playground's tooltips wait less than the library's default.** The user found the default far too long for a tooltip that is the only label
+an icon-only button or a "?" mark has, and chose to set the Playground's own tooltips from one constant,
 `TOOLTIP_HOVER_DELAY_MS`, rather than change the library's default; the Tooltip page's knob starts there too. The
 default is still open to revisiting on the same argument.
 
@@ -5824,9 +5824,8 @@ a list of boxes.
 
 **Defaults are neutral, not tuned to what an example needed.** The user's words were that 84 feels oddly
 specific and a bit off-grid for a default. Every layout is authored in the same nominal hundred-unit space
-now, so an untouched ring is exactly 100 across with a 25 hole and a 25 band, an arc's box is 100 with 25
-items, and a honeycomb cell is 25. The numbers the examples used to lean on moved into the example files —
-the wheel menu asks for its 64 hole and 84 band, the fan menu for its 168 by 40 items — which is the same
+now, with round defaults in that space. The numbers the examples used to lean on moved into the example files,
+which is the same
 split the pixel work drew: the arrangement is the library's, the size is the consumer's.
 
 ### Layouts carry no pixels, and the box a layout is given is the consumer's
@@ -6887,8 +6886,7 @@ different effects and both stay.
 - **The clock runs only while a square is still fading.** Each frame with a live square keeps it awake, and its own
   grace is one short beat, so it stops as the last square goes.
 - **`squareSize` is in pixels**, as a tracked pattern's cell size is: it is the consumer's knob, and a square that
-  grew with the box would turn a resize into a change of look. The defaults, 20 pixels and 500ms, are Fancy
-  Components' own.
+  grew with the box would turn a resize into a change of look. The defaults are Fancy Components' own.
 
 ### Patterns split into timed and tracked, the way the gradients are
 
@@ -6982,7 +6980,7 @@ entry two along argues it — and this is the consumer that was leaning on the o
 **The wheel corrects for it rather than the layout going back.** It reads the first placement's sector, takes
 the middle of it, and turns the whole assembly by whatever lands that middle on the marker. Any layout, any
 facing, any wedge count: the wedge the wheel names is the wedge under the marker. `markerDegrees` says where
-the marker is and defaults to `-90`, straight up, which is where the layouts already face and where a pip
+the marker is and defaults to straight up, which is where the layouts already face and where a pip
 conventionally sits. It is a prop because the marker is drawn by the consumer, outside the wheel, so nothing
 else can know.
 
@@ -7163,7 +7161,7 @@ nothing said so: below `itemSpacing + 2` the lower pair of one whorl sat on top 
 The defaults were already inside that — a drop of 1.75 and a step of 3.5, where 3.75 was the first value that
 cleared. **`whorlSpacing` is now the gap between whorls**, measured from the bottom of one to the top of the
 next, so zero means they touch exactly and nothing can overlap. The step is worked out from the whorl's own
-height instead of being asserted. Its default is `0.5` rather than `3.5`, being a different quantity.
+height instead of being asserted. Its default changed with it, being a different quantity.
 
 ### The band's hole is a share of its radius, so nothing about it is a length
 
@@ -7578,8 +7576,8 @@ l"; `l` then `i` means Lisbon. One rule covers both: when the query normalizes t
 current item is excluded from the scan, otherwise it is not — which is why typing `li` does not walk away
 from the Lisbon it just landed on.
 
-**The query is forgotten after a second**, following React Aria and Radix rather than the shorter half-second
-some native controls use. A slow typist breaks a two-word name at 500ms, and the cost of the longer window is
+**The query is forgotten after React Aria's and Radix's window**, rather than the shorter one some native
+controls use. A slow typist breaks a two-word name in the shorter one, and the cost of the longer window is
 only a stale query, which the next pause clears anyway.
 
 **Space joins the query only when there is a query to join.** Space activates a menu item and selects an
@@ -7606,7 +7604,7 @@ the frame was the _only_ path: `setHasTransitionFinished(false)` happens immedia
 inside the callback. So on a page that stops producing frames — a backgrounded tab — a dismissed `Modal`
 never leaves: `getIsVisible` stays true, the `<Show>` stays mounted, and the focus trap stays with it.
 
-It now schedules the same idempotent `commit` from both a frame and a 100ms timer, whichever arrives first,
+It now schedules the same idempotent `commit` from both a frame and a timer, whichever arrives first,
 canceling the loser.
 
 ### `ElementFader`: the end of a transition is the browser's answer, not the duration
@@ -7866,7 +7864,7 @@ collapses the menu.
 
 **A sidebar that starts expanded appears expanded.** `ElementFader` always starts from hidden and grows into
 the first state it is given, so every page load slid the Playground's menu open. The first transition runs at
-zero duration when the starting state is expanded, and the real duration applies from the first change on. The default rest before it expands is 300ms, shorter than a tooltip's 700 because the strip is a
+zero duration when the starting state is expanded, and the real duration applies from the first change on. The default rest before it expands is shorter than a tooltip's, because the strip is a
 deliberate target rather than something passed over on the way elsewhere; it is a guess, not a measurement.
 
 **It does not register itself with `ElevationUtils`.** The first build did, reading its own `z-index` from
@@ -8467,8 +8465,8 @@ control's container only has to be positioned and `isolation: isolate`.
 beside it; both take the visibility target and the duration every appearing painter takes. Where the selected
 item and the highlighted item are different things each gets its own marker, and the name says which one it
 follows. `Select`, `Listbox`, `Tree`, `Tabs` and `RadioGroup` take both; `Menu`, which has no selection, takes
-the highlight one only. One `floaterTransitionDurationMs` drives both, defaulting to 100 in each control's
-defaults — the user's number, after 150 felt slow; `Tabs` and `RadioGroup` keep their own 200, also the user's call.
+the highlight one only. One `floaterTransitionDurationMs` drives both; its default in each control's defaults is
+the user's number, after 150 felt slow, and `Tabs` and `RadioGroup` keep a longer one of their own, also the user's call.
 
 **The highlight is the hovered item first, then the focused or keyboard-highlighted one.** In `Tabs`,
 `RadioGroup` and `Tree` the controls read the pointer through `pointerover` and `pointerleave` on their container
@@ -8620,9 +8618,8 @@ on the Sunburst's six top-level folders, and a chart slice painted `error` reads
   for the fill that reaches `7:1` under white text and the one that reaches it under black, and the one whose
   lightness moved less from `50%` wins, since that keeps the color most vivid. `contrast` is the matching white or
   black, carrying the hue.
-- **`dark` and `light` are fixed, the way `primary`'s are, at `50%` saturation** — `50%` and `60%` lightness under
-  black text, `40%` and `50%` under white. The user chose fixed steps over deriving them from `main`, then dropped
-  them by ten points under white text once the fixed `50%`/`60%` left reds and blues under white text below AA. The
+- **`dark` and `light` are fixed steps of saturation and lightness, the way `primary`'s are**. The user chose fixed steps over deriving them from `main`, then dropped
+  them by ten points under white text once the first fixed steps left reds and blues under white text below AA. The
   gradient ends make no AAA promise; only `main` does.
 - **The white-or-black pick looks at `main` alone, so a hue near the tie can land on the side whose edges read worse.**
   At full `main` saturation with `50%` edges, hue `292.5` picked black by `0.19` points of lightness and left its
@@ -8659,7 +8656,7 @@ is laid under it. Only the appearance is common. The metrics travel as the exist
 `FIELD_GAP` / `FIELD_HEIGHT` constants, which `TagInput`'s page now passes — `FIELD_HEIGHT` through
 `getMinHeight`, so an empty tag box is exactly as tall as a text field and grows from there.
 
-**Width is deliberately not matched.** A text field is 240px because its painter says so; a tag box is as
+**Width is deliberately not matched.** A text field's width is its painter's; a tag box is as
 wide as its tags, which is the documented behavior of the control.
 
 **`PageListboxSurface` wears it too**, at the user's request: a standalone `Listbox` is a field-shaped control,
@@ -8676,7 +8673,7 @@ Button page, form submits and resets, buttons inside a dialog, popover or tour s
 drawer openers, toast raisers, and the page-level Reset among the knobs.
 
 **A symbol where one is obvious, the word otherwise** — option B of three the user was shown. Words stay
-in a pill of the same look (28px tall, at least 28px wide) rather than inventing a symbol nobody reads without
+in a pill of the same look rather than inventing a symbol nobody reads without
 hovering. Steppers such as SlotText's "add 10" keep their words too: "+10" would have needed a name that does
 not contain it, which WCAG 2.5.3 (Label in Name) refuses.
 
@@ -9328,6 +9325,16 @@ Pausing freezes the animation where it is, which is what scrubbing needs.
 
 **Tabbing away or resizing does not restart a pass.** The loop does not depend on the cell layout, so it carries on from the progress it holds. The counter still goes one past the maximum on the last pass, and `!getHasEnded()` in `getIsRunning` is the guard it feeds. The source reset is `on(getSource, …, { defer: true })` putting both the counter and the progress back to zero.
 
+### The animation pages give each example its own pause button and scrubber
+
+The user's call, for `CellAnimation`, `ScanlineAnimation` and `RGBAnimation`: every example that shows one running
+animation has a `PagePlaybackScrubber` under it, driving a play state and a progress that belong to that example
+alone, so pausing or scrubbing one leaves the rest running. A page-wide play state survives only where something
+still needs one, the stress tests, whose popup switches it. **Two kinds of example take no controls**: `CellAnimation`'s
+Wipe, which exists only while it covers the whole screen, and the stress tests, which run dozens at once. On the
+drawn-source examples (`CellAnimation`'s Gradient and Pattern) the colors inside the picture keep moving while the cells
+are paused, because they animate on the source's own clock; a scrub moves the cells only.
+
 ### `CellAnimation`: the screen wipe is an example, not a component
 
 **There is no `ScreenWiper`, owner's call: CellAnimation already carries weights and samples, so a separate wiper had nothing of its own.** The CellAnimation page reproduces it: a solid-color SVG source at the viewport's size, portaled into the viewport layer and fixed over it, one `pipe` iteration with a hold (in, hold, out, the part covered first uncovered first) and `finalFrame="nothing"`, unmounted on `onAnimationEnd`. The order of the cells is whichever weight sample the page has selected. **The lozenge is a square turned 45° and scaled past √2**, the least that covers its own cell, because CellAnimation only transforms and filters rectangular cuts. **The circle has no equivalent** for the same reason: a transform cannot round a corner. Under reduced motion the leg is 0ms, so the cover cuts in, holds and cuts out.
@@ -9753,7 +9760,7 @@ all hundred are built.
 `backlog.md` held that withholding the panel would cost the animation on that first expansion, "since there
 would be nothing to measure yet" — which assumes the measuring and the opening happen at the same instant.
 They do not. `ElementFaderUtils.setTarget` already defers the flip of `transitionTarget` to a `requestAnimationFrame`,
-with the 100ms fallback recorded above, precisely so the browser paints a start value before a transition
+with the timer fallback recorded above, precisely so the browser paints a start value before a transition
 begins. **That deferral is a gap, and the measurement lands inside it.**
 
 In order: the press writes `expanded`; in the same update the latch memo turns true and the content
@@ -12834,7 +12841,7 @@ the earlier feedback. **A hold is the other way round**: it fires the moment it 
 to change your mind about once the bar is full and waiting for a release would leave a completed hold looking
 broken.
 
-**`getHoldDurationMs` defaults to 1000 and is a prop because it is a tuned value.** Long enough to be
+**`getHoldDurationMs` is a prop because it is a tuned value.** Its default is meant to be long enough to be
 deliberate, short enough not to feel stuck; nobody has measured it, and a consumer with a heavier consequence
 should be able to set it without forking the control.
 
@@ -14034,10 +14041,9 @@ faint rings stayed parked in the middle of the surface. Every satellite's alpha 
 distance, which also takes them away when the pointer leaves the window. The source needs no such thing: it
 follows the pointer, so it leaves on its own.
 
-**What makes the chain read: alpha, count and spacing.** Ghost alphas run between 0.07 and 0.2 against the
-source's 0.9, saturation is cut to 55% and lightness lifted 25%, so each one is a pale veil rather than a
-colored circle. Reaches are uneven — 0.36, 0.62, 0.95, 1.18, 1.44, 1.72, 2 along the line from the pointer
-through the center — because evenly spaced ghosts read as a pattern, and sizes alternate between specks and
+**What makes the chain read: alpha, count and spacing.** Ghost alphas are a small fraction of the
+source's, saturation is cut and lightness lifted, so each one is a pale veil rather than a
+colored circle. Reaches along the line from the pointer through the center are uneven, because evenly spaced ghosts read as a pattern, and sizes alternate between specks and
 wide faint rings for the same reason. `spot_flare_2` keeps one filled satellite and one ring, which is the
 user's call: two colors should look simpler than three, not merely differ in hue. The source itself is a small bright core with a tight bloom and a long
 faint veil, four stops in, which is what separates a light from a haze.
@@ -14482,8 +14488,8 @@ the current time, and no frames at all when there is nothing to draw. Writing it
 twenty-five lines of stateful loop duplicated in two sample files, which is the kind of thing that drifts.
 
 **Each sample gets its own clock, not one clock for the registry.** `createClock` is called once at the top
-of a sample's module with that sample's own grace period, so a trail whose stamps live 720ms and a ripple
-whose rings live 700ms each stop at the right moment for their own content. It is also what keeps the
+of a sample's module with that sample's own grace period, so a trail and a ripple whose marks live for
+different times each stop at the right moment for their own content. It is also what keeps the
 samples independent: a clock is alive only while layers of its own sample are mounted.
 
 **It mirrors `PointerTracker`'s shape rather than inventing one.** A signal every consumer reads, a
@@ -14645,7 +14651,7 @@ wants it, which no slot inside one component can promise, so the paginator becam
 Ark UI's does.
 
 **`PaginatorRoot` owns the numbers, the landmark and the layout; `PaginatorSteps` and `PaginatorPages` own their
-rows.** The root takes `itemCount`, `pageSize` (default 10, Ant Design's and Ark UI's), `page`, `onPageChange`,
+rows.** The root takes `itemCount`, `pageSize` (defaulting to Ant Design's and Ark UI's), `page`, `onPageChange`,
 `ariaLabel`, `isDisabled`, `computeLayout` and `computeEffect`, draws the one `<nav>` and nothing else — it has no
 row style, because what sits inside it is the page's arrangement. The steps piece draws first and previous, its
 `children`, then next and last; the pages piece draws the number row and alone works out the clusters and gaps.
@@ -15194,7 +15200,7 @@ The user's design, settled point by point before it was built:
   runs at its own rate"_. Not focusable: the keyboard scrolls the box, as Windows' standard scrollbar works. WCAG
   4.1.2 rules out hiding it, since a person operates it.
 - **Fading**: `isAutoHiding`, default `false`. When on, the painter gets `isScrolling` — true while scrolling and for
-  `hideDelayMs` after it stops, default 600 — and whether the pointer is over the box (hover counted from real pointer
+  `hideDelayMs` after it stops — and whether the pointer is over the box (hover counted from real pointer
   movement only), plus one shown flag worked out from both. A faded bar stays in the page.
 - **Space**: `isBarOverlaid`, default `false` — the bar keeps its own strip beside the content and never covers it;
   overlaid, it floats over the content's edge. Independent of `isAutoHiding`. With both bars in their own strips, the
@@ -15215,8 +15221,8 @@ What the build added on its own account:
   words. `renderButton` takes the axis as a third argument and each pair's stepper is bound to it.
 - **The bar painter gets two refs**, the track and the thumb: the track is measured and takes presses, the thumb is
   what decides a drag from a page, whatever the bar's shape. `role="scrollbar"` sits on the library's strip around
-  the painter, not on the painter's track. `aria-valuenow` is reported at most every 100ms, `ScratchCard`'s rate.
-- **A track press repeats after 400ms, every 100ms** — guesses, private constants, the user's to tune. An Alt press
+  the painter, not on the painter's track. `aria-valuenow` is reported at a throttled rate, `ScratchCard`'s.
+- **A track press repeats after a delay, at a steady rate** — both guesses, private constants, the user's to tune. An Alt press
   jumps and then carries on as a drag if the pointer keeps moving, as macOS does.
 - **The fading flag stays on while a thumb is held**, or a drag held still past the delay would fade its own bar.
 - **Two grids.** The root's tracks are written only where step buttons are, so its `gap` never surrounds an empty
@@ -15498,7 +15504,7 @@ repeated copies and windowing count groups. **A slide in two groups** is drawn, 
 that group holds it, otherwise in the nearest group holding it; between two groups that both hold it, it stays at
 distance 0 while its slot and size blend, so nothing jumps along a glide. A slide no group holds is drawn alone.
 **Cover flow and depth wave gained `faceRatio`** (default `1`): a group needs the content's length to put slides
-edge to edge, which those rules never knew; the Playground passes its narrow frame's 0.55 across and 1 up and down
+edge to edge, which those rules never knew; the Playground passes its narrow frame's own
 (`toFramedPlacement`). The paddle wheel keeps a group on one paddle, in reading order. The vertical cover flow and
 depth wave crowd behind the group, as their single-slide vertical look already does with the narrow frame.
 `progress` `0` is the first group at rest; `1` is the last group at rest on a
@@ -15789,7 +15795,7 @@ turn the same way cannot be drawn, so the transform is `undefined` for it.
 without measuring anything, and resizing the box carries the corners with it. `QuadWarpUtils.RESTING_CORNERS` is the
 untouched box. `corners` is two-way, written back by every route that moves a grip.
 
-**A corner may go past the box's edges by `reachRatio`, default `0.5`, and stops short of folding.** The user's call, so
+**A corner may go past the box's edges by `reachRatio`, and stops short of folding.** The user's call, so
 the content can be stretched as well as squeezed. Folding is the one thing the math cannot draw, so `clampMove` moves
 the corner along its straight path and stops it where any corner would come within a margin of lying on the line
 between its neighbors; each of the three turns a moved corner affects is linear in its position, which is what makes
@@ -15814,11 +15820,12 @@ past it, which is the rule for anything turning under perspective.
 names for one idea would have read as two ideas, so both components took it from `Abstracts/QuadWarp` as `CornerKey`, and
 it went to `ss-utils` with the rest of the four-corner geometry as `QuadCorner`.
 
-### `Exotics/PointerEffects`: four wrappers that restyle their content by where the pointer is
+### `Exotics/PointerEffects`: three wrappers that restyle their content by where the pointer is
 
-`Tilter`, `ShadowCaster`, `LightCatcher` and `RGBSplitter` are one family and now sit in one folder, in the library and in
+`Tilter`, `ShadowCaster` and `LightCatcher` are one family and now sit in one folder, in the library and in
 the Playground's tree. Each wraps arbitrary content, reads the pointer against its own box, and changes one
-thing about how that content looks: it leans, it throws a shadow, it brightens, or it splits into its channels.
+thing about how that content looks: it leans, it throws a shadow, or it brightens. `RGBSplitter` was the fourth
+until the user made it a looping animation, `RGBAnimation`, in `Exotics/Animations`; see its own entry.
 
 **The name was chosen over `Responders` and `Surfaces`, and its cost was known.** `Responders` reads better in
 the tree — a plural agent noun beside three agent nouns — but says nothing about the pointer, and most of the
@@ -15926,52 +15933,54 @@ toward white by `l`. It keeps the effect on the one `filter` property the family
 element over the content, and the chain is left off entirely while lightness is at `0`, so a consumer who
 never touches it pays for no inverts.
 
-### `RGBSplitter`: the channels pull apart by distance, in directions drawn at random
+### `RGBAnimation`: `CellAnimation` by channel instead of by cell
 
-Asked for by the user as a pointer effect that splits an element into its red, green and blue and shifts each by its
-own amount. The name was theirs, taken over `ChannelSplitter`, `Glitcher` and `Prism` as the most technically exact.
+It began as `RGBSplitter`, a pointer effect asked for by the user that split an element into its red, green and blue as
+the pointer neared its center. They then moved it out of `PointerEffects` into a looping animation, and finally gave
+it the shape of its siblings: `CellAnimation` animates cells, `ScanlineAnimation` lines, and this animates channels —
+`computeChannelAnimation(defs, timeline)` returns the same transform-and-filter values, so a channel moving, scaling,
+turning, fading or changing hue is the consumer's function and nothing in the library is specific to splitting. The
+rename to `RGBAnimation` was theirs, since a channel that only fades is not a split.
 
-**The pointer sets how far, never which way.** The user's call, over two options where the pointer's direction steered
-the split. When the split opens, each channel draws a random target anywhere inside a circle of radius `maxOffsetPx` —
-spread evenly over its area, so a diagonal goes no further than a straight shift — and keeps it while the split shows.
-The draw happens again the next time it opens, so no two approaches tear the content the same way.
+**It takes a picture, `src`, for parity with its siblings** — the user's choice once it was clear the siblings do not
+take live content either: a picture's address, a drawn SVG serialized into one (the _Swell_ headline, as
+`CellAnimation`'s gradient examples do), `ariaLabel` and `sizeAnchor` as `CellAnimation` has them. The alternative
+was any content rendered three times; it was turned down because the content would run three times over (its own
+animations, video, effects), any `id` inside would appear three times and break what referred to it, and Solid can
+only render a child three times if it is a function. What it gave up is what `RGBSplitter` did beyond its siblings:
+live text and markup.
 
-**"Opens" means the strength rises from nothing**, not the pointer crossing one named range. The strength is `0`
-outside `activeRangePx` (resting) and at or beyond `splitRangePx` (the ramp has run out), and the user's "when the pointer
-hits the threshold" is whichever of the two the pointer crosses on the way in. Keying the draw to the strength
-covers both without asking the consumer which one they meant. The targets are a memo over that yes-or-no, so they are
-redrawn only when it flips.
+**Three stacked copies, not one SVG filter, because SVG filters cannot scale or turn.** The Filter Effects primitives
+([W3C](https://www.w3.org/TR/filter-effects-1/)) move pixels only by offset or displacement map. So each channel is a
+full-size copy of the picture, filtered down to its channel by `feColorMatrix`
+(`SVGFilterDefsUtils.computeRGBSplitMatrix`, shared with the builder's split step), animated with ordinary CSS on the
+element around it, and blended back with `mix-blend-mode` inside an isolated container. At rest the three blend back
+into the picture exactly. **The container does not clip**: what drifts past the picture spills past its box, which is
+the rule for anything that moves at rest-size.
 
-**The strength is measured from the center, as `ShadowCaster`'s is and unlike `LightCatcher`'s.** Stated by the user:
-proximity to the center controls how wide the split is, so it is full only dead on the middle and keeps growing as
-the pointer crosses the content. `PointerEffectsUtils.computeCenterStrength` is that ramp, beside the edge one.
+**It runs on `CellAnimationUtils.runPasses` and takes `CellAnimation`'s timing props by their names**, with `playback`
+and `progress` as two-way values exactly as `CellAnimation` has them, and `computeRootAnimation` for the whole
+picture. Its defaults in `RGB_ANIMATION_DEFAULTS` are round guesses, not measured, and differ from `CellAnimation`'s
+on purpose: a glitch wants a short pass and a long rest. Once every pass is done, each channel stays as last drawn.
 
-**The eased value is the shift itself, not the strength**, so when the pointer comes back while the split is still
-closing, the channels glide from where they are onto the new targets instead of jumping to them.
+**WCAG 2.2.2 Pause, Stop, Hide applies**: the motion starts by itself, loops for longer than five seconds by default
+and sits beside other content. `playback` is the mechanism, wired by the consumer, as for `CellAnimation`; the
+Playground puts a play/pause scrubber under each example, each with its own `playback` and `progress`, since two
+animations sharing one `progress` would each advance it and run the pass at double speed. 2.3.1 _Three Flashes_ is
+the consumer's to keep through their own animation.
 
-**It is an SVG filter, because CSS has none that separates channels.** The step lives in the filter builder as
-`addRGBSplitFilter`, so anything built with the builder can use it: each channel is kept through a color matrix, shifted
-with `feOffset`, and the three are blended back. `addColorChannelFilter` was the obvious thing to reuse and was not
-enough: it can keep one channel, but only by emptying the other two, which is half of what the mixing below needs. The
-builder's own two assembly modes could not do it — `chain` feeds one step into the next and
-`isolate` stacks results with `feMerge`, which only lays one copy over another — so the split is one step that takes
-one picture in and gives one out, with its intermediate results private, like the noise displacement.
+**`color-scheme` is read only once the root is in the page.** Solid hands a `ref` the element before it is
+attached, and a detached element computes `color-scheme` as nothing, which reads as light: a dark page's first pass
+blended subtractively until the next pass read it again. Solid reads it after `onMount`; React in a layout effect,
+Vue in `watchAfterRender` and Svelte in an `$effect` already run after attachment. `rgbAnimation.spec.ts` pins it on
+a dark page.
 
-**The offsets are accessors, so the filter is built once and its `feOffset` attributes follow in place.** Rebuilding
-the filter on every pointer move would replace its elements every frame. Because the registry decides the region
-before any offset is known, `maxOffset` is passed separately as the furthest any channel will go, and the component
-rebuilds the filter only when `maxOffsetPx` changes. Without a known element size the region falls back to the
-builder's `-50% / 200%`.
-
-**`colorMixing` exists because a filter cannot see the ground behind it.** Where one copy has drifted away from the
-other two, the filter has to invent the missing channels. Screening copies that hold one channel on black invents
+**`colorMixing` exists because a copy cannot see the ground behind it.** Where one copy has drifted away from the
+other two, the blend has to invent the missing channels. Screening copies that hold one channel on black invents
 zeros: red, green and blue fringes, right on a dark ground and dark smudges on a light one. Multiplying copies that
 hold one channel on white invents ones: cyan, magenta and yellow fringes, right on a light ground and pale glows on a
-dark one. Both come back to the original exactly where the copies overlap. Found by rendering the first build, which
-only screened, on a white page. The user named the values `"additive"` and `"subtractive"` over `"light"` /
-`"pigment"`, which reads as "for a light page", and over `"RGB"` / `"CMY"`, which would sit badly inside a component
-called `RGBSplitter`; the prop is `colorMixing` because it explains itself. The builder defaults to additive, since it
-has no element to look at.
+dark one. Found by rendering the first `RGBSplitter`, which only screened, on a white page. The user named the values
+`"additive"` and `"subtractive"` over `"light"` / `"pigment"` and `"RGB"` / `"CMY"`.
 
 **Left out, the mixing follows `color-scheme`, as a smarter baseline than a fixed default.** The user's call, with the
 prop still there to override it: `dark` is additive, `light` subtractive, `light dark` follows the system setting
@@ -15979,18 +15988,27 @@ through `prefers-color-scheme`, and `normal` — what a page that sets nothing h
 then draws its default light colors. The system setting is read only where the page itself declared it follows it, so
 this does not cut across the reduced-motion entry's rule that the library leaves preferences to the consumer. The
 computed value is the declared one, not the resolved one, which is why `light dark` needs the media query at all
-([MDN](https://developer.mozilla.org/en-US/docs/Web/CSS/color-scheme)). It is read each time the split opens, through
-`PointerEffectsUtils.openSplit` alongside the random targets, because nothing announces a change to `color-scheme`, and
-a theme switched while the pointer was away is then picked up on the way back in. Its cost is a dark site that never
+([MDN](https://developer.mozilla.org/en-US/docs/Web/CSS/color-scheme)). It is read at the start of each pass, through
+`RGBAnimationUtils.readColorMixing`, because nothing announces a change to `color-scheme`, and a theme switched
+mid-pass is then picked up by the next one. Its cost is a dark site that never
 declares `color-scheme` getting the light-ground look — the case the prop is for.
 
-**Its page shows a photo and a headline, and no row.** The user's call after trying both: random directions drawn per
-item make a row read as noise rather than as one effect, and a primary-colored card had no red in it to split off. The
-photo has all three channels.
+**The page's examples start and end each pass with the picture whole.** A channel holds its last frame through the
+rest between passes, so an effect still mid-way at the end of its pass would freeze there; every example's function
+returns to rest at both ends (an envelope, a staggered window, or a whole number of turns). **Which picture they show is
+one global Source knob** (`knight` or `text`), the user's call over a knob per example; the box takes the chosen
+picture's width from `SOURCE_WIDTHS`.
 
-**With nothing shifted the filter is not written at all.** Blending three copies by their opacity draws a partly
-see-through pixel — the soft edge of a letter — somewhat more opaque than the original, even with every channel in
-place. Dropping the filter at zero keeps the resting content exactly as painted and costs nothing while it rests.
+**Examples tried and dropped by the user, so not to be offered again**: a channel fading out in turn (Channel drop), a
+random per-channel brightness stutter (Flicker — capped at three changes a second for WCAG 2.3.1, and too tame at the
+page's pass length), a fast per-channel zoom (Punch — read as Swell), a per-axis stretch (Stretch) and a split-flap flip
+over the horizontal axis (Flip). A per-channel slant (Wobble) was offered and not taken.
+
+**Hue swap holds a different channel still each pass** — the user's design. CSS `hue-rotate()` is the fixed matrix in
+Filter Effects 1 (`feColorMatrix` `hueRotate`), weighted toward green for brightness, so a pure red or blue copy turned
+part-way becomes a dim green and loses what is clipped below zero, while a turned green stays bright. Holding green still
+every pass made the whole picture green; rotating which channel is held spreads that over three passes of unequal
+strength (a strong green pass, a moderate magenta one, a nearly still one), which the user accepted as variety.
 
 ### `ShadowCaster`: a wrapper, and a filter rather than a box shadow
 
@@ -16515,6 +16533,10 @@ The rollout `backlog.md` used to carry as its own item is done: all thirty-three
 carry the source-code button, and `PageVariants` itself has no consumers left. What the four `Exotics` pages
 settled held for the rest; two things they never exercised did not.
 
+**An `Exotics` page lays its examples out with `layout={"flow"}`, so each takes the width it needs.** The user's
+rule, given when `RGBAnimationPage`'s SVG headline overflowed its grid cell: an exotic demo has its own size, and a
+grid column of a fixed share squeezes it rather than the other way round.
+
 **An example card now marks its demo, because the source button is a button in the card.** `PageExamples`
 wraps the demo in a `data-demo` element and `e2e/helpers.ts` gains `demo(key)` beside `example(key)`. Without
 a marker a spec asking for "the first button in this card" found the `</>` button and opened the source viewer
@@ -16568,9 +16590,9 @@ collapsing two demos into one plus a panel knob, because that removes demos and 
 user holds that as a separate pass.
 
 **One demo needed pinning down rather than converting.** `SplitPane`'s bounded demo stretched until a pane's
-160px floor stopped being reachable — with a wide enough frame the neighbor never reaches it, so the spec
-proving the floor is honored had nothing to bump into. `PageSplitPaneFrame` now caps at 380px, which is the
-width it used to get. The alternative was to weaken the assertion.
+floor stopped being reachable — with a wide enough frame the neighbor never reaches it, so the spec
+proving the floor is honored had nothing to bump into. `PageSplitPaneFrame` now caps at the width it used
+to get. The alternative was to weaken the assertion.
 
 ### `PageExamples` lays out on a grid, with the column width per page and a span per example
 
@@ -16584,9 +16606,8 @@ to a single column and stacked cards that had room to sit side by side. `CellAni
 1280px area with two 630px columns available. A wrapping flex row hid this by sizing itself to max-content.
 
 **The column floor is the page's, because it follows from the demo rather than from the layout.**
-`getMinColumnWidth` defaults to the 320 `PageVariants` used, and a page that states a width for its demo
-states a floor of that width plus the card's own padding — `SplitPane` 420 for its 380px frame, `Scroller`
-460, `TextArea` 340. Where a page's demos have no declared width the default stands. It is a prop rather than
+`getMinColumnWidth` defaults to the width `PageVariants` used, and a page that states a width for its demo
+states a floor of that width plus the card's own padding — `SplitPane`, `Scroller`, `TextArea`. Where a page's demos have no declared width the default stands. It is a prop rather than
 something derived because the demo's own width is often inside a styled component the page never names.
 
 **An example may take more than one column, and the grid's floor is divided by the widest span on the page.**
@@ -16596,7 +16617,7 @@ two-column example never resolves to a single column, and the spanning card ther
 grid has not got.
 
 **Two pages had been getting their sizes from the old row, and both showed it.** A wrapping row sizes a card
-to its content, which had been hiding two things. `Shape`'s demo is a fixed, resizable 320px box with a `Shape`
+to its content, which had been hiding two things. `Shape`'s demo is a fixed, resizable box with a `Shape`
 around it tracing its contour — and `Shape`'s own root has no width, so under a card that stretches its
 children it grew to the column while the box it traces stayed 320: the contour and the content came apart. The
 box is what the demo is about, so the page now wraps it in a `width: fit-content` host and the `Shape` hugs it
@@ -16639,7 +16660,7 @@ the content — so hugging implies a wrapping row, and a wrapping row is only wo
 `getLayout` is therefore a single prop with `grid` (the default) and `flow`, and no page states both.
 
 **The rule for which is whether the demo owns its width.** A demo the page hands a size to is being shown for
-its footprint, so the card has to be flush with it: `Shape`'s `fit-content` host, `Wheel`'s 340px overhead wheel,
+its footprint, so the card has to be flush with it: `Shape`'s `fit-content` host, `Wheel`'s overhead wheel,
 every measure box that is given a width. A control that takes whatever width it is given — a field, a tree, a
 tab strip — has no size of its own, any width is as arbitrary as any other, and an even column beats a ragged
 one. Argued from ownership rather than from how the pages happen to look: a demo with no width cannot be
@@ -17461,8 +17482,7 @@ measured.
 **Which edge it sits on follows the direction of travel, not the variant.** Faces that travel sideways — a
 overhead wheel's rim and a drum on the upright axis — take the pip above, pointing down; the reel's faces travel
 up and over, so it takes the pip at the left, pointing in. `PageWheelPip` accepts that as `getSide`, one of
-`"top"` or `"left"`, and the same class both places the box and turns the glyph. It hangs 70% of its own size
-outside the edge, so the tip crosses onto the wedge and the body reads as sitting outside it.
+`"top"` or `"left"`, and the same class both places the box and turns the glyph. It hangs mostly outside the edge, so the tip crosses onto the wedge and the body reads as sitting outside it.
 
 **The drums needed a box of their own to be measured against, and `PageWheelStack` could not be it.** The flat
 demo's stack is a full-width block because `OverheadWheel` is `width: 100%` inside it, and a box that shrinks to
@@ -17530,7 +17550,7 @@ The user's idea, its six questions settled with them in `backlog.md` before anyt
 
 **Accessibility is `Barrel`'s**: `faceRoleDescription` is required, `computeFaceDefs` names each face and says whether it is hidden, and hidden faces get `aria-hidden` and `inert`. It is also handed the face's angle, because a wheel hides what is turned away (`SpineUtils.getIsTurnedAway`) while a book also hides pages that face the viewer but are covered. WCAG 4.1.2 checked; Spine never moves on its own, so 2.2.2 falls to whatever drives the position.
 
-**`hasBacks` defaults to `false`, and `perspectivePx` is a prop** (default `1000`, `Barrel`'s constant), because a split-flap the size of a character and a book the size of a spread want very different depths.
+**`hasBacks` defaults to `false`, and `perspectivePx` is a prop** (defaulting to `Barrel`'s constant), because a split-flap the size of a character and a book the size of a spread want very different depths.
 
 **A face fills the whole box but paints half of it, so its unpainted half can catch clicks meant for what lies beneath.** `Flipbook` turns pointer events off on the face and back on for its painted half, in its own stylesheet; every half-painted use of `Spine` meets the same overlap, so it may belong in `Spine` itself.
 
@@ -18326,7 +18346,7 @@ From Skiper UI's knockout bracket, which shows a window of the tree and pages th
 
 **Zoomed out, the family is kept and no round is current.** A view wider than every family's framed view is showing no family; `family` stays as it was, so zooming back in returns to it — the user's call, who found that desirable — and `isCurrent` is false on every layer while it lasts, which is what unlights the round names.
 
-**`familyMargin` is a prop, defaulting to `0`.** The user's rule: a headless library does not make a layout guess, and twelve pixels of room around a family was one. The Playground passes its twelve.
+**`familyMargin` is a prop, defaulting to `0`.** The user's rule: a headless library does not make a layout guess, and twelve pixels of room around a family was one. The Playground passes its own.
 
 **`isSnappingToFamily` glides the view to the family in it once a gesture is over, or to the whole board when the gesture left the view wider than any family**, so a snapped board only ever rests on one of two levels. The user first asked whether the wheel should simply toggle between the two; keeping the live zoom during the gesture and landing on one of the two afterwards was taken instead, since a toggle leaves a pinch with nothing moving under the fingers and needs a threshold against the stream of small wheel events a trackpad sends. It was first built to leave a view wider than any family where it was, which let a zoom stop halfway between the two. A gesture is over when a drag or a pinch is let go, and for the wheel after it has rested for 200ms, since a wheel has no release. The 200ms is a feel value, not a measurement. The shared gesture tracker reports the end of a gesture through `onSettle` and every view move a gesture makes through `onGestureMove`; neither knows what a family is. A general "snap this view" function for PatchBoard was not built, since nobody asked for one there.
 
@@ -18469,9 +18489,9 @@ than sitting still. Measuring on every stamp ties that cost to the pointer's rat
 point is that it should never have been tied to it at all** — that is now a convention rather than a note
 here, under _"What a component reports runs at its own rate"_ in `conventions.md`. **Throttle rather than debounce, which was the user's call and is the right one**: somebody
 rubbing steadily never stops, so a debounce would report nothing until they lifted the pointer. So a
-measurement runs at once, then at most once every 100ms, with a trailing one so the final number always
+measurement runs at once, then at a bounded rate, with a trailing one so the final number always
 settles — and the user's own argument for why the delay is free is that nobody can tell whether a threshold
-was announced a tenth of a second late.
+was announced a fraction of a second late.
 
 Measured after: frame pacing over a three-pass scribble is identical at precision 16, 32 and 64 — same median,
 same 95th percentile, same count of frames over budget. **Precision no longer touches the frame budget**, only
@@ -18581,7 +18601,7 @@ consumer, which is worth knowing before anything is built on it.
 
 **With no lens, the layer is hidden rather than taken out**, so moving the pointer in and out does not rebuild the copy or decode a picture in it again each time. The lens shows whenever the pointer is anywhere on the page, as `Reveal`'s hole does, so it slides in from the edge.
 
-**The defaults are a zoom of 2, a radius of 90, a step of 20 and a softness of 0.** Softness is 0, a hard edge, where `Reveal`'s is 0.55, because a lens reads as glass only if its rim is sharp. Zoom is not clamped: 1 magnifies nothing and below 1 shrinks the copy. A radius of 0 shows no lens.
+**Softness defaults to a hard edge**, where `Reveal`'s is soft, because a lens reads as glass only if its rim is sharp. Zoom is not clamped: 1 magnifies nothing and below 1 shrinks the copy. A radius of 0 shows no lens.
 
 **The keyboard is `Reveal`'s, for the same reason.** WCAG 2.1.1 applies as it does there: what the lens shows depends on where the pointer is, so a keyboard user needs their own way to move it. One Tab stop, `role="group"` and a required `ariaLabel`; the lens opens at the center on `:focus-visible`, the arrows move it by `stepSize` inside the element, and blur closes it.
 
@@ -19442,7 +19462,7 @@ one; that ended when they got pages, and they are now a group of their own betwe
 
 **The nav marker says whether there is anything to look at, and its weight follows what is there.** A branch
 keeps the heaviest mark, ▶, because it holds the most; a leaf with examples takes a •; and a leaf carrying
-only a description takes the lightest, · — 26 of the 113 entries, every one of them an `Abstract`. The user's call, chosen over fading the row to 75%: opacity already means disabled on
+only a description takes the lightest, · — every one of them an `Abstract`. The user's call, chosen over fading the row to 75%: opacity already means disabled on
 that row, and one signal carrying two meanings is worse than a glyph nobody guesses but everybody learns
 once. The fade was measured before it was rejected rather than after — 9.6:1 against the dark end of the
 nav's gradient and 8.4:1 against the light end, so contrast was never the objection.
@@ -20454,8 +20474,8 @@ a moving area that only the pointer can move fails 2.1.1. With the window itself
 way a scrolled page moves (the right arrow shows more of what is to the right), the page keys by most of its
 height, and `Home` back to a tile's corner on the window's. Keys inside the content are left to the content.
 
-**Motion.** A drag past four pixels captures the pointer and suppresses the click it would end in; on release the
-plane coasts on the last 100ms of speed, decaying exponentially with `momentumMs` as the time constant, summed
+**Motion.** A drag past a few pixels captures the pointer and suppresses the click it would end in; on release the
+plane coasts on its speed just before release, decaying exponentially with `momentumMs` as the time constant, summed
 exactly rather than per frame so the coast is the same on any frame rate. The wheel moves it without easing and
 takes the scroll with it, which is the cost of a wheel route on something with no end. Keys and focus glide over
 `glideDurationMs`. Both durations at `0` are the reduced-motion route, as elsewhere in the library: the component
@@ -20603,6 +20623,17 @@ The first build had two modes under a `spawnMode` union. `batch` was the above; 
 
 **Pausing freezes every particle.** Everything is drawn from the pass's progress, which only advances while the field runs, so a hidden tab or a pause does not age the particles.
 
+**Every refresh rolls every cell, and a window over spawn times was tried and measured slower.** Sorting the cells by spawn moment and binary-searching the live run skips nothing in the middle of a pass at an ordinary lifetime, when nearly every cell is alive, and the live list then has to be sorted back into reading order on almost every frame, because a new column spawns on almost every frame. Measured on `ParticleDissolve`'s Card at its densest grid, the window doubled the roster's own time (about 0.1 ms a frame against roughly 18 ms of main-thread work) and won only with very short lifetimes; the user chose to keep the plain loop.
+
+### Particle and cell layers are contained, and clipped only where they already were
+
+The user's call, for `ParticleField`, `ParticleSpawner`, `ParticleDissolve` (through its field), `CellAnimation` and so `ScanlineAnimation`: their particles or cells are born, moved and removed on every frame, and **`contain`** tells the browser that nothing inside affects layout outside, so each change is laid out and painted within the box rather than up the page.
+
+- **The particle roots take `contain: size layout style`, never `paint`.** Paint containment clips descendants to the box (MDN, `contain`: "If a descendant overflows the containing element's bounds, then that descendant will be clipped"), and particles leave their box on purpose — ash rising off a button. Layout containment does not clip; per CSS Containment 2, §3.2, overflow of a box with `overflow: visible` "must be treated as ink overflow", so a particle drifting past the box is still drawn but no longer gives an ancestor a scrollbar. Size containment is free here: the roots are `width` and `height` `100%`, and their only children are absolutely positioned, which never sized them anyway.
+- **`CellAnimation`'s container takes `contain: strict`**, since it already has `overflow: hidden` and an inline width and height, so neither the clipping nor the size changes anything a reader sees.
+- Layout containment also makes each root a stacking context, so a `z-index` a consumer gives a particle now orders it only among its siblings.
+- **Measured headless on `ParticleDissolve`'s Card, it changed neither layout nor style time**, since the particles were already absolutely positioned; the largest single cost there is the browser assigning each moving particle a compositor layer. Kept as the user's call; a GPU window was not measured.
+
 ### `ParticleSpawner`: `emit` sends a round alongside playback, and that is what makes a relay
 
 **A pressed burst and a timed spawn are the same round, started by different things.** The frame loop animates a set of rounds, not the one round the playback effect owns. So `emit(count)` adds a round beside whatever is playing, and stopping playback takes back only the played round. An emitted particle finishes its trip. **That is what lets two spawners chain without drifting**: `onParticleArrive={() => relay.emit(1)}` starts the return trip at the exact frame of arrival, for a pressed spawn as much as a timed one. That is why neither a `ParticleRepeater` nor a `sources` prop exists, and that was the owner's call. Many sources is many spawners. Timed chaining still belongs to `spawnIterationPatterns[].beginDelayMs`. **An emitted round is not a round of the pattern**, so it never calls `onIterationEnd` or `onAnimationEnd`. A consumer counting a pattern's rounds must not have presses mixed into the count. It returns `false` when it cannot act: nothing to send, no targets, not measured yet, or the page hidden. **A burst on press needs no library change at all.** The Playground's example gives the spawner its own playback signal and one round. The press writes `true` and `onAnimationEnd` writes `false`, and a press during a burst is a no-op because the signal already holds `true`.
@@ -20693,7 +20724,7 @@ on the straight top edge of the loop, where the fault is exactly zero.
 
 **A range's paint is a fixed length, so `sizing="fill"` needs a length to match.** Also the user's, on the
 timeline demo: the pointer at the right-hand end of the painted track read about seventy per cent rather than
-a hundred. `PageRangeContent` draws a track of `RANGE_LENGTH`, 220 pixels, whatever box it is given; the
+a hundred. `PageRangeContent` draws a track of `RANGE_LENGTH` whatever box it is given; the
 control had been told to fill a 320-wide box, so the hit area was 320 and the paint was 220 and the arithmetic
 was right about a track nobody could see. Nothing in the library is wrong here — a painter that draws its own
 size is the whole point of the split — but **a `Range` given `sizing="fill"` has to be given `length` as
@@ -20913,7 +20944,7 @@ is removed by a zoom — into the new level's first branch going in, back onto t
 out, and onto the level's list when a level has no branches at all. Focus is only moved when it was inside the
 treemap before the zoom, so pressing the page's bar leaves focus on the bar.
 
-**The zoom is the example's, run through the Web Animations API.** 750ms on an ease-in-out cubic, which is
+**The zoom is the example's, run through the Web Animations API**, on an ease-in-out cubic, which is
 D3's default transition easing. Going in, the level being left is enlarged around the chosen tile until that
 tile fills the box, while the new level grows out of the tile and fades in on top; going out is the reverse,
 with the level being left shrinking into its tile and fading out on top. Tiles animate their `left`, `top`,
@@ -21355,10 +21386,9 @@ left unnamed: the node button inside it already carries the name, and labelling 
 
 ### `PatchBoard`: positions written as fractions of the width, like `Formation`
 
-**The defaults are the user's, confirmed by eye**: `socketSize` 0.03, `socketReach` 0.06 and `stepSize` 0.02, the old
-14, 28 and 8 pixels on a 460-pixel board. They were converted by the add-ons round rather than tuned, and put to the
-user, who kept them; so were `Smoother`'s settle threshold of 0.001, `Reveal`'s `stepSize` of 20 pixels and
-`Cuboid`'s drag, a quarter turn per box width with a release past half completing it. They are measured values now,
+**The defaults are the user's, confirmed by eye**: `socketSize`, `socketReach` and `stepSize` were converted from the old
+pixel values by the add-ons round rather than tuned, and put to the user, who kept them; so were `Smoother`'s settle
+threshold, `Reveal`'s `stepSize` and `Cuboid`'s drag. They are measured values now,
 under the rule that leaves those to the user.
 
 **Every spot, node size, socket size, reach and step is a fraction of the board's own width, and the board writes them as `cqw`.** A saved patch does not depend on how wide it was drawn. Zooming was the consumer giving the board more width or scaling it, until it moved into the board as a view — see `PanZoom`. There is no `size`, only `heightRatio`, because once the width is the container's, the only thing left to say is the board's shape. The root is the query container, and a spacer child gives it its height for the reason recorded under `Formation`: an element cannot query itself. The cable surface's viewBox is `0 0 1 heightRatio`, so a painter writes paths in the same numbers the defs carry. `y` is also a fraction of the width rather than the height, so a node keeps its shape on any board.
@@ -21519,9 +21549,9 @@ exists today, and the gallery spec fails on one.
 
 **Each tile is a nested `ViewportWrapper`, so a preview is a real scaled viewport rather than a CSS shrink**: pointer
 positions, anchored popups and measurements inside all know the scale, and popups open clipped to the tile. The
-canvas is 600 wide and at least 400 tall, chosen by eye against how small a 960-wide canvas made text; the height
+canvas's width and minimum height were chosen by eye, against how small a 960-wide canvas made text; the height
 grows to the example's natural height plus padding, so a tall example is shrunk to fit rather than cut off. Width
-does not grow, so an example wider than 520 still clips at the side (`Table`), and a very tall one comes out small
+does not grow, so an example wider than the canvas still clips at the side (`Table`), and a very tall one comes out small
 (which is why `ViewportWrapper` is excluded).
 
 **An example is centered by its own natural width, and anything meant to fill says so with a width.** The preview
@@ -21617,13 +21647,13 @@ The Playground's examples describe the keyboard route only ("Hold Enter or Space
 ### A docs example's code sits below its box, and the accordion examples share one width
 
 **The "Show code" accordion is drawn below the example box, not inside it.** The example is a column
-(`docsExampleStack`, 10px between its children): first the box with the demo and its knobs, carrying `docsExample`
+(`docsExampleStack`): first the box with the demo and its knobs, carrying `docsExample`
 and the `data-docs-example` marker; then the accordion on its own, at the same layer level as the box so it keeps
 its colors, inside a `docsExampleCode` box that gives it the box's shadow and the header's rounding. Specs find an
 example by the marker on the box, so the code — which repeats an example's text — can never match a locator built
 from that text.
 
-**Every accordion and collapsible in the Docs examples sits in a box capped at 480px** (the shared `docsAccordion`
+**Every accordion and collapsible in the Docs examples sits in a box of capped width** (the shared `docsAccordion`
 class; Collapsible's Side example composes it into `sideExample`, which also centers), and takes the shared
 `DOCS_GAP` as its gap, except Accordion's Basic, whose gap is a knob. A readout beside an accordion (Deferred's
 "Built so far") sits outside the capped box, so the demo's own spacing separates the two.
@@ -21668,7 +21698,7 @@ button for 2.2.2, the bar's hover and focus passed to `setIsHeldByPage`) **sits 
 
 The shared settings panel and the Examples page went, as on Accordion: each example owns only the knobs for its own
 feature. The slide-count knob went with the panel, under _"A docs example has no knob that exists only for the
-Playground"_. Every example sits in a `docsCarousel` box capped at 480px, like the accordion examples (the user's
+Playground"_. Every example sits in a `docsCarousel` box of capped width, like the accordion examples (the user's
 call), and every one except Looks uses the plain `track` placement and draws `PageCarouselSlide` straight, with no
 frame. Looping and autoplay are one example, at the user's request, so turning looping off shows rotation stopping on
 the last slide; its Looping knob starts on, since looping is what the section shows (see _"A section's knob starts
@@ -22101,10 +22131,9 @@ old page's order — right to left after reordering, since its example relies on
 knob under Select's precedent (`TableKnobs`, starting at the old 50,000) through `createStressParts(count)`, and shows
 no timing, since the old page had none. "Reorderable columns" carries a WCAG 2.5.7 alert asking for a
 `TableHeaderReorder` in every movable header. No example has a readout: sort, selection, widths, order and open rows
-all show on screen. The pinned example sits in a box capped at 480px (`tableFrameCapped`, composing `docsAccordion`),
-so its columns overflow and the pinned ones visibly hold. In a reorderable header Category is 140px and In stock 130px,
-against 120 and 100 elsewhere: the grip, sort marker, gaps and padding take 71px around titles drawing at 61 and 53px,
-rounded up to the next ten. The closed row expander mirrors in right-to-left text (◂), read through
+all show on screen. The pinned example sits in a box of capped width (`tableFrameCapped`, composing `docsAccordion`),
+so its columns overflow and the pinned ones visibly hold. In a reorderable header Category and In stock are wider
+than elsewhere, by what the grip, sort marker, gaps and padding take around their titles, rounded up to the next ten. The closed row expander mirrors in right-to-left text (◂), read through
 `NavigatorSolidUtils.createDirectionSignal` as Tree's arrow is.
 
 ### `Toasts` becomes a provider, and each toast brings its own painter — decided, not yet built
@@ -22307,36 +22336,27 @@ register already warns when a consumer's pair is a single character.
 
 **What it is.** A wrapper in `Exotics/Particles`, beside the `ParticleField` it drives. The user named it `Dissolve`, over `Disintegrate` and `Burn`: it names what happens to the content, and the painter decides whether that is ash, smoke or sand. **Where it lives was the user's call, made twice.** It first went into `Reveals`, then into `PointerEffects`, though nothing about it follows the pointer: it is a wrapper that changes how its content looks, driven by a prop, and the user refused a new family for one member. They then moved it into `Particles` and renamed it `ParticleDissolve`. It grew out of an idea for a button burning into ash, whose point was that ash needs no picture of the content, so item 1's wait for the platform does not apply.
 
-**One progress drives both layers.** `ParticleDissolve` owns a `0`-to-`1` progress and hands it to a paused `ParticleField` as its scrubbed `progress`, and the mask is drawn from the same number. The field's own clock never runs. The edge reaches the end of the sweep when the last particle is released, so with `L` the lifetime as a share of the duration the edge is `progress / (1 - L)`, and a cell at position `s` along the sweep has weight `1 - s`, which `ParticleField` turns into a release at progress `s * (1 - L)`, exactly when the edge is at `s`. `computeLifetimeShare` holds `L` at 0.9 so the edge always has some of the duration. **A rebuild is the same scrub run backwards**, which `ParticleField` already supports, so the particles fly back to where they came from.
+**One progress drives both layers.** `ParticleDissolve` owns a `0`-to-`1` progress and hands it to a paused `ParticleField` as its scrubbed `progress`, and the mask is drawn from the same number. The field's own clock never runs. The edge reaches the end of the sweep when the last particle is released, so with `L` the lifetime as a share of the duration the edge is `progress / (1 - L)`, and a cell at position `s` along the sweep has weight `1 - s`, which `ParticleField` turns into a release at progress `s * (1 - L)`, exactly when the edge is at `s`. `computeLifetimeShare` holds `L` below the whole so the edge always has some of the duration. **A rebuild is the same scrub run backwards**, which `ParticleField` already supports, so the particles fly back to where they came from.
 
 **The trigger is a plain `isDissolved`, not a two-way value.** I proposed a two-way `dissolved` that the component keeps privately when unshared, and dropped it while building: nothing inside the component ever writes it, so a private copy would be a value nobody could change. It is data the consumer owns, like `isVisible`. A press-point burn is the consumer's own handler setting `originShare` and then `isDissolved`. A change part-way runs from the current progress, taking the matching part of the duration, and `onDissolveEnd` / `onRebuildEnd` report the end of a trip.
 
 **Two sweeps, both smooth gradient masks.** A straight one at an angle (CSS's own, so `90` goes right) and, when `originShare` is set, an outward one from a point as a share of the content's size. A function from any point to its moment (option C of the question) was refused because a smooth mask cannot follow an arbitrary function. The mask is a ramp whose start sits clear of the box at an edge of `0` and whose end sits clear of it at `1`, and it is not applied at all at `0`.
 
-**Particles come only from where the content is painted, from the first build.** `PaintedAreaUtils` (`Abstracts/PaintedArea`) reads the content when a transition begins, never ahead of time: the line boxes of text, the box of an element with a background or a border less its rounded corners, replaced elements and form fields as boxes, and every SVG shape with a fill or stroke tested through `isPointInFill` and `isPointInStroke`. Nine points are sampled per grid cell, so a thin line of text is found where one center point would miss it. A particle is placed at a painted sample and takes that region's color, and a cell with no painted sample draws nothing. It is named `PaintedArea` and is not the SVG `PaintArea` generator, which is unrelated.
+**Particles come only from where the content is painted, from the first build.** `PaintedAreaUtils` (`Abstracts/PaintedArea`) reads the content when a transition begins, never ahead of time: the line boxes of text, the box of an element with a background or a border less its rounded corners, replaced elements and form fields as boxes, and every SVG shape with a fill or stroke tested through `isPointInFill` and `isPointInStroke`. A point on a stroke takes the stroke's color and a point inside it the fill's, since the stroke paints over the fill; text inside an SVG takes its `fill`, which is what SVG paints it with, not its CSS `color`. Several points are sampled per grid cell, so a thin line of text is found where one center point would miss it. A particle is placed at a painted sample and takes that region's color, and a cell with no painted sample draws nothing. It is named `PaintedArea` and is not the SVG `PaintArea` generator, which is unrelated.
 
-**Pictures are read pixel by pixel, for `<img>`, `<canvas>` and `<video>`** (the user chose this scope over also reading CSS `background-image: url()`, which would mean loading the image again asynchronously and redoing the browser's own `background-size`, `position` and `repeat` math; SVG `<image>` was left out for the same reason). `Abstracts/ImagePixels` draws the element into a canvas four times finer than a 96-cell grid, placed as `object-fit` and `object-position` place it, and averages each cell weighted by opacity; a cell under half opaque is not painted, so a cut-out picture sheds ash only from what it shows. The arithmetic is pure and unit-tested (`computeFit`, `computeCellAverages`, `computeColorAt`); only `read` needs a page. `PaintedRegion` gained `getColorAt`, and a picture's region is on top of the element's own background region. **A picture from another origin only gives up its pixels with `crossorigin` on the element and a server that sends `Access-Control-Allow-Origin`** (MDN, _CORS enabled image_: the canvas is tainted and reading it throws `SecurityError`). The reader never works around that: it falls back to the whole box in the element's color, quietly, and the menu description says so. `ColorExtractor` was not reusable, since it picks a dominant palette from a URL asynchronously.
+**Pictures are read pixel by pixel, for `<img>`, `<canvas>` and `<video>`** (the user chose this scope over also reading CSS `background-image: url()`, which would mean loading the image again asynchronously and redoing the browser's own `background-size`, `position` and `repeat` math; SVG `<image>` was left out for the same reason). `Abstracts/ImagePixels` draws the element into a canvas finer than its cell grid, placed as `object-fit` and `object-position` place it, and averages each cell weighted by opacity; a mostly transparent cell is not painted, so a cut-out picture sheds ash only from what it shows. The arithmetic is pure and unit-tested (`computeFit`, `computeCellAverages`, `computeColorAt`); only `read` needs a page. `PaintedRegion` gained `getColorAt`, and a picture's region is on top of the element's own background region. **A picture from another origin only gives up its pixels with `crossorigin` on the element and a server that sends `Access-Control-Allow-Origin`** (MDN, _CORS enabled image_: the canvas is tainted and reading it throws `SecurityError`). The reader never works around that: it falls back to the whole box in the element's color, quietly, and the menu description says so. `ColorExtractor` was not reusable, since it picks a dominant palette from a URL asynchronously.
 
 **Approximations, by agreement.** A gradient, a CSS background image, or a picture the browser will not hand the pixels of cannot show transparency, so its whole box counts, and its color is the element's `background-color`, or its text color when it has none. **The answer to a gradient is a fallback color, not code:** the user's call is that a Playground painter with a `backgroundImage` also sets a `backgroundColor`, which the image covers on screen and the particles take. A sweep added `backgroundColor` beside every opaque theme gradient in `playground/src` (56 declarations); translucent gradients, repeating patterns and ones that mix `transparent` were left alone, since a color under them would show. **A new painter with a `backgroundImage` sets one too.** A fringe of the fallback color at the antialiased edge of a rounded gradient is possible and was not looked for. The effect's supported cases are written in the page's menu description. `overflow` clipping, masks and `clip-path` on content are not read. `visibility: hidden` is **not** applied to fully dissolved content, because the next rebuild reads the content's paint and would find all of it hidden; the fully transparent mask hides it instead.
 
 **Out of reach while dissolved.** The content takes `inert` for as long as progress is above `0`, which also covers the rebuild, since a mask changes what is painted and not what can be clicked.
 
-**Reduced motion** skips the particles and the sweep, fades the content by opacity, and caps the duration at 200 ms. The particle layer is mounted only while the progress is strictly between `0` and `1`.
+**Reduced motion** skips the particles and the sweep, fades the content by opacity, and caps the duration. The particle layer is mounted only while the progress is strictly between `0` and `1`.
 
-**A cell can release several particles, and the spawn chance is rolled for each one** (the user's call). `particlesPerCell` is a whole number from 1 to 8, built as that many paused `ParticleField`s over the same box, each with its own roll sequence and its own record of which painted point each cell's particle took. `ParticleField` itself still holds one particle per cell, so nothing changed there.
+**One cell, one particle** — the user's call. A `particlesPerCell` prop once stacked up to eight paused `ParticleField`s over the same box, each repeating the whole field's work every frame; it was removed, and denser ash comes from a smaller `cellSize`.
 
-**The consumer paints the particle**, through `renderParticle` with the cell and the color it came from, and moves it through `computeParticleAnimation`; the library carries no colors. The grid is squares of `cellSize` pixels, capped at 80 across or down.
+**The consumer paints the particle**, through `renderParticle` with the cell and the color it came from, and moves it through `computeParticleAnimation`; the library carries no colors. The grid is squares of `cellSize` pixels, capped across and down.
 
-**Per framework, the layers and the scrubbed field.** Solid makes each `particlesPerCell` layer's record of sample
-points inside `<For>` and drops it on cleanup. The others cannot create state per item in markup:
-
-- React: each layer is a small private component (`ParticleDissolveLayer`) owning its record, which adds itself to the
-  parent's set on mount so a new transition can clear it. `computeCellWeights` is a `useCallback` on size and sweep,
-  since React's `ParticleField` lists it as a dependency.
-- Vue: each layer's record and the functions handed to its field are made once and kept in a `Map` by layer index. A
-  record outlives its layer until the next transition clears every record.
-- Svelte: a list of layer records that only grows, of which the first `particlesPerCell` are shown; each layer's
-  `renderParticle` snippet is declared inside the `{#each}` to see its own record.
+**Per framework, the record of sample points.** The component keeps one map from a cell to the painted point its particle took, cleared when a transition begins, and hands `ParticleField` a `computeParticlePos` that fills it and a `renderParticle` that reads it. Solid, Vue and Svelte make the map and the functions once in setup; React keeps the map in `useState` and rebuilds the functions each render, reading the latest props through `useLatest`. `computeCellWeights` is a `useCallback` on size and sweep in React, since React's `ParticleField` lists it as a dependency.
 
 The field must never write its own progress. Solid hands it `[getProgress, () => undefined]`; Vue binds `progress` and
 `playback` with do-nothing `onUpdate:` listeners, so `useModel` treats them as bound; Svelte uses a function binding
@@ -22348,4 +22368,4 @@ only `isDissolved` all rely on the start and end progress being equal at mount, 
 `BaseParticleDissolveExampleValues` and its Angle and Svg extensions; Solid wraps them in `AccessorValues`, the others
 use them as they are, as `CardStackExamples.types.ts` is consumed.
 
-**Defaults are mine and unmeasured:** 1200 ms, a 600 ms lifetime, a feather of 0.2, a spawn chance of 0.5, one particle per cell, and a 12 px cell. They are the user's to move. The Solid build is checked in a headless browser, which draws masks on the software path; a mask is a rendering matter, so it is unverified until seen in a real window.
+**The defaults in `PARTICLE_DISSOLVE_DEFAULTS` are mine and unmeasured**, and the user's to move. The Solid build is checked in a headless browser, which draws masks on the software path; a mask is a rendering matter, so it is unverified until seen in a real window.

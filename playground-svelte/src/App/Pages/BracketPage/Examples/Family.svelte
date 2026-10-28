@@ -7,10 +7,7 @@
     import * as styles from "@thewaver/ss-playground/App/Pages/BracketPage/BracketPage.css";
     import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
-    import PageExampleKnobs from "../../../PageComponents/ExampleKnobs/PageExampleKnobs.svelte";
-    import PageCheckField from "../../../PageComponents/Field/PageCheckField.svelte";
     import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.svelte";
-    import PageProp from "../../../PageComponents/Prop/Prop.svelte";
     import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
     import { branch, computeFamilySteps, describeFamily, seed } from "../BracketPageSvelte.const";
     import type { BracketFamilyExampleProps } from "../BracketPage.types";
@@ -35,7 +32,6 @@
     let props: Props = $props();
 
     let family = $state.raw<BracketNode<string>>();
-    let isSnapping = $state(BracketKnobs.STARTING_IS_SNAPPING_TO_FAMILY);
 
     const headerSize = $derived(props.orientation === "horizontal" ? ACROSS_HEADER_SIZE : DOWN_HEADER_SIZE);
 
@@ -87,7 +83,7 @@
                 bind:family
                 bind:view
                 isFollowingFamily={true}
-                isSnappingToFamily={isSnapping}
+                isSnappingToFamily={props.isSnappingToFamily}
                 familyMargin={BracketKnobs.FAMILY_MARGIN}
                 transitionDurationMs={props.transitionDurationMs}
                 layerGap={props.layerGap}
@@ -138,21 +134,4 @@
             </Button>
         {/each}
     </div>
-
-    <PageExampleKnobs>
-        <PageProp
-            itemKey={"isSnappingToFamily"}
-            label={"Snap to family"}
-            hint={"Glides the window to frame the family in it once a drag, a pinch or the wheel is over."}
-            controls={"Sets BracketProps.isSnappingToFamily"}
-        >
-            <PageCheckField
-                value={isSnapping}
-                ariaLabel={"Snap to family"}
-                onChange={(value) => {
-                    isSnapping = value;
-                }}
-            />
-        </PageProp>
-    </PageExampleKnobs>
 </div>

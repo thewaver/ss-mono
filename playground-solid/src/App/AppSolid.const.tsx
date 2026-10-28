@@ -109,10 +109,7 @@ const LightCatcherPage = lazyPage(
     () => import("./Pages/PointerEffects/LightCatcherPage/LightCatcherPage"),
     "LightCatcherPage",
 );
-const RGBSplitterPage = lazyPage(
-    () => import("./Pages/PointerEffects/RGBSplitterPage/RGBSplitterPage"),
-    "RGBSplitterPage",
-);
+const RGBAnimationPage = lazyPage(() => import("./Pages/RGBAnimationPage/RGBAnimationPage"), "RGBAnimationPage");
 const ShadowCasterPage = lazyPage(
     () => import("./Pages/PointerEffects/ShadowCasterPage/ShadowCasterPage"),
     "ShadowCasterPage",
@@ -643,6 +640,10 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                         component: () => <CellAnimationPage />,
                     },
                     {
+                        name: "RGBAnimation",
+                        component: () => <RGBAnimationPage />,
+                    },
+                    {
                         name: "ScanlineAnimation",
                         component: () => <ScanlineAnimationPage />,
                     },
@@ -776,10 +777,6 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                     {
                         name: "LightCatcher",
                         component: () => <LightCatcherPage />,
-                    },
-                    {
-                        name: "RGBSplitter",
-                        component: () => <RGBSplitterPage />,
                     },
                     {
                         name: "ShadowCaster",

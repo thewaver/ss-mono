@@ -2,24 +2,18 @@
 import { computed, shallowRef } from "vue";
 
 import { ElementObserverVueUtils, InfiniteCorridor } from "@thewaver/ss-components-vue";
-import { InfiniteCorridorKnobs } from "@thewaver/ss-playground/App/Knobs/InfiniteCorridors.const";
-import { FIELD_WIDTH } from "@thewaver/ss-playground/App/Pages/InfiniteCorridorPage/InfiniteCorridorPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/InfiniteCorridorPage/InfiniteCorridorPage.css";
 
-import PageExampleKnobs from "../../../PageComponents/ExampleKnobs/PageExampleKnobs.vue";
-import PageNumberField from "../../../PageComponents/Field/PageNumberField.vue";
-import PageProp from "../../../PageComponents/Prop/Prop.vue";
 import { useSpinDegrees } from "../InfiniteCorridorPage.utils";
-import type { InfiniteCorridorExampleProps } from "../InfiniteCorridorPageVue.types";
+import type { InfiniteCorridorScrolledExampleProps } from "../InfiniteCorridorPageVue.types";
 import Room from "./Room.vue";
 
-type Props = InfiniteCorridorExampleProps;
+type Props = InfiniteCorridorScrolledExampleProps;
 
 const props = defineProps<Props>();
 
 const boxRef = shallowRef<HTMLElement>();
 const runwayRef = shallowRef<HTMLElement>();
-const scrollLength = shallowRef(InfiniteCorridorKnobs.STARTING_SCROLL_LENGTH);
 
 const progress = ElementObserverVueUtils.useScrollContainerProgress(runwayRef, boxRef);
 
@@ -57,23 +51,4 @@ const layout = computed(() => props.toLayout(spinDegrees.value));
             :style="{ height: `${scrollLength * styles.CORRIDOR_HEIGHT}px` }"
         />
     </div>
-
-    <PageExampleKnobs>
-        <PageProp
-            item-key="scrollLength"
-            controls="Sets how long the example scroll runway that drives InfiniteCorridorProps.progress is"
-            label="Scroll length"
-            hint="How far the box scrolls to walk one lap of the corridor, in heights of the box. Longer is slower."
-        >
-            <PageNumberField
-                :value="scrollLength"
-                :min="InfiniteCorridorKnobs.MIN_SCROLL_LENGTH"
-                :max="InfiniteCorridorKnobs.MAX_SCROLL_LENGTH"
-                :step="InfiniteCorridorKnobs.SCROLL_LENGTH_STEP"
-                :width="FIELD_WIDTH"
-                ariaLabel="Scroll length in box heights"
-                @input="(value: number) => (scrollLength = value)"
-            />
-        </PageProp>
-    </PageExampleKnobs>
 </template>

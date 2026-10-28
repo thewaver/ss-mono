@@ -22,7 +22,6 @@
     let particleLifetimeMs = $state(PARTICLE_DISSOLVE_DEFAULTS.particleLifetimeMs);
     let featherShare = $state(PARTICLE_DISSOLVE_DEFAULTS.featherShare);
     let spawnChance = $state(PARTICLE_DISSOLVE_DEFAULTS.spawnChance);
-    let particlesPerCell = $state(PARTICLE_DISSOLVE_DEFAULTS.particlesPerCell);
     let cellSize = $state(PARTICLE_DISSOLVE_DEFAULTS.cellSize);
 
     const commonProps: ParticleDissolveExampleProps = $derived({
@@ -30,7 +29,6 @@
         particleLifetimeMs,
         featherShare,
         spawnChance,
-        particlesPerCell,
         cellSize,
     });
 
@@ -168,26 +166,6 @@
         />
     </PageProp>
 
-    <PageProp
-        itemKey={"particlesPerCell"}
-        controls={"Sets ParticleDissolveProps.particlesPerCell"}
-        label={"Particles per cell"}
-        hint={
-            "How many particles one grid square of painted content can release. Each is rolled against the spawn chance on its own."
-        }
-    >
-        <PageNumberField
-            value={particlesPerCell}
-            min={ParticleDissolveKnobs.MIN_PARTICLES_PER_CELL}
-            max={ParticleDissolveKnobs.MAX_PARTICLES_PER_CELL}
-            step={ParticleDissolveKnobs.PARTICLES_PER_CELL_STEP}
-            width={FIELD_WIDTH}
-            ariaLabel={"Particles per cell"}
-            onInput={(value) => {
-                particlesPerCell = value;
-            }}
-        />
-    </PageProp>
 
     <PageProp
         itemKey={"cellSize"}

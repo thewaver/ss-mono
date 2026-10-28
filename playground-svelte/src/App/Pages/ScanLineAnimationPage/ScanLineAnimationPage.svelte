@@ -157,51 +157,51 @@
 </script>
 
 {#snippet glitchExample()}
-    <GlitchExampleWrapper {...commonProps} bind:playback />
+    <GlitchExampleWrapper {...commonProps} />
 {/snippet}
 
 {#snippet surgeExample()}
-    <SurgeExampleWrapper {...commonProps} bind:playback />
+    <SurgeExampleWrapper {...commonProps} />
 {/snippet}
 
 {#snippet snakeExample()}
-    <SnakeExampleWrapper {...commonProps} bind:playback />
+    <SnakeExampleWrapper {...commonProps} />
 {/snippet}
 
 {#snippet splitExample()}
-    <SplitExampleWrapper {...commonProps} bind:playback />
+    <SplitExampleWrapper {...commonProps} />
 {/snippet}
 
 {#snippet brightnessExample()}
-    <BrightnessExampleWrapper {...commonProps} bind:playback />
+    <BrightnessExampleWrapper {...commonProps} />
 {/snippet}
 
 {#snippet grayscaleExample()}
-    <GrayscaleExampleWrapper {...commonProps} bind:playback />
+    <GrayscaleExampleWrapper {...commonProps} />
 {/snippet}
 
 {#snippet hueExample()}
-    <HueExampleWrapper {...commonProps} bind:playback />
+    <HueExampleWrapper {...commonProps} />
 {/snippet}
 
 {#snippet waveExample()}
-    <WaveExampleWrapper {...commonProps} bind:playback />
+    <WaveExampleWrapper {...commonProps} />
 {/snippet}
 
 {#snippet rollExample()}
-    <RollExampleWrapper {...commonProps} bind:playback />
+    <RollExampleWrapper {...commonProps} />
 {/snippet}
 
 {#snippet dropoutExample()}
-    <DropoutExampleWrapper {...commonProps} bind:playback />
+    <DropoutExampleWrapper {...commonProps} />
 {/snippet}
 
 {#snippet interlaceExample()}
-    <InterlaceExampleWrapper {...commonProps} bind:playback />
+    <InterlaceExampleWrapper {...commonProps} />
 {/snippet}
 
 {#snippet skewExample()}
-    <SkewExampleWrapper {...commonProps} bind:playback />
+    <SkewExampleWrapper {...commonProps} />
 {/snippet}
 
 {#snippet stressTestExample()}

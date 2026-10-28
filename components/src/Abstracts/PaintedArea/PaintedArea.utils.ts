@@ -79,6 +79,11 @@ const readIsColorTransparent = (color: string) => {
     return legacy ? Number.parseFloat(legacy[1] ?? "1") === 0 : false;
 };
 
+const readSvgPaint = (paint: string) => (paint === NO_PAINT || readIsColorTransparent(paint) ? NOTHING : paint);
+
+const readSvgStroke = (style: CSSStyleDeclaration) =>
+    Number.parseFloat(style.strokeWidth) > 0 ? readSvgPaint(style.stroke) : NOTHING;
+
 const parseRadius = (value: string, length: number) => {
     const token = value.trim().split(/\s+/)[0] ?? "";
     const number = Number.parseFloat(token);
@@ -166,7 +171,7 @@ export namespace PaintedAreaUtils {
      *
      * @param region One of the regions {@link measure} answers.
      * @param point A point the region paints, in the regions' coordinates.
-     * @returns The picture's color there for a picture, and the region's one color otherwise.
+     * @returns The color at that point for a picture or a stroked SVG shape, and the region's one color otherwise.
      */
     export const getRegionColor = (region: PaintedRegion, point: Point2d) => region.getColorAt?.(point) ?? region.color;
 
@@ -209,8 +214,9 @@ export namespace PaintedAreaUtils {
      * Walks everything inside it, skipping what is not shown, and collects the line boxes of its text, the box of every
      * element with a visible background or a border (less its rounded corners), the box of an iframe or form field, the
      * pixels of an image, canvas or video, and every SVG shape that has a fill or a stroke, which is tested point by
-     * point against the shape itself. Reads the page as it is now, so call it when the answer is wanted rather than ahead
-     * of time.
+     * point against the shape itself and answers its stroke's color on the stroke and its fill's color inside. Text in an
+     * SVG takes its fill's color, or its stroke's when it has no fill, as SVG paints it. Reads the page as it is now, so
+     * call it when the answer is wanted rather than ahead of time.
      *
      * Coordinates are layout pixels from the element's top left corner, with a scaling ancestor such as `Viewport`
      * divided out.
@@ -231,7 +237,12 @@ export namespace PaintedAreaUtils {
         });
 
         const readText = (node: Text, parentStyle: CSSStyleDeclaration) => {
-            if (parentStyle.visibility === "hidden" || node.data.trim() === "") return;
+            const color =
+                node.parentElement instanceof SVGElement
+                    ? (readSvgPaint(parentStyle.fill) ?? readSvgStroke(parentStyle))
+                    : parentStyle.color;
+
+            if (parentStyle.visibility === "hidden" || node.data.trim() === "" || color === NOTHING) return;
 
             const range = document.createRange();
 
@@ -239,35 +250,35 @@ export namespace PaintedAreaUtils {
 
             for (const rect of range.getClientRects()) {
                 if (rect.width > 0 && rect.height > 0) {
-                    regions.push({ rect: toLocalRect(rect), radii: NO_RADII, color: parentStyle.color });
+                    regions.push({ rect: toLocalRect(rect), radii: NO_RADII, color });
                 }
             }
         };
 
         const readSvgShape = (element: SVGGeometryElement, style: CSSStyleDeclaration) => {
-            const hasFill = style.fill !== NO_PAINT && !readIsColorTransparent(style.fill);
-            const hasStroke =
-                style.stroke !== NO_PAINT &&
-                !readIsColorTransparent(style.stroke) &&
-                Number.parseFloat(style.strokeWidth) > 0;
+            const fill = readSvgPaint(style.fill);
+            const stroke = readSvgStroke(style);
+            const color = fill ?? stroke;
             const matrix = element.getScreenCTM();
 
-            if ((!hasFill && !hasStroke) || !matrix) return;
+            if (color === NOTHING || !matrix) return;
 
             const inverse = matrix.inverse();
+
+            const toShapePoint = (point: Point2d) =>
+                new DOMPoint(rootRect.left + point.x * scale, rootRect.top + point.y * scale).matrixTransform(inverse);
+
+            const getIsInStroke = (point: Point2d) =>
+                stroke !== NOTHING && element.isPointInStroke(toShapePoint(point));
+
+            const getIsInFill = (point: Point2d) => fill !== NOTHING && element.isPointInFill(toShapePoint(point));
 
             regions.push({
                 rect: toLocalRect(element.getBoundingClientRect()),
                 radii: NO_RADII,
-                color: hasFill ? style.fill : style.stroke,
-                getIsInside: (point) => {
-                    const local = new DOMPoint(
-                        rootRect.left + point.x * scale,
-                        rootRect.top + point.y * scale,
-                    ).matrixTransform(inverse);
-
-                    return (hasFill && element.isPointInFill(local)) || (hasStroke && element.isPointInStroke(local));
-                },
+                color,
+                getIsInside: (point) => getIsInStroke(point) || getIsInFill(point),
+                getColorAt: (point) => (getIsInStroke(point) ? stroke : fill),
             });
         };
 

@@ -22,6 +22,7 @@ export const cellAnimationContainer = style({
     position: "relative",
     overflow: "hidden",
     isolation: "isolate",
+    contain: "strict",
 });
 
 export const cellAnimationCell = style({

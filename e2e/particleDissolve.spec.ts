@@ -5,9 +5,9 @@ import { inlineStyle, prop } from "./helpers";
 /**
  * A `ParticleDissolve` has no id and no test key of its own, so each example sits in a stage that does, and the spec walks down
  * from it: the stage's first child is the `ParticleDissolve` root, whose first child is the content and whose second, present
- * only while a dissolve is running, is the layer the particles are drawn in. Each particle is one more `ParticleField`
- * layer's item, placed by an inline `left` and `top` in the content's own layout pixels, so the window's scale never
- * enters a comparison of where a particle is and what is painted there.
+ * only while a dissolve is running, is the layer the particles are drawn in. Each particle is an item of the
+ * `ParticleField` inside it, placed by an inline `left` and `top` in the content's own layout pixels, so the window's
+ * scale never enters a comparison of where a particle is and what is painted there.
  *
  * Every test reads a relationship, never a number the page could tune: a particle lies on something painted, takes the
  * color of what it came from, the edge has moved on, the content is out of reach. The page's durations are left as they
@@ -40,12 +40,11 @@ const setNumber = async (page: Page, key: string, value: number) => {
 };
 
 /**
- * A dense run: every painted spot releases a particle and a cell releases several, so a rule about where particles
- * come from is tested against hundreds of them rather than the few a default run leaves.
+ * A dense run: every painted cell releases its particle, so a rule about where particles come from is tested against
+ * hundreds of them rather than the few a default run leaves.
  */
 const makeDense = async (page: Page) => {
     await setNumber(page, "spawnChance", 1);
-    await setNumber(page, "particlesPerCell", 4);
 };
 
 /**
@@ -260,6 +259,51 @@ test("an SVG sheds particles only from its own fill and stroke", async ({ page }
 });
 
 /**
+ * A stroke paints over its fill, so a particle from the outline takes the stroke's color and one from inside it the
+ * fill's. The example's label sits inside the shape in a color of its own, so particles near it are left out.
+ */
+test("an SVG particle takes the color of the paint it came from, the stroke over the fill", async ({ page }) => {
+    await makeDense(page);
+
+    const { dots } = await particleDissolveAndWatch(page, "Svg", "#particleDissolveSvgBurn");
+
+    const counts = await page.evaluate((places) => {
+        const path = document.querySelector("#particleDissolveSvgStage svg path") as SVGGeometryElement;
+        const label = document.querySelector("#particleDissolveSvgStage svg text") as SVGGraphicsElement | null;
+        const labelBox = label?.getBBox();
+        const { fill, stroke } = getComputedStyle(path);
+
+        const getIsNearLabel = (point: DOMPoint) =>
+            labelBox !== undefined &&
+            point.x >= labelBox.x &&
+            point.x <= labelBox.x + labelBox.width &&
+            point.y >= labelBox.y &&
+            point.y <= labelBox.y + labelBox.height;
+
+        const onStroke = places.filter((place) => path.isPointInStroke(new DOMPoint(place.x, place.y)));
+        const insideOnly = places.filter((place) => {
+            const point = new DOMPoint(place.x, place.y);
+
+            return path.isPointInFill(point) && !path.isPointInStroke(point) && !getIsNearLabel(point);
+        });
+
+        return {
+            onStroke: onStroke.length,
+            wrongOnStroke: onStroke.filter((place) => place.color !== stroke).length,
+            insideOnly: insideOnly.length,
+            wrongInside: insideOnly.filter((place) => place.color !== fill).length,
+            isSameColor: fill === stroke,
+        };
+    }, dots);
+
+    expect(counts.isSameColor, "the example paints its stroke and fill in different colors").toBe(false);
+    expect(counts.onStroke, "some particles come from the outline").toBeGreaterThan(0);
+    expect(counts.insideOnly, "and some from inside it").toBeGreaterThan(0);
+    expect(counts.wrongOnStroke, "every particle from the outline has the stroke's color").toBe(0);
+    expect(counts.wrongInside, "every particle from inside has the fill's color").toBe(0);
+});
+
+/**
  * A picture is read pixel by pixel, so what it does not paint sheds nothing. The picture's own pixels are the reference:
  * every particle has something opaque within a few layout pixels, which a whole-box reading, spreading particles over
  * the picture's transparent surround, fails by a long way.
@@ -302,17 +346,6 @@ test("an image sheds particles only where it has pixels", async ({ page }) => {
     }, dots);
 
     expect(stray, "no particle starts where the picture is transparent").toBe(0);
-});
-
-test("a cell releases as many particles as the page asks for", async ({ page }) => {
-    await setNumber(page, "particlesPerCell", 3);
-    await page.locator("#particleDissolveCardBurn").click();
-    await expect(page.locator(layer("Card"))).toHaveCount(1);
-
-    expect(
-        await page.locator(layer("Card")).evaluate((element) => element.children.length),
-        "one layer of particles for each one a cell can release",
-    ).toBe(3);
 });
 
 test("rebuilding part-way turns the dissolve round", async ({ page }) => {

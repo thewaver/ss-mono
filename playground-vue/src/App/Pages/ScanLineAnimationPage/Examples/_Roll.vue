@@ -26,6 +26,7 @@ type Props = ScanlineAnimationExampleProps & {
 const props = defineProps<Props>();
 
 const playback = useModel(props, "playback");
+const progress = useModel(props, "progress");
 
 const computeCellWeights = (count: Index2d) =>
     CellAnimationWeights.computeCellWeights(props.weightType, count, WEIGHT_ORIGIN);
@@ -42,6 +43,7 @@ const computeScanlineAnimation = (defs: ScanlineAnimationEvaluationDefs, timelin
 <template>
     <ScanlineAnimation
         v-model:playback="playback"
+        v-model:progress="progress"
         :src="src"
         :line-count="lineCount"
         :orientation="orientation"

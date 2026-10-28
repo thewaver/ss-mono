@@ -138,11 +138,11 @@
 {/snippet}
 
 {#snippet gradientExample()}
-    <GradientExampleWrapper {...commonProps} bind:playback />
+    <GradientExampleWrapper {...commonProps} />
 {/snippet}
 
 {#snippet patternExample()}
-    <PatternExampleWrapper {...commonProps} bind:playback />
+    <PatternExampleWrapper {...commonProps} />
 {/snippet}
 
 {#snippet wipeExample()}

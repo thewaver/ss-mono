@@ -37,7 +37,6 @@ export const ButtonExample = (props: Props) => {
                 particleLifetimeMs={props.particleLifetimeMs}
                 featherShare={props.featherShare}
                 spawnChance={props.spawnChance}
-                particlesPerCell={props.particlesPerCell}
                 cellSize={props.cellSize}
                 computeParticleAnimation={computeAshAnimation}
                 renderParticle={(defs) => <AshParticle defs={defs} />}

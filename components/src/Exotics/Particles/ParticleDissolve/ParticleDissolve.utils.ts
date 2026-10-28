@@ -4,7 +4,6 @@ import type { ParticleDissolveSweep } from "./ParticleDissolve.types";
 
 const MAX_LIFETIME_SHARE = 0.9;
 const MAX_CELLS_PER_AXIS = 80;
-const MAX_PARTICLES_PER_CELL = 8;
 const REDUCED_MOTION_DURATION_MS = 200;
 const COMPLETION_BACKSTOP_MS = 100;
 const DEGREES_TO_RADIANS = Math.PI / 180;
@@ -173,15 +172,6 @@ export namespace ParticleDissolveUtils {
             row: MathUtils.clamp(Math.ceil(size.height / side), 1, MAX_CELLS_PER_AXIS),
         };
     };
-
-    /**
-     * How many particles a grid square releases.
-     *
-     * @param requested The number asked for.
-     * @returns A whole number from `1` to `8`.
-     */
-    export const computeParticlesPerCell = (requested: number) =>
-        MathUtils.clamp(Math.round(requested), 1, MAX_PARTICLES_PER_CELL);
 
     /**
      * How long the dissolve takes for a reader.

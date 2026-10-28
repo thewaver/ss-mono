@@ -105,7 +105,6 @@ export const ParticleDissolvePage = () => {
     const [getLifetimeMs, setLifetimeMs] = createSignal(PARTICLE_DISSOLVE_DEFAULTS.particleLifetimeMs);
     const [getFeather, setFeather] = createSignal(PARTICLE_DISSOLVE_DEFAULTS.featherShare);
     const [getSpawnChance, setSpawnChance] = createSignal(PARTICLE_DISSOLVE_DEFAULTS.spawnChance);
-    const [getParticlesPerCell, setParticlesPerCell] = createSignal(PARTICLE_DISSOLVE_DEFAULTS.particlesPerCell);
     const [getCellSize, setCellSize] = createSignal(PARTICLE_DISSOLVE_DEFAULTS.cellSize);
 
     const getExamples = createMemo(() => {
@@ -114,7 +113,6 @@ export const ParticleDissolvePage = () => {
             particleLifetimeMs: getLifetimeMs,
             featherShare: getFeather,
             spawnChance: getSpawnChance,
-            particlesPerCell: getParticlesPerCell,
             cellSize: getCellSize,
         };
 
@@ -228,25 +226,6 @@ export const ParticleDissolvePage = () => {
                         width={FIELD_WIDTH}
                         ariaLabel={"Spawn chance"}
                         onInput={setSpawnChance}
-                    />
-                </PageProp>
-
-                <PageProp
-                    key={"particlesPerCell"}
-                    label={"Particles per cell"}
-                    hint={
-                        "How many particles one grid square of painted content can release. Each is rolled against the spawn chance on its own."
-                    }
-                    controls={"Sets ParticleDissolveProps.particlesPerCell"}
-                >
-                    <PageNumberField
-                        value={getParticlesPerCell}
-                        min={ParticleDissolveKnobs.MIN_PARTICLES_PER_CELL}
-                        max={ParticleDissolveKnobs.MAX_PARTICLES_PER_CELL}
-                        step={ParticleDissolveKnobs.PARTICLES_PER_CELL_STEP}
-                        width={FIELD_WIDTH}
-                        ariaLabel={"Particles per cell"}
-                        onInput={setParticlesPerCell}
                     />
                 </PageProp>
 

@@ -8,6 +8,7 @@
     import PageExampleKnobs from "../../PageComponents/ExampleKnobs/PageExampleKnobs.svelte";
     import PageSelectField from "../../PageComponents/Field/PageSelectField.svelte";
     import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.svelte";
+    import PagePlaybackScrubber from "../../PageComponents/PlaybackScrubber/PlaybackScrubber.svelte";
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
     import { SVGDefsSources } from "../../PageComponents/SVGDefsSources/SVGDefsSourcesSvelte.const";
     import type { CellAnimationExampleProps } from "./CellAnimationPage.types";
@@ -17,9 +18,12 @@
     const computeContainerWidth = (size: Size2d) =>
         (IMAGE_CONTAINER_SIZE * size.width) / Math.max(size.width, size.height);
 
-    type Props = CellAnimationExampleProps;
+    type Props = Omit<CellAnimationExampleProps, "playback">;
 
-    let { playback = $bindable(), ...props }: Props = $props();
+    let props: Props = $props();
+
+    let playback = $state(true);
+    let progress = $state(0);
 
     let key = $state<SVGDefsSamples.Pattern.Timed.SampleKey>(CellAnimationKnobs.STARTING_PATTERN_KEY);
     let ratio = $state<SVGDefsSources.SourceRatio>(CellAnimationKnobs.DEFAULT_SOURCE_RATIO);
@@ -33,10 +37,12 @@
     const src = $derived(SVGDefsSources.computePatternSource(key, size, cycleDurationMs));
 </script>
 
-<div class={styles.exampleRoot}>
+<div class={styles.stack}>
     <PageMeasureBox width={computeContainerWidth(size)}>
-        <DefaultExample {...props} bind:playback {src} />
+        <DefaultExample {...props} bind:playback bind:progress {src} />
     </PageMeasureBox>
+
+    <PagePlaybackScrubber id={"cellAnimationPattern"} ariaLabel={"Position in the pass"} bind:playback bind:progress />
 </div>
 
 <PageExampleKnobs>

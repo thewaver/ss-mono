@@ -37,10 +37,10 @@ import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
 import PageBeam from "../../StyledComponents/Beam/Beam.vue";
 import type { BracketExampleProps } from "./BracketPage.types";
 import { BEAM_PATHS, NOTHING_PICKED, computeRouteSpan, toConnectorBoard } from "./BracketPageVue.const";
-import FamilyExample from "./Examples/Family.vue";
 import KnockoutExample from "./Examples/Knockout.vue";
 import OrgChartExample from "./Examples/OrgChart.vue";
 import SkillTreeExample from "./Examples/SkillTree.vue";
+import FamilyExampleWrapper from "./FamilyExampleWrapper.vue";
 
 const layerGap = shallowRef(BRACKET_DEFAULTS.layerGap);
 const crossGap = shallowRef(BRACKET_DEFAULTS.crossGap);
@@ -259,7 +259,7 @@ const examples: ExampleDefs[] = [
         </template>
 
         <template #family>
-            <FamilyExample
+            <FamilyExampleWrapper
                 v-bind="commonProps"
                 :transition-duration-ms="prefersReducedMotion ? NO_MOTION_DURATION_MS : transitionDurationMs"
                 @family-change="(next: string) => (family = next)"

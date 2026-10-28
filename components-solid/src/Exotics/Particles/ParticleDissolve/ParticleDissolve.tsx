@@ -1,14 +1,4 @@
-import {
-    type Accessor,
-    For,
-    type JSX,
-    type ParentProps,
-    Show,
-    createEffect,
-    createMemo,
-    createSignal,
-    on,
-} from "solid-js";
+import { type Accessor, type JSX, type ParentProps, Show, createEffect, createMemo, createSignal, on } from "solid-js";
 import { onCleanup, untrack } from "solid-js";
 
 import {
@@ -95,22 +85,37 @@ export const ParticleDissolve = (props: ParentProps<ParticleDissolveProps>) => {
         "opacity": getPrefersReducedMotion() && getProgress() > 0 ? 1 - getProgress() : undefined,
     }));
 
-    const getLayerIndexes = createMemo(() =>
-        Array.from(
-            {
-                length: ParticleDissolveUtils.computeParticlesPerCell(
-                    access(props.particlesPerCell) ?? PARTICLE_DISSOLVE_DEFAULTS.particlesPerCell,
-                ),
-            },
-            (_, index) => index,
-        ),
-    );
-
     const getHasParticles = createMemo(() => !getPrefersReducedMotion() && getProgress() > 0 && getProgress() < 1);
 
     let regions: PaintedRegion[] = [];
 
-    const layers = new Set<Map<number, PaintedSample>>();
+    const samples = new Map<number, PaintedSample>();
+
+    const computeParticlePos = (cell: ParticleFieldCellDefs) => {
+        const key = getCellKey(cell);
+        const painted = PaintedAreaUtils.computeSamples(regions, cell.rect);
+        const sample = painted[Math.floor(Math.random() * painted.length)];
+
+        if (!sample) {
+            samples.delete(key);
+
+            return RectUtils.getCenter(cell.rect);
+        }
+
+        samples.set(key, sample);
+
+        return sample.pos;
+    };
+
+    const computeParticleAnimation = (cell: ParticleFieldCellDefs, t: number) =>
+        props.computeParticleAnimation?.({ cell, color: samples.get(getCellKey(cell))?.color ?? NO_COLOR }, t) ??
+        NO_ANIMATION;
+
+    const renderParticle = (cell: ParticleFieldCellDefs, getT: Accessor<number>) => {
+        const sample = samples.get(getCellKey(cell));
+
+        return sample ? props.renderParticle({ cell, color: sample.color }, getT) : undefined;
+    };
 
     createEffect(
         on(
@@ -125,7 +130,7 @@ export const ParticleDissolve = (props: ParentProps<ParticleDissolveProps>) => {
 
                 regions = content ? PaintedAreaUtils.measure(content) : [];
 
-                for (const samples of layers) samples.clear();
+                samples.clear();
 
                 onCleanup(
                     ParticleDissolveUtils.run({
@@ -152,64 +157,21 @@ export const ParticleDissolve = (props: ParentProps<ParticleDissolveProps>) => {
 
             <Show when={getHasParticles()}>
                 <div class={styles.particleDissolveParticles} aria-hidden="true">
-                    <For each={getLayerIndexes()}>
-                        {() => {
-                            const samples = new Map<number, PaintedSample>();
-
-                            layers.add(samples);
-                            onCleanup(() => layers.delete(samples));
-
-                            const computeParticlePos = (cell: ParticleFieldCellDefs) => {
-                                const key = getCellKey(cell);
-                                const painted = PaintedAreaUtils.computeSamples(regions, cell.rect);
-                                const sample = painted[Math.floor(Math.random() * painted.length)];
-
-                                if (!sample) {
-                                    samples.delete(key);
-
-                                    return RectUtils.getCenter(cell.rect);
-                                }
-
-                                samples.set(key, sample);
-
-                                return sample.pos;
-                            };
-
-                            const computeParticleAnimation = (cell: ParticleFieldCellDefs, t: number) =>
-                                props.computeParticleAnimation?.(
-                                    { cell, color: samples.get(getCellKey(cell))?.color ?? NO_COLOR },
-                                    t,
-                                ) ?? NO_ANIMATION;
-
-                            const renderParticle = (cell: ParticleFieldCellDefs, getT: Accessor<number>) => {
-                                const sample = samples.get(getCellKey(cell));
-
-                                return sample ? props.renderParticle({ cell, color: sample.color }, getT) : undefined;
-                            };
-
-                            return (
-                                <div class={styles.particleDissolveParticleLayer}>
-                                    <ParticleField
-                                        cellCount={getCellCount}
-                                        spawnChance={() =>
-                                            access(props.spawnChance) ?? PARTICLE_DISSOLVE_DEFAULTS.spawnChance
-                                        }
-                                        animationDurationMs={getDurationMs}
-                                        animationIterationCount={SINGLE_PASS}
-                                        particleLifetimeMs={() => getLifetimeShare() * getDurationMs()}
-                                        playback={NEVER_PLAYING}
-                                        progress={[getProgress, () => undefined]}
-                                        computeCellWeights={(count) =>
-                                            ParticleDissolveUtils.computeCellWeights(count, getSize(), getSweep())
-                                        }
-                                        computeParticlePos={computeParticlePos}
-                                        computeParticleAnimation={computeParticleAnimation}
-                                        renderParticle={renderParticle}
-                                    />
-                                </div>
-                            );
-                        }}
-                    </For>
+                    <ParticleField
+                        cellCount={getCellCount}
+                        spawnChance={() => access(props.spawnChance) ?? PARTICLE_DISSOLVE_DEFAULTS.spawnChance}
+                        animationDurationMs={getDurationMs}
+                        animationIterationCount={SINGLE_PASS}
+                        particleLifetimeMs={() => getLifetimeShare() * getDurationMs()}
+                        playback={NEVER_PLAYING}
+                        progress={[getProgress, () => undefined]}
+                        computeCellWeights={(count) =>
+                            ParticleDissolveUtils.computeCellWeights(count, getSize(), getSweep())
+                        }
+                        computeParticlePos={computeParticlePos}
+                        computeParticleAnimation={computeParticleAnimation}
+                        renderParticle={renderParticle}
+                    />
                 </div>
             </Show>
         </div>

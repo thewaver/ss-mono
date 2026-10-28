@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, shallowRef, useModel } from "vue";
+import { computed, shallowRef } from "vue";
 
 import { CellAnimationPlaybackUtils } from "@thewaver/ss-components-vue";
 import type { SVGDefsSamples } from "@thewaver/ss-components-vue";
@@ -11,6 +11,7 @@ import type { Size2d } from "@thewaver/ss-utils";
 import PageExampleKnobs from "../../PageComponents/ExampleKnobs/PageExampleKnobs.vue";
 import PageSelectField from "../../PageComponents/Field/PageSelectField.vue";
 import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.vue";
+import PagePlaybackScrubber from "../../PageComponents/PlaybackScrubber/PlaybackScrubber.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
 import { SVGDefsSources } from "../../PageComponents/SVGDefsSources/SVGDefsSourcesVue.const";
 import type { CellAnimationExampleProps } from "./CellAnimationPage.types";
@@ -22,7 +23,8 @@ type Props = CellAnimationExampleProps;
 
 const props = defineProps<Props>();
 
-const playback = useModel(props, "playback");
+const playback = shallowRef(true);
+const progress = shallowRef(0);
 
 const key = shallowRef<SVGDefsSamples.Pattern.Timed.SampleKey>(CellAnimationKnobs.STARTING_PATTERN_KEY);
 const ratio = shallowRef<SVGDefsSources.SourceRatio>(CellAnimationKnobs.DEFAULT_SOURCE_RATIO);
@@ -43,10 +45,17 @@ const src = computed(() => SVGDefsSources.computePatternSource(key.value, size.v
 </script>
 
 <template>
-    <div :class="styles.exampleRoot">
+    <div :class="styles.stack">
         <PageMeasureBox :width="computeContainerWidth(size)">
-            <DefaultExample v-bind="sharedProps" v-model:playback="playback" :src="src" />
+            <DefaultExample v-bind="sharedProps" v-model:playback="playback" v-model:progress="progress" :src="src" />
         </PageMeasureBox>
+
+        <PagePlaybackScrubber
+            id="cellAnimationPattern"
+            v-model:playback="playback"
+            v-model:progress="progress"
+            ariaLabel="Position in the pass"
+        />
     </div>
 
     <PageExampleKnobs>

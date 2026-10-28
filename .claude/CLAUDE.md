@@ -276,6 +276,9 @@ This file, the rules and `decisions.md` are written for Claude; `backlog.md` and
   short; check them before an architectural call.
 - **`decisions.md`** — the same at the local level: why one control, abstract or corner of the repo is the way it is.
   The record of arguments already had, and where `backlog.md` items point for reasoning. Most new writing lands here.
+  **It never restates a value the code shows** — a default, a constant, a limit — the user's correction, after a
+  copied cell size had already drifted from the code. Name where the value lives and say only what the code cannot:
+  that it was a guess, whose call it is, why it is that.
 - **`backlog.md`** — outstanding work, numbered contiguously from 1. **It holds work items — planned, deferred or
   rejected — and never a description of how something behaves.** The user's correction, after an item was drafted
   that only wrote down a behavior and left the fixable half of it unfixed: a behavior worth recording is either

@@ -43,15 +43,10 @@ export type BaseParticleDissolveValues = {
      */
     featherShare?: number;
     /**
-     * The chance, `0`–`1`, that a particle is released. Each one a grid square can release is rolled on its own, so at
-     * `1` every one is, and a lower number thins the ash out.
+     * The chance, `0`–`1`, that a grid square of painted content releases its particle. Each square is rolled on its
+     * own, so at `1` every one does, and a lower number thins the ash out.
      */
     spawnChance?: number;
-    /**
-     * How many particles one grid square of painted content can release, a whole number from `1` to `8`. Each lifts off
-     * from its own painted point in the square, so a higher number makes denser ash without a finer grid.
-     */
-    particlesPerCell?: number;
     /** The side of one square of the grid particles are released from, in pixels. A smaller square means finer ash. */
     cellSize?: number;
 };

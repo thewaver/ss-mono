@@ -112,6 +112,8 @@ const ImageExampleWrapper = (
 };
 
 const GradientExampleWrapper = (props: CellAnimationExampleProps) => {
+    const playback = useState(true);
+    const progress = useState(0);
     const [key, setKey] = useState<SVGDefsSamples.Gradient.Timed.SampleKey>(CellAnimationKnobs.STARTING_GRADIENT_KEY);
     const [ratio, setRatio] = useState<SVGDefsSources.SourceRatio>(CellAnimationKnobs.DEFAULT_SOURCE_RATIO);
 
@@ -129,10 +131,17 @@ const GradientExampleWrapper = (props: CellAnimationExampleProps) => {
 
     return (
         <>
-            <div className={styles.exampleRoot}>
+            <div className={styles.stack}>
                 <PageMeasureBox width={computeContainerWidth(size)}>
-                    <DefaultExample {...props} src={src} />
+                    <DefaultExample {...props} playback={playback} progress={progress} src={src} />
                 </PageMeasureBox>
+
+                <PagePlaybackScrubber
+                    id={"cellAnimationGradient"}
+                    ariaLabel={"Position in the pass"}
+                    playback={playback}
+                    progress={progress}
+                />
             </div>
 
             <PageExampleKnobs>
@@ -171,6 +180,8 @@ const GradientExampleWrapper = (props: CellAnimationExampleProps) => {
 };
 
 const PatternExampleWrapper = (props: CellAnimationExampleProps) => {
+    const playback = useState(true);
+    const progress = useState(0);
     const [key, setKey] = useState<SVGDefsSamples.Pattern.Timed.SampleKey>(CellAnimationKnobs.STARTING_PATTERN_KEY);
     const [ratio, setRatio] = useState<SVGDefsSources.SourceRatio>(CellAnimationKnobs.DEFAULT_SOURCE_RATIO);
 
@@ -188,10 +199,17 @@ const PatternExampleWrapper = (props: CellAnimationExampleProps) => {
 
     return (
         <>
-            <div className={styles.exampleRoot}>
+            <div className={styles.stack}>
                 <PageMeasureBox width={computeContainerWidth(size)}>
-                    <DefaultExample {...props} src={src} />
+                    <DefaultExample {...props} playback={playback} progress={progress} src={src} />
                 </PageMeasureBox>
+
+                <PagePlaybackScrubber
+                    id={"cellAnimationPattern"}
+                    ariaLabel={"Position in the pass"}
+                    playback={playback}
+                    progress={progress}
+                />
             </div>
 
             <PageExampleKnobs>

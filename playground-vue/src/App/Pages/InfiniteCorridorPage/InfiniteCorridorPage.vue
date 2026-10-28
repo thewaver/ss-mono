@@ -28,9 +28,9 @@ import PageProp from "../../PageComponents/Prop/Prop.vue";
 import PagePropsDivider from "../../PageComponents/PropsPanel/PagePropsDivider.vue";
 import PagePropsGroups from "../../PageComponents/PropsPanel/PagePropsGroups.vue";
 import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
-import ClockExample from "./Examples/Clock.vue";
-import ScrolledExample from "./Examples/Scrolled.vue";
+import ClockExampleWrapper from "./ClockExampleWrapper.vue";
 import type { InfiniteCorridorExampleProps } from "./InfiniteCorridorPageVue.types";
+import ScrolledExampleWrapper from "./ScrolledExampleWrapper.vue";
 
 const layoutKey = shallowRef<CorridorLayouts.SampleKey>(InfiniteCorridorKnobs.STARTING_LAYOUT);
 const itemCount = shallowRef(InfiniteCorridorKnobs.STARTING_ITEM_COUNT);
@@ -55,7 +55,6 @@ const items = computed(() => Array.from({ length: itemCount.value }, (_, index) 
 const commonProps = computed<InfiniteCorridorExampleProps>(() => ({
     items: items.value,
     glideDurationMs: glideDurationMs.value,
-    startingLapMs: InfiniteCorridorKnobs.STARTING_LAP_MS_BY_FAMILY[family.value],
     spinDegreesPerSecond: family.value === "tube" ? spinDegreesPerSecond.value : 0,
     toLayout,
 }));
@@ -165,11 +164,14 @@ const examples: ExampleDefs[] = [
 
     <PageExamples :items="examples">
         <template #scrolled>
-            <ScrolledExample v-bind="commonProps" />
+            <ScrolledExampleWrapper v-bind="commonProps" />
         </template>
 
         <template #clock>
-            <ClockExample v-bind="commonProps" />
+            <ClockExampleWrapper
+                v-bind="commonProps"
+                :starting-lap-ms="InfiniteCorridorKnobs.STARTING_LAP_MS_BY_FAMILY[family]"
+            />
         </template>
     </PageExamples>
 </template>

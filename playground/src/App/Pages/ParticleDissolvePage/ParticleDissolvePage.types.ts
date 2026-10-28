@@ -5,7 +5,6 @@ export type BaseParticleDissolveExampleValues = {
     particleLifetimeMs: number;
     featherShare: number;
     spawnChance: number;
-    particlesPerCell: number;
     cellSize: number;
 };
 

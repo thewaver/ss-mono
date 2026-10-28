@@ -21,5 +21,6 @@ export type BracketExampleProps = AccessorProps<{
 export type BracketFamilyExampleProps = BracketExampleProps &
     AccessorProps<{
         transitionDurationMs: number;
+        isSnappingToFamily: boolean;
         onFamilyChange: (family: string) => void;
     }>;

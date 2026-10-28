@@ -17,6 +17,7 @@ import {
     toRoomName,
 } from "@thewaver/ss-playground/App/Pages/InfiniteCorridorPage/InfiniteCorridorPage.const";
 
+import { PageExampleKnobs } from "../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";
 import { PageKnobs } from "../../PageComponents/Knobs/Knobs";
@@ -26,6 +27,75 @@ import { PagePropsDivider, PagePropsGroups, PagePropsPanel } from "../../PageCom
 import { ClockExample } from "./Examples/Clock";
 import { ScrolledExample } from "./Examples/Scrolled";
 import type { InfiniteCorridorExampleProps } from "./InfiniteCorridorPageReact.types";
+
+const ScrolledExampleWrapper = (props: InfiniteCorridorExampleProps) => {
+    const [scrollLength, setScrollLength] = useState(InfiniteCorridorKnobs.STARTING_SCROLL_LENGTH);
+
+    return (
+        <>
+            <ScrolledExample {...props} scrollLength={scrollLength} />
+
+            <PageExampleKnobs>
+                <PageProp
+                    itemKey={"scrollLength"}
+                    label={"Scroll length"}
+                    hint={
+                        "How far the box scrolls to walk one lap of the corridor, in heights of the box. Longer is slower."
+                    }
+                    controls={"Sets how long the example scroll runway that drives InfiniteCorridorProps.progress is"}
+                >
+                    <PageNumberField
+                        value={scrollLength}
+                        min={InfiniteCorridorKnobs.MIN_SCROLL_LENGTH}
+                        max={InfiniteCorridorKnobs.MAX_SCROLL_LENGTH}
+                        step={InfiniteCorridorKnobs.SCROLL_LENGTH_STEP}
+                        width={FIELD_WIDTH}
+                        ariaLabel={"Scroll length in box heights"}
+                        onInput={setScrollLength}
+                    />
+                </PageProp>
+            </PageExampleKnobs>
+        </>
+    );
+};
+
+const ClockExampleWrapper = (props: InfiniteCorridorExampleProps & { startingLapMs: number }) => {
+    const [lapMs, setLapMs] = useState(props.startingLapMs);
+    const [followedStartingLapMs, setFollowedStartingLapMs] = useState(props.startingLapMs);
+
+    if (props.startingLapMs !== followedStartingLapMs) {
+        setFollowedStartingLapMs(props.startingLapMs);
+        setLapMs(props.startingLapMs);
+    }
+
+    return (
+        <>
+            <ClockExample {...props} lapMs={lapMs} />
+
+            <PageExampleKnobs>
+                <PageProp
+                    itemKey={"lapMs"}
+                    label={"Lap (ms)"}
+                    hint={
+                        "How long the clock takes to walk the whole corridor once, past every room and back to the first."
+                    }
+                    controls={"Sets how fast the example clock advances InfiniteCorridorProps.progress"}
+                >
+                    <PageNumberField
+                        value={lapMs}
+                        resetValue={props.startingLapMs}
+                        min={InfiniteCorridorKnobs.MIN_LAP_MS}
+                        max={InfiniteCorridorKnobs.MAX_LAP_MS}
+                        step={InfiniteCorridorKnobs.LAP_STEP_MS}
+                        width={FIELD_WIDTH}
+                        ariaLabel={"Lap duration in milliseconds"}
+                        onInput={setLapMs}
+                    />
+                </PageProp>
+            </PageExampleKnobs>
+        </>
+    );
+};
 
 const NO_DEFS: Record<string, number | boolean> = {};
 
@@ -58,7 +128,6 @@ export const InfiniteCorridorPage = () => {
     const commonProps: InfiniteCorridorExampleProps = {
         items,
         glideDurationMs,
-        startingLapMs: InfiniteCorridorKnobs.STARTING_LAP_MS_BY_FAMILY[family],
         spinDegreesPerSecond: family === "tube" ? spinDegreesPerSecond : 0,
         toLayout,
     };
@@ -69,7 +138,7 @@ export const InfiniteCorridorPage = () => {
             name: EXAMPLE_NAMES.scrolled,
             readout: () =>
                 "scrolling the box walks the corridor one lap from top to bottom — Tab to a room out of view and the corridor brings it in, scrolling the box there",
-            component: () => <ScrolledExample {...commonProps} />,
+            component: () => <ScrolledExampleWrapper {...commonProps} />,
             path: `${EXAMPLES_ROOT}/Scrolled.tsx`,
         },
         {
@@ -77,7 +146,12 @@ export const InfiniteCorridorPage = () => {
             name: EXAMPLE_NAMES.clock,
             readout: () =>
                 "the progress is advanced on every frame, so the corridor walks by itself until paused — it starts paused when the visitor has asked for reduced motion",
-            component: () => <ClockExample {...commonProps} />,
+            component: () => (
+                <ClockExampleWrapper
+                    {...commonProps}
+                    startingLapMs={InfiniteCorridorKnobs.STARTING_LAP_MS_BY_FAMILY[family]}
+                />
+            ),
             path: `${EXAMPLES_ROOT}/Clock.tsx`,
         },
     ];

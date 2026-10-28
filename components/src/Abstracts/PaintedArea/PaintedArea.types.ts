@@ -15,8 +15,9 @@ export type PaintedRegion = {
      */
     getIsInside?: (point: Point2d) => boolean;
     /**
-     * The color painted at a point inside the box, for a picture, whose color changes from point to point and which may
-     * be transparent in places. `undefined` for a point nothing is painted at. Left out, the region is one flat `color`.
+     * The color painted at a point inside the box, for a region whose color changes from point to point: a picture,
+     * which may be transparent in places, or an SVG shape whose stroke paints over its fill in another color.
+     * `undefined` for a point nothing is painted at. Left out, the region is one flat `color`.
      */
     getColorAt?: (point: Point2d) => string | undefined;
 };

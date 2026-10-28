@@ -10,8 +10,3 @@ export const particleDissolveParticles = style({
     inset: 0,
     pointerEvents: "none",
 });
-
-export const particleDissolveParticleLayer = style({
-    position: "absolute",
-    inset: 0,
-});

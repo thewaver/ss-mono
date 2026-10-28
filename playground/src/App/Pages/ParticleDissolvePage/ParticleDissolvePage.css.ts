@@ -49,13 +49,21 @@ export const ashParticle = style({
 export const svgShape = style({
     display: "block",
     overflow: "visible",
+    color: themeVars.color.primary.main,
 });
 
 export const svgShapePath = style({
-    fill: themeVars.color.primary.light,
-    stroke: themeVars.color.primary.dark,
+    fill: themeVars.color.primary.contrast,
+    stroke: themeVars.color.primary.main,
     strokeWidth: 4,
     strokeLinejoin: "round",
+});
+
+export const svgShapeText = style({
+    fill: "currentColor",
+    fontWeight: "bold",
+    dominantBaseline: "middle",
+    textAnchor: "middle",
 });
 
 export const image = style({

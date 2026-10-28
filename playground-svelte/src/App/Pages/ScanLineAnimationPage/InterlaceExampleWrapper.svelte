@@ -1,4 +1,5 @@
 <script lang="ts">
+    import * as styles from "@thewaver/ss-playground/App/Pages/ScanLineAnimationPage/ScanlineAnimationPage.css";
     import { ScanlineAnimationKeyframes } from "@thewaver/ss-components-svelte";
     import type { CellAnimationBreakpointOpts, _ScanlineHorizontalInterlaceOpts } from "@thewaver/ss-components-svelte";
     import { ScanlineAnimationKnobs } from "@thewaver/ss-playground/App/Knobs/ScanlineAnimations.const";
@@ -8,6 +9,7 @@
     import PageKnobs from "../../PageComponents/Knobs/Knobs.svelte";
     import type { Knob } from "../../PageComponents/Knobs/Knobs.types";
     import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.svelte";
+    import PagePlaybackScrubber from "../../PageComponents/PlaybackScrubber/PlaybackScrubber.svelte";
     import DirInput from "./DirInput.svelte";
     import InterlaceExample from "./Examples/_Interlace.svelte";
     import type { ScanlineAnimationExampleProps } from "./ScanlineAnimationPage.types";
@@ -16,7 +18,10 @@
         IMAGE_CONTAINER_SIZE,
     } from "@thewaver/ss-playground/App/Pages/ScanLineAnimationPage/ScanLineAnimationPage.const";
 
-    let { playback = $bindable(), ...props }: ScanlineAnimationExampleProps = $props();
+    let props: Omit<ScanlineAnimationExampleProps, "playback"> = $props();
+
+    let playback = $state(true);
+    let progress = $state(0);
 
     let keyframeOpts = $state.raw<Record<string, number | boolean>>({});
     let breakpointOpts = $state.raw<CellAnimationBreakpointOpts>({
@@ -24,14 +29,18 @@
     });
 </script>
 
-<PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
-    <InterlaceExample
-        {...props}
-        bind:playback
-        keyframeOpts={keyframeOpts as _ScanlineHorizontalInterlaceOpts}
-        {breakpointOpts}
-    />
-</PageMeasureBox>
+<div class={styles.stack}>
+    <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
+        <InterlaceExample
+            {...props}
+            bind:playback bind:progress
+            keyframeOpts={keyframeOpts as _ScanlineHorizontalInterlaceOpts}
+            {breakpointOpts}
+        />
+    </PageMeasureBox>
+
+    <PagePlaybackScrubber id={"scanlineInterlace"} ariaLabel={"Position in the pass"} bind:playback bind:progress />
+</div>
 
 <PageExampleKnobs>
     <PageKnobs

@@ -17,7 +17,7 @@
         keyframeOpts: _ScanlineHorizontalSkewOpts;
     };
 
-    let { playback = $bindable(), keyframeOpts, breakpointOpts, weightType, ...otherProps }: Props = $props();
+    let { playback = $bindable(), progress = $bindable(0), keyframeOpts, breakpointOpts, weightType, ...otherProps }: Props = $props();
 
     const computeCellWeights = (count: Index2d) =>
         CellAnimationWeights.computeCellWeights(weightType, count, WEIGHT_ORIGIN);
@@ -26,6 +26,7 @@
 <ScanlineAnimation
     {...otherProps}
     bind:playback
+    bind:progress
     {computeCellWeights}
     computeScanlineAnimation={(defs, timeline) =>
         ScanlineAnimationKeyframes._computeHorizontalSkew(

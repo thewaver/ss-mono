@@ -8,4 +8,5 @@ export type ScanlineAnimationExampleProps = {
     animationDurationMs: number;
     animationIterationDelayMs: number;
     playback: readonly [boolean, (isPlaying: boolean) => void];
+    progress?: readonly [number, (progress: number) => void];
 };

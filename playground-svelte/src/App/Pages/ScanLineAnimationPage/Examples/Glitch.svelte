@@ -50,7 +50,7 @@
         keyframeOpts: { count: number; shiftPercent: number; chunkyness: number };
     };
 
-    let { playback = $bindable(), keyframeOpts, weightType, ...otherProps }: Props = $props();
+    let { playback = $bindable(), progress = $bindable(0), keyframeOpts, weightType, ...otherProps }: Props = $props();
 
     const breakpointGroups = $derived.by(() => {
         const count = keyframeOpts.count;
@@ -76,6 +76,7 @@
 <ScanlineAnimation
     {...otherProps}
     bind:playback
+    bind:progress
     {computeCellWeights}
     computeRootAnimation={(timeline) => {
         for (let g = 0; g < breakpointGroups.length; g++) {

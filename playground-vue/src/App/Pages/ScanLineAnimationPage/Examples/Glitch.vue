@@ -46,6 +46,7 @@ type Props = ScanlineAnimationExampleProps & {
 const props = defineProps<Props>();
 
 const playback = useModel(props, "playback");
+const progress = useModel(props, "progress");
 
 const breakpointGroups = computed(() => {
     const count = props.keyframeOpts.count;
@@ -112,6 +113,7 @@ const computeScanlineAnimation = (defs: ScanlineAnimationEvaluationDefs, timelin
 <template>
     <ScanlineAnimation
         v-model:playback="playback"
+        v-model:progress="progress"
         :src="src"
         :line-count="lineCount"
         :orientation="orientation"

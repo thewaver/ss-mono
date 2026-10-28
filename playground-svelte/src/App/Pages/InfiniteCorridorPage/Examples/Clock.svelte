@@ -3,22 +3,16 @@
         Button,
         InfiniteCorridor,
         MediaQueryMonitorSvelteUtils,
-        watchChange,
     } from "@thewaver/ss-components-svelte";
-    import { InfiniteCorridorKnobs } from "@thewaver/ss-playground/App/Knobs/InfiniteCorridors.const";
-    import { FIELD_WIDTH } from "@thewaver/ss-playground/App/Pages/InfiniteCorridorPage/InfiniteCorridorPage.const";
     import * as styles from "@thewaver/ss-playground/App/Pages/InfiniteCorridorPage/InfiniteCorridorPage.css";
     import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
-    import PageExampleKnobs from "../../../PageComponents/ExampleKnobs/PageExampleKnobs.svelte";
-    import PageNumberField from "../../../PageComponents/Field/PageNumberField.svelte";
-    import PageProp from "../../../PageComponents/Prop/Prop.svelte";
     import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
     import { createSpinDegrees } from "../InfiniteCorridorPage.utils.svelte";
-    import type { InfiniteCorridorExampleProps } from "../InfiniteCorridorPageSvelte.types";
+    import type { InfiniteCorridorClockExampleProps } from "../InfiniteCorridorPageSvelte.types";
     import Room from "./Room.svelte";
 
-    type Props = InfiniteCorridorExampleProps;
+    type Props = InfiniteCorridorClockExampleProps;
 
     let props: Props = $props();
 
@@ -26,19 +20,11 @@
 
     let progress = $state(0);
     let isWalking = $state(!getPrefersReducedMotion());
-    let lapMs = $state(props.startingLapMs);
-
-    watchChange(
-        () => props.startingLapMs,
-        (next) => {
-            lapMs = next;
-        },
-    );
 
     $effect(() => {
         if (!isWalking) return;
 
-        const lap = lapMs;
+        const lap = props.lapMs;
 
         let frameId: number;
         let lastMs = performance.now();
@@ -91,25 +77,3 @@
         {/snippet}
     </Button>
 </div>
-
-<PageExampleKnobs>
-    <PageProp
-        itemKey={"lapMs"}
-        controls={"Sets how fast the example clock advances InfiniteCorridorProps.progress"}
-        label={"Lap (ms)"}
-        hint={"How long the clock takes to walk the whole corridor once, past every room and back to the first."}
-    >
-        <PageNumberField
-            value={lapMs}
-            resetValue={props.startingLapMs}
-            min={InfiniteCorridorKnobs.MIN_LAP_MS}
-            max={InfiniteCorridorKnobs.MAX_LAP_MS}
-            step={InfiniteCorridorKnobs.LAP_STEP_MS}
-            width={FIELD_WIDTH}
-            ariaLabel={"Lap duration in milliseconds"}
-            onInput={(value) => {
-                lapMs = value;
-            }}
-        />
-    </PageProp>
-</PageExampleKnobs>

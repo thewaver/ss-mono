@@ -1,9 +1,11 @@
 <script lang="ts">
+    import * as styles from "@thewaver/ss-playground/App/Pages/ScanLineAnimationPage/ScanlineAnimationPage.css";
     import { ScanlineAnimationKnobs } from "@thewaver/ss-playground/App/Knobs/ScanlineAnimations.const";
 
     import PageExampleKnobs from "../../PageComponents/ExampleKnobs/PageExampleKnobs.svelte";
     import PageNumberField from "../../PageComponents/Field/PageNumberField.svelte";
     import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.svelte";
+    import PagePlaybackScrubber from "../../PageComponents/PlaybackScrubber/PlaybackScrubber.svelte";
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
     import GlitchExample from "./Examples/Glitch.svelte";
     import type { ScanlineAnimationExampleProps } from "./ScanlineAnimationPage.types";
@@ -11,14 +13,21 @@
         IMAGE_CONTAINER_SIZE,
     } from "@thewaver/ss-playground/App/Pages/ScanLineAnimationPage/ScanLineAnimationPage.const";
 
-    let { playback = $bindable(), ...props }: ScanlineAnimationExampleProps = $props();
+    let props: Omit<ScanlineAnimationExampleProps, "playback"> = $props();
+
+    let playback = $state(true);
+    let progress = $state(0);
 
     let keyframeOpts = $state.raw({ ...ScanlineAnimationKnobs.STARTING_GLITCH_OPTS });
 </script>
 
-<PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
-    <GlitchExample {...props} bind:playback {keyframeOpts} />
-</PageMeasureBox>
+<div class={styles.stack}>
+    <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
+        <GlitchExample {...props} bind:playback bind:progress {keyframeOpts} />
+    </PageMeasureBox>
+
+    <PagePlaybackScrubber id={"scanlineGlitch"} ariaLabel={"Position in the pass"} bind:playback bind:progress />
+</div>
 
 <PageExampleKnobs>
     <PageProp itemKey={"count"} controls={"Sets the number of glitch bursts in the example's ScanlineAnimationProps.computeScanlineAnimation"} label={"Count"} hint={"How many glitch bursts happen over one pass."}>

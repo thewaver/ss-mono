@@ -1,4 +1,4 @@
-import { type RefObject, useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import {
     PARTICLE_DISSOLVE_DEFAULTS,
@@ -26,84 +26,13 @@ const ignoreWrite = () => undefined;
 
 const getCellKey = (cell: ParticleFieldCellDefs) => Index2dUtils.toFlatIndex(cell.pos, cell.count.col);
 
-type ParticleDissolveLayerProps = Pick<ParticleDissolveProps, "computeParticleAnimation" | "renderParticle"> & {
-    regionsRef: RefObject<PaintedRegion[]>;
-    layers: Set<Map<number, PaintedSample>>;
-    cellCount: Index2d;
-    spawnChance: number;
-    durationMs: number;
-    lifetimeMs: number;
-    progress: number;
-    computeCellWeights: (count: Index2d) => number[][];
-};
-
-const ParticleDissolveLayer = (props: ParticleDissolveLayerProps) => {
-    const [samples] = useState(() => new Map<number, PaintedSample>());
-
-    const latest = useLatest(props);
-
-    useLayoutEffect(() => {
-        props.layers.add(samples);
-
-        return () => {
-            props.layers.delete(samples);
-        };
-    }, [props.layers, samples]);
-
-    const computeParticlePos = (cell: ParticleFieldCellDefs) => {
-        const key = getCellKey(cell);
-        const painted = PaintedAreaUtils.computeSamples(latest.current.regionsRef.current, cell.rect);
-        const sample = painted[Math.floor(Math.random() * painted.length)];
-
-        if (!sample) {
-            samples.delete(key);
-
-            return RectUtils.getCenter(cell.rect);
-        }
-
-        samples.set(key, sample);
-
-        return sample.pos;
-    };
-
-    const computeParticleAnimation = (cell: ParticleFieldCellDefs, t: number) =>
-        latest.current.computeParticleAnimation?.(
-            { cell, color: samples.get(getCellKey(cell))?.color ?? NO_COLOR },
-            t,
-        ) ?? NO_ANIMATION;
-
-    const renderParticle = (cell: ParticleFieldCellDefs, t: number) => {
-        const sample = samples.get(getCellKey(cell));
-
-        return sample ? props.renderParticle({ cell, color: sample.color }, t) : undefined;
-    };
-
-    return (
-        <div className={styles.particleDissolveParticleLayer}>
-            <ParticleField
-                cellCount={props.cellCount}
-                spawnChance={props.spawnChance}
-                animationDurationMs={props.durationMs}
-                animationIterationCount={SINGLE_PASS}
-                particleLifetimeMs={props.lifetimeMs}
-                playback={NEVER_PLAYING}
-                progress={[props.progress, ignoreWrite]}
-                computeCellWeights={props.computeCellWeights}
-                computeParticlePos={computeParticlePos}
-                computeParticleAnimation={computeParticleAnimation}
-                renderParticle={renderParticle}
-            />
-        </div>
-    );
-};
-
 export const ParticleDissolve = (props: ParticleDissolveProps) => {
     const rootRef = useRef<HTMLDivElement | null>(null);
     const contentRef = useRef<HTMLDivElement | null>(null);
     const regionsRef = useRef<PaintedRegion[]>([]);
 
     const [progress, setProgressState] = useState(props.isDissolved ? 1 : 0);
-    const [layers] = useState(() => new Set<Map<number, PaintedSample>>());
+    const [samples] = useState(() => new Map<number, PaintedSample>());
 
     const progressRef = useRef(progress);
 
@@ -148,18 +77,37 @@ export const ParticleDissolve = (props: ParticleDissolveProps) => {
               size,
           );
 
-    const layerIndexes = Array.from(
-        {
-            length: ParticleDissolveUtils.computeParticlesPerCell(
-                props.particlesPerCell ?? PARTICLE_DISSOLVE_DEFAULTS.particlesPerCell,
-            ),
-        },
-        (_, index) => index,
-    );
-
     const hasParticles = !prefersReducedMotion && progress > 0 && progress < 1;
 
     const latest = useLatest({ props, durationMs, prefersReducedMotion, setProgress });
+
+    const computeParticlePos = (cell: ParticleFieldCellDefs) => {
+        const key = getCellKey(cell);
+        const painted = PaintedAreaUtils.computeSamples(regionsRef.current, cell.rect);
+        const sample = painted[Math.floor(Math.random() * painted.length)];
+
+        if (!sample) {
+            samples.delete(key);
+
+            return RectUtils.getCenter(cell.rect);
+        }
+
+        samples.set(key, sample);
+
+        return sample.pos;
+    };
+
+    const computeParticleAnimation = (cell: ParticleFieldCellDefs, t: number) =>
+        latest.current.props.computeParticleAnimation?.(
+            { cell, color: samples.get(getCellKey(cell))?.color ?? NO_COLOR },
+            t,
+        ) ?? NO_ANIMATION;
+
+    const renderParticle = (cell: ParticleFieldCellDefs, t: number) => {
+        const sample = samples.get(getCellKey(cell));
+
+        return sample ? props.renderParticle({ cell, color: sample.color }, t) : undefined;
+    };
 
     useLayoutEffect(() => {
         const isDissolved = latest.current.props.isDissolved;
@@ -170,7 +118,7 @@ export const ParticleDissolve = (props: ParticleDissolveProps) => {
 
         regionsRef.current = contentRef.current ? PaintedAreaUtils.measure(contentRef.current) : [];
 
-        for (const samples of layers) samples.clear();
+        samples.clear();
 
         return ParticleDissolveUtils.run({
             from,
@@ -182,7 +130,7 @@ export const ParticleDissolve = (props: ParticleDissolveProps) => {
             onProgress: (value) => latest.current.setProgress(value),
             onEnd: () => (isDissolved ? latest.current.props.onDissolveEnd : latest.current.props.onRebuildEnd)?.(),
         });
-    }, [props.isDissolved, layers]);
+    }, [props.isDissolved, samples]);
 
     return (
         <div ref={rootRef} className={styles.particleDissolveRoot}>
@@ -200,21 +148,19 @@ export const ParticleDissolve = (props: ParticleDissolveProps) => {
 
             {hasParticles && (
                 <div className={styles.particleDissolveParticles} aria-hidden="true">
-                    {layerIndexes.map((index) => (
-                        <ParticleDissolveLayer
-                            key={index}
-                            regionsRef={regionsRef}
-                            layers={layers}
-                            cellCount={cellCount}
-                            spawnChance={props.spawnChance ?? PARTICLE_DISSOLVE_DEFAULTS.spawnChance}
-                            durationMs={durationMs}
-                            lifetimeMs={lifetimeShare * durationMs}
-                            progress={progress}
-                            computeCellWeights={computeCellWeights}
-                            computeParticleAnimation={props.computeParticleAnimation}
-                            renderParticle={props.renderParticle}
-                        />
-                    ))}
+                    <ParticleField
+                        cellCount={cellCount}
+                        spawnChance={props.spawnChance ?? PARTICLE_DISSOLVE_DEFAULTS.spawnChance}
+                        animationDurationMs={durationMs}
+                        animationIterationCount={SINGLE_PASS}
+                        particleLifetimeMs={lifetimeShare * durationMs}
+                        playback={NEVER_PLAYING}
+                        progress={[progress, ignoreWrite]}
+                        computeCellWeights={computeCellWeights}
+                        computeParticlePos={computeParticlePos}
+                        computeParticleAnimation={computeParticleAnimation}
+                        renderParticle={renderParticle}
+                    />
                 </div>
             )}
         </div>

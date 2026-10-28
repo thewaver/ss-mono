@@ -10,15 +10,6 @@ export const root = style({
     gap: themeVars.spacing.quad,
 });
 
-export const exampleRoot = style({
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "start",
-    alignItems: "start",
-    flexWrap: "wrap",
-    gap: themeVars.spacing.double,
-});
-
 export const valueList = style({
     display: "grid",
     gridTemplateColumns: "repeat(2, 1fr)",

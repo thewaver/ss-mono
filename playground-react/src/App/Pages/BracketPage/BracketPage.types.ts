@@ -18,5 +18,6 @@ export type BracketExampleProps = {
 
 export type BracketFamilyExampleProps = BracketExampleProps & {
     transitionDurationMs: number;
+    isSnappingToFamily: boolean;
     onFamilyChange: (family: string) => void;
 };

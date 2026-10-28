@@ -912,6 +912,30 @@ const readBoardTransform = (page: Page) =>
             return getComputedStyle(board).transform;
         });
 
+/**
+ * The board's transform once it has stopped moving: a glide that has drawn the right nodes into view can still be
+ * easing its last fraction of a pixel, so a reading taken then is not where the board rests.
+ */
+const readRestingBoardTransform = async (page: Page) => {
+    let previous = await readBoardTransform(page);
+
+    await expect
+        .poll(
+            async () => {
+                const current = await readBoardTransform(page);
+                const isStill = current === previous;
+
+                previous = current;
+
+                return isStill;
+            },
+            { message: "the board has stopped moving" },
+        )
+        .toBe(true);
+
+    return previous;
+};
+
 test("dragging the window towards the final carries the family with it, and letting go frames the final's", async ({
     page,
 }) => {
@@ -936,7 +960,7 @@ test("zoomed out, no round is lit and the draw cannot be dragged off center", as
     await expect.poll(() => framedNodes(page), { message: "the whole draw" }).toEqual([...ALL_NODES].sort());
     await expect.poll(() => litRound(page), { message: "no round stands out" }).toBeUndefined();
 
-    const resting = await readBoardTransform(page);
+    const resting = await readRestingBoardTransform(page);
 
     await dragFrame(page, 200, 60);
     await page.waitForTimeout(SETTLE_MS);

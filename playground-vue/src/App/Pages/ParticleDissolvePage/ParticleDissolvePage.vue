@@ -24,7 +24,6 @@ const durationMs = shallowRef(PARTICLE_DISSOLVE_DEFAULTS.durationMs);
 const particleLifetimeMs = shallowRef(PARTICLE_DISSOLVE_DEFAULTS.particleLifetimeMs);
 const featherShare = shallowRef(PARTICLE_DISSOLVE_DEFAULTS.featherShare);
 const spawnChance = shallowRef(PARTICLE_DISSOLVE_DEFAULTS.spawnChance);
-const particlesPerCell = shallowRef(PARTICLE_DISSOLVE_DEFAULTS.particlesPerCell);
 const cellSize = shallowRef(PARTICLE_DISSOLVE_DEFAULTS.cellSize);
 
 const commonProps = computed<ParticleDissolveExampleProps>(() => ({
@@ -32,7 +31,6 @@ const commonProps = computed<ParticleDissolveExampleProps>(() => ({
     particleLifetimeMs: particleLifetimeMs.value,
     featherShare: featherShare.value,
     spawnChance: spawnChance.value,
-    particlesPerCell: particlesPerCell.value,
     cellSize: cellSize.value,
 }));
 
@@ -134,23 +132,6 @@ const examples: ExampleDefs[] = [
                 :width="FIELD_WIDTH"
                 ariaLabel="Spawn chance"
                 @input="(value: number) => (spawnChance = value)"
-            />
-        </PageProp>
-
-        <PageProp
-            item-key="particlesPerCell"
-            controls="Sets ParticleDissolveProps.particlesPerCell"
-            label="Particles per cell"
-            hint="How many particles one grid square of painted content can release. Each is rolled against the spawn chance on its own."
-        >
-            <PageNumberField
-                :value="particlesPerCell"
-                :min="ParticleDissolveKnobs.MIN_PARTICLES_PER_CELL"
-                :max="ParticleDissolveKnobs.MAX_PARTICLES_PER_CELL"
-                :step="ParticleDissolveKnobs.PARTICLES_PER_CELL_STEP"
-                :width="FIELD_WIDTH"
-                ariaLabel="Particles per cell"
-                @input="(value: number) => (particlesPerCell = value)"
             />
         </PageProp>
 

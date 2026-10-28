@@ -26,8 +26,8 @@
     import PagePropsDivider from "../../PageComponents/PropsPanel/PagePropsDivider.svelte";
     import PagePropsGroups from "../../PageComponents/PropsPanel/PagePropsGroups.svelte";
     import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
-    import ClockExample from "./Examples/Clock.svelte";
-    import ScrolledExample from "./Examples/Scrolled.svelte";
+    import ClockExampleWrapper from "./ClockExampleWrapper.svelte";
+    import ScrolledExampleWrapper from "./ScrolledExampleWrapper.svelte";
     import type { InfiniteCorridorExampleProps } from "./InfiniteCorridorPageSvelte.types";
 
     const NO_DEFS = {};
@@ -54,7 +54,6 @@
     const commonProps: InfiniteCorridorExampleProps = $derived({
         items,
         glideDurationMs,
-        startingLapMs: InfiniteCorridorKnobs.STARTING_LAP_MS_BY_FAMILY[family],
         spinDegreesPerSecond: family === "tube" ? spinDegreesPerSecond : 0,
         toLayout,
     });
@@ -80,11 +79,11 @@
 </script>
 
 {#snippet scrolledExample()}
-    <ScrolledExample {...commonProps} />
+    <ScrolledExampleWrapper {...commonProps} />
 {/snippet}
 
 {#snippet clockExample()}
-    <ClockExample {...commonProps} />
+    <ClockExampleWrapper {...commonProps} startingLapMs={InfiniteCorridorKnobs.STARTING_LAP_MS_BY_FAMILY[family]} />
 {/snippet}
 
 <PagePropsGroups>

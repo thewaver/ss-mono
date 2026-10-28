@@ -10,7 +10,7 @@ import {
     ParticleDissolveUtils,
     type ParticleFieldCellDefs,
 } from "@thewaver/ss-components";
-import { type CSSAnimationValues, type Index2d, Index2dUtils, type Point2d, RectUtils } from "@thewaver/ss-utils";
+import { type CSSAnimationValues, type Index2d, Index2dUtils, RectUtils } from "@thewaver/ss-utils";
 
 import { ElementObserverVueUtils } from "../../../Abstracts/ElementObserver/ElementObserverVue.utils";
 import { MediaQueryMonitorVueUtils } from "../../../Abstracts/MediaQueryMonitor/MediaQueryMonitorVue.utils";
@@ -24,13 +24,6 @@ import type { ParticleDissolveProps, ParticleDissolveSlots } from "./ParticleDis
 const NO_ANIMATION: CSSAnimationValues = {};
 const NO_COLOR = "";
 const SINGLE_PASS = 1;
-
-type ParticleDissolveLayer = {
-    samples: Map<number, PaintedSample>;
-    computeParticlePos: (cell: ParticleFieldCellDefs) => Point2d;
-    computeParticleAnimation: (cell: ParticleFieldCellDefs, t: number) => CSSAnimationValues;
-    renderParticle: ParticleFieldSlots["renderParticle"];
-};
 
 const getCellKey = (cell: ParticleFieldCellDefs) => Index2dUtils.toFlatIndex(cell.pos, cell.count.col);
 
@@ -77,49 +70,34 @@ export const ParticleDissolve = defineComponent(
 
         let regions: PaintedRegion[] = [];
 
-        const layers = new Map<number, ParticleDissolveLayer>();
+        const samples = new Map<number, PaintedSample>();
 
-        const getLayer = (index: number) => {
-            const existing = layers.get(index);
+        const computeParticlePos = (cell: ParticleFieldCellDefs) => {
+            const key = getCellKey(cell);
+            const painted = PaintedAreaUtils.computeSamples(regions, cell.rect);
+            const sample = painted[Math.floor(Math.random() * painted.length)];
 
-            if (existing) return existing;
+            if (!sample) {
+                samples.delete(key);
 
-            const samples = new Map<number, PaintedSample>();
+                return RectUtils.getCenter(cell.rect);
+            }
 
-            const layer: ParticleDissolveLayer = {
-                samples,
-                computeParticlePos: (cell) => {
-                    const key = getCellKey(cell);
-                    const painted = PaintedAreaUtils.computeSamples(regions, cell.rect);
-                    const sample = painted[Math.floor(Math.random() * painted.length)];
+            samples.set(key, sample);
 
-                    if (!sample) {
-                        samples.delete(key);
+            return sample.pos;
+        };
 
-                        return RectUtils.getCenter(cell.rect);
-                    }
+        const computeParticleAnimation = (cell: ParticleFieldCellDefs, t: number) =>
+            props.computeParticleAnimation?.({ cell, color: samples.get(getCellKey(cell))?.color ?? NO_COLOR }, t) ??
+            NO_ANIMATION;
 
-                    samples.set(key, sample);
+        const renderParticle: ParticleFieldSlots["renderParticle"] = ({ defs, t }) => {
+            const sample = samples.get(getCellKey(defs));
 
-                    return sample.pos;
-                },
-                computeParticleAnimation: (cell, t) =>
-                    props.computeParticleAnimation?.(
-                        { cell, color: samples.get(getCellKey(cell))?.color ?? NO_COLOR },
-                        t,
-                    ) ?? NO_ANIMATION,
-                renderParticle: ({ defs, t }) => {
-                    const sample = samples.get(getCellKey(defs));
-
-                    return sample
-                        ? callSlot(slots.renderParticle, { defs: { cell: defs, color: sample.color }, t })
-                        : undefined;
-                },
-            };
-
-            layers.set(index, layer);
-
-            return layer;
+            return sample
+                ? callSlot(slots.renderParticle, { defs: { cell: defs, color: sample.color }, t })
+                : undefined;
         };
 
         const computeCellWeights = (count: Index2d) =>
@@ -135,7 +113,7 @@ export const ParticleDissolve = defineComponent(
 
             regions = content ? PaintedAreaUtils.measure(content) : [];
 
-            for (const layer of layers.values()) layer.samples.clear();
+            samples.clear();
 
             return ParticleDissolveUtils.run({
                 from,
@@ -158,15 +136,6 @@ export const ParticleDissolve = defineComponent(
                       size.value,
                   );
 
-            const layerIndexes = Array.from(
-                {
-                    length: ParticleDissolveUtils.computeParticlesPerCell(
-                        props.particlesPerCell ?? PARTICLE_DISSOLVE_DEFAULTS.particlesPerCell,
-                    ),
-                },
-                (_, index) => index,
-            );
-
             return (
                 <div ref={rootRef} class={ParticleDissolveStyles.particleDissolveRoot}>
                     <div
@@ -183,33 +152,24 @@ export const ParticleDissolve = defineComponent(
 
                     {hasParticles.value && (
                         <div class={ParticleDissolveStyles.particleDissolveParticles} aria-hidden="true">
-                            {layerIndexes.map((index) => {
-                                const layer = getLayer(index);
-
-                                return (
-                                    <div key={index} class={ParticleDissolveStyles.particleDissolveParticleLayer}>
-                                        <ParticleField
-                                            {...{
-                                                "cellCount": cellCount.value,
-                                                "spawnChance":
-                                                    props.spawnChance ?? PARTICLE_DISSOLVE_DEFAULTS.spawnChance,
-                                                "animationDurationMs": getDurationMs(),
-                                                "animationIterationCount": SINGLE_PASS,
-                                                "particleLifetimeMs": lifetimeShare.value * getDurationMs(),
-                                                "playback": false,
-                                                "onUpdate:playback": ignoreWrite,
-                                                "progress": progress.value,
-                                                "onUpdate:progress": ignoreWrite,
-                                                "computeCellWeights": computeCellWeights,
-                                                "computeParticlePos": layer.computeParticlePos,
-                                                "computeParticleAnimation": layer.computeParticleAnimation,
-                                            }}
-                                        >
-                                            {{ renderParticle: layer.renderParticle } satisfies ParticleFieldSlots}
-                                        </ParticleField>
-                                    </div>
-                                );
-                            })}
+                            <ParticleField
+                                {...{
+                                    "cellCount": cellCount.value,
+                                    "spawnChance": props.spawnChance ?? PARTICLE_DISSOLVE_DEFAULTS.spawnChance,
+                                    "animationDurationMs": getDurationMs(),
+                                    "animationIterationCount": SINGLE_PASS,
+                                    "particleLifetimeMs": lifetimeShare.value * getDurationMs(),
+                                    "playback": false,
+                                    "onUpdate:playback": ignoreWrite,
+                                    "progress": progress.value,
+                                    "onUpdate:progress": ignoreWrite,
+                                    "computeCellWeights": computeCellWeights,
+                                    "computeParticlePos": computeParticlePos,
+                                    "computeParticleAnimation": computeParticleAnimation,
+                                }}
+                            >
+                                {{ renderParticle } satisfies ParticleFieldSlots}
+                            </ParticleField>
                         </div>
                     )}
                 </div>
@@ -227,7 +187,6 @@ export const ParticleDissolve = defineComponent(
             particleLifetimeMs: null,
             featherShare: null,
             spawnChance: null,
-            particlesPerCell: null,
             cellSize: null,
             computeParticleAnimation: null,
             onDissolveEnd: null,

@@ -4,6 +4,7 @@ export const particleSpawnerRoot = style({
     position: "relative",
     width: "100%",
     height: "100%",
+    contain: "size layout style",
 });
 
 export const particleSpawnerItem = style({

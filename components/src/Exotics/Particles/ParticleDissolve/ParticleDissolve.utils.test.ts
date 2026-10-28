@@ -142,16 +142,6 @@ describe("computeCellCount", () => {
     });
 });
 
-describe("computeParticlesPerCell", () => {
-    it("rounds to a whole number, with at least one and at most eight", () => {
-        expect(ParticleDissolveUtils.computeParticlesPerCell(3)).toBe(3);
-        expect(ParticleDissolveUtils.computeParticlesPerCell(2.6)).toBe(3);
-        expect(ParticleDissolveUtils.computeParticlesPerCell(0)).toBe(1);
-        expect(ParticleDissolveUtils.computeParticlesPerCell(-4)).toBe(1);
-        expect(ParticleDissolveUtils.computeParticlesPerCell(500)).toBe(8);
-    });
-});
-
 describe("computeDurationMs", () => {
     it("shortens the run for a reader who asked for reduced motion, and never lengthens it", () => {
         expect(ParticleDissolveUtils.computeDurationMs(1200, false)).toBe(1200);

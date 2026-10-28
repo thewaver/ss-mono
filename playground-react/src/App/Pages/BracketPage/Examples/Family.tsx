@@ -6,10 +6,7 @@ import { BracketKnobs } from "@thewaver/ss-playground/App/Knobs/Brackets.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/BracketPage/BracketPage.css";
 import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
-import { PageExampleKnobs } from "../../../PageComponents/ExampleKnobs/ExampleKnobs";
-import { PageCheckField } from "../../../PageComponents/Field/Field";
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
-import { PageProp } from "../../../PageComponents/Prop/Prop";
 import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import type { BracketFamilyExampleProps } from "../BracketPage.types";
 import {
@@ -39,7 +36,6 @@ type Props = BracketFamilyExampleProps;
 
 export const FamilyExample = (props: Props) => {
     const [family, setFamily] = useState<BracketNode<string>>();
-    const [isSnapping, setIsSnapping] = useState(BracketKnobs.STARTING_IS_SNAPPING_TO_FAMILY);
 
     const headerSize = props.orientation === "horizontal" ? ACROSS_HEADER_SIZE : DOWN_HEADER_SIZE;
 
@@ -89,7 +85,7 @@ export const FamilyExample = (props: Props) => {
                         family={[family, setFamily]}
                         view={[view, setView]}
                         isFollowingFamily={true}
-                        isSnappingToFamily={isSnapping}
+                        isSnappingToFamily={props.isSnappingToFamily}
                         familyMargin={BracketKnobs.FAMILY_MARGIN}
                         transitionDurationMs={props.transitionDurationMs}
                         layerGap={props.layerGap}
@@ -134,17 +130,6 @@ export const FamilyExample = (props: Props) => {
                     />
                 ))}
             </div>
-
-            <PageExampleKnobs>
-                <PageProp
-                    itemKey={"isSnappingToFamily"}
-                    label={"Snap to family"}
-                    hint={"Glides the window to frame the family in it once a drag, a pinch or the wheel is over."}
-                    controls={"Sets BracketProps.isSnappingToFamily"}
-                >
-                    <PageCheckField value={isSnapping} ariaLabel={"Snap to family"} onChange={setIsSnapping} />
-                </PageProp>
-            </PageExampleKnobs>
         </div>
     );
 };

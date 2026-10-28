@@ -262,8 +262,6 @@ export { default as DatePicker } from "./Essentials/Input/DatePicker/DatePicker.
 export type * from "./Essentials/Input/DatePicker/DatePicker.types.js";
 export { default as LightCatcher } from "./Exotics/PointerEffects/LightCatcher/LightCatcher.svelte";
 export type * from "./Exotics/PointerEffects/LightCatcher/LightCatcher.types.js";
-export { default as RGBSplitter } from "./Exotics/PointerEffects/RGBSplitter/RGBSplitter.svelte";
-export type * from "./Exotics/PointerEffects/RGBSplitter/RGBSplitter.types.js";
 export { default as ShadowCaster } from "./Exotics/PointerEffects/ShadowCaster/ShadowCaster.svelte";
 export type * from "./Exotics/PointerEffects/ShadowCaster/ShadowCaster.types.js";
 export { default as Tilter } from "./Exotics/PointerEffects/Tilter/Tilter.svelte";
@@ -326,6 +324,8 @@ export { default as CirclePacking } from "./Exotics/Charts/CirclePacking/CircleP
 export type * from "./Exotics/Charts/CirclePacking/CirclePacking.types.js";
 export { default as CellAnimation } from "./Exotics/Animations/CellAnimation/CellAnimation.svelte";
 export type * from "./Exotics/Animations/CellAnimation/CellAnimation.types.js";
+export { default as RGBAnimation } from "./Exotics/Animations/RGBAnimation/RGBAnimation.svelte";
+export type * from "./Exotics/Animations/RGBAnimation/RGBAnimation.types.js";
 export { default as ScanlineAnimation } from "./Exotics/Animations/ScanlineAnimation/ScanlineAnimation.svelte";
 export type * from "./Exotics/Animations/ScanlineAnimation/ScanlineAnimation.types.js";
 export { default as Satellite } from "./Exotics/Arrangements/Satellite/Satellite.svelte";

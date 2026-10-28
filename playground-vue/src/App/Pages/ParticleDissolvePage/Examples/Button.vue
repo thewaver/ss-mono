@@ -51,7 +51,6 @@ const rebuild = () => {
             :particle-lifetime-ms="particleLifetimeMs"
             :feather-share="featherShare"
             :spawn-chance="spawnChance"
-            :particles-per-cell="particlesPerCell"
             :cell-size="cellSize"
             :compute-particle-animation="computeAshAnimation"
         >

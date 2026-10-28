@@ -319,3 +319,48 @@ test("the file picker belongs to the example that has a file, not to the page", 
     await page.locator("#gradientKnobs").click();
     await expect(page.locator('input[type="file"]'), "and in no other example's").toHaveCount(0);
 });
+
+/**
+ * The drawn-source examples have their own pause button and scrubber beside the picture example's. Pausing one leaves
+ * the picture example running, a paused example holds its frame, and scrubbing it moves its cells. The colors inside a
+ * drawn source animate on the source's own clock and are not read.
+ */
+test("the drawn-source examples each pause and scrub on their own", async ({ page }) => {
+    const readFrame = (key: string) =>
+        page
+            .locator(demo(key))
+            .evaluate((root) =>
+                [...root.querySelectorAll("div")]
+                    .map(
+                        (element) =>
+                            `${(element as HTMLElement).style.transform}|${(element as HTMLElement).style.filter}`,
+                    )
+                    .join(";"),
+            );
+
+    for (const [key, id] of [
+        ["gradient", "cellAnimationGradient"],
+        ["pattern", "cellAnimationPattern"],
+    ]) {
+        await page.locator(`#${id}Playback`).click();
+        await expect(page.locator(`#${id}Playback`)).toHaveAccessibleName("Play");
+        await expect(page.locator("#cellAnimationPlayback"), "the picture example runs on").toHaveAccessibleName(
+            "Pause",
+        );
+
+        await page.locator(`#${id}Progress`).focus();
+        await page.keyboard.press("Home");
+
+        const start = await readFrame(key);
+
+        for (let i = 0; i < 50; i++) await page.keyboard.press("ArrowRight");
+
+        await expect.poll(() => readFrame(key), { message: `${key} moves when scrubbed` }).not.toBe(start);
+
+        const middle = await readFrame(key);
+
+        await page.waitForTimeout(300);
+
+        expect(await readFrame(key), `${key} holds while paused`).toBe(middle);
+    }
+});
