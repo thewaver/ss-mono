@@ -16,7 +16,7 @@ const tileFor = (route: string) => `${TILE}[data-testid="${route}"]`;
 const menu = (page: Page) => page.getByRole("navigation", { name: "Library" }).getByRole("tree");
 
 /**
- * A menu row's link ends in the tab pages open on (Docs by default), so the page's own route is the segment before it
+ * A menu row's link ends in the tab the last page was on (Docs at first), so the page's own route is the segment before it
  * when the last one names a tab. Examples is the index and adds no segment.
  */
 const TAB_SEGMENTS = ["docs", "api"];

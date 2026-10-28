@@ -38,8 +38,10 @@ import {
 import { DEFAULT_VIEWPORT_ANCHOR } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
 import {
     DEFAULT_PAGE_VIEW,
+    EXAMPLES_VIEW,
     PAGE_VIEW_KEYS,
     toBaseRoute,
+    toPageViewKey,
     toPageViewRoute,
 } from "@thewaver/ss-playground/App/PageComponents/ViewTabs/ViewTabs.const";
 import { FunctionUtils, Size2d, StringUtils } from "@thewaver/ss-utils";
@@ -103,7 +105,10 @@ const flattenConfigs = (nodes: MenuNodeConfig[]): ComponentConfig[] =>
     nodes.flatMap((node) => (getIsBranchConfig(node) ? flattenConfigs(node.children) : [node]));
 
 const toPageHref = (config: ComponentConfig, view: PageViewKey) =>
-    toPageViewRoute(componentToRouteName(config.name), config.component === undefined ? "docs" : view);
+    toPageViewRoute(
+        componentToRouteName(config.name),
+        config.component === undefined && view === EXAMPLES_VIEW ? "docs" : view,
+    );
 
 const toPreview = (config: ComponentConfig) =>
     PREVIEW_EXCLUDED_PAGES.includes(config.name) ? undefined : (config.docs ?? config.component);
@@ -344,7 +349,7 @@ export function AppContent(props: { viewportAnchor: readonly [ViewportAnchor, (v
 
     const [searchTerm, setSearchTerm] = useState("");
     const showsDescriptionOnlyState = useState(false);
-    const pageViewState = useState<PageViewKey>(DEFAULT_PAGE_VIEW);
+    const [pageView, setPageView] = useState<PageViewKey>(DEFAULT_PAGE_VIEW);
     const [isAutoHidden, setIsAutoHidden] = useState(false);
     const [browseExpanded, setBrowseExpanded] = useState<MenuNodeConfig[]>(VISIBLE_MENU_CONFIGS);
     const [searchExpanded, setSearchExpanded] = useState<MenuNodeConfig[]>([]);
@@ -359,7 +364,9 @@ export function AppContent(props: { viewportAnchor: readonly [ViewportAnchor, (v
 
     const isSearching = searchTerm.trim().length > 0;
     const showsDescriptionOnly = showsDescriptionOnlyState[0];
-    const pageView = pageViewState[0];
+    const shownView = selectedConfig ? toPageViewKey(location.pathname, toBaseRoute(location.pathname)) : undefined;
+
+    if (shownView !== undefined && shownView !== pageView) setPageView(shownView);
 
     const filteredNodes = useMemo(() => {
         const menuNodes = MENU_NODES_BY_VIEW[pageView];
@@ -495,7 +502,6 @@ export function AppContent(props: { viewportAnchor: readonly [ViewportAnchor, (v
                                         <div className={styles.navSettingsBox}>
                                             <PageNavSettings
                                                 showsDescriptionOnly={showsDescriptionOnlyState}
-                                                pageView={pageViewState}
                                                 viewportAnchor={props.viewportAnchor}
                                             />
                                         </div>

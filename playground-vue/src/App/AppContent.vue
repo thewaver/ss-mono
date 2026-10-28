@@ -7,7 +7,11 @@ import type { TreeNode } from "@thewaver/ss-components-vue";
 import * as styles from "@thewaver/ss-playground/App/App.css";
 import { LAYOUT } from "@thewaver/ss-playground/App/Layout.const";
 import { IS_BUILD_PROGRESS_SHOWN } from "@thewaver/ss-playground/App/PageComponents/BuildProgress/BuildProgress.utils";
-import { DEFAULT_PAGE_VIEW, toBaseRoute } from "@thewaver/ss-playground/App/PageComponents/ViewTabs/ViewTabs.const";
+import {
+    DEFAULT_PAGE_VIEW,
+    toBaseRoute,
+    toPageViewKey,
+} from "@thewaver/ss-playground/App/PageComponents/ViewTabs/ViewTabs.const";
 
 import type { ComponentConfig, MenuNodeConfig } from "./App.types";
 import { AppUtils } from "./App.utils";
@@ -46,6 +50,16 @@ const browseExpanded = shallowRef<MenuNodeConfig[]>(AppUtils.VISIBLE_MENU_CONFIG
 const searchExpanded = shallowRef<MenuNodeConfig[]>([]);
 
 const selectedConfig = computed(() => AppUtils.COMPONENT_CONFIGS_BY_ROUTE[toBaseRoute(route.path)]);
+
+watch(
+    () => route.path,
+    (path) => {
+        const baseRoute = toBaseRoute(path);
+
+        if (AppUtils.COMPONENT_CONFIGS_BY_ROUTE[baseRoute]) pageView.value = toPageViewKey(path, baseRoute);
+    },
+    { immediate: true },
+);
 
 const isAboutSelected = computed(() => route.path === "/");
 
@@ -189,7 +203,6 @@ const computeNodeText = (node: TreeNode<MenuNodeConfig>) => node.value.name;
                                     <div :class="styles.navSettingsBox">
                                         <PageNavSettings
                                             v-model:shows-description-only="showsDescriptionOnly"
-                                            v-model:page-view="pageView"
                                             v-model:viewport-anchor="viewportAnchor"
                                         />
                                     </div>

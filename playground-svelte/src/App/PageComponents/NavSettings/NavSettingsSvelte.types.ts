@@ -1,7 +1,5 @@
 import type { ViewportAnchor } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.types";
 
-import type { PageViewKey } from "../ViewTabs/ViewTabsSvelte.types";
-
 export type {
     PlaygroundTheme,
     ViewportAnchor,
@@ -10,6 +8,5 @@ export type {
 
 export type PageNavSettingsProps = {
     showsDescriptionOnly: boolean;
-    pageView: PageViewKey;
     viewportAnchor: ViewportAnchor;
 };

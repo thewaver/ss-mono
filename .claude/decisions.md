@@ -3778,12 +3778,15 @@ anchor color back to `inherit`, which is a Playground fix rather than a theme ch
 `<nav>` is touched.
 
 **The menu's options sit behind a cog beside the search field**, the same `PageExampleKnobsButton` an
-example uses, holding three rows: pages without examples, which tab a page opens on, and the viewport anchor.
-The user asked for the two segmented rows. **The tab setting rewrites the links rather than redirecting after
-arrival**: the tree is built once per view (`MENU_NODES_BY_VIEW`) and the setting picks which set is shown,
-so the values stay the same objects and expansion and selection survive the switch. The dependency links in
-the page header follow the same setting, since they open pages too, and a page with no examples links straight
-to its docs whatever the setting says. **The anchor is owned by `App`**, because the `ViewportWrapper` it
+example uses, holding pages without examples, the viewport anchor and the theme.
+**A page picked from the menu opens on the tab the last component page was showing** — the user's rule, which
+replaced an "Open pages on" setting. The tab is read off the address of each component page visited and kept
+while non-component pages (About, Getting started, Gallery) are shown, starting at Docs before any has been
+opened. Only Examples falls back, to Docs, on a page without one; API carries over as API, since every page has
+one. **The links are rewritten rather than redirected after arrival**: the tree is built once per view
+(`MENU_NODES_BY_VIEW`) and the remembered tab picks which set is shown, so the values stay the same objects and
+expansion and selection survive the switch. The dependency links in the page header follow the same tab, since
+they open pages too. **The anchor is owned by `App`**, because the `ViewportWrapper` it
 sizes wraps the menu; `AppContent` is handed the signal. `none` passes the window's size through unscaled,
 `auto` is the screen's height as before, and the numbers are a fixed 16:9 page (1920 by 1080, 2560 by 1440) that the wrapper fits inside the window with empty bars, at the user's request, rather than a height whose width follows the window. None of it is remembered across a
 reload, which is how the checkbox behaved before it moved.
@@ -3913,10 +3916,6 @@ name, `virtual:component-api` too, and the shared files (`DocsView.css.ts`, `.co
 `DocsView` name for now although the API view is what uses most of them; the tables are `ApiView` in Solid, with
 its own `BasePageApiViewValues` in the shared half. The other three frameworks still have the merged Docs view
 until ported.
-
-**The setting that picks the tab a page opens on is a select and defaults to Docs.** It was a segmented control
-defaulting to Examples; three entries and a default of Docs are the user's call. Its options come from
-`PAGE_VIEW_KEYS`, so a view added later appears in it.
 
 **Examples is the index rather than a segment of its own.** `/button` is the Examples view and `/docs` and `/api`
 are added. Giving Examples a segment would have renamed every address in the Playground and every

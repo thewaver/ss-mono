@@ -11,7 +11,11 @@ import type {
 } from "@thewaver/ss-components-vue";
 import * as styles from "@thewaver/ss-playground/App/App.css";
 import { MENU_DESCRIPTIONS } from "@thewaver/ss-playground/App/MenuDescriptions.const";
-import { PAGE_VIEW_KEYS, toPageViewRoute } from "@thewaver/ss-playground/App/PageComponents/ViewTabs/ViewTabs.const";
+import {
+    EXAMPLES_VIEW,
+    PAGE_VIEW_KEYS,
+    toPageViewRoute,
+} from "@thewaver/ss-playground/App/PageComponents/ViewTabs/ViewTabs.const";
 import { StringUtils } from "@thewaver/ss-utils";
 
 import type { ComponentConfig, MenuBranchConfig, MenuNodeConfig } from "./App.types";
@@ -33,7 +37,10 @@ export namespace AppUtils {
         nodes.flatMap((node) => (getIsBranchConfig(node) ? flattenConfigs(node.children) : [node]));
 
     export const toPageHref = (config: ComponentConfig, view: PageViewKey) =>
-        toPageViewRoute(componentToRouteName(config.name), config.component === undefined ? "docs" : view);
+        toPageViewRoute(
+            componentToRouteName(config.name),
+            config.component === undefined && view === EXAMPLES_VIEW ? "docs" : view,
+        );
 
     const GALLERY_NAME_SEPARATOR = " / ";
     const NAV_PREVIEW_PLACEMENT: AnchorPlacement = { x: "right_out", y: "center" };

@@ -20,6 +20,7 @@
         DEFAULT_PAGE_VIEW,
         PAGE_VIEW_KEYS,
         toBaseRoute,
+        toPageViewKey,
     } from "@thewaver/ss-playground/App/PageComponents/ViewTabs/ViewTabs.const";
 
     import { MENU_CONFIGS, MENU_EDGE, MENU_ID, SEARCH_FIELD_WIDTH } from "./AppSvelte.const";
@@ -143,6 +144,13 @@
         void route.pathname;
 
         restoreRootSlash();
+    });
+
+    $effect(() => {
+        const pathname = route.pathname;
+        const baseRoute = toBaseRoute(pathname);
+
+        if (COMPONENT_CONFIGS_BY_ROUTE[baseRoute]) pageView = toPageViewKey(pathname, baseRoute);
     });
 
     const isSearching = $derived(searchTerm.trim().length > 0);
@@ -290,7 +298,7 @@
 
                             <div class={styles.searchContainer}>
                                 <div class={styles.navSettingsBox}>
-                                    <PageNavSettings bind:showsDescriptionOnly bind:pageView bind:viewportAnchor />
+                                    <PageNavSettings bind:showsDescriptionOnly bind:viewportAnchor />
                                 </div>
 
                                 <div

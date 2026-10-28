@@ -39,8 +39,10 @@ import {
 import { DEFAULT_VIEWPORT_ANCHOR } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
 import {
     DEFAULT_PAGE_VIEW,
+    EXAMPLES_VIEW,
     PAGE_VIEW_KEYS,
     toBaseRoute,
+    toPageViewKey,
     toPageViewRoute,
 } from "@thewaver/ss-playground/App/PageComponents/ViewTabs/ViewTabs.const";
 import { FunctionUtils, Size2d, StringUtils } from "@thewaver/ss-utils";
@@ -105,7 +107,10 @@ const flattenConfigs = (nodes: MenuNodeConfig[]): ComponentConfig[] =>
     nodes.flatMap((node) => (getIsBranchConfig(node) ? flattenConfigs(node.children) : [node]));
 
 const toPageHref = (config: ComponentConfig, view: PageViewKey) =>
-    toPageViewRoute(componentToRouteName(config.name), config.component === undefined ? "docs" : view);
+    toPageViewRoute(
+        componentToRouteName(config.name),
+        config.component === undefined && view === EXAMPLES_VIEW ? "docs" : view,
+    );
 
 const toPreview = (config: ComponentConfig) =>
     PREVIEW_EXCLUDED_PAGES.includes(config.name) ? undefined : (config.docs ?? config.component);
@@ -362,7 +367,7 @@ export function AppContent(props: RouteSectionProps & { viewportAnchor: SignalPa
     const [getSelectedConfig, setSelectedConfig] = createSignal<ComponentConfig>();
     const [getSearchTerm, setSearchTerm] = createSignal("");
     const showsDescriptionOnlySignal = createSignal(false);
-    const pageViewSignal = createSignal<PageViewKey>(DEFAULT_PAGE_VIEW);
+    const [getPageView, setPageView] = createSignal<PageViewKey>(DEFAULT_PAGE_VIEW);
     const isAutoHiddenSignal = createSignal(false);
     const [getBrowseExpanded, setBrowseExpanded] = createSignal<MenuNodeConfig[]>(VISIBLE_MENU_CONFIGS);
     const [getSearchExpanded, setSearchExpanded] = createSignal<MenuNodeConfig[]>([]);
@@ -378,7 +383,7 @@ export function AppContent(props: RouteSectionProps & { viewportAnchor: SignalPa
     const getFilteredNodes = createMemo(() => {
         const isSearching = getIsSearching();
         const showsDescriptionOnly = showsDescriptionOnlySignal[0]();
-        const menuNodes = MENU_NODES_BY_VIEW[pageViewSignal[0]()];
+        const menuNodes = MENU_NODES_BY_VIEW[getPageView()];
 
         if (!isSearching && showsDescriptionOnly) return menuNodes;
 
@@ -413,12 +418,15 @@ export function AppContent(props: RouteSectionProps & { viewportAnchor: SignalPa
     createEffect(on(() => props.location.pathname, restoreRootSlash));
 
     createEffect(() => {
-        const pathName = toBaseRoute(toRoutePath(props.location.pathname));
+        const routePath = toRoutePath(props.location.pathname);
+        const pathName = toBaseRoute(routePath);
         const config = COMPONENT_CONFIGS_BY_ROUTE[pathName];
 
         setSelectedConfig(() => config);
 
         if (!config) return;
+
+        setPageView(toPageViewKey(routePath, pathName));
 
         const ancestors = ANCESTORS_BY_CONFIG.get(config) ?? [];
 
@@ -437,7 +445,7 @@ export function AppContent(props: RouteSectionProps & { viewportAnchor: SignalPa
     const goToPage = (pageName: string) => {
         const config = VISIBLE_COMPONENT_CONFIGS.find((candidate) => candidate.name === pageName);
 
-        if (config) navigate(toPageHref(config, pageViewSignal[0]()));
+        if (config) navigate(toPageHref(config, getPageView()));
     };
 
     const viewportContext = useViewportContext();
@@ -513,7 +521,6 @@ export function AppContent(props: RouteSectionProps & { viewportAnchor: SignalPa
                                         <div class={styles.navSettingsBox}>
                                             <PageNavSettings
                                                 showsDescriptionOnly={showsDescriptionOnlySignal}
-                                                pageView={pageViewSignal}
                                                 viewportAnchor={props.viewportAnchor}
                                             />
                                         </div>
@@ -625,7 +632,7 @@ export function AppContent(props: RouteSectionProps & { viewportAnchor: SignalPa
                                 <div class={styles.pageHeader}>
                                     <h1 class={styles.pageTitle}>{getConfig().name}</h1>
 
-                                    <PageDependencies name={getConfig().name} view={pageViewSignal[0]()} />
+                                    <PageDependencies name={getConfig().name} view={getPageView()} />
 
                                     <PageViewTabs
                                         baseRoute={componentToRouteName(getConfig().name)}

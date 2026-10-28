@@ -1,15 +1,8 @@
-import type { PageViewKey } from "../ViewTabs/PageView.types";
-import { PAGE_VIEW_KEYS, PAGE_VIEW_LABELS } from "../ViewTabs/ViewTabs.const";
 import type { NavSettingsOption, PlaygroundTheme, ViewportAnchor } from "./NavSettings.types";
 
 export const DEFAULT_VIEWPORT_ANCHOR: ViewportAnchor = "auto";
 
 export const THEME_FIELD_ID = "playgroundTheme";
-
-export const PAGE_VIEW_OPTIONS: NavSettingsOption<PageViewKey>[] = PAGE_VIEW_KEYS.map((key) => ({
-    value: key,
-    label: PAGE_VIEW_LABELS[key],
-}));
 
 export const VIEWPORT_ANCHOR_OPTIONS: NavSettingsOption<ViewportAnchor>[] = [
     { value: "none", label: "None" },

@@ -1,16 +1,11 @@
 import { MediaQueryMonitorSolidUtils, SHAPE_REVEAL_DEFAULTS, Toggle } from "@thewaver/ss-components-solid";
 import {
-    PAGE_VIEW_OPTIONS,
     THEME_FIELD_ID,
     THEME_OPTIONS,
     VIEWPORT_ANCHOR_OPTIONS,
 } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
 import { NO_MOTION_DURATION_MS } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
 import { EXAMPLES_ONLY_PROP } from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.const";
-import {
-    DEFAULT_PAGE_VIEW,
-    PAGE_VIEW_LABELS,
-} from "@thewaver/ss-playground/App/PageComponents/ViewTabs/ViewTabs.const";
 
 import { PageToggleContent } from "../../StyledComponents/ToggleContent/ToggleContent";
 import { PageExampleKnobsButton } from "../ExampleKnobs/ExampleKnobs";
@@ -18,7 +13,6 @@ import { PageSelectField } from "../Field/Field";
 import { OWN_FRAMEWORK } from "../FrameworkMenu/FrameworkMenu.const";
 import { PageProp } from "../Prop/Prop";
 import { getAppliedTheme, revealTheme } from "../Theme/ThemeSolid.const";
-import type { PageViewKey } from "../ViewTabs/ViewTabsSolid.types";
 import type { PageNavSettingsProps, PlaygroundTheme, ViewportAnchor } from "./NavSettingsSolid.types";
 
 const computeViewportAnchorLabel = (anchor: ViewportAnchor) =>
@@ -26,8 +20,6 @@ const computeViewportAnchorLabel = (anchor: ViewportAnchor) =>
 
 const computeThemeLabel = (theme: PlaygroundTheme) =>
     THEME_OPTIONS.find((option) => option.value === theme)?.label ?? theme;
-
-const computePageViewLabel = (view: PageViewKey) => PAGE_VIEW_LABELS[view];
 
 export const PageNavSettings = (props: PageNavSettingsProps) => {
     const getPrefersReducedMotion = MediaQueryMonitorSolidUtils.createReducedMotion();
@@ -58,24 +50,6 @@ export const PageNavSettings = (props: PageNavSettingsProps) => {
                             checked={props.showsDescriptionOnly}
                             ariaLabel={"Show pages without examples"}
                             renderContent={(getFlags) => <PageToggleContent flags={getFlags} />}
-                        />
-                    </PageProp>
-
-                    <PageProp
-                        key={"pageView"}
-                        label={"Open pages on"}
-                        hint={
-                            "Which tab a page opens on when it is picked from the list. A page with no examples always opens on its docs."
-                        }
-                        controls={EXAMPLES_ONLY_PROP}
-                        defaultValue={computePageViewLabel(DEFAULT_PAGE_VIEW)}
-                    >
-                        <PageSelectField
-                            value={props.pageView[0]}
-                            values={PAGE_VIEW_OPTIONS.map((option) => option.value)}
-                            computeLabel={computePageViewLabel}
-                            ariaLabel={"Open pages on"}
-                            onChange={props.pageView[1]}
                         />
                     </PageProp>
 

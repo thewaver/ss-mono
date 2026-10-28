@@ -4,7 +4,7 @@ import { createRouter } from "sv-router";
 import { GALLERY_NAME_SEPARATOR, GALLERY_ROUTE, GETTING_STARTED_ROUTE } from "@thewaver/ss-playground/App/App.const";
 import { MENU_DESCRIPTIONS } from "@thewaver/ss-playground/App/MenuDescriptions.const";
 import { toRouterBase } from "@thewaver/ss-playground/App/PageComponents/FrameworkSwitch/FrameworkSwitch.const";
-import { toPageViewRoute } from "@thewaver/ss-playground/App/PageComponents/ViewTabs/ViewTabs.const";
+import { EXAMPLES_VIEW, toPageViewRoute } from "@thewaver/ss-playground/App/PageComponents/ViewTabs/ViewTabs.const";
 import { StringUtils } from "@thewaver/ss-utils";
 
 import type { ComponentConfig, MenuBranchConfig, MenuNodeConfig } from "./App.types";
@@ -23,7 +23,10 @@ export const flattenConfigs = (nodes: MenuNodeConfig[]): ComponentConfig[] =>
     nodes.flatMap((node) => (getIsBranchConfig(node) ? flattenConfigs(node.children) : [node]));
 
 export const toPageHref = (config: ComponentConfig, view: PageViewKey) =>
-    toPageViewRoute(componentToRouteName(config.name), config.component === undefined ? "docs" : view);
+    toPageViewRoute(
+        componentToRouteName(config.name),
+        config.component === undefined && view === EXAMPLES_VIEW ? "docs" : view,
+    );
 
 export const COMPONENT_CONFIGS = flattenConfigs(MENU_CONFIGS);
 

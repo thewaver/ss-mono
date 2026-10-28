@@ -68,6 +68,47 @@ test("a page whose examples moved into Docs has no Examples view, and its bare r
     await expect(page.locator("[data-docs-example]").first(), "and the examples are on the Docs view").toBeVisible();
 });
 
+/**
+ * A page picked from the menu opens on the tab the page before it was showing, so reading one component's
+ * examples and then another's needs no extra click. Nothing has been read before the first page, so that one
+ * opens on Docs; a page with no Examples view takes Docs in its place, and API is kept as API since every page has
+ * one.
+ */
+test("a page picked from the menu opens on the tab the last page was on", async ({ page }) => {
+    const menu = page.getByRole("navigation", { name: "Library" }).getByRole("tree");
+    const search = page.getByRole("textbox", { name: "Search components" });
+
+    const openFromMenu = async (name: string) => {
+        await search.click();
+        await page.keyboard.press("ControlOrMeta+A");
+        await page.keyboard.type(name);
+        await menu.getByRole("treeitem", { name, exact: true }).click();
+        await expect(page.getByRole("heading", { level: 1, name, exact: true })).toBeVisible();
+    };
+
+    const selectedTab = page.locator(VIEW_TABS).locator('[role="tab"][aria-selected="true"]');
+
+    await page.goto("/");
+    await openFromMenu("RGBAnimation");
+    await expect(selectedTab, "the first page opens on Docs").toHaveText("Docs");
+
+    await page.locator(VIEW_TABS).getByRole("tab", { name: "Examples" }).click();
+    await expect(selectedTab).toHaveText("Examples");
+    await openFromMenu("CellAnimation");
+    await expect(selectedTab, "and the next one on the tab the last was left on").toHaveText("Examples");
+
+    await openFromMenu("Tabs");
+    await expect(selectedTab, "a page without Examples falls back to Docs").toHaveText("Docs");
+
+    await page.locator(VIEW_TABS).getByRole("tab", { name: "API" }).click();
+    await expect(selectedTab).toHaveText("API");
+    await openFromMenu("RGBAnimation");
+    await expect(selectedTab, "and API carries over as API").toHaveText("API");
+
+    await openFromMenu("Tabs");
+    await expect(selectedTab, "even onto a page without Examples").toHaveText("API");
+});
+
 test("Docs draws no tables, which are on the API view", async ({ page }) => {
     await page.goto("/drum-wheel/docs");
     await expect(page.locator(DOCS)).toBeVisible();

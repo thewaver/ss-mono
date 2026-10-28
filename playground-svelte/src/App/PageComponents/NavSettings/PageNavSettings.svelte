@@ -8,23 +8,18 @@
     import { OWN_FRAMEWORK } from "../FrameworkMenu/FrameworkMenu.const";
     import PageProp from "../Prop/Prop.svelte";
     import { getAppliedTheme, revealTheme } from "../Theme/ThemeSvelte.const.svelte";
-    import { PAGE_VIEW_OPTIONS, THEME_FIELD_ID, THEME_OPTIONS, VIEWPORT_ANCHOR_OPTIONS } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
-    import { DEFAULT_PAGE_VIEW, PAGE_VIEW_LABELS } from "@thewaver/ss-playground/App/PageComponents/ViewTabs/ViewTabs.const";
-    import type { PageViewKey } from "../ViewTabs/ViewTabsSvelte.types";
+    import { THEME_FIELD_ID, THEME_OPTIONS, VIEWPORT_ANCHOR_OPTIONS } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
     import type { PageNavSettingsProps, PlaygroundTheme, ViewportAnchor } from "./NavSettingsSvelte.types";
     import { NO_MOTION_DURATION_MS } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
 
     const computeViewportAnchorLabel = (anchor: ViewportAnchor) =>
         VIEWPORT_ANCHOR_OPTIONS.find((option) => option.value === anchor)?.label ?? String(anchor);
 
-    const computePageViewLabel = (view: PageViewKey) => PAGE_VIEW_LABELS[view];
-
     const computeThemeLabel = (theme: PlaygroundTheme) =>
         THEME_OPTIONS.find((option) => option.value === theme)?.label ?? theme;
 
     let {
         showsDescriptionOnly = $bindable(),
-        pageView = $bindable(),
         viewportAnchor = $bindable(),
     }: PageNavSettingsProps = $props();
 
@@ -53,24 +48,6 @@
                 <PageToggleContent {flags} />
             {/snippet}
         </Toggle>
-    </PageProp>
-
-    <PageProp
-        itemKey={"pageView"}
-        controls={EXAMPLES_ONLY_PROP}
-        label={"Open pages on"}
-        hint={"Which tab a page opens on when it is picked from the list. A page with no examples always opens on its docs."}
-        defaultValue={computePageViewLabel(DEFAULT_PAGE_VIEW)}
-    >
-        <PageSelectField
-            value={pageView}
-            values={PAGE_VIEW_OPTIONS.map((option) => option.value)}
-            computeLabel={computePageViewLabel}
-            ariaLabel={"Open pages on"}
-            onChange={(value) => {
-                pageView = value;
-            }}
-        />
     </PageProp>
 
     <PageProp
