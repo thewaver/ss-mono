@@ -157,51 +157,51 @@
 </script>
 
 {#snippet glitchExample()}
-    <GlitchExampleWrapper {...commonProps} />
+    <GlitchExampleWrapper {...commonProps} isPagePlaying={playback} />
 {/snippet}
 
 {#snippet surgeExample()}
-    <SurgeExampleWrapper {...commonProps} />
+    <SurgeExampleWrapper {...commonProps} isPagePlaying={playback} />
 {/snippet}
 
 {#snippet snakeExample()}
-    <SnakeExampleWrapper {...commonProps} />
+    <SnakeExampleWrapper {...commonProps} isPagePlaying={playback} />
 {/snippet}
 
 {#snippet splitExample()}
-    <SplitExampleWrapper {...commonProps} />
+    <SplitExampleWrapper {...commonProps} isPagePlaying={playback} />
 {/snippet}
 
 {#snippet brightnessExample()}
-    <BrightnessExampleWrapper {...commonProps} />
+    <BrightnessExampleWrapper {...commonProps} isPagePlaying={playback} />
 {/snippet}
 
 {#snippet grayscaleExample()}
-    <GrayscaleExampleWrapper {...commonProps} />
+    <GrayscaleExampleWrapper {...commonProps} isPagePlaying={playback} />
 {/snippet}
 
 {#snippet hueExample()}
-    <HueExampleWrapper {...commonProps} />
+    <HueExampleWrapper {...commonProps} isPagePlaying={playback} />
 {/snippet}
 
 {#snippet waveExample()}
-    <WaveExampleWrapper {...commonProps} />
+    <WaveExampleWrapper {...commonProps} isPagePlaying={playback} />
 {/snippet}
 
 {#snippet rollExample()}
-    <RollExampleWrapper {...commonProps} />
+    <RollExampleWrapper {...commonProps} isPagePlaying={playback} />
 {/snippet}
 
 {#snippet dropoutExample()}
-    <DropoutExampleWrapper {...commonProps} />
+    <DropoutExampleWrapper {...commonProps} isPagePlaying={playback} />
 {/snippet}
 
 {#snippet interlaceExample()}
-    <InterlaceExampleWrapper {...commonProps} />
+    <InterlaceExampleWrapper {...commonProps} isPagePlaying={playback} />
 {/snippet}
 
 {#snippet skewExample()}
-    <SkewExampleWrapper {...commonProps} />
+    <SkewExampleWrapper {...commonProps} isPagePlaying={playback} />
 {/snippet}
 
 {#snippet stressTestExample()}

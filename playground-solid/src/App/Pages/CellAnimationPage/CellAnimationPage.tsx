@@ -1,4 +1,4 @@
-import { createMemo, createSignal } from "solid-js";
+import { Show, createMemo, createSignal, splitProps } from "solid-js";
 import type { Signal } from "solid-js";
 import { createStore } from "solid-js/store";
 
@@ -12,7 +12,6 @@ import {
     CellAnimationPlaybackUtils,
     CellAnimationWeights,
     SVGDefsSamples,
-    access,
 } from "@thewaver/ss-components-solid";
 import type {
     CellAnimationBreakpointOpts,
@@ -23,19 +22,19 @@ import type {
 import { CellAnimationKnobs } from "@thewaver/ss-playground/App/Knobs/CellAnimations.const";
 import {
     DEFAULT_EXAMPLE_PATH,
-    DRAWN_SOURCE_PATH,
     EXAMPLE_NAMES,
     IMAGE_CONTAINER_SIZE,
     PERCENT,
+    SOURCE_READOUTS,
     STRESS_CELL_COUNT,
     STRESS_ITEMS,
     WIPE_EXAMPLE_PATH,
 } from "@thewaver/ss-playground/App/Pages/CellAnimationPage/CellAnimationPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/CellAnimationPage/CellAnimationPage.css";
+import type { CellAnimationSourceKind } from "@thewaver/ss-playground/App/Pages/CellAnimationPage/CellAnimationPage.types";
 import knight_profile from "@thewaver/ss-playground/App/knight_profile.webp";
 import type { Index2d, Size2d } from "@thewaver/ss-utils";
 
-import { PageExampleKnobs } from "../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import {
     PageCheckField,
@@ -46,15 +45,17 @@ import {
 } from "../../PageComponents/Field/Field";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PagePlaybackScrubber } from "../../PageComponents/PlaybackScrubber/PlaybackScrubber";
+import { PlaybackScrubberUtils } from "../../PageComponents/PlaybackScrubber/PlaybackScrubber.utils";
 import { PageProp } from "../../PageComponents/Prop/Prop";
-import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
+import { PagePropsDivider, PagePropsGroups, PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { SVGDefsSources } from "../../PageComponents/SVGDefsSources/SVGDefsSourcesSolid.const";
 import { StressTest } from "../../PageComponents/StressTest/StressTest";
 import type { CellAnimationExampleProps, CellAnimationSourcedExampleProps } from "./CellAnimationPage.types";
 import { DefaultExample } from "./Examples/Default";
 import { WipeExample } from "./Examples/Wipe";
 
-const computeContainerWidth = (size: Size2d) => (IMAGE_CONTAINER_SIZE * size.width) / Math.max(size.width, size.height);
+const computeContainerWidth = (size: Size2d, longestSide: number) =>
+    (longestSide * size.width) / Math.max(size.width, size.height);
 
 const extractOptionGroupWord = (key: string) => key.replace(/^_/, "").match(/^[a-z]+/)?.[0] ?? key;
 
@@ -74,194 +75,39 @@ const groupOptions = <T extends string>(keys: readonly T[]) => {
 const GROUPPED_WEIGHTS = groupOptions(CellAnimationWeights.WEIGHT_TYPES);
 const GROUPPED_ANIMATIONS = groupOptions(CellAnimationKeyframes.ANIMATION_TYPES);
 
-const ImageExampleWrapper = (props: CellAnimationExampleProps & { progress: Signal<number> }) => {
-    const [getSrc, setSrc] = createSignal(knight_profile);
+const SourcedExampleWrapper = (
+    props: CellAnimationSourcedExampleProps & {
+        ownPlayback: Signal<boolean>;
+        progress: Signal<number>;
+        computeWidth: (longestSide: number) => number;
+    },
+) => {
+    const [local, exampleProps] = splitProps(props, ["ownPlayback", "computeWidth"]);
 
     return (
-        <>
-            <div class={styles.stack}>
-                <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
-                    <DefaultExample {...props} src={getSrc} />
-                </PageMeasureBox>
-
-                <PagePlaybackScrubber
-                    id={"cellAnimation"}
-                    ariaLabel={"Position in the pass"}
-                    playback={props.playback}
-                    progress={props.progress}
+        <div class={styles.stack}>
+            <PageMeasureBox width={() => local.computeWidth(IMAGE_CONTAINER_SIZE)}>
+                <DefaultExample
+                    {...exampleProps}
+                    playback={PlaybackScrubberUtils.gate(local.ownPlayback, exampleProps.playback[0])}
                 />
-            </div>
+            </PageMeasureBox>
 
-            <PageExampleKnobs>
-                <PageProp
-                    key={"image"}
-                    label={"Image"}
-                    hint={
-                        "Swaps in a picture of your own, so the cells can be watched against something other than the sample."
-                    }
-                    controls={"Picks the example picture sent to CellAnimationProps.src"}
-                >
-                    <PageFileField
-                        accept={"image/*"}
-                        ariaLabel={"Image"}
-                        onPick={(file) => setSrc(URL.createObjectURL(file))}
-                    />
-                </PageProp>
-            </PageExampleKnobs>
-        </>
+            <PagePlaybackScrubber
+                id={"cellAnimation"}
+                ariaLabel={"Position in the pass"}
+                playback={local.ownPlayback}
+                progress={exampleProps.progress}
+            />
+        </div>
     );
 };
 
-const GradientExampleWrapper = (props: CellAnimationExampleProps) => {
-    const playback = createSignal(true);
-    const progress = createSignal(0);
-    const [getKey, setKey] = createSignal<SVGDefsSamples.Gradient.Timed.SampleKey>(
-        CellAnimationKnobs.STARTING_GRADIENT_KEY,
-    );
-    const [getRatio, setRatio] = createSignal<SVGDefsSources.SourceRatio>(CellAnimationKnobs.DEFAULT_SOURCE_RATIO);
+const StressTestWrapper = (
+    props: CellAnimationSourcedExampleProps & { computeWidth: (longestSide: number) => number },
+) => {
+    const [local, exampleProps] = splitProps(props, ["computeWidth"]);
 
-    const getSize = createMemo(() => SVGDefsSources.computeSourceSize(getRatio()));
-
-    return (
-        <>
-            <div class={styles.stack}>
-                <PageMeasureBox width={() => computeContainerWidth(getSize())}>
-                    <DefaultExample
-                        {...props}
-                        playback={playback}
-                        progress={progress}
-                        src={() =>
-                            SVGDefsSources.computeGradientSource(
-                                getKey(),
-                                getSize(),
-                                CellAnimationPlaybackUtils.computeCycleDurationMs(
-                                    access(props.animationDurationMs),
-                                    access(props.playbackOpts),
-                                ),
-                                access(props.animationIterationDelayMs),
-                            )
-                        }
-                    />
-                </PageMeasureBox>
-
-                <PagePlaybackScrubber
-                    id={"cellAnimationGradient"}
-                    ariaLabel={"Position in the pass"}
-                    playback={playback}
-                    progress={progress}
-                />
-            </div>
-
-            <PageExampleKnobs>
-                <PageProp
-                    key={"gradient"}
-                    label={"Gradient"}
-                    hint={"Which animated gradient is rendered into the picture the cells are cut from."}
-                    controls={"Picks the gradient drawn into the example picture sent to CellAnimationProps.src"}
-                >
-                    <PageSelectField
-                        value={getKey}
-                        values={SVGDefsSources.GRADIENT_KEYS}
-                        ariaLabel={"Gradient"}
-                        onChange={(key) => setKey(() => key)}
-                    />
-                </PageProp>
-
-                <PageProp
-                    key={"gradientRatio"}
-                    label={"Ratio"}
-                    hint={
-                        "The shape of the picture the gradient is drawn into, which decides how the cells are proportioned."
-                    }
-                    controls={"Sets the shape of the example picture sent to CellAnimationProps.src"}
-                >
-                    <PageSelectField
-                        value={getRatio}
-                        values={SVGDefsSources.SOURCE_RATIOS}
-                        ariaLabel={"Gradient ratio"}
-                        onChange={(ratio) => setRatio(() => ratio)}
-                    />
-                </PageProp>
-            </PageExampleKnobs>
-        </>
-    );
-};
-
-const PatternExampleWrapper = (props: CellAnimationExampleProps) => {
-    const playback = createSignal(true);
-    const progress = createSignal(0);
-    const [getKey, setKey] = createSignal<SVGDefsSamples.Pattern.Timed.SampleKey>(
-        CellAnimationKnobs.STARTING_PATTERN_KEY,
-    );
-    const [getRatio, setRatio] = createSignal<SVGDefsSources.SourceRatio>(CellAnimationKnobs.DEFAULT_SOURCE_RATIO);
-
-    const getSize = createMemo(() => SVGDefsSources.computeSourceSize(getRatio()));
-
-    return (
-        <>
-            <div class={styles.stack}>
-                <PageMeasureBox width={() => computeContainerWidth(getSize())}>
-                    <DefaultExample
-                        {...props}
-                        playback={playback}
-                        progress={progress}
-                        src={() =>
-                            SVGDefsSources.computePatternSource(
-                                getKey(),
-                                getSize(),
-                                CellAnimationPlaybackUtils.computeCycleDurationMs(
-                                    access(props.animationDurationMs),
-                                    access(props.playbackOpts),
-                                ),
-                            )
-                        }
-                    />
-                </PageMeasureBox>
-
-                <PagePlaybackScrubber
-                    id={"cellAnimationPattern"}
-                    ariaLabel={"Position in the pass"}
-                    playback={playback}
-                    progress={progress}
-                />
-            </div>
-
-            <PageExampleKnobs>
-                <PageProp
-                    key={"pattern"}
-                    label={"Pattern"}
-                    hint={"Which repeating pattern is rendered into the picture the cells are cut from."}
-                    controls={"Picks the pattern drawn into the example picture sent to CellAnimationProps.src"}
-                >
-                    <PageSelectField
-                        value={getKey}
-                        values={SVGDefsSources.PATTERN_KEYS}
-                        ariaLabel={"Pattern"}
-                        onChange={(key) => setKey(() => key)}
-                    />
-                </PageProp>
-
-                <PageProp
-                    key={"patternRatio"}
-                    label={"Ratio"}
-                    hint={
-                        "The shape of the picture the pattern is drawn into, which decides how the cells are proportioned."
-                    }
-                    controls={"Sets the shape of the example picture sent to CellAnimationProps.src"}
-                >
-                    <PageSelectField
-                        value={getRatio}
-                        values={SVGDefsSources.SOURCE_RATIOS}
-                        ariaLabel={"Pattern ratio"}
-                        onChange={(ratio) => setRatio(() => ratio)}
-                    />
-                </PageProp>
-            </PageExampleKnobs>
-        </>
-    );
-};
-
-const StressTestWrapper = (props: CellAnimationSourcedExampleProps) => {
     const modalPlayback = createSignal(true);
 
     return (
@@ -271,18 +117,15 @@ const StressTestWrapper = (props: CellAnimationSourcedExampleProps) => {
             <StressTest
                 configs={STRESS_ITEMS}
                 onHideModal={() => {
-                    props.playback[1](true);
+                    exampleProps.playback[1](true);
                 }}
                 onShowModal={() => {
-                    props.playback[1](false);
+                    exampleProps.playback[1](false);
                 }}
                 renderLabel={(getConfigIndex) => `Render ${STRESS_ITEMS[getConfigIndex()].count} items`}
                 renderItem={(getConfigIndex) => (
-                    <PageMeasureBox
-                        width={() => STRESS_ITEMS[getConfigIndex()].size}
-                        height={() => STRESS_ITEMS[getConfigIndex()].size}
-                    >
-                        <DefaultExample {...props} playback={modalPlayback} cellCount={STRESS_CELL_COUNT} />
+                    <PageMeasureBox width={() => local.computeWidth(STRESS_ITEMS[getConfigIndex()].size)}>
+                        <DefaultExample {...exampleProps} playback={modalPlayback} cellCount={STRESS_CELL_COUNT} />
                     </PageMeasureBox>
                 )}
             />
@@ -292,8 +135,22 @@ const StressTestWrapper = (props: CellAnimationSourcedExampleProps) => {
 
 export const CellAnimationPage = () => {
     const playback = createSignal(true);
-    const imagePlayback = createSignal(true);
-    const imageProgress = createSignal(0);
+    const sourcedPlayback = createSignal(true);
+    const sourcedProgress = createSignal(0);
+
+    const [getSourceKind, setSourceKind] = createSignal<CellAnimationSourceKind>(
+        CellAnimationKnobs.STARTING_SOURCE_KIND,
+    );
+    const [getImageSrc, setImageSrc] = createSignal(knight_profile);
+    const [getGradientKey, setGradientKey] = createSignal<SVGDefsSamples.Gradient.Timed.SampleKey>(
+        CellAnimationKnobs.STARTING_GRADIENT_KEY,
+    );
+    const [getPatternKey, setPatternKey] = createSignal<SVGDefsSamples.Pattern.Timed.SampleKey>(
+        CellAnimationKnobs.STARTING_PATTERN_KEY,
+    );
+    const [getSourceRatio, setSourceRatio] = createSignal<SVGDefsSources.SourceRatio>(
+        CellAnimationKnobs.DEFAULT_SOURCE_RATIO,
+    );
 
     const [getOriginType, setOriginType] = createSignal<CellAnimationOrigins.OriginType>(
         CellAnimationKnobs.STARTING_ORIGIN_KEY,
@@ -321,6 +178,33 @@ export const CellAnimationPage = () => {
         ...CellAnimationKnobs.STARTING_PLAYBACK_OPTS,
     });
 
+    const getSourceSize = createMemo(() => SVGDefsSources.computeSourceSize(getSourceRatio()));
+
+    const getCycleDurationMs = () =>
+        CellAnimationPlaybackUtils.computeCycleDurationMs(getAnimationDurationMs(), playbackOpts);
+
+    const getSourcedSrc = createMemo(() => {
+        const sourceKind = getSourceKind();
+
+        if (sourceKind === "gradient") {
+            return SVGDefsSources.computeGradientSource(
+                getGradientKey(),
+                getSourceSize(),
+                getCycleDurationMs(),
+                getAnimationIterationDelayMs(),
+            );
+        }
+
+        if (sourceKind === "pattern") {
+            return SVGDefsSources.computePatternSource(getPatternKey(), getSourceSize(), getCycleDurationMs());
+        }
+
+        return getImageSrc();
+    });
+
+    const computeSourcedWidth = (longestSide: number) =>
+        getSourceKind() === "image" ? longestSide : computeContainerWidth(getSourceSize(), longestSide);
+
     const getExamples = createMemo(() => {
         const commonProps: CellAnimationExampleProps = {
             playback,
@@ -342,30 +226,20 @@ export const CellAnimationPage = () => {
 
         return [
             {
-                key: "image",
-                name: EXAMPLE_NAMES.image,
+                key: "source",
+                name: EXAMPLE_NAMES.source,
                 readout: () =>
-                    `${Math.round(imageProgress[0]() * PERCENT)}% through the pass, ${imagePlayback[0]() ? "running" : "stopped"} — the progress signal is written by the component while it plays, and writing it moves the pass there`,
+                    `${Math.round(sourcedProgress[0]() * PERCENT)}% through the pass, ${sourcedPlayback[0]() ? "running" : "stopped"} — ${SOURCE_READOUTS[getSourceKind()]}`,
                 component: () => (
-                    <ImageExampleWrapper {...commonProps} playback={imagePlayback} progress={imageProgress} />
+                    <SourcedExampleWrapper
+                        {...commonProps}
+                        src={getSourcedSrc}
+                        ownPlayback={sourcedPlayback}
+                        progress={sourcedProgress}
+                        computeWidth={computeSourcedWidth}
+                    />
                 ),
                 path: DEFAULT_EXAMPLE_PATH,
-            },
-            {
-                key: "gradient",
-                name: EXAMPLE_NAMES.gradient,
-                readout: () =>
-                    "the Shape page's own gradients, serialized into a source — the start and the pause a script would have timed are written into the markup instead, so they run at the same length and rhythm as the cells",
-                component: () => <GradientExampleWrapper {...commonProps} />,
-                path: DRAWN_SOURCE_PATH,
-            },
-            {
-                key: "pattern",
-                name: EXAMPLE_NAMES.pattern,
-                readout: () =>
-                    "the same for the patterns, which flow on without a pause — a repeating fill has no beat to be out of step with",
-                component: () => <PatternExampleWrapper {...commonProps} />,
-                path: DRAWN_SOURCE_PATH,
             },
             {
                 key: "wipe",
@@ -378,267 +252,362 @@ export const CellAnimationPage = () => {
             {
                 key: "stressTest",
                 name: EXAMPLE_NAMES.stressTest,
-                component: () => <StressTestWrapper {...commonProps} src={() => knight_profile} />,
+                component: () => (
+                    <StressTestWrapper {...commonProps} src={getSourcedSrc} computeWidth={computeSourcedWidth} />
+                ),
             },
         ];
     });
 
     return (
         <div class={styles.root}>
-            <PagePropsPanel scope={"global"}>
-                <PageProp
-                    key={"cellCountCols"}
-                    label={"Cell count (cols x rows)"}
-                    hint={
-                        "How many columns and rows the picture is cut into. More cells is a finer animation and more work per frame."
-                    }
-                    controls={"Sets CellAnimationProps.cellCount"}
-                >
-                    <div class={styles.valueList}>
-                        <PageNumberField
-                            value={() => cellCount.col}
-                            min={CellAnimationKnobs.MIN_CELL_COUNT}
-                            max={CellAnimationKnobs.MAX_CELL_COUNT}
-                            step={CellAnimationKnobs.CELL_COUNT_STEP}
-                            ariaLabel={"Columns"}
-                            onInput={(value) => setCellCount("col", value)}
+            <PagePropsGroups>
+                <PagePropsPanel scope={"sample"}>
+                    <PageProp
+                        key={"sourceKind"}
+                        label={"Source"}
+                        hint={
+                            "What the cells are cut from, in the first example and the stress test: a photograph, or one of the Shape page's gradients or patterns drawn into a picture. Choosing one brings its own knobs with it."
+                        }
+                        controls={"Picks the kind of example picture sent to CellAnimationProps.src"}
+                    >
+                        <PageSelectField
+                            value={getSourceKind}
+                            values={CellAnimationKnobs.SOURCE_KINDS}
+                            ariaLabel={"Source"}
+                            onChange={(kind) => setSourceKind(() => kind)}
                         />
-                        <PageNumberField
-                            value={() => cellCount.row}
-                            min={CellAnimationKnobs.MIN_CELL_COUNT}
-                            max={CellAnimationKnobs.MAX_CELL_COUNT}
-                            step={CellAnimationKnobs.CELL_COUNT_STEP}
-                            ariaLabel={"Rows"}
-                            onInput={(value) => setCellCount("row", value)}
+                    </PageProp>
+
+                    <Show when={getSourceKind() === "image"}>
+                        <PageProp
+                            key={"image"}
+                            label={"Image"}
+                            hint={
+                                "Swaps in a picture of your own, so the cells can be watched against something other than the sample."
+                            }
+                            controls={"Picks the example picture sent to CellAnimationProps.src"}
+                        >
+                            <PageFileField
+                                accept={"image/*"}
+                                ariaLabel={"Image"}
+                                onPick={(file) => setImageSrc(URL.createObjectURL(file))}
+                            />
+                        </PageProp>
+                    </Show>
+
+                    <Show when={getSourceKind() === "gradient"}>
+                        <PageProp
+                            key={"gradient"}
+                            label={"Gradient"}
+                            hint={"Which animated gradient is rendered into the picture the cells are cut from."}
+                            controls={
+                                "Picks the gradient drawn into the example picture sent to CellAnimationProps.src"
+                            }
+                        >
+                            <PageSelectField
+                                value={getGradientKey}
+                                values={SVGDefsSources.GRADIENT_KEYS}
+                                ariaLabel={"Gradient"}
+                                onChange={(key) => setGradientKey(() => key)}
+                            />
+                        </PageProp>
+                    </Show>
+
+                    <Show when={getSourceKind() === "pattern"}>
+                        <PageProp
+                            key={"pattern"}
+                            label={"Pattern"}
+                            hint={"Which repeating pattern is rendered into the picture the cells are cut from."}
+                            controls={"Picks the pattern drawn into the example picture sent to CellAnimationProps.src"}
+                        >
+                            <PageSelectField
+                                value={getPatternKey}
+                                values={SVGDefsSources.PATTERN_KEYS}
+                                ariaLabel={"Pattern"}
+                                onChange={(key) => setPatternKey(() => key)}
+                            />
+                        </PageProp>
+                    </Show>
+
+                    <Show when={getSourceKind() !== "image"}>
+                        <PageProp
+                            key={"sourceRatio"}
+                            label={"Ratio"}
+                            hint={
+                                "The shape of the picture the gradient or pattern is drawn into, which decides how the cells are proportioned."
+                            }
+                            controls={"Sets the shape of the example picture sent to CellAnimationProps.src"}
+                        >
+                            <PageSelectField
+                                value={getSourceRatio}
+                                values={SVGDefsSources.SOURCE_RATIOS}
+                                ariaLabel={"Ratio"}
+                                onChange={(ratio) => setSourceRatio(() => ratio)}
+                            />
+                        </PageProp>
+                    </Show>
+                </PagePropsPanel>
+
+                <PagePropsDivider />
+
+                <PagePropsPanel scope={"global"}>
+                    <PageProp
+                        key={"cellCountCols"}
+                        label={"Cell count (cols x rows)"}
+                        hint={
+                            "How many columns and rows the picture is cut into. More cells is a finer animation and more work per frame."
+                        }
+                        controls={"Sets CellAnimationProps.cellCount"}
+                    >
+                        <div class={styles.valueList}>
+                            <PageNumberField
+                                value={() => cellCount.col}
+                                min={CellAnimationKnobs.MIN_CELL_COUNT}
+                                max={CellAnimationKnobs.MAX_CELL_COUNT}
+                                step={CellAnimationKnobs.CELL_COUNT_STEP}
+                                ariaLabel={"Columns"}
+                                onInput={(value) => setCellCount("col", value)}
+                            />
+                            <PageNumberField
+                                value={() => cellCount.row}
+                                min={CellAnimationKnobs.MIN_CELL_COUNT}
+                                max={CellAnimationKnobs.MAX_CELL_COUNT}
+                                step={CellAnimationKnobs.CELL_COUNT_STEP}
+                                ariaLabel={"Rows"}
+                                onInput={(value) => setCellCount("row", value)}
+                            />
+                        </div>
+                    </PageProp>
+
+                    <PageProp
+                        key={"originType"}
+                        label={"Origin"}
+                        hint={
+                            "Where in the grid the animation starts from. It only applies to weights that are measured from a point."
+                        }
+                        controls={
+                            "Picks the point the example's weights are measured from, sent to CellAnimationProps.computeCellWeights"
+                        }
+                    >
+                        <PageSelectField
+                            value={getOriginType}
+                            values={CellAnimationOrigins.ORIGIN_TYPES}
+                            isDisabled={() => !CellAnimationWeights.isOriginAware(getWeightType())}
+                            ariaLabel={"Origin"}
+                            onChange={(origin) => setOriginType(() => origin)}
                         />
-                    </div>
-                </PageProp>
+                    </PageProp>
 
-                <PageProp
-                    key={"originType"}
-                    label={"Origin"}
-                    hint={
-                        "Where in the grid the animation starts from. It only applies to weights that are measured from a point."
-                    }
-                    controls={
-                        "Picks the point the example's weights are measured from, sent to CellAnimationProps.computeCellWeights"
-                    }
-                >
-                    <PageSelectField
-                        value={getOriginType}
-                        values={CellAnimationOrigins.ORIGIN_TYPES}
-                        isDisabled={() => !CellAnimationWeights.isOriginAware(getWeightType())}
-                        ariaLabel={"Origin"}
-                        onChange={(origin) => setOriginType(() => origin)}
-                    />
-                </PageProp>
+                    <PageProp
+                        key={"weightType"}
+                        label={"Weight"}
+                        hint={
+                            "How each cell's turn is decided: its distance from the origin, a wave, a random draw, and so on."
+                        }
+                        controls={"Picks the example's weight function sent to CellAnimationProps.computeCellWeights"}
+                    >
+                        <PageGroupedSelectField
+                            value={getWeightType}
+                            groups={GROUPPED_WEIGHTS}
+                            ariaLabel={"Weight"}
+                            onChange={(weight) => setWeightType(() => weight)}
+                        />
+                    </PageProp>
 
-                <PageProp
-                    key={"weightType"}
-                    label={"Weight"}
-                    hint={
-                        "How each cell's turn is decided: its distance from the origin, a wave, a random draw, and so on."
-                    }
-                    controls={"Picks the example's weight function sent to CellAnimationProps.computeCellWeights"}
-                >
-                    <PageGroupedSelectField
-                        value={getWeightType}
-                        groups={GROUPPED_WEIGHTS}
-                        ariaLabel={"Weight"}
-                        onChange={(weight) => setWeightType(() => weight)}
-                    />
-                </PageProp>
+                    <PageProp
+                        key={"uniqueWeights"}
+                        label={"Unique weights"}
+                        hint={
+                            "Gives every cell a turn of its own, so no two move together even where the weight would have tied them."
+                        }
+                        controls={"Sets WeightOpts.shouldMakeUnique"}
+                    >
+                        <PageCheckField
+                            value={() => !!weightOpts.shouldMakeUnique}
+                            ariaLabel={"Unique weights"}
+                            onChange={(value) => setWeightOpts("shouldMakeUnique", value)}
+                        />
+                    </PageProp>
 
-                <PageProp
-                    key={"uniqueWeights"}
-                    label={"Unique weights"}
-                    hint={
-                        "Gives every cell a turn of its own, so no two move together even where the weight would have tied them."
-                    }
-                    controls={"Sets WeightOpts.shouldMakeUnique"}
-                >
-                    <PageCheckField
-                        value={() => !!weightOpts.shouldMakeUnique}
-                        ariaLabel={"Unique weights"}
-                        onChange={(value) => setWeightOpts("shouldMakeUnique", value)}
-                    />
-                </PageProp>
+                    <PageProp
+                        key={"normalizeWeights"}
+                        label={"Normalize weights"}
+                        hint={
+                            "Spreads the weights out to fill the whole run, so the first cell starts at the beginning and the last ends at the end."
+                        }
+                        controls={"Sets WeightOpts.shouldNormalize"}
+                    >
+                        <PageCheckField
+                            value={() => !!weightOpts.shouldNormalize}
+                            ariaLabel={"Normalize weights"}
+                            onChange={(value) => setWeightOpts("shouldNormalize", value)}
+                        />
+                    </PageProp>
 
-                <PageProp
-                    key={"normalizeWeights"}
-                    label={"Normalize weights"}
-                    hint={
-                        "Spreads the weights out to fill the whole run, so the first cell starts at the beginning and the last ends at the end."
-                    }
-                    controls={"Sets WeightOpts.shouldNormalize"}
-                >
-                    <PageCheckField
-                        value={() => !!weightOpts.shouldNormalize}
-                        ariaLabel={"Normalize weights"}
-                        onChange={(value) => setWeightOpts("shouldNormalize", value)}
-                    />
-                </PageProp>
+                    <PageProp
+                        key={"animationType"}
+                        label={"Animation"}
+                        hint={"What each cell actually does on its turn: fade, slide, spin, and the rest."}
+                        controls={"Picks the example's cell keyframes sent to CellAnimationProps.computeCellAnimation"}
+                    >
+                        <PageGroupedSelectField
+                            value={getAnimationType}
+                            groups={GROUPPED_ANIMATIONS}
+                            ariaLabel={"Animation"}
+                            onChange={(anim) => setAnimationType(() => anim)}
+                        />
+                    </PageProp>
 
-                <PageProp
-                    key={"animationType"}
-                    label={"Animation"}
-                    hint={"What each cell actually does on its turn: fade, slide, spin, and the rest."}
-                    controls={"Picks the example's cell keyframes sent to CellAnimationProps.computeCellAnimation"}
-                >
-                    <PageGroupedSelectField
-                        value={getAnimationType}
-                        groups={GROUPPED_ANIMATIONS}
-                        ariaLabel={"Animation"}
-                        onChange={(anim) => setAnimationType(() => anim)}
-                    />
-                </PageProp>
+                    <PageProp
+                        key={"direction"}
+                        label={"Direction"}
+                        hint={"Which way the run travels through the weights, and so which cells go first."}
+                        controls={"Sets CellAnimationBreakpointOpts.dir"}
+                    >
+                        <PageSelectField
+                            value={() => breakpointOpts.dir!}
+                            values={CellAnimationBreakpoints.DIRECTIONS}
+                            ariaLabel={"Direction"}
+                            onChange={(dir) => setBreakpointOpts("dir", dir)}
+                        />
+                    </PageProp>
 
-                <PageProp
-                    key={"direction"}
-                    label={"Direction"}
-                    hint={"Which way the run travels through the weights, and so which cells go first."}
-                    controls={"Sets CellAnimationBreakpointOpts.dir"}
-                >
-                    <PageSelectField
-                        value={() => breakpointOpts.dir!}
-                        values={CellAnimationBreakpoints.DIRECTIONS}
-                        ariaLabel={"Direction"}
-                        onChange={(dir) => setBreakpointOpts("dir", dir)}
-                    />
-                </PageProp>
+                    <PageProp
+                        key={"easing"}
+                        label={"Easing"}
+                        hint={"The speed curve a single cell follows from its start to its finish."}
+                        controls={"Sets CellAnimationBreakpointOpts.easing"}
+                    >
+                        <PageSelectField
+                            value={() => breakpointOpts.easing!}
+                            values={CellAnimationBreakpoints.EASINGS}
+                            ariaLabel={"Easing"}
+                            onChange={(easing) => setBreakpointOpts("easing", easing)}
+                        />
+                    </PageProp>
 
-                <PageProp
-                    key={"easing"}
-                    label={"Easing"}
-                    hint={"The speed curve a single cell follows from its start to its finish."}
-                    controls={"Sets CellAnimationBreakpointOpts.easing"}
-                >
-                    <PageSelectField
-                        value={() => breakpointOpts.easing!}
-                        values={CellAnimationBreakpoints.EASINGS}
-                        ariaLabel={"Easing"}
-                        onChange={(easing) => setBreakpointOpts("easing", easing)}
-                    />
-                </PageProp>
+                    <PageProp
+                        key={"smoothness01"}
+                        label={"Smoothness (0-1)"}
+                        hint={
+                            "How much a cell's own movement overlaps its neighbors'. 0 makes each cell wait its turn; 1 blurs them into one sweep."
+                        }
+                        controls={"Sets CellAnimationBreakpointOpts.smoothness"}
+                    >
+                        <PageNumberField
+                            value={() => breakpointOpts.smoothness!}
+                            min={CellAnimationKnobs.MIN_SMOOTHNESS}
+                            max={CellAnimationKnobs.MAX_SMOOTHNESS}
+                            step={CellAnimationKnobs.SMOOTHNESS_STEP}
+                            ariaLabel={"Smoothness"}
+                            onInput={(value) => setBreakpointOpts("smoothness", value)}
+                        />
+                    </PageProp>
 
-                <PageProp
-                    key={"smoothness01"}
-                    label={"Smoothness (0-1)"}
-                    hint={
-                        "How much a cell's own movement overlaps its neighbors'. 0 makes each cell wait its turn; 1 blurs them into one sweep."
-                    }
-                    controls={"Sets CellAnimationBreakpointOpts.smoothness"}
-                >
-                    <PageNumberField
-                        value={() => breakpointOpts.smoothness!}
-                        min={CellAnimationKnobs.MIN_SMOOTHNESS}
-                        max={CellAnimationKnobs.MAX_SMOOTHNESS}
-                        step={CellAnimationKnobs.SMOOTHNESS_STEP}
-                        ariaLabel={"Smoothness"}
-                        onInput={(value) => setBreakpointOpts("smoothness", value)}
-                    />
-                </PageProp>
+                    <PageProp
+                        key={"animationDurationMs"}
+                        label={"Animation duration (ms)"}
+                        hint={"How long one pass over the whole grid takes."}
+                        controls={"Sets CellAnimationProps.animationDurationMs"}
+                    >
+                        <PageNumberField
+                            value={getAnimationDurationMs}
+                            min={CellAnimationKnobs.MIN_DURATION_MS}
+                            max={CellAnimationKnobs.MAX_DURATION_MS}
+                            step={CellAnimationKnobs.DURATION_STEP_MS}
+                            ariaLabel={"Animation duration"}
+                            onInput={setAnimationDurationMs}
+                        />
+                    </PageProp>
 
-                <PageProp
-                    key={"animationDurationMs"}
-                    label={"Animation duration (ms)"}
-                    hint={"How long one pass over the whole grid takes."}
-                    controls={"Sets CellAnimationProps.animationDurationMs"}
-                >
-                    <PageNumberField
-                        value={getAnimationDurationMs}
-                        min={CellAnimationKnobs.MIN_DURATION_MS}
-                        max={CellAnimationKnobs.MAX_DURATION_MS}
-                        step={CellAnimationKnobs.DURATION_STEP_MS}
-                        ariaLabel={"Animation duration"}
-                        onInput={setAnimationDurationMs}
-                    />
-                </PageProp>
+                    <PageProp
+                        key={"animationIterationDelayMs"}
+                        label={"Iteration delay (ms)"}
+                        hint={"How long the grid waits between one pass and the next."}
+                        controls={"Sets CellAnimationProps.animationIterationDelayMs"}
+                    >
+                        <PageNumberField
+                            value={getAnimationIterationDelayMs}
+                            min={CellAnimationKnobs.MIN_ITERATION_DELAY_MS}
+                            max={CellAnimationKnobs.MAX_ITERATION_DELAY_MS}
+                            step={CellAnimationKnobs.DURATION_STEP_MS}
+                            ariaLabel={"Iteration delay"}
+                            onInput={setAnimationIterationDelayMs}
+                        />
+                    </PageProp>
 
-                <PageProp
-                    key={"animationIterationDelayMs"}
-                    label={"Iteration delay (ms)"}
-                    hint={"How long the grid waits between one pass and the next."}
-                    controls={"Sets CellAnimationProps.animationIterationDelayMs"}
-                >
-                    <PageNumberField
-                        value={getAnimationIterationDelayMs}
-                        min={CellAnimationKnobs.MIN_ITERATION_DELAY_MS}
-                        max={CellAnimationKnobs.MAX_ITERATION_DELAY_MS}
-                        step={CellAnimationKnobs.DURATION_STEP_MS}
-                        ariaLabel={"Iteration delay"}
-                        onInput={setAnimationIterationDelayMs}
-                    />
-                </PageProp>
+                    <PageProp
+                        key={"animationIterationCount"}
+                        label={"Iteration count (-1 = endless)"}
+                        hint={"How many passes to run. -1 means it never stops, and 0 shows the final frame at once."}
+                        controls={"Sets CellAnimationProps.animationIterationCount, with -1 sent as Infinity"}
+                    >
+                        <PageNumberField
+                            value={getAnimationIterationCount}
+                            min={CellAnimationKnobs.MIN_ITERATION_COUNT}
+                            max={CellAnimationKnobs.MAX_ITERATION_COUNT}
+                            step={CellAnimationKnobs.CELL_COUNT_STEP}
+                            ariaLabel={"Iteration count"}
+                            onInput={setAnimationIterationCount}
+                        />
+                    </PageProp>
 
-                <PageProp
-                    key={"animationIterationCount"}
-                    label={"Iteration count (-1 = endless)"}
-                    hint={"How many passes to run. -1 means it never stops, and 0 shows the final frame at once."}
-                    controls={"Sets CellAnimationProps.animationIterationCount, with -1 sent as Infinity"}
-                >
-                    <PageNumberField
-                        value={getAnimationIterationCount}
-                        min={CellAnimationKnobs.MIN_ITERATION_COUNT}
-                        max={CellAnimationKnobs.MAX_ITERATION_COUNT}
-                        step={CellAnimationKnobs.CELL_COUNT_STEP}
-                        ariaLabel={"Iteration count"}
-                        onInput={setAnimationIterationCount}
-                    />
-                </PageProp>
+                    <PageProp
+                        key={"finalFrame"}
+                        label={"Final frame is"}
+                        hint={
+                            "What the grid is left showing once the passes are done. It has nothing to settle on while the run is endless."
+                        }
+                        controls={"Sets CellAnimationProps.finalFrame"}
+                    >
+                        <PageSelectField
+                            value={getFinalFrame}
+                            values={CELL_ANIMATION_FINAL_FRAMES}
+                            isDisabled={() =>
+                                getAnimationIterationCount() === CellAnimationKnobs.ENDLESS_ITERATION_COUNT
+                            }
+                            ariaLabel={"Final frame"}
+                            onChange={(frame) => setFinalFrame(() => frame)}
+                        />
+                    </PageProp>
 
-                <PageProp
-                    key={"finalFrame"}
-                    label={"Final frame is"}
-                    hint={
-                        "What the grid is left showing once the passes are done. It has nothing to settle on while the run is endless."
-                    }
-                    controls={"Sets CellAnimationProps.finalFrame"}
-                >
-                    <PageSelectField
-                        value={getFinalFrame}
-                        values={CELL_ANIMATION_FINAL_FRAMES}
-                        isDisabled={() => getAnimationIterationCount() === CellAnimationKnobs.ENDLESS_ITERATION_COUNT}
-                        ariaLabel={"Final frame"}
-                        onChange={(frame) => setFinalFrame(() => frame)}
-                    />
-                </PageProp>
+                    <PageProp
+                        key={"playbackDir"}
+                        label={"Playback direction"}
+                        hint={
+                            "Whether each pass runs one way, or goes out and comes back. Coming back, stack starts with the last cell to arrive and pipe with the first."
+                        }
+                        controls={"Sets CellAnimationPlaybackOpts.dir"}
+                    >
+                        <PageSelectField
+                            value={() => playbackOpts.dir!}
+                            values={CellAnimationPlayback.DIRECTIONS}
+                            ariaLabel={"Playback direction"}
+                            onChange={(dir) => setPlaybackOpts("dir", dir)}
+                        />
+                    </PageProp>
 
-                <PageProp
-                    key={"playbackDir"}
-                    label={"Playback direction"}
-                    hint={
-                        "Whether each pass runs one way, or goes out and comes back. Coming back, stack starts with the last cell to arrive and pipe with the first."
-                    }
-                    controls={"Sets CellAnimationPlaybackOpts.dir"}
-                >
-                    <PageSelectField
-                        value={() => playbackOpts.dir!}
-                        values={CellAnimationPlayback.DIRECTIONS}
-                        ariaLabel={"Playback direction"}
-                        onChange={(dir) => setPlaybackOpts("dir", dir)}
-                    />
-                </PageProp>
-
-                <PageProp
-                    key={"holdMs"}
-                    label={"Hold at far end (ms)"}
-                    hint={
-                        "How long the grid rests at the far end before turning back. It only applies to stack and pipe, which come back."
-                    }
-                    controls={"Sets CellAnimationPlaybackOpts.holdMs"}
-                >
-                    <PageNumberField
-                        value={() => playbackOpts.holdMs!}
-                        min={CellAnimationKnobs.MIN_HOLD_MS}
-                        max={CellAnimationKnobs.MAX_HOLD_MS}
-                        step={CellAnimationKnobs.DURATION_STEP_MS}
-                        isDisabled={() => !CellAnimationPlaybackUtils.isRoundTrip(playbackOpts.dir)}
-                        ariaLabel={"Hold at far end"}
-                        onInput={(value) => setPlaybackOpts("holdMs", value)}
-                    />
-                </PageProp>
-            </PagePropsPanel>
+                    <PageProp
+                        key={"holdMs"}
+                        label={"Hold at far end (ms)"}
+                        hint={
+                            "How long the grid rests at the far end before turning back. It only applies to stack and pipe, which come back."
+                        }
+                        controls={"Sets CellAnimationPlaybackOpts.holdMs"}
+                    >
+                        <PageNumberField
+                            value={() => playbackOpts.holdMs!}
+                            min={CellAnimationKnobs.MIN_HOLD_MS}
+                            max={CellAnimationKnobs.MAX_HOLD_MS}
+                            step={CellAnimationKnobs.DURATION_STEP_MS}
+                            isDisabled={() => !CellAnimationPlaybackUtils.isRoundTrip(playbackOpts.dir)}
+                            ariaLabel={"Hold at far end"}
+                            onInput={(value) => setPlaybackOpts("holdMs", value)}
+                        />
+                    </PageProp>
+                </PagePropsPanel>
+            </PagePropsGroups>
 
             <PageExamples items={getExamples} layout={"flow"} />
         </div>

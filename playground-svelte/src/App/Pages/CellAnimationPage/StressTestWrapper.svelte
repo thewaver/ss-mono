@@ -37,9 +37,9 @@
         },
     ];
 
-    type Props = CellAnimationSourcedExampleProps;
+    type Props = CellAnimationSourcedExampleProps & { computeWidth: (longestSide: number) => number };
 
-    let { playback = $bindable(), ...props }: Props = $props();
+    let { playback = $bindable(), computeWidth, ...props }: Props = $props();
 
     let modalPlayback = $state(true);
 </script>
@@ -60,7 +60,7 @@
     {/snippet}
 
     {#snippet renderItem(configIndex)}
-        <PageMeasureBox width={STRESS_ITEMS[configIndex].size} height={STRESS_ITEMS[configIndex].size}>
+        <PageMeasureBox width={computeWidth(STRESS_ITEMS[configIndex].size)}>
             <DefaultExample {...props} bind:playback={modalPlayback} cellCount={STRESS_CELL_COUNT} />
         </PageMeasureBox>
     {/snippet}

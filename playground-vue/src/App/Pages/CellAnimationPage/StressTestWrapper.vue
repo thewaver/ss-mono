@@ -11,7 +11,7 @@ import StressTest from "../../PageComponents/StressTest/StressTest.vue";
 import type { CellAnimationSourcedExampleProps } from "./CellAnimationPage.types";
 import DefaultExample from "./Examples/Default.vue";
 
-type Props = CellAnimationSourcedExampleProps;
+type Props = CellAnimationSourcedExampleProps & { computeWidth: (longestSide: number) => number };
 
 const props = defineProps<Props>();
 
@@ -20,7 +20,12 @@ const playback = useModel(props, "playback");
 const modalPlayback = shallowRef(true);
 
 const sharedProps = computed(() => {
-    const { "playback": _playback, "onUpdate:playback": _setPlayback, ...shared } = props;
+    const {
+        "playback": _playback,
+        "onUpdate:playback": _setPlayback,
+        "computeWidth": _computeWidth,
+        ...shared
+    } = props;
 
     return shared;
 });
@@ -41,7 +46,7 @@ const pause = () => {
         <template #renderLabel="{ configIndex }">{{ `Render ${STRESS_ITEMS[configIndex].count} items` }}</template>
 
         <template #renderItem="{ configIndex }">
-            <PageMeasureBox :width="STRESS_ITEMS[configIndex].size" :height="STRESS_ITEMS[configIndex].size">
+            <PageMeasureBox :width="computeWidth(STRESS_ITEMS[configIndex].size)">
                 <DefaultExample v-bind="sharedProps" v-model:playback="modalPlayback" :cell-count="STRESS_CELL_COUNT" />
             </PageMeasureBox>
         </template>

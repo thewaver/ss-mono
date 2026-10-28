@@ -41,6 +41,7 @@ const SHARED_THEME_VALUES = {
         },
     },
     spacing: {
+        quarter: "2px",
         half: "5px",
         full: "10px",
         double: "20px",

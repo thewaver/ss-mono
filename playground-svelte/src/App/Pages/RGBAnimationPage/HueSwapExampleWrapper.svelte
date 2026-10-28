@@ -11,14 +11,20 @@
     import HueSwapExample from "./Examples/HueSwap.svelte";
     import type { RGBAnimationWrapperProps } from "./RGBAnimationPageSvelte.types";
 
-    let { playback = $bindable(), progress = $bindable(), boxWidth, ...props }: RGBAnimationWrapperProps = $props();
+    let {
+        playback = $bindable(),
+        progress = $bindable(),
+        boxWidth,
+        isPagePlaying,
+        ...props
+    }: RGBAnimationWrapperProps = $props();
 
     let turns = $state(RGBAnimationKnobs.STARTING_HUE_TURNS);
 </script>
 
 <div class={styles.stack}>
     <PageMeasureBox width={boxWidth}>
-        <HueSwapExample {...props} bind:playback bind:progress {turns} />
+        <HueSwapExample {...props} bind:playback={() => isPagePlaying && playback, (next) => (playback = next)} bind:progress {turns} />
     </PageMeasureBox>
 
     <PagePlaybackScrubber id={"hueSwap"} ariaLabel={"Position in the pass"} bind:playback bind:progress />

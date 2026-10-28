@@ -1,3 +1,4 @@
+import type { StressTestDefs } from "../../PageComponents/StressTest/StressText.types";
 import type { RGBAnimationSourceKey } from "./RGBAnimationPage.types";
 
 export const EXAMPLE_NAMES = {
@@ -10,6 +11,7 @@ export const EXAMPLE_NAMES = {
     tilt: "Tilt",
     anaglyph: "Anaglyph",
     echo: "Echo",
+    stressTest: "Stress Test",
 };
 
 export const EXAMPLES_ROOT = "/src/App/Pages/RGBAnimationPage/Examples";
@@ -29,3 +31,28 @@ export const SOURCE_KEYS: RGBAnimationSourceKey[] = ["knight", "text"];
 export const SOURCE_WIDTHS: Record<RGBAnimationSourceKey, number> = { knight: PHOTO_WIDTH, text: HEADLINE_WIDTH };
 
 export const SOURCE_LABELS: Record<RGBAnimationSourceKey, string> = { knight: "A knight in armor", text: "Signal" };
+
+export const STRESS_ITEM_WIDTH = 120;
+
+export const STRESS_ITEMS: StressTestDefs[] = [
+    {
+        count: 4 * 3,
+        cols: 4,
+        gap: 10,
+    },
+    {
+        count: 6 * 4,
+        cols: 6,
+        gap: 10,
+    },
+    {
+        count: 8 * 6,
+        cols: 8,
+        gap: 10,
+    },
+    {
+        count: 12 * 6,
+        cols: 12,
+        gap: 10,
+    },
+];

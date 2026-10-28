@@ -11,14 +11,20 @@
     import SwellExample from "./Examples/Swell.svelte";
     import type { RGBAnimationWrapperProps } from "./RGBAnimationPageSvelte.types";
 
-    let { playback = $bindable(), progress = $bindable(), boxWidth, ...props }: RGBAnimationWrapperProps = $props();
+    let {
+        playback = $bindable(),
+        progress = $bindable(),
+        boxWidth,
+        isPagePlaying,
+        ...props
+    }: RGBAnimationWrapperProps = $props();
 
     let scalePercent = $state(RGBAnimationKnobs.STARTING_SCALE_PERCENT);
 </script>
 
 <div class={styles.stack}>
     <PageMeasureBox width={boxWidth}>
-        <SwellExample {...props} bind:playback bind:progress {scalePercent} />
+        <SwellExample {...props} bind:playback={() => isPagePlaying && playback, (next) => (playback = next)} bind:progress {scalePercent} />
     </PageMeasureBox>
 
     <PagePlaybackScrubber id={"swell"} ariaLabel={"Position in the pass"} bind:playback bind:progress />

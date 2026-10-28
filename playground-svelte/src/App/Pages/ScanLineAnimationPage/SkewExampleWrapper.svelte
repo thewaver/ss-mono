@@ -18,7 +18,10 @@
         IMAGE_CONTAINER_SIZE,
     } from "@thewaver/ss-playground/App/Pages/ScanLineAnimationPage/ScanLineAnimationPage.const";
 
-    let props: Omit<ScanlineAnimationExampleProps, "playback"> = $props();
+    let {
+        isPagePlaying,
+        ...props
+    }: Omit<ScanlineAnimationExampleProps, "playback"> & { isPagePlaying: boolean } = $props();
 
     let playback = $state(true);
     let progress = $state(0);
@@ -31,7 +34,7 @@
 
 <div class={styles.stack}>
     <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
-        <SkewExample {...props} bind:playback bind:progress keyframeOpts={keyframeOpts as _ScanlineHorizontalSkewOpts} {breakpointOpts} />
+        <SkewExample {...props} bind:playback={() => isPagePlaying && playback, (next) => (playback = next)} bind:progress keyframeOpts={keyframeOpts as _ScanlineHorizontalSkewOpts} {breakpointOpts} />
     </PageMeasureBox>
 
     <PagePlaybackScrubber id={"scanlineSkew"} ariaLabel={"Position in the pass"} bind:playback bind:progress />

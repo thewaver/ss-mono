@@ -1728,7 +1728,7 @@ and the file-name-is-the-key rule is intact inside the registries.
 
 **`SVGDefsSources` and `SVGDefsUri` did not go with them**, and are now
 `playground/src/App/PageComponents/SVGDefsSources`. They are not samples: they render sample defs and serialize
-them to a data URI so two `CellAnimation` examples have something to animate. That is Playground furniture by
+them to a data URI so `CellAnimation`'s drawn sources have something to animate. That is Playground furniture by
 the _"three trees"_ definition, it needs a DOM, and keeping it out of the library keeps page tooling off the
 published surface. Its source tab still works, because it is Playground-side.
 
@@ -8745,18 +8745,20 @@ the same trick for this component. Two things the SVG must do: declare `xmlns`, 
 **zero** cells painted a background while the anchor still sized the box correctly, which is the failure that looks
 like the animation having broken rather than the source.
 
-**The Playground shows three source kinds as three examples, each owning the one setting only it can
-answer.** A photograph is picked per example rather than per page — `ScanlineAnimationPage`'s arrangement —
-and the two drawn examples each carry a dropdown over `Shape`'s own gradient and pattern samples. Everything
-the three share, the grid and the weights and the timing, stays in the page's own panel, since changing it is
-meant to change all of them.
+**The Playground shows the three source kinds in one example, chosen from a sample group at the top of the
+page.** The user's merge: a `Source` picker (`image`, `gradient`, `pattern`) heads its own panel and brings the
+knobs that kind needs — a file for the photograph, a dropdown over `Shape`'s own gradient or pattern samples and a
+ratio for a drawn one — while the grid, the weights and the timing stay in the page-wide panel below. The stress
+test slices the same chosen source, its tiles sized by `computeSourcedWidth` so each keeps the picture's
+proportions with its longest side at the tile size.
 
-**A drawn example also picks its own shape, which the photograph cannot.** The two serialized sources are
-written at whatever width and height they are handed, so `1:1`, `2:1` and `1:2` are a per-example dropdown over
+**A drawn source also picks its own shape, which the photograph cannot.** The two serialized sources are
+written at whatever width and height they are handed, so `1:1`, `2:1` and `1:2` are one ratio dropdown, shared by
+gradient and pattern, over
 `SOURCE_RATIO_SIZES` — the long side stays 1200 and the short one halves, so the default source is the same
 1200×1200 it always was. `computeGradientSource` and `computePatternSource` take that size as an argument
 rather than reading `SOURCE_SIZE`, since the rect, the sample's own `getSize` and the `<svg>` attributes all
-have to agree on one number. A photograph's ratio is the file's, so the first example has no such control, and
+have to agree on one number. A photograph's ratio is the file's, so the image source has no such control, and
 the pattern's cell size is left at 150×150 — a wider source therefore shows more pattern cells rather than
 stretched ones. The demo box takes its width from the ratio so the longest side is always the same 480: a
 portrait source renders 240 wide rather than 960 tall.
@@ -9330,10 +9332,16 @@ Pausing freezes the animation where it is, which is what scrubbing needs.
 The user's call, for `CellAnimation`, `ScanlineAnimation` and `RGBAnimation`: every example that shows one running
 animation has a `PagePlaybackScrubber` under it, driving a play state and a progress that belong to that example
 alone, so pausing or scrubbing one leaves the rest running. A page-wide play state survives only where something
-still needs one, the stress tests, whose popup switches it. **Two kinds of example take no controls**: `CellAnimation`'s
-Wipe, which exists only while it covers the whole screen, and the stress tests, which run dozens at once. On the
-drawn-source examples (`CellAnimation`'s Gradient and Pattern) the colors inside the picture keep moving while the cells
-are paused, because they animate on the source's own clock; a scrub moves the cells only.
+still needs one, the stress tests, whose popup switches it. **Every example's component plays only while both its
+own state and the page-wide one say so**, so opening the popup pauses everything behind it while each scrubber keeps
+showing its own state; handing the example its own state alone had left the page-wide one switching nothing. Solid
+and React join the two with `PlaybackScrubberUtils.gate`; Vue binds `isPagePlaying && playback` with its own update
+listener, and Svelte a function binding of the same. RGBAnimation's stress test is one group, each tile one of the
+page's examples at random at its starting settings, where ScanlineAnimation's splits transforms from filters.
+**Two kinds of example take no controls**: `CellAnimation`'s Wipe, which exists only while it covers the whole
+screen, and the stress tests, which run dozens at once. On a drawn source (`CellAnimation`'s gradient or pattern)
+the colors inside the picture keep moving while the cells are paused, because they animate on the source's own
+clock; a scrub moves the cells only.
 
 ### `CellAnimation`: the screen wipe is an example, not a component
 

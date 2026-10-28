@@ -11,14 +11,20 @@
     import FocusPullExample from "./Examples/FocusPull.svelte";
     import type { RGBAnimationWrapperProps } from "./RGBAnimationPageSvelte.types";
 
-    let { playback = $bindable(), progress = $bindable(), boxWidth, ...props }: RGBAnimationWrapperProps = $props();
+    let {
+        playback = $bindable(),
+        progress = $bindable(),
+        boxWidth,
+        isPagePlaying,
+        ...props
+    }: RGBAnimationWrapperProps = $props();
 
     let maxBlurPx = $state(RGBAnimationKnobs.STARTING_FOCUS_BLUR_PX);
 </script>
 
 <div class={styles.stack}>
     <PageMeasureBox width={boxWidth}>
-        <FocusPullExample {...props} bind:playback bind:progress {maxBlurPx} />
+        <FocusPullExample {...props} bind:playback={() => isPagePlaying && playback, (next) => (playback = next)} bind:progress {maxBlurPx} />
     </PageMeasureBox>
 
     <PagePlaybackScrubber id={"focusPull"} ariaLabel={"Position in the pass"} bind:playback bind:progress />

@@ -32,7 +32,8 @@ const keyframeOpts = reactive({ ...ScanlineAnimationKnobs.STARTING_GLITCH_OPTS }
         <PageMeasureBox :width="IMAGE_CONTAINER_SIZE">
             <GlitchExample
                 v-bind="sharedProps"
-                v-model:playback="playback"
+                :playback="props.playback && playback"
+                @update:playback="(next: boolean) => (playback = next)"
                 v-model:progress="progress"
                 :keyframe-opts="keyframeOpts"
             />

@@ -27,6 +27,7 @@ const sharedProps = computed(() => {
         "progress": _progress,
         "onUpdate:progress": _setProgress,
         "boxWidth": _boxWidth,
+        "isPagePlaying": _isPagePlaying,
         ...shared
     } = props;
 
@@ -39,7 +40,8 @@ const sharedProps = computed(() => {
         <PageMeasureBox :width="boxWidth">
             <EchoExample
                 v-bind="sharedProps"
-                v-model:playback="playback"
+                :playback="isPagePlaying && playback"
+                @update:playback="(next: boolean) => (playback = next)"
                 v-model:progress="progress"
                 :distance-percent="distancePercent"
             />

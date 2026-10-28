@@ -51,6 +51,7 @@ import { PageKnobs } from "../../PageComponents/Knobs/Knobs";
 import type { Knob } from "../../PageComponents/Knobs/Knobs.types";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PagePlaybackScrubber } from "../../PageComponents/PlaybackScrubber/PlaybackScrubber";
+import { PlaybackScrubberUtils } from "../../PageComponents/PlaybackScrubber/PlaybackScrubber.utils";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { StressTest } from "../../PageComponents/StressTest/StressTest";
@@ -223,7 +224,12 @@ const GlitchExampleWrapper = (props: ScanlineAnimationExampleProps) => {
         <>
             <div className={styles.stack}>
                 <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
-                    <GlitchExample {...props} playback={playback} progress={progress} keyframeOpts={keyframeOpts} />
+                    <GlitchExample
+                        {...props}
+                        playback={PlaybackScrubberUtils.gate(playback, props.playback[0])}
+                        progress={progress}
+                        keyframeOpts={keyframeOpts}
+                    />
                 </PageMeasureBox>
 
                 <PagePlaybackScrubber
@@ -310,7 +316,7 @@ const SurgeExampleWrapper = (props: ScanlineAnimationExampleProps) => {
                 <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
                     <SurgeExample
                         {...props}
-                        playback={playback}
+                        playback={PlaybackScrubberUtils.gate(playback, props.playback[0])}
                         progress={progress}
                         keyframeOpts={keyframeOpts as ScanlineHorizontalStretchOpts}
                         breakpointOpts={breakpointOpts}
@@ -358,7 +364,7 @@ const SnakeExampleWrapper = (props: ScanlineAnimationExampleProps) => {
                 <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
                     <SnakeExample
                         {...props}
-                        playback={playback}
+                        playback={PlaybackScrubberUtils.gate(playback, props.playback[0])}
                         progress={progress}
                         keyframeOpts={keyframeOpts as ScanlineHorizontalSnakeOpts}
                         breakpointOpts={breakpointOpts}
@@ -406,7 +412,7 @@ const SplitExampleWrapper = (props: ScanlineAnimationExampleProps) => {
                 <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
                     <SplitExample
                         {...props}
-                        playback={playback}
+                        playback={PlaybackScrubberUtils.gate(playback, props.playback[0])}
                         progress={progress}
                         keyframeOpts={keyframeOpts as ScanlineHorizontalSplitOpts}
                         breakpointOpts={breakpointOpts}
@@ -454,7 +460,7 @@ const BrightnessExampleWrapper = (props: ScanlineAnimationExampleProps) => {
                 <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
                     <BrightnessExample
                         {...props}
-                        playback={playback}
+                        playback={PlaybackScrubberUtils.gate(playback, props.playback[0])}
                         progress={progress}
                         keyframeOpts={keyframeOpts}
                         breakpointOpts={breakpointOpts}
@@ -495,7 +501,7 @@ const GrayscaleExampleWrapper = (props: ScanlineAnimationExampleProps) => {
                 <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
                     <GrayscaleExample
                         {...props}
-                        playback={playback}
+                        playback={PlaybackScrubberUtils.gate(playback, props.playback[0])}
                         progress={progress}
                         keyframeOpts={keyframeOpts}
                         breakpointOpts={breakpointOpts}
@@ -536,7 +542,7 @@ const HueExampleWrapper = (props: ScanlineAnimationExampleProps) => {
                 <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
                     <HueExample
                         {...props}
-                        playback={playback}
+                        playback={PlaybackScrubberUtils.gate(playback, props.playback[0])}
                         progress={progress}
                         keyframeOpts={keyframeOpts}
                         breakpointOpts={breakpointOpts}
@@ -577,7 +583,7 @@ const WaveExampleWrapper = (props: ScanlineAnimationExampleProps) => {
                 <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
                     <WaveExample
                         {...props}
-                        playback={playback}
+                        playback={PlaybackScrubberUtils.gate(playback, props.playback[0])}
                         progress={progress}
                         keyframeOpts={keyframeOpts as _ScanlineHorizontalWaveOpts}
                         breakpointOpts={breakpointOpts}
@@ -625,7 +631,7 @@ const RollExampleWrapper = (props: ScanlineAnimationExampleProps) => {
                 <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
                     <RollExample
                         {...props}
-                        playback={playback}
+                        playback={PlaybackScrubberUtils.gate(playback, props.playback[0])}
                         progress={progress}
                         keyframeOpts={keyframeOpts as _ScanlineHorizontalRollOpts}
                         breakpointOpts={breakpointOpts}
@@ -673,7 +679,7 @@ const DropoutExampleWrapper = (props: ScanlineAnimationExampleProps) => {
                 <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
                     <DropoutExample
                         {...props}
-                        playback={playback}
+                        playback={PlaybackScrubberUtils.gate(playback, props.playback[0])}
                         progress={progress}
                         keyframeOpts={keyframeOpts as _ScanlineHorizontalDropoutOpts}
                         breakpointOpts={breakpointOpts}
@@ -721,7 +727,7 @@ const InterlaceExampleWrapper = (props: ScanlineAnimationExampleProps) => {
                 <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
                     <InterlaceExample
                         {...props}
-                        playback={playback}
+                        playback={PlaybackScrubberUtils.gate(playback, props.playback[0])}
                         progress={progress}
                         keyframeOpts={keyframeOpts as _ScanlineHorizontalInterlaceOpts}
                         breakpointOpts={breakpointOpts}
@@ -769,7 +775,7 @@ const SkewExampleWrapper = (props: ScanlineAnimationExampleProps) => {
                 <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
                     <SkewExample
                         {...props}
-                        playback={playback}
+                        playback={PlaybackScrubberUtils.gate(playback, props.playback[0])}
                         progress={progress}
                         keyframeOpts={keyframeOpts as _ScanlineHorizontalSkewOpts}
                         breakpointOpts={breakpointOpts}

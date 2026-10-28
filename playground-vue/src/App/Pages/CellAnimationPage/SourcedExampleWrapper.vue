@@ -1,21 +1,19 @@
 <script setup lang="ts">
-import { computed, shallowRef, useModel } from "vue";
+import { computed, useModel } from "vue";
 
 import { IMAGE_CONTAINER_SIZE } from "@thewaver/ss-playground/App/Pages/CellAnimationPage/CellAnimationPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/CellAnimationPage/CellAnimationPage.css";
-import knight_profile from "@thewaver/ss-playground/App/knight_profile.webp";
 
-import PageExampleKnobs from "../../PageComponents/ExampleKnobs/PageExampleKnobs.vue";
-import PageFileField from "../../PageComponents/Field/PageFileField.vue";
 import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.vue";
 import PagePlaybackScrubber from "../../PageComponents/PlaybackScrubber/PlaybackScrubber.vue";
-import PageProp from "../../PageComponents/Prop/Prop.vue";
-import type { CellAnimationExampleProps } from "./CellAnimationPage.types";
+import type { CellAnimationSourcedExampleProps } from "./CellAnimationPage.types";
 import DefaultExample from "./Examples/Default.vue";
 
-type Props = CellAnimationExampleProps & {
+type Props = CellAnimationSourcedExampleProps & {
     "progress": number;
     "onUpdate:progress"?: (progress: number) => void;
+    "isPagePlaying": boolean;
+    "computeWidth": (longestSide: number) => number;
 };
 
 const props = defineProps<Props>();
@@ -23,29 +21,30 @@ const props = defineProps<Props>();
 const playback = useModel(props, "playback");
 const progress = useModel(props, "progress");
 
-const src = shallowRef(knight_profile);
-
 const sharedProps = computed(() => {
     const {
         "playback": _playback,
         "onUpdate:playback": _setPlayback,
         "progress": _progress,
         "onUpdate:progress": _setProgress,
+        "isPagePlaying": _isPagePlaying,
+        "computeWidth": _computeWidth,
         ...shared
     } = props;
 
     return shared;
 });
-
-const pick = (file: File) => {
-    src.value = URL.createObjectURL(file);
-};
 </script>
 
 <template>
     <div :class="styles.stack">
-        <PageMeasureBox :width="IMAGE_CONTAINER_SIZE">
-            <DefaultExample v-bind="sharedProps" v-model:playback="playback" v-model:progress="progress" :src="src" />
+        <PageMeasureBox :width="computeWidth(IMAGE_CONTAINER_SIZE)">
+            <DefaultExample
+                v-bind="sharedProps"
+                v-model:progress="progress"
+                :playback="isPagePlaying && playback"
+                @update:playback="(next: boolean) => (playback = next)"
+            />
         </PageMeasureBox>
 
         <PagePlaybackScrubber
@@ -55,15 +54,4 @@ const pick = (file: File) => {
             ariaLabel="Position in the pass"
         />
     </div>
-
-    <PageExampleKnobs>
-        <PageProp
-            item-key="image"
-            controls="Picks the example picture sent to CellAnimationProps.src"
-            label="Image"
-            hint="Swaps in a picture of your own, so the cells can be watched against something other than the sample."
-        >
-            <PageFileField accept="image/*" ariaLabel="Image" @pick="pick" />
-        </PageProp>
-    </PageExampleKnobs>
 </template>

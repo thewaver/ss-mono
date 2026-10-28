@@ -1,4 +1,4 @@
-import { type Accessor, createMemo, createSignal, splitProps } from "solid-js";
+import { type Accessor, type JSX, type Signal, createMemo, createSignal, splitProps } from "solid-js";
 import { createStore } from "solid-js/store";
 
 import { RGB_ANIMATION_DEFAULTS } from "@thewaver/ss-components-solid";
@@ -11,6 +11,8 @@ import {
     SOURCE_KEYS,
     SOURCE_LABELS,
     SOURCE_WIDTHS,
+    STRESS_ITEMS,
+    STRESS_ITEM_WIDTH,
 } from "@thewaver/ss-playground/App/Pages/RGBAnimationPage/RGBAnimationPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/RGBAnimationPage/RGBAnimationPage.css";
 import type { RGBAnimationSourceKey } from "@thewaver/ss-playground/App/Pages/RGBAnimationPage/RGBAnimationPage.types";
@@ -21,8 +23,10 @@ import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PagePlaybackScrubber } from "../../PageComponents/PlaybackScrubber/PlaybackScrubber";
+import { PlaybackScrubberUtils } from "../../PageComponents/PlaybackScrubber/PlaybackScrubber.utils";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
+import { StressTest } from "../../PageComponents/StressTest/StressTest";
 import { AnaglyphExample } from "./Examples/Anaglyph";
 import { EchoExample } from "./Examples/Echo";
 import { FocusPullExample } from "./Examples/FocusPull";
@@ -36,10 +40,28 @@ import type { RGBAnimationExampleProps } from "./RGBAnimationPageSolid.types";
 
 const SOURCES: Record<RGBAnimationSourceKey, string> = { knight: knightProfile, text: HEADLINE_SOURCE };
 
-type WrapperProps = RGBAnimationExampleProps & { boxWidth: Accessor<number> };
+type WrapperProps = RGBAnimationExampleProps & {
+    playback: Signal<boolean>;
+    boxWidth: Accessor<number>;
+    isPagePlaying: Accessor<boolean>;
+};
+
+const STRESS_EXAMPLES: ((props: RGBAnimationExampleProps) => JSX.Element)[] = [
+    (props) => <GlitchExample {...props} glitchOpts={RGBAnimationKnobs.STARTING_GLITCH_OPTS} />,
+    (props) => <SwellExample {...props} scalePercent={RGBAnimationKnobs.STARTING_SCALE_PERCENT} />,
+    (props) => <OrbitExample {...props} radiusPercent={RGBAnimationKnobs.STARTING_ORBIT_RADIUS_PERCENT} />,
+    (props) => <FocusPullExample {...props} maxBlurPx={RGBAnimationKnobs.STARTING_FOCUS_BLUR_PX} />,
+    (props) => <TwistExample {...props} maxDegrees={RGBAnimationKnobs.STARTING_TWIST_DEGREES} />,
+    (props) => <HueSwapExample {...props} turns={RGBAnimationKnobs.STARTING_HUE_TURNS} />,
+    (props) => <TiltExample {...props} maxDegrees={RGBAnimationKnobs.STARTING_TILT_DEGREES} />,
+    (props) => (
+        <AnaglyphExample {...props} separationPercent={RGBAnimationKnobs.STARTING_ANAGLYPH_SEPARATION_PERCENT} />
+    ),
+    (props) => <EchoExample {...props} distancePercent={RGBAnimationKnobs.STARTING_ECHO_DISTANCE_PERCENT} />,
+];
 
 const GlitchExampleWrapper = (props: WrapperProps) => {
-    const [local, exampleProps] = splitProps(props, ["boxWidth"]);
+    const [local, exampleProps] = splitProps(props, ["boxWidth", "isPagePlaying"]);
 
     const [glitchOpts, setGlitchOpts] = createStore({ ...RGBAnimationKnobs.STARTING_GLITCH_OPTS });
 
@@ -47,7 +69,11 @@ const GlitchExampleWrapper = (props: WrapperProps) => {
         <>
             <div class={styles.stack}>
                 <PageMeasureBox width={local.boxWidth}>
-                    <GlitchExample {...exampleProps} glitchOpts={() => ({ ...glitchOpts })} />
+                    <GlitchExample
+                        {...exampleProps}
+                        playback={PlaybackScrubberUtils.gate(props.playback, local.isPagePlaying)}
+                        glitchOpts={() => ({ ...glitchOpts })}
+                    />
                 </PageMeasureBox>
 
                 <PagePlaybackScrubber
@@ -100,7 +126,7 @@ const GlitchExampleWrapper = (props: WrapperProps) => {
 };
 
 const SwellExampleWrapper = (props: WrapperProps) => {
-    const [local, exampleProps] = splitProps(props, ["boxWidth"]);
+    const [local, exampleProps] = splitProps(props, ["boxWidth", "isPagePlaying"]);
 
     const [getScalePercent, setScalePercent] = createSignal(RGBAnimationKnobs.STARTING_SCALE_PERCENT);
 
@@ -108,7 +134,11 @@ const SwellExampleWrapper = (props: WrapperProps) => {
         <>
             <div class={styles.stack}>
                 <PageMeasureBox width={local.boxWidth}>
-                    <SwellExample {...exampleProps} scalePercent={getScalePercent} />
+                    <SwellExample
+                        {...exampleProps}
+                        playback={PlaybackScrubberUtils.gate(props.playback, local.isPagePlaying)}
+                        scalePercent={getScalePercent}
+                    />
                 </PageMeasureBox>
 
                 <PagePlaybackScrubber
@@ -142,14 +172,18 @@ const SwellExampleWrapper = (props: WrapperProps) => {
 };
 
 const OrbitExampleWrapper = (props: WrapperProps) => {
-    const [local, exampleProps] = splitProps(props, ["boxWidth"]);
+    const [local, exampleProps] = splitProps(props, ["boxWidth", "isPagePlaying"]);
     const [getRadiusPercent, setRadiusPercent] = createSignal(RGBAnimationKnobs.STARTING_ORBIT_RADIUS_PERCENT);
 
     return (
         <>
             <div class={styles.stack}>
                 <PageMeasureBox width={local.boxWidth}>
-                    <OrbitExample {...exampleProps} radiusPercent={getRadiusPercent} />
+                    <OrbitExample
+                        {...exampleProps}
+                        playback={PlaybackScrubberUtils.gate(props.playback, local.isPagePlaying)}
+                        radiusPercent={getRadiusPercent}
+                    />
                 </PageMeasureBox>
 
                 <PagePlaybackScrubber
@@ -185,14 +219,18 @@ const OrbitExampleWrapper = (props: WrapperProps) => {
 };
 
 const FocusPullExampleWrapper = (props: WrapperProps) => {
-    const [local, exampleProps] = splitProps(props, ["boxWidth"]);
+    const [local, exampleProps] = splitProps(props, ["boxWidth", "isPagePlaying"]);
     const [getMaxBlurPx, setMaxBlurPx] = createSignal(RGBAnimationKnobs.STARTING_FOCUS_BLUR_PX);
 
     return (
         <>
             <div class={styles.stack}>
                 <PageMeasureBox width={local.boxWidth}>
-                    <FocusPullExample {...exampleProps} maxBlurPx={getMaxBlurPx} />
+                    <FocusPullExample
+                        {...exampleProps}
+                        playback={PlaybackScrubberUtils.gate(props.playback, local.isPagePlaying)}
+                        maxBlurPx={getMaxBlurPx}
+                    />
                 </PageMeasureBox>
 
                 <PagePlaybackScrubber
@@ -226,14 +264,18 @@ const FocusPullExampleWrapper = (props: WrapperProps) => {
 };
 
 const TwistExampleWrapper = (props: WrapperProps) => {
-    const [local, exampleProps] = splitProps(props, ["boxWidth"]);
+    const [local, exampleProps] = splitProps(props, ["boxWidth", "isPagePlaying"]);
     const [getMaxDegrees, setMaxDegrees] = createSignal(RGBAnimationKnobs.STARTING_TWIST_DEGREES);
 
     return (
         <>
             <div class={styles.stack}>
                 <PageMeasureBox width={local.boxWidth}>
-                    <TwistExample {...exampleProps} maxDegrees={getMaxDegrees} />
+                    <TwistExample
+                        {...exampleProps}
+                        playback={PlaybackScrubberUtils.gate(props.playback, local.isPagePlaying)}
+                        maxDegrees={getMaxDegrees}
+                    />
                 </PageMeasureBox>
 
                 <PagePlaybackScrubber
@@ -269,14 +311,18 @@ const TwistExampleWrapper = (props: WrapperProps) => {
 };
 
 const HueSwapExampleWrapper = (props: WrapperProps) => {
-    const [local, exampleProps] = splitProps(props, ["boxWidth"]);
+    const [local, exampleProps] = splitProps(props, ["boxWidth", "isPagePlaying"]);
     const [getTurns, setTurns] = createSignal(RGBAnimationKnobs.STARTING_HUE_TURNS);
 
     return (
         <>
             <div class={styles.stack}>
                 <PageMeasureBox width={local.boxWidth}>
-                    <HueSwapExample {...exampleProps} turns={getTurns} />
+                    <HueSwapExample
+                        {...exampleProps}
+                        playback={PlaybackScrubberUtils.gate(props.playback, local.isPagePlaying)}
+                        turns={getTurns}
+                    />
                 </PageMeasureBox>
 
                 <PagePlaybackScrubber
@@ -312,14 +358,18 @@ const HueSwapExampleWrapper = (props: WrapperProps) => {
 };
 
 const TiltExampleWrapper = (props: WrapperProps) => {
-    const [local, exampleProps] = splitProps(props, ["boxWidth"]);
+    const [local, exampleProps] = splitProps(props, ["boxWidth", "isPagePlaying"]);
     const [getMaxDegrees, setMaxDegrees] = createSignal(RGBAnimationKnobs.STARTING_TILT_DEGREES);
 
     return (
         <>
             <div class={styles.stack}>
                 <PageMeasureBox width={local.boxWidth}>
-                    <TiltExample {...exampleProps} maxDegrees={getMaxDegrees} />
+                    <TiltExample
+                        {...exampleProps}
+                        playback={PlaybackScrubberUtils.gate(props.playback, local.isPagePlaying)}
+                        maxDegrees={getMaxDegrees}
+                    />
                 </PageMeasureBox>
 
                 <PagePlaybackScrubber
@@ -353,7 +403,7 @@ const TiltExampleWrapper = (props: WrapperProps) => {
 };
 
 const AnaglyphExampleWrapper = (props: WrapperProps) => {
-    const [local, exampleProps] = splitProps(props, ["boxWidth"]);
+    const [local, exampleProps] = splitProps(props, ["boxWidth", "isPagePlaying"]);
     const [getSeparationPercent, setSeparationPercent] = createSignal(
         RGBAnimationKnobs.STARTING_ANAGLYPH_SEPARATION_PERCENT,
     );
@@ -362,7 +412,11 @@ const AnaglyphExampleWrapper = (props: WrapperProps) => {
         <>
             <div class={styles.stack}>
                 <PageMeasureBox width={local.boxWidth}>
-                    <AnaglyphExample {...exampleProps} separationPercent={getSeparationPercent} />
+                    <AnaglyphExample
+                        {...exampleProps}
+                        playback={PlaybackScrubberUtils.gate(props.playback, local.isPagePlaying)}
+                        separationPercent={getSeparationPercent}
+                    />
                 </PageMeasureBox>
 
                 <PagePlaybackScrubber
@@ -398,14 +452,18 @@ const AnaglyphExampleWrapper = (props: WrapperProps) => {
 };
 
 const EchoExampleWrapper = (props: WrapperProps) => {
-    const [local, exampleProps] = splitProps(props, ["boxWidth"]);
+    const [local, exampleProps] = splitProps(props, ["boxWidth", "isPagePlaying"]);
     const [getDistancePercent, setDistancePercent] = createSignal(RGBAnimationKnobs.STARTING_ECHO_DISTANCE_PERCENT);
 
     return (
         <>
             <div class={styles.stack}>
                 <PageMeasureBox width={local.boxWidth}>
-                    <EchoExample {...exampleProps} distancePercent={getDistancePercent} />
+                    <EchoExample
+                        {...exampleProps}
+                        playback={PlaybackScrubberUtils.gate(props.playback, local.isPagePlaying)}
+                        distancePercent={getDistancePercent}
+                    />
                 </PageMeasureBox>
 
                 <PagePlaybackScrubber
@@ -442,7 +500,35 @@ const EchoExampleWrapper = (props: WrapperProps) => {
     );
 };
 
+const StressTestWrapper = (props: Omit<RGBAnimationExampleProps, "progress"> & { playback: Signal<boolean> }) => {
+    const modalPlayback = createSignal(true);
+
+    return (
+        <StressTest
+            configs={STRESS_ITEMS}
+            onHideModal={() => {
+                props.playback[1](true);
+            }}
+            onShowModal={() => {
+                props.playback[1](false);
+            }}
+            renderLabel={(getConfigIndex) => `Render ${STRESS_ITEMS[getConfigIndex()].count} items`}
+            renderItem={() => {
+                const StressExample = STRESS_EXAMPLES[Math.floor(Math.random() * STRESS_EXAMPLES.length)];
+                const progress = createSignal(0);
+
+                return (
+                    <PageMeasureBox width={STRESS_ITEM_WIDTH}>
+                        <StressExample {...props} playback={modalPlayback} progress={progress} />
+                    </PageMeasureBox>
+                );
+            }}
+        />
+    );
+};
+
 export const RGBAnimationPage = () => {
+    const playback = createSignal(true);
     const glitchPlayback = createSignal(true);
     const glitchProgress = createSignal(0);
     const swellPlayback = createSignal(true);
@@ -498,6 +584,7 @@ export const RGBAnimationPage = () => {
                     <GlitchExampleWrapper
                         {...commonProps}
                         boxWidth={getBoxWidth}
+                        isPagePlaying={playback[0]}
                         playback={glitchPlayback}
                         progress={glitchProgress}
                     />
@@ -512,6 +599,7 @@ export const RGBAnimationPage = () => {
                     <SwellExampleWrapper
                         {...commonProps}
                         boxWidth={getBoxWidth}
+                        isPagePlaying={playback[0]}
                         playback={swellPlayback}
                         progress={swellProgress}
                     />
@@ -527,6 +615,7 @@ export const RGBAnimationPage = () => {
                     <OrbitExampleWrapper
                         {...commonProps}
                         boxWidth={getBoxWidth}
+                        isPagePlaying={playback[0]}
                         playback={orbitPlayback}
                         progress={orbitProgress}
                     />
@@ -542,6 +631,7 @@ export const RGBAnimationPage = () => {
                     <TwistExampleWrapper
                         {...commonProps}
                         boxWidth={getBoxWidth}
+                        isPagePlaying={playback[0]}
                         playback={twistPlayback}
                         progress={twistProgress}
                     />
@@ -557,6 +647,7 @@ export const RGBAnimationPage = () => {
                     <TiltExampleWrapper
                         {...commonProps}
                         boxWidth={getBoxWidth}
+                        isPagePlaying={playback[0]}
                         playback={tiltPlayback}
                         progress={tiltProgress}
                     />
@@ -572,6 +663,7 @@ export const RGBAnimationPage = () => {
                     <AnaglyphExampleWrapper
                         {...commonProps}
                         boxWidth={getBoxWidth}
+                        isPagePlaying={playback[0]}
                         playback={anaglyphPlayback}
                         progress={anaglyphProgress}
                     />
@@ -587,6 +679,7 @@ export const RGBAnimationPage = () => {
                     <EchoExampleWrapper
                         {...commonProps}
                         boxWidth={getBoxWidth}
+                        isPagePlaying={playback[0]}
                         playback={echoPlayback}
                         progress={echoProgress}
                     />
@@ -602,6 +695,7 @@ export const RGBAnimationPage = () => {
                     <HueSwapExampleWrapper
                         {...commonProps}
                         boxWidth={getBoxWidth}
+                        isPagePlaying={playback[0]}
                         playback={hueSwapPlayback}
                         progress={hueSwapProgress}
                     />
@@ -617,11 +711,17 @@ export const RGBAnimationPage = () => {
                     <FocusPullExampleWrapper
                         {...commonProps}
                         boxWidth={getBoxWidth}
+                        isPagePlaying={playback[0]}
                         playback={focusPullPlayback}
                         progress={focusPullProgress}
                     />
                 ),
                 path: `${EXAMPLES_ROOT}/FocusPull.tsx`,
+            },
+            {
+                key: "stressTest",
+                name: EXAMPLE_NAMES.stressTest,
+                component: () => <StressTestWrapper {...commonProps} playback={playback} />,
             },
         ];
     });

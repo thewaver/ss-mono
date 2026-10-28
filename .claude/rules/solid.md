@@ -122,6 +122,13 @@ until each toggles again — `PageRangeContent` lost its colors and error look, 
 marker, whenever the orientation knob switched. **Put the changing class into the `classList` object** and keep
 `class` fixed.
 
+### Nothing is created inside a prop expression
+
+The compiler turns `progress={createSignal(0)}` into a getter, so every read of `props.progress` runs the
+expression again and gets a new signal: the component writes into one copy and reads a fresh `0` from the next, and
+its animation sits on the first frame. **Create the signal, store or object first, in the component or callback
+body, and pass the variable.**
+
 ### A conditional prop read outside a render is written as a function
 
 Solid compiles `prop={a ? b : c}` into a getter that builds a memo on every read. Read inside a component, that memo

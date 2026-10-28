@@ -10,6 +10,7 @@
         CellAnimationWeights,
     } from "@thewaver/ss-components-svelte";
     import type {
+        SVGDefsSamples,
         CellAnimationBreakpointOpts,
         CellAnimationFinalFrame,
         CellAnimationPlaybackOpts,
@@ -17,31 +18,37 @@
     } from "@thewaver/ss-components-svelte";
     import * as styles from "@thewaver/ss-playground/App/Pages/CellAnimationPage/CellAnimationPage.css";
     import knight_profile from "@thewaver/ss-playground/App/knight_profile.webp";
-    import type { Index2d } from "@thewaver/ss-utils";
+    import type { CellAnimationSourceKind } from "@thewaver/ss-playground/App/Pages/CellAnimationPage/CellAnimationPage.types";
+    import type { Index2d, Size2d } from "@thewaver/ss-utils";
 
     import { CellAnimationKnobs } from "@thewaver/ss-playground/App/Knobs/CellAnimations.const";
     import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../PageComponents/Examples/PageExamples.svelte";
     import PageCheckField from "../../PageComponents/Field/PageCheckField.svelte";
+    import PageFileField from "../../PageComponents/Field/PageFileField.svelte";
     import PageGroupedSelectField from "../../PageComponents/Field/PageGroupedSelectField.svelte";
     import PageNumberField from "../../PageComponents/Field/PageNumberField.svelte";
     import PageSelectField from "../../PageComponents/Field/PageSelectField.svelte";
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
+    import PagePropsDivider from "../../PageComponents/PropsPanel/PagePropsDivider.svelte";
+    import PagePropsGroups from "../../PageComponents/PropsPanel/PagePropsGroups.svelte";
     import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
+    import { SVGDefsSources } from "../../PageComponents/SVGDefsSources/SVGDefsSourcesSvelte.const";
     import type { CellAnimationExampleProps } from "./CellAnimationPage.types";
     import WipeExample from "./Examples/Wipe.svelte";
-    import GradientExampleWrapper from "./GradientExampleWrapper.svelte";
-    import ImageExampleWrapper from "./ImageExampleWrapper.svelte";
-    import PatternExampleWrapper from "./PatternExampleWrapper.svelte";
+    import SourcedExampleWrapper from "./SourcedExampleWrapper.svelte";
     import StressTestWrapper from "./StressTestWrapper.svelte";
     import {
-    DRAWN_SOURCE_PATH,
-    EXAMPLE_NAMES,
-    PERCENT,
-} from "@thewaver/ss-playground/App/Pages/CellAnimationPage/CellAnimationPage.const";
+        EXAMPLE_NAMES,
+        PERCENT,
+        SOURCE_READOUTS,
+    } from "@thewaver/ss-playground/App/Pages/CellAnimationPage/CellAnimationPage.const";
 
     const DEFAULT_EXAMPLE_PATH = "/src/App/Pages/CellAnimationPage/Examples/Default.svelte";
     const WIPE_EXAMPLE_PATH = "/src/App/Pages/CellAnimationPage/Examples/Wipe.svelte";
+
+    const computeContainerWidth = (size: Size2d, longestSide: number) =>
+        (longestSide * size.width) / Math.max(size.width, size.height);
 
     const extractOptionGroupWord = (key: string) => key.replace(/^_/, "").match(/^[a-z]+/)?.[0] ?? key;
 
@@ -62,8 +69,14 @@
     const GROUPPED_ANIMATIONS = groupOptions(CellAnimationKeyframes.ANIMATION_TYPES);
 
     let playback = $state(true);
-    let imagePlayback = $state(true);
-    let imageProgress = $state(0);
+    let sourcedPlayback = $state(true);
+    let sourcedProgress = $state(0);
+
+    let sourceKind = $state<CellAnimationSourceKind>(CellAnimationKnobs.STARTING_SOURCE_KIND);
+    let imageSrc = $state(knight_profile);
+    let gradientKey = $state<SVGDefsSamples.Gradient.Timed.SampleKey>(CellAnimationKnobs.STARTING_GRADIENT_KEY);
+    let patternKey = $state<SVGDefsSamples.Pattern.Timed.SampleKey>(CellAnimationKnobs.STARTING_PATTERN_KEY);
+    let sourceRatio = $state<SVGDefsSources.SourceRatio>(CellAnimationKnobs.DEFAULT_SOURCE_RATIO);
 
     let originType = $state<CellAnimationOrigins.OriginType>(CellAnimationKnobs.STARTING_ORIGIN_KEY);
     let weightType = $state<CellAnimationWeights.WeightType>(CellAnimationKnobs.STARTING_WEIGHT_KEY);
@@ -92,30 +105,40 @@
         finalFrame,
     });
 
+    const sourceSize = $derived(SVGDefsSources.computeSourceSize(sourceRatio));
+
+    const cycleDurationMs = $derived(
+        CellAnimationPlaybackUtils.computeCycleDurationMs(animationDurationMs, playbackOpts),
+    );
+
+    const sourcedSrc = $derived.by(() => {
+        if (sourceKind === "gradient") {
+            return SVGDefsSources.computeGradientSource(
+                gradientKey,
+                sourceSize,
+                cycleDurationMs,
+                animationIterationDelayMs,
+            );
+        }
+
+        if (sourceKind === "pattern") {
+            return SVGDefsSources.computePatternSource(patternKey, sourceSize, cycleDurationMs);
+        }
+
+        return imageSrc;
+    });
+
+    const computeSourcedWidth = (longestSide: number) =>
+        sourceKind === "image" ? longestSide : computeContainerWidth(sourceSize, longestSide);
+
     const examples: ExampleDefs[] = [
         {
-            key: "image",
-            name: EXAMPLE_NAMES.image,
+            key: "source",
+            name: EXAMPLE_NAMES.source,
             readout: () =>
-                `${Math.round(imageProgress * PERCENT)}% through the pass, ${imagePlayback ? "running" : "stopped"} — the progress signal is written by the component while it plays, and writing it moves the pass there`,
-            component: imageExample,
+                `${Math.round(sourcedProgress * PERCENT)}% through the pass, ${sourcedPlayback ? "running" : "stopped"} — ${SOURCE_READOUTS[sourceKind]}`,
+            component: sourcedExample,
             path: DEFAULT_EXAMPLE_PATH,
-        },
-        {
-            key: "gradient",
-            name: EXAMPLE_NAMES.gradient,
-            readout: () =>
-                "the Shape page's own gradients, serialized into a source — the start and the pause a script would have timed are written into the markup instead, so they run at the same length and rhythm as the cells",
-            component: gradientExample,
-            path: DRAWN_SOURCE_PATH,
-        },
-        {
-            key: "pattern",
-            name: EXAMPLE_NAMES.pattern,
-            readout: () =>
-                "the same for the patterns, which flow on without a pause — a repeating fill has no beat to be out of step with",
-            component: patternExample,
-            path: DRAWN_SOURCE_PATH,
         },
         {
             key: "wipe",
@@ -133,16 +156,15 @@
     ];
 </script>
 
-{#snippet imageExample()}
-    <ImageExampleWrapper {...commonProps} bind:playback={imagePlayback} bind:progress={imageProgress} />
-{/snippet}
-
-{#snippet gradientExample()}
-    <GradientExampleWrapper {...commonProps} />
-{/snippet}
-
-{#snippet patternExample()}
-    <PatternExampleWrapper {...commonProps} />
+{#snippet sourcedExample()}
+    <SourcedExampleWrapper
+        {...commonProps}
+        bind:playback={sourcedPlayback}
+        bind:progress={sourcedProgress}
+        src={sourcedSrc}
+        isPagePlaying={playback}
+        computeWidth={computeSourcedWidth}
+    />
 {/snippet}
 
 {#snippet wipeExample()}
@@ -150,11 +172,103 @@
 {/snippet}
 
 {#snippet stressTestExample()}
-    <StressTestWrapper {...commonProps} bind:playback src={knight_profile} />
+    <StressTestWrapper {...commonProps} bind:playback src={sourcedSrc} computeWidth={computeSourcedWidth} />
 {/snippet}
 
 <div class={styles.root}>
-    <PagePropsPanel scope={"global"}>
+    <PagePropsGroups>
+        <PagePropsPanel scope={"sample"}>
+            <PageProp
+                itemKey={"sourceKind"}
+                controls={"Picks the kind of example picture sent to CellAnimationProps.src"}
+                label={"Source"}
+                hint={"What the cells are cut from, in the first example and the stress test: a photograph, or one of the Shape page's gradients or patterns drawn into a picture. Choosing one brings its own knobs with it."}
+            >
+                <PageSelectField
+                    value={sourceKind}
+                    values={CellAnimationKnobs.SOURCE_KINDS}
+                    ariaLabel={"Source"}
+                    onChange={(next) => {
+                        sourceKind = next;
+                    }}
+                />
+            </PageProp>
+
+            {#if sourceKind === "image"}
+                <PageProp
+                    itemKey={"image"}
+                    controls={"Picks the example picture sent to CellAnimationProps.src"}
+                    label={"Image"}
+                    hint={"Swaps in a picture of your own, so the cells can be watched against something other than the sample."}
+                >
+                    <PageFileField
+                        accept={"image/*"}
+                        ariaLabel={"Image"}
+                        onPick={(file) => {
+                            imageSrc = URL.createObjectURL(file);
+                        }}
+                    />
+                </PageProp>
+            {/if}
+
+            {#if sourceKind === "gradient"}
+                <PageProp
+                    itemKey={"gradient"}
+                    controls={"Picks the gradient drawn into the example picture sent to CellAnimationProps.src"}
+                    label={"Gradient"}
+                    hint={"Which animated gradient is rendered into the picture the cells are cut from."}
+                >
+                    <PageSelectField
+                        value={gradientKey}
+                        values={SVGDefsSources.GRADIENT_KEYS}
+                        ariaLabel={"Gradient"}
+                        onChange={(next) => {
+                            gradientKey = next;
+                        }}
+                    />
+                </PageProp>
+            {/if}
+
+            {#if sourceKind === "pattern"}
+                <PageProp
+                    itemKey={"pattern"}
+                    controls={"Picks the pattern drawn into the example picture sent to CellAnimationProps.src"}
+                    label={"Pattern"}
+                    hint={"Which repeating pattern is rendered into the picture the cells are cut from."}
+                >
+                    <PageSelectField
+                        value={patternKey}
+                        values={SVGDefsSources.PATTERN_KEYS}
+                        ariaLabel={"Pattern"}
+                        onChange={(next) => {
+                            patternKey = next;
+                        }}
+                    />
+                </PageProp>
+            {/if}
+
+            {#if sourceKind !== "image"}
+                <PageProp
+                    itemKey={"sourceRatio"}
+                    controls={"Sets the shape of the example picture sent to CellAnimationProps.src"}
+                    label={"Ratio"}
+                    hint={"The shape of the picture the gradient or pattern is drawn into, which decides how the cells are proportioned."}
+                >
+                    <PageSelectField
+                        value={sourceRatio}
+                        values={SVGDefsSources.SOURCE_RATIOS}
+                        ariaLabel={"Ratio"}
+                        onChange={(next) => {
+                            sourceRatio = next;
+                        }}
+                    />
+                </PageProp>
+            {/if}
+        </PagePropsPanel>
+
+        <PagePropsDivider />
+
+        <PagePropsPanel scope={"global"}>
         <PageProp
             itemKey={"cellCountCols"}
             controls={"Sets CellAnimationProps.cellCount"}
@@ -433,7 +547,8 @@
                 }}
             />
         </PageProp>
-    </PagePropsPanel>
+        </PagePropsPanel>
+    </PagePropsGroups>
 
     <PageExamples items={examples} layout={"flow"} />
 </div>

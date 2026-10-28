@@ -8,6 +8,7 @@ import type {
     CellAnimationOrigins,
     CellAnimationPlaybackOpts,
     CellAnimationWeights,
+    SignalSource,
     WeightOpts,
 } from "@thewaver/ss-components-solid";
 import type { Index2d } from "@thewaver/ss-utils";
@@ -24,7 +25,7 @@ export type CellAnimationExampleProps = AccessorProps<{
     animationIterationCount: number;
     animationIterationDelayMs: number;
     finalFrame: CellAnimationFinalFrame;
-    playback: Signal<boolean>;
+    playback: SignalSource<boolean>;
     progress?: Signal<number>;
 }>;
 

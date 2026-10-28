@@ -28,12 +28,14 @@
     import GlitchExampleWrapper from "./GlitchExampleWrapper.svelte";
     import HueSwapExampleWrapper from "./HueSwapExampleWrapper.svelte";
     import OrbitExampleWrapper from "./OrbitExampleWrapper.svelte";
+    import StressTestWrapper from "./StressTestWrapper.svelte";
     import SwellExampleWrapper from "./SwellExampleWrapper.svelte";
     import TiltExampleWrapper from "./TiltExampleWrapper.svelte";
     import TwistExampleWrapper from "./TwistExampleWrapper.svelte";
 
     const SOURCES: Record<RGBAnimationSourceKey, string> = { knight: knightProfile, text: HEADLINE_SOURCE };
 
+    let playback = $state(true);
     let glitchPlayback = $state(true);
     let glitchProgress = $state(0);
     let swellPlayback = $state(true);
@@ -147,43 +149,52 @@
             component: focusPullExample,
             path: `${EXAMPLES_ROOT}/FocusPull.svelte`,
         },
+        {
+            key: "stressTest",
+            name: EXAMPLE_NAMES.stressTest,
+            component: stressTestExample,
+        },
     ];
 </script>
 
 {#snippet glitchExample()}
-    <GlitchExampleWrapper {...commonProps} {boxWidth} bind:playback={glitchPlayback} bind:progress={glitchProgress} />
+    <GlitchExampleWrapper {...commonProps} {boxWidth} isPagePlaying={playback} bind:playback={glitchPlayback} bind:progress={glitchProgress} />
 {/snippet}
 
 {#snippet swellExample()}
-    <SwellExampleWrapper {...commonProps} {boxWidth} bind:playback={swellPlayback} bind:progress={swellProgress} />
+    <SwellExampleWrapper {...commonProps} {boxWidth} isPagePlaying={playback} bind:playback={swellPlayback} bind:progress={swellProgress} />
 {/snippet}
 
 {#snippet orbitExample()}
-    <OrbitExampleWrapper {...commonProps} {boxWidth} bind:playback={orbitPlayback} bind:progress={orbitProgress} />
+    <OrbitExampleWrapper {...commonProps} {boxWidth} isPagePlaying={playback} bind:playback={orbitPlayback} bind:progress={orbitProgress} />
 {/snippet}
 
 {#snippet twistExample()}
-    <TwistExampleWrapper {...commonProps} {boxWidth} bind:playback={twistPlayback} bind:progress={twistProgress} />
+    <TwistExampleWrapper {...commonProps} {boxWidth} isPagePlaying={playback} bind:playback={twistPlayback} bind:progress={twistProgress} />
 {/snippet}
 
 {#snippet tiltExample()}
-    <TiltExampleWrapper {...commonProps} {boxWidth} bind:playback={tiltPlayback} bind:progress={tiltProgress} />
+    <TiltExampleWrapper {...commonProps} {boxWidth} isPagePlaying={playback} bind:playback={tiltPlayback} bind:progress={tiltProgress} />
 {/snippet}
 
 {#snippet anaglyphExample()}
-    <AnaglyphExampleWrapper {...commonProps} {boxWidth} bind:playback={anaglyphPlayback} bind:progress={anaglyphProgress} />
+    <AnaglyphExampleWrapper {...commonProps} {boxWidth} isPagePlaying={playback} bind:playback={anaglyphPlayback} bind:progress={anaglyphProgress} />
 {/snippet}
 
 {#snippet echoExample()}
-    <EchoExampleWrapper {...commonProps} {boxWidth} bind:playback={echoPlayback} bind:progress={echoProgress} />
+    <EchoExampleWrapper {...commonProps} {boxWidth} isPagePlaying={playback} bind:playback={echoPlayback} bind:progress={echoProgress} />
 {/snippet}
 
 {#snippet hueSwapExample()}
-    <HueSwapExampleWrapper {...commonProps} {boxWidth} bind:playback={hueSwapPlayback} bind:progress={hueSwapProgress} />
+    <HueSwapExampleWrapper {...commonProps} {boxWidth} isPagePlaying={playback} bind:playback={hueSwapPlayback} bind:progress={hueSwapProgress} />
 {/snippet}
 
 {#snippet focusPullExample()}
-    <FocusPullExampleWrapper {...commonProps} {boxWidth} bind:playback={focusPullPlayback} bind:progress={focusPullProgress} />
+    <FocusPullExampleWrapper {...commonProps} {boxWidth} isPagePlaying={playback} bind:playback={focusPullPlayback} bind:progress={focusPullProgress} />
+{/snippet}
+
+{#snippet stressTestExample()}
+    <StressTestWrapper {...commonProps} bind:playback />
 {/snippet}
 
 <PagePropsPanel scope={"global"}>

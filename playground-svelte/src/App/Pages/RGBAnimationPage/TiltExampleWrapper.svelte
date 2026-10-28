@@ -11,14 +11,20 @@
     import TiltExample from "./Examples/Tilt.svelte";
     import type { RGBAnimationWrapperProps } from "./RGBAnimationPageSvelte.types";
 
-    let { playback = $bindable(), progress = $bindable(), boxWidth, ...props }: RGBAnimationWrapperProps = $props();
+    let {
+        playback = $bindable(),
+        progress = $bindable(),
+        boxWidth,
+        isPagePlaying,
+        ...props
+    }: RGBAnimationWrapperProps = $props();
 
     let maxDegrees = $state(RGBAnimationKnobs.STARTING_TILT_DEGREES);
 </script>
 
 <div class={styles.stack}>
     <PageMeasureBox width={boxWidth}>
-        <TiltExample {...props} bind:playback bind:progress {maxDegrees} />
+        <TiltExample {...props} bind:playback={() => isPagePlaying && playback, (next) => (playback = next)} bind:progress {maxDegrees} />
     </PageMeasureBox>
 
     <PagePlaybackScrubber id={"tilt"} ariaLabel={"Position in the pass"} bind:playback bind:progress />

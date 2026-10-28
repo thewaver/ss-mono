@@ -1,6 +1,11 @@
 import type { Signal } from "solid-js";
 
-import type { AccessorProps, CellAnimationWeights, ScanlineAnimationOrientation } from "@thewaver/ss-components-solid";
+import type {
+    AccessorProps,
+    CellAnimationWeights,
+    ScanlineAnimationOrientation,
+    SignalSource,
+} from "@thewaver/ss-components-solid";
 
 export type ScanlineAnimationExampleProps = AccessorProps<{
     src: string;
@@ -9,6 +14,6 @@ export type ScanlineAnimationExampleProps = AccessorProps<{
     weightType: CellAnimationWeights.OriginFreeWeightType;
     animationDurationMs: number;
     animationIterationDelayMs: number;
-    playback: Signal<boolean>;
+    playback: SignalSource<boolean>;
     progress?: Signal<number>;
 }>;

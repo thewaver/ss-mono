@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { demo, prop, revealProp } from "./helpers";
+import { demo, prop } from "./helpers";
 
 /**
  * The three motion components have Playground pages and no specs, because what they produce is movement over
@@ -26,28 +26,41 @@ const cellSources = (page: import("@playwright/test").Page, scope: string) =>
         };
     }, scope);
 
-test("each example slices its own kind of source, and all of them reach the cells", async ({ page }) => {
-    await expect(page.locator(`${demo("image")} img`), "the first example is a file").toHaveAttribute("src", /\.webp/);
-    await expect(page.locator(`${demo("gradient")} img`), "the second is a Shape gradient, serialized").toHaveAttribute(
+/** Switches the picture the first example's cells are cut from, through the page's own picker. */
+const pickSource = async (page: import("@playwright/test").Page, kind: "image" | "gradient" | "pattern") => {
+    await page.locator(`${prop("sourceKind")} [role="combobox"]`).click();
+    await page.getByRole("option", { name: kind, exact: true }).click();
+};
+
+const sourceOf = async (page: import("@playwright/test").Page) =>
+    decodeURIComponent(
+        (await page.locator(`${demo("source")} img`).getAttribute("src"))!.replace("data:image/svg+xml,", ""),
+    );
+
+test("each kind of source reaches the cells", async ({ page }) => {
+    await expect(page.locator(`${demo("source")} img`), "the page opens on a file").toHaveAttribute("src", /\.webp/);
+
+    const image = await cellSources(page, demo("source"));
+
+    expect(image.filed, "the photograph reaches the cells").toBeGreaterThan(10);
+    expect(image.drawn, "and nothing drawn does").toBe(0);
+
+    await pickSource(page, "gradient");
+    await expect(page.locator(`${demo("source")} img`), "a Shape gradient, serialized").toHaveAttribute(
         "src",
         /^data:image\/svg\+xml,.*linearGradient/,
     );
-    await expect(page.locator(`${demo("pattern")} img`), "the third is a Shape pattern").toHaveAttribute(
+    expect(
+        (await cellSources(page, demo("source"))).drawn,
+        "the drawn gradient reaches the cells, which an unquoted url would have dropped",
+    ).toBeGreaterThan(10);
+
+    await pickSource(page, "pattern");
+    await expect(page.locator(`${demo("source")} img`), "a Shape pattern").toHaveAttribute(
         "src",
         /^data:image\/svg\+xml,.*pattern/,
     );
-
-    const image = await cellSources(page, demo("image"));
-    const gradient = await cellSources(page, demo("gradient"));
-    const pattern = await cellSources(page, demo("pattern"));
-
-    expect(image.filed, "the photograph reaches its own cells").toBeGreaterThan(10);
-    expect(image.drawn, "and only its own").toBe(0);
-    expect(
-        gradient.drawn,
-        "the drawn gradient reaches its cells, which an unquoted url would have dropped",
-    ).toBeGreaterThan(10);
-    expect(pattern.drawn, "and so does the drawn pattern").toBeGreaterThan(10);
+    expect((await cellSources(page, demo("source"))).drawn, "and so does the drawn pattern").toBeGreaterThan(10);
 });
 
 /**
@@ -56,8 +69,8 @@ test("each example slices its own kind of source, and all of them reach the cell
  * draws each source and counts what came out.
  */
 test("a serialized def paints, rather than merely loading", async ({ page }) => {
-    const drawn = await page.evaluate(async () => {
-        const inspect = async (selector: string) => {
+    const inspect = (selector: string) =>
+        page.evaluate(async (selector) => {
             const img = new Image();
 
             img.src = document.querySelector<HTMLImageElement>(selector)!.src;
@@ -80,13 +93,18 @@ test("a serialized def paints, rather than merely loading", async ({ page }) => 
             }
 
             return { loaded: img.naturalWidth, distinct: seen.size };
-        };
+        }, selector);
 
-        return {
-            gradient: await inspect('[data-testid="gradient"] img'),
-            pattern: await inspect('[data-testid="pattern"] img'),
-        };
-    });
+    await pickSource(page, "gradient");
+    await expect(page.locator(`${demo("source")} img`)).toHaveAttribute("src", /linearGradient/);
+
+    const gradient = await inspect(`${demo("source")} img`);
+
+    await pickSource(page, "pattern");
+    await expect(page.locator(`${demo("source")} img`)).toHaveAttribute("src", /pattern/);
+
+    const pattern = await inspect(`${demo("source")} img`);
+    const drawn = { gradient, pattern };
 
     expect(drawn.gradient.loaded, "the gradient source has an intrinsic size, so it can anchor the box").toBe(1200);
     expect(drawn.gradient.distinct, "and it is a spread of colors rather than one flat fill").toBeGreaterThan(10);
@@ -101,46 +119,55 @@ test("a serialized def paints, rather than merely loading", async ({ page }) => 
  * only correct because the source is a document nothing will ever drive.
  */
 test("a serialized gradient keeps animating, having had its begin written in", async ({ page }) => {
-    const moved = await page.evaluate(async () => {
-        const sample = async (uri: string) => {
-            const img = new Image();
+    await pickSource(page, "gradient");
+    await expect(page.locator(`${demo("source")} img`)).toHaveAttribute("src", /linearGradient/);
 
-            img.src = uri;
-            img.style.cssText = "position:fixed;left:0;top:0;width:100px;height:100px;opacity:0.01";
-            document.body.appendChild(img);
-            await img.decode().catch(() => undefined);
+    const moved = await page.evaluate(
+        async (selector) => {
+            const sample = async (uri: string) => {
+                const img = new Image();
 
-            const read = () => {
-                const canvas = document.createElement("canvas");
+                img.src = uri;
+                img.style.cssText = "position:fixed;left:0;top:0;width:100px;height:100px;opacity:0.01";
+                document.body.appendChild(img);
+                await img.decode().catch(() => undefined);
 
-                canvas.width = 20;
-                canvas.height = 20;
+                const read = () => {
+                    const canvas = document.createElement("canvas");
 
-                const context = canvas.getContext("2d")!;
+                    canvas.width = 20;
+                    canvas.height = 20;
 
-                context.drawImage(img, 0, 0, 20, 20);
+                    const context = canvas.getContext("2d")!;
 
-                return [...context.getImageData(0, 0, 20, 20).data].join(",");
+                    context.drawImage(img, 0, 0, 20, 20);
+
+                    return [...context.getImageData(0, 0, 20, 20).data].join(",");
+                };
+
+                const first = read();
+
+                await new Promise((resolve) => setTimeout(resolve, 700));
+
+                const changed = first !== read();
+
+                img.remove();
+
+                return changed;
             };
 
-            const first = read();
+            const live = document.querySelector<HTMLImageElement>(selector)!.src;
+            const frozen = `data:image/svg+xml,${encodeURIComponent(
+                decodeURIComponent(live.replace("data:image/svg+xml,", "")).replace(
+                    /begin="[^"]*"/g,
+                    'begin="indefinite"',
+                ),
+            )}`;
 
-            await new Promise((resolve) => setTimeout(resolve, 700));
-
-            const changed = first !== read();
-
-            img.remove();
-
-            return changed;
-        };
-
-        const live = document.querySelector<HTMLImageElement>('[data-testid="gradient"] img')!.src;
-        const frozen = `data:image/svg+xml,${encodeURIComponent(
-            decodeURIComponent(live.replace("data:image/svg+xml,", "")).replace(/begin="[^"]*"/g, 'begin="indefinite"'),
-        )}`;
-
-        return { live: await sample(live), frozen: await sample(frozen) };
-    });
+            return { live: await sample(live), frozen: await sample(frozen) };
+        },
+        `${demo("source")} img`,
+    );
 
     expect(moved.live, "the source the page builds is moving").toBe(true);
     expect(moved.frozen, "and the same markup with the begin put back is not, which is what it was doing before").toBe(
@@ -178,31 +205,27 @@ const cycleMs = async (page: import("@playwright/test").Page) => {
  * whichever state the page happens to open in.
  */
 test("a drawn source takes its palette from the samples and its duration from the page", async ({ page }) => {
-    const sourceOf = async (key: string) =>
-        decodeURIComponent(
-            (await page.locator(`${demo(key)} img`).getAttribute("src"))!.replace("data:image/svg+xml,", ""),
-        );
-
     const delayMs = Number(await page.locator(`${prop("animationIterationDelayMs")} input`).inputValue());
     const opening = await cycleMs(page);
 
-    expect(await sourceOf("gradient"), "the Shape palette, not a second one").toContain("#FFFF00");
-    expect(await sourceOf("gradient"), "and the iteration the panel currently describes").toContain(
-        `dur="${opening}ms"`,
-    );
+    await pickSource(page, "gradient");
+    await expect.poll(() => sourceOf(page), { message: "the Shape palette, not a second one" }).toContain("#FFFF00");
+    expect(await sourceOf(page), "and the iteration the panel currently describes").toContain(`dur="${opening}ms"`);
     expect(
-        await sourceOf("pattern"),
-        "a pattern sample is free to run at a multiple of what it is given, and this one takes four times",
-    ).toContain(`dur="${opening * PATTERN_CYCLE_MULTIPLE}ms"`);
-    expect(
-        await sourceOf("pattern"),
-        "a repeating fill has no beat to be out of step with, so it flows on without the pause",
-    ).not.toContain(".end+");
-
-    expect(
-        await sourceOf("gradient"),
+        await sourceOf(page),
         "the pause between repeats is the page's too, expressed as a begin that refers to the animation's own end",
     ).toMatch(new RegExp(`begin="0s;[^"]+\\.end\\+${delayMs}ms"`));
+
+    await pickSource(page, "pattern");
+    await expect
+        .poll(() => sourceOf(page), {
+            message: "a pattern sample is free to run at a multiple of what it is given, and this one takes four times",
+        })
+        .toContain(`dur="${opening * PATTERN_CYCLE_MULTIPLE}ms"`);
+    expect(
+        await sourceOf(page),
+        "a repeating fill has no beat to be out of step with, so it flows on without the pause",
+    ).not.toContain(".end+");
 
     const duration = page.locator(`${prop("animationDurationMs")} input`);
 
@@ -214,11 +237,15 @@ test("a drawn source takes its palette from the samples and its duration from th
     expect(stretched, "the knob moved, so there is something to see").not.toBe(opening);
 
     await expect
-        .poll(() => sourceOf("gradient"), { message: "changing the duration rebuilds the source at the new length" })
-        .toContain(`dur="${stretched}ms"`);
-    await expect
-        .poll(() => sourceOf("pattern"), { message: "and the multiple follows it rather than staying put" })
+        .poll(() => sourceOf(page), {
+            message: "changing the duration rebuilds the source, and the multiple follows it",
+        })
         .toContain(`dur="${stretched * PATTERN_CYCLE_MULTIPLE}ms"`);
+
+    await pickSource(page, "gradient");
+    await expect
+        .poll(() => sourceOf(page), { message: "and the gradient is built at the new length" })
+        .toContain(`dur="${stretched}ms"`);
 
     await page.locator(`${prop("playbackDir")} [role="combobox"]`).click();
     await page.getByRole("option", { name: "normal", exact: true }).click();
@@ -228,7 +255,7 @@ test("a drawn source takes its palette from the samples and its duration from th
     expect(oneWay, "a pass that does not come back drops the return leg and the hold with it").toBeLessThan(stretched);
 
     await expect
-        .poll(() => sourceOf("gradient"), {
+        .poll(() => sourceOf(page), {
             message: "and the source is rebuilt at the leg rather than the round trip",
         })
         .toContain(`dur="${oneWay}ms"`);
@@ -241,22 +268,15 @@ test("a drawn source takes its palette from the samples and its duration from th
  * to say, so the simpler continuous form comes back.
  */
 test("a delay of zero puts the source back to a continuous loop", async ({ page }) => {
+    await pickSource(page, "gradient");
+
     const delay = page.locator(`${prop("animationIterationDelayMs")} input`);
 
     await delay.fill("0");
     await delay.press("Enter");
 
     await expect
-        .poll(
-            async () =>
-                decodeURIComponent(
-                    (await page.locator(`${demo("gradient")} img`).getAttribute("src"))!.replace(
-                        "data:image/svg+xml,",
-                        "",
-                    ),
-                ),
-            { message: "no pause to express, so nothing refers to its own end" },
-        )
+        .poll(() => sourceOf(page), { message: "no pause to express, so nothing refers to its own end" })
         .not.toContain(".end+");
 });
 
@@ -277,58 +297,63 @@ test("a new picture starts the cell timeline over", async ({ page }) => {
             return cells.map((cell) => cell.style.transform).join("|");
         }, scope);
 
-    await expect.poll(() => progressOf(demo("gradient")), { message: "the cells are mid-assembly" }).not.toBe("");
+    await pickSource(page, "gradient");
+    await expect.poll(() => progressOf(demo("source")), { message: "the cells are mid-assembly" }).not.toBe("");
 
-    await revealProp(page, "gradient", "gradient");
     await page.locator(`${prop("gradient")} [role="combobox"]`).click();
     await page.locator('[role="listbox"] [role="option"]', { hasText: "orbit_async_3" }).first().click();
 
-    const afterPick = await progressOf(demo("gradient"));
+    const afterPick = await progressOf(demo("source"));
 
     await expect
-        .poll(() => progressOf(demo("gradient")), { message: "and they are running again from the start" })
+        .poll(() => progressOf(demo("source")), { message: "and they are running again from the start" })
         .not.toBe(afterPick);
 });
 
 test("picking another def rebuilds the source", async ({ page }) => {
-    const before = await page.locator(`${demo("pattern")} img`).getAttribute("src");
+    await pickSource(page, "pattern");
+    await expect(page.locator(`${demo("source")} img`)).toHaveAttribute("src", /pattern/);
 
-    await revealProp(page, "pattern", "pattern");
+    const before = await page.locator(`${demo("source")} img`).getAttribute("src");
+
     await page.locator(`${prop("pattern")} [role="combobox"]`).click();
     await page.locator('[role="listbox"] [role="option"]', { hasText: "triangle_t_2" }).first().click();
 
     await expect
-        .poll(() => page.locator(`${demo("pattern")} img`).getAttribute("src"), {
+        .poll(() => page.locator(`${demo("source")} img`).getAttribute("src"), {
             message: "the source is rebuilt from the def the dropdown names",
         })
         .not.toBe(before);
 });
 
-test("the file picker belongs to the example that has a file, not to the page", async ({ page }) => {
-    await expect(
-        page.locator('input[type="file"]'),
-        "it is not on the page until an example's settings open",
-    ).toHaveCount(0);
+/**
+ * The source picker heads its own group on the page, and each kind brings the knobs that describe it: a file for the
+ * photograph, a def and a ratio for a drawn source. Nothing belonging to another kind stays behind.
+ */
+test("each source brings its own knobs and takes the others away", async ({ page }) => {
+    await expect(page.locator('input[type="file"]'), "the photograph brings a file picker").toHaveCount(1);
+    await expect(page.locator(prop("gradient")), "and no def").toHaveCount(0);
+    await expect(page.locator(prop("sourceRatio")), "and no ratio, since a file has its own").toHaveCount(0);
 
-    await revealProp(page, "image", "image");
-    await expect(
-        page.locator('[role="dialog"] input[type="file"]'),
-        "it sits in the first example's settings",
-    ).toHaveCount(1);
+    await pickSource(page, "gradient");
+    await expect(page.locator(prop("gradient")), "a gradient brings its def").toBeVisible();
+    await expect(page.locator(prop("sourceRatio")), "and a ratio").toBeVisible();
+    await expect(page.locator('input[type="file"]'), "and takes the file picker away").toHaveCount(0);
 
-    await page.locator("#gradientKnobs").click();
-    await expect(page.locator('input[type="file"]'), "and in no other example's").toHaveCount(0);
+    await pickSource(page, "pattern");
+    await expect(page.locator(prop("pattern")), "a pattern brings its own def").toBeVisible();
+    await expect(page.locator(prop("gradient")), "in place of the gradient's").toHaveCount(0);
+    await expect(page.locator(prop("sourceRatio")), "and keeps the ratio").toBeVisible();
 });
 
 /**
- * The drawn-source examples have their own pause button and scrubber beside the picture example's. Pausing one leaves
- * the picture example running, a paused example holds its frame, and scrubbing it moves its cells. The colors inside a
- * drawn source animate on the source's own clock and are not read.
+ * Paused, the example holds its frame, and scrubbing moves its cells — on a drawn source as on the photograph. The
+ * colors inside a drawn source animate on the source's own clock and are not read.
  */
-test("the drawn-source examples each pause and scrub on their own", async ({ page }) => {
-    const readFrame = (key: string) =>
+test("the example pauses and scrubs whatever its source", async ({ page }) => {
+    const readFrame = () =>
         page
-            .locator(demo(key))
+            .locator(demo("source"))
             .evaluate((root) =>
                 [...root.querySelectorAll("div")]
                     .map(
@@ -338,29 +363,28 @@ test("the drawn-source examples each pause and scrub on their own", async ({ pag
                     .join(";"),
             );
 
-    for (const [key, id] of [
-        ["gradient", "cellAnimationGradient"],
-        ["pattern", "cellAnimationPattern"],
-    ]) {
-        await page.locator(`#${id}Playback`).click();
-        await expect(page.locator(`#${id}Playback`)).toHaveAccessibleName("Play");
-        await expect(page.locator("#cellAnimationPlayback"), "the picture example runs on").toHaveAccessibleName(
-            "Pause",
+    await page.locator("#cellAnimationPlayback").click();
+    await expect(page.locator("#cellAnimationPlayback")).toHaveAccessibleName("Play");
+
+    for (const kind of ["gradient", "pattern"] as const) {
+        await pickSource(page, kind);
+        await expect(page.locator("#cellAnimationPlayback"), "a new source leaves it paused").toHaveAccessibleName(
+            "Play",
         );
 
-        await page.locator(`#${id}Progress`).focus();
+        await page.locator("#cellAnimationProgress").focus();
         await page.keyboard.press("Home");
 
-        const start = await readFrame(key);
+        const start = await readFrame();
 
         for (let i = 0; i < 50; i++) await page.keyboard.press("ArrowRight");
 
-        await expect.poll(() => readFrame(key), { message: `${key} moves when scrubbed` }).not.toBe(start);
+        await expect.poll(readFrame, { message: `${kind} moves when scrubbed` }).not.toBe(start);
 
-        const middle = await readFrame(key);
+        const middle = await readFrame();
 
         await page.waitForTimeout(300);
 
-        expect(await readFrame(key), `${key} holds while paused`).toBe(middle);
+        expect(await readFrame(), `${kind} holds while paused`).toBe(middle);
     }
 });

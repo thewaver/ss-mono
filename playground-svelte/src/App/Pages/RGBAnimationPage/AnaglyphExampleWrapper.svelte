@@ -11,14 +11,20 @@
     import AnaglyphExample from "./Examples/Anaglyph.svelte";
     import type { RGBAnimationWrapperProps } from "./RGBAnimationPageSvelte.types";
 
-    let { playback = $bindable(), progress = $bindable(), boxWidth, ...props }: RGBAnimationWrapperProps = $props();
+    let {
+        playback = $bindable(),
+        progress = $bindable(),
+        boxWidth,
+        isPagePlaying,
+        ...props
+    }: RGBAnimationWrapperProps = $props();
 
     let separationPercent = $state(RGBAnimationKnobs.STARTING_ANAGLYPH_SEPARATION_PERCENT);
 </script>
 
 <div class={styles.stack}>
     <PageMeasureBox width={boxWidth}>
-        <AnaglyphExample {...props} bind:playback bind:progress {separationPercent} />
+        <AnaglyphExample {...props} bind:playback={() => isPagePlaying && playback, (next) => (playback = next)} bind:progress {separationPercent} />
     </PageMeasureBox>
 
     <PagePlaybackScrubber id={"anaglyph"} ariaLabel={"Position in the pass"} bind:playback bind:progress />

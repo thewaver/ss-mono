@@ -7,4 +7,4 @@ export type RGBAnimationExampleProps = BaseRGBAnimationExampleProps & {
     "onUpdate:progress"?: (progress: number) => void;
 };
 
-export type RGBAnimationWrapperProps = RGBAnimationExampleProps & { boxWidth: number };
+export type RGBAnimationWrapperProps = RGBAnimationExampleProps & { boxWidth: number; isPagePlaying: boolean };

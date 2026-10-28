@@ -43,7 +43,8 @@ const breakpointOpts = reactive<CellAnimationBreakpointOpts>({
         <PageMeasureBox :width="IMAGE_CONTAINER_SIZE">
             <SkewExample
                 v-bind="sharedProps"
-                v-model:playback="playback"
+                :playback="props.playback && playback"
+                @update:playback="(next: boolean) => (playback = next)"
                 v-model:progress="progress"
                 :keyframe-opts="keyframeOpts as _ScanlineHorizontalSkewOpts"
                 :breakpoint-opts="breakpointOpts"

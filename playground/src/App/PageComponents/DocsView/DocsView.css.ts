@@ -122,10 +122,9 @@ export const docsOptional = style({
 
 export const docsPropName = style({
     gap: themeVars.spacing.half,
-    padding: `0 ${themeVars.spacing.half}`,
-    borderRadius: themeVars.borderRadius.full,
-    backgroundColor: `rgb(from ${layerVars.main} r g b / 50%)`,
-    color: layerVars.contrast,
+    padding: "0.125rem 0.25rem",
+    borderRadius: themeVars.borderRadius.half,
+    backgroundColor: `rgb(from currentColor r g b / 25%)`,
     fontFamily: "monospace",
     whiteSpace: "nowrap",
 });

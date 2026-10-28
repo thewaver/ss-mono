@@ -14,7 +14,10 @@
         IMAGE_CONTAINER_SIZE,
     } from "@thewaver/ss-playground/App/Pages/ScanLineAnimationPage/ScanLineAnimationPage.const";
 
-    let props: Omit<ScanlineAnimationExampleProps, "playback"> = $props();
+    let {
+        isPagePlaying,
+        ...props
+    }: Omit<ScanlineAnimationExampleProps, "playback"> & { isPagePlaying: boolean } = $props();
 
     let playback = $state(true);
     let progress = $state(0);
@@ -28,7 +31,7 @@
 
 <div class={styles.stack}>
     <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
-        <GrayscaleExample {...props} bind:playback bind:progress {keyframeOpts} {breakpointOpts} />
+        <GrayscaleExample {...props} bind:playback={() => isPagePlaying && playback, (next) => (playback = next)} bind:progress {keyframeOpts} {breakpointOpts} />
     </PageMeasureBox>
 
     <PagePlaybackScrubber id={"scanlineGrayscale"} ariaLabel={"Position in the pass"} bind:playback bind:progress />

@@ -30,6 +30,7 @@ import FocusPullExampleWrapper from "./FocusPullExampleWrapper.vue";
 import GlitchExampleWrapper from "./GlitchExampleWrapper.vue";
 import HueSwapExampleWrapper from "./HueSwapExampleWrapper.vue";
 import OrbitExampleWrapper from "./OrbitExampleWrapper.vue";
+import StressTestWrapper from "./StressTestWrapper.vue";
 import SwellExampleWrapper from "./SwellExampleWrapper.vue";
 import TiltExampleWrapper from "./TiltExampleWrapper.vue";
 import TwistExampleWrapper from "./TwistExampleWrapper.vue";
@@ -38,6 +39,7 @@ type ColorMixingChoice = (typeof RGBAnimationKnobs.COLOR_MIXING_CHOICES)[number]
 
 const SOURCES: Record<RGBAnimationSourceKey, string> = { knight: knightProfile, text: HEADLINE_SOURCE };
 
+const playback = shallowRef(true);
 const glitchPlayback = shallowRef(true);
 const glitchProgress = shallowRef(0);
 const swellPlayback = shallowRef(true);
@@ -135,6 +137,10 @@ const examples: ExampleDefs[] = [
             "each channel blurs and sharpens in turn, overlapping the next, like a lens hunting for focus with a colored halo",
         path: `${EXAMPLES_ROOT}/FocusPull.vue`,
     },
+    {
+        key: "stressTest",
+        name: EXAMPLE_NAMES.stressTest,
+    },
 ];
 </script>
 
@@ -208,6 +214,7 @@ const examples: ExampleDefs[] = [
             <GlitchExampleWrapper
                 v-bind="commonProps"
                 :box-width="boxWidth"
+                :is-page-playing="playback"
                 v-model:playback="glitchPlayback"
                 v-model:progress="glitchProgress"
             />
@@ -217,6 +224,7 @@ const examples: ExampleDefs[] = [
             <SwellExampleWrapper
                 v-bind="commonProps"
                 :box-width="boxWidth"
+                :is-page-playing="playback"
                 v-model:playback="swellPlayback"
                 v-model:progress="swellProgress"
             />
@@ -226,6 +234,7 @@ const examples: ExampleDefs[] = [
             <OrbitExampleWrapper
                 v-bind="commonProps"
                 :box-width="boxWidth"
+                :is-page-playing="playback"
                 v-model:playback="orbitPlayback"
                 v-model:progress="orbitProgress"
             />
@@ -235,6 +244,7 @@ const examples: ExampleDefs[] = [
             <TwistExampleWrapper
                 v-bind="commonProps"
                 :box-width="boxWidth"
+                :is-page-playing="playback"
                 v-model:playback="twistPlayback"
                 v-model:progress="twistProgress"
             />
@@ -244,6 +254,7 @@ const examples: ExampleDefs[] = [
             <TiltExampleWrapper
                 v-bind="commonProps"
                 :box-width="boxWidth"
+                :is-page-playing="playback"
                 v-model:playback="tiltPlayback"
                 v-model:progress="tiltProgress"
             />
@@ -253,6 +264,7 @@ const examples: ExampleDefs[] = [
             <AnaglyphExampleWrapper
                 v-bind="commonProps"
                 :box-width="boxWidth"
+                :is-page-playing="playback"
                 v-model:playback="anaglyphPlayback"
                 v-model:progress="anaglyphProgress"
             />
@@ -262,6 +274,7 @@ const examples: ExampleDefs[] = [
             <EchoExampleWrapper
                 v-bind="commonProps"
                 :box-width="boxWidth"
+                :is-page-playing="playback"
                 v-model:playback="echoPlayback"
                 v-model:progress="echoProgress"
             />
@@ -271,6 +284,7 @@ const examples: ExampleDefs[] = [
             <HueSwapExampleWrapper
                 v-bind="commonProps"
                 :box-width="boxWidth"
+                :is-page-playing="playback"
                 v-model:playback="hueSwapPlayback"
                 v-model:progress="hueSwapProgress"
             />
@@ -280,9 +294,14 @@ const examples: ExampleDefs[] = [
             <FocusPullExampleWrapper
                 v-bind="commonProps"
                 :box-width="boxWidth"
+                :is-page-playing="playback"
                 v-model:playback="focusPullPlayback"
                 v-model:progress="focusPullProgress"
             />
+        </template>
+
+        <template #stressTest>
+            <StressTestWrapper v-bind="commonProps" v-model:playback="playback" />
         </template>
     </PageExamples>
 </template>

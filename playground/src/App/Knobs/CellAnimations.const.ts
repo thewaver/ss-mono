@@ -10,8 +10,10 @@ import type {
 import type { Index2d } from "@thewaver/ss-utils";
 
 import type { SVGDefsSourceRatio } from "../PageComponents/SVGDefsSources/SVGDefsSourceSizes.const";
+import type { CellAnimationSourceKind } from "../Pages/CellAnimationPage/CellAnimationPage.types";
 
 export namespace CellAnimationKnobs {
+    export const SOURCE_KINDS: CellAnimationSourceKind[] = ["image", "gradient", "pattern"];
     export const DEFAULT_SOURCE_RATIO: SVGDefsSourceRatio = "1:1";
 
     export const MIN_CELL_COUNT = 1;
@@ -31,6 +33,7 @@ export namespace CellAnimationKnobs {
     export const MIN_HOLD_MS = 0;
     export const MAX_HOLD_MS = 5000;
 
+    export const STARTING_SOURCE_KIND: CellAnimationSourceKind = "image";
     export const STARTING_CELL_COUNT: Index2d = { row: 11, col: 11 };
     export const STARTING_ORIGIN_KEY: CellAnimationOrigins.OriginType = "center";
     export const STARTING_WEIGHT_KEY: CellAnimationWeights.WeightType = "diamond_default";
