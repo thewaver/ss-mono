@@ -31,6 +31,7 @@ export * from "./Abstracts/Rotator/RotatorSolid.utils";
 export * from "./Abstracts/Selection/SelectionSolid.utils";
 export * from "./Abstracts/Shortcut/ShortcutSolid.utils";
 export * from "./Abstracts/SignalMirror/SignalMirrorSolid.utils";
+export * from "./Abstracts/SliceRenderer/SliceRendererSolid.utils";
 export * from "./Abstracts/Smoother/SmootherSolid.utils";
 export * from "./Abstracts/TextSync/TextSyncSolid.utils";
 export * from "./Abstracts/Typeahead/TypeaheadSolid.utils";

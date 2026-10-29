@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 
-import { RGBAnimation, RGB_ANIMATION_CHANNELS } from "@thewaver/ss-components-react";
-import type { CellAnimationBreakpointTriple } from "@thewaver/ss-components-react";
+import { RGBAnimation, RGB_ANIMATION_CHANNELS, SliceAnimationKeyframeUtils } from "@thewaver/ss-components-react";
+import type { SliceAnimationBreakpointTriple, SliceStop } from "@thewaver/ss-components-react";
 
 import type { RGBAnimationExampleProps } from "../RGBAnimationPageReact.types";
 
 const getGlitchBreakpointGroups = (count: number, start: number, end: number) => {
-    const result: CellAnimationBreakpointTriple[] = [];
+    const result: SliceAnimationBreakpointTriple[] = [];
     const range = end - start;
     const segmentWidth = range / count;
 
@@ -49,6 +49,23 @@ export const GlitchExample = (props: Props) => {
         setShifts(generateShifts());
     }, [breakpointGroups, props.glitchOpts.shiftPercent]);
 
+    const animation = useMemo(() => {
+        const channelStops = RGB_ANIMATION_CHANNELS.map((_, channel) =>
+            breakpointGroups.flatMap(([start, , end], group): SliceStop[] => {
+                const [x, y] = shifts[group]?.[channel] ?? [0, 0];
+
+                return [
+                    { at: start, translateX: 0, translateY: 0 },
+                    { at: start, translateX: x, translateY: y },
+                    { at: end, translateX: x, translateY: y },
+                    { at: end, translateX: 0, translateY: 0 },
+                ];
+            }),
+        );
+
+        return SliceAnimationKeyframeUtils.fromSlices(({ pos }) => channelStops[pos.col] ?? channelStops[0]);
+    }, [breakpointGroups, shifts]);
+
     const findGroup = (timeline: number) =>
         breakpointGroups.findIndex(([start, , end]) => timeline >= start && timeline <= end);
 
@@ -62,12 +79,7 @@ export const GlitchExample = (props: Props) => {
             animationDurationMs={props.animationDurationMs}
             animationIterationDelayMs={props.animationIterationDelayMs}
             computeRootAnimation={(timeline) => ({ brightness: findGroup(timeline) === -1 ? 100 : 125 })}
-            computeSliceAnimation={(defs, timeline) => {
-                const group = findGroup(timeline);
-                const shift = shifts[group]?.[RGB_ANIMATION_CHANNELS.indexOf(defs.channel)];
-
-                return { translate: shift ?? [0, 0] };
-            }}
+            computeSliceAnimation={animation}
             onIterationEnd={() => {
                 setShifts(generateShifts());
             }}

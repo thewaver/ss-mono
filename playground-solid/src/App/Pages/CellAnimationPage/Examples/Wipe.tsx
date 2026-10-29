@@ -4,16 +4,14 @@ import { Portal } from "solid-js/web";
 import {
     Button,
     CellAnimation,
-    CellAnimationBreakpointUtils,
-    CellAnimationKeyframeUtils,
     CellAnimationOrigins,
-    CellAnimationPlaybackUtils,
-    CellAnimationWeights,
     MediaQueryMonitorSolidUtils,
+    SliceAnimationKeyframeUtils,
+    SliceAnimationWeights,
     access,
     useViewportContext,
 } from "@thewaver/ss-components-solid";
-import type { CellAnimationPlaybackOpts } from "@thewaver/ss-components-solid";
+import type { SliceAnimationPlaybackOpts } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/Pages/CellAnimationPage/CellAnimationPage.css";
 import type { Index2d, Size2d } from "@thewaver/ss-utils";
 
@@ -24,8 +22,8 @@ const WIPE_CELL_SIZE = 120;
 const WIPE_LEG_MS = 600;
 const WIPE_COLOR = "black";
 const LOZENGE_COVER_PERCENT = 150;
-const WIPE_PLAYBACK: CellAnimationPlaybackOpts = { dir: "pipe", holdMs: 400 };
-const LOZENGE_GROW = CellAnimationKeyframeUtils.fromStops([
+const WIPE_PLAYBACK: SliceAnimationPlaybackOpts = { dir: "pipe", holdMs: 400 };
+const LOZENGE_GROW = SliceAnimationKeyframeUtils.fromStops([
     { at: 0, rotate: 45, scaleX: 0, scaleY: 0 },
     { at: 1, rotate: 45, scaleX: LOZENGE_COVER_PERCENT, scaleY: LOZENGE_COVER_PERCENT },
 ]);
@@ -74,39 +72,21 @@ export const WipeExample = (props: Props) => {
                             <CellAnimation
                                 src={() => computeSolidSource(getSize())}
                                 cellCount={getCellCount}
-                                animationDurationMs={() =>
-                                    CellAnimationPlaybackUtils.computeCycleDurationMs(getLegMs(), WIPE_PLAYBACK)
-                                }
+                                origin={getOrigin}
+                                breakpointOpts={props.breakpointOpts}
+                                playbackOpts={WIPE_PLAYBACK}
+                                animationDurationMs={getLegMs}
                                 animationIterationCount={1}
                                 finalFrame={"nothing"}
-                                computeCellWeights={(count) =>
-                                    CellAnimationWeights.computeCellWeights(
+                                computeSliceWeights={(count) =>
+                                    SliceAnimationWeights.computeSliceWeights(
                                         access(props.weightType),
                                         count,
                                         getOrigin(),
                                         access(props.weightOpts),
                                     )
                                 }
-                                computeSliceAnimation={(defs, timeline) =>
-                                    CellAnimationKeyframeUtils.computeAnimation(
-                                        LOZENGE_GROW,
-                                        CellAnimationBreakpointUtils.computeBreakpoints(
-                                            defs.weight,
-                                            CellAnimationPlaybackUtils.computeBreakpointOpts(
-                                                access(props.breakpointOpts),
-                                                timeline,
-                                                WIPE_PLAYBACK,
-                                            ),
-                                        ),
-                                        { ...defs, origin: getOrigin() },
-                                        CellAnimationPlaybackUtils.computeGlobalTimeline(
-                                            timeline,
-                                            getLegMs(),
-                                            WIPE_PLAYBACK,
-                                        ),
-                                        access(props.breakpointOpts).easing,
-                                    )
-                                }
+                                computeSliceAnimation={LOZENGE_GROW}
                                 onAnimationEnd={() => setWipeSize(undefined)}
                             />
                         </div>

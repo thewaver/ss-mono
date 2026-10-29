@@ -2,13 +2,13 @@
     import { Button, ParticleDissolve } from "@thewaver/ss-components-svelte";
     import {
         CENTER_SHARE,
-        computeAshAnimation,
+        ASH_ANIMATION,
+        ASH_SRC,
     } from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.const";
     import * as styles from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.css";
     import type { Point2d } from "@thewaver/ss-utils";
 
     import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.svelte";
-    import AshParticle from "../AshParticle.svelte";
     import type { ParticleDissolveExampleProps } from "../ParticleDissolvePageSvelte.types";
 
     type Props = ParticleDissolveExampleProps;
@@ -40,7 +40,8 @@
         featherShare={props.featherShare}
         spawnChance={props.spawnChance}
         cellSize={props.cellSize}
-        computeParticleAnimation={computeAshAnimation}
+        src={ASH_SRC}
+        computeParticleAnimation={ASH_ANIMATION}
     >
         <Button
             id={"particleDissolveBurn"}
@@ -53,10 +54,6 @@
                 <PageButtonContent {flags}>Click to burn me up</PageButtonContent>
             {/snippet}
         </Button>
-
-        {#snippet renderParticle(defs)}
-            <AshParticle {defs} />
-        {/snippet}
     </ParticleDissolve>
 
     <Button

@@ -1,6 +1,6 @@
 <script lang="ts">
     import {
-        CellAnimationWeights,
+        SliceAnimationWeights,
         SCANLINE_ANIMATION_DEFAULTS,
         SCANLINE_ANIMATION_ORIENTATIONS,
     } from "@thewaver/ss-components-svelte";
@@ -51,7 +51,7 @@
         return Object.entries(result);
     };
 
-    const GROUPPED_WEIGHTS = groupOptions(CellAnimationWeights.ORIGIN_FREE_WEIGHT_TYPES);
+    const GROUPPED_WEIGHTS = groupOptions(SliceAnimationWeights.ORIGIN_FREE_WEIGHT_TYPES);
 
     let playback = $state(true);
 
@@ -60,7 +60,7 @@
     let orientation = $state<ScanlineAnimationOrientation>(SCANLINE_ANIMATION_DEFAULTS.orientation);
     let animationDurationMs = $state(ScanlineAnimationKnobs.STARTING_DURATION_MS);
     let animationIterationDelayMs = $state(ScanlineAnimationKnobs.STARTING_ITERATION_DELAY_MS);
-    let weightType = $state<CellAnimationWeights.OriginFreeWeightType>(ScanlineAnimationKnobs.STARTING_WEIGHT_TYPE);
+    let weightType = $state<SliceAnimationWeights.OriginFreeWeightType>(ScanlineAnimationKnobs.STARTING_WEIGHT_TYPE);
 
     const handleFile = (file: File) => {
         src = URL.createObjectURL(file);
@@ -221,7 +221,7 @@
 
         <PageProp
             itemKey={"weightType"}
-            controls={"Picks the example's weight function sent to ScanlineAnimationProps.computeCellWeights"}
+            controls={"Picks the example's weight function sent to ScanlineAnimationProps.computeSliceWeights"}
             label={"Weight"}
             hint={"How each line's turn is decided: its position, a wave, a random draw, and so on."}
         >

@@ -1,7 +1,7 @@
-import type { CellAnimationFn } from "../../../../Generators/CellAnimationKeyframes/CellAnimationKeyframes.types";
-import { CellAnimationKeyframeUtils } from "../../../../Generators/CellAnimationKeyframes/CellAnimationKeyframes.utils";
+import type { SliceAnimationFn } from "../../../../Generators/SliceAnimationKeyframes/SliceAnimationKeyframes.types";
+import { SliceAnimationKeyframeUtils } from "../../../../Generators/SliceAnimationKeyframes/SliceAnimationKeyframes.utils";
 
-export const tumbleRight: CellAnimationFn = CellAnimationKeyframeUtils.fromStops([
+export const tumbleRight: SliceAnimationFn = SliceAnimationKeyframeUtils.fromStops([
     { at: 0, opacity: 0, translateX: -200, translateY: 0, rotate: -180 },
     { at: 0.25, opacity: 100, translateX: -150, translateY: 50, rotate: -135 },
     { at: 0.5, translateX: -100, translateY: 0, rotate: -90 },

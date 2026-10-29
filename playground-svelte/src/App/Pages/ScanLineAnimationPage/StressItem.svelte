@@ -42,12 +42,8 @@
 <script lang="ts">
     import { untrack } from "svelte";
 
-    import {
-        CellAnimationBreakpointUtils,
-        CellAnimationWeights,
-        ScanlineAnimation,
-        ScanlineAnimationKeyframes,
-    } from "@thewaver/ss-components-svelte";
+    import { SliceAnimationWeights, ScanlineAnimation, ScanlineAnimationKeyframes } from "@thewaver/ss-components-svelte";
+    import type { SliceAnimationRenderer } from "@thewaver/ss-components-svelte";
     import type { Index2d } from "@thewaver/ss-utils";
 
     import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.svelte";
@@ -59,28 +55,29 @@
 
         return kind === "transform"
             ? random < 1
-                ? ScanlineAnimationKeyframes.computeHorizontalSnake
+                ? ScanlineAnimationKeyframes.createHorizontalSnake()
                 : random < 2
-                  ? ScanlineAnimationKeyframes.computeHorizontalSplit
-                  : ScanlineAnimationKeyframes.computeHorizontalStretch
+                  ? ScanlineAnimationKeyframes.createHorizontalSplit()
+                  : ScanlineAnimationKeyframes.createHorizontalStretch()
             : random < 1
-              ? ScanlineAnimationKeyframes.computeHorizontalBrightness
+              ? ScanlineAnimationKeyframes.createHorizontalBrightness()
               : random < 2
-                ? ScanlineAnimationKeyframes.computeHorizontalHue
-                : ScanlineAnimationKeyframes.computeHorizontalGrayscale;
+                ? ScanlineAnimationKeyframes.createHorizontalHue()
+                : ScanlineAnimationKeyframes.createHorizontalGrayscale();
     };
 
     type StressItemProps = Omit<ScanlineAnimationExampleProps, "playback"> & {
         configIndex: number;
         modalPlayback: boolean;
+        renderer: SliceAnimationRenderer;
     };
 
     let { configIndex, modalPlayback = $bindable(), weightType, ...props }: StressItemProps = $props();
 
-    const foo = untrack(() => pickStressKeyframes(STRESS_ITEMS[configIndex].kind));
+    const animation = untrack(() => pickStressKeyframes(STRESS_ITEMS[configIndex].kind));
 
-    const computeCellWeights = (count: Index2d) =>
-        CellAnimationWeights.computeCellWeights(weightType, count, WEIGHT_ORIGIN);
+    const computeSliceWeights = (count: Index2d) =>
+        SliceAnimationWeights.computeSliceWeights(weightType, count, WEIGHT_ORIGIN);
 </script>
 
 <PageMeasureBox width={STRESS_ITEMS[configIndex].size} height={STRESS_ITEMS[configIndex].size}>
@@ -89,8 +86,7 @@
         bind:playback={modalPlayback}
         lineCount={STRESS_LINE_COUNT}
         animationIterationDelayMs={0}
-        {computeCellWeights}
-        computeSliceAnimation={(defs, timeline) =>
-            foo(CellAnimationBreakpointUtils.computeBreakpoints(defs.weight, undefined), defs, timeline, undefined)}
+        {computeSliceWeights}
+        computeSliceAnimation={animation}
     />
 </PageMeasureBox>

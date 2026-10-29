@@ -1,5 +1,7 @@
-import { type EasingFn, EasingUtils, Point2d, Point2dUtils } from "@thewaver/ss-utils";
+import type { ParticleTravelDefs } from "@thewaver/ss-components";
+import { type CSSAnimationValues, type EasingFn, EasingUtils, Point2d, Point2dUtils } from "@thewaver/ss-utils";
 
+import { ParticlePictureUtils } from "../../PageComponents/ParticlePicture/ParticlePicture.utils";
 import type { StressTestDefs } from "../../PageComponents/StressTest/StressText.types";
 import type {
     IterationPattern,
@@ -8,6 +10,9 @@ import type {
     ParticleTravelPatternFactory,
     TravelEasingKey,
 } from "./ParticleSpawnerPatterns.types";
+
+import { themeVars } from "../../Theme.css";
+import { PARTICLE_SIZE_PX } from "./ParticleSpawnerPage.css";
 
 export const TRAVEL_EASING_FNS: Record<TravelEasingKey, EasingFn> = {
     linear: EasingUtils.linear,
@@ -50,14 +55,31 @@ export const TRAVEL_EASING_FNS: Record<TravelEasingKey, EasingFn> = {
 export const TRAVEL_EASING_KEYS = Object.keys(TRAVEL_EASING_FNS) as TravelEasingKey[];
 
 const FADE_IN_SHARE = 0.15;
+const PERCENT = 100;
 const ARRIVAL_SCALE = 0.5;
 
 const randomBetween = (min: number, max: number) => min + Math.random() * (max - min);
 
-export const computeParticleGlow = (t: number) => ({
+const computeParticleGlow = (t: number) => ({
     opacity: t < FADE_IN_SHARE ? t / FADE_IN_SHARE : 1,
     scale: 1 + t * ARRIVAL_SCALE,
 });
+
+export const computeParticleAnimation = (_defs: ParticleTravelDefs, t: number): CSSAnimationValues => {
+    const glow = computeParticleGlow(t);
+
+    return { opacity: glow.opacity * PERCENT, scale: [glow.scale * PERCENT, glow.scale * PERCENT] };
+};
+
+export const createParticleSrc = () =>
+    ParticlePictureUtils.createDotSrc(themeVars.color.primary.light, themeVars.color.primary.dark, {
+        sizePx: PARTICLE_SIZE_PX,
+    });
+
+export const createReturnParticleSrc = () =>
+    ParticlePictureUtils.createDotSrc(themeVars.color.secondary.light, themeVars.color.secondary.dark, {
+        sizePx: PARTICLE_SIZE_PX,
+    });
 
 const lerp = (from: Point2d, to: Point2d, t: number): Point2d => ({
     x: from.x + (to.x - from.x) * t,

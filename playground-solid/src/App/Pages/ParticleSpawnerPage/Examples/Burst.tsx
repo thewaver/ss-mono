@@ -2,7 +2,10 @@ import { For, createSignal } from "solid-js";
 
 import { Button, ParticleSpawner, access } from "@thewaver/ss-components-solid";
 import type { ParticleSpawnIterationPattern } from "@thewaver/ss-components-solid";
-import { computeParticleGlow } from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.const";
+import {
+    computeParticleAnimation,
+    createParticleSrc,
+} from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.css";
 
 import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
@@ -20,6 +23,8 @@ const TARGET_POSITIONS = [
 ];
 
 export const BurstExample = (props: ParticleSpawnerExampleProps) => {
+    const particleSrc = createParticleSrc();
+
     const playback = createSignal(false);
     const [, setIsPlaying] = playback;
 
@@ -60,16 +65,8 @@ export const BurstExample = (props: ParticleSpawnerExampleProps) => {
                         playback={playback}
                         spawnIterationPatterns={ONE_ROUND}
                         targets={getTargetRefs}
-                        renderParticle={(_index, getT) => {
-                            const getGlow = () => computeParticleGlow(getT());
-
-                            return (
-                                <div
-                                    class={styles.particle}
-                                    style={{ opacity: getGlow().opacity, transform: `scale(${getGlow().scale})` }}
-                                />
-                            );
-                        }}
+                        src={particleSrc}
+                        computeParticleAnimation={computeParticleAnimation}
                         onAnimationEnd={() => setIsPlaying(false)}
                     />
                 </div>

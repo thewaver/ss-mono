@@ -1,10 +1,10 @@
 import type {
-    CellAnimationBreakpointOpts,
     CellAnimationKeyframes,
     CellAnimationOrigins,
-    CellAnimationPlaybackOpts,
-    CellAnimationWeights,
     SVGDefsSamples,
+    SliceAnimationBreakpointOpts,
+    SliceAnimationPlaybackOpts,
+    SliceAnimationWeights,
     WeightOpts,
 } from "@thewaver/ss-components";
 import type { Index2d } from "@thewaver/ss-utils";
@@ -36,7 +36,7 @@ export namespace CellAnimationKnobs {
     export const STARTING_SOURCE_KIND: CellAnimationSourceKind = "image";
     export const STARTING_CELL_COUNT: Index2d = { row: 11, col: 11 };
     export const STARTING_ORIGIN_KEY: CellAnimationOrigins.OriginType = "center";
-    export const STARTING_WEIGHT_KEY: CellAnimationWeights.WeightType = "diamond_default";
+    export const STARTING_WEIGHT_KEY: SliceAnimationWeights.WeightType = "diamond_default";
     export const STARTING_ANIMATION_KEY: CellAnimationKeyframes.AnimationType = "zoom_in";
     export const STARTING_GRADIENT_KEY: SVGDefsSamples.Gradient.Timed.SampleKey = "orbit_async_2v1";
     export const STARTING_PATTERN_KEY: SVGDefsSamples.Pattern.Timed.SampleKey = "hexagon_pt_2";
@@ -44,12 +44,12 @@ export namespace CellAnimationKnobs {
         shouldMakeUnique: false,
         shouldNormalize: false,
     };
-    export const STARTING_BREAKPOINT_OPTS: CellAnimationBreakpointOpts = {
+    export const STARTING_BREAKPOINT_OPTS: SliceAnimationBreakpointOpts = {
         dir: "asc",
         smoothness: 0.25,
         easing: "linear",
     };
-    export const STARTING_PLAYBACK_OPTS: CellAnimationPlaybackOpts = {
+    export const STARTING_PLAYBACK_OPTS: SliceAnimationPlaybackOpts = {
         dir: "stack",
         holdMs: 1000,
     };

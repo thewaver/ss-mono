@@ -1,7 +1,7 @@
-import type { CellAnimationFn } from "../../../../Generators/CellAnimationKeyframes/CellAnimationKeyframes.types";
-import { CellAnimationKeyframeUtils } from "../../../../Generators/CellAnimationKeyframes/CellAnimationKeyframes.utils";
+import type { SliceAnimationFn } from "../../../../Generators/SliceAnimationKeyframes/SliceAnimationKeyframes.types";
+import { SliceAnimationKeyframeUtils } from "../../../../Generators/SliceAnimationKeyframes/SliceAnimationKeyframes.utils";
 
-export const pullHorizontal: CellAnimationFn = CellAnimationKeyframeUtils.fromStops([
+export const pullHorizontal: SliceAnimationFn = SliceAnimationKeyframeUtils.fromStops([
     { at: 0, scaleX: 100, scaleY: 0 },
     { at: 1, scaleX: 100, scaleY: 100 },
 ]);

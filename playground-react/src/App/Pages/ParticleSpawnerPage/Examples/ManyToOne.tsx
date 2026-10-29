@@ -1,7 +1,10 @@
 import { useState } from "react";
 
 import { ParticleSpawner } from "@thewaver/ss-components-react";
-import { computeParticleGlow } from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.const";
+import {
+    computeParticleAnimation,
+    createParticleSrc,
+} from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.css";
 
 import type { ParticleSpawnerExampleProps } from "../ParticleSpawnerPage.types";
@@ -16,6 +19,8 @@ const SPAWNER_POSITIONS = [
 ];
 
 export const ManyToOneExample = (props: ParticleSpawnerExampleProps) => {
+    const [particleSrc] = useState(createParticleSrc);
+
     const [targetRef, setTargetRef] = useState<HTMLElement | null>(null);
 
     return (
@@ -35,16 +40,8 @@ export const ManyToOneExample = (props: ParticleSpawnerExampleProps) => {
                     <ParticleSpawner
                         {...props}
                         targets={[targetRef ?? undefined]}
-                        renderParticle={(_index, t) => {
-                            const glow = computeParticleGlow(t);
-
-                            return (
-                                <div
-                                    className={styles.particle}
-                                    style={{ opacity: glow.opacity, transform: `scale(${glow.scale})` }}
-                                />
-                            );
-                        }}
+                        src={particleSrc}
+                        computeParticleAnimation={computeParticleAnimation}
                     />
                 </div>
             ))}

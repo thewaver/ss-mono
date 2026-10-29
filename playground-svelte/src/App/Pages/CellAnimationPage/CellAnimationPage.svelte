@@ -2,18 +2,18 @@
     import {
         CELL_ANIMATION_DEFAULTS,
         CELL_ANIMATION_FINAL_FRAMES,
-        CellAnimationBreakpoints,
+        SliceAnimationBreakpoints,
         CellAnimationKeyframes,
         CellAnimationOrigins,
-        CellAnimationPlayback,
-        CellAnimationPlaybackUtils,
-        CellAnimationWeights,
+        SliceAnimationPlayback,
+        SliceAnimationPlaybackUtils,
+        SliceAnimationWeights,
     } from "@thewaver/ss-components-svelte";
     import type {
         SVGDefsSamples,
-        CellAnimationBreakpointOpts,
+        SliceAnimationBreakpointOpts,
         CellAnimationFinalFrame,
-        CellAnimationPlaybackOpts,
+        SliceAnimationPlaybackOpts,
         WeightOpts,
     } from "@thewaver/ss-components-svelte";
     import * as styles from "@thewaver/ss-playground/App/Pages/CellAnimationPage/CellAnimationPage.css";
@@ -65,7 +65,7 @@
         return Object.entries(result);
     };
 
-    const GROUPPED_WEIGHTS = groupOptions(CellAnimationWeights.WEIGHT_TYPES);
+    const GROUPPED_WEIGHTS = groupOptions(SliceAnimationWeights.WEIGHT_TYPES);
     const GROUPPED_ANIMATIONS = groupOptions(CellAnimationKeyframes.ANIMATION_TYPES);
 
     let playback = $state(true);
@@ -79,7 +79,7 @@
     let sourceRatio = $state<SVGDefsSources.SourceRatio>(CellAnimationKnobs.DEFAULT_SOURCE_RATIO);
 
     let originType = $state<CellAnimationOrigins.OriginType>(CellAnimationKnobs.STARTING_ORIGIN_KEY);
-    let weightType = $state<CellAnimationWeights.WeightType>(CellAnimationKnobs.STARTING_WEIGHT_KEY);
+    let weightType = $state<SliceAnimationWeights.WeightType>(CellAnimationKnobs.STARTING_WEIGHT_KEY);
     let animationType = $state<CellAnimationKeyframes.AnimationType>(CellAnimationKnobs.STARTING_ANIMATION_KEY);
     let animationDurationMs = $state(CELL_ANIMATION_DEFAULTS.animationDurationMs);
     let animationIterationDelayMs = $state(CELL_ANIMATION_DEFAULTS.animationIterationDelayMs);
@@ -87,8 +87,8 @@
     let finalFrame = $state<CellAnimationFinalFrame>(CELL_ANIMATION_DEFAULTS.finalFrame);
     let cellCount = $state.raw<Index2d>({ ...CellAnimationKnobs.STARTING_CELL_COUNT });
     let weightOpts = $state.raw<WeightOpts>({ ...CellAnimationKnobs.STARTING_WEIGHT_OPTS });
-    let breakpointOpts = $state.raw<CellAnimationBreakpointOpts>({ ...CellAnimationKnobs.STARTING_BREAKPOINT_OPTS });
-    let playbackOpts = $state.raw<CellAnimationPlaybackOpts>({ ...CellAnimationKnobs.STARTING_PLAYBACK_OPTS });
+    let breakpointOpts = $state.raw<SliceAnimationBreakpointOpts>({ ...CellAnimationKnobs.STARTING_BREAKPOINT_OPTS });
+    let playbackOpts = $state.raw<SliceAnimationPlaybackOpts>({ ...CellAnimationKnobs.STARTING_PLAYBACK_OPTS });
 
     const commonProps: Omit<CellAnimationExampleProps, "playback"> = $derived({
         cellCount,
@@ -108,7 +108,7 @@
     const sourceSize = $derived(SVGDefsSources.computeSourceSize(sourceRatio));
 
     const cycleDurationMs = $derived(
-        CellAnimationPlaybackUtils.computeCycleDurationMs(animationDurationMs, playbackOpts),
+        SliceAnimationPlaybackUtils.computeCycleDurationMs(animationDurationMs, playbackOpts),
     );
 
     const sourcedSrc = $derived.by(() => {
@@ -303,7 +303,7 @@
 
         <PageProp
             itemKey={"originType"}
-            controls={"Picks the point the example's weights are measured from, sent to CellAnimationProps.computeCellWeights"}
+            controls={"Picks the point the example's weights are measured from, sent to CellAnimationProps.computeSliceWeights"}
             label={"Origin"}
             hint={
                 "Where in the grid the animation starts from. It only applies to weights that are measured from a point."
@@ -312,7 +312,7 @@
             <PageSelectField
                 value={originType}
                 values={CellAnimationOrigins.ORIGIN_TYPES}
-                isDisabled={!CellAnimationWeights.isOriginAware(weightType)}
+                isDisabled={!SliceAnimationWeights.isOriginAware(weightType)}
                 ariaLabel={"Origin"}
                 onChange={(origin) => {
                     originType = origin;
@@ -322,7 +322,7 @@
 
         <PageProp
             itemKey={"weightType"}
-            controls={"Picks the example's weight function sent to CellAnimationProps.computeCellWeights"}
+            controls={"Picks the example's weight function sent to CellAnimationProps.computeSliceWeights"}
             label={"Weight"}
             hint={"How each cell's turn is decided: its distance from the origin, a wave, a random draw, and so on."}
         >
@@ -388,13 +388,13 @@
 
         <PageProp
             itemKey={"direction"}
-            controls={"Sets CellAnimationBreakpointOpts.dir"}
+            controls={"Sets SliceAnimationBreakpointOpts.dir"}
             label={"Direction"}
             hint={"Which way the run travels through the weights, and so which cells go first."}
         >
             <PageSelectField
                 value={breakpointOpts.dir!}
-                values={CellAnimationBreakpoints.DIRECTIONS}
+                values={SliceAnimationBreakpoints.DIRECTIONS}
                 ariaLabel={"Direction"}
                 onChange={(dir) => {
                     breakpointOpts = { ...breakpointOpts, dir };
@@ -404,13 +404,13 @@
 
         <PageProp
             itemKey={"easing"}
-            controls={"Sets CellAnimationBreakpointOpts.easing"}
+            controls={"Sets SliceAnimationBreakpointOpts.easing"}
             label={"Easing"}
             hint={"The speed curve a single cell follows from its start to its finish."}
         >
             <PageSelectField
                 value={breakpointOpts.easing!}
-                values={CellAnimationBreakpoints.EASINGS}
+                values={SliceAnimationBreakpoints.EASINGS}
                 ariaLabel={"Easing"}
                 onChange={(easing) => {
                     breakpointOpts = { ...breakpointOpts, easing };
@@ -420,7 +420,7 @@
 
         <PageProp
             itemKey={"smoothness01"}
-            controls={"Sets CellAnimationBreakpointOpts.smoothness"}
+            controls={"Sets SliceAnimationBreakpointOpts.smoothness"}
             label={"Smoothness (0-1)"}
             hint={
                 "How much a cell's own movement overlaps its neighbors'. 0 makes each cell wait its turn; 1 blurs them into one sweep."
@@ -513,13 +513,13 @@
 
         <PageProp
             itemKey={"playbackDir"}
-            controls={"Sets CellAnimationPlaybackOpts.dir"}
+            controls={"Sets SliceAnimationPlaybackOpts.dir"}
             label={"Playback direction"}
             hint={"Whether each pass runs one way, or goes out and comes back. Coming back, stack starts with the last cell to arrive and pipe with the first."}
         >
             <PageSelectField
                 value={playbackOpts.dir!}
-                values={CellAnimationPlayback.DIRECTIONS}
+                values={SliceAnimationPlayback.DIRECTIONS}
                 ariaLabel={"Playback direction"}
                 onChange={(dir) => {
                     playbackOpts = { ...playbackOpts, dir };
@@ -529,7 +529,7 @@
 
         <PageProp
             itemKey={"holdMs"}
-            controls={"Sets CellAnimationPlaybackOpts.holdMs"}
+            controls={"Sets SliceAnimationPlaybackOpts.holdMs"}
             label={"Hold at far end (ms)"}
             hint={
                 "How long the grid rests at the far end before turning back. It only applies to stack and pipe, which come back."
@@ -540,7 +540,7 @@
                 min={CellAnimationKnobs.MIN_HOLD_MS}
                 max={CellAnimationKnobs.MAX_HOLD_MS}
                 step={CellAnimationKnobs.DURATION_STEP_MS}
-                isDisabled={!CellAnimationPlaybackUtils.isRoundTrip(playbackOpts.dir)}
+                isDisabled={!SliceAnimationPlaybackUtils.isRoundTrip(playbackOpts.dir)}
                 ariaLabel={"Hold at far end"}
                 onInput={(value) => {
                     playbackOpts = { ...playbackOpts, holdMs: value };

@@ -4,13 +4,13 @@
         NO_EDGE_THICKNESSES,
         SVG_LABEL,
         SVG_SIZE,
-        computeAshAnimation,
+        ASH_ANIMATION,
+        ASH_SRC,
     } from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.const";
     import * as styles from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.css";
     import { ShapeConst, ShapeUtils } from "@thewaver/ss-utils";
 
     import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.svelte";
-    import AshParticle from "../AshParticle.svelte";
     import type { ParticleDissolveSvgExampleProps } from "../ParticleDissolvePageSvelte.types";
 
     type Props = ParticleDissolveSvgExampleProps;
@@ -33,7 +33,8 @@
         featherShare={props.featherShare}
         spawnChance={props.spawnChance}
         cellSize={props.cellSize}
-        computeParticleAnimation={computeAshAnimation}
+        src={ASH_SRC}
+        computeParticleAnimation={ASH_ANIMATION}
     >
         <svg
             class={styles.svgShape}
@@ -45,10 +46,6 @@
             <path class={styles.svgShapePath} d={path} />
             <text class={styles.svgShapeText} x={"50%"} y={"50%"}>{SVG_LABEL}</text>
         </svg>
-
-        {#snippet renderParticle(defs)}
-            <AshParticle {defs} />
-        {/snippet}
     </ParticleDissolve>
 
     <div class={styles.buttonRow}>

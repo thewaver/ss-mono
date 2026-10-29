@@ -1,11 +1,10 @@
 <script lang="ts">
     import {
-        CellAnimationBreakpointUtils,
-        CellAnimationWeights,
+        SliceAnimationWeights,
         ScanlineAnimation,
         ScanlineAnimationKeyframes,
     } from "@thewaver/ss-components-svelte";
-    import type { CellAnimationBreakpointOpts, ScanlineHorizontalGrayscaleOpts } from "@thewaver/ss-components-svelte";
+    import type { SliceAnimationBreakpointOpts, ScanlineHorizontalGrayscaleOpts } from "@thewaver/ss-components-svelte";
     import type { Index2d } from "@thewaver/ss-utils";
 
     import type { ScanlineAnimationExampleProps } from "../ScanlineAnimationPage.types";
@@ -13,26 +12,23 @@
     const WEIGHT_ORIGIN = { row: 0, col: 0 };
 
     type Props = ScanlineAnimationExampleProps & {
-        breakpointOpts: CellAnimationBreakpointOpts;
+        breakpointOpts: SliceAnimationBreakpointOpts;
         keyframeOpts: ScanlineHorizontalGrayscaleOpts;
     };
 
     let { playback = $bindable(), progress = $bindable(0), keyframeOpts, breakpointOpts, weightType, ...otherProps }: Props = $props();
 
-    const computeCellWeights = (count: Index2d) =>
-        CellAnimationWeights.computeCellWeights(weightType, count, WEIGHT_ORIGIN);
+    const computeSliceWeights = (count: Index2d) =>
+        SliceAnimationWeights.computeSliceWeights(weightType, count, WEIGHT_ORIGIN);
+
+    const animation = $derived(ScanlineAnimationKeyframes.createHorizontalGrayscale(keyframeOpts));
 </script>
 
 <ScanlineAnimation
     {...otherProps}
     bind:playback
     bind:progress
-    {computeCellWeights}
-    computeSliceAnimation={(defs, timeline) =>
-        ScanlineAnimationKeyframes.computeHorizontalGrayscale(
-            CellAnimationBreakpointUtils.computeBreakpoints(defs.weight, breakpointOpts),
-            defs,
-            timeline,
-            keyframeOpts,
-        )}
+    {computeSliceWeights}
+    {breakpointOpts}
+    computeSliceAnimation={animation}
 />

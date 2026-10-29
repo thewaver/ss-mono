@@ -1,12 +1,12 @@
-import type { CellAnimationFn } from "../../../../Generators/CellAnimationKeyframes/CellAnimationKeyframes.types";
-import { CellAnimationKeyframeUtils } from "../../../../Generators/CellAnimationKeyframes/CellAnimationKeyframes.utils";
+import type { SliceAnimationFn } from "../../../../Generators/SliceAnimationKeyframes/SliceAnimationKeyframes.types";
+import { SliceAnimationKeyframeUtils } from "../../../../Generators/SliceAnimationKeyframes/SliceAnimationKeyframes.utils";
 import { pullDown } from "./pullDown";
 import { pullLeft } from "./pullLeft";
 import { pullRight } from "./pullRight";
 import { pullUp } from "./pullUp";
 import { zoomIn } from "./zoomIn";
 
-export const pullQuadrant: CellAnimationFn = CellAnimationKeyframeUtils.fromZones(
+export const pullQuadrant: SliceAnimationFn = SliceAnimationKeyframeUtils.fromZones(
     [
         { zone: "top", animation: pullUp },
         { zone: "bottom", animation: pullDown },

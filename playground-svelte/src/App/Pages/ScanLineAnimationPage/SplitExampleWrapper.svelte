@@ -1,7 +1,7 @@
 <script lang="ts">
     import * as styles from "@thewaver/ss-playground/App/Pages/ScanLineAnimationPage/ScanlineAnimationPage.css";
     import { ScanlineAnimationKeyframes } from "@thewaver/ss-components-svelte";
-    import type { CellAnimationBreakpointOpts, ScanlineHorizontalSplitOpts } from "@thewaver/ss-components-svelte";
+    import type { SliceAnimationBreakpointOpts, ScanlineHorizontalSplitOpts } from "@thewaver/ss-components-svelte";
     import { ScanlineAnimationKnobs } from "@thewaver/ss-playground/App/Knobs/ScanlineAnimations.const";
 
     import { ScanlineAnimationKeyframeKnobs } from "@thewaver/ss-playground/App/Knobs/ScanlineAnimationKeyframes.const";
@@ -27,7 +27,7 @@
     let progress = $state(0);
 
     let keyframeOpts = $state.raw<Record<string, number | boolean>>({});
-    let breakpointOpts = $state.raw<CellAnimationBreakpointOpts>({
+    let breakpointOpts = $state.raw<SliceAnimationBreakpointOpts>({
         ...ScanlineAnimationKnobs.STARTING_SPLIT_BREAKPOINT_OPTS,
     });
 </script>

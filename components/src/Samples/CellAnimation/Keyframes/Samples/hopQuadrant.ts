@@ -1,12 +1,12 @@
-import type { CellAnimationFn } from "../../../../Generators/CellAnimationKeyframes/CellAnimationKeyframes.types";
-import { CellAnimationKeyframeUtils } from "../../../../Generators/CellAnimationKeyframes/CellAnimationKeyframes.utils";
+import type { SliceAnimationFn } from "../../../../Generators/SliceAnimationKeyframes/SliceAnimationKeyframes.types";
+import { SliceAnimationKeyframeUtils } from "../../../../Generators/SliceAnimationKeyframes/SliceAnimationKeyframes.utils";
 import { hopDown } from "./hopDown";
 import { hopLeft } from "./hopLeft";
 import { hopRight } from "./hopRight";
 import { hopUp } from "./hopUp";
 import { zoomIn } from "./zoomIn";
 
-export const hopQuadrant: CellAnimationFn = CellAnimationKeyframeUtils.fromZones(
+export const hopQuadrant: SliceAnimationFn = SliceAnimationKeyframeUtils.fromZones(
     [
         { zone: "top", animation: hopUp },
         { zone: "bottom", animation: hopDown },

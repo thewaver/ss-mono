@@ -815,16 +815,16 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
         name: "Generators",
         children: [
             {
-                name: "CellAnimationBreakpoints",
+                name: "SliceAnimationBreakpoints",
             },
             {
                 name: "CellAnimationKeyframes",
             },
             {
-                name: "CellAnimationPlayback",
+                name: "SliceAnimationPlayback",
             },
             {
-                name: "CellAnimationWeights",
+                name: "SliceAnimationWeights",
             },
             {
                 name: "CellAnimationZones",

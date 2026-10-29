@@ -1,17 +1,8 @@
 <script setup lang="ts">
-import { useModel } from "vue";
+import { computed, useModel } from "vue";
 
-import {
-    CellAnimationBreakpointUtils,
-    CellAnimationWeights,
-    ScanlineAnimation,
-    ScanlineAnimationKeyframes,
-} from "@thewaver/ss-components-vue";
-import type {
-    CellAnimationBreakpointOpts,
-    ScanlineAnimationEvaluationDefs,
-    _ScanlineHorizontalWaveOpts,
-} from "@thewaver/ss-components-vue";
+import { ScanlineAnimation, ScanlineAnimationKeyframes, SliceAnimationWeights } from "@thewaver/ss-components-vue";
+import type { SliceAnimationBreakpointOpts, _ScanlineHorizontalWaveOpts } from "@thewaver/ss-components-vue";
 import type { Index2d } from "@thewaver/ss-utils";
 
 import type { ScanlineAnimationExampleProps } from "../ScanlineAnimationPage.types";
@@ -19,7 +10,7 @@ import type { ScanlineAnimationExampleProps } from "../ScanlineAnimationPage.typ
 const WEIGHT_ORIGIN = { row: 0, col: 0 };
 
 type Props = ScanlineAnimationExampleProps & {
-    breakpointOpts: CellAnimationBreakpointOpts;
+    breakpointOpts: SliceAnimationBreakpointOpts;
     keyframeOpts: _ScanlineHorizontalWaveOpts;
 };
 
@@ -28,16 +19,10 @@ const props = defineProps<Props>();
 const playback = useModel(props, "playback");
 const progress = useModel(props, "progress");
 
-const computeCellWeights = (count: Index2d) =>
-    CellAnimationWeights.computeCellWeights(props.weightType, count, WEIGHT_ORIGIN);
+const computeSliceWeights = (count: Index2d) =>
+    SliceAnimationWeights.computeSliceWeights(props.weightType, count, WEIGHT_ORIGIN);
 
-const computeSliceAnimation = (defs: ScanlineAnimationEvaluationDefs, timeline: number) =>
-    ScanlineAnimationKeyframes._computeHorizontalWave(
-        CellAnimationBreakpointUtils.computeBreakpoints(defs.weight, props.breakpointOpts),
-        defs,
-        timeline,
-        props.keyframeOpts,
-    );
+const animation = computed(() => ScanlineAnimationKeyframes._createHorizontalWave(props.keyframeOpts));
 </script>
 
 <template>
@@ -49,7 +34,8 @@ const computeSliceAnimation = (defs: ScanlineAnimationEvaluationDefs, timeline: 
         :orientation="orientation"
         :animation-duration-ms="animationDurationMs"
         :animation-iteration-delay-ms="animationIterationDelayMs"
-        :compute-cell-weights="computeCellWeights"
-        :compute-slice-animation="computeSliceAnimation"
+        :compute-slice-weights="computeSliceWeights"
+        :breakpoint-opts="breakpointOpts"
+        :compute-slice-animation="animation"
     />
 </template>

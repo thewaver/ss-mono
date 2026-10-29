@@ -1,17 +1,14 @@
 import { useMemo, useState } from "react";
 
 import {
-    CellAnimationBreakpointUtils,
-    CellAnimationBreakpoints,
-    CellAnimationWeights,
     SCANLINE_ANIMATION_DEFAULTS,
     SCANLINE_ANIMATION_ORIENTATIONS,
     ScanlineAnimation,
     ScanlineAnimationKeyframes,
+    SliceAnimationBreakpoints,
+    SliceAnimationWeights,
 } from "@thewaver/ss-components-react";
 import type {
-    CellAnimationBreakpointDirection,
-    CellAnimationBreakpointOpts,
     ScanlineAnimationOrientation,
     ScanlineHorizontalBrightnessOpts,
     ScanlineHorizontalGrayscaleOpts,
@@ -19,6 +16,9 @@ import type {
     ScanlineHorizontalSnakeOpts,
     ScanlineHorizontalSplitOpts,
     ScanlineHorizontalStretchOpts,
+    SliceAnimationBreakpointDirection,
+    SliceAnimationBreakpointOpts,
+    SliceAnimationRenderer,
     _ScanlineHorizontalDropoutOpts,
     _ScanlineHorizontalInterlaceOpts,
     _ScanlineHorizontalRollOpts,
@@ -42,6 +42,7 @@ import type { Index2d } from "@thewaver/ss-utils";
 import { PageExampleKnobs } from "../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import {
+    PageCheckField,
     PageFileField,
     PageGroupedSelectField,
     PageNumberField,
@@ -84,34 +85,35 @@ const groupOptions = <T extends string>(keys: readonly T[]) => {
     return Object.entries(result);
 };
 
-const GROUPPED_WEIGHTS = groupOptions(CellAnimationWeights.ORIGIN_FREE_WEIGHT_TYPES);
+const GROUPPED_WEIGHTS = groupOptions(SliceAnimationWeights.ORIGIN_FREE_WEIGHT_TYPES);
 
 const pickStressKeyframes = (kind: "transform" | "filter") => {
     const random = Math.random() * 3;
 
     return kind === "transform"
         ? random < 1
-            ? ScanlineAnimationKeyframes.computeHorizontalSnake
+            ? ScanlineAnimationKeyframes.createHorizontalSnake()
             : random < 2
-              ? ScanlineAnimationKeyframes.computeHorizontalSplit
-              : ScanlineAnimationKeyframes.computeHorizontalStretch
+              ? ScanlineAnimationKeyframes.createHorizontalSplit()
+              : ScanlineAnimationKeyframes.createHorizontalStretch()
         : random < 1
-          ? ScanlineAnimationKeyframes.computeHorizontalBrightness
+          ? ScanlineAnimationKeyframes.createHorizontalBrightness()
           : random < 2
-            ? ScanlineAnimationKeyframes.computeHorizontalHue
-            : ScanlineAnimationKeyframes.computeHorizontalGrayscale;
+            ? ScanlineAnimationKeyframes.createHorizontalHue()
+            : ScanlineAnimationKeyframes.createHorizontalGrayscale();
 };
 
 type StressItemProps = ScanlineAnimationExampleProps & {
     configIndex: number;
     modalPlayback: readonly [boolean, (isPlaying: boolean) => void];
+    renderer: SliceAnimationRenderer;
 };
 
 const StressItem = ({ configIndex, modalPlayback, weightType, ...props }: StressItemProps) => {
-    const [foo] = useState(() => pickStressKeyframes(STRESS_ITEMS[configIndex].kind));
+    const [animation] = useState(() => pickStressKeyframes(STRESS_ITEMS[configIndex].kind));
 
-    const computeCellWeights = useMemo(
-        () => (count: Index2d) => CellAnimationWeights.computeCellWeights(weightType, count, WEIGHT_ORIGIN),
+    const computeSliceWeights = useMemo(
+        () => (count: Index2d) => SliceAnimationWeights.computeSliceWeights(weightType, count, WEIGHT_ORIGIN),
         [weightType],
     );
 
@@ -122,15 +124,8 @@ const StressItem = ({ configIndex, modalPlayback, weightType, ...props }: Stress
                 playback={modalPlayback}
                 lineCount={STRESS_LINE_COUNT}
                 animationIterationDelayMs={0}
-                computeCellWeights={computeCellWeights}
-                computeSliceAnimation={(defs, timeline) =>
-                    foo(
-                        CellAnimationBreakpointUtils.computeBreakpoints(defs.weight, undefined),
-                        defs,
-                        timeline,
-                        undefined,
-                    )
-                }
+                computeSliceWeights={computeSliceWeights}
+                computeSliceAnimation={animation}
             />
         </PageMeasureBox>
     );
@@ -139,9 +134,28 @@ const StressItem = ({ configIndex, modalPlayback, weightType, ...props }: Stress
 const StressTestWrapper = (props: ScanlineAnimationExampleProps) => {
     const modalPlayback = useState(true);
 
+    const [isOnGraphicsCard, setIsOnGraphicsCard] = useState(true);
+
     return (
         <>
             <div>{"120 lines"}</div>
+
+            <PagePropsPanel scope={"local"} hasReset={false}>
+                <PageProp
+                    itemKey={"onGraphicsCard"}
+                    label={"On the graphics card"}
+                    hint={
+                        "Draws the stress test's lines in one canvas per item, with the keyframes worked out on the graphics card. Off, every line is an element of its own."
+                    }
+                    controls={"Sets ScanlineAnimationProps.renderer in the stress test"}
+                >
+                    <PageCheckField
+                        value={isOnGraphicsCard}
+                        ariaLabel={"On the graphics card"}
+                        onChange={setIsOnGraphicsCard}
+                    />
+                </PageProp>
+            </PagePropsPanel>
 
             <StressTest
                 configs={STRESS_ITEMS}
@@ -155,7 +169,12 @@ const StressTestWrapper = (props: ScanlineAnimationExampleProps) => {
                     `Render ${STRESS_ITEMS[configIndex].count} ${STRESS_ITEMS[configIndex].kind} items`
                 }
                 renderItem={(configIndex) => (
-                    <StressItem {...props} configIndex={configIndex} modalPlayback={modalPlayback} />
+                    <StressItem
+                        {...props}
+                        configIndex={configIndex}
+                        modalPlayback={modalPlayback}
+                        renderer={isOnGraphicsCard ? "graphics_card" : "elements"}
+                    />
                 )}
             />
         </>
@@ -170,7 +189,7 @@ const SmoothnessInput = (props: { value: number; setter: (value: number) => void
             hint={
                 "How much one line's movement overlaps its neighbors'. 0 makes each line wait its turn; 1 blurs them into one sweep."
             }
-            controls={"Sets CellAnimationBreakpointOpts.smoothness"}
+            controls={"Sets SliceAnimationBreakpointOpts.smoothness"}
         >
             <PageNumberField
                 value={props.value}
@@ -185,19 +204,19 @@ const SmoothnessInput = (props: { value: number; setter: (value: number) => void
 };
 
 const DirInput = (props: {
-    value: CellAnimationBreakpointDirection;
-    setter: (value: CellAnimationBreakpointDirection) => void;
+    value: SliceAnimationBreakpointDirection;
+    setter: (value: SliceAnimationBreakpointDirection) => void;
 }) => {
     return (
         <PageProp
             itemKey={"direction"}
             label={"Direction"}
             hint={"Which way the sweep travels through the lines, and so which lines go first."}
-            controls={"Sets CellAnimationBreakpointOpts.dir"}
+            controls={"Sets SliceAnimationBreakpointOpts.dir"}
         >
             <PageSelectField
                 value={props.value}
-                values={CellAnimationBreakpoints.DIRECTIONS}
+                values={SliceAnimationBreakpoints.DIRECTIONS}
                 ariaLabel={"Direction"}
                 onChange={props.setter}
             />
@@ -304,7 +323,7 @@ const SurgeExampleWrapper = (props: ScanlineAnimationExampleProps) => {
     const progress = useState(0);
 
     const [keyframeOpts, setKeyframeOpts] = useFieldState<Record<string, number | boolean>>({});
-    const [breakpointOpts, setBreakpointOpts] = useFieldState<CellAnimationBreakpointOpts>({
+    const [breakpointOpts, setBreakpointOpts] = useFieldState<SliceAnimationBreakpointOpts>({
         ...ScanlineAnimationKnobs.STARTING_SURGE_BREAKPOINT_OPTS,
     });
 
@@ -352,7 +371,7 @@ const SnakeExampleWrapper = (props: ScanlineAnimationExampleProps) => {
     const progress = useState(0);
 
     const [keyframeOpts, setKeyframeOpts] = useFieldState<Record<string, number | boolean>>({});
-    const [breakpointOpts, setBreakpointOpts] = useFieldState<CellAnimationBreakpointOpts>({
+    const [breakpointOpts, setBreakpointOpts] = useFieldState<SliceAnimationBreakpointOpts>({
         ...ScanlineAnimationKnobs.STARTING_SNAKE_BREAKPOINT_OPTS,
     });
 
@@ -400,7 +419,7 @@ const SplitExampleWrapper = (props: ScanlineAnimationExampleProps) => {
     const progress = useState(0);
 
     const [keyframeOpts, setKeyframeOpts] = useFieldState<Record<string, number | boolean>>({});
-    const [breakpointOpts, setBreakpointOpts] = useFieldState<CellAnimationBreakpointOpts>({
+    const [breakpointOpts, setBreakpointOpts] = useFieldState<SliceAnimationBreakpointOpts>({
         ...ScanlineAnimationKnobs.STARTING_SPLIT_BREAKPOINT_OPTS,
     });
 
@@ -448,7 +467,7 @@ const BrightnessExampleWrapper = (props: ScanlineAnimationExampleProps) => {
     const progress = useState(0);
 
     const [keyframeOpts] = useState<ScanlineHorizontalBrightnessOpts>({});
-    const [breakpointOpts, setBreakpointOpts] = useFieldState<CellAnimationBreakpointOpts>({
+    const [breakpointOpts, setBreakpointOpts] = useFieldState<SliceAnimationBreakpointOpts>({
         ...ScanlineAnimationKnobs.STARTING_BRIGHTNESS_BREAKPOINT_OPTS,
     });
 
@@ -489,7 +508,7 @@ const GrayscaleExampleWrapper = (props: ScanlineAnimationExampleProps) => {
     const progress = useState(0);
 
     const [keyframeOpts] = useState<ScanlineHorizontalGrayscaleOpts>({});
-    const [breakpointOpts, setBreakpointOpts] = useFieldState<CellAnimationBreakpointOpts>({
+    const [breakpointOpts, setBreakpointOpts] = useFieldState<SliceAnimationBreakpointOpts>({
         ...ScanlineAnimationKnobs.STARTING_GRAYSCALE_BREAKPOINT_OPTS,
     });
 
@@ -530,7 +549,7 @@ const HueExampleWrapper = (props: ScanlineAnimationExampleProps) => {
     const progress = useState(0);
 
     const [keyframeOpts] = useState<ScanlineHorizontalHueOpts>({});
-    const [breakpointOpts, setBreakpointOpts] = useFieldState<CellAnimationBreakpointOpts>({
+    const [breakpointOpts, setBreakpointOpts] = useFieldState<SliceAnimationBreakpointOpts>({
         ...ScanlineAnimationKnobs.STARTING_HUE_BREAKPOINT_OPTS,
     });
 
@@ -571,7 +590,7 @@ const WaveExampleWrapper = (props: ScanlineAnimationExampleProps) => {
     const progress = useState(0);
 
     const [keyframeOpts, setKeyframeOpts] = useFieldState<Record<string, number | boolean>>({});
-    const [breakpointOpts, setBreakpointOpts] = useFieldState<CellAnimationBreakpointOpts>({
+    const [breakpointOpts, setBreakpointOpts] = useFieldState<SliceAnimationBreakpointOpts>({
         ...ScanlineAnimationKnobs.STARTING_WAVE_BREAKPOINT_OPTS,
     });
 
@@ -619,7 +638,7 @@ const RollExampleWrapper = (props: ScanlineAnimationExampleProps) => {
     const progress = useState(0);
 
     const [keyframeOpts, setKeyframeOpts] = useFieldState<Record<string, number | boolean>>({});
-    const [breakpointOpts, setBreakpointOpts] = useFieldState<CellAnimationBreakpointOpts>({
+    const [breakpointOpts, setBreakpointOpts] = useFieldState<SliceAnimationBreakpointOpts>({
         ...ScanlineAnimationKnobs.STARTING_ROLL_BREAKPOINT_OPTS,
     });
 
@@ -667,7 +686,7 @@ const DropoutExampleWrapper = (props: ScanlineAnimationExampleProps) => {
     const progress = useState(0);
 
     const [keyframeOpts, setKeyframeOpts] = useFieldState<Record<string, number | boolean>>({});
-    const [breakpointOpts, setBreakpointOpts] = useFieldState<CellAnimationBreakpointOpts>({
+    const [breakpointOpts, setBreakpointOpts] = useFieldState<SliceAnimationBreakpointOpts>({
         ...ScanlineAnimationKnobs.STARTING_DROPOUT_BREAKPOINT_OPTS,
     });
 
@@ -715,7 +734,7 @@ const InterlaceExampleWrapper = (props: ScanlineAnimationExampleProps) => {
     const progress = useState(0);
 
     const [keyframeOpts, setKeyframeOpts] = useFieldState<Record<string, number | boolean>>({});
-    const [breakpointOpts, setBreakpointOpts] = useFieldState<CellAnimationBreakpointOpts>({
+    const [breakpointOpts, setBreakpointOpts] = useFieldState<SliceAnimationBreakpointOpts>({
         ...ScanlineAnimationKnobs.STARTING_INTERLACE_BREAKPOINT_OPTS,
     });
 
@@ -763,7 +782,7 @@ const SkewExampleWrapper = (props: ScanlineAnimationExampleProps) => {
     const progress = useState(0);
 
     const [keyframeOpts, setKeyframeOpts] = useFieldState<Record<string, number | boolean>>({});
-    const [breakpointOpts, setBreakpointOpts] = useFieldState<CellAnimationBreakpointOpts>({
+    const [breakpointOpts, setBreakpointOpts] = useFieldState<SliceAnimationBreakpointOpts>({
         ...ScanlineAnimationKnobs.STARTING_SKEW_BREAKPOINT_OPTS,
     });
 
@@ -818,7 +837,7 @@ export const ScanlineAnimationPage = () => {
     const [animationIterationDelayMs, setAnimationIterationDelayMs] = useState(
         ScanlineAnimationKnobs.STARTING_ITERATION_DELAY_MS,
     );
-    const [weightType, setWeightType] = useState<CellAnimationWeights.OriginFreeWeightType>(
+    const [weightType, setWeightType] = useState<SliceAnimationWeights.OriginFreeWeightType>(
         ScanlineAnimationKnobs.STARTING_WEIGHT_TYPE,
     );
 
@@ -934,7 +953,7 @@ export const ScanlineAnimationPage = () => {
                     itemKey={"weightType"}
                     label={"Weight"}
                     hint={"How each line's turn is decided: its position, a wave, a random draw, and so on."}
-                    controls={"Picks the example's weight function sent to ScanlineAnimationProps.computeCellWeights"}
+                    controls={"Picks the example's weight function sent to ScanlineAnimationProps.computeSliceWeights"}
                 >
                     <PageGroupedSelectField
                         value={weightType}

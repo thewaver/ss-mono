@@ -3,7 +3,10 @@
     import type { Attachment } from "svelte/attachments";
 
     import { ParticleSpawner } from "@thewaver/ss-components-svelte";
-    import { computeParticleGlow } from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.const";
+    import {
+        computeParticleAnimation,
+        createParticleSrc,
+    } from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.const";
     import * as styles from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.css";
 
     import type { ParticleSpawnerExampleProps } from "../ParticleSpawnerPage.types";
@@ -18,6 +21,8 @@
     ];
 
     let { playback = $bindable(), ...props }: ParticleSpawnerExampleProps = $props();
+
+    const particleSrc = createParticleSrc();
 
     let targetRefs = $state.raw<(HTMLElement | undefined)[]>(TARGET_POSITIONS.map(() => undefined));
 
@@ -49,15 +54,12 @@
     <div class={styles.spawnerRoot} style:left={"50%"} style:top={"50%"}>
         <div class={styles.spawnerMarker}></div>
 
-        <ParticleSpawner {...props} bind:playback targets={targetRefs}>
-            {#snippet renderParticle(_index, t)}
-                {@const glow = computeParticleGlow(t)}
-                <div
-                    class={styles.particle}
-                    style:opacity={glow.opacity}
-                    style:transform={`scale(${glow.scale})`}
-                ></div>
-            {/snippet}
-        </ParticleSpawner>
+        <ParticleSpawner
+            {...props}
+            bind:playback
+            targets={targetRefs}
+            src={particleSrc}
+            {computeParticleAnimation}
+        />
     </div>
 </div>

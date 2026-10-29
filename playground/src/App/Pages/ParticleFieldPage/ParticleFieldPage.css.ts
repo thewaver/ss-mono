@@ -2,8 +2,6 @@ import { style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
 
-export const PARTICLE_SIZE_PX = 10;
-
 export const root = style({
     display: "flex",
     flexDirection: "column",
@@ -16,14 +14,6 @@ export const valueList = style({
     display: "grid",
     gridTemplateColumns: "repeat(2, 1fr)",
     gap: themeVars.spacing.full,
-});
-
-export const particle = style({
-    width: PARTICLE_SIZE_PX,
-    height: PARTICLE_SIZE_PX,
-    borderRadius: "50%",
-    backgroundColor: themeVars.color.success.light,
-    backgroundImage: `radial-gradient(circle at 70% 30%, ${themeVars.color.success.light}, ${themeVars.color.success.dark})`,
 });
 
 export const stack = style({

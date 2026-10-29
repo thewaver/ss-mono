@@ -41,13 +41,8 @@ export const STRESS_ITEMS: (StressTestDefs & { size: number; kind: "transform" |
 <script setup lang="ts">
 import { useModel } from "vue";
 
-import {
-    CellAnimationBreakpointUtils,
-    CellAnimationWeights,
-    ScanlineAnimation,
-    ScanlineAnimationKeyframes,
-} from "@thewaver/ss-components-vue";
-import type { ScanlineAnimationEvaluationDefs } from "@thewaver/ss-components-vue";
+import { ScanlineAnimation, ScanlineAnimationKeyframes, SliceAnimationWeights } from "@thewaver/ss-components-vue";
+import type { SliceAnimationRenderer } from "@thewaver/ss-components-vue";
 import { WEIGHT_ORIGIN } from "@thewaver/ss-playground/App/Pages/ScanLineAnimationPage/ScanLineAnimationPage.const";
 import type { Index2d } from "@thewaver/ss-utils";
 
@@ -59,20 +54,21 @@ const pickStressKeyframes = (kind: "transform" | "filter") => {
 
     return kind === "transform"
         ? random < 1
-            ? ScanlineAnimationKeyframes.computeHorizontalSnake
+            ? ScanlineAnimationKeyframes.createHorizontalSnake()
             : random < 2
-              ? ScanlineAnimationKeyframes.computeHorizontalSplit
-              : ScanlineAnimationKeyframes.computeHorizontalStretch
+              ? ScanlineAnimationKeyframes.createHorizontalSplit()
+              : ScanlineAnimationKeyframes.createHorizontalStretch()
         : random < 1
-          ? ScanlineAnimationKeyframes.computeHorizontalBrightness
+          ? ScanlineAnimationKeyframes.createHorizontalBrightness()
           : random < 2
-            ? ScanlineAnimationKeyframes.computeHorizontalHue
-            : ScanlineAnimationKeyframes.computeHorizontalGrayscale;
+            ? ScanlineAnimationKeyframes.createHorizontalHue()
+            : ScanlineAnimationKeyframes.createHorizontalGrayscale();
 };
 
 type Props = ScanlineAnimationExampleProps & {
     "configIndex": number;
     "modalPlayback": boolean;
+    "renderer": SliceAnimationRenderer;
     "onUpdate:modalPlayback"?: (isPlaying: boolean) => void;
 };
 
@@ -80,13 +76,10 @@ const props = defineProps<Props>();
 
 const modalPlayback = useModel(props, "modalPlayback");
 
-const foo = pickStressKeyframes(STRESS_ITEMS[props.configIndex].kind);
+const animation = pickStressKeyframes(STRESS_ITEMS[props.configIndex].kind);
 
-const computeCellWeights = (count: Index2d) =>
-    CellAnimationWeights.computeCellWeights(props.weightType, count, WEIGHT_ORIGIN);
-
-const computeSliceAnimation = (defs: ScanlineAnimationEvaluationDefs, timeline: number) =>
-    foo(CellAnimationBreakpointUtils.computeBreakpoints(defs.weight, undefined), defs, timeline, undefined);
+const computeSliceWeights = (count: Index2d) =>
+    SliceAnimationWeights.computeSliceWeights(props.weightType, count, WEIGHT_ORIGIN);
 </script>
 
 <template>
@@ -98,8 +91,9 @@ const computeSliceAnimation = (defs: ScanlineAnimationEvaluationDefs, timeline: 
             :animation-duration-ms="animationDurationMs"
             :line-count="STRESS_LINE_COUNT"
             :animation-iteration-delay-ms="0"
-            :compute-cell-weights="computeCellWeights"
-            :compute-slice-animation="computeSliceAnimation"
+            :renderer="renderer"
+            :compute-slice-weights="computeSliceWeights"
+            :compute-slice-animation="animation"
         />
     </PageMeasureBox>
 </template>

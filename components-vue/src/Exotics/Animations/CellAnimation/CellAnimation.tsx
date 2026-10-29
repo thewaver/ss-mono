@@ -1,33 +1,48 @@
 import { computed, defineComponent, shallowRef } from "vue";
 
-import { CELL_ANIMATION_DEFAULTS, CellAnimationStyles, CellAnimationUtils } from "@thewaver/ss-components";
+import {
+    CELL_ANIMATION_DEFAULTS,
+    CellAnimationStyles,
+    CellAnimationUtils,
+    SliceAnimationUtils,
+    SliceRendererStyles,
+    SliceRendererUtils,
+} from "@thewaver/ss-components";
 import { CellAnimationConst } from "@thewaver/ss-components/internal";
-import type { Index2d } from "@thewaver/ss-utils";
+import { type Index2d, MathUtils, Size2d } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { ElementObserverVueUtils } from "../../../Abstracts/ElementObserver/ElementObserverVue.utils";
 import { InteractionTrackerVueUtils } from "../../../Abstracts/InteractionTracker/InteractionTrackerVue.utils";
+import { SliceRendererVueUtils } from "../../../Abstracts/SliceRenderer/SliceRendererVue.utils";
+import { useViewportContext } from "../../../Abstracts/Viewport/Viewport.context";
 import { watchAfterRender } from "../../../Utils/effectUtils";
 import { declareProps, useTwoWay } from "../../../Utils/propUtils";
 import type { CellAnimationProps } from "./CellAnimation.types";
 
 export const CellAnimation = defineComponent(
     (props: CellAnimationProps) => {
+        const viewportContext = useViewportContext();
+
         const getDurationMs = () => props.animationDurationMs ?? CELL_ANIMATION_DEFAULTS.animationDurationMs;
         const getIterationCount = () =>
             props.animationIterationCount ?? CELL_ANIMATION_DEFAULTS.animationIterationCount;
         const getIterationDelayMs = () =>
             props.animationIterationDelayMs ?? CELL_ANIMATION_DEFAULTS.animationIterationDelayMs;
+        const getCycleDurationMs = () =>
+            SliceAnimationUtils.computeCycleDurationMs(getDurationMs(), props.playbackOpts);
 
         const rootRef = shallowRef<HTMLDivElement>();
         const imgRef = shallowRef<HTMLImageElement>();
         const containerRef = shallowRef<HTMLDivElement>();
+        const canvasRef = shallowRef<HTMLCanvasElement>();
 
         const isPageHidden = InteractionTrackerVueUtils.usePageHidden();
 
         const isPlaying = useTwoWay(props, "playback", true);
         const progress = useTwoWay(props, "progress", CellAnimationConst.NO_PROGRESS);
         const currentIteration = shallowRef(CellAnimationConst.FIRST_ITERATION);
+        const shownSize = shallowRef<Size2d>({ width: 0, height: 0 });
 
         const rootSize = ElementObserverVueUtils.useBorderBoxSize(imgRef);
         const rootWidth = computed(() => rootSize.value.width);
@@ -39,7 +54,7 @@ export const CellAnimation = defineComponent(
             return previous && CellAnimationUtils.getIsSameCount(previous, next) ? previous : next;
         });
 
-        const weights = computed(() => props.computeCellWeights?.(cellCount.value) ?? CellAnimationConst.NO_WEIGHTS);
+        const weights = computed(() => props.computeSliceWeights?.(cellCount.value) ?? CellAnimationConst.NO_WEIGHTS);
 
         const columnEdges = computed(() => CellAnimationUtils.computeEdges(rootWidth.value, cellCount.value.col));
 
@@ -49,6 +64,10 @@ export const CellAnimation = defineComponent(
 
         const evaluationDefs = computed(() =>
             CellAnimationUtils.computeEvaluationDefs(cellDefs.value, columnEdges.value, rowEdges.value),
+        );
+
+        const slices = computed(() =>
+            SliceAnimationUtils.withOrigin(evaluationDefs.value, props.origin ?? CELL_ANIMATION_DEFAULTS.origin),
         );
 
         const frameState = computed(() =>
@@ -61,7 +80,76 @@ export const CellAnimation = defineComponent(
 
         const areCellsMounted = computed(() => frameState.value.areCellsMounted);
 
-        const isRunning = computed(() => isPlaying.value && !isPageHidden.value && !frameState.value.hasEnded);
+        const timing = computed(() =>
+            SliceAnimationUtils.computeTiming(
+                progress.value,
+                getDurationMs(),
+                props.breakpointOpts,
+                props.playbackOpts,
+            ),
+        );
+
+        const renderer = computed(() => props.renderer ?? CELL_ANIMATION_DEFAULTS.renderer);
+
+        const isElementsOnly = computed(() => renderer.value === "elements");
+
+        const isAvailable = SliceRendererVueUtils.useIsAvailable(isElementsOnly);
+
+        const picture = SliceRendererVueUtils.usePicture(() => props.src, isElementsOnly);
+
+        const tables = computed(() =>
+            isElementsOnly.value
+                ? undefined
+                : SliceAnimationUtils.resolveTables(props.computeSliceAnimation, slices.value),
+        );
+
+        const isOnGraphicsCard = computed(
+            () => isAvailable.value && SliceRendererUtils.getCanDraw(renderer.value, picture.value) && !!tables.value,
+        );
+
+        const item = SliceRendererVueUtils.useItem(canvasRef, isAvailable);
+
+        const easing = computed(() => SliceRendererUtils.computeEasing(props.breakpointOpts?.easing));
+
+        const rendererSlices = computed(() => {
+            const tableIndices = tables.value?.tableIndices ?? [];
+
+            return cellDefs.value.map((defs, idx) => {
+                const bounds = CellAnimationUtils.computeCellBounds(columnEdges.value, rowEdges.value, defs.pos);
+
+                return {
+                    left: bounds.col,
+                    top: bounds.row,
+                    width: bounds.width,
+                    height: bounds.height,
+                    weight: defs.weight,
+                    table: tableIndices[idx] ?? 0,
+                };
+            });
+        });
+
+        const area = computed(() => {
+            const size = rootSize.value;
+            const largest = evaluationDefs.value.reduce(
+                (most, defs) => ({
+                    width: Math.max(most.width, defs.size.width),
+                    height: Math.max(most.height, defs.size.height),
+                }),
+                { width: 0, height: 0 },
+            );
+            const reach = SliceRendererUtils.computeReach(tables.value?.tables ?? [], largest, size);
+
+            return { x: -reach, y: -reach, width: size.width + 2 * reach, height: size.height + 2 * reach };
+        });
+
+        const isRunning = computed(
+            () =>
+                isPlaying.value &&
+                !isPageHidden.value &&
+                !frameState.value.hasEnded &&
+                !!rootRef.value &&
+                (isOnGraphicsCard.value ? !!item.value : !!containerRef.value),
+        );
 
         let drawnSrc = props.src;
 
@@ -73,29 +161,95 @@ export const CellAnimation = defineComponent(
             progress.value = CellAnimationConst.NO_PROGRESS;
         });
 
-        watchAfterRender([progress, evaluationDefs, areCellsMounted], ([currentProgress, defs, isMounted]) => {
-            const root = rootRef.value;
-            const container = containerRef.value;
+        watchAfterRender(
+            [progress, timing, slices, areCellsMounted, isOnGraphicsCard],
+            ([currentProgress, currentTiming, currentSlices, isMounted, isOnCard]) => {
+                const root = rootRef.value;
+                const container = containerRef.value;
 
-            if (!root) return;
+                if (!root || isOnCard) return;
 
-            const cells =
-                container && isMounted ? (Array.from(container.querySelectorAll(":scope > div")) as HTMLElement[]) : [];
+                const cells =
+                    container && isMounted
+                        ? (Array.from(container.querySelectorAll(":scope > div")) as HTMLElement[])
+                        : [];
 
-            CellAnimationUtils.drawFrame(
-                root,
-                cells,
-                defs,
+                CellAnimationUtils.drawFrame(
+                    root,
+                    cells,
+                    currentSlices,
+                    currentProgress,
+                    currentTiming,
+                    props.computeRootAnimation,
+                    props.computeSliceAnimation,
+                );
+            },
+        );
+
+        watchAfterRender(
+            [
+                item,
+                progress,
+                timing,
+                tables,
+                rendererSlices,
+                area,
+                easing,
+                rootSize,
+                areCellsMounted,
+                isOnGraphicsCard,
+                picture,
+            ],
+            ([
+                currentItem,
                 currentProgress,
-                props.computeRootAnimation,
-                props.computeSliceAnimation,
-            );
-        });
+                currentTiming,
+                currentTables,
+                currentSlices,
+                currentArea,
+                currentEasing,
+                size,
+                isShown,
+                isOnCard,
+            ]) => {
+                const root = rootRef.value;
+
+                if (!root || !currentItem || !isOnCard) return;
+
+                if (props.computeRootAnimation) {
+                    SliceAnimationUtils.assignAnimationProps(
+                        root,
+                        props.computeRootAnimation(MathUtils.clamp01(currentProgress)),
+                    );
+                }
+
+                const scale = window.devicePixelRatio * viewportContext.getScale();
+                const sliceWindow = SliceAnimationUtils.computeWindow(currentTiming);
+                const shown = currentItem.draw({
+                    mode: "slices",
+                    src: props.src,
+                    tables: currentTables?.tables ?? [],
+                    easing: currentEasing,
+                    slices: currentSlices,
+                    size,
+                    area: currentArea,
+                    scale,
+                    timeline: currentTiming.globalTimeline,
+                    half: sliceWindow.half,
+                    isDescending: sliceWindow.isDescending,
+                    isShown,
+                    hasPerspective: true,
+                });
+                const next = { width: shown.width / scale, height: shown.height / scale };
+
+                if (!Size2d.isSame(shownSize.value, next)) shownSize.value = next;
+            },
+        );
 
         watchAfterRender([isRunning], ([running]) => {
             if (!running) return;
 
-            return CellAnimationUtils.runPasses({
+            return SliceAnimationUtils.runPasses({
                 getProgress: () => progress.value,
                 setProgress: (value) => {
                     progress.value = value;
@@ -104,7 +258,7 @@ export const CellAnimation = defineComponent(
                 setCurrentIteration: (value) => {
                     currentIteration.value = value;
                 },
-                getDurationMs,
+                getDurationMs: getCycleDurationMs,
                 getIterationCount,
                 getIterationDelayMs,
                 onIterationEnd: () => props.onIterationEnd?.(),
@@ -136,47 +290,68 @@ export const CellAnimation = defineComponent(
                         aria-hidden="true"
                     />
 
-                    <div
-                        ref={containerRef}
-                        class={[
-                            CellAnimationStyles.cellAnimationContainer,
-                            isRunning.value && CellAnimationStyles.cellAnimationContainerMoving,
-                        ]}
-                        style={{
-                            ...assignInlineVars({
-                                [CellAnimationStyles.cellSrcVar]: CellAnimationUtils.toSourceImage(props.src),
-                                [CellAnimationStyles.cellSizeVar]: `${size.width}px ${size.height}px`,
-                            }),
-                            width: `${size.width}px`,
-                            height: `${size.height}px`,
-                            perspective: CellAnimationUtils.computePerspective(size),
-                        }}
-                    >
-                        {areCellsMounted.value &&
-                            cellDefs.value.map((defs, index) => {
-                                const bounds = CellAnimationUtils.computeCellBounds(
-                                    columnEdges.value,
-                                    rowEdges.value,
-                                    defs.pos,
-                                );
+                    {isOnGraphicsCard.value ? (
+                        <div
+                            key="canvas"
+                            class={CellAnimationStyles.cellAnimationContainer}
+                            style={{ width: `${size.width}px`, height: `${size.height}px` }}
+                        >
+                            <canvas
+                                ref={canvasRef}
+                                class={SliceRendererStyles.sliceRendererCanvas}
+                                style={{
+                                    left: `${area.value.x}px`,
+                                    top: `${area.value.y}px`,
+                                    width: `${shownSize.value.width}px`,
+                                    height: `${shownSize.value.height}px`,
+                                }}
+                                aria-hidden="true"
+                            />
+                        </div>
+                    ) : (
+                        <div
+                            key="cells"
+                            ref={containerRef}
+                            class={[
+                                CellAnimationStyles.cellAnimationContainer,
+                                isRunning.value && CellAnimationStyles.cellAnimationContainerMoving,
+                            ]}
+                            style={{
+                                ...assignInlineVars({
+                                    [CellAnimationStyles.cellSrcVar]: CellAnimationUtils.toSourceImage(props.src),
+                                    [CellAnimationStyles.cellSizeVar]: `${size.width}px ${size.height}px`,
+                                }),
+                                width: `${size.width}px`,
+                                height: `${size.height}px`,
+                                perspective: CellAnimationUtils.computePerspective(size),
+                            }}
+                        >
+                            {areCellsMounted.value &&
+                                cellDefs.value.map((defs, index) => {
+                                    const bounds = CellAnimationUtils.computeCellBounds(
+                                        columnEdges.value,
+                                        rowEdges.value,
+                                        defs.pos,
+                                    );
 
-                                return (
-                                    <div
-                                        key={index}
-                                        class={CellAnimationStyles.cellAnimationCell}
-                                        style={{
-                                            left: `${bounds.col}px`,
-                                            top: `${bounds.row}px`,
-                                            width: `${bounds.width}px`,
-                                            height: `${bounds.height}px`,
-                                            backgroundPosition: `${-bounds.col}px ${-bounds.row}px`,
-                                            zIndex: CellAnimationUtils.computeCellDepth(defs.weight),
-                                        }}
-                                        aria-hidden="true"
-                                    />
-                                );
-                            })}
-                    </div>
+                                    return (
+                                        <div
+                                            key={index}
+                                            class={CellAnimationStyles.cellAnimationCell}
+                                            style={{
+                                                left: `${bounds.col}px`,
+                                                top: `${bounds.row}px`,
+                                                width: `${bounds.width}px`,
+                                                height: `${bounds.height}px`,
+                                                backgroundPosition: `${-bounds.col}px ${-bounds.row}px`,
+                                                zIndex: CellAnimationUtils.computeCellDepth(defs.weight),
+                                            }}
+                                            aria-hidden="true"
+                                        />
+                                    );
+                                })}
+                        </div>
+                    )}
                 </div>
             );
         };
@@ -196,7 +371,11 @@ export const CellAnimation = defineComponent(
             "progress": null,
             "onUpdate:progress": null,
             "finalFrame": null,
-            "computeCellWeights": null,
+            "origin": null,
+            "breakpointOpts": null,
+            "playbackOpts": null,
+            "renderer": null,
+            "computeSliceWeights": null,
             "computeRootAnimation": null,
             "computeSliceAnimation": null,
             "onIterationEnd": null,

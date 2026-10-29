@@ -1,18 +1,9 @@
 <script setup lang="ts">
-import { shallowRef, useModel } from "vue";
+import { computed, shallowRef, useModel } from "vue";
 
-import { RGBAnimation, RGB_ANIMATION_CHANNELS } from "@thewaver/ss-components-vue";
-import type { RGBAnimationChannel, RGBAnimationEvaluationDefs } from "@thewaver/ss-components-vue";
+import { RGBAnimation, RGBAnimationKeyframes, RGB_ANIMATION_CHANNELS } from "@thewaver/ss-components-vue";
 
 import type { RGBAnimationExampleProps } from "../RGBAnimationPageVue.types";
-
-const FULL_TURN_DEGREES = 360;
-
-const computeDirection = (channel: RGBAnimationChannel, anchor: RGBAnimationChannel) => {
-    if (channel === anchor) return 0;
-
-    return RGB_ANIMATION_CHANNELS.find((other) => other !== anchor) === channel ? 1 : -1;
-};
 
 type Props = RGBAnimationExampleProps & { turns: number };
 
@@ -27,13 +18,12 @@ const nextPass = () => {
     pass.value += 1;
 };
 
-const computeSliceAnimation = (defs: RGBAnimationEvaluationDefs, timeline: number) => ({
-    "hue-rotate":
-        computeDirection(defs.channel, RGB_ANIMATION_CHANNELS[pass.value % RGB_ANIMATION_CHANNELS.length]) *
-        props.turns *
-        FULL_TURN_DEGREES *
-        timeline,
-});
+const animation = computed(() =>
+    RGBAnimationKeyframes.createHueSwap({
+        turns: props.turns,
+        anchor: RGB_ANIMATION_CHANNELS[pass.value % RGB_ANIMATION_CHANNELS.length],
+    }),
+);
 </script>
 
 <template>
@@ -45,7 +35,7 @@ const computeSliceAnimation = (defs: RGBAnimationEvaluationDefs, timeline: numbe
         :color-mixing="colorMixing"
         :animation-duration-ms="animationDurationMs"
         :animation-iteration-delay-ms="animationIterationDelayMs"
-        :compute-slice-animation="computeSliceAnimation"
+        :compute-slice-animation="animation"
         @iteration-end="nextPass"
     />
 </template>

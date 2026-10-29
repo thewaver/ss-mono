@@ -1,13 +1,11 @@
-import { type Accessor, Show, type Signal, createMemo, createSignal, splitProps } from "solid-js";
+import { type Accessor, type Signal, createMemo, createSignal, splitProps } from "solid-js";
 import { createStore } from "solid-js/store";
 
 import {
-    type CellAnimationFn,
     RGBAnimation,
     RGBAnimationKeyframes,
-    RGBAnimationUtils,
     RGB_ANIMATION_DEFAULTS,
-    access,
+    type SliceAnimationFn,
 } from "@thewaver/ss-components-solid";
 import { RGBAnimationKnobs } from "@thewaver/ss-playground/App/Knobs/RGBAnimations.const";
 import {
@@ -35,7 +33,6 @@ import { PlaybackScrubberUtils } from "../../PageComponents/PlaybackScrubber/Pla
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { StressTest } from "../../PageComponents/StressTest/StressTest";
-import { GpuCellAnimation } from "../CellAnimationPage/GpuCells";
 import { AnaglyphExample } from "./Examples/Anaglyph";
 import { EchoExample } from "./Examples/Echo";
 import { FocusPullExample } from "./Examples/FocusPull";
@@ -55,10 +52,8 @@ type WrapperProps = RGBAnimationExampleProps & {
     isPagePlaying: Accessor<boolean>;
 };
 
-const WHOLE_PASS = { smoothness: 1 };
-
 const STRESS_SAMPLES: (() => {
-    animation: CellAnimationFn;
+    animation: SliceAnimationFn;
     computeRootAnimation?: (timeline: number) => CSSAnimationValues;
 })[] = [
     () => ({
@@ -537,20 +532,24 @@ const EchoExampleWrapper = (props: WrapperProps) => {
 const StressTestWrapper = (props: Omit<RGBAnimationExampleProps, "progress"> & { playback: Signal<boolean> }) => {
     const modalPlayback = createSignal(true);
 
-    const [getIsOnGpu, setIsOnGpu] = createSignal(true);
+    const [getIsOnGraphicsCard, setIsOnGraphicsCard] = createSignal(true);
 
     return (
         <>
             <PagePropsPanel scope={"local"} hasReset={false}>
                 <PageProp
-                    key={"gpuProof"}
+                    key={"onGraphicsCard"}
                     label={"On the graphics card"}
                     hint={
-                        "A proof of concept: draws the stress test's channels in one WebGL canvas per item, with the keyframes worked out on the graphics card."
+                        "Draws the stress test's channels in one canvas per item, with the keyframes worked out on the graphics card. Off, every channel is an element of its own."
                     }
-                    controls={"Swaps RGBAnimation for the Playground's GpuCellAnimation in the stress test"}
+                    controls={"Sets RGBAnimationProps.renderer in the stress test"}
                 >
-                    <PageCheckField value={getIsOnGpu} ariaLabel={"On the graphics card"} onChange={setIsOnGpu} />
+                    <PageCheckField
+                        value={getIsOnGraphicsCard}
+                        ariaLabel={"On the graphics card"}
+                        onChange={setIsOnGraphicsCard}
+                    />
                 </PageProp>
             </PagePropsPanel>
 
@@ -568,42 +567,16 @@ const StressTestWrapper = (props: Omit<RGBAnimationExampleProps, "progress"> & {
 
                     return (
                         <PageMeasureBox width={STRESS_ITEM_WIDTH}>
-                            <Show
-                                when={getIsOnGpu()}
-                                fallback={
-                                    <RGBAnimation
-                                        src={props.src}
-                                        colorMixing={props.colorMixing}
-                                        playback={modalPlayback}
-                                        animationDurationMs={props.animationDurationMs}
-                                        animationIterationDelayMs={props.animationIterationDelayMs}
-                                        computeRootAnimation={sample.computeRootAnimation}
-                                        computeSliceAnimation={(defs, timeline) =>
-                                            sample.animation(timeline, RGBAnimationUtils.toSliceDefs(defs))
-                                        }
-                                    />
-                                }
-                            >
-                                <GpuCellAnimation
-                                    src={props.src}
-                                    cellCount={{ row: 1, col: 3 }}
-                                    origin={{ row: 0, col: 0 }}
-                                    isChannels
-                                    breakpointOpts={WHOLE_PASS}
-                                    colorMixing={() => access(props.colorMixing)}
-                                    playback={modalPlayback}
-                                    animationDurationMs={() =>
-                                        access(props.animationDurationMs) ?? RGB_ANIMATION_DEFAULTS.animationDurationMs
-                                    }
-                                    animationIterationCount={RGB_ANIMATION_DEFAULTS.animationIterationCount}
-                                    animationIterationDelayMs={() =>
-                                        access(props.animationIterationDelayMs) ??
-                                        RGB_ANIMATION_DEFAULTS.animationIterationDelayMs
-                                    }
-                                    animation={sample.animation}
-                                    computeRootAnimation={sample.computeRootAnimation}
-                                />
-                            </Show>
+                            <RGBAnimation
+                                src={props.src}
+                                colorMixing={props.colorMixing}
+                                playback={modalPlayback}
+                                animationDurationMs={props.animationDurationMs}
+                                animationIterationDelayMs={props.animationIterationDelayMs}
+                                renderer={() => (getIsOnGraphicsCard() ? "graphics_card" : "elements")}
+                                computeRootAnimation={sample.computeRootAnimation}
+                                computeSliceAnimation={sample.animation}
+                            />
                         </PageMeasureBox>
                     );
                 }}

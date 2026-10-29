@@ -277,13 +277,13 @@ export const MENU_DESCRIPTIONS: Record<string, string> = {
         "Repeats whatever arrangement it holds in every direction, so it can be moved forever — a mosaic, a formation, a plain grid. It is dragged with momentum, scrolled with the wheel and moved by the keys, and a tile leaving one edge comes back in at the other. Only one copy is real: the rest are inert and hidden from screen readers, the real one moves under the pointer so hovering and clicking reach it, and tabbing to an item brings the item itself into view.",
     Generators:
         "Functions that work out something to hand a component, such as a gradient, a pattern or a layout, rather than drawing anything themselves.",
-    CellAnimationBreakpoints:
+    SliceAnimationBreakpoints:
         "When each cell of a cell animation plays. A weight becomes a window of the shared timeline — heavy cells early, light ones late, or the other way round — and the smoothness decides how much of the timeline one window takes, from every cell being an instant to every cell moving together. The same window is where an easing curve is applied, so the curve bends each cell's own motion rather than the stagger. `ScanlineAnimation` times its lines with it too.",
     CellAnimationKeyframes:
         "The per-cell animations written as keyframes rather than as code: a list of stops — at this point, these values — is turned into the function a cell animation asks for, with the interpolation done for you. A stop may also name the point a cell turns about and how far it is pushed towards the viewer, which are folded into ordinary transform values. Different parts of the grid can play different animations, by zone.",
-    CellAnimationPlayback:
+    SliceAnimationPlayback:
         "Turns elapsed time into the position on a cell animation's timeline. A cell animation is handed a timeline from 0 to 1 and knows nothing about time; this runs it forwards or backwards, or out and back again with an optional hold at the turn, so a loop can rest at its end rather than snapping back to its start. It also says how long one loop takes, which is what a player needs to know when to start the next.",
-    CellAnimationWeights:
+    SliceAnimationWeights:
         "Where a cell's turn comes from. A weight is a number from 0 to 1 per cell, heavy cells going first, and these are what weights are made of: distances from the origin measured straight, in squares, in rings stretched to the grid's shape and along the diagonals; orderings by row, by column, by a scattering stride and along a Z-shaped curve; a seeded random order that holds still between renders; and three shapes built from those — a ripple, a radar sweep and a spiral. One call runs a weight function over the whole grid and can break ties or even out the spacing.",
     CellAnimationZones:
         "Named parts of a cell animation's grid, for an animation that does different things in different places: a side of the origin, a quadrant, an axis, the origin itself, a parity of rows, columns, rings or checkered cells, or a half by weight. Everything is measured from the origin, so a zone moves with it. Every parity zone is the exact complement of its partner, so the two together take every cell exactly once.",

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, shallowRef } from "vue";
 
-import { CellAnimationKeyframes, CellAnimationOrigins, CellAnimationWeights } from "@thewaver/ss-components-vue";
+import { CellAnimationKeyframes, CellAnimationOrigins, SliceAnimationWeights } from "@thewaver/ss-components-vue";
 import { ParticleFieldKnobs } from "@thewaver/ss-playground/App/Knobs/ParticleFields.const";
 import {
     EXAMPLES_ROOT,
@@ -39,7 +39,7 @@ const groupOptions = <T extends string>(keys: readonly T[]) => {
     return Object.entries(result);
 };
 
-const GROUPPED_WEIGHTS = groupOptions(CellAnimationWeights.WEIGHT_TYPES);
+const GROUPPED_WEIGHTS = groupOptions(SliceAnimationWeights.WEIGHT_TYPES);
 const GROUPPED_ANIMATIONS = groupOptions(CellAnimationKeyframes.ANIMATION_TYPES);
 
 const playback = shallowRef(true);
@@ -53,7 +53,7 @@ const iterationDelayMs = shallowRef(ParticleFieldKnobs.STARTING_ITERATION_DELAY_
 const holdShare = shallowRef(ParticleFieldKnobs.STARTING_HOLD_SHARE);
 const isScattered = shallowRef(ParticleFieldKnobs.STARTING_IS_SCATTERED);
 const originType = shallowRef<CellAnimationOrigins.OriginType>(ParticleFieldKnobs.STARTING_ORIGIN_KEY);
-const weightType = shallowRef<CellAnimationWeights.WeightType>(ParticleFieldKnobs.STARTING_WEIGHT_KEY);
+const weightType = shallowRef<SliceAnimationWeights.WeightType>(ParticleFieldKnobs.STARTING_WEIGHT_KEY);
 const animationType = shallowRef<CellAnimationKeyframes.AnimationType>(ParticleFieldKnobs.STARTING_ANIMATION_KEY);
 const cellCount = shallowRef<Index2d>({ ...ParticleFieldKnobs.STARTING_CELL_COUNT });
 
@@ -146,7 +146,7 @@ const examples: ExampleDefs[] = [
                 <PageSelectField
                     :value="originType"
                     :values="CellAnimationOrigins.ORIGIN_TYPES"
-                    :is-disabled="!CellAnimationWeights.isOriginAware(weightType)"
+                    :is-disabled="!SliceAnimationWeights.isOriginAware(weightType)"
                     ariaLabel="Origin"
                     @change="(origin: CellAnimationOrigins.OriginType) => (originType = origin)"
                 />
@@ -162,7 +162,7 @@ const examples: ExampleDefs[] = [
                     :value="weightType"
                     :groups="GROUPPED_WEIGHTS"
                     ariaLabel="Weight"
-                    @change="(weight: CellAnimationWeights.WeightType) => (weightType = weight)"
+                    @change="(weight: SliceAnimationWeights.WeightType) => (weightType = weight)"
                 />
             </PageProp>
 

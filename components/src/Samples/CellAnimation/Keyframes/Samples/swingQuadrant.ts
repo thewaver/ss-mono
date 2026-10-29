@@ -1,12 +1,12 @@
-import type { CellAnimationFn } from "../../../../Generators/CellAnimationKeyframes/CellAnimationKeyframes.types";
-import { CellAnimationKeyframeUtils } from "../../../../Generators/CellAnimationKeyframes/CellAnimationKeyframes.utils";
+import type { SliceAnimationFn } from "../../../../Generators/SliceAnimationKeyframes/SliceAnimationKeyframes.types";
+import { SliceAnimationKeyframeUtils } from "../../../../Generators/SliceAnimationKeyframes/SliceAnimationKeyframes.utils";
 import { swingBottom } from "./swingBottom";
 import { swingLeft } from "./swingLeft";
 import { swingRight } from "./swingRight";
 import { swingTop } from "./swingTop";
 import { zoomIn } from "./zoomIn";
 
-export const swingQuadrant: CellAnimationFn = CellAnimationKeyframeUtils.fromZones(
+export const swingQuadrant: SliceAnimationFn = SliceAnimationKeyframeUtils.fromZones(
     [
         { zone: "top", animation: swingTop },
         { zone: "bottom", animation: swingBottom },

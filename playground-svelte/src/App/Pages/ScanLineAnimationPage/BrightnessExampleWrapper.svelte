@@ -1,6 +1,6 @@
 <script lang="ts">
     import * as styles from "@thewaver/ss-playground/App/Pages/ScanLineAnimationPage/ScanlineAnimationPage.css";
-    import type { CellAnimationBreakpointOpts, ScanlineHorizontalBrightnessOpts } from "@thewaver/ss-components-svelte";
+    import type { SliceAnimationBreakpointOpts, ScanlineHorizontalBrightnessOpts } from "@thewaver/ss-components-svelte";
     import { ScanlineAnimationKnobs } from "@thewaver/ss-playground/App/Knobs/ScanlineAnimations.const";
 
     import PageExampleKnobs from "../../PageComponents/ExampleKnobs/PageExampleKnobs.svelte";
@@ -24,7 +24,7 @@
 
     const keyframeOpts: ScanlineHorizontalBrightnessOpts = {};
 
-    let breakpointOpts = $state.raw<CellAnimationBreakpointOpts>({
+    let breakpointOpts = $state.raw<SliceAnimationBreakpointOpts>({
         ...ScanlineAnimationKnobs.STARTING_BRIGHTNESS_BREAKPOINT_OPTS,
     });
 </script>

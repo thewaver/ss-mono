@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { CellAnimationBreakpoints } from "@thewaver/ss-components-vue";
-import type { CellAnimationBreakpointDirection } from "@thewaver/ss-components-vue";
+import { SliceAnimationBreakpoints } from "@thewaver/ss-components-vue";
+import type { SliceAnimationBreakpointDirection } from "@thewaver/ss-components-vue";
 
 import PageSelectField from "../../PageComponents/Field/PageSelectField.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
 
 type Props = {
-    value: CellAnimationBreakpointDirection;
-    setter: (value: CellAnimationBreakpointDirection) => void;
+    value: SliceAnimationBreakpointDirection;
+    setter: (value: SliceAnimationBreakpointDirection) => void;
 };
 
 defineProps<Props>();
@@ -16,13 +16,13 @@ defineProps<Props>();
 <template>
     <PageProp
         item-key="direction"
-        controls="Sets CellAnimationBreakpointOpts.dir"
+        controls="Sets SliceAnimationBreakpointOpts.dir"
         label="Direction"
         hint="Which way the sweep travels through the lines, and so which lines go first."
     >
         <PageSelectField
             :value="value"
-            :values="CellAnimationBreakpoints.DIRECTIONS"
+            :values="SliceAnimationBreakpoints.DIRECTIONS"
             ariaLabel="Direction"
             @change="setter"
         />

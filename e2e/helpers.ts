@@ -19,6 +19,21 @@ export const example = (key: string) => `[data-example][data-testid="${key}"]`;
 export const prop = (key: string) => `[data-prop][data-testid="${key}"]`;
 
 /**
+ * Takes WebGL 2 away from the page before it loads, so every slice animation and particle component draws with page
+ * elements — what a browser without WebGL 2 in an offscreen canvas gets. The specs that read one cell or one particle
+ * at a time use it: the graphics card paints them all into one canvas, where none can be told apart, and which slices
+ * play what, when and where is worked out the same way for both renderers. `graphicsCard.spec.ts` covers the canvas.
+ */
+export const useElementRenderer = (page: Page) =>
+    page.addInitScript(() => {
+        const getContext = OffscreenCanvas.prototype.getContext;
+
+        OffscreenCanvas.prototype.getContext = function (this: OffscreenCanvas, type: string, ...rest: unknown[]) {
+            return type === "webgl2" ? null : getContext.call(this, type as "2d", ...(rest as []));
+        } as typeof getContext;
+    });
+
+/**
  * The demo itself, without the card around it. An example card carries a source-code button beside its
  * title, so a lookup for "the button in this card" finds that one first unless it is scoped to the demo.
  */

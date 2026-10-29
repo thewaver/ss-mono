@@ -1,5 +1,3 @@
-import type { Snippet } from "svelte";
-
 import type { BaseParticleSpawnerProps } from "@thewaver/ss-components";
 
 export type ParticleSpawnerProps = BaseParticleSpawnerProps & {
@@ -8,6 +6,4 @@ export type ParticleSpawnerProps = BaseParticleSpawnerProps & {
      * Sending when left out.
      */
     playback?: boolean;
-    /** Draws one particle, and is told how far along its path it is. */
-    renderParticle: Snippet<[index: number, t: number]>;
 };

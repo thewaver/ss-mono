@@ -1,7 +1,7 @@
-import type { CellAnimationFn } from "../../../../Generators/CellAnimationKeyframes/CellAnimationKeyframes.types";
-import { CellAnimationKeyframeUtils } from "../../../../Generators/CellAnimationKeyframes/CellAnimationKeyframes.utils";
+import type { SliceAnimationFn } from "../../../../Generators/SliceAnimationKeyframes/SliceAnimationKeyframes.types";
+import { SliceAnimationKeyframeUtils } from "../../../../Generators/SliceAnimationKeyframes/SliceAnimationKeyframes.utils";
 
-export const shootUp: CellAnimationFn = CellAnimationKeyframeUtils.fromStops([
+export const shootUp: SliceAnimationFn = SliceAnimationKeyframeUtils.fromStops([
     { at: 0, opacity: 0, translateY: 800, scaleX: 100, scaleY: 100 },
     { at: 0.25, opacity: 100 },
     { at: 0.66, translateY: -400, scaleX: 150, scaleY: 150 },

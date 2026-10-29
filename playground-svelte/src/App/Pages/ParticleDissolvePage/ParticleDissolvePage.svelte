@@ -16,6 +16,7 @@
     import ButtonExample from "./Examples/Button.svelte";
     import ImageExampleWrapper from "./ImageExampleWrapper.svelte";
     import type { ParticleDissolveExampleProps } from "./ParticleDissolvePageSvelte.types";
+    import StressTestWrapper from "./StressTestWrapper.svelte";
     import SvgExampleWrapper from "./SvgExampleWrapper.svelte";
 
     let durationMs = $state(PARTICLE_DISSOLVE_DEFAULTS.durationMs);
@@ -64,6 +65,11 @@
             component: imageExample,
             path: `${EXAMPLES_ROOT}/Image.svelte`,
         },
+        {
+            key: "stressTest",
+            name: EXAMPLE_NAMES.stressTest,
+            component: stressTest,
+        },
     ];
 </script>
 
@@ -81,6 +87,10 @@
 
 {#snippet imageExample()}
     <ImageExampleWrapper {...commonProps} />
+{/snippet}
+
+{#snippet stressTest()}
+    <StressTestWrapper {...commonProps} />
 {/snippet}
 
 <PagePropsPanel scope={"global"}>

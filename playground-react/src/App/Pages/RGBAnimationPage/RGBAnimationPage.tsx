@@ -1,6 +1,12 @@
-import { type ReactNode, useState } from "react";
+import { useState } from "react";
 
-import { RGB_ANIMATION_DEFAULTS } from "@thewaver/ss-components-react";
+import {
+    RGBAnimation,
+    RGBAnimationKeyframes,
+    RGB_ANIMATION_DEFAULTS,
+    type SliceAnimationFn,
+    type SliceAnimationRenderer,
+} from "@thewaver/ss-components-react";
 import { RGBAnimationKnobs } from "@thewaver/ss-playground/App/Knobs/RGBAnimations.const";
 import {
     EXAMPLES_ROOT,
@@ -16,10 +22,11 @@ import {
 import * as styles from "@thewaver/ss-playground/App/Pages/RGBAnimationPage/RGBAnimationPage.css";
 import type { RGBAnimationSourceKey } from "@thewaver/ss-playground/App/Pages/RGBAnimationPage/RGBAnimationPage.types";
 import knightProfile from "@thewaver/ss-playground/App/knight_profile.webp";
+import type { CSSAnimationValues } from "@thewaver/ss-utils";
 
 import { PageExampleKnobs } from "../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
-import { PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";
+import { PageCheckField, PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PagePlaybackScrubber } from "../../PageComponents/PlaybackScrubber/PlaybackScrubber";
 import { PlaybackScrubberUtils } from "../../PageComponents/PlaybackScrubber/PlaybackScrubber.utils";
@@ -41,18 +48,41 @@ const SOURCES: Record<RGBAnimationSourceKey, string> = { knight: knightProfile, 
 
 type WrapperProps = RGBAnimationExampleProps & { boxWidth: number; isPagePlaying: boolean };
 
-const STRESS_EXAMPLES: ((props: RGBAnimationExampleProps) => ReactNode)[] = [
-    (props) => <GlitchExample {...props} glitchOpts={RGBAnimationKnobs.STARTING_GLITCH_OPTS} />,
-    (props) => <SwellExample {...props} scalePercent={RGBAnimationKnobs.STARTING_SCALE_PERCENT} />,
-    (props) => <OrbitExample {...props} radiusPercent={RGBAnimationKnobs.STARTING_ORBIT_RADIUS_PERCENT} />,
-    (props) => <FocusPullExample {...props} maxBlurPx={RGBAnimationKnobs.STARTING_FOCUS_BLUR_PX} />,
-    (props) => <TwistExample {...props} maxDegrees={RGBAnimationKnobs.STARTING_TWIST_DEGREES} />,
-    (props) => <HueSwapExample {...props} turns={RGBAnimationKnobs.STARTING_HUE_TURNS} />,
-    (props) => <TiltExample {...props} maxDegrees={RGBAnimationKnobs.STARTING_TILT_DEGREES} />,
-    (props) => (
-        <AnaglyphExample {...props} separationPercent={RGBAnimationKnobs.STARTING_ANAGLYPH_SEPARATION_PERCENT} />
-    ),
-    (props) => <EchoExample {...props} distancePercent={RGBAnimationKnobs.STARTING_ECHO_DISTANCE_PERCENT} />,
+const STRESS_SAMPLES: (() => {
+    animation: SliceAnimationFn;
+    computeRootAnimation?: (timeline: number) => CSSAnimationValues;
+})[] = [
+    () => ({
+        animation: RGBAnimationKeyframes.createSwell({ scalePercent: RGBAnimationKnobs.STARTING_SCALE_PERCENT }),
+    }),
+    () => ({
+        animation: RGBAnimationKeyframes.createOrbit({
+            radiusPercent: RGBAnimationKnobs.STARTING_ORBIT_RADIUS_PERCENT,
+        }),
+    }),
+    () => ({
+        animation: RGBAnimationKeyframes.createFocusPull({ maxBlurPx: RGBAnimationKnobs.STARTING_FOCUS_BLUR_PX }),
+    }),
+    () => ({ animation: RGBAnimationKeyframes.createTwist({ maxDegrees: RGBAnimationKnobs.STARTING_TWIST_DEGREES }) }),
+    () => ({
+        animation: RGBAnimationKeyframes.createHueSwap({ turns: RGBAnimationKnobs.STARTING_HUE_TURNS, anchor: "red" }),
+    }),
+    () => ({ animation: RGBAnimationKeyframes.createTilt({ maxDegrees: RGBAnimationKnobs.STARTING_TILT_DEGREES }) }),
+    () => ({
+        animation: RGBAnimationKeyframes.createAnaglyph({
+            separationPercent: RGBAnimationKnobs.STARTING_ANAGLYPH_SEPARATION_PERCENT,
+        }),
+    }),
+    () => {
+        const opts = { distancePercent: RGBAnimationKnobs.STARTING_ECHO_DISTANCE_PERCENT };
+
+        return {
+            animation: RGBAnimationKeyframes.createEcho(opts),
+            computeRootAnimation: (timeline) => ({
+                translate: RGBAnimationKeyframes.computeEchoRootPath(timeline, opts),
+            }),
+        };
+    },
 ];
 
 const GlitchExampleWrapper = ({ boxWidth, isPagePlaying, ...props }: WrapperProps) => {
@@ -482,28 +512,67 @@ const FocusPullExampleWrapper = ({ boxWidth, isPagePlaying, ...props }: WrapperP
     );
 };
 
-const StressItem = (props: Omit<RGBAnimationExampleProps, "progress">) => {
-    const [renderExample] = useState(() => STRESS_EXAMPLES[Math.floor(Math.random() * STRESS_EXAMPLES.length)]);
-    const progress = useState(0);
+const StressItem = (props: Omit<RGBAnimationExampleProps, "progress"> & { renderer: SliceAnimationRenderer }) => {
+    const [sample] = useState(() => STRESS_SAMPLES[Math.floor(Math.random() * STRESS_SAMPLES.length)]());
 
-    return <PageMeasureBox width={STRESS_ITEM_WIDTH}>{renderExample({ ...props, progress })}</PageMeasureBox>;
+    return (
+        <PageMeasureBox width={STRESS_ITEM_WIDTH}>
+            <RGBAnimation
+                src={props.src}
+                colorMixing={props.colorMixing}
+                playback={props.playback}
+                animationDurationMs={props.animationDurationMs}
+                animationIterationDelayMs={props.animationIterationDelayMs}
+                renderer={props.renderer}
+                computeRootAnimation={sample.computeRootAnimation}
+                computeSliceAnimation={sample.animation}
+            />
+        </PageMeasureBox>
+    );
 };
 
 const StressTestWrapper = (props: Omit<RGBAnimationExampleProps, "progress">) => {
     const modalPlayback = useState(true);
 
+    const [isOnGraphicsCard, setIsOnGraphicsCard] = useState(true);
+
     return (
-        <StressTest
-            configs={STRESS_ITEMS}
-            onHideModal={() => {
-                props.playback[1](true);
-            }}
-            onShowModal={() => {
-                props.playback[1](false);
-            }}
-            renderLabel={(configIndex) => `Render ${STRESS_ITEMS[configIndex].count} items`}
-            renderItem={() => <StressItem {...props} playback={modalPlayback} />}
-        />
+        <>
+            <PagePropsPanel scope={"local"} hasReset={false}>
+                <PageProp
+                    itemKey={"onGraphicsCard"}
+                    label={"On the graphics card"}
+                    hint={
+                        "Draws the stress test's channels in one canvas per item, with the keyframes worked out on the graphics card. Off, every channel is an element of its own."
+                    }
+                    controls={"Sets RGBAnimationProps.renderer in the stress test"}
+                >
+                    <PageCheckField
+                        value={isOnGraphicsCard}
+                        ariaLabel={"On the graphics card"}
+                        onChange={setIsOnGraphicsCard}
+                    />
+                </PageProp>
+            </PagePropsPanel>
+
+            <StressTest
+                configs={STRESS_ITEMS}
+                onHideModal={() => {
+                    props.playback[1](true);
+                }}
+                onShowModal={() => {
+                    props.playback[1](false);
+                }}
+                renderLabel={(configIndex) => `Render ${STRESS_ITEMS[configIndex].count} items`}
+                renderItem={() => (
+                    <StressItem
+                        {...props}
+                        playback={modalPlayback}
+                        renderer={isOnGraphicsCard ? "graphics_card" : "elements"}
+                    />
+                )}
+            />
+        </>
     );
 };
 

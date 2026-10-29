@@ -1,4 +1,4 @@
-import type { ParticleSpawnIterationPattern } from "@thewaver/ss-components-svelte";
+import type { ParticleSpawnIterationPattern, SliceAnimationRenderer } from "@thewaver/ss-components-svelte";
 import type { ParticleTravelPatternFn } from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPatterns.types";
 
 export type {
@@ -20,4 +20,5 @@ export type ParticleSpawnerExampleProps = {
     computeParticlePos: ParticleTravelPatternFn;
     areTargetsHidden: boolean;
     playback: boolean;
+    renderer?: SliceAnimationRenderer;
 };

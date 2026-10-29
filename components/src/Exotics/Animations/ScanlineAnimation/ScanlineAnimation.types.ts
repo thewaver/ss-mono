@@ -1,10 +1,14 @@
-import type { CellAnimationEvaluationDefs, CellAnimationEvaluationResult } from "../CellAnimation/CellAnimation.types";
+import type { SliceAnimationFn } from "../../../Generators/SliceAnimationKeyframes/SliceAnimationKeyframes.types";
+import type {
+    SliceAnimationEvaluationDefs,
+    SliceAnimationEvaluationResult,
+} from "../CellAnimation/CellAnimation.types";
 
 export type ScanlineAnimationOrientation = "horizontal" | "vertical";
 
-export type ScanlineAnimationEvaluationDefs = CellAnimationEvaluationDefs;
+export type ScanlineAnimationEvaluationDefs = SliceAnimationEvaluationDefs;
 
-export type ScanlineAnimationEvaluationResult = CellAnimationEvaluationResult;
+export type ScanlineAnimationEvaluationResult = SliceAnimationEvaluationResult;
 
 export type BaseScanlineAnimationValues = {
     /** How many lines the picture is cut into. More lines is a finer sweep and more work per frame. */
@@ -17,11 +21,12 @@ export type BaseScanlineAnimationValues = {
 };
 
 export type BaseScanlineAnimationCbs = {
-    /** What one line does on its turn, given where it is and how far through the pass it is. */
-    computeSliceAnimation: (
-        defs: ScanlineAnimationEvaluationDefs,
-        timeline: number,
-    ) => ScanlineAnimationEvaluationResult;
+    /**
+     * The sample each line plays over its own turn, from `0` as its turn starts to `1` as it ends, handed the line and
+     * the grid. A sample built by `SliceAnimationKeyframeUtils` — every one in `ScanlineAnimationKeyframes` — can be
+     * drawn on the graphics card; one written by hand plays on page elements.
+     */
+    computeSliceAnimation: SliceAnimationFn;
 };
 
 export type BaseScanlineAnimationProps = BaseScanlineAnimationValues & BaseScanlineAnimationCbs;

@@ -1,26 +1,24 @@
-import { Show, createMemo, createSignal } from "solid-js";
+import { createMemo, createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
 
 import {
-    CellAnimationBreakpointUtils,
-    CellAnimationBreakpoints,
-    CellAnimationKeyframeUtils,
-    CellAnimationWeights,
     SCANLINE_ANIMATION_DEFAULTS,
     SCANLINE_ANIMATION_ORIENTATIONS,
     ScanlineAnimation,
     ScanlineAnimationKeyframes,
+    SliceAnimationBreakpoints,
+    SliceAnimationWeights,
     access,
 } from "@thewaver/ss-components-solid";
 import type {
-    CellAnimationBreakpointDirection,
-    CellAnimationBreakpointOpts,
     ScanlineHorizontalBrightnessOpts,
     ScanlineHorizontalGrayscaleOpts,
     ScanlineHorizontalHueOpts,
     ScanlineHorizontalSnakeOpts,
     ScanlineHorizontalSplitOpts,
     ScanlineHorizontalStretchOpts,
+    SliceAnimationBreakpointDirection,
+    SliceAnimationBreakpointOpts,
     _ScanlineHorizontalDropoutOpts,
     _ScanlineHorizontalInterlaceOpts,
     _ScanlineHorizontalRollOpts,
@@ -57,7 +55,6 @@ import { PlaybackScrubberUtils } from "../../PageComponents/PlaybackScrubber/Pla
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { StressTest } from "../../PageComponents/StressTest/StressTest";
-import { GpuCellAnimation } from "../CellAnimationPage/GpuCells";
 import { BrightnessExample } from "./Examples/Brightness";
 import { GlitchExample } from "./Examples/Glitch";
 import { GrayscaleExample } from "./Examples/Grayscale";
@@ -87,12 +84,12 @@ const groupOptions = <T extends string>(keys: readonly T[]) => {
     return Object.entries(result);
 };
 
-const GROUPPED_WEIGHTS = groupOptions(CellAnimationWeights.ORIGIN_FREE_WEIGHT_TYPES);
+const GROUPPED_WEIGHTS = groupOptions(SliceAnimationWeights.ORIGIN_FREE_WEIGHT_TYPES);
 
 const StressTestWrapper = (props: ScanlineAnimationExampleProps) => {
     const modalPlayback = createSignal(true);
 
-    const [getIsOnGpu, setIsOnGpu] = createSignal(true);
+    const [getIsOnGraphicsCard, setIsOnGraphicsCard] = createSignal(true);
 
     return (
         <>
@@ -100,14 +97,18 @@ const StressTestWrapper = (props: ScanlineAnimationExampleProps) => {
 
             <PagePropsPanel scope={"local"} hasReset={false}>
                 <PageProp
-                    key={"gpuProof"}
+                    key={"onGraphicsCard"}
                     label={"On the graphics card"}
                     hint={
-                        "A proof of concept: draws the stress test's lines in one WebGL canvas per item, with the keyframes worked out on the graphics card."
+                        "Draws the stress test's lines in one canvas per item, with the keyframes worked out on the graphics card. Off, every line is an element of its own."
                     }
-                    controls={"Swaps ScanlineAnimation for the Playground's GpuCellAnimation in the stress test"}
+                    controls={"Sets ScanlineAnimationProps.renderer in the stress test"}
                 >
-                    <PageCheckField value={getIsOnGpu} ariaLabel={"On the graphics card"} onChange={setIsOnGpu} />
+                    <PageCheckField
+                        value={getIsOnGraphicsCard}
+                        ariaLabel={"On the graphics card"}
+                        onChange={setIsOnGraphicsCard}
+                    />
                 </PageProp>
             </PagePropsPanel>
 
@@ -136,49 +137,23 @@ const StressTestWrapper = (props: ScanlineAnimationExampleProps) => {
                               : random < 2
                                 ? ScanlineAnimationKeyframes.createHorizontalHue()
                                 : ScanlineAnimationKeyframes.createHorizontalGrayscale();
-                    const computeCellWeights = (count: { row: number; col: number }) =>
-                        CellAnimationWeights.computeCellWeights(access(props.weightType), count, WEIGHT_ORIGIN);
+                    const computeSliceWeights = (count: { row: number; col: number }) =>
+                        SliceAnimationWeights.computeSliceWeights(access(props.weightType), count, WEIGHT_ORIGIN);
 
                     return (
                         <PageMeasureBox
                             width={() => STRESS_ITEMS[getConfigIndex()].size}
                             height={() => STRESS_ITEMS[getConfigIndex()].size}
                         >
-                            <Show
-                                when={getIsOnGpu()}
-                                fallback={
-                                    <ScanlineAnimation
-                                        {...props}
-                                        playback={modalPlayback}
-                                        lineCount={STRESS_LINE_COUNT}
-                                        animationIterationDelayMs={0}
-                                        computeCellWeights={computeCellWeights}
-                                        computeSliceAnimation={(defs, timeline) =>
-                                            CellAnimationKeyframeUtils.computeAnimation(
-                                                animation,
-                                                CellAnimationBreakpointUtils.computeBreakpoints(defs.weight, undefined),
-                                                { ...defs, origin: WEIGHT_ORIGIN },
-                                                timeline,
-                                            )
-                                        }
-                                    />
-                                }
-                            >
-                                <GpuCellAnimation
-                                    src={props.src}
-                                    cellCount={() =>
-                                        access(props.orientation) === "vertical"
-                                            ? { row: 1, col: STRESS_LINE_COUNT }
-                                            : { row: STRESS_LINE_COUNT, col: 1 }
-                                    }
-                                    origin={WEIGHT_ORIGIN}
-                                    animationDurationMs={props.animationDurationMs}
-                                    animationIterationDelayMs={0}
-                                    playback={modalPlayback}
-                                    animation={animation}
-                                    computeCellWeights={computeCellWeights}
-                                />
-                            </Show>
+                            <ScanlineAnimation
+                                {...props}
+                                playback={modalPlayback}
+                                lineCount={STRESS_LINE_COUNT}
+                                animationIterationDelayMs={0}
+                                renderer={() => (getIsOnGraphicsCard() ? "graphics_card" : "elements")}
+                                computeSliceWeights={computeSliceWeights}
+                                computeSliceAnimation={animation}
+                            />
                         </PageMeasureBox>
                     );
                 }}
@@ -195,7 +170,7 @@ const SmoothnessInput = (props: { getter: () => number; setter: (value: number) 
             hint={
                 "How much one line's movement overlaps its neighbors'. 0 makes each line wait its turn; 1 blurs them into one sweep."
             }
-            controls={"Sets CellAnimationBreakpointOpts.smoothness"}
+            controls={"Sets SliceAnimationBreakpointOpts.smoothness"}
         >
             <PageNumberField
                 value={props.getter}
@@ -210,19 +185,19 @@ const SmoothnessInput = (props: { getter: () => number; setter: (value: number) 
 };
 
 const DirInput = (props: {
-    getter: () => CellAnimationBreakpointDirection;
-    setter: (value: CellAnimationBreakpointDirection) => void;
+    getter: () => SliceAnimationBreakpointDirection;
+    setter: (value: SliceAnimationBreakpointDirection) => void;
 }) => {
     return (
         <PageProp
             key={"direction"}
             label={"Direction"}
             hint={"Which way the sweep travels through the lines, and so which lines go first."}
-            controls={"Sets CellAnimationBreakpointOpts.dir"}
+            controls={"Sets SliceAnimationBreakpointOpts.dir"}
         >
             <PageSelectField
                 value={props.getter}
-                values={CellAnimationBreakpoints.DIRECTIONS}
+                values={SliceAnimationBreakpoints.DIRECTIONS}
                 ariaLabel={"Direction"}
                 onChange={props.setter}
             />
@@ -320,7 +295,7 @@ const SurgeExampleWrapper = (props: ScanlineAnimationExampleProps) => {
     const progress = createSignal(0);
 
     const [keyframeOpts, setKeyframeOpts] = createStore<Record<string, number | boolean>>({});
-    const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpointOpts>({
+    const [breakpointOpts, setBreakpointOpts] = createStore<SliceAnimationBreakpointOpts>({
         ...ScanlineAnimationKnobs.STARTING_SURGE_BREAKPOINT_OPTS,
     });
 
@@ -368,7 +343,7 @@ const SnakeExampleWrapper = (props: ScanlineAnimationExampleProps) => {
     const progress = createSignal(0);
 
     const [keyframeOpts, setKeyframeOpts] = createStore<Record<string, number | boolean>>({});
-    const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpointOpts>({
+    const [breakpointOpts, setBreakpointOpts] = createStore<SliceAnimationBreakpointOpts>({
         ...ScanlineAnimationKnobs.STARTING_SNAKE_BREAKPOINT_OPTS,
     });
 
@@ -416,7 +391,7 @@ const SplitExampleWrapper = (props: ScanlineAnimationExampleProps) => {
     const progress = createSignal(0);
 
     const [keyframeOpts, setKeyframeOpts] = createStore<Record<string, number | boolean>>({});
-    const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpointOpts>({
+    const [breakpointOpts, setBreakpointOpts] = createStore<SliceAnimationBreakpointOpts>({
         ...ScanlineAnimationKnobs.STARTING_SPLIT_BREAKPOINT_OPTS,
     });
 
@@ -464,7 +439,7 @@ const BrightnessExampleWrapper = (props: ScanlineAnimationExampleProps) => {
     const progress = createSignal(0);
 
     const [keyframeOpts] = createStore<ScanlineHorizontalBrightnessOpts>({});
-    const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpointOpts>({
+    const [breakpointOpts, setBreakpointOpts] = createStore<SliceAnimationBreakpointOpts>({
         ...ScanlineAnimationKnobs.STARTING_BRIGHTNESS_BREAKPOINT_OPTS,
     });
 
@@ -505,7 +480,7 @@ const GrayscaleExampleWrapper = (props: ScanlineAnimationExampleProps) => {
     const progress = createSignal(0);
 
     const [keyframeOpts] = createStore<ScanlineHorizontalGrayscaleOpts>({});
-    const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpointOpts>({
+    const [breakpointOpts, setBreakpointOpts] = createStore<SliceAnimationBreakpointOpts>({
         ...ScanlineAnimationKnobs.STARTING_GRAYSCALE_BREAKPOINT_OPTS,
     });
 
@@ -546,7 +521,7 @@ const HueExampleWrapper = (props: ScanlineAnimationExampleProps) => {
     const progress = createSignal(0);
 
     const [keyframeOpts] = createStore<ScanlineHorizontalHueOpts>({});
-    const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpointOpts>({
+    const [breakpointOpts, setBreakpointOpts] = createStore<SliceAnimationBreakpointOpts>({
         ...ScanlineAnimationKnobs.STARTING_HUE_BREAKPOINT_OPTS,
     });
 
@@ -587,7 +562,7 @@ const WaveExampleWrapper = (props: ScanlineAnimationExampleProps) => {
     const progress = createSignal(0);
 
     const [keyframeOpts, setKeyframeOpts] = createStore<Record<string, number | boolean>>({});
-    const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpointOpts>({
+    const [breakpointOpts, setBreakpointOpts] = createStore<SliceAnimationBreakpointOpts>({
         ...ScanlineAnimationKnobs.STARTING_WAVE_BREAKPOINT_OPTS,
     });
 
@@ -635,7 +610,7 @@ const RollExampleWrapper = (props: ScanlineAnimationExampleProps) => {
     const progress = createSignal(0);
 
     const [keyframeOpts, setKeyframeOpts] = createStore<Record<string, number | boolean>>({});
-    const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpointOpts>({
+    const [breakpointOpts, setBreakpointOpts] = createStore<SliceAnimationBreakpointOpts>({
         ...ScanlineAnimationKnobs.STARTING_ROLL_BREAKPOINT_OPTS,
     });
 
@@ -683,7 +658,7 @@ const DropoutExampleWrapper = (props: ScanlineAnimationExampleProps) => {
     const progress = createSignal(0);
 
     const [keyframeOpts, setKeyframeOpts] = createStore<Record<string, number | boolean>>({});
-    const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpointOpts>({
+    const [breakpointOpts, setBreakpointOpts] = createStore<SliceAnimationBreakpointOpts>({
         ...ScanlineAnimationKnobs.STARTING_DROPOUT_BREAKPOINT_OPTS,
     });
 
@@ -731,7 +706,7 @@ const InterlaceExampleWrapper = (props: ScanlineAnimationExampleProps) => {
     const progress = createSignal(0);
 
     const [keyframeOpts, setKeyframeOpts] = createStore<Record<string, number | boolean>>({});
-    const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpointOpts>({
+    const [breakpointOpts, setBreakpointOpts] = createStore<SliceAnimationBreakpointOpts>({
         ...ScanlineAnimationKnobs.STARTING_INTERLACE_BREAKPOINT_OPTS,
     });
 
@@ -779,7 +754,7 @@ const SkewExampleWrapper = (props: ScanlineAnimationExampleProps) => {
     const progress = createSignal(0);
 
     const [keyframeOpts, setKeyframeOpts] = createStore<Record<string, number | boolean>>({});
-    const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpointOpts>({
+    const [breakpointOpts, setBreakpointOpts] = createStore<SliceAnimationBreakpointOpts>({
         ...ScanlineAnimationKnobs.STARTING_SKEW_BREAKPOINT_OPTS,
     });
 
@@ -832,7 +807,7 @@ export const ScanlineAnimationPage = () => {
     const [getAnimationIterationDelayMs, setAnimationIterationDelayMs] = createSignal(
         ScanlineAnimationKnobs.STARTING_ITERATION_DELAY_MS,
     );
-    const [getWeightType, setWeightType] = createSignal<CellAnimationWeights.OriginFreeWeightType>(
+    const [getWeightType, setWeightType] = createSignal<SliceAnimationWeights.OriginFreeWeightType>(
         ScanlineAnimationKnobs.STARTING_WEIGHT_TYPE,
     );
 
@@ -950,7 +925,7 @@ export const ScanlineAnimationPage = () => {
                     key={"weightType"}
                     label={"Weight"}
                     hint={"How each line's turn is decided: its position, a wave, a random draw, and so on."}
-                    controls={"Picks the example's weight function sent to ScanlineAnimationProps.computeCellWeights"}
+                    controls={"Picks the example's weight function sent to ScanlineAnimationProps.computeSliceWeights"}
                 >
                     <PageGroupedSelectField
                         value={getWeightType}

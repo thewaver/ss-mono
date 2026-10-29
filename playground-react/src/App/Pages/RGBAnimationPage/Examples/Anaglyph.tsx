@@ -1,13 +1,17 @@
-import { RGBAnimation } from "@thewaver/ss-components-react";
-import type { RGBAnimationChannel } from "@thewaver/ss-components-react";
+import { useMemo } from "react";
+
+import { RGBAnimation, RGBAnimationKeyframes } from "@thewaver/ss-components-react";
 
 import type { RGBAnimationExampleProps } from "../RGBAnimationPageReact.types";
-
-const DIRECTIONS: Record<RGBAnimationChannel, number> = { red: -1, green: 0, blue: 1 };
 
 type Props = RGBAnimationExampleProps & { separationPercent: number };
 
 export const AnaglyphExample = (props: Props) => {
+    const animation = useMemo(
+        () => RGBAnimationKeyframes.createAnaglyph({ separationPercent: props.separationPercent }),
+        [props.separationPercent],
+    );
+
     return (
         <RGBAnimation
             src={props.src}
@@ -17,9 +21,7 @@ export const AnaglyphExample = (props: Props) => {
             colorMixing={props.colorMixing}
             animationDurationMs={props.animationDurationMs}
             animationIterationDelayMs={props.animationIterationDelayMs}
-            computeSliceAnimation={(defs, timeline) => ({
-                translateX: DIRECTIONS[defs.channel] * props.separationPercent * Math.sin(timeline * Math.PI),
-            })}
+            computeSliceAnimation={animation}
         />
     );
 };

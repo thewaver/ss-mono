@@ -1,6 +1,6 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { demo, prop, revealProp } from "./helpers";
+import { demo, prop, revealProp, useElementRenderer } from "./helpers";
 
 /**
  * The RGB animation stacks one copy of its picture per channel, each filtered down to its channel and blended back
@@ -57,6 +57,7 @@ const countFrames = async (page: Page, key: string) =>
     ).size;
 
 test.beforeEach(async ({ page }) => {
+    await useElementRenderer(page);
     await page.goto("/rgb-animation");
     await expect(page.locator(channelsOf("glitch"))).toHaveCount(3);
 });

@@ -1,5 +1,7 @@
-import type { CSSAnimationValues, Point2d } from "@thewaver/ss-utils";
+import type { Point2d } from "@thewaver/ss-utils";
 
+import type { SliceAnimationRenderer } from "../../../Abstracts/SliceAnimation/SliceAnimation.types";
+import type { SliceAnimationFn } from "../../../Generators/SliceAnimationKeyframes/SliceAnimationKeyframes.types";
 import type { ParticleFieldCellDefs } from "../ParticleField/ParticleField.types";
 
 export type ParticleDissolveSweep = { kind: "linear"; angleDegrees: number } | { kind: "radial"; origin: Point2d };
@@ -12,6 +14,12 @@ export type ParticleDissolveParticleDefs = {
 };
 
 export type BaseParticleDissolveValues = {
+    /**
+     * The picture every particle is drawn with, at the size of the square of content it rose from, and multiplied by
+     * that content's color. A white picture takes the content's colors exactly; a dot that fills only part of its
+     * picture gives finer ash.
+     */
+    src: string;
     /**
      * Whether the content is dissolved. Changing it plays the dissolve or the rebuild from wherever the content is now,
      * so a change part-way through turns round rather than starting again, and writing the value it already has does
@@ -49,14 +57,24 @@ export type BaseParticleDissolveValues = {
     spawnChance?: number;
     /** The side of one square of the grid particles are released from, in pixels. A smaller square means finer ash. */
     cellSize?: number;
+    /**
+     * What draws the particles. `"graphics_card"` draws them into one canvas and falls back to page elements by itself
+     * wherever it cannot: no WebGL 2, a sample written by hand rather than built by `SliceAnimationKeyframeUtils`, a
+     * picture whose server gives no cross-origin permission, or a moment the browser has taken the graphics card away.
+     * `"elements"` always draws each particle as an element of its own, which keeps an animated picture playing — the
+     * graphics card draws only its first frame.
+     */
+    renderer?: SliceAnimationRenderer;
 };
 
 export type BaseParticleDissolveCbs = {
     /**
-     * What one particle does over its life, `0` as it is released and `1` as it is gone, in the same values
-     * `CellAnimation` takes for a cell. Played backwards as the content rebuilds.
+     * The sample one particle plays over its life, from `0` as it is released to `1` as it is gone, handed the square
+     * it rose from — the same samples `CellAnimation` plays on a cell. Played backwards as the content rebuilds. A
+     * sample built by `SliceAnimationKeyframeUtils` can be drawn on the graphics card; one written by hand plays on page
+     * elements.
      */
-    computeParticleAnimation?: (defs: ParticleDissolveParticleDefs, t: number) => CSSAnimationValues;
+    computeParticleAnimation?: SliceAnimationFn;
     /** Runs when the content has finished dissolving, with the last particle gone. */
     onDissolveEnd?: () => void;
     /** Runs when the content has finished rebuilding. */

@@ -1,16 +1,19 @@
+import { createMemo } from "solid-js";
+
 import {
     CellAnimationKeyframes,
     CellAnimationOrigins,
-    CellAnimationWeights,
     ParticleField,
     type ParticleFieldProps,
+    SliceAnimationWeights,
     access,
 } from "@thewaver/ss-components-solid";
+import { ParticlePictureUtils } from "@thewaver/ss-playground/App/PageComponents/ParticlePicture/ParticlePicture.utils";
 import {
     computeParticlePos,
-    computeParticleTimeline,
+    createEnvelope,
 } from "@thewaver/ss-playground/App/Pages/ParticleFieldPage/ParticleFieldPage.const";
-import * as styles from "@thewaver/ss-playground/App/Pages/ParticleFieldPage/ParticleFieldPage.css";
+import { themeVars } from "@thewaver/ss-playground/App/Theme.css";
 
 import type { ParticleFieldExampleProps } from "../ParticleFieldPage.types";
 
@@ -21,23 +24,30 @@ export const DefaultExample = ({
     holdShare,
     isScattered,
     ...otherProps
-}: ParticleFieldExampleProps & Pick<ParticleFieldProps, "computeShapePoints" | "shapeJoinRadii" | "progress">) => (
-    <ParticleField
-        {...otherProps}
-        computeCellWeights={(count) =>
-            CellAnimationWeights.computeCellWeights(
-                access(weightType),
-                count,
-                CellAnimationOrigins.computeOrigin(access(originType), count),
-            )
-        }
-        computeParticlePos={(defs) => computeParticlePos(defs.rect, access(isScattered))}
-        computeParticleAnimation={(defs, t) =>
-            CellAnimationKeyframes.SAMPLE_ANIMATIONS[access(animationType)](
-                computeParticleTimeline(t, access(holdShare)),
-                { ...defs, origin: CellAnimationOrigins.computeOrigin(access(originType), defs.count) },
-            )
-        }
-        renderParticle={() => <div class={styles.particle} />}
-    />
-);
+}: ParticleFieldExampleProps &
+    Pick<ParticleFieldProps, "computeShapePoints" | "shapeJoinRadii" | "progress" | "renderer">) => {
+    const getSrc = createMemo(() =>
+        ParticlePictureUtils.createDotSrc(themeVars.color.success.light, themeVars.color.success.dark),
+    );
+
+    const getAnimation = createMemo(() =>
+        createEnvelope(CellAnimationKeyframes.SAMPLE_ANIMATIONS[access(animationType)], access(holdShare)),
+    );
+
+    return (
+        <ParticleField
+            {...otherProps}
+            src={getSrc}
+            origin={() => CellAnimationOrigins.computeOrigin(access(originType), access(otherProps.cellCount))}
+            computeCellWeights={(count) =>
+                SliceAnimationWeights.computeSliceWeights(
+                    access(weightType),
+                    count,
+                    CellAnimationOrigins.computeOrigin(access(originType), count),
+                )
+            }
+            computeParticlePos={(defs) => computeParticlePos(defs.rect, access(isScattered))}
+            computeParticleAnimation={getAnimation()}
+        />
+    );
+};

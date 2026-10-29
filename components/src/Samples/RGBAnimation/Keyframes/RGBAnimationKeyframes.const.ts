@@ -1,10 +1,10 @@
 import { RGB_ANIMATION_CHANNELS } from "../../../Exotics/Animations/RGBAnimation/RGBAnimation.const";
 import type { RGBAnimationChannel } from "../../../Exotics/Animations/RGBAnimation/RGBAnimation.types";
 import type {
-    CellAnimationFn,
-    CellStop,
-} from "../../../Generators/CellAnimationKeyframes/CellAnimationKeyframes.types";
-import { CellAnimationKeyframeUtils } from "../../../Generators/CellAnimationKeyframes/CellAnimationKeyframes.utils";
+    SliceAnimationFn,
+    SliceStop,
+} from "../../../Generators/SliceAnimationKeyframes/SliceAnimationKeyframes.types";
+import { SliceAnimationKeyframeUtils } from "../../../Generators/SliceAnimationKeyframes/SliceAnimationKeyframes.utils";
 import type {
     RGBAnaglyphOpts,
     RGBEchoOpts,
@@ -25,17 +25,17 @@ const FOCUS_WINDOW_SHARE = 0.5;
 const FOCUS_STAGGER_SHARE = 0.25;
 const SPREAD: Record<RGBAnimationChannel, number> = { red: 1, green: 0, blue: -1 };
 
-const toSampledStops = (compute: (timeline: number) => Omit<CellStop, "at">): CellStop[] =>
+const toSampledStops = (compute: (timeline: number) => Omit<SliceStop, "at">): SliceStop[] =>
     Array.from({ length: SAMPLED_STOP_COUNT + 1 }, (_, idx) => {
         const timeline = idx / SAMPLED_STOP_COUNT;
 
         return { at: timeline, ...compute(timeline) };
     });
 
-const perChannel = (compute: (channel: RGBAnimationChannel, index: number) => CellStop[]) => {
+const perChannel = (compute: (channel: RGBAnimationChannel, index: number) => SliceStop[]) => {
     const stops = RGB_ANIMATION_CHANNELS.map((channel, index) => compute(channel, index));
 
-    return CellAnimationKeyframeUtils.fromSlices(({ pos }) => stops[pos.col] ?? stops[0]);
+    return SliceAnimationKeyframeUtils.fromSlices(({ pos }) => stops[pos.col] ?? stops[0]);
 };
 
 const computeEchoPath = (timeline: number, distance: number) => {
@@ -49,7 +49,7 @@ const computeEchoPath = (timeline: number, distance: number) => {
 const computeBump = (share: number) => (share <= 0 || share >= 1 ? 0 : (1 - Math.cos(share * 2 * Math.PI)) * 0.5);
 
 export namespace RGBAnimationKeyframes {
-    export const createAnaglyph = ({ separationPercent }: RGBAnaglyphOpts): CellAnimationFn =>
+    export const createAnaglyph = ({ separationPercent }: RGBAnaglyphOpts): SliceAnimationFn =>
         perChannel((channel) =>
             toSampledStops((timeline) => ({
                 translateX: -SPREAD[channel] * separationPercent * Math.sin(timeline * Math.PI),
@@ -59,7 +59,7 @@ export namespace RGBAnimationKeyframes {
     export const computeEchoRootPath = (timeline: number, { distancePercent }: RGBEchoOpts) =>
         computeEchoPath(timeline, distancePercent);
 
-    export const createEcho = ({ distancePercent }: RGBEchoOpts): CellAnimationFn =>
+    export const createEcho = ({ distancePercent }: RGBEchoOpts): SliceAnimationFn =>
         perChannel((_, index) =>
             toSampledStops((timeline) => {
                 const [rootX, rootY] = computeEchoPath(timeline, distancePercent);
@@ -69,14 +69,14 @@ export namespace RGBAnimationKeyframes {
             }),
         );
 
-    export const createFocusPull = ({ maxBlurPx }: RGBFocusPullOpts): CellAnimationFn =>
+    export const createFocusPull = ({ maxBlurPx }: RGBFocusPullOpts): SliceAnimationFn =>
         perChannel((_, index) =>
             toSampledStops((timeline) => ({
                 blur: maxBlurPx * computeBump((timeline - index * FOCUS_STAGGER_SHARE) / FOCUS_WINDOW_SHARE),
             })),
         );
 
-    export const createHueSwap = ({ turns, anchor }: RGBHueSwapOpts): CellAnimationFn =>
+    export const createHueSwap = ({ turns, anchor }: RGBHueSwapOpts): SliceAnimationFn =>
         perChannel((channel) => {
             const direction =
                 channel === anchor ? 0 : RGB_ANIMATION_CHANNELS.find((other) => other !== anchor) === channel ? 1 : -1;
@@ -87,7 +87,7 @@ export namespace RGBAnimationKeyframes {
             ];
         });
 
-    export const createOrbit = ({ radiusPercent }: RGBOrbitOpts): CellAnimationFn =>
+    export const createOrbit = ({ radiusPercent }: RGBOrbitOpts): SliceAnimationFn =>
         perChannel((_, index) =>
             toSampledStops((timeline) => {
                 const angle = (timeline + index / RGB_ANIMATION_CHANNELS.length) * 2 * Math.PI;
@@ -97,7 +97,7 @@ export namespace RGBAnimationKeyframes {
             }),
         );
 
-    export const createSwell = ({ scalePercent }: RGBSwellOpts): CellAnimationFn =>
+    export const createSwell = ({ scalePercent }: RGBSwellOpts): SliceAnimationFn =>
         perChannel((channel) =>
             toSampledStops((timeline) => {
                 const scale = 100 + SPREAD[channel] * scalePercent * (1 - Math.cos(timeline * 2 * Math.PI)) * 0.5;
@@ -106,7 +106,7 @@ export namespace RGBAnimationKeyframes {
             }),
         );
 
-    export const createTilt = ({ maxDegrees }: RGBTiltOpts): CellAnimationFn =>
+    export const createTilt = ({ maxDegrees }: RGBTiltOpts): SliceAnimationFn =>
         perChannel((channel) =>
             toSampledStops((timeline) => ({
                 perspective: TILT_PERSPECTIVE_PX,
@@ -114,7 +114,7 @@ export namespace RGBAnimationKeyframes {
             })),
         );
 
-    export const createTwist = ({ maxDegrees }: RGBTwistOpts): CellAnimationFn =>
+    export const createTwist = ({ maxDegrees }: RGBTwistOpts): SliceAnimationFn =>
         perChannel((channel) =>
             toSampledStops((timeline) => ({
                 rotate: SPREAD[channel] * maxDegrees * Math.sin(timeline * Math.PI),

@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed, shallowRef, useModel, watch } from "vue";
 
-import { RGBAnimation, RGB_ANIMATION_CHANNELS } from "@thewaver/ss-components-vue";
-import type { CellAnimationBreakpointTriple, RGBAnimationEvaluationDefs } from "@thewaver/ss-components-vue";
+import { RGBAnimation, RGB_ANIMATION_CHANNELS, SliceAnimationKeyframeUtils } from "@thewaver/ss-components-vue";
+import type { SliceAnimationBreakpointTriple, SliceStop } from "@thewaver/ss-components-vue";
 
 import type { RGBAnimationExampleProps } from "../RGBAnimationPageVue.types";
 
 const getGlitchBreakpointGroups = (count: number, start: number, end: number) => {
-    const result: CellAnimationBreakpointTriple[] = [];
+    const result: SliceAnimationBreakpointTriple[] = [];
     const range = end - start;
     const segmentWidth = range / count;
 
@@ -61,12 +61,22 @@ const findGroup = (timeline: number) =>
 
 const computeRootAnimation = (timeline: number) => ({ brightness: findGroup(timeline) === -1 ? 100 : 125 });
 
-const computeSliceAnimation = (defs: RGBAnimationEvaluationDefs, timeline: number) => {
-    const group = findGroup(timeline);
-    const shift = shifts.value[group]?.[RGB_ANIMATION_CHANNELS.indexOf(defs.channel)];
+const animation = computed(() => {
+    const channelStops = RGB_ANIMATION_CHANNELS.map((_, channel) =>
+        breakpointGroups.value.flatMap(([start, , end], group): SliceStop[] => {
+            const [x, y] = shifts.value[group]?.[channel] ?? [0, 0];
 
-    return { translate: shift ?? [0, 0] };
-};
+            return [
+                { at: start, translateX: 0, translateY: 0 },
+                { at: start, translateX: x, translateY: y },
+                { at: end, translateX: x, translateY: y },
+                { at: end, translateX: 0, translateY: 0 },
+            ];
+        }),
+    );
+
+    return SliceAnimationKeyframeUtils.fromSlices(({ pos }) => channelStops[pos.col] ?? channelStops[0]);
+});
 </script>
 
 <template>
@@ -79,7 +89,7 @@ const computeSliceAnimation = (defs: RGBAnimationEvaluationDefs, timeline: numbe
         :animation-duration-ms="animationDurationMs"
         :animation-iteration-delay-ms="animationIterationDelayMs"
         :compute-root-animation="computeRootAnimation"
-        :compute-slice-animation="computeSliceAnimation"
+        :compute-slice-animation="animation"
         @iteration-end="regenerateShifts"
     />
 </template>

@@ -1,6 +1,6 @@
 import type { Index2d } from "@thewaver/ss-utils";
 
-import type { CellAnimationEvaluationDefs } from "../../Exotics/Animations/CellAnimation/CellAnimation.types";
+import type { SliceAnimationEvaluationDefs } from "../../Exotics/Animations/CellAnimation/CellAnimation.types";
 
 export type CellAnimationZoneType =
     | "all"
@@ -30,4 +30,4 @@ export type CellAnimationZoneType =
     | "lighter_half"
     | "heavier_half";
 
-export type CellAnimationZoneFn = (defs: CellAnimationEvaluationDefs & { origin: Index2d }) => boolean;
+export type CellAnimationZoneFn = (defs: SliceAnimationEvaluationDefs & { origin: Index2d }) => boolean;

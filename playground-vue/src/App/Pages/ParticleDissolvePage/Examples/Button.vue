@@ -3,14 +3,14 @@ import { shallowRef } from "vue";
 
 import { Button, ParticleDissolve } from "@thewaver/ss-components-vue";
 import {
+    ASH_ANIMATION,
+    ASH_SRC,
     CENTER_SHARE,
-    computeAshAnimation,
 } from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.css";
 import type { Point2d } from "@thewaver/ss-utils";
 
 import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.vue";
-import AshParticle from "../AshParticle.vue";
 import type { ParticleDissolveExampleProps } from "../ParticleDissolvePageVue.types";
 
 type Props = ParticleDissolveExampleProps;
@@ -52,17 +52,14 @@ const rebuild = () => {
             :feather-share="featherShare"
             :spawn-chance="spawnChance"
             :cell-size="cellSize"
-            :compute-particle-animation="computeAshAnimation"
+            :src="ASH_SRC"
+            :compute-particle-animation="ASH_ANIMATION"
         >
             <Button id="particleDissolveBurn" @click="burn">
                 <template #renderContent="flags">
                     <PageButtonContent :flags="flags">Click to burn me up</PageButtonContent>
                 </template>
             </Button>
-
-            <template #renderParticle="{ defs }">
-                <AshParticle :defs="defs" />
-            </template>
         </ParticleDissolve>
 
         <Button id="particleDissolveRebuild" @click="rebuild">

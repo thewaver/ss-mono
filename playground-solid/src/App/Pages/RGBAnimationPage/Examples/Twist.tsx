@@ -1,6 +1,6 @@
 import { createMemo } from "solid-js";
 
-import { RGBAnimation, RGBAnimationKeyframes, RGBAnimationUtils, access } from "@thewaver/ss-components-solid";
+import { RGBAnimation, RGBAnimationKeyframes, access } from "@thewaver/ss-components-solid";
 import type { AccessorProps } from "@thewaver/ss-components-solid";
 
 import type { RGBAnimationExampleProps } from "../RGBAnimationPageSolid.types";
@@ -19,7 +19,7 @@ export const TwistExample = (props: Props) => {
             colorMixing={props.colorMixing}
             animationDurationMs={props.animationDurationMs}
             animationIterationDelayMs={props.animationIterationDelayMs}
-            computeSliceAnimation={(defs, timeline) => getAnimation()(timeline, RGBAnimationUtils.toSliceDefs(defs))}
+            computeSliceAnimation={getAnimation()}
         />
     );
 };

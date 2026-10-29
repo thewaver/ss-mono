@@ -1,0 +1,168 @@
+import { describe, expect, it } from "vitest";
+
+import type { Index2d } from "@thewaver/ss-utils";
+
+import { CellAnimationOrigins } from "../../CellAnimation/Origins/CellAnimationOrigins.const";
+import { SliceAnimationWeights } from "./SliceAnimationWeights.const";
+
+const ODD_GRID: Index2d = { col: 7, row: 7 };
+const EVEN_COLUMN: Index2d = { col: 1, row: 8 };
+const EVEN_GRID: Index2d = { col: 8, row: 8 };
+const AWKWARD_GRIDS: Index2d[] = [EVEN_GRID, EVEN_COLUMN, { col: 10, row: 4 }, { col: 2, row: 2 }];
+
+const centerOf = (count: Index2d) => CellAnimationOrigins.computeOrigin("center", count);
+
+const DETERMINISTIC_WEIGHTS = SliceAnimationWeights.WEIGHT_TYPES.filter((type) => !type.startsWith("random"));
+
+const RANDOM_WEIGHTS = SliceAnimationWeights.WEIGHT_TYPES.filter((type) => type.startsWith("random"));
+
+describe("SliceAnimationWeightsConst", () => {
+    it("knows which weights ignore the origin", () => {
+        expect(SliceAnimationWeights.isOriginAware("line_row")).toBe(true);
+        expect(SliceAnimationWeights.isOriginAware("diamond_default")).toBe(true);
+        expect(SliceAnimationWeights.isOriginAware("sequence_linear")).toBe(false);
+        expect(SliceAnimationWeights.isOriginAware("random_default")).toBe(false);
+    });
+
+    it("gives a row per y and a column per x", () => {
+        const weights = SliceAnimationWeights.computeSliceWeights("line_row", { col: 3, row: 5 }, { col: 0, row: 0 });
+
+        expect(weights).toHaveLength(5);
+        expect(weights.every((row) => row.length === 3)).toBe(true);
+    });
+
+    it("returns an empty grid rather than throwing on a zero count", () => {
+        expect(SliceAnimationWeights.computeSliceWeights("line_row", { col: 0, row: 0 }, { col: 0, row: 0 })).toEqual(
+            [],
+        );
+    });
+
+    it("stays finite on a single-cell grid, where the farthest bound is zero", () => {
+        const weights = SliceAnimationWeights.computeSliceWeights(
+            "diamond_default",
+            { col: 1, row: 1 },
+            { col: 0, row: 0 },
+        );
+
+        expect(weights).toEqual([[1]]);
+    });
+
+    it.each(DETERMINISTIC_WEIGHTS)("keeps %s inside 0..1 on an odd grid", (type) => {
+        const weights = SliceAnimationWeights.computeSliceWeights(type, ODD_GRID, centerOf(ODD_GRID)).flat();
+
+        expect(weights.every((weight) => Number.isFinite(weight))).toBe(true);
+        expect(Math.min(...weights)).toBeGreaterThanOrEqual(0);
+        expect(Math.max(...weights)).toBeLessThanOrEqual(1);
+    });
+
+    it.each(DETERMINISTIC_WEIGHTS)("computes %s from its inputs alone", (type) => {
+        const first = SliceAnimationWeights.computeSliceWeights(type, ODD_GRID, centerOf(ODD_GRID));
+        const second = SliceAnimationWeights.computeSliceWeights(type, ODD_GRID, centerOf(ODD_GRID));
+
+        expect(first).toEqual(second);
+    });
+
+    it.each(SliceAnimationWeights.ORIGIN_FREE_WEIGHT_TYPES.filter((type) => !type.startsWith("random")))(
+        "leaves %s unchanged when the origin moves",
+        (type) => {
+            const fromCorner = SliceAnimationWeights.computeSliceWeights(type, ODD_GRID, { col: 0, row: 0 });
+            const fromCenter = SliceAnimationWeights.computeSliceWeights(type, ODD_GRID, centerOf(ODD_GRID));
+
+            expect(fromCorner).toEqual(fromCenter);
+        },
+    );
+
+    it("moves an origin-aware weight when the origin moves", () => {
+        const fromCorner = SliceAnimationWeights.computeSliceWeights("diamond_default", ODD_GRID, { col: 0, row: 0 });
+        const fromCenter = SliceAnimationWeights.computeSliceWeights("diamond_default", ODD_GRID, centerOf(ODD_GRID));
+
+        expect(fromCorner).not.toEqual(fromCenter);
+    });
+
+    it("normalizes to span the full range, evenly spaced by rank rather than by value", () => {
+        const weights = SliceAnimationWeights.computeSliceWeights(
+            "line_row",
+            ODD_GRID,
+            { col: 0, row: 0 },
+            {
+                shouldNormalize: true,
+            },
+        ).flat();
+
+        expect(Math.min(...weights)).toBe(0);
+        expect(Math.max(...weights)).toBe(1);
+    });
+
+    it("gives every cell its own weight when asked to make them unique", () => {
+        const weights = SliceAnimationWeights.computeSliceWeights(
+            "line_row",
+            ODD_GRID,
+            { col: 0, row: 0 },
+            {
+                shouldMakeUnique: true,
+            },
+        ).flat();
+
+        expect(
+            new Set(weights).size,
+            "a staggering primitive that repeats a weight starts two cells at the same moment",
+        ).toBe(weights.length);
+    });
+
+    it("still alternates on an even count with a centered origin, where a raw modulo would not", () => {
+        const alternating = SliceAnimationWeights.computeSliceWeights(
+            "line_row_alternate",
+            EVEN_COLUMN,
+            centerOf(EVEN_COLUMN),
+        ).flat();
+
+        expect(alternating).toEqual([0, 0.643, 0.286, 0.929, 0.929, 0.286, 0.643, 0]);
+
+        const convergent = SliceAnimationWeights.computeSliceWeights(
+            "line_row_convergent",
+            EVEN_COLUMN,
+            centerOf(EVEN_COLUMN),
+        ).flat();
+
+        expect(Math.min(...convergent)).toBe(0.071);
+        expect(Math.max(...convergent)).toBe(0.929);
+    });
+
+    it.each(DETERMINISTIC_WEIGHTS)("keeps %s inside 0..1 on the grids a formula overshoots", (type) => {
+        for (const count of AWKWARD_GRIDS) {
+            const weights = SliceAnimationWeights.computeSliceWeights(type, count, centerOf(count)).flat();
+
+            expect(Math.min(...weights), `${count.col}x${count.row}`).toBeGreaterThanOrEqual(0);
+            expect(Math.max(...weights), `${count.col}x${count.row}`).toBeLessThanOrEqual(1);
+        }
+    });
+
+    it.each(RANDOM_WEIGHTS)("draws %s again on every call, rather than repeating one pattern", (type) => {
+        const first = SliceAnimationWeights.computeSliceWeights(type, ODD_GRID, centerOf(ODD_GRID));
+        const second = SliceAnimationWeights.computeSliceWeights(type, ODD_GRID, centerOf(ODD_GRID));
+
+        expect(first).not.toEqual(second);
+    });
+
+    it.each(["sequence_morton", "sequence_stride_row", "sequence_stride_column"] as const)(
+        "starts %s from the origin, rather than from the first cell",
+        (type) => {
+            const fromCorner = SliceAnimationWeights.computeSliceWeights(type, ODD_GRID, { col: 0, row: 0 });
+            const fromCenter = SliceAnimationWeights.computeSliceWeights(type, ODD_GRID, centerOf(ODD_GRID));
+
+            expect(fromCorner).not.toEqual(fromCenter);
+            expect(fromCorner[0][0], "the origin's own cell is the first to arrive").toBe(1);
+        },
+    );
+
+    it("turns the mirrored radar the other way round", () => {
+        const center = centerOf(ODD_GRID);
+        const ccw = SliceAnimationWeights.computeSliceWeights("radar_single", ODD_GRID, center);
+        const cw = SliceAnimationWeights.computeSliceWeights("radar_single_cw", ODD_GRID, center);
+        const axes = (weights: number[][]) => [weights[center.row][ODD_GRID.col - 1], weights[center.row][0]];
+
+        expect(axes(ccw), "counter-clockwise reaches the right of the origin before the left").toEqual(
+            axes(cw).reverse(),
+        );
+    });
+});

@@ -2,13 +2,13 @@ import { createSignal } from "solid-js";
 
 import { Button, ParticleDissolve } from "@thewaver/ss-components-solid";
 import {
+    ASH_ANIMATION,
+    ASH_SRC,
     CARD_TEXT,
-    computeAshAnimation,
 } from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.css";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
-import { AshParticle } from "../AshParticle";
 import type { ParticleDissolveAngleExampleProps } from "../ParticleDissolvePageSolid.types";
 
 type Props = ParticleDissolveAngleExampleProps;
@@ -26,8 +26,8 @@ export const CardExample = (props: Props) => {
                 featherShare={props.featherShare}
                 spawnChance={props.spawnChance}
                 cellSize={props.cellSize}
-                computeParticleAnimation={computeAshAnimation}
-                renderParticle={(defs) => <AshParticle defs={defs} />}
+                src={ASH_SRC}
+                computeParticleAnimation={ASH_ANIMATION}
             >
                 <div class={styles.card}>
                     <span id={"particleDissolveCardTitle"} class={styles.cardTitle}>

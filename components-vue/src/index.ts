@@ -31,6 +31,7 @@ export * from "./Abstracts/Rotator/RotatorVue.utils";
 export * from "./Abstracts/Selection/SelectionVue.utils";
 export * from "./Abstracts/Shortcut/ShortcutVue.utils";
 export * from "./Abstracts/SignalMirror/SignalMirrorVue.utils";
+export * from "./Abstracts/SliceRenderer/SliceRendererVue.utils";
 export * from "./Abstracts/Smoother/SmootherVue.utils";
 export * from "./Abstracts/TextSync/TextSyncVue.utils";
 export * from "./Abstracts/Typeahead/TypeaheadVue.utils";

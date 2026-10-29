@@ -4,15 +4,13 @@ import { computed, shallowRef } from "vue";
 import {
     Button,
     CellAnimation,
-    CellAnimationBreakpointUtils,
-    CellAnimationKeyframeUtils,
     CellAnimationOrigins,
-    CellAnimationPlaybackUtils,
-    CellAnimationWeights,
     MediaQueryMonitorVueUtils,
+    SliceAnimationKeyframeUtils,
+    SliceAnimationWeights,
     useViewportContext,
 } from "@thewaver/ss-components-vue";
-import type { CellAnimationEvaluationDefs, CellAnimationPlaybackOpts } from "@thewaver/ss-components-vue";
+import type { SliceAnimationPlaybackOpts } from "@thewaver/ss-components-vue";
 import * as styles from "@thewaver/ss-playground/App/Pages/CellAnimationPage/CellAnimationPage.css";
 import type { Index2d, Size2d } from "@thewaver/ss-utils";
 
@@ -23,8 +21,8 @@ const WIPE_CELL_SIZE = 120;
 const WIPE_LEG_MS = 600;
 const WIPE_COLOR = "black";
 const LOZENGE_COVER_PERCENT = 150;
-const WIPE_PLAYBACK: CellAnimationPlaybackOpts = { dir: "pipe", holdMs: 400 };
-const LOZENGE_GROW = CellAnimationKeyframeUtils.fromStops([
+const WIPE_PLAYBACK: SliceAnimationPlaybackOpts = { dir: "pipe", holdMs: 400 };
+const LOZENGE_GROW = SliceAnimationKeyframeUtils.fromStops([
     { at: 0, rotate: 45, scaleX: 0, scaleY: 0 },
     { at: 1, rotate: 45, scaleX: LOZENGE_COVER_PERCENT, scaleY: LOZENGE_COVER_PERCENT },
 ]);
@@ -59,20 +57,8 @@ const wipe = () => {
     wipeSize.value = { ...viewportContext.getSize() };
 };
 
-const computeCellWeights = (count: Index2d) =>
-    CellAnimationWeights.computeCellWeights(props.weightType, count, origin.value, props.weightOpts);
-
-const computeSliceAnimation = (defs: CellAnimationEvaluationDefs, timeline: number) =>
-    CellAnimationKeyframeUtils.computeAnimation(
-        LOZENGE_GROW,
-        CellAnimationBreakpointUtils.computeBreakpoints(
-            defs.weight,
-            CellAnimationPlaybackUtils.computeBreakpointOpts(props.breakpointOpts, timeline, WIPE_PLAYBACK),
-        ),
-        { ...defs, origin: origin.value },
-        CellAnimationPlaybackUtils.computeGlobalTimeline(timeline, legMs.value, WIPE_PLAYBACK),
-        props.breakpointOpts.easing,
-    );
+const computeSliceWeights = (count: Index2d) =>
+    SliceAnimationWeights.computeSliceWeights(props.weightType, count, origin.value, props.weightOpts);
 </script>
 
 <template>
@@ -87,11 +73,14 @@ const computeSliceAnimation = (defs: CellAnimationEvaluationDefs, timeline: numb
             <CellAnimation
                 :src="computeSolidSource(wipeSize)"
                 :cell-count="cellCount"
-                :animation-duration-ms="CellAnimationPlaybackUtils.computeCycleDurationMs(legMs, WIPE_PLAYBACK)"
+                :origin="origin"
+                :breakpoint-opts="breakpointOpts"
+                :playback-opts="WIPE_PLAYBACK"
+                :animation-duration-ms="legMs"
                 :animation-iteration-count="1"
                 final-frame="nothing"
-                :compute-cell-weights="computeCellWeights"
-                :compute-slice-animation="computeSliceAnimation"
+                :compute-slice-weights="computeSliceWeights"
+                :compute-slice-animation="LOZENGE_GROW"
                 @animation-end="wipeSize = undefined"
             />
         </div>

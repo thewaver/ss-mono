@@ -1,12 +1,7 @@
 import { useMemo } from "react";
 
-import {
-    CellAnimationBreakpointUtils,
-    CellAnimationWeights,
-    ScanlineAnimation,
-    ScanlineAnimationKeyframes,
-} from "@thewaver/ss-components-react";
-import type { CellAnimationBreakpointOpts, _ScanlineHorizontalDropoutOpts } from "@thewaver/ss-components-react";
+import { ScanlineAnimation, ScanlineAnimationKeyframes, SliceAnimationWeights } from "@thewaver/ss-components-react";
+import type { SliceAnimationBreakpointOpts, _ScanlineHorizontalDropoutOpts } from "@thewaver/ss-components-react";
 import type { Index2d } from "@thewaver/ss-utils";
 
 import type { ScanlineAnimationExampleProps } from "../ScanlineAnimationPage.types";
@@ -14,28 +9,24 @@ import type { ScanlineAnimationExampleProps } from "../ScanlineAnimationPage.typ
 const WEIGHT_ORIGIN = { row: 0, col: 0 };
 
 type Props = ScanlineAnimationExampleProps & {
-    breakpointOpts: CellAnimationBreakpointOpts;
+    breakpointOpts: SliceAnimationBreakpointOpts;
     keyframeOpts: _ScanlineHorizontalDropoutOpts;
 };
 
 export const DropoutExample = ({ keyframeOpts, breakpointOpts, weightType, ...otherProps }: Props) => {
-    const computeCellWeights = useMemo(
-        () => (count: Index2d) => CellAnimationWeights.computeCellWeights(weightType, count, WEIGHT_ORIGIN),
+    const computeSliceWeights = useMemo(
+        () => (count: Index2d) => SliceAnimationWeights.computeSliceWeights(weightType, count, WEIGHT_ORIGIN),
         [weightType],
     );
+
+    const animation = useMemo(() => ScanlineAnimationKeyframes._createHorizontalDropout(keyframeOpts), [keyframeOpts]);
 
     return (
         <ScanlineAnimation
             {...otherProps}
-            computeCellWeights={computeCellWeights}
-            computeSliceAnimation={(defs, timeline) =>
-                ScanlineAnimationKeyframes._computeHorizontalDropout(
-                    CellAnimationBreakpointUtils.computeBreakpoints(defs.weight, breakpointOpts),
-                    defs,
-                    timeline,
-                    keyframeOpts,
-                )
-            }
+            computeSliceWeights={computeSliceWeights}
+            breakpointOpts={breakpointOpts}
+            computeSliceAnimation={animation}
         />
     );
 };

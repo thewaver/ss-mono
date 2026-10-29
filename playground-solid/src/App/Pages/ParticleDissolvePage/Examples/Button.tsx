@@ -2,14 +2,14 @@ import { createSignal } from "solid-js";
 
 import { Button, ParticleDissolve } from "@thewaver/ss-components-solid";
 import {
+    ASH_ANIMATION,
+    ASH_SRC,
     CENTER_SHARE,
-    computeAshAnimation,
 } from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.css";
 import type { Point2d } from "@thewaver/ss-utils";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
-import { AshParticle } from "../AshParticle";
 import type { ParticleDissolveExampleProps } from "../ParticleDissolvePageSolid.types";
 
 type Props = ParticleDissolveExampleProps;
@@ -40,8 +40,8 @@ export const ButtonExample = (props: Props) => {
                 featherShare={props.featherShare}
                 spawnChance={props.spawnChance}
                 cellSize={props.cellSize}
-                computeParticleAnimation={computeAshAnimation}
-                renderParticle={(defs) => <AshParticle defs={defs} />}
+                src={ASH_SRC}
+                computeParticleAnimation={ASH_ANIMATION}
             >
                 <Button
                     id={"particleDissolveBurn"}

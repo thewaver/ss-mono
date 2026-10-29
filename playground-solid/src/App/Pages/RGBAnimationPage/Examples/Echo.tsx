@@ -1,6 +1,6 @@
 import { createMemo } from "solid-js";
 
-import { RGBAnimation, RGBAnimationKeyframes, RGBAnimationUtils, access } from "@thewaver/ss-components-solid";
+import { RGBAnimation, RGBAnimationKeyframes, access } from "@thewaver/ss-components-solid";
 import type { AccessorProps } from "@thewaver/ss-components-solid";
 
 import type { RGBAnimationExampleProps } from "../RGBAnimationPageSolid.types";
@@ -24,7 +24,7 @@ export const EchoExample = (props: Props) => {
             computeRootAnimation={(timeline) => ({
                 translate: RGBAnimationKeyframes.computeEchoRootPath(timeline, getOpts()),
             })}
-            computeSliceAnimation={(defs, timeline) => getAnimation()(timeline, RGBAnimationUtils.toSliceDefs(defs))}
+            computeSliceAnimation={getAnimation()}
         />
     );
 };

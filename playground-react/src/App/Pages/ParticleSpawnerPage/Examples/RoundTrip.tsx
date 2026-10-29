@@ -2,7 +2,11 @@ import { useState } from "react";
 
 import { ParticleSpawner } from "@thewaver/ss-components-react";
 import type { ParticleSpawnerController } from "@thewaver/ss-components-react";
-import { computeParticleGlow } from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.const";
+import {
+    computeParticleAnimation,
+    createParticleSrc,
+    createReturnParticleSrc,
+} from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.css";
 
 import type { ParticleSpawnerExampleProps } from "../ParticleSpawnerPage.types";
@@ -15,11 +19,8 @@ export const RoundTripExample = (props: ParticleSpawnerExampleProps) => {
     const [relay, setRelay] = useState<ParticleSpawnerController>();
     const relayPlayback = useState(false);
 
-    const renderParticle = (t: number, particleClass: string) => {
-        const glow = computeParticleGlow(t);
-
-        return <div className={particleClass} style={{ opacity: glow.opacity, transform: `scale(${glow.scale})` }} />;
-    };
+    const [particleSrc] = useState(createParticleSrc);
+    const [returnParticleSrc] = useState(createReturnParticleSrc);
 
     return (
         <div className={styles.demoArea}>
@@ -29,7 +30,8 @@ export const RoundTripExample = (props: ParticleSpawnerExampleProps) => {
                 <ParticleSpawner
                     {...props}
                     targets={[returnMarker ?? undefined]}
-                    renderParticle={(_index, t) => renderParticle(t, styles.particle)}
+                    src={particleSrc}
+                    computeParticleAnimation={computeParticleAnimation}
                     onParticleArrive={() => relay?.emit(RETURN_COUNT)}
                 />
             </div>
@@ -41,7 +43,8 @@ export const RoundTripExample = (props: ParticleSpawnerExampleProps) => {
                     {...props}
                     playback={relayPlayback}
                     targets={[outboundMarker ?? undefined]}
-                    renderParticle={(_index, t) => renderParticle(t, styles.particleReturn)}
+                    src={returnParticleSrc}
+                    computeParticleAnimation={computeParticleAnimation}
                     onMount={setRelay}
                 />
             </div>

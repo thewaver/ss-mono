@@ -1,7 +1,7 @@
-import type { CellAnimationFn } from "../../../../Generators/CellAnimationKeyframes/CellAnimationKeyframes.types";
-import { CellAnimationKeyframeUtils } from "../../../../Generators/CellAnimationKeyframes/CellAnimationKeyframes.utils";
+import type { SliceAnimationFn } from "../../../../Generators/SliceAnimationKeyframes/SliceAnimationKeyframes.types";
+import { SliceAnimationKeyframeUtils } from "../../../../Generators/SliceAnimationKeyframes/SliceAnimationKeyframes.utils";
 
-export const invertFlash: CellAnimationFn = CellAnimationKeyframeUtils.fromStops([
+export const invertFlash: SliceAnimationFn = SliceAnimationKeyframeUtils.fromStops([
     { at: 0, opacity: 0, invert: 100 },
     { at: 0.15, opacity: 100, invert: 100 },
     { at: 0.35, invert: 0 },

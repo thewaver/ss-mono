@@ -1,15 +1,19 @@
 import { useEffect, useMemo, useState } from "react";
 
-import { CellAnimationWeights, ScanlineAnimation } from "@thewaver/ss-components-react";
-import type { CellAnimationBreakpointTriple } from "@thewaver/ss-components-react";
+import { ScanlineAnimation, SliceAnimationKeyframeUtils, SliceAnimationWeights } from "@thewaver/ss-components-react";
+import type { SliceAnimationBreakpointTriple, SliceStop } from "@thewaver/ss-components-react";
 import type { Index2d } from "@thewaver/ss-utils";
 
 import type { ScanlineAnimationExampleProps } from "../ScanlineAnimationPage.types";
 
 const WEIGHT_ORIGIN = { row: 0, col: 0 };
 
+const NO_STOPS: SliceStop[] = [];
+
+const WHOLE_PASS = { smoothness: 1 };
+
 const getGlitchBreakpointGroups = (count: number, start: number, end: number) => {
-    const result: CellAnimationBreakpointTriple[] = [];
+    const result: SliceAnimationBreakpointTriple[] = [];
     const range = end - start;
     const segmentWidth = range / count;
 
@@ -64,15 +68,32 @@ export const GlitchExample = ({ keyframeOpts, weightType, ...otherProps }: Props
         setShifts(generateShifts());
     }, [breakpointGroups, otherProps.lineCount, keyframeOpts.shiftPercent, keyframeOpts.chunkyness]);
 
-    const computeCellWeights = useMemo(
-        () => (count: Index2d) => CellAnimationWeights.computeCellWeights(weightType, count, WEIGHT_ORIGIN),
+    const computeSliceWeights = useMemo(
+        () => (count: Index2d) => SliceAnimationWeights.computeSliceWeights(weightType, count, WEIGHT_ORIGIN),
         [weightType],
     );
+
+    const animation = useMemo(() => {
+        const rowStops = Array.from({ length: otherProps.lineCount }, (_, row) =>
+            breakpointGroups.flatMap(([start, , end], group): SliceStop[] => {
+                const shift = shifts[group]?.[row] ?? 0;
+
+                return [
+                    { at: start, translateX: 0 },
+                    { at: start, translateX: shift },
+                    { at: end, translateX: shift },
+                    { at: end, translateX: 0 },
+                ];
+            }),
+        );
+
+        return SliceAnimationKeyframeUtils.fromSlices(({ pos }) => rowStops[pos.row] ?? NO_STOPS);
+    }, [breakpointGroups, shifts, otherProps.lineCount]);
 
     return (
         <ScanlineAnimation
             {...otherProps}
-            computeCellWeights={computeCellWeights}
+            computeSliceWeights={computeSliceWeights}
             computeRootAnimation={(timeline) => {
                 for (let g = 0; g < breakpointGroups.length; g++) {
                     const [start, , end] = breakpointGroups[g];
@@ -84,20 +105,8 @@ export const GlitchExample = ({ keyframeOpts, weightType, ...otherProps }: Props
 
                 return { brightness: 100 };
             }}
-            computeSliceAnimation={(defs, timeline) => {
-                for (let g = 0; g < breakpointGroups.length; g++) {
-                    const [start, , end] = breakpointGroups[g];
-
-                    if (timeline >= start && timeline <= end) {
-                        const shiftGroup = shifts[g];
-                        const shiftVal = shiftGroup ? (shiftGroup[defs.pos.row] ?? 0) : 0;
-
-                        return { translateX: shiftVal };
-                    }
-                }
-
-                return { translateX: 0 };
-            }}
+            breakpointOpts={WHOLE_PASS}
+            computeSliceAnimation={animation}
             onIterationEnd={() => {
                 setShifts(generateShifts());
             }}

@@ -1,6 +1,10 @@
 import type { Signal } from "solid-js";
 
-import type { AccessorProps, ParticleSpawnIterationPattern } from "@thewaver/ss-components-solid";
+import type {
+    AccessorProps,
+    ParticleSpawnIterationPattern,
+    SliceAnimationRenderer,
+} from "@thewaver/ss-components-solid";
 import type { ParticleTravelPatternFn } from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPatterns.types";
 
 export type {
@@ -22,4 +26,5 @@ export type ParticleSpawnerExampleProps = AccessorProps<{
     computeParticlePos: ParticleTravelPatternFn;
     areTargetsHidden: boolean;
     playback: Signal<boolean>;
+    renderer?: SliceAnimationRenderer;
 }>;

@@ -1,82 +1,30 @@
-import {
-    type CSSAnimationKey,
-    type CSSAnimationStyle,
-    type CSSAnimationValues,
-    CSSUtils,
-    type Index2d,
-    MathUtils,
-    type Size2d,
-} from "@thewaver/ss-utils";
+import { type CSSAnimationValues, type Index2d, MathUtils, type Size2d } from "@thewaver/ss-utils";
 
-import type { CellAnimationEvaluationDefs, CellAnimationFinalFrame } from "./CellAnimation.types";
+import type { SliceAnimationSlice, SliceAnimationTiming } from "../../../Abstracts/SliceAnimation/SliceAnimation.types";
+import { SliceAnimationUtils } from "../../../Abstracts/SliceAnimation/SliceAnimation.utils";
+import type { SliceAnimationFn } from "../../../Generators/SliceAnimationKeyframes/SliceAnimationKeyframes.types";
+import type { CellAnimationFinalFrame, SliceAnimationEvaluationDefs } from "./CellAnimation.types";
 
 const DEFAULT_CELL_WEIGHT = 0;
 const PERSPECTIVE_RATIO = 1.5;
 const BLEED_PX = 1;
 const DEPTH_STEPS = 100;
-const NO_PROGRESS = 0;
-const FULL_PROGRESS = 1;
-
-const written = new WeakMap<HTMLElement, { values: CSSAnimationValues; style: CSSAnimationStyle }>();
-
-const isSameValue = (a: number | number[] | undefined, b: number | number[] | undefined) =>
-    Array.isArray(a) && Array.isArray(b) ? a.length === b.length && a.every((value, idx) => value === b[idx]) : a === b;
-
-const isSameValues = (a: CSSAnimationValues, b: CSSAnimationValues) => {
-    for (const key in a) {
-        if (!isSameValue(a[key as CSSAnimationKey], b[key as CSSAnimationKey])) return false;
-    }
-
-    for (const key in b) {
-        if (!(key in a)) return false;
-    }
-
-    return true;
-};
 
 /** A cell's place in the grid and its share of the drawing, before its size is known. */
-export type CellAnimationCellDefs = Omit<CellAnimationEvaluationDefs, "size">;
+export type CellAnimationCellDefs = Omit<SliceAnimationEvaluationDefs, "size">;
 
 /** Where a cell sits and how large it is, in the animation's own pixels. */
 export type CellAnimationCellBounds = { col: number; row: number; width: number; height: number };
 
 /**
- * Cuts a picture into a grid of cells, runs its passes, applies an animation's numbers to each cell, and answers which
- * cells alternate with which.
+ * Cuts a picture into a grid of cells, applies a sample's numbers to each cell, and answers which cells alternate with
+ * which.
  *
- * The numbers come from evaluating the animation per cell and per frame; what is here is the grid's arithmetic, the
- * clock that drives the passes, turning the numbers into CSS, and the parity tests that let a wave, a ripple or a
- * checkerboard alternate direction across the grid. `ParticleField` runs on the same grid and the same clock.
+ * What is here is the grid's arithmetic, drawing a frame onto the cells, and the parity tests that let a wave, a ripple
+ * or a checkerboard alternate direction across the grid. The clock and the timing every slice animation shares are in
+ * `SliceAnimationUtils`. `ParticleField` runs on the same grid and the same clock.
  */
 export namespace CellAnimationUtils {
-    /**
-     * Writes an animation's values onto a cell as `transform`, `filter` and `opacity`.
-     *
-     * Set on the element's style directly rather than through a signal, because this runs for every cell
-     * on every frame and the reactive round trip is not affordable at that rate. Values equal to the last ones
-     * written to the element are not worked out again, and a property whose text has not changed is not written
-     * again.
-     *
-     * @param el The cell's element. Its `transform`, `filter` and `opacity` must be left to this function: a
-     * change made to them anywhere else is not noticed, and stands until the animation's own value changes.
-     * @param evalResult The animation's values for this cell and frame, by CSS function name. Functions
-     * not mentioned are left out, so a value that stops being produced stops applying. Compared with the last
-     * values by content, so an object changed after it was handed over is not noticed.
-     */
-    export const assignAnimationProps = (el: HTMLElement, evalResult: CSSAnimationValues) => {
-        const last = written.get(el);
-
-        if (last && last.values !== evalResult && isSameValues(last.values, evalResult)) return;
-
-        const style = CSSUtils.toAnimationStyle(evalResult);
-
-        if (style.transform !== last?.style.transform) el.style.transform = style.transform;
-        if (style.filter !== last?.style.filter) el.style.filter = style.filter;
-        if (style.opacity !== last?.style.opacity) el.style.opacity = style.opacity;
-
-        written.set(el, { values: evalResult, style });
-    };
-
     /**
      * Whether a cell sits on an even row.
      *
@@ -186,7 +134,7 @@ export namespace CellAnimationUtils {
         cellDefs: CellAnimationCellDefs[],
         columnEdges: number[],
         rowEdges: number[],
-    ): CellAnimationEvaluationDefs[] =>
+    ): SliceAnimationEvaluationDefs[] =>
         cellDefs.map((defs) => {
             const bounds = computeCellBounds(columnEdges, rowEdges, defs.pos);
 
@@ -250,104 +198,31 @@ export namespace CellAnimationUtils {
      * Draws one frame: the whole picture's animation on the root, then each cell's on its cell.
      *
      * @param root The animation's root element.
-     * @param cells The cells' elements, in the order of `cellDefs`. A shorter list draws only as many.
-     * @param cellDefs What each cell's animation is handed, from {@link computeEvaluationDefs}.
-     * @param progress How far through the pass, held to `0`–`1` here.
+     * @param cells The cells' elements, in the order of `slices`. A shorter list draws only as many.
+     * @param slices Every cell with its origin, from `SliceAnimationUtils.withOrigin`.
+     * @param progress How far through the pass, held to `0`–`1` here; what the whole picture's animation is handed.
+     * @param timing Where the pass stands, from `SliceAnimationUtils.computeTiming`.
      * @param computeRootAnimation What the whole picture does, if anything.
-     * @param computeSliceAnimation What one cell does.
+     * @param computeSliceAnimation The sample each cell plays.
      */
     export const drawFrame = (
         root: HTMLElement,
         cells: HTMLElement[],
-        cellDefs: CellAnimationEvaluationDefs[],
+        slices: SliceAnimationSlice[],
         progress: number,
+        timing: SliceAnimationTiming,
         computeRootAnimation: ((timeline: number) => CSSAnimationValues) | undefined,
-        computeSliceAnimation: (defs: CellAnimationEvaluationDefs, timeline: number) => CSSAnimationValues,
+        computeSliceAnimation: SliceAnimationFn,
     ) => {
-        const t = MathUtils.clamp01(progress);
-
-        if (computeRootAnimation) assignAnimationProps(root, computeRootAnimation(t));
-
-        for (let i = 0; i < cells.length && i < cellDefs.length; i++) {
-            assignAnimationProps(cells[i], computeSliceAnimation(cellDefs[i], t));
+        if (computeRootAnimation) {
+            SliceAnimationUtils.assignAnimationProps(root, computeRootAnimation(MathUtils.clamp01(progress)));
         }
-    };
 
-    /**
-     * Runs passes on animation frames until stopped or until the last pass is done.
-     *
-     * Each frame reads the progress afresh and adds the time since the last, so a write from outside between frames
-     * is carried on from — which is how a consumer scrubs while playing. At the end of a pass it reports it, and
-     * either counts the last pass done and stops, or waits the delay, starts the next pass at `0` and carries on.
-     *
-     * @param defs.getProgress How far through the pass, `0`–`1`.
-     * @param defs.setProgress Writes the progress.
-     * @param defs.getCurrentIteration Passes finished so far.
-     * @param defs.setCurrentIteration Writes it.
-     * @param defs.getDurationMs How long one pass takes. `0` or less finishes a pass on its first frame.
-     * @param defs.getIterationCount How many passes to run.
-     * @param defs.getIterationDelayMs How long to wait between passes.
-     * @param defs.onIterationEnd Runs at the end of each pass.
-     * @param defs.onAnimationEnd Runs once the last pass is done, before it is counted.
-     * @returns Stops the frames and any wait between passes. Another call starts again from the progress as it is.
-     */
-    export const runPasses = (defs: {
-        getProgress: () => number;
-        setProgress: (progress: number) => void;
-        getCurrentIteration: () => number;
-        setCurrentIteration: (iteration: number) => void;
-        getDurationMs: () => number;
-        getIterationCount: () => number;
-        getIterationDelayMs: () => number;
-        onIterationEnd?: () => void;
-        onAnimationEnd?: () => void;
-    }) => {
-        let frameId: ReturnType<typeof requestAnimationFrame> | undefined;
-        let timeout: ReturnType<typeof setTimeout> | undefined;
-        let lastMs = performance.now();
-
-        const advance = (nowMs: number) => {
-            const durationMs = defs.getDurationMs();
-            const elapsedMs = Math.max(nowMs - lastMs, 0);
-            const next =
-                durationMs > 0
-                    ? Math.min(MathUtils.clamp01(defs.getProgress()) + elapsedMs / durationMs, FULL_PROGRESS)
-                    : FULL_PROGRESS;
-
-            frameId = undefined;
-            lastMs = nowMs;
-            defs.setProgress(next);
-
-            if (next < FULL_PROGRESS) {
-                frameId = requestAnimationFrame(advance);
-
-                return;
-            }
-
-            defs.onIterationEnd?.();
-
-            if (defs.getCurrentIteration() + 1 >= defs.getIterationCount()) {
-                defs.onAnimationEnd?.();
-                defs.setCurrentIteration(defs.getCurrentIteration() + 1);
-
-                return;
-            }
-
-            timeout = setTimeout(() => {
-                timeout = undefined;
-                defs.setProgress(NO_PROGRESS);
-                defs.setCurrentIteration(defs.getCurrentIteration() + 1);
-                lastMs = performance.now();
-                frameId = requestAnimationFrame(advance);
-            }, defs.getIterationDelayMs());
-        };
-
-        frameId = requestAnimationFrame(advance);
-
-        return () => {
-            if (frameId !== undefined) cancelAnimationFrame(frameId);
-
-            clearTimeout(timeout);
-        };
+        for (let i = 0; i < cells.length && i < slices.length; i++) {
+            SliceAnimationUtils.assignAnimationProps(
+                cells[i],
+                SliceAnimationUtils.computeValues(computeSliceAnimation, slices[i], timing),
+            );
+        }
     };
 }

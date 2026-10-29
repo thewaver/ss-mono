@@ -1,13 +1,17 @@
-import { RGBAnimation } from "@thewaver/ss-components-react";
-import type { RGBAnimationChannel } from "@thewaver/ss-components-react";
+import { useMemo } from "react";
+
+import { RGBAnimation, RGBAnimationKeyframes } from "@thewaver/ss-components-react";
 
 import type { RGBAnimationExampleProps } from "../RGBAnimationPageReact.types";
-
-const DIRECTIONS: Record<RGBAnimationChannel, number> = { red: 1, green: 0, blue: -1 };
 
 type Props = RGBAnimationExampleProps & { maxDegrees: number };
 
 export const TwistExample = (props: Props) => {
+    const animation = useMemo(
+        () => RGBAnimationKeyframes.createTwist({ maxDegrees: props.maxDegrees }),
+        [props.maxDegrees],
+    );
+
     return (
         <RGBAnimation
             src={props.src}
@@ -17,9 +21,7 @@ export const TwistExample = (props: Props) => {
             colorMixing={props.colorMixing}
             animationDurationMs={props.animationDurationMs}
             animationIterationDelayMs={props.animationIterationDelayMs}
-            computeSliceAnimation={(defs, timeline) => ({
-                rotate: DIRECTIONS[defs.channel] * props.maxDegrees * Math.sin(timeline * Math.PI),
-            })}
+            computeSliceAnimation={animation}
         />
     );
 };

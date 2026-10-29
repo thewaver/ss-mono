@@ -1,17 +1,18 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 
 import {
     CellAnimationKeyframes,
     CellAnimationOrigins,
-    CellAnimationWeights,
     ParticleField,
     type ParticleFieldProps,
+    SliceAnimationWeights,
 } from "@thewaver/ss-components-react";
+import { ParticlePictureUtils } from "@thewaver/ss-playground/App/PageComponents/ParticlePicture/ParticlePicture.utils";
 import {
     computeParticlePos,
-    computeParticleTimeline,
+    createEnvelope,
 } from "@thewaver/ss-playground/App/Pages/ParticleFieldPage/ParticleFieldPage.const";
-import * as styles from "@thewaver/ss-playground/App/Pages/ParticleFieldPage/ParticleFieldPage.css";
+import { themeVars } from "@thewaver/ss-playground/App/Theme.css";
 import type { Index2d } from "@thewaver/ss-utils";
 
 import type { ParticleFieldExampleProps } from "../ParticleFieldPage.types";
@@ -23,10 +24,26 @@ export const DefaultExample = ({
     holdShare,
     isScattered,
     ...otherProps
-}: ParticleFieldExampleProps & Pick<ParticleFieldProps, "computeShapePoints" | "shapeJoinRadii" | "progress">) => {
+}: ParticleFieldExampleProps &
+    Pick<ParticleFieldProps, "computeShapePoints" | "shapeJoinRadii" | "progress" | "renderer">) => {
+    const src = useMemo(
+        () => ParticlePictureUtils.createDotSrc(themeVars.color.success.light, themeVars.color.success.dark),
+        [],
+    );
+
+    const animation = useMemo(
+        () => createEnvelope(CellAnimationKeyframes.SAMPLE_ANIMATIONS[animationType], holdShare),
+        [animationType, holdShare],
+    );
+
+    const origin = useMemo(
+        () => CellAnimationOrigins.computeOrigin(originType, otherProps.cellCount),
+        [originType, otherProps.cellCount],
+    );
+
     const computeCellWeights = useCallback(
         (count: Index2d) =>
-            CellAnimationWeights.computeCellWeights(
+            SliceAnimationWeights.computeSliceWeights(
                 weightType,
                 count,
                 CellAnimationOrigins.computeOrigin(originType, count),
@@ -37,15 +54,11 @@ export const DefaultExample = ({
     return (
         <ParticleField
             {...otherProps}
+            src={src}
+            origin={origin}
             computeCellWeights={computeCellWeights}
             computeParticlePos={(defs) => computeParticlePos(defs.rect, isScattered)}
-            computeParticleAnimation={(defs, t) =>
-                CellAnimationKeyframes.SAMPLE_ANIMATIONS[animationType](computeParticleTimeline(t, holdShare), {
-                    ...defs,
-                    origin: CellAnimationOrigins.computeOrigin(originType, defs.count),
-                })
-            }
-            renderParticle={() => <div className={styles.particle} />}
+            computeParticleAnimation={animation}
         />
     );
 };

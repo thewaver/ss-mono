@@ -2,13 +2,13 @@ import { useState } from "react";
 
 import { Button, ParticleDissolve } from "@thewaver/ss-components-react";
 import {
+    ASH_ANIMATION,
+    ASH_SRC,
     CARD_TEXT,
-    computeAshAnimation,
 } from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.css";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
-import { AshParticle } from "../AshParticle";
 import type { ParticleDissolveAngleExampleProps } from "../ParticleDissolvePageReact.types";
 
 type Props = ParticleDissolveAngleExampleProps;
@@ -26,8 +26,8 @@ export const CardExample = (props: Props) => {
                 featherShare={props.featherShare}
                 spawnChance={props.spawnChance}
                 cellSize={props.cellSize}
-                computeParticleAnimation={computeAshAnimation}
-                renderParticle={(defs) => <AshParticle defs={defs} />}
+                src={ASH_SRC}
+                computeParticleAnimation={ASH_ANIMATION}
             >
                 <div className={styles.card}>
                     <span id={"particleDissolveCardTitle"} className={styles.cardTitle}>

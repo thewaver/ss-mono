@@ -42,6 +42,7 @@ export * from "./Abstracts/Rotator/RotatorReact.utils";
 export * from "./Abstracts/Selection/SelectionReact.utils";
 export * from "./Abstracts/Shortcut/ShortcutReact.utils";
 export * from "./Abstracts/SignalMirror/SignalMirrorReact.utils";
+export * from "./Abstracts/SliceRenderer/SliceRendererReact.utils";
 export * from "./Abstracts/Smoother/SmootherReact.utils";
 export * from "./Abstracts/TextSync/TextSyncReact.utils";
 export * from "./Abstracts/Typeahead/TypeaheadReact.utils";

@@ -72,14 +72,6 @@ export const isHiddenMarker = style({
     visibility: "hidden",
 });
 
-export const particle = style({
-    width: PARTICLE_SIZE_PX,
-    height: PARTICLE_SIZE_PX,
-    borderRadius: "50%",
-    backgroundColor: themeVars.color.primary.light,
-    backgroundImage: `radial-gradient(circle at 70% 30%, ${themeVars.color.primary.light}, ${themeVars.color.primary.dark})`,
-});
-
 export const burstRoot = style({
     position: "absolute",
     transform: "translate(-50%, -50%)",
@@ -90,11 +82,3 @@ export const spawnerOverlay = style({
     inset: 0,
     pointerEvents: "none",
 });
-
-export const particleReturn = style([
-    particle,
-    {
-        backgroundColor: themeVars.color.secondary.light,
-        backgroundImage: `radial-gradient(circle at 70% 30%, ${themeVars.color.secondary.light}, ${themeVars.color.secondary.dark})`,
-    },
-]);

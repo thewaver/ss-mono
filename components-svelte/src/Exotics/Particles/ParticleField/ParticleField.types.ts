@@ -1,6 +1,4 @@
-import type { Snippet } from "svelte";
-
-import type { BaseParticleFieldProps, ParticleFieldCellDefs } from "@thewaver/ss-components";
+import type { BaseParticleFieldProps } from "@thewaver/ss-components";
 
 export type ParticleFieldProps = BaseParticleFieldProps & {
     /**
@@ -14,6 +12,4 @@ export type ParticleFieldProps = BaseParticleFieldProps & {
      * playback paused it scrubs.
      */
     progress?: number;
-    /** Draws one particle, and is told how far through its life it is. */
-    renderParticle: Snippet<[defs: ParticleFieldCellDefs, t: number]>;
 };

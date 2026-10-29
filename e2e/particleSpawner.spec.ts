@@ -1,6 +1,6 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { demo, example, prop } from "./helpers";
+import { demo, example, prop, useElementRenderer } from "./helpers";
 
 /**
  * A particle is only ever in the page while it is traveling or resting on its target: the component adds an
@@ -179,6 +179,7 @@ const inFlightAtSecondPress = (page: Page) =>
     page.evaluate(() => (window as unknown as { __inFlightAtSecondPress: number | null }).__inFlightAtSecondPress ?? 0);
 
 test.beforeEach(async ({ page }) => {
+    await useElementRenderer(page);
     await page.goto("/particle-spawner");
     await expect(page.locator(BURST)).toBeVisible();
     await setNumber(page, "particleCount", PARTICLE_COUNT);

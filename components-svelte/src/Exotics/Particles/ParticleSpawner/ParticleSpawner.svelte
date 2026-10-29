@@ -1,31 +1,46 @@
 <script lang="ts">
     import { untrack } from "svelte";
     import type { Attachment } from "svelte/attachments";
-    import { SvelteMap } from "svelte/reactivity";
 
     import {
+        CellAnimationUtils,
         ElementObserverUtils,
         PARTICLE_SPAWNER_DEFAULTS,
         type ParticleSpawnIterationPattern,
         type ParticleSpawnerController,
         type ParticleSpawnerFrame,
         ParticleSpawnerUtils,
+        type ParticleTravelDefs,
+        SliceAnimationUtils,
+        type SliceRendererSlice,
+        SliceRendererStyles,
+        SliceRendererUtils,
         ParticleSpawnerStyles as styles,
     } from "@thewaver/ss-components";
     import { ParticleSpawnerConst } from "@thewaver/ss-components/internal";
+    import { type Point2d, Rect, Size2d } from "@thewaver/ss-utils";
+    import { setElementVars } from "@vanilla-extract/dynamic";
 
     import { InteractionTrackerSvelteUtils } from "../../../Abstracts/InteractionTracker/InteractionTrackerSvelte.utils.svelte.js";
     import { MediaQueryMonitorSvelteUtils } from "../../../Abstracts/MediaQueryMonitor/MediaQueryMonitorSvelte.utils.svelte.js";
+    import { SliceRendererSvelteUtils } from "../../../Abstracts/SliceRenderer/SliceRendererSvelte.utils.svelte.js";
     import { getViewportContext } from "../../../Abstracts/Viewport/Viewport.context.js";
     import { readStore } from "../../../Utils/storeUtils.js";
     import type { ParticleSpawnerProps } from "./ParticleSpawner.types.js";
 
+    type Placed = { defs: ParticleTravelDefs; pos: Point2d; t: number };
+
     let { playback = $bindable(true), ...props }: ParticleSpawnerProps = $props();
+
+    const LINEAR = SliceRendererUtils.computeEasing(undefined);
+    const NO_AREA: Rect = { x: 0, y: 0, width: 1, height: 1 };
+    const UNUSED_SIZE: Size2d = { width: 1, height: 1 };
 
     const travelDurationMs = $derived(props.travelDurationMs ?? PARTICLE_SPAWNER_DEFAULTS.travelDurationMs);
     const restDurationMs = $derived(props.restDurationMs ?? PARTICLE_SPAWNER_DEFAULTS.restDurationMs);
     const spawnDelayMs = $derived(props.spawnDelayMs ?? PARTICLE_SPAWNER_DEFAULTS.spawnDelayMs);
     const particleCount = $derived(ParticleSpawnerUtils.toParticleCount(props.particleCount));
+    const renderer = $derived(props.renderer ?? PARTICLE_SPAWNER_DEFAULTS.renderer);
 
     const patternsKey = $derived(
         JSON.stringify(props.spawnIterationPatterns ?? PARTICLE_SPAWNER_DEFAULTS.spawnIterationPatterns),
@@ -33,10 +48,17 @@
     const patterns = $derived(JSON.parse(patternsKey) as ParticleSpawnIterationPattern[]);
 
     let root = $state<HTMLDivElement>();
+    let canvas = $state<HTMLCanvasElement>();
     let stage = $state.raw({ index: ParticleSpawnerConst.FIRST_STAGE });
+    let area = $state.raw<Rect>(NO_AREA);
+    let shownSize = $state.raw<Size2d>({ width: 0, height: 0 });
 
     const elements = new Map<number, HTMLElement>();
-    const ts = new SvelteMap<number, number>();
+    const bodies = new Map<number, HTMLElement>();
+    const pictures = new Map<number, HTMLElement>();
+    const stand = new Map<number, HTMLElement>();
+    const placed = new Map<number, Placed>();
+    const tints = new Map<number, string | undefined>();
 
     const getIsPageHidden = InteractionTrackerSvelteUtils.trackPageHidden();
     const isWindowVisible = $derived(!getIsPageHidden());
@@ -44,7 +66,38 @@
 
     const viewportContext = getViewportContext();
 
+    const isElementsOnly = $derived(renderer === "elements");
+
+    const getIsAvailable = SliceRendererSvelteUtils.createIsAvailable(() => isElementsOnly);
+
+    const getPicture = SliceRendererSvelteUtils.createPicture(
+        () => props.src,
+        () => false,
+    );
+
+    let lastParticleSize = UNUSED_SIZE;
+
+    const particleSize = $derived.by(() => {
+        const next = getPicture()?.size ?? UNUSED_SIZE;
+
+        if (Size2d.isSame(lastParticleSize, next)) return lastParticleSize;
+
+        lastParticleSize = next;
+
+        return next;
+    });
+
+    const isOnGraphicsCard = $derived(getIsAvailable() && SliceRendererUtils.getCanDraw(renderer, getPicture()));
+
+    const getItem = SliceRendererSvelteUtils.createItem(() => canvas ?? undefined, getIsAvailable);
+
     const canSpawn = $derived(!!root && isWindowVisible && props.targets.length > 0);
+
+    const getTint = (defs: ParticleTravelDefs) => {
+        if (!tints.has(defs.id)) tints.set(defs.id, props.computeParticleTint?.(defs));
+
+        return tints.get(defs.id);
+    };
 
     const measureFrame = (): ParticleSpawnerFrame => ({
         rootRect: root ? ElementObserverUtils.measureViewportRect(root, viewportContext) : undefined,
@@ -52,16 +105,131 @@
         prefersReducedMotion: getPrefersReducedMotion(),
     });
 
+    const applyTint = (id: number, entry: Placed) => {
+        const picture = pictures.get(id);
+
+        if (!picture || picture.dataset.tinted) return;
+
+        const tint = getTint(entry.defs);
+
+        picture.dataset.tinted = "true";
+
+        if (tint === undefined) return;
+
+        const tintStyle = SliceRendererUtils.toTintStyle(SliceRendererUtils.toTint(tint));
+
+        setElementVars(picture, { [SliceRendererStyles.pictureTintVar]: tintStyle.color });
+        picture.classList.add(SliceRendererStyles.sliceRendererPictureTinted);
+        picture.style.opacity = `${tintStyle.opacity}`;
+    };
+
+    const applyParticle = (id: number) => {
+        const body = bodies.get(id);
+        const entry = placed.get(id);
+
+        if (!body || !entry) return;
+
+        applyTint(id, entry);
+
+        if (props.computeParticleAnimation) {
+            SliceAnimationUtils.assignAnimationProps(body, props.computeParticleAnimation(entry.defs, entry.t));
+        }
+    };
+
+    const drawOnGraphicsCard = () => {
+        const item = getItem();
+
+        if (!item) return;
+
+        const size = particleSize;
+        const current = area;
+        const slices: SliceRendererSlice[] = [];
+
+        let nextArea: Rect | undefined = current === NO_AREA ? undefined : current;
+
+        for (const particle of getParticles()) {
+            const entry = placed.get(particle.id);
+
+            if (!entry) continue;
+
+            const direct = ParticleSpawnerUtils.toDirectValues(
+                props.computeParticleAnimation?.(entry.defs, entry.t) ?? {},
+                size,
+            );
+            const center = { x: entry.pos.x + direct.shiftX, y: entry.pos.y + direct.shiftY };
+            const tint = getTint(entry.defs);
+
+            nextArea = ParticleSpawnerUtils.growArea(nextArea, center, size, direct);
+            slices.push({
+                left: center.x - size.width * 0.5,
+                top: center.y - size.height * 0.5,
+                width: size.width,
+                height: size.height,
+                weight: 0,
+                table: 0,
+                tint: tint === undefined ? undefined : SliceRendererUtils.toTint(tint),
+                direct: [direct.scaleX, direct.scaleY, direct.rotate, direct.opacity],
+            });
+        }
+
+        const shownArea = slices.length === 0 || !nextArea ? NO_AREA : nextArea;
+
+        if (!Rect.isSame(shownArea, current)) area = shownArea;
+
+        const scale = window.devicePixelRatio * viewportContext.getScale();
+        const shown = item.draw({
+            mode: "direct",
+            src: props.src,
+            tables: [],
+            easing: LINEAR,
+            slices,
+            size: UNUSED_SIZE,
+            area: shownArea,
+            scale,
+            timeline: 0,
+            half: 0,
+            isDescending: false,
+            isShown: slices.length > 0,
+            hasPerspective: false,
+        });
+        const next = { width: shown.width / scale, height: shown.height / scale };
+
+        if (!Size2d.isSame(shownSize, next)) shownSize = next;
+    };
+
     const engine = ParticleSpawnerUtils.createEngine({
         getTargetCount: () => props.targets.length,
         computeTarget: (index, targetCount) => props.computeTarget?.(index, targetCount),
-        getElement: (id) => elements.get(id),
+        getElement: (id) => {
+            if (!untrack(() => isOnGraphicsCard)) return elements.get(id);
+
+            const existing = stand.get(id);
+
+            if (existing) return existing;
+
+            const next = { style: {} } as HTMLElement;
+
+            stand.set(id, next);
+
+            return next;
+        },
         getFrame: measureFrame,
         getTiming: () => ({ spawnDelayMs, travelDurationMs, restDurationMs }),
         getCanSpawn: () => canSpawn,
-        computeParticlePos: (travel, t) => props.computeParticlePos(travel, t),
-        onParticleT: (id, t) => ts.set(id, t),
+        computeParticlePos: (travel, t) => {
+            const pos = props.computeParticlePos(travel, t);
+
+            placed.set(travel.id, { defs: travel, pos, t });
+
+            return pos;
+        },
+        onParticleT: (id) => {
+            if (!untrack(() => isOnGraphicsCard)) untrack(() => applyParticle(id));
+        },
         onParticleArrive: (index) => props.onParticleArrive?.(index),
+        onTick: () => {
+            if (untrack(() => isOnGraphicsCard)) untrack(drawOnGraphicsCard);
+        },
     });
 
     const getParticles = readStore(engine.particles);
@@ -72,7 +240,33 @@
         untrack(() => props.onMount?.(controller));
     });
 
-    $effect(() => engine.stop);
+    $effect(() => () => {
+        engine.stop();
+        elements.clear();
+        bodies.clear();
+        pictures.clear();
+        stand.clear();
+        placed.clear();
+        tints.clear();
+    });
+
+    $effect(() => {
+        const particles = getParticles();
+
+        untrack(() => {
+            const ids = new Set(particles.map((particle) => particle.id));
+
+            for (const id of [...placed.keys()]) {
+                if (!ids.has(id)) {
+                    placed.delete(id);
+                    stand.delete(id);
+                    tints.delete(id);
+                }
+            }
+
+            if (particles.length === 0 && isOnGraphicsCard) drawOnGraphicsCard();
+        });
+    });
 
     $effect(() => {
         void particleCount;
@@ -116,20 +310,70 @@
 
             return () => {
                 elements.delete(id);
-                untrack(() => ts.delete(id));
+            };
+        };
+
+    const attachBody =
+        (id: number): Attachment<HTMLElement> =>
+        (element) => {
+            bodies.set(id, element);
+
+            return () => {
+                bodies.delete(id);
+            };
+        };
+
+    const attachSource: Attachment<HTMLElement> = (element) => {
+        setElementVars(element, { [SliceRendererStyles.pictureSrcVar]: CellAnimationUtils.toSourceImage(props.src) });
+    };
+
+    const attachPicture =
+        (id: number): Attachment<HTMLElement> =>
+        (element) => {
+            pictures.set(id, element);
+            untrack(() => applyParticle(id));
+
+            return () => {
+                pictures.delete(id);
             };
         };
 </script>
 
 <div
     bind:this={root}
-    class={[styles.particleSpawnerRoot, getParticles().length > 0 && styles.particleSpawnerRootMoving]}
+    class={[
+        styles.particleSpawnerRoot,
+        !isOnGraphicsCard && getParticles().length > 0 && styles.particleSpawnerRootMoving,
+    ]}
     role="presentation"
     aria-hidden="true"
 >
-    {#each getParticles() as particle (particle.id)}
-        <div class={styles.particleSpawnerItem} {@attach attachParticle(particle.id)}>
-            {@render props.renderParticle(particle.index, ts.get(particle.id) ?? ParticleSpawnerConst.NOT_STARTED)}
-        </div>
-    {/each}
+    {#if isOnGraphicsCard}
+        <canvas
+            bind:this={canvas}
+            class={SliceRendererStyles.sliceRendererCanvas}
+            style:left={`${area.x}px`}
+            style:top={`${area.y}px`}
+            style:width={`${shownSize.width}px`}
+            style:height={`${shownSize.height}px`}
+            aria-hidden="true"
+        ></canvas>
+    {:else}
+        {#each getParticles() as particle (particle.id)}
+            <div class={styles.particleSpawnerItem} {@attach attachParticle(particle.id)}>
+                <div
+                    class={styles.particleSpawnerBody}
+                    style:width={`${particleSize.width}px`}
+                    style:height={`${particleSize.height}px`}
+                    {@attach attachBody(particle.id)}
+                >
+                    <div
+                        class={SliceRendererStyles.sliceRendererPicture}
+                        {@attach attachSource}
+                        {@attach attachPicture(particle.id)}
+                    ></div>
+                </div>
+            </div>
+        {/each}
+    {/if}
 </div>

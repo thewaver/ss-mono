@@ -1,9 +1,10 @@
 import { MathUtils, type Size2d } from "@thewaver/ss-utils";
 
+import type { SliceAnimationSlice } from "../../../Abstracts/SliceAnimation/SliceAnimation.types";
+import { SliceAnimationUtils } from "../../../Abstracts/SliceAnimation/SliceAnimation.utils";
 import type { SVGColorMixing } from "../../../Generators/SVGDefs/SVGFilters/SVGFilterDefs.types";
 import { SVGFilterDefsUtils } from "../../../Generators/SVGDefs/SVGFilters/SVGFilterDefs.utils";
-import type { CellAnimationEvaluationDefs } from "../CellAnimation/CellAnimation.types";
-import { CellAnimationUtils } from "../CellAnimation/CellAnimation.utils";
+import type { SliceAnimationFn } from "../../../Generators/SliceAnimationKeyframes/SliceAnimationKeyframes.types";
 import { RGB_ANIMATION_CHANNELS } from "./RGBAnimation.const";
 import type {
     RGBAnimationChannel,
@@ -13,16 +14,13 @@ import type {
 
 const DARK_SCHEME_QUERY = "(prefers-color-scheme: dark)";
 
-const sliceDefs = new WeakMap<
-    RGBAnimationEvaluationDefs,
-    CellAnimationEvaluationDefs & { origin: { row: number; col: number } }
->();
+const sliceDefs = new WeakMap<RGBAnimationEvaluationDefs, SliceAnimationSlice>();
 
 /**
  * The arithmetic behind `RGBAnimation`: which mixing to use, how each channel's copy keeps only its channel, and
  * drawing a frame.
  *
- * A framework's view runs the passes on `CellAnimationUtils.runPasses`, stacks one copy of the picture per channel,
+ * A framework's view runs the passes on `SliceAnimationUtils.runPasses`, stacks one copy of the picture per channel,
  * filters each down to its channel with {@link computeChannelMatrix}, blends them with {@link getBlendMode}, and
  * draws each frame with {@link drawFrame}.
  */
@@ -121,7 +119,8 @@ export namespace RGBAnimationUtils {
      * @param defs What each channel's animation is handed, from {@link computeEvaluationDefs}.
      * @param progress How far through the pass, kept between `0` and `1` before it is handed on.
      * @param computeRootAnimation The whole picture's animation, if any.
-     * @param computeSliceAnimation Each channel's animation.
+     * @param computeSliceAnimation The sample each channel plays over the whole pass, handed the channel through
+     * {@link toSliceDefs}.
      */
     export const drawFrame = (
         root: HTMLElement,
@@ -129,14 +128,14 @@ export namespace RGBAnimationUtils {
         defs: RGBAnimationEvaluationDefs[],
         progress: number,
         computeRootAnimation: ((timeline: number) => RGBAnimationEvaluationResult) | undefined,
-        computeSliceAnimation: (defs: RGBAnimationEvaluationDefs, timeline: number) => RGBAnimationEvaluationResult,
+        computeSliceAnimation: SliceAnimationFn,
     ) => {
         const t = MathUtils.clamp01(progress);
 
-        if (computeRootAnimation) CellAnimationUtils.assignAnimationProps(root, computeRootAnimation(t));
+        if (computeRootAnimation) SliceAnimationUtils.assignAnimationProps(root, computeRootAnimation(t));
 
         for (let i = 0; i < channels.length && i < defs.length; i++) {
-            CellAnimationUtils.assignAnimationProps(channels[i], computeSliceAnimation(defs[i], t));
+            SliceAnimationUtils.assignAnimationProps(channels[i], computeSliceAnimation(t, toSliceDefs(defs[i])));
         }
     };
 }

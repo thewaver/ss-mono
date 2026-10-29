@@ -5,18 +5,18 @@ import { createStore } from "solid-js/store";
 import {
     CELL_ANIMATION_DEFAULTS,
     CELL_ANIMATION_FINAL_FRAMES,
-    CellAnimationBreakpoints,
     CellAnimationKeyframes,
     CellAnimationOrigins,
-    CellAnimationPlayback,
-    CellAnimationPlaybackUtils,
-    CellAnimationWeights,
     SVGDefsSamples,
+    SliceAnimationBreakpoints,
+    SliceAnimationPlayback,
+    SliceAnimationPlaybackUtils,
+    SliceAnimationWeights,
 } from "@thewaver/ss-components-solid";
 import type {
-    CellAnimationBreakpointOpts,
     CellAnimationFinalFrame,
-    CellAnimationPlaybackOpts,
+    SliceAnimationBreakpointOpts,
+    SliceAnimationPlaybackOpts,
     WeightOpts,
 } from "@thewaver/ss-components-solid";
 import { CellAnimationKnobs } from "@thewaver/ss-playground/App/Knobs/CellAnimations.const";
@@ -53,7 +53,6 @@ import { StressTest } from "../../PageComponents/StressTest/StressTest";
 import type { CellAnimationExampleProps, CellAnimationSourcedExampleProps } from "./CellAnimationPage.types";
 import { DefaultExample } from "./Examples/Default";
 import { WipeExample } from "./Examples/Wipe";
-import { GpuCells } from "./GpuCells";
 
 const computeContainerWidth = (size: Size2d, longestSide: number) =>
     (longestSide * size.width) / Math.max(size.width, size.height);
@@ -73,7 +72,7 @@ const groupOptions = <T extends string>(keys: readonly T[]) => {
     return Object.entries(result);
 };
 
-const GROUPPED_WEIGHTS = groupOptions(CellAnimationWeights.WEIGHT_TYPES);
+const GROUPPED_WEIGHTS = groupOptions(SliceAnimationWeights.WEIGHT_TYPES);
 const GROUPPED_ANIMATIONS = groupOptions(CellAnimationKeyframes.ANIMATION_TYPES);
 
 const SourcedExampleWrapper = (
@@ -111,7 +110,7 @@ const StressTestWrapper = (
 
     const modalPlayback = createSignal(true);
 
-    const [getIsOnGpu, setIsOnGpu] = createSignal(true);
+    const [getIsOnGraphicsCard, setIsOnGraphicsCard] = createSignal(true);
 
     return (
         <>
@@ -119,14 +118,18 @@ const StressTestWrapper = (
 
             <PagePropsPanel scope={"local"} hasReset={false}>
                 <PageProp
-                    key={"gpuProof"}
+                    key={"onGraphicsCard"}
                     label={"On the graphics card"}
                     hint={
-                        "A proof of concept: draws the stress test's cells in one WebGL canvas per item, with the keyframes worked out on the graphics card. Every sample built from stops or zones takes this path; one written by hand falls back to the components."
+                        "Draws the stress test's cells in one canvas per item, with the keyframes worked out on the graphics card. Off, every cell is an element of its own."
                     }
-                    controls={"Swaps CellAnimation for the Playground's GpuCells in the stress test"}
+                    controls={"Sets CellAnimationProps.renderer in the stress test"}
                 >
-                    <PageCheckField value={getIsOnGpu} ariaLabel={"On the graphics card"} onChange={setIsOnGpu} />
+                    <PageCheckField
+                        value={getIsOnGraphicsCard}
+                        ariaLabel={"On the graphics card"}
+                        onChange={setIsOnGraphicsCard}
+                    />
                 </PageProp>
             </PagePropsPanel>
 
@@ -141,18 +144,12 @@ const StressTestWrapper = (
                 renderLabel={(getConfigIndex) => `Render ${STRESS_ITEMS[getConfigIndex()].count} items`}
                 renderItem={(getConfigIndex) => (
                     <PageMeasureBox width={() => local.computeWidth(STRESS_ITEMS[getConfigIndex()].size)}>
-                        <Show
-                            when={getIsOnGpu()}
-                            fallback={
-                                <DefaultExample
-                                    {...exampleProps}
-                                    playback={modalPlayback}
-                                    cellCount={STRESS_CELL_COUNT}
-                                />
-                            }
-                        >
-                            <GpuCells {...exampleProps} playback={modalPlayback} cellCount={STRESS_CELL_COUNT} />
-                        </Show>
+                        <DefaultExample
+                            {...exampleProps}
+                            playback={modalPlayback}
+                            cellCount={STRESS_CELL_COUNT}
+                            renderer={() => (getIsOnGraphicsCard() ? "graphics_card" : "elements")}
+                        />
                     </PageMeasureBox>
                 )}
             />
@@ -182,7 +179,7 @@ export const CellAnimationPage = () => {
     const [getOriginType, setOriginType] = createSignal<CellAnimationOrigins.OriginType>(
         CellAnimationKnobs.STARTING_ORIGIN_KEY,
     );
-    const [getWeightType, setWeightType] = createSignal<CellAnimationWeights.WeightType>(
+    const [getWeightType, setWeightType] = createSignal<SliceAnimationWeights.WeightType>(
         CellAnimationKnobs.STARTING_WEIGHT_KEY,
     );
     const [getAnimationType, setAnimationType] = createSignal<CellAnimationKeyframes.AnimationType>(
@@ -198,17 +195,17 @@ export const CellAnimationPage = () => {
     const [getFinalFrame, setFinalFrame] = createSignal<CellAnimationFinalFrame>(CELL_ANIMATION_DEFAULTS.finalFrame);
     const [cellCount, setCellCount] = createStore<Index2d>({ ...CellAnimationKnobs.STARTING_CELL_COUNT });
     const [weightOpts, setWeightOpts] = createStore<WeightOpts>({ ...CellAnimationKnobs.STARTING_WEIGHT_OPTS });
-    const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpointOpts>({
+    const [breakpointOpts, setBreakpointOpts] = createStore<SliceAnimationBreakpointOpts>({
         ...CellAnimationKnobs.STARTING_BREAKPOINT_OPTS,
     });
-    const [playbackOpts, setPlaybackOpts] = createStore<CellAnimationPlaybackOpts>({
+    const [playbackOpts, setPlaybackOpts] = createStore<SliceAnimationPlaybackOpts>({
         ...CellAnimationKnobs.STARTING_PLAYBACK_OPTS,
     });
 
     const getSourceSize = createMemo(() => SVGDefsSources.computeSourceSize(getSourceRatio()));
 
     const getCycleDurationMs = () =>
-        CellAnimationPlaybackUtils.computeCycleDurationMs(getAnimationDurationMs(), playbackOpts);
+        SliceAnimationPlaybackUtils.computeCycleDurationMs(getAnimationDurationMs(), playbackOpts);
 
     const getSourcedSrc = createMemo(() => {
         const sourceKind = getSourceKind();
@@ -414,13 +411,13 @@ export const CellAnimationPage = () => {
                             "Where in the grid the animation starts from. It only applies to weights that are measured from a point."
                         }
                         controls={
-                            "Picks the point the example's weights are measured from, sent to CellAnimationProps.computeCellWeights"
+                            "Picks the point the example's weights are measured from, sent to CellAnimationProps.computeSliceWeights"
                         }
                     >
                         <PageSelectField
                             value={getOriginType}
                             values={CellAnimationOrigins.ORIGIN_TYPES}
-                            isDisabled={() => !CellAnimationWeights.isOriginAware(getWeightType())}
+                            isDisabled={() => !SliceAnimationWeights.isOriginAware(getWeightType())}
                             ariaLabel={"Origin"}
                             onChange={(origin) => setOriginType(() => origin)}
                         />
@@ -432,7 +429,7 @@ export const CellAnimationPage = () => {
                         hint={
                             "How each cell's turn is decided: its distance from the origin, a wave, a random draw, and so on."
                         }
-                        controls={"Picks the example's weight function sent to CellAnimationProps.computeCellWeights"}
+                        controls={"Picks the example's weight function sent to CellAnimationProps.computeSliceWeights"}
                     >
                         <PageGroupedSelectField
                             value={getWeightType}
@@ -490,11 +487,11 @@ export const CellAnimationPage = () => {
                         key={"direction"}
                         label={"Direction"}
                         hint={"Which way the run travels through the weights, and so which cells go first."}
-                        controls={"Sets CellAnimationBreakpointOpts.dir"}
+                        controls={"Sets SliceAnimationBreakpointOpts.dir"}
                     >
                         <PageSelectField
                             value={() => breakpointOpts.dir!}
-                            values={CellAnimationBreakpoints.DIRECTIONS}
+                            values={SliceAnimationBreakpoints.DIRECTIONS}
                             ariaLabel={"Direction"}
                             onChange={(dir) => setBreakpointOpts("dir", dir)}
                         />
@@ -504,11 +501,11 @@ export const CellAnimationPage = () => {
                         key={"easing"}
                         label={"Easing"}
                         hint={"The speed curve a single cell follows from its start to its finish."}
-                        controls={"Sets CellAnimationBreakpointOpts.easing"}
+                        controls={"Sets SliceAnimationBreakpointOpts.easing"}
                     >
                         <PageSelectField
                             value={() => breakpointOpts.easing!}
-                            values={CellAnimationBreakpoints.EASINGS}
+                            values={SliceAnimationBreakpoints.EASINGS}
                             ariaLabel={"Easing"}
                             onChange={(easing) => setBreakpointOpts("easing", easing)}
                         />
@@ -520,7 +517,7 @@ export const CellAnimationPage = () => {
                         hint={
                             "How much a cell's own movement overlaps its neighbors'. 0 makes each cell wait its turn; 1 blurs them into one sweep."
                         }
-                        controls={"Sets CellAnimationBreakpointOpts.smoothness"}
+                        controls={"Sets SliceAnimationBreakpointOpts.smoothness"}
                     >
                         <PageNumberField
                             value={() => breakpointOpts.smoothness!}
@@ -605,11 +602,11 @@ export const CellAnimationPage = () => {
                         hint={
                             "Whether each pass runs one way, or goes out and comes back. Coming back, stack starts with the last cell to arrive and pipe with the first."
                         }
-                        controls={"Sets CellAnimationPlaybackOpts.dir"}
+                        controls={"Sets SliceAnimationPlaybackOpts.dir"}
                     >
                         <PageSelectField
                             value={() => playbackOpts.dir!}
-                            values={CellAnimationPlayback.DIRECTIONS}
+                            values={SliceAnimationPlayback.DIRECTIONS}
                             ariaLabel={"Playback direction"}
                             onChange={(dir) => setPlaybackOpts("dir", dir)}
                         />
@@ -621,14 +618,14 @@ export const CellAnimationPage = () => {
                         hint={
                             "How long the grid rests at the far end before turning back. It only applies to stack and pipe, which come back."
                         }
-                        controls={"Sets CellAnimationPlaybackOpts.holdMs"}
+                        controls={"Sets SliceAnimationPlaybackOpts.holdMs"}
                     >
                         <PageNumberField
                             value={() => playbackOpts.holdMs!}
                             min={CellAnimationKnobs.MIN_HOLD_MS}
                             max={CellAnimationKnobs.MAX_HOLD_MS}
                             step={CellAnimationKnobs.DURATION_STEP_MS}
-                            isDisabled={() => !CellAnimationPlaybackUtils.isRoundTrip(playbackOpts.dir)}
+                            isDisabled={() => !SliceAnimationPlaybackUtils.isRoundTrip(playbackOpts.dir)}
                             ariaLabel={"Hold at far end"}
                             onInput={(value) => setPlaybackOpts("holdMs", value)}
                         />

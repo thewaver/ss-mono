@@ -3,16 +3,16 @@ import { computed, shallowRef } from "vue";
 
 import { Button, ParticleDissolve } from "@thewaver/ss-components-vue";
 import {
+    ASH_ANIMATION,
+    ASH_SRC,
     NO_EDGE_THICKNESSES,
     SVG_LABEL,
     SVG_SIZE,
-    computeAshAnimation,
 } from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.css";
 import { ShapeConst, ShapeUtils } from "@thewaver/ss-utils";
 
 import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.vue";
-import AshParticle from "../AshParticle.vue";
 import type { ParticleDissolveSvgExampleProps } from "../ParticleDissolvePageVue.types";
 
 type Props = ParticleDissolveSvgExampleProps;
@@ -45,7 +45,8 @@ const path = computed(
             :feather-share="featherShare"
             :spawn-chance="spawnChance"
             :cell-size="cellSize"
-            :compute-particle-animation="computeAshAnimation"
+            :src="ASH_SRC"
+            :compute-particle-animation="ASH_ANIMATION"
         >
             <svg
                 :class="styles.svgShape"
@@ -57,10 +58,6 @@ const path = computed(
                 <path :class="styles.svgShapePath" :d="path" />
                 <text :class="styles.svgShapeText" x="50%" y="50%">{{ SVG_LABEL }}</text>
             </svg>
-
-            <template #renderParticle="{ defs }">
-                <AshParticle :defs="defs" />
-            </template>
         </ParticleDissolve>
 
         <div :class="styles.buttonRow">

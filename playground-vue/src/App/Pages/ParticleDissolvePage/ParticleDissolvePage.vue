@@ -18,6 +18,7 @@ import CardExampleWrapper from "./CardExampleWrapper.vue";
 import ButtonExample from "./Examples/Button.vue";
 import ImageExampleWrapper from "./ImageExampleWrapper.vue";
 import type { ParticleDissolveExampleProps } from "./ParticleDissolvePageVue.types";
+import StressTestWrapper from "./StressTestWrapper.vue";
 import SvgExampleWrapper from "./SvgExampleWrapper.vue";
 
 const durationMs = shallowRef(PARTICLE_DISSOLVE_DEFAULTS.durationMs);
@@ -61,6 +62,10 @@ const examples: ExampleDefs[] = [
         readout: () =>
             "a picture, read pixel by pixel: ash rises only from what is shown, in the colors it is shown in, and never from the transparent parts",
         path: `${EXAMPLES_ROOT}/Image.vue`,
+    },
+    {
+        key: "stressTest",
+        name: EXAMPLE_NAMES.stressTest,
     },
 ];
 </script>
@@ -168,6 +173,10 @@ const examples: ExampleDefs[] = [
 
         <template #image>
             <ImageExampleWrapper v-bind="commonProps" />
+        </template>
+
+        <template #stressTest>
+            <StressTestWrapper v-bind="commonProps" />
         </template>
     </PageExamples>
 </template>

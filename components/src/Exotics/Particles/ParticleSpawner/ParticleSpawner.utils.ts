@@ -1,7 +1,15 @@
-import { type Point2d, type Rect, type Store, StoreUtils } from "@thewaver/ss-utils";
+import {
+    type CSSAnimationValues,
+    type Point2d,
+    type Rect,
+    type Size2d,
+    type Store,
+    StoreUtils,
+} from "@thewaver/ss-utils";
 
 import type {
     ParticleSpawnIterationPattern,
+    ParticleSpawnerDirectValues,
     ParticleSpawnerFrame,
     ParticleSpawnerParticle,
     ParticleSpawnerTiming,
@@ -9,6 +17,15 @@ import type {
 } from "./ParticleSpawner.types";
 
 const NO_DELAY_MS = 0;
+const PERCENT = 100;
+const AREA_STEP_PX = 64;
+
+const toValue = (value: number | number[] | undefined, idx: number) =>
+    Array.isArray(value) ? value[idx] : idx === 0 ? value : undefined;
+
+const snapOut = (value: number) => Math.floor(value / AREA_STEP_PX) * AREA_STEP_PX;
+
+const snapIn = (value: number) => Math.ceil(value / AREA_STEP_PX) * AREA_STEP_PX;
 
 let nextId = 0;
 
@@ -108,6 +125,51 @@ export namespace ParticleSpawnerUtils {
         x: rect.x + rect.width * 0.5 - rootRect.x,
         y: rect.y + rect.height * 0.5 - rootRect.y,
     });
+
+    /**
+     * The part of a particle's look the graphics card draws: its scale, its turn, its fade and how far it is shifted
+     * off its path, from the values `computeParticleAnimation` returns. Every other value is left out.
+     *
+     * @param values The particle's values at this point along its path.
+     * @param size The particle's size, which a shift in percent is measured against.
+     */
+    export const toDirectValues = (values: CSSAnimationValues, size: Size2d): ParticleSpawnerDirectValues => ({
+        scaleX: ((toValue(values.scale, 0) ?? PERCENT) * (toValue(values.scaleX, 0) ?? PERCENT)) / (PERCENT * PERCENT),
+        scaleY:
+            ((toValue(values.scale, 1) ?? toValue(values.scale, 0) ?? PERCENT) *
+                (toValue(values.scaleY, 0) ?? PERCENT)) /
+            (PERCENT * PERCENT),
+        rotate: Number(values.rotate ?? 0) || 0,
+        opacity: (Number(values.opacity ?? PERCENT) || 0) / PERCENT,
+        shiftX: (((toValue(values.translate, 0) ?? 0) + (Number(values.translateX) || 0)) * size.width) / PERCENT,
+        shiftY: (((toValue(values.translate, 1) ?? 0) + (Number(values.translateY) || 0)) * size.height) / PERCENT,
+    });
+
+    /**
+     * The area a spawner's canvas covers, grown to take in one more particle.
+     *
+     * It grows in steps of whole blocks rather than to the pixel, and never shrinks, so the canvas is not made again
+     * on every frame as particles move; a spawner starts again from nothing once no particle is left.
+     *
+     * @param area The area so far, or `undefined` for the first particle of a frame with none before it.
+     * @param center Where the particle is centered, relative to the spawner's root.
+     * @param size The particle's size.
+     * @param direct Its scale and turn, from {@link toDirectValues}, which can carry it past its size.
+     */
+    export const growArea = (
+        area: Rect | undefined,
+        center: Point2d,
+        size: Size2d,
+        direct: ParticleSpawnerDirectValues,
+    ): Rect => {
+        const reach = Math.max(direct.scaleX, direct.scaleY, 1) * Math.hypot(size.width, size.height) * 0.5;
+        const left = Math.min(area ? area.x : Infinity, snapOut(center.x - reach));
+        const top = Math.min(area ? area.y : Infinity, snapOut(center.y - reach));
+        const right = Math.max(area ? area.x + area.width : -Infinity, snapIn(center.x + reach));
+        const bottom = Math.max(area ? area.y + area.height : -Infinity, snapIn(center.y + reach));
+
+        return { x: left, y: top, width: right - left, height: bottom - top };
+    };
 
     /**
      * Writes a particle's position onto its element, centering the element on the point.

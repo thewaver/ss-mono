@@ -42,6 +42,7 @@ export * from "./Abstracts/Rotator/RotatorSvelte.utils.svelte.js";
 export * from "./Abstracts/Selection/SelectionSvelte.utils.js";
 export * from "./Abstracts/Shortcut/ShortcutSvelte.utils.svelte.js";
 export * from "./Abstracts/SignalMirror/SignalMirrorSvelte.utils.svelte.js";
+export * from "./Abstracts/SliceRenderer/SliceRendererSvelte.utils.svelte.js";
 export * from "./Abstracts/Smoother/SmootherSvelte.utils.svelte.js";
 export * from "./Abstracts/TextSync/TextSyncSvelte.utils.svelte.js";
 export * from "./Abstracts/Typeahead/TypeaheadSvelte.utils.svelte.js";

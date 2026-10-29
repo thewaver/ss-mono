@@ -1,6 +1,8 @@
 import type { CSSAnimationValues, Size2d } from "@thewaver/ss-utils";
 
+import type { SliceAnimationRenderer } from "../../../Abstracts/SliceAnimation/SliceAnimation.types";
 import type { SVGColorMixing } from "../../../Generators/SVGDefs/SVGFilters/SVGFilterDefs.types";
+import type { SliceAnimationFn } from "../../../Generators/SliceAnimationKeyframes/SliceAnimationKeyframes.types";
 
 export type RGBAnimationChannel = "red" | "green" | "blue";
 
@@ -35,19 +37,29 @@ export type BaseRGBAnimationValues = {
     animationIterationCount?: number;
     /** How long the picture waits between one pass and the next, in milliseconds. */
     animationIterationDelayMs?: number;
+    /**
+     * What draws the channels. `"graphics_card"` draws them into one canvas and falls back to page elements by itself
+     * wherever it cannot: no WebGL 2, a sample written by hand rather than built by `SliceAnimationKeyframeUtils`, a
+     * picture whose server gives no cross-origin permission, or a moment the browser has taken the graphics card away.
+     * `"elements"` always draws each channel as an element of its own, which keeps an animated picture playing — the
+     * graphics card draws only its first frame.
+     */
+    renderer?: SliceAnimationRenderer;
 };
 
 export type BaseRGBAnimationCbs = {
     /** What the picture as a whole does over the pass, for an effect that is not per channel. */
     computeRootAnimation?: (timeline: number) => RGBAnimationEvaluationResult;
     /**
-     * What one channel does over the pass, given which channel it is and how far through the pass it is.
+     * The sample each channel plays over the whole pass, from `0` to `1`, handed the channel as one slice of a single
+     * row — red, green, blue — with the picture's size. `RGBAnimationKeyframes` holds ready ones.
      *
      * Each channel is a full-size copy of the picture holding only that channel, so moving, turning, scaling or fading
      * one pulls it away from the other two and leaves fringes along every edge; where all three still overlap, the
-     * picture's own colors come back.
+     * picture's own colors come back. A sample built by `SliceAnimationKeyframeUtils` can be drawn on the graphics card;
+     * one written by hand plays on page elements.
      */
-    computeSliceAnimation: (defs: RGBAnimationEvaluationDefs, timeline: number) => RGBAnimationEvaluationResult;
+    computeSliceAnimation: SliceAnimationFn;
     /** Runs at the end of each pass. */
     onIterationEnd?: () => void;
     /** Runs once every pass is done. */

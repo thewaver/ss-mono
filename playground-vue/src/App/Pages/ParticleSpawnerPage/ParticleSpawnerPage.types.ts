@@ -1,4 +1,4 @@
-import type { ParticleSpawnIterationPattern } from "@thewaver/ss-components-vue";
+import type { ParticleSpawnIterationPattern, SliceAnimationRenderer } from "@thewaver/ss-components-vue";
 import type { ParticleTravelPatternFn } from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPatterns.types";
 
 export type {
@@ -21,4 +21,5 @@ export type ParticleSpawnerExampleProps = {
     "areTargetsHidden": boolean;
     "playback": boolean;
     "onUpdate:playback"?: (value: boolean) => void;
+    "renderer"?: SliceAnimationRenderer;
 };

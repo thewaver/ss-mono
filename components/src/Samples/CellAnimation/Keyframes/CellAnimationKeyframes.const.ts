@@ -1,15 +1,15 @@
 import type { Index2d } from "@thewaver/ss-utils";
 
 import type {
-    CellAnimationEvaluationDefs,
-    CellAnimationEvaluationResult,
+    SliceAnimationEvaluationDefs,
+    SliceAnimationEvaluationResult,
 } from "../../../Exotics/Animations/CellAnimation/CellAnimation.types";
 import type {
-    CellAnimationBreakpointTriple,
-    CellAnimationEasing,
-} from "../../../Generators/CellAnimationBreakpoints/CellAnimationBreakpoints.types";
-import type { CellAnimationFn } from "../../../Generators/CellAnimationKeyframes/CellAnimationKeyframes.types";
-import { CellAnimationKeyframeUtils } from "../../../Generators/CellAnimationKeyframes/CellAnimationKeyframes.utils";
+    SliceAnimationBreakpointTriple,
+    SliceAnimationEasing,
+} from "../../../Generators/SliceAnimationBreakpoints/SliceAnimationBreakpoints.types";
+import type { SliceAnimationFn } from "../../../Generators/SliceAnimationKeyframes/SliceAnimationKeyframes.types";
+import { SliceAnimationKeyframeUtils } from "../../../Generators/SliceAnimationKeyframes/SliceAnimationKeyframes.utils";
 import { blurDefault } from "./Samples/blurDefault";
 import { bounceDefault } from "./Samples/bounceDefault";
 import { carouselBottom } from "./Samples/carouselBottom";
@@ -248,7 +248,7 @@ export namespace CellAnimationKeyframes {
     ] as const;
     export type AnimationType = (typeof ANIMATION_TYPES)[number];
 
-    export const SAMPLE_ANIMATIONS: Record<AnimationType, CellAnimationFn> = {
+    export const SAMPLE_ANIMATIONS: Record<AnimationType, SliceAnimationFn> = {
         blur_default: blurDefault,
         bounce_default: bounceDefault,
         carousel_bottom: carouselBottom,
@@ -369,10 +369,10 @@ export namespace CellAnimationKeyframes {
 
     export const computeAnimation = (
         type: AnimationType,
-        breakpoints: CellAnimationBreakpointTriple,
-        defs: CellAnimationEvaluationDefs & { origin: Index2d },
+        breakpoints: SliceAnimationBreakpointTriple,
+        defs: SliceAnimationEvaluationDefs & { origin: Index2d },
         timeline: number,
-        easing?: CellAnimationEasing,
-    ): CellAnimationEvaluationResult =>
-        CellAnimationKeyframeUtils.computeAnimation(SAMPLE_ANIMATIONS[type], breakpoints, defs, timeline, easing);
+        easing?: SliceAnimationEasing,
+    ): SliceAnimationEvaluationResult =>
+        SliceAnimationKeyframeUtils.computeAnimation(SAMPLE_ANIMATIONS[type], breakpoints, defs, timeline, easing);
 }

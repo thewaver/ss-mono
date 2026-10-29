@@ -1,19 +1,26 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-import { PARTICLE_DISSOLVE_DEFAULTS } from "@thewaver/ss-components-react";
+import { PARTICLE_DISSOLVE_DEFAULTS, ParticleDissolve } from "@thewaver/ss-components-react";
 import { ParticleDissolveKnobs } from "@thewaver/ss-playground/App/Knobs/ParticleDissolves.const";
 import {
+    ASH_ANIMATION,
+    ASH_SRC,
+    CARD_TEXT,
     EXAMPLES_ROOT,
     EXAMPLE_NAMES,
     FIELD_WIDTH,
+    STRESS_CELL_SIZE,
+    STRESS_ITEMS,
 } from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.const";
+import * as styles from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.css";
 import { ShapeConst } from "@thewaver/ss-utils";
 
 import { PageExampleKnobs } from "../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
-import { PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";
+import { PageCheckField, PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
+import { StressTest } from "../../PageComponents/StressTest/StressTest";
 import { ButtonExample } from "./Examples/Button";
 import { CardExample } from "./Examples/Card";
 import { ImageExample } from "./Examples/Image";
@@ -38,6 +45,71 @@ const AngleKnob = (props: { value: number; onInput: (value: number) => void }) =
         />
     </PageProp>
 );
+
+const StressCard = (props: ParticleDissolveExampleProps & { isOnGraphicsCard: boolean }) => {
+    const [isDissolved, setIsDissolved] = useState(false);
+
+    useEffect(() => {
+        const timeout = setTimeout(() => setIsDissolved(true));
+
+        return () => clearTimeout(timeout);
+    }, []);
+
+    return (
+        <ParticleDissolve
+            src={ASH_SRC}
+            isDissolved={isDissolved}
+            durationMs={props.durationMs}
+            particleLifetimeMs={props.particleLifetimeMs}
+            featherShare={props.featherShare}
+            spawnChance={props.spawnChance}
+            cellSize={STRESS_CELL_SIZE}
+            renderer={props.isOnGraphicsCard ? "graphics_card" : "elements"}
+            computeParticleAnimation={ASH_ANIMATION}
+            onDissolveEnd={() => setIsDissolved(false)}
+            onRebuildEnd={() => setIsDissolved(true)}
+        >
+            <div className={styles.card}>
+                <span className={styles.cardTitle}>{CARD_TEXT.title}</span>
+                <span>{CARD_TEXT.body}</span>
+                <span className={styles.badge}>{CARD_TEXT.badge}</span>
+            </div>
+        </ParticleDissolve>
+    );
+};
+
+const StressTestWrapper = (props: ParticleDissolveExampleProps) => {
+    const [isOnGraphicsCard, setIsOnGraphicsCard] = useState(true);
+
+    return (
+        <>
+            <div>{`${STRESS_CELL_SIZE} px cells`}</div>
+
+            <PagePropsPanel scope={"local"} hasReset={false}>
+                <PageProp
+                    itemKey={"onGraphicsCard"}
+                    label={"On the graphics card"}
+                    hint={
+                        "Draws each card's ash in one canvas, with each particle's motion worked out on the graphics card. Off, every particle is an element of its own."
+                    }
+                    controls={"Sets ParticleDissolveProps.renderer in the stress test"}
+                >
+                    <PageCheckField
+                        value={isOnGraphicsCard}
+                        ariaLabel={"On the graphics card"}
+                        onChange={setIsOnGraphicsCard}
+                    />
+                </PageProp>
+            </PagePropsPanel>
+
+            <StressTest
+                configs={STRESS_ITEMS}
+                renderLabel={(configIndex) => `Render ${STRESS_ITEMS[configIndex].count} cards`}
+                renderItem={() => <StressCard {...props} isOnGraphicsCard={isOnGraphicsCard} />}
+            />
+        </>
+    );
+};
 
 const CardExampleWrapper = (props: ParticleDissolveExampleProps) => {
     const [angle, setAngle] = useState(PARTICLE_DISSOLVE_DEFAULTS.angleDegrees);
@@ -144,6 +216,11 @@ export const ParticleDissolvePage = () => {
                 "a picture, read pixel by pixel: ash rises only from what is shown, in the colors it is shown in, and never from the transparent parts",
             component: () => <ImageExampleWrapper {...commonProps} />,
             path: `${EXAMPLES_ROOT}/Image.tsx`,
+        },
+        {
+            key: "stressTest",
+            name: EXAMPLE_NAMES.stressTest,
+            component: () => <StressTestWrapper {...commonProps} />,
         },
     ];
 

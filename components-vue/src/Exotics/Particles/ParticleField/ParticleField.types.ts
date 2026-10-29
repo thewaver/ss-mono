@@ -1,6 +1,4 @@
-import type { VNodeChild } from "vue";
-
-import type { BaseParticleFieldProps, ParticleFieldCellDefs } from "@thewaver/ss-components";
+import type { BaseParticleFieldProps } from "@thewaver/ss-components";
 
 export type ParticleFieldProps = BaseParticleFieldProps & {
     /** Whether the field is running. It is the only thing that starts or pauses it, and a pause freezes every particle. */
@@ -14,9 +12,4 @@ export type ParticleFieldProps = BaseParticleFieldProps & {
     "progress"?: number;
     /** Receives the pass's progress as it runs, which is what `v-model:progress` binds. */
     "onUpdate:progress"?: (progress: number) => void;
-};
-
-export type ParticleFieldSlots = {
-    /** Draws one particle, and is told how far through its life it is. */
-    renderParticle: (props: { defs: ParticleFieldCellDefs; t: number }) => VNodeChild;
 };

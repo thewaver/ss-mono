@@ -7,7 +7,7 @@ import { CellAnimation } from "../CellAnimation/CellAnimation";
 import type { ScanlineAnimationProps } from "./ScanlineAnimationSolid.types";
 
 export const ScanlineAnimation = (props: ScanlineAnimationProps) => {
-    const [local, otherProps] = splitProps(props, ["lineCount", "orientation", "computeSliceAnimation"]);
+    const [local, otherProps] = splitProps(props, ["lineCount", "orientation"]);
 
     const getOrientation = createMemo(() => access(local.orientation) ?? SCANLINE_ANIMATION_DEFAULTS.orientation);
 
@@ -19,7 +19,6 @@ export const ScanlineAnimation = (props: ScanlineAnimationProps) => {
                     ? { row: 1, col: access(local.lineCount) }
                     : { row: access(local.lineCount), col: 1 }
             }
-            computeSliceAnimation={(defs, timeline) => local.computeSliceAnimation(defs, timeline)}
         />
     );
 };

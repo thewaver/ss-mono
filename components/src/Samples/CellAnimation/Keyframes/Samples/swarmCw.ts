@@ -1,7 +1,7 @@
-import type { CellAnimationFn } from "../../../../Generators/CellAnimationKeyframes/CellAnimationKeyframes.types";
-import { CellAnimationKeyframeUtils } from "../../../../Generators/CellAnimationKeyframes/CellAnimationKeyframes.utils";
+import type { SliceAnimationFn } from "../../../../Generators/SliceAnimationKeyframes/SliceAnimationKeyframes.types";
+import { SliceAnimationKeyframeUtils } from "../../../../Generators/SliceAnimationKeyframes/SliceAnimationKeyframes.utils";
 
-export const swarmCw: CellAnimationFn = CellAnimationKeyframeUtils.fromStops([
+export const swarmCw: SliceAnimationFn = SliceAnimationKeyframeUtils.fromStops([
     { at: 0, translateX: -200, translateY: -200, scaleX: 0, scaleY: 0, rotate: -360 },
     { at: 0.1, translateX: 200, translateY: -200, scaleX: 5, scaleY: 5, rotate: -360 },
     { at: 0.2, translateX: 200, translateY: 200, scaleX: 10, scaleY: 10, rotate: -320 },

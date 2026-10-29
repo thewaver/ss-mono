@@ -1,6 +1,6 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { demo } from "./helpers";
+import { demo, useElementRenderer } from "./helpers";
 
 /**
  * Each example on the page has its own pause button and scrubber, driving its own playback and progress. The lines'
@@ -52,6 +52,7 @@ const readScrubbedKeys = async (page: Page) => {
 };
 
 test.beforeEach(async ({ page }) => {
+    await useElementRenderer(page);
     await page.goto("/scanline-animation");
     await expect(page.locator("[data-example]").first()).toBeVisible();
 });

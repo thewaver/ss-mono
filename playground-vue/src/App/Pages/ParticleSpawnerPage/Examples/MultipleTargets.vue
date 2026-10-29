@@ -2,7 +2,10 @@
 import { type ComponentPublicInstance, shallowRef, useModel } from "vue";
 
 import { ParticleSpawner, toElement } from "@thewaver/ss-components-vue";
-import { computeParticleGlow } from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.const";
+import {
+    computeParticleAnimation,
+    createParticleSrc,
+} from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.css";
 
 import type { ParticleSpawnerExampleProps } from "../ParticleSpawnerPage.types";
@@ -25,11 +28,7 @@ const targetRefSetters = TARGET_TOPS.map((_, index) => (target: Element | Compon
     targetRefs.value = targetRefs.value.map((ref, refIndex) => (refIndex === index ? element : ref));
 });
 
-const computeParticleStyle = (t: number) => {
-    const glow = computeParticleGlow(t);
-
-    return { opacity: glow.opacity, transform: `scale(${glow.scale})` };
-};
+const particleSrc = createParticleSrc();
 </script>
 
 <template>
@@ -54,11 +53,10 @@ const computeParticleStyle = (t: number) => {
                 :spawn-iteration-patterns="spawnIterationPatterns"
                 :compute-particle-pos="computeParticlePos"
                 :targets="targetRefs"
-            >
-                <template #renderParticle="{ t }">
-                    <div :class="styles.particle" :style="computeParticleStyle(t)" />
-                </template>
-            </ParticleSpawner>
+                :src="particleSrc"
+                :compute-particle-animation="computeParticleAnimation"
+                :renderer="renderer"
+            />
         </div>
     </div>
 </template>

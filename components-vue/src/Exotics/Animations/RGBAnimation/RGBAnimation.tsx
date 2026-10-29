@@ -8,18 +8,29 @@ import {
     RGB_ANIMATION_DEFAULTS,
     type SVGColorMixing,
     SVGFilterDefs,
+    SliceAnimationUtils,
+    SliceRendererStyles,
+    SliceRendererUtils,
 } from "@thewaver/ss-components";
 import { RGBAnimationConst } from "@thewaver/ss-components/internal";
+import { MathUtils, Size2d } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { ElementObserverVueUtils } from "../../../Abstracts/ElementObserver/ElementObserverVue.utils";
 import { InteractionTrackerVueUtils } from "../../../Abstracts/InteractionTracker/InteractionTrackerVue.utils";
+import { SliceRendererVueUtils } from "../../../Abstracts/SliceRenderer/SliceRendererVue.utils";
+import { useViewportContext } from "../../../Abstracts/Viewport/Viewport.context";
 import { watchAfterRender } from "../../../Utils/effectUtils";
 import { declareProps, useTwoWay } from "../../../Utils/propUtils";
 import type { RGBAnimationProps } from "./RGBAnimation.types";
 
+const WHOLE_PASS = { half: 0.5, isDescending: false };
+const LINEAR = SliceRendererUtils.computeEasing(undefined);
+
 export const RGBAnimation = defineComponent(
     (props: RGBAnimationProps) => {
+        const viewportContext = useViewportContext();
+
         const getDurationMs = () => props.animationDurationMs ?? RGB_ANIMATION_DEFAULTS.animationDurationMs;
         const getIterationCount = () => props.animationIterationCount ?? RGB_ANIMATION_DEFAULTS.animationIterationCount;
         const getIterationDelayMs = () =>
@@ -29,6 +40,7 @@ export const RGBAnimation = defineComponent(
 
         const rootRef = shallowRef<HTMLDivElement>();
         const imgRef = shallowRef<HTMLImageElement>();
+        const canvasRef = shallowRef<HTMLCanvasElement>();
         const channelRefs: HTMLElement[] = [];
 
         const isPageHidden = InteractionTrackerVueUtils.usePageHidden();
@@ -37,6 +49,7 @@ export const RGBAnimation = defineComponent(
         const progress = useTwoWay(props, "progress", RGBAnimationConst.NO_PROGRESS);
         const currentIteration = shallowRef(RGBAnimationConst.FIRST_ITERATION);
         const schemeMixing = shallowRef<SVGColorMixing>(RGBAnimationUtils.readColorMixing(undefined));
+        const shownSize = shallowRef<Size2d>({ width: 0, height: 0 });
 
         const rootSize = ElementObserverVueUtils.useBorderBoxSize(imgRef);
 
@@ -44,8 +57,56 @@ export const RGBAnimation = defineComponent(
 
         const evaluationDefs = computed(() => RGBAnimationUtils.computeEvaluationDefs(rootSize.value));
 
+        const renderer = computed(() => props.renderer ?? RGB_ANIMATION_DEFAULTS.renderer);
+
+        const isElementsOnly = computed(() => renderer.value === "elements");
+
+        const isAvailable = SliceRendererVueUtils.useIsAvailable(isElementsOnly);
+
+        const picture = SliceRendererVueUtils.usePicture(() => props.src, isElementsOnly);
+
+        const tables = computed(() =>
+            isElementsOnly.value
+                ? undefined
+                : SliceAnimationUtils.resolveTables(
+                      props.computeSliceAnimation,
+                      evaluationDefs.value.map(RGBAnimationUtils.toSliceDefs),
+                  ),
+        );
+
+        const isOnGraphicsCard = computed(
+            () => isAvailable.value && SliceRendererUtils.getCanDraw(renderer.value, picture.value) && !!tables.value,
+        );
+
+        const item = SliceRendererVueUtils.useItem(canvasRef, isAvailable);
+
+        const rendererSlices = computed(() => {
+            const size = rootSize.value;
+
+            return (tables.value?.tableIndices ?? []).map((table) => ({
+                left: 0,
+                top: 0,
+                width: size.width,
+                height: size.height,
+                weight: 0,
+                table,
+            }));
+        });
+
+        const area = computed(() => {
+            const size = rootSize.value;
+            const reach = SliceRendererUtils.computeReach(tables.value?.tables ?? [], size, size);
+
+            return { x: -reach, y: -reach, width: size.width + 2 * reach, height: size.height + 2 * reach };
+        });
+
         const isRunning = computed(
-            () => isPlaying.value && !isPageHidden.value && currentIteration.value < getIterationCount(),
+            () =>
+                isPlaying.value &&
+                !isPageHidden.value &&
+                currentIteration.value < getIterationCount() &&
+                !!rootRef.value &&
+                (!isOnGraphicsCard.value || !!item.value),
         );
 
         let drawnSrc = props.src;
@@ -62,10 +123,10 @@ export const RGBAnimation = defineComponent(
             progress.value = RGBAnimationConst.NO_PROGRESS;
         });
 
-        watchAfterRender([progress, evaluationDefs], ([currentProgress, defs]) => {
+        watchAfterRender([progress, evaluationDefs, isOnGraphicsCard], ([currentProgress, defs, isOnCard]) => {
             const root = rootRef.value;
 
-            if (!root) return;
+            if (!root || isOnCard) return;
 
             RGBAnimationUtils.drawFrame(
                 root,
@@ -77,10 +138,46 @@ export const RGBAnimation = defineComponent(
             );
         });
 
+        watchAfterRender(
+            [item, progress, tables, rendererSlices, area, rootSize, colorMixing, isOnGraphicsCard, picture],
+            ([currentItem, currentProgress, currentTables, slices, currentArea, size, channelMixing, isOnCard]) => {
+                const root = rootRef.value;
+
+                if (!root || !currentItem || !isOnCard) return;
+
+                const timeline = MathUtils.clamp01(currentProgress);
+
+                if (props.computeRootAnimation) {
+                    SliceAnimationUtils.assignAnimationProps(root, props.computeRootAnimation(timeline));
+                }
+
+                const scale = window.devicePixelRatio * viewportContext.getScale();
+                const shown = currentItem.draw({
+                    mode: "slices",
+                    src: props.src,
+                    tables: currentTables?.tables ?? [],
+                    easing: LINEAR,
+                    slices,
+                    size,
+                    area: currentArea,
+                    scale,
+                    timeline,
+                    half: WHOLE_PASS.half,
+                    isDescending: WHOLE_PASS.isDescending,
+                    isShown: true,
+                    hasPerspective: true,
+                    channelMixing,
+                });
+                const next = { width: shown.width / scale, height: shown.height / scale };
+
+                if (!Size2d.isSame(shownSize.value, next)) shownSize.value = next;
+            },
+        );
+
         watchAfterRender([isRunning], ([running]) => {
             if (!running) return;
 
-            return CellAnimationUtils.runPasses({
+            return SliceAnimationUtils.runPasses({
                 getProgress: () => progress.value,
                 setProgress: (value) => {
                     progress.value = value;
@@ -133,34 +230,55 @@ export const RGBAnimation = defineComponent(
                         </defs>
                     </svg>
 
-                    <div
-                        class={RGBAnimationStyles.rgbAnimationContainer}
-                        style={{
-                            ...assignInlineVars({
-                                [RGBAnimationStyles.channelSrcVar]: CellAnimationUtils.toSourceImage(props.src),
-                            }),
-                            width: `${size.width}px`,
-                            height: `${size.height}px`,
-                            perspective: CellAnimationUtils.computePerspective(size),
-                        }}
-                    >
-                        {RGB_ANIMATION_CHANNELS.map((channel, index) => (
-                            <div
-                                key={channel}
-                                ref={(el) => {
-                                    if (el) channelRefs[index] = el as HTMLElement;
+                    {isOnGraphicsCard.value ? (
+                        <div
+                            key="canvas"
+                            class={RGBAnimationStyles.rgbAnimationContainer}
+                            style={{ width: `${size.width}px`, height: `${size.height}px` }}
+                        >
+                            <canvas
+                                ref={canvasRef}
+                                class={SliceRendererStyles.sliceRendererCanvas}
+                                style={{
+                                    left: `${area.value.x}px`,
+                                    top: `${area.value.y}px`,
+                                    width: `${shownSize.value.width}px`,
+                                    height: `${shownSize.value.height}px`,
                                 }}
-                                class={RGBAnimationStyles.rgbAnimationChannel}
-                                style={{ mixBlendMode: blendMode }}
                                 aria-hidden="true"
-                            >
+                            />
+                        </div>
+                    ) : (
+                        <div
+                            key="channels"
+                            class={RGBAnimationStyles.rgbAnimationContainer}
+                            style={{
+                                ...assignInlineVars({
+                                    [RGBAnimationStyles.channelSrcVar]: CellAnimationUtils.toSourceImage(props.src),
+                                }),
+                                width: `${size.width}px`,
+                                height: `${size.height}px`,
+                                perspective: CellAnimationUtils.computePerspective(size),
+                            }}
+                        >
+                            {RGB_ANIMATION_CHANNELS.map((channel, index) => (
                                 <div
-                                    class={RGBAnimationStyles.rgbAnimationChannelPicture}
-                                    style={{ filter: `url(#${filterId}-${channel})` }}
-                                />
-                            </div>
-                        ))}
-                    </div>
+                                    key={channel}
+                                    ref={(el) => {
+                                        if (el) channelRefs[index] = el as HTMLElement;
+                                    }}
+                                    class={RGBAnimationStyles.rgbAnimationChannel}
+                                    style={{ mixBlendMode: blendMode }}
+                                    aria-hidden="true"
+                                >
+                                    <div
+                                        class={RGBAnimationStyles.rgbAnimationChannelPicture}
+                                        style={{ filter: `url(#${filterId}-${channel})` }}
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
             );
         };
@@ -179,6 +297,7 @@ export const RGBAnimation = defineComponent(
             "onUpdate:playback": null,
             "progress": null,
             "onUpdate:progress": null,
+            "renderer": null,
             "computeRootAnimation": null,
             "computeSliceAnimation": null,
             "onIterationEnd": null,

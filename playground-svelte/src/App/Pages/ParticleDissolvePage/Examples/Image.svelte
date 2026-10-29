@@ -1,11 +1,10 @@
 <script lang="ts">
     import { Button, ParticleDissolve } from "@thewaver/ss-components-svelte";
-    import { computeAshAnimation } from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.const";
+    import { ASH_ANIMATION, ASH_SRC } from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.const";
     import * as styles from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.css";
     import knight from "@thewaver/ss-playground/App/knight.webp";
 
     import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.svelte";
-    import AshParticle from "../AshParticle.svelte";
     import type { ParticleDissolveAngleExampleProps } from "../ParticleDissolvePageSvelte.types";
 
     type Props = ParticleDissolveAngleExampleProps;
@@ -24,13 +23,10 @@
         featherShare={props.featherShare}
         spawnChance={props.spawnChance}
         cellSize={props.cellSize}
-        computeParticleAnimation={computeAshAnimation}
+        src={ASH_SRC}
+        computeParticleAnimation={ASH_ANIMATION}
     >
         <img class={styles.image} src={knight} alt={"A knight"} />
-
-        {#snippet renderParticle(defs)}
-            <AshParticle {defs} />
-        {/snippet}
     </ParticleDissolve>
 
     <div class={styles.buttonRow}>

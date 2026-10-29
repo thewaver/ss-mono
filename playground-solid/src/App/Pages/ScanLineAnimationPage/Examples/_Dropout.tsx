@@ -1,16 +1,14 @@
 import { createMemo } from "solid-js";
 
 import {
-    CellAnimationBreakpointUtils,
-    CellAnimationKeyframeUtils,
-    CellAnimationWeights,
     ScanlineAnimation,
     ScanlineAnimationKeyframes,
+    SliceAnimationWeights,
     access,
 } from "@thewaver/ss-components-solid";
 import type {
     AccessorProps,
-    CellAnimationBreakpointOpts,
+    SliceAnimationBreakpointOpts,
     _ScanlineHorizontalDropoutOpts,
 } from "@thewaver/ss-components-solid";
 
@@ -20,7 +18,7 @@ const WEIGHT_ORIGIN = { row: 0, col: 0 };
 
 type Props = ScanlineAnimationExampleProps &
     AccessorProps<{
-        breakpointOpts: CellAnimationBreakpointOpts;
+        breakpointOpts: SliceAnimationBreakpointOpts;
         keyframeOpts: _ScanlineHorizontalDropoutOpts;
     }>;
 
@@ -30,18 +28,11 @@ export const DropoutExample = ({ keyframeOpts, breakpointOpts, weightType, ...ot
     return (
         <ScanlineAnimation
             {...otherProps}
-            computeCellWeights={(count) =>
-                CellAnimationWeights.computeCellWeights(access(weightType), count, WEIGHT_ORIGIN)
+            computeSliceWeights={(count) =>
+                SliceAnimationWeights.computeSliceWeights(access(weightType), count, WEIGHT_ORIGIN)
             }
-            computeSliceAnimation={(defs, timeline) =>
-                CellAnimationKeyframeUtils.computeAnimation(
-                    getAnimation(),
-                    CellAnimationBreakpointUtils.computeBreakpoints(defs.weight, access(breakpointOpts)),
-                    { ...defs, origin: WEIGHT_ORIGIN },
-                    timeline,
-                    access(breakpointOpts).easing,
-                )
-            }
+            breakpointOpts={breakpointOpts}
+            computeSliceAnimation={getAnimation()}
         />
     );
 };

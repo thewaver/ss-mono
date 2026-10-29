@@ -1,4 +1,7 @@
-import type { CSSAnimationValues, Index2d, Point2d, Rect, Size2d } from "@thewaver/ss-utils";
+import type { Index2d, Point2d, Rect, Size2d } from "@thewaver/ss-utils";
+
+import type { SliceAnimationRenderer } from "../../../Abstracts/SliceAnimation/SliceAnimation.types";
+import type { SliceAnimationFn } from "../../../Generators/SliceAnimationKeyframes/SliceAnimationKeyframes.types";
 
 export type ParticleFieldCellDefs = {
     pos: Index2d;
@@ -20,6 +23,11 @@ export type ParticleFieldParticle = {
 };
 
 export type BaseParticleFieldValues = {
+    /**
+     * The picture every particle is drawn with, at its cell's size. A white picture takes any color through
+     * `computeParticleTint`; a picture of its own, a butterfly rather than a dot, is drawn as it is.
+     */
+    src: string;
     /**
      * How many cells the field is split into, across and down. A cell holds at most one particle at a time, so this is
      * also the most particles the field can show at once.
@@ -43,6 +51,16 @@ export type BaseParticleFieldValues = {
     shapeJoinRadii?: number[];
     /** How square or how pinched each rounded corner of the area is, as `Shape` takes it. */
     shapeLameExponents?: number[];
+    /** The cell a sample measures from — the center its zones and its own geometry take. */
+    origin?: Index2d;
+    /**
+     * What draws the particles. `"graphics_card"` draws them into one canvas and falls back to page elements by itself
+     * wherever it cannot: no WebGL 2, a sample written by hand rather than built by `SliceAnimationKeyframeUtils`, a
+     * picture whose server gives no cross-origin permission, or a moment the browser has taken the graphics card away.
+     * `"elements"` always draws each particle as an element of its own, which keeps an animated picture playing — the
+     * graphics card draws only its first frame.
+     */
+    renderer?: SliceAnimationRenderer;
 };
 
 export type BaseParticleFieldCbs = {
@@ -63,10 +81,16 @@ export type BaseParticleFieldCbs = {
      */
     computeParticlePos?: (defs: ParticleFieldCellDefs) => Point2d;
     /**
-     * What one particle does over its life, `0` as it appears and `1` as it is removed — the same values
-     * `CellAnimation` takes for a cell, so its keyframe samples play here too.
+     * The sample one particle plays over its life, from `0` as it appears to `1` as it is removed, handed the cell it
+     * spawned in — the same samples `CellAnimation` plays on a cell. A sample built by `SliceAnimationKeyframeUtils` can
+     * be drawn on the graphics card; one written by hand plays on page elements.
      */
-    computeParticleAnimation?: (defs: ParticleFieldCellDefs, t: number) => CSSAnimationValues;
+    computeParticleAnimation?: SliceAnimationFn;
+    /**
+     * The color one particle is multiplied by, as CSS writes it, asked once as it appears. A picture tinted red stays
+     * the same picture, only redder; left out, the picture is drawn as it is.
+     */
+    computeParticleTint?: (defs: ParticleFieldCellDefs) => string;
     /** Runs at the end of each pass. */
     onIterationEnd?: () => void;
     /** Runs once every pass is done. */

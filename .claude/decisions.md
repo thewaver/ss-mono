@@ -157,7 +157,7 @@ is that the export list is now load-bearing: a component missing from `index.ts`
 instead of going unnoticed. The user's call, taken with the cost below on the table.
 
 **There is no alias into `components/src` any more.** `@components/…` existed for one reason: twenty
-`CellAnimationWeights` samples and one `CellAnimationZones` const reached `CellAnimationUtils` as a leaf module
+`SliceAnimationWeights` samples and one `CellAnimationZones` const reached `CellAnimationUtils` as a leaf module
 rather than through `index.ts`, because their unit tests run in plain Node and loading the whole library there
 calls Solid's `delegateEvents` at module scope and dies without a `window`. Moving the samples into
 `components/src` made that an ordinary relative import inside one package, so the alias, its three definition
@@ -1644,7 +1644,7 @@ the other pages copy. Taken on Claude's judgment under the unsupervised port.
 
 - **`LightCatcher`, `ShadowCaster` and `Tilter` share one `PointerEffectsUtils`** in the parent `PointerEffects` folder,
   which held no namespace of its own, since they share the resting rule and the edge falloff; its functions apply each
-  component's defaults, so either view passes its props straight through. **`CellAnimationUtils.runPasses` is the one
+  component's defaults, so either view passes its props straight through. **`SliceAnimationUtils.runPasses` is the one
   pass clock** that `CellAnimation` and `ParticleField` each used to carry a copy of; `TrailUtils.run`,
   `ScratchCardUtils.createMeasureScheduler`, `ParticleFieldUtils.createRoster`, `ParticleSpawnerUtils.createEngine` and
   the new `RevealUtils` took over what the Solid views' effects did.
@@ -1743,8 +1743,8 @@ The user's restructure. Every registry is `<Component>/<Part>` — `CellAnimatio
 that have samples, and a second part slots in beside the first without a folder having to be invented later.
 Three of the four parents hold a single child, which is the point rather than an accident.
 
-**Only the folder names are short; files keep their full names.** `CellAnimation/Weights/CellAnimationWeights.const.ts`
-still exports `CellAnimationWeights`, and no name in the published API moved. The user's call between that and
+**Only the folder names are short; files keep their full names.** `SliceAnimation/Weights/SliceAnimationWeights.const.ts`
+still exports `SliceAnimationWeights`, and no name in the published API moved. The user's call between that and
 shortening the files too, which would have broken the file-is-named-after-its-namespace rule for a folder depth
 that already says `CellAnimation`.
 
@@ -2135,7 +2135,7 @@ component-driven. Not outstanding work — the argument, so it is not re-derived
 - **`CellAnimationUtils`** is two things. `assignAnimationProps` writes ordered transforms and filters
   onto an element and already reads `CSSConst.ANIMATION_UNITS`, so it is the missing writer half of
   something that package owns; the four parity predicates are grid tiling and belong with the weights.
-- **`SlideButtonUtils`** and half of **`CellAnimationWeightUtils`** mostly dissolved into `clamp01` and
+- **`SlideButtonUtils`** and half of **`SliceAnimationWeightUtils`** mostly dissolved into `clamp01` and
   `normalize`. What is left of the first is a thumb sliding in a track, which is `SlideButton`'s.
 - **`radar` and `spiral` should not go at all**: real algorithms, but tuned by a `SweepDefs` record — a
   quadrant count and one multiplier per clock direction (`clockDownMul`, `clockRightMul`, `clockUpMul`,
@@ -4142,24 +4142,24 @@ _"A family is a folder"_ has it. The menu's `Generators` section mirrors that, w
 was and a page each for the layouts and the effects.
 
 **The breakpoint and zone tables became generators of their own, split by what they hold.** They arrived as
-`CellAnimationBreakpoints.const.ts` and `CellAnimationZones.const.ts`, each one namespace mixing constant
+`SliceAnimationBreakpoints.const.ts` and `CellAnimationZones.const.ts`, each one namespace mixing constant
 lists, types and callable functions — so the Docs view skipped the functions, being `.const`, and nothing
 documented them. The user's call: the lists stay in the `.const.ts`, the types go to a `.types.ts` as
-top-level names (`CellAnimationEasing`, `CellAnimationBreakpointTriple`, `CellAnimationZoneType`), and the
-functions go to a documented `.utils.ts` as `CellAnimationBreakpointUtils` and `CellAnimationZoneUtils`. They
+top-level names (`SliceAnimationEasing`, `SliceAnimationBreakpointTriple`, `CellAnimationZoneType`), and the
+functions go to a documented `.utils.ts` as `SliceAnimationBreakpointUtils` and `CellAnimationZoneUtils`. They
 got a folder each rather than joining `CellAnimationKeyframes`, which reads both, because
 _"One namespace per folder"_ in `conventions.md` would otherwise have put three namespaces of functions in one
 folder, and because `ScanlineAnimation` times its lines with the breakpoints too and should not have to reach
 into the cell-animation keyframes to do it.
 
-**`CellAnimationPlayback` joined them in the file-kind sweep that followed.** Its functions turn elapsed
+**`SliceAnimationPlayback` joined them in the file-kind sweep that followed.** Its functions turn elapsed
 time into a timeline position for any duration and direction the caller has, which is the reusable side of
 _"A small thing used only where it is declared stays there"_ in `conventions.md`, so it took the breakpoints'
-shape: `DIRECTIONS` in the `.const.ts`, `CellAnimationPlaybackDirection` and `CellAnimationPlaybackOpts` in the
-`.types.ts`, `CellAnimationPlaybackUtils` in a documented `.utils.ts`, and a page under `Generators`.
+shape: `DIRECTIONS` in the `.const.ts`, `SliceAnimationPlaybackDirection` and `SliceAnimationPlaybackOpts` in the
+`.types.ts`, `SliceAnimationPlaybackUtils` in a documented `.utils.ts`, and a page under `Generators`.
 
 **The rest of that sweep found everything outside `Samples` already in order, and most of `Samples` stays.** The
-registry lookups (`CellAnimationKeyframes.computeAnimation`, `CellAnimationWeights.computeCellWeights`,
+registry lookups (`CellAnimationKeyframes.computeAnimation`, `SliceAnimationWeights.computeSliceWeights`,
 `CellAnimationOrigins.computeOrigin`, `Timed.toConfig`), every `SampleKey` and the samples that are themselves
 functions stay in their `.const.ts`, being local to the table they serve. So do `SVGAnimationTracks` and
 `BracketConnectorPaths.getSpine`, small helpers that exist for the entries beside them. Two things moved.
@@ -8832,16 +8832,16 @@ never thought of, or a distribution driven by their own data, had no way in. All
 consumer asked for — the requested count is clamped against the measured pixel size, since cells thinner
 than a pixel cannot draw. A weight grid built from the consumer's own numbers would be the wrong shape
 whenever that clamp bites, and a wrong shape breaks indexing, so the component hands the effective count to
-`computeCellWeights`. Missing weights fall back to `0` per cell rather than throwing.
+`computeSliceWeights`. Missing weights fall back to `0` per cell rather than throwing.
 
 **The origin never enters the library at all, not even as data on the defs.**
-`CellAnimationEvaluationDefs` is `{ pos, count, weight, size }`; a consumer needing an origin merges their
+`SliceAnimationEvaluationDefs` is `{ pos, count, weight, size }`; a consumer needing an origin merges their
 own in at the call site, as the Playground's `DefaultExample` does. A threaded origin would be a value the
 component stores, validates and re-renders on while never reading it — API surface that only forwards. The
 consumer already holds the point, having computed the weights from it.
 
 Two consequences. Whoever wants origin-aware zones or keyframes types their own defs as
-`CellAnimationEvaluationDefs & { origin: Point2d }`, which is what `CellAnimationZones.isInZone` and
+`SliceAnimationEvaluationDefs & { origin: Point2d }`, which is what `CellAnimationZones.isInZone` and
 `CellAnimationKeyframes.computeAnimation` take. And a consumer whose origin is derived from the grid must
 derive it from the count they requested, not the count the component settled on — the one place this shape
 is weaker than threading the value.
@@ -8898,7 +8898,7 @@ a distance rather than measure one.
 **`getFarthestBound` is not a drop-in for the old `getMaxDistance`.** It reports the honest `0` on a
 single-cell grid where the original floored at `1`. Every distance-based weight divides by that number, so
 the floor is what stops a 1×1 grid producing `Infinity` — a property of the weight functions rather than the
-geometry, so it lives in `CellAnimationWeights.const.ts`. `computeCellWeights` is pinned on a 1×1 grid so a
+geometry, so it lives in `SliceAnimationWeights.const.ts`. `computeSliceWeights` is pinned on a 1×1 grid so a
 future simplification that drops it fails loudly.
 
 **An anchor is a translate, not a new value key.** Scaling or rotating about an anchor `a` equals the
@@ -8937,7 +8937,7 @@ collection and the user's verdict on most of them was that they look repetitive,
 of adding a fifth circle rather than a failure of the individual samples. **What pays off instead is machinery
 that recombines what is already there**: an operator over any weight, or a combinator over any two animations,
 multiplies the collection without adding anything that looks like its neighbor. `shouldMakeUnique` and
-`shouldNormalize` on `computeCellWeights` are already this pattern, and `fromZones` is the first one on the
+`shouldNormalize` on `computeSliceWeights` are already this pattern, and `fromZones` is the first one on the
 animation side. Ideas of that kind, graded but not built, are in `backlog.md` under **_Open discussion_**.
 
 **The three ring metrics are diamond, circle and rectangle, and two of them were called the wrong thing.** What
@@ -9095,9 +9095,9 @@ and `random_clustered` interpolates a hash over four-cell blocks, which is the o
 blob. A flat hash of the cell's coordinates was built as well, and its only distinction from `random_default` was
 that it repeated; once the user chose a pattern that never repeats, a freshly seeded flat hash is a slower
 `Math.random()` giving a statistically identical picture, so it was dropped rather than kept as a duplicate.
-`random_clustered` takes a seed, and the seed is drawn once per `computeCellWeights` call: a cluster needs
+`random_clustered` takes a seed, and the seed is drawn once per `computeSliceWeights` call: a cluster needs
 neighboring cells to agree on it, and a never-repeating pattern cannot fix it at module load either. That is
-the one piece of mutable state in the collection, it lives in `CellAnimationWeightUtils` beside the hash, and
+the one piece of mutable state in the collection, it lives in `SliceAnimationWeightUtils` beside the hash, and
 `FIXED_HASH_SEED` is there for the callers that want the opposite — `_computeHorizontalDropout` picks which
 scanlines drop out and is called every frame, so a seed that moved would reshuffle the dropout mid-animation.
 
@@ -9194,7 +9194,7 @@ while it was under review, rather than in a group of its own — which is the co
 make possible. Nothing in the `CellAnimation` collections carries it now; the `ScanlineAnimation` keyframe
 builders still do.
 
-### `CellAnimationPlayback`: which way a pass runs, and why the duration it is given is one-way
+### `SliceAnimationPlayback`: which way a pass runs, and why the duration it is given is one-way
 
 **Running a pass out and back is not a breakpoint, so it is not in `BreakpointOpts`.** `computeBreakpoints`
 turns one cell's weight into the slice of the global timeline that cell animates in; playback direction decides
@@ -9248,8 +9248,8 @@ the pause between iterations, and for a pass that returns to where it started, t
 near end. A second control for it would be two knobs over one gap.
 
 **Two things are called direction, and the collision is accepted.**
-`CellAnimationBreakpoints.Direction` is `asc`/`desc` and says which cell goes first;
-`CellAnimationPlayback.Direction` says which way the pass runs and whether it comes back. Both are namespaced, and the
+`SliceAnimationBreakpoints.Direction` is `asc`/`desc` and says which cell goes first;
+`SliceAnimationPlayback.Direction` says which way the pass runs and whether it comes back. Both are namespaced, and the
 Playground labels them _Direction_ and _Playback direction_.
 
 **The drawn gradient and pattern sources are timed to the cycle, not to the leg.** Those two examples serialize
@@ -9343,6 +9343,89 @@ page's examples at random at its starting settings, where ScanlineAnimation's sp
 screen, and the stress tests, which run dozens at once. On a drawn source (`CellAnimation`'s gradient or pattern)
 the colors inside the picture keep moving while the cells are paused, because they animate on the source's own
 clock; a scrub moves the cells only.
+
+### Slice animations: a component takes the recipe, and draws it on the graphics card when it can
+
+Covers `CellAnimation`, `ScanlineAnimation`, `RGBAnimation`, `ParticleField`, `ParticleDissolve` and, in part,
+`ParticleSpawner`; the shared machinery is `SliceAnimationUtils` and `SliceRendererUtils`.
+
+**A component takes the sample, not an evaluator — the user's call, after the alternative was argued.**
+`computeSliceAnimation` and `computeParticleAnimation` keep their names (every sample-taking prop in the library is
+a `compute*`, as `computeEffect` and `computeLayout` are) but take a `SliceAnimationFn` itself, and `CellAnimation`
+and `ScanlineAnimation` take `breakpointOpts`, `playbackOpts` and `origin` beside it and work each slice's window out
+themselves (`SliceAnimationUtils.computeTiming`, `computeValues`). Before, every example assembled the window, the
+playback and the origin into an evaluator of its own, and the library could see only a function. The rejected
+alternative kept the evaluator and had a helper tag it with what it was built from; wrapping the helper's result in
+an arrow, as every example did, would have silently dropped it to page elements. The argument that carried it: when
+a slice's turn comes is the component's business, since it already holds the weights. `RGBAnimation` plays every
+channel over the whole pass; a scanline or cell sample that wants the whole pass sets `smoothness: 1`.
+
+**The scanline samples are tables, the same input the cell samples take** — the user's call, which leaves one row
+(or one column) of cells as the only difference between the two components. They were hand-written functions given a
+line's window and the timeline, several with randomness of their own; a line that needs a table of its own (Glitch's
+shifts, Dropout's hashed lines, a phase per line) gets it from `fromSlices`. That is also what lets them reach the
+graphics card.
+
+**A sample exposes its tables by remembering what it was built from.** `fromStops`, `fromZones` and `fromSlices`
+register their inputs in a module-level `WeakMap` keyed by the returned function; `getDefinition` reads it back and
+`resolveStops` follows zones and per-slice stops down to one slice's table. `SliceAnimationUtils.resolveTables` asks
+for every slice once per grid and keeps each distinct table once. A function written by hand has no definition, and
+neither does any sample whose zones reach one, so `resolveTables` answers `undefined` and the component draws with
+elements. `fromSlices` asks its function for each slice's stops once per grid and caches by the array returned, so
+the function must return the same array for the same slice for as long as the sample is in use.
+
+**The renderer, as built.** One WebGL 2 context on an `OffscreenCanvas` serves the page, since browsers keep only a
+few contexts alive and the stress tests run 72 to 96 components. The tables go up as a small float texture, one row
+per table plus a row for the easing curve, and the shader interpolates them per slice per frame, in three modes:
+slices whose window comes from their weight, particles whose life comes from when they spawned, and particles whose
+values JavaScript worked out (`ParticleSpawner`, whose path is a function). **A component's picture is handed over,
+never copied**: each item draws into the bottom-left corner of the shared canvas, which only grows, and moves the
+whole picture into the component's own canvas through a `bitmaprenderer` context, the canvas element sized to the
+picture with its unused part see-through. Measured in a real window during the proof of concept, both alternatives
+lost: resizing the shared canvas per component reallocated it once per component per frame (a scanline test fell to
+16 frames a second), and copying the region out cost about two thirds of the frame rate on the cells and the
+spawners. **A canvas reaches past its box** by `computeReach`, which counts only what moves a slice past the box —
+travel, growth, turning, nearness under perspective, blur — because a first, generous bound made the scanline
+canvases six times their box and cost most of their frame rate. Its formula and the spawner's area step
+(`ParticleSpawnerUtils.growArea`) are Claude's guesses, checked only by the pictures matching. **The table texture's
+limits throw** rather than draw something wrong. **Accepted as close enough**, all from the proof of concept: blur
+is a pre-shrunk copy of the picture with softened edges rather than an exact blur; curved RGB effects are sampled at
+33 points; multiply mixing over a see-through picture skips one term of the blend; the scanline samples Wave and
+Interlace follow each line's own window rather than the whole pass, so they look different from their old
+hand-written forms; and the picture is always sampled smoothly, where Chrome samples a moving 2D element jaggedly.
+
+**When it falls back to elements, and the `renderer` prop.** Both renderers stay, the graphics card the default —
+the user's call, "for now". A component draws with elements when asked to (`renderer: "elements"`), where there is no
+WebGL 2 in an offscreen canvas (Safari before 17), when its sample has no tables, when the picture's server refuses
+cross-origin permission, and while the browser has taken the context away. The picture is requested with
+`crossOrigin = "anonymous"`, since the graphics card may not read a picture without it; a refusal gets a second,
+plain request so the size is still known, and a warning names the address. A lost context is rebuilt when the
+browser gives it back (`webglcontextlost` is prevented so that it can), and every component hears both through
+`SliceRendererUtils.subscribe`. **An animated picture freezes on the graphics card**, and `renderer: "elements"` is
+the way to keep it playing — the user's choice over detecting it and falling back silently, since detection is
+missing from Safari. Where `ImageDecoder` exists, a picture whose address names a format that can hold frames is
+fetched once and warned about if it has more than one; an SVG is not checked, since `ImageDecoder` cannot read one.
+
+**A canvas sits where the elements sat** — the user's call. It is a child of the component's root, as the particle
+and cell elements are, so it stacks and clips as they did: under a modal while the spawner is on the page, inside the
+modal while the spawner is in it. One canvas over the whole page was ruled out for exactly that stacking. It reaches
+as far as anything it draws travels, since particles leave their box on purpose (ash rising off a button, a spawner
+reaching a target elsewhere): `ParticleField` and `ParticleDissolve` from their tables, `ParticleSpawner` from its
+live particles each frame, growing in steps and starting again once none is left.
+
+**Checking it.** `.claude/gpuCompare.md` compares the two renderers headlessly, picture for picture, and
+`.claude/perfCompare.md` their frame rates in a real window. `e2e/graphicsCard.spec.ts` checks only which renderer
+drew; the component specs read single slices off the elements, with WebGL taken away (`useElementRenderer`).
+
+**Particles take a picture and a tint** — a tint rather than a color, because a picture is multiplied, not
+recolored: a butterfly tinted red stays a butterfly. No size prop, the user's call: `ParticleField` and `ParticleDissolve` draw a
+particle at its cell's size, `ParticleSpawner` at its picture's own size. A tint is multiplied into the picture; on
+elements that is the picture as a background over the tint with `background-blend-mode: multiply`, cut to the
+picture's shape with the same picture as a mask and the tint's alpha as an opacity. It differs from the graphics
+card only on a soft edge, where the element comes out slightly lighter. `ParticleDissolve` tints each particle with
+the color of the content it rose from, and a fully see-through tint where it found none. The spawner works its path
+and its look out in JavaScript on either renderer, so the graphics card draws only its scale, turn, fade and travel
+(`ParticleSpawnerUtils.toDirectValues`); a filter shows only on elements.
 
 ### `CellAnimation`: the screen wipe is an example, not a component
 
@@ -11383,7 +11466,7 @@ words, so this cannot be warned about; the requirement that a painter mark decor
 the other half. The Playground briefly used a visually-hidden span instead, which worked and is gone: it made
 every icon button carry a clip-rect idiom the consumer had to know.
 
-### The 0..1 guarantee belongs to `computeCellWeights`, not to each formula
+### The 0..1 guarantee belongs to `computeSliceWeights`, not to each formula
 
 Three formulas leave the range a weight is defined on, and always for the same reason: they are built for
 whole-number distances, and a centered origin on an even count makes the farthest bound a half-integer. `spiral`
@@ -11392,7 +11475,7 @@ subtracts its raw result from 1 and divides, so a result below 1 lifts the weigh
 `radar_double` -0.038 and `radar_quad` -0.083. `checkered_convergent` reached -0.071 on the same grid and -0.25 on
 every cell of a two-by-two.
 
-**So the clamp sits in `computeCellWeights`, once, on the user's call.** It is the only place that knows a
+**So the clamp sits in `computeSliceWeights`, once, on the user's call.** It is the only place that knows a
 weight is contractually a position on the timeline between 0 and 1, and per-formula clamps had already been
 added twice while a third case sat unnoticed. The two that existed are gone, so no formula clamps its own
 return any more, and a new sample cannot forget to.
@@ -13029,18 +13112,18 @@ gone; the line it drew is kept, now read as "unreadable in one file". Which regi
 produces files shorter than their own import headers — the same emptiness that unfolding the pattern factories
 avoided, from the other direction. They get a folder and keep their registry whole. The rule is the goal
 restated: split until a tab reads, and stop. Split so far: `SVGDefs` (2534 lines), `CellAnimation` (600),
-`CellAnimationWeights` (515). Left whole: `CellAnimationZones`, `CellAnimationOrigins`,
+`SliceAnimationWeights` (515). Left whole: `CellAnimationZones`, `CellAnimationOrigins`,
 `CellAnimation/Breakpoints`, `ScanlineAnimation/Keyframes`, the largest at 123 lines.
 
 **A Playground namespace may not share a name with a library one, and the source view is what makes that a
 rule.** The keyframe helpers were `CellAnimationUtils`, which `Lib/Exotics` already exports for something else
 entirely. Two namespaces of one name is legal and nothing imported both, so the collision cost nothing while the
 code was only ever read in an editor that could tell you which was which. A tab is read **out of context**,
-which is exactly the confusion a tab cannot resolve. The Playground one is now `CellAnimationKeyframeUtils`.
+which is exactly the confusion a tab cannot resolve. The Playground one is now `SliceAnimationKeyframeUtils`.
 
 Two smaller rules fell out, both house style everywhere else and broken only in the files this split created.
 **A `.utils.ts` exports a namespace**, like `InteractionTracker`, `TreeUtils` and `SelectUtils`; `SVGDefsUtils`
-and `CellAnimationWeightUtils` were bare exports and are not any more. And **the folder path names the
+and `SliceAnimationWeightUtils` were bare exports and are not any more. And **the folder path names the
 namespace it exports** — the keyframes folder was `CellAnimation/` while exporting `CellAnimationKeyframes`.
 Since the restructure the path carries it in two parts rather than one: `CellAnimation/Keyframes` exports
 `CellAnimationKeyframes`, and the file inside still holds the whole name. See _"How Samples is laid out"_.
@@ -14558,17 +14641,17 @@ either way, which is what a pointer-driven one needs.
 the `.const.ts`, and only code driven by a runtime string — the Playground's dropdowns — touches it.
 
 **Why file layout alone did not achieve this.** The samples were already one file each, and that made no
-difference to what a consumer pays for: `CellAnimationWeights.const.ts` imported all sixty back into a
-`Record<WeightType, WeightFn>` and `computeCellWeights` looked its entry up by a string. Splitting the registries
+difference to what a consumer pays for: `SliceAnimationWeights.const.ts` imported all sixty back into a
+`Record<WeightType, WeightFn>` and `computeSliceWeights` looked its entry up by a string. Splitting the registries
 was for the source-view tabs and remains justified on that ground alone.
 
-**What moved.** `computeCellWeights` (with its private `normalizeWeights` / `makeWeightsUnique`) went to
-`CellAnimationWeights.utils.ts` and now takes a `WeightFn`. `computeAnimation` went to
-`CellAnimationKeyframes.utils.ts` and now takes a `CellAnimationFn`. Each `.const.ts` exports its registry as
+**What moved.** `computeSliceWeights` (with its private `normalizeWeights` / `makeWeightsUnique`) went to
+`SliceAnimationWeights.utils.ts` and now takes a `WeightFn`. `computeAnimation` went to
+`CellAnimationKeyframes.utils.ts` and now takes a `SliceAnimationFn`. Each `.const.ts` exports its registry as
 `SAMPLE_WEIGHTS` / `SAMPLE_ANIMATIONS`, matching the `SAMPLE_CONFIGS` / `SAMPLE_LAYOUTS` / `SAMPLE_INDENTS`
 names the other registries already used.
 
-**The key-based call is kept, as a one-line forwarder in the registry module.** `CellAnimationWeights.computeCellWeights("line_row", …)` still works and every Playground call site is unchanged. This is not two APIs
+**The key-based call is kept, as a one-line forwarder in the registry module.** `SliceAnimationWeights.computeSliceWeights("line_row", …)` still works and every Playground call site is unchanged. This is not two APIs
 competing: the forwarder lives in the module that already costs the whole collection, so anyone paying for the
 registry keeps the ergonomic call, and anyone who wants one sample imports the sample and the utils module.
 
@@ -15967,7 +16050,7 @@ element around it, and blended back with `mix-blend-mode` inside an isolated con
 into the picture exactly. **The container does not clip**: what drifts past the picture spills past its box, which is
 the rule for anything that moves at rest-size.
 
-**It runs on `CellAnimationUtils.runPasses` and takes `CellAnimation`'s timing props by their names**, with `playback`
+**It runs on `SliceAnimationUtils.runPasses` and takes `CellAnimation`'s timing props by their names**, with `playback`
 and `progress` as two-way values exactly as `CellAnimation` has them, and `computeRootAnimation` for the whole
 picture. Its defaults in `RGB_ANIMATION_DEFAULTS` are round guesses, not measured, and differ from `CellAnimation`'s
 on purpose: a glitch wants a short pass and a long rest. Once every pass is done, each channel stays as last drawn.
@@ -16388,7 +16471,7 @@ the network: the user's call, so that a hole of this kind is not open to the who
 **An example is given the key rather than the resolved sample, and three pages changed to do it.** Still true
 of what the example's own body shows, though the tab that displayed the resolved sample is gone. `Shape`
 passed `getStrokeConfig`, `getFillConfig` and `getIterationConfig` already looked up; `CellAnimation` passed a
-`computeCellWeights` closure and a resolved origin; `ScanlineAnimation` passed a `computeCellWeights` closure.
+`computeSliceWeights` closure and a resolved origin; `ScanlineAnimation` passed a `computeSliceWeights` closure.
 All three now pass keys and the example does the lookup in its own body, which is the line the reader came to
 see. `CellAnimation`'s stress test gains a correctness fix on the way: the origin is computed from the cell
 count actually in force rather than from the page's.
@@ -18721,7 +18804,7 @@ each segment's `startIndex` so a weight still reaches the character it was compu
 `computeCharacterWeights(count)` returns one number per position and the position settles at
 `initialDelayMs + weight * settleDurationMs`, so left to right, right to left, outwards from the middle and a
 scatter are all the same component with a different function. It is the 1D form of
-`CellAnimation.computeCellWeights` deliberately, down to the guarantee living in the resolver rather than in
+`CellAnimation.computeSliceWeights` deliberately, down to the guarantee living in the resolver rather than in
 each formula: `resolveWeights` clamps whatever it is handed and fills any position the caller skipped.
 
 **A character has three states, not two, and the third is what makes a sequential reveal possible.**
@@ -20624,7 +20707,7 @@ The first build had two modes under a `spawnMode` union. `batch` was the above; 
 
 **The heaviest cell spawns first, as in `CellAnimation`**, and the lightest late enough that its particle is removed exactly as the pass ends (`computeBatchSpawnMs`). A particle whose lifetime is longer than the pass is cut to the pass; otherwise it would still be showing at the end, and during the pause between iterations it would sit frozen. **A cell with no weight counts as `0`**, as in `CellAnimation`.
 
-**A particle's life is its own `0`–`1`, and `particleLifetimeMs` is its length.** `CellAnimation` hands a cell the shared timeline and lets breakpoints place its window. The field places the window itself, from the weight and the lifetime, and hands the evaluator the particle's own progress, so a lifetime can be set without touching the weights. `computeParticleAnimation` returns the same transform-and-filter values `CellAnimation` does, written by `CellAnimationUtils.assignAnimationProps` on an inner element, so the position on the outer one is never overwritten. The Playground plays a keyframe sample forwards to appear and backwards to disappear, with a hold share between; that envelope is page code, not the library's.
+**A particle's life is its own `0`–`1`, and `particleLifetimeMs` is its length.** `CellAnimation` hands a cell the shared timeline and lets breakpoints place its window. The field places the window itself, from the weight and the lifetime, and hands the evaluator the particle's own progress, so a lifetime can be set without touching the weights. `computeParticleAnimation` returns the same transform-and-filter values `CellAnimation` does, written by `SliceAnimationUtils.assignAnimationProps` on an inner element, so the position on the outer one is never overwritten. The Playground plays a keyframe sample forwards to appear and backwards to disappear, with a hold share between; that envelope is page code, not the library's.
 
 **Where a particle sits is `computeParticlePos`, asked once per spawn, defaulting to the cell's center.** Scattering it inside the cell is a random answer to that callback, which the Playground offers, and is what makes the grid stop showing. The component owns no randomness except the spawn roll.
 

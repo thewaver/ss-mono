@@ -1,7 +1,7 @@
-import type { CellAnimationFn } from "../../../../Generators/CellAnimationKeyframes/CellAnimationKeyframes.types";
-import { CellAnimationKeyframeUtils } from "../../../../Generators/CellAnimationKeyframes/CellAnimationKeyframes.utils";
+import type { SliceAnimationFn } from "../../../../Generators/SliceAnimationKeyframes/SliceAnimationKeyframes.types";
+import { SliceAnimationKeyframeUtils } from "../../../../Generators/SliceAnimationKeyframes/SliceAnimationKeyframes.utils";
 
-export const tumbleUp: CellAnimationFn = CellAnimationKeyframeUtils.fromStops([
+export const tumbleUp: SliceAnimationFn = SliceAnimationKeyframeUtils.fromStops([
     { at: 0, opacity: 0, translateY: 200, translateX: 0, rotate: 180 },
     { at: 0.25, opacity: 100, translateY: 150, translateX: 50, rotate: 135 },
     { at: 0.5, translateY: 100, translateX: 0, rotate: 90 },

@@ -15,7 +15,7 @@ defineProps<Props>();
 <template>
     <PageProp
         item-key="smoothness01"
-        controls="Sets CellAnimationBreakpointOpts.smoothness"
+        controls="Sets SliceAnimationBreakpointOpts.smoothness"
         label="Smoothness (0-1)"
         hint="How much one line's movement overlaps its neighbors'. 0 makes each line wait its turn; 1 blurs them into one sweep."
     >

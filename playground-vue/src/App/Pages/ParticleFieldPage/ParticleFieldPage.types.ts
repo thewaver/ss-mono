@@ -1,4 +1,4 @@
-import type { CellAnimationKeyframes, CellAnimationOrigins, CellAnimationWeights } from "@thewaver/ss-components-vue";
+import type { CellAnimationKeyframes, CellAnimationOrigins, SliceAnimationWeights } from "@thewaver/ss-components-vue";
 import type { Index2d } from "@thewaver/ss-utils";
 
 export type ParticleFieldExampleProps = {
@@ -8,7 +8,7 @@ export type ParticleFieldExampleProps = {
     "animationDurationMs": number;
     "particleLifetimeMs": number;
     "originType": CellAnimationOrigins.OriginType;
-    "weightType": CellAnimationWeights.WeightType;
+    "weightType": SliceAnimationWeights.WeightType;
     "animationType": CellAnimationKeyframes.AnimationType;
     "holdShare": number;
     "isScattered": boolean;

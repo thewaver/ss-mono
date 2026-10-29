@@ -1,21 +1,35 @@
-import { For, type Setter, createEffect, createMemo, createSignal, on, onCleanup, onMount, untrack } from "solid-js";
+import { For, Show, createEffect, createMemo, createSignal, on, onCleanup, onMount, untrack } from "solid-js";
 
 import {
     CellAnimationUtils,
     ElementObserverUtils,
     PARTICLE_FIELD_DEFAULTS,
+    type ParticleFieldCellDefs,
     type ParticleFieldParticle,
     ParticleFieldUtils,
+    type SliceAnimationSlice,
+    SliceAnimationUtils,
+    type SliceRendererSlice,
+    SliceRendererStyles,
+    SliceRendererUtils,
     ParticleFieldStyles as styles,
 } from "@thewaver/ss-components";
 import { ParticleFieldConst } from "@thewaver/ss-components/internal";
 import { MathUtils, Size2d } from "@thewaver/ss-utils";
+import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { SignalMirrorSolidUtils } from "../../../Abstracts/SignalMirror/SignalMirrorSolid.utils";
+import { SliceRendererSolidUtils } from "../../../Abstracts/SliceRenderer/SliceRendererSolid.utils";
+import { useViewportContext } from "../../../Abstracts/Viewport/Viewport.context";
 import { access } from "../../../Utils/propUtils";
 import type { ParticleFieldProps } from "./ParticleFieldSolid.types";
 
+const LINEAR = SliceRendererUtils.computeEasing(undefined);
+const NO_TABLES = { tables: [[]], tableIndices: [] };
+
 export const ParticleField = (props: ParticleFieldProps) => {
+    const viewportContext = useViewportContext();
+
     const getSpawnChance = createMemo(() => access(props.spawnChance) ?? PARTICLE_FIELD_DEFAULTS.spawnChance);
 
     const getDurationMs = createMemo(
@@ -34,7 +48,14 @@ export const ParticleField = (props: ParticleFieldProps) => {
         Math.min(access(props.particleLifetimeMs) ?? PARTICLE_FIELD_DEFAULTS.particleLifetimeMs, getDurationMs()),
     );
 
+    const getOrigin = createMemo(() => access(props.origin) ?? PARTICLE_FIELD_DEFAULTS.origin);
+
+    const getRenderer = createMemo(() => access(props.renderer) ?? PARTICLE_FIELD_DEFAULTS.renderer);
+
+    const getSource = createMemo(() => access(props.src));
+
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
+    const [getCanvasRef, setCanvasRef] = createSignal<HTMLCanvasElement>();
     const [getIsWindowVisible, setIsWindowVisible] = createSignal(true);
     const [getIsPlaying] = SignalMirrorSolidUtils.createOptional(() => props.playback, true);
     const [getProgress, setProgress] = SignalMirrorSolidUtils.createOptional(
@@ -44,6 +65,7 @@ export const ParticleField = (props: ParticleFieldProps) => {
     const [getCurrentIteration, setCurrentIteration] = createSignal(0);
     const [getRootSize, setRootSize] = createSignal<Size2d>({ width: 0, height: 0 }, { equals: Size2d.isSame });
     const [getLiveParticles, setLiveParticles] = createSignal<ParticleFieldParticle[]>([]);
+    const [getShownSize, setShownSize] = createSignal<Size2d>({ width: 0, height: 0 }, { equals: Size2d.isSame });
 
     const getCellCount = createMemo(
         () => CellAnimationUtils.computeCellCount(access(props.cellCount), getRootSize()),
@@ -68,6 +90,54 @@ export const ParticleField = (props: ParticleFieldProps) => {
         ),
     );
 
+    const getSlices = createMemo(() => {
+        const origin = getOrigin();
+
+        return new Map<ParticleFieldCellDefs, SliceAnimationSlice>(
+            getCells().map((cell) => [cell, { ...cell, origin }]),
+        );
+    });
+
+    const getIsElementsOnly = createMemo(() => getRenderer() === "elements");
+
+    const getIsAvailable = SliceRendererSolidUtils.createIsAvailable(getIsElementsOnly);
+
+    const getPicture = SliceRendererSolidUtils.createPicture(getSource, getIsElementsOnly);
+
+    const getTables = createMemo(() => {
+        if (getIsElementsOnly()) return undefined;
+
+        const animation = props.computeParticleAnimation;
+
+        return animation ? SliceAnimationUtils.resolveTables(animation, [...getSlices().values()]) : NO_TABLES;
+    });
+
+    const getTableByCell = createMemo(() => {
+        const tableIndices = getTables()?.tableIndices ?? [];
+
+        return new Map(getCells().map((cell, idx) => [cell, tableIndices[idx] ?? 0]));
+    });
+
+    const getIsOnGraphicsCard = createMemo(
+        () => getIsAvailable() && SliceRendererUtils.getCanDraw(getRenderer(), getPicture()) && !!getTables(),
+    );
+
+    const getItem = SliceRendererSolidUtils.createItem(getCanvasRef, getIsAvailable);
+
+    const getArea = createMemo(() => {
+        const size = getRootSize();
+        const largest = getCells().reduce(
+            (most, cell) => ({
+                width: Math.max(most.width, cell.size.width),
+                height: Math.max(most.height, cell.size.height),
+            }),
+            { width: 0, height: 0 },
+        );
+        const reach = SliceRendererUtils.computeReach(getTables()?.tables ?? [], largest, undefined);
+
+        return { x: -reach, y: -reach, width: size.width + 2 * reach, height: size.height + 2 * reach };
+    });
+
     const getHasEnded = createMemo(() => getCurrentIteration() >= getIterationCount());
 
     const getIsRunning = createMemo(
@@ -81,18 +151,69 @@ export const ParticleField = (props: ParticleFieldProps) => {
 
     const roster = ParticleFieldUtils.createRoster();
     const refs = new Map<number, HTMLElement>();
-    const tSetters = new Map<number, Setter<number>>();
+    const tints = new Map<number, string | undefined>();
 
     let clockMs = 0;
+    let particlesNow: ParticleFieldParticle[] = [];
+    let rendererSlices: SliceRendererSlice[] = [];
+    let slicedTableByCell: Map<ParticleFieldCellDefs, number> | undefined;
+
+    const getTint = (particle: ParticleFieldParticle) => {
+        if (!tints.has(particle.id)) tints.set(particle.id, props.computeParticleTint?.(particle.cell));
+
+        return tints.get(particle.id);
+    };
+
+    const toRendererSlice = (particle: ParticleFieldParticle): SliceRendererSlice => {
+        const tint = getTint(particle);
+
+        return {
+            left: particle.pos.x - particle.cell.size.width * 0.5,
+            top: particle.pos.y - particle.cell.size.height * 0.5,
+            width: particle.cell.size.width,
+            height: particle.cell.size.height,
+            weight: particle.spawnMs,
+            table: untrack(getTableByCell).get(particle.cell) ?? 0,
+            tint: tint === undefined ? undefined : SliceRendererUtils.toTint(tint),
+        };
+    };
 
     const applyParticle = (particle: ParticleFieldParticle, el: HTMLElement | undefined) => {
+        const animation = props.computeParticleAnimation;
+        const slice = untrack(getSlices).get(particle.cell);
+
+        if (!el || !animation || !slice) return;
+
         const t = ParticleFieldUtils.computeLife(clockMs, particle.spawnMs, getLifetimeMs());
 
-        tSetters.get(particle.id)?.(t);
+        SliceAnimationUtils.assignAnimationProps(el, animation(t, slice));
+    };
 
-        if (el && props.computeParticleAnimation) {
-            CellAnimationUtils.assignAnimationProps(el, props.computeParticleAnimation(particle.cell, t));
-        }
+    const drawOnGraphicsCard = () => {
+        const item = getItem();
+
+        if (!item) return;
+
+        const scale = window.devicePixelRatio * viewportContext.getScale();
+        const shown = item.draw({
+            mode: "particles",
+            src: getSource(),
+            tables: getTables()?.tables ?? [],
+            easing: LINEAR,
+            slices: rendererSlices,
+            size: getRootSize(),
+            area: getArea(),
+            scale,
+            timeline: 0,
+            half: 0,
+            isDescending: false,
+            isShown: true,
+            hasPerspective: false,
+            clockMs,
+            lifetimeMs: getLifetimeMs(),
+        });
+
+        setShownSize({ width: shown.width / scale, height: shown.height / scale });
     };
 
     const refresh = () => {
@@ -108,6 +229,27 @@ export const ParticleField = (props: ParticleFieldProps) => {
             computeParticlePos: props.computeParticlePos,
         });
 
+        particlesNow = particles;
+
+        if (hasChanged) {
+            const ids = new Set(particles.map((particle) => particle.id));
+
+            for (const id of [...tints.keys()]) {
+                if (!ids.has(id)) tints.delete(id);
+            }
+        }
+
+        if (getIsOnGraphicsCard()) {
+            if (hasChanged || rendererSlices.length !== particles.length || slicedTableByCell !== getTableByCell()) {
+                slicedTableByCell = getTableByCell();
+                rendererSlices = particles.map(toRendererSlice);
+            }
+
+            drawOnGraphicsCard();
+
+            return;
+        }
+
         if (hasChanged) setLiveParticles(particles);
 
         for (const particle of particles) applyParticle(particle, refs.get(particle.id));
@@ -118,6 +260,9 @@ export const ParticleField = (props: ParticleFieldProps) => {
             getCellCount,
             () => {
                 roster.clear();
+                tints.clear();
+                particlesNow = [];
+                rendererSlices = [];
                 setLiveParticles([]);
                 setCurrentIteration(0);
                 setProgress(ParticleFieldConst.NO_PROGRESS);
@@ -126,14 +271,26 @@ export const ParticleField = (props: ParticleFieldProps) => {
         ),
     );
 
+    createEffect(
+        on(getIsOnGraphicsCard, (isOnGraphicsCard) => {
+            rendererSlices = isOnGraphicsCard ? particlesNow.map(toRendererSlice) : [];
+            setLiveParticles(isOnGraphicsCard ? [] : particlesNow);
+        }),
+    );
+
     createEffect(() => {
         const progress = MathUtils.clamp01(getProgress());
 
         getCells();
+        getTables();
+        getArea();
         getHasEnded();
         getLifetimeMs();
         getSpawnChance();
         getCurrentIteration();
+        getIsOnGraphicsCard();
+        getItem();
+        getPicture();
 
         untrack(() => {
             clockMs = progress * getDurationMs();
@@ -145,7 +302,7 @@ export const ParticleField = (props: ParticleFieldProps) => {
         if (!getIsRunning()) return;
 
         onCleanup(
-            CellAnimationUtils.runPasses({
+            SliceAnimationUtils.runPasses({
                 getProgress: () => untrack(getProgress),
                 setProgress,
                 getCurrentIteration: () => untrack(getCurrentIteration),
@@ -175,7 +332,7 @@ export const ParticleField = (props: ParticleFieldProps) => {
 
     onCleanup(() => {
         refs.clear();
-        tSetters.clear();
+        tints.clear();
     });
 
     return (
@@ -186,37 +343,68 @@ export const ParticleField = (props: ParticleFieldProps) => {
             role="presentation"
             aria-hidden="true"
         >
-            <For each={getLiveParticles()}>
-                {(particle) => {
-                    const [getT, setT] = createSignal(
-                        ParticleFieldUtils.computeLife(clockMs, particle.spawnMs, getLifetimeMs()),
-                    );
+            <Show
+                when={getIsOnGraphicsCard()}
+                fallback={
+                    <For each={getLiveParticles()}>
+                        {(particle) => {
+                            const tint = getTint(particle);
+                            const tintStyle =
+                                tint === undefined
+                                    ? undefined
+                                    : SliceRendererUtils.toTintStyle(SliceRendererUtils.toTint(tint));
 
-                    tSetters.set(particle.id, setT);
+                            onCleanup(() => refs.delete(particle.id));
 
-                    onCleanup(() => {
-                        tSetters.delete(particle.id);
-                        refs.delete(particle.id);
-                    });
-
-                    return (
-                        <div
-                            class={styles.particleFieldItem}
-                            style={{ left: `${particle.pos.x}px`, top: `${particle.pos.y}px` }}
-                        >
-                            <div
-                                class={styles.particleFieldBody}
-                                ref={(el) => {
-                                    refs.set(particle.id, el);
-                                    applyParticle(particle, el);
-                                }}
-                            >
-                                {props.renderParticle(particle.cell, getT)}
-                            </div>
-                        </div>
-                    );
-                }}
-            </For>
+                            return (
+                                <div
+                                    class={styles.particleFieldItem}
+                                    style={{ left: `${particle.pos.x}px`, top: `${particle.pos.y}px` }}
+                                >
+                                    <div
+                                        class={styles.particleFieldBody}
+                                        style={{
+                                            width: `${particle.cell.size.width}px`,
+                                            height: `${particle.cell.size.height}px`,
+                                        }}
+                                        ref={(el) => {
+                                            refs.set(particle.id, el);
+                                            applyParticle(particle, el);
+                                        }}
+                                    >
+                                        <div
+                                            class={SliceRendererStyles.sliceRendererPicture}
+                                            classList={{
+                                                [SliceRendererStyles.sliceRendererPictureTinted]: !!tintStyle,
+                                            }}
+                                            style={{
+                                                ...assignInlineVars({
+                                                    [SliceRendererStyles.pictureSrcVar]:
+                                                        CellAnimationUtils.toSourceImage(getSource()),
+                                                    [SliceRendererStyles.pictureTintVar]: tintStyle?.color ?? "",
+                                                }),
+                                                opacity: tintStyle ? `${tintStyle.opacity}` : undefined,
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                            );
+                        }}
+                    </For>
+                }
+            >
+                <canvas
+                    ref={setCanvasRef}
+                    class={SliceRendererStyles.sliceRendererCanvas}
+                    style={{
+                        left: `${getArea().x}px`,
+                        top: `${getArea().y}px`,
+                        width: `${getShownSize().width}px`,
+                        height: `${getShownSize().height}px`,
+                    }}
+                    aria-hidden="true"
+                />
+            </Show>
         </div>
     );
 };

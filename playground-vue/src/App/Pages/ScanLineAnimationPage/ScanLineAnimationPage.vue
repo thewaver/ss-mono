@@ -2,9 +2,9 @@
 import { computed, shallowRef } from "vue";
 
 import {
-    CellAnimationWeights,
     SCANLINE_ANIMATION_DEFAULTS,
     SCANLINE_ANIMATION_ORIENTATIONS,
+    SliceAnimationWeights,
 } from "@thewaver/ss-components-vue";
 import type { ScanlineAnimationOrientation } from "@thewaver/ss-components-vue";
 import { ScanlineAnimationKnobs } from "@thewaver/ss-playground/App/Knobs/ScanlineAnimations.const";
@@ -53,7 +53,7 @@ const groupOptions = <T extends string>(keys: readonly T[]) => {
     return Object.entries(result);
 };
 
-const GROUPPED_WEIGHTS = groupOptions(CellAnimationWeights.ORIGIN_FREE_WEIGHT_TYPES);
+const GROUPPED_WEIGHTS = groupOptions(SliceAnimationWeights.ORIGIN_FREE_WEIGHT_TYPES);
 
 const playback = shallowRef(true);
 
@@ -62,7 +62,7 @@ const lineCount = shallowRef(ScanlineAnimationKnobs.STARTING_LINE_COUNT);
 const orientation = shallowRef<ScanlineAnimationOrientation>(SCANLINE_ANIMATION_DEFAULTS.orientation);
 const animationDurationMs = shallowRef(ScanlineAnimationKnobs.STARTING_DURATION_MS);
 const animationIterationDelayMs = shallowRef(ScanlineAnimationKnobs.STARTING_ITERATION_DELAY_MS);
-const weightType = shallowRef<CellAnimationWeights.OriginFreeWeightType>(ScanlineAnimationKnobs.STARTING_WEIGHT_TYPE);
+const weightType = shallowRef<SliceAnimationWeights.OriginFreeWeightType>(ScanlineAnimationKnobs.STARTING_WEIGHT_TYPE);
 
 const handleFile = (file: File) => {
     src.value = URL.createObjectURL(file);
@@ -163,7 +163,7 @@ const examples: ExampleDefs[] = [
 
             <PageProp
                 item-key="weightType"
-                controls="Picks the example's weight function sent to ScanlineAnimationProps.computeCellWeights"
+                controls="Picks the example's weight function sent to ScanlineAnimationProps.computeSliceWeights"
                 label="Weight"
                 hint="How each line's turn is decided: its position, a wave, a random draw, and so on."
             >
@@ -171,7 +171,7 @@ const examples: ExampleDefs[] = [
                     :value="weightType"
                     :groups="GROUPPED_WEIGHTS"
                     ariaLabel="Weight"
-                    @change="(value: CellAnimationWeights.OriginFreeWeightType) => (weightType = value)"
+                    @change="(value: SliceAnimationWeights.OriginFreeWeightType) => (weightType = value)"
                 />
             </PageProp>
 

@@ -1,7 +1,10 @@
 import { For, createSignal } from "solid-js";
 
 import { ParticleSpawner, access } from "@thewaver/ss-components-solid";
-import { computeParticleGlow } from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.const";
+import {
+    computeParticleAnimation,
+    createParticleSrc,
+} from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.css";
 
 import type { ParticleSpawnerExampleProps } from "../ParticleSpawnerPage.types";
@@ -16,6 +19,8 @@ const SPAWNER_POSITIONS = [
 ];
 
 export const ManyToOneExample = (props: ParticleSpawnerExampleProps) => {
+    const particleSrc = createParticleSrc();
+
     const [getTargetRef, setTargetRef] = createSignal<HTMLElement>();
 
     return (
@@ -35,16 +40,8 @@ export const ManyToOneExample = (props: ParticleSpawnerExampleProps) => {
                         <ParticleSpawner
                             {...props}
                             targets={() => [getTargetRef()]}
-                            renderParticle={(_index, getT) => {
-                                const getGlow = () => computeParticleGlow(getT());
-
-                                return (
-                                    <div
-                                        class={styles.particle}
-                                        style={{ opacity: getGlow().opacity, transform: `scale(${getGlow().scale})` }}
-                                    />
-                                );
-                            }}
+                            src={particleSrc}
+                            computeParticleAnimation={computeParticleAnimation}
                         />
                     </div>
                 )}

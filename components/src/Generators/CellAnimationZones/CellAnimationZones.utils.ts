@@ -1,8 +1,8 @@
 import type { Index2d } from "@thewaver/ss-utils";
 
-import type { CellAnimationEvaluationDefs } from "../../Exotics/Animations/CellAnimation/CellAnimation.types";
+import type { SliceAnimationEvaluationDefs } from "../../Exotics/Animations/CellAnimation/CellAnimation.types";
 import { CellAnimationUtils } from "../../Exotics/Animations/CellAnimation/CellAnimation.utils";
-import { CellAnimationWeightUtils } from "../CellAnimationWeights/CellAnimationWeights.utils";
+import { SliceAnimationWeightUtils } from "../SliceAnimationWeights/SliceAnimationWeights.utils";
 import type { CellAnimationZoneFn, CellAnimationZoneType } from "./CellAnimationZones.types";
 
 const zoneRegistry: Record<CellAnimationZoneType, CellAnimationZoneFn> = {
@@ -22,18 +22,18 @@ const zoneRegistry: Record<CellAnimationZoneType, CellAnimationZoneFn> = {
     axis3: ({ pos, origin }) => pos.col > origin.col && pos.row === origin.row,
     axis4: ({ pos, origin }) => pos.col === origin.col && pos.row > origin.row,
     origin: ({ pos, origin }) => pos.col === origin.col && pos.row === origin.row,
-    even_rows: ({ pos, origin }) => CellAnimationUtils.isEvenRow(CellAnimationWeightUtils.getCellDelta(origin, pos)),
-    odd_rows: ({ pos, origin }) => !CellAnimationUtils.isEvenRow(CellAnimationWeightUtils.getCellDelta(origin, pos)),
+    even_rows: ({ pos, origin }) => CellAnimationUtils.isEvenRow(SliceAnimationWeightUtils.getCellDelta(origin, pos)),
+    odd_rows: ({ pos, origin }) => !CellAnimationUtils.isEvenRow(SliceAnimationWeightUtils.getCellDelta(origin, pos)),
     even_columns: ({ pos, origin }) =>
-        CellAnimationUtils.isEvenColumn(CellAnimationWeightUtils.getCellDelta(origin, pos)),
+        CellAnimationUtils.isEvenColumn(SliceAnimationWeightUtils.getCellDelta(origin, pos)),
     odd_columns: ({ pos, origin }) =>
-        !CellAnimationUtils.isEvenColumn(CellAnimationWeightUtils.getCellDelta(origin, pos)),
-    even_rings: ({ pos, origin }) => CellAnimationUtils.isEvenRing(CellAnimationWeightUtils.getCellDelta(origin, pos)),
-    odd_rings: ({ pos, origin }) => !CellAnimationUtils.isEvenRing(CellAnimationWeightUtils.getCellDelta(origin, pos)),
+        !CellAnimationUtils.isEvenColumn(SliceAnimationWeightUtils.getCellDelta(origin, pos)),
+    even_rings: ({ pos, origin }) => CellAnimationUtils.isEvenRing(SliceAnimationWeightUtils.getCellDelta(origin, pos)),
+    odd_rings: ({ pos, origin }) => !CellAnimationUtils.isEvenRing(SliceAnimationWeightUtils.getCellDelta(origin, pos)),
     even_checkered_cells: ({ pos, origin }) =>
-        CellAnimationUtils.isEvenCheckered(CellAnimationWeightUtils.getCellDelta(origin, pos)),
+        CellAnimationUtils.isEvenCheckered(SliceAnimationWeightUtils.getCellDelta(origin, pos)),
     odd_checkered_cells: ({ pos, origin }) =>
-        !CellAnimationUtils.isEvenCheckered(CellAnimationWeightUtils.getCellDelta(origin, pos)),
+        !CellAnimationUtils.isEvenCheckered(SliceAnimationWeightUtils.getCellDelta(origin, pos)),
     lighter_half: ({ weight }) => weight < 0.5,
     heavier_half: ({ weight }) => weight >= 0.5,
 };
@@ -43,7 +43,7 @@ const zoneRegistry: Record<CellAnimationZoneType, CellAnimationZoneFn> = {
  *
  * A zone is named rather than written: a side of the origin, a quadrant, an axis, a parity of rows, columns,
  * rings or checkered cells, or a half by weight. Everything is measured from the animation's origin, so the
- * same zone follows the origin wherever it is placed. `CellAnimationKeyframeUtils.fromZones` is what picks an
+ * same zone follows the origin wherever it is placed. `SliceAnimationKeyframeUtils.fromZones` is what picks an
  * animation by zone; this answers the question it asks.
  */
 export namespace CellAnimationZoneUtils {
@@ -59,6 +59,6 @@ export namespace CellAnimationZoneUtils {
      * @param defs The cell, its weight, the grid and the origin, as the animation is handed them.
      * @returns `true` when the cell is in the zone.
      */
-    export const isInZone = (type: CellAnimationZoneType, defs: CellAnimationEvaluationDefs & { origin: Index2d }) =>
+    export const isInZone = (type: CellAnimationZoneType, defs: SliceAnimationEvaluationDefs & { origin: Index2d }) =>
         zoneRegistry[type](defs);
 }

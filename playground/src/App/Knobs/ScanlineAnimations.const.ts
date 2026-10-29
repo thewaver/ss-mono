@@ -1,4 +1,4 @@
-import type { CellAnimationBreakpointOpts, CellAnimationWeights } from "@thewaver/ss-components";
+import type { SliceAnimationBreakpointOpts, SliceAnimationWeights } from "@thewaver/ss-components";
 
 export namespace ScanlineAnimationKnobs {
     export const MIN_GLITCH_COUNT = 1;
@@ -24,17 +24,17 @@ export namespace ScanlineAnimationKnobs {
     export const STARTING_LINE_COUNT = 120;
     export const STARTING_DURATION_MS = 2000;
     export const STARTING_ITERATION_DELAY_MS = 1000;
-    export const STARTING_WEIGHT_TYPE: CellAnimationWeights.OriginFreeWeightType = "sequence_linear";
+    export const STARTING_WEIGHT_TYPE: SliceAnimationWeights.OriginFreeWeightType = "sequence_linear";
     export const STARTING_GLITCH_OPTS = { count: 3, shiftPercent: 10, chunkyness: 0.8 };
-    export const STARTING_SURGE_BREAKPOINT_OPTS: CellAnimationBreakpointOpts = { dir: "asc", smoothness: 0.2 };
-    export const STARTING_SNAKE_BREAKPOINT_OPTS: CellAnimationBreakpointOpts = { dir: "asc", smoothness: 0.2 };
-    export const STARTING_SPLIT_BREAKPOINT_OPTS: CellAnimationBreakpointOpts = { dir: "asc", smoothness: 1 };
-    export const STARTING_BRIGHTNESS_BREAKPOINT_OPTS: CellAnimationBreakpointOpts = { dir: "asc", smoothness: 0.5 };
-    export const STARTING_GRAYSCALE_BREAKPOINT_OPTS: CellAnimationBreakpointOpts = { dir: "asc", smoothness: 0.5 };
-    export const STARTING_HUE_BREAKPOINT_OPTS: CellAnimationBreakpointOpts = { dir: "asc", smoothness: 0.5 };
-    export const STARTING_WAVE_BREAKPOINT_OPTS: CellAnimationBreakpointOpts = { dir: "asc", smoothness: 0.6 };
-    export const STARTING_ROLL_BREAKPOINT_OPTS: CellAnimationBreakpointOpts = { dir: "asc", smoothness: 0.1 };
-    export const STARTING_DROPOUT_BREAKPOINT_OPTS: CellAnimationBreakpointOpts = { dir: "asc", smoothness: 0.2 };
-    export const STARTING_INTERLACE_BREAKPOINT_OPTS: CellAnimationBreakpointOpts = { dir: "asc", smoothness: 0.8 };
-    export const STARTING_SKEW_BREAKPOINT_OPTS: CellAnimationBreakpointOpts = { dir: "asc", smoothness: 0.3 };
+    export const STARTING_SURGE_BREAKPOINT_OPTS: SliceAnimationBreakpointOpts = { dir: "asc", smoothness: 0.2 };
+    export const STARTING_SNAKE_BREAKPOINT_OPTS: SliceAnimationBreakpointOpts = { dir: "asc", smoothness: 0.2 };
+    export const STARTING_SPLIT_BREAKPOINT_OPTS: SliceAnimationBreakpointOpts = { dir: "asc", smoothness: 1 };
+    export const STARTING_BRIGHTNESS_BREAKPOINT_OPTS: SliceAnimationBreakpointOpts = { dir: "asc", smoothness: 0.5 };
+    export const STARTING_GRAYSCALE_BREAKPOINT_OPTS: SliceAnimationBreakpointOpts = { dir: "asc", smoothness: 0.5 };
+    export const STARTING_HUE_BREAKPOINT_OPTS: SliceAnimationBreakpointOpts = { dir: "asc", smoothness: 0.5 };
+    export const STARTING_WAVE_BREAKPOINT_OPTS: SliceAnimationBreakpointOpts = { dir: "asc", smoothness: 0.6 };
+    export const STARTING_ROLL_BREAKPOINT_OPTS: SliceAnimationBreakpointOpts = { dir: "asc", smoothness: 0.1 };
+    export const STARTING_DROPOUT_BREAKPOINT_OPTS: SliceAnimationBreakpointOpts = { dir: "asc", smoothness: 0.2 };
+    export const STARTING_INTERLACE_BREAKPOINT_OPTS: SliceAnimationBreakpointOpts = { dir: "asc", smoothness: 0.8 };
+    export const STARTING_SKEW_BREAKPOINT_OPTS: SliceAnimationBreakpointOpts = { dir: "asc", smoothness: 0.3 };
 }

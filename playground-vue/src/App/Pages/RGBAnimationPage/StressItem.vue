@@ -1,62 +1,76 @@
 <script setup lang="ts">
-import { type Component, computed, shallowRef, useModel } from "vue";
+import { useModel } from "vue";
 
+import { RGBAnimation, RGBAnimationKeyframes } from "@thewaver/ss-components-vue";
+import type { SliceAnimationFn, SliceAnimationRenderer } from "@thewaver/ss-components-vue";
 import { RGBAnimationKnobs } from "@thewaver/ss-playground/App/Knobs/RGBAnimations.const";
 import { STRESS_ITEM_WIDTH } from "@thewaver/ss-playground/App/Pages/RGBAnimationPage/RGBAnimationPage.const";
 import type { BaseRGBAnimationExampleProps } from "@thewaver/ss-playground/App/Pages/RGBAnimationPage/RGBAnimationPage.types";
+import type { CSSAnimationValues } from "@thewaver/ss-utils";
 
 import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.vue";
-import AnaglyphExample from "./Examples/Anaglyph.vue";
-import EchoExample from "./Examples/Echo.vue";
-import FocusPullExample from "./Examples/FocusPull.vue";
-import GlitchExample from "./Examples/Glitch.vue";
-import HueSwapExample from "./Examples/HueSwap.vue";
-import OrbitExample from "./Examples/Orbit.vue";
-import SwellExample from "./Examples/Swell.vue";
-import TiltExample from "./Examples/Tilt.vue";
-import TwistExample from "./Examples/Twist.vue";
 
-const STRESS_EXAMPLES: { component: Component; props: Record<string, unknown> }[] = [
-    { component: GlitchExample, props: { glitchOpts: RGBAnimationKnobs.STARTING_GLITCH_OPTS } },
-    { component: SwellExample, props: { scalePercent: RGBAnimationKnobs.STARTING_SCALE_PERCENT } },
-    { component: OrbitExample, props: { radiusPercent: RGBAnimationKnobs.STARTING_ORBIT_RADIUS_PERCENT } },
-    { component: FocusPullExample, props: { maxBlurPx: RGBAnimationKnobs.STARTING_FOCUS_BLUR_PX } },
-    { component: TwistExample, props: { maxDegrees: RGBAnimationKnobs.STARTING_TWIST_DEGREES } },
-    { component: HueSwapExample, props: { turns: RGBAnimationKnobs.STARTING_HUE_TURNS } },
-    { component: TiltExample, props: { maxDegrees: RGBAnimationKnobs.STARTING_TILT_DEGREES } },
-    {
-        component: AnaglyphExample,
-        props: { separationPercent: RGBAnimationKnobs.STARTING_ANAGLYPH_SEPARATION_PERCENT },
+const STRESS_SAMPLES: (() => {
+    animation: SliceAnimationFn;
+    computeRootAnimation?: (timeline: number) => CSSAnimationValues;
+})[] = [
+    () => ({
+        animation: RGBAnimationKeyframes.createSwell({ scalePercent: RGBAnimationKnobs.STARTING_SCALE_PERCENT }),
+    }),
+    () => ({
+        animation: RGBAnimationKeyframes.createOrbit({
+            radiusPercent: RGBAnimationKnobs.STARTING_ORBIT_RADIUS_PERCENT,
+        }),
+    }),
+    () => ({
+        animation: RGBAnimationKeyframes.createFocusPull({ maxBlurPx: RGBAnimationKnobs.STARTING_FOCUS_BLUR_PX }),
+    }),
+    () => ({ animation: RGBAnimationKeyframes.createTwist({ maxDegrees: RGBAnimationKnobs.STARTING_TWIST_DEGREES }) }),
+    () => ({
+        animation: RGBAnimationKeyframes.createHueSwap({ turns: RGBAnimationKnobs.STARTING_HUE_TURNS, anchor: "red" }),
+    }),
+    () => ({ animation: RGBAnimationKeyframes.createTilt({ maxDegrees: RGBAnimationKnobs.STARTING_TILT_DEGREES }) }),
+    () => ({
+        animation: RGBAnimationKeyframes.createAnaglyph({
+            separationPercent: RGBAnimationKnobs.STARTING_ANAGLYPH_SEPARATION_PERCENT,
+        }),
+    }),
+    () => {
+        const opts = { distancePercent: RGBAnimationKnobs.STARTING_ECHO_DISTANCE_PERCENT };
+
+        return {
+            animation: RGBAnimationKeyframes.createEcho(opts),
+            computeRootAnimation: (timeline) => ({
+                translate: RGBAnimationKeyframes.computeEchoRootPath(timeline, opts),
+            }),
+        };
     },
-    { component: EchoExample, props: { distancePercent: RGBAnimationKnobs.STARTING_ECHO_DISTANCE_PERCENT } },
 ];
 
 type Props = BaseRGBAnimationExampleProps & {
     "modalPlayback": boolean;
     "onUpdate:modalPlayback"?: (isPlaying: boolean) => void;
+    "renderer": SliceAnimationRenderer;
 };
 
 const props = defineProps<Props>();
 
 const modalPlayback = useModel(props, "modalPlayback");
-const progress = shallowRef(0);
 
-const example = STRESS_EXAMPLES[Math.floor(Math.random() * STRESS_EXAMPLES.length)];
-
-const sharedProps = computed(() => {
-    const { "modalPlayback": _modalPlayback, "onUpdate:modalPlayback": _setModalPlayback, ...shared } = props;
-
-    return { ...shared, ...example.props };
-});
+const sample = STRESS_SAMPLES[Math.floor(Math.random() * STRESS_SAMPLES.length)]();
 </script>
 
 <template>
     <PageMeasureBox :width="STRESS_ITEM_WIDTH">
-        <component
-            :is="example.component"
-            v-bind="sharedProps"
+        <RGBAnimation
             v-model:playback="modalPlayback"
-            v-model:progress="progress"
+            :src="src"
+            :color-mixing="colorMixing"
+            :animation-duration-ms="animationDurationMs"
+            :animation-iteration-delay-ms="animationIterationDelayMs"
+            :renderer="renderer"
+            :compute-root-animation="sample.computeRootAnimation"
+            :compute-slice-animation="sample.animation"
         />
     </PageMeasureBox>
 </template>

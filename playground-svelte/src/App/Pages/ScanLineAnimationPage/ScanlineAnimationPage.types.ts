@@ -1,10 +1,10 @@
-import type { CellAnimationWeights, ScanlineAnimationOrientation } from "@thewaver/ss-components-svelte";
+import type { ScanlineAnimationOrientation, SliceAnimationWeights } from "@thewaver/ss-components-svelte";
 
 export type ScanlineAnimationExampleProps = {
     src: string;
     lineCount: number;
     orientation: ScanlineAnimationOrientation;
-    weightType: CellAnimationWeights.OriginFreeWeightType;
+    weightType: SliceAnimationWeights.OriginFreeWeightType;
     animationDurationMs: number;
     animationIterationDelayMs: number;
     playback: boolean;

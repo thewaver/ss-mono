@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { CellAnimationKeyframes, CellAnimationOrigins, CellAnimationWeights } from "@thewaver/ss-components-react";
+import { CellAnimationKeyframes, CellAnimationOrigins, SliceAnimationWeights } from "@thewaver/ss-components-react";
 import { ParticleFieldKnobs } from "@thewaver/ss-playground/App/Knobs/ParticleFields.const";
 import {
     BOX_HEIGHT,
@@ -47,7 +47,7 @@ const groupOptions = <T extends string>(keys: readonly T[]) => {
     return Object.entries(result);
 };
 
-const GROUPPED_WEIGHTS = groupOptions(CellAnimationWeights.WEIGHT_TYPES);
+const GROUPPED_WEIGHTS = groupOptions(SliceAnimationWeights.WEIGHT_TYPES);
 const GROUPPED_ANIMATIONS = groupOptions(CellAnimationKeyframes.ANIMATION_TYPES);
 
 const DefaultExampleWrapper = (
@@ -120,9 +120,28 @@ const ShapedExampleWrapper = (props: ParticleFieldExampleProps) => {
 const StressTestWrapper = (props: ParticleFieldExampleProps) => {
     const modalPlayback = useState(true);
 
+    const [isOnGraphicsCard, setIsOnGraphicsCard] = useState(true);
+
     return (
         <>
             <div>{`${STRESS_CELL_COUNT.col} x ${STRESS_CELL_COUNT.row} cells`}</div>
+
+            <PagePropsPanel scope={"local"} hasReset={false}>
+                <PageProp
+                    itemKey={"onGraphicsCard"}
+                    label={"On the graphics card"}
+                    hint={
+                        "Draws the stress test's particles in one canvas per field, with the keyframes worked out on the graphics card. Off, every particle is an element of its own."
+                    }
+                    controls={"Sets ParticleFieldProps.renderer in the stress test"}
+                >
+                    <PageCheckField
+                        value={isOnGraphicsCard}
+                        ariaLabel={"On the graphics card"}
+                        onChange={setIsOnGraphicsCard}
+                    />
+                </PageProp>
+            </PagePropsPanel>
 
             <StressTest
                 configs={STRESS_ITEMS}
@@ -131,7 +150,12 @@ const StressTestWrapper = (props: ParticleFieldExampleProps) => {
                 renderLabel={(configIndex) => `Render ${STRESS_ITEMS[configIndex].count} fields`}
                 renderItem={(configIndex) => (
                     <PageMeasureBox width={STRESS_ITEMS[configIndex].size} height={STRESS_ITEMS[configIndex].size}>
-                        <DefaultExample {...props} playback={modalPlayback} cellCount={STRESS_CELL_COUNT} />
+                        <DefaultExample
+                            {...props}
+                            playback={modalPlayback}
+                            cellCount={STRESS_CELL_COUNT}
+                            renderer={isOnGraphicsCard ? "graphics_card" : "elements"}
+                        />
                     </PageMeasureBox>
                 )}
             />
@@ -153,7 +177,7 @@ export const ParticleFieldPage = () => {
     const [originType, setOriginType] = useState<CellAnimationOrigins.OriginType>(
         ParticleFieldKnobs.STARTING_ORIGIN_KEY,
     );
-    const [weightType, setWeightType] = useState<CellAnimationWeights.WeightType>(
+    const [weightType, setWeightType] = useState<SliceAnimationWeights.WeightType>(
         ParticleFieldKnobs.STARTING_WEIGHT_KEY,
     );
     const [animationType, setAnimationType] = useState<CellAnimationKeyframes.AnimationType>(
@@ -261,7 +285,7 @@ export const ParticleFieldPage = () => {
                     <PageSelectField
                         value={originType}
                         values={CellAnimationOrigins.ORIGIN_TYPES}
-                        isDisabled={!CellAnimationWeights.isOriginAware(weightType)}
+                        isDisabled={!SliceAnimationWeights.isOriginAware(weightType)}
                         ariaLabel={"Origin"}
                         onChange={(origin) => setOriginType(origin)}
                     />

@@ -47,23 +47,48 @@ import type {
 const StressTestWrapper = (props: ParticleSpawnerExampleProps) => {
     const modalPlayback = useState(true);
 
+    const [isOnGraphicsCard, setIsOnGraphicsCard] = useState(true);
+
     return (
-        <StressTest
-            configs={STRESS_ITEMS}
-            onShowModal={() => props.playback[1](false)}
-            onHideModal={() => props.playback[1](true)}
-            renderLabel={(configIndex) => `Render ${STRESS_ITEMS[configIndex].count} spawners`}
-            renderItem={(configIndex) => (
-                <div
-                    style={{
-                        width: `${STRESS_ITEMS[configIndex].width}px`,
-                        height: `${STRESS_ITEMS[configIndex].height}px`,
-                    }}
+        <>
+            <PagePropsPanel scope={"local"} hasReset={false}>
+                <PageProp
+                    itemKey={"onGraphicsCard"}
+                    label={"On the graphics card"}
+                    hint={
+                        "Draws each spawner's particles in one canvas that follows them, with their positions worked out as before. Off, every particle is an element of its own."
+                    }
+                    controls={"Sets ParticleSpawnerProps.renderer in the stress test"}
                 >
-                    <SingleTargetExample {...props} playback={modalPlayback} />
-                </div>
-            )}
-        />
+                    <PageCheckField
+                        value={isOnGraphicsCard}
+                        ariaLabel={"On the graphics card"}
+                        onChange={setIsOnGraphicsCard}
+                    />
+                </PageProp>
+            </PagePropsPanel>
+
+            <StressTest
+                configs={STRESS_ITEMS}
+                onShowModal={() => props.playback[1](false)}
+                onHideModal={() => props.playback[1](true)}
+                renderLabel={(configIndex) => `Render ${STRESS_ITEMS[configIndex].count} spawners`}
+                renderItem={(configIndex) => (
+                    <div
+                        style={{
+                            width: `${STRESS_ITEMS[configIndex].width}px`,
+                            height: `${STRESS_ITEMS[configIndex].height}px`,
+                        }}
+                    >
+                        <SingleTargetExample
+                            {...props}
+                            playback={modalPlayback}
+                            renderer={isOnGraphicsCard ? "graphics_card" : "elements"}
+                        />
+                    </div>
+                )}
+            />
+        </>
     );
 };
 

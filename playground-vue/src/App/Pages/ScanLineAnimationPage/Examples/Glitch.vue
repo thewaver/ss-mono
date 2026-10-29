@@ -1,16 +1,20 @@
 <script setup lang="ts">
 import { computed, shallowRef, useModel, watch } from "vue";
 
-import { CellAnimationWeights, ScanlineAnimation } from "@thewaver/ss-components-vue";
-import type { CellAnimationBreakpointTriple, ScanlineAnimationEvaluationDefs } from "@thewaver/ss-components-vue";
+import { ScanlineAnimation, SliceAnimationKeyframeUtils, SliceAnimationWeights } from "@thewaver/ss-components-vue";
+import type { SliceAnimationBreakpointTriple, SliceStop } from "@thewaver/ss-components-vue";
 import type { Index2d } from "@thewaver/ss-utils";
 
 import type { ScanlineAnimationExampleProps } from "../ScanlineAnimationPage.types";
 
 const WEIGHT_ORIGIN = { row: 0, col: 0 };
 
+const NO_STOPS: SliceStop[] = [];
+
+const WHOLE_PASS = { smoothness: 1 };
+
 const getGlitchBreakpointGroups = (count: number, start: number, end: number) => {
-    const result: CellAnimationBreakpointTriple[] = [];
+    const result: SliceAnimationBreakpointTriple[] = [];
     const range = end - start;
     const segmentWidth = range / count;
 
@@ -79,8 +83,8 @@ watch(
     regenerateShifts,
 );
 
-const computeCellWeights = (count: Index2d) =>
-    CellAnimationWeights.computeCellWeights(props.weightType, count, WEIGHT_ORIGIN);
+const computeSliceWeights = (count: Index2d) =>
+    SliceAnimationWeights.computeSliceWeights(props.weightType, count, WEIGHT_ORIGIN);
 
 const computeRootAnimation = (timeline: number) => {
     for (let g = 0; g < breakpointGroups.value.length; g++) {
@@ -94,20 +98,23 @@ const computeRootAnimation = (timeline: number) => {
     return { brightness: 100 };
 };
 
-const computeSliceAnimation = (defs: ScanlineAnimationEvaluationDefs, timeline: number) => {
-    for (let g = 0; g < breakpointGroups.value.length; g++) {
-        const [start, , end] = breakpointGroups.value[g];
+const animation = computed(() => {
+    const groups = breakpointGroups.value;
+    const rowStops = Array.from({ length: props.lineCount }, (_, row) =>
+        groups.flatMap(([start, , end], group): SliceStop[] => {
+            const shift = shifts.value[group]?.[row] ?? 0;
 
-        if (timeline >= start && timeline <= end) {
-            const shiftGroup = shifts.value[g];
-            const shiftVal = shiftGroup ? (shiftGroup[defs.pos.row] ?? 0) : 0;
+            return [
+                { at: start, translateX: 0 },
+                { at: start, translateX: shift },
+                { at: end, translateX: shift },
+                { at: end, translateX: 0 },
+            ];
+        }),
+    );
 
-            return { translateX: shiftVal };
-        }
-    }
-
-    return { translateX: 0 };
-};
+    return SliceAnimationKeyframeUtils.fromSlices(({ pos }) => rowStops[pos.row] ?? NO_STOPS);
+});
 </script>
 
 <template>
@@ -119,9 +126,10 @@ const computeSliceAnimation = (defs: ScanlineAnimationEvaluationDefs, timeline: 
         :orientation="orientation"
         :animation-duration-ms="animationDurationMs"
         :animation-iteration-delay-ms="animationIterationDelayMs"
-        :compute-cell-weights="computeCellWeights"
+        :compute-slice-weights="computeSliceWeights"
         :compute-root-animation="computeRootAnimation"
-        :compute-slice-animation="computeSliceAnimation"
+        :breakpoint-opts="WHOLE_PASS"
+        :compute-slice-animation="animation"
         @iteration-end="regenerateShifts"
     />
 </template>

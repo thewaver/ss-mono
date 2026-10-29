@@ -2,16 +2,16 @@ import { createMemo, createSignal } from "solid-js";
 
 import { Button, ParticleDissolve, access } from "@thewaver/ss-components-solid";
 import {
+    ASH_ANIMATION,
+    ASH_SRC,
     NO_EDGE_THICKNESSES,
     SVG_LABEL,
     SVG_SIZE,
-    computeAshAnimation,
 } from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.css";
 import { ShapeConst, ShapeUtils } from "@thewaver/ss-utils";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
-import { AshParticle } from "../AshParticle";
 import type { ParticleDissolveSvgExampleProps } from "../ParticleDissolvePageSolid.types";
 
 type Props = ParticleDissolveSvgExampleProps;
@@ -37,8 +37,8 @@ export const SvgExample = (props: Props) => {
                 featherShare={props.featherShare}
                 spawnChance={props.spawnChance}
                 cellSize={props.cellSize}
-                computeParticleAnimation={computeAshAnimation}
-                renderParticle={(defs) => <AshParticle defs={defs} />}
+                src={ASH_SRC}
+                computeParticleAnimation={ASH_ANIMATION}
             >
                 <svg
                     class={styles.svgShape}

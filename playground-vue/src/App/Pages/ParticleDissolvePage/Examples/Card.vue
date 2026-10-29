@@ -3,13 +3,13 @@ import { shallowRef } from "vue";
 
 import { Button, ParticleDissolve } from "@thewaver/ss-components-vue";
 import {
+    ASH_ANIMATION,
+    ASH_SRC,
     CARD_TEXT,
-    computeAshAnimation,
 } from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.css";
 
 import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.vue";
-import AshParticle from "../AshParticle.vue";
 import type { ParticleDissolveAngleExampleProps } from "../ParticleDissolvePageVue.types";
 
 type Props = ParticleDissolveAngleExampleProps;
@@ -37,17 +37,14 @@ const rebuild = () => {
             :feather-share="featherShare"
             :spawn-chance="spawnChance"
             :cell-size="cellSize"
-            :compute-particle-animation="computeAshAnimation"
+            :src="ASH_SRC"
+            :compute-particle-animation="ASH_ANIMATION"
         >
             <div :class="styles.card">
                 <span id="particleDissolveCardTitle" :class="styles.cardTitle">{{ CARD_TEXT.title }}</span>
                 <span>{{ CARD_TEXT.body }}</span>
                 <span id="particleDissolveCardBadge" :class="styles.badge">{{ CARD_TEXT.badge }}</span>
             </div>
-
-            <template #renderParticle="{ defs }">
-                <AshParticle :defs="defs" />
-            </template>
         </ParticleDissolve>
 
         <div :class="styles.buttonRow">

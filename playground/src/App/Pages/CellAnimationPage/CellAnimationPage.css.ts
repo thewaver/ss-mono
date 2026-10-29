@@ -23,12 +23,6 @@ export const stack = style({
     gap: themeVars.spacing.full,
 });
 
-export const gpuCellsCanvas = style({
-    position: "absolute",
-    display: "block",
-    pointerEvents: "none",
-});
-
 export const wipeOverlay = style({
     position: "fixed",
     inset: 0,

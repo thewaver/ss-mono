@@ -43,10 +43,6 @@ export const badge = style({
     fontWeight: "bold",
 });
 
-export const ashParticle = style({
-    borderRadius: "50%",
-});
-
 export const svgShape = style({
     display: "block",
     overflow: "visible",

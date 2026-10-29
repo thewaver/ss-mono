@@ -1,17 +1,44 @@
+import {
+    SLICE_STOP_KEYS,
+    type SliceAnimationFn,
+    SliceAnimationKeyframeUtils,
+    type SliceStop,
+} from "@thewaver/ss-components";
 import { type Index2d, type Point2d, type Rect, RectUtils } from "@thewaver/ss-utils";
 
 import type { StressTestDefs } from "../../PageComponents/StressTest/StressText.types";
 
-export const computeParticleTimeline = (t: number, holdShare: number) => {
+const composeEnvelope = (stops: SliceStop[], holdShare: number): SliceStop[] => {
     const edge = (1 - holdShare) * 0.5;
 
-    if (edge <= 0) return 1;
+    return SLICE_STOP_KEYS.flatMap((key) => {
+        const track = stops.filter((stop) => stop[key] !== undefined);
 
-    if (t < edge) return t / edge;
+        if (track.length === 0) return [];
+        if (edge <= 0) return [{ at: 0, [key]: track[track.length - 1][key] }];
 
-    if (t > 1 - edge) return (1 - t) / edge;
+        return [
+            ...track.map((stop) => ({ at: stop.at * edge, [key]: stop[key] })),
+            ...[...track].reverse().map((stop) => ({ at: 1 - stop.at * edge, [key]: stop[key] })),
+        ];
+    });
+};
 
-    return 1;
+export const createEnvelope = (animation: SliceAnimationFn, holdShare: number) => {
+    const composed = new WeakMap<SliceStop[], SliceStop[]>();
+
+    return SliceAnimationKeyframeUtils.fromSlices((defs) => {
+        const stops = SliceAnimationKeyframeUtils.resolveStops(animation, defs) ?? [];
+        const existing = composed.get(stops);
+
+        if (existing) return existing;
+
+        const next = composeEnvelope(stops, holdShare);
+
+        composed.set(stops, next);
+
+        return next;
+    });
 };
 
 export const computeParticlePos = (rect: Rect, isScattered: boolean): Point2d =>

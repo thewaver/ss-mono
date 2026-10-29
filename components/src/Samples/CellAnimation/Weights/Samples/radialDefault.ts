@@ -1,9 +1,0 @@
-import type { WeightFn } from "../../../../Generators/CellAnimationWeights/CellAnimationWeights.types";
-import { CellAnimationWeightUtils } from "../../../../Generators/CellAnimationWeights/CellAnimationWeights.utils";
-
-export const radialDefault: WeightFn = (pos, count, origin) => {
-    const maxDist = CellAnimationWeightUtils.getMaxDistance(origin, count);
-    const dist = CellAnimationWeightUtils.getCellDelta(origin, pos);
-
-    return 1 - CellAnimationWeightUtils.getCellDistance(dist) / CellAnimationWeightUtils.getCellDistance(maxDist);
-};

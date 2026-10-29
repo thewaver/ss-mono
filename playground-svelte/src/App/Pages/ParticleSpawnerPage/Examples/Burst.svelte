@@ -4,7 +4,10 @@
 
     import { Button, ParticleSpawner } from "@thewaver/ss-components-svelte";
     import type { ParticleSpawnIterationPattern } from "@thewaver/ss-components-svelte";
-    import { computeParticleGlow } from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.const";
+    import {
+        computeParticleAnimation,
+        createParticleSrc,
+    } from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.const";
     import * as styles from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.css";
 
     import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
@@ -22,6 +25,8 @@
     ];
 
     let { playback: _playback, ...props }: ParticleSpawnerExampleProps = $props();
+
+    const particleSrc = createParticleSrc();
 
     let playback = $state(false);
 
@@ -70,19 +75,12 @@
                 bind:playback
                 spawnIterationPatterns={ONE_ROUND}
                 targets={targetRefs}
+                src={particleSrc}
+                {computeParticleAnimation}
                 onAnimationEnd={() => {
                     playback = false;
                 }}
-            >
-                {#snippet renderParticle(_index, t)}
-                    {@const glow = computeParticleGlow(t)}
-                    <div
-                        class={styles.particle}
-                        style:opacity={glow.opacity}
-                        style:transform={`scale(${glow.scale})`}
-                    ></div>
-                {/snippet}
-            </ParticleSpawner>
+            />
         </div>
     </div>
 </div>

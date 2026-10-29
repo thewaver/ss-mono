@@ -1,12 +1,12 @@
-import type { CellAnimationFn } from "../../../../Generators/CellAnimationKeyframes/CellAnimationKeyframes.types";
-import { CellAnimationKeyframeUtils } from "../../../../Generators/CellAnimationKeyframes/CellAnimationKeyframes.utils";
+import type { SliceAnimationFn } from "../../../../Generators/SliceAnimationKeyframes/SliceAnimationKeyframes.types";
+import { SliceAnimationKeyframeUtils } from "../../../../Generators/SliceAnimationKeyframes/SliceAnimationKeyframes.utils";
 import { shakeDown } from "./shakeDown";
 import { shakeLeft } from "./shakeLeft";
 import { shakeRight } from "./shakeRight";
 import { shakeUp } from "./shakeUp";
 import { zoomIn } from "./zoomIn";
 
-export const shakeQuadrantInverted: CellAnimationFn = CellAnimationKeyframeUtils.fromZones(
+export const shakeQuadrantInverted: SliceAnimationFn = SliceAnimationKeyframeUtils.fromZones(
     [
         { zone: "top", animation: shakeDown },
         { zone: "bottom", animation: shakeUp },

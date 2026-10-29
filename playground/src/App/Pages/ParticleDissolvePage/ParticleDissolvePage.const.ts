@@ -1,7 +1,8 @@
-import { CellAnimationKeyframeUtils } from "@thewaver/ss-components";
-import type { CellStop, ParticleDissolveParticleDefs } from "@thewaver/ss-components";
-import { type CSSAnimationValues, RandomUtils } from "@thewaver/ss-utils";
+import { SliceAnimationKeyframeUtils } from "@thewaver/ss-components";
+import type { SliceStop } from "@thewaver/ss-components";
+import { RandomUtils } from "@thewaver/ss-utils";
 
+import { ParticlePictureUtils } from "../../PageComponents/ParticlePicture/ParticlePicture.utils";
 import type { StressTestDefs } from "../../PageComponents/StressTest/StressText.types";
 
 const RISE_MIN = 300;
@@ -34,6 +35,8 @@ export const FIELD_WIDTH = 110;
 
 export const PARTICLE_SHARE = 0.6;
 
+const ASH_COLOR = "#ffffff";
+
 export const SVG_SIZE = { width: 200, height: 200 };
 
 export const SVG_LABEL = "N∅THING";
@@ -48,16 +51,16 @@ export const NO_EDGE_THICKNESSES = [0];
 
 export const CENTER_SHARE = { x: 0.5, y: 0.5 };
 
-export const createAshAnimation = () => {
-    const byKey = new Map<number, CellStop[]>();
+const createAshAnimation = () => {
+    const byKey = new Map<number, SliceStop[]>();
 
-    return CellAnimationKeyframeUtils.fromSlices(({ pos, count }) => {
+    return SliceAnimationKeyframeUtils.fromSlices(({ pos, count }) => {
         const key = pos.row * count.col + pos.col;
         const existing = byKey.get(key);
 
         if (existing) return existing;
 
-        const stops: CellStop[] = [
+        const stops: SliceStop[] = [
             { at: 0, translateX: 0, translateY: 0, scaleX: FULL, scaleY: FULL, opacity: FULL },
             {
                 at: 1,
@@ -75,13 +78,6 @@ export const createAshAnimation = () => {
     });
 };
 
-export const computeAshAnimation = (defs: ParticleDissolveParticleDefs, t: number): CSSAnimationValues => {
-    const key = defs.cell.pos.row * defs.cell.count.col + defs.cell.pos.col;
+export const ASH_ANIMATION = createAshAnimation();
 
-    return {
-        translateX: (RandomUtils.hash(key, DRIFT_SEED) - 0.5) * DRIFT_SPREAD * t,
-        translateY: -(RISE_MIN + RandomUtils.hash(key, RISE_SEED) * RISE_SPREAD) * t,
-        scale: [FULL - SHRINK * t, FULL - SHRINK * t],
-        opacity: FULL * (1 - t),
-    };
-};
+export const ASH_SRC = ParticlePictureUtils.createDotSrc(ASH_COLOR, ASH_COLOR, { fillShare: PARTICLE_SHARE });

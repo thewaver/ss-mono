@@ -1,12 +1,12 @@
-import type { CellAnimationFn } from "../../../../Generators/CellAnimationKeyframes/CellAnimationKeyframes.types";
-import { CellAnimationKeyframeUtils } from "../../../../Generators/CellAnimationKeyframes/CellAnimationKeyframes.utils";
+import type { SliceAnimationFn } from "../../../../Generators/SliceAnimationKeyframes/SliceAnimationKeyframes.types";
+import { SliceAnimationKeyframeUtils } from "../../../../Generators/SliceAnimationKeyframes/SliceAnimationKeyframes.utils";
 import { carouselBottom } from "./carouselBottom";
 import { carouselLeft } from "./carouselLeft";
 import { carouselRight } from "./carouselRight";
 import { carouselTop } from "./carouselTop";
 import { zoomIn } from "./zoomIn";
 
-export const carouselQuadrantInverted: CellAnimationFn = CellAnimationKeyframeUtils.fromZones(
+export const carouselQuadrantInverted: SliceAnimationFn = SliceAnimationKeyframeUtils.fromZones(
     [
         { zone: "top", animation: carouselBottom },
         { zone: "bottom", animation: carouselTop },

@@ -16,3 +16,7 @@ export const particleSpawnerItem = style({
     left: 0,
     top: 0,
 });
+
+export const particleSpawnerBody = style({
+    transformOrigin: "center center",
+});

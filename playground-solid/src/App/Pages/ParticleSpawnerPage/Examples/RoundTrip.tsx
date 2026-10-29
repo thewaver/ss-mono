@@ -1,8 +1,12 @@
-import { type Accessor, createSignal } from "solid-js";
+import { createSignal } from "solid-js";
 
 import { ParticleSpawner } from "@thewaver/ss-components-solid";
 import type { ParticleSpawnerController } from "@thewaver/ss-components-solid";
-import { computeParticleGlow } from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.const";
+import {
+    computeParticleAnimation,
+    createParticleSrc,
+    createReturnParticleSrc,
+} from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.css";
 
 import type { ParticleSpawnerExampleProps } from "../ParticleSpawnerPage.types";
@@ -15,13 +19,8 @@ export const RoundTripExample = (props: ParticleSpawnerExampleProps) => {
     const [getRelay, setRelay] = createSignal<ParticleSpawnerController>();
     const relayPlayback = createSignal(false);
 
-    const renderParticle = (getT: Accessor<number>, particleClass: string) => {
-        const getGlow = () => computeParticleGlow(getT());
-
-        return (
-            <div class={particleClass} style={{ opacity: getGlow().opacity, transform: `scale(${getGlow().scale})` }} />
-        );
-    };
+    const particleSrc = createParticleSrc();
+    const returnParticleSrc = createReturnParticleSrc();
 
     return (
         <div class={styles.demoArea}>
@@ -31,7 +30,8 @@ export const RoundTripExample = (props: ParticleSpawnerExampleProps) => {
                 <ParticleSpawner
                     {...props}
                     targets={() => [getReturnMarker()]}
-                    renderParticle={(_index, getT) => renderParticle(getT, styles.particle)}
+                    src={particleSrc}
+                    computeParticleAnimation={computeParticleAnimation}
                     onParticleArrive={() => getRelay()?.emit(RETURN_COUNT)}
                 />
             </div>
@@ -43,7 +43,8 @@ export const RoundTripExample = (props: ParticleSpawnerExampleProps) => {
                     {...props}
                     playback={relayPlayback}
                     targets={() => [getOutboundMarker()]}
-                    renderParticle={(_index, getT) => renderParticle(getT, styles.particleReturn)}
+                    src={returnParticleSrc}
+                    computeParticleAnimation={computeParticleAnimation}
                     onMount={setRelay}
                 />
             </div>

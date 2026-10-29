@@ -1,12 +1,6 @@
 import { createMemo, createSignal } from "solid-js";
 
-import {
-    RGBAnimation,
-    RGBAnimationKeyframes,
-    RGBAnimationUtils,
-    RGB_ANIMATION_CHANNELS,
-    access,
-} from "@thewaver/ss-components-solid";
+import { RGBAnimation, RGBAnimationKeyframes, RGB_ANIMATION_CHANNELS, access } from "@thewaver/ss-components-solid";
 import type { AccessorProps } from "@thewaver/ss-components-solid";
 
 import type { RGBAnimationExampleProps } from "../RGBAnimationPageSolid.types";
@@ -32,7 +26,7 @@ export const HueSwapExample = (props: Props) => {
             colorMixing={props.colorMixing}
             animationDurationMs={props.animationDurationMs}
             animationIterationDelayMs={props.animationIterationDelayMs}
-            computeSliceAnimation={(defs, timeline) => getAnimation()(timeline, RGBAnimationUtils.toSliceDefs(defs))}
+            computeSliceAnimation={getAnimation()}
             onIterationEnd={() => {
                 setPass((pass) => pass + 1);
             }}

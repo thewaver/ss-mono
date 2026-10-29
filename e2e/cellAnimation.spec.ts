@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { demo, prop, revealProp } from "./helpers";
+import { demo, prop, revealProp, useElementRenderer } from "./helpers";
 
 /**
  * The three motion components have Playground pages and no specs, because what they produce is movement over
@@ -11,6 +11,7 @@ import { demo, prop, revealProp } from "./helpers";
  * still size itself correctly, which is the failure that looks like the animation having gone wrong.
  */
 test.beforeEach(async ({ page }) => {
+    await useElementRenderer(page);
     await page.goto("/cell-animation");
     await expect(page.locator("img").first()).toBeVisible();
 });

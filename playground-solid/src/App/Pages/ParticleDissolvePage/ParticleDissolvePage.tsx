@@ -1,18 +1,16 @@
-import { Show, createMemo, createSignal, onCleanup, onMount } from "solid-js";
+import { createMemo, createSignal, onCleanup, onMount } from "solid-js";
 
 import { PARTICLE_DISSOLVE_DEFAULTS, ParticleDissolve } from "@thewaver/ss-components-solid";
 import { ParticleDissolveKnobs } from "@thewaver/ss-playground/App/Knobs/ParticleDissolves.const";
-import { CellGpuUtils } from "@thewaver/ss-playground/App/Pages/CellAnimationPage/CellGpu/CellGpu.utils";
 import {
+    ASH_ANIMATION,
+    ASH_SRC,
     CARD_TEXT,
     EXAMPLES_ROOT,
     EXAMPLE_NAMES,
     FIELD_WIDTH,
-    PARTICLE_SHARE,
     STRESS_CELL_SIZE,
     STRESS_ITEMS,
-    computeAshAnimation,
-    createAshAnimation,
 } from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.css";
 import { ShapeConst } from "@thewaver/ss-utils";
@@ -23,12 +21,10 @@ import { PageCheckField, PageNumberField, PageSelectField } from "../../PageComp
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { StressTest } from "../../PageComponents/StressTest/StressTest";
-import { AshParticle } from "./AshParticle";
 import { ButtonExample } from "./Examples/Button";
 import { CardExample } from "./Examples/Card";
 import { ImageExample } from "./Examples/Image";
 import { SvgExample } from "./Examples/Svg";
-import { GpuParticleDissolve } from "./GpuParticleDissolve";
 import type { ParticleDissolveExampleProps } from "./ParticleDissolvePageSolid.types";
 
 const AngleKnob = (props: { value: () => number; onInput: (value: number) => void }) => (
@@ -50,12 +46,8 @@ const AngleKnob = (props: { value: () => number; onInput: (value: number) => voi
     </PageProp>
 );
 
-const StressCard = (props: ParticleDissolveExampleProps & { isOnGpu: boolean }) => {
+const StressCard = (props: ParticleDissolveExampleProps & { isOnGraphicsCard: boolean }) => {
     const [getIsDissolved, setIsDissolved] = createSignal(false);
-
-    const ashAnimation = createAshAnimation();
-
-    const src = CellGpuUtils.createDotSrc("#ffffff", "#ffffff");
 
     onMount(() => {
         const timeout = setTimeout(() => setIsDissolved(true));
@@ -63,58 +55,31 @@ const StressCard = (props: ParticleDissolveExampleProps & { isOnGpu: boolean }) 
         onCleanup(() => clearTimeout(timeout));
     });
 
-    const renderCard = () => (
-        <div class={styles.card}>
-            <span class={styles.cardTitle}>{CARD_TEXT.title}</span>
-            <span>{CARD_TEXT.body}</span>
-            <span class={styles.badge}>{CARD_TEXT.badge}</span>
-        </div>
-    );
-
     return (
-        <Show
-            when={props.isOnGpu}
-            fallback={
-                <ParticleDissolve
-                    isDissolved={getIsDissolved}
-                    durationMs={props.durationMs}
-                    particleLifetimeMs={props.particleLifetimeMs}
-                    featherShare={props.featherShare}
-                    spawnChance={props.spawnChance}
-                    cellSize={STRESS_CELL_SIZE}
-                    computeParticleAnimation={computeAshAnimation}
-                    renderParticle={(defs) => <AshParticle defs={defs} />}
-                    onDissolveEnd={() => setIsDissolved(false)}
-                    onRebuildEnd={() => setIsDissolved(true)}
-                >
-                    {renderCard()}
-                </ParticleDissolve>
-            }
+        <ParticleDissolve
+            src={ASH_SRC}
+            isDissolved={getIsDissolved}
+            durationMs={props.durationMs}
+            particleLifetimeMs={props.particleLifetimeMs}
+            featherShare={props.featherShare}
+            spawnChance={props.spawnChance}
+            cellSize={STRESS_CELL_SIZE}
+            renderer={() => (props.isOnGraphicsCard ? "graphics_card" : "elements")}
+            computeParticleAnimation={ASH_ANIMATION}
+            onDissolveEnd={() => setIsDissolved(false)}
+            onRebuildEnd={() => setIsDissolved(true)}
         >
-            <GpuParticleDissolve
-                src={src}
-                isDissolved={getIsDissolved}
-                durationMs={props.durationMs}
-                particleLifetimeMs={props.particleLifetimeMs}
-                featherShare={props.featherShare}
-                spawnChance={props.spawnChance}
-                cellSize={STRESS_CELL_SIZE}
-                animation={ashAnimation}
-                computeParticleSize={(cell) => ({
-                    width: cell.size.width * PARTICLE_SHARE,
-                    height: cell.size.height * PARTICLE_SHARE,
-                })}
-                onDissolveEnd={() => setIsDissolved(false)}
-                onRebuildEnd={() => setIsDissolved(true)}
-            >
-                {renderCard()}
-            </GpuParticleDissolve>
-        </Show>
+            <div class={styles.card}>
+                <span class={styles.cardTitle}>{CARD_TEXT.title}</span>
+                <span>{CARD_TEXT.body}</span>
+                <span class={styles.badge}>{CARD_TEXT.badge}</span>
+            </div>
+        </ParticleDissolve>
     );
 };
 
 const StressTestWrapper = (props: ParticleDissolveExampleProps) => {
-    const [getIsOnGpu, setIsOnGpu] = createSignal(true);
+    const [getIsOnGraphicsCard, setIsOnGraphicsCard] = createSignal(true);
 
     return (
         <>
@@ -122,21 +87,25 @@ const StressTestWrapper = (props: ParticleDissolveExampleProps) => {
 
             <PagePropsPanel scope={"local"} hasReset={false}>
                 <PageProp
-                    key={"gpuProof"}
+                    key={"onGraphicsCard"}
                     label={"On the graphics card"}
                     hint={
-                        "A proof of concept: draws each card's ash in one WebGL canvas, with each particle's motion worked out on the graphics card."
+                        "Draws each card's ash in one canvas, with each particle's motion worked out on the graphics card. Off, every particle is an element of its own."
                     }
-                    controls={"Swaps ParticleDissolve for the Playground's GpuParticleDissolve in the stress test"}
+                    controls={"Sets ParticleDissolveProps.renderer in the stress test"}
                 >
-                    <PageCheckField value={getIsOnGpu} ariaLabel={"On the graphics card"} onChange={setIsOnGpu} />
+                    <PageCheckField
+                        value={getIsOnGraphicsCard}
+                        ariaLabel={"On the graphics card"}
+                        onChange={setIsOnGraphicsCard}
+                    />
                 </PageProp>
             </PagePropsPanel>
 
             <StressTest
                 configs={STRESS_ITEMS}
                 renderLabel={(getConfigIndex) => `Render ${STRESS_ITEMS[getConfigIndex()].count} cards`}
-                renderItem={() => <StressCard {...props} isOnGpu={getIsOnGpu()} />}
+                renderItem={() => <StressCard {...props} isOnGraphicsCard={getIsOnGraphicsCard()} />}
             />
         </>
     );

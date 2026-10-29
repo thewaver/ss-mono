@@ -9,7 +9,7 @@ import {
     type ParticleFieldCellDefs,
     ParticleDissolveStyles as styles,
 } from "@thewaver/ss-components";
-import { type CSSAnimationValues, type Index2d, Index2dUtils, RectUtils } from "@thewaver/ss-utils";
+import { type Index2d, Index2dUtils, RectUtils } from "@thewaver/ss-utils";
 
 import { ElementObserverReactUtils } from "../../../Abstracts/ElementObserver/ElementObserverReact.utils";
 import { MediaQueryMonitorReactUtils } from "../../../Abstracts/MediaQueryMonitor/MediaQueryMonitorReact.utils";
@@ -17,8 +17,7 @@ import { useLatest } from "../../../Utils/refUtils";
 import { ParticleField } from "../ParticleField/ParticleField";
 import type { ParticleDissolveProps } from "./ParticleDissolve.types";
 
-const NO_ANIMATION: CSSAnimationValues = {};
-const NO_COLOR = "";
+const NO_COLOR = "transparent";
 const NEVER_PLAYING = [false, () => undefined] as const;
 const SINGLE_PASS = 1;
 
@@ -97,17 +96,7 @@ export const ParticleDissolve = (props: ParticleDissolveProps) => {
         return sample.pos;
     };
 
-    const computeParticleAnimation = (cell: ParticleFieldCellDefs, t: number) =>
-        latest.current.props.computeParticleAnimation?.(
-            { cell, color: samples.get(getCellKey(cell))?.color ?? NO_COLOR },
-            t,
-        ) ?? NO_ANIMATION;
-
-    const renderParticle = (cell: ParticleFieldCellDefs, t: number) => {
-        const sample = samples.get(getCellKey(cell));
-
-        return sample ? props.renderParticle({ cell, color: sample.color }, t) : undefined;
-    };
+    const computeParticleTint = (cell: ParticleFieldCellDefs) => samples.get(getCellKey(cell))?.color ?? NO_COLOR;
 
     useLayoutEffect(() => {
         const isDissolved = latest.current.props.isDissolved;
@@ -149,6 +138,8 @@ export const ParticleDissolve = (props: ParticleDissolveProps) => {
             {hasParticles && (
                 <div className={styles.particleDissolveParticles} aria-hidden="true">
                     <ParticleField
+                        src={props.src}
+                        renderer={props.renderer ?? PARTICLE_DISSOLVE_DEFAULTS.renderer}
                         cellCount={cellCount}
                         spawnChance={props.spawnChance ?? PARTICLE_DISSOLVE_DEFAULTS.spawnChance}
                         animationDurationMs={durationMs}
@@ -158,8 +149,8 @@ export const ParticleDissolve = (props: ParticleDissolveProps) => {
                         progress={[progress, ignoreWrite]}
                         computeCellWeights={computeCellWeights}
                         computeParticlePos={computeParticlePos}
-                        computeParticleAnimation={computeParticleAnimation}
-                        renderParticle={renderParticle}
+                        computeParticleAnimation={props.computeParticleAnimation}
+                        computeParticleTint={computeParticleTint}
                     />
                 </div>
             )}

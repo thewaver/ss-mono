@@ -2,12 +2,12 @@
     import { Button, ParticleDissolve } from "@thewaver/ss-components-svelte";
     import {
         CARD_TEXT,
-        computeAshAnimation,
+        ASH_ANIMATION,
+        ASH_SRC,
     } from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.const";
     import * as styles from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.css";
 
     import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.svelte";
-    import AshParticle from "../AshParticle.svelte";
     import type { ParticleDissolveAngleExampleProps } from "../ParticleDissolvePageSvelte.types";
 
     type Props = ParticleDissolveAngleExampleProps;
@@ -26,17 +26,14 @@
         featherShare={props.featherShare}
         spawnChance={props.spawnChance}
         cellSize={props.cellSize}
-        computeParticleAnimation={computeAshAnimation}
+        src={ASH_SRC}
+        computeParticleAnimation={ASH_ANIMATION}
     >
         <div class={styles.card}>
             <span id={"particleDissolveCardTitle"} class={styles.cardTitle}>{CARD_TEXT.title}</span>
             <span>{CARD_TEXT.body}</span>
             <span id={"particleDissolveCardBadge"} class={styles.badge}>{CARD_TEXT.badge}</span>
         </div>
-
-        {#snippet renderParticle(defs)}
-            <AshParticle {defs} />
-        {/snippet}
     </ParticleDissolve>
 
     <div class={styles.buttonRow}>

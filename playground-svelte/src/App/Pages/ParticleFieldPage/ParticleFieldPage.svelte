@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { CellAnimationKeyframes, CellAnimationOrigins, CellAnimationWeights } from "@thewaver/ss-components-svelte";
+    import { CellAnimationKeyframes, CellAnimationOrigins, SliceAnimationWeights } from "@thewaver/ss-components-svelte";
     import { ParticleFieldKnobs } from "@thewaver/ss-playground/App/Knobs/ParticleFields.const";
     import * as styles from "@thewaver/ss-playground/App/Pages/ParticleFieldPage/ParticleFieldPage.css";
     import type { Index2d } from "@thewaver/ss-utils";
@@ -37,7 +37,7 @@
         return Object.entries(result);
     };
 
-    const GROUPPED_WEIGHTS = groupOptions(CellAnimationWeights.WEIGHT_TYPES);
+    const GROUPPED_WEIGHTS = groupOptions(SliceAnimationWeights.WEIGHT_TYPES);
     const GROUPPED_ANIMATIONS = groupOptions(CellAnimationKeyframes.ANIMATION_TYPES);
 
     let playback = $state(true);
@@ -51,7 +51,7 @@
     let holdShare = $state(ParticleFieldKnobs.STARTING_HOLD_SHARE);
     let isScattered = $state(ParticleFieldKnobs.STARTING_IS_SCATTERED);
     let originType = $state<CellAnimationOrigins.OriginType>(ParticleFieldKnobs.STARTING_ORIGIN_KEY);
-    let weightType = $state<CellAnimationWeights.WeightType>(ParticleFieldKnobs.STARTING_WEIGHT_KEY);
+    let weightType = $state<SliceAnimationWeights.WeightType>(ParticleFieldKnobs.STARTING_WEIGHT_KEY);
     let animationType = $state<CellAnimationKeyframes.AnimationType>(ParticleFieldKnobs.STARTING_ANIMATION_KEY);
     let cellCount = $state.raw<Index2d>({ ...ParticleFieldKnobs.STARTING_CELL_COUNT });
 
@@ -168,7 +168,7 @@
             <PageSelectField
                 value={originType}
                 values={CellAnimationOrigins.ORIGIN_TYPES}
-                isDisabled={!CellAnimationWeights.isOriginAware(weightType)}
+                isDisabled={!SliceAnimationWeights.isOriginAware(weightType)}
                 ariaLabel={"Origin"}
                 onChange={(origin) => {
                     originType = origin;

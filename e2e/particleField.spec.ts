@@ -1,6 +1,6 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { demo, example, prop, revealProp } from "./helpers";
+import { demo, example, prop, revealProp, useElementRenderer } from "./helpers";
 
 /**
  * A particle is in the page only while it lives: the field adds an element when a cell spawns and removes it once
@@ -76,6 +76,7 @@ const placesOf = (page: Page, key: string) =>
         );
 
 test.beforeEach(async ({ page }) => {
+    await useElementRenderer(page);
     await page.goto("/particle-field");
     await expect(page.locator(example("default"))).toBeVisible();
 });

@@ -1,12 +1,14 @@
 import { useState } from "react";
 
 import { Button, ParticleDissolve } from "@thewaver/ss-components-react";
-import { computeAshAnimation } from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.const";
+import {
+    ASH_ANIMATION,
+    ASH_SRC,
+} from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.css";
 import knight from "@thewaver/ss-playground/App/knight.webp";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
-import { AshParticle } from "../AshParticle";
 import type { ParticleDissolveAngleExampleProps } from "../ParticleDissolvePageReact.types";
 
 type Props = ParticleDissolveAngleExampleProps;
@@ -24,8 +26,8 @@ export const ImageExample = (props: Props) => {
                 featherShare={props.featherShare}
                 spawnChance={props.spawnChance}
                 cellSize={props.cellSize}
-                computeParticleAnimation={computeAshAnimation}
-                renderParticle={(defs) => <AshParticle defs={defs} />}
+                src={ASH_SRC}
+                computeParticleAnimation={ASH_ANIMATION}
             >
                 <img className={styles.image} src={knight} alt={"A knight"} />
             </ParticleDissolve>

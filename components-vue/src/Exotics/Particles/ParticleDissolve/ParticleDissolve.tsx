@@ -10,19 +10,17 @@ import {
     ParticleDissolveUtils,
     type ParticleFieldCellDefs,
 } from "@thewaver/ss-components";
-import { type CSSAnimationValues, type Index2d, Index2dUtils, RectUtils } from "@thewaver/ss-utils";
+import { type Index2d, Index2dUtils, RectUtils } from "@thewaver/ss-utils";
 
 import { ElementObserverVueUtils } from "../../../Abstracts/ElementObserver/ElementObserverVue.utils";
 import { MediaQueryMonitorVueUtils } from "../../../Abstracts/MediaQueryMonitor/MediaQueryMonitorVue.utils";
 import { watchAfterRender } from "../../../Utils/effectUtils";
-import { callSlot, declareProps } from "../../../Utils/propUtils";
+import { declareProps } from "../../../Utils/propUtils";
 import type { SlotsContext } from "../../../Utils/typeUtils";
 import { ParticleField } from "../ParticleField/ParticleField";
-import type { ParticleFieldSlots } from "../ParticleField/ParticleField.types";
 import type { ParticleDissolveProps, ParticleDissolveSlots } from "./ParticleDissolve.types";
 
-const NO_ANIMATION: CSSAnimationValues = {};
-const NO_COLOR = "";
+const NO_COLOR = "transparent";
 const SINGLE_PASS = 1;
 
 const getCellKey = (cell: ParticleFieldCellDefs) => Index2dUtils.toFlatIndex(cell.pos, cell.count.col);
@@ -88,17 +86,7 @@ export const ParticleDissolve = defineComponent(
             return sample.pos;
         };
 
-        const computeParticleAnimation = (cell: ParticleFieldCellDefs, t: number) =>
-            props.computeParticleAnimation?.({ cell, color: samples.get(getCellKey(cell))?.color ?? NO_COLOR }, t) ??
-            NO_ANIMATION;
-
-        const renderParticle: ParticleFieldSlots["renderParticle"] = ({ defs, t }) => {
-            const sample = samples.get(getCellKey(defs));
-
-            return sample
-                ? callSlot(slots.renderParticle, { defs: { cell: defs, color: sample.color }, t })
-                : undefined;
-        };
+        const computeParticleTint = (cell: ParticleFieldCellDefs) => samples.get(getCellKey(cell))?.color ?? NO_COLOR;
 
         const computeCellWeights = (count: Index2d) =>
             ParticleDissolveUtils.computeCellWeights(count, size.value, sweep.value);
@@ -154,6 +142,8 @@ export const ParticleDissolve = defineComponent(
                         <div class={ParticleDissolveStyles.particleDissolveParticles} aria-hidden="true">
                             <ParticleField
                                 {...{
+                                    "src": props.src,
+                                    "renderer": props.renderer ?? PARTICLE_DISSOLVE_DEFAULTS.renderer,
                                     "cellCount": cellCount.value,
                                     "spawnChance": props.spawnChance ?? PARTICLE_DISSOLVE_DEFAULTS.spawnChance,
                                     "animationDurationMs": getDurationMs(),
@@ -165,11 +155,10 @@ export const ParticleDissolve = defineComponent(
                                     "onUpdate:progress": ignoreWrite,
                                     "computeCellWeights": computeCellWeights,
                                     "computeParticlePos": computeParticlePos,
-                                    "computeParticleAnimation": computeParticleAnimation,
+                                    "computeParticleAnimation": props.computeParticleAnimation,
+                                    "computeParticleTint": computeParticleTint,
                                 }}
-                            >
-                                {{ renderParticle } satisfies ParticleFieldSlots}
-                            </ParticleField>
+                            />
                         </div>
                     )}
                 </div>
@@ -180,6 +169,7 @@ export const ParticleDissolve = defineComponent(
         name: "ParticleDissolve",
         slots: Object as SlotsType<ParticleDissolveSlots>,
         props: declareProps<ParticleDissolveProps>({
+            src: null,
             isDissolved: Boolean,
             angleDegrees: null,
             originShare: null,
@@ -188,6 +178,7 @@ export const ParticleDissolve = defineComponent(
             featherShare: null,
             spawnChance: null,
             cellSize: null,
+            renderer: null,
             computeParticleAnimation: null,
             onDissolveEnd: null,
             onRebuildEnd: null,

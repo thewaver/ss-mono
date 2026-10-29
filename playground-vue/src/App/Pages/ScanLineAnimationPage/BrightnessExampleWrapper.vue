@@ -2,9 +2,9 @@
 import { computed, reactive, shallowRef } from "vue";
 
 import type {
-    CellAnimationBreakpointDirection,
-    CellAnimationBreakpointOpts,
     ScanlineHorizontalBrightnessOpts,
+    SliceAnimationBreakpointDirection,
+    SliceAnimationBreakpointOpts,
 } from "@thewaver/ss-components-vue";
 import { ScanlineAnimationKnobs } from "@thewaver/ss-playground/App/Knobs/ScanlineAnimations.const";
 import { IMAGE_CONTAINER_SIZE } from "@thewaver/ss-playground/App/Pages/ScanLineAnimationPage/ScanLineAnimationPage.const";
@@ -30,7 +30,7 @@ const sharedProps = computed(() => {
 });
 
 const keyframeOpts: ScanlineHorizontalBrightnessOpts = {};
-const breakpointOpts = reactive<CellAnimationBreakpointOpts>({
+const breakpointOpts = reactive<SliceAnimationBreakpointOpts>({
     ...ScanlineAnimationKnobs.STARTING_BRIGHTNESS_BREAKPOINT_OPTS,
 });
 </script>
@@ -63,7 +63,7 @@ const breakpointOpts = reactive<CellAnimationBreakpointOpts>({
         />
         <DirInput
             :value="breakpointOpts.dir!"
-            :setter="(value: CellAnimationBreakpointDirection) => (breakpointOpts.dir = value)"
+            :setter="(value: SliceAnimationBreakpointDirection) => (breakpointOpts.dir = value)"
         />
     </PageExampleKnobs>
 </template>

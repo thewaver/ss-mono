@@ -1,6 +1,6 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { inlineStyle, prop } from "./helpers";
+import { inlineStyle, prop, useElementRenderer } from "./helpers";
 
 /**
  * A `ParticleDissolve` has no id and no test key of its own, so each example sits in a stage that does, and the spec walks down
@@ -49,7 +49,8 @@ const makeDense = async (page: Page) => {
 
 /**
  * Watches a dissolve for a while and keeps every particle it sees, once, where it was placed. A particle is in the page
- * only while it lives, so a single read at the end would find none.
+ * only while it lives, so a single read at the end would find none. Its color is the tint its picture is multiplied by;
+ * a particle that rose from a spot with no paint is tinted fully see-through, and is not seen.
  */
 const watchDots = (page: Page, key: string, watchMs: number): Promise<DotSample> =>
     page.evaluate(
@@ -65,14 +66,14 @@ const watchDots = (page: Page, key: string, watchMs: number): Promise<DotSample>
                     )) {
                         if (seen.has(item)) continue;
 
-                        const dot = item.querySelector("div > div[style*='background-color']") as HTMLElement | null;
+                        const picture = item.querySelector(":scope > div > div") as HTMLElement | null;
 
-                        if (!dot) continue;
+                        if (!picture || picture.style.opacity === "0") continue;
 
                         seen.set(item, {
                             x: Number.parseFloat((item as HTMLElement).style.left),
                             y: Number.parseFloat((item as HTMLElement).style.top),
-                            color: dot.style.backgroundColor,
+                            color: getComputedStyle(picture).backgroundColor,
                         });
                     }
 
@@ -103,6 +104,7 @@ const particleDissolveAndWatch = async (page: Page, key: string, burnId: string)
 };
 
 test.beforeEach(async ({ page }) => {
+    await useElementRenderer(page);
     await page.goto("/particle-dissolve");
     await expect(page.locator("#particleDissolveCardBurn")).toBeVisible();
 

@@ -1,10 +1,11 @@
 import type {
-    CellAnimationBreakpointOpts,
     CellAnimationFinalFrame,
     CellAnimationKeyframes,
     CellAnimationOrigins,
-    CellAnimationPlaybackOpts,
-    CellAnimationWeights,
+    SliceAnimationBreakpointOpts,
+    SliceAnimationPlaybackOpts,
+    SliceAnimationRenderer,
+    SliceAnimationWeights,
     WeightOpts,
 } from "@thewaver/ss-components-vue";
 import type { Index2d } from "@thewaver/ss-utils";
@@ -12,15 +13,16 @@ import type { Index2d } from "@thewaver/ss-utils";
 export type CellAnimationExampleProps = {
     "cellCount": Index2d;
     "originType": CellAnimationOrigins.OriginType;
-    "weightType": CellAnimationWeights.WeightType;
+    "weightType": SliceAnimationWeights.WeightType;
     "weightOpts": WeightOpts;
-    "breakpointOpts": CellAnimationBreakpointOpts;
-    "playbackOpts": CellAnimationPlaybackOpts;
+    "breakpointOpts": SliceAnimationBreakpointOpts;
+    "playbackOpts": SliceAnimationPlaybackOpts;
     "animationType": CellAnimationKeyframes.AnimationType;
     "animationDurationMs": number;
     "animationIterationCount": number;
     "animationIterationDelayMs": number;
     "finalFrame": CellAnimationFinalFrame;
+    "renderer"?: SliceAnimationRenderer;
     "playback": boolean;
     "onUpdate:playback"?: (isPlaying: boolean) => void;
 };

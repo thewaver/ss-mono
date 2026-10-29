@@ -2,16 +2,16 @@ import { useMemo, useState } from "react";
 
 import { Button, ParticleDissolve } from "@thewaver/ss-components-react";
 import {
+    ASH_ANIMATION,
+    ASH_SRC,
     NO_EDGE_THICKNESSES,
     SVG_LABEL,
     SVG_SIZE,
-    computeAshAnimation,
 } from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.css";
 import { ShapeConst, ShapeUtils } from "@thewaver/ss-utils";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
-import { AshParticle } from "../AshParticle";
 import type { ParticleDissolveSvgExampleProps } from "../ParticleDissolvePageReact.types";
 
 type Props = ParticleDissolveSvgExampleProps;
@@ -36,8 +36,8 @@ export const SvgExample = (props: Props) => {
                 featherShare={props.featherShare}
                 spawnChance={props.spawnChance}
                 cellSize={props.cellSize}
-                computeParticleAnimation={computeAshAnimation}
-                renderParticle={(defs) => <AshParticle defs={defs} />}
+                src={ASH_SRC}
+                computeParticleAnimation={ASH_ANIMATION}
             >
                 <svg
                     className={styles.svgShape}

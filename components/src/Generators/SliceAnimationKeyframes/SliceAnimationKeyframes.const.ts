@@ -1,0 +1,25 @@
+import type { SliceStop } from "./SliceAnimationKeyframes.types";
+
+export const SLICE_STOP_KEYS: readonly Exclude<keyof SliceStop, "at">[] = [
+    "perspective",
+    "translateX",
+    "translateY",
+    "translateZ",
+    "rotate",
+    "rotateX",
+    "rotateY",
+    "skewX",
+    "skewY",
+    "scaleX",
+    "scaleY",
+    "opacity",
+    "blur",
+    "brightness",
+    "grayscale",
+    "hue-rotate",
+    "invert",
+    "saturate",
+    "originX",
+    "originY",
+    "depth",
+];

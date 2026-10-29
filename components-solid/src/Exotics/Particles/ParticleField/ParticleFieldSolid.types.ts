@@ -1,6 +1,4 @@
-import type { Accessor, JSX } from "solid-js";
-
-import type { BaseParticleFieldCbs, BaseParticleFieldValues, ParticleFieldCellDefs } from "@thewaver/ss-components";
+import type { BaseParticleFieldCbs, BaseParticleFieldValues } from "@thewaver/ss-components";
 
 import type { AccessorValues, SignalSource } from "../../../Utils/typeUtils";
 
@@ -13,6 +11,4 @@ export type ParticleFieldProps = AccessorValues<BaseParticleFieldValues> &
          * moves the pass there: while playing it carries on from the new point, and with playback paused it scrubs.
          */
         progress?: SignalSource<number>;
-        /** Draws one particle, and is told how far through its life it is. */
-        renderParticle: (defs: ParticleFieldCellDefs, getT: Accessor<number>) => JSX.Element;
     };

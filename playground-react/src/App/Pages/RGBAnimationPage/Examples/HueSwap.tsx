@@ -1,24 +1,22 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
-import { RGBAnimation, RGB_ANIMATION_CHANNELS } from "@thewaver/ss-components-react";
-import type { RGBAnimationChannel } from "@thewaver/ss-components-react";
+import { RGBAnimation, RGBAnimationKeyframes, RGB_ANIMATION_CHANNELS } from "@thewaver/ss-components-react";
 
 import type { RGBAnimationExampleProps } from "../RGBAnimationPageReact.types";
-
-const FULL_TURN_DEGREES = 360;
-
-const computeDirection = (channel: RGBAnimationChannel, anchor: RGBAnimationChannel) => {
-    if (channel === anchor) return 0;
-
-    return RGB_ANIMATION_CHANNELS.find((other) => other !== anchor) === channel ? 1 : -1;
-};
 
 type Props = RGBAnimationExampleProps & { turns: number };
 
 export const HueSwapExample = (props: Props) => {
     const [pass, setPass] = useState(0);
 
-    const anchor = RGB_ANIMATION_CHANNELS[pass % RGB_ANIMATION_CHANNELS.length];
+    const animation = useMemo(
+        () =>
+            RGBAnimationKeyframes.createHueSwap({
+                turns: props.turns,
+                anchor: RGB_ANIMATION_CHANNELS[pass % RGB_ANIMATION_CHANNELS.length],
+            }),
+        [props.turns, pass],
+    );
 
     return (
         <RGBAnimation
@@ -29,9 +27,7 @@ export const HueSwapExample = (props: Props) => {
             colorMixing={props.colorMixing}
             animationDurationMs={props.animationDurationMs}
             animationIterationDelayMs={props.animationIterationDelayMs}
-            computeSliceAnimation={(defs, timeline) => ({
-                "hue-rotate": computeDirection(defs.channel, anchor) * props.turns * FULL_TURN_DEGREES * timeline,
-            })}
+            computeSliceAnimation={animation}
             onIterationEnd={() => {
                 setPass((pass) => pass + 1);
             }}

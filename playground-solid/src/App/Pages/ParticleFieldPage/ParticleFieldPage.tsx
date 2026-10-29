@@ -1,14 +1,8 @@
-import { Show, type Signal, createMemo, createSignal } from "solid-js";
+import { type Signal, createMemo, createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
 
-import {
-    CellAnimationKeyframes,
-    CellAnimationOrigins,
-    CellAnimationWeights,
-    access,
-} from "@thewaver/ss-components-solid";
+import { CellAnimationKeyframes, CellAnimationOrigins, SliceAnimationWeights } from "@thewaver/ss-components-solid";
 import { ParticleFieldKnobs } from "@thewaver/ss-playground/App/Knobs/ParticleFields.const";
-import { CellGpuUtils } from "@thewaver/ss-playground/App/Pages/CellAnimationPage/CellGpu/CellGpu.utils";
 import {
     BOX_HEIGHT,
     BOX_WIDTH,
@@ -18,10 +12,8 @@ import {
     SHAPED_BOX_SIZE,
     STRESS_CELL_COUNT,
     STRESS_ITEMS,
-    computeParticlePos,
 } from "@thewaver/ss-playground/App/Pages/ParticleFieldPage/ParticleFieldPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ParticleFieldPage/ParticleFieldPage.css";
-import { themeVars } from "@thewaver/ss-playground/App/Theme.css";
 import { type Index2d, ShapeConst } from "@thewaver/ss-utils";
 
 import { PageExampleKnobs } from "../../PageComponents/ExampleKnobs/ExampleKnobs";
@@ -39,7 +31,6 @@ import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { StressTest } from "../../PageComponents/StressTest/StressTest";
 import { DefaultExample } from "./Examples/Default";
 import { ShapedExample } from "./Examples/Shaped";
-import { GpuParticleField } from "./GpuParticleField";
 import type { ParticleFieldExampleProps } from "./ParticleFieldPage.types";
 
 const extractOptionGroupWord = (key: string) => key.replace(/^_/, "").match(/^[a-z]+/)?.[0] ?? key;
@@ -57,7 +48,7 @@ const groupOptions = <T extends string>(keys: readonly T[]) => {
     return Object.entries(result);
 };
 
-const GROUPPED_WEIGHTS = groupOptions(CellAnimationWeights.WEIGHT_TYPES);
+const GROUPPED_WEIGHTS = groupOptions(SliceAnimationWeights.WEIGHT_TYPES);
 const GROUPPED_ANIMATIONS = groupOptions(CellAnimationKeyframes.ANIMATION_TYPES);
 
 const DefaultExampleWrapper = (
@@ -127,18 +118,7 @@ const ShapedExampleWrapper = (props: ParticleFieldExampleProps) => {
 const StressTestWrapper = (props: ParticleFieldExampleProps) => {
     const modalPlayback = createSignal(true);
 
-    const [getIsOnGpu, setIsOnGpu] = createSignal(true);
-
-    const getSrc = createMemo(() =>
-        CellGpuUtils.createDotSrc(themeVars.color.success.light, themeVars.color.success.dark),
-    );
-
-    const getAnimation = createMemo(() =>
-        CellGpuUtils.createEnvelope(
-            CellAnimationKeyframes.SAMPLE_ANIMATIONS[access(props.animationType)],
-            access(props.holdShare),
-        ),
-    );
+    const [getIsOnGraphicsCard, setIsOnGraphicsCard] = createSignal(true);
 
     return (
         <>
@@ -146,14 +126,18 @@ const StressTestWrapper = (props: ParticleFieldExampleProps) => {
 
             <PagePropsPanel scope={"local"} hasReset={false}>
                 <PageProp
-                    key={"gpuProof"}
+                    key={"onGraphicsCard"}
                     label={"On the graphics card"}
                     hint={
-                        "A proof of concept: draws the stress test's particles in one WebGL canvas per field, with the keyframes worked out on the graphics card."
+                        "Draws the stress test's particles in one canvas per field, with the keyframes worked out on the graphics card. Off, every particle is an element of its own."
                     }
-                    controls={"Swaps ParticleField for the Playground's GpuParticleField in the stress test"}
+                    controls={"Sets ParticleFieldProps.renderer in the stress test"}
                 >
-                    <PageCheckField value={getIsOnGpu} ariaLabel={"On the graphics card"} onChange={setIsOnGpu} />
+                    <PageCheckField
+                        value={getIsOnGraphicsCard}
+                        ariaLabel={"On the graphics card"}
+                        onChange={setIsOnGraphicsCard}
+                    />
                 </PageProp>
             </PagePropsPanel>
 
@@ -167,38 +151,12 @@ const StressTestWrapper = (props: ParticleFieldExampleProps) => {
                         width={() => STRESS_ITEMS[getConfigIndex()].size}
                         height={() => STRESS_ITEMS[getConfigIndex()].size}
                     >
-                        <Show
-                            when={getIsOnGpu()}
-                            fallback={
-                                <DefaultExample {...props} playback={modalPlayback} cellCount={STRESS_CELL_COUNT} />
-                            }
-                        >
-                            <GpuParticleField
-                                src={getSrc()}
-                                cellCount={STRESS_CELL_COUNT}
-                                origin={() =>
-                                    CellAnimationOrigins.computeOrigin(access(props.originType), STRESS_CELL_COUNT)
-                                }
-                                spawnChance={props.spawnChance}
-                                animationDurationMs={props.animationDurationMs}
-                                animationIterationDelayMs={props.animationIterationDelayMs}
-                                particleLifetimeMs={props.particleLifetimeMs}
-                                playback={modalPlayback}
-                                animation={getAnimation()}
-                                computeParticleSize={() => ({
-                                    width: styles.PARTICLE_SIZE_PX,
-                                    height: styles.PARTICLE_SIZE_PX,
-                                })}
-                                computeCellWeights={(count) =>
-                                    CellAnimationWeights.computeCellWeights(
-                                        access(props.weightType),
-                                        count,
-                                        CellAnimationOrigins.computeOrigin(access(props.originType), count),
-                                    )
-                                }
-                                computeParticlePos={(defs) => computeParticlePos(defs.rect, access(props.isScattered))}
-                            />
-                        </Show>
+                        <DefaultExample
+                            {...props}
+                            playback={modalPlayback}
+                            cellCount={STRESS_CELL_COUNT}
+                            renderer={() => (getIsOnGraphicsCard() ? "graphics_card" : "elements")}
+                        />
                     </PageMeasureBox>
                 )}
             />
@@ -220,7 +178,7 @@ export const ParticleFieldPage = () => {
     const [getOriginType, setOriginType] = createSignal<CellAnimationOrigins.OriginType>(
         ParticleFieldKnobs.STARTING_ORIGIN_KEY,
     );
-    const [getWeightType, setWeightType] = createSignal<CellAnimationWeights.WeightType>(
+    const [getWeightType, setWeightType] = createSignal<SliceAnimationWeights.WeightType>(
         ParticleFieldKnobs.STARTING_WEIGHT_KEY,
     );
     const [getAnimationType, setAnimationType] = createSignal<CellAnimationKeyframes.AnimationType>(
@@ -330,7 +288,7 @@ export const ParticleFieldPage = () => {
                     <PageSelectField
                         value={getOriginType}
                         values={CellAnimationOrigins.ORIGIN_TYPES}
-                        isDisabled={() => !CellAnimationWeights.isOriginAware(getWeightType())}
+                        isDisabled={() => !SliceAnimationWeights.isOriginAware(getWeightType())}
                         ariaLabel={"Origin"}
                         onChange={(origin) => setOriginType(() => origin)}
                     />
