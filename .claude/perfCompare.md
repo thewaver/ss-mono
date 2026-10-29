@@ -33,6 +33,13 @@ anything.
 
     If the user says "after" is the working copy, skip exporting it and build from the repo itself in step 3.
 
+    **An old version needs patching in its export for parity with the latest**, or some tests are missing or measure
+    something else: `ba65aa1d` has no dissolve stress test (add `stressTest`, `STRESS_CELL_SIZE` and `STRESS_ITEMS` to
+    its `ParticleDissolvePage.const.ts`, and today's `StressCard` and `StressTestWrapper` to its Solid page, drawn with
+    its own `renderParticle` and `computeAshAnimation`), its card badge lacks the `marginTop` that makes the card 200 px
+    tall rather than 190, and its spawner stress test is 96 boxes of 120 × 80 rather than 72 squares of 120 in a
+    `PageMeasureBox`. Diff the export's Playground against the latest for anything newer before trusting a result.
+
 3. **Build each** (run in the background; each takes about a minute):
 
     ```bash
@@ -130,7 +137,7 @@ const SCENARIOS = {
     "Cells, 3D cube": cell("cube_left"),
     "Scanlines, moves": scan("transform"),
     "Scanlines, filters": scan("filter"),
-    "Spawners, 96": { route: "/particle-spawner", setup: (page) => press(page, "Render 96 spawners") },
+    "Spawners, 72": { route: "/particle-spawner", setup: (page) => press(page, "Render 72 spawners") },
     "Fields, 72": {
         route: "/particle-field",
         setup: async (page) => {

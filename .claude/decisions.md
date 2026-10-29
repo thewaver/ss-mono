@@ -9378,13 +9378,23 @@ the function must return the same array for the same slice for as long as the sa
 few contexts alive and the stress tests run 72 to 96 components. The tables go up as a small float texture, one row
 per table plus a row for the easing curve, and the shader interpolates them per slice per frame, in three modes:
 slices whose window comes from their weight, particles whose life comes from when they spawned, and particles whose
-values JavaScript worked out (`ParticleSpawner`, whose path is a function). **A component's picture is handed over,
-never copied**: each item draws into the bottom-left corner of the shared canvas, which only grows, and moves the
-whole picture into the component's own canvas through a `bitmaprenderer` context, the canvas element sized to the
-picture with its unused part see-through. Measured in a real window during the proof of concept, both alternatives
-lost: resizing the shared canvas per component reallocated it once per component per frame (a scanline test fell to
-16 frames a second), and copying the region out cost about two thirds of the frame rate on the cells and the
-spawners. **A canvas reaches past its box** by `computeReach`, which counts only what moves a slice past the box —
+values JavaScript worked out (`ParticleSpawner`, whose path is a function).
+
+**Every component's frame is drawn into one shared picture, handed over once per animation frame, and cut into
+pieces** — the user's choice, after measuring. `item.draw` only takes note of the frame and returns the size of the
+component's piece; one `requestAnimationFrame` per frame draws every noted component into its own rectangle of the
+shared canvas (laid out in rows, a second picture only if one would pass the graphics card's limit), hands it over
+with one `transferToImageBitmap`, and cuts each rectangle out with `createImageBitmap` for the component's
+`bitmaprenderer` canvas, which is sized to its piece. **The cost is one frame**: a picture shows one animation frame
+after the progress it was drawn for, since the four frameworks update the page at different moments and the renderer
+cannot know when the last component of a frame has asked. The first build handed each component's picture over on
+its own, which measured fast on the proof of concept's machine (a Radeon RX 7900 XTX) and, on an M3 Pro through
+Metal, made the browser wait for the graphics card at every handover — about 1.2 ms each, so 72 components capped
+the page near 11 frames a second whatever they drew. A bare page with none of the library's code showed the same,
+in Playwright's Chromium and in Google Chrome alike, and showed handing over without drawing first costing 0.16 ms,
+so the cost was the waiting. Copying each picture out instead measured three times faster on the M3 and three times
+slower on the Radeon, so it only traded one machine for the other; one handover per frame took the M3's stress tests
+from 11 to about 100 frames a second. **A canvas reaches past its box** by `computeReach`, which counts only what moves a slice past the box —
 travel, growth, turning, nearness under perspective, blur — because a first, generous bound made the scanline
 canvases six times their box and cost most of their frame rate. Its formula and the spawner's area step
 (`ParticleSpawnerUtils.growArea`) are Claude's guesses, checked only by the pictures matching. **The table texture's

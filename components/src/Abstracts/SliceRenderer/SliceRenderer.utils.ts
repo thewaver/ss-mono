@@ -34,6 +34,17 @@ type Renderer = {
     resources: Resources | undefined;
 };
 
+type Submission = {
+    width: number;
+    height: number;
+    render: () => void;
+    present: (picture: ImageBitmap) => void;
+};
+
+type Placement = { submission: Submission; left: number; top: number };
+
+type Batch = { placements: Placement[]; width: number; height: number };
+
 type PictureEntry = {
     picture: SliceRendererPicture;
     image: HTMLImageElement | undefined;
@@ -55,6 +66,7 @@ const NO_DIRECT: [number, number, number, number] = [1, 1, 0, 1];
 const NO_SIZE: Size2d = { width: 0, height: 0 };
 const NOTHING_TO_NOTIFY = () => undefined;
 const SPRITE_RESOLUTION = 128;
+const ATLAS_WIDTH_PX = 4096;
 const SPRITE_KEY = "sprite";
 const MODES: Record<SliceRendererMode, number> = { slices: 0, particles: 1, direct: 2 };
 const CHANNEL_MODES = { additive: 1, subtractive: 2 } as const;
@@ -91,6 +103,9 @@ const tints = new Map<string, SliceRendererTint>();
 
 let renderer: Renderer | null | undefined;
 let tintContext: CanvasRenderingContext2D | null | undefined;
+let flushId: ReturnType<typeof requestAnimationFrame> | undefined;
+
+const submissions = new Map<object, Submission>();
 
 const notify = () => {
     for (const subscriber of [...subscribers]) subscriber();
@@ -398,12 +413,101 @@ const getTintContext = () => {
     return tintContext;
 };
 
+const layoutBatches = (pending: Submission[], maxTextureSize: number): Batch[] => {
+    const atlasWidth = Math.min(maxTextureSize, Math.max(ATLAS_WIDTH_PX, ...pending.map((item) => item.width)));
+    const batches: Batch[] = [];
+
+    let batch: Batch = { placements: [], width: 0, height: 0 };
+    let left = 0;
+    let rowTop = 0;
+    let rowHeight = 0;
+
+    for (const submission of pending) {
+        if (left > 0 && left + submission.width > atlasWidth) {
+            left = 0;
+            rowTop += rowHeight;
+            rowHeight = 0;
+        }
+
+        if (batch.placements.length > 0 && rowTop + submission.height > maxTextureSize) {
+            batches.push(batch);
+            batch = { placements: [], width: 0, height: 0 };
+            left = 0;
+            rowTop = 0;
+            rowHeight = 0;
+        }
+
+        batch.placements.push({ submission, left, top: rowTop });
+        batch.width = Math.max(batch.width, left + submission.width);
+        batch.height = Math.max(batch.height, rowTop + submission.height);
+        left += submission.width;
+        rowHeight = Math.max(rowHeight, submission.height);
+    }
+
+    if (batch.placements.length > 0) batches.push(batch);
+
+    return batches;
+};
+
+const drawBatch = (current: Renderer, batch: Batch) => {
+    const { gl, canvas } = current;
+
+    if (canvas.width < batch.width) canvas.width = batch.width;
+    if (canvas.height < batch.height) canvas.height = batch.height;
+
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    gl.disable(gl.SCISSOR_TEST);
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    gl.clearColor(0, 0, 0, 0);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.enable(gl.SCISSOR_TEST);
+
+    for (const { submission, left, top } of batch.placements) {
+        const bottom = canvas.height - top - submission.height;
+
+        gl.viewport(left, bottom, submission.width, submission.height);
+        gl.scissor(left, bottom, submission.width, submission.height);
+        submission.render();
+    }
+
+    gl.disable(gl.SCISSOR_TEST);
+
+    const atlas = canvas.transferToImageBitmap();
+
+    Promise.all(
+        batch.placements.map(({ submission, left, top }) =>
+            createImageBitmap(atlas, left, top, submission.width, submission.height).then(submission.present),
+        ),
+    )
+        .catch(() => undefined)
+        .finally(() => atlas.close());
+};
+
+const flush = () => {
+    flushId = undefined;
+
+    const current = renderer;
+    const pending = [...submissions.values()];
+
+    submissions.clear();
+
+    if (!current?.resources || pending.length === 0) return;
+
+    for (const batch of layoutBatches(pending, current.resources.maxTextureSize)) drawBatch(current, batch);
+};
+
+const submit = (key: object, submission: Submission) => {
+    submissions.set(key, submission);
+
+    if (flushId === undefined) flushId = requestAnimationFrame(flush);
+};
+
 /**
  * Draws slice animations and particles on the graphics card, into a canvas each component owns.
  *
  * One WebGL context serves the whole page, since browsers keep only a few alive at once. A component asks for an item
- * bound to its own canvas and hands it a frame; the item draws into the shared context and moves the picture into the
- * component's canvas without copying it. The tables a sample is built from are uploaded once and worked out per
+ * bound to its own canvas and hands it a frame; once per animation frame every component's frame is drawn into one
+ * shared picture, handed over once and cut into each component's piece. The tables a sample is built from are uploaded once and worked out per
  * slice on the graphics card, so the page only advances the clock. Where the graphics card cannot be used — no
  * WebGL 2 in an offscreen canvas, a picture whose server gives no cross-origin permission, a context the browser has
  * taken away — {@link getCanDraw} says so and the component draws with page elements instead.
@@ -563,9 +667,10 @@ export namespace SliceRendererUtils {
     /**
      * Binds a component's canvas to the shared context.
      *
-     * The canvas is handed each frame whole, sized to the largest picture any component has needed, with the part
-     * this component did not use left see-through; {@link SliceRendererItem.draw} returns that size so the canvas
-     * element can be sized to it.
+     * {@link SliceRendererItem.draw} only takes note of the frame and returns the size of the component's picture, in
+     * the canvas's pixels, at once. Once per animation frame every component noted since the last is drawn into one
+     * shared picture, which is handed over once and cut into each component's piece, so a component's canvas shows its
+     * frame one animation frame after it was asked for.
      *
      * A picture still loading draws nothing; the component hears it arrive through {@link requestPicture} and draws
      * again.
@@ -619,23 +724,11 @@ export namespace SliceRendererUtils {
         pointInstances(0);
         gl.bindVertexArray(null);
 
-        const prepareCanvas = (width: number, height: number) => {
-            if (current.canvas.width < width) current.canvas.width = width;
-            if (current.canvas.height < height) current.canvas.height = height;
+        const key = {};
 
-            gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-            gl.viewport(0, current.canvas.height - height, width, height);
-            gl.clearColor(0, 0, 0, 0);
-            gl.clear(gl.COLOR_BUFFER_BIT);
-        };
-
-        const present = (): Size2d => {
-            const presented = { width: current.canvas.width, height: current.canvas.height };
-
-            output.transferFromImageBitmap(current.canvas.transferToImageBitmap());
-
-            return presented;
-        };
+        let submitted = 0;
+        let presented = 0;
+        let isDisposed = false;
 
         const drawLayers = (mixing: SVGColorMixing, count: number) => {
             for (let idx = 0; idx < count; idx++) {
@@ -654,18 +747,13 @@ export namespace SliceRendererUtils {
             pointInstances(0);
         };
 
-        const draw = (frame: SliceRendererFrame): Size2d => {
-            if (!isCurrent()) return NO_SIZE;
-
-            const width = Math.max(1, Math.round(frame.area.width * frame.scale));
-            const height = Math.max(1, Math.round(frame.area.height * frame.scale));
-
-            prepareCanvas(width, height);
+        const render = (frame: SliceRendererFrame, width: number, height: number) => {
+            if (!isCurrent()) return;
 
             const entry = requestPictureEntry(frame.src, NOTHING_TO_NOTIFY);
             const image = entry.image;
 
-            if (!frame.isShown || !image || frame.slices.length === 0 || frame.size.width <= 0) return present();
+            if (!frame.isShown || !image || frame.slices.length === 0 || frame.size.width <= 0) return;
 
             checkFrames(frame.src);
 
@@ -749,11 +837,38 @@ export namespace SliceRendererUtils {
             }
 
             gl.bindVertexArray(null);
+        };
 
-            return present();
+        const draw = (frame: SliceRendererFrame): Size2d => {
+            if (!isCurrent()) return NO_SIZE;
+
+            const width = Math.max(1, Math.round(frame.area.width * frame.scale));
+            const height = Math.max(1, Math.round(frame.area.height * frame.scale));
+            const sequence = ++submitted;
+
+            submit(key, {
+                width,
+                height,
+                render: () => render(frame, width, height),
+                present: (picture) => {
+                    if (isDisposed || sequence < presented) {
+                        picture.close();
+
+                        return;
+                    }
+
+                    presented = sequence;
+                    output.transferFromImageBitmap(picture);
+                },
+            });
+
+            return { width, height };
         };
 
         const dispose = () => {
+            isDisposed = true;
+            submissions.delete(key);
+
             if (!isCurrent()) return;
 
             gl.deleteVertexArray(vao);
