@@ -49,7 +49,7 @@
     onTransitionStatusChange={(isFinished) => (isModalTransitionFinished = isFinished)}
 >
     {#snippet renderOverlay(visibilityTarget, transitionDurationMs)}
-        <PageModalOverlay {visibilityTarget} {transitionDurationMs} />
+        <PageModalOverlay {visibilityTarget} {transitionDurationMs} isOpaque={true} />
     {/snippet}
 
     {#snippet renderContent(visibilityTarget, transitionDurationMs)}

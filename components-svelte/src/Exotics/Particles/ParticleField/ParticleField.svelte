@@ -153,7 +153,12 @@
         };
 </script>
 
-<div bind:this={root} class={styles.particleFieldRoot} role="presentation" aria-hidden="true">
+<div
+    bind:this={root}
+    class={[styles.particleFieldRoot, particles.length > 0 && styles.particleFieldRootMoving]}
+    role="presentation"
+    aria-hidden="true"
+>
     {#each particles as particle (particle.id)}
         <div class={styles.particleFieldItem} style:left={`${particle.pos.x}px`} style:top={`${particle.pos.y}px`}>
             <div class={styles.particleFieldBody} {@attach attachBody(particle.id)}>

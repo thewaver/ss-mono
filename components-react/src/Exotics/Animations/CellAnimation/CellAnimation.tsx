@@ -157,6 +157,10 @@ export const CellAnimation = (props: CellAnimationProps) => {
         ? `${CellAnimationStyles.cellAnimationAnchor} ${CellAnimationStyles.cellAnimationAnchorRevealed}`
         : CellAnimationStyles.cellAnimationAnchor;
 
+    const containerClassName = isRunning
+        ? `${CellAnimationStyles.cellAnimationContainer} ${CellAnimationStyles.cellAnimationContainerMoving}`
+        : CellAnimationStyles.cellAnimationContainer;
+
     return (
         <div
             ref={rootRef}
@@ -176,7 +180,7 @@ export const CellAnimation = (props: CellAnimationProps) => {
 
             <div
                 ref={containerRef}
-                className={CellAnimationStyles.cellAnimationContainer}
+                className={containerClassName}
                 style={{
                     ...(assignInlineVars({
                         [CellAnimationStyles.cellSrcVar]: CellAnimationUtils.toSourceImage(props.src),

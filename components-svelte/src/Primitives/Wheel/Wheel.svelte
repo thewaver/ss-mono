@@ -163,6 +163,7 @@
                 class={styles.overheadWheelWedge}
                 style:transform={WheelUtils.getWedgeTransform(getWedgeAngle(index), wedgeEffect)}
                 style:filter={wedgeEffect?.filter || undefined}
+                style:opacity={wedgeEffect?.opacity || undefined}
                 style:z-index={index === selectedIndex ? WheelConst.SELECTED_WEDGE_LAYER : undefined}
                 role="group"
                 aria-roledescription={wedgeRoleDescription}

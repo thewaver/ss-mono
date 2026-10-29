@@ -171,6 +171,7 @@ export const Wheel = <T,>(props: WheelProps<T>) => {
                                 style={{
                                     "transform": WheelUtils.getWedgeTransform(getWedgeAngle(index), getEffect()),
                                     "filter": getEffect()?.filter || undefined,
+                                    "opacity": getEffect()?.opacity || undefined,
                                     "z-index":
                                         index === getSelectedIndex() ? WheelConst.SELECTED_WEDGE_LAYER : undefined,
                                 }}

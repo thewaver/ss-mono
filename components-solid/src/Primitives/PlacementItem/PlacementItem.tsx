@@ -15,6 +15,7 @@ const toBoxStyle = (values: ReturnType<typeof PlacementItemUtils.computeStyleVal
     "rotate": values.rotate,
     "transform": values.transform,
     "filter": values.filter,
+    "opacity": values.opacity,
     "z-index": values.zIndex,
     "clip-path": values.clipPath,
     "transition": values.transition,

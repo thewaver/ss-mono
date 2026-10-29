@@ -15,7 +15,6 @@ export const drawerPanel = style({
     color: themeVars.color.surface.contrast,
     backgroundColor: themeVars.color.surface.light,
     backgroundImage: `linear-gradient(215deg, ${themeVars.color.surface.light}, ${themeVars.color.surface.dark})`,
-    backdropFilter: "brightness(75%) grayscale(25%) blur(10px)",
     boxShadow: themeVars.shadow.large,
 });
 

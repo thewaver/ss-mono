@@ -171,6 +171,7 @@ export const Wheel = defineComponent(
                                 style={{
                                     transform: WheelUtils.getWedgeTransform(getWedgeAngle(index), effect),
                                     filter: effect?.filter || undefined,
+                                    opacity: effect?.opacity || undefined,
                                     zIndex: index === selectedIndex.value ? WheelConst.SELECTED_WEDGE_LAYER : undefined,
                                 }}
                                 role="group"

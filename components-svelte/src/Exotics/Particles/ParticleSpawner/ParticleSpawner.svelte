@@ -4,18 +4,19 @@
     import { SvelteMap } from "svelte/reactivity";
 
     import {
+        ElementObserverUtils,
         PARTICLE_SPAWNER_DEFAULTS,
         type ParticleSpawnIterationPattern,
         type ParticleSpawnerController,
+        type ParticleSpawnerFrame,
         ParticleSpawnerUtils,
         ParticleSpawnerStyles as styles,
     } from "@thewaver/ss-components";
     import { ParticleSpawnerConst } from "@thewaver/ss-components/internal";
-    import { Rect } from "@thewaver/ss-utils";
 
-    import { ElementObserverSvelteUtils } from "../../../Abstracts/ElementObserver/ElementObserverSvelte.utils.svelte.js";
     import { InteractionTrackerSvelteUtils } from "../../../Abstracts/InteractionTracker/InteractionTrackerSvelte.utils.svelte.js";
     import { MediaQueryMonitorSvelteUtils } from "../../../Abstracts/MediaQueryMonitor/MediaQueryMonitorSvelte.utils.svelte.js";
+    import { getViewportContext } from "../../../Abstracts/Viewport/Viewport.context.js";
     import { readStore } from "../../../Utils/storeUtils.js";
     import type { ParticleSpawnerProps } from "./ParticleSpawner.types.js";
 
@@ -33,7 +34,6 @@
 
     let root = $state<HTMLDivElement>();
     let stage = $state.raw({ index: ParticleSpawnerConst.FIRST_STAGE });
-    let rootRect = $state.raw<Rect>();
 
     const elements = new Map<number, HTMLElement>();
     const ts = new SvelteMap<number, number>();
@@ -42,32 +42,21 @@
     const isWindowVisible = $derived(!getIsPageHidden());
     const getPrefersReducedMotion = MediaQueryMonitorSvelteUtils.createReducedMotion();
 
-    ElementObserverSvelteUtils.createViewportRectObserver(
-        () => root ?? undefined,
-        () => isWindowVisible,
-        {
-            setElementRect: (rect) => {
-                if (!rootRect || !Rect.isSame(rootRect, rect)) rootRect = rect;
-            },
-        },
-    );
+    const viewportContext = getViewportContext();
 
-    const getTargetRects = ElementObserverSvelteUtils.createViewportRectListObserver(
-        () => props.targets,
-        () => isWindowVisible,
-    );
+    const canSpawn = $derived(!!root && isWindowVisible && props.targets.length > 0);
 
-    const canSpawn = $derived(rootRect !== undefined && isWindowVisible && props.targets.length > 0);
+    const measureFrame = (): ParticleSpawnerFrame => ({
+        rootRect: root ? ElementObserverUtils.measureViewportRect(root, viewportContext) : undefined,
+        targetRects: ElementObserverUtils.measureViewportRects(props.targets, viewportContext),
+        prefersReducedMotion: getPrefersReducedMotion(),
+    });
 
     const engine = ParticleSpawnerUtils.createEngine({
         getTargetCount: () => props.targets.length,
         computeTarget: (index, targetCount) => props.computeTarget?.(index, targetCount),
         getElement: (id) => elements.get(id),
-        getFrame: () => ({
-            rootRect,
-            targetRects: getTargetRects(),
-            prefersReducedMotion: getPrefersReducedMotion(),
-        }),
+        getFrame: measureFrame,
         getTiming: () => ({ spawnDelayMs, travelDurationMs, restDurationMs }),
         getCanSpawn: () => canSpawn,
         computeParticlePos: (travel, t) => props.computeParticlePos(travel, t),
@@ -132,7 +121,12 @@
         };
 </script>
 
-<div bind:this={root} class={styles.particleSpawnerRoot} role="presentation" aria-hidden="true">
+<div
+    bind:this={root}
+    class={[styles.particleSpawnerRoot, getParticles().length > 0 && styles.particleSpawnerRootMoving]}
+    role="presentation"
+    aria-hidden="true"
+>
     {#each getParticles() as particle (particle.id)}
         <div class={styles.particleSpawnerItem} {@attach attachParticle(particle.id)}>
             {@render props.renderParticle(particle.index, ts.get(particle.id) ?? ParticleSpawnerConst.NOT_STARTED)}

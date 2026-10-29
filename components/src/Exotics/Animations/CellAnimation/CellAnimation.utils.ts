@@ -1,4 +1,12 @@
-import { type CSSAnimationValues, CSSUtils, type Index2d, MathUtils, type Size2d } from "@thewaver/ss-utils";
+import {
+    type CSSAnimationKey,
+    type CSSAnimationStyle,
+    type CSSAnimationValues,
+    CSSUtils,
+    type Index2d,
+    MathUtils,
+    type Size2d,
+} from "@thewaver/ss-utils";
 
 import type { CellAnimationEvaluationDefs, CellAnimationFinalFrame } from "./CellAnimation.types";
 
@@ -8,6 +16,23 @@ const BLEED_PX = 1;
 const DEPTH_STEPS = 100;
 const NO_PROGRESS = 0;
 const FULL_PROGRESS = 1;
+
+const written = new WeakMap<HTMLElement, { values: CSSAnimationValues; style: CSSAnimationStyle }>();
+
+const isSameValue = (a: number | number[] | undefined, b: number | number[] | undefined) =>
+    Array.isArray(a) && Array.isArray(b) ? a.length === b.length && a.every((value, idx) => value === b[idx]) : a === b;
+
+const isSameValues = (a: CSSAnimationValues, b: CSSAnimationValues) => {
+    for (const key in a) {
+        if (!isSameValue(a[key as CSSAnimationKey], b[key as CSSAnimationKey])) return false;
+    }
+
+    for (const key in b) {
+        if (!(key in a)) return false;
+    }
+
+    return true;
+};
 
 /** A cell's place in the grid and its share of the drawing, before its size is known. */
 export type CellAnimationCellDefs = Omit<CellAnimationEvaluationDefs, "size">;
@@ -25,21 +50,31 @@ export type CellAnimationCellBounds = { col: number; row: number; width: number;
  */
 export namespace CellAnimationUtils {
     /**
-     * Writes an animation's values onto a cell as `transform` and `filter`.
+     * Writes an animation's values onto a cell as `transform`, `filter` and `opacity`.
      *
      * Set on the element's style directly rather than through a signal, because this runs for every cell
-     * on every frame and the reactive round trip is not affordable at that rate.
+     * on every frame and the reactive round trip is not affordable at that rate. Values equal to the last ones
+     * written to the element are not worked out again, and a property whose text has not changed is not written
+     * again.
      *
-     * @param el The cell's element.
+     * @param el The cell's element. Its `transform`, `filter` and `opacity` must be left to this function: a
+     * change made to them anywhere else is not noticed, and stands until the animation's own value changes.
      * @param evalResult The animation's values for this cell and frame, by CSS function name. Functions
-     * not mentioned are left out, and both properties are rewritten in full each time, so a value that
-     * stops being produced stops applying.
+     * not mentioned are left out, so a value that stops being produced stops applying. Compared with the last
+     * values by content, so an object changed after it was handed over is not noticed.
      */
     export const assignAnimationProps = (el: HTMLElement, evalResult: CSSAnimationValues) => {
+        const last = written.get(el);
+
+        if (last && last.values !== evalResult && isSameValues(last.values, evalResult)) return;
+
         const style = CSSUtils.toAnimationStyle(evalResult);
 
-        el.style.transform = style.transform;
-        el.style.filter = style.filter;
+        if (style.transform !== last?.style.transform) el.style.transform = style.transform;
+        if (style.filter !== last?.style.filter) el.style.filter = style.filter;
+        if (style.opacity !== last?.style.opacity) el.style.opacity = style.opacity;
+
+        written.set(el, { values: evalResult, style });
     };
 
     /**

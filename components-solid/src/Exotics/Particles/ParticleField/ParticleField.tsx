@@ -179,7 +179,13 @@ export const ParticleField = (props: ParticleFieldProps) => {
     });
 
     return (
-        <div ref={setRootRef} class={styles.particleFieldRoot} role="presentation" aria-hidden="true">
+        <div
+            ref={setRootRef}
+            class={styles.particleFieldRoot}
+            classList={{ [styles.particleFieldRootMoving]: getLiveParticles().length > 0 }}
+            role="presentation"
+            aria-hidden="true"
+        >
             <For each={getLiveParticles()}>
                 {(particle) => {
                     const [getT, setT] = createSignal(

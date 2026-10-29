@@ -4,12 +4,14 @@ import * as styles from "@thewaver/ss-playground/App/StyledComponents/ModalOverl
 import type { ModalOverlayProps } from "./ModalOverlaySolid.types";
 
 export const PageModalOverlay = (props: ModalOverlayProps) => {
+    const getVariants = () => (access(props.isOpaque) ? styles.opaqueOverlayVariants : styles.blurredOverlayVariants);
+
+    const getDurationMs = () => access(props.transitionDurationMs);
+
     return (
         <div
-            class={access(props.visibilityTarget) === 1 ? styles.overlayOn : styles.overlayOff}
-            style={{
-                transition: `backdrop-filter ${access(props.transitionDurationMs)}ms`,
-            }}
+            class={getVariants()[access(props.visibilityTarget) === 1 ? "on" : "off"]}
+            style={{ transition: `backdrop-filter ${getDurationMs()}ms, opacity ${getDurationMs()}ms` }}
         />
     );
 };

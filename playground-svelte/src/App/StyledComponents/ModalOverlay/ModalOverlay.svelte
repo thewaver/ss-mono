@@ -4,9 +4,11 @@
     import type { ModalOverlayProps } from "./ModalOverlaySvelte.types";
 
     let props: ModalOverlayProps = $props();
+
+    const variants = $derived(props.isOpaque ? styles.opaqueOverlayVariants : styles.blurredOverlayVariants);
 </script>
 
 <div
-    class={props.visibilityTarget === 1 ? styles.overlayOn : styles.overlayOff}
-    style:transition={`backdrop-filter ${props.transitionDurationMs}ms`}
+    class={variants[props.visibilityTarget === 1 ? "on" : "off"]}
+    style:transition={`backdrop-filter ${props.transitionDurationMs}ms, opacity ${props.transitionDurationMs}ms`}
 ></div>

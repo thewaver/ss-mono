@@ -51,7 +51,11 @@ export const StressTest = (props: StressTestProps) => {
                 onHide={props.onHideModal}
                 onTransitionStatusChange={setModalTransitionFinished}
                 renderOverlay={(visibilityTarget, transitionDurationMs) => (
-                    <PageModalOverlay visibilityTarget={visibilityTarget} transitionDurationMs={transitionDurationMs} />
+                    <PageModalOverlay
+                        visibilityTarget={visibilityTarget}
+                        transitionDurationMs={transitionDurationMs}
+                        isOpaque
+                    />
                 )}
                 renderContent={(visibilityTarget, transitionDurationMs) => (
                     <PageModalPanel visibilityTarget={visibilityTarget} transitionDurationMs={transitionDurationMs}>

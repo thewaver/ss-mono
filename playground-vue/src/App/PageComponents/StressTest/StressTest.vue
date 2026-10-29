@@ -55,7 +55,11 @@ const setModalTransitionFinished = (hasTransitionFinished: boolean) => {
         @transition-status-change="setModalTransitionFinished"
     >
         <template #renderOverlay="{ visibilityTarget, transitionDurationMs }">
-            <PageModalOverlay :visibility-target="visibilityTarget" :transition-duration-ms="transitionDurationMs" />
+            <PageModalOverlay
+                :visibility-target="visibilityTarget"
+                :transition-duration-ms="transitionDurationMs"
+                is-opaque
+            />
         </template>
 
         <template #renderContent="{ visibilityTarget, transitionDurationMs }">

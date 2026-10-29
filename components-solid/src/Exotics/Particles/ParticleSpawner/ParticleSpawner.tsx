@@ -1,16 +1,17 @@
 import { For, type Setter, createEffect, createMemo, createSignal, on, onCleanup, onMount, untrack } from "solid-js";
 
 import {
+    ElementObserverUtils,
     PARTICLE_SPAWNER_DEFAULTS,
     type ParticleSpawnerController,
+    type ParticleSpawnerFrame,
     ParticleSpawnerUtils,
     ParticleSpawnerStyles as styles,
 } from "@thewaver/ss-components";
-import { Rect } from "@thewaver/ss-utils";
 
-import { ElementObserverSolidUtils } from "../../../Abstracts/ElementObserver/ElementObserverSolid.utils";
 import { MediaQueryMonitorSolidUtils } from "../../../Abstracts/MediaQueryMonitor/MediaQueryMonitorSolid.utils";
 import { SignalMirrorSolidUtils } from "../../../Abstracts/SignalMirror/SignalMirrorSolid.utils";
+import { useViewportContext } from "../../../Abstracts/Viewport/Viewport.context";
 import { access } from "../../../Utils/propUtils";
 import { accessStore } from "../../../Utils/storeUtils";
 import type { ParticleSpawnerProps } from "./ParticleSpawnerSolid.types";
@@ -35,33 +36,31 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
     const [getIsWindowVisible, setIsWindowVisible] = createSignal(true);
     const [getIsPlaying] = SignalMirrorSolidUtils.createOptional(() => props.playback, true);
     const [getStageIndex, setStageIndex] = createSignal(0, { equals: false });
-    const [getRootRect, setRootRect] = createSignal<Rect | undefined>(undefined, {
-        equals: (a, b) => (a === undefined || b === undefined ? a === b : Rect.isSame(a, b)),
-    });
-    const getHasRootRect = createMemo(() => getRootRect() !== undefined);
 
     const getPrefersReducedMotion = MediaQueryMonitorSolidUtils.createReducedMotion();
 
-    ElementObserverSolidUtils.createViewportRectObserver(getRootRef, getIsWindowVisible, {
-        setElementRect: setRootRect,
-    });
-
-    const getTargetRects = ElementObserverSolidUtils.createViewportRectListObserver(getTargets, getIsWindowVisible);
+    const viewportContext = useViewportContext();
 
     const refs = new Map<number, HTMLElement>();
     const tSetters = new Map<number, Setter<number>>();
 
-    const getCanSpawn = () => getHasRootRect() && getIsWindowVisible() && getTargets().length > 0;
+    const getCanSpawn = () => !!getRootRef() && getIsWindowVisible() && getTargets().length > 0;
+
+    const measureFrame = (): ParticleSpawnerFrame => {
+        const rootRef = getRootRef();
+
+        return {
+            rootRect: rootRef ? ElementObserverUtils.measureViewportRect(rootRef, viewportContext) : undefined,
+            targetRects: ElementObserverUtils.measureViewportRects(getTargets(), viewportContext),
+            prefersReducedMotion: getPrefersReducedMotion(),
+        };
+    };
 
     const engine = ParticleSpawnerUtils.createEngine({
         getTargetCount: () => getTargets().length,
         computeTarget: (index, targetCount) => props.computeTarget?.(index, targetCount),
         getElement: (id) => refs.get(id),
-        getFrame: () => ({
-            rootRect: getRootRect(),
-            targetRects: getTargetRects(),
-            prefersReducedMotion: getPrefersReducedMotion(),
-        }),
+        getFrame: measureFrame,
         getTiming: () => ({
             spawnDelayMs: getSpawnDelayMs(),
             travelDurationMs: getTravelDurationMs(),
@@ -123,7 +122,13 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
     });
 
     return (
-        <div ref={setRootRef} class={styles.particleSpawnerRoot} role="presentation" aria-hidden="true">
+        <div
+            ref={setRootRef}
+            class={styles.particleSpawnerRoot}
+            classList={{ [styles.particleSpawnerRootMoving]: getLiveParticles().length > 0 }}
+            role="presentation"
+            aria-hidden="true"
+        >
             <For each={getLiveParticles()}>
                 {(particle) => {
                     const [getT, setT] = createSignal(0);

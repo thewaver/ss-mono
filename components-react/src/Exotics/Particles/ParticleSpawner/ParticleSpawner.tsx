@@ -1,19 +1,21 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import {
+    ElementObserverUtils,
     PARTICLE_SPAWNER_DEFAULTS,
     type ParticleSpawnIterationPattern,
     type ParticleSpawnerController,
+    type ParticleSpawnerFrame,
     ParticleSpawnerStyles,
     ParticleSpawnerUtils,
 } from "@thewaver/ss-components";
 import { ParticleSpawnerConst } from "@thewaver/ss-components/internal";
 
-import { ElementObserverReactUtils } from "../../../Abstracts/ElementObserver/ElementObserverReact.utils";
 import { InteractionTrackerReactUtils } from "../../../Abstracts/InteractionTracker/InteractionTrackerReact.utils";
 import { MediaQueryMonitorReactUtils } from "../../../Abstracts/MediaQueryMonitor/MediaQueryMonitorReact.utils";
 import { SignalMirrorReactUtils } from "../../../Abstracts/SignalMirror/SignalMirrorReact.utils";
-import { useLatest } from "../../../Utils/refUtils";
+import { useViewportContext } from "../../../Abstracts/Viewport/Viewport.context";
+import { useElement, useLatest } from "../../../Utils/refUtils";
 import { useStore } from "../../../Utils/storeUtils";
 import type { ParticleSpawnerProps } from "./ParticleSpawner.types";
 
@@ -39,38 +41,44 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
     const isWindowVisible = !InteractionTrackerReactUtils.usePageHidden();
     const prefersReducedMotion = MediaQueryMonitorReactUtils.useReducedMotion();
 
-    const rootRect = ElementObserverReactUtils.useViewportRect(rootRef, isWindowVisible);
-    const targetRects = ElementObserverReactUtils.useViewportRects(props.targets, isWindowVisible);
+    const viewportContext = useViewportContext();
+    const rootElement = useElement(rootRef);
 
-    const canSpawn = rootRect !== undefined && isWindowVisible && props.targets.length > 0;
+    const canSpawn = rootElement !== undefined && isWindowVisible && props.targets.length > 0;
 
     const latest = useLatest({
         props,
-        rootRect,
-        targetRects,
+        viewportContext,
         prefersReducedMotion,
         canSpawn,
         timing: { spawnDelayMs, travelDurationMs, restDurationMs },
     });
 
-    const [engine] = useState(() =>
-        ParticleSpawnerUtils.createEngine({
+    const [engine] = useState(() => {
+        const measureFrame = (): ParticleSpawnerFrame => {
+            const root = rootRef.current;
+            const current = latest.current;
+
+            return {
+                rootRect: root ? ElementObserverUtils.measureViewportRect(root, current.viewportContext) : undefined,
+                targetRects: ElementObserverUtils.measureViewportRects(current.props.targets, current.viewportContext),
+                prefersReducedMotion: current.prefersReducedMotion,
+            };
+        };
+
+        return ParticleSpawnerUtils.createEngine({
             getTargetCount: () => latest.current.props.targets.length,
             computeTarget: (index, targetCount) => latest.current.props.computeTarget?.(index, targetCount),
             getElement: (id) => elementsRef.current.get(id),
-            getFrame: () => ({
-                rootRect: latest.current.rootRect,
-                targetRects: latest.current.targetRects,
-                prefersReducedMotion: latest.current.prefersReducedMotion,
-            }),
+            getFrame: measureFrame,
             getTiming: () => latest.current.timing,
             getCanSpawn: () => latest.current.canSpawn,
             computeParticlePos: (travel, t) => latest.current.props.computeParticlePos(travel, t),
             onParticleT: (id, t) => tsRef.current.set(id, t),
             onParticleArrive: (index) => latest.current.props.onParticleArrive?.(index),
             onTick: () => setFrame((frame) => frame + 1),
-        }),
-    );
+        });
+    });
 
     const particles = useStore(engine.particles);
 
@@ -99,7 +107,16 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
     }, [engine, canSpawn, isPlaying, particleCount, pattern, stage, travelDurationMs, restDurationMs, spawnDelayMs]);
 
     return (
-        <div ref={rootRef} className={ParticleSpawnerStyles.particleSpawnerRoot} role="presentation" aria-hidden="true">
+        <div
+            ref={rootRef}
+            className={
+                particles.length > 0
+                    ? `${ParticleSpawnerStyles.particleSpawnerRoot} ${ParticleSpawnerStyles.particleSpawnerRootMoving}`
+                    : ParticleSpawnerStyles.particleSpawnerRoot
+            }
+            role="presentation"
+            aria-hidden="true"
+        >
             {particles.map((particle) => (
                 <div
                     key={particle.id}

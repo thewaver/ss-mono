@@ -25,6 +25,10 @@ export const cellAnimationContainer = style({
     contain: "strict",
 });
 
+export const cellAnimationContainerMoving = style({
+    willChange: "transform",
+});
+
 export const cellAnimationCell = style({
     position: "absolute",
     backgroundImage: cellSrcVar,

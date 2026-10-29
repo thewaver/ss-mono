@@ -278,11 +278,12 @@ describe("getNearestGroup and getGlideTarget", () => {
 });
 
 describe("toSlideStyle", () => {
-    it("writes the placement's transform and filter, its origin, and a layer nearer the slide showing", () => {
+    it("writes the placement's transform and opacity, its origin, and a layer nearer the slide showing", () => {
         const style = CarouselUtils.toSlideStyle({ effect: { translateX: 100, opacity: 50 } }, 1);
 
         expect(style.transform).toBe("translateX(100%)");
-        expect(style.filter).toBe("opacity(50%)");
+        expect(style.opacity, "a fade is the opacity property").toBe(String(50 / 100));
+        expect(style.filter, "and no filter function").toBe("none");
         expect(style["transform-origin"]).toBe("50% 50%");
         expect(Number(style["z-index"])).toBeLessThan(Number(CarouselUtils.toSlideStyle({ effect: {} }, 0)["z-index"]));
     });

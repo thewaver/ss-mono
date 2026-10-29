@@ -1,4 +1,4 @@
-import { type CSSAnimationKey, type Index2d, MathUtils, Matrix3dUtils, type Point3d } from "@thewaver/ss-utils";
+import { type CSSAnimationKey, type Index2d, Matrix3dUtils, type Point3d } from "@thewaver/ss-utils";
 
 import type {
     CellAnimationEvaluationDefs,
@@ -19,6 +19,9 @@ import type {
 } from "./CellAnimationKeyframes.types";
 
 const RESULT_DECIMAL_PLACES = 3;
+const RESULT_SCALE = 10 ** RESULT_DECIMAL_PLACES;
+
+const roundForStyle = (value: number) => Math.round(value * RESULT_SCALE) / RESULT_SCALE;
 
 /**
  * Builds the per-cell functions a cell animation plays, from keyframes rather than from code.
@@ -91,7 +94,7 @@ export namespace CellAnimationKeyframeUtils {
      * @returns The animation, ready to hand to the component.
      */
     export const fromStops = (stops: CellStop[]): CellAnimationFn => {
-        const compiled = compileStops(stops);
+        const tracks = Object.entries(compileStops(stops));
 
         return (timeline, defs) => {
             const result: Partial<Record<CSSAnimationKey, number>> = {};
@@ -100,7 +103,7 @@ export namespace CellAnimationKeyframeUtils {
             let originY: number | undefined;
             let depth: number | undefined;
 
-            for (const [key, track] of Object.entries(compiled)) {
+            for (const [key, track] of tracks) {
                 const value = sampleTrack(track, timeline);
 
                 if (key === "originX") {
@@ -110,7 +113,7 @@ export namespace CellAnimationKeyframeUtils {
                 } else if (key === "depth") {
                     depth = value;
                 } else {
-                    result[key as CSSAnimationKey] = MathUtils.roundToDecimalPlaces(value, RESULT_DECIMAL_PLACES);
+                    result[key as CSSAnimationKey] = roundForStyle(value);
                 }
             }
 
@@ -141,20 +144,15 @@ export namespace CellAnimationKeyframeUtils {
                 z: anchor.z - rotatedAnchor.z + rotatedOffset.z,
             };
 
-            result.translateX = MathUtils.roundToDecimalPlaces(
+            result.translateX = roundForStyle(
                 (result.translateX ?? 0) + (width > 0 ? (translation.x / width) * 100 : 0),
-                RESULT_DECIMAL_PLACES,
             );
-            result.translateY = MathUtils.roundToDecimalPlaces(
+            result.translateY = roundForStyle(
                 (result.translateY ?? 0) + (height > 0 ? (translation.y / height) * 100 : 0),
-                RESULT_DECIMAL_PLACES,
             );
 
             if (translation.z !== 0 || result.translateZ !== undefined) {
-                result.translateZ = MathUtils.roundToDecimalPlaces(
-                    (result.translateZ ?? 0) + translation.z,
-                    RESULT_DECIMAL_PLACES,
-                );
+                result.translateZ = roundForStyle((result.translateZ ?? 0) + translation.z);
             }
 
             return result;

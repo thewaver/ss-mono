@@ -138,7 +138,10 @@ export const CellAnimation = defineComponent(
 
                     <div
                         ref={containerRef}
-                        class={CellAnimationStyles.cellAnimationContainer}
+                        class={[
+                            CellAnimationStyles.cellAnimationContainer,
+                            isRunning.value && CellAnimationStyles.cellAnimationContainerMoving,
+                        ]}
                         style={{
                             ...assignInlineVars({
                                 [CellAnimationStyles.cellSrcVar]: CellAnimationUtils.toSourceImage(props.src),

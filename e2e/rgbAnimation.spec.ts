@@ -10,7 +10,7 @@ import { demo, prop, revealProp } from "./helpers";
  *
  * Each example is paused before it is read, and moved through its pass with its scrubber's keyboard, so the frame
  * read is the one asked for rather than whichever the clock had reached. A channel's own animation is written to its
- * `transform` and `filter`, so the two together are what tell one copy's frame from another's.
+ * `transform`, `filter` and `opacity`, so the three together are what tell one copy's frame from another's.
  */
 const channelsOf = (key: string) => `${demo(key)} [role="img"] > div:last-child > div`;
 
@@ -23,6 +23,7 @@ const readChannels = (page: Page, key: string) =>
             return {
                 transform: (channel as HTMLElement).style.transform,
                 filter: (channel as HTMLElement).style.filter,
+                opacity: (channel as HTMLElement).style.opacity,
                 blend: (channel as HTMLElement).style.mixBlendMode,
                 image: getComputedStyle(picture).backgroundImage,
                 hasFilter: !!id && !!document.getElementById(id)?.querySelector("feColorMatrix"),
@@ -51,7 +52,9 @@ const choose = async (page: Page, key: string, name: string) => {
 const chooseColorMixing = (page: Page, name: string) => choose(page, "colorMixing", name);
 
 const countFrames = async (page: Page, key: string) =>
-    new Set((await readChannels(page, key)).map((channel) => `${channel.transform}|${channel.filter}`)).size;
+    new Set(
+        (await readChannels(page, key)).map((channel) => `${channel.transform}|${channel.filter}|${channel.opacity}`),
+    ).size;
 
 test.beforeEach(async ({ page }) => {
     await page.goto("/rgb-animation");
@@ -89,10 +92,18 @@ test("every channel copy is filled with the picture the page picks, and points a
 
 /**
  * Every example starts its pass with the picture whole, so the rest between passes is a rest, and parts its copies
- * mid-pass. Which way each part moves is the example's own function and is not read.
+ * mid-pass. Which way each part moves is the example's own function and is not read. An example with no controls of
+ * its own — the stress test — cannot be scrubbed and is left out.
  */
 test("every example starts its pass with its copies together, and parts them mid-pass", async ({ page }) => {
-    const keys = await page.locator("[data-example]").evaluateAll((cards) => cards.map((card) => card.dataset.testid!));
+    const cardKeys = await page
+        .locator("[data-example]")
+        .evaluateAll((cards) => cards.map((card) => card.dataset.testid!));
+    const keys: string[] = [];
+
+    for (const key of cardKeys) {
+        if ((await page.locator(`#${key}Playback`).count()) > 0) keys.push(key);
+    }
 
     expect(keys.length).toBeGreaterThan(0);
 

@@ -7,6 +7,10 @@ export const particleSpawnerRoot = style({
     contain: "size layout style",
 });
 
+export const particleSpawnerRootMoving = style({
+    willChange: "transform",
+});
+
 export const particleSpawnerItem = style({
     position: "absolute",
     left: 0,

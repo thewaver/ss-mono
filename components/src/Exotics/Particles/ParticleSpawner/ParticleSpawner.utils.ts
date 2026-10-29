@@ -22,7 +22,47 @@ type Round = ParticleSpawnerTiming & {
 
 type LiveParticle = ParticleSpawnerParticle & { round: Round };
 
+type FrameParticipant = {
+    read: () => void;
+    write: (nowMs: number) => void;
+};
+
 const NO_PARTICLES: LiveParticle[] = [];
+
+const participants = new Set<FrameParticipant>();
+
+let sharedFrameId: ReturnType<typeof requestAnimationFrame> | undefined;
+
+const runSharedFrame = (nowMs: number) => {
+    sharedFrameId = undefined;
+
+    const current = [...participants];
+
+    for (const participant of current) {
+        if (participants.has(participant)) participant.read();
+    }
+
+    for (const participant of current) {
+        if (participants.has(participant)) participant.write(nowMs);
+    }
+
+    if (participants.size > 0 && sharedFrameId === undefined) sharedFrameId = requestAnimationFrame(runSharedFrame);
+};
+
+const joinSharedFrame = (participant: FrameParticipant) => {
+    participants.add(participant);
+
+    if (sharedFrameId === undefined) sharedFrameId = requestAnimationFrame(runSharedFrame);
+};
+
+const leaveSharedFrame = (participant: FrameParticipant) => {
+    participants.delete(participant);
+
+    if (participants.size > 0 || sharedFrameId === undefined) return;
+
+    cancelAnimationFrame(sharedFrameId);
+    sharedFrameId = undefined;
+};
 
 /**
  * The pieces of a particle's motion that are not the caller's own evaluator: settling how many a
@@ -91,13 +131,18 @@ export namespace ParticleSpawnerUtils {
      * boxes, the timing — through `defs` at the moment it needs it, so it is made once and never rebuilt. Nothing is
      * disposed for good: `stop` leaves it ready to send again.
      *
+     * Every engine on the page shares one animation frame, and takes part in it only while it has a round in flight.
+     * In that frame each engine first asks where its spawner and targets are, and only then does any of them move a
+     * particle, so the engines' measuring forces at most one layout a frame however many spawners there are.
+     *
      * @param defs.getTargetCount How many targets there are now.
      * @param defs.computeTarget Which target one particle is aimed at. `undefined` picks one at random.
      * @param defs.getElement A live particle's element, once the view has drawn it. A particle without one is not
      * moved, and cannot arrive, until it has one.
-     * @param defs.getFrame Where the spawner and its targets are now.
+     * @param defs.getFrame Where the spawner and its targets are now. Called once a frame while a round is in flight,
+     * before any engine moves anything, so it may measure the page directly.
      * @param defs.getTiming The stagger, the travel and the rest a new round is sent with.
-     * @param defs.getCanSpawn Whether anything can be sent now: measured, visible, with somewhere to go.
+     * @param defs.getCanSpawn Whether anything can be sent now: on the page, visible, with somewhere to go.
      * @param defs.computeParticlePos Where one particle is at a point along its path.
      * @param defs.onParticleT Hands on how far along its path each moved particle is, every frame.
      * @param defs.onParticleArrive Runs as a particle is taken away at its target, with its place in its round.
@@ -119,7 +164,7 @@ export namespace ParticleSpawnerUtils {
         const particles = StoreUtils.create(NO_PARTICLES);
         const rounds = new Set<Round>();
 
-        let rafId: ReturnType<typeof requestAnimationFrame> | undefined;
+        let lastFrame: ParticleSpawnerFrame | undefined;
 
         const spawnNext = (round: Round, targetCount: number): LiveParticle | undefined => {
             const index = round.spawnedCount;
@@ -136,10 +181,15 @@ export namespace ParticleSpawnerUtils {
             return { id: nextId++, index, round, targetIndex, spawnedAtMs: round.startMs + index * round.spawnDelayMs };
         };
 
-        const place = (particle: LiveParticle, el: HTMLElement, nowMs: number, frame: ParticleSpawnerFrame) => {
-            const rootRect = frame.rootRect;
+        const place = (
+            particle: LiveParticle,
+            el: HTMLElement,
+            nowMs: number,
+            frame: ParticleSpawnerFrame | undefined,
+        ) => {
+            const rootRect = frame?.rootRect;
 
-            if (!rootRect) return false;
+            if (!frame || !rootRect) return false;
 
             const from = { x: rootRect.width * 0.5, y: rootRect.height * 0.5 };
             const t = Math.min(1, (nowMs - particle.spawnedAtMs) / particle.round.travelDurationMs);
@@ -166,9 +216,11 @@ export namespace ParticleSpawnerUtils {
             return true;
         };
 
-        const tick = (nowMs: number) => {
-            rafId = undefined;
+        const read = () => {
+            lastFrame = defs.getFrame();
+        };
 
+        const write = (nowMs: number) => {
             const targetCount = defs.getTargetCount();
             const spawned: LiveParticle[] = [];
 
@@ -185,7 +237,6 @@ export namespace ParticleSpawnerUtils {
 
             if (spawned.length > 0) particles.update((list) => [...list, ...spawned]);
 
-            const frame = defs.getFrame();
             const arrived: LiveParticle[] = [];
 
             let hasMoved = false;
@@ -193,7 +244,7 @@ export namespace ParticleSpawnerUtils {
             for (const particle of particles.get()) {
                 const el = defs.getElement(particle.id);
 
-                if (!el || !place(particle, el, nowMs, frame)) continue;
+                if (!el || !place(particle, el, nowMs, lastFrame)) continue;
 
                 hasMoved = true;
 
@@ -222,8 +273,10 @@ export namespace ParticleSpawnerUtils {
                 round.onEnd?.();
             }
 
-            if (rounds.size > 0 && rafId === undefined) rafId = requestAnimationFrame(tick);
+            if (rounds.size === 0) leaveSharedFrame(participant);
         };
+
+        const participant: FrameParticipant = { read, write };
 
         const startRound = (count: number, onEnd?: () => void) => {
             const round: Round = {
@@ -236,8 +289,7 @@ export namespace ParticleSpawnerUtils {
             };
 
             rounds.add(round);
-
-            if (rafId === undefined) rafId = requestAnimationFrame(tick);
+            joinSharedFrame(participant);
 
             return round;
         };
@@ -245,6 +297,8 @@ export namespace ParticleSpawnerUtils {
         const dropRound = (round: Round) => {
             rounds.delete(round);
             particles.update((list) => list.filter((particle) => particle.round !== round));
+
+            if (rounds.size === 0) leaveSharedFrame(participant);
         };
 
         return {
@@ -323,7 +377,8 @@ export namespace ParticleSpawnerUtils {
             },
             /**
              * Puts a particle where it is now, for a view whose element arrives between frames — so it is never
-             * painted at the spawner's corner before the next frame moves it.
+             * painted at the spawner's corner before the next frame moves it. It places the particle against the
+             * boxes the last frame read, and measures them itself only before any frame has.
              *
              * @param id The particle.
              * @param el Its element.
@@ -331,13 +386,11 @@ export namespace ParticleSpawnerUtils {
             drawParticle: (id: number, el: HTMLElement) => {
                 const particle = particles.get().find((live) => live.id === id);
 
-                if (particle) place(particle, el, performance.now(), defs.getFrame());
+                if (particle) place(particle, el, performance.now(), lastFrame ?? defs.getFrame());
             },
             /** Stops the frames and forgets every round and particle. The engine can be played again. */
             stop: () => {
-                if (rafId !== undefined) cancelAnimationFrame(rafId);
-
-                rafId = undefined;
+                leaveSharedFrame(participant);
                 rounds.clear();
                 particles.set(NO_PARTICLES);
             },

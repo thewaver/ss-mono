@@ -119,6 +119,8 @@ describe("computeWedgeEffect", () => {
 describe("getWedgeTransform", () => {
     it("turns the wedge, then applies the effect's own transform after it", () => {
         expect(WheelUtils.getWedgeTransform(30, undefined)).toBe("rotate(30deg)");
-        expect(WheelUtils.getWedgeTransform(30, { transform: "scale(2)", filter: "" })).toBe("rotate(30deg) scale(2)");
+        expect(WheelUtils.getWedgeTransform(30, { transform: "scale(2)", filter: "", opacity: "" })).toBe(
+            "rotate(30deg) scale(2)",
+        );
     });
 });

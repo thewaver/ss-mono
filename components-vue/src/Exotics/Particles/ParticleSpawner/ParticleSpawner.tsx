@@ -1,17 +1,19 @@
 import { type SlotsType, computed, defineComponent, onScopeDispose, shallowRef } from "vue";
 
 import {
+    ElementObserverUtils,
     PARTICLE_SPAWNER_DEFAULTS,
     type ParticleSpawnIterationPattern,
     type ParticleSpawnerController,
+    type ParticleSpawnerFrame,
     ParticleSpawnerStyles,
     ParticleSpawnerUtils,
 } from "@thewaver/ss-components";
 import { ParticleSpawnerConst } from "@thewaver/ss-components/internal";
 
-import { ElementObserverVueUtils } from "../../../Abstracts/ElementObserver/ElementObserverVue.utils";
 import { InteractionTrackerVueUtils } from "../../../Abstracts/InteractionTracker/InteractionTrackerVue.utils";
 import { MediaQueryMonitorVueUtils } from "../../../Abstracts/MediaQueryMonitor/MediaQueryMonitorVue.utils";
+import { useViewportContext } from "../../../Abstracts/Viewport/Viewport.context";
 import { watchAfterRender } from "../../../Utils/effectUtils";
 import { callSlot, declareProps, useTwoWay } from "../../../Utils/propUtils";
 import { toElement } from "../../../Utils/refUtils";
@@ -43,22 +45,25 @@ export const ParticleSpawner = defineComponent(
         const isWindowVisible = computed(() => !isPageHidden.value);
         const prefersReducedMotion = MediaQueryMonitorVueUtils.useReducedMotion();
 
-        const rootRect = ElementObserverVueUtils.useViewportRect(rootRef, isWindowVisible);
-        const targetRects = ElementObserverVueUtils.useViewportRects(() => props.targets, isWindowVisible);
+        const viewportContext = useViewportContext();
 
-        const canSpawn = computed(
-            () => rootRect.value !== undefined && isWindowVisible.value && props.targets.length > 0,
-        );
+        const canSpawn = computed(() => !!rootRef.value && isWindowVisible.value && props.targets.length > 0);
+
+        const measureFrame = (): ParticleSpawnerFrame => {
+            const root = rootRef.value;
+
+            return {
+                rootRect: root ? ElementObserverUtils.measureViewportRect(root, viewportContext) : undefined,
+                targetRects: ElementObserverUtils.measureViewportRects(props.targets, viewportContext),
+                prefersReducedMotion: prefersReducedMotion.value,
+            };
+        };
 
         const engine = ParticleSpawnerUtils.createEngine({
             getTargetCount: () => props.targets.length,
             computeTarget: (index, targetCount) => props.computeTarget?.(index, targetCount),
             getElement: (id) => elements.get(id),
-            getFrame: () => ({
-                rootRect: rootRect.value,
-                targetRects: targetRects.value,
-                prefersReducedMotion: prefersReducedMotion.value,
-            }),
+            getFrame: measureFrame,
             getTiming: () => ({
                 spawnDelayMs: getSpawnDelayMs(),
                 travelDurationMs: getTravelDurationMs(),
@@ -119,7 +124,10 @@ export const ParticleSpawner = defineComponent(
             return (
                 <div
                     ref={rootRef}
-                    class={ParticleSpawnerStyles.particleSpawnerRoot}
+                    class={[
+                        ParticleSpawnerStyles.particleSpawnerRoot,
+                        particles.value.length > 0 && ParticleSpawnerStyles.particleSpawnerRootMoving,
+                    ]}
                     role="presentation"
                     aria-hidden="true"
                 >

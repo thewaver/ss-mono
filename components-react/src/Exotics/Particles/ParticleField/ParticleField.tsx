@@ -142,7 +142,16 @@ export const ParticleField = (props: ParticleFieldProps) => {
     }, [isRunning]);
 
     return (
-        <div ref={rootRef} className={ParticleFieldStyles.particleFieldRoot} role="presentation" aria-hidden="true">
+        <div
+            ref={rootRef}
+            className={
+                particles.length > 0
+                    ? `${ParticleFieldStyles.particleFieldRoot} ${ParticleFieldStyles.particleFieldRootMoving}`
+                    : ParticleFieldStyles.particleFieldRoot
+            }
+            role="presentation"
+            aria-hidden="true"
+        >
             {particles.map((particle) => (
                 <div
                     key={particle.id}

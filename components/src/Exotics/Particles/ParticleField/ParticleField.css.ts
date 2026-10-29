@@ -7,6 +7,10 @@ export const particleFieldRoot = style({
     contain: "size layout style",
 });
 
+export const particleFieldRootMoving = style({
+    willChange: "transform",
+});
+
 export const particleFieldItem = style({
     position: "absolute",
     transform: "translate(-50%, -50%)",

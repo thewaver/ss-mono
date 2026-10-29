@@ -36,7 +36,7 @@ export type ParticleSpawnerTiming = {
 };
 
 export type ParticleSpawnerFrame = {
-    /** The spawner's box, in viewport content coordinates, or `undefined` before it has been measured. */
+    /** The spawner's box, in viewport content coordinates, or `undefined` while the spawner is not on the page. */
     rootRect: Rect | undefined;
     /** Each target's box, in the same coordinates. A missing one sends its particles nowhere but the spawner. */
     targetRects: (Rect | undefined)[];
@@ -53,8 +53,8 @@ export type ParticleSpawnerController = {
      * calls `onIterationEnd` or `onAnimationEnd`, and stopping playback does not take it back.
      *
      * @param count How many particles to send, rounded to a whole number.
-     * @returns `false` when nothing was sent: the count rounds to nothing, there are no targets, the spawner has not
-     * been measured yet, or the page is hidden.
+     * @returns `false` when nothing was sent: the count rounds to nothing, there are no targets, the spawner is not
+     * on the page yet, or the page is hidden.
      */
     emit: (count: number) => boolean;
 };

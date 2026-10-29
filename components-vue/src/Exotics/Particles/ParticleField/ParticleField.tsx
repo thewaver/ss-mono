@@ -144,7 +144,15 @@ export const ParticleField = defineComponent(
         });
 
         return () => (
-            <div ref={rootRef} class={ParticleFieldStyles.particleFieldRoot} role="presentation" aria-hidden="true">
+            <div
+                ref={rootRef}
+                class={[
+                    ParticleFieldStyles.particleFieldRoot,
+                    particles.value.length > 0 && ParticleFieldStyles.particleFieldRootMoving,
+                ]}
+                role="presentation"
+                aria-hidden="true"
+            >
                 {particles.value.map((particle) => (
                     <div
                         key={particle.id}

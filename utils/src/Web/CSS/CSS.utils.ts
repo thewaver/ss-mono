@@ -6,6 +6,7 @@ import {
     type CSSBorderRadius,
     type CSSBorderWidth,
     type CSSCornerShape,
+    type CSSFilterKey,
     type CSSLogicalPadding,
     type CSSMargin,
     type CSSPhysicalPadding,
@@ -62,10 +63,39 @@ const TRANSFORM_ORDER: readonly CSSTransformKey[] = [
  */
 const toFunctionCall = (key: CSSAnimationKey, value: number | number[]) => {
     const units = CSSConst.ANIMATION_UNITS[key];
-    const values = Array.isArray(value) ? value : [value];
-    const args = units.map((unit, idx) => `${values[idx] ?? 0}${unit}`);
 
-    return `${key}(${args.join(", ")})`;
+    let call = `${key}(`;
+
+    for (let idx = 0; idx < units.length; idx++) {
+        const arg = Array.isArray(value) ? value[idx] : idx === 0 ? value : undefined;
+
+        call += `${idx === 0 ? "" : ", "}${arg ?? 0}${units[idx]}`;
+    }
+
+    return `${call})`;
+};
+
+/** Adds one function call to a list of them, space-separated as `transform` and `filter` take them. */
+const appendCall = (list: string, call: string) => (list ? `${list} ${call}` : call);
+
+/** How many of an opacity's percentage points make the `opacity` property's whole. */
+const PERCENT = 100;
+
+/** The order filter functions are written in: every one but `opacity`, which is a property of its own. */
+const FILTER_ORDER: readonly CSSFilterKey[] = CSS_FILTER_KEYS.filter((key) => key !== "opacity");
+
+/** Whether a filter function's value is the one at which it changes nothing. */
+const isNeutralFilter = (key: CSSFilterKey, value: number | number[]) => {
+    const neutral = CSSConst.NEUTRAL_FILTER_VALUES[key];
+
+    return neutral !== undefined && (Array.isArray(value) ? value[0] : value) === neutral;
+};
+
+/** An opacity in percent as the `opacity` property's value, or empty when it is absent or changes nothing. */
+const toOpacity = (value: number | number[] | undefined) => {
+    const percent = Array.isArray(value) ? value[0] : value;
+
+    return percent === undefined || percent === CSSConst.NEUTRAL_FILTER_VALUES.opacity ? "" : `${percent / PERCENT}`;
 };
 
 /**
@@ -223,34 +253,41 @@ export namespace CSSUtils {
     ) => Object.fromEntries(Object.entries(entries).map(([key, value]) => [mapKey(key as keyof T), `${value}px`]));
 
     /**
-     * Writes a set of transform and filter values as the two CSS properties that carry them.
+     * Writes a set of transform and filter values as the three CSS properties that carry them.
      *
-     * Both properties come back in full every time, so a caller assigning the result wholesale drops
+     * All three come back in full every time, so a caller assigning the result wholesale drops
      * whatever the previous set wrote — a value that stops being produced stops applying, rather than
      * lingering because nothing overwrote it. Transform functions are ordered rather than taken as
      * given, since CSS applies them in sequence and the same set in another order is another
      * transform.
      *
+     * `opacity` is written as the `opacity` property, from 0 to 1, rather than as a filter function,
+     * and a filter function at the value where it changes nothing
+     * ({@link CSSConst.NEUTRAL_FILTER_VALUES}) is left out, an `opacity` of 100 included. A caller
+     * has to write all three, or a fade is lost.
+     *
      * @param values The functions and their arguments, keyed by CSS function name.
-     * @returns `transform` and `filter`, each an empty string when nothing asked for it.
+     * @returns `transform`, `filter` and `opacity`, each an empty string when there is nothing to write.
      */
 
     export const toAnimationStyle = (values: CSSAnimationValues): CSSAnimationStyle => {
-        const transforms: string[] = [];
-        const filters: string[] = [];
+        let transform = "";
+        let filter = "";
 
         for (const key of TRANSFORM_ORDER) {
             const value = values[key];
 
-            if (value !== undefined) transforms.push(toFunctionCall(key, value));
+            if (value !== undefined) transform = appendCall(transform, toFunctionCall(key, value));
         }
 
-        for (const key of CSS_FILTER_KEYS) {
+        for (const key of FILTER_ORDER) {
             const value = values[key];
 
-            if (value !== undefined) filters.push(toFunctionCall(key, value));
+            if (value !== undefined && !isNeutralFilter(key, value)) {
+                filter = appendCall(filter, toFunctionCall(key, value));
+            }
         }
 
-        return { transform: transforms.join(" "), filter: filters.join(" ") };
+        return { transform, filter, opacity: toOpacity(values.opacity) };
     };
 }

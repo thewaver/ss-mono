@@ -23,10 +23,8 @@ const readFrame = (page: Page, key: string) =>
     page
         .locator(demo(key))
         .evaluate((root) =>
-            [...root.querySelectorAll("div")]
-                .map(
-                    (element) => `${(element as HTMLElement).style.transform}|${(element as HTMLElement).style.filter}`,
-                )
+            [...root.querySelectorAll<HTMLElement>("div")]
+                .map((element) => `${element.style.transform}|${element.style.filter}|${element.style.opacity}`)
                 .join(";"),
         );
 

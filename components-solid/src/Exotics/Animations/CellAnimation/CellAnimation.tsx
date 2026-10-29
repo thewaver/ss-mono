@@ -182,6 +182,7 @@ export const CellAnimation = (props: CellAnimationProps) => {
             <div
                 ref={setContainerRef}
                 class={styles.cellAnimationContainer}
+                classList={{ [styles.cellAnimationContainerMoving]: getIsRunning() }}
                 style={{
                     ...assignInlineVars({
                         [styles.cellSrcVar]: CellAnimationUtils.toSourceImage(access(props.src)),

@@ -40,10 +40,16 @@ describe("computeStyleValues", () => {
     });
 
     it("leaves an empty effect unwritten", () => {
-        const values = PlacementItemUtils.computeStyleValues(RECT, undefined, { transform: "", filter: "" }, undefined);
+        const values = PlacementItemUtils.computeStyleValues(
+            RECT,
+            undefined,
+            { transform: "", filter: "", opacity: "" },
+            undefined,
+        );
 
         expect(values.transform).toBeUndefined();
         expect(values.filter).toBeUndefined();
+        expect(values.opacity).toBeUndefined();
     });
 });
 

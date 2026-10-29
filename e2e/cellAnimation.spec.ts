@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { demo, prop } from "./helpers";
+import { demo, prop, revealProp } from "./helpers";
 
 /**
  * The three motion components have Playground pages and no specs, because what they produce is movement over
@@ -355,11 +355,8 @@ test("the example pauses and scrubs whatever its source", async ({ page }) => {
         page
             .locator(demo("source"))
             .evaluate((root) =>
-                [...root.querySelectorAll("div")]
-                    .map(
-                        (element) =>
-                            `${(element as HTMLElement).style.transform}|${(element as HTMLElement).style.filter}`,
-                    )
+                [...root.querySelectorAll<HTMLElement>("div")]
+                    .map((element) => `${element.style.transform}|${element.style.filter}|${element.style.opacity}`)
                     .join(";"),
             );
 
@@ -387,4 +384,69 @@ test("the example pauses and scrubs whatever its source", async ({ page }) => {
 
         expect(await readFrame(), `${kind} holds while paused`).toBe(middle);
     }
+});
+
+/**
+ * A cell's fade is written to its `opacity`, not as an `opacity()` inside its `filter`, and a filter function at the
+ * value where it changes nothing is left out — so a cell that has finished its turn carries no filter at all.
+ * `blur_default` fades and blurs at once, so it shows both: a cell partway through its turn has an opacity between
+ * nothing and whole and no `opacity()` in its filter, and a cell at the end of its turn has neither a filter nor an
+ * opacity left.
+ *
+ * Paused and scrubbed from start to end, the example is read at even steps, each read two frames after the scrub so
+ * the cells have been drawn. Where in the pass the cells rest at the end of their turn depends on the playback
+ * direction, so the steps are read together rather than one of them being named.
+ */
+test("a cell fades through its opacity, and carries no filter once its turn is over", async ({ page }) => {
+    const STEP_PERCENT = 5;
+
+    const readCells = () =>
+        page.locator(demo("source")).evaluate(async (root) => {
+            await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
+            return [...root.querySelectorAll<HTMLElement>("div")]
+                .filter((element) => getComputedStyle(element).backgroundImage.startsWith("url("))
+                .map((element) => ({ filter: element.style.filter, opacity: element.style.opacity }));
+        });
+
+    await page.locator("#cellAnimationPlayback").click();
+    await expect(page.locator("#cellAnimationPlayback")).toHaveAccessibleName("Play");
+
+    await revealProp(page, "animationType");
+    await page.locator(`${prop("animationType")} [role="combobox"]`).click();
+    await page.getByRole("option", { name: "blur_default", exact: true }).click();
+
+    await page.locator("#cellAnimationProgress").focus();
+    await page.keyboard.press("Home");
+
+    const start = await readCells();
+
+    expect(start.length, "the example has cells").toBeGreaterThan(0);
+    expect(
+        start.every((cell) => cell.filter !== ""),
+        "every cell starts its turn blurred",
+    ).toBe(true);
+
+    const frames = [start];
+
+    for (let percent = STEP_PERCENT; percent <= 100; percent += STEP_PERCENT) {
+        for (let i = 0; i < STEP_PERCENT; i++) await page.keyboard.press("ArrowRight");
+
+        frames.push(await readCells());
+    }
+
+    const cells = frames.flat();
+
+    expect(
+        cells.filter((cell) => cell.filter.includes("opacity(")),
+        "no fade is written into a filter",
+    ).toEqual([]);
+    expect(
+        cells.some((cell) => cell.opacity !== "" && Number(cell.opacity) > 0 && Number(cell.opacity) < 1),
+        "a cell partway through its turn carries its fade as its opacity",
+    ).toBe(true);
+    expect(
+        frames.some((frame) => frame.every((cell) => cell.filter === "" && cell.opacity === "")),
+        "once every cell has finished its turn, none carries a filter or an opacity",
+    ).toBe(true);
 });

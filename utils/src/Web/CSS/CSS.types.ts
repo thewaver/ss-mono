@@ -100,8 +100,9 @@ export type CSSAnimationKey = CSSFilterKey | CSSTransformKey;
  */
 export type CSSAnimationValues = Partial<Record<CSSAnimationKey, number | number[]>>;
 
-/** The two CSS properties {@link CSSAnimationValues} is written into. */
+/** The three CSS properties {@link CSSAnimationValues} is written into, each empty when there is nothing to write. */
 export type CSSAnimationStyle = {
     transform: string;
     filter: string;
+    opacity: string;
 };

@@ -144,7 +144,11 @@
         aria-hidden="true"
     />
 
-    <div bind:this={container} class={styles.cellAnimationContainer} style={containerStyle}>
+    <div
+        bind:this={container}
+        class={[styles.cellAnimationContainer, isRunning && styles.cellAnimationContainerMoving]}
+        style={containerStyle}
+    >
         {#if frameState.areCellsMounted}
             {#each cellDefs as defs, index (index)}
                 {@const bounds = CellAnimationUtils.computeCellBounds(columnEdges, rowEdges, defs.pos)}

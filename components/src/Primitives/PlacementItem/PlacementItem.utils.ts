@@ -75,7 +75,8 @@ export namespace PlacementItemUtils {
      *
      * @param rect The item's placement. Its sizes are written in `cqw`, so they resolve against the box.
      * @param stackAt The consumer's stacking order, used where the placement names no `depth` of its own.
-     * @param effect What {@link computeEffectStyle} answered. An empty `transform` or `filter` is left unwritten.
+     * @param effect What {@link computeEffectStyle} answered. An empty `transform`, `filter` or `opacity` is left
+     * unwritten.
      * @param transition What {@link toTransition} answered while gliding, `undefined` otherwise.
      */
     export const computeStyleValues = (
@@ -91,6 +92,7 @@ export namespace PlacementItemUtils {
         rotate: `${rect.angle ?? NO_ANGLE}deg`,
         transform: effect?.transform || undefined,
         filter: effect?.filter || undefined,
+        opacity: effect?.opacity || undefined,
         zIndex: rect.depth ?? stackAt,
         clipPath: rect.clipPath,
         transition,

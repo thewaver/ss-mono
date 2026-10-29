@@ -26,17 +26,64 @@ const origin = computed(() => CellAnimationOrigins.computeOrigin(props.originTyp
 const computeCellWeights = (count: Index2d) =>
     CellAnimationWeights.computeCellWeights(props.weightType, count, origin.value, props.weightOpts);
 
-const computeCellAnimation = (defs: CellAnimationEvaluationDefs, timeline: number) =>
-    CellAnimationKeyframes.computeAnimation(
-        props.animationType,
-        CellAnimationBreakpointUtils.computeBreakpoints(
-            defs.weight,
-            CellAnimationPlaybackUtils.computeBreakpointOpts(props.breakpointOpts, timeline, props.playbackOpts),
-        ),
-        { ...defs, origin: origin.value },
-        CellAnimationPlaybackUtils.computeGlobalTimeline(timeline, props.animationDurationMs, props.playbackOpts),
-        props.breakpointOpts.easing,
+const settings = computed(() => ({
+    animationType: props.animationType,
+    breakpointOpts: { ...props.breakpointOpts },
+    playbackOpts: { ...props.playbackOpts },
+    durationMs: props.animationDurationMs,
+    origin: origin.value,
+}));
+
+const cellsWithOrigin = new WeakMap<CellAnimationEvaluationDefs, CellAnimationEvaluationDefs & { origin: Index2d }>();
+
+const computeFrame = (timeline: number, frameSettings: typeof settings.value) => ({
+    timeline,
+    settings: frameSettings,
+    breakpointOpts: CellAnimationPlaybackUtils.computeBreakpointOpts(
+        frameSettings.breakpointOpts,
+        timeline,
+        frameSettings.playbackOpts,
+    ),
+    globalTimeline: CellAnimationPlaybackUtils.computeGlobalTimeline(
+        timeline,
+        frameSettings.durationMs,
+        frameSettings.playbackOpts,
+    ),
+});
+
+let frame: ReturnType<typeof computeFrame> | undefined;
+
+const getFrame = (timeline: number) => {
+    const current = settings.value;
+
+    if (frame?.timeline !== timeline || frame.settings !== current) frame = computeFrame(timeline, current);
+
+    return frame;
+};
+
+const withOrigin = (defs: CellAnimationEvaluationDefs, cellOrigin: Index2d) => {
+    const cached = cellsWithOrigin.get(defs);
+
+    if (cached?.origin === cellOrigin) return cached;
+
+    const cell = { ...defs, origin: cellOrigin };
+
+    cellsWithOrigin.set(defs, cell);
+
+    return cell;
+};
+
+const computeCellAnimation = (defs: CellAnimationEvaluationDefs, timeline: number) => {
+    const { settings: frameSettings, breakpointOpts, globalTimeline } = getFrame(timeline);
+
+    return CellAnimationKeyframes.computeAnimation(
+        frameSettings.animationType,
+        CellAnimationBreakpointUtils.computeBreakpoints(defs.weight, breakpointOpts),
+        withOrigin(defs, frameSettings.origin),
+        globalTimeline,
+        frameSettings.breakpointOpts.easing,
     );
+};
 </script>
 
 <template>

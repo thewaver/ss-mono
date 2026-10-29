@@ -22,6 +22,8 @@ const CENTER: Point2d = { x: 0.5, y: 0.5 };
 
 const PERCENT = 100;
 
+const FULL_OPACITY = "1";
+
 /** The furthest a swipe is allowed to drag the slides, as a share of one slide. */
 const SWIPE_RATIO_LIMIT = 1;
 
@@ -783,15 +785,16 @@ export namespace CarouselUtils {
      *
      * @param placement What the carousel's placement rule answered for the slide.
      * @param distance The slide's distance, which decides its layer when the placement names none.
-     * @returns `transform`, `filter`, `transform-origin` and `z-index`, as dashed CSS properties.
+     * @returns `transform`, `filter`, `opacity`, `transform-origin` and `z-index`, as dashed CSS properties.
      */
     export const toSlideStyle = (placement: CarouselPlacement, distance: number) => {
-        const { transform, filter } = CSSUtils.toAnimationStyle(placement.effect);
+        const { transform, filter, opacity } = CSSUtils.toAnimationStyle(placement.effect);
         const origin = placement.origin ?? CENTER;
 
         return {
             "transform": transform || "none",
             "filter": filter || "none",
+            "opacity": opacity || FULL_OPACITY,
             "transform-origin": `${origin.x * PERCENT}% ${origin.y * PERCENT}%`,
             "z-index": `${Math.round((placement.layer ?? -Math.abs(distance)) * LAYER_RESOLUTION)}`,
         };
