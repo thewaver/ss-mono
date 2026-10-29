@@ -19,7 +19,7 @@ export const SwellExample = (props: Props) => {
             colorMixing={props.colorMixing}
             animationDurationMs={props.animationDurationMs}
             animationIterationDelayMs={props.animationIterationDelayMs}
-            computeChannelAnimation={(defs, timeline) => {
+            computeSliceAnimation={(defs, timeline) => {
                 const scale = 100 + SCALE_DIRECTIONS[defs.channel] * props.scalePercent * computeSwell(timeline);
 
                 return { scale: [scale, scale] };

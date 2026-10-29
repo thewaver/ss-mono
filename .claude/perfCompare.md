@@ -56,7 +56,11 @@ anything.
    in the background.
 6. **Check for outliers.** The script prints every run. Where the three runs of one test on one version spread by more
    than about 15%, rerun just that test (`ONLY="Cells, blur"`, several names separated by `|`) and use the rerun.
-7. **Report** the table the script prints — test, before, after, change — and the graphics card it names. Say which
+7. **Report** the table the script prints — test, before, after, change — and the graphics card it names. **The user
+   wants both the average and the 90th-percentile frame rate, each with a percentage shift**: take the 90th
+   percentile from the sorted gaps between frame stamps (`1000 / gaps[floor(0.9 × count)]`). Where the "after"
+   build is fast, add `--disable-gpu-vsync` and `--disable-frame-rate-limit` to `ARGS`, or every result stops at the
+   screen's refresh rate; Chromium honored both as of this writing (the dissolve Card measured 2,600 frames a second). Say which
    tests were rerun and why. If a knob or button a test needs is missing on one version, the script says so: report
    that test as not comparable rather than guessing.
 8. **Clean up**: stop both preview servers (stopping the background task may leave the `node` process listening —
@@ -134,6 +138,7 @@ const SCENARIOS = {
             await press(page, "Render 72 fields");
         },
     },
+    "Dissolve, 20 cards": { route: "/particle-dissolve", setup: (page) => press(page, "Render 20 cards") },
     "Dissolve, Card, 4 px cells": {
         route: "/particle-dissolve",
         setup: async (page) => {

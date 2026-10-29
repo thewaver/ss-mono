@@ -47,7 +47,7 @@ export type BaseRGBAnimationCbs = {
      * one pulls it away from the other two and leaves fringes along every edge; where all three still overlap, the
      * picture's own colors come back.
      */
-    computeChannelAnimation: (defs: RGBAnimationEvaluationDefs, timeline: number) => RGBAnimationEvaluationResult;
+    computeSliceAnimation: (defs: RGBAnimationEvaluationDefs, timeline: number) => RGBAnimationEvaluationResult;
     /** Runs at the end of each pass. */
     onIterationEnd?: () => void;
     /** Runs once every pass is done. */

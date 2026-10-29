@@ -27,7 +27,7 @@ const nextPass = () => {
     pass.value += 1;
 };
 
-const computeChannelAnimation = (defs: RGBAnimationEvaluationDefs, timeline: number) => ({
+const computeSliceAnimation = (defs: RGBAnimationEvaluationDefs, timeline: number) => ({
     "hue-rotate":
         computeDirection(defs.channel, RGB_ANIMATION_CHANNELS[pass.value % RGB_ANIMATION_CHANNELS.length]) *
         props.turns *
@@ -45,7 +45,7 @@ const computeChannelAnimation = (defs: RGBAnimationEvaluationDefs, timeline: num
         :color-mixing="colorMixing"
         :animation-duration-ms="animationDurationMs"
         :animation-iteration-delay-ms="animationIterationDelayMs"
-        :compute-channel-animation="computeChannelAnimation"
+        :compute-slice-animation="computeSliceAnimation"
         @iteration-end="nextPass"
     />
 </template>

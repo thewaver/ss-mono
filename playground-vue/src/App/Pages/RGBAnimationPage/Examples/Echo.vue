@@ -26,7 +26,7 @@ const progress = useModel(props, "progress");
 
 const computeRootAnimation = (timeline: number) => ({ translate: computePath(timeline, props.distancePercent) });
 
-const computeChannelAnimation = (defs: RGBAnimationEvaluationDefs, timeline: number) => {
+const computeSliceAnimation = (defs: RGBAnimationEvaluationDefs, timeline: number) => {
     const lag = RGB_ANIMATION_CHANNELS.indexOf(defs.channel) * LAG_SHARE;
     const [rootX, rootY] = computePath(timeline, props.distancePercent);
     const [laggedX, laggedY] = computePath(timeline - lag, props.distancePercent);
@@ -45,6 +45,6 @@ const computeChannelAnimation = (defs: RGBAnimationEvaluationDefs, timeline: num
         :animation-duration-ms="animationDurationMs"
         :animation-iteration-delay-ms="animationIterationDelayMs"
         :compute-root-animation="computeRootAnimation"
-        :compute-channel-animation="computeChannelAnimation"
+        :compute-slice-animation="computeSliceAnimation"
     />
 </template>

@@ -20,7 +20,7 @@
     colorMixing={props.colorMixing}
     animationDurationMs={props.animationDurationMs}
     animationIterationDelayMs={props.animationIterationDelayMs}
-    computeChannelAnimation={(defs, timeline) => ({
+    computeSliceAnimation={(defs, timeline) => ({
         perspective: PERSPECTIVE_PX,
         rotateY: DIRECTIONS[defs.channel] * props.maxDegrees * Math.sin(timeline * 2 * Math.PI),
     })}

@@ -109,7 +109,7 @@ export const CellAnimation = (props: CellAnimationProps) => {
             evaluationDefs,
             progress,
             latest.current.props.computeRootAnimation,
-            latest.current.props.computeCellAnimation,
+            latest.current.props.computeSliceAnimation,
         );
     }, [progress, evaluationDefs, areCellsMounted]);
 

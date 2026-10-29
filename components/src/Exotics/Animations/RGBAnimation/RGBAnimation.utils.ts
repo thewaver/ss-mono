@@ -2,6 +2,7 @@ import { MathUtils, type Size2d } from "@thewaver/ss-utils";
 
 import type { SVGColorMixing } from "../../../Generators/SVGDefs/SVGFilters/SVGFilterDefs.types";
 import { SVGFilterDefsUtils } from "../../../Generators/SVGDefs/SVGFilters/SVGFilterDefs.utils";
+import type { CellAnimationEvaluationDefs } from "../CellAnimation/CellAnimation.types";
 import { CellAnimationUtils } from "../CellAnimation/CellAnimation.utils";
 import { RGB_ANIMATION_CHANNELS } from "./RGBAnimation.const";
 import type {
@@ -11,6 +12,11 @@ import type {
 } from "./RGBAnimation.types";
 
 const DARK_SCHEME_QUERY = "(prefers-color-scheme: dark)";
+
+const sliceDefs = new WeakMap<
+    RGBAnimationEvaluationDefs,
+    CellAnimationEvaluationDefs & { origin: { row: number; col: number } }
+>();
 
 /**
  * The arithmetic behind `RGBAnimation`: which mixing to use, how each channel's copy keeps only its channel, and
@@ -82,6 +88,32 @@ export namespace RGBAnimationUtils {
         RGB_ANIMATION_CHANNELS.map((channel) => ({ channel, size }));
 
     /**
+     * A channel's defs in the shape a cell animation is handed, so the keyframe samples and builders play on a channel.
+     *
+     * The channel becomes one cell of a single row, in the order of `RGB_ANIMATION_CHANNELS`, with no weight and the
+     * origin at the first. The same defs give back the same object, so a builder that caches by cell stays cached.
+     *
+     * @param defs The channel's defs, as the component hands them over.
+     */
+    export const toSliceDefs = (defs: RGBAnimationEvaluationDefs) => {
+        const cached = sliceDefs.get(defs);
+
+        if (cached) return cached;
+
+        const slice = {
+            pos: { row: 0, col: RGB_ANIMATION_CHANNELS.indexOf(defs.channel) },
+            count: { row: 1, col: RGB_ANIMATION_CHANNELS.length },
+            weight: 0,
+            size: defs.size,
+            origin: { row: 0, col: 0 },
+        };
+
+        sliceDefs.set(defs, slice);
+
+        return slice;
+    };
+
+    /**
      * Draws one frame: the whole picture's animation on the root, then each channel's on its copy.
      *
      * @param root The animation's root element.
@@ -89,7 +121,7 @@ export namespace RGBAnimationUtils {
      * @param defs What each channel's animation is handed, from {@link computeEvaluationDefs}.
      * @param progress How far through the pass, kept between `0` and `1` before it is handed on.
      * @param computeRootAnimation The whole picture's animation, if any.
-     * @param computeChannelAnimation Each channel's animation.
+     * @param computeSliceAnimation Each channel's animation.
      */
     export const drawFrame = (
         root: HTMLElement,
@@ -97,14 +129,14 @@ export namespace RGBAnimationUtils {
         defs: RGBAnimationEvaluationDefs[],
         progress: number,
         computeRootAnimation: ((timeline: number) => RGBAnimationEvaluationResult) | undefined,
-        computeChannelAnimation: (defs: RGBAnimationEvaluationDefs, timeline: number) => RGBAnimationEvaluationResult,
+        computeSliceAnimation: (defs: RGBAnimationEvaluationDefs, timeline: number) => RGBAnimationEvaluationResult,
     ) => {
         const t = MathUtils.clamp01(progress);
 
         if (computeRootAnimation) CellAnimationUtils.assignAnimationProps(root, computeRootAnimation(t));
 
         for (let i = 0; i < channels.length && i < defs.length; i++) {
-            CellAnimationUtils.assignAnimationProps(channels[i], computeChannelAnimation(defs[i], t));
+            CellAnimationUtils.assignAnimationProps(channels[i], computeSliceAnimation(defs[i], t));
         }
     };
 }

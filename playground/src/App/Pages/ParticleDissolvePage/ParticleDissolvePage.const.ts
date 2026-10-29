@@ -1,5 +1,8 @@
-import type { ParticleDissolveParticleDefs } from "@thewaver/ss-components";
+import { CellAnimationKeyframeUtils } from "@thewaver/ss-components";
+import type { CellStop, ParticleDissolveParticleDefs } from "@thewaver/ss-components";
 import { type CSSAnimationValues, RandomUtils } from "@thewaver/ss-utils";
+
+import type { StressTestDefs } from "../../PageComponents/StressTest/StressText.types";
 
 const RISE_MIN = 300;
 const RISE_SPREAD = 500;
@@ -14,7 +17,16 @@ export const EXAMPLE_NAMES = {
     card: "A card",
     svg: "An SVG",
     image: "An image",
+    stressTest: "Stress Test",
 };
+
+export const STRESS_CELL_SIZE = 4;
+
+export const STRESS_ITEMS: StressTestDefs[] = [
+    { count: 3 * 2, cols: 3, gap: 10 },
+    { count: 4 * 3, cols: 4, gap: 10 },
+    { count: 5 * 4, cols: 5, gap: 10 },
+];
 
 export const EXAMPLES_ROOT = "/src/App/Pages/ParticleDissolvePage/Examples";
 
@@ -35,6 +47,33 @@ export const CARD_TEXT = {
 export const NO_EDGE_THICKNESSES = [0];
 
 export const CENTER_SHARE = { x: 0.5, y: 0.5 };
+
+export const createAshAnimation = () => {
+    const byKey = new Map<number, CellStop[]>();
+
+    return CellAnimationKeyframeUtils.fromSlices(({ pos, count }) => {
+        const key = pos.row * count.col + pos.col;
+        const existing = byKey.get(key);
+
+        if (existing) return existing;
+
+        const stops: CellStop[] = [
+            { at: 0, translateX: 0, translateY: 0, scaleX: FULL, scaleY: FULL, opacity: FULL },
+            {
+                at: 1,
+                translateX: (RandomUtils.hash(key, DRIFT_SEED) - 0.5) * DRIFT_SPREAD,
+                translateY: -(RISE_MIN + RandomUtils.hash(key, RISE_SEED) * RISE_SPREAD),
+                scaleX: FULL - SHRINK,
+                scaleY: FULL - SHRINK,
+                opacity: 0,
+            },
+        ];
+
+        byKey.set(key, stops);
+
+        return stops;
+    });
+};
 
 export const computeAshAnimation = (defs: ParticleDissolveParticleDefs, t: number): CSSAnimationValues => {
     const key = defs.cell.pos.row * defs.cell.count.col + defs.cell.pos.col;

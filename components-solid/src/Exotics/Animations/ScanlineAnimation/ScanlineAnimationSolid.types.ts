@@ -3,6 +3,6 @@ import type { BaseScanlineAnimationCbs, BaseScanlineAnimationValues } from "@the
 import type { AccessorValues } from "../../../Utils/typeUtils";
 import type { CellAnimationProps } from "../CellAnimation/CellAnimationSolid.types";
 
-export type ScanlineAnimationProps = Omit<CellAnimationProps, "cellCount" | "computeCellAnimation"> &
+export type ScanlineAnimationProps = Omit<CellAnimationProps, "cellCount" | "computeSliceAnimation"> &
     AccessorValues<BaseScanlineAnimationValues> &
     BaseScanlineAnimationCbs;

@@ -1,23 +1,34 @@
-import { createMemo, createSignal } from "solid-js";
+import { Show, createMemo, createSignal, onCleanup, onMount } from "solid-js";
 
-import { PARTICLE_DISSOLVE_DEFAULTS } from "@thewaver/ss-components-solid";
+import { PARTICLE_DISSOLVE_DEFAULTS, ParticleDissolve } from "@thewaver/ss-components-solid";
 import { ParticleDissolveKnobs } from "@thewaver/ss-playground/App/Knobs/ParticleDissolves.const";
+import { CellGpuUtils } from "@thewaver/ss-playground/App/Pages/CellAnimationPage/CellGpu/CellGpu.utils";
 import {
+    CARD_TEXT,
     EXAMPLES_ROOT,
     EXAMPLE_NAMES,
     FIELD_WIDTH,
+    PARTICLE_SHARE,
+    STRESS_CELL_SIZE,
+    STRESS_ITEMS,
+    computeAshAnimation,
+    createAshAnimation,
 } from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.const";
+import * as styles from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.css";
 import { ShapeConst } from "@thewaver/ss-utils";
 
 import { PageExampleKnobs } from "../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
-import { PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";
+import { PageCheckField, PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
+import { StressTest } from "../../PageComponents/StressTest/StressTest";
+import { AshParticle } from "./AshParticle";
 import { ButtonExample } from "./Examples/Button";
 import { CardExample } from "./Examples/Card";
 import { ImageExample } from "./Examples/Image";
 import { SvgExample } from "./Examples/Svg";
+import { GpuParticleDissolve } from "./GpuParticleDissolve";
 import type { ParticleDissolveExampleProps } from "./ParticleDissolvePageSolid.types";
 
 const AngleKnob = (props: { value: () => number; onInput: (value: number) => void }) => (
@@ -38,6 +49,98 @@ const AngleKnob = (props: { value: () => number; onInput: (value: number) => voi
         />
     </PageProp>
 );
+
+const StressCard = (props: ParticleDissolveExampleProps & { isOnGpu: boolean }) => {
+    const [getIsDissolved, setIsDissolved] = createSignal(false);
+
+    const ashAnimation = createAshAnimation();
+
+    const src = CellGpuUtils.createDotSrc("#ffffff", "#ffffff");
+
+    onMount(() => {
+        const timeout = setTimeout(() => setIsDissolved(true));
+
+        onCleanup(() => clearTimeout(timeout));
+    });
+
+    const renderCard = () => (
+        <div class={styles.card}>
+            <span class={styles.cardTitle}>{CARD_TEXT.title}</span>
+            <span>{CARD_TEXT.body}</span>
+            <span class={styles.badge}>{CARD_TEXT.badge}</span>
+        </div>
+    );
+
+    return (
+        <Show
+            when={props.isOnGpu}
+            fallback={
+                <ParticleDissolve
+                    isDissolved={getIsDissolved}
+                    durationMs={props.durationMs}
+                    particleLifetimeMs={props.particleLifetimeMs}
+                    featherShare={props.featherShare}
+                    spawnChance={props.spawnChance}
+                    cellSize={STRESS_CELL_SIZE}
+                    computeParticleAnimation={computeAshAnimation}
+                    renderParticle={(defs) => <AshParticle defs={defs} />}
+                    onDissolveEnd={() => setIsDissolved(false)}
+                    onRebuildEnd={() => setIsDissolved(true)}
+                >
+                    {renderCard()}
+                </ParticleDissolve>
+            }
+        >
+            <GpuParticleDissolve
+                src={src}
+                isDissolved={getIsDissolved}
+                durationMs={props.durationMs}
+                particleLifetimeMs={props.particleLifetimeMs}
+                featherShare={props.featherShare}
+                spawnChance={props.spawnChance}
+                cellSize={STRESS_CELL_SIZE}
+                animation={ashAnimation}
+                computeParticleSize={(cell) => ({
+                    width: cell.size.width * PARTICLE_SHARE,
+                    height: cell.size.height * PARTICLE_SHARE,
+                })}
+                onDissolveEnd={() => setIsDissolved(false)}
+                onRebuildEnd={() => setIsDissolved(true)}
+            >
+                {renderCard()}
+            </GpuParticleDissolve>
+        </Show>
+    );
+};
+
+const StressTestWrapper = (props: ParticleDissolveExampleProps) => {
+    const [getIsOnGpu, setIsOnGpu] = createSignal(true);
+
+    return (
+        <>
+            <div>{`${STRESS_CELL_SIZE} px cells`}</div>
+
+            <PagePropsPanel scope={"local"} hasReset={false}>
+                <PageProp
+                    key={"gpuProof"}
+                    label={"On the graphics card"}
+                    hint={
+                        "A proof of concept: draws each card's ash in one WebGL canvas, with each particle's motion worked out on the graphics card."
+                    }
+                    controls={"Swaps ParticleDissolve for the Playground's GpuParticleDissolve in the stress test"}
+                >
+                    <PageCheckField value={getIsOnGpu} ariaLabel={"On the graphics card"} onChange={setIsOnGpu} />
+                </PageProp>
+            </PagePropsPanel>
+
+            <StressTest
+                configs={STRESS_ITEMS}
+                renderLabel={(getConfigIndex) => `Render ${STRESS_ITEMS[getConfigIndex()].count} cards`}
+                renderItem={() => <StressCard {...props} isOnGpu={getIsOnGpu()} />}
+            />
+        </>
+    );
+};
 
 const CardExampleWrapper = (props: ParticleDissolveExampleProps) => {
     const [getAngle, setAngle] = createSignal(PARTICLE_DISSOLVE_DEFAULTS.angleDegrees);
@@ -149,6 +252,11 @@ export const ParticleDissolvePage = () => {
                 component: () => <ImageExampleWrapper {...commonProps} />,
                 path: `${EXAMPLES_ROOT}/Image.tsx`,
             },
+            {
+                key: "stressTest",
+                name: EXAMPLE_NAMES.stressTest,
+                component: () => <StressTestWrapper {...commonProps} />,
+            },
         ];
     });
 
@@ -249,7 +357,7 @@ export const ParticleDissolvePage = () => {
                 </PageProp>
             </PagePropsPanel>
 
-            <PageExamples items={getExamples} />
+            <PageExamples items={getExamples} layout={"flow"} />
         </>
     );
 };

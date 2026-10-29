@@ -6,7 +6,7 @@ import type { ScanlineAnimationProps } from "./ScanlineAnimation.types";
 export const ScanlineAnimation = ({
     lineCount,
     orientation,
-    computeScanlineAnimation,
+    computeSliceAnimation,
     ...otherProps
 }: ScanlineAnimationProps) => {
     const isVertical = (orientation ?? SCANLINE_ANIMATION_DEFAULTS.orientation) === "vertical";
@@ -15,7 +15,7 @@ export const ScanlineAnimation = ({
         <CellAnimation
             {...otherProps}
             cellCount={isVertical ? { row: 1, col: lineCount } : { row: lineCount, col: 1 }}
-            computeCellAnimation={computeScanlineAnimation}
+            computeSliceAnimation={computeSliceAnimation}
         />
     );
 };

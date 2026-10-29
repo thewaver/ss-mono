@@ -2,7 +2,7 @@ import { style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
 
-const PARTICLE_SIZE_PX = 10;
+export const PARTICLE_SIZE_PX = 10;
 
 export const root = style({
     display: "flex",

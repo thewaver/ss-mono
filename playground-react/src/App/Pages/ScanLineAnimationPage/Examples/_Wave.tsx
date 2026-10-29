@@ -28,7 +28,7 @@ export const WaveExample = ({ keyframeOpts, breakpointOpts, weightType, ...other
         <ScanlineAnimation
             {...otherProps}
             computeCellWeights={computeCellWeights}
-            computeScanlineAnimation={(defs, timeline) =>
+            computeSliceAnimation={(defs, timeline) =>
                 ScanlineAnimationKeyframes._computeHorizontalWave(
                     CellAnimationBreakpointUtils.computeBreakpoints(defs.weight, breakpointOpts),
                     defs,

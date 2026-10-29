@@ -41,7 +41,7 @@ export type BaseCellAnimationCbs = {
     /** What the picture as a whole does over the pass, for an effect that is not per cell. */
     computeRootAnimation?: (timeline: number) => CellAnimationEvaluationResult;
     /** What one cell does on its turn, given where it is and how far through the pass it is. */
-    computeCellAnimation: (defs: CellAnimationEvaluationDefs, timeline: number) => CellAnimationEvaluationResult;
+    computeSliceAnimation: (defs: CellAnimationEvaluationDefs, timeline: number) => CellAnimationEvaluationResult;
     /** Runs at the end of each pass. */
     onIterationEnd?: () => void;
     /** Runs once every pass is done. */

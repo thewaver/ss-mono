@@ -76,7 +76,7 @@
         return cell;
     };
 
-    const computeCellAnimation = (defs: CellAnimationEvaluationDefs, timeline: number) => {
+    const computeSliceAnimation = (defs: CellAnimationEvaluationDefs, timeline: number) => {
         const { settings: frameSettings, breakpointOpts: cellBreakpointOpts, globalTimeline } = getFrame(timeline);
 
         return CellAnimationKeyframes.computeAnimation(
@@ -98,5 +98,5 @@
         playbackOpts,
     )}
     computeCellWeights={(count) => CellAnimationWeights.computeCellWeights(weightType, count, origin, weightOpts)}
-    {computeCellAnimation}
+    {computeSliceAnimation}
 />

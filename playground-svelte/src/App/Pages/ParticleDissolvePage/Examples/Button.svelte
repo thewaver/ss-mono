@@ -50,7 +50,7 @@
             }}
         >
             {#snippet renderContent(flags)}
-                <PageButtonContent {flags}>Burn me</PageButtonContent>
+                <PageButtonContent {flags}>Click to burn me up</PageButtonContent>
             {/snippet}
         </Button>
 

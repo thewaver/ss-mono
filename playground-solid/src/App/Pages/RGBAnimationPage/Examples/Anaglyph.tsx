@@ -1,13 +1,17 @@
-import { RGBAnimation, access } from "@thewaver/ss-components-solid";
-import type { AccessorProps, RGBAnimationChannel } from "@thewaver/ss-components-solid";
+import { createMemo } from "solid-js";
+
+import { RGBAnimation, RGBAnimationKeyframes, RGBAnimationUtils, access } from "@thewaver/ss-components-solid";
+import type { AccessorProps } from "@thewaver/ss-components-solid";
 
 import type { RGBAnimationExampleProps } from "../RGBAnimationPageSolid.types";
-
-const DIRECTIONS: Record<RGBAnimationChannel, number> = { red: -1, green: 0, blue: 1 };
 
 type Props = RGBAnimationExampleProps & AccessorProps<{ separationPercent: number }>;
 
 export const AnaglyphExample = (props: Props) => {
+    const getAnimation = createMemo(() =>
+        RGBAnimationKeyframes.createAnaglyph({ separationPercent: access(props.separationPercent) }),
+    );
+
     return (
         <RGBAnimation
             src={props.src}
@@ -17,9 +21,7 @@ export const AnaglyphExample = (props: Props) => {
             colorMixing={props.colorMixing}
             animationDurationMs={props.animationDurationMs}
             animationIterationDelayMs={props.animationIterationDelayMs}
-            computeChannelAnimation={(defs, timeline) => ({
-                translateX: DIRECTIONS[defs.channel] * access(props.separationPercent) * Math.sin(timeline * Math.PI),
-            })}
+            computeSliceAnimation={(defs, timeline) => getAnimation()(timeline, RGBAnimationUtils.toSliceDefs(defs))}
         />
     );
 };

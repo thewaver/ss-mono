@@ -28,7 +28,7 @@ export const SkewExample = ({ keyframeOpts, breakpointOpts, weightType, ...other
         <ScanlineAnimation
             {...otherProps}
             computeCellWeights={computeCellWeights}
-            computeScanlineAnimation={(defs, timeline) =>
+            computeSliceAnimation={(defs, timeline) =>
                 ScanlineAnimationKeyframes._computeHorizontalSkew(
                     CellAnimationBreakpointUtils.computeBreakpoints(defs.weight, breakpointOpts),
                     defs,

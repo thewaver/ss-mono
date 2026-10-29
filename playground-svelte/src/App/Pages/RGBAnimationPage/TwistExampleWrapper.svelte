@@ -33,7 +33,7 @@
 <PageExampleKnobs>
     <PageProp
         itemKey={"maxDegrees"}
-        controls={"Sets the example's angle, read by its RGBAnimationProps.computeChannelAnimation"}
+        controls={"Sets the example's angle, read by its RGBAnimationProps.computeSliceAnimation"}
         label={"Angle (°)"}
         hint={"How far red and blue turn, in opposite directions, at the middle of the pass. Green stays put."}
     >

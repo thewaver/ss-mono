@@ -77,7 +77,7 @@
                 defs,
                 value,
                 props.computeRootAnimation,
-                props.computeChannelAnimation,
+                props.computeSliceAnimation,
             ),
         );
     });

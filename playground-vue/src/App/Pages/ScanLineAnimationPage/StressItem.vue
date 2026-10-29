@@ -85,7 +85,7 @@ const foo = pickStressKeyframes(STRESS_ITEMS[props.configIndex].kind);
 const computeCellWeights = (count: Index2d) =>
     CellAnimationWeights.computeCellWeights(props.weightType, count, WEIGHT_ORIGIN);
 
-const computeScanlineAnimation = (defs: ScanlineAnimationEvaluationDefs, timeline: number) =>
+const computeSliceAnimation = (defs: ScanlineAnimationEvaluationDefs, timeline: number) =>
     foo(CellAnimationBreakpointUtils.computeBreakpoints(defs.weight, undefined), defs, timeline, undefined);
 </script>
 
@@ -99,7 +99,7 @@ const computeScanlineAnimation = (defs: ScanlineAnimationEvaluationDefs, timelin
             :line-count="STRESS_LINE_COUNT"
             :animation-iteration-delay-ms="0"
             :compute-cell-weights="computeCellWeights"
-            :compute-scanline-animation="computeScanlineAnimation"
+            :compute-slice-animation="computeSliceAnimation"
         />
     </PageMeasureBox>
 </template>

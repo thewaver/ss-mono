@@ -789,6 +789,8 @@ export * from "./Samples/SVGDefs/SVGPatternLayouts.const";
 export type * from "./Samples/SVGDefs/SVGPatternLayouts.types";
 export * from "./Samples/ScanlineAnimation/Keyframes/ScanlineAnimationKeyframes.const";
 export type * from "./Samples/ScanlineAnimation/Keyframes/ScanlineAnimationKeyframes.types";
+export * from "./Samples/RGBAnimation/Keyframes/RGBAnimationKeyframes.const";
+export type * from "./Samples/RGBAnimation/Keyframes/RGBAnimationKeyframes.types";
 export * from "./Samples/ScrambleText/Glyphs/ScrambleTextGlyphs.const";
 export type * from "./Samples/ScrambleText/Glyphs/ScrambleTextGlyphs.types";
 export * from "./Samples/Staircase/Indents/StaircaseIndents.const";

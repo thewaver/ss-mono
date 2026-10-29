@@ -14,7 +14,7 @@ purpose: it answers "what is outstanding", and neither of them is.
 | [Blockers and known issues](#blockers-and-known-issues)   |     6 |
 | [Deliberately not built](#deliberately-not-built)         |     1 |
 | [Accessibility gaps](#accessibility-gaps)                 |     5 |
-| [Planned projects](#planned-projects)                     |     3 |
+| [Planned projects](#planned-projects)                     |     6 |
 | [Waiting on browser support](#waiting-on-browser-support) |     4 |
 
 ---
@@ -54,6 +54,9 @@ They cluster, and no single item owns them.
 | #   | What                                          | Standing                                                                                                      |
 | --- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
 | 2   | **A consumer-facing layer above the library** | **Deferred to a near-future session of its own.** Painted, ready-to-use controls, as Magic UI sells templates |
+| 12  | **`ScanlineAnimation` samples**               | **Built in Solid; React, Vue and Svelte to port.** The samples take the cell samples' input, as one row       |
+| 13  | **Particle components**                       | **Proof of concept built; library change due with 14.** A picture plus a tint, in place of `renderParticle`   |
+| 14  | **Graphics-card animations**                  | **Housekeeping.** Move the renderer into the library and drop "cell" from the names the three share           |
 
 ## Waiting on browser support
 

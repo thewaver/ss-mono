@@ -76,7 +76,7 @@
             finalFrame={"nothing"}
             computeCellWeights={(count) =>
                 CellAnimationWeights.computeCellWeights(props.weightType, count, origin, props.weightOpts)}
-            computeCellAnimation={(defs, timeline) =>
+            computeSliceAnimation={(defs, timeline) =>
                 CellAnimationKeyframeUtils.computeAnimation(
                     LOZENGE_GROW,
                     CellAnimationBreakpointUtils.computeBreakpoints(

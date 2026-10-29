@@ -16,7 +16,7 @@
     colorMixing={props.colorMixing}
     animationDurationMs={props.animationDurationMs}
     animationIterationDelayMs={props.animationIterationDelayMs}
-    computeChannelAnimation={(defs, timeline) => {
+    computeSliceAnimation={(defs, timeline) => {
         const index = RGB_ANIMATION_CHANNELS.indexOf(defs.channel);
         const angle = (timeline + index / RGB_ANIMATION_CHANNELS.length) * 2 * Math.PI;
         const radius = props.radiusPercent * Math.sin(timeline * Math.PI);

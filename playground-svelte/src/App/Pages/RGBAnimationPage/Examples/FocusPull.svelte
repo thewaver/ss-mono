@@ -21,7 +21,7 @@
     colorMixing={props.colorMixing}
     animationDurationMs={props.animationDurationMs}
     animationIterationDelayMs={props.animationIterationDelayMs}
-    computeChannelAnimation={(defs, timeline) => {
+    computeSliceAnimation={(defs, timeline) => {
         const index = RGB_ANIMATION_CHANNELS.indexOf(defs.channel);
         const share = (timeline - index * STAGGER_SHARE) / WINDOW_SHARE;
 

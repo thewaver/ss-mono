@@ -58,7 +58,7 @@ const sharedProps = computed(() => {
     <PageExampleKnobs>
         <PageProp
             item-key="turns"
-            controls="Sets the example's turns, read by its RGBAnimationProps.computeChannelAnimation"
+            controls="Sets the example's turns, read by its RGBAnimationProps.computeSliceAnimation"
             label="Turns"
             hint="How many times the two turning channels go round the color wheel, in opposite directions, over one pass. The third stays put, a different one each pass."
         >

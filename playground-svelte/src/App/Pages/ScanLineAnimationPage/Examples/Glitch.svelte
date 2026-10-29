@@ -89,7 +89,7 @@
 
         return { brightness: 100 };
     }}
-    computeScanlineAnimation={(defs, timeline) => {
+    computeSliceAnimation={(defs, timeline) => {
         for (let g = 0; g < breakpointGroups.length; g++) {
             const [start, , end] = breakpointGroups[g];
 

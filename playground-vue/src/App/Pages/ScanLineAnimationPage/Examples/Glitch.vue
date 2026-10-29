@@ -94,7 +94,7 @@ const computeRootAnimation = (timeline: number) => {
     return { brightness: 100 };
 };
 
-const computeScanlineAnimation = (defs: ScanlineAnimationEvaluationDefs, timeline: number) => {
+const computeSliceAnimation = (defs: ScanlineAnimationEvaluationDefs, timeline: number) => {
     for (let g = 0; g < breakpointGroups.value.length; g++) {
         const [start, , end] = breakpointGroups.value[g];
 
@@ -121,7 +121,7 @@ const computeScanlineAnimation = (defs: ScanlineAnimationEvaluationDefs, timelin
         :animation-iteration-delay-ms="animationIterationDelayMs"
         :compute-cell-weights="computeCellWeights"
         :compute-root-animation="computeRootAnimation"
-        :compute-scanline-animation="computeScanlineAnimation"
+        :compute-slice-animation="computeSliceAnimation"
         @iteration-end="regenerateShifts"
     />
 </template>

@@ -58,7 +58,7 @@ const sharedProps = computed(() => {
     <PageExampleKnobs>
         <PageProp
             item-key="distancePercent"
-            controls="Sets the example's distance, read by its RGBAnimationProps.computeRootAnimation and computeChannelAnimation"
+            controls="Sets the example's distance, read by its RGBAnimationProps.computeRootAnimation and computeSliceAnimation"
             label="Distance (%)"
             hint="How far the picture drifts along its figure-eight, as a share of its size. Green and blue follow a little later than red."
         >

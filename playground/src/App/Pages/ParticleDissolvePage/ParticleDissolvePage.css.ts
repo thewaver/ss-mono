@@ -34,6 +34,7 @@ export const cardTitle = style({
 
 export const badge = style({
     alignSelf: "start",
+    marginTop: themeVars.spacing.full,
     padding: `${themeVars.spacing.half} ${themeVars.spacing.full}`,
     borderRadius: themeVars.borderRadius.full,
     backgroundColor: themeVars.color.success.light,

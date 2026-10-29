@@ -62,7 +62,7 @@ export const GlitchExample = (props: Props) => {
             animationDurationMs={props.animationDurationMs}
             animationIterationDelayMs={props.animationIterationDelayMs}
             computeRootAnimation={(timeline) => ({ brightness: findGroup(timeline) === -1 ? 100 : 125 })}
-            computeChannelAnimation={(defs, timeline) => {
+            computeSliceAnimation={(defs, timeline) => {
                 const group = findGroup(timeline);
                 const shift = shifts[group]?.[RGB_ANIMATION_CHANNELS.indexOf(defs.channel)];
 

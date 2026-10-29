@@ -28,7 +28,7 @@ export const SurgeExample = ({ keyframeOpts, breakpointOpts, weightType, ...othe
         <ScanlineAnimation
             {...otherProps}
             computeCellWeights={computeCellWeights}
-            computeScanlineAnimation={(defs, timeline) =>
+            computeSliceAnimation={(defs, timeline) =>
                 ScanlineAnimationKeyframes.computeHorizontalStretch(
                     CellAnimationBreakpointUtils.computeBreakpoints(defs.weight, breakpointOpts),
                     defs,

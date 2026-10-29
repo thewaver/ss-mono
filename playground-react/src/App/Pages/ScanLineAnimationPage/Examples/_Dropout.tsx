@@ -28,7 +28,7 @@ export const DropoutExample = ({ keyframeOpts, breakpointOpts, weightType, ...ot
         <ScanlineAnimation
             {...otherProps}
             computeCellWeights={computeCellWeights}
-            computeScanlineAnimation={(defs, timeline) =>
+            computeSliceAnimation={(defs, timeline) =>
                 ScanlineAnimationKeyframes._computeHorizontalDropout(
                     CellAnimationBreakpointUtils.computeBreakpoints(defs.weight, breakpointOpts),
                     defs,

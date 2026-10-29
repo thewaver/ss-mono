@@ -18,7 +18,7 @@ const props = defineProps<Props>();
 const playback = useModel(props, "playback");
 const progress = useModel(props, "progress");
 
-const computeChannelAnimation = (defs: RGBAnimationEvaluationDefs, timeline: number) => {
+const computeSliceAnimation = (defs: RGBAnimationEvaluationDefs, timeline: number) => {
     const index = RGB_ANIMATION_CHANNELS.indexOf(defs.channel);
     const share = (timeline - index * STAGGER_SHARE) / WINDOW_SHARE;
 
@@ -35,6 +35,6 @@ const computeChannelAnimation = (defs: RGBAnimationEvaluationDefs, timeline: num
         :color-mixing="colorMixing"
         :animation-duration-ms="animationDurationMs"
         :animation-iteration-delay-ms="animationIterationDelayMs"
-        :compute-channel-animation="computeChannelAnimation"
+        :compute-slice-animation="computeSliceAnimation"
     />
 </template>

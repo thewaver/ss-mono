@@ -19,7 +19,7 @@
     colorMixing={props.colorMixing}
     animationDurationMs={props.animationDurationMs}
     animationIterationDelayMs={props.animationIterationDelayMs}
-    computeChannelAnimation={(defs, timeline) => ({
+    computeSliceAnimation={(defs, timeline) => ({
         translateX: DIRECTIONS[defs.channel] * props.separationPercent * Math.sin(timeline * Math.PI),
     })}
 />

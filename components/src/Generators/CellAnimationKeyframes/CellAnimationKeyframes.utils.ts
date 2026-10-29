@@ -11,9 +11,11 @@ import type {
 import { CellAnimationBreakpointUtils } from "../CellAnimationBreakpoints/CellAnimationBreakpoints.utils";
 import { CellAnimationZoneUtils } from "../CellAnimationZones/CellAnimationZones.utils";
 import type {
+    CellAnimationDefinition,
     CellAnimationFn,
     CellStop,
     CellStopTrack,
+    CellStopsFn,
     CellZone,
     CompiledCellStops,
 } from "./CellAnimationKeyframes.types";
@@ -22,6 +24,14 @@ const RESULT_DECIMAL_PLACES = 3;
 const RESULT_SCALE = 10 ** RESULT_DECIMAL_PLACES;
 
 const roundForStyle = (value: number) => Math.round(value * RESULT_SCALE) / RESULT_SCALE;
+
+const definitions = new WeakMap<CellAnimationFn, CellAnimationDefinition>();
+
+const define = (definition: CellAnimationDefinition, animation: CellAnimationFn) => {
+    definitions.set(animation, definition);
+
+    return animation;
+};
 
 /**
  * Builds the per-cell functions a cell animation plays, from keyframes rather than from code.
@@ -96,7 +106,7 @@ export namespace CellAnimationKeyframeUtils {
     export const fromStops = (stops: CellStop[]): CellAnimationFn => {
         const tracks = Object.entries(compileStops(stops));
 
-        return (timeline, defs) => {
+        return define({ kind: "stops", stops }, (timeline, defs) => {
             const result: Partial<Record<CSSAnimationKey, number>> = {};
 
             let originX: number | undefined;
@@ -156,7 +166,7 @@ export namespace CellAnimationKeyframeUtils {
             }
 
             return result;
-        };
+        });
     };
 
     /**
@@ -169,15 +179,72 @@ export namespace CellAnimationKeyframeUtils {
      * @param fallback What a cell outside every zone plays.
      * @returns One animation that dispatches by zone.
      */
-    export const fromZones =
-        (zones: CellZone[], fallback: CellAnimationFn): CellAnimationFn =>
-        (timeline, defs) => {
+    export const fromZones = (zones: CellZone[], fallback: CellAnimationFn): CellAnimationFn =>
+        define({ kind: "zones", zones, fallback }, (timeline, defs) => {
             for (const { zone, animation } of zones) {
                 if (CellAnimationZoneUtils.isInZone(zone, defs)) return animation(timeline, defs);
             }
 
             return fallback(timeline, defs);
-        };
+        });
+
+    /**
+     * Plays stops of each cell's own, worked out from the cell.
+     *
+     * For variation zones cannot name: a shift drawn at random for each line, a phase that moves along the grid, a
+     * cell picked by a hash. The function is asked for the stops rather than the values, so a renderer that works
+     * the keyframes out elsewhere can ask it once per grid and never per frame. It should return the same array for
+     * the same cell for as long as the animation is in use; to change the stops, build a new animation.
+     *
+     * @param computeStops The stops one cell plays, from the cell and the grid.
+     * @returns One animation that plays each cell its own stops.
+     */
+    export const fromSlices = (computeStops: CellStopsFn): CellAnimationFn => {
+        const compiled = new WeakMap<CellStop[], CellAnimationFn>();
+
+        return define({ kind: "slices", computeStops }, (timeline, defs) => {
+            const stops = computeStops(defs);
+            const animation = compiled.get(stops) ?? fromStops(stops);
+
+            compiled.set(stops, animation);
+
+            return animation(timeline, defs);
+        });
+    };
+
+    /**
+     * What an animation was built from, when it was built by {@link fromStops}, {@link fromZones} or
+     * {@link fromSlices}.
+     *
+     * Lets a renderer that cannot call a function for every cell on every frame — one working the keyframes out on
+     * the graphics card — read the stops instead. A hand-written function has no definition.
+     *
+     * @param animation The animation to look up.
+     * @returns Its stops, its zones or its per-cell stops, or `undefined` for an animation written by hand.
+     */
+    export const getDefinition = (animation: CellAnimationFn) => definitions.get(animation);
+
+    /**
+     * The stops one cell of an animation plays, following zones and per-cell stops down to a table.
+     *
+     * @param animation The animation, as handed to the component.
+     * @param defs The cell and the grid, as the animation would be handed them.
+     * @returns The cell's stops, or `undefined` when any step on the way was written by hand.
+     */
+    export const resolveStops = (
+        animation: CellAnimationFn,
+        defs: CellAnimationEvaluationDefs & { origin: Index2d },
+    ): CellStop[] | undefined => {
+        const definition = definitions.get(animation);
+
+        if (!definition) return undefined;
+        if (definition.kind === "stops") return definition.stops;
+        if (definition.kind === "slices") return definition.computeStops(defs);
+
+        const match = definition.zones.find(({ zone }) => CellAnimationZoneUtils.isInZone(zone, defs));
+
+        return resolveStops(match ? match.animation : definition.fallback, defs);
+    };
 
     /**
      * Evaluates an animation for one cell at one point on the shared timeline.

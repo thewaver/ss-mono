@@ -33,7 +33,7 @@
 <PageExampleKnobs>
     <PageProp
         itemKey={"scalePercent"}
-        controls={"Sets the example's scale, read by its RGBAnimationProps.computeChannelAnimation"}
+        controls={"Sets the example's scale, read by its RGBAnimationProps.computeSliceAnimation"}
         label={"Scale (%)"}
         hint={"How far red grows and blue shrinks at the top of the swell. Green stays put."}
     >

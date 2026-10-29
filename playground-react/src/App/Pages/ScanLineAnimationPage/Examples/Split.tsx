@@ -28,7 +28,7 @@ export const SplitExample = ({ keyframeOpts, breakpointOpts, weightType, ...othe
         <ScanlineAnimation
             {...otherProps}
             computeCellWeights={computeCellWeights}
-            computeScanlineAnimation={(defs, timeline) =>
+            computeSliceAnimation={(defs, timeline) =>
                 ScanlineAnimationKeyframes.computeHorizontalSplit(
                     CellAnimationBreakpointUtils.computeBreakpoints(defs.weight, breakpointOpts),
                     defs,

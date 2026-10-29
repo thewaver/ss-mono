@@ -3,7 +3,7 @@ import { keyframes, style } from "@vanilla-extract/css";
 import { themeVars } from "../../Theme.css";
 
 const MARKER_SIZE_PX = 28;
-const PARTICLE_SIZE_PX = 10;
+export const PARTICLE_SIZE_PX = 10;
 const MOVING_TARGET_LOOP_MS = 4000;
 const CORNER_NEAR = "15%";
 const CORNER_FAR = "85%";

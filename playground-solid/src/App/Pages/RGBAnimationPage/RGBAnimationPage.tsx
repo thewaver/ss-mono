@@ -1,7 +1,14 @@
-import { type Accessor, type JSX, type Signal, createMemo, createSignal, splitProps } from "solid-js";
+import { type Accessor, Show, type Signal, createMemo, createSignal, splitProps } from "solid-js";
 import { createStore } from "solid-js/store";
 
-import { RGB_ANIMATION_DEFAULTS } from "@thewaver/ss-components-solid";
+import {
+    type CellAnimationFn,
+    RGBAnimation,
+    RGBAnimationKeyframes,
+    RGBAnimationUtils,
+    RGB_ANIMATION_DEFAULTS,
+    access,
+} from "@thewaver/ss-components-solid";
 import { RGBAnimationKnobs } from "@thewaver/ss-playground/App/Knobs/RGBAnimations.const";
 import {
     EXAMPLES_ROOT,
@@ -17,16 +24,18 @@ import {
 import * as styles from "@thewaver/ss-playground/App/Pages/RGBAnimationPage/RGBAnimationPage.css";
 import type { RGBAnimationSourceKey } from "@thewaver/ss-playground/App/Pages/RGBAnimationPage/RGBAnimationPage.types";
 import knightProfile from "@thewaver/ss-playground/App/knight_profile.webp";
+import type { CSSAnimationValues } from "@thewaver/ss-utils";
 
 import { PageExampleKnobs } from "../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
-import { PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";
+import { PageCheckField, PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PagePlaybackScrubber } from "../../PageComponents/PlaybackScrubber/PlaybackScrubber";
 import { PlaybackScrubberUtils } from "../../PageComponents/PlaybackScrubber/PlaybackScrubber.utils";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { StressTest } from "../../PageComponents/StressTest/StressTest";
+import { GpuCellAnimation } from "../CellAnimationPage/GpuCells";
 import { AnaglyphExample } from "./Examples/Anaglyph";
 import { EchoExample } from "./Examples/Echo";
 import { FocusPullExample } from "./Examples/FocusPull";
@@ -46,18 +55,43 @@ type WrapperProps = RGBAnimationExampleProps & {
     isPagePlaying: Accessor<boolean>;
 };
 
-const STRESS_EXAMPLES: ((props: RGBAnimationExampleProps) => JSX.Element)[] = [
-    (props) => <GlitchExample {...props} glitchOpts={RGBAnimationKnobs.STARTING_GLITCH_OPTS} />,
-    (props) => <SwellExample {...props} scalePercent={RGBAnimationKnobs.STARTING_SCALE_PERCENT} />,
-    (props) => <OrbitExample {...props} radiusPercent={RGBAnimationKnobs.STARTING_ORBIT_RADIUS_PERCENT} />,
-    (props) => <FocusPullExample {...props} maxBlurPx={RGBAnimationKnobs.STARTING_FOCUS_BLUR_PX} />,
-    (props) => <TwistExample {...props} maxDegrees={RGBAnimationKnobs.STARTING_TWIST_DEGREES} />,
-    (props) => <HueSwapExample {...props} turns={RGBAnimationKnobs.STARTING_HUE_TURNS} />,
-    (props) => <TiltExample {...props} maxDegrees={RGBAnimationKnobs.STARTING_TILT_DEGREES} />,
-    (props) => (
-        <AnaglyphExample {...props} separationPercent={RGBAnimationKnobs.STARTING_ANAGLYPH_SEPARATION_PERCENT} />
-    ),
-    (props) => <EchoExample {...props} distancePercent={RGBAnimationKnobs.STARTING_ECHO_DISTANCE_PERCENT} />,
+const WHOLE_PASS = { smoothness: 1 };
+
+const STRESS_SAMPLES: (() => {
+    animation: CellAnimationFn;
+    computeRootAnimation?: (timeline: number) => CSSAnimationValues;
+})[] = [
+    () => ({
+        animation: RGBAnimationKeyframes.createSwell({ scalePercent: RGBAnimationKnobs.STARTING_SCALE_PERCENT }),
+    }),
+    () => ({
+        animation: RGBAnimationKeyframes.createOrbit({
+            radiusPercent: RGBAnimationKnobs.STARTING_ORBIT_RADIUS_PERCENT,
+        }),
+    }),
+    () => ({
+        animation: RGBAnimationKeyframes.createFocusPull({ maxBlurPx: RGBAnimationKnobs.STARTING_FOCUS_BLUR_PX }),
+    }),
+    () => ({ animation: RGBAnimationKeyframes.createTwist({ maxDegrees: RGBAnimationKnobs.STARTING_TWIST_DEGREES }) }),
+    () => ({
+        animation: RGBAnimationKeyframes.createHueSwap({ turns: RGBAnimationKnobs.STARTING_HUE_TURNS, anchor: "red" }),
+    }),
+    () => ({ animation: RGBAnimationKeyframes.createTilt({ maxDegrees: RGBAnimationKnobs.STARTING_TILT_DEGREES }) }),
+    () => ({
+        animation: RGBAnimationKeyframes.createAnaglyph({
+            separationPercent: RGBAnimationKnobs.STARTING_ANAGLYPH_SEPARATION_PERCENT,
+        }),
+    }),
+    () => {
+        const opts = { distancePercent: RGBAnimationKnobs.STARTING_ECHO_DISTANCE_PERCENT };
+
+        return {
+            animation: RGBAnimationKeyframes.createEcho(opts),
+            computeRootAnimation: (timeline) => ({
+                translate: RGBAnimationKeyframes.computeEchoRootPath(timeline, opts),
+            }),
+        };
+    },
 ];
 
 const GlitchExampleWrapper = (props: WrapperProps) => {
@@ -91,7 +125,7 @@ const GlitchExampleWrapper = (props: WrapperProps) => {
                     hint={
                         "How many tears follow each other in the middle of a pass. Each one shifts every channel its own way."
                     }
-                    controls={"Sets the example's glitch count, read by its RGBAnimationProps.computeChannelAnimation"}
+                    controls={"Sets the example's glitch count, read by its RGBAnimationProps.computeSliceAnimation"}
                 >
                     <PageNumberField
                         value={() => glitchOpts.count}
@@ -108,7 +142,7 @@ const GlitchExampleWrapper = (props: WrapperProps) => {
                     key={"shiftPercent"}
                     label={"Shift (%)"}
                     hint={"The furthest a channel moves in a tear, as a share of the picture's size."}
-                    controls={"Sets the example's shift, read by its RGBAnimationProps.computeChannelAnimation"}
+                    controls={"Sets the example's shift, read by its RGBAnimationProps.computeSliceAnimation"}
                 >
                     <PageNumberField
                         value={() => glitchOpts.shiftPercent}
@@ -154,7 +188,7 @@ const SwellExampleWrapper = (props: WrapperProps) => {
                     key={"scalePercent"}
                     label={"Scale (%)"}
                     hint={"How far red grows and blue shrinks at the top of the swell. Green stays put."}
-                    controls={"Sets the example's scale, read by its RGBAnimationProps.computeChannelAnimation"}
+                    controls={"Sets the example's scale, read by its RGBAnimationProps.computeSliceAnimation"}
                 >
                     <PageNumberField
                         value={getScalePercent}
@@ -201,7 +235,7 @@ const OrbitExampleWrapper = (props: WrapperProps) => {
                     hint={
                         "How far the channels circle from their resting place at the widest point of the pass, as a share of the picture's size."
                     }
-                    controls={"Sets the example's radius, read by its RGBAnimationProps.computeChannelAnimation"}
+                    controls={"Sets the example's radius, read by its RGBAnimationProps.computeSliceAnimation"}
                 >
                     <PageNumberField
                         value={getRadiusPercent}
@@ -246,7 +280,7 @@ const FocusPullExampleWrapper = (props: WrapperProps) => {
                     key={"maxBlurPx"}
                     label={"Blur (px)"}
                     hint={"How soft each channel goes at the worst of its turn out of focus."}
-                    controls={"Sets the example's blur, read by its RGBAnimationProps.computeChannelAnimation"}
+                    controls={"Sets the example's blur, read by its RGBAnimationProps.computeSliceAnimation"}
                 >
                     <PageNumberField
                         value={getMaxBlurPx}
@@ -293,7 +327,7 @@ const TwistExampleWrapper = (props: WrapperProps) => {
                     hint={
                         "How far red and blue turn, in opposite directions, at the middle of the pass. Green stays put."
                     }
-                    controls={"Sets the example's angle, read by its RGBAnimationProps.computeChannelAnimation"}
+                    controls={"Sets the example's angle, read by its RGBAnimationProps.computeSliceAnimation"}
                 >
                     <PageNumberField
                         value={getMaxDegrees}
@@ -340,7 +374,7 @@ const HueSwapExampleWrapper = (props: WrapperProps) => {
                     hint={
                         "How many times the two turning channels go round the color wheel, in opposite directions, over one pass. The third stays put, a different one each pass."
                     }
-                    controls={"Sets the example's turns, read by its RGBAnimationProps.computeChannelAnimation"}
+                    controls={"Sets the example's turns, read by its RGBAnimationProps.computeSliceAnimation"}
                 >
                     <PageNumberField
                         value={getTurns}
@@ -385,7 +419,7 @@ const TiltExampleWrapper = (props: WrapperProps) => {
                     key={"maxDegrees"}
                     label={"Angle (°)"}
                     hint={"How far red and blue swing in depth, in opposite directions. Green stays put."}
-                    controls={"Sets the example's angle, read by its RGBAnimationProps.computeChannelAnimation"}
+                    controls={"Sets the example's angle, read by its RGBAnimationProps.computeSliceAnimation"}
                 >
                     <PageNumberField
                         value={getMaxDegrees}
@@ -434,7 +468,7 @@ const AnaglyphExampleWrapper = (props: WrapperProps) => {
                     hint={
                         "How far red moves left and blue moves right at the middle of the pass, as a share of the picture's width. Green stays put."
                     }
-                    controls={"Sets the example's separation, read by its RGBAnimationProps.computeChannelAnimation"}
+                    controls={"Sets the example's separation, read by its RGBAnimationProps.computeSliceAnimation"}
                 >
                     <PageNumberField
                         value={getSeparationPercent}
@@ -482,7 +516,7 @@ const EchoExampleWrapper = (props: WrapperProps) => {
                         "How far the picture drifts along its figure-eight, as a share of its size. Green and blue follow a little later than red."
                     }
                     controls={
-                        "Sets the example's distance, read by its RGBAnimationProps.computeRootAnimation and computeChannelAnimation"
+                        "Sets the example's distance, read by its RGBAnimationProps.computeRootAnimation and computeSliceAnimation"
                     }
                 >
                     <PageNumberField
@@ -503,27 +537,78 @@ const EchoExampleWrapper = (props: WrapperProps) => {
 const StressTestWrapper = (props: Omit<RGBAnimationExampleProps, "progress"> & { playback: Signal<boolean> }) => {
     const modalPlayback = createSignal(true);
 
-    return (
-        <StressTest
-            configs={STRESS_ITEMS}
-            onHideModal={() => {
-                props.playback[1](true);
-            }}
-            onShowModal={() => {
-                props.playback[1](false);
-            }}
-            renderLabel={(getConfigIndex) => `Render ${STRESS_ITEMS[getConfigIndex()].count} items`}
-            renderItem={() => {
-                const StressExample = STRESS_EXAMPLES[Math.floor(Math.random() * STRESS_EXAMPLES.length)];
-                const progress = createSignal(0);
+    const [getIsOnGpu, setIsOnGpu] = createSignal(true);
 
-                return (
-                    <PageMeasureBox width={STRESS_ITEM_WIDTH}>
-                        <StressExample {...props} playback={modalPlayback} progress={progress} />
-                    </PageMeasureBox>
-                );
-            }}
-        />
+    return (
+        <>
+            <PagePropsPanel scope={"local"} hasReset={false}>
+                <PageProp
+                    key={"gpuProof"}
+                    label={"On the graphics card"}
+                    hint={
+                        "A proof of concept: draws the stress test's channels in one WebGL canvas per item, with the keyframes worked out on the graphics card."
+                    }
+                    controls={"Swaps RGBAnimation for the Playground's GpuCellAnimation in the stress test"}
+                >
+                    <PageCheckField value={getIsOnGpu} ariaLabel={"On the graphics card"} onChange={setIsOnGpu} />
+                </PageProp>
+            </PagePropsPanel>
+
+            <StressTest
+                configs={STRESS_ITEMS}
+                onHideModal={() => {
+                    props.playback[1](true);
+                }}
+                onShowModal={() => {
+                    props.playback[1](false);
+                }}
+                renderLabel={(getConfigIndex) => `Render ${STRESS_ITEMS[getConfigIndex()].count} items`}
+                renderItem={() => {
+                    const sample = STRESS_SAMPLES[Math.floor(Math.random() * STRESS_SAMPLES.length)]();
+
+                    return (
+                        <PageMeasureBox width={STRESS_ITEM_WIDTH}>
+                            <Show
+                                when={getIsOnGpu()}
+                                fallback={
+                                    <RGBAnimation
+                                        src={props.src}
+                                        colorMixing={props.colorMixing}
+                                        playback={modalPlayback}
+                                        animationDurationMs={props.animationDurationMs}
+                                        animationIterationDelayMs={props.animationIterationDelayMs}
+                                        computeRootAnimation={sample.computeRootAnimation}
+                                        computeSliceAnimation={(defs, timeline) =>
+                                            sample.animation(timeline, RGBAnimationUtils.toSliceDefs(defs))
+                                        }
+                                    />
+                                }
+                            >
+                                <GpuCellAnimation
+                                    src={props.src}
+                                    cellCount={{ row: 1, col: 3 }}
+                                    origin={{ row: 0, col: 0 }}
+                                    isChannels
+                                    breakpointOpts={WHOLE_PASS}
+                                    colorMixing={() => access(props.colorMixing)}
+                                    playback={modalPlayback}
+                                    animationDurationMs={() =>
+                                        access(props.animationDurationMs) ?? RGB_ANIMATION_DEFAULTS.animationDurationMs
+                                    }
+                                    animationIterationCount={RGB_ANIMATION_DEFAULTS.animationIterationCount}
+                                    animationIterationDelayMs={() =>
+                                        access(props.animationIterationDelayMs) ??
+                                        RGB_ANIMATION_DEFAULTS.animationIterationDelayMs
+                                    }
+                                    animation={sample.animation}
+                                    computeRootAnimation={sample.computeRootAnimation}
+                                />
+                            </Show>
+                        </PageMeasureBox>
+                    );
+                }}
+            />
+        </>
     );
 };
 

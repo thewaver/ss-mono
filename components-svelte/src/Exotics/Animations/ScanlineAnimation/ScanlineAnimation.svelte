@@ -11,7 +11,7 @@
         progress = $bindable(NO_PROGRESS),
         lineCount,
         orientation,
-        computeScanlineAnimation,
+        computeSliceAnimation,
         ...otherProps
     }: ScanlineAnimationProps = $props();
 
@@ -23,5 +23,5 @@
     bind:playback
     bind:progress
     cellCount={isVertical ? { row: 1, col: lineCount } : { row: lineCount, col: 1 }}
-    computeCellAnimation={computeScanlineAnimation}
+    computeSliceAnimation={computeSliceAnimation}
 />

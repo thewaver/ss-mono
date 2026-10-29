@@ -62,7 +62,7 @@ const wipe = () => {
 const computeCellWeights = (count: Index2d) =>
     CellAnimationWeights.computeCellWeights(props.weightType, count, origin.value, props.weightOpts);
 
-const computeCellAnimation = (defs: CellAnimationEvaluationDefs, timeline: number) =>
+const computeSliceAnimation = (defs: CellAnimationEvaluationDefs, timeline: number) =>
     CellAnimationKeyframeUtils.computeAnimation(
         LOZENGE_GROW,
         CellAnimationBreakpointUtils.computeBreakpoints(
@@ -91,7 +91,7 @@ const computeCellAnimation = (defs: CellAnimationEvaluationDefs, timeline: numbe
                 :animation-iteration-count="1"
                 final-frame="nothing"
                 :compute-cell-weights="computeCellWeights"
-                :compute-cell-animation="computeCellAnimation"
+                :compute-slice-animation="computeSliceAnimation"
                 @animation-end="wipeSize = undefined"
             />
         </div>

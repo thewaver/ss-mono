@@ -61,7 +61,7 @@ const findGroup = (timeline: number) =>
 
 const computeRootAnimation = (timeline: number) => ({ brightness: findGroup(timeline) === -1 ? 100 : 125 });
 
-const computeChannelAnimation = (defs: RGBAnimationEvaluationDefs, timeline: number) => {
+const computeSliceAnimation = (defs: RGBAnimationEvaluationDefs, timeline: number) => {
     const group = findGroup(timeline);
     const shift = shifts.value[group]?.[RGB_ANIMATION_CHANNELS.indexOf(defs.channel)];
 
@@ -79,7 +79,7 @@ const computeChannelAnimation = (defs: RGBAnimationEvaluationDefs, timeline: num
         :animation-duration-ms="animationDurationMs"
         :animation-iteration-delay-ms="animationIterationDelayMs"
         :compute-root-animation="computeRootAnimation"
-        :compute-channel-animation="computeChannelAnimation"
+        :compute-slice-animation="computeSliceAnimation"
         @iteration-end="regenerateShifts"
     />
 </template>

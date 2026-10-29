@@ -73,7 +73,7 @@ export const RGBAnimation = defineComponent(
                 defs,
                 currentProgress,
                 props.computeRootAnimation,
-                props.computeChannelAnimation,
+                props.computeSliceAnimation,
             );
         });
 
@@ -180,7 +180,7 @@ export const RGBAnimation = defineComponent(
             "progress": null,
             "onUpdate:progress": null,
             "computeRootAnimation": null,
-            "computeChannelAnimation": null,
+            "computeSliceAnimation": null,
             "onIterationEnd": null,
             "onAnimationEnd": null,
         }),

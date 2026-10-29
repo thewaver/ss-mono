@@ -31,7 +31,7 @@ const progress = useModel(props, "progress");
 const computeCellWeights = (count: Index2d) =>
     CellAnimationWeights.computeCellWeights(props.weightType, count, WEIGHT_ORIGIN);
 
-const computeScanlineAnimation = (defs: ScanlineAnimationEvaluationDefs, timeline: number) =>
+const computeSliceAnimation = (defs: ScanlineAnimationEvaluationDefs, timeline: number) =>
     ScanlineAnimationKeyframes._computeHorizontalWave(
         CellAnimationBreakpointUtils.computeBreakpoints(defs.weight, props.breakpointOpts),
         defs,
@@ -50,6 +50,6 @@ const computeScanlineAnimation = (defs: ScanlineAnimationEvaluationDefs, timelin
         :animation-duration-ms="animationDurationMs"
         :animation-iteration-delay-ms="animationIterationDelayMs"
         :compute-cell-weights="computeCellWeights"
-        :compute-scanline-animation="computeScanlineAnimation"
+        :compute-slice-animation="computeSliceAnimation"
     />
 </template>

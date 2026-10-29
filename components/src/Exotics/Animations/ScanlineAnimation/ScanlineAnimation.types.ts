@@ -18,7 +18,7 @@ export type BaseScanlineAnimationValues = {
 
 export type BaseScanlineAnimationCbs = {
     /** What one line does on its turn, given where it is and how far through the pass it is. */
-    computeScanlineAnimation: (
+    computeSliceAnimation: (
         defs: ScanlineAnimationEvaluationDefs,
         timeline: number,
     ) => ScanlineAnimationEvaluationResult;

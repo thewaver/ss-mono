@@ -89,7 +89,7 @@ export const DefaultExample = ({
             computeCellWeights={(count) =>
                 CellAnimationWeights.computeCellWeights(access(weightType), count, getOrigin(), access(weightOpts))
             }
-            computeCellAnimation={(defs, timeline) => {
+            computeSliceAnimation={(defs, timeline) => {
                 const { settings, breakpointOpts: cellBreakpointOpts, globalTimeline } = getFrame(timeline);
 
                 return CellAnimationKeyframes.computeAnimation(

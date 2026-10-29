@@ -120,7 +120,7 @@ export const CellAnimation = (props: CellAnimationProps) => {
                 cellDefs,
                 progress,
                 props.computeRootAnimation,
-                props.computeCellAnimation,
+                props.computeSliceAnimation,
             ),
         );
     });

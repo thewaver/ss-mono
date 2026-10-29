@@ -153,7 +153,7 @@ const examples: ExampleDefs[] = [
         </PageProp>
     </PagePropsPanel>
 
-    <PageExamples :items="examples">
+    <PageExamples :items="examples" layout="flow">
         <template #button>
             <ButtonExample v-bind="commonProps" />
         </template>

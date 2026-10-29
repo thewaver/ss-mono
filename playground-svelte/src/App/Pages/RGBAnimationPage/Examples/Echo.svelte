@@ -28,7 +28,7 @@
     animationDurationMs={props.animationDurationMs}
     animationIterationDelayMs={props.animationIterationDelayMs}
     computeRootAnimation={(timeline) => ({ translate: computePath(timeline, props.distancePercent) })}
-    computeChannelAnimation={(defs, timeline) => {
+    computeSliceAnimation={(defs, timeline) => {
         const lag = RGB_ANIMATION_CHANNELS.indexOf(defs.channel) * LAG_SHARE;
         const [rootX, rootY] = computePath(timeline, props.distancePercent);
         const [laggedX, laggedY] = computePath(timeline - lag, props.distancePercent);

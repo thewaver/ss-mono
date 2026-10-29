@@ -17,7 +17,7 @@ const props = defineProps<Props>();
 const playback = useModel(props, "playback");
 const progress = useModel(props, "progress");
 
-const computeChannelAnimation = (defs: RGBAnimationEvaluationDefs, timeline: number) => {
+const computeSliceAnimation = (defs: RGBAnimationEvaluationDefs, timeline: number) => {
     const scale = 100 + SCALE_DIRECTIONS[defs.channel] * props.scalePercent * computeSwell(timeline);
 
     return { scale: [scale, scale] };
@@ -33,6 +33,6 @@ const computeChannelAnimation = (defs: RGBAnimationEvaluationDefs, timeline: num
         :color-mixing="colorMixing"
         :animation-duration-ms="animationDurationMs"
         :animation-iteration-delay-ms="animationIterationDelayMs"
-        :compute-channel-animation="computeChannelAnimation"
+        :compute-slice-animation="computeSliceAnimation"
     />
 </template>

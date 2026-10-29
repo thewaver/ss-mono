@@ -33,7 +33,7 @@
 <PageExampleKnobs>
     <PageProp
         itemKey={"maxBlurPx"}
-        controls={"Sets the example's blur, read by its RGBAnimationProps.computeChannelAnimation"}
+        controls={"Sets the example's blur, read by its RGBAnimationProps.computeSliceAnimation"}
         label={"Blur (px)"}
         hint={"How soft each channel goes at the worst of its turn out of focus."}
     >

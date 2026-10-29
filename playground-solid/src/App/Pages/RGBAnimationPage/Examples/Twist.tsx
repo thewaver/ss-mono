@@ -1,13 +1,15 @@
-import { RGBAnimation, access } from "@thewaver/ss-components-solid";
-import type { AccessorProps, RGBAnimationChannel } from "@thewaver/ss-components-solid";
+import { createMemo } from "solid-js";
+
+import { RGBAnimation, RGBAnimationKeyframes, RGBAnimationUtils, access } from "@thewaver/ss-components-solid";
+import type { AccessorProps } from "@thewaver/ss-components-solid";
 
 import type { RGBAnimationExampleProps } from "../RGBAnimationPageSolid.types";
-
-const DIRECTIONS: Record<RGBAnimationChannel, number> = { red: 1, green: 0, blue: -1 };
 
 type Props = RGBAnimationExampleProps & AccessorProps<{ maxDegrees: number }>;
 
 export const TwistExample = (props: Props) => {
+    const getAnimation = createMemo(() => RGBAnimationKeyframes.createTwist({ maxDegrees: access(props.maxDegrees) }));
+
     return (
         <RGBAnimation
             src={props.src}
@@ -17,9 +19,7 @@ export const TwistExample = (props: Props) => {
             colorMixing={props.colorMixing}
             animationDurationMs={props.animationDurationMs}
             animationIterationDelayMs={props.animationIterationDelayMs}
-            computeChannelAnimation={(defs, timeline) => ({
-                rotate: DIRECTIONS[defs.channel] * access(props.maxDegrees) * Math.sin(timeline * Math.PI),
-            })}
+            computeSliceAnimation={(defs, timeline) => getAnimation()(timeline, RGBAnimationUtils.toSliceDefs(defs))}
         />
     );
 };

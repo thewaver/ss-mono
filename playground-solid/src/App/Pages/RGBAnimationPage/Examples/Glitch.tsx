@@ -1,7 +1,13 @@
 import { createEffect, createMemo, createSignal } from "solid-js";
 
-import { RGBAnimation, RGB_ANIMATION_CHANNELS, access } from "@thewaver/ss-components-solid";
-import type { AccessorProps, CellAnimationBreakpointTriple } from "@thewaver/ss-components-solid";
+import {
+    CellAnimationKeyframeUtils,
+    RGBAnimation,
+    RGBAnimationUtils,
+    RGB_ANIMATION_CHANNELS,
+    access,
+} from "@thewaver/ss-components-solid";
+import type { AccessorProps, CellAnimationBreakpointTriple, CellStop } from "@thewaver/ss-components-solid";
 
 import type { RGBAnimationExampleProps } from "../RGBAnimationPageSolid.types";
 
@@ -50,6 +56,23 @@ export const GlitchExample = (props: Props) => {
         setShifts(generateShifts());
     });
 
+    const getAnimation = createMemo(() => {
+        const channelStops = RGB_ANIMATION_CHANNELS.map((_, channel) =>
+            getBreakpointGroups().flatMap(([start, , end], group): CellStop[] => {
+                const [x, y] = getShifts()[group]?.[channel] ?? [0, 0];
+
+                return [
+                    { at: start, translateX: 0, translateY: 0 },
+                    { at: start, translateX: x, translateY: y },
+                    { at: end, translateX: x, translateY: y },
+                    { at: end, translateX: 0, translateY: 0 },
+                ];
+            }),
+        );
+
+        return CellAnimationKeyframeUtils.fromSlices(({ pos }) => channelStops[pos.col] ?? channelStops[0]);
+    });
+
     const findGroup = (timeline: number) =>
         getBreakpointGroups().findIndex(([start, , end]) => timeline >= start && timeline <= end);
 
@@ -63,12 +86,7 @@ export const GlitchExample = (props: Props) => {
             animationDurationMs={props.animationDurationMs}
             animationIterationDelayMs={props.animationIterationDelayMs}
             computeRootAnimation={(timeline) => ({ brightness: findGroup(timeline) === -1 ? 100 : 125 })}
-            computeChannelAnimation={(defs, timeline) => {
-                const group = findGroup(timeline);
-                const shift = getShifts()[group]?.[RGB_ANIMATION_CHANNELS.indexOf(defs.channel)];
-
-                return { translate: shift ?? [0, 0] };
-            }}
+            computeSliceAnimation={(defs, timeline) => getAnimation()(timeline, RGBAnimationUtils.toSliceDefs(defs))}
             onIterationEnd={() => {
                 setShifts(generateShifts());
             }}

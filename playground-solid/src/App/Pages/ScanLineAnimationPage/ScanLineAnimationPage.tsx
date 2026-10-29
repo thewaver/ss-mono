@@ -1,9 +1,10 @@
-import { createMemo, createSignal } from "solid-js";
+import { Show, createMemo, createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
 
 import {
     CellAnimationBreakpointUtils,
     CellAnimationBreakpoints,
+    CellAnimationKeyframeUtils,
     CellAnimationWeights,
     SCANLINE_ANIMATION_DEFAULTS,
     SCANLINE_ANIMATION_ORIENTATIONS,
@@ -42,6 +43,7 @@ import knight from "@thewaver/ss-playground/App/knight.webp";
 import { PageExampleKnobs } from "../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import {
+    PageCheckField,
     PageFileField,
     PageGroupedSelectField,
     PageNumberField,
@@ -55,6 +57,7 @@ import { PlaybackScrubberUtils } from "../../PageComponents/PlaybackScrubber/Pla
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { StressTest } from "../../PageComponents/StressTest/StressTest";
+import { GpuCellAnimation } from "../CellAnimationPage/GpuCells";
 import { BrightnessExample } from "./Examples/Brightness";
 import { GlitchExample } from "./Examples/Glitch";
 import { GrayscaleExample } from "./Examples/Grayscale";
@@ -89,9 +92,24 @@ const GROUPPED_WEIGHTS = groupOptions(CellAnimationWeights.ORIGIN_FREE_WEIGHT_TY
 const StressTestWrapper = (props: ScanlineAnimationExampleProps) => {
     const modalPlayback = createSignal(true);
 
+    const [getIsOnGpu, setIsOnGpu] = createSignal(true);
+
     return (
         <>
             <div>{"120 lines"}</div>
+
+            <PagePropsPanel scope={"local"} hasReset={false}>
+                <PageProp
+                    key={"gpuProof"}
+                    label={"On the graphics card"}
+                    hint={
+                        "A proof of concept: draws the stress test's lines in one WebGL canvas per item, with the keyframes worked out on the graphics card."
+                    }
+                    controls={"Swaps ScanlineAnimation for the Playground's GpuCellAnimation in the stress test"}
+                >
+                    <PageCheckField value={getIsOnGpu} ariaLabel={"On the graphics card"} onChange={setIsOnGpu} />
+                </PageProp>
+            </PagePropsPanel>
 
             <StressTest
                 configs={STRESS_ITEMS}
@@ -106,45 +124,61 @@ const StressTestWrapper = (props: ScanlineAnimationExampleProps) => {
                 }
                 renderItem={(getConfigIndex) => {
                     const random = Math.random() * 3;
-                    const foo =
+                    const animation =
                         STRESS_ITEMS[getConfigIndex()].kind === "transform"
                             ? random < 1
-                                ? ScanlineAnimationKeyframes.computeHorizontalSnake
+                                ? ScanlineAnimationKeyframes.createHorizontalSnake()
                                 : random < 2
-                                  ? ScanlineAnimationKeyframes.computeHorizontalSplit
-                                  : ScanlineAnimationKeyframes.computeHorizontalStretch
+                                  ? ScanlineAnimationKeyframes.createHorizontalSplit()
+                                  : ScanlineAnimationKeyframes.createHorizontalStretch()
                             : random < 1
-                              ? ScanlineAnimationKeyframes.computeHorizontalBrightness
+                              ? ScanlineAnimationKeyframes.createHorizontalBrightness()
                               : random < 2
-                                ? ScanlineAnimationKeyframes.computeHorizontalHue
-                                : ScanlineAnimationKeyframes.computeHorizontalGrayscale;
+                                ? ScanlineAnimationKeyframes.createHorizontalHue()
+                                : ScanlineAnimationKeyframes.createHorizontalGrayscale();
+                    const computeCellWeights = (count: { row: number; col: number }) =>
+                        CellAnimationWeights.computeCellWeights(access(props.weightType), count, WEIGHT_ORIGIN);
 
                     return (
                         <PageMeasureBox
                             width={() => STRESS_ITEMS[getConfigIndex()].size}
                             height={() => STRESS_ITEMS[getConfigIndex()].size}
                         >
-                            <ScanlineAnimation
-                                {...props}
-                                playback={modalPlayback}
-                                lineCount={STRESS_LINE_COUNT}
-                                animationIterationDelayMs={0}
-                                computeCellWeights={(count) =>
-                                    CellAnimationWeights.computeCellWeights(
-                                        access(props.weightType),
-                                        count,
-                                        WEIGHT_ORIGIN,
-                                    )
+                            <Show
+                                when={getIsOnGpu()}
+                                fallback={
+                                    <ScanlineAnimation
+                                        {...props}
+                                        playback={modalPlayback}
+                                        lineCount={STRESS_LINE_COUNT}
+                                        animationIterationDelayMs={0}
+                                        computeCellWeights={computeCellWeights}
+                                        computeSliceAnimation={(defs, timeline) =>
+                                            CellAnimationKeyframeUtils.computeAnimation(
+                                                animation,
+                                                CellAnimationBreakpointUtils.computeBreakpoints(defs.weight, undefined),
+                                                { ...defs, origin: WEIGHT_ORIGIN },
+                                                timeline,
+                                            )
+                                        }
+                                    />
                                 }
-                                computeScanlineAnimation={(defs, timeline) =>
-                                    foo(
-                                        CellAnimationBreakpointUtils.computeBreakpoints(defs.weight, undefined),
-                                        defs,
-                                        timeline,
-                                        undefined,
-                                    )
-                                }
-                            />
+                            >
+                                <GpuCellAnimation
+                                    src={props.src}
+                                    cellCount={() =>
+                                        access(props.orientation) === "vertical"
+                                            ? { row: 1, col: STRESS_LINE_COUNT }
+                                            : { row: STRESS_LINE_COUNT, col: 1 }
+                                    }
+                                    origin={WEIGHT_ORIGIN}
+                                    animationDurationMs={props.animationDurationMs}
+                                    animationIterationDelayMs={0}
+                                    playback={modalPlayback}
+                                    animation={animation}
+                                    computeCellWeights={computeCellWeights}
+                                />
+                            </Show>
                         </PageMeasureBox>
                     );
                 }}
@@ -228,7 +262,7 @@ const GlitchExampleWrapper = (props: ScanlineAnimationExampleProps) => {
                     label={"Count"}
                     hint={"How many glitch bursts happen over one pass."}
                     controls={
-                        "Sets the number of glitch bursts in the example's ScanlineAnimationProps.computeScanlineAnimation"
+                        "Sets the number of glitch bursts in the example's ScanlineAnimationProps.computeSliceAnimation"
                     }
                 >
                     <PageNumberField
@@ -245,9 +279,7 @@ const GlitchExampleWrapper = (props: ScanlineAnimationExampleProps) => {
                     key={"maxShift"}
                     label={"Max shift (%)"}
                     hint={"How far a line can be thrown sideways at the worst of a burst, as a share of its own width."}
-                    controls={
-                        "Sets how far rows slide in the example's ScanlineAnimationProps.computeScanlineAnimation"
-                    }
+                    controls={"Sets how far rows slide in the example's ScanlineAnimationProps.computeSliceAnimation"}
                 >
                     <PageNumberField
                         value={() => keyframeOpts.shiftPercent!}
@@ -266,7 +298,7 @@ const GlitchExampleWrapper = (props: ScanlineAnimationExampleProps) => {
                         "How blocky the glitch is: low values throw single lines about, high values throw thick slabs."
                     }
                     controls={
-                        "Sets how many neighboring rows slide together in the example's ScanlineAnimationProps.computeScanlineAnimation"
+                        "Sets how many neighboring rows slide together in the example's ScanlineAnimationProps.computeSliceAnimation"
                     }
                 >
                     <PageNumberField

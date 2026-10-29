@@ -73,7 +73,7 @@ const withOrigin = (defs: CellAnimationEvaluationDefs, cellOrigin: Index2d) => {
     return cell;
 };
 
-const computeCellAnimation = (defs: CellAnimationEvaluationDefs, timeline: number) => {
+const computeSliceAnimation = (defs: CellAnimationEvaluationDefs, timeline: number) => {
     const { settings: frameSettings, breakpointOpts, globalTimeline } = getFrame(timeline);
 
     return CellAnimationKeyframes.computeAnimation(
@@ -97,6 +97,6 @@ const computeCellAnimation = (defs: CellAnimationEvaluationDefs, timeline: numbe
         :final-frame="finalFrame"
         :animation-duration-ms="CellAnimationPlaybackUtils.computeCycleDurationMs(animationDurationMs, playbackOpts)"
         :compute-cell-weights="computeCellWeights"
-        :compute-cell-animation="computeCellAnimation"
+        :compute-slice-animation="computeSliceAnimation"
     />
 </template>

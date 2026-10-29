@@ -91,7 +91,7 @@ export const DefaultExample = ({
             computeCellWeights={(count) =>
                 CellAnimationWeights.computeCellWeights(weightType, count, origin, weightOpts)
             }
-            computeCellAnimation={(defs, timeline) => {
+            computeSliceAnimation={(defs, timeline) => {
                 const {
                     settings: frameSettings,
                     breakpointOpts: cellBreakpointOpts,

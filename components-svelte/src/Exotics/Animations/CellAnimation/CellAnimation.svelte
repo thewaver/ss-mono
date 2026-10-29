@@ -86,7 +86,7 @@
                 defs,
                 value,
                 props.computeRootAnimation,
-                props.computeCellAnimation,
+                props.computeSliceAnimation,
             );
         });
     });

@@ -91,7 +91,7 @@ export const RGBAnimation = (props: RGBAnimationProps) => {
                 defs,
                 progress,
                 props.computeRootAnimation,
-                props.computeChannelAnimation,
+                props.computeSliceAnimation,
             ),
         );
     });

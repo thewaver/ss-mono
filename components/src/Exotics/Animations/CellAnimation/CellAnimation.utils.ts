@@ -254,7 +254,7 @@ export namespace CellAnimationUtils {
      * @param cellDefs What each cell's animation is handed, from {@link computeEvaluationDefs}.
      * @param progress How far through the pass, held to `0`–`1` here.
      * @param computeRootAnimation What the whole picture does, if anything.
-     * @param computeCellAnimation What one cell does.
+     * @param computeSliceAnimation What one cell does.
      */
     export const drawFrame = (
         root: HTMLElement,
@@ -262,14 +262,14 @@ export namespace CellAnimationUtils {
         cellDefs: CellAnimationEvaluationDefs[],
         progress: number,
         computeRootAnimation: ((timeline: number) => CSSAnimationValues) | undefined,
-        computeCellAnimation: (defs: CellAnimationEvaluationDefs, timeline: number) => CSSAnimationValues,
+        computeSliceAnimation: (defs: CellAnimationEvaluationDefs, timeline: number) => CSSAnimationValues,
     ) => {
         const t = MathUtils.clamp01(progress);
 
         if (computeRootAnimation) assignAnimationProps(root, computeRootAnimation(t));
 
         for (let i = 0; i < cells.length && i < cellDefs.length; i++) {
-            assignAnimationProps(cells[i], computeCellAnimation(cellDefs[i], t));
+            assignAnimationProps(cells[i], computeSliceAnimation(cellDefs[i], t));
         }
     };
 

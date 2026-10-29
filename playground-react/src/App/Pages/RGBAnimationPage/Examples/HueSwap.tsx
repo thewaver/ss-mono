@@ -29,7 +29,7 @@ export const HueSwapExample = (props: Props) => {
             colorMixing={props.colorMixing}
             animationDurationMs={props.animationDurationMs}
             animationIterationDelayMs={props.animationIterationDelayMs}
-            computeChannelAnimation={(defs, timeline) => ({
+            computeSliceAnimation={(defs, timeline) => ({
                 "hue-rotate": computeDirection(defs.channel, anchor) * props.turns * FULL_TURN_DEGREES * timeline,
             })}
             onIterationEnd={() => {

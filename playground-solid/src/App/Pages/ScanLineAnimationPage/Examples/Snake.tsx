@@ -1,5 +1,8 @@
+import { createMemo } from "solid-js";
+
 import {
     CellAnimationBreakpointUtils,
+    CellAnimationKeyframeUtils,
     CellAnimationWeights,
     ScanlineAnimation,
     ScanlineAnimationKeyframes,
@@ -22,18 +25,21 @@ type Props = ScanlineAnimationExampleProps &
     }>;
 
 export const SnakeExample = ({ keyframeOpts, breakpointOpts, weightType, ...otherProps }: Props) => {
+    const getAnimation = createMemo(() => ScanlineAnimationKeyframes.createHorizontalSnake(access(keyframeOpts)));
+
     return (
         <ScanlineAnimation
             {...otherProps}
             computeCellWeights={(count) =>
                 CellAnimationWeights.computeCellWeights(access(weightType), count, WEIGHT_ORIGIN)
             }
-            computeScanlineAnimation={(defs, timeline) =>
-                ScanlineAnimationKeyframes.computeHorizontalSnake(
+            computeSliceAnimation={(defs, timeline) =>
+                CellAnimationKeyframeUtils.computeAnimation(
+                    getAnimation(),
                     CellAnimationBreakpointUtils.computeBreakpoints(defs.weight, access(breakpointOpts)),
-                    defs,
+                    { ...defs, origin: WEIGHT_ORIGIN },
                     timeline,
-                    access(keyframeOpts),
+                    access(breakpointOpts).easing,
                 )
             }
         />

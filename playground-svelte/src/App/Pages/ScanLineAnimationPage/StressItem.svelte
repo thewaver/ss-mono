@@ -90,7 +90,7 @@
         lineCount={STRESS_LINE_COUNT}
         animationIterationDelayMs={0}
         {computeCellWeights}
-        computeScanlineAnimation={(defs, timeline) =>
+        computeSliceAnimation={(defs, timeline) =>
             foo(CellAnimationBreakpointUtils.computeBreakpoints(defs.weight, undefined), defs, timeline, undefined)}
     />
 </PageMeasureBox>

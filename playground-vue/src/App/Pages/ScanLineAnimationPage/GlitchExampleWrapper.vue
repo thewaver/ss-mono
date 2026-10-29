@@ -50,7 +50,7 @@ const keyframeOpts = reactive({ ...ScanlineAnimationKnobs.STARTING_GLITCH_OPTS }
     <PageExampleKnobs>
         <PageProp
             item-key="count"
-            controls="Sets the number of glitch bursts in the example's ScanlineAnimationProps.computeScanlineAnimation"
+            controls="Sets the number of glitch bursts in the example's ScanlineAnimationProps.computeSliceAnimation"
             label="Count"
             hint="How many glitch bursts happen over one pass."
         >
@@ -66,7 +66,7 @@ const keyframeOpts = reactive({ ...ScanlineAnimationKnobs.STARTING_GLITCH_OPTS }
 
         <PageProp
             item-key="maxShift"
-            controls="Sets how far rows slide in the example's ScanlineAnimationProps.computeScanlineAnimation"
+            controls="Sets how far rows slide in the example's ScanlineAnimationProps.computeSliceAnimation"
             label="Max shift (%)"
             hint="How far a line can be thrown sideways at the worst of a burst, as a share of its own width."
         >
@@ -82,7 +82,7 @@ const keyframeOpts = reactive({ ...ScanlineAnimationKnobs.STARTING_GLITCH_OPTS }
 
         <PageProp
             item-key="chunkyness01"
-            controls="Sets how many neighboring rows slide together in the example's ScanlineAnimationProps.computeScanlineAnimation"
+            controls="Sets how many neighboring rows slide together in the example's ScanlineAnimationProps.computeSliceAnimation"
             label="Chunkyness (0-1)"
             hint="How blocky the glitch is: low values throw single lines about, high values throw thick slabs."
         >

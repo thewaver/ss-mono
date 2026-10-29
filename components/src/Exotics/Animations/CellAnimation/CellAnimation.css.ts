@@ -20,9 +20,8 @@ export const cellSizeVar = createVar();
 
 export const cellAnimationContainer = style({
     position: "relative",
-    overflow: "hidden",
     isolation: "isolate",
-    contain: "strict",
+    contain: "size layout style",
 });
 
 export const cellAnimationContainerMoving = style({

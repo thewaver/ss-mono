@@ -28,7 +28,7 @@
     bind:playback
     bind:progress
     {computeCellWeights}
-    computeScanlineAnimation={(defs, timeline) =>
+    computeSliceAnimation={(defs, timeline) =>
         ScanlineAnimationKeyframes.computeHorizontalGrayscale(
             CellAnimationBreakpointUtils.computeBreakpoints(defs.weight, breakpointOpts),
             defs,

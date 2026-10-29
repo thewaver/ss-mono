@@ -132,7 +132,7 @@ export const LIBRARY: TreemapNode<string> = branch(
     ),
     branch(
         "Exotics",
-        branch("Animations", leaf("CellAnimation", 694), leaf("RGBAnimation", 442), leaf("ScanlineAnimation", 67)),
+        branch("Animations", leaf("CellAnimation", 693), leaf("RGBAnimation", 474), leaf("ScanlineAnimation", 67)),
         branch("Arrangements", leaf("Formation", 119), leaf("Satellite", 217), leaf("Staircase", 163)),
         leaf("CardStack", 779),
         branch("Charts", leaf("CirclePacking", 509), leaf("Icicle", 603), leaf("Sunburst", 567), leaf("Treemap", 789)),
@@ -180,7 +180,7 @@ export const LIBRARY: TreemapNode<string> = branch(
         "Generators",
         leaf("CarouselPlacements", 874),
         leaf("CellAnimationBreakpoints", 99),
-        leaf("CellAnimationKeyframes", 229),
+        leaf("CellAnimationKeyframes", 303),
         leaf("CellAnimationPlayback", 134),
         leaf("CellAnimationWeights", 528),
         leaf("CellAnimationZones", 129),
@@ -221,7 +221,7 @@ export const LIBRARY: TreemapNode<string> = branch(
         branch("Carousel", leaf("Placements", 19)),
         branch(
             "CellAnimation",
-            branch("Keyframes", leaf("Samples", 1286), leaf("Keyframes files", 378)),
+            branch("Keyframes", leaf("Samples", 1285), leaf("Keyframes files", 378)),
             leaf("Origins", 31),
             branch("Weights", leaf("Samples", 924), leaf("Weights files", 252)),
         ),
@@ -230,6 +230,7 @@ export const LIBRARY: TreemapNode<string> = branch(
         branch("PatchBoard", leaf("Snaps", 12)),
         branch("Placement", leaf("Layouts", 18)),
         branch("Proximity", leaf("Effects", 13)),
+        branch("RGBAnimation", leaf("Keyframes", 140)),
         branch(
             "SVGDefs",
             branch("Gradient", leaf("Timed", 3452), leaf("Tracked", 3791), leaf("Gradient files", 184)),
@@ -237,11 +238,11 @@ export const LIBRARY: TreemapNode<string> = branch(
             branch("Pattern", leaf("Timed", 1055), leaf("Tracked", 853), leaf("Pattern files", 249)),
             leaf("SVGDefs files", 1928),
         ),
-        branch("ScanlineAnimation", leaf("Keyframes", 256)),
+        branch("ScanlineAnimation", leaf("Keyframes", 382)),
         branch("ScrambleText", leaf("Glyphs", 37), leaf("Weights", 37)),
         branch("SlotText", leaf("Reels", 78)),
         branch("Staircase", leaf("Indents", 49)),
     ),
     leaf("Utils", 116),
-    leaf("src files", 1278),
+    leaf("src files", 1280),
 );

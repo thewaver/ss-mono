@@ -45,7 +45,9 @@ export const ButtonExample = (props: Props) => {
             >
                 <Button
                     id={"particleDissolveBurn"}
-                    renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Burn me</PageButtonContent>}
+                    renderContent={(getFlags) => (
+                        <PageButtonContent flags={getFlags}>Click to burn me up</PageButtonContent>
+                    )}
                     onClick={(e) => {
                         setOriginShare(computePressShare(e));
                         setIsDissolved(true);

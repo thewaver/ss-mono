@@ -23,3 +23,10 @@ export type CellZone = {
     zone: CellAnimationZoneType;
     animation: CellAnimationFn;
 };
+
+export type CellStopsFn = (defs: CellAnimationEvaluationDefs & { origin: Index2d }) => CellStop[];
+
+export type CellAnimationDefinition =
+    | { kind: "stops"; stops: CellStop[] }
+    | { kind: "zones"; zones: CellZone[]; fallback: CellAnimationFn }
+    | { kind: "slices"; computeStops: CellStopsFn };

@@ -1,9 +1,10 @@
-import { createMemo, createSignal } from "solid-js";
+import { Show, createMemo, createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
 
-import { PARTICLE_SPAWNER_DEFAULTS } from "@thewaver/ss-components-solid";
+import { PARTICLE_SPAWNER_DEFAULTS, access } from "@thewaver/ss-components-solid";
 import { ParticleSpawnerKnobs } from "@thewaver/ss-playground/App/Knobs/ParticleSpawners.const";
 import { EXAMPLES_ONLY_PROP } from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.const";
+import { CellGpuUtils } from "@thewaver/ss-playground/App/Pages/CellAnimationPage/CellGpu/CellGpu.utils";
 import {
     BOX_HEIGHT,
     BOX_WIDTH,
@@ -18,7 +19,10 @@ import {
     TRAVEL_PATTERN_FACTORIES,
     TRAVEL_PATTERN_KEYS,
     applyOvershoot,
+    computeParticleGlow,
 } from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.const";
+import * as styles from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.css";
+import { themeVars } from "@thewaver/ss-playground/App/Theme.css";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageCheckField, PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";
@@ -37,6 +41,7 @@ import { RadialExample } from "./Examples/Radial";
 import { RoundTripExample } from "./Examples/RoundTrip";
 import { SingleTargetExample } from "./Examples/SingleTarget";
 import { VerticalExample } from "./Examples/Vertical";
+import { GpuParticleSpawner } from "./GpuParticleSpawner";
 import type {
     IterationPattern,
     ParticleSpawnerExampleProps,
@@ -44,26 +49,94 @@ import type {
     TravelEasingKey,
 } from "./ParticleSpawnerPage.types";
 
+const PERCENT = 100;
+
+const GpuSingleTarget = (props: ParticleSpawnerExampleProps & { src: string }) => {
+    const [getTargetRef, setTargetRef] = createSignal<HTMLElement>();
+
+    return (
+        <div class={styles.demoArea}>
+            <div
+                ref={setTargetRef}
+                class={styles.targetMarker}
+                classList={{ [styles.isHiddenMarker]: access(props.areTargetsHidden) }}
+                style={{ left: "85%", top: "50%" }}
+            />
+
+            <div class={styles.spawnerRoot} style={{ left: "15%", top: "50%" }}>
+                <div class={styles.spawnerMarker} />
+
+                <GpuParticleSpawner
+                    src={props.src}
+                    particleSize={{ width: styles.PARTICLE_SIZE_PX, height: styles.PARTICLE_SIZE_PX }}
+                    targets={() => [getTargetRef()]}
+                    particleCount={props.particleCount}
+                    travelDurationMs={props.travelDurationMs}
+                    restDurationMs={props.restDurationMs}
+                    spawnDelayMs={props.spawnDelayMs}
+                    spawnIterationPatterns={props.spawnIterationPatterns}
+                    playback={props.playback}
+                    computeParticlePos={(defs, t) => props.computeParticlePos(defs, t)}
+                    computeParticleAnimation={(_defs, t) => {
+                        const glow = computeParticleGlow(t);
+
+                        return {
+                            opacity: glow.opacity * PERCENT,
+                            scale: [glow.scale * PERCENT, glow.scale * PERCENT],
+                        };
+                    }}
+                />
+            </div>
+        </div>
+    );
+};
+
 const StressTestWrapper = (props: ParticleSpawnerExampleProps) => {
     const modalPlayback = createSignal(true);
 
+    const [getIsOnGpu, setIsOnGpu] = createSignal(true);
+
+    const getSrc = createMemo(() =>
+        CellGpuUtils.createDotSrc(themeVars.color.primary.light, themeVars.color.primary.dark),
+    );
+
     return (
-        <StressTest
-            configs={STRESS_ITEMS}
-            onShowModal={() => props.playback[1](false)}
-            onHideModal={() => props.playback[1](true)}
-            renderLabel={(getConfigIndex) => `Render ${STRESS_ITEMS[getConfigIndex()].count} spawners`}
-            renderItem={(getConfigIndex) => (
-                <div
-                    style={{
-                        width: `${STRESS_ITEMS[getConfigIndex()].width}px`,
-                        height: `${STRESS_ITEMS[getConfigIndex()].height}px`,
-                    }}
+        <>
+            <PagePropsPanel scope={"local"} hasReset={false}>
+                <PageProp
+                    key={"gpuProof"}
+                    label={"On the graphics card"}
+                    hint={
+                        "A proof of concept: draws each spawner's particles in one WebGL canvas that follows them, with their positions worked out as before."
+                    }
+                    controls={"Swaps ParticleSpawner for the Playground's GpuParticleSpawner in the stress test"}
                 >
-                    <SingleTargetExample {...props} playback={modalPlayback} />
-                </div>
-            )}
-        />
+                    <PageCheckField value={getIsOnGpu} ariaLabel={"On the graphics card"} onChange={setIsOnGpu} />
+                </PageProp>
+            </PagePropsPanel>
+
+            <StressTest
+                configs={STRESS_ITEMS}
+                onShowModal={() => props.playback[1](false)}
+                onHideModal={() => props.playback[1](true)}
+                renderLabel={(getConfigIndex) => `Render ${STRESS_ITEMS[getConfigIndex()].count} spawners`}
+                renderItem={(getConfigIndex) => (
+                    <div
+                        style={{
+                            width: `${STRESS_ITEMS[getConfigIndex()].width}px`,
+                            height: `${STRESS_ITEMS[getConfigIndex()].height}px`,
+                        }}
+                    >
+                        <Show
+                            when={getIsOnGpu()}
+                            fallback={<SingleTargetExample {...props} playback={modalPlayback} />}
+                        >
+                            <GpuSingleTarget {...props} playback={modalPlayback} src={getSrc()} />
+                        </Show>
+                    </div>
+                )}
+            />
+        </>
     );
 };
 

@@ -28,7 +28,7 @@ export const ScanlineAnimation = defineComponent(
                         },
                     }}
                     cellCount={isVertical ? { row: 1, col: props.lineCount } : { row: props.lineCount, col: 1 }}
-                    computeCellAnimation={props.computeScanlineAnimation}
+                    computeSliceAnimation={props.computeSliceAnimation}
                 />
             );
         };
@@ -53,7 +53,7 @@ export const ScanlineAnimation = defineComponent(
             "onAnimationEnd": null,
             "lineCount": null,
             "orientation": null,
-            "computeScanlineAnimation": null,
+            "computeSliceAnimation": null,
         }),
     },
 );

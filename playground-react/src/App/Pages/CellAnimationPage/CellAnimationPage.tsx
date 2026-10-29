@@ -430,7 +430,7 @@ export const CellAnimationPage = () => {
                         itemKey={"animationType"}
                         label={"Animation"}
                         hint={"What each cell actually does on its turn: fade, slide, spin, and the rest."}
-                        controls={"Picks the example's cell keyframes sent to CellAnimationProps.computeCellAnimation"}
+                        controls={"Picks the example's cell keyframes sent to CellAnimationProps.computeSliceAnimation"}
                     >
                         <PageGroupedSelectField
                             value={animationType}

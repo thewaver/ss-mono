@@ -96,7 +96,7 @@ export const RGBAnimation = (props: RGBAnimationProps) => {
             evaluationDefs,
             progress,
             latest.current.props.computeRootAnimation,
-            latest.current.props.computeChannelAnimation,
+            latest.current.props.computeSliceAnimation,
         );
     }, [progress, evaluationDefs]);
 

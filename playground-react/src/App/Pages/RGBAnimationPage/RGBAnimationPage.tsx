@@ -84,7 +84,7 @@ const GlitchExampleWrapper = ({ boxWidth, isPagePlaying, ...props }: WrapperProp
                     hint={
                         "How many tears follow each other in the middle of a pass. Each one shifts every channel its own way."
                     }
-                    controls={"Sets the example's glitch count, read by its RGBAnimationProps.computeChannelAnimation"}
+                    controls={"Sets the example's glitch count, read by its RGBAnimationProps.computeSliceAnimation"}
                 >
                     <PageNumberField
                         value={glitchOpts.count}
@@ -101,7 +101,7 @@ const GlitchExampleWrapper = ({ boxWidth, isPagePlaying, ...props }: WrapperProp
                     itemKey={"shiftPercent"}
                     label={"Shift (%)"}
                     hint={"The furthest a channel moves in a tear, as a share of the picture's size."}
-                    controls={"Sets the example's shift, read by its RGBAnimationProps.computeChannelAnimation"}
+                    controls={"Sets the example's shift, read by its RGBAnimationProps.computeSliceAnimation"}
                 >
                     <PageNumberField
                         value={glitchOpts.shiftPercent}
@@ -145,7 +145,7 @@ const SwellExampleWrapper = ({ boxWidth, isPagePlaying, ...props }: WrapperProps
                     itemKey={"scalePercent"}
                     label={"Scale (%)"}
                     hint={"How far red grows and blue shrinks at the top of the swell. Green stays put."}
-                    controls={"Sets the example's scale, read by its RGBAnimationProps.computeChannelAnimation"}
+                    controls={"Sets the example's scale, read by its RGBAnimationProps.computeSliceAnimation"}
                 >
                     <PageNumberField
                         value={scalePercent}
@@ -191,7 +191,7 @@ const OrbitExampleWrapper = ({ boxWidth, isPagePlaying, ...props }: WrapperProps
                     hint={
                         "How far the channels circle from their resting place at the widest point of the pass, as a share of the picture's size."
                     }
-                    controls={"Sets the example's radius, read by its RGBAnimationProps.computeChannelAnimation"}
+                    controls={"Sets the example's radius, read by its RGBAnimationProps.computeSliceAnimation"}
                 >
                     <PageNumberField
                         value={radiusPercent}
@@ -237,7 +237,7 @@ const TwistExampleWrapper = ({ boxWidth, isPagePlaying, ...props }: WrapperProps
                     hint={
                         "How far red and blue turn, in opposite directions, at the middle of the pass. Green stays put."
                     }
-                    controls={"Sets the example's angle, read by its RGBAnimationProps.computeChannelAnimation"}
+                    controls={"Sets the example's angle, read by its RGBAnimationProps.computeSliceAnimation"}
                 >
                     <PageNumberField
                         value={maxDegrees}
@@ -281,7 +281,7 @@ const TiltExampleWrapper = ({ boxWidth, isPagePlaying, ...props }: WrapperProps)
                     itemKey={"maxDegrees"}
                     label={"Angle (°)"}
                     hint={"How far red and blue swing in depth, in opposite directions. Green stays put."}
-                    controls={"Sets the example's angle, read by its RGBAnimationProps.computeChannelAnimation"}
+                    controls={"Sets the example's angle, read by its RGBAnimationProps.computeSliceAnimation"}
                 >
                     <PageNumberField
                         value={maxDegrees}
@@ -327,7 +327,7 @@ const AnaglyphExampleWrapper = ({ boxWidth, isPagePlaying, ...props }: WrapperPr
                     hint={
                         "How far red moves left and blue moves right at the middle of the pass, as a share of the picture's width. Green stays put."
                     }
-                    controls={"Sets the example's separation, read by its RGBAnimationProps.computeChannelAnimation"}
+                    controls={"Sets the example's separation, read by its RGBAnimationProps.computeSliceAnimation"}
                 >
                     <PageNumberField
                         value={separationPercent}
@@ -374,7 +374,7 @@ const EchoExampleWrapper = ({ boxWidth, isPagePlaying, ...props }: WrapperProps)
                         "How far the picture drifts along its figure-eight, as a share of its size. Green and blue follow a little later than red."
                     }
                     controls={
-                        "Sets the example's distance, read by its RGBAnimationProps.computeRootAnimation and computeChannelAnimation"
+                        "Sets the example's distance, read by its RGBAnimationProps.computeRootAnimation and computeSliceAnimation"
                     }
                 >
                     <PageNumberField
@@ -421,7 +421,7 @@ const HueSwapExampleWrapper = ({ boxWidth, isPagePlaying, ...props }: WrapperPro
                     hint={
                         "How many times the two turning channels go round the color wheel, in opposite directions, over one pass. The third stays put, a different one each pass."
                     }
-                    controls={"Sets the example's turns, read by its RGBAnimationProps.computeChannelAnimation"}
+                    controls={"Sets the example's turns, read by its RGBAnimationProps.computeSliceAnimation"}
                 >
                     <PageNumberField
                         value={turns}
@@ -465,7 +465,7 @@ const FocusPullExampleWrapper = ({ boxWidth, isPagePlaying, ...props }: WrapperP
                     itemKey={"maxBlurPx"}
                     label={"Blur (px)"}
                     hint={"How soft each channel goes at the worst of its turn out of focus."}
-                    controls={"Sets the example's blur, read by its RGBAnimationProps.computeChannelAnimation"}
+                    controls={"Sets the example's blur, read by its RGBAnimationProps.computeSliceAnimation"}
                 >
                     <PageNumberField
                         value={maxBlurPx}

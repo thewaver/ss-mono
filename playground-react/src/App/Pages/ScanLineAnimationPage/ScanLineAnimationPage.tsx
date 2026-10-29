@@ -123,7 +123,7 @@ const StressItem = ({ configIndex, modalPlayback, weightType, ...props }: Stress
                 lineCount={STRESS_LINE_COUNT}
                 animationIterationDelayMs={0}
                 computeCellWeights={computeCellWeights}
-                computeScanlineAnimation={(defs, timeline) =>
+                computeSliceAnimation={(defs, timeline) =>
                     foo(
                         CellAnimationBreakpointUtils.computeBreakpoints(defs.weight, undefined),
                         defs,
@@ -246,7 +246,7 @@ const GlitchExampleWrapper = (props: ScanlineAnimationExampleProps) => {
                     label={"Count"}
                     hint={"How many glitch bursts happen over one pass."}
                     controls={
-                        "Sets the number of glitch bursts in the example's ScanlineAnimationProps.computeScanlineAnimation"
+                        "Sets the number of glitch bursts in the example's ScanlineAnimationProps.computeSliceAnimation"
                     }
                 >
                     <PageNumberField
@@ -263,9 +263,7 @@ const GlitchExampleWrapper = (props: ScanlineAnimationExampleProps) => {
                     itemKey={"maxShift"}
                     label={"Max shift (%)"}
                     hint={"How far a line can be thrown sideways at the worst of a burst, as a share of its own width."}
-                    controls={
-                        "Sets how far rows slide in the example's ScanlineAnimationProps.computeScanlineAnimation"
-                    }
+                    controls={"Sets how far rows slide in the example's ScanlineAnimationProps.computeSliceAnimation"}
                 >
                     <PageNumberField
                         value={keyframeOpts.shiftPercent}
@@ -284,7 +282,7 @@ const GlitchExampleWrapper = (props: ScanlineAnimationExampleProps) => {
                         "How blocky the glitch is: low values throw single lines about, high values throw thick slabs."
                     }
                     controls={
-                        "Sets how many neighboring rows slide together in the example's ScanlineAnimationProps.computeScanlineAnimation"
+                        "Sets how many neighboring rows slide together in the example's ScanlineAnimationProps.computeSliceAnimation"
                     }
                 >
                     <PageNumberField

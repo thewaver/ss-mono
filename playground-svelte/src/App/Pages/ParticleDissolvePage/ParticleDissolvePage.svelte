@@ -189,4 +189,4 @@
     </PageProp>
 </PagePropsPanel>
 
-<PageExamples items={examples} />
+<PageExamples items={examples} layout={"flow"} />

@@ -1,11 +1,18 @@
 import { createEffect, createMemo, createSignal } from "solid-js";
 
-import { CellAnimationWeights, ScanlineAnimation, access } from "@thewaver/ss-components-solid";
-import type { AccessorProps, CellAnimationBreakpointTriple } from "@thewaver/ss-components-solid";
+import {
+    CellAnimationKeyframeUtils,
+    CellAnimationWeights,
+    ScanlineAnimation,
+    access,
+} from "@thewaver/ss-components-solid";
+import type { AccessorProps, CellAnimationBreakpointTriple, CellStop } from "@thewaver/ss-components-solid";
 
 import type { ScanlineAnimationExampleProps } from "../ScanlineAnimationPage.types";
 
 const WEIGHT_ORIGIN = { row: 0, col: 0 };
+
+const NO_STOPS: CellStop[] = [];
 
 const getGlitchBreakpointGroups = (count: number, start: number, end: number) => {
     const result: CellAnimationBreakpointTriple[] = [];
@@ -65,6 +72,24 @@ export const GlitchExample = ({ keyframeOpts, weightType, ...otherProps }: Props
         setShifts(generateShifts());
     });
 
+    const getAnimation = createMemo(() => {
+        const breakpointGroups = getBreakpointGroups();
+        const rowStops = Array.from({ length: access(otherProps.lineCount) }, (_, row) =>
+            breakpointGroups.flatMap(([start, , end], group): CellStop[] => {
+                const shift = getShifts()[group]?.[row] ?? 0;
+
+                return [
+                    { at: start, translateX: 0 },
+                    { at: start, translateX: shift },
+                    { at: end, translateX: shift },
+                    { at: end, translateX: 0 },
+                ];
+            }),
+        );
+
+        return CellAnimationKeyframeUtils.fromSlices(({ pos }) => rowStops[pos.row] ?? NO_STOPS);
+    });
+
     return (
         <ScanlineAnimation
             {...otherProps}
@@ -84,23 +109,7 @@ export const GlitchExample = ({ keyframeOpts, weightType, ...otherProps }: Props
 
                 return { brightness: 100 };
             }}
-            computeScanlineAnimation={(defs, timeline) => {
-                const breakpointGroups = getBreakpointGroups();
-                const shifts = getShifts();
-
-                for (let g = 0; g < breakpointGroups.length; g++) {
-                    const [start, , end] = breakpointGroups[g];
-
-                    if (timeline >= start && timeline <= end) {
-                        const shiftGroup = shifts[g];
-                        const shiftVal = shiftGroup ? (shiftGroup[defs.pos.row] ?? 0) : 0;
-
-                        return { translateX: shiftVal };
-                    }
-                }
-
-                return { translateX: 0 };
-            }}
+            computeSliceAnimation={(defs, timeline) => getAnimation()(timeline, { ...defs, origin: WEIGHT_ORIGIN })}
             onIterationEnd={() => {
                 setShifts(generateShifts());
             }}

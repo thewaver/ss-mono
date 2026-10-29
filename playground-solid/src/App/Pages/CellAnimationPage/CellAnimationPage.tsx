@@ -53,6 +53,7 @@ import { StressTest } from "../../PageComponents/StressTest/StressTest";
 import type { CellAnimationExampleProps, CellAnimationSourcedExampleProps } from "./CellAnimationPage.types";
 import { DefaultExample } from "./Examples/Default";
 import { WipeExample } from "./Examples/Wipe";
+import { GpuCells } from "./GpuCells";
 
 const computeContainerWidth = (size: Size2d, longestSide: number) =>
     (longestSide * size.width) / Math.max(size.width, size.height);
@@ -110,9 +111,24 @@ const StressTestWrapper = (
 
     const modalPlayback = createSignal(true);
 
+    const [getIsOnGpu, setIsOnGpu] = createSignal(true);
+
     return (
         <>
             <div>{`${STRESS_CELL_COUNT.col} x ${STRESS_CELL_COUNT.row} cells`}</div>
+
+            <PagePropsPanel scope={"local"} hasReset={false}>
+                <PageProp
+                    key={"gpuProof"}
+                    label={"On the graphics card"}
+                    hint={
+                        "A proof of concept: draws the stress test's cells in one WebGL canvas per item, with the keyframes worked out on the graphics card. Every sample built from stops or zones takes this path; one written by hand falls back to the components."
+                    }
+                    controls={"Swaps CellAnimation for the Playground's GpuCells in the stress test"}
+                >
+                    <PageCheckField value={getIsOnGpu} ariaLabel={"On the graphics card"} onChange={setIsOnGpu} />
+                </PageProp>
+            </PagePropsPanel>
 
             <StressTest
                 configs={STRESS_ITEMS}
@@ -125,7 +141,18 @@ const StressTestWrapper = (
                 renderLabel={(getConfigIndex) => `Render ${STRESS_ITEMS[getConfigIndex()].count} items`}
                 renderItem={(getConfigIndex) => (
                     <PageMeasureBox width={() => local.computeWidth(STRESS_ITEMS[getConfigIndex()].size)}>
-                        <DefaultExample {...exampleProps} playback={modalPlayback} cellCount={STRESS_CELL_COUNT} />
+                        <Show
+                            when={getIsOnGpu()}
+                            fallback={
+                                <DefaultExample
+                                    {...exampleProps}
+                                    playback={modalPlayback}
+                                    cellCount={STRESS_CELL_COUNT}
+                                />
+                            }
+                        >
+                            <GpuCells {...exampleProps} playback={modalPlayback} cellCount={STRESS_CELL_COUNT} />
+                        </Show>
                     </PageMeasureBox>
                 )}
             />
@@ -449,7 +476,7 @@ export const CellAnimationPage = () => {
                         key={"animationType"}
                         label={"Animation"}
                         hint={"What each cell actually does on its turn: fade, slide, spin, and the rest."}
-                        controls={"Picks the example's cell keyframes sent to CellAnimationProps.computeCellAnimation"}
+                        controls={"Picks the example's cell keyframes sent to CellAnimationProps.computeSliceAnimation"}
                     >
                         <PageGroupedSelectField
                             value={getAnimationType}

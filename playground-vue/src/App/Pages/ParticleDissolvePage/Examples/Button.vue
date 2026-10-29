@@ -56,7 +56,7 @@ const rebuild = () => {
         >
             <Button id="particleDissolveBurn" @click="burn">
                 <template #renderContent="flags">
-                    <PageButtonContent :flags="flags">Burn me</PageButtonContent>
+                    <PageButtonContent :flags="flags">Click to burn me up</PageButtonContent>
                 </template>
             </Button>
 

@@ -15947,7 +15947,7 @@ never touches it pays for no inverts.
 It began as `RGBSplitter`, a pointer effect asked for by the user that split an element into its red, green and blue as
 the pointer neared its center. They then moved it out of `PointerEffects` into a looping animation, and finally gave
 it the shape of its siblings: `CellAnimation` animates cells, `ScanlineAnimation` lines, and this animates channels —
-`computeChannelAnimation(defs, timeline)` returns the same transform-and-filter values, so a channel moving, scaling,
+`computeSliceAnimation(defs, timeline)` returns the same transform-and-filter values, so a channel moving, scaling,
 turning, fading or changing hue is the consumer's function and nothing in the library is specific to splitting. The
 rename to `RGBAnimation` was theirs, since a channel that only fades is not a split.
 
@@ -20634,12 +20634,12 @@ The first build had two modes under a `spawnMode` union. `batch` was the above; 
 
 **Every refresh rolls every cell, and a window over spawn times was tried and measured slower.** Sorting the cells by spawn moment and binary-searching the live run skips nothing in the middle of a pass at an ordinary lifetime, when nearly every cell is alive, and the live list then has to be sorted back into reading order on almost every frame, because a new column spawns on almost every frame. Measured on `ParticleDissolve`'s Card at its densest grid, the window doubled the roster's own time (about 0.1 ms a frame against roughly 18 ms of main-thread work) and won only with very short lifetimes; the user chose to keep the plain loop.
 
-### Particle and cell layers are contained, and clipped only where they already were
+### Particle and cell layers are contained, and never clipped
 
 The user's call, for `ParticleField`, `ParticleSpawner`, `ParticleDissolve` (through its field), `CellAnimation` and so `ScanlineAnimation`: their particles or cells are born, moved and removed on every frame, and **`contain`** tells the browser that nothing inside affects layout outside, so each change is laid out and painted within the box rather than up the page.
 
 - **The particle roots take `contain: size layout style`, never `paint`.** Paint containment clips descendants to the box (MDN, `contain`: "If a descendant overflows the containing element's bounds, then that descendant will be clipped"), and particles leave their box on purpose — ash rising off a button. Layout containment does not clip; per CSS Containment 2, §3.2, overflow of a box with `overflow: visible` "must be treated as ink overflow", so a particle drifting past the box is still drawn but no longer gives an ancestor a scrollbar. Size containment is free here: the roots are `width` and `height` `100%`, and their only children are absolutely positioned, which never sized them anyway.
-- **`CellAnimation`'s container takes `contain: strict`**, since it already has `overflow: hidden` and an inline width and height, so neither the clipping nor the size changes anything a reader sees.
+- **`CellAnimation`'s container takes `contain: size layout style`, never `paint`, and no `overflow: hidden`**: cells are meant to fly in from outside the box (`tumble_left` and its siblings start there), so the container never clips them — the user's call.
 - Layout containment also makes each root a stacking context, so a `z-index` a consumer gives a particle now orders it only among its siblings.
 - **Measured headless on `ParticleDissolve`'s Card, it changed neither layout nor style time**, since the particles were already absolutely positioned. Kept as the user's call; a GPU window was not measured. **Particles do not get compositor layers of their own** — a later measurement counted seven layers on the whole page mid-dissolve at a 4 px cell size. What cost most there was a fade written as a filter, which the next entry is about.
 

@@ -92,7 +92,7 @@ export const WipeExample = (props: Props) => {
                                     props.weightOpts,
                                 )
                             }
-                            computeCellAnimation={(defs, timeline) =>
+                            computeSliceAnimation={(defs, timeline) =>
                                 CellAnimationKeyframeUtils.computeAnimation(
                                     LOZENGE_GROW,
                                     CellAnimationBreakpointUtils.computeBreakpoints(

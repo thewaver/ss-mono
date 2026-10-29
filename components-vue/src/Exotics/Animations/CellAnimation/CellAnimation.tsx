@@ -88,7 +88,7 @@ export const CellAnimation = defineComponent(
                 defs,
                 currentProgress,
                 props.computeRootAnimation,
-                props.computeCellAnimation,
+                props.computeSliceAnimation,
             );
         });
 
@@ -198,7 +198,7 @@ export const CellAnimation = defineComponent(
             "finalFrame": null,
             "computeCellWeights": null,
             "computeRootAnimation": null,
-            "computeCellAnimation": null,
+            "computeSliceAnimation": null,
             "onIterationEnd": null,
             "onAnimationEnd": null,
         }),
