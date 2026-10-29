@@ -74,18 +74,16 @@ const StressTestWrapper = (props: ParticleSpawnerExampleProps) => {
                 onHideModal={() => props.playback[1](true)}
                 renderLabel={(getConfigIndex) => `Render ${STRESS_ITEMS[getConfigIndex()].count} spawners`}
                 renderItem={(getConfigIndex) => (
-                    <div
-                        style={{
-                            width: `${STRESS_ITEMS[getConfigIndex()].width}px`,
-                            height: `${STRESS_ITEMS[getConfigIndex()].height}px`,
-                        }}
+                    <PageMeasureBox
+                        width={() => STRESS_ITEMS[getConfigIndex()].size}
+                        height={() => STRESS_ITEMS[getConfigIndex()].size}
                     >
                         <SingleTargetExample
                             {...props}
                             playback={modalPlayback}
                             renderer={() => (getIsOnGraphicsCard() ? "graphics_card" : "elements")}
                         />
-                    </div>
+                    </PageMeasureBox>
                 )}
             />
         </>

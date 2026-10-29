@@ -482,13 +482,11 @@ export const BOX_WIDTH = 420;
 
 export const BOX_HEIGHT = 260;
 
-export const STRESS_BOX_WIDTH = 120;
+export const STRESS_ITEM_SIZE = 120;
 
-export const STRESS_BOX_HEIGHT = 80;
-
-export const STRESS_ITEMS: (StressTestDefs & { width: number; height: number })[] = [
-    { count: 8, cols: 4, gap: 10, width: STRESS_BOX_WIDTH, height: STRESS_BOX_HEIGHT },
-    { count: 24, cols: 6, gap: 8, width: STRESS_BOX_WIDTH, height: STRESS_BOX_HEIGHT },
-    { count: 48, cols: 8, gap: 6, width: STRESS_BOX_WIDTH, height: STRESS_BOX_HEIGHT },
-    { count: 96, cols: 12, gap: 4, width: STRESS_BOX_WIDTH, height: STRESS_BOX_HEIGHT },
+export const STRESS_ITEMS: (StressTestDefs & { size: number })[] = [
+    { count: 4 * 3, cols: 4, gap: 10, size: STRESS_ITEM_SIZE },
+    { count: 6 * 4, cols: 6, gap: 10, size: STRESS_ITEM_SIZE },
+    { count: 8 * 6, cols: 8, gap: 10, size: STRESS_ITEM_SIZE },
+    { count: 12 * 6, cols: 12, gap: 10, size: STRESS_ITEM_SIZE },
 ];

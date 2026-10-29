@@ -1,21 +1,19 @@
 <script lang="ts">
     import PageCheckField from "../../PageComponents/Field/PageCheckField.svelte";
+    import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.svelte";
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
     import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
     import StressTest from "../../PageComponents/StressTest/StressTest.svelte";
     import type { StressTestDefs } from "../../PageComponents/StressTest/StressTextSvelte.types";
     import SingleTargetExample from "./Examples/SingleTarget.svelte";
     import type { ParticleSpawnerExampleProps } from "./ParticleSpawnerPage.types";
-    import {
-        STRESS_BOX_HEIGHT,
-        STRESS_BOX_WIDTH,
-    } from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.const";
+    import { STRESS_ITEM_SIZE } from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.const";
 
-    const STRESS_ITEMS: (StressTestDefs & { width: number; height: number })[] = [
-        { count: 8, cols: 4, gap: 10, width: STRESS_BOX_WIDTH, height: STRESS_BOX_HEIGHT },
-        { count: 24, cols: 6, gap: 8, width: STRESS_BOX_WIDTH, height: STRESS_BOX_HEIGHT },
-        { count: 48, cols: 8, gap: 6, width: STRESS_BOX_WIDTH, height: STRESS_BOX_HEIGHT },
-        { count: 96, cols: 12, gap: 4, width: STRESS_BOX_WIDTH, height: STRESS_BOX_HEIGHT },
+    const STRESS_ITEMS: (StressTestDefs & { size: number })[] = [
+        { count: 4 * 3, cols: 4, gap: 10, size: STRESS_ITEM_SIZE },
+        { count: 6 * 4, cols: 6, gap: 10, size: STRESS_ITEM_SIZE },
+        { count: 8 * 6, cols: 8, gap: 10, size: STRESS_ITEM_SIZE },
+        { count: 12 * 6, cols: 12, gap: 10, size: STRESS_ITEM_SIZE },
     ];
 
     let { playback = $bindable(), ...props }: ParticleSpawnerExampleProps = $props();
@@ -55,15 +53,12 @@
     {/snippet}
 
     {#snippet renderItem(configIndex)}
-        <div
-            style:width={`${STRESS_ITEMS[configIndex].width}px`}
-            style:height={`${STRESS_ITEMS[configIndex].height}px`}
-        >
+        <PageMeasureBox width={STRESS_ITEMS[configIndex].size} height={STRESS_ITEMS[configIndex].size}>
             <SingleTargetExample
                 {...props}
                 bind:playback={modalPlayback}
                 renderer={isOnGraphicsCard ? "graphics_card" : "elements"}
             />
-        </div>
+        </PageMeasureBox>
     {/snippet}
 </StressTest>

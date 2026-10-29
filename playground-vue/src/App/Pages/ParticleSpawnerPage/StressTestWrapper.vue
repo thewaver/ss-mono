@@ -4,6 +4,7 @@ import { shallowRef, useModel } from "vue";
 import { STRESS_ITEMS } from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.const";
 
 import PageCheckField from "../../PageComponents/Field/PageCheckField.vue";
+import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
 import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
 import StressTest from "../../PageComponents/StressTest/StressTest.vue";
@@ -41,12 +42,7 @@ const isOnGraphicsCard = shallowRef(true);
         <template #renderLabel="{ configIndex }">{{ `Render ${STRESS_ITEMS[configIndex].count} spawners` }}</template>
 
         <template #renderItem="{ configIndex }">
-            <div
-                :style="{
-                    width: `${STRESS_ITEMS[configIndex].width}px`,
-                    height: `${STRESS_ITEMS[configIndex].height}px`,
-                }"
-            >
+            <PageMeasureBox :width="STRESS_ITEMS[configIndex].size" :height="STRESS_ITEMS[configIndex].size">
                 <SingleTargetExample
                     v-model:playback="modalPlayback"
                     :particle-count="particleCount"
@@ -58,7 +54,7 @@ const isOnGraphicsCard = shallowRef(true);
                     :are-targets-hidden="areTargetsHidden"
                     :renderer="isOnGraphicsCard ? 'graphics_card' : 'elements'"
                 />
-            </div>
+            </PageMeasureBox>
         </template>
     </StressTest>
 </template>
