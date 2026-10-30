@@ -47,7 +47,7 @@ export const LIBRARY: TreemapNode<string> = branch(
         leaf("Shortcut", 368),
         leaf("SignalMirror", 292),
         leaf("SliceAnimation", 312),
-        leaf("SliceRenderer", 1409),
+        leaf("SliceRenderer", 1399),
         leaf("Smoother", 141),
         leaf("TextSync", 472),
         leaf("TurnClock", 208),

@@ -38,7 +38,7 @@ type Submission = {
     width: number;
     height: number;
     render: () => void;
-    present: (picture: ImageBitmap) => void;
+    present: (picture: ImageBitmap, left: number, top: number) => void;
 };
 
 type Placement = { submission: Submission; left: number; top: number };
@@ -474,16 +474,9 @@ const drawBatch = (current: Renderer, batch: Batch) => {
 
     const atlas = canvas.transferToImageBitmap();
 
-    Promise.all(
-        batch.placements.map(({ submission, left, top }) =>
-            createImageBitmap(atlas, left, top, submission.width, submission.height, {
-                resizeWidth: submission.width,
-                resizeHeight: submission.height,
-            }).then(submission.present),
-        ),
-    )
-        .catch(() => undefined)
-        .finally(() => atlas.close());
+    for (const { submission, left, top } of batch.placements) submission.present(atlas, left, top);
+
+    atlas.close();
 };
 
 const flush = () => {
@@ -686,7 +679,7 @@ export namespace SliceRendererUtils {
     export const createItem = (canvas: HTMLCanvasElement): SliceRendererItem | undefined => {
         const current = getRenderer();
         const resources = current?.resources;
-        const output = canvas.getContext("bitmaprenderer");
+        const output = canvas.getContext("2d");
 
         if (!current || !resources || !output) return undefined;
 
@@ -731,8 +724,6 @@ export namespace SliceRendererUtils {
 
         const key = {};
 
-        let submitted = 0;
-        let presented = 0;
         let isDisposed = false;
 
         const drawLayers = (mixing: SVGColorMixing, count: number) => {
@@ -849,28 +840,27 @@ export namespace SliceRendererUtils {
 
             const width = Math.max(1, Math.round(frame.area.width * frame.scale));
             const height = Math.max(1, Math.round(frame.area.height * frame.scale));
-            const sequence = ++submitted;
             const submission: Submission = {
                 width,
                 height,
                 render: () => render(frame, width, height),
-                present: (picture) => {
-                    if (isDisposed || sequence < presented) {
-                        picture.close();
+                present: (picture, left, top) => {
+                    if (isDisposed) return;
 
-                        return;
+                    if (canvas.width !== width || canvas.height !== height) {
+                        canvas.width = width;
+                        canvas.height = height;
+                    } else {
+                        output.clearRect(0, 0, width, height);
                     }
 
-                    const shown = {
+                    output.drawImage(picture, left, top, width, height, 0, 0, width, height);
+                    onShown({
                         x: frame.area.x,
                         y: frame.area.y,
-                        width: picture.width / frame.scale,
-                        height: picture.height / frame.scale,
-                    };
-
-                    presented = sequence;
-                    output.transferFromImageBitmap(picture);
-                    onShown(shown);
+                        width: width / frame.scale,
+                        height: height / frame.scale,
+                    });
                 },
             };
 
