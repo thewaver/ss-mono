@@ -140,7 +140,7 @@ const StressTestWrapper = (
                     key={"handoverPerElement"}
                     label={"Hand over each element"}
                     hint={
-                        "Hands each element's picture to its canvas the moment it is drawn. Off, every element is drawn together once a frame and cut out of one shared picture."
+                        "Every element is drawn together once a frame either way. On, each element's picture is handed to its canvas the moment it is drawn; off, one shared picture is handed over and each element's piece is cut out of it."
                     }
                     controls={"Sets how the graphics card hands pictures over, for every animation on the page"}
                 >

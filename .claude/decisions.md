@@ -9404,8 +9404,16 @@ clipping each canvas to its own area recovered nothing, since the cost follows t
 of it is shown. The proof of concept met none of this because only its stress test drew on the graphics card.
 **Both handovers are kept**, chosen through `SliceRendererInternalUtils.setHandover` on the internal entry and a
 checkbox in the Solid cell stress test — the user's call, not dead code: the Radeon is faster with `per_element`, and
-the M3 was far slower with a handover per item (measured before this sizing; not measured since). `per_element` reports the shared canvas's size, so every component's canvas is that size,
+the M3 is about ten times slower with it, sizing or not — every 72-item stress test at 7–11 frames a second against
+80–100 for `shared`, the main thread blocked 90–150 ms a frame. `per_element` reports the shared canvas's size, so every component's canvas is that size,
 transparent past its own corner.
+**The two differ only in their ending** — the user's call. Both note the frame and draw it in the one pass per
+animation frame; `per_element` then hands each piece over as it is drawn, in the canvas's corner, and `shared` draws
+each into its rectangle and hands the whole over once. Until then `per_element` drew at the moment of asking, and its
+Radeon figures above were measured that way. The pass knows every piece's size, but `draw` has to answer with the size
+before the pass runs, so the "this frame or the one before" sizing stays. **Each noted frame keeps the ending it was
+asked under** (`Submission.alone`, the promised size), so a switch mid-frame hands each piece over the way its
+component was told and sized its canvas for.
 **A canvas reaches past its box** by `computeReach`, which counts only what moves a slice past the box —
 travel, growth, turning, nearness under perspective, blur — because a first, generous bound made the scanline
 canvases six times their box and cost most of their frame rate. Its formula and the spawner's area step

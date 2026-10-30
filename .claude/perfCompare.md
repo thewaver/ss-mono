@@ -11,7 +11,8 @@ missing.
 ## What it measures
 
 The Solid Playground's stress tests, in a real Chrome window on this machine's graphics card: each test three times on
-each version, the middle result kept. Per test: frames a second, and the main thread's busy time per frame. The
+each version, the middle result kept, the first 100 ms of each recording left out as a warm-up. Per test: frames a
+second, and the main thread's busy time per frame. The
 dissolve is measured only by its 20-card stress test at 4 px cells — a larger cell size does not load the browser
 enough to mean anything, and the user dropped the single-Card test as pointless.
 
@@ -38,6 +39,23 @@ the user's machine. Frames a second, middle of three runs; Cells blur from a rer
 | Fields, 72         | 8.5     | 4.5             | 121.7                   |
 | Dissolve, 20 cards | 3.9     | 1.4             | 272.4                   |
 
+**Apple M3 Pro** (`ANGLE (Apple, ANGLE Metal Renderer: Apple M3 Pro, Unspecified Version)`) — the user's laptop.
+Frames a second, middle of three runs; Cells blur, Spawners, Fields and Dissolve from a rerun. Measured before the
+script took main-thread time, so that column is empty. The slowest tests spread past 15% even on the rerun, at rates
+under 6 frames a second.
+
+| Test               | Average | 90th percentile | Main thread, ms a frame |
+| ------------------ | ------- | --------------- | ----------------------- |
+| Cells, 2D zoom     | 43.9    | 27.7            | —                       |
+| Cells, fade        | 5.3     | 3.5             | —                       |
+| Cells, blur        | 0.5     | 0.4             | —                       |
+| Cells, 3D cube     | 1.7     | 0.9             | —                       |
+| Scanlines, moves   | 52.3    | 49.5            | —                       |
+| Scanlines, filters | 5.2     | 3.6             | —                       |
+| Spawners, 72       | 15.8    | 5.3             | —                       |
+| Fields, 72         | 5.0     | 2.4             | —                       |
+| Dissolve, 20 cards | 4.9     | 1.8             | —                       |
+
 ## Steps
 
 1. **Check the machine.** `npm install` must have been run, and Playwright's Chromium must be present
@@ -62,6 +80,11 @@ the user's machine. Frames a second, middle of three runs; Cells blur from a rer
     its own `renderParticle` and `computeAshAnimation`), its card badge lacks the `marginTop` that makes the card 200 px
     tall rather than 190, and its spawner stress test is 96 boxes of 120 × 80 rather than 72 squares of 120 in a
     `PageMeasureBox`. Diff the export's Playground against the latest for anything newer before trusting a result.
+    **To compare the renderer's two handovers on one version**, export it twice and, in one copy, set
+    `DEFAULT_HANDOVER` in `components/src/Abstracts/SliceRenderer/SliceRenderer.internal.utils.ts` to `"per_element"`
+    — the Playground's switch exists only on the cell stress test, and each run loads a fresh page. Check each build's
+    `SliceRendererSolid.utils-*.js` for the default it bundled. "Before" is then `shared` and "after" `per_element`.
+
     **The old version keeps its own stress-test backdrop and modal styling** — the user's call: its blurred
     `ModalOverlay`, `ModalPanel` and `DrawerPanel` stay, and today's opaque overlay is not ported.
 
@@ -113,6 +136,7 @@ const ARGS = [
     "--disable-gpu-vsync",
     "--disable-frame-rate-limit",
 ];
+const WARM_UP_MS = 100;
 const prop = (key) => `[data-prop][data-testid="${key}"]`;
 
 class MissingControl extends Error {}
@@ -185,6 +209,7 @@ const runOnce = async (browser, base, scenario) => {
         await page.waitForLoadState("networkidle");
         await page.waitForTimeout(1000);
         await scenario.setup(page);
+        await page.waitForTimeout(WARM_UP_MS);
 
         const client = await context.newCDPSession(page);
         await client.send("Performance.enable");
