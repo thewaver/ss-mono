@@ -9380,25 +9380,30 @@ per table plus a row for the easing curve, and the shader interpolates them per 
 slices whose window comes from their weight, particles whose life comes from when they spawned, and particles whose
 values JavaScript worked out (`ParticleSpawner`, whose path is a function).
 
-**Every component's frame is drawn into one shared picture, handed over once per animation frame, and cut into
-pieces** — the user's choice, after measuring. `item.draw` only takes note of the frame; one `requestAnimationFrame`
-per frame draws every noted component into its own rectangle of the shared canvas (laid out in rows, a second picture
-only if one would pass the graphics card's limit), hands it over with one `transferToImageBitmap`, and cuts each
-rectangle out with `createImageBitmap` for the component's `bitmaprenderer` canvas, which is sized to its piece. **The
+**Every component's frame is drawn into one shared picture once per animation frame, and each piece is copied onto
+its component's canvas** — the user's choice, after measuring. `item.draw` only takes note of the frame; one
+`requestAnimationFrame` per frame draws every noted component into its own rectangle of the shared canvas (laid out in
+rows, a second picture only if one would pass the graphics card's limit), takes it with one `transferToImageBitmap`,
+and copies each rectangle with `drawImage` onto the component's own 2D canvas, which is sized to its piece. **The
 cost is one frame**: a picture shows one animation frame after the progress it was drawn for, since the four
 frameworks update the page at different moments and the renderer cannot know when the last component of a frame has
 asked. **So a component places and sizes its canvas only when `draw`'s `onShown` reports the picture landed**, never
 from what it just asked for: `ParticleSpawner`'s canvas follows its particles and moved a frame ahead of its picture,
 which showed late and stretched, as particles jumping.
-**Each cut-out asks `createImageBitmap` for its own size** (`resizeWidth`/`resizeHeight` equal to the cut), which
-scales nothing: a plain cut handed to a `bitmaprenderer` canvas shows Firefox the whole uncut picture, squeezed into the
-canvas, while asking for a size forces a real copy that it shows correctly. Checked headless in Firefox, with WebGL and
-with 2D sources alike; asking for `premultiplyAlpha: "none"` also works but changes how see-through edges are stored.
-**The copy is made in every browser, not only where the fault shows** — the user's call: Chrome got faster with it
-and a freshly launched Edge stayed level. A check choosing per browser is not wanted unless Safari's numbers argue for
-one.
+**The pieces are not cut out with `createImageBitmap` into `bitmaprenderer` canvases**, which the renderer did before.
+A plain cut shows Firefox the whole uncut picture, squeezed into the canvas (asking `createImageBitmap` for the cut's
+own size forces a real copy and fixes it), and Safari on an M3 Pro ran 72 cells at 8 frames a second that way. Copying
+with `drawImage` took Safari, Chrome and Firefox on the M3, and Chrome and Edge on the Radeon, to their screens' refresh
+rate; Firefox on Windows runs it at 54 to 65 in a clean profile, and half that in the user's own, which an extension
+or a changed setting slows (Troubleshoot Mode recovers it). **Copying straight from the WebGL canvas, skipping
+`transferToImageBitmap`, stalls Firefox below one frame a second**, and padding small canvases to Firefox's 128-pixel
+acceleration threshold changed nothing. Firefox's cost is that `transferToImageBitmap` reads the shared picture back
+from the graphics card (its WebGL runs in another process) — half of every frame in a profile. Showing each piece
+through `-moz-element` instead, to skip the read-back, failed both ways: a canvas registered with `mozSetImageElement`
+never repaints its pieces, and one placed on the page is read back again, below one frame a second.
 **Handing each component's picture over on its own was removed** — the user's call. It made the browser wait for the
-graphics card at every handover, so 72 components ran about ten times slower on an M3 Pro, in Safari and in Firefox.
+graphics card at every handover, so 72 components ran about ten times slower in Chrome on an M3 Pro, and Firefox there
+managed 22; Safari preferred it to the old cut-outs, but not to the copy above.
 Its one advantage, about 1.6× on a Radeon RX 7900 XTX, was measured only in a Chromium drawing with its older engine;
 Chrome with Skia Graphite and Edge show no such gap, so it is not to come back for that number. A handover per item
 also needed the shared canvas sized to the largest item of the frame, every canvas that size, which the shared

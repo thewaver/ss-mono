@@ -503,7 +503,7 @@ const submit = (key: object, submission: Submission) => {
  *
  * One WebGL context serves the whole page, since browsers keep only a few alive at once. A component asks for an item
  * bound to its own canvas and hands it a frame; once per animation frame, every component's frame is drawn into one
- * shared picture and each is cut out of it for its own canvas. The tables a sample is built from are uploaded once and worked out per
+ * shared picture and each is copied from it onto its own canvas. The tables a sample is built from are uploaded once and worked out per
  * slice on the graphics card, so the page only advances the clock. Where the graphics card cannot be used — no
  * WebGL 2 in an offscreen canvas, a picture whose server gives no cross-origin permission, a context the browser has
  * taken away — {@link getCanDraw} says so and the component draws with page elements instead.
@@ -667,7 +667,7 @@ export namespace SliceRendererUtils {
      * where that canvas must sit and how large it must be, in the component's own pixels. The picture's top-left corner
      * is the frame's area; it may be larger than that area, and the rest of it is transparent, so the canvas is sized to
      * it rather than to the area. The picture is drawn with every other component's at the next animation frame and
-     * cut out of one shared picture, so it arrives one animation frame after it was asked for. A component places and sizes its canvas only from that callback, so the
+     * copied from one shared picture, so it arrives one animation frame after it was asked for. A component places and sizes its canvas only from that callback, so the
      * canvas never shows one frame's picture at another frame's place.
      *
      * A picture still loading draws nothing; the component hears it arrive through {@link requestPicture} and draws
