@@ -10,7 +10,7 @@
         CellAnimationStyles as styles,
     } from "@thewaver/ss-components";
     import { CellAnimationConst } from "@thewaver/ss-components/internal";
-    import { type Index2d, MathUtils, Size2d } from "@thewaver/ss-utils";
+    import { type Index2d, MathUtils, Rect } from "@thewaver/ss-utils";
     import { assignInlineVars } from "@vanilla-extract/dynamic";
 
     import { ElementObserverSvelteUtils } from "../../../Abstracts/ElementObserver/ElementObserverSvelte.utils.svelte.js";
@@ -22,6 +22,8 @@
     import type { CellAnimationProps } from "./CellAnimation.types.js";
 
     let { playback = $bindable(true), progress = $bindable(CellAnimationConst.NO_PROGRESS), ...props }: CellAnimationProps = $props();
+
+    const NO_RECT: Rect = { x: 0, y: 0, width: 0, height: 0 };
 
     const durationMs = $derived(props.animationDurationMs ?? CELL_ANIMATION_DEFAULTS.animationDurationMs);
     const iterationCount = $derived(props.animationIterationCount ?? CELL_ANIMATION_DEFAULTS.animationIterationCount);
@@ -41,7 +43,7 @@
     let container = $state<HTMLDivElement>();
     let canvas = $state<HTMLCanvasElement>();
     let currentIteration = $state(CellAnimationConst.FIRST_ITERATION);
-    let shownSize = $state.raw<Size2d>({ width: 0, height: 0 });
+    let shownRect = $state.raw<Rect>(NO_RECT);
 
     const getIsPageHidden = InteractionTrackerSvelteUtils.trackPageHidden();
 
@@ -190,7 +192,7 @@
 
             const scale = window.devicePixelRatio * viewportContext.getScale();
             const sliceWindow = SliceAnimationUtils.computeWindow(timing);
-            const shown = item.draw({
+            item.draw({
                 mode: "slices",
                 src,
                 tables: currentTables,
@@ -204,10 +206,9 @@
                 isDescending: sliceWindow.isDescending,
                 isShown,
                 hasPerspective: true,
+            }, (next) => {
+                if (!Rect.isSame(shownRect, next)) shownRect = next;
             });
-            const next = { width: shown.width / scale, height: shown.height / scale };
-
-            if (!Size2d.isSame(shownSize, next)) shownSize = next;
         });
     });
 
@@ -273,10 +274,10 @@
             <canvas
                 bind:this={canvas}
                 class={SliceRendererStyles.sliceRendererCanvas}
-                style:left={`${area.x}px`}
-                style:top={`${area.y}px`}
-                style:width={`${shownSize.width}px`}
-                style:height={`${shownSize.height}px`}
+                style:left={`${shownRect.x}px`}
+                style:top={`${shownRect.y}px`}
+                style:width={`${shownRect.width}px`}
+                style:height={`${shownRect.height}px`}
                 aria-hidden="true"
             ></canvas>
         </div>

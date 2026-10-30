@@ -13,7 +13,7 @@ import {
     SliceRendererUtils,
 } from "@thewaver/ss-components";
 import { RGBAnimationConst } from "@thewaver/ss-components/internal";
-import { MathUtils, Size2d } from "@thewaver/ss-utils";
+import { MathUtils, Rect } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { ElementObserverReactUtils } from "../../../Abstracts/ElementObserver/ElementObserverReact.utils";
@@ -26,6 +26,7 @@ import type { RGBAnimationProps } from "./RGBAnimation.types";
 
 const WHOLE_PASS = { half: 0.5, isDescending: false };
 const LINEAR = SliceRendererUtils.computeEasing(undefined);
+const NO_RECT: Rect = { x: 0, y: 0, width: 0, height: 0 };
 
 export const RGBAnimation = (props: RGBAnimationProps) => {
     const durationMs = props.animationDurationMs ?? RGB_ANIMATION_DEFAULTS.animationDurationMs;
@@ -54,7 +55,7 @@ export const RGBAnimation = (props: RGBAnimationProps) => {
     const [schemeMixing, setSchemeMixing] = useState<SVGColorMixing>(() =>
         RGBAnimationUtils.readColorMixing(undefined),
     );
-    const [shownSize, setShownSize] = useState<Size2d>({ width: 0, height: 0 });
+    const [shownRect, setShownRect] = useState<Rect>(NO_RECT);
 
     const rootSize = ElementObserverReactUtils.useBorderBoxSize(imgRef);
 
@@ -167,25 +168,25 @@ export const RGBAnimation = (props: RGBAnimationProps) => {
         }
 
         const scale = window.devicePixelRatio * viewportContext.getScale();
-        const shown = item.draw({
-            mode: "slices",
-            src: current.props.src,
-            tables: tables?.tables ?? [],
-            easing: LINEAR,
-            slices: rendererSlices,
-            size: rootSize,
-            area,
-            scale,
-            timeline,
-            half: WHOLE_PASS.half,
-            isDescending: WHOLE_PASS.isDescending,
-            isShown: true,
-            hasPerspective: true,
-            channelMixing: colorMixing,
-        });
-        const next = { width: shown.width / scale, height: shown.height / scale };
-
-        setShownSize((previous) => (Size2d.isSame(previous, next) ? previous : next));
+        item.draw(
+            {
+                mode: "slices",
+                src: current.props.src,
+                tables: tables?.tables ?? [],
+                easing: LINEAR,
+                slices: rendererSlices,
+                size: rootSize,
+                area,
+                scale,
+                timeline,
+                half: WHOLE_PASS.half,
+                isDescending: WHOLE_PASS.isDescending,
+                isShown: true,
+                hasPerspective: true,
+                channelMixing: colorMixing,
+            },
+            (next) => setShownRect((previous) => (Rect.isSame(previous, next) ? previous : next)),
+        );
     }, [item, progress, isOnGraphicsCard, tables, rendererSlices, area, rootSize, colorMixing, picture]);
 
     useEffect(() => {
@@ -245,10 +246,10 @@ export const RGBAnimation = (props: RGBAnimationProps) => {
                         ref={canvasRef}
                         className={SliceRendererStyles.sliceRendererCanvas}
                         style={{
-                            left: `${area.x}px`,
-                            top: `${area.y}px`,
-                            width: `${shownSize.width}px`,
-                            height: `${shownSize.height}px`,
+                            left: `${shownRect.x}px`,
+                            top: `${shownRect.y}px`,
+                            width: `${shownRect.width}px`,
+                            height: `${shownRect.height}px`,
                         }}
                         aria-hidden="true"
                     />

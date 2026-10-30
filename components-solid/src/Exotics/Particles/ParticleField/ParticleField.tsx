@@ -15,7 +15,7 @@ import {
     ParticleFieldStyles as styles,
 } from "@thewaver/ss-components";
 import { ParticleFieldConst } from "@thewaver/ss-components/internal";
-import { MathUtils, Size2d } from "@thewaver/ss-utils";
+import { MathUtils, Rect, Size2d } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { SignalMirrorSolidUtils } from "../../../Abstracts/SignalMirror/SignalMirrorSolid.utils";
@@ -25,6 +25,7 @@ import { access } from "../../../Utils/propUtils";
 import type { ParticleFieldProps } from "./ParticleFieldSolid.types";
 
 const LINEAR = SliceRendererUtils.computeEasing(undefined);
+const NO_RECT: Rect = { x: 0, y: 0, width: 0, height: 0 };
 const NO_TABLES = { tables: [[]], tableIndices: [] };
 
 export const ParticleField = (props: ParticleFieldProps) => {
@@ -65,7 +66,7 @@ export const ParticleField = (props: ParticleFieldProps) => {
     const [getCurrentIteration, setCurrentIteration] = createSignal(0);
     const [getRootSize, setRootSize] = createSignal<Size2d>({ width: 0, height: 0 }, { equals: Size2d.isSame });
     const [getLiveParticles, setLiveParticles] = createSignal<ParticleFieldParticle[]>([]);
-    const [getShownSize, setShownSize] = createSignal<Size2d>({ width: 0, height: 0 }, { equals: Size2d.isSame });
+    const [getShownRect, setShownRect] = createSignal<Rect>(NO_RECT, { equals: Rect.isSame });
 
     const getCellCount = createMemo(
         () => CellAnimationUtils.computeCellCount(access(props.cellCount), getRootSize()),
@@ -195,25 +196,26 @@ export const ParticleField = (props: ParticleFieldProps) => {
         if (!item) return;
 
         const scale = window.devicePixelRatio * viewportContext.getScale();
-        const shown = item.draw({
-            mode: "particles",
-            src: getSource(),
-            tables: getTables()?.tables ?? [],
-            easing: LINEAR,
-            slices: rendererSlices,
-            size: getRootSize(),
-            area: getArea(),
-            scale,
-            timeline: 0,
-            half: 0,
-            isDescending: false,
-            isShown: true,
-            hasPerspective: false,
-            clockMs,
-            lifetimeMs: getLifetimeMs(),
-        });
-
-        setShownSize({ width: shown.width / scale, height: shown.height / scale });
+        item.draw(
+            {
+                mode: "particles",
+                src: getSource(),
+                tables: getTables()?.tables ?? [],
+                easing: LINEAR,
+                slices: rendererSlices,
+                size: getRootSize(),
+                area: getArea(),
+                scale,
+                timeline: 0,
+                half: 0,
+                isDescending: false,
+                isShown: true,
+                hasPerspective: false,
+                clockMs,
+                lifetimeMs: getLifetimeMs(),
+            },
+            setShownRect,
+        );
     };
 
     const refresh = () => {
@@ -397,10 +399,10 @@ export const ParticleField = (props: ParticleFieldProps) => {
                     ref={setCanvasRef}
                     class={SliceRendererStyles.sliceRendererCanvas}
                     style={{
-                        left: `${getArea().x}px`,
-                        top: `${getArea().y}px`,
-                        width: `${getShownSize().width}px`,
-                        height: `${getShownSize().height}px`,
+                        left: `${getShownRect().x}px`,
+                        top: `${getShownRect().y}px`,
+                        width: `${getShownRect().width}px`,
+                        height: `${getShownRect().height}px`,
                     }}
                     aria-hidden="true"
                 />

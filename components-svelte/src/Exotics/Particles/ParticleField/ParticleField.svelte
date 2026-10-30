@@ -16,7 +16,7 @@
         ParticleFieldStyles as styles,
     } from "@thewaver/ss-components";
     import { ParticleFieldConst } from "@thewaver/ss-components/internal";
-    import { type Index2d, MathUtils, Size2d } from "@thewaver/ss-utils";
+    import { type Index2d, MathUtils, Rect } from "@thewaver/ss-utils";
     import { assignInlineVars } from "@vanilla-extract/dynamic";
 
     import { ElementObserverSvelteUtils } from "../../../Abstracts/ElementObserver/ElementObserverSvelte.utils.svelte.js";
@@ -30,6 +30,7 @@
     let { playback = $bindable(true), progress = $bindable(ParticleFieldConst.NO_PROGRESS), ...props }: ParticleFieldProps = $props();
 
     const LINEAR = SliceRendererUtils.computeEasing(undefined);
+    const NO_RECT: Rect = { x: 0, y: 0, width: 0, height: 0 };
     const NO_TABLES = { tables: [[]], tableIndices: [] };
 
     const viewportContext = getViewportContext();
@@ -49,7 +50,7 @@
     let root = $state<HTMLDivElement>();
     let canvas = $state<HTMLCanvasElement>();
     let currentIteration = $state(ParticleFieldConst.FIRST_ITERATION);
-    let shownSize = $state.raw<Size2d>({ width: 0, height: 0 });
+    let shownRect = $state.raw<Rect>(NO_RECT);
 
     const bodies = new Map<number, HTMLElement>();
     const tints = new Map<number, string | undefined>();
@@ -257,7 +258,7 @@
 
         untrack(() => {
             const scale = window.devicePixelRatio * viewportContext.getScale();
-            const shown = item.draw({
+            item.draw({
                 mode: "particles",
                 src,
                 tables: currentTables,
@@ -273,10 +274,9 @@
                 hasPerspective: false,
                 clockMs: clock,
                 lifetimeMs: lifetime,
+            }, (next) => {
+                if (!Rect.isSame(shownRect, next)) shownRect = next;
             });
-            const next = { width: shown.width / scale, height: shown.height / scale };
-
-            if (!Size2d.isSame(shownSize, next)) shownSize = next;
         });
     });
 
@@ -325,10 +325,10 @@
         <canvas
             bind:this={canvas}
             class={SliceRendererStyles.sliceRendererCanvas}
-            style:left={`${area.x}px`}
-            style:top={`${area.y}px`}
-            style:width={`${shownSize.width}px`}
-            style:height={`${shownSize.height}px`}
+            style:left={`${shownRect.x}px`}
+            style:top={`${shownRect.y}px`}
+            style:width={`${shownRect.width}px`}
+            style:height={`${shownRect.height}px`}
             aria-hidden="true"
         ></canvas>
     {:else}

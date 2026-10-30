@@ -31,6 +31,7 @@ import type { ParticleSpawnerProps } from "./ParticleSpawner.types";
 
 const LINEAR = SliceRendererUtils.computeEasing(undefined);
 const NO_AREA: Rect = { x: 0, y: 0, width: 1, height: 1 };
+const NO_RECT: Rect = { x: 0, y: 0, width: 0, height: 0 };
 const UNUSED_SIZE: Size2d = { width: 1, height: 1 };
 
 type Placed = { defs: ParticleTravelDefs; pos: Point2d; t: number };
@@ -56,10 +57,11 @@ export const ParticleSpawner = defineComponent(
         const placed = new Map<number, Placed>();
         const tints = new Map<number, string | undefined>();
 
+        let drawnArea: Rect | undefined;
+
         const isPlaying = useTwoWay(props, "playback", true);
         const stage = shallowRef({ index: ParticleSpawnerConst.FIRST_STAGE });
-        const area = shallowRef<Rect>(NO_AREA);
-        const shownSize = shallowRef<Size2d>({ width: 0, height: 0 });
+        const shownRect = shallowRef<Rect>(NO_RECT);
 
         const isPageHidden = InteractionTrackerVueUtils.usePageHidden();
         const isWindowVisible = computed(() => !isPageHidden.value);
@@ -142,10 +144,9 @@ export const ParticleSpawner = defineComponent(
             if (!currentItem) return;
 
             const size = particleSize.value;
-            const current = area.value;
             const slices: SliceRendererSlice[] = [];
 
-            let grown: Rect | undefined = current === NO_AREA ? undefined : current;
+            let grown = drawnArea;
 
             for (const particle of particles.value) {
                 const entry = placed.get(particle.id);
@@ -172,29 +173,29 @@ export const ParticleSpawner = defineComponent(
                 });
             }
 
-            const shownArea = slices.length === 0 || !grown ? NO_AREA : grown;
-
-            if (!Rect.isSame(shownArea, current)) area.value = shownArea;
+            drawnArea = slices.length === 0 ? undefined : grown;
 
             const scale = window.devicePixelRatio * viewportContext.getScale();
-            const shown = currentItem.draw({
-                mode: "direct",
-                src: props.src,
-                tables: [],
-                easing: LINEAR,
-                slices,
-                size: UNUSED_SIZE,
-                area: shownArea,
-                scale,
-                timeline: 0,
-                half: 0,
-                isDescending: false,
-                isShown: slices.length > 0,
-                hasPerspective: false,
-            });
-            const next = { width: shown.width / scale, height: shown.height / scale };
-
-            if (!Size2d.isSame(shownSize.value, next)) shownSize.value = next;
+            currentItem.draw(
+                {
+                    mode: "direct",
+                    src: props.src,
+                    tables: [],
+                    easing: LINEAR,
+                    slices,
+                    size: UNUSED_SIZE,
+                    area: drawnArea ?? NO_AREA,
+                    scale,
+                    timeline: 0,
+                    half: 0,
+                    isDescending: false,
+                    isShown: slices.length > 0,
+                    hasPerspective: false,
+                },
+                (next) => {
+                    if (!Rect.isSame(shownRect.value, next)) shownRect.value = next;
+                },
+            );
         };
 
         const engine = ParticleSpawnerUtils.createEngine({
@@ -318,10 +319,10 @@ export const ParticleSpawner = defineComponent(
                             ref={canvasRef}
                             class={SliceRendererStyles.sliceRendererCanvas}
                             style={{
-                                left: `${area.value.x}px`,
-                                top: `${area.value.y}px`,
-                                width: `${shownSize.value.width}px`,
-                                height: `${shownSize.value.height}px`,
+                                left: `${shownRect.value.x}px`,
+                                top: `${shownRect.value.y}px`,
+                                width: `${shownRect.value.width}px`,
+                                height: `${shownRect.value.height}px`,
                             }}
                             aria-hidden="true"
                         />

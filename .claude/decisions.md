@@ -9381,39 +9381,28 @@ slices whose window comes from their weight, particles whose life comes from whe
 values JavaScript worked out (`ParticleSpawner`, whose path is a function).
 
 **Every component's frame is drawn into one shared picture, handed over once per animation frame, and cut into
-pieces** — the user's choice, after measuring. `item.draw` only takes note of the frame and returns the size of the
-component's piece; one `requestAnimationFrame` per frame draws every noted component into its own rectangle of the
-shared canvas (laid out in rows, a second picture only if one would pass the graphics card's limit), hands it over
-with one `transferToImageBitmap`, and cuts each rectangle out with `createImageBitmap` for the component's
-`bitmaprenderer` canvas, which is sized to its piece. **The cost is one frame**: a picture shows one animation frame
-after the progress it was drawn for, since the four frameworks update the page at different moments and the renderer
-cannot know when the last component of a frame has asked. The first build handed each component's picture over on
-its own, which measured fast on the proof of concept's machine (a Radeon RX 7900 XTX) and, on an M3 Pro through
-Metal, made the browser wait for the graphics card at every handover — about 1.2 ms each, so 72 components capped
-the page near 11 frames a second whatever they drew. A bare page with none of the library's code showed the same,
-in Playwright's Chromium and in Google Chrome alike, and showed handing over without drawing first costing 0.16 ms,
-so the cost was the waiting. Copying each picture out instead measured three times faster on the M3 and three times
-slower on the Radeon, so it only traded one machine for the other; one handover per frame took the M3's stress tests
-from 11 to about 100 frames a second. **On the Radeon, `shared` costs about a third of the frame rate** — the
-graphics process spends its time on the cut-outs, which are copies — and `per_element` is the faster there, about 1.6×.
-**`per_element` sizes the shared canvas to the largest item drawn in this frame or the one before**, told apart by
-`document.timeline.currentTime`. Each alternative measured worse: grown to the largest picture ever drawn, one large
-example elsewhere on the page made every canvas that large, slower than `shared`; resized to each item, three
-sizes mixed reallocated it up to 72 times a frame and took the scanline stress test to about 16 frames a second; and
-clipping each canvas to its own area recovered nothing, since the cost follows the shared canvas's size, not how much
-of it is shown. The proof of concept met none of this because only its stress test drew on the graphics card.
-**Both handovers are kept**, chosen through `SliceRendererInternalUtils.setHandover` on the internal entry and a
-checkbox in the Solid cell stress test — the user's call, not dead code: the Radeon is faster with `per_element`, and
-the M3 is about ten times slower with it, sizing or not — every 72-item stress test at 7–11 frames a second against
-80–100 for `shared`, the main thread blocked 90–150 ms a frame. `per_element` reports the shared canvas's size, so every component's canvas is that size,
-transparent past its own corner.
-**The two differ only in their ending** — the user's call. Both note the frame and draw it in the one pass per
-animation frame; `per_element` then hands each piece over as it is drawn, in the canvas's corner, and `shared` draws
-each into its rectangle and hands the whole over once. Until then `per_element` drew at the moment of asking, and its
-Radeon figures above were measured that way. The pass knows every piece's size, but `draw` has to answer with the size
-before the pass runs, so the "this frame or the one before" sizing stays. **Each noted frame keeps the ending it was
-asked under** (`Submission.alone`, the promised size), so a switch mid-frame hands each piece over the way its
-component was told and sized its canvas for.
+pieces** — the user's choice, after measuring. `item.draw` only takes note of the frame; one `requestAnimationFrame`
+per frame draws every noted component into its own rectangle of the shared canvas (laid out in rows, a second picture
+only if one would pass the graphics card's limit), hands it over with one `transferToImageBitmap`, and cuts each
+rectangle out with `createImageBitmap` for the component's `bitmaprenderer` canvas, which is sized to its piece. **The
+cost is one frame**: a picture shows one animation frame after the progress it was drawn for, since the four
+frameworks update the page at different moments and the renderer cannot know when the last component of a frame has
+asked. **So a component places and sizes its canvas only when `draw`'s `onShown` reports the picture landed**, never
+from what it just asked for: `ParticleSpawner`'s canvas follows its particles and moved a frame ahead of its picture,
+which showed late and stretched, as particles jumping.
+**Each cut-out asks `createImageBitmap` for its own size** (`resizeWidth`/`resizeHeight` equal to the cut), which
+scales nothing: a plain cut handed to a `bitmaprenderer` canvas shows Firefox the whole uncut picture, squeezed into the
+canvas, while asking for a size forces a real copy that it shows correctly. Checked headless in Firefox, with WebGL and
+with 2D sources alike; asking for `premultiplyAlpha: "none"` also works but changes how see-through edges are stored.
+**The copy is made in every browser, not only where the fault shows** — the user's call: Chrome got faster with it
+and a freshly launched Edge stayed level. A check choosing per browser is not wanted unless Safari's numbers argue for
+one.
+**Handing each component's picture over on its own was removed** — the user's call. It made the browser wait for the
+graphics card at every handover, so 72 components ran about ten times slower on an M3 Pro, in Safari and in Firefox.
+Its one advantage, about 1.6× on a Radeon RX 7900 XTX, was measured only in a Chromium drawing with its older engine;
+Chrome with Skia Graphite and Edge show no such gap, so it is not to come back for that number. A handover per item
+also needed the shared canvas sized to the largest item of the frame, every canvas that size, which the shared
+picture never did.
 **A canvas reaches past its box** by `computeReach`, which counts only what moves a slice past the box —
 travel, growth, turning, nearness under perspective, blur — because a first, generous bound made the scanline
 canvases six times their box and cost most of their frame rate. Its formula and the spawner's area step

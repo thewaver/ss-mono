@@ -14,7 +14,7 @@
         RGBAnimationStyles as styles,
     } from "@thewaver/ss-components";
     import { RGBAnimationConst } from "@thewaver/ss-components/internal";
-    import { MathUtils, Size2d } from "@thewaver/ss-utils";
+    import { MathUtils, Rect } from "@thewaver/ss-utils";
     import { assignInlineVars } from "@vanilla-extract/dynamic";
 
     import { ElementObserverSvelteUtils } from "../../../Abstracts/ElementObserver/ElementObserverSvelte.utils.svelte.js";
@@ -29,6 +29,7 @@
 
     const WHOLE_PASS = { half: 0.5, isDescending: false };
     const LINEAR = SliceRendererUtils.computeEasing(undefined);
+    const NO_RECT: Rect = { x: 0, y: 0, width: 0, height: 0 };
 
     const filterId = $props.id();
 
@@ -46,7 +47,7 @@
     let img = $state<HTMLImageElement>();
     let canvas = $state<HTMLCanvasElement>();
     let channels = $state<HTMLElement[]>([]);
-    let shownSize = $state.raw<Size2d>({ width: 0, height: 0 });
+    let shownRect = $state.raw<Rect>(NO_RECT);
     let currentIteration = $state(RGBAnimationConst.FIRST_ITERATION);
     let schemeMixing = $state<SVGColorMixing>(RGBAnimationUtils.readColorMixing(undefined));
 
@@ -171,7 +172,7 @@
             }
 
             const scale = window.devicePixelRatio * viewportContext.getScale();
-            const shown = item.draw({
+            item.draw({
                 mode: "slices",
                 src,
                 tables: currentTables,
@@ -186,10 +187,9 @@
                 isShown: true,
                 hasPerspective: true,
                 channelMixing,
+            }, (next) => {
+                if (!Rect.isSame(shownRect, next)) shownRect = next;
             });
-            const next = { width: shown.width / scale, height: shown.height / scale };
-
-            if (!Size2d.isSame(shownSize, next)) shownSize = next;
         });
     });
 
@@ -268,10 +268,10 @@
             <canvas
                 bind:this={canvas}
                 class={SliceRendererStyles.sliceRendererCanvas}
-                style:left={`${area.x}px`}
-                style:top={`${area.y}px`}
-                style:width={`${shownSize.width}px`}
-                style:height={`${shownSize.height}px`}
+                style:left={`${shownRect.x}px`}
+                style:top={`${shownRect.y}px`}
+                style:width={`${shownRect.width}px`}
+                style:height={`${shownRect.height}px`}
                 aria-hidden="true"
             ></canvas>
         </div>

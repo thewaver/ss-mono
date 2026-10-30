@@ -14,7 +14,7 @@ import {
     SliceRendererUtils,
 } from "@thewaver/ss-components";
 import { ParticleFieldConst } from "@thewaver/ss-components/internal";
-import { MathUtils, Size2d } from "@thewaver/ss-utils";
+import { MathUtils, Rect } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { ElementObserverReactUtils } from "../../../Abstracts/ElementObserver/ElementObserverReact.utils";
@@ -26,6 +26,7 @@ import { useLatest } from "../../../Utils/refUtils";
 import type { ParticleFieldProps } from "./ParticleField.types";
 
 const LINEAR = SliceRendererUtils.computeEasing(undefined);
+const NO_RECT: Rect = { x: 0, y: 0, width: 0, height: 0 };
 const NO_TABLES = { tables: [[]], tableIndices: [] };
 
 export const ParticleField = (props: ParticleFieldProps) => {
@@ -52,7 +53,7 @@ export const ParticleField = (props: ParticleFieldProps) => {
         ParticleFieldConst.NO_PROGRESS,
     );
     const [currentIteration, setCurrentIterationState] = useState(ParticleFieldConst.FIRST_ITERATION);
-    const [shownSize, setShownSize] = useState<Size2d>({ width: 0, height: 0 });
+    const [shownRect, setShownRect] = useState<Rect>(NO_RECT);
 
     const rootSize = ElementObserverReactUtils.useBorderBoxSize(rootRef);
 
@@ -229,26 +230,26 @@ export const ParticleField = (props: ParticleFieldProps) => {
         if (!item || !isOnGraphicsCard) return;
 
         const scale = window.devicePixelRatio * viewportContext.getScale();
-        const shown = item.draw({
-            mode: "particles",
-            src: latest.current.props.src,
-            tables: tables?.tables ?? [],
-            easing: LINEAR,
-            slices: rendererSlices,
-            size: rootSize,
-            area,
-            scale,
-            timeline: 0,
-            half: 0,
-            isDescending: false,
-            isShown: true,
-            hasPerspective: false,
-            clockMs,
-            lifetimeMs,
-        });
-        const next = { width: shown.width / scale, height: shown.height / scale };
-
-        setShownSize((previous) => (Size2d.isSame(previous, next) ? previous : next));
+        item.draw(
+            {
+                mode: "particles",
+                src: latest.current.props.src,
+                tables: tables?.tables ?? [],
+                easing: LINEAR,
+                slices: rendererSlices,
+                size: rootSize,
+                area,
+                scale,
+                timeline: 0,
+                half: 0,
+                isDescending: false,
+                isShown: true,
+                hasPerspective: false,
+                clockMs,
+                lifetimeMs,
+            },
+            (next) => setShownRect((previous) => (Rect.isSame(previous, next) ? previous : next)),
+        );
     }, [item, isOnGraphicsCard, tables, rendererSlices, rootSize, area, clockMs, lifetimeMs, picture]);
 
     useEffect(() => {
@@ -285,10 +286,10 @@ export const ParticleField = (props: ParticleFieldProps) => {
                     ref={canvasRef}
                     className={SliceRendererStyles.sliceRendererCanvas}
                     style={{
-                        left: `${area.x}px`,
-                        top: `${area.y}px`,
-                        width: `${shownSize.width}px`,
-                        height: `${shownSize.height}px`,
+                        left: `${shownRect.x}px`,
+                        top: `${shownRect.y}px`,
+                        width: `${shownRect.width}px`,
+                        height: `${shownRect.height}px`,
                     }}
                     aria-hidden="true"
                 />

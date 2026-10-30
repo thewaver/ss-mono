@@ -106,6 +106,7 @@ The reasoning that would have gone into paragraphs goes into the documents, wher
 
 - **Surface one at a time.** They often work by voice and read in short bursts; a bundle means none land. Say there
   are N pending and present the first, **each headed _"Question X of Y"_** so they know how far through they are.
+  **A lone question carries no heading** — the user's correction; the count only helps when there are two or more.
 - **Settle every one before doing any of the work** — _"we settle work decisions, then sweep"_. An answer to one
   question is not a go-ahead while another is open.
 - **No work starts while one is pending — not even a fix on sight; a fault goes first, as a question.** While Claude

@@ -9,7 +9,7 @@ import {
     SliceRendererUtils,
 } from "@thewaver/ss-components";
 import { CellAnimationConst } from "@thewaver/ss-components/internal";
-import { MathUtils, Size2d } from "@thewaver/ss-utils";
+import { MathUtils, Rect } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { ElementObserverReactUtils } from "../../../Abstracts/ElementObserver/ElementObserverReact.utils";
@@ -19,6 +19,8 @@ import { SliceRendererReactUtils } from "../../../Abstracts/SliceRenderer/SliceR
 import { useViewportContext } from "../../../Abstracts/Viewport/Viewport.context";
 import { useLatest } from "../../../Utils/refUtils";
 import type { CellAnimationProps } from "./CellAnimation.types";
+
+const NO_RECT: Rect = { x: 0, y: 0, width: 0, height: 0 };
 
 export const CellAnimation = (props: CellAnimationProps) => {
     const durationMs = props.animationDurationMs ?? CELL_ANIMATION_DEFAULTS.animationDurationMs;
@@ -45,7 +47,7 @@ export const CellAnimation = (props: CellAnimationProps) => {
         CellAnimationConst.NO_PROGRESS,
     );
     const [currentIteration, setCurrentIterationState] = useState(CellAnimationConst.FIRST_ITERATION);
-    const [shownSize, setShownSize] = useState<Size2d>({ width: 0, height: 0 });
+    const [shownRect, setShownRect] = useState<Rect>(NO_RECT);
 
     const rootSize = ElementObserverReactUtils.useBorderBoxSize(imgRef);
 
@@ -222,24 +224,24 @@ export const CellAnimation = (props: CellAnimationProps) => {
 
         const scale = window.devicePixelRatio * viewportContext.getScale();
         const sliceWindow = SliceAnimationUtils.computeWindow(timing);
-        const shown = item.draw({
-            mode: "slices",
-            src: current.props.src,
-            tables: tables?.tables ?? [],
-            easing,
-            slices: rendererSlices,
-            size: rootSize,
-            area,
-            scale,
-            timeline: timing.globalTimeline,
-            half: sliceWindow.half,
-            isDescending: sliceWindow.isDescending,
-            isShown: areCellsMounted,
-            hasPerspective: true,
-        });
-        const next = { width: shown.width / scale, height: shown.height / scale };
-
-        setShownSize((previous) => (Size2d.isSame(previous, next) ? previous : next));
+        item.draw(
+            {
+                mode: "slices",
+                src: current.props.src,
+                tables: tables?.tables ?? [],
+                easing,
+                slices: rendererSlices,
+                size: rootSize,
+                area,
+                scale,
+                timeline: timing.globalTimeline,
+                half: sliceWindow.half,
+                isDescending: sliceWindow.isDescending,
+                isShown: areCellsMounted,
+                hasPerspective: true,
+            },
+            (next) => setShownRect((previous) => (Rect.isSame(previous, next) ? previous : next)),
+        );
     }, [
         item,
         progress,
@@ -330,10 +332,10 @@ export const CellAnimation = (props: CellAnimationProps) => {
                         ref={canvasRef}
                         className={SliceRendererStyles.sliceRendererCanvas}
                         style={{
-                            left: `${area.x}px`,
-                            top: `${area.y}px`,
-                            width: `${shownSize.width}px`,
-                            height: `${shownSize.height}px`,
+                            left: `${shownRect.x}px`,
+                            top: `${shownRect.y}px`,
+                            width: `${shownRect.width}px`,
+                            height: `${shownRect.height}px`,
                         }}
                         aria-hidden="true"
                     />

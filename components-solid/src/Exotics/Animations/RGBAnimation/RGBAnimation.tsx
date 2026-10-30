@@ -24,7 +24,7 @@ import {
     RGBAnimationStyles as styles,
 } from "@thewaver/ss-components";
 import { RGBAnimationConst } from "@thewaver/ss-components/internal";
-import { MathUtils, Size2d } from "@thewaver/ss-utils";
+import { MathUtils, Rect, Size2d } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { SignalMirrorSolidUtils } from "../../../Abstracts/SignalMirror/SignalMirrorSolid.utils";
@@ -35,6 +35,7 @@ import type { RGBAnimationProps } from "./RGBAnimationSolid.types";
 
 const WHOLE_PASS = { half: 0.5, isDescending: false };
 const LINEAR = SliceRendererUtils.computeEasing(undefined);
+const NO_RECT: Rect = { x: 0, y: 0, width: 0, height: 0 };
 
 export const RGBAnimation = (props: RGBAnimationProps) => {
     const filterId = createUniqueId();
@@ -74,7 +75,7 @@ export const RGBAnimation = (props: RGBAnimationProps) => {
     const [getChannelRefs, setChannelRefs] = createSignal<HTMLElement[]>([], { equals: false });
     const [getIsMounted, setIsMounted] = createSignal(false);
     const [getCanvasRef, setCanvasRef] = createSignal<HTMLCanvasElement>();
-    const [getShownSize, setShownSize] = createSignal<Size2d>({ width: 0, height: 0 }, { equals: Size2d.isSame });
+    const [getShownRect, setShownRect] = createSignal<Rect>(NO_RECT, { equals: Rect.isSame });
 
     const getHasEnded = createMemo(() => getCurrentIteration() >= getAnimationIterationCount());
 
@@ -193,24 +194,25 @@ export const RGBAnimation = (props: RGBAnimationProps) => {
             }
 
             const scale = window.devicePixelRatio * viewportContext.getScale();
-            const shown = item.draw({
-                mode: "slices",
-                src: getSource(),
-                tables,
-                easing: LINEAR,
-                slices,
-                size,
-                area,
-                scale,
-                timeline,
-                half: WHOLE_PASS.half,
-                isDescending: WHOLE_PASS.isDescending,
-                isShown: true,
-                hasPerspective: true,
-                channelMixing,
-            });
-
-            setShownSize({ width: shown.width / scale, height: shown.height / scale });
+            item.draw(
+                {
+                    mode: "slices",
+                    src: getSource(),
+                    tables,
+                    easing: LINEAR,
+                    slices,
+                    size,
+                    area,
+                    scale,
+                    timeline,
+                    half: WHOLE_PASS.half,
+                    isDescending: WHOLE_PASS.isDescending,
+                    isShown: true,
+                    hasPerspective: true,
+                    channelMixing,
+                },
+                setShownRect,
+            );
         });
     });
 
@@ -330,10 +332,10 @@ export const RGBAnimation = (props: RGBAnimationProps) => {
                         ref={setCanvasRef}
                         class={SliceRendererStyles.sliceRendererCanvas}
                         style={{
-                            left: `${getArea().x}px`,
-                            top: `${getArea().y}px`,
-                            width: `${getShownSize().width}px`,
-                            height: `${getShownSize().height}px`,
+                            left: `${getShownRect().x}px`,
+                            top: `${getShownRect().y}px`,
+                            width: `${getShownRect().width}px`,
+                            height: `${getShownRect().height}px`,
                         }}
                         aria-hidden="true"
                     />

@@ -10,7 +10,7 @@ import {
     CellAnimationStyles as styles,
 } from "@thewaver/ss-components";
 import { CellAnimationConst } from "@thewaver/ss-components/internal";
-import { type Index2d, MathUtils, Size2d } from "@thewaver/ss-utils";
+import { type Index2d, MathUtils, Rect, Size2d } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { SignalMirrorSolidUtils } from "../../../Abstracts/SignalMirror/SignalMirrorSolid.utils";
@@ -18,6 +18,8 @@ import { SliceRendererSolidUtils } from "../../../Abstracts/SliceRenderer/SliceR
 import { useViewportContext } from "../../../Abstracts/Viewport/Viewport.context";
 import { access } from "../../../Utils/propUtils";
 import type { CellAnimationProps } from "./CellAnimationSolid.types";
+
+const NO_RECT: Rect = { x: 0, y: 0, width: 0, height: 0 };
 
 export const CellAnimation = (props: CellAnimationProps) => {
     const viewportContext = useViewportContext();
@@ -63,7 +65,7 @@ export const CellAnimation = (props: CellAnimationProps) => {
     const [getCellRefs, setCellRefs] = createSignal<HTMLElement[]>([], { equals: false });
     const [getCurrentIteration, setCurrentIteration] = createSignal(0);
     const [getRootSize, setRootSize] = createSignal<Size2d>({ width: 0, height: 0 }, { equals: Size2d.isSame });
-    const [getShownSize, setShownSize] = createSignal<Size2d>({ width: 0, height: 0 }, { equals: Size2d.isSame });
+    const [getShownRect, setShownRect] = createSignal<Rect>(NO_RECT, { equals: Rect.isSame });
 
     const getCellCount = createMemo(
         () => CellAnimationUtils.computeCellCount(access(props.cellCount), getRootSize()),
@@ -242,23 +244,24 @@ export const CellAnimation = (props: CellAnimationProps) => {
 
             const scale = window.devicePixelRatio * viewportContext.getScale();
             const sliceWindow = SliceAnimationUtils.computeWindow(timing);
-            const shown = item.draw({
-                mode: "slices",
-                src: getSource(),
-                tables,
-                easing,
-                slices,
-                size,
-                area,
-                scale,
-                timeline: timing.globalTimeline,
-                half: sliceWindow.half,
-                isDescending: sliceWindow.isDescending,
-                isShown,
-                hasPerspective: true,
-            });
-
-            setShownSize({ width: shown.width / scale, height: shown.height / scale });
+            item.draw(
+                {
+                    mode: "slices",
+                    src: getSource(),
+                    tables,
+                    easing,
+                    slices,
+                    size,
+                    area,
+                    scale,
+                    timeline: timing.globalTimeline,
+                    half: sliceWindow.half,
+                    isDescending: sliceWindow.isDescending,
+                    isShown,
+                    hasPerspective: true,
+                },
+                setShownRect,
+            );
         });
     });
 
@@ -366,10 +369,10 @@ export const CellAnimation = (props: CellAnimationProps) => {
                         ref={setCanvasRef}
                         class={SliceRendererStyles.sliceRendererCanvas}
                         style={{
-                            left: `${getArea().x}px`,
-                            top: `${getArea().y}px`,
-                            width: `${getShownSize().width}px`,
-                            height: `${getShownSize().height}px`,
+                            left: `${getShownRect().x}px`,
+                            top: `${getShownRect().y}px`,
+                            width: `${getShownRect().width}px`,
+                            height: `${getShownRect().height}px`,
                         }}
                         aria-hidden="true"
                     />

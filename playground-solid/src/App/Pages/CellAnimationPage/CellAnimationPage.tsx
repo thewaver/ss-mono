@@ -19,7 +19,6 @@ import type {
     SliceAnimationPlaybackOpts,
     WeightOpts,
 } from "@thewaver/ss-components-solid";
-import { SliceRendererInternalUtils } from "@thewaver/ss-components/internal";
 import { CellAnimationKnobs } from "@thewaver/ss-playground/App/Knobs/CellAnimations.const";
 import {
     DEFAULT_EXAMPLE_PATH,
@@ -112,9 +111,6 @@ const StressTestWrapper = (
     const modalPlayback = createSignal(true);
 
     const [getIsOnGraphicsCard, setIsOnGraphicsCard] = createSignal(true);
-    const [getIsHandoverPerElement, setIsHandoverPerElement] = createSignal(
-        SliceRendererInternalUtils.getHandover() === "per_element",
-    );
 
     return (
         <>
@@ -133,24 +129,6 @@ const StressTestWrapper = (
                         value={getIsOnGraphicsCard}
                         ariaLabel={"On the graphics card"}
                         onChange={setIsOnGraphicsCard}
-                    />
-                </PageProp>
-
-                <PageProp
-                    key={"handoverPerElement"}
-                    label={"Hand over each element"}
-                    hint={
-                        "Every element is drawn together once a frame either way. On, each element's picture is handed to its canvas the moment it is drawn; off, one shared picture is handed over and each element's piece is cut out of it."
-                    }
-                    controls={"Sets how the graphics card hands pictures over, for every animation on the page"}
-                >
-                    <PageCheckField
-                        value={getIsHandoverPerElement}
-                        ariaLabel={"Hand over each element"}
-                        onChange={(isPerElement) => {
-                            SliceRendererInternalUtils.setHandover(isPerElement ? "per_element" : "shared");
-                            setIsHandoverPerElement(isPerElement);
-                        }}
                     />
                 </PageProp>
             </PagePropsPanel>

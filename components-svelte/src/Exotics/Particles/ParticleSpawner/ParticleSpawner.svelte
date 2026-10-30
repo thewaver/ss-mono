@@ -34,6 +34,7 @@
 
     const LINEAR = SliceRendererUtils.computeEasing(undefined);
     const NO_AREA: Rect = { x: 0, y: 0, width: 1, height: 1 };
+    const NO_RECT: Rect = { x: 0, y: 0, width: 0, height: 0 };
     const UNUSED_SIZE: Size2d = { width: 1, height: 1 };
 
     const travelDurationMs = $derived(props.travelDurationMs ?? PARTICLE_SPAWNER_DEFAULTS.travelDurationMs);
@@ -50,8 +51,8 @@
     let root = $state<HTMLDivElement>();
     let canvas = $state<HTMLCanvasElement>();
     let stage = $state.raw({ index: ParticleSpawnerConst.FIRST_STAGE });
-    let area = $state.raw<Rect>(NO_AREA);
-    let shownSize = $state.raw<Size2d>({ width: 0, height: 0 });
+    let drawnArea: Rect | undefined;
+    let shownRect = $state.raw<Rect>(NO_RECT);
 
     const elements = new Map<number, HTMLElement>();
     const bodies = new Map<number, HTMLElement>();
@@ -142,10 +143,9 @@
         if (!item) return;
 
         const size = particleSize;
-        const current = area;
         const slices: SliceRendererSlice[] = [];
 
-        let nextArea: Rect | undefined = current === NO_AREA ? undefined : current;
+        let nextArea = drawnArea;
 
         for (const particle of getParticles()) {
             const entry = placed.get(particle.id);
@@ -172,29 +172,26 @@
             });
         }
 
-        const shownArea = slices.length === 0 || !nextArea ? NO_AREA : nextArea;
-
-        if (!Rect.isSame(shownArea, current)) area = shownArea;
+        drawnArea = slices.length === 0 ? undefined : nextArea;
 
         const scale = window.devicePixelRatio * viewportContext.getScale();
-        const shown = item.draw({
+        item.draw({
             mode: "direct",
             src: props.src,
             tables: [],
             easing: LINEAR,
             slices,
             size: UNUSED_SIZE,
-            area: shownArea,
+            area: drawnArea ?? NO_AREA,
             scale,
             timeline: 0,
             half: 0,
             isDescending: false,
             isShown: slices.length > 0,
             hasPerspective: false,
+        }, (next) => {
+            if (!Rect.isSame(shownRect, next)) shownRect = next;
         });
-        const next = { width: shown.width / scale, height: shown.height / scale };
-
-        if (!Size2d.isSame(shownSize, next)) shownSize = next;
     };
 
     const engine = ParticleSpawnerUtils.createEngine({
@@ -352,10 +349,10 @@
         <canvas
             bind:this={canvas}
             class={SliceRendererStyles.sliceRendererCanvas}
-            style:left={`${area.x}px`}
-            style:top={`${area.y}px`}
-            style:width={`${shownSize.width}px`}
-            style:height={`${shownSize.height}px`}
+            style:left={`${shownRect.x}px`}
+            style:top={`${shownRect.y}px`}
+            style:width={`${shownRect.width}px`}
+            style:height={`${shownRect.height}px`}
             aria-hidden="true"
         ></canvas>
     {:else}

@@ -30,6 +30,7 @@ import type { ParticleSpawnerProps } from "./ParticleSpawner.types";
 
 const LINEAR = SliceRendererUtils.computeEasing(undefined);
 const NO_AREA: Rect = { x: 0, y: 0, width: 1, height: 1 };
+const NO_RECT: Rect = { x: 0, y: 0, width: 0, height: 0 };
 const UNUSED_SIZE: Size2d = { width: 1, height: 1 };
 
 type Placed = { defs: ParticleTravelDefs; pos: Point2d; t: number };
@@ -54,12 +55,11 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
     const standRef = useRef(new Map<number, HTMLElement>());
     const placedRef = useRef(new Map<number, Placed>());
     const tintsRef = useRef(new Map<number, string | undefined>());
-    const areaRef = useRef(NO_AREA);
+    const drawnAreaRef = useRef<Rect>(undefined);
 
     const [isPlaying] = SignalMirrorReactUtils.useOptionalState(props.playback, true);
     const [stage, setStage] = useState({ index: ParticleSpawnerConst.FIRST_STAGE });
-    const [area, setArea] = useState(NO_AREA);
-    const [shownSize, setShownSize] = useState<Size2d>({ width: 0, height: 0 });
+    const [shownRect, setShownRect] = useState<Rect>(NO_RECT);
 
     const isWindowVisible = !InteractionTrackerReactUtils.usePageHidden();
     const prefersReducedMotion = MediaQueryMonitorReactUtils.useReducedMotion();
@@ -151,10 +151,9 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
             if (!item) return;
 
             const size = current.particleSize;
-            const previous = areaRef.current;
             const slices: SliceRendererSlice[] = [];
 
-            let grown: Rect | undefined = previous === NO_AREA ? undefined : previous;
+            let grown = drawnAreaRef.current;
 
             for (const particle of engine.particles.get()) {
                 const entry = placedRef.current.get(particle.id);
@@ -181,32 +180,27 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
                 });
             }
 
-            const shownArea = slices.length === 0 || !grown ? NO_AREA : grown;
-
-            if (!Rect.isSame(shownArea, previous)) {
-                areaRef.current = shownArea;
-                setArea(shownArea);
-            }
+            drawnAreaRef.current = slices.length === 0 ? undefined : grown;
 
             const scale = window.devicePixelRatio * current.viewportContext.getScale();
-            const shown = item.draw({
-                mode: "direct",
-                src: current.props.src,
-                tables: [],
-                easing: LINEAR,
-                slices,
-                size: UNUSED_SIZE,
-                area: shownArea,
-                scale,
-                timeline: 0,
-                half: 0,
-                isDescending: false,
-                isShown: slices.length > 0,
-                hasPerspective: false,
-            });
-            const next = { width: shown.width / scale, height: shown.height / scale };
-
-            setShownSize((last) => (Size2d.isSame(last, next) ? last : next));
+            item.draw(
+                {
+                    mode: "direct",
+                    src: current.props.src,
+                    tables: [],
+                    easing: LINEAR,
+                    slices,
+                    size: UNUSED_SIZE,
+                    area: drawnAreaRef.current ?? NO_AREA,
+                    scale,
+                    timeline: 0,
+                    half: 0,
+                    isDescending: false,
+                    isShown: slices.length > 0,
+                    hasPerspective: false,
+                },
+                (next) => setShownRect((last) => (Rect.isSame(last, next) ? last : next)),
+            );
         };
 
         const engine = ParticleSpawnerUtils.createEngine({
@@ -320,10 +314,10 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
                     ref={canvasRef}
                     className={SliceRendererStyles.sliceRendererCanvas}
                     style={{
-                        left: `${area.x}px`,
-                        top: `${area.y}px`,
-                        width: `${shownSize.width}px`,
-                        height: `${shownSize.height}px`,
+                        left: `${shownRect.x}px`,
+                        top: `${shownRect.y}px`,
+                        width: `${shownRect.width}px`,
+                        height: `${shownRect.height}px`,
                     }}
                     aria-hidden="true"
                 />

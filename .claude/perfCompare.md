@@ -12,7 +12,10 @@ missing.
 
 The Solid Playground's stress tests, in a real Chrome window on this machine's graphics card: each test three times on
 each version, the middle result kept, the first 100 ms of each recording left out as a warm-up. Per test: frames a
-second, and the main thread's busy time per frame. The
+second, and the main thread's busy time per frame. **The cell and scanline tests run in constant motion**: the
+script sets the iteration delay (and the cells' hold) to 0, so every frame redraws everything, and a page left at its
+defaults pauses between passes and reads far higher on its counter — 168 against 98 for the same 2D zoom on the
+Radeon. Compare a hand-opened page with the script's numbers only after zeroing those knobs. The
 dissolve is measured only by its 20-card stress test at 4 px cells — a larger cell size does not load the browser
 enough to mean anything, and the user dropped the single-Card test as pointless.
 
@@ -80,11 +83,6 @@ under 6 frames a second.
     its own `renderParticle` and `computeAshAnimation`), its card badge lacks the `marginTop` that makes the card 200 px
     tall rather than 190, and its spawner stress test is 96 boxes of 120 × 80 rather than 72 squares of 120 in a
     `PageMeasureBox`. Diff the export's Playground against the latest for anything newer before trusting a result.
-    **To compare the renderer's two handovers on one version**, export it twice and, in one copy, set
-    `DEFAULT_HANDOVER` in `components/src/Abstracts/SliceRenderer/SliceRenderer.internal.utils.ts` to `"per_element"`
-    — the Playground's switch exists only on the cell stress test, and each run loads a fresh page. Check each build's
-    `SliceRendererSolid.utils-*.js` for the default it bundled. "Before" is then `shared` and "after" `per_element`.
-
     **The old version keeps its own stress-test backdrop and modal styling** — the user's call: its blurred
     `ModalOverlay`, `ModalPanel` and `DrawerPanel` stay, and today's opaque overlay is not ported.
 

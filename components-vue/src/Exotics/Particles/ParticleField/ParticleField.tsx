@@ -14,7 +14,7 @@ import {
     SliceRendererUtils,
 } from "@thewaver/ss-components";
 import { ParticleFieldConst } from "@thewaver/ss-components/internal";
-import { type Index2d, MathUtils, Size2d } from "@thewaver/ss-utils";
+import { type Index2d, MathUtils, Rect } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { ElementObserverVueUtils } from "../../../Abstracts/ElementObserver/ElementObserverVue.utils";
@@ -26,6 +26,7 @@ import { declareProps, useTwoWay } from "../../../Utils/propUtils";
 import type { ParticleFieldProps } from "./ParticleField.types";
 
 const LINEAR = SliceRendererUtils.computeEasing(undefined);
+const NO_RECT: Rect = { x: 0, y: 0, width: 0, height: 0 };
 const NO_TABLES = { tables: [[]], tableIndices: [] };
 const NO_PARTICLES: ParticleFieldParticle[] = [];
 
@@ -51,7 +52,7 @@ export const ParticleField = defineComponent(
         const isPlaying = useTwoWay(props, "playback", true);
         const progress = useTwoWay(props, "progress", ParticleFieldConst.NO_PROGRESS);
         const currentIteration = shallowRef(ParticleFieldConst.FIRST_ITERATION);
-        const shownSize = shallowRef<Size2d>({ width: 0, height: 0 });
+        const shownRect = shallowRef<Rect>(NO_RECT);
 
         const rootSize = ElementObserverVueUtils.useBorderBoxSize(rootRef);
 
@@ -239,26 +240,28 @@ export const ParticleField = defineComponent(
                 }
 
                 const scale = window.devicePixelRatio * viewportContext.getScale();
-                const shown = currentItem.draw({
-                    mode: "particles",
-                    src: props.src,
-                    tables: tables.value?.tables ?? [],
-                    easing: LINEAR,
-                    slices: rendererSlices,
-                    size,
-                    area: currentArea,
-                    scale,
-                    timeline: 0,
-                    half: 0,
-                    isDescending: false,
-                    isShown: true,
-                    hasPerspective: false,
-                    clockMs: clock,
-                    lifetimeMs: getLifetimeMs(),
-                });
-                const next = { width: shown.width / scale, height: shown.height / scale };
-
-                if (!Size2d.isSame(shownSize.value, next)) shownSize.value = next;
+                currentItem.draw(
+                    {
+                        mode: "particles",
+                        src: props.src,
+                        tables: tables.value?.tables ?? [],
+                        easing: LINEAR,
+                        slices: rendererSlices,
+                        size,
+                        area: currentArea,
+                        scale,
+                        timeline: 0,
+                        half: 0,
+                        isDescending: false,
+                        isShown: true,
+                        hasPerspective: false,
+                        clockMs: clock,
+                        lifetimeMs: getLifetimeMs(),
+                    },
+                    (next) => {
+                        if (!Rect.isSame(shownRect.value, next)) shownRect.value = next;
+                    },
+                );
             },
         );
 
@@ -302,10 +305,10 @@ export const ParticleField = defineComponent(
                         ref={canvasRef}
                         class={SliceRendererStyles.sliceRendererCanvas}
                         style={{
-                            left: `${area.value.x}px`,
-                            top: `${area.value.y}px`,
-                            width: `${shownSize.value.width}px`,
-                            height: `${shownSize.value.height}px`,
+                            left: `${shownRect.value.x}px`,
+                            top: `${shownRect.value.y}px`,
+                            width: `${shownRect.value.width}px`,
+                            height: `${shownRect.value.height}px`,
                         }}
                         aria-hidden="true"
                     />

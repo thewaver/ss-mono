@@ -9,7 +9,7 @@ import {
     SliceRendererUtils,
 } from "@thewaver/ss-components";
 import { CellAnimationConst } from "@thewaver/ss-components/internal";
-import { type Index2d, MathUtils, Size2d } from "@thewaver/ss-utils";
+import { type Index2d, MathUtils, Rect } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { ElementObserverVueUtils } from "../../../Abstracts/ElementObserver/ElementObserverVue.utils";
@@ -19,6 +19,8 @@ import { useViewportContext } from "../../../Abstracts/Viewport/Viewport.context
 import { watchAfterRender } from "../../../Utils/effectUtils";
 import { declareProps, useTwoWay } from "../../../Utils/propUtils";
 import type { CellAnimationProps } from "./CellAnimation.types";
+
+const NO_RECT: Rect = { x: 0, y: 0, width: 0, height: 0 };
 
 export const CellAnimation = defineComponent(
     (props: CellAnimationProps) => {
@@ -42,7 +44,7 @@ export const CellAnimation = defineComponent(
         const isPlaying = useTwoWay(props, "playback", true);
         const progress = useTwoWay(props, "progress", CellAnimationConst.NO_PROGRESS);
         const currentIteration = shallowRef(CellAnimationConst.FIRST_ITERATION);
-        const shownSize = shallowRef<Size2d>({ width: 0, height: 0 });
+        const shownRect = shallowRef<Rect>(NO_RECT);
 
         const rootSize = ElementObserverVueUtils.useBorderBoxSize(imgRef);
         const rootWidth = computed(() => rootSize.value.width);
@@ -225,24 +227,26 @@ export const CellAnimation = defineComponent(
 
                 const scale = window.devicePixelRatio * viewportContext.getScale();
                 const sliceWindow = SliceAnimationUtils.computeWindow(currentTiming);
-                const shown = currentItem.draw({
-                    mode: "slices",
-                    src: props.src,
-                    tables: currentTables?.tables ?? [],
-                    easing: currentEasing,
-                    slices: currentSlices,
-                    size,
-                    area: currentArea,
-                    scale,
-                    timeline: currentTiming.globalTimeline,
-                    half: sliceWindow.half,
-                    isDescending: sliceWindow.isDescending,
-                    isShown,
-                    hasPerspective: true,
-                });
-                const next = { width: shown.width / scale, height: shown.height / scale };
-
-                if (!Size2d.isSame(shownSize.value, next)) shownSize.value = next;
+                currentItem.draw(
+                    {
+                        mode: "slices",
+                        src: props.src,
+                        tables: currentTables?.tables ?? [],
+                        easing: currentEasing,
+                        slices: currentSlices,
+                        size,
+                        area: currentArea,
+                        scale,
+                        timeline: currentTiming.globalTimeline,
+                        half: sliceWindow.half,
+                        isDescending: sliceWindow.isDescending,
+                        isShown,
+                        hasPerspective: true,
+                    },
+                    (next) => {
+                        if (!Rect.isSame(shownRect.value, next)) shownRect.value = next;
+                    },
+                );
             },
         );
 
@@ -300,10 +304,10 @@ export const CellAnimation = defineComponent(
                                 ref={canvasRef}
                                 class={SliceRendererStyles.sliceRendererCanvas}
                                 style={{
-                                    left: `${area.value.x}px`,
-                                    top: `${area.value.y}px`,
-                                    width: `${shownSize.value.width}px`,
-                                    height: `${shownSize.value.height}px`,
+                                    left: `${shownRect.value.x}px`,
+                                    top: `${shownRect.value.y}px`,
+                                    width: `${shownRect.value.width}px`,
+                                    height: `${shownRect.value.height}px`,
                                 }}
                                 aria-hidden="true"
                             />
