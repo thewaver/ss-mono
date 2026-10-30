@@ -3,7 +3,9 @@ import { computed, shallowRef, useModel } from "vue";
 
 import {
     STRESS_CELL_COUNT,
+    STRESS_HOLD_MS,
     STRESS_ITEMS,
+    STRESS_ITERATION_DELAY_MS,
 } from "@thewaver/ss-playground/App/Pages/CellAnimationPage/CellAnimationPage.const";
 
 import PageCheckField from "../../PageComponents/Field/PageCheckField.vue";
@@ -34,6 +36,8 @@ const sharedProps = computed(() => {
 
     return shared;
 });
+
+const stressPlaybackOpts = computed(() => ({ ...props.playbackOpts, holdMs: STRESS_HOLD_MS }));
 
 const resume = () => {
     playback.value = true;
@@ -69,6 +73,8 @@ const pause = () => {
             <PageMeasureBox :width="computeWidth(STRESS_ITEMS[configIndex].size)">
                 <DefaultExample
                     v-bind="sharedProps"
+                    :playback-opts="stressPlaybackOpts"
+                    :animation-iteration-delay-ms="STRESS_ITERATION_DELAY_MS"
                     v-model:playback="modalPlayback"
                     :cell-count="STRESS_CELL_COUNT"
                     :renderer="isOnGraphicsCard ? 'graphics_card' : 'elements'"

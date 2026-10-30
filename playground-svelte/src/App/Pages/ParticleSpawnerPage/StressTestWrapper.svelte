@@ -7,7 +7,11 @@
     import type { StressTestDefs } from "../../PageComponents/StressTest/StressTextSvelte.types";
     import SingleTargetExample from "./Examples/SingleTarget.svelte";
     import type { ParticleSpawnerExampleProps } from "./ParticleSpawnerPage.types";
-    import { STRESS_ITEM_SIZE } from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.const";
+    import {
+        STRESS_ITEM_SIZE,
+        STRESS_PARTICLE_COUNT,
+        STRESS_SPAWN_DELAY_MS,
+    } from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.const";
 
     const STRESS_ITEMS: (StressTestDefs & { size: number })[] = [
         { count: 4 * 3, cols: 4, gap: 10, size: STRESS_ITEM_SIZE },
@@ -56,6 +60,8 @@
         <PageMeasureBox width={STRESS_ITEMS[configIndex].size} height={STRESS_ITEMS[configIndex].size}>
             <SingleTargetExample
                 {...props}
+                particleCount={STRESS_PARTICLE_COUNT}
+                spawnDelayMs={STRESS_SPAWN_DELAY_MS}
                 bind:playback={modalPlayback}
                 renderer={isOnGraphicsCard ? "graphics_card" : "elements"}
             />

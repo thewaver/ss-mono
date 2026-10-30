@@ -13,6 +13,8 @@ import {
     ITERATION_PATTERN_KEYS,
     NO_TRAVEL_DEFS,
     STRESS_ITEMS,
+    STRESS_PARTICLE_COUNT,
+    STRESS_SPAWN_DELAY_MS,
     TRAVEL_EASING_FNS,
     TRAVEL_EASING_KEYS,
     TRAVEL_PATTERN_FACTORIES,
@@ -77,6 +79,8 @@ const StressTestWrapper = (props: ParticleSpawnerExampleProps) => {
                     <PageMeasureBox width={STRESS_ITEMS[configIndex].size} height={STRESS_ITEMS[configIndex].size}>
                         <SingleTargetExample
                             {...props}
+                            particleCount={STRESS_PARTICLE_COUNT}
+                            spawnDelayMs={STRESS_SPAWN_DELAY_MS}
                             playback={modalPlayback}
                             renderer={isOnGraphicsCard ? "graphics_card" : "elements"}
                         />

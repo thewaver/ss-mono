@@ -9408,6 +9408,9 @@ Its one advantage, about 1.6× on a Radeon RX 7900 XTX, was measured only in a C
 Chrome with Skia Graphite and Edge show no such gap, so it is not to come back for that number. A handover per item
 also needed the shared canvas sized to the largest item of the frame, every canvas that size, which the shared
 picture never did.
+**A frame's `tables` and `easing` are compared by identity**, and a new one is converted and uploaded again, so a
+component passes the same array every frame — a constant where it has none (`ParticleSpawner`'s `NO_TABLES`): a fresh
+`[]` per frame re-uploaded 72 times a frame in the spawner stress test.
 **A canvas reaches past its box** by `computeReach`, which counts only what moves a slice past the box —
 travel, growth, turning, nearness under perspective, blur — because a first, generous bound made the scanline
 canvases six times their box and cost most of their frame rate. Its formula and the spawner's area step
@@ -20776,6 +20779,11 @@ From the same profiling, under the user's rule above. Each spawner used to run t
 - **The view measures inside `getFrame`** rather than keeping observers, since the engine calls it only in the frame's reading half. `getCanSpawn` asks whether the spawner is on the page rather than whether it has been measured, and `drawParticle` places a particle against the boxes the last frame read, so a view drawing from a ref callback does not measure in the middle of its own commit.
 - Measured at 96 spawners with the popup blur off: forced layouts 8.4 → 1.4 a frame, main thread 17–20 → 16 ms, 44–47 → 49 frames a second. Measuring calls went from about 250 to 194 a frame, two per active spawner, because the page's own examples paused behind the popup stopped measuring.
 - **Solid's view only, until ported**: the React, Vue and Svelte views still keep their two observers and hand the readings through `getFrame`, which is correct and still measures while idle.
+- **Targets are measured every frame a round is in flight, and no prop says they hold still** — the user's call, for the
+  reason popovers measure their anchors: a consumer cannot be trusted to know a target is truly static, and a CSS
+  animation moving one reports nothing. Measuring is about 8% of the 72-spawner stress test and nothing on an ordinary
+  page.
+- **A view drawing on the graphics card says so through `getIsDrawingElements`**, and the engine then asks for no element and writes no position: each view used to hand it stand-in objects to receive a CSS `translate` per particle per frame that nothing showed, 7% of the spawner stress test's work. Target centers are worked out once a frame, not once per particle.
 
 ### `ParticleSpawner`: `emit` sends a round alongside playback, and that is what makes a relay
 

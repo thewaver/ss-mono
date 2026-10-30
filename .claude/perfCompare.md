@@ -12,12 +12,14 @@ missing.
 
 The Solid Playground's stress tests, in a real Chrome window on this machine's graphics card: each test three times on
 each version, the middle result kept, the first 100 ms of each recording left out as a warm-up. Per test: frames a
-second, and the main thread's busy time per frame. **The cell and scanline tests run in constant motion**: the
-script sets the iteration delay (and the cells' hold) to 0, so every frame redraws everything, and a page left at its
-defaults pauses between passes and reads far higher on its counter — 168 against 98 for the same 2D zoom on the
-Radeon. Compare a hand-opened page with the script's numbers only after zeroing those knobs. The
-dissolve is measured only by its 20-card stress test at 4 px cells — a larger cell size does not load the browser
-enough to mean anything, and the user dropped the single-Card test as pointless.
+second, and the main thread's busy time per frame. **The stress tests run in constant motion whatever the page's knobs
+say**: the cell, scanline and RGB stress tests run with no iteration delay (the cells with no hold either), so every
+frame redraws everything, and the spawner stress test sends 60 particles a spawner with no spawn delay. A page's own examples left at their
+defaults pause between passes and read far higher on a counter — 168 against 98 for the same 2D zoom on the Radeon —
+so a hand-opened page compares with the script's numbers only inside a stress test. The
+dissolve is measured only by its 20-card stress test, at 8 px cells — the user's choice, which brings its count
+(17,500 cells) close to the other tests' — and the user dropped the single-Card test as pointless. The stored dissolve
+rows were measured at 4 px cells (70,000) and no longer compare.
 
 ## Stored results for `ba65aa1d`
 
@@ -25,7 +27,9 @@ The user asked for the old version's results to be kept so it need not be measur
 `ba65aa1d` and the graphics card the script prints matches one below, skip exporting, building and serving the
 "before" side** and run the script with `ONLY_BUILD=after`; take the "before" column from here. On any other card, or
 another "before" ref, measure both sides as usual and add the new card's results here. They hold only for the script
-below as it stands, with `ba65aa1d` patched as step 2 says; a change to either means measuring again.
+below as it stands, with `ba65aa1d` patched as step 2 says; a change to either means measuring again. **The spawner
+rows no longer compare**: they were measured before the spawner stress test took the scatter path and no spawn delay.
+The cell and scanline rows still do, since the script zeroed the same knobs the stress tests now ignore.
 
 **AMD Radeon RX 7900 XTX** (`ANGLE (AMD, AMD Radeon RX 7900 XTX (0x0000744C) Direct3D11 vs_5_0 ps_5_0, D3D11)`) —
 the user's machine. Frames a second, middle of three runs; Cells blur from a rerun after a 17% spread.
@@ -82,7 +86,9 @@ under 6 frames a second.
     its `ParticleDissolvePage.const.ts`, and today's `StressCard` and `StressTestWrapper` to its Solid page, drawn with
     its own `renderParticle` and `computeAshAnimation`), its card badge lacks the `marginTop` that makes the card 200 px
     tall rather than 190, and its spawner stress test is 96 boxes of 120 × 80 rather than 72 squares of 120 in a
-    `PageMeasureBox`. Diff the export's Playground against the latest for anything newer before trusting a result.
+    `PageMeasureBox`. Its stress tests also take the page's knobs: give its cell stress test no iteration delay or hold
+    and its spawner stress test the scatter path, 60 particles and no spawn delay, as today's do. Diff the export's Playground against
+    the latest for anything newer before trusting a result.
     **The old version keeps its own stress-test backdrop and modal styling** — the user's call: its blurred
     `ModalOverlay`, `ModalPanel` and `DrawerPanel` stay, and today's opaque overlay is not ported.
 
@@ -165,8 +171,6 @@ const press = async (page, label) => {
 const cell = (animation) => ({
     route: "/cell-animation",
     setup: async (page) => {
-        await setNumber(page, "animationIterationDelayMs", 0);
-        await setNumber(page, "holdMs", 0);
         if (animation) await pick(page, "animationType", animation);
         await press(page, "Render 72 items");
     },
@@ -174,10 +178,7 @@ const cell = (animation) => ({
 
 const scan = (kind) => ({
     route: "/scanline-animation",
-    setup: async (page) => {
-        await setNumber(page, "animationIterationDelayMs", 0);
-        await press(page, `Render 72 ${kind} items`);
-    },
+    setup: (page) => press(page, `Render 72 ${kind} items`),
 });
 
 const SCENARIOS = {

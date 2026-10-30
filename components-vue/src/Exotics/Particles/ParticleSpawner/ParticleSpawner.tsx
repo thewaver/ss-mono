@@ -14,6 +14,7 @@ import {
     type SliceRendererSlice,
     SliceRendererStyles,
     SliceRendererUtils,
+    type SliceStop,
 } from "@thewaver/ss-components";
 import { ParticleSpawnerConst } from "@thewaver/ss-components/internal";
 import { type Point2d, Rect, Size2d } from "@thewaver/ss-utils";
@@ -33,6 +34,7 @@ const LINEAR = SliceRendererUtils.computeEasing(undefined);
 const NO_AREA: Rect = { x: 0, y: 0, width: 1, height: 1 };
 const NO_RECT: Rect = { x: 0, y: 0, width: 0, height: 0 };
 const UNUSED_SIZE: Size2d = { width: 1, height: 1 };
+const NO_TABLES: SliceStop[][] = [];
 
 type Placed = { defs: ParticleTravelDefs; pos: Point2d; t: number };
 
@@ -53,7 +55,6 @@ export const ParticleSpawner = defineComponent(
         const elements = new Map<number, HTMLElement>();
         const bodies = new Map<number, HTMLElement>();
         const pictures = new Map<number, HTMLElement>();
-        const stand = new Map<number, HTMLElement>();
         const placed = new Map<number, Placed>();
         const tints = new Map<number, string | undefined>();
 
@@ -180,7 +181,7 @@ export const ParticleSpawner = defineComponent(
                 {
                     mode: "direct",
                     src: props.src,
-                    tables: [],
+                    tables: NO_TABLES,
                     easing: LINEAR,
                     slices,
                     size: UNUSED_SIZE,
@@ -201,19 +202,8 @@ export const ParticleSpawner = defineComponent(
         const engine = ParticleSpawnerUtils.createEngine({
             getTargetCount: () => props.targets.length,
             computeTarget: (index, targetCount) => props.computeTarget?.(index, targetCount),
-            getElement: (id) => {
-                if (!isOnGraphicsCard.value) return elements.get(id);
-
-                const existing = stand.get(id);
-
-                if (existing) return existing;
-
-                const next = { style: {} } as HTMLElement;
-
-                stand.set(id, next);
-
-                return next;
-            },
+            getElement: (id) => elements.get(id),
+            getIsDrawingElements: () => !isOnGraphicsCard.value,
             getFrame: measureFrame,
             getTiming: () => ({
                 spawnDelayMs: getSpawnDelayMs(),
@@ -245,7 +235,6 @@ export const ParticleSpawner = defineComponent(
             for (const id of [...placed.keys()]) {
                 if (!ids.has(id)) {
                     placed.delete(id);
-                    stand.delete(id);
                     tints.delete(id);
                 }
             }
@@ -264,7 +253,6 @@ export const ParticleSpawner = defineComponent(
             elements.clear();
             bodies.clear();
             pictures.clear();
-            stand.clear();
             placed.clear();
             tints.clear();
         });

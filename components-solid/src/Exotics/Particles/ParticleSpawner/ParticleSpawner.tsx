@@ -12,6 +12,7 @@ import {
     type SliceRendererSlice,
     SliceRendererStyles,
     SliceRendererUtils,
+    type SliceStop,
     ParticleSpawnerStyles as styles,
 } from "@thewaver/ss-components";
 import { type Point2d, Rect, Size2d } from "@thewaver/ss-utils";
@@ -29,6 +30,7 @@ const LINEAR = SliceRendererUtils.computeEasing(undefined);
 const NO_AREA: Rect = { x: 0, y: 0, width: 1, height: 1 };
 const NO_RECT: Rect = { x: 0, y: 0, width: 0, height: 0 };
 const UNUSED_SIZE: Size2d = { width: 1, height: 1 };
+const NO_TABLES: SliceStop[][] = [];
 
 type Placed = { defs: ParticleTravelDefs; pos: Point2d; t: number };
 
@@ -80,7 +82,6 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
     const refs = new Map<number, HTMLElement>();
     const bodies = new Map<number, HTMLElement>();
     const pictures = new Map<number, HTMLElement>();
-    const stand = new Map<number, HTMLElement>();
     const placed = new Map<number, Placed>();
     const tints = new Map<number, string | undefined>();
 
@@ -177,7 +178,7 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
             {
                 mode: "direct",
                 src: getSource(),
-                tables: [],
+                tables: NO_TABLES,
                 easing: LINEAR,
                 slices,
                 size: UNUSED_SIZE,
@@ -196,19 +197,8 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
     const engine = ParticleSpawnerUtils.createEngine({
         getTargetCount: () => getTargets().length,
         computeTarget: (index, targetCount) => props.computeTarget?.(index, targetCount),
-        getElement: (id) => {
-            if (!untrack(getIsOnGraphicsCard)) return refs.get(id);
-
-            const existing = stand.get(id);
-
-            if (existing) return existing;
-
-            const next = { style: {} } as HTMLElement;
-
-            stand.set(id, next);
-
-            return next;
-        },
+        getElement: (id) => refs.get(id),
+        getIsDrawingElements: () => !untrack(getIsOnGraphicsCard),
         getFrame: measureFrame,
         getTiming: () => ({
             spawnDelayMs: getSpawnDelayMs(),
@@ -245,7 +235,6 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
             for (const id of [...placed.keys()]) {
                 if (!ids.has(id)) {
                     placed.delete(id);
-                    stand.delete(id);
                     tints.delete(id);
                 }
             }
@@ -296,7 +285,6 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
         refs.clear();
         bodies.clear();
         pictures.clear();
-        stand.clear();
         placed.clear();
         tints.clear();
     });

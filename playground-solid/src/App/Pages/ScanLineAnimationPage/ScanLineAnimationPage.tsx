@@ -32,6 +32,7 @@ import {
     EXAMPLE_NAMES,
     IMAGE_CONTAINER_SIZE,
     STRESS_ITEMS,
+    STRESS_ITERATION_DELAY_MS,
     STRESS_LINE_COUNT,
     WEIGHT_ORIGIN,
 } from "@thewaver/ss-playground/App/Pages/ScanLineAnimationPage/ScanLineAnimationPage.const";
@@ -149,7 +150,7 @@ const StressTestWrapper = (props: ScanlineAnimationExampleProps) => {
                                 {...props}
                                 playback={modalPlayback}
                                 lineCount={STRESS_LINE_COUNT}
-                                animationIterationDelayMs={0}
+                                animationIterationDelayMs={STRESS_ITERATION_DELAY_MS}
                                 renderer={() => (getIsOnGraphicsCard() ? "graphics_card" : "elements")}
                                 computeSliceWeights={computeSliceWeights}
                                 computeSliceAnimation={animation}

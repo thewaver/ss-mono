@@ -1,4 +1,4 @@
-import { DOMUtils, type Point2d, type Rect } from "@thewaver/ss-utils";
+import type { Point2d, Rect } from "@thewaver/ss-utils";
 
 import type { ViewportContextType } from "./Viewport.context.types";
 
@@ -21,13 +21,16 @@ export namespace ViewportUtils {
      * @returns A new `DOMRect` in content coordinates.
      */
     export const getAdjustedBoundingClientRect = (child: Element, viewportContext: ViewportContextType) => {
+        const rect = child.getBoundingClientRect();
         const viewportRect = viewportContext.getScaledRect();
         const viewportScale = 1 / viewportContext.getScale();
 
-        return DOMUtils.scaleDOMRect(
-            DOMUtils.offsetDOMRect(child.getBoundingClientRect(), viewportRect),
-            viewportScale,
-        )!;
+        return DOMRect.fromRect({
+            x: (rect.x - viewportRect.x) * viewportScale,
+            y: (rect.y - viewportRect.y) * viewportScale,
+            width: rect.width * viewportScale,
+            height: rect.height * viewportScale,
+        });
     };
 
     /**

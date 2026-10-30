@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import { shallowRef, useModel } from "vue";
 
-import { STRESS_ITEMS } from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.const";
+import {
+    STRESS_ITEMS,
+    STRESS_PARTICLE_COUNT,
+    STRESS_SPAWN_DELAY_MS,
+} from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.const";
 
 import PageCheckField from "../../PageComponents/Field/PageCheckField.vue";
 import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.vue";
@@ -45,10 +49,10 @@ const isOnGraphicsCard = shallowRef(true);
             <PageMeasureBox :width="STRESS_ITEMS[configIndex].size" :height="STRESS_ITEMS[configIndex].size">
                 <SingleTargetExample
                     v-model:playback="modalPlayback"
-                    :particle-count="particleCount"
+                    :particle-count="STRESS_PARTICLE_COUNT"
                     :travel-duration-ms="travelDurationMs"
                     :rest-duration-ms="restDurationMs"
-                    :spawn-delay-ms="spawnDelayMs"
+                    :spawn-delay-ms="STRESS_SPAWN_DELAY_MS"
                     :spawn-iteration-patterns="spawnIterationPatterns"
                     :compute-particle-pos="computeParticlePos"
                     :are-targets-hidden="areTargetsHidden"

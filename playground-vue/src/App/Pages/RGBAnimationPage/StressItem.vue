@@ -4,7 +4,10 @@ import { useModel } from "vue";
 import { RGBAnimation, RGBAnimationKeyframes } from "@thewaver/ss-components-vue";
 import type { SliceAnimationFn, SliceAnimationRenderer } from "@thewaver/ss-components-vue";
 import { RGBAnimationKnobs } from "@thewaver/ss-playground/App/Knobs/RGBAnimations.const";
-import { STRESS_ITEM_WIDTH } from "@thewaver/ss-playground/App/Pages/RGBAnimationPage/RGBAnimationPage.const";
+import {
+    STRESS_ITEM_WIDTH,
+    STRESS_ITERATION_DELAY_MS,
+} from "@thewaver/ss-playground/App/Pages/RGBAnimationPage/RGBAnimationPage.const";
 import type { BaseRGBAnimationExampleProps } from "@thewaver/ss-playground/App/Pages/RGBAnimationPage/RGBAnimationPage.types";
 import type { CSSAnimationValues } from "@thewaver/ss-utils";
 
@@ -67,7 +70,7 @@ const sample = STRESS_SAMPLES[Math.floor(Math.random() * STRESS_SAMPLES.length)]
             :src="src"
             :color-mixing="colorMixing"
             :animation-duration-ms="animationDurationMs"
-            :animation-iteration-delay-ms="animationIterationDelayMs"
+            :animation-iteration-delay-ms="STRESS_ITERATION_DELAY_MS"
             :renderer="renderer"
             :compute-root-animation="sample.computeRootAnimation"
             :compute-slice-animation="sample.animation"

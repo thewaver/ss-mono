@@ -484,6 +484,10 @@ export const BOX_HEIGHT = 260;
 
 export const STRESS_ITEM_SIZE = 120;
 
+export const STRESS_SPAWN_DELAY_MS = 0;
+
+export const STRESS_PARTICLE_COUNT = 60;
+
 export const STRESS_ITEMS: (StressTestDefs & { size: number })[] = [
     { count: 4 * 3, cols: 4, gap: 10, size: STRESS_ITEM_SIZE },
     { count: 6 * 4, cols: 6, gap: 10, size: STRESS_ITEM_SIZE },

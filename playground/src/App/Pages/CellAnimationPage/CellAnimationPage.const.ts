@@ -23,6 +23,10 @@ export const STRESS_CELL_COUNT: Index2d = { row: 11, col: 11 };
 
 export const STRESS_ITEM_SIZE = 120;
 
+export const STRESS_ITERATION_DELAY_MS = 0;
+
+export const STRESS_HOLD_MS = 0;
+
 export const STRESS_ITEMS: (StressTestDefs & { size: number })[] = [
     {
         count: 4 * 3,

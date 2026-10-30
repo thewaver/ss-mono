@@ -18,6 +18,7 @@ import {
     SOURCE_WIDTHS,
     STRESS_ITEMS,
     STRESS_ITEM_WIDTH,
+    STRESS_ITERATION_DELAY_MS,
 } from "@thewaver/ss-playground/App/Pages/RGBAnimationPage/RGBAnimationPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/RGBAnimationPage/RGBAnimationPage.css";
 import type { RGBAnimationSourceKey } from "@thewaver/ss-playground/App/Pages/RGBAnimationPage/RGBAnimationPage.types";
@@ -522,7 +523,7 @@ const StressItem = (props: Omit<RGBAnimationExampleProps, "progress"> & { render
                 colorMixing={props.colorMixing}
                 playback={props.playback}
                 animationDurationMs={props.animationDurationMs}
-                animationIterationDelayMs={props.animationIterationDelayMs}
+                animationIterationDelayMs={STRESS_ITERATION_DELAY_MS}
                 renderer={props.renderer}
                 computeRootAnimation={sample.computeRootAnimation}
                 computeSliceAnimation={sample.animation}

@@ -20,6 +20,8 @@ export const IMAGE_CONTAINER_SIZE = 360;
 
 export const STRESS_LINE_COUNT = 120;
 
+export const STRESS_ITERATION_DELAY_MS = 0;
+
 export const STRESS_ITEMS: (StressTestDefs & { size: number; kind: "transform" | "filter" })[] = (
     ["transform", "filter"] as const
 )

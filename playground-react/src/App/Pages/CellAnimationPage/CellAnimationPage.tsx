@@ -25,7 +25,9 @@ import {
     PERCENT,
     SOURCE_READOUTS,
     STRESS_CELL_COUNT,
+    STRESS_HOLD_MS,
     STRESS_ITEMS,
+    STRESS_ITERATION_DELAY_MS,
     WIPE_EXAMPLE_PATH,
 } from "@thewaver/ss-playground/App/Pages/CellAnimationPage/CellAnimationPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/CellAnimationPage/CellAnimationPage.css";
@@ -106,6 +108,8 @@ const StressTestWrapper = ({
 
     const [isOnGraphicsCard, setIsOnGraphicsCard] = useState(true);
 
+    const stressPlaybackOpts = useMemo(() => ({ ...props.playbackOpts, holdMs: STRESS_HOLD_MS }), [props.playbackOpts]);
+
     return (
         <>
             <div>{`${STRESS_CELL_COUNT.col} x ${STRESS_CELL_COUNT.row} cells`}</div>
@@ -140,6 +144,8 @@ const StressTestWrapper = ({
                     <PageMeasureBox width={computeWidth(STRESS_ITEMS[configIndex].size)}>
                         <DefaultExample
                             {...props}
+                            playbackOpts={stressPlaybackOpts}
+                            animationIterationDelayMs={STRESS_ITERATION_DELAY_MS}
                             playback={modalPlayback}
                             cellCount={STRESS_CELL_COUNT}
                             renderer={isOnGraphicsCard ? "graphics_card" : "elements"}

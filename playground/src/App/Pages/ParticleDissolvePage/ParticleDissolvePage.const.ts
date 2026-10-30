@@ -21,7 +21,7 @@ export const EXAMPLE_NAMES = {
     stressTest: "Stress Test",
 };
 
-export const STRESS_CELL_SIZE = 4;
+export const STRESS_CELL_SIZE = 8;
 
 export const STRESS_ITEMS: StressTestDefs[] = [
     { count: 3 * 2, cols: 3, gap: 10 },

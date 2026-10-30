@@ -50,7 +50,10 @@
 
 <script lang="ts">
     import { RGBAnimation, type SliceAnimationRenderer } from "@thewaver/ss-components-svelte";
-    import { STRESS_ITEM_WIDTH } from "@thewaver/ss-playground/App/Pages/RGBAnimationPage/RGBAnimationPage.const";
+    import {
+        STRESS_ITEM_WIDTH,
+        STRESS_ITERATION_DELAY_MS,
+    } from "@thewaver/ss-playground/App/Pages/RGBAnimationPage/RGBAnimationPage.const";
     import type { BaseRGBAnimationExampleProps } from "@thewaver/ss-playground/App/Pages/RGBAnimationPage/RGBAnimationPage.types";
 
     import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.svelte";
@@ -68,7 +71,7 @@
         src={props.src}
         colorMixing={props.colorMixing}
         animationDurationMs={props.animationDurationMs}
-        animationIterationDelayMs={props.animationIterationDelayMs}
+        animationIterationDelayMs={STRESS_ITERATION_DELAY_MS}
         renderer={props.renderer}
         computeRootAnimation={sample.computeRootAnimation}
         computeSliceAnimation={sample.animation}

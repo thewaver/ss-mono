@@ -32,6 +32,7 @@ import {
     EXAMPLE_NAMES,
     IMAGE_CONTAINER_SIZE,
     STRESS_ITEMS,
+    STRESS_ITERATION_DELAY_MS,
     STRESS_LINE_COUNT,
     WEIGHT_ORIGIN,
 } from "@thewaver/ss-playground/App/Pages/ScanLineAnimationPage/ScanLineAnimationPage.const";
@@ -123,7 +124,7 @@ const StressItem = ({ configIndex, modalPlayback, weightType, ...props }: Stress
                 {...props}
                 playback={modalPlayback}
                 lineCount={STRESS_LINE_COUNT}
-                animationIterationDelayMs={0}
+                animationIterationDelayMs={STRESS_ITERATION_DELAY_MS}
                 computeSliceWeights={computeSliceWeights}
                 computeSliceAnimation={animation}
             />

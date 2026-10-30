@@ -46,6 +46,8 @@ type FrameParticipant = {
 
 const NO_PARTICLES: LiveParticle[] = [];
 
+type Placement = { from: Point2d; targets: (Point2d | undefined)[]; prefersReducedMotion: boolean };
+
 const participants = new Set<FrameParticipant>();
 
 let sharedFrameId: ReturnType<typeof requestAnimationFrame> | undefined;
@@ -200,7 +202,9 @@ export namespace ParticleSpawnerUtils {
      * @param defs.getTargetCount How many targets there are now.
      * @param defs.computeTarget Which target one particle is aimed at. `undefined` picks one at random.
      * @param defs.getElement A live particle's element, once the view has drawn it. A particle without one is not
-     * moved, and cannot arrive, until it has one.
+     * moved, and cannot arrive, until it has one. Not asked while `getIsDrawingElements` says no.
+     * @param defs.getIsDrawingElements Whether the view draws particles as page elements. While it does not, the engine
+     * asks for no element and writes no position: each position reaches the view only through `computeParticlePos`.
      * @param defs.getFrame Where the spawner and its targets are now. Called once a frame while a round is in flight,
      * before any engine moves anything, so it may measure the page directly.
      * @param defs.getTiming The stagger, the travel and the rest a new round is sent with.
@@ -215,6 +219,7 @@ export namespace ParticleSpawnerUtils {
         getTargetCount: () => number;
         computeTarget: (index: number, targetCount: number) => number | undefined;
         getElement: (id: number) => HTMLElement | undefined;
+        getIsDrawingElements: () => boolean;
         getFrame: () => ParticleSpawnerFrame;
         getTiming: () => ParticleSpawnerTiming;
         getCanSpawn: () => boolean;
@@ -226,7 +231,7 @@ export namespace ParticleSpawnerUtils {
         const particles = StoreUtils.create(NO_PARTICLES);
         const rounds = new Set<Round>();
 
-        let lastFrame: ParticleSpawnerFrame | undefined;
+        let lastPlacement: Placement | undefined;
 
         const spawnNext = (round: Round, targetCount: number): LiveParticle | undefined => {
             const index = round.spawnedCount;
@@ -243,43 +248,49 @@ export namespace ParticleSpawnerUtils {
             return { id: nextId++, index, round, targetIndex, spawnedAtMs: round.startMs + index * round.spawnDelayMs };
         };
 
+        const toPlacement = (frame: ParticleSpawnerFrame): Placement | undefined => {
+            const rootRect = frame.rootRect;
+
+            if (!rootRect) return undefined;
+
+            return {
+                from: { x: rootRect.width * 0.5, y: rootRect.height * 0.5 },
+                targets: frame.targetRects.map((rect) => (rect ? toRelativeCenter(rect, rootRect) : undefined)),
+                prefersReducedMotion: frame.prefersReducedMotion,
+            };
+        };
+
         const place = (
             particle: LiveParticle,
-            el: HTMLElement,
+            el: HTMLElement | undefined,
             nowMs: number,
-            frame: ParticleSpawnerFrame | undefined,
+            placement: Placement | undefined,
         ) => {
-            const rootRect = frame?.rootRect;
+            if (!placement) return false;
 
-            if (!frame || !rootRect) return false;
-
-            const from = { x: rootRect.width * 0.5, y: rootRect.height * 0.5 };
             const t = Math.min(1, (nowMs - particle.spawnedAtMs) / particle.round.travelDurationMs);
-            const targetRect = frame.targetRects[particle.targetIndex];
-            const to = targetRect ? toRelativeCenter(targetRect, rootRect) : from;
 
             defs.onParticleT?.(particle.id, t);
 
-            assignParticlePos(
-                el,
-                defs.computeParticlePos(
-                    {
-                        id: particle.id,
-                        index: particle.index,
-                        targetIndex: particle.targetIndex,
-                        from,
-                        to,
-                        prefersReducedMotion: frame.prefersReducedMotion,
-                    },
-                    t,
-                ),
+            const pos = defs.computeParticlePos(
+                {
+                    id: particle.id,
+                    index: particle.index,
+                    targetIndex: particle.targetIndex,
+                    from: placement.from,
+                    to: placement.targets[particle.targetIndex] ?? placement.from,
+                    prefersReducedMotion: placement.prefersReducedMotion,
+                },
+                t,
             );
+
+            if (el) assignParticlePos(el, pos);
 
             return true;
         };
 
         const read = () => {
-            lastFrame = defs.getFrame();
+            lastPlacement = toPlacement(defs.getFrame());
         };
 
         const write = (nowMs: number) => {
@@ -303,10 +314,12 @@ export namespace ParticleSpawnerUtils {
 
             let hasMoved = false;
 
-            for (const particle of particles.get()) {
-                const el = defs.getElement(particle.id);
+            const isDrawingElements = defs.getIsDrawingElements();
 
-                if (!el || !place(particle, el, nowMs, lastFrame)) continue;
+            for (const particle of particles.get()) {
+                const el = isDrawingElements ? defs.getElement(particle.id) : undefined;
+
+                if ((isDrawingElements && !el) || !place(particle, el, nowMs, lastPlacement)) continue;
 
                 hasMoved = true;
 
@@ -448,7 +461,7 @@ export namespace ParticleSpawnerUtils {
             drawParticle: (id: number, el: HTMLElement) => {
                 const particle = particles.get().find((live) => live.id === id);
 
-                if (particle) place(particle, el, performance.now(), lastFrame ?? defs.getFrame());
+                if (particle) place(particle, el, performance.now(), lastPlacement ?? toPlacement(defs.getFrame()));
             },
             /** Stops the frames and forgets every round and particle. The engine can be played again. */
             stop: () => {

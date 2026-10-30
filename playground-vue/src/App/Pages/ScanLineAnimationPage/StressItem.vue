@@ -43,7 +43,10 @@ import { useModel } from "vue";
 
 import { ScanlineAnimation, ScanlineAnimationKeyframes, SliceAnimationWeights } from "@thewaver/ss-components-vue";
 import type { SliceAnimationRenderer } from "@thewaver/ss-components-vue";
-import { WEIGHT_ORIGIN } from "@thewaver/ss-playground/App/Pages/ScanLineAnimationPage/ScanLineAnimationPage.const";
+import {
+    STRESS_ITERATION_DELAY_MS,
+    WEIGHT_ORIGIN,
+} from "@thewaver/ss-playground/App/Pages/ScanLineAnimationPage/ScanLineAnimationPage.const";
 import type { Index2d } from "@thewaver/ss-utils";
 
 import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.vue";
@@ -90,7 +93,7 @@ const computeSliceWeights = (count: Index2d) =>
             :orientation="orientation"
             :animation-duration-ms="animationDurationMs"
             :line-count="STRESS_LINE_COUNT"
-            :animation-iteration-delay-ms="0"
+            :animation-iteration-delay-ms="STRESS_ITERATION_DELAY_MS"
             :renderer="renderer"
             :compute-slice-weights="computeSliceWeights"
             :compute-slice-animation="animation"

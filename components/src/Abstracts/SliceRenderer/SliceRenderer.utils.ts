@@ -370,7 +370,11 @@ const toTableData = (tables: SliceStop[][], easing: Float32Array, maxTextureSize
 const computePerspectivePx = (size: Size2d) =>
     parseFloat(CellAnimationUtils.computePerspective(size)) || NO_PERSPECTIVE;
 
-const toInstanceData = (slices: SliceRendererSlice[], mode: SliceRendererMode) => {
+const writeInstanceData = (
+    slices: SliceRendererSlice[],
+    mode: SliceRendererMode,
+    into: Float32Array<ArrayBuffer>,
+): Float32Array<ArrayBuffer> => {
     const ordered =
         mode === "slices"
             ? slices
@@ -378,22 +382,28 @@ const toInstanceData = (slices: SliceRendererSlice[], mode: SliceRendererMode) =
                   .sort((a, b) => a.depth - b.depth || a.idx - b.idx)
                   .map(({ slice }) => slice)
             : slices;
-    const data = new Float32Array(ordered.length * INSTANCE_FLOATS);
+    const needed = ordered.length * INSTANCE_FLOATS;
+    const data = into.length >= needed ? into : new Float32Array(Math.max(needed, into.length * 2));
 
     ordered.forEach((slice, idx) => {
-        data.set(
-            [
-                slice.left,
-                slice.top,
-                slice.width,
-                slice.height,
-                slice.weight,
-                slice.table,
-                ...(slice.tint ?? NO_TINT),
-                ...(slice.direct ?? NO_DIRECT),
-            ],
-            idx * INSTANCE_FLOATS,
-        );
+        const offset = idx * INSTANCE_FLOATS;
+        const tint = slice.tint ?? NO_TINT;
+        const direct = slice.direct ?? NO_DIRECT;
+
+        data[offset] = slice.left;
+        data[offset + 1] = slice.top;
+        data[offset + 2] = slice.width;
+        data[offset + 3] = slice.height;
+        data[offset + 4] = slice.weight;
+        data[offset + 5] = slice.table;
+        data[offset + 6] = tint[0];
+        data[offset + 7] = tint[1];
+        data[offset + 8] = tint[2];
+        data[offset + 9] = tint[3];
+        data[offset + 10] = direct[0];
+        data[offset + 11] = direct[1];
+        data[offset + 12] = direct[2];
+        data[offset + 13] = direct[3];
     });
 
     return data;
@@ -691,6 +701,7 @@ export namespace SliceRendererUtils {
         const stride = INSTANCE_FLOATS * BYTES_PER_FLOAT;
 
         let layoutSlices: SliceRendererSlice[] | undefined;
+        let instanceData: Float32Array<ArrayBuffer> = new Float32Array(0);
         let layoutTables: SliceStop[][] | undefined;
         let layoutEasing: Float32Array | undefined;
         let easingRow = 0;
@@ -757,7 +768,8 @@ export namespace SliceRendererUtils {
 
             if (layoutSlices !== frame.slices) {
                 gl.bindBuffer(gl.ARRAY_BUFFER, instances);
-                gl.bufferData(gl.ARRAY_BUFFER, toInstanceData(frame.slices, frame.mode), gl.DYNAMIC_DRAW);
+                instanceData = writeInstanceData(frame.slices, frame.mode, instanceData);
+                gl.bufferData(gl.ARRAY_BUFFER, instanceData, gl.DYNAMIC_DRAW, 0, frame.slices.length * INSTANCE_FLOATS);
                 layoutSlices = frame.slices;
             }
 

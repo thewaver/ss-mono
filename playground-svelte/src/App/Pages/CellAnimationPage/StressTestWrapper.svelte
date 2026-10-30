@@ -9,7 +9,9 @@
     import DefaultExample from "./Examples/Default.svelte";
     import {
         STRESS_CELL_COUNT,
+        STRESS_HOLD_MS,
         STRESS_ITEM_SIZE,
+        STRESS_ITERATION_DELAY_MS,
     } from "@thewaver/ss-playground/App/Pages/CellAnimationPage/CellAnimationPage.const";
 
     const STRESS_ITEMS: (StressTestDefs & { size: number })[] = [
@@ -45,6 +47,8 @@
 
     let modalPlayback = $state(true);
     let isOnGraphicsCard = $state(true);
+
+    const stressPlaybackOpts = $derived({ ...props.playbackOpts, holdMs: STRESS_HOLD_MS });
 </script>
 
 <div>{`${STRESS_CELL_COUNT.col} x ${STRESS_CELL_COUNT.row} cells`}</div>
@@ -83,6 +87,8 @@
         <PageMeasureBox width={computeWidth(STRESS_ITEMS[configIndex].size)}>
             <DefaultExample
                 {...props}
+                playbackOpts={stressPlaybackOpts}
+                animationIterationDelayMs={STRESS_ITERATION_DELAY_MS}
                 bind:playback={modalPlayback}
                 cellCount={STRESS_CELL_COUNT}
                 renderer={isOnGraphicsCard ? "graphics_card" : "elements"}

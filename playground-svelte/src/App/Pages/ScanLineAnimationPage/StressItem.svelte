@@ -48,7 +48,10 @@
 
     import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.svelte";
     import type { ScanlineAnimationExampleProps } from "./ScanlineAnimationPage.types";
-    import { WEIGHT_ORIGIN } from "@thewaver/ss-playground/App/Pages/ScanLineAnimationPage/ScanLineAnimationPage.const";
+    import {
+        STRESS_ITERATION_DELAY_MS,
+        WEIGHT_ORIGIN,
+    } from "@thewaver/ss-playground/App/Pages/ScanLineAnimationPage/ScanLineAnimationPage.const";
 
     const pickStressKeyframes = (kind: "transform" | "filter") => {
         const random = Math.random() * 3;
@@ -85,7 +88,7 @@
         {...props}
         bind:playback={modalPlayback}
         lineCount={STRESS_LINE_COUNT}
-        animationIterationDelayMs={0}
+        animationIterationDelayMs={STRESS_ITERATION_DELAY_MS}
         {computeSliceWeights}
         computeSliceAnimation={animation}
     />

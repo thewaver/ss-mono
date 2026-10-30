@@ -34,6 +34,8 @@ export const SOURCE_LABELS: Record<RGBAnimationSourceKey, string> = { knight: "A
 
 export const STRESS_ITEM_WIDTH = 120;
 
+export const STRESS_ITERATION_DELAY_MS = 0;
+
 export const STRESS_ITEMS: StressTestDefs[] = [
     {
         count: 4 * 3,

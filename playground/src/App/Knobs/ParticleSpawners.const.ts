@@ -17,13 +17,13 @@ export namespace ParticleSpawnerKnobs {
     export const MAX_TRAVEL_DURATION_MS = 4000;
     export const TRAVEL_DURATION_STEP_MS = 100;
 
-    export const STARTING_TRAVEL_PATTERN_KEY: ParticleTravelPattern = "arc";
+    export const STARTING_TRAVEL_PATTERN_KEY: ParticleTravelPattern = "scatter";
     export const STARTING_ITERATION_PATTERN_KEY: IterationPattern = "continuous";
 
     export const MIN_SPAWN_DELAY_MS = 0;
     export const MAX_SPAWN_DELAY_MS = 1000;
     export const SPAWN_DELAY_STEP_MS = 10;
-    export const STARTING_SPAWN_DELAY_MS = 50;
+    export const STARTING_SPAWN_DELAY_MS = 10;
 
     export const MIN_RETENTION_MS = 0;
     export const MAX_RETENTION_MS = 2000;

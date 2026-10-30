@@ -14,6 +14,7 @@ import {
     type SliceRendererSlice,
     SliceRendererStyles,
     SliceRendererUtils,
+    type SliceStop,
 } from "@thewaver/ss-components";
 import { ParticleSpawnerConst } from "@thewaver/ss-components/internal";
 import { type Point2d, Rect, Size2d } from "@thewaver/ss-utils";
@@ -32,6 +33,7 @@ const LINEAR = SliceRendererUtils.computeEasing(undefined);
 const NO_AREA: Rect = { x: 0, y: 0, width: 1, height: 1 };
 const NO_RECT: Rect = { x: 0, y: 0, width: 0, height: 0 };
 const UNUSED_SIZE: Size2d = { width: 1, height: 1 };
+const NO_TABLES: SliceStop[][] = [];
 
 type Placed = { defs: ParticleTravelDefs; pos: Point2d; t: number };
 
@@ -52,7 +54,6 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
     const elementsRef = useRef(new Map<number, HTMLDivElement>());
     const bodiesRef = useRef(new Map<number, HTMLDivElement>());
     const picturesRef = useRef(new Map<number, HTMLDivElement>());
-    const standRef = useRef(new Map<number, HTMLElement>());
     const placedRef = useRef(new Map<number, Placed>());
     const tintsRef = useRef(new Map<number, string | undefined>());
     const drawnAreaRef = useRef<Rect>(undefined);
@@ -187,7 +188,7 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
                 {
                     mode: "direct",
                     src: current.props.src,
-                    tables: [],
+                    tables: NO_TABLES,
                     easing: LINEAR,
                     slices,
                     size: UNUSED_SIZE,
@@ -206,19 +207,8 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
         const engine = ParticleSpawnerUtils.createEngine({
             getTargetCount: () => latest.current.props.targets.length,
             computeTarget: (index, targetCount) => latest.current.props.computeTarget?.(index, targetCount),
-            getElement: (id) => {
-                if (!latest.current.isOnGraphicsCard) return elementsRef.current.get(id);
-
-                const existing = standRef.current.get(id);
-
-                if (existing) return existing;
-
-                const next = { style: {} } as HTMLElement;
-
-                standRef.current.set(id, next);
-
-                return next;
-            },
+            getElement: (id) => elementsRef.current.get(id),
+            getIsDrawingElements: () => !latest.current.isOnGraphicsCard,
             getFrame: measureFrame,
             getTiming: () => latest.current.timing,
             getCanSpawn: () => latest.current.canSpawn,
@@ -257,7 +247,6 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
             elementsRef.current.clear();
             bodiesRef.current.clear();
             picturesRef.current.clear();
-            standRef.current.clear();
             placedRef.current.clear();
             tintsRef.current.clear();
         },
@@ -270,7 +259,6 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
         for (const id of [...placedRef.current.keys()]) {
             if (!ids.has(id)) {
                 placedRef.current.delete(id);
-                standRef.current.delete(id);
                 tintsRef.current.delete(id);
             }
         }
