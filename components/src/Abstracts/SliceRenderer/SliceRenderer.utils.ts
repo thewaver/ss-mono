@@ -7,6 +7,7 @@ import { SliceAnimationBreakpointUtils } from "../../Generators/SliceAnimationBr
 import type { SliceStop } from "../../Generators/SliceAnimationKeyframes/SliceAnimationKeyframes.types";
 import type { SliceAnimationRenderer } from "../SliceAnimation/SliceAnimation.types";
 import { SliceRendererConst } from "./SliceRenderer.internal.const";
+import { SliceRendererInternalUtils } from "./SliceRenderer.internal.utils";
 import type {
     SliceRendererFrame,
     SliceRendererItem,
@@ -104,6 +105,9 @@ const tints = new Map<string, SliceRendererTint>();
 let renderer: Renderer | null | undefined;
 let tintContext: CanvasRenderingContext2D | null | undefined;
 let flushId: ReturnType<typeof requestAnimationFrame> | undefined;
+let aloneFrameTime: number | undefined;
+let aloneLargest: Size2d = NO_SIZE;
+let aloneLargestBefore: Size2d = NO_SIZE;
 
 const submissions = new Map<object, Submission>();
 
@@ -483,6 +487,44 @@ const drawBatch = (current: Renderer, batch: Batch) => {
         .finally(() => atlas.close());
 };
 
+const computeAloneSize = (submission: Submission): Size2d => {
+    const frameTime = Number(document.timeline.currentTime ?? performance.now());
+
+    if (frameTime !== aloneFrameTime) {
+        aloneFrameTime = frameTime;
+        aloneLargestBefore = aloneLargest;
+        aloneLargest = NO_SIZE;
+    }
+
+    aloneLargest = {
+        width: Math.max(aloneLargest.width, submission.width),
+        height: Math.max(aloneLargest.height, submission.height),
+    };
+
+    return {
+        width: Math.max(aloneLargest.width, aloneLargestBefore.width),
+        height: Math.max(aloneLargest.height, aloneLargestBefore.height),
+    };
+};
+
+const drawAlone = (current: Renderer, submission: Submission): Size2d => {
+    const { gl, canvas } = current;
+    const size = computeAloneSize(submission);
+
+    if (canvas.width !== size.width) canvas.width = size.width;
+    if (canvas.height !== size.height) canvas.height = size.height;
+
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    gl.disable(gl.SCISSOR_TEST);
+    gl.clearColor(0, 0, 0, 0);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.viewport(0, canvas.height - submission.height, submission.width, submission.height);
+    submission.render();
+    submission.present(canvas.transferToImageBitmap());
+
+    return { width: canvas.width, height: canvas.height };
+};
+
 const flush = () => {
     flushId = undefined;
 
@@ -506,8 +548,8 @@ const submit = (key: object, submission: Submission) => {
  * Draws slice animations and particles on the graphics card, into a canvas each component owns.
  *
  * One WebGL context serves the whole page, since browsers keep only a few alive at once. A component asks for an item
- * bound to its own canvas and hands it a frame; once per animation frame every component's frame is drawn into one
- * shared picture, handed over once and cut into each component's piece. The tables a sample is built from are uploaded once and worked out per
+ * bound to its own canvas and hands it a frame, which reaches the canvas either on its own or, once per animation
+ * frame, cut out of one shared picture holding every component's frame. The tables a sample is built from are uploaded once and worked out per
  * slice on the graphics card, so the page only advances the clock. Where the graphics card cannot be used — no
  * WebGL 2 in an offscreen canvas, a picture whose server gives no cross-origin permission, a context the browser has
  * taken away — {@link getCanDraw} says so and the component draws with page elements instead.
@@ -667,10 +709,11 @@ export namespace SliceRendererUtils {
     /**
      * Binds a component's canvas to the shared context.
      *
-     * {@link SliceRendererItem.draw} only takes note of the frame and returns the size of the component's picture, in
-     * the canvas's pixels, at once. Once per animation frame every component noted since the last is drawn into one
-     * shared picture, which is handed over once and cut into each component's piece, so a component's canvas shows its
-     * frame one animation frame after it was asked for.
+     * {@link SliceRendererItem.draw} returns the size of the picture the component's canvas will show, in the canvas's
+     * pixels, at once. Its top-left corner is the frame's area; it may be larger than that area, and the rest of it is
+     * transparent, so the canvas is sized to it rather than to the area. Depending on how the renderer hands pictures
+     * over, the frame is either drawn and shown at once, or noted and drawn with every other component's at the next
+     * animation frame, cut out of one shared picture, and shown one animation frame after it was asked for.
      *
      * A picture still loading draws nothing; the component hears it arrive through {@link requestPicture} and draws
      * again.
@@ -845,8 +888,7 @@ export namespace SliceRendererUtils {
             const width = Math.max(1, Math.round(frame.area.width * frame.scale));
             const height = Math.max(1, Math.round(frame.area.height * frame.scale));
             const sequence = ++submitted;
-
-            submit(key, {
+            const submission: Submission = {
                 width,
                 height,
                 render: () => render(frame, width, height),
@@ -860,7 +902,11 @@ export namespace SliceRendererUtils {
                     presented = sequence;
                     output.transferFromImageBitmap(picture);
                 },
-            });
+            };
+
+            if (SliceRendererInternalUtils.getHandover() === "per_element") return drawAlone(current, submission);
+
+            submit(key, submission);
 
             return { width, height };
         };

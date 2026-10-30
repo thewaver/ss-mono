@@ -9394,7 +9394,19 @@ the page near 11 frames a second whatever they drew. A bare page with none of th
 in Playwright's Chromium and in Google Chrome alike, and showed handing over without drawing first costing 0.16 ms,
 so the cost was the waiting. Copying each picture out instead measured three times faster on the M3 and three times
 slower on the Radeon, so it only traded one machine for the other; one handover per frame took the M3's stress tests
-from 11 to about 100 frames a second. **A canvas reaches past its box** by `computeReach`, which counts only what moves a slice past the box —
+from 11 to about 100 frames a second. **On the Radeon, `shared` costs about a third of the frame rate** — the
+graphics process spends its time on the cut-outs, which are copies — and `per_element` is the faster there, about 1.6×.
+**`per_element` sizes the shared canvas to the largest item drawn in this frame or the one before**, told apart by
+`document.timeline.currentTime`. Each alternative measured worse: grown to the largest picture ever drawn, one large
+example elsewhere on the page made every canvas that large, slower than `shared`; resized to each item, three
+sizes mixed reallocated it up to 72 times a frame and took the scanline stress test to about 16 frames a second; and
+clipping each canvas to its own area recovered nothing, since the cost follows the shared canvas's size, not how much
+of it is shown. The proof of concept met none of this because only its stress test drew on the graphics card.
+**Both handovers are kept**, chosen through `SliceRendererInternalUtils.setHandover` on the internal entry and a
+checkbox in the Solid cell stress test — the user's call, not dead code: the Radeon is faster with `per_element`, and
+the M3 was far slower with a handover per item (measured before this sizing; not measured since). `per_element` reports the shared canvas's size, so every component's canvas is that size,
+transparent past its own corner.
+**A canvas reaches past its box** by `computeReach`, which counts only what moves a slice past the box —
 travel, growth, turning, nearness under perspective, blur — because a first, generous bound made the scanline
 canvases six times their box and cost most of their frame rate. Its formula and the spawner's area step
 (`ParticleSpawnerUtils.growArea`) are Claude's guesses, checked only by the pictures matching. **The table texture's

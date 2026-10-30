@@ -12,8 +12,31 @@ missing.
 
 The Solid Playground's stress tests, in a real Chrome window on this machine's graphics card: each test three times on
 each version, the middle result kept. Per test: frames a second, and the main thread's busy time per frame. The
-dissolve is measured only on the Card at 4 px cells — a larger cell size does not load the browser enough to mean
-anything.
+dissolve is measured only by its 20-card stress test at 4 px cells — a larger cell size does not load the browser
+enough to mean anything, and the user dropped the single-Card test as pointless.
+
+## Stored results for `ba65aa1d`
+
+The user asked for the old version's results to be kept so it need not be measured again. **When "before" is
+`ba65aa1d` and the graphics card the script prints matches one below, skip exporting, building and serving the
+"before" side** and run the script with `ONLY_BUILD=after`; take the "before" column from here. On any other card, or
+another "before" ref, measure both sides as usual and add the new card's results here. They hold only for the script
+below as it stands, with `ba65aa1d` patched as step 2 says; a change to either means measuring again.
+
+**AMD Radeon RX 7900 XTX** (`ANGLE (AMD, AMD Radeon RX 7900 XTX (0x0000744C) Direct3D11 vs_5_0 ps_5_0, D3D11)`) —
+the user's machine. Frames a second, middle of three runs; Cells blur from a rerun after a 17% spread.
+
+| Test               | Average | 90th percentile | Main thread, ms a frame |
+| ------------------ | ------- | --------------- | ----------------------- |
+| Cells, 2D zoom     | 34.5    | 27.0            | 29.4                    |
+| Cells, fade        | 6.2     | 5.1             | 170.9                   |
+| Cells, blur        | 2.0     | 1.2             | 709.9                   |
+| Cells, 3D cube     | 0.9     | 0.5             | 1090.1                  |
+| Scanlines, moves   | 39.2    | 33.2            | 25.7                    |
+| Scanlines, filters | 6.5     | 5.2             | 160.6                   |
+| Spawners, 72       | 28.5    | 17.1            | 34.4                    |
+| Fields, 72         | 8.5     | 4.5             | 121.7                   |
+| Dissolve, 20 cards | 3.9     | 1.4             | 272.4                   |
 
 ## Steps
 
@@ -39,6 +62,8 @@ anything.
     its own `renderParticle` and `computeAshAnimation`), its card badge lacks the `marginTop` that makes the card 200 px
     tall rather than 190, and its spawner stress test is 96 boxes of 120 × 80 rather than 72 squares of 120 in a
     `PageMeasureBox`. Diff the export's Playground against the latest for anything newer before trusting a result.
+    **The old version keeps its own stress-test backdrop and modal styling** — the user's call: its blurred
+    `ModalOverlay`, `ModalPanel` and `DrawerPanel` stay, and today's opaque overlay is not ported.
 
 3. **Build each** (run in the background; each takes about a minute):
 
@@ -63,13 +88,13 @@ anything.
    in the background.
 6. **Check for outliers.** The script prints every run. Where the three runs of one test on one version spread by more
    than about 15%, rerun just that test (`ONLY="Cells, blur"`, several names separated by `|`) and use the rerun.
-7. **Report** the table the script prints — test, before, after, change — and the graphics card it names. **The user
-   wants both the average and the 90th-percentile frame rate, each with a percentage shift**: take the 90th
-   percentile from the sorted gaps between frame stamps (`1000 / gaps[floor(0.9 × count)]`). Where the "after"
-   build is fast, add `--disable-gpu-vsync` and `--disable-frame-rate-limit` to `ARGS`, or every result stops at the
-   screen's refresh rate; Chromium honored both as of this writing (the dissolve Card measured 2,600 frames a second). Say which
-   tests were rerun and why. If a knob or button a test needs is missing on one version, the script says so: report
-   that test as not comparable rather than guessing.
+7. **Report** the table the script prints and the graphics card it names. **The user wants both the average and the
+   90th-percentile frame rate, each with its change written as a multiple, never a percentage** — `x2` where a
+   percentage would say +100%, `x0.8` for a slowdown. The script takes the 90th percentile from the sorted gaps
+   between frame stamps (`1000 / gaps[floor(0.9 × count)]`). `ARGS` carries `--disable-gpu-vsync` and
+   `--disable-frame-rate-limit`, or every fast result stops at the screen's refresh rate; Chromium honored both as of
+   this writing (a single dissolving card once measured 3,000 frames a second). Say which tests were rerun and why. If a knob or button a test needs is
+   missing on one version, the script says so: report that test as not comparable rather than guessing.
 8. **Clean up**: stop both preview servers (stopping the background task may leave the `node` process listening —
    check the ports and stop only the `vite preview` processes you started) and delete `.scratch/perf`.
 
@@ -78,12 +103,15 @@ anything.
 ```js
 import { chromium } from "@playwright/test";
 
-const BUILDS = { before: "http://127.0.0.1:4191", after: "http://127.0.0.1:4192" };
+const ALL_BUILDS = { before: "http://127.0.0.1:4191", after: "http://127.0.0.1:4192" };
+const BUILDS = process.env.ONLY_BUILD ? { [process.env.ONLY_BUILD]: ALL_BUILDS[process.env.ONLY_BUILD] } : ALL_BUILDS;
 const ARGS = [
     "--disable-backgrounding-occluded-windows",
     "--disable-renderer-backgrounding",
     "--disable-background-timer-throttling",
     "--ignore-gpu-blocklist",
+    "--disable-gpu-vsync",
+    "--disable-frame-rate-limit",
 ];
 const prop = (key) => `[data-prop][data-testid="${key}"]`;
 
@@ -146,18 +174,6 @@ const SCENARIOS = {
         },
     },
     "Dissolve, 20 cards": { route: "/particle-dissolve", setup: (page) => press(page, "Render 20 cards") },
-    "Dissolve, Card, 4 px cells": {
-        route: "/particle-dissolve",
-        setup: async (page) => {
-            await setNumber(page, "durationMs", 4000);
-            await setNumber(page, "particleLifetimeMs", 2000);
-            await setNumber(page, "cellSize", 4);
-            await page.locator("#particleDissolveCardBurn").scrollIntoViewIfNeeded();
-            await page.waitForTimeout(500);
-        },
-        action: (page) => page.locator("#particleDissolveCardBurn").click(),
-        measureMs: 4300,
-    },
 };
 
 const runOnce = async (browser, base, scenario) => {
@@ -194,9 +210,14 @@ const runOnce = async (browser, base, scenario) => {
         const stamps = await recording;
         const busyAfter = await busy();
         const frames = stamps.length - 1;
+        const gaps = stamps
+            .slice(1)
+            .map((t, i) => t - stamps[i])
+            .sort((a, b) => a - b);
 
         return {
             fps: (frames / (stamps.at(-1) - stamps[0])) * 1000,
+            p90: 1000 / gaps[Math.floor(0.9 * gaps.length)],
             busyMs: ((busyAfter - busyBefore) * 1000) / frames,
         };
     } finally {
@@ -209,7 +230,7 @@ const only = process.env.ONLY?.split("|");
 const browser = await chromium.launch({ headless: false, args: ARGS });
 
 const probe = await browser.newPage();
-await probe.goto(BUILDS.after);
+await probe.goto(Object.values(BUILDS)[0]);
 const renderer = await probe.evaluate(() => {
     const gl = document.createElement("canvas").getContext("webgl");
     const info = gl?.getExtension("WEBGL_debug_renderer_info");
@@ -218,7 +239,14 @@ const renderer = await probe.evaluate(() => {
 await probe.close();
 console.log(`Graphics: ${renderer}\n`);
 
-const table = ["| Test | Before | After | Change |", "|---|---|---|---|"];
+const table = [
+    "| Test | Before avg | After avg | Change | Before p90 | After p90 | Change |",
+    "|---|---|---|---|---|---|---|",
+];
+const shift = (from, to) => {
+    const times = to / from;
+    return `x${times < 10 ? times.toFixed(1) : times.toFixed(0)}`;
+};
 
 for (const [name, scenario] of Object.entries(SCENARIOS)) {
     if (only && !only.includes(name)) continue;
@@ -229,24 +257,29 @@ for (const [name, scenario] of Object.entries(SCENARIOS)) {
         for (const [build, base] of Object.entries(BUILDS)) {
             const runs = [];
             for (let i = 0; i < 3; i++) runs.push(await runOnce(browser, base, scenario));
-            result[build] = { fps: median(runs.map((r) => r.fps)), busyMs: median(runs.map((r) => r.busyMs)) };
+            result[build] = {
+                fps: median(runs.map((r) => r.fps)),
+                p90: median(runs.map((r) => r.p90)),
+                busyMs: median(runs.map((r) => r.busyMs)),
+            };
             console.log(
-                `${name} — ${build}: runs ${runs.map((r) => r.fps.toFixed(1)).join(", ")} fps; median main thread ${result[build].busyMs.toFixed(1)} ms a frame`,
+                `${name} — ${build}: runs ${runs.map((r) => r.fps.toFixed(1)).join(", ")} fps avg; p90 ${runs.map((r) => r.p90.toFixed(1)).join(", ")} fps; median main thread ${result[build].busyMs.toFixed(1)} ms a frame`,
             );
         }
     } catch (error) {
         if (!(error instanceof MissingControl)) throw error;
         console.log(`${name}: not comparable — ${error.message}`);
-        table.push(`| ${name} | — | — | not comparable |`);
+        table.push(`| ${name} | — | — | not comparable | — | — | — |`);
         continue;
     }
 
-    const change = ((result.after.fps / result.before.fps - 1) * 100).toFixed(0);
+    const { before, after } = result;
+    if (!before || !after) continue;
     table.push(
-        `| ${name} | ${result.before.fps.toFixed(1)} fps | ${result.after.fps.toFixed(1)} fps | ${change > 0 ? "+" : ""}${change}% |`,
+        `| ${name} | ${before.fps.toFixed(1)} | ${after.fps.toFixed(1)} | ${shift(before.fps, after.fps)} | ${before.p90.toFixed(1)} | ${after.p90.toFixed(1)} | ${shift(before.p90, after.p90)} |`,
     );
 }
 
 await browser.close();
-console.log(`\n${table.join("\n")}`);
+if (table.length > 2) console.log(`\n${table.join("\n")}`);
 ```

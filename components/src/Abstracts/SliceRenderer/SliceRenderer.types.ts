@@ -5,6 +5,8 @@ import type { SliceStop } from "../../Generators/SliceAnimationKeyframes/SliceAn
 
 export type SliceRendererMode = "slices" | "particles" | "direct";
 
+export type SliceRendererHandover = "per_element" | "shared";
+
 export type SliceRendererTint = [red: number, green: number, blue: number, alpha: number];
 
 export type SliceRendererDirect = [scaleX: number, scaleY: number, rotateDegrees: number, opacity: number];

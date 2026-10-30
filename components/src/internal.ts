@@ -1,3 +1,4 @@
+export * from "./Abstracts/SliceRenderer/SliceRenderer.internal.utils";
 export * from "./Abstracts/Virtualizer/Virtualizer.internal.const";
 export * from "./Composites/Surface/Surface.internal.const";
 export * from "./Essentials/Buttons/SlideButton/SlideButton.internal.const";
