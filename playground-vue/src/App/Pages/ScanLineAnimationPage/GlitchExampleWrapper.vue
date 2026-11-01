@@ -8,6 +8,7 @@ import * as styles from "@thewaver/ss-playground/App/Pages/ScanLineAnimationPage
 import PageExampleKnobs from "../../PageComponents/ExampleKnobs/PageExampleKnobs.vue";
 import PageNumberField from "../../PageComponents/Field/PageNumberField.vue";
 import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.vue";
+import { usePagePlayback } from "../../PageComponents/PlaybackScrubber/PlaybackGroup.context";
 import PagePlaybackScrubber from "../../PageComponents/PlaybackScrubber/PlaybackScrubber.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
 import GlitchExample from "./Examples/Glitch.vue";
@@ -15,7 +16,7 @@ import type { ScanlineAnimationExampleProps } from "./ScanlineAnimationPage.type
 
 const props = defineProps<ScanlineAnimationExampleProps>();
 
-const playback = shallowRef(true);
+const playback = usePagePlayback("scanlineGlitch");
 const progress = shallowRef(0);
 
 const sharedProps = computed(() => {

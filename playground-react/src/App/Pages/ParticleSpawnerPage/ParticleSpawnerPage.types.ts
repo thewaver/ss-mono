@@ -15,5 +15,18 @@ export type ParticleSpawnerExampleProps = {
     computeParticlePos: ParticleTravelPathFn;
     areTargetsHidden: boolean;
     playback: readonly [boolean, (value: boolean) => void];
+    progress?: readonly [number, (value: number) => void];
+    takeProgress?: (index: number) => readonly [number, (value: number) => void];
     renderer?: SliceAnimationRenderer;
+};
+
+export type WindExampleProps = ParticleSpawnerExampleProps & {
+    windDirectionDegrees: number;
+    windStrengthPixels: number;
+    windGustRatio: number;
+};
+
+export type AttractionExampleProps = ParticleSpawnerExampleProps & {
+    attractionStrengthRatio: number;
+    attractionReachPixels: number;
 };

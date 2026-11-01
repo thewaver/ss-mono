@@ -9,6 +9,7 @@
     import PageKnobs from "../../PageComponents/Knobs/Knobs.svelte";
     import type { Knob } from "../../PageComponents/Knobs/Knobs.types";
     import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.svelte";
+    import { usePagePlayback } from "../../PageComponents/PlaybackScrubber/PlaybackGroup.context";
     import PagePlaybackScrubber from "../../PageComponents/PlaybackScrubber/PlaybackScrubber.svelte";
     import DirInput from "./DirInput.svelte";
     import WaveExample from "./Examples/_Wave.svelte";
@@ -23,7 +24,7 @@
         ...props
     }: Omit<ScanlineAnimationExampleProps, "playback"> & { isPagePlaying: boolean } = $props();
 
-    let playback = $state(true);
+    const playback = usePagePlayback("scanlineWave");
     let progress = $state(0);
 
     let keyframeOpts = $state.raw<Record<string, number | boolean>>({});
@@ -34,10 +35,10 @@
 
 <div class={styles.stack}>
     <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
-        <WaveExample {...props} bind:playback={() => isPagePlaying && playback, (next) => (playback = next)} bind:progress keyframeOpts={keyframeOpts as _ScanlineHorizontalWaveOpts} {breakpointOpts} />
+        <WaveExample {...props} bind:playback={() => isPagePlaying && playback.value, (next) => (playback.value = next)} bind:progress keyframeOpts={keyframeOpts as _ScanlineHorizontalWaveOpts} {breakpointOpts} />
     </PageMeasureBox>
 
-    <PagePlaybackScrubber id={"scanlineWave"} ariaLabel={"Position in the pass"} bind:playback bind:progress />
+    <PagePlaybackScrubber id={"scanlineWave"} ariaLabel={"Position in the pass"} bind:playback={() => playback.value, (next) => (playback.value = next)} bind:progress />
 </div>
 
 <PageExampleKnobs>

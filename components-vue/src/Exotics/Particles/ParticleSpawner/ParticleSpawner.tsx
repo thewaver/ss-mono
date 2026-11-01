@@ -38,6 +38,8 @@ const NO_TABLES: SliceStop[][] = [];
 
 type Placed = { defs: ParticleTravelDefs; pos: Point2d; t: number };
 
+type LegTint = { legIndex: number; tint: string | undefined };
+
 export const ParticleSpawner = defineComponent(
     (props: ParticleSpawnerProps) => {
         const getTravelDurationMs = () => props.travelDurationMs ?? PARTICLE_SPAWNER_DEFAULTS.travelDurationMs;
@@ -56,12 +58,12 @@ export const ParticleSpawner = defineComponent(
         const bodies = new Map<number, HTMLElement>();
         const pictures = new Map<number, HTMLElement>();
         const placed = new Map<number, Placed>();
-        const tints = new Map<number, string | undefined>();
+        const tints = new Map<number, LegTint>();
 
         let drawnArea: Rect | undefined;
 
         const isPlaying = useTwoWay(props, "playback", true);
-        const stage = shallowRef({ index: ParticleSpawnerConst.FIRST_STAGE });
+        const progress = useTwoWay(props, "progress", ParticleSpawnerConst.NO_PROGRESS);
         const shownRect = shallowRef<Rect>(NO_RECT);
 
         const isPageHidden = InteractionTrackerVueUtils.usePageHidden();
@@ -90,10 +92,18 @@ export const ParticleSpawner = defineComponent(
 
         const item = SliceRendererVueUtils.useItem(canvasRef, isAvailable);
 
-        const getTint = (defs: ParticleTravelDefs) => {
-            if (!tints.has(defs.id)) tints.set(defs.id, props.computeParticleTint?.(defs));
+        let currentProgress = progress.value;
 
-            return tints.get(defs.id);
+        const getTint = (defs: ParticleTravelDefs) => {
+            const cached = tints.get(defs.id);
+
+            if (cached?.legIndex === defs.legIndex) return cached.tint;
+
+            const tint = props.computeParticleTint?.(defs);
+
+            tints.set(defs.id, { legIndex: defs.legIndex, tint });
+
+            return tint;
         };
 
         const canSpawn = computed(() => !!rootRef.value && isWindowVisible.value && props.targets.length > 0);
@@ -104,6 +114,7 @@ export const ParticleSpawner = defineComponent(
             return {
                 rootRect: root ? ElementObserverUtils.measureViewportRect(root, viewportContext) : undefined,
                 targetRects: ElementObserverUtils.measureViewportRects(props.targets, viewportContext),
+                modMarkerRects: ElementObserverUtils.measureViewportRects(props.modMarkers ?? [], viewportContext),
                 prefersReducedMotion: prefersReducedMotion.value,
             };
         };
@@ -111,13 +122,20 @@ export const ParticleSpawner = defineComponent(
         const applyTint = (id: number, entry: Placed) => {
             const element = pictures.get(id);
 
-            if (!element || element.dataset.tinted) return;
+            const legIndex = String(entry.defs.legIndex);
+
+            if (!element || element.dataset.tintedLeg === legIndex) return;
 
             const tint = getTint(entry.defs);
 
-            element.dataset.tinted = "true";
+            element.dataset.tintedLeg = legIndex;
 
-            if (tint === undefined) return;
+            if (tint === undefined) {
+                element.classList.remove(SliceRendererStyles.sliceRendererPictureTinted);
+                element.style.opacity = "";
+
+                return;
+            }
 
             const tintStyle = SliceRendererUtils.toTintStyle(SliceRendererUtils.toTint(tint));
 
@@ -199,9 +217,10 @@ export const ParticleSpawner = defineComponent(
             );
         };
 
-        const engine = ParticleSpawnerUtils.createLegacyEngine({
+        const engine = ParticleSpawnerUtils.createEngine({
             getTargetCount: () => props.targets.length,
             computeTarget: (index, targetCount) => props.computeTarget?.(index, targetCount),
+            computeRoute: (index, targetCount) => props.computeRoute?.(index, targetCount),
             getElement: (id) => elements.get(id),
             getIsDrawingElements: () => !isOnGraphicsCard.value,
             getFrame: measureFrame,
@@ -210,18 +229,24 @@ export const ParticleSpawner = defineComponent(
                 travelDurationMs: getTravelDurationMs(),
                 restDurationMs: getRestDurationMs(),
             }),
+            getParticleCount,
+            getPatterns: () => patterns.value,
             getCanSpawn: () => canSpawn.value,
-            computeParticlePos: (travel, t) => {
-                const pos = props.computeParticlePos(travel, t);
-
+            getProgress: () => currentProgress,
+            setProgress: (value) => {
+                currentProgress = value;
+                progress.value = value;
+            },
+            computeParticlePos: (travel, t) => props.computeParticlePos(travel, t),
+            getModifiers: () => props.particleModifiers,
+            onParticlePlace: (travel, pos, t) => {
                 placed.set(travel.id, { defs: travel, pos, t });
 
-                return pos;
-            },
-            onParticleT: (id) => {
-                if (!isOnGraphicsCard.value) applyParticle(id);
+                if (!isOnGraphicsCard.value) applyParticle(travel.id);
             },
             onParticleArrive: (index) => props.onParticleArrive?.(index),
+            onIterationEnd: () => props.onIterationEnd?.(),
+            onAnimationEnd: () => props.onAnimationEnd?.(),
             onTick: () => {
                 if (isOnGraphicsCard.value) drawOnGraphicsCard();
             },
@@ -257,35 +282,26 @@ export const ParticleSpawner = defineComponent(
             tints.clear();
         });
 
-        watchAfterRender([getParticleCount, getSpawnDelayMs, patterns], () => {
-            stage.value = { index: ParticleSpawnerConst.FIRST_STAGE };
+        watch([getParticleCount, getSpawnDelayMs, getTravelDurationMs, getRestDurationMs, patterns], () => {
+            engine.restart();
         });
 
-        const pattern = computed(() => patterns.value[stage.value.index]);
+        watch(isPlaying, (isOn, wasOn) => {
+            if (isOn && !wasOn && engine.getHasEnded()) engine.restart();
+        });
 
-        watchAfterRender(
-            [
-                canSpawn,
-                isPlaying,
-                getParticleCount,
-                pattern,
-                stage,
-                getTravelDurationMs,
-                getRestDurationMs,
-                getSpawnDelayMs,
-            ],
-            ([isSpawnable, isOn, particleCount, current]) => {
-                if (!isSpawnable || !isOn || particleCount <= 0 || !current) return;
+        watchAfterRender([isPlaying, canSpawn], ([isOn, isSpawnable]) => {
+            const isRunning = isOn && isSpawnable;
 
-                return engine.playPattern(current, particleCount, {
-                    onIterationEnd: () => props.onIterationEnd?.(),
-                    onAnimationEnd: () => props.onAnimationEnd?.(),
-                    onNextStage: (index) => {
-                        stage.value = { index };
-                    },
-                });
-            },
-        );
+            engine.setIsRunning(isRunning);
+
+            if (!isRunning) engine.render();
+        });
+
+        watch(progress, (value) => {
+            currentProgress = value;
+            engine.scrub();
+        });
 
         return () => {
             const size = particleSize.value;
@@ -377,6 +393,8 @@ export const ParticleSpawner = defineComponent(
             "spawnIterationPatterns": null,
             "playback": Boolean,
             "onUpdate:playback": null,
+            "progress": null,
+            "onUpdate:progress": null,
             "renderer": null,
             "computeTarget": null,
             "computeRoute": null,

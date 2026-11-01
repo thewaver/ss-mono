@@ -37,11 +37,6 @@ export const createLegTints = () => [
     ParticlePictureUtils.resolveColor(themeVars.color.secondary.main),
 ];
 
-export const createReturnParticleSrc = () =>
-    ParticlePictureUtils.createDotSrc(themeVars.color.secondary.light, themeVars.color.secondary.dark, {
-        sizePx: PARTICLE_SIZE_PX,
-    });
-
 export const EXAMPLE_NAMES = {
     singleTarget: "Single target",
     vertical: "Vertical",

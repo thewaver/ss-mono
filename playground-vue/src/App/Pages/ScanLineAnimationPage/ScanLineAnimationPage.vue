@@ -21,6 +21,8 @@ import PageFileField from "../../PageComponents/Field/PageFileField.vue";
 import PageGroupedSelectField from "../../PageComponents/Field/PageGroupedSelectField.vue";
 import PageNumberField from "../../PageComponents/Field/PageNumberField.vue";
 import PageSelectField from "../../PageComponents/Field/PageSelectField.vue";
+import { providePlaybackGroupContext } from "../../PageComponents/PlaybackScrubber/PlaybackGroup.context";
+import { PlaybackScrubberUtils } from "../../PageComponents/PlaybackScrubber/PlaybackScrubber.utils";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
 import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
 import BrightnessExampleWrapper from "./BrightnessExampleWrapper.vue";
@@ -56,6 +58,8 @@ const groupOptions = <T extends string>(keys: readonly T[]) => {
 const GROUPPED_WEIGHTS = groupOptions(SliceAnimationWeights.ORIGIN_FREE_WEIGHT_TYPES);
 
 const playback = shallowRef(true);
+
+providePlaybackGroupContext(PlaybackScrubberUtils.useGroup("scanlineGlitch"));
 
 const src = shallowRef(knight);
 const lineCount = shallowRef(ScanlineAnimationKnobs.STARTING_LINE_COUNT);

@@ -13,8 +13,6 @@ import {
 import { ParticleSpawnerKnobs } from "@thewaver/ss-playground/App/Knobs/ParticleSpawners.const";
 import { EXAMPLES_ONLY_PROP } from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.const";
 import {
-    BOX_HEIGHT,
-    BOX_WIDTH,
     EXAMPLES_ROOT,
     EXAMPLE_NAMES,
     FIELD_WIDTH,
@@ -27,11 +25,12 @@ import PageCheckField from "../../PageComponents/Field/PageCheckField.vue";
 import PageNumberField from "../../PageComponents/Field/PageNumberField.vue";
 import PageSelectField from "../../PageComponents/Field/PageSelectField.vue";
 import PageKnobs from "../../PageComponents/Knobs/Knobs.vue";
-import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.vue";
+import { PlaybackScrubberUtils } from "../../PageComponents/PlaybackScrubber/PlaybackScrubber.utils";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
 import PagePropsDivider from "../../PageComponents/PropsPanel/PagePropsDivider.vue";
 import PagePropsGroups from "../../PageComponents/PropsPanel/PagePropsGroups.vue";
 import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
+import AttractionExampleWrapper from "./AttractionExampleWrapper.vue";
 import DiagonalExample from "./Examples/Diagonal.vue";
 import GridExample from "./Examples/Grid.vue";
 import ManyToOneExample from "./Examples/ManyToOne.vue";
@@ -42,7 +41,9 @@ import RoundTripExample from "./Examples/RoundTrip.vue";
 import SingleTargetExample from "./Examples/SingleTarget.vue";
 import VerticalExample from "./Examples/Vertical.vue";
 import type { ParticleSpawnerExampleProps } from "./ParticleSpawnerPage.types";
+import ScrubbedExampleWrapper from "./ScrubbedExampleWrapper.vue";
 import StressTestWrapper from "./StressTestWrapper.vue";
+import WindExampleWrapper from "./WindExampleWrapper.vue";
 
 const particleCount = shallowRef(ParticleSpawnerKnobs.STARTING_PARTICLE_COUNT);
 const travelDurationMs = shallowRef(PARTICLE_SPAWNER_DEFAULTS.travelDurationMs);
@@ -61,6 +62,18 @@ const areTargetsHidden = shallowRef(ParticleSpawnerKnobs.STARTING_ARE_TARGETS_HI
 
 const travelDefs = shallowRef<Record<string, Record<string, number | boolean>>>({});
 const playback = shallowRef(true);
+const takePlayback = PlaybackScrubberUtils.useGroup("singleTarget");
+const singleTargetPlayback = takePlayback("singleTarget");
+const verticalPlayback = takePlayback("vertical");
+const diagonalPlayback = takePlayback("diagonal");
+const movingTargetPlayback = takePlayback("movingTarget");
+const radialPlayback = takePlayback("radial");
+const manyToOnePlayback = takePlayback("manyToOne");
+const roundTripPlayback = takePlayback("roundTrip");
+const windPlayback = takePlayback("wind");
+const attractionPlayback = takePlayback("attraction");
+const multipleTargetsPlayback = takePlayback("multipleTargets");
+const gridPlayback = takePlayback("grid");
 
 const travelKnobs = computed(() => ParticleSpawnerKnobs.TRAVEL_KNOBS_BY_PATTERN[travelPatternKey.value]);
 const travelDefaults = computed(() => ParticleTravelPaths.DEFAULT_OPTS[travelPatternKey.value]);
@@ -132,6 +145,16 @@ const examples: ExampleDefs[] = [
         key: "roundTrip",
         name: EXAMPLE_NAMES.roundTrip,
         path: `${EXAMPLES_ROOT}/RoundTrip.vue`,
+    },
+    {
+        key: "wind",
+        name: EXAMPLE_NAMES.wind,
+        path: `${EXAMPLES_ROOT}/Wind.vue`,
+    },
+    {
+        key: "attraction",
+        name: EXAMPLE_NAMES.attraction,
+        path: `${EXAMPLES_ROOT}/Attraction.vue`,
     },
     {
         key: "multipleTargets",
@@ -312,57 +335,125 @@ const examples: ExampleDefs[] = [
 
     <PageExamples :items="examples" layout="flow">
         <template #singleTarget>
-            <PageMeasureBox :width="BOX_WIDTH" :height="BOX_HEIGHT">
-                <SingleTargetExample v-bind="commonProps" v-model:playback="playback" />
-            </PageMeasureBox>
+            <ScrubbedExampleWrapper id="singleTarget" :is-page-playing="playback" v-model:playback="singleTargetPlayback">
+                <template #default="{ playback: examplePlayback, progress }">
+                    <SingleTargetExample
+                        v-bind="commonProps"
+                        v-model:playback="examplePlayback.value"
+                        v-model:progress="progress.value"
+                    />
+                </template>
+            </ScrubbedExampleWrapper>
         </template>
 
         <template #vertical>
-            <PageMeasureBox :width="BOX_WIDTH" :height="BOX_HEIGHT">
-                <VerticalExample v-bind="commonProps" v-model:playback="playback" />
-            </PageMeasureBox>
+            <ScrubbedExampleWrapper id="vertical" :is-page-playing="playback" v-model:playback="verticalPlayback">
+                <template #default="{ playback: examplePlayback, progress }">
+                    <VerticalExample
+                        v-bind="commonProps"
+                        v-model:playback="examplePlayback.value"
+                        v-model:progress="progress.value"
+                    />
+                </template>
+            </ScrubbedExampleWrapper>
         </template>
 
         <template #diagonal>
-            <PageMeasureBox :width="BOX_WIDTH" :height="BOX_HEIGHT">
-                <DiagonalExample v-bind="commonProps" v-model:playback="playback" />
-            </PageMeasureBox>
+            <ScrubbedExampleWrapper id="diagonal" :is-page-playing="playback" v-model:playback="diagonalPlayback">
+                <template #default="{ playback: examplePlayback, progress }">
+                    <DiagonalExample
+                        v-bind="commonProps"
+                        v-model:playback="examplePlayback.value"
+                        v-model:progress="progress.value"
+                    />
+                </template>
+            </ScrubbedExampleWrapper>
         </template>
 
         <template #movingTarget>
-            <PageMeasureBox :width="BOX_WIDTH" :height="BOX_HEIGHT">
-                <MovingTargetExample v-bind="commonProps" v-model:playback="playback" />
-            </PageMeasureBox>
+            <ScrubbedExampleWrapper id="movingTarget" :is-page-playing="playback" v-model:playback="movingTargetPlayback">
+                <template #default="{ playback: examplePlayback, progress }">
+                    <MovingTargetExample
+                        v-bind="commonProps"
+                        v-model:playback="examplePlayback.value"
+                        v-model:progress="progress.value"
+                    />
+                </template>
+            </ScrubbedExampleWrapper>
         </template>
 
         <template #radial>
-            <PageMeasureBox :width="BOX_WIDTH" :height="BOX_HEIGHT">
-                <RadialExample v-bind="commonProps" v-model:playback="playback" />
-            </PageMeasureBox>
+            <ScrubbedExampleWrapper id="radial" :is-page-playing="playback" v-model:playback="radialPlayback">
+                <template #default="{ playback: examplePlayback, progress }">
+                    <RadialExample
+                        v-bind="commonProps"
+                        v-model:playback="examplePlayback.value"
+                        v-model:progress="progress.value"
+                    />
+                </template>
+            </ScrubbedExampleWrapper>
         </template>
 
         <template #manyToOne>
-            <PageMeasureBox :width="BOX_WIDTH" :height="BOX_HEIGHT">
-                <ManyToOneExample v-bind="commonProps" v-model:playback="playback" />
-            </PageMeasureBox>
+            <ScrubbedExampleWrapper id="manyToOne" :is-page-playing="playback" v-model:playback="manyToOnePlayback">
+                <template #default="{ playback: examplePlayback, progress, takeProgress }">
+                    <ManyToOneExample
+                        v-bind="commonProps"
+                        v-model:playback="examplePlayback.value"
+                        v-model:progress="progress.value"
+                        :take-progress="takeProgress"
+                    />
+                </template>
+            </ScrubbedExampleWrapper>
         </template>
 
         <template #roundTrip>
-            <PageMeasureBox :width="BOX_WIDTH" :height="BOX_HEIGHT">
-                <RoundTripExample v-bind="commonProps" v-model:playback="playback" />
-            </PageMeasureBox>
+            <ScrubbedExampleWrapper id="roundTrip" :is-page-playing="playback" v-model:playback="roundTripPlayback">
+                <template #default="{ playback: examplePlayback, progress }">
+                    <RoundTripExample
+                        v-bind="commonProps"
+                        v-model:playback="examplePlayback.value"
+                        v-model:progress="progress.value"
+                    />
+                </template>
+            </ScrubbedExampleWrapper>
+        </template>
+
+        <template #wind>
+            <WindExampleWrapper :example-props="commonProps" :is-page-playing="playback" v-model:playback="windPlayback" />
+        </template>
+
+        <template #attraction>
+            <AttractionExampleWrapper
+                :example-props="commonProps"
+                :is-page-playing="playback"
+                v-model:playback="attractionPlayback"
+            />
         </template>
 
         <template #multipleTargets>
-            <PageMeasureBox :width="BOX_WIDTH" :height="BOX_HEIGHT">
-                <MultipleTargetsExample v-bind="commonProps" v-model:playback="playback" />
-            </PageMeasureBox>
+            <ScrubbedExampleWrapper id="multipleTargets" :is-page-playing="playback" v-model:playback="multipleTargetsPlayback">
+                <template #default="{ playback: examplePlayback, progress }">
+                    <MultipleTargetsExample
+                        v-bind="commonProps"
+                        v-model:playback="examplePlayback.value"
+                        v-model:progress="progress.value"
+                    />
+                </template>
+            </ScrubbedExampleWrapper>
         </template>
 
         <template #grid>
-            <PageMeasureBox :width="BOX_WIDTH" :height="BOX_HEIGHT">
-                <GridExample v-bind="commonProps" v-model:playback="playback" />
-            </PageMeasureBox>
+            <ScrubbedExampleWrapper id="grid" :is-page-playing="playback" v-model:playback="gridPlayback">
+                <template #default="{ playback: examplePlayback, progress, takeProgress }">
+                    <GridExample
+                        v-bind="commonProps"
+                        v-model:playback="examplePlayback.value"
+                        v-model:progress="progress.value"
+                        :take-progress="takeProgress"
+                    />
+                </template>
+            </ScrubbedExampleWrapper>
         </template>
 
         <template #stressTest>

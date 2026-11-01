@@ -43,7 +43,6 @@ reading.
 9. `GlassSurface`'s ripple layer shows a defect at its edge — _postponed until the platform catches up_
 10. Arbitrary placement — the gaps the trials left — _open_
 11. The Playground's painters in Windows high-contrast mode — _open, decided, not yet built_
-12. `ParticleSpawner`'s timeline, routes and modifiers, ported to React, Vue and Svelte — _open, decided, not yet built_
 
 ---
 
@@ -398,46 +397,6 @@ active)` rule drawing its shapes in system colors (`CanvasText` for a track or a
 selected or filled part), with `forced-color-adjust` left alone unless a part has to keep its own color. **The
 normal theme does not change**: this is the user's styling, and the rules apply only while high-contrast mode is
 on.
-
----
-
-## 12. `ParticleSpawner`'s timeline, routes and modifiers, ported to React, Vue and Svelte — _open, decided, not yet built_
-
-Built and tested in Solid only. In React, Vue and Svelte a spawner still runs on `createLegacyEngine`, so it cannot
-pause a round in place or be scrubbed, and it accepts `computeRoute`, `particleModifiers` and `modMarkers` and
-ignores all three. Their Playgrounds still show Round trip as two spawners relaying, with no Wind or Attraction
-examples, and their Spawner, Scanline and RGB pages play every example at once. The reasoning is in `decisions.md`
-under _"`ParticleSpawner`: a round is worked out from its progress, so it pauses and scrubs"_, _"`ParticleSpawner`:
-a route is a list of stops, and modifiers move a particle after its path"_ and _"`ParticleSpawner`: every engine
-shares one frame"_. Solid's view and Playground are the model for each port.
-
-**The library, in each of the three views:**
-
-- Move from `createLegacyEngine` to `createEngine`, handing it `computeRoute`, `getModifiers` and the restart,
-  playback and scrub effects Solid's view has.
-- A two-way `progress` (`0`–`1`), shared and kept private like `playback`: a `[value, setValue]` pair in React,
-  `v-model:progress` in Vue, `bind:progress` in Svelte.
-- Measure inside `getFrame`, as Solid does, instead of keeping two observers — the spawner, its targets and its
-  `modMarkers`, which go in `modMarkerRects`.
-- Ask the tint again whenever a particle starts a new leg, and repaint it on the elements renderer.
-
-**The Playgrounds, in each of the three:**
-
-- The Spawner page: a pause button and scrubber on every example but the stress test, Grid and Many to one handing
-  every spawner its own `progress` with the scrubber writing all of them, and Round trip as one spawner with the
-  route `[0, "spawner"]`, a white dot tinted per leg.
-- The Wind and Attraction examples, each with its knobs in a wrapper in the page file: the dashed wind arrow, and the
-  bobbing ring passed as `modMarkers`.
-- One example playing at a time on the Spawner, Scanline and RGB pages, only the first starting on its own, as
-  Solid's `PlaybackScrubberUtils.createGroup` and `PlaybackGroup.context.ts` do it.
-
-**The cleanup, once all three are ported:**
-
-- Delete `createLegacyEngine` and its types from `ParticleSpawner.utils.ts`.
-- Delete the relay spec in `e2e/particleSpawner.spec.ts` (_"every particle that reaches the far spawner is sent
-  back"_), and take `@solid` off the spawner, Scanline and RGB tests that carry it, so they run in all four.
-- Delete `createReturnParticleSrc` and `spawnerMarkerReturn` from the shared Playground, which only the relays use.
-- Drop _"until ported"_ from those `decisions.md` entries.
 
 ---
 

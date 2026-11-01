@@ -28,7 +28,6 @@ Something that misbehaves, or a cost nobody has paid down.
 | 10  | **Any placed control**     | A layout guesses each item's box, so content wider than the guess overflows it and, on a ring, overlaps a neighbor                        |
 | 10  | **Any placed control**     | Nothing stops a layout outgrowing the room it is in — a ring can reach past the screen, and a placed toolbar has nothing to collapse into |
 | 10  | **`Menu`, hold and flick** | How far a flick must travel to pick an item is a guess — about 30px on the demo wheel — not a measured number                             |
-| 12  | **`ParticleSpawner`**      | In React, Vue and Svelte a round cannot be paused in place or scrubbed, and routes, modifiers and `modMarkers` are accepted but ignored   |
 
 ## Deliberately not built
 

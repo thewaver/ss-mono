@@ -42,6 +42,7 @@ export const GridExample = (props: ParticleSpawnerExampleProps) => {
 
                     <ParticleSpawner
                         {...props}
+                        progress={index === 0 ? props.progress : props.takeProgress?.(index)}
                         targets={targetRefs}
                         src={particleSrc}
                         computeParticleAnimation={computeParticleAnimation}

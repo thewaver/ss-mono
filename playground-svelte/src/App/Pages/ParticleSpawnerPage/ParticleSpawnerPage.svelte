@@ -1,7 +1,7 @@
 <script lang="ts">
     import { EXAMPLES_ONLY_PROP } from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.const";
     import { PARTICLE_SPAWNER_DEFAULTS, ParticleIterationPatterns, ParticleTravelEasings, ParticleTravelPaths, type ParticleIterationPatternType, type ParticleTravelEasingType, type ParticleTravelPathType } from "@thewaver/ss-components-svelte";
-    import { BOX_HEIGHT, BOX_WIDTH, EXAMPLE_NAMES, EXAMPLES_ROOT, FIELD_WIDTH, NO_TRAVEL_DEFS } from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.const";
+    import { EXAMPLE_NAMES, EXAMPLES_ROOT, FIELD_WIDTH, NO_TRAVEL_DEFS } from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.const";
 
     import { ParticleSpawnerKnobs } from "@thewaver/ss-playground/App/Knobs/ParticleSpawners.const";
     import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
@@ -10,11 +10,12 @@
     import PageNumberField from "../../PageComponents/Field/PageNumberField.svelte";
     import PageSelectField from "../../PageComponents/Field/PageSelectField.svelte";
     import PageKnobs from "../../PageComponents/Knobs/Knobs.svelte";
-    import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.svelte";
+    import { PlaybackScrubberUtils } from "../../PageComponents/PlaybackScrubber/PlaybackScrubber.utils.svelte";
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
     import PagePropsDivider from "../../PageComponents/PropsPanel/PagePropsDivider.svelte";
     import PagePropsGroups from "../../PageComponents/PropsPanel/PagePropsGroups.svelte";
     import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
+    import AttractionExampleWrapper from "./AttractionExampleWrapper.svelte";
     import DiagonalExample from "./Examples/Diagonal.svelte";
     import GridExample from "./Examples/Grid.svelte";
     import ManyToOneExample from "./Examples/ManyToOne.svelte";
@@ -24,8 +25,11 @@
     import RoundTripExample from "./Examples/RoundTrip.svelte";
     import SingleTargetExample from "./Examples/SingleTarget.svelte";
     import VerticalExample from "./Examples/Vertical.svelte";
-    import type { ParticleSpawnerExampleProps } from "./ParticleSpawnerPage.types";
+    import type { PlaybackSlot } from "../../PageComponents/PlaybackScrubber/PlaybackScrubber.types";
+    import type { ParticleSpawnerExampleProps, ProgressSlot } from "./ParticleSpawnerPage.types";
+    import ScrubbedExampleWrapper from "./ScrubbedExampleWrapper.svelte";
     import StressTestWrapper from "./StressTestWrapper.svelte";
+    import WindExampleWrapper from "./WindExampleWrapper.svelte";
 
     let particleCount = $state(ParticleSpawnerKnobs.STARTING_PARTICLE_COUNT);
     let travelDurationMs = $state(PARTICLE_SPAWNER_DEFAULTS.travelDurationMs);
@@ -42,6 +46,7 @@
 
     let travelDefs = $state.raw<Record<string, Record<string, number | boolean>>>({});
     let playback = $state(true);
+    const takePlayback = PlaybackScrubberUtils.createGroup("singleTarget");
 
     const travelKnobs = $derived(ParticleSpawnerKnobs.TRAVEL_KNOBS_BY_PATTERN[travelPatternKey]);
     const travelDefaults = $derived(ParticleTravelPaths.DEFAULT_OPTS[travelPatternKey]);
@@ -115,6 +120,18 @@
             path: `${EXAMPLES_ROOT}/RoundTrip.svelte`,
         },
         {
+            key: "wind",
+            name: EXAMPLE_NAMES.wind,
+            component: windExample,
+            path: `${EXAMPLES_ROOT}/Wind.svelte`,
+        },
+        {
+            key: "attraction",
+            name: EXAMPLE_NAMES.attraction,
+            component: attractionExample,
+            path: `${EXAMPLES_ROOT}/Attraction.svelte`,
+        },
+        {
             key: "multipleTargets",
             name: EXAMPLE_NAMES.multipleTargets,
             component: multipleTargetsExample,
@@ -135,59 +152,176 @@
 </script>
 
 {#snippet singleTargetExample()}
-    <PageMeasureBox width={BOX_WIDTH} height={BOX_HEIGHT}>
-        <SingleTargetExample {...commonProps} bind:playback />
-    </PageMeasureBox>
+    {@const groupPlayback = takePlayback("singleTarget")}
+    {#snippet renderSingleTarget(examplePlayback: PlaybackSlot, progress: ProgressSlot)}
+        <SingleTargetExample
+            {...commonProps}
+            bind:playback={() => examplePlayback.value, (next) => (examplePlayback.value = next)}
+            bind:progress={() => progress.value, (next) => (progress.value = next)}
+        />
+    {/snippet}
+    <ScrubbedExampleWrapper
+        id={"singleTarget"}
+        isPagePlaying={playback}
+        bind:playback={() => groupPlayback.value, (next) => (groupPlayback.value = next)}
+        renderExample={renderSingleTarget}
+    />
 {/snippet}
 
 {#snippet verticalExample()}
-    <PageMeasureBox width={BOX_WIDTH} height={BOX_HEIGHT}>
-        <VerticalExample {...commonProps} bind:playback />
-    </PageMeasureBox>
+    {@const groupPlayback = takePlayback("vertical")}
+    {#snippet renderVertical(examplePlayback: PlaybackSlot, progress: ProgressSlot)}
+        <VerticalExample
+            {...commonProps}
+            bind:playback={() => examplePlayback.value, (next) => (examplePlayback.value = next)}
+            bind:progress={() => progress.value, (next) => (progress.value = next)}
+        />
+    {/snippet}
+    <ScrubbedExampleWrapper
+        id={"vertical"}
+        isPagePlaying={playback}
+        bind:playback={() => groupPlayback.value, (next) => (groupPlayback.value = next)}
+        renderExample={renderVertical}
+    />
 {/snippet}
 
 {#snippet diagonalExample()}
-    <PageMeasureBox width={BOX_WIDTH} height={BOX_HEIGHT}>
-        <DiagonalExample {...commonProps} bind:playback />
-    </PageMeasureBox>
+    {@const groupPlayback = takePlayback("diagonal")}
+    {#snippet renderDiagonal(examplePlayback: PlaybackSlot, progress: ProgressSlot)}
+        <DiagonalExample
+            {...commonProps}
+            bind:playback={() => examplePlayback.value, (next) => (examplePlayback.value = next)}
+            bind:progress={() => progress.value, (next) => (progress.value = next)}
+        />
+    {/snippet}
+    <ScrubbedExampleWrapper
+        id={"diagonal"}
+        isPagePlaying={playback}
+        bind:playback={() => groupPlayback.value, (next) => (groupPlayback.value = next)}
+        renderExample={renderDiagonal}
+    />
 {/snippet}
 
 {#snippet movingTargetExample()}
-    <PageMeasureBox width={BOX_WIDTH} height={BOX_HEIGHT}>
-        <MovingTargetExample {...commonProps} bind:playback />
-    </PageMeasureBox>
+    {@const groupPlayback = takePlayback("movingTarget")}
+    {#snippet renderMovingTarget(examplePlayback: PlaybackSlot, progress: ProgressSlot)}
+        <MovingTargetExample
+            {...commonProps}
+            bind:playback={() => examplePlayback.value, (next) => (examplePlayback.value = next)}
+            bind:progress={() => progress.value, (next) => (progress.value = next)}
+        />
+    {/snippet}
+    <ScrubbedExampleWrapper
+        id={"movingTarget"}
+        isPagePlaying={playback}
+        bind:playback={() => groupPlayback.value, (next) => (groupPlayback.value = next)}
+        renderExample={renderMovingTarget}
+    />
 {/snippet}
 
 {#snippet radialExample()}
-    <PageMeasureBox width={BOX_WIDTH} height={BOX_HEIGHT}>
-        <RadialExample {...commonProps} bind:playback />
-    </PageMeasureBox>
+    {@const groupPlayback = takePlayback("radial")}
+    {#snippet renderRadial(examplePlayback: PlaybackSlot, progress: ProgressSlot)}
+        <RadialExample
+            {...commonProps}
+            bind:playback={() => examplePlayback.value, (next) => (examplePlayback.value = next)}
+            bind:progress={() => progress.value, (next) => (progress.value = next)}
+        />
+    {/snippet}
+    <ScrubbedExampleWrapper
+        id={"radial"}
+        isPagePlaying={playback}
+        bind:playback={() => groupPlayback.value, (next) => (groupPlayback.value = next)}
+        renderExample={renderRadial}
+    />
 {/snippet}
 
 {#snippet manyToOneExample()}
-    <PageMeasureBox width={BOX_WIDTH} height={BOX_HEIGHT}>
-        <ManyToOneExample {...commonProps} bind:playback />
-    </PageMeasureBox>
+    {@const groupPlayback = takePlayback("manyToOne")}
+    {#snippet renderManyToOne(examplePlayback: PlaybackSlot, progress: ProgressSlot, takeProgress: () => ProgressSlot)}
+        <ManyToOneExample
+            {...commonProps}
+            bind:playback={() => examplePlayback.value, (next) => (examplePlayback.value = next)}
+            bind:progress={() => progress.value, (next) => (progress.value = next)}
+            {takeProgress}
+        />
+    {/snippet}
+    <ScrubbedExampleWrapper
+        id={"manyToOne"}
+        isPagePlaying={playback}
+        bind:playback={() => groupPlayback.value, (next) => (groupPlayback.value = next)}
+        renderExample={renderManyToOne}
+    />
 {/snippet}
 
 {#snippet roundTripExample()}
-    <PageMeasureBox width={BOX_WIDTH} height={BOX_HEIGHT}>
-        <RoundTripExample {...commonProps} bind:playback />
-    </PageMeasureBox>
+    {@const groupPlayback = takePlayback("roundTrip")}
+    {#snippet renderRoundTrip(examplePlayback: PlaybackSlot, progress: ProgressSlot)}
+        <RoundTripExample
+            {...commonProps}
+            bind:playback={() => examplePlayback.value, (next) => (examplePlayback.value = next)}
+            bind:progress={() => progress.value, (next) => (progress.value = next)}
+        />
+    {/snippet}
+    <ScrubbedExampleWrapper
+        id={"roundTrip"}
+        isPagePlaying={playback}
+        bind:playback={() => groupPlayback.value, (next) => (groupPlayback.value = next)}
+        renderExample={renderRoundTrip}
+    />
 {/snippet}
 
 {#snippet multipleTargetsExample()}
-    <PageMeasureBox width={BOX_WIDTH} height={BOX_HEIGHT}>
-        <MultipleTargetsExample {...commonProps} bind:playback />
-    </PageMeasureBox>
+    {@const groupPlayback = takePlayback("multipleTargets")}
+    {#snippet renderMultipleTargets(examplePlayback: PlaybackSlot, progress: ProgressSlot)}
+        <MultipleTargetsExample
+            {...commonProps}
+            bind:playback={() => examplePlayback.value, (next) => (examplePlayback.value = next)}
+            bind:progress={() => progress.value, (next) => (progress.value = next)}
+        />
+    {/snippet}
+    <ScrubbedExampleWrapper
+        id={"multipleTargets"}
+        isPagePlaying={playback}
+        bind:playback={() => groupPlayback.value, (next) => (groupPlayback.value = next)}
+        renderExample={renderMultipleTargets}
+    />
 {/snippet}
 
 {#snippet gridExample()}
-    <PageMeasureBox width={BOX_WIDTH} height={BOX_HEIGHT}>
-        <GridExample {...commonProps} bind:playback />
-    </PageMeasureBox>
+    {@const groupPlayback = takePlayback("grid")}
+    {#snippet renderGrid(examplePlayback: PlaybackSlot, progress: ProgressSlot, takeProgress: () => ProgressSlot)}
+        <GridExample
+            {...commonProps}
+            bind:playback={() => examplePlayback.value, (next) => (examplePlayback.value = next)}
+            bind:progress={() => progress.value, (next) => (progress.value = next)}
+            {takeProgress}
+        />
+    {/snippet}
+    <ScrubbedExampleWrapper
+        id={"grid"}
+        isPagePlaying={playback}
+        bind:playback={() => groupPlayback.value, (next) => (groupPlayback.value = next)}
+        renderExample={renderGrid}
+    />
 {/snippet}
 
+{#snippet windExample()}
+    {@const windPlayback = takePlayback("wind")}
+    <WindExampleWrapper
+        exampleProps={commonProps}
+        isPagePlaying={playback}
+        bind:playback={() => windPlayback.value, (next) => (windPlayback.value = next)}
+    />
+{/snippet}
+{#snippet attractionExample()}
+    {@const attractionPlayback = takePlayback("attraction")}
+    <AttractionExampleWrapper
+        exampleProps={commonProps}
+        isPagePlaying={playback}
+        bind:playback={() => attractionPlayback.value, (next) => (attractionPlayback.value = next)}
+    />
+{/snippet}
 {#snippet stressTestExample()}
     <StressTestWrapper {...commonProps} bind:playback />
 {/snippet}

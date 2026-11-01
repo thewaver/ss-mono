@@ -1,54 +1,44 @@
 <script lang="ts">
-    import { ParticleSpawner } from "@thewaver/ss-components-svelte";
-    import type { ParticleSpawnerController } from "@thewaver/ss-components-svelte";
+    import { type ParticleRouteStop, ParticleSpawner } from "@thewaver/ss-components-svelte";
     import {
         computeParticleAnimation,
-        createParticleSrc,
-        createReturnParticleSrc,
+        createLegTints,
+        createTintableParticleSrc,
     } from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.const";
     import * as styles from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.css";
 
     import type { ParticleSpawnerExampleProps } from "../ParticleSpawnerPage.types";
 
-    const RETURN_COUNT = 1;
+    const OUT_AND_BACK: ParticleRouteStop[] = [0, "spawner"];
 
-    let { playback = $bindable(), ...props }: ParticleSpawnerExampleProps = $props();
+    let { playback = $bindable(), progress = $bindable(0), ...props }: ParticleSpawnerExampleProps = $props();
 
-    const particleSrc = createParticleSrc();
-    const returnParticleSrc = createReturnParticleSrc();
+    const particleSrc = createTintableParticleSrc();
+    const legTints = createLegTints();
 
-    let outboundMarker = $state<HTMLElement>();
-    let returnMarker = $state<HTMLElement>();
-    let relay = $state.raw<ParticleSpawnerController>();
-    let relayPlayback = $state(false);
+    let targetRef = $state<HTMLElement>();
 </script>
 
 <div class={styles.demoArea}>
+    <div
+        bind:this={targetRef}
+        class={[styles.targetMarker, props.areTargetsHidden && styles.isHiddenMarker]}
+        style:left={"85%"}
+        style:top={"50%"}
+    ></div>
+
     <div class={styles.spawnerRoot} style:left={"15%"} style:top={"50%"}>
-        <div bind:this={outboundMarker} class={styles.spawnerMarker}></div>
+        <div class={styles.spawnerMarker}></div>
 
         <ParticleSpawner
             {...props}
             bind:playback
-            targets={[returnMarker ?? undefined]}
+            bind:progress
+            targets={[targetRef ?? undefined]}
             src={particleSrc}
+            computeRoute={() => OUT_AND_BACK}
+            computeParticleTint={(defs) => legTints[defs.legIndex % legTints.length]}
             {computeParticleAnimation}
-            onParticleArrive={() => relay?.emit(RETURN_COUNT)}
-        />
-    </div>
-
-    <div class={styles.spawnerRoot} style:left={"85%"} style:top={"50%"}>
-        <div bind:this={returnMarker} class={styles.spawnerMarkerReturn}></div>
-
-        <ParticleSpawner
-            {...props}
-            bind:playback={relayPlayback}
-            targets={[outboundMarker ?? undefined]}
-            src={returnParticleSrc}
-            {computeParticleAnimation}
-            onMount={(controller) => {
-                relay = controller;
-            }}
         />
     </div>
 </div>

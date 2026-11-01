@@ -12,6 +12,7 @@ import * as styles from "@thewaver/ss-playground/App/Pages/ScanLineAnimationPage
 
 import PageExampleKnobs from "../../PageComponents/ExampleKnobs/PageExampleKnobs.vue";
 import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.vue";
+import { usePagePlayback } from "../../PageComponents/PlaybackScrubber/PlaybackGroup.context";
 import PagePlaybackScrubber from "../../PageComponents/PlaybackScrubber/PlaybackScrubber.vue";
 import DirInput from "./DirInput.vue";
 import GrayscaleExample from "./Examples/Grayscale.vue";
@@ -20,7 +21,7 @@ import SmoothnessInput from "./SmoothnessInput.vue";
 
 const props = defineProps<ScanlineAnimationExampleProps>();
 
-const playback = shallowRef(true);
+const playback = usePagePlayback("scanlineGrayscale");
 const progress = shallowRef(0);
 
 const sharedProps = computed(() => {

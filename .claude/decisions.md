@@ -1660,6 +1660,20 @@ the other pages copy. Taken on Claude's judgment under the unsupervised port.
   `equals: false` gives it.
 - **The particle roster clears itself when handed a different cell count**, since a cell's key then names a different
   cell.
+- **The engine reads `progress` back the moment it writes it**, so each view hands it a copy that is current at once.
+  React writes a ref beside the state setter, as above. Vue keeps the last value it wrote in a plain variable and
+  takes the prop's value when it changes, because a bound `useModel` goes on reading the old prop until the parent
+  re-renders. Svelte reads the bindable directly, which a bound write updates at once.
+- **The React `ParticleSpawner` builds its particle elements in a memo over the particle list**, since an unshared
+  `progress` re-renders it every frame, and React calls a ref callback written inline again on every render — each
+  particle would be placed and painted twice a frame.
+- **The `restart` and `scrub` effects run only on a change, never on mount**, as Solid's `defer` does: React keeps the
+  last value in a ref and compares (which also survives Strict Mode's second mount), Vue uses a plain `watch`, and
+  Svelte `watchChange`.
+- **The spawner page's Grid and Many to one followers**: Solid, Vue and Svelte make one progress per follower as it
+  mounts, and the scrubber writes every one. React cannot make state in a loop, so the wrapper holds the followers'
+  values in one object keyed by spawner, an unwritten follower reads the first spawner's value, and a scrub empties
+  the object so all of them read the scrubbed value.
 
 ### Porting: `Cuboid`, `Die`, `FlipCard`, `Odometer`, `RichText`, `ScrambleText` and `Typewriter`
 
@@ -9334,9 +9348,8 @@ The user's call, for `CellAnimation`, `ScanlineAnimation` and `RGBAnimation`: ev
 animation has a `PagePlaybackScrubber` under it, driving a play state and a progress that belong to that example
 alone. **Only one example plays at a time** — the user's rule, on every page of the animation and particle families
 with more than one: only the first plays when the page opens, and starting another pauses whichever was playing
-(`PlaybackScrubberUtils.createGroup`; the scanline page's wrappers take their state through
-`PlaybackGroup.context`). The spawner page's Round trip has no play button and stays outside it for now, the user's
-call. A page-wide play state survives only where something
+(`PlaybackScrubberUtils.createGroup` in Solid and Svelte, `useGroup` in React and Vue; the scanline page's wrappers
+take their state through `PlaybackGroup.context`). A page-wide play state survives only where something
 still needs one, the stress tests, whose popup switches it. **Every example's component plays only while both its
 own state and the page-wide one say so**, so opening the popup pauses everything behind it while each scrubber keeps
 showing its own state; handing the example its own state alone had left the page-wide one switching nothing. Solid
@@ -20816,7 +20829,6 @@ From the same profiling, under the user's rule above. Each spawner used to run t
 - **One animation frame for every engine on the page**, private to `ParticleSpawner.utils.ts`. In it every engine first calls `getFrame`, then every engine moves its particles, so measuring costs at most one layout a frame however many spawners there are. **An engine takes part only while something of its own moves** — a running played round or a sent one — so a paused or idle spawner does no work at all.
 - **The view measures inside `getFrame`** rather than keeping observers, since the engine calls it only in the frame's reading half. `getCanSpawn` asks whether the spawner is on the page rather than whether it has been measured, and `drawParticle` places a particle against the boxes the last frame read, so a view drawing from a ref callback does not measure in the middle of its own commit.
 - Measured at 96 spawners with the popup blur off: forced layouts 8.4 → 1.4 a frame, main thread 17–20 → 16 ms, 44–47 → 49 frames a second. Measuring calls went from about 250 to 194 a frame, two per active spawner, because the page's own examples paused behind the popup stopped measuring.
-- **Solid's view only, until ported**: the React, Vue and Svelte views still keep their two observers and hand the readings through `getFrame`, which is correct and still measures while idle.
 - **Targets are measured every frame a round is in flight, and no prop says they hold still** — the user's call, for the
   reason popovers measure their anchors: a consumer cannot be trusted to know a target is truly static, and a CSS
   animation moving one reports nothing. Measuring is about 8% of the 72-spawner stress test and nothing on an ordinary
@@ -20849,16 +20861,13 @@ drawn the same twice.
   `playback={false}` and only emits.
 - **The Playground gives every example a pause button and scrubber except the stress test.** Round trip had none
   while it was a relay, since a scrubber would have moved the outbound round while the return particles kept their
-  own clock; as a route inside one spawner it scrubs like the rest. The React, Vue and Svelte Playgrounds still show
-  the relay until they are ported.
+  own clock; as a route inside one spawner it scrubs like the rest.
 - **A `progress` shared by several spawners would advance once per spawner per frame**, since each adds its own elapsed
   time. **A read-only copy for the others was tried and dropped**: when the first spawner started its next round and
   wrote `0`, a follower still on its old round redrew that round from its start, so its last particles vanished
   before landing. So in the Playground's Grid and Many to one every spawner advances its own `progress`, and the
   scrubber shows the first one's and writes to all of them — the user's call. While running, a spawner leaves a
   `progress` written from outside to its next frame rather than drawing at once.
-- **The React, Vue and Svelte views still use `createLegacyEngine`**, the previous engine kept under that name until
-  they are ported; it goes when they move to `createEngine`.
 
 ### `ParticleSpawner`: a route is a list of stops, and modifiers move a particle after its path
 
@@ -20903,9 +20912,6 @@ The user's calls, taken together so a particle's whole path can be traced and sc
   marker moved by CSS is followed only while the spawner draws, so a paused or scrubbed spawner draws against wherever
   the marker is now. The Playground's ring bobs on a CSS animation; the wind's and attraction's defaults are guesses
   in `ParticleModifierDefaults` and the user's to tune.
-- **Solid only, until ported.** The React, Vue and Svelte views accept `computeRoute`, `particleModifiers` and
-  `modMarkers` through the shared props and ignore them, since `createLegacyEngine` knows none of them; their tint is
-  still asked once per particle.
 
 ### `ParticleSpawner`'s travel paths, easings and iteration patterns are library samples
 

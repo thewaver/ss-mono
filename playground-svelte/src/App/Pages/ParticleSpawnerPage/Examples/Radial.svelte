@@ -20,7 +20,7 @@
         { left: "20%", top: "30%" },
     ];
 
-    let { playback = $bindable(), ...props }: ParticleSpawnerExampleProps = $props();
+    let { playback = $bindable(), progress = $bindable(0), ...props }: ParticleSpawnerExampleProps = $props();
 
     const particleSrc = createParticleSrc();
 
@@ -57,6 +57,7 @@
         <ParticleSpawner
             {...props}
             bind:playback
+            bind:progress
             targets={targetRefs}
             src={particleSrc}
             {computeParticleAnimation}

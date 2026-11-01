@@ -5,6 +5,7 @@
     import PageExampleKnobs from "../../PageComponents/ExampleKnobs/PageExampleKnobs.svelte";
     import PageNumberField from "../../PageComponents/Field/PageNumberField.svelte";
     import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.svelte";
+    import { usePagePlayback } from "../../PageComponents/PlaybackScrubber/PlaybackGroup.context";
     import PagePlaybackScrubber from "../../PageComponents/PlaybackScrubber/PlaybackScrubber.svelte";
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
     import GlitchExample from "./Examples/Glitch.svelte";
@@ -18,7 +19,7 @@
         ...props
     }: Omit<ScanlineAnimationExampleProps, "playback"> & { isPagePlaying: boolean } = $props();
 
-    let playback = $state(true);
+    const playback = usePagePlayback("scanlineGlitch");
     let progress = $state(0);
 
     let keyframeOpts = $state.raw({ ...ScanlineAnimationKnobs.STARTING_GLITCH_OPTS });
@@ -26,10 +27,10 @@
 
 <div class={styles.stack}>
     <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
-        <GlitchExample {...props} bind:playback={() => isPagePlaying && playback, (next) => (playback = next)} bind:progress {keyframeOpts} />
+        <GlitchExample {...props} bind:playback={() => isPagePlaying && playback.value, (next) => (playback.value = next)} bind:progress {keyframeOpts} />
     </PageMeasureBox>
 
-    <PagePlaybackScrubber id={"scanlineGlitch"} ariaLabel={"Position in the pass"} bind:playback bind:progress />
+    <PagePlaybackScrubber id={"scanlineGlitch"} ariaLabel={"Position in the pass"} bind:playback={() => playback.value, (next) => (playback.value = next)} bind:progress />
 </div>
 
 <PageExampleKnobs>

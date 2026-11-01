@@ -68,7 +68,7 @@ test.beforeEach(async ({ page }) => {
  * whichever was playing. The second example is the one started, so the test names nothing an edit to the page's
  * examples would move.
  */
-test("only the first example plays when the page opens, and starting another pauses it @solid", async ({ page }) => {
+test("only the first example plays when the page opens, and starting another pauses it", async ({ page }) => {
     const [first, second] = await readScrubbedKeys(page);
 
     expect(second, "the page has at least two examples with their own controls").toBeDefined();

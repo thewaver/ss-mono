@@ -1,3 +1,5 @@
+import type { Ref } from "vue";
+
 import type {
     ParticleSpawnIterationPattern,
     ParticleTravelPathFn,
@@ -16,5 +18,19 @@ export type ParticleSpawnerExampleProps = {
     "areTargetsHidden": boolean;
     "playback": boolean;
     "onUpdate:playback"?: (value: boolean) => void;
+    "progress"?: number;
+    "onUpdate:progress"?: (value: number) => void;
+    "takeProgress"?: () => Ref<number>;
     "renderer"?: SliceAnimationRenderer;
+};
+
+export type WindExampleProps = ParticleSpawnerExampleProps & {
+    windDirectionDegrees: number;
+    windStrengthPixels: number;
+    windGustRatio: number;
+};
+
+export type AttractionExampleProps = ParticleSpawnerExampleProps & {
+    attractionStrengthRatio: number;
+    attractionReachPixels: number;
 };

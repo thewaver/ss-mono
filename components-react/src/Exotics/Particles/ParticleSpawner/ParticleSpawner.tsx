@@ -37,6 +37,8 @@ const NO_TABLES: SliceStop[][] = [];
 
 type Placed = { defs: ParticleTravelDefs; pos: Point2d; t: number };
 
+type LegTint = { legIndex: number; tint: string | undefined };
+
 export const ParticleSpawner = (props: ParticleSpawnerProps) => {
     const travelDurationMs = props.travelDurationMs ?? PARTICLE_SPAWNER_DEFAULTS.travelDurationMs;
     const restDurationMs = props.restDurationMs ?? PARTICLE_SPAWNER_DEFAULTS.restDurationMs;
@@ -55,12 +57,22 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
     const bodiesRef = useRef(new Map<number, HTMLDivElement>());
     const picturesRef = useRef(new Map<number, HTMLDivElement>());
     const placedRef = useRef(new Map<number, Placed>());
-    const tintsRef = useRef(new Map<number, string | undefined>());
+    const tintsRef = useRef(new Map<number, LegTint>());
     const drawnAreaRef = useRef<Rect>(undefined);
 
     const [isPlaying] = SignalMirrorReactUtils.useOptionalState(props.playback, true);
-    const [stage, setStage] = useState({ index: ParticleSpawnerConst.FIRST_STAGE });
+    const [progress, setProgressState] = SignalMirrorReactUtils.useOptionalState(
+        props.progress,
+        ParticleSpawnerConst.NO_PROGRESS,
+    );
     const [shownRect, setShownRect] = useState<Rect>(NO_RECT);
+
+    const progressRef = useLatest(progress);
+
+    const setProgress = (value: number) => {
+        progressRef.current = value;
+        setProgressState(value);
+    };
 
     const isWindowVisible = !InteractionTrackerReactUtils.usePageHidden();
     const prefersReducedMotion = MediaQueryMonitorReactUtils.useReducedMotion();
@@ -88,9 +100,12 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
         prefersReducedMotion,
         canSpawn,
         timing: { spawnDelayMs, travelDurationMs, restDurationMs },
+        particleCount,
+        patterns,
         isOnGraphicsCard,
         item,
         particleSize,
+        setProgress,
     });
 
     const [view] = useState(() => {
@@ -101,28 +116,43 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
             return {
                 rootRect: root ? ElementObserverUtils.measureViewportRect(root, current.viewportContext) : undefined,
                 targetRects: ElementObserverUtils.measureViewportRects(current.props.targets, current.viewportContext),
+                modMarkerRects: ElementObserverUtils.measureViewportRects(
+                    current.props.modMarkers ?? [],
+                    current.viewportContext,
+                ),
                 prefersReducedMotion: current.prefersReducedMotion,
             };
         };
 
         const getTint = (defs: ParticleTravelDefs) => {
-            const tints = tintsRef.current;
+            const cached = tintsRef.current.get(defs.id);
 
-            if (!tints.has(defs.id)) tints.set(defs.id, latest.current.props.computeParticleTint?.(defs));
+            if (cached?.legIndex === defs.legIndex) return cached.tint;
 
-            return tints.get(defs.id);
+            const tint = latest.current.props.computeParticleTint?.(defs);
+
+            tintsRef.current.set(defs.id, { legIndex: defs.legIndex, tint });
+
+            return tint;
         };
 
         const applyTint = (id: number, entry: Placed) => {
             const picture = picturesRef.current.get(id);
 
-            if (!picture || picture.dataset.tinted) return;
+            const legIndex = String(entry.defs.legIndex);
+
+            if (!picture || picture.dataset.tintedLeg === legIndex) return;
 
             const tint = getTint(entry.defs);
 
-            picture.dataset.tinted = "true";
+            picture.dataset.tintedLeg = legIndex;
 
-            if (tint === undefined) return;
+            if (tint === undefined) {
+                picture.classList.remove(SliceRendererStyles.sliceRendererPictureTinted);
+                picture.style.opacity = "";
+
+                return;
+            }
 
             const tintStyle = SliceRendererUtils.toTintStyle(SliceRendererUtils.toTint(tint));
 
@@ -204,25 +234,29 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
             );
         };
 
-        const engine = ParticleSpawnerUtils.createLegacyEngine({
+        const engine = ParticleSpawnerUtils.createEngine({
             getTargetCount: () => latest.current.props.targets.length,
             computeTarget: (index, targetCount) => latest.current.props.computeTarget?.(index, targetCount),
+            computeRoute: (index, targetCount) => latest.current.props.computeRoute?.(index, targetCount),
             getElement: (id) => elementsRef.current.get(id),
             getIsDrawingElements: () => !latest.current.isOnGraphicsCard,
             getFrame: measureFrame,
             getTiming: () => latest.current.timing,
+            getParticleCount: () => latest.current.particleCount,
+            getPatterns: () => latest.current.patterns,
             getCanSpawn: () => latest.current.canSpawn,
-            computeParticlePos: (travel, t) => {
-                const pos = latest.current.props.computeParticlePos(travel, t);
-
+            getProgress: () => progressRef.current,
+            setProgress: (value) => latest.current.setProgress(value),
+            computeParticlePos: (travel, t) => latest.current.props.computeParticlePos(travel, t),
+            getModifiers: () => latest.current.props.particleModifiers,
+            onParticlePlace: (travel, pos, t) => {
                 placedRef.current.set(travel.id, { defs: travel, pos, t });
 
-                return pos;
-            },
-            onParticleT: (id) => {
-                if (!latest.current.isOnGraphicsCard) applyParticle(id);
+                if (!latest.current.isOnGraphicsCard) applyParticle(travel.id);
             },
             onParticleArrive: (index) => latest.current.props.onParticleArrive?.(index),
+            onIterationEnd: () => latest.current.props.onIterationEnd?.(),
+            onAnimationEnd: () => latest.current.props.onAnimationEnd?.(),
             onTick: () => {
                 if (latest.current.isOnGraphicsCard) drawOnGraphicsCard();
             },
@@ -266,25 +300,94 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
         if (particles.length === 0 && latest.current.isOnGraphicsCard) view.drawOnGraphicsCard();
     }, [particles]);
 
-    useEffect(() => {
-        setStage({ index: ParticleSpawnerConst.FIRST_STAGE });
-    }, [particleCount, spawnDelayMs, patterns]);
-
-    const pattern = patterns[stage.index];
+    const restartKey = JSON.stringify([particleCount, spawnDelayMs, travelDurationMs, restDurationMs, patternsKey]);
+    const restartKeyRef = useRef(restartKey);
 
     useEffect(() => {
-        if (!canSpawn || !isPlaying || particleCount <= 0 || !pattern) return;
+        if (restartKeyRef.current === restartKey) return;
 
-        return engine.playPattern(pattern, particleCount, {
-            onIterationEnd: () => latest.current.props.onIterationEnd?.(),
-            onAnimationEnd: () => latest.current.props.onAnimationEnd?.(),
-            onNextStage: (index) => setStage({ index }),
-        });
-    }, [engine, canSpawn, isPlaying, particleCount, pattern, stage, travelDurationMs, restDurationMs, spawnDelayMs]);
+        restartKeyRef.current = restartKey;
+        engine.restart();
+    }, [engine, restartKey]);
 
-    const pictureStyle = assignInlineVars({
-        [SliceRendererStyles.pictureSrcVar]: CellAnimationUtils.toSourceImage(props.src),
-    }) as CSSProperties;
+    const wasPlayingRef = useRef(isPlaying);
+
+    useEffect(() => {
+        const wasPlaying = wasPlayingRef.current;
+
+        wasPlayingRef.current = isPlaying;
+
+        if (isPlaying && !wasPlaying && engine.getHasEnded()) engine.restart();
+    }, [engine, isPlaying]);
+
+    useEffect(() => {
+        const isRunning = isPlaying && canSpawn;
+
+        engine.setIsRunning(isRunning);
+
+        if (!isRunning) engine.render();
+    }, [engine, isPlaying, canSpawn]);
+
+    const scrubbedProgressRef = useRef(progress);
+
+    useEffect(() => {
+        if (scrubbedProgressRef.current === progress) return;
+
+        scrubbedProgressRef.current = progress;
+        engine.scrub();
+    }, [engine, progress]);
+
+    const particleElements = useMemo(() => {
+        const pictureStyle = assignInlineVars({
+            [SliceRendererStyles.pictureSrcVar]: CellAnimationUtils.toSourceImage(props.src),
+        }) as CSSProperties;
+
+        return particles.map((particle) => (
+            <div
+                key={particle.id}
+                className={ParticleSpawnerStyles.particleSpawnerItem}
+                ref={(element) => {
+                    if (!element) return;
+
+                    elementsRef.current.set(particle.id, element);
+                    engine.drawParticle(particle.id, element);
+
+                    return () => {
+                        elementsRef.current.delete(particle.id);
+                    };
+                }}
+            >
+                <div
+                    className={ParticleSpawnerStyles.particleSpawnerBody}
+                    style={{ width: `${particleSize.width}px`, height: `${particleSize.height}px` }}
+                    ref={(element) => {
+                        if (!element) return;
+
+                        bodiesRef.current.set(particle.id, element);
+
+                        return () => {
+                            bodiesRef.current.delete(particle.id);
+                        };
+                    }}
+                >
+                    <div
+                        className={SliceRendererStyles.sliceRendererPicture}
+                        style={pictureStyle}
+                        ref={(element) => {
+                            if (!element) return;
+
+                            picturesRef.current.set(particle.id, element);
+                            view.applyParticle(particle.id);
+
+                            return () => {
+                                picturesRef.current.delete(particle.id);
+                            };
+                        }}
+                    />
+                </div>
+            </div>
+        ));
+    }, [engine, view, particles, particleSize, props.src]);
 
     return (
         <div
@@ -310,51 +413,7 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
                     aria-hidden="true"
                 />
             ) : (
-                particles.map((particle) => (
-                    <div
-                        key={particle.id}
-                        className={ParticleSpawnerStyles.particleSpawnerItem}
-                        ref={(element) => {
-                            if (!element) return;
-
-                            elementsRef.current.set(particle.id, element);
-                            engine.drawParticle(particle.id, element);
-
-                            return () => {
-                                elementsRef.current.delete(particle.id);
-                            };
-                        }}
-                    >
-                        <div
-                            className={ParticleSpawnerStyles.particleSpawnerBody}
-                            style={{ width: `${particleSize.width}px`, height: `${particleSize.height}px` }}
-                            ref={(element) => {
-                                if (!element) return;
-
-                                bodiesRef.current.set(particle.id, element);
-
-                                return () => {
-                                    bodiesRef.current.delete(particle.id);
-                                };
-                            }}
-                        >
-                            <div
-                                className={SliceRendererStyles.sliceRendererPicture}
-                                style={pictureStyle}
-                                ref={(element) => {
-                                    if (!element) return;
-
-                                    picturesRef.current.set(particle.id, element);
-                                    view.applyParticle(particle.id);
-
-                                    return () => {
-                                        picturesRef.current.delete(particle.id);
-                                    };
-                                }}
-                            />
-                        </div>
-                    </div>
-                ))
+                particleElements
             )}
         </div>
     );

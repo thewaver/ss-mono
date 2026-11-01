@@ -24,6 +24,19 @@ type Props = ParticleSpawnerExampleProps;
 const props = defineProps<Props>();
 
 const playback = useModel(props, "playback");
+const progress = useModel(props, "progress");
+
+const followerProgresses = SPAWNER_POSITIONS.map((_, index) => (index === 0 ? undefined : props.takeProgress?.()));
+
+const setProgressAt = (index: number, value: number) => {
+    const follower = followerProgresses[index];
+
+    if (follower) {
+        follower.value = value;
+    } else {
+        progress.value = value;
+    }
+};
 
 const targetRef = shallowRef<HTMLElement>();
 
@@ -43,6 +56,8 @@ const particleSrc = createParticleSrc();
 
             <ParticleSpawner
                 v-model:playback="playback"
+                :progress="followerProgresses[index]?.value ?? progress"
+                @update:progress="(value: number) => setProgressAt(index, value)"
                 :particle-count="particleCount"
                 :travel-duration-ms="travelDurationMs"
                 :rest-duration-ms="restDurationMs"

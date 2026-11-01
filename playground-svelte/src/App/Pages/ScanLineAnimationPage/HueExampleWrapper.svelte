@@ -5,6 +5,7 @@
 
     import PageExampleKnobs from "../../PageComponents/ExampleKnobs/PageExampleKnobs.svelte";
     import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.svelte";
+    import { usePagePlayback } from "../../PageComponents/PlaybackScrubber/PlaybackGroup.context";
     import PagePlaybackScrubber from "../../PageComponents/PlaybackScrubber/PlaybackScrubber.svelte";
     import DirInput from "./DirInput.svelte";
     import HueExample from "./Examples/Hue.svelte";
@@ -19,7 +20,7 @@
         ...props
     }: Omit<ScanlineAnimationExampleProps, "playback"> & { isPagePlaying: boolean } = $props();
 
-    let playback = $state(true);
+    const playback = usePagePlayback("scanlineHue");
     let progress = $state(0);
 
     const keyframeOpts: ScanlineHorizontalHueOpts = {};
@@ -31,10 +32,10 @@
 
 <div class={styles.stack}>
     <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
-        <HueExample {...props} bind:playback={() => isPagePlaying && playback, (next) => (playback = next)} bind:progress {keyframeOpts} {breakpointOpts} />
+        <HueExample {...props} bind:playback={() => isPagePlaying && playback.value, (next) => (playback.value = next)} bind:progress {keyframeOpts} {breakpointOpts} />
     </PageMeasureBox>
 
-    <PagePlaybackScrubber id={"scanlineHue"} ariaLabel={"Position in the pass"} bind:playback bind:progress />
+    <PagePlaybackScrubber id={"scanlineHue"} ariaLabel={"Position in the pass"} bind:playback={() => playback.value, (next) => (playback.value = next)} bind:progress />
 </div>
 
 <PageExampleKnobs>

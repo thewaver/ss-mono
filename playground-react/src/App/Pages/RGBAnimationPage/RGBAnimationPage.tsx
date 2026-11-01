@@ -579,23 +579,24 @@ const StressTestWrapper = (props: Omit<RGBAnimationExampleProps, "progress">) =>
 
 export const RGBAnimationPage = () => {
     const playback = useState(true);
-    const glitchPlayback = useState(true);
+    const takePlayback = PlaybackScrubberUtils.useGroup("glitch");
+    const glitchPlayback = takePlayback("glitch");
     const glitchProgress = useState(0);
-    const swellPlayback = useState(true);
+    const swellPlayback = takePlayback("swell");
     const swellProgress = useState(0);
-    const orbitPlayback = useState(true);
+    const orbitPlayback = takePlayback("orbit");
     const orbitProgress = useState(0);
-    const twistPlayback = useState(true);
+    const twistPlayback = takePlayback("twist");
     const twistProgress = useState(0);
-    const tiltPlayback = useState(true);
+    const tiltPlayback = takePlayback("tilt");
     const tiltProgress = useState(0);
-    const anaglyphPlayback = useState(true);
+    const anaglyphPlayback = takePlayback("anaglyph");
     const anaglyphProgress = useState(0);
-    const echoPlayback = useState(true);
+    const echoPlayback = takePlayback("echo");
     const echoProgress = useState(0);
-    const hueSwapPlayback = useState(true);
+    const hueSwapPlayback = takePlayback("hueSwap");
     const hueSwapProgress = useState(0);
-    const focusPullPlayback = useState(true);
+    const focusPullPlayback = takePlayback("focusPull");
     const focusPullProgress = useState(0);
 
     const [animationDurationMs, setAnimationDurationMs] = useState(RGB_ANIMATION_DEFAULTS.animationDurationMs);

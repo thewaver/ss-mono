@@ -14,7 +14,21 @@
     const SPAWNER_TOPS = ["20%", "50%", "80%"];
     const TARGET_TOPS = ["20%", "50%", "80%"];
 
-    let { playback = $bindable(), ...props }: ParticleSpawnerExampleProps = $props();
+    let { playback = $bindable(), progress = $bindable(0), ...props }: ParticleSpawnerExampleProps = $props();
+
+    const followers = SPAWNER_TOPS.map((_, index) => (index === 0 ? undefined : props.takeProgress?.()));
+
+    const getProgressAt = (index: number) => followers[index]?.value ?? progress;
+
+    const setProgressAt = (index: number, value: number) => {
+        const follower = followers[index];
+
+        if (follower) {
+            follower.value = value;
+        } else {
+            progress = value;
+        }
+    };
 
     const particleSrc = createParticleSrc();
 
@@ -52,6 +66,7 @@
             <ParticleSpawner
                 {...props}
                 bind:playback
+                bind:progress={() => getProgressAt(index), (value) => setProgressAt(index, value)}
                 targets={targetRefs}
                 src={particleSrc}
                 {computeParticleAnimation}

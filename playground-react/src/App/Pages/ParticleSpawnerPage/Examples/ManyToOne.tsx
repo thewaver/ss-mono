@@ -39,6 +39,7 @@ export const ManyToOneExample = (props: ParticleSpawnerExampleProps) => {
 
                     <ParticleSpawner
                         {...props}
+                        progress={index === 0 ? props.progress : props.takeProgress?.(index)}
                         targets={[targetRef ?? undefined]}
                         src={particleSrc}
                         computeParticleAnimation={computeParticleAnimation}

@@ -17,6 +17,8 @@
     import PageSelectField from "../../PageComponents/Field/PageSelectField.svelte";
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
     import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
+    import { setPlaybackGroupContext } from "../../PageComponents/PlaybackScrubber/PlaybackGroup.context";
+    import { PlaybackScrubberUtils } from "../../PageComponents/PlaybackScrubber/PlaybackScrubber.utils.svelte";
     import BrightnessExampleWrapper from "./BrightnessExampleWrapper.svelte";
     import DropoutExampleWrapper from "./DropoutExampleWrapper.svelte";
     import GlitchExampleWrapper from "./GlitchExampleWrapper.svelte";
@@ -54,6 +56,8 @@
     const GROUPPED_WEIGHTS = groupOptions(SliceAnimationWeights.ORIGIN_FREE_WEIGHT_TYPES);
 
     let playback = $state(true);
+
+    setPlaybackGroupContext(PlaybackScrubberUtils.createGroup("scanlineGlitch"));
 
     let src = $state(knight);
     let lineCount = $state(ScanlineAnimationKnobs.STARTING_LINE_COUNT);

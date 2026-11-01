@@ -21,6 +21,7 @@
     import PageNumberField from "../../PageComponents/Field/PageNumberField.svelte";
     import PageSelectField from "../../PageComponents/Field/PageSelectField.svelte";
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
+    import { PlaybackScrubberUtils } from "../../PageComponents/PlaybackScrubber/PlaybackScrubber.utils.svelte";
     import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
     import AnaglyphExampleWrapper from "./AnaglyphExampleWrapper.svelte";
     import EchoExampleWrapper from "./EchoExampleWrapper.svelte";
@@ -36,23 +37,24 @@
     const SOURCES: Record<RGBAnimationSourceKey, string> = { knight: knightProfile, text: HEADLINE_SOURCE };
 
     let playback = $state(true);
-    let glitchPlayback = $state(true);
+    const takePlayback = PlaybackScrubberUtils.createGroup("glitch");
+    const glitchPlayback = takePlayback("glitch");
     let glitchProgress = $state(0);
-    let swellPlayback = $state(true);
+    const swellPlayback = takePlayback("swell");
     let swellProgress = $state(0);
-    let orbitPlayback = $state(true);
+    const orbitPlayback = takePlayback("orbit");
     let orbitProgress = $state(0);
-    let twistPlayback = $state(true);
+    const twistPlayback = takePlayback("twist");
     let twistProgress = $state(0);
-    let tiltPlayback = $state(true);
+    const tiltPlayback = takePlayback("tilt");
     let tiltProgress = $state(0);
-    let anaglyphPlayback = $state(true);
+    const anaglyphPlayback = takePlayback("anaglyph");
     let anaglyphProgress = $state(0);
-    let echoPlayback = $state(true);
+    const echoPlayback = takePlayback("echo");
     let echoProgress = $state(0);
-    let hueSwapPlayback = $state(true);
+    const hueSwapPlayback = takePlayback("hueSwap");
     let hueSwapProgress = $state(0);
-    let focusPullPlayback = $state(true);
+    const focusPullPlayback = takePlayback("focusPull");
     let focusPullProgress = $state(0);
 
     let animationDurationMs = $state(RGB_ANIMATION_DEFAULTS.animationDurationMs);
@@ -158,39 +160,39 @@
 </script>
 
 {#snippet glitchExample()}
-    <GlitchExampleWrapper {...commonProps} {boxWidth} isPagePlaying={playback} bind:playback={glitchPlayback} bind:progress={glitchProgress} />
+    <GlitchExampleWrapper {...commonProps} {boxWidth} isPagePlaying={playback} bind:playback={() => glitchPlayback.value, (next) => (glitchPlayback.value = next)} bind:progress={glitchProgress} />
 {/snippet}
 
 {#snippet swellExample()}
-    <SwellExampleWrapper {...commonProps} {boxWidth} isPagePlaying={playback} bind:playback={swellPlayback} bind:progress={swellProgress} />
+    <SwellExampleWrapper {...commonProps} {boxWidth} isPagePlaying={playback} bind:playback={() => swellPlayback.value, (next) => (swellPlayback.value = next)} bind:progress={swellProgress} />
 {/snippet}
 
 {#snippet orbitExample()}
-    <OrbitExampleWrapper {...commonProps} {boxWidth} isPagePlaying={playback} bind:playback={orbitPlayback} bind:progress={orbitProgress} />
+    <OrbitExampleWrapper {...commonProps} {boxWidth} isPagePlaying={playback} bind:playback={() => orbitPlayback.value, (next) => (orbitPlayback.value = next)} bind:progress={orbitProgress} />
 {/snippet}
 
 {#snippet twistExample()}
-    <TwistExampleWrapper {...commonProps} {boxWidth} isPagePlaying={playback} bind:playback={twistPlayback} bind:progress={twistProgress} />
+    <TwistExampleWrapper {...commonProps} {boxWidth} isPagePlaying={playback} bind:playback={() => twistPlayback.value, (next) => (twistPlayback.value = next)} bind:progress={twistProgress} />
 {/snippet}
 
 {#snippet tiltExample()}
-    <TiltExampleWrapper {...commonProps} {boxWidth} isPagePlaying={playback} bind:playback={tiltPlayback} bind:progress={tiltProgress} />
+    <TiltExampleWrapper {...commonProps} {boxWidth} isPagePlaying={playback} bind:playback={() => tiltPlayback.value, (next) => (tiltPlayback.value = next)} bind:progress={tiltProgress} />
 {/snippet}
 
 {#snippet anaglyphExample()}
-    <AnaglyphExampleWrapper {...commonProps} {boxWidth} isPagePlaying={playback} bind:playback={anaglyphPlayback} bind:progress={anaglyphProgress} />
+    <AnaglyphExampleWrapper {...commonProps} {boxWidth} isPagePlaying={playback} bind:playback={() => anaglyphPlayback.value, (next) => (anaglyphPlayback.value = next)} bind:progress={anaglyphProgress} />
 {/snippet}
 
 {#snippet echoExample()}
-    <EchoExampleWrapper {...commonProps} {boxWidth} isPagePlaying={playback} bind:playback={echoPlayback} bind:progress={echoProgress} />
+    <EchoExampleWrapper {...commonProps} {boxWidth} isPagePlaying={playback} bind:playback={() => echoPlayback.value, (next) => (echoPlayback.value = next)} bind:progress={echoProgress} />
 {/snippet}
 
 {#snippet hueSwapExample()}
-    <HueSwapExampleWrapper {...commonProps} {boxWidth} isPagePlaying={playback} bind:playback={hueSwapPlayback} bind:progress={hueSwapProgress} />
+    <HueSwapExampleWrapper {...commonProps} {boxWidth} isPagePlaying={playback} bind:playback={() => hueSwapPlayback.value, (next) => (hueSwapPlayback.value = next)} bind:progress={hueSwapProgress} />
 {/snippet}
 
 {#snippet focusPullExample()}
-    <FocusPullExampleWrapper {...commonProps} {boxWidth} isPagePlaying={playback} bind:playback={focusPullPlayback} bind:progress={focusPullProgress} />
+    <FocusPullExampleWrapper {...commonProps} {boxWidth} isPagePlaying={playback} bind:playback={() => focusPullPlayback.value, (next) => (focusPullPlayback.value = next)} bind:progress={focusPullProgress} />
 {/snippet}
 
 {#snippet stressTestExample()}

@@ -1,0 +1,59 @@
+import { useMemo, useState } from "react";
+
+import { ParticleModifierUtils, ParticleSpawner } from "@thewaver/ss-components-react";
+import {
+    computeParticleAnimation,
+    createParticleSrc,
+} from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.const";
+import * as styles from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.css";
+
+import type { WindExampleProps } from "../ParticleSpawnerPage.types";
+
+export const WindExample = (props: WindExampleProps) => {
+    const [particleSrc] = useState(createParticleSrc);
+
+    const [targetRef, setTargetRef] = useState<HTMLElement | null>(null);
+
+    const modifiers = useMemo(
+        () => [
+            ParticleModifierUtils.createWind({
+                directionDegrees: props.windDirectionDegrees,
+                strengthPixels: props.windStrengthPixels,
+                gustRatio: props.windGustRatio,
+            }),
+        ],
+        [props.windDirectionDegrees, props.windStrengthPixels, props.windGustRatio],
+    );
+
+    return (
+        <div className={styles.demoArea}>
+            <div
+                ref={setTargetRef}
+                className={[styles.targetMarker, props.areTargetsHidden && styles.isHiddenMarker]
+                    .filter(Boolean)
+                    .join(" ")}
+                style={{ left: "85%", top: "50%" }}
+            />
+
+            <div
+                className={styles.windArrow}
+                style={{
+                    width: `${props.windStrengthPixels}px`,
+                    transform: `rotate(${props.windDirectionDegrees}deg)`,
+                }}
+            />
+
+            <div className={styles.spawnerRoot} style={{ left: "15%", top: "50%" }}>
+                <div className={styles.spawnerMarker} />
+
+                <ParticleSpawner
+                    {...props}
+                    targets={[targetRef ?? undefined]}
+                    src={particleSrc}
+                    particleModifiers={modifiers}
+                    computeParticleAnimation={computeParticleAnimation}
+                />
+            </div>
+        </div>
+    );
+};

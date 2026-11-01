@@ -31,7 +31,6 @@ const SPAWNER = '[role="presentation"][aria-hidden="true"]';
 const PARTICLE_COUNT = 6;
 const RETENTION_MS = 300;
 const NEAR_SHARE = 0.15;
-const RELAY_WINDOW_MS = 500;
 const HOLD_MS = 600;
 const SCRUB_TO = 30;
 const PAST_THE_END = 100;
@@ -154,8 +153,6 @@ const readLog = (page: Page) => page.evaluate(() => (window as unknown as { part
 
 const arrivals = (log: ParticleLog) => log.trips.filter((trip) => trip.diedAt !== null);
 
-const births = (log: ParticleLog) => log.trips.filter((trip) => trip.bornAt !== null);
-
 const liveCount = (page: Page, key: string) => page.locator(`${demo(key)} ${SPAWNER} > *`).count();
 
 const readPositions = (page: Page, key: string) =>
@@ -231,7 +228,13 @@ test.beforeEach(async ({ page }) => {
     await setNumber(page, "restDurationMs", RETENTION_MS);
 });
 
+/**
+ * On a straight path, as the wind and attraction tests use. A particle is first seen at whatever point of its path the
+ * frame it sets off in has reached, and the scatter path the page starts on moves fastest at the very start, so there
+ * one slow frame shows a particle beyond the near share of its spawner.
+ */
 test("particles from every spawner arrive at the one shared target", { tag: "@solo" }, async ({ page }) => {
+    await chooseKnob(page, "travelPattern", "line");
     await page.locator(MANY_TO_ONE).scrollIntoViewIfNeeded();
     await startPlaying(page, "manyToOne");
     await installLog(page, MANY_TO_ONE);
@@ -269,79 +272,11 @@ test("particles from every spawner arrive at the one shared target", { tag: "@so
 });
 
 /**
- * The outbound spawner plays on its own; the return spawner never plays and only sends when told to, and it is
- * told to once for each particle that reaches it — `onParticleArrive` calls its `emit(1)`. So every return
- * trip is born just after an outbound arrival, one for one, and every outbound arrival gets its return. The
- * pairing is done in order with a generous window, and the arrivals too close to the end of the log to have
- * had their answer yet are left out, as are returns too close to its start to have had their arrival logged.
- */
-test(
-    "every particle that reaches the far spawner is sent back, one for one @react @vue @svelte",
-    { tag: "@solo" },
-    async ({ page }) => {
-        await page.locator(ROUND_TRIP).scrollIntoViewIfNeeded();
-        await installLog(page, ROUND_TRIP);
-
-        const installedAt = await page.evaluate(() => performance.now());
-
-        await expect
-            .poll(async () => arrivals(await readLog(page)).filter((trip) => trip.spawner === 1).length, {
-                message: "some returns have made it all the way back",
-                timeout: 10_000,
-            })
-            .toBeGreaterThan(PARTICLE_COUNT);
-
-        const log = await readLog(page);
-        const loggedUntil = await page.evaluate(() => performance.now());
-        const [outboundCenter, returnCenter] = log.spawnerCenters;
-
-        const outboundArrivals = arrivals(log)
-            .filter((trip) => trip.spawner === 0)
-            .map((trip) => trip.diedAt!)
-            .sort((a, b) => a - b);
-        const returnBirths = births(log)
-            .filter((trip) => trip.spawner === 1)
-            .map((trip) => trip.bornAt!)
-            .sort((a, b) => a - b);
-
-        const claimed = new Set<number>();
-        const unanswered: number[] = [];
-
-        for (const bornAt of returnBirths) {
-            const match = outboundArrivals.findIndex(
-                (arrivedAt, index) =>
-                    !claimed.has(index) && arrivedAt <= bornAt && bornAt - arrivedAt < RELAY_WINDOW_MS,
-            );
-
-            if (match >= 0) claimed.add(match);
-            else if (bornAt - installedAt > RELAY_WINDOW_MS) unanswered.push(bornAt);
-        }
-
-        const unreturned = outboundArrivals.filter(
-            (arrivedAt, index) => !claimed.has(index) && loggedUntil - arrivedAt > RELAY_WINDOW_MS,
-        );
-
-        expect(outboundArrivals.length, "the outbound spawner has been landing particles").toBeGreaterThan(0);
-        expect(unanswered, "the return spawner sends nothing that an arrival did not ask for").toEqual([]);
-        expect(unreturned, "and every arrival is answered with a return").toEqual([]);
-
-        for (const trip of arrivals(log).filter((trip) => trip.bornAt !== null)) {
-            const [from, to] = trip.spawner === 0 ? [outboundCenter, returnCenter] : [returnCenter, outboundCenter];
-
-            expect(distance(trip.first!, from), "a trip starts at the spawner that sent it").toBeLessThan(
-                distance(from, to) * NEAR_SHARE,
-            );
-            expect(distance(trip.last, to), "and ends on the other one").toBeLessThan(distance(from, to) * NEAR_SHARE);
-        }
-    },
-);
-
-/**
  * The page plays one example at a time: only the first one plays when the page opens, and starting another pauses
  * whichever was playing. The second example is the one started, so the test names nothing an edit to the page's
  * examples would move.
  */
-test("only the first example plays when the page opens, and starting another pauses it @solid", async ({ page }) => {
+test("only the first example plays when the page opens, and starting another pauses it", async ({ page }) => {
     const [first, second] = ["singleTarget", "grid"];
 
     expect(second, "the page has at least two examples with their own controls").toBeDefined();
@@ -360,7 +295,7 @@ test("only the first example plays when the page opens, and starting another pau
  * playing again carries the round on from that point. Nothing may move while paused, so the test lets time pass
  * rather than waiting on a change.
  */
-test("pausing keeps every particle where it stands, and playing carries on from there @solid", async ({ page }) => {
+test("pausing keeps every particle where it stands, and playing carries on from there", async ({ page }) => {
     await page.locator(SINGLE_TARGET).scrollIntoViewIfNeeded();
     await expect
         .poll(() => liveCount(page, "singleTarget"), { message: "the example has particles in flight" })
@@ -392,7 +327,7 @@ test("pausing keeps every particle where it stands, and playing carries on from 
  * Scrubbing a paused round draws its particles where they are at that point: none once the round is over, and the
  * same picture whenever it comes back to the same point.
  */
-test("a scrub draws the round where it is, none past its end, and the same picture at the same point @solid", async ({
+test("a scrub draws the round where it is, none past its end, and the same picture at the same point", async ({
     page,
 }) => {
     await page.locator(SINGLE_TARGET).scrollIntoViewIfNeeded();
@@ -422,7 +357,7 @@ test("a scrub draws the round where it is, none past its end, and the same pictu
  * A route of two stops — the target, then the spawner — takes every particle out and back within one spawner: it
  * sets off from the spawner, comes within reach of the target on the way, and is taken away back at the spawner.
  */
-test("a route takes each particle out to its target and back to its own spawner @solid", async ({ page }) => {
+test("a route takes each particle out to its target and back to its own spawner", async ({ page }) => {
     await page.locator(ROUND_TRIP).scrollIntoViewIfNeeded();
     await startPlaying(page, "roundTrip");
 
@@ -446,7 +381,7 @@ test("a route takes each particle out to its target and back to its own spawner 
  * wind blows toward and never as far to the other; turning the wind around turns the lean around. Either way the
  * push fades out before the end of the path, so every particle still lands on the target.
  */
-test("wind pushes particles off their path the way it blows, and they still land on the target @solid", async ({
+test("wind pushes particles off their path the way it blows, and they still land on the target", async ({
     page,
 }) => {
     await chooseKnob(page, "travelPattern", "line");
@@ -501,7 +436,7 @@ test("wind pushes particles off their path the way it blows, and they still land
  * wherever the ring is as they pass. Either way the pull fades out before the end of the path, so every particle
  * still lands on the target.
  */
-test("attraction bends the paths a pull of nothing leaves straight, and particles still land on the target @solid", async ({
+test("attraction bends the paths a pull of nothing leaves straight, and particles still land on the target", async ({
     page,
 }) => {
     await chooseKnob(page, "travelPattern", "line");

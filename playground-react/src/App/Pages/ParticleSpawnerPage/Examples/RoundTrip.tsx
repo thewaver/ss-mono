@@ -1,51 +1,43 @@
 import { useState } from "react";
 
-import { ParticleSpawner } from "@thewaver/ss-components-react";
-import type { ParticleSpawnerController } from "@thewaver/ss-components-react";
+import { type ParticleRouteStop, ParticleSpawner } from "@thewaver/ss-components-react";
 import {
     computeParticleAnimation,
-    createParticleSrc,
-    createReturnParticleSrc,
+    createLegTints,
+    createTintableParticleSrc,
 } from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.css";
 
 import type { ParticleSpawnerExampleProps } from "../ParticleSpawnerPage.types";
 
-const RETURN_COUNT = 1;
+const OUT_AND_BACK: ParticleRouteStop[] = [0, "spawner"];
 
 export const RoundTripExample = (props: ParticleSpawnerExampleProps) => {
-    const [outboundMarker, setOutboundMarker] = useState<HTMLElement | null>(null);
-    const [returnMarker, setReturnMarker] = useState<HTMLElement | null>(null);
-    const [relay, setRelay] = useState<ParticleSpawnerController>();
-    const relayPlayback = useState(false);
+    const [particleSrc] = useState(createTintableParticleSrc);
+    const [legTints] = useState(createLegTints);
 
-    const [particleSrc] = useState(createParticleSrc);
-    const [returnParticleSrc] = useState(createReturnParticleSrc);
+    const [targetRef, setTargetRef] = useState<HTMLElement | null>(null);
 
     return (
         <div className={styles.demoArea}>
+            <div
+                ref={setTargetRef}
+                className={[styles.targetMarker, props.areTargetsHidden && styles.isHiddenMarker]
+                    .filter(Boolean)
+                    .join(" ")}
+                style={{ left: "85%", top: "50%" }}
+            />
+
             <div className={styles.spawnerRoot} style={{ left: "15%", top: "50%" }}>
-                <div ref={setOutboundMarker} className={styles.spawnerMarker} />
+                <div className={styles.spawnerMarker} />
 
                 <ParticleSpawner
                     {...props}
-                    targets={[returnMarker ?? undefined]}
+                    targets={[targetRef ?? undefined]}
                     src={particleSrc}
+                    computeRoute={() => OUT_AND_BACK}
+                    computeParticleTint={(defs) => legTints[defs.legIndex % legTints.length]}
                     computeParticleAnimation={computeParticleAnimation}
-                    onParticleArrive={() => relay?.emit(RETURN_COUNT)}
-                />
-            </div>
-
-            <div className={styles.spawnerRoot} style={{ left: "85%", top: "50%" }}>
-                <div ref={setReturnMarker} className={styles.spawnerMarkerReturn} />
-
-                <ParticleSpawner
-                    {...props}
-                    playback={relayPlayback}
-                    targets={[outboundMarker ?? undefined]}
-                    src={returnParticleSrc}
-                    computeParticleAnimation={computeParticleAnimation}
-                    onMount={setRelay}
                 />
             </div>
         </div>

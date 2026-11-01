@@ -39,14 +39,6 @@ export const spawnerMarker = style({
     boxShadow: themeVars.shadow.small,
 });
 
-export const spawnerMarkerReturn = style([
-    spawnerMarker,
-    {
-        backgroundColor: themeVars.color.secondary.light,
-        backgroundImage: `radial-gradient(circle at 70% 30%, ${themeVars.color.secondary.light}, ${themeVars.color.secondary.dark})`,
-    },
-]);
-
 const bobUpAndDown = keyframes({
     "0%": { top: CORNER_NEAR },
     "50%": { top: CORNER_FAR },

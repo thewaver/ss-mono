@@ -15,6 +15,7 @@ import * as styles from "@thewaver/ss-playground/App/Pages/ScanLineAnimationPage
 import PageExampleKnobs from "../../PageComponents/ExampleKnobs/PageExampleKnobs.vue";
 import PageKnobs from "../../PageComponents/Knobs/Knobs.vue";
 import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.vue";
+import { usePagePlayback } from "../../PageComponents/PlaybackScrubber/PlaybackGroup.context";
 import PagePlaybackScrubber from "../../PageComponents/PlaybackScrubber/PlaybackScrubber.vue";
 import DirInput from "./DirInput.vue";
 import SplitExample from "./Examples/Split.vue";
@@ -23,7 +24,7 @@ import SmoothnessInput from "./SmoothnessInput.vue";
 
 const props = defineProps<ScanlineAnimationExampleProps>();
 
-const playback = shallowRef(true);
+const playback = usePagePlayback("scanlineSplit");
 const progress = shallowRef(0);
 
 const sharedProps = computed(() => {

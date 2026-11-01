@@ -4,3 +4,5 @@ export type PagePlaybackScrubberProps = {
     playback: boolean;
     progress: number;
 };
+
+export type PlaybackSlot = { value: boolean };

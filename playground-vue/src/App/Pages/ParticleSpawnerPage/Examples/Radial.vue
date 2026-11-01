@@ -24,6 +24,7 @@ type Props = ParticleSpawnerExampleProps;
 const props = defineProps<Props>();
 
 const playback = useModel(props, "playback");
+const progress = useModel(props, "progress");
 
 const targetRefs = shallowRef<(HTMLElement | undefined)[]>(TARGET_POSITIONS.map(() => undefined));
 
@@ -53,6 +54,7 @@ const particleSrc = createParticleSrc();
 
             <ParticleSpawner
                 v-model:playback="playback"
+                v-model:progress="progress"
                 :particle-count="particleCount"
                 :travel-duration-ms="travelDurationMs"
                 :rest-duration-ms="restDurationMs"

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { type ReactNode, useMemo, useState } from "react";
 
 import {
     PARTICLE_SPAWNER_DEFAULTS,
@@ -22,14 +22,19 @@ import {
     STRESS_PARTICLE_COUNT,
     STRESS_SPAWN_DELAY_MS,
 } from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.const";
+import * as styles from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.css";
 
+import { PageExampleKnobs } from "../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageCheckField, PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";
 import { PageKnobs } from "../../PageComponents/Knobs/Knobs";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
+import { PagePlaybackScrubber } from "../../PageComponents/PlaybackScrubber/PlaybackScrubber";
+import { PlaybackScrubberUtils } from "../../PageComponents/PlaybackScrubber/PlaybackScrubber.utils";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsDivider, PagePropsGroups, PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { StressTest } from "../../PageComponents/StressTest/StressTest";
+import { AttractionExample } from "./Examples/Attraction";
 import { DiagonalExample } from "./Examples/Diagonal";
 import { GridExample } from "./Examples/Grid";
 import { ManyToOneExample } from "./Examples/ManyToOne";
@@ -39,7 +44,219 @@ import { RadialExample } from "./Examples/Radial";
 import { RoundTripExample } from "./Examples/RoundTrip";
 import { SingleTargetExample } from "./Examples/SingleTarget";
 import { VerticalExample } from "./Examples/Vertical";
+import { WindExample } from "./Examples/Wind";
 import type { ParticleSpawnerExampleProps } from "./ParticleSpawnerPage.types";
+
+type PlaybackPair = readonly [boolean, (isPlaying: boolean) => void];
+
+type ProgressPair = readonly [number, (value: number) => void];
+
+const NO_FOLLOWERS: Record<number, number> = {};
+
+const ScrubbedExampleWrapper = (props: {
+    id: string;
+    isPagePlaying: boolean;
+    playback: PlaybackPair;
+    renderExample: (
+        playback: PlaybackPair,
+        progress: ProgressPair,
+        takeProgress: (index: number) => ProgressPair,
+    ) => ReactNode;
+}) => {
+    const [progress, setProgress] = useState(0);
+    const [followers, setFollowers] = useState(NO_FOLLOWERS);
+
+    const takeProgress = (index: number): ProgressPair => [
+        followers[index] ?? progress,
+        (value) => setFollowers((previous) => ({ ...previous, [index]: value })),
+    ];
+
+    const scrubbedProgress: ProgressPair = [
+        progress,
+        (value) => {
+            setProgress(value);
+            setFollowers(NO_FOLLOWERS);
+        },
+    ];
+
+    return (
+        <div className={styles.stack}>
+            <PageMeasureBox width={BOX_WIDTH} height={BOX_HEIGHT}>
+                {props.renderExample(
+                    PlaybackScrubberUtils.gate(props.playback, props.isPagePlaying),
+                    [progress, setProgress],
+                    takeProgress,
+                )}
+            </PageMeasureBox>
+
+            <PagePlaybackScrubber
+                id={props.id}
+                ariaLabel={"Position in the round"}
+                playback={props.playback}
+                progress={scrubbedProgress}
+            />
+        </div>
+    );
+};
+
+const WindExampleWrapper = (props: {
+    exampleProps: ParticleSpawnerExampleProps;
+    isPagePlaying: boolean;
+    playback: PlaybackPair;
+}) => {
+    const [directionDegrees, setDirectionDegrees] = useState(ParticleSpawnerKnobs.STARTING_WIND_DIRECTION_DEGREES);
+    const [strengthPixels, setStrengthPixels] = useState(ParticleSpawnerKnobs.STARTING_WIND_STRENGTH_PIXELS);
+    const [gustRatio, setGustRatio] = useState(ParticleSpawnerKnobs.STARTING_WIND_GUST_RATIO);
+
+    return (
+        <>
+            <ScrubbedExampleWrapper
+                id={"wind"}
+                isPagePlaying={props.isPagePlaying}
+                playback={props.playback}
+                renderExample={(examplePlayback, progress) => (
+                    <WindExample
+                        {...props.exampleProps}
+                        playback={examplePlayback}
+                        progress={progress}
+                        windDirectionDegrees={directionDegrees}
+                        windStrengthPixels={strengthPixels}
+                        windGustRatio={gustRatio}
+                    />
+                )}
+            />
+
+            <PageExampleKnobs>
+                <PageProp
+                    itemKey={"windDirectionDegrees"}
+                    label={"Direction (degrees)"}
+                    hint={"Which way the wind blows, in degrees clockwise from rightward. 90 blows down."}
+                    controls={
+                        "Sets directionDegrees of ParticleModifierUtils.createWind, sent to ParticleSpawnerProps.particleModifiers"
+                    }
+                >
+                    <PageNumberField
+                        value={directionDegrees}
+                        min={ParticleSpawnerKnobs.MIN_WIND_DIRECTION_DEGREES}
+                        max={ParticleSpawnerKnobs.MAX_WIND_DIRECTION_DEGREES}
+                        step={ParticleSpawnerKnobs.WIND_DIRECTION_STEP_DEGREES}
+                        width={FIELD_WIDTH}
+                        ariaLabel={"Wind direction in degrees"}
+                        onInput={setDirectionDegrees}
+                    />
+                </PageProp>
+
+                <PageProp
+                    itemKey={"windStrengthPixels"}
+                    label={"Strength (px)"}
+                    hint={"How far a particle is carried off its path halfway along it, between gusts."}
+                    controls={
+                        "Sets strengthPixels of ParticleModifierUtils.createWind, sent to ParticleSpawnerProps.particleModifiers"
+                    }
+                >
+                    <PageNumberField
+                        value={strengthPixels}
+                        min={ParticleSpawnerKnobs.MIN_WIND_STRENGTH_PIXELS}
+                        max={ParticleSpawnerKnobs.MAX_WIND_STRENGTH_PIXELS}
+                        step={ParticleSpawnerKnobs.WIND_STRENGTH_STEP_PIXELS}
+                        width={FIELD_WIDTH}
+                        ariaLabel={"Wind strength in pixels"}
+                        onInput={setStrengthPixels}
+                    />
+                </PageProp>
+
+                <PageProp
+                    itemKey={"windGustRatio"}
+                    label={"Gusts"}
+                    hint={"How much the strength swings above and below itself over time. 0 is a steady wind."}
+                    controls={
+                        "Sets gustRatio of ParticleModifierUtils.createWind, sent to ParticleSpawnerProps.particleModifiers"
+                    }
+                >
+                    <PageNumberField
+                        value={gustRatio}
+                        min={ParticleSpawnerKnobs.MIN_WIND_GUST_RATIO}
+                        max={ParticleSpawnerKnobs.MAX_WIND_GUST_RATIO}
+                        step={ParticleSpawnerKnobs.WIND_GUST_RATIO_STEP}
+                        width={FIELD_WIDTH}
+                        ariaLabel={"Wind gusts"}
+                        onInput={setGustRatio}
+                    />
+                </PageProp>
+            </PageExampleKnobs>
+        </>
+    );
+};
+
+const AttractionExampleWrapper = (props: {
+    exampleProps: ParticleSpawnerExampleProps;
+    isPagePlaying: boolean;
+    playback: PlaybackPair;
+}) => {
+    const [strengthRatio, setStrengthRatio] = useState(ParticleSpawnerKnobs.STARTING_ATTRACTION_STRENGTH_RATIO);
+    const [reachPixels, setReachPixels] = useState(ParticleSpawnerKnobs.STARTING_ATTRACTION_REACH_PIXELS);
+
+    return (
+        <>
+            <ScrubbedExampleWrapper
+                id={"attraction"}
+                isPagePlaying={props.isPagePlaying}
+                playback={props.playback}
+                renderExample={(examplePlayback, progress) => (
+                    <AttractionExample
+                        {...props.exampleProps}
+                        playback={examplePlayback}
+                        progress={progress}
+                        attractionStrengthRatio={strengthRatio}
+                        attractionReachPixels={reachPixels}
+                    />
+                )}
+            />
+
+            <PageExampleKnobs>
+                <PageProp
+                    itemKey={"attractionStrengthRatio"}
+                    label={"Strength"}
+                    hint={"How much of the way to the ring a particle passing right by it is drawn."}
+                    controls={
+                        "Sets strengthRatio of ParticleModifierUtils.createAttraction, sent to ParticleSpawnerProps.particleModifiers"
+                    }
+                >
+                    <PageNumberField
+                        value={strengthRatio}
+                        min={ParticleSpawnerKnobs.MIN_ATTRACTION_STRENGTH_RATIO}
+                        max={ParticleSpawnerKnobs.MAX_ATTRACTION_STRENGTH_RATIO}
+                        step={ParticleSpawnerKnobs.ATTRACTION_STRENGTH_RATIO_STEP}
+                        width={FIELD_WIDTH}
+                        ariaLabel={"Attraction strength"}
+                        onInput={setStrengthRatio}
+                    />
+                </PageProp>
+
+                <PageProp
+                    itemKey={"attractionReachPixels"}
+                    label={"Reach (px)"}
+                    hint={
+                        "How far from the ring the pull is felt at all. Particles passing farther away are left alone."
+                    }
+                    controls={
+                        "Sets reachPixels of ParticleModifierUtils.createAttraction, sent to ParticleSpawnerProps.particleModifiers"
+                    }
+                >
+                    <PageNumberField
+                        value={reachPixels}
+                        min={ParticleSpawnerKnobs.MIN_ATTRACTION_REACH_PIXELS}
+                        max={ParticleSpawnerKnobs.MAX_ATTRACTION_REACH_PIXELS}
+                        step={ParticleSpawnerKnobs.ATTRACTION_REACH_STEP_PIXELS}
+                        width={FIELD_WIDTH}
+                        ariaLabel={"Attraction reach in pixels"}
+                        onInput={setReachPixels}
+                    />
+                </PageProp>
+            </PageExampleKnobs>
+        </>
+    );
+};
 
 const StressTestWrapper = (props: ParticleSpawnerExampleProps) => {
     const modalPlayback = useState(true);
@@ -108,6 +325,7 @@ export const ParticleSpawnerPage = () => {
 
     const [travelDefs, setTravelDefs] = useState<Record<string, Record<string, number | boolean>>>({});
     const playback = useState(true);
+    const takePlayback = PlaybackScrubberUtils.useGroup("singleTarget");
 
     const travelKnobs = ParticleSpawnerKnobs.TRAVEL_KNOBS_BY_PATTERN[travelPatternKey];
     const travelDefaults = ParticleTravelPaths.DEFAULT_OPTS[travelPatternKey];
@@ -140,9 +358,14 @@ export const ParticleSpawnerPage = () => {
             key: "singleTarget",
             name: EXAMPLE_NAMES.singleTarget,
             component: () => (
-                <PageMeasureBox width={BOX_WIDTH} height={BOX_HEIGHT}>
-                    <SingleTargetExample {...commonProps} />
-                </PageMeasureBox>
+                <ScrubbedExampleWrapper
+                    id={"singleTarget"}
+                    isPagePlaying={playback[0]}
+                    playback={takePlayback("singleTarget")}
+                    renderExample={(examplePlayback, progress) => (
+                        <SingleTargetExample {...commonProps} playback={examplePlayback} progress={progress} />
+                    )}
+                />
             ),
             path: `${EXAMPLES_ROOT}/SingleTarget.tsx`,
         },
@@ -150,9 +373,14 @@ export const ParticleSpawnerPage = () => {
             key: "vertical",
             name: EXAMPLE_NAMES.vertical,
             component: () => (
-                <PageMeasureBox width={BOX_WIDTH} height={BOX_HEIGHT}>
-                    <VerticalExample {...commonProps} />
-                </PageMeasureBox>
+                <ScrubbedExampleWrapper
+                    id={"vertical"}
+                    isPagePlaying={playback[0]}
+                    playback={takePlayback("vertical")}
+                    renderExample={(examplePlayback, progress) => (
+                        <VerticalExample {...commonProps} playback={examplePlayback} progress={progress} />
+                    )}
+                />
             ),
             path: `${EXAMPLES_ROOT}/Vertical.tsx`,
         },
@@ -160,9 +388,14 @@ export const ParticleSpawnerPage = () => {
             key: "diagonal",
             name: EXAMPLE_NAMES.diagonal,
             component: () => (
-                <PageMeasureBox width={BOX_WIDTH} height={BOX_HEIGHT}>
-                    <DiagonalExample {...commonProps} />
-                </PageMeasureBox>
+                <ScrubbedExampleWrapper
+                    id={"diagonal"}
+                    isPagePlaying={playback[0]}
+                    playback={takePlayback("diagonal")}
+                    renderExample={(examplePlayback, progress) => (
+                        <DiagonalExample {...commonProps} playback={examplePlayback} progress={progress} />
+                    )}
+                />
             ),
             path: `${EXAMPLES_ROOT}/Diagonal.tsx`,
         },
@@ -170,9 +403,14 @@ export const ParticleSpawnerPage = () => {
             key: "movingTarget",
             name: EXAMPLE_NAMES.movingTarget,
             component: () => (
-                <PageMeasureBox width={BOX_WIDTH} height={BOX_HEIGHT}>
-                    <MovingTargetExample {...commonProps} />
-                </PageMeasureBox>
+                <ScrubbedExampleWrapper
+                    id={"movingTarget"}
+                    isPagePlaying={playback[0]}
+                    playback={takePlayback("movingTarget")}
+                    renderExample={(examplePlayback, progress) => (
+                        <MovingTargetExample {...commonProps} playback={examplePlayback} progress={progress} />
+                    )}
+                />
             ),
             path: `${EXAMPLES_ROOT}/MovingTarget.tsx`,
         },
@@ -180,9 +418,14 @@ export const ParticleSpawnerPage = () => {
             key: "radial",
             name: EXAMPLE_NAMES.radial,
             component: () => (
-                <PageMeasureBox width={BOX_WIDTH} height={BOX_HEIGHT}>
-                    <RadialExample {...commonProps} />
-                </PageMeasureBox>
+                <ScrubbedExampleWrapper
+                    id={"radial"}
+                    isPagePlaying={playback[0]}
+                    playback={takePlayback("radial")}
+                    renderExample={(examplePlayback, progress) => (
+                        <RadialExample {...commonProps} playback={examplePlayback} progress={progress} />
+                    )}
+                />
             ),
             path: `${EXAMPLES_ROOT}/Radial.tsx`,
         },
@@ -190,9 +433,19 @@ export const ParticleSpawnerPage = () => {
             key: "manyToOne",
             name: EXAMPLE_NAMES.manyToOne,
             component: () => (
-                <PageMeasureBox width={BOX_WIDTH} height={BOX_HEIGHT}>
-                    <ManyToOneExample {...commonProps} />
-                </PageMeasureBox>
+                <ScrubbedExampleWrapper
+                    id={"manyToOne"}
+                    isPagePlaying={playback[0]}
+                    playback={takePlayback("manyToOne")}
+                    renderExample={(examplePlayback, progress, takeProgress) => (
+                        <ManyToOneExample
+                            {...commonProps}
+                            playback={examplePlayback}
+                            progress={progress}
+                            takeProgress={takeProgress}
+                        />
+                    )}
+                />
             ),
             path: `${EXAMPLES_ROOT}/ManyToOne.tsx`,
         },
@@ -200,19 +453,53 @@ export const ParticleSpawnerPage = () => {
             key: "roundTrip",
             name: EXAMPLE_NAMES.roundTrip,
             component: () => (
-                <PageMeasureBox width={BOX_WIDTH} height={BOX_HEIGHT}>
-                    <RoundTripExample {...commonProps} />
-                </PageMeasureBox>
+                <ScrubbedExampleWrapper
+                    id={"roundTrip"}
+                    isPagePlaying={playback[0]}
+                    playback={takePlayback("roundTrip")}
+                    renderExample={(examplePlayback, progress) => (
+                        <RoundTripExample {...commonProps} playback={examplePlayback} progress={progress} />
+                    )}
+                />
             ),
             path: `${EXAMPLES_ROOT}/RoundTrip.tsx`,
+        },
+        {
+            key: "wind",
+            name: EXAMPLE_NAMES.wind,
+            component: () => (
+                <WindExampleWrapper
+                    exampleProps={commonProps}
+                    isPagePlaying={playback[0]}
+                    playback={takePlayback("wind")}
+                />
+            ),
+            path: `${EXAMPLES_ROOT}/Wind.tsx`,
+        },
+        {
+            key: "attraction",
+            name: EXAMPLE_NAMES.attraction,
+            component: () => (
+                <AttractionExampleWrapper
+                    exampleProps={commonProps}
+                    isPagePlaying={playback[0]}
+                    playback={takePlayback("attraction")}
+                />
+            ),
+            path: `${EXAMPLES_ROOT}/Attraction.tsx`,
         },
         {
             key: "multipleTargets",
             name: EXAMPLE_NAMES.multipleTargets,
             component: () => (
-                <PageMeasureBox width={BOX_WIDTH} height={BOX_HEIGHT}>
-                    <MultipleTargetsExample {...commonProps} />
-                </PageMeasureBox>
+                <ScrubbedExampleWrapper
+                    id={"multipleTargets"}
+                    isPagePlaying={playback[0]}
+                    playback={takePlayback("multipleTargets")}
+                    renderExample={(examplePlayback, progress) => (
+                        <MultipleTargetsExample {...commonProps} playback={examplePlayback} progress={progress} />
+                    )}
+                />
             ),
             path: `${EXAMPLES_ROOT}/MultipleTargets.tsx`,
         },
@@ -220,9 +507,19 @@ export const ParticleSpawnerPage = () => {
             key: "grid",
             name: EXAMPLE_NAMES.grid,
             component: () => (
-                <PageMeasureBox width={BOX_WIDTH} height={BOX_HEIGHT}>
-                    <GridExample {...commonProps} />
-                </PageMeasureBox>
+                <ScrubbedExampleWrapper
+                    id={"grid"}
+                    isPagePlaying={playback[0]}
+                    playback={takePlayback("grid")}
+                    renderExample={(examplePlayback, progress, takeProgress) => (
+                        <GridExample
+                            {...commonProps}
+                            playback={examplePlayback}
+                            progress={progress}
+                            takeProgress={takeProgress}
+                        />
+                    )}
+                />
             ),
             path: `${EXAMPLES_ROOT}/Grid.tsx`,
         },
