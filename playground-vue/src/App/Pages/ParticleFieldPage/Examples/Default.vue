@@ -7,13 +7,11 @@ import {
     ParticleField,
     type ParticleFieldCellDefs,
     type ParticleFieldProps,
+    SliceAnimationKeyframeUtils,
     SliceAnimationWeights,
 } from "@thewaver/ss-components-vue";
 import { ParticlePictureUtils } from "@thewaver/ss-playground/App/PageComponents/ParticlePicture/ParticlePicture.utils";
-import {
-    computeParticlePos,
-    createEnvelope,
-} from "@thewaver/ss-playground/App/Pages/ParticleFieldPage/ParticleFieldPage.const";
+import { computeParticlePos } from "@thewaver/ss-playground/App/Pages/ParticleFieldPage/ParticleFieldPage.const";
 import { themeVars } from "@thewaver/ss-playground/App/Theme.css";
 import type { Index2d } from "@thewaver/ss-utils";
 
@@ -36,7 +34,10 @@ const src = computed(() =>
 const origin = computed(() => CellAnimationOrigins.computeOrigin(props.originType, props.cellCount));
 
 const animation = computed(() =>
-    createEnvelope(CellAnimationKeyframes.SAMPLE_ANIMATIONS[props.animationType], props.holdShare),
+    SliceAnimationKeyframeUtils.createEnvelope(
+        CellAnimationKeyframes.SAMPLE_ANIMATIONS[props.animationType],
+        props.holdShare,
+    ),
 );
 
 const computeCellWeights = computed(

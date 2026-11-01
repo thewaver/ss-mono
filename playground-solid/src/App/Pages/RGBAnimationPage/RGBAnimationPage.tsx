@@ -5,6 +5,7 @@ import {
     RGBAnimation,
     RGBAnimationKeyframes,
     RGB_ANIMATION_DEFAULTS,
+    type SignalPair,
     type SliceAnimationFn,
 } from "@thewaver/ss-components-solid";
 import { RGBAnimationKnobs } from "@thewaver/ss-playground/App/Knobs/RGBAnimations.const";
@@ -48,7 +49,7 @@ import type { RGBAnimationExampleProps } from "./RGBAnimationPageSolid.types";
 const SOURCES: Record<RGBAnimationSourceKey, string> = { knight: knightProfile, text: HEADLINE_SOURCE };
 
 type WrapperProps = RGBAnimationExampleProps & {
-    playback: Signal<boolean>;
+    playback: SignalPair<boolean>;
     boxWidth: Accessor<number>;
     isPagePlaying: Accessor<boolean>;
 };
@@ -588,23 +589,24 @@ const StressTestWrapper = (props: Omit<RGBAnimationExampleProps, "progress"> & {
 
 export const RGBAnimationPage = () => {
     const playback = createSignal(true);
-    const glitchPlayback = createSignal(true);
+    const takePlayback = PlaybackScrubberUtils.createGroup("glitch");
+    const glitchPlayback = takePlayback("glitch");
     const glitchProgress = createSignal(0);
-    const swellPlayback = createSignal(true);
+    const swellPlayback = takePlayback("swell");
     const swellProgress = createSignal(0);
-    const orbitPlayback = createSignal(true);
+    const orbitPlayback = takePlayback("orbit");
     const orbitProgress = createSignal(0);
-    const focusPullPlayback = createSignal(true);
+    const focusPullPlayback = takePlayback("focusPull");
     const focusPullProgress = createSignal(0);
-    const twistPlayback = createSignal(true);
+    const twistPlayback = takePlayback("twist");
     const twistProgress = createSignal(0);
-    const hueSwapPlayback = createSignal(true);
+    const hueSwapPlayback = takePlayback("hueSwap");
     const hueSwapProgress = createSignal(0);
-    const tiltPlayback = createSignal(true);
+    const tiltPlayback = takePlayback("tilt");
     const tiltProgress = createSignal(0);
-    const anaglyphPlayback = createSignal(true);
+    const anaglyphPlayback = takePlayback("anaglyph");
     const anaglyphProgress = createSignal(0);
-    const echoPlayback = createSignal(true);
+    const echoPlayback = takePlayback("echo");
     const echoProgress = createSignal(0);
 
     const [getAnimationDurationMs, setAnimationDurationMs] = createSignal(RGB_ANIMATION_DEFAULTS.animationDurationMs);

@@ -1,15 +1,10 @@
-import type { ParticleSpawnIterationPattern, SliceAnimationRenderer } from "@thewaver/ss-components-svelte";
-import type { ParticleTravelPatternFn } from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPatterns.types";
+import type {
+    ParticleSpawnIterationPattern,
+    ParticleTravelPathFn,
+    SliceAnimationRenderer,
+} from "@thewaver/ss-components-svelte";
 
-export type {
-    IterationPattern,
-    IterationPatternFn,
-    ParticleTravelKnobs,
-    ParticleTravelPattern,
-    ParticleTravelPatternFactory,
-    ParticleTravelPatternFn,
-    TravelEasingKey,
-} from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPatterns.types";
+export type { ParticleTravelKnobs } from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPatterns.types";
 
 export type ParticleSpawnerExampleProps = {
     particleCount: number;
@@ -17,7 +12,7 @@ export type ParticleSpawnerExampleProps = {
     restDurationMs: number;
     spawnDelayMs: number;
     spawnIterationPatterns: ParticleSpawnIterationPattern[];
-    computeParticlePos: ParticleTravelPatternFn;
+    computeParticlePos: ParticleTravelPathFn;
     areTargetsHidden: boolean;
     playback: boolean;
     renderer?: SliceAnimationRenderer;

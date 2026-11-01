@@ -1,7 +1,15 @@
 <script setup lang="ts">
 import { computed, shallowRef } from "vue";
 
-import { PARTICLE_SPAWNER_DEFAULTS } from "@thewaver/ss-components-vue";
+import {
+    PARTICLE_SPAWNER_DEFAULTS,
+    type ParticleIterationPatternType,
+    ParticleIterationPatterns,
+    type ParticleTravelEasingType,
+    ParticleTravelEasings,
+    type ParticleTravelPathType,
+    ParticleTravelPaths,
+} from "@thewaver/ss-components-vue";
 import { ParticleSpawnerKnobs } from "@thewaver/ss-playground/App/Knobs/ParticleSpawners.const";
 import { EXAMPLES_ONLY_PROP } from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.const";
 import {
@@ -10,14 +18,7 @@ import {
     EXAMPLES_ROOT,
     EXAMPLE_NAMES,
     FIELD_WIDTH,
-    ITERATION_PATTERNS,
-    ITERATION_PATTERN_KEYS,
     NO_TRAVEL_DEFS,
-    TRAVEL_EASING_FNS,
-    TRAVEL_EASING_KEYS,
-    TRAVEL_PATTERN_FACTORIES,
-    TRAVEL_PATTERN_KEYS,
-    applyOvershoot,
 } from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.const";
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
@@ -31,7 +32,6 @@ import PageProp from "../../PageComponents/Prop/Prop.vue";
 import PagePropsDivider from "../../PageComponents/PropsPanel/PagePropsDivider.vue";
 import PagePropsGroups from "../../PageComponents/PropsPanel/PagePropsGroups.vue";
 import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
-import BurstExample from "./Examples/Burst.vue";
 import DiagonalExample from "./Examples/Diagonal.vue";
 import GridExample from "./Examples/Grid.vue";
 import ManyToOneExample from "./Examples/ManyToOne.vue";
@@ -41,12 +41,7 @@ import RadialExample from "./Examples/Radial.vue";
 import RoundTripExample from "./Examples/RoundTrip.vue";
 import SingleTargetExample from "./Examples/SingleTarget.vue";
 import VerticalExample from "./Examples/Vertical.vue";
-import type {
-    IterationPattern,
-    ParticleSpawnerExampleProps,
-    ParticleTravelPattern,
-    TravelEasingKey,
-} from "./ParticleSpawnerPage.types";
+import type { ParticleSpawnerExampleProps } from "./ParticleSpawnerPage.types";
 import StressTestWrapper from "./StressTestWrapper.vue";
 
 const particleCount = shallowRef(ParticleSpawnerKnobs.STARTING_PARTICLE_COUNT);
@@ -54,11 +49,13 @@ const travelDurationMs = shallowRef(PARTICLE_SPAWNER_DEFAULTS.travelDurationMs);
 const restDurationMs = shallowRef(PARTICLE_SPAWNER_DEFAULTS.restDurationMs);
 const spawnDelayMs = shallowRef(ParticleSpawnerKnobs.STARTING_SPAWN_DELAY_MS);
 const overshootPercent = shallowRef(ParticleSpawnerKnobs.STARTING_OVERSHOOT_PERCENT);
-const travelEasingKey = shallowRef<TravelEasingKey>(ParticleSpawnerKnobs.STARTING_TRAVEL_EASING_KEY);
+const travelEasingKey = shallowRef<ParticleTravelEasingType>(ParticleSpawnerKnobs.STARTING_TRAVEL_EASING_KEY);
 
-const travelPatternKey = shallowRef<ParticleTravelPattern>(ParticleSpawnerKnobs.STARTING_TRAVEL_PATTERN_KEY);
+const travelPatternKey = shallowRef<ParticleTravelPathType>(ParticleSpawnerKnobs.STARTING_TRAVEL_PATTERN_KEY);
 
-const iterationPatternKey = shallowRef<IterationPattern>(ParticleSpawnerKnobs.STARTING_ITERATION_PATTERN_KEY);
+const iterationPatternKey = shallowRef<ParticleIterationPatternType>(
+    ParticleSpawnerKnobs.STARTING_ITERATION_PATTERN_KEY,
+);
 
 const areTargetsHidden = shallowRef(ParticleSpawnerKnobs.STARTING_ARE_TARGETS_HIDDEN);
 
@@ -66,22 +63,22 @@ const travelDefs = shallowRef<Record<string, Record<string, number | boolean>>>(
 const playback = shallowRef(true);
 
 const travelKnobs = computed(() => ParticleSpawnerKnobs.TRAVEL_KNOBS_BY_PATTERN[travelPatternKey.value]);
-const travelDefaults = computed(() => ParticleSpawnerKnobs.TRAVEL_DEFAULTS_BY_PATTERN[travelPatternKey.value]);
+const travelDefaults = computed(() => ParticleTravelPaths.DEFAULT_OPTS[travelPatternKey.value]);
 const pickedTravelDefs = computed(() => travelDefs.value[travelPatternKey.value] ?? NO_TRAVEL_DEFS);
 
 const computeParticlePos = computed(() => {
-    const evaluate = TRAVEL_PATTERN_FACTORIES[travelPatternKey.value]({
+    const evaluate = ParticleTravelPaths.SAMPLE_PATHS[travelPatternKey.value]({
         ...travelDefaults.value,
         ...pickedTravelDefs.value,
     } as Record<string, number>);
-    const easingFn = TRAVEL_EASING_FNS[travelEasingKey.value];
+    const easingFn = ParticleTravelEasings.SAMPLE_EASINGS[travelEasingKey.value];
     const overshoot = overshootPercent.value;
 
     return (defs: Parameters<typeof evaluate>[0], t: number) =>
-        evaluate(defs, applyOvershoot(t, easingFn(t), overshoot));
+        evaluate(defs, ParticleTravelEasings.applyOvershoot(t, easingFn(t), overshoot));
 });
 
-const spawnIterationPatterns = computed(() => ITERATION_PATTERNS[iterationPatternKey.value]());
+const spawnIterationPatterns = computed(() => ParticleIterationPatterns.SAMPLE_PATTERNS[iterationPatternKey.value]);
 
 const commonProps = computed<Omit<ParticleSpawnerExampleProps, "playback">>(() => ({
     particleCount: particleCount.value,
@@ -132,11 +129,6 @@ const examples: ExampleDefs[] = [
         path: `${EXAMPLES_ROOT}/ManyToOne.vue`,
     },
     {
-        key: "burst",
-        name: EXAMPLE_NAMES.burst,
-        path: `${EXAMPLES_ROOT}/Burst.vue`,
-    },
-    {
         key: "roundTrip",
         name: EXAMPLE_NAMES.roundTrip,
         path: `${EXAMPLES_ROOT}/RoundTrip.vue`,
@@ -169,10 +161,10 @@ const examples: ExampleDefs[] = [
             >
                 <PageSelectField
                     :value="travelPatternKey"
-                    :values="TRAVEL_PATTERN_KEYS"
+                    :values="ParticleTravelPaths.PATH_TYPES"
                     :width="FIELD_WIDTH"
                     ariaLabel="Travel pattern"
-                    @change="(key: ParticleTravelPattern) => (travelPatternKey = key)"
+                    @change="(key: ParticleTravelPathType) => (travelPatternKey = key)"
                 />
             </PageProp>
 
@@ -264,10 +256,10 @@ const examples: ExampleDefs[] = [
             >
                 <PageSelectField
                     :value="iterationPatternKey"
-                    :values="ITERATION_PATTERN_KEYS"
+                    :values="ParticleIterationPatterns.PATTERN_TYPES"
                     :width="FIELD_WIDTH"
                     ariaLabel="Iteration pattern"
-                    @change="(key: IterationPattern) => (iterationPatternKey = key)"
+                    @change="(key: ParticleIterationPatternType) => (iterationPatternKey = key)"
                 />
             </PageProp>
 
@@ -309,10 +301,10 @@ const examples: ExampleDefs[] = [
             >
                 <PageSelectField
                     :value="travelEasingKey"
-                    :values="TRAVEL_EASING_KEYS"
+                    :values="ParticleTravelEasings.EASING_TYPES"
                     :width="FIELD_WIDTH"
                     ariaLabel="Travel easing"
-                    @change="(key: TravelEasingKey) => (travelEasingKey = key)"
+                    @change="(key: ParticleTravelEasingType) => (travelEasingKey = key)"
                 />
             </PageProp>
         </PagePropsPanel>
@@ -352,12 +344,6 @@ const examples: ExampleDefs[] = [
         <template #manyToOne>
             <PageMeasureBox :width="BOX_WIDTH" :height="BOX_HEIGHT">
                 <ManyToOneExample v-bind="commonProps" v-model:playback="playback" />
-            </PageMeasureBox>
-        </template>
-
-        <template #burst>
-            <PageMeasureBox :width="BOX_WIDTH" :height="BOX_HEIGHT">
-                <BurstExample v-bind="commonProps" v-model:playback="playback" />
             </PageMeasureBox>
         </template>
 

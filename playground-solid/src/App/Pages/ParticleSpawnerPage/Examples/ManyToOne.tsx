@@ -33,18 +33,23 @@ export const ManyToOneExample = (props: ParticleSpawnerExampleProps) => {
             />
 
             <For each={SPAWNER_POSITIONS}>
-                {(position) => (
-                    <div class={styles.spawnerRoot} style={position}>
-                        <div class={styles.spawnerMarker} />
+                {(position, index) => {
+                    const progress = index() === 0 ? props.progress : props.takeProgress?.();
 
-                        <ParticleSpawner
-                            {...props}
-                            targets={() => [getTargetRef()]}
-                            src={particleSrc}
-                            computeParticleAnimation={computeParticleAnimation}
-                        />
-                    </div>
-                )}
+                    return (
+                        <div class={styles.spawnerRoot} style={position}>
+                            <div class={styles.spawnerMarker} />
+
+                            <ParticleSpawner
+                                {...props}
+                                progress={progress}
+                                targets={() => [getTargetRef()]}
+                                src={particleSrc}
+                                computeParticleAnimation={computeParticleAnimation}
+                            />
+                        </div>
+                    );
+                }}
             </For>
         </div>
     );

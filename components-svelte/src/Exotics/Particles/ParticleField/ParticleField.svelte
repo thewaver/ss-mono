@@ -130,9 +130,7 @@
             }),
             { width: 0, height: 0 },
         );
-        const reach = SliceRendererUtils.computeReach(tables?.tables ?? [], largest, undefined);
-
-        return { x: -reach, y: -reach, width: size.width + 2 * reach, height: size.height + 2 * reach };
+        return SliceRendererUtils.computeArea(tables?.tables ?? [], largest, size, undefined);
     });
 
     const hasEnded = $derived(currentIteration >= iterationCount);

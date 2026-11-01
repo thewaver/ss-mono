@@ -8,6 +8,8 @@ const resolveThemeColor = (value: string) => {
 };
 
 export namespace ParticlePictureUtils {
+    export const resolveColor = resolveThemeColor;
+
     export const createDotSrc = (
         lightColor: string,
         darkColor: string,

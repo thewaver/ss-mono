@@ -199,7 +199,7 @@ export const ParticleSpawner = defineComponent(
             );
         };
 
-        const engine = ParticleSpawnerUtils.createEngine({
+        const engine = ParticleSpawnerUtils.createLegacyEngine({
             getTargetCount: () => props.targets.length,
             computeTarget: (index, targetCount) => props.computeTarget?.(index, targetCount),
             getElement: (id) => elements.get(id),
@@ -379,7 +379,10 @@ export const ParticleSpawner = defineComponent(
             "onUpdate:playback": null,
             "renderer": null,
             "computeTarget": null,
+            "computeRoute": null,
+            "modMarkers": null,
             "computeParticlePos": null,
+            "particleModifiers": null,
             "computeParticleAnimation": null,
             "computeParticleTint": null,
             "onParticleArrive": null,

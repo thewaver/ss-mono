@@ -151,9 +151,7 @@ export const CellAnimation = (props: CellAnimationProps) => {
             }),
             { width: 0, height: 0 },
         );
-        const reach = SliceRendererUtils.computeReach(tables?.tables ?? [], largest, rootSize);
-
-        return { x: -reach, y: -reach, width: rootSize.width + 2 * reach, height: rootSize.height + 2 * reach };
+        return SliceRendererUtils.computeArea(tables?.tables ?? [], largest, rootSize, rootSize);
     }, [evaluationDefs, tables, rootSize]);
 
     const { hasEnded, areCellsMounted, isSourceRevealed } = CellAnimationUtils.computeFrameState(

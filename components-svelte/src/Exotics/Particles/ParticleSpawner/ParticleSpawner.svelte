@@ -195,7 +195,7 @@
         });
     };
 
-    const engine = ParticleSpawnerUtils.createEngine({
+    const engine = ParticleSpawnerUtils.createLegacyEngine({
         getTargetCount: () => props.targets.length,
         computeTarget: (index, targetCount) => props.computeTarget?.(index, targetCount),
         getElement: (id) => elements.get(id),

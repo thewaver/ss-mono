@@ -1,6 +1,14 @@
 import { useMemo, useState } from "react";
 
-import { PARTICLE_SPAWNER_DEFAULTS } from "@thewaver/ss-components-react";
+import {
+    PARTICLE_SPAWNER_DEFAULTS,
+    type ParticleIterationPatternType,
+    ParticleIterationPatterns,
+    type ParticleTravelEasingType,
+    ParticleTravelEasings,
+    type ParticleTravelPathType,
+    ParticleTravelPaths,
+} from "@thewaver/ss-components-react";
 import { ParticleSpawnerKnobs } from "@thewaver/ss-playground/App/Knobs/ParticleSpawners.const";
 import { EXAMPLES_ONLY_PROP } from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.const";
 import {
@@ -9,17 +17,10 @@ import {
     EXAMPLES_ROOT,
     EXAMPLE_NAMES,
     FIELD_WIDTH,
-    ITERATION_PATTERNS,
-    ITERATION_PATTERN_KEYS,
     NO_TRAVEL_DEFS,
     STRESS_ITEMS,
     STRESS_PARTICLE_COUNT,
     STRESS_SPAWN_DELAY_MS,
-    TRAVEL_EASING_FNS,
-    TRAVEL_EASING_KEYS,
-    TRAVEL_PATTERN_FACTORIES,
-    TRAVEL_PATTERN_KEYS,
-    applyOvershoot,
 } from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
@@ -29,7 +30,6 @@ import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsDivider, PagePropsGroups, PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { StressTest } from "../../PageComponents/StressTest/StressTest";
-import { BurstExample } from "./Examples/Burst";
 import { DiagonalExample } from "./Examples/Diagonal";
 import { GridExample } from "./Examples/Grid";
 import { ManyToOneExample } from "./Examples/ManyToOne";
@@ -39,12 +39,7 @@ import { RadialExample } from "./Examples/Radial";
 import { RoundTripExample } from "./Examples/RoundTrip";
 import { SingleTargetExample } from "./Examples/SingleTarget";
 import { VerticalExample } from "./Examples/Vertical";
-import type {
-    IterationPattern,
-    ParticleSpawnerExampleProps,
-    ParticleTravelPattern,
-    TravelEasingKey,
-} from "./ParticleSpawnerPage.types";
+import type { ParticleSpawnerExampleProps } from "./ParticleSpawnerPage.types";
 
 const StressTestWrapper = (props: ParticleSpawnerExampleProps) => {
     const modalPlayback = useState(true);
@@ -97,15 +92,15 @@ export const ParticleSpawnerPage = () => {
     const [restDurationMs, setRestDurationMs] = useState(PARTICLE_SPAWNER_DEFAULTS.restDurationMs);
     const [spawnDelayMs, setSpawnDelayMs] = useState(ParticleSpawnerKnobs.STARTING_SPAWN_DELAY_MS);
     const [overshootPercent, setOvershootPercent] = useState(ParticleSpawnerKnobs.STARTING_OVERSHOOT_PERCENT);
-    const [travelEasingKey, setTravelEasingKey] = useState<TravelEasingKey>(
+    const [travelEasingKey, setTravelEasingKey] = useState<ParticleTravelEasingType>(
         ParticleSpawnerKnobs.STARTING_TRAVEL_EASING_KEY,
     );
 
-    const [travelPatternKey, setTravelPatternKey] = useState<ParticleTravelPattern>(
+    const [travelPatternKey, setTravelPatternKey] = useState<ParticleTravelPathType>(
         ParticleSpawnerKnobs.STARTING_TRAVEL_PATTERN_KEY,
     );
 
-    const [iterationPatternKey, setIterationPatternKey] = useState<IterationPattern>(
+    const [iterationPatternKey, setIterationPatternKey] = useState<ParticleIterationPatternType>(
         ParticleSpawnerKnobs.STARTING_ITERATION_PATTERN_KEY,
     );
 
@@ -115,18 +110,18 @@ export const ParticleSpawnerPage = () => {
     const playback = useState(true);
 
     const travelKnobs = ParticleSpawnerKnobs.TRAVEL_KNOBS_BY_PATTERN[travelPatternKey];
-    const travelDefaults = ParticleSpawnerKnobs.TRAVEL_DEFAULTS_BY_PATTERN[travelPatternKey];
+    const travelDefaults = ParticleTravelPaths.DEFAULT_OPTS[travelPatternKey];
     const pickedTravelDefs = travelDefs[travelPatternKey] ?? NO_TRAVEL_DEFS;
 
     const computeParticlePos = useMemo(() => {
-        const evaluate = TRAVEL_PATTERN_FACTORIES[travelPatternKey]({
+        const evaluate = ParticleTravelPaths.SAMPLE_PATHS[travelPatternKey]({
             ...travelDefaults,
             ...pickedTravelDefs,
         } as Record<string, number>);
-        const easingFn = TRAVEL_EASING_FNS[travelEasingKey];
+        const easingFn = ParticleTravelEasings.SAMPLE_EASINGS[travelEasingKey];
 
         return (defs: Parameters<typeof evaluate>[0], t: number) =>
-            evaluate(defs, applyOvershoot(t, easingFn(t), overshootPercent));
+            evaluate(defs, ParticleTravelEasings.applyOvershoot(t, easingFn(t), overshootPercent));
     }, [travelPatternKey, travelDefaults, pickedTravelDefs, travelEasingKey, overshootPercent]);
 
     const commonProps: ParticleSpawnerExampleProps = {
@@ -134,7 +129,7 @@ export const ParticleSpawnerPage = () => {
         travelDurationMs,
         restDurationMs,
         spawnDelayMs,
-        spawnIterationPatterns: ITERATION_PATTERNS[iterationPatternKey](),
+        spawnIterationPatterns: ParticleIterationPatterns.SAMPLE_PATTERNS[iterationPatternKey],
         computeParticlePos,
         areTargetsHidden,
         playback,
@@ -202,16 +197,6 @@ export const ParticleSpawnerPage = () => {
             path: `${EXAMPLES_ROOT}/ManyToOne.tsx`,
         },
         {
-            key: "burst",
-            name: EXAMPLE_NAMES.burst,
-            component: () => (
-                <PageMeasureBox width={BOX_WIDTH} height={BOX_HEIGHT}>
-                    <BurstExample {...commonProps} />
-                </PageMeasureBox>
-            ),
-            path: `${EXAMPLES_ROOT}/Burst.tsx`,
-        },
-        {
             key: "roundTrip",
             name: EXAMPLE_NAMES.roundTrip,
             component: () => (
@@ -264,7 +249,7 @@ export const ParticleSpawnerPage = () => {
                     >
                         <PageSelectField
                             value={travelPatternKey}
-                            values={TRAVEL_PATTERN_KEYS}
+                            values={ParticleTravelPaths.PATH_TYPES}
                             width={FIELD_WIDTH}
                             ariaLabel={"Travel pattern"}
                             onChange={(key) => setTravelPatternKey(key)}
@@ -370,7 +355,7 @@ export const ParticleSpawnerPage = () => {
                     >
                         <PageSelectField
                             value={iterationPatternKey}
-                            values={ITERATION_PATTERN_KEYS}
+                            values={ParticleIterationPatterns.PATTERN_TYPES}
                             width={FIELD_WIDTH}
                             ariaLabel={"Iteration pattern"}
                             onChange={(key) => setIterationPatternKey(key)}
@@ -423,7 +408,7 @@ export const ParticleSpawnerPage = () => {
                     >
                         <PageSelectField
                             value={travelEasingKey}
-                            values={TRAVEL_EASING_KEYS}
+                            values={ParticleTravelEasings.EASING_TYPES}
                             width={FIELD_WIDTH}
                             ariaLabel={"Travel easing"}
                             onChange={(key) => setTravelEasingKey(key)}

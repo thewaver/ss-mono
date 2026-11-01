@@ -134,9 +134,7 @@ export const RGBAnimation = (props: RGBAnimationProps) => {
 
     const getArea = createMemo(() => {
         const size = getRootSize();
-        const reach = SliceRendererUtils.computeReach(getTables()?.tables ?? [], size, size);
-
-        return { x: -reach, y: -reach, width: size.width + 2 * reach, height: size.height + 2 * reach };
+        return SliceRendererUtils.computeArea(getTables()?.tables ?? [], size, size, size);
     });
 
     createEffect(

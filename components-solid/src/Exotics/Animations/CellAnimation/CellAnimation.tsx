@@ -147,9 +147,7 @@ export const CellAnimation = (props: CellAnimationProps) => {
             }),
             { width: 0, height: 0 },
         );
-        const reach = SliceRendererUtils.computeReach(getTables()?.tables ?? [], largest, size);
-
-        return { x: -reach, y: -reach, width: size.width + 2 * reach, height: size.height + 2 * reach };
+        return SliceRendererUtils.computeArea(getTables()?.tables ?? [], largest, size, size);
     });
 
     const getIsRunning = createMemo(

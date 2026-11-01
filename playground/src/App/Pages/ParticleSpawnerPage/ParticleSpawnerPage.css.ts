@@ -8,6 +8,14 @@ const MOVING_TARGET_LOOP_MS = 4000;
 const CORNER_NEAR = "15%";
 const CORNER_FAR = "85%";
 const LOZENGE_WIDTH_SHARE = 0.75;
+const ATTRACTOR_LOOP_MS = 3000;
+
+export const stack = style({
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "stretch",
+    gap: themeVars.spacing.full,
+});
 
 export const demoArea = style({
     position: "relative",
@@ -38,6 +46,49 @@ export const spawnerMarkerReturn = style([
         backgroundImage: `radial-gradient(circle at 70% 30%, ${themeVars.color.secondary.light}, ${themeVars.color.secondary.dark})`,
     },
 ]);
+
+const bobUpAndDown = keyframes({
+    "0%": { top: CORNER_NEAR },
+    "50%": { top: CORNER_FAR },
+    "100%": { top: CORNER_NEAR },
+});
+
+export const attractorMarker = style({
+    position: "absolute",
+    left: "50%",
+    top: CORNER_NEAR,
+    transform: "translate(-50%, -50%)",
+    animationName: bobUpAndDown,
+    animationDuration: `${ATTRACTOR_LOOP_MS}ms`,
+    animationTimingFunction: "ease-in-out",
+    animationIterationCount: "infinite",
+    width: MARKER_SIZE_PX,
+    height: MARKER_SIZE_PX,
+    borderRadius: themeVars.borderRadius.half,
+    border: `2px dashed ${themeVars.color.secondary.main}`,
+    boxSizing: "border-box",
+});
+
+export const windArrow = style({
+    position: "absolute",
+    left: "50%",
+    top: "50%",
+    height: 0,
+    borderTop: `2px dashed ${themeVars.color.secondary.main}`,
+    transformOrigin: "0 0",
+    selectors: {
+        "&::after": {
+            content: '""',
+            position: "absolute",
+            right: 0,
+            top: -1,
+            transform: "translateY(-50%)",
+            borderLeft: `8px solid ${themeVars.color.secondary.main}`,
+            borderTop: "5px solid transparent",
+            borderBottom: "5px solid transparent",
+        },
+    },
+});
 
 export const targetMarker = style({
     position: "absolute",
@@ -70,15 +121,4 @@ export const movingTargetMarker = style([
 
 export const isHiddenMarker = style({
     visibility: "hidden",
-});
-
-export const burstRoot = style({
-    position: "absolute",
-    transform: "translate(-50%, -50%)",
-});
-
-export const spawnerOverlay = style({
-    position: "absolute",
-    inset: 0,
-    pointerEvents: "none",
 });

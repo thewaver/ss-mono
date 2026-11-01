@@ -15,6 +15,7 @@ import {
     type SliceStop,
     ParticleSpawnerStyles as styles,
 } from "@thewaver/ss-components";
+import { ParticleSpawnerConst } from "@thewaver/ss-components/internal";
 import { type Point2d, Rect, Size2d } from "@thewaver/ss-utils";
 import { assignInlineVars, setElementVars } from "@vanilla-extract/dynamic";
 
@@ -34,6 +35,8 @@ const NO_TABLES: SliceStop[][] = [];
 
 type Placed = { defs: ParticleTravelDefs; pos: Point2d; t: number };
 
+type LegTint = { legIndex: number; tint: string | undefined };
+
 export const ParticleSpawner = (props: ParticleSpawnerProps) => {
     const getTravelDurationMs = createMemo(
         () => access(props.travelDurationMs) ?? PARTICLE_SPAWNER_DEFAULTS.travelDurationMs,
@@ -49,6 +52,7 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
 
     const getParticleCount = createMemo(() => ParticleSpawnerUtils.toParticleCount(access(props.particleCount)));
     const getTargets = createMemo(() => access(props.targets));
+    const getModMarkers = createMemo(() => access(props.modMarkers));
 
     const getSource = createMemo(() => access(props.src));
 
@@ -58,7 +62,10 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
     const [getCanvasRef, setCanvasRef] = createSignal<HTMLCanvasElement>();
     const [getIsWindowVisible, setIsWindowVisible] = createSignal(true);
     const [getIsPlaying] = SignalMirrorSolidUtils.createOptional(() => props.playback, true);
-    const [getStageIndex, setStageIndex] = createSignal(0, { equals: false });
+    const [getProgress, setProgress] = SignalMirrorSolidUtils.createOptional(
+        () => props.progress,
+        ParticleSpawnerConst.NO_PROGRESS,
+    );
     const [getShownRect, setShownRect] = createSignal<Rect>(NO_RECT, { equals: Rect.isSame });
 
     const getPrefersReducedMotion = MediaQueryMonitorSolidUtils.createReducedMotion();
@@ -83,14 +90,20 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
     const bodies = new Map<number, HTMLElement>();
     const pictures = new Map<number, HTMLElement>();
     const placed = new Map<number, Placed>();
-    const tints = new Map<number, string | undefined>();
+    const tints = new Map<number, LegTint>();
 
     let drawnArea: Rect | undefined;
 
     const getTint = (defs: ParticleTravelDefs) => {
-        if (!tints.has(defs.id)) tints.set(defs.id, props.computeParticleTint?.(defs));
+        const cached = tints.get(defs.id);
 
-        return tints.get(defs.id);
+        if (cached?.legIndex === defs.legIndex) return cached.tint;
+
+        const tint = props.computeParticleTint?.(defs);
+
+        tints.set(defs.id, { legIndex: defs.legIndex, tint });
+
+        return tint;
     };
 
     const getCanSpawn = () => !!getRootRef() && getIsWindowVisible() && getTargets().length > 0;
@@ -101,6 +114,7 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
         return {
             rootRect: rootRef ? ElementObserverUtils.measureViewportRect(rootRef, viewportContext) : undefined,
             targetRects: ElementObserverUtils.measureViewportRects(getTargets(), viewportContext),
+            modMarkerRects: ElementObserverUtils.measureViewportRects(getModMarkers() ?? [], viewportContext),
             prefersReducedMotion: getPrefersReducedMotion(),
         };
     };
@@ -108,13 +122,20 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
     const applyTint = (id: number, entry: Placed) => {
         const picture = pictures.get(id);
 
-        if (!picture || picture.dataset.tinted) return;
+        const legIndex = String(entry.defs.legIndex);
+
+        if (!picture || picture.dataset.tintedLeg === legIndex) return;
 
         const tint = getTint(entry.defs);
 
-        picture.dataset.tinted = "true";
+        picture.dataset.tintedLeg = legIndex;
 
-        if (tint === undefined) return;
+        if (tint === undefined) {
+            picture.classList.remove(SliceRendererStyles.sliceRendererPictureTinted);
+            picture.style.opacity = "";
+
+            return;
+        }
 
         const tintStyle = SliceRendererUtils.toTintStyle(SliceRendererUtils.toTint(tint));
 
@@ -195,28 +216,33 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
     };
 
     const engine = ParticleSpawnerUtils.createEngine({
-        getTargetCount: () => getTargets().length,
+        getTargetCount: () => untrack(getTargets).length,
         computeTarget: (index, targetCount) => props.computeTarget?.(index, targetCount),
+        computeRoute: (index, targetCount) => props.computeRoute?.(index, targetCount),
         getElement: (id) => refs.get(id),
         getIsDrawingElements: () => !untrack(getIsOnGraphicsCard),
-        getFrame: measureFrame,
-        getTiming: () => ({
-            spawnDelayMs: getSpawnDelayMs(),
-            travelDurationMs: getTravelDurationMs(),
-            restDurationMs: getRestDurationMs(),
-        }),
-        getCanSpawn,
-        computeParticlePos: (travel, t) => {
-            const pos = props.computeParticlePos(travel, t);
-
+        getFrame: () => untrack(measureFrame),
+        getTiming: () =>
+            untrack(() => ({
+                spawnDelayMs: getSpawnDelayMs(),
+                travelDurationMs: getTravelDurationMs(),
+                restDurationMs: getRestDurationMs(),
+            })),
+        getParticleCount: () => untrack(getParticleCount),
+        getPatterns: () => untrack(getSpawnIterationPatterns),
+        getCanSpawn: () => untrack(getCanSpawn),
+        getProgress: () => untrack(getProgress),
+        setProgress,
+        computeParticlePos: (travel, t) => props.computeParticlePos(travel, t),
+        getModifiers: () => props.particleModifiers,
+        onParticlePlace: (travel, pos, t) => {
             placed.set(travel.id, { defs: travel, pos, t });
 
-            return pos;
-        },
-        onParticleT: (id) => {
-            if (!untrack(getIsOnGraphicsCard)) applyParticle(id);
+            if (!untrack(getIsOnGraphicsCard)) applyParticle(travel.id);
         },
         onParticleArrive: (index) => props.onParticleArrive?.(index),
+        onIterationEnd: () => props.onIterationEnd?.(),
+        onAnimationEnd: () => props.onAnimationEnd?.(),
         onTick: () => {
             if (untrack(getIsOnGraphicsCard)) drawOnGraphicsCard();
         },
@@ -243,30 +269,35 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
         }),
     );
 
-    createEffect(on([getParticleCount, getSpawnDelayMs, getSpawnIterationPatterns], () => setStageIndex(0)));
+    createEffect(
+        on(
+            [getParticleCount, getSpawnDelayMs, getTravelDurationMs, getRestDurationMs, getSpawnIterationPatterns],
+            () => untrack(engine.restart),
+            { defer: true },
+        ),
+    );
+
+    createEffect(
+        on(
+            getIsPlaying,
+            (isPlaying, wasPlaying) => {
+                if (isPlaying && wasPlaying === false && engine.getHasEnded()) untrack(engine.restart);
+            },
+            { defer: true },
+        ),
+    );
 
     createEffect(() => {
-        const particleCount = getParticleCount();
-        const pattern = getSpawnIterationPatterns()[getStageIndex()];
-        const isPlaying = getIsPlaying();
-        const canSpawn = getCanSpawn();
+        const isRunning = getIsPlaying() && getCanSpawn();
 
-        getTravelDurationMs();
-        getRestDurationMs();
-        getSpawnDelayMs();
+        untrack(() => {
+            engine.setIsRunning(isRunning);
 
-        if (!canSpawn || !isPlaying || particleCount <= 0 || !pattern) return;
-
-        onCleanup(
-            untrack(() =>
-                engine.playPattern(pattern, particleCount, {
-                    onIterationEnd: () => props.onIterationEnd?.(),
-                    onAnimationEnd: () => props.onAnimationEnd?.(),
-                    onNextStage: setStageIndex,
-                }),
-            ),
-        );
+            if (!isRunning) engine.render();
+        });
     });
+
+    createEffect(on(getProgress, () => untrack(engine.scrub), { defer: true }));
 
     onMount(() => {
         const handleVisibilityChange = () => setIsWindowVisible(document.visibilityState === "visible");
@@ -309,7 +340,13 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
                             });
 
                             return (
-                                <div class={styles.particleSpawnerItem} ref={(el) => refs.set(particle.id, el)}>
+                                <div
+                                    class={styles.particleSpawnerItem}
+                                    ref={(el) => {
+                                        refs.set(particle.id, el);
+                                        engine.drawParticle(particle.id, el);
+                                    }}
+                                >
                                     <div
                                         class={styles.particleSpawnerBody}
                                         style={{

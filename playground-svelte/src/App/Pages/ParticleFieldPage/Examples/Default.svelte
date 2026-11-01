@@ -2,15 +2,13 @@
     import {
         CellAnimationKeyframes,
         CellAnimationOrigins,
+        SliceAnimationKeyframeUtils,
         SliceAnimationWeights,
         ParticleField,
         type ParticleFieldProps,
     } from "@thewaver/ss-components-svelte";
     import { ParticlePictureUtils } from "@thewaver/ss-playground/App/PageComponents/ParticlePicture/ParticlePicture.utils";
-    import {
-        computeParticlePos,
-        createEnvelope,
-    } from "@thewaver/ss-playground/App/Pages/ParticleFieldPage/ParticleFieldPage.const";
+    import { computeParticlePos } from "@thewaver/ss-playground/App/Pages/ParticleFieldPage/ParticleFieldPage.const";
     import { themeVars } from "@thewaver/ss-playground/App/Theme.css";
     import type { Index2d } from "@thewaver/ss-utils";
 
@@ -32,7 +30,7 @@
 
     const origin = $derived(CellAnimationOrigins.computeOrigin(originType, otherProps.cellCount));
 
-    const animation = $derived(createEnvelope(CellAnimationKeyframes.SAMPLE_ANIMATIONS[animationType], holdShare));
+    const animation = $derived(SliceAnimationKeyframeUtils.createEnvelope(CellAnimationKeyframes.SAMPLE_ANIMATIONS[animationType], holdShare));
 
     const computeCellWeights = $derived((count: Index2d) =>
         SliceAnimationWeights.computeSliceWeights(weightType, count, CellAnimationOrigins.computeOrigin(originType, count)),

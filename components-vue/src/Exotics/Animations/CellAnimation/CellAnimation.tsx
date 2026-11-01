@@ -139,9 +139,7 @@ export const CellAnimation = defineComponent(
                 }),
                 { width: 0, height: 0 },
             );
-            const reach = SliceRendererUtils.computeReach(tables.value?.tables ?? [], largest, size);
-
-            return { x: -reach, y: -reach, width: size.width + 2 * reach, height: size.height + 2 * reach };
+            return SliceRendererUtils.computeArea(tables.value?.tables ?? [], largest, size, size);
         });
 
         const isRunning = computed(

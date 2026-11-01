@@ -204,7 +204,7 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
             );
         };
 
-        const engine = ParticleSpawnerUtils.createEngine({
+        const engine = ParticleSpawnerUtils.createLegacyEngine({
             getTargetCount: () => latest.current.props.targets.length,
             computeTarget: (index, targetCount) => latest.current.props.computeTarget?.(index, targetCount),
             getElement: (id) => elementsRef.current.get(id),

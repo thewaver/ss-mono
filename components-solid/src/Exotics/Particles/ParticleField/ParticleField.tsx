@@ -134,9 +134,7 @@ export const ParticleField = (props: ParticleFieldProps) => {
             }),
             { width: 0, height: 0 },
         );
-        const reach = SliceRendererUtils.computeReach(getTables()?.tables ?? [], largest, undefined);
-
-        return { x: -reach, y: -reach, width: size.width + 2 * reach, height: size.height + 2 * reach };
+        return SliceRendererUtils.computeArea(getTables()?.tables ?? [], largest, size, undefined);
     });
 
     const getHasEnded = createMemo(() => getCurrentIteration() >= getIterationCount());

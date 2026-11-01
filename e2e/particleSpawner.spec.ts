@@ -1,6 +1,6 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { demo, example, prop, useElementRenderer } from "./helpers";
+import { demo, example, prop, revealProp, useElementRenderer } from "./helpers";
 
 /**
  * A particle is only ever in the page while it is traveling or resting on its target: the component adds an
@@ -17,19 +17,26 @@ import { demo, example, prop, useElementRenderer } from "./helpers";
  *
  * A spawner is its `role="presentation"` root with `aria-hidden`, which is how the component marks the layer it
  * paints into. A target is a marker with nothing inside it that sits outside every spawner and is not the
- * marker a spawner is drawn on — the burst's six ring markers and the many-to-one example's single center.
+ * marker a spawner is drawn on — the many-to-one example's single center, for one. Both are
+ * looked for inside the example's own box, which leaves out the scrubber under it, whose track is empty elements too.
  */
-const BURST = example("burst");
+const SINGLE_TARGET = example("singleTarget");
 const MANY_TO_ONE = example("manyToOne");
 const ROUND_TRIP = example("roundTrip");
+const WIND = example("wind");
+const ATTRACTION = example("attraction");
 
-const BURST_BUTTON = "#particleBurst";
 const SPAWNER = '[role="presentation"][aria-hidden="true"]';
 
 const PARTICLE_COUNT = 6;
 const RETENTION_MS = 300;
 const NEAR_SHARE = 0.15;
 const RELAY_WINDOW_MS = 500;
+const HOLD_MS = 600;
+const SCRUB_TO = 30;
+const PAST_THE_END = 100;
+const HALF_TURN_DEGREES = 180;
+const FULL_TURN_DEGREES = 360;
 
 type Point = { x: number; y: number };
 
@@ -39,6 +46,7 @@ type Trip = {
     diedAt: number | null;
     first: Point | null;
     last: Point;
+    path: Point[];
 };
 
 type ParticleLog = {
@@ -54,9 +62,6 @@ const setNumber = async (page: Page, key: string, value: number) => {
 
 const distance = (a: Point, b: Point) => Math.hypot(a.x - b.x, a.y - b.y);
 
-const nearest = (point: Point, candidates: Point[]) =>
-    candidates.reduce((best, candidate) => (distance(point, candidate) < distance(point, best) ? candidate : best));
-
 /**
  * Particles already in flight when the log is installed are entered too, with no birth, so that their arrival
  * is still counted — the round trip pairs every arrival with a return, and one missed arrival would leave a
@@ -66,7 +71,8 @@ const installLog = (page: Page, scope: string) =>
     page.evaluate(
         (value) => {
             const demoElement = document.querySelector(`${value.scope} [data-demo]`)!;
-            const spawners = [...demoElement.querySelectorAll(value.spawner)];
+            const area = demoElement.querySelector("[data-measure-box]") ?? demoElement;
+            const spawners = [...area.querySelectorAll(value.spawner)];
 
             const centerOf = (element: Element) => {
                 const box = demoElement.getBoundingClientRect();
@@ -79,7 +85,7 @@ const installLog = (page: Page, scope: string) =>
             const log: ParticleLog = {
                 trips: [],
                 spawnerCenters: spawners.map(centerOf),
-                targetCenters: [...demoElement.querySelectorAll("div:empty")]
+                targetCenters: [...area.querySelectorAll("div:empty")]
                     .filter(
                         (element) =>
                             !spawners.some(
@@ -94,7 +100,8 @@ const installLog = (page: Page, scope: string) =>
 
             spawners.forEach((spawner, index) => {
                 for (const child of spawner.children) {
-                    const trip = { spawner: index, bornAt: null, diedAt: null, first: null, last: centerOf(child) };
+                    const at = centerOf(child);
+                    const trip = { spawner: index, bornAt: null, diedAt: null, first: null, last: at, path: [at] };
 
                     live.set(child, trip);
                     log.trips.push(trip);
@@ -110,6 +117,7 @@ const installLog = (page: Page, scope: string) =>
                                 diedAt: null,
                                 first: at,
                                 last: at,
+                                path: [at],
                             };
 
                             live.set(node, trip);
@@ -129,7 +137,10 @@ const installLog = (page: Page, scope: string) =>
             });
 
             const follow = () => {
-                for (const [node, trip] of live) trip.last = centerOf(node as Element);
+                for (const [node, trip] of live) {
+                    trip.last = centerOf(node as Element);
+                    trip.path.push(trip.last);
+                }
 
                 requestAnimationFrame(follow);
             };
@@ -147,97 +158,82 @@ const births = (log: ParticleLog) => log.trips.filter((trip) => trip.bornAt !== 
 
 const liveCount = (page: Page, key: string) => page.locator(`${demo(key)} ${SPAWNER} > *`).count();
 
+const readPositions = (page: Page, key: string) =>
+    page
+        .locator(`${demo(key)} ${SPAWNER} > *`)
+        .evaluateAll((elements) => elements.map((element) => (element as HTMLElement).style.transform));
+
 /**
- * The second press has to land while the first round is still in the air, and a round lasts little more than a
- * second. Pressing from the spec once it had seen a particle asked "does a press mid-burst send nothing" and "did
- * the press arrive before the round was over" at once, and under a full parallel run the second question is the
- * one that answered: the press came in after the round had ended, rightly sent a round of its own, and the count
- * came out doubled. So the second press is armed from inside the page before the first is made, and fires the
- * moment the first particle is added — which is inside the round by construction, however slow the spec is. It
- * notes how many particles were in flight as it pressed, so that "mid-burst" is still checked rather than assumed.
+ * Only one example plays at a time, and only the first one starts on its own. A Playground whose examples have no
+ * controls of their own plays every example, and there is nothing to press.
  */
-const pressAgainOnFirstParticle = (page: Page, key: string) =>
-    page.evaluate(
-        (args) => {
-            const record = window as unknown as { __inFlightAtSecondPress: number | null };
-            const layer = document.querySelector(args.layer)!;
+const startPlaying = async (page: Page, key: string) => {
+    const button = page.locator(`#${key}Playback`);
 
-            record.__inFlightAtSecondPress = null;
+    if ((await button.count()) === 0) return;
+    if ((await button.getAttribute("aria-label")) === "Play") await button.click();
 
-            new MutationObserver((_, observer) => {
-                if (layer.children.length === 0) return;
+    await expect(button).toHaveAccessibleName("Pause");
+};
 
-                observer.disconnect();
-                record.__inFlightAtSecondPress = layer.children.length;
-                (document.querySelector(args.button) as HTMLElement).click();
-            }).observe(layer, { childList: true });
-        },
-        { layer: `${demo(key)} ${SPAWNER}`, button: BURST_BUTTON },
+const chooseKnob = async (page: Page, key: string, name: string) => {
+    const picker = page.locator(`${prop(key)} [role="combobox"]`);
+
+    await picker.click();
+    await page
+        .locator(`[id="${await picker.getAttribute("aria-controls")}"]`)
+        .getByRole("option", { name, exact: true })
+        .click();
+};
+
+/**
+ * The trips that began and ended while the log was installed — whole ones, from their spawner to where they were
+ * taken away — once there are at least as many as one round sends.
+ */
+const logWholeTrips = async (page: Page, scope: string) => {
+    await installLog(page, scope);
+    await expect
+        .poll(async () => arrivals(await readLog(page)).filter((trip) => trip.bornAt !== null).length, {
+            message: "a round's worth of particles has made its whole trip",
+            timeout: 15_000,
+        })
+        .toBeGreaterThanOrEqual(PARTICLE_COUNT);
+
+    const log = await readLog(page);
+
+    return { log, trips: arrivals(log).filter((trip) => trip.bornAt !== null) };
+};
+
+/**
+ * How far each point of a trip lies to one side of the straight line from `from` to `to`: positive on the side a
+ * clockwise turn of the line's direction faces, which is below a line running left to right.
+ */
+const sideOffsets = (trip: Trip, from: Point, to: Point) => {
+    const length = distance(from, to);
+
+    return trip.path.map(
+        (point) => ((to.x - from.x) * (point.y - from.y) - (to.y - from.y) * (point.x - from.x)) / length,
     );
+};
 
-const inFlightAtSecondPress = (page: Page) =>
-    page.evaluate(() => (window as unknown as { __inFlightAtSecondPress: number | null }).__inFlightAtSecondPress ?? 0);
+const scrubTo = async (page: Page, key: string, percent: number) => {
+    await page.locator(`#${key}Progress`).click();
+    await page.keyboard.press("Home");
+
+    for (let i = 0; i < percent; i++) await page.keyboard.press("ArrowRight");
+};
 
 test.beforeEach(async ({ page }) => {
     await useElementRenderer(page);
     await page.goto("/particle-spawner");
-    await expect(page.locator(BURST)).toBeVisible();
+    await expect(page.locator(SINGLE_TARGET)).toBeVisible();
     await setNumber(page, "particleCount", PARTICLE_COUNT);
     await setNumber(page, "restDurationMs", RETENTION_MS);
 });
 
-/**
- * The burst example gives its spawner a playback signal of its own that starts off: the press writes it on and
- * the end of the one round writes it off. So a press sends exactly one round, a press while that round is
- * still going finds the signal already on and does nothing, and once the round is over the button works again.
- */
-test("a press sends one round, and a press mid-burst sends nothing extra", { tag: "@solo" }, async ({ page }) => {
-    await page.locator(BURST).scrollIntoViewIfNeeded();
-
-    expect(await liveCount(page, "burst"), "nothing is sent until somebody presses").toBe(0);
-
-    await installLog(page, BURST);
-    await pressAgainOnFirstParticle(page, "burst");
-    await page.locator(BURST_BUTTON).click();
-    await expect
-        .poll(() => inFlightAtSecondPress(page), { message: "the second press is made while the round is traveling" })
-        .toBeGreaterThan(0);
-
-    await expect
-        .poll(async () => arrivals(await readLog(page)).length, { message: "the round lands", timeout: 10_000 })
-        .toBe(PARTICLE_COUNT);
-    await expect.poll(() => liveCount(page, "burst"), { message: "and nothing is left in flight" }).toBe(0);
-
-    const log = await readLog(page);
-
-    expect(births(log).length, "two presses, one round: the second found the burst already playing").toBe(
-        PARTICLE_COUNT,
-    );
-
-    for (const trip of arrivals(log)) {
-        const target = nearest(trip.last, log.targetCenters);
-        const origin = log.spawnerCenters[trip.spawner];
-
-        expect(distance(trip.first!, origin), "each particle sets off from the button").toBeLessThan(
-            distance(origin, target) * NEAR_SHARE,
-        );
-        expect(distance(trip.last, target), "and lands on one of the ring's markers").toBeLessThan(
-            distance(origin, target) * NEAR_SHARE,
-        );
-    }
-
-    await page.locator(BURST_BUTTON).click();
-
-    await expect
-        .poll(async () => births(await readLog(page)).length, {
-            message: "the round's end handed the button back, so a later press sends another round",
-            timeout: 10_000,
-        })
-        .toBe(PARTICLE_COUNT * 2);
-});
-
 test("particles from every spawner arrive at the one shared target", { tag: "@solo" }, async ({ page }) => {
     await page.locator(MANY_TO_ONE).scrollIntoViewIfNeeded();
+    await startPlaying(page, "manyToOne");
     await installLog(page, MANY_TO_ONE);
 
     const initial = await readLog(page);
@@ -279,58 +275,265 @@ test("particles from every spawner arrive at the one shared target", { tag: "@so
  * pairing is done in order with a generous window, and the arrivals too close to the end of the log to have
  * had their answer yet are left out, as are returns too close to its start to have had their arrival logged.
  */
-test("every particle that reaches the far spawner is sent back, one for one", { tag: "@solo" }, async ({ page }) => {
-    await page.locator(ROUND_TRIP).scrollIntoViewIfNeeded();
-    await installLog(page, ROUND_TRIP);
+test(
+    "every particle that reaches the far spawner is sent back, one for one @react @vue @svelte",
+    { tag: "@solo" },
+    async ({ page }) => {
+        await page.locator(ROUND_TRIP).scrollIntoViewIfNeeded();
+        await installLog(page, ROUND_TRIP);
 
-    const installedAt = await page.evaluate(() => performance.now());
+        const installedAt = await page.evaluate(() => performance.now());
+
+        await expect
+            .poll(async () => arrivals(await readLog(page)).filter((trip) => trip.spawner === 1).length, {
+                message: "some returns have made it all the way back",
+                timeout: 10_000,
+            })
+            .toBeGreaterThan(PARTICLE_COUNT);
+
+        const log = await readLog(page);
+        const loggedUntil = await page.evaluate(() => performance.now());
+        const [outboundCenter, returnCenter] = log.spawnerCenters;
+
+        const outboundArrivals = arrivals(log)
+            .filter((trip) => trip.spawner === 0)
+            .map((trip) => trip.diedAt!)
+            .sort((a, b) => a - b);
+        const returnBirths = births(log)
+            .filter((trip) => trip.spawner === 1)
+            .map((trip) => trip.bornAt!)
+            .sort((a, b) => a - b);
+
+        const claimed = new Set<number>();
+        const unanswered: number[] = [];
+
+        for (const bornAt of returnBirths) {
+            const match = outboundArrivals.findIndex(
+                (arrivedAt, index) =>
+                    !claimed.has(index) && arrivedAt <= bornAt && bornAt - arrivedAt < RELAY_WINDOW_MS,
+            );
+
+            if (match >= 0) claimed.add(match);
+            else if (bornAt - installedAt > RELAY_WINDOW_MS) unanswered.push(bornAt);
+        }
+
+        const unreturned = outboundArrivals.filter(
+            (arrivedAt, index) => !claimed.has(index) && loggedUntil - arrivedAt > RELAY_WINDOW_MS,
+        );
+
+        expect(outboundArrivals.length, "the outbound spawner has been landing particles").toBeGreaterThan(0);
+        expect(unanswered, "the return spawner sends nothing that an arrival did not ask for").toEqual([]);
+        expect(unreturned, "and every arrival is answered with a return").toEqual([]);
+
+        for (const trip of arrivals(log).filter((trip) => trip.bornAt !== null)) {
+            const [from, to] = trip.spawner === 0 ? [outboundCenter, returnCenter] : [returnCenter, outboundCenter];
+
+            expect(distance(trip.first!, from), "a trip starts at the spawner that sent it").toBeLessThan(
+                distance(from, to) * NEAR_SHARE,
+            );
+            expect(distance(trip.last, to), "and ends on the other one").toBeLessThan(distance(from, to) * NEAR_SHARE);
+        }
+    },
+);
+
+/**
+ * The page plays one example at a time: only the first one plays when the page opens, and starting another pauses
+ * whichever was playing. The second example is the one started, so the test names nothing an edit to the page's
+ * examples would move.
+ */
+test("only the first example plays when the page opens, and starting another pauses it @solid", async ({ page }) => {
+    const [first, second] = ["singleTarget", "grid"];
+
+    expect(second, "the page has at least two examples with their own controls").toBeDefined();
+
+    await expect(page.locator(`#${first}Playback`)).toHaveAccessibleName("Pause");
+    await expect(page.locator(`#${second}Playback`)).toHaveAccessibleName("Play");
+
+    await page.locator(`#${second}Playback`).click();
+
+    await expect(page.locator(`#${second}Playback`)).toHaveAccessibleName("Pause");
+    await expect(page.locator(`#${first}Playback`)).toHaveAccessibleName("Play");
+});
+
+/**
+ * A round is worked out from how far it has run, so a pause leaves every particle exactly where it stands, and
+ * playing again carries the round on from that point. Nothing may move while paused, so the test lets time pass
+ * rather than waiting on a change.
+ */
+test("pausing keeps every particle where it stands, and playing carries on from there @solid", async ({ page }) => {
+    await page.locator(SINGLE_TARGET).scrollIntoViewIfNeeded();
+    await expect
+        .poll(() => liveCount(page, "singleTarget"), { message: "the example has particles in flight" })
+        .toBeGreaterThan(0);
+
+    await page.locator("#singleTargetPlayback").click();
+    await expect(page.locator("#singleTargetPlayback")).toHaveAccessibleName("Play");
+
+    const held = await readPositions(page, "singleTarget");
+    const progress = await page.locator("#singleTargetProgress").inputValue();
+
+    expect(held.length, "the pause caught particles in flight").toBeGreaterThan(0);
+
+    await page.waitForTimeout(HOLD_MS);
+
+    expect(await readPositions(page, "singleTarget"), "every particle stays where it was").toEqual(held);
+    expect(await page.locator("#singleTargetProgress").inputValue(), "and the round does not move on").toBe(progress);
+
+    await page.locator("#singleTargetPlayback").click();
 
     await expect
-        .poll(async () => arrivals(await readLog(page)).filter((trip) => trip.spawner === 1).length, {
-            message: "some returns have made it all the way back",
-            timeout: 10_000,
+        .poll(() => page.locator("#singleTargetProgress").inputValue(), {
+            message: "playing again carries the round on",
         })
-        .toBeGreaterThan(PARTICLE_COUNT);
+        .not.toBe(progress);
+});
 
-    const log = await readLog(page);
-    const loggedUntil = await page.evaluate(() => performance.now());
-    const [outboundCenter, returnCenter] = log.spawnerCenters;
+/**
+ * Scrubbing a paused round draws its particles where they are at that point: none once the round is over, and the
+ * same picture whenever it comes back to the same point.
+ */
+test("a scrub draws the round where it is, none past its end, and the same picture at the same point @solid", async ({
+    page,
+}) => {
+    await page.locator(SINGLE_TARGET).scrollIntoViewIfNeeded();
+    await page.locator("#singleTargetPlayback").click();
+    await expect(page.locator("#singleTargetPlayback")).toHaveAccessibleName("Play");
 
-    const outboundArrivals = arrivals(log)
-        .filter((trip) => trip.spawner === 0)
-        .map((trip) => trip.diedAt!)
-        .sort((a, b) => a - b);
-    const returnBirths = births(log)
-        .filter((trip) => trip.spawner === 1)
-        .map((trip) => trip.bornAt!)
-        .sort((a, b) => a - b);
+    await scrubTo(page, "singleTarget", SCRUB_TO);
 
-    const claimed = new Set<number>();
-    const unanswered: number[] = [];
+    const midway = await readPositions(page, "singleTarget");
 
-    for (const bornAt of returnBirths) {
-        const match = outboundArrivals.findIndex(
-            (arrivedAt, index) => !claimed.has(index) && arrivedAt <= bornAt && bornAt - arrivedAt < RELAY_WINDOW_MS,
+    expect(midway.length, "partway through the round, particles are out").toBeGreaterThan(0);
+
+    for (let i = SCRUB_TO; i < PAST_THE_END; i++) await page.keyboard.press("ArrowRight");
+
+    await expect.poll(() => liveCount(page, "singleTarget"), { message: "at the round's end, none is left" }).toBe(0);
+
+    for (let i = PAST_THE_END; i > SCRUB_TO; i--) await page.keyboard.press("ArrowLeft");
+
+    await expect
+        .poll(() => readPositions(page, "singleTarget"), {
+            message: "back at the same point, the same particles in the same places",
+        })
+        .toEqual(midway);
+});
+
+/**
+ * A route of two stops — the target, then the spawner — takes every particle out and back within one spawner: it
+ * sets off from the spawner, comes within reach of the target on the way, and is taken away back at the spawner.
+ */
+test("a route takes each particle out to its target and back to its own spawner @solid", async ({ page }) => {
+    await page.locator(ROUND_TRIP).scrollIntoViewIfNeeded();
+    await startPlaying(page, "roundTrip");
+
+    const { log, trips } = await logWholeTrips(page, ROUND_TRIP);
+    const [origin] = log.spawnerCenters;
+    const [target] = log.targetCenters;
+    const near = distance(origin, target) * NEAR_SHARE;
+
+    for (const trip of trips) {
+        expect(distance(trip.first!, origin), "a particle sets off from its spawner").toBeLessThan(near);
+        expect(
+            Math.min(...trip.path.map((point) => distance(point, target))),
+            "it reaches the target on the way",
+        ).toBeLessThan(near);
+        expect(distance(trip.last, origin), "and it comes back to the spawner").toBeLessThan(near);
+    }
+});
+
+/**
+ * On a straight path, wind is the only thing that moves a particle sideways, so every trip leans to the side the
+ * wind blows toward and never as far to the other; turning the wind around turns the lean around. Either way the
+ * push fades out before the end of the path, so every particle still lands on the target.
+ */
+test("wind pushes particles off their path the way it blows, and they still land on the target @solid", async ({
+    page,
+}) => {
+    await chooseKnob(page, "travelPattern", "line");
+    await page.locator(WIND).scrollIntoViewIfNeeded();
+    await startPlaying(page, "wind");
+
+    const readLeans = async () => {
+        const { log, trips } = await logWholeTrips(page, WIND);
+        const [origin] = log.spawnerCenters;
+        const [target] = log.targetCenters;
+
+        for (const trip of trips) {
+            expect(distance(trip.last, target), "every particle still lands on the target").toBeLessThan(
+                distance(origin, target) * NEAR_SHARE,
+            );
+        }
+
+        return trips.map((trip) => {
+            const offsets = sideOffsets(trip, origin, target);
+
+            return { clockwise: Math.max(...offsets), counterclockwise: -Math.min(...offsets) };
+        });
+    };
+
+    await revealProp(page, "windDirectionDegrees", "wind");
+
+    const direction = Number(await page.locator(`${prop("windDirectionDegrees")} input`).inputValue());
+    const before = await readLeans();
+
+    await revealProp(page, "windDirectionDegrees", "wind");
+    await setNumber(page, "windDirectionDegrees", (direction + HALF_TURN_DEGREES) % FULL_TURN_DEGREES);
+
+    const after = await readLeans();
+    const [leaning, turned] = before[0].clockwise > before[0].counterclockwise ? [before, after] : [after, before];
+
+    for (const lean of leaning) {
+        expect(lean.clockwise, "one way, every trip leans to the side the wind blows toward").toBeGreaterThan(
+            lean.counterclockwise,
         );
-
-        if (match >= 0) claimed.add(match);
-        else if (bornAt - installedAt > RELAY_WINDOW_MS) unanswered.push(bornAt);
     }
 
-    const unreturned = outboundArrivals.filter(
-        (arrivedAt, index) => !claimed.has(index) && loggedUntil - arrivedAt > RELAY_WINDOW_MS,
-    );
-
-    expect(outboundArrivals.length, "the outbound spawner has been landing particles").toBeGreaterThan(0);
-    expect(unanswered, "the return spawner sends nothing that an arrival did not ask for").toEqual([]);
-    expect(unreturned, "and every arrival is answered with a return").toEqual([]);
-
-    for (const trip of arrivals(log).filter((trip) => trip.bornAt !== null)) {
-        const [from, to] = trip.spawner === 0 ? [outboundCenter, returnCenter] : [returnCenter, outboundCenter];
-
-        expect(distance(trip.first!, from), "a trip starts at the spawner that sent it").toBeLessThan(
-            distance(from, to) * NEAR_SHARE,
-        );
-        expect(distance(trip.last, to), "and ends on the other one").toBeLessThan(distance(from, to) * NEAR_SHARE);
+    for (const lean of turned) {
+        expect(
+            lean.counterclockwise,
+            "and with the wind turned around, every trip leans the other way",
+        ).toBeGreaterThan(lean.clockwise);
     }
+});
+
+/**
+ * On a straight path, a pull of nothing leaves every trip on the line, and the ring's pull bends trips off it toward
+ * wherever the ring is as they pass. Either way the pull fades out before the end of the path, so every particle
+ * still lands on the target.
+ */
+test("attraction bends the paths a pull of nothing leaves straight, and particles still land on the target @solid", async ({
+    page,
+}) => {
+    await chooseKnob(page, "travelPattern", "line");
+    await page.locator(ATTRACTION).scrollIntoViewIfNeeded();
+    await startPlaying(page, "attraction");
+
+    const readBends = async () => {
+        const { log, trips } = await logWholeTrips(page, ATTRACTION);
+        const [origin] = log.spawnerCenters;
+        const [target] = log.targetCenters;
+
+        for (const trip of trips) {
+            expect(distance(trip.last, target), "every particle still lands on the target").toBeLessThan(
+                distance(origin, target) * NEAR_SHARE,
+            );
+        }
+
+        const bends = trips.map((trip) => Math.max(...sideOffsets(trip, origin, target).map(Math.abs)));
+
+        return bends.reduce((sum, bend) => sum + bend, 0) / bends.length;
+    };
+
+    await revealProp(page, "attractionStrengthRatio", "attraction");
+
+    const strength = await page.locator(`${prop("attractionStrengthRatio")} input`).inputValue();
+
+    await setNumber(page, "attractionStrengthRatio", 0);
+
+    const straight = await readBends();
+
+    await revealProp(page, "attractionStrengthRatio", "attraction");
+    await setNumber(page, "attractionStrengthRatio", Number(strength));
+
+    expect(await readBends(), "the pull bends the paths further than no pull does").toBeGreaterThan(straight);
 });

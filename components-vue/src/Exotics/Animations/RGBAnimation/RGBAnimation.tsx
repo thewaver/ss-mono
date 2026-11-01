@@ -96,9 +96,7 @@ export const RGBAnimation = defineComponent(
 
         const area = computed(() => {
             const size = rootSize.value;
-            const reach = SliceRendererUtils.computeReach(tables.value?.tables ?? [], size, size);
-
-            return { x: -reach, y: -reach, width: size.width + 2 * reach, height: size.height + 2 * reach };
+            return SliceRendererUtils.computeArea(tables.value?.tables ?? [], size, size, size);
         });
 
         const isRunning = computed(

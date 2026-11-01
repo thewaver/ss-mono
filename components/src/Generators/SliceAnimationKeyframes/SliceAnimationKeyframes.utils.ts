@@ -10,6 +10,7 @@ import type {
     SliceAnimationEasing,
 } from "../SliceAnimationBreakpoints/SliceAnimationBreakpoints.types";
 import { SliceAnimationBreakpointUtils } from "../SliceAnimationBreakpoints/SliceAnimationBreakpoints.utils";
+import { SLICE_STOP_KEYS } from "./SliceAnimationKeyframes.const";
 import type {
     CompiledSliceStops,
     SliceAnimationDefinition,
@@ -25,7 +26,25 @@ const RESULT_SCALE = 10 ** RESULT_DECIMAL_PLACES;
 
 const roundForStyle = (value: number) => Math.round(value * RESULT_SCALE) / RESULT_SCALE;
 
+const HALF = 0.5;
+
 const definitions = new WeakMap<SliceAnimationFn, SliceAnimationDefinition>();
+
+const composeEnvelope = (stops: SliceStop[], holdShare: number): SliceStop[] => {
+    const edge = (1 - holdShare) * HALF;
+
+    return SLICE_STOP_KEYS.flatMap((key) => {
+        const track = stops.filter((stop) => stop[key] !== undefined);
+
+        if (track.length === 0) return [];
+        if (edge <= 0) return [{ at: 0, [key]: track[track.length - 1][key] }];
+
+        return [
+            ...track.map((stop) => ({ at: stop.at * edge, [key]: stop[key] })),
+            ...[...track].reverse().map((stop) => ({ at: 1 - stop.at * edge, [key]: stop[key] })),
+        ];
+    });
+};
 
 const define = (definition: SliceAnimationDefinition, animation: SliceAnimationFn) => {
     definitions.set(animation, definition);
@@ -244,6 +263,37 @@ export namespace SliceAnimationKeyframeUtils {
         const match = definition.zones.find(({ zone }) => CellAnimationZoneUtils.isInZone(zone, defs));
 
         return resolveStops(match ? match.animation : definition.fallback, defs);
+    };
+
+    /**
+     * An animation that plays another one forwards, holds its end, and plays it backwards — an appear, a stay and a
+     * disappear made from one sample, as a particle that comes and goes needs.
+     *
+     * Each property's stops are squeezed into the first and last parts of the timeline and mirrored, so the end of
+     * the forward half is held for `holdShare` of the whole. Every cell keeps its own stops, so a sample whose cells
+     * differ still differs. The source must be built from keyframes (`fromStops`, `fromZones`, `fromSlices`);
+     * one written by hand has no stops to fold, and plays nothing.
+     *
+     * @param animation The sample to play there and back.
+     * @param holdShare How much of the timeline the end is held for, from `0` (straight back) to `1` (the end
+     * throughout).
+     * @returns The folded animation.
+     */
+    export const createEnvelope = (animation: SliceAnimationFn, holdShare: number): SliceAnimationFn => {
+        const composed = new WeakMap<SliceStop[], SliceStop[]>();
+
+        return fromSlices((defs) => {
+            const stops = resolveStops(animation, defs) ?? [];
+            const existing = composed.get(stops);
+
+            if (existing) return existing;
+
+            const next = composeEnvelope(stops, holdShare);
+
+            composed.set(stops, next);
+
+            return next;
+        });
     };
 
     /**

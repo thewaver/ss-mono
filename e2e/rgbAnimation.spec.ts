@@ -31,9 +31,15 @@ const readChannels = (page: Page, key: string) =>
         }),
     );
 
+/**
+ * Only one example plays at a time, so most start paused, and a click on a paused example's button would start it.
+ */
 const pause = async (page: Page, key: string) => {
-    await page.locator(`#${key}Playback`).click();
-    await expect(page.locator(`#${key}Playback`)).toHaveAccessibleName("Play");
+    const button = page.locator(`#${key}Playback`);
+
+    if ((await button.getAttribute("aria-label")) === "Pause") await button.click();
+
+    await expect(button).toHaveAccessibleName("Play");
 };
 
 const scrubTo = async (page: Page, key: string, percent: number) => {
@@ -116,6 +122,34 @@ test("every example starts its pass with its copies together, and parts them mid
         await scrubTo(page, key, 45);
         await expect.poll(() => countFrames(page, key), { message: `${key} parts mid-pass` }).toBeGreaterThan(1);
     }
+});
+
+/**
+ * The page plays one example at a time: only the first one plays when the page opens, and starting another pauses
+ * whichever was playing. The second example is the one started, so the test names nothing an edit to the page's
+ * examples would move.
+ */
+test("only the first example plays when the page opens, and starting another pauses it @solid", async ({ page }) => {
+    const [first, second] = await page
+        .locator("[data-example]")
+        .evaluateAll((cards) => cards.map((card) => card.dataset.testid!))
+        .then(async (keys) => {
+            const scrubbed: string[] = [];
+
+            for (const key of keys) if ((await page.locator(`#${key}Playback`).count()) > 0) scrubbed.push(key);
+
+            return scrubbed;
+        });
+
+    expect(second, "the page has at least two examples with their own controls").toBeDefined();
+
+    await expect(page.locator(`#${first}Playback`)).toHaveAccessibleName("Pause");
+    await expect(page.locator(`#${second}Playback`)).toHaveAccessibleName("Play");
+
+    await page.locator(`#${second}Playback`).click();
+
+    await expect(page.locator(`#${second}Playback`)).toHaveAccessibleName("Pause");
+    await expect(page.locator(`#${first}Playback`)).toHaveAccessibleName("Play");
 });
 
 test("at rest the three copies sit on one another, and mid-tear each moves its own way", async ({ page }) => {

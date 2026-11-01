@@ -67,6 +67,9 @@ const NO_SIZE: Size2d = { width: 0, height: 0 };
 const NOTHING_TO_NOTIFY = () => undefined;
 const SPRITE_RESOLUTION = 128;
 const ATLAS_WIDTH_PX = 4096;
+const ATLAS_HEADROOM = 0.01;
+const ATLAS_SHRINK_FRAMES = 60;
+const ATLAS_SHRINK_COST_MS = 16;
 const SPRITE_KEY = "sprite";
 const MODES: Record<SliceRendererMode, number> = { slices: 0, particles: 1, direct: 2 };
 const CHANNEL_MODES = { additive: 1, subtractive: 2 } as const;
@@ -104,6 +107,10 @@ const tints = new Map<string, SliceRendererTint>();
 let renderer: Renderer | null | undefined;
 let tintContext: CanvasRenderingContext2D | null | undefined;
 let flushId: ReturnType<typeof requestAnimationFrame> | undefined;
+
+const shrink = { frames: 0, width: 0, height: 0, costMs: 0 };
+
+let readBackMsPerPixel = 0;
 
 const submissions = new Map<object, Submission>();
 
@@ -279,6 +286,7 @@ const uploadTexture = (gl: WebGL2RenderingContext, image: CanvasImageSource, wid
         context.drawImage(image, 0, 0, width, height);
     }
 
+    gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
@@ -412,6 +420,12 @@ const writeInstanceData = (
 const getTrackExtreme = (stops: SliceStop[], key: keyof SliceStop, fallback: number) =>
     stops.reduce((most, stop) => Math.max(most, Math.abs(stop[key] ?? fallback)), Math.abs(fallback));
 
+const getTrackRange = (stops: SliceStop[], key: keyof SliceStop, fallback: number) =>
+    stops.reduce(
+        ([least, most], stop) => [Math.min(least, stop[key] ?? fallback), Math.max(most, stop[key] ?? fallback)],
+        [fallback, fallback],
+    );
+
 const getTintContext = () => {
     if (tintContext === undefined) {
         tintContext =
@@ -459,11 +473,37 @@ const layoutBatches = (pending: Submission[], maxTextureSize: number): Batch[] =
     return batches;
 };
 
-const drawBatch = (current: Renderer, batch: Batch) => {
+const fitCanvas = (canvas: OffscreenCanvas, batch: Batch, maxTextureSize: number) => {
+    const width = Math.min(Math.ceil(batch.width * (1 + ATLAS_HEADROOM)), maxTextureSize);
+    const height = Math.min(Math.ceil(batch.height * (1 + ATLAS_HEADROOM)), maxTextureSize);
+
+    if (batch.width > canvas.width || batch.height > canvas.height) {
+        if (batch.width > canvas.width) canvas.width = width;
+        if (batch.height > canvas.height) canvas.height = height;
+        shrink.frames = 0;
+        shrink.costMs = 0;
+    } else if (width >= canvas.width && height >= canvas.height) {
+        shrink.frames = 0;
+        shrink.costMs = 0;
+    } else {
+        shrink.width = shrink.frames === 0 ? width : Math.max(shrink.width, width);
+        shrink.height = shrink.frames === 0 ? height : Math.max(shrink.height, height);
+        shrink.frames++;
+        shrink.costMs += Math.max(canvas.width * canvas.height - width * height, 0) * readBackMsPerPixel;
+
+        if (shrink.frames >= ATLAS_SHRINK_FRAMES || shrink.costMs >= ATLAS_SHRINK_COST_MS) {
+            canvas.width = shrink.width;
+            canvas.height = shrink.height;
+            shrink.frames = 0;
+            shrink.costMs = 0;
+        }
+    }
+};
+
+const drawBatch = (current: Renderer, batch: Batch, maxTextureSize: number) => {
     const { gl, canvas } = current;
 
-    if (canvas.width < batch.width) canvas.width = batch.width;
-    if (canvas.height < batch.height) canvas.height = batch.height;
+    fitCanvas(canvas, batch, maxTextureSize);
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.disable(gl.SCISSOR_TEST);
@@ -482,7 +522,10 @@ const drawBatch = (current: Renderer, batch: Batch) => {
 
     gl.disable(gl.SCISSOR_TEST);
 
+    const readBackStartMs = performance.now();
     const atlas = canvas.transferToImageBitmap();
+
+    readBackMsPerPixel = (performance.now() - readBackStartMs) / (canvas.width * canvas.height);
 
     for (const { submission, left, top } of batch.placements) submission.present(atlas, left, top);
 
@@ -499,7 +542,9 @@ const flush = () => {
 
     if (!current?.resources || pending.length === 0) return;
 
-    for (const batch of layoutBatches(pending, current.resources.maxTextureSize)) drawBatch(current, batch);
+    const { maxTextureSize } = current.resources;
+
+    for (const batch of layoutBatches(pending, maxTextureSize)) drawBatch(current, batch, maxTextureSize);
 };
 
 const submit = (key: object, submission: Submission) => {
@@ -627,25 +672,33 @@ export namespace SliceRendererUtils {
         );
 
     /**
-     * How far past a component's box its canvas has to reach for everything its tables move to stay inside it.
+     * The area a component's canvas has to cover for everything its tables move to stay inside it: the box, reaching
+     * past each side by as much as anything is carried past that side.
      *
      * Counts only what carries a slice past the box: travel, growth beyond full size, turning, nearness under
-     * perspective and blur.
+     * perspective and blur. Travel reaches only the sides it heads towards, so a slice that only rises adds nothing
+     * below the box; everything else reaches every side alike.
      *
      * @param tables The tables the slices play.
      * @param size The largest slice.
-     * @param box The component's box, for slices that turn in depth; `undefined` where nothing is drawn in depth.
-     * @returns The reach on every side, in pixels.
+     * @param box The component's box.
+     * @param perspectiveBox The box slices turning in depth are seen against; `undefined` where nothing is drawn in
+     * depth.
+     * @returns The area, relative to the box's top-left corner, in the component's own pixels.
      */
-    export const computeReach = (tables: SliceStop[][], size: Size2d, box: Size2d | undefined) => {
+    export const computeArea = (
+        tables: SliceStop[][],
+        size: Size2d,
+        box: Size2d,
+        perspectiveBox: Size2d | undefined,
+    ): Rect => {
         const longest = Math.max(size.width, size.height);
         const diagonal = Math.hypot(size.width, size.height);
+        const reach = { left: 0, top: 0, right: 0, bottom: 0 };
 
-        return tables.reduce((most, stops) => {
-            const travel = Math.max(
-                (getTrackExtreme(stops, "translateX", 0) * size.width) / PERCENT,
-                (getTrackExtreme(stops, "translateY", 0) * size.height) / PERCENT,
-            );
+        for (const stops of tables) {
+            const [leastX, mostX] = getTrackRange(stops, "translateX", 0);
+            const [leastY, mostY] = getTrackRange(stops, "translateY", 0);
             const scale =
                 Math.max(getTrackExtreme(stops, "scaleX", PERCENT), getTrackExtreme(stops, "scaleY", PERCENT)) /
                 PERCENT;
@@ -657,17 +710,25 @@ export namespace SliceRendererUtils {
             );
             const grown = (Math.max(scale, 1) - 1) * longest * 0.5 + (isTurned ? (diagonal - longest) * 0.5 : 0);
             const near = isTilted ? getTrackExtreme(stops, "translateZ", 0) + diagonal * Math.max(scale, 1) * 0.5 : 0;
-            const viewer = box ? computePerspectivePx(box) : 0;
+            const viewer = perspectiveBox ? computePerspectivePx(perspectiveBox) : 0;
             const bulge =
-                box && near > 0 && near < viewer ? (Math.max(box.width, box.height) * 0.5 * near) / (viewer - near) : 0;
+                perspectiveBox && near > 0 && near < viewer
+                    ? (Math.max(perspectiveBox.width, perspectiveBox.height) * 0.5 * near) / (viewer - near)
+                    : 0;
+            const around = grown + bulge + near * (isTilted ? 1 : 0) + BLUR_REACH * getTrackExtreme(stops, "blur", 0);
 
-            return Math.max(
-                most,
-                Math.ceil(
-                    travel + grown + bulge + near * (isTilted ? 1 : 0) + BLUR_REACH * getTrackExtreme(stops, "blur", 0),
-                ),
-            );
-        }, 0);
+            reach.left = Math.max(reach.left, Math.ceil(around + (Math.max(-leastX, 0) * size.width) / PERCENT));
+            reach.right = Math.max(reach.right, Math.ceil(around + (Math.max(mostX, 0) * size.width) / PERCENT));
+            reach.top = Math.max(reach.top, Math.ceil(around + (Math.max(-leastY, 0) * size.height) / PERCENT));
+            reach.bottom = Math.max(reach.bottom, Math.ceil(around + (Math.max(mostY, 0) * size.height) / PERCENT));
+        }
+
+        return {
+            x: -reach.left,
+            y: -reach.top,
+            width: box.width + reach.left + reach.right,
+            height: box.height + reach.top + reach.bottom,
+        };
     };
 
     /**

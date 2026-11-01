@@ -28,9 +28,15 @@ const readFrame = (page: Page, key: string) =>
                 .join(";"),
         );
 
+/**
+ * Only one example plays at a time, so most start paused, and a click on a paused example's button would start it.
+ */
 const pause = async (page: Page, id: string) => {
-    await page.locator(`#${id}Playback`).click();
-    await expect(page.locator(`#${id}Playback`)).toHaveAccessibleName("Play");
+    const button = page.locator(`#${id}Playback`);
+
+    if ((await button.getAttribute("aria-label")) === "Pause") await button.click();
+
+    await expect(button).toHaveAccessibleName("Play");
 };
 
 const scrubTo = async (page: Page, id: string, percent: number) => {
@@ -57,14 +63,23 @@ test.beforeEach(async ({ page }) => {
     await expect(page.locator("[data-example]").first()).toBeVisible();
 });
 
-test("pausing one example leaves the others running", async ({ page }) => {
+/**
+ * The page plays one example at a time: only the first one plays when the page opens, and starting another pauses
+ * whichever was playing. The second example is the one started, so the test names nothing an edit to the page's
+ * examples would move.
+ */
+test("only the first example plays when the page opens, and starting another pauses it @solid", async ({ page }) => {
     const [first, second] = await readScrubbedKeys(page);
 
     expect(second, "the page has at least two examples with their own controls").toBeDefined();
 
-    await pause(page, toControlId(first));
+    await expect(page.locator(`#${toControlId(first)}Playback`)).toHaveAccessibleName("Pause");
+    await expect(page.locator(`#${toControlId(second)}Playback`)).toHaveAccessibleName("Play");
+
+    await page.locator(`#${toControlId(second)}Playback`).click();
 
     await expect(page.locator(`#${toControlId(second)}Playback`)).toHaveAccessibleName("Pause");
+    await expect(page.locator(`#${toControlId(first)}Playback`)).toHaveAccessibleName("Play");
 });
 
 test("every example's scrubber moves its own lines, and a paused example holds its frame", async ({ page }) => {

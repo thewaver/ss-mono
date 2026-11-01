@@ -98,9 +98,7 @@
 
     const area = $derived.by(() => {
         const size = getRootSize();
-        const reach = SliceRendererUtils.computeReach(tables?.tables ?? [], size, size);
-
-        return { x: -reach, y: -reach, width: size.width + 2 * reach, height: size.height + 2 * reach };
+        return SliceRendererUtils.computeArea(tables?.tables ?? [], size, size, size);
     });
 
     const isRunning = $derived(

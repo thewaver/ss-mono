@@ -117,9 +117,7 @@ export const RGBAnimation = (props: RGBAnimationProps) => {
     );
 
     const area = useMemo(() => {
-        const reach = SliceRendererUtils.computeReach(tables?.tables ?? [], rootSize, rootSize);
-
-        return { x: -reach, y: -reach, width: rootSize.width + 2 * reach, height: rootSize.height + 2 * reach };
+        return SliceRendererUtils.computeArea(tables?.tables ?? [], rootSize, rootSize, rootSize);
     }, [tables, rootSize]);
 
     const hasEnded = currentIteration >= iterationCount;

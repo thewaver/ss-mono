@@ -51,6 +51,10 @@ import {
 import { PageKnobs } from "../../PageComponents/Knobs/Knobs";
 import type { Knob } from "../../PageComponents/Knobs/Knobs.types";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
+import {
+    PlaybackGroupContextProvider,
+    usePagePlayback,
+} from "../../PageComponents/PlaybackScrubber/PlaybackGroup.context";
 import { PagePlaybackScrubber } from "../../PageComponents/PlaybackScrubber/PlaybackScrubber";
 import { PlaybackScrubberUtils } from "../../PageComponents/PlaybackScrubber/PlaybackScrubber.utils";
 import { PageProp } from "../../PageComponents/Prop/Prop";
@@ -207,7 +211,7 @@ const DirInput = (props: {
 };
 
 const GlitchExampleWrapper = (props: ScanlineAnimationExampleProps) => {
-    const playback = createSignal(true);
+    const playback = usePagePlayback("scanlineGlitch");
     const progress = createSignal(0);
 
     const [keyframeOpts, setKeyframeOpts] = createStore({ ...ScanlineAnimationKnobs.STARTING_GLITCH_OPTS });
@@ -292,7 +296,7 @@ const GlitchExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 };
 
 const SurgeExampleWrapper = (props: ScanlineAnimationExampleProps) => {
-    const playback = createSignal(true);
+    const playback = usePagePlayback("scanlineSurge");
     const progress = createSignal(0);
 
     const [keyframeOpts, setKeyframeOpts] = createStore<Record<string, number | boolean>>({});
@@ -340,7 +344,7 @@ const SurgeExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 };
 
 const SnakeExampleWrapper = (props: ScanlineAnimationExampleProps) => {
-    const playback = createSignal(true);
+    const playback = usePagePlayback("scanlineSnake");
     const progress = createSignal(0);
 
     const [keyframeOpts, setKeyframeOpts] = createStore<Record<string, number | boolean>>({});
@@ -388,7 +392,7 @@ const SnakeExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 };
 
 const SplitExampleWrapper = (props: ScanlineAnimationExampleProps) => {
-    const playback = createSignal(true);
+    const playback = usePagePlayback("scanlineSplit");
     const progress = createSignal(0);
 
     const [keyframeOpts, setKeyframeOpts] = createStore<Record<string, number | boolean>>({});
@@ -436,7 +440,7 @@ const SplitExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 };
 
 const BrightnessExampleWrapper = (props: ScanlineAnimationExampleProps) => {
-    const playback = createSignal(true);
+    const playback = usePagePlayback("scanlineBrightness");
     const progress = createSignal(0);
 
     const [keyframeOpts] = createStore<ScanlineHorizontalBrightnessOpts>({});
@@ -477,7 +481,7 @@ const BrightnessExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 };
 
 const GrayscaleExampleWrapper = (props: ScanlineAnimationExampleProps) => {
-    const playback = createSignal(true);
+    const playback = usePagePlayback("scanlineGrayscale");
     const progress = createSignal(0);
 
     const [keyframeOpts] = createStore<ScanlineHorizontalGrayscaleOpts>({});
@@ -518,7 +522,7 @@ const GrayscaleExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 };
 
 const HueExampleWrapper = (props: ScanlineAnimationExampleProps) => {
-    const playback = createSignal(true);
+    const playback = usePagePlayback("scanlineHue");
     const progress = createSignal(0);
 
     const [keyframeOpts] = createStore<ScanlineHorizontalHueOpts>({});
@@ -559,7 +563,7 @@ const HueExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 };
 
 const WaveExampleWrapper = (props: ScanlineAnimationExampleProps) => {
-    const playback = createSignal(true);
+    const playback = usePagePlayback("scanlineWave");
     const progress = createSignal(0);
 
     const [keyframeOpts, setKeyframeOpts] = createStore<Record<string, number | boolean>>({});
@@ -607,7 +611,7 @@ const WaveExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 };
 
 const RollExampleWrapper = (props: ScanlineAnimationExampleProps) => {
-    const playback = createSignal(true);
+    const playback = usePagePlayback("scanlineRoll");
     const progress = createSignal(0);
 
     const [keyframeOpts, setKeyframeOpts] = createStore<Record<string, number | boolean>>({});
@@ -655,7 +659,7 @@ const RollExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 };
 
 const DropoutExampleWrapper = (props: ScanlineAnimationExampleProps) => {
-    const playback = createSignal(true);
+    const playback = usePagePlayback("scanlineDropout");
     const progress = createSignal(0);
 
     const [keyframeOpts, setKeyframeOpts] = createStore<Record<string, number | boolean>>({});
@@ -703,7 +707,7 @@ const DropoutExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 };
 
 const InterlaceExampleWrapper = (props: ScanlineAnimationExampleProps) => {
-    const playback = createSignal(true);
+    const playback = usePagePlayback("scanlineInterlace");
     const progress = createSignal(0);
 
     const [keyframeOpts, setKeyframeOpts] = createStore<Record<string, number | boolean>>({});
@@ -751,7 +755,7 @@ const InterlaceExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 };
 
 const SkewExampleWrapper = (props: ScanlineAnimationExampleProps) => {
-    const playback = createSignal(true);
+    const playback = usePagePlayback("scanlineSkew");
     const progress = createSignal(0);
 
     const [keyframeOpts, setKeyframeOpts] = createStore<Record<string, number | boolean>>({});
@@ -800,6 +804,7 @@ const SkewExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 
 export const ScanlineAnimationPage = () => {
     const playback = createSignal(true);
+    const takePlayback = PlaybackScrubberUtils.createGroup("scanlineGlitch");
 
     const [getSrc, setSrc] = createSignal(knight);
     const [getLineCount, setLineCount] = createSignal(ScanlineAnimationKnobs.STARTING_LINE_COUNT);
@@ -1003,7 +1008,9 @@ export const ScanlineAnimationPage = () => {
                 </PageProp>
             </PagePropsPanel>
 
-            <PageExamples items={getExamples} layout={"flow"} />
+            <PlaybackGroupContextProvider value={takePlayback}>
+                <PageExamples items={getExamples} layout={"flow"} />
+            </PlaybackGroupContextProvider>
         </div>
     );
 };

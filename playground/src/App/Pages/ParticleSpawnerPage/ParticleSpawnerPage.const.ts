@@ -1,72 +1,25 @@
 import type { ParticleTravelDefs } from "@thewaver/ss-components";
-import { type CSSAnimationValues, type EasingFn, EasingUtils, Point2d, Point2dUtils } from "@thewaver/ss-utils";
+import type { CSSAnimationValues } from "@thewaver/ss-utils";
 
 import { ParticlePictureUtils } from "../../PageComponents/ParticlePicture/ParticlePicture.utils";
 import type { StressTestDefs } from "../../PageComponents/StressTest/StressText.types";
-import type {
-    IterationPattern,
-    IterationPatternFn,
-    ParticleTravelPattern,
-    ParticleTravelPatternFactory,
-    TravelEasingKey,
-} from "./ParticleSpawnerPatterns.types";
 
 import { themeVars } from "../../Theme.css";
 import { PARTICLE_SIZE_PX } from "./ParticleSpawnerPage.css";
 
-export const TRAVEL_EASING_FNS: Record<TravelEasingKey, EasingFn> = {
-    linear: EasingUtils.linear,
-    ease: EasingUtils.ease,
-    ease_in: EasingUtils.easeIn,
-    ease_out: EasingUtils.easeOut,
-    ease_in_out: EasingUtils.easeInOut,
-    ease_in_quad: EasingUtils.easeInQuad,
-    ease_out_quad: EasingUtils.easeOutQuad,
-    ease_in_out_quad: EasingUtils.easeInOutQuad,
-    ease_in_cubic: EasingUtils.easeInCubic,
-    ease_out_cubic: EasingUtils.easeOutCubic,
-    ease_in_out_cubic: EasingUtils.easeInOutCubic,
-    ease_in_quart: EasingUtils.easeInQuart,
-    ease_out_quart: EasingUtils.easeOutQuart,
-    ease_in_out_quart: EasingUtils.easeInOutQuart,
-    ease_in_quint: EasingUtils.easeInQuint,
-    ease_out_quint: EasingUtils.easeOutQuint,
-    ease_in_out_quint: EasingUtils.easeInOutQuint,
-    ease_in_sine: EasingUtils.easeInSine,
-    ease_out_sine: EasingUtils.easeOutSine,
-    ease_in_out_sine: EasingUtils.easeInOutSine,
-    ease_in_expo: EasingUtils.easeInExpo,
-    ease_out_expo: EasingUtils.easeOutExpo,
-    ease_in_out_expo: EasingUtils.easeInOutExpo,
-    ease_in_circ: EasingUtils.easeInCirc,
-    ease_out_circ: EasingUtils.easeOutCirc,
-    ease_in_out_circ: EasingUtils.easeInOutCirc,
-    ease_in_back: EasingUtils.easeInBack,
-    ease_out_back: EasingUtils.easeOutBack,
-    ease_in_out_back: EasingUtils.easeInOutBack,
-    ease_in_elastic: EasingUtils.easeInElastic,
-    ease_out_elastic: EasingUtils.easeOutElastic,
-    ease_in_out_elastic: EasingUtils.easeInOutElastic,
-    ease_out_bounce: EasingUtils.easeOutBounce,
-    ease_in_bounce: EasingUtils.easeInBounce,
-    ease_in_out_bounce: EasingUtils.easeInOutBounce,
-};
-
-export const TRAVEL_EASING_KEYS = Object.keys(TRAVEL_EASING_FNS) as TravelEasingKey[];
-
 const FADE_IN_SHARE = 0.15;
 const PERCENT = 100;
 const ARRIVAL_SCALE = 0.5;
+const TINTABLE_LIGHT = "white";
+const TINTABLE_DARK = "gray";
 
-const randomBetween = (min: number, max: number) => min + Math.random() * (max - min);
-
-const computeParticleGlow = (t: number) => ({
-    opacity: t < FADE_IN_SHARE ? t / FADE_IN_SHARE : 1,
-    scale: 1 + t * ARRIVAL_SCALE,
+const computeParticleGlow = (defs: ParticleTravelDefs, t: number) => ({
+    opacity: defs.legIndex === 0 && t < FADE_IN_SHARE ? t / FADE_IN_SHARE : 1,
+    scale: defs.legIndex === defs.legCount - 1 ? 1 + t * ARRIVAL_SCALE : 1,
 });
 
-export const computeParticleAnimation = (_defs: ParticleTravelDefs, t: number): CSSAnimationValues => {
-    const glow = computeParticleGlow(t);
+export const computeParticleAnimation = (defs: ParticleTravelDefs, t: number): CSSAnimationValues => {
+    const glow = computeParticleGlow(defs, t);
 
     return { opacity: glow.opacity * PERCENT, scale: [glow.scale * PERCENT, glow.scale * PERCENT] };
 };
@@ -76,387 +29,18 @@ export const createParticleSrc = () =>
         sizePx: PARTICLE_SIZE_PX,
     });
 
+export const createTintableParticleSrc = () =>
+    ParticlePictureUtils.createDotSrc(TINTABLE_LIGHT, TINTABLE_DARK, { sizePx: PARTICLE_SIZE_PX });
+
+export const createLegTints = () => [
+    ParticlePictureUtils.resolveColor(themeVars.color.primary.main),
+    ParticlePictureUtils.resolveColor(themeVars.color.secondary.main),
+];
+
 export const createReturnParticleSrc = () =>
     ParticlePictureUtils.createDotSrc(themeVars.color.secondary.light, themeVars.color.secondary.dark, {
         sizePx: PARTICLE_SIZE_PX,
     });
-
-const lerp = (from: Point2d, to: Point2d, t: number): Point2d => ({
-    x: from.x + (to.x - from.x) * t,
-    y: from.y + (to.y - from.y) * t,
-});
-
-const OVERSHOOT_WINDOW_START_T = 0.85;
-const OVERSHOOT_MAX_STRENGTH = 6;
-
-export const applyOvershoot = (rawT: number, valueT: number, overshootPercent: number): number => {
-    if (overshootPercent <= 0 || rawT <= OVERSHOOT_WINDOW_START_T) return valueT;
-
-    const windowSpan = 1 - OVERSHOOT_WINDOW_START_T;
-    const localT = (rawT - OVERSHOOT_WINDOW_START_T) / windowSpan;
-    const strength = (overshootPercent / 100) * OVERSHOOT_MAX_STRENGTH;
-    const bump = strength * localT * localT * (1 - localT);
-
-    return valueT + windowSpan * bump;
-};
-
-const line: ParticleTravelPatternFactory = () => (defs, t) =>
-    defs.prefersReducedMotion ? defs.to : lerp(defs.from, defs.to, t);
-
-const arc: ParticleTravelPatternFactory = (knobs) => {
-    const heightById = new Map<number, number>();
-
-    const getHeight = (id: number) => {
-        const cached = heightById.get(id);
-
-        if (cached !== undefined) return cached;
-
-        const height = randomBetween(knobs.arcHeightMinPx, knobs.arcHeightMaxPx);
-
-        heightById.set(id, height);
-
-        return height;
-    };
-
-    return (defs, t) => {
-        if (defs.prefersReducedMotion) return defs.to;
-
-        const pos = lerp(defs.from, defs.to, t);
-        const perpendicular = Point2dUtils.getPerpendicular(Point2dUtils.getNormal(Point2d.sub(defs.to, defs.from)));
-        const bulge = -Math.sin(t * Math.PI) * getHeight(defs.id);
-
-        return Point2d.add(pos, Point2d.mul(perpendicular, { x: bulge, y: bulge }));
-    };
-};
-
-const wave: ParticleTravelPatternFactory = (knobs) => {
-    const amplitudeById = new Map<number, number>();
-    const cyclesById = new Map<number, number>();
-
-    const getAmplitude = (id: number) => {
-        const cached = amplitudeById.get(id);
-
-        if (cached !== undefined) return cached;
-
-        const amplitude = randomBetween(knobs.waveAmplitudeMinPx, knobs.waveAmplitudeMaxPx);
-
-        amplitudeById.set(id, amplitude);
-
-        return amplitude;
-    };
-
-    const getCycles = (id: number) => {
-        const cached = cyclesById.get(id);
-
-        if (cached !== undefined) return cached;
-
-        const cycles = randomBetween(knobs.waveCyclesMin, knobs.waveCyclesMax);
-
-        cyclesById.set(id, cycles);
-
-        return cycles;
-    };
-
-    return (defs, t) => {
-        if (defs.prefersReducedMotion) return defs.to;
-
-        const pos = lerp(defs.from, defs.to, t);
-        const perpendicular = Point2dUtils.getPerpendicular(Point2dUtils.getNormal(Point2d.sub(defs.to, defs.from)));
-        const offset = Math.sin(t * Math.PI) * Math.sin(t * getCycles(defs.id) * Math.PI * 2) * getAmplitude(defs.id);
-
-        return Point2d.add(pos, Point2d.mul(perpendicular, { x: offset, y: offset }));
-    };
-};
-
-const ORBIT_APPROACH_END_T = 0.35;
-const ORBIT_HOLD_END_T = 0.75;
-
-const smoothstep = (edgeStart: number, edgeEnd: number, x: number) => {
-    const eased = Math.min(1, Math.max(0, (x - edgeStart) / (edgeEnd - edgeStart)));
-
-    return eased * eased * (3 - 2 * eased);
-};
-
-const spinOffset = (normal: Point2d, perpendicular: Point2d, angle: number, radius: number): Point2d => {
-    const along = Math.cos(angle) * radius;
-    const across = Math.sin(angle) * radius;
-
-    return Point2d.add(
-        Point2d.mul(normal, { x: along, y: along }),
-        Point2d.mul(perpendicular, { x: across, y: across }),
-    );
-};
-
-const spiral: ParticleTravelPatternFactory = (knobs) => {
-    const radiusById = new Map<number, number>();
-    const turnsById = new Map<number, number>();
-
-    const getRadius = (id: number) => {
-        const cached = radiusById.get(id);
-
-        if (cached !== undefined) return cached;
-
-        const radius = randomBetween(knobs.spiralRadiusMinPx, knobs.spiralRadiusMaxPx);
-
-        radiusById.set(id, radius);
-
-        return radius;
-    };
-
-    const getTurns = (id: number) => {
-        const cached = turnsById.get(id);
-
-        if (cached !== undefined) return cached;
-
-        const turns = randomBetween(knobs.spiralTurnsMin, knobs.spiralTurnsMax);
-
-        turnsById.set(id, turns);
-
-        return turns;
-    };
-
-    return (defs, t) => {
-        if (defs.prefersReducedMotion) return defs.to;
-
-        const pos = lerp(defs.from, defs.to, t);
-        const normal = Point2dUtils.getNormal(Point2d.sub(defs.to, defs.from));
-        const perpendicular = Point2dUtils.getPerpendicular(normal);
-        const angle = t * getTurns(defs.id) * Math.PI * 2;
-        const radius = Math.sin(t * Math.PI) * getRadius(defs.id);
-
-        return Point2d.add(pos, spinOffset(normal, perpendicular, angle, radius));
-    };
-};
-
-const orbit: ParticleTravelPatternFactory = (knobs) => {
-    const radiusById = new Map<number, number>();
-    const turnsById = new Map<number, number>();
-
-    const getRadius = (id: number) => {
-        const cached = radiusById.get(id);
-
-        if (cached !== undefined) return cached;
-
-        const radius = randomBetween(knobs.orbitRadiusMinPx, knobs.orbitRadiusMaxPx);
-
-        radiusById.set(id, radius);
-
-        return radius;
-    };
-
-    const getTurns = (id: number) => {
-        const cached = turnsById.get(id);
-
-        if (cached !== undefined) return cached;
-
-        const turns = randomBetween(knobs.orbitTurnsMin, knobs.orbitTurnsMax);
-
-        turnsById.set(id, turns);
-
-        return turns;
-    };
-
-    return (defs, t) => {
-        if (defs.prefersReducedMotion) return defs.to;
-
-        const normal = Point2dUtils.getNormal(Point2d.sub(defs.to, defs.from));
-        const perpendicular = Point2dUtils.getPerpendicular(normal);
-        const angle = t * getTurns(defs.id) * Math.PI * 2;
-        const radius = (1 - smoothstep(ORBIT_HOLD_END_T, 1, t)) * getRadius(defs.id);
-        const orbitPoint = Point2d.add(defs.to, spinOffset(normal, perpendicular, angle, radius));
-
-        const approachT = Math.min(1, t / ORBIT_APPROACH_END_T);
-
-        return lerp(defs.from, orbitPoint, approachT);
-    };
-};
-
-const bezier: ParticleTravelPatternFactory = (knobs) => {
-    const alongFracById = new Map<number, number>();
-    const offsetById = new Map<number, number>();
-
-    const getAlongFrac = (id: number) => {
-        const cached = alongFracById.get(id);
-
-        if (cached !== undefined) return cached;
-
-        const alongFrac = randomBetween(knobs.bezierElbowAlongMin, knobs.bezierElbowAlongMax);
-
-        alongFracById.set(id, alongFrac);
-
-        return alongFrac;
-    };
-
-    const getOffset = (id: number) => {
-        const cached = offsetById.get(id);
-
-        if (cached !== undefined) return cached;
-
-        const offset = randomBetween(knobs.bezierElbowOffsetMinPx, knobs.bezierElbowOffsetMaxPx);
-
-        offsetById.set(id, offset);
-
-        return offset;
-    };
-
-    return (defs, t) => {
-        if (defs.prefersReducedMotion) return defs.to;
-
-        const perpendicular = Point2dUtils.getPerpendicular(Point2dUtils.getNormal(Point2d.sub(defs.to, defs.from)));
-        const offset = getOffset(defs.id);
-        const elbow = Point2d.add(
-            lerp(defs.from, defs.to, getAlongFrac(defs.id)),
-            Point2d.mul(perpendicular, { x: offset, y: offset }),
-        );
-
-        const inverseT = 1 - t;
-        const fromWeight = inverseT * inverseT;
-        const elbowWeight = 2 * inverseT * t;
-        const toWeight = t * t;
-
-        return {
-            x: fromWeight * defs.from.x + elbowWeight * elbow.x + toWeight * defs.to.x,
-            y: fromWeight * defs.from.y + elbowWeight * elbow.y + toWeight * defs.to.y,
-        };
-    };
-};
-
-const zigzag: ParticleTravelPatternFactory = (knobs) => {
-    const countById = new Map<number, number>();
-    const amplitudeById = new Map<number, number>();
-
-    const getCount = (id: number) => {
-        const cached = countById.get(id);
-
-        if (cached !== undefined) return cached;
-
-        const count = Math.round(randomBetween(knobs.zigzagCountMin, knobs.zigzagCountMax));
-
-        countById.set(id, count);
-
-        return count;
-    };
-
-    const getAmplitude = (id: number) => {
-        const cached = amplitudeById.get(id);
-
-        if (cached !== undefined) return cached;
-
-        const amplitude = randomBetween(knobs.zigzagAmplitudeMinPx, knobs.zigzagAmplitudeMaxPx);
-
-        amplitudeById.set(id, amplitude);
-
-        return amplitude;
-    };
-
-    return (defs, t) => {
-        if (defs.prefersReducedMotion) return defs.to;
-
-        const perpendicular = Point2dUtils.getPerpendicular(Point2dUtils.getNormal(Point2d.sub(defs.to, defs.from)));
-        const amplitude = getAmplitude(defs.id);
-        const segments = getCount(defs.id) + 1;
-
-        const cornerAt = (index: number): Point2d => {
-            if (index <= 0) return defs.from;
-            if (index >= segments) return defs.to;
-
-            const side = index % 2 === 0 ? 1 : -1;
-            const base = lerp(defs.from, defs.to, index / segments);
-            const sideOffset = side * amplitude;
-
-            return Point2d.add(base, Point2d.mul(perpendicular, { x: sideOffset, y: sideOffset }));
-        };
-
-        const scaledT = t * segments;
-        const segmentIndex = Math.min(segments - 1, Math.floor(scaledT));
-
-        return lerp(cornerAt(segmentIndex), cornerAt(segmentIndex + 1), scaledT - segmentIndex);
-    };
-};
-
-const scatter: ParticleTravelPatternFactory = (knobs) => {
-    const angleById = new Map<number, number>();
-    const radiusById = new Map<number, number>();
-    const turnShareById = new Map<number, number>();
-
-    const getAngle = (id: number) => {
-        const cached = angleById.get(id);
-
-        if (cached !== undefined) return cached;
-
-        const angle = randomBetween(0, Math.PI * 2);
-
-        angleById.set(id, angle);
-
-        return angle;
-    };
-
-    const getRadius = (id: number) => {
-        const cached = radiusById.get(id);
-
-        if (cached !== undefined) return cached;
-
-        const radius = randomBetween(knobs.scatterRadiusMinPx, knobs.scatterRadiusMaxPx);
-
-        radiusById.set(id, radius);
-
-        return radius;
-    };
-
-    const getTurnShare = (id: number) => {
-        const cached = turnShareById.get(id);
-
-        if (cached !== undefined) return cached;
-
-        const turnShare = randomBetween(knobs.scatterTurnShareMin, knobs.scatterTurnShareMax);
-
-        turnShareById.set(id, turnShare);
-
-        return turnShare;
-    };
-
-    return (defs, t) => {
-        if (defs.prefersReducedMotion) return defs.to;
-
-        const angle = getAngle(defs.id);
-        const radius = getRadius(defs.id);
-        const turnShare = getTurnShare(defs.id);
-        const peak = Point2d.add(defs.from, { x: Math.cos(angle) * radius, y: Math.sin(angle) * radius });
-
-        if (t <= turnShare) return lerp(defs.from, peak, EasingUtils.easeOutQuad(t / turnShare));
-
-        return lerp(peak, defs.to, (t - turnShare) / (1 - turnShare));
-    };
-};
-
-export const TRAVEL_PATTERN_FACTORIES: Record<ParticleTravelPattern, ParticleTravelPatternFactory> = {
-    line,
-    arc,
-    wave,
-    spiral,
-    orbit,
-    bezier,
-    zigzag,
-    scatter,
-};
-
-export const TRAVEL_PATTERN_KEYS = Object.keys(TRAVEL_PATTERN_FACTORIES) as ParticleTravelPattern[];
-
-const BURST_SHOT_COUNT = 3;
-const BURST_PAUSE_MS = 600;
-const INTERMITTENT_PAUSE_MS = 500;
-const NO_PAUSE_MS = 0;
-const SELF = 0;
-
-const burst: IterationPatternFn = () => [{ count: BURST_SHOT_COUNT, beginDelayMs: BURST_PAUSE_MS, nextIndex: SELF }];
-
-const intermittent: IterationPatternFn = () => [{ count: 1, beginDelayMs: INTERMITTENT_PAUSE_MS, nextIndex: SELF }];
-
-const continuous: IterationPatternFn = () => [{ count: 1, beginDelayMs: NO_PAUSE_MS, nextIndex: SELF }];
-
-export const ITERATION_PATTERNS: Record<IterationPattern, IterationPatternFn> = { burst, intermittent, continuous };
-
-export const ITERATION_PATTERN_KEYS = Object.keys(ITERATION_PATTERNS) as IterationPattern[];
 
 export const EXAMPLE_NAMES = {
     singleTarget: "Single target",
@@ -465,8 +49,9 @@ export const EXAMPLE_NAMES = {
     movingTarget: "Moving target",
     radial: "Radial (1 spawner, many targets)",
     manyToOne: "Many to one (many spawners, 1 target)",
-    burst: "Burst on press",
-    roundTrip: "Round trip (a relay on arrival)",
+    roundTrip: "Round trip",
+    wind: "Wind",
+    attraction: "Attraction",
     multipleTargets: "Multiple targets",
     grid: "N spawners x M targets",
     stressTest: "Stress Test",

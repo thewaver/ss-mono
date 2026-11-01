@@ -23,7 +23,7 @@ export const PagePlaybackScrubber = (props: PagePlaybackScrubberProps) => {
                     />
                 )}
                 onClick={() => {
-                    props.playback[1]((isPlaying) => !isPlaying);
+                    props.playback[1](!props.playback[0]());
                 }}
             />
 

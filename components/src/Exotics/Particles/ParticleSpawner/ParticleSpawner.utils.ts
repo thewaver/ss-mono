@@ -1,5 +1,6 @@
 import {
     type CSSAnimationValues,
+    MathUtils,
     type Point2d,
     type Rect,
     type Size2d,
@@ -8,6 +9,8 @@ import {
 } from "@thewaver/ss-utils";
 
 import type {
+    ParticleModifier,
+    ParticleRouteStop,
     ParticleSpawnIterationPattern,
     ParticleSpawnerDirectValues,
     ParticleSpawnerFrame,
@@ -19,6 +22,9 @@ import type {
 const NO_DELAY_MS = 0;
 const PERCENT = 100;
 const AREA_STEP_PX = 64;
+const FIRST_STAGE = 0;
+const NO_PROGRESS = 0;
+const FULL_PROGRESS = 1;
 
 const toValue = (value: number | number[] | undefined, idx: number) =>
     Array.isArray(value) ? value[idx] : idx === 0 ? value : undefined;
@@ -29,7 +35,7 @@ const snapIn = (value: number) => Math.ceil(value / AREA_STEP_PX) * AREA_STEP_PX
 
 let nextId = 0;
 
-type Round = ParticleSpawnerTiming & {
+type LegacyRound = ParticleSpawnerTiming & {
     count: number;
     startMs: number;
     spawnedCount: number;
@@ -37,16 +43,38 @@ type Round = ParticleSpawnerTiming & {
     onEnd?: () => void;
 };
 
-type LiveParticle = ParticleSpawnerParticle & { round: Round };
+type LegacyParticle = { id: number; index: number; targetIndex: number; spawnedAtMs: number; round: LegacyRound };
+
+type Round = ParticleSpawnerTiming & {
+    durationMs: number;
+    startMs: number;
+    elapsedMs: number;
+    particles: RoundParticle[];
+};
+
+type RoundParticle = ParticleSpawnerParticle & { round: Round };
 
 type FrameParticipant = {
     read: () => void;
     write: (nowMs: number) => void;
 };
 
-const NO_PARTICLES: LiveParticle[] = [];
+const NO_LEGACY_PARTICLES: LegacyParticle[] = [];
 
-type Placement = { from: Point2d; targets: (Point2d | undefined)[]; prefersReducedMotion: boolean };
+const NO_PARTICLES: RoundParticle[] = [];
+
+const NO_MODIFIERS: ParticleModifier[] = [];
+
+const NO_RECTS: (Rect | undefined)[] = [];
+
+type Placement = {
+    origin: Point2d;
+    targets: (Point2d | undefined)[];
+    modMarkers: (Point2d | undefined)[];
+    prefersReducedMotion: boolean;
+};
+
+type Leg = { legIndex: number; t: number; elapsedMs: number };
 
 const participants = new Set<FrameParticipant>();
 
@@ -82,6 +110,28 @@ const leaveSharedFrame = (participant: FrameParticipant) => {
     cancelAnimationFrame(sharedFrameId);
     sharedFrameId = undefined;
 };
+
+const toLegMs = (timing: ParticleSpawnerTiming) => timing.travelDurationMs + timing.restDurationMs;
+
+const toEndMs = (particle: RoundParticle) => particle.startsAtMs + particle.route.length * toLegMs(particle.round);
+
+const isLiveAt = (particle: RoundParticle, elapsedMs: number) =>
+    elapsedMs >= particle.startsAtMs && elapsedMs < toEndMs(particle);
+
+const toLeg = (particle: RoundParticle): Leg => {
+    const { round } = particle;
+    const elapsedMs = Math.max(round.elapsedMs - particle.startsAtMs, 0);
+    const legMs = toLegMs(round);
+    const lastLeg = particle.route.length - 1;
+    const legIndex = legMs <= 0 ? lastLeg : Math.min(Math.floor(elapsedMs / legMs), lastLeg);
+    const legElapsedMs = elapsedMs - legIndex * legMs;
+    const t = round.travelDurationMs <= 0 ? FULL_PROGRESS : MathUtils.clamp01(legElapsedMs / round.travelDurationMs);
+
+    return { legIndex, t, elapsedMs };
+};
+
+const isSameList = <T>(a: readonly T[], b: readonly T[]) =>
+    a.length === b.length && a.every((item, idx) => item === b[idx]);
 
 /**
  * The pieces of a particle's motion that are not the caller's own evaluator: settling how many a
@@ -187,8 +237,446 @@ export namespace ParticleSpawnerUtils {
     };
 
     /**
-     * The machinery of a spawner: rounds of particles sent out on a stagger, walked to their targets on animation
-     * frames, and taken away once they have arrived and rested.
+     * The machinery of a spawner: rounds of particles worked out from a clock, so a round can be paused where it stands
+     * and drawn at any point of it.
+     *
+     * A round makes every particle it will send as it starts — each one's id, route and the moment it sets off — and
+     * from then on where every particle is, and whether it is out yet, follows from how far the round has run alone.
+     * The rounds of `spawnIterationPatterns` run on `progress`, which the engine advances while running and a consumer
+     * may write to move the round; a sent round (`emit`) runs on its own clock, playing or not. The engine keeps the
+     * particles that are out in a store, which is what a view draws its elements from, and writes each one's position
+     * straight onto its element. It reads everything that can change through `defs` at the moment it needs it, so it
+     * is made once and never rebuilt.
+     *
+     * Every engine on the page shares one animation frame, and takes part in it only while something of its own moves.
+     * In that frame each engine first asks where its spawner and targets are, and only then does any of them move a
+     * particle, so the engines' measuring forces at most one layout a frame however many spawners there are.
+     *
+     * @param defs.getTargetCount How many targets there are now.
+     * @param defs.computeTarget Which target one particle is aimed at. `undefined` picks one at random. Not asked when
+     * `computeRoute` answers.
+     * @param defs.computeRoute The stops one particle visits in order, each leg one travel and one rest. `undefined`
+     * gives it the one stop `computeTarget` picks; an empty route sends nothing.
+     * @param defs.getElement A particle's element, once the view has drawn it. A particle without one is not moved. Not
+     * asked while `getIsDrawingElements` says no.
+     * @param defs.getIsDrawingElements Whether the view draws particles as page elements. While it does not, the engine
+     * asks for no element and writes no position.
+     * @param defs.getFrame Where the spawner, its targets and its `modMarkers` are now. Called once a frame while anything moves, before
+     * any engine moves anything, so it may measure the page directly; and once for each draw while nothing moves.
+     * @param defs.getTiming The stagger, the travel and the rest a new round is made with.
+     * @param defs.getParticleCount How many particles a played round sends.
+     * @param defs.getPatterns The stages of rounds to play.
+     * @param defs.getCanSpawn Whether anything can be sent now: on the page, visible, with somewhere to go.
+     * @param defs.getProgress How far through the played round, `0`–`1`.
+     * @param defs.setProgress Writes it, as the round runs and when a new one starts.
+     * @param defs.computeParticlePos Where one particle is at a point along one leg. The same particle on the same leg
+     * at the same point must give the same answer.
+     * @param defs.getModifiers Functions applied in order to that point, each with the leg, how far along it and the
+     * milliseconds since the particle set off. Read at every placement, so a change shows on the next draw.
+     * @param defs.onParticlePlace Hands on where each placed particle is and how far along its path, every draw.
+     * @param defs.onParticleArrive Runs as a particle is taken away at its last stop, with its place in its round. Only
+     * while the round runs, never for a written `progress`.
+     * @param defs.onIterationEnd Runs at the end of each played round.
+     * @param defs.onAnimationEnd Runs after the last played round of a stage that names no next one.
+     * @param defs.onTick Runs after each draw that placed any particle.
+     * @returns `particles`, the particles that are out, as a store; `setIsRunning`, `restart`, `render`, `scrub`, `emit`,
+     * `drawParticle`, `getHasEnded` and `stop`.
+     */
+    export const createEngine = (defs: {
+        getTargetCount: () => number;
+        computeTarget: (index: number, targetCount: number) => number | undefined;
+        computeRoute: (index: number, targetCount: number) => ParticleRouteStop[] | undefined;
+        getElement: (id: number) => HTMLElement | undefined;
+        getIsDrawingElements: () => boolean;
+        getFrame: () => ParticleSpawnerFrame;
+        getTiming: () => ParticleSpawnerTiming;
+        getParticleCount: () => number;
+        getPatterns: () => ParticleSpawnIterationPattern[];
+        getCanSpawn: () => boolean;
+        getProgress: () => number;
+        setProgress: (progress: number) => void;
+        computeParticlePos: (travel: ParticleTravelDefs, t: number) => Point2d;
+        getModifiers: () => ParticleModifier[] | undefined;
+        onParticlePlace?: (travel: ParticleTravelDefs, pos: Point2d, t: number) => void;
+        onParticleArrive?: (index: number) => void;
+        onIterationEnd?: () => void;
+        onAnimationEnd?: () => void;
+        onTick?: () => void;
+    }) => {
+        const particles = StoreUtils.create(NO_PARTICLES);
+        const emitted = new Set<Round>();
+
+        let played: Round | undefined;
+        let stageIndex = FIRST_STAGE;
+        let repeatIndex = 0;
+        let hasEnded = false;
+        let isRunning = false;
+        let isWriting = false;
+        let lastMs = 0;
+        let ownProgress = NO_PROGRESS;
+        let lastPlacement: Placement | undefined;
+        let pendingStage: number | undefined;
+        let waitMs = 0;
+        let waitStartMs = 0;
+        let waitTimer: ReturnType<typeof setTimeout> | undefined;
+
+        const toRoute = (index: number, targetCount: number): ParticleRouteStop[] => {
+            const route = defs.computeRoute(index, targetCount);
+
+            if (route) return route;
+
+            const targetIndex = defs.computeTarget(index, targetCount) ?? pickRandomTarget(targetCount);
+
+            return targetIndex === undefined ? [] : [targetIndex];
+        };
+
+        const createRound = (count: number, timing: ParticleSpawnerTiming, startMs: number): Round => {
+            const targetCount = defs.getTargetCount();
+            const round: Round = { ...timing, durationMs: 0, startMs, elapsedMs: 0, particles: [] };
+
+            for (let index = 0; index < count; index++) {
+                const route = toRoute(index, targetCount);
+
+                if (route.length === 0) continue;
+
+                const particle: RoundParticle = {
+                    id: nextId++,
+                    index,
+                    route: [...route],
+                    startsAtMs: index * timing.spawnDelayMs,
+                    round,
+                };
+
+                round.particles.push(particle);
+                round.durationMs = Math.max(round.durationMs, toEndMs(particle));
+            }
+
+            return round;
+        };
+
+        const writeProgress = (progress: number) => {
+            ownProgress = progress;
+            defs.setProgress(progress);
+        };
+
+        const createPlayed = () => {
+            const count = defs.getParticleCount();
+
+            return count > 0 && defs.getPatterns()[stageIndex] ? createRound(count, defs.getTiming(), 0) : undefined;
+        };
+
+        const toPlacement = (frame: ParticleSpawnerFrame): Placement | undefined => {
+            const rootRect = frame.rootRect;
+
+            if (!rootRect) return undefined;
+
+            return {
+                origin: { x: rootRect.width * 0.5, y: rootRect.height * 0.5 },
+                targets: frame.targetRects.map((rect) => (rect ? toRelativeCenter(rect, rootRect) : undefined)),
+                modMarkers: (frame.modMarkerRects ?? NO_RECTS).map((rect) =>
+                    rect ? toRelativeCenter(rect, rootRect) : undefined,
+                ),
+                prefersReducedMotion: frame.prefersReducedMotion,
+            };
+        };
+
+        const toStopPos = (stop: ParticleRouteStop | undefined, placement: Placement) =>
+            (stop === undefined || stop === "spawner" ? undefined : placement.targets[stop]) ?? placement.origin;
+
+        const toTravel = (particle: RoundParticle, legIndex: number, placement: Placement): ParticleTravelDefs => ({
+            id: particle.id,
+            index: particle.index,
+            stop: particle.route[legIndex],
+            legIndex,
+            legCount: particle.route.length,
+            origin: placement.origin,
+            from: toStopPos(particle.route[legIndex - 1], placement),
+            to: toStopPos(particle.route[legIndex], placement),
+            modMarkers: placement.modMarkers,
+            prefersReducedMotion: placement.prefersReducedMotion,
+        });
+
+        const place = (particle: RoundParticle, el: HTMLElement | undefined, placement: Placement) => {
+            const { legIndex, t, elapsedMs } = toLeg(particle);
+            const travel = toTravel(particle, legIndex, placement);
+            const pos = (defs.getModifiers() ?? NO_MODIFIERS).reduce(
+                (moved, modify) => modify(moved, travel, t, elapsedMs),
+                defs.computeParticlePos(travel, t),
+            );
+
+            if (el) assignParticlePos(el, pos);
+
+            defs.onParticlePlace?.(travel, pos, t);
+        };
+
+        const arriveBetween = (round: Round, fromMs: number, toMs: number) => {
+            for (const particle of round.particles) {
+                const endMs = toEndMs(particle);
+
+                if (endMs > fromMs && endMs <= toMs) defs.onParticleArrive?.(particle.index);
+            }
+        };
+
+        const getNeedsFrames = () =>
+            (isRunning && !!played && !hasEnded && pendingStage === undefined) || emitted.size > 0;
+
+        const syncFrame = () => {
+            if (getNeedsFrames()) {
+                joinSharedFrame(participant);
+            } else {
+                leaveSharedFrame(participant);
+            }
+        };
+
+        const armWait = () => {
+            if (pendingStage === undefined || !isRunning || waitTimer !== undefined) return;
+
+            waitStartMs = performance.now();
+            waitTimer = setTimeout(() => {
+                waitTimer = undefined;
+                stageIndex = pendingStage ?? FIRST_STAGE;
+                pendingStage = undefined;
+                repeatIndex = 0;
+                played = createPlayed();
+                writeProgress(NO_PROGRESS);
+                lastMs = performance.now();
+                syncFrame();
+            }, waitMs);
+        };
+
+        const settleWait = () => {
+            if (waitTimer === undefined) return;
+
+            clearTimeout(waitTimer);
+            waitTimer = undefined;
+            waitMs = Math.max(waitMs - (performance.now() - waitStartMs), NO_DELAY_MS);
+        };
+
+        const endPlayedRound = () => {
+            const pattern = defs.getPatterns()[stageIndex];
+
+            repeatIndex++;
+            defs.onIterationEnd?.();
+
+            if (pattern && repeatIndex < pattern.count) {
+                played = createPlayed();
+                writeProgress(NO_PROGRESS);
+
+                return;
+            }
+
+            const nextIndex = pattern?.nextIndex;
+
+            if (nextIndex === undefined) {
+                hasEnded = true;
+                defs.onAnimationEnd?.();
+
+                return;
+            }
+
+            pendingStage = nextIndex;
+            waitMs = pattern?.beginDelayMs ?? NO_DELAY_MS;
+            armWait();
+        };
+
+        const advancePlayed = (nowMs: number) => {
+            const elapsedMs = Math.max(nowMs - lastMs, 0);
+
+            lastMs = nowMs;
+
+            if (!played || !isRunning || hasEnded || pendingStage !== undefined) return;
+
+            const durationMs = played.durationMs;
+            const from = MathUtils.clamp01(defs.getProgress());
+            const next = durationMs > 0 ? Math.min(from + elapsedMs / durationMs, FULL_PROGRESS) : FULL_PROGRESS;
+
+            arriveBetween(played, from * durationMs, next * durationMs);
+            writeProgress(next);
+
+            if (next >= FULL_PROGRESS) endPlayedRound();
+        };
+
+        const advanceEmitted = (nowMs: number) => {
+            for (const round of emitted) {
+                const elapsedMs = Math.min(Math.max(nowMs - round.startMs, 0), round.durationMs);
+
+                arriveBetween(round, round.elapsedMs, elapsedMs);
+                round.elapsedMs = elapsedMs;
+
+                if (elapsedMs >= round.durationMs) {
+                    emitted.delete(round);
+                }
+            }
+        };
+
+        const draw = (placement: Placement | undefined) => {
+            const isDrawingElements = defs.getIsDrawingElements();
+            const live: RoundParticle[] = [];
+            const rounds = played ? [played, ...emitted] : [...emitted];
+
+            if (played) played.elapsedMs = MathUtils.clamp01(defs.getProgress()) * played.durationMs;
+
+            for (const round of rounds) {
+                for (const particle of round.particles) {
+                    if (isLiveAt(particle, round.elapsedMs)) live.push(particle);
+                }
+            }
+
+            if (!isSameList(live, particles.get())) particles.set(live);
+
+            if (!placement) return;
+
+            let hasPlaced = false;
+
+            for (const particle of live) {
+                const el = isDrawingElements ? defs.getElement(particle.id) : undefined;
+
+                if (isDrawingElements && !el) continue;
+
+                place(particle, el, placement);
+                hasPlaced = true;
+            }
+
+            if (hasPlaced) defs.onTick?.();
+        };
+
+        const read = () => {
+            lastPlacement = toPlacement(defs.getFrame());
+        };
+
+        const write = (nowMs: number) => {
+            isWriting = true;
+            advancePlayed(nowMs);
+            advanceEmitted(nowMs);
+            draw(lastPlacement);
+            isWriting = false;
+            syncFrame();
+        };
+
+        const participant: FrameParticipant = { read, write };
+
+        const render = () => {
+            if (isWriting) return;
+
+            lastPlacement = toPlacement(defs.getFrame());
+            draw(lastPlacement);
+        };
+
+        return {
+            /** The particles that are out, in the order their rounds began and they set off. */
+            particles: { get: particles.get, subscribe: particles.subscribe } as Store<ParticleSpawnerParticle[]>,
+            /**
+             * Runs or pauses the played rounds. Paused, the round stays where it stands and running again carries on
+             * from there; a round sent with `emit` runs either way. Asking for the state it is already in does nothing.
+             *
+             * @param next Whether the played rounds run.
+             */
+            setIsRunning: (next: boolean) => {
+                if (next === isRunning) return;
+
+                isRunning = next;
+
+                if (next) {
+                    if (!played && !hasEnded) played = createPlayed();
+
+                    lastMs = performance.now();
+                    armWait();
+                } else {
+                    settleWait();
+                }
+
+                syncFrame();
+            },
+            /**
+             * Starts the played rounds over from the first stage, at `0`. Running, the new round starts at once; paused,
+             * nothing is drawn until running starts it or {@link scrub} asks for it.
+             */
+            restart: () => {
+                clearTimeout(waitTimer);
+                waitTimer = undefined;
+                pendingStage = undefined;
+                stageIndex = FIRST_STAGE;
+                repeatIndex = 0;
+                hasEnded = false;
+                played = isRunning ? createPlayed() : undefined;
+                lastMs = performance.now();
+                writeProgress(NO_PROGRESS);
+                syncFrame();
+
+                if (!isRunning) render();
+            },
+            /**
+             * Draws every particle where it is now, measuring the page itself — for a spawner that has just paused.
+             * Draws only rounds already made. Does nothing during the engine's own frame, which draws anyway.
+             */
+            render,
+            /**
+             * Draws the played round at `progress` after something other than the engine wrote it, making the round
+             * first if there is none yet — so a spawner that has never played shows nothing until it is played or
+             * scrubbed. A value the engine wrote itself only redraws. While the engine is running, its next frame
+             * draws the written value instead, so nothing is measured or drawn twice.
+             */
+            scrub: () => {
+                if (isWriting || getNeedsFrames()) return;
+
+                const isWrittenFromOutside = MathUtils.clamp01(defs.getProgress()) !== ownProgress;
+
+                if (isWrittenFromOutside && !played && !hasEnded && defs.getCanSpawn()) played = createPlayed();
+
+                render();
+            },
+            /**
+             * Sends one round now, outside any stage, on its own clock.
+             *
+             * @param count How many particles, rounded by {@link toParticleCount}.
+             * @returns `false` when nothing was sent, as `ParticleSpawnerController.emit` describes.
+             */
+            emit: (count: number) => {
+                const particleCount = toParticleCount(count);
+
+                if (particleCount <= 0 || !defs.getCanSpawn()) return false;
+
+                emitted.add(createRound(particleCount, defs.getTiming(), performance.now()));
+                syncFrame();
+
+                return true;
+            },
+            /**
+             * Puts a particle where it is now, for a view whose element arrives between frames — so it is never
+             * painted at the spawner's corner before the next frame moves it. It places the particle against the
+             * boxes the last draw read, and measures them itself only before any draw has.
+             *
+             * @param id The particle.
+             * @param el Its element.
+             */
+            drawParticle: (id: number, el: HTMLElement) => {
+                const particle = particles.get().find((live) => live.id === id);
+                const placement = lastPlacement ?? toPlacement(defs.getFrame());
+
+                if (particle && placement) place(particle, el, placement);
+            },
+            /** Whether the last played round of the last stage is done. `restart` plays them again. */
+            getHasEnded: () => hasEnded,
+            /** Stops the frames and forgets every round and particle. The engine can be run again. */
+            stop: () => {
+                leaveSharedFrame(participant);
+                clearTimeout(waitTimer);
+                waitTimer = undefined;
+                pendingStage = undefined;
+                isRunning = false;
+                played = undefined;
+                emitted.clear();
+                particles.set(NO_PARTICLES);
+            },
+        };
+    };
+
+    /**
+     * The previous machinery of a spawner, which sends particles as frames pass rather than working a round out from
+     * its progress, and so cannot pause a round or scrub it. Use {@link createEngine}.
+     *
+     * Rounds of particles are sent out on a stagger, walked to their targets on animation frames, and taken away once
+     * they have arrived and rested.
      *
      * The engine keeps the live particles in a store, which is what a view draws its elements from, and writes each
      * one's position straight onto its element every frame. It reads everything that can change — the targets, the
@@ -215,7 +703,7 @@ export namespace ParticleSpawnerUtils {
      * @param defs.onTick Runs after each frame that moved any particle.
      * @returns `particles`, the live particles as a store; `playPattern`, `emit`, `drawParticle` and `stop`.
      */
-    export const createEngine = (defs: {
+    export const createLegacyEngine = (defs: {
         getTargetCount: () => number;
         computeTarget: (index: number, targetCount: number) => number | undefined;
         getElement: (id: number) => HTMLElement | undefined;
@@ -228,12 +716,12 @@ export namespace ParticleSpawnerUtils {
         onParticleArrive?: (index: number) => void;
         onTick?: () => void;
     }) => {
-        const particles = StoreUtils.create(NO_PARTICLES);
-        const rounds = new Set<Round>();
+        const particles = StoreUtils.create(NO_LEGACY_PARTICLES);
+        const rounds = new Set<LegacyRound>();
 
         let lastPlacement: Placement | undefined;
 
-        const spawnNext = (round: Round, targetCount: number): LiveParticle | undefined => {
+        const spawnNext = (round: LegacyRound, targetCount: number): LegacyParticle | undefined => {
             const index = round.spawnedCount;
             const targetIndex = defs.computeTarget(index, targetCount) ?? pickRandomTarget(targetCount);
 
@@ -254,14 +742,17 @@ export namespace ParticleSpawnerUtils {
             if (!rootRect) return undefined;
 
             return {
-                from: { x: rootRect.width * 0.5, y: rootRect.height * 0.5 },
+                origin: { x: rootRect.width * 0.5, y: rootRect.height * 0.5 },
                 targets: frame.targetRects.map((rect) => (rect ? toRelativeCenter(rect, rootRect) : undefined)),
+                modMarkers: (frame.modMarkerRects ?? NO_RECTS).map((rect) =>
+                    rect ? toRelativeCenter(rect, rootRect) : undefined,
+                ),
                 prefersReducedMotion: frame.prefersReducedMotion,
             };
         };
 
         const place = (
-            particle: LiveParticle,
+            particle: LegacyParticle,
             el: HTMLElement | undefined,
             nowMs: number,
             placement: Placement | undefined,
@@ -276,9 +767,13 @@ export namespace ParticleSpawnerUtils {
                 {
                     id: particle.id,
                     index: particle.index,
-                    targetIndex: particle.targetIndex,
-                    from: placement.from,
-                    to: placement.targets[particle.targetIndex] ?? placement.from,
+                    stop: particle.targetIndex,
+                    legIndex: 0,
+                    legCount: 1,
+                    origin: placement.origin,
+                    from: placement.origin,
+                    to: placement.targets[particle.targetIndex] ?? placement.origin,
+                    modMarkers: placement.modMarkers,
                     prefersReducedMotion: placement.prefersReducedMotion,
                 },
                 t,
@@ -295,7 +790,7 @@ export namespace ParticleSpawnerUtils {
 
         const write = (nowMs: number) => {
             const targetCount = defs.getTargetCount();
-            const spawned: LiveParticle[] = [];
+            const spawned: LegacyParticle[] = [];
 
             for (const round of rounds) {
                 while (
@@ -310,7 +805,7 @@ export namespace ParticleSpawnerUtils {
 
             if (spawned.length > 0) particles.update((list) => [...list, ...spawned]);
 
-            const arrived: LiveParticle[] = [];
+            const arrived: LegacyParticle[] = [];
 
             let hasMoved = false;
 
@@ -354,7 +849,7 @@ export namespace ParticleSpawnerUtils {
         const participant: FrameParticipant = { read, write };
 
         const startRound = (count: number, onEnd?: () => void) => {
-            const round: Round = {
+            const round: LegacyRound = {
                 ...defs.getTiming(),
                 count,
                 startMs: performance.now(),
@@ -369,7 +864,7 @@ export namespace ParticleSpawnerUtils {
             return round;
         };
 
-        const dropRound = (round: Round) => {
+        const dropRound = (round: LegacyRound) => {
             rounds.delete(round);
             particles.update((list) => list.filter((particle) => particle.round !== round));
 
@@ -378,7 +873,7 @@ export namespace ParticleSpawnerUtils {
 
         return {
             /** The live particles, in the order they set off. */
-            particles: { get: particles.get, subscribe: particles.subscribe } as Store<ParticleSpawnerParticle[]>,
+            particles: { get: particles.get, subscribe: particles.subscribe } as Store<LegacyParticle[]>,
             /**
              * Plays one stage of `spawnIterationPatterns`: its rounds one after another, each sent once the one before
              * has arrived.
@@ -401,7 +896,7 @@ export namespace ParticleSpawnerUtils {
                     onNextStage: (nextIndex: number) => void;
                 },
             ) => {
-                let round: Round | undefined;
+                let round: LegacyRound | undefined;
                 let repeatIndex = 0;
                 let timeout: ReturnType<typeof setTimeout> | undefined;
 
@@ -467,7 +962,7 @@ export namespace ParticleSpawnerUtils {
             stop: () => {
                 leaveSharedFrame(participant);
                 rounds.clear();
-                particles.set(NO_PARTICLES);
+                particles.set(NO_LEGACY_PARTICLES);
             },
         };
     };

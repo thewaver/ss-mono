@@ -1,9 +1,11 @@
-import type {
-    IterationPattern,
-    ParticleTravelKnobs,
-    ParticleTravelPattern,
-    TravelEasingKey,
-} from "../Pages/ParticleSpawnerPage/ParticleSpawnerPatterns.types";
+import {
+    type ParticleIterationPatternType,
+    ParticleModifierDefaults,
+    type ParticleTravelEasingType,
+    type ParticleTravelPathType,
+} from "@thewaver/ss-components";
+
+import type { ParticleTravelKnobs } from "../Pages/ParticleSpawnerPage/ParticleSpawnerPatterns.types";
 
 const FIELD_WIDTH_KNOB_STEP = 5;
 
@@ -17,8 +19,8 @@ export namespace ParticleSpawnerKnobs {
     export const MAX_TRAVEL_DURATION_MS = 4000;
     export const TRAVEL_DURATION_STEP_MS = 100;
 
-    export const STARTING_TRAVEL_PATTERN_KEY: ParticleTravelPattern = "scatter";
-    export const STARTING_ITERATION_PATTERN_KEY: IterationPattern = "continuous";
+    export const STARTING_TRAVEL_PATTERN_KEY: ParticleTravelPathType = "scatter";
+    export const STARTING_ITERATION_PATTERN_KEY: ParticleIterationPatternType = "continuous";
 
     export const MIN_SPAWN_DELAY_MS = 0;
     export const MAX_SPAWN_DELAY_MS = 1000;
@@ -34,11 +36,36 @@ export namespace ParticleSpawnerKnobs {
     export const OVERSHOOT_PERCENT_STEP = 5;
     export const STARTING_OVERSHOOT_PERCENT = 0;
 
-    export const STARTING_TRAVEL_EASING_KEY: TravelEasingKey = "linear";
+    export const STARTING_TRAVEL_EASING_KEY: ParticleTravelEasingType = "linear";
 
     export const STARTING_ARE_TARGETS_HIDDEN = false;
 
-    export const TRAVEL_KNOBS_BY_PATTERN: Record<ParticleTravelPattern, ParticleTravelKnobs> = {
+    export const MIN_WIND_DIRECTION_DEGREES = 0;
+    export const MAX_WIND_DIRECTION_DEGREES = 345;
+    export const WIND_DIRECTION_STEP_DEGREES = 15;
+    export const STARTING_WIND_DIRECTION_DEGREES = ParticleModifierDefaults.WIND_DEFAULTS.directionDegrees;
+
+    export const MIN_WIND_STRENGTH_PIXELS = 0;
+    export const MAX_WIND_STRENGTH_PIXELS = 150;
+    export const WIND_STRENGTH_STEP_PIXELS = 5;
+    export const STARTING_WIND_STRENGTH_PIXELS = ParticleModifierDefaults.WIND_DEFAULTS.strengthPixels;
+
+    export const MIN_WIND_GUST_RATIO = 0;
+    export const MAX_WIND_GUST_RATIO = 1;
+    export const WIND_GUST_RATIO_STEP = 0.05;
+    export const STARTING_WIND_GUST_RATIO = ParticleModifierDefaults.WIND_DEFAULTS.gustRatio;
+
+    export const MIN_ATTRACTION_STRENGTH_RATIO = 0;
+    export const MAX_ATTRACTION_STRENGTH_RATIO = 1;
+    export const ATTRACTION_STRENGTH_RATIO_STEP = 0.05;
+    export const STARTING_ATTRACTION_STRENGTH_RATIO = ParticleModifierDefaults.ATTRACTION_DEFAULTS.strengthRatio;
+
+    export const MIN_ATTRACTION_REACH_PIXELS = 0;
+    export const MAX_ATTRACTION_REACH_PIXELS = 300;
+    export const ATTRACTION_REACH_STEP_PIXELS = 10;
+    export const STARTING_ATTRACTION_REACH_PIXELS = ParticleModifierDefaults.ATTRACTION_DEFAULTS.reachPixels;
+
+    export const TRAVEL_KNOBS_BY_PATTERN: Record<ParticleTravelPathType, ParticleTravelKnobs> = {
         line: {},
         arc: {
             arcHeightMinPx: {
@@ -313,27 +340,6 @@ export namespace ParticleSpawnerKnobs {
                 max: 0.9,
                 step: 0.05,
             },
-        },
-    };
-
-    export const TRAVEL_DEFAULTS_BY_PATTERN: Record<ParticleTravelPattern, Record<string, number>> = {
-        line: {},
-        arc: { arcHeightMinPx: -60, arcHeightMaxPx: 60 },
-        wave: { waveAmplitudeMinPx: 20, waveAmplitudeMaxPx: 60, waveCyclesMin: 2, waveCyclesMax: 2 },
-        spiral: { spiralRadiusMinPx: 20, spiralRadiusMaxPx: 50, spiralTurnsMin: 2, spiralTurnsMax: 3 },
-        orbit: { orbitRadiusMinPx: 40, orbitRadiusMaxPx: 70, orbitTurnsMin: 1, orbitTurnsMax: 2 },
-        bezier: {
-            bezierElbowAlongMin: 0.2,
-            bezierElbowAlongMax: 0.4,
-            bezierElbowOffsetMinPx: -70,
-            bezierElbowOffsetMaxPx: 70,
-        },
-        zigzag: { zigzagCountMin: 3, zigzagCountMax: 4, zigzagAmplitudeMinPx: 20, zigzagAmplitudeMaxPx: 35 },
-        scatter: {
-            scatterRadiusMinPx: 40,
-            scatterRadiusMaxPx: 90,
-            scatterTurnShareMin: 0.2,
-            scatterTurnShareMax: 0.35,
         },
     };
 }

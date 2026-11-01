@@ -5,13 +5,11 @@ import {
     CellAnimationOrigins,
     ParticleField,
     type ParticleFieldProps,
+    SliceAnimationKeyframeUtils,
     SliceAnimationWeights,
 } from "@thewaver/ss-components-react";
 import { ParticlePictureUtils } from "@thewaver/ss-playground/App/PageComponents/ParticlePicture/ParticlePicture.utils";
-import {
-    computeParticlePos,
-    createEnvelope,
-} from "@thewaver/ss-playground/App/Pages/ParticleFieldPage/ParticleFieldPage.const";
+import { computeParticlePos } from "@thewaver/ss-playground/App/Pages/ParticleFieldPage/ParticleFieldPage.const";
 import { themeVars } from "@thewaver/ss-playground/App/Theme.css";
 import type { Index2d } from "@thewaver/ss-utils";
 
@@ -32,7 +30,11 @@ export const DefaultExample = ({
     );
 
     const animation = useMemo(
-        () => createEnvelope(CellAnimationKeyframes.SAMPLE_ANIMATIONS[animationType], holdShare),
+        () =>
+            SliceAnimationKeyframeUtils.createEnvelope(
+                CellAnimationKeyframes.SAMPLE_ANIMATIONS[animationType],
+                holdShare,
+            ),
         [animationType, holdShare],
     );
 

@@ -42,10 +42,10 @@ const SHARED_THEME_VALUES = {
     },
     spacing: {
         quarter: "2px",
-        half: "5px",
-        full: "10px",
-        double: "20px",
-        quad: "40px",
+        half: "4px",
+        full: "8px",
+        double: "16px",
+        quad: "32px",
     },
     fontSize: {
         xSmall: "0.75rem",

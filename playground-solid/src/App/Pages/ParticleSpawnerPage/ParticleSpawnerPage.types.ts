@@ -3,19 +3,12 @@ import type { Signal } from "solid-js";
 import type {
     AccessorProps,
     ParticleSpawnIterationPattern,
+    ParticleTravelPathFn,
+    SignalSource,
     SliceAnimationRenderer,
 } from "@thewaver/ss-components-solid";
-import type { ParticleTravelPatternFn } from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPatterns.types";
 
-export type {
-    IterationPattern,
-    IterationPatternFn,
-    ParticleTravelKnobs,
-    ParticleTravelPattern,
-    ParticleTravelPatternFactory,
-    ParticleTravelPatternFn,
-    TravelEasingKey,
-} from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPatterns.types";
+export type { ParticleTravelKnobs } from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPatterns.types";
 
 export type ParticleSpawnerExampleProps = AccessorProps<{
     particleCount: number;
@@ -23,8 +16,23 @@ export type ParticleSpawnerExampleProps = AccessorProps<{
     restDurationMs: number;
     spawnDelayMs: number;
     spawnIterationPatterns: ParticleSpawnIterationPattern[];
-    computeParticlePos: ParticleTravelPatternFn;
+    computeParticlePos: ParticleTravelPathFn;
     areTargetsHidden: boolean;
-    playback: Signal<boolean>;
+    playback: SignalSource<boolean>;
+    progress?: Signal<number>;
+    takeProgress?: () => Signal<number>;
     renderer?: SliceAnimationRenderer;
 }>;
+
+export type WindExampleProps = ParticleSpawnerExampleProps &
+    AccessorProps<{
+        windDirectionDegrees: number;
+        windStrengthPixels: number;
+        windGustRatio: number;
+    }>;
+
+export type AttractionExampleProps = ParticleSpawnerExampleProps &
+    AccessorProps<{
+        attractionStrengthRatio: number;
+        attractionReachPixels: number;
+    }>;

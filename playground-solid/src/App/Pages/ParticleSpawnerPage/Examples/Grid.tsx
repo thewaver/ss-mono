@@ -34,18 +34,23 @@ export const GridExample = (props: ParticleSpawnerExampleProps) => {
             </For>
 
             <For each={SPAWNER_TOPS}>
-                {(top) => (
-                    <div class={styles.spawnerRoot} style={{ left: "10%", top }}>
-                        <div class={styles.spawnerMarker} />
+                {(top, index) => {
+                    const progress = index() === 0 ? props.progress : props.takeProgress?.();
 
-                        <ParticleSpawner
-                            {...props}
-                            targets={getTargetRefs}
-                            src={particleSrc}
-                            computeParticleAnimation={computeParticleAnimation}
-                        />
-                    </div>
-                )}
+                    return (
+                        <div class={styles.spawnerRoot} style={{ left: "10%", top }}>
+                            <div class={styles.spawnerMarker} />
+
+                            <ParticleSpawner
+                                {...props}
+                                progress={progress}
+                                targets={getTargetRefs}
+                                src={particleSrc}
+                                computeParticleAnimation={computeParticleAnimation}
+                            />
+                        </div>
+                    );
+                }}
             </For>
         </div>
     );
