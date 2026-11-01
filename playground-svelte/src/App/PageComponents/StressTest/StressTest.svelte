@@ -1,6 +1,7 @@
 <script lang="ts">
     import { Button, FrameRateMonitorSvelteUtils, Modal } from "@thewaver/ss-components-svelte";
     import * as styles from "@thewaver/ss-playground/App/PageComponents/StressTest/StressTest.css";
+    import { StressTestUtils } from "@thewaver/ss-playground/App/PageComponents/StressTest/StressTest.utils";
     import { CSSUtils } from "@thewaver/ss-utils";
 
     import PageButtonContent from "../../StyledComponents/ButtonContent/ButtonContent.svelte";
@@ -57,9 +58,7 @@
             <div
                 class={[
                     styles.fpsCounter,
-                    styles.fpsCounterVariants[
-                        frameRate.average >= 59.5 ? "good" : frameRate.average >= 29.5 ? "mid" : "bad"
-                    ],
+                    styles.fpsCounterVariants[StressTestUtils.getGrade(frameRate.average)],
                 ]}
             >
                 {`FPS: ${frameRate.current.toFixed(1)}\nAVG: ${frameRate.average.toFixed(1)}`}

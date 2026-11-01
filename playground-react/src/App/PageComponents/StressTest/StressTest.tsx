@@ -2,6 +2,7 @@ import { Fragment, useMemo, useState } from "react";
 
 import { Button, FrameRateMonitorReactUtils, Modal } from "@thewaver/ss-components-react";
 import * as styles from "@thewaver/ss-playground/App/PageComponents/StressTest/StressTest.css";
+import { StressTestUtils } from "@thewaver/ss-playground/App/PageComponents/StressTest/StressTest.utils";
 import { CSSUtils } from "@thewaver/ss-utils";
 
 import { PageButtonContent } from "../../StyledComponents/ButtonContent/ButtonContent";
@@ -62,9 +63,7 @@ export const StressTest = (props: StressTestProps) => {
                         <div
                             className={[
                                 styles.fpsCounter,
-                                styles.fpsCounterVariants[
-                                    frameRate.average >= 59.5 ? "good" : frameRate.average >= 29.5 ? "mid" : "bad"
-                                ],
+                                styles.fpsCounterVariants[StressTestUtils.getGrade(frameRate.average)],
                             ].join(" ")}
                         >{`FPS: ${frameRate.current.toFixed(1)}\nAVG: ${frameRate.average.toFixed(1)}`}</div>
                         <div

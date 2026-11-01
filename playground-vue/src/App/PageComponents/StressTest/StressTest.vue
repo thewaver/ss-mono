@@ -3,6 +3,7 @@ import { computed, shallowRef } from "vue";
 
 import { Button, FrameRateMonitorVueUtils, Modal } from "@thewaver/ss-components-vue";
 import * as styles from "@thewaver/ss-playground/App/PageComponents/StressTest/StressTest.css";
+import { StressTestUtils } from "@thewaver/ss-playground/App/PageComponents/StressTest/StressTest.utils";
 import { CSSUtils } from "@thewaver/ss-utils";
 
 import PageButtonContent from "../../StyledComponents/ButtonContent/ButtonContent.vue";
@@ -22,10 +23,6 @@ const configIndex = shallowRef(0);
 const arr = computed(() => Array.from({ length: props.configs[configIndex.value].count }, (_, idx) => idx));
 
 const frameRate = FrameRateMonitorVueUtils.useFrameRate(() => !(isModalOpen.value && isModalTransitionFinished.value));
-
-const fpsVariant = computed(() =>
-    frameRate.value.average >= 59.5 ? "good" : frameRate.value.average >= 29.5 ? "mid" : "bad",
-);
 
 const openConfig = async (index: number) => {
     configIndex.value = index;
@@ -64,7 +61,9 @@ const setModalTransitionFinished = (hasTransitionFinished: boolean) => {
 
         <template #renderContent="{ visibilityTarget, transitionDurationMs }">
             <PageModalPanel :visibility-target="visibilityTarget" :transition-duration-ms="transitionDurationMs">
-                <div :class="[styles.fpsCounter, styles.fpsCounterVariants[fpsVariant]]">
+                <div
+                    :class="[styles.fpsCounter, styles.fpsCounterVariants[StressTestUtils.getGrade(frameRate.average)]]"
+                >
                     {{ `FPS: ${frameRate.current.toFixed(1)}\nAVG: ${frameRate.average.toFixed(1)}` }}
                 </div>
                 <div

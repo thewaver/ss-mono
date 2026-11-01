@@ -20,13 +20,25 @@ export const fpsCounter = style({
 });
 
 export const fpsCounterVariants = styleVariants({
+    incredible: {
+        color: "#8080FF",
+    },
+    superb: {
+        color: "#30C0FF",
+    },
+    great: {
+        color: "#30FFC0",
+    },
     good: {
-        color: "#80FF00",
+        color: "#C0FF30",
     },
     mid: {
-        color: "#FF8000",
+        color: "#FFC030",
     },
     bad: {
-        color: "#FF0080",
+        color: "#FF30C0",
+    },
+    slideshow: {
+        color: "#C0C0C0",
     },
 });

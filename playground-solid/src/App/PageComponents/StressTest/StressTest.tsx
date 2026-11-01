@@ -2,6 +2,7 @@ import { For, createMemo, createSignal } from "solid-js";
 
 import { Button, FrameRateMonitorSolidUtils, Modal, access } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/PageComponents/StressTest/StressTest.css";
+import { StressTestUtils } from "@thewaver/ss-playground/App/PageComponents/StressTest/StressTest.utils";
 import { CSSUtils } from "@thewaver/ss-utils";
 
 import { PageButtonContent } from "../../StyledComponents/ButtonContent/ButtonContent";
@@ -70,13 +71,7 @@ export const StressTest = (props: StressTestProps) => {
                         <div
                             class={[
                                 styles.fpsCounter,
-                                styles.fpsCounterVariants[
-                                    getFrameRate().average >= 59.5
-                                        ? "good"
-                                        : getFrameRate().average >= 29.5
-                                          ? "mid"
-                                          : "bad"
-                                ],
+                                styles.fpsCounterVariants[StressTestUtils.getGrade(getFrameRate().average)],
                             ].join(" ")}
                         >{`FPS: ${getFrameRate().current.toFixed(1)}\nAVG: ${getFrameRate().average.toFixed(1)}`}</div>
                         <div
