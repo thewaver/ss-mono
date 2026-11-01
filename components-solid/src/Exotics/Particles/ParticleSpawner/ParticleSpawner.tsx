@@ -179,6 +179,7 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
             const center = { x: entry.pos.x + direct.shiftX, y: entry.pos.y + direct.shiftY };
             const tint = getTint(entry.defs);
 
+            area ??= ParticleSpawnerUtils.settleArea(engine.getPlacement(), size);
             area = ParticleSpawnerUtils.growArea(area, center, size, direct);
             slices.push({
                 left: center.x - size.width * 0.5,

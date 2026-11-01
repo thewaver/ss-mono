@@ -15,6 +15,7 @@ import type {
     ParticleSpawnerDirectValues,
     ParticleSpawnerFrame,
     ParticleSpawnerParticle,
+    ParticleSpawnerPlacement,
     ParticleSpawnerTiming,
     ParticleTravelDefs,
 } from "./ParticleSpawner.types";
@@ -54,13 +55,6 @@ const NO_PARTICLES: RoundParticle[] = [];
 const NO_MODIFIERS: ParticleModifier[] = [];
 
 const NO_RECTS: (Rect | undefined)[] = [];
-
-type Placement = {
-    origin: Point2d;
-    targets: (Point2d | undefined)[];
-    modMarkers: (Point2d | undefined)[];
-    prefersReducedMotion: boolean;
-};
 
 type Leg = { legIndex: number; t: number; elapsedMs: number };
 
@@ -212,6 +206,43 @@ export namespace ParticleSpawnerUtils {
     };
 
     /**
+     * The area a spawner's canvas starts a round with, taking in every place its particles are headed for: the
+     * spawner's own box and every target and modifier marker, each with room for a particle around it.
+     *
+     * Starting from it, the area stays the same size while the round's particles fly between those places, and
+     * {@link growArea} grows it only for a particle carried further — scaled up past its size, or pushed away by a
+     * modifier. Snapped to the same blocks as {@link growArea}, with one block more on every side.
+     *
+     * @param placement Where the spawner, its targets and its markers are, from the engine's `getPlacement`;
+     * `undefined` before anything was measured.
+     * @param size The particle's size.
+     * @returns The area, relative to the spawner's box, or `undefined` when `placement` is, so the area starts from the
+     * first particle alone.
+     */
+    export const settleArea = (placement: ParticleSpawnerPlacement | undefined, size: Size2d): Rect | undefined => {
+        if (!placement) return undefined;
+
+        const reach = Math.hypot(size.width, size.height) * 0.5 + AREA_STEP_PX;
+        const { origin, rootSize } = placement;
+
+        let left = snapOut(origin.x - rootSize.width * 0.5 - reach);
+        let top = snapOut(origin.y - rootSize.height * 0.5 - reach);
+        let right = snapIn(origin.x + rootSize.width * 0.5 + reach);
+        let bottom = snapIn(origin.y + rootSize.height * 0.5 + reach);
+
+        for (const point of [...placement.targets, ...placement.modMarkers]) {
+            if (!point) continue;
+
+            left = Math.min(left, snapOut(point.x - reach));
+            top = Math.min(top, snapOut(point.y - reach));
+            right = Math.max(right, snapIn(point.x + reach));
+            bottom = Math.max(bottom, snapIn(point.y + reach));
+        }
+
+        return { x: left, y: top, width: right - left, height: bottom - top };
+    };
+
+    /**
      * Writes a particle's position onto its element, centering the element on the point.
      *
      * Set directly on the style rather than through a signal, because this runs for every live
@@ -268,7 +299,7 @@ export namespace ParticleSpawnerUtils {
      * @param defs.onAnimationEnd Runs after the last played round of a stage that names no next one.
      * @param defs.onTick Runs after each draw that placed any particle.
      * @returns `particles`, the particles that are out, as a store; `setIsRunning`, `restart`, `render`, `scrub`, `emit`,
-     * `drawParticle`, `getHasEnded` and `stop`.
+     * `drawParticle`, `getPlacement`, `getHasEnded` and `stop`.
      */
     export const createEngine = (defs: {
         getTargetCount: () => number;
@@ -302,7 +333,7 @@ export namespace ParticleSpawnerUtils {
         let isWriting = false;
         let lastMs = 0;
         let ownProgress = NO_PROGRESS;
-        let lastPlacement: Placement | undefined;
+        let lastPlacement: ParticleSpawnerPlacement | undefined;
         let pendingStage: number | undefined;
         let waitMs = 0;
         let waitStartMs = 0;
@@ -353,13 +384,14 @@ export namespace ParticleSpawnerUtils {
             return count > 0 && defs.getPatterns()[stageIndex] ? createRound(count, defs.getTiming(), 0) : undefined;
         };
 
-        const toPlacement = (frame: ParticleSpawnerFrame): Placement | undefined => {
+        const toPlacement = (frame: ParticleSpawnerFrame): ParticleSpawnerPlacement | undefined => {
             const rootRect = frame.rootRect;
 
             if (!rootRect) return undefined;
 
             return {
                 origin: { x: rootRect.width * 0.5, y: rootRect.height * 0.5 },
+                rootSize: { width: rootRect.width, height: rootRect.height },
                 targets: frame.targetRects.map((rect) => (rect ? toRelativeCenter(rect, rootRect) : undefined)),
                 modMarkers: (frame.modMarkerRects ?? NO_RECTS).map((rect) =>
                     rect ? toRelativeCenter(rect, rootRect) : undefined,
@@ -368,10 +400,14 @@ export namespace ParticleSpawnerUtils {
             };
         };
 
-        const toStopPos = (stop: ParticleRouteStop | undefined, placement: Placement) =>
+        const toStopPos = (stop: ParticleRouteStop | undefined, placement: ParticleSpawnerPlacement) =>
             (stop === undefined || stop === "spawner" ? undefined : placement.targets[stop]) ?? placement.origin;
 
-        const toTravel = (particle: RoundParticle, legIndex: number, placement: Placement): ParticleTravelDefs => ({
+        const toTravel = (
+            particle: RoundParticle,
+            legIndex: number,
+            placement: ParticleSpawnerPlacement,
+        ): ParticleTravelDefs => ({
             id: particle.id,
             index: particle.index,
             stop: particle.route[legIndex],
@@ -384,7 +420,7 @@ export namespace ParticleSpawnerUtils {
             prefersReducedMotion: placement.prefersReducedMotion,
         });
 
-        const place = (particle: RoundParticle, el: HTMLElement | undefined, placement: Placement) => {
+        const place = (particle: RoundParticle, el: HTMLElement | undefined, placement: ParticleSpawnerPlacement) => {
             const { legIndex, t, elapsedMs } = toLeg(particle);
             const travel = toTravel(particle, legIndex, placement);
             const pos = (defs.getModifiers() ?? NO_MODIFIERS).reduce(
@@ -497,7 +533,7 @@ export namespace ParticleSpawnerUtils {
             }
         };
 
-        const draw = (placement: Placement | undefined) => {
+        const draw = (placement: ParticleSpawnerPlacement | undefined) => {
             const isDrawingElements = defs.getIsDrawingElements();
             const live: RoundParticle[] = [];
             const rounds = played ? [played, ...emitted] : [...emitted];
@@ -643,6 +679,12 @@ export namespace ParticleSpawnerUtils {
 
                 if (particle && placement) place(particle, el, placement);
             },
+            /**
+             * Where the spawner, its targets and its markers were at the last draw, relative to the spawner's box —
+             * what {@link settleArea} takes. Measures them itself only before any draw has, and answers `undefined`
+             * while the spawner is not on the page.
+             */
+            getPlacement: () => lastPlacement ?? toPlacement(defs.getFrame()),
             /** Whether the last played round of the last stage is done. `restart` plays them again. */
             getHasEnded: () => hasEnded,
             /** Stops the frames and forgets every round and particle. The engine can be run again. */

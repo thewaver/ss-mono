@@ -50,3 +50,5 @@ export type SliceRendererPicture = {
     status: SliceRendererPictureStatus;
     size: Size2d;
 };
+
+export type SliceRendererThread = "worker" | "in_thread";

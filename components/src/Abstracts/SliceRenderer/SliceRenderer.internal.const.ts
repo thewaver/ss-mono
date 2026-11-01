@@ -16,7 +16,43 @@ precision highp int;
 #define BLUR_EPS 0.01
 #define BLUR_REACH 3.0
 #define BOX_PER_SIGMA 3.4641
+
+layout(std140) uniform Item {
+    vec4 u_area;
+    vec2 u_size;
+    vec2 u_viewport;
+    vec2 u_scale;
+    float u_timeline;
+    float u_half;
+    float u_desc;
+    float u_clock;
+    float u_lifetime;
+    float u_perspective;
+    float u_srcScale;
+    int u_easingRow;
+    int u_mode;
+    int u_channelMode;
+    int u_isSprite;
+};
 `;
+
+const ITEM_MEMBERS = [
+    "u_area",
+    "u_size",
+    "u_viewport",
+    "u_scale",
+    "u_timeline",
+    "u_half",
+    "u_desc",
+    "u_clock",
+    "u_lifetime",
+    "u_perspective",
+    "u_srcScale",
+    "u_easingRow",
+    "u_mode",
+    "u_channelMode",
+    "u_isSprite",
+];
 
 const EVALUATION = `
 #define TRACK_COUNT ${TRACK_KEYS.length}
@@ -25,13 +61,6 @@ const EVALUATION = `
 ${TRACK_DEFINES}
 
 uniform highp sampler2D u_tables;
-uniform int u_easingRow;
-uniform int u_mode;
-uniform float u_timeline;
-uniform float u_half;
-uniform float u_desc;
-uniform float u_clock;
-uniform float u_lifetime;
 
 layout(location = 0) in vec2 a_corner;
 layout(location = 1) in vec4 a_rect;
@@ -236,11 +265,6 @@ vec4 applyColorFilters(vec4 premultiplied, vec4 filtersA, float saturate) {
 `;
 
 const DRAW_VERTEX = `${HEADER}${EVALUATION}
-uniform vec2 u_size;
-uniform vec4 u_area;
-uniform float u_perspective;
-uniform vec2 u_viewport;
-uniform vec2 u_scale;
 
 out vec2 v_local;
 flat out vec4 v_tint;
@@ -284,11 +308,6 @@ void main() {
 
 const DRAW_FRAGMENT = `${HEADER}${FILTERS}
 uniform sampler2D u_src;
-uniform vec2 u_size;
-uniform vec2 u_scale;
-uniform int u_channelMode;
-uniform int u_isSprite;
-uniform float u_srcScale;
 
 in vec2 v_local;
 flat in vec4 v_tint;
@@ -338,4 +357,6 @@ export namespace SliceRendererConst {
     export const EASING_SAMPLE_COUNT = EASING_SIZE;
     export const VERTEX_SHADER = DRAW_VERTEX;
     export const FRAGMENT_SHADER = DRAW_FRAGMENT;
+    export const ITEM_BLOCK_NAME = "Item";
+    export const ITEM_BLOCK_MEMBERS = ITEM_MEMBERS;
 }

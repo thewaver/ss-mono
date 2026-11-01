@@ -9,6 +9,10 @@ import { useElementRenderer } from "./helpers";
  *
  * The suite's browser runs WebGL in software (`playwright.config.ts`), which is enough to tell a painted canvas from
  * an empty one and says nothing about how a real graphics card draws.
+ *
+ * The canvas check polls at a fixed 50 ms rather than Playwright's growing intervals, because the dissolve's burning
+ * card holds a picture for only about half a second and the renderer's first frame may land a little later when it
+ * runs on a worker.
  */
 
 const PAGES: { route: string; start?: (page: Page) => Promise<void> }[] = [
@@ -70,7 +74,7 @@ for (const { route, start } of PAGES) {
         await open(page, route, start);
 
         await expect
-            .poll(() => paintedPixels(page), { message: "a canvas holds a picture", timeout: 10_000 })
+            .poll(() => paintedPixels(page), { message: "a canvas holds a picture", timeout: 10_000, intervals: [50] })
             .toBeGreaterThan(0);
 
         expect(await picturedElements(page), "and no slice or particle is an element of its own").toBe(0);

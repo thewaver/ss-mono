@@ -22,6 +22,12 @@ nothing installed, stop what you start. The frame-rate comparison is `perfCompar
    (`[data-prop][data-testid="onGraphicsCard"] input`), which drives the components' `renderer`, let real time pass so the page settles (`waitForTimeout`), open the stress test, then advance the clock to
    fixed moments and screenshot items by their `img` anchor's box.
 6. **Check the harness first**: one renderer against itself must come out identical (difference 0).
+7. **The renderer picks its thread itself, and nothing overrides it**: with the SwiftShader flags above the read-back
+   measures 0 and it stays in-thread; with Playwright's default headless flags it measures about 4.8 ms per megapixel
+   and takes the worker. To force in-thread, stub `Worker` to throw in the init script; to force the worker, drop the
+   flags. **Under the worker, wait before each screenshot until every submitted frame is shown** — wrap `Worker` in the
+   init script, note the `id` of each posted `frame` message and the `frame` of each `shown` reply, and wait until they
+   match, since a frame is drawn a task or more after the clock advanced.
 
 ## Reading the result
 

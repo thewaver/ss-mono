@@ -1,4 +1,4 @@
-import type { CSSAnimationValues, Point2d, Rect } from "@thewaver/ss-utils";
+import type { CSSAnimationValues, Point2d, Rect, Size2d } from "@thewaver/ss-utils";
 
 import type { SliceAnimationRenderer } from "../../../Abstracts/SliceAnimation/SliceAnimation.types";
 
@@ -80,6 +80,19 @@ export type ParticleSpawnerFrame = {
     /** Each of `modMarkers`' boxes, in the same coordinates. Left out when there are none. */
     modMarkerRects?: (Rect | undefined)[];
     /** Whether the reader asked for reduced motion, handed on to `computeParticlePos`. */
+    prefersReducedMotion: boolean;
+};
+
+export type ParticleSpawnerPlacement = {
+    /** The spawner's center, relative to its own box. */
+    origin: Point2d;
+    /** The size of the spawner's box. */
+    rootSize: Size2d;
+    /** Each target's center, relative to the spawner's box, or `undefined` for one not on the page. */
+    targets: (Point2d | undefined)[];
+    /** Each of `modMarkers`' centers, relative to the spawner's box, or `undefined` for one not on the page. */
+    modMarkers: (Point2d | undefined)[];
+    /** Whether the reader asked for reduced motion. */
     prefersReducedMotion: boolean;
 };
 

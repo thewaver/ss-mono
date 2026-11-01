@@ -63,6 +63,54 @@ under 6 frames a second.
 | Fields, 72         | 5.0     | 2.4             | —                       |
 | Dissolve, 20 cards | 4.9     | 1.8             | —                       |
 
+## Stored results for `8d520e91`, both renderers
+
+Measured with the same scenarios, the renderer chosen through each stress test's "On the graphics card" checkbox
+(`[data-prop][data-testid="onGraphicsCard"] input`, set before pressing "Render …"). Chrome 156 uncapped, median of
+three; Safari 27 at the 60 Hz cap, upper of two. `tail` is a cross-browser stand-in for main-thread frame cost: the
+median delay from inside the recording `requestAnimationFrame` callback to a `MessageChannel` message posted there,
+which covers the remaining callbacks plus style, layout, paint and commit. Safari reports it in whole milliseconds.
+
+**Apple M3 Pro** (`ANGLE (Apple, ANGLE Metal Renderer: Apple M3 Pro, Unspecified Version)`), 1920 × 1080 at 60 Hz.
+
+| Test               | Renderer      | Chrome avg | Chrome p90 | Chrome main ms | Chrome tail ms | Safari avg | Safari p90 | Safari tail ms |
+| ------------------ | ------------- | ---------- | ---------- | -------------- | -------------- | ---------- | ---------- | -------------- |
+| Cells, 2D zoom     | graphics card | 300.0      | 277.8      | 3.2            | 2.8            | 60.0       | 58.8       | 2              |
+| Cells, 2D zoom     | elements      | 69.0       | 48.1       | 14.7           | 12.5           | 31.8       | 23.3       | 31             |
+| Cells, fade        | graphics card | 300.3      | 270.3      | 3.2            | 0.6            | 60.0       | 58.8       | 2              |
+| Cells, fade        | elements      | 83.5       | 54.9       | 11.8           | 9.5            | 42.7       | 29.4       | 21             |
+| Cells, blur        | graphics card | 198.9      | 151.5      | 4.8            | 4.1            | 59.9       | 55.6       | 2              |
+| Cells, blur        | elements      | 3.3        | 1.4        | 348.1          | 301.9          | 10.4       | 3.9        | 33             |
+| Cells, 3D cube     | graphics card | 287.3      | 222.2      | 3.2            | 2.8            | 60.0       | 58.8       | 2              |
+| Cells, 3D cube     | elements      | 3.9        | 1.5        | 271.0          | 138.6          | 0.9        | 0.6        | 83             |
+| Scanlines, moves   | graphics card | 249.7      | 222.2      | 3.8            | 3.5            | 60.0       | 58.8       | 2              |
+| Scanlines, moves   | elements      | 64.2       | 51.5       | 15.9           | 14.6           | 27.3       | 25.0       | 36             |
+| Scanlines, filters | graphics card | 260.3      | 232.6      | 3.7            | 3.4            | 59.9       | 58.8       | 2              |
+| Scanlines, filters | elements      | 15.0       | 9.7        | 68.9           | 61.5           | 20.1       | 13.9       | 30             |
+| Spawners, 72       | graphics card | 170.0      | 108.7      | 6.0            | 4.5            | 60.1       | 55.6       | 8              |
+| Spawners, 72       | elements      | 10.9       | 6.1        | 95.8           | 70.1           | 13.6       | 10.8       | 75             |
+| Fields, 72         | graphics card | 270.1      | 188.7      | 3.8            | 3.0            | 60.0       | 58.8       | 4              |
+| Fields, 72         | elements      | 16.3       | 8.7        | 63.9           | 45.1           | 9.4        | 5.3        | 90             |
+| Dissolve, 20 cards | graphics card | 453.6      | 238.1      | 2.0            | 0.3            | 59.8       | 58.8       | 1              |
+| Dissolve, 20 cards | elements      | 3.2        | 1.0        | 396.6          | 110.2          | 18.6       | 7.9        | 23             |
+
+The installed Firefox 155, graphics card only, at its 60 Hz cap: cells, scanlines, fields and dissolve at 58–60 with a
+tail of 9–15 ms (the dissolve 0), the blur cells at 47 with a tail of 20, and the spawners at 39 with a tail of 26.
+
+## Safari and the installed Firefox: a same-origin probe page, since neither has a driver here
+
+Playwright drives only Chrome on this machine: its Firefox build installs but shows "Profile Missing" on every launch,
+headed or headless, and Safari has no driver without enabling remote automation. Both were measured through a page
+served from the build's own folder (`probe.html` beside `index.html`), which embeds the route in a 1600 × 1200 iframe,
+scripts it as the same origin (clicks the combobox and option, sets the checkbox, fills the number knob through the
+native value setter plus `input`/`change`/`blur`, presses "Render …"), records 5 s of frame stamps and the tail
+inside the iframe window, posts the result to a small collector on another port, and navigates itself to the next job.
+Opened with `open -a Safari <url>` or `open -a Firefox <url>`; the collector answers `OPTIONS` with
+`Access-Control-Allow-Origin: *`. A locked screen stops the browser painting and voids whatever ran meanwhile, so the
+start and end time of each pass is recorded and compared with the lock. Neither browser can be uncapped, so the tail is
+the number to compare. The scripts that did this were in `.scratch/perf/` and are rewritten from this description when
+needed.
+
 ## Steps
 
 1. **Check the machine.** `npm install` must have been run, and Playwright's Chromium must be present

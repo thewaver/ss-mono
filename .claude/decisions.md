@@ -9459,7 +9459,8 @@ component passes the same array every frame — a constant where it has none (`P
 travel, growth, turning, nearness under perspective, blur — because a first, generous bound made the scanline
 canvases six times their box and cost most of their frame rate. Travel reaches only the sides it heads towards, which
 is safe because the shader adds travel after turning and a track never leaves its stops' range. **A spawner's area
-grows as its particles fly and starts again from nothing once none is left** (`ParticleSpawnerUtils.growArea`). Three
+starts each round from every place its particles head for, grows if one is carried further, and starts again once
+none is left** (`ParticleSpawnerUtils.settleArea`, `growArea`; why it is settled is under the worker, below). Three
 other sizings were built and measured, and none earned its place: following the particles frame by frame resized
 canvases often enough to slow Chrome; one size per round, worked out ahead from every particle's path, and stepped sizes
 over the round, also worked out ahead, both left Firefox no faster. **Firefox pays for the shared picture, not for a
@@ -9488,8 +9489,8 @@ fetched once and warned about if it has more than one; an SVG is not checked, si
 and cell elements are, so it stacks and clips as they did: under a modal while the spawner is on the page, inside the
 modal while the spawner is in it. One canvas over the whole page was ruled out for exactly that stacking. It reaches
 as far as anything it draws travels, since particles leave their box on purpose (ash rising off a button, a spawner
-reaching a target elsewhere): `ParticleField` and `ParticleDissolve` from their tables, `ParticleSpawner` from its
-live particles each frame, growing in steps and starting again once none is left.
+reaching a target elsewhere): `ParticleField` and `ParticleDissolve` from their tables, `ParticleSpawner` from
+where its round's particles head, growing in steps past that and starting again once none is left.
 
 **Checking it.** `.claude/gpuCompare.md` compares the two renderers headlessly, picture for picture, and
 `.claude/perfCompare.md` their frame rates in a real window. `e2e/graphicsCard.spec.ts` checks only which renderer
@@ -9504,6 +9505,78 @@ card only on a soft edge, where the element comes out slightly lighter. `Particl
 the color of the content it rose from, and a fully see-through tint where it found none. The spawner works its path
 and its look out in JavaScript on either renderer, so the graphics card draws only its scale, turn, fade and travel
 (`ParticleSpawnerUtils.toDirectValues`); a filter shows only on elements.
+
+**The renderer runs on a worker thread where reading the shared picture back is slow, and makes fewer WebGL calls —
+the user adopted both after they were measured on the M3 Pro** (Chrome 156 uncapped, Safari 27 and Firefox 155 at the
+60 Hz cap, the Solid Playground's stress tests; the method and the stored tables are in `.claude/perfCompare.md`).
+Before them, at 72 components: Chrome spent about 3 ms of main thread a frame and ran 300 frames a second uncapped (170
+for the spawners); Safari held the refresh rate with a 2 ms frame tail (8 ms for the spawners); Firefox spent 9–15 ms
+of main thread a frame, which dropped the blur cells to 47 frames a second and the spawners to 39. A Chrome trace put
+its 3 ms at about half WebGL calls (17 uniform writes per component a frame, 1.2 ms of them) and half the main thread
+blocked on the GPU process's command buffer; the Firefox time is the read-back of the shared picture
+(`transferToImageBitmap`, about 3–4 ms per megapixel there, 0 in Chrome, about 0.2 in Safari).
+
+- **The host and the executor.** `SliceRendererUtils` is split in two. The host, on the page's thread, keeps every
+  calculation — pictures, tints, areas, instance and table data, the depth sort, the shared picture's layout and its
+  grow and shrink rules — and packs one message a frame. The executor, `runExecutor`, owns the WebGL 2 context, the
+  per-item buffers and textures and the item canvases, and does only what the message says. It runs either in-thread,
+  called directly with the probe's canvas, or in a dedicated worker made from a Blob URL of its own source, with each
+  item canvas handed over by `transferControlToOffscreen`. **So the executor must stay self-contained**: it references
+  only its parameters and browser globals, everything else (shaders, the placement layout, the uniform block's
+  offsets) arrives in `EXECUTOR_PARAMS`, and after `npm run build -w components` the function in
+  `dist/Abstracts/SliceRenderer/SliceRenderer.utils.js` is checked to name nothing else. Nothing framework-side
+  changed, since every framework reaches the renderer through `createItem`. Where `Worker` or
+  `transferControlToOffscreen` is missing, or the worker throws or fails before it is ready, the host falls back to
+  in-thread and replays what it had queued. A worker that throws after it is ready is terminated and the renderer
+  counts as failed: it marks itself lost and notifies, and every component falls back to elements as on a lost context,
+  for the rest of the page's life — in-thread is no longer possible, since the canvases already belong to the worker. A canvas handed to the worker can never be drawn into or read on the page
+  again, which the Solid `Show` already tolerates by remounting the canvas on a renderer switch.
+- **The thread is chosen once, by measuring the read-back**, so no browser is named: at the renderer's first use a
+  1024 × 1024 probe context is read back once untimed (the first read-back carries a one-time cost — about 30 ms in
+  headless Chromium against 5 for the rest), then enough times to cover `READ_BACK_PROBE_MEGAPIXELS` in one timed
+  span, and the cost per megapixel is compared with `WORKER_READ_BACK_MS_PER_MEGAPIXEL`; above it, the worker.
+  **The sample is summed because Safari's clock steps in whole milliseconds**: a single 1-megapixel read-back read 0,
+  1 or 2 ms there for the same work, which sits on the threshold either way, while one span over four reads at most
+  one tick too many, about 0.25 per megapixel. Expected readings: Chrome about 0, Safari about 0.2 (at most 0.5),
+  Firefox 3–4. **Both constants, 4 megapixels and 1 ms per megapixel, are Claude's round guesses and the user's to
+  tune.** The probe costs Firefox an estimated 15–20 ms once, at the renderer's first use (five read-backs at its 3–4 ms each). `getThread` and
+  `getReadBackMsPerMegapixel` publish the choice and the reading; nothing overrides the choice, so a comparison forces
+  a thread from outside (`.claude/gpuCompare.md`).
+- **At most one frame is in flight.** While the worker is drawing, an animation frame sends nothing and marks a frame
+  pending; the `shown` reply sends it at once with every component's latest frame, so a slow worker drops frames
+  rather than queueing them. In-thread a frame is shown before `send` returns, so the rule never holds anything back.
+- **Fewer WebGL calls.** Each item's values go into one std140 uniform block, written into the frame's placement data
+  on the host and uploaded once a frame with `bindBufferRange` per item; instance buffers keep spare capacity and are
+  written with `bufferSubData` instead of a fresh `bufferData`. The block's member offsets are checked against the
+  driver's at context creation, and a mismatch throws, which falls back to elements.
+- **The transferred buffers are pooled.** A frame's `placements`, `instances` and `tables` arrays travel to the worker
+  as transferred buffers, so the host can no longer reuse them; the executor hands every one back in its `shown`
+  reply, and the host takes the smallest pooled buffer that fits before allocating a new one, sized up to a power of two.
+  In-thread the same buffers come back at once. Without the pool, garbage collection on the spawner stress test rose
+  from 0.12 to 0.35 ms a frame.
+- **`ParticleSpawner` settles its area for a round instead of following it.** Under a worker, a canvas whose box
+  changes shows one stretched frame: the host sets the canvas's CSS box in one task and the worker resizes its bitmap in
+  another, and the browser may paint between them. The other components' boxes never change while they play; the
+  spawner's did, as its particles flew. So when the first particle of a round appears, the area starts from
+  `ParticleSpawnerUtils.settleArea`: the spawner's own box and every target's and modifier marker's center, each
+  padded by a particle's half-diagonal plus one `AREA_STEP_PX` block, snapped out to those blocks — the union of
+  every place the round's particles head for, from the engine's `getPlacement`. `growArea` still grows it for a
+  particle carried further (scaled up, pushed by a modifier), and it still starts again once no particle is left. **This
+  is not the "one size per round" trial above**: that was worked out from every particle's path and was dropped
+  because it left Firefox no faster; this one exists because a box that moves frame by frame cannot be kept in step
+  across two threads, and it reads only boxes the engine already measured.
+- **Measured.** Firefox takes the worker, and its main-thread frame tail falls from 9–27 ms to 0–4 ms; the spawners go
+  from 39 to 60 frames a second and the blur cells from 47 to 60 (their pictures update about 40 times a second while
+  the page runs at 60), and with the uniform block the fields on the worker went from 54 to 60. Chrome measures the
+  read-back at 0 and stays in-thread; forced onto the worker it freed about 1 ms a frame at 60 Hz, with more garbage
+  collection, which the pool answers. The uniform block moved Chrome's time to `bindTexture` and its frame rates by
+  −2% to +5%: the cost there is whichever call waits on the GPU process, not the call count. Safari stays in-thread,
+  and has to: its canvases owned by a worker update only 30–46 times a second however little the worker does; the
+  uniform block and instance headroom took its spawner frame tail from 8 to 2 ms, since the spawner re-sends its
+  instance data every frame. Pictures match the previous renderer exactly on all six stress pages.
+- **Closed by measurement, in a standalone probe:** one WebGL context per component — Chrome and Safari keep 16 on the
+  main thread and 4 in a worker, Firefox keeps all 72; cutting the shared picture into `bitmaprenderer` canvases with
+  `createImageBitmap` in a worker — wrong pictures in Firefox, 130 ms a frame in Safari.
 
 ### `CellAnimation`: the screen wipe is an example, not a component
 
