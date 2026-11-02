@@ -483,7 +483,7 @@ while, then retired whole (_"The gallery is gone"_, above).
   The user's call, after About wrapped at 720 and Docs at 960: one number for everything, with code boxes
   scrolling sideways rather than widening the page, and the docs table losing its `Passing` column to fit. A root-relative link a page draws itself, such as the rich-text
   sample's, goes through `toOwnAppHref` so it stays inside its own app.
-- **The site is assembled by `npm run build:site`**: the Solid app built with base `/solid/` into `dist/solid`, the
+- **The site is assembled by `npm run build:playground`**: the Solid app built with base `/solid/` into `dist/solid`, the
   React app with `/react/` into `dist/react`, and `playground/landing/index.html` — plain HTML, two links, as
   bare as the user asked — at the root. `vercel.json` serves each app's `index.html` for its own routes and sends
   every older address, from before the apps moved under a prefix, to the same page under `/solid/`.
@@ -2626,8 +2626,9 @@ A green `verify:dom` reads as broader coverage than it is, so the shape of its b
 ```bash
 npm start # dev server for the Playground
 npm run build # utils first, then the components library: vite lib build + tsup .d.ts emit
-npm run build:playground
-npm run build:all # both of the above
+npm run build:playground # all four Playgrounds plus the landing page, into dist/
+npm run build:playground:solid # one Playground alone; also :react, :vue, :svelte
+npm run build:all # the library, then build:playground
 npm test # vitest in all three packages
 npm run verify:dom # playwright: build the playground, then drive it in a real browser
 npm run format # prettier, 4 spaces, 120 cols, import sorting
