@@ -67,7 +67,7 @@ watch(
             </PageLayer>
         </div>
 
-        <PageLayer v-if="file" :level="1">
+        <PageLayer v-if="file" :level="0">
             <div :class="styles.docsExampleCode">
                 <Collapsible sizing="fill" is-panel-built-on-expand>
                     <template #renderTrigger="flags">

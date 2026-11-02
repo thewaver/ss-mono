@@ -8,7 +8,8 @@ const TOGGLE_HEIGHT = 32;
 const TOGGLE_BORDER = 2;
 const HANDLE_GAP = 4;
 const HANDLE_SIZE = TOGGLE_HEIGHT - 2 * (TOGGLE_BORDER + HANDLE_GAP);
-const HANDLE_TRAVEL = TOGGLE_WIDTH - 2 * (TOGGLE_BORDER + HANDLE_GAP) - HANDLE_SIZE;
+const HALF_SIZE = HANDLE_SIZE * 0.5;
+const HALF_TRAVEL = (TOGGLE_WIDTH - TOGGLE_HEIGHT) * 0.5;
 
 export const isChecked = style([lookStates.isChecked]);
 export const isMixed = style([lookStates.isMixed]);
@@ -48,18 +49,18 @@ export const toggleHandle = style([
     lookEntries.toggleHandle,
     {
         position: "absolute",
-        top: HANDLE_GAP,
-        insetInlineStart: HANDLE_GAP,
+        top: `calc(50% - ${HALF_SIZE}px)`,
+        insetInlineStart: `calc(50% - ${HALF_SIZE + HALF_TRAVEL}px)`,
         width: HANDLE_SIZE,
         height: HANDLE_SIZE,
         transition: `inset-inline-start ${themeVars.animation.duration}, background-color ${themeVars.animation.duration}`,
 
         selectors: {
             [`${toggleContent}.${isMixed} &`]: {
-                insetInlineStart: HANDLE_GAP + HANDLE_TRAVEL * 0.5,
+                insetInlineStart: `calc(50% - ${HALF_SIZE}px)`,
             },
             [`${toggleContent}.${isChecked} &`]: {
-                insetInlineStart: HANDLE_GAP + HANDLE_TRAVEL,
+                insetInlineStart: `calc(50% - ${HALF_SIZE - HALF_TRAVEL}px)`,
             },
         },
     },

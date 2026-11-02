@@ -74,7 +74,7 @@
         {#if file}
             {@const source = file.source}
 
-            <PageLayer level={1}>
+            <PageLayer level={0}>
                 <div class={styles.docsExampleCode}>
                     <Collapsible sizing={"fill"} isPanelBuiltOnExpand={true}>
                         {#snippet renderTrigger(flags)}

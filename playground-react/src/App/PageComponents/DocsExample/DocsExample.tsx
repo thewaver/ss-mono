@@ -71,7 +71,7 @@ export const PageDocsExample = (props: PropsWithChildren<PageDocsExampleProps>) 
             </div>
 
             {file && (
-                <PageLayer level={1}>
+                <PageLayer level={0}>
                     <div className={styles.docsExampleCode}>
                         <Collapsible
                             sizing={"fill"}

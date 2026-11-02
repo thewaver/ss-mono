@@ -22169,8 +22169,8 @@ The Playground's examples describe the keyboard route only ("Hold Enter or Space
 
 **The "Show code" accordion is drawn below the example box, not inside it.** The example is a column
 (`docsExampleStack`): first the box with the demo and its knobs, carrying `docsExample`
-and the `data-docs-example` marker; then the accordion on its own, at the same layer level as the box so it keeps
-its colors, inside a `docsExampleCode` box that gives it the box's shadow and the header's rounding. Specs find an
+and the `data-docs-example` marker; then the accordion on its own, at level 0, since it sits on the page background
+like the box rather than in it (the user's correction — it first carried the box's level 1), inside a `docsExampleCode` box that gives it the box's shadow and the header's rounding. Specs find an
 example by the marker on the box, so the code — which repeats an example's text — can never match a locator built
 from that text.
 

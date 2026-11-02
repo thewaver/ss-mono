@@ -38,8 +38,15 @@ export const OrientationDocsExample = (props: Props) => {
                 sizing={access(props.orientation) === "horizontal" ? "fit-content" : undefined}
                 isSingleExpand={true}
                 isExpandRequired={true}
-                renderHeader={(getItem) => (
-                    <div class={[styles.orientationStrip, getLayerClass()].join(" ")}>
+                renderHeader={(getItem, getFlags) => (
+                    <div
+                        class={styles.orientationStrip}
+                        classList={{
+                            [getLayerClass()]: true,
+                            [styles.isExpanded]: getFlags().isExpanded,
+                            [styles.isHovered]: getFlags().isHovered,
+                        }}
+                    >
                         <span class={styles.orientationLabel}>{getItem().value}</span>
                     </div>
                 )}

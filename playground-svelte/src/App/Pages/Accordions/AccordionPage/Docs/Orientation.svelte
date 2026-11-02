@@ -40,8 +40,15 @@
         isSingleExpand={true}
         isExpandRequired={true}
     >
-        {#snippet renderHeader(item)}
-            <div class={[styles.orientationStrip, layerClass]}>
+        {#snippet renderHeader(item, flags)}
+            <div
+                class={[
+                    styles.orientationStrip,
+                    layerClass,
+                    flags.isExpanded && styles.isExpanded,
+                    flags.isHovered && styles.isHovered,
+                ]}
+            >
                 <span class={styles.orientationLabel}>{item.value}</span>
             </div>
         {/snippet}

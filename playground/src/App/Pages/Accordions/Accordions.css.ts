@@ -1,6 +1,6 @@
 import { createVar, keyframes, style } from "@vanilla-extract/css";
 
-import { layerVars } from "../../StyledComponents/Layer/Layer.css";
+import { lookEntries, lookStates } from "../../Looks/Look.css";
 import { themeVars } from "../../Theme.css";
 
 export const textWithPanel = style({
@@ -70,28 +70,28 @@ export const orientationExample = style([
 const whenHorizontal = `${orientationExample}[data-orientation="horizontal"] &`;
 const whenVertical = `${orientationExample}[data-orientation="vertical"] &`;
 
-export const orientationStrip = style({
-    display: "flex",
-    alignItems: "center",
-    padding: themeVars.spacing.full,
-    borderRadius: themeVars.borderRadius.half,
-    backgroundColor: layerVars.main,
-    fontSize: themeVars.fontSize.medium,
-    transition: `filter ${themeVars.animation.duration}`,
+export const isExpanded = style([lookStates.isExpanded]);
+export const isHovered = style([lookStates.isHovered]);
 
-    selectors: {
-        "&:hover": {
-            filter: themeVars.hover.filter,
-        },
-        [whenHorizontal]: {
-            justifyContent: "center",
-            height: ROW_HEIGHT,
-        },
-        [whenVertical]: {
-            width: "100%",
+export const orientationStrip = style([
+    lookEntries.accordionHeader,
+    {
+        display: "flex",
+        alignItems: "center",
+        padding: themeVars.spacing.full,
+        transition: `filter ${themeVars.animation.duration}`,
+
+        selectors: {
+            [whenHorizontal]: {
+                justifyContent: "center",
+                height: ROW_HEIGHT,
+            },
+            [whenVertical]: {
+                width: "100%",
+            },
         },
     },
-});
+]);
 
 export const orientationLabel = style({
     selectors: {
@@ -105,31 +105,32 @@ export const orientationLabel = style({
 
 export const isEntering = style({});
 
-export const orientationPanel = style({
-    vars: { [moveVar]: "0" },
-    display: "flex",
-    flexDirection: "column",
-    gap: themeVars.spacing.full,
-    padding: themeVars.spacing.double,
-    borderRadius: themeVars.borderRadius.half,
-    backgroundColor: layerVars.main,
-    fontSize: themeVars.fontSize.small,
+export const orientationPanel = style([
+    lookEntries.panel,
+    {
+        vars: { [moveVar]: "0" },
+        display: "flex",
+        flexDirection: "column",
+        gap: themeVars.spacing.full,
+        padding: themeVars.spacing.double,
+        fontSize: themeVars.fontSize.small,
 
-    selectors: {
-        [whenHorizontal]: {
-            justifyContent: "center",
-            width: ROW_PANEL_WIDTH,
-            height: ROW_HEIGHT,
-        },
-        '&[data-move="forward"]': {
-            vars: { [moveVar]: "1" },
-        },
-        '&[data-move="backward"]': {
-            vars: { [moveVar]: "-1" },
-        },
-        [`&.${isEntering}[data-move]`]: {
-            animationName: slideIn,
-            animationFillMode: "both",
+        selectors: {
+            [whenHorizontal]: {
+                justifyContent: "center",
+                width: ROW_PANEL_WIDTH,
+                height: ROW_HEIGHT,
+            },
+            '&[data-move="forward"]': {
+                vars: { [moveVar]: "1" },
+            },
+            '&[data-move="backward"]': {
+                vars: { [moveVar]: "-1" },
+            },
+            [`&.${isEntering}[data-move]`]: {
+                animationName: slideIn,
+                animationFillMode: "both",
+            },
         },
     },
-});
+]);

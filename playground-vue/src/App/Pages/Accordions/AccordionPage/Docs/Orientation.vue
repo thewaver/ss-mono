@@ -43,8 +43,15 @@ const expanded = shallowRef<string[]>(["Mountains"]);
             is-single-expand
             is-expand-required
         >
-            <template #renderHeader="{ item }">
-                <div :class="[styles.orientationStrip, layerClass]">
+            <template #renderHeader="{ item, flags }">
+                <div
+                    :class="[
+                        styles.orientationStrip,
+                        layerClass,
+                        flags.isExpanded && styles.isExpanded,
+                        flags.isHovered && styles.isHovered,
+                    ]"
+                >
                     <span :class="styles.orientationLabel">{{ item.value }}</span>
                 </div>
             </template>

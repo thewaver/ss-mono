@@ -80,7 +80,7 @@ LookUtils.define(plasticine, {
     },
     accordionHeader: {
         borderRadius: themeVars.borderRadius.half,
-        backgroundColor: layerVars.main,
+        backgroundColor: `rgb(from ${layerVars.main} r g b / 50%)`,
         color: layerVars.contrast,
         fontSize: themeVars.fontSize.medium,
         selectors: {

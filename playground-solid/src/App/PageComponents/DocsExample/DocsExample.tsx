@@ -58,7 +58,7 @@ export const PageDocsExample = (props: ParentProps<PageDocsExampleProps>) => {
 
             <Show when={getFile()}>
                 {(getLoadedFile) => (
-                    <PageLayer level={1}>
+                    <PageLayer level={0}>
                         <div class={styles.docsExampleCode}>
                             <Collapsible
                                 sizing={"fill"}
