@@ -5,27 +5,27 @@ import type { Look } from "./Look.types";
 import { layerVars } from "../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../Theme.css";
 
-export const pageBackground = style({
+const pageBackground = style({
     backgroundColor: themeVars.color.background.dark,
     backgroundImage: `linear-gradient(315deg, ${themeVars.color.background.dark}, ${themeVars.color.background.light})`,
     color: themeVars.color.background.contrast,
 });
 
-export const leftNav = style({
+const leftNav = style({
     backgroundColor: themeVars.color.surface.dark,
     backgroundImage: `linear-gradient(45deg, ${themeVars.color.surface.dark}, ${themeVars.color.surface.light})`,
     color: themeVars.color.surface.contrast,
     boxShadow: themeVars.shadow.large,
 });
 
-export const surface = style({
+const surface = style({
     backgroundColor: themeVars.color.surface.dark,
     backgroundImage: `linear-gradient(315deg, ${themeVars.color.surface.dark}, ${themeVars.color.surface.light})`,
     color: themeVars.color.surface.contrast,
     boxShadow: themeVars.shadow.medium,
 });
 
-export const tooltip = style({
+const tooltip = style({
     backgroundColor: layerVars.main,
     color: layerVars.contrast,
     boxShadow: themeVars.shadow.small,
@@ -44,7 +44,7 @@ const BUTTON_STATES = {
     },
 } as const;
 
-export const button = style({
+const button = style({
     backgroundColor: themeVars.color.primary.dark,
     backgroundImage: `linear-gradient(315deg, ${themeVars.color.primary.dark}, ${themeVars.color.primary.light})`,
     color: themeVars.color.primary.contrast,
@@ -52,14 +52,19 @@ export const button = style({
     selectors: BUTTON_STATES,
 });
 
-export const buttonSimple = style({
+const buttonSimple = style({
     backgroundColor: `rgb(from ${layerVars.contrast} r g b / 25%)`,
     color: layerVars.contrast,
     boxShadow: themeVars.shadow.small,
-    selectors: BUTTON_STATES,
+    selectors: {
+        ...BUTTON_STATES,
+        "[aria-selected='true'] &": {
+            color: themeVars.color.primary.main,
+        },
+    },
 });
 
-export const input = style({
+const input = style({
     border: `2px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
     backgroundColor: layerVars.main,
     color: layerVars.contrast,
@@ -82,18 +87,18 @@ export const input = style({
     },
 });
 
-export const dropdown = style({
+const dropdown = style({
     border: `2px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
     backgroundColor: layerVars.main,
     color: layerVars.contrast,
     boxShadow: themeVars.shadow.small,
 });
 
-export const hoverFloater = style({
+const hoverFloater = style({
     backgroundColor: `rgb(from ${layerVars.contrast} r g b / 25%)`,
 });
 
-export const item = style({
+const item = style({
     selectors: {
         "[aria-selected='true'] &": {
             color: themeVars.color.primary.main,
