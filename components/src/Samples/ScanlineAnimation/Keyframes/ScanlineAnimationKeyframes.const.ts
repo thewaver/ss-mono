@@ -8,16 +8,13 @@ import { SliceAnimationKeyframeUtils } from "../../../Generators/SliceAnimationK
 import { SliceAnimationWeightUtils } from "../../../Generators/SliceAnimationWeights/SliceAnimationWeights.utils";
 import type {
     ScanlineHorizontalBrightnessOpts,
+    ScanlineHorizontalDropoutOpts,
     ScanlineHorizontalGrayscaleOpts,
     ScanlineHorizontalHueOpts,
+    ScanlineHorizontalInterlaceOpts,
     ScanlineHorizontalSnakeOpts,
     ScanlineHorizontalSplitOpts,
     ScanlineHorizontalStretchOpts,
-    _ScanlineHorizontalDropoutOpts,
-    _ScanlineHorizontalInterlaceOpts,
-    _ScanlineHorizontalRollOpts,
-    _ScanlineHorizontalSkewOpts,
-    _ScanlineHorizontalWaveOpts,
 } from "./ScanlineAnimationKeyframes.types";
 
 const peak = (a: number, b: number, x: number) => {
@@ -52,19 +49,6 @@ const toSampledStops = (key: keyof SliceStop, compute: (local: number) => number
         return { at: local, [key]: compute(local) };
     });
 
-const perRow = (compute: (row: number, rowCount: number) => SliceStop[]) => {
-    const cache = new Map<string, SliceStop[]>();
-
-    return SliceAnimationKeyframeUtils.fromSlices(({ pos, count }) => {
-        const key = `${pos.row}/${count.row}`;
-        const stops = cache.get(key) ?? compute(pos.row, count.row);
-
-        cache.set(key, stops);
-
-        return stops;
-    });
-};
-
 export namespace ScanlineAnimationKeyframes {
     export const DEFAULT_HORIZONTAL_SNAKE_OPTS: Required<ScanlineHorizontalSnakeOpts> = {
         shiftPercent: 5,
@@ -78,28 +62,14 @@ export namespace ScanlineAnimationKeyframes {
         peakScalePercent: 150,
     };
 
-    export const DEFAULT_HORIZONTAL_WAVE_OPTS: Required<_ScanlineHorizontalWaveOpts> = {
-        shiftPercent: 8,
-        waveCount: 3,
-    };
-
-    export const DEFAULT_HORIZONTAL_ROLL_OPTS: Required<_ScanlineHorizontalRollOpts> = {
-        shiftPercent: 100,
-        seamBrightnessPercent: 40,
-    };
-
-    export const DEFAULT_HORIZONTAL_DROPOUT_OPTS: Required<_ScanlineHorizontalDropoutOpts> = {
+    export const DEFAULT_HORIZONTAL_DROPOUT_OPTS: Required<ScanlineHorizontalDropoutOpts> = {
         dropChance: 0.3,
         shiftPercent: 15,
     };
 
-    export const DEFAULT_HORIZONTAL_INTERLACE_OPTS: Required<_ScanlineHorizontalInterlaceOpts> = {
+    export const DEFAULT_HORIZONTAL_INTERLACE_OPTS: Required<ScanlineHorizontalInterlaceOpts> = {
         dipPercent: 40,
         fieldCount: 8,
-    };
-
-    export const DEFAULT_HORIZONTAL_SKEW_OPTS: Required<_ScanlineHorizontalSkewOpts> = {
-        skewDegrees: 20,
     };
 
     export const createHorizontalSnake = (opts?: ScanlineHorizontalSnakeOpts): SliceAnimationFn =>
@@ -129,31 +99,7 @@ export namespace ScanlineAnimationKeyframes {
     export const createHorizontalGrayscale = (opts?: ScanlineHorizontalGrayscaleOpts): SliceAnimationFn =>
         SliceAnimationKeyframeUtils.fromStops(toPeakStops("grayscale", 0, 100));
 
-    export const _createHorizontalWave = (opts?: _ScanlineHorizontalWaveOpts): SliceAnimationFn => {
-        const { shiftPercent, waveCount } = { ...DEFAULT_HORIZONTAL_WAVE_OPTS, ...opts };
-
-        return perRow((row, rowCount) =>
-            toSampledStops(
-                "translateX",
-                (local) =>
-                    shiftPercent *
-                    peak(0, 1, local) *
-                    Math.sin(((row / Math.max(rowCount, 1)) * waveCount + local) * Math.PI * 2),
-            ),
-        );
-    };
-
-    export const _createHorizontalRoll = (opts?: _ScanlineHorizontalRollOpts): SliceAnimationFn => {
-        const { shiftPercent, seamBrightnessPercent } = { ...DEFAULT_HORIZONTAL_ROLL_OPTS, ...opts };
-
-        return SliceAnimationKeyframeUtils.fromStops([
-            { at: 0, translateY: shiftPercent, brightness: 100 },
-            { at: 0.5, brightness: 100 + seamBrightnessPercent },
-            { at: 1, translateY: 0, brightness: 100 },
-        ]);
-    };
-
-    export const _createHorizontalDropout = (opts?: _ScanlineHorizontalDropoutOpts): SliceAnimationFn => {
+    export const createHorizontalDropout = (opts?: ScanlineHorizontalDropoutOpts): SliceAnimationFn => {
         const { dropChance, shiftPercent } = { ...DEFAULT_HORIZONTAL_DROPOUT_OPTS, ...opts };
         const dropped: SliceStop[] = [
             { at: 0, opacity: 100, translateX: 0 },
@@ -168,7 +114,7 @@ export namespace ScanlineAnimationKeyframes {
         );
     };
 
-    export const _createHorizontalInterlace = (opts?: _ScanlineHorizontalInterlaceOpts): SliceAnimationFn => {
+    export const createHorizontalInterlace = (opts?: ScanlineHorizontalInterlaceOpts): SliceAnimationFn => {
         const { dipPercent, fieldCount } = { ...DEFAULT_HORIZONTAL_INTERLACE_OPTS, ...opts };
         const toStops = (dir: number) =>
             toSampledStops(
@@ -180,9 +126,4 @@ export namespace ScanlineAnimationKeyframes {
 
         return SliceAnimationKeyframeUtils.fromSlices(({ pos }) => (MathUtils.isEven(pos.row) ? even : odd));
     };
-
-    export const _createHorizontalSkew = (opts?: _ScanlineHorizontalSkewOpts): SliceAnimationFn =>
-        SliceAnimationKeyframeUtils.fromStops(
-            toSwingStops("skewX", { ...DEFAULT_HORIZONTAL_SKEW_OPTS, ...opts }.skewDegrees),
-        );
 }

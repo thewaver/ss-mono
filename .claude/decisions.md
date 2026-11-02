@@ -7133,6 +7133,31 @@ needs a layout for every name it accepts, so this was not optional.
 **The Shape page caps its per-corner grid at six columns.** It lays one column per two corners, which is three
 for a hexagon and would be fifty for the hectogon, overrunning the row and painting over its own label.
 
+### Every built-in shape with more than three corners has a `_star` version
+
+Asked for by the user: `square_star`, `lozenge_star`, `hexagon_pointy_top_star`, `hexagon_flat_top_star` and
+`hectogon_star`. **`DEFAULT_SHAPES` is sorted alphabetically, the existing thirteen included** — the user's call, under the sample
+rule: alphabetical, with exceptions at the top. It has no exception of its own; `ShapeReveals.const.ts` puts `circle`
+ahead of it. **The triangles have none**, since three corners make no star worth the name; the corner-cut ones
+are not regular in any case. **`hectogon_star` is included because the rule was "anything with more than three
+points"**, which makes it a two-hundred-corner serrated disk; it is the first to go if the user finds it silly.
+
+**The polygon's own corners are the tips, and a notch sits between each pair** on the line from the box's center
+through the middle of the edge joining them. That is why a `square_star` points at the corners of its box and a
+`lozenge_star` at the middle of its sides: they inherit their polygons' orientations, so the two are different
+stars rather than one drawn twice. Built from the tip positions, not from angles, so a star in an oblong box is its
+polygon's stretch and not a separate guess.
+
+**The notch depth is one number for all five, `STAR_INNER_RATIO` in `shape.ts`, and it was a guess** — the user's
+call to tune once seen. It is a share of the polygon's radius, so a hexagram would be about 0.58 and the default is
+a little spikier. A per-shape depth is the next step if one number does not suit all five.
+
+**`TileBoard` leaves them out**, by excluding any name ending in `_star` from `TileBoardTilingKind`: a star has no
+lattice it tiles on, and the board needs a layout for every name it accepts. `Reveal`, `Lens` and `ScratchCard`
+pickers are `DEFAULT_SHAPES` unchanged, so they gained the stars without an edit. `Reveal` grows a star until the
+nearest part of its edge, which is a notch, reaches the viewport's far corner — so a star reveal ends much larger
+than a polygon's, and every tip is far offscreen by then.
+
 ### The cliff exposes one knob, because the other four broke it
 
 Renamed from `cliffs` to `cliff` at the user's word, one arrangement being one cliff.
@@ -9205,8 +9230,17 @@ can be found and judged against the existing collection in one pass; it is a rev
 naming convention, and it comes off when an entry is kept. The Playground's option grouping strips it before
 grouping, so `_carouselQuadrant` sat inside the `carousel` group next to the four members it dispatches to
 while it was under review, rather than in a group of its own — which is the comparison the prefix exists to
-make possible. Nothing in the `CellAnimation` collections carries it now; the `ScanlineAnimation` keyframe
-builders still do.
+make possible. Nothing in the `CellAnimation` collections carries it now, and the `ScanlineAnimation` keyframe
+builders groomed: `Dropout` and `Interlace` were kept and lost the underscore; `Wave`, `Roll` and `Skew` were dropped.
+
+**`Skew` was dropped because a lean on a row of the picture cannot be seen.** A row is a few pixels tall at the
+Playground's line counts, and a lean moves a strip's top and bottom edges sideways by a fraction of its own height, so
+20° at 3px a row moved the edges about half a pixel and the middle not at all. A version that leaned the whole picture
+(each row sliding in proportion to its distance from the middle) was offered and not taken.
+
+**On the `ScanlineAnimation` page, examples that apply a filter sit after the ones that apply a transform** — the
+user's rule: `Brightness`, `Grayscale`, `Hue` and `Interlace` come last, before the stress test. `Dropout` slides rows
+as it fades them, so it sits with the transforms.
 
 ### `SliceAnimationPlayback`: which way a pass runs, and why the duration it is given is one-way
 

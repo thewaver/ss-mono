@@ -32,9 +32,6 @@ export namespace ScanlineAnimationKnobs {
     export const STARTING_BRIGHTNESS_BREAKPOINT_OPTS: SliceAnimationBreakpointOpts = { dir: "asc", smoothness: 0.5 };
     export const STARTING_GRAYSCALE_BREAKPOINT_OPTS: SliceAnimationBreakpointOpts = { dir: "asc", smoothness: 0.5 };
     export const STARTING_HUE_BREAKPOINT_OPTS: SliceAnimationBreakpointOpts = { dir: "asc", smoothness: 0.5 };
-    export const STARTING_WAVE_BREAKPOINT_OPTS: SliceAnimationBreakpointOpts = { dir: "asc", smoothness: 0.6 };
-    export const STARTING_ROLL_BREAKPOINT_OPTS: SliceAnimationBreakpointOpts = { dir: "asc", smoothness: 0.1 };
     export const STARTING_DROPOUT_BREAKPOINT_OPTS: SliceAnimationBreakpointOpts = { dir: "asc", smoothness: 0.2 };
     export const STARTING_INTERLACE_BREAKPOINT_OPTS: SliceAnimationBreakpointOpts = { dir: "asc", smoothness: 0.8 };
-    export const STARTING_SKEW_BREAKPOINT_OPTS: SliceAnimationBreakpointOpts = { dir: "asc", smoothness: 0.3 };
 }

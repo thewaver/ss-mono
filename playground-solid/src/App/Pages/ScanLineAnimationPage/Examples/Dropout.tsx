@@ -8,8 +8,8 @@ import {
 } from "@thewaver/ss-components-solid";
 import type {
     AccessorProps,
+    ScanlineHorizontalDropoutOpts,
     SliceAnimationBreakpointOpts,
-    _ScanlineHorizontalDropoutOpts,
 } from "@thewaver/ss-components-solid";
 
 import type { ScanlineAnimationExampleProps } from "../ScanlineAnimationPage.types";
@@ -19,11 +19,11 @@ const WEIGHT_ORIGIN = { row: 0, col: 0 };
 type Props = ScanlineAnimationExampleProps &
     AccessorProps<{
         breakpointOpts: SliceAnimationBreakpointOpts;
-        keyframeOpts: _ScanlineHorizontalDropoutOpts;
+        keyframeOpts: ScanlineHorizontalDropoutOpts;
     }>;
 
 export const DropoutExample = ({ keyframeOpts, breakpointOpts, weightType, ...otherProps }: Props) => {
-    const getAnimation = createMemo(() => ScanlineAnimationKeyframes._createHorizontalDropout(access(keyframeOpts)));
+    const getAnimation = createMemo(() => ScanlineAnimationKeyframes.createHorizontalDropout(access(keyframeOpts)));
 
     return (
         <ScanlineAnimation

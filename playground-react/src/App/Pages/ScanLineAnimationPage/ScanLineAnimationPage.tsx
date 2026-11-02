@@ -11,19 +11,16 @@ import {
 import type {
     ScanlineAnimationOrientation,
     ScanlineHorizontalBrightnessOpts,
+    ScanlineHorizontalDropoutOpts,
     ScanlineHorizontalGrayscaleOpts,
     ScanlineHorizontalHueOpts,
+    ScanlineHorizontalInterlaceOpts,
     ScanlineHorizontalSnakeOpts,
     ScanlineHorizontalSplitOpts,
     ScanlineHorizontalStretchOpts,
     SliceAnimationBreakpointDirection,
     SliceAnimationBreakpointOpts,
     SliceAnimationRenderer,
-    _ScanlineHorizontalDropoutOpts,
-    _ScanlineHorizontalInterlaceOpts,
-    _ScanlineHorizontalRollOpts,
-    _ScanlineHorizontalSkewOpts,
-    _ScanlineHorizontalWaveOpts,
 } from "@thewaver/ss-components-react";
 import { ScanlineAnimationKeyframeKnobs } from "@thewaver/ss-playground/App/Knobs/ScanlineAnimationKeyframes.const";
 import { ScanlineAnimationKnobs } from "@thewaver/ss-playground/App/Knobs/ScanlineAnimations.const";
@@ -62,17 +59,14 @@ import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { StressTest } from "../../PageComponents/StressTest/StressTest";
 import { BrightnessExample } from "./Examples/Brightness";
+import { DropoutExample } from "./Examples/Dropout";
 import { GlitchExample } from "./Examples/Glitch";
 import { GrayscaleExample } from "./Examples/Grayscale";
 import { HueExample } from "./Examples/Hue";
+import { InterlaceExample } from "./Examples/Interlace";
 import { SnakeExample } from "./Examples/Snake";
 import { SplitExample } from "./Examples/Split";
 import { SurgeExample } from "./Examples/Surge";
-import { DropoutExample } from "./Examples/_Dropout";
-import { InterlaceExample } from "./Examples/_Interlace";
-import { RollExample } from "./Examples/_Roll";
-import { SkewExample } from "./Examples/_Skew";
-import { WaveExample } from "./Examples/_Wave";
 import type { ScanlineAnimationExampleProps } from "./ScanlineAnimationPage.types";
 
 const extractOptionGroupWord = (key: string) => key.replace(/^_/, "").match(/^[a-z]+/)?.[0] ?? key;
@@ -590,102 +584,6 @@ const HueExampleWrapper = (props: ScanlineAnimationExampleProps) => {
     );
 };
 
-const WaveExampleWrapper = (props: ScanlineAnimationExampleProps) => {
-    const playback = usePagePlayback("scanlineWave");
-    const progress = useState(0);
-
-    const [keyframeOpts, setKeyframeOpts] = useFieldState<Record<string, number | boolean>>({});
-    const [breakpointOpts, setBreakpointOpts] = useFieldState<SliceAnimationBreakpointOpts>({
-        ...ScanlineAnimationKnobs.STARTING_WAVE_BREAKPOINT_OPTS,
-    });
-
-    return (
-        <>
-            <div className={styles.stack}>
-                <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
-                    <WaveExample
-                        {...props}
-                        playback={PlaybackScrubberUtils.gate(playback, props.playback[0])}
-                        progress={progress}
-                        keyframeOpts={keyframeOpts as _ScanlineHorizontalWaveOpts}
-                        breakpointOpts={breakpointOpts}
-                    />
-                </PageMeasureBox>
-
-                <PagePlaybackScrubber
-                    id={"scanlineWave"}
-                    ariaLabel={"Position in the pass"}
-                    playback={playback}
-                    progress={progress}
-                />
-            </div>
-
-            <PageExampleKnobs>
-                <PageKnobs
-                    knobs={ScanlineAnimationKeyframeKnobs.WAVE_KNOBS as Record<string, Knob>}
-                    defaults={ScanlineAnimationKeyframes.DEFAULT_HORIZONTAL_WAVE_OPTS}
-                    values={keyframeOpts}
-                    onInput={(key, value) => setKeyframeOpts(key, value)}
-                />
-
-                <SmoothnessInput
-                    value={breakpointOpts.smoothness!}
-                    setter={(value) => setBreakpointOpts("smoothness", value)}
-                />
-                <DirInput value={breakpointOpts.dir!} setter={(value) => setBreakpointOpts("dir", value)} />
-            </PageExampleKnobs>
-        </>
-    );
-};
-
-const RollExampleWrapper = (props: ScanlineAnimationExampleProps) => {
-    const playback = usePagePlayback("scanlineRoll");
-    const progress = useState(0);
-
-    const [keyframeOpts, setKeyframeOpts] = useFieldState<Record<string, number | boolean>>({});
-    const [breakpointOpts, setBreakpointOpts] = useFieldState<SliceAnimationBreakpointOpts>({
-        ...ScanlineAnimationKnobs.STARTING_ROLL_BREAKPOINT_OPTS,
-    });
-
-    return (
-        <>
-            <div className={styles.stack}>
-                <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
-                    <RollExample
-                        {...props}
-                        playback={PlaybackScrubberUtils.gate(playback, props.playback[0])}
-                        progress={progress}
-                        keyframeOpts={keyframeOpts as _ScanlineHorizontalRollOpts}
-                        breakpointOpts={breakpointOpts}
-                    />
-                </PageMeasureBox>
-
-                <PagePlaybackScrubber
-                    id={"scanlineRoll"}
-                    ariaLabel={"Position in the pass"}
-                    playback={playback}
-                    progress={progress}
-                />
-            </div>
-
-            <PageExampleKnobs>
-                <PageKnobs
-                    knobs={ScanlineAnimationKeyframeKnobs.ROLL_KNOBS as Record<string, Knob>}
-                    defaults={ScanlineAnimationKeyframes.DEFAULT_HORIZONTAL_ROLL_OPTS}
-                    values={keyframeOpts}
-                    onInput={(key, value) => setKeyframeOpts(key, value)}
-                />
-
-                <SmoothnessInput
-                    value={breakpointOpts.smoothness!}
-                    setter={(value) => setBreakpointOpts("smoothness", value)}
-                />
-                <DirInput value={breakpointOpts.dir!} setter={(value) => setBreakpointOpts("dir", value)} />
-            </PageExampleKnobs>
-        </>
-    );
-};
-
 const DropoutExampleWrapper = (props: ScanlineAnimationExampleProps) => {
     const playback = usePagePlayback("scanlineDropout");
     const progress = useState(0);
@@ -703,7 +601,7 @@ const DropoutExampleWrapper = (props: ScanlineAnimationExampleProps) => {
                         {...props}
                         playback={PlaybackScrubberUtils.gate(playback, props.playback[0])}
                         progress={progress}
-                        keyframeOpts={keyframeOpts as _ScanlineHorizontalDropoutOpts}
+                        keyframeOpts={keyframeOpts as ScanlineHorizontalDropoutOpts}
                         breakpointOpts={breakpointOpts}
                     />
                 </PageMeasureBox>
@@ -751,7 +649,7 @@ const InterlaceExampleWrapper = (props: ScanlineAnimationExampleProps) => {
                         {...props}
                         playback={PlaybackScrubberUtils.gate(playback, props.playback[0])}
                         progress={progress}
-                        keyframeOpts={keyframeOpts as _ScanlineHorizontalInterlaceOpts}
+                        keyframeOpts={keyframeOpts as ScanlineHorizontalInterlaceOpts}
                         breakpointOpts={breakpointOpts}
                     />
                 </PageMeasureBox>
@@ -768,54 +666,6 @@ const InterlaceExampleWrapper = (props: ScanlineAnimationExampleProps) => {
                 <PageKnobs
                     knobs={ScanlineAnimationKeyframeKnobs.INTERLACE_KNOBS as Record<string, Knob>}
                     defaults={ScanlineAnimationKeyframes.DEFAULT_HORIZONTAL_INTERLACE_OPTS}
-                    values={keyframeOpts}
-                    onInput={(key, value) => setKeyframeOpts(key, value)}
-                />
-
-                <SmoothnessInput
-                    value={breakpointOpts.smoothness!}
-                    setter={(value) => setBreakpointOpts("smoothness", value)}
-                />
-                <DirInput value={breakpointOpts.dir!} setter={(value) => setBreakpointOpts("dir", value)} />
-            </PageExampleKnobs>
-        </>
-    );
-};
-
-const SkewExampleWrapper = (props: ScanlineAnimationExampleProps) => {
-    const playback = usePagePlayback("scanlineSkew");
-    const progress = useState(0);
-
-    const [keyframeOpts, setKeyframeOpts] = useFieldState<Record<string, number | boolean>>({});
-    const [breakpointOpts, setBreakpointOpts] = useFieldState<SliceAnimationBreakpointOpts>({
-        ...ScanlineAnimationKnobs.STARTING_SKEW_BREAKPOINT_OPTS,
-    });
-
-    return (
-        <>
-            <div className={styles.stack}>
-                <PageMeasureBox width={IMAGE_CONTAINER_SIZE}>
-                    <SkewExample
-                        {...props}
-                        playback={PlaybackScrubberUtils.gate(playback, props.playback[0])}
-                        progress={progress}
-                        keyframeOpts={keyframeOpts as _ScanlineHorizontalSkewOpts}
-                        breakpointOpts={breakpointOpts}
-                    />
-                </PageMeasureBox>
-
-                <PagePlaybackScrubber
-                    id={"scanlineSkew"}
-                    ariaLabel={"Position in the pass"}
-                    playback={playback}
-                    progress={progress}
-                />
-            </div>
-
-            <PageExampleKnobs>
-                <PageKnobs
-                    knobs={ScanlineAnimationKeyframeKnobs.SKEW_KNOBS as Record<string, Knob>}
-                    defaults={ScanlineAnimationKeyframes.DEFAULT_HORIZONTAL_SKEW_OPTS}
                     values={keyframeOpts}
                     onInput={(key, value) => setKeyframeOpts(key, value)}
                 />
@@ -887,6 +737,12 @@ export const ScanlineAnimationPage = () => {
             path: `${EXAMPLES_ROOT}/Split.tsx`,
         },
         {
+            key: "dropout",
+            name: EXAMPLE_NAMES.dropout,
+            component: () => <DropoutExampleWrapper {...commonProps} />,
+            path: `${EXAMPLES_ROOT}/Dropout.tsx`,
+        },
+        {
             key: "brightness",
             name: EXAMPLE_NAMES.brightness,
             component: () => <BrightnessExampleWrapper {...commonProps} />,
@@ -905,34 +761,10 @@ export const ScanlineAnimationPage = () => {
             path: `${EXAMPLES_ROOT}/Hue.tsx`,
         },
         {
-            key: "_wave",
-            name: EXAMPLE_NAMES._wave,
-            component: () => <WaveExampleWrapper {...commonProps} />,
-            path: `${EXAMPLES_ROOT}/_Wave.tsx`,
-        },
-        {
-            key: "_roll",
-            name: EXAMPLE_NAMES._roll,
-            component: () => <RollExampleWrapper {...commonProps} />,
-            path: `${EXAMPLES_ROOT}/_Roll.tsx`,
-        },
-        {
-            key: "_dropout",
-            name: EXAMPLE_NAMES._dropout,
-            component: () => <DropoutExampleWrapper {...commonProps} />,
-            path: `${EXAMPLES_ROOT}/_Dropout.tsx`,
-        },
-        {
-            key: "_interlace",
-            name: EXAMPLE_NAMES._interlace,
+            key: "interlace",
+            name: EXAMPLE_NAMES.interlace,
             component: () => <InterlaceExampleWrapper {...commonProps} />,
-            path: `${EXAMPLES_ROOT}/_Interlace.tsx`,
-        },
-        {
-            key: "_skew",
-            name: EXAMPLE_NAMES._skew,
-            component: () => <SkewExampleWrapper {...commonProps} />,
-            path: `${EXAMPLES_ROOT}/_Skew.tsx`,
+            path: `${EXAMPLES_ROOT}/Interlace.tsx`,
         },
         {
             key: "stressTest",

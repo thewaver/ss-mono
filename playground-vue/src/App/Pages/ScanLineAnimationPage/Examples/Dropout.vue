@@ -2,7 +2,7 @@
 import { computed, useModel } from "vue";
 
 import { ScanlineAnimation, ScanlineAnimationKeyframes, SliceAnimationWeights } from "@thewaver/ss-components-vue";
-import type { SliceAnimationBreakpointOpts, _ScanlineHorizontalWaveOpts } from "@thewaver/ss-components-vue";
+import type { ScanlineHorizontalDropoutOpts, SliceAnimationBreakpointOpts } from "@thewaver/ss-components-vue";
 import type { Index2d } from "@thewaver/ss-utils";
 
 import type { ScanlineAnimationExampleProps } from "../ScanlineAnimationPage.types";
@@ -11,7 +11,7 @@ const WEIGHT_ORIGIN = { row: 0, col: 0 };
 
 type Props = ScanlineAnimationExampleProps & {
     breakpointOpts: SliceAnimationBreakpointOpts;
-    keyframeOpts: _ScanlineHorizontalWaveOpts;
+    keyframeOpts: ScanlineHorizontalDropoutOpts;
 };
 
 const props = defineProps<Props>();
@@ -22,7 +22,7 @@ const progress = useModel(props, "progress");
 const computeSliceWeights = (count: Index2d) =>
     SliceAnimationWeights.computeSliceWeights(props.weightType, count, WEIGHT_ORIGIN);
 
-const animation = computed(() => ScanlineAnimationKeyframes._createHorizontalWave(props.keyframeOpts));
+const animation = computed(() => ScanlineAnimationKeyframes.createHorizontalDropout(props.keyframeOpts));
 </script>
 
 <template>

@@ -3,9 +3,9 @@ import { computed, reactive, shallowRef } from "vue";
 
 import { ScanlineAnimationKeyframes } from "@thewaver/ss-components-vue";
 import type {
+    ScanlineHorizontalDropoutOpts,
     SliceAnimationBreakpointDirection,
     SliceAnimationBreakpointOpts,
-    _ScanlineHorizontalDropoutOpts,
 } from "@thewaver/ss-components-vue";
 import { ScanlineAnimationKeyframeKnobs } from "@thewaver/ss-playground/App/Knobs/ScanlineAnimationKeyframes.const";
 import { ScanlineAnimationKnobs } from "@thewaver/ss-playground/App/Knobs/ScanlineAnimations.const";
@@ -18,7 +18,7 @@ import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.vue";
 import { usePagePlayback } from "../../PageComponents/PlaybackScrubber/PlaybackGroup.context";
 import PagePlaybackScrubber from "../../PageComponents/PlaybackScrubber/PlaybackScrubber.vue";
 import DirInput from "./DirInput.vue";
-import DropoutExample from "./Examples/_Dropout.vue";
+import DropoutExample from "./Examples/Dropout.vue";
 import type { ScanlineAnimationExampleProps } from "./ScanlineAnimationPage.types";
 import SmoothnessInput from "./SmoothnessInput.vue";
 
@@ -47,7 +47,7 @@ const breakpointOpts = reactive<SliceAnimationBreakpointOpts>({
                 :playback="props.playback && playback"
                 @update:playback="(next: boolean) => (playback = next)"
                 v-model:progress="progress"
-                :keyframe-opts="keyframeOpts as _ScanlineHorizontalDropoutOpts"
+                :keyframe-opts="keyframeOpts as ScanlineHorizontalDropoutOpts"
                 :breakpoint-opts="breakpointOpts"
             />
         </PageMeasureBox>

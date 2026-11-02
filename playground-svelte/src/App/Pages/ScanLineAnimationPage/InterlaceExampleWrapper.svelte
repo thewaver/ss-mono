@@ -1,7 +1,7 @@
 <script lang="ts">
     import * as styles from "@thewaver/ss-playground/App/Pages/ScanLineAnimationPage/ScanlineAnimationPage.css";
     import { ScanlineAnimationKeyframes } from "@thewaver/ss-components-svelte";
-    import type { SliceAnimationBreakpointOpts, _ScanlineHorizontalInterlaceOpts } from "@thewaver/ss-components-svelte";
+    import type { SliceAnimationBreakpointOpts, ScanlineHorizontalInterlaceOpts } from "@thewaver/ss-components-svelte";
     import { ScanlineAnimationKnobs } from "@thewaver/ss-playground/App/Knobs/ScanlineAnimations.const";
 
     import { ScanlineAnimationKeyframeKnobs } from "@thewaver/ss-playground/App/Knobs/ScanlineAnimationKeyframes.const";
@@ -12,7 +12,7 @@
     import { usePagePlayback } from "../../PageComponents/PlaybackScrubber/PlaybackGroup.context";
     import PagePlaybackScrubber from "../../PageComponents/PlaybackScrubber/PlaybackScrubber.svelte";
     import DirInput from "./DirInput.svelte";
-    import InterlaceExample from "./Examples/_Interlace.svelte";
+    import InterlaceExample from "./Examples/Interlace.svelte";
     import type { ScanlineAnimationExampleProps } from "./ScanlineAnimationPage.types";
     import SmoothnessInput from "./SmoothnessInput.svelte";
     import {
@@ -38,7 +38,7 @@
         <InterlaceExample
             {...props}
             bind:playback={() => isPagePlaying && playback.value, (next) => (playback.value = next)} bind:progress
-            keyframeOpts={keyframeOpts as _ScanlineHorizontalInterlaceOpts}
+            keyframeOpts={keyframeOpts as ScanlineHorizontalInterlaceOpts}
             {breakpointOpts}
         />
     </PageMeasureBox>

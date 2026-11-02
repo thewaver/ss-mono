@@ -62,6 +62,52 @@ describe("ShapeConst.getDefaultShapePoints", () => {
         expect(ShapeConst.getDefaultShapePoints("hectogon", size)).toHaveLength(100);
     });
 
+    it("gives every shape of more than three corners a star with twice as many", () => {
+        const stars = ShapeConst.DEFAULT_SHAPES.filter((shape) => shape.endsWith("_star"));
+
+        for (const star of stars) {
+            const base = star.slice(0, -"_star".length) as ShapeConst.DefaultShape;
+            const tips = ShapeConst.getDefaultShapePoints(base, size);
+
+            expect(tips.length, star).toBeGreaterThan(3);
+            expect(ShapeConst.getDefaultShapePoints(star, size), star).toHaveLength(tips.length * 2);
+        }
+
+        for (const shape of ShapeConst.DEFAULT_SHAPES) {
+            if (ShapeConst.getDefaultShapePoints(shape, size).length > 3 && !shape.endsWith("_star")) {
+                expect(stars, shape).toContain(`${shape}_star`);
+            }
+        }
+    });
+
+    it("keeps the polygon's corners as a star's tips and puts a notch between each pair, nearer the center", () => {
+        const center = { x: size.width * 0.5, y: size.height * 0.5 };
+        const getReach = (point: Point2d) => Math.hypot(point.x - center.x, point.y - center.y);
+
+        for (const star of ShapeConst.DEFAULT_SHAPES.filter((shape) => shape.endsWith("_star"))) {
+            const base = star.slice(0, -"_star".length) as ShapeConst.DefaultShape;
+            const tips = ShapeConst.getDefaultShapePoints(base, size);
+            const points = ShapeConst.getDefaultShapePoints(star, size);
+
+            for (const [index, tip] of tips.entries()) {
+                expect(points[index * 2], star).toEqual(tip);
+                expect(getReach(points[index * 2 + 1]), star).toBeLessThan(
+                    Math.min(getReach(tip), getReach(tips[(index + 1) % tips.length])),
+                );
+            }
+        }
+    });
+
+    it("points a square star at the corners of its box and a lozenge star at the middle of its sides", () => {
+        const square = ShapeConst.getDefaultShapePoints("square_star", size);
+        const lozenge = ShapeConst.getDefaultShapePoints("lozenge_star", size);
+
+        expect(square[0]).toEqual({ x: 0, y: 0 });
+        expect(square[2]).toEqual({ x: 100, y: 0 });
+        expect(lozenge[0]).toEqual({ x: 50, y: 0 });
+        expect(lozenge[2]).toEqual({ x: 100, y: 30 });
+    });
+
     it("puts a corner-cut triangle's right angle in the corner it is named for", () => {
         expect(ShapeConst.getDefaultShapePoints("triangle_top_left", size)).toEqual([
             { x: 0, y: 0 },

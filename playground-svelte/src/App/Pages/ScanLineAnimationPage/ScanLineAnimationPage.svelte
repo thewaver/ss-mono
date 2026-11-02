@@ -25,14 +25,11 @@
     import GrayscaleExampleWrapper from "./GrayscaleExampleWrapper.svelte";
     import HueExampleWrapper from "./HueExampleWrapper.svelte";
     import InterlaceExampleWrapper from "./InterlaceExampleWrapper.svelte";
-    import RollExampleWrapper from "./RollExampleWrapper.svelte";
     import type { ScanlineAnimationExampleProps } from "./ScanlineAnimationPage.types";
-    import SkewExampleWrapper from "./SkewExampleWrapper.svelte";
     import SnakeExampleWrapper from "./SnakeExampleWrapper.svelte";
     import SplitExampleWrapper from "./SplitExampleWrapper.svelte";
     import StressTestWrapper from "./StressTestWrapper.svelte";
     import SurgeExampleWrapper from "./SurgeExampleWrapper.svelte";
-    import WaveExampleWrapper from "./WaveExampleWrapper.svelte";
     import {
     EXAMPLE_NAMES,
     EXAMPLES_ROOT,
@@ -105,6 +102,12 @@
             path: `${EXAMPLES_ROOT}/Split.svelte`,
         },
         {
+            key: "dropout",
+            name: EXAMPLE_NAMES.dropout,
+            component: dropoutExample,
+            path: `${EXAMPLES_ROOT}/Dropout.svelte`,
+        },
+        {
             key: "brightness",
             name: EXAMPLE_NAMES.brightness,
             component: brightnessExample,
@@ -123,34 +126,10 @@
             path: `${EXAMPLES_ROOT}/Hue.svelte`,
         },
         {
-            key: "_wave",
-            name: EXAMPLE_NAMES._wave,
-            component: waveExample,
-            path: `${EXAMPLES_ROOT}/_Wave.svelte`,
-        },
-        {
-            key: "_roll",
-            name: EXAMPLE_NAMES._roll,
-            component: rollExample,
-            path: `${EXAMPLES_ROOT}/_Roll.svelte`,
-        },
-        {
-            key: "_dropout",
-            name: EXAMPLE_NAMES._dropout,
-            component: dropoutExample,
-            path: `${EXAMPLES_ROOT}/_Dropout.svelte`,
-        },
-        {
-            key: "_interlace",
-            name: EXAMPLE_NAMES._interlace,
+            key: "interlace",
+            name: EXAMPLE_NAMES.interlace,
             component: interlaceExample,
-            path: `${EXAMPLES_ROOT}/_Interlace.svelte`,
-        },
-        {
-            key: "_skew",
-            name: EXAMPLE_NAMES._skew,
-            component: skewExample,
-            path: `${EXAMPLES_ROOT}/_Skew.svelte`,
+            path: `${EXAMPLES_ROOT}/Interlace.svelte`,
         },
         {
             key: "stressTest",
@@ -188,24 +167,12 @@
     <HueExampleWrapper {...commonProps} isPagePlaying={playback} />
 {/snippet}
 
-{#snippet waveExample()}
-    <WaveExampleWrapper {...commonProps} isPagePlaying={playback} />
-{/snippet}
-
-{#snippet rollExample()}
-    <RollExampleWrapper {...commonProps} isPagePlaying={playback} />
-{/snippet}
-
 {#snippet dropoutExample()}
     <DropoutExampleWrapper {...commonProps} isPagePlaying={playback} />
 {/snippet}
 
 {#snippet interlaceExample()}
     <InterlaceExampleWrapper {...commonProps} isPagePlaying={playback} />
-{/snippet}
-
-{#snippet skewExample()}
-    <SkewExampleWrapper {...commonProps} isPagePlaying={playback} />
 {/snippet}
 
 {#snippet stressTestExample()}

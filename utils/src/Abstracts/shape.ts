@@ -12,6 +12,7 @@ const CIRCLE_KAPPA = 1;
 const HALF_PI = Math.PI * 0.5;
 const HALF = 0.5;
 const HECTOGON_SIDES = 100;
+const STAR_INNER_RATIO = 0.5;
 const MIN_TANGENT_COS_GAP = 1e-9;
 const MAX_TANGENT_LENGTH_FACTOR = 1e6;
 const ARROW_BASE_START = -1;
@@ -173,6 +174,32 @@ const getRegularPolygonPoints = (sides: number, { width, height }: Size2d): Poin
     });
 
 /**
+ * A star made from the corners of a regular polygon: the corners become the tips, and a notch sits between each pair.
+ *
+ * Each notch lies on the line from the box's center through the middle of the edge between two tips, at
+ * {@link STAR_INNER_RATIO} of the polygon's radius. Built from the tips' own positions, so a polygon stretched to fill
+ * an oblong box gives a star stretched the same way.
+ *
+ * @param tips The polygon's corners, clockwise.
+ * @param size The box the polygon fills.
+ * @returns The tips and notches alternating, starting with the first tip, clockwise.
+ */
+const getStarPoints = (tips: Point2d[], { width, height }: Size2d): Point2d[] => {
+    const center = { x: width * 0.5, y: height * 0.5 };
+    const notchReach = STAR_INNER_RATIO / Math.cos(Math.PI / tips.length);
+
+    return tips.flatMap((tip, index) => {
+        const next = tips[(index + 1) % tips.length];
+        const middle = { x: (tip.x + next.x) * 0.5, y: (tip.y + next.y) * 0.5 };
+
+        return [
+            tip,
+            { x: center.x + (middle.x - center.x) * notchReach, y: center.y + (middle.y - center.y) * notchReach },
+        ];
+    });
+};
+
+/**
  * Every result {@link ShapeConst.getPaths} has ever worked out.
  *
  * Deliberately unbounded and never evicted. Generating a shape is expensive and
@@ -199,28 +226,38 @@ export namespace ShapeConst {
     /**
      * The built-in shapes {@link getDefaultShapePoints} knows how to build.
      *
-     * The first four triangles point at the middle of one side of their box; the next four are the halves
-     * of a box cut corner to corner, each named for the corner its right angle sits in.
+     * Listed alphabetically. `triangle_up`, `triangle_down`, `triangle_left` and `triangle_right` point at the middle
+     * of one side of their box; the other four triangles are the halves of a box cut corner to corner, each named for
+     * the corner its right angle sits in.
      *
      * `hectogon` is a hundred-sided polygon rather than a circle: it sits at most 0.05% of the radius inside the
      * circle it approximates, which is a circle to the eye while still being corners that anything taking points
      * can use. For an exact circle, take a `square` and give every corner a join radius of half its side.
+     *
+     * Every shape with more than three corners has a `_star` version: the same corners as its tips, with a notch
+     * between each pair reaching halfway in. A `square_star` points at the corners of its box and a `lozenge_star` at
+     * the middle of its sides.
      */
 
     export const DEFAULT_SHAPES = [
-        "triangle_up",
+        "hectogon",
+        "hectogon_star",
+        "hexagon_flat_top",
+        "hexagon_flat_top_star",
+        "hexagon_pointy_top",
+        "hexagon_pointy_top_star",
+        "lozenge",
+        "lozenge_star",
+        "square",
+        "square_star",
+        "triangle_bottom_left",
+        "triangle_bottom_right",
         "triangle_down",
         "triangle_left",
         "triangle_right",
         "triangle_top_left",
         "triangle_top_right",
-        "triangle_bottom_right",
-        "triangle_bottom_left",
-        "square",
-        "lozenge",
-        "hexagon_pointy_top",
-        "hexagon_flat_top",
-        "hectogon",
+        "triangle_up",
     ] as const;
 
     /** One of the built-in shape names. */
@@ -330,6 +367,27 @@ export namespace ShapeConst {
                     { x: width * 0.5, y: height },
                     { x: 0, y: height * 0.5 },
                 ];
+
+            case "square_star":
+                return getStarPoints(getDefaultShapePoints("square", { width, height }), { width, height });
+
+            case "lozenge_star":
+                return getStarPoints(getDefaultShapePoints("lozenge", { width, height }), { width, height });
+
+            case "hexagon_pointy_top_star":
+                return getStarPoints(getDefaultShapePoints("hexagon_pointy_top", { width, height }), {
+                    width,
+                    height,
+                });
+
+            case "hexagon_flat_top_star":
+                return getStarPoints(getDefaultShapePoints("hexagon_flat_top", { width, height }), {
+                    width,
+                    height,
+                });
+
+            case "hectogon_star":
+                return getStarPoints(getDefaultShapePoints("hectogon", { width, height }), { width, height });
 
             case "hexagon_pointy_top":
                 return [

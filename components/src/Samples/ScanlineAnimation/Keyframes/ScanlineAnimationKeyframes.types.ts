@@ -16,26 +16,12 @@ export type ScanlineHorizontalBrightnessOpts = {};
 
 export type ScanlineHorizontalGrayscaleOpts = {};
 
-export type _ScanlineHorizontalWaveOpts = {
-    shiftPercent?: number;
-    waveCount?: number;
-};
-
-export type _ScanlineHorizontalRollOpts = {
-    shiftPercent?: number;
-    seamBrightnessPercent?: number;
-};
-
-export type _ScanlineHorizontalDropoutOpts = {
+export type ScanlineHorizontalDropoutOpts = {
     dropChance?: number;
     shiftPercent?: number;
 };
 
-export type _ScanlineHorizontalInterlaceOpts = {
+export type ScanlineHorizontalInterlaceOpts = {
     dipPercent?: number;
     fieldCount?: number;
-};
-
-export type _ScanlineHorizontalSkewOpts = {
-    skewDegrees?: number;
 };

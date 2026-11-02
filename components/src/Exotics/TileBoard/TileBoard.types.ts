@@ -3,7 +3,11 @@ import type { Index2d, Point2d, Rect, ShapeConst, Size2d } from "@thewaver/ss-ut
 export type TileBoardTilingKind =
     | Exclude<
           ShapeConst.DefaultShape,
-          "triangle_top_left" | "triangle_top_right" | "triangle_bottom_right" | "triangle_bottom_left"
+          | "triangle_top_left"
+          | "triangle_top_right"
+          | "triangle_bottom_right"
+          | "triangle_bottom_left"
+          | `${string}_star`
       >
     | "triangle_ltr"
     | "triangle_rtl"

@@ -31,14 +31,11 @@ import GlitchExampleWrapper from "./GlitchExampleWrapper.vue";
 import GrayscaleExampleWrapper from "./GrayscaleExampleWrapper.vue";
 import HueExampleWrapper from "./HueExampleWrapper.vue";
 import InterlaceExampleWrapper from "./InterlaceExampleWrapper.vue";
-import RollExampleWrapper from "./RollExampleWrapper.vue";
 import type { ScanlineAnimationExampleProps } from "./ScanlineAnimationPage.types";
-import SkewExampleWrapper from "./SkewExampleWrapper.vue";
 import SnakeExampleWrapper from "./SnakeExampleWrapper.vue";
 import SplitExampleWrapper from "./SplitExampleWrapper.vue";
 import StressTestWrapper from "./StressTestWrapper.vue";
 import SurgeExampleWrapper from "./SurgeExampleWrapper.vue";
-import WaveExampleWrapper from "./WaveExampleWrapper.vue";
 
 const extractOptionGroupWord = (key: string) => key.replace(/^_/, "").match(/^[a-z]+/)?.[0] ?? key;
 
@@ -107,6 +104,11 @@ const examples: ExampleDefs[] = [
         path: `${EXAMPLES_ROOT}/Split.vue`,
     },
     {
+        key: "dropout",
+        name: EXAMPLE_NAMES.dropout,
+        path: `${EXAMPLES_ROOT}/Dropout.vue`,
+    },
+    {
         key: "brightness",
         name: EXAMPLE_NAMES.brightness,
         path: `${EXAMPLES_ROOT}/Brightness.vue`,
@@ -122,29 +124,9 @@ const examples: ExampleDefs[] = [
         path: `${EXAMPLES_ROOT}/Hue.vue`,
     },
     {
-        key: "_wave",
-        name: EXAMPLE_NAMES._wave,
-        path: `${EXAMPLES_ROOT}/_Wave.vue`,
-    },
-    {
-        key: "_roll",
-        name: EXAMPLE_NAMES._roll,
-        path: `${EXAMPLES_ROOT}/_Roll.vue`,
-    },
-    {
-        key: "_dropout",
-        name: EXAMPLE_NAMES._dropout,
-        path: `${EXAMPLES_ROOT}/_Dropout.vue`,
-    },
-    {
-        key: "_interlace",
-        name: EXAMPLE_NAMES._interlace,
-        path: `${EXAMPLES_ROOT}/_Interlace.vue`,
-    },
-    {
-        key: "_skew",
-        name: EXAMPLE_NAMES._skew,
-        path: `${EXAMPLES_ROOT}/_Skew.vue`,
+        key: "interlace",
+        name: EXAMPLE_NAMES.interlace,
+        path: `${EXAMPLES_ROOT}/Interlace.vue`,
     },
     {
         key: "stressTest",
@@ -259,6 +241,10 @@ const examples: ExampleDefs[] = [
                 <SplitExampleWrapper v-bind="commonProps" />
             </template>
 
+            <template #dropout>
+                <DropoutExampleWrapper v-bind="commonProps" />
+            </template>
+
             <template #brightness>
                 <BrightnessExampleWrapper v-bind="commonProps" />
             </template>
@@ -271,24 +257,8 @@ const examples: ExampleDefs[] = [
                 <HueExampleWrapper v-bind="commonProps" />
             </template>
 
-            <template #_wave>
-                <WaveExampleWrapper v-bind="commonProps" />
-            </template>
-
-            <template #_roll>
-                <RollExampleWrapper v-bind="commonProps" />
-            </template>
-
-            <template #_dropout>
-                <DropoutExampleWrapper v-bind="commonProps" />
-            </template>
-
-            <template #_interlace>
+            <template #interlace>
                 <InterlaceExampleWrapper v-bind="commonProps" />
-            </template>
-
-            <template #_skew>
-                <SkewExampleWrapper v-bind="commonProps" />
             </template>
 
             <template #stressTest>

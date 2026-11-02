@@ -8,8 +8,8 @@ import {
 } from "@thewaver/ss-components-solid";
 import type {
     AccessorProps,
+    ScanlineHorizontalInterlaceOpts,
     SliceAnimationBreakpointOpts,
-    _ScanlineHorizontalRollOpts,
 } from "@thewaver/ss-components-solid";
 
 import type { ScanlineAnimationExampleProps } from "../ScanlineAnimationPage.types";
@@ -19,11 +19,11 @@ const WEIGHT_ORIGIN = { row: 0, col: 0 };
 type Props = ScanlineAnimationExampleProps &
     AccessorProps<{
         breakpointOpts: SliceAnimationBreakpointOpts;
-        keyframeOpts: _ScanlineHorizontalRollOpts;
+        keyframeOpts: ScanlineHorizontalInterlaceOpts;
     }>;
 
-export const RollExample = ({ keyframeOpts, breakpointOpts, weightType, ...otherProps }: Props) => {
-    const getAnimation = createMemo(() => ScanlineAnimationKeyframes._createHorizontalRoll(access(keyframeOpts)));
+export const InterlaceExample = ({ keyframeOpts, breakpointOpts, weightType, ...otherProps }: Props) => {
+    const getAnimation = createMemo(() => ScanlineAnimationKeyframes.createHorizontalInterlace(access(keyframeOpts)));
 
     return (
         <ScanlineAnimation

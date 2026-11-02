@@ -5,14 +5,11 @@ export const EXAMPLE_NAMES = {
     surge: "Surge",
     snake: "Snake",
     split: "Split",
+    dropout: "Dropout",
     brightness: "Brightness",
     grayscale: "Grayscale",
     hue: "Hue",
-    _wave: "_Wave",
-    _roll: "_Roll",
-    _dropout: "_Dropout",
-    _interlace: "_Interlace",
-    _skew: "_Skew",
+    interlace: "Interlace",
     stressTest: "Stress Test",
 };
 

@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 
 import { ScanlineAnimation, ScanlineAnimationKeyframes, SliceAnimationWeights } from "@thewaver/ss-components-react";
-import type { SliceAnimationBreakpointOpts, _ScanlineHorizontalDropoutOpts } from "@thewaver/ss-components-react";
+import type { ScanlineHorizontalDropoutOpts, SliceAnimationBreakpointOpts } from "@thewaver/ss-components-react";
 import type { Index2d } from "@thewaver/ss-utils";
 
 import type { ScanlineAnimationExampleProps } from "../ScanlineAnimationPage.types";
@@ -10,7 +10,7 @@ const WEIGHT_ORIGIN = { row: 0, col: 0 };
 
 type Props = ScanlineAnimationExampleProps & {
     breakpointOpts: SliceAnimationBreakpointOpts;
-    keyframeOpts: _ScanlineHorizontalDropoutOpts;
+    keyframeOpts: ScanlineHorizontalDropoutOpts;
 };
 
 export const DropoutExample = ({ keyframeOpts, breakpointOpts, weightType, ...otherProps }: Props) => {
@@ -19,7 +19,7 @@ export const DropoutExample = ({ keyframeOpts, breakpointOpts, weightType, ...ot
         [weightType],
     );
 
-    const animation = useMemo(() => ScanlineAnimationKeyframes._createHorizontalDropout(keyframeOpts), [keyframeOpts]);
+    const animation = useMemo(() => ScanlineAnimationKeyframes.createHorizontalDropout(keyframeOpts), [keyframeOpts]);
 
     return (
         <ScanlineAnimation
