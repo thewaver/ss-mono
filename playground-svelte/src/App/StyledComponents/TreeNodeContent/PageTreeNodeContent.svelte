@@ -34,7 +34,7 @@
 <div
     bind:this={element}
     class={[
-        styles.treeNodeContent,
+        props.isGliding ? styles.treeNodeContent : styles.treeNodeContentWithoutFloater,
         layerClass,
         props.renderProps.isBranch && styles.isBranch,
         props.renderProps.isExpanded && styles.isExpanded,

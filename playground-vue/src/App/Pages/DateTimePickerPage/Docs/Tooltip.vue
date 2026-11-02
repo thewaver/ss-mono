@@ -24,9 +24,7 @@ import PageClockFrame from "../../../StyledComponents/ClockContent/PageClockFram
 import PageClockOption from "../../../StyledComponents/ClockContent/PageClockOption.vue";
 import PageClockUnit from "../../../StyledComponents/ClockContent/PageClockUnit.vue";
 import PageDatePickerTrigger from "../../../StyledComponents/DatePickerTrigger/DatePickerTrigger.vue";
-import PageTextFieldContent, {
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
+import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 import PageTextFieldPlaceholder from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.vue";
 import PageTimePickerTrigger from "../../../StyledComponents/TimePickerTrigger/TimePickerTrigger.vue";
 import PageTooltipContent from "../../../StyledComponents/TooltipContent/TooltipContent.vue";
@@ -61,7 +59,6 @@ const tooltipDefs: InteractionTooltipDefs<TextFieldFlags> = {
         :locale="LOCALE"
         :padding="FIELD_STEPPER_PADDING"
         :gap="FIELD_GAP"
-        :compute-text-style="computePageTextFieldTextStyle"
         :tooltip-defs="tooltipDefs"
         trigger-id="tooltipDateTrigger"
         :trigger-aria-label="CALENDAR_TRIGGER_LABEL"

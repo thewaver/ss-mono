@@ -26,9 +26,7 @@ import PageGlideFloater from "../../StyledComponents/GlideFloater/PageGlideFloat
 import PageModalOverlay from "../../StyledComponents/ModalOverlay/ModalOverlay.vue";
 import PageSelectGroupContent from "../../StyledComponents/SelectGroupContent/SelectGroupContent.vue";
 import PageSelectOptionContent from "../../StyledComponents/SelectOptionContent/SelectOptionContent.vue";
-import PageTextFieldContent, {
-    computePageTextFieldTextStyle,
-} from "../../StyledComponents/TextFieldContent/TextFieldContent.vue";
+import PageTextFieldContent from "../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 import PageTextFieldPlaceholder from "../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.vue";
 import { appliedTheme, revealTheme } from "../Theme/ThemeVue.const";
 import type { AppCommandsProps } from "./AppCommandsVue.types";
@@ -80,7 +78,6 @@ const activate = (command: string) => {
         listAriaLabel="Matching commands"
         :field-padding="FIELD_PADDING"
         :field-gap="FIELD_GAP"
-        :compute-field-text-style="computePageTextFieldTextStyle"
         @activate="activate"
     >
         <template #renderOverlay="{ visibilityTarget, transitionDurationMs }">

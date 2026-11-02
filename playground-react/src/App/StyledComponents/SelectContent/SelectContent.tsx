@@ -1,18 +1,9 @@
 import type { PropsWithChildren } from "react";
 
-import type { InteractionFlags, SelectFlags, TextFieldTextStyle } from "@thewaver/ss-components-react";
-import { layerVars } from "@thewaver/ss-playground/App/StyledComponents/Layer/Layer.css";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/SelectContent/SelectContent.css";
-import { themeVars } from "@thewaver/ss-playground/App/Theme.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type { SelectContentProps } from "./SelectContentReact.types";
-
-export const computePageSelectTextStyle = (flags: InteractionFlags<SelectFlags>): TextFieldTextStyle => ({
-    color: flags.isDisabled ? `rgb(from ${layerVars.contrast} r g b / 50%)` : layerVars.contrast,
-    caretColor: themeVars.color.primary.main,
-    fontSize: styles.FIELD_FONT_SIZE,
-});
 
 export const PageSelectContent = (props: PropsWithChildren<SelectContentProps>) => {
     const layerClass = useLayerClass();

@@ -11,9 +11,7 @@ import {
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 import type { TimeValue } from "@thewaver/ss-utils";
 
-import PageTextFieldContent, {
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
+import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 import PageTooltipContent from "../../../StyledComponents/TooltipContent/TooltipContent.vue";
 import type { TimeInputTooltipDocsExampleProps } from "../TimeInputPageVue.types";
 
@@ -40,7 +38,6 @@ const tooltipDefs: InteractionTooltipDefs<TextFieldFlags> = {
         :segment-hints="TIME_SEGMENT_HINTS"
         :padding="FIELD_PADDING"
         :gap="FIELD_GAP"
-        :compute-text-style="computePageTextFieldTextStyle"
         :tooltip-defs="tooltipDefs"
     >
         <template #renderContent="flags">

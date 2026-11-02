@@ -7,9 +7,7 @@
     } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
     import PageSelectOptionContent from "../../../StyledComponents/SelectOptionContent/SelectOptionContent.svelte";
-    import PageTextFieldContent, {
-        computePageTextFieldTextStyle,
-    } from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
+    import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
     import PageTextFieldPlaceholder from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.svelte";
     import { renderSelectPopup } from "../../SelectPage/SelectPage.const.svelte";
 
@@ -32,7 +30,6 @@
     {suggestions}
     suggestionsAriaLabel={"Cities"}
     computeCustomSuggestionText={(city) => city.name}
-    computeTextStyle={computePageTextFieldTextStyle}
     renderSuggestionPopup={renderSelectPopup}
 >
     {#snippet renderContent(flags)}

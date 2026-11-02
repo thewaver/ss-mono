@@ -33,10 +33,7 @@ import { PageSelectClear } from "../../StyledComponents/SelectClear/SelectClear"
 import { PageSelectContent } from "../../StyledComponents/SelectContent/SelectContent";
 import { PageSelectGroupContent } from "../../StyledComponents/SelectGroupContent/SelectGroupContent";
 import { PageSelectOptionContent } from "../../StyledComponents/SelectOptionContent/SelectOptionContent";
-import {
-    PageTextFieldContent,
-    computePageTextFieldTextStyle,
-} from "../../StyledComponents/TextFieldContent/TextFieldContent";
+import { PageTextFieldContent } from "../../StyledComponents/TextFieldContent/TextFieldContent";
 import { PageTextFieldPlaceholder } from "../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder";
 import { PageToggleContent } from "../../StyledComponents/ToggleContent/ToggleContent";
 import { pageColorPickerSlots } from "../ColorPicker/ColorPicker";
@@ -94,7 +91,6 @@ export const PageNumberField = (props: PageNumberFieldProps) => {
             ariaLabel={props.ariaLabel}
             padding={FIELD_STEPPER_PADDING}
             gap={FIELD_GAP}
-            computeTextStyle={computePageTextFieldTextStyle}
             renderContent={(getFlags) => (
                 <PageTextFieldContent
                     flags={getFlags}
@@ -127,7 +123,6 @@ export const PageTextField = (props: PageTextFieldProps) => {
             ariaLabel={props.ariaLabel}
             padding={FIELD_PADDING}
             gap={FIELD_GAP}
-            computeTextStyle={computePageTextFieldTextStyle}
             renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} width={props.width} />}
             renderPlaceholder={
                 props.placeholder === undefined

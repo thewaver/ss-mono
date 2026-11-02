@@ -13,9 +13,7 @@ import PageFormButtons from "../../../StyledComponents/FormFieldContent/PageForm
 import PageFormFieldCaption from "../../../StyledComponents/FormFieldContent/PageFormFieldCaption.vue";
 import PageFormFieldMessage from "../../../StyledComponents/FormFieldContent/PageFormFieldMessage.vue";
 import PageFormStack from "../../../StyledComponents/FormFieldContent/PageFormStack.vue";
-import PageTextFieldContent, {
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
+import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 import type { FormFieldInFormDocsExampleProps } from "../FormFieldPageVue.types";
 
 const HINT = "Shown to everyone who can see your posts.";
@@ -56,7 +54,6 @@ const submit = () => {
                             :has-error="fieldState.hasError"
                             :padding="FIELD_PADDING"
                             :gap="FIELD_GAP"
-                            :compute-text-style="computePageTextFieldTextStyle"
                         >
                             <template #renderContent="flags">
                                 <PageTextFieldContent :flags="flags" />

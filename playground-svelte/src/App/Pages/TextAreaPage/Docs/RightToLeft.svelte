@@ -6,9 +6,7 @@
         FIELD_PADDING,
     } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
-    import PageTextFieldContent, {
-        computePageTextFieldTextStyle,
-    } from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
+    import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
     import PageTextFieldPlaceholder from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.svelte";
 
     const STARTING_TEXT = "One line\nTwo lines\nThree lines, and the third one wraps onto a fourth";
@@ -22,7 +20,6 @@
         padding={FIELD_PADDING}
         gap={FIELD_GAP}
         ariaLabel={"Notes"}
-        computeTextStyle={computePageTextFieldTextStyle}
     >
         {#snippet renderContent(flags)}
             <PageTextFieldContent {flags} width={FIELD_WIDTH} height={FIXED_HEIGHT} />

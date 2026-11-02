@@ -14,9 +14,7 @@ import PageGlideFloater from "../../../../StyledComponents/GlideFloater/PageGlid
 import PageModalOverlay from "../../../../StyledComponents/ModalOverlay/ModalOverlay.vue";
 import PageSelectGroupContent from "../../../../StyledComponents/SelectGroupContent/SelectGroupContent.vue";
 import PageSelectOptionContent from "../../../../StyledComponents/SelectOptionContent/SelectOptionContent.vue";
-import PageTextFieldContent, {
-    computePageTextFieldTextStyle,
-} from "../../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
+import PageTextFieldContent from "../../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 import PageTextFieldPlaceholder from "../../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.vue";
 import {
     ADD_NOTE,
@@ -64,7 +62,6 @@ const runNoteAction = (value: string) => {
         listAriaLabel="Matching note actions"
         :field-padding="FIELD_PADDING"
         :field-gap="FIELD_GAP"
-        :compute-field-text-style="computePageTextFieldTextStyle"
         @activate="runNoteAction"
     >
         <template #renderOverlay="{ visibilityTarget, transitionDurationMs }">

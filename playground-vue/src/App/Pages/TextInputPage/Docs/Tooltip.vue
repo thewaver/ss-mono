@@ -8,9 +8,7 @@ import {
     FIELD_PADDING,
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
-import PageTextFieldContent, {
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
+import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 import PageTooltipContent from "../../../StyledComponents/TooltipContent/TooltipContent.vue";
 import type { TextInputTooltipDocsExampleProps } from "../TextInputPageVue.types";
 
@@ -36,7 +34,6 @@ const tooltipDefs: InteractionTooltipDefs<TextFieldFlags> = {
         :is-disabled="isDisabled"
         :is-reachable-when-disabled="isReachableWhenDisabled"
         ariaLabel="Field with a tooltip"
-        :compute-text-style="computePageTextFieldTextStyle"
         :tooltip-defs="tooltipDefs"
     >
         <template #renderContent="flags">

@@ -9,9 +9,7 @@ import {
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
 import PageNumberInputStepper from "../../../PageComponents/NumberInputStepper/NumberInputStepper.vue";
-import PageTextFieldContent, {
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
+import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 import PageTextFieldPlaceholder from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.vue";
 import type { NumberInputBasicDocsExampleProps } from "../NumberInputPageVue.types";
 
@@ -31,7 +29,6 @@ const value = shallowRef<number | undefined>(undefined);
         :padding="FIELD_STEPPER_PADDING"
         :gap="FIELD_GAP"
         ariaLabel="How many"
-        :compute-text-style="computePageTextFieldTextStyle"
     >
         <template #renderContent="flags">
             <PageTextFieldContent :flags="flags" :width="FIELD_WIDTH" />

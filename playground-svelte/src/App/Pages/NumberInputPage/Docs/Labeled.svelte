@@ -8,9 +8,7 @@
 
     import PageNumberInputStepper from "../../../PageComponents/NumberInputStepper/NumberInputStepper.svelte";
     import PageLabelCaption from "../../../StyledComponents/LabelCaption/LabelCaption.svelte";
-    import PageTextFieldContent, {
-        computePageTextFieldTextStyle,
-    } from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
+    import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
 
     const LABEL_GAP = 5;
     const GUEST_MIN = 1;
@@ -28,7 +26,6 @@
         max={GUEST_MAX}
         padding={FIELD_STEPPER_PADDING}
         gap={FIELD_GAP}
-        computeTextStyle={computePageTextFieldTextStyle}
     >
         {#snippet renderContent(flags)}
             <PageTextFieldContent {flags} width={FIELD_WIDTH} />

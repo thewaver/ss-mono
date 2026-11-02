@@ -19,10 +19,7 @@ import {
     PageClockUnit,
 } from "../../../StyledComponents/ClockContent/ClockContent";
 import { PageLabelCaption } from "../../../StyledComponents/LabelCaption/LabelCaption";
-import {
-    PageTextFieldContent,
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent";
+import { PageTextFieldContent } from "../../../StyledComponents/TextFieldContent/TextFieldContent";
 import { PageTextFieldPlaceholder } from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder";
 import { PageTimePickerTrigger } from "../../../StyledComponents/TimePickerTrigger/TimePickerTrigger";
 
@@ -42,7 +39,6 @@ export const LabeledDocsExample = () => {
                 locale={LOCALE}
                 padding={FIELD_STEPPER_PADDING}
                 gap={FIELD_GAP}
-                computeTextStyle={computePageTextFieldTextStyle}
                 renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} width={FIELD_WIDTH} />}
                 renderPlaceholder={(getFlags, hint) => (
                     <PageTextFieldPlaceholder flags={getFlags}>{hint}</PageTextFieldPlaceholder>

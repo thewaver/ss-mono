@@ -1,22 +1,22 @@
 import { style, styleVariants } from "@vanilla-extract/css";
 
+import { lookEntries } from "../../Looks/Look.css";
 import { themeVars } from "../../Theme.css";
 
 const DRAWER_THICKNESS = 320;
 const DRAWER_DEPTH = 200;
 const DRAWER_MAX_DEPTH = 400;
 
-export const drawerPanel = style({
-    display: "flex",
-    flexDirection: "column",
-    gap: themeVars.spacing.double,
-    padding: themeVars.spacing.double,
-    overflow: "auto",
-    color: themeVars.color.surface.contrast,
-    backgroundColor: themeVars.color.surface.light,
-    backgroundImage: `linear-gradient(215deg, ${themeVars.color.surface.light}, ${themeVars.color.surface.dark})`,
-    boxShadow: themeVars.shadow.large,
-});
+export const drawerPanel = style([
+    lookEntries.drawer,
+    {
+        display: "flex",
+        flexDirection: "column",
+        gap: themeVars.spacing.double,
+        padding: themeVars.spacing.double,
+        overflow: "auto",
+    },
+]);
 
 export const drawerSizeVariants = styleVariants({
     left: { width: DRAWER_THICKNESS },

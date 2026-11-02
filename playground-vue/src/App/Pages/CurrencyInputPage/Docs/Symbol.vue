@@ -9,9 +9,7 @@ import {
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
 import PageTextFieldAdornment from "../../../StyledComponents/TextFieldAdornment/TextFieldAdornment.vue";
-import PageTextFieldContent, {
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
+import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 import PageTextFieldPlaceholder from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.vue";
 
 const FIELD_WIDTH = 200;
@@ -20,13 +18,7 @@ const value = shallowRef<number | undefined>(STARTING_PRICE);
 </script>
 
 <template>
-    <CurrencyInput
-        v-model:value="value"
-        :padding="FIELD_STEPPER_PADDING"
-        :gap="FIELD_GAP"
-        ariaLabel="Price"
-        :compute-text-style="computePageTextFieldTextStyle"
-    >
+    <CurrencyInput v-model:value="value" :padding="FIELD_STEPPER_PADDING" :gap="FIELD_GAP" ariaLabel="Price">
         <template #renderContent="flags">
             <PageTextFieldContent :flags="flags" :width="FIELD_WIDTH" />
         </template>

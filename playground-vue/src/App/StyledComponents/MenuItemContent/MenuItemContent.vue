@@ -17,12 +17,10 @@ const layerClass = useLayerClass();
 <template>
     <div
         :class="[
-            styles.menuItemContent,
+            isGliding ? styles.menuItemContent : styles.menuItemContentWithoutFloater,
             layerClass,
-            !isGliding && flags.isHovered && styles.isHovered,
+            !isGliding && (flags.isHovered || flags.isHighlighted || flags.isOpen) && styles.isHovered,
             flags.isActive && styles.isActive,
-            !isGliding && flags.isHighlighted && styles.isHighlighted,
-            flags.isOpen && styles.isOpen,
             flags.isDisabled && styles.isDisabled,
         ]"
     >

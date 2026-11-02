@@ -7,9 +7,7 @@
     } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
     import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
 
-    import PageTextFieldContent, {
-        computePageTextFieldTextStyle,
-    } from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
+    import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
     import PageTextFieldPlaceholder from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.svelte";
     import type { CurrencyInputSignedDocsExampleProps } from "../CurrencyInputPageSvelte.types";
 
@@ -28,7 +26,6 @@
     padding={FIELD_STEPPER_PADDING}
     gap={FIELD_GAP}
     ariaLabel={"Adjustment"}
-    computeTextStyle={computePageTextFieldTextStyle}
 >
     {#snippet renderContent(flags)}
         <PageTextFieldContent {flags} width={FIELD_WIDTH} />

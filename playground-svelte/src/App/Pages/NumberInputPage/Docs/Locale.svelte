@@ -7,9 +7,7 @@
     } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
     import PageNumberInputStepper from "../../../PageComponents/NumberInputStepper/NumberInputStepper.svelte";
-    import PageTextFieldContent, {
-        computePageTextFieldTextStyle,
-    } from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
+    import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
     import type { NumberInputLocaleDocsExampleProps } from "../NumberInputPageSvelte.types";
 
     type Props = NumberInputLocaleDocsExampleProps;
@@ -26,7 +24,6 @@
     padding={FIELD_STEPPER_PADDING}
     gap={FIELD_GAP}
     ariaLabel={"Amount"}
-    computeTextStyle={computePageTextFieldTextStyle}
 >
     {#snippet renderContent(flags)}
         <PageTextFieldContent {flags} width={FIELD_WIDTH} />

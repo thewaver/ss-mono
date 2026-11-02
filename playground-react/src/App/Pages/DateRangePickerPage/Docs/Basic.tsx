@@ -20,10 +20,7 @@ import {
     PageCalendarWeekday,
 } from "../../../StyledComponents/CalendarContent/CalendarContent";
 import { PageDatePickerTrigger } from "../../../StyledComponents/DatePickerTrigger/DatePickerTrigger";
-import {
-    PageTextFieldContent,
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent";
+import { PageTextFieldContent } from "../../../StyledComponents/TextFieldContent/TextFieldContent";
 import { PageTextFieldPlaceholder } from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder";
 import { PageDateRangeSeparator } from "../DateRangePickerPage.content";
 import type { DateRangePickerBasicDocsExampleProps } from "../DateRangePickerPageReact.types";
@@ -51,7 +48,6 @@ export const BasicDocsExample = (props: Props) => {
                 locale={LOCALE}
                 padding={FIELD_STEPPER_PADDING}
                 gap={FIELD_GAP}
-                computeTextStyle={computePageTextFieldTextStyle}
                 renderContent={(flags) => <PageTextFieldContent flags={flags} width={PAIR_FIELD_WIDTH} />}
                 renderPlaceholder={(flags, hint) => (
                     <PageTextFieldPlaceholder flags={flags}>{hint}</PageTextFieldPlaceholder>

@@ -7,10 +7,7 @@ import {
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
 import { PageTextFieldAdornment } from "../../../StyledComponents/TextFieldAdornment/TextFieldAdornment";
-import {
-    PageTextFieldContent,
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent";
+import { PageTextFieldContent } from "../../../StyledComponents/TextFieldContent/TextFieldContent";
 import { PageTextFieldPlaceholder } from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder";
 
 export const AdornmentsDocsExample = () => {
@@ -23,7 +20,6 @@ export const AdornmentsDocsExample = () => {
             gap={FIELD_GAP}
             ariaLabel={"Username"}
             autoComplete={"username"}
-            computeTextStyle={computePageTextFieldTextStyle}
             renderContent={(flags) => <PageTextFieldContent flags={flags} />}
             renderPlaceholder={(flags) => <PageTextFieldPlaceholder flags={flags}>Username</PageTextFieldPlaceholder>}
             renderLeading={(flags) => (

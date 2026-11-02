@@ -18,9 +18,7 @@ import PageClockFrame from "../../../StyledComponents/ClockContent/PageClockFram
 import PageClockOption from "../../../StyledComponents/ClockContent/PageClockOption.vue";
 import PageClockUnit from "../../../StyledComponents/ClockContent/PageClockUnit.vue";
 import PageLabelCaption from "../../../StyledComponents/LabelCaption/LabelCaption.vue";
-import PageTextFieldContent, {
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
+import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 import PageTextFieldPlaceholder from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.vue";
 import PageTimePickerTrigger from "../../../StyledComponents/TimePickerTrigger/TimePickerTrigger.vue";
 
@@ -40,7 +38,6 @@ const value = shallowRef<TimeValue | undefined>(undefined);
             :locale="LOCALE"
             :padding="FIELD_STEPPER_PADDING"
             :gap="FIELD_GAP"
-            :compute-text-style="computePageTextFieldTextStyle"
             trigger-id="labeledTrigger"
             :trigger-aria-label="CLOCK_TRIGGER_LABEL"
         >

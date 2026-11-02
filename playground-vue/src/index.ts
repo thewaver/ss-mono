@@ -2,6 +2,7 @@ import { createApp } from "vue";
 import type { RouteRecordRaw } from "vue-router";
 import { createRouter, createWebHistory } from "vue-router";
 
+import { DEFAULT_LOOK, PLAYGROUND_LOOKS } from "@thewaver/ss-playground/App/Looks/Look.const";
 import { MENU_DESCRIPTIONS } from "@thewaver/ss-playground/App/MenuDescriptions.const";
 import { toPageViewRoute } from "@thewaver/ss-playground/App/PageComponents/ViewTabs/ViewTabs.const";
 import { PLAYGROUND_THEMES } from "@thewaver/ss-playground/App/Theme.css";
@@ -54,5 +55,6 @@ const router = createRouter({
 });
 
 document.documentElement.classList.add(PLAYGROUND_THEMES.vue);
+document.documentElement.classList.add(PLAYGROUND_LOOKS[DEFAULT_LOOK]);
 
 createApp(App).use(router).mount("#root");

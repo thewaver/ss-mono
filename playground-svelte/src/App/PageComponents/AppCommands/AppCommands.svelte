@@ -27,7 +27,6 @@
         renderPalettePlaceholder,
     } from "../../Pages/Menus/CommandPalettePage/CommandPalettePage.const.svelte";
     import { renderPageHighlightFloater } from "../../StyledComponents/GlideFloater/GlideFloater.const.svelte";
-    import { computePageTextFieldTextStyle } from "../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
     import { getAppliedTheme, revealTheme } from "../Theme/ThemeSvelte.const.svelte";
     import type { AppCommandsProps } from "./AppCommandsSvelte.types";
 
@@ -73,7 +72,6 @@
     listAriaLabel={"Matching commands"}
     fieldPadding={FIELD_PADDING}
     fieldGap={FIELD_GAP}
-    computeFieldTextStyle={computePageTextFieldTextStyle}
     renderOverlay={renderPaletteOverlay}
     renderFieldContent={renderPaletteField}
     renderFieldPlaceholder={renderPalettePlaceholder}

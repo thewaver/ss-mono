@@ -1,12 +1,13 @@
 import { style } from "@vanilla-extract/css";
 
+import { lookEntries, lookStates } from "../../Looks/Look.css";
 import { themeVars } from "../../Theme.css";
 import { layerVars } from "../Layer/Layer.css";
 
 export const isCurrent = style({});
-export const isHovered = style({});
-export const isActive = style({});
-export const isDisabled = style({});
+export const isHovered = style([lookStates.isHovered]);
+export const isActive = style([lookStates.isActive]);
+export const isDisabled = style([lookStates.isDisabled]);
 
 const cellBase = style({
     display: "flex",
@@ -15,10 +16,13 @@ const cellBase = style({
     minWidth: 32,
     height: 32,
     paddingInline: themeVars.spacing.half,
+    transition: `color ${themeVars.animation.duration}, filter ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}, background-color ${themeVars.animation.duration}`,
+});
+
+const cellText = style({
     color: layerVars.contrast,
     borderRadius: themeVars.borderRadius.half,
     fontSize: themeVars.fontSize.small,
-    transition: `color ${themeVars.animation.duration}, filter ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}, background-color ${themeVars.animation.duration}`,
 
     selectors: {
         [`&.${isHovered}`]: {
@@ -35,10 +39,9 @@ const cellBase = style({
 });
 
 export const paginatorPage = style([
+    lookEntries.buttonSimple,
     cellBase,
     {
-        backgroundColor: `rgb(from ${layerVars.contrast} r g b / 10%)`,
-
         selectors: {
             [`&.${isCurrent}`]: {
                 color: themeVars.color.primary.contrast,
@@ -49,15 +52,11 @@ export const paginatorPage = style([
     },
 ]);
 
-export const paginatorStep = style([
-    cellBase,
-    {
-        backgroundColor: `rgb(from ${layerVars.contrast} r g b / 10%)`,
-    },
-]);
+export const paginatorStep = style([lookEntries.buttonSimple, cellBase]);
 
 export const paginatorGap = style([
     cellBase,
+    cellText,
     {
         opacity: 0.5,
     },
@@ -65,6 +64,7 @@ export const paginatorGap = style([
 
 export const paginatorCount = style([
     cellBase,
+    cellText,
     {
         whiteSpace: "nowrap",
     },
@@ -172,15 +172,16 @@ export const paginatorDemo = style({
     minWidth: 0,
 });
 
-export const paginatorPanel = style({
-    display: "flex",
-    flexDirection: "column",
-    gap: themeVars.spacing.half,
-    borderRadius: themeVars.borderRadius.half,
-    padding: themeVars.spacing.full,
-    backgroundColor: layerVars.main,
-    fontSize: themeVars.fontSize.small,
-});
+export const paginatorPanel = style([
+    lookEntries.panel,
+    {
+        display: "flex",
+        flexDirection: "column",
+        gap: themeVars.spacing.half,
+        padding: themeVars.spacing.full,
+        fontSize: themeVars.fontSize.small,
+    },
+]);
 
 export const paginatorPanelSummary = style({
     color: layerVars.contrast,

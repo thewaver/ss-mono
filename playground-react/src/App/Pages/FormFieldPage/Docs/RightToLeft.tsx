@@ -10,10 +10,7 @@ import {
     PageFormFieldCaption,
     PageFormFieldMessage,
 } from "../../../StyledComponents/FormFieldContent/FormFieldContent";
-import {
-    PageTextFieldContent,
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent";
+import { PageTextFieldContent } from "../../../StyledComponents/TextFieldContent/TextFieldContent";
 
 const MESSAGE = "Shown to everyone who can see your posts";
 
@@ -32,7 +29,6 @@ export const RightToLeftDocsExample = () => {
                         hasError={state.hasError}
                         padding={FIELD_PADDING}
                         gap={FIELD_GAP}
-                        computeTextStyle={computePageTextFieldTextStyle}
                         renderContent={(flags) => <PageTextFieldContent flags={flags} />}
                     />
                 )}

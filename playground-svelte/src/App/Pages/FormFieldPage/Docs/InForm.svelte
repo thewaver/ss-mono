@@ -11,9 +11,7 @@
     import PageFormFieldCaption from "../../../StyledComponents/FormFieldContent/PageFormFieldCaption.svelte";
     import PageFormFieldMessage from "../../../StyledComponents/FormFieldContent/PageFormFieldMessage.svelte";
     import PageFormStack from "../../../StyledComponents/FormFieldContent/PageFormStack.svelte";
-    import PageTextFieldContent, {
-        computePageTextFieldTextStyle,
-    } from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
+    import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
     import type { FormFieldInFormDocsExampleProps } from "../FormFieldPageSvelte.types";
 
     const HINT = "Shown to everyone who can see your posts.";
@@ -54,7 +52,6 @@
                         hasError={fieldState.hasError}
                         padding={FIELD_PADDING}
                         gap={FIELD_GAP}
-                        computeTextStyle={computePageTextFieldTextStyle}
                     >
                         {#snippet renderContent(flags)}
                             <PageTextFieldContent {flags} />

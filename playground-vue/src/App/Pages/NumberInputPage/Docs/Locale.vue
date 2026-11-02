@@ -9,9 +9,7 @@ import {
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
 import PageNumberInputStepper from "../../../PageComponents/NumberInputStepper/NumberInputStepper.vue";
-import PageTextFieldContent, {
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
+import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 import type { NumberInputLocaleDocsExampleProps } from "../NumberInputPageVue.types";
 
 type Props = NumberInputLocaleDocsExampleProps;
@@ -29,7 +27,6 @@ const value = shallowRef<number | undefined>(1234.5);
         :padding="FIELD_STEPPER_PADDING"
         :gap="FIELD_GAP"
         ariaLabel="Amount"
-        :compute-text-style="computePageTextFieldTextStyle"
     >
         <template #renderContent="flags">
             <PageTextFieldContent :flags="flags" :width="FIELD_WIDTH" />

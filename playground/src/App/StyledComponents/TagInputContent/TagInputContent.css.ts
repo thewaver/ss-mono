@@ -1,12 +1,13 @@
 import { style } from "@vanilla-extract/css";
 
+import { lookEntries, lookStates } from "../../Looks/Look.css";
 import { themeVars } from "../../Theme.css";
 import { layerVars } from "../Layer/Layer.css";
 import { FIELD_FONT_SIZE, fieldSurface } from "../TextFieldContent/TextFieldContent.css";
 
-export const isHovered = style({});
+export const isHovered = style([lookStates.isHovered]);
 export const isFocused = style({});
-export const isDisabled = style({});
+export const isDisabled = style([lookStates.isDisabled]);
 
 export const tagInputContent = style([
     fieldSurface,
@@ -16,34 +17,24 @@ export const tagInputContent = style([
     },
 ]);
 
-export const tagContent = style({
-    display: "flex",
-    alignItems: "center",
-    gap: themeVars.spacing.half,
-    height: 24,
-    paddingInline: themeVars.spacing.full,
-    borderRadius: themeVars.borderRadius.half,
-    backgroundColor: themeVars.color.primary.light,
-    backgroundImage: `linear-gradient(45deg, ${themeVars.color.primary.dark}, ${themeVars.color.primary.light})`,
-    color: themeVars.color.primary.contrast,
-    fontSize: themeVars.fontSize.xSmall,
-    whiteSpace: "nowrap",
-    transition: `filter ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}`,
+export const tagContent = style([
+    lookEntries.tag,
+    {
+        display: "flex",
+        alignItems: "center",
+        gap: themeVars.spacing.half,
+        height: 24,
+        whiteSpace: "nowrap",
+        transition: `filter ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}`,
 
-    selectors: {
-        [`&.${isHovered}`]: {
-            filter: themeVars.hover.filter,
-        },
-        [`&.${isFocused}`]: {
-            outline: `2px solid ${themeVars.color.outline.main}`,
-            outlineOffset: 1,
-        },
-        [`&.${isDisabled}`]: {
-            filter: themeVars.disabled.filter,
-            opacity: themeVars.disabled.opacity,
+        selectors: {
+            [`&.${isFocused}`]: {
+                outline: `2px solid ${themeVars.color.outline.main}`,
+                outlineOffset: 1,
+            },
         },
     },
-});
+]);
 
 export const tagRemove = style({
     fontSize: themeVars.fontSize.xSmall,

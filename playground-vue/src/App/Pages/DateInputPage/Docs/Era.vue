@@ -12,9 +12,7 @@ import {
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
 import PageEraCycle from "../../../PageComponents/EraCycle/EraCycle.vue";
-import PageTextFieldContent, {
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
+import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 import PageTextFieldPlaceholder from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.vue";
 
 const value = shallowRef<DateValue | undefined>(CAESAR);
@@ -30,7 +28,6 @@ const valueText = computed(() => (value.value ? DateValueUtils.toIso(value.value
         :part-hints="DATE_PART_HINTS"
         :padding="FIELD_PADDING"
         :gap="FIELD_GAP"
-        :compute-text-style="computePageTextFieldTextStyle"
     >
         <template #renderContent="flags">
             <PageTextFieldContent :flags="flags" :width="FIELD_WIDTH" />

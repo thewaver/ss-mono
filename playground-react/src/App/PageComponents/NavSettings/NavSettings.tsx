@@ -1,5 +1,8 @@
 import { MediaQueryMonitorReactUtils, SHAPE_REVEAL_DEFAULTS, Toggle } from "@thewaver/ss-components-react";
+import { DEFAULT_LOOK } from "@thewaver/ss-playground/App/Looks/Look.const";
 import {
+    LOOK_FIELD_ID,
+    LOOK_OPTIONS,
     THEME_FIELD_ID,
     THEME_OPTIONS,
     VIEWPORT_ANCHOR_OPTIONS,
@@ -11,9 +14,10 @@ import { PageToggleContent } from "../../StyledComponents/ToggleContent/ToggleCo
 import { PageExampleKnobsButton } from "../ExampleKnobs/ExampleKnobs";
 import { PageSelectField } from "../Field/Field";
 import { OWN_FRAMEWORK } from "../FrameworkMenu/FrameworkMenu.const";
+import { revealLook, useAppliedLook } from "../Look/LookReact.const";
 import { PageProp } from "../Prop/Prop";
 import { revealTheme, useAppliedTheme } from "../Theme/ThemeReact.const";
-import type { PageNavSettingsProps, PlaygroundTheme, ViewportAnchor } from "./NavSettingsReact.types";
+import type { PageNavSettingsProps, PlaygroundLook, PlaygroundTheme, ViewportAnchor } from "./NavSettingsReact.types";
 
 const computeViewportAnchorLabel = (anchor: ViewportAnchor) =>
     VIEWPORT_ANCHOR_OPTIONS.find((option) => option.value === anchor)?.label ?? String(anchor);
@@ -21,14 +25,24 @@ const computeViewportAnchorLabel = (anchor: ViewportAnchor) =>
 const computeThemeLabel = (theme: PlaygroundTheme) =>
     THEME_OPTIONS.find((option) => option.value === theme)?.label ?? theme;
 
+const computeLookLabel = (look: PlaygroundLook) => LOOK_OPTIONS.find((option) => option.value === look)?.label ?? look;
+
 export const PageNavSettings = (props: PageNavSettingsProps) => {
     const theme = useAppliedTheme();
+    const look = useAppliedLook();
 
     const prefersReducedMotion = MediaQueryMonitorReactUtils.useReducedMotion();
 
     const pickTheme = (nextTheme: PlaygroundTheme) => {
         void revealTheme(nextTheme, {
             origin: document.getElementById(THEME_FIELD_ID) ?? SHAPE_REVEAL_DEFAULTS.origin,
+            durationMs: prefersReducedMotion ? NO_MOTION_DURATION_MS : SHAPE_REVEAL_DEFAULTS.durationMs,
+        });
+    };
+
+    const pickLook = (nextLook: PlaygroundLook) => {
+        void revealLook(nextLook, {
+            origin: document.getElementById(LOOK_FIELD_ID) ?? SHAPE_REVEAL_DEFAULTS.origin,
             durationMs: prefersReducedMotion ? NO_MOTION_DURATION_MS : SHAPE_REVEAL_DEFAULTS.durationMs,
         });
     };
@@ -89,6 +103,25 @@ export const PageNavSettings = (props: PageNavSettingsProps) => {
                             computeLabel={computeThemeLabel}
                             ariaLabel={"Theme"}
                             onChange={pickTheme}
+                        />
+                    </PageProp>
+
+                    <PageProp
+                        itemKey={"look"}
+                        label={"Look"}
+                        hint={
+                            "How the playground is drawn: the shapes, borders, shadows and fonts its controls are painted with, and where the theme's colors go. The new look is uncovered by a circle growing from this field."
+                        }
+                        controls={EXAMPLES_ONLY_PROP}
+                        defaultValue={computeLookLabel(DEFAULT_LOOK)}
+                    >
+                        <PageSelectField
+                            id={LOOK_FIELD_ID}
+                            value={look}
+                            values={LOOK_OPTIONS.map((option) => option.value)}
+                            computeLabel={computeLookLabel}
+                            ariaLabel={"Look"}
+                            onChange={pickLook}
                         />
                     </PageProp>
                 </>

@@ -12,10 +12,7 @@ import { TimeUtils } from "@thewaver/ss-utils";
 import type { TimeValue } from "@thewaver/ss-utils";
 
 import { PageMeridiemToggle } from "../../../PageComponents/MeridiemToggle/MeridiemToggle";
-import {
-    PageTextFieldContent,
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent";
+import { PageTextFieldContent } from "../../../StyledComponents/TextFieldContent/TextFieldContent";
 import type { TimeInputTwelveHourDocsExampleProps } from "../TimeInputPageReact.types";
 
 type Props = TimeInputTwelveHourDocsExampleProps;
@@ -34,7 +31,6 @@ export const TwelveHourDocsExample = (props: Props) => {
                 segmentHints={TIME_SEGMENT_HINTS}
                 padding={FIELD_STEPPER_PADDING}
                 gap={FIELD_GAP}
-                computeTextStyle={computePageTextFieldTextStyle}
                 renderContent={(flags) => <PageTextFieldContent flags={flags} width={FIELD_WIDTH} />}
                 renderTrailing={(flags, meridiem) =>
                     props.isTwelveHour && (

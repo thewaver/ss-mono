@@ -8,9 +8,7 @@
     } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
     import PageSelectClear from "../../StyledComponents/SelectClear/SelectClear.svelte";
-    import PageTextFieldContent, {
-        computePageTextFieldTextStyle,
-    } from "../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
+    import PageTextFieldContent from "../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
     import PageTextFieldPlaceholder from "../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.svelte";
     import { useFieldReset } from "./FieldSvelte.context";
     import type { PageTextFieldProps } from "./FieldSvelte.types";
@@ -37,7 +35,6 @@
     ariaLabel={props.ariaLabel}
     padding={FIELD_PADDING}
     gap={FIELD_GAP}
-    computeTextStyle={computePageTextFieldTextStyle}
     renderPlaceholder={props.placeholder === undefined ? undefined : renderPlaceholder}
     renderTrailing={props.clearAriaLabel === undefined ? undefined : renderTrailing}
 >

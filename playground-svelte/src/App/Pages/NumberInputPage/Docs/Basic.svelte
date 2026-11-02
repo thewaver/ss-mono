@@ -7,9 +7,7 @@
     } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
     import PageNumberInputStepper from "../../../PageComponents/NumberInputStepper/NumberInputStepper.svelte";
-    import PageTextFieldContent, {
-        computePageTextFieldTextStyle,
-    } from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
+    import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
     import PageTextFieldPlaceholder from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.svelte";
     import type { NumberInputBasicDocsExampleProps } from "../NumberInputPageSvelte.types";
 
@@ -28,7 +26,6 @@
     padding={FIELD_STEPPER_PADDING}
     gap={FIELD_GAP}
     ariaLabel={"How many"}
-    computeTextStyle={computePageTextFieldTextStyle}
 >
     {#snippet renderContent(flags)}
         <PageTextFieldContent {flags} width={FIELD_WIDTH} />

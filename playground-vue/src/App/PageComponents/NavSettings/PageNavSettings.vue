@@ -2,7 +2,10 @@
 import { useModel } from "vue";
 
 import { MediaQueryMonitorVueUtils, SHAPE_REVEAL_DEFAULTS, Toggle } from "@thewaver/ss-components-vue";
+import { DEFAULT_LOOK } from "@thewaver/ss-playground/App/Looks/Look.const";
 import {
+    LOOK_FIELD_ID,
+    LOOK_OPTIONS,
     THEME_FIELD_ID,
     THEME_OPTIONS,
     VIEWPORT_ANCHOR_OPTIONS,
@@ -14,15 +17,18 @@ import PageToggleContent from "../../StyledComponents/ToggleContent/ToggleConten
 import PageExampleKnobsButton from "../ExampleKnobs/PageExampleKnobsButton.vue";
 import PageSelectField from "../Field/PageSelectField.vue";
 import { OWN_FRAMEWORK } from "../FrameworkMenu/FrameworkMenu.const";
+import { appliedLook, revealLook } from "../Look/LookVue.const";
 import PageProp from "../Prop/Prop.vue";
 import { appliedTheme, revealTheme } from "../Theme/ThemeVue.const";
-import type { PageNavSettingsProps, PlaygroundTheme, ViewportAnchor } from "./NavSettingsVue.types";
+import type { PageNavSettingsProps, PlaygroundLook, PlaygroundTheme, ViewportAnchor } from "./NavSettingsVue.types";
 
 const computeViewportAnchorLabel = (anchor: ViewportAnchor) =>
     VIEWPORT_ANCHOR_OPTIONS.find((option) => option.value === anchor)?.label ?? String(anchor);
 
 const computeThemeLabel = (theme: PlaygroundTheme) =>
     THEME_OPTIONS.find((option) => option.value === theme)?.label ?? theme;
+
+const computeLookLabel = (look: PlaygroundLook) => LOOK_OPTIONS.find((option) => option.value === look)?.label ?? look;
 
 const props = defineProps<PageNavSettingsProps>();
 
@@ -34,6 +40,13 @@ const prefersReducedMotion = MediaQueryMonitorVueUtils.useReducedMotion();
 const pickTheme = (nextTheme: PlaygroundTheme) => {
     void revealTheme(nextTheme, {
         origin: document.getElementById(THEME_FIELD_ID) ?? SHAPE_REVEAL_DEFAULTS.origin,
+        durationMs: prefersReducedMotion.value ? NO_MOTION_DURATION_MS : SHAPE_REVEAL_DEFAULTS.durationMs,
+    });
+};
+
+const pickLook = (nextLook: PlaygroundLook) => {
+    void revealLook(nextLook, {
+        origin: document.getElementById(LOOK_FIELD_ID) ?? SHAPE_REVEAL_DEFAULTS.origin,
         durationMs: prefersReducedMotion.value ? NO_MOTION_DURATION_MS : SHAPE_REVEAL_DEFAULTS.durationMs,
     });
 };
@@ -90,6 +103,23 @@ const setViewportAnchor = (anchor: ViewportAnchor) => {
                     :compute-label="computeThemeLabel"
                     ariaLabel="Theme"
                     @change="pickTheme"
+                />
+            </PageProp>
+
+            <PageProp
+                item-key="look"
+                :controls="EXAMPLES_ONLY_PROP"
+                label="Look"
+                hint="How the playground is drawn: the shapes, borders, shadows and fonts its controls are painted with, and where the theme's colors go. The new look is uncovered by a circle growing from this field."
+                :default-value="computeLookLabel(DEFAULT_LOOK)"
+            >
+                <PageSelectField
+                    :id="LOOK_FIELD_ID"
+                    :value="appliedLook"
+                    :values="LOOK_OPTIONS.map((option) => option.value)"
+                    :compute-label="computeLookLabel"
+                    ariaLabel="Look"
+                    @change="pickLook"
                 />
             </PageProp>
         </template>

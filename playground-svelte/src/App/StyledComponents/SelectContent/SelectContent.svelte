@@ -1,18 +1,7 @@
-<script lang="ts" module>
-    import type { InteractionFlags, SelectFlags, TextFieldTextStyle } from "@thewaver/ss-components-svelte";
-    import { layerVars } from "@thewaver/ss-playground/App/StyledComponents/Layer/Layer.css";
-    import * as styles from "@thewaver/ss-playground/App/StyledComponents/SelectContent/SelectContent.css";
-    import { themeVars } from "@thewaver/ss-playground/App/Theme.css";
-
-    export const computePageSelectTextStyle = (flags: InteractionFlags<SelectFlags>): TextFieldTextStyle => ({
-        color: flags.isDisabled ? `rgb(from ${layerVars.contrast} r g b / 50%)` : layerVars.contrast,
-        caretColor: themeVars.color.primary.main,
-        fontSize: styles.FIELD_FONT_SIZE,
-    });
-</script>
-
 <script lang="ts">
     import type { Snippet } from "svelte";
+
+    import * as styles from "@thewaver/ss-playground/App/StyledComponents/SelectContent/SelectContent.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
     import type { SelectContentProps } from "./SelectContentSvelte.types";

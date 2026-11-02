@@ -6,9 +6,7 @@ import * as popupStyles from "@thewaver/ss-playground/App/StyledComponents/Popov
 
 import PageGlideFloater from "../../../StyledComponents/GlideFloater/PageGlideFloater.vue";
 import PagePopoverSurface from "../../../StyledComponents/PopoverSurface/PopoverSurface.vue";
-import PageSelectContent, {
-    computePageSelectTextStyle,
-} from "../../../StyledComponents/SelectContent/SelectContent.vue";
+import PageSelectContent from "../../../StyledComponents/SelectContent/SelectContent.vue";
 import PageSelectGroupContent from "../../../StyledComponents/SelectGroupContent/SelectGroupContent.vue";
 import PageSelectOptionContent from "../../../StyledComponents/SelectOptionContent/SelectOptionContent.vue";
 import { GROUPED_COUNTRIES, PLACEHOLDER, QUERY_PADDING } from "../../SelectPage/SelectPageVue.const";
@@ -41,7 +39,6 @@ const options = computed(() => {
         :options="options"
         ariaLabel="Countries"
         :padding="QUERY_PADDING"
-        :compute-text-style="computePageSelectTextStyle"
     >
         <template #renderContent="{ selectedOptions, flags }">
             <PageSelectContent :flags="flags">{{

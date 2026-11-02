@@ -7,9 +7,7 @@
     } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
     import PageTextFieldAdornment from "../../../StyledComponents/TextFieldAdornment/TextFieldAdornment.svelte";
-    import PageTextFieldContent, {
-        computePageTextFieldTextStyle,
-    } from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
+    import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
     import PageTextFieldPlaceholder from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.svelte";
 
     const FIELD_WIDTH = 200;
@@ -23,7 +21,6 @@
         padding={FIELD_STEPPER_PADDING}
         gap={FIELD_GAP}
         ariaLabel={"Price"}
-        computeTextStyle={computePageTextFieldTextStyle}
     >
         {#snippet renderContent(flags)}
             <PageTextFieldContent {flags} width={FIELD_WIDTH} />

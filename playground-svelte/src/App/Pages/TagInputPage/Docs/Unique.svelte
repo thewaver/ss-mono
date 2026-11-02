@@ -11,7 +11,6 @@
     import PageTagContent from "../../../StyledComponents/TagInputContent/PageTagContent.svelte";
     import PageTagInputContent from "../../../StyledComponents/TagInputContent/PageTagInputContent.svelte";
     import PageTagInputPlaceholder from "../../../StyledComponents/TagInputContent/PageTagInputPlaceholder.svelte";
-    import { computePageTextFieldTextStyle } from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
 
     let value = $state.raw(STARTING_TAGS);
 </script>
@@ -28,7 +27,6 @@
         return tag && !value.includes(tag) ? tag : undefined;
     }}
     computeTagAriaLabel={computeTagAriaLabel}
-    computeTextStyle={computePageTextFieldTextStyle}
 >
     {#snippet renderContent(flags)}
         <PageTagInputContent {flags} />

@@ -17,13 +17,13 @@ export const PageMenuItemContent = (props: ParentProps<MenuItemContentProps>) =>
 
     return (
         <div
-            class={styles.menuItemContent}
+            class={access(props.isGliding) ? styles.menuItemContent : styles.menuItemContentWithoutFloater}
             classList={{
                 [getLayerClass()]: true,
-                [styles.isHovered]: !access(props.isGliding) && access(props.flags).isHovered,
+                [styles.isHovered]:
+                    !access(props.isGliding) &&
+                    (access(props.flags).isHovered || access(props.flags).isHighlighted || access(props.flags).isOpen),
                 [styles.isActive]: access(props.flags).isActive,
-                [styles.isHighlighted]: !access(props.isGliding) && access(props.flags).isHighlighted,
-                [styles.isOpen]: access(props.flags).isOpen,
                 [styles.isDisabled]: access(props.flags).isDisabled,
             }}
         >

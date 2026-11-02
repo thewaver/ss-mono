@@ -3,6 +3,7 @@ import { style } from "@vanilla-extract/css";
 import { LAYOUT } from "../../Layout.const";
 
 import { layoutVars } from "../../Layout.css";
+import { lookEntries } from "../../Looks/Look.css";
 import { layerVars } from "../../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../../Theme.css";
 
@@ -80,12 +81,12 @@ export const docsEmpty = style({
     opacity: 0.75,
 });
 
-export const docsTableScroller = style({
-    overflowX: "auto",
-    backgroundColor: [themeVars.color.background.dark, `rgba(from ${themeVars.color.background.dark} r g b / 50%)`],
-    borderRadius: themeVars.borderRadius.full,
-    boxShadow: themeVars.shadow.small,
-});
+export const docsTableScroller = style([
+    lookEntries.panel,
+    {
+        overflowX: "auto",
+    },
+]);
 
 export const docsTable = style({
     borderCollapse: "collapse",

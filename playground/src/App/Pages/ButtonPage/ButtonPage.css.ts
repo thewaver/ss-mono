@@ -18,21 +18,3 @@ export const counterValue = style({
     fontSize: themeVars.fontSize.large,
     fontVariantNumeric: "tabular-nums",
 });
-
-export const isPressed = style({});
-
-export const pressedContent = style({
-    position: "relative",
-
-    selectors: {
-        [`&.${isPressed}::after`]: {
-            content: '""',
-            position: "absolute",
-            inset: 0,
-            borderRadius: themeVars.borderRadius.half,
-            boxShadow: `inset 0 0 0 4px white`,
-            mixBlendMode: "overlay",
-            pointerEvents: "none",
-        },
-    },
-});

@@ -8,9 +8,7 @@ import {
     FIELD_PADDING,
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
-import PageTextFieldContent, {
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
+import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 import PageTextFieldPlaceholder from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.vue";
 
 const value = shallowRef("");
@@ -22,7 +20,6 @@ const value = shallowRef("");
         :padding="FIELD_PADDING"
         :gap="FIELD_GAP"
         ariaLabel="Coupon code"
-        :compute-text-style="computePageTextFieldTextStyle"
         @input="(next: string) => (value = next.toLocaleUpperCase())"
     >
         <template #renderContent="flags">

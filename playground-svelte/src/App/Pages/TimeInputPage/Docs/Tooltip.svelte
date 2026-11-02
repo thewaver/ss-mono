@@ -8,9 +8,7 @@
     } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
     import type { TimeValue } from "@thewaver/ss-utils";
 
-    import PageTextFieldContent, {
-        computePageTextFieldTextStyle,
-    } from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
+    import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
     import PageTooltipContent from "../../../StyledComponents/TooltipContent/TooltipContent.svelte";
     import type { TimeInputTooltipDocsExampleProps } from "../TimeInputPageSvelte.types";
 
@@ -29,7 +27,6 @@
     segmentHints={TIME_SEGMENT_HINTS}
     padding={FIELD_PADDING}
     gap={FIELD_GAP}
-    computeTextStyle={computePageTextFieldTextStyle}
     tooltipDefs={{
         placement: { x: "center", y: "top_out" },
         offset: { x: 0, y: 10 },

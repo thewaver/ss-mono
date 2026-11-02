@@ -10,9 +10,7 @@ import {
     FIELD_PADDING,
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
-import PageTextFieldContent, {
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
+import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 import PageTooltipContent from "../../../StyledComponents/TooltipContent/TooltipContent.vue";
 import type { DateInputTooltipDocsExampleProps } from "../DateInputPageVue.types";
 
@@ -40,7 +38,6 @@ const tooltipDefs: InteractionTooltipDefs<TextFieldFlags> = {
         :part-hints="DATE_PART_HINTS"
         :padding="FIELD_PADDING"
         :gap="FIELD_GAP"
-        :compute-text-style="computePageTextFieldTextStyle"
         :tooltip-defs="tooltipDefs"
     >
         <template #renderContent="flags">

@@ -13,6 +13,7 @@ import {
     PageFrameworkMenuItem,
     PageFrameworkMenuTrigger,
 } from "../../StyledComponents/FrameworkMenuContent/FrameworkMenuContent";
+import { renderPageHighlightFloater } from "../../StyledComponents/GlideFloater/GlideFloater";
 import { PagePopoverSurface } from "../../StyledComponents/PopoverSurface/PopoverSurface";
 import { PageLayer } from "../Layer/Layer";
 import { OWN_FRAMEWORK } from "./FrameworkMenu.const";
@@ -40,6 +41,7 @@ export const PageFrameworkMenu = () => {
                     {PLAYGROUND_FRAMEWORK_LABELS[getItem().value]}
                 </PageFrameworkMenuItem>
             )}
+            renderHighlightFloater={renderPageHighlightFloater}
             renderPopup={(renderItems, getVisibilityTarget, getTransitionDurationMs, getPlacement) => (
                 <PageLayer level={2}>
                     <PagePopoverSurface

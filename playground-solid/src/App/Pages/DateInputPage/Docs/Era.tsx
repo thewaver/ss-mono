@@ -11,10 +11,7 @@ import {
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
 import { PageEraCycle } from "../../../PageComponents/EraCycle/EraCycle";
-import {
-    PageTextFieldContent,
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent";
+import { PageTextFieldContent } from "../../../StyledComponents/TextFieldContent/TextFieldContent";
 import { PageTextFieldPlaceholder } from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder";
 
 export const EraDocsExample = () => {
@@ -35,7 +32,6 @@ export const EraDocsExample = () => {
                 partHints={DATE_PART_HINTS}
                 padding={FIELD_PADDING}
                 gap={FIELD_GAP}
-                computeTextStyle={computePageTextFieldTextStyle}
                 renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} width={FIELD_WIDTH} />}
                 renderPlaceholder={(getFlags, hint) => (
                     <PageTextFieldPlaceholder flags={getFlags}>{hint}</PageTextFieldPlaceholder>

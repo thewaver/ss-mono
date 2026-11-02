@@ -9,9 +9,7 @@ import {
 
 import PageFormFieldCaption from "../../../StyledComponents/FormFieldContent/PageFormFieldCaption.vue";
 import PageFormFieldMessage from "../../../StyledComponents/FormFieldContent/PageFormFieldMessage.vue";
-import PageTextFieldContent, {
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
+import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 
 const MESSAGE = "Shown to everyone who can see your posts";
 
@@ -30,13 +28,7 @@ const value = shallowRef("");
             </template>
 
             <template #renderControl="state">
-                <TextInput
-                    v-model:value="value"
-                    :has-error="state.hasError"
-                    :padding="FIELD_PADDING"
-                    :gap="FIELD_GAP"
-                    :compute-text-style="computePageTextFieldTextStyle"
-                >
+                <TextInput v-model:value="value" :has-error="state.hasError" :padding="FIELD_PADDING" :gap="FIELD_GAP">
                     <template #renderContent="flags">
                         <PageTextFieldContent :flags="flags" />
                     </template>

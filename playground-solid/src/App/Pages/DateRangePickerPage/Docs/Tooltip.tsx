@@ -19,10 +19,7 @@ import {
     PageCalendarWeekday,
 } from "../../../StyledComponents/CalendarContent/CalendarContent";
 import { PageDatePickerTrigger } from "../../../StyledComponents/DatePickerTrigger/DatePickerTrigger";
-import {
-    PageTextFieldContent,
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent";
+import { PageTextFieldContent } from "../../../StyledComponents/TextFieldContent/TextFieldContent";
 import { PageTextFieldPlaceholder } from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder";
 import { PageTooltipContent } from "../../../StyledComponents/TooltipContent/TooltipContent";
 import { PageDateRangeSeparator } from "../DateRangePickerPage.content";
@@ -45,7 +42,6 @@ export const TooltipDocsExample = (props: Props) => {
             locale={LOCALE}
             padding={FIELD_STEPPER_PADDING}
             gap={FIELD_GAP}
-            computeTextStyle={computePageTextFieldTextStyle}
             renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} width={PAIR_FIELD_WIDTH} />}
             renderPlaceholder={(getFlags, hint) => (
                 <PageTextFieldPlaceholder flags={getFlags}>{hint}</PageTextFieldPlaceholder>

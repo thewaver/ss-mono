@@ -11,9 +11,7 @@ import {
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
 import PageLabelCaption from "../../../StyledComponents/LabelCaption/LabelCaption.vue";
-import PageTextFieldContent, {
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
+import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 import PageTextFieldPlaceholder from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.vue";
 
 const LABEL_GAP = 5;
@@ -31,7 +29,6 @@ const value = shallowRef<DateValue | undefined>();
             :part-hints="DATE_PART_HINTS"
             :padding="FIELD_PADDING"
             :gap="FIELD_GAP"
-            :compute-text-style="computePageTextFieldTextStyle"
         >
             <template #renderContent="flags">
                 <PageTextFieldContent :flags="flags" :width="FIELD_WIDTH" />

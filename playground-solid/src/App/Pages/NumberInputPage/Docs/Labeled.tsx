@@ -9,10 +9,7 @@ import {
 
 import { PageNumberInputStepper } from "../../../PageComponents/NumberInputStepper/NumberInputStepper";
 import { PageLabelCaption } from "../../../StyledComponents/LabelCaption/LabelCaption";
-import {
-    PageTextFieldContent,
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent";
+import { PageTextFieldContent } from "../../../StyledComponents/TextFieldContent/TextFieldContent";
 
 const LABEL_GAP = 5;
 const GUEST_MIN = 1;
@@ -31,7 +28,6 @@ export const LabeledDocsExample = () => {
                 max={GUEST_MAX}
                 padding={FIELD_STEPPER_PADDING}
                 gap={FIELD_GAP}
-                computeTextStyle={computePageTextFieldTextStyle}
                 renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} width={FIELD_WIDTH} />}
                 renderTrailing={(getFlags, stepper) => <PageNumberInputStepper flags={getFlags} stepper={stepper} />}
             />

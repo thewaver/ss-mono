@@ -4,9 +4,7 @@
 
     import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater.const.svelte";
     import PagePopoverSurface from "../../../StyledComponents/PopoverSurface/PopoverSurface.svelte";
-    import PageSelectContent, {
-        computePageSelectTextStyle,
-    } from "../../../StyledComponents/SelectContent/SelectContent.svelte";
+    import PageSelectContent from "../../../StyledComponents/SelectContent/SelectContent.svelte";
     import PageSelectGroupContent from "../../../StyledComponents/SelectGroupContent/SelectGroupContent.svelte";
     import PageSelectOptionContent from "../../../StyledComponents/SelectOptionContent/SelectOptionContent.svelte";
     import { GROUPED_COUNTRIES, PLACEHOLDER, QUERY_PADDING } from "../../SelectPage/SelectPage.const.svelte";
@@ -39,7 +37,6 @@
     {options}
     ariaLabel={"Countries"}
     padding={QUERY_PADDING}
-    computeTextStyle={computePageSelectTextStyle}
 >
     {#snippet renderContent(selectedOptions, flags)}
         <PageSelectContent {flags}>

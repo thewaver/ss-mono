@@ -30,7 +30,7 @@ export const PageTreeNodeContent = (props: PropsWithChildren<TreeNodeContentProp
         <div
             ref={ref}
             className={[
-                styles.treeNodeContent,
+                props.isGliding ? styles.treeNodeContent : styles.treeNodeContentWithoutFloater,
                 layerClass,
                 props.renderProps.isBranch && styles.isBranch,
                 props.renderProps.isExpanded && styles.isExpanded,

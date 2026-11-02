@@ -1,5 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
+import { lookEntries } from "../../Looks/Look.css";
 import { themeVars } from "../../Theme.css";
 import { layerVars } from "../Layer/Layer.css";
 
@@ -39,16 +40,16 @@ export const rowGrip = style([gutterGrip, { width: 2, height: 24 }]);
 
 export const columnGrip = style([gutterGrip, { width: 24, height: 2 }]);
 
-export const splitPaneBox = style({
-    width: "100%",
-    height: "100%",
-    padding: themeVars.spacing.full,
-    borderRadius: themeVars.borderRadius.half,
-    color: layerVars.contrast,
-    backgroundColor: layerVars.main,
-    fontSize: themeVars.fontSize.small,
-    overflow: "auto",
-});
+export const splitPaneBox = style([
+    lookEntries.panel,
+    {
+        width: "100%",
+        height: "100%",
+        padding: themeVars.spacing.full,
+        fontSize: themeVars.fontSize.small,
+        overflow: "auto",
+    },
+]);
 
 export const splitPaneFrame = style({
     width: "100%",

@@ -7,9 +7,22 @@
     import PageSelectField from "../Field/PageSelectField.svelte";
     import { OWN_FRAMEWORK } from "../FrameworkMenu/FrameworkMenu.const";
     import PageProp from "../Prop/Prop.svelte";
+    import { getAppliedLook, revealLook } from "../Look/LookSvelte.const.svelte";
     import { getAppliedTheme, revealTheme } from "../Theme/ThemeSvelte.const.svelte";
-    import { THEME_FIELD_ID, THEME_OPTIONS, VIEWPORT_ANCHOR_OPTIONS } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
-    import type { PageNavSettingsProps, PlaygroundTheme, ViewportAnchor } from "./NavSettingsSvelte.types";
+    import {
+        LOOK_FIELD_ID,
+        LOOK_OPTIONS,
+        THEME_FIELD_ID,
+        THEME_OPTIONS,
+        VIEWPORT_ANCHOR_OPTIONS,
+    } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
+    import { DEFAULT_LOOK } from "@thewaver/ss-playground/App/Looks/Look.const";
+    import type {
+        PageNavSettingsProps,
+        PlaygroundLook,
+        PlaygroundTheme,
+        ViewportAnchor,
+    } from "./NavSettingsSvelte.types";
     import { NO_MOTION_DURATION_MS } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
 
     const computeViewportAnchorLabel = (anchor: ViewportAnchor) =>
@@ -17,6 +30,9 @@
 
     const computeThemeLabel = (theme: PlaygroundTheme) =>
         THEME_OPTIONS.find((option) => option.value === theme)?.label ?? theme;
+
+    const computeLookLabel = (look: PlaygroundLook) =>
+        LOOK_OPTIONS.find((option) => option.value === look)?.label ?? look;
 
     let {
         showsDescriptionOnly = $bindable(),
@@ -28,6 +44,13 @@
     const pickTheme = (nextTheme: PlaygroundTheme) => {
         void revealTheme(nextTheme, {
             origin: document.getElementById(THEME_FIELD_ID) ?? SHAPE_REVEAL_DEFAULTS.origin,
+            durationMs: getPrefersReducedMotion() ? NO_MOTION_DURATION_MS : SHAPE_REVEAL_DEFAULTS.durationMs,
+        });
+    };
+
+    const pickLook = (nextLook: PlaygroundLook) => {
+        void revealLook(nextLook, {
+            origin: document.getElementById(LOOK_FIELD_ID) ?? SHAPE_REVEAL_DEFAULTS.origin,
             durationMs: getPrefersReducedMotion() ? NO_MOTION_DURATION_MS : SHAPE_REVEAL_DEFAULTS.durationMs,
         });
     };
@@ -82,6 +105,23 @@
             computeLabel={computeThemeLabel}
             ariaLabel={"Theme"}
             onChange={pickTheme}
+        />
+    </PageProp>
+
+    <PageProp
+        itemKey={"look"}
+        controls={EXAMPLES_ONLY_PROP}
+        label={"Look"}
+        hint={"How the playground is drawn: the shapes, borders, shadows and fonts its controls are painted with, and where the theme's colors go. The new look is uncovered by a circle growing from this field."}
+        defaultValue={computeLookLabel(DEFAULT_LOOK)}
+    >
+        <PageSelectField
+            id={LOOK_FIELD_ID}
+            value={getAppliedLook()}
+            values={LOOK_OPTIONS.map((option) => option.value)}
+            computeLabel={computeLookLabel}
+            ariaLabel={"Look"}
+            onChange={pickLook}
         />
     </PageProp>
 {/snippet}

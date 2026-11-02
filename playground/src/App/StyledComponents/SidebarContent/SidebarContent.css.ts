@@ -1,5 +1,6 @@
 import { style, styleVariants } from "@vanilla-extract/css";
 
+import { lookEntries } from "../../Looks/Look.css";
 import { themeVars } from "../../Theme.css";
 import { layerVars } from "../Layer/Layer.css";
 
@@ -44,15 +45,14 @@ export const sidebarFrame = style({
     overflow: "hidden",
 });
 
-export const sidebarSurface = style({
-    width: "100%",
-    height: "100%",
-    overflow: "hidden",
-    color: themeVars.color.surface.contrast,
-    backgroundColor: themeVars.color.surface.light,
-    backgroundImage: `linear-gradient(45deg, ${themeVars.color.surface.dark}, ${themeVars.color.surface.light})`,
-    boxShadow: themeVars.shadow.medium,
-});
+export const sidebarSurface = style([
+    lookEntries.drawer,
+    {
+        width: "100%",
+        height: "100%",
+        overflow: "hidden",
+    },
+]);
 
 export const sidebarSurfaceContent = style({
     display: "flex",

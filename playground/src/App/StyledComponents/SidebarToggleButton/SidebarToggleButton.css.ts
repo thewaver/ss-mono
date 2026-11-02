@@ -1,37 +1,32 @@
 import { style } from "@vanilla-extract/css";
 
 import { layoutVars } from "../../Layout.css";
+import { lookEntries, lookStates } from "../../Looks/Look.css";
 import { themeVars } from "../../Theme.css";
-import { layerVars } from "../Layer/Layer.css";
 
-export const isHovered = style({});
-export const isDisabled = style({});
+export const isHovered = style([lookStates.isHovered]);
+export const isDisabled = style([lookStates.isDisabled]);
 
-export const sidebarToggle = style({
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    pointerEvents: "all",
-    width: layoutVars.iconButtonSize,
-    height: layoutVars.iconButtonSize,
-    padding: 0,
-    border: "none",
-    borderRadius: themeVars.borderRadius.half,
-    font: "inherit",
-    fontSize: themeVars.fontSize.large,
-    color: layerVars.contrast,
-    background: "none",
-    cursor: "pointer",
-    transition: `background-color ${themeVars.animation.duration}`,
+export const sidebarToggle = style([
+    lookEntries.decoration,
+    {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        pointerEvents: "all",
+        width: layoutVars.iconButtonSize,
+        height: layoutVars.iconButtonSize,
+        padding: 0,
+        border: "none",
+        font: "inherit",
+        fontSize: themeVars.fontSize.large,
+        cursor: "pointer",
+        transition: `background-color ${themeVars.animation.duration}`,
 
-    selectors: {
-        [`&.${isHovered}:not(.${isDisabled})`]: {
-            backgroundColor: `rgb(from ${layerVars.contrast} r g b / 25%)`,
-        },
-        [`&.${isDisabled}`]: {
-            opacity: themeVars.disabled.opacity,
-            filter: themeVars.disabled.filter,
-            cursor: "default",
+        selectors: {
+            [`&.${isDisabled}`]: {
+                cursor: "default",
+            },
         },
     },
-});
+]);

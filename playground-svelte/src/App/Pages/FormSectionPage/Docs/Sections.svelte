@@ -13,9 +13,7 @@
     import PageFormSectionBody from "../../../StyledComponents/FormFieldContent/PageFormSectionBody.svelte";
     import PageFormSectionCaption from "../../../StyledComponents/FormFieldContent/PageFormSectionCaption.svelte";
     import PageFormStack from "../../../StyledComponents/FormFieldContent/PageFormStack.svelte";
-    import PageTextFieldContent, {
-        computePageTextFieldTextStyle,
-    } from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
+    import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
 
     type TextState = [() => string, (next: string) => void];
 
@@ -45,7 +43,6 @@
         {hasError}
         padding={FIELD_PADDING}
         gap={FIELD_GAP}
-        computeTextStyle={computePageTextFieldTextStyle}
     >
         {#snippet renderContent(flags)}
             <PageTextFieldContent {flags} width={FIELD_WIDTH} />

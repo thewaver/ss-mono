@@ -1,10 +1,10 @@
 import { keyframes, style } from "@vanilla-extract/css";
 
+import { lookEntries, lookStates } from "../../Looks/Look.css";
 import { themeVars } from "../../Theme.css";
-import { layerVars } from "../Layer/Layer.css";
 
 export const isIndeterminate = style({});
-export const hasError = style({});
+export const hasError = style([lookStates.hasError]);
 
 const sweep = keyframes({
     "0%": { transform: "translateX(-100%)" },
@@ -16,54 +16,35 @@ const sweepFromRight = keyframes({
     "100%": { transform: "translateX(-300%)" },
 });
 
-export const progressTrack = style({
-    position: "relative",
-    overflow: "hidden",
-    width: "100%",
-    height: 8,
-    boxShadow: themeVars.shadow.small,
-    border: `2px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
-    borderRadius: themeVars.borderRadius.half,
-    backgroundColor: layerVars.main,
-    transition: `border-color ${themeVars.animation.duration}`,
+export const progressTrack = style([
+    lookEntries.progressTrack,
+    {
+        position: "relative",
+        overflow: "hidden",
+        width: "100%",
+        height: 8,
+        transition: `border-color ${themeVars.animation.duration}`,
+    },
+]);
 
-    selectors: {
-        [`&.${hasError}`]: {
-            borderColor: themeVars.color.error.main,
+export const progressFill = style([
+    lookEntries.progressFill,
+    {
+        height: "100%",
+        transition: `width ${themeVars.animation.duration}`,
+
+        selectors: {
+            [`${progressTrack}.${isIndeterminate} &`]: {
+                width: "33%",
+                animation: `${sweep} 1.2s linear infinite`,
+                transition: "none",
+            },
+            [`${progressTrack}.${isIndeterminate} &:dir(rtl)`]: {
+                animationName: sweepFromRight,
+            },
         },
     },
-});
-
-export const progressFill = style({
-    height: "100%",
-    borderRadius: themeVars.borderRadius.half,
-    backgroundColor: themeVars.color.primary.light,
-    backgroundImage: `linear-gradient(90deg, ${themeVars.color.primary.dark}, ${themeVars.color.primary.light})`,
-    transition: `width ${themeVars.animation.duration}`,
-
-    selectors: {
-        [`${progressTrack}.${hasError} &`]: {
-            backgroundColor: themeVars.color.error.light,
-            backgroundImage: `linear-gradient(90deg, ${themeVars.color.error.dark}, ${themeVars.color.error.light})`,
-        },
-        [`&:dir(rtl)`]: {
-            backgroundColor: themeVars.color.primary.light,
-            backgroundImage: `linear-gradient(270deg, ${themeVars.color.primary.dark}, ${themeVars.color.primary.light})`,
-        },
-        [`${progressTrack}.${hasError} &:dir(rtl)`]: {
-            backgroundColor: themeVars.color.error.light,
-            backgroundImage: `linear-gradient(270deg, ${themeVars.color.error.dark}, ${themeVars.color.error.light})`,
-        },
-        [`${progressTrack}.${isIndeterminate} &`]: {
-            width: "33%",
-            animation: `${sweep} 1.2s linear infinite`,
-            transition: "none",
-        },
-        [`${progressTrack}.${isIndeterminate} &:dir(rtl)`]: {
-            animationName: sweepFromRight,
-        },
-    },
-});
+]);
 
 export const progressReadout = style({
     fontSize: themeVars.fontSize.xSmall,

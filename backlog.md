@@ -134,6 +134,44 @@ compose a `Trigger` and a `Content`. So "no `renderContent` tooltip renderer, ju
 string" is not a departure from how the industry splits these two layers — it is the split, stated in the
 same example.
 
+**Looks — begun.** The Playground's painters now take their paint from a Look picked in the left nav, as a Theme
+is: the Theme gives the colors, the Look decides shapes and where those colors go. Plasticine is the only one.
+How it works is in `decisions.md` under _"Looks"_. What follows keeps its own paint, so a Look does not reach it
+yet.
+
+**Deferred, by the user, until this item picks them up:**
+
+- **The links** — they paint too differently from one another for one Look entry: some brighten and underline
+  on hover, some tint, one dims until current.
+    - Library components: breadcrumbs, the flyout menu, the table of contents.
+    - Playground-only: the left nav's ABOUT, GETTING STARTED and GALLERY, and the framework menu's trigger.
+- **The selection markers, and the tab labels with them** (all library components): the tab underline and
+  vertical bar, the honeycomb tabs' hex markers, the segmented radio's marker, and the table of contents'
+  current-entry bar. Tabs have to stay very flexible: another Look might draw them as a segmented control with a
+  groove behind, or as a rectangle that moves around the selected tab. A Look entry for the marker and another
+  for its groove would cover only the row and column layouts; the hex tabs would stay fully custom. The table of
+  contents' thin bar could be a full-length one in another Look.
+
+**Left with their own paint, by the user's call:**
+
+- Library components:
+    - the chips and badges other than tags: the satellite badge and pill, the staircase steps and the stepper
+      markers;
+    - the custom variants, which want a painter of their own rather than classes: the progress ring, the range
+      knob, the scroller arc, the slide button and the color area;
+    - the calendar's days, title and weekday headings, the clock's options and unit labels, and the accordion
+      header;
+    - the data views: the table, the timeline, the patch board, the sortable list and grid, the split pane, the
+      form section's line, the file drop zone and the inline edit;
+    - the decorative samples drawn inside components: the cuboid and die faces, the flip card's back, the mosaic
+      tiles, the icicle, treemap, sunburst and circle-packing charts, the wheel, the tile board, the trail, the
+      beam, the SVG filters stage, the ripple and the formation items.
+- Playground-only:
+    - the prop hint badge beside each knob, and the inline code chips in docs prose;
+    - the docs alert boxes, the build-progress strip, the measuring box and the stress test's frame-rate counter;
+    - the text sizes of the page header, the docs headings and prose, and the small captions and readouts;
+    - the divider lines in API tables, the props panel and docs examples, and the shadow around docs code.
+
 ---
 
 ## 3. `ColorInput` — the eyedropper — _postponed until the platform catches up_

@@ -11,9 +11,7 @@
     import PageButtonContent from "../../../../StyledComponents/ButtonContent/ButtonContent.svelte";
     import PageControlButtonContent from "../../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
     import { renderPageHighlightFloater } from "../../../../StyledComponents/GlideFloater/GlideFloater.const.svelte";
-    import PageTextFieldContent, {
-        computePageTextFieldTextStyle,
-    } from "../../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
+    import PageTextFieldContent from "../../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
     import PageTextFieldPlaceholder from "../../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.svelte";
     import {
         BARE_LETTER_SHORTCUT,
@@ -54,7 +52,6 @@
     padding={FIELD_PADDING}
     gap={FIELD_GAP}
     ariaLabel={"Somewhere to type"}
-    computeTextStyle={computePageTextFieldTextStyle}
 >
     {#snippet renderContent(flags)}
         <PageTextFieldContent {flags} />
@@ -75,7 +72,6 @@
     renderOverlay={renderPaletteOverlay}
     fieldPadding={FIELD_PADDING}
     fieldGap={FIELD_GAP}
-    computeFieldTextStyle={computePageTextFieldTextStyle}
     renderFieldContent={renderPaletteField}
     renderFieldPlaceholder={renderPalettePlaceholder}
     renderOption={renderPaletteOption}

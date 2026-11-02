@@ -30,7 +30,7 @@ export const PageTreeNodeContent = (props: ParentProps<TreeNodeContentProps>) =>
     return (
         <div
             ref={setRef}
-            class={styles.treeNodeContent}
+            class={access(props.isGliding) ? styles.treeNodeContent : styles.treeNodeContentWithoutFloater}
             style={{
                 "padding-inline-start": `calc(${themeVars.spacing.half} + ${access(props.renderProps).depth * INDENT_PER_DEPTH}px)`,
             }}

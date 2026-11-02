@@ -9,9 +9,7 @@ import {
     FIELD_PADDING,
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
-import PageTextFieldContent, {
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
+import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 import type { TextAreaGrowingDocsExampleProps } from "../TextAreaPageVue.types";
 
 type Props = TextAreaGrowingDocsExampleProps;
@@ -30,7 +28,6 @@ const value = shallowRef(LONG_TEXT);
         :padding="FIELD_PADDING"
         :gap="FIELD_GAP"
         ariaLabel="Message"
-        :compute-text-style="computePageTextFieldTextStyle"
     >
         <template #renderContent="flags">
             <PageTextFieldContent :flags="flags" :width="FIELD_WIDTH" is-stretched />

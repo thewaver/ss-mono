@@ -6,10 +6,7 @@ import {
     FIELD_PADDING,
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
-import {
-    PageTextFieldContent,
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent";
+import { PageTextFieldContent } from "../../../StyledComponents/TextFieldContent/TextFieldContent";
 import { PageTextFieldPlaceholder } from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder";
 import type { TextInputBasicDocsExampleProps } from "../TextInputPageSolid.types";
 
@@ -27,7 +24,6 @@ export const BasicDocsExample = (props: Props) => {
             hasError={props.hasError}
             isDisabled={props.isDisabled}
             ariaLabel={"Your name"}
-            computeTextStyle={computePageTextFieldTextStyle}
             renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} />}
             renderPlaceholder={(getFlags) => (
                 <PageTextFieldPlaceholder flags={getFlags}>Your name</PageTextFieldPlaceholder>

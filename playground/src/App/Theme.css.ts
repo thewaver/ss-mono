@@ -150,7 +150,6 @@ globalStyle("a:active:not([aria-disabled='true'])", {
 globalStyle("body", {
     margin: 0,
     padding: 0,
-    color: themeVars.color.background.contrast,
     backgroundColor: "#202020",
     fontFamily: "Arial, Helvetica, sans-serif",
     fontSize: 16,

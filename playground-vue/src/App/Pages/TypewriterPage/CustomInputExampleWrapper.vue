@@ -14,9 +14,7 @@ import {
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
 import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.vue";
-import PageTextFieldContent, {
-    computePageTextFieldTextStyle,
-} from "../../StyledComponents/TextFieldContent/TextFieldContent.vue";
+import PageTextFieldContent from "../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 import PageTextFieldPlaceholder from "../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.vue";
 import CustomInputExample from "./Examples/CustomInput.vue";
 import type { TypewriterExampleWrapperProps } from "./TypewriterPageVue.types";
@@ -35,7 +33,6 @@ const text = shallowRef("Line one\n\nline two");
         :padding="FIELD_PADDING"
         :gap="FIELD_GAP"
         ariaLabel="Custom text"
-        :compute-text-style="computePageTextFieldTextStyle"
     >
         <template #renderContent="flags">
             <PageTextFieldContent :flags="flags" :width="CUSTOM_TEXT_WIDTH" is-stretched />

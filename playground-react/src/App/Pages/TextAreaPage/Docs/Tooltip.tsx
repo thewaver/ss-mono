@@ -7,10 +7,7 @@ import {
     FIELD_PADDING,
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
-import {
-    PageTextFieldContent,
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent";
+import { PageTextFieldContent } from "../../../StyledComponents/TextFieldContent/TextFieldContent";
 import { PageTooltipContent } from "../../../StyledComponents/TooltipContent/TooltipContent";
 import type { TextAreaTooltipDocsExampleProps } from "../TextAreaPageReact.types";
 
@@ -27,7 +24,6 @@ export const TooltipDocsExample = (props: Props) => {
             isDisabled={props.isDisabled}
             isReachableWhenDisabled={props.isReachableWhenDisabled}
             ariaLabel={"Notes with a tooltip"}
-            computeTextStyle={computePageTextFieldTextStyle}
             renderContent={(flags) => <PageTextFieldContent flags={flags} width={FIELD_WIDTH} height={FIXED_HEIGHT} />}
             tooltipDefs={{
                 placement: { x: "center", y: "top_out" },

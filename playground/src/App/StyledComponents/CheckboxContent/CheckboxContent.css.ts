@@ -1,13 +1,13 @@
 import { style } from "@vanilla-extract/css";
 
+import { lookEntries, lookStates } from "../../Looks/Look.css";
 import { themeVars } from "../../Theme.css";
-import { layerVars } from "../Layer/Layer.css";
 
-export const isChecked = style({});
-export const isMixed = style({});
+export const isChecked = style([lookStates.isChecked]);
+export const isMixed = style([lookStates.isMixed]);
 export const isHovered = style({});
 export const isDisabled = style({});
-export const hasError = style({});
+export const hasError = style([lookStates.hasError]);
 
 export const checkboxContent = style({
     display: "flex",
@@ -26,35 +26,29 @@ export const checkboxContent = style({
     },
 });
 
-export const checkboxBox = style({
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    flexShrink: 0,
-    width: 20,
-    height: 20,
-    boxShadow: themeVars.shadow.small,
-    border: `2px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
-    borderRadius: themeVars.borderRadius.half,
-    backgroundColor: layerVars.main,
-    transition: `border-color ${themeVars.animation.duration}`,
+export const checkboxBox = style([
+    lookEntries.checkboxBox,
+    {
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        flexShrink: 0,
+        width: 20,
+        height: 20,
+        transition: `border-color ${themeVars.animation.duration}`,
+    },
+]);
 
-    selectors: {
-        [`${checkboxContent}.${hasError} &`]: {
-            borderColor: themeVars.color.error.main,
+export const checkboxMark = style([
+    lookEntries.checkboxMark,
+    {
+        transform: "scale(0)",
+        transition: `transform ${themeVars.animation.duration}`,
+
+        selectors: {
+            [`${checkboxContent}.${isChecked} &, ${checkboxContent}.${isMixed} &`]: {
+                transform: "scale(1)",
+            },
         },
     },
-});
-
-export const checkboxMark = style({
-    color: themeVars.color.primary.main,
-    fontSize: themeVars.fontSize.medium,
-    transform: "scale(0)",
-    transition: `transform ${themeVars.animation.duration}`,
-
-    selectors: {
-        [`${checkboxContent}.${isChecked} &, ${checkboxContent}.${isMixed} &`]: {
-            transform: "scale(1)",
-        },
-    },
-});
+]);

@@ -7,9 +7,7 @@
     } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
     import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
 
-    import PageTextFieldContent, {
-        computePageTextFieldTextStyle,
-    } from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
+    import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
     import PageTextFieldPlaceholder from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.svelte";
 
     let value = $state("");
@@ -25,7 +23,6 @@
     onInput={(next) => {
         value = next.replace(/\D/g, "").slice(0, PIN_LENGTH);
     }}
-    computeTextStyle={computePageTextFieldTextStyle}
 >
     {#snippet renderContent(flags)}
         <PageTextFieldContent {flags} />

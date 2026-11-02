@@ -5,9 +5,7 @@
 
     import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater.const.svelte";
     import PagePopoverSurface from "../../../StyledComponents/PopoverSurface/PopoverSurface.svelte";
-    import PageSelectContent, {
-        computePageSelectTextStyle,
-    } from "../../../StyledComponents/SelectContent/SelectContent.svelte";
+    import PageSelectContent from "../../../StyledComponents/SelectContent/SelectContent.svelte";
     import PageSelectOptionContent from "../../../StyledComponents/SelectOptionContent/SelectOptionContent.svelte";
     import { AIRPORTS, PLACEHOLDER, QUERY_PADDING } from "../SelectPage.const.svelte";
 
@@ -34,7 +32,6 @@
     {options}
     ariaLabel={"Airport"}
     padding={QUERY_PADDING}
-    computeTextStyle={computePageSelectTextStyle}
 >
     {#snippet renderContent(selectedOption, flags)}
         <PageSelectContent {flags}>{selectedOption?.value.city ?? PLACEHOLDER}</PageSelectContent>

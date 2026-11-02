@@ -15,9 +15,7 @@
     import PageClockFrame from "../../../StyledComponents/ClockContent/PageClockFrame.svelte";
     import PageClockOption from "../../../StyledComponents/ClockContent/PageClockOption.svelte";
     import PageClockUnit from "../../../StyledComponents/ClockContent/PageClockUnit.svelte";
-    import PageTextFieldContent, {
-        computePageTextFieldTextStyle,
-    } from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
+    import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
     import PageTextFieldPlaceholder from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.svelte";
     import PageTimePickerTrigger from "../../../StyledComponents/TimePickerTrigger/TimePickerTrigger.svelte";
     import PageTooltipContent from "../../../StyledComponents/TooltipContent/TooltipContent.svelte";
@@ -40,7 +38,6 @@
     locale={LOCALE}
     padding={FIELD_STEPPER_PADDING}
     gap={FIELD_GAP}
-    computeTextStyle={computePageTextFieldTextStyle}
     tooltipDefs={{
         placement: { x: "center", y: "top_out" },
         offset: { x: 0, y: 10 },

@@ -5,7 +5,7 @@ import * as popupStyles from "@thewaver/ss-playground/App/StyledComponents/Popov
 
 import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater";
 import { PagePopoverSurface } from "../../../StyledComponents/PopoverSurface/PopoverSurface";
-import { PageSelectContent, computePageSelectTextStyle } from "../../../StyledComponents/SelectContent/SelectContent";
+import { PageSelectContent } from "../../../StyledComponents/SelectContent/SelectContent";
 import { PageSelectGroupContent } from "../../../StyledComponents/SelectGroupContent/SelectGroupContent";
 import { PageSelectOptionContent } from "../../../StyledComponents/SelectOptionContent/SelectOptionContent";
 import { GROUPED_COUNTRIES, PLACEHOLDER, QUERY_PADDING } from "../../SelectPage/SelectPageSolid.const";
@@ -39,7 +39,6 @@ export const GroupedDocsExample = () => {
             options={getOptions}
             ariaLabel={"Countries"}
             padding={QUERY_PADDING}
-            computeTextStyle={computePageSelectTextStyle}
             renderContent={(getSelectedOptions, getFlags) => (
                 <PageSelectContent flags={getFlags}>
                     {getSelectedOptions().length ? `${getSelectedOptions().length} selected` : PLACEHOLDER}

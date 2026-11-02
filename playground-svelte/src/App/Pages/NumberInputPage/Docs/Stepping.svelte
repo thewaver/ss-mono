@@ -8,9 +8,7 @@
     import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
 
     import PageNumberInputStepper from "../../../PageComponents/NumberInputStepper/NumberInputStepper.svelte";
-    import PageTextFieldContent, {
-        computePageTextFieldTextStyle,
-    } from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
+    import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
     import type { NumberInputSteppingDocsExampleProps } from "../NumberInputPageSvelte.types";
 
     type Props = NumberInputSteppingDocsExampleProps;
@@ -28,7 +26,6 @@
     padding={FIELD_STEPPER_PADDING}
     gap={FIELD_GAP}
     ariaLabel={"Quantity"}
-    computeTextStyle={computePageTextFieldTextStyle}
 >
     {#snippet renderContent(flags)}
         <PageTextFieldContent {flags} width={FIELD_WIDTH} />

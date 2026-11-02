@@ -32,10 +32,7 @@ import { PagePaintPicker, usePaintSlot } from "../../PageComponents/PaintPicker/
 import { getIsUsingKind } from "../../PageComponents/PaintPicker/PaintPickerReact.const";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsDivider, PagePropsGroups, PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
-import {
-    PageTextFieldContent,
-    computePageTextFieldTextStyle,
-} from "../../StyledComponents/TextFieldContent/TextFieldContent";
+import { PageTextFieldContent } from "../../StyledComponents/TextFieldContent/TextFieldContent";
 import { PageTextFieldPlaceholder } from "../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder";
 import { CircleExample } from "./Examples/Circle";
 import { CustomInputExample } from "./Examples/CustomInput";
@@ -145,7 +142,6 @@ const CustomInputExampleWrapper = ({ width, ...props }: ExampleWrapperProps) => 
                 padding={FIELD_PADDING}
                 gap={FIELD_GAP}
                 ariaLabel={"Custom text"}
-                computeTextStyle={computePageTextFieldTextStyle}
                 renderContent={(flags) => (
                     <PageTextFieldContent flags={flags} width={PaintedTextKnobs.CUSTOM_TEXT_WIDTH} isStretched={true} />
                 )}

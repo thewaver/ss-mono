@@ -7,10 +7,7 @@ import {
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
 import { PageInlineEditContent } from "../../../StyledComponents/InlineEditContent/InlineEditContent";
-import {
-    PageTextFieldContent,
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent";
+import { PageTextFieldContent } from "../../../StyledComponents/TextFieldContent/TextFieldContent";
 
 export const EditableDocsExample = () => {
     const [value, setValue] = useState("Ada Lovelace");
@@ -84,7 +81,6 @@ export const EditableDocsExample = () => {
                 padding={FIELD_PADDING}
                 gap={FIELD_GAP}
                 ariaLabel={"Name"}
-                computeTextStyle={computePageTextFieldTextStyle}
                 renderContent={(flags) => <PageTextFieldContent flags={flags} />}
             />
         </div>

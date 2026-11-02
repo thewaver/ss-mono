@@ -10,10 +10,7 @@ import {
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
 import { PageLabelCaption } from "../../../StyledComponents/LabelCaption/LabelCaption";
-import {
-    PageTextFieldContent,
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent";
+import { PageTextFieldContent } from "../../../StyledComponents/TextFieldContent/TextFieldContent";
 import { PageTextFieldPlaceholder } from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder";
 
 const LABEL_GAP = 5;
@@ -31,7 +28,6 @@ export const LabeledDocsExample = () => {
                 partHints={DATE_PART_HINTS}
                 padding={FIELD_PADDING}
                 gap={FIELD_GAP}
-                computeTextStyle={computePageTextFieldTextStyle}
                 renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} width={FIELD_WIDTH} />}
                 renderPlaceholder={(getFlags, hint) => (
                     <PageTextFieldPlaceholder flags={getFlags}>{hint}</PageTextFieldPlaceholder>

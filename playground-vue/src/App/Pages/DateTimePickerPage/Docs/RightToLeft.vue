@@ -24,9 +24,7 @@ import PageClockFrame from "../../../StyledComponents/ClockContent/PageClockFram
 import PageClockOption from "../../../StyledComponents/ClockContent/PageClockOption.vue";
 import PageClockUnit from "../../../StyledComponents/ClockContent/PageClockUnit.vue";
 import PageDatePickerTrigger from "../../../StyledComponents/DatePickerTrigger/DatePickerTrigger.vue";
-import PageTextFieldContent, {
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
+import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 import PageTextFieldPlaceholder from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.vue";
 import PageTimePickerTrigger from "../../../StyledComponents/TimePickerTrigger/TimePickerTrigger.vue";
 import PageDateTimeSeparator from "../PageDateTimeSeparator.vue";
@@ -47,7 +45,6 @@ const value = shallowRef<DateTimeValue | undefined>(undefined);
             :locale="LOCALE"
             :padding="FIELD_STEPPER_PADDING"
             :gap="FIELD_GAP"
-            :compute-text-style="computePageTextFieldTextStyle"
             trigger-id="rightToLeftDateTrigger"
             :trigger-aria-label="CALENDAR_TRIGGER_LABEL"
             time-trigger-id="rightToLeftTimeTrigger"

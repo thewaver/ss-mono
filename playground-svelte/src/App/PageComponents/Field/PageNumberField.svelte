@@ -5,9 +5,7 @@
         FIELD_STEPPER_PADDING,
     } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
-    import PageTextFieldContent, {
-        computePageTextFieldTextStyle,
-    } from "../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
+    import PageTextFieldContent from "../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
     import PageNumberInputStepper from "../NumberInputStepper/NumberInputStepper.svelte";
     import { useFieldReset } from "./FieldSvelte.context";
     import type { PageNumberFieldProps } from "./FieldSvelte.types";
@@ -41,7 +39,6 @@
     ariaLabel={props.ariaLabel}
     padding={FIELD_STEPPER_PADDING}
     gap={FIELD_GAP}
-    computeTextStyle={computePageTextFieldTextStyle}
 >
     {#snippet renderContent(flags)}
         <PageTextFieldContent {flags} width={props.width ?? DEFAULT_NUMBER_FIELD_WIDTH} />

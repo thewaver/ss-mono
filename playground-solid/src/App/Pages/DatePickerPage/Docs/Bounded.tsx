@@ -25,10 +25,7 @@ import {
     PageCalendarWeekday,
 } from "../../../StyledComponents/CalendarContent/CalendarContent";
 import { PageDatePickerTrigger } from "../../../StyledComponents/DatePickerTrigger/DatePickerTrigger";
-import {
-    PageTextFieldContent,
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent";
+import { PageTextFieldContent } from "../../../StyledComponents/TextFieldContent/TextFieldContent";
 import { PageTextFieldPlaceholder } from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder";
 
 export const BoundedDocsExample = () => {
@@ -52,7 +49,6 @@ export const BoundedDocsExample = () => {
                 locale={LOCALE}
                 padding={FIELD_STEPPER_PADDING}
                 gap={FIELD_GAP}
-                computeTextStyle={computePageTextFieldTextStyle}
                 renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} width={FIELD_WIDTH} />}
                 renderPlaceholder={(getFlags, hint) => (
                     <PageTextFieldPlaceholder flags={getFlags}>{hint}</PageTextFieldPlaceholder>

@@ -1,21 +1,21 @@
 import { style } from "@vanilla-extract/css";
 
+import { lookEntries } from "../../Looks/Look.css";
 import { themeVars } from "../../Theme.css";
-import { layerVars } from "../Layer/Layer.css";
 
 const PILL_HEIGHT = 48;
 
-export const satelliteSubject = style({
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: themeVars.spacing.full,
-    borderRadius: themeVars.borderRadius.half,
-    backgroundImage: `linear-gradient(135deg, rgb(from ${layerVars.main} r g b / 50%), rgb(from ${layerVars.main} r g b / 75%))`,
-    color: layerVars.contrast,
-    fontSize: themeVars.fontSize.small,
-    textAlign: "center",
-});
+export const satelliteSubject = style([
+    lookEntries.panel,
+    {
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        padding: themeVars.spacing.full,
+        fontSize: themeVars.fontSize.small,
+        textAlign: "center",
+    },
+]);
 
 export const satelliteBadge = style({
     display: "flex",

@@ -8,9 +8,7 @@
         FIELD_PADDING,
     } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
-    import PageTextFieldContent, {
-        computePageTextFieldTextStyle,
-    } from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
+    import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
     import PageTooltipContent from "../../../StyledComponents/TooltipContent/TooltipContent.svelte";
     import type { DateInputTooltipDocsExampleProps } from "../DateInputPageSvelte.types";
 
@@ -30,7 +28,6 @@
     partHints={DATE_PART_HINTS}
     padding={FIELD_PADDING}
     gap={FIELD_GAP}
-    computeTextStyle={computePageTextFieldTextStyle}
     tooltipDefs={{
         placement: { x: "center", y: "top_out" },
         offset: { x: 0, y: 10 },

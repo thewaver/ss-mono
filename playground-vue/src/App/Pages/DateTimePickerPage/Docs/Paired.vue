@@ -23,9 +23,7 @@ import {
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 import { TimeUtils } from "@thewaver/ss-utils";
 
-import PageTextFieldContent, {
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
+import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 import PageTextFieldPlaceholder from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.vue";
 
 const value = shallowRef<DateTimeValue | undefined>(DateTimeValueUtils.of(TODAY, NOON));
@@ -45,7 +43,6 @@ const getValueText = () =>
             :locale="LOCALE"
             :padding="FIELD_PADDING"
             :gap="FIELD_GAP"
-            :compute-text-style="computePageTextFieldTextStyle"
         >
             <template #renderContent="flags">
                 <PageTextFieldContent :flags="flags" :width="PAIR_FIELD_WIDTH" />
@@ -62,7 +59,6 @@ const getValueText = () =>
             :segment-hints="TIME_SEGMENT_HINTS"
             :padding="FIELD_PADDING"
             :gap="FIELD_GAP"
-            :compute-text-style="computePageTextFieldTextStyle"
         >
             <template #renderContent="flags">
                 <PageTextFieldContent :flags="flags" :width="PAIR_FIELD_WIDTH" />

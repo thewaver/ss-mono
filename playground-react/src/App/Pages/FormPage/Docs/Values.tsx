@@ -19,10 +19,7 @@ import {
 import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater";
 import { PageSelectContent } from "../../../StyledComponents/SelectContent/SelectContent";
 import { PageSelectOptionContent } from "../../../StyledComponents/SelectOptionContent/SelectOptionContent";
-import {
-    PageTextFieldContent,
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent";
+import { PageTextFieldContent } from "../../../StyledComponents/TextFieldContent/TextFieldContent";
 import { PageTextFieldPlaceholder } from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder";
 import { PLACEHOLDER, renderSelectPopup } from "../../SelectPage/SelectPageReact.const";
 
@@ -113,7 +110,6 @@ export const ValuesDocsExample = () => {
                                 partHints={DATE_PART_HINTS}
                                 padding={FIELD_PADDING}
                                 gap={FIELD_GAP}
-                                computeTextStyle={computePageTextFieldTextStyle}
                                 renderContent={(flags) => <PageTextFieldContent flags={flags} width={FIELD_WIDTH} />}
                                 renderPlaceholder={(flags, hint) => (
                                     <PageTextFieldPlaceholder flags={flags}>{hint}</PageTextFieldPlaceholder>

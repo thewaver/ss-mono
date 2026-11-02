@@ -14,10 +14,7 @@ import {
     PageFormFieldMessage,
     PageFormStack,
 } from "../../../StyledComponents/FormFieldContent/FormFieldContent";
-import {
-    PageTextFieldContent,
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent";
+import { PageTextFieldContent } from "../../../StyledComponents/TextFieldContent/TextFieldContent";
 import type { FormFieldInFormDocsExampleProps } from "../FormFieldPageReact.types";
 
 const HINT = "Shown to everyone who can see your posts.";
@@ -54,7 +51,6 @@ export const InFormDocsExample = (props: Props) => {
                                 hasError={fieldState.hasError}
                                 padding={FIELD_PADDING}
                                 gap={FIELD_GAP}
-                                computeTextStyle={computePageTextFieldTextStyle}
                                 renderContent={(flags) => <PageTextFieldContent flags={flags} />}
                             />
                         )}

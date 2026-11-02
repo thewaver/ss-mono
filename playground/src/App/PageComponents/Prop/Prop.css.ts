@@ -1,24 +1,24 @@
 import { style, styleVariants } from "@vanilla-extract/css";
 
-import { layerVars } from "../../StyledComponents/Layer/Layer.css";
+import { lookEntries } from "../../Looks/Look.css";
 import { themeVars } from "../../Theme.css";
 
-export const propScopeBase = style({
-    display: "grid",
-    gridTemplateColumns: "1fr auto",
-    alignItems: "center",
-    gap: themeVars.spacing.full,
-    borderRadius: themeVars.borderRadius.half,
-    padding: themeVars.spacing.full,
-    width: "100%",
-    boxShadow: themeVars.shadow.small,
-});
+export const propScopeBase = style([
+    lookEntries.panel,
+    {
+        display: "grid",
+        gridTemplateColumns: "1fr auto",
+        alignItems: "center",
+        gap: themeVars.spacing.full,
+        padding: themeVars.spacing.full,
+        width: "100%",
+    },
+]);
 
 export const propScopeVariants = styleVariants({
     global: [
         propScopeBase,
         {
-            color: layerVars.contrast,
             backgroundColor: [
                 themeVars.color.background.dark,
                 `hsl(from ${themeVars.color.background.dark} h s l / 50%)`,
@@ -28,7 +28,6 @@ export const propScopeVariants = styleVariants({
     sample: [
         propScopeBase,
         {
-            color: layerVars.contrast,
             backgroundColor: [
                 themeVars.color.background.dark,
                 `hsl(from ${themeVars.color.background.dark} h s l / 50%)`,
@@ -38,7 +37,6 @@ export const propScopeVariants = styleVariants({
     local: [
         propScopeBase,
         {
-            color: layerVars.contrast,
             backgroundColor: [themeVars.color.surface.dark, `hsl(from ${themeVars.color.surface.dark}  h s l / 50%)`],
         },
     ],

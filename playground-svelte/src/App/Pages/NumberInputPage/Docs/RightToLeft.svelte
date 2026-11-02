@@ -9,9 +9,7 @@
 
     import PageNumberInputStepper from "../../../PageComponents/NumberInputStepper/NumberInputStepper.svelte";
     import PageTextFieldAdornment from "../../../StyledComponents/TextFieldAdornment/TextFieldAdornment.svelte";
-    import PageTextFieldContent, {
-        computePageTextFieldTextStyle,
-    } from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
+    import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
 
     let value = $state<number | undefined>(72);
 </script>
@@ -23,7 +21,6 @@
         padding={FIELD_STEPPER_PADDING}
         gap={FIELD_GAP}
         ariaLabel={"Width"}
-        computeTextStyle={computePageTextFieldTextStyle}
     >
         {#snippet renderContent(flags)}
             <PageTextFieldContent {flags} width={FIELD_WIDTH} />

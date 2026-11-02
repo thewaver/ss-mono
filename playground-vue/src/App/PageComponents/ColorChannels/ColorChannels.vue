@@ -24,9 +24,7 @@ import PageColorChannel from "../../StyledComponents/ColorAreaContent/PageColorC
 import PageColorChannelGrid from "../../StyledComponents/ColorAreaContent/PageColorChannelGrid.vue";
 import PageColorPickerRow from "../../StyledComponents/ColorAreaContent/PageColorPickerRow.vue";
 import PageRadioContent from "../../StyledComponents/RadioContent/RadioContent.vue";
-import PageTextFieldContent, {
-    computePageTextFieldTextStyle,
-} from "../../StyledComponents/TextFieldContent/TextFieldContent.vue";
+import PageTextFieldContent from "../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 import PageNumberField from "../Field/PageNumberField.vue";
 import type { PageColorChannelsProps } from "./ColorChannels.types";
 
@@ -161,7 +159,6 @@ watch(space, (value) => {
                 ariaLabel="Hex with alpha"
                 :padding="FIELD_PADDING"
                 :gap="FIELD_GAP"
-                :compute-text-style="computePageTextFieldTextStyle"
             >
                 <template #renderContent="flags">
                     <PageTextFieldContent :flags="flags" :width="HEX_FIELD_WIDTH" />

@@ -14,7 +14,6 @@ import {
     PageTagInputContent,
     PageTagInputPlaceholder,
 } from "../../../StyledComponents/TagInputContent/TagInputContent";
-import { computePageTextFieldTextStyle } from "../../../StyledComponents/TextFieldContent/TextFieldContent";
 
 export const RightToLeftDocsExample = () => {
     const valueState = useState(STARTING_TAGS);
@@ -28,7 +27,6 @@ export const RightToLeftDocsExample = () => {
                 padding={FIELD_PADDING}
                 minHeight={FIELD_HEIGHT}
                 computeTagAriaLabel={computeTagAriaLabel}
-                computeTextStyle={computePageTextFieldTextStyle}
                 renderContent={(flags) => <PageTagInputContent flags={flags} />}
                 renderPlaceholder={() => <PageTagInputPlaceholder>Type and press Enter</PageTagInputPlaceholder>}
                 renderTag={(tag, flags) => <PageTagContent flags={flags}>{tag}</PageTagContent>}

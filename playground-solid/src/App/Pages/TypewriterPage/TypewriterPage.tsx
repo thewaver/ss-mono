@@ -25,10 +25,7 @@ import { PageNumberField, PageSelectField } from "../../PageComponents/Field/Fie
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
-import {
-    PageTextFieldContent,
-    computePageTextFieldTextStyle,
-} from "../../StyledComponents/TextFieldContent/TextFieldContent";
+import { PageTextFieldContent } from "../../StyledComponents/TextFieldContent/TextFieldContent";
 import { PageTextFieldPlaceholder } from "../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder";
 import { ComplexExample } from "./Examples/Complex";
 import { CustomInputExample } from "./Examples/CustomInput";
@@ -56,7 +53,6 @@ const CustomInputExampleWrapper = ({ width, ...props }: ExampleWrapperProps) => 
                 padding={FIELD_PADDING}
                 gap={FIELD_GAP}
                 ariaLabel={"Custom text"}
-                computeTextStyle={computePageTextFieldTextStyle}
                 renderContent={(getFlags) => (
                     <PageTextFieldContent flags={getFlags} width={CUSTOM_TEXT_WIDTH} isStretched={true} />
                 )}

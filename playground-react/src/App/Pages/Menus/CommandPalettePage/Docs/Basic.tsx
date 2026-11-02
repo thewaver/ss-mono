@@ -10,7 +10,6 @@ import {
 
 import { PageButtonContent } from "../../../../StyledComponents/ButtonContent/ButtonContent";
 import { renderPageHighlightFloater } from "../../../../StyledComponents/GlideFloater/GlideFloater";
-import { computePageTextFieldTextStyle } from "../../../../StyledComponents/TextFieldContent/TextFieldContent";
 import {
     GROUPED_ACTIONS,
     NOTHING_RUN,
@@ -51,7 +50,6 @@ export const BasicDocsExample = () => {
                 renderPanel={computePalettePanelRenderer(actions)}
                 fieldPadding={FIELD_PADDING}
                 fieldGap={FIELD_GAP}
-                computeFieldTextStyle={computePageTextFieldTextStyle}
                 renderFieldContent={renderPaletteField}
                 renderFieldPlaceholder={renderPalettePlaceholder}
                 renderOption={renderPaletteOption}

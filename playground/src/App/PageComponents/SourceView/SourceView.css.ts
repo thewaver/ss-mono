@@ -10,21 +10,19 @@ export const sourceViewRoot = style({
     width: SOURCE_VIEW_WIDTH,
     maxWidth: "100%",
     borderRadius: "inherit",
-    overflowY: "auto",
+    overflow: "hidden",
 });
 
 export const sourceViewTabs = style({
-    position: "sticky",
-    top: 0,
-    zIndex: 2,
     flexShrink: 0,
     paddingBlock: themeVars.spacing.double,
     marginInline: themeVars.spacing.double,
-    backgroundColor: [themeVars.color.surface.light, `rgb(from ${themeVars.color.surface.light} r g b / 25%)`],
-    backdropFilter: "blur(10px)",
 });
 
 export const sourceViewPanel = style({
+    flex: "1 1 auto",
+    minHeight: 0,
+    overflowY: "auto",
     paddingInline: themeVars.spacing.double,
     paddingBlockEnd: themeVars.spacing.double,
 });

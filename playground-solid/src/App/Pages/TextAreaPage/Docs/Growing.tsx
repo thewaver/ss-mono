@@ -8,10 +8,7 @@ import {
     FIELD_PADDING,
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
-import {
-    PageTextFieldContent,
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent";
+import { PageTextFieldContent } from "../../../StyledComponents/TextFieldContent/TextFieldContent";
 import type { TextAreaGrowingDocsExampleProps } from "../TextAreaPageSolid.types";
 
 type Props = TextAreaGrowingDocsExampleProps;
@@ -29,7 +26,6 @@ export const GrowingDocsExample = (props: Props) => {
                 padding={FIELD_PADDING}
                 gap={FIELD_GAP}
                 ariaLabel={"Message"}
-                computeTextStyle={computePageTextFieldTextStyle}
                 renderContent={(getFlags) => (
                     <PageTextFieldContent flags={getFlags} width={FIELD_WIDTH} isStretched={true} />
                 )}

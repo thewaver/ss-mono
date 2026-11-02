@@ -8,10 +8,7 @@ import {
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
 import { PageSelectOptionContent } from "../../../StyledComponents/SelectOptionContent/SelectOptionContent";
-import {
-    PageTextFieldContent,
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent";
+import { PageTextFieldContent } from "../../../StyledComponents/TextFieldContent/TextFieldContent";
 import { PageTextFieldPlaceholder } from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder";
 import { renderSelectPopup } from "../../SelectPage/SelectPageReact.const";
 
@@ -36,7 +33,6 @@ export const SuggestionsDocsExample = () => {
             suggestions={suggestions}
             suggestionsAriaLabel={"Cities"}
             computeCustomSuggestionText={(city) => city.name}
-            computeTextStyle={computePageTextFieldTextStyle}
             renderContent={(flags) => <PageTextFieldContent flags={flags} />}
             renderPlaceholder={(flags) => <PageTextFieldPlaceholder flags={flags}>Any city</PageTextFieldPlaceholder>}
             renderSuggestion={(city, flags) => (

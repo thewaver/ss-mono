@@ -10,9 +10,7 @@ import {
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
 import PageNumberInputStepper from "../../../PageComponents/NumberInputStepper/NumberInputStepper.vue";
-import PageTextFieldContent, {
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
+import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 import PageTooltipContent from "../../../StyledComponents/TooltipContent/TooltipContent.vue";
 import type { NumberInputTooltipDocsExampleProps } from "../NumberInputPageVue.types";
 
@@ -42,7 +40,6 @@ const tooltipDefs: InteractionTooltipDefs<TextFieldFlags> = {
         :padding="FIELD_STEPPER_PADDING"
         :gap="FIELD_GAP"
         ariaLabel="Disabled but reachable amount"
-        :compute-text-style="computePageTextFieldTextStyle"
         :tooltip-defs="tooltipDefs"
     >
         <template #renderContent="flags">

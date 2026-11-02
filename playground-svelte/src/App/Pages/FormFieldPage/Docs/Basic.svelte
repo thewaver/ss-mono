@@ -7,9 +7,7 @@
 
     import PageFormFieldCaption from "../../../StyledComponents/FormFieldContent/PageFormFieldCaption.svelte";
     import PageFormFieldMessage from "../../../StyledComponents/FormFieldContent/PageFormFieldMessage.svelte";
-    import PageTextFieldContent, {
-        computePageTextFieldTextStyle,
-    } from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
+    import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
     import type { FormFieldBasicDocsExampleProps } from "../FormFieldPageSvelte.types";
 
     type Props = FormFieldBasicDocsExampleProps;
@@ -41,7 +39,6 @@
             isRequired={state.isRequired}
             padding={FIELD_PADDING}
             gap={FIELD_GAP}
-            computeTextStyle={computePageTextFieldTextStyle}
         >
             {#snippet renderContent(flags)}
                 <PageTextFieldContent {flags} />

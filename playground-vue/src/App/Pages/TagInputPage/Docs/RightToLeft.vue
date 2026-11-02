@@ -13,7 +13,6 @@ import {
 import PageTagContent from "../../../StyledComponents/TagInputContent/PageTagContent.vue";
 import PageTagInputContent from "../../../StyledComponents/TagInputContent/PageTagInputContent.vue";
 import PageTagInputPlaceholder from "../../../StyledComponents/TagInputContent/PageTagInputPlaceholder.vue";
-import { computePageTextFieldTextStyle } from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 
 const value = shallowRef(STARTING_TAGS);
 </script>
@@ -27,7 +26,6 @@ const value = shallowRef(STARTING_TAGS);
             :padding="FIELD_PADDING"
             :min-height="FIELD_HEIGHT"
             :compute-tag-aria-label="computeTagAriaLabel"
-            :compute-text-style="computePageTextFieldTextStyle"
         >
             <template #renderContent="flags">
                 <PageTagInputContent :flags="flags" />

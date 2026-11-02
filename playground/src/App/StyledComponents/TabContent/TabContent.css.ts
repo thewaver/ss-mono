@@ -1,5 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
+import { lookEntries } from "../../Looks/Look.css";
 import { themeVars } from "../../Theme.css";
 import { layerVars } from "../Layer/Layer.css";
 
@@ -77,12 +78,13 @@ export const columnTabFloater = style({
     },
 });
 
-export const tabPanel = style({
-    borderRadius: themeVars.borderRadius.half,
-    padding: themeVars.spacing.full,
-    backgroundColor: layerVars.main,
-    fontSize: themeVars.fontSize.small,
-});
+export const tabPanel = style([
+    lookEntries.panel,
+    {
+        padding: themeVars.spacing.full,
+        fontSize: themeVars.fontSize.small,
+    },
+]);
 
 const HEX_CLIP = "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)";
 
@@ -107,20 +109,22 @@ export const hexTab = style([
     },
 ]);
 
-export const hexTabHighlightFloater = style({
-    width: "100%",
-    height: "100%",
-    clipPath: HEX_CLIP,
-    backgroundColor: `rgb(from ${themeVars.color.primary.main} r g b / 25%)`,
-    opacity: 0,
-    transitionProperty: "opacity",
+export const hexTabHighlightFloater = style([
+    lookEntries.hoverFloater,
+    {
+        width: "100%",
+        height: "100%",
+        clipPath: HEX_CLIP,
+        opacity: 0,
+        transitionProperty: "opacity",
 
-    selectors: {
-        [`&.${isVisible}`]: {
-            opacity: 1,
+        selectors: {
+            [`&.${isVisible}`]: {
+                opacity: 1,
+            },
         },
     },
-});
+]);
 
 export const hexTabFloater = style({
     width: "100%",

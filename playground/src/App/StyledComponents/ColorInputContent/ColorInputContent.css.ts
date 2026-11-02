@@ -1,39 +1,25 @@
 import { style } from "@vanilla-extract/css";
 
+import { lookEntries, lookStates } from "../../Looks/Look.css";
 import { themeVars } from "../../Theme.css";
 import { layerVars } from "../Layer/Layer.css";
 
-const FIELD_BORDER = 2;
 const SWATCH_SIZE = 24;
 
-export const isHovered = style({});
-export const isDisabled = style({});
-export const hasError = style({});
+export const isHovered = style([lookStates.isHovered]);
+export const isDisabled = style([lookStates.isDisabled]);
+export const hasError = style([lookStates.hasError]);
 
-export const colorInputContent = style({
-    display: "flex",
-    alignItems: "center",
-    gap: themeVars.spacing.full,
-    padding: themeVars.spacing.full,
-    boxShadow: themeVars.shadow.small,
-    border: `${FIELD_BORDER}px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
-    borderRadius: themeVars.borderRadius.half,
-    backgroundColor: layerVars.main,
-    transition: `filter ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}, border-color ${themeVars.animation.duration}`,
-
-    selectors: {
-        [`&.${hasError}`]: {
-            borderColor: themeVars.color.error.main,
-        },
-        [`&.${isHovered}`]: {
-            filter: themeVars.hover.filter,
-        },
-        [`&.${isDisabled}`]: {
-            filter: themeVars.disabled.filter,
-            opacity: themeVars.disabled.opacity,
-        },
+export const colorInputContent = style([
+    lookEntries.input,
+    {
+        display: "flex",
+        alignItems: "center",
+        gap: themeVars.spacing.full,
+        padding: themeVars.spacing.full,
+        transition: `filter ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}, border-color ${themeVars.animation.duration}`,
     },
-});
+]);
 
 export const colorInputSwatch = style({
     width: SWATCH_SIZE,

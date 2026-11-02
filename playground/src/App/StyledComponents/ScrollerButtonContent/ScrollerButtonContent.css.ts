@@ -1,11 +1,11 @@
 import { style, styleVariants } from "@vanilla-extract/css";
 
+import { lookEntries, lookStates } from "../../Looks/Look.css";
 import { themeVars } from "../../Theme.css";
-import { layerVars } from "../Layer/Layer.css";
 
-export const isHovered = style({});
-export const isActive = style({});
-export const isDisabled = style({});
+export const isHovered = style([lookStates.isHovered]);
+export const isActive = style([lookStates.isActive]);
+export const isDisabled = style([lookStates.isDisabled]);
 
 const GLYPH_SIZE = 10;
 
@@ -42,28 +42,14 @@ export const scrollerButtonGlyphVariants = {
     }),
 };
 
-export const scrollerButton = style({
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    width: 28,
-    height: 28,
-    color: layerVars.contrast,
-    backgroundColor: `rgb(from ${layerVars.contrast} r g b / 10%)`,
-    borderRadius: themeVars.borderRadius.half,
-    fontSize: themeVars.fontSize.small,
-    transition: `filter ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}`,
-
-    selectors: {
-        [`&.${isHovered}`]: {
-            color: themeVars.color.primary.main,
-        },
-        [`&.${isActive}`]: {
-            filter: themeVars.active.filter,
-        },
-        [`&.${isDisabled}`]: {
-            opacity: themeVars.disabled.opacity,
-            filter: themeVars.disabled.filter,
-        },
+export const scrollerButton = style([
+    lookEntries.buttonSimple,
+    {
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        width: 28,
+        height: 28,
+        transition: `filter ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}`,
     },
-});
+]);

@@ -11,10 +11,7 @@ import {
     PageFormSectionBody,
     PageFormSectionCaption,
 } from "../../../StyledComponents/FormFieldContent/FormFieldContent";
-import {
-    PageTextFieldContent,
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent";
+import { PageTextFieldContent } from "../../../StyledComponents/TextFieldContent/TextFieldContent";
 
 export const RightToLeftDocsExample = () => {
     const streetSignal = createSignal("");
@@ -33,7 +30,6 @@ export const RightToLeftDocsExample = () => {
                                     value={streetSignal}
                                     padding={FIELD_PADDING}
                                     gap={FIELD_GAP}
-                                    computeTextStyle={computePageTextFieldTextStyle}
                                     renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} />}
                                 />
                             )}
@@ -46,7 +42,6 @@ export const RightToLeftDocsExample = () => {
                                     value={citySignal}
                                     padding={FIELD_PADDING}
                                     gap={FIELD_GAP}
-                                    computeTextStyle={computePageTextFieldTextStyle}
                                     renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} />}
                                 />
                             )}

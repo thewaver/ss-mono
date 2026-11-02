@@ -1,6 +1,7 @@
 import { style, styleVariants } from "@vanilla-extract/css";
 
 import { layoutVars } from "../../Layout.css";
+import { lookEntries } from "../../Looks/Look.css";
 import { themeVars } from "../../Theme.css";
 
 const examplesRoot = style({
@@ -28,21 +29,18 @@ export const examplesRootVariants = styleVariants({
     ],
 });
 
-export const exampleContainer = style({
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "start",
-    alignItems: "stretch",
-    gap: themeVars.spacing.double,
-    minWidth: 0,
-
-    color: themeVars.color.surface.contrast,
-    backgroundColor: themeVars.color.surface.light,
-    backgroundImage: `linear-gradient(315deg, ${themeVars.color.surface.dark}, ${themeVars.color.surface.light})`,
-    boxShadow: themeVars.shadow.medium,
-    borderRadius: themeVars.borderRadius.full,
-    padding: themeVars.spacing.double,
-});
+export const exampleContainer = style([
+    lookEntries.surface,
+    {
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "start",
+        alignItems: "stretch",
+        gap: themeVars.spacing.double,
+        minWidth: 0,
+        padding: themeVars.spacing.double,
+    },
+]);
 
 export const exampleDemo = style({
     position: "relative",

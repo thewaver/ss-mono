@@ -14,7 +14,6 @@ import {
     PageTagInputContent,
     PageTagInputPlaceholder,
 } from "../../../StyledComponents/TagInputContent/TagInputContent";
-import { computePageTextFieldTextStyle } from "../../../StyledComponents/TextFieldContent/TextFieldContent";
 import { PageTooltipContent } from "../../../StyledComponents/TooltipContent/TooltipContent";
 import type { TagInputTooltipDocsExampleProps } from "../TagInputPageSolid.types";
 
@@ -33,7 +32,6 @@ export const TooltipDocsExample = (props: Props) => {
             isDisabled={props.isDisabled}
             isReachableWhenDisabled={props.isReachableWhenDisabled}
             computeTagAriaLabel={computeTagAriaLabel}
-            computeTextStyle={computePageTextFieldTextStyle}
             renderContent={(getFlags) => <PageTagInputContent flags={getFlags} />}
             renderPlaceholder={() => <PageTagInputPlaceholder>Type and press Enter</PageTagInputPlaceholder>}
             renderTag={(getTag, getFlags) => <PageTagContent flags={getFlags}>{getTag()}</PageTagContent>}

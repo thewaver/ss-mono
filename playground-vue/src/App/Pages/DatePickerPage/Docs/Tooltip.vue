@@ -18,9 +18,7 @@ import PageCalendarDay from "../../../StyledComponents/CalendarContent/PageCalen
 import PageCalendarFrame from "../../../StyledComponents/CalendarContent/PageCalendarFrame.vue";
 import PageCalendarWeekday from "../../../StyledComponents/CalendarContent/PageCalendarWeekday.vue";
 import PageDatePickerTrigger from "../../../StyledComponents/DatePickerTrigger/DatePickerTrigger.vue";
-import PageTextFieldContent, {
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
+import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 import PageTextFieldPlaceholder from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.vue";
 import PageTooltipContent from "../../../StyledComponents/TooltipContent/TooltipContent.vue";
 import type { DatePickerTooltipDocsExampleProps } from "../DatePickerPageVue.types";
@@ -50,7 +48,6 @@ const tooltipDefs: InteractionTooltipDefs<TextFieldFlags> = {
         :locale="LOCALE"
         :padding="FIELD_STEPPER_PADDING"
         :gap="FIELD_GAP"
-        :compute-text-style="computePageTextFieldTextStyle"
         :tooltip-defs="tooltipDefs"
         trigger-id="tooltipTrigger"
         :trigger-aria-label="CALENDAR_TRIGGER_LABEL"

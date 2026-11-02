@@ -10,10 +10,7 @@ import {
 
 import { PageNumberInputStepper } from "../../../PageComponents/NumberInputStepper/NumberInputStepper";
 import { PageTextFieldAdornment } from "../../../StyledComponents/TextFieldAdornment/TextFieldAdornment";
-import {
-    PageTextFieldContent,
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent";
+import { PageTextFieldContent } from "../../../StyledComponents/TextFieldContent/TextFieldContent";
 
 export const RightToLeftDocsExample = () => {
     const valueSignal = createSignal<number | undefined>(72);
@@ -26,7 +23,6 @@ export const RightToLeftDocsExample = () => {
                 padding={FIELD_STEPPER_PADDING}
                 gap={FIELD_GAP}
                 ariaLabel={"Width"}
-                computeTextStyle={computePageTextFieldTextStyle}
                 renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} width={FIELD_WIDTH} />}
                 renderTrailing={(getFlags, stepper) => (
                     <div class={styles.unitTrailing}>

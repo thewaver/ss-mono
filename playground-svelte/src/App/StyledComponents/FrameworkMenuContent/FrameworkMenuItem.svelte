@@ -15,8 +15,6 @@
     class={[
         styles.selectOptionContent,
         layerClass,
-        props.flags.isHovered && styles.isHovered,
-        props.flags.isHighlighted && styles.isHighlighted,
         props.flags.isChecked && styles.isSelected,
         props.flags.isDisabled && styles.isDisabled,
     ]}

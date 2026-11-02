@@ -17,10 +17,7 @@ import {
     PageFormSectionCaption,
     PageFormStack,
 } from "../../../StyledComponents/FormFieldContent/FormFieldContent";
-import {
-    PageTextFieldContent,
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent";
+import { PageTextFieldContent } from "../../../StyledComponents/TextFieldContent/TextFieldContent";
 
 const FIELD_WIDTH = 240;
 const MIN_PASSWORD_LENGTH = 8;
@@ -32,7 +29,6 @@ const renderTextField = (signal: Signal<string>, getHasError?: () => boolean) =>
         hasError={getHasError}
         padding={FIELD_PADDING}
         gap={FIELD_GAP}
-        computeTextStyle={computePageTextFieldTextStyle}
         renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} width={FIELD_WIDTH} />}
     />
 );

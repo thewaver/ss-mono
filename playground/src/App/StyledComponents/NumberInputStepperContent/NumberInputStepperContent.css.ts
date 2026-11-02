@@ -1,10 +1,10 @@
 import { style } from "@vanilla-extract/css";
 
+import { lookEntries, lookStates } from "../../Looks/Look.css";
 import { themeVars } from "../../Theme.css";
-import { layerVars } from "../Layer/Layer.css";
 
-export const isHovered = style({});
-export const isDisabled = style({});
+export const isHovered = style([lookStates.isHovered]);
+export const isDisabled = style([lookStates.isDisabled]);
 
 export const numberInputStepper = style({
     display: "flex",
@@ -12,28 +12,18 @@ export const numberInputStepper = style({
     gap: 2,
 });
 
-export const numberInputStepperButton = style({
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    width: 20,
-    height: 14,
-    borderRadius: themeVars.borderRadius.half,
-    color: `rgb(from ${layerVars.contrast} r g b / 65%)`,
-    fontSize: themeVars.fontSize.xSmall,
-    transition: `background-color ${themeVars.animation.duration}, color ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}`,
-
-    selectors: {
-        [`&.${isHovered}`]: {
-            color: layerVars.contrast,
-            backgroundColor: `rgb(from ${layerVars.contrast} r g b / 10%)`,
-        },
-        [`&.${isDisabled}`]: {
-            filter: themeVars.disabled.filter,
-            opacity: themeVars.disabled.opacity,
-        },
+export const numberInputStepperButton = style([
+    lookEntries.decoration,
+    {
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        width: 20,
+        height: 14,
+        fontSize: themeVars.fontSize.xSmall,
+        transition: `background-color ${themeVars.animation.duration}, color ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}`,
     },
-});
+]);
 
 export const numberInputStepperName = style({
     position: "absolute",

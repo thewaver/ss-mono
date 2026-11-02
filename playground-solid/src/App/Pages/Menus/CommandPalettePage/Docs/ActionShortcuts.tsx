@@ -10,7 +10,6 @@ import {
 
 import { PageButtonContent } from "../../../../StyledComponents/ButtonContent/ButtonContent";
 import { renderPageHighlightFloater } from "../../../../StyledComponents/GlideFloater/GlideFloater";
-import { computePageTextFieldTextStyle } from "../../../../StyledComponents/TextFieldContent/TextFieldContent";
 import {
     ADD_NOTE,
     CLEAR_NOTES,
@@ -62,7 +61,6 @@ export const ActionShortcutsDocsExample = () => {
                 renderPanel={computePalettePanelRenderer(getActions)}
                 fieldPadding={FIELD_PADDING}
                 fieldGap={FIELD_GAP}
-                computeFieldTextStyle={computePageTextFieldTextStyle}
                 renderFieldContent={renderPaletteField}
                 renderFieldPlaceholder={renderPalettePlaceholder}
                 renderOption={renderPaletteOption}

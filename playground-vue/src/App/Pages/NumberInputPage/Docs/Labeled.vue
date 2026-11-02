@@ -10,9 +10,7 @@ import {
 
 import PageNumberInputStepper from "../../../PageComponents/NumberInputStepper/NumberInputStepper.vue";
 import PageLabelCaption from "../../../StyledComponents/LabelCaption/LabelCaption.vue";
-import PageTextFieldContent, {
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
+import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 
 const LABEL_GAP = 5;
 const GUEST_MIN = 1;
@@ -31,7 +29,6 @@ const value = shallowRef<number | undefined>(undefined);
             :max="GUEST_MAX"
             :padding="FIELD_STEPPER_PADDING"
             :gap="FIELD_GAP"
-            :compute-text-style="computePageTextFieldTextStyle"
         >
             <template #renderContent="flags">
                 <PageTextFieldContent :flags="flags" :width="FIELD_WIDTH" />

@@ -7,9 +7,7 @@
     } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
     import PageNumberInputStepper from "../../../PageComponents/NumberInputStepper/NumberInputStepper.svelte";
-    import PageTextFieldContent, {
-        computePageTextFieldTextStyle,
-    } from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
+    import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
     import PageTooltipContent from "../../../StyledComponents/TooltipContent/TooltipContent.svelte";
     import type { NumberInputTooltipDocsExampleProps } from "../NumberInputPageSvelte.types";
 
@@ -27,7 +25,6 @@
     padding={FIELD_STEPPER_PADDING}
     gap={FIELD_GAP}
     ariaLabel={"Disabled but reachable amount"}
-    computeTextStyle={computePageTextFieldTextStyle}
     tooltipDefs={{
         placement: { x: "center", y: "top_out" },
         offset: { x: 0, y: 10 },

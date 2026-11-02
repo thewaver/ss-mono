@@ -1,44 +1,32 @@
 import { globalStyle, style } from "@vanilla-extract/css";
 
+import { lookEntries, lookStates } from "../../Looks/Look.css";
 import { themeVars } from "../../Theme.css";
 import { layerVars } from "../Layer/Layer.css";
 
-export const isHovered = style({});
+export const isHovered = style([lookStates.isHovered]);
 export const isActive = style({});
-export const isHighlighted = style({});
-export const isOpen = style({});
-export const isDisabled = style({});
+export const isDisabled = style([lookStates.isDisabled]);
 
-export const menuItemContent = style({
+const menuItemBase = style({
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
     gap: themeVars.spacing.double,
     padding: themeVars.spacing.full,
-    borderRadius: themeVars.borderRadius.half,
-    fontSize: themeVars.fontSize.medium,
     whiteSpace: "nowrap",
     transition: `background-color ${themeVars.animation.duration}, filter ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}`,
 
     selectors: {
-        [`&.${isHighlighted}`]: {
-            backgroundColor: `rgb(from ${layerVars.contrast} r g b / 10%)`,
-        },
-        [`&.${isOpen}`]: {
-            backgroundColor: `rgb(from ${layerVars.contrast} r g b / 25%)`,
-        },
-        [`&.${isHovered}`]: {
-            backgroundColor: `rgb(from ${layerVars.contrast} r g b / 25%)`,
-        },
         [`&.${isActive}`]: {
             filter: themeVars.active.filter,
         },
-        [`&.${isDisabled}`]: {
-            filter: themeVars.disabled.filter,
-            opacity: 0.5,
-        },
     },
 });
+
+export const menuItemContent = style([lookEntries.itemWithFloater, menuItemBase]);
+
+export const menuItemContentWithoutFloater = style([lookEntries.itemWithoutFloater, menuItemBase]);
 
 export const menuItemShortcut = style({
     opacity: 0.5,

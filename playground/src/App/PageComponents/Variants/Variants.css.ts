@@ -1,5 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
+import { lookEntries } from "../../Looks/Look.css";
 import { themeVars } from "../../Theme.css";
 
 export const DEFAULT_MIN_COLUMN_WIDTH = 320;
@@ -10,21 +11,17 @@ export const variantsRoot = style({
     gap: themeVars.spacing.double,
 });
 
-export const variantContainer = style({
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    gap: themeVars.spacing.full,
-    minWidth: 0,
-
-    color: themeVars.color.surface.contrast,
-    backgroundColor: themeVars.color.surface.light,
-    backgroundImage: `linear-gradient(315deg, ${themeVars.color.surface.dark}, ${themeVars.color.surface.light})`,
-    backdropFilter: "blur(10px)",
-    boxShadow: themeVars.shadow.medium,
-    borderRadius: themeVars.borderRadius.full,
-    padding: themeVars.spacing.double,
-});
+export const variantContainer = style([
+    lookEntries.surface,
+    {
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: themeVars.spacing.full,
+        minWidth: 0,
+        padding: themeVars.spacing.double,
+    },
+]);
 
 export const variantTitle = style({
     fontSize: themeVars.fontSize.xSmall,

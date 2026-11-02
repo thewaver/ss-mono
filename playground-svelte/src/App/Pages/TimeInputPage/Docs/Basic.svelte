@@ -10,9 +10,7 @@
     import { TimeUtils } from "@thewaver/ss-utils";
     import type { TimeValue } from "@thewaver/ss-utils";
 
-    import PageTextFieldContent, {
-        computePageTextFieldTextStyle,
-    } from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
+    import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
     import PageTextFieldPlaceholder from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.svelte";
     import type { TimeInputBasicDocsExampleProps } from "../TimeInputPageSvelte.types";
 
@@ -35,7 +33,6 @@
     segmentHints={TIME_SEGMENT_HINTS}
     padding={FIELD_PADDING}
     gap={FIELD_GAP}
-    computeTextStyle={computePageTextFieldTextStyle}
 >
     {#snippet renderContent(flags)}
         <PageTextFieldContent {flags} width={FIELD_WIDTH} />

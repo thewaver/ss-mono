@@ -1,6 +1,7 @@
 import { style } from "@vanilla-extract/css";
 
 import { layoutVars } from "../../Layout.css";
+import { exampleContainer } from "../../PageComponents/Examples/Examples.css";
 import { themeVars } from "../../Theme.css";
 
 export const galleryPage = style({
@@ -41,20 +42,7 @@ export const galleryGrid = style({
     gap: themeVars.spacing.double,
 });
 
-export const galleryTile = style({
-    display: "flex",
-    flexDirection: "column",
-    gap: themeVars.spacing.full,
-    minWidth: 0,
-
-    color: themeVars.color.surface.contrast,
-    backgroundColor: themeVars.color.surface.light,
-    backgroundImage: `linear-gradient(315deg, ${themeVars.color.surface.dark}, ${themeVars.color.surface.light})`,
-    backdropFilter: "blur(10px)",
-    boxShadow: themeVars.shadow.medium,
-    borderRadius: themeVars.borderRadius.full,
-    padding: themeVars.spacing.double,
-});
+export const galleryTile = style([exampleContainer, { gap: themeVars.spacing.full }]);
 
 export const galleryTileName = style({
     alignSelf: "start",

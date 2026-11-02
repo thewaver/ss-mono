@@ -12,6 +12,7 @@ export const PageButtonContent = (props: ParentProps<ButtonContentProps>) => {
             classList={{
                 [styles.isHovered]: access(props.flags).isHovered,
                 [styles.isActive]: access(props.flags).isActive,
+                [styles.isPressed]: access(props.flags).isPressed,
                 [styles.isDisabled]: access(props.flags).isDisabled,
                 [styles.hasError]: access(props.flags).hasError,
             }}

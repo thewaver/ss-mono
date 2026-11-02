@@ -9,9 +9,7 @@ import {
 
 import PageFormFieldCaption from "../../../StyledComponents/FormFieldContent/PageFormFieldCaption.vue";
 import PageFormFieldMessage from "../../../StyledComponents/FormFieldContent/PageFormFieldMessage.vue";
-import PageTextFieldContent, {
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
+import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 import type { FormFieldBasicDocsExampleProps } from "../FormFieldPageVue.types";
 
 type Props = FormFieldBasicDocsExampleProps;
@@ -38,7 +36,6 @@ const value = shallowRef("");
                 :is-required="state.isRequired"
                 :padding="FIELD_PADDING"
                 :gap="FIELD_GAP"
-                :compute-text-style="computePageTextFieldTextStyle"
             >
                 <template #renderContent="flags">
                     <PageTextFieldContent :flags="flags" />

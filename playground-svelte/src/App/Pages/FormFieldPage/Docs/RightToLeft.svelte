@@ -7,9 +7,7 @@
 
     import PageFormFieldCaption from "../../../StyledComponents/FormFieldContent/PageFormFieldCaption.svelte";
     import PageFormFieldMessage from "../../../StyledComponents/FormFieldContent/PageFormFieldMessage.svelte";
-    import PageTextFieldContent, {
-        computePageTextFieldTextStyle,
-    } from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
+    import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
 
     const MESSAGE = "Shown to everyone who can see your posts";
 
@@ -32,7 +30,6 @@
                 hasError={state.hasError}
                 padding={FIELD_PADDING}
                 gap={FIELD_GAP}
-                computeTextStyle={computePageTextFieldTextStyle}
             >
                 {#snippet renderContent(flags)}
                     <PageTextFieldContent {flags} />

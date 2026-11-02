@@ -6,9 +6,7 @@ import {
     FIELD_STEPPER_PADDING,
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
-import PageTextFieldContent, {
-    computePageTextFieldTextStyle,
-} from "../../StyledComponents/TextFieldContent/TextFieldContent.vue";
+import PageTextFieldContent from "../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 import PageNumberInputStepper from "../NumberInputStepper/NumberInputStepper.vue";
 import { useFieldReset } from "./FieldVue.context";
 import type { PageNumberFieldProps } from "./FieldVue.types";
@@ -42,7 +40,6 @@ const value = SignalMirrorVueUtils.useValueMirror<number | undefined>(
         :ariaLabel="ariaLabel"
         :padding="FIELD_STEPPER_PADDING"
         :gap="FIELD_GAP"
-        :compute-text-style="computePageTextFieldTextStyle"
     >
         <template #renderContent="flags">
             <PageTextFieldContent :flags="flags" :width="width ?? DEFAULT_NUMBER_FIELD_WIDTH" />

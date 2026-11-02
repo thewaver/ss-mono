@@ -25,10 +25,7 @@ import {
     PageColorPickerRow,
 } from "../../StyledComponents/ColorAreaContent/ColorAreaContent";
 import { PageRadioContent } from "../../StyledComponents/RadioContent/RadioContent";
-import {
-    PageTextFieldContent,
-    computePageTextFieldTextStyle,
-} from "../../StyledComponents/TextFieldContent/TextFieldContent";
+import { PageTextFieldContent } from "../../StyledComponents/TextFieldContent/TextFieldContent";
 import { PageNumberField } from "../Field/Field";
 import type { PageColorChannelsProps } from "./ColorChannels.types";
 
@@ -175,7 +172,6 @@ export const PageColorChannels = (props: PageColorChannelsProps) => {
                             ariaLabel={"Hex with alpha"}
                             padding={FIELD_PADDING}
                             gap={FIELD_GAP}
-                            computeTextStyle={computePageTextFieldTextStyle}
                             renderContent={(getFlags) => (
                                 <PageTextFieldContent flags={getFlags} width={HEX_FIELD_WIDTH} />
                             )}

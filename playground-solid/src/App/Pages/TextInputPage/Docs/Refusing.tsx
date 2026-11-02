@@ -8,10 +8,7 @@ import {
     FIELD_PADDING,
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
-import {
-    PageTextFieldContent,
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent";
+import { PageTextFieldContent } from "../../../StyledComponents/TextFieldContent/TextFieldContent";
 import { PageTextFieldPlaceholder } from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder";
 
 export const RefusingDocsExample = () => {
@@ -29,7 +26,6 @@ export const RefusingDocsExample = () => {
                 onInput={(value) => {
                     valueSignal[1](value.replace(/\D/g, "").slice(0, PIN_LENGTH));
                 }}
-                computeTextStyle={computePageTextFieldTextStyle}
                 renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} />}
                 renderPlaceholder={(getFlags) => (
                     <PageTextFieldPlaceholder flags={getFlags}>Digits only</PageTextFieldPlaceholder>

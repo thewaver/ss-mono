@@ -1,12 +1,12 @@
 import { style } from "@vanilla-extract/css";
 
+import { lookEntries, lookStates } from "../../Looks/Look.css";
 import { themeVars } from "../../Theme.css";
-import { layerVars } from "../Layer/Layer.css";
 
-export const isChecked = style({});
+export const isChecked = style([lookStates.isChecked]);
 export const isHovered = style({});
 export const isDisabled = style({});
-export const hasError = style({});
+export const hasError = style([lookStates.hasError]);
 
 export const radioContent = style({
     display: "flex",
@@ -28,38 +28,31 @@ export const radioContent = style({
     },
 });
 
-export const radioMarker = style({
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    flexShrink: 0,
-    width: 20,
-    height: 20,
-    boxShadow: themeVars.shadow.small,
-    border: `2px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
-    borderRadius: "50%",
-    backgroundColor: layerVars.main,
-    transition: `border-color ${themeVars.animation.duration}`,
+export const radioMarker = style([
+    lookEntries.radioBox,
+    {
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        flexShrink: 0,
+        width: 20,
+        height: 20,
+        transition: `border-color ${themeVars.animation.duration}`,
+    },
+]);
 
-    selectors: {
-        [`${radioContent}.${hasError} &`]: {
-            borderColor: themeVars.color.error.main,
+export const radioDot = style([
+    lookEntries.radioDot,
+    {
+        width: 8,
+        height: 8,
+        transform: "scale(0)",
+        transition: `transform ${themeVars.animation.duration}`,
+
+        selectors: {
+            [`${radioContent}.${isChecked} &`]: {
+                transform: "scale(1)",
+            },
         },
     },
-});
-
-export const radioDot = style({
-    width: 8,
-    height: 8,
-    borderRadius: "50%",
-    backgroundColor: themeVars.color.primary.light,
-    backgroundImage: `linear-gradient(45deg, ${themeVars.color.primary.dark}, ${themeVars.color.primary.light})`,
-    transform: "scale(0)",
-    transition: `transform ${themeVars.animation.duration}`,
-
-    selectors: {
-        [`${radioContent}.${isChecked} &`]: {
-            transform: "scale(1)",
-        },
-    },
-});
+]);

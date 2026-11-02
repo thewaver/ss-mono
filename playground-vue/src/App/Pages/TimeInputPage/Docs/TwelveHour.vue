@@ -13,9 +13,7 @@ import { TimeUtils } from "@thewaver/ss-utils";
 import type { TimeValue } from "@thewaver/ss-utils";
 
 import PageMeridiemToggle from "../../../PageComponents/MeridiemToggle/MeridiemToggle.vue";
-import PageTextFieldContent, {
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
+import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 import type { TimeInputTwelveHourDocsExampleProps } from "../TimeInputPageVue.types";
 
 type Props = TimeInputTwelveHourDocsExampleProps;
@@ -35,7 +33,6 @@ const valueText = computed(() => (value.value ? TimeUtils.toIso(value.value) : "
         :segment-hints="TIME_SEGMENT_HINTS"
         :padding="FIELD_STEPPER_PADDING"
         :gap="FIELD_GAP"
-        :compute-text-style="computePageTextFieldTextStyle"
     >
         <template #renderContent="flags">
             <PageTextFieldContent :flags="flags" :width="FIELD_WIDTH" />

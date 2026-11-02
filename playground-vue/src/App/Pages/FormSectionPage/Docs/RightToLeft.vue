@@ -10,9 +10,7 @@ import {
 import PageFormFieldCaption from "../../../StyledComponents/FormFieldContent/PageFormFieldCaption.vue";
 import PageFormSectionBody from "../../../StyledComponents/FormFieldContent/PageFormSectionBody.vue";
 import PageFormSectionCaption from "../../../StyledComponents/FormFieldContent/PageFormSectionCaption.vue";
-import PageTextFieldContent, {
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
+import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 
 const street = shallowRef("");
 const city = shallowRef("");
@@ -33,12 +31,7 @@ const city = shallowRef("");
                         </template>
 
                         <template #renderControl>
-                            <TextInput
-                                v-model:value="street"
-                                :padding="FIELD_PADDING"
-                                :gap="FIELD_GAP"
-                                :compute-text-style="computePageTextFieldTextStyle"
-                            >
+                            <TextInput v-model:value="street" :padding="FIELD_PADDING" :gap="FIELD_GAP">
                                 <template #renderContent="flags">
                                     <PageTextFieldContent :flags="flags" />
                                 </template>
@@ -52,12 +45,7 @@ const city = shallowRef("");
                         </template>
 
                         <template #renderControl>
-                            <TextInput
-                                v-model:value="city"
-                                :padding="FIELD_PADDING"
-                                :gap="FIELD_GAP"
-                                :compute-text-style="computePageTextFieldTextStyle"
-                            >
+                            <TextInput v-model:value="city" :padding="FIELD_PADDING" :gap="FIELD_GAP">
                                 <template #renderContent="flags">
                                     <PageTextFieldContent :flags="flags" />
                                 </template>

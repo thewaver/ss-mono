@@ -8,9 +8,7 @@
 
     import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater.const.svelte";
     import PagePopoverSurface from "../../../StyledComponents/PopoverSurface/PopoverSurface.svelte";
-    import PageSelectContent, {
-        computePageSelectTextStyle,
-    } from "../../../StyledComponents/SelectContent/SelectContent.svelte";
+    import PageSelectContent from "../../../StyledComponents/SelectContent/SelectContent.svelte";
     import PageSelectOptionContent from "../../../StyledComponents/SelectOptionContent/SelectOptionContent.svelte";
     import { PLACEHOLDER, QUERY_PADDING, searchRoutes } from "../SelectPage.const.svelte";
 
@@ -56,7 +54,6 @@
     hasMoreOptions={results.length < total || isSearching}
     ariaLabel={"Route"}
     padding={QUERY_PADDING}
-    computeTextStyle={computePageSelectTextStyle}
     onReachEnd={() => {
         if (isSearching) return;
 

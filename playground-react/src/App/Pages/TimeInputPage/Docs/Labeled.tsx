@@ -10,10 +10,7 @@ import {
 import type { TimeValue } from "@thewaver/ss-utils";
 
 import { PageLabelCaption } from "../../../StyledComponents/LabelCaption/LabelCaption";
-import {
-    PageTextFieldContent,
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent";
+import { PageTextFieldContent } from "../../../StyledComponents/TextFieldContent/TextFieldContent";
 import { PageTextFieldPlaceholder } from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder";
 
 const LABEL_GAP = 5;
@@ -30,7 +27,6 @@ export const LabeledDocsExample = () => {
                 segmentHints={TIME_SEGMENT_HINTS}
                 padding={FIELD_PADDING}
                 gap={FIELD_GAP}
-                computeTextStyle={computePageTextFieldTextStyle}
                 renderContent={(flags) => <PageTextFieldContent flags={flags} width={FIELD_WIDTH} />}
                 renderPlaceholder={(flags, hint) => (
                     <PageTextFieldPlaceholder flags={flags}>{hint}</PageTextFieldPlaceholder>

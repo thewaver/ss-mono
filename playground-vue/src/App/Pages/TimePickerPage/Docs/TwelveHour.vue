@@ -20,9 +20,7 @@ import PageClockColumn from "../../../StyledComponents/ClockContent/PageClockCol
 import PageClockFrame from "../../../StyledComponents/ClockContent/PageClockFrame.vue";
 import PageClockOption from "../../../StyledComponents/ClockContent/PageClockOption.vue";
 import PageClockUnit from "../../../StyledComponents/ClockContent/PageClockUnit.vue";
-import PageTextFieldContent, {
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
+import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 import PageTextFieldPlaceholder from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.vue";
 import PageTimePickerTrigger from "../../../StyledComponents/TimePickerTrigger/TimePickerTrigger.vue";
 import type { TimePickerTwelveHourDocsExampleProps } from "../TimePickerPageVue.types";
@@ -46,7 +44,6 @@ const getValueText = () => (value.value ? TimeUtils.toIso(value.value) : "nothin
         :locale="LOCALE"
         :padding="FIELD_STEPPER_PADDING"
         :gap="FIELD_GAP"
-        :compute-text-style="computePageTextFieldTextStyle"
         trigger-id="twelveHourTrigger"
         :trigger-aria-label="CLOCK_TRIGGER_LABEL"
     >

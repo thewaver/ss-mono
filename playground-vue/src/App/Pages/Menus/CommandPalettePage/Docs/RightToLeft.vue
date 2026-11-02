@@ -14,9 +14,7 @@ import PageGlideFloater from "../../../../StyledComponents/GlideFloater/PageGlid
 import PageModalOverlay from "../../../../StyledComponents/ModalOverlay/ModalOverlay.vue";
 import PageSelectGroupContent from "../../../../StyledComponents/SelectGroupContent/SelectGroupContent.vue";
 import PageSelectOptionContent from "../../../../StyledComponents/SelectOptionContent/SelectOptionContent.vue";
-import PageTextFieldContent, {
-    computePageTextFieldTextStyle,
-} from "../../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
+import PageTextFieldContent from "../../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 import PageTextFieldPlaceholder from "../../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.vue";
 import { GROUPED_ACTIONS, NOTHING_RUN, formatPageResolvedShortcut } from "../CommandPalettePageVue.const";
 import CommandPalettePanel from "../CommandPalettePanel.vue";
@@ -53,7 +51,6 @@ const setLastRun = (value: string) => {
             listAriaLabel="Matching actions"
             :field-padding="FIELD_PADDING"
             :field-gap="FIELD_GAP"
-            :compute-field-text-style="computePageTextFieldTextStyle"
             @activate="setLastRun"
         >
             <template #renderOverlay="{ visibilityTarget, transitionDurationMs }">

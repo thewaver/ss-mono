@@ -1,5 +1,6 @@
 import { createVar, style } from "@vanilla-extract/css";
 
+import { lookEntries, lookStates } from "../../Looks/Look.css";
 import { themeVars } from "../../Theme.css";
 import { layerVars } from "../Layer/Layer.css";
 import { FIELD_HEIGHT, FIELD_PADDING } from "../TextFieldContent/TextFieldContent.css";
@@ -12,9 +13,9 @@ export const swatchVar = createVar();
 const THUMB_SIZE = 16;
 
 export const isDragging = style({});
-export const isHovered = style({});
+export const isHovered = style([lookStates.isHovered]);
 export const isFocused = style({});
-export const isDisabled = style({});
+export const isDisabled = style([lookStates.isDisabled]);
 
 export const colorAreaSquare = style({
     position: "relative",
@@ -109,18 +110,16 @@ export const colorSwatch = style({
     boxShadow: `inset 0 0 0 1px rgb(from ${layerVars.contrast} r g b / 25%)`,
 });
 
-export const colorPickerPopup = style({
-    display: "flex",
-    flexDirection: "column",
-    gap: themeVars.spacing.full,
-    width: 360,
-    borderRadius: themeVars.borderRadius.full,
-    padding: themeVars.spacing.double,
-    color: layerVars.contrast,
-    backgroundColor: layerVars.main,
-    backdropFilter: "brightness(75%) blur(10px)",
-    boxShadow: themeVars.shadow.large,
-});
+export const colorPickerPopup = style([
+    lookEntries.dropdown,
+    {
+        display: "flex",
+        flexDirection: "column",
+        gap: themeVars.spacing.full,
+        width: 360,
+        padding: themeVars.spacing.double,
+    },
+]);
 
 const CHECKER_SIZE = 8;
 
@@ -169,32 +168,19 @@ export const colorPickerRow = style({
     fontVariantNumeric: "tabular-nums",
 });
 
-export const colorFieldTrigger = style({
-    display: "flex",
-    alignItems: "center",
-    gap: themeVars.spacing.full,
-    width: 180,
-    height: FIELD_HEIGHT,
-    boxShadow: themeVars.shadow.small,
-    border: `2px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
-    borderRadius: themeVars.borderRadius.half,
-    paddingInline: FIELD_PADDING,
-    backgroundColor: layerVars.main,
-    color: layerVars.contrast,
-    fontSize: themeVars.fontSize.medium,
-    fontVariantNumeric: "tabular-nums",
-    transition: `filter ${themeVars.animation.duration}, border-color ${themeVars.animation.duration}`,
-
-    selectors: {
-        [`&.${isHovered}`]: {
-            filter: themeVars.hover.filter,
-        },
-        [`&.${isDisabled}`]: {
-            filter: themeVars.disabled.filter,
-            opacity: themeVars.disabled.opacity,
-        },
+export const colorFieldTrigger = style([
+    lookEntries.input,
+    {
+        display: "flex",
+        alignItems: "center",
+        gap: themeVars.spacing.full,
+        width: 180,
+        height: FIELD_HEIGHT,
+        paddingInline: FIELD_PADDING,
+        fontVariantNumeric: "tabular-nums",
+        transition: `filter ${themeVars.animation.duration}, border-color ${themeVars.animation.duration}`,
     },
-});
+]);
 
 export const colorPreviewChecker = style({
     ...checkerboard,

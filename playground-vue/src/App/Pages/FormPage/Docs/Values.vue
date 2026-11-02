@@ -18,9 +18,7 @@ import PageFormStack from "../../../StyledComponents/FormFieldContent/PageFormSt
 import PageGlideFloater from "../../../StyledComponents/GlideFloater/PageGlideFloater.vue";
 import PageSelectContent from "../../../StyledComponents/SelectContent/SelectContent.vue";
 import PageSelectOptionContent from "../../../StyledComponents/SelectOptionContent/SelectOptionContent.vue";
-import PageTextFieldContent, {
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
+import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 import PageTextFieldPlaceholder from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.vue";
 import { PLACEHOLDER } from "../../SelectPage/SelectPageVue.const";
 import SelectPopup from "../../SelectPage/SelectPopup.vue";
@@ -129,7 +127,6 @@ const reset = () => {
                             :part-hints="DATE_PART_HINTS"
                             :padding="FIELD_PADDING"
                             :gap="FIELD_GAP"
-                            :compute-text-style="computePageTextFieldTextStyle"
                         >
                             <template #renderContent="flags">
                                 <PageTextFieldContent :flags="flags" :width="FIELD_WIDTH" />

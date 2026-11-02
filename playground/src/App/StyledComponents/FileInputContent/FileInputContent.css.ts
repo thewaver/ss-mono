@@ -1,46 +1,30 @@
 import { style } from "@vanilla-extract/css";
 
+import { lookEntries, lookStates } from "../../Looks/Look.css";
 import { themeVars } from "../../Theme.css";
 import { layerVars } from "../Layer/Layer.css";
 
 const FIELD_WIDTH = 200;
 const FIELD_HEIGHT = 40;
-const FIELD_BORDER = 2;
-const FIELD_FONT_SIZE = themeVars.fontSize.medium;
 
-export const isHovered = style({});
+export const isHovered = style([lookStates.isHovered]);
 export const isEmpty = style({});
-export const isDisabled = style({});
-export const hasError = style({});
+export const isDisabled = style([lookStates.isDisabled]);
+export const hasError = style([lookStates.hasError]);
 
-export const fileInputContent = style({
-    display: "flex",
-    alignItems: "center",
-    gap: themeVars.spacing.full,
-    boxSizing: "border-box",
-    width: FIELD_WIDTH,
-    height: FIELD_HEIGHT,
-    padding: themeVars.spacing.full,
-    boxShadow: themeVars.shadow.small,
-    border: `${FIELD_BORDER}px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
-    borderRadius: themeVars.borderRadius.half,
-    backgroundColor: layerVars.main,
-    fontSize: FIELD_FONT_SIZE,
-    transition: `filter ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}, border-color ${themeVars.animation.duration}`,
-
-    selectors: {
-        [`&.${hasError}`]: {
-            borderColor: themeVars.color.error.main,
-        },
-        [`&.${isHovered}`]: {
-            filter: themeVars.hover.filter,
-        },
-        [`&.${isDisabled}`]: {
-            filter: themeVars.disabled.filter,
-            opacity: themeVars.disabled.opacity,
-        },
+export const fileInputContent = style([
+    lookEntries.input,
+    {
+        display: "flex",
+        alignItems: "center",
+        gap: themeVars.spacing.full,
+        boxSizing: "border-box",
+        width: FIELD_WIDTH,
+        height: FIELD_HEIGHT,
+        padding: themeVars.spacing.full,
+        transition: `filter ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}, border-color ${themeVars.animation.duration}`,
     },
-});
+]);
 
 export const fileInputPrompt = style({
     flexShrink: 0,

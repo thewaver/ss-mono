@@ -12,6 +12,7 @@ defineProps<ButtonContentProps>();
             styles.buttonContent,
             flags.isHovered && styles.isHovered,
             flags.isActive && styles.isActive,
+            flags.isPressed && styles.isPressed,
             flags.isDisabled && styles.isDisabled,
             flags.hasError && styles.hasError,
         ]"

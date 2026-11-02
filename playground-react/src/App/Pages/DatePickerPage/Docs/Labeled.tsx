@@ -20,10 +20,7 @@ import {
 } from "../../../StyledComponents/CalendarContent/CalendarContent";
 import { PageDatePickerTrigger } from "../../../StyledComponents/DatePickerTrigger/DatePickerTrigger";
 import { PageLabelCaption } from "../../../StyledComponents/LabelCaption/LabelCaption";
-import {
-    PageTextFieldContent,
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent";
+import { PageTextFieldContent } from "../../../StyledComponents/TextFieldContent/TextFieldContent";
 import { PageTextFieldPlaceholder } from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder";
 
 const LABEL_GAP = 5;
@@ -42,7 +39,6 @@ export const LabeledDocsExample = () => {
                 locale={LOCALE}
                 padding={FIELD_STEPPER_PADDING}
                 gap={FIELD_GAP}
-                computeTextStyle={computePageTextFieldTextStyle}
                 renderContent={(flags) => <PageTextFieldContent flags={flags} width={FIELD_WIDTH} />}
                 renderPlaceholder={(flags, hint) => (
                     <PageTextFieldPlaceholder flags={flags}>{hint}</PageTextFieldPlaceholder>

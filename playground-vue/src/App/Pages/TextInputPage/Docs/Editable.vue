@@ -8,9 +8,7 @@ import {
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
 import PageInlineEditContent from "../../../StyledComponents/InlineEditContent/InlineEditContent.vue";
-import PageTextFieldContent, {
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
+import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 
 const value = shallowRef("Ada Lovelace");
 const editing = shallowRef(false);
@@ -68,14 +66,7 @@ watch(
     </Button>
 
     <div v-else @keydown="handleKeyDown" @focusout="finishEditing(true)">
-        <TextInput
-            :ref="setInputRef"
-            v-model:value="draft"
-            :padding="FIELD_PADDING"
-            :gap="FIELD_GAP"
-            ariaLabel="Name"
-            :compute-text-style="computePageTextFieldTextStyle"
-        >
+        <TextInput :ref="setInputRef" v-model:value="draft" :padding="FIELD_PADDING" :gap="FIELD_GAP" ariaLabel="Name">
             <template #renderContent="flags">
                 <PageTextFieldContent :flags="flags" />
             </template>

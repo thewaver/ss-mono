@@ -111,6 +111,136 @@ line that divides parts of something — table rows, a tab row's gutter, a docs 
 a grid's cell lines — is not a stroke and keeps its own alpha. Alphas stay on 25, 50 and 75, with 10, 35
 and 65 where a step is needed.
 
+### Looks
+
+**A Theme is pure colors; a Look is shape and where those colors go** — the user's split. Plasticine paints a
+gradient button; another Look might paint a bordered one with heavily rounded corners, from the same Theme. A
+Look owns everything that paints — color, background, shadow, border, radius, padding, font — while display,
+size, position, z-index, transforms and transitions stay in the painter, for now. **A Look is picked the way a
+Theme is**: a class on `<html>`, swapped from the left nav's settings (`PageComponents/Look`, beside
+`PageComponents/Theme`), from `PLAYGROUND_LOOKS` in `Looks/Look.const.ts`. **Every Look lives in
+`Looks/Variants/`**, one file each, the user's placement; `Looks/` itself holds only the machinery.
+
+**Fourteen Looks exist, Plasticine being the default.** The user approved the first six from a published
+reference each and asked for every further idea to be built for rating, with the warning that a Look has to
+change shape, not just where colors fall; several will be dropped once lived with:
+
+- **Plasma** — flat and bordered: no gradient or shadow anywhere, 2px rims in the layer's `contrast` color,
+  pill radius on everything small and a doubled `full` radius on boxes; buttons and tags are "stickers", a flat
+  `primary.light` fill rimmed in `primary.dark`.
+- **Neon** — dark panes at 85–95% over a faint grid, one-pixel strokes that glow (`box-shadow` at 6px and
+  14px) and text that glows (`text-shadow`) on anything lit — a button, a selected item, a checked switch —
+  with the error color glowing the same way.
+
+- **Brutalist** — neobrutalism: square corners, hard unblurred offset shadows in black (the user's call, after
+  contrast-colored shadows read as white cut-outs on a dark Theme), and a 3px stroke in the layer's `contrast`
+  color **on the inputs only** — fields and the checkbox, radio and toggle boxes; surfaces, buttons, popups and
+  tags are shadow and fill alone, also the user's call; uppercase bold buttons; selected means inverted.
+- **Glass** — translucent fills over a page gradient with colored glows (so the frost has something to blur),
+  `backdrop-filter`, a one-pixel light edge and an inset top highlight, pill buttons. **The `pageBackground`
+  entry sits on the app root, not the page column**, so it runs under the left nav and the portalled layers too;
+  a frosted nav over the flat body color had nothing to blur and looked solid.
+- **Clay** — soft neumorphism: every surface in its own layer color, lifted by a lighter and a darker shadow
+  made with relative color syntax (`hsl(from … calc(l ± 8))`), sunk inward when pressed, checked or selected.
+- **Terminal** — monospace inside every entry, one-pixel rules, no radius and no shadow, `primary.main` used
+  only for text, outlines and a segmented progress fill.
+- **Retro OS** — the two-tone bevel of early desktop chrome, drawn with four inset shadows (light top-left, dark
+  bottom-right) that swap when pressed, sunk or selected; gray chrome in `surface.light`, square everything, a
+  yellow note for the tooltip.
+- **Pixel** — 4px borders with the corner pixel clipped off (`clip-path` notches), checkerboard dither for
+  hover, tracks and the checked toggle, monospace; nothing casts a shadow, since a clip would cut it.
+- **Blueprint** — outlines only: transparent surfaces, one-pixel lines in the layer's `contrast` color, dashed
+  for panels, hatching for every fill, a two-scale grid behind the page; selected means inverted.
+- **Paper** — hand-drawn: the classic uneven `border-radius` pair gives every box a wobble, 2px ink lines,
+  ruled-paper lines behind the page, scribble fills, and the Theme's `alert` color as a highlighter for
+  selection, hover and tags.
+- **HUD** — cut corners (`clip-path` polygons) on panes and small cells, half-strength primary frames, tiny
+  spaced uppercase labels, and glow only inward (`inset` shadows) on hover and selection, because an outer glow
+  would be clipped.
+- **Material** — the elevation ladder (1, 2, 4, 8dp shadows), filled buttons without borders, text buttons in
+  primary, filled inputs with only a bottom line, pill chips, and selection as a 12% primary tint.
+- **Aqua** — a glossy cap (a white gradient fading at the midline) over every colored control, pinstriped
+  surfaces, sunken wells for inputs and tracks, jelly pills for buttons, tags and the selected item.
+
+**The mechanism is the user's option B**: every Look paints the same set of shared entry classes
+(`lookEntries` in `Looks/Look.css.ts` — `button`, `input`, `surface` and the rest), and a painter adds an entry by
+composing it, `style([lookEntries.button, { …layout }])`. A Look writes its rules once through
+`LookUtils.define(root, entries)`, which scopes each under the Look's root class — `&` is the entry,
+selectors may nest, a top-level comma inside `:is(…)` is not split — and puts them in the `look` cascade layer.
+A variables contract like Theme's was weighed and set aside: it caps every Look at the properties the first one
+planned for.
+
+- **The layer is what lets a painter override a Look.** Unlayered rules always beat layered ones, so any paint
+  still in a painter wins over its entry, whatever the specificity or stylesheet order. Paint left in a painter
+  is, by that, paint no entry covers yet.
+- **States come from shared classes, not pseudo-classes.** `lookStates` (`isHovered`, `isActive`, `isSelected`,
+  `isReadOnly`, `isDisabled`, `hasError`) carry the library's verdict, which `:hover`, `:active` and
+  `[aria-selected]` do not: the flags force hover off while disabled, report a keyboard press as active, and
+  mark a keyboard-highlighted item that the pointer never touched. A painter composes the shared class into its
+  own — `export const isHovered = style([lookStates.isHovered])` — so its markup is unchanged in every
+  framework, and its own selectors still name the composition's unique class and cannot match a neighbor's.
+- **A Look writes no selector of its own** — the user's rule. Every state a Look can paint is a named key in
+  `lookSelectors` (`Looks/Look.css.ts`), joined with `LookUtils.anyOf` where one rule covers two, so a new
+  Look imports the names and writes only the styles. A state a Look needs that has no key gets one there,
+  never a literal in the Look.
+- **A Look's rule matches a state on the entry's own element** (`&.isHovered`), so a checkbox row's hover filter
+  and its box's paint cannot stack. **The ancestor matches are the switches' row states** (`.hasError &`,
+  `.isChecked &`, `.isMixed &`): checkbox, radio and toggle carry their state on the row around the box, and the
+  box and its mark each have an entry — `checkboxBox`, `radioBox`, `toggleTrack` beside their marks — so a Look
+  can change either by state. The user's call; Plasticine paints the boxes as `input` through one shared
+  constant.
+- **A field's typed text is painted through its wrapper** — the user's pick. The library's `<input>` sits beside
+  the painted box, not inside it, and inherits color and font from the wrapper both share, so `input` paints
+  that wrapper with `:has(> &)`: text color, caret color, font size, and a dimmer color while disabled. Painters
+  hand the library no `computeTextStyle` for it.
+- **Who the entries are for.** `drawer` is every page-edge or full panel — the left nav, drawers, modals and the
+  sidebar sample, which paints exactly the left nav (an earlier call of the user's). `tooltip` takes the small
+  floating popups — spotlight and hover card as well as the tooltip. `surface` is the example and variant boxes,
+  toasts and the knobs popup; `panel` the boxes of content inside them, the API tables, code boxes, prop rows
+  and the dependency chips. `decoration` — the user's — is the small see-through button inside or beside a
+  field (select clear, picker triggers, era and AM/PM toggles, stepper arrows, adornments, the sidebar toggle);
+  it reacts to hover only when it is or sits in a `button` or `[role='button']`, because a static icon
+  adornment is handed the field's hover flag. `tag` is a tag input's chip; the other chips and badges keep
+  their own paint, the user's call. The binary switches' insides — `checkboxMark`, `radioDot`, `toggleHandle` —
+  and the standard bars — `progressTrack` and `progressFill`, `rangeTrack`, `rangeFill` and `rangeThumb`,
+  `scrollerTrack` and `scrollerThumb` (painted on `::before`) — have entries; `isChecked` and `isMixed` joined
+  the shared states for the toggle's handle, matched on the row around it, as is a progress fill's error.
+- **A modal's backdrop has two entries**, `opaqueOverlay` and `blurredOverlay`, one per kind the modal offers;
+  the painter keeps only what animates it open and shut.
+- **Only a control's standard layout gets entries; a custom variant keeps its own paint** — the user's rule. The
+  progress ring, range knob, scroller arc, slide button and color area are left alone, because whoever builds a
+  custom slide button, tab layout or progress wants full control of the element — a painter of their own, not a
+  set of classes to restyle. A radius computed from a painter's own size (a track's thickness) also stays in the
+  painter.
+- **Hover in a list is the floater's, everywhere a list can have one** — the user's rule. An item comes in two
+  entries: `itemWithFloater` paints no hover at all, `itemWithoutFloater` paints its own and is for lists whose
+  component offers no floater slot (`Toolbar`'s overflow, `Menubar`, `TextInput`'s suggestions). A painter picks
+  by its `isGliding` prop; without a floater, hover covers pointer hover, the keyboard highlight and an open
+  submenu, so a keyboard walk stays visible.
+- **Where a painter disagreed with its entry, the entry won** — the user's call. Padding, radius and font join
+  an entry only when every painter using it agrees, and are expected to converge later; until then they stay in
+  the painters. **Radius is the one a Look most needs**, since a Look decides shape and an unlayered radius in a
+  painter beats it: `input`, `checkboxBox`, `radioBox`, `toggleTrack` and `tooltip` carry it (their painters all
+  agreed), so Brutalist and Terminal can square them. **A pressed toggle button is painted by the Look through
+  `isPressed`** — before, the painter ignored the flag and only `aria-pressed` told the state, a WCAG 1.3.1 gap;
+  each Look sinks, inverts or hatches it in its own idiom, distinct from hover and the press-down. The Button
+  page's own `PressedButtonContent` wrapper, which drew a white inset ring over the painter, went with it.
+  `accordionHeader` has its own entry, with `isExpanded` among
+  the shared states so a Look can mark an open header, and **the hover and selection floaters take their radius
+  from the Look**, matched to that Look's items, since a floater is the shape drawn behind an item. `surface`,
+  `panel` and `dropdown` carry it too, since the user
+  unified their painters to each entry's majority — `surface` and `dropdown` at `full`, `panel` at `half` — which
+  rounded the toast, the modal-free popovers and the select list a little more, and squared the API table box,
+  the dependency summary and gave the accordion panel corners it had not had. **A radius computed from a painter's
+  own size** (a track's thickness, a pill badge) stays in the painter.
+- **The page's font and backdrop are constants, not the Look's** — the user's call. The `body` rule in
+  `Theme.css.ts` holds the font family, size, line height and the backdrop behind the app, and sets no text
+  color: every painted area sets its own.
+- **SVG paint is not reached yet**: a fill or stroke handed to `Shape` through `computeFillDefs` or
+  `computeStrokeDefs` is data, not a class. The user deferred how a Look reaches it.
+- **The loading screen is plain black** (`vite/loadingScreen.ts`), the user's call, so it belongs to no Theme or
+  Look and the build config needs neither.
+
 - **`e2e/`** — Playwright interaction suite. Imports from neither tree; drives the built Playground in
   a real browser. See _"Verifying interaction"_ in `conventions.md`.
 
@@ -989,7 +1119,7 @@ other pages copy. Taken on Claude's judgment under the unsupervised port.
   `PageTextField.vue` and the rest; `Examples.tsx` is `PageExamples.vue` and `PageExample.vue`; `App.tsx` is `App.vue`,
   `AppContent.vue`, `PageDependencies.vue` and `EmptyPage.vue`. A value a React file exported beside its component is
   exported from a plain `<script>` block of that `.vue` and imported by name beside the default
-  (`import PageTextFieldContent, { computePageTextFieldTextStyle } from ".../TextFieldContent.vue"`).
+  (`import StressItem, { STRESS_ITEMS } from "./StressItem.vue"`).
   `pageColorPickerSlots` is the exception: a template cannot spread an object of slots onto a component, so its three
   render functions are three components in `ColorPicker/` — `PageColorPickerArea`, `PageColorPickerHue` and
   `PageColorPickerPanel` — each written into its own slot of `ColorInput`.
@@ -1280,8 +1410,7 @@ the other pages copy. Taken on Claude's judgment under the unsupervised port.
   file per component, named after the component.** `SourceView.tsx` is `SourceView.svelte`; `Field.tsx` is
   `PageNumberField.svelte`, `PageTextField.svelte` and the rest, `TabContent.tsx` is `PageTabContent.svelte`,
   `PageTabFloater.svelte` and so on. `App.tsx` is `App.svelte`, `AppContent.svelte`, `PageDependencies.svelte` and
-  `EmptyPage.svelte`. A value a React file exported beside its component — `computePageTextFieldTextStyle`,
-  `computePageSelectTextStyle`, `STEP_GLYPHS`, `getPoints`/`getViewBox`, `INDENT_PER_DEPTH`/`LEAF_MARKER`,
+  `EmptyPage.svelte`. A value a React file exported beside its component — `STEP_GLYPHS`, `getPoints`/`getViewBox`, `INDENT_PER_DEPTH`/`LEAF_MARKER`,
   `pageColorPickerSlots` — is exported from that component's `<script module>` and imported by name beside the default.
 - **The source view keys a split file by the React file it came from.** A `PageX.svelte` inside folder `F` belongs to the
   stem `F/F`, so it shares a tab with `F.types.ts` and `F.css.ts` exactly as `F.tsx` did, while the sections list the

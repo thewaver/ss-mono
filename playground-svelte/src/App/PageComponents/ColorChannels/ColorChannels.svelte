@@ -12,9 +12,7 @@
     import PageColorChannelGrid from "../../StyledComponents/ColorAreaContent/PageColorChannelGrid.svelte";
     import PageColorPickerRow from "../../StyledComponents/ColorAreaContent/PageColorPickerRow.svelte";
     import PageRadioContent from "../../StyledComponents/RadioContent/RadioContent.svelte";
-    import PageTextFieldContent, {
-        computePageTextFieldTextStyle,
-    } from "../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
+    import PageTextFieldContent from "../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
     import PageNumberField from "../Field/PageNumberField.svelte";
     import type { PageColorChannelsProps } from "./ColorChannels.types";
     import {
@@ -177,7 +175,6 @@
                 ariaLabel={"Hex with alpha"}
                 padding={FIELD_PADDING}
                 gap={FIELD_GAP}
-                computeTextStyle={computePageTextFieldTextStyle}
             >
                 {#snippet renderContent(flags)}
                     <PageTextFieldContent {flags} width={HEX_FIELD_WIDTH} />

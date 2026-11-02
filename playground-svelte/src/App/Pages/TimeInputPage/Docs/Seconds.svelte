@@ -8,9 +8,7 @@
     } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
     import type { TimeValue } from "@thewaver/ss-utils";
 
-    import PageTextFieldContent, {
-        computePageTextFieldTextStyle,
-    } from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
+    import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
     import type { TimeInputSecondsDocsExampleProps } from "../TimeInputPageSvelte.types";
 
     type Props = TimeInputSecondsDocsExampleProps;
@@ -27,7 +25,6 @@
     segmentHints={TIME_SEGMENT_HINTS}
     padding={FIELD_PADDING}
     gap={FIELD_GAP}
-    computeTextStyle={computePageTextFieldTextStyle}
 >
     {#snippet renderContent(flags)}
         <PageTextFieldContent {flags} width={FIELD_WIDTH} />

@@ -8,10 +8,7 @@ import {
     FIELD_PADDING,
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
-import {
-    PageTextFieldContent,
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent";
+import { PageTextFieldContent } from "../../../StyledComponents/TextFieldContent/TextFieldContent";
 import { PageTextFieldPlaceholder } from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder";
 import type { TextAreaBasicDocsExampleProps } from "../TextAreaPageReact.types";
 
@@ -30,7 +27,6 @@ export const BasicDocsExample = (props: Props) => {
                 hasError={props.hasError}
                 isDisabled={props.isDisabled}
                 ariaLabel={"Notes"}
-                computeTextStyle={computePageTextFieldTextStyle}
                 renderContent={(flags) => (
                     <PageTextFieldContent flags={flags} width={FIELD_WIDTH} height={FIXED_HEIGHT} />
                 )}

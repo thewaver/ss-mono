@@ -14,7 +14,6 @@ import {
     PageTagInputContent,
     PageTagInputPlaceholder,
 } from "../../../StyledComponents/TagInputContent/TagInputContent";
-import { computePageTextFieldTextStyle } from "../../../StyledComponents/TextFieldContent/TextFieldContent";
 
 export const UniqueDocsExample = () => {
     const valueState = useState(STARTING_TAGS);
@@ -32,7 +31,6 @@ export const UniqueDocsExample = () => {
                 return tag && !valueState[0].includes(tag) ? tag : undefined;
             }}
             computeTagAriaLabel={computeTagAriaLabel}
-            computeTextStyle={computePageTextFieldTextStyle}
             renderContent={(flags) => <PageTagInputContent flags={flags} />}
             renderPlaceholder={() => <PageTagInputPlaceholder>Type and press Enter</PageTagInputPlaceholder>}
             renderTag={(tag, flags) => <PageTagContent flags={flags}>{tag}</PageTagContent>}

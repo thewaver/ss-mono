@@ -17,9 +17,7 @@
     import PageCalendarWeekday from "../../../StyledComponents/CalendarContent/PageCalendarWeekday.svelte";
     import PageDatePickerTrigger from "../../../StyledComponents/DatePickerTrigger/DatePickerTrigger.svelte";
     import PageLabelCaption from "../../../StyledComponents/LabelCaption/LabelCaption.svelte";
-    import PageTextFieldContent, {
-        computePageTextFieldTextStyle,
-    } from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
+    import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
     import PageTextFieldPlaceholder from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.svelte";
 
     const LABEL_GAP = 5;
@@ -37,7 +35,6 @@
         locale={LOCALE}
         padding={FIELD_STEPPER_PADDING}
         gap={FIELD_GAP}
-        computeTextStyle={computePageTextFieldTextStyle}
         triggerId={"labeledTrigger"}
         triggerAriaLabel={CALENDAR_TRIGGER_LABEL}
     >

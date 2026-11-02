@@ -1,13 +1,13 @@
 import { style, styleVariants } from "@vanilla-extract/css";
 
+import { lookEntries, lookStates } from "../../Looks/Look.css";
 import { themeVars } from "../../Theme.css";
-import { layerVars } from "../Layer/Layer.css";
 
 export const SCROLLER_BAR_THICKNESS = 24;
 export const SCROLLER_BAR_LINE = 6;
 
 export const isHidden = style({});
-export const isDragging = style({});
+export const isDragging = style([lookStates.isActive]);
 
 export const scrollerBar = style({
     display: "flex",
@@ -33,19 +33,21 @@ export const scrollerBarVariants = styleVariants({
     },
 });
 
-export const scrollerBarTrack = style({
-    position: "relative",
-    flexGrow: 1,
+export const scrollerBarTrack = style([
+    lookEntries.scrollerTrack,
+    {
+        position: "relative",
+        flexGrow: 1,
 
-    selectors: {
-        "&::before": {
-            content: '""',
-            position: "absolute",
-            borderRadius: SCROLLER_BAR_LINE,
-            backgroundColor: `rgb(from ${layerVars.contrast} r g b / 25%)`,
+        selectors: {
+            "&::before": {
+                content: '""',
+                position: "absolute",
+                borderRadius: SCROLLER_BAR_LINE,
+            },
         },
     },
-});
+]);
 
 export const scrollerBarTrackVariants = styleVariants({
     x: {
@@ -72,22 +74,20 @@ export const scrollerBarTrackVariants = styleVariants({
     },
 });
 
-export const scrollerBarThumb = style({
-    position: "absolute",
+export const scrollerBarThumb = style([
+    lookEntries.scrollerThumb,
+    {
+        position: "absolute",
 
-    selectors: {
-        "&::before": {
-            content: '""',
-            position: "absolute",
-            borderRadius: SCROLLER_BAR_LINE,
-            backgroundColor: themeVars.color.primary.main,
-            boxShadow: themeVars.shadow.small,
-        },
-        [`&.${isDragging}::before`]: {
-            filter: themeVars.active.filter,
+        selectors: {
+            "&::before": {
+                content: '""',
+                position: "absolute",
+                borderRadius: SCROLLER_BAR_LINE,
+            },
         },
     },
-});
+]);
 
 export const scrollerBarThumbVariants = styleVariants({
     x: {

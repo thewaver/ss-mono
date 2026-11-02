@@ -9,10 +9,7 @@ import {
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
 import { PageNumberInputStepper } from "../../../PageComponents/NumberInputStepper/NumberInputStepper";
-import {
-    PageTextFieldContent,
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent";
+import { PageTextFieldContent } from "../../../StyledComponents/TextFieldContent/TextFieldContent";
 import type { NumberInputSteppingDocsExampleProps } from "../NumberInputPageReact.types";
 
 type Props = NumberInputSteppingDocsExampleProps;
@@ -30,7 +27,6 @@ export const SteppingDocsExample = (props: Props) => {
                 padding={FIELD_STEPPER_PADDING}
                 gap={FIELD_GAP}
                 ariaLabel={"Quantity"}
-                computeTextStyle={computePageTextFieldTextStyle}
                 renderContent={(flags) => <PageTextFieldContent flags={flags} width={FIELD_WIDTH} />}
                 renderTrailing={(flags, stepper) => <PageNumberInputStepper flags={flags} stepper={stepper} />}
             />

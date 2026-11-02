@@ -1,23 +1,22 @@
 import { globalStyle, style } from "@vanilla-extract/css";
 
+import { lookEntries, lookStates } from "../../Looks/Look.css";
 import { themeVars } from "../../Theme.css";
 import { layerVars } from "../Layer/Layer.css";
 
 export const isBranch = style({});
 export const isExpanded = style({});
-export const isHovered = style({});
-export const isSelected = style({});
-export const isDisabled = style({});
+export const isHovered = style([lookStates.isHovered]);
+export const isSelected = style([lookStates.isSelected]);
+export const isDisabled = style([lookStates.isDisabled]);
 export const isCategory = style({});
 export const isRightToLeft = style({});
 
-export const treeNodeContent = style({
+const treeNodeBase = style({
     display: "flex",
     alignItems: "center",
     gap: themeVars.spacing.full,
     padding: themeVars.spacing.half,
-    borderRadius: themeVars.borderRadius.half,
-    fontSize: themeVars.fontSize.medium,
     whiteSpace: "nowrap",
     transition: `background-color ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}`,
 
@@ -27,19 +26,12 @@ export const treeNodeContent = style({
             fontWeight: "bold",
             filter: "saturate(200%) brightness(75%)",
         },
-        [`&.${isHovered}`]: {
-            backgroundColor: `rgb(from ${layerVars.contrast} r g b / 25%)`,
-        },
-        [`&.${isSelected}`]: {
-            color: themeVars.color.primary.main,
-            fontWeight: "bold",
-        },
-        [`&.${isDisabled}`]: {
-            filter: themeVars.disabled.filter,
-            opacity: themeVars.disabled.opacity,
-        },
     },
 });
+
+export const treeNodeContent = style([lookEntries.itemWithFloater, treeNodeBase]);
+
+export const treeNodeContentWithoutFloater = style([lookEntries.itemWithoutFloater, treeNodeBase]);
 
 export const treeNodeMarker = style({
     width: "1ch",
@@ -48,16 +40,16 @@ export const treeNodeMarker = style({
     transition: `transform ${themeVars.animation.duration}`,
 
     selectors: {
-        [`${treeNodeContent}.${isBranch} &`]: {
+        [`${treeNodeBase}.${isBranch} &`]: {
             opacity: 1,
         },
-        [`${treeNodeContent}.${isExpanded} &`]: {
+        [`${treeNodeBase}.${isExpanded} &`]: {
             transform: "rotate(90deg)",
         },
-        [`${treeNodeContent}.${isRightToLeft} &`]: {
+        [`${treeNodeBase}.${isRightToLeft} &`]: {
             transform: "scaleX(-1) rotate(0deg)",
         },
-        [`${treeNodeContent}.${isExpanded}.${isRightToLeft} &`]: {
+        [`${treeNodeBase}.${isExpanded}.${isRightToLeft} &`]: {
             transform: "scaleX(-1) rotate(90deg)",
         },
     },

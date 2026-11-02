@@ -10,9 +10,7 @@ import {
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
 import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.vue";
-import PageTextFieldContent, {
-    computePageTextFieldTextStyle,
-} from "../../StyledComponents/TextFieldContent/TextFieldContent.vue";
+import PageTextFieldContent from "../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 import PageTextFieldPlaceholder from "../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.vue";
 import CustomInputExample from "./Examples/CustomInput.vue";
 import type { PaintedTextExampleProps, PaintedTextExampleWrapperProps } from "./PaintedTextPageVue.types";
@@ -37,7 +35,6 @@ const exampleProps = computed((): PaintedTextExampleProps => {
         :padding="FIELD_PADDING"
         :gap="FIELD_GAP"
         ariaLabel="Custom text"
-        :compute-text-style="computePageTextFieldTextStyle"
     >
         <template #renderContent="flags">
             <PageTextFieldContent :flags="flags" :width="PaintedTextKnobs.CUSTOM_TEXT_WIDTH" is-stretched />

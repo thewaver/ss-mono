@@ -9,7 +9,6 @@
 
     import PageButtonContent from "../../../../StyledComponents/ButtonContent/ButtonContent.svelte";
     import { renderPageHighlightFloater } from "../../../../StyledComponents/GlideFloater/GlideFloater.const.svelte";
-    import { computePageTextFieldTextStyle } from "../../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
     import {
         GROUPED_ACTIONS,
         NOTHING_RUN,
@@ -50,7 +49,6 @@
         renderOverlay={renderPaletteOverlay}
         fieldPadding={FIELD_PADDING}
         fieldGap={FIELD_GAP}
-        computeFieldTextStyle={computePageTextFieldTextStyle}
         renderFieldContent={renderPaletteField}
         renderFieldPlaceholder={renderPalettePlaceholder}
         renderOption={renderPaletteOption}

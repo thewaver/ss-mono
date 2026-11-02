@@ -7,7 +7,7 @@ import * as popupStyles from "@thewaver/ss-playground/App/StyledComponents/Popov
 
 import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater";
 import { PagePopoverSurface } from "../../../StyledComponents/PopoverSurface/PopoverSurface";
-import { PageSelectContent, computePageSelectTextStyle } from "../../../StyledComponents/SelectContent/SelectContent";
+import { PageSelectContent } from "../../../StyledComponents/SelectContent/SelectContent";
 import { PageSelectOptionContent } from "../../../StyledComponents/SelectOptionContent/SelectOptionContent";
 import { PLACEHOLDER, QUERY_PADDING, searchRoutes } from "../SelectPageReact.const";
 
@@ -52,7 +52,6 @@ export const AutocompleteOnDemandDocsExample = () => {
             hasMoreOptions={results.length < total || isSearching}
             ariaLabel={"Route"}
             padding={QUERY_PADDING}
-            computeTextStyle={computePageSelectTextStyle}
             renderContent={(selectedOption, flags) => (
                 <PageSelectContent flags={flags}>{selectedOption?.value.name ?? PLACEHOLDER}</PageSelectContent>
             )}

@@ -13,7 +13,6 @@ import {
     PageTagInputContent,
     PageTagInputPlaceholder,
 } from "../../../StyledComponents/TagInputContent/TagInputContent";
-import { computePageTextFieldTextStyle } from "../../../StyledComponents/TextFieldContent/TextFieldContent";
 
 export const EmptyDocsExample = () => {
     const valueSignal = createSignal<string[]>([]);
@@ -26,7 +25,6 @@ export const EmptyDocsExample = () => {
             padding={FIELD_PADDING}
             minHeight={FIELD_HEIGHT}
             computeTagAriaLabel={computeTagAriaLabel}
-            computeTextStyle={computePageTextFieldTextStyle}
             renderContent={(getFlags) => <PageTagInputContent flags={getFlags} />}
             renderPlaceholder={() => <PageTagInputPlaceholder>Type and press Enter</PageTagInputPlaceholder>}
             renderTag={(getTag, getFlags) => <PageTagContent flags={getFlags}>{getTag()}</PageTagContent>}

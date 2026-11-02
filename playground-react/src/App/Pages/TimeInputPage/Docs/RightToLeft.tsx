@@ -10,10 +10,7 @@ import {
 import type { TimeValue } from "@thewaver/ss-utils";
 
 import { PageMeridiemToggle } from "../../../PageComponents/MeridiemToggle/MeridiemToggle";
-import {
-    PageTextFieldContent,
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent";
+import { PageTextFieldContent } from "../../../StyledComponents/TextFieldContent/TextFieldContent";
 
 export const RightToLeftDocsExample = () => {
     const valueState = useState<TimeValue | undefined>({ hour: 14, minute: 30 });
@@ -27,7 +24,6 @@ export const RightToLeftDocsExample = () => {
                 segmentHints={TIME_SEGMENT_HINTS}
                 padding={FIELD_STEPPER_PADDING}
                 gap={FIELD_GAP}
-                computeTextStyle={computePageTextFieldTextStyle}
                 renderContent={(flags) => <PageTextFieldContent flags={flags} width={FIELD_WIDTH} />}
                 renderTrailing={(flags, meridiem) => (
                     <PageMeridiemToggle

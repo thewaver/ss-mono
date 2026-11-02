@@ -11,9 +11,7 @@ import {
 
 import PagePopoverSurface from "../../../StyledComponents/PopoverSurface/PopoverSurface.vue";
 import PageSelectOptionContent from "../../../StyledComponents/SelectOptionContent/SelectOptionContent.vue";
-import PageTextFieldContent, {
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
+import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 import PageTextFieldPlaceholder from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.vue";
 
 const value = shallowRef("");
@@ -38,7 +36,6 @@ const computeCitySuggestionText = (city: City) => city.name;
         :suggestions="suggestions"
         suggestions-aria-label="Cities"
         :compute-custom-suggestion-text="computeCitySuggestionText"
-        :compute-text-style="computePageTextFieldTextStyle"
     >
         <template #renderContent="flags">
             <PageTextFieldContent :flags="flags" />

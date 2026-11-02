@@ -13,6 +13,7 @@
         styles.buttonContent,
         props.flags.isHovered && styles.isHovered,
         props.flags.isActive && styles.isActive,
+        props.flags.isPressed && styles.isPressed,
         props.flags.isDisabled && styles.isDisabled,
         props.flags.hasError && styles.hasError,
     ]}

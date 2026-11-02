@@ -18,12 +18,12 @@
 
 <div
     class={[
-        styles.menuItemContent,
+        props.isGliding ? styles.menuItemContent : styles.menuItemContentWithoutFloater,
         layerClass,
-        !props.isGliding && props.flags.isHovered && styles.isHovered,
+        !props.isGliding &&
+            (props.flags.isHovered || props.flags.isHighlighted || props.flags.isOpen) &&
+            styles.isHovered,
         props.flags.isActive && styles.isActive,
-        !props.isGliding && props.flags.isHighlighted && styles.isHighlighted,
-        props.flags.isOpen && styles.isOpen,
         props.flags.isDisabled && styles.isDisabled,
     ]}
 >

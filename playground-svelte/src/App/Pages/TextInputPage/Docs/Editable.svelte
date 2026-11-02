@@ -9,9 +9,7 @@
     } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
     import PageInlineEditContent from "../../../StyledComponents/InlineEditContent/InlineEditContent.svelte";
-    import PageTextFieldContent, {
-        computePageTextFieldTextStyle,
-    } from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
+    import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
 
     let value = $state("Ada Lovelace");
     let editing = $state(false);
@@ -71,7 +69,6 @@
             padding={FIELD_PADDING}
             gap={FIELD_GAP}
             ariaLabel={"Name"}
-            computeTextStyle={computePageTextFieldTextStyle}
         >
             {#snippet renderContent(flags)}
                 <PageTextFieldContent {flags} />

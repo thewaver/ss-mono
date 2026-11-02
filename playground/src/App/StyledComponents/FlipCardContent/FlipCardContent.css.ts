@@ -1,5 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
+import { lookEntries } from "../../Looks/Look.css";
 import { themeVars } from "../../Theme.css";
 import { layerVars } from "../Layer/Layer.css";
 
@@ -16,12 +17,7 @@ const cardFace = style({
     userSelect: "none",
 });
 
-export const flipCardFront = style([
-    cardFace,
-    {
-        backgroundImage: `linear-gradient(135deg, rgb(from ${layerVars.main} r g b / 50%), rgb(from ${layerVars.main} r g b / 75%))`,
-    },
-]);
+export const flipCardFront = style([lookEntries.panel, cardFace]);
 
 export const flipCardBack = style([
     cardFace,

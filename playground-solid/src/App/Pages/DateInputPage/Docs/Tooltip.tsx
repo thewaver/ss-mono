@@ -9,10 +9,7 @@ import {
     FIELD_PADDING,
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
-import {
-    PageTextFieldContent,
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent";
+import { PageTextFieldContent } from "../../../StyledComponents/TextFieldContent/TextFieldContent";
 import { PageTooltipContent } from "../../../StyledComponents/TooltipContent/TooltipContent";
 import type { DateInputTooltipDocsExampleProps } from "../DateInputPageSolid.types";
 
@@ -31,7 +28,6 @@ export const TooltipDocsExample = (props: Props) => {
             partHints={DATE_PART_HINTS}
             padding={FIELD_PADDING}
             gap={FIELD_GAP}
-            computeTextStyle={computePageTextFieldTextStyle}
             renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} width={FIELD_WIDTH} />}
             tooltipDefs={() => ({
                 placement: () => ({ x: "center", y: "top_out" }),

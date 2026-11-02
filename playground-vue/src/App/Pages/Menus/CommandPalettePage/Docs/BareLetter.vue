@@ -15,9 +15,7 @@ import PageControlButtonContent from "../../../../StyledComponents/ControlButton
 import PageGlideFloater from "../../../../StyledComponents/GlideFloater/PageGlideFloater.vue";
 import PageModalOverlay from "../../../../StyledComponents/ModalOverlay/ModalOverlay.vue";
 import PageSelectOptionContent from "../../../../StyledComponents/SelectOptionContent/SelectOptionContent.vue";
-import PageTextFieldContent, {
-    computePageTextFieldTextStyle,
-} from "../../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
+import PageTextFieldContent from "../../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 import PageTextFieldPlaceholder from "../../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.vue";
 import { BARE_LETTER_SHORTCUT, GREET, formatPageResolvedShortcut } from "../CommandPalettePageVue.const";
 import CommandPalettePanel from "../CommandPalettePanel.vue";
@@ -54,13 +52,7 @@ const toggleShortcut = () => {
         </template>
     </Button>
 
-    <TextInput
-        v-model:value="text"
-        :padding="FIELD_PADDING"
-        :gap="FIELD_GAP"
-        ariaLabel="Somewhere to type"
-        :compute-text-style="computePageTextFieldTextStyle"
-    >
+    <TextInput v-model:value="text" :padding="FIELD_PADDING" :gap="FIELD_GAP" ariaLabel="Somewhere to type">
         <template #renderContent="flags">
             <PageTextFieldContent :flags="flags" />
         </template>
@@ -79,7 +71,6 @@ const toggleShortcut = () => {
         listAriaLabel="Matching greetings"
         :field-padding="FIELD_PADDING"
         :field-gap="FIELD_GAP"
-        :compute-field-text-style="computePageTextFieldTextStyle"
         @activate="greet"
     >
         <template #renderOverlay="{ visibilityTarget, transitionDurationMs }">

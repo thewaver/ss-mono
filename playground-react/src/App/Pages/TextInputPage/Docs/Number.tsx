@@ -11,10 +11,7 @@ import {
     FIELD_PADDING,
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
-import {
-    PageTextFieldContent,
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent";
+import { PageTextFieldContent } from "../../../StyledComponents/TextFieldContent/TextFieldContent";
 
 export const NumberDocsExample = () => {
     const valueState = useState("10");
@@ -29,7 +26,6 @@ export const NumberDocsExample = () => {
             min={QUANTITY_MIN}
             max={QUANTITY_MAX}
             step={QUANTITY_STEP}
-            computeTextStyle={computePageTextFieldTextStyle}
             renderContent={(flags) => <PageTextFieldContent flags={flags} />}
         />
     );

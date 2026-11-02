@@ -4,13 +4,12 @@ import { defineConfig } from "vite";
 import { svelte } from "@sveltejs/vite-plugin-svelte";
 import { vanillaExtractPlugin } from "@vanilla-extract/vite-plugin";
 
-import { SVELTE_THEME_VALUES } from "../playground/src/App/Theme.const.ts";
 import { componentApi } from "../playground/vite/componentApi.ts";
 import { componentDependencies } from "../playground/vite/componentDependencies.ts";
+import { loadingScreen } from "../playground/vite/loadingScreen.ts";
 import { playgroundSource } from "../playground/vite/playgroundSource.ts";
 import { definePlaygroundUrls } from "../playground/vite/playgroundUrls.ts";
 import { refuseFrameworks } from "../playground/vite/refuseFrameworks.ts";
-import { themeLoading } from "../playground/vite/themeLoading.ts";
 
 const fromRepo = (path: string) => fileURLToPath(new URL(path, import.meta.url));
 
@@ -18,7 +17,7 @@ export default defineConfig({
     root: fromRepo("."),
     plugins: [
         refuseFrameworks("svelte"),
-        themeLoading(SVELTE_THEME_VALUES.color.background),
+        loadingScreen(),
         playgroundSource(),
         componentDependencies([fromRepo("../components-svelte/src"), fromRepo("../components/src")]),
         componentApi(

@@ -1,17 +1,18 @@
 import { globalStyle, style } from "@vanilla-extract/css";
 
-import { toBackdropGradient } from "./Theme.utils";
-
 import { layoutVars } from "./Layout.css";
-import { layerVars } from "./StyledComponents/Layer/Layer.css";
+import { lookEntries } from "./Looks/Look.css";
 import { themeVars } from "./Theme.css";
 
-export const appRoot = style({
-    position: "relative",
-    width: "100%",
-    height: "100vh",
-    overflow: "hidden",
-});
+export const appRoot = style([
+    lookEntries.pageBackground,
+    {
+        position: "relative",
+        width: "100%",
+        height: "100vh",
+        overflow: "hidden",
+    },
+]);
 
 export const appFrame = style({
     display: "flex",
@@ -29,16 +30,15 @@ export const appContent = style({
     width: "100%",
 });
 
-export const leftMenu = style({
-    boxSizing: "border-box",
-    color: themeVars.color.surface.contrast,
-    backgroundColor: themeVars.color.surface.light,
-    backgroundImage: `linear-gradient(45deg, ${themeVars.color.surface.dark}, ${themeVars.color.surface.light})`,
-    boxShadow: themeVars.shadow.large,
-    width: "100%",
-    height: "100%",
-    overflow: "hidden",
-});
+export const leftMenu = style([
+    lookEntries.drawer,
+    {
+        boxSizing: "border-box",
+        width: "100%",
+        height: "100%",
+        overflow: "hidden",
+    },
+]);
 
 export const leftMenuContent = style({
     display: "flex",
@@ -137,7 +137,6 @@ export const pageColumn = style({
     padding: layoutVars.pageMargin,
     overflowY: "auto",
     scrollbarGutter: "stable",
-    backgroundImage: toBackdropGradient(themeVars.color.background.dark, themeVars.color.background.light),
 });
 
 globalStyle(`${pageColumn} > *`, {
@@ -199,24 +198,24 @@ globalStyle(`${dependencyDisclosure} [aria-expanded]`, {
     width: "fit-content",
 });
 
-export const dependencySummary = style({
-    display: "flex",
-    alignItems: "center",
-    gap: themeVars.spacing.half,
-    padding: `${themeVars.spacing.half} ${themeVars.spacing.full}`,
-    borderRadius: themeVars.borderRadius.full,
-    backgroundColor: `rgb(from ${layerVars.main} r g b / 75%)`,
-    color: layerVars.contrast,
-    fontFamily: "monospace",
-    whiteSpace: "nowrap",
-    transition: `filter ${themeVars.animation.duration}`,
+export const dependencySummary = style([
+    lookEntries.panel,
+    {
+        display: "flex",
+        alignItems: "center",
+        gap: themeVars.spacing.half,
+        padding: `${themeVars.spacing.half} ${themeVars.spacing.full}`,
+        fontFamily: "monospace",
+        whiteSpace: "nowrap",
+        transition: `filter ${themeVars.animation.duration}`,
 
-    selectors: {
-        [`&.${isHovered}`]: {
-            filter: themeVars.hover.filter,
+        selectors: {
+            [`&.${isHovered}`]: {
+                filter: themeVars.hover.filter,
+            },
         },
     },
-});
+]);
 
 export const dependencySummaryMarker = style({
     fontSize: themeVars.fontSize.xSmall,
@@ -242,14 +241,15 @@ export const dependencyLabel = style({
     letterSpacing: 1,
 });
 
-const dependencyChip = style({
-    padding: `${themeVars.spacing.half} ${themeVars.spacing.full}`,
-    borderRadius: themeVars.borderRadius.half,
-    backgroundImage: `linear-gradient(45deg, rgb(from ${layerVars.main} r g b / 50%), rgb(from ${layerVars.main} r g b / 75%))`,
-    fontFamily: "monospace",
-});
+const dependencyChip = style([
+    lookEntries.panel,
+    {
+        padding: `${themeVars.spacing.half} ${themeVars.spacing.full}`,
+        fontFamily: "monospace",
+    },
+]);
 
-export const dependencyName = style([dependencyChip, { color: layerVars.contrast }]);
+export const dependencyName = style([dependencyChip]);
 
 export const dependencyLink = style([
     dependencyChip,

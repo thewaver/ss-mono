@@ -28,7 +28,6 @@ import {
     renderPalettePlaceholder,
 } from "../../Pages/Menus/CommandPalettePage/CommandPalettePageReact.const";
 import { renderPageHighlightFloater } from "../../StyledComponents/GlideFloater/GlideFloater";
-import { computePageTextFieldTextStyle } from "../../StyledComponents/TextFieldContent/TextFieldContent";
 import { getAppliedTheme, revealTheme } from "../Theme/ThemeReact.const";
 import type { AppCommandsProps } from "./AppCommandsReact.types";
 
@@ -74,7 +73,6 @@ export const PageAppCommands = (props: AppCommandsProps) => {
             listAriaLabel={"Matching commands"}
             fieldPadding={FIELD_PADDING}
             fieldGap={FIELD_GAP}
-            computeFieldTextStyle={computePageTextFieldTextStyle}
             renderOverlay={renderPaletteOverlay}
             renderPanel={computePalettePanelRenderer(actions)}
             renderFieldContent={renderPaletteField}

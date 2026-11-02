@@ -1,18 +1,18 @@
 import { style } from "@vanilla-extract/css";
 
+import { lookEntries } from "../../Looks/Look.css";
 import { themeVars } from "../../Theme.css";
 
-export const spotlightPopup = style({
-    display: "flex",
-    flexDirection: "column",
-    gap: themeVars.spacing.full,
-    width: 280,
-    color: themeVars.color.surface.contrast,
-    backgroundColor: themeVars.color.surface.dark,
-    borderRadius: themeVars.borderRadius.full,
-    padding: themeVars.spacing.double,
-    boxShadow: themeVars.shadow.large,
-});
+export const spotlightPopup = style([
+    lookEntries.tooltip,
+    {
+        display: "flex",
+        flexDirection: "column",
+        gap: themeVars.spacing.full,
+        width: 280,
+        padding: themeVars.spacing.double,
+    },
+]);
 
 export const spotlightPopupTitle = style({
     fontWeight: "bold",

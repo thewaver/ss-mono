@@ -14,7 +14,6 @@ import {
     PageTagInputContent,
     PageTagInputPlaceholder,
 } from "../../../StyledComponents/TagInputContent/TagInputContent";
-import { computePageTextFieldTextStyle } from "../../../StyledComponents/TextFieldContent/TextFieldContent";
 import type { TagInputBasicDocsExampleProps } from "../TagInputPageReact.types";
 
 type Props = TagInputBasicDocsExampleProps;
@@ -32,7 +31,6 @@ export const BasicDocsExample = (props: Props) => {
             hasError={props.hasError}
             isDisabled={props.isDisabled}
             computeTagAriaLabel={computeTagAriaLabel}
-            computeTextStyle={computePageTextFieldTextStyle}
             renderContent={(flags) => <PageTagInputContent flags={flags} />}
             renderPlaceholder={() => <PageTagInputPlaceholder>Type and press Enter</PageTagInputPlaceholder>}
             renderTag={(tag, flags) => <PageTagContent flags={flags}>{tag}</PageTagContent>}

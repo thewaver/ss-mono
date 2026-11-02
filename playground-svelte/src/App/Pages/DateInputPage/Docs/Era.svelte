@@ -10,9 +10,7 @@
     } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
     import PageEraCycle from "../../../PageComponents/EraCycle/EraCycle.svelte";
-    import PageTextFieldContent, {
-        computePageTextFieldTextStyle,
-    } from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
+    import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
     import PageTextFieldPlaceholder from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.svelte";
 
     let value = $state.raw<DateValue | undefined>(CAESAR);
@@ -27,7 +25,6 @@
     partHints={DATE_PART_HINTS}
     padding={FIELD_PADDING}
     gap={FIELD_GAP}
-    computeTextStyle={computePageTextFieldTextStyle}
     renderLeading={eraCycle}
 >
     {#snippet renderContent(flags)}

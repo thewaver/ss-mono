@@ -16,10 +16,7 @@ import {
     PageFormSectionCaption,
     PageFormStack,
 } from "../../../StyledComponents/FormFieldContent/FormFieldContent";
-import {
-    PageTextFieldContent,
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent";
+import { PageTextFieldContent } from "../../../StyledComponents/TextFieldContent/TextFieldContent";
 
 const FIELD_WIDTH = 240;
 const CARD_DIGITS = 4;
@@ -30,7 +27,6 @@ const renderTextField = (state: readonly [string, (value: string) => void], hasE
         hasError={hasError}
         padding={FIELD_PADDING}
         gap={FIELD_GAP}
-        computeTextStyle={computePageTextFieldTextStyle}
         renderContent={(flags) => <PageTextFieldContent flags={flags} width={FIELD_WIDTH} />}
     />
 );

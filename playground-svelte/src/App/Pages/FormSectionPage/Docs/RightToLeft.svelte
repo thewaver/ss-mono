@@ -8,9 +8,7 @@
     import PageFormFieldCaption from "../../../StyledComponents/FormFieldContent/PageFormFieldCaption.svelte";
     import PageFormSectionBody from "../../../StyledComponents/FormFieldContent/PageFormSectionBody.svelte";
     import PageFormSectionCaption from "../../../StyledComponents/FormFieldContent/PageFormSectionCaption.svelte";
-    import PageTextFieldContent, {
-        computePageTextFieldTextStyle,
-    } from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
+    import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
 
     let street = $state("");
     let city = $state("");
@@ -34,7 +32,6 @@
                             bind:value={street}
                             padding={FIELD_PADDING}
                             gap={FIELD_GAP}
-                            computeTextStyle={computePageTextFieldTextStyle}
                         >
                             {#snippet renderContent(flags)}
                                 <PageTextFieldContent {flags} />
@@ -53,7 +50,6 @@
                             bind:value={city}
                             padding={FIELD_PADDING}
                             gap={FIELD_GAP}
-                            computeTextStyle={computePageTextFieldTextStyle}
                         >
                             {#snippet renderContent(flags)}
                                 <PageTextFieldContent {flags} />

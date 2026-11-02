@@ -16,9 +16,7 @@
     import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater.const.svelte";
     import PageSelectContent from "../../../StyledComponents/SelectContent/SelectContent.svelte";
     import PageSelectOptionContent from "../../../StyledComponents/SelectOptionContent/SelectOptionContent.svelte";
-    import PageTextFieldContent, {
-        computePageTextFieldTextStyle,
-    } from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
+    import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
     import PageTextFieldPlaceholder from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.svelte";
     import { PLACEHOLDER, renderSelectPopup } from "../../SelectPage/SelectPage.const.svelte";
 
@@ -115,7 +113,6 @@
                         partHints={DATE_PART_HINTS}
                         padding={FIELD_PADDING}
                         gap={FIELD_GAP}
-                        computeTextStyle={computePageTextFieldTextStyle}
                     >
                         {#snippet renderContent(flags)}
                             <PageTextFieldContent {flags} width={FIELD_WIDTH} />

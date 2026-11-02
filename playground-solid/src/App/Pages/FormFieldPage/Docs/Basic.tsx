@@ -10,10 +10,7 @@ import {
     PageFormFieldCaption,
     PageFormFieldMessage,
 } from "../../../StyledComponents/FormFieldContent/FormFieldContent";
-import {
-    PageTextFieldContent,
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent";
+import { PageTextFieldContent } from "../../../StyledComponents/TextFieldContent/TextFieldContent";
 import type { FormFieldBasicDocsExampleProps } from "../FormFieldPageSolid.types";
 
 type Props = FormFieldBasicDocsExampleProps;
@@ -41,7 +38,6 @@ export const BasicDocsExample = (props: Props) => {
                     isRequired={() => getState().isRequired}
                     padding={FIELD_PADDING}
                     gap={FIELD_GAP}
-                    computeTextStyle={computePageTextFieldTextStyle}
                     renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} />}
                 />
             )}

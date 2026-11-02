@@ -7,9 +7,7 @@
     } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
     import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.svelte";
-    import PageTextFieldContent, {
-        computePageTextFieldTextStyle,
-    } from "../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
+    import PageTextFieldContent from "../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
     import PageTextFieldPlaceholder from "../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.svelte";
     import CustomInputExample from "./Examples/CustomInput.svelte";
     import type { TypewriterExampleWrapperProps } from "./TypewriterPageSvelte.types";
@@ -32,7 +30,6 @@
     padding={FIELD_PADDING}
     gap={FIELD_GAP}
     ariaLabel={"Custom text"}
-    computeTextStyle={computePageTextFieldTextStyle}
 >
     {#snippet renderContent(flags)}
         <PageTextFieldContent {flags} width={CUSTOM_TEXT_WIDTH} isStretched={true} />

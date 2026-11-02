@@ -7,9 +7,7 @@
     } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
     import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
 
-    import PageTextFieldContent, {
-        computePageTextFieldTextStyle,
-    } from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
+    import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
     import type { TextAreaGrowingDocsExampleProps } from "../TextAreaPageSvelte.types";
 
     type Props = TextAreaGrowingDocsExampleProps;
@@ -27,7 +25,6 @@
     padding={FIELD_PADDING}
     gap={FIELD_GAP}
     ariaLabel={"Message"}
-    computeTextStyle={computePageTextFieldTextStyle}
 >
     {#snippet renderContent(flags)}
         <PageTextFieldContent {flags} width={FIELD_WIDTH} isStretched={true} />

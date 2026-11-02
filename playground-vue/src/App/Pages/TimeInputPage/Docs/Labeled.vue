@@ -11,9 +11,7 @@ import {
 import type { TimeValue } from "@thewaver/ss-utils";
 
 import PageLabelCaption from "../../../StyledComponents/LabelCaption/LabelCaption.vue";
-import PageTextFieldContent, {
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
+import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 import PageTextFieldPlaceholder from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.vue";
 
 const LABEL_GAP = 5;
@@ -25,13 +23,7 @@ const value = shallowRef<TimeValue | undefined>();
     <Label orientation="vertical" :gap="LABEL_GAP">
         <PageLabelCaption>Wake-up time</PageLabelCaption>
 
-        <TimeInput
-            v-model:value="value"
-            :segment-hints="TIME_SEGMENT_HINTS"
-            :padding="FIELD_PADDING"
-            :gap="FIELD_GAP"
-            :compute-text-style="computePageTextFieldTextStyle"
-        >
+        <TimeInput v-model:value="value" :segment-hints="TIME_SEGMENT_HINTS" :padding="FIELD_PADDING" :gap="FIELD_GAP">
             <template #renderContent="flags">
                 <PageTextFieldContent :flags="flags" :width="FIELD_WIDTH" />
             </template>

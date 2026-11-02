@@ -11,10 +11,7 @@ import {
     PageFormSectionBody,
     PageFormSectionCaption,
 } from "../../../StyledComponents/FormFieldContent/FormFieldContent";
-import {
-    PageTextFieldContent,
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent";
+import { PageTextFieldContent } from "../../../StyledComponents/TextFieldContent/TextFieldContent";
 
 export const RightToLeftDocsExample = () => {
     const streetState = useState("");
@@ -33,7 +30,6 @@ export const RightToLeftDocsExample = () => {
                                     value={streetState}
                                     padding={FIELD_PADDING}
                                     gap={FIELD_GAP}
-                                    computeTextStyle={computePageTextFieldTextStyle}
                                     renderContent={(flags) => <PageTextFieldContent flags={flags} />}
                                 />
                             )}
@@ -46,7 +42,6 @@ export const RightToLeftDocsExample = () => {
                                     value={cityState}
                                     padding={FIELD_PADDING}
                                     gap={FIELD_GAP}
-                                    computeTextStyle={computePageTextFieldTextStyle}
                                     renderContent={(flags) => <PageTextFieldContent flags={flags} />}
                                 />
                             )}

@@ -1,15 +1,13 @@
-import { style, styleVariants } from "@vanilla-extract/css";
+import { styleVariants } from "@vanilla-extract/css";
 
-const opaqueOverlay = style({
-    backgroundColor: "black",
-});
+import { lookEntries } from "../../Looks/Look.css";
 
 export const blurredOverlayVariants = styleVariants({
-    on: { backdropFilter: "blur(10px) grayscale(75%)" },
+    on: [lookEntries.blurredOverlay],
     off: { backdropFilter: "none" },
 });
 
 export const opaqueOverlayVariants = styleVariants({
-    on: [opaqueOverlay, { opacity: 1 }],
-    off: [opaqueOverlay, { opacity: 0 }],
+    on: [lookEntries.opaqueOverlay, { opacity: 1 }],
+    off: [lookEntries.opaqueOverlay, { opacity: 0 }],
 });

@@ -13,7 +13,6 @@ import {
 import PageTagContent from "../../../StyledComponents/TagInputContent/PageTagContent.vue";
 import PageTagInputContent from "../../../StyledComponents/TagInputContent/PageTagInputContent.vue";
 import PageTagInputPlaceholder from "../../../StyledComponents/TagInputContent/PageTagInputPlaceholder.vue";
-import { computePageTextFieldTextStyle } from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 import type { TagInputBasicDocsExampleProps } from "../TagInputPageVue.types";
 
 type Props = TagInputBasicDocsExampleProps;
@@ -33,7 +32,6 @@ const value = shallowRef(STARTING_TAGS);
         :has-error="hasError"
         :is-disabled="isDisabled"
         :compute-tag-aria-label="computeTagAriaLabel"
-        :compute-text-style="computePageTextFieldTextStyle"
     >
         <template #renderContent="flags">
             <PageTagInputContent :flags="flags" />

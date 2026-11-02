@@ -7,10 +7,7 @@ import {
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
 import { PageTextFieldAdornment } from "../../../StyledComponents/TextFieldAdornment/TextFieldAdornment";
-import {
-    PageTextFieldContent,
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent";
+import { PageTextFieldContent } from "../../../StyledComponents/TextFieldContent/TextFieldContent";
 import { PageTextFieldPlaceholder } from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder";
 
 export const PasswordDocsExample = () => {
@@ -25,7 +22,6 @@ export const PasswordDocsExample = () => {
             type={() => (revealSignal[0]() ? "text" : "password")}
             ariaLabel={"Password"}
             autoComplete={"current-password"}
-            computeTextStyle={computePageTextFieldTextStyle}
             renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} />}
             renderPlaceholder={(getFlags) => (
                 <PageTextFieldPlaceholder flags={getFlags}>Password</PageTextFieldPlaceholder>

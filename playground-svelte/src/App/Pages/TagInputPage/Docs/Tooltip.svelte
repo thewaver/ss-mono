@@ -11,7 +11,6 @@
     import PageTagContent from "../../../StyledComponents/TagInputContent/PageTagContent.svelte";
     import PageTagInputContent from "../../../StyledComponents/TagInputContent/PageTagInputContent.svelte";
     import PageTagInputPlaceholder from "../../../StyledComponents/TagInputContent/PageTagInputPlaceholder.svelte";
-    import { computePageTextFieldTextStyle } from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
     import PageTooltipContent from "../../../StyledComponents/TooltipContent/TooltipContent.svelte";
     import type { TagInputTooltipDocsExampleProps } from "../TagInputPageSvelte.types";
 
@@ -31,7 +30,6 @@
     isDisabled={props.isDisabled}
     isReachableWhenDisabled={props.isReachableWhenDisabled}
     computeTagAriaLabel={computeTagAriaLabel}
-    computeTextStyle={computePageTextFieldTextStyle}
     tooltipDefs={{
         placement: { x: "center", y: "top_out" },
         offset: { x: 0, y: 10 },

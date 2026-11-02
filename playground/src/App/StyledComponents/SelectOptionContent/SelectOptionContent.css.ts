@@ -1,41 +1,25 @@
 import { style } from "@vanilla-extract/css";
 
+import { lookEntries, lookStates } from "../../Looks/Look.css";
 import { themeVars } from "../../Theme.css";
-import { layerVars } from "../Layer/Layer.css";
 
-export const isHovered = style({});
-export const isHighlighted = style({});
-export const isSelected = style({});
-export const isDisabled = style({});
+export const isHovered = style([lookStates.isHovered]);
+export const isSelected = style([lookStates.isSelected]);
+export const isDisabled = style([lookStates.isDisabled]);
 
-export const selectOptionContent = style({
+const selectOptionBase = style({
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
     gap: themeVars.spacing.full,
     padding: themeVars.spacing.full,
-    borderRadius: themeVars.borderRadius.half,
-    fontSize: themeVars.fontSize.medium,
     whiteSpace: "nowrap",
     transition: `background-color ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}`,
-
-    selectors: {
-        [`&.${isHighlighted}`]: {
-            backgroundColor: `rgb(from ${layerVars.contrast} r g b / 10%)`,
-        },
-        [`&.${isHovered}`]: {
-            backgroundColor: `rgb(from ${layerVars.contrast} r g b / 25%)`,
-        },
-        [`&.${isSelected}`]: {
-            color: themeVars.color.primary.main,
-            fontWeight: 700,
-        },
-        [`&.${isDisabled}`]: {
-            filter: themeVars.disabled.filter,
-            opacity: 0.5,
-        },
-    },
 });
+
+export const selectOptionContent = style([lookEntries.itemWithFloater, selectOptionBase]);
+
+export const selectOptionContentWithoutFloater = style([lookEntries.itemWithoutFloater, selectOptionBase]);
 
 export const selectOptionText = style({
     display: "flex",
@@ -60,7 +44,7 @@ export const selectOptionMark = style({
     opacity: 0,
 
     selectors: {
-        [`${selectOptionContent}.${isSelected} &`]: {
+        [`${selectOptionBase}.${isSelected} &`]: {
             opacity: 1,
         },
     },

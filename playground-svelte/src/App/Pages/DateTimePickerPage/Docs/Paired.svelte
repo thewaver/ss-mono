@@ -25,9 +25,7 @@
     } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
     import { TimeUtils } from "@thewaver/ss-utils";
 
-    import PageTextFieldContent, {
-        computePageTextFieldTextStyle,
-    } from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
+    import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
     import PageTextFieldPlaceholder from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.svelte";
 
     let value = $state.raw<DateTimeValue | undefined>(DateTimeValueUtils.of(TODAY, NOON));
@@ -52,7 +50,6 @@
         locale={LOCALE}
         padding={FIELD_PADDING}
         gap={FIELD_GAP}
-        computeTextStyle={computePageTextFieldTextStyle}
     >
         {#snippet renderContent(flags)}
             <PageTextFieldContent {flags} width={PAIR_FIELD_WIDTH} />
@@ -69,7 +66,6 @@
         segmentHints={TIME_SEGMENT_HINTS}
         padding={FIELD_PADDING}
         gap={FIELD_GAP}
-        computeTextStyle={computePageTextFieldTextStyle}
     >
         {#snippet renderContent(flags)}
             <PageTextFieldContent {flags} width={PAIR_FIELD_WIDTH} />

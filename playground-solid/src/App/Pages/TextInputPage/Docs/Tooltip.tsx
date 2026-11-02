@@ -6,10 +6,7 @@ import {
     FIELD_PADDING,
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
-import {
-    PageTextFieldContent,
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent";
+import { PageTextFieldContent } from "../../../StyledComponents/TextFieldContent/TextFieldContent";
 import { PageTooltipContent } from "../../../StyledComponents/TooltipContent/TooltipContent";
 import type { TextInputTooltipDocsExampleProps } from "../TextInputPageSolid.types";
 
@@ -26,7 +23,6 @@ export const TooltipDocsExample = (props: Props) => {
             isDisabled={props.isDisabled}
             isReachableWhenDisabled={props.isReachableWhenDisabled}
             ariaLabel={"Field with a tooltip"}
-            computeTextStyle={computePageTextFieldTextStyle}
             renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} />}
             tooltipDefs={() => ({
                 placement: () => ({ x: "center", y: "top_out" }),

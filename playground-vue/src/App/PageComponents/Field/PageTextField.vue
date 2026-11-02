@@ -9,9 +9,7 @@ import {
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
 import PageSelectClear from "../../StyledComponents/SelectClear/SelectClear.vue";
-import PageTextFieldContent, {
-    computePageTextFieldTextStyle,
-} from "../../StyledComponents/TextFieldContent/TextFieldContent.vue";
+import PageTextFieldContent from "../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 import PageTextFieldPlaceholder from "../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.vue";
 import { useFieldReset } from "./FieldVue.context";
 import type { PageTextFieldProps } from "./FieldVue.types";
@@ -36,7 +34,6 @@ const clear = () => {
         :ariaLabel="ariaLabel"
         :padding="FIELD_PADDING"
         :gap="FIELD_GAP"
-        :compute-text-style="computePageTextFieldTextStyle"
         @update:value="props.onInput"
     >
         <template #renderContent="flags">

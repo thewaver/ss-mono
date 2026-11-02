@@ -18,9 +18,7 @@ import PageCalendarPagedCaption from "../../../PageComponents/CalendarCaption/Ca
 import PageCalendarCell from "../../../StyledComponents/CalendarContent/PageCalendarCell.vue";
 import PageCalendarFrame from "../../../StyledComponents/CalendarContent/PageCalendarFrame.vue";
 import PageDatePickerTrigger from "../../../StyledComponents/DatePickerTrigger/DatePickerTrigger.vue";
-import PageTextFieldContent, {
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
+import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 import PageTextFieldPlaceholder from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.vue";
 
 const MONTH_CELL_OPTIONS: Intl.DateTimeFormatOptions = { month: "short" };
@@ -40,7 +38,6 @@ const getValueText = () => (value.value ? DateValueUtils.toIso(value.value) : "n
         :locale="LOCALE"
         :padding="FIELD_STEPPER_PADDING"
         :gap="FIELD_GAP"
-        :compute-text-style="computePageTextFieldTextStyle"
         trigger-id="monthPickerTrigger"
         :trigger-aria-label="CALENDAR_TRIGGER_LABEL"
     >

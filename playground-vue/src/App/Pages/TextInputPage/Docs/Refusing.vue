@@ -9,9 +9,7 @@ import {
     FIELD_PADDING,
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
-import PageTextFieldContent, {
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
+import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 import PageTextFieldPlaceholder from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.vue";
 
 const value = shallowRef("");
@@ -25,7 +23,6 @@ const value = shallowRef("");
         ariaLabel="PIN"
         input-mode="numeric"
         :has-error="value.length > 0 && value.length < PIN_LENGTH"
-        :compute-text-style="computePageTextFieldTextStyle"
         @input="(next: string) => (value = next.replace(/\D/g, '').slice(0, PIN_LENGTH))"
     >
         <template #renderContent="flags">

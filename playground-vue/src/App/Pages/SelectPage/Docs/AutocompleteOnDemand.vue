@@ -8,9 +8,7 @@ import * as popupStyles from "@thewaver/ss-playground/App/StyledComponents/Popov
 
 import PageGlideFloater from "../../../StyledComponents/GlideFloater/PageGlideFloater.vue";
 import PagePopoverSurface from "../../../StyledComponents/PopoverSurface/PopoverSurface.vue";
-import PageSelectContent, {
-    computePageSelectTextStyle,
-} from "../../../StyledComponents/SelectContent/SelectContent.vue";
+import PageSelectContent from "../../../StyledComponents/SelectContent/SelectContent.vue";
 import PageSelectOptionContent from "../../../StyledComponents/SelectOptionContent/SelectOptionContent.vue";
 import { PLACEHOLDER, QUERY_PADDING, searchRoutes } from "../SelectPageVue.const";
 
@@ -62,7 +60,6 @@ const searchMore = () => {
         :has-more-options="results.length < total || isSearching"
         ariaLabel="Route"
         :padding="QUERY_PADDING"
-        :compute-text-style="computePageSelectTextStyle"
         @reach-end="searchMore"
     >
         <template #renderContent="{ selectedOption, flags }">

@@ -25,10 +25,7 @@ import { PageCheckField, PageNumberField } from "../../PageComponents/Field/Fiel
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
-import {
-    PageTextFieldContent,
-    computePageTextFieldTextStyle,
-} from "../../StyledComponents/TextFieldContent/TextFieldContent";
+import { PageTextFieldContent } from "../../StyledComponents/TextFieldContent/TextFieldContent";
 import { PageTextFieldPlaceholder } from "../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder";
 import { CustomInputExample } from "./Examples/CustomInput";
 import { CustomTagsExample } from "./Examples/CustomTags";
@@ -79,7 +76,6 @@ export const RichTextPage = () => {
                         padding={FIELD_PADDING}
                         gap={FIELD_GAP}
                         ariaLabel={"Tagged text"}
-                        computeTextStyle={computePageTextFieldTextStyle}
                         renderContent={(flags) => (
                             <PageTextFieldContent flags={flags} width={FIELD_WIDTH} isStretched={true} />
                         )}

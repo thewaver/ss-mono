@@ -11,7 +11,6 @@
     import PageTagContent from "../../../StyledComponents/TagInputContent/PageTagContent.svelte";
     import PageTagInputContent from "../../../StyledComponents/TagInputContent/PageTagInputContent.svelte";
     import PageTagInputPlaceholder from "../../../StyledComponents/TagInputContent/PageTagInputPlaceholder.svelte";
-    import { computePageTextFieldTextStyle } from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
     import type { TagInputBasicDocsExampleProps } from "../TagInputPageSvelte.types";
 
     type Props = TagInputBasicDocsExampleProps;
@@ -30,7 +29,6 @@
     hasError={props.hasError}
     isDisabled={props.isDisabled}
     computeTagAriaLabel={computeTagAriaLabel}
-    computeTextStyle={computePageTextFieldTextStyle}
 >
     {#snippet renderContent(flags)}
         <PageTagInputContent {flags} />

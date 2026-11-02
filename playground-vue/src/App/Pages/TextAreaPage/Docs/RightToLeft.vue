@@ -8,9 +8,7 @@ import {
     FIELD_PADDING,
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
-import PageTextFieldContent, {
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
+import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 import PageTextFieldPlaceholder from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.vue";
 
 const STARTING_TEXT = "One line\nTwo lines\nThree lines, and the third one wraps onto a fourth";
@@ -20,13 +18,7 @@ const value = shallowRef(STARTING_TEXT);
 
 <template>
     <div dir="rtl">
-        <TextArea
-            v-model:value="value"
-            :padding="FIELD_PADDING"
-            :gap="FIELD_GAP"
-            ariaLabel="Notes"
-            :compute-text-style="computePageTextFieldTextStyle"
-        >
+        <TextArea v-model:value="value" :padding="FIELD_PADDING" :gap="FIELD_GAP" ariaLabel="Notes">
             <template #renderContent="flags">
                 <PageTextFieldContent :flags="flags" :width="FIELD_WIDTH" :height="FIXED_HEIGHT" />
             </template>

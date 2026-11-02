@@ -10,9 +10,7 @@
     import type { TimeValue } from "@thewaver/ss-utils";
 
     import PageMeridiemToggle from "../../../PageComponents/MeridiemToggle/MeridiemToggle.svelte";
-    import PageTextFieldContent, {
-        computePageTextFieldTextStyle,
-    } from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
+    import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
 
     let value = $state.raw<TimeValue | undefined>({ hour: 14, minute: 30 });
 </script>
@@ -25,7 +23,6 @@
         segmentHints={TIME_SEGMENT_HINTS}
         padding={FIELD_STEPPER_PADDING}
         gap={FIELD_GAP}
-        computeTextStyle={computePageTextFieldTextStyle}
         renderTrailing={meridiemToggle}
     >
         {#snippet renderContent(flags)}

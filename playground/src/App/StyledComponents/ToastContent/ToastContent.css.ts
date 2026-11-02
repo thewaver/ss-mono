@@ -1,5 +1,6 @@
 import { keyframes, style, styleVariants } from "@vanilla-extract/css";
 
+import { lookEntries } from "../../Looks/Look.css";
 import { themeVars } from "../../Theme.css";
 
 const countdown = keyframes({
@@ -7,23 +8,20 @@ const countdown = keyframes({
     "100%": { width: "0%" },
 });
 
-export const toastCard = style({
-    position: "relative",
-    overflow: "hidden",
+export const toastCard = style([
+    lookEntries.surface,
+    {
+        position: "relative",
+        overflow: "hidden",
 
-    display: "flex",
-    alignItems: "center",
-    gap: themeVars.spacing.full,
-    width: 300,
-    borderRadius: themeVars.borderRadius.half,
-    borderInlineStart: "4px solid currentColor",
-    padding: themeVars.spacing.full,
-    color: themeVars.color.surface.contrast,
-    backgroundColor: themeVars.color.surface.light,
-    backgroundImage: `linear-gradient(215deg, ${themeVars.color.surface.light}, ${themeVars.color.surface.dark})`,
-    backdropFilter: "brightness(75%) grayscale(25%) blur(10px)",
-    boxShadow: themeVars.shadow.medium,
-});
+        display: "flex",
+        alignItems: "center",
+        gap: themeVars.spacing.full,
+        width: 300,
+        borderInlineStart: `4px solid ${themeVars.color.primary.main}`,
+        padding: themeVars.spacing.full,
+    },
+]);
 
 export const toastKindVariants = styleVariants({
     info: { color: themeVars.color.info.main },

@@ -22,9 +22,7 @@
     import PageClockOption from "../../../StyledComponents/ClockContent/PageClockOption.svelte";
     import PageClockUnit from "../../../StyledComponents/ClockContent/PageClockUnit.svelte";
     import PageDatePickerTrigger from "../../../StyledComponents/DatePickerTrigger/DatePickerTrigger.svelte";
-    import PageTextFieldContent, {
-        computePageTextFieldTextStyle,
-    } from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
+    import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
     import PageTextFieldPlaceholder from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.svelte";
     import PageTimePickerTrigger from "../../../StyledComponents/TimePickerTrigger/TimePickerTrigger.svelte";
     import PageDateTimeSeparator from "../DateTimePickerPage.content.svelte";
@@ -44,7 +42,6 @@
         locale={LOCALE}
         padding={FIELD_STEPPER_PADDING}
         gap={FIELD_GAP}
-        computeTextStyle={computePageTextFieldTextStyle}
         triggerId={"rightToLeftDateTrigger"}
         triggerAriaLabel={CALENDAR_TRIGGER_LABEL}
         timeTriggerId={"rightToLeftTimeTrigger"}

@@ -28,9 +28,7 @@ import PageNumberField from "../../PageComponents/Field/PageNumberField.vue";
 import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
 import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
-import PageTextFieldContent, {
-    computePageTextFieldTextStyle,
-} from "../../StyledComponents/TextFieldContent/TextFieldContent.vue";
+import PageTextFieldContent from "../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 import PageTextFieldPlaceholder from "../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.vue";
 import CustomInputExample from "./Examples/CustomInput.vue";
 import CustomTagsExample from "./Examples/CustomTags.vue";
@@ -130,7 +128,6 @@ const examples: ExampleDefs[] = [
                     :padding="FIELD_PADDING"
                     :gap="FIELD_GAP"
                     ariaLabel="Tagged text"
-                    :compute-text-style="computePageTextFieldTextStyle"
                 >
                     <template #renderContent="flags">
                         <PageTextFieldContent :flags="flags" :width="FIELD_WIDTH" is-stretched />

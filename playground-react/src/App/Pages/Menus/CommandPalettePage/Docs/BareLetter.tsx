@@ -12,10 +12,7 @@ import {
 import { PageButtonContent } from "../../../../StyledComponents/ButtonContent/ButtonContent";
 import { PageControlButtonContent } from "../../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import { renderPageHighlightFloater } from "../../../../StyledComponents/GlideFloater/GlideFloater";
-import {
-    PageTextFieldContent,
-    computePageTextFieldTextStyle,
-} from "../../../../StyledComponents/TextFieldContent/TextFieldContent";
+import { PageTextFieldContent } from "../../../../StyledComponents/TextFieldContent/TextFieldContent";
 import { PageTextFieldPlaceholder } from "../../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder";
 import {
     BARE_LETTER_SHORTCUT,
@@ -59,7 +56,6 @@ export const BareLetterDocsExample = () => {
                 padding={FIELD_PADDING}
                 gap={FIELD_GAP}
                 ariaLabel={"Somewhere to type"}
-                computeTextStyle={computePageTextFieldTextStyle}
                 renderContent={(flags) => <PageTextFieldContent flags={flags} />}
                 renderPlaceholder={(flags) => (
                     <PageTextFieldPlaceholder flags={flags}>A g typed here stays a g</PageTextFieldPlaceholder>
@@ -77,7 +73,6 @@ export const BareLetterDocsExample = () => {
                 renderPanel={computePalettePanelRenderer(actions)}
                 fieldPadding={FIELD_PADDING}
                 fieldGap={FIELD_GAP}
-                computeFieldTextStyle={computePageTextFieldTextStyle}
                 renderFieldContent={renderPaletteField}
                 renderFieldPlaceholder={renderPalettePlaceholder}
                 renderOption={renderPaletteOption}

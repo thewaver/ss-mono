@@ -19,6 +19,7 @@
     import { route } from "../../App.router";
     import PageFrameworkMenuTrigger from "../../StyledComponents/FrameworkMenuContent/FrameworkMenuContent.svelte";
     import PageFrameworkMenuItem from "../../StyledComponents/FrameworkMenuContent/FrameworkMenuItem.svelte";
+    import { renderPageHighlightFloater } from "../../StyledComponents/GlideFloater/GlideFloater.const.svelte";
     import PagePopoverSurface from "../../StyledComponents/PopoverSurface/PopoverSurface.svelte";
     import PageLayer from "../Layer/Layer.svelte";
     import { OWN_FRAMEWORK } from "./FrameworkMenu.const";
@@ -37,6 +38,7 @@
     bind:checked={() => CHECKED, () => {}}
     {renderContent}
     {renderItem}
+    renderHighlightFloater={renderPageHighlightFloater}
     {renderPopup}
     onActivate={(framework) => {
         if (framework === OWN_FRAMEWORK) return;

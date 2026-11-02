@@ -33,8 +33,6 @@ export const PageFrameworkMenuItem = (props: ParentProps<FrameworkMenuItemProps>
             class={optionStyles.selectOptionContent}
             classList={{
                 [getLayerClass()]: true,
-                [optionStyles.isHovered]: access(props.flags).isHovered,
-                [optionStyles.isHighlighted]: access(props.flags).isHighlighted,
                 [optionStyles.isSelected]: access(props.flags).isChecked,
                 [optionStyles.isDisabled]: access(props.flags).isDisabled,
             }}

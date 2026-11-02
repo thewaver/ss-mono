@@ -1,5 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
+import { lookEntries } from "../../Looks/Look.css";
 import { themeVars } from "../../Theme.css";
 import { layerVars } from "../Layer/Layer.css";
 import { FIELD_HEIGHT } from "../TextFieldContent/TextFieldContent.css";
@@ -108,16 +109,16 @@ export const calendarHeader = style({
     fontSize: themeVars.fontSize.small,
 });
 
-export const calendarFrame = style({
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    width: "fit-content",
-    borderRadius: themeVars.borderRadius.full,
-    padding: themeVars.spacing.full,
-    backgroundColor: layerVars.main,
-    boxShadow: themeVars.shadow.medium,
-});
+export const calendarFrame = style([
+    lookEntries.dropdown,
+    {
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        width: "fit-content",
+        padding: themeVars.spacing.full,
+    },
+]);
 
 export const calendarCaptionFields = style({
     display: "flex",

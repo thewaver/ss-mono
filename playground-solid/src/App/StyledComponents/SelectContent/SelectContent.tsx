@@ -1,20 +1,11 @@
 import type { ParentProps } from "solid-js";
 import { Show } from "solid-js";
 
-import type { InteractionFlags, SelectFlags, TextFieldTextStyle } from "@thewaver/ss-components-solid";
 import { access } from "@thewaver/ss-components-solid";
-import { layerVars } from "@thewaver/ss-playground/App/StyledComponents/Layer/Layer.css";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/SelectContent/SelectContent.css";
-import { themeVars } from "@thewaver/ss-playground/App/Theme.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type { SelectContentProps } from "./SelectContentSolid.types";
-
-export const computePageSelectTextStyle = (getFlags: () => InteractionFlags<SelectFlags>): TextFieldTextStyle => ({
-    "color": getFlags().isDisabled ? `rgb(from ${layerVars.contrast} r g b / 50%)` : layerVars.contrast,
-    "caret-color": themeVars.color.primary.main,
-    "font-size": styles.FIELD_FONT_SIZE,
-});
 
 export const PageSelectContent = (props: ParentProps<SelectContentProps>) => {
     const getLayerClass = useLayerClass();

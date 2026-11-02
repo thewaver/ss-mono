@@ -12,6 +12,7 @@ import type { PlaygroundFramework } from "@thewaver/ss-playground/App/PageCompon
 
 import PageFrameworkMenuTrigger from "../../StyledComponents/FrameworkMenuContent/FrameworkMenuContent.vue";
 import PageFrameworkMenuItem from "../../StyledComponents/FrameworkMenuContent/FrameworkMenuItem.vue";
+import PageGlideFloater from "../../StyledComponents/GlideFloater/PageGlideFloater.vue";
 import PagePopoverSurface from "../../StyledComponents/PopoverSurface/PopoverSurface.vue";
 import PageLayer from "../Layer/Layer.vue";
 import { OWN_FRAMEWORK } from "./FrameworkMenu.const";
@@ -46,6 +47,10 @@ const switchFramework = (framework: PlaygroundFramework) => {
             <PageFrameworkMenuItem :flags="flags">
                 {{ computeLabel(item.value) }}
             </PageFrameworkMenuItem>
+        </template>
+
+        <template #renderHighlightFloater="floater">
+            <PageGlideFloater kind="highlight" v-bind="floater" />
         </template>
 
         <template #renderPopup="{ renderItems, visibilityTarget, transitionDurationMs, placement }">

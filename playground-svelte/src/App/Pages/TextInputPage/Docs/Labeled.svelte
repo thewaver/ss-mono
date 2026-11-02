@@ -6,9 +6,7 @@
     } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
     import PageLabelCaption from "../../../StyledComponents/LabelCaption/LabelCaption.svelte";
-    import PageTextFieldContent, {
-        computePageTextFieldTextStyle,
-    } from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
+    import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
 
     const LABEL_GAP = 5;
 
@@ -18,7 +16,7 @@
 <Label orientation={"vertical"} gap={LABEL_GAP}>
     <PageLabelCaption>Display name</PageLabelCaption>
 
-    <TextInput bind:value padding={FIELD_PADDING} gap={FIELD_GAP} computeTextStyle={computePageTextFieldTextStyle}>
+    <TextInput bind:value padding={FIELD_PADDING} gap={FIELD_GAP}>
         {#snippet renderContent(flags)}
             <PageTextFieldContent {flags} />
         {/snippet}

@@ -14,7 +14,6 @@ import {
 import PageTagContent from "../../../StyledComponents/TagInputContent/PageTagContent.vue";
 import PageTagInputContent from "../../../StyledComponents/TagInputContent/PageTagInputContent.vue";
 import PageTagInputPlaceholder from "../../../StyledComponents/TagInputContent/PageTagInputPlaceholder.vue";
-import { computePageTextFieldTextStyle } from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 import PageTooltipContent from "../../../StyledComponents/TooltipContent/TooltipContent.vue";
 import type { TagInputTooltipDocsExampleProps } from "../TagInputPageVue.types";
 
@@ -46,7 +45,6 @@ const tooltipDefs: InteractionTooltipDefs<TagInputFlags> = {
         :is-disabled="isDisabled"
         :is-reachable-when-disabled="isReachableWhenDisabled"
         :compute-tag-aria-label="computeTagAriaLabel"
-        :compute-text-style="computePageTextFieldTextStyle"
         :tooltip-defs="tooltipDefs"
     >
         <template #renderContent="flags">

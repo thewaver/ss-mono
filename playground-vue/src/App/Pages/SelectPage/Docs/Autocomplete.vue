@@ -7,9 +7,7 @@ import * as popupStyles from "@thewaver/ss-playground/App/StyledComponents/Popov
 
 import PageGlideFloater from "../../../StyledComponents/GlideFloater/PageGlideFloater.vue";
 import PagePopoverSurface from "../../../StyledComponents/PopoverSurface/PopoverSurface.vue";
-import PageSelectContent, {
-    computePageSelectTextStyle,
-} from "../../../StyledComponents/SelectContent/SelectContent.vue";
+import PageSelectContent from "../../../StyledComponents/SelectContent/SelectContent.vue";
 import PageSelectOptionContent from "../../../StyledComponents/SelectOptionContent/SelectOptionContent.vue";
 import { AIRPORTS, PLACEHOLDER, QUERY_PADDING } from "../SelectPageVue.const";
 
@@ -30,14 +28,7 @@ const options = computed(() => {
 </script>
 
 <template>
-    <Select
-        v-model:value="value"
-        v-model:query="query"
-        :options="options"
-        ariaLabel="Airport"
-        :padding="QUERY_PADDING"
-        :compute-text-style="computePageSelectTextStyle"
-    >
+    <Select v-model:value="value" v-model:query="query" :options="options" ariaLabel="Airport" :padding="QUERY_PADDING">
         <template #renderContent="{ selectedOption, flags }">
             <PageSelectContent :flags="flags">{{ selectedOption?.value.city ?? PLACEHOLDER }}</PageSelectContent>
         </template>

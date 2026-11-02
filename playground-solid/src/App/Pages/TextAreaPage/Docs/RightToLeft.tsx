@@ -7,10 +7,7 @@ import {
     FIELD_PADDING,
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
-import {
-    PageTextFieldContent,
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent";
+import { PageTextFieldContent } from "../../../StyledComponents/TextFieldContent/TextFieldContent";
 import { PageTextFieldPlaceholder } from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder";
 
 const STARTING_TEXT = "One line\nTwo lines\nThree lines, and the third one wraps onto a fourth";
@@ -25,7 +22,6 @@ export const RightToLeftDocsExample = () => {
                 padding={FIELD_PADDING}
                 gap={FIELD_GAP}
                 ariaLabel={"Notes"}
-                computeTextStyle={computePageTextFieldTextStyle}
                 renderContent={(getFlags) => (
                     <PageTextFieldContent flags={getFlags} width={FIELD_WIDTH} height={FIXED_HEIGHT} />
                 )}

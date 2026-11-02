@@ -7,9 +7,7 @@
     } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
     import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
 
-    import PageTextFieldContent, {
-        computePageTextFieldTextStyle,
-    } from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
+    import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
     import PageTextFieldPlaceholder from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.svelte";
     import type { TextAreaBasicDocsExampleProps } from "../TextAreaPageSvelte.types";
 
@@ -28,7 +26,6 @@
     hasError={props.hasError}
     isDisabled={props.isDisabled}
     ariaLabel={"Notes"}
-    computeTextStyle={computePageTextFieldTextStyle}
 >
     {#snippet renderContent(flags)}
         <PageTextFieldContent {flags} width={FIELD_WIDTH} height={FIXED_HEIGHT} />

@@ -14,8 +14,6 @@ const layerClass = useLayerClass();
         :class="[
             styles.selectOptionContent,
             layerClass,
-            flags.isHovered && styles.isHovered,
-            flags.isHighlighted && styles.isHighlighted,
             flags.isChecked && styles.isSelected,
             flags.isDisabled && styles.isDisabled,
         ]"

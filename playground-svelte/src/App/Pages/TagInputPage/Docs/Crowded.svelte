@@ -11,7 +11,6 @@
     import PageTagContent from "../../../StyledComponents/TagInputContent/PageTagContent.svelte";
     import PageTagInputContent from "../../../StyledComponents/TagInputContent/PageTagInputContent.svelte";
     import PageTagInputPlaceholder from "../../../StyledComponents/TagInputContent/PageTagInputPlaceholder.svelte";
-    import { computePageTextFieldTextStyle } from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
 
     let value = $state.raw(CROWDED_TAGS);
 </script>
@@ -24,7 +23,6 @@
         padding={FIELD_PADDING}
         minHeight={FIELD_HEIGHT}
         computeTagAriaLabel={computeTagAriaLabel}
-        computeTextStyle={computePageTextFieldTextStyle}
     >
         {#snippet renderContent(flags)}
             <PageTagInputContent {flags} />

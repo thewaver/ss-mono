@@ -12,9 +12,7 @@ import {
     FIELD_PADDING,
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
-import PageTextFieldContent, {
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
+import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 
 const value = shallowRef("10");
 </script>
@@ -29,7 +27,6 @@ const value = shallowRef("10");
         :min="QUANTITY_MIN"
         :max="QUANTITY_MAX"
         :step="QUANTITY_STEP"
-        :compute-text-style="computePageTextFieldTextStyle"
     >
         <template #renderContent="flags">
             <PageTextFieldContent :flags="flags" />

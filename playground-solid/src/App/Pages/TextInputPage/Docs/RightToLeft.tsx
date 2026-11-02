@@ -7,10 +7,7 @@ import {
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
 import { PageTextFieldAdornment } from "../../../StyledComponents/TextFieldAdornment/TextFieldAdornment";
-import {
-    PageTextFieldContent,
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent";
+import { PageTextFieldContent } from "../../../StyledComponents/TextFieldContent/TextFieldContent";
 import { PageTextFieldPlaceholder } from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder";
 
 export const RightToLeftDocsExample = () => {
@@ -24,7 +21,6 @@ export const RightToLeftDocsExample = () => {
                 gap={FIELD_GAP}
                 ariaLabel={"Username"}
                 autoComplete={"username"}
-                computeTextStyle={computePageTextFieldTextStyle}
                 renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} />}
                 renderPlaceholder={(getFlags) => (
                     <PageTextFieldPlaceholder flags={getFlags}>Username</PageTextFieldPlaceholder>

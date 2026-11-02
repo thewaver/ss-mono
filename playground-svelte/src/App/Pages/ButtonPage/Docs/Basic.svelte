@@ -2,7 +2,7 @@
     import { Button } from "@thewaver/ss-components-svelte";
 
     import type { ButtonDocsExampleProps } from "../ButtonPageSvelte.types";
-    import PressedButtonContent from "./PressedButtonContent.svelte";
+    import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.svelte";
 
     type Props = ButtonDocsExampleProps;
 
@@ -20,6 +20,6 @@
     }}
 >
     {#snippet renderContent(flags)}
-        <PressedButtonContent {flags}>{`Clicks: ${clicks}`}</PressedButtonContent>
+        <PageButtonContent {flags}>{`Clicks: ${clicks}`}</PageButtonContent>
     {/snippet}
 </Button>

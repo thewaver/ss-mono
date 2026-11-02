@@ -1,5 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
+import { lookEntries } from "../../Looks/Look.css";
 import { themeVars } from "../../Theme.css";
 import { controlButtonBase, isActive, isDisabled, isHovered } from "../ControlButtonContent/ControlButtonContent.css";
 import { layerVars } from "../Layer/Layer.css";
@@ -9,19 +10,19 @@ export const CAROUSEL_SLIDE_HEIGHT = 140;
 export const isCurrent = style({});
 export { isActive, isDisabled, isHovered };
 
-export const carouselSlide = style({
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
-    gap: themeVars.spacing.half,
-    height: CAROUSEL_SLIDE_HEIGHT,
-    minHeight: "100%",
-    borderRadius: themeVars.borderRadius.half,
-    backgroundImage: `linear-gradient(315deg, hsl(from ${layerVars.main} h s calc(l - 5)), hsl(from ${layerVars.main} h s calc(l + 5)))`,
-    color: layerVars.contrast,
-    userSelect: "none",
-});
+export const carouselSlide = style([
+    lookEntries.panel,
+    {
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        gap: themeVars.spacing.half,
+        height: CAROUSEL_SLIDE_HEIGHT,
+        minHeight: "100%",
+        userSelect: "none",
+    },
+]);
 
 export const carouselSlideTitle = style({
     fontSize: themeVars.fontSize.large,

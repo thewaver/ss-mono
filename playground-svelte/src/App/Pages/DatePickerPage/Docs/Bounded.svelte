@@ -22,9 +22,7 @@
     import PageCalendarFrame from "../../../StyledComponents/CalendarContent/PageCalendarFrame.svelte";
     import PageCalendarWeekday from "../../../StyledComponents/CalendarContent/PageCalendarWeekday.svelte";
     import PageDatePickerTrigger from "../../../StyledComponents/DatePickerTrigger/DatePickerTrigger.svelte";
-    import PageTextFieldContent, {
-        computePageTextFieldTextStyle,
-    } from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
+    import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
     import PageTextFieldPlaceholder from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.svelte";
 
     let value = $state.raw<DateValue | undefined>();
@@ -42,7 +40,6 @@
     locale={LOCALE}
     padding={FIELD_STEPPER_PADDING}
     gap={FIELD_GAP}
-    computeTextStyle={computePageTextFieldTextStyle}
     triggerId={"boundedTrigger"}
     triggerAriaLabel={CALENDAR_TRIGGER_LABEL}
 >

@@ -14,9 +14,7 @@ import PageFormButtons from "../../../StyledComponents/FormFieldContent/PageForm
 import PageFormFieldCaption from "../../../StyledComponents/FormFieldContent/PageFormFieldCaption.vue";
 import PageFormFieldMessage from "../../../StyledComponents/FormFieldContent/PageFormFieldMessage.vue";
 import PageFormStack from "../../../StyledComponents/FormFieldContent/PageFormStack.vue";
-import PageTextFieldContent, {
-    computePageTextFieldTextStyle,
-} from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
+import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 
 const FIELD_WIDTH = 240;
 const MIN_PASSWORD_LENGTH = 8;
@@ -73,7 +71,6 @@ const reset = () => {
                             :has-error="fieldState.hasError"
                             :padding="FIELD_PADDING"
                             :gap="FIELD_GAP"
-                            :compute-text-style="computePageTextFieldTextStyle"
                         >
                             <template #renderContent="flags">
                                 <PageTextFieldContent :flags="flags" :width="FIELD_WIDTH" />
@@ -97,7 +94,6 @@ const reset = () => {
                             :has-error="fieldState.hasError"
                             :padding="FIELD_PADDING"
                             :gap="FIELD_GAP"
-                            :compute-text-style="computePageTextFieldTextStyle"
                         >
                             <template #renderContent="flags">
                                 <PageTextFieldContent :flags="flags" :width="FIELD_WIDTH" />
