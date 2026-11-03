@@ -43,6 +43,7 @@ reading.
 9. `GlassSurface`'s ripple layer shows a defect at its edge — _postponed until the platform catches up_
 10. Arbitrary placement — the gaps the trials left — _open_
 11. The Playground's painters in Windows high-contrast mode — _open, decided, not yet built_
+12. The Looks page in React, Vue and Svelte — _open, decided, not yet built_
 
 ---
 
@@ -435,6 +436,49 @@ active)` rule drawing its shapes in system colors (`CanvasText` for a track or a
 selected or filled part), with `forced-color-adjust` left alone unless a part has to keep its own color. **The
 normal theme does not change**: this is the user's styling, and the rules apply only while high-contrast mode is
 on.
+
+---
+
+## 12. The Looks page in React, Vue and Svelte
+
+The Looks page (`/looks`, under Gallery in the nav) exists only in the Solid Playground. In the other three there is
+no page and no nav link, and the framework switch on the Solid page leads nowhere. **Everything shared is already in
+place and needs no porting**: the styles and sample data in `playground/src/App/Pages/LooksPage/`, `LOOKS_ROUTE` in
+`App.const.ts`, and the Look scoping that lets a row wear a Look other than the page's (`lookBoundary`). The work, in
+each of the three:
+
+- **The page**, copied from `playground-solid/src/App/Pages/LooksPage/LooksPage.tsx` and its types. A `RadioGroup`
+  (vertical, `gap` of `LOOK_ROW_GAP`, named "Look") holds one `Radio` per entry of `LOOK_OPTIONS`. Its value is the
+  framework's own applied-look state (`LookReact.const.ts`, `LookVue.const.ts`, `LookSvelte.const.svelte.ts`), and
+  picking a row calls that file's reveal with the row's element (`look-row-<look>`) as the origin, with no motion
+  when reduced motion is preferred — as the nav's Look field already does.
+- **A row**, nested exactly so: `lookRow` (the page Look's hollow frame) → `lookSampleBoundary` → the row Look's
+  class from `PLAYGROUND_LOOKS` → `lookSamples` (the row Look's page background) → the radio's painter
+  (`PageRadioContent`) with the Look's name, then `lookColumns` carrying `inert` and `aria-hidden="true"`. The
+  boundary and the Look's class must be on two separate elements, or the row loses its own Look.
+- **The samples**, one box per control, in this order and with these states:
+    - Surface — a panel inside it.
+    - Button — default, pressed, disabled, error.
+    - Input — default, read-only, disabled, error.
+    - Toggle — off, on, disabled, error.
+    - Checkbox — off, on, mixed, disabled, error.
+    - Radio — off, on, disabled, error, each its own one-option group.
+    - Progress — default, error; and Range — default, disabled, error. Both stacked one per line.
+    - Tags and Slide button — default, disabled, error each. The slide button carries
+      `LOOK_SAMPLE_SLIDE_DESCRIPTION`.
+    - Tabs — one row, the first tab selected and the third disabled, with the selected tab's panel below. Tab and
+      panel ids start with `look-<look>`, so the four rows do not repeat an id.
+    - Accordion — open, closed and disabled sections.
+- **The route and the nav link**, placed after Gallery's in each framework's `App`.
+- **Vue and Svelte keep one component per file**, so the row and each sample helper become files of their own, as
+  `GalleryTile` did.
+
+**A spec comes with the port, run in all four**: a row's samples wear its Look while the page wears another
+(Terminal's button is monospace while the page is on Plasticine); clicking a row switches the page's Look and checks
+that row's radio; nothing among the samples takes focus.
+
+Not settled: whether those tests join `e2e/looks.spec.ts`, which tests the Look machinery, or go in a file of their
+own.
 
 ---
 

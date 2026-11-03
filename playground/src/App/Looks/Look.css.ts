@@ -9,6 +9,9 @@ const barAngle = createVar();
 export const lookVars = {
     barAngle: fallbackVar(barAngle, "90deg"),
 };
+
+export const lookBoundary = style({});
+
 export const lookEntries: Record<LookEntry, string> = {
     accordionHeader: style({}),
     accordionPanel: style({}),

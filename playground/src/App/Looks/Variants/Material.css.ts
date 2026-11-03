@@ -314,17 +314,31 @@ LookUtils.define(material, {
     rangeTrack: RANGE_TRACK,
     rangeFill: RANGE_FILL,
     rangeThumb: RANGE_THUMB,
-    slideButtonTrack: RANGE_TRACK,
-    slideButtonFill: RANGE_FILL,
+    slideButtonTrack: {
+        ...RANGE_TRACK,
+        borderRadius: PILL_RADIUS,
+    },
+    slideButtonFill: {
+        ...RANGE_FILL,
+        borderRadius: PILL_RADIUS,
+    },
     slideButtonHint: {
         fontWeight: "bold",
     },
-    slideButtonThumb: RANGE_THUMB,
-    slideButtonArrow: {
-        stroke: themeVars.color.primary.main,
+    slideButtonThumb: {
+        ...RANGE_THUMB,
+        backgroundColor: themeVars.color.primary.main,
         selectors: {
             [lookSelectors.hasError]: {
-                stroke: themeVars.color.error.main,
+                backgroundColor: themeVars.color.error.main,
+            },
+        },
+    },
+    slideButtonArrow: {
+        stroke: themeVars.color.primary.contrast,
+        selectors: {
+            [lookSelectors.hasError]: {
+                stroke: themeVars.color.error.contrast,
             },
         },
     },

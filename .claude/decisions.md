@@ -123,7 +123,8 @@ scale**: Plasticine and Glass hold their own copies (`SHADOW_SMALL`, `SHADOW_MED
 `themeVars.shadow` stays only for the custom painters outside the Looks, until the user decides their shadows. **Every Look lives in
 `Looks/Variants/`**, one file each, the user's placement; `Looks/` itself holds only the machinery.
 
-**Fourteen Looks exist, Plasticine being the default.** The user approved the first six from a published
+**Fourteen Looks were built, Plasticine being the default; `PLAYGROUND_LOOKS` holds the ones still kept**, and
+the list below describes all fourteen. The user approved the first six from a published
 reference each and asked for every further idea to be built for rating, with the warning that a Look has to
 change shape, not just where colors fall; several will be dropped once lived with:
 
@@ -172,6 +173,15 @@ selectors may nest, a top-level comma inside `:is(…)` is not split — and put
 A variables contract like Theme's was weighed and set aside: it caps every Look at the properties the first one
 planned for.
 
+- **A Look's rules stop at `lookBoundary`**, so a box can wear a different Look from the page around it (the Looks
+  page's rows). Each rule is emitted as `@scope (.<look root>) to (.lookBoundary) { :scope <selector> }` inside the
+  layer. The lower boundary is what isolates a row, not the nearer root winning: the cascade compares
+  specificity before scope proximity, so without the boundary the page's Look still reaches in with any rule the
+  row's Look does not write — a hover, a gradient. **A nested Look takes two elements**, the boundary outside and
+  the Look's root class inside it, so no root is also its own limit. `:scope` stands where `.<root>` used to, so
+  specificity is unchanged. What a nested box opens in a portal (a list, a tooltip) lands outside it and wears the
+  page's Look.
+
 - **The layer is what lets a painter override a Look.** Unlayered rules always beat layered ones, so any paint
   still in a painter wins over its entry, whatever the specificity or stylesheet order. Paint left in a painter
   is, by that, paint no entry covers yet.
@@ -214,7 +224,10 @@ planned for.
   `slideButtonFill`, `slideButtonHint`, `slideButtonThumb` and `slideButtonArrow` — have entries, the slide
   button's added at the user's request with its error marked on each part; Plasticine keeps the slide button's
   earlier paint, every other Look paints its track, fill and thumb with its range's (`RANGE_TRACK`, `RANGE_FILL`,
-  `RANGE_THUMB`), so the two stay in step until a Look parts them; `isChecked` and `isMixed` joined
+  `RANGE_THUMB`), so the two stay in step until a Look parts them — Material does: its slide button is a pill and
+  its thumb takes the strip's main color with the arrow in the family's `contrast`, because a thumb as tall as its
+  strip showed the strip's corners behind it, a second shade beside it, and an arrow at 1.22:1 against WCAG 1.4.11's
+  3:1 (the user's pick, B on both); `isChecked` and `isMixed` joined
   the shared states for the toggle's handle, matched on the row around it, as is a progress fill's error.
 - **A bar's axis is a state; its text direction is not** — the user's call. `isVertical` is on each part of a
   standing progress bar or range (the progress painter's own `orientation`, since `Progress` has none). The state
@@ -22092,6 +22105,29 @@ builtin rendered outside a header cell warns and renders nothing, as an orphan `
 **The guarantee this gave up**: under the slots, a consumer who painted nothing still had a working, invisible
 target, so sorting could not die silently. With builtins, a consumer who renders none gets no pointer route, and
 the warning is what stands in for the guarantee.
+
+### The Looks page: one row per Look, picked like a radio
+
+`/looks` sits under Gallery in the nav. Each row draws the same samples in its own Look (see _"A Look's rules stop
+at `lookBoundary`"_) and picking a row applies that Look to the whole Playground through `revealLook`, the circle
+growing from the row; the nav's Look field reads the same signal, so the two never disagree. **The samples are a
+picture, not controls** — the user's option A over live samples with a pick button per row. Each row is a `Radio`
+in a `RadioGroup`, the samples `inert` and `aria-hidden="true"`: a radio's contents are presentational (WAI-ARIA
+1.2, "children presentational"), so live controls inside it would be flattened for a screen reader, and a click on
+one would also pick the row. The cost is that hover and press are not shown; disabled, error, checked and pressed
+are drawn as fixed states instead. The nav previews made the same call.
+
+**Every part a Look paints is shown** — the user's option C, laid out at their direction: a wrapping row of
+columns, each an example box on the Look's own page background, each a grid of states for a control that has
+them; a control with no states to split (Surface, Tabs, Accordion) takes its column whole. Bars stack one per line,
+since two side by side overlap at that width. **Nothing that opens a popup is sampled**, since a portalled popup
+leaves the row's Look.
+
+**A row is the page Look's `hollowSurface`, filled with the row Look's page background, title included** — the
+user's call, after a full `surface` holding a page background read as a box inside a box. So the radio dot and name
+are drawn in the row's Look too, and what marks the picked row differs from row to row; the frame clips its
+contents so the background follows its corners, which leaves the focus ring alone, since the radio input that
+draws it sits outside the clipped painter.
 
 ### The gallery page: every page's first example, live, on one page
 

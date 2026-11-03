@@ -14,7 +14,7 @@ purpose: it answers "what is outstanding", and neither of them is.
 | [Blockers and known issues](#blockers-and-known-issues)   |     4 |
 | [Deliberately not built](#deliberately-not-built)         |     1 |
 | [Accessibility gaps](#accessibility-gaps)                 |     5 |
-| [Planned projects](#planned-projects)                     |     1 |
+| [Planned projects](#planned-projects)                     |     2 |
 | [Waiting on browser support](#waiting-on-browser-support) |     4 |
 
 ---
@@ -54,6 +54,7 @@ They cluster, and no single item owns them.
 | #   | What                                          | Standing                                                                                                      |
 | --- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
 | 2   | **A consumer-facing layer above the library** | **Deferred to a near-future session of its own.** Painted, ready-to-use controls, as Magic UI sells templates |
+| 12  | **The Looks page in React, Vue and Svelte**   | Built in Solid only; the other three have no page and no nav link to it                                       |
 
 ## Waiting on browser support
 

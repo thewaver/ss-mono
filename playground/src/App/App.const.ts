@@ -4,6 +4,8 @@ export const GETTING_STARTED_ROUTE = "/getting-started";
 
 export const GALLERY_ROUTE = "/gallery";
 
+export const LOOKS_ROUTE = "/looks";
+
 export const GALLERY_NAME_SEPARATOR = " / ";
 
 export const NAV_PREVIEW_PLACEMENT: AnchorPlacement = { x: "right_out", y: "center" };

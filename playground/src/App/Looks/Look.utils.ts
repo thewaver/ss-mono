@@ -2,7 +2,7 @@ import { globalStyle } from "@vanilla-extract/css";
 
 import type { LookEntry, LookRule, LookRules } from "./Look.types";
 
-import { lookEntries, lookLayer } from "./Look.css";
+import { lookBoundary, lookEntries, lookLayer } from "./Look.css";
 
 const splitSelectorList = (selector: string) => {
     const parts: string[] = [];
@@ -35,18 +35,23 @@ const FRAME_PROPERTIES = [
     "clipPath",
 ] as const;
 
-const scopeSelector = (root: string, target: string, selector: string) =>
+const scopeSelector = (target: string, selector: string) =>
     splitSelectorList(selector)
-        .map((part) => `.${root} ${part.replaceAll("&", target)}`)
+        .map((part) => `:scope ${part.replaceAll("&", target)}`)
         .join(", ");
+
+const computeScopeBounds = (root: string) => `(.${root}) to (.${lookBoundary})`;
 
 const defineRule = (root: string, target: string, rule: LookRule) => {
     const { selectors, ...base } = rule;
+    const bounds = computeScopeBounds(root);
 
-    globalStyle(scopeSelector(root, target, "&"), { "@layer": { [lookLayer]: base } });
+    globalStyle(scopeSelector(target, "&"), { "@layer": { [lookLayer]: { "@scope": { [bounds]: base } } } });
 
     Object.entries(selectors ?? {}).forEach(([selector, nested]) => {
-        globalStyle(scopeSelector(root, target, selector), { "@layer": { [lookLayer]: nested } });
+        globalStyle(scopeSelector(target, selector), {
+            "@layer": { [lookLayer]: { "@scope": { [bounds]: nested } } },
+        });
     });
 };
 
