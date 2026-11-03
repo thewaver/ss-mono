@@ -10,4 +10,4 @@ export const PLAYGROUND_LOOKS = {
     terminal,
 };
 
-export const DEFAULT_LOOK: keyof typeof PLAYGROUND_LOOKS = "material";
+export const DEFAULT_LOOK: keyof typeof PLAYGROUND_LOOKS = "plasticine";
