@@ -2,6 +2,7 @@ import type { GlobalStyleRule } from "@vanilla-extract/css";
 
 export type LookEntry =
     | "accordionHeader"
+    | "accordionPanel"
     | "blurredOverlay"
     | "button"
     | "buttonSimple"
@@ -10,6 +11,7 @@ export type LookEntry =
     | "decoration"
     | "drawer"
     | "dropdown"
+    | "hollowSurface"
     | "hoverFloater"
     | "input"
     | "itemWithFloater"
@@ -27,6 +29,11 @@ export type LookEntry =
     | "scrollerThumb"
     | "scrollerTrack"
     | "selectionFloater"
+    | "slideButtonArrow"
+    | "slideButtonFill"
+    | "slideButtonHint"
+    | "slideButtonThumb"
+    | "slideButtonTrack"
     | "surface"
     | "tag"
     | "toggleHandle"
@@ -41,6 +48,9 @@ export type LookState =
     | "isPressed"
     | "isChecked"
     | "isMixed"
+    | "isVertical"
+    | "isStart"
+    | "isEnd"
     | "isReadOnly"
     | "isDisabled"
     | "hasError";

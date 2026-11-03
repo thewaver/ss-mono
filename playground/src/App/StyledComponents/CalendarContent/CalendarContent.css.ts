@@ -56,8 +56,7 @@ export const calendarDay = style({
             borderEndEndRadius: themeVars.borderRadius.half,
         },
         [`&.${isSelected}`]: {
-            backgroundColor: themeVars.color.primary.light,
-            backgroundImage: `linear-gradient(215deg, ${themeVars.color.primary.light}, ${themeVars.color.primary.dark})`,
+            backgroundColor: themeVars.color.primary.main,
             color: themeVars.color.primary.contrast,
         },
         [`&.${isDisabled}`]: {

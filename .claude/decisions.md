@@ -118,7 +118,9 @@ gradient button; another Look might paint a bordered one with heavily rounded co
 Look owns everything that paints — color, background, shadow, border, radius, padding, font — while display,
 size, position, z-index, transforms and transitions stay in the painter, for now. **A Look is picked the way a
 Theme is**: a class on `<html>`, swapped from the left nav's settings (`PageComponents/Look`, beside
-`PageComponents/Theme`), from `PLAYGROUND_LOOKS` in `Looks/Look.const.ts`. **Every Look lives in
+`PageComponents/Theme`), from `PLAYGROUND_LOOKS` in `Looks/Look.const.ts`. **No Look reads the theme's shadow
+scale**: Plasticine and Glass hold their own copies (`SHADOW_SMALL`, `SHADOW_MEDIUM`, `SHADOW_LARGE`), and
+`themeVars.shadow` stays only for the custom painters outside the Looks, until the user decides their shadows. **Every Look lives in
 `Looks/Variants/`**, one file each, the user's placement; `Looks/` itself holds only the machinery.
 
 **Fourteen Looks exist, Plasticine being the default.** The user approved the first six from a published
@@ -180,7 +182,9 @@ planned for.
   own — `export const isHovered = style([lookStates.isHovered])` — so its markup is unchanged in every
   framework, and its own selectors still name the composition's unique class and cannot match a neighbor's.
 - **A Look writes no selector of its own** — the user's rule. Every state a Look can paint is a named key in
-  `lookSelectors` (`Looks/Look.css.ts`), joined with `LookUtils.anyOf` where one rule covers two, so a new
+  `lookSelectors` (`Looks/Look.css.ts`), joined with `LookUtils.anyOf` where one rule covers two and
+  `LookUtils.allOf` where a rule needs two at once (it chains each as `:is(…)` on the entry, so it cannot take
+  `line`'s pseudo-element or `fieldText`, whose `&` is not the painted element), so a new
   Look imports the names and writes only the styles. A state a Look needs that has no key gets one there,
   never a literal in the Look.
 - **A Look's rule matches a state on the entry's own element** (`&.isHovered`), so a checkbox row's hover filter
@@ -196,20 +200,38 @@ planned for.
 - **Who the entries are for.** `drawer` is every page-edge or full panel — the left nav, drawers, modals and the
   sidebar sample, which paints exactly the left nav (an earlier call of the user's). `tooltip` takes the small
   floating popups — spotlight and hover card as well as the tooltip. `surface` is the example and variant boxes,
-  toasts and the knobs popup; `panel` the boxes of content inside them, the API tables, code boxes, prop rows
+  toasts and the knobs popup; `hollowSurface` — the user's name — is `surface` without its fill, for a box around
+  siblings that paint their own (the "Show code" accordion's `docsExampleCode`), and every Look derives it from its
+  `surface` with `LookUtils.hollow`, which keeps only border, radius, shadow and clip, so the two cannot drift;
+  `panel` the boxes of content inside them, the API tables, code boxes, prop rows
   and the dependency chips. `decoration` — the user's — is the small see-through button inside or beside a
   field (select clear, picker triggers, era and AM/PM toggles, stepper arrows, adornments, the sidebar toggle);
   it reacts to hover only when it is or sits in a `button` or `[role='button']`, because a static icon
   adornment is handed the field's hover flag. `tag` is a tag input's chip; the other chips and badges keep
   their own paint, the user's call. The binary switches' insides — `checkboxMark`, `radioDot`, `toggleHandle` —
   and the standard bars — `progressTrack` and `progressFill`, `rangeTrack`, `rangeFill` and `rangeThumb`,
-  `scrollerTrack` and `scrollerThumb` (painted on `::before`) — have entries; `isChecked` and `isMixed` joined
+  `scrollerTrack` and `scrollerThumb` (painted on `::before`), and the slide button's `slideButtonTrack`,
+  `slideButtonFill`, `slideButtonHint`, `slideButtonThumb` and `slideButtonArrow` — have entries, the slide
+  button's added at the user's request with its error marked on each part; Plasticine keeps the slide button's
+  earlier paint, every other Look paints its track, fill and thumb with its range's (`RANGE_TRACK`, `RANGE_FILL`,
+  `RANGE_THUMB`), so the two stay in step until a Look parts them; `isChecked` and `isMixed` joined
   the shared states for the toggle's handle, matched on the row around it, as is a progress fill's error.
+- **A bar's axis is a state; its text direction is not** — the user's call. `isVertical` is on each part of a
+  standing progress bar or range (the progress painter's own `orientation`, since `Progress` has none). The state
+  sets `lookVars.barAngle` (`Looks/Look.css.ts`), and a gradient along a bar takes that angle, so a Look writes
+  each gradient once and needs no vertical rule — the user's call, to be rid of selectors combining two states. A Look paints the same in a right-to-left box: a gradient
+  along the bar keeps its direction there. **A pair's thumbs are one entry with two states**, `isStart` and
+  `isEnd` — the user's pick over two entries, since a Look writes the thumb once and only the difference; a
+  single-value range's thumb carries neither.
+- **Entries are as few as possible, but a component with an entry for one part gets one for each part** — the
+  user's rule. So the accordion body has `accordionPanel` beside `accordionHeader` rather than borrowing
+  `panel`; each Look starts it on the same paint as its `panel`, through one `PANEL` constant, until the Look
+  chooses to tie it to its header.
 - **A modal's backdrop has two entries**, `opaqueOverlay` and `blurredOverlay`, one per kind the modal offers;
   the painter keeps only what animates it open and shut.
 - **Only a control's standard layout gets entries; a custom variant keeps its own paint** — the user's rule. The
-  progress ring, range knob, scroller arc, slide button and color area are left alone, because whoever builds a
-  custom slide button, tab layout or progress wants full control of the element — a painter of their own, not a
+  progress ring, range knob, scroller arc and color area are left alone, because whoever builds a
+  custom tab layout or progress wants full control of the element — a painter of their own, not a
   set of classes to restyle. A radius computed from a painter's own size (a track's thickness) also stays in the
   painter.
 - **Hover in a list is the floater's, everywhere a list can have one** — the user's rule. An item comes in two
@@ -232,7 +254,9 @@ planned for.
   unified their painters to each entry's majority — `surface` and `dropdown` at `full`, `panel` at `half` — which
   rounded the toast, the modal-free popovers and the select list a little more, and squared the API table box,
   the dependency summary and gave the accordion panel corners it had not had. **A radius computed from a painter's
-  own size** (a track's thickness, a pill badge) stays in the painter.
+  own size** (a track's thickness, a pill badge) stays in the painter — except the standard bars': the user moved
+  `rangeTrack`'s and `rangeFill`'s to the Looks, as `progressTrack`'s and `progressFill`'s already were, and each
+  Look gives a range part the radius it gives the matching progress part.
 - **The page's font and backdrop are constants, not the Look's** — the user's call. The `body` rule in
   `Theme.css.ts` holds the font family, size, line height and the backdrop behind the app, and sets no text
   color: every painted area sets its own.
@@ -9994,6 +10018,36 @@ wants contents with a width of their own.
 left showing would be visible and unusable; keeping it usable means lifting `inert`, which lets Tab walk into
 the clipped part. The user dropped it rather than change what closing means. `Sidebar` is where a panel that
 stays partly visible lives.
+
+**Every element the two render between the consumer's box and the consumer's painters passes `border-radius`
+down** — the user's call: a consumer who rounds the box around an accordion and writes `border-radius: inherit`
+in their header and panel painters gets matching corners without knowing what lies between, rather than two radii
+or a clip. Both are runs in `CornerRunUtils`' sense: an `Accordion` hands the box's leading corners to its first
+section and the trailing ones to its last, none to a section between; a `Collapsible` squares the corners where
+its trigger meets its panel while it is open, on its own button and panel, so the consumer never writes the
+seam. While a panel animates shut the trigger is already rounded, since `aria-expanded` flips first.
+
+### Which components pass corners down, and where each run is
+
+`controls.md`'s _"A component passes the box's corners down"_ applied, all in the core stylesheets so the four
+frameworks share it; only `Paginator`'s `<nav>` and the standalone `Listbox`'s root gained a class to hang it on.
+
+- **`Tabs`** — the tab list is the run, keyed on its `aria-orientation`; the tab panel is the consumer's markup, so
+  rounding it is theirs. The gutter inherits all four.
+- **`SplitPane`** — the panes are the run, read as a row when a divider says `aria-orientation="vertical"` and a
+  column otherwise, so a lone pane takes all four. Panes already hide their overflow, so they trim their contents.
+- **`Toolbar`** — the shown items are the run; items held back for measuring are left out, the overflow button
+  counts while shown.
+- **`Paginator`** — every row is a run of its children, so the pages row nested in the steps row is one item of
+  the outer run and its own run inside.
+- **`Table`** — header then body; the body's last row; each row's first and last cells. Windowed rows are left
+  out, since the last row drawn is not the table's last.
+- **`Tree`, `Menu`, `Listbox` and what reuses it (`Select`, `MultiSelect`, `TextInput`'s suggestions,
+  `CommandPalette`)** — every level and every `role="group"` inside is a run, so the last row on screen gets the
+  bottom corners however deeply nested. `Menu` and `Listbox` write it at zero specificity because a consumer's
+  group header sits in the run. A horizontal `Listbox` wraps, so it gets nothing; a consumer's `renderGroupBox`
+  sits between a group and its items and breaks the chain until it inherits too.
+- **Not reached**: anything laid out by `computeLayout` (placed, not a run) and virtualized rows.
 
 ### `Accordion`, `Collapsible`, `Preview`, `Tree`: two-way state is optional
 

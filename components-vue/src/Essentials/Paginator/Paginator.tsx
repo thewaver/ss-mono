@@ -346,7 +346,7 @@ export const PaginatorRoot = defineComponent(
             const currentLayout = layout.value;
 
             return (
-                <nav aria-label={props.ariaLabel}>
+                <nav class={PaginatorStyles.paginatorRoot} aria-label={props.ariaLabel}>
                     {currentLayout ? (
                         <PlacementBox layout={currentLayout} computeEffect={props.computeEffect}>
                             {{ default: () => slots.default?.() }}

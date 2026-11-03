@@ -242,7 +242,7 @@ export const PaginatorRoot = (props: PaginatorRootProps) => {
     const pieces = <PaginatorContextProvider value={context}>{props.children}</PaginatorContextProvider>;
 
     return (
-        <nav aria-label={props.ariaLabel}>
+        <nav className={PaginatorStyles.paginatorRoot} aria-label={props.ariaLabel}>
             {layout ? (
                 <PlacementBox layout={layout} computeEffect={props.computeEffect}>
                     {pieces}

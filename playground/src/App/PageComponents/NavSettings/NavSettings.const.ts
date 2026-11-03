@@ -22,15 +22,7 @@ export const THEME_OPTIONS: NavSettingsOption<PlaygroundTheme>[] = [
 ];
 
 export const LOOK_OPTIONS: NavSettingsOption<PlaygroundLook>[] = [
-    { value: "aqua", label: "Aqua" },
-    { value: "brutalist", label: "Brutalist" },
-    { value: "clay", label: "Clay" },
-    { value: "glass", label: "Glass" },
-    { value: "hud", label: "HUD" },
     { value: "material", label: "Material" },
-    { value: "neon", label: "Neon" },
-    { value: "pixel", label: "Pixel" },
-    { value: "plasma", label: "Plasma" },
     { value: "plasticine", label: "Plasticine" },
     { value: "retroOS", label: "Retro OS" },
     { value: "terminal", label: "Terminal" },

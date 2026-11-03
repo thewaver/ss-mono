@@ -4,7 +4,7 @@ import { LookUtils } from "../Look.utils";
 
 import { layerVars } from "../../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../../Theme.css";
-import { lookSelectors } from "../Look.css";
+import { lookSelectors, lookVars } from "../Look.css";
 
 export const retroOS = style({});
 
@@ -21,7 +21,7 @@ const THIN_RAISED = `inset -1px -1px 0 ${DARK_EDGE}, inset 1px 1px 0 ${LIGHT_EDG
 const THIN_SUNKEN = `inset 1px 1px 0 ${DARK_EDGE}, inset -1px -1px 0 ${LIGHT_EDGE}`;
 
 const segments = (color: string) =>
-    `repeating-linear-gradient(90deg, ${color} 0 ${SEGMENT_WIDTH}px, transparent ${SEGMENT_WIDTH}px ${SEGMENT_WIDTH + SEGMENT_GAP}px)`;
+    `repeating-linear-gradient(${lookVars.barAngle}, ${color} 0 ${SEGMENT_WIDTH}px, transparent ${SEGMENT_WIDTH}px ${SEGMENT_WIDTH + SEGMENT_GAP}px)`;
 
 const CHROME = {
     borderRadius: 0,
@@ -57,7 +57,7 @@ const PRESS_STATES = {
 
 const ITEM_STATES = {
     [lookSelectors.isSelected]: {
-        backgroundColor: themeVars.color.primary.light,
+        backgroundColor: themeVars.color.primary.main,
         color: themeVars.color.primary.contrast,
     },
     [lookSelectors.isDisabled]: {
@@ -66,18 +66,46 @@ const ITEM_STATES = {
     },
 } as const;
 
+const PANEL = {
+    ...WELL,
+    border: "none",
+    color: layerVars.contrast,
+} as const;
+
+const RANGE_TRACK = {
+    borderRadius: 0,
+    backgroundColor: layerVars.main,
+    boxShadow: THIN_SUNKEN,
+} as const;
+
+const RANGE_FILL = {
+    borderRadius: 0,
+    backgroundColor: themeVars.color.primary.main,
+    selectors: {
+        [lookSelectors.hasError]: {
+            backgroundColor: themeVars.color.error.main,
+        },
+    },
+} as const;
+
+const RANGE_THUMB = {
+    ...CHROME,
+    selectors: {
+        [lookSelectors.hasError]: {
+            backgroundColor: themeVars.color.error.main,
+        },
+    },
+} as const;
+
 LookUtils.define(retroOS, {
     pageBackground: {
-        backgroundColor: themeVars.color.background.dark,
+        backgroundColor: themeVars.color.background.light,
         color: themeVars.color.background.contrast,
     },
     drawer: CHROME,
     surface: CHROME,
-    panel: {
-        ...WELL,
-        border: "none",
-        color: layerVars.contrast,
-    },
+    hollowSurface: LookUtils.hollow(CHROME),
+    panel: PANEL,
     tooltip: {
         borderRadius: 0,
         backgroundColor: themeVars.color.alert.light,
@@ -85,7 +113,7 @@ LookUtils.define(retroOS, {
         border: `1px solid ${themeVars.color.alert.contrast}`,
     },
     accordionHeader: {
-        ...CHROME,
+        ...WELL,
         fontSize: themeVars.fontSize.medium,
         fontWeight: "bold",
         selectors: {
@@ -100,6 +128,7 @@ LookUtils.define(retroOS, {
             },
         },
     },
+    accordionPanel: PANEL,
     opaqueOverlay: {
         backgroundColor: themeVars.color.background.dark,
     },
@@ -109,14 +138,15 @@ LookUtils.define(retroOS, {
     button: {
         ...CHROME,
         paddingInline: themeVars.spacing.double,
+        backgroundColor: themeVars.color.primary.main,
+        color: themeVars.color.primary.contrast,
         fontWeight: "bold",
         selectors: {
             [lookSelectors.isPressed]: {
-                backgroundColor: `hsl(from ${themeVars.color.surface.light} h s calc(l - 8))`,
                 boxShadow: SUNKEN,
             },
             [lookSelectors.hasError]: {
-                color: themeVars.color.error.main,
+                backgroundColor: themeVars.color.error.main,
             },
             ...PRESS_STATES,
         },
@@ -205,7 +235,7 @@ LookUtils.define(retroOS, {
         selectors: {
             ...WELL_STATES,
             [LookUtils.anyOf(lookSelectors.withinChecked, lookSelectors.withinMixed)]: {
-                backgroundColor: themeVars.color.primary.dark,
+                backgroundColor: themeVars.color.primary.main,
             },
         },
     },
@@ -225,30 +255,27 @@ LookUtils.define(retroOS, {
     progressFill: {
         borderRadius: 0,
         backgroundColor: "transparent",
-        backgroundImage: segments(themeVars.color.primary.light),
+        backgroundImage: segments(themeVars.color.primary.main),
         selectors: {
             [lookSelectors.withinError]: {
-                backgroundImage: segments(themeVars.color.error.light),
+                backgroundImage: segments(themeVars.color.error.main),
             },
         },
     },
-    rangeTrack: {
-        backgroundColor: layerVars.main,
-        boxShadow: THIN_SUNKEN,
+    rangeTrack: RANGE_TRACK,
+    rangeFill: RANGE_FILL,
+    rangeThumb: RANGE_THUMB,
+    slideButtonTrack: RANGE_TRACK,
+    slideButtonFill: RANGE_FILL,
+    slideButtonHint: {
+        fontWeight: "bold",
     },
-    rangeFill: {
-        backgroundColor: themeVars.color.primary.light,
+    slideButtonThumb: RANGE_THUMB,
+    slideButtonArrow: {
+        stroke: themeVars.color.primary.main,
         selectors: {
             [lookSelectors.hasError]: {
-                backgroundColor: themeVars.color.error.light,
-            },
-        },
-    },
-    rangeThumb: {
-        ...CHROME,
-        selectors: {
-            [lookSelectors.hasError]: {
-                backgroundColor: themeVars.color.error.light,
+                stroke: themeVars.color.error.main,
             },
         },
     },
@@ -290,7 +317,7 @@ LookUtils.define(retroOS, {
     },
     selectionFloater: {
         borderRadius: 0,
-        backgroundColor: themeVars.color.primary.light,
+        backgroundColor: themeVars.color.primary.main,
     },
     itemWithFloater: {
         borderRadius: 0,
@@ -302,7 +329,7 @@ LookUtils.define(retroOS, {
         fontSize: themeVars.fontSize.medium,
         selectors: {
             [lookSelectors.isHovered]: {
-                backgroundColor: themeVars.color.primary.light,
+                backgroundColor: themeVars.color.primary.main,
                 color: themeVars.color.primary.contrast,
             },
             ...ITEM_STATES,

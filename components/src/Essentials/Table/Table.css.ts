@@ -1,4 +1,6 @@
-import { createVar, style } from "@vanilla-extract/css";
+import { createVar, globalStyle, style } from "@vanilla-extract/css";
+
+import { CornerRunUtils } from "../../Abstracts/CornerRun/CornerRun.utils";
 
 export const tableTemplateVar = createVar();
 export const tableResizerWidthVar = createVar();
@@ -10,6 +12,7 @@ export const tableRoot = style({
     width: "100%",
     minWidth: tableMinWidthVar,
     isolation: "isolate",
+    borderRadius: "inherit",
 });
 
 export const tableHeader = style({
@@ -127,3 +130,20 @@ export const tableHint = style({
     whiteSpace: "nowrap",
     border: 0,
 });
+
+globalStyle(`${tableRoot} > ${tableHeader}`, CornerRunUtils.computeEdge("column", "leading", "inherit"));
+
+globalStyle(`${tableRoot} > ${tableBody}`, CornerRunUtils.computeEdge("column", "trailing", "inherit"));
+
+globalStyle(`${tableHeader} > ${tableRow}`, {
+    borderRadius: "inherit",
+});
+
+globalStyle(
+    `${tableBody} > ${tableRow}:not(${tableWindowedRow}):last-child`,
+    CornerRunUtils.computeEdge("column", "trailing", "inherit"),
+);
+
+globalStyle(`${tableRow} > :first-child`, CornerRunUtils.computeEdge("row", "leading", "inherit"));
+
+globalStyle(`${tableRow} > :last-child`, CornerRunUtils.computeEdge("row", "trailing", "inherit"));

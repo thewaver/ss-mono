@@ -33,8 +33,7 @@ export const clockOption = style({
             boxShadow: `inset 0 0 0 1px ${themeVars.color.primary.main}`,
         },
         [`&.${isSelected}`]: {
-            backgroundColor: themeVars.color.primary.light,
-            backgroundImage: `linear-gradient(215deg, ${themeVars.color.primary.light}, ${themeVars.color.primary.dark})`,
+            backgroundColor: themeVars.color.primary.main,
             color: themeVars.color.primary.contrast,
         },
         [`&.${isDisabled}`]: {

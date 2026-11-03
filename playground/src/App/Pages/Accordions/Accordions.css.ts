@@ -106,7 +106,7 @@ export const orientationLabel = style({
 export const isEntering = style({});
 
 export const orientationPanel = style([
-    lookEntries.panel,
+    lookEntries.accordionPanel,
     {
         vars: { [moveVar]: "0" },
         display: "flex",

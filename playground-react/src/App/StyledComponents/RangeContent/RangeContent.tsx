@@ -14,6 +14,8 @@ export const PageRangeContent = (props: RangeContentProps) => {
 
     const orientation = props.renderProps.orientation;
 
+    const isPair = props.renderProps.ratios.length > 1;
+
     const length = props.length ?? DEFAULT_RANGE_CONTENT_LENGTH;
 
     const fill = props.renderProps.fill;
@@ -57,6 +59,8 @@ export const PageRangeContent = (props: RangeContentProps) => {
                         styles.rangeThumbVariants[orientation],
                         props.renderProps.focusVisibleThumb === index && styles.isFocused,
                         props.renderProps.hasError && styles.hasError,
+                        isPair && index === 0 && styles.isStart,
+                        isPair && index === 1 && styles.isEnd,
                     ]
                         .filter(Boolean)
                         .join(" ")}

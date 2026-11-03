@@ -4,16 +4,20 @@ import { LookUtils } from "../Look.utils";
 
 import { layerVars } from "../../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../../Theme.css";
-import { lookSelectors } from "../Look.css";
+import { lookSelectors, lookVars } from "../Look.css";
 
 export const plasticine = style({});
 
 const PILL_RADIUS = "9999px";
 
+const SHADOW_SMALL = "0 2px 2px 0px rgba(0, 0, 0, 0.65)";
+const SHADOW_MEDIUM = `${SHADOW_SMALL}, 0 4px 8px 0px rgba(0, 0, 0, 0.5)`;
+const SHADOW_LARGE = `${SHADOW_MEDIUM}, 0 16px 64px 0px rgba(0, 0, 0, 0.35)`;
+
 const FIELD_SURFACE = {
     border: `2px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
     backgroundColor: layerVars.main,
-    boxShadow: themeVars.shadow.small,
+    boxShadow: SHADOW_SMALL,
 } as const;
 
 const SWITCH_BOX_STATES = {
@@ -47,6 +51,21 @@ const BUTTON_STATES = {
     },
 } as const;
 
+const PANEL = {
+    borderRadius: themeVars.borderRadius.half,
+    backgroundColor: `rgb(from ${layerVars.main} r g b / 50%)`,
+    color: layerVars.contrast,
+    boxShadow: SHADOW_SMALL,
+} as const;
+
+const SURFACE = {
+    borderRadius: themeVars.borderRadius.full,
+    backgroundColor: themeVars.color.surface.dark,
+    backgroundImage: `linear-gradient(315deg, ${themeVars.color.surface.dark}, ${themeVars.color.surface.light})`,
+    color: themeVars.color.surface.contrast,
+    boxShadow: SHADOW_MEDIUM,
+} as const;
+
 LookUtils.define(plasticine, {
     pageBackground: {
         backgroundColor: themeVars.color.background.dark,
@@ -57,26 +76,16 @@ LookUtils.define(plasticine, {
         backgroundColor: themeVars.color.surface.dark,
         backgroundImage: `linear-gradient(45deg, ${themeVars.color.surface.dark}, ${themeVars.color.surface.light})`,
         color: themeVars.color.surface.contrast,
-        boxShadow: themeVars.shadow.large,
+        boxShadow: SHADOW_LARGE,
     },
-    surface: {
-        borderRadius: themeVars.borderRadius.full,
-        backgroundColor: themeVars.color.surface.dark,
-        backgroundImage: `linear-gradient(315deg, ${themeVars.color.surface.dark}, ${themeVars.color.surface.light})`,
-        color: themeVars.color.surface.contrast,
-        boxShadow: themeVars.shadow.medium,
-    },
-    panel: {
-        borderRadius: themeVars.borderRadius.half,
-        backgroundColor: `rgb(from ${layerVars.main} r g b / 50%)`,
-        color: layerVars.contrast,
-        boxShadow: themeVars.shadow.small,
-    },
+    surface: SURFACE,
+    hollowSurface: LookUtils.hollow(SURFACE),
+    panel: PANEL,
     tooltip: {
         borderRadius: themeVars.borderRadius.full,
         backgroundColor: layerVars.main,
         color: layerVars.contrast,
-        boxShadow: themeVars.shadow.small,
+        boxShadow: SHADOW_SMALL,
     },
     accordionHeader: {
         borderRadius: themeVars.borderRadius.half,
@@ -93,6 +102,7 @@ LookUtils.define(plasticine, {
             },
         },
     },
+    accordionPanel: PANEL,
     opaqueOverlay: {
         backgroundColor: "black",
     },
@@ -105,7 +115,7 @@ LookUtils.define(plasticine, {
         backgroundColor: themeVars.color.primary.dark,
         backgroundImage: `linear-gradient(315deg, ${themeVars.color.primary.dark}, ${themeVars.color.primary.light})`,
         color: themeVars.color.primary.contrast,
-        boxShadow: themeVars.shadow.small,
+        boxShadow: SHADOW_SMALL,
         fontWeight: "bold",
         selectors: {
             [lookSelectors.isPressed]: {
@@ -124,7 +134,7 @@ LookUtils.define(plasticine, {
         borderRadius: themeVars.borderRadius.half,
         backgroundColor: `rgb(from ${layerVars.contrast} r g b / 25%)`,
         color: layerVars.contrast,
-        boxShadow: themeVars.shadow.small,
+        boxShadow: SHADOW_SMALL,
         fontSize: themeVars.fontSize.small,
         selectors: {
             ...BUTTON_STATES,
@@ -136,7 +146,7 @@ LookUtils.define(plasticine, {
     decoration: {
         borderRadius: themeVars.borderRadius.half,
         backgroundColor: "transparent",
-        color: `rgb(from ${layerVars.contrast} r g b / 65%)`,
+        color: `rgb(from ${layerVars.contrast} r g b / 75%)`,
         selectors: {
             [lookSelectors.isHoveredPressable]: {
                 color: layerVars.contrast,
@@ -185,7 +195,7 @@ LookUtils.define(plasticine, {
         border: `2px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
         backgroundColor: layerVars.main,
         color: layerVars.contrast,
-        boxShadow: themeVars.shadow.small,
+        boxShadow: SHADOW_SMALL,
     },
     checkboxBox: {
         ...FIELD_SURFACE,
@@ -203,7 +213,7 @@ LookUtils.define(plasticine, {
     },
     radioDot: {
         borderRadius: "50%",
-        backgroundColor: themeVars.color.primary.light,
+        backgroundColor: themeVars.color.primary.dark,
         backgroundImage: `linear-gradient(45deg, ${themeVars.color.primary.dark}, ${themeVars.color.primary.light})`,
     },
     toggleTrack: {
@@ -222,9 +232,9 @@ LookUtils.define(plasticine, {
     },
     progressTrack: {
         border: `2px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
-        borderRadius: themeVars.borderRadius.half,
+        borderRadius: themeVars.borderRadius.full,
         backgroundColor: layerVars.main,
-        boxShadow: themeVars.shadow.small,
+        boxShadow: SHADOW_SMALL,
         selectors: {
             [lookSelectors.hasError]: {
                 borderColor: themeVars.color.error.main,
@@ -232,31 +242,29 @@ LookUtils.define(plasticine, {
         },
     },
     progressFill: {
-        borderRadius: themeVars.borderRadius.half,
-        backgroundColor: themeVars.color.primary.light,
-        backgroundImage: `linear-gradient(90deg, ${themeVars.color.primary.dark}, ${themeVars.color.primary.light})`,
+        borderRadius: themeVars.borderRadius.full,
+        backgroundColor: themeVars.color.primary.dark,
+        backgroundImage: `linear-gradient(${lookVars.barAngle}, ${themeVars.color.primary.dark}, ${themeVars.color.primary.light})`,
         selectors: {
-            [lookSelectors.rightToLeft]: {
-                backgroundImage: `linear-gradient(270deg, ${themeVars.color.primary.dark}, ${themeVars.color.primary.light})`,
-            },
             [lookSelectors.withinError]: {
                 backgroundColor: themeVars.color.error.light,
-                backgroundImage: `linear-gradient(90deg, ${themeVars.color.error.dark}, ${themeVars.color.error.light})`,
-            },
-            [lookSelectors.withinErrorRightToLeft]: {
-                backgroundImage: `linear-gradient(270deg, ${themeVars.color.error.dark}, ${themeVars.color.error.light})`,
+                backgroundImage: `linear-gradient(${lookVars.barAngle}, ${themeVars.color.error.dark}, ${themeVars.color.error.light})`,
             },
         },
     },
     rangeTrack: {
+        borderRadius: themeVars.borderRadius.full,
         backgroundColor: `rgb(from ${layerVars.contrast} r g b / 25%)`,
-        boxShadow: themeVars.shadow.small,
+        boxShadow: SHADOW_SMALL,
     },
     rangeFill: {
-        backgroundColor: themeVars.color.primary.main,
+        borderRadius: themeVars.borderRadius.full,
+        backgroundColor: themeVars.color.primary.dark,
+        backgroundImage: `linear-gradient(${lookVars.barAngle}, ${themeVars.color.primary.dark}, ${themeVars.color.primary.light})`,
         selectors: {
             [lookSelectors.hasError]: {
-                backgroundColor: themeVars.color.error.main,
+                backgroundColor: themeVars.color.error.dark,
+                backgroundImage: `linear-gradient(${lookVars.barAngle}, ${themeVars.color.error.dark}, ${themeVars.color.error.light})`,
             },
         },
     },
@@ -264,10 +272,50 @@ LookUtils.define(plasticine, {
         borderRadius: "50%",
         border: `2px solid ${themeVars.color.primary.main}`,
         backgroundColor: layerVars.main,
-        boxShadow: themeVars.shadow.small,
+        boxShadow: SHADOW_SMALL,
+        selectors: {
+            [lookSelectors.isStart]: {
+                borderColor: themeVars.color.primary.dark,
+            },
+            [lookSelectors.hasError]: {
+                borderColor: themeVars.color.error.main,
+            },
+        },
+    },
+    slideButtonTrack: {
+        borderRadius: PILL_RADIUS,
+        backgroundColor: `rgb(from ${layerVars.contrast} r g b / 10%)`,
+        boxShadow: SHADOW_SMALL,
+    },
+    slideButtonFill: {
+        backgroundColor: themeVars.color.primary.light,
+        backgroundImage: `linear-gradient(${lookVars.barAngle}, ${themeVars.color.primary.dark}, ${themeVars.color.primary.light})`,
+        selectors: {
+            [lookSelectors.hasError]: {
+                backgroundColor: themeVars.color.error.light,
+                backgroundImage: `linear-gradient(${lookVars.barAngle}, ${themeVars.color.error.dark}, ${themeVars.color.error.light})`,
+            },
+        },
+    },
+    slideButtonHint: {
+        fontWeight: "bold",
+    },
+    slideButtonThumb: {
+        borderRadius: "50%",
+        border: `2px solid ${themeVars.color.primary.main}`,
+        backgroundColor: layerVars.main,
+        boxShadow: SHADOW_SMALL,
         selectors: {
             [lookSelectors.hasError]: {
                 borderColor: themeVars.color.error.main,
+            },
+        },
+    },
+    slideButtonArrow: {
+        stroke: themeVars.color.primary.main,
+        selectors: {
+            [lookSelectors.hasError]: {
+                stroke: themeVars.color.error.main,
             },
         },
     },
@@ -282,7 +330,7 @@ LookUtils.define(plasticine, {
         selectors: {
             [lookSelectors.line]: {
                 backgroundColor: themeVars.color.primary.main,
-                boxShadow: themeVars.shadow.small,
+                boxShadow: SHADOW_SMALL,
             },
             [lookSelectors.lineActive]: {
                 filter: themeVars.active.filter,
@@ -292,7 +340,7 @@ LookUtils.define(plasticine, {
     tag: {
         borderRadius: themeVars.borderRadius.half,
         paddingInline: themeVars.spacing.full,
-        backgroundColor: themeVars.color.primary.light,
+        backgroundColor: themeVars.color.primary.dark,
         backgroundImage: `linear-gradient(45deg, ${themeVars.color.primary.dark}, ${themeVars.color.primary.light})`,
         color: themeVars.color.primary.contrast,
         fontSize: themeVars.fontSize.xSmall,

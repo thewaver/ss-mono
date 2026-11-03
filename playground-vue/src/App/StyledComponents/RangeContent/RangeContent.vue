@@ -18,6 +18,8 @@ const layerClass = useLayerClass();
 
 const orientation = computed(() => props.renderProps.orientation);
 
+const isPair = computed(() => props.renderProps.ratios.length > 1);
+
 const length = computed(() => props.length ?? DEFAULT_RANGE_CONTENT_LENGTH);
 
 const fill = computed(() => props.renderProps.fill);
@@ -54,6 +56,8 @@ const fillSpan = computed(() => travel(fill.value.end - fill.value.start));
                 styles.rangeThumbVariants[orientation],
                 renderProps.focusVisibleThumb === index && styles.isFocused,
                 renderProps.hasError && styles.hasError,
+                isPair && index === 0 && styles.isStart,
+                isPair && index === 1 && styles.isEnd,
             ]"
             :style="orientation === 'vertical' ? { bottom: travel(ratio) } : { insetInlineStart: travel(ratio) }"
         />

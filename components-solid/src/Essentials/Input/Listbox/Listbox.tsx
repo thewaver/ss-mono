@@ -465,6 +465,7 @@ export const ListboxComposite = <T,>(props: ListboxCompositeProps<T>) => {
         <div
             ref={setRootRef}
             id={getListboxId()}
+            class={styles.listboxRoot}
             role="listbox"
             aria-label={access(props.ariaLabel)}
             aria-multiselectable={getIsMultiple() || undefined}

@@ -3,24 +3,33 @@
 
     import { getLayerClass } from "../Layer/Layer.context";
     import type { ProgressContentProps } from "./ProgressContentSvelte.types";
-    import { PERCENT } from "@thewaver/ss-playground/App/StyledComponents/ProgressContent/ProgressContent.const";
+    import {
+        DEFAULT_PROGRESS_CONTENT_ORIENTATION,
+        PERCENT,
+    } from "@thewaver/ss-playground/App/StyledComponents/ProgressContent/ProgressContent.const";
 
     let props: ProgressContentProps = $props();
 
     const layerClass = $derived.by(getLayerClass());
+
+    const isVertical = $derived((props.orientation ?? DEFAULT_PROGRESS_CONTENT_ORIENTATION) === "vertical");
+
+    const fillLength = $derived(props.state.ratio === undefined ? undefined : `${props.state.ratio * PERCENT}%`);
 </script>
 
-<div class={[styles.progressRow, layerClass]}>
+<div class={[styles.progressRow, layerClass, isVertical && styles.isVertical]}>
     <div
         class={[
             styles.progressTrack,
             props.state.ratio === undefined && styles.isIndeterminate,
             props.state.hasError && styles.hasError,
+            isVertical && styles.isVertical,
         ]}
     >
         <div
-            class={styles.progressFill}
-            style:width={props.state.ratio === undefined ? undefined : `${props.state.ratio * PERCENT}%`}
+            class={[styles.progressFill, isVertical && styles.isVertical]}
+            style:width={isVertical ? undefined : fillLength}
+            style:height={isVertical ? fillLength : undefined}
         ></div>
     </div>
 

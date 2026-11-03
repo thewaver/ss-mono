@@ -10,47 +10,45 @@ export const material = style({});
 
 const PILL_RADIUS = "9999px";
 
-const ELEVATION_1 = "0 1px 3px rgb(0 0 0 / 30%), 0 1px 2px rgb(0 0 0 / 24%)";
-const ELEVATION_2 = "0 3px 6px rgb(0 0 0 / 32%), 0 3px 6px rgb(0 0 0 / 23%)";
-const ELEVATION_4 = "0 10px 20px rgb(0 0 0 / 38%), 0 6px 6px rgb(0 0 0 / 23%)";
-const ELEVATION_8 = "0 14px 28px rgb(0 0 0 / 45%), 0 10px 10px rgb(0 0 0 / 22%)";
+const ELEVATION_1 = "0 1px 3px rgb(0 0 0 / 35%), 0 1px 3px rgb(0 0 0 / 25%)";
+const ELEVATION_2 = "0 2px 6px rgb(0 0 0 / 40%), 0 2px 6px rgb(0 0 0 / 25%)";
+const ELEVATION_4 = "0 4px 12px rgb(0 0 0 / 45%), 0 4px 12px rgb(0 0 0 / 25%)";
+const ELEVATION_8 = "0 8px 24px rgb(0 0 0 / 50%), 0 8px 24px rgb(0 0 0 / 25%)";
 
-const tint = (color: string, alpha: number) => `rgb(from ${color} r g b / ${alpha}%)`;
-
-const PRIMARY = themeVars.color.primary.main;
+const alpha = (color: string, alpha: number) => `rgb(from ${color} r g b / ${alpha}%)`;
 
 const LABEL = {
-    fontWeight: 500,
+    fontWeight: "bold",
     textTransform: "uppercase",
     letterSpacing: "0.05em",
 } as const;
 
 const SHEET = {
-    borderRadius: themeVars.borderRadius.half,
+    borderRadius: themeVars.borderRadius.full,
     backgroundColor: themeVars.color.surface.light,
     color: themeVars.color.surface.contrast,
     boxShadow: ELEVATION_2,
 } as const;
 
 const SWITCH_BOX = {
-    border: `2px solid ${tint(layerVars.contrast, 60)}`,
+    border: `2px solid ${alpha(layerVars.contrast, 60)}`,
     backgroundColor: "transparent",
 } as const;
 
 const SWITCH_BOX_STATES = {
+    [LookUtils.anyOf(lookSelectors.withinChecked, lookSelectors.withinMixed)]: {
+        borderColor: themeVars.color.primary.main,
+        backgroundColor: themeVars.color.primary.main,
+    },
     [lookSelectors.withinError]: {
         borderColor: themeVars.color.error.main,
-    },
-    [LookUtils.anyOf(lookSelectors.withinChecked, lookSelectors.withinMixed)]: {
-        borderColor: themeVars.color.primary.light,
-        backgroundColor: themeVars.color.primary.light,
     },
 } as const;
 
 const ITEM_STATES = {
     [lookSelectors.isSelected]: {
-        backgroundColor: tint(PRIMARY, 12),
-        color: PRIMARY,
+        backgroundColor: alpha(themeVars.color.primary.main, 15),
+        color: themeVars.color.primary.main,
     },
     [lookSelectors.isDisabled]: {
         backgroundColor: "transparent",
@@ -58,9 +56,43 @@ const ITEM_STATES = {
     },
 } as const;
 
+const PANEL = {
+    borderRadius: themeVars.borderRadius.half,
+    backgroundColor: layerVars.main,
+    color: layerVars.contrast,
+    boxShadow: ELEVATION_1,
+} as const;
+
+const RANGE_TRACK = {
+    borderRadius: themeVars.borderRadius.half,
+    backgroundColor: alpha(themeVars.color.primary.main, 30),
+} as const;
+
+const RANGE_FILL = {
+    borderRadius: themeVars.borderRadius.half,
+    backgroundColor: themeVars.color.primary.main,
+    selectors: {
+        [lookSelectors.hasError]: {
+            backgroundColor: themeVars.color.error.main,
+        },
+    },
+} as const;
+
+const RANGE_THUMB = {
+    borderRadius: "50%",
+    border: "2px solid transparent",
+    backgroundColor: themeVars.color.primary.light,
+    boxShadow: ELEVATION_1,
+    selectors: {
+        [lookSelectors.hasError]: {
+            backgroundColor: themeVars.color.error.light,
+        },
+    },
+} as const;
+
 LookUtils.define(material, {
     pageBackground: {
-        backgroundColor: themeVars.color.background.dark,
+        backgroundColor: themeVars.color.background.light,
         color: themeVars.color.background.contrast,
     },
     drawer: {
@@ -69,15 +101,11 @@ LookUtils.define(material, {
         boxShadow: ELEVATION_8,
     },
     surface: SHEET,
-    panel: {
-        borderRadius: themeVars.borderRadius.half,
-        backgroundColor: layerVars.main,
-        color: layerVars.contrast,
-        boxShadow: ELEVATION_1,
-    },
+    hollowSurface: LookUtils.hollow(SHEET),
+    panel: PANEL,
     tooltip: {
         borderRadius: themeVars.borderRadius.half,
-        backgroundColor: tint(layerVars.contrast, 90),
+        backgroundColor: alpha(layerVars.contrast, 60),
         color: layerVars.main,
         boxShadow: ELEVATION_2,
     },
@@ -92,7 +120,7 @@ LookUtils.define(material, {
                 boxShadow: ELEVATION_2,
             },
             [lookSelectors.isExpanded]: {
-                color: PRIMARY,
+                color: themeVars.color.primary.main,
             },
             [lookSelectors.isDisabled]: {
                 boxShadow: "none",
@@ -100,6 +128,7 @@ LookUtils.define(material, {
             },
         },
     },
+    accordionPanel: PANEL,
     opaqueOverlay: {
         backgroundColor: themeVars.color.background.dark,
     },
@@ -141,17 +170,17 @@ LookUtils.define(material, {
         ...LABEL,
         borderRadius: themeVars.borderRadius.half,
         backgroundColor: "transparent",
-        color: PRIMARY,
+        color: themeVars.color.primary.main,
         fontSize: themeVars.fontSize.small,
         selectors: {
             [lookSelectors.isHovered]: {
-                backgroundColor: tint(PRIMARY, 10),
+                backgroundColor: alpha(themeVars.color.primary.main, 15),
             },
             [lookSelectors.isActive]: {
-                backgroundColor: tint(PRIMARY, 20),
+                backgroundColor: alpha(themeVars.color.primary.main, 30),
             },
             [lookSelectors.isSelected]: {
-                backgroundColor: tint(PRIMARY, 12),
+                backgroundColor: alpha(themeVars.color.primary.main, 15),
             },
             [lookSelectors.isDisabled]: {
                 color: layerVars.contrast,
@@ -162,14 +191,14 @@ LookUtils.define(material, {
     decoration: {
         borderRadius: PILL_RADIUS,
         backgroundColor: "transparent",
-        color: tint(layerVars.contrast, 65),
+        color: alpha(layerVars.contrast, 60),
         selectors: {
             [lookSelectors.isHoveredPressable]: {
                 color: layerVars.contrast,
-                backgroundColor: tint(layerVars.contrast, 8),
+                backgroundColor: alpha(layerVars.contrast, 15),
             },
             [lookSelectors.isActive]: {
-                backgroundColor: tint(layerVars.contrast, 16),
+                backgroundColor: alpha(layerVars.contrast, 30),
             },
             [lookSelectors.isDisabled]: {
                 opacity: themeVars.disabled.opacity,
@@ -179,14 +208,14 @@ LookUtils.define(material, {
     input: {
         borderRadius: `${themeVars.borderRadius.half} ${themeVars.borderRadius.half} 0 0`,
         border: "2px solid transparent",
-        borderBottomColor: tint(layerVars.contrast, 40),
-        backgroundColor: tint(layerVars.contrast, 8),
+        borderBottomColor: alpha(layerVars.contrast, 60),
+        backgroundColor: alpha(layerVars.contrast, 15),
         color: layerVars.contrast,
         fontSize: themeVars.fontSize.medium,
         selectors: {
             [lookSelectors.isHovered]: {
-                borderBottomColor: tint(layerVars.contrast, 80),
-                backgroundColor: tint(layerVars.contrast, 12),
+                borderBottomColor: alpha(layerVars.contrast, 75),
+                backgroundColor: alpha(layerVars.contrast, 30),
             },
             [lookSelectors.isReadOnly]: {
                 borderBottomStyle: "dotted",
@@ -200,11 +229,11 @@ LookUtils.define(material, {
             },
             [lookSelectors.fieldText]: {
                 color: layerVars.contrast,
-                caretColor: PRIMARY,
+                caretColor: themeVars.color.primary.main,
                 fontSize: themeVars.fontSize.medium,
             },
             [lookSelectors.fieldTextDisabled]: {
-                color: tint(layerVars.contrast, 50),
+                color: alpha(layerVars.contrast, 45),
             },
         },
     },
@@ -243,13 +272,13 @@ LookUtils.define(material, {
     toggleTrack: {
         border: "2px solid transparent",
         borderRadius: PILL_RADIUS,
-        backgroundColor: tint(layerVars.contrast, 40),
+        backgroundColor: alpha(layerVars.contrast, 30),
         selectors: {
             [lookSelectors.withinError]: {
                 borderColor: themeVars.color.error.main,
             },
             [LookUtils.anyOf(lookSelectors.withinChecked, lookSelectors.withinMixed)]: {
-                backgroundColor: tint(PRIMARY, 50),
+                backgroundColor: alpha(themeVars.color.primary.main, 30),
             },
         },
     },
@@ -266,10 +295,10 @@ LookUtils.define(material, {
     progressTrack: {
         border: "2px solid transparent",
         borderRadius: themeVars.borderRadius.half,
-        backgroundColor: tint(PRIMARY, 25),
+        backgroundColor: alpha(themeVars.color.primary.main, 30),
         selectors: {
             [lookSelectors.hasError]: {
-                backgroundColor: tint(themeVars.color.error.main, 25),
+                backgroundColor: alpha(themeVars.color.error.main, 30),
             },
         },
     },
@@ -282,54 +311,49 @@ LookUtils.define(material, {
             },
         },
     },
-    rangeTrack: {
-        backgroundColor: tint(PRIMARY, 25),
+    rangeTrack: RANGE_TRACK,
+    rangeFill: RANGE_FILL,
+    rangeThumb: RANGE_THUMB,
+    slideButtonTrack: RANGE_TRACK,
+    slideButtonFill: RANGE_FILL,
+    slideButtonHint: {
+        fontWeight: "bold",
     },
-    rangeFill: {
-        backgroundColor: PRIMARY,
+    slideButtonThumb: RANGE_THUMB,
+    slideButtonArrow: {
+        stroke: themeVars.color.primary.main,
         selectors: {
             [lookSelectors.hasError]: {
-                backgroundColor: themeVars.color.error.main,
-            },
-        },
-    },
-    rangeThumb: {
-        borderRadius: "50%",
-        border: "2px solid transparent",
-        backgroundColor: themeVars.color.primary.light,
-        boxShadow: ELEVATION_1,
-        selectors: {
-            [lookSelectors.hasError]: {
-                backgroundColor: themeVars.color.error.light,
+                stroke: themeVars.color.error.main,
             },
         },
     },
     scrollerTrack: {
         selectors: {
             [lookSelectors.line]: {
-                backgroundColor: tint(layerVars.contrast, 25),
+                backgroundColor: alpha(layerVars.contrast, 30),
             },
         },
     },
     scrollerThumb: {
         selectors: {
             [lookSelectors.line]: {
-                backgroundColor: tint(layerVars.contrast, 60),
+                backgroundColor: alpha(layerVars.contrast, 60),
             },
             [lookSelectors.lineActive]: {
-                backgroundColor: PRIMARY,
+                backgroundColor: themeVars.color.primary.main,
             },
         },
     },
     tag: {
         borderRadius: PILL_RADIUS,
         paddingInline: themeVars.spacing.full,
-        backgroundColor: tint(layerVars.contrast, 12),
+        backgroundColor: alpha(layerVars.contrast, 15),
         color: layerVars.contrast,
         fontSize: themeVars.fontSize.xSmall,
         selectors: {
             [lookSelectors.isHovered]: {
-                backgroundColor: tint(layerVars.contrast, 20),
+                backgroundColor: alpha(layerVars.contrast, 30),
             },
             [lookSelectors.isDisabled]: {
                 opacity: themeVars.disabled.opacity,
@@ -338,11 +362,11 @@ LookUtils.define(material, {
     },
     hoverFloater: {
         borderRadius: themeVars.borderRadius.half,
-        backgroundColor: tint(layerVars.contrast, 8),
+        backgroundColor: alpha(layerVars.contrast, 15),
     },
     selectionFloater: {
         borderRadius: themeVars.borderRadius.half,
-        backgroundColor: tint(PRIMARY, 12),
+        backgroundColor: alpha(themeVars.color.primary.main, 15),
     },
     itemWithFloater: {
         borderRadius: themeVars.borderRadius.half,
@@ -354,7 +378,7 @@ LookUtils.define(material, {
         fontSize: themeVars.fontSize.medium,
         selectors: {
             [lookSelectors.isHovered]: {
-                backgroundColor: tint(layerVars.contrast, 8),
+                backgroundColor: alpha(layerVars.contrast, 15),
             },
             ...ITEM_STATES,
         },

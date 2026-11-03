@@ -17,6 +17,12 @@ export const accordionHeader = style([
         width: "100%",
         padding: themeVars.spacing.full,
         transition: `filter ${themeVars.animation.duration}`,
+
+        selectors: {
+            [`.${lookEntries.hollowSurface} &`]: {
+                borderRadius: "inherit",
+            },
+        },
     },
 ]);
 
@@ -50,12 +56,18 @@ export const accordionMarker = style({
 });
 
 export const accordionPanel = style([
-    lookEntries.panel,
+    lookEntries.accordionPanel,
     {
         display: "flex",
         flexDirection: "column",
         gap: themeVars.spacing.full,
         padding: themeVars.spacing.full,
         fontSize: themeVars.fontSize.small,
+
+        selectors: {
+            [`.${lookEntries.hollowSurface} &`]: {
+                borderRadius: "inherit",
+            },
+        },
     },
 ]);

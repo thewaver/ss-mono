@@ -47,7 +47,10 @@ export const PageSlideButtonContent = (props: ParentProps<SlideButtonContentProp
         >
             <div
                 class={styles.slideButtonFill}
-                classList={{ [styles.isTracking]: getIsTracking() }}
+                classList={{
+                    [styles.isTracking]: getIsTracking(),
+                    [styles.hasError]: access(props.renderProps).hasError,
+                }}
                 style={getIsVertical() ? { height: covered(getRatio()) } : { width: covered(getRatio()) }}
             />
 
@@ -60,10 +63,16 @@ export const PageSlideButtonContent = (props: ParentProps<SlideButtonContentProp
                 classList={{
                     [styles.isTracking]: getIsTracking(),
                     [styles.isFocused]: access(props.renderProps).isFocusVisible,
+                    [styles.hasError]: access(props.renderProps).hasError,
                 }}
                 style={getThumbStyle()}
             >
-                <svg class={styles.slideButtonArrow} viewBox="0 0 24 24" aria-hidden="true">
+                <svg
+                    class={styles.slideButtonArrow}
+                    classList={{ [styles.hasError]: access(props.renderProps).hasError }}
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                >
                     <path d="M5 12 H19 M13 6 L19 12 L13 18" />
                 </svg>
             </div>

@@ -7,6 +7,8 @@ export type * from "./Abstracts/CheckedState/CheckedState.types";
 export * from "./Abstracts/CheckedState/CheckedState.utils";
 export type * from "./Abstracts/ColorExtractor/ColorExtractor.types";
 export * from "./Abstracts/ColorExtractor/ColorExtractor.utils";
+export type * from "./Abstracts/CornerRun/CornerRun.types";
+export * from "./Abstracts/CornerRun/CornerRun.utils";
 export type * from "./Abstracts/Cutout/Cutout.types";
 export * from "./Abstracts/Cutout/Cutout.utils";
 export type * from "./Abstracts/DateTimeValue/DateTimeValue.types";

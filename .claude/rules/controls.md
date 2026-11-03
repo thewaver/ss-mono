@@ -160,6 +160,19 @@ to it. Valid because the root is neither focusable nor carries global ARIA. Not 
 relationship the DOM no longer shows; not hand-rolled items, which _"the composition is an implementation detail"_
 rules out. A consumer's own markup between a listbox and its items is theirs to mark.
 
+### A component passes the box's corners down to the painters that touch them
+
+The user's rule. A consumer who rounds the box around a component and writes `border-radius: inherit` in their
+painters must get matching corners without knowing what the component renders in between — `inherit` reads only
+the parent, so every element of the component's own between the box and a painter declares it. **Items in a row or
+column share the corners out** (`CornerRunUtils`): the first item's elements pass on the leading pair, the last
+item's the trailing pair, an item between them none, and two parts that meet square the seam themselves — so the
+consumer never counts children, which they cannot do anyway, since their painter is not the child the selector
+sees. Written in logical corners, so a right-to-left page needs nothing more; picked with `:nth-child(1 of …)`
+where siblings the run excludes (floaters, markers) sit beside it; at zero specificity where a consumer's own
+element can sit in the run (a group header), so their own radius still wins. Not a clip on the box, which would
+cut the focus ring of whatever touches its edge.
+
 ### An example that shows a picture gives it the picture's own proportions
 
 The user's rule, after two examples cropped a square picture into a landscape box. A Playground example sets the width

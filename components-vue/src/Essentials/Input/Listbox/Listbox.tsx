@@ -527,6 +527,7 @@ export const ListboxComposite = defineComponent(
                 <div
                     ref={rootRef}
                     id={cursor.listboxId.value}
+                    class={ListboxStyles.listboxRoot}
                     role="listbox"
                     aria-label={props.ariaLabel}
                     aria-multiselectable={isMultiple || undefined}

@@ -244,7 +244,7 @@ export const PaginatorRoot = (props: ParentProps<PaginatorRootProps>) => {
     const renderPieces = () => <PaginatorContextProvider value={context}>{props.children}</PaginatorContextProvider>;
 
     return (
-        <nav aria-label={access(props.ariaLabel)}>
+        <nav class={styles.paginatorRoot} aria-label={access(props.ariaLabel)}>
             <Show when={getLayout()} fallback={renderPieces()}>
                 {(getResolved) => (
                     <PlacementBox layout={getResolved} computeEffect={props.computeEffect}>

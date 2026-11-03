@@ -404,6 +404,7 @@ export const ListboxComposite = <T,>(props: ListboxCompositeProps<T>) => {
         <div
             ref={rootRef}
             id={listboxId}
+            className={ListboxStyles.listboxRoot}
             role="listbox"
             aria-label={props.ariaLabel}
             aria-multiselectable={isMultiple || undefined}

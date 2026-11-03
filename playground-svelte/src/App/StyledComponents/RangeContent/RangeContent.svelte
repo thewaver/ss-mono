@@ -19,6 +19,8 @@
 
     const orientation = $derived(props.renderProps.orientation);
 
+    const isPair = $derived(props.renderProps.ratios.length > 1);
+
     const length = $derived(props.length ?? DEFAULT_RANGE_CONTENT_LENGTH);
 
     const fill = $derived(props.renderProps.fill);
@@ -57,6 +59,8 @@
                 styles.rangeThumbVariants[orientation],
                 props.renderProps.focusVisibleThumb === index && styles.isFocused,
                 props.renderProps.hasError && styles.hasError,
+                isPair && index === 0 && styles.isStart,
+                isPair && index === 1 && styles.isEnd,
             ]}
             style={toStyle(orientation === "vertical" ? { bottom: travel(ratio) } : { insetInlineStart: travel(ratio) })}
         ></div>

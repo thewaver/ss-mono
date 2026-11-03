@@ -1,8 +1,17 @@
-import { style } from "@vanilla-extract/css";
+import { globalStyle, style } from "@vanilla-extract/css";
+
+import { CornerRunUtils } from "../../../Abstracts/CornerRun/CornerRun.utils";
+
+import { floater } from "../../../Abstracts/Floater/Floater.css";
+
+export const listboxRoot = style({
+    borderRadius: "inherit",
+});
 
 export const listboxOptions = style({
     position: "relative",
     isolation: "isolate",
+    borderRadius: "inherit",
 });
 
 export const listboxHorizontal = style({
@@ -31,6 +40,7 @@ export const listboxSizerRow = style({
 
 export const listboxOption = style({
     width: "100%",
+    borderRadius: "inherit",
     cursor: "pointer",
     pointerEvents: "all",
 
@@ -40,3 +50,21 @@ export const listboxOption = style({
         },
     },
 });
+
+const STACKED_OPTIONS = `${listboxOptions}:not(${listboxHorizontal})`;
+const LEVEL = `:is(${STACKED_OPTIONS}, ${STACKED_OPTIONS} [role="group"])`;
+const ITEM = `:not(${floater}, ${listboxEndMarker})`;
+
+globalStyle(`:where(${LEVEL} > ${ITEM})`, {
+    borderRadius: 0,
+});
+
+globalStyle(
+    `:where(${LEVEL} > ${ITEM}:nth-child(1 of ${ITEM}))`,
+    CornerRunUtils.computeEdge("column", "leading", "inherit"),
+);
+
+globalStyle(
+    `:where(${LEVEL} > ${ITEM}:nth-last-child(1 of ${ITEM}))`,
+    CornerRunUtils.computeEdge("column", "trailing", "inherit"),
+);

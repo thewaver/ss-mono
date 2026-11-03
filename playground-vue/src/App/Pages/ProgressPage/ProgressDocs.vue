@@ -16,6 +16,7 @@ import LiveRangeDocsExample from "./Docs/LiveRange.vue";
 import OutOfRangeDocsExample from "./Docs/OutOfRange.vue";
 import RightToLeftDocsExample from "./Docs/RightToLeft.vue";
 import RingDocsExample from "./Docs/Ring.vue";
+import VerticalDocsExample from "./Docs/Vertical.vue";
 
 const value = shallowRef(ProgressKnobs.STARTING_VALUE);
 const hasError = shallowRef(false);
@@ -60,6 +61,15 @@ const hasError = shallowRef(false);
 
     <PageDocsExample :path="`${DOCS_ROOT}/RightToLeft.vue`">
         <RightToLeftDocsExample />
+    </PageDocsExample>
+
+    <PageDocsSection
+        title="Standing upright"
+        content="Which way the bar runs is the painter's to decide: this one stands upright and fills from the bottom, and nothing about the component changes."
+    />
+
+    <PageDocsExample :path="`${DOCS_ROOT}/Vertical.vue`">
+        <VerticalDocsExample />
     </PageDocsExample>
 
     <PageDocsSection

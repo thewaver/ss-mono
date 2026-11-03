@@ -1,7 +1,12 @@
 <script lang="ts">
     import { onDestroy } from "svelte";
 
-    import { PAGINATOR_DEFAULTS, type PaginatorControlEntry, PaginatorUtils } from "@thewaver/ss-components";
+    import {
+        PAGINATOR_DEFAULTS,
+        type PaginatorControlEntry,
+        PaginatorUtils,
+        PaginatorStyles as styles,
+    } from "@thewaver/ss-components";
 
     import PlacementBox from "../../Primitives/PlacementBox/PlacementBox.svelte";
     import { setPaginatorContext } from "./Paginator.context.js";
@@ -56,7 +61,7 @@
     });
 </script>
 
-<nav aria-label={props.ariaLabel}>
+<nav class={styles.paginatorRoot} aria-label={props.ariaLabel}>
     {#if layout}
         <PlacementBox {layout} computeEffect={props.computeEffect}>
             {@render props.children?.()}

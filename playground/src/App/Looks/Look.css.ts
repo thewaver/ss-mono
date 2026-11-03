@@ -1,11 +1,17 @@
-import { layer, style } from "@vanilla-extract/css";
+import { createVar, fallbackVar, layer, style } from "@vanilla-extract/css";
 
 import type { LookEntry, LookState } from "./Look.types";
 
 export const lookLayer = layer("look");
 
+const barAngle = createVar();
+
+export const lookVars = {
+    barAngle: fallbackVar(barAngle, "90deg"),
+};
 export const lookEntries: Record<LookEntry, string> = {
     accordionHeader: style({}),
+    accordionPanel: style({}),
     blurredOverlay: style({}),
     button: style({}),
     buttonSimple: style({}),
@@ -14,6 +20,7 @@ export const lookEntries: Record<LookEntry, string> = {
     decoration: style({}),
     drawer: style({}),
     dropdown: style({}),
+    hollowSurface: style({}),
     hoverFloater: style({}),
     input: style({}),
     itemWithFloater: style({}),
@@ -31,6 +38,11 @@ export const lookEntries: Record<LookEntry, string> = {
     scrollerThumb: style({}),
     scrollerTrack: style({}),
     selectionFloater: style({}),
+    slideButtonArrow: style({}),
+    slideButtonFill: style({}),
+    slideButtonHint: style({}),
+    slideButtonThumb: style({}),
+    slideButtonTrack: style({}),
     surface: style({}),
     tag: style({}),
     toggleHandle: style({}),
@@ -46,6 +58,9 @@ export const lookStates: Record<LookState, string> = {
     isPressed: style({}),
     isChecked: style({}),
     isMixed: style({}),
+    isVertical: style({ vars: { [barAngle]: "0deg" } }),
+    isStart: style({}),
+    isEnd: style({}),
     isReadOnly: style({}),
     isDisabled: style({}),
     hasError: style({}),
@@ -68,8 +83,9 @@ export const lookSelectors = {
     withinMixed: `.${lookStates.isMixed} &`,
     withinError: `.${lookStates.hasError} &`,
     isHoveredPressable: `${PRESSABLE} &.${lookStates.isHovered}, &.${lookStates.isHovered}${PRESSABLE}`,
-    rightToLeft: "&:dir(rtl)",
-    withinErrorRightToLeft: `.${lookStates.hasError} &:dir(rtl)`,
+    isVertical: `&.${lookStates.isVertical}`,
+    isStart: `&.${lookStates.isStart}`,
+    isEnd: `&.${lookStates.isEnd}`,
     fieldText: ":has(> &)",
     fieldTextDisabled: `:has(> &.${lookStates.isDisabled})`,
     line: "&::before",

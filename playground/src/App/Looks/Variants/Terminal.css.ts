@@ -4,7 +4,7 @@ import { LookUtils } from "../Look.utils";
 
 import { layerVars } from "../../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../../Theme.css";
-import { lookSelectors } from "../Look.css";
+import { lookSelectors, lookVars } from "../Look.css";
 
 export const terminal = style({});
 
@@ -19,7 +19,7 @@ const RULE_STRONG = `1px solid ${dim(50)}`;
 const ACCENT_RULE = `1px solid ${themeVars.color.primary.main}`;
 
 const segments = (color: string) =>
-    `repeating-linear-gradient(90deg, ${color} 0 ${SEGMENT_WIDTH}px, transparent ${SEGMENT_WIDTH}px ${SEGMENT_WIDTH + SEGMENT_GAP}px)`;
+    `repeating-linear-gradient(${lookVars.barAngle}, ${color} 0 ${SEGMENT_WIDTH}px, transparent ${SEGMENT_WIDTH}px ${SEGMENT_WIDTH + SEGMENT_GAP}px)`;
 
 const BOX = {
     border: RULE,
@@ -44,6 +44,48 @@ const ITEM_STATES = {
     },
 } as const;
 
+const PANEL = {
+    borderRadius: 0,
+    backgroundColor: layerVars.main,
+    color: layerVars.contrast,
+    border: RULE,
+    fontFamily: MONO,
+} as const;
+
+const SURFACE = {
+    borderRadius: 0,
+    backgroundColor: themeVars.color.surface.dark,
+    color: themeVars.color.surface.contrast,
+    border: RULE,
+    fontFamily: MONO,
+} as const;
+
+const RANGE_TRACK = {
+    borderRadius: 0,
+    backgroundColor: dim(25),
+} as const;
+
+const RANGE_FILL = {
+    borderRadius: 0,
+    backgroundColor: themeVars.color.primary.main,
+    selectors: {
+        [lookSelectors.hasError]: {
+            backgroundColor: themeVars.color.error.main,
+        },
+    },
+} as const;
+
+const RANGE_THUMB = {
+    borderRadius: 0,
+    border: ACCENT_RULE,
+    backgroundColor: layerVars.main,
+    selectors: {
+        [lookSelectors.hasError]: {
+            borderColor: themeVars.color.error.main,
+        },
+    },
+} as const;
+
 LookUtils.define(terminal, {
     pageBackground: {
         backgroundColor: themeVars.color.background.dark,
@@ -56,20 +98,9 @@ LookUtils.define(terminal, {
         border: RULE,
         fontFamily: MONO,
     },
-    surface: {
-        borderRadius: 0,
-        backgroundColor: themeVars.color.surface.dark,
-        color: themeVars.color.surface.contrast,
-        border: RULE,
-        fontFamily: MONO,
-    },
-    panel: {
-        borderRadius: 0,
-        backgroundColor: layerVars.main,
-        color: layerVars.contrast,
-        border: RULE,
-        fontFamily: MONO,
-    },
+    surface: SURFACE,
+    hollowSurface: LookUtils.hollow(SURFACE),
+    panel: PANEL,
     tooltip: {
         borderRadius: 0,
         backgroundColor: layerVars.main,
@@ -98,6 +129,7 @@ LookUtils.define(terminal, {
             },
         },
     },
+    accordionPanel: PANEL,
     opaqueOverlay: {
         backgroundColor: themeVars.color.background.dark,
     },
@@ -259,24 +291,20 @@ LookUtils.define(terminal, {
             },
         },
     },
-    rangeTrack: {
-        backgroundColor: dim(25),
+    rangeTrack: RANGE_TRACK,
+    rangeFill: RANGE_FILL,
+    rangeThumb: RANGE_THUMB,
+    slideButtonTrack: RANGE_TRACK,
+    slideButtonFill: RANGE_FILL,
+    slideButtonHint: {
+        fontWeight: "bold",
     },
-    rangeFill: {
-        backgroundColor: themeVars.color.primary.main,
+    slideButtonThumb: RANGE_THUMB,
+    slideButtonArrow: {
+        stroke: themeVars.color.primary.main,
         selectors: {
             [lookSelectors.hasError]: {
-                backgroundColor: themeVars.color.error.main,
-            },
-        },
-    },
-    rangeThumb: {
-        borderRadius: 0,
-        border: ACCENT_RULE,
-        backgroundColor: layerVars.main,
-        selectors: {
-            [lookSelectors.hasError]: {
-                borderColor: themeVars.color.error.main,
+                stroke: themeVars.color.error.main,
             },
         },
     },

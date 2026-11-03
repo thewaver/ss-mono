@@ -17,6 +17,8 @@ export const PageRangeContent = (props: RangeContentProps) => {
 
     const getOrientation = () => access(props.renderProps).orientation;
 
+    const getIsPair = () => access(props.renderProps).ratios.length > 1;
+
     const getLength = () => access(props.length) ?? DEFAULT_RANGE_CONTENT_LENGTH;
 
     const getFillSpan = () => {
@@ -58,6 +60,8 @@ export const PageRangeContent = (props: RangeContentProps) => {
                             [styles.rangeThumbVariants[getOrientation()]]: true,
                             [styles.isFocused]: access(props.renderProps).focusVisibleThumb === getIndex(),
                             [styles.hasError]: access(props.renderProps).hasError,
+                            [styles.isStart]: getIsPair() && getIndex() === 0,
+                            [styles.isEnd]: getIsPair() && getIndex() === 1,
                         }}
                         style={
                             getOrientation() === "vertical"

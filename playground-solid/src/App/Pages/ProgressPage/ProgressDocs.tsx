@@ -14,6 +14,7 @@ import { LiveRangeDocsExample } from "./Docs/LiveRange";
 import { OutOfRangeDocsExample } from "./Docs/OutOfRange";
 import { RightToLeftDocsExample } from "./Docs/RightToLeft";
 import { RingDocsExample } from "./Docs/Ring";
+import { VerticalDocsExample } from "./Docs/Vertical";
 
 export const ProgressDocs = () => {
     const [getValue, setValue] = createSignal(ProgressKnobs.STARTING_VALUE);
@@ -64,6 +65,17 @@ export const ProgressDocs = () => {
 
             <PageDocsExample path={`${DOCS_ROOT}/RightToLeft.tsx`}>
                 <RightToLeftDocsExample />
+            </PageDocsExample>
+
+            <PageDocsSection
+                title={"Standing upright"}
+                content={
+                    "Which way the bar runs is the painter's to decide: this one stands upright and fills from the bottom, and nothing about the component changes."
+                }
+            />
+
+            <PageDocsExample path={`${DOCS_ROOT}/Vertical.tsx`}>
+                <VerticalDocsExample />
             </PageDocsExample>
 
             <PageDocsSection

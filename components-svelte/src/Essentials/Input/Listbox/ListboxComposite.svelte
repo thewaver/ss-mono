@@ -1,7 +1,7 @@
 <script lang="ts" generics="T">
     import { on } from "svelte/events";
 
-    import { LISTBOX_DEFAULTS } from "@thewaver/ss-components";
+    import { LISTBOX_DEFAULTS, ListboxStyles as styles } from "@thewaver/ss-components";
 
     import { NavigatorSvelteUtils } from "../../../Abstracts/Navigator/NavigatorSvelte.utils.svelte.js";
     import type { ListboxCompositeProps } from "./Listbox.types.js";
@@ -42,6 +42,7 @@
     bind:this={root}
     {@attach (element) => on(element, "keydown", (e) => cursor.handleKeyDown(e))}
     id={listboxId}
+    class={styles.listboxRoot}
     role="listbox"
     aria-label={props.ariaLabel}
     aria-multiselectable={isMultiple || undefined}

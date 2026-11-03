@@ -14,6 +14,7 @@
     import OutOfRangeDocsExample from "./Docs/OutOfRange.svelte";
     import RightToLeftDocsExample from "./Docs/RightToLeft.svelte";
     import RingDocsExample from "./Docs/Ring.svelte";
+    import VerticalDocsExample from "./Docs/Vertical.svelte";
 
     let value = $state(ProgressKnobs.STARTING_VALUE);
     let hasError = $state(false);
@@ -65,6 +66,15 @@
 
 <PageDocsExample path={`${DOCS_ROOT}/RightToLeft.svelte`}>
     <RightToLeftDocsExample />
+</PageDocsExample>
+
+<PageDocsSection
+    title={"Standing upright"}
+    content={"Which way the bar runs is the painter's to decide: this one stands upright and fills from the bottom, and nothing about the component changes."}
+/>
+
+<PageDocsExample path={`${DOCS_ROOT}/Vertical.svelte`}>
+    <VerticalDocsExample />
 </PageDocsExample>
 
 <PageDocsSection
