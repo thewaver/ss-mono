@@ -15,7 +15,14 @@ import {
 
 import type { ComponentConfig, MenuNodeConfig } from "./App.types";
 import { AppUtils } from "./App.utils";
-import { GALLERY_ROUTE, GETTING_STARTED_ROUTE, MENU_EDGE, MENU_ID, SEARCH_FIELD_WIDTH } from "./AppVue.const";
+import {
+    GALLERY_ROUTE,
+    GETTING_STARTED_ROUTE,
+    LOOKS_ROUTE,
+    MENU_EDGE,
+    MENU_ID,
+    SEARCH_FIELD_WIDTH,
+} from "./AppVue.const";
 import PageAppCommands from "./PageComponents/AppCommands/PageAppCommands.vue";
 import PageBuildProgress from "./PageComponents/BuildProgress/PageBuildProgress.vue";
 import PageTextField from "./PageComponents/Field/PageTextField.vue";
@@ -66,6 +73,8 @@ const isAboutSelected = computed(() => route.path === "/");
 const isGettingStartedSelected = computed(() => route.path === GETTING_STARTED_ROUTE);
 
 const isGallerySelected = computed(() => route.path === GALLERY_ROUTE);
+
+const isLooksSelected = computed(() => route.path === LOOKS_ROUTE);
 
 const isSearching = computed(() => searchTerm.value.trim().length > 0);
 
@@ -249,6 +258,10 @@ const computeNodeText = (node: TreeNode<MenuNodeConfig>) => node.value.name;
 
                                         <PageNavLink :href="GALLERY_ROUTE" :is-selected="isGallerySelected" is-gliding>
                                             Gallery
+                                        </PageNavLink>
+
+                                        <PageNavLink :href="LOOKS_ROUTE" :is-selected="isLooksSelected" is-gliding>
+                                            Looks
                                         </PageNavLink>
                                     </PageNavLinkGroup>
                                 </div>

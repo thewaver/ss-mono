@@ -28,6 +28,7 @@
         COMPONENT_CONFIGS_BY_ROUTE,
         GALLERY_ROUTE,
         GETTING_STARTED_ROUTE,
+        LOOKS_ROUTE,
         componentToRouteName,
         flattenConfigs,
         getIsBranchConfig,
@@ -139,6 +140,8 @@
     const isGettingStartedSelected = $derived(route.pathname === GETTING_STARTED_ROUTE);
 
     const isGallerySelected = $derived(route.pathname === GALLERY_ROUTE);
+
+    const isLooksSelected = $derived(route.pathname === LOOKS_ROUTE);
 
     $effect(() => {
         void route.pathname;
@@ -345,6 +348,10 @@
 
                                     <PageNavLink href={GALLERY_ROUTE} isSelected={isGallerySelected} isGliding={true}>
                                         Gallery
+                                    </PageNavLink>
+
+                                    <PageNavLink href={LOOKS_ROUTE} isSelected={isLooksSelected} isGliding={true}>
+                                        Looks
                                     </PageNavLink>
                                 </PageNavLinkGroup>
                             </div>

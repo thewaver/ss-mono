@@ -1,5 +1,7 @@
 import { style } from "@vanilla-extract/css";
 
+import { LOOK_COLUMN_MIN_WIDTH } from "./LooksPage.const";
+
 import { layoutVars } from "../../Layout.css";
 import { lookBoundary, lookEntries } from "../../Looks/Look.css";
 import { exampleContainer } from "../../PageComponents/Examples/Examples.css";
@@ -40,14 +42,14 @@ export const lookSamples = style([
 ]);
 
 export const lookColumns = style({
-    display: "flex",
-    flexDirection: "row",
-    flexWrap: "wrap",
-    alignItems: "start",
+    display: "grid",
+    gridTemplateColumns: `repeat(auto-fill, minmax(${LOOK_COLUMN_MIN_WIDTH}px, 1fr))`,
     gap: themeVars.spacing.double,
 });
 
 export const lookColumn = style([exampleContainer, { alignItems: "start", gap: themeVars.spacing.full }]);
+
+export const lookWideColumn = style({ gridColumn: "span 2" });
 
 export const lookColumnName = style({
     fontSize: themeVars.fontSize.small,
@@ -57,21 +59,25 @@ export const lookColumnName = style({
 export const lookStateGrid = style({
     display: "grid",
     gridTemplateColumns: "repeat(2, auto)",
+    width: "100%",
     alignItems: "center",
     gap: themeVars.spacing.full,
 });
+
+export const lookFittedStateGrid = style({ justifyContent: "start" });
 
 export const lookBarStack = style({
     display: "flex",
     flexDirection: "column",
     gap: themeVars.spacing.full,
+    width: "100%",
 });
 
 export const lookBarCell = style({
     display: "flex",
     flexDirection: "column",
     gap: themeVars.spacing.half,
-    width: 200,
+    width: "100%",
 });
 
 export const lookBarCaption = style({
@@ -82,7 +88,6 @@ export const lookBarCaption = style({
 export const lookPanel = style([
     lookEntries.panel,
     {
-        width: 160,
         padding: themeVars.spacing.full,
         fontSize: themeVars.fontSize.small,
     },
@@ -92,5 +97,5 @@ export const lookWideSample = style({
     display: "flex",
     flexDirection: "column",
     gap: themeVars.spacing.full,
-    width: 280,
+    width: "100%",
 });

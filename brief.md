@@ -54,7 +54,6 @@ They cluster, and no single item owns them.
 | #   | What                                          | Standing                                                                                                      |
 | --- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
 | 2   | **A consumer-facing layer above the library** | **Deferred to a near-future session of its own.** Painted, ready-to-use controls, as Magic UI sells templates |
-| 12  | **The Looks page in React, Vue and Svelte**   | Built in Solid only; the other three have no page and no nav link to it                                       |
 
 ## Waiting on browser support
 

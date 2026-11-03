@@ -4,7 +4,7 @@ import { SHOW_COMPOSITES } from "@thewaver/ss-playground/App/App.const";
 
 import type { MenuBranchConfig } from "./App.types";
 
-export { GETTING_STARTED_ROUTE, GALLERY_ROUTE } from "@thewaver/ss-playground/App/App.const";
+export { GETTING_STARTED_ROUTE, GALLERY_ROUTE, LOOKS_ROUTE } from "@thewaver/ss-playground/App/App.const";
 export {
     LIST_PAGELESS_COMPONENTS,
     SEARCH_FIELD_WIDTH,

@@ -11,6 +11,11 @@ export type LookSamplesProps = {
 
 export type LookSampleColumnProps = {
     name: string;
+    isWide?: boolean;
+};
+
+export type LookStateGridProps = {
+    isFitted?: boolean;
 };
 
 export type LookStateProps = {

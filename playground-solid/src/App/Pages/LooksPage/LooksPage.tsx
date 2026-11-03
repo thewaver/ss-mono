@@ -36,6 +36,7 @@ import {
     LOOK_SAMPLE_TABS,
     LOOK_SAMPLE_TAB_PANEL,
     LOOK_SAMPLE_TAGS,
+    computeLookRowId,
 } from "@thewaver/ss-playground/App/Pages/LooksPage/LooksPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/LooksPage/LooksPage.css";
 import { RADIO_GROUP_GAP } from "@thewaver/ss-playground/App/Pages/RadioPage/RadioPage.const";
@@ -47,6 +48,7 @@ import {
     FIELD_HEIGHT,
     FIELD_PADDING,
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
+import person from "@thewaver/ss-playground/App/person.svg";
 
 import { PageLayer } from "../../PageComponents/Layer/Layer";
 import { getAppliedLook, revealLook } from "../../PageComponents/Look/LookSolid.const";
@@ -54,6 +56,7 @@ import { PageTabPanel } from "../../PageComponents/TabPanel/TabPanel";
 import { PageAccordionHeader, PageAccordionPanel } from "../../StyledComponents/AccordionContent/AccordionContent";
 import { PageButtonContent } from "../../StyledComponents/ButtonContent/ButtonContent";
 import { PageCheckboxContent } from "../../StyledComponents/CheckboxContent/CheckboxContent";
+import { PageIcon } from "../../StyledComponents/Icon/Icon";
 import { PageProgressContent } from "../../StyledComponents/ProgressContent/ProgressContent";
 import { PageRadioContent } from "../../StyledComponents/RadioContent/RadioContent";
 import { PageRangeContent } from "../../StyledComponents/RangeContent/RangeContent";
@@ -64,14 +67,19 @@ import {
     PageTagInputContent,
     PageTagInputPlaceholder,
 } from "../../StyledComponents/TagInputContent/TagInputContent";
+import { PageTextFieldAdornment } from "../../StyledComponents/TextFieldAdornment/TextFieldAdornment";
 import { PageTextFieldContent } from "../../StyledComponents/TextFieldContent/TextFieldContent";
 import { PageToggleContent } from "../../StyledComponents/ToggleContent/ToggleContent";
-import type { LookRowProps, LookSampleColumnProps, LookSamplesProps, LookStateProps } from "./LooksPage.types";
-
-const computeRowId = (look: PlaygroundLook) => `look-row-${look}`;
+import type {
+    LookRowProps,
+    LookSampleColumnProps,
+    LookSamplesProps,
+    LookStateGridProps,
+    LookStateProps,
+} from "./LooksPage.types";
 
 const LookSampleColumn = (props: ParentProps<LookSampleColumnProps>) => (
-    <div class={styles.lookColumn}>
+    <div class={styles.lookColumn} classList={{ [styles.lookWideColumn]: props.isWide }}>
         <PageLayer level={1}>
             <div class={styles.lookColumnName}>{props.name}</div>
 
@@ -80,7 +88,11 @@ const LookSampleColumn = (props: ParentProps<LookSampleColumnProps>) => (
     </div>
 );
 
-const LookStateGrid = (props: ParentProps) => <div class={styles.lookStateGrid}>{props.children}</div>;
+const LookStateGrid = (props: ParentProps<LookStateGridProps>) => (
+    <div class={styles.lookStateGrid} classList={{ [styles.lookFittedStateGrid]: props.isFitted }}>
+        {props.children}
+    </div>
+);
 
 const LookBarStack = (props: ParentProps) => <div class={styles.lookBarStack}>{props.children}</div>;
 
@@ -115,6 +127,19 @@ const LookInputSample = (props: LookStateProps) => {
             hasError={props.hasError}
             ariaLabel={props.state}
             renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} />}
+            renderLeading={(getFlags) => (
+                <PageTextFieldAdornment flags={getFlags}>
+                    <PageIcon src={person} />
+                </PageTextFieldAdornment>
+            )}
+            renderTrailing={() => (
+                <Button
+                    isDisabled={props.isDisabled}
+                    renderContent={(getFlags) => (
+                        <PageTextFieldAdornment flags={getFlags}>Clear</PageTextFieldAdornment>
+                    )}
+                />
+            )}
         />
     );
 };
@@ -242,21 +267,64 @@ const LookSamples = (props: LookSamplesProps) => {
                 <div class={styles.lookPanel}>{"A panel inside a surface."}</div>
             </LookSampleColumn>
 
+            <LookSampleColumn name={"Tabs"}>
+                <div class={styles.lookWideSample}>
+                    <Tabs
+                        tabGap={ROW_TAB_GAP}
+                        ariaLabel={"Tabs"}
+                        tabs={getTabs}
+                        selectedValue={() => LOOK_SAMPLE_SELECTED_TAB}
+                        renderGutter={() => <PageTabGutter orientation={"horizontal"} />}
+                        renderSelectionFloater={(getVisibilityTarget, getTransitionDurationMs) => (
+                            <PageTabFloater
+                                orientation={"horizontal"}
+                                visibilityTarget={getVisibilityTarget}
+                                transitionDurationMs={getTransitionDurationMs}
+                            />
+                        )}
+                        renderTab={(getTab, getFlags) => (
+                            <PageTabContent
+                                flags={getFlags}
+                                orientation={"horizontal"}
+                                isSelected={() => getTab().value === LOOK_SAMPLE_SELECTED_TAB}
+                            >
+                                {getTab().value}
+                            </PageTabContent>
+                        )}
+                    />
+
+                    <PageTabPanel
+                        id={getPanelId(getIdPrefix(), LOOK_SAMPLE_SELECTED_TAB)}
+                        tabId={getTabId(getIdPrefix(), LOOK_SAMPLE_SELECTED_TAB)}
+                    >
+                        {LOOK_SAMPLE_TAB_PANEL}
+                    </PageTabPanel>
+                </div>
+            </LookSampleColumn>
+
+            <LookSampleColumn name={"Input"} isWide>
+                <LookStateGrid isFitted>
+                    <LookInputSample state={"Default"} />
+                    <LookInputSample state={"Read-only"} isReadOnly />
+                    <LookInputSample state={"Disabled"} isDisabled />
+                    <LookInputSample state={"Error"} hasError />
+                </LookStateGrid>
+            </LookSampleColumn>
+
+            <LookSampleColumn name={"Tags"} isWide>
+                <LookStateGrid isFitted>
+                    <LookTagSample state={"Default"} />
+                    <LookTagSample state={"Disabled"} isDisabled />
+                    <LookTagSample state={"Error"} hasError />
+                </LookStateGrid>
+            </LookSampleColumn>
+
             <LookSampleColumn name={"Button"}>
                 <LookStateGrid>
                     <LookButtonSample state={"Default"} />
                     <LookButtonSample state={"Pressed"} isPressed />
                     <LookButtonSample state={"Disabled"} isDisabled />
                     <LookButtonSample state={"Error"} hasError />
-                </LookStateGrid>
-            </LookSampleColumn>
-
-            <LookSampleColumn name={"Input"}>
-                <LookStateGrid>
-                    <LookInputSample state={"Default"} />
-                    <LookInputSample state={"Read-only"} isReadOnly />
-                    <LookInputSample state={"Disabled"} isDisabled />
-                    <LookInputSample state={"Error"} hasError />
                 </LookStateGrid>
             </LookSampleColumn>
 
@@ -303,55 +371,12 @@ const LookSamples = (props: LookSamplesProps) => {
                 </LookBarStack>
             </LookSampleColumn>
 
-            <LookSampleColumn name={"Tags"}>
-                <LookStateGrid>
-                    <LookTagSample state={"Default"} />
-                    <LookTagSample state={"Disabled"} isDisabled />
-                    <LookTagSample state={"Error"} hasError />
-                </LookStateGrid>
-            </LookSampleColumn>
-
             <LookSampleColumn name={"Slide button"}>
-                <LookStateGrid>
+                <LookBarStack>
                     <LookSlideSample state={"Default"} />
                     <LookSlideSample state={"Disabled"} isDisabled />
                     <LookSlideSample state={"Error"} hasError />
-                </LookStateGrid>
-            </LookSampleColumn>
-
-            <LookSampleColumn name={"Tabs"}>
-                <div class={styles.lookWideSample}>
-                    <Tabs
-                        tabGap={ROW_TAB_GAP}
-                        ariaLabel={"Tabs"}
-                        tabs={getTabs}
-                        selectedValue={() => LOOK_SAMPLE_SELECTED_TAB}
-                        renderGutter={() => <PageTabGutter orientation={"horizontal"} />}
-                        renderSelectionFloater={(getVisibilityTarget, getTransitionDurationMs) => (
-                            <PageTabFloater
-                                orientation={"horizontal"}
-                                visibilityTarget={getVisibilityTarget}
-                                transitionDurationMs={getTransitionDurationMs}
-                            />
-                        )}
-                        renderTab={(getTab, getFlags) => (
-                            <PageTabContent
-                                flags={getFlags}
-                                orientation={"horizontal"}
-                                isSelected={() => getTab().value === LOOK_SAMPLE_SELECTED_TAB}
-                            >
-                                {getTab().value}
-                            </PageTabContent>
-                        )}
-                    />
-
-                    <PageTabPanel
-                        id={getPanelId(getIdPrefix(), LOOK_SAMPLE_SELECTED_TAB)}
-                        tabId={getTabId(getIdPrefix(), LOOK_SAMPLE_SELECTED_TAB)}
-                    >
-                        {LOOK_SAMPLE_TAB_PANEL}
-                    </PageTabPanel>
-                </div>
+                </LookBarStack>
             </LookSampleColumn>
 
             <LookSampleColumn name={"Accordion"}>
@@ -384,7 +409,7 @@ const LookRow = (props: LookRowProps) => (
         ariaLabel={() => props.label}
         sizing={"fill"}
         renderContent={(getFlags) => (
-            <div id={computeRowId(props.look)} class={styles.lookRow}>
+            <div id={computeLookRowId(props.look)} class={styles.lookRow}>
                 <div class={styles.lookSampleBoundary}>
                     <div class={PLAYGROUND_LOOKS[props.look]}>
                         <div class={styles.lookSamples}>
@@ -406,7 +431,7 @@ export const LooksPage = () => {
 
     const pickLook = (look: PlaygroundLook) => {
         void revealLook(look, {
-            origin: document.getElementById(computeRowId(look)) ?? SHAPE_REVEAL_DEFAULTS.origin,
+            origin: document.getElementById(computeLookRowId(look)) ?? SHAPE_REVEAL_DEFAULTS.origin,
             durationMs: getPrefersReducedMotion() ? NO_MOTION_DURATION_MS : SHAPE_REVEAL_DEFAULTS.durationMs,
         });
     };

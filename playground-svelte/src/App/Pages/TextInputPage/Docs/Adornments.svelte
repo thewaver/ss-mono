@@ -4,7 +4,9 @@
         FIELD_GAP,
         FIELD_PADDING,
     } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
+    import person from "@thewaver/ss-playground/App/person.svg";
 
+    import PageIcon from "../../../StyledComponents/Icon/Icon.svelte";
     import PageTextFieldAdornment from "../../../StyledComponents/TextFieldAdornment/TextFieldAdornment.svelte";
     import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
     import PageTextFieldPlaceholder from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.svelte";
@@ -29,7 +31,7 @@
 
     {#snippet renderLeading(flags)}
         <PageTextFieldAdornment {flags}>
-            <span aria-hidden="true">👤︎</span>
+            <PageIcon src={person} />
         </PageTextFieldAdornment>
     {/snippet}
 

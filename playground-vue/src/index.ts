@@ -48,6 +48,10 @@ const router = createRouter({
                     component: () => import("./App/Pages/GalleryPage/GalleryPage.vue"),
                     props: { sections: AppUtils.GALLERY_SECTIONS },
                 },
+                {
+                    path: "looks",
+                    component: () => import("./App/Pages/LooksPage/LooksPage.vue"),
+                },
                 ...PAGE_ROUTES,
             ],
         },

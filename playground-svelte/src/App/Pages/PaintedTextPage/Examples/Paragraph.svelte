@@ -2,7 +2,7 @@
     import { PaintedText } from "@thewaver/ss-components-svelte";
     import * as styles from "@thewaver/ss-playground/App/Pages/PaintedTextPage/PaintedTextPage.css";
     import knight from "@thewaver/ss-playground/App/knight.webp";
-    import testFile from "@thewaver/ss-playground/App/test.svg?raw";
+    import testFile from "@thewaver/ss-playground/App/person.svg?raw";
 
     import { computeSampleDefs } from "../PaintedTextPageSvelte.const";
     import type { PaintedTextExampleProps } from "../PaintedTextPageSvelte.types";

@@ -5,7 +5,9 @@ import {
     FIELD_GAP,
     FIELD_PADDING,
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
+import person from "@thewaver/ss-playground/App/person.svg";
 
+import { PageIcon } from "../../../StyledComponents/Icon/Icon";
 import { PageTextFieldAdornment } from "../../../StyledComponents/TextFieldAdornment/TextFieldAdornment";
 import { PageTextFieldContent } from "../../../StyledComponents/TextFieldContent/TextFieldContent";
 import { PageTextFieldPlaceholder } from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder";
@@ -27,7 +29,7 @@ export const RightToLeftDocsExample = () => {
                 )}
                 renderLeading={(flags) => (
                     <PageTextFieldAdornment flags={flags}>
-                        <span aria-hidden="true">👤︎</span>
+                        <PageIcon src={person} />
                     </PageTextFieldAdornment>
                 )}
                 renderTrailing={() => (

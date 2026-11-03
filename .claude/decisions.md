@@ -165,6 +165,20 @@ change shape, not just where colors fall; several will be dropped once lived wit
 - **Aqua** — a glossy cap (a white gradient fading at the midline) over every colored control, pinstriped
   surfaces, sunken wells for inputs and tracks, jelly pills for buttons, tags and the selected item.
 
+**Fourteen more, prefixed `_`, are interpretations of the user's old Protos project** (protos.vercel.app; its
+source survives only in the site's published source maps), built for grading at the user's request, all fourteen
+of its themes including those whose names overlap a Look above — the user's point being that the earlier builds
+were bad, not the ideas. Each started as a copy of Plasticine's file, the user's method, and keeps all of its
+entries. Protos styled only a field, two buttons and a checkbox, from a random palette in JavaScript; the
+translation onto the Theme is: Protos' two accents → `primary` and `secondary`; its "mix" color (black or white
+against the background) → `layerVars.contrast`, and its inverse → that color inverted with relative color syntax;
+its shadow color (the background 25 lighter or darker) → `background.dark` darkened, clamped at zero; its
+lightness shifts, hue spins and mixes → `hsl(from …)` and `color-mix()`. Every Theme here is dark, so Protos'
+dark-background branch is the one taken. Protos painted a checkbox like its primary button; here a checked or mixed
+box takes the button's recipe and an unchecked one the field's. Everything Protos never styled (surfaces, tabs,
+bars, the accordion, floaters) is extrapolated from the field and button recipes, and is the part most open to
+the user's grading.
+
 **The mechanism is the user's option B**: every Look paints the same set of shared entry classes
 (`lookEntries` in `Looks/Look.css.ts` — `button`, `input`, `surface` and the rest), and a painter adds an entry by
 composing it, `style([lookEntries.button, { …layout }])`. A Look writes its rules once through
@@ -22119,7 +22133,11 @@ are drawn as fixed states instead. The nav previews made the same call.
 
 **Every part a Look paints is shown** — the user's option C, laid out at their direction: a wrapping row of
 columns, each an example box on the Look's own page background, each a grid of states for a control that has
-them; a control with no states to split (Surface, Tabs, Accordion) takes its column whole. Bars stack one per line,
+them; a control with no states to split (Surface, Tabs, Accordion) takes its column whole. **The columns are a
+grid of equal tracks** (`LOOK_COLUMN_MIN_WIDTH`, the user's number), each box filling its cell, and a group too wide
+for one track spans two (`lookWideColumn`: Input and Tags — the user's picks). **An empty cell left where
+a wide group wraps is accepted**, the user's call over letting the grid fill holes out of order; the groups are
+ordered by hand to keep holes few, Tags always straight after Input. Bars stack one per line,
 since two side by side overlap at that width. **Nothing that opens a popup is sampled**, since a portalled popup
 leaves the row's Look.
 
@@ -22128,6 +22146,15 @@ user's call, after a full `surface` holding a page background read as a box insi
 are drawn in the row's Look too, and what marks the picked row differs from row to row; the frame clips its
 contents so the background follows its corners, which leaves the focus ring alone, since the radio input that
 draws it sits outside the clipped painter.
+
+**Porting: where the four differ.** The row's id comes from `computeLookRowId` in the shared `LooksPage.const.ts`,
+since the row and the page's reveal origin both need it and Vue's two live in different files. Vue and Svelte split
+the row, the samples and each sample helper into files of their own; the state grid and bar stack, which are a bare
+`div` each, are written inline there. **Vue's sample helpers default every boolean prop to `undefined`**
+(`withDefaults`), because Vue turns a missing boolean prop into `false`, and `Button` handed `isPressed: false`
+writes `aria-pressed="false"` — a toggle button where Solid draws a plain one. Svelte seeds each sample's own state
+from its props inside `untrack`, so the seed is read once, as Solid's `createSignal(props.x)` does. The spec is
+`e2e/looksPage.spec.ts`, apart from `looks.spec.ts`, which tests the Look machinery rather than this page.
 
 ### The gallery page: every page's first example, live, on one page
 
@@ -22387,13 +22414,20 @@ with no capital. Open with a word of the sentence and bring the prop in after it
 
 ### The in-field adornment painter: a label outside a button, a button's look inside one
 
-`PageTextFieldAdornment` draws both static content in a field's leading or trailing slot (👤︎, £, px) and the look of
+`PageTextFieldAdornment` draws both static content in a field's leading or trailing slot (an icon, £, px) and the look of
 a small button there (Clear, Show), and the field hands it the field's own state either way. So the painter decides
 by where it sits: **inside `button` or `[role='button']`** it pads its sides, lights up on hover, and is small and
 uppercase; **anywhere else** it is a label, at the field's own text size (`FIELD_FONT_SIZE`), with no padding and no
 hover, and it still dims when disabled. The user's calls, one at a time, starting from the TextInput Docs page's
 username field, whose glyph lit up on hover, sat padded away from the text and looked small beside the placeholder.
 The sizing is provisional by the user's word: it is to be revisited once the other input pages are built.
+
+**An icon in a slot is drawn by `PageIcon`** (text such as £ or px stays text), the user's call after the 👤︎ glyph
+painted as a color emoji on one machine and as text on another, and `@` hung below the line beside the word it
+labeled. `PageIcon` takes an SVG's
+URL (`person.svg`, in `playground/src/App`) and uses it as the mask of a one-text-height box filled with
+`currentColor`, so the icon takes whatever color the painter around it has — dimmed, red — and is centered by the
+slot like any other content. A mask rather than `<img>`, because an image cannot read the page's `currentColor`.
 
 **`TextArea` follows the same template**: Basic is the fixed-height box with the three state knobs, then growing with
 what is typed — one example, at the user's request, with a Max rows knob starting at 8, the limit the old capped

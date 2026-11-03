@@ -22,6 +22,7 @@ import {
     GALLERY_NAME_SEPARATOR,
     GALLERY_ROUTE,
     GETTING_STARTED_ROUTE,
+    LOOKS_ROUTE,
     NAV_PREVIEW_ARROW,
     NAV_PREVIEW_OFFSET,
     NAV_PREVIEW_PLACEMENT,
@@ -93,6 +94,10 @@ const PageGettingStartedPage = lazy(() =>
 
 const PageGalleryPage = lazy(() =>
     import("./Pages/GalleryPage/GalleryPage").then((module) => ({ default: module.GalleryPage })),
+);
+
+const PageLooksPage = lazy(() =>
+    import("./Pages/LooksPage/LooksPage").then((module) => ({ default: module.LooksPage })),
 );
 
 const getIsBranchConfig = (node: MenuNodeConfig): node is MenuBranchConfig => "children" in node;
@@ -359,6 +364,7 @@ export function AppContent(props: { viewportAnchor: readonly [ViewportAnchor, (v
     const isAboutSelected = location.pathname === "/";
     const isGettingStartedSelected = location.pathname === GETTING_STARTED_ROUTE;
     const isGallerySelected = location.pathname === GALLERY_ROUTE;
+    const isLooksSelected = location.pathname === LOOKS_ROUTE;
 
     useEffect(restoreRootSlash, [location.pathname]);
 
@@ -553,6 +559,10 @@ export function AppContent(props: { viewportAnchor: readonly [ViewportAnchor, (v
                                             <PageNavLink href={GALLERY_ROUTE} isSelected={isGallerySelected} isGliding>
                                                 {"Gallery"}
                                             </PageNavLink>
+
+                                            <PageNavLink href={LOOKS_ROUTE} isSelected={isLooksSelected} isGliding>
+                                                {"Looks"}
+                                            </PageNavLink>
                                         </PageNavLinkGroup>
                                     </div>
 
@@ -682,6 +692,7 @@ export function App() {
                         <Route index={true} element={<PageAboutPage />} />
                         <Route path={GETTING_STARTED_ROUTE} element={<PageGettingStartedPage />} />
                         <Route path={GALLERY_ROUTE} element={<PageGalleryPage sections={GALLERY_SECTIONS} />} />
+                        <Route path={LOOKS_ROUTE} element={<PageLooksPage />} />
                         {COMPONENT_CONFIGS.map((config) => (
                             <Route key={config.name} path={componentToRouteName(config.name)}>
                                 <Route
