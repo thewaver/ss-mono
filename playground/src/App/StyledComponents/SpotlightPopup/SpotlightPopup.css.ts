@@ -1,10 +1,10 @@
 import { style } from "@vanilla-extract/css";
 
-import { lookEntries } from "../../Looks/Look.css";
+import { skinEntries } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 
 export const spotlightPopup = style([
-    lookEntries.tooltip,
+    skinEntries.tooltip,
     {
         display: "flex",
         flexDirection: "column",

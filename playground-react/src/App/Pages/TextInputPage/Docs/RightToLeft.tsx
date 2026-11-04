@@ -9,6 +9,7 @@ import person from "@thewaver/ss-playground/App/person.svg";
 
 import { PageIcon } from "../../../StyledComponents/Icon/Icon";
 import { PageTextFieldAdornment } from "../../../StyledComponents/TextFieldAdornment/TextFieldAdornment";
+import { PageTextFieldButtonContent } from "../../../StyledComponents/TextFieldButtonContent/TextFieldButtonContent";
 import { PageTextFieldContent } from "../../../StyledComponents/TextFieldContent/TextFieldContent";
 import { PageTextFieldPlaceholder } from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder";
 
@@ -38,7 +39,9 @@ export const RightToLeftDocsExample = () => {
                         onClick={() => {
                             valueState[1]("");
                         }}
-                        renderContent={(flags) => <PageTextFieldAdornment flags={flags}>Clear</PageTextFieldAdornment>}
+                        renderContent={(flags) => (
+                            <PageTextFieldButtonContent flags={flags}>Clear</PageTextFieldButtonContent>
+                        )}
                     />
                 )}
             />

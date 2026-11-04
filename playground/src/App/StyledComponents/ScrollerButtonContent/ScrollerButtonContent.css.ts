@@ -1,11 +1,11 @@
 import { style, styleVariants } from "@vanilla-extract/css";
 
-import { lookEntries, lookStates } from "../../Looks/Look.css";
+import { skinEntries, skinStates } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 
-export const isHovered = style([lookStates.isHovered]);
-export const isActive = style([lookStates.isActive]);
-export const isDisabled = style([lookStates.isDisabled]);
+export const isHovered = style([skinStates.isHovered]);
+export const isActive = style([skinStates.isActive]);
+export const isDisabled = style([skinStates.isDisabled]);
 
 const GLYPH_SIZE = 10;
 
@@ -43,7 +43,7 @@ export const scrollerButtonGlyphVariants = {
 };
 
 export const scrollerButton = style([
-    lookEntries.buttonSimple,
+    skinEntries.buttonSimple,
     {
         display: "flex",
         justifyContent: "center",

@@ -1,16 +1,16 @@
 import { style } from "@vanilla-extract/css";
 
-import { lookEntries, lookStates } from "../../Looks/Look.css";
+import { skinEntries, skinStates } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 
 export const SELECT_CLEAR_SIZE = 24;
 
-export const isHovered = style([lookStates.isHovered]);
-export const isActive = style([lookStates.isActive]);
-export const isDisabled = style([lookStates.isDisabled]);
+export const isHovered = style([skinStates.isHovered]);
+export const isActive = style([skinStates.isActive]);
+export const isDisabled = style([skinStates.isDisabled]);
 
 export const selectClear = style([
-    lookEntries.decoration,
+    skinEntries.decoration,
     {
         display: "flex",
         justifyContent: "center",

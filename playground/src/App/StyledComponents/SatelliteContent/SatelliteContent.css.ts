@@ -1,12 +1,12 @@
 import { style } from "@vanilla-extract/css";
 
-import { lookEntries } from "../../Looks/Look.css";
+import { skinEntries } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 
 const PILL_HEIGHT = 48;
 
 export const satelliteSubject = style([
-    lookEntries.panel,
+    skinEntries.panel,
     {
         display: "flex",
         justifyContent: "center",

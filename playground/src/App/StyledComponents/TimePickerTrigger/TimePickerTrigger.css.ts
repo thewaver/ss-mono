@@ -1,14 +1,14 @@
 import { style } from "@vanilla-extract/css";
 
-import { lookEntries, lookStates } from "../../Looks/Look.css";
+import { skinEntries, skinStates } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 
-export const isHovered = style([lookStates.isHovered]);
-export const isOpen = style([lookStates.isHovered]);
-export const isDisabled = style([lookStates.isDisabled]);
+export const isHovered = style([skinStates.isHovered]);
+export const isOpen = style([skinStates.isHovered]);
+export const isDisabled = style([skinStates.isDisabled]);
 
 export const timePickerTrigger = style([
-    lookEntries.decoration,
+    skinEntries.decoration,
     {
         display: "flex",
         justifyContent: "center",

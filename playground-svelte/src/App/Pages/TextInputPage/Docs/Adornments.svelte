@@ -8,6 +8,7 @@
 
     import PageIcon from "../../../StyledComponents/Icon/Icon.svelte";
     import PageTextFieldAdornment from "../../../StyledComponents/TextFieldAdornment/TextFieldAdornment.svelte";
+    import PageTextFieldButtonContent from "../../../StyledComponents/TextFieldButtonContent/TextFieldButtonContent.svelte";
     import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
     import PageTextFieldPlaceholder from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.svelte";
 
@@ -43,7 +44,7 @@
             }}
         >
             {#snippet renderContent(flags)}
-                <PageTextFieldAdornment {flags}>Clear</PageTextFieldAdornment>
+                <PageTextFieldButtonContent {flags}>Clear</PageTextFieldButtonContent>
             {/snippet}
         </Button>
     {/snippet}

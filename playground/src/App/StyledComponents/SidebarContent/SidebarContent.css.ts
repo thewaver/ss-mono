@@ -1,6 +1,6 @@
 import { style, styleVariants } from "@vanilla-extract/css";
 
-import { lookEntries } from "../../Looks/Look.css";
+import { skinEntries } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 import { layerVars } from "../Layer/Layer.css";
 
@@ -46,7 +46,7 @@ export const sidebarFrame = style({
 });
 
 export const sidebarSurface = style([
-    lookEntries.drawer,
+    skinEntries.drawer,
     {
         width: "100%",
         height: "100%",

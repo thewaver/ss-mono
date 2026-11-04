@@ -120,11 +120,13 @@ export const DEFAULT_THEME_VALUES = {
         primary: DEFAULT_PRIMARY,
         background: {
             dark: "rgb(0, 0, 0)",
+            main: "rgb(16, 16, 16)",
             light: "rgb(32, 32, 32)",
             contrast: "rgb(255, 255, 255)",
         },
         surface: {
             dark: "rgb(32, 32, 32)",
+            main: "rgb(48, 48, 48)",
             light: "rgb(64, 64, 64)",
             contrast: "rgb(255, 255, 255)",
         },
@@ -152,11 +154,13 @@ export const REACT_THEME_VALUES = {
         primary: REACT_PRIMARY,
         background: {
             dark: "hsl(240, 10%, 10%)",
+            main: "hsl(240, 10%, 15%)",
             light: "hsl(210, 15%, 20%)",
             contrast: "hsl(210, 100%, 95%)",
         },
         surface: {
             dark: "hsl(0, 10%, 10%)",
+            main: "hsl(0, 10%, 15%)",
             light: "hsl(30, 15%, 20%)",
             contrast: "hsl(30, 100%, 95%)",
         },
@@ -184,11 +188,13 @@ export const SOLID_THEME_VALUES = {
         primary: SOLID_PRIMARY,
         background: {
             dark: "hsl(0, 10%, 10%)",
+            main: "hsl(30, 10%, 15%)",
             light: "hsl(30, 15%, 20%)",
             contrast: "hsl(30, 100%, 95%)",
         },
         surface: {
             dark: "hsl(240, 10%, 10%)",
+            main: "hsl(210, 10%, 15%)",
             light: "hsl(210, 15%, 20%)",
             contrast: "hsl(210, 100%, 95%)",
         },
@@ -216,11 +222,13 @@ export const SVELTE_THEME_VALUES = {
         primary: SVELTE_PRIMARY,
         background: {
             dark: "hsl(300, 10%, 10%)",
+            main: "hsl(270, 15%, 15%)",
             light: "hsl(270, 15%, 20%)",
             contrast: "hsl(270, 100%, 95%)",
         },
         surface: {
             dark: "hsl(0, 10%, 10%)",
+            main: "hsl(30, 15%, 15%)",
             light: "hsl(30, 15%, 20%)",
             contrast: "hsl(30, 100%, 95%)",
         },
@@ -248,11 +256,13 @@ export const VUE_THEME_VALUES = {
         primary: VUE_PRIMARY,
         background: {
             dark: "hsl(0, 10%, 10%)",
+            main: "hsl(30, 15%, 15%)",
             light: "hsl(30, 15%, 20%)",
             contrast: "hsl(30, 100%, 95%)",
         },
         surface: {
             dark: "hsl(120, 10%, 10%)",
+            main: "hsl(90, 15%, 15%)",
             light: "hsl(90, 15%, 20%)",
             contrast: "hsl(90, 100%, 95%)",
         },

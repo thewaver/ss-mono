@@ -28,7 +28,7 @@
         COMPONENT_CONFIGS_BY_ROUTE,
         GALLERY_ROUTE,
         GETTING_STARTED_ROUTE,
-        LOOKS_ROUTE,
+        SKINS_ROUTE,
         componentToRouteName,
         flattenConfigs,
         getIsBranchConfig,
@@ -141,7 +141,7 @@
 
     const isGallerySelected = $derived(route.pathname === GALLERY_ROUTE);
 
-    const isLooksSelected = $derived(route.pathname === LOOKS_ROUTE);
+    const isSkinsSelected = $derived(route.pathname === SKINS_ROUTE);
 
     $effect(() => {
         void route.pathname;
@@ -350,8 +350,8 @@
                                         Gallery
                                     </PageNavLink>
 
-                                    <PageNavLink href={LOOKS_ROUTE} isSelected={isLooksSelected} isGliding={true}>
-                                        Looks
+                                    <PageNavLink href={SKINS_ROUTE} isSelected={isSkinsSelected} isGliding={true}>
+                                        Skins
                                     </PageNavLink>
                                 </PageNavLinkGroup>
                             </div>

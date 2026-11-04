@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { COLLAPSIBLE_DEFAULTS } from "@thewaver/ss-components-vue";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/AccordionContent/AccordionContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
@@ -17,6 +18,7 @@ const layerClass = useLayerClass();
             flags.isExpanded && styles.isExpanded,
             flags.isHovered && styles.isHovered,
             flags.isDisabled && styles.isDisabled,
+            flags.isExpanded && styles.headerJoins[side ?? COLLAPSIBLE_DEFAULTS.side],
         ]"
     >
         <div><slot /></div>

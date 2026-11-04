@@ -1,6 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
-import { lookEntries } from "../../Looks/Look.css";
+import { skinEntries } from "../../Skins/Skin.css";
 
 export const isVisible = style({});
 
@@ -17,6 +17,6 @@ const glideFloaterBase = style({
     },
 });
 
-export const selectionGlideFloater = style([lookEntries.selectionFloater, glideFloaterBase]);
+export const selectionGlideFloater = style([skinEntries.selectionFloater, glideFloaterBase]);
 
-export const highlightGlideFloater = style([lookEntries.hoverFloater, glideFloaterBase]);
+export const highlightGlideFloater = style([skinEntries.hoverFloater, glideFloaterBase]);

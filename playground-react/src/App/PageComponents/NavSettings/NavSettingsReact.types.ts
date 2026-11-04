@@ -1,7 +1,7 @@
 import type { ViewportAnchor } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.types";
 
 export type {
-    PlaygroundLook,
+    PlaygroundSkin,
     PlaygroundTheme,
     ViewportAnchor,
     NavSettingsOption,

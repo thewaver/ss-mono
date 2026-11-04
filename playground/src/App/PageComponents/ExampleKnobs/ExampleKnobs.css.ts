@@ -1,6 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
-import { lookEntries } from "../../Looks/Look.css";
+import { skinEntries } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 
 const KNOBS_WIDTH = 360;
@@ -8,7 +8,7 @@ const KNOBS_WIDTH = 360;
 export const isVisible = style({});
 
 export const exampleKnobsSurface = style([
-    lookEntries.surface,
+    skinEntries.surface,
     {
         boxSizing: "border-box",
         minWidth: KNOBS_WIDTH,

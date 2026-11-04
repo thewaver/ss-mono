@@ -7,7 +7,7 @@ import {
     FIELD_PADDING,
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
-import PageTextFieldAdornment from "../../../StyledComponents/TextFieldAdornment/TextFieldAdornment.vue";
+import PageTextFieldButtonContent from "../../../StyledComponents/TextFieldButtonContent/TextFieldButtonContent.vue";
 import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 import PageTextFieldPlaceholder from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.vue";
 
@@ -39,7 +39,9 @@ const toggleReveal = () => {
         <template #renderTrailing>
             <Button @click="toggleReveal">
                 <template #renderContent="flags">
-                    <PageTextFieldAdornment :flags="flags">{{ reveal ? "Hide" : "Show" }}</PageTextFieldAdornment>
+                    <PageTextFieldButtonContent :flags="flags">{{
+                        reveal ? "Hide" : "Show"
+                    }}</PageTextFieldButtonContent>
                 </template>
             </Button>
         </template>

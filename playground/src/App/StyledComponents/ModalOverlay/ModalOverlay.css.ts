@@ -1,13 +1,13 @@
 import { styleVariants } from "@vanilla-extract/css";
 
-import { lookEntries } from "../../Looks/Look.css";
+import { skinEntries } from "../../Skins/Skin.css";
 
 export const blurredOverlayVariants = styleVariants({
-    on: [lookEntries.blurredOverlay],
+    on: [skinEntries.blurredOverlay],
     off: { backdropFilter: "none" },
 });
 
 export const opaqueOverlayVariants = styleVariants({
-    on: [lookEntries.opaqueOverlay, { opacity: 1 }],
-    off: [lookEntries.opaqueOverlay, { opacity: 0 }],
+    on: [skinEntries.opaqueOverlay, { opacity: 1 }],
+    off: [skinEntries.opaqueOverlay, { opacity: 0 }],
 });

@@ -15,12 +15,12 @@ import { docsDemo, docsExample, docsSettled, prop } from "./helpers";
  * rect rather than Playwright's box, which reports nothing for an element seen exactly edge-on.
  */
 const CAROUSEL_DOCS = "/src/App/Pages/Carousels/CarouselPage/Docs";
-const LOOKS = docsDemo(CAROUSEL_DOCS, "Looks");
-const LOOKS_EXAMPLE = docsExample(CAROUSEL_DOCS, "Looks");
+const SKINS = docsDemo(CAROUSEL_DOCS, "Skins");
+const SKINS_EXAMPLE = docsExample(CAROUSEL_DOCS, "Skins");
 
-const slide = `${LOOKS} [aria-roledescription="slide"]`;
+const slide = `${SKINS} [aria-roledescription="slide"]`;
 const currentSlide = `${slide}:not([aria-hidden="true"])`;
-const viewport = `${LOOKS} [aria-roledescription="carousel"] > div:first-child`;
+const viewport = `${SKINS} [aria-roledescription="carousel"] > div:first-child`;
 const paintedWidth = (page: import("@playwright/test").Page, index: number) =>
     page
         .locator(slide)
@@ -35,7 +35,7 @@ const slideTransform = (page: import("@playwright/test").Page) =>
         .evaluate((element) => (element as HTMLElement).style.transform);
 
 const pickOption = async (page: import("@playwright/test").Page, key: string, name: string) => {
-    const picker = page.locator(`${LOOKS_EXAMPLE} ${prop(key)} [role="combobox"]`);
+    const picker = page.locator(`${SKINS_EXAMPLE} ${prop(key)} [role="combobox"]`);
 
     await picker.click();
     await page
@@ -95,7 +95,7 @@ test("a step turns every paddle round the spine and moves the current one", asyn
 
     expect(before, "a paddle turns about the upright spine on a carousel running across").toContain("rotateY(");
 
-    await page.locator(`${LOOKS} button[aria-label="Next slide"]`).click();
+    await page.locator(`${SKINS} button[aria-label="Next slide"]`).click();
 
     await expect(page.locator(currentSlide), "the step lands on the next paddle").toHaveAttribute(
         "aria-label",

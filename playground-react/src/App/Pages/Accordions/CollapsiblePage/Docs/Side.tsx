@@ -22,7 +22,11 @@ export const SideDocsExample = (props: Props) => (
                 </PageAccordionHeader>
             )}
             renderPanel={(visibilityTarget, transitionDurationMs) => (
-                <PageAccordionPanel visibilityTarget={visibilityTarget} transitionDurationMs={transitionDurationMs}>
+                <PageAccordionPanel
+                    side={props.side}
+                    visibilityTarget={visibilityTarget}
+                    transitionDurationMs={transitionDurationMs}
+                >
                     <div style={{ width: `${PANEL_WIDTH}px` }}>
                         Opens beside its trigger rather than below it, uncovering contents that keep their own width.
                     </div>

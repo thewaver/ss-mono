@@ -1,7 +1,7 @@
 import { style, styleVariants } from "@vanilla-extract/css";
 
 import { layoutVars } from "../../Layout.css";
-import { lookEntries } from "../../Looks/Look.css";
+import { skinEntries } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 
 const examplesRoot = style({
@@ -30,7 +30,7 @@ export const examplesRootVariants = styleVariants({
 });
 
 export const exampleContainer = style([
-    lookEntries.surface,
+    skinEntries.surface,
     {
         display: "flex",
         flexDirection: "column",

@@ -1,11 +1,11 @@
 import { style } from "@vanilla-extract/css";
 
-import { lookEntries, lookStates } from "../../Looks/Look.css";
+import { skinEntries, skinStates } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 
-export const isHovered = style([lookStates.isHovered]);
-export const isSelected = style([lookStates.isSelected]);
-export const isDisabled = style([lookStates.isDisabled]);
+export const isHovered = style([skinStates.isHovered]);
+export const isSelected = style([skinStates.isSelected]);
+export const isDisabled = style([skinStates.isDisabled]);
 
 const selectOptionBase = style({
     display: "flex",
@@ -17,9 +17,9 @@ const selectOptionBase = style({
     transition: `background-color ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}`,
 });
 
-export const selectOptionContent = style([lookEntries.itemWithFloater, selectOptionBase]);
+export const selectOptionContent = style([skinEntries.itemWithFloater, selectOptionBase]);
 
-export const selectOptionContentWithoutFloater = style([lookEntries.itemWithoutFloater, selectOptionBase]);
+export const selectOptionContentWithoutFloater = style([skinEntries.itemWithoutFloater, selectOptionBase]);
 
 export const selectOptionText = style({
     display: "flex",

@@ -20,7 +20,7 @@
         {/snippet}
 
         {#snippet renderPanel(visibilityTarget, transitionDurationMs)}
-            <PageAccordionPanel {visibilityTarget} {transitionDurationMs}>
+            <PageAccordionPanel side={props.side} {visibilityTarget} {transitionDurationMs}>
                 <div style:width={`${PANEL_WIDTH}px`}>
                     Opens beside its trigger rather than below it, uncovering contents that keep their own width.
                 </div>

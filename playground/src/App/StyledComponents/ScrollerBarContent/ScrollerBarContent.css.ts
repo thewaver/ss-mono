@@ -1,13 +1,13 @@
 import { style, styleVariants } from "@vanilla-extract/css";
 
-import { lookEntries, lookStates } from "../../Looks/Look.css";
+import { skinEntries, skinStates } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 
 export const SCROLLER_BAR_THICKNESS = 24;
 export const SCROLLER_BAR_LINE = 6;
 
 export const isHidden = style({});
-export const isDragging = style([lookStates.isActive]);
+export const isDragging = style([skinStates.isActive]);
 
 export const scrollerBar = style({
     display: "flex",
@@ -34,7 +34,7 @@ export const scrollerBarVariants = styleVariants({
 });
 
 export const scrollerBarTrack = style([
-    lookEntries.scrollerTrack,
+    skinEntries.scrollerTrack,
     {
         position: "relative",
         flexGrow: 1,
@@ -75,7 +75,7 @@ export const scrollerBarTrackVariants = styleVariants({
 });
 
 export const scrollerBarThumb = style([
-    lookEntries.scrollerThumb,
+    skinEntries.scrollerThumb,
     {
         position: "absolute",
 

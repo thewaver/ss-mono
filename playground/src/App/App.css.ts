@@ -1,11 +1,11 @@
 import { globalStyle, style } from "@vanilla-extract/css";
 
 import { layoutVars } from "./Layout.css";
-import { lookEntries } from "./Looks/Look.css";
+import { skinEntries } from "./Skins/Skin.css";
 import { themeVars } from "./Theme.css";
 
 export const appRoot = style([
-    lookEntries.pageBackground,
+    skinEntries.pageBackground,
     {
         position: "relative",
         width: "100%",
@@ -31,7 +31,7 @@ export const appContent = style({
 });
 
 export const leftMenu = style([
-    lookEntries.drawer,
+    skinEntries.drawer,
     {
         boxSizing: "border-box",
         width: "100%",
@@ -199,7 +199,7 @@ globalStyle(`${dependencyDisclosure} [aria-expanded]`, {
 });
 
 export const dependencySummary = style([
-    lookEntries.panel,
+    skinEntries.panel,
     {
         display: "flex",
         alignItems: "center",
@@ -242,7 +242,7 @@ export const dependencyLabel = style({
 });
 
 const dependencyChip = style([
-    lookEntries.panel,
+    skinEntries.panel,
     {
         padding: `${themeVars.spacing.half} ${themeVars.spacing.full}`,
         fontFamily: "monospace",

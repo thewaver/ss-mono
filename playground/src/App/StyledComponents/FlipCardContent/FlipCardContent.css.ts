@@ -1,6 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
-import { lookEntries } from "../../Looks/Look.css";
+import { skinEntries } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 import { layerVars } from "../Layer/Layer.css";
 
@@ -17,7 +17,7 @@ const cardFace = style({
     userSelect: "none",
 });
 
-export const flipCardFront = style([lookEntries.panel, cardFace]);
+export const flipCardFront = style([skinEntries.panel, cardFace]);
 
 export const flipCardBack = style([
     cardFace,

@@ -1,12 +1,12 @@
 import { globalStyle, style } from "@vanilla-extract/css";
 
-import { lookEntries, lookStates } from "../../Looks/Look.css";
+import { skinEntries, skinStates } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 import { layerVars } from "../Layer/Layer.css";
 
-export const isHovered = style([lookStates.isHovered]);
+export const isHovered = style([skinStates.isHovered]);
 export const isActive = style({});
-export const isDisabled = style([lookStates.isDisabled]);
+export const isDisabled = style([skinStates.isDisabled]);
 
 const menuItemBase = style({
     display: "flex",
@@ -24,9 +24,9 @@ const menuItemBase = style({
     },
 });
 
-export const menuItemContent = style([lookEntries.itemWithFloater, menuItemBase]);
+export const menuItemContent = style([skinEntries.itemWithFloater, menuItemBase]);
 
-export const menuItemContentWithoutFloater = style([lookEntries.itemWithoutFloater, menuItemBase]);
+export const menuItemContentWithoutFloater = style([skinEntries.itemWithoutFloater, menuItemBase]);
 
 export const menuItemShortcut = style({
     opacity: 0.5,

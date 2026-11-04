@@ -1,13 +1,13 @@
 import { style } from "@vanilla-extract/css";
 
-import { lookEntries, lookStates } from "../../Looks/Look.css";
+import { skinEntries, skinStates } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 import { layerVars } from "../Layer/Layer.css";
 
 export const isCurrent = style({});
-export const isHovered = style([lookStates.isHovered]);
-export const isActive = style([lookStates.isActive]);
-export const isDisabled = style([lookStates.isDisabled]);
+export const isHovered = style([skinStates.isHovered]);
+export const isActive = style([skinStates.isActive]);
+export const isDisabled = style([skinStates.isDisabled]);
 
 const cellBase = style({
     display: "flex",
@@ -39,7 +39,7 @@ const cellText = style({
 });
 
 export const paginatorPage = style([
-    lookEntries.buttonSimple,
+    skinEntries.buttonSimple,
     cellBase,
     {
         selectors: {
@@ -52,7 +52,7 @@ export const paginatorPage = style([
     },
 ]);
 
-export const paginatorStep = style([lookEntries.buttonSimple, cellBase]);
+export const paginatorStep = style([skinEntries.buttonSimple, cellBase]);
 
 export const paginatorGap = style([
     cellBase,
@@ -173,7 +173,7 @@ export const paginatorDemo = style({
 });
 
 export const paginatorPanel = style([
-    lookEntries.panel,
+    skinEntries.panel,
     {
         display: "flex",
         flexDirection: "column",

@@ -3,7 +3,7 @@ import { style } from "@vanilla-extract/css";
 import { LAYOUT } from "../../Layout.const";
 
 import { layoutVars } from "../../Layout.css";
-import { lookEntries } from "../../Looks/Look.css";
+import { skinEntries } from "../../Skins/Skin.css";
 import { layerVars } from "../../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../../Theme.css";
 
@@ -82,7 +82,7 @@ export const docsEmpty = style({
 });
 
 export const docsTableScroller = style([
-    lookEntries.panel,
+    skinEntries.panel,
     {
         overflowX: "auto",
     },

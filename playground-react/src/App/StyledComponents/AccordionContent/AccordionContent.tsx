@@ -1,5 +1,6 @@
 import type { PropsWithChildren } from "react";
 
+import { COLLAPSIBLE_DEFAULTS } from "@thewaver/ss-components-react";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/AccordionContent/AccordionContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
@@ -16,6 +17,7 @@ export const PageAccordionHeader = (props: PropsWithChildren<AccordionHeaderProp
                 props.flags.isExpanded && styles.isExpanded,
                 props.flags.isHovered && styles.isHovered,
                 props.flags.isDisabled && styles.isDisabled,
+                props.flags.isExpanded && styles.headerJoins[props.side ?? COLLAPSIBLE_DEFAULTS.side],
             ]
                 .filter(Boolean)
                 .join(" ")}
@@ -34,7 +36,13 @@ export const PageAccordionPanel = (props: PropsWithChildren<AccordionPanelProps>
 
     return (
         <div
-            className={[styles.accordionPanel, layerClass].join(" ")}
+            className={[
+                styles.accordionPanel,
+                layerClass,
+                props.visibilityTarget === 1 && styles.panelJoins[props.side ?? COLLAPSIBLE_DEFAULTS.side],
+            ]
+                .filter(Boolean)
+                .join(" ")}
             style={{
                 opacity: props.visibilityTarget,
                 transition: `opacity ${props.transitionDurationMs}ms`,

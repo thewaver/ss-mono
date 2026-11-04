@@ -1,10 +1,10 @@
-import type { NavSettingsOption, PlaygroundLook, PlaygroundTheme, ViewportAnchor } from "./NavSettings.types";
+import type { NavSettingsOption, PlaygroundSkin, PlaygroundTheme, ViewportAnchor } from "./NavSettings.types";
 
 export const DEFAULT_VIEWPORT_ANCHOR: ViewportAnchor = "auto";
 
 export const THEME_FIELD_ID = "playgroundTheme";
 
-export const LOOK_FIELD_ID = "playgroundLook";
+export const SKIN_FIELD_ID = "playgroundSkin";
 
 export const VIEWPORT_ANCHOR_OPTIONS: NavSettingsOption<ViewportAnchor>[] = [
     { value: "none", label: "None" },
@@ -21,9 +21,11 @@ export const THEME_OPTIONS: NavSettingsOption<PlaygroundTheme>[] = [
     { value: "vue", label: "Vue" },
 ];
 
-export const LOOK_OPTIONS: NavSettingsOption<PlaygroundLook>[] = [
-    { value: "material", label: "Material" },
+export const SKIN_OPTIONS: NavSettingsOption<PlaygroundSkin>[] = [
+    // GROOMED
     { value: "plasticine", label: "Plasticine" },
+    // OTHER
+    { value: "material", label: "Material" },
     { value: "retroOS", label: "Retro OS" },
     { value: "terminal", label: "Terminal" },
     { value: "_acrylic", label: "_Acrylic" },

@@ -25,9 +25,9 @@ a store has to write themselves.
 
 The user's rule. A color group is `dark` / `main` / `light` / `contrast` (or without `main`):
 
-- **A background drawn as a gradient from `dark` to `light` is Plasticine's look**, written in its Look file — not a
-  rule for painters, which the user withdrew once Looks existed. The calendar's and the clock's selected item take a
-  flat `primary.main` at the user's request, so they read the same under every Look.
+- **A background drawn as a gradient from `dark` to `light` is Plasticine's look**, written in its Skin file — not a
+  rule for painters, which the user withdrew once Skins existed. The calendar's and the clock's selected item take a
+  flat `primary.main` at the user's request, so they read the same under every Skin.
 - **`color` only takes `main` or `contrast`**: `main` for a colored accent on a dark surface, `contrast` on its own
   family's background. Never `dark` or `light`.
 

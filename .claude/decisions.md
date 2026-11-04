@@ -111,21 +111,21 @@ line that divides parts of something — table rows, a tab row's gutter, a docs 
 a grid's cell lines — is not a stroke and keeps its own alpha. Alphas stay on 25, 50 and 75, with 10, 35
 and 65 where a step is needed.
 
-### Looks
+### Skins
 
-**A Theme is pure colors; a Look is shape and where those colors go** — the user's split. Plasticine paints a
-gradient button; another Look might paint a bordered one with heavily rounded corners, from the same Theme. A
-Look owns everything that paints — color, background, shadow, border, radius, padding, font — while display,
-size, position, z-index, transforms and transitions stay in the painter, for now. **A Look is picked the way a
-Theme is**: a class on `<html>`, swapped from the left nav's settings (`PageComponents/Look`, beside
-`PageComponents/Theme`), from `PLAYGROUND_LOOKS` in `Looks/Look.const.ts`. **No Look reads the theme's shadow
+**A Theme is pure colors; a Skin is shape and where those colors go** — the user's split. Plasticine paints a
+gradient button; another Skin might paint a bordered one with heavily rounded corners, from the same Theme. A
+Skin owns everything that paints — color, background, shadow, border, radius, padding, font — while display,
+size, position, z-index, transforms and transitions stay in the painter, for now. **A Skin is picked the way a
+Theme is**: a class on `<html>`, swapped from the left nav's settings (`PageComponents/Skin`, beside
+`PageComponents/Theme`), from `PLAYGROUND_SKINS` in `Skins/Skin.const.ts`. **No Skin reads the theme's shadow
 scale**: Plasticine and Glass hold their own copies (`SHADOW_SMALL`, `SHADOW_MEDIUM`, `SHADOW_LARGE`), and
-`themeVars.shadow` stays only for the custom painters outside the Looks, until the user decides their shadows. **Every Look lives in
-`Looks/Variants/`**, one file each, the user's placement; `Looks/` itself holds only the machinery.
+`themeVars.shadow` stays only for the custom painters outside the Skins, until the user decides their shadows. **Every Skin lives in
+`Skins/Variants/`**, one file each, the user's placement; `Skins/` itself holds only the machinery.
 
-**Fourteen Looks were built, Plasticine being the default; `PLAYGROUND_LOOKS` holds the ones still kept**, and
+**Fourteen Skins were built, Plasticine being the default; `PLAYGROUND_SKINS` holds the ones still kept**, and
 the list below describes all fourteen. The user approved the first six from a published
-reference each and asked for every further idea to be built for rating, with the warning that a Look has to
+reference each and asked for every further idea to be built for rating, with the warning that a Skin has to
 change shape, not just where colors fall; several will be dropped once lived with:
 
 - **Plasma** — flat and bordered: no gradient or shadow anywhere, 2px rims in the layer's `contrast` color,
@@ -167,7 +167,7 @@ change shape, not just where colors fall; several will be dropped once lived wit
 
 **Fourteen more, prefixed `_`, are interpretations of the user's old Protos project** (protos.vercel.app; its
 source survives only in the site's published source maps), built for grading at the user's request, all fourteen
-of its themes including those whose names overlap a Look above — the user's point being that the earlier builds
+of its themes including those whose names overlap a Skin above — the user's point being that the earlier builds
 were bad, not the ideas. Each started as a copy of Plasticine's file, the user's method, and keeps all of its
 entries. Protos styled only a field, two buttons and a checkbox, from a random palette in JavaScript; the
 translation onto the Theme is: Protos' two accents → `primary` and `secondary`; its "mix" color (black or white
@@ -179,42 +179,46 @@ box takes the button's recipe and an unchecked one the field's. Everything Proto
 bars, the accordion, floaters) is extrapolated from the field and button recipes, and is the part most open to
 the user's grading.
 
-**The mechanism is the user's option B**: every Look paints the same set of shared entry classes
-(`lookEntries` in `Looks/Look.css.ts` — `button`, `input`, `surface` and the rest), and a painter adds an entry by
-composing it, `style([lookEntries.button, { …layout }])`. A Look writes its rules once through
-`LookUtils.define(root, entries)`, which scopes each under the Look's root class — `&` is the entry,
-selectors may nest, a top-level comma inside `:is(…)` is not split — and puts them in the `look` cascade layer.
-A variables contract like Theme's was weighed and set aside: it caps every Look at the properties the first one
+**The mechanism is the user's option B**: every Skin paints the same set of shared entry classes
+(`skinEntries` in `Skins/Skin.css.ts` — `button`, `input`, `surface` and the rest), and a painter adds an entry by
+composing it, `style([skinEntries.button, { …layout }])`. A Skin writes its rules once through
+`SkinUtils.define(root, entries)`, which scopes each under the Skin's root class — `&` is the entry,
+selectors may nest, a top-level comma inside `:is(…)` is not split — and puts them in the `skin` cascade layer.
+A variables contract like Theme's was weighed and set aside: it caps every Skin at the properties the first one
 planned for.
 
-- **A Look's rules stop at `lookBoundary`**, so a box can wear a different Look from the page around it (the Looks
-  page's rows). Each rule is emitted as `@scope (.<look root>) to (.lookBoundary) { :scope <selector> }` inside the
+- **A Skin's rules stop at `skinBoundary`**, so a box can wear a different Skin from the page around it (the Skins
+  page's rows). Each rule is emitted as `@scope (.<skin root>) to (.skinBoundary) { :scope <selector> }` inside the
   layer. The lower boundary is what isolates a row, not the nearer root winning: the cascade compares
-  specificity before scope proximity, so without the boundary the page's Look still reaches in with any rule the
-  row's Look does not write — a hover, a gradient. **A nested Look takes two elements**, the boundary outside and
-  the Look's root class inside it, so no root is also its own limit. `:scope` stands where `.<root>` used to, so
+  specificity before scope proximity, so without the boundary the page's Skin still reaches in with any rule the
+  row's Skin does not write — a hover, a gradient. **A nested Skin takes two elements**, the boundary outside and
+  the Skin's root class inside it, so no root is also its own limit. `:scope` stands where `.<root>` used to, so
   specificity is unchanged. What a nested box opens in a portal (a list, a tooltip) lands outside it and wears the
-  page's Look.
+  page's Skin.
 
-- **The layer is what lets a painter override a Look.** Unlayered rules always beat layered ones, so any paint
+- **The layer is what lets a painter override a Skin.** Unlayered rules always beat layered ones, so any paint
   still in a painter wins over its entry, whatever the specificity or stylesheet order. Paint left in a painter
   is, by that, paint no entry covers yet.
-- **States come from shared classes, not pseudo-classes.** `lookStates` (`isHovered`, `isActive`, `isSelected`,
+- **States come from shared classes, not pseudo-classes.** `skinStates` (`isHovered`, `isActive`, `isSelected`,
   `isReadOnly`, `isDisabled`, `hasError`) carry the library's verdict, which `:hover`, `:active` and
   `[aria-selected]` do not: the flags force hover off while disabled, report a keyboard press as active, and
   mark a keyboard-highlighted item that the pointer never touched. A painter composes the shared class into its
-  own — `export const isHovered = style([lookStates.isHovered])` — so its markup is unchanged in every
+  own — `export const isHovered = style([skinStates.isHovered])` — so its markup is unchanged in every
   framework, and its own selectors still name the composition's unique class and cannot match a neighbor's.
-- **A Look writes no selector of its own** — the user's rule. Every state a Look can paint is a named key in
-  `lookSelectors` (`Looks/Look.css.ts`), joined with `LookUtils.anyOf` where one rule covers two and
-  `LookUtils.allOf` where a rule needs two at once (it chains each as `:is(…)` on the entry, so it cannot take
+- **A Skin writes no selector of its own** — the user's rule. Every state a Skin can paint is a named key in
+  `skinSelectors` (`Skins/Skin.css.ts`), joined with `SkinUtils.anyOf` where one rule covers two and
+  `SkinUtils.allOf` where a rule needs two at once (it chains each as `:is(…)` on the entry, so it cannot take
   `line`'s pseudo-element or `fieldText`, whose `&` is not the painted element), so a new
-  Look imports the names and writes only the styles. A state a Look needs that has no key gets one there,
-  never a literal in the Look.
-- **A Look's rule matches a state on the entry's own element** (`&.isHovered`), so a checkbox row's hover filter
+  Skin imports the names and writes only the styles. A state a Skin needs that has no key gets one there,
+  never a literal in the Skin.
+- **A painter's internals are opaque to the Skin writer** — the user's rule. An entry is written in the terms of
+  any box (`color`, `backgroundColor`, `borderColor`, …), never in how the painter happens to draw it: the slide
+  button's arrow is an SVG line, so its painter sets `stroke: currentColor` and every Skin's `slideButtonArrow`
+  sets `color`. A painter that draws with `stroke`, `fill` or a gradient's `stopColor` maps `currentColor` onto it.
+- **A Skin's rule matches a state on the entry's own element** (`&.isHovered`), so a checkbox row's hover filter
   and its box's paint cannot stack. **The ancestor matches are the switches' row states** (`.hasError &`,
   `.isChecked &`, `.isMixed &`): checkbox, radio and toggle carry their state on the row around the box, and the
-  box and its mark each have an entry — `checkboxBox`, `radioBox`, `toggleTrack` beside their marks — so a Look
+  box and its mark each have an entry — `checkboxBox`, `radioBox`, `toggleTrack` beside their marks — so a Skin
   can change either by state. The user's call; Plasticine paints the boxes as `input` through one shared
   constant.
 - **A field's typed text is painted through its wrapper** — the user's pick. The library's `<input>` sits beside
@@ -225,39 +229,39 @@ planned for.
   sidebar sample, which paints exactly the left nav (an earlier call of the user's). `tooltip` takes the small
   floating popups — spotlight and hover card as well as the tooltip. `surface` is the example and variant boxes,
   toasts and the knobs popup; `hollowSurface` — the user's name — is `surface` without its fill, for a box around
-  siblings that paint their own (the "Show code" accordion's `docsExampleCode`), and every Look derives it from its
-  `surface` with `LookUtils.hollow`, which keeps only border, radius, shadow and clip, so the two cannot drift;
+  siblings that paint their own (the "Show code" accordion's `docsExampleCode`), and every Skin derives it from its
+  `surface` with `SkinUtils.hollow`, which keeps only border, radius, shadow and clip, so the two cannot drift;
   `panel` the boxes of content inside them, the API tables, code boxes, prop rows
   and the dependency chips. `decoration` — the user's — is the small see-through button inside or beside a
-  field (select clear, picker triggers, era and AM/PM toggles, stepper arrows, adornments, the sidebar toggle);
-  it reacts to hover only when it is or sits in a `button` or `[role='button']`, because a static icon
-  adornment is handed the field's hover flag. `tag` is a tag input's chip; the other chips and badges keep
+  field (select clear, picker triggers, era and AM/PM toggles, stepper arrows, adornments, the sidebar toggle),
+  and it reacts to plain `isHovered`: every painter that hands it hover is a button's, and the static adornment
+  never passes hover on (_"The in-field adornment painter"_). `tag` is a tag input's chip; the other chips and badges keep
   their own paint, the user's call. The tabs have `tabsItem`, `tabsGutter` and `tabsFloater` — `tabsGutter` after
   the library's `renderGutter`, the line the user called the track. The gutter and the floater keep the boxes the
-  library gives them, the whole list and the selected tab, and the Look paints the marker's shape, an underline
-  being a bottom border — the user's pick over a painter-drawn 2px line, so a Look can draw a pill instead. A
-  vertical list carries `isVertical` on all three. Every other Look starts on Plasticine's tab paint, the user's
+  library gives them, the whole list and the selected tab, and the Skin paints the marker's shape, an underline
+  being a bottom border — the user's pick over a painter-drawn 2px line, so a Skin can draw a pill instead. A
+  vertical list carries `isVertical` on all three. Every other Skin starts on Plasticine's tab paint, the user's
   call while they are temporary. The honeycomb tabs are a custom variant and keep their own paint. The binary switches' insides — `checkboxMark`, `radioDot`, `toggleHandle` —
   and the standard bars — `progressTrack` and `progressFill`, `rangeTrack`, `rangeFill` and `rangeThumb`,
   `scrollerTrack` and `scrollerThumb` (painted on `::before`), and the slide button's `slideButtonTrack`,
   `slideButtonFill`, `slideButtonHint`, `slideButtonThumb` and `slideButtonArrow` — have entries, the slide
   button's added at the user's request with its error marked on each part; Plasticine keeps the slide button's
-  earlier paint, every other Look paints its track, fill and thumb with its range's (`RANGE_TRACK`, `RANGE_FILL`,
-  `RANGE_THUMB`), so the two stay in step until a Look parts them — Material does: its slide button is a pill and
+  earlier paint, every other Skin paints its track, fill and thumb with its range's (`RANGE_TRACK`, `RANGE_FILL`,
+  `RANGE_THUMB`), so the two stay in step until a Skin parts them — Material does: its slide button is a pill and
   its thumb takes the strip's main color with the arrow in the family's `contrast`, because a thumb as tall as its
   strip showed the strip's corners behind it, a second shade beside it, and an arrow at 1.22:1 against WCAG 1.4.11's
   3:1 (the user's pick, B on both); `isChecked` and `isMixed` joined
   the shared states for the toggle's handle, matched on the row around it, as is a progress fill's error.
 - **A bar's axis is a state; its text direction is not** — the user's call. `isVertical` is on each part of a
   standing progress bar or range (the progress painter's own `orientation`, since `Progress` has none). The state
-  sets `lookVars.barAngle` (`Looks/Look.css.ts`), and a gradient along a bar takes that angle, so a Look writes
-  each gradient once and needs no vertical rule — the user's call, to be rid of selectors combining two states. A Look paints the same in a right-to-left box: a gradient
+  sets `skinVars.barAngle` (`Skins/Skin.css.ts`), and a gradient along a bar takes that angle, so a Skin writes
+  each gradient once and needs no vertical rule — the user's call, to be rid of selectors combining two states. A Skin paints the same in a right-to-left box: a gradient
   along the bar keeps its direction there. **A pair's thumbs are one entry with two states**, `isStart` and
-  `isEnd` — the user's pick over two entries, since a Look writes the thumb once and only the difference; a
+  `isEnd` — the user's pick over two entries, since a Skin writes the thumb once and only the difference; a
   single-value range's thumb carries neither.
 - **Entries are as few as possible, but a component with an entry for one part gets one for each part** — the
   user's rule. So the accordion body has `accordionPanel` beside `accordionHeader` rather than borrowing
-  `panel`; each Look starts it on the same paint as its `panel`, through one `PANEL` constant, until the Look
+  `panel`; each Skin starts it on the same paint as its `panel`, through one `PANEL` constant, until the Skin
   chooses to tie it to its header.
 - **A modal's backdrop has two entries**, `opaqueOverlay` and `blurredOverlay`, one per kind the modal offers;
   the painter keeps only what animates it open and shut.
@@ -273,29 +277,34 @@ planned for.
   submenu, so a keyboard walk stays visible.
 - **Where a painter disagreed with its entry, the entry won** — the user's call. Padding, radius and font join
   an entry only when every painter using it agrees, and are expected to converge later; until then they stay in
-  the painters. **Radius is the one a Look most needs**, since a Look decides shape and an unlayered radius in a
+  the painters. **Radius is the one a Skin most needs**, since a Skin decides shape and an unlayered radius in a
   painter beats it: `input`, `checkboxBox`, `radioBox`, `toggleTrack` and `tooltip` carry it (their painters all
-  agreed), so Brutalist and Terminal can square them. **A pressed toggle button is painted by the Look through
+  agreed), so Brutalist and Terminal can square them. **A pressed toggle button is painted by the Skin through
   `isPressed`** — before, the painter ignored the flag and only `aria-pressed` told the state, a WCAG 1.3.1 gap;
-  each Look sinks, inverts or hatches it in its own idiom, distinct from hover and the press-down. The Button
+  each Skin sinks, inverts or hatches it in its own idiom, distinct from hover and the press-down. The Button
   page's own `PressedButtonContent` wrapper, which drew a white inset ring over the painter, went with it.
   `accordionHeader` has its own entry, with `isExpanded` among
-  the shared states so a Look can mark an open header, and **the hover and selection floaters take their radius
-  from the Look**, matched to that Look's items, since a floater is the shape drawn behind an item. `surface`,
+  the shared states so a Skin can mark an open header. **Where an open header meets its panel is a Skin state too**,
+  the user's call: `isJoinedBlockStart`, `…BlockEnd`, `…InlineStart` and `…InlineEnd` name the edge of a part that
+  touches its partner, the painter picks one from the side the panel opens on (`headerJoins` and `panelJoins` in
+  `AccordionContent.css.ts`), and the Skin decides what a join looks like — `SkinUtils.joinedCorners(radius)` sets the two corners on the joined edge, `0` by default, which is what Plasticine takes.
+  A painter's own radius from its Skin cannot inherit the library's squared seam, and ARIA has nothing to read on
+  the panel: `aria-expanded` is on the header's button only. **The hover and selection floaters take their radius
+  from the Skin**, matched to that Skin's items, since a floater is the shape drawn behind an item. `surface`,
   `panel` and `dropdown` carry it too, since the user
   unified their painters to each entry's majority — `surface` and `dropdown` at `full`, `panel` at `half` — which
   rounded the toast, the modal-free popovers and the select list a little more, and squared the API table box,
   the dependency summary and gave the accordion panel corners it had not had. **A radius computed from a painter's
   own size** (a track's thickness, a pill badge) stays in the painter — except the standard bars': the user moved
-  `rangeTrack`'s and `rangeFill`'s to the Looks, as `progressTrack`'s and `progressFill`'s already were, and each
-  Look gives a range part the radius it gives the matching progress part.
-- **The page's font and backdrop are constants, not the Look's** — the user's call. The `body` rule in
+  `rangeTrack`'s and `rangeFill`'s to the Skins, as `progressTrack`'s and `progressFill`'s already were, and each
+  Skin gives a range part the radius it gives the matching progress part.
+- **The page's font and backdrop are constants, not the Skin's** — the user's call. The `body` rule in
   `Theme.css.ts` holds the font family, size, line height and the backdrop behind the app, and sets no text
   color: every painted area sets its own.
 - **SVG paint is not reached yet**: a fill or stroke handed to `Shape` through `computeFillDefs` or
-  `computeStrokeDefs` is data, not a class. The user deferred how a Look reaches it.
+  `computeStrokeDefs` is data, not a class. The user deferred how a Skin reaches it.
 - **The loading screen is plain black** (`vite/loadingScreen.ts`), the user's call, so it belongs to no Theme or
-  Look and the build config needs neither.
+  Skin and the build config needs neither.
 
 - **`e2e/`** — Playwright interaction suite. Imports from neither tree; drives the built Playground in
   a real browser. See _"Verifying interaction"_ in `conventions.md`.
@@ -22125,41 +22134,41 @@ builtin rendered outside a header cell warns and renders nothing, as an orphan `
 target, so sorting could not die silently. With builtins, a consumer who renders none gets no pointer route, and
 the warning is what stands in for the guarantee.
 
-### The Looks page: one row per Look, picked like a radio
+### The Skins page: one row per Skin, picked like a radio
 
-`/looks` sits under Gallery in the nav. Each row draws the same samples in its own Look (see _"A Look's rules stop
-at `lookBoundary`"_) and picking a row applies that Look to the whole Playground through `revealLook`, the circle
-growing from the row; the nav's Look field reads the same signal, so the two never disagree. **The samples are a
+`/skins` sits under Gallery in the nav. Each row draws the same samples in its own Skin (see _"A Skin's rules stop
+at `skinBoundary`"_) and picking a row applies that Skin to the whole Playground through `revealSkin`, the circle
+growing from the row; the nav's Skin field reads the same signal, so the two never disagree. **The samples are a
 picture, not controls** — the user's option A over live samples with a pick button per row. Each row is a `Radio`
 in a `RadioGroup`, the samples `inert` and `aria-hidden="true"`: a radio's contents are presentational (WAI-ARIA
 1.2, "children presentational"), so live controls inside it would be flattened for a screen reader, and a click on
 one would also pick the row. The cost is that hover and press are not shown; disabled, error, checked and pressed
 are drawn as fixed states instead. The nav previews made the same call.
 
-**Every part a Look paints is shown** — the user's option C, laid out at their direction: a wrapping row of
-columns, each an example box on the Look's own page background, each a grid of states for a control that has
+**Every part a Skin paints is shown** — the user's option C, laid out at their direction: a wrapping row of
+columns, each an example box on the Skin's own page background, each a grid of states for a control that has
 them; a control with no states to split (Surface, Tabs, Accordion) takes its column whole. **The columns are a
-grid of equal tracks** (`LOOK_COLUMN_MIN_WIDTH`, the user's number), each box filling its cell, and a group too wide
-for one track spans two (`lookWideColumn`: Input and Tags — the user's picks). **An empty cell left where
+grid of equal tracks** (`SKIN_COLUMN_MIN_WIDTH`, the user's number), each box filling its cell, and a group too wide
+for one track spans two (`skinWideColumn`: Input and Tags — the user's picks). **An empty cell left where
 a wide group wraps is accepted**, the user's call over letting the grid fill holes out of order; the groups are
 ordered by hand to keep holes few, Tags always straight after Input. Bars stack one per line,
 since two side by side overlap at that width. **Nothing that opens a popup is sampled**, since a portalled popup
-leaves the row's Look.
+leaves the row's Skin.
 
-**A row is the page Look's `hollowSurface`, filled with the row Look's page background, title included** — the
+**A row is the page Skin's `hollowSurface`, filled with the row Skin's page background, title included** — the
 user's call, after a full `surface` holding a page background read as a box inside a box. So the radio dot and name
-are drawn in the row's Look too, and what marks the picked row differs from row to row; the frame clips its
+are drawn in the row's Skin too, and what marks the picked row differs from row to row; the frame clips its
 contents so the background follows its corners, which leaves the focus ring alone, since the radio input that
 draws it sits outside the clipped painter.
 
-**Porting: where the four differ.** The row's id comes from `computeLookRowId` in the shared `LooksPage.const.ts`,
+**Porting: where the four differ.** The row's id comes from `computeSkinRowId` in the shared `SkinsPage.const.ts`,
 since the row and the page's reveal origin both need it and Vue's two live in different files. Vue and Svelte split
 the row, the samples and each sample helper into files of their own; the state grid and bar stack, which are a bare
 `div` each, are written inline there. **Vue's sample helpers default every boolean prop to `undefined`**
 (`withDefaults`), because Vue turns a missing boolean prop into `false`, and `Button` handed `isPressed: false`
 writes `aria-pressed="false"` — a toggle button where Solid draws a plain one. Svelte seeds each sample's own state
 from its props inside `untrack`, so the seed is read once, as Solid's `createSignal(props.x)` does. The spec is
-`e2e/looksPage.spec.ts`, apart from `looks.spec.ts`, which tests the Look machinery rather than this page.
+`e2e/skinsPage.spec.ts`, apart from `skins.spec.ts`, which tests the Skin machinery rather than this page.
 
 ### The gallery page: every page's first example, live, on one page
 
@@ -22419,13 +22428,20 @@ with no capital. Open with a word of the sentence and bring the prop in after it
 
 ### The in-field adornment painter: a label outside a button, a button's look inside one
 
-`PageTextFieldAdornment` draws both static content in a field's leading or trailing slot (an icon, £, px) and the look of
-a small button there (Clear, Show), and the field hands it the field's own state either way. So the painter decides
-by where it sits: **inside `button` or `[role='button']`** it pads its sides, lights up on hover, and is small and
-uppercase; **anywhere else** it is a label, at the field's own text size (`FIELD_FONT_SIZE`), with no padding and no
-hover, and it still dims when disabled. The user's calls, one at a time, starting from the TextInput Docs page's
-username field, whose glyph lit up on hover, sat padded away from the text and looked small beside the placeholder.
-The sizing is provisional by the user's word: it is to be revisited once the other input pages are built.
+Two painters. **`PageTextFieldAdornment`** draws static content in a field's leading or trailing slot (an icon, £,
+px): a label at the field's own text size (`FIELD_FONT_SIZE`), with no padding and no hover, still dimming when
+disabled. **`PageTextFieldButtonContent`** draws a small button there (Clear, Show) inside a `Button`'s
+`renderContent`: padded, small, uppercase, lit on hover. The looks are the user's calls, one at a time, starting from
+the TextInput Docs page's username field, whose glyph lit up on hover, sat padded away from the text and looked small
+beside the placeholder. The sizing is provisional by the user's word: it is to be revisited once the other input
+pages are built.
+
+**The static painter reads no hover because the field hands it the field's state**, and "the field is hovered" is
+not "this icon is hovered". It used to be one painter that told the two apart by whether it sat inside a button, with
+a skin selector (`isHoveredPressable`) doing the same for hover. The user asked for the fix as low as it could go,
+and the library was ruled out: a field's slots receiving the field's hover is true and documented, and a consumer
+may want an icon to brighten with the field, so dropping it would take that from every consumer to fix one painter.
+The painter is where "field hovered" was misread, so the split is there.
 
 **An icon in a slot is drawn by `PageIcon`** (text such as £ or px stays text), the user's call after the 👤︎ glyph
 painted as a color emoji on one machine and as text on another, and `@` hung below the line beside the word it

@@ -1,6 +1,6 @@
 import { style, styleVariants } from "@vanilla-extract/css";
 
-import { lookEntries } from "../../Looks/Look.css";
+import { skinEntries } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 
 const DRAWER_THICKNESS = 320;
@@ -8,7 +8,7 @@ const DRAWER_DEPTH = 200;
 const DRAWER_MAX_DEPTH = 400;
 
 export const drawerPanel = style([
-    lookEntries.drawer,
+    skinEntries.drawer,
     {
         display: "flex",
         flexDirection: "column",

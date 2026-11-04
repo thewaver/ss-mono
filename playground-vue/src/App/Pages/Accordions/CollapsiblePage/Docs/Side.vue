@@ -24,6 +24,7 @@ defineProps<Props>();
 
             <template #renderPanel="{ visibilityTarget, transitionDurationMs }">
                 <PageAccordionPanel
+                    :side="side"
                     :visibility-target="visibilityTarget"
                     :transition-duration-ms="transitionDurationMs"
                 >

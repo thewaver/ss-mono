@@ -1,23 +1,23 @@
 import { MediaQueryMonitorSolidUtils, SHAPE_REVEAL_DEFAULTS, Toggle } from "@thewaver/ss-components-solid";
-import { DEFAULT_LOOK } from "@thewaver/ss-playground/App/Looks/Look.const";
 import {
-    LOOK_FIELD_ID,
-    LOOK_OPTIONS,
+    SKIN_FIELD_ID,
+    SKIN_OPTIONS,
     THEME_FIELD_ID,
     THEME_OPTIONS,
     VIEWPORT_ANCHOR_OPTIONS,
 } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
 import { NO_MOTION_DURATION_MS } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
 import { EXAMPLES_ONLY_PROP } from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.const";
+import { DEFAULT_SKIN } from "@thewaver/ss-playground/App/Skins/Skin.const";
 
 import { PageToggleContent } from "../../StyledComponents/ToggleContent/ToggleContent";
 import { PageExampleKnobsButton } from "../ExampleKnobs/ExampleKnobs";
 import { PageSelectField } from "../Field/Field";
 import { OWN_FRAMEWORK } from "../FrameworkMenu/FrameworkMenu.const";
-import { getAppliedLook, revealLook } from "../Look/LookSolid.const";
 import { PageProp } from "../Prop/Prop";
+import { getAppliedSkin, revealSkin } from "../Skin/SkinSolid.const";
 import { getAppliedTheme, revealTheme } from "../Theme/ThemeSolid.const";
-import type { PageNavSettingsProps, PlaygroundLook, PlaygroundTheme, ViewportAnchor } from "./NavSettingsSolid.types";
+import type { PageNavSettingsProps, PlaygroundSkin, PlaygroundTheme, ViewportAnchor } from "./NavSettingsSolid.types";
 
 const computeViewportAnchorLabel = (anchor: ViewportAnchor) =>
     VIEWPORT_ANCHOR_OPTIONS.find((option) => option.value === anchor)?.label ?? String(anchor);
@@ -25,7 +25,7 @@ const computeViewportAnchorLabel = (anchor: ViewportAnchor) =>
 const computeThemeLabel = (theme: PlaygroundTheme) =>
     THEME_OPTIONS.find((option) => option.value === theme)?.label ?? theme;
 
-const computeLookLabel = (look: PlaygroundLook) => LOOK_OPTIONS.find((option) => option.value === look)?.label ?? look;
+const computeSkinLabel = (skin: PlaygroundSkin) => SKIN_OPTIONS.find((option) => option.value === skin)?.label ?? skin;
 
 export const PageNavSettings = (props: PageNavSettingsProps) => {
     const getPrefersReducedMotion = MediaQueryMonitorSolidUtils.createReducedMotion();
@@ -37,9 +37,9 @@ export const PageNavSettings = (props: PageNavSettingsProps) => {
         });
     };
 
-    const pickLook = (look: PlaygroundLook) => {
-        void revealLook(look, {
-            origin: document.getElementById(LOOK_FIELD_ID) ?? SHAPE_REVEAL_DEFAULTS.origin,
+    const pickSkin = (skin: PlaygroundSkin) => {
+        void revealSkin(skin, {
+            origin: document.getElementById(SKIN_FIELD_ID) ?? SHAPE_REVEAL_DEFAULTS.origin,
             durationMs: getPrefersReducedMotion() ? NO_MOTION_DURATION_MS : SHAPE_REVEAL_DEFAULTS.durationMs,
         });
     };
@@ -104,21 +104,21 @@ export const PageNavSettings = (props: PageNavSettingsProps) => {
                     </PageProp>
 
                     <PageProp
-                        key={"look"}
-                        label={"Look"}
+                        key={"skin"}
+                        label={"Skin"}
                         hint={
-                            "How the playground is drawn: the shapes, borders, shadows and fonts its controls are painted with, and where the theme's colors go. The new look is uncovered by a circle growing from this field."
+                            "How the playground is drawn: the shapes, borders, shadows and fonts its controls are painted with, and where the theme's colors go. The new skin is uncovered by a circle growing from this field."
                         }
                         controls={EXAMPLES_ONLY_PROP}
-                        defaultValue={computeLookLabel(DEFAULT_LOOK)}
+                        defaultValue={computeSkinLabel(DEFAULT_SKIN)}
                     >
                         <PageSelectField
-                            id={LOOK_FIELD_ID}
-                            value={getAppliedLook}
-                            values={LOOK_OPTIONS.map((option) => option.value)}
-                            computeLabel={computeLookLabel}
-                            ariaLabel={"Look"}
-                            onChange={pickLook}
+                            id={SKIN_FIELD_ID}
+                            value={getAppliedSkin}
+                            values={SKIN_OPTIONS.map((option) => option.value)}
+                            computeLabel={computeSkinLabel}
+                            ariaLabel={"Skin"}
+                            onChange={pickSkin}
                         />
                     </PageProp>
                 </>

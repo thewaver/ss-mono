@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { COLLAPSIBLE_DEFAULTS } from "@thewaver/ss-components-vue";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/AccordionContent/AccordionContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
@@ -11,7 +12,11 @@ const layerClass = useLayerClass();
 
 <template>
     <div
-        :class="[styles.accordionPanel, layerClass]"
+        :class="[
+            styles.accordionPanel,
+            layerClass,
+            visibilityTarget === 1 && styles.panelJoins[side ?? COLLAPSIBLE_DEFAULTS.side],
+        ]"
         :style="{
             opacity: visibilityTarget,
             transition: `opacity ${transitionDurationMs}ms`,

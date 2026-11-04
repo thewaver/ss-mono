@@ -1,6 +1,6 @@
 import { createVar, style } from "@vanilla-extract/css";
 
-import { lookEntries, lookStates } from "../../Looks/Look.css";
+import { skinEntries, skinStates } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 import { layerVars } from "../Layer/Layer.css";
 import { FIELD_HEIGHT, FIELD_PADDING } from "../TextFieldContent/TextFieldContent.css";
@@ -13,9 +13,9 @@ export const swatchVar = createVar();
 const THUMB_SIZE = 16;
 
 export const isDragging = style({});
-export const isHovered = style([lookStates.isHovered]);
+export const isHovered = style([skinStates.isHovered]);
 export const isFocused = style({});
-export const isDisabled = style([lookStates.isDisabled]);
+export const isDisabled = style([skinStates.isDisabled]);
 
 export const colorAreaSquare = style({
     position: "relative",
@@ -111,7 +111,7 @@ export const colorSwatch = style({
 });
 
 export const colorPickerPopup = style([
-    lookEntries.dropdown,
+    skinEntries.dropdown,
     {
         display: "flex",
         flexDirection: "column",
@@ -169,7 +169,7 @@ export const colorPickerRow = style({
 });
 
 export const colorFieldTrigger = style([
-    lookEntries.input,
+    skinEntries.input,
     {
         display: "flex",
         alignItems: "center",

@@ -1,20 +1,20 @@
 import { style } from "@vanilla-extract/css";
 
-import { lookEntries, lookStates } from "../../Looks/Look.css";
+import { skinEntries, skinStates } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 
 export const SLIDE_BUTTON_THUMB_SIZE = 44;
 export const SLIDE_BUTTON_LENGTH = 300;
 
-export const isVertical = style([lookStates.isVertical]);
+export const isVertical = style([skinStates.isVertical]);
 export const isRightToLeft = style({});
 export const isTracking = style({});
 export const isFocused = style({});
 export const isDisabled = style({});
-export const hasError = style([lookStates.hasError]);
+export const hasError = style([skinStates.hasError]);
 
 export const slideButtonContent = style([
-    lookEntries.slideButtonTrack,
+    skinEntries.slideButtonTrack,
     {
         position: "relative",
         display: "flex",
@@ -37,7 +37,7 @@ export const slideButtonContent = style([
 ]);
 
 export const slideButtonFill = style([
-    lookEntries.slideButtonFill,
+    skinEntries.slideButtonFill,
     {
         position: "absolute",
         left: 0,
@@ -63,7 +63,7 @@ export const slideButtonFill = style([
 ]);
 
 export const slideButtonHint = style([
-    lookEntries.slideButtonHint,
+    skinEntries.slideButtonHint,
     {
         position: "relative",
         flex: 1,
@@ -82,7 +82,7 @@ export const slideButtonHint = style([
 ]);
 
 export const slideButtonThumb = style([
-    lookEntries.slideButtonThumb,
+    skinEntries.slideButtonThumb,
     {
         position: "absolute",
         left: 0,
@@ -115,12 +115,13 @@ export const slideButtonThumb = style([
 ]);
 
 export const slideButtonArrow = style([
-    lookEntries.slideButtonArrow,
+    skinEntries.slideButtonArrow,
     {
         display: "block",
         width: "100%",
         height: "100%",
         fill: "none",
+        stroke: "currentColor",
         strokeWidth: 2,
         strokeLinecap: "round",
         strokeLinejoin: "round",

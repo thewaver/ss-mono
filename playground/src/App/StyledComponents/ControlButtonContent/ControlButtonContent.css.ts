@@ -1,16 +1,18 @@
 import { style } from "@vanilla-extract/css";
 
-import { lookEntries, lookStates } from "../../Looks/Look.css";
+import { skinEntries, skinStates } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 
 export const CONTROL_BUTTON_SIZE = 28;
 
-export const isHovered = style([lookStates.isHovered]);
-export const isActive = style([lookStates.isActive]);
-export const isDisabled = style([lookStates.isDisabled]);
+export const isHovered = style([skinStates.isHovered]);
+export const isActive = style([skinStates.isActive]);
+export const isPressed = style([skinStates.isPressed]);
+export const isDisabled = style([skinStates.isDisabled]);
+export const hasError = style([skinStates.hasError]);
 
 export const controlButtonBase = style([
-    lookEntries.buttonSimple,
+    skinEntries.buttonSimple,
     {
         display: "flex",
         justifyContent: "center",

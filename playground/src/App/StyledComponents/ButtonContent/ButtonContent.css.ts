@@ -1,16 +1,16 @@
 import { style } from "@vanilla-extract/css";
 
-import { lookEntries, lookStates } from "../../Looks/Look.css";
+import { skinEntries, skinStates } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 
-export const isHovered = style([lookStates.isHovered]);
-export const isActive = style([lookStates.isActive]);
-export const isPressed = style([lookStates.isPressed]);
-export const isDisabled = style([lookStates.isDisabled]);
-export const hasError = style([lookStates.hasError]);
+export const isHovered = style([skinStates.isHovered]);
+export const isActive = style([skinStates.isActive]);
+export const isPressed = style([skinStates.isPressed]);
+export const isDisabled = style([skinStates.isDisabled]);
+export const hasError = style([skinStates.hasError]);
 
 export const buttonContent = style([
-    lookEntries.button,
+    skinEntries.button,
     {
         display: "flex",
         justifyContent: "center",

@@ -23,6 +23,7 @@ export const SideDocsExample = (props: Props) => (
             )}
             renderPanel={(getVisibilityTarget, getTransitionDurationMs) => (
                 <PageAccordionPanel
+                    side={props.side}
                     visibilityTarget={getVisibilityTarget}
                     transitionDurationMs={getTransitionDurationMs}
                 >

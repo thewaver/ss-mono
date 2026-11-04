@@ -6,7 +6,7 @@ import {
     FIELD_PADDING,
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
-import { PageTextFieldAdornment } from "../../../StyledComponents/TextFieldAdornment/TextFieldAdornment";
+import { PageTextFieldButtonContent } from "../../../StyledComponents/TextFieldButtonContent/TextFieldButtonContent";
 import { PageTextFieldContent } from "../../../StyledComponents/TextFieldContent/TextFieldContent";
 import { PageTextFieldPlaceholder } from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder";
 
@@ -30,7 +30,9 @@ export const PasswordDocsExample = () => {
                         setIsRevealed((prev) => !prev);
                     }}
                     renderContent={(flags) => (
-                        <PageTextFieldAdornment flags={flags}>{isRevealed ? "Hide" : "Show"}</PageTextFieldAdornment>
+                        <PageTextFieldButtonContent flags={flags}>
+                            {isRevealed ? "Hide" : "Show"}
+                        </PageTextFieldButtonContent>
                     )}
                 />
             )}

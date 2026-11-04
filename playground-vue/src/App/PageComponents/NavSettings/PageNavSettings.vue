@@ -2,25 +2,25 @@
 import { useModel } from "vue";
 
 import { MediaQueryMonitorVueUtils, SHAPE_REVEAL_DEFAULTS, Toggle } from "@thewaver/ss-components-vue";
-import { DEFAULT_LOOK } from "@thewaver/ss-playground/App/Looks/Look.const";
 import {
-    LOOK_FIELD_ID,
-    LOOK_OPTIONS,
+    SKIN_FIELD_ID,
+    SKIN_OPTIONS,
     THEME_FIELD_ID,
     THEME_OPTIONS,
     VIEWPORT_ANCHOR_OPTIONS,
 } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
 import { NO_MOTION_DURATION_MS } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
 import { EXAMPLES_ONLY_PROP } from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.const";
+import { DEFAULT_SKIN } from "@thewaver/ss-playground/App/Skins/Skin.const";
 
 import PageToggleContent from "../../StyledComponents/ToggleContent/ToggleContent.vue";
 import PageExampleKnobsButton from "../ExampleKnobs/PageExampleKnobsButton.vue";
 import PageSelectField from "../Field/PageSelectField.vue";
 import { OWN_FRAMEWORK } from "../FrameworkMenu/FrameworkMenu.const";
-import { appliedLook, revealLook } from "../Look/LookVue.const";
 import PageProp from "../Prop/Prop.vue";
+import { appliedSkin, revealSkin } from "../Skin/SkinVue.const";
 import { appliedTheme, revealTheme } from "../Theme/ThemeVue.const";
-import type { PageNavSettingsProps, PlaygroundLook, PlaygroundTheme, ViewportAnchor } from "./NavSettingsVue.types";
+import type { PageNavSettingsProps, PlaygroundSkin, PlaygroundTheme, ViewportAnchor } from "./NavSettingsVue.types";
 
 const computeViewportAnchorLabel = (anchor: ViewportAnchor) =>
     VIEWPORT_ANCHOR_OPTIONS.find((option) => option.value === anchor)?.label ?? String(anchor);
@@ -28,7 +28,7 @@ const computeViewportAnchorLabel = (anchor: ViewportAnchor) =>
 const computeThemeLabel = (theme: PlaygroundTheme) =>
     THEME_OPTIONS.find((option) => option.value === theme)?.label ?? theme;
 
-const computeLookLabel = (look: PlaygroundLook) => LOOK_OPTIONS.find((option) => option.value === look)?.label ?? look;
+const computeSkinLabel = (skin: PlaygroundSkin) => SKIN_OPTIONS.find((option) => option.value === skin)?.label ?? skin;
 
 const props = defineProps<PageNavSettingsProps>();
 
@@ -44,9 +44,9 @@ const pickTheme = (nextTheme: PlaygroundTheme) => {
     });
 };
 
-const pickLook = (nextLook: PlaygroundLook) => {
-    void revealLook(nextLook, {
-        origin: document.getElementById(LOOK_FIELD_ID) ?? SHAPE_REVEAL_DEFAULTS.origin,
+const pickSkin = (nextSkin: PlaygroundSkin) => {
+    void revealSkin(nextSkin, {
+        origin: document.getElementById(SKIN_FIELD_ID) ?? SHAPE_REVEAL_DEFAULTS.origin,
         durationMs: prefersReducedMotion.value ? NO_MOTION_DURATION_MS : SHAPE_REVEAL_DEFAULTS.durationMs,
     });
 };
@@ -107,19 +107,19 @@ const setViewportAnchor = (anchor: ViewportAnchor) => {
             </PageProp>
 
             <PageProp
-                item-key="look"
+                item-key="skin"
                 :controls="EXAMPLES_ONLY_PROP"
-                label="Look"
-                hint="How the playground is drawn: the shapes, borders, shadows and fonts its controls are painted with, and where the theme's colors go. The new look is uncovered by a circle growing from this field."
-                :default-value="computeLookLabel(DEFAULT_LOOK)"
+                label="Skin"
+                hint="How the playground is drawn: the shapes, borders, shadows and fonts its controls are painted with, and where the theme's colors go. The new skin is uncovered by a circle growing from this field."
+                :default-value="computeSkinLabel(DEFAULT_SKIN)"
             >
                 <PageSelectField
-                    :id="LOOK_FIELD_ID"
-                    :value="appliedLook"
-                    :values="LOOK_OPTIONS.map((option) => option.value)"
-                    :compute-label="computeLookLabel"
-                    ariaLabel="Look"
-                    @change="pickLook"
+                    :id="SKIN_FIELD_ID"
+                    :value="appliedSkin"
+                    :values="SKIN_OPTIONS.map((option) => option.value)"
+                    :compute-label="computeSkinLabel"
+                    ariaLabel="Skin"
+                    @change="pickSkin"
                 />
             </PageProp>
         </template>

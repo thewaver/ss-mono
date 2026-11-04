@@ -134,23 +134,23 @@ compose a `Trigger` and a `Content`. So "no `renderContent` tooltip renderer, ju
 string" is not a departure from how the industry splits these two layers — it is the split, stated in the
 same example.
 
-**Looks — begun.** The Playground's painters now take their paint from a Look picked in the left nav, as a Theme
-is: the Theme gives the colors, the Look decides shapes and where those colors go. Plasticine is the only one.
-How it works is in `decisions.md` under _"Looks"_. What follows keeps its own paint, so a Look does not reach it
+**Skins — begun.** The Playground's painters now take their paint from a Skin picked in the left nav, as a Theme
+is: the Theme gives the colors, the Skin decides shapes and where those colors go. Plasticine is the only one.
+How it works is in `decisions.md` under _"Skins"_. What follows keeps its own paint, so a Skin does not reach it
 yet.
 
 **Deferred, by the user, until this item picks them up:**
 
-- **The links** — they paint too differently from one another for one Look entry: some brighten and underline
+- **The links** — they paint too differently from one another for one Skin entry: some brighten and underline
   on hover, some tint, one dims until current.
     - Library components: breadcrumbs, the flyout menu, the table of contents.
     - Playground-only: the left nav's ABOUT, GETTING STARTED and GALLERY, and the framework menu's trigger.
 - **The selection markers, and the tab labels with them** (all library components): the tab underline and
   vertical bar, the honeycomb tabs' hex markers, the segmented radio's marker, and the table of contents'
-  current-entry bar. Tabs have to stay very flexible: another Look might draw them as a segmented control with a
-  groove behind, or as a rectangle that moves around the selected tab. A Look entry for the marker and another
+  current-entry bar. Tabs have to stay very flexible: another Skin might draw them as a segmented control with a
+  groove behind, or as a rectangle that moves around the selected tab. A Skin entry for the marker and another
   for its groove would cover only the row and column layouts; the hex tabs would stay fully custom. The table of
-  contents' thin bar could be a full-length one in another Look.
+  contents' thin bar could be a full-length one in another Skin.
 
 **Left with their own paint, by the user's call:**
 

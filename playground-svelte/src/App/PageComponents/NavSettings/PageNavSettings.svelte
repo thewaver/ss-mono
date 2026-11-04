@@ -7,19 +7,19 @@
     import PageSelectField from "../Field/PageSelectField.svelte";
     import { OWN_FRAMEWORK } from "../FrameworkMenu/FrameworkMenu.const";
     import PageProp from "../Prop/Prop.svelte";
-    import { getAppliedLook, revealLook } from "../Look/LookSvelte.const.svelte";
+    import { getAppliedSkin, revealSkin } from "../Skin/SkinSvelte.const.svelte";
     import { getAppliedTheme, revealTheme } from "../Theme/ThemeSvelte.const.svelte";
     import {
-        LOOK_FIELD_ID,
-        LOOK_OPTIONS,
+        SKIN_FIELD_ID,
+        SKIN_OPTIONS,
         THEME_FIELD_ID,
         THEME_OPTIONS,
         VIEWPORT_ANCHOR_OPTIONS,
     } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
-    import { DEFAULT_LOOK } from "@thewaver/ss-playground/App/Looks/Look.const";
+    import { DEFAULT_SKIN } from "@thewaver/ss-playground/App/Skins/Skin.const";
     import type {
         PageNavSettingsProps,
-        PlaygroundLook,
+        PlaygroundSkin,
         PlaygroundTheme,
         ViewportAnchor,
     } from "./NavSettingsSvelte.types";
@@ -31,8 +31,8 @@
     const computeThemeLabel = (theme: PlaygroundTheme) =>
         THEME_OPTIONS.find((option) => option.value === theme)?.label ?? theme;
 
-    const computeLookLabel = (look: PlaygroundLook) =>
-        LOOK_OPTIONS.find((option) => option.value === look)?.label ?? look;
+    const computeSkinLabel = (skin: PlaygroundSkin) =>
+        SKIN_OPTIONS.find((option) => option.value === skin)?.label ?? skin;
 
     let {
         showsDescriptionOnly = $bindable(),
@@ -48,9 +48,9 @@
         });
     };
 
-    const pickLook = (nextLook: PlaygroundLook) => {
-        void revealLook(nextLook, {
-            origin: document.getElementById(LOOK_FIELD_ID) ?? SHAPE_REVEAL_DEFAULTS.origin,
+    const pickSkin = (nextSkin: PlaygroundSkin) => {
+        void revealSkin(nextSkin, {
+            origin: document.getElementById(SKIN_FIELD_ID) ?? SHAPE_REVEAL_DEFAULTS.origin,
             durationMs: getPrefersReducedMotion() ? NO_MOTION_DURATION_MS : SHAPE_REVEAL_DEFAULTS.durationMs,
         });
     };
@@ -109,19 +109,19 @@
     </PageProp>
 
     <PageProp
-        itemKey={"look"}
+        itemKey={"skin"}
         controls={EXAMPLES_ONLY_PROP}
-        label={"Look"}
-        hint={"How the playground is drawn: the shapes, borders, shadows and fonts its controls are painted with, and where the theme's colors go. The new look is uncovered by a circle growing from this field."}
-        defaultValue={computeLookLabel(DEFAULT_LOOK)}
+        label={"Skin"}
+        hint={"How the playground is drawn: the shapes, borders, shadows and fonts its controls are painted with, and where the theme's colors go. The new skin is uncovered by a circle growing from this field."}
+        defaultValue={computeSkinLabel(DEFAULT_SKIN)}
     >
         <PageSelectField
-            id={LOOK_FIELD_ID}
-            value={getAppliedLook()}
-            values={LOOK_OPTIONS.map((option) => option.value)}
-            computeLabel={computeLookLabel}
-            ariaLabel={"Look"}
-            onChange={pickLook}
+            id={SKIN_FIELD_ID}
+            value={getAppliedSkin()}
+            values={SKIN_OPTIONS.map((option) => option.value)}
+            computeLabel={computeSkinLabel}
+            ariaLabel={"Skin"}
+            onChange={pickSkin}
         />
     </PageProp>
 {/snippet}

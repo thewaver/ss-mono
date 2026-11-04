@@ -17,7 +17,9 @@ const layerClass = useLayerClass();
             glyph !== undefined && styles.controlButtonGlyph,
             flags.isHovered && styles.isHovered,
             flags.isActive && styles.isActive,
+            flags.isPressed && styles.isPressed,
             flags.isDisabled && styles.isDisabled,
+            flags.hasError && styles.hasError,
         ]"
         :aria-hidden="glyph !== undefined || undefined"
     >

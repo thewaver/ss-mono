@@ -10,12 +10,7 @@ export const PageTextFieldAdornment = (props: PropsWithChildren<TextFieldAdornme
 
     return (
         <div
-            className={[
-                styles.textFieldAdornment,
-                layerClass,
-                props.flags.isHovered && styles.isHovered,
-                props.flags.isDisabled && styles.isDisabled,
-            ]
+            className={[styles.textFieldAdornment, layerClass, props.flags.isDisabled && styles.isDisabled]
                 .filter(Boolean)
                 .join(" ")}
         >

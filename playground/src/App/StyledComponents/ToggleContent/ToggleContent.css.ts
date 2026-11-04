@@ -1,6 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
-import { lookEntries, lookStates } from "../../Looks/Look.css";
+import { skinEntries, skinStates } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 
 const TOGGLE_WIDTH = 56;
@@ -11,11 +11,11 @@ const HANDLE_SIZE = TOGGLE_HEIGHT - 2 * (TOGGLE_BORDER + HANDLE_GAP);
 const HALF_SIZE = HANDLE_SIZE * 0.5;
 const HALF_TRAVEL = (TOGGLE_WIDTH - TOGGLE_HEIGHT) * 0.5;
 
-export const isChecked = style([lookStates.isChecked]);
-export const isMixed = style([lookStates.isMixed]);
+export const isChecked = style([skinStates.isChecked]);
+export const isMixed = style([skinStates.isMixed]);
 export const isHovered = style({});
 export const isDisabled = style({});
-export const hasError = style([lookStates.hasError]);
+export const hasError = style([skinStates.hasError]);
 
 export const toggleContent = style({
     display: "flex",
@@ -35,7 +35,7 @@ export const toggleContent = style({
 });
 
 export const toggleTrack = style([
-    lookEntries.toggleTrack,
+    skinEntries.toggleTrack,
     {
         position: "relative",
         flexShrink: 0,
@@ -46,7 +46,7 @@ export const toggleTrack = style([
 ]);
 
 export const toggleHandle = style([
-    lookEntries.toggleHandle,
+    skinEntries.toggleHandle,
     {
         position: "absolute",
         top: `calc(50% - ${HALF_SIZE}px)`,

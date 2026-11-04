@@ -1,5 +1,7 @@
 import { style, styleVariants } from "@vanilla-extract/css";
 
+import { buttonCursor } from "../Buttons/Button/Button.css";
+
 const OVERLAY_OVERHANG = 1;
 
 export const previewSizingVariants = styleVariants({
@@ -32,13 +34,16 @@ export const previewOverlay = style({
     pointerEvents: "none",
 });
 
-export const previewTrigger = style({
-    display: "flex",
-    pointerEvents: "all",
-    border: "none",
-    padding: 0,
-    background: "none",
-    font: "inherit",
-    color: "inherit",
-    textAlign: "inherit",
-});
+export const previewTrigger = style([
+    buttonCursor,
+    {
+        display: "flex",
+        pointerEvents: "all",
+        border: "none",
+        padding: 0,
+        background: "none",
+        font: "inherit",
+        color: "inherit",
+        textAlign: "inherit",
+    },
+]);

@@ -1,14 +1,14 @@
 import { keyframes, style } from "@vanilla-extract/css";
 
-import { lookEntries, lookStates } from "../../Looks/Look.css";
+import { skinEntries, skinStates } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 
 const PROGRESS_THICKNESS = 8;
 const PROGRESS_LENGTH = 160;
 
 export const isIndeterminate = style({});
-export const hasError = style([lookStates.hasError]);
-export const isVertical = style([lookStates.isVertical]);
+export const hasError = style([skinStates.hasError]);
+export const isVertical = style([skinStates.isVertical]);
 
 const sweep = keyframes({
     "0%": { transform: "translateX(-100%)" },
@@ -26,7 +26,7 @@ const sweepUp = keyframes({
 });
 
 export const progressTrack = style([
-    lookEntries.progressTrack,
+    skinEntries.progressTrack,
     {
         position: "relative",
         overflow: "hidden",
@@ -47,7 +47,7 @@ export const progressTrack = style([
 ]);
 
 export const progressFill = style([
-    lookEntries.progressFill,
+    skinEntries.progressFill,
     {
         height: "100%",
         transition: `width ${themeVars.animation.duration}`,

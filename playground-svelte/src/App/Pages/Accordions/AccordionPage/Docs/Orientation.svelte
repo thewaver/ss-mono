@@ -1,8 +1,12 @@
 <script lang="ts">
-    import { Accordion } from "@thewaver/ss-components-svelte";
+    import { Accordion, AccordionUtils } from "@thewaver/ss-components-svelte";
     import type { AccordionItem } from "@thewaver/ss-components-svelte";
     import { DOCS_GAP } from "@thewaver/ss-playground/App/Pages/Accordions/AccordionPage/AccordionPage.const";
     import * as styles from "@thewaver/ss-playground/App/Pages/Accordions/Accordions.css";
+    import {
+        headerJoins,
+        panelJoins,
+    } from "@thewaver/ss-playground/App/StyledComponents/AccordionContent/AccordionContent.css";
 
     import { getLayerClass } from "../../../../StyledComponents/Layer/Layer.context";
     import type { AccordionOrientationDocsExampleProps } from "../AccordionPageSvelte.types";
@@ -27,6 +31,8 @@
 
     let expanded = $state<string[]>(["Mountains"]);
 
+    const panelSide = $derived(AccordionUtils.getPanelSide(props.orientation));
+
     const layerClass = $derived.by(getLayerClass());
 </script>
 
@@ -47,6 +53,7 @@
                     layerClass,
                     flags.isExpanded && styles.isExpanded,
                     flags.isHovered && styles.isHovered,
+                    flags.isExpanded && headerJoins[panelSide],
                 ]}
             >
                 <span class={styles.orientationLabel}>{item.value}</span>
@@ -55,7 +62,12 @@
 
         {#snippet renderPanel(item, visibilityTarget, transitionDurationMs, moveDirection)}
             <div
-                class={[styles.orientationPanel, layerClass, visibilityTarget === 1 && styles.isEntering]}
+                class={[
+                    styles.orientationPanel,
+                    layerClass,
+                    visibilityTarget === 1 && styles.isEntering,
+                    visibilityTarget === 1 && panelJoins[panelSide],
+                ]}
                 data-move={moveDirection}
                 style:opacity={visibilityTarget}
                 style:transition={`opacity ${transitionDurationMs}ms`}

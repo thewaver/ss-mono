@@ -8,6 +8,7 @@ export type BaseAccordionHeaderValues = {
 export type BaseAccordionHeaderProps = BaseAccordionHeaderValues;
 
 export type BaseAccordionPanelValues = {
+    side?: CollapsibleSide;
     visibilityTarget: 0 | 1;
     transitionDurationMs: number;
 };

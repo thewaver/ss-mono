@@ -1,12 +1,12 @@
 import { style } from "@vanilla-extract/css";
 
-import { lookEntries, lookStates } from "../../Looks/Look.css";
+import { skinEntries, skinStates } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 import { layerVars } from "../Layer/Layer.css";
 
-export const isSelected = style([lookStates.isSelected]);
-export const isHovered = style([lookStates.isHovered]);
-export const isDisabled = style([lookStates.isDisabled]);
+export const isSelected = style([skinStates.isSelected]);
+export const isHovered = style([skinStates.isHovered]);
+export const isDisabled = style([skinStates.isDisabled]);
 export const isVisible = style({});
 
 const tabBase = style({
@@ -15,7 +15,7 @@ const tabBase = style({
 });
 
 export const rowTab = style([
-    lookEntries.tabsItem,
+    skinEntries.tabsItem,
     tabBase,
     {
         marginBlockEnd: themeVars.spacing.half,
@@ -23,20 +23,20 @@ export const rowTab = style([
 ]);
 
 export const columnTab = style([
-    lookEntries.tabsItem,
-    lookStates.isVertical,
+    skinEntries.tabsItem,
+    skinStates.isVertical,
     tabBase,
     {
         textAlign: "start",
     },
 ]);
 
-export const rowTabGutter = style([lookEntries.tabsGutter]);
+export const rowTabGutter = style([skinEntries.tabsGutter]);
 
-export const columnTabGutter = style([lookEntries.tabsGutter, lookStates.isVertical]);
+export const columnTabGutter = style([skinEntries.tabsGutter, skinStates.isVertical]);
 
 export const rowTabFloater = style([
-    lookEntries.tabsFloater,
+    skinEntries.tabsFloater,
     {
         transform: "scaleX(0)",
         transition: "transform",
@@ -50,8 +50,8 @@ export const rowTabFloater = style([
 ]);
 
 export const columnTabFloater = style([
-    lookEntries.tabsFloater,
-    lookStates.isVertical,
+    skinEntries.tabsFloater,
+    skinStates.isVertical,
     {
         width: "100%",
         height: "100%",
@@ -67,7 +67,7 @@ export const columnTabFloater = style([
 ]);
 
 export const tabPanel = style([
-    lookEntries.panel,
+    skinEntries.panel,
     {
         padding: themeVars.spacing.full,
         fontSize: themeVars.fontSize.small,
@@ -105,7 +105,7 @@ export const hexTab = style([
 ]);
 
 export const hexTabHighlightFloater = style([
-    lookEntries.hoverFloater,
+    skinEntries.hoverFloater,
     {
         width: "100%",
         height: "100%",

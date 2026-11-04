@@ -1,13 +1,13 @@
 import { style } from "@vanilla-extract/css";
 
-import { lookEntries, lookStates } from "../../Looks/Look.css";
+import { skinEntries, skinStates } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 
-export const isChecked = style([lookStates.isChecked]);
-export const isMixed = style([lookStates.isMixed]);
+export const isChecked = style([skinStates.isChecked]);
+export const isMixed = style([skinStates.isMixed]);
 export const isHovered = style({});
 export const isDisabled = style({});
-export const hasError = style([lookStates.hasError]);
+export const hasError = style([skinStates.hasError]);
 
 export const checkboxContent = style({
     display: "flex",
@@ -27,7 +27,7 @@ export const checkboxContent = style({
 });
 
 export const checkboxBox = style([
-    lookEntries.checkboxBox,
+    skinEntries.checkboxBox,
     {
         display: "flex",
         justifyContent: "center",
@@ -40,7 +40,7 @@ export const checkboxBox = style([
 ]);
 
 export const checkboxMark = style([
-    lookEntries.checkboxMark,
+    skinEntries.checkboxMark,
     {
         transform: "scale(0)",
         transition: `transform ${themeVars.animation.duration}`,

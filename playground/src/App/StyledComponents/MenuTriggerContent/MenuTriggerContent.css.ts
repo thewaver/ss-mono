@@ -1,17 +1,17 @@
 import { style } from "@vanilla-extract/css";
 
-import { lookEntries, lookStates } from "../../Looks/Look.css";
+import { skinEntries, skinStates } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 
 const TRIGGER_CHEVRON_WIDTH = 10;
 
-export const isHovered = style([lookStates.isHovered]);
-export const isActive = style([lookStates.isActive]);
+export const isHovered = style([skinStates.isHovered]);
+export const isActive = style([skinStates.isActive]);
 export const isOpen = style({});
-export const isDisabled = style([lookStates.isDisabled]);
+export const isDisabled = style([skinStates.isDisabled]);
 
 export const menuTriggerContent = style([
-    lookEntries.button,
+    skinEntries.button,
     {
         display: "flex",
         alignItems: "center",

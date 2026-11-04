@@ -1,6 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
-import { lookEntries } from "../../Looks/Look.css";
+import { skinEntries } from "../../Skins/Skin.css";
 import { layerVars } from "../../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../../Theme.css";
 import { exampleContainer, exampleDemo } from "../Examples/Examples.css";
@@ -14,7 +14,7 @@ export const docsExampleStack = style({
 
 export const docsExample = style([exampleContainer]);
 
-export const docsExampleCode = style([lookEntries.hollowSurface]);
+export const docsExampleCode = style([skinEntries.hollowSurface]);
 
 export const docsExampleSection = style({
     display: "flex",

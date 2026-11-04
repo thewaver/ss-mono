@@ -1,6 +1,6 @@
 import type { ParentProps } from "solid-js";
 
-import { access } from "@thewaver/ss-components-solid";
+import { COLLAPSIBLE_DEFAULTS, access } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/AccordionContent/AccordionContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
@@ -8,6 +8,7 @@ import type { AccordionHeaderProps, AccordionPanelProps } from "./AccordionConte
 
 export const PageAccordionHeader = (props: ParentProps<AccordionHeaderProps>) => {
     const getLayerClass = useLayerClass();
+    const getJoinClass = () => styles.headerJoins[access(props.side) ?? COLLAPSIBLE_DEFAULTS.side];
 
     return (
         <div
@@ -17,6 +18,7 @@ export const PageAccordionHeader = (props: ParentProps<AccordionHeaderProps>) =>
                 [styles.isExpanded]: access(props.flags).isExpanded,
                 [styles.isHovered]: access(props.flags).isHovered,
                 [styles.isDisabled]: access(props.flags).isDisabled,
+                [getJoinClass()]: access(props.flags).isExpanded,
             }}
         >
             <div>{props.children}</div>
@@ -30,10 +32,15 @@ export const PageAccordionHeader = (props: ParentProps<AccordionHeaderProps>) =>
 
 export const PageAccordionPanel = (props: ParentProps<AccordionPanelProps>) => {
     const getLayerClass = useLayerClass();
+    const getJoinClass = () => styles.panelJoins[access(props.side) ?? COLLAPSIBLE_DEFAULTS.side];
 
     return (
         <div
-            class={[styles.accordionPanel, getLayerClass()].join(" ")}
+            class={styles.accordionPanel}
+            classList={{
+                [getLayerClass()]: true,
+                [getJoinClass()]: access(props.visibilityTarget) === 1,
+            }}
             style={{
                 opacity: access(props.visibilityTarget),
                 transition: `opacity ${access(props.transitionDurationMs)}ms`,

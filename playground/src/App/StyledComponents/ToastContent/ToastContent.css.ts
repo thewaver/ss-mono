@@ -1,6 +1,6 @@
 import { keyframes, style, styleVariants } from "@vanilla-extract/css";
 
-import { lookEntries } from "../../Looks/Look.css";
+import { skinEntries } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 
 const countdown = keyframes({
@@ -9,7 +9,7 @@ const countdown = keyframes({
 });
 
 export const toastCard = style([
-    lookEntries.surface,
+    skinEntries.surface,
     {
         position: "relative",
         overflow: "hidden",

@@ -1,13 +1,13 @@
 import { style } from "@vanilla-extract/css";
 
-import { lookEntries, lookStates } from "../../Looks/Look.css";
+import { skinEntries, skinStates } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 import { layerVars } from "../Layer/Layer.css";
 import { FIELD_FONT_SIZE, fieldSurface } from "../TextFieldContent/TextFieldContent.css";
 
-export const isHovered = style([lookStates.isHovered]);
+export const isHovered = style([skinStates.isHovered]);
 export const isFocused = style({});
-export const isDisabled = style([lookStates.isDisabled]);
+export const isDisabled = style([skinStates.isDisabled]);
 
 export const tagInputContent = style([
     fieldSurface,
@@ -18,7 +18,7 @@ export const tagInputContent = style([
 ]);
 
 export const tagContent = style([
-    lookEntries.tag,
+    skinEntries.tag,
     {
         display: "flex",
         alignItems: "center",

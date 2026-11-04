@@ -22,11 +22,11 @@ import {
     GALLERY_NAME_SEPARATOR,
     GALLERY_ROUTE,
     GETTING_STARTED_ROUTE,
-    LOOKS_ROUTE,
     NAV_PREVIEW_ARROW,
     NAV_PREVIEW_OFFSET,
     NAV_PREVIEW_PLACEMENT,
     SCREEN_HEIGHT,
+    SKINS_ROUTE,
 } from "@thewaver/ss-playground/App/App.const";
 import * as styles from "@thewaver/ss-playground/App/App.css";
 import { LAYOUT } from "@thewaver/ss-playground/App/Layout.const";
@@ -96,8 +96,8 @@ const PageGalleryPage = lazy(() =>
     import("./Pages/GalleryPage/GalleryPage").then((module) => ({ default: module.GalleryPage })),
 );
 
-const PageLooksPage = lazy(() =>
-    import("./Pages/LooksPage/LooksPage").then((module) => ({ default: module.LooksPage })),
+const PageSkinsPage = lazy(() =>
+    import("./Pages/SkinsPage/SkinsPage").then((module) => ({ default: module.SkinsPage })),
 );
 
 const PassThroughPage = (props: RouteSectionProps) => <>{props.children}</>;
@@ -383,7 +383,7 @@ export function AppContent(props: RouteSectionProps & { viewportAnchor: SignalPa
 
     const getIsGallerySelected = () => toRoutePath(props.location.pathname) === GALLERY_ROUTE;
 
-    const getIsLooksSelected = () => toRoutePath(props.location.pathname) === LOOKS_ROUTE;
+    const getIsSkinsSelected = () => toRoutePath(props.location.pathname) === SKINS_ROUTE;
 
     const getIsSearching = createMemo(() => getSearchTerm().trim().length > 0);
 
@@ -580,8 +580,8 @@ export function AppContent(props: RouteSectionProps & { viewportAnchor: SignalPa
                                                 {"Gallery"}
                                             </PageNavLink>
 
-                                            <PageNavLink href={LOOKS_ROUTE} isSelected={getIsLooksSelected()} isGliding>
-                                                {"Looks"}
+                                            <PageNavLink href={SKINS_ROUTE} isSelected={getIsSkinsSelected()} isGliding>
+                                                {"Skins"}
                                             </PageNavLink>
                                         </PageNavLinkGroup>
                                     </div>
@@ -713,7 +713,7 @@ export function App() {
                     <Route path="/" component={PageAboutPage} />
                     <Route path={GETTING_STARTED_ROUTE} component={PageGettingStartedPage} />
                     <Route path={GALLERY_ROUTE} component={() => <PageGalleryPage sections={GALLERY_SECTIONS} />} />
-                    <Route path={LOOKS_ROUTE} component={PageLooksPage} />
+                    <Route path={SKINS_ROUTE} component={PageSkinsPage} />
                     {COMPONENT_CONFIGS.map((config) => (
                         <Route path={componentToRouteName(config.name)} component={PassThroughPage}>
                             <Route

@@ -16,7 +16,9 @@ export const PageControlButtonContent = (props: PropsWithChildren<ControlButtonC
                 props.glyph !== undefined && styles.controlButtonGlyph,
                 props.flags.isHovered && styles.isHovered,
                 props.flags.isActive && styles.isActive,
+                props.flags.isPressed && styles.isPressed,
                 props.flags.isDisabled && styles.isDisabled,
+                props.flags.hasError && styles.hasError,
             ]
                 .filter(Boolean)
                 .join(" ")}

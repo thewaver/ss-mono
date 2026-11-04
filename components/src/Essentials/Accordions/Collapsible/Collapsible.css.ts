@@ -4,6 +4,7 @@ import type { CornerRunDirection } from "../../../Abstracts/CornerRun/CornerRun.
 import { CornerRunUtils } from "../../../Abstracts/CornerRun/CornerRun.utils";
 
 import { interactionRoot } from "../../../Primitives/InteractionWrapper/InteractionWrapper.css";
+import { buttonCursor } from "../../Buttons/Button/Button.css";
 
 export const collapsibleSizingVariants = styleVariants({
     "fit-content": {
@@ -33,18 +34,21 @@ export const collapsibleSidewaysContent = style({
     height: "100%",
 });
 
-export const collapsibleTrigger = style({
-    display: "flex",
-    pointerEvents: "all",
-    width: "100%",
-    border: "none",
-    borderRadius: "inherit",
-    padding: 0,
-    background: "none",
-    font: "inherit",
-    color: "inherit",
-    textAlign: "inherit",
-});
+export const collapsibleTrigger = style([
+    buttonCursor,
+    {
+        display: "flex",
+        pointerEvents: "all",
+        width: "100%",
+        border: "none",
+        borderRadius: "inherit",
+        padding: 0,
+        background: "none",
+        font: "inherit",
+        color: "inherit",
+        textAlign: "inherit",
+    },
+]);
 
 export const collapsibleHeading = style({
     margin: 0,

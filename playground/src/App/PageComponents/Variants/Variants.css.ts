@@ -1,6 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
-import { lookEntries } from "../../Looks/Look.css";
+import { skinEntries } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 
 export const DEFAULT_MIN_COLUMN_WIDTH = 320;
@@ -12,7 +12,7 @@ export const variantsRoot = style({
 });
 
 export const variantContainer = style([
-    lookEntries.surface,
+    skinEntries.surface,
     {
         display: "flex",
         flexDirection: "column",

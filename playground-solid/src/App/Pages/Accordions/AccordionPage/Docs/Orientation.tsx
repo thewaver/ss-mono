@@ -1,9 +1,13 @@
 import { createSignal } from "solid-js";
 
-import { Accordion, access } from "@thewaver/ss-components-solid";
+import { Accordion, AccordionUtils, access } from "@thewaver/ss-components-solid";
 import type { AccordionItem } from "@thewaver/ss-components-solid";
 import { DOCS_GAP } from "@thewaver/ss-playground/App/Pages/Accordions/AccordionPage/AccordionPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/Accordions/Accordions.css";
+import {
+    headerJoins,
+    panelJoins,
+} from "@thewaver/ss-playground/App/StyledComponents/AccordionContent/AccordionContent.css";
 
 import { useLayerClass } from "../../../../StyledComponents/Layer/Layer.context";
 import type { AccordionOrientationDocsExampleProps } from "../AccordionPageSolid.types";
@@ -27,6 +31,7 @@ type Props = AccordionOrientationDocsExampleProps;
 export const OrientationDocsExample = (props: Props) => {
     const getLayerClass = useLayerClass();
     const expandedSignal = createSignal<string[]>(["Mountains"]);
+    const getPanelSide = () => AccordionUtils.getPanelSide(access(props.orientation));
 
     return (
         <div class={styles.orientationExample} data-orientation={access(props.orientation)}>
@@ -45,6 +50,7 @@ export const OrientationDocsExample = (props: Props) => {
                             [getLayerClass()]: true,
                             [styles.isExpanded]: getFlags().isExpanded,
                             [styles.isHovered]: getFlags().isHovered,
+                            [headerJoins[getPanelSide()]]: getFlags().isExpanded,
                         }}
                     >
                         <span class={styles.orientationLabel}>{getItem().value}</span>
@@ -52,8 +58,12 @@ export const OrientationDocsExample = (props: Props) => {
                 )}
                 renderPanel={(getItem, getVisibilityTarget, getTransitionDurationMs, getMoveDirection) => (
                     <div
-                        class={[styles.orientationPanel, getLayerClass()].join(" ")}
-                        classList={{ [styles.isEntering]: getVisibilityTarget() === 1 }}
+                        class={styles.orientationPanel}
+                        classList={{
+                            [getLayerClass()]: true,
+                            [styles.isEntering]: getVisibilityTarget() === 1,
+                            [panelJoins[getPanelSide()]]: getVisibilityTarget() === 1,
+                        }}
                         data-move={getMoveDirection()}
                         style={{
                             "opacity": getVisibilityTarget(),

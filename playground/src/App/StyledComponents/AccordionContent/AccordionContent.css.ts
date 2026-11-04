@@ -1,14 +1,34 @@
+import type { CollapsibleSide } from "@thewaver/ss-components";
 import { style } from "@vanilla-extract/css";
 
-import { lookEntries, lookStates } from "../../Looks/Look.css";
+import { skinEntries, skinStates } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 
-export const isExpanded = style([lookStates.isExpanded]);
-export const isHovered = style([lookStates.isHovered]);
-export const isDisabled = style([lookStates.isDisabled]);
+export const isExpanded = style([skinStates.isExpanded]);
+export const isHovered = style([skinStates.isHovered]);
+export const isDisabled = style([skinStates.isDisabled]);
+
+const isJoinedBlockStart = style([skinStates.isJoinedBlockStart]);
+const isJoinedBlockEnd = style([skinStates.isJoinedBlockEnd]);
+const isJoinedInlineStart = style([skinStates.isJoinedInlineStart]);
+const isJoinedInlineEnd = style([skinStates.isJoinedInlineEnd]);
+
+export const headerJoins: Record<CollapsibleSide, string> = {
+    top: isJoinedBlockStart,
+    right: isJoinedInlineEnd,
+    bottom: isJoinedBlockEnd,
+    left: isJoinedInlineStart,
+};
+
+export const panelJoins: Record<CollapsibleSide, string> = {
+    top: isJoinedBlockEnd,
+    right: isJoinedInlineStart,
+    bottom: isJoinedBlockStart,
+    left: isJoinedInlineEnd,
+};
 
 export const accordionHeader = style([
-    lookEntries.accordionHeader,
+    skinEntries.accordionHeader,
     {
         display: "flex",
         alignItems: "center",
@@ -19,7 +39,7 @@ export const accordionHeader = style([
         transition: `filter ${themeVars.animation.duration}`,
 
         selectors: {
-            [`.${lookEntries.hollowSurface} &`]: {
+            [`.${skinEntries.hollowSurface} &`]: {
                 borderRadius: "inherit",
             },
         },
@@ -56,7 +76,7 @@ export const accordionMarker = style({
 });
 
 export const accordionPanel = style([
-    lookEntries.accordionPanel,
+    skinEntries.accordionPanel,
     {
         display: "flex",
         flexDirection: "column",
@@ -65,7 +85,7 @@ export const accordionPanel = style([
         fontSize: themeVars.fontSize.small,
 
         selectors: {
-            [`.${lookEntries.hollowSurface} &`]: {
+            [`.${skinEntries.hollowSurface} &`]: {
                 borderRadius: "inherit",
             },
         },

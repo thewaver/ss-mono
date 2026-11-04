@@ -1,6 +1,6 @@
 import { style, styleVariants } from "@vanilla-extract/css";
 
-import { lookEntries, lookStates } from "../../Looks/Look.css";
+import { skinEntries, skinStates } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 
 export const RANGE_THUMB_SIZE = 18;
@@ -9,9 +9,9 @@ export const RANGE_LENGTH = 220;
 
 export const isFocused = style({});
 export const isDisabled = style({});
-export const hasError = style([lookStates.hasError]);
-export const isStart = style([lookStates.isStart]);
-export const isEnd = style([lookStates.isEnd]);
+export const hasError = style([skinStates.hasError]);
+export const isStart = style([skinStates.isStart]);
+export const isEnd = style([skinStates.isEnd]);
 
 export const rangeContent = style({
     position: "relative",
@@ -35,7 +35,7 @@ export const rangeContentVariants = styleVariants({
 });
 
 export const rangeTrack = style([
-    lookEntries.rangeTrack,
+    skinEntries.rangeTrack,
     {
         position: "absolute",
     },
@@ -50,7 +50,7 @@ export const rangeTrackVariants = styleVariants({
         transform: `translateY(-50%)`,
     },
     vertical: [
-        lookStates.isVertical,
+        skinStates.isVertical,
         {
             top: 0,
             bottom: 0,
@@ -62,7 +62,7 @@ export const rangeTrackVariants = styleVariants({
 });
 
 export const rangeFill = style([
-    lookEntries.rangeFill,
+    skinEntries.rangeFill,
     {
         position: "absolute",
     },
@@ -74,7 +74,7 @@ export const rangeFillVariants = styleVariants({
         bottom: 0,
     },
     vertical: [
-        lookStates.isVertical,
+        skinStates.isVertical,
         {
             left: 0,
             right: 0,
@@ -83,7 +83,7 @@ export const rangeFillVariants = styleVariants({
 });
 
 export const rangeThumb = style([
-    lookEntries.rangeThumb,
+    skinEntries.rangeThumb,
     {
         position: "absolute",
         width: RANGE_THUMB_SIZE,
@@ -104,7 +104,7 @@ export const rangeThumbVariants = styleVariants({
         marginTop: -RANGE_THUMB_SIZE * 0.5,
     },
     vertical: [
-        lookStates.isVertical,
+        skinStates.isVertical,
         {
             left: "50%",
             marginLeft: -RANGE_THUMB_SIZE * 0.5,

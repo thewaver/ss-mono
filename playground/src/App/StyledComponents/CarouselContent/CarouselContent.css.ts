@@ -1,6 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
-import { lookEntries } from "../../Looks/Look.css";
+import { skinEntries } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 import { controlButtonBase, isActive, isDisabled, isHovered } from "../ControlButtonContent/ControlButtonContent.css";
 import { layerVars } from "../Layer/Layer.css";
@@ -11,7 +11,7 @@ export const isCurrent = style({});
 export { isActive, isDisabled, isHovered };
 
 export const carouselSlide = style([
-    lookEntries.panel,
+    skinEntries.panel,
     {
         display: "flex",
         flexDirection: "column",

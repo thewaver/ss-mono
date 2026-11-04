@@ -1,10 +1,14 @@
 <script setup lang="ts">
-import { shallowRef } from "vue";
+import { computed, shallowRef } from "vue";
 
-import { Accordion } from "@thewaver/ss-components-vue";
+import { Accordion, AccordionUtils } from "@thewaver/ss-components-vue";
 import type { AccordionItem } from "@thewaver/ss-components-vue";
 import { DOCS_GAP } from "@thewaver/ss-playground/App/Pages/Accordions/AccordionPage/AccordionPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/Accordions/Accordions.css";
+import {
+    headerJoins,
+    panelJoins,
+} from "@thewaver/ss-playground/App/StyledComponents/AccordionContent/AccordionContent.css";
 
 import { useLayerClass } from "../../../../StyledComponents/Layer/Layer.context";
 import type { AccordionOrientationDocsExampleProps } from "../AccordionPageVue.types";
@@ -25,11 +29,12 @@ const ITEMS: AccordionItem<string>[] = [
 
 type Props = AccordionOrientationDocsExampleProps;
 
-defineProps<Props>();
+const props = defineProps<Props>();
 
 const layerClass = useLayerClass();
 
 const expanded = shallowRef<string[]>(["Mountains"]);
+const panelSide = computed(() => AccordionUtils.getPanelSide(props.orientation));
 </script>
 
 <template>
@@ -50,6 +55,7 @@ const expanded = shallowRef<string[]>(["Mountains"]);
                         layerClass,
                         flags.isExpanded && styles.isExpanded,
                         flags.isHovered && styles.isHovered,
+                        flags.isExpanded && headerJoins[panelSide],
                     ]"
                 >
                     <span :class="styles.orientationLabel">{{ item.value }}</span>
@@ -58,7 +64,12 @@ const expanded = shallowRef<string[]>(["Mountains"]);
 
             <template #renderPanel="{ item, visibilityTarget, transitionDurationMs, moveDirection }">
                 <div
-                    :class="[styles.orientationPanel, layerClass, visibilityTarget === 1 && styles.isEntering]"
+                    :class="[
+                        styles.orientationPanel,
+                        layerClass,
+                        visibilityTarget === 1 && styles.isEntering,
+                        visibilityTarget === 1 && panelJoins[panelSide],
+                    ]"
                     :data-move="moveDirection"
                     :style="{
                         opacity: visibilityTarget,

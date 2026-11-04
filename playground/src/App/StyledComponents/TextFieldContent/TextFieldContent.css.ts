@@ -1,6 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
-import { lookEntries, lookStates } from "../../Looks/Look.css";
+import { skinEntries, skinStates } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 import { layerVars } from "../Layer/Layer.css";
 
@@ -21,13 +21,13 @@ export const FIELD_FONT_SIZE = themeVars.fontSize.medium;
 export const isEmpty = style({});
 export const isStretched = style({});
 export const isTopAligned = style({});
-export const isHovered = style([lookStates.isHovered]);
-export const isReadOnly = style([lookStates.isReadOnly]);
-export const isDisabled = style([lookStates.isDisabled]);
-export const hasError = style([lookStates.hasError]);
+export const isHovered = style([skinStates.isHovered]);
+export const isReadOnly = style([skinStates.isReadOnly]);
+export const isDisabled = style([skinStates.isDisabled]);
+export const hasError = style([skinStates.hasError]);
 
 export const fieldSurface = style([
-    lookEntries.input,
+    skinEntries.input,
     {
         transition: `filter ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}, border-color ${themeVars.animation.duration}`,
     },

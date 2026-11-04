@@ -10,14 +10,7 @@ const layerClass = useLayerClass();
 </script>
 
 <template>
-    <div
-        :class="[
-            styles.textFieldAdornment,
-            layerClass,
-            flags.isHovered && styles.isHovered,
-            flags.isDisabled && styles.isDisabled,
-        ]"
-    >
+    <div :class="[styles.textFieldAdornment, layerClass, flags.isDisabled && styles.isDisabled]">
         <slot />
     </div>
 </template>

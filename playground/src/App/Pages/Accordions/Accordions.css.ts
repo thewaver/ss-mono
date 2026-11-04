@@ -1,6 +1,6 @@
 import { createVar, keyframes, style } from "@vanilla-extract/css";
 
-import { lookEntries, lookStates } from "../../Looks/Look.css";
+import { skinEntries, skinStates } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 
 export const textWithPanel = style({
@@ -70,11 +70,11 @@ export const orientationExample = style([
 const whenHorizontal = `${orientationExample}[data-orientation="horizontal"] &`;
 const whenVertical = `${orientationExample}[data-orientation="vertical"] &`;
 
-export const isExpanded = style([lookStates.isExpanded]);
-export const isHovered = style([lookStates.isHovered]);
+export const isExpanded = style([skinStates.isExpanded]);
+export const isHovered = style([skinStates.isHovered]);
 
 export const orientationStrip = style([
-    lookEntries.accordionHeader,
+    skinEntries.accordionHeader,
     {
         display: "flex",
         alignItems: "center",
@@ -106,7 +106,7 @@ export const orientationLabel = style({
 export const isEntering = style({});
 
 export const orientationPanel = style([
-    lookEntries.accordionPanel,
+    skinEntries.accordionPanel,
     {
         vars: { [moveVar]: "0" },
         display: "flex",

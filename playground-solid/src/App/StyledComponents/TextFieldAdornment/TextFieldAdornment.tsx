@@ -14,7 +14,6 @@ export const PageTextFieldAdornment = (props: ParentProps<TextFieldAdornmentProp
             class={styles.textFieldAdornment}
             classList={{
                 [getLayerClass()]: true,
-                [styles.isHovered]: access(props.flags).isHovered,
                 [styles.isDisabled]: access(props.flags).isDisabled,
             }}
         >

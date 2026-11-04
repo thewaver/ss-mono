@@ -1,6 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
-import { lookEntries } from "../../Looks/Look.css";
+import { skinEntries } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 import { layerVars } from "../Layer/Layer.css";
 
@@ -63,7 +63,7 @@ export const clockColumn = style({
 });
 
 export const clockFrame = style([
-    lookEntries.dropdown,
+    skinEntries.dropdown,
     {
         display: "flex",
         flexDirection: "column",

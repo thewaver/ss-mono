@@ -5,7 +5,7 @@
         FIELD_PADDING,
     } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
-    import PageTextFieldAdornment from "../../../StyledComponents/TextFieldAdornment/TextFieldAdornment.svelte";
+    import PageTextFieldButtonContent from "../../../StyledComponents/TextFieldButtonContent/TextFieldButtonContent.svelte";
     import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
     import PageTextFieldPlaceholder from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.svelte";
 
@@ -36,7 +36,7 @@
             }}
         >
             {#snippet renderContent(flags)}
-                <PageTextFieldAdornment {flags}>{reveal ? "Hide" : "Show"}</PageTextFieldAdornment>
+                <PageTextFieldButtonContent {flags}>{reveal ? "Hide" : "Show"}</PageTextFieldButtonContent>
             {/snippet}
         </Button>
     {/snippet}

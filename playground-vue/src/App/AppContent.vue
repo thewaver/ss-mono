@@ -18,10 +18,10 @@ import { AppUtils } from "./App.utils";
 import {
     GALLERY_ROUTE,
     GETTING_STARTED_ROUTE,
-    LOOKS_ROUTE,
     MENU_EDGE,
     MENU_ID,
     SEARCH_FIELD_WIDTH,
+    SKINS_ROUTE,
 } from "./AppVue.const";
 import PageAppCommands from "./PageComponents/AppCommands/PageAppCommands.vue";
 import PageBuildProgress from "./PageComponents/BuildProgress/PageBuildProgress.vue";
@@ -74,7 +74,7 @@ const isGettingStartedSelected = computed(() => route.path === GETTING_STARTED_R
 
 const isGallerySelected = computed(() => route.path === GALLERY_ROUTE);
 
-const isLooksSelected = computed(() => route.path === LOOKS_ROUTE);
+const isSkinsSelected = computed(() => route.path === SKINS_ROUTE);
 
 const isSearching = computed(() => searchTerm.value.trim().length > 0);
 
@@ -260,8 +260,8 @@ const computeNodeText = (node: TreeNode<MenuNodeConfig>) => node.value.name;
                                             Gallery
                                         </PageNavLink>
 
-                                        <PageNavLink :href="LOOKS_ROUTE" :is-selected="isLooksSelected" is-gliding>
-                                            Looks
+                                        <PageNavLink :href="SKINS_ROUTE" :is-selected="isSkinsSelected" is-gliding>
+                                            Skins
                                         </PageNavLink>
                                     </PageNavLinkGroup>
                                 </div>

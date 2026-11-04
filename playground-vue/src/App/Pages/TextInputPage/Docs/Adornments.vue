@@ -10,6 +10,7 @@ import person from "@thewaver/ss-playground/App/person.svg";
 
 import PageIcon from "../../../StyledComponents/Icon/Icon.vue";
 import PageTextFieldAdornment from "../../../StyledComponents/TextFieldAdornment/TextFieldAdornment.vue";
+import PageTextFieldButtonContent from "../../../StyledComponents/TextFieldButtonContent/TextFieldButtonContent.vue";
 import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 import PageTextFieldPlaceholder from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.vue";
 
@@ -43,7 +44,7 @@ const clear = () => {
         <template #renderTrailing>
             <Button :is-disabled="value === ''" @click="clear">
                 <template #renderContent="flags">
-                    <PageTextFieldAdornment :flags="flags">Clear</PageTextFieldAdornment>
+                    <PageTextFieldButtonContent :flags="flags">Clear</PageTextFieldButtonContent>
                 </template>
             </Button>
         </template>

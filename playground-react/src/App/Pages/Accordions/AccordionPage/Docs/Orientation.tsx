@@ -1,9 +1,13 @@
 import { useState } from "react";
 
-import { Accordion } from "@thewaver/ss-components-react";
+import { Accordion, AccordionUtils } from "@thewaver/ss-components-react";
 import type { AccordionItem } from "@thewaver/ss-components-react";
 import { DOCS_GAP } from "@thewaver/ss-playground/App/Pages/Accordions/AccordionPage/AccordionPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/Accordions/Accordions.css";
+import {
+    headerJoins,
+    panelJoins,
+} from "@thewaver/ss-playground/App/StyledComponents/AccordionContent/AccordionContent.css";
 
 import { useLayerClass } from "../../../../StyledComponents/Layer/Layer.context";
 import type { AccordionOrientationDocsExampleProps } from "../AccordionPageReact.types";
@@ -27,6 +31,7 @@ type Props = AccordionOrientationDocsExampleProps;
 export const OrientationDocsExample = (props: Props) => {
     const layerClass = useLayerClass();
     const expandedState = useState<string[]>(["Mountains"]);
+    const panelSide = AccordionUtils.getPanelSide(props.orientation);
 
     return (
         <div className={styles.orientationExample} data-orientation={props.orientation}>
@@ -45,6 +50,7 @@ export const OrientationDocsExample = (props: Props) => {
                             layerClass,
                             flags.isExpanded && styles.isExpanded,
                             flags.isHovered && styles.isHovered,
+                            flags.isExpanded && headerJoins[panelSide],
                         ]
                             .filter(Boolean)
                             .join(" ")}
@@ -54,7 +60,12 @@ export const OrientationDocsExample = (props: Props) => {
                 )}
                 renderPanel={(item, visibilityTarget, transitionDurationMs, moveDirection) => (
                     <div
-                        className={[styles.orientationPanel, layerClass, visibilityTarget === 1 && styles.isEntering]
+                        className={[
+                            styles.orientationPanel,
+                            layerClass,
+                            visibilityTarget === 1 && styles.isEntering,
+                            visibilityTarget === 1 && panelJoins[panelSide],
+                        ]
                             .filter(Boolean)
                             .join(" ")}
                         data-move={moveDirection}

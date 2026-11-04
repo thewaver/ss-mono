@@ -2,9 +2,9 @@ import { createApp } from "vue";
 import type { RouteRecordRaw } from "vue-router";
 import { createRouter, createWebHistory } from "vue-router";
 
-import { DEFAULT_LOOK, PLAYGROUND_LOOKS } from "@thewaver/ss-playground/App/Looks/Look.const";
 import { MENU_DESCRIPTIONS } from "@thewaver/ss-playground/App/MenuDescriptions.const";
 import { toPageViewRoute } from "@thewaver/ss-playground/App/PageComponents/ViewTabs/ViewTabs.const";
+import { DEFAULT_SKIN, PLAYGROUND_SKINS } from "@thewaver/ss-playground/App/Skins/Skin.const";
 import { PLAYGROUND_THEMES } from "@thewaver/ss-playground/App/Theme.css";
 
 import { AppUtils } from "./App/App.utils";
@@ -49,8 +49,8 @@ const router = createRouter({
                     props: { sections: AppUtils.GALLERY_SECTIONS },
                 },
                 {
-                    path: "looks",
-                    component: () => import("./App/Pages/LooksPage/LooksPage.vue"),
+                    path: "skins",
+                    component: () => import("./App/Pages/SkinsPage/SkinsPage.vue"),
                 },
                 ...PAGE_ROUTES,
             ],
@@ -59,6 +59,6 @@ const router = createRouter({
 });
 
 document.documentElement.classList.add(PLAYGROUND_THEMES.vue);
-document.documentElement.classList.add(PLAYGROUND_LOOKS[DEFAULT_LOOK]);
+document.documentElement.classList.add(PLAYGROUND_SKINS[DEFAULT_SKIN]);
 
 createApp(App).use(router).mount("#root");

@@ -1,14 +1,14 @@
 import { globalStyle, style } from "@vanilla-extract/css";
 
-import { lookEntries, lookStates } from "../../Looks/Look.css";
+import { skinEntries, skinStates } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 import { layerVars } from "../Layer/Layer.css";
 
 export const isBranch = style({});
 export const isExpanded = style({});
-export const isHovered = style([lookStates.isHovered]);
-export const isSelected = style([lookStates.isSelected]);
-export const isDisabled = style([lookStates.isDisabled]);
+export const isHovered = style([skinStates.isHovered]);
+export const isSelected = style([skinStates.isSelected]);
+export const isDisabled = style([skinStates.isDisabled]);
 export const isCategory = style({});
 export const isRightToLeft = style({});
 
@@ -29,9 +29,9 @@ const treeNodeBase = style({
     },
 });
 
-export const treeNodeContent = style([lookEntries.itemWithFloater, treeNodeBase]);
+export const treeNodeContent = style([skinEntries.itemWithFloater, treeNodeBase]);
 
-export const treeNodeContentWithoutFloater = style([lookEntries.itemWithoutFloater, treeNodeBase]);
+export const treeNodeContentWithoutFloater = style([skinEntries.itemWithoutFloater, treeNodeBase]);
 
 export const treeNodeMarker = style({
     width: "1ch",

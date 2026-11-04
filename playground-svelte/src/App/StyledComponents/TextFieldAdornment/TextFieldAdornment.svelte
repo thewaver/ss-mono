@@ -15,7 +15,6 @@
     class={[
         styles.textFieldAdornment,
         layerClass,
-        props.flags.isHovered && styles.isHovered,
         props.flags.isDisabled && styles.isDisabled,
     ]}
 >

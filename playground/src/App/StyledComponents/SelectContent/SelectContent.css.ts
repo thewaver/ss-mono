@@ -1,6 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
-import { lookEntries, lookStates } from "../../Looks/Look.css";
+import { skinEntries, skinStates } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 import { layerVars } from "../Layer/Layer.css";
 import { SELECT_CLEAR_SIZE } from "../SelectClear/SelectClear.css";
@@ -17,14 +17,14 @@ export const FIELD_FONT_SIZE = themeVars.fontSize.medium;
 
 export const isEmpty = style({});
 export const isFiltering = style({});
-export const isHovered = style([lookStates.isHovered]);
+export const isHovered = style([skinStates.isHovered]);
 export const isActive = style({});
 export const isOpen = style({});
-export const isDisabled = style([lookStates.isDisabled]);
-export const hasError = style([lookStates.hasError]);
+export const isDisabled = style([skinStates.isDisabled]);
+export const hasError = style([skinStates.hasError]);
 
 export const selectContent = style([
-    lookEntries.input,
+    skinEntries.input,
     {
         display: "flex",
         alignItems: "center",

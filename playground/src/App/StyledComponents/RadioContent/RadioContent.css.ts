@@ -1,12 +1,12 @@
 import { style } from "@vanilla-extract/css";
 
-import { lookEntries, lookStates } from "../../Looks/Look.css";
+import { skinEntries, skinStates } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 
-export const isChecked = style([lookStates.isChecked]);
+export const isChecked = style([skinStates.isChecked]);
 export const isHovered = style({});
 export const isDisabled = style({});
-export const hasError = style([lookStates.hasError]);
+export const hasError = style([skinStates.hasError]);
 
 export const radioContent = style({
     display: "flex",
@@ -29,7 +29,7 @@ export const radioContent = style({
 });
 
 export const radioMarker = style([
-    lookEntries.radioBox,
+    skinEntries.radioBox,
     {
         display: "flex",
         justifyContent: "center",
@@ -42,7 +42,7 @@ export const radioMarker = style([
 ]);
 
 export const radioDot = style([
-    lookEntries.radioDot,
+    skinEntries.radioDot,
     {
         width: 8,
         height: 8,
