@@ -9,4 +9,4 @@
     const layerClass = $derived.by(getLayerClass());
 </script>
 
-<div class={[props.orientation === "horizontal" ? styles.rowTabGutter : undefined, layerClass]} data-gutter=""></div>
+<div class={[props.orientation === "horizontal" ? styles.rowTabGutter : styles.columnTabGutter, layerClass]} data-gutter=""></div>

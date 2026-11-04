@@ -10,5 +10,8 @@ const layerClass = useLayerClass();
 </script>
 
 <template>
-    <div :class="[orientation === 'horizontal' ? styles.rowTabGutter : undefined, layerClass]" data-gutter="" />
+    <div
+        :class="[orientation === 'horizontal' ? styles.rowTabGutter : styles.columnTabGutter, layerClass]"
+        data-gutter=""
+    />
 </template>

@@ -1,4 +1,4 @@
-import { style } from "@vanilla-extract/css";
+import { globalStyle, style } from "@vanilla-extract/css";
 
 import { LOOK_COLUMN_MIN_WIDTH } from "./LooksPage.const";
 
@@ -11,6 +11,10 @@ export const looksPage = style({
     display: "flex",
     flexDirection: "column",
     gap: themeVars.spacing.quad,
+    width: "100%",
+});
+
+globalStyle(`${looksPage} > [role="radiogroup"]`, {
     width: "100%",
 });
 

@@ -1,4 +1,5 @@
-import { style } from "@vanilla-extract/css";
+import { ObjectUtils } from "@thewaver/ss-utils";
+import { type StyleRule, style } from "@vanilla-extract/css";
 
 import { LookUtils } from "../Look.utils";
 
@@ -14,31 +15,7 @@ const SHADOW_SMALL = "0 2px 2px 0px rgba(0, 0, 0, 0.65)";
 const SHADOW_MEDIUM = `${SHADOW_SMALL}, 0 4px 8px 0px rgba(0, 0, 0, 0.5)`;
 const SHADOW_LARGE = `${SHADOW_MEDIUM}, 0 16px 64px 0px rgba(0, 0, 0, 0.35)`;
 
-const FIELD_SURFACE = {
-    border: `2px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
-    backgroundColor: layerVars.main,
-    boxShadow: SHADOW_SMALL,
-} as const;
-
-const SWITCH_BOX_STATES = {
-    [lookSelectors.withinError]: {
-        borderColor: themeVars.color.error.main,
-    },
-} as const;
-
-const ITEM_STATES = {
-    [lookSelectors.isSelected]: {
-        color: themeVars.color.primary.main,
-        fontWeight: "bold",
-    },
-    [lookSelectors.isDisabled]: {
-        backgroundColor: "transparent",
-        filter: themeVars.disabled.filter,
-        opacity: themeVars.disabled.opacity,
-    },
-} as const;
-
-const BUTTON_STATES = {
+const INTERACTIBLE_STATES: StyleRule["selectors"] = {
     [lookSelectors.isHovered]: {
         filter: themeVars.hover.filter,
     },
@@ -51,14 +28,33 @@ const BUTTON_STATES = {
     },
 } as const;
 
-const PANEL = {
-    borderRadius: themeVars.borderRadius.half,
-    backgroundColor: `rgb(from ${layerVars.main} r g b / 50%)`,
-    color: layerVars.contrast,
+const INPUT_STATES: StyleRule["selectors"] = {
+    [LookUtils.anyOf(lookSelectors.hasErrorWithin, lookSelectors.hasError)]: {
+        borderColor: themeVars.color.error.main,
+    },
+    ...INTERACTIBLE_STATES,
+} as const;
+
+const ITEM_STATES: StyleRule["selectors"] = ObjectUtils.deepMerge(
+    {
+        [lookSelectors.isSelected]: {
+            color: themeVars.color.primary.main,
+            fontWeight: "bold",
+        },
+        [lookSelectors.isDisabled]: {
+            backgroundColor: "transparent",
+        },
+    },
+    INTERACTIBLE_STATES,
+);
+
+const FIELD_SHELL: StyleRule = {
+    border: `2px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
+    backgroundColor: layerVars.main,
     boxShadow: SHADOW_SMALL,
 } as const;
 
-const SURFACE = {
+const SURFACE: StyleRule = {
     borderRadius: themeVars.borderRadius.full,
     backgroundColor: themeVars.color.surface.dark,
     backgroundImage: `linear-gradient(315deg, ${themeVars.color.surface.dark}, ${themeVars.color.surface.light})`,
@@ -67,26 +63,6 @@ const SURFACE = {
 } as const;
 
 LookUtils.define(plasticine, {
-    pageBackground: {
-        backgroundColor: themeVars.color.background.dark,
-        backgroundImage: `linear-gradient(315deg, ${themeVars.color.background.dark}, ${themeVars.color.background.light})`,
-        color: themeVars.color.background.contrast,
-    },
-    drawer: {
-        backgroundColor: themeVars.color.surface.dark,
-        backgroundImage: `linear-gradient(45deg, ${themeVars.color.surface.dark}, ${themeVars.color.surface.light})`,
-        color: themeVars.color.surface.contrast,
-        boxShadow: SHADOW_LARGE,
-    },
-    surface: SURFACE,
-    hollowSurface: LookUtils.hollow(SURFACE),
-    panel: PANEL,
-    tooltip: {
-        borderRadius: themeVars.borderRadius.full,
-        backgroundColor: layerVars.main,
-        color: layerVars.contrast,
-        boxShadow: SHADOW_SMALL,
-    },
     accordionHeader: {
         borderRadius: themeVars.borderRadius.half,
         backgroundColor: `rgb(from ${layerVars.main} r g b / 50%)`,
@@ -102,9 +78,11 @@ LookUtils.define(plasticine, {
             },
         },
     },
-    accordionPanel: PANEL,
-    opaqueOverlay: {
-        backgroundColor: "black",
+    accordionPanel: {
+        borderRadius: themeVars.borderRadius.half,
+        backgroundColor: `rgb(from ${layerVars.main} r g b / 50%)`,
+        color: layerVars.contrast,
+        boxShadow: SHADOW_SMALL,
     },
     blurredOverlay: {
         backdropFilter: "blur(10px) grayscale(75%)",
@@ -119,15 +97,14 @@ LookUtils.define(plasticine, {
         fontWeight: "bold",
         selectors: {
             [lookSelectors.isPressed]: {
-                backgroundImage: `linear-gradient(135deg, ${themeVars.color.primary.dark}, ${themeVars.color.primary.light})`,
-                boxShadow: `inset 0 2px 4px rgb(0 0 0 / 50%)`,
+                boxShadow: `inset 0 1px 3px rgb(0 0 0 / 75%), inset 0 2px 6px rgb(0 0 0 / 50%)`,
             },
             [lookSelectors.hasError]: {
-                backgroundColor: themeVars.color.error.dark,
+                backgroundColor: themeVars.color.error.main,
                 backgroundImage: `linear-gradient(315deg, ${themeVars.color.error.dark}, ${themeVars.color.error.light})`,
                 color: themeVars.color.error.contrast,
             },
-            ...BUTTON_STATES,
+            ...INTERACTIBLE_STATES,
         },
     },
     buttonSimple: {
@@ -137,11 +114,20 @@ LookUtils.define(plasticine, {
         boxShadow: SHADOW_SMALL,
         fontSize: themeVars.fontSize.small,
         selectors: {
-            ...BUTTON_STATES,
             [lookSelectors.isSelected]: {
                 color: themeVars.color.primary.main,
             },
+            ...INTERACTIBLE_STATES,
         },
+    },
+    checkboxBox: {
+        ...FIELD_SHELL,
+        borderRadius: themeVars.borderRadius.half,
+        selectors: INPUT_STATES,
+    },
+    checkboxMark: {
+        color: themeVars.color.primary.main,
+        fontSize: themeVars.fontSize.medium,
     },
     decoration: {
         borderRadius: themeVars.borderRadius.half,
@@ -161,8 +147,26 @@ LookUtils.define(plasticine, {
             },
         },
     },
+    drawer: {
+        backgroundColor: themeVars.color.surface.dark,
+        backgroundImage: `linear-gradient(45deg, ${themeVars.color.surface.dark}, ${themeVars.color.surface.light})`,
+        color: themeVars.color.surface.contrast,
+        boxShadow: SHADOW_LARGE,
+    },
+    dropdown: {
+        borderRadius: themeVars.borderRadius.full,
+        border: `2px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
+        backgroundColor: layerVars.main,
+        color: layerVars.contrast,
+        boxShadow: SHADOW_SMALL,
+    },
+    hollowSurface: LookUtils.hollow(SURFACE),
+    hoverFloater: {
+        borderRadius: themeVars.borderRadius.half,
+        backgroundColor: `rgb(from ${layerVars.contrast} r g b / 25%)`,
+    },
     input: {
-        ...FIELD_SURFACE,
+        ...FIELD_SHELL,
         borderRadius: themeVars.borderRadius.half,
         color: layerVars.contrast,
         fontSize: themeVars.fontSize.medium,
@@ -190,43 +194,43 @@ LookUtils.define(plasticine, {
             },
         },
     },
-    dropdown: {
-        borderRadius: themeVars.borderRadius.full,
-        border: `2px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
-        backgroundColor: layerVars.main,
+    itemWithFloater: {
+        borderRadius: themeVars.borderRadius.half,
+        fontSize: themeVars.fontSize.medium,
+        selectors: ITEM_STATES,
+    },
+    itemWithoutFloater: {
+        borderRadius: themeVars.borderRadius.half,
+        fontSize: themeVars.fontSize.medium,
+        selectors: {
+            [lookSelectors.isHovered]: {
+                backgroundColor: `rgb(from ${layerVars.contrast} r g b / 25%)`,
+            },
+            ...ITEM_STATES,
+        },
+    },
+    opaqueOverlay: {
+        backgroundColor: "black",
+    },
+    pageBackground: {
+        backgroundColor: themeVars.color.background.dark,
+        backgroundImage: `linear-gradient(315deg, ${themeVars.color.background.dark}, ${themeVars.color.background.light})`,
+        color: themeVars.color.background.contrast,
+    },
+    panel: {
+        borderRadius: themeVars.borderRadius.half,
+        backgroundColor: `rgb(from ${layerVars.main} r g b / 50%)`,
         color: layerVars.contrast,
         boxShadow: SHADOW_SMALL,
     },
-    checkboxBox: {
-        ...FIELD_SURFACE,
-        borderRadius: themeVars.borderRadius.half,
-        selectors: SWITCH_BOX_STATES,
-    },
-    checkboxMark: {
-        color: themeVars.color.primary.main,
-        fontSize: themeVars.fontSize.medium,
-    },
-    radioBox: {
-        ...FIELD_SURFACE,
-        borderRadius: "50%",
-        selectors: SWITCH_BOX_STATES,
-    },
-    radioDot: {
-        borderRadius: "50%",
+    progressFill: {
+        borderRadius: themeVars.borderRadius.full,
         backgroundColor: themeVars.color.primary.dark,
-        backgroundImage: `linear-gradient(45deg, ${themeVars.color.primary.dark}, ${themeVars.color.primary.light})`,
-    },
-    toggleTrack: {
-        ...FIELD_SURFACE,
-        borderRadius: PILL_RADIUS,
-        selectors: SWITCH_BOX_STATES,
-    },
-    toggleHandle: {
-        borderRadius: "50%",
-        backgroundColor: `rgb(from ${layerVars.contrast} r g b / 75%)`,
+        backgroundImage: `linear-gradient(${lookVars.barAngle}, ${themeVars.color.primary.dark}, ${themeVars.color.primary.light})`,
         selectors: {
-            [LookUtils.anyOf(lookSelectors.withinChecked, lookSelectors.withinMixed)]: {
-                backgroundColor: themeVars.color.primary.main,
+            [lookSelectors.hasErrorWithin]: {
+                backgroundColor: themeVars.color.error.light,
+                backgroundImage: `linear-gradient(${lookVars.barAngle}, ${themeVars.color.error.dark}, ${themeVars.color.error.light})`,
             },
         },
     },
@@ -241,21 +245,15 @@ LookUtils.define(plasticine, {
             },
         },
     },
-    progressFill: {
-        borderRadius: themeVars.borderRadius.full,
-        backgroundColor: themeVars.color.primary.dark,
-        backgroundImage: `linear-gradient(${lookVars.barAngle}, ${themeVars.color.primary.dark}, ${themeVars.color.primary.light})`,
-        selectors: {
-            [lookSelectors.withinError]: {
-                backgroundColor: themeVars.color.error.light,
-                backgroundImage: `linear-gradient(${lookVars.barAngle}, ${themeVars.color.error.dark}, ${themeVars.color.error.light})`,
-            },
-        },
+    radioBox: {
+        ...FIELD_SHELL,
+        borderRadius: "50%",
+        selectors: INPUT_STATES,
     },
-    rangeTrack: {
-        borderRadius: themeVars.borderRadius.full,
-        backgroundColor: `rgb(from ${layerVars.contrast} r g b / 25%)`,
-        boxShadow: SHADOW_SMALL,
+    radioDot: {
+        borderRadius: "50%",
+        backgroundColor: themeVars.color.primary.dark,
+        backgroundImage: `linear-gradient(45deg, ${themeVars.color.primary.dark}, ${themeVars.color.primary.light})`,
     },
     rangeFill: {
         borderRadius: themeVars.borderRadius.full,
@@ -282,10 +280,40 @@ LookUtils.define(plasticine, {
             },
         },
     },
-    slideButtonTrack: {
-        borderRadius: PILL_RADIUS,
-        backgroundColor: `rgb(from ${layerVars.contrast} r g b / 10%)`,
+    rangeTrack: {
+        borderRadius: themeVars.borderRadius.full,
+        backgroundColor: `rgb(from ${layerVars.contrast} r g b / 25%)`,
         boxShadow: SHADOW_SMALL,
+    },
+    scrollerThumb: {
+        selectors: {
+            [lookSelectors.line]: {
+                backgroundColor: themeVars.color.primary.main,
+                boxShadow: SHADOW_SMALL,
+            },
+            [lookSelectors.lineActive]: {
+                filter: themeVars.active.filter,
+            },
+        },
+    },
+    scrollerTrack: {
+        selectors: {
+            [lookSelectors.line]: {
+                backgroundColor: `rgb(from ${layerVars.contrast} r g b / 25%)`,
+            },
+        },
+    },
+    selectionFloater: {
+        borderRadius: themeVars.borderRadius.half,
+        backgroundColor: `rgb(from ${themeVars.color.primary.main} r g b / 10%)`,
+    },
+    slideButtonArrow: {
+        stroke: themeVars.color.primary.main,
+        selectors: {
+            [lookSelectors.hasError]: {
+                stroke: themeVars.color.error.main,
+            },
+        },
     },
     slideButtonFill: {
         backgroundColor: themeVars.color.primary.light,
@@ -311,29 +339,46 @@ LookUtils.define(plasticine, {
             },
         },
     },
-    slideButtonArrow: {
-        stroke: themeVars.color.primary.main,
+    slideButtonTrack: {
+        borderRadius: PILL_RADIUS,
+        backgroundColor: `rgb(from ${layerVars.contrast} r g b / 10%)`,
+        boxShadow: SHADOW_SMALL,
+    },
+    surface: SURFACE,
+    tabsFloater: {
+        borderBlockEnd: `2px solid ${themeVars.color.primary.main}`,
         selectors: {
-            [lookSelectors.hasError]: {
-                stroke: themeVars.color.error.main,
+            [lookSelectors.isVertical]: {
+                borderBlockEnd: "none",
+                borderInlineStart: `2px solid ${themeVars.color.primary.main}`,
             },
         },
     },
-    scrollerTrack: {
+    tabsGutter: {
+        borderBlockEnd: `2px solid rgb(from ${layerVars.contrast} r g b / 10%)`,
         selectors: {
-            [lookSelectors.line]: {
-                backgroundColor: `rgb(from ${layerVars.contrast} r g b / 25%)`,
+            [lookSelectors.isVertical]: {
+                borderBlockEnd: "none",
+                borderInlineStart: `2px solid rgb(from ${layerVars.contrast} r g b / 10%)`,
             },
         },
     },
-    scrollerThumb: {
+    tabsItem: {
+        paddingBlock: themeVars.spacing.half,
+        paddingInline: themeVars.spacing.full,
+        fontSize: themeVars.fontSize.small,
+        fontWeight: "bold",
         selectors: {
-            [lookSelectors.line]: {
-                backgroundColor: themeVars.color.primary.main,
-                boxShadow: SHADOW_SMALL,
+            [lookSelectors.isVertical]: {
+                paddingBlock: themeVars.spacing.quarter,
+                paddingInline: themeVars.spacing.double,
             },
-            [lookSelectors.lineActive]: {
-                filter: themeVars.active.filter,
+            [LookUtils.anyOf(lookSelectors.isHovered, lookSelectors.isSelected)]: {
+                color: themeVars.color.primary.main,
+            },
+            [lookSelectors.isDisabled]: {
+                filter: themeVars.disabled.filter,
+                opacity: themeVars.disabled.opacity,
             },
         },
     },
@@ -354,27 +399,24 @@ LookUtils.define(plasticine, {
             },
         },
     },
-    hoverFloater: {
-        borderRadius: themeVars.borderRadius.half,
-        backgroundColor: `rgb(from ${layerVars.contrast} r g b / 25%)`,
-    },
-    selectionFloater: {
-        borderRadius: themeVars.borderRadius.half,
-        backgroundColor: `rgb(from ${themeVars.color.primary.main} r g b / 10%)`,
-    },
-    itemWithFloater: {
-        borderRadius: themeVars.borderRadius.half,
-        fontSize: themeVars.fontSize.medium,
-        selectors: ITEM_STATES,
-    },
-    itemWithoutFloater: {
-        borderRadius: themeVars.borderRadius.half,
-        fontSize: themeVars.fontSize.medium,
+    toggleHandle: {
+        borderRadius: "50%",
+        backgroundColor: `rgb(from ${layerVars.contrast} r g b / 75%)`,
         selectors: {
-            [lookSelectors.isHovered]: {
-                backgroundColor: `rgb(from ${layerVars.contrast} r g b / 25%)`,
+            [LookUtils.anyOf(lookSelectors.isCheckedWithin, lookSelectors.isMixedWithin)]: {
+                backgroundColor: themeVars.color.primary.main,
             },
-            ...ITEM_STATES,
         },
+    },
+    toggleTrack: {
+        ...FIELD_SHELL,
+        borderRadius: PILL_RADIUS,
+        selectors: INPUT_STATES,
+    },
+    tooltip: {
+        borderRadius: themeVars.borderRadius.full,
+        backgroundColor: layerVars.main,
+        color: layerVars.contrast,
+        boxShadow: SHADOW_SMALL,
     },
 });

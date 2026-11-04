@@ -36,11 +36,11 @@ const SWITCH_BOX = {
 } as const;
 
 const SWITCH_BOX_STATES = {
-    [LookUtils.anyOf(lookSelectors.withinChecked, lookSelectors.withinMixed)]: {
+    [LookUtils.anyOf(lookSelectors.isCheckedWithin, lookSelectors.isMixedWithin)]: {
         borderColor: themeVars.color.primary.main,
         backgroundColor: themeVars.color.primary.main,
     },
-    [lookSelectors.withinError]: {
+    [lookSelectors.hasErrorWithin]: {
         borderColor: themeVars.color.error.main,
     },
 } as const;
@@ -257,10 +257,10 @@ LookUtils.define(material, {
         ...SWITCH_BOX,
         borderRadius: "50%",
         selectors: {
-            [lookSelectors.withinError]: {
+            [lookSelectors.hasErrorWithin]: {
                 borderColor: themeVars.color.error.main,
             },
-            [lookSelectors.withinChecked]: {
+            [lookSelectors.isCheckedWithin]: {
                 borderColor: themeVars.color.primary.light,
             },
         },
@@ -274,10 +274,10 @@ LookUtils.define(material, {
         borderRadius: PILL_RADIUS,
         backgroundColor: alpha(layerVars.contrast, 30),
         selectors: {
-            [lookSelectors.withinError]: {
+            [lookSelectors.hasErrorWithin]: {
                 borderColor: themeVars.color.error.main,
             },
-            [LookUtils.anyOf(lookSelectors.withinChecked, lookSelectors.withinMixed)]: {
+            [LookUtils.anyOf(lookSelectors.isCheckedWithin, lookSelectors.isMixedWithin)]: {
                 backgroundColor: alpha(themeVars.color.primary.main, 30),
             },
         },
@@ -287,7 +287,7 @@ LookUtils.define(material, {
         backgroundColor: layerVars.contrast,
         boxShadow: ELEVATION_1,
         selectors: {
-            [LookUtils.anyOf(lookSelectors.withinChecked, lookSelectors.withinMixed)]: {
+            [LookUtils.anyOf(lookSelectors.isCheckedWithin, lookSelectors.isMixedWithin)]: {
                 backgroundColor: themeVars.color.primary.light,
             },
         },
@@ -306,7 +306,7 @@ LookUtils.define(material, {
         borderRadius: themeVars.borderRadius.half,
         backgroundColor: themeVars.color.primary.light,
         selectors: {
-            [lookSelectors.withinError]: {
+            [lookSelectors.hasErrorWithin]: {
                 backgroundColor: themeVars.color.error.light,
             },
         },
@@ -356,6 +356,44 @@ LookUtils.define(material, {
             },
             [lookSelectors.lineActive]: {
                 backgroundColor: themeVars.color.primary.main,
+            },
+        },
+    },
+    tabsFloater: {
+        borderBlockEnd: `2px solid ${themeVars.color.primary.main}`,
+        selectors: {
+            [lookSelectors.isVertical]: {
+                borderBlockEnd: "none",
+                backgroundImage: `linear-gradient(to right, ${themeVars.color.primary.main} 3px, rgb(from ${layerVars.contrast} r g b / 10%) 3px, transparent)`,
+            },
+        },
+    },
+    tabsGutter: {
+        borderBlockEnd: `2px solid rgb(from ${layerVars.contrast} r g b / 10%)`,
+        selectors: {
+            [lookSelectors.isVertical]: {
+                borderBlockEnd: "none",
+            },
+        },
+    },
+    tabsItem: {
+        paddingBlock: themeVars.spacing.half,
+        paddingInline: themeVars.spacing.full,
+        fontSize: themeVars.fontSize.xSmall,
+        fontWeight: "bold",
+        selectors: {
+            [lookSelectors.isVertical]: {
+                paddingBlock: themeVars.spacing.full,
+                paddingInline: themeVars.spacing.double,
+                fontSize: themeVars.fontSize.small,
+                fontWeight: "inherit",
+            },
+            [LookUtils.anyOf(lookSelectors.isHovered, lookSelectors.isSelected)]: {
+                color: themeVars.color.primary.main,
+            },
+            [lookSelectors.isDisabled]: {
+                filter: themeVars.disabled.filter,
+                opacity: themeVars.disabled.opacity,
             },
         },
     },

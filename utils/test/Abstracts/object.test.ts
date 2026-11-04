@@ -42,6 +42,68 @@ describe("ObjectUtils.onlyDefinedProps", () => {
     });
 });
 
+describe("ObjectUtils.deepMerge", () => {
+    const base = {
+        surface: { fill: "#fff", stroke: { width: 1, color: "#000" } },
+        text: { size: 14, weight: 400 },
+        stops: ["#000", "#fff"],
+    };
+
+    it("merges nested plain objects key by key", () => {
+        expect(ObjectUtils.deepMerge(base, { surface: { stroke: { width: 2 } } })).toEqual({
+            surface: { fill: "#fff", stroke: { width: 2, color: "#000" } },
+            text: { size: 14, weight: 400 },
+            stops: ["#000", "#fff"],
+        });
+    });
+
+    it("reuses the branches the override does not touch", () => {
+        const merged = ObjectUtils.deepMerge(base, { surface: { fill: "#eee" } });
+
+        expect(merged.text).toBe(base.text);
+        expect(merged.surface.stroke).toBe(base.surface.stroke);
+        expect(merged.surface).not.toBe(base.surface);
+    });
+
+    it("replaces arrays and other non-plain objects whole", () => {
+        const date = new Date(0);
+
+        expect(ObjectUtils.deepMerge(base, { stops: ["#f00"] }).stops).toEqual(["#f00"]);
+        expect(ObjectUtils.deepMerge({ at: new Date(1) }, { at: date }).at).toBe(date);
+    });
+
+    it("keeps the base's value where the override is undefined, but not where it is null", () => {
+        type Theme = { tint: string | null; size: number };
+        const theme: Theme = { tint: "#f00", size: 1 };
+
+        expect(ObjectUtils.deepMerge(theme, { tint: undefined, size: 2 })).toEqual({ tint: "#f00", size: 2 });
+        expect(ObjectUtils.deepMerge(theme, { tint: null })).toEqual({ tint: null, size: 1 });
+    });
+
+    it("returns the base itself when there is no override", () => {
+        expect(ObjectUtils.deepMerge(base, undefined)).toBe(base);
+    });
+
+    it("does not modify either input", () => {
+        const override = { surface: { stroke: { width: 2 } } };
+
+        ObjectUtils.deepMerge(base, override);
+
+        expect(base.surface.stroke.width).toBe(1);
+        expect(override).toEqual({ surface: { stroke: { width: 2 } } });
+    });
+
+    it("cannot reach a prototype through __proto__ or constructor", () => {
+        const attack = JSON.parse(
+            '{"__proto__": {"polluted": true}, "constructor": {"prototype": {"polluted": true}}}',
+        );
+        const merged = ObjectUtils.deepMerge<Record<string, unknown>>({}, attack);
+
+        expect(Object.getPrototypeOf(merged)).toBe(Object.prototype);
+        expect(({} as Record<string, unknown>).polluted).toBeUndefined();
+    });
+});
+
 describe("ObjectUtils.getRandomArrayValues", () => {
     it("never draws the same entry twice", () => {
         const source = [1, 2, 3, 4, 5];

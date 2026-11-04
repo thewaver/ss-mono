@@ -47,9 +47,10 @@ export const PageTabGutter = (props: TabDecorationProps) => {
 
     return (
         <div
-            class={[access(props.orientation) === "horizontal" ? styles.rowTabGutter : undefined, getLayerClass()].join(
-                " ",
-            )}
+            class={[
+                access(props.orientation) === "horizontal" ? styles.rowTabGutter : styles.columnTabGutter,
+                getLayerClass(),
+            ].join(" ")}
             data-gutter
         />
     );

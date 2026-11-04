@@ -1,3 +1,5 @@
+import type { DeepPartial } from "../TypeScript/typeUtils.js";
+
 /**
  * A frozen empty array, safe to use as a default value.
  *
@@ -13,6 +15,14 @@ export const EMPTY_ARRAY = [] as const;
  * which stops React hooks and memo comparisons from seeing a "change" every render.
  */
 export const EMPTY_OBJECT = {} as const;
+
+const isPlainObject = (value: unknown): value is Record<string, unknown> => {
+    if (value === null || typeof value !== "object") return false;
+
+    const proto = Object.getPrototypeOf(value);
+
+    return proto === Object.prototype || proto === null;
+};
 
 export namespace ObjectUtils {
     /**
@@ -46,6 +56,44 @@ export namespace ObjectUtils {
 
             return res;
         }, {} as Partial<T>);
+    };
+
+    /**
+     * Lays an override over a base object, merging nested plain objects key by key.
+     *
+     * Only plain objects — written as `{ … }` or made with `Object.create(null)` — are merged. Anything else in the
+     * override replaces what the base had at that key outright: an array, a `Date`, a class instance, a function,
+     * `null`. A key the override leaves `undefined` keeps the base's value, so an optional field left unset never
+     * wipes a default. Only the override's own string keys are read, and a key named `__proto__` is ignored.
+     *
+     * Branches the override does not touch are the base's own objects, not copies, and a nested object the base
+     * lacked is the override's own. Neither input is modified, but the result shares objects with both, so treat
+     * it as read-only.
+     *
+     * @param base The object to start from.
+     * @param override What to lay over it. `undefined` returns `base` itself.
+     * @returns A new object, or `base` when there is no override.
+     */
+    export const deepMerge = <T extends object>(base: T, override: DeepPartial<T> | undefined): T => {
+        if (!override) return base;
+
+        const source = base as Record<string, unknown>;
+        const changes = override as Record<string, unknown>;
+        const result: Record<string, unknown> = { ...source };
+
+        for (const key of Object.keys(changes)) {
+            if (key === "__proto__") continue;
+
+            const next = changes[key];
+
+            if (next === undefined) continue;
+
+            const current = Object.hasOwn(source, key) ? source[key] : undefined;
+
+            result[key] = isPlainObject(current) && isPlainObject(next) ? deepMerge(current, next) : next;
+        }
+
+        return result as T;
     };
 
     /**

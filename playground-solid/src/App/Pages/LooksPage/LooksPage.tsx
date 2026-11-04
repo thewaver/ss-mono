@@ -41,6 +41,7 @@ import {
 import * as styles from "@thewaver/ss-playground/App/Pages/LooksPage/LooksPage.css";
 import { RADIO_GROUP_GAP } from "@thewaver/ss-playground/App/Pages/RadioPage/RadioPage.const";
 import { ROW_TAB_GAP, getPanelId, getTabId } from "@thewaver/ss-playground/App/Pages/TabsPage/TabsPage.const";
+import * as tabsPageStyles from "@thewaver/ss-playground/App/Pages/TabsPage/TabsPage.css";
 import { RANGE_THUMB_SIZE } from "@thewaver/ss-playground/App/StyledComponents/RangeContent/RangeContent.css";
 import { SLIDE_BUTTON_THUMB_SIZE } from "@thewaver/ss-playground/App/StyledComponents/SlideButtonContent/SlideButtonContent.css";
 import {
@@ -74,12 +75,12 @@ import type {
     LookRowProps,
     LookSampleColumnProps,
     LookSamplesProps,
-    LookStateGridProps,
     LookStateProps,
+    LookTabsSampleProps,
 } from "./LooksPage.types";
 
 const LookSampleColumn = (props: ParentProps<LookSampleColumnProps>) => (
-    <div class={styles.lookColumn} classList={{ [styles.lookWideColumn]: props.isWide }}>
+    <div class={styles.lookColumn}>
         <PageLayer level={1}>
             <div class={styles.lookColumnName}>{props.name}</div>
 
@@ -88,13 +89,9 @@ const LookSampleColumn = (props: ParentProps<LookSampleColumnProps>) => (
     </div>
 );
 
-const LookStateGrid = (props: ParentProps<LookStateGridProps>) => (
-    <div class={styles.lookStateGrid} classList={{ [styles.lookFittedStateGrid]: props.isFitted }}>
-        {props.children}
-    </div>
-);
+const LookStateGrid = (props: ParentProps) => <div class={styles.lookStateGrid}>{props.children}</div>;
 
-const LookBarStack = (props: ParentProps) => <div class={styles.lookBarStack}>{props.children}</div>;
+const LookStack = (props: ParentProps) => <div class={styles.lookBarStack}>{props.children}</div>;
 
 const LookBarCell = (props: ParentProps<LookStateProps>) => (
     <div class={styles.lookBarCell}>
@@ -150,6 +147,7 @@ const LookToggleSample = (props: LookStateProps) => {
     return (
         <Toggle
             checked={checkedSignal}
+            isMixed={props.isMixed}
             isDisabled={props.isDisabled}
             hasError={props.hasError}
             ariaLabel={props.state}
@@ -249,10 +247,8 @@ const LookSlideSample = (props: LookStateProps) => (
     />
 );
 
-const LookSamples = (props: LookSamplesProps) => {
-    const expandedSignal = createSignal(LOOK_SAMPLE_EXPANDED_SECTIONS);
-
-    const getIdPrefix = () => `look-${props.look}`;
+const LookTabsSample = (props: LookTabsSampleProps) => {
+    const getIdPrefix = () => `look-${props.look}-${props.orientation}`;
 
     const getTabs = () =>
         LOOK_SAMPLE_TABS.map((tab) => ({
@@ -262,61 +258,76 @@ const LookSamples = (props: LookSamplesProps) => {
         }));
 
     return (
+        <div class={tabsPageStyles.tabsDemo} data-orientation={props.orientation}>
+            <Tabs
+                orientation={props.orientation}
+                tabGap={ROW_TAB_GAP}
+                ariaLabel={"Tabs"}
+                tabs={getTabs}
+                selectedValue={() => LOOK_SAMPLE_SELECTED_TAB}
+                renderGutter={() => <PageTabGutter orientation={props.orientation} />}
+                renderSelectionFloater={(getVisibilityTarget, getTransitionDurationMs) => (
+                    <PageTabFloater
+                        orientation={props.orientation}
+                        visibilityTarget={getVisibilityTarget}
+                        transitionDurationMs={getTransitionDurationMs}
+                    />
+                )}
+                renderTab={(getTab, getFlags) => (
+                    <PageTabContent
+                        flags={getFlags}
+                        orientation={props.orientation}
+                        isSelected={() => getTab().value === LOOK_SAMPLE_SELECTED_TAB}
+                    >
+                        {getTab().value}
+                    </PageTabContent>
+                )}
+            />
+
+            <div class={tabsPageStyles.tabsDemoPanel}>
+                <PageTabPanel
+                    id={getPanelId(getIdPrefix(), LOOK_SAMPLE_SELECTED_TAB)}
+                    tabId={getTabId(getIdPrefix(), LOOK_SAMPLE_SELECTED_TAB)}
+                >
+                    {LOOK_SAMPLE_TAB_PANEL}
+                </PageTabPanel>
+            </div>
+        </div>
+    );
+};
+
+const LookSamples = (props: LookSamplesProps) => {
+    const expandedSignal = createSignal(LOOK_SAMPLE_EXPANDED_SECTIONS);
+
+    return (
         <>
             <LookSampleColumn name={"Surface"}>
                 <div class={styles.lookPanel}>{"A panel inside a surface."}</div>
             </LookSampleColumn>
 
             <LookSampleColumn name={"Tabs"}>
-                <div class={styles.lookWideSample}>
-                    <Tabs
-                        tabGap={ROW_TAB_GAP}
-                        ariaLabel={"Tabs"}
-                        tabs={getTabs}
-                        selectedValue={() => LOOK_SAMPLE_SELECTED_TAB}
-                        renderGutter={() => <PageTabGutter orientation={"horizontal"} />}
-                        renderSelectionFloater={(getVisibilityTarget, getTransitionDurationMs) => (
-                            <PageTabFloater
-                                orientation={"horizontal"}
-                                visibilityTarget={getVisibilityTarget}
-                                transitionDurationMs={getTransitionDurationMs}
-                            />
-                        )}
-                        renderTab={(getTab, getFlags) => (
-                            <PageTabContent
-                                flags={getFlags}
-                                orientation={"horizontal"}
-                                isSelected={() => getTab().value === LOOK_SAMPLE_SELECTED_TAB}
-                            >
-                                {getTab().value}
-                            </PageTabContent>
-                        )}
-                    />
-
-                    <PageTabPanel
-                        id={getPanelId(getIdPrefix(), LOOK_SAMPLE_SELECTED_TAB)}
-                        tabId={getTabId(getIdPrefix(), LOOK_SAMPLE_SELECTED_TAB)}
-                    >
-                        {LOOK_SAMPLE_TAB_PANEL}
-                    </PageTabPanel>
-                </div>
+                <LookTabsSample look={props.look} orientation={"horizontal"} />
             </LookSampleColumn>
 
-            <LookSampleColumn name={"Input"} isWide>
-                <LookStateGrid isFitted>
+            <LookSampleColumn name={"Vertical tabs"}>
+                <LookTabsSample look={props.look} orientation={"vertical"} />
+            </LookSampleColumn>
+
+            <LookSampleColumn name={"Input"}>
+                <LookStack>
                     <LookInputSample state={"Default"} />
                     <LookInputSample state={"Read-only"} isReadOnly />
                     <LookInputSample state={"Disabled"} isDisabled />
                     <LookInputSample state={"Error"} hasError />
-                </LookStateGrid>
+                </LookStack>
             </LookSampleColumn>
 
-            <LookSampleColumn name={"Tags"} isWide>
-                <LookStateGrid isFitted>
+            <LookSampleColumn name={"Tags"}>
+                <LookStack>
                     <LookTagSample state={"Default"} />
                     <LookTagSample state={"Disabled"} isDisabled />
                     <LookTagSample state={"Error"} hasError />
-                </LookStateGrid>
+                </LookStack>
             </LookSampleColumn>
 
             <LookSampleColumn name={"Button"}>
@@ -325,6 +336,7 @@ const LookSamples = (props: LookSamplesProps) => {
                     <LookButtonSample state={"Pressed"} isPressed />
                     <LookButtonSample state={"Disabled"} isDisabled />
                     <LookButtonSample state={"Error"} hasError />
+                    <LookButtonSample state={"Pressed Error"} isPressed hasError />
                 </LookStateGrid>
             </LookSampleColumn>
 
@@ -332,8 +344,10 @@ const LookSamples = (props: LookSamplesProps) => {
                 <LookStateGrid>
                     <LookToggleSample state={"Off"} />
                     <LookToggleSample state={"On"} isChecked />
+                    <LookToggleSample state={"Mixed"} isMixed />
                     <LookToggleSample state={"Disabled"} isDisabled />
                     <LookToggleSample state={"Error"} hasError />
+                    <LookToggleSample state={"On Error"} isChecked hasError />
                 </LookStateGrid>
             </LookSampleColumn>
 
@@ -344,6 +358,7 @@ const LookSamples = (props: LookSamplesProps) => {
                     <LookCheckboxSample state={"Mixed"} isMixed />
                     <LookCheckboxSample state={"Disabled"} isDisabled />
                     <LookCheckboxSample state={"Error"} hasError />
+                    <LookCheckboxSample state={"On Error"} isChecked hasError />
                 </LookStateGrid>
             </LookSampleColumn>
 
@@ -353,30 +368,31 @@ const LookSamples = (props: LookSamplesProps) => {
                     <LookRadioSample state={"On"} isChecked />
                     <LookRadioSample state={"Disabled"} isDisabled />
                     <LookRadioSample state={"Error"} hasError />
+                    <LookRadioSample state={"On Error"} isChecked hasError />
                 </LookStateGrid>
             </LookSampleColumn>
 
             <LookSampleColumn name={"Progress"}>
-                <LookBarStack>
+                <LookStack>
                     <LookProgressSample state={"Default"} />
                     <LookProgressSample state={"Error"} hasError />
-                </LookBarStack>
+                </LookStack>
             </LookSampleColumn>
 
             <LookSampleColumn name={"Range"}>
-                <LookBarStack>
+                <LookStack>
                     <LookRangeSample state={"Default"} />
                     <LookRangeSample state={"Disabled"} isDisabled />
                     <LookRangeSample state={"Error"} hasError />
-                </LookBarStack>
+                </LookStack>
             </LookSampleColumn>
 
             <LookSampleColumn name={"Slide button"}>
-                <LookBarStack>
+                <LookStack>
                     <LookSlideSample state={"Default"} />
                     <LookSlideSample state={"Disabled"} isDisabled />
                     <LookSlideSample state={"Error"} hasError />
-                </LookBarStack>
+                </LookStack>
             </LookSampleColumn>
 
             <LookSampleColumn name={"Accordion"}>

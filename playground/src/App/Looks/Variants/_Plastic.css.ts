@@ -45,8 +45,8 @@ const FIELD_HOVER = {
 
 const SWITCH_BOX_STATES = {
     [lookSelectors.isHovered]: FIELD_HOVER,
-    [LookUtils.anyOf(lookSelectors.withinChecked, lookSelectors.withinMixed)]: moldedHover(themeVars.color.primary),
-    [lookSelectors.withinError]: {
+    [LookUtils.anyOf(lookSelectors.isCheckedWithin, lookSelectors.isMixedWithin)]: moldedHover(themeVars.color.primary),
+    [lookSelectors.hasErrorWithin]: {
         backgroundColor: withAlpha(themeVars.color.error.main, 40),
         boxShadow: glow(themeVars.color.error.main, 40),
     },
@@ -220,7 +220,7 @@ LookUtils.define(_plastic, {
         borderRadius: 0,
         backgroundColor: withAlpha(layerVars.contrast, 75),
         selectors: {
-            [LookUtils.anyOf(lookSelectors.withinChecked, lookSelectors.withinMixed)]: {
+            [LookUtils.anyOf(lookSelectors.isCheckedWithin, lookSelectors.isMixedWithin)]: {
                 backgroundColor: themeVars.color.primary.contrast,
             },
         },
@@ -240,7 +240,7 @@ LookUtils.define(_plastic, {
         backgroundColor: themeVars.color.primary.main,
         boxShadow: glow(themeVars.color.primary.main, 60),
         selectors: {
-            [lookSelectors.withinError]: {
+            [lookSelectors.hasErrorWithin]: {
                 backgroundColor: themeVars.color.error.main,
                 boxShadow: glow(themeVars.color.error.main, 60),
             },
@@ -319,6 +319,44 @@ LookUtils.define(_plastic, {
             },
             [lookSelectors.lineActive]: {
                 filter: themeVars.active.filter,
+            },
+        },
+    },
+    tabsFloater: {
+        borderBlockEnd: `2px solid ${themeVars.color.primary.main}`,
+        selectors: {
+            [lookSelectors.isVertical]: {
+                borderBlockEnd: "none",
+                backgroundImage: `linear-gradient(to right, ${themeVars.color.primary.main} 3px, rgb(from ${layerVars.contrast} r g b / 10%) 3px, transparent)`,
+            },
+        },
+    },
+    tabsGutter: {
+        borderBlockEnd: `2px solid rgb(from ${layerVars.contrast} r g b / 10%)`,
+        selectors: {
+            [lookSelectors.isVertical]: {
+                borderBlockEnd: "none",
+            },
+        },
+    },
+    tabsItem: {
+        paddingBlock: themeVars.spacing.half,
+        paddingInline: themeVars.spacing.full,
+        fontSize: themeVars.fontSize.xSmall,
+        fontWeight: "bold",
+        selectors: {
+            [lookSelectors.isVertical]: {
+                paddingBlock: themeVars.spacing.full,
+                paddingInline: themeVars.spacing.double,
+                fontSize: themeVars.fontSize.small,
+                fontWeight: "inherit",
+            },
+            [LookUtils.anyOf(lookSelectors.isHovered, lookSelectors.isSelected)]: {
+                color: themeVars.color.primary.main,
+            },
+            [lookSelectors.isDisabled]: {
+                filter: themeVars.disabled.filter,
+                opacity: themeVars.disabled.opacity,
             },
         },
     },

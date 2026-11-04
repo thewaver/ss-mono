@@ -232,7 +232,12 @@ planned for.
   field (select clear, picker triggers, era and AM/PM toggles, stepper arrows, adornments, the sidebar toggle);
   it reacts to hover only when it is or sits in a `button` or `[role='button']`, because a static icon
   adornment is handed the field's hover flag. `tag` is a tag input's chip; the other chips and badges keep
-  their own paint, the user's call. The binary switches' insides — `checkboxMark`, `radioDot`, `toggleHandle` —
+  their own paint, the user's call. The tabs have `tabsItem`, `tabsGutter` and `tabsFloater` — `tabsGutter` after
+  the library's `renderGutter`, the line the user called the track. The gutter and the floater keep the boxes the
+  library gives them, the whole list and the selected tab, and the Look paints the marker's shape, an underline
+  being a bottom border — the user's pick over a painter-drawn 2px line, so a Look can draw a pill instead. A
+  vertical list carries `isVertical` on all three. Every other Look starts on Plasticine's tab paint, the user's
+  call while they are temporary. The honeycomb tabs are a custom variant and keep their own paint. The binary switches' insides — `checkboxMark`, `radioDot`, `toggleHandle` —
   and the standard bars — `progressTrack` and `progressFill`, `rangeTrack`, `rangeFill` and `rangeThumb`,
   `scrollerTrack` and `scrollerThumb` (painted on `::before`), and the slide button's `slideButtonTrack`,
   `slideButtonFill`, `slideButtonHint`, `slideButtonThumb` and `slideButtonArrow` — have entries, the slide

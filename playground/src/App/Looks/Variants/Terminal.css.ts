@@ -28,7 +28,7 @@ const BOX = {
 } as const;
 
 const BOX_STATES = {
-    [lookSelectors.withinError]: {
+    [lookSelectors.hasErrorWithin]: {
         borderColor: themeVars.color.error.main,
     },
 } as const;
@@ -268,7 +268,7 @@ LookUtils.define(terminal, {
         borderRadius: 0,
         backgroundColor: dim(50),
         selectors: {
-            [LookUtils.anyOf(lookSelectors.withinChecked, lookSelectors.withinMixed)]: {
+            [LookUtils.anyOf(lookSelectors.isCheckedWithin, lookSelectors.isMixedWithin)]: {
                 backgroundColor: themeVars.color.primary.main,
             },
         },
@@ -286,7 +286,7 @@ LookUtils.define(terminal, {
         backgroundColor: "transparent",
         backgroundImage: segments(themeVars.color.primary.main),
         selectors: {
-            [lookSelectors.withinError]: {
+            [lookSelectors.hasErrorWithin]: {
                 backgroundImage: segments(themeVars.color.error.main),
             },
         },
@@ -322,6 +322,44 @@ LookUtils.define(terminal, {
             },
             [lookSelectors.lineActive]: {
                 backgroundColor: themeVars.color.primary.light,
+            },
+        },
+    },
+    tabsFloater: {
+        borderBlockEnd: `2px solid ${themeVars.color.primary.main}`,
+        selectors: {
+            [lookSelectors.isVertical]: {
+                borderBlockEnd: "none",
+                backgroundImage: `linear-gradient(to right, ${themeVars.color.primary.main} 3px, rgb(from ${layerVars.contrast} r g b / 10%) 3px, transparent)`,
+            },
+        },
+    },
+    tabsGutter: {
+        borderBlockEnd: `2px solid rgb(from ${layerVars.contrast} r g b / 10%)`,
+        selectors: {
+            [lookSelectors.isVertical]: {
+                borderBlockEnd: "none",
+            },
+        },
+    },
+    tabsItem: {
+        paddingBlock: themeVars.spacing.half,
+        paddingInline: themeVars.spacing.full,
+        fontSize: themeVars.fontSize.xSmall,
+        fontWeight: "bold",
+        selectors: {
+            [lookSelectors.isVertical]: {
+                paddingBlock: themeVars.spacing.full,
+                paddingInline: themeVars.spacing.double,
+                fontSize: themeVars.fontSize.small,
+                fontWeight: "inherit",
+            },
+            [LookUtils.anyOf(lookSelectors.isHovered, lookSelectors.isSelected)]: {
+                color: themeVars.color.primary.main,
+            },
+            [lookSelectors.isDisabled]: {
+                filter: themeVars.disabled.filter,
+                opacity: themeVars.disabled.opacity,
             },
         },
     },

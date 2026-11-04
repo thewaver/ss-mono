@@ -1,82 +1,70 @@
 import { style } from "@vanilla-extract/css";
 
-import { lookEntries } from "../../Looks/Look.css";
+import { lookEntries, lookStates } from "../../Looks/Look.css";
 import { themeVars } from "../../Theme.css";
 import { layerVars } from "../Layer/Layer.css";
 
-export const isSelected = style({});
-export const isHovered = style({});
-export const isDisabled = style({});
+export const isSelected = style([lookStates.isSelected]);
+export const isHovered = style([lookStates.isHovered]);
+export const isDisabled = style([lookStates.isDisabled]);
 export const isVisible = style({});
 
 const tabBase = style({
     whiteSpace: "nowrap",
     transition: `color ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}`,
-
-    selectors: {
-        [`&.${isHovered}`]: {
-            color: themeVars.color.primary.main,
-        },
-        [`&.${isSelected}`]: {
-            color: themeVars.color.primary.main,
-        },
-        [`&.${isDisabled}`]: {
-            opacity: themeVars.disabled.opacity,
-            filter: themeVars.disabled.filter,
-        },
-    },
 });
 
 export const rowTab = style([
+    lookEntries.tabsItem,
     tabBase,
     {
-        paddingBlock: themeVars.spacing.half,
-        paddingInline: themeVars.spacing.full,
         marginBlockEnd: themeVars.spacing.half,
-        fontSize: themeVars.fontSize.xSmall,
-        fontWeight: "bold",
     },
 ]);
 
 export const columnTab = style([
+    lookEntries.tabsItem,
+    lookStates.isVertical,
     tabBase,
     {
-        paddingBlock: themeVars.spacing.full,
-        paddingInline: themeVars.spacing.double,
-        fontSize: themeVars.fontSize.small,
         textAlign: "start",
     },
 ]);
 
-export const rowTabGutter = style({
-    borderBlockEnd: `2px solid rgb(from ${layerVars.contrast} r g b / 10%)`,
-});
+export const rowTabGutter = style([lookEntries.tabsGutter]);
 
-export const rowTabFloater = style({
-    borderBlockEnd: `2px solid ${themeVars.color.primary.main}`,
-    transform: "scaleX(0)",
-    transition: "transform",
+export const columnTabGutter = style([lookEntries.tabsGutter, lookStates.isVertical]);
 
-    selectors: {
-        [`&.${isVisible}`]: {
-            transform: "scaleX(1)",
+export const rowTabFloater = style([
+    lookEntries.tabsFloater,
+    {
+        transform: "scaleX(0)",
+        transition: "transform",
+
+        selectors: {
+            [`&.${isVisible}`]: {
+                transform: "scaleX(1)",
+            },
         },
     },
-});
+]);
 
-export const columnTabFloater = style({
-    backgroundImage: `linear-gradient(to right, ${themeVars.color.primary.main} 3px, rgb(from ${layerVars.contrast} r g b / 10%) 3px, transparent)`,
-    width: "100%",
-    height: "100%",
-    opacity: 0,
-    transition: "opacity",
+export const columnTabFloater = style([
+    lookEntries.tabsFloater,
+    lookStates.isVertical,
+    {
+        width: "100%",
+        height: "100%",
+        opacity: 0,
+        transition: "opacity",
 
-    selectors: {
-        [`&.${isVisible}`]: {
-            opacity: 1,
+        selectors: {
+            [`&.${isVisible}`]: {
+                opacity: 1,
+            },
         },
     },
-});
+]);
 
 export const tabPanel = style([
     lookEntries.panel,
@@ -101,9 +89,16 @@ export const hexTab = style([
         transition: `color ${themeVars.animation.duration}, background-color ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}`,
 
         selectors: {
+            [`&.${isHovered}`]: {
+                color: themeVars.color.primary.main,
+            },
             [`&.${isSelected}`]: {
                 color: themeVars.color.primary.contrast,
                 backgroundColor: "transparent",
+            },
+            [`&.${isDisabled}`]: {
+                opacity: themeVars.disabled.opacity,
+                filter: themeVars.disabled.filter,
             },
         },
     },

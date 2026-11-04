@@ -55,8 +55,8 @@ const FIELD_HOVER = {
 
 const SWITCH_BOX_STATES = {
     [lookSelectors.isHovered]: FIELD_HOVER,
-    [LookUtils.anyOf(lookSelectors.withinChecked, lookSelectors.withinMixed)]: accent(themeVars.color.primary),
-    [lookSelectors.withinError]: {
+    [LookUtils.anyOf(lookSelectors.isCheckedWithin, lookSelectors.isMixedWithin)]: accent(themeVars.color.primary),
+    [lookSelectors.hasErrorWithin]: {
         borderColor: themeVars.color.error.main,
         boxShadow: glow(themeVars.color.error.main),
     },
@@ -235,7 +235,7 @@ LookUtils.define(_shaded, {
         borderRadius: themeVars.borderRadius.half,
         backgroundImage: shade(layerVars.contrast, withAlpha(layerVars.contrast, 60)),
         selectors: {
-            [LookUtils.anyOf(lookSelectors.withinChecked, lookSelectors.withinMixed)]: {
+            [LookUtils.anyOf(lookSelectors.isCheckedWithin, lookSelectors.isMixedWithin)]: {
                 backgroundImage: shade(
                     themeVars.color.primary.contrast,
                     withAlpha(themeVars.color.primary.contrast, 75),
@@ -261,7 +261,7 @@ LookUtils.define(_shaded, {
         ),
         boxShadow: glow(themeVars.color.primary.main),
         selectors: {
-            [lookSelectors.withinError]: {
+            [lookSelectors.hasErrorWithin]: {
                 backgroundColor: themeVars.color.error.main,
                 backgroundImage: shade(
                     themeVars.color.error.main,
@@ -366,6 +366,44 @@ LookUtils.define(_shaded, {
             },
             [lookSelectors.lineActive]: {
                 filter: themeVars.active.filter,
+            },
+        },
+    },
+    tabsFloater: {
+        borderBlockEnd: `2px solid ${themeVars.color.primary.main}`,
+        selectors: {
+            [lookSelectors.isVertical]: {
+                borderBlockEnd: "none",
+                backgroundImage: `linear-gradient(to right, ${themeVars.color.primary.main} 3px, rgb(from ${layerVars.contrast} r g b / 10%) 3px, transparent)`,
+            },
+        },
+    },
+    tabsGutter: {
+        borderBlockEnd: `2px solid rgb(from ${layerVars.contrast} r g b / 10%)`,
+        selectors: {
+            [lookSelectors.isVertical]: {
+                borderBlockEnd: "none",
+            },
+        },
+    },
+    tabsItem: {
+        paddingBlock: themeVars.spacing.half,
+        paddingInline: themeVars.spacing.full,
+        fontSize: themeVars.fontSize.xSmall,
+        fontWeight: "bold",
+        selectors: {
+            [lookSelectors.isVertical]: {
+                paddingBlock: themeVars.spacing.full,
+                paddingInline: themeVars.spacing.double,
+                fontSize: themeVars.fontSize.small,
+                fontWeight: "inherit",
+            },
+            [LookUtils.anyOf(lookSelectors.isHovered, lookSelectors.isSelected)]: {
+                color: themeVars.color.primary.main,
+            },
+            [lookSelectors.isDisabled]: {
+                filter: themeVars.disabled.filter,
+                opacity: themeVars.disabled.opacity,
             },
         },
     },

@@ -80,11 +80,11 @@ const RING_STATES = {
     [lookSelectors.isHovered]: {
         borderColor: lighten(themeVars.color.primary.main, 10),
     },
-    [LookUtils.anyOf(lookSelectors.withinChecked, lookSelectors.withinMixed)]: candy(
+    [LookUtils.anyOf(lookSelectors.isCheckedWithin, lookSelectors.isMixedWithin)]: candy(
         themeVars.color.primary,
         SMALL_BAND,
     ),
-    [lookSelectors.withinError]: {
+    [lookSelectors.hasErrorWithin]: {
         borderColor: themeVars.color.error.main,
     },
 } as const;
@@ -267,7 +267,7 @@ LookUtils.define(_hardCandy, {
         backgroundColor: layerVars.contrast,
         backgroundImage: sheen("white", "black", 25),
         selectors: {
-            [LookUtils.anyOf(lookSelectors.withinChecked, lookSelectors.withinMixed)]: {
+            [LookUtils.anyOf(lookSelectors.isCheckedWithin, lookSelectors.isMixedWithin)]: {
                 backgroundColor: themeVars.color.primary.contrast,
             },
         },
@@ -288,7 +288,7 @@ LookUtils.define(_hardCandy, {
             SMALL_BAND,
         ),
         selectors: {
-            [lookSelectors.withinError]: {
+            [lookSelectors.hasErrorWithin]: {
                 backgroundColor: themeVars.color.error.main,
                 backgroundImage: stripes(
                     themeVars.color.error.main,
@@ -385,6 +385,44 @@ LookUtils.define(_hardCandy, {
             },
             [lookSelectors.lineActive]: {
                 filter: themeVars.active.filter,
+            },
+        },
+    },
+    tabsFloater: {
+        borderBlockEnd: `2px solid ${themeVars.color.primary.main}`,
+        selectors: {
+            [lookSelectors.isVertical]: {
+                borderBlockEnd: "none",
+                backgroundImage: `linear-gradient(to right, ${themeVars.color.primary.main} 3px, rgb(from ${layerVars.contrast} r g b / 10%) 3px, transparent)`,
+            },
+        },
+    },
+    tabsGutter: {
+        borderBlockEnd: `2px solid rgb(from ${layerVars.contrast} r g b / 10%)`,
+        selectors: {
+            [lookSelectors.isVertical]: {
+                borderBlockEnd: "none",
+            },
+        },
+    },
+    tabsItem: {
+        paddingBlock: themeVars.spacing.half,
+        paddingInline: themeVars.spacing.full,
+        fontSize: themeVars.fontSize.xSmall,
+        fontWeight: "bold",
+        selectors: {
+            [lookSelectors.isVertical]: {
+                paddingBlock: themeVars.spacing.full,
+                paddingInline: themeVars.spacing.double,
+                fontSize: themeVars.fontSize.small,
+                fontWeight: "inherit",
+            },
+            [LookUtils.anyOf(lookSelectors.isHovered, lookSelectors.isSelected)]: {
+                color: themeVars.color.primary.main,
+            },
+            [lookSelectors.isDisabled]: {
+                filter: themeVars.disabled.filter,
+                opacity: themeVars.disabled.opacity,
             },
         },
     },

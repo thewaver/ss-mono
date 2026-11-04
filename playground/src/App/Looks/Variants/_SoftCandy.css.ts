@@ -63,11 +63,11 @@ const FIELD_ERROR = {
 
 const SWITCH_BOX_STATES = {
     [lookSelectors.isHovered]: FIELD_HOVER,
-    [LookUtils.anyOf(lookSelectors.withinChecked, lookSelectors.withinMixed)]: {
+    [LookUtils.anyOf(lookSelectors.isCheckedWithin, lookSelectors.isMixedWithin)]: {
         ...sweet(themeVars.color.primary),
         borderImage: edge(themeVars.color.primary.main),
     },
-    [lookSelectors.withinError]: FIELD_ERROR,
+    [lookSelectors.hasErrorWithin]: FIELD_ERROR,
 } as const;
 
 const ITEM_STATES = {
@@ -231,8 +231,10 @@ LookUtils.define(_softCandy, {
             [lookSelectors.isHovered]: {
                 backgroundImage: wash(themeVars.color.primary.main, 0),
             },
-            [LookUtils.anyOf(lookSelectors.withinChecked, lookSelectors.withinMixed)]: sweet(themeVars.color.primary),
-            [lookSelectors.withinError]: {
+            [LookUtils.anyOf(lookSelectors.isCheckedWithin, lookSelectors.isMixedWithin)]: sweet(
+                themeVars.color.primary,
+            ),
+            [lookSelectors.hasErrorWithin]: {
                 borderColor: themeVars.color.error.main,
             },
         },
@@ -250,8 +252,10 @@ LookUtils.define(_softCandy, {
             [lookSelectors.isHovered]: {
                 backgroundImage: wash(themeVars.color.primary.main, 0),
             },
-            [LookUtils.anyOf(lookSelectors.withinChecked, lookSelectors.withinMixed)]: sweet(themeVars.color.primary),
-            [lookSelectors.withinError]: {
+            [LookUtils.anyOf(lookSelectors.isCheckedWithin, lookSelectors.isMixedWithin)]: sweet(
+                themeVars.color.primary,
+            ),
+            [lookSelectors.hasErrorWithin]: {
                 borderColor: themeVars.color.error.main,
             },
         },
@@ -260,7 +264,7 @@ LookUtils.define(_softCandy, {
         borderRadius: "50%",
         backgroundColor: withAlpha(layerVars.contrast, 75),
         selectors: {
-            [LookUtils.anyOf(lookSelectors.withinChecked, lookSelectors.withinMixed)]: {
+            [LookUtils.anyOf(lookSelectors.isCheckedWithin, lookSelectors.isMixedWithin)]: {
                 backgroundColor: themeVars.color.primary.contrast,
             },
         },
@@ -276,7 +280,7 @@ LookUtils.define(_softCandy, {
         backgroundColor: themeVars.color.primary.main,
         backgroundImage: candy(themeVars.color.primary.main, lookVars.barAngle),
         selectors: {
-            [lookSelectors.withinError]: {
+            [lookSelectors.hasErrorWithin]: {
                 backgroundColor: themeVars.color.error.main,
                 backgroundImage: candy(themeVars.color.error.main, lookVars.barAngle),
             },
@@ -354,6 +358,44 @@ LookUtils.define(_softCandy, {
             },
             [lookSelectors.lineActive]: {
                 filter: themeVars.active.filter,
+            },
+        },
+    },
+    tabsFloater: {
+        borderBlockEnd: `2px solid ${themeVars.color.primary.main}`,
+        selectors: {
+            [lookSelectors.isVertical]: {
+                borderBlockEnd: "none",
+                backgroundImage: `linear-gradient(to right, ${themeVars.color.primary.main} 3px, rgb(from ${layerVars.contrast} r g b / 10%) 3px, transparent)`,
+            },
+        },
+    },
+    tabsGutter: {
+        borderBlockEnd: `2px solid rgb(from ${layerVars.contrast} r g b / 10%)`,
+        selectors: {
+            [lookSelectors.isVertical]: {
+                borderBlockEnd: "none",
+            },
+        },
+    },
+    tabsItem: {
+        paddingBlock: themeVars.spacing.half,
+        paddingInline: themeVars.spacing.full,
+        fontSize: themeVars.fontSize.xSmall,
+        fontWeight: "bold",
+        selectors: {
+            [lookSelectors.isVertical]: {
+                paddingBlock: themeVars.spacing.full,
+                paddingInline: themeVars.spacing.double,
+                fontSize: themeVars.fontSize.small,
+                fontWeight: "inherit",
+            },
+            [LookUtils.anyOf(lookSelectors.isHovered, lookSelectors.isSelected)]: {
+                color: themeVars.color.primary.main,
+            },
+            [lookSelectors.isDisabled]: {
+                filter: themeVars.disabled.filter,
+                opacity: themeVars.disabled.opacity,
             },
         },
     },

@@ -46,6 +46,18 @@ export type Redefine<T1, T2 extends { [K in keyof T1]?: any }> = {
 export type RequiredKeys<T, K extends keyof T> = T & Required<Pick<T, K>>;
 
 /**
+ * Makes every key optional, all the way down through nested objects.
+ *
+ * Arrays and functions stay whole: a partial of `{ stops: string[] }` takes a full `stops` array or none, never
+ * part of one. The shape {@link ObjectUtils.deepMerge} takes as its override.
+ */
+export type DeepPartial<T> = T extends readonly unknown[] | ((...args: never[]) => unknown)
+    ? T
+    : T extends object
+      ? { [K in keyof T]?: DeepPartial<T[K]> }
+      : T;
+
+/**
  * Collects the names of every key whose value matches a given type.
  *
  * `KeysOfType<{ a: number; b: string }, number>` gives `"a"`.
