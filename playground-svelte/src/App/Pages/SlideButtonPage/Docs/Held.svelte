@@ -20,7 +20,7 @@
         }}
     >
         {#snippet renderContent(renderProps)}
-            <PageSlideButtonContent {renderProps}>Slide or hold to arm</PageSlideButtonContent>
+            <PageSlideButtonContent {renderProps}>Slide or hold</PageSlideButtonContent>
         {/snippet}
     </SlideButton>
 

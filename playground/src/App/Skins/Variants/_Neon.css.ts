@@ -116,10 +116,7 @@ SkinUtils.define(_neon, {
         },
     },
     accordionPanel: PANEL,
-    opaqueOverlay: {
-        backgroundColor: "black",
-    },
-    blurredOverlay: {
+    overlay: {
         backdropFilter: "blur(10px) grayscale(75%)",
         backgroundColor: withAlpha("black", 50),
     },
@@ -284,6 +281,7 @@ SkinUtils.define(_neon, {
     slideButtonTrack: {
         ...FIELD,
         borderRadius: themeVars.borderRadius.full,
+        textShadow: `0 0 8px ${MIX}`,
     },
     slideButtonFill: {
         backgroundColor: withAlpha(themeVars.color.primary.main, 30),
@@ -293,21 +291,14 @@ SkinUtils.define(_neon, {
             },
         },
     },
-    slideButtonHint: {
-        textShadow: `0 0 8px ${MIX}`,
-    },
     slideButtonThumb: {
         ...tube(themeVars.color.primary),
         borderRadius: "50%",
         backgroundColor: "black",
-        selectors: {
-            [skinSelectors.hasError]: tube(themeVars.color.error),
-        },
-    },
-    slideButtonArrow: {
         color: tint(themeVars.color.primary.main, MIX, 75),
         selectors: {
             [skinSelectors.hasError]: {
+                ...tube(themeVars.color.error),
                 color: tint(themeVars.color.error.main, MIX, 75),
             },
         },

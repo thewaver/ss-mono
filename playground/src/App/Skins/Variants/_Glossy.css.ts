@@ -138,10 +138,7 @@ SkinUtils.define(_glossy, {
         ...SHALLOW_WELL,
         color: layerVars.contrast,
     },
-    opaqueOverlay: {
-        backgroundColor: "black",
-    },
-    blurredOverlay: {
+    overlay: {
         backdropFilter: "blur(10px) grayscale(75%)",
     },
     button: {
@@ -293,6 +290,7 @@ SkinUtils.define(_glossy, {
     slideButtonTrack: {
         ...WELL,
         borderRadius: themeVars.borderRadius.full,
+        fontWeight: "bold",
     },
     slideButtonFill: {
         backgroundColor: themeVars.color.primary.main,
@@ -304,20 +302,13 @@ SkinUtils.define(_glossy, {
             },
         },
     },
-    slideButtonHint: {
-        fontWeight: "bold",
-    },
     slideButtonThumb: {
         ...accent(themeVars.color.primary),
         borderRadius: "50%",
-        selectors: {
-            [skinSelectors.hasError]: accent(themeVars.color.error),
-        },
-    },
-    slideButtonArrow: {
         color: themeVars.color.primary.contrast,
         selectors: {
             [skinSelectors.hasError]: {
+                ...accent(themeVars.color.error),
                 color: themeVars.color.error.contrast,
             },
         },

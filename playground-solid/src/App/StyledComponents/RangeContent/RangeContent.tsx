@@ -12,6 +12,8 @@ const travel = (ratio: number) => `calc(${ratio} * (100% - ${styles.RANGE_THUMB_
 const center = (ratio: number) =>
     `calc(${ratio} * (100% - ${styles.RANGE_THUMB_SIZE}px) + ${styles.RANGE_THUMB_SIZE * 0.5}px)`;
 
+const HALF_DRAWN_THUMB = `${styles.RANGE_DRAWN_THUMB_WIDTH} * 0.5`;
+
 export const PageRangeContent = (props: RangeContentProps) => {
     const getLayerClass = useLayerClass();
 
@@ -21,11 +23,11 @@ export const PageRangeContent = (props: RangeContentProps) => {
 
     const getLength = () => access(props.length) ?? DEFAULT_RANGE_CONTENT_LENGTH;
 
-    const getFillSpan = () => {
-        const fill = access(props.renderProps).fill;
+    const getFillStart = () =>
+        getIsPair() ? `calc(${center(access(props.renderProps).fill.start)} - ${HALF_DRAWN_THUMB})` : "0px";
 
-        return travel(fill.end - fill.start);
-    };
+    const getFillSpan = () =>
+        `calc(${center(access(props.renderProps).fill.end)} + ${HALF_DRAWN_THUMB} - ${getFillStart()})`;
 
     return (
         <div
@@ -37,7 +39,13 @@ export const PageRangeContent = (props: RangeContentProps) => {
                 [styles.isDisabled]: access(props.renderProps).isDisabled,
             }}
         >
-            <div class={[styles.rangeTrack, styles.rangeTrackVariants[getOrientation()]].join(" ")} />
+            <div
+                class={styles.rangeTrack}
+                classList={{
+                    [styles.rangeTrackVariants[getOrientation()]]: true,
+                    [styles.hasError]: access(props.renderProps).hasError,
+                }}
+            />
 
             <div
                 class={styles.rangeFill}
@@ -47,8 +55,8 @@ export const PageRangeContent = (props: RangeContentProps) => {
                 }}
                 style={
                     getOrientation() === "vertical"
-                        ? { bottom: center(access(props.renderProps).fill.start), height: getFillSpan() }
-                        : { "inset-inline-start": center(access(props.renderProps).fill.start), "width": getFillSpan() }
+                        ? { bottom: getFillStart(), height: getFillSpan() }
+                        : { "inset-inline-start": getFillStart(), "width": getFillSpan() }
                 }
             />
 

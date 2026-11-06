@@ -30,7 +30,7 @@ export type TagInputProps = Omit<InteractionWrapperProps<TagInputFlags>, "extraF
 
 export type TagInputSlots = Pick<InteractionWrapperSlots<TagInputFlags>, "renderDecoration"> &
     InteractionControlSlots<TagInputFlags> & {
-        /** Draws one tag. */
+        /** Draws one tag. Its flags carry the field's `isDisabled` and `hasError`. */
         renderTag: (props: { tag: string; flags: InteractionFlags }) => VNodeChild;
         /** Draws the placeholder shown while the field is empty. */
         renderPlaceholder?: (flags: InteractionFlags<TagInputFlags>) => VNodeChild;

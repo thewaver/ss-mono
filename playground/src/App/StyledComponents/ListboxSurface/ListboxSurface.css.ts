@@ -1,11 +1,11 @@
 import { style } from "@vanilla-extract/css";
 
+import { skinEntries } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 import { layerVars } from "../Layer/Layer.css";
-import { fieldSurface } from "../TextFieldContent/TextFieldContent.css";
 
 export const listboxSurface = style([
-    fieldSurface,
+    skinEntries.dropdown,
     {
         boxSizing: "border-box",
         width: 240,

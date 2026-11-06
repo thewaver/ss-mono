@@ -18,7 +18,7 @@ export const rowTab = style([
     skinEntries.tabsItem,
     tabBase,
     {
-        marginBlockEnd: themeVars.spacing.half,
+        marginBlockEnd: 0,
     },
 ]);
 

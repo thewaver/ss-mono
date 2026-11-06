@@ -22,26 +22,24 @@ export const THEME_OPTIONS: NavSettingsOption<PlaygroundTheme>[] = [
 ];
 
 export const SKIN_OPTIONS: NavSettingsOption<PlaygroundSkin>[] = [
+    // CURRENT
+    { value: "cartoon", label: "Cartoon" },
     // GROOMED
+    { value: "blocky", label: "Blocky" },
+    { value: "cardboard", label: "Cardboard" },
     { value: "plasticine", label: "Plasticine" },
-    // OTHER
-    { value: "material", label: "Material" },
-    { value: "retroOS", label: "Retro OS" },
     { value: "terminal", label: "Terminal" },
+    // OTHER
     { value: "_acrylic", label: "_Acrylic" },
     { value: "_beveled", label: "_Beveled" },
     { value: "_clear", label: "_Clear" },
     { value: "_gemstone", label: "_Gemstone" },
     { value: "_glossy", label: "_Glossy" },
     { value: "_hardCandy", label: "_Hard Candy" },
-    { value: "_hollow", label: "_Hollow" },
     { value: "_matte", label: "_Matte" },
-    { value: "_minimal", label: "_Minimal" },
     { value: "_neon", label: "_Neon" },
     { value: "_plastic", label: "_Plastic" },
-    { value: "_retro", label: "_Retro" },
     { value: "_shaded", label: "_Shaded" },
-    { value: "_softCandy", label: "_Soft Candy" },
 ];
 
 export const NO_MOTION_DURATION_MS = 0;

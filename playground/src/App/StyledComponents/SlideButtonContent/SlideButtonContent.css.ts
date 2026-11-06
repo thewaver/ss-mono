@@ -4,7 +4,7 @@ import { skinEntries, skinStates } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 
 export const SLIDE_BUTTON_THUMB_SIZE = 44;
-export const SLIDE_BUTTON_LENGTH = 300;
+export const SLIDE_BUTTON_LENGTH = 240;
 
 export const isVertical = style([skinStates.isVertical]);
 export const isRightToLeft = style({});
@@ -13,24 +13,34 @@ export const isFocused = style({});
 export const isDisabled = style({});
 export const hasError = style([skinStates.hasError]);
 
-export const slideButtonContent = style([
+export const slideButtonContent = style({
+    position: "relative",
+    height: SLIDE_BUTTON_THUMB_SIZE,
+    transition: `filter ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}`,
+
+    selectors: {
+        [`&.${isVertical}`]: {
+            width: SLIDE_BUTTON_THUMB_SIZE,
+        },
+        [`&.${isDisabled}`]: {
+            filter: themeVars.disabled.filter,
+            opacity: themeVars.disabled.opacity,
+        },
+    },
+});
+
+export const slideButtonTrack = style([
     skinEntries.slideButtonTrack,
     {
-        position: "relative",
+        position: "absolute",
+        inset: 0,
         display: "flex",
         alignItems: "center",
-        height: SLIDE_BUTTON_THUMB_SIZE,
         overflow: "hidden",
-        transition: `filter ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}`,
 
         selectors: {
-            [`&.${isVertical}`]: {
+            [`.${isVertical} &`]: {
                 flexDirection: "column",
-                width: SLIDE_BUTTON_THUMB_SIZE,
-            },
-            [`&.${isDisabled}`]: {
-                filter: themeVars.disabled.filter,
-                opacity: themeVars.disabled.opacity,
             },
         },
     },
@@ -62,24 +72,21 @@ export const slideButtonFill = style([
     },
 ]);
 
-export const slideButtonHint = style([
-    skinEntries.slideButtonHint,
-    {
-        position: "relative",
-        flex: 1,
-        textAlign: "center",
-        paddingInline: SLIDE_BUTTON_THUMB_SIZE,
-        whiteSpace: "nowrap",
+export const slideButtonHint = style({
+    position: "relative",
+    flex: 1,
+    textAlign: "center",
+    paddingInline: SLIDE_BUTTON_THUMB_SIZE,
+    whiteSpace: "nowrap",
 
-        selectors: {
-            [`.${isVertical} &`]: {
-                writingMode: "vertical-rl",
-                textOrientation: "upright",
-                letterSpacing: "-0.25em",
-            },
+    selectors: {
+        [`.${isVertical} &`]: {
+            writingMode: "vertical-rl",
+            textOrientation: "upright",
+            letterSpacing: "-0.25em",
         },
     },
-]);
+});
 
 export const slideButtonThumb = style([
     skinEntries.slideButtonThumb,
@@ -114,25 +121,22 @@ export const slideButtonThumb = style([
     },
 ]);
 
-export const slideButtonArrow = style([
-    skinEntries.slideButtonArrow,
-    {
-        display: "block",
-        width: "100%",
-        height: "100%",
-        fill: "none",
-        stroke: "currentColor",
-        strokeWidth: 2,
-        strokeLinecap: "round",
-        strokeLinejoin: "round",
+export const slideButtonArrow = style({
+    display: "block",
+    width: "100%",
+    height: "100%",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 2,
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
 
-        selectors: {
-            [`.${isVertical} &`]: {
-                transform: "rotate(-90deg)",
-            },
-            [`.${isRightToLeft} &`]: {
-                transform: "rotate(180deg)",
-            },
+    selectors: {
+        [`.${isVertical} &`]: {
+            transform: "rotate(-90deg)",
+        },
+        [`.${isRightToLeft} &`]: {
+            transform: "rotate(180deg)",
         },
     },
-]);
+});

@@ -34,6 +34,7 @@ export const PageTagContent = (props: ParentProps<TagContentProps>) => {
                 [styles.isHovered]: access(props.flags).isHovered,
                 [styles.isFocused]: access(props.flags).isFocusVisible,
                 [styles.isDisabled]: access(props.flags).isDisabled,
+                [styles.hasError]: access(props.flags).hasError,
             }}
         >
             {props.children}

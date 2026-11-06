@@ -92,7 +92,7 @@ export const LIBRARY: TreemapNode<string> = branch(
             leaf("RangeCalendar", 118),
             leaf("SegmentedInput", 396),
             leaf("Select", 899),
-            leaf("TagInput", 471),
+            leaf("TagInput", 472),
             leaf("TextArea", 21),
             leaf("TextInput", 200),
             leaf("TimeInput", 402),

@@ -66,6 +66,8 @@ const toThemeValues = <T extends { color: { primary: ColorFamily } }>(values: T)
     },
 });
 
+export const BODY_FONT_FAMILY = "Arial, Helvetica, sans-serif";
+
 export const RAINBOW_HUES = [22.5, 67.5, 112.5, 157.5, 202.5, 247.5, 292.5, 337.5] as const;
 
 export const RAINBOW = Object.fromEntries(RAINBOW_HUES.map((hue) => [hue, toCssFamily(toRainbowFamily(hue))]));
@@ -151,7 +153,7 @@ globalStyle("body", {
     margin: 0,
     padding: 0,
     backgroundColor: "#202020",
-    fontFamily: "Arial, Helvetica, sans-serif",
+    fontFamily: BODY_FONT_FAMILY,
     fontSize: 16,
     lineHeight: 1.5,
     colorScheme: themeVars.scheme,

@@ -10,7 +10,7 @@ import type { SlideButtonContentProps } from "./SlideButtonContentSolid.types";
 const travel = (ratio: number) => `calc(${ratio} * (100% - ${styles.SLIDE_BUTTON_THUMB_SIZE}px))`;
 
 const covered = (ratio: number) =>
-    `calc(${ratio} * (100% - ${styles.SLIDE_BUTTON_THUMB_SIZE}px) + ${styles.SLIDE_BUTTON_THUMB_SIZE / 2}px)`;
+    `calc(${ratio} * (100% - ${styles.SLIDE_BUTTON_THUMB_SIZE}px) + ${styles.SLIDE_BUTTON_THUMB_SIZE}px)`;
 
 export const PageSlideButtonContent = (props: ParentProps<SlideButtonContentProps>) => {
     const getLayerClass = useLayerClass();
@@ -42,20 +42,27 @@ export const PageSlideButtonContent = (props: ParentProps<SlideButtonContentProp
                 [styles.isVertical]: getIsVertical(),
                 [styles.isRightToLeft]: getIsRightToLeft(),
                 [styles.isDisabled]: access(props.renderProps).isDisabled,
-                [styles.hasError]: access(props.renderProps).hasError,
             }}
         >
             <div
-                class={styles.slideButtonFill}
+                class={styles.slideButtonTrack}
                 classList={{
-                    [styles.isTracking]: getIsTracking(),
+                    [styles.isVertical]: getIsVertical(),
                     [styles.hasError]: access(props.renderProps).hasError,
                 }}
-                style={getIsVertical() ? { height: covered(getRatio()) } : { width: covered(getRatio()) }}
-            />
+            >
+                <div
+                    class={styles.slideButtonFill}
+                    classList={{
+                        [styles.isTracking]: getIsTracking(),
+                        [styles.hasError]: access(props.renderProps).hasError,
+                    }}
+                    style={getIsVertical() ? { height: covered(getRatio()) } : { width: covered(getRatio()) }}
+                />
 
-            <div class={styles.slideButtonHint} style={{ opacity: 1 - getRatio() }}>
-                {props.children}
+                <div class={styles.slideButtonHint} style={{ opacity: 1 - getRatio() }}>
+                    {props.children}
+                </div>
             </div>
 
             <div
@@ -67,12 +74,7 @@ export const PageSlideButtonContent = (props: ParentProps<SlideButtonContentProp
                 }}
                 style={getThumbStyle()}
             >
-                <svg
-                    class={styles.slideButtonArrow}
-                    classList={{ [styles.hasError]: access(props.renderProps).hasError }}
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                >
+                <svg class={styles.slideButtonArrow} viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M5 12 H19 M13 6 L19 12 L13 18" />
                 </svg>
             </div>

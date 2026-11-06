@@ -153,10 +153,7 @@ SkinUtils.define(_hardCandy, {
         },
     },
     accordionPanel: PANEL,
-    opaqueOverlay: {
-        backgroundColor: "black",
-    },
-    blurredOverlay: {
+    overlay: {
         backdropFilter: "blur(10px) grayscale(75%)",
     },
     button: {
@@ -336,6 +333,7 @@ SkinUtils.define(_hardCandy, {
     slideButtonTrack: {
         ...RING,
         borderRadius: themeVars.borderRadius.full,
+        fontWeight: "bold",
     },
     slideButtonFill: {
         backgroundColor: themeVars.color.primary.main,
@@ -347,20 +345,13 @@ SkinUtils.define(_hardCandy, {
             },
         },
     },
-    slideButtonHint: {
-        fontWeight: "bold",
-    },
     slideButtonThumb: {
         borderRadius: "50%",
         ...candy(themeVars.color.primary, SMALL_BAND),
-        selectors: {
-            [skinSelectors.hasError]: candy(themeVars.color.error, SMALL_BAND),
-        },
-    },
-    slideButtonArrow: {
         color: themeVars.color.primary.contrast,
         selectors: {
             [skinSelectors.hasError]: {
+                ...candy(themeVars.color.error, SMALL_BAND),
                 color: themeVars.color.error.contrast,
             },
         },

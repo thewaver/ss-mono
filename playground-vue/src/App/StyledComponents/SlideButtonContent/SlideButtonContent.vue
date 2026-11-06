@@ -10,7 +10,7 @@ import type { SlideButtonContentProps } from "./SlideButtonContentVue.types";
 const travel = (ratio: number) => `calc(${ratio} * (100% - ${styles.SLIDE_BUTTON_THUMB_SIZE}px))`;
 
 const covered = (ratio: number) =>
-    `calc(${ratio} * (100% - ${styles.SLIDE_BUTTON_THUMB_SIZE}px) + ${styles.SLIDE_BUTTON_THUMB_SIZE / 2}px)`;
+    `calc(${ratio} * (100% - ${styles.SLIDE_BUTTON_THUMB_SIZE}px) + ${styles.SLIDE_BUTTON_THUMB_SIZE}px)`;
 
 const props = defineProps<SlideButtonContentProps>();
 
@@ -43,17 +43,24 @@ const thumbStyle = computed(() => {
             isVertical && styles.isVertical,
             isRightToLeft && styles.isRightToLeft,
             renderProps.isDisabled && styles.isDisabled,
-            renderProps.hasError && styles.hasError,
         ]"
         :style="isVertical ? { height: `${length}px` } : { width: `${length}px` }"
     >
         <div
-            :class="[styles.slideButtonFill, isTracking && styles.isTracking]"
-            :style="isVertical ? { height: covered(ratio) } : { width: covered(ratio) }"
-        />
+            :class="[styles.slideButtonTrack, isVertical && styles.isVertical, renderProps.hasError && styles.hasError]"
+        >
+            <div
+                :class="[
+                    styles.slideButtonFill,
+                    isTracking && styles.isTracking,
+                    renderProps.hasError && styles.hasError,
+                ]"
+                :style="isVertical ? { height: covered(ratio) } : { width: covered(ratio) }"
+            />
 
-        <div :class="styles.slideButtonHint" :style="{ opacity: 1 - ratio }">
-            <slot />
+            <div :class="styles.slideButtonHint" :style="{ opacity: 1 - ratio }">
+                <slot />
+            </div>
         </div>
 
         <div
@@ -61,6 +68,7 @@ const thumbStyle = computed(() => {
                 styles.slideButtonThumb,
                 isTracking && styles.isTracking,
                 renderProps.isFocusVisible && styles.isFocused,
+                renderProps.hasError && styles.hasError,
             ]"
             :style="thumbStyle"
         >

@@ -136,10 +136,7 @@ SkinUtils.define(_matte, {
         ...PANEL,
         borderInlineStartColor: "transparent",
     },
-    opaqueOverlay: {
-        backgroundColor: "black",
-    },
-    blurredOverlay: {
+    overlay: {
         backdropFilter: "blur(10px) grayscale(75%)",
     },
     button: {
@@ -320,6 +317,7 @@ SkinUtils.define(_matte, {
     },
     slideButtonTrack: {
         ...FIELD,
+        fontWeight: "bold",
     },
     slideButtonFill: {
         backgroundColor: themeVars.color.primary.main,
@@ -339,20 +337,13 @@ SkinUtils.define(_matte, {
             },
         },
     },
-    slideButtonHint: {
-        fontWeight: "bold",
-    },
     slideButtonThumb: {
         borderRadius: 0,
         ...accent(themeVars.color.primary),
-        selectors: {
-            [skinSelectors.hasError]: accent(themeVars.color.error),
-        },
-    },
-    slideButtonArrow: {
         color: themeVars.color.primary.contrast,
         selectors: {
             [skinSelectors.hasError]: {
+                ...accent(themeVars.color.error),
                 color: themeVars.color.error.contrast,
             },
         },

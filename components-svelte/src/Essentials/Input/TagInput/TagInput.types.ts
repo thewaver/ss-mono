@@ -23,7 +23,7 @@ export type TagInputProps = Omit<InteractionWrapperProps<TagInputFlags>, "render
         text?: string;
         /** Styles the field's text against its current state. */
         computeTextStyle?: (flags: InteractionFlags<TagInputFlags>) => TextFieldTextStyle;
-        /** Draws one tag. */
+        /** Draws one tag. Its flags carry the field's `isDisabled` and `hasError`. */
         renderTag: Snippet<[tag: string, flags: InteractionFlags]>;
         /** Draws the placeholder shown while the field is empty. */
         renderPlaceholder?: Snippet<[flags: InteractionFlags<TagInputFlags>]>;

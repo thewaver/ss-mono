@@ -25,7 +25,7 @@ export type TagInputProps = Omit<InteractionWrapperProps<TagInputFlags>, "render
         text?: readonly [string, (text: string) => void];
         /** Styles the field's text against its current state. */
         computeTextStyle?: (flags: InteractionFlags<TagInputFlags>) => TextFieldTextStyle;
-        /** Draws one tag. */
+        /** Draws one tag. Its flags carry the field's `isDisabled` and `hasError`. */
         renderTag: (tag: string, flags: InteractionFlags) => ReactNode;
         /** Draws the placeholder shown while the field is empty. */
         renderPlaceholder?: (flags: InteractionFlags<TagInputFlags>) => ReactNode;

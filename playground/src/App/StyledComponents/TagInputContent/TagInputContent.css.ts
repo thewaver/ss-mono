@@ -8,6 +8,7 @@ import { FIELD_FONT_SIZE, fieldSurface } from "../TextFieldContent/TextFieldCont
 export const isHovered = style([skinStates.isHovered]);
 export const isFocused = style({});
 export const isDisabled = style([skinStates.isDisabled]);
+export const hasError = style([skinStates.hasError]);
 
 export const tagInputContent = style([
     fieldSurface,

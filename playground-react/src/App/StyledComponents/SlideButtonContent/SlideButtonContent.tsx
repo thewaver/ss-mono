@@ -9,7 +9,7 @@ import type { SlideButtonContentProps } from "./SlideButtonContentReact.types";
 const travel = (ratio: number) => `calc(${ratio} * (100% - ${styles.SLIDE_BUTTON_THUMB_SIZE}px))`;
 
 const covered = (ratio: number) =>
-    `calc(${ratio} * (100% - ${styles.SLIDE_BUTTON_THUMB_SIZE}px) + ${styles.SLIDE_BUTTON_THUMB_SIZE / 2}px)`;
+    `calc(${ratio} * (100% - ${styles.SLIDE_BUTTON_THUMB_SIZE}px) + ${styles.SLIDE_BUTTON_THUMB_SIZE}px)`;
 
 export const PageSlideButtonContent = (props: PropsWithChildren<SlideButtonContentProps>) => {
     const layerClass = useLayerClass();
@@ -36,19 +36,34 @@ export const PageSlideButtonContent = (props: PropsWithChildren<SlideButtonConte
                 isVertical && styles.isVertical,
                 isRightToLeft && styles.isRightToLeft,
                 props.renderProps.isDisabled && styles.isDisabled,
-                props.renderProps.hasError && styles.hasError,
             ]
                 .filter(Boolean)
                 .join(" ")}
             style={isVertical ? { height: `${length}px` } : { width: `${length}px` }}
         >
             <div
-                className={[styles.slideButtonFill, isTracking && styles.isTracking].filter(Boolean).join(" ")}
-                style={isVertical ? { height: covered(ratio) } : { width: covered(ratio) }}
-            />
+                className={[
+                    styles.slideButtonTrack,
+                    isVertical && styles.isVertical,
+                    props.renderProps.hasError && styles.hasError,
+                ]
+                    .filter(Boolean)
+                    .join(" ")}
+            >
+                <div
+                    className={[
+                        styles.slideButtonFill,
+                        isTracking && styles.isTracking,
+                        props.renderProps.hasError && styles.hasError,
+                    ]
+                        .filter(Boolean)
+                        .join(" ")}
+                    style={isVertical ? { height: covered(ratio) } : { width: covered(ratio) }}
+                />
 
-            <div className={styles.slideButtonHint} style={{ opacity: 1 - ratio }}>
-                {props.children}
+                <div className={styles.slideButtonHint} style={{ opacity: 1 - ratio }}>
+                    {props.children}
+                </div>
             </div>
 
             <div
@@ -56,6 +71,7 @@ export const PageSlideButtonContent = (props: PropsWithChildren<SlideButtonConte
                     styles.slideButtonThumb,
                     isTracking && styles.isTracking,
                     props.renderProps.isFocusVisible && styles.isFocused,
+                    props.renderProps.hasError && styles.hasError,
                 ]
                     .filter(Boolean)
                     .join(" ")}

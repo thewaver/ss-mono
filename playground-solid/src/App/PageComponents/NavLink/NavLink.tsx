@@ -21,17 +21,17 @@ export const PageNavLink = (props: ParentProps<PageNavLinkProps>) => {
     const getLayerClass = useLayerClass();
 
     return (
-        <A
-            href={access(props.href)}
-            end={true}
-            class={styles.navLinkContent}
-            classList={{
-                [getLayerClass()]: true,
-                [styles.isSelected]: access(props.isSelected),
-                [styles.isGliding]: access(props.isGliding) ?? false,
-            }}
-        >
-            {props.children}
+        <A href={access(props.href)} end={true} class={styles.navLink}>
+            <div
+                classList={{
+                    [getLayerClass()]: true,
+                    [styles.navLinkContent]: access(props.isGliding) ?? false,
+                    [styles.navLinkContentWithoutFloater]: !(access(props.isGliding) ?? false),
+                    [styles.isSelected]: access(props.isSelected),
+                }}
+            >
+                {props.children}
+            </div>
         </A>
     );
 };

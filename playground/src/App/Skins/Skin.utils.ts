@@ -2,7 +2,12 @@ import { globalStyle } from "@vanilla-extract/css";
 
 import type { SkinEntry, SkinRule, SkinRules } from "./Skin.types";
 
-import { skinBoundary, skinEntries, skinLayer, skinSelectors } from "./Skin.css";
+import { BODY_FONT_FAMILY } from "../Theme.css";
+import { skinBoundary, skinEntries, skinLayer, skinSelectors, skinSizeVars } from "./Skin.css";
+
+const UNSET_SIZE_VARS = Object.fromEntries(Object.values(skinSizeVars).map((sizeVar) => [sizeVar, "initial"]));
+
+const ROOT_RESET = { fontFamily: BODY_FONT_FAMILY, vars: UNSET_SIZE_VARS };
 
 const splitSelectorList = (selector: string) => {
     const parts: string[] = [];
@@ -79,6 +84,8 @@ export namespace SkinUtils {
         );
 
     export const define = (root: string, rules: SkinRules) => {
+        globalStyle(`.${root}`, { "@layer": { [skinLayer]: ROOT_RESET } });
+
         (Object.keys(rules) as SkinEntry[]).forEach((entry) => {
             defineRule(root, `.${skinEntries[entry]}`, rules[entry]);
         });

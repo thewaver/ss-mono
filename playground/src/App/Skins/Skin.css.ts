@@ -6,8 +6,17 @@ export const skinLayer = layer("skin");
 
 const barAngle = createVar();
 
+export const skinSizeVars = {
+    rangeTrackThickness: createVar(),
+    rangeFillThickness: createVar(),
+    rangeThumbWidth: createVar(),
+    rangeThumbHeight: createVar(),
+    progressTrackThickness: createVar(),
+};
+
 export const skinVars = {
     barAngle: fallbackVar(barAngle, "90deg"),
+    ...skinSizeVars,
 };
 
 export const skinBoundary = style({});
@@ -15,7 +24,6 @@ export const skinBoundary = style({});
 export const skinEntries: Record<SkinEntry, string> = {
     accordionHeader: style({}),
     accordionPanel: style({}),
-    blurredOverlay: style({}),
     button: style({}),
     buttonSimple: style({}),
     checkboxBox: style({}),
@@ -28,7 +36,7 @@ export const skinEntries: Record<SkinEntry, string> = {
     input: style({}),
     itemWithFloater: style({}),
     itemWithoutFloater: style({}),
-    opaqueOverlay: style({}),
+    overlay: style({}),
     pageBackground: style({}),
     panel: style({}),
     progressFill: style({}),
@@ -41,9 +49,7 @@ export const skinEntries: Record<SkinEntry, string> = {
     scrollerThumb: style({}),
     scrollerTrack: style({}),
     selectionFloater: style({}),
-    slideButtonArrow: style({}),
     slideButtonFill: style({}),
-    slideButtonHint: style({}),
     slideButtonThumb: style({}),
     slideButtonTrack: style({}),
     surface: style({}),
@@ -99,6 +105,7 @@ export const skinSelectors = {
     isJoinedInlineEnd: `&.${skinStates.isJoinedInlineEnd}`,
     fieldText: ":has(> &)",
     fieldTextDisabled: `:has(> &.${skinStates.isDisabled})`,
+    fieldTextError: `:has(> &.${skinStates.hasError})`,
     line: "&::before",
     lineActive: `&.${skinStates.isActive}::before`,
 } as const;

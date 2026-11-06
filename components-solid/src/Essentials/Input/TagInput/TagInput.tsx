@@ -151,6 +151,7 @@ export const TagInput = (props: TagInputProps) => {
                             {(getTag, index) => (
                                 <InteractionWrapper
                                     isDisabled={() => getFlags().isDisabled ?? false}
+                                    hasError={() => getFlags().hasError ?? false}
                                     isTabbable={false}
                                     renderControl={(setTagRef, getTagFlags) => (
                                         <button

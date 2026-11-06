@@ -11,9 +11,9 @@ export const plasticine = style({});
 
 const PILL_RADIUS = "9999px";
 
-const SHADOW_SMALL = "0 2px 2px 0px rgba(0, 0, 0, 0.65)";
+const SHADOW_SMALL = "0 2px 2px 0px rgba(0, 0, 0, 0.75)";
 const SHADOW_MEDIUM = `${SHADOW_SMALL}, 0 4px 8px 0px rgba(0, 0, 0, 0.5)`;
-const SHADOW_LARGE = `${SHADOW_MEDIUM}, 0 16px 64px 0px rgba(0, 0, 0, 0.35)`;
+const SHADOW_LARGE = `${SHADOW_MEDIUM}, 0 16px 64px 0px rgba(0, 0, 0, 0.25)`;
 
 const INTERACTIBLE_STATES: StyleRule["selectors"] = {
     [skinSelectors.isHovered]: {
@@ -30,7 +30,7 @@ const INTERACTIBLE_STATES: StyleRule["selectors"] = {
 
 const INPUT_STATES: StyleRule["selectors"] = {
     [skinSelectors.isReadOnly]: {
-        backgroundColor: `rgb(from ${layerVars.contrast} r g b / 10%)`,
+        backgroundColor: [layerVars.contrast, `rgb(from ${layerVars.contrast} r g b / 10%)`],
     },
     [SkinUtils.anyOf(skinSelectors.hasErrorWithin, skinSelectors.hasError)]: {
         borderColor: themeVars.color.error.main,
@@ -48,11 +48,19 @@ const ITEM_STATES: StyleRule["selectors"] = ObjectUtils.deepMerge(INTERACTIBLE_S
     },
 });
 
-const FIELD_SHELL: StyleRule = {
-    border: `2px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
+const SWITCH_STATES: StyleRule["selectors"] = {
+    ...INPUT_STATES,
+};
+
+const INPUT_SHELL: StyleRule = {
+    border: [`2px solid ${layerVars.contrast}`, `2px solid rgb(from ${layerVars.contrast} r g b / 25%)`],
     backgroundColor: layerVars.main,
-    color: layerVars.contrast,
     boxShadow: SHADOW_SMALL,
+    color: layerVars.contrast,
+} as const;
+
+const SWITCH_SHELL: StyleRule = {
+    ...INPUT_SHELL,
 } as const;
 
 const ACCORDION: StyleRule = {
@@ -65,16 +73,18 @@ const ACCORDION: StyleRule = {
 const ITEM: StyleRule = {
     borderRadius: themeVars.borderRadius.half,
     fontSize: themeVars.fontSize.medium,
-    selectors: ITEM_STATES,
+    selectors: {
+        ...ITEM_STATES,
+    },
 } as const;
 
 const SURFACE: StyleRule = {
     borderRadius: themeVars.borderRadius.half,
     backgroundColor: themeVars.color.surface.main,
     backgroundImage: `linear-gradient(315deg, ${themeVars.color.surface.dark}, ${themeVars.color.surface.light})`,
+    boxShadow: SHADOW_MEDIUM,
     color: themeVars.color.surface.contrast,
     fontSize: themeVars.fontSize.medium,
-    boxShadow: SHADOW_MEDIUM,
 } as const;
 
 SkinUtils.define(plasticine, {
@@ -91,20 +101,17 @@ SkinUtils.define(plasticine, {
             ...SkinUtils.joinedCorners(),
         },
     },
-    blurredOverlay: {
-        backdropFilter: "blur(10px) grayscale(75%)",
-    },
     button: {
         borderRadius: themeVars.borderRadius.half,
         paddingInline: themeVars.spacing.double,
         backgroundColor: themeVars.color.primary.main,
         backgroundImage: `linear-gradient(315deg, ${themeVars.color.primary.dark}, ${themeVars.color.primary.light})`,
-        color: themeVars.color.primary.contrast,
         boxShadow: SHADOW_SMALL,
+        color: themeVars.color.primary.contrast,
         fontWeight: "bold",
         selectors: {
             [skinSelectors.isPressed]: {
-                boxShadow: `inset 0 1px 3px rgb(0 0 0 / 75%), inset 0 2px 6px rgb(0 0 0 / 50%)`,
+                boxShadow: `inset 0 1px 2px rgb(0 0 0 / 75%), inset 0 2px 8px rgb(0 0 0 / 50%), inset 0 4px 32px rgb(0 0 0 / 25%)`,
             },
             [skinSelectors.hasError]: {
                 backgroundColor: themeVars.color.error.main,
@@ -117,8 +124,8 @@ SkinUtils.define(plasticine, {
     buttonSimple: {
         borderRadius: themeVars.borderRadius.half,
         backgroundColor: [layerVars.contrast, `rgb(from ${layerVars.contrast} r g b / 25%)`],
-        color: layerVars.contrast,
         boxShadow: SHADOW_SMALL,
+        color: layerVars.contrast,
         fontSize: themeVars.fontSize.small,
         selectors: {
             [skinSelectors.isPressed]: {
@@ -131,18 +138,21 @@ SkinUtils.define(plasticine, {
         },
     },
     checkboxBox: {
-        ...FIELD_SHELL,
+        ...SWITCH_SHELL,
         borderRadius: themeVars.borderRadius.half,
-        selectors: INPUT_STATES,
+        selectors: {
+            ...SWITCH_STATES,
+        },
     },
     checkboxMark: {
         color: themeVars.color.primary.main,
         fontSize: themeVars.fontSize.medium,
+        fontWeight: "bold",
     },
     decoration: {
         borderRadius: themeVars.borderRadius.half,
         backgroundColor: "transparent",
-        color: [layerVars.contrast, `rgb(from ${layerVars.contrast} r g b / 75%)`],
+        opacity: 0.75,
         selectors: {
             ...INTERACTIBLE_STATES,
         },
@@ -150,19 +160,19 @@ SkinUtils.define(plasticine, {
     drawer: {
         backgroundColor: themeVars.color.surface.main,
         backgroundImage: `linear-gradient(45deg, ${themeVars.color.surface.dark}, ${themeVars.color.surface.light})`,
-        color: themeVars.color.surface.contrast,
         boxShadow: SHADOW_LARGE,
+        color: themeVars.color.surface.contrast,
     },
     dropdown: {
-        ...FIELD_SHELL,
+        ...INPUT_SHELL,
     },
     hollowSurface: SkinUtils.hollow(SURFACE),
     hoverFloater: {
         borderRadius: themeVars.borderRadius.half,
-        backgroundColor: [layerVars.contrast, `rgb(from ${layerVars.contrast} r g b / 25%)`],
+        backgroundColor: [layerVars.contrast, `rgb(from ${layerVars.contrast} r g b / 10%)`],
     },
     input: {
-        ...FIELD_SHELL,
+        ...INPUT_SHELL,
         selectors: {
             ...INPUT_STATES,
             [skinSelectors.fieldText]: {
@@ -181,12 +191,12 @@ SkinUtils.define(plasticine, {
     itemWithoutFloater: ObjectUtils.deepMerge(ITEM, {
         selectors: {
             [skinSelectors.isHovered]: {
-                backgroundColor: `rgb(from ${layerVars.contrast} r g b / 25%)`,
+                backgroundColor: `rgb(from ${layerVars.contrast} r g b / 10%)`,
             },
         },
     }),
-    opaqueOverlay: {
-        backgroundColor: "black",
+    overlay: {
+        backdropFilter: "blur(10px) grayscale(75%)",
     },
     pageBackground: {
         backgroundColor: themeVars.color.background.main,
@@ -196,8 +206,8 @@ SkinUtils.define(plasticine, {
     panel: {
         borderRadius: themeVars.borderRadius.half,
         backgroundColor: [layerVars.main, `rgb(from ${layerVars.main} r g b / 50%)`],
-        color: layerVars.contrast,
         boxShadow: SHADOW_SMALL,
+        color: layerVars.contrast,
     },
     progressFill: {
         borderRadius: PILL_RADIUS,
@@ -222,9 +232,11 @@ SkinUtils.define(plasticine, {
         },
     },
     radioBox: {
-        ...FIELD_SHELL,
+        ...SWITCH_SHELL,
         borderRadius: "50%",
-        selectors: INPUT_STATES,
+        selectors: {
+            ...SWITCH_STATES,
+        },
     },
     radioDot: {
         borderRadius: "50%",
@@ -283,15 +295,8 @@ SkinUtils.define(plasticine, {
         borderRadius: themeVars.borderRadius.half,
         backgroundColor: [themeVars.color.primary.main, `rgb(from ${themeVars.color.primary.main} r g b / 10%)`],
     },
-    slideButtonArrow: {
-        color: themeVars.color.primary.main,
-        selectors: {
-            [skinSelectors.hasError]: {
-                color: themeVars.color.error.main,
-            },
-        },
-    },
     slideButtonFill: {
+        borderRadius: PILL_RADIUS,
         backgroundColor: themeVars.color.primary.main,
         backgroundImage: `linear-gradient(${skinVars.barAngle}, ${themeVars.color.primary.dark}, ${themeVars.color.primary.light})`,
         selectors: {
@@ -301,16 +306,15 @@ SkinUtils.define(plasticine, {
             },
         },
     },
-    slideButtonHint: {
-        fontWeight: "bold",
-    },
     slideButtonThumb: {
         borderRadius: "50%",
         border: `2px solid ${themeVars.color.primary.main}`,
         backgroundColor: layerVars.main,
         boxShadow: SHADOW_SMALL,
+        color: themeVars.color.primary.main,
         selectors: {
             [skinSelectors.hasError]: {
+                color: themeVars.color.error.main,
                 borderColor: themeVars.color.error.main,
             },
         },
@@ -319,6 +323,7 @@ SkinUtils.define(plasticine, {
         borderRadius: PILL_RADIUS,
         backgroundColor: [layerVars.contrast, `rgb(from ${layerVars.contrast} r g b / 10%)`],
         boxShadow: SHADOW_SMALL,
+        fontWeight: "bold",
     },
     surface: SURFACE,
     tabsFloater: {
@@ -343,22 +348,19 @@ SkinUtils.define(plasticine, {
         },
     },
     tabsItem: {
-        paddingBlock: themeVars.spacing.half,
-        paddingInline: themeVars.spacing.full,
+        paddingBlock: themeVars.spacing.full,
+        paddingInline: themeVars.spacing.double,
         fontSize: themeVars.fontSize.small,
         fontWeight: "bold",
         selectors: {
             [skinSelectors.isVertical]: {
-                paddingBlock: themeVars.spacing.quarter,
+                paddingBlock: themeVars.spacing.full,
                 paddingInline: themeVars.spacing.double,
             },
             [SkinUtils.anyOf(skinSelectors.isHovered, skinSelectors.isSelected)]: {
                 color: themeVars.color.primary.main,
             },
-            [skinSelectors.isDisabled]: {
-                filter: themeVars.disabled.filter,
-                opacity: themeVars.disabled.opacity,
-            },
+            ...INTERACTIBLE_STATES,
         },
     },
     tag: {
@@ -368,14 +370,9 @@ SkinUtils.define(plasticine, {
         backgroundImage: `linear-gradient(45deg, ${themeVars.color.primary.dark}, ${themeVars.color.primary.light})`,
         color: themeVars.color.primary.contrast,
         fontSize: themeVars.fontSize.xSmall,
+        fontWeight: "bold",
         selectors: {
-            [skinSelectors.isHovered]: {
-                filter: themeVars.hover.filter,
-            },
-            [skinSelectors.isDisabled]: {
-                filter: themeVars.disabled.filter,
-                opacity: themeVars.disabled.opacity,
-            },
+            ...INTERACTIBLE_STATES,
         },
     },
     toggleHandle: {
@@ -388,14 +385,16 @@ SkinUtils.define(plasticine, {
         },
     },
     toggleTrack: {
-        ...FIELD_SHELL,
+        ...SWITCH_SHELL,
         borderRadius: PILL_RADIUS,
-        selectors: INPUT_STATES,
+        selectors: {
+            ...SWITCH_STATES,
+        },
     },
     tooltip: {
         borderRadius: themeVars.borderRadius.full,
         backgroundColor: layerVars.main,
-        color: layerVars.contrast,
         boxShadow: SHADOW_SMALL,
+        color: layerVars.contrast,
     },
 });

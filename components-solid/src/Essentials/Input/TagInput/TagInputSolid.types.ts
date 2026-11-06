@@ -20,7 +20,7 @@ export type TagInputProps = Omit<InteractionWrapperProps<TagInputFlags>, "render
             text?: SignalSource<string>;
             /** Styles the field's text against its current state. */
             computeTextStyle?: (getFlags: () => InteractionFlags<TagInputFlags>) => TextFieldTextStyle;
-            /** Draws one tag. */
+            /** Draws one tag. Its flags carry the field's `isDisabled` and `hasError`. */
             renderTag: (getTag: Accessor<string>, getFlags: () => InteractionFlags) => JSX.Element;
             /** Draws the placeholder shown while the field is empty. */
             renderPlaceholder?: (getFlags: () => InteractionFlags<TagInputFlags>) => JSX.Element;

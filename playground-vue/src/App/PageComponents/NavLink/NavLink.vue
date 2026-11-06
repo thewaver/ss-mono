@@ -11,11 +11,15 @@ const layerClass = useLayerClass();
 </script>
 
 <template>
-    <PageRouterLink
-        :href="href"
-        :class="[styles.navLinkContent, layerClass, isSelected && styles.isSelected, isGliding && styles.isGliding]"
-        :aria-current="isSelected ? 'page' : undefined"
-    >
-        <slot />
+    <PageRouterLink :href="href" :class="styles.navLink" :aria-current="isSelected ? 'page' : undefined">
+        <div
+            :class="[
+                isGliding ? styles.navLinkContent : styles.navLinkContentWithoutFloater,
+                layerClass,
+                isSelected && styles.isSelected,
+            ]"
+        >
+            <slot />
+        </div>
     </PageRouterLink>
 </template>

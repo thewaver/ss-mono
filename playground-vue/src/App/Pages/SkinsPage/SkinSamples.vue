@@ -23,6 +23,7 @@ import PageTabGutter from "../../StyledComponents/TabContent/PageTabGutter.vue";
 import SkinButtonSample from "./SkinButtonSample.vue";
 import SkinCheckboxSample from "./SkinCheckboxSample.vue";
 import SkinInputSample from "./SkinInputSample.vue";
+import SkinListboxSample from "./SkinListboxSample.vue";
 import SkinProgressSample from "./SkinProgressSample.vue";
 import SkinRadioSample from "./SkinRadioSample.vue";
 import SkinRangeSample from "./SkinRangeSample.vue";
@@ -101,6 +102,10 @@ const tabs = computed(() =>
             <SkinTagSample state="Disabled" is-disabled />
             <SkinTagSample state="Error" has-error />
         </div>
+    </SkinSampleColumn>
+
+    <SkinSampleColumn name="Listbox">
+        <SkinListboxSample />
     </SkinSampleColumn>
 
     <SkinSampleColumn name="Button">

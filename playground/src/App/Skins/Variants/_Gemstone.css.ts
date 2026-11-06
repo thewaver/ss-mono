@@ -136,10 +136,7 @@ SkinUtils.define(_gemstone, {
         ...FIELD,
         color: layerVars.contrast,
     },
-    opaqueOverlay: {
-        backgroundColor: "black",
-    },
-    blurredOverlay: {
+    overlay: {
         backdropFilter: "blur(10px) grayscale(75%)",
     },
     button: {
@@ -293,6 +290,7 @@ SkinUtils.define(_gemstone, {
     },
     slideButtonTrack: {
         ...FIELD,
+        fontWeight: "bold",
     },
     slideButtonFill: {
         backgroundColor: "black",
@@ -303,20 +301,13 @@ SkinUtils.define(_gemstone, {
             },
         },
     },
-    slideButtonHint: {
-        fontWeight: "bold",
-    },
     slideButtonThumb: {
         ...gem(themeVars.color.primary),
         borderRadius: "50%",
-        selectors: {
-            [skinSelectors.hasError]: gem(themeVars.color.error),
-        },
-    },
-    slideButtonArrow: {
         color: tint(midtone(themeVars.color.primary.main), "white", 85),
         selectors: {
             [skinSelectors.hasError]: {
+                ...gem(themeVars.color.error),
                 color: tint(midtone(themeVars.color.error.main), "white", 85),
             },
         },

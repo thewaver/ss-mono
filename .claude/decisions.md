@@ -147,9 +147,11 @@ change shape, not just where colors fall; several will be dropped once lived wit
   made with relative color syntax (`hsl(from … calc(l ± 8))`), sunk inward when pressed, checked or selected.
 - **Terminal** — monospace inside every entry, one-pixel rules, no radius and no shadow, `primary.main` used
   only for text, outlines and a segmented progress fill.
-- **Retro OS** — the two-tone bevel of early desktop chrome, drawn with four inset shadows (light top-left, dark
-  bottom-right) that swap when pressed, sunk or selected; gray chrome in `surface.light`, square everything, a
-  yellow note for the tooltip.
+- **Blocky** — early desktop chrome, finished by the user: square everything, and a bevel of two inset shadows in
+  see-through white and black (light top-left when raised, swapped when sunk), so it shades whatever color lies
+  under it rather than being derived from that color. Fields and switch boxes are sunk; buttons, thumbs, panels and popups
+  are raised; surfaces add a hard offset drop shadow; a selected item is a raised `primary.main` block; the
+  progress fill is segmented; the range track is thickened through `skinVars`.
 - **Pixel** — 4px borders with the corner pixel clipped off (`clip-path` notches), checkerboard dither for
   hover, tracks and the checked toggle, monospace; nothing casts a shadow, since a clip would cut it.
 - **Blueprint** — outlines only: transparent surfaces, one-pixel lines in the layer's `contrast` color, dashed
@@ -160,7 +162,7 @@ change shape, not just where colors fall; several will be dropped once lived wit
 - **HUD** — cut corners (`clip-path` polygons) on panes and small cells, half-strength primary frames, tiny
   spaced uppercase labels, and glow only inward (`inset` shadows) on hover and selection, because an outer glow
   would be clipped.
-- **Material** — the elevation ladder (1, 2, 4, 8dp shadows), filled buttons without borders, text buttons in
+- **Cardboard** — the elevation ladder (1, 2, 4, 8dp shadows), filled buttons without borders, text buttons in
   primary, filled inputs with only a bottom line, pill chips, and selection as a 12% primary tint.
 - **Aqua** — a glossy cap (a white gradient fading at the midline) over every colored control, pinstriped
   surfaces, sunken wells for inputs and tracks, jelly pills for buttons, tags and the selected item.
@@ -213,8 +215,8 @@ planned for.
   never a literal in the Skin.
 - **A painter's internals are opaque to the Skin writer** — the user's rule. An entry is written in the terms of
   any box (`color`, `backgroundColor`, `borderColor`, …), never in how the painter happens to draw it: the slide
-  button's arrow is an SVG line, so its painter sets `stroke: currentColor` and every Skin's `slideButtonArrow`
-  sets `color`. A painter that draws with `stroke`, `fill` or a gradient's `stopColor` maps `currentColor` onto it.
+  button's arrow is an SVG line, so its painter sets `stroke: currentColor` and every Skin's `slideButtonThumb`
+  sets the `color` the arrow inherits. A painter that draws with `stroke`, `fill` or a gradient's `stopColor` maps `currentColor` onto it.
 - **A Skin's rule matches a state on the entry's own element** (`&.isHovered`), so a checkbox row's hover filter
   and its box's paint cannot stack. **The ancestor matches are the switches' row states** (`.hasError &`,
   `.isChecked &`, `.isMixed &`): checkbox, radio and toggle carry their state on the row around the box, and the
@@ -244,10 +246,15 @@ planned for.
   call while they are temporary. The honeycomb tabs are a custom variant and keep their own paint. The binary switches' insides — `checkboxMark`, `radioDot`, `toggleHandle` —
   and the standard bars — `progressTrack` and `progressFill`, `rangeTrack`, `rangeFill` and `rangeThumb`,
   `scrollerTrack` and `scrollerThumb` (painted on `::before`), and the slide button's `slideButtonTrack`,
-  `slideButtonFill`, `slideButtonHint`, `slideButtonThumb` and `slideButtonArrow` — have entries, the slide
-  button's added at the user's request with its error marked on each part; Plasticine keeps the slide button's
+  `slideButtonFill` and `slideButtonThumb` — have entries, the slide button's added at the user's request with its
+  error marked on each part. The user folded its hint and arrow entries into the parts around them: the hint's
+  text styling is set on `slideButtonTrack` and the arrow's color on `slideButtonThumb`, both inherited, so a
+  Skin colors the hint and the arrow apart. `slideButtonTrack` paints its own element inside an unpainted box,
+  holding the fill and hint and clipping them, with the thumb beside it over the track's border, as Range's thumbs
+  are: a border on the box itself had pushed the thumb inward. The user's split — the fill stays clipped, so with a
+  track border its end can miss the thumb's edge by up to that border's width; Plasticine keeps the slide button's
   earlier paint, every other Skin paints its track, fill and thumb with its range's (`RANGE_TRACK`, `RANGE_FILL`,
-  `RANGE_THUMB`), so the two stay in step until a Skin parts them — Material does: its slide button is a pill and
+  `RANGE_THUMB`), so the two stay in step until a Skin parts them — Cardboard does: its slide button is a pill and
   its thumb takes the strip's main color with the arrow in the family's `contrast`, because a thumb as tall as its
   strip showed the strip's corners behind it, a second shade beside it, and an arrow at 1.22:1 against WCAG 1.4.11's
   3:1 (the user's pick, B on both); `isChecked` and `isMixed` joined
@@ -263,8 +270,9 @@ planned for.
   user's rule. So the accordion body has `accordionPanel` beside `accordionHeader` rather than borrowing
   `panel`; each Skin starts it on the same paint as its `panel`, through one `PANEL` constant, until the Skin
   chooses to tie it to its header.
-- **A modal's backdrop has two entries**, `opaqueOverlay` and `blurredOverlay`, one per kind the modal offers;
-  the painter keeps only what animates it open and shut.
+- **A modal's backdrop has one entry, `overlay`, for the see-through kind**; the opaque kind is always solid
+  black, the user's call, so its painter paints it and no Skin can change it. The painter otherwise keeps only
+  what animates the backdrop open and shut.
 - **Only a control's standard layout gets entries; a custom variant keeps its own paint** — the user's rule. The
   progress ring, range knob, scroller arc and color area are left alone, because whoever builds a
   custom tab layout or progress wants full control of the element — a painter of their own, not a

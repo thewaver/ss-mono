@@ -1,10 +1,12 @@
-import { keyframes, style } from "@vanilla-extract/css";
+import { fallbackVar, keyframes, style } from "@vanilla-extract/css";
 
-import { skinEntries, skinStates } from "../../Skins/Skin.css";
+import { skinEntries, skinStates, skinVars } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 
 const PROGRESS_THICKNESS = 8;
 const PROGRESS_LENGTH = 160;
+
+const TRACK_THICKNESS = fallbackVar(skinVars.progressTrackThickness, `${PROGRESS_THICKNESS}px`);
 
 export const isIndeterminate = style({});
 export const hasError = style([skinStates.hasError]);
@@ -31,7 +33,7 @@ export const progressTrack = style([
         position: "relative",
         overflow: "hidden",
         width: "100%",
-        height: PROGRESS_THICKNESS,
+        height: TRACK_THICKNESS,
         transition: `border-color ${themeVars.animation.duration}`,
 
         selectors: {
@@ -39,7 +41,7 @@ export const progressTrack = style([
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "flex-end",
-                width: PROGRESS_THICKNESS,
+                width: TRACK_THICKNESS,
                 height: PROGRESS_LENGTH,
             },
         },

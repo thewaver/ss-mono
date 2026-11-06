@@ -12,8 +12,6 @@ export const radioContent = style({
     display: "flex",
     alignItems: "center",
     gap: themeVars.spacing.full,
-    height: 40,
-    paddingInline: themeVars.spacing.full,
     borderRadius: themeVars.borderRadius.half,
     transition: `filter ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}`,
 

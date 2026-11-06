@@ -108,10 +108,7 @@ SkinUtils.define(_plastic, {
         },
     },
     accordionPanel: PANEL,
-    opaqueOverlay: {
-        backgroundColor: "black",
-    },
-    blurredOverlay: {
+    overlay: {
         backdropFilter: "blur(10px) grayscale(75%)",
         backgroundColor: withAlpha(themeVars.color.primary.dark, 15),
     },
@@ -277,6 +274,7 @@ SkinUtils.define(_plastic, {
     slideButtonTrack: {
         ...FIELD,
         backgroundColor: withAlpha(themeVars.color.primary.main, 20),
+        fontWeight: "bold",
     },
     slideButtonFill: {
         backgroundColor: withAlpha(themeVars.color.primary.main, 60),
@@ -286,20 +284,13 @@ SkinUtils.define(_plastic, {
             },
         },
     },
-    slideButtonHint: {
-        fontWeight: "bold",
-    },
     slideButtonThumb: {
         borderRadius: 0,
         ...moldedHover(themeVars.color.primary),
-        selectors: {
-            [skinSelectors.hasError]: moldedHover(themeVars.color.error),
-        },
-    },
-    slideButtonArrow: {
         color: themeVars.color.primary.contrast,
         selectors: {
             [skinSelectors.hasError]: {
+                ...moldedHover(themeVars.color.error),
                 color: themeVars.color.error.contrast,
             },
         },

@@ -141,10 +141,7 @@ SkinUtils.define(_clear, {
         ...FIELD,
         color: layerVars.contrast,
     },
-    opaqueOverlay: {
-        backgroundColor: "black",
-    },
-    blurredOverlay: {
+    overlay: {
         backdropFilter: "blur(12px)",
         backgroundColor: withAlpha(MIX_INV, 25),
     },
@@ -308,6 +305,7 @@ SkinUtils.define(_clear, {
     slideButtonTrack: {
         ...FIELD,
         borderRadius: themeVars.borderRadius.full,
+        fontWeight: "bold",
     },
     slideButtonFill: {
         backgroundColor: "transparent",
@@ -318,26 +316,17 @@ SkinUtils.define(_clear, {
             },
         },
     },
-    slideButtonHint: {
-        fontWeight: "bold",
-    },
     slideButtonThumb: {
         border: `2px solid ${themeVars.color.primary.main}`,
         borderRadius: "50%",
         backgroundColor: withAlpha(layerVars.main, 50),
         backgroundImage: `radial-gradient(circle at 35% 30%, ${withAlpha("white", 60)}, transparent 60%)`,
         boxShadow: SHADOW,
-        selectors: {
-            [skinSelectors.hasError]: {
-                borderColor: themeVars.color.error.main,
-            },
-        },
-    },
-    slideButtonArrow: {
         color: themeVars.color.primary.main,
         selectors: {
             [skinSelectors.hasError]: {
                 color: themeVars.color.error.main,
+                borderColor: themeVars.color.error.main,
             },
         },
     },

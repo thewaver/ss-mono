@@ -3,11 +3,11 @@ import { styleVariants } from "@vanilla-extract/css";
 import { skinEntries } from "../../Skins/Skin.css";
 
 export const blurredOverlayVariants = styleVariants({
-    on: [skinEntries.blurredOverlay],
+    on: [skinEntries.overlay],
     off: { backdropFilter: "none" },
 });
 
 export const opaqueOverlayVariants = styleVariants({
-    on: [skinEntries.opaqueOverlay, { opacity: 1 }],
-    off: [skinEntries.opaqueOverlay, { opacity: 0 }],
+    on: { backgroundColor: "black", opacity: 1 },
+    off: { backgroundColor: "black", opacity: 0 },
 });

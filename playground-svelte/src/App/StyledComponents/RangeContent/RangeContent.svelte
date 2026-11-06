@@ -13,6 +13,8 @@
     const center = (ratio: number) =>
         `calc(${ratio} * (100% - ${styles.RANGE_THUMB_SIZE}px) + ${styles.RANGE_THUMB_SIZE * 0.5}px)`;
 
+    const HALF_DRAWN_THUMB = `${styles.RANGE_DRAWN_THUMB_WIDTH} * 0.5`;
+
     let props: RangeContentProps = $props();
 
     const layerClass = $derived.by(getLayerClass());
@@ -25,7 +27,9 @@
 
     const fill = $derived(props.renderProps.fill);
 
-    const fillSpan = $derived(travel(fill.end - fill.start));
+    const fillStart = $derived(isPair ? `calc(${center(fill.start)} - ${HALF_DRAWN_THUMB})` : "0px");
+
+    const fillSpan = $derived(`calc(${center(fill.end)} + ${HALF_DRAWN_THUMB} - ${fillStart})`);
 </script>
 
 <div
@@ -37,7 +41,9 @@
     ]}
     style={toStyle(orientation === "vertical" ? { height: `${length}px` } : { width: `${length}px` })}
 >
-    <div class={[styles.rangeTrack, styles.rangeTrackVariants[orientation]]}></div>
+    <div
+        class={[styles.rangeTrack, styles.rangeTrackVariants[orientation], props.renderProps.hasError && styles.hasError]}
+    ></div>
 
     <div
         class={[
@@ -47,8 +53,8 @@
         ]}
         style={toStyle(
             orientation === "vertical"
-                ? { bottom: center(fill.start), height: fillSpan }
-                : { insetInlineStart: center(fill.start), width: fillSpan },
+                ? { bottom: fillStart, height: fillSpan }
+                : { insetInlineStart: fillStart, width: fillSpan },
         )}
     ></div>
 

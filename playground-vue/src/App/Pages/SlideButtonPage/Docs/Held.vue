@@ -21,7 +21,7 @@ const isArmed = shallowRef(false);
             @activate="isArmed = true"
         >
             <template #renderContent="renderProps">
-                <PageSlideButtonContent :render-props="renderProps">Slide or hold to arm</PageSlideButtonContent>
+                <PageSlideButtonContent :render-props="renderProps">Slide or hold</PageSlideButtonContent>
             </template>
         </SlideButton>
 

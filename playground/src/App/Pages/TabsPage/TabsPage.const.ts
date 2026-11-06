@@ -1,6 +1,6 @@
 import { type HoneycombDefs, PlacementLayoutUtils, type Tab } from "@thewaver/ss-components";
 
-export const ROW_TAB_GAP = 10;
+export const ROW_TAB_GAP = 0;
 
 export const getTabId = (prefix: string, value: string) => `${prefix}-tab-${value.toLocaleLowerCase()}`;
 

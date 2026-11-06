@@ -117,10 +117,7 @@ SkinUtils.define(_acrylic, {
         },
     },
     accordionPanel: PANE,
-    opaqueOverlay: {
-        backgroundColor: "black",
-    },
-    blurredOverlay: {
+    overlay: {
         backdropFilter: "blur(20px) saturate(120%)",
         backgroundColor: withAlpha(MIX_INV, 25),
     },
@@ -282,6 +279,7 @@ SkinUtils.define(_acrylic, {
     },
     slideButtonTrack: {
         ...FIELD,
+        fontWeight: "bold",
     },
     slideButtonFill: {
         backgroundColor: withAlpha(themeVars.color.primary.main, 50),
@@ -293,20 +291,13 @@ SkinUtils.define(_acrylic, {
             },
         },
     },
-    slideButtonHint: {
-        fontWeight: "bold",
-    },
     slideButtonThumb: {
         borderRadius: 0,
         ...accent(themeVars.color.primary),
-        selectors: {
-            [skinSelectors.hasError]: accent(themeVars.color.error),
-        },
-    },
-    slideButtonArrow: {
         color: themeVars.color.primary.contrast,
         selectors: {
             [skinSelectors.hasError]: {
+                ...accent(themeVars.color.error),
                 color: themeVars.color.error.contrast,
             },
         },

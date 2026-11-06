@@ -140,6 +140,7 @@ export const TagInput = defineComponent(
                                         <InteractionWrapper
                                             key={index}
                                             isDisabled={flags.isDisabled ?? false}
+                                            hasError={flags.hasError ?? false}
                                             isTabbable={false}
                                         >
                                             {

@@ -12,7 +12,7 @@
     const travel = (ratio: number) => `calc(${ratio} * (100% - ${styles.SLIDE_BUTTON_THUMB_SIZE}px))`;
 
     const covered = (ratio: number) =>
-        `calc(${ratio} * (100% - ${styles.SLIDE_BUTTON_THUMB_SIZE}px) + ${styles.SLIDE_BUTTON_THUMB_SIZE * 0.5}px)`;
+        `calc(${ratio} * (100% - ${styles.SLIDE_BUTTON_THUMB_SIZE}px) + ${styles.SLIDE_BUTTON_THUMB_SIZE}px)`;
 
     let props: SlideButtonContentProps & { children?: Snippet } = $props();
 
@@ -36,19 +36,26 @@
         isVertical && styles.isVertical,
         isRightToLeft && styles.isRightToLeft,
         props.renderProps.isDisabled && styles.isDisabled,
-        props.renderProps.hasError && styles.hasError,
     ]}
     style:width={isVertical ? undefined : `${length}px`}
     style:height={isVertical ? `${length}px` : undefined}
 >
     <div
-        class={[styles.slideButtonFill, isTracking && styles.isTracking]}
-        style:width={isVertical ? undefined : covered(ratio)}
-        style:height={isVertical ? covered(ratio) : undefined}
-    ></div>
+        class={[styles.slideButtonTrack, isVertical && styles.isVertical, props.renderProps.hasError && styles.hasError]}
+    >
+        <div
+            class={[
+                styles.slideButtonFill,
+                isTracking && styles.isTracking,
+                props.renderProps.hasError && styles.hasError,
+            ]}
+            style:width={isVertical ? undefined : covered(ratio)}
+            style:height={isVertical ? covered(ratio) : undefined}
+        ></div>
 
-    <div class={styles.slideButtonHint} style:opacity={1 - ratio}>
-        {@render props.children?.()}
+        <div class={styles.slideButtonHint} style:opacity={1 - ratio}>
+            {@render props.children?.()}
+        </div>
     </div>
 
     <div
@@ -56,6 +63,7 @@
             styles.slideButtonThumb,
             isTracking && styles.isTracking,
             props.renderProps.isFocusVisible && styles.isFocused,
+            props.renderProps.hasError && styles.hasError,
         ]}
         style:left={isVertical || isRightToLeft ? undefined : travel(ratio)}
         style:right={isRightToLeft ? travel(ratio) : undefined}

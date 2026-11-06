@@ -1,11 +1,21 @@
-import { style, styleVariants } from "@vanilla-extract/css";
+import { fallbackVar, style, styleVariants } from "@vanilla-extract/css";
 
-import { skinEntries, skinStates } from "../../Skins/Skin.css";
+import { skinEntries, skinStates, skinVars } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 
 export const RANGE_THUMB_SIZE = 18;
 export const RANGE_TRACK_THICKNESS = 6;
 export const RANGE_LENGTH = 220;
+
+const PRESS_SIZE = `${RANGE_THUMB_SIZE}px`;
+const TRACK_THICKNESS = fallbackVar(skinVars.rangeTrackThickness, `${RANGE_TRACK_THICKNESS}px`);
+const FILL_THICKNESS = fallbackVar(skinVars.rangeFillThickness, "100%");
+const THUMB_WIDTH = fallbackVar(skinVars.rangeThumbWidth, PRESS_SIZE);
+const THUMB_HEIGHT = fallbackVar(skinVars.rangeThumbHeight, PRESS_SIZE);
+const CROSS_SIZE = `max(${PRESS_SIZE}, ${TRACK_THICKNESS}, ${THUMB_HEIGHT}, ${fallbackVar(skinVars.rangeFillThickness, "0px")})`;
+
+export const RANGE_DRAWN_THUMB_WIDTH = THUMB_WIDTH;
+const CENTERING_OFFSET = `calc((${PRESS_SIZE} - ${THUMB_WIDTH}) * 0.5)`;
 
 export const isFocused = style({});
 export const isDisabled = style({});
@@ -27,10 +37,10 @@ export const rangeContent = style({
 
 export const rangeContentVariants = styleVariants({
     horizontal: {
-        height: RANGE_THUMB_SIZE,
+        height: CROSS_SIZE,
     },
     vertical: {
-        width: RANGE_THUMB_SIZE,
+        width: CROSS_SIZE,
     },
 });
 
@@ -46,7 +56,7 @@ export const rangeTrackVariants = styleVariants({
         left: 0,
         right: 0,
         top: "50%",
-        height: RANGE_TRACK_THICKNESS,
+        height: TRACK_THICKNESS,
         transform: `translateY(-50%)`,
     },
     vertical: [
@@ -55,7 +65,7 @@ export const rangeTrackVariants = styleVariants({
             top: 0,
             bottom: 0,
             left: "50%",
-            width: RANGE_TRACK_THICKNESS,
+            width: TRACK_THICKNESS,
             transform: `translateX(-50%)`,
         },
     ],
@@ -70,14 +80,16 @@ export const rangeFill = style([
 
 export const rangeFillVariants = styleVariants({
     horizontal: {
-        top: 0,
-        bottom: 0,
+        top: "50%",
+        height: FILL_THICKNESS,
+        transform: `translateY(-50%)`,
     },
     vertical: [
         skinStates.isVertical,
         {
-            left: 0,
-            right: 0,
+            left: "50%",
+            width: FILL_THICKNESS,
+            transform: `translateX(-50%)`,
         },
     ],
 });
@@ -86,8 +98,6 @@ export const rangeThumb = style([
     skinEntries.rangeThumb,
     {
         position: "absolute",
-        width: RANGE_THUMB_SIZE,
-        height: RANGE_THUMB_SIZE,
         transition: `border-color ${themeVars.animation.duration}, transform ${themeVars.animation.duration}`,
 
         selectors: {
@@ -101,13 +111,19 @@ export const rangeThumb = style([
 export const rangeThumbVariants = styleVariants({
     horizontal: {
         top: "50%",
-        marginTop: -RANGE_THUMB_SIZE * 0.5,
+        width: THUMB_WIDTH,
+        height: THUMB_HEIGHT,
+        marginTop: `calc(${THUMB_HEIGHT} * -0.5)`,
+        marginInlineStart: CENTERING_OFFSET,
     },
     vertical: [
         skinStates.isVertical,
         {
             left: "50%",
-            marginLeft: -RANGE_THUMB_SIZE * 0.5,
+            width: THUMB_HEIGHT,
+            height: THUMB_WIDTH,
+            marginLeft: `calc(${THUMB_HEIGHT} * -0.5)`,
+            marginBottom: CENTERING_OFFSET,
         },
     ],
 });

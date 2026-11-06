@@ -116,7 +116,7 @@
             }}
         >
             {#each value as tag, index (index)}
-                <InteractionWrapper isDisabled={flags.isDisabled ?? false} isTabbable={false}>
+                <InteractionWrapper isDisabled={flags.isDisabled ?? false} hasError={flags.hasError ?? false} isTabbable={false}>
                     {#snippet renderControl(attachTag, tagFlags)}
                         <button
                             bind:this={tagElements[index]}

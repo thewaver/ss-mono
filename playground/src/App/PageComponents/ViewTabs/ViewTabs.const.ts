@@ -32,7 +32,7 @@ export const toBaseRoute = (pathname: string) => {
     return segment === undefined ? pathname : pathname.slice(0, -segment.length);
 };
 
-export const TAB_GAP = 20;
+export const TAB_GAP = 0;
 
 export const TAB_ORIENTATION = "horizontal";
 

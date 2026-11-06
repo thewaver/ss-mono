@@ -1,37 +1,43 @@
 import { globalStyle, style } from "@vanilla-extract/css";
 
+import { skinEntries, skinStates } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 import { layerVars } from "../Layer/Layer.css";
 
-export const isSelected = style({});
-export const isGliding = style({});
+export const isSelected = style([skinStates.isSelected]);
 
 export const navLinkGroup = style({
     position: "relative",
     isolation: "isolate",
 });
 
-export const navLinkContent = style({
+export const navLink = style({
     display: "block",
+});
+
+globalStyle(`a.${navLink}, a.${navLink}:visited`, {
+    color: "inherit",
+});
+
+const navLinkBase = style({
     padding: themeVars.spacing.half,
-    borderRadius: themeVars.borderRadius.half,
     fontSize: themeVars.fontSize.medium,
     fontWeight: "bold",
     textTransform: "uppercase",
     whiteSpace: "nowrap",
     transition: `background-color ${themeVars.animation.duration}`,
+});
 
-    selectors: {
-        [`&:hover:not(.${isGliding})`]: {
-            backgroundColor: `rgb(from ${layerVars.contrast} r g b / 25%)`,
+export const navLinkContent = style([skinEntries.itemWithFloater, navLinkBase]);
+
+export const navLinkContentWithoutFloater = style([
+    skinEntries.itemWithoutFloater,
+    navLinkBase,
+    {
+        selectors: {
+            [`${navLink}:hover > &`]: {
+                backgroundColor: `rgb(from ${layerVars.contrast} r g b / 25%)`,
+            },
         },
     },
-});
-
-globalStyle(`a.${navLinkContent}, a.${navLinkContent}:visited`, {
-    color: "inherit",
-});
-
-globalStyle(`a.${navLinkContent}.${isSelected}, a.${navLinkContent}.${isSelected}:visited`, {
-    color: themeVars.color.primary.main,
-});
+]);

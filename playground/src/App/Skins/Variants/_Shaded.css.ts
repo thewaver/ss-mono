@@ -122,10 +122,7 @@ SkinUtils.define(_shaded, {
         },
     },
     accordionPanel: PANEL,
-    opaqueOverlay: {
-        backgroundColor: "black",
-    },
-    blurredOverlay: {
+    overlay: {
         backdropFilter: "blur(10px) grayscale(75%)",
     },
     button: {
@@ -314,6 +311,7 @@ SkinUtils.define(_shaded, {
     slideButtonTrack: {
         ...FIELD,
         borderRadius: themeVars.borderRadius.full,
+        fontWeight: "bold",
     },
     slideButtonFill: {
         backgroundColor: themeVars.color.primary.main,
@@ -333,20 +331,13 @@ SkinUtils.define(_shaded, {
             },
         },
     },
-    slideButtonHint: {
-        fontWeight: "bold",
-    },
     slideButtonThumb: {
         borderRadius: themeVars.borderRadius.full,
         ...accent(themeVars.color.primary),
-        selectors: {
-            [skinSelectors.hasError]: accent(themeVars.color.error),
-        },
-    },
-    slideButtonArrow: {
         color: themeVars.color.primary.contrast,
         selectors: {
             [skinSelectors.hasError]: {
+                ...accent(themeVars.color.error),
                 color: themeVars.color.error.contrast,
             },
         },

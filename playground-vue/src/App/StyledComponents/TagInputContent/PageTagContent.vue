@@ -17,6 +17,7 @@ const layerClass = useLayerClass();
             flags.isHovered && styles.isHovered,
             flags.isFocusVisible && styles.isFocused,
             flags.isDisabled && styles.isDisabled,
+            flags.hasError && styles.hasError,
         ]"
     >
         <slot />

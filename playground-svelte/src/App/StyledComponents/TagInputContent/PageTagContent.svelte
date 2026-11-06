@@ -18,6 +18,7 @@
         props.flags.isHovered && styles.isHovered,
         props.flags.isFocusVisible && styles.isFocused,
         props.flags.isDisabled && styles.isDisabled,
+        props.flags.hasError && styles.hasError,
     ]}
 >
     {@render props.children?.()}<span class={styles.tagRemove} aria-hidden="true">✕</span>

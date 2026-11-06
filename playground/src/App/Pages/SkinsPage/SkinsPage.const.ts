@@ -10,6 +10,10 @@ export const SKIN_SAMPLE_SELECTED_TAB = "Selected";
 
 export const SKIN_SAMPLE_TAB_PANEL = "The panel of the selected tab.";
 
+export const SKIN_SAMPLE_OPTIONS = [{ value: "Selected" }, { value: "Plain" }, { value: "Disabled", isDisabled: true }];
+
+export const SKIN_SAMPLE_SELECTED_OPTION = "Selected";
+
 export const SKIN_SAMPLE_SECTIONS = [{ value: "Open" }, { value: "Closed" }, { value: "Disabled", isDisabled: true }];
 
 export const SKIN_SAMPLE_EXPANDED_SECTIONS = ["Open"];

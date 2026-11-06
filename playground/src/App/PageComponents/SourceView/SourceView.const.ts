@@ -21,7 +21,7 @@ export const STYLED_COMPONENTS_ROOT = `${APP_ROOT}/StyledComponents/`;
 
 export const THEME_STEM = `${APP_ROOT}/Theme`;
 
-export const TAB_GAP = 10;
+export const TAB_GAP = 0;
 
 export const SOURCE_EXTENSIONS = [".tsx", ".ts"];
 

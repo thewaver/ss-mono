@@ -621,6 +621,51 @@ commitment, and an entry that already carries the user's verdict is recorded her
 not put to them twice. An entry leaves this section in one of two directions: upward into a numbered item, which is the user's
 decision to take, or into `conventions.md` / `decisions.md` if building it settles something.
 
+### A text field whose painter draws the text, as a checkbox's painter draws the box
+
+**The problem.** In a button, the `<button>` holds focus and draws the focus ring, and the painter sits inside it, so a
+painter can fade itself with opacity or a filter and the ring is untouched. A checkbox is the same in another shape:
+the library's `<input>` lies over the painter and draws nothing but the ring, so the painter owns everything visible.
+A text field is the odd one out. Its `<input>` draws the ring **and** the typed text, and the painter sits beside it.
+Nothing the painter sets reaches the text, so today a Skin reaches past the painter into the library's markup
+(`fieldText`, `fieldTextDisabled`) to color and dim it. Anything that fades the text fades the ring with it, which
+a consumer should not have to know.
+
+**The idea.** Make the text field work like the checkbox: the input keeps drawing the caret and the selection but its
+own text is invisible, and the painter draws a copy of the text underneath, kept in step with the input. The one
+reason it might not work is that a text field's text is live: the browser places the caret, the selection, the
+characters being composed, the scrolling and the wrapping against the text it draws itself, so the copy has to land
+on exactly the same pixels.
+
+**What an experiment found.** Headless Chromium on Windows, comparing screenshots of the input drawing its own text
+against the invisible text with a copy beneath it. As a check, each case was also run with the copy one pixel off,
+which differs in hundreds to thousands of pixels.
+
+- **Exact, pixel for pixel, side to side**, in every single-line case: Latin text with kerning and ligatures, Hebrew,
+  Arabic, an emoji with a skin tone, a combining accent, monospace, right to left, scrolled either way, and text typed
+  live past the edge. It takes two things: the copy follows the input's scroll position, and it is cut off at the
+  inner edge of the padding, as the input cuts off its own text.
+- **Exact for a text area**, wrapped and scrolled, with no adjustment at all.
+- **Passwords:** Chromium hides each character with "•" (U+2022), and a copy made of those matches exactly. Other
+  browsers were not tried, and the page cannot ask a browser which dot it uses.
+- **With its text invisible, the input still draws the caret and the selection**, so neither has to be copied.
+- **Where a one-line field puts its text vertically could not be copied.** The best centering formula matched 122 of
+  192 combinations of font size, line height and field height; sizing the input to exactly one line at a whole-pixel
+  line height matched 138. Every remaining miss was a case where the letters are taller than the line, which looks
+  like the one-line input cutting off their tops and tails — likely, not proven.
+- **Under display scaling (125% and 150%) a scrolled field no longer matched**, though an unscrolled one still did.
+  The likely cause is that the page reads the scroll position rounded while the browser scrolls by finer steps — not
+  confirmed.
+- **Characters being composed** (with a Japanese input method, say) are already in the field's value while they are
+  composed, so the copy can show them, but the underline beneath them is drawn in the text's color and vanishes with
+  it; the copy would have to draw it.
+- **Not measured:** spelling squiggles (headless Chromium draws none even on visible text), text areas under display
+  scaling, Firefox and Safari.
+
+**Where it stands.** The copy works exactly wherever the browser's layout can be read — side to side, and in text
+areas. What is left is concentrated in single-line fields, in the two things the browser decides without telling the
+page: the vertical position of the line and the exact scroll position under display scaling. Nothing is decided.
+
 ### A scattered layout for `InfiniteCorridor`, done differently
 
 The corridor first had a third layout that strewed items over both walls at different heights and sizes, each drawn

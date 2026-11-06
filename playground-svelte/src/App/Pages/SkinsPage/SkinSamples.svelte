@@ -21,6 +21,7 @@
     import SkinButtonSample from "./SkinButtonSample.svelte";
     import SkinCheckboxSample from "./SkinCheckboxSample.svelte";
     import SkinInputSample from "./SkinInputSample.svelte";
+    import SkinListboxSample from "./SkinListboxSample.svelte";
     import SkinProgressSample from "./SkinProgressSample.svelte";
     import SkinRadioSample from "./SkinRadioSample.svelte";
     import SkinRangeSample from "./SkinRangeSample.svelte";
@@ -92,6 +93,10 @@
         <SkinTagSample state={"Disabled"} isDisabled={true} />
         <SkinTagSample state={"Error"} hasError={true} />
     </div>
+</SkinSampleColumn>
+
+<SkinSampleColumn name={"Listbox"}>
+    <SkinListboxSample />
 </SkinSampleColumn>
 
 <SkinSampleColumn name={"Button"}>

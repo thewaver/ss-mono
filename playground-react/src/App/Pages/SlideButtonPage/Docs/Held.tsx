@@ -18,7 +18,7 @@ export const HeldDocsExample = () => {
                 isPressed={isArmed}
                 thumbSize={SLIDE_BUTTON_THUMB_SIZE}
                 renderContent={(renderProps) => (
-                    <PageSlideButtonContent renderProps={renderProps}>Slide or hold to arm</PageSlideButtonContent>
+                    <PageSlideButtonContent renderProps={renderProps}>Slide or hold</PageSlideButtonContent>
                 )}
                 onActivate={() => {
                     setIsArmed(true);

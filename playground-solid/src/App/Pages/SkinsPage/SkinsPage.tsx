@@ -4,6 +4,7 @@ import {
     Accordion,
     Button,
     Checkbox,
+    Listbox,
     MediaQueryMonitorSolidUtils,
     Progress,
     Radio,
@@ -27,10 +28,12 @@ import { RADIO_GROUP_GAP } from "@thewaver/ss-playground/App/Pages/RadioPage/Rad
 import {
     SKIN_ROW_GAP,
     SKIN_SAMPLE_EXPANDED_SECTIONS,
+    SKIN_SAMPLE_OPTIONS,
     SKIN_SAMPLE_PROGRESS,
     SKIN_SAMPLE_RANGE,
     SKIN_SAMPLE_SECTIONS,
     SKIN_SAMPLE_SECTION_BODY,
+    SKIN_SAMPLE_SELECTED_OPTION,
     SKIN_SAMPLE_SELECTED_TAB,
     SKIN_SAMPLE_SLIDE_DESCRIPTION,
     SKIN_SAMPLE_TABS,
@@ -58,10 +61,13 @@ import { PageAccordionHeader, PageAccordionPanel } from "../../StyledComponents/
 import { PageButtonContent } from "../../StyledComponents/ButtonContent/ButtonContent";
 import { PageCheckboxContent } from "../../StyledComponents/CheckboxContent/CheckboxContent";
 import { PageControlButtonContent } from "../../StyledComponents/ControlButtonContent/ControlButtonContent";
+import { renderPageHighlightFloater } from "../../StyledComponents/GlideFloater/GlideFloater";
 import { PageIcon } from "../../StyledComponents/Icon/Icon";
+import { PageListboxSurface } from "../../StyledComponents/ListboxSurface/ListboxSurface";
 import { PageProgressContent } from "../../StyledComponents/ProgressContent/ProgressContent";
 import { PageRadioContent } from "../../StyledComponents/RadioContent/RadioContent";
 import { PageRangeContent } from "../../StyledComponents/RangeContent/RangeContent";
+import { PageSelectOptionContent } from "../../StyledComponents/SelectOptionContent/SelectOptionContent";
 import { PageSlideButtonContent } from "../../StyledComponents/SlideButtonContent/SlideButtonContent";
 import { PageTabContent, PageTabFloater, PageTabGutter } from "../../StyledComponents/TabContent/TabContent";
 import {
@@ -248,6 +254,26 @@ const SkinTagSample = (props: SkinStateProps) => {
     );
 };
 
+const SkinListboxSample = () => {
+    const valueSignal = createSignal<string | undefined>(SKIN_SAMPLE_SELECTED_OPTION);
+
+    return (
+        <PageListboxSurface>
+            <Listbox
+                value={valueSignal}
+                options={SKIN_SAMPLE_OPTIONS}
+                ariaLabel={"Listbox"}
+                renderHighlightFloater={renderPageHighlightFloater}
+                renderOption={(getOption, getFlags) => (
+                    <PageSelectOptionContent isGliding flags={getFlags}>
+                        {getOption().value}
+                    </PageSelectOptionContent>
+                )}
+            />
+        </PageListboxSurface>
+    );
+};
+
 const SkinSlideSample = (props: SkinStateProps) => (
     <SlideButton
         ariaDescription={SKIN_SAMPLE_SLIDE_DESCRIPTION}
@@ -341,6 +367,10 @@ const SkinSamples = (props: SkinSamplesProps) => {
                     <SkinTagSample state={"Disabled"} isDisabled />
                     <SkinTagSample state={"Error"} hasError />
                 </SkinStack>
+            </SkinSampleColumn>
+
+            <SkinSampleColumn name={"Listbox"}>
+                <SkinListboxSample />
             </SkinSampleColumn>
 
             <SkinSampleColumn name={"Button"}>

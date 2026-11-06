@@ -21,19 +21,18 @@ export const PageNavLink = (props: PropsWithChildren<PageNavLinkProps>) => {
     const layerClass = useLayerClass();
 
     return (
-        <NavLink
-            to={props.href}
-            end={true}
-            className={[
-                styles.navLinkContent,
-                layerClass,
-                props.isSelected && styles.isSelected,
-                (props.isGliding ?? false) && styles.isGliding,
-            ]
-                .filter(Boolean)
-                .join(" ")}
-        >
-            {props.children}
+        <NavLink to={props.href} end={true} className={styles.navLink}>
+            <div
+                className={[
+                    (props.isGliding ?? false) ? styles.navLinkContent : styles.navLinkContentWithoutFloater,
+                    layerClass,
+                    props.isSelected && styles.isSelected,
+                ]
+                    .filter(Boolean)
+                    .join(" ")}
+            >
+                {props.children}
+            </div>
         </NavLink>
     );
 };
