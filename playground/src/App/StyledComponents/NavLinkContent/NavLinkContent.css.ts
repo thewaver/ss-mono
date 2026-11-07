@@ -4,7 +4,10 @@ import { skinEntries, skinStates } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 import { layerVars } from "../Layer/Layer.css";
 
+export const isHovered = style([skinStates.isHovered]);
 export const isSelected = style([skinStates.isSelected]);
+export const hasHoverFloater = style([skinEntries.itemWithHoverFloater, skinStates.hasHoverFloater]);
+export const hasSelectionFloater = style([skinEntries.itemWithSelectionFloater, skinStates.hasSelectionFloater]);
 
 export const navLinkGroup = style({
     position: "relative",
@@ -28,16 +31,12 @@ const navLinkBase = style({
     transition: `background-color ${themeVars.animation.duration}`,
 });
 
-export const navLinkContent = style([skinEntries.itemWithFloater, navLinkBase]);
+export const navLinkContent = style([skinEntries.itemBase, navLinkBase]);
 
-export const navLinkContentWithoutFloater = style([
-    skinEntries.itemWithoutFloater,
-    navLinkBase,
-    {
-        selectors: {
-            [`${navLink}:hover > &`]: {
-                backgroundColor: `rgb(from ${layerVars.contrast} r g b / 25%)`,
-            },
+export const hasNoHoverFloater = style({
+    selectors: {
+        [`${navLink}:hover > &`]: {
+            backgroundColor: `rgb(from ${layerVars.contrast} r g b / 25%)`,
         },
     },
-]);
+});

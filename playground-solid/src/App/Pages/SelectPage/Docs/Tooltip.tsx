@@ -26,7 +26,7 @@ export const TooltipDocsExample = (props: Props) => {
                 <PageSelectContent flags={getFlags}>{getSelectedOption()?.value ?? PLACEHOLDER}</PageSelectContent>
             )}
             renderOption={(getOption, getFlags) => (
-                <PageSelectOptionContent isGliding flags={getFlags}>
+                <PageSelectOptionContent hasHoverFloater flags={getFlags}>
                     {getOption().value}
                 </PageSelectOptionContent>
             )}

@@ -6,6 +6,7 @@
 
     import PageAccordionHeader from "../../../../StyledComponents/AccordionContent/PageAccordionHeader.svelte";
     import PageAccordionPanel from "../../../../StyledComponents/AccordionContent/PageAccordionPanel.svelte";
+    import PageAccordionWrapper from "../../../../StyledComponents/AccordionContent/PageAccordionWrapper.svelte";
     import PageButtonContent from "../../../../StyledComponents/ButtonContent/ButtonContent.svelte";
 
     const ITEMS: AccordionItem<string>[] = [{ value: "Shipping" }];
@@ -16,6 +17,10 @@
 
 <div class={styles.docsAccordion}>
     <Accordion items={ITEMS} gap={DOCS_GAP} bind:expanded>
+        {#snippet renderSection(renderContent, _, flags)}
+            <PageAccordionWrapper {flags}>{@render renderContent()}</PageAccordionWrapper>
+        {/snippet}
+
         {#snippet renderHeader(item, flags)}
             <PageAccordionHeader {flags}>{item.value}</PageAccordionHeader>
         {/snippet}

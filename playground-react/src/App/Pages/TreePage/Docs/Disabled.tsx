@@ -21,7 +21,7 @@ export const DisabledDocsExample = (props: Props) => {
             expanded={expandedState}
             ariaLabel={"Repository"}
             renderNode={(node, renderProps) => (
-                <PageTreeNodeContent isGliding renderProps={renderProps}>
+                <PageTreeNodeContent hasHoverFloater renderProps={renderProps}>
                     {node.value}
                 </PageTreeNodeContent>
             )}

@@ -13,19 +13,26 @@ import * as styles from "@thewaver/ss-playground/App/StyledComponents/NavLinkCon
 
 import { renderPageHighlightFloater } from "../../StyledComponents/GlideFloater/GlideFloater";
 import { useLayerClass } from "../../StyledComponents/Layer/Layer.context";
+import { NavLinkGroupContextProvider, useNavLinkGroupContext } from "./NavLink.context";
 import type { PageNavLinkProps } from "./NavLinkReact.types";
 
 const TRANSITION_DURATION_MS = TREE_DEFAULTS.floaterTransitionDurationMs;
 
 export const PageNavLink = (props: PropsWithChildren<PageNavLinkProps>) => {
     const layerClass = useLayerClass();
+    const groupContext = useNavLinkGroupContext();
+    const [link, setLink] = useState<HTMLElement | null>(null);
+    const isHovered = link !== null && groupContext?.highlightedLink === link;
 
     return (
-        <NavLink to={props.href} end={true} className={styles.navLink}>
+        <NavLink ref={setLink} to={props.href} end={true} className={styles.navLink}>
             <div
                 className={[
-                    (props.isGliding ?? false) ? styles.navLinkContent : styles.navLinkContentWithoutFloater,
+                    styles.navLinkContent,
                     layerClass,
+                    (props.hasHoverFloater ?? false) ? styles.hasHoverFloater : styles.hasNoHoverFloater,
+                    props.hasSelectionFloater && styles.hasSelectionFloater,
+                    isHovered && styles.isHovered,
                     props.isSelected && styles.isSelected,
                 ]
                     .filter(Boolean)
@@ -54,10 +61,12 @@ export const PageNavLinkGroup = (props: PropsWithChildren) => {
         return link && InteractionTrackerUtils.computeIsFocusVisible(link) ? link : undefined;
     };
 
+    const highlightedLink = hoveredLink ?? focusVisibleLink;
+
     const floater = FloaterReactUtils.useFloater({
         isEnabled: true,
         container: root ?? undefined,
-        target: hoveredLink ?? focusVisibleLink,
+        target: highlightedLink,
         transitionDurationMs: TRANSITION_DURATION_MS,
     });
 
@@ -80,7 +89,7 @@ export const PageNavLinkGroup = (props: PropsWithChildren) => {
                 </div>
             )}
 
-            {props.children}
+            <NavLinkGroupContextProvider value={{ highlightedLink }}>{props.children}</NavLinkGroupContextProvider>
         </div>
     );
 };

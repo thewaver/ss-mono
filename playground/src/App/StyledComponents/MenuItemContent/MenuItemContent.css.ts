@@ -7,6 +7,8 @@ import { layerVars } from "../Layer/Layer.css";
 export const isHovered = style([skinStates.isHovered]);
 export const isActive = style({});
 export const isDisabled = style([skinStates.isDisabled]);
+export const hasHoverFloater = style([skinEntries.itemWithHoverFloater, skinStates.hasHoverFloater]);
+export const hasSelectionFloater = style([skinEntries.itemWithSelectionFloater, skinStates.hasSelectionFloater]);
 
 const menuItemBase = style({
     display: "flex",
@@ -24,9 +26,7 @@ const menuItemBase = style({
     },
 });
 
-export const menuItemContent = style([skinEntries.itemWithFloater, menuItemBase]);
-
-export const menuItemContentWithoutFloater = style([skinEntries.itemWithoutFloater, menuItemBase]);
+export const menuItemContent = style([skinEntries.itemBase, menuItemBase]);
 
 export const menuItemShortcut = style({
     opacity: 0.5,

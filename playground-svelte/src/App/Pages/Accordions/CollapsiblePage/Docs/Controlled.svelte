@@ -4,6 +4,7 @@
 
     import PageAccordionHeader from "../../../../StyledComponents/AccordionContent/PageAccordionHeader.svelte";
     import PageAccordionPanel from "../../../../StyledComponents/AccordionContent/PageAccordionPanel.svelte";
+    import PageAccordionWrapper from "../../../../StyledComponents/AccordionContent/PageAccordionWrapper.svelte";
     import PageButtonContent from "../../../../StyledComponents/ButtonContent/ButtonContent.svelte";
 
     let isExpanded = $state(false);
@@ -11,6 +12,10 @@
 
 <div class={styles.docsAccordion}>
     <Collapsible bind:expanded={isExpanded} sizing={"fit-content"}>
+        {#snippet renderSection(renderContent, flags)}
+            <PageAccordionWrapper {flags}>{@render renderContent()}</PageAccordionWrapper>
+        {/snippet}
+
         {#snippet renderTrigger(flags)}
             <PageAccordionHeader {flags}>{flags.isExpanded ? "Show less" : "Show more"}</PageAccordionHeader>
         {/snippet}

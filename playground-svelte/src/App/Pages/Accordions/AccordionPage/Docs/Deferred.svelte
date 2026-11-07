@@ -9,6 +9,7 @@
 
     import PageAccordionHeader from "../../../../StyledComponents/AccordionContent/PageAccordionHeader.svelte";
     import PageAccordionPanel from "../../../../StyledComponents/AccordionContent/PageAccordionPanel.svelte";
+    import PageAccordionWrapper from "../../../../StyledComponents/AccordionContent/PageAccordionWrapper.svelte";
 
     const SECTION_BODIES: Record<string, string[]> = {
         Shipping: ["Orders leave the warehouse within two working days.", "Tracking arrives by email."],
@@ -29,6 +30,10 @@
 
 <div class={accordionStyles.docsAccordion}>
     <Accordion items={ITEMS} gap={DOCS_GAP} isPanelBuiltOnExpand={true}>
+        {#snippet renderSection(renderContent, _, flags)}
+            <PageAccordionWrapper {flags}>{@render renderContent()}</PageAccordionWrapper>
+        {/snippet}
+
         {#snippet renderHeader(item, flags)}
             <PageAccordionHeader {flags}>{item.value}</PageAccordionHeader>
         {/snippet}

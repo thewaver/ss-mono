@@ -5,9 +5,13 @@ import { SkinUtils } from "../Skin.utils";
 
 import { layerVars } from "../../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../../Theme.css";
-import { skinSelectors } from "../Skin.css";
+import { skinSelectors, skinVars } from "../Skin.css";
 
-export const cartoon = style({});
+export const cartoon = style({
+    vars: {
+        [skinVars.rangeTrackThickness]: "20px",
+    },
+});
 
 const SHADOW_SMALL = "4px 4px 0 0px rgba(0, 0, 0, 0.5)";
 const SHADOW_MEDIUM = "8px 8px 0 0px rgba(0, 0, 0, 0.5)";
@@ -61,7 +65,7 @@ const SWITCH_STATES: StyleRule["selectors"] = ObjectUtils.deepMerge(INPUT_STATES
 });
 
 const INPUT_SHELL: StyleRule = {
-    border: "2px solid black",
+    border: [`2px solid ${layerVars.contrast}`, `2px solid rgb(from ${layerVars.contrast} r g b / 25%)`],
     backgroundColor: layerVars.main,
     boxShadow: SHADOW_SMALL,
     color: layerVars.contrast,
@@ -72,11 +76,8 @@ const SWITCH_SHELL: StyleRule = {
 } as const;
 
 const ACCORDION: StyleRule = {
-    border: "2px solid black",
     backgroundColor: [layerVars.main, `rgb(from ${layerVars.main} r g b / 50%)`],
-    boxShadow: SHADOW_SMALL,
     color: layerVars.contrast,
-    fontSize: themeVars.fontSize.medium,
 } as const;
 
 const ITEM: StyleRule = {
@@ -86,6 +87,19 @@ const ITEM: StyleRule = {
         ...ITEM_STATES,
     },
 } as const;
+
+const ITEM_FLOATER_HOVER: StyleRule = {
+    border: `2px solid black`,
+    backgroundColor: [layerVars.contrast, `rgb(from ${layerVars.contrast} r g b / 10%)`],
+    boxShadow: SHADOW_SMALL,
+};
+
+const ITEM_FLOATER_SELECTED: StyleRule = {
+    border: `2px solid black`,
+    backgroundColor: [layerVars.contrast, `rgb(from ${layerVars.contrast} r g b / 10%)`],
+    boxShadow: SHADOW_SMALL,
+    color: themeVars.color.primary.main,
+};
 
 const SURFACE: StyleRule = {
     border: "2px solid black",
@@ -102,8 +116,8 @@ SkinUtils.define(cartoon, {
             ...SkinUtils.joinedCorners(),
             ...INTERACTIBLE_STATES,
             [skinSelectors.isExpanded]: {
-                backgroundColor: themeVars.color.primary.main,
-                color: themeVars.color.primary.contrast,
+                color: themeVars.color.primary.main,
+                fontWeight: "bold",
             },
         },
     },
@@ -112,6 +126,11 @@ SkinUtils.define(cartoon, {
         selectors: {
             ...SkinUtils.joinedCorners(),
         },
+    },
+    accordionWrapper: {
+        border: "2px solid black",
+        boxShadow: SHADOW_SMALL,
+        fontSize: themeVars.fontSize.medium,
     },
     button: {
         paddingInline: themeVars.spacing.double,
@@ -139,10 +158,11 @@ SkinUtils.define(cartoon, {
         fontSize: themeVars.fontSize.small,
         selectors: {
             [skinSelectors.isPressed]: {
-                color: themeVars.color.primary.main,
+                boxShadow: `inset 2px 2px 0 rgb(0 0 0 / 50%)`,
             },
             [skinSelectors.hasError]: {
-                boxShadow: `inset 0 0 0 2px ${themeVars.color.error.main}, ${SHADOW_SMALL}`,
+                backgroundColor: themeVars.color.error.main,
+                color: themeVars.color.error.contrast,
             },
             ...INTERACTIBLE_STATES,
         },
@@ -178,10 +198,6 @@ SkinUtils.define(cartoon, {
         ...INPUT_SHELL,
     },
     hollowSurface: SkinUtils.hollow(SURFACE),
-    hoverFloater: {
-        backgroundColor: [layerVars.contrast, `rgb(from ${layerVars.contrast} r g b / 10%)`],
-        boxShadow: SHADOW_SMALL,
-    },
     input: {
         ...INPUT_SHELL,
         selectors: {
@@ -196,17 +212,24 @@ SkinUtils.define(cartoon, {
             },
         },
     },
-    itemWithFloater: {
-        ...ITEM,
-    },
-    itemWithoutFloater: ObjectUtils.deepMerge(ITEM, {
+    itemBase: ObjectUtils.deepMerge(ITEM, {
         selectors: {
-            [skinSelectors.isHovered]: {
-                backgroundColor: `rgb(from ${layerVars.contrast} r g b / 10%)`,
-                boxShadow: SHADOW_SMALL,
+            [skinSelectors.isHoveredWithoutFloater]: {
+                ...ITEM_FLOATER_HOVER,
+            },
+            [skinSelectors.isSelectedWithoutFloater]: {
+                ...ITEM_FLOATER_SELECTED,
             },
         },
     }),
+    itemHoverFloater: {
+        ...ITEM_FLOATER_HOVER,
+    },
+    itemSelectionFloater: {
+        ...ITEM_FLOATER_SELECTED,
+    },
+    itemWithHoverFloater: {},
+    itemWithSelectionFloater: {},
     overlay: {
         backdropFilter: "blur(10px) grayscale(75%)",
     },
@@ -216,10 +239,7 @@ SkinUtils.define(cartoon, {
         fontFamily: "monospace",
     },
     panel: {
-        border: [
-            `2px solid ${themeVars.color.surface.contrast}`,
-            `2px solid rgb( from ${themeVars.color.surface.contrast} r g b / 25%)`,
-        ],
+        border: `2px solid black`,
         backgroundColor: [layerVars.main, `rgb(from ${layerVars.main} r g b / 50%)`],
         boxShadow: SHADOW_SMALL,
         color: layerVars.contrast,
@@ -233,7 +253,8 @@ SkinUtils.define(cartoon, {
         },
     },
     progressTrack: {
-        border: `2px solid ${themeVars.color.primary.main}`,
+        border: `2px solid black`,
+        backgroundColor: [layerVars.main, `rgb(from ${layerVars.main} r g b / 50%)`],
         boxShadow: SHADOW_SMALL,
         selectors: {
             [skinSelectors.hasError]: {
@@ -275,7 +296,8 @@ SkinUtils.define(cartoon, {
         },
     },
     rangeTrack: {
-        border: `2px solid ${themeVars.color.primary.main}`,
+        border: `2px solid black`,
+        backgroundColor: [layerVars.contrast, `rgb(from ${layerVars.contrast} r g b / 10%)`],
         boxShadow: SHADOW_SMALL,
         selectors: {
             [skinSelectors.hasError]: {
@@ -300,9 +322,6 @@ SkinUtils.define(cartoon, {
             },
         },
     },
-    selectionFloater: {
-        backgroundColor: [themeVars.color.primary.main, `rgb(from ${themeVars.color.primary.main} r g b / 10%)`],
-    },
     slideButtonFill: {
         backgroundColor: themeVars.color.primary.main,
         boxShadow: SHADOW_SMALL,
@@ -326,7 +345,8 @@ SkinUtils.define(cartoon, {
         },
     },
     slideButtonTrack: {
-        border: `2px solid ${themeVars.color.primary.main}`,
+        border: `2px solid black`,
+        backgroundColor: [layerVars.contrast, `rgb(from ${layerVars.contrast} r g b / 10%)`],
         boxShadow: SHADOW_SMALL,
         fontWeight: "bold",
         selectors: {
@@ -337,11 +357,8 @@ SkinUtils.define(cartoon, {
     },
     surface: SURFACE,
     tabsFloater: {
-        border: `2px solid ${themeVars.color.primary.main}`,
-        boxShadow: SHADOW_SMALL,
-    },
-    tabsGutter: {
-        border: [`2px solid ${layerVars.contrast}`, `2px solid rgb( from ${layerVars.contrast} r g b / 25%)`],
+        border: `2px solid black`,
+        backgroundColor: [layerVars.main, `rgb(from ${layerVars.main} r g b / 50%)`],
         boxShadow: SHADOW_SMALL,
     },
     tabsItem: {
@@ -349,7 +366,7 @@ SkinUtils.define(cartoon, {
         paddingInline: themeVars.spacing.double,
         fontSize: themeVars.fontSize.small,
         fontWeight: "bold",
-        selectors: {
+        selectors: ObjectUtils.deepMerge(INTERACTIBLE_STATES, {
             [skinSelectors.isVertical]: {
                 paddingBlock: themeVars.spacing.full,
                 paddingInline: themeVars.spacing.double,
@@ -360,8 +377,12 @@ SkinUtils.define(cartoon, {
             [skinSelectors.isSelected]: {
                 color: themeVars.color.primary.main,
             },
-            ...INTERACTIBLE_STATES,
-        },
+        }),
+    },
+    tabsTrack: {
+        border: `2px solid black`,
+        backgroundColor: [layerVars.contrast, `rgb(from ${layerVars.contrast} r g b / 10%)`],
+        boxShadow: SHADOW_SMALL,
     },
     tag: {
         paddingInline: themeVars.spacing.full,
@@ -374,11 +395,14 @@ SkinUtils.define(cartoon, {
             ...INTERACTIBLE_STATES,
         },
     },
-    toggleHandle: {
+    toggleThumb: {
         backgroundColor: [layerVars.contrast, `rgb(from ${layerVars.contrast} r g b / 75%)`],
         selectors: {
             [SkinUtils.anyOf(skinSelectors.isCheckedWithin, skinSelectors.isMixedWithin)]: {
                 backgroundColor: themeVars.color.primary.contrast,
+            },
+            [skinSelectors.hasErrorWithin]: {
+                backgroundColor: themeVars.color.error.contrast,
             },
         },
     },

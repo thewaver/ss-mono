@@ -25,7 +25,7 @@ const countries = shallowRef<string[]>(["Denmark"]);
             </template>
 
             <template #renderOption="{ option, flags }">
-                <PageSelectOptionContent is-gliding :flags="flags">{{ option.value }}</PageSelectOptionContent>
+                <PageSelectOptionContent has-hover-floater :flags="flags">{{ option.value }}</PageSelectOptionContent>
             </template>
 
             <template #renderHighlightFloater="floater">

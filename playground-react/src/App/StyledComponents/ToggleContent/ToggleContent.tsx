@@ -24,7 +24,7 @@ export const PageToggleContent = (props: PropsWithChildren<ToggleContentProps>) 
             aria-hidden="true"
         >
             <div className={styles.toggleTrack}>
-                <div className={styles.toggleHandle} />
+                <div className={styles.toggleThumb} />
             </div>
 
             {props.children}

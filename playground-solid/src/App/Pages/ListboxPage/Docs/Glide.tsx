@@ -26,7 +26,11 @@ export const GlideDocsExample = (props: Props) => {
                 options={COUNTRIES_WITH_REACHABLE}
                 ariaLabel={"Shipping country, gliding"}
                 renderOption={(getOption, getFlags) => (
-                    <PageSelectOptionContent isGliding={props.isGliding} flags={getFlags}>
+                    <PageSelectOptionContent
+                        hasHoverFloater={props.isGliding}
+                        hasSelectionFloater={props.isGliding}
+                        flags={getFlags}
+                    >
                         {getOption().value}
                     </PageSelectOptionContent>
                 )}

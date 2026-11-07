@@ -12,9 +12,11 @@ const layerClass = useLayerClass();
 <template>
     <div
         :class="[
-            isGliding ? styles.selectOptionContent : styles.selectOptionContentWithoutFloater,
+            styles.selectOptionContent,
             layerClass,
-            !isGliding && (flags.isHovered || flags.isHighlighted) && styles.isHovered,
+            hasHoverFloater && styles.hasHoverFloater,
+            hasSelectionFloater && styles.hasSelectionFloater,
+            (flags.isHovered || flags.isHighlighted) && styles.isHovered,
             flags.isSelected && styles.isSelected,
             flags.isDisabled && styles.isDisabled,
         ]"

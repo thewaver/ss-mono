@@ -38,7 +38,7 @@ export const AutocompleteDocsExample = () => {
                 <PageSelectContent flags={getFlags}>{getSelectedOption()?.value.city ?? PLACEHOLDER}</PageSelectContent>
             )}
             renderOption={(getOption, getFlags) => (
-                <PageSelectOptionContent isGliding flags={getFlags}>
+                <PageSelectOptionContent hasHoverFloater flags={getFlags}>
                     {getOption().value.city} ({getOption().value.code})
                 </PageSelectOptionContent>
             )}

@@ -29,7 +29,7 @@
     {/snippet}
 
     {#snippet renderItem(item, flags)}
-        <PageMenuItemContent isGliding={props.isGliding} {flags} kind={item.kind} shortcut={item.value.shortcut ?? ""}>
+        <PageMenuItemContent hasHoverFloater={props.isGliding} {flags} kind={item.kind} shortcut={item.value.shortcut ?? ""}>
             {item.value.name}
         </PageMenuItemContent>
     {/snippet}

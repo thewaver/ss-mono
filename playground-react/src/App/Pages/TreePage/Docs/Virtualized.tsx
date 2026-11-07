@@ -26,7 +26,7 @@ export const VirtualizedDocsExample = (props: Props) => {
                 ariaLabel={"Generated repository"}
                 computeEstimatedNodeHeight={() => NODE_HEIGHT}
                 renderNode={(node, renderProps) => (
-                    <PageTreeNodeContent isGliding renderProps={renderProps}>
+                    <PageTreeNodeContent hasHoverFloater renderProps={renderProps}>
                         {node.value}
                     </PageTreeNodeContent>
                 )}

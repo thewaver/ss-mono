@@ -5,6 +5,7 @@
 
     import PageAccordionHeader from "../../../../StyledComponents/AccordionContent/PageAccordionHeader.svelte";
     import PageAccordionPanel from "../../../../StyledComponents/AccordionContent/PageAccordionPanel.svelte";
+    import PageAccordionWrapper from "../../../../StyledComponents/AccordionContent/PageAccordionWrapper.svelte";
     import type { AccordionBasicDocsExampleProps } from "../AccordionPageSvelte.types";
 
     const SECTION_BODIES: Record<string, string[]> = {
@@ -34,6 +35,10 @@
         gap={props.gap}
         transitionDurationMs={props.transitionDurationMs}
     >
+        {#snippet renderSection(renderContent, _, flags)}
+            <PageAccordionWrapper {flags}>{@render renderContent()}</PageAccordionWrapper>
+        {/snippet}
+
         {#snippet renderHeader(item, flags)}
             <PageAccordionHeader {flags}>{item.value}</PageAccordionHeader>
         {/snippet}

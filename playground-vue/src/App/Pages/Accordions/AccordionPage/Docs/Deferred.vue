@@ -8,6 +8,7 @@ import { DOCS_GAP } from "@thewaver/ss-playground/App/Pages/Accordions/Accordion
 import * as accordionStyles from "@thewaver/ss-playground/App/Pages/Accordions/Accordions.css";
 
 import PageAccordionHeader from "../../../../StyledComponents/AccordionContent/PageAccordionHeader.vue";
+import PageAccordionWrapper from "../../../../StyledComponents/AccordionContent/PageAccordionWrapper.vue";
 import DeferredPanel from "./DeferredPanel.vue";
 
 const ITEMS: AccordionItem<string>[] = [{ value: "Shipping" }, { value: "Returns" }, { value: "Warranty" }];
@@ -22,6 +23,10 @@ const build = (value: string) => {
 <template>
     <div :class="accordionStyles.docsAccordion">
         <Accordion :items="ITEMS" :gap="DOCS_GAP" is-panel-built-on-expand>
+            <template #renderSection="{ renderContent, flags }">
+                <PageAccordionWrapper :flags="flags"><component :is="renderContent" /></PageAccordionWrapper>
+            </template>
+
             <template #renderHeader="{ item, flags }">
                 <PageAccordionHeader :flags="flags">{{ item.value }}</PageAccordionHeader>
             </template>

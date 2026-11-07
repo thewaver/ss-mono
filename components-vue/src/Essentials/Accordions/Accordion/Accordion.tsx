@@ -51,6 +51,12 @@ const AccordionSection = defineComponent(
                                 transitionDurationMs,
                                 moveDirection: props.moveDirection,
                             }),
+                        ...(slots.renderSection === undefined
+                            ? {}
+                            : {
+                                  renderSection: ({ renderContent, flags }) =>
+                                      callSlot(slots.renderSection, { renderContent, item: props.item, flags }),
+                              }),
                     } satisfies Partial<CollapsibleSlots>
                 }
             </Collapsible>
@@ -158,7 +164,11 @@ export const Accordion = defineComponent(
                             moveDirection={moveDirection.value}
                             onToggle={() => handleToggle(item.value)}
                         >
-                            {{ renderHeader: slots.renderHeader, renderPanel: slots.renderPanel }}
+                            {{
+                                renderHeader: slots.renderHeader,
+                                renderPanel: slots.renderPanel,
+                                ...(slots.renderSection === undefined ? {} : { renderSection: slots.renderSection }),
+                            }}
                         </AccordionSection>
                     ))}
                 </div>

@@ -1,4 +1,15 @@
-import type { CollapsibleFlags, CollapsibleSide, InteractionFlags } from "@thewaver/ss-components";
+import type {
+    CollapsibleFlags,
+    CollapsibleSectionFlags,
+    CollapsibleSide,
+    InteractionFlags,
+} from "@thewaver/ss-components";
+
+export type BaseAccordionWrapperValues = {
+    flags: CollapsibleSectionFlags;
+};
+
+export type BaseAccordionWrapperProps = BaseAccordionWrapperValues;
 
 export type BaseAccordionHeaderValues = {
     flags: InteractionFlags<CollapsibleFlags>;

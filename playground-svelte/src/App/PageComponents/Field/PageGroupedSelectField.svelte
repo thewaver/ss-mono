@@ -53,7 +53,7 @@
     {/snippet}
 
     {#snippet renderOption(option, flags)}
-        <PageSelectOptionContent isGliding {flags}>
+        <PageSelectOptionContent hasHoverFloater {flags}>
             {props.computeLabel?.(option.value) ?? String(option.value)}
         </PageSelectOptionContent>
     {/snippet}

@@ -1,4 +1,4 @@
-import { type ParentProps, Show, createSignal } from "solid-js";
+import { type ParentProps, Show, createSelector, createSignal } from "solid-js";
 
 import { A } from "@solidjs/router";
 import {
@@ -13,20 +13,26 @@ import * as styles from "@thewaver/ss-playground/App/StyledComponents/NavLinkCon
 
 import { renderPageHighlightFloater } from "../../StyledComponents/GlideFloater/GlideFloater";
 import { useLayerClass } from "../../StyledComponents/Layer/Layer.context";
+import { NavLinkGroupContextProvider, useNavLinkGroupContext } from "./NavLink.context";
 import type { PageNavLinkProps } from "./NavLinkSolid.types";
 
 const getTransitionDurationMs = () => TREE_DEFAULTS.floaterTransitionDurationMs;
 
 export const PageNavLink = (props: ParentProps<PageNavLinkProps>) => {
     const getLayerClass = useLayerClass();
+    const groupContext = useNavLinkGroupContext();
+    const [getRef, setRef] = createSignal<HTMLElement>();
 
     return (
-        <A href={access(props.href)} end={true} class={styles.navLink}>
+        <A ref={setRef} href={access(props.href)} end={true} class={styles.navLink}>
             <div
+                class={styles.navLinkContent}
                 classList={{
                     [getLayerClass()]: true,
-                    [styles.navLinkContent]: access(props.isGliding) ?? false,
-                    [styles.navLinkContentWithoutFloater]: !(access(props.isGliding) ?? false),
+                    [styles.hasHoverFloater]: access(props.hasHoverFloater) ?? false,
+                    [styles.hasNoHoverFloater]: !(access(props.hasHoverFloater) ?? false),
+                    [styles.hasSelectionFloater]: access(props.hasSelectionFloater) ?? false,
+                    [styles.isHovered]: groupContext?.getIsHighlighted(getRef()) ?? false,
                     [styles.isSelected]: access(props.isSelected),
                 }}
             >
@@ -53,10 +59,13 @@ export const PageNavLinkGroup = (props: ParentProps) => {
         return link && InteractionTrackerUtils.computeIsFocusVisible(link) ? link : undefined;
     };
 
+    const getHighlightedLink = () => getHoveredLink() ?? getFocusVisibleLink();
+    const getIsHighlighted = createSelector<HTMLElement | undefined, HTMLElement | undefined>(getHighlightedLink);
+
     const floater = FloaterSolidUtils.create({
         getIsEnabled: () => true,
         getContainer: getRootRef,
-        getTarget: () => getHoveredLink() ?? getFocusVisibleLink(),
+        getTarget: getHighlightedLink,
         getTransitionDurationMs,
     });
 
@@ -79,7 +88,11 @@ export const PageNavLinkGroup = (props: ParentProps) => {
                 </div>
             </Show>
 
-            {props.children}
+            <NavLinkGroupContextProvider
+                value={{ getIsHighlighted: (link) => link !== undefined && getIsHighlighted(link) }}
+            >
+                {props.children}
+            </NavLinkGroupContextProvider>
         </div>
     );
 };

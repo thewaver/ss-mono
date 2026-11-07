@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 
-import { Accordion, Scroller, Tabs, useViewportContext } from "@thewaver/ss-components-react";
+import { Accordion, Scroller, TabPanel, Tabs, useViewportContext } from "@thewaver/ss-components-react";
 import type { AccordionItem, ScrollerController, Tab } from "@thewaver/ss-components-react";
 import {
     MODAL_MARGIN_HEIGHT,
@@ -10,11 +10,14 @@ import {
 import * as styles from "@thewaver/ss-playground/App/PageComponents/SourceView/SourceView.css";
 import { FOCUS_RING_WIDTH } from "@thewaver/ss-playground/App/Theme.css";
 
-import { PageAccordionHeader, PageAccordionPanel } from "../../StyledComponents/AccordionContent/AccordionContent";
+import {
+    PageAccordionHeader,
+    PageAccordionPanel,
+    PageAccordionWrapper,
+} from "../../StyledComponents/AccordionContent/AccordionContent";
 import { PageTabContent, PageTabFloater, PageTabGutter } from "../../StyledComponents/TabContent/TabContent";
 import { PageCodeBox } from "../CodeBox/CodeBox";
 import { PageScrollerButton } from "../ScrollerButton/ScrollerButton";
-import { PageTabPanel } from "../TabPanel/TabPanel";
 import { SourceViewUtils } from "./SourceView.utils";
 import type { SourceGroup, SourceViewProps } from "./SourceViewReact.types";
 
@@ -120,11 +123,14 @@ export const PageSourceView = (props: SourceViewProps) => {
             </div>
 
             <div className={styles.sourceViewPanel}>
-                <PageTabPanel id={getPanelId(selectedGroup.name)} tabId={getTabId(selectedGroup.name)}>
+                <TabPanel id={getPanelId(selectedGroup.name)} tabId={getTabId(selectedGroup.name)}>
                     <Accordion
                         items={items}
                         expanded={expandedState}
                         gap={SECTION_GAP}
+                        renderSection={(renderContent, _, flags) => (
+                            <PageAccordionWrapper flags={flags}>{renderContent()}</PageAccordionWrapper>
+                        )}
                         renderHeader={(item, flags) => (
                             <PageAccordionHeader flags={flags}>{item.value}</PageAccordionHeader>
                         )}
@@ -137,7 +143,7 @@ export const PageSourceView = (props: SourceViewProps) => {
                             </PageAccordionPanel>
                         )}
                     />
-                </PageTabPanel>
+                </TabPanel>
             </div>
         </div>
     );

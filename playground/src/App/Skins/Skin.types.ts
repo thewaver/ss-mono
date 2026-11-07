@@ -3,6 +3,7 @@ import type { GlobalStyleRule } from "@vanilla-extract/css";
 export type SkinEntry =
     | "accordionHeader"
     | "accordionPanel"
+    | "accordionWrapper"
     | "button"
     | "buttonSimple"
     | "checkboxBox"
@@ -11,10 +12,12 @@ export type SkinEntry =
     | "drawer"
     | "dropdown"
     | "hollowSurface"
-    | "hoverFloater"
     | "input"
-    | "itemWithFloater"
-    | "itemWithoutFloater"
+    | "itemBase"
+    | "itemHoverFloater"
+    | "itemSelectionFloater"
+    | "itemWithHoverFloater"
+    | "itemWithSelectionFloater"
     | "overlay"
     | "pageBackground"
     | "panel"
@@ -27,16 +30,15 @@ export type SkinEntry =
     | "rangeTrack"
     | "scrollerThumb"
     | "scrollerTrack"
-    | "selectionFloater"
     | "slideButtonFill"
     | "slideButtonThumb"
     | "slideButtonTrack"
     | "surface"
     | "tabsFloater"
-    | "tabsGutter"
     | "tabsItem"
+    | "tabsTrack"
     | "tag"
-    | "toggleHandle"
+    | "toggleThumb"
     | "toggleTrack"
     | "tooltip";
 
@@ -57,7 +59,9 @@ export type SkinState =
     | "isJoinedInlineEnd"
     | "isReadOnly"
     | "isDisabled"
-    | "hasError";
+    | "hasError"
+    | "hasHoverFloater"
+    | "hasSelectionFloater";
 
 export type SkinRule = GlobalStyleRule & {
     selectors?: Record<string, GlobalStyleRule>;

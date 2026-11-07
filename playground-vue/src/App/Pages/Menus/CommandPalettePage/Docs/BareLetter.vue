@@ -91,7 +91,7 @@ const toggleShortcut = () => {
 
         <template #renderOption="{ action, renderProps }">
             <PageSelectOptionContent
-                is-gliding
+                has-hover-floater
                 :has-mark="false"
                 :flags="renderProps"
                 :shortcut="formatPageResolvedShortcut(renderProps.shortcut)"

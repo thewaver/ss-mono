@@ -6,6 +6,8 @@ import { themeVars } from "../../Theme.css";
 export const isHovered = style([skinStates.isHovered]);
 export const isSelected = style([skinStates.isSelected]);
 export const isDisabled = style([skinStates.isDisabled]);
+export const hasHoverFloater = style([skinEntries.itemWithHoverFloater, skinStates.hasHoverFloater]);
+export const hasSelectionFloater = style([skinEntries.itemWithSelectionFloater, skinStates.hasSelectionFloater]);
 
 const selectOptionBase = style({
     display: "flex",
@@ -17,9 +19,7 @@ const selectOptionBase = style({
     transition: `background-color ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}`,
 });
 
-export const selectOptionContent = style([skinEntries.itemWithFloater, selectOptionBase]);
-
-export const selectOptionContentWithoutFloater = style([skinEntries.itemWithoutFloater, selectOptionBase]);
+export const selectOptionContent = style([skinEntries.itemBase, selectOptionBase]);
 
 export const selectOptionText = style({
     display: "flex",

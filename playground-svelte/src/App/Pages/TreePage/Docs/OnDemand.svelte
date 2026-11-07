@@ -42,7 +42,7 @@
 
 <Tree renderHighlightFloater={renderPageHighlightFloater} {nodes} bind:expanded ariaLabel={"Remote repository"}>
     {#snippet renderNode(node, renderProps)}
-        <PageTreeNodeContent isGliding {renderProps}>{node.value}</PageTreeNodeContent>
+        <PageTreeNodeContent hasHoverFloater {renderProps}>{node.value}</PageTreeNodeContent>
     {/snippet}
 
     {#snippet renderPendingChildren(_node, depth)}

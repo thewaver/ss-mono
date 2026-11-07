@@ -23,7 +23,7 @@ export const GlideDocsExample = (props: Props) => {
                 renderContent={(flags) => <PageMenuTriggerContent flags={flags}>Edit</PageMenuTriggerContent>}
                 renderItem={(item, flags) => (
                     <PageMenuItemContent
-                        isGliding={props.isGliding}
+                        hasHoverFloater={props.isGliding}
                         flags={flags}
                         kind={item.kind}
                         shortcut={item.value.shortcut ?? ""}

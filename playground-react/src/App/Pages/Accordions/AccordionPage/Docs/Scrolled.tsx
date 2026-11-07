@@ -6,6 +6,7 @@ import * as styles from "@thewaver/ss-playground/App/Pages/Accordions/Accordions
 import {
     PageAccordionHeader,
     PageAccordionPanel,
+    PageAccordionWrapper,
 } from "../../../../StyledComponents/AccordionContent/AccordionContent";
 import type { AccordionScrolledDocsExampleProps } from "../AccordionPageReact.types";
 
@@ -41,6 +42,9 @@ export const ScrolledDocsExample = (props: Props) => (
             items={ITEMS}
             gap={DOCS_GAP}
             isScrolledIntoViewOnExpand={props.isScrolledIntoViewOnExpand}
+            renderSection={(renderContent, _, flags) => (
+                <PageAccordionWrapper flags={flags}>{renderContent()}</PageAccordionWrapper>
+            )}
             renderHeader={(item, flags) => <PageAccordionHeader flags={flags}>{item.value}</PageAccordionHeader>}
             renderPanel={(item, visibilityTarget, transitionDurationMs) => (
                 <PageAccordionPanel visibilityTarget={visibilityTarget} transitionDurationMs={transitionDurationMs}>

@@ -26,7 +26,7 @@ export const RightToLeftDocsExample = () => {
                     </PageSelectContent>
                 )}
                 renderOption={(getOption, getFlags) => (
-                    <PageSelectOptionContent isGliding flags={getFlags}>
+                    <PageSelectOptionContent hasHoverFloater flags={getFlags}>
                         {getOption().value}
                     </PageSelectOptionContent>
                 )}

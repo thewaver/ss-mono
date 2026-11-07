@@ -22,6 +22,6 @@
     linkComponent={props.hasLinkComponent ? CustomTreeLink : undefined}
 >
     {#snippet renderNode(node, renderProps)}
-        <PageTreeNodeContent isGliding {renderProps}>{node.value}</PageTreeNodeContent>
+        <PageTreeNodeContent hasHoverFloater {renderProps}>{node.value}</PageTreeNodeContent>
     {/snippet}
 </Tree>

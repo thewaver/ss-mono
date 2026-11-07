@@ -19,7 +19,11 @@ export const RecordsDocsExample = () => {
                 value={valueSignal}
                 ariaLabel={"Assets"}
                 renderNode={(getNode, getRenderProps) => (
-                    <PageTreeNodeContent isGliding renderProps={getRenderProps} detail={() => getNode().value.kind}>
+                    <PageTreeNodeContent
+                        hasHoverFloater
+                        renderProps={getRenderProps}
+                        detail={() => getNode().value.kind}
+                    >
                         {getNode().value.name}
                     </PageTreeNodeContent>
                 )}

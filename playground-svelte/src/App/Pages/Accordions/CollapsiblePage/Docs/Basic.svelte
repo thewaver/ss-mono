@@ -4,6 +4,7 @@
 
     import PageAccordionHeader from "../../../../StyledComponents/AccordionContent/PageAccordionHeader.svelte";
     import PageAccordionPanel from "../../../../StyledComponents/AccordionContent/PageAccordionPanel.svelte";
+    import PageAccordionWrapper from "../../../../StyledComponents/AccordionContent/PageAccordionWrapper.svelte";
     import type { CollapsibleBasicDocsExampleProps } from "../CollapsiblePageSvelte.types";
 
     type Props = CollapsibleBasicDocsExampleProps;
@@ -18,6 +19,10 @@
     </div>
 
     <Collapsible transitionDurationMs={props.transitionDurationMs} sizing={"fit-content"}>
+        {#snippet renderSection(renderContent, flags)}
+            <PageAccordionWrapper {flags}>{@render renderContent()}</PageAccordionWrapper>
+        {/snippet}
+
         {#snippet renderTrigger(flags)}
             <PageAccordionHeader {flags}>{flags.isExpanded ? "Show less" : "Show more"}</PageAccordionHeader>
         {/snippet}

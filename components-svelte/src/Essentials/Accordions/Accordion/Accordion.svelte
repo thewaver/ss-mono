@@ -102,6 +102,7 @@
             transitionDurationMs={props.transitionDurationMs}
             renderHeader={props.renderHeader}
             renderPanel={props.renderPanel}
+            renderSection={props.renderSection}
             {moveDirection}
             onToggle={() => handleToggle(item.value)}
         />

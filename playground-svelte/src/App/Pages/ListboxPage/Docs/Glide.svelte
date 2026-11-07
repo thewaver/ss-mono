@@ -27,7 +27,7 @@
         ariaLabel={"Shipping country, gliding"}
     >
         {#snippet renderOption(option, flags)}
-            <PageSelectOptionContent isGliding={props.isGliding} {flags}>{option.value}</PageSelectOptionContent>
+            <PageSelectOptionContent hasHoverFloater={props.isGliding} hasSelectionFloater={props.isGliding} {flags}>{option.value}</PageSelectOptionContent>
         {/snippet}
     </Listbox>
 </PageListboxSurface>

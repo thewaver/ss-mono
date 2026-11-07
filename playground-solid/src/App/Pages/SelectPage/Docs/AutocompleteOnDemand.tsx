@@ -59,7 +59,11 @@ export const AutocompleteOnDemandDocsExample = () => {
                 <PageSelectContent flags={getFlags}>{getSelectedOption()?.value.name ?? PLACEHOLDER}</PageSelectContent>
             )}
             renderOption={(getOption, getFlags) => (
-                <PageSelectOptionContent isGliding flags={getFlags} description={() => getOption().value.description}>
+                <PageSelectOptionContent
+                    hasHoverFloater
+                    flags={getFlags}
+                    description={() => getOption().value.description}
+                >
                     {getOption().value.name}
                 </PageSelectOptionContent>
             )}

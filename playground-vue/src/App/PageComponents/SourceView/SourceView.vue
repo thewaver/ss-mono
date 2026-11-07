@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, shallowRef, watch } from "vue";
 
-import { Accordion, Scroller, Tabs, useViewportContext } from "@thewaver/ss-components-vue";
+import { Accordion, Scroller, TabPanel, Tabs, useViewportContext } from "@thewaver/ss-components-vue";
 import type { AccordionItem, ScrollerController, Tab } from "@thewaver/ss-components-vue";
 import {
     MODAL_MARGIN_HEIGHT,
@@ -13,12 +13,12 @@ import { FOCUS_RING_WIDTH } from "@thewaver/ss-playground/App/Theme.css";
 
 import PageAccordionHeader from "../../StyledComponents/AccordionContent/PageAccordionHeader.vue";
 import PageAccordionPanel from "../../StyledComponents/AccordionContent/PageAccordionPanel.vue";
+import PageAccordionWrapper from "../../StyledComponents/AccordionContent/PageAccordionWrapper.vue";
 import PageTabContent from "../../StyledComponents/TabContent/PageTabContent.vue";
 import PageTabFloater from "../../StyledComponents/TabContent/PageTabFloater.vue";
 import PageTabGutter from "../../StyledComponents/TabContent/PageTabGutter.vue";
 import PageCodeBox from "../CodeBox/CodeBox.vue";
 import PageScrollerButton from "../ScrollerButton/ScrollerButton.vue";
-import PageTabPanel from "../TabPanel/TabPanel.vue";
 import { SourceViewUtils } from "./SourceView.utils";
 import type { SourceGroup, SourceViewProps } from "./SourceViewVue.types";
 
@@ -131,8 +131,12 @@ watch(
         </div>
 
         <div :class="styles.sourceViewPanel">
-            <PageTabPanel :id="getPanelId(selectedGroup.name)" :tab-id="getTabId(selectedGroup.name)">
+            <TabPanel :id="getPanelId(selectedGroup.name)" :tab-id="getTabId(selectedGroup.name)">
                 <Accordion v-model:expanded="expandedNames" :items="items" :gap="SECTION_GAP">
+                    <template #renderSection="{ renderContent, flags }">
+                        <PageAccordionWrapper :flags="flags"><component :is="renderContent" /></PageAccordionWrapper>
+                    </template>
+
                     <template #renderHeader="{ item, flags }">
                         <PageAccordionHeader :flags="flags">{{ item.value }}</PageAccordionHeader>
                     </template>
@@ -146,7 +150,7 @@ watch(
                         </PageAccordionPanel>
                     </template>
                 </Accordion>
-            </PageTabPanel>
+            </TabPanel>
         </div>
     </div>
 </template>

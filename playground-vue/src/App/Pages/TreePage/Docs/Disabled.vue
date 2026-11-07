@@ -24,7 +24,7 @@ const nodes = computed(() => createFilesWithDisabled(props.isReachable));
         </template>
 
         <template #renderNode="{ node, renderProps }">
-            <PageTreeNodeContent is-gliding :render-props="renderProps">{{ node.value }}</PageTreeNodeContent>
+            <PageTreeNodeContent has-hover-floater :render-props="renderProps">{{ node.value }}</PageTreeNodeContent>
         </template>
     </Tree>
 </template>

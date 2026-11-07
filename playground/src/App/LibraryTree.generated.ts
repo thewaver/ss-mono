@@ -59,7 +59,7 @@ export const LIBRARY: TreemapNode<string> = branch(
     branch("Composites", leaf("GlassSurface", 175), leaf("Surface", 265)),
     branch(
         "Essentials",
-        branch("Accordions", leaf("Accordion", 470), leaf("Collapsible", 438)),
+        branch("Accordions", leaf("Accordion", 491), leaf("Collapsible", 484)),
         leaf("Breadcrumbs", 216),
         branch("Buttons", leaf("Button", 225), leaf("SlideButton", 744)),
         leaf("Carousel", 1726),

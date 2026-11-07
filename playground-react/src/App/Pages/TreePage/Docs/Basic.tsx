@@ -10,7 +10,7 @@ export const BasicDocsExample = () => (
         nodes={FILES}
         ariaLabel={"Repository"}
         renderNode={(node, renderProps) => (
-            <PageTreeNodeContent isGliding renderProps={renderProps}>
+            <PageTreeNodeContent hasHoverFloater renderProps={renderProps}>
                 {node.value}
             </PageTreeNodeContent>
         )}

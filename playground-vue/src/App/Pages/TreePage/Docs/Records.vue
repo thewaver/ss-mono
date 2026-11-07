@@ -19,7 +19,7 @@ const value = shallowRef<Asset | undefined>();
         </template>
 
         <template #renderNode="{ node, renderProps }">
-            <PageTreeNodeContent is-gliding :render-props="renderProps" :detail="node.value.kind">{{
+            <PageTreeNodeContent has-hover-floater :render-props="renderProps" :detail="node.value.kind">{{
                 node.value.name
             }}</PageTreeNodeContent>
         </template>

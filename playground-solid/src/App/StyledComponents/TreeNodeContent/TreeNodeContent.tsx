@@ -30,15 +30,17 @@ export const PageTreeNodeContent = (props: ParentProps<TreeNodeContentProps>) =>
     return (
         <div
             ref={setRef}
-            class={access(props.isGliding) ? styles.treeNodeContent : styles.treeNodeContentWithoutFloater}
+            class={styles.treeNodeContent}
             style={{
                 "padding-inline-start": `calc(${themeVars.spacing.half} + ${access(props.renderProps).depth * INDENT_PER_DEPTH}px)`,
             }}
             classList={{
                 [getLayerClass()]: true,
+                [styles.hasHoverFloater]: access(props.hasHoverFloater) ?? false,
+                [styles.hasSelectionFloater]: access(props.hasSelectionFloater) ?? false,
                 [styles.isBranch]: access(props.renderProps).isBranch,
                 [styles.isExpanded]: access(props.renderProps).isExpanded,
-                [styles.isHovered]: !access(props.isGliding) && access(props.renderProps).isHovered,
+                [styles.isHovered]: access(props.renderProps).isHovered,
                 [styles.isSelected]: access(props.renderProps).isSelected,
                 [styles.isDisabled]: access(props.renderProps).isDisabled,
                 [styles.isCategory]: access(props.renderProps).depth === 0,

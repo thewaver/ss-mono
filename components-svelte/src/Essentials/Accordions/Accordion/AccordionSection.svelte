@@ -1,4 +1,8 @@
 <script lang="ts" generics="T">
+    import type { Snippet } from "svelte";
+
+    import type { CollapsibleSectionFlags } from "@thewaver/ss-components";
+
     import Collapsible from "../Collapsible/Collapsible.svelte";
     import type { AccordionSectionProps } from "./Accordion.types.js";
 
@@ -7,8 +11,13 @@
     const headerId = $props.id();
 </script>
 
+{#snippet section(renderContent: Snippet, flags: CollapsibleSectionFlags)}
+    {@render props.renderSection?.(renderContent, props.item, flags)}
+{/snippet}
+
 <Collapsible
     bind:ref
+    renderSection={props.renderSection === undefined ? undefined : section}
     id={headerId}
     isDisabled={props.item.isDisabled ?? false}
     isFocusableWhenDisabled={props.item.isReachableWhenDisabled ?? false}

@@ -18,6 +18,10 @@ export type SkinStateGridProps = {
     isFitted?: boolean;
 };
 
+export type SkinHoveredOptionProps = {
+    isGliding?: boolean;
+};
+
 export type SkinStateProps = {
     state: string;
     isPressed?: boolean;

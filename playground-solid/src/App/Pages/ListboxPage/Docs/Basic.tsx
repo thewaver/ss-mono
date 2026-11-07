@@ -23,7 +23,7 @@ export const BasicDocsExample = (props: Props) => {
                 isDisabled={props.isDisabled}
                 ariaLabel={"Shipping country"}
                 renderOption={(getOption, getFlags) => (
-                    <PageSelectOptionContent isGliding flags={getFlags}>
+                    <PageSelectOptionContent hasHoverFloater flags={getFlags}>
                         {getOption().value}
                     </PageSelectOptionContent>
                 )}

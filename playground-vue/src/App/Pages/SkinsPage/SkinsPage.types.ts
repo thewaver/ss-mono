@@ -14,6 +14,10 @@ export type SkinSampleColumnProps = {
     isWide?: boolean;
 };
 
+export type SkinListboxSampleProps = {
+    isGliding?: boolean;
+};
+
 export type SkinStateProps = {
     state: string;
     isPressed?: boolean;

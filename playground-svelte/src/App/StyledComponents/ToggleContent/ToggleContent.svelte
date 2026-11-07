@@ -24,7 +24,7 @@
     aria-hidden="true"
 >
     <div class={styles.toggleTrack}>
-        <div class={styles.toggleHandle}></div>
+        <div class={styles.toggleThumb}></div>
     </div>
 
     {@render props.children?.()}

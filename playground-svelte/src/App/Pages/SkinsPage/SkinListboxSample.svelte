@@ -5,22 +5,36 @@
         SKIN_SAMPLE_SELECTED_OPTION,
     } from "@thewaver/ss-playground/App/Pages/SkinsPage/SkinsPage.const";
 
-    import { renderPageHighlightFloater } from "../../StyledComponents/GlideFloater/GlideFloater.const.svelte";
+    import {
+        renderPageHighlightFloater,
+        renderPageSelectionFloater,
+    } from "../../StyledComponents/GlideFloater/GlideFloater.const.svelte";
     import PageListboxSurface from "../../StyledComponents/ListboxSurface/ListboxSurface.svelte";
     import PageSelectOptionContent from "../../StyledComponents/SelectOptionContent/SelectOptionContent.svelte";
+    import SkinHoveredOption from "./SkinHoveredOption.svelte";
+    import type { SkinListboxSampleProps } from "./SkinsPage.types";
+
+    let props: SkinListboxSampleProps = $props();
 
     let value = $state<string | undefined>(SKIN_SAMPLE_SELECTED_OPTION);
 </script>
 
 <PageListboxSurface>
     <Listbox
-        renderHighlightFloater={renderPageHighlightFloater}
+        renderSelectionFloater={props.isGliding ? renderPageSelectionFloater : undefined}
+        renderHighlightFloater={props.isGliding ? renderPageHighlightFloater : undefined}
         bind:value
         options={SKIN_SAMPLE_OPTIONS}
-        ariaLabel={"Listbox"}
+        ariaLabel={props.isGliding ? "Listbox" : "Listbox without floater"}
     >
         {#snippet renderOption(option, flags)}
-            <PageSelectOptionContent isGliding {flags}>{option.value}</PageSelectOptionContent>
+            <PageSelectOptionContent
+                hasHoverFloater={props.isGliding}
+                hasSelectionFloater={props.isGliding}
+                {flags}>{option.value}</PageSelectOptionContent
+            >
         {/snippet}
     </Listbox>
+
+    <SkinHoveredOption isGliding={props.isGliding} />
 </PageListboxSurface>

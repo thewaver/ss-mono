@@ -7,6 +7,7 @@ import * as collapsibleStyles from "@thewaver/ss-playground/App/Pages/Accordions
 import {
     PageAccordionHeader,
     PageAccordionPanel,
+    PageAccordionWrapper,
 } from "../../../../StyledComponents/AccordionContent/AccordionContent";
 
 const NOTES = ["Signed for on arrival", "Left with a neighbor", "Returned to the depot"];
@@ -36,6 +37,9 @@ export const DeferredDocsExample = () => {
                 <Collapsible
                     sizing={"fill"}
                     isPanelBuiltOnExpand={true}
+                    renderSection={(renderContent, flags) => (
+                        <PageAccordionWrapper flags={flags}>{renderContent()}</PageAccordionWrapper>
+                    )}
                     renderTrigger={(flags) => (
                         <PageAccordionHeader flags={flags}>
                             {flags.isExpanded ? "Hide the delivery notes" : "Show the delivery notes"}

@@ -24,7 +24,7 @@ export const RightToLeftDocsExample = (props: Props) => {
                     orientation={props.orientation}
                     ariaLabel={"Size"}
                     renderOption={(option, flags) => (
-                        <PageSelectOptionContent isGliding flags={flags}>
+                        <PageSelectOptionContent hasHoverFloater flags={flags}>
                             {option.value}
                         </PageSelectOptionContent>
                     )}

@@ -34,11 +34,13 @@
 <div
     bind:this={element}
     class={[
-        props.isGliding ? styles.treeNodeContent : styles.treeNodeContentWithoutFloater,
+        styles.treeNodeContent,
         layerClass,
+        props.hasHoverFloater && styles.hasHoverFloater,
+        props.hasSelectionFloater && styles.hasSelectionFloater,
         props.renderProps.isBranch && styles.isBranch,
         props.renderProps.isExpanded && styles.isExpanded,
-        !props.isGliding && props.renderProps.isHovered && styles.isHovered,
+        props.renderProps.isHovered && styles.isHovered,
         props.renderProps.isSelected && styles.isSelected,
         props.renderProps.isDisabled && styles.isDisabled,
         props.renderProps.depth === 0 && styles.isCategory,

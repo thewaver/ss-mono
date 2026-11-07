@@ -47,7 +47,7 @@ export const OnDemandDocsExample = () => {
             expanded={expandedSignal}
             ariaLabel={"Remote repository"}
             renderNode={(getNode, getRenderProps) => (
-                <PageTreeNodeContent isGliding renderProps={getRenderProps}>
+                <PageTreeNodeContent hasHoverFloater renderProps={getRenderProps}>
                     {getNode().value}
                 </PageTreeNodeContent>
             )}

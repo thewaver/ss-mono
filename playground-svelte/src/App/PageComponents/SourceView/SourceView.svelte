@@ -1,19 +1,19 @@
 <script lang="ts">
     import { untrack } from "svelte";
 
-    import { Accordion, Scroller, Tabs, getViewportContext } from "@thewaver/ss-components-svelte";
+    import { Accordion, Scroller, TabPanel, Tabs, getViewportContext } from "@thewaver/ss-components-svelte";
     import type { AccordionItem, ScrollerController, Tab } from "@thewaver/ss-components-svelte";
     import * as styles from "@thewaver/ss-playground/App/PageComponents/SourceView/SourceView.css";
     import { FOCUS_RING_WIDTH } from "@thewaver/ss-playground/App/Theme.css";
 
     import PageAccordionHeader from "../../StyledComponents/AccordionContent/PageAccordionHeader.svelte";
     import PageAccordionPanel from "../../StyledComponents/AccordionContent/PageAccordionPanel.svelte";
+    import PageAccordionWrapper from "../../StyledComponents/AccordionContent/PageAccordionWrapper.svelte";
     import PageTabContent from "../../StyledComponents/TabContent/PageTabContent.svelte";
     import PageTabFloater from "../../StyledComponents/TabContent/PageTabFloater.svelte";
     import PageTabGutter from "../../StyledComponents/TabContent/PageTabGutter.svelte";
     import PageCodeBox from "../CodeBox/CodeBox.svelte";
     import PageScrollerButton from "../ScrollerButton/ScrollerButton.svelte";
-    import PageTabPanel from "../TabPanel/TabPanel.svelte";
     import type { SourceGroup, SourceViewProps } from "./SourceViewSvelte.types";
     import { SourceViewUtils } from "./SourceView.utils";
     import {
@@ -128,8 +128,12 @@
         </div>
 
         <div class={styles.sourceViewPanel}>
-            <PageTabPanel id={getPanelId(selectedGroup.name)} tabId={getTabId(selectedGroup.name)}>
+            <TabPanel id={getPanelId(selectedGroup.name)} tabId={getTabId(selectedGroup.name)}>
                 <Accordion {items} bind:expanded={expandedNames} gap={SECTION_GAP}>
+                    {#snippet renderSection(renderContent, _, flags)}
+                        <PageAccordionWrapper {flags}>{@render renderContent()}</PageAccordionWrapper>
+                    {/snippet}
+
                     {#snippet renderHeader(item, flags)}
                         <PageAccordionHeader {flags}>{item.value}</PageAccordionHeader>
                     {/snippet}
@@ -140,7 +144,7 @@
                         </PageAccordionPanel>
                     {/snippet}
                 </Accordion>
-            </PageTabPanel>
+            </TabPanel>
         </div>
     </div>
 {/if}

@@ -4,7 +4,26 @@ import { COLLAPSIBLE_DEFAULTS } from "@thewaver/ss-components-react";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/AccordionContent/AccordionContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { AccordionHeaderProps, AccordionPanelProps } from "./AccordionContentReact.types";
+import type { AccordionHeaderProps, AccordionPanelProps, AccordionWrapperProps } from "./AccordionContentReact.types";
+
+export const PageAccordionWrapper = (props: PropsWithChildren<AccordionWrapperProps>) => {
+    const layerClass = useLayerClass();
+
+    return (
+        <div
+            className={[
+                styles.accordionWrapper,
+                layerClass,
+                props.flags.isExpanded && styles.isExpanded,
+                props.flags.isDisabled && styles.isDisabled,
+            ]
+                .filter(Boolean)
+                .join(" ")}
+        >
+            {props.children}
+        </div>
+    );
+};
 
 export const PageAccordionHeader = (props: PropsWithChildren<AccordionHeaderProps>) => {
     const layerClass = useLayerClass();

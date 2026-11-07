@@ -8,6 +8,7 @@ import * as styles from "@thewaver/ss-playground/App/Pages/Accordions/Accordions
 import {
     PageAccordionHeader,
     PageAccordionPanel,
+    PageAccordionWrapper,
 } from "../../../../StyledComponents/AccordionContent/AccordionContent";
 import { PageButtonContent } from "../../../../StyledComponents/ButtonContent/ButtonContent";
 
@@ -23,6 +24,9 @@ export const GrowingDocsExample = () => {
                 items={ITEMS}
                 gap={DOCS_GAP}
                 expanded={expandedSignal}
+                renderSection={(renderContent, _, getFlags) => (
+                    <PageAccordionWrapper flags={getFlags}>{renderContent()}</PageAccordionWrapper>
+                )}
                 renderHeader={(getItem, getFlags) => (
                     <PageAccordionHeader flags={getFlags}>{getItem().value}</PageAccordionHeader>
                 )}

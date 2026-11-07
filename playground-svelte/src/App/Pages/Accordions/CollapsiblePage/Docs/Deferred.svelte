@@ -5,6 +5,7 @@
 
     import PageAccordionHeader from "../../../../StyledComponents/AccordionContent/PageAccordionHeader.svelte";
     import PageAccordionPanel from "../../../../StyledComponents/AccordionContent/PageAccordionPanel.svelte";
+    import PageAccordionWrapper from "../../../../StyledComponents/AccordionContent/PageAccordionWrapper.svelte";
 
     const NOTES = ["Signed for on arrival", "Left with a neighbor", "Returned to the depot"];
 
@@ -17,6 +18,10 @@
 
 <div class={collapsibleStyles.docsAccordion}>
     <Collapsible sizing={"fill"} isPanelBuiltOnExpand={true}>
+        {#snippet renderSection(renderContent, flags)}
+            <PageAccordionWrapper {flags}>{@render renderContent()}</PageAccordionWrapper>
+        {/snippet}
+
         {#snippet renderTrigger(flags)}
             <PageAccordionHeader {flags}>
                 {flags.isExpanded ? "Hide the delivery notes" : "Show the delivery notes"}

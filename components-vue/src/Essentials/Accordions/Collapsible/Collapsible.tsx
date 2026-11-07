@@ -3,6 +3,7 @@ import { type SlotsType, computed, defineComponent, h, shallowRef, useId, watch 
 import {
     COLLAPSIBLE_DEFAULTS,
     type CollapsibleFlags,
+    type CollapsibleSectionFlags,
     CollapsibleStyles,
     CollapsibleUtils,
 } from "@thewaver/ss-components";
@@ -102,9 +103,8 @@ export const Collapsible = defineComponent(
             return CollapsibleUtils.scrollIntoView(root, trigger);
         });
 
-        return () => {
+        const renderContent = () => {
             const transitionDurationMs = getTransitionDurationMs();
-            const sizing = props.sizing ?? COLLAPSIBLE_DEFAULTS.sizing;
             const side = props.side ?? COLLAPSIBLE_DEFAULTS.side;
             const isSideways = CollapsibleUtils.getIsSideways(side);
             const panelAxis = CollapsibleUtils.getPanelAxis(side);
@@ -144,14 +144,7 @@ export const Collapsible = defineComponent(
             );
 
             return (
-                <div
-                    ref={rootRef}
-                    class={[
-                        CollapsibleStyles.collapsibleRoot,
-                        CollapsibleStyles.collapsibleSizingVariants[sizing],
-                        CollapsibleStyles.collapsibleSideVariants[side],
-                    ]}
-                >
+                <div class={[CollapsibleStyles.collapsibleContent, CollapsibleStyles.collapsibleSideVariants[side]]}>
                     {HeadingTag ? h(HeadingTag, { class: CollapsibleStyles.collapsibleHeading }, [wrapper]) : wrapper}
 
                     <div
@@ -174,6 +167,27 @@ export const Collapsible = defineComponent(
                                 callSlot(slots.renderPanel, { visibilityTarget, transitionDurationMs })}
                         </div>
                     </div>
+                </div>
+            );
+        };
+
+        return () => {
+            const sizing = props.sizing ?? COLLAPSIBLE_DEFAULTS.sizing;
+            const flags: CollapsibleSectionFlags = {
+                isExpanded: isExpanded.value,
+                isDisabled: props.isDisabled ?? false,
+            };
+
+            return (
+                <div
+                    ref={rootRef}
+                    class={[CollapsibleStyles.collapsibleRoot, CollapsibleStyles.collapsibleSizingVariants[sizing]]}
+                >
+                    {slots.renderSection === undefined ? (
+                        <div class={CollapsibleStyles.collapsibleSection}>{renderContent()}</div>
+                    ) : (
+                        callSlot(slots.renderSection, { renderContent, flags })
+                    )}
                 </div>
             );
         };

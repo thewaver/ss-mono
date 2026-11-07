@@ -17,6 +17,6 @@ const glideFloaterBase = style({
     },
 });
 
-export const selectionGlideFloater = style([skinEntries.selectionFloater, glideFloaterBase]);
+export const selectionGlideFloater = style([skinEntries.itemSelectionFloater, glideFloaterBase]);
 
-export const highlightGlideFloater = style([skinEntries.hoverFloater, glideFloaterBase]);
+export const highlightGlideFloater = style([skinEntries.itemHoverFloater, glideFloaterBase]);

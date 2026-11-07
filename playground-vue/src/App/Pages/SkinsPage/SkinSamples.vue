@@ -17,9 +17,11 @@ import { ROW_TAB_GAP, getPanelId, getTabId } from "@thewaver/ss-playground/App/P
 import PageTabPanel from "../../PageComponents/TabPanel/TabPanel.vue";
 import PageAccordionHeader from "../../StyledComponents/AccordionContent/PageAccordionHeader.vue";
 import PageAccordionPanel from "../../StyledComponents/AccordionContent/PageAccordionPanel.vue";
+import PageAccordionWrapper from "../../StyledComponents/AccordionContent/PageAccordionWrapper.vue";
 import PageTabContent from "../../StyledComponents/TabContent/PageTabContent.vue";
 import PageTabFloater from "../../StyledComponents/TabContent/PageTabFloater.vue";
 import PageTabGutter from "../../StyledComponents/TabContent/PageTabGutter.vue";
+import SkinBarCell from "./SkinBarCell.vue";
 import SkinButtonSample from "./SkinButtonSample.vue";
 import SkinCheckboxSample from "./SkinCheckboxSample.vue";
 import SkinInputSample from "./SkinInputSample.vue";
@@ -105,7 +107,15 @@ const tabs = computed(() =>
     </SkinSampleColumn>
 
     <SkinSampleColumn name="Listbox">
-        <SkinListboxSample />
+        <div :class="styles.skinBarStack">
+            <SkinBarCell state="With floater">
+                <SkinListboxSample is-gliding />
+            </SkinBarCell>
+
+            <SkinBarCell state="Without floater">
+                <SkinListboxSample />
+            </SkinBarCell>
+        </div>
     </SkinSampleColumn>
 
     <SkinSampleColumn name="Button">
@@ -182,6 +192,10 @@ const tabs = computed(() =>
     <SkinSampleColumn name="Accordion">
         <div :class="styles.skinWideSample">
             <Accordion v-model:expanded="expanded" :items="SKIN_SAMPLE_SECTIONS" :gap="DOCS_GAP">
+                <template #renderSection="{ renderContent, flags }">
+                    <PageAccordionWrapper :flags="flags"><component :is="renderContent" /></PageAccordionWrapper>
+                </template>
+
                 <template #renderHeader="{ item, flags }">
                     <PageAccordionHeader :flags="flags">{{ item.value }}</PageAccordionHeader>
                 </template>

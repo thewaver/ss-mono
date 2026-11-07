@@ -5,7 +5,8 @@ export type BaseSelectOptionContentValues = {
     description?: string;
     shortcut?: string;
     hasMark?: boolean;
-    isGliding?: boolean;
+    hasHoverFloater?: boolean;
+    hasSelectionFloater?: boolean;
 };
 
 export type BaseSelectOptionContentProps = BaseSelectOptionContentValues;

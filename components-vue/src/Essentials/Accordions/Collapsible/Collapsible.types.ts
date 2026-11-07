@@ -1,6 +1,11 @@
 import type { AriaAttributes, VNodeChild } from "vue";
 
-import type { BaseCollapsibleProps, CollapsibleFlags, InteractionFlags } from "@thewaver/ss-components";
+import type {
+    BaseCollapsibleProps,
+    CollapsibleFlags,
+    CollapsibleSectionFlags,
+    InteractionFlags,
+} from "@thewaver/ss-components";
 
 import type {
     InteractionControlProps,
@@ -9,6 +14,11 @@ import type {
 } from "../../../Primitives/InteractionWrapper/InteractionWrapper.types";
 
 export type CollapsiblePanelRenderer = (props: { visibilityTarget: 0 | 1; transitionDurationMs: number }) => VNodeChild;
+
+export type CollapsibleSectionRenderer = (props: {
+    renderContent: () => VNodeChild;
+    flags: CollapsibleSectionFlags;
+}) => VNodeChild;
 
 export type CollapsibleTriggerProps = InteractionControlProps<CollapsibleFlags> & {
     /** Identifies the panel the trigger opens, so the trigger can point at it. */
@@ -45,4 +55,11 @@ export type CollapsibleSlots = Pick<InteractionWrapperSlots<CollapsibleFlags>, "
     renderTrigger: (flags: InteractionFlags<CollapsibleFlags>) => VNodeChild;
     /** Draws the panel body. */
     renderPanel: CollapsiblePanelRenderer;
+    /**
+     * Draws a box around the trigger and the panel together, for a border, shadow or background that has to hold
+     * both. `renderContent` draws the pair, from a template as `<component :is="renderContent" />`; leave it out of the
+     * box and the collapsible draws nothing. Where the panel sits beside the trigger stays the collapsible's own
+     * layout. Left out, the pair is drawn with no box around it.
+     */
+    renderSection?: CollapsibleSectionRenderer;
 };

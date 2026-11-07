@@ -6,6 +6,13 @@ export type CollapsibleFlags = {
     isExpanded: boolean;
 };
 
+export type CollapsibleSectionFlags = {
+    /** Whether the panel is open, so the box around the pair can join or change with it. */
+    isExpanded: boolean;
+    /** Whether the collapsible is disabled, so the box can look unavailable along with its trigger. */
+    isDisabled: boolean;
+};
+
 export type BaseCollapsibleValues = {
     /** Identifies the collapsible, and is what the trigger and panel compose their own ids from. */
     id?: string;

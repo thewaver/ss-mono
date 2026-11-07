@@ -560,14 +560,14 @@ export function AppContent(props: RouteSectionProps & { viewportAnchor: SignalPa
                                         style={{ "transition-duration": `${getTransitionDurationMs()}ms` }}
                                     >
                                         <PageNavLinkGroup>
-                                            <PageNavLink href={"/"} isSelected={getIsAboutSelected()} isGliding>
+                                            <PageNavLink href={"/"} isSelected={getIsAboutSelected()} hasHoverFloater>
                                                 {"About"}
                                             </PageNavLink>
 
                                             <PageNavLink
                                                 href={GETTING_STARTED_ROUTE}
                                                 isSelected={getIsGettingStartedSelected()}
-                                                isGliding
+                                                hasHoverFloater
                                             >
                                                 {"Getting started"}
                                             </PageNavLink>
@@ -575,12 +575,16 @@ export function AppContent(props: RouteSectionProps & { viewportAnchor: SignalPa
                                             <PageNavLink
                                                 href={GALLERY_ROUTE}
                                                 isSelected={getIsGallerySelected()}
-                                                isGliding
+                                                hasHoverFloater
                                             >
                                                 {"Gallery"}
                                             </PageNavLink>
 
-                                            <PageNavLink href={SKINS_ROUTE} isSelected={getIsSkinsSelected()} isGliding>
+                                            <PageNavLink
+                                                href={SKINS_ROUTE}
+                                                isSelected={getIsSkinsSelected()}
+                                                hasHoverFloater
+                                            >
                                                 {"Skins"}
                                             </PageNavLink>
                                         </PageNavLinkGroup>
@@ -605,7 +609,7 @@ export function AppContent(props: RouteSectionProps & { viewportAnchor: SignalPa
                                                 computeCustomText={(node) => node.value.name}
                                                 renderNode={(getNode, getRenderProps) => (
                                                     <PageTreeNodeContent
-                                                        isGliding
+                                                        hasHoverFloater
                                                         renderProps={getRenderProps}
                                                         hasExamples={() => {
                                                             const node = getNode().value;

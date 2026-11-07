@@ -78,6 +78,14 @@ const ITEM: StyleRule = {
     },
 } as const;
 
+const ITEM_FLOATER_HOVER: StyleRule = {
+    backgroundColor: [layerVars.contrast, `rgb(from ${layerVars.contrast} r g b / 10%)`],
+};
+
+const ITEM_FLOATER_SELECTED: StyleRule = {
+    color: themeVars.color.primary.main,
+};
+
 const SURFACE: StyleRule = {
     borderRadius: themeVars.borderRadius.half,
     backgroundColor: themeVars.color.surface.main,
@@ -93,6 +101,10 @@ SkinUtils.define(plasticine, {
         selectors: {
             ...SkinUtils.joinedCorners(),
             ...INTERACTIBLE_STATES,
+            [skinSelectors.isExpanded]: {
+                color: themeVars.color.primary.main,
+                fontWeight: "bold",
+            },
         },
     },
     accordionPanel: {
@@ -101,6 +113,7 @@ SkinUtils.define(plasticine, {
             ...SkinUtils.joinedCorners(),
         },
     },
+    accordionWrapper: {},
     button: {
         borderRadius: themeVars.borderRadius.half,
         paddingInline: themeVars.spacing.double,
@@ -111,7 +124,7 @@ SkinUtils.define(plasticine, {
         fontWeight: "bold",
         selectors: {
             [skinSelectors.isPressed]: {
-                boxShadow: `inset 0 1px 2px rgb(0 0 0 / 75%), inset 0 2px 8px rgb(0 0 0 / 50%), inset 0 4px 32px rgb(0 0 0 / 25%)`,
+                boxShadow: `inset 0 2px 2px rgb(0 0 0 / 75%), inset 0 4px 4px rgb(0 0 0 / 50%), inset 0 8px 8px rgb(0 0 0 / 25%)`,
             },
             [skinSelectors.hasError]: {
                 backgroundColor: themeVars.color.error.main,
@@ -132,7 +145,7 @@ SkinUtils.define(plasticine, {
                 color: themeVars.color.primary.main,
             },
             [skinSelectors.hasError]: {
-                boxShadow: `inset 0 0 0 2px ${themeVars.color.error.main}`,
+                boxShadow: [`inset 0 0 0 2px ${themeVars.color.error.main}`, SHADOW_SMALL].join(", "),
             },
             ...INTERACTIBLE_STATES,
         },
@@ -167,10 +180,6 @@ SkinUtils.define(plasticine, {
         ...INPUT_SHELL,
     },
     hollowSurface: SkinUtils.hollow(SURFACE),
-    hoverFloater: {
-        borderRadius: themeVars.borderRadius.half,
-        backgroundColor: [layerVars.contrast, `rgb(from ${layerVars.contrast} r g b / 10%)`],
-    },
     input: {
         ...INPUT_SHELL,
         selectors: {
@@ -185,16 +194,24 @@ SkinUtils.define(plasticine, {
             },
         },
     },
-    itemWithFloater: {
-        ...ITEM,
-    },
-    itemWithoutFloater: ObjectUtils.deepMerge(ITEM, {
+    itemBase: ObjectUtils.deepMerge(ITEM, {
         selectors: {
-            [skinSelectors.isHovered]: {
-                backgroundColor: `rgb(from ${layerVars.contrast} r g b / 10%)`,
+            [skinSelectors.isHoveredWithoutFloater]: {
+                ...ITEM_FLOATER_HOVER,
+            },
+            [skinSelectors.isSelectedWithoutFloater]: {
+                ...ITEM_FLOATER_SELECTED,
             },
         },
     }),
+    itemHoverFloater: {
+        ...ITEM_FLOATER_HOVER,
+    },
+    itemSelectionFloater: {
+        ...ITEM_FLOATER_SELECTED,
+    },
+    itemWithHoverFloater: {},
+    itemWithSelectionFloater: {},
     overlay: {
         backdropFilter: "blur(10px) grayscale(75%)",
     },
@@ -247,6 +264,7 @@ SkinUtils.define(plasticine, {
         borderRadius: PILL_RADIUS,
         backgroundColor: themeVars.color.primary.main,
         backgroundImage: `linear-gradient(${skinVars.barAngle}, ${themeVars.color.primary.dark}, ${themeVars.color.primary.light})`,
+        boxShadow: SHADOW_SMALL,
         selectors: {
             [skinSelectors.hasError]: {
                 backgroundColor: themeVars.color.error.main,
@@ -291,10 +309,6 @@ SkinUtils.define(plasticine, {
             },
         },
     },
-    selectionFloater: {
-        borderRadius: themeVars.borderRadius.half,
-        backgroundColor: [themeVars.color.primary.main, `rgb(from ${themeVars.color.primary.main} r g b / 10%)`],
-    },
     slideButtonFill: {
         borderRadius: PILL_RADIUS,
         backgroundColor: themeVars.color.primary.main,
@@ -335,18 +349,6 @@ SkinUtils.define(plasticine, {
             },
         },
     },
-    tabsGutter: {
-        borderBlockEnd: [`2px solid ${layerVars.contrast}`, `2px solid rgb(from ${layerVars.contrast} r g b / 10%)`],
-        selectors: {
-            [skinSelectors.isVertical]: {
-                borderBlockEnd: "none",
-                borderInlineStart: [
-                    `2px solid ${layerVars.contrast}`,
-                    `2px solid rgb(from ${layerVars.contrast} r g b / 10%)`,
-                ],
-            },
-        },
-    },
     tabsItem: {
         paddingBlock: themeVars.spacing.full,
         paddingInline: themeVars.spacing.double,
@@ -363,11 +365,24 @@ SkinUtils.define(plasticine, {
             ...INTERACTIBLE_STATES,
         },
     },
+    tabsTrack: {
+        borderBlockEnd: [`2px solid ${layerVars.contrast}`, `2px solid rgb(from ${layerVars.contrast} r g b / 10%)`],
+        selectors: {
+            [skinSelectors.isVertical]: {
+                borderBlockEnd: "none",
+                borderInlineStart: [
+                    `2px solid ${layerVars.contrast}`,
+                    `2px solid rgb(from ${layerVars.contrast} r g b / 10%)`,
+                ],
+            },
+        },
+    },
     tag: {
         borderRadius: themeVars.borderRadius.half,
         paddingInline: themeVars.spacing.full,
         backgroundColor: themeVars.color.primary.main,
         backgroundImage: `linear-gradient(45deg, ${themeVars.color.primary.dark}, ${themeVars.color.primary.light})`,
+        boxShadow: SHADOW_SMALL,
         color: themeVars.color.primary.contrast,
         fontSize: themeVars.fontSize.xSmall,
         fontWeight: "bold",
@@ -375,7 +390,7 @@ SkinUtils.define(plasticine, {
             ...INTERACTIBLE_STATES,
         },
     },
-    toggleHandle: {
+    toggleThumb: {
         borderRadius: "50%",
         backgroundColor: [layerVars.contrast, `rgb(from ${layerVars.contrast} r g b / 75%)`],
         selectors: {

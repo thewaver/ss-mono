@@ -4,6 +4,7 @@
 
     import PageAccordionHeader from "../../../../StyledComponents/AccordionContent/PageAccordionHeader.svelte";
     import PageAccordionPanel from "../../../../StyledComponents/AccordionContent/PageAccordionPanel.svelte";
+    import PageAccordionWrapper from "../../../../StyledComponents/AccordionContent/PageAccordionWrapper.svelte";
     import type { CollapsibleSideDocsExampleProps } from "../CollapsiblePageSvelte.types";
 
     const PANEL_WIDTH = 220;
@@ -15,6 +16,10 @@
 
 <div class={styles.sideExample}>
     <Collapsible side={props.side} sizing={"fit-content"}>
+        {#snippet renderSection(renderContent, flags)}
+            <PageAccordionWrapper {flags}>{@render renderContent()}</PageAccordionWrapper>
+        {/snippet}
+
         {#snippet renderTrigger(flags)}
             <PageAccordionHeader {flags} side={props.side}>{flags.isExpanded ? "Less" : "More"}</PageAccordionHeader>
         {/snippet}

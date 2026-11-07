@@ -39,7 +39,7 @@ export const renderPaletteOption = (
     getRenderProps: () => CommandPaletteOptionRenderProps,
 ) => (
     <PageSelectOptionContent
-        isGliding
+        hasHoverFloater
         hasMark={false}
         flags={getRenderProps}
         shortcut={() => {

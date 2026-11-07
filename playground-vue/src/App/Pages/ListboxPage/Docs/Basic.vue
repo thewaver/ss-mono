@@ -26,7 +26,7 @@ const country = shallowRef<string | undefined>("Portugal");
             ariaLabel="Shipping country"
         >
             <template #renderOption="{ option, flags }">
-                <PageSelectOptionContent is-gliding :flags="flags">{{ option.value }}</PageSelectOptionContent>
+                <PageSelectOptionContent has-hover-floater :flags="flags">{{ option.value }}</PageSelectOptionContent>
             </template>
 
             <template #renderHighlightFloater="floater">

@@ -544,23 +544,31 @@ export function AppContent(props: { viewportAnchor: readonly [ViewportAnchor, (v
                                         style={{ transitionDuration: `${transitionDurationMs}ms` }}
                                     >
                                         <PageNavLinkGroup>
-                                            <PageNavLink href={"/"} isSelected={isAboutSelected} isGliding>
+                                            <PageNavLink href={"/"} isSelected={isAboutSelected} hasHoverFloater>
                                                 {"About"}
                                             </PageNavLink>
 
                                             <PageNavLink
                                                 href={GETTING_STARTED_ROUTE}
                                                 isSelected={isGettingStartedSelected}
-                                                isGliding
+                                                hasHoverFloater
                                             >
                                                 {"Getting started"}
                                             </PageNavLink>
 
-                                            <PageNavLink href={GALLERY_ROUTE} isSelected={isGallerySelected} isGliding>
+                                            <PageNavLink
+                                                href={GALLERY_ROUTE}
+                                                isSelected={isGallerySelected}
+                                                hasHoverFloater
+                                            >
                                                 {"Gallery"}
                                             </PageNavLink>
 
-                                            <PageNavLink href={SKINS_ROUTE} isSelected={isSkinsSelected} isGliding>
+                                            <PageNavLink
+                                                href={SKINS_ROUTE}
+                                                isSelected={isSkinsSelected}
+                                                hasHoverFloater
+                                            >
                                                 {"Skins"}
                                             </PageNavLink>
                                         </PageNavLinkGroup>
@@ -587,7 +595,7 @@ export function AppContent(props: { viewportAnchor: readonly [ViewportAnchor, (v
                                                 computeCustomText={(node) => node.value.name}
                                                 renderNode={(node, renderProps) => (
                                                     <PageTreeNodeContent
-                                                        isGliding
+                                                        hasHoverFloater
                                                         renderProps={renderProps}
                                                         hasExamples={
                                                             getIsBranchConfig(node.value) ||

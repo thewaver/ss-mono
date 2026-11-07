@@ -8,6 +8,7 @@ import * as styles from "@thewaver/ss-playground/App/Pages/Accordions/Accordions
 
 import PageAccordionHeader from "../../../../StyledComponents/AccordionContent/PageAccordionHeader.vue";
 import PageAccordionPanel from "../../../../StyledComponents/AccordionContent/PageAccordionPanel.vue";
+import PageAccordionWrapper from "../../../../StyledComponents/AccordionContent/PageAccordionWrapper.vue";
 import PageButtonContent from "../../../../StyledComponents/ButtonContent/ButtonContent.vue";
 
 const ITEMS: AccordionItem<string>[] = [{ value: "Shipping" }];
@@ -19,6 +20,10 @@ const extraLines = shallowRef(0);
 <template>
     <div :class="styles.docsAccordion">
         <Accordion v-model:expanded="expanded" :items="ITEMS" :gap="DOCS_GAP">
+            <template #renderSection="{ renderContent, flags }">
+                <PageAccordionWrapper :flags="flags"><component :is="renderContent" /></PageAccordionWrapper>
+            </template>
+
             <template #renderHeader="{ item, flags }">
                 <PageAccordionHeader :flags="flags">{{ item.value }}</PageAccordionHeader>
             </template>

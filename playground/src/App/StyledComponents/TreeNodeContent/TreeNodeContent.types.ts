@@ -4,7 +4,8 @@ export type BaseTreeNodeContentValues = {
     renderProps: InteractionFlags<TreeNodeRenderProps>;
     detail?: string;
     hasExamples?: boolean;
-    isGliding?: boolean;
+    hasHoverFloater?: boolean;
+    hasSelectionFloater?: boolean;
     hasCheckbox?: boolean;
 };
 

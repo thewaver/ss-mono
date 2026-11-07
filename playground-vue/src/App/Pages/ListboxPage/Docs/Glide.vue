@@ -25,9 +25,12 @@ const country = shallowRef<string | undefined>("Portugal");
             ariaLabel="Shipping country, gliding"
         >
             <template #renderOption="{ option, flags }">
-                <PageSelectOptionContent :is-gliding="isGliding" :flags="flags">{{
-                    option.value
-                }}</PageSelectOptionContent>
+                <PageSelectOptionContent
+                    :has-hover-floater="isGliding"
+                    :has-selection-floater="isGliding"
+                    :flags="flags"
+                    >{{ option.value }}</PageSelectOptionContent
+                >
             </template>
 
             <template v-if="isGliding" #renderSelectionFloater="floater">

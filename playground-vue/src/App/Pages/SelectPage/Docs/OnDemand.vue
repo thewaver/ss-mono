@@ -43,7 +43,7 @@ const fetchNext = async () => {
         </template>
 
         <template #renderOption="{ option, flags }">
-            <PageSelectOptionContent is-gliding :flags="flags" :description="option.value.description">{{
+            <PageSelectOptionContent has-hover-floater :flags="flags" :description="option.value.description">{{
                 option.value.name
             }}</PageSelectOptionContent>
         </template>

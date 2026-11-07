@@ -9,6 +9,8 @@ export const isExpanded = style({});
 export const isHovered = style([skinStates.isHovered]);
 export const isSelected = style([skinStates.isSelected]);
 export const isDisabled = style([skinStates.isDisabled]);
+export const hasHoverFloater = style([skinEntries.itemWithHoverFloater, skinStates.hasHoverFloater]);
+export const hasSelectionFloater = style([skinEntries.itemWithSelectionFloater, skinStates.hasSelectionFloater]);
 export const isCategory = style({});
 export const isRightToLeft = style({});
 
@@ -29,9 +31,7 @@ const treeNodeBase = style({
     },
 });
 
-export const treeNodeContent = style([skinEntries.itemWithFloater, treeNodeBase]);
-
-export const treeNodeContentWithoutFloater = style([skinEntries.itemWithoutFloater, treeNodeBase]);
+export const treeNodeContent = style([skinEntries.itemBase, treeNodeBase]);
 
 export const treeNodeMarker = style({
     width: "1ch",

@@ -3,7 +3,7 @@ import { fallbackVar, style, styleVariants } from "@vanilla-extract/css";
 import { skinEntries, skinStates, skinVars } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 
-export const RANGE_THUMB_SIZE = 18;
+export const RANGE_THUMB_SIZE = 20;
 export const RANGE_TRACK_THICKNESS = 6;
 export const RANGE_LENGTH = 220;
 

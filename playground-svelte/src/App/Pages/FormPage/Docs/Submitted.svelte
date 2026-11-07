@@ -64,7 +64,7 @@
                         {/snippet}
 
                         {#snippet renderOption(option, flags)}
-                            <PageSelectOptionContent isGliding {flags}>{option.value}</PageSelectOptionContent>
+                            <PageSelectOptionContent hasHoverFloater {flags}>{option.value}</PageSelectOptionContent>
                         {/snippet}
                     </Select>
                 {/snippet}
@@ -98,7 +98,7 @@
                         {/snippet}
 
                         {#snippet renderOption(option, flags)}
-                            <PageSelectOptionContent isGliding {flags}>{option.value}</PageSelectOptionContent>
+                            <PageSelectOptionContent hasHoverFloater {flags}>{option.value}</PageSelectOptionContent>
                         {/snippet}
                     </MultiSelect>
                 {/snippet}

@@ -5,18 +5,34 @@
 
     import { getLayerClass } from "../../StyledComponents/Layer/Layer.context";
     import PageRouterLink from "../RouterLink/RouterLink.svelte";
+    import { getNavLinkGroupContext } from "./NavLink.context";
     import type { PageNavLinkProps } from "./NavLinkSvelte.types";
 
     let props: PageNavLinkProps & { children?: Snippet } = $props();
 
     const layerClass = $derived.by(getLayerClass());
+    const groupContext = getNavLinkGroupContext();
+
+    let link = $state<HTMLElement>();
+
+    const isHovered = $derived(link !== undefined && groupContext?.highlightedLink === link);
 </script>
 
-<PageRouterLink href={props.href} class={styles.navLink} aria-current={props.isSelected ? "page" : undefined}>
+<PageRouterLink
+    {@attach (element: HTMLElement) => {
+        link = element;
+    }}
+    href={props.href}
+    class={styles.navLink}
+    aria-current={props.isSelected ? "page" : undefined}
+>
     <div
         class={[
-            (props.isGliding ?? false) ? styles.navLinkContent : styles.navLinkContentWithoutFloater,
+            styles.navLinkContent,
             layerClass,
+            (props.hasHoverFloater ?? false) ? styles.hasHoverFloater : styles.hasNoHoverFloater,
+            props.hasSelectionFloater && styles.hasSelectionFloater,
+            isHovered && styles.isHovered,
             props.isSelected && styles.isSelected,
         ]}
     >

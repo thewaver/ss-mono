@@ -1,6 +1,11 @@
 import type { JSX } from "solid-js";
 
-import type { BaseCollapsibleValues, CollapsibleFlags, InteractionFlags } from "@thewaver/ss-components";
+import type {
+    BaseCollapsibleValues,
+    CollapsibleFlags,
+    CollapsibleSectionFlags,
+    InteractionFlags,
+} from "@thewaver/ss-components";
 
 import type {
     InteractionControlProps,
@@ -11,6 +16,11 @@ import type { AccessorProps, AccessorValues, SignalSource } from "../../../Utils
 export type CollapsiblePanelRenderer = (
     getVisibilityTarget: () => 0 | 1,
     getTransitionDurationMs: () => number,
+) => JSX.Element;
+
+export type CollapsibleSectionRenderer = (
+    renderContent: () => JSX.Element,
+    getFlags: () => CollapsibleSectionFlags,
 ) => JSX.Element;
 
 export type CollapsibleTriggerProps = AccessorProps<
@@ -51,4 +61,10 @@ export type CollapsibleProps = Omit<
         renderTrigger: (getFlags: () => InteractionFlags<CollapsibleFlags>) => JSX.Element;
         /** Draws the panel body. */
         renderPanel: CollapsiblePanelRenderer;
+        /**
+         * Draws a box around the trigger and the panel together, for a border, shadow or background that has to hold
+         * both. Call `renderContent` inside it, or the collapsible draws nothing; where the panel sits beside the
+         * trigger stays the collapsible's own layout. Left out, the pair is drawn with no box around it.
+         */
+        renderSection?: CollapsibleSectionRenderer;
     }>;

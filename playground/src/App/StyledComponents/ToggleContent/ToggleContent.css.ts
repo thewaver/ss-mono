@@ -45,8 +45,8 @@ export const toggleTrack = style([
     },
 ]);
 
-export const toggleHandle = style([
-    skinEntries.toggleHandle,
+export const toggleThumb = style([
+    skinEntries.toggleThumb,
     {
         position: "absolute",
         top: `calc(50% - ${HALF_SIZE}px)`,

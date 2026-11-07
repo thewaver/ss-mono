@@ -26,7 +26,7 @@ export const LabeledDocsExample = () => {
                     <PageSelectContent flags={flags}>{selectedOption?.value ?? PLACEHOLDER}</PageSelectContent>
                 )}
                 renderOption={(option, flags) => (
-                    <PageSelectOptionContent isGliding flags={flags}>
+                    <PageSelectOptionContent hasHoverFloater flags={flags}>
                         {option.value}
                     </PageSelectOptionContent>
                 )}

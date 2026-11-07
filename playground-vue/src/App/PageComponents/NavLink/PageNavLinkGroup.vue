@@ -6,6 +6,7 @@ import { LINK_SELECTOR } from "@thewaver/ss-playground/App/PageComponents/NavLin
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/NavLinkContent/NavLinkContent.css";
 
 import PageGlideFloater from "../../StyledComponents/GlideFloater/PageGlideFloater.vue";
+import { provideNavLinkGroupContext } from "./NavLink.context";
 
 const transitionDurationMs = TREE_DEFAULTS.floaterTransitionDurationMs;
 
@@ -25,11 +26,19 @@ const readFocusVisibleLink = (target: EventTarget | null) => {
     return link && InteractionTrackerUtils.computeIsFocusVisible(link) ? link : undefined;
 };
 
+const getHighlightedLink = () => hoveredLink.value ?? focusVisibleLink.value;
+
 const { bounds, isRendered, visibilityTarget, setRef } = FloaterVueUtils.useFloater({
     isEnabled: true,
     container: rootRef,
-    target: () => hoveredLink.value ?? focusVisibleLink.value,
+    target: getHighlightedLink,
     transitionDurationMs,
+});
+
+provideNavLinkGroupContext({
+    get highlightedLink() {
+        return getHighlightedLink();
+    },
 });
 </script>
 

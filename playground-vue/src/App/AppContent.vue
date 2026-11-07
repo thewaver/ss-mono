@@ -244,23 +244,31 @@ const computeNodeText = (node: TreeNode<MenuNodeConfig>) => node.value.name;
                                     :style="{ transitionDuration: `${transitionDurationMs}ms` }"
                                 >
                                     <PageNavLinkGroup>
-                                        <PageNavLink href="/" :is-selected="isAboutSelected" is-gliding
+                                        <PageNavLink href="/" :is-selected="isAboutSelected" has-hover-floater
                                             >About</PageNavLink
                                         >
 
                                         <PageNavLink
                                             :href="GETTING_STARTED_ROUTE"
                                             :is-selected="isGettingStartedSelected"
-                                            is-gliding
+                                            has-hover-floater
                                         >
                                             Getting started
                                         </PageNavLink>
 
-                                        <PageNavLink :href="GALLERY_ROUTE" :is-selected="isGallerySelected" is-gliding>
+                                        <PageNavLink
+                                            :href="GALLERY_ROUTE"
+                                            :is-selected="isGallerySelected"
+                                            has-hover-floater
+                                        >
                                             Gallery
                                         </PageNavLink>
 
-                                        <PageNavLink :href="SKINS_ROUTE" :is-selected="isSkinsSelected" is-gliding>
+                                        <PageNavLink
+                                            :href="SKINS_ROUTE"
+                                            :is-selected="isSkinsSelected"
+                                            has-hover-floater
+                                        >
                                             Skins
                                         </PageNavLink>
                                     </PageNavLinkGroup>
@@ -287,7 +295,7 @@ const computeNodeText = (node: TreeNode<MenuNodeConfig>) => node.value.name;
                                         >
                                             <template #renderNode="{ node, renderProps }">
                                                 <PageTreeNodeContent
-                                                    is-gliding
+                                                    has-hover-floater
                                                     :render-props="renderProps"
                                                     :has-examples="
                                                         AppUtils.getIsBranchConfig(node.value) ||

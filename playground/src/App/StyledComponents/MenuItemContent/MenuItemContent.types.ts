@@ -4,7 +4,8 @@ export type BaseMenuItemContentValues = {
     flags: InteractionFlags<MenuItemFlags>;
     kind: MenuItemKind | undefined;
     shortcut?: string;
-    isGliding?: boolean;
+    hasHoverFloater?: boolean;
+    hasSelectionFloater?: boolean;
 };
 
 export type BaseMenuItemContentProps = BaseMenuItemContentValues;

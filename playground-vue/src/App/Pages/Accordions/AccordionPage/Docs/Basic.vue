@@ -5,6 +5,7 @@ import * as styles from "@thewaver/ss-playground/App/Pages/Accordions/Accordions
 
 import PageAccordionHeader from "../../../../StyledComponents/AccordionContent/PageAccordionHeader.vue";
 import PageAccordionPanel from "../../../../StyledComponents/AccordionContent/PageAccordionPanel.vue";
+import PageAccordionWrapper from "../../../../StyledComponents/AccordionContent/PageAccordionWrapper.vue";
 import type { AccordionBasicDocsExampleProps } from "../AccordionPageVue.types";
 
 const SECTION_BODIES: Record<string, string[]> = {
@@ -35,6 +36,10 @@ defineProps<Props>();
             :gap="gap"
             :transition-duration-ms="transitionDurationMs"
         >
+            <template #renderSection="{ renderContent, flags }">
+                <PageAccordionWrapper :flags="flags"><component :is="renderContent" /></PageAccordionWrapper>
+            </template>
+
             <template #renderHeader="{ item, flags }">
                 <PageAccordionHeader :flags="flags">{{ item.value }}</PageAccordionHeader>
             </template>

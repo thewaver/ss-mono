@@ -4,6 +4,7 @@ import * as styles from "@thewaver/ss-playground/App/Pages/Accordions/Accordions
 
 import PageAccordionHeader from "../../../../StyledComponents/AccordionContent/PageAccordionHeader.vue";
 import PageAccordionPanel from "../../../../StyledComponents/AccordionContent/PageAccordionPanel.vue";
+import PageAccordionWrapper from "../../../../StyledComponents/AccordionContent/PageAccordionWrapper.vue";
 import type { CollapsibleSideDocsExampleProps } from "../CollapsiblePageVue.types";
 
 const PANEL_WIDTH = 220;
@@ -16,6 +17,10 @@ defineProps<Props>();
 <template>
     <div :class="styles.sideExample">
         <Collapsible :side="side" sizing="fit-content">
+            <template #renderSection="{ renderContent, flags }">
+                <PageAccordionWrapper :flags="flags"><component :is="renderContent" /></PageAccordionWrapper>
+            </template>
+
             <template #renderTrigger="flags">
                 <PageAccordionHeader :flags="flags" :side="side">{{
                     flags.isExpanded ? "Less" : "More"

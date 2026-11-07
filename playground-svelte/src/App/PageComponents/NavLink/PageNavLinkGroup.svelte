@@ -14,6 +14,8 @@
     import { renderPageHighlightFloater } from "../../StyledComponents/GlideFloater/GlideFloater.const.svelte";
     import { LINK_SELECTOR } from "@thewaver/ss-playground/App/PageComponents/NavLink/NavLink.const";
 
+    import { setNavLinkGroupContext } from "./NavLink.context";
+
     const transitionDurationMs = TREE_DEFAULTS.floaterTransitionDurationMs;
 
     let props: { children?: Snippet } = $props();
@@ -34,11 +36,19 @@
         return link && InteractionTrackerUtils.computeIsFocusVisible(link) ? link : undefined;
     };
 
+    const getHighlightedLink = () => hoveredLink ?? focusVisibleLink;
+
     const floater = FloaterSvelteUtils.create({
         getIsEnabled: () => true,
         getContainer: () => root ?? undefined,
-        getTarget: () => hoveredLink ?? focusVisibleLink,
+        getTarget: getHighlightedLink,
         getTransitionDurationMs: () => transitionDurationMs,
+    });
+
+    setNavLinkGroupContext({
+        get highlightedLink() {
+            return getHighlightedLink();
+        },
     });
 </script>
 

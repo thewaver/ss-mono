@@ -1,6 +1,11 @@
 import type { AriaAttributes, AriaRole, ReactNode } from "react";
 
-import type { BaseCollapsibleProps, CollapsibleFlags, InteractionFlags } from "@thewaver/ss-components";
+import type {
+    BaseCollapsibleProps,
+    CollapsibleFlags,
+    CollapsibleSectionFlags,
+    InteractionFlags,
+} from "@thewaver/ss-components";
 
 import type {
     InteractionControlProps,
@@ -8,6 +13,8 @@ import type {
 } from "../../../Primitives/InteractionWrapper/InteractionWrapper.types";
 
 export type CollapsiblePanelRenderer = (visibilityTarget: 0 | 1, transitionDurationMs: number) => ReactNode;
+
+export type CollapsibleSectionRenderer = (renderContent: () => ReactNode, flags: CollapsibleSectionFlags) => ReactNode;
 
 export type CollapsibleTriggerProps = Omit<InteractionControlProps<CollapsibleFlags>, "renderContent"> & {
     /** Identifies the panel the trigger opens, so the trigger can point at it. */
@@ -45,4 +52,10 @@ export type CollapsibleProps = Omit<
         renderTrigger: (flags: InteractionFlags<CollapsibleFlags>) => ReactNode;
         /** Draws the panel body. */
         renderPanel: CollapsiblePanelRenderer;
+        /**
+         * Draws a box around the trigger and the panel together, for a border, shadow or background that has to hold
+         * both. Call `renderContent` inside it, or the collapsible draws nothing; where the panel sits beside the
+         * trigger stays the collapsible's own layout. Left out, the pair is drawn with no box around it.
+         */
+        renderSection?: CollapsibleSectionRenderer;
     };

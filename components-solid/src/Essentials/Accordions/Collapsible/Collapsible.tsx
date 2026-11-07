@@ -4,6 +4,7 @@ import { Dynamic } from "solid-js/web";
 import {
     COLLAPSIBLE_DEFAULTS,
     type CollapsibleFlags,
+    type CollapsibleSectionFlags,
     CollapsibleUtils,
     CollapsibleStyles as styles,
 } from "@thewaver/ss-components";
@@ -124,15 +125,13 @@ export const Collapsible = (props: CollapsibleProps) => {
         />
     );
 
-    return (
-        <div
-            ref={setRootRef}
-            class={[
-                styles.collapsibleRoot,
-                styles.collapsibleSizingVariants[getSizing()],
-                styles.collapsibleSideVariants[getSide()],
-            ].join(" ")}
-        >
+    const getSectionFlags = (): CollapsibleSectionFlags => ({
+        isExpanded: getIsExpanded(),
+        isDisabled: access(props.isDisabled) ?? false,
+    });
+
+    const renderContent = () => (
+        <div class={[styles.collapsibleContent, styles.collapsibleSideVariants[getSide()]].join(" ")}>
             <Show when={getHeadingTag()} fallback={renderWrapper()}>
                 {(getTag) => (
                     <Dynamic component={getTag()} class={styles.collapsibleHeading}>
@@ -159,6 +158,16 @@ export const Collapsible = (props: CollapsibleProps) => {
                     </Show>
                 </div>
             </div>
+        </div>
+    );
+
+    return (
+        <div ref={setRootRef} class={[styles.collapsibleRoot, styles.collapsibleSizingVariants[getSizing()]].join(" ")}>
+            {props.renderSection === undefined ? (
+                <div class={styles.collapsibleSection}>{renderContent()}</div>
+            ) : (
+                props.renderSection(renderContent, getSectionFlags)
+            )}
         </div>
     );
 };

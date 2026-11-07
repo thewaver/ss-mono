@@ -6,6 +6,7 @@ import * as styles from "@thewaver/ss-playground/App/Pages/Accordions/Accordions
 import {
     PageAccordionHeader,
     PageAccordionPanel,
+    PageAccordionWrapper,
 } from "../../../../StyledComponents/AccordionContent/AccordionContent";
 import { PageButtonContent } from "../../../../StyledComponents/ButtonContent/ButtonContent";
 
@@ -18,6 +19,9 @@ export const ControlledDocsExample = () => {
                 <Collapsible
                     expanded={[getIsExpanded, setIsExpanded]}
                     sizing={"fit-content"}
+                    renderSection={(renderContent, getFlags) => (
+                        <PageAccordionWrapper flags={getFlags}>{renderContent()}</PageAccordionWrapper>
+                    )}
                     renderTrigger={(getFlags) => (
                         <PageAccordionHeader flags={getFlags}>
                             {getFlags().isExpanded ? "Show less" : "Show more"}

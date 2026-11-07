@@ -10,7 +10,7 @@ export const CheckboxesDocsExample = () => (
         nodes={FILES}
         ariaLabel={"Files to include"}
         renderNode={(node, renderProps, setExpanderRef) => (
-            <PageTreeNodeContent isGliding hasCheckbox renderProps={renderProps} setExpanderRef={setExpanderRef}>
+            <PageTreeNodeContent hasHoverFloater hasCheckbox renderProps={renderProps} setExpanderRef={setExpanderRef}>
                 {node.value}
             </PageTreeNodeContent>
         )}

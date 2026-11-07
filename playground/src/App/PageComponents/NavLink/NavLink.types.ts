@@ -1,7 +1,8 @@
 export type BasePageNavLinkValues = {
     href: string;
     isSelected: boolean;
-    isGliding?: boolean;
+    hasHoverFloater?: boolean;
+    hasSelectionFloater?: boolean;
 };
 
 export type BasePageNavLinkProps = BasePageNavLinkValues;

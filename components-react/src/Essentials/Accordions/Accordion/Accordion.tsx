@@ -30,6 +30,11 @@ const AccordionSection = <T,>(props: AccordionSectionProps<T>) => {
             panelAriaAttributes={{ "aria-labelledby": headerId }}
             expanded={[props.isExpanded, () => props.onToggle()]}
             renderTrigger={(flags) => props.renderHeader(props.item, flags)}
+            renderSection={
+                props.renderSection === undefined
+                    ? undefined
+                    : (renderContent, flags) => props.renderSection?.(renderContent, props.item, flags)
+            }
             renderPanel={(visibilityTarget, transitionDurationMs) =>
                 props.renderPanel(props.item, visibilityTarget, transitionDurationMs, props.moveDirection)
             }
@@ -121,6 +126,7 @@ export const Accordion = <T,>(props: AccordionProps<T>) => {
                     transitionDurationMs={props.transitionDurationMs}
                     renderHeader={props.renderHeader}
                     renderPanel={props.renderPanel}
+                    renderSection={props.renderSection}
                     moveDirection={moveDirection}
                     onToggle={() => handleToggle(item.value)}
                 />

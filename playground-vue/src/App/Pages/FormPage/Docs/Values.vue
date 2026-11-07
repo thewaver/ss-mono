@@ -66,7 +66,7 @@ const reset = () => {
                             </template>
 
                             <template #renderOption="{ option, flags }">
-                                <PageSelectOptionContent is-gliding :flags="flags">{{
+                                <PageSelectOptionContent has-hover-floater :flags="flags">{{
                                     option.value
                                 }}</PageSelectOptionContent>
                             </template>
@@ -98,7 +98,7 @@ const reset = () => {
                             </template>
 
                             <template #renderOption="{ option, flags }">
-                                <PageSelectOptionContent is-gliding :flags="flags">{{
+                                <PageSelectOptionContent has-hover-floater :flags="flags">{{
                                     option.value
                                 }}</PageSelectOptionContent>
                             </template>

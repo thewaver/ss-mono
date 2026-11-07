@@ -26,7 +26,7 @@ const lastRun = shallowRef(NOTHING_RUN);
 
         <template #renderItem="{ item, flags }">
             <PageMenuItemContent
-                :is-gliding="isGliding"
+                :has-hover-floater="isGliding"
                 :flags="flags"
                 :kind="item.kind"
                 :shortcut="item.value.shortcut ?? ''"

@@ -6,6 +6,7 @@
 
     import PageAccordionHeader from "../../../../StyledComponents/AccordionContent/PageAccordionHeader.svelte";
     import PageAccordionPanel from "../../../../StyledComponents/AccordionContent/PageAccordionPanel.svelte";
+    import PageAccordionWrapper from "../../../../StyledComponents/AccordionContent/PageAccordionWrapper.svelte";
     import type { AccordionScrolledDocsExampleProps } from "../AccordionPageSvelte.types";
 
     const SECTION_BODIES: Record<string, string[]> = {
@@ -39,6 +40,10 @@
 
 <div class={[styles.scrollBox, styles.docsAccordion]} data-scroll-box="">
     <Accordion items={ITEMS} gap={DOCS_GAP} isScrolledIntoViewOnExpand={props.isScrolledIntoViewOnExpand}>
+        {#snippet renderSection(renderContent, _, flags)}
+            <PageAccordionWrapper {flags}>{@render renderContent()}</PageAccordionWrapper>
+        {/snippet}
+
         {#snippet renderHeader(item, flags)}
             <PageAccordionHeader {flags}>{item.value}</PageAccordionHeader>
         {/snippet}

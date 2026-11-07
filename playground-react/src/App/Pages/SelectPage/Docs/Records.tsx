@@ -27,7 +27,7 @@ export const RecordsDocsExample = () => {
                     </PageSelectContent>
                 )}
                 renderOption={(option, flags) => (
-                    <PageSelectOptionContent isGliding flags={flags}>
+                    <PageSelectOptionContent hasHoverFloater flags={flags}>
                         {option.value.city} ({option.value.code})
                     </PageSelectOptionContent>
                 )}

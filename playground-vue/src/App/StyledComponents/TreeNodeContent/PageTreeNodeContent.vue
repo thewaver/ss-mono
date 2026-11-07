@@ -31,11 +31,13 @@ const direction = NavigatorVueUtils.useDirection(root);
     <div
         ref="root"
         :class="[
-            isGliding ? styles.treeNodeContent : styles.treeNodeContentWithoutFloater,
+            styles.treeNodeContent,
             layerClass,
+            hasHoverFloater && styles.hasHoverFloater,
+            hasSelectionFloater && styles.hasSelectionFloater,
             renderProps.isBranch && styles.isBranch,
             renderProps.isExpanded && styles.isExpanded,
-            !isGliding && renderProps.isHovered && styles.isHovered,
+            renderProps.isHovered && styles.isHovered,
             renderProps.isSelected && styles.isSelected,
             renderProps.isDisabled && styles.isDisabled,
             renderProps.depth === 0 && styles.isCategory,

@@ -47,7 +47,7 @@ export const LeaningDocsExample = (props: Props) => {
             computeLayout={COLUMN}
             computeEffect={computeEffect}
             renderNode={(getNode, getRenderProps) => (
-                <PageTreeNodeContent isGliding renderProps={getRenderProps}>
+                <PageTreeNodeContent hasHoverFloater renderProps={getRenderProps}>
                     {getNode().value}
                 </PageTreeNodeContent>
             )}

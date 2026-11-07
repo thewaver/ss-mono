@@ -23,7 +23,7 @@ export const GroupsDocsExample = () => {
                     <PageSelectGroupContent flags={flags}>{group.label}</PageSelectGroupContent>
                 )}
                 renderOption={(option, flags) => (
-                    <PageSelectOptionContent isGliding flags={flags}>
+                    <PageSelectOptionContent hasHoverFloater flags={flags}>
                         {option.value}
                     </PageSelectOptionContent>
                 )}

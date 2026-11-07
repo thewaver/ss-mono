@@ -62,13 +62,13 @@ export const renderMenuPopup = (
 );
 
 export const renderMenuItem = (item: MenuItem<Action>, flags: InteractionFlags<MenuItemFlags>) => (
-    <PageMenuItemContent isGliding flags={flags} kind={item.kind} shortcut={item.value.shortcut ?? ""}>
+    <PageMenuItemContent hasHoverFloater flags={flags} kind={item.kind} shortcut={item.value.shortcut ?? ""}>
         {item.value.name}
     </PageMenuItemContent>
 );
 
 export const renderDestinationItem = (item: MenuItem<Destination>, flags: InteractionFlags<MenuItemFlags>) => (
-    <PageMenuItemContent isGliding flags={flags} kind={item.kind} shortcut={""}>
+    <PageMenuItemContent hasHoverFloater flags={flags} kind={item.kind} shortcut={""}>
         {item.value.name}
     </PageMenuItemContent>
 );

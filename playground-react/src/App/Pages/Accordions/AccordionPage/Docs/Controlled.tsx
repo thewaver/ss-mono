@@ -9,6 +9,7 @@ import { PageControlRow } from "../../../../PageComponents/ControlRow/ControlRow
 import {
     PageAccordionHeader,
     PageAccordionPanel,
+    PageAccordionWrapper,
 } from "../../../../StyledComponents/AccordionContent/AccordionContent";
 import { PageButtonContent } from "../../../../StyledComponents/ButtonContent/ButtonContent";
 
@@ -30,6 +31,9 @@ export const ControlledDocsExample = () => {
                     items={ITEMS}
                     gap={DOCS_GAP}
                     expanded={expandedState}
+                    renderSection={(renderContent, _, flags) => (
+                        <PageAccordionWrapper flags={flags}>{renderContent()}</PageAccordionWrapper>
+                    )}
                     renderHeader={(item, flags) => (
                         <PageAccordionHeader flags={flags}>{item.value}</PageAccordionHeader>
                     )}

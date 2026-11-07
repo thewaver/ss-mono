@@ -23,7 +23,7 @@ const layerClass = useLayerClass();
         aria-hidden="true"
     >
         <div :class="styles.toggleTrack">
-            <div :class="styles.toggleHandle" />
+            <div :class="styles.toggleThumb" />
         </div>
 
         <slot />

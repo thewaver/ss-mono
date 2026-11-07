@@ -3,6 +3,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import {
     COLLAPSIBLE_DEFAULTS,
     type CollapsibleFlags,
+    type CollapsibleSectionFlags,
     CollapsibleStyles,
     CollapsibleUtils,
 } from "@thewaver/ss-components";
@@ -113,14 +114,11 @@ export const Collapsible = (props: CollapsibleProps) => {
         />
     );
 
-    return (
+    const renderContent = () => (
         <div
-            ref={rootRef}
-            className={[
-                CollapsibleStyles.collapsibleRoot,
-                CollapsibleStyles.collapsibleSizingVariants[sizing],
-                CollapsibleStyles.collapsibleSideVariants[side],
-            ].join(" ")}
+            className={[CollapsibleStyles.collapsibleContent, CollapsibleStyles.collapsibleSideVariants[side]].join(
+                " ",
+            )}
         >
             {HeadingTag ? <HeadingTag className={CollapsibleStyles.collapsibleHeading}>{wrapper}</HeadingTag> : wrapper}
 
@@ -140,6 +138,23 @@ export const Collapsible = (props: CollapsibleProps) => {
                     {hasPanelContent && props.renderPanel(fader.transitionTarget, transitionDurationMs)}
                 </div>
             </div>
+        </div>
+    );
+
+    const sectionFlags: CollapsibleSectionFlags = { isExpanded, isDisabled: props.isDisabled ?? false };
+
+    return (
+        <div
+            ref={rootRef}
+            className={[CollapsibleStyles.collapsibleRoot, CollapsibleStyles.collapsibleSizingVariants[sizing]].join(
+                " ",
+            )}
+        >
+            {props.renderSection === undefined ? (
+                <div className={CollapsibleStyles.collapsibleSection}>{renderContent()}</div>
+            ) : (
+                props.renderSection(renderContent, sectionFlags)
+            )}
         </div>
     );
 };

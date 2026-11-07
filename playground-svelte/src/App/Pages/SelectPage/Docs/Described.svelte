@@ -23,7 +23,7 @@
     {/snippet}
 
     {#snippet renderOption(option, flags)}
-        <PageSelectOptionContent isGliding {flags} description={option.value.description}>
+        <PageSelectOptionContent hasHoverFloater {flags} description={option.value.description}>
             {option.value.name}
         </PageSelectOptionContent>
     {/snippet}

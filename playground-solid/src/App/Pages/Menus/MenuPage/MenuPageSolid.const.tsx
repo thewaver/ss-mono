@@ -72,7 +72,7 @@ export const renderMenuItem = (
     getFlags: () => InteractionFlags<MenuItemFlags>,
 ) => (
     <PageMenuItemContent
-        isGliding
+        hasHoverFloater
         flags={getFlags}
         kind={() => getItem().kind}
         shortcut={() => getItem().value.shortcut ?? ""}
@@ -85,7 +85,7 @@ export const renderDestinationItem = (
     getItem: Accessor<MenuItem<Destination>>,
     getFlags: () => InteractionFlags<MenuItemFlags>,
 ) => (
-    <PageMenuItemContent isGliding flags={getFlags} kind={() => getItem().kind} shortcut={""}>
+    <PageMenuItemContent hasHoverFloater flags={getFlags} kind={() => getItem().kind} shortcut={""}>
         {getItem().value.name}
     </PageMenuItemContent>
 );

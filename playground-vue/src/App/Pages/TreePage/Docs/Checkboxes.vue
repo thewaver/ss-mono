@@ -14,7 +14,7 @@ import { FILES } from "../TreePageVue.const";
 
         <template #renderNode="{ node, renderProps, setExpanderRef }">
             <PageTreeNodeContent
-                is-gliding
+                has-hover-floater
                 has-checkbox
                 :render-props="renderProps"
                 :set-expander-ref="setExpanderRef"

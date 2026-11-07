@@ -50,7 +50,7 @@
 {/snippet}
 
 {#snippet renderPaletteOption(action: CommandPaletteAction<string>, renderProps: CommandPaletteOptionRenderProps)}
-    <PageSelectOptionContent isGliding hasMark={false} flags={renderProps} shortcut={formatOptionShortcut(renderProps)}>
+    <PageSelectOptionContent hasHoverFloater hasMark={false} flags={renderProps} shortcut={formatOptionShortcut(renderProps)}>
         {action.value}
     </PageSelectOptionContent>
 {/snippet}

@@ -8,6 +8,6 @@
 
 <MultiTree renderHighlightFloater={renderPageHighlightFloater} nodes={FILES} ariaLabel={"Files to include"}>
     {#snippet renderNode(node, renderProps, setExpanderRef)}
-        <PageTreeNodeContent isGliding hasCheckbox {renderProps} {setExpanderRef}>{node.value}</PageTreeNodeContent>
+        <PageTreeNodeContent hasHoverFloater hasCheckbox {renderProps} {setExpanderRef}>{node.value}</PageTreeNodeContent>
     {/snippet}
 </MultiTree>

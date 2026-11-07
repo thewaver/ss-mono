@@ -31,9 +31,9 @@ export const columnTab = style([
     },
 ]);
 
-export const rowTabGutter = style([skinEntries.tabsGutter]);
+export const rowTabGutter = style([skinEntries.tabsTrack]);
 
-export const columnTabGutter = style([skinEntries.tabsGutter, skinStates.isVertical]);
+export const columnTabGutter = style([skinEntries.tabsTrack, skinStates.isVertical]);
 
 export const rowTabFloater = style([
     skinEntries.tabsFloater,
@@ -105,7 +105,7 @@ export const hexTab = style([
 ]);
 
 export const hexTabHighlightFloater = style([
-    skinEntries.hoverFloater,
+    skinEntries.itemHoverFloater,
     {
         width: "100%",
         height: "100%",

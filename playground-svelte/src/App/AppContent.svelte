@@ -334,23 +334,23 @@
                                 style:transition-duration={`${transitionDurationMs}ms`}
                             >
                                 <PageNavLinkGroup>
-                                    <PageNavLink href={"/"} isSelected={isAboutSelected} isGliding={true}>
+                                    <PageNavLink href={"/"} isSelected={isAboutSelected} hasHoverFloater={true}>
                                         About
                                     </PageNavLink>
 
                                     <PageNavLink
                                         href={GETTING_STARTED_ROUTE}
                                         isSelected={isGettingStartedSelected}
-                                        isGliding={true}
+                                        hasHoverFloater={true}
                                     >
                                         Getting started
                                     </PageNavLink>
 
-                                    <PageNavLink href={GALLERY_ROUTE} isSelected={isGallerySelected} isGliding={true}>
+                                    <PageNavLink href={GALLERY_ROUTE} isSelected={isGallerySelected} hasHoverFloater={true}>
                                         Gallery
                                     </PageNavLink>
 
-                                    <PageNavLink href={SKINS_ROUTE} isSelected={isSkinsSelected} isGliding={true}>
+                                    <PageNavLink href={SKINS_ROUTE} isSelected={isSkinsSelected} hasHoverFloater={true}>
                                         Skins
                                     </PageNavLink>
                                 </PageNavLinkGroup>

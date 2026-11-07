@@ -4,7 +4,24 @@ import { COLLAPSIBLE_DEFAULTS, access } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/AccordionContent/AccordionContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
-import type { AccordionHeaderProps, AccordionPanelProps } from "./AccordionContentSolid.types";
+import type { AccordionHeaderProps, AccordionPanelProps, AccordionWrapperProps } from "./AccordionContentSolid.types";
+
+export const PageAccordionWrapper = (props: ParentProps<AccordionWrapperProps>) => {
+    const getLayerClass = useLayerClass();
+
+    return (
+        <div
+            class={styles.accordionWrapper}
+            classList={{
+                [getLayerClass()]: true,
+                [styles.isExpanded]: access(props.flags).isExpanded,
+                [styles.isDisabled]: access(props.flags).isDisabled,
+            }}
+        >
+            {props.children}
+        </div>
+    );
+};
 
 export const PageAccordionHeader = (props: ParentProps<AccordionHeaderProps>) => {
     const getLayerClass = useLayerClass();

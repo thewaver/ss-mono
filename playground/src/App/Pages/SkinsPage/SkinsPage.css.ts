@@ -89,6 +89,19 @@ export const skinBarCaption = style({
     opacity: 0.75,
 });
 
+export const skinHoveredOption = style({
+    position: "relative",
+    isolation: "isolate",
+});
+
+export const skinHoveredFloater = style({
+    position: "absolute",
+    inset: 0,
+    zIndex: -1,
+    display: "grid",
+    pointerEvents: "none",
+});
+
 export const skinPanel = style([
     skinEntries.panel,
     {

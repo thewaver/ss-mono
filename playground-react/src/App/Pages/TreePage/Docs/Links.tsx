@@ -23,7 +23,7 @@ export const LinksDocsExample = (props: Props) => {
             ariaLabel={"Documentation"}
             linkComponent={props.hasLinkComponent ? CustomTreeLink : undefined}
             renderNode={(node, renderProps) => (
-                <PageTreeNodeContent isGliding renderProps={renderProps}>
+                <PageTreeNodeContent hasHoverFloater renderProps={renderProps}>
                     {node.value}
                 </PageTreeNodeContent>
             )}

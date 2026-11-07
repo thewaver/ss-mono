@@ -160,7 +160,7 @@ export const PageSelectField = <T,>(props: PageSelectFieldProps<T>) => {
                 </PageSelectContent>
             )}
             renderOption={(option, flags) => (
-                <PageSelectOptionContent isGliding flags={flags}>
+                <PageSelectOptionContent hasHoverFloater flags={flags}>
                     {props.computeLabel?.(option.value) ?? String(option.value)}
                 </PageSelectOptionContent>
             )}
@@ -200,7 +200,7 @@ export const PageGroupedSelectField = <T,>(props: PageGroupedSelectFieldProps<T>
             )}
             renderGroupHeader={(group) => <PageSelectGroupContent>{group.label}</PageSelectGroupContent>}
             renderOption={(option, flags) => (
-                <PageSelectOptionContent isGliding flags={flags}>
+                <PageSelectOptionContent hasHoverFloater flags={flags}>
                     {props.computeLabel?.(option.value) ?? String(option.value)}
                 </PageSelectOptionContent>
             )}

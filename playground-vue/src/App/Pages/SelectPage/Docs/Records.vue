@@ -29,7 +29,7 @@ const value = shallowRef<Airport | undefined>(undefined);
         </template>
 
         <template #renderOption="{ option, flags }">
-            <PageSelectOptionContent is-gliding :flags="flags"
+            <PageSelectOptionContent has-hover-floater :flags="flags"
                 >{{ option.value.city }} ({{ option.value.code }})</PageSelectOptionContent
             >
         </template>

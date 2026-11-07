@@ -6,6 +6,7 @@ import * as styles from "@thewaver/ss-playground/App/PageComponents/Examples/Exa
 import * as collapsibleStyles from "@thewaver/ss-playground/App/Pages/Accordions/Accordions.css";
 
 import PageAccordionHeader from "../../../../StyledComponents/AccordionContent/PageAccordionHeader.vue";
+import PageAccordionWrapper from "../../../../StyledComponents/AccordionContent/PageAccordionWrapper.vue";
 import DeferredPanel from "./DeferredPanel.vue";
 
 const isBuilt = shallowRef(false);
@@ -14,6 +15,10 @@ const isBuilt = shallowRef(false);
 <template>
     <div :class="collapsibleStyles.docsAccordion">
         <Collapsible sizing="fill" is-panel-built-on-expand>
+            <template #renderSection="{ renderContent, flags }">
+                <PageAccordionWrapper :flags="flags"><component :is="renderContent" /></PageAccordionWrapper>
+            </template>
+
             <template #renderTrigger="flags">
                 <PageAccordionHeader :flags="flags">{{
                     flags.isExpanded ? "Hide the delivery notes" : "Show the delivery notes"

@@ -13,9 +13,11 @@
 
 <div
     class={[
-        props.isGliding ? styles.selectOptionContent : styles.selectOptionContentWithoutFloater,
+        styles.selectOptionContent,
         layerClass,
-        !props.isGliding && (props.flags.isHovered || props.flags.isHighlighted) && styles.isHovered,
+        props.hasHoverFloater && styles.hasHoverFloater,
+        props.hasSelectionFloater && styles.hasSelectionFloater,
+        (props.flags.isHovered || props.flags.isHighlighted) && styles.isHovered,
         props.flags.isSelected && styles.isSelected,
         props.flags.isDisabled && styles.isDisabled,
     ]}

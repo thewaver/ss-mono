@@ -12,7 +12,7 @@
 
 <Tree renderHighlightFloater={renderPageHighlightFloater} nodes={ASSETS} bind:value ariaLabel={"Assets"}>
     {#snippet renderNode(node, renderProps)}
-        <PageTreeNodeContent isGliding {renderProps} detail={node.value.kind}>{node.value.name}</PageTreeNodeContent>
+        <PageTreeNodeContent hasHoverFloater {renderProps} detail={node.value.kind}>{node.value.name}</PageTreeNodeContent>
     {/snippet}
 </Tree>
 

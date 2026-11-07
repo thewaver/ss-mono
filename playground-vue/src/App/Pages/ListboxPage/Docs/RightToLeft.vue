@@ -21,7 +21,9 @@ const size = shallowRef<string | undefined>();
         <PageListboxSurface :is-wide="orientation === 'horizontal'">
             <Listbox id="size" v-model:value="size" :options="SIZES" :orientation="orientation" ariaLabel="Size">
                 <template #renderOption="{ option, flags }">
-                    <PageSelectOptionContent is-gliding :flags="flags">{{ option.value }}</PageSelectOptionContent>
+                    <PageSelectOptionContent has-hover-floater :flags="flags">{{
+                        option.value
+                    }}</PageSelectOptionContent>
                 </template>
 
                 <template #renderHighlightFloater="floater">

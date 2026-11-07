@@ -33,7 +33,7 @@ export const GroupsDocsExample = (props: Props) => {
                     : undefined
             }
             renderOption={(option, flags) => (
-                <PageSelectOptionContent isGliding flags={flags}>
+                <PageSelectOptionContent hasHoverFloater flags={flags}>
                     {option.value}
                 </PageSelectOptionContent>
             )}

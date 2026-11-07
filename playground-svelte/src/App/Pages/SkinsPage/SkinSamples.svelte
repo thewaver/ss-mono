@@ -15,10 +15,12 @@
     import PageTabPanel from "../../PageComponents/TabPanel/TabPanel.svelte";
     import PageAccordionHeader from "../../StyledComponents/AccordionContent/PageAccordionHeader.svelte";
     import PageAccordionPanel from "../../StyledComponents/AccordionContent/PageAccordionPanel.svelte";
+    import PageAccordionWrapper from "../../StyledComponents/AccordionContent/PageAccordionWrapper.svelte";
     import PageTabContent from "../../StyledComponents/TabContent/PageTabContent.svelte";
     import PageTabFloater from "../../StyledComponents/TabContent/PageTabFloater.svelte";
     import PageTabGutter from "../../StyledComponents/TabContent/PageTabGutter.svelte";
     import SkinButtonSample from "./SkinButtonSample.svelte";
+    import SkinBarCell from "./SkinBarCell.svelte";
     import SkinCheckboxSample from "./SkinCheckboxSample.svelte";
     import SkinInputSample from "./SkinInputSample.svelte";
     import SkinListboxSample from "./SkinListboxSample.svelte";
@@ -96,7 +98,15 @@
 </SkinSampleColumn>
 
 <SkinSampleColumn name={"Listbox"}>
-    <SkinListboxSample />
+    <div class={styles.skinBarStack}>
+        <SkinBarCell state={"With floater"}>
+            <SkinListboxSample isGliding={true} />
+        </SkinBarCell>
+
+        <SkinBarCell state={"Without floater"}>
+            <SkinListboxSample />
+        </SkinBarCell>
+    </div>
 </SkinSampleColumn>
 
 <SkinSampleColumn name={"Button"}>
@@ -173,6 +183,10 @@
 <SkinSampleColumn name={"Accordion"}>
     <div class={styles.skinWideSample}>
         <Accordion items={SKIN_SAMPLE_SECTIONS} gap={DOCS_GAP} bind:expanded>
+            {#snippet renderSection(renderContent, _, flags)}
+                <PageAccordionWrapper {flags}>{@render renderContent()}</PageAccordionWrapper>
+            {/snippet}
+
             {#snippet renderHeader(item, flags)}
                 <PageAccordionHeader {flags}>{item.value}</PageAccordionHeader>
             {/snippet}

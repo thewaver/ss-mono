@@ -27,7 +27,7 @@
     {/snippet}
 
     {#snippet renderOption(option, flags)}
-        <PageSelectOptionContent isGliding {flags}>
+        <PageSelectOptionContent hasHoverFloater {flags}>
             {option.value.city} ({option.value.code})
         </PageSelectOptionContent>
     {/snippet}

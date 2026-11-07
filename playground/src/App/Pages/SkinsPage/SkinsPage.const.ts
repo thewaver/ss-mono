@@ -1,8 +1,10 @@
+import type { InteractionFlags, SelectOptionFlags } from "@thewaver/ss-components";
+
 import type { PlaygroundSkin } from "../../PageComponents/NavSettings/NavSettings.types";
 
 export const SKIN_ROW_GAP = 20;
 
-export const SKIN_COLUMN_MIN_WIDTH = 280;
+export const SKIN_COLUMN_MIN_WIDTH = 320;
 
 export const SKIN_SAMPLE_TABS = [{ value: "Selected" }, { value: "Plain" }, { value: "Disabled", isDisabled: true }];
 
@@ -13,6 +15,14 @@ export const SKIN_SAMPLE_TAB_PANEL = "The panel of the selected tab.";
 export const SKIN_SAMPLE_OPTIONS = [{ value: "Selected" }, { value: "Plain" }, { value: "Disabled", isDisabled: true }];
 
 export const SKIN_SAMPLE_SELECTED_OPTION = "Selected";
+
+export const SKIN_SAMPLE_HOVERED_OPTION = "Hovered";
+
+export const SKIN_SAMPLE_HOVERED_FLAGS: InteractionFlags<SelectOptionFlags> = {
+    isHovered: true,
+    isHighlighted: false,
+    isSelected: false,
+};
 
 export const SKIN_SAMPLE_SECTIONS = [{ value: "Open" }, { value: "Closed" }, { value: "Disabled", isDisabled: true }];
 

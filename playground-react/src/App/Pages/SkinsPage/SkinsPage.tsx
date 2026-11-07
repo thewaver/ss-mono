@@ -28,6 +28,8 @@ import { RADIO_GROUP_GAP } from "@thewaver/ss-playground/App/Pages/RadioPage/Rad
 import {
     SKIN_ROW_GAP,
     SKIN_SAMPLE_EXPANDED_SECTIONS,
+    SKIN_SAMPLE_HOVERED_FLAGS,
+    SKIN_SAMPLE_HOVERED_OPTION,
     SKIN_SAMPLE_OPTIONS,
     SKIN_SAMPLE_PROGRESS,
     SKIN_SAMPLE_RANGE,
@@ -56,11 +58,19 @@ import person from "@thewaver/ss-playground/App/person.svg";
 import { PageLayer } from "../../PageComponents/Layer/Layer";
 import { revealSkin, useAppliedSkin } from "../../PageComponents/Skin/SkinReact.const";
 import { PageTabPanel } from "../../PageComponents/TabPanel/TabPanel";
-import { PageAccordionHeader, PageAccordionPanel } from "../../StyledComponents/AccordionContent/AccordionContent";
+import {
+    PageAccordionHeader,
+    PageAccordionPanel,
+    PageAccordionWrapper,
+} from "../../StyledComponents/AccordionContent/AccordionContent";
 import { PageButtonContent } from "../../StyledComponents/ButtonContent/ButtonContent";
 import { PageCheckboxContent } from "../../StyledComponents/CheckboxContent/CheckboxContent";
 import { PageControlButtonContent } from "../../StyledComponents/ControlButtonContent/ControlButtonContent";
-import { renderPageHighlightFloater } from "../../StyledComponents/GlideFloater/GlideFloater";
+import {
+    PageGlideFloater,
+    renderPageHighlightFloater,
+    renderPageSelectionFloater,
+} from "../../StyledComponents/GlideFloater/GlideFloater";
 import { PageIcon } from "../../StyledComponents/Icon/Icon";
 import { PageListboxSurface } from "../../StyledComponents/ListboxSurface/ListboxSurface";
 import { PageProgressContent } from "../../StyledComponents/ProgressContent/ProgressContent";
@@ -79,6 +89,7 @@ import { PageTextFieldButtonContent } from "../../StyledComponents/TextFieldButt
 import { PageTextFieldContent } from "../../StyledComponents/TextFieldContent/TextFieldContent";
 import { PageToggleContent } from "../../StyledComponents/ToggleContent/ToggleContent";
 import type {
+    SkinHoveredOptionProps,
     SkinRowProps,
     SkinSampleColumnProps,
     SkinSamplesProps,
@@ -254,6 +265,24 @@ const SkinTagSample = (props: SkinStateProps) => {
     );
 };
 
+const SkinHoveredOption = (props: SkinHoveredOptionProps) => (
+    <div className={styles.skinHoveredOption}>
+        {props.isGliding ? (
+            <div className={styles.skinHoveredFloater}>
+                <PageGlideFloater kind={"highlight"} visibilityTarget={1} transitionDurationMs={0} />
+            </div>
+        ) : null}
+
+        <PageSelectOptionContent
+            hasHoverFloater={props.isGliding}
+            hasSelectionFloater={props.isGliding}
+            flags={SKIN_SAMPLE_HOVERED_FLAGS}
+        >
+            {SKIN_SAMPLE_HOVERED_OPTION}
+        </PageSelectOptionContent>
+    </div>
+);
+
 const SkinListboxSample = () => {
     const valueState = useState<string | undefined>(SKIN_SAMPLE_SELECTED_OPTION);
 
@@ -263,13 +292,35 @@ const SkinListboxSample = () => {
                 value={valueState}
                 options={SKIN_SAMPLE_OPTIONS}
                 ariaLabel={"Listbox"}
+                renderSelectionFloater={renderPageSelectionFloater}
                 renderHighlightFloater={renderPageHighlightFloater}
                 renderOption={(option, flags) => (
-                    <PageSelectOptionContent isGliding flags={flags}>
+                    <PageSelectOptionContent hasHoverFloater hasSelectionFloater flags={flags}>
                         {option.value}
                     </PageSelectOptionContent>
                 )}
             />
+
+            <SkinHoveredOption isGliding />
+        </PageListboxSurface>
+    );
+};
+
+const SkinListboxWithoutFloaterSample = () => {
+    const valueState = useState<string | undefined>(SKIN_SAMPLE_SELECTED_OPTION);
+
+    return (
+        <PageListboxSurface>
+            <Listbox
+                value={valueState}
+                options={SKIN_SAMPLE_OPTIONS}
+                ariaLabel={"Listbox without floater"}
+                renderOption={(option, flags) => (
+                    <PageSelectOptionContent flags={flags}>{option.value}</PageSelectOptionContent>
+                )}
+            />
+
+            <SkinHoveredOption />
         </PageListboxSurface>
     );
 };
@@ -356,7 +407,15 @@ const SkinSamples = (props: SkinSamplesProps) => {
             </SkinSampleColumn>
 
             <SkinSampleColumn name={"Listbox"}>
-                <SkinListboxSample />
+                <SkinBarStack>
+                    <SkinBarCell state={"With floater"}>
+                        <SkinListboxSample />
+                    </SkinBarCell>
+
+                    <SkinBarCell state={"Without floater"}>
+                        <SkinListboxWithoutFloaterSample />
+                    </SkinBarCell>
+                </SkinBarStack>
             </SkinSampleColumn>
 
             <SkinSampleColumn name={"Button"}>
@@ -436,6 +495,9 @@ const SkinSamples = (props: SkinSamplesProps) => {
                         items={SKIN_SAMPLE_SECTIONS}
                         gap={DOCS_GAP}
                         expanded={expandedState}
+                        renderSection={(renderContent, _, flags) => (
+                            <PageAccordionWrapper flags={flags}>{renderContent()}</PageAccordionWrapper>
+                        )}
                         renderHeader={(item, flags) => (
                             <PageAccordionHeader flags={flags}>{item.value}</PageAccordionHeader>
                         )}

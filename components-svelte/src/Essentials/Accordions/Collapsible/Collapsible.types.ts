@@ -1,7 +1,12 @@
 import type { Snippet } from "svelte";
 import type { AriaAttributes, AriaRole } from "svelte/elements";
 
-import type { BaseCollapsibleProps, CollapsibleFlags, InteractionFlags } from "@thewaver/ss-components";
+import type {
+    BaseCollapsibleProps,
+    CollapsibleFlags,
+    CollapsibleSectionFlags,
+    InteractionFlags,
+} from "@thewaver/ss-components";
 
 import type {
     InteractionControlProps,
@@ -9,6 +14,8 @@ import type {
 } from "../../../Primitives/InteractionWrapper/InteractionWrapper.types.js";
 
 export type CollapsiblePanelRenderer = Snippet<[visibilityTarget: 0 | 1, transitionDurationMs: number]>;
+
+export type CollapsibleSectionRenderer = Snippet<[renderContent: Snippet, flags: CollapsibleSectionFlags]>;
 
 export type CollapsibleTriggerProps = Omit<InteractionControlProps<CollapsibleFlags>, "renderContent"> & {
     /** Identifies the panel the trigger opens, so the trigger can point at it. */
@@ -46,4 +53,10 @@ export type CollapsibleProps = Omit<
         renderTrigger: Snippet<[flags: InteractionFlags<CollapsibleFlags>]>;
         /** Draws the panel body. */
         renderPanel: CollapsiblePanelRenderer;
+        /**
+         * Draws a box around the trigger and the panel together, for a border, shadow or background that has to hold
+         * both. Render `renderContent` inside it, or the collapsible draws nothing; where the panel sits beside the
+         * trigger stays the collapsible's own layout. Left out, the pair is drawn with no box around it.
+         */
+        renderSection?: CollapsibleSectionRenderer;
     };

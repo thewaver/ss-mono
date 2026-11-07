@@ -19,6 +19,10 @@ export type SkinSampleColumnProps = {
     name: string;
 };
 
+export type SkinHoveredOptionProps = {
+    isGliding?: boolean;
+};
+
 export type SkinStateProps = {
     state: string;
     isPressed?: boolean;

@@ -5,6 +5,7 @@ import * as styles from "@thewaver/ss-playground/App/Pages/Accordions/Accordions
 import {
     PageAccordionHeader,
     PageAccordionPanel,
+    PageAccordionWrapper,
 } from "../../../../StyledComponents/AccordionContent/AccordionContent";
 import type { AccordionBasicDocsExampleProps } from "../AccordionPageReact.types";
 
@@ -32,6 +33,9 @@ export const BasicDocsExample = (props: Props) => (
             isExpandRequired={props.isExpandRequired}
             gap={props.gap}
             transitionDurationMs={props.transitionDurationMs}
+            renderSection={(renderContent, _, flags) => (
+                <PageAccordionWrapper flags={flags}>{renderContent()}</PageAccordionWrapper>
+            )}
             renderHeader={(item, flags) => <PageAccordionHeader flags={flags}>{item.value}</PageAccordionHeader>}
             renderPanel={(item, visibilityTarget, transitionDurationMs) => (
                 <PageAccordionPanel visibilityTarget={visibilityTarget} transitionDurationMs={transitionDurationMs}>

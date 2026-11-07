@@ -9,6 +9,7 @@ import * as accordionStyles from "@thewaver/ss-playground/App/Pages/Accordions/A
 import {
     PageAccordionHeader,
     PageAccordionPanel,
+    PageAccordionWrapper,
 } from "../../../../StyledComponents/AccordionContent/AccordionContent";
 
 const SECTION_BODIES: Record<string, string[]> = {
@@ -50,6 +51,9 @@ export const DeferredDocsExample = () => {
                     items={ITEMS}
                     gap={DOCS_GAP}
                     isPanelBuiltOnExpand={true}
+                    renderSection={(renderContent, _, flags) => (
+                        <PageAccordionWrapper flags={flags}>{renderContent()}</PageAccordionWrapper>
+                    )}
                     renderHeader={(item, flags) => (
                         <PageAccordionHeader flags={flags}>{item.value}</PageAccordionHeader>
                     )}

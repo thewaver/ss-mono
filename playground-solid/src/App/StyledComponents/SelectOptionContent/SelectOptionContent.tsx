@@ -12,11 +12,12 @@ export const PageSelectOptionContent = (props: ParentProps<SelectOptionContentPr
 
     return (
         <div
-            class={access(props.isGliding) ? styles.selectOptionContent : styles.selectOptionContentWithoutFloater}
+            class={styles.selectOptionContent}
             classList={{
                 [getLayerClass()]: true,
-                [styles.isHovered]:
-                    !access(props.isGliding) && (access(props.flags).isHovered || access(props.flags).isHighlighted),
+                [styles.hasHoverFloater]: access(props.hasHoverFloater) ?? false,
+                [styles.hasSelectionFloater]: access(props.hasSelectionFloater) ?? false,
+                [styles.isHovered]: access(props.flags).isHovered || access(props.flags).isHighlighted,
                 [styles.isSelected]: access(props.flags).isSelected,
                 [styles.isDisabled]: access(props.flags).isDisabled,
             }}

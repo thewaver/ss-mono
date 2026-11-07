@@ -2,6 +2,7 @@
     import {
         COLLAPSIBLE_DEFAULTS,
         type CollapsibleFlags,
+        type CollapsibleSectionFlags,
         CollapsibleUtils,
         CollapsibleStyles as styles,
     } from "@thewaver/ss-components";
@@ -78,6 +79,11 @@
 
     const extraFlags: CollapsibleFlags = $derived({ isExpanded: expanded });
 
+    const sectionFlags: CollapsibleSectionFlags = $derived({
+        isExpanded: expanded,
+        isDisabled: props.isDisabled ?? false,
+    });
+
     const panelExtent = $derived(
         CollapsibleUtils.computePanelExtent(fader.getTransitionTarget(), getContentSize(), side),
     );
@@ -109,30 +115,39 @@
     </InteractionWrapper>
 {/snippet}
 
-<div
-    bind:this={root}
-    class={[styles.collapsibleRoot, styles.collapsibleSizingVariants[sizing], styles.collapsibleSideVariants[side]]}
->
-    {#if headingTag}
-        <svelte:element this={headingTag} class={styles.collapsibleHeading}>
+{#snippet renderContent()}
+    <div class={[styles.collapsibleContent, styles.collapsibleSideVariants[side]]}>
+        {#if headingTag}
+            <svelte:element this={headingTag} class={styles.collapsibleHeading}>
+                {@render wrapper()}
+            </svelte:element>
+        {:else}
             {@render wrapper()}
-        </svelte:element>
-    {:else}
-        {@render wrapper()}
-    {/if}
+        {/if}
 
-    <div
-        id={panelId}
-        class={styles.collapsiblePanel}
-        style={panelStyle}
-        role={props.panelRole}
-        {...props.panelAriaAttributes}
-        inert={!expanded}
-    >
-        <div bind:this={content} class={isSideways ? styles.collapsibleSidewaysContent : undefined}>
-            {#if hasPanelContent}
-                {@render props.renderPanel(fader.getTransitionTarget(), transitionDurationMs)}
-            {/if}
+        <div
+            id={panelId}
+            class={styles.collapsiblePanel}
+            style={panelStyle}
+            role={props.panelRole}
+            {...props.panelAriaAttributes}
+            inert={!expanded}
+        >
+            <div bind:this={content} class={isSideways ? styles.collapsibleSidewaysContent : undefined}>
+                {#if hasPanelContent}
+                    {@render props.renderPanel(fader.getTransitionTarget(), transitionDurationMs)}
+                {/if}
+            </div>
         </div>
     </div>
+{/snippet}
+
+<div bind:this={root} class={[styles.collapsibleRoot, styles.collapsibleSizingVariants[sizing]]}>
+    {#if props.renderSection}
+        {@render props.renderSection(renderContent, sectionFlags)}
+    {:else}
+        <div class={styles.collapsibleSection}>
+            {@render renderContent()}
+        </div>
+    {/if}
 </div>

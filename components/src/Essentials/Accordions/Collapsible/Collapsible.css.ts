@@ -16,6 +16,17 @@ export const collapsibleSizingVariants = styleVariants({
 });
 
 export const collapsibleRoot = style({
+    display: "grid",
+    gridTemplateColumns: "minmax(0, 1fr)",
+    borderRadius: "inherit",
+});
+
+export const collapsibleSection = style({
+    display: "contents",
+    borderRadius: "inherit",
+});
+
+export const collapsibleContent = style({
     display: "flex",
     borderRadius: "inherit",
 });
@@ -63,7 +74,7 @@ export const collapsiblePanel = style({
 });
 
 globalStyle(
-    `${collapsibleRoot} > ${interactionRoot}, ${collapsibleHeading} > ${interactionRoot}, ${collapsiblePanel} > *`,
+    `${collapsibleContent} > ${interactionRoot}, ${collapsibleHeading} > ${interactionRoot}, ${collapsiblePanel} > *`,
     {
         borderRadius: "inherit",
     },

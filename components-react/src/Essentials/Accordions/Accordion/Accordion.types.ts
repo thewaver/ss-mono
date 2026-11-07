@@ -5,6 +5,7 @@ import type {
     AccordionMoveDirection,
     BaseAccordionProps,
     CollapsibleFlags,
+    CollapsibleSectionFlags,
     CollapsibleSide,
     InteractionFlags,
 } from "@thewaver/ss-components";
@@ -19,6 +20,12 @@ export type AccordionPanelRenderer<T> = (
     visibilityTarget: 0 | 1,
     transitionDurationMs: number,
     moveDirection: AccordionMoveDirection | undefined,
+) => ReactNode;
+
+export type AccordionSectionRenderer<T> = (
+    renderContent: () => ReactNode,
+    item: AccordionItem<T>,
+    flags: CollapsibleSectionFlags,
 ) => ReactNode;
 
 export type AccordionSectionProps<T> = {
@@ -44,6 +51,8 @@ export type AccordionSectionProps<T> = {
     renderHeader: AccordionHeaderRenderer<T>;
     /** Draws this section's panel. */
     renderPanel: AccordionPanelRenderer<T>;
+    /** Draws the box around this section's header and panel together. */
+    renderSection?: AccordionSectionRenderer<T>;
     /** Which way the open section last moved, handed on to the panel. */
     moveDirection: AccordionMoveDirection | undefined;
 };
@@ -64,4 +73,10 @@ export type AccordionProps<T> = BaseAccordionProps<T> & {
      * from. The motion is the consumer's.
      */
     renderPanel: AccordionPanelRenderer<T>;
+    /**
+     * Draws a box around a section's header and panel together, for a border, shadow or background that has to hold
+     * both. Call `renderContent` inside it, or the section draws nothing; where the panel sits beside the header stays
+     * the accordion's own layout. Left out, each pair is drawn with no box around it.
+     */
+    renderSection?: AccordionSectionRenderer<T>;
 };

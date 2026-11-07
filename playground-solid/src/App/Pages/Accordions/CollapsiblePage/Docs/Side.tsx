@@ -4,6 +4,7 @@ import * as styles from "@thewaver/ss-playground/App/Pages/Accordions/Accordions
 import {
     PageAccordionHeader,
     PageAccordionPanel,
+    PageAccordionWrapper,
 } from "../../../../StyledComponents/AccordionContent/AccordionContent";
 import type { CollapsibleSideDocsExampleProps } from "../CollapsiblePageSolid.types";
 
@@ -16,6 +17,9 @@ export const SideDocsExample = (props: Props) => (
         <Collapsible
             side={props.side}
             sizing={"fit-content"}
+            renderSection={(renderContent, getFlags) => (
+                <PageAccordionWrapper flags={getFlags}>{renderContent()}</PageAccordionWrapper>
+            )}
             renderTrigger={(getFlags) => (
                 <PageAccordionHeader flags={getFlags} side={props.side}>
                     {getFlags().isExpanded ? "Less" : "More"}

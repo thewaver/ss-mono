@@ -42,7 +42,7 @@ const setValue = (value: T | undefined) => {
         </template>
 
         <template #renderOption="{ option, flags }">
-            <PageSelectOptionContent is-gliding :flags="flags">{{
+            <PageSelectOptionContent has-hover-floater :flags="flags">{{
                 computeLabel?.(option.value) ?? String(option.value)
             }}</PageSelectOptionContent>
         </template>

@@ -238,12 +238,13 @@ planned for.
   field (select clear, picker triggers, era and AM/PM toggles, stepper arrows, adornments, the sidebar toggle),
   and it reacts to plain `isHovered`: every painter that hands it hover is a button's, and the static adornment
   never passes hover on (_"The in-field adornment painter"_). `tag` is a tag input's chip; the other chips and badges keep
-  their own paint, the user's call. The tabs have `tabsItem`, `tabsGutter` and `tabsFloater` — `tabsGutter` after
-  the library's `renderGutter`, the line the user called the track. The gutter and the floater keep the boxes the
+  their own paint, the user's call. The tabs have `tabsItem`, `tabsTrack` and `tabsFloater` — `tabsTrack` paints
+  the library's `renderGutter`, named track by the user to match the other entries' track-thumb-fill parts. The
+  track and the floater keep the boxes the
   library gives them, the whole list and the selected tab, and the Skin paints the marker's shape, an underline
   being a bottom border — the user's pick over a painter-drawn 2px line, so a Skin can draw a pill instead. A
   vertical list carries `isVertical` on all three. Every other Skin starts on Plasticine's tab paint, the user's
-  call while they are temporary. The honeycomb tabs are a custom variant and keep their own paint. The binary switches' insides — `checkboxMark`, `radioDot`, `toggleHandle` —
+  call while they are temporary. The honeycomb tabs are a custom variant and keep their own paint. The binary switches' insides — `checkboxMark`, `radioDot`, `toggleThumb` —
   and the standard bars — `progressTrack` and `progressFill`, `rangeTrack`, `rangeFill` and `rangeThumb`,
   `scrollerTrack` and `scrollerThumb` (painted on `::before`), and the slide button's `slideButtonTrack`,
   `slideButtonFill` and `slideButtonThumb` — have entries, the slide button's added at the user's request with its
@@ -278,11 +279,19 @@ planned for.
   custom tab layout or progress wants full control of the element — a painter of their own, not a
   set of classes to restyle. A radius computed from a painter's own size (a track's thickness) also stays in the
   painter.
-- **Hover in a list is the floater's, everywhere a list can have one** — the user's rule. An item comes in two
-  entries: `itemWithFloater` paints no hover at all, `itemWithoutFloater` paints its own and is for lists whose
-  component offers no floater slot (`Toolbar`'s overflow, `Menubar`, `TextInput`'s suggestions). A painter picks
-  by its `isGliding` prop; without a floater, hover covers pointer hover, the keyboard highlight and an open
-  submenu, so a keyboard walk stays visible.
+- **Hover in a list is the floater's, everywhere a list can have one** — the user's rule. Hover and selection are
+  two separate choices, since most lists glide a hover floater but paint their own selected state (the nav, `Tree`,
+  `Select`, `Menu`), and only the `Listbox` examples have a selection floater too. So an item is three entries,
+  the user's design: `itemBase` paints the item and its own hover and selected states, and
+  `itemWithHoverFloater` / `itemWithSelectionFloater` override only what clashes with that floater. A painter
+  always paints `itemBase`, adds each `itemWith…` its `hasHoverFloater` / `hasSelectionFloater` props ask for, and
+  sets its state classes truthfully either way; hover covers pointer hover, the keyboard highlight and an open
+  submenu, so a keyboard walk stays visible. **The overrides win by specificity, never by order**:
+  `SkinUtils.define` writes them against `.itemBase.itemWith…`, one class more than anything in `itemBase`. A hover
+  override that cancels a property the selected state also sets uses `skinSelectors.isHoveredUnselected`, or
+  hovering a selected item would wipe its selected paint. **The two `itemWith…` entries are on their way out**, the
+  user's call: the painters also set the states `hasHoverFloater` and `hasSelectionFloater` (`skinSelectors`), so a
+  Skin writes those overrides inside `itemBase`, and the user is moving the Skins over by hand.
 - **Where a painter disagreed with its entry, the entry won** — the user's call. Padding, radius and font join
   an entry only when every painter using it agrees, and are expected to converge later; until then they stay in
   the painters. **Radius is the one a Skin most needs**, since a Skin decides shape and an unlayered radius in a
@@ -4047,8 +4056,11 @@ components, and keep the extra space that sets them apart, and moving them in wo
 `FloaterSolidUtils` with `renderPageHighlightFloater` and the tree's `TREE_DEFAULTS.floaterTransitionDurationMs`,
 following the hovered or keyboard-focused link. The track does not glide across into the tree; the two are
 separate on purpose. Their font matches the tree's top level and their color does not, also the user's call. A
-link drawn inside the group switches off its own `:hover` background through `isGliding`, so links outside one
-keep theirs.
+link drawn inside the group switches off its own `:hover` background through `hasHoverFloater`, so links outside
+one keep theirs. **The group tells each link whether it is the one the floater is on**, through a context, and the
+link sets the Skin's hovered state from it, as a tree row does: without it the Skin's `itemWithHoverFloater` overrides
+never reached these links, and a selected one kept its selected paint over the floater while a selected tree row gave
+it up.
 
 ### The floater appears and disappears through `ElementFader`, like every other library element that comes and goes
 
@@ -8743,9 +8755,11 @@ had to ask a removed option for its index, which reads a row that filtering has 
 **In the Playground, a floater replaces every background that marks hover or selection.** The user's rule: any
 control that takes a floater and whose painter changes a box's background to show the hovered, highlighted or
 selected item shows it with a floater instead — `Select`, `MultiSelect`, `Listbox`, `Menu`, `ContextMenu`, `Tree`
-(the left nav included), the honeycomb `Tabs` and `FanMenu`. The painters shared with controls that take no floater
-— the text field's suggestions, the menubar, the toolbar's overflow menu — keep their backgrounds, so the switch is a
-prop on the painter, `isGliding`, rather than a deletion from its styles. Painters that mark state by color, a
+(the left nav included), the honeycomb `Tabs` and `FanMenu`. That holds per floater: a list that draws only a
+hover floater still paints its own selected state, through the Skin's `itemBase`. The painters shared with controls that take no floater
+— the text field's suggestions, the menubar, the toolbar's overflow menu — keep their backgrounds, so the switch is
+on the painter, one prop per floater (`hasHoverFloater`, `hasSelectionFloater`), rather than a deletion from its
+styles. Painters that mark state by color, a
 filter or an underline are untouched, and so are the wheel's wedges, which fill a path rather than a box.
 `renderPageHighlightFloater` and `renderPageSelectionFloater` are the one-line way a usage takes the floater in Solid and
 React; Svelte keeps them as snippets in `GlideFloater.const.svelte`, since a component file cannot export snippets
@@ -10075,6 +10089,17 @@ or a clip. Both are runs in `CornerRunUtils`' sense: an `Accordion` hands the bo
 section and the trailing ones to its last, none to a section between; a `Collapsible` squares the corners where
 its trigger meets its panel while it is open, on its own button and panel, so the consumer never writes the
 seam. While a panel animates shut the trigger is already rounded, since `aria-expanded` flips first.
+
+**A box around the trigger and panel together is a third painter, `renderSection`** — the user's design, on both
+`Collapsible` and `Accordion` (which hands it the item too). It is for decoration — a border, shadow or background
+holding the pair — and never for layout, so it follows `renderGroupBox`'s shape: handed `renderContent` and the
+section's flags (`CollapsibleSectionFlags`: open, disabled), it wraps a library element that keeps the side
+layout. The structure is the root (sizing, a one-cell grid so whatever sits in it fills it, its column
+`minmax(0, 1fr)` so content that cannot wrap, such as code, does not widen it past its container) → the consumer's box,
+or with no `renderSection` a `display: contents` element the user asked for so nothing is dropped → the library's
+content element (the flex row or column for `side`) → heading and panel. A box that does not inherit
+`border-radius` breaks the corner chain below it, as `renderGroupBox` does; the Playground's
+`PageAccordionWrapper` inherits only inside a hollow surface, matching its header and panel painters.
 
 ### Which components pass corners down, and where each run is
 

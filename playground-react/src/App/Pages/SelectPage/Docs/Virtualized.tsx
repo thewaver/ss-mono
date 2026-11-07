@@ -31,7 +31,7 @@ export const VirtualizedDocsExample = (props: Props) => {
                 <PageSelectContent flags={flags}>{selectedOption?.value.name ?? PLACEHOLDER}</PageSelectContent>
             )}
             renderOption={(option, flags) => (
-                <PageSelectOptionContent isGliding flags={flags} description={option.value.description}>
+                <PageSelectOptionContent hasHoverFloater flags={flags} description={option.value.description}>
                     {option.value.name}
                 </PageSelectOptionContent>
             )}

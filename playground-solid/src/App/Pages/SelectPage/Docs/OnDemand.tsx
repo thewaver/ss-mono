@@ -44,7 +44,7 @@ export const OnDemandDocsExample = () => {
                 )}
                 renderOption={(getOption, getFlags) => (
                     <PageSelectOptionContent
-                        isGliding
+                        hasHoverFloater
                         flags={getFlags}
                         description={() => getOption().value.description}
                     >

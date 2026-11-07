@@ -17,6 +17,10 @@ export type SkinSampleColumnProps = {
     children?: Snippet;
 };
 
+export type SkinListboxSampleProps = {
+    isGliding?: boolean;
+};
+
 export type SkinStateProps = {
     state: string;
     isPressed?: boolean;

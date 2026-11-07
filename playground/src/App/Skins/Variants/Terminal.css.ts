@@ -7,7 +7,11 @@ import { layerVars } from "../../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../../Theme.css";
 import { skinSelectors, skinVars } from "../Skin.css";
 
-export const terminal = style({ vars: { [skinVars.rangeTrackThickness]: "16px" } });
+export const terminal = style({
+    vars: {
+        [skinVars.rangeTrackThickness]: "20px",
+    },
+});
 
 const SEGMENT_WIDTH = 8;
 const SEGMENT_GAP = 2;
@@ -83,6 +87,15 @@ const ITEM: StyleRule = {
     },
 } as const;
 
+const ITEM_FLOATER_HOVER: StyleRule = {
+    backgroundColor: [layerVars.contrast, `rgb(from ${layerVars.contrast} r g b / 10%)`],
+};
+
+const ITEM_FLOATER_SELECTED: StyleRule = {
+    backgroundColor: [themeVars.color.primary.main, `rgb(from ${themeVars.color.primary.main} r g b / 10%)`],
+    color: themeVars.color.primary.main,
+};
+
 const SURFACE: StyleRule = {
     border: [
         `2px solid ${themeVars.color.surface.contrast}`,
@@ -102,6 +115,7 @@ SkinUtils.define(terminal, {
             [skinSelectors.isExpanded]: {
                 border: `2px solid ${themeVars.color.primary.main}`,
                 color: themeVars.color.primary.main,
+                fontWeight: "bold",
             },
         },
     },
@@ -111,6 +125,7 @@ SkinUtils.define(terminal, {
             ...SkinUtils.joinedCorners(),
         },
     },
+    accordionWrapper: {},
     button: {
         paddingInline: themeVars.spacing.double,
         border: `2px solid ${layerVars.contrast}`,
@@ -182,9 +197,6 @@ SkinUtils.define(terminal, {
         ...INPUT_SHELL,
     },
     hollowSurface: SkinUtils.hollow(SURFACE),
-    hoverFloater: {
-        backgroundColor: [layerVars.contrast, `rgb(from ${layerVars.contrast} r g b / 10%)`],
-    },
     input: {
         ...INPUT_SHELL,
         selectors: {
@@ -199,16 +211,24 @@ SkinUtils.define(terminal, {
             },
         },
     },
-    itemWithFloater: {
-        ...ITEM,
-    },
-    itemWithoutFloater: ObjectUtils.deepMerge(ITEM, {
+    itemBase: ObjectUtils.deepMerge(ITEM, {
         selectors: {
-            [skinSelectors.isHovered]: {
-                backgroundColor: `rgb(from ${layerVars.contrast} r g b / 10%)`,
+            [skinSelectors.isHoveredWithoutFloater]: {
+                ...ITEM_FLOATER_HOVER,
+            },
+            [skinSelectors.isSelectedWithoutFloater]: {
+                ...ITEM_FLOATER_SELECTED,
             },
         },
     }),
+    itemHoverFloater: {
+        ...ITEM_FLOATER_HOVER,
+    },
+    itemSelectionFloater: {
+        ...ITEM_FLOATER_SELECTED,
+    },
+    itemWithHoverFloater: {},
+    itemWithSelectionFloater: {},
     overlay: {
         backdropFilter: "blur(10px) grayscale(75%)",
     },
@@ -292,9 +312,6 @@ SkinUtils.define(terminal, {
             },
         },
     },
-    selectionFloater: {
-        backgroundColor: [themeVars.color.primary.main, `rgb(from ${themeVars.color.primary.main} r g b / 10%)`],
-    },
     slideButtonFill: {
         backgroundColor: themeVars.color.primary.main,
         selectors: {
@@ -323,9 +340,6 @@ SkinUtils.define(terminal, {
     tabsFloater: {
         border: `2px solid ${themeVars.color.primary.main}`,
     },
-    tabsGutter: {
-        border: [`2px solid ${layerVars.contrast}`, `2px solid rgb(from ${layerVars.contrast} r g b / 25%)`],
-    },
     tabsItem: {
         paddingBlock: themeVars.spacing.full,
         paddingInline: themeVars.spacing.double,
@@ -345,6 +359,9 @@ SkinUtils.define(terminal, {
             ...INTERACTIBLE_STATES,
         },
     },
+    tabsTrack: {
+        border: [`2px solid ${layerVars.contrast}`, `2px solid rgb(from ${layerVars.contrast} r g b / 25%)`],
+    },
     tag: {
         paddingInline: themeVars.spacing.full,
         backgroundColor: [layerVars.contrast, `rgb(from ${layerVars.contrast} r g b / 25%)`],
@@ -355,7 +372,7 @@ SkinUtils.define(terminal, {
             ...INTERACTIBLE_STATES,
         },
     },
-    toggleHandle: {
+    toggleThumb: {
         backgroundColor: [layerVars.contrast, `rgb(from ${layerVars.contrast} r g b / 75%)`],
         selectors: {
             [SkinUtils.anyOf(skinSelectors.isCheckedWithin, skinSelectors.isMixedWithin)]: {
