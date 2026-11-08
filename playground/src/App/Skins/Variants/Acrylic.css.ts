@@ -250,7 +250,7 @@ SkinUtils.define(acrylic, {
     },
     pageBackground: {
         backgroundColor: themeVars.color.background.light,
-        backgroundImage: `linear-gradient(315deg, hsl(from ${themeVars.color.background.dark} h 100 l / 10%), transparent, hsl(from ${themeVars.color.primary.light} h 100 l / 10%))`,
+        backgroundImage: `linear-gradient(135deg, hsl(from ${themeVars.color.primary.light} h 100 l / 10%), transparent, hsl(from ${themeVars.color.primary.light} h 100 l / 10%))`,
         color: themeVars.color.background.contrast,
     },
     panel: {

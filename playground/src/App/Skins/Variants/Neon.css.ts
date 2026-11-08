@@ -15,14 +15,14 @@ export const neon = style({
 
 const darkGlow = (alphaPercent: number) =>
     [
-        `inset 0 0 1px 1px rgb(from black r g b / ${alphaPercent * 0.9}%)`,
-        `inset 0 0 8px 2px rgb(from black r g b  / ${alphaPercent * 0.75}%)`,
-        `inset 0 0 32px 4px rgb(from black r g b  / ${alphaPercent * 0.6}%)`,
-        `inset 0 0 64px 8px rgb(from black r g b  / ${alphaPercent * 0.45}%)`,
-        `0 0 1px 1px rgb(from black r g b  / ${alphaPercent * 0.9}%)`,
-        `0 0 8px 2px rgb(from black r g b  / ${alphaPercent * 0.75}%)`,
-        `0 0 32px 4px rgb(from black r g b  / ${alphaPercent * 0.6}%)`,
-        `0 0 64px 8px rgb(from black r g b  / ${alphaPercent * 0.45}%)`,
+        `inset 0 0 1px 1px rgb(from black r g b / ${alphaPercent * 0.8}%)`,
+        `inset 0 0 8px 2px rgb(from black r g b  / ${alphaPercent * 0.65}%)`,
+        `inset 0 0 32px 4px rgb(from black r g b  / ${alphaPercent * 0.5}%)`,
+        `inset 0 0 64px 8px rgb(from black r g b  / ${alphaPercent * 0.35}%)`,
+        `0 0 1px 1px rgb(from black r g b  / ${alphaPercent * 0.8}%)`,
+        `0 0 8px 2px rgb(from black r g b  / ${alphaPercent * 0.65}%)`,
+        `0 0 32px 4px rgb(from black r g b  / ${alphaPercent * 0.5}%)`,
+        `0 0 64px 8px rgb(from black r g b  / ${alphaPercent * 0.35}%)`,
     ].join(", ");
 
 const lightGlow = (color: string, alphaPercent: number) =>
@@ -249,7 +249,7 @@ SkinUtils.define(neon, {
     },
     pageBackground: {
         backgroundColor: themeVars.color.background.light,
-        backgroundImage: `linear-gradient(315deg, hsl(from ${themeVars.color.background.dark} h 100 l / 10%), transparent, hsl(from ${themeVars.color.primary.light} h 100 l / 10%))`,
+        backgroundImage: `linear-gradient(135deg, hsl(from ${themeVars.color.primary.light} h 100 l / 10%), transparent, hsl(from ${themeVars.color.primary.light} h 100 l / 10%))`,
         color: themeVars.color.background.contrast,
         fontFamily: "monospace",
     },
