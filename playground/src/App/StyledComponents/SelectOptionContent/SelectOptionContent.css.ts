@@ -6,8 +6,8 @@ import { themeVars } from "../../Theme.css";
 export const isHovered = style([skinStates.isHovered]);
 export const isSelected = style([skinStates.isSelected]);
 export const isDisabled = style([skinStates.isDisabled]);
-export const hasHoverFloater = style([skinEntries.itemWithHoverFloater, skinStates.hasHoverFloater]);
-export const hasSelectionFloater = style([skinEntries.itemWithSelectionFloater, skinStates.hasSelectionFloater]);
+export const hasHoverFloater = style([skinStates.hasHoverFloater]);
+export const hasSelectionFloater = style([skinStates.hasSelectionFloater]);
 
 const selectOptionBase = style({
     display: "flex",

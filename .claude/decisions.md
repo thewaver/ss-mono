@@ -238,12 +238,13 @@ planned for.
   field (select clear, picker triggers, era and AM/PM toggles, stepper arrows, adornments, the sidebar toggle),
   and it reacts to plain `isHovered`: every painter that hands it hover is a button's, and the static adornment
   never passes hover on (_"The in-field adornment painter"_). `tag` is a tag input's chip; the other chips and badges keep
-  their own paint, the user's call. The tabs have `tabsItem`, `tabsTrack` and `tabsFloater` — `tabsTrack` paints
-  the library's `renderGutter`, named track by the user to match the other entries' track-thumb-fill parts. The
-  track and the floater keep the boxes the
-  library gives them, the whole list and the selected tab, and the Skin paints the marker's shape, an underline
-  being a bottom border — the user's pick over a painter-drawn 2px line, so a Skin can draw a pill instead. A
-  vertical list carries `isVertical` on all three. Every other Skin starts on Plasticine's tab paint, the user's
+  their own paint, the user's call. The tabs mirror the list item, the user's design: `tabsItemBase`,
+  `tabsItemHoverFloater` and `tabsItemSelectionFloater`, plus `tabsTrack`, which paints the library's
+  `renderGutter`, named track by the user to match the other entries' track-thumb-fill parts. Each Skin starts the
+  two tab floaters and the tab's without-floater states on its own `ITEM_FLOATER_HOVER` / `ITEM_FLOATER_SELECTED`,
+  as written by the user — where that constant is only a text color, the selection floater paints nothing, and the
+  user chose that over keeping the tab's own selected color. The track and the floaters keep the boxes the library
+  gives them, the whole list and the tab. A vertical list carries `isVertical` on all four. Every other Skin starts on Plasticine's tab paint, the user's
   call while they are temporary. The honeycomb tabs are a custom variant and keep their own paint. The binary switches' insides — `checkboxMark`, `radioDot`, `toggleThumb` —
   and the standard bars — `progressTrack` and `progressFill`, `rangeTrack`, `rangeFill` and `rangeThumb`,
   `scrollerTrack` and `scrollerThumb` (painted on `::before`), and the slide button's `slideButtonTrack`,
@@ -282,16 +283,11 @@ planned for.
 - **Hover in a list is the floater's, everywhere a list can have one** — the user's rule. Hover and selection are
   two separate choices, since most lists glide a hover floater but paint their own selected state (the nav, `Tree`,
   `Select`, `Menu`), and only the `Listbox` examples have a selection floater too. So an item is three entries,
-  the user's design: `itemBase` paints the item and its own hover and selected states, and
-  `itemWithHoverFloater` / `itemWithSelectionFloater` override only what clashes with that floater. A painter
-  always paints `itemBase`, adds each `itemWith…` its `hasHoverFloater` / `hasSelectionFloater` props ask for, and
-  sets its state classes truthfully either way; hover covers pointer hover, the keyboard highlight and an open
-  submenu, so a keyboard walk stays visible. **The overrides win by specificity, never by order**:
-  `SkinUtils.define` writes them against `.itemBase.itemWith…`, one class more than anything in `itemBase`. A hover
-  override that cancels a property the selected state also sets uses `skinSelectors.isHoveredUnselected`, or
-  hovering a selected item would wipe its selected paint. **The two `itemWith…` entries are on their way out**, the
-  user's call: the painters also set the states `hasHoverFloater` and `hasSelectionFloater` (`skinSelectors`), so a
-  Skin writes those overrides inside `itemBase`, and the user is moving the Skins over by hand.
+  the user's design: `itemBase` paints the item, and `itemHoverFloater` / `itemSelectionFloater` paint the two
+  markers. A painter sets the states `hasHoverFloater` and `hasSelectionFloater` from its props, and `itemBase`
+  paints the hover and selected backgrounds only without them (`skinSelectors.isHoveredWithoutFloater`,
+  `isSelectedWithoutFloater`); hover covers pointer hover, the keyboard highlight and an open submenu, so a keyboard
+  walk stays visible. The tab entries follow the same shape.
 - **Where a painter disagreed with its entry, the entry won** — the user's call. Padding, radius and font join
   an entry only when every painter using it agrees, and are expected to converge later; until then they stay in
   the painters. **Radius is the one a Skin most needs**, since a Skin decides shape and an unlayered radius in a
@@ -4058,7 +4054,7 @@ following the hovered or keyboard-focused link. The track does not glide across 
 separate on purpose. Their font matches the tree's top level and their color does not, also the user's call. A
 link drawn inside the group switches off its own `:hover` background through `hasHoverFloater`, so links outside
 one keep theirs. **The group tells each link whether it is the one the floater is on**, through a context, and the
-link sets the Skin's hovered state from it, as a tree row does: without it the Skin's `itemWithHoverFloater` overrides
+link sets the Skin's hovered state from it, as a tree row does: without it the Skin's hover-with-floater rules
 never reached these links, and a selected one kept its selected paint over the floater while a selected tree row gave
 it up.
 

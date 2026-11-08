@@ -4,6 +4,8 @@ export type BaseTabContentValues = {
     flags: InteractionFlags;
     orientation: TabsOrientation;
     isSelected: boolean;
+    hasHoverFloater?: boolean;
+    hasSelectionFloater?: boolean;
 };
 
 export type BaseTabContentProps = BaseTabContentValues;

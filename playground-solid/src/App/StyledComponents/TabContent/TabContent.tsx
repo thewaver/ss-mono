@@ -17,6 +17,8 @@ export const PageTabContent = (props: ParentProps<TabContentProps>) => {
                 [styles.isSelected]: access(props.isSelected),
                 [styles.isHovered]: access(props.flags).isHovered,
                 [styles.isDisabled]: access(props.flags).isDisabled,
+                [styles.hasHoverFloater]: access(props.hasHoverFloater) ?? false,
+                [styles.hasSelectionFloater]: access(props.hasSelectionFloater) ?? true,
             }}
         >
             {props.children}
@@ -94,6 +96,24 @@ export const PageTabFloater = (props: TabFloaterProps) => {
             }}
             style={{ "transition-duration": `${access(props.transitionDurationMs)}ms` }}
             data-floater
+        />
+    );
+};
+
+export const PageTabHighlightFloater = (props: TabFloaterProps) => {
+    const getLayerClass = useLayerClass();
+
+    return (
+        <div
+            classList={{
+                [access(props.orientation) === "horizontal"
+                    ? styles.rowTabHighlightFloater
+                    : styles.columnTabHighlightFloater]: true,
+                [getLayerClass()]: true,
+                [styles.isVisible]: access(props.visibilityTarget) === 1,
+            }}
+            style={{ "transition-duration": `${access(props.transitionDurationMs)}ms` }}
+            data-floater={"highlight"}
         />
     );
 };

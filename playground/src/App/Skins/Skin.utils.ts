@@ -47,17 +47,6 @@ const JOINED_CORNERS = [
     [skinSelectors.isJoinedInlineEnd, ["borderStartEndRadius", "borderEndEndRadius"]],
 ] as const;
 
-const OVERRIDE_ENTRIES: Partial<Record<SkinEntry, SkinEntry>> = {
-    itemWithHoverFloater: "itemBase",
-    itemWithSelectionFloater: "itemBase",
-};
-
-const computeEntryTarget = (entry: SkinEntry) => {
-    const overridden = OVERRIDE_ENTRIES[entry];
-
-    return overridden === undefined ? `.${skinEntries[entry]}` : `.${skinEntries[overridden]}.${skinEntries[entry]}`;
-};
-
 const scopeSelector = (target: string, selector: string) =>
     splitSelectorList(selector)
         .map((part) => `:scope ${part.replaceAll("&", target)}`)
@@ -98,7 +87,7 @@ export namespace SkinUtils {
         globalStyle(`.${root}`, { "@layer": { [skinLayer]: ROOT_RESET } });
 
         (Object.keys(rules) as SkinEntry[]).forEach((entry) => {
-            defineRule(root, computeEntryTarget(entry), rules[entry]);
+            defineRule(root, `.${skinEntries[entry]}`, rules[entry]);
         });
     };
 }

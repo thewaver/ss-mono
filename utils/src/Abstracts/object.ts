@@ -24,6 +24,28 @@ const isPlainObject = (value: unknown): value is Record<string, unknown> => {
     return proto === Object.prototype || proto === null;
 };
 
+const mergeOne = <T extends object>(base: T, override: DeepPartial<T> | undefined): T => {
+    if (!override) return base;
+
+    const source = base as Record<string, unknown>;
+    const changes = override as Record<string, unknown>;
+    const result: Record<string, unknown> = { ...source };
+
+    for (const key of Object.keys(changes)) {
+        if (key === "__proto__") continue;
+
+        const next = changes[key];
+
+        if (next === undefined) continue;
+
+        const current = Object.hasOwn(source, key) ? source[key] : undefined;
+
+        result[key] = isPlainObject(current) && isPlainObject(next) ? mergeOne(current, next) : next;
+    }
+
+    return result as T;
+};
+
 export namespace ObjectUtils {
     /**
      * Treats any two empty objects or arrays as equal, and otherwise compares by reference.
@@ -59,42 +81,26 @@ export namespace ObjectUtils {
     };
 
     /**
-     * Lays an override over a base object, merging nested plain objects key by key.
+     * Lays overrides over a base object one after another, merging nested plain objects key by key.
      *
-     * Only plain objects — written as `{ … }` or made with `Object.create(null)` — are merged. Anything else in the
-     * override replaces what the base had at that key outright: an array, a `Date`, a class instance, a function,
-     * `null`. A key the override leaves `undefined` keeps the base's value, so an optional field left unset never
-     * wipes a default. Only the override's own string keys are read, and a key named `__proto__` is ignored.
+     * Each override is laid over the result of the ones before it, so where two set the same key the later one
+     * wins. Only plain objects — written as `{ … }` or made with `Object.create(null)` — are merged. Anything else
+     * in an override replaces what was there at that key outright: an array, a `Date`, a class instance, a
+     * function, `null`. A key an override leaves `undefined` keeps the value before it, so an optional field left
+     * unset never wipes a default. Only an override's own string keys are read, and a key named `__proto__` is
+     * ignored.
      *
-     * Branches the override does not touch are the base's own objects, not copies, and a nested object the base
-     * lacked is the override's own. Neither input is modified, but the result shares objects with both, so treat
-     * it as read-only.
+     * Branches no override touches are the base's own objects, not copies, and a nested object the base lacked is
+     * the override's own until a later override merges into it. No input is modified, but the result shares
+     * objects with all of them, so treat it as read-only.
      *
-     * @param base The object to start from.
-     * @param override What to lay over it. `undefined` returns `base` itself.
-     * @returns A new object, or `base` when there is no override.
+     * @param base The object to start from. The result's type is read from it, and every override is checked
+     * against it.
+     * @param overrides What to lay over it, in order. An `undefined` one is skipped.
+     * @returns A new object, or `base` itself when every override is missing.
      */
-    export const deepMerge = <T extends object>(base: T, override: DeepPartial<T> | undefined): T => {
-        if (!override) return base;
-
-        const source = base as Record<string, unknown>;
-        const changes = override as Record<string, unknown>;
-        const result: Record<string, unknown> = { ...source };
-
-        for (const key of Object.keys(changes)) {
-            if (key === "__proto__") continue;
-
-            const next = changes[key];
-
-            if (next === undefined) continue;
-
-            const current = Object.hasOwn(source, key) ? source[key] : undefined;
-
-            result[key] = isPlainObject(current) && isPlainObject(next) ? deepMerge(current, next) : next;
-        }
-
-        return result as T;
-    };
+    export const deepMerge = <T extends object>(base: T, ...overrides: (DeepPartial<T> | undefined)[]): T =>
+        overrides.reduce<T>((merged, override) => mergeOne(merged, override), base);
 
     /**
      * Picks a number of entries at random, without ever picking the same one twice.

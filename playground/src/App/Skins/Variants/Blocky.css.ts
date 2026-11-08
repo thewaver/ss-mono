@@ -98,9 +98,6 @@ const ACCORDION: StyleRule = {
 
 const ITEM: StyleRule = {
     fontSize: themeVars.fontSize.medium,
-    selectors: {
-        ...ITEM_STATES,
-    },
 } as const;
 
 const ITEM_FLOATER_HOVER: StyleRule = {
@@ -114,6 +111,14 @@ const ITEM_FLOATER_SELECTED: StyleRule = {
     color: themeVars.color.primary.contrast,
 };
 
+const TAB_FLOATER_HOVER: StyleRule = {
+    ...ITEM_FLOATER_HOVER,
+};
+
+const TAB_FLOATER_SELECTED: StyleRule = {
+    ...ITEM_FLOATER_SELECTED,
+};
+
 const SURFACE: StyleRule = {
     backgroundColor: themeVars.color.surface.main,
     boxShadow: [insetShadowRaised(themeVars.color.surface.main), SHADOW_MEDIUM].join(","),
@@ -124,16 +129,14 @@ const SURFACE: StyleRule = {
 SkinUtils.define(blocky, {
     accordionHeader: {
         ...ACCORDION,
-        selectors: {
-            ...SkinUtils.joinedCorners(),
-            ...INTERACTIBLE_STATES,
+        selectors: ObjectUtils.deepMerge(SkinUtils.joinedCorners(), INTERACTIBLE_STATES, {
             [skinSelectors.isExpanded]: {
                 backgroundColor: themeVars.color.primary.main,
                 boxShadow: insetShadowRaised(themeVars.color.primary.main),
                 color: themeVars.color.primary.contrast,
                 fontWeight: "bold",
             },
-        },
+        }),
     },
     accordionPanel: {
         ...ACCORDION,
@@ -225,24 +228,23 @@ SkinUtils.define(blocky, {
             },
         }),
     },
-    itemBase: ObjectUtils.deepMerge(ITEM, {
-        selectors: {
+    itemBase: {
+        ...ITEM,
+        selectors: ObjectUtils.deepMerge(ITEM_STATES, {
             [skinSelectors.isHoveredWithoutFloater]: {
                 ...ITEM_FLOATER_HOVER,
             },
             [skinSelectors.isSelectedWithoutFloater]: {
                 ...ITEM_FLOATER_SELECTED,
             },
-        },
-    }),
+        }),
+    },
     itemHoverFloater: {
         ...ITEM_FLOATER_HOVER,
     },
     itemSelectionFloater: {
         ...ITEM_FLOATER_SELECTED,
     },
-    itemWithHoverFloater: {},
-    itemWithSelectionFloater: {},
     overlay: {
         backdropFilter: "blur(10px) grayscale(75%)",
     },
@@ -359,27 +361,29 @@ SkinUtils.define(blocky, {
         fontWeight: "bold",
     },
     surface: SURFACE,
-    tabsFloater: {
-        backgroundColor: themeVars.color.primary.main,
-        boxShadow: insetShadowRaised(themeVars.color.primary.main),
-    },
-    tabsItem: {
+    tabsItemBase: {
         paddingBlock: themeVars.spacing.full,
         paddingInline: themeVars.spacing.double,
         fontSize: themeVars.fontSize.small,
         fontWeight: "bold",
-        selectors: ObjectUtils.deepMerge(INTERACTIBLE_STATES, {
+        selectors: ObjectUtils.deepMerge(ITEM_STATES, {
             [skinSelectors.isVertical]: {
                 paddingBlock: themeVars.spacing.full,
                 paddingInline: themeVars.spacing.double,
             },
-            [skinSelectors.isHovered]: {
-                color: themeVars.color.primary.main,
+            [skinSelectors.isHoveredWithoutFloater]: {
+                ...TAB_FLOATER_HOVER,
             },
-            [skinSelectors.isSelected]: {
-                color: themeVars.color.primary.contrast,
+            [skinSelectors.isSelectedWithoutFloater]: {
+                ...TAB_FLOATER_SELECTED,
             },
         }),
+    },
+    tabsItemHoverFloater: {
+        ...TAB_FLOATER_HOVER,
+    },
+    tabsItemSelectionFloater: {
+        ...TAB_FLOATER_SELECTED,
     },
     tabsTrack: {
         backgroundColor: [layerVars.contrast, `rgb(from ${layerVars.contrast} r g b / 10%)`],

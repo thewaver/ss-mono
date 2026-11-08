@@ -82,6 +82,31 @@ describe("ObjectUtils.deepMerge", () => {
 
     it("returns the base itself when there is no override", () => {
         expect(ObjectUtils.deepMerge(base, undefined)).toBe(base);
+        expect(ObjectUtils.deepMerge(base)).toBe(base);
+        expect(ObjectUtils.deepMerge(base, undefined, undefined)).toBe(base);
+    });
+
+    it("lays several overrides in order, the later winning where they meet", () => {
+        const merged = ObjectUtils.deepMerge(base, { surface: { fill: "#eee", stroke: { width: 2 } } }, undefined, {
+            surface: { stroke: { width: 3, color: "#f00" } },
+            text: { size: 16 },
+        });
+
+        expect(merged).toEqual({
+            surface: { fill: "#eee", stroke: { width: 3, color: "#f00" } },
+            text: { size: 16, weight: 400 },
+            stops: ["#000", "#fff"],
+        });
+    });
+
+    it("does not modify an earlier override that a later one merges into", () => {
+        type Tree = { branch?: { a?: number; b?: number } };
+        const first: Tree = { branch: { a: 1 } };
+
+        const merged = ObjectUtils.deepMerge<Tree>({}, first, { branch: { b: 2 } });
+
+        expect(merged.branch).toEqual({ a: 1, b: 2 });
+        expect(first).toEqual({ branch: { a: 1 } });
     });
 
     it("does not modify either input", () => {

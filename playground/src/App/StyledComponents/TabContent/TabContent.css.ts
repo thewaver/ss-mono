@@ -7,6 +7,8 @@ import { layerVars } from "../Layer/Layer.css";
 export const isSelected = style([skinStates.isSelected]);
 export const isHovered = style([skinStates.isHovered]);
 export const isDisabled = style([skinStates.isDisabled]);
+export const hasHoverFloater = style([skinStates.hasHoverFloater]);
+export const hasSelectionFloater = style([skinStates.hasSelectionFloater]);
 export const isVisible = style({});
 
 const tabBase = style({
@@ -15,7 +17,7 @@ const tabBase = style({
 });
 
 export const rowTab = style([
-    skinEntries.tabsItem,
+    skinEntries.tabsItemBase,
     tabBase,
     {
         marginBlockEnd: 0,
@@ -23,7 +25,7 @@ export const rowTab = style([
 ]);
 
 export const columnTab = style([
-    skinEntries.tabsItem,
+    skinEntries.tabsItemBase,
     skinStates.isVertical,
     tabBase,
     {
@@ -36,7 +38,7 @@ export const rowTabGutter = style([skinEntries.tabsTrack]);
 export const columnTabGutter = style([skinEntries.tabsTrack, skinStates.isVertical]);
 
 export const rowTabFloater = style([
-    skinEntries.tabsFloater,
+    skinEntries.tabsItemSelectionFloater,
     {
         transform: "scaleX(0)",
         transition: "transform",
@@ -50,7 +52,7 @@ export const rowTabFloater = style([
 ]);
 
 export const columnTabFloater = style([
-    skinEntries.tabsFloater,
+    skinEntries.tabsItemSelectionFloater,
     skinStates.isVertical,
     {
         width: "100%",
@@ -64,6 +66,27 @@ export const columnTabFloater = style([
             },
         },
     },
+]);
+
+const tabHighlightFloaterBase = style({
+    width: "100%",
+    height: "100%",
+    opacity: 0,
+    transitionProperty: "opacity",
+
+    selectors: {
+        [`&.${isVisible}`]: {
+            opacity: 1,
+        },
+    },
+});
+
+export const rowTabHighlightFloater = style([skinEntries.tabsItemHoverFloater, tabHighlightFloaterBase]);
+
+export const columnTabHighlightFloater = style([
+    skinEntries.tabsItemHoverFloater,
+    skinStates.isVertical,
+    tabHighlightFloaterBase,
 ]);
 
 export const tabPanel = style([

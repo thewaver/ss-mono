@@ -26,6 +26,7 @@ export const SKIN_OPTIONS: NavSettingsOption<PlaygroundSkin>[] = [
     { value: "blocky", label: "Blocky" },
     { value: "cardboard", label: "Cardboard" },
     { value: "cartoon", label: "Cartoon" },
+    { value: "neon", label: "Neon" },
     { value: "plasticine", label: "Plasticine" },
     { value: "terminal", label: "Terminal" },
 ];

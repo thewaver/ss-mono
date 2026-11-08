@@ -32,7 +32,7 @@ const INTERACTIBLE_STATES: StyleRule["selectors"] = {
     },
 } as const;
 
-const INPUT_STATES: StyleRule["selectors"] = {
+const INPUT_STATES: StyleRule["selectors"] = ObjectUtils.deepMerge(INTERACTIBLE_STATES, {
     [skinSelectors.isReadOnly]: {
         backgroundColor: [layerVars.contrast, `rgb(from ${layerVars.contrast} r g b / 10%)`],
     },
@@ -41,8 +41,7 @@ const INPUT_STATES: StyleRule["selectors"] = {
         borderColor: themeVars.color.error.main,
         color: themeVars.color.error.main,
     },
-    ...INTERACTIBLE_STATES,
-} as const;
+});
 
 const ITEM_STATES: StyleRule["selectors"] = ObjectUtils.deepMerge(INTERACTIBLE_STATES, {
     [skinSelectors.isSelected]: {
@@ -92,8 +91,16 @@ const ITEM_FLOATER_HOVER: StyleRule = {
 };
 
 const ITEM_FLOATER_SELECTED: StyleRule = {
-    backgroundColor: [themeVars.color.primary.main, `rgb(from ${themeVars.color.primary.main} r g b / 10%)`],
     color: themeVars.color.primary.main,
+};
+
+const TAB_FLOATER_HOVER: StyleRule = {
+    ...ITEM_FLOATER_HOVER,
+};
+
+const TAB_FLOATER_SELECTED: StyleRule = {
+    ...ITEM_FLOATER_SELECTED,
+    border: `2px solid ${themeVars.color.primary.main}`,
 };
 
 const SURFACE: StyleRule = {
@@ -109,15 +116,13 @@ const SURFACE: StyleRule = {
 SkinUtils.define(terminal, {
     accordionHeader: {
         ...ACCORDION,
-        selectors: {
-            ...SkinUtils.joinedCorners(),
-            ...INTERACTIBLE_STATES,
+        selectors: ObjectUtils.deepMerge(SkinUtils.joinedCorners(), INTERACTIBLE_STATES, {
             [skinSelectors.isExpanded]: {
                 border: `2px solid ${themeVars.color.primary.main}`,
                 color: themeVars.color.primary.main,
                 fontWeight: "bold",
             },
-        },
+        }),
     },
     accordionPanel: {
         ...ACCORDION,
@@ -131,7 +136,7 @@ SkinUtils.define(terminal, {
         border: `2px solid ${layerVars.contrast}`,
         color: layerVars.contrast,
         fontWeight: "bold",
-        selectors: {
+        selectors: ObjectUtils.deepMerge(INTERACTIBLE_STATES, {
             [skinSelectors.isPressed]: {
                 borderColor: themeVars.color.primary.main,
                 color: themeVars.color.primary.main,
@@ -144,14 +149,13 @@ SkinUtils.define(terminal, {
                 borderColor: themeVars.color.error.main,
                 color: themeVars.color.primary.main,
             },
-            ...INTERACTIBLE_STATES,
-        },
+        }),
     },
     buttonSimple: {
         border: `2px solid ${layerVars.contrast}`,
         color: layerVars.contrast,
         fontSize: themeVars.fontSize.small,
-        selectors: {
+        selectors: ObjectUtils.deepMerge(INTERACTIBLE_STATES, {
             [skinSelectors.isPressed]: {
                 borderColor: themeVars.color.primary.main,
                 color: themeVars.color.primary.main,
@@ -164,8 +168,7 @@ SkinUtils.define(terminal, {
                 borderColor: themeVars.color.error.main,
                 color: themeVars.color.primary.main,
             },
-            ...INTERACTIBLE_STATES,
-        },
+        }),
     },
     checkboxBox: {
         ...SWITCH_SHELL,
@@ -199,8 +202,7 @@ SkinUtils.define(terminal, {
     hollowSurface: SkinUtils.hollow(SURFACE),
     input: {
         ...INPUT_SHELL,
-        selectors: {
-            ...INPUT_STATES,
+        selectors: ObjectUtils.deepMerge(INPUT_STATES, {
             [skinSelectors.fieldText]: {
                 color: layerVars.contrast,
                 caretColor: themeVars.color.primary.main,
@@ -209,26 +211,25 @@ SkinUtils.define(terminal, {
             [skinSelectors.fieldTextDisabled]: {
                 color: [layerVars.contrast, `rgb(from ${layerVars.contrast} r g b / ${themeVars.disabled.opacity})`],
             },
-        },
+        }),
     },
-    itemBase: ObjectUtils.deepMerge(ITEM, {
-        selectors: {
+    itemBase: {
+        ...ITEM,
+        selectors: ObjectUtils.deepMerge(ITEM_STATES, {
             [skinSelectors.isHoveredWithoutFloater]: {
                 ...ITEM_FLOATER_HOVER,
             },
             [skinSelectors.isSelectedWithoutFloater]: {
                 ...ITEM_FLOATER_SELECTED,
             },
-        },
-    }),
+        }),
+    },
     itemHoverFloater: {
         ...ITEM_FLOATER_HOVER,
     },
     itemSelectionFloater: {
         ...ITEM_FLOATER_SELECTED,
     },
-    itemWithHoverFloater: {},
-    itemWithSelectionFloater: {},
     overlay: {
         backdropFilter: "blur(10px) grayscale(75%)",
     },
@@ -337,27 +338,29 @@ SkinUtils.define(terminal, {
         fontWeight: "bold",
     },
     surface: SURFACE,
-    tabsFloater: {
-        border: `2px solid ${themeVars.color.primary.main}`,
-    },
-    tabsItem: {
+    tabsItemBase: {
         paddingBlock: themeVars.spacing.full,
         paddingInline: themeVars.spacing.double,
         fontSize: themeVars.fontSize.small,
         fontWeight: "bold",
-        selectors: {
+        selectors: ObjectUtils.deepMerge(ITEM_STATES, {
             [skinSelectors.isVertical]: {
                 paddingBlock: themeVars.spacing.full,
                 paddingInline: themeVars.spacing.double,
             },
-            [skinSelectors.isHovered]: {
-                color: themeVars.color.primary.main,
+            [skinSelectors.isHoveredWithoutFloater]: {
+                ...TAB_FLOATER_HOVER,
             },
-            [skinSelectors.isSelected]: {
-                color: themeVars.color.primary.main,
+            [skinSelectors.isSelectedWithoutFloater]: {
+                ...TAB_FLOATER_SELECTED,
             },
-            ...INTERACTIBLE_STATES,
-        },
+        }),
+    },
+    tabsItemHoverFloater: {
+        ...TAB_FLOATER_HOVER,
+    },
+    tabsItemSelectionFloater: {
+        ...TAB_FLOATER_SELECTED,
     },
     tabsTrack: {
         border: [`2px solid ${layerVars.contrast}`, `2px solid rgb(from ${layerVars.contrast} r g b / 25%)`],

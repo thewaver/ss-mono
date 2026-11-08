@@ -11,8 +11,12 @@ import {
 import * as styles from "@thewaver/ss-playground/App/Pages/TabsPage/TabsPage.css";
 
 import { PageTabPanel } from "../../../PageComponents/TabPanel/TabPanel";
-import { PageGlideFloater } from "../../../StyledComponents/GlideFloater/GlideFloater";
-import { PageTabContent, PageTabFloater, PageTabGutter } from "../../../StyledComponents/TabContent/TabContent";
+import {
+    PageTabContent,
+    PageTabFloater,
+    PageTabGutter,
+    PageTabHighlightFloater,
+} from "../../../StyledComponents/TabContent/TabContent";
 
 const ID_PREFIX = "hoverPill";
 
@@ -37,14 +41,15 @@ export const HoverPillDocsExample = () => {
                     />
                 )}
                 renderHighlightFloater={(getVisibilityTarget, getTransitionDurationMs) => (
-                    <PageGlideFloater
-                        kind={"highlight"}
+                    <PageTabHighlightFloater
+                        orientation={"horizontal"}
                         visibilityTarget={getVisibilityTarget}
                         transitionDurationMs={getTransitionDurationMs}
                     />
                 )}
                 renderTab={(getTab, getFlags) => (
                     <PageTabContent
+                        hasHoverFloater
                         flags={getFlags}
                         orientation={"horizontal"}
                         isSelected={() => getTab().value === getSelectedValue()}

@@ -6,8 +6,8 @@ import { layerVars } from "../Layer/Layer.css";
 
 export const isHovered = style([skinStates.isHovered]);
 export const isSelected = style([skinStates.isSelected]);
-export const hasHoverFloater = style([skinEntries.itemWithHoverFloater, skinStates.hasHoverFloater]);
-export const hasSelectionFloater = style([skinEntries.itemWithSelectionFloater, skinStates.hasSelectionFloater]);
+export const hasHoverFloater = style([skinStates.hasHoverFloater]);
+export const hasSelectionFloater = style([skinStates.hasSelectionFloater]);
 
 export const navLinkGroup = style({
     position: "relative",
