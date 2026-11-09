@@ -1,5 +1,5 @@
 import type { PropsWithChildren } from "react";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 import { Button } from "@thewaver/ss-components-react";
 import { EXAMPLES_ONLY_PROP } from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.const";
@@ -15,7 +15,6 @@ import type { FieldResetRegistry } from "../Field/FieldReact.context";
 import { FieldResetProvider } from "../Field/FieldReact.context";
 import { useIsPreview } from "../Preview/Preview.context";
 import { PageProp } from "../Prop/Prop";
-import { PropsPanelContextProvider } from "./PropsPanel.context";
 import type { PagePropsPanelProps } from "./PropsPanelReact.types";
 
 export const PagePropsGroups = (props: PropsWithChildren) => {
@@ -35,8 +34,6 @@ const PagePropsPanelContent = (props: PropsWithChildren<PagePropsPanelProps>) =>
         },
     }));
 
-    const scopeContext = useMemo(() => ({ scope: props.scope }), [props.scope]);
-
     const isSampleScope = props.scope === "sample";
 
     const leastToReset = isSampleScope ? SAMPLE_SELECTOR_ALONE : NOTHING_TO_RESET;
@@ -46,25 +43,23 @@ const PagePropsPanelContent = (props: PropsWithChildren<PagePropsPanelProps>) =>
     return (
         <div className={styles.propsPanelScopeVariants[props.scope]} data-panel={props.scope}>
             <FieldResetProvider value={resetRegistry}>
-                <PropsPanelContextProvider value={scopeContext}>
-                    {props.children}
+                {props.children}
 
-                    {(props.hasReset ?? DEFAULT_HAS_RESET) && resets.length > leastToReset && (
-                        <PageProp
-                            itemKey={"resetPanel"}
-                            label={"These controls"}
-                            hint={"Puts every control in this panel back to the value it started at."}
-                            controls={EXAMPLES_ONLY_PROP}
-                        >
-                            <Button
-                                renderContent={(flags) => <PageButtonContent flags={flags}>Reset</PageButtonContent>}
-                                onClick={() => {
-                                    resettable.forEach((reset) => reset());
-                                }}
-                            />
-                        </PageProp>
-                    )}
-                </PropsPanelContextProvider>
+                {(props.hasReset ?? DEFAULT_HAS_RESET) && resets.length > leastToReset && (
+                    <PageProp
+                        itemKey={"resetPanel"}
+                        label={"These controls"}
+                        hint={"Puts every control in this panel back to the value it started at."}
+                        controls={EXAMPLES_ONLY_PROP}
+                    >
+                        <Button
+                            renderContent={(flags) => <PageButtonContent flags={flags}>Reset</PageButtonContent>}
+                            onClick={() => {
+                                resettable.forEach((reset) => reset());
+                            }}
+                        />
+                    </PageProp>
+                )}
             </FieldResetProvider>
         </div>
     );

@@ -14,7 +14,6 @@ import { PageButtonContent } from "../../StyledComponents/ButtonContent/ButtonCo
 import { FieldResetProvider } from "../Field/FieldSolid.context";
 import { useIsPreview } from "../Preview/Preview.context";
 import { PageProp } from "../Prop/Prop";
-import { PropsPanelContextProvider } from "./PropsPanel.context";
 import type { PagePropsPanelProps } from "./PropsPanelSolid.types";
 
 export const PagePropsGroups = (props: ParentProps) => {
@@ -43,29 +42,23 @@ export const PagePropsPanel = (props: ParentProps<PagePropsPanelProps>) => {
     return (
         <div class={styles.propsPanelScopeVariants[access(props.scope)]} data-panel={access(props.scope)}>
             <FieldResetProvider value={{ register }}>
-                <PropsPanelContextProvider value={{ scope: props.scope }}>
-                    {props.children}
+                {props.children}
 
-                    <Show
-                        when={(access(props.hasReset) ?? DEFAULT_HAS_RESET) && getResets().length > getLeastToReset()}
+                <Show when={(access(props.hasReset) ?? DEFAULT_HAS_RESET) && getResets().length > getLeastToReset()}>
+                    <PageProp
+                        key={"resetPanel"}
+                        label={"These controls"}
+                        hint={"Puts every control in this panel back to the value it started at."}
+                        controls={EXAMPLES_ONLY_PROP}
                     >
-                        <PageProp
-                            key={"resetPanel"}
-                            label={"These controls"}
-                            hint={"Puts every control in this panel back to the value it started at."}
-                            controls={EXAMPLES_ONLY_PROP}
-                        >
-                            <Button
-                                renderContent={(getFlags) => (
-                                    <PageButtonContent flags={getFlags}>Reset</PageButtonContent>
-                                )}
-                                onClick={() => {
-                                    getResettable().forEach((reset) => reset());
-                                }}
-                            />
-                        </PageProp>
-                    </Show>
-                </PropsPanelContextProvider>
+                        <Button
+                            renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Reset</PageButtonContent>}
+                            onClick={() => {
+                                getResettable().forEach((reset) => reset());
+                            }}
+                        />
+                    </PageProp>
+                </Show>
             </FieldResetProvider>
         </div>
     );

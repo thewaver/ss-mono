@@ -3,6 +3,7 @@ import { shallowRef } from "vue";
 
 import { Radio, RadioGroup } from "@thewaver/ss-components-vue";
 import { ARC_LAYOUT, ARC_WIDTH, STARTING_RATING } from "@thewaver/ss-playground/App/Pages/RadioPage/RadioPage.const";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/RadioStarContent/RadioStarContent.css";
 
 import PageRadioStarCell from "../../../StyledComponents/RadioStarContent/PageRadioStarCell.vue";
 import PageRadioStarContent from "../../../StyledComponents/RadioStarContent/PageRadioStarContent.vue";
@@ -26,6 +27,8 @@ const hovered = shallowRef<number>();
             >
                 <template #renderContent="flags">
                     <PageRadioStarCell>
+                        <span :class="styles.starNumber" aria-hidden="true">{{ rating }}</span>
+
                         <PageRadioStarContent :flags="flags" :is-filled="rating <= (hovered ?? value)" />
                     </PageRadioStarCell>
                 </template>

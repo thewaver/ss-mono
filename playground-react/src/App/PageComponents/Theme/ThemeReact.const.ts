@@ -2,11 +2,12 @@ import { useSyncExternalStore } from "react";
 
 import { type ShapeRevealOpts, ShapeRevealUtils } from "@thewaver/ss-components-react";
 import type { PlaygroundTheme } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.types";
+import { NavSettingsUtils } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.utils";
 import { PLAYGROUND_THEMES } from "@thewaver/ss-playground/App/Theme.css";
 
 import { OWN_FRAMEWORK } from "../FrameworkMenu/FrameworkMenu.const";
 
-let appliedTheme: PlaygroundTheme = OWN_FRAMEWORK;
+let appliedTheme: PlaygroundTheme = NavSettingsUtils.loadTheme(OWN_FRAMEWORK);
 
 const listeners = new Set<() => void>();
 
@@ -29,6 +30,7 @@ export const useAppliedTheme = () => useSyncExternalStore(subscribe, getAppliedT
 
 export const revealTheme = (theme: PlaygroundTheme, opts: ShapeRevealOpts) => {
     appliedTheme = theme;
+    NavSettingsUtils.save("theme", theme);
     listeners.forEach((listener) => listener());
 
     return ShapeRevealUtils.reveal(() => applyTheme(theme), opts);

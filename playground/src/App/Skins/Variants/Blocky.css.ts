@@ -1,6 +1,7 @@
 import { ObjectUtils } from "@thewaver/ss-utils";
 import { type StyleRule, style } from "@vanilla-extract/css";
 
+import type { SkinBaseColor } from "../Skin.types";
 import { SkinUtils } from "../Skin.utils";
 
 import { layerVars } from "../../StyledComponents/Layer/Layer.css";
@@ -119,10 +120,10 @@ const TAB_FLOATER_SELECTED: StyleRule = {
     ...ITEM_FLOATER_SELECTED,
 };
 
-const surface = (layer: "background" | "surface"): StyleRule => ({
-    backgroundColor: themeVars.color[layer].main,
-    boxShadow: [insetShadowRaised(themeVars.color[layer].main), SHADOW_MEDIUM].join(","),
-    color: themeVars.color[layer].contrast,
+const surface = (color: SkinBaseColor): StyleRule => ({
+    backgroundColor: color.main,
+    boxShadow: [insetShadowRaised(color.main), SHADOW_MEDIUM].join(","),
+    color: color.contrast,
     fontSize: themeVars.fontSize.medium,
 });
 
@@ -209,7 +210,21 @@ SkinUtils.define(blocky, {
     },
     dropdown: {
         ...INPUT_SHELL,
-        border: "none",
+    },
+    dropZone: {
+        border: [`2px dashed ${layerVars.contrast}`, `2px dashed rgb(from ${layerVars.contrast} r g b / 25%)`],
+        selectors: ObjectUtils.deepMerge(INPUT_STATES, {
+            [skinSelectors.isCarrying]: {
+                borderColor: [layerVars.contrast, `rgb(from ${layerVars.contrast} r g b / 50%)`],
+            },
+            [skinSelectors.isReceiving]: {
+                borderColor: themeVars.color.primary.main,
+                backgroundColor: [
+                    themeVars.color.primary.main,
+                    `rgb(from ${themeVars.color.primary.main} r g b / 10%)`,
+                ],
+            },
+        }),
     },
     input: {
         ...INPUT_SHELL,
@@ -244,6 +259,10 @@ SkinUtils.define(blocky, {
     itemSelectionFloater: {
         ...ITEM_FLOATER_SELECTED,
     },
+    itemStatic: {
+        ...ITEM,
+        ...ITEM_FLOATER_HOVER,
+    },
     overlay: {
         backdropFilter: "blur(10px) grayscale(75%)",
     },
@@ -253,7 +272,7 @@ SkinUtils.define(blocky, {
         fontFamily: "monospace",
     },
     pageContainer: {
-        ...surface("background"),
+        ...surface(SkinUtils.extendColor(layerVars)),
     },
     panel: {
         backgroundColor: [layerVars.main, `rgb(from ${layerVars.main} r g b / 50%)`],
@@ -363,7 +382,7 @@ SkinUtils.define(blocky, {
         fontWeight: "bold",
     },
     surface: {
-        ...surface("surface"),
+        ...surface(themeVars.color.surface),
     },
     tabsItemBase: {
         paddingBlock: themeVars.spacing.full,

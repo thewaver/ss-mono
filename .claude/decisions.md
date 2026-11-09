@@ -99,8 +99,8 @@ sees it.
 
 **Where a surface sits decides its paint, not what it is.** The user's rule. Anything page-level — on the
 page background or in a top-level portal of its own: the example box, the left menu, modals, drawers, toasts,
-hover cards, spotlight popups, tooltips — takes the `surface` gradient. Anything contained in an example box
-takes a solid fill of its level: a sample's frames and panels paint `layerVars.main`. The one exception is
+spotlight popups, tooltips — takes the `surface` gradient. Anything contained in an example box
+takes a solid fill of its level: a sample's frames and panels paint `layerVars.main`, unless the frame has a Skin entry: `Table`'s frame is `panel`, and the `Toolbar` and `Menubar` bars are `dropZone`. The one exception is
 `PageSidebarSurface`, which paints exactly the left menu's gradient, since it is a sample of that same
 furniture; a solid fill was tried and reverted by the user. `color.background.*` is off-limits to all of it. Where a solid fill takes away the difference between neighboring tiles or cells, their
 separators become the 25% stroke, since a separator painted in the fill itself disappears.
@@ -229,10 +229,13 @@ planned for.
   hand the library no `computeTextStyle` for it.
 - **Who the entries are for.** `drawer` is every page-edge or full panel — the left nav, drawers, modals and the
   sidebar sample, which paints exactly the left nav (an earlier call of the user's). `tooltip` takes the small
-  floating popups — spotlight and hover card as well as the tooltip. `surface` is the example and variant boxes,
+  floating popups — spotlight as well as the tooltip; the hover card is a `dropdown`, the user's move. `itemStatic` — the
+  user's — is an item that is only shown, not picked: the rows, chips and tiles inside `EdgeFader` and `Scroller`, and
+  `Sortable`'s items. `dropZone` — the user's — is a box things land in or sit on: `FileInput`'s zone, `Sortable`'s
+  surface and the `Toolbar` and `Menubar` bars. `surface` is the example and variant boxes,
   toasts and the knobs popup; `pageContainer` — the user's — is the wrapping box of the docs' "Show code" disclosures
   and the API tables, and the frame of the Skins page's rows; `panel` the boxes of content inside them, code boxes,
-  prop rows and the dependency chips. `decoration` — the user's — is the small see-through button inside or beside a
+  prop rows, the dependency chips, the `Table` frame, the `Sidebar` example's frame and the `Preview` box — the last with its fill overridden to a solid `layerVars.main` and no image, the user's override, since its fade runs into that color. `decoration` — the user's — is the small see-through button inside or beside a
   field (select clear, picker triggers, era and AM/PM toggles, stepper arrows, adornments, the sidebar toggle),
   and it reacts to plain `isHovered`: every painter that hands it hover is a button's, and the static adornment
   never passes hover on (_"The in-field adornment painter"_). `tag` is a tag input's chip; the other chips and badges keep
@@ -243,7 +246,7 @@ planned for.
   as written by the user — where that constant is only a text color, the selection floater paints nothing, and the
   user chose that over keeping the tab's own selected color. The track and the floaters keep the boxes the library
   gives them, the whole list and the tab. A vertical list carries `isVertical` on all four. Every other Skin starts on Shaded's tab paint, the user's
-  call while they are temporary. The honeycomb tabs are a custom variant and keep their own paint. The binary switches' insides — `checkboxMark`, `radioDot`, `toggleThumb` —
+  call while they are temporary. The honeycomb tabs are a custom variant and keep their own paint. The segmented radio is painted as tabs, the user's call: `tabsTrack`, `tabsItemBase` and `tabsItemSelectionFloater`. The binary switches' insides — `checkboxMark`, `radioDot`, `toggleThumb` —
   and the standard bars — `progressTrack` and `progressFill`, `rangeTrack`, `rangeFill` and `rangeThumb`,
   `scrollerTrack` and `scrollerThumb` (painted on `::before`), and the slide button's `slideButtonTrack`,
   `slideButtonFill` and `slideButtonThumb` — have entries, the slide button's added at the user's request with its
@@ -317,6 +320,29 @@ planned for.
   own size** (a track's thickness, a pill badge) stays in the painter — except the standard bars': the user moved
   `rangeTrack`'s and `rangeFill`'s to the Skins, as `progressTrack`'s and `progressFill`'s already were, and each
   Skin gives a range part the radius it gives the matching progress part.
+- **`Table`'s header and pinned cells keep their solid fill** — the user's call, after weighing a see-through header
+  and a new entry. The header stays pinned while rows scroll beneath it and pinned cells do the same sideways, so
+  they have to hide what passes behind them, and `panel` on the frame is see-through.
+- **`FanMenu`'s items are `itemBase` with `itemHoverFloater`, each also wearing `dropdown`** so it looks like an item
+  in a real menu, the user's call. A highlighted item drops its `dropdown` fill, or the floater behind it would be
+  hidden. It keeps its small font.
+- **A selected `SegmentedInput` cell also wears `itemBase`**, only while selected, so it takes the item's selection
+  paint as a calendar range does. The user's call.
+- **The `Sidebar` toggle's `border: none` lives in the `skin` layer**: it is a native `<button>` and no Skin sets a
+  border on `decoration`, so removing it brings back the browser's own border, while left unlayered it would beat any
+  Skin that does.
+- **`dropZone` has two drag states, `isCarrying` and `isReceiving`** — the user's design, painted by each Skin on the
+  entry and carried by `Sortable`'s surface. `isCarrying` is on every list while anything is carried and `isReceiving`
+  only on the list the item is over, so a Skin writes `isReceiving` after `isCarrying`. The entry also takes every input's states through
+  `INPUT_STATES`, the user's call: `FileInput`'s zone sends hover, disabled and error, its drag-over is `isReceiving`,
+  and `Sortable`'s surface sends disabled, so none of those looks stays in a painter. A carried `Sortable` item writes no
+  `border-style`: with no width from its entry the browser draws a 3px border, the card grows as it is picked up,
+  and the landing marker ends up on a card.
+- **The left nav's settings survive a refresh**, in `localStorage`, at the user's request, through `NavSettingsUtils`.
+  Theme and Skin are written only when picked, so a reader who never picks a Theme keeps each framework's own. Every
+  value read back is checked against that setting's list of options, since browser storage can be edited; a value no
+  longer on the list falls back to the default. ASVS 8.2.2 asks that browser storage hold no sensitive data, and these
+  are display preferences only.
 - **The page's font and backdrop are constants, not the Skin's** — the user's call. The `body` rule in
   `Theme.css.ts` holds the font family, size, line height and the backdrop behind the app, and sets no text
   color: every painted area sets its own.
@@ -7630,7 +7656,7 @@ also fixed the geometry and was tried first; the user preferred the cards to sta
 the column demo too, where the three shorter cards now center in the width of the longest rather than lining
 up on the left.
 
-**The dashed surface is drawn outside the list, so every demo has to keep room for it.** `sortableSurface`
+**The surface is drawn outside the list, so every demo has to keep room for it.** `sortableSurface`
 sits at `inset: calc(-1 * spacing.full)` — deliberately a spacing unit beyond the list it belongs to, so the
 items look enclosed by it. The two-list example had that unit back all along, in the wrapper that holds its
 captions, which is why its surface landed neatly on the example card's content edge while every other
@@ -8710,7 +8736,9 @@ framework helper per package (`FloaterSolidUtils.create` and its siblings).
 **What the abstract owns.** The marker's box, in the container's own coordinates: measured from the item
 (`FloaterUtils.observeBounds`, a `ResizeObserver` on the container and the item plus the `offsetParent` hop
 described above) in a plain row or column, or derived from the item's placement in container-query units
-(`computePlacedBounds`) under a layout, where nothing is measured. The fade through `ElementFader`, with the
+(`computePlacedBounds`) under a layout, where nothing is measured. A measured marker keeps the item's fractional
+size, read from the computed style: `offsetWidth` rounds, and a marker rounded up past an item that fills a scrolling
+box gave that box a horizontal scrollbar on hover. The fade through `ElementFader`, with the
 last box kept while the marker fades out, so the exit plays where it was, and dropped once it has gone, so the
 next entrance starts at the new item instead of sliding in from the old one. The `floater` class
 (`position: absolute`, `z-index: -1`, no pointer events, transitions on the four box properties), so each

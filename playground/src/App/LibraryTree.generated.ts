@@ -22,7 +22,7 @@ export const LIBRARY: TreemapNode<string> = branch(
         leaf("ElementObserver", 891),
         leaf("Elevation", 127),
         leaf("Flattener", 122),
-        leaf("Floater", 211),
+        leaf("Floater", 229),
         leaf("FocusManager", 358),
         leaf("FrameRateMonitor", 120),
         leaf("Glass", 311),

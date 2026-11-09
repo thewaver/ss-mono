@@ -6,14 +6,18 @@
 
     import { FIXED_ANCHOR_RATIO } from "./AppSvelte.const";
     import AppContent from "./AppContent.svelte";
-    import { DEFAULT_VIEWPORT_ANCHOR } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
+    import { NavSettingsUtils } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.utils";
     import type { ViewportAnchor } from "./PageComponents/NavSettings/NavSettingsSvelte.types";
     import { SCREEN_HEIGHT } from "@thewaver/ss-playground/App/App.const";
 
     const getWindowInnerSize = () => ({ width: window.innerWidth, height: window.innerHeight });
 
     let windowSize = $state.raw<Size2d>(getWindowInnerSize());
-    let viewportAnchor = $state<ViewportAnchor>(DEFAULT_VIEWPORT_ANCHOR);
+    let viewportAnchor = $state<ViewportAnchor>(NavSettingsUtils.loadViewportAnchor());
+
+    $effect(() => {
+        NavSettingsUtils.save("viewportAnchor", viewportAnchor);
+    });
 
     const viewportSize = $derived.by(() => {
         if (viewportAnchor === "none") return windowSize;

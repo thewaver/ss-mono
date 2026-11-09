@@ -1,53 +1,35 @@
 import { style } from "@vanilla-extract/css";
 
+import { skinEntries, skinStates } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 import { layerVars } from "../Layer/Layer.css";
 
 const ZONE_WIDTH = 320;
 const ZONE_HEIGHT = 120;
-const ZONE_BORDER = 2;
 
-export const isHovered = style({});
-export const isDragOver = style({});
+export const isHovered = style([skinStates.isHovered]);
+export const isDragOver = style([skinStates.isReceiving]);
 export const isEmpty = style({});
-export const isDisabled = style({});
-export const hasError = style({});
+export const isDisabled = style([skinStates.isDisabled]);
+export const hasError = style([skinStates.hasError]);
 
-export const fileDropZoneContent = style({
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: themeVars.spacing.half,
-    boxSizing: "border-box",
-    width: ZONE_WIDTH,
-    height: ZONE_HEIGHT,
-    padding: themeVars.spacing.full,
-    border: `${ZONE_BORDER}px dashed rgb(from ${layerVars.contrast} r g b / 25%)`,
-    borderRadius: themeVars.borderRadius.full,
-    backgroundColor: layerVars.main,
-    fontSize: themeVars.fontSize.medium,
-    textAlign: "center",
-    transition: `filter ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}, border-color ${themeVars.animation.duration}, background-color ${themeVars.animation.duration}`,
-
-    selectors: {
-        [`&.${hasError}`]: {
-            borderColor: themeVars.color.error.main,
-        },
-        [`&.${isHovered}`]: {
-            filter: themeVars.hover.filter,
-        },
-        [`&.${isDragOver}`]: {
-            borderStyle: "solid",
-            borderColor: themeVars.color.primary.main,
-            backgroundColor: `rgb(from ${themeVars.color.primary.main} r g b / 15%)`,
-        },
-        [`&.${isDisabled}`]: {
-            filter: themeVars.disabled.filter,
-            opacity: themeVars.disabled.opacity,
-        },
+export const fileDropZoneContent = style([
+    skinEntries.dropZone,
+    {
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: themeVars.spacing.half,
+        boxSizing: "border-box",
+        width: ZONE_WIDTH,
+        height: ZONE_HEIGHT,
+        padding: themeVars.spacing.full,
+        fontSize: themeVars.fontSize.medium,
+        textAlign: "center",
+        transition: `filter ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}, border-color ${themeVars.animation.duration}, background-color ${themeVars.animation.duration}`,
     },
-});
+]);
 
 export const fileDropZonePrompt = style({
     fontWeight: "bold",

@@ -1,6 +1,6 @@
 import { globalStyle } from "@vanilla-extract/css";
 
-import type { SkinEntry, SkinRule, SkinRules } from "./Skin.types";
+import type { SkinBaseColor, SkinEntry, SkinRule, SkinRules } from "./Skin.types";
 
 import { BODY_FONT_FAMILY } from "../Theme.css";
 import { skinBoundary, skinEntries, skinLayer, skinSelectors, skinSizeVars } from "./Skin.css";
@@ -69,6 +69,12 @@ export namespace SkinUtils {
                 Object.fromEntries(corners.map((corner) => [corner, radius])),
             ]),
         );
+
+    export const extendColor = (color: Pick<SkinBaseColor, "contrast" | "main">): SkinBaseColor => ({
+        ...color,
+        dark: `hsl(from ${color.main} h s max(l - 10, 0))`,
+        light: `hsl(from ${color.main} h s min(l + 10, 100))`,
+    });
 
     export const define = (root: string, rules: SkinRules) => {
         globalStyle(`.${root}`, { "@layer": { [skinLayer]: ROOT_RESET } });

@@ -50,7 +50,6 @@ export const renderFanItem = (
     <div
         class={styles.item}
         classList={{
-            [styles.itemBack]: getFlags().isBack,
             [styles.itemHighlighted]: getFlags().isHighlighted,
             [styles.itemDisabled]: getFlags().isDisabled,
         }}

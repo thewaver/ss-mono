@@ -14,7 +14,6 @@ import * as styles from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.cs
 import { PagePropHintBadge } from "../../StyledComponents/PropHintBadge/PropHintBadge";
 import { PageTooltipContent } from "../../StyledComponents/TooltipContent/TooltipContent";
 import { FieldDefaultProvider } from "../Field/FieldSolid.context";
-import { usePropsPanelContext } from "../PropsPanel/PropsPanel.context";
 import type { PagePropProps } from "./Prop.types";
 
 const toDefaultText = (value: unknown) => {
@@ -29,8 +28,6 @@ const toBreakableText = (text: string) =>
     text.split(MEMBER_SEPARATOR).flatMap((part, index) => (index === 0 ? [part] : [MEMBER_SEPARATOR, <wbr />, part]));
 
 export const PageProp = (props: ParentProps<PagePropProps>) => {
-    const propsPanelScope = usePropsPanelContext();
-
     const [getReported, setReported] = createSignal<{ value: unknown }[]>([]);
 
     const report = (value: unknown) => {
@@ -47,11 +44,7 @@ export const PageProp = (props: ParentProps<PagePropProps>) => {
         toDefaultText(props.defaultValue === undefined ? getReportedDefault() : access(props.defaultValue));
 
     return (
-        <div
-            class={styles.propScopeVariants[(propsPanelScope ? access(propsPanelScope.scope) : undefined) ?? "unknown"]}
-            data-prop
-            data-testid={access(props.key)}
-        >
+        <div class={styles.propRow} data-prop data-testid={access(props.key)}>
             <div class={styles.propLabel}>
                 {access(props.label)}
 

@@ -52,7 +52,6 @@
     <div
         class={[
             styles.item,
-            flags.isBack && styles.itemBack,
             flags.isHighlighted && styles.itemHighlighted,
             flags.isDisabled && styles.itemDisabled,
         ]}

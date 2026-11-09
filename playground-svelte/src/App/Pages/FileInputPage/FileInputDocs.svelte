@@ -17,6 +17,8 @@
 
     let hasError = $state(false);
     let isDisabled = $state(false);
+    let dropZoneHasError = $state(false);
+    let dropZoneIsDisabled = $state(false);
     let isReachableWhenDisabled = $state(false);
     let isTooltipDisabled = $state(false);
 </script>
@@ -96,7 +98,39 @@
 </PageDocsAlert>
 
 <PageDocsExample path={`${DOCS_ROOT}/DropZone.svelte`}>
-    <DropZoneDocsExample />
+    <DropZoneDocsExample hasError={dropZoneHasError} isDisabled={dropZoneIsDisabled} />
+
+    {#snippet renderKnobs()}
+        <PageProp
+            itemKey={"dropZoneHasError"}
+            label={"Error"}
+            hint={"Marks the control invalid, for screen readers as well as for the painter."}
+            controls={"Sets FileInputProps.hasError"}
+        >
+            <PageCheckField
+                value={dropZoneHasError}
+                ariaLabel={"Error"}
+                onChange={(value) => {
+                    dropZoneHasError = value;
+                }}
+            />
+        </PageProp>
+
+        <PageProp
+            itemKey={"dropZoneIsDisabled"}
+            label={"Disabled"}
+            hint={"Turns the control off: pressing it opens no dialog, a dropped file is refused, and the Tab key skips it."}
+            controls={"Sets FileInputProps.isDisabled"}
+        >
+            <PageCheckField
+                value={dropZoneIsDisabled}
+                ariaLabel={"Disabled"}
+                onChange={(value) => {
+                    dropZoneIsDisabled = value;
+                }}
+            />
+        </PageProp>
+    {/snippet}
 </PageDocsExample>
 
 <PageDocsSection

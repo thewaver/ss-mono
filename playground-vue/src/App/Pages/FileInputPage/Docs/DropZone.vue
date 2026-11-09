@@ -12,6 +12,11 @@ import {
 } from "@thewaver/ss-playground/App/Pages/FileInputPage/FileInputPage.const";
 
 import PageFileDropZoneContent from "../../../StyledComponents/FileDropZoneContent/FileDropZoneContent.vue";
+import type { FileInputDropZoneDocsExampleProps } from "../FileInputPageVue.types";
+
+type Props = FileInputDropZoneDocsExampleProps;
+
+defineProps<Props>();
 
 const files = shallowRef<File[]>([]);
 const rejections = shallowRef<FileInputRejection[]>([]);
@@ -29,6 +34,8 @@ const readout = computed(
 <template>
     <FileInput
         v-model:files="files"
+        :has-error="hasError"
+        :is-disabled="isDisabled"
         is-multiple
         :max-files="DROP_ZONE_MAX_FILES"
         :max-size-bytes="DROP_ZONE_MAX_SIZE_BYTES"

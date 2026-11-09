@@ -1,9 +1,7 @@
 import { style } from "@vanilla-extract/css";
 
-import { layerVars } from "../../StyledComponents/Layer/Layer.css";
+import { skinEntries } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
-
-const tileBackground = `rgb(from ${layerVars.contrast} r g b / 10%)`;
 
 export const frame = style({
     width: "100%",
@@ -20,31 +18,31 @@ export const column = style({
     gap: themeVars.spacing.half,
 });
 
-export const row = style({
-    padding: themeVars.spacing.full,
-    color: layerVars.contrast,
-    backgroundColor: tileBackground,
-    borderRadius: themeVars.borderRadius.half,
-});
+export const row = style([
+    skinEntries.itemStatic,
+    {
+        padding: themeVars.spacing.full,
+    },
+]);
 
 export const strip = style({
     display: "flex",
     gap: themeVars.spacing.full,
 });
 
-export const chip = style({
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    flexShrink: 0,
-    height: 32,
-    paddingInline: themeVars.spacing.double,
-    color: layerVars.contrast,
-    backgroundColor: tileBackground,
-    borderRadius: themeVars.borderRadius.half,
-    fontSize: themeVars.fontSize.small,
-    whiteSpace: "nowrap",
-});
+export const chip = style([
+    skinEntries.itemStatic,
+    {
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        flexShrink: 0,
+        height: 32,
+        paddingInline: themeVars.spacing.double,
+        fontSize: themeVars.fontSize.small,
+        whiteSpace: "nowrap",
+    },
+]);
 
 export const grid = style({
     display: "grid",
@@ -52,15 +50,15 @@ export const grid = style({
     gap: themeVars.spacing.full,
 });
 
-export const tile = style({
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    height: 80,
-    color: layerVars.contrast,
-    backgroundColor: tileBackground,
-    borderRadius: themeVars.borderRadius.half,
-});
+export const tile = style([
+    skinEntries.itemStatic,
+    {
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: 80,
+    },
+]);
 
 export const card = style({
     display: "flex",

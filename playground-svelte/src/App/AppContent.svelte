@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { NavSettingsUtils } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.utils";
     import { Router } from "sv-router";
     import { untrack } from "svelte";
 
@@ -128,7 +129,11 @@
     let { viewportAnchor = $bindable() }: { viewportAnchor: ViewportAnchor } = $props();
 
     let searchTerm = $state("");
-    let showsDescriptionOnly = $state(false);
+    let showsDescriptionOnly = $state(NavSettingsUtils.loadShowsDescriptionOnly());
+
+    $effect(() => {
+        NavSettingsUtils.save("showsDescriptionOnly", showsDescriptionOnly);
+    });
     let pageView = $state<PageViewKey>(DEFAULT_PAGE_VIEW);
     let isAutoHidden = $state(false);
     let browseExpanded = $state.raw<MenuNodeConfig[]>(VISIBLE_MENU_CONFIGS);

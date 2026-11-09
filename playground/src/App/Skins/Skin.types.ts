@@ -11,10 +11,12 @@ export type SkinEntry =
     | "decoration"
     | "drawer"
     | "dropdown"
+    | "dropZone"
     | "input"
     | "itemBase"
     | "itemHoverFloater"
     | "itemSelectionFloater"
+    | "itemStatic"
     | "overlay"
     | "pageBackground"
     | "pageContainer"
@@ -48,6 +50,8 @@ export type SkinState =
     | "isExpanded"
     | "isPressed"
     | "isChecked"
+    | "isCarrying"
+    | "isReceiving"
     | "isMixed"
     | "isVertical"
     | "isStart"
@@ -67,3 +71,10 @@ export type SkinRule = GlobalStyleRule & {
 };
 
 export type SkinRules = Record<SkinEntry, SkinRule>;
+
+export type SkinBaseColor = {
+    dark: string;
+    main: string;
+    light: string;
+    contrast: string;
+};

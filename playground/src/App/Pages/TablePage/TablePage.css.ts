@@ -1,15 +1,15 @@
 import { style } from "@vanilla-extract/css";
 
-import { layerVars } from "../../StyledComponents/Layer/Layer.css";
-import { themeVars } from "../../Theme.css";
+import { skinEntries } from "../../Skins/Skin.css";
 import { docsAccordion } from "../Accordions/Accordions.css";
 
-export const tableFrame = style({
-    width: "100%",
-    borderRadius: themeVars.borderRadius.half,
-    backgroundColor: layerVars.main,
-    overflow: "auto",
-});
+export const tableFrame = style([
+    skinEntries.panel,
+    {
+        width: "100%",
+        overflow: "auto",
+    },
+]);
 
 export const tableFrameShort = style([tableFrame, { maxHeight: 260 }]);
 

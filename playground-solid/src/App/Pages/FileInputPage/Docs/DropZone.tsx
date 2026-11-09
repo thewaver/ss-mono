@@ -11,8 +11,11 @@ import {
 } from "@thewaver/ss-playground/App/Pages/FileInputPage/FileInputPage.const";
 
 import { PageFileDropZoneContent } from "../../../StyledComponents/FileDropZoneContent/FileDropZoneContent";
+import type { FileInputDropZoneDocsExampleProps } from "../FileInputPageSolid.types";
 
-export const DropZoneDocsExample = () => {
+type Props = FileInputDropZoneDocsExampleProps;
+
+export const DropZoneDocsExample = (props: Props) => {
     const filesSignal = createSignal<File[]>([]);
 
     const [getRejections, setRejections] = createSignal<FileInputRejection[]>([]);
@@ -21,6 +24,8 @@ export const DropZoneDocsExample = () => {
         <>
             <FileInput
                 files={filesSignal}
+                hasError={props.hasError}
+                isDisabled={props.isDisabled}
                 isMultiple={true}
                 maxFiles={DROP_ZONE_MAX_FILES}
                 maxSizeBytes={DROP_ZONE_MAX_SIZE_BYTES}

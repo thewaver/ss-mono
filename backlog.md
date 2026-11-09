@@ -135,7 +135,7 @@ string" is not a departure from how the industry splits these two layers — it 
 same example.
 
 **Skins — begun.** The Playground's painters now take their paint from a Skin picked in the left nav, as a Theme
-is: the Theme gives the colors, the Skin decides shapes and where those colors go. Shaded is the only one.
+is: the Theme gives the colors, the Skin decides shapes and where those colors go. Shaded is the default, and the ones kept are in `PLAYGROUND_SKINS`.
 How it works is in `decisions.md` under _"Skins"_. What follows keeps its own paint, so a Skin does not reach it
 yet.
 
@@ -146,7 +146,7 @@ yet.
     - Library components: breadcrumbs, the flyout menu, the table of contents.
     - Playground-only: the left nav's ABOUT, GETTING STARTED and GALLERY, and the framework menu's trigger.
 - **The selection markers, and the tab labels with them** (all library components): the tab underline and
-  vertical bar, the honeycomb tabs' hex markers, the segmented radio's marker, and the table of contents'
+  vertical bar, the honeycomb tabs' hex markers and the table of contents'
   current-entry bar. Tabs have to stay very flexible: another Skin might draw them as a segmented control with a
   groove behind, or as a rectangle that moves around the selected tab. A Skin entry for the marker and another
   for its groove would cover only the row and column layouts; the hex tabs would stay fully custom. The table of
@@ -158,11 +158,10 @@ yet.
     - the chips and badges other than tags: the satellite badge and pill, the staircase steps and the stepper
       markers;
     - the custom variants, which want a painter of their own rather than classes: the progress ring, the range
-      knob, the scroller arc, the slide button and the color area;
-    - the calendar's days, title and weekday headings, the clock's options and unit labels, and the accordion
-      header;
-    - the data views: the table, the timeline, the patch board, the sortable list and grid, the split pane, the
-      form section's line, the file drop zone and the inline edit;
+      knob, the scroller arc and the color area;
+    - the calendar's title and weekday headings, and the clock's unit labels;
+    - the data views: the table's header and cells, the timeline, the patch board, the sortable grid, the split pane, the
+      form section's line and the inline edit;
     - the decorative samples drawn inside components: the cuboid and die faces, the flip card's back, the mosaic
       tiles, the icicle, treemap, sunburst and circle-packing charts, the wheel, the tile board, the trail, the
       beam, the SVG filters stage, the ripple and the formation items.

@@ -1,5 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
+import { skinEntries } from "../../Skins/Skin.css";
 import { layerVars } from "../../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../../Theme.css";
 
@@ -10,11 +11,14 @@ export const paragraphs = style({
     paddingBottom: themeVars.spacing.full,
 });
 
-export const panel = style({
-    borderRadius: themeVars.borderRadius.full,
-    padding: themeVars.spacing.full,
-    backgroundColor: layerVars.main,
-});
+export const panel = style([
+    skinEntries.panel,
+    {
+        padding: themeVars.spacing.full,
+        backgroundColor: layerVars.main,
+        backgroundImage: "none",
+    },
+]);
 
 export const fade = style({
     height: 60,

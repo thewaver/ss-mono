@@ -1,6 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
-import { layerVars } from "../../StyledComponents/Layer/Layer.css";
+import { skinEntries } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 
 export const resizer = style({
@@ -13,15 +13,16 @@ export const resizer = style({
     borderRadius: themeVars.borderRadius.full,
 });
 
-export const bar = style({
-    display: "flex",
-    alignItems: "center",
-    width: "100%",
-    height: "100%",
-    padding: themeVars.spacing.half,
-    borderRadius: themeVars.borderRadius.full,
-    backgroundColor: layerVars.main,
-});
+export const bar = style([
+    skinEntries.dropZone,
+    {
+        display: "flex",
+        alignItems: "center",
+        width: "100%",
+        height: "100%",
+        padding: themeVars.spacing.half,
+    },
+]);
 
 const PRESSED_MARK_PX = 3;
 

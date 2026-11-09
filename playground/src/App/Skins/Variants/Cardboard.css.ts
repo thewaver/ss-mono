@@ -1,6 +1,7 @@
 import { ObjectUtils } from "@thewaver/ss-utils";
 import { type StyleRule, style } from "@vanilla-extract/css";
 
+import type { SkinBaseColor } from "../Skin.types";
 import { SkinUtils } from "../Skin.utils";
 
 import { layerVars } from "../../StyledComponents/Layer/Layer.css";
@@ -119,11 +120,11 @@ const TAB_FLOATER_SELECTED_VERT: StyleRule = {
     borderInlineStart: `2px solid ${themeVars.color.primary.main}`,
 };
 
-const surface = (layer: "background" | "surface"): StyleRule => ({
+const surface = (color: SkinBaseColor): StyleRule => ({
     borderRadius: themeVars.borderRadius.half,
-    backgroundColor: themeVars.color[layer].main,
+    backgroundColor: color.main,
     boxShadow: SHADOW_MEDIUM,
-    color: themeVars.color[layer].contrast,
+    color: color.contrast,
     fontSize: themeVars.fontSize.medium,
 });
 
@@ -203,7 +204,22 @@ SkinUtils.define(cardboard, {
     },
     dropdown: {
         ...INPUT_SHELL,
-        border: "none",
+        border: INPUT_SHELL.borderBottom,
+    },
+    dropZone: {
+        border: [`2px dashed ${layerVars.contrast}`, `2px dashed rgb(from ${layerVars.contrast} r g b / 25%)`],
+        selectors: ObjectUtils.deepMerge(INPUT_STATES, {
+            [skinSelectors.isCarrying]: {
+                borderColor: [layerVars.contrast, `rgb(from ${layerVars.contrast} r g b / 50%)`],
+            },
+            [skinSelectors.isReceiving]: {
+                borderColor: themeVars.color.primary.main,
+                backgroundColor: [
+                    themeVars.color.primary.main,
+                    `rgb(from ${themeVars.color.primary.main} r g b / 10%)`,
+                ],
+            },
+        }),
     },
     input: {
         ...INPUT_SHELL,
@@ -235,6 +251,10 @@ SkinUtils.define(cardboard, {
     itemSelectionFloater: {
         ...ITEM_FLOATER_SELECTED,
     },
+    itemStatic: {
+        ...ITEM,
+        ...ITEM_FLOATER_HOVER,
+    },
     overlay: {
         backdropFilter: "blur(10px) grayscale(75%)",
     },
@@ -243,7 +263,7 @@ SkinUtils.define(cardboard, {
         color: themeVars.color.background.contrast,
     },
     pageContainer: {
-        ...surface("background"),
+        ...surface(SkinUtils.extendColor(layerVars)),
     },
     panel: {
         borderRadius: themeVars.borderRadius.half,
@@ -354,7 +374,7 @@ SkinUtils.define(cardboard, {
         fontWeight: "bold",
     },
     surface: {
-        ...surface("surface"),
+        ...surface(themeVars.color.surface),
     },
     tabsItemBase: {
         paddingBlock: themeVars.spacing.full,

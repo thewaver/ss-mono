@@ -7,7 +7,6 @@
     import { setFieldResetContext } from "../Field/FieldSvelte.context";
     import { getIsPreview } from "../Preview/Preview.context";
     import PageProp from "../Prop/Prop.svelte";
-    import { setPropsPanelContext } from "./PropsPanel.context";
     import type { PagePropsPanelProps } from "./PropsPanelSvelte.types";
     import {
         DEFAULT_HAS_RESET,
@@ -28,12 +27,6 @@
             return () => {
                 resets = resets.filter((entry) => entry !== reset);
             };
-        },
-    });
-
-    setPropsPanelContext({
-        get scope() {
-            return props.scope;
         },
     });
 

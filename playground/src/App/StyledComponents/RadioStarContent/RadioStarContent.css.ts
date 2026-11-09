@@ -36,8 +36,19 @@ export const starContent = style({
 });
 
 export const starCell = style({
+    position: "relative",
     display: "grid",
     placeItems: "center",
     width: "100%",
     height: "100%",
+});
+
+export const starNumber = style({
+    position: "absolute",
+    insetBlockEnd: "100%",
+    insetInline: 0,
+    color: layerVars.contrast,
+    fontSize: themeVars.fontSize.xSmall,
+    textAlign: "center",
+    pointerEvents: "none",
 });

@@ -1,57 +1,51 @@
 import { style } from "@vanilla-extract/css";
 
+import { skinEntries, skinStates } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
-import { layerVars } from "../Layer/Layer.css";
 
-export const isChecked = style({});
-export const isHovered = style({});
-export const isDisabled = style({});
+export const isChecked = style([skinStates.isSelected]);
+export const isHovered = style([skinStates.isHovered]);
+export const isDisabled = style([skinStates.isDisabled]);
 export const hasError = style({});
 export const isVisible = style({});
 
-export const segmentGroup = style({
-    width: "fit-content",
-    padding: themeVars.spacing.half,
-    border: `1px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
-    borderRadius: themeVars.borderRadius.full,
-    backgroundColor: layerVars.main,
-});
+export const segmentGroup = style([
+    skinEntries.tabsTrack,
+    {
+        width: "fit-content",
+        padding: themeVars.spacing.half,
+    },
+]);
 
-export const segmentContent = style({
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    height: 40,
-    paddingInline: themeVars.spacing.double,
-    transition: `color ${themeVars.animation.duration}, filter ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}`,
+export const segmentContent = style([
+    skinEntries.tabsItemBase,
+    skinStates.hasSelectionFloater,
+    {
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: 40,
+        paddingInline: themeVars.spacing.double,
+        transition: `color ${themeVars.animation.duration}, filter ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}`,
 
-    selectors: {
-        [`&.${isChecked}`]: {
-            color: themeVars.color.primary.contrast,
-        },
-        [`&.${hasError}`]: {
-            color: themeVars.color.error.main,
-        },
-        [`&.${isHovered}`]: {
-            filter: themeVars.hover.filter,
-        },
-        [`&.${isDisabled}`]: {
-            filter: themeVars.disabled.filter,
-            opacity: themeVars.disabled.opacity,
+        selectors: {
+            [`&.${hasError}`]: {
+                color: themeVars.color.error.main,
+            },
         },
     },
-});
+]);
 
-export const segmentFloater = style({
-    borderRadius: themeVars.borderRadius.half,
-    backgroundColor: themeVars.color.primary.light,
-    backgroundImage: `linear-gradient(45deg, ${themeVars.color.primary.dark}, ${themeVars.color.primary.light})`,
-    opacity: 0,
-    transitionProperty: "opacity",
+export const segmentFloater = style([
+    skinEntries.tabsItemSelectionFloater,
+    {
+        opacity: 0,
+        transitionProperty: "opacity",
 
-    selectors: {
-        [`&.${isVisible}`]: {
-            opacity: 1,
+        selectors: {
+            [`&.${isVisible}`]: {
+                opacity: 1,
+            },
         },
     },
-});
+]);

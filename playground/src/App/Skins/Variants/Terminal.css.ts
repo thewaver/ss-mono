@@ -1,6 +1,7 @@
 import { ObjectUtils } from "@thewaver/ss-utils";
 import { type StyleRule, style } from "@vanilla-extract/css";
 
+import type { SkinBaseColor } from "../Skin.types";
 import { SkinUtils } from "../Skin.utils";
 
 import { layerVars } from "../../StyledComponents/Layer/Layer.css";
@@ -103,13 +104,10 @@ const TAB_FLOATER_SELECTED: StyleRule = {
     border: `2px solid ${themeVars.color.primary.main}`,
 };
 
-const surface = (layer: "background" | "surface"): StyleRule => ({
-    border: [
-        `2px solid ${themeVars.color[layer].contrast}`,
-        `2px solid rgb( from ${themeVars.color[layer].contrast} r g b / 25%)`,
-    ],
-    backgroundColor: themeVars.color[layer].dark,
-    color: themeVars.color[layer].contrast,
+const surface = (color: SkinBaseColor): StyleRule => ({
+    border: [`2px solid ${color.contrast}`, `2px solid rgb( from ${color.contrast} r g b / 25%)`],
+    backgroundColor: color.main,
+    color: color.contrast,
     fontSize: themeVars.fontSize.medium,
 });
 
@@ -199,6 +197,21 @@ SkinUtils.define(terminal, {
     dropdown: {
         ...INPUT_SHELL,
     },
+    dropZone: {
+        border: [`2px dashed ${layerVars.contrast}`, `2px dashed rgb(from ${layerVars.contrast} r g b / 25%)`],
+        selectors: ObjectUtils.deepMerge(INPUT_STATES, {
+            [skinSelectors.isCarrying]: {
+                borderColor: [layerVars.contrast, `rgb(from ${layerVars.contrast} r g b / 50%)`],
+            },
+            [skinSelectors.isReceiving]: {
+                borderColor: themeVars.color.primary.main,
+                backgroundColor: [
+                    themeVars.color.primary.main,
+                    `rgb(from ${themeVars.color.primary.main} r g b / 10%)`,
+                ],
+            },
+        }),
+    },
     input: {
         ...INPUT_SHELL,
         selectors: ObjectUtils.deepMerge(INPUT_STATES, {
@@ -229,6 +242,10 @@ SkinUtils.define(terminal, {
     itemSelectionFloater: {
         ...ITEM_FLOATER_SELECTED,
     },
+    itemStatic: {
+        ...ITEM,
+        ...ITEM_FLOATER_HOVER,
+    },
     overlay: {
         backdropFilter: "blur(10px) grayscale(75%)",
     },
@@ -238,7 +255,7 @@ SkinUtils.define(terminal, {
         fontFamily: "monospace",
     },
     pageContainer: {
-        ...surface("background"),
+        ...surface(SkinUtils.extendColor(layerVars)),
     },
     panel: {
         border: [
@@ -340,7 +357,7 @@ SkinUtils.define(terminal, {
         fontWeight: "bold",
     },
     surface: {
-        ...surface("surface"),
+        ...surface(themeVars.color.surface),
     },
     tabsItemBase: {
         paddingBlock: themeVars.spacing.full,

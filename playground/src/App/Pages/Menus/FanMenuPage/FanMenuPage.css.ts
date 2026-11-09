@@ -1,57 +1,53 @@
 import { style } from "@vanilla-extract/css";
 
+import { skinEntries, skinStates } from "../../../Skins/Skin.css";
 import { layerVars } from "../../../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../../../Theme.css";
 
-export const itemHighlighted = style({});
+export const itemHighlighted = style([skinStates.isHovered]);
 
-export const item = style({
-    display: "flex",
-    position: "relative",
-    isolation: "isolate",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: themeVars.spacing.half,
-    width: "100%",
-    height: "100%",
-    padding: `0 ${themeVars.spacing.full}`,
-    borderRadius: themeVars.borderRadius.full,
-    backgroundColor: layerVars.main,
-    boxShadow: themeVars.shadow.small,
-    color: layerVars.contrast,
-    fontSize: themeVars.fontSize.small,
-    textAlign: "center",
-    transition: "background-color 120ms ease-out, color 120ms ease-out, transform 120ms ease-out",
+export const item = style([
+    skinEntries.dropdown,
+    skinEntries.itemBase,
+    skinStates.hasHoverFloater,
+    {
+        display: "flex",
+        position: "relative",
+        isolation: "isolate",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: themeVars.spacing.half,
+        width: "100%",
+        height: "100%",
+        padding: `0 ${themeVars.spacing.full}`,
+        fontSize: themeVars.fontSize.small,
+        textAlign: "center",
+        transition: "background-color 120ms ease-out, color 120ms ease-out, transform 120ms ease-out",
 
-    selectors: {
-        [`&.${itemHighlighted}`]: {
-            color: themeVars.color.primary.contrast,
-            backgroundColor: "transparent",
+        selectors: {
+            [`&.${skinStates.isHovered}`]: {
+                backgroundColor: "transparent",
+                backgroundImage: "none",
+            },
         },
     },
-});
+]);
 
-export const itemFloater = style({
-    width: "100%",
-    height: "100%",
-    borderRadius: themeVars.borderRadius.full,
-    backgroundColor: themeVars.color.primary.light,
-    backgroundImage: `linear-gradient(45deg, ${themeVars.color.primary.dark}, ${themeVars.color.primary.light})`,
-    opacity: 0,
-    transitionProperty: "opacity",
-});
+export const itemFloater = style([
+    skinEntries.itemHoverFloater,
+    {
+        width: "100%",
+        height: "100%",
+        opacity: 0,
+        transitionProperty: "opacity",
+    },
+]);
 
 export const itemFloaterVisible = style({
     opacity: 1,
 });
 
-export const itemBack = style({
-    backgroundImage: `linear-gradient(45deg, rgb(from ${themeVars.color.primary.dark} r g b / 30%), rgb(from ${themeVars.color.primary.light} r g b / 30%))`,
-});
-
-export const itemDisabled = style({
-    opacity: 0.4,
-});
+export const itemDisabled = style([skinStates.isDisabled]);
 
 export const shortcut = style({
     flex: "none",

@@ -2,6 +2,7 @@ import { For, createSignal } from "solid-js";
 
 import { Radio, RadioGroup } from "@thewaver/ss-components-solid";
 import { ARC_LAYOUT, ARC_WIDTH, STARTING_RATING } from "@thewaver/ss-playground/App/Pages/RadioPage/RadioPage.const";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/RadioStarContent/RadioStarContent.css";
 
 import { PageRadioStarCell, PageRadioStarContent } from "../../../StyledComponents/RadioStarContent/RadioStarContent";
 
@@ -23,6 +24,10 @@ export const ArcDocsExample = () => {
                             onMouseLeave={() => setHovered(undefined)}
                             renderContent={(getFlags) => (
                                 <PageRadioStarCell>
+                                    <span class={styles.starNumber} aria-hidden="true">
+                                        {rating}
+                                    </span>
+
                                     <PageRadioStarContent
                                         flags={getFlags}
                                         isFilled={() => rating <= (getHovered() ?? valueSignal[0]())}

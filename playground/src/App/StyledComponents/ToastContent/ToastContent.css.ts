@@ -18,7 +18,6 @@ export const toastCard = style([
         alignItems: "center",
         gap: themeVars.spacing.full,
         width: 300,
-        borderInlineStart: `4px solid ${themeVars.color.primary.main}`,
         padding: themeVars.spacing.full,
     },
 ]);

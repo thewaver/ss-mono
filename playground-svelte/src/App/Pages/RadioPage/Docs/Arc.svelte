@@ -2,6 +2,7 @@
     
     import { Radio, RadioGroup } from "@thewaver/ss-components-svelte";
     import { ARC_LAYOUT, ARC_WIDTH, STARTING_RATING } from "@thewaver/ss-playground/App/Pages/RadioPage/RadioPage.const";
+    import * as styles from "@thewaver/ss-playground/App/StyledComponents/RadioStarContent/RadioStarContent.css";
 
     import PageRadioStarCell from "../../../StyledComponents/RadioStarContent/PageRadioStarCell.svelte";
     import PageRadioStarContent from "../../../StyledComponents/RadioStarContent/PageRadioStarContent.svelte";
@@ -27,6 +28,8 @@
             >
                 {#snippet renderContent(flags)}
                     <PageRadioStarCell>
+                        <span class={styles.starNumber} aria-hidden="true">{rating}</span>
+
                         <PageRadioStarContent {flags} isFilled={rating <= (hovered ?? value)} />
                     </PageRadioStarCell>
                 {/snippet}

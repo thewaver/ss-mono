@@ -36,7 +36,7 @@ import {
     restoreRootSlash,
     toRouterBase,
 } from "@thewaver/ss-playground/App/PageComponents/FrameworkSwitch/FrameworkSwitch.const";
-import { DEFAULT_VIEWPORT_ANCHOR } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
+import { NavSettingsUtils } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.utils";
 import {
     DEFAULT_PAGE_VIEW,
     EXAMPLES_VIEW,
@@ -353,7 +353,13 @@ export function AppContent(props: { viewportAnchor: readonly [ViewportAnchor, (v
     const location = useLocation();
 
     const [searchTerm, setSearchTerm] = useState("");
-    const showsDescriptionOnlyState = useState(false);
+    const showsDescriptionOnlyState = useState(NavSettingsUtils.loadShowsDescriptionOnly);
+
+    useEffect(
+        () => NavSettingsUtils.save("showsDescriptionOnly", showsDescriptionOnlyState[0]),
+        [showsDescriptionOnlyState[0]],
+    );
+
     const [pageView, setPageView] = useState<PageViewKey>(DEFAULT_PAGE_VIEW);
     const [isAutoHidden, setIsAutoHidden] = useState(false);
     const [browseExpanded, setBrowseExpanded] = useState<MenuNodeConfig[]>(VISIBLE_MENU_CONFIGS);
@@ -653,7 +659,9 @@ const getWindowInnerSize = () => ({ width: window.innerWidth, height: window.inn
 
 export function App() {
     const [windowSize, setWindowSize] = useState<Size2d>(getWindowInnerSize);
-    const viewportAnchorState = useState<ViewportAnchor>(DEFAULT_VIEWPORT_ANCHOR);
+    const viewportAnchorState = useState<ViewportAnchor>(NavSettingsUtils.loadViewportAnchor);
+
+    useEffect(() => NavSettingsUtils.save("viewportAnchor", viewportAnchorState[0]), [viewportAnchorState[0]]);
 
     const anchor = viewportAnchorState[0];
 

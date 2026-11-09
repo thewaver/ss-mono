@@ -29,6 +29,24 @@ const measureOffset = (container: HTMLElement, target: HTMLElement) => {
     return { top, left };
 };
 
+const sumPixels = (...lengths: string[]) => lengths.reduce((total, length) => total + Number.parseFloat(length), 0);
+
+/** An element's border box in layout pixels, to the fraction, falling back to whole pixels where it has no used size. */
+const measureExactSize = (target: HTMLElement) => {
+    const style = getComputedStyle(target);
+    const width = Number.parseFloat(style.width);
+    const height = Number.parseFloat(style.height);
+
+    if (Number.isNaN(width) || Number.isNaN(height)) return { width: target.offsetWidth, height: target.offsetHeight };
+    if (style.boxSizing === "border-box") return { width, height };
+
+    return {
+        width: width + sumPixels(style.paddingLeft, style.paddingRight, style.borderLeftWidth, style.borderRightWidth),
+        height:
+            height + sumPixels(style.paddingTop, style.paddingBottom, style.borderTopWidth, style.borderBottomWidth),
+    };
+};
+
 /**
  * A marker that slides to whichever item a control is pointing at — the selected tab, the highlighted option — drawn
  * by the consumer behind the items.
@@ -74,8 +92,8 @@ export namespace FloaterUtils {
     /**
      * The box round an item, against the container the marker is drawn in.
      *
-     * Measured in layout pixels through the offsets, so a scaled ancestor does not throw it off, and with any
-     * scrolling between the two taken out.
+     * Measured in layout pixels, so a scaled ancestor does not throw it off, and with any scrolling between the two
+     * taken out. The size keeps its fraction, so a marker round an item that fills a scrolling box never overflows it.
      *
      * @param container The element the marker is positioned in. It has to be the item's offset parent or one of its
      * ancestors' — a positioned element round the items.
@@ -84,12 +102,13 @@ export namespace FloaterUtils {
      */
     export const measureBounds = (container: HTMLElement, target: HTMLElement): FloaterBounds => {
         const { top, left } = measureOffset(container, target);
+        const { width, height } = measureExactSize(target);
 
         return {
             top: `${top}px`,
             left: `${left}px`,
-            width: `${target.offsetWidth}px`,
-            height: `${target.offsetHeight}px`,
+            width: `${width}px`,
+            height: `${height}px`,
         };
     };
 

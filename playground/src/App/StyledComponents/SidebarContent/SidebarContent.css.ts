@@ -2,7 +2,6 @@ import { style, styleVariants } from "@vanilla-extract/css";
 
 import { skinEntries } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
-import { layerVars } from "../Layer/Layer.css";
 
 const FRAME_MAX_WIDTH = 520;
 const FRAME_HEIGHT = 240;
@@ -34,16 +33,16 @@ export const sidebarFrameVariants = styleVariants({
     },
 });
 
-export const sidebarFrame = style({
-    display: "flex",
-    width: "100%",
-    maxWidth: FRAME_MAX_WIDTH,
-    height: FRAME_HEIGHT,
-    border: `1px solid rgb(from currentColor r g b / 25%)`,
-    borderRadius: themeVars.borderRadius.full,
-    backgroundColor: layerVars.main,
-    overflow: "hidden",
-});
+export const sidebarFrame = style([
+    skinEntries.panel,
+    {
+        display: "flex",
+        width: "100%",
+        maxWidth: FRAME_MAX_WIDTH,
+        height: FRAME_HEIGHT,
+        overflow: "hidden",
+    },
+]);
 
 export const sidebarSurface = style([
     skinEntries.drawer,

@@ -1,9 +1,9 @@
-import { style, styleVariants } from "@vanilla-extract/css";
+import { style } from "@vanilla-extract/css";
 
 import { skinEntries } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 
-export const propScopeBase = style([
+export const propRow = style([
     skinEntries.panel,
     {
         display: "grid",
@@ -14,34 +14,6 @@ export const propScopeBase = style([
         width: "100%",
     },
 ]);
-
-export const propScopeVariants = styleVariants({
-    global: [
-        propScopeBase,
-        {
-            backgroundColor: [
-                themeVars.color.background.dark,
-                `hsl(from ${themeVars.color.background.dark} h s l / 50%)`,
-            ],
-        },
-    ],
-    sample: [
-        propScopeBase,
-        {
-            backgroundColor: [
-                themeVars.color.background.dark,
-                `hsl(from ${themeVars.color.background.dark} h s l / 50%)`,
-            ],
-        },
-    ],
-    local: [
-        propScopeBase,
-        {
-            backgroundColor: [themeVars.color.surface.dark, `hsl(from ${themeVars.color.surface.dark}  h s l / 50%)`],
-        },
-    ],
-    unknown: {},
-});
 
 export const propLabel = style({
     display: "flex",

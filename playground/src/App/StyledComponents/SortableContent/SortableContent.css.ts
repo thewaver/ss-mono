@@ -1,46 +1,47 @@
 import { style } from "@vanilla-extract/css";
 
+import { skinEntries, skinStates } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 import { layerVars } from "../Layer/Layer.css";
 
 export const isCarried = style({});
 export const isHovered = style({});
-export const isDisabled = style({});
-export const isReceiving = style({});
-export const isCarrying = style({});
+const disabled = style({});
+export const isDisabled = style([disabled, skinStates.isDisabled]);
+export const isReceiving = style([skinStates.isReceiving]);
+export const isCarrying = style([skinStates.isCarrying]);
 
-export const sortableItemContent = style({
-    display: "flex",
-    alignItems: "center",
-    gap: themeVars.spacing.full,
-    padding: themeVars.spacing.full,
-    border: `1px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
-    borderRadius: themeVars.borderRadius.half,
-    backgroundColor: layerVars.main,
-    fontSize: themeVars.fontSize.medium,
-    whiteSpace: "nowrap",
-    cursor: "grab",
-    transition: `opacity ${themeVars.animation.duration}, border-color ${themeVars.animation.duration}, background-color ${themeVars.animation.duration}`,
+export const sortableItemContent = style([
+    skinEntries.itemStatic,
+    {
+        display: "flex",
+        alignItems: "center",
+        gap: themeVars.spacing.full,
+        padding: themeVars.spacing.full,
+        fontSize: themeVars.fontSize.medium,
+        whiteSpace: "nowrap",
+        cursor: "grab",
+        transition: `opacity ${themeVars.animation.duration}, border-color ${themeVars.animation.duration}, background-color ${themeVars.animation.duration}`,
 
-    selectors: {
-        [`&.${isHovered}`]: {
-            borderColor: `rgb(from ${layerVars.contrast} r g b / 50%)`,
-        },
-        [`&.${isCarried}`]: {
-            borderStyle: "dashed",
-            borderColor: themeVars.color.primary.main,
-            backgroundColor: "transparent",
-            color: `rgb(from ${layerVars.contrast} r g b / 50%)`,
-            boxShadow: "none",
-            cursor: "grabbing",
-        },
-        [`&.${isDisabled}`]: {
-            filter: themeVars.disabled.filter,
-            opacity: themeVars.disabled.opacity,
-            cursor: "default",
+        selectors: {
+            [`&.${isHovered}`]: {
+                borderColor: `rgb(from ${layerVars.contrast} r g b / 50%)`,
+            },
+            [`&.${isCarried}`]: {
+                borderColor: themeVars.color.primary.main,
+                backgroundColor: "transparent",
+                color: `rgb(from ${layerVars.contrast} r g b / 50%)`,
+                boxShadow: "none",
+                cursor: "grabbing",
+            },
+            [`&.${disabled}`]: {
+                filter: themeVars.disabled.filter,
+                opacity: themeVars.disabled.opacity,
+                cursor: "default",
+            },
         },
     },
-});
+]);
 
 export const sortableItemGrip = style({
     fontSize: themeVars.fontSize.medium,
@@ -54,32 +55,19 @@ export const sortableItemDetail = style({
     opacity: 0.75,
 });
 
-export const sortableSurface = style({
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    position: "absolute",
-    inset: `calc(-1 * ${themeVars.spacing.full})`,
-    zIndex: -1,
-    border: `1px dashed rgb(from ${layerVars.contrast} r g b / 25%)`,
-    borderRadius: themeVars.borderRadius.full,
-    pointerEvents: "none",
-    transition: `border-color ${themeVars.animation.duration}, background-color ${themeVars.animation.duration}`,
-
-    selectors: {
-        [`&.${isCarrying}`]: {
-            borderColor: `rgb(from ${layerVars.contrast} r g b / 50%)`,
-        },
-        [`&.${isReceiving}`]: {
-            borderColor: themeVars.color.primary.main,
-            backgroundColor: `rgb(from ${themeVars.color.primary.main} r g b / 10%)`,
-        },
-        [`&.${isDisabled}`]: {
-            filter: themeVars.disabled.filter,
-            opacity: themeVars.disabled.opacity,
-        },
+export const sortableSurface = style([
+    skinEntries.dropZone,
+    {
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        position: "absolute",
+        inset: `calc(-1 * ${themeVars.spacing.full})`,
+        zIndex: -1,
+        pointerEvents: "none",
+        transition: `border-color ${themeVars.animation.duration}, background-color ${themeVars.animation.duration}`,
     },
-});
+]);
 
 export const sortableEmpty = style({
     fontSize: themeVars.fontSize.small,

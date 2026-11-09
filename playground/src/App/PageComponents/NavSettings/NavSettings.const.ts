@@ -2,6 +2,10 @@ import type { NavSettingsOption, PlaygroundSkin, PlaygroundTheme, ViewportAnchor
 
 export const DEFAULT_VIEWPORT_ANCHOR: ViewportAnchor = "auto";
 
+export const NAV_SETTINGS_STORAGE_PREFIX = "ssPlayground.";
+
+export const SHOWS_DESCRIPTION_ONLY_OPTIONS = [true, false];
+
 export const THEME_FIELD_ID = "playgroundTheme";
 
 export const SKIN_FIELD_ID = "playgroundSkin";

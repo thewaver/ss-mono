@@ -8,6 +8,8 @@ export type PlaygroundSkin = keyof typeof PLAYGROUND_SKINS;
 
 export type ViewportAnchor = "none" | "auto" | 1080 | 1440;
 
+export type NavSettingKey = "theme" | "skin" | "viewportAnchor" | "showsDescriptionOnly";
+
 export type NavSettingsOption<T> = {
     value: T;
     label: string;

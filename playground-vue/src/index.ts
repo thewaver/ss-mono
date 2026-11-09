@@ -3,13 +3,15 @@ import type { RouteRecordRaw } from "vue-router";
 import { createRouter, createWebHistory } from "vue-router";
 
 import { MENU_DESCRIPTIONS } from "@thewaver/ss-playground/App/MenuDescriptions.const";
+import { NavSettingsUtils } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.utils";
 import { toPageViewRoute } from "@thewaver/ss-playground/App/PageComponents/ViewTabs/ViewTabs.const";
-import { DEFAULT_SKIN, PLAYGROUND_SKINS } from "@thewaver/ss-playground/App/Skins/Skin.const";
+import { PLAYGROUND_SKINS } from "@thewaver/ss-playground/App/Skins/Skin.const";
 import { PLAYGROUND_THEMES } from "@thewaver/ss-playground/App/Theme.css";
 
 import { AppUtils } from "./App/App.utils";
 import App from "./App/App.vue";
 import AppContent from "./App/AppContent.vue";
+import { OWN_FRAMEWORK } from "./App/PageComponents/FrameworkMenu/FrameworkMenu.const";
 
 const PAGE_ROUTES: RouteRecordRaw[] = AppUtils.COMPONENT_CONFIGS.flatMap((config) => {
     const route = AppUtils.componentToRouteName(config.name);
@@ -58,7 +60,7 @@ const router = createRouter({
     ],
 });
 
-document.documentElement.classList.add(PLAYGROUND_THEMES.vue);
-document.documentElement.classList.add(PLAYGROUND_SKINS[DEFAULT_SKIN]);
+document.documentElement.classList.add(PLAYGROUND_THEMES[NavSettingsUtils.loadTheme(OWN_FRAMEWORK)]);
+document.documentElement.classList.add(PLAYGROUND_SKINS[NavSettingsUtils.loadSkin()]);
 
 createApp(App).use(router).mount("#root");

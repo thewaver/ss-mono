@@ -5,7 +5,6 @@
     import PagePropHintBadge from "../../StyledComponents/PropHintBadge/PropHintBadge.svelte";
     import PageTooltipContent from "../../StyledComponents/TooltipContent/TooltipContent.svelte";
     import { setFieldDefaultContext } from "../Field/FieldSvelte.context";
-    import { getPropsPanelContext } from "../PropsPanel/PropsPanel.context";
     import type { PagePropProps } from "./Prop.types";
     import {
         EMPTY_TEXT,
@@ -26,8 +25,6 @@
     let props: PagePropProps = $props();
 
     const controlsParts = $derived(props.controls.split(MEMBER_SEPARATOR));
-
-    const propsPanelScope = getPropsPanelContext();
 
     let reported = $state.raw<{ value: unknown }[]>([]);
 
@@ -51,7 +48,7 @@
 </script>
 
 <div
-    class={styles.propScopeVariants[propsPanelScope?.scope ?? "unknown"]}
+    class={styles.propRow}
     data-prop=""
     data-testid={props.itemKey}
 >

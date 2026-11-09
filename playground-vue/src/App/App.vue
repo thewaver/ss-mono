@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { computed, onScopeDispose, shallowRef } from "vue";
+import { computed, onScopeDispose, shallowRef, watch } from "vue";
 
 import { ViewportWrapper } from "@thewaver/ss-components-vue";
 import { SCREEN_HEIGHT } from "@thewaver/ss-playground/App/App.const";
 import * as styles from "@thewaver/ss-playground/App/App.css";
-import { DEFAULT_VIEWPORT_ANCHOR } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
+import { NavSettingsUtils } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.utils";
 import { FunctionUtils, type Size2d } from "@thewaver/ss-utils";
 
 import { FIXED_ANCHOR_RATIO } from "./AppVue.const";
@@ -13,7 +13,9 @@ import type { ViewportAnchor } from "./PageComponents/NavSettings/NavSettingsVue
 const getWindowInnerSize = () => ({ width: window.innerWidth, height: window.innerHeight });
 
 const windowSize = shallowRef<Size2d>(getWindowInnerSize());
-const viewportAnchor = shallowRef<ViewportAnchor>(DEFAULT_VIEWPORT_ANCHOR);
+const viewportAnchor = shallowRef<ViewportAnchor>(NavSettingsUtils.loadViewportAnchor());
+
+watch(viewportAnchor, (anchor) => NavSettingsUtils.save("viewportAnchor", anchor), { immediate: true });
 
 const viewportSize = computed(() => {
     const anchor = viewportAnchor.value;

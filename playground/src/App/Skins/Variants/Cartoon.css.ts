@@ -1,6 +1,7 @@
 import { ObjectUtils } from "@thewaver/ss-utils";
 import { type StyleRule, style } from "@vanilla-extract/css";
 
+import type { SkinBaseColor } from "../Skin.types";
 import { SkinUtils } from "../Skin.utils";
 
 import { layerVars } from "../../StyledComponents/Layer/Layer.css";
@@ -111,11 +112,11 @@ const TAB_FLOATER_SELECTED: StyleRule = {
     ...ITEM_FLOATER_SELECTED,
 };
 
-const surface = (layer: "background" | "surface"): StyleRule => ({
+const surface = (color: SkinBaseColor): StyleRule => ({
     border: "2px solid black",
-    backgroundColor: themeVars.color[layer].light,
+    backgroundColor: color.light,
     boxShadow: SHADOW_MEDIUM,
-    color: themeVars.color[layer].contrast,
+    color: color.contrast,
     fontSize: themeVars.fontSize.medium,
 });
 
@@ -199,6 +200,21 @@ SkinUtils.define(cartoon, {
     dropdown: {
         ...INPUT_SHELL,
     },
+    dropZone: {
+        border: [`2px dashed ${layerVars.contrast}`, `2px dashed rgb(from ${layerVars.contrast} r g b / 25%)`],
+        selectors: ObjectUtils.deepMerge(INPUT_STATES, {
+            [skinSelectors.isCarrying]: {
+                borderColor: [layerVars.contrast, `rgb(from ${layerVars.contrast} r g b / 50%)`],
+            },
+            [skinSelectors.isReceiving]: {
+                borderColor: themeVars.color.primary.main,
+                backgroundColor: [
+                    themeVars.color.primary.main,
+                    `rgb(from ${themeVars.color.primary.main} r g b / 10%)`,
+                ],
+            },
+        }),
+    },
     input: {
         ...INPUT_SHELL,
         selectors: ObjectUtils.deepMerge(INPUT_STATES, {
@@ -229,6 +245,10 @@ SkinUtils.define(cartoon, {
     itemSelectionFloater: {
         ...ITEM_FLOATER_SELECTED,
     },
+    itemStatic: {
+        ...ITEM,
+        ...ITEM_FLOATER_HOVER,
+    },
     overlay: {
         backdropFilter: "blur(10px) grayscale(75%)",
     },
@@ -238,7 +258,7 @@ SkinUtils.define(cartoon, {
         fontFamily: "monospace",
     },
     pageContainer: {
-        ...surface("background"),
+        ...surface(SkinUtils.extendColor(layerVars)),
     },
     panel: {
         border: `2px solid black`,
@@ -358,7 +378,7 @@ SkinUtils.define(cartoon, {
         },
     },
     surface: {
-        ...surface("surface"),
+        ...surface(themeVars.color.surface),
     },
     tabsItemBase: {
         paddingBlock: themeVars.spacing.full,

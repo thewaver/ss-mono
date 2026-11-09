@@ -49,7 +49,6 @@ export const renderFanItem = (item: MenuItem<FanAction>, flags: InteractionFlags
         <div
             className={[
                 styles.item,
-                flags.isBack && styles.itemBack,
                 flags.isHighlighted && styles.itemHighlighted,
                 flags.isDisabled && styles.itemDisabled,
             ]

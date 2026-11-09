@@ -2,7 +2,7 @@ import { style, styleVariants } from "@vanilla-extract/css";
 
 import { GRID_SIZE } from "./ScrollerPage.const";
 
-import { layerVars } from "../../StyledComponents/Layer/Layer.css";
+import { skinEntries } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 
 export const root = style({
@@ -50,19 +50,19 @@ export const item = style({
     flexShrink: 0,
 });
 
-export const chip = style({
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    flexShrink: 0,
-    height: 32,
-    paddingInline: themeVars.spacing.double,
-    color: layerVars.contrast,
-    backgroundColor: `rgb(from ${layerVars.contrast} r g b / 10%)`,
-    borderRadius: themeVars.borderRadius.half,
-    fontSize: themeVars.fontSize.small,
-    whiteSpace: "nowrap",
-});
+export const chip = style([
+    skinEntries.itemStatic,
+    {
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        flexShrink: 0,
+        height: 32,
+        paddingInline: themeVars.spacing.double,
+        fontSize: themeVars.fontSize.small,
+        whiteSpace: "nowrap",
+    },
+]);
 
 export const row = style([
     chip,

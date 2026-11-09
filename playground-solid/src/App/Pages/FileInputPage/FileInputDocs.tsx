@@ -19,6 +19,8 @@ import { TooltipDocsExample } from "./Docs/Tooltip";
 export const FileInputDocs = () => {
     const [getHasError, setHasError] = createSignal(false);
     const [getIsDisabled, setIsDisabled] = createSignal(false);
+    const [getDropZoneHasError, setDropZoneHasError] = createSignal(false);
+    const [getDropZoneIsDisabled, setDropZoneIsDisabled] = createSignal(false);
     const [getIsReachableWhenDisabled, setIsReachableWhenDisabled] = createSignal(false);
     const [getIsTooltipDisabled, setIsTooltipDisabled] = createSignal(false);
 
@@ -100,8 +102,41 @@ export const FileInputDocs = () => {
                 place to drop alone.
             </PageDocsAlert>
 
-            <PageDocsExample path={`${DOCS_ROOT}/DropZone.tsx`}>
-                <DropZoneDocsExample />
+            <PageDocsExample
+                path={`${DOCS_ROOT}/DropZone.tsx`}
+                renderKnobs={() => (
+                    <>
+                        <PageProp
+                            key={"dropZoneHasError"}
+                            label={"Error"}
+                            hint={"Marks the control invalid, for screen readers as well as for the painter."}
+                            controls={"Sets FileInputProps.hasError"}
+                        >
+                            <PageCheckField
+                                value={getDropZoneHasError}
+                                ariaLabel={"Error"}
+                                onChange={setDropZoneHasError}
+                            />
+                        </PageProp>
+
+                        <PageProp
+                            key={"dropZoneIsDisabled"}
+                            label={"Disabled"}
+                            hint={
+                                "Turns the control off: pressing it opens no dialog, a dropped file is refused, and the Tab key skips it."
+                            }
+                            controls={"Sets FileInputProps.isDisabled"}
+                        >
+                            <PageCheckField
+                                value={getDropZoneIsDisabled}
+                                ariaLabel={"Disabled"}
+                                onChange={setDropZoneIsDisabled}
+                            />
+                        </PageProp>
+                    </>
+                )}
+            >
+                <DropZoneDocsExample hasError={getDropZoneHasError} isDisabled={getDropZoneIsDisabled} />
             </PageDocsExample>
 
             <PageDocsSection

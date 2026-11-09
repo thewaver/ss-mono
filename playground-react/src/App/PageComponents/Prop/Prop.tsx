@@ -15,7 +15,6 @@ import { PagePropHintBadge } from "../../StyledComponents/PropHintBadge/PropHint
 import { PageTooltipContent } from "../../StyledComponents/TooltipContent/TooltipContent";
 import type { FieldDefaultRegistry } from "../Field/FieldReact.context";
 import { FieldDefaultProvider } from "../Field/FieldReact.context";
-import { usePropsPanelContext } from "../PropsPanel/PropsPanel.context";
 import type { PagePropProps } from "./Prop.types";
 
 const toDefaultText = (value: unknown) => {
@@ -40,8 +39,6 @@ const toBreakableText = (text: string) =>
     ));
 
 export const PageProp = (props: PropsWithChildren<PagePropProps>) => {
-    const propsPanelScope = usePropsPanelContext();
-
     const [reported, setReported] = useState<{ value: unknown }[]>([]);
 
     const [defaultRegistry] = useState<FieldDefaultRegistry>(() => ({
@@ -59,11 +56,7 @@ export const PageProp = (props: PropsWithChildren<PagePropProps>) => {
     const defaultText = toDefaultText(props.defaultValue === undefined ? reportedDefault : props.defaultValue);
 
     return (
-        <div
-            className={styles.propScopeVariants[propsPanelScope?.scope ?? "unknown"]}
-            data-prop=""
-            data-testid={props.itemKey}
-        >
+        <div className={styles.propRow} data-prop="" data-testid={props.itemKey}>
             <div className={styles.propLabel}>
                 {props.label}
 

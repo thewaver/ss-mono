@@ -2,9 +2,10 @@ import { useSyncExternalStore } from "react";
 
 import { type ShapeRevealOpts, ShapeRevealUtils } from "@thewaver/ss-components-react";
 import type { PlaygroundSkin } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.types";
-import { DEFAULT_SKIN, PLAYGROUND_SKINS } from "@thewaver/ss-playground/App/Skins/Skin.const";
+import { NavSettingsUtils } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.utils";
+import { PLAYGROUND_SKINS } from "@thewaver/ss-playground/App/Skins/Skin.const";
 
-let appliedSkin: PlaygroundSkin = DEFAULT_SKIN;
+let appliedSkin: PlaygroundSkin = NavSettingsUtils.loadSkin();
 
 const listeners = new Set<() => void>();
 
@@ -27,6 +28,7 @@ export const useAppliedSkin = () => useSyncExternalStore(subscribe, getAppliedSk
 
 export const revealSkin = (skin: PlaygroundSkin, opts: ShapeRevealOpts) => {
     appliedSkin = skin;
+    NavSettingsUtils.save("skin", skin);
     listeners.forEach((listener) => listener());
 
     return ShapeRevealUtils.reveal(() => applySkin(skin), opts);

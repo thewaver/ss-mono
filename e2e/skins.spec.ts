@@ -90,6 +90,49 @@ test("the settings' Skin select names a Skin", async ({ page }) => {
     expect(selected.length, "the select shows the Skin the page is drawn in").toBeGreaterThan(0);
 });
 
+const SKIN_STORAGE_KEY = "ssPlayground.skin";
+
+const htmlClasses = (page: Page) => page.evaluate(() => [...document.documentElement.classList].sort());
+
+const selectedSkin = async (page: Page) => {
+    await expect(page.locator("#libraryKnobs"), "the settings button is mounted").toBeVisible();
+    await revealProp(page, "skin", "library");
+
+    return ((await page.locator(`${prop("skin")} [role="combobox"]`).textContent()) ?? "").trim();
+};
+
+test("a Skin that was picked is still the one in use after a reload", async ({ page }) => {
+    await page.goto("/");
+
+    const before = await selectedSkin(page);
+    const classesBefore = await htmlClasses(page);
+
+    await page.locator(`${prop("skin")} [role="combobox"]`).click();
+    await page.locator('[role="option"]:not([aria-selected="true"])').first().click();
+
+    await expect.poll(() => htmlClasses(page), "the page is redrawn in the new Skin").not.toEqual(classesBefore);
+
+    const classesPicked = await htmlClasses(page);
+
+    await page.reload();
+
+    expect(await htmlClasses(page), "the reloaded page starts in the picked Skin").toEqual(classesPicked);
+    expect(await selectedSkin(page), "and the select says so").not.toBe(before);
+});
+
+test("a saved Skin that is not on the list falls back to the default", async ({ page }) => {
+    await page.goto("/");
+
+    const defaultSkin = await selectedSkin(page);
+    const defaultClasses = await htmlClasses(page);
+
+    await page.evaluate((key) => localStorage.setItem(key, JSON.stringify("constructor")), SKIN_STORAGE_KEY);
+    await page.reload();
+
+    expect(await htmlClasses(page), "the page is drawn as if nothing were saved").toEqual(defaultClasses);
+    expect(await selectedSkin(page), "and the select shows the default").toBe(defaultSkin);
+});
+
 test("a field's typed text inherits its color, caret and size from the wrapper around its box", async ({ page }) => {
     await page.goto("/text-input/docs");
     await docsSettled(page);

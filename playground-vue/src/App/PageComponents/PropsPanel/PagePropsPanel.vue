@@ -14,7 +14,6 @@ import PageButtonContent from "../../StyledComponents/ButtonContent/ButtonConten
 import { provideFieldReset } from "../Field/FieldVue.context";
 import { useIsPreview } from "../Preview/Preview.context";
 import PageProp from "../Prop/Prop.vue";
-import { providePropsPanelContext } from "./PropsPanel.context";
 import type { PagePropsPanelProps } from "./PropsPanelVue.types";
 
 const props = withDefaults(defineProps<PagePropsPanelProps>(), { hasReset: DEFAULT_HAS_RESET });
@@ -30,12 +29,6 @@ provideFieldReset({
         return () => {
             resets.value = resets.value.filter((entry) => entry !== reset);
         };
-    },
-});
-
-providePropsPanelContext({
-    get scope() {
-        return props.scope;
     },
 });
 

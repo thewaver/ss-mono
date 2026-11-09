@@ -6,7 +6,7 @@ import { themeVars } from "../../Theme.css";
 export const isVisible = style({});
 
 export const hoverCardContent = style([
-    skinEntries.tooltip,
+    skinEntries.dropdown,
     {
         boxSizing: "border-box",
         width: 280,

@@ -6,4 +6,6 @@ import type {
 
 export type FileInputBasicDocsExampleProps = AccessorValues<BaseFileInputBasicDocsExampleValues>;
 
+export type FileInputDropZoneDocsExampleProps = AccessorValues<BaseFileInputBasicDocsExampleValues>;
+
 export type FileInputTooltipDocsExampleProps = AccessorValues<BaseFileInputTooltipDocsExampleValues>;

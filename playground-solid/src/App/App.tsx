@@ -37,7 +37,7 @@ import {
     toRoutePath,
     toRouterBase,
 } from "@thewaver/ss-playground/App/PageComponents/FrameworkSwitch/FrameworkSwitch.const";
-import { DEFAULT_VIEWPORT_ANCHOR } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
+import { NavSettingsUtils } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.utils";
 import {
     DEFAULT_PAGE_VIEW,
     EXAMPLES_VIEW,
@@ -371,7 +371,10 @@ const PageDependencies = (props: { name: string; view: PageViewKey }) => {
 export function AppContent(props: RouteSectionProps & { viewportAnchor: SignalPair<ViewportAnchor> }) {
     const [getSelectedConfig, setSelectedConfig] = createSignal<ComponentConfig>();
     const [getSearchTerm, setSearchTerm] = createSignal("");
-    const showsDescriptionOnlySignal = createSignal(false);
+    const showsDescriptionOnlySignal = createSignal(NavSettingsUtils.loadShowsDescriptionOnly());
+
+    createEffect(() => NavSettingsUtils.save("showsDescriptionOnly", showsDescriptionOnlySignal[0]()));
+
     const [getPageView, setPageView] = createSignal<PageViewKey>(DEFAULT_PAGE_VIEW);
     const isAutoHiddenSignal = createSignal(false);
     const [getBrowseExpanded, setBrowseExpanded] = createSignal<MenuNodeConfig[]>(VISIBLE_MENU_CONFIGS);
@@ -669,7 +672,9 @@ const getWindowInnerSize = () => ({ width: window.innerWidth, height: window.inn
 
 export function App() {
     const [getWindowSize, setWindowSize] = createSignal<Size2d>(getWindowInnerSize());
-    const viewportAnchorSignal = createSignal<ViewportAnchor>(DEFAULT_VIEWPORT_ANCHOR);
+    const viewportAnchorSignal = createSignal<ViewportAnchor>(NavSettingsUtils.loadViewportAnchor());
+
+    createEffect(() => NavSettingsUtils.save("viewportAnchor", viewportAnchorSignal[0]()));
 
     const getViewportSize = createMemo(() => {
         const windowSize = getWindowSize();

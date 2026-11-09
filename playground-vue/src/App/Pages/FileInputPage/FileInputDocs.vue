@@ -19,6 +19,8 @@ import TooltipDocsExample from "./Docs/Tooltip.vue";
 
 const hasError = shallowRef(false);
 const isDisabled = shallowRef(false);
+const dropZoneHasError = shallowRef(false);
+const dropZoneIsDisabled = shallowRef(false);
 const isReachableWhenDisabled = shallowRef(false);
 const isTooltipDisabled = shallowRef(false);
 </script>
@@ -91,7 +93,35 @@ const isTooltipDisabled = shallowRef(false);
     </PageDocsAlert>
 
     <PageDocsExample :path="`${DOCS_ROOT}/DropZone.vue`">
-        <DropZoneDocsExample />
+        <DropZoneDocsExample :has-error="dropZoneHasError" :is-disabled="dropZoneIsDisabled" />
+
+        <template #renderKnobs>
+            <PageProp
+                item-key="dropZoneHasError"
+                label="Error"
+                hint="Marks the control invalid, for screen readers as well as for the painter."
+                controls="Sets FileInputProps.hasError"
+            >
+                <PageCheckField
+                    :value="dropZoneHasError"
+                    ariaLabel="Error"
+                    @change="(value: boolean) => (dropZoneHasError = value)"
+                />
+            </PageProp>
+
+            <PageProp
+                item-key="dropZoneIsDisabled"
+                label="Disabled"
+                hint="Turns the control off: pressing it opens no dialog, a dropped file is refused, and the Tab key skips it."
+                controls="Sets FileInputProps.isDisabled"
+            >
+                <PageCheckField
+                    :value="dropZoneIsDisabled"
+                    ariaLabel="Disabled"
+                    @change="(value: boolean) => (dropZoneIsDisabled = value)"
+                />
+            </PageProp>
+        </template>
     </PageDocsExample>
 
     <PageDocsSection

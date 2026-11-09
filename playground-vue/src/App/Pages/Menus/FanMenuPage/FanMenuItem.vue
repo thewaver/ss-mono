@@ -8,14 +8,7 @@ defineProps<FanMenuItemProps>();
 </script>
 
 <template>
-    <div
-        :class="[
-            styles.item,
-            flags.isBack && styles.itemBack,
-            flags.isHighlighted && styles.itemHighlighted,
-            flags.isDisabled && styles.itemDisabled,
-        ]"
-    >
+    <div :class="[styles.item, flags.isHighlighted && styles.itemHighlighted, flags.isDisabled && styles.itemDisabled]">
         <span v-if="flags.isBack" aria-hidden="true">{{ BACK_MARK }}</span>
 
         <span>{{ item.value.name }}</span>

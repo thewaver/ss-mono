@@ -10,6 +10,11 @@
     } from "@thewaver/ss-playground/App/Pages/FileInputPage/FileInputPage.const";
 
     import PageFileDropZoneContent from "../../../StyledComponents/FileDropZoneContent/FileDropZoneContent.svelte";
+    import type { FileInputDropZoneDocsExampleProps } from "../FileInputPageSvelte.types";
+
+    type Props = FileInputDropZoneDocsExampleProps;
+
+    let props: Props = $props();
 
     let files = $state.raw<File[]>([]);
     let rejections = $state.raw<FileInputRejection[]>([]);
@@ -17,6 +22,8 @@
 
 <FileInput
     bind:files
+    hasError={props.hasError}
+    isDisabled={props.isDisabled}
     isMultiple={true}
     maxFiles={DROP_ZONE_MAX_FILES}
     maxSizeBytes={DROP_ZONE_MAX_SIZE_BYTES}

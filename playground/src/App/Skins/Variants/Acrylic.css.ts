@@ -1,6 +1,7 @@
 import { ObjectUtils } from "@thewaver/ss-utils";
 import { type StyleRule, style } from "@vanilla-extract/css";
 
+import type { SkinBaseColor } from "../Skin.types";
 import { SkinUtils } from "../Skin.utils";
 
 import { layerVars } from "../../StyledComponents/Layer/Layer.css";
@@ -126,12 +127,12 @@ const TAB_FLOATER_SELECTED_VERT: StyleRule = {
     borderInlineStart: `2px solid ${themeVars.color.primary.main}`,
 };
 
-const surface = (layer: "background" | "surface"): StyleRule => ({
-    ...sheen(themeVars.color[layer].dark, 25, 10),
+const surface = (color: SkinBaseColor): StyleRule => ({
+    ...sheen(color.dark, 25, 10),
     backdropFilter: "blur(10px)",
     borderRadius: themeVars.borderRadius.half,
     boxShadow: SHADOW_MEDIUM,
-    color: themeVars.color[layer].contrast,
+    color: color.contrast,
     fontSize: themeVars.fontSize.medium,
 });
 
@@ -212,7 +213,21 @@ SkinUtils.define(acrylic, {
     },
     dropdown: {
         ...INPUT_SHELL,
-        border: "none",
+    },
+    dropZone: {
+        border: [`2px dashed ${layerVars.contrast}`, `2px dashed rgb(from ${layerVars.contrast} r g b / 25%)`],
+        selectors: ObjectUtils.deepMerge(INPUT_STATES, {
+            [skinSelectors.isCarrying]: {
+                borderColor: [layerVars.contrast, `rgb(from ${layerVars.contrast} r g b / 50%)`],
+            },
+            [skinSelectors.isReceiving]: {
+                borderColor: themeVars.color.primary.main,
+                backgroundColor: [
+                    themeVars.color.primary.main,
+                    `rgb(from ${themeVars.color.primary.main} r g b / 10%)`,
+                ],
+            },
+        }),
     },
     input: {
         ...INPUT_SHELL,
@@ -244,6 +259,10 @@ SkinUtils.define(acrylic, {
     itemSelectionFloater: {
         ...ITEM_FLOATER_SELECTED,
     },
+    itemStatic: {
+        ...ITEM,
+        ...ITEM_FLOATER_HOVER,
+    },
     overlay: {
         backdropFilter: "blur(10px) grayscale(75%)",
     },
@@ -253,7 +272,7 @@ SkinUtils.define(acrylic, {
         color: themeVars.color.background.contrast,
     },
     pageContainer: {
-        ...surface("background"),
+        ...surface(SkinUtils.extendColor(layerVars)),
     },
     panel: {
         backgroundImage: `linear-gradient(to bottom, rgb(from ${layerVars.main} r g b / 25%), rgb(from ${layerVars.main} r g b / 50%))`,
@@ -363,7 +382,7 @@ SkinUtils.define(acrylic, {
         fontWeight: "bold",
     },
     surface: {
-        ...surface("surface"),
+        ...surface(themeVars.color.surface),
     },
     tabsItemBase: {
         paddingBlock: themeVars.spacing.full,

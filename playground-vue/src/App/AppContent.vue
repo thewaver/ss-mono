@@ -7,6 +7,7 @@ import type { TreeNode } from "@thewaver/ss-components-vue";
 import * as styles from "@thewaver/ss-playground/App/App.css";
 import { LAYOUT } from "@thewaver/ss-playground/App/Layout.const";
 import { IS_BUILD_PROGRESS_SHOWN } from "@thewaver/ss-playground/App/PageComponents/BuildProgress/BuildProgress.utils";
+import { NavSettingsUtils } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.utils";
 import {
     DEFAULT_PAGE_VIEW,
     toBaseRoute,
@@ -50,7 +51,9 @@ const route = useRoute();
 const router = useRouter();
 
 const searchTerm = shallowRef("");
-const showsDescriptionOnly = shallowRef(false);
+const showsDescriptionOnly = shallowRef(NavSettingsUtils.loadShowsDescriptionOnly());
+
+watch(showsDescriptionOnly, (isShown) => NavSettingsUtils.save("showsDescriptionOnly", isShown), { immediate: true });
 const pageView = shallowRef<PageViewKey>(DEFAULT_PAGE_VIEW);
 const isAutoHidden = shallowRef(false);
 const browseExpanded = shallowRef<MenuNodeConfig[]>(AppUtils.VISIBLE_MENU_CONFIGS);

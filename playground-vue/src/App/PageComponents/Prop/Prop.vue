@@ -15,7 +15,6 @@ import * as styles from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.cs
 import PagePropHintBadge from "../../StyledComponents/PropHintBadge/PropHintBadge.vue";
 import PageTooltipContent from "../../StyledComponents/TooltipContent/TooltipContent.vue";
 import { provideFieldDefault } from "../Field/FieldVue.context";
-import { usePropsPanelContext } from "../PropsPanel/PropsPanel.context";
 import type { PagePropProps } from "./Prop.types";
 
 const toDefaultText = (value: unknown) => {
@@ -30,8 +29,6 @@ const toBreakableText = (text: string) =>
     text.split(MEMBER_SEPARATOR).flatMap((part, index) => (index === 0 ? [part] : [MEMBER_SEPARATOR, h("wbr"), part]));
 
 const props = defineProps<PagePropProps>();
-
-const propsPanelScope = usePropsPanelContext();
 
 const reported = shallowRef<{ value: unknown }[]>([]);
 
@@ -66,7 +63,7 @@ const tooltipDefs: InteractionTooltipDefs = {
 </script>
 
 <template>
-    <div :class="styles.propScopeVariants[propsPanelScope?.scope ?? 'unknown']" data-prop="" :data-testid="itemKey">
+    <div :class="styles.propRow" data-prop="" :data-testid="itemKey">
         <div :class="styles.propLabel">
             {{ label
             }}<Button :ariaLabel="`About ${label}`" :tooltip-defs="tooltipDefs">
