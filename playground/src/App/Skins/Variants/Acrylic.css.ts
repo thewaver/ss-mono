@@ -88,6 +88,7 @@ const SWITCH_SHELL: StyleRule = {
 const ACCORDION: StyleRule = {
     backgroundImage: `linear-gradient(to bottom, rgb(from ${layerVars.main} r g b / 25%), rgb(from ${layerVars.main} r g b / 50%))`,
     borderRadius: themeVars.borderRadius.half,
+    boxShadow: SHADOW_SMALL,
     color: layerVars.contrast,
     fontSize: themeVars.fontSize.medium,
 } as const;
@@ -125,18 +126,17 @@ const TAB_FLOATER_SELECTED_VERT: StyleRule = {
     borderInlineStart: `2px solid ${themeVars.color.primary.main}`,
 };
 
-const SURFACE: StyleRule = {
-    ...sheen(themeVars.color.surface.dark, 25, 10),
+const surface = (layer: "background" | "surface"): StyleRule => ({
+    ...sheen(themeVars.color[layer].dark, 25, 10),
     backdropFilter: "blur(10px)",
     borderRadius: themeVars.borderRadius.half,
     boxShadow: SHADOW_MEDIUM,
-    color: themeVars.color.surface.contrast,
+    color: themeVars.color[layer].contrast,
     fontSize: themeVars.fontSize.medium,
-} as const;
+});
 
 SkinUtils.define(acrylic, {
     accordionHeader: {
-        ...ACCORDION,
         selectors: ObjectUtils.deepMerge(SkinUtils.joinedCorners(), INTERACTIBLE_STATES, {
             [skinSelectors.isExpanded]: {
                 color: themeVars.color.primary.main,
@@ -145,13 +145,13 @@ SkinUtils.define(acrylic, {
         }),
     },
     accordionPanel: {
-        ...ACCORDION,
-        backgroundImage: `linear-gradient(to bottom, rgb(from ${layerVars.main} r g b / 50%), rgb(from ${layerVars.main} r g b / 50%))`,
         selectors: {
             ...SkinUtils.joinedCorners(),
         },
     },
-    accordionWrapper: {},
+    accordionWrapper: {
+        ...ACCORDION,
+    },
     button: {
         ...sheen(themeVars.color.primary.main, 100, 50),
         borderRadius: PILL_RADIUS,
@@ -214,7 +214,6 @@ SkinUtils.define(acrylic, {
         ...INPUT_SHELL,
         border: "none",
     },
-    hollowSurface: SkinUtils.hollow(SURFACE),
     input: {
         ...INPUT_SHELL,
         selectors: ObjectUtils.deepMerge(INPUT_STATES, {
@@ -252,6 +251,9 @@ SkinUtils.define(acrylic, {
         backgroundColor: themeVars.color.background.light,
         backgroundImage: `linear-gradient(135deg, hsl(from ${themeVars.color.primary.light} h 100 l / 10%), transparent, hsl(from ${themeVars.color.primary.light} h 100 l / 10%))`,
         color: themeVars.color.background.contrast,
+    },
+    pageContainer: {
+        ...surface("background"),
     },
     panel: {
         backgroundImage: `linear-gradient(to bottom, rgb(from ${layerVars.main} r g b / 25%), rgb(from ${layerVars.main} r g b / 50%))`,
@@ -360,7 +362,9 @@ SkinUtils.define(acrylic, {
         boxShadow: SHADOW_SMALL,
         fontWeight: "bold",
     },
-    surface: SURFACE,
+    surface: {
+        ...surface("surface"),
+    },
     tabsItemBase: {
         paddingBlock: themeVars.spacing.full,
         paddingInline: themeVars.spacing.double,

@@ -25,6 +25,7 @@ export const RangeCalendar = (props: RangeCalendarProps) => {
             computeIsSelected={(day) => RangeCalendarUtils.getIsSelected(day, pendingStart, range)}
             anchorDay={RangeCalendarUtils.computeAnchorDay(pendingStart, lastPicked, range)}
             computeRange={(highlighted) => RangeCalendarUtils.computePaintedRange(highlighted, pendingStart, range)}
+            isRangePending={pendingStart !== undefined}
             onPick={pick}
         />
     );

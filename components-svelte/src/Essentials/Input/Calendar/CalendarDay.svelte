@@ -18,6 +18,7 @@
 
             props.onSelect();
         })}
+    {@attach (element) => on(element, "pointermove", () => props.onHover())}
     id={props.id}
     class={styles.calendarDay}
     role="gridcell"

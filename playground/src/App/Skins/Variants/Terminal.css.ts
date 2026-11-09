@@ -103,19 +103,18 @@ const TAB_FLOATER_SELECTED: StyleRule = {
     border: `2px solid ${themeVars.color.primary.main}`,
 };
 
-const SURFACE: StyleRule = {
+const surface = (layer: "background" | "surface"): StyleRule => ({
     border: [
-        `2px solid ${themeVars.color.surface.contrast}`,
-        `2px solid rgb( from ${themeVars.color.surface.contrast} r g b / 25%)`,
+        `2px solid ${themeVars.color[layer].contrast}`,
+        `2px solid rgb( from ${themeVars.color[layer].contrast} r g b / 25%)`,
     ],
-    backgroundColor: themeVars.color.surface.dark,
-    color: themeVars.color.surface.contrast,
+    backgroundColor: themeVars.color[layer].dark,
+    color: themeVars.color[layer].contrast,
     fontSize: themeVars.fontSize.medium,
-} as const;
+});
 
 SkinUtils.define(terminal, {
     accordionHeader: {
-        ...ACCORDION,
         selectors: ObjectUtils.deepMerge(SkinUtils.joinedCorners(), INTERACTIBLE_STATES, {
             [skinSelectors.isExpanded]: {
                 border: `2px solid ${themeVars.color.primary.main}`,
@@ -125,12 +124,13 @@ SkinUtils.define(terminal, {
         }),
     },
     accordionPanel: {
-        ...ACCORDION,
         selectors: {
             ...SkinUtils.joinedCorners(),
         },
     },
-    accordionWrapper: {},
+    accordionWrapper: {
+        ...ACCORDION,
+    },
     button: {
         paddingInline: themeVars.spacing.double,
         border: `2px solid ${layerVars.contrast}`,
@@ -199,7 +199,6 @@ SkinUtils.define(terminal, {
     dropdown: {
         ...INPUT_SHELL,
     },
-    hollowSurface: SkinUtils.hollow(SURFACE),
     input: {
         ...INPUT_SHELL,
         selectors: ObjectUtils.deepMerge(INPUT_STATES, {
@@ -237,6 +236,9 @@ SkinUtils.define(terminal, {
         backgroundColor: themeVars.color.background.dark,
         color: themeVars.color.background.contrast,
         fontFamily: "monospace",
+    },
+    pageContainer: {
+        ...surface("background"),
     },
     panel: {
         border: [
@@ -337,7 +339,9 @@ SkinUtils.define(terminal, {
         border: [`2px solid ${layerVars.contrast}`, `2px solid rgb( from ${layerVars.contrast} r g b / 25%)`],
         fontWeight: "bold",
     },
-    surface: SURFACE,
+    surface: {
+        ...surface("surface"),
+    },
     tabsItemBase: {
         paddingBlock: themeVars.spacing.full,
         paddingInline: themeVars.spacing.double,

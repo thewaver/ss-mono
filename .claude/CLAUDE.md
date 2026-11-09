@@ -228,8 +228,9 @@ and no rephrasing in a reply to foreground who did the work.
 ## Writing code
 
 **Work is built in Solid first, then paused for the user to test**: the library and `playground-solid` only, then
-stop and report. Specs and the React, Vue and Svelte ports come after their feedback, so nothing is built twice.
-**Simple changes skip the pause** — a renamed label, a deleted or reordered example — and land in all four at once.
+stop and report. Specs come after their feedback, so nothing is built twice. **The React, Vue and Svelte ports wait
+until they say to port**: approval of the result is not that instruction, because porting costs tokens and the timing
+is theirs. **Simple changes skip the pause** — a renamed label, a deleted or reordered example — and land in all four at once.
 
 **When you find something broken and can fix it, fix it — do not stop to ask**, provided the fix adds no package and
 breaks nothing that works. Report it afterwards. **Do not bundle a judgment call into a bug fix**: a subjective design,

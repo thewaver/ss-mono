@@ -135,7 +135,7 @@ string" is not a departure from how the industry splits these two layers — it 
 same example.
 
 **Skins — begun.** The Playground's painters now take their paint from a Skin picked in the left nav, as a Theme
-is: the Theme gives the colors, the Skin decides shapes and where those colors go. Plasticine is the only one.
+is: the Theme gives the colors, the Skin decides shapes and where those colors go. Shaded is the only one.
 How it works is in `decisions.md` under _"Skins"_. What follows keeps its own paint, so a Skin does not reach it
 yet.
 

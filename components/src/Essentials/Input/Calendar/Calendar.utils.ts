@@ -523,6 +523,7 @@ export namespace CalendarUtils {
      * @param opts.today Today.
      * @param opts.isSelected Whether the cell counts as picked.
      * @param opts.range The range to band, if there is one.
+     * @param opts.isRangePending Whether that range is a preview, with only its first end picked.
      */
     export const computeCellFlags = (
         day: DateValue,
@@ -533,6 +534,7 @@ export namespace CalendarUtils {
             today: DateValue;
             isSelected: boolean;
             range: DateValueRange | undefined;
+            isRangePending?: boolean;
         },
     ): CalendarRenderProps => ({
         day,
@@ -543,6 +545,7 @@ export namespace CalendarUtils {
         isInRange: DateValueUtils.getIsWithin(day, opts.range),
         isRangeStart: DateValueUtils.isSame(day, opts.range?.start),
         isRangeEnd: DateValueUtils.isSame(day, opts.range?.end),
+        isRangePending: opts.isRangePending ?? false,
     });
 
     /**

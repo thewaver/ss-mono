@@ -14,7 +14,7 @@ export const docsExampleStack = style({
 
 export const docsExample = style([exampleContainer]);
 
-export const docsExampleCode = style([skinEntries.hollowSurface]);
+export const docsExampleCode = style([skinEntries.pageContainer]);
 
 export const docsExampleSection = style({
     display: "flex",

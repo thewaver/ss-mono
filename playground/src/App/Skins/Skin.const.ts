@@ -3,7 +3,7 @@ import { blocky } from "./Variants/Blocky.css";
 import { cardboard } from "./Variants/Cardboard.css";
 import { cartoon } from "./Variants/Cartoon.css";
 import { neon } from "./Variants/Neon.css";
-import { plasticine } from "./Variants/Plasticine.css";
+import { shaded } from "./Variants/Shaded.css";
 import { terminal } from "./Variants/Terminal.css";
 
 export const PLAYGROUND_SKINS = {
@@ -12,8 +12,8 @@ export const PLAYGROUND_SKINS = {
     cartoon,
     cardboard,
     neon,
-    plasticine,
+    shaded,
     terminal,
 };
 
-export const DEFAULT_SKIN: keyof typeof PLAYGROUND_SKINS = "plasticine";
+export const DEFAULT_SKIN: keyof typeof PLAYGROUND_SKINS = "shaded";

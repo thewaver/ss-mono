@@ -24,5 +24,6 @@
     computeIsSelected={(day) => RangeCalendarUtils.getIsSelected(day, pendingStart, value)}
     anchorDay={RangeCalendarUtils.computeAnchorDay(pendingStart, lastPicked, value)}
     computeRange={(highlighted) => RangeCalendarUtils.computePaintedRange(highlighted, pendingStart, value)}
+    isRangePending={pendingStart !== undefined}
     onPick={pick}
 />

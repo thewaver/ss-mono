@@ -32,6 +32,7 @@ export const RangeCalendar = (props: RangeCalendarProps) => {
             computeRange={(highlighted) =>
                 RangeCalendarUtils.computePaintedRange(highlighted, getPendingStart(), getRange())
             }
+            isRangePending={() => getPendingStart() !== undefined}
             onPick={pick}
         />
     );

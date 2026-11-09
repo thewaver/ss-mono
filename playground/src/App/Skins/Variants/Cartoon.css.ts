@@ -75,8 +75,11 @@ const SWITCH_SHELL: StyleRule = {
 } as const;
 
 const ACCORDION: StyleRule = {
+    border: "2px solid black",
     backgroundColor: [layerVars.main, `rgb(from ${layerVars.main} r g b / 50%)`],
+    boxShadow: SHADOW_SMALL,
     color: layerVars.contrast,
+    fontSize: themeVars.fontSize.medium,
 } as const;
 
 const ITEM: StyleRule = {
@@ -108,17 +111,16 @@ const TAB_FLOATER_SELECTED: StyleRule = {
     ...ITEM_FLOATER_SELECTED,
 };
 
-const SURFACE: StyleRule = {
+const surface = (layer: "background" | "surface"): StyleRule => ({
     border: "2px solid black",
-    backgroundColor: themeVars.color.surface.light,
+    backgroundColor: themeVars.color[layer].light,
     boxShadow: SHADOW_MEDIUM,
-    color: themeVars.color.surface.contrast,
+    color: themeVars.color[layer].contrast,
     fontSize: themeVars.fontSize.medium,
-} as const;
+});
 
 SkinUtils.define(cartoon, {
     accordionHeader: {
-        ...ACCORDION,
         selectors: ObjectUtils.deepMerge(SkinUtils.joinedCorners(), INTERACTIBLE_STATES, {
             [skinSelectors.isExpanded]: {
                 color: themeVars.color.primary.main,
@@ -127,15 +129,12 @@ SkinUtils.define(cartoon, {
         }),
     },
     accordionPanel: {
-        ...ACCORDION,
         selectors: {
             ...SkinUtils.joinedCorners(),
         },
     },
     accordionWrapper: {
-        border: "2px solid black",
-        boxShadow: SHADOW_SMALL,
-        fontSize: themeVars.fontSize.medium,
+        ...ACCORDION,
     },
     button: {
         paddingInline: themeVars.spacing.double,
@@ -200,7 +199,6 @@ SkinUtils.define(cartoon, {
     dropdown: {
         ...INPUT_SHELL,
     },
-    hollowSurface: SkinUtils.hollow(SURFACE),
     input: {
         ...INPUT_SHELL,
         selectors: ObjectUtils.deepMerge(INPUT_STATES, {
@@ -238,6 +236,9 @@ SkinUtils.define(cartoon, {
         backgroundColor: themeVars.color.background.light,
         color: themeVars.color.background.contrast,
         fontFamily: "monospace",
+    },
+    pageContainer: {
+        ...surface("background"),
     },
     panel: {
         border: `2px solid black`,
@@ -356,7 +357,9 @@ SkinUtils.define(cartoon, {
             },
         },
     },
-    surface: SURFACE,
+    surface: {
+        ...surface("surface"),
+    },
     tabsItemBase: {
         paddingBlock: themeVars.spacing.full,
         paddingInline: themeVars.spacing.double,

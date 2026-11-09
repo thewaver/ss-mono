@@ -4,7 +4,7 @@ import { skinEntries, skinStates } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 import { layerVars } from "../Layer/Layer.css";
 
-export const isCurrent = style({});
+export const isCurrent = style([skinStates.isPressed]);
 export const isHovered = style([skinStates.isHovered]);
 export const isActive = style([skinStates.isActive]);
 export const isDisabled = style([skinStates.isDisabled]);
@@ -38,19 +38,7 @@ const cellText = style({
     },
 });
 
-export const paginatorPage = style([
-    skinEntries.buttonSimple,
-    cellBase,
-    {
-        selectors: {
-            [`&.${isCurrent}`]: {
-                color: themeVars.color.primary.contrast,
-                backgroundColor: themeVars.color.primary.light,
-                backgroundImage: `linear-gradient(215deg, ${themeVars.color.primary.light}, ${themeVars.color.primary.dark})`,
-            },
-        },
-    },
-]);
+export const paginatorPage = style([skinEntries.buttonSimple, cellBase]);
 
 export const paginatorStep = style([skinEntries.buttonSimple, cellBase]);
 

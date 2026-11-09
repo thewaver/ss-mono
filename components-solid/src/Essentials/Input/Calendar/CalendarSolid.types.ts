@@ -33,6 +33,8 @@ export type CalendarDayProps = AccessorProps<
         renderContent: (getRenderProps: () => InteractionFlags<CalendarRenderProps>) => JSX.Element;
         /** Runs when this day is picked. */
         onSelect: () => void;
+        /** Runs as the pointer moves over this day. */
+        onHover: () => void;
     }
 >;
 
@@ -71,7 +73,10 @@ export type CalendarCompositeProps = CalendarBaseProps &
         computeRange?: (highlighted: DateValue) => DateValueRange | undefined;
         /** Runs when a day is picked. */
         onPick: (day: DateValue) => void;
-    };
+    } & AccessorProps<{
+        /** Whether the range being painted is still a preview, with only its first end picked. */
+        isRangePending?: boolean;
+    }>;
 
 export type CalendarProps = CalendarBaseProps &
     CalendarPrecisionProps & {

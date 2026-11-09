@@ -36,6 +36,7 @@ const CalendarDay = (props: CalendarDayProps) => {
 
                 props.onSelect();
             }}
+            onPointerMove={() => props.onHover()}
         >
             {props.renderContent(props.flags)}
         </div>
@@ -50,6 +51,7 @@ export const CalendarComposite = (props: CalendarCompositeProps) => {
     const rootRef = useRef<HTMLDivElement | null>(null);
     const previousPageStartRef = useRef<DateValue | undefined>(undefined);
     const [highlighted, setHighlighted] = useState<DateValue>();
+    const [hoveredDay, setHoveredDay] = useState<DateValue>();
 
     const direction = NavigatorReactUtils.useDirection(rootRef);
 
@@ -114,7 +116,7 @@ export const CalendarComposite = (props: CalendarCompositeProps) => {
         pageStart,
     });
 
-    const paintedRange = props.computeRange?.(rovingDay);
+    const paintedRange = props.computeRange?.(hoveredDay ?? rovingDay);
 
     const getIsDayDisabled = (day: DateValue) =>
         CalendarUtils.getIsCellDisabled(day, precision, {
@@ -141,6 +143,14 @@ export const CalendarComposite = (props: CalendarCompositeProps) => {
         setHighlighted(picked);
         props.onPick(picked);
     };
+
+    const hoverDay = (day: DateValue) => {
+        if (!props.computeRange || getIsDayDisabled(day)) return;
+
+        setHoveredDay(day);
+    };
+
+    const clearHoveredDay = () => setHoveredDay(undefined);
 
     useEffect(() => LiveAnnouncerUtils.reserve("polite"), []);
 
@@ -186,6 +196,8 @@ export const CalendarComposite = (props: CalendarCompositeProps) => {
 
         e.preventDefault();
 
+        clearHoveredDay();
+
         if (action.kind === "pick") pickDay(action.day);
         else moveTo(action.day);
     };
@@ -212,6 +224,7 @@ export const CalendarComposite = (props: CalendarCompositeProps) => {
                     today,
                     isSelected: props.computeIsSelected(day),
                     range: paintedRange,
+                    isRangePending: props.isRangePending,
                 })}
                 renderControl={(setElementRef, flags) => (
                     <CalendarDay
@@ -221,6 +234,7 @@ export const CalendarComposite = (props: CalendarCompositeProps) => {
                         ariaLabel={labelCell(day)}
                         renderContent={(dayFlags) => props.renderDay(day, dayFlags)}
                         onSelect={() => pickDay(day)}
+                        onHover={() => hoverDay(day)}
                     />
                 )}
             />
@@ -288,6 +302,7 @@ export const CalendarComposite = (props: CalendarCompositeProps) => {
                 aria-label={props.ariaLabel}
                 aria-disabled={props.isDisabled || undefined}
                 onKeyDown={handleKeyDown}
+                onPointerLeave={clearHoveredDay}
             >
                 {renderRows(pages[0])}
             </div>
@@ -304,6 +319,7 @@ export const CalendarComposite = (props: CalendarCompositeProps) => {
             aria-label={props.ariaLabel}
             aria-disabled={props.isDisabled || undefined}
             onKeyDown={handleKeyDown}
+            onPointerLeave={clearHoveredDay}
         >
             {pages.map((page, index) => (
                 <div key={index} className={CalendarStyles.calendarMonth}>

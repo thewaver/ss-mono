@@ -44,6 +44,7 @@ const CalendarDay = defineComponent(
 
                         props.onSelect();
                     }}
+                    onPointermove={() => props.onHover()}
                 >
                     {callSlot(slots.renderContent, props.flags)}
                 </div>
@@ -57,6 +58,7 @@ const CalendarDay = defineComponent(
             flags: null,
             ariaLabel: null,
             onSelect: null,
+            onHover: null,
         }),
     },
 );
@@ -69,6 +71,7 @@ export const CalendarComposite = defineComponent(
 
         const rootRef = shallowRef<HTMLDivElement>();
         const highlighted = shallowRef<DateValue>();
+        const hoveredDay = shallowRef<DateValue>();
 
         let previousPageStart: DateValue | undefined;
 
@@ -181,6 +184,16 @@ export const CalendarComposite = defineComponent(
             props.onPick(picked);
         };
 
+        const hoverDay = (day: DateValue) => {
+            if (!props.computeRange || getIsDayDisabled(day)) return;
+
+            hoveredDay.value = day;
+        };
+
+        const clearHoveredDay = () => {
+            hoveredDay.value = undefined;
+        };
+
         watchAfterRender([], () => LiveAnnouncerUtils.reserve("polite"));
 
         watchAfterRender([() => props.anchorDay], ([anchorDay]) => {
@@ -225,6 +238,8 @@ export const CalendarComposite = defineComponent(
 
             e.preventDefault();
 
+            clearHoveredDay();
+
             if (action.kind === "pick") pickDay(action.day);
             else moveTo(action.day);
         };
@@ -232,7 +247,7 @@ export const CalendarComposite = defineComponent(
         return () => {
             const precision = getPrecision();
             const shape = CalendarUtils.getGridShape(month.value, precision);
-            const paintedRange = props.computeRange?.(rovingDay.value);
+            const paintedRange = props.computeRange?.(hoveredDay.value ?? rovingDay.value);
             const isMultiMonth = getIsMultiMonth();
             const hasWeekNumbers = precision === "day" && slots.renderWeekNumber !== undefined;
             const columnCount = shape.colCount + (hasWeekNumbers ? 1 : 0);
@@ -262,6 +277,7 @@ export const CalendarComposite = defineComponent(
                             today: today.value,
                             isSelected: props.computeIsSelected(day),
                             range: paintedRange,
+                            isRangePending: props.isRangePending,
                         })}
                     >
                         {
@@ -273,6 +289,7 @@ export const CalendarComposite = defineComponent(
                                         flags={flags}
                                         ariaLabel={labelCell.value(day)}
                                         onSelect={() => pickDay(day)}
+                                        onHover={() => hoverDay(day)}
                                     >
                                         {
                                             {
@@ -349,6 +366,7 @@ export const CalendarComposite = defineComponent(
                         aria-label={props.ariaLabel}
                         aria-disabled={props.isDisabled || undefined}
                         onKeydown={handleKeyDown}
+                        onPointerleave={clearHoveredDay}
                     >
                         {renderRows(pages.value[0])}
                     </div>
@@ -365,6 +383,7 @@ export const CalendarComposite = defineComponent(
                     aria-label={props.ariaLabel}
                     aria-disabled={props.isDisabled || undefined}
                     onKeydown={handleKeyDown}
+                    onPointerleave={clearHoveredDay}
                 >
                     {pages.value.map((page, index) => (
                         <div key={index} class={CalendarStyles.calendarMonth}>
@@ -408,6 +427,7 @@ export const CalendarComposite = defineComponent(
             "computeIsSelected": null,
             "anchorDay": null,
             "computeRange": null,
+            "isRangePending": Boolean,
             "onPick": null,
         }),
     },

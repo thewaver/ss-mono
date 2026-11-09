@@ -78,6 +78,7 @@ const SWITCH_SHELL: StyleRule = {
 const ACCORDION: StyleRule = {
     borderRadius: themeVars.borderRadius.half,
     backgroundColor: [layerVars.main, `rgb(from ${layerVars.main} r g b / 50%)`],
+    boxShadow: SHADOW_SMALL,
     color: layerVars.contrast,
     fontSize: themeVars.fontSize.medium,
 } as const;
@@ -118,17 +119,16 @@ const TAB_FLOATER_SELECTED_VERT: StyleRule = {
     borderInlineStart: `2px solid ${themeVars.color.primary.main}`,
 };
 
-const SURFACE: StyleRule = {
+const surface = (layer: "background" | "surface"): StyleRule => ({
     borderRadius: themeVars.borderRadius.half,
-    backgroundColor: themeVars.color.surface.main,
+    backgroundColor: themeVars.color[layer].main,
     boxShadow: SHADOW_MEDIUM,
-    color: themeVars.color.surface.contrast,
+    color: themeVars.color[layer].contrast,
     fontSize: themeVars.fontSize.medium,
-} as const;
+});
 
 SkinUtils.define(cardboard, {
     accordionHeader: {
-        ...ACCORDION,
         selectors: ObjectUtils.deepMerge(SkinUtils.joinedCorners(), INTERACTIBLE_STATES, {
             [skinSelectors.isExpanded]: {
                 color: themeVars.color.primary.main,
@@ -137,12 +137,13 @@ SkinUtils.define(cardboard, {
         }),
     },
     accordionPanel: {
-        ...ACCORDION,
         selectors: {
             ...SkinUtils.joinedCorners(),
         },
     },
-    accordionWrapper: {},
+    accordionWrapper: {
+        ...ACCORDION,
+    },
     button: {
         borderRadius: PILL_RADIUS,
         paddingInline: themeVars.spacing.double,
@@ -204,7 +205,6 @@ SkinUtils.define(cardboard, {
         ...INPUT_SHELL,
         border: "none",
     },
-    hollowSurface: SkinUtils.hollow(SURFACE),
     input: {
         ...INPUT_SHELL,
         selectors: ObjectUtils.deepMerge(INPUT_STATES, {
@@ -241,6 +241,9 @@ SkinUtils.define(cardboard, {
     pageBackground: {
         backgroundColor: themeVars.color.background.main,
         color: themeVars.color.background.contrast,
+    },
+    pageContainer: {
+        ...surface("background"),
     },
     panel: {
         borderRadius: themeVars.borderRadius.half,
@@ -350,7 +353,9 @@ SkinUtils.define(cardboard, {
         boxShadow: SHADOW_SMALL,
         fontWeight: "bold",
     },
-    surface: SURFACE,
+    surface: {
+        ...surface("surface"),
+    },
     tabsItemBase: {
         paddingBlock: themeVars.spacing.full,
         paddingInline: themeVars.spacing.double,

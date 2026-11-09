@@ -30,16 +30,6 @@ const splitSelectorList = (selector: string) => {
     return parts.map((part) => part.trim());
 };
 
-const FRAME_PROPERTIES = [
-    "border",
-    "borderColor",
-    "borderStyle",
-    "borderWidth",
-    "borderRadius",
-    "boxShadow",
-    "clipPath",
-] as const;
-
 const JOINED_CORNERS = [
     [skinSelectors.isJoinedBlockStart, ["borderStartStartRadius", "borderStartEndRadius"]],
     [skinSelectors.isJoinedBlockEnd, ["borderEndStartRadius", "borderEndEndRadius"]],
@@ -71,9 +61,6 @@ export namespace SkinUtils {
     export const anyOf = (...selectors: string[]) => selectors.join(", ");
 
     export const allOf = (...selectors: string[]) => `&${selectors.map((selector) => `:is(${selector})`).join("")}`;
-
-    export const hollow = (rule: SkinRule): SkinRule =>
-        Object.fromEntries(FRAME_PROPERTIES.filter((key) => key in rule).map((key) => [key, rule[key]]));
 
     export const joinedCorners = (radius: string | number = 0): NonNullable<SkinRule["selectors"]> =>
         Object.fromEntries(

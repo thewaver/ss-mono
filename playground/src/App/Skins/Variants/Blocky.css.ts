@@ -119,16 +119,15 @@ const TAB_FLOATER_SELECTED: StyleRule = {
     ...ITEM_FLOATER_SELECTED,
 };
 
-const SURFACE: StyleRule = {
-    backgroundColor: themeVars.color.surface.main,
-    boxShadow: [insetShadowRaised(themeVars.color.surface.main), SHADOW_MEDIUM].join(","),
-    color: themeVars.color.surface.contrast,
+const surface = (layer: "background" | "surface"): StyleRule => ({
+    backgroundColor: themeVars.color[layer].main,
+    boxShadow: [insetShadowRaised(themeVars.color[layer].main), SHADOW_MEDIUM].join(","),
+    color: themeVars.color[layer].contrast,
     fontSize: themeVars.fontSize.medium,
-} as const;
+});
 
 SkinUtils.define(blocky, {
     accordionHeader: {
-        ...ACCORDION,
         selectors: ObjectUtils.deepMerge(SkinUtils.joinedCorners(), INTERACTIBLE_STATES, {
             [skinSelectors.isExpanded]: {
                 backgroundColor: themeVars.color.primary.main,
@@ -139,12 +138,13 @@ SkinUtils.define(blocky, {
         }),
     },
     accordionPanel: {
-        ...ACCORDION,
         selectors: {
             ...SkinUtils.joinedCorners(),
         },
     },
-    accordionWrapper: {},
+    accordionWrapper: {
+        ...ACCORDION,
+    },
     button: {
         paddingInline: themeVars.spacing.double,
         backgroundColor: themeVars.color.primary.main,
@@ -211,7 +211,6 @@ SkinUtils.define(blocky, {
         ...INPUT_SHELL,
         border: "none",
     },
-    hollowSurface: SkinUtils.hollow(SURFACE),
     input: {
         ...INPUT_SHELL,
         selectors: ObjectUtils.deepMerge(INPUT_STATES, {
@@ -252,6 +251,9 @@ SkinUtils.define(blocky, {
         backgroundColor: themeVars.color.background.main,
         color: themeVars.color.background.contrast,
         fontFamily: "monospace",
+    },
+    pageContainer: {
+        ...surface("background"),
     },
     panel: {
         backgroundColor: [layerVars.main, `rgb(from ${layerVars.main} r g b / 50%)`],
@@ -360,7 +362,9 @@ SkinUtils.define(blocky, {
         boxShadow: insetShadowLowered(layerVars.main),
         fontWeight: "bold",
     },
-    surface: SURFACE,
+    surface: {
+        ...surface("surface"),
+    },
     tabsItemBase: {
         paddingBlock: themeVars.spacing.full,
         paddingInline: themeVars.spacing.double,

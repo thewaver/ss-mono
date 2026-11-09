@@ -68,6 +68,34 @@ test("the second press completes the span and reports it as one value", async ({
 });
 
 /**
+ * The band follows the pointer only while one end is held, and only on the page: what is previewed is not picked, so
+ * the one day marked selected stays the held end until the second press, which marks the whole span at once.
+ */
+test("with one end held the band follows the pointer, and the second press selects the whole span", async ({
+    page,
+}) => {
+    const selected = page.locator(`${cell(BASIC)}[aria-selected="true"]`);
+
+    await page.locator(day(BASIC, "10 August 2026")).click();
+    await page.locator(day(BASIC, "14 August 2026")).hover();
+
+    await expect(page.locator(banded(BASIC)), "the span reaches the day under the pointer").toHaveCount(5);
+    await expect(selected, "and only the held end is selected").toHaveCount(1);
+
+    await page.locator(day(BASIC, "12 August 2026")).hover();
+
+    await expect(page.locator(banded(BASIC)), "it shrinks as the pointer comes back").toHaveCount(3);
+
+    await page.mouse.move(0, 0);
+
+    await expect(page.locator(banded(BASIC)), "and falls back to the held end off the grid").toHaveCount(1);
+
+    await page.locator(day(BASIC, "14 August 2026")).click();
+
+    await expect(selected, "both ends and the days between them are selected").toHaveCount(5);
+});
+
+/**
  * Picking backwards is the case a consumer hits by accident, and it is the reason the value is ordered by the
  * component rather than by whoever reads it. The span is the same span either way round.
  */

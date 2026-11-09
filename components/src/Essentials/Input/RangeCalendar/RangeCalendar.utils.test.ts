@@ -37,6 +37,13 @@ describe("RangeCalendarUtils while a start is pending", () => {
         expect(iso(RangeCalendarUtils.computeAnchorDay(pending, undefined, range)!)).toBe("2026-08-10");
     });
 
+    it("marks every day of a complete range, and none outside it", () => {
+        expect(RangeCalendarUtils.getIsSelected(date("2026-08-01"), undefined, range)).toBe(true);
+        expect(RangeCalendarUtils.getIsSelected(date("2026-08-03"), undefined, range)).toBe(true);
+        expect(RangeCalendarUtils.getIsSelected(date("2026-08-05"), undefined, range)).toBe(true);
+        expect(RangeCalendarUtils.getIsSelected(date("2026-08-06"), undefined, range)).toBe(false);
+    });
+
     it("anchors on the last end pressed once the range is complete", () => {
         expect(iso(RangeCalendarUtils.computeAnchorDay(undefined, date("2026-08-05"), range)!)).toBe("2026-08-05");
         expect(iso(RangeCalendarUtils.computeAnchorDay(undefined, date("2026-08-20"), range)!)).toBe("2026-08-01");

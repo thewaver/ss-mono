@@ -31,7 +31,7 @@ export const skinsDescription = style({
     opacity: 0.75,
 });
 
-export const skinRow = style([skinEntries.hollowSurface, { overflow: "hidden" }]);
+export const skinRow = style([skinEntries.pageContainer, { overflow: "hidden" }]);
 
 export const skinSampleBoundary = style([skinBoundary, { isolation: "isolate" }]);
 

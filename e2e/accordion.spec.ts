@@ -35,6 +35,24 @@ const offsetWidthOf = (page: Page, selector: string, index: number) =>
         .nth(index)
         .evaluate((element) => (element as HTMLElement).offsetWidth);
 
+/**
+ * A section's own box is the widest ancestor of a header holding no other header. It is measured whole, rather than as
+ * its header plus its panel, because the fault this guards against leaves the two adding up to less than the box: the
+ * sections came out equally wide, with the open panel cut off and empty space beside each closed header.
+ */
+const sectionWidths = (page: Page, scope: string) =>
+    page.locator(header(scope)).evaluateAll((headers) =>
+        headers.map((head) => {
+            let section = head as HTMLElement;
+
+            while (section.parentElement?.querySelectorAll("button[aria-expanded]").length === 1) {
+                section = section.parentElement;
+            }
+
+            return section.offsetWidth;
+        }),
+    );
+
 test.describe("the Accordion's docs", () => {
     test.beforeEach(async ({ page }) => {
         await page.goto("/accordion/docs");
@@ -261,6 +279,23 @@ test.describe("the Accordion's docs", () => {
             "aria-expanded",
             "true",
         );
+    });
+
+    test("in a row the open section is wider than the closed ones, since only it holds a panel", async ({ page }) => {
+        const OPENED = 2;
+
+        await page.locator(header(ROW)).nth(OPENED).click();
+
+        await expect
+            .poll(
+                async () => {
+                    const widths = await sectionWidths(page, ROW);
+
+                    return widths[OPENED] - Math.max(...widths.filter((_, index) => index !== OPENED));
+                },
+                { message: "the open section stands wider than every closed one", timeout: TRANSITION_TIMEOUT_MS },
+            )
+            .toBeGreaterThan(0);
     });
 
     test("the orientation knob turns the row into a column, and the arrows follow", async ({ page }) => {

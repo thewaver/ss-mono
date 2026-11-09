@@ -7,7 +7,7 @@ import { layerVars } from "../../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../../Theme.css";
 import { skinSelectors, skinVars } from "../Skin.css";
 
-export const plasticine = style({});
+export const shaded = style({});
 
 const PILL_RADIUS = "9999px";
 
@@ -65,6 +65,7 @@ const SWITCH_SHELL: StyleRule = {
 const ACCORDION: StyleRule = {
     borderRadius: themeVars.borderRadius.half,
     backgroundColor: [layerVars.main, `rgb(from ${layerVars.main} r g b / 50%)`],
+    boxShadow: SHADOW_SMALL,
     color: layerVars.contrast,
     fontSize: themeVars.fontSize.medium,
 } as const;
@@ -105,18 +106,17 @@ const TAB_FLOATER_SELECTED_VERT: StyleRule = {
     borderInlineStart: `2px solid ${themeVars.color.primary.main}`,
 };
 
-const SURFACE: StyleRule = {
+const surface = (layer: "background" | "surface"): StyleRule => ({
     borderRadius: themeVars.borderRadius.half,
-    backgroundColor: themeVars.color.surface.main,
-    backgroundImage: `linear-gradient(315deg, ${themeVars.color.surface.dark}, ${themeVars.color.surface.light})`,
+    backgroundColor: themeVars.color[layer].main,
+    backgroundImage: `linear-gradient(315deg, ${themeVars.color[layer].dark}, ${themeVars.color[layer].light})`,
     boxShadow: SHADOW_MEDIUM,
-    color: themeVars.color.surface.contrast,
+    color: themeVars.color[layer].contrast,
     fontSize: themeVars.fontSize.medium,
-} as const;
+});
 
-SkinUtils.define(plasticine, {
+SkinUtils.define(shaded, {
     accordionHeader: {
-        ...ACCORDION,
         selectors: ObjectUtils.deepMerge(SkinUtils.joinedCorners(), INTERACTIBLE_STATES, {
             [skinSelectors.isExpanded]: {
                 color: themeVars.color.primary.main,
@@ -125,12 +125,13 @@ SkinUtils.define(plasticine, {
         }),
     },
     accordionPanel: {
-        ...ACCORDION,
         selectors: {
             ...SkinUtils.joinedCorners(),
         },
     },
-    accordionWrapper: {},
+    accordionWrapper: {
+        ...ACCORDION,
+    },
     button: {
         borderRadius: themeVars.borderRadius.half,
         paddingInline: themeVars.spacing.double,
@@ -194,7 +195,6 @@ SkinUtils.define(plasticine, {
     dropdown: {
         ...INPUT_SHELL,
     },
-    hollowSurface: SkinUtils.hollow(SURFACE),
     input: {
         ...INPUT_SHELL,
         selectors: ObjectUtils.deepMerge(INPUT_STATES, {
@@ -233,6 +233,9 @@ SkinUtils.define(plasticine, {
         backgroundColor: themeVars.color.background.main,
         backgroundImage: `linear-gradient(315deg, ${themeVars.color.background.dark}, ${themeVars.color.background.light})`,
         color: themeVars.color.background.contrast,
+    },
+    pageContainer: {
+        ...surface("background"),
     },
     panel: {
         borderRadius: themeVars.borderRadius.half,
@@ -353,7 +356,9 @@ SkinUtils.define(plasticine, {
         boxShadow: SHADOW_SMALL,
         fontWeight: "bold",
     },
-    surface: SURFACE,
+    surface: {
+        ...surface("surface"),
+    },
     tabsItemBase: {
         paddingBlock: themeVars.spacing.full,
         paddingInline: themeVars.spacing.double,

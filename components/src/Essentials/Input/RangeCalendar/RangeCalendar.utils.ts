@@ -38,8 +38,8 @@ export namespace RangeCalendarUtils {
     /**
      * Tests whether a day is marked as picked.
      *
-     * @returns While a start is pending, whether the day is that start; otherwise whether it is either end of the
-     * range.
+     * @returns While a start is pending, whether the day is that start; otherwise whether it falls in the range, both
+     * ends included.
      */
     export const getIsSelected = (
         day: DateValue,
@@ -48,7 +48,7 @@ export namespace RangeCalendarUtils {
     ) => {
         if (pendingStart) return DateValueUtils.isSame(day, pendingStart);
 
-        return DateValueUtils.isSame(day, range?.start) || DateValueUtils.isSame(day, range?.end);
+        return DateValueUtils.getIsWithin(day, range);
     };
 
     /**

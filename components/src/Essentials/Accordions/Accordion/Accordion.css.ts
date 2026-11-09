@@ -38,6 +38,10 @@ globalStyle(`${accordionRoot} > ${collapsibleRoot}`, {
     borderRadius: 0,
 });
 
+globalStyle(`${accordionOrientationVariants.horizontal} > ${collapsibleRoot}`, {
+    gridTemplateColumns: "auto",
+});
+
 (Object.keys(ORIENTATION_DIRECTIONS) as (keyof typeof ORIENTATION_DIRECTIONS)[]).forEach((orientation) => {
     const orientationClass = accordionOrientationVariants[orientation];
     const direction = ORIENTATION_DIRECTIONS[orientation];

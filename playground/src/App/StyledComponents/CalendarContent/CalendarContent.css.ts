@@ -1,6 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
-import { skinEntries } from "../../Skins/Skin.css";
+import { skinEntries, skinStates } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 import { layerVars } from "../Layer/Layer.css";
 import { FIELD_HEIGHT } from "../TextFieldContent/TextFieldContent.css";
@@ -8,62 +8,49 @@ import { FIELD_HEIGHT } from "../TextFieldContent/TextFieldContent.css";
 const CELL_SIZE = 46;
 const WIDE_CELL_WIDTH = 92;
 
-export const isSelected = style({});
+export const isSelected = style([skinStates.isSelected]);
 export const isToday = style({});
 export const isOutsideMonth = style({});
-export const isHovered = style({});
-export const isDisabled = style({});
+export const isHovered = style([skinStates.isHovered]);
+export const isDisabled = style([skinStates.isDisabled]);
 export const isInRange = style({});
 export const isRangeStart = style({});
 export const isRangeEnd = style({});
 export const isWide = style({});
 
-export const calendarDay = style({
+const calendarDayBase = style({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     width: CELL_SIZE,
     height: CELL_SIZE,
-    borderRadius: themeVars.borderRadius.half,
-    color: layerVars.contrast,
     fontSize: themeVars.fontSize.small,
     fontVariantNumeric: "tabular-nums",
-    transition: `background-color ${themeVars.animation.duration}, color ${themeVars.animation.duration}`,
+    transition: `background-color ${themeVars.animation.duration}, color ${themeVars.animation.duration}, filter ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}`,
 
     selectors: {
         [`&.${isWide}`]: {
             width: WIDE_CELL_WIDTH,
         },
-        [`&.${isOutsideMonth}`]: {
+        [`&.${isOutsideMonth}:not(.${isDisabled})`]: {
             opacity: 0.5,
         },
-        [`&.${isHovered}`]: {
-            backgroundColor: `rgb(from ${themeVars.color.primary.main} r g b / 25%)`,
-        },
         [`&.${isToday}`]: {
-            boxShadow: `inset 0 0 0 1px ${themeVars.color.primary.main}`,
+            textDecoration: "underline",
+            textUnderlineOffset: themeVars.spacing.half,
         },
-        [`&.${isInRange}`]: {
-            borderRadius: 0,
-            backgroundColor: `rgb(from ${themeVars.color.primary.main} r g b / 15%)`,
+        [`&.${isInRange}:not(.${isRangeStart})`]: {
+            borderStartStartRadius: 0,
+            borderEndStartRadius: 0,
         },
-        [`&.${isRangeStart}`]: {
-            borderStartStartRadius: themeVars.borderRadius.half,
-            borderEndStartRadius: themeVars.borderRadius.half,
-        },
-        [`&.${isRangeEnd}`]: {
-            borderStartEndRadius: themeVars.borderRadius.half,
-            borderEndEndRadius: themeVars.borderRadius.half,
-        },
-        [`&.${isSelected}`]: {
-            backgroundColor: themeVars.color.primary.main,
-            color: themeVars.color.primary.contrast,
-        },
-        [`&.${isDisabled}`]: {
-            opacity: 0.25,
+        [`&.${isInRange}:not(.${isRangeEnd})`]: {
+            borderStartEndRadius: 0,
+            borderEndEndRadius: 0,
         },
     },
 });
+
+export const calendarDay = style([skinEntries.itemBase, calendarDayBase]);
 
 export const calendarWeekday = style({
     display: "flex",

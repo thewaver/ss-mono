@@ -9,6 +9,7 @@ import {
     panelJoins,
 } from "@thewaver/ss-playground/App/StyledComponents/AccordionContent/AccordionContent.css";
 
+import { PageAccordionWrapper } from "../../../../StyledComponents/AccordionContent/AccordionContent";
 import { useLayerClass } from "../../../../StyledComponents/Layer/Layer.context";
 import type { AccordionOrientationDocsExampleProps } from "../AccordionPageSolid.types";
 
@@ -43,6 +44,9 @@ export const OrientationDocsExample = (props: Props) => {
                 sizing={access(props.orientation) === "horizontal" ? "fit-content" : undefined}
                 isSingleExpand={true}
                 isExpandRequired={true}
+                renderSection={(renderContent, _, getFlags) => (
+                    <PageAccordionWrapper flags={getFlags}>{renderContent()}</PageAccordionWrapper>
+                )}
                 renderHeader={(getItem, getFlags) => (
                     <div
                         class={styles.orientationStrip}

@@ -17,7 +17,7 @@ const layerClass = useLayerClass();
             renderProps.isSelected && styles.isSelected,
             renderProps.isToday && styles.isToday,
             renderProps.isOutsideMonth && styles.isOutsideMonth,
-            renderProps.isHovered && styles.isHovered,
+            (renderProps.isHovered || (renderProps.isInRange && renderProps.isRangePending)) && styles.isHovered,
             renderProps.isDisabled && styles.isDisabled,
             renderProps.isInRange && styles.isInRange,
             renderProps.isRangeStart && styles.isRangeStart,

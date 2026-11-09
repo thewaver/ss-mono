@@ -33,6 +33,7 @@ const CalendarDay = (props: CalendarDayProps) => {
 
                 props.onSelect();
             }}
+            onPointerMove={() => props.onHover()}
         >
             {props.renderContent(() => access(props.flags))}
         </div>
@@ -52,6 +53,7 @@ export const CalendarComposite = (props: CalendarCompositeProps) => {
 
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
     const [getHighlighted, setHighlighted] = createSignal<DateValue | undefined>();
+    const [getHoveredDay, setHoveredDay] = createSignal<DateValue | undefined>();
 
     const getDirection = NavigatorSolidUtils.createDirectionSignal(getRootRef);
 
@@ -174,7 +176,15 @@ export const CalendarComposite = (props: CalendarCompositeProps) => {
         props.onPick(picked);
     };
 
-    const getPaintedRange = createMemo(() => props.computeRange?.(getRovingDay()));
+    const hoverDay = (day: DateValue) => {
+        if (!props.computeRange || getIsDayDisabled(day)) return;
+
+        setHoveredDay(() => day);
+    };
+
+    const clearHoveredDay = () => setHoveredDay(undefined);
+
+    const getPaintedRange = createMemo(() => props.computeRange?.(getHoveredDay() ?? getRovingDay()));
 
     createEffect(() => {
         const anchor = props.computeAnchorDay?.();
@@ -218,6 +228,8 @@ export const CalendarComposite = (props: CalendarCompositeProps) => {
 
         e.preventDefault();
 
+        clearHoveredDay();
+
         if (action.kind === "pick") pickDay(action.day);
         else moveTo(action.day);
     };
@@ -240,6 +252,7 @@ export const CalendarComposite = (props: CalendarCompositeProps) => {
                         today: getToday(),
                         isSelected: props.computeIsSelected(getDay()),
                         range: getPaintedRange(),
+                        isRangePending: access(props.isRangePending),
                     })
                 }
                 renderControl={(setElementRef, getRenderProps) => (
@@ -250,6 +263,7 @@ export const CalendarComposite = (props: CalendarCompositeProps) => {
                         ariaLabel={() => getCellLabeler()(getDay())}
                         renderContent={(getDayFlags) => props.renderDay(getDay, getDayFlags)}
                         onSelect={() => pickDay(getDay())}
+                        onHover={() => hoverDay(getDay())}
                     />
                 )}
             />
@@ -321,6 +335,7 @@ export const CalendarComposite = (props: CalendarCompositeProps) => {
                     aria-label={access(props.ariaLabel)}
                     aria-disabled={access(props.isDisabled) || undefined}
                     onKeyDown={handleKeyDown}
+                    onPointerLeave={clearHoveredDay}
                 >
                     {renderRows(() => getPages()[0])}
                 </div>
@@ -335,6 +350,7 @@ export const CalendarComposite = (props: CalendarCompositeProps) => {
                 aria-label={access(props.ariaLabel)}
                 aria-disabled={access(props.isDisabled) || undefined}
                 onKeyDown={handleKeyDown}
+                onPointerLeave={clearHoveredDay}
             >
                 <Index each={getPages()}>
                     {(getPage, index) => (

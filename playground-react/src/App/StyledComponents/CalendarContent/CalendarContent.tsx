@@ -16,7 +16,8 @@ export const PageCalendarDay = (props: CalendarDayProps) => {
                 props.renderProps.isSelected && styles.isSelected,
                 props.renderProps.isToday && styles.isToday,
                 props.renderProps.isOutsideMonth && styles.isOutsideMonth,
-                props.renderProps.isHovered && styles.isHovered,
+                (props.renderProps.isHovered || (props.renderProps.isInRange && props.renderProps.isRangePending)) &&
+                    styles.isHovered,
                 props.renderProps.isDisabled && styles.isDisabled,
                 props.renderProps.isInRange && styles.isInRange,
                 props.renderProps.isRangeStart && styles.isRangeStart,

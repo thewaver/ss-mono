@@ -27,6 +27,8 @@ export type CalendarRenderProps = {
     isRangeStart: boolean;
     /** Whether this day is the last of the picked range. */
     isRangeEnd: boolean;
+    /** Whether the range is still a preview, with only its first end picked. Always `false` on a single-date calendar. */
+    isRangePending: boolean;
 };
 
 export type CalendarKeyAction = {

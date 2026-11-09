@@ -59,7 +59,7 @@ export const LIBRARY: TreemapNode<string> = branch(
     branch("Composites", leaf("GlassSurface", 175), leaf("Surface", 265)),
     branch(
         "Essentials",
-        branch("Accordions", leaf("Accordion", 492), leaf("Collapsible", 481)),
+        branch("Accordions", leaf("Accordion", 496), leaf("Collapsible", 481)),
         leaf("Breadcrumbs", 216),
         branch("Buttons", leaf("Button", 225), leaf("SlideButton", 744)),
         leaf("Carousel", 1726),
@@ -67,7 +67,7 @@ export const LIBRARY: TreemapNode<string> = branch(
         leaf("Form", 167),
         branch(
             "Input",
-            leaf("Calendar", 1314),
+            leaf("Calendar", 1340),
             leaf("Checkbox", 57),
             leaf("CheckboxGroup", 226),
             leaf("Clock", 750),
@@ -89,7 +89,7 @@ export const LIBRARY: TreemapNode<string> = branch(
             leaf("Radio", 84),
             leaf("RadioGroup", 455),
             leaf("Range", 789),
-            leaf("RangeCalendar", 118),
+            leaf("RangeCalendar", 119),
             leaf("SegmentedInput", 396),
             leaf("Select", 899),
             leaf("TagInput", 472),

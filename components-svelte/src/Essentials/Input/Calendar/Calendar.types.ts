@@ -25,6 +25,8 @@ export type CalendarDayProps = Omit<InteractionControlProps<CalendarRenderProps>
     ariaLabel: string;
     /** Runs when this day is picked. */
     onSelect: () => void;
+    /** Runs as the pointer moves over this day. */
+    onHover: () => void;
 };
 
 export type CalendarBaseProps = BaseCalendarProps & {
@@ -59,6 +61,8 @@ export type CalendarCompositeProps = CalendarBaseProps &
          * pointer.
          */
         computeRange?: (highlighted: DateValue) => DateValueRange | undefined;
+        /** Whether the range being painted is still a preview, with only its first end picked. */
+        isRangePending?: boolean;
         /** Runs when a day is picked. */
         onPick: (day: DateValue) => void;
     };

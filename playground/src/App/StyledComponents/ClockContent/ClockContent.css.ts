@@ -1,6 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
-import { skinEntries } from "../../Skins/Skin.css";
+import { skinEntries, skinStates } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 import { layerVars } from "../Layer/Layer.css";
 
@@ -8,39 +8,30 @@ const OPTION_WIDTH = 52;
 const OPTION_HEIGHT = 34;
 const COLUMN_HEIGHT = OPTION_HEIGHT * 5;
 
-export const isSelected = style({});
+export const isSelected = style([skinStates.isSelected]);
 export const isNow = style({});
-export const isHovered = style({});
-export const isDisabled = style({});
+export const isHovered = style([skinStates.isHovered]);
+export const isDisabled = style([skinStates.isDisabled]);
 
-export const clockOption = style({
+const clockOptionBase = style({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     width: OPTION_WIDTH,
     height: OPTION_HEIGHT,
-    borderRadius: themeVars.borderRadius.half,
-    color: layerVars.contrast,
     fontSize: themeVars.fontSize.small,
     fontVariantNumeric: "tabular-nums",
-    transition: `background-color ${themeVars.animation.duration}, color ${themeVars.animation.duration}`,
+    transition: `background-color ${themeVars.animation.duration}, color ${themeVars.animation.duration}, filter ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}`,
 
     selectors: {
-        [`&.${isHovered}`]: {
-            backgroundColor: `rgb(from ${themeVars.color.primary.main} r g b / 25%)`,
-        },
         [`&.${isNow}`]: {
-            boxShadow: `inset 0 0 0 1px ${themeVars.color.primary.main}`,
-        },
-        [`&.${isSelected}`]: {
-            backgroundColor: themeVars.color.primary.main,
-            color: themeVars.color.primary.contrast,
-        },
-        [`&.${isDisabled}`]: {
-            opacity: 0.25,
+            textDecoration: "underline",
+            textUnderlineOffset: themeVars.spacing.half,
         },
     },
 });
+
+export const clockOption = style([skinEntries.itemBase, clockOptionBase]);
 
 export const clockUnit = style({
     display: "flex",

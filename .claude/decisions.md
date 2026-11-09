@@ -113,17 +113,17 @@ and 65 where a step is needed.
 
 ### Skins
 
-**A Theme is pure colors; a Skin is shape and where those colors go** — the user's split. Plasticine paints a
+**A Theme is pure colors; a Skin is shape and where those colors go** — the user's split. Shaded paints a
 gradient button; another Skin might paint a bordered one with heavily rounded corners, from the same Theme. A
 Skin owns everything that paints — color, background, shadow, border, radius, padding, font — while display,
 size, position, z-index, transforms and transitions stay in the painter, for now. **A Skin is picked the way a
 Theme is**: a class on `<html>`, swapped from the left nav's settings (`PageComponents/Skin`, beside
 `PageComponents/Theme`), from `PLAYGROUND_SKINS` in `Skins/Skin.const.ts`. **No Skin reads the theme's shadow
-scale**: Plasticine and Glass hold their own copies (`SHADOW_SMALL`, `SHADOW_MEDIUM`, `SHADOW_LARGE`), and
+scale**: Shaded and Glass hold their own copies (`SHADOW_SMALL`, `SHADOW_MEDIUM`, `SHADOW_LARGE`), and
 `themeVars.shadow` stays only for the custom painters outside the Skins, until the user decides their shadows. **Every Skin lives in
 `Skins/Variants/`**, one file each, the user's placement; `Skins/` itself holds only the machinery.
 
-**Fourteen Skins were built, Plasticine being the default; `PLAYGROUND_SKINS` holds the ones still kept**, and
+**Fourteen Skins were built, Shaded being the default; `PLAYGROUND_SKINS` holds the ones still kept**, and
 the list below describes all fourteen. The user approved the first six from a published
 reference each and asked for every further idea to be built for rating, with the warning that a Skin has to
 change shape, not just where colors fall; several will be dropped once lived with:
@@ -170,7 +170,7 @@ change shape, not just where colors fall; several will be dropped once lived wit
 **Fourteen more, prefixed `_`, are interpretations of the user's old Protos project** (protos.vercel.app; its
 source survives only in the site's published source maps), built for grading at the user's request, all fourteen
 of its themes including those whose names overlap a Skin above — the user's point being that the earlier builds
-were bad, not the ideas. Each started as a copy of Plasticine's file, the user's method, and keeps all of its
+were bad, not the ideas. Each started as a copy of Shaded's file, the user's method, and keeps all of its
 entries. Protos styled only a field, two buttons and a checkbox, from a random palette in JavaScript; the
 translation onto the Theme is: Protos' two accents → `primary` and `secondary`; its "mix" color (black or white
 against the background) → `layerVars.contrast`, and its inverse → that color inverted with relative color syntax;
@@ -221,7 +221,7 @@ planned for.
   and its box's paint cannot stack. **The ancestor matches are the switches' row states** (`.hasError &`,
   `.isChecked &`, `.isMixed &`): checkbox, radio and toggle carry their state on the row around the box, and the
   box and its mark each have an entry — `checkboxBox`, `radioBox`, `toggleTrack` beside their marks — so a Skin
-  can change either by state. The user's call; Plasticine paints the boxes as `input` through one shared
+  can change either by state. The user's call; Shaded paints the boxes as `input` through one shared
   constant.
 - **A field's typed text is painted through its wrapper** — the user's pick. The library's `<input>` sits beside
   the painted box, not inside it, and inherits color and font from the wrapper both share, so `input` paints
@@ -230,11 +230,9 @@ planned for.
 - **Who the entries are for.** `drawer` is every page-edge or full panel — the left nav, drawers, modals and the
   sidebar sample, which paints exactly the left nav (an earlier call of the user's). `tooltip` takes the small
   floating popups — spotlight and hover card as well as the tooltip. `surface` is the example and variant boxes,
-  toasts and the knobs popup; `hollowSurface` — the user's name — is `surface` without its fill, for a box around
-  siblings that paint their own (the "Show code" accordion's `docsExampleCode`), and every Skin derives it from its
-  `surface` with `SkinUtils.hollow`, which keeps only border, radius, shadow and clip, so the two cannot drift;
-  `panel` the boxes of content inside them, the API tables, code boxes, prop rows
-  and the dependency chips. `decoration` — the user's — is the small see-through button inside or beside a
+  toasts and the knobs popup; `pageContainer` — the user's — is the wrapping box of the docs' "Show code" disclosures
+  and the API tables, and the frame of the Skins page's rows; `panel` the boxes of content inside them, code boxes,
+  prop rows and the dependency chips. `decoration` — the user's — is the small see-through button inside or beside a
   field (select clear, picker triggers, era and AM/PM toggles, stepper arrows, adornments, the sidebar toggle),
   and it reacts to plain `isHovered`: every painter that hands it hover is a button's, and the static adornment
   never passes hover on (_"The in-field adornment painter"_). `tag` is a tag input's chip; the other chips and badges keep
@@ -244,7 +242,7 @@ planned for.
   two tab floaters and the tab's without-floater states on its own `ITEM_FLOATER_HOVER` / `ITEM_FLOATER_SELECTED`,
   as written by the user — where that constant is only a text color, the selection floater paints nothing, and the
   user chose that over keeping the tab's own selected color. The track and the floaters keep the boxes the library
-  gives them, the whole list and the tab. A vertical list carries `isVertical` on all four. Every other Skin starts on Plasticine's tab paint, the user's
+  gives them, the whole list and the tab. A vertical list carries `isVertical` on all four. Every other Skin starts on Shaded's tab paint, the user's
   call while they are temporary. The honeycomb tabs are a custom variant and keep their own paint. The binary switches' insides — `checkboxMark`, `radioDot`, `toggleThumb` —
   and the standard bars — `progressTrack` and `progressFill`, `rangeTrack`, `rangeFill` and `rangeThumb`,
   `scrollerTrack` and `scrollerThumb` (painted on `::before`), and the slide button's `slideButtonTrack`,
@@ -254,7 +252,7 @@ planned for.
   Skin colors the hint and the arrow apart. `slideButtonTrack` paints its own element inside an unpainted box,
   holding the fill and hint and clipping them, with the thumb beside it over the track's border, as Range's thumbs
   are: a border on the box itself had pushed the thumb inward. The user's split — the fill stays clipped, so with a
-  track border its end can miss the thumb's edge by up to that border's width; Plasticine keeps the slide button's
+  track border its end can miss the thumb's edge by up to that border's width; Shaded keeps the slide button's
   earlier paint, every other Skin paints its track, fill and thumb with its range's (`RANGE_TRACK`, `RANGE_FILL`,
   `RANGE_THUMB`), so the two stay in step until a Skin parts them — Cardboard does: its slide button is a pill and
   its thumb takes the strip's main color with the arrow in the family's `contrast`, because a thumb as tall as its
@@ -270,8 +268,8 @@ planned for.
   single-value range's thumb carries neither.
 - **Entries are as few as possible, but a component with an entry for one part gets one for each part** — the
   user's rule. So the accordion body has `accordionPanel` beside `accordionHeader` rather than borrowing
-  `panel`; each Skin starts it on the same paint as its `panel`, through one `PANEL` constant, until the Skin
-  chooses to tie it to its header.
+  `panel`. The surface of a section is `accordionWrapper`, the user's design, and the header and panel draw only on top
+  of it.
 - **A modal's backdrop has one entry, `overlay`, for the see-through kind**; the opaque kind is always solid
   black, the user's call, so its painter paints it and no Skin can change it. The painter otherwise keeps only
   what animates the backdrop open and shut.
@@ -287,7 +285,15 @@ planned for.
   markers. A painter sets the states `hasHoverFloater` and `hasSelectionFloater` from its props, and `itemBase`
   paints the hover and selected backgrounds only without them (`skinSelectors.isHoveredWithoutFloater`,
   `isSelectedWithoutFloater`); hover covers pointer hover, the keyboard highlight and an open submenu, so a keyboard
-  walk stays visible. The tab entries follow the same shape.
+  walk stays visible. The tab entries follow the same shape. **`Calendar`'s cells and `Clock`'s options are items too**,
+  the user's call, with no floater. Today and now are underlined, in the text's own color, so no Skin has anything to
+  override. While a range is being picked every day of the preview switches on the hover state, the user's pick over a
+  separate in-range state, "simple for samples", so the day under the pointer does not stand out in the preview and it
+  is to be revisited if it looks wrong. The held start wears hover and selected together, the user's call; a day cannot
+  tell that start from a finished range's end, which is why `CalendarRenderProps` carries `isRangePending`. A finished range is selected on every day, in `aria-selected` as well as in
+  paint (WCAG 1.3.1). `Calendar` squares the corners where range days meet, so its
+  ends keep the Skin's radius outside. What the painters keep is the dimming outside the month and their font size,
+  which disagrees with the other items'.
 - **Where a painter disagreed with its entry, the entry won** — the user's call. Padding, radius and font join
   an entry only when every painter using it agrees, and are expected to converge later; until then they stay in
   the painters. **Radius is the one a Skin most needs**, since a Skin decides shape and an unlayered radius in a
@@ -300,7 +306,7 @@ planned for.
   the shared states so a Skin can mark an open header. **Where an open header meets its panel is a Skin state too**,
   the user's call: `isJoinedBlockStart`, `…BlockEnd`, `…InlineStart` and `…InlineEnd` name the edge of a part that
   touches its partner, the painter picks one from the side the panel opens on (`headerJoins` and `panelJoins` in
-  `AccordionContent.css.ts`), and the Skin decides what a join looks like — `SkinUtils.joinedCorners(radius)` sets the two corners on the joined edge, `0` by default, which is what Plasticine takes.
+  `AccordionContent.css.ts`), and the Skin decides what a join looks like — `SkinUtils.joinedCorners(radius)` sets the two corners on the joined edge, `0` by default, which is what Shaded takes.
   A painter's own radius from its Skin cannot inherit the library's squared seam, and ARIA has nothing to read on
   the panel: `aria-expanded` is on the header's button only. **The hover and selection floaters take their radius
   from the Skin**, matched to that Skin's items, since a floater is the shape drawn behind an item. `surface`,
@@ -10095,7 +10101,7 @@ layout. The structure is the root (sizing, a one-cell grid so whatever sits in i
 or with no `renderSection` a `display: contents` element the user asked for so nothing is dropped → the library's
 content element (the flex row or column for `side`) → heading and panel. A box that does not inherit
 `border-radius` breaks the corner chain below it, as `renderGroupBox` does; the Playground's
-`PageAccordionWrapper` inherits only inside a hollow surface, matching its header and panel painters.
+`PageAccordionWrapper` inherits only inside a `pageContainer`, matching its header and panel painters.
 
 ### Which components pass corners down, and where each run is
 
@@ -10233,7 +10239,9 @@ strips with a rotated label, the opening panel's content sliding in from the sid
 
 **`orientation` is the library's axis word** (`conventions.md`), defaulting to `vertical`. A row lays the sections
 out with `flex-direction: row` and gives every section's `Collapsible` `side: "right"`, so the panel opens beside its
-header and animates its width. The backlog expected the height observer to need a twin for width; it did not,
+header and animates its width. A section in a row sizes its one grid column to its content, overriding the
+`Collapsible` root's `minmax(0, 1fr)`: with no floor from its content, every section came out the same width and the
+open panel was cut off. The backlog expected the height observer to need a twin for width; it did not,
 because `Collapsible` already measured the content's border box on both axes and animated whichever its side named,
 for its own sideways example — so the row is a layout and a side, not new measuring. The arrows that walk the
 headers follow the orientation through `NavigatorUtils.computeNextPosition`, and a row reads the text's direction so
@@ -10822,7 +10830,9 @@ than by taking the root's first `<input>`.
 
 **The half-entered state is the component's, and never reaches the consumer.** `RangeCalendar` holds the first
 end in a private signal; while it is set, the outward value is `undefined` and the grid paints the span from
-that end to the roving day, so keyboard movement previews the range without a pointer. The second press
+that end to the day under the pointer, or to the roving day when the pointer is off the grid, so keyboard movement
+previews the range without a pointer. The pointer's day is held apart from the roving day, because moving the roving
+day moves focus, and a key press drops it so the band follows the keyboard from there. The second press
 commits `orderRange(first, second)`, which sorts the ends — so picking backwards gives the same span, and a
 consumer never receives a record of which end was clicked first. A third press starts again rather than
 extending, which is the behavior that needs no rule to remember.
@@ -22184,7 +22194,7 @@ ordered by hand to keep holes few, Tags always straight after Input. Bars stack 
 since two side by side overlap at that width. **Nothing that opens a popup is sampled**, since a portalled popup
 leaves the row's Skin.
 
-**A row is the page Skin's `hollowSurface`, filled with the row Skin's page background, title included** — the
+**A row is the page Skin's `pageContainer`, filled with the row Skin's page background, title included** — the
 user's call, after a full `surface` holding a page background read as a box inside a box. So the radio dot and name
 are drawn in the row's Skin too, and what marks the picked row differs from row to row; the frame clips its
 contents so the background follows its corners, which leaves the focus ring alone, since the radio input that

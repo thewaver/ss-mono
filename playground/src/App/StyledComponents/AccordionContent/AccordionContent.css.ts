@@ -31,7 +31,7 @@ export const accordionWrapper = style([
     skinEntries.accordionWrapper,
     {
         selectors: {
-            [`.${skinEntries.hollowSurface} &`]: {
+            [`.${skinEntries.pageContainer} &`]: {
                 borderRadius: "inherit",
             },
         },
@@ -50,7 +50,7 @@ export const accordionHeader = style([
         transition: `filter ${themeVars.animation.duration}`,
 
         selectors: {
-            [`.${skinEntries.hollowSurface} &`]: {
+            [`.${skinEntries.pageContainer} &`]: {
                 borderRadius: "inherit",
             },
         },
@@ -96,7 +96,7 @@ export const accordionPanel = style([
         fontSize: themeVars.fontSize.small,
 
         selectors: {
-            [`.${skinEntries.hollowSurface} &`]: {
+            [`.${skinEntries.pageContainer} &`]: {
                 borderRadius: "inherit",
             },
         },

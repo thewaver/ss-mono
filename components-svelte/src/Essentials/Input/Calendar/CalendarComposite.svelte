@@ -32,6 +32,7 @@
 
     let root = $state<HTMLDivElement>();
     let highlighted = $state.raw<DateValue>();
+    let hoveredDay = $state.raw<DateValue>();
 
     const getDirection = NavigatorSvelteUtils.createDirection(() => root);
 
@@ -86,7 +87,7 @@
         }),
     );
 
-    const paintedRange = $derived(props.computeRange?.(rovingDay));
+    const paintedRange = $derived(props.computeRange?.(hoveredDay ?? rovingDay));
 
     const getIsDayDisabled = (day: DateValue) =>
         CalendarUtils.getIsCellDisabled(day, precision, {
@@ -112,6 +113,16 @@
 
         highlighted = picked;
         props.onPick(picked);
+    };
+
+    const hoverDay = (day: DateValue) => {
+        if (!props.computeRange || getIsDayDisabled(day)) return;
+
+        hoveredDay = day;
+    };
+
+    const clearHoveredDay = () => {
+        hoveredDay = undefined;
     };
 
     $effect(() => {
@@ -173,6 +184,8 @@
 
         e.preventDefault();
 
+        clearHoveredDay();
+
         if (action.kind === "pick") pickDay(action.day);
         else moveTo(action.day);
     };
@@ -198,6 +211,7 @@
                 today,
                 isSelected: props.computeIsSelected(day),
                 range: paintedRange,
+                isRangePending: props.isRangePending,
             })}
         >
             {#snippet renderControl(attachElement, flags)}
@@ -211,6 +225,7 @@
                     ariaLabel={labelCell(day)}
                     renderContent={dayContent}
                     onSelect={() => pickDay(day)}
+                    onHover={() => hoverDay(day)}
                 />
             {/snippet}
         </InteractionWrapper>
@@ -262,6 +277,7 @@
     <div
         bind:this={root}
         {@attach (element) => on(element, "keydown", handleKeyDown)}
+        {@attach (element) => on(element, "pointerleave", clearHoveredDay)}
         id={gridId}
         class={styles.calendarMonths}
         style:gap={`${props.monthGap ?? CALENDAR_DEFAULTS.monthGap}px`}
@@ -289,6 +305,7 @@
     <div
         bind:this={root}
         {@attach (element) => on(element, "keydown", handleKeyDown)}
+        {@attach (element) => on(element, "pointerleave", clearHoveredDay)}
         id={gridId}
         class={styles.calendarRoot}
         style:grid-template-columns={gridTemplateColumns}

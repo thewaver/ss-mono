@@ -82,7 +82,7 @@ export const docsEmpty = style({
 });
 
 export const docsTableScroller = style([
-    skinEntries.panel,
+    skinEntries.pageContainer,
     {
         overflowX: "auto",
     },

@@ -91,6 +91,7 @@ const SWITCH_SHELL: StyleRule = {
 
 const ACCORDION: StyleRule = {
     backgroundColor: [layerVars.main, `rgb(from ${layerVars.main} r g b / 50%)`],
+    boxShadow: darkGlow(25),
     color: layerVars.contrast,
     fontSize: themeVars.fontSize.medium,
 } as const;
@@ -120,17 +121,16 @@ const TAB_FLOATER_SELECTED: StyleRule = {
     boxShadow: lightGlow(themeVars.color.primary.main, 100),
 };
 
-const SURFACE: StyleRule = {
-    backgroundColor: [themeVars.color.surface.dark, `rgb(from ${themeVars.color.surface.dark} r g b / 50%)`],
+const surface = (layer: "background" | "surface"): StyleRule => ({
+    backgroundColor: [themeVars.color[layer].dark, `rgb(from ${themeVars.color[layer].dark} r g b / 50%)`],
     backdropFilter: "blur(10px)",
     boxShadow: darkGlow(50),
-    color: themeVars.color.surface.contrast,
+    color: themeVars.color[layer].contrast,
     fontSize: themeVars.fontSize.medium,
-} as const;
+});
 
 SkinUtils.define(neon, {
     accordionHeader: {
-        ...ACCORDION,
         selectors: ObjectUtils.deepMerge(SkinUtils.joinedCorners(), INTERACTIBLE_STATES, {
             [skinSelectors.isExpanded]: {
                 color: themeVars.color.primary.main,
@@ -139,13 +139,12 @@ SkinUtils.define(neon, {
         }),
     },
     accordionPanel: {
-        ...ACCORDION,
         selectors: {
             ...SkinUtils.joinedCorners(),
         },
     },
     accordionWrapper: {
-        boxShadow: darkGlow(25),
+        ...ACCORDION,
     },
     button: {
         paddingInline: themeVars.spacing.double,
@@ -213,7 +212,6 @@ SkinUtils.define(neon, {
     dropdown: {
         ...INPUT_SHELL,
     },
-    hollowSurface: SkinUtils.hollow(SURFACE),
     input: {
         ...INPUT_SHELL,
         selectors: ObjectUtils.deepMerge(INPUT_STATES, {
@@ -252,6 +250,9 @@ SkinUtils.define(neon, {
         backgroundImage: `linear-gradient(135deg, hsl(from ${themeVars.color.primary.light} h 100 l / 10%), transparent, hsl(from ${themeVars.color.primary.light} h 100 l / 10%))`,
         color: themeVars.color.background.contrast,
         fontFamily: "monospace",
+    },
+    pageContainer: {
+        ...surface("background"),
     },
     panel: {
         backgroundColor: [layerVars.main, `rgb(from ${layerVars.main} r g b / 50%)`],
@@ -356,7 +357,9 @@ SkinUtils.define(neon, {
         boxShadow: darkGlow(25),
         fontWeight: "bold",
     },
-    surface: SURFACE,
+    surface: {
+        ...surface("surface"),
+    },
     tabsItemBase: {
         paddingBlock: themeVars.spacing.full,
         paddingInline: themeVars.spacing.double,

@@ -39,6 +39,7 @@ export const RangeCalendar = defineComponent(
                 computeRange={(highlighted: DateValue) =>
                     RangeCalendarUtils.computePaintedRange(highlighted, pendingStart.value, range.value)
                 }
+                isRangePending={pendingStart.value !== undefined}
                 onPick={pick}
             >
                 {
