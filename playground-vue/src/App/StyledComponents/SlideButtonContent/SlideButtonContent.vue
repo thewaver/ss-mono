@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { computed } from "vue";
 
+import { skinVars } from "@thewaver/ss-playground/App/Skins/Skin.css";
 import { DEFAULT_SLIDE_BUTTON_CONTENT_LENGTH } from "@thewaver/ss-playground/App/StyledComponents/SlideButtonContent/SlideButtonContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/SlideButtonContent/SlideButtonContent.css";
+import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type { SlideButtonContentProps } from "./SlideButtonContentVue.types";
@@ -26,6 +28,10 @@ const ratio = computed(() => (props.renderProps.isPressed ? 1 : props.renderProp
 
 const isTracking = computed(() => props.renderProps.isDragging || props.renderProps.isHolding);
 
+const valueVars = computed(() =>
+    assignInlineVars({ [skinVars.startValue]: "0", [skinVars.endValue]: `${ratio.value}` }),
+);
+
 const thumbStyle = computed(() => {
     const offset = travel(ratio.value);
 
@@ -44,24 +50,20 @@ const thumbStyle = computed(() => {
             isRightToLeft && styles.isRightToLeft,
             renderProps.isDisabled && styles.isDisabled,
         ]"
-        :style="isVertical ? { height: `${length}px` } : { width: `${length}px` }"
+        :style="[isVertical ? { height: `${length}px` } : { width: `${length}px` }, valueVars]"
     >
         <div
             :class="[styles.slideButtonTrack, isVertical && styles.isVertical, renderProps.hasError && styles.hasError]"
         >
-            <div
-                :class="[
-                    styles.slideButtonFill,
-                    isTracking && styles.isTracking,
-                    renderProps.hasError && styles.hasError,
-                ]"
-                :style="isVertical ? { height: covered(ratio) } : { width: covered(ratio) }"
-            />
-
-            <div :class="styles.slideButtonHint" :style="{ opacity: 1 - ratio }">
+            <div :class="styles.slideButtonHint">
                 <slot />
             </div>
         </div>
+
+        <div
+            :class="[styles.slideButtonFill, isTracking && styles.isTracking, renderProps.hasError && styles.hasError]"
+            :style="isVertical ? { height: covered(ratio) } : { width: covered(ratio) }"
+        />
 
         <div
             :class="[

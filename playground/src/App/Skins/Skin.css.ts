@@ -12,10 +12,14 @@ export const skinSizeVars = {
     rangeThumbWidth: createVar(),
     rangeThumbHeight: createVar(),
     progressTrackThickness: createVar(),
+    progressTipWidth: createVar(),
+    progressTipHeight: createVar(),
 };
 
 export const skinVars = {
     barAngle: fallbackVar(barAngle, "90deg"),
+    startValue: createVar(),
+    endValue: createVar(),
     ...skinSizeVars,
 };
 
@@ -43,6 +47,7 @@ export const skinEntries: Record<SkinEntry, string> = {
     pageContainer: style({}),
     panel: style({}),
     progressFill: style({}),
+    progressTip: style({}),
     progressTrack: style({}),
     radioBox: style({}),
     radioDot: style({}),

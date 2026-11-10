@@ -178,6 +178,9 @@ SkinUtils.define(shaded, {
         color: themeVars.color.primary.main,
         fontSize: themeVars.fontSize.medium,
         fontWeight: "bold",
+        [skinSelectors.hasErrorWithin]: {
+            color: themeVars.color.error.main,
+        },
     },
     decoration: {
         borderRadius: themeVars.borderRadius.half,
@@ -247,7 +250,7 @@ SkinUtils.define(shaded, {
         ...ITEM_FLOATER_HOVER,
     },
     overlay: {
-        backdropFilter: "blur(10px) grayscale(75%)",
+        backdropFilter: "blur(20px) grayscale(75%)",
     },
     pageBackground: {
         backgroundColor: themeVars.color.background.main,
@@ -274,6 +277,7 @@ SkinUtils.define(shaded, {
             },
         },
     },
+    progressTip: {},
     progressTrack: {
         border: [layerVars.contrast, `2px solid rgb(from ${layerVars.contrast} r g b / 25%)`],
         borderRadius: PILL_RADIUS,
@@ -295,7 +299,9 @@ SkinUtils.define(shaded, {
     radioDot: {
         borderRadius: "50%",
         backgroundColor: themeVars.color.primary.main,
-        backgroundImage: `linear-gradient(45deg, ${themeVars.color.primary.dark}, ${themeVars.color.primary.light})`,
+        [skinSelectors.hasErrorWithin]: {
+            backgroundColor: themeVars.color.error.main,
+        },
     },
     rangeFill: {
         borderRadius: PILL_RADIUS,
@@ -450,6 +456,9 @@ SkinUtils.define(shaded, {
         selectors: {
             [SkinUtils.anyOf(skinSelectors.isCheckedWithin, skinSelectors.isMixedWithin)]: {
                 backgroundColor: themeVars.color.primary.main,
+            },
+            [SkinUtils.anyOf(skinSelectors.hasErrorWithin, skinSelectors.hasError)]: {
+                backgroundColor: themeVars.color.error.main,
             },
         },
     },

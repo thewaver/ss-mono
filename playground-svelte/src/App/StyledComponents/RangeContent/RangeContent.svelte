@@ -1,6 +1,8 @@
 <script lang="ts">
     import { toStyle } from "@thewaver/ss-components-svelte";
+    import { skinVars } from "@thewaver/ss-playground/App/Skins/Skin.css";
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/RangeContent/RangeContent.css";
+    import { assignInlineVars } from "@vanilla-extract/dynamic";
 
     import { getLayerClass } from "../Layer/Layer.context";
     import type { RangeContentProps } from "./RangeContentSvelte.types";
@@ -39,7 +41,10 @@
         layerClass,
         props.renderProps.isDisabled && styles.isDisabled,
     ]}
-    style={toStyle(orientation === "vertical" ? { height: `${length}px` } : { width: `${length}px` })}
+    style={toStyle(
+        orientation === "vertical" ? { height: `${length}px` } : { width: `${length}px` },
+        assignInlineVars({ [skinVars.startValue]: `${fill.start}`, [skinVars.endValue]: `${fill.end}` }),
+    )}
 >
     <div
         class={[styles.rangeTrack, styles.rangeTrackVariants[orientation], props.renderProps.hasError && styles.hasError]}

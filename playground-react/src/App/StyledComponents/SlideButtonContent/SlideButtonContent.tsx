@@ -1,7 +1,9 @@
-import type { PropsWithChildren } from "react";
+import type { CSSProperties, PropsWithChildren } from "react";
 
+import { skinVars } from "@thewaver/ss-playground/App/Skins/Skin.css";
 import { DEFAULT_SLIDE_BUTTON_CONTENT_LENGTH } from "@thewaver/ss-playground/App/StyledComponents/SlideButtonContent/SlideButtonContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/SlideButtonContent/SlideButtonContent.css";
+import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type { SlideButtonContentProps } from "./SlideButtonContentReact.types";
@@ -39,7 +41,10 @@ export const PageSlideButtonContent = (props: PropsWithChildren<SlideButtonConte
             ]
                 .filter(Boolean)
                 .join(" ")}
-            style={isVertical ? { height: `${length}px` } : { width: `${length}px` }}
+            style={{
+                ...(isVertical ? { height: `${length}px` } : { width: `${length}px` }),
+                ...(assignInlineVars({ [skinVars.startValue]: "0", [skinVars.endValue]: `${ratio}` }) as CSSProperties),
+            }}
         >
             <div
                 className={[
@@ -50,21 +55,19 @@ export const PageSlideButtonContent = (props: PropsWithChildren<SlideButtonConte
                     .filter(Boolean)
                     .join(" ")}
             >
-                <div
-                    className={[
-                        styles.slideButtonFill,
-                        isTracking && styles.isTracking,
-                        props.renderProps.hasError && styles.hasError,
-                    ]
-                        .filter(Boolean)
-                        .join(" ")}
-                    style={isVertical ? { height: covered(ratio) } : { width: covered(ratio) }}
-                />
-
-                <div className={styles.slideButtonHint} style={{ opacity: 1 - ratio }}>
-                    {props.children}
-                </div>
+                <div className={styles.slideButtonHint}>{props.children}</div>
             </div>
+
+            <div
+                className={[
+                    styles.slideButtonFill,
+                    isTracking && styles.isTracking,
+                    props.renderProps.hasError && styles.hasError,
+                ]
+                    .filter(Boolean)
+                    .join(" ")}
+                style={isVertical ? { height: covered(ratio) } : { width: covered(ratio) }}
+            />
 
             <div
                 className={[

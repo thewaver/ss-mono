@@ -1,7 +1,10 @@
 <script lang="ts">
     import type { Snippet } from "svelte";
 
+    import { toStyle } from "@thewaver/ss-components-svelte";
+    import { skinVars } from "@thewaver/ss-playground/App/Skins/Skin.css";
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/SlideButtonContent/SlideButtonContent.css";
+    import { assignInlineVars } from "@vanilla-extract/dynamic";
 
     import { getLayerClass } from "../Layer/Layer.context";
     import type { SlideButtonContentProps } from "./SlideButtonContentSvelte.types";
@@ -37,26 +40,28 @@
         isRightToLeft && styles.isRightToLeft,
         props.renderProps.isDisabled && styles.isDisabled,
     ]}
-    style:width={isVertical ? undefined : `${length}px`}
-    style:height={isVertical ? `${length}px` : undefined}
+    style={toStyle(
+        isVertical ? { height: `${length}px` } : { width: `${length}px` },
+        assignInlineVars({ [skinVars.startValue]: "0", [skinVars.endValue]: `${ratio}` }),
+    )}
 >
     <div
         class={[styles.slideButtonTrack, isVertical && styles.isVertical, props.renderProps.hasError && styles.hasError]}
     >
-        <div
-            class={[
-                styles.slideButtonFill,
-                isTracking && styles.isTracking,
-                props.renderProps.hasError && styles.hasError,
-            ]}
-            style:width={isVertical ? undefined : covered(ratio)}
-            style:height={isVertical ? covered(ratio) : undefined}
-        ></div>
-
-        <div class={styles.slideButtonHint} style:opacity={1 - ratio}>
+        <div class={styles.slideButtonHint}>
             {@render props.children?.()}
         </div>
     </div>
+
+    <div
+        class={[
+            styles.slideButtonFill,
+            isTracking && styles.isTracking,
+            props.renderProps.hasError && styles.hasError,
+        ]}
+        style:width={isVertical ? undefined : covered(ratio)}
+        style:height={isVertical ? covered(ratio) : undefined}
+    ></div>
 
     <div
         class={[

@@ -247,15 +247,16 @@ planned for.
   user chose that over keeping the tab's own selected color. The track and the floaters keep the boxes the library
   gives them, the whole list and the tab. A vertical list carries `isVertical` on all four. Every other Skin starts on Shaded's tab paint, the user's
   call while they are temporary. The honeycomb tabs are a custom variant and keep their own paint. The segmented radio is painted as tabs, the user's call: `tabsTrack`, `tabsItemBase` and `tabsItemSelectionFloater`. The binary switches' insides — `checkboxMark`, `radioDot`, `toggleThumb` —
-  and the standard bars — `progressTrack` and `progressFill`, `rangeTrack`, `rangeFill` and `rangeThumb`,
+  and the standard bars — `progressTrack`, `progressFill` and `progressTip`, `rangeTrack`, `rangeFill` and `rangeThumb`,
   `scrollerTrack` and `scrollerThumb` (painted on `::before`), and the slide button's `slideButtonTrack`,
   `slideButtonFill` and `slideButtonThumb` — have entries, the slide button's added at the user's request with its
   error marked on each part. The user folded its hint and arrow entries into the parts around them: the hint's
   text styling is set on `slideButtonTrack` and the arrow's color on `slideButtonThumb`, both inherited, so a
-  Skin colors the hint and the arrow apart. `slideButtonTrack` paints its own element inside an unpainted box,
-  holding the fill and hint and clipping them, with the thumb beside it over the track's border, as Range's thumbs
-  are: a border on the box itself had pushed the thumb inward. The user's split — the fill stays clipped, so with a
-  track border its end can miss the thumb's edge by up to that border's width; Shaded keeps the slide button's
+  Skin colors the hint and the arrow apart. `slideButtonTrack` paints its own element inside an unpainted box and
+  holds the hint, with the fill and thumb beside it over the track's border, as Range's are: a border on the box
+  itself had pushed the thumb inward, and a fill inside the bordered track missed the thumb's edge by that border's
+  width. The fill is unclipped and paints over the border and the hint, the user's call, so the hint is covered as
+  the thumb passes; the painter does not fade it, and a Skin that wants a fade reads `skinVars.endValue`. Shaded keeps the slide button's
   earlier paint, every other Skin paints its track, fill and thumb with its range's (`RANGE_TRACK`, `RANGE_FILL`,
   `RANGE_THUMB`), so the two stay in step until a Skin parts them — Cardboard does: its slide button is a pill and
   its thumb takes the strip's main color with the arrow in the family's `contrast`, because a thumb as tall as its
@@ -7950,6 +7951,22 @@ _that_ the bar is indeterminate.
 rather than imported.** A control's natural size is its content; a track's is its container. Both
 vocabularies have the same two members, and sharing the type would file a non-interactive component's
 geometry under `InteractionWrapper.types`.
+
+### Playground: `progressTip`, the decoration riding the end of a progress bar's fill
+
+**It is the painter's, not a slot on `Progress`** — the user's pick. The library has no track or fill and does not know
+which way a bar runs or where in the painter's box the bar sits, so it could not place one; `Range` and `SlideButton`
+leave their visible thumbs to the painter for the same reason. **The fill and the tip sit beside the track**, in a
+shared unpainted box, as Range's and SlideButton's fills and thumbs do, so a track border cannot put them out of line;
+the fill is unclipped, the user's call. Only an indeterminate bar keeps its fill inside the track, which clips the sweep.
+A zero-size element takes the position and centers the tip on it, so a Skin's `transform` on `progressTip` cannot
+displace it and right to left needs no rule of its own. Its transition has to stay the same as the fill's. No tip while
+indeterminate: a sweeping fill has no end to follow. Every Skin's entry starts empty, the user's call; they paint it,
+and size it through `progressTipWidth` and `progressTipHeight`.
+
+**`skinVars.startValue` and `skinVars.endValue`**, the user's names, carry a bar's position from 0 to 1 for Skins to
+read, written by the Progress, Range and SlideButton painters on their outermost element so every part inherits them.
+Start is 0 except on a two-thumb Range, where the two are its thumbs. An indeterminate bar leaves them unset.
 
 ### Controls: `Progress`'s `role`, and the name both roles require
 

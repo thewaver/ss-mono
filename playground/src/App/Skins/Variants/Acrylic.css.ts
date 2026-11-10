@@ -77,7 +77,7 @@ const SWITCH_STATES: StyleRule["selectors"] = ObjectUtils.deepMerge(INPUT_STATES
 const INPUT_SHELL: StyleRule = {
     border: [`2px solid ${layerVars.contrast}`, `2px solid rgb(from ${layerVars.contrast} r g b / 25%)`],
     backgroundImage: `linear-gradient(to bottom, rgb(from ${layerVars.main} r g b / 75%), rgb(from ${layerVars.main} r g b / 50%))`,
-    backdropFilter: "blur(10px)",
+    backdropFilter: "blur(20px)",
     boxShadow: SHADOW_SMALL,
     color: layerVars.contrast,
 } as const;
@@ -129,7 +129,7 @@ const TAB_FLOATER_SELECTED_VERT: StyleRule = {
 
 const surface = (color: SkinBaseColor): StyleRule => ({
     ...sheen(color.dark, 25, 10),
-    backdropFilter: "blur(10px)",
+    backdropFilter: "blur(20px)",
     borderRadius: themeVars.borderRadius.half,
     boxShadow: SHADOW_MEDIUM,
     color: color.contrast,
@@ -207,7 +207,7 @@ SkinUtils.define(acrylic, {
     },
     drawer: {
         ...sheen(themeVars.color.surface.dark, 25, 10),
-        backdropFilter: "blur(10px)",
+        backdropFilter: "blur(20px)",
         boxShadow: SHADOW_LARGE,
         color: themeVars.color.surface.contrast,
     },
@@ -264,7 +264,7 @@ SkinUtils.define(acrylic, {
         ...ITEM_FLOATER_HOVER,
     },
     overlay: {
-        backdropFilter: "blur(10px) grayscale(75%)",
+        backdropFilter: "blur(20px) grayscale(75%)",
     },
     pageBackground: {
         backgroundColor: themeVars.color.background.light,
@@ -288,6 +288,7 @@ SkinUtils.define(acrylic, {
             },
         },
     },
+    progressTip: {},
     progressTrack: {
         borderRadius: PILL_RADIUS,
         backgroundColor: [layerVars.main, `rgb(from ${layerVars.main} r g b / 50%)`],

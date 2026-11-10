@@ -7,6 +7,9 @@ const DOCS = "/src/App/Pages/ProgressPage/Docs";
 const bar = (name: string) => `${docsDemo(DOCS, name)} [role="progressbar"]`;
 const METER = `${docsDemo(DOCS, "DiskMeter")} [role="meter"]`;
 
+/** A determinate bar's fill sits beside its track, the track first, so the fill's place is second. */
+const fillOf = (name: string) => `${bar(name)} > div > div > div:nth-child(2)`;
+
 const offsetWidth = (locator: Locator) => locator.evaluate((element) => (element as HTMLElement).offsetWidth);
 
 const knob = (page: Page, key: string) => page.locator(`${prop(key)} input`);
@@ -42,7 +45,7 @@ test("a determinate bar carries its value and both ends of its range", async ({ 
 });
 
 test("a new value reaches ARIA and the painter together", async ({ page }) => {
-    const fill = page.locator(`${bar("Basic")} > div > div > div`);
+    const fill = page.locator(fillOf("Basic"));
     const before = parseFloat(await inlineStyle(fill, "width"));
     const start = Number(await inputValue(knob(page, "value")));
     const next = start < 0.5 ? "0.9" : "0.1";
@@ -94,7 +97,7 @@ test("a real unit range reaches ARIA unscaled, with a readable text", async ({ p
 
 test("a value past the end is clamped for the painter but reported as given", async ({ page }) => {
     expect(
-        await inlineStyle(page.locator(`${bar("OutOfRange")} > div > div > div`), "width"),
+        await inlineStyle(page.locator(fillOf("OutOfRange")), "width"),
         "a value past the end reaches the painter as a clamped ratio, drawn full",
     ).toBe("100%");
 

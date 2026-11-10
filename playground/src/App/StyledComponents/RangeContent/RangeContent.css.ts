@@ -5,7 +5,7 @@ import { themeVars } from "../../Theme.css";
 
 export const RANGE_THUMB_SIZE = 20;
 export const RANGE_TRACK_THICKNESS = 6;
-export const RANGE_LENGTH = 220;
+export const RANGE_LENGTH = 240;
 
 const PRESS_SIZE = `${RANGE_THUMB_SIZE}px`;
 const TRACK_THICKNESS = fallbackVar(skinVars.rangeTrackThickness, `${RANGE_TRACK_THICKNESS}px`);

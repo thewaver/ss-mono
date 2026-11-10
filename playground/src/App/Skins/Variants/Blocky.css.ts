@@ -27,12 +27,6 @@ const insetShadowLowered = (color: string) =>
         `inset -${INSET_SHADOW_THICKNESS}px -${INSET_SHADOW_THICKNESS}px 0 rgb(255 255 255 / 65%)`,
     ].join(", ");
 
-const SEGMENT_WIDTH = 8;
-const SEGMENT_GAP = 2;
-
-const segments = (color: string) =>
-    `repeating-linear-gradient(${skinVars.barAngle}, ${color} 0 ${SEGMENT_WIDTH}px, transparent ${SEGMENT_WIDTH}px ${SEGMENT_WIDTH + SEGMENT_GAP}px)`;
-
 const SHADOW_MEDIUM = "8px 8px 0 0px rgba(0, 0, 0, 0.35)";
 
 const INTERACTIBLE_STATES: StyleRule["selectors"] = {
@@ -264,7 +258,7 @@ SkinUtils.define(blocky, {
         ...ITEM_FLOATER_HOVER,
     },
     overlay: {
-        backdropFilter: "blur(10px) grayscale(75%)",
+        backdropFilter: "blur(20px) grayscale(75%)",
     },
     pageBackground: {
         backgroundColor: themeVars.color.background.main,
@@ -280,13 +274,15 @@ SkinUtils.define(blocky, {
         color: layerVars.contrast,
     },
     progressFill: {
-        backgroundImage: segments(themeVars.color.primary.main),
+        backgroundColor: themeVars.color.primary.main,
+        boxShadow: insetShadowRaised(layerVars.main),
         selectors: {
             [skinSelectors.hasErrorWithin]: {
-                backgroundImage: segments(themeVars.color.error.main),
+                backgroundColor: themeVars.color.error.main,
             },
         },
     },
+    progressTip: {},
     progressTrack: {
         backgroundColor: [layerVars.main, `rgb(from ${layerVars.main} r g b / 50%)`],
         boxShadow: insetShadowLowered(layerVars.main),

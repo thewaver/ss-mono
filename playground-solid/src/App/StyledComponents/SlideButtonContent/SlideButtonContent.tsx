@@ -1,8 +1,10 @@
 import type { ParentProps } from "solid-js";
 
 import { access } from "@thewaver/ss-components-solid";
+import { skinVars } from "@thewaver/ss-playground/App/Skins/Skin.css";
 import { DEFAULT_SLIDE_BUTTON_CONTENT_LENGTH } from "@thewaver/ss-playground/App/StyledComponents/SlideButtonContent/SlideButtonContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/SlideButtonContent/SlideButtonContent.css";
+import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type { SlideButtonContentProps } from "./SlideButtonContentSolid.types";
@@ -36,7 +38,10 @@ export const PageSlideButtonContent = (props: ParentProps<SlideButtonContentProp
     return (
         <div
             class={styles.slideButtonContent}
-            style={getIsVertical() ? { height: `${getLength()}px` } : { width: `${getLength()}px` }}
+            style={{
+                ...(getIsVertical() ? { height: `${getLength()}px` } : { width: `${getLength()}px` }),
+                ...assignInlineVars({ [skinVars.startValue]: "0", [skinVars.endValue]: `${getRatio()}` }),
+            }}
             classList={{
                 [getLayerClass()]: true,
                 [styles.isVertical]: getIsVertical(),
@@ -51,19 +56,17 @@ export const PageSlideButtonContent = (props: ParentProps<SlideButtonContentProp
                     [styles.hasError]: access(props.renderProps).hasError,
                 }}
             >
-                <div
-                    class={styles.slideButtonFill}
-                    classList={{
-                        [styles.isTracking]: getIsTracking(),
-                        [styles.hasError]: access(props.renderProps).hasError,
-                    }}
-                    style={getIsVertical() ? { height: covered(getRatio()) } : { width: covered(getRatio()) }}
-                />
-
-                <div class={styles.slideButtonHint} style={{ opacity: 1 - getRatio() }}>
-                    {props.children}
-                </div>
+                <div class={styles.slideButtonHint}>{props.children}</div>
             </div>
+
+            <div
+                class={styles.slideButtonFill}
+                classList={{
+                    [styles.isTracking]: getIsTracking(),
+                    [styles.hasError]: access(props.renderProps).hasError,
+                }}
+                style={getIsVertical() ? { height: covered(getRatio()) } : { width: covered(getRatio()) }}
+            />
 
             <div
                 class={styles.slideButtonThumb}

@@ -7,6 +7,8 @@ const PROGRESS_THICKNESS = 8;
 const PROGRESS_LENGTH = 160;
 
 const TRACK_THICKNESS = fallbackVar(skinVars.progressTrackThickness, `${PROGRESS_THICKNESS}px`);
+const TIP_WIDTH = fallbackVar(skinVars.progressTipWidth, TRACK_THICKNESS);
+const TIP_HEIGHT = fallbackVar(skinVars.progressTipHeight, TRACK_THICKNESS);
 
 export const isIndeterminate = style({});
 export const hasError = style([skinStates.hasError]);
@@ -31,16 +33,15 @@ export const progressTrack = style([
     skinEntries.progressTrack,
     {
         position: "relative",
-        overflow: "hidden",
         width: "100%",
         height: TRACK_THICKNESS,
         transition: `border-color ${themeVars.animation.duration}`,
 
         selectors: {
+            [`&.${isIndeterminate}`]: {
+                overflow: "hidden",
+            },
             [`&.${isVertical}`]: {
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "flex-end",
                 width: TRACK_THICKNESS,
                 height: PROGRESS_LENGTH,
             },
@@ -51,7 +52,10 @@ export const progressTrack = style([
 export const progressFill = style([
     skinEntries.progressFill,
     {
-        height: "100%",
+        position: "absolute",
+        top: 0,
+        bottom: 0,
+        insetInlineStart: 0,
         transition: `width ${themeVars.animation.duration}`,
 
         selectors: {
@@ -64,14 +68,58 @@ export const progressFill = style([
                 animationName: sweepFromRight,
             },
             [`&.${isVertical}`]: {
-                width: "100%",
-                height: "auto",
+                top: "auto",
+                left: 0,
+                right: 0,
                 transition: `height ${themeVars.animation.duration}`,
             },
             [`${progressTrack}.${isIndeterminate} &.${isVertical}`]: {
-                width: "100%",
+                width: "auto",
                 height: "33%",
                 animationName: sweepUp,
+            },
+        },
+    },
+]);
+
+export const progressBar = style({
+    position: "relative",
+});
+
+export const progressTipAnchor = style({
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: 0,
+    pointerEvents: "none",
+    transition: `inset-inline-start ${themeVars.animation.duration}`,
+
+    selectors: {
+        [`&.${isVertical}`]: {
+            top: "auto",
+            left: 0,
+            right: 0,
+            width: "auto",
+            height: 0,
+            transition: `bottom ${themeVars.animation.duration}`,
+        },
+    },
+});
+
+export const progressTip = style([
+    skinEntries.progressTip,
+    {
+        flexShrink: 0,
+        width: TIP_WIDTH,
+        height: TIP_HEIGHT,
+
+        selectors: {
+            [`&.${isVertical}`]: {
+                width: TIP_HEIGHT,
+                height: TIP_WIDTH,
             },
         },
     },

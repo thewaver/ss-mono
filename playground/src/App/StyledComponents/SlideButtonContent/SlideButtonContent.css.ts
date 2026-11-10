@@ -4,7 +4,7 @@ import { skinEntries, skinStates } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 
 export const SLIDE_BUTTON_THUMB_SIZE = 44;
-export const SLIDE_BUTTON_LENGTH = 240;
+export const SLIDE_BUTTON_LENGTH = 280;
 
 export const isVertical = style([skinStates.isVertical]);
 export const isRightToLeft = style({});

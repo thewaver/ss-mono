@@ -81,7 +81,8 @@ const SWITCH_STATES: StyleRule["selectors"] = ObjectUtils.deepMerge(INPUT_STATES
 });
 
 const INPUT_SHELL: StyleRule = {
-    backgroundColor: layerVars.main,
+    backgroundColor: [layerVars.main, `rgb(from ${layerVars.main} r g b / 50%)`],
+    backdropFilter: "blur(20px)",
     boxShadow: lightGlow(layerVars.contrast, 25),
     color: layerVars.contrast,
 } as const;
@@ -124,7 +125,7 @@ const TAB_FLOATER_SELECTED: StyleRule = {
 
 const surface = (color: SkinBaseColor): StyleRule => ({
     backgroundColor: [color.main, `rgb(from ${color.main} r g b / 50%)`],
-    backdropFilter: "blur(10px)",
+    backdropFilter: "blur(20px)",
     boxShadow: darkGlow(50),
     color: color.contrast,
     fontSize: themeVars.fontSize.medium,
@@ -196,6 +197,9 @@ SkinUtils.define(neon, {
         color: themeVars.color.primary.main,
         fontSize: themeVars.fontSize.medium,
         fontWeight: "bold",
+        [skinSelectors.hasErrorWithin]: {
+            color: themeVars.color.error.main,
+        },
     },
     decoration: {
         backgroundColor: "transparent",
@@ -206,7 +210,7 @@ SkinUtils.define(neon, {
     },
     drawer: {
         backgroundColor: [themeVars.color.surface.dark, `rgb(from ${themeVars.color.surface.dark} r g b / 50%)`],
-        backdropFilter: "blur(10px)",
+        backdropFilter: "blur(20px)",
         boxShadow: darkGlow(50),
         color: themeVars.color.surface.contrast,
     },
@@ -268,7 +272,7 @@ SkinUtils.define(neon, {
         ...ITEM_FLOATER_HOVER,
     },
     overlay: {
-        backdropFilter: "blur(10px) grayscale(75%)",
+        backdropFilter: "blur(20px) grayscale(75%)",
     },
     pageBackground: {
         backgroundColor: themeVars.color.background.light,
@@ -294,7 +298,9 @@ SkinUtils.define(neon, {
             },
         },
     },
+    progressTip: {},
     progressTrack: {
+        backgroundColor: [layerVars.main, `rgb(from ${layerVars.main} r g b / 25%)`],
         boxShadow: darkGlow(25),
         selectors: {
             [skinSelectors.hasError]: {
@@ -312,7 +318,9 @@ SkinUtils.define(neon, {
     radioDot: {
         borderRadius: "50%",
         backgroundColor: themeVars.color.primary.main,
-        boxShadow: lightGlow(themeVars.color.primary.main, 100),
+        [skinSelectors.hasErrorWithin]: {
+            backgroundColor: themeVars.color.error.main,
+        },
     },
     rangeFill: {
         backgroundColor: themeVars.color.primary.main,
@@ -337,6 +345,7 @@ SkinUtils.define(neon, {
         },
     },
     rangeTrack: {
+        backgroundColor: [layerVars.main, `rgb(from ${layerVars.main} r g b / 25%)`],
         boxShadow: darkGlow(25),
     },
     scrollerThumb: {
@@ -379,6 +388,7 @@ SkinUtils.define(neon, {
         },
     },
     slideButtonTrack: {
+        backgroundColor: [layerVars.main, `rgb(from ${layerVars.main} r g b / 25%)`],
         boxShadow: darkGlow(25),
         fontWeight: "bold",
     },
@@ -429,6 +439,10 @@ SkinUtils.define(neon, {
             [SkinUtils.anyOf(skinSelectors.isCheckedWithin, skinSelectors.isMixedWithin)]: {
                 backgroundColor: themeVars.color.primary.main,
                 boxShadow: lightGlow(themeVars.color.primary.main, 100),
+            },
+            [SkinUtils.anyOf(skinSelectors.hasErrorWithin, skinSelectors.hasError)]: {
+                backgroundColor: themeVars.color.error.main,
+                boxShadow: lightGlow(themeVars.color.error.main, 100),
             },
         },
     },

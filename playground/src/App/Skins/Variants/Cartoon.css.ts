@@ -250,7 +250,7 @@ SkinUtils.define(cartoon, {
         ...ITEM_FLOATER_HOVER,
     },
     overlay: {
-        backdropFilter: "blur(10px) grayscale(75%)",
+        backdropFilter: "blur(20px) grayscale(75%)",
     },
     pageBackground: {
         backgroundColor: themeVars.color.background.light,
@@ -274,6 +274,7 @@ SkinUtils.define(cartoon, {
             },
         },
     },
+    progressTip: {},
     progressTrack: {
         border: `2px solid black`,
         backgroundColor: [layerVars.main, `rgb(from ${layerVars.main} r g b / 50%)`],

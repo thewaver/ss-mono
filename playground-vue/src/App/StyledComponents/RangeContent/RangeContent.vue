@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { computed } from "vue";
 
+import { skinVars } from "@thewaver/ss-playground/App/Skins/Skin.css";
 import { DEFAULT_RANGE_CONTENT_LENGTH } from "@thewaver/ss-playground/App/StyledComponents/RangeContent/RangeContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/RangeContent/RangeContent.css";
+import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type { RangeContentProps } from "./RangeContentVue.types";
@@ -29,6 +31,13 @@ const fill = computed(() => props.renderProps.fill);
 const fillStart = computed(() => (isPair.value ? `calc(${center(fill.value.start)} - ${HALF_DRAWN_THUMB})` : "0px"));
 
 const fillSpan = computed(() => `calc(${center(fill.value.end)} + ${HALF_DRAWN_THUMB} - ${fillStart.value})`);
+
+const valueVars = computed(() =>
+    assignInlineVars({
+        [skinVars.startValue]: `${fill.value.start}`,
+        [skinVars.endValue]: `${fill.value.end}`,
+    }),
+);
 </script>
 
 <template>
@@ -39,7 +48,7 @@ const fillSpan = computed(() => `calc(${center(fill.value.end)} + ${HALF_DRAWN_T
             layerClass,
             renderProps.isDisabled && styles.isDisabled,
         ]"
-        :style="orientation === 'vertical' ? { height: `${length}px` } : { width: `${length}px` }"
+        :style="[orientation === 'vertical' ? { height: `${length}px` } : { width: `${length}px` }, valueVars]"
     >
         <div
             :class="[

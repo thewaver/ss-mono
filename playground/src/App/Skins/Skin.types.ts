@@ -22,6 +22,7 @@ export type SkinEntry =
     | "pageContainer"
     | "panel"
     | "progressFill"
+    | "progressTip"
     | "progressTrack"
     | "radioBox"
     | "radioDot"

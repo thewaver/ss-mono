@@ -178,6 +178,9 @@ SkinUtils.define(terminal, {
         color: themeVars.color.primary.main,
         fontSize: themeVars.fontSize.medium,
         fontWeight: "bold",
+        [skinSelectors.hasErrorWithin]: {
+            color: themeVars.color.error.main,
+        },
     },
     decoration: {
         backgroundColor: "transparent",
@@ -247,7 +250,7 @@ SkinUtils.define(terminal, {
         ...ITEM_FLOATER_HOVER,
     },
     overlay: {
-        backdropFilter: "blur(10px) grayscale(75%)",
+        backdropFilter: "blur(20px) grayscale(75%)",
     },
     pageBackground: {
         backgroundColor: themeVars.color.background.dark,
@@ -273,6 +276,7 @@ SkinUtils.define(terminal, {
             },
         },
     },
+    progressTip: {},
     progressTrack: {
         border: [`2px solid ${layerVars.contrast}`, `2px solid rgb( from ${layerVars.contrast} r g b / 25%)`],
         selectors: {
@@ -291,6 +295,9 @@ SkinUtils.define(terminal, {
     radioDot: {
         borderRadius: "50%",
         backgroundColor: themeVars.color.primary.main,
+        [skinSelectors.hasErrorWithin]: {
+            backgroundColor: themeVars.color.error.main,
+        },
     },
     rangeFill: {
         backgroundColor: themeVars.color.primary.main,
@@ -401,6 +408,9 @@ SkinUtils.define(terminal, {
         selectors: {
             [SkinUtils.anyOf(skinSelectors.isCheckedWithin, skinSelectors.isMixedWithin)]: {
                 backgroundColor: themeVars.color.primary.main,
+            },
+            [SkinUtils.anyOf(skinSelectors.hasErrorWithin, skinSelectors.hasError)]: {
+                backgroundColor: themeVars.color.error.main,
             },
         },
     },

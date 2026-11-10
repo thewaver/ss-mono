@@ -1,5 +1,9 @@
+import type { CSSProperties } from "react";
+
+import { skinVars } from "@thewaver/ss-playground/App/Skins/Skin.css";
 import { DEFAULT_RANGE_CONTENT_LENGTH } from "@thewaver/ss-playground/App/StyledComponents/RangeContent/RangeContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/RangeContent/RangeContent.css";
+import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type { RangeContentProps } from "./RangeContentReact.types";
@@ -36,7 +40,13 @@ export const PageRangeContent = (props: RangeContentProps) => {
             ]
                 .filter(Boolean)
                 .join(" ")}
-            style={orientation === "vertical" ? { height: `${length}px` } : { width: `${length}px` }}
+            style={{
+                ...(orientation === "vertical" ? { height: `${length}px` } : { width: `${length}px` }),
+                ...(assignInlineVars({
+                    [skinVars.startValue]: `${fill.start}`,
+                    [skinVars.endValue]: `${fill.end}`,
+                }) as CSSProperties),
+            }}
         >
             <div
                 className={[

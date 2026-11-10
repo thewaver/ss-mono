@@ -1,8 +1,10 @@
 import { For } from "solid-js";
 
 import { access } from "@thewaver/ss-components-solid";
+import { skinVars } from "@thewaver/ss-playground/App/Skins/Skin.css";
 import { DEFAULT_RANGE_CONTENT_LENGTH } from "@thewaver/ss-playground/App/StyledComponents/RangeContent/RangeContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/RangeContent/RangeContent.css";
+import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type { RangeContentProps } from "./RangeContentSolid.types";
@@ -32,7 +34,13 @@ export const PageRangeContent = (props: RangeContentProps) => {
     return (
         <div
             class={styles.rangeContent}
-            style={getOrientation() === "vertical" ? { height: `${getLength()}px` } : { width: `${getLength()}px` }}
+            style={{
+                ...(getOrientation() === "vertical" ? { height: `${getLength()}px` } : { width: `${getLength()}px` }),
+                ...assignInlineVars({
+                    [skinVars.startValue]: `${access(props.renderProps).fill.start}`,
+                    [skinVars.endValue]: `${access(props.renderProps).fill.end}`,
+                }),
+            }}
             classList={{
                 [styles.rangeContentVariants[getOrientation()]]: true,
                 [getLayerClass()]: true,
