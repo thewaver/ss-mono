@@ -189,13 +189,7 @@ SkinUtils.define(cartoon, {
         },
     },
     drawer: {
-        border: [
-            `2px solid ${themeVars.color.surface.contrast}`,
-            `2px solid rgb( from ${themeVars.color.surface.contrast} r g b / 25%)`,
-        ],
-        backgroundColor: themeVars.color.surface.main,
-        color: themeVars.color.surface.contrast,
-        boxShadow: SHADOW_MEDIUM,
+        ...surface(layerVars),
     },
     dropdown: {
         ...INPUT_SHELL,
@@ -253,12 +247,12 @@ SkinUtils.define(cartoon, {
         backdropFilter: "blur(20px) grayscale(75%)",
     },
     pageBackground: {
-        backgroundColor: themeVars.color.background.light,
-        color: themeVars.color.background.contrast,
+        backgroundColor: themeVars.color.layers.level0.light,
+        color: themeVars.color.layers.level0.contrast,
         fontFamily: "monospace",
     },
     pageContainer: {
-        ...surface(SkinUtils.extendColor(layerVars)),
+        ...surface(layerVars),
     },
     panel: {
         border: `2px solid black`,
@@ -379,7 +373,7 @@ SkinUtils.define(cartoon, {
         },
     },
     surface: {
-        ...surface(themeVars.color.surface),
+        ...surface(layerVars),
     },
     tabsItemBase: {
         paddingBlock: themeVars.spacing.full,
@@ -439,6 +433,7 @@ SkinUtils.define(cartoon, {
         },
     },
     tooltip: {
+        border: [`2px solid ${layerVars.contrast}`, `2px solid rgb(from ${layerVars.contrast} r g b / 25%)`],
         backgroundColor: layerVars.main,
         boxShadow: SHADOW_SMALL,
         color: layerVars.contrast,

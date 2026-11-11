@@ -15,7 +15,7 @@ export const renderMenubarPopup = (
     getTransitionDurationMs: () => number,
     getPlacement: () => AnchorPlacement,
 ) => (
-    <PageLayer level={2}>
+    <PageLayer>
         <PagePopoverSurface
             visibilityTarget={getVisibilityTarget}
             transitionDurationMs={getTransitionDurationMs}

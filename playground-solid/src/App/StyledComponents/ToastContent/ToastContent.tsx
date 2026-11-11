@@ -69,7 +69,7 @@ export const PageToastContent = (props: ParentProps<ToastContentProps>) => {
     });
 
     return (
-        <PageLayer level={2}>
+        <PageLayer>
             <div
                 style={{
                     "transition": `transform ${access(props.state).isSwiping ? 0 : access(props.transitionDurationMs)}ms`,

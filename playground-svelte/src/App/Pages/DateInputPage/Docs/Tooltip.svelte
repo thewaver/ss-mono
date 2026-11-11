@@ -1,4 +1,5 @@
 <script lang="ts">
+    import type { ShapeArrowAim } from "@thewaver/ss-utils";
     import type { DateValue } from "@thewaver/ss-components-svelte";
     import { DateInput } from "@thewaver/ss-components-svelte";
     import { DATE_PART_HINTS } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
@@ -39,6 +40,6 @@
     {/snippet}
 </DateInput>
 
-{#snippet tooltip(visibilityTarget: 0 | 1, transitionDurationMs: number)}
-    <PageTooltipContent {visibilityTarget} {transitionDurationMs}>A tooltip on a date field.</PageTooltipContent>
+{#snippet tooltip(visibilityTarget: 0 | 1, transitionDurationMs: number, _placement: unknown, _flags: unknown, arrowAim: ShapeArrowAim | undefined)}
+    <PageTooltipContent {visibilityTarget} {transitionDurationMs} {arrowAim}>A tooltip on a date field.</PageTooltipContent>
 {/snippet}

@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import * as styles from "@thewaver/ss-playground/App/PageComponents/Variants/Variants.css";
 
+import { useNextLayerClass } from "../../StyledComponents/Layer/Layer.context";
 import PageLayer from "../Layer/Layer.vue";
 import type { VariantsProps } from "./Variants.types";
 
 defineProps<VariantsProps>();
+
+const nextLayerClass = useNextLayerClass();
 </script>
 
 <template>
@@ -17,11 +20,11 @@ defineProps<VariantsProps>();
         <div
             v-for="variant in items"
             :key="variant.key"
-            :class="styles.variantContainer"
+            :class="[styles.variantContainer, nextLayerClass]"
             data-variant=""
             :data-testid="variant.key"
         >
-            <PageLayer :level="1">
+            <PageLayer>
                 <div :class="styles.variantTitle">{{ variant.name }}</div>
 
                 <div :class="styles.variantDemo"><slot :name="variant.key" /></div>

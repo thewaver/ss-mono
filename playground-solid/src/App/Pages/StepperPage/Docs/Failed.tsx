@@ -38,10 +38,17 @@ export const FailedDocsExample = (props: Props) => {
                     placement: () => ({ x: "center", y: "top_out" }),
                     offset: () => ({ x: 0, y: 10 }),
                     hoverShowDelayMs: 0,
-                    renderContent: (getVisibilityTarget, getTransitionDurationMs) => (
+                    renderContent: (
+                        getVisibilityTarget,
+                        getTransitionDurationMs,
+                        _getPlacement,
+                        _getFlags,
+                        getArrowAim,
+                    ) => (
                         <PageTooltipContent
                             visibilityTarget={getVisibilityTarget}
                             transitionDurationMs={getTransitionDurationMs}
+                            arrowAim={getArrowAim}
                         >
                             {reason}
                         </PageTooltipContent>

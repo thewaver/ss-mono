@@ -1,4 +1,5 @@
 <script lang="ts">
+    import type { ShapeArrowAim } from "@thewaver/ss-utils";
     import type { Snippet } from "svelte";
 
     import type { AnchorPlacement, SelectOption, Toast, ToastState } from "@thewaver/ss-components-svelte";
@@ -76,8 +77,8 @@
     ];
 </script>
 
-{#snippet roamingTooltip(visibilityTarget: 0 | 1, transitionDurationMs: number)}
-    <PageTooltipContent {visibilityTarget} {transitionDurationMs}>
+{#snippet roamingTooltip(visibilityTarget: 0 | 1, transitionDurationMs: number, _placement: unknown, _flags: unknown, arrowAim: ShapeArrowAim | undefined)}
+    <PageTooltipContent {visibilityTarget} {transitionDurationMs} {arrowAim}>
         My tooltip has the same boundary I do.
     </PageTooltipContent>
 {/snippet}

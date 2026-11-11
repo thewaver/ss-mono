@@ -137,7 +137,7 @@
         itemKey={"lameExponents"}
         controls={"Sets every corner of LensProps.lameExponents"}
         label={"Lamé Exponent"}
-        hint={"How square or how pinched the lens's rounded corners are: 2 is a circular round, higher is squarer."}
+        hint={"How square or how pinched the lens's rounded corners are: 1 is a circular round, higher is squarer."}
     >
         <PageNumberField
             value={lameExponent}

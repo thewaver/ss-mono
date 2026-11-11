@@ -1,4 +1,5 @@
 <script lang="ts">
+    import type { ShapeArrowAim } from "@thewaver/ss-utils";
     import { TextInput } from "@thewaver/ss-components-svelte";
     import {
         FIELD_GAP,
@@ -34,6 +35,6 @@
     {/snippet}
 </TextInput>
 
-{#snippet tooltip(visibilityTarget: 0 | 1, transitionDurationMs: number)}
-    <PageTooltipContent {visibilityTarget} {transitionDurationMs}>A tooltip on a text field.</PageTooltipContent>
+{#snippet tooltip(visibilityTarget: 0 | 1, transitionDurationMs: number, _placement: unknown, _flags: unknown, arrowAim: ShapeArrowAim | undefined)}
+    <PageTooltipContent {visibilityTarget} {transitionDurationMs} {arrowAim}>A tooltip on a text field.</PageTooltipContent>
 {/snippet}

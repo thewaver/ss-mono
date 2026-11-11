@@ -1,40 +1,33 @@
 import type { PropsWithChildren } from "react";
 
-import { Shape } from "@thewaver/ss-components-react";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/TooltipContent/TooltipContent.css";
-import { computeTooltipGeometry } from "@thewaver/ss-playground/App/StyledComponents/TooltipContent/TooltipContent.utils";
-import { themeVars } from "@thewaver/ss-playground/App/Theme.css";
+import {
+    computeTooltipGeometry,
+    getTooltipHasArrow,
+} from "@thewaver/ss-playground/App/StyledComponents/TooltipContent/TooltipContent.utils";
 
 import { PageLayer } from "../../PageComponents/Layer/Layer";
 import type { TooltipContentProps } from "./TooltipContent.types";
+import { PageTooltipSurface } from "./TooltipSurface";
 
-export const PageTooltipContent = (props: PropsWithChildren<TooltipContentProps>) => {
-    return (
-        <div
-            className={[
-                styles.tooltipVisibility,
-                styles.tooltipRevealVariants[props.reveal ?? "fade"],
-                props.visibilityTarget === 1 && styles.isVisible,
-            ]
-                .filter(Boolean)
-                .join(" ")}
-            style={{ transitionDuration: `${props.transitionDurationMs}ms` }}
+export const PageTooltipContent = (props: PropsWithChildren<TooltipContentProps>) => (
+    <div
+        className={[
+            styles.tooltipVisibility,
+            styles.tooltipRevealVariants[props.reveal ?? "fade"],
+            props.visibilityTarget === 1 && styles.isVisible,
+        ]
+            .filter(Boolean)
+            .join(" ")}
+        style={{ transitionDuration: `${props.transitionDurationMs}ms` }}
+    >
+        <PageTooltipSurface
+            hasArrow={getTooltipHasArrow(props.arrow)}
+            computeGeometry={(size, bodyStyle) => computeTooltipGeometry(size, props, bodyStyle)}
         >
-            <div className={styles.tooltipShadow}>
-                <Shape
-                    computePoints={(size) => computeTooltipGeometry(size, props)}
-                    computeFillDefs={() => [{ color: themeVars.color.surface.dark }]}
-                    renderChildren={() => (
-                        <div
-                            className={[styles.tooltipBody, props.isWide && styles.tooltipBodyWide]
-                                .filter(Boolean)
-                                .join(" ")}
-                        >
-                            <PageLayer level={2}>{props.children}</PageLayer>
-                        </div>
-                    )}
-                />
+            <div className={[styles.tooltipBody, props.isWide && styles.tooltipBodyWide].filter(Boolean).join(" ")}>
+                <PageLayer>{props.children}</PageLayer>
             </div>
-        </div>
-    );
-};
+        </PageTooltipSurface>
+    </div>
+);

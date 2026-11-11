@@ -20,10 +20,11 @@ export const RightToLeftDocsExample = () => {
                 placement={{ x: "center", y: "top_out" }}
                 offset={{ x: 0, y: 10 }}
                 hoverShowDelayMs={TOOLTIP_HOVER_DELAY_MS}
-                renderContent={(getVisibilityTarget, getTransitionDurationMs) => (
+                renderContent={(getVisibilityTarget, getTransitionDurationMs, _getPlacement, getArrowAim) => (
                     <PageTooltipContent
                         visibilityTarget={getVisibilityTarget}
                         transitionDurationMs={getTransitionDurationMs}
+                        arrowAim={getArrowAim}
                     >
                         <div class={styles.richTitle}>Everyone with the link</div>
 

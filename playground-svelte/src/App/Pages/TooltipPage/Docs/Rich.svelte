@@ -17,8 +17,8 @@
         offset={{ x: 0, y: 10 }}
         hoverShowDelayMs={TOOLTIP_HOVER_DELAY_MS}
     >
-        {#snippet renderContent(visibilityTarget, transitionDurationMs)}
-            <PageTooltipContent {visibilityTarget} {transitionDurationMs}>
+        {#snippet renderContent(visibilityTarget, transitionDurationMs, _placement, arrowAim)}
+            <PageTooltipContent {visibilityTarget} {transitionDurationMs} {arrowAim}>
                 <div class={styles.richTitle}>Everyone with the link</div>
 
                 <div class={styles.richBody}>

@@ -5,7 +5,8 @@ import type { ShapeConst, Size2d } from "@thewaver/ss-utils";
 
 import type { Paint } from "../../PageComponents/PaintPicker/PaintPickerSvelte.types";
 
-export type ShapeExampleProps = Pick<ShapeProps, "lameExponents" | "joinRadii"> & {
+export type ShapeExampleProps = Pick<ShapeProps, "lameExponents"> & {
+    joinRadii?: number[];
     shouldClipChildren?: boolean;
     shouldPadChildren?: boolean;
     blurWidth?: number;

@@ -23,6 +23,8 @@ export const TOOLTIP_ARROWS = ["none", "triangle", "bolt"] as const;
 
 export type TooltipArrow = (typeof TOOLTIP_ARROWS)[number];
 
+export const DEFAULT_TOOLTIP_ARROW: TooltipArrow = "triangle";
+
 export const TOOLTIP_ARROW_LABELS: Record<TooltipArrow, string> = {
     none: "None",
     triangle: "Triangle",

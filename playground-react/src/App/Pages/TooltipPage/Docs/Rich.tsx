@@ -20,7 +20,7 @@ export const RichDocsExample = () => {
                 placement={{ x: "center", y: "top_out" }}
                 offset={{ x: 0, y: 10 }}
                 hoverShowDelayMs={TOOLTIP_HOVER_DELAY_MS}
-                renderContent={(visibilityTarget, transitionDurationMs) => (
+                renderContent={(visibilityTarget, transitionDurationMs, _placement, arrowAim) => (
                     <PageTooltipContent visibilityTarget={visibilityTarget} transitionDurationMs={transitionDurationMs}>
                         <div className={styles.richTitle}>Everyone with the link</div>
 

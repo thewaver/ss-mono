@@ -7,7 +7,7 @@ import type { SVGDefs } from "../../Generators/SVGDefs/SVGDefsSolid.types";
 import { access } from "../../Utils/propUtils";
 import type { ShapeProps } from "./ShapeSolid.types";
 
-const renderPath = (def: SVGDefs, getD: () => string, fillRule?: "evenodd") => {
+const renderPath = (def: SVGDefs, getD: () => string, fillRule?: "evenodd", getClipId?: () => string | undefined) => {
     const paint = ShapeLayerUtils.computePaint(def);
 
     return (
@@ -17,7 +17,7 @@ const renderPath = (def: SVGDefs, getD: () => string, fillRule?: "evenodd") => {
             fill={paint.fill}
             fill-opacity={paint.fillOpacity}
             filter={paint.filter}
-            clip-path={paint.clipPath}
+            clip-path={getClipId?.() ? `url(#${getClipId()})` : paint.clipPath}
             style={paint.mixBlendMode ? { "mix-blend-mode": paint.mixBlendMode } : undefined}
         />
     );
@@ -54,6 +54,29 @@ export const Shape = (props: ShapeProps) => {
         ),
     );
 
+    const getFillClip = (index: number) => access(props.fillGeom)?.[index]?.clip;
+
+    const renderFillClip = (index: number) => {
+        const clip = getFillClip(index);
+
+        if (!clip) return undefined;
+
+        const getClip = () =>
+            ShapeLayerUtils.computeFillClip(
+                getGeometry().points,
+                clip,
+                getPaths()[0].outerPath,
+                getGeometry().joinRadii,
+                getGeometry().lameExponents,
+            );
+
+        return (
+            <clipPath id={clip.id} clipPathUnits="userSpaceOnUse">
+                <path d={getClip().path} clip-rule={getClip().rule} />
+            </clipPath>
+        );
+    };
+
     const getShapeOutside = createMemo(() => ShapeLayerUtils.computeShapeOutside(getPaths()[0].outerContour));
 
     onMount(() => {
@@ -74,17 +97,35 @@ export const Shape = (props: ShapeProps) => {
                 >
                     <defs>
                         <For each={getFillDefs()}>
-                            {(def) => (
+                            {(def, getIndex) => (
                                 <>
                                     {def.gradientOrPattern?.renderDefsElement()}
                                     {def.filter?.renderDefsElement()}
-                                    {def.clipPath?.renderDefsElement()}
+                                    {getFillClip(getIndex())
+                                        ? renderFillClip(getIndex())
+                                        : def.clipPath?.renderDefsElement()}
                                 </>
                             )}
                         </For>
                     </defs>
 
-                    <For each={getFillDefs()}>{(def) => renderPath(def, () => getPaths()[0].outerPath)}</For>
+                    <For each={getFillDefs()}>
+                        {(def, getIndex) =>
+                            renderPath(
+                                def,
+                                () =>
+                                    ShapeLayerUtils.computeFillPath(
+                                        getGeometry().points,
+                                        access(props.fillGeom)?.[getIndex()],
+                                        getPaths()[0].outerPath,
+                                        getGeometry().joinRadii,
+                                        getGeometry().lameExponents,
+                                    ),
+                                undefined,
+                                () => getFillClip(getIndex())?.id,
+                            )
+                        }
+                    </For>
                 </svg>
             )}
 

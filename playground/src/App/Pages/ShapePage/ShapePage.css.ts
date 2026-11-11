@@ -79,6 +79,28 @@ export const morphHost = style({
     gap: themeVars.spacing.double,
 });
 
+export const fromCssRow = style({
+    display: "flex",
+    flexWrap: "wrap",
+    alignItems: "start",
+    gap: themeVars.spacing.double,
+});
+
+export const fromCssCaption = style({
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+});
+
+export const fromCssBox = style([
+    fromCssCaption,
+    {
+        boxSizing: "border-box",
+        width: exampleSize,
+        height: exampleSize * 0.625,
+    },
+]);
+
 export const wrapText = style({
     maxWidth: 520,
 });

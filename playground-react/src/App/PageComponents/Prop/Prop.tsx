@@ -65,10 +65,11 @@ export const PageProp = (props: PropsWithChildren<PagePropProps>) => {
                     tooltipDefs={{
                         placement: HINT_PLACEMENT,
                         offset: HINT_OFFSET,
-                        renderContent: (visibilityTarget, transitionDurationMs) => (
+                        renderContent: (visibilityTarget, transitionDurationMs, _placement, _flags, arrowAim) => (
                             <PageTooltipContent
                                 visibilityTarget={visibilityTarget}
                                 transitionDurationMs={transitionDurationMs}
+                                arrowAim={arrowAim}
                             >
                                 {props.hint}
 

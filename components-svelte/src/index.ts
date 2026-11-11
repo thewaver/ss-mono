@@ -169,6 +169,7 @@ export * from "./Generators/SVGDefs/SVGGradients/PaintArea.context.js";
 export type * from "./Generators/SVGDefs/SVGGradients/PaintArea.context.types.js";
 export { default as PaintAreaProvider } from "./Generators/SVGDefs/SVGGradients/PaintAreaProvider.svelte";
 export * from "./Generators/SVGDefs/SVGGradients/SVGGradientDefsSvelte.utils.js";
+export * from "./Generators/SVGDefs/SVGStyles/SVGStyleDefsSvelte.utils.js";
 export * from "./Generators/SVGDefs/SVGPatterns/SVGPatternDefsSvelte.utils.js";
 export * from "./Abstracts/Glass/GlassSvelte.utils.js";
 export { default as Shape } from "./Exotics/Shape/Shape.svelte";

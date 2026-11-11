@@ -1,4 +1,5 @@
 <script lang="ts">
+    import type { ShapeArrowAim } from "@thewaver/ss-utils";
     import { Menu } from "@thewaver/ss-components-svelte";
 
     import { renderPageHighlightFloater } from "../../../../StyledComponents/GlideFloater/GlideFloater.const.svelte";
@@ -32,6 +33,6 @@
     {/snippet}
 </Menu>
 
-{#snippet tooltip(visibilityTarget: 0 | 1, transitionDurationMs: number)}
-    <PageTooltipContent {visibilityTarget} {transitionDurationMs}>Cut, copy or paste what is selected.</PageTooltipContent>
+{#snippet tooltip(visibilityTarget: 0 | 1, transitionDurationMs: number, _placement: unknown, _flags: unknown, arrowAim: ShapeArrowAim | undefined)}
+    <PageTooltipContent {visibilityTarget} {transitionDurationMs} {arrowAim}>Cut, copy or paste what is selected.</PageTooltipContent>
 {/snippet}

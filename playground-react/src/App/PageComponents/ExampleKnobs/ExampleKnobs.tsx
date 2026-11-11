@@ -13,6 +13,7 @@ import {
 import * as styles from "@thewaver/ss-playground/App/PageComponents/ExampleKnobs/ExampleKnobs.css";
 import * as examplesStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
 
+import { useNextLayerClass } from "../../StyledComponents/Layer/Layer.context";
 import { PageTooltipContent } from "../../StyledComponents/TooltipContent/TooltipContent";
 import { PageLayer } from "../Layer/Layer";
 import { PagePropsPanel } from "../PropsPanel/PropsPanel";
@@ -21,6 +22,7 @@ import type { PageExampleKnobsButtonProps } from "./ExampleKnobs.types";
 
 export const PageExampleKnobsButton = (props: PageExampleKnobsButtonProps) => {
     const popupId = useId();
+    const nextLayerClass = useNextLayerClass();
 
     const [triggerRef, setTriggerRef] = useState<HTMLElement | null>(null);
     const [isOpen, setIsOpen] = useState(false);
@@ -41,10 +43,11 @@ export const PageExampleKnobsButton = (props: PageExampleKnobsButtonProps) => {
                 tooltipDefs={{
                     placement: TOOLTIP_PLACEMENT,
                     offset: TOOLTIP_OFFSET,
-                    renderContent: (visibilityTarget, transitionDurationMs) => (
+                    renderContent: (visibilityTarget, transitionDurationMs, _placement, _flags, arrowAim) => (
                         <PageTooltipContent
                             visibilityTarget={visibilityTarget}
                             transitionDurationMs={transitionDurationMs}
+                            arrowAim={arrowAim}
                         >
                             Settings
                         </PageTooltipContent>
@@ -80,12 +83,16 @@ export const PageExampleKnobsButton = (props: PageExampleKnobsButtonProps) => {
                 onDismiss={handleDismiss}
                 renderContent={(visibilityTarget, transitionDurationMs) => (
                     <div
-                        className={[styles.exampleKnobsSurface, visibilityTarget === 1 && styles.isVisible]
+                        className={[
+                            styles.exampleKnobsSurface,
+                            nextLayerClass,
+                            visibilityTarget === 1 && styles.isVisible,
+                        ]
                             .filter(Boolean)
                             .join(" ")}
                         style={{ transition: `opacity ${transitionDurationMs}ms` }}
                     >
-                        <PageLayer level={2}>
+                        <PageLayer>
                             <PagePropsPanel scope={"local"}>{props.renderKnobs()}</PagePropsPanel>
                         </PageLayer>
                     </div>

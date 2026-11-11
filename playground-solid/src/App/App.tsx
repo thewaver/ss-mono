@@ -77,6 +77,7 @@ import type { PageViewKey } from "./PageComponents/ViewTabs/ViewTabsSolid.types"
 import type { GallerySection } from "./Pages/GalleryPage/GalleryPage.types";
 import { renderPageHighlightFloater } from "./StyledComponents/GlideFloater/GlideFloater";
 import { useLayerClass } from "./StyledComponents/Layer/Layer.context";
+import { useNextLayerClass } from "./StyledComponents/Layer/Layer.context";
 import { PageTooltipContent } from "./StyledComponents/TooltipContent/TooltipContent";
 import { PageTreeNodeContent } from "./StyledComponents/TreeNodeContent/TreeNodeContent";
 
@@ -369,6 +370,7 @@ const PageDependencies = (props: { name: string; view: PageViewKey }) => {
 };
 
 export function AppContent(props: RouteSectionProps & { viewportAnchor: SignalPair<ViewportAnchor> }) {
+    const getNextLayerClass = useNextLayerClass();
     const [getSelectedConfig, setSelectedConfig] = createSignal<ComponentConfig>();
     const [getSearchTerm, setSearchTerm] = createSignal("");
     const showsDescriptionOnlySignal = createSignal(NavSettingsUtils.loadShowsDescriptionOnly());
@@ -495,11 +497,11 @@ export function AppContent(props: RouteSectionProps & { viewportAnchor: SignalPa
                     expanded={menuExpandedSignal}
                     renderContent={(getPhase, getTransitionDurationMs) => (
                         <nav
-                            class={styles.leftMenu}
+                            class={[styles.leftMenu, getNextLayerClass()].join(" ")}
                             style={{ "padding-left": `${getMenuGutter()}px` }}
                             aria-label={"Library"}
                         >
-                            <PageLayer level={1}>
+                            <PageLayer>
                                 <div class={styles.leftMenuContent}>
                                     <div class={styles.searchContainer}>
                                         <PageSidebarToggle

@@ -9,6 +9,7 @@
     import PageAccordionPanel from "../../StyledComponents/AccordionContent/PageAccordionPanel.svelte";
     import PageCodeBox from "../CodeBox/CodeBox.svelte";
     import PageLayer from "../Layer/Layer.svelte";
+    import { getNextLayerClass } from "../../StyledComponents/Layer/Layer.context";
     import { getPreviewContext } from "../Preview/Preview.context";
     import PagePropsPanel from "../PropsPanel/PagePropsPanel.svelte";
     import { SourceViewUtils } from "../SourceView/SourceView.utils";
@@ -16,6 +17,8 @@
     import type { PageDocsExampleProps } from "./DocsExampleSvelte.types";
 
     let props: PageDocsExampleProps = $props();
+
+    const getNextLayerClassName = getNextLayerClass();
 
     const preview = getPreviewContext();
 
@@ -51,8 +54,8 @@
     {/if}
 {:else}
     <div class={styles.docsExampleStack}>
-        <div class={styles.docsExample} data-docs-example="">
-            <PageLayer level={1}>
+        <div class={[styles.docsExample, getNextLayerClassName()]} data-docs-example="">
+            <PageLayer>
                 <div class={styles.docsExampleSection}>
                     <div class={styles.docsExampleDemo} data-demo="" data-testid={props.path}>
                         {@render props.children?.()}

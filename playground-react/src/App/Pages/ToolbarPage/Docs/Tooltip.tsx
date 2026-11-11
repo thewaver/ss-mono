@@ -20,7 +20,7 @@ const toHint = (text: string): InteractionTooltipDefs => ({
     placement: PLACEMENT,
     offset: OFFSET,
     hoverShowDelayMs: TOOLTIP_HOVER_DELAY_MS,
-    renderContent: (visibilityTarget, transitionDurationMs) => (
+    renderContent: (visibilityTarget, transitionDurationMs, _placement, _flags, arrowAim) => (
         <PageTooltipContent visibilityTarget={visibilityTarget} transitionDurationMs={transitionDurationMs}>
             {text}
         </PageTooltipContent>

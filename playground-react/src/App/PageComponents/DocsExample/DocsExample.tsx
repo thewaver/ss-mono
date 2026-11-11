@@ -6,6 +6,7 @@ import * as styles from "@thewaver/ss-playground/App/PageComponents/DocsExample/
 import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
 
 import { PageAccordionHeader, PageAccordionPanel } from "../../StyledComponents/AccordionContent/AccordionContent";
+import { useNextLayerClass } from "../../StyledComponents/Layer/Layer.context";
 import { PageCodeBox } from "../CodeBox/CodeBox";
 import { PageLayer } from "../Layer/Layer";
 import { usePreviewContext } from "../Preview/Preview.context";
@@ -16,6 +17,7 @@ import type { PageDocsExampleProps } from "./DocsExampleReact.types";
 
 export const PageDocsExample = (props: PropsWithChildren<PageDocsExampleProps>) => {
     const preview = usePreviewContext();
+    const nextLayerClass = useNextLayerClass();
     const demoId = useId();
     const [file, setFile] = useState<SourceFile>();
 
@@ -44,8 +46,8 @@ export const PageDocsExample = (props: PropsWithChildren<PageDocsExampleProps>) 
 
     return (
         <div className={styles.docsExampleStack}>
-            <div className={styles.docsExample} data-docs-example>
-                <PageLayer level={1}>
+            <div className={[styles.docsExample, nextLayerClass].join(" ")} data-docs-example>
+                <PageLayer>
                     <div className={styles.docsExampleSection}>
                         <div className={styles.docsExampleDemo} data-demo data-testid={props.path}>
                             {props.children}

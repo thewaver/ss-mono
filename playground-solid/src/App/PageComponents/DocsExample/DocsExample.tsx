@@ -6,6 +6,7 @@ import * as styles from "@thewaver/ss-playground/App/PageComponents/DocsExample/
 import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
 
 import { PageAccordionHeader, PageAccordionPanel } from "../../StyledComponents/AccordionContent/AccordionContent";
+import { useNextLayerClass } from "../../StyledComponents/Layer/Layer.context";
 import { PageCodeBox } from "../CodeBox/CodeBox";
 import { PageLayer } from "../Layer/Layer";
 import { usePreviewContext } from "../Preview/Preview.context";
@@ -24,12 +25,14 @@ export const PageDocsExample = (props: ParentProps<PageDocsExampleProps>) => {
         ) : null;
     }
 
+    const getNextLayerClass = useNextLayerClass();
+
     const [getFile] = createResource(() => access(props.path), SourceViewUtils.loadFile);
 
     return (
         <div class={styles.docsExampleStack}>
-            <div class={styles.docsExample} data-docs-example>
-                <PageLayer level={1}>
+            <div class={[styles.docsExample, getNextLayerClass()].join(" ")} data-docs-example>
+                <PageLayer>
                     <div class={styles.docsExampleSection}>
                         <div class={styles.docsExampleDemo} data-demo data-testid={access(props.path)}>
                             {props.children}

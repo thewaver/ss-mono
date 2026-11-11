@@ -21,10 +21,10 @@ const value = shallowRef<string | undefined>("Sweden");
 const tooltipDefs: InteractionTooltipDefs<SelectFlags> = {
     placement: { x: "center", y: "top_out" },
     offset: { x: 0, y: 10 },
-    renderContent: ({ visibilityTarget, transitionDurationMs }) =>
+    renderContent: ({ visibilityTarget, transitionDurationMs, arrowAim }) =>
         h(
             PageTooltipContent,
-            { visibilityTarget, transitionDurationMs },
+            { visibilityTarget, transitionDurationMs, arrowAim },
             () => "Focusable so this can be read, but the list must not open.",
         ),
 };

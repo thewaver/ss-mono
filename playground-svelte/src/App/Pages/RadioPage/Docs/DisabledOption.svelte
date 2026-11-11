@@ -1,4 +1,5 @@
 <script lang="ts">
+    import type { ShapeArrowAim } from "@thewaver/ss-utils";
     import { Radio, RadioGroup } from "@thewaver/ss-components-svelte";
     import { RADIO_GROUP_GAP, SIZE_OPTIONS } from "@thewaver/ss-playground/App/Pages/RadioPage/RadioPage.const";
     import type { SizeValue } from "@thewaver/ss-playground/App/Pages/RadioPage/RadioPage.types";
@@ -38,6 +39,6 @@
     {/each}
 </RadioGroup>
 
-{#snippet tooltip(visibilityTarget: 0 | 1, transitionDurationMs: number)}
-    <PageTooltipContent {visibilityTarget} {transitionDurationMs}>Out of stock in this size.</PageTooltipContent>
+{#snippet tooltip(visibilityTarget: 0 | 1, transitionDurationMs: number, _placement: unknown, _flags: unknown, arrowAim: ShapeArrowAim | undefined)}
+    <PageTooltipContent {visibilityTarget} {transitionDurationMs} {arrowAim}>Out of stock in this size.</PageTooltipContent>
 {/snippet}

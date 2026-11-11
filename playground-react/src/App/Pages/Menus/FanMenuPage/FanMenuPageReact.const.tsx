@@ -81,6 +81,6 @@ export const renderFanPopup = (renderItems: () => ReactNode, visibilityTarget: 0
             transition: `opacity ${transitionDurationMs}ms, transform ${transitionDurationMs}ms`,
         }}
     >
-        <PageLayer level={2}>{renderItems()}</PageLayer>
+        <PageLayer>{renderItems()}</PageLayer>
     </div>
 );

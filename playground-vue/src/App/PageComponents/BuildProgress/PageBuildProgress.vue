@@ -37,7 +37,7 @@ const dismiss = () => {
 <template>
     <Sidebar edge="top" :collapsed-size="0" :expanded-size="BUILD_PROGRESS_HEIGHT" :expanded="isShown">
         <template #renderContent="{ phase }">
-            <PageLayer :level="1">
+            <PageLayer>
                 <div :class="styles.buildProgressClip">
                     <div :class="[styles.buildProgressStrip, phase === 'collapsed' && styles.isHidden]">
                         <Progress

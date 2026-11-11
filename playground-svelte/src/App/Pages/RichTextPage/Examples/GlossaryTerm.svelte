@@ -26,8 +26,8 @@
         offset={TOOLTIP_OFFSET}
         hoverShowDelayMs={TOOLTIP_HOVER_DELAY_MS}
     >
-        {#snippet renderContent(visibilityTarget, transitionDurationMs)}
-            <PageTooltipContent {visibilityTarget} {transitionDurationMs}>
+        {#snippet renderContent(visibilityTarget, transitionDurationMs, _placement, arrowAim)}
+            <PageTooltipContent {visibilityTarget} {transitionDurationMs} {arrowAim}>
                 {props.tip}
             </PageTooltipContent>
         {/snippet}

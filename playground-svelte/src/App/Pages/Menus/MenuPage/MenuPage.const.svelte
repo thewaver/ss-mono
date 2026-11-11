@@ -1,4 +1,5 @@
 <script lang="ts" module>
+    import type { ShapeArrowAim } from "@thewaver/ss-utils";
     import type { Snippet } from "svelte";
 
     import type { AnchorPlacement, InteractionFlags, MenuItem, MenuItemFlags } from "@thewaver/ss-components-svelte";
@@ -40,12 +41,12 @@
     export { renderMenuPopup, renderMenuItem, renderDestinationItem };
 </script>
 
-{#snippet pasteTooltip(visibilityTarget: 0 | 1, transitionDurationMs: number)}
-    <PageTooltipContent {visibilityTarget} {transitionDurationMs}>The clipboard is empty.</PageTooltipContent>
+{#snippet pasteTooltip(visibilityTarget: 0 | 1, transitionDurationMs: number, _placement: unknown, _flags: unknown, arrowAim: ShapeArrowAim | undefined)}
+    <PageTooltipContent {visibilityTarget} {transitionDurationMs} {arrowAim}>The clipboard is empty.</PageTooltipContent>
 {/snippet}
 
-{#snippet duplicateTooltip(visibilityTarget: 0 | 1, transitionDurationMs: number)}
-    <PageTooltipContent {visibilityTarget} {transitionDurationMs}>Nothing is selected to duplicate.</PageTooltipContent>
+{#snippet duplicateTooltip(visibilityTarget: 0 | 1, transitionDurationMs: number, _placement: unknown, _flags: unknown, arrowAim: ShapeArrowAim | undefined)}
+    <PageTooltipContent {visibilityTarget} {transitionDurationMs} {arrowAim}>Nothing is selected to duplicate.</PageTooltipContent>
 {/snippet}
 
 {#snippet renderMenuPopup(
@@ -54,7 +55,7 @@
     transitionDurationMs: number,
     placement: AnchorPlacement,
 )}
-    <PageLayer level={2}>
+    <PageLayer>
         <PagePopoverSurface {visibilityTarget} {transitionDurationMs} {placement}>
             {@render renderItems()}
         </PagePopoverSurface>

@@ -23,6 +23,7 @@ import {
 } from "@thewaver/ss-playground/App/Pages/ViewportWrapperPage/ViewportWrapperPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ViewportWrapperPage/ViewportWrapperPage.css";
 import { RANGE_THUMB_SIZE } from "@thewaver/ss-playground/App/StyledComponents/RangeContent/RangeContent.css";
+import type { ShapeArrowAim } from "@thewaver/ss-utils";
 
 import { PageVariants } from "../../PageComponents/Variants/Variants";
 import { PageButtonContent } from "../../StyledComponents/ButtonContent/ButtonContent";
@@ -38,8 +39,18 @@ import { PageTooltipContent } from "../../StyledComponents/TooltipContent/Toolti
 const renderTooltip = (text: string) => ({
     placement: () => ({ x: "center", y: "top_out" }) as const,
     offset: () => ({ x: 0, y: 10 }),
-    renderContent: (getVisibilityTarget: () => 0 | 1, getTransitionDurationMs: () => number) => (
-        <PageTooltipContent visibilityTarget={getVisibilityTarget} transitionDurationMs={getTransitionDurationMs}>
+    renderContent: (
+        getVisibilityTarget: () => 0 | 1,
+        getTransitionDurationMs: () => number,
+        _getPlacement: unknown,
+        _getFlags: unknown,
+        getArrowAim: () => ShapeArrowAim | undefined,
+    ) => (
+        <PageTooltipContent
+            visibilityTarget={getVisibilityTarget}
+            transitionDurationMs={getTransitionDurationMs}
+            arrowAim={getArrowAim}
+        >
             {text}
         </PageTooltipContent>
     ),

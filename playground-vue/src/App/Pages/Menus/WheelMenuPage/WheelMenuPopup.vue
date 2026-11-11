@@ -12,6 +12,6 @@ defineProps<WheelMenuPopupProps>();
         :class="[styles.layer, visibilityTarget === 1 && styles.layerVisible]"
         :style="{ transition: `opacity ${transitionDurationMs}ms, transform ${transitionDurationMs}ms` }"
     >
-        <PageLayer :level="2"><component :is="renderItems" /></PageLayer>
+        <PageLayer><component :is="renderItems" /></PageLayer>
     </div>
 </template>

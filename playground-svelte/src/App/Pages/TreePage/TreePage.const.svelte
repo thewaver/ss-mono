@@ -1,4 +1,5 @@
 <script lang="ts" module>
+    import type { ShapeArrowAim } from "@thewaver/ss-utils";
     import type { Snippet } from "svelte";
 
     import type { TreeNode } from "@thewaver/ss-components-svelte";
@@ -9,7 +10,9 @@
 
     const toDisabledNode = (
         value: string,
-        renderReason: Snippet<[visibilityTarget: 0 | 1, transitionDurationMs: number]>,
+        renderReason: Snippet<
+            [visibilityTarget: 0 | 1, transitionDurationMs: number, placement: unknown, flags: unknown, arrowAim: ShapeArrowAim | undefined]
+        >,
         isReachable: boolean,
         children?: TreeNode<string>[],
     ): TreeNode<string> => ({
@@ -37,14 +40,14 @@
     ];
 </script>
 
-{#snippet indexTooltip(visibilityTarget: 0 | 1, transitionDurationMs: number)}
-    <PageTooltipContent {visibilityTarget} {transitionDurationMs}>
+{#snippet indexTooltip(visibilityTarget: 0 | 1, transitionDurationMs: number, _placement: unknown, _flags: unknown, arrowAim: ShapeArrowAim | undefined)}
+    <PageTooltipContent {visibilityTarget} {transitionDurationMs} {arrowAim}>
         Generated on build, so it cannot be picked.
     </PageTooltipContent>
 {/snippet}
 
-{#snippet libTooltip(visibilityTarget: 0 | 1, transitionDurationMs: number)}
-    <PageTooltipContent {visibilityTarget} {transitionDurationMs}>
+{#snippet libTooltip(visibilityTarget: 0 | 1, transitionDurationMs: number, _placement: unknown, _flags: unknown, arrowAim: ShapeArrowAim | undefined)}
+    <PageTooltipContent {visibilityTarget} {transitionDurationMs} {arrowAim}>
         Locked while a release is cut. What is inside stays open to browse.
     </PageTooltipContent>
 {/snippet}

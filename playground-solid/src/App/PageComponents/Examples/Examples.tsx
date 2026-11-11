@@ -5,6 +5,7 @@ import { Button, Modal, access } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
 import { CSSUtils } from "@thewaver/ss-utils";
 
+import { useNextLayerClass } from "../../StyledComponents/Layer/Layer.context";
 import { PageModalOverlay } from "../../StyledComponents/ModalOverlay/ModalOverlay";
 import { PageModalPanel } from "../../StyledComponents/ModalPanel/ModalPanel";
 import { PageTooltipContent } from "../../StyledComponents/TooltipContent/TooltipContent";
@@ -36,6 +37,7 @@ const PageFirstExample = (props: ExamplesProps) => (
 export const PageExamples = (props: ExamplesProps) => {
     if (useIsPreview()) return <PageFirstExample {...props} />;
 
+    const getNextLayerClass = useNextLayerClass();
     const [getActiveIndex, setActiveIndex] = createSignal(0);
     const modalVisibility = createSignal(false);
     const [, setIsModalOpen] = modalVisibility;
@@ -62,12 +64,12 @@ export const PageExamples = (props: ExamplesProps) => {
 
                         return (
                             <div
-                                class={styles.exampleContainer}
+                                class={[styles.exampleContainer, getNextLayerClass()].join(" ")}
                                 style={{ "grid-column": `span ${example.span ?? SINGLE_SPAN}` }}
                                 data-example
                                 data-testid={example.key}
                             >
-                                <PageLayer level={1}>
+                                <PageLayer>
                                     <div class={styles.exampleTitle}>
                                         {`${example.name}:`}
                                         <div class={styles.exampleActions}>
@@ -81,10 +83,14 @@ export const PageExamples = (props: ExamplesProps) => {
                                                         renderContent: (
                                                             getVisibilityTarget,
                                                             getTransitionDurationMs,
+                                                            _getPlacement,
+                                                            _getFlags,
+                                                            getArrowAim,
                                                         ) => (
                                                             <PageTooltipContent
                                                                 visibilityTarget={getVisibilityTarget}
                                                                 transitionDurationMs={getTransitionDurationMs}
+                                                                arrowAim={getArrowAim}
                                                             >
                                                                 View source code
                                                             </PageTooltipContent>

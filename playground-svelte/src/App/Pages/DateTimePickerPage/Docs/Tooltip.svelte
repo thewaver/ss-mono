@@ -1,4 +1,5 @@
 <script lang="ts">
+    import type { ShapeArrowAim } from "@thewaver/ss-utils";
     import type { DateTimeValue } from "@thewaver/ss-components-svelte";
     import { DateTimePicker } from "@thewaver/ss-components-svelte";
     import {
@@ -112,6 +113,6 @@
     {/snippet}
 </DateTimePicker>
 
-{#snippet tooltip(visibilityTarget: 0 | 1, transitionDurationMs: number)}
-    <PageTooltipContent {visibilityTarget} {transitionDurationMs}>A tooltip on a date and time picker.</PageTooltipContent>
+{#snippet tooltip(visibilityTarget: 0 | 1, transitionDurationMs: number, _placement: unknown, _flags: unknown, arrowAim: ShapeArrowAim | undefined)}
+    <PageTooltipContent {visibilityTarget} {transitionDurationMs} {arrowAim}>A tooltip on a date and time picker.</PageTooltipContent>
 {/snippet}

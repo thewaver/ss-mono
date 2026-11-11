@@ -1,12 +1,14 @@
-import { ObjectUtils, type Point2d, type ShapeGeometry, ShapeUtils } from "@thewaver/ss-utils";
+import { ObjectUtils, type Point2d, type ShapeGeometry, type ShapeJoinRadius, ShapeUtils } from "@thewaver/ss-utils";
 
 import type { SVGDefsOf } from "../../Generators/SVGDefs/SVGDefs.types";
-import type { ShapeStrokeGeom } from "./Shape.types";
+import type { ShapeFillClip, ShapeFillGeom, ShapeStrokeGeom } from "./Shape.types";
 
 const DEFAULT_STROKE_GEOM: ShapeStrokeGeom = { thicknesses: [0] };
 const NO_EDGE_THICKNESSES = [0];
 const MIN_CONTOUR_POINTS = 3;
 const BLEND_MODE = "screen" as const;
+const INVERTED_CLIP_REACH = 100000;
+const INVERTED_CLIP_FRAME = `M ${-INVERTED_CLIP_REACH} ${-INVERTED_CLIP_REACH} H ${INVERTED_CLIP_REACH} V ${INVERTED_CLIP_REACH} H ${-INVERTED_CLIP_REACH} Z`;
 
 /**
  * The arithmetic behind `Shape`'s two SVG layers: which contour each stroke paints along, the float shape its
@@ -32,7 +34,7 @@ export namespace ShapeLayerUtils {
      */
     export const computeGeometry = (
         contour: Point2d[] | ShapeGeometry,
-        joinRadii: number[] | undefined,
+        joinRadii: ShapeJoinRadius[] | undefined,
         lameExponents: number[] | undefined,
         strokeGeom: ShapeStrokeGeom[] | undefined,
     ) => {
@@ -51,6 +53,72 @@ export namespace ShapeLayerUtils {
                   }))
                 : strokeGeom,
         };
+    };
+
+    /**
+     * The contour one fill layer is painted along.
+     *
+     * A layer with no geometry follows the first stroke's outer edge, which is what every fill follows when no layer
+     * has any. A layer with geometry is measured from the shape's own corners instead, each edge moved out by its
+     * offset or in by a negative one, and rounded as {@link ShapeFillGeom.joinRadii} describes.
+     *
+     * @param points The shape's corners, in the element's own pixels.
+     * @param fillGeom The layer's geometry, if it has any.
+     * @param defaultPath The first stroke's outer edge, from {@link computeLayerPaths}.
+     * @param joinRadii How far each corner is rounded.
+     * @param lameExponents How square each rounded corner is.
+     * @returns Path text for the layer's `d` attribute.
+     */
+    export const computeFillPath = (
+        points: Point2d[],
+        fillGeom: ShapeFillGeom | undefined,
+        defaultPath: string,
+        joinRadii: ShapeJoinRadius[] | undefined,
+        lameExponents: number[] | undefined,
+    ) => {
+        if (!fillGeom) return defaultPath;
+
+        const insets = (fillGeom.offsets ?? NO_EDGE_THICKNESSES).map((offset) => -offset);
+
+        if (fillGeom.joinRadii) {
+            const movedPoints = ShapeUtils.setupPaths(points, insets).inner.vertices;
+
+            return ShapeUtils.getPaths(movedPoints, NO_EDGE_THICKNESSES, fillGeom.joinRadii, lameExponents).outerPath;
+        }
+
+        const pairedRadii = joinRadii?.map((radius): ShapeJoinRadius =>
+            Array.isArray(radius) ? radius : [radius, radius],
+        );
+
+        return ShapeUtils.getPaths(points, insets, pairedRadii, lameExponents).innerPath;
+    };
+
+    /**
+     * The clip one fill layer's paint is cut to.
+     *
+     * The contour is measured from the shape's own corners as {@link computeFillPath} measures a layer's. An
+     * inverted clip keeps everything outside that contour, out to a frame far larger than any shape.
+     *
+     * @param points The shape's corners, in the element's own pixels.
+     * @param clip The layer's clip.
+     * @param defaultPath The first stroke's outer edge, from {@link computeLayerPaths}.
+     * @param joinRadii How far each corner is rounded.
+     * @param lameExponents How square each rounded corner is.
+     * @returns Path text for the clip's `d` attribute, and the `clip-rule` to draw it with.
+     */
+    export const computeFillClip = (
+        points: Point2d[],
+        clip: ShapeFillClip,
+        defaultPath: string,
+        joinRadii: ShapeJoinRadius[] | undefined,
+        lameExponents: number[] | undefined,
+    ) => {
+        const geom = clip.offsets || clip.joinRadii ? { offsets: clip.offsets, joinRadii: clip.joinRadii } : undefined;
+        const path = computeFillPath(points, geom, defaultPath, joinRadii, lameExponents);
+
+        return clip.isInverted
+            ? { path: `${INVERTED_CLIP_FRAME} ${path}`, rule: "evenodd" as const }
+            : { path, rule: "nonzero" as const };
     };
 
     /**
@@ -73,7 +141,7 @@ export namespace ShapeLayerUtils {
         points: Point2d[],
         strokeDefs: readonly unknown[] | undefined,
         strokeGeom: ShapeStrokeGeom[] | undefined,
-        joinRadii: number[] | undefined,
+        joinRadii: ShapeJoinRadius[] | undefined,
         lameExponents: number[] | undefined,
     ) => {
         if (!strokeDefs?.length) {

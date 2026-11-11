@@ -70,7 +70,7 @@
     );
 </script>
 
-<PageLayer level={2}>
+<PageLayer>
     <div
         style:transition={`transform ${props.state.isSwiping ? 0 : props.transitionDurationMs}ms`}
         style:transform={computeTransform(props)}

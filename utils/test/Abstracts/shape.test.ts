@@ -21,7 +21,7 @@ describe("ShapeConst.CORNER_SHAPE_LAME_EXPONENTS", () => {
     it("matches the CSS corner-shape keywords", () => {
         expect(ShapeConst.CORNER_SHAPE_LAME_EXPONENTS).toEqual({
             square: Infinity,
-            squircle: 2,
+            squircle: 3,
             round: 1,
             bevel: 0,
             scoop: -1,

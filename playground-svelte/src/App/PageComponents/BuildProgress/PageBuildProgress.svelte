@@ -30,7 +30,7 @@
 
 <Sidebar edge={"top"} collapsedSize={0} expandedSize={BUILD_PROGRESS_HEIGHT} expanded={isShown}>
     {#snippet renderContent(phase)}
-        <PageLayer level={1}>
+        <PageLayer>
             <div class={styles.buildProgressClip}>
                 <div class={[styles.buildProgressStrip, phase === "collapsed" && styles.isHidden]}>
                     <Progress

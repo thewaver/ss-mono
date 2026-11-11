@@ -85,6 +85,6 @@
         class={[styles.layer, visibilityTarget === 1 && styles.layerVisible]}
         style:transition={`opacity ${transitionDurationMs}ms, transform ${transitionDurationMs}ms`}
     >
-        <PageLayer level={2}>{@render renderItems()}</PageLayer>
+        <PageLayer>{@render renderItems()}</PageLayer>
     </div>
 {/snippet}

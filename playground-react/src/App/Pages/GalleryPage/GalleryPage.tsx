@@ -6,16 +6,22 @@ import * as styles from "@thewaver/ss-playground/App/Pages/GalleryPage/GalleryPa
 
 import { PageLayer } from "../../PageComponents/Layer/Layer";
 import { PagePreview } from "../../PageComponents/Preview/Preview";
+import { useNextLayerClass } from "../../StyledComponents/Layer/Layer.context";
 import type { GalleryPageProps, GalleryTileProps } from "./GalleryPage.types";
 
 const GalleryTile = (props: GalleryTileProps) => {
     const previewRef = useRef<HTMLDivElement | null>(null);
+    const nextLayerClass = useNextLayerClass();
 
     const isOnScreen = ElementObserverReactUtils.useViewportIntersection(previewRef);
 
     return (
-        <div className={styles.galleryTile} data-gallery-tile="" data-testid={props.item.href}>
-            <PageLayer level={1}>
+        <div
+            className={[styles.galleryTile, nextLayerClass].join(" ")}
+            data-gallery-tile=""
+            data-testid={props.item.href}
+        >
+            <PageLayer>
                 <Link className={styles.galleryTileName} to={props.item.href}>
                     {props.item.name}
                 </Link>

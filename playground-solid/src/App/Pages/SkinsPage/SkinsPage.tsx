@@ -73,6 +73,7 @@ import {
     renderPageSelectionFloater,
 } from "../../StyledComponents/GlideFloater/GlideFloater";
 import { PageIcon } from "../../StyledComponents/Icon/Icon";
+import { useNextLayerClass } from "../../StyledComponents/Layer/Layer.context";
 import { PageListboxSurface } from "../../StyledComponents/ListboxSurface/ListboxSurface";
 import { PageProgressContent } from "../../StyledComponents/ProgressContent/ProgressContent";
 import { PageRadioContent } from "../../StyledComponents/RadioContent/RadioContent";
@@ -98,15 +99,19 @@ import type {
     SkinTabsSampleProps,
 } from "./SkinsPage.types";
 
-const SkinSampleColumn = (props: ParentProps<SkinSampleColumnProps>) => (
-    <div class={styles.skinColumn}>
-        <PageLayer level={1}>
-            <div class={styles.skinColumnName}>{props.name}</div>
+const SkinSampleColumn = (props: ParentProps<SkinSampleColumnProps>) => {
+    const getNextLayerClass = useNextLayerClass();
 
-            {props.children}
-        </PageLayer>
-    </div>
-);
+    return (
+        <div class={[styles.skinColumn, getNextLayerClass()].join(" ")}>
+            <PageLayer>
+                <div class={styles.skinColumnName}>{props.name}</div>
+
+                {props.children}
+            </PageLayer>
+        </div>
+    );
+};
 
 const SkinStateGrid = (props: ParentProps) => <div class={styles.skinStateGrid}>{props.children}</div>;
 

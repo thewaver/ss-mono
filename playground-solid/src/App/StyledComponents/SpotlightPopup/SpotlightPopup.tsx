@@ -4,19 +4,22 @@ import { access } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/SpotlightPopup/SpotlightPopup.css";
 
 import { PageLayer } from "../../PageComponents/Layer/Layer";
+import { useNextLayerClass } from "../Layer/Layer.context";
 import type { SpotlightPopupProps } from "./SpotlightPopupSolid.types";
 
 export const PageSpotlightPopup = (props: ParentProps<SpotlightPopupProps>) => {
+    const getLayerClass = useNextLayerClass();
+
     return (
         <div
-            class={styles.spotlightPopup}
+            class={[styles.spotlightPopup, getLayerClass()].join(" ")}
             style={{
                 opacity: access(props.visibilityTarget),
                 transition: `opacity ${access(props.transitionDurationMs)}ms`,
             }}
         >
             <div class={styles.spotlightPopupTitle}>{access(props.title)}</div>
-            <PageLayer level={2}>{props.children}</PageLayer>
+            <PageLayer>{props.children}</PageLayer>
         </div>
     );
 };

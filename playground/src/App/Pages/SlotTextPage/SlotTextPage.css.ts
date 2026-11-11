@@ -1,5 +1,6 @@
 import { createVar, keyframes, style } from "@vanilla-extract/css";
 
+import { skinEntries } from "../../Skins/Skin.css";
 import { layerVars } from "../../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../../Theme.css";
 
@@ -41,11 +42,11 @@ export const digit = style({
     placeItems: "center",
     width: "100%",
     height: "100%",
-    backgroundColor: layerVars.main,
-    color: themeVars.color.primary.main,
     fontFamily: "monospace",
     fontSize: themeVars.fontSize.xLarge,
 });
+
+export const slotTile = style([skinEntries.input, digit]);
 
 export const fixed = style({
     color: layerVars.contrast,
@@ -53,30 +54,31 @@ export const fixed = style({
     fontSize: themeVars.fontSize.xLarge,
 });
 
-export const flapTile = style({
-    "position": "relative",
-    "display": "grid",
-    "placeItems": "center",
-    "width": "100%",
-    "height": "100%",
-    "border": `1px solid ${themeVars.color.background.dark}`,
-    "borderRadius": themeVars.borderRadius.half,
-    "background": `linear-gradient(215deg, ${themeVars.color.surface.light}, ${themeVars.color.surface.dark})`,
-    "color": themeVars.color.surface.contrast,
-    "fontFamily": "monospace",
-    "fontSize": themeVars.fontSize.xLarge,
-    "::after": {
-        content: "''",
-        position: "absolute",
-        left: 0,
-        right: 0,
-        top: "50%",
-        height: 2,
-        transform: "translateY(-50%)",
-        backgroundColor: themeVars.color.background.dark,
+export const flapTile = style([
+    skinEntries.input,
+    {
+        "position": "relative",
+        "display": "grid",
+        "placeItems": "center",
+        "width": "100%",
+        "height": "100%",
+        "fontFamily": "monospace",
+        "fontSize": themeVars.fontSize.xLarge,
+        "::after": {
+            content: "''",
+            position: "absolute",
+            left: 0,
+            right: 0,
+            top: "50%",
+            height: 2,
+            transform: "translateY(-50%)",
+            backgroundColor: `rgb(from ${layerVars.contrast} r g b / 10%)`,
+        },
     },
-});
+]);
 
 export const line = style({
     display: "flex",
 });
+
+export const numbersLine = style([skinEntries.input, line]);

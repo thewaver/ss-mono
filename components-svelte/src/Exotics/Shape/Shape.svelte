@@ -42,6 +42,25 @@
         ),
     );
 
+    const fillClips = $derived(
+        fillDefs?.map((_def, index) => {
+            const clip = props.fillGeom?.[index]?.clip;
+
+            return (
+                clip && {
+                    id: clip.id,
+                    ...ShapeLayerUtils.computeFillClip(
+                        geometry.points,
+                        clip,
+                        paths[0].outerPath,
+                        geometry.joinRadii,
+                        geometry.lameExponents,
+                    ),
+                }
+            );
+        }),
+    );
+
     const viewBox = $derived(`0 0 ${rootSize.width} ${rootSize.height}`);
 </script>
 
@@ -60,20 +79,33 @@
         >
             <defs>
                 {#each fillDefs as def, index (index)}
+                    {@const fillClip = fillClips?.[index]}
                     <Markup markup={def.gradientOrPattern?.renderDefsElement()} />
                     <Markup markup={def.filter?.renderDefsElement()} />
-                    <Markup markup={def.clipPath?.renderDefsElement()} />
+                    {#if fillClip}
+                        <clipPath id={fillClip.id} clipPathUnits="userSpaceOnUse">
+                            <path d={fillClip.path} clip-rule={fillClip.rule} />
+                        </clipPath>
+                    {:else}
+                        <Markup markup={def.clipPath?.renderDefsElement()} />
+                    {/if}
                 {/each}
             </defs>
 
             {#each fillDefs as def, index (index)}
                 {@const paint = ShapeLayerUtils.computePaint(def)}
                 <path
-                    d={paths[0].outerPath}
+                    d={ShapeLayerUtils.computeFillPath(
+                        geometry.points,
+                        props.fillGeom?.[index],
+                        paths[0].outerPath,
+                        geometry.joinRadii,
+                        geometry.lameExponents,
+                    )}
                     fill={paint.fill}
                     fill-opacity={paint.fillOpacity}
                     filter={paint.filter}
-                    clip-path={paint.clipPath}
+                    clip-path={fillClips?.[index] ? `url(#${fillClips[index].id})` : paint.clipPath}
                     style:mix-blend-mode={paint.mixBlendMode}
                 />
             {/each}

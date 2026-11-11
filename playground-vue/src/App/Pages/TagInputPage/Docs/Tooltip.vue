@@ -26,10 +26,10 @@ const value = shallowRef(STARTING_TAGS);
 const tooltipDefs: InteractionTooltipDefs<TagInputFlags> = {
     placement: { x: "center", y: "top_out" },
     offset: { x: 0, y: 10 },
-    renderContent: ({ visibilityTarget, transitionDurationMs }) =>
+    renderContent: ({ visibilityTarget, transitionDurationMs, arrowAim }) =>
         h(
             PageTooltipContent,
-            { visibilityTarget, transitionDurationMs },
+            { visibilityTarget, transitionDurationMs, arrowAim },
             () => "Focusable so this tooltip can be read, but no tag may be added or removed.",
         ),
 };

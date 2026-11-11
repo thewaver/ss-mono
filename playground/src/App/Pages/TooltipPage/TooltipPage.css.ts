@@ -60,7 +60,6 @@ export const arrowBedLabel = style({
     width: ARROW_BED_BOX_SIZE.width,
     minHeight: ARROW_BED_BOX_SIZE.height,
     padding: themeVars.spacing.full,
-    color: themeVars.color.surface.contrast,
     fontFamily: "monospace",
     fontSize: themeVars.fontSize.xSmall,
     textAlign: "center",

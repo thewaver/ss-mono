@@ -5,6 +5,7 @@ import { Button, Modal } from "@thewaver/ss-components-react";
 import * as styles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
 import { CSSUtils } from "@thewaver/ss-utils";
 
+import { useNextLayerClass } from "../../StyledComponents/Layer/Layer.context";
 import { PageModalOverlay } from "../../StyledComponents/ModalOverlay/ModalOverlay";
 import { PageModalPanel } from "../../StyledComponents/ModalPanel/ModalPanel";
 import { PageTooltipContent } from "../../StyledComponents/TooltipContent/TooltipContent";
@@ -24,6 +25,7 @@ const SOURCE_MARK = "</>";
 const PREVIEW_KNOBS_CONTEXT = { setRenderKnobs: () => undefined };
 
 const PageExample = (props: ExampleProps) => {
+    const nextLayerClass = useNextLayerClass();
     const [renderKnobs, setRenderKnobs] = useState<() => ReactNode>();
 
     const knobsContext = useMemo(
@@ -35,12 +37,12 @@ const PageExample = (props: ExampleProps) => {
 
     return (
         <div
-            className={styles.exampleContainer}
+            className={[styles.exampleContainer, nextLayerClass].join(" ")}
             style={{ gridColumn: `span ${props.example.span ?? SINGLE_SPAN}` }}
             data-example=""
             data-testid={props.example.key}
         >
-            <PageLayer level={1}>
+            <PageLayer>
                 <div className={styles.exampleTitle}>
                     {`${props.example.name}:`}
                     <div className={styles.exampleActions}>
@@ -51,10 +53,17 @@ const PageExample = (props: ExampleProps) => {
                                 tooltipDefs={{
                                     placement: { x: "center", y: "top_out" },
                                     offset: { x: 0, y: 10 },
-                                    renderContent: (visibilityTarget, transitionDurationMs) => (
+                                    renderContent: (
+                                        visibilityTarget,
+                                        transitionDurationMs,
+                                        _placement,
+                                        _flags,
+                                        arrowAim,
+                                    ) => (
                                         <PageTooltipContent
                                             visibilityTarget={visibilityTarget}
                                             transitionDurationMs={transitionDurationMs}
+                                            arrowAim={arrowAim}
                                         >
                                             View source code
                                         </PageTooltipContent>

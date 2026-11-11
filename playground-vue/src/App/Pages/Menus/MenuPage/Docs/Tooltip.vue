@@ -19,8 +19,12 @@ defineProps<Props>();
 const tooltipDefs: InteractionTooltipDefs<MenuFlags> = {
     placement: { x: "center", y: "top_out" },
     offset: { x: 0, y: 10 },
-    renderContent: ({ visibilityTarget, transitionDurationMs }) =>
-        h(PageTooltipContent, { visibilityTarget, transitionDurationMs }, () => "Cut, copy or paste what is selected."),
+    renderContent: ({ visibilityTarget, transitionDurationMs, arrowAim }) =>
+        h(
+            PageTooltipContent,
+            { visibilityTarget, transitionDurationMs, arrowAim },
+            () => "Cut, copy or paste what is selected.",
+        ),
 };
 </script>
 

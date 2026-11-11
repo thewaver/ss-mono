@@ -1,4 +1,5 @@
 <script lang="ts">
+    import type { ShapeArrowAim } from "@thewaver/ss-utils";
     import { Checkbox } from "@thewaver/ss-components-svelte";
 
     import PageCheckboxContent from "../../../StyledComponents/CheckboxContent/CheckboxContent.svelte";
@@ -29,6 +30,6 @@
     {/snippet}
 </Checkbox>
 
-{#snippet tooltip(visibilityTarget: 0 | 1, transitionDurationMs: number)}
-    <PageTooltipContent {visibilityTarget} {transitionDurationMs}>A tooltip on a checkbox.</PageTooltipContent>
+{#snippet tooltip(visibilityTarget: 0 | 1, transitionDurationMs: number, _placement: unknown, _flags: unknown, arrowAim: ShapeArrowAim | undefined)}
+    <PageTooltipContent {visibilityTarget} {transitionDurationMs} {arrowAim}>A tooltip on a checkbox.</PageTooltipContent>
 {/snippet}

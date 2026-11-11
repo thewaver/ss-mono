@@ -33,6 +33,8 @@ export namespace ShapeKnobs {
     export const STARTING_SHOULD_PAD_CHILDREN = true;
     export const STARTING_SHAPE_KIND: ShapeConst.DefaultShape = "square";
     export const STARTING_TEXT_WRAP_SHAPE_KIND: ShapeConst.DefaultShape = "lozenge";
+    export const STARTING_FROM_CSS_TEXT =
+        "background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 30%, transparent 35%) right 10px top 10px / 40px 40px space, linear-gradient(120deg, #e8590c, #5f3dc4); border: 12px solid; border-image: linear-gradient(90deg, #ffd43b, #12b886, #228be6, #f06595) 24 round; border-radius: 80px / 40px; corner-shape: squircle; box-shadow: inset 0 6px 12px 2px rgba(0, 0, 0, 0.5), 0 14px 24px -6px rgba(0, 0, 0, 0.8)";
     export const STARTING_EDGE_THICKNESS = 4;
     export const STARTING_STAR_POINTS = 4;
     export const STARTING_JOIN_RADII: number[] = [40, 40, 40, 40, 40, 40];

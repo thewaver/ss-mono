@@ -128,7 +128,7 @@ export const RevealPage = () => {
                     itemKey={"lameExponents"}
                     label={"Lamé Exponent"}
                     hint={
-                        "How square or how pinched the window's rounded corners are: 2 is a circular round, higher is squarer."
+                        "How square or how pinched the window's rounded corners are: 1 is a circular round, higher is squarer."
                     }
                     controls={"Sets every corner of RevealProps.lameExponents"}
                 >

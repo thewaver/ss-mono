@@ -4,19 +4,24 @@ import { access } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/SidebarContent/SidebarContent.css";
 
 import { PageLayer } from "../../PageComponents/Layer/Layer";
+import { useNextLayerClass } from "../Layer/Layer.context";
 import type { SidebarFadeProps, SidebarFrameProps, SidebarSurfaceProps } from "./SidebarContentSolid.types";
 
 export const PageSidebarFrame = (props: ParentProps<SidebarFrameProps>) => (
     <div class={[styles.sidebarFrame, styles.sidebarFrameVariants[access(props.edge)]].join(" ")}>{props.children}</div>
 );
 
-export const PageSidebarSurface = (props: ParentProps<SidebarSurfaceProps>) => (
-    <div class={styles.sidebarSurface}>
-        <div class={styles.sidebarSurfaceContent} style={{ width: `${access(props.width)}px` }}>
-            <PageLayer level={1}>{props.children}</PageLayer>
+export const PageSidebarSurface = (props: ParentProps<SidebarSurfaceProps>) => {
+    const getNextLayerClass = useNextLayerClass();
+
+    return (
+        <div class={[styles.sidebarSurface, getNextLayerClass()].join(" ")}>
+            <div class={styles.sidebarSurfaceContent} style={{ width: `${access(props.width)}px` }}>
+                <PageLayer>{props.children}</PageLayer>
+            </div>
         </div>
-    </div>
-);
+    );
+};
 
 export const PageSidebarFade = (props: ParentProps<SidebarFadeProps>) => (
     <div

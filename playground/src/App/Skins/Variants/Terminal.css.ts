@@ -190,12 +190,7 @@ SkinUtils.define(terminal, {
         },
     },
     drawer: {
-        border: [
-            `2px solid ${themeVars.color.surface.contrast}`,
-            `2px solid rgb( from ${themeVars.color.surface.contrast} r g b / 25%)`,
-        ],
-        backgroundColor: themeVars.color.surface.main,
-        color: themeVars.color.surface.contrast,
+        ...surface(layerVars),
     },
     dropdown: {
         ...INPUT_SHELL,
@@ -253,18 +248,15 @@ SkinUtils.define(terminal, {
         backdropFilter: "blur(20px) grayscale(75%)",
     },
     pageBackground: {
-        backgroundColor: themeVars.color.background.dark,
-        color: themeVars.color.background.contrast,
+        backgroundColor: themeVars.color.layers.level0.dark,
+        color: themeVars.color.layers.level0.contrast,
         fontFamily: "monospace",
     },
     pageContainer: {
-        ...surface(SkinUtils.extendColor(layerVars)),
+        ...surface(layerVars),
     },
     panel: {
-        border: [
-            `2px solid ${themeVars.color.surface.contrast}`,
-            `2px solid rgb( from ${themeVars.color.surface.contrast} r g b / 25%)`,
-        ],
+        border: [`2px solid ${layerVars.contrast}`, `2px solid rgb( from ${layerVars.contrast} r g b / 25%)`],
         backgroundColor: [layerVars.main, `rgb(from ${layerVars.main} r g b / 50%)`],
         color: layerVars.contrast,
     },
@@ -364,7 +356,7 @@ SkinUtils.define(terminal, {
         fontWeight: "bold",
     },
     surface: {
-        ...surface(themeVars.color.surface),
+        ...surface(layerVars),
     },
     tabsItemBase: {
         paddingBlock: themeVars.spacing.full,
@@ -421,6 +413,7 @@ SkinUtils.define(terminal, {
         },
     },
     tooltip: {
+        border: [`2px solid ${layerVars.contrast}`, `2px solid rgb( from ${layerVars.contrast} r g b / 25%)`],
         backgroundColor: layerVars.main,
         color: layerVars.contrast,
     },

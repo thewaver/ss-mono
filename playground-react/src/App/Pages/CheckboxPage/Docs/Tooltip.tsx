@@ -22,7 +22,7 @@ export const TooltipDocsExample = (props: Props) => {
                 placement: { x: "center", y: "top_out" },
                 offset: { x: 0, y: 10 },
                 hoverShowDelayMs: 0,
-                renderContent: (visibilityTarget, transitionDurationMs) => (
+                renderContent: (visibilityTarget, transitionDurationMs, _placement, _flags, arrowAim) => (
                     <PageTooltipContent visibilityTarget={visibilityTarget} transitionDurationMs={transitionDurationMs}>
                         A tooltip on a checkbox.
                     </PageTooltipContent>

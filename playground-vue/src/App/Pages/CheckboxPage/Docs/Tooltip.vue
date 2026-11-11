@@ -18,8 +18,8 @@ const tooltipDefs: InteractionTooltipDefs<BinarySwitchFlags> = {
     placement: { x: "center", y: "top_out" },
     offset: { x: 0, y: 10 },
     hoverShowDelayMs: 0,
-    renderContent: ({ visibilityTarget, transitionDurationMs }) =>
-        h(PageTooltipContent, { visibilityTarget, transitionDurationMs }, () => "A tooltip on a checkbox."),
+    renderContent: ({ visibilityTarget, transitionDurationMs, arrowAim }) =>
+        h(PageTooltipContent, { visibilityTarget, transitionDurationMs, arrowAim }, () => "A tooltip on a checkbox."),
 };
 </script>
 

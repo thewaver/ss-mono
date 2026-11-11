@@ -1,4 +1,5 @@
 <script lang="ts">
+    import type { ShapeArrowAim } from "@thewaver/ss-utils";
     import { FileInput } from "@thewaver/ss-components-svelte";
 
     import PageFileInputContent from "../../../StyledComponents/FileInputContent/FileInputContent.svelte";
@@ -29,8 +30,8 @@
     {/snippet}
 </FileInput>
 
-{#snippet tooltip(visibilityTarget: 0 | 1, transitionDurationMs: number)}
-    <PageTooltipContent {visibilityTarget} {transitionDurationMs}>
+{#snippet tooltip(visibilityTarget: 0 | 1, transitionDurationMs: number, _placement: unknown, _flags: unknown, arrowAim: ShapeArrowAim | undefined)}
+    <PageTooltipContent {visibilityTarget} {transitionDurationMs} {arrowAim}>
         Focusable so this tooltip can be read, but the file dialog must not open.
     </PageTooltipContent>
 {/snippet}

@@ -19,10 +19,10 @@ const value = shallowRef("");
 const tooltipDefs: InteractionTooltipDefs<TextFieldFlags> = {
     placement: { x: "center", y: "top_out" },
     offset: { x: 0, y: 10 },
-    renderContent: ({ visibilityTarget, transitionDurationMs }) =>
+    renderContent: ({ visibilityTarget, transitionDurationMs, arrowAim }) =>
         h(
             PageTooltipContent,
-            { visibilityTarget, transitionDurationMs },
+            { visibilityTarget, transitionDurationMs, arrowAim },
             () => "Focusable so this tooltip can be read, but nothing typed may reach the cells.",
         ),
 };

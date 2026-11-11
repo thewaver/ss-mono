@@ -2,6 +2,7 @@
     import type { Snippet } from "svelte";
 
     import type { AnchorPlacement, SelectOption } from "@thewaver/ss-components-svelte";
+    import type { ShapeArrowAim } from "@thewaver/ss-utils";
 
     import PagePopoverSurface from "../../StyledComponents/PopoverSurface/PopoverSurface.svelte";
     import PageTooltipContent from "../../StyledComponents/TooltipContent/TooltipContent.svelte";
@@ -38,14 +39,14 @@
     export { renderSelectPopup };
 </script>
 
-{#snippet denmarkTooltip(visibilityTarget: 0 | 1, transitionDurationMs: number)}
-    <PageTooltipContent {visibilityTarget} {transitionDurationMs}>
+{#snippet denmarkTooltip(visibilityTarget: 0 | 1, transitionDurationMs: number, _placement: unknown, _flags: unknown, arrowAim: ShapeArrowAim | undefined)}
+    <PageTooltipContent {visibilityTarget} {transitionDurationMs} {arrowAim}>
         Not shipping here until the new depot opens.
     </PageTooltipContent>
 {/snippet}
 
-{#snippet finlandTooltip(visibilityTarget: 0 | 1, transitionDurationMs: number)}
-    <PageTooltipContent {visibilityTarget} {transitionDurationMs}>
+{#snippet finlandTooltip(visibilityTarget: 0 | 1, transitionDurationMs: number, _placement: unknown, _flags: unknown, arrowAim: ShapeArrowAim | undefined)}
+    <PageTooltipContent {visibilityTarget} {transitionDurationMs} {arrowAim}>
         Out of stock for the rest of the quarter.
     </PageTooltipContent>
 {/snippet}

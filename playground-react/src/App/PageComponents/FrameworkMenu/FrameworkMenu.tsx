@@ -43,7 +43,7 @@ export const PageFrameworkMenu = () => {
             )}
             renderHighlightFloater={renderPageHighlightFloater}
             renderPopup={(renderItems, visibilityTarget, transitionDurationMs, placement) => (
-                <PageLayer level={2}>
+                <PageLayer>
                     <PagePopoverSurface
                         visibilityTarget={visibilityTarget}
                         transitionDurationMs={transitionDurationMs}

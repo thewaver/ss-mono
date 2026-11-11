@@ -57,7 +57,7 @@
     {/snippet}
 
     {#snippet renderPanel(renderLinks, visibilityTarget, transitionDurationMs, placement, size)}
-        <PageLayer level={2}>
+        <PageLayer>
             <PagePopoverSurface {visibilityTarget} {transitionDurationMs} {placement}>
                 <div
                     class={styles.flyoutMenuPanelBody}

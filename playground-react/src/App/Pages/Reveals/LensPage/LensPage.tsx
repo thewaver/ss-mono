@@ -137,7 +137,7 @@ export const LensPage = () => {
                     itemKey={"lameExponents"}
                     label={"Lamé Exponent"}
                     hint={
-                        "How square or how pinched the lens's rounded corners are: 2 is a circular round, higher is squarer."
+                        "How square or how pinched the lens's rounded corners are: 1 is a circular round, higher is squarer."
                     }
                     controls={"Sets every corner of LensProps.lameExponents"}
                 >

@@ -108,7 +108,7 @@
         itemKey={"lameExponent"}
         controls={"Sets ShapeProps.lameExponents"}
         label={"Lamé Exponent"}
-        hint={"How square or how pinched each rounded corner is: 2 is a circular round, higher is squarer, lower is pinched inward."}
+        hint={"How square or how pinched each rounded corner is: 1 is a circular round, higher is squarer, 0 is a straight bevel and below 0 scoops inward."}
     >
         <div class={styles.valueList} style:grid-template-columns={templateColumns}>
             {#each pointIterator as index (index)}

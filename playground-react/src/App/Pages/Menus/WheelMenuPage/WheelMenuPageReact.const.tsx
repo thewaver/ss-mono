@@ -120,6 +120,6 @@ export const renderWheelPopup = (
             transition: `opacity ${transitionDurationMs}ms, transform ${transitionDurationMs}ms`,
         }}
     >
-        <PageLayer level={2}>{renderItems()}</PageLayer>
+        <PageLayer>{renderItems()}</PageLayer>
     </div>
 );

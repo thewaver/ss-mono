@@ -1,4 +1,5 @@
 <script lang="ts">
+    import type { ShapeArrowAim } from "@thewaver/ss-utils";
     import type { Snippet } from "svelte";
 
     import { Button } from "@thewaver/ss-components-svelte";
@@ -8,12 +9,15 @@
     import { setExampleKnobsContext } from "../ExampleKnobs/ExampleKnobs.context";
     import PageExampleKnobsButton from "../ExampleKnobs/PageExampleKnobsButton.svelte";
     import PageLayer from "../Layer/Layer.svelte";
+    import { getNextLayerClass } from "../../StyledComponents/Layer/Layer.context";
     import type { ExampleProps } from "./Examples.types";
 
     const SINGLE_SPAN = 1;
     const SOURCE_MARK = "</>";
 
     let props: ExampleProps = $props();
+
+    const getNextLayerClassName = getNextLayerClass();
 
     let renderKnobs = $state.raw<Snippet>();
 
@@ -25,12 +29,12 @@
 </script>
 
 <div
-    class={styles.exampleContainer}
+    class={[styles.exampleContainer, getNextLayerClassName()]}
     style:grid-column={`span ${props.example.span ?? SINGLE_SPAN}`}
     data-example=""
     data-testid={props.example.key}
 >
-    <PageLayer level={1}>
+    <PageLayer>
         <div class={styles.exampleTitle}>
             {`${props.example.name}:`}
             <div class={styles.exampleActions}>
@@ -75,6 +79,6 @@
     </PageLayer>
 </div>
 
-{#snippet sourceTooltip(visibilityTarget: 0 | 1, transitionDurationMs: number)}
-    <PageTooltipContent {visibilityTarget} {transitionDurationMs}>View source code</PageTooltipContent>
+{#snippet sourceTooltip(visibilityTarget: 0 | 1, transitionDurationMs: number, _placement: unknown, _flags: unknown, arrowAim: ShapeArrowAim | undefined)}
+    <PageTooltipContent {visibilityTarget} {transitionDurationMs} {arrowAim}>View source code</PageTooltipContent>
 {/snippet}

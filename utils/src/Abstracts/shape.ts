@@ -33,6 +33,17 @@ type ShapePaths = {
 };
 
 /**
+ * How far one corner is rounded.
+ *
+ * A single number rounds it evenly. A pair sets the reach along each edge separately, which is what an elliptical
+ * corner is: the first number is how far the curve starts back along the edge arriving at the corner, the second how
+ * far it ends along the edge leaving it. If either number of a pair is zero or less, the corner is sharp. With a stroke,
+ * a pair's inner curve takes each reach less the thickness of the other edge, as a CSS border does, while a single
+ * number takes the thicker edge's thickness off both.
+ */
+export type ShapeJoinRadius = number | [number, number];
+
+/**
  * A contour together with the lists that style it, matched to its corners and edges by position.
  *
  * This is everything {@link ShapeUtils.getPaths} reads about a shape apart from its offset, gathered so that a
@@ -43,7 +54,7 @@ type ShapePaths = {
  */
 export type ShapeGeometry = {
     points: Point2d[];
-    joinRadii?: number[];
+    joinRadii?: ShapeJoinRadius[];
     lameExponents?: number[];
     strokeThicknesses?: number[][];
 };
@@ -84,6 +95,12 @@ type ArrowVertex = {
     point: Point2d;
     corner: number;
     edge: number;
+};
+
+const getJoinReaches = (radius: ShapeJoinRadius): [number, number] => {
+    if (typeof radius === "number") return [radius, radius];
+
+    return Math.min(radius[0], radius[1]) > 0 ? radius : [0, 0];
 };
 
 /** The corners a walk along the contour passes, from one contour point forward to another. */
@@ -274,7 +291,7 @@ export namespace ShapeConst {
 
     export const CORNER_SHAPE_LAME_EXPONENTS = {
         square: Infinity,
-        squircle: 2,
+        squircle: 3,
         round: 1,
         bevel: 0,
         scoop: -1,
@@ -576,7 +593,7 @@ export namespace ShapeUtils {
      * @param vertices The shape's corners, in order.
      * @param edgeThicknesses Stroke thickness per edge. Short lists are padded by
      * repeating the last entry, CSS-shorthand style.
-     * @param joinRadii Corner radius per corner, padded the same way. Radii too large
+     * @param joinRadii Corner radius per corner, padded the same way; see {@link ShapeJoinRadius}. Radii too large
      * for their edge are scaled down together so neighbors never overlap.
      * @param lameExponents Corner style per corner. See
      * {@link ShapeConst.CORNER_SHAPE_LAME_EXPONENTS}.
@@ -588,7 +605,7 @@ export namespace ShapeUtils {
     export const setupPaths = (
         vertices: Point2d[],
         edgeThicknesses: number[],
-        joinRadii?: number[],
+        joinRadii?: ShapeJoinRadius[],
         lameExponents?: number[],
         offset: number = 0,
     ) => {
@@ -600,12 +617,15 @@ export namespace ShapeUtils {
         };
 
         const hasThickness = common.edgeThicknesses.some((t) => t !== 0);
-        const rawJoinRadii = ObjectUtils.padArray(joinRadii ?? [], 0, vertexCount);
-        const hasRadii = rawJoinRadii.some((r) => r > 0);
+        const paddedJoinRadii = ObjectUtils.padArray<ShapeJoinRadius>(joinRadii ?? [], 0, vertexCount);
+        const rawJoinReaches = paddedJoinRadii.map(getJoinReaches);
+        const hasRadii = rawJoinReaches.some(([before, after]) => before > 0 || after > 0);
 
         const outer = {
             vertices: [] as Point2d[],
             joinRadii: [] as number[],
+            joinReaches: [] as [number, number][],
+            isPairedJoin: paddedJoinRadii.map((radius) => typeof radius !== "number"),
         };
 
         const inner = {
@@ -622,7 +642,7 @@ export namespace ShapeUtils {
         if (vertexCount < 3) return { outer, inner, common, vectors, hasThickness, hasRadii };
 
         if (!hasRadii) {
-            outer.joinRadii = rawJoinRadii;
+            outer.joinReaches = rawJoinReaches;
         } else {
             const edgeScaleFactors = new Array(vertexCount).fill(1);
             const tangentLengthFactors = vertices.map((vertex, i) => {
@@ -648,8 +668,8 @@ export namespace ShapeUtils {
                     vertices[nextIndex].y - vertices[i].y,
                 );
                 const thickness = common.edgeThicknesses[i];
-                const rCurrent = rawJoinRadii[i] * tangentLengthFactors[i];
-                const rNext = rawJoinRadii[nextIndex] * tangentLengthFactors[nextIndex];
+                const rCurrent = rawJoinReaches[i][1] * tangentLengthFactors[i];
+                const rNext = rawJoinReaches[nextIndex][0] * tangentLengthFactors[nextIndex];
                 const kCurrent = common.lameExponents[i];
                 const kNext = common.lameExponents[nextIndex];
                 const thicknessOverhead = (kCurrent < 0 ? thickness : 0) + (kNext < 0 ? thickness : 0);
@@ -663,14 +683,16 @@ export namespace ShapeUtils {
                 }
             }
 
-            outer.joinRadii = rawJoinRadii.map((r, i) => {
+            outer.joinReaches = rawJoinReaches.map(([before, after], i): [number, number] => {
                 const prevEdgeIndex = (i - 1 + vertexCount) % vertexCount;
                 const currEdgeIndex = i;
                 const strictFactor = Math.min(edgeScaleFactors[prevEdgeIndex], edgeScaleFactors[currEdgeIndex]);
 
-                return r * strictFactor;
+                return [before * strictFactor, after * strictFactor];
             });
         }
+
+        outer.joinRadii = outer.joinReaches.map(([before, after]) => Math.max(before, after));
 
         const { totalX, totalY } = vertices.reduce(
             (acc, curr) => ({ totalX: acc.totalX + curr.x, totalY: acc.totalY + curr.y }),
@@ -768,7 +790,7 @@ export namespace ShapeUtils {
      * @param edgeThicknesses Stroke thickness per edge. Short lists are padded by
      * repeating the last entry, CSS-shorthand style. All zeroes means no stroke, and
      * the inner path then matches the outer one.
-     * @param joinRadii Corner radius per corner, padded the same way.
+     * @param joinRadii Corner radius per corner, padded the same way; see {@link ShapeJoinRadius}.
      * @param lameExponents Corner style per corner. See
      * {@link ShapeConst.CORNER_SHAPE_LAME_EXPONENTS}.
      * @param offset Pushes the whole contour outwards. Negative pulls it in.
@@ -782,7 +804,7 @@ export namespace ShapeUtils {
     export const getPaths = (
         vertices: Point2d[],
         edgeThicknesses: number[],
-        joinRadii?: number[],
+        joinRadii?: ShapeJoinRadius[],
         lameExponents?: number[],
         offset: number = 0,
     ): ShapePaths => {
@@ -901,33 +923,31 @@ export namespace ShapeUtils {
             const currNormal = unitNormals[i];
             const crossCheck = crossChecks[i];
             const outerRadius = outer.joinRadii[i];
+            const [reachBefore, reachAfter] = outer.joinReaches[i];
             const isReflex = currTangent.x * prevNormal.x + currTangent.y * prevNormal.y > 0;
             const side = isReflex ? -1 : 1;
 
-            const prevArcRefPt = {
-                x: vertex.x + (offset - side * outerRadius) * prevNormal.x,
-                y: vertex.y + (offset - side * outerRadius) * prevNormal.y,
+            const computeOuterArcEnd = (radius: number, normal: Point2d) => {
+                const prevArcRefPt = {
+                    x: vertex.x + (offset - side * radius) * prevNormal.x,
+                    y: vertex.y + (offset - side * radius) * prevNormal.y,
+                };
+                const currArcRefPt = {
+                    x: vertex.x + (offset - side * radius) * currNormal.x,
+                    y: vertex.y + (offset - side * radius) * currNormal.y,
+                };
+                const outerIntersectionScale =
+                    ((currArcRefPt.x - prevArcRefPt.x) * currTangent.y -
+                        (currArcRefPt.y - prevArcRefPt.y) * currTangent.x) /
+                    crossCheck;
+
+                return {
+                    x: prevArcRefPt.x + outerIntersectionScale * prevTangent.x + side * radius * normal.x,
+                    y: prevArcRefPt.y + outerIntersectionScale * prevTangent.y + side * radius * normal.y,
+                };
             };
-            const currArcRefPt = {
-                x: vertex.x + (offset - side * outerRadius) * currNormal.x,
-                y: vertex.y + (offset - side * outerRadius) * currNormal.y,
-            };
-            const outerIntersectionScale =
-                ((currArcRefPt.x - prevArcRefPt.x) * currTangent.y -
-                    (currArcRefPt.y - prevArcRefPt.y) * currTangent.x) /
-                crossCheck;
-            const cornerArcCenter = {
-                x: prevArcRefPt.x + outerIntersectionScale * prevTangent.x,
-                y: prevArcRefPt.y + outerIntersectionScale * prevTangent.y,
-            };
-            const outerArcStart = {
-                x: cornerArcCenter.x + side * outerRadius * prevNormal.x,
-                y: cornerArcCenter.y + side * outerRadius * prevNormal.y,
-            };
-            const outerArcEnd = {
-                x: cornerArcCenter.x + side * outerRadius * currNormal.x,
-                y: cornerArcCenter.y + side * outerRadius * currNormal.y,
-            };
+            const outerArcStart = computeOuterArcEnd(reachBefore, prevNormal);
+            const outerArcEnd = computeOuterArcEnd(reachAfter, currNormal);
 
             const outerPts = generatePolylineCorner(
                 outerArcStart,
@@ -962,42 +982,43 @@ export namespace ShapeUtils {
             const currThickness = common.edgeThicknesses[i];
             const maxThickness = Math.max(prevThickness, currThickness);
             const isConcave = kappa < 0;
-            const innerRadius = outerRadius - side * maxThickness;
-            const fallbackInnerRadius = inner.joinRadii[i];
+            const isPaired = outer.isPairedJoin[i];
+            const innerReachBefore = isPaired ? reachBefore - side * currThickness : outerRadius - side * maxThickness;
+            const innerReachAfter = isPaired ? reachAfter - side * prevThickness : outerRadius - side * maxThickness;
+            const innerRadius = Math.min(innerReachBefore, innerReachAfter);
             const sharpInnerIntersection = inner.vertices[i];
 
-            if (!isConcave && !isReflex && (innerRadius <= 0 || fallbackInnerRadius <= 0)) {
+            if (!isConcave && !isReflex && innerRadius <= 0) {
                 innerPathSegments.push(
                     `L ${sharpInnerIntersection.x.toFixed(3)} ${sharpInnerIntersection.y.toFixed(3)}`,
                 );
                 innerStartPoints.push(sharpInnerIntersection);
                 innerEndPoints.push(sharpInnerIntersection);
             } else {
-                const layoutRadius = isConcave ? outerRadius : innerRadius;
-                const prevInnerArcRefPt = {
-                    x: vertex.x + (offset - prevThickness - side * layoutRadius) * prevNormal.x,
-                    y: vertex.y + (offset - prevThickness - side * layoutRadius) * prevNormal.y,
+                const computeInnerArcEnd = (radius: number, normal: Point2d) => {
+                    const prevInnerArcRefPt = {
+                        x: vertex.x + (offset - prevThickness - side * radius) * prevNormal.x,
+                        y: vertex.y + (offset - prevThickness - side * radius) * prevNormal.y,
+                    };
+                    const currInnerArcRefPt = {
+                        x: vertex.x + (offset - currThickness - side * radius) * currNormal.x,
+                        y: vertex.y + (offset - currThickness - side * radius) * currNormal.y,
+                    };
+                    const innerIntersectionScale =
+                        ((currInnerArcRefPt.x - prevInnerArcRefPt.x) * currTangent.y -
+                            (currInnerArcRefPt.y - prevInnerArcRefPt.y) * currTangent.x) /
+                        crossCheck;
+
+                    return {
+                        x: prevInnerArcRefPt.x + innerIntersectionScale * prevTangent.x + side * radius * normal.x,
+                        y: prevInnerArcRefPt.y + innerIntersectionScale * prevTangent.y + side * radius * normal.y,
+                    };
                 };
-                const currInnerArcRefPt = {
-                    x: vertex.x + (offset - currThickness - side * layoutRadius) * currNormal.x,
-                    y: vertex.y + (offset - currThickness - side * layoutRadius) * currNormal.y,
-                };
-                const innerIntersectionScale =
-                    ((currInnerArcRefPt.x - prevInnerArcRefPt.x) * currTangent.y -
-                        (currInnerArcRefPt.y - prevInnerArcRefPt.y) * currTangent.x) /
-                    crossCheck;
-                const innerCornerArcCenter = {
-                    x: prevInnerArcRefPt.x + innerIntersectionScale * prevTangent.x,
-                    y: prevInnerArcRefPt.y + innerIntersectionScale * prevTangent.y,
-                };
-                const innerArcStart = {
-                    x: innerCornerArcCenter.x + side * layoutRadius * prevNormal.x,
-                    y: innerCornerArcCenter.y + side * layoutRadius * prevNormal.y,
-                };
-                const innerArcEnd = {
-                    x: innerCornerArcCenter.x + side * layoutRadius * currNormal.x,
-                    y: innerCornerArcCenter.y + side * layoutRadius * currNormal.y,
-                };
+                const layoutReachBefore = isConcave ? reachBefore : innerReachBefore;
+                const layoutReachAfter = isConcave ? reachAfter : innerReachAfter;
+                const layoutRadius = Math.max(layoutReachBefore, layoutReachAfter);
+                const innerArcStart = computeInnerArcEnd(layoutReachBefore, prevNormal);
+                const innerArcEnd = computeInnerArcEnd(layoutReachAfter, currNormal);
 
                 const innerPts = generatePolylineCorner(
                     innerArcStart,
@@ -1055,7 +1076,7 @@ export namespace ShapeUtils {
      *
      * @param edgeThicknesses Stroke thickness per side, in CSS order: top, right,
      * bottom, left. Short lists are padded by repeating the last entry.
-     * @param joinRadii Corner radius per corner, padded the same way.
+     * @param joinRadii Corner radius per corner, padded the same way; a pair counts as its larger reach.
      * @param lameExponents Corner style per corner. See
      * {@link ShapeConst.CORNER_SHAPE_LAME_EXPONENTS}.
      * @returns CSS padding, ready to spread onto a style object.
@@ -1063,19 +1084,19 @@ export namespace ShapeUtils {
 
     export const getRectPadding = (
         edgeThicknesses: number[],
-        joinRadii?: number[],
+        joinRadii?: ShapeJoinRadius[],
         lameExponents?: number[],
     ): CSS.PropertiesHyphen => {
         const count = 4;
 
         const et = ObjectUtils.padArray(edgeThicknesses, 0, count);
-        const jr = ObjectUtils.padArray(joinRadii ?? [], 0, count);
+        const jr = ObjectUtils.padArray<ShapeJoinRadius>(joinRadii ?? [], 0, count);
         const le = ObjectUtils.padArray(lameExponents ?? [], CIRCLE_KAPPA, count);
 
         const getCornerPadding = (index: number) => {
             const t = et[index];
             const e = le[index];
-            const r = jr[index];
+            const r = Math.max(...getJoinReaches(jr[index]));
             const cssExponent = e >= 0 ? e + 1 : 1 / (1 - e);
             const fOut = Math.pow(0.5, 1 / cssExponent);
             const cornerIntrusion = r * (1 - fOut) + t * Math.SQRT1_2;
@@ -1208,11 +1229,11 @@ export namespace ShapeUtils {
             getArea(coveringForward) >= getArea(coveringBackward) ? coveringForward : coveringBackward,
         );
 
-        const spreadCorners = (
-            values: number[] | undefined,
-            arrowValues: [number, number, number] | undefined,
-            defaultValue: number,
-            noArrowValues: [number, number, number],
+        const spreadCorners = <T>(
+            values: T[] | undefined,
+            arrowValues: [T, T, T] | undefined,
+            defaultValue: T,
+            noArrowValues: [T, T, T],
         ) => {
             if (!values && !arrowValues) return undefined;
 
@@ -1224,7 +1245,7 @@ export namespace ShapeUtils {
 
         return {
             points: vertices.map((vertex) => vertex.point),
-            joinRadii: spreadCorners(geometry.joinRadii, template.joinRadii, 0, NO_ARROW_RADII),
+            joinRadii: spreadCorners<ShapeJoinRadius>(geometry.joinRadii, template.joinRadii, 0, NO_ARROW_RADII),
             lameExponents: spreadCorners(
                 geometry.lameExponents,
                 template.lameExponents,

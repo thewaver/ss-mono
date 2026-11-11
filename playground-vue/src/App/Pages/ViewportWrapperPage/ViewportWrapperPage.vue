@@ -39,8 +39,8 @@ const INNER_TOAST_MARGINS = {
 const renderTooltip = (text: string): InteractionTooltipDefs<SelectFlags> => ({
     placement: { x: "center", y: "top_out" } as const,
     offset: { x: 0, y: 10 },
-    renderContent: ({ visibilityTarget, transitionDurationMs }) =>
-        h(PageTooltipContent, { visibilityTarget, transitionDurationMs }, () => text),
+    renderContent: ({ visibilityTarget, transitionDurationMs, arrowAim }) =>
+        h(PageTooltipContent, { visibilityTarget, transitionDurationMs, arrowAim }, () => text),
 });
 
 const ROAMING_TOOLTIP_DEFS = renderTooltip("My tooltip has the same boundary I do.");

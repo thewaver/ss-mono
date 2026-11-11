@@ -42,7 +42,7 @@ export const PageArticle = (props: PageArticleProps) => {
                                 );
                             case "code":
                                 return (
-                                    <PageLayer key={index} level={1}>
+                                    <PageLayer key={index}>
                                         <PageCodeBox source={AboutPageUtils.toCodeHtml(block.language, block.source)} />
                                     </PageLayer>
                                 );

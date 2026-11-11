@@ -132,7 +132,7 @@
 {#snippet counterExample()}
     <div class={styles.stack}>
         <PageMeasureBox>
-            <div class={styles.line}>
+            <div class={styles.numbersLine}>
                 <CounterExample {...commonProps} />
             </div>
         </PageMeasureBox>
@@ -144,7 +144,7 @@
 {#snippet reelsExample()}
     <div class={styles.stack}>
         <PageMeasureBox>
-            <div class={styles.line}>
+            <div class={styles.numbersLine}>
                 <ReelsExample text={pad(reelValue)} {reelKey} />
             </div>
         </PageMeasureBox>
@@ -188,7 +188,7 @@
 {#snippet splitFlapExample()}
     <div class={styles.stack}>
         <PageMeasureBox>
-            <div class={styles.line}>
+            <div class={styles.numbersLine}>
                 <SplitFlapExample {...commonProps} />
             </div>
         </PageMeasureBox>
@@ -200,7 +200,7 @@
 {#snippet wordsExample()}
     <div class={styles.stack}>
         <PageMeasureBox>
-            <div class={styles.line}>
+            <div class={styles.numbersLine}>
                 <WordsExample {...commonProps} text={WORDS[wordIndex]} mechanism={wordMechanism} {letterRoute} />
             </div>
         </PageMeasureBox>

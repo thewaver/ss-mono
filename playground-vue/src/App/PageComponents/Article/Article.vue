@@ -33,7 +33,7 @@ defineProps<PageArticleProps>();
                     </li>
                 </ul>
 
-                <PageLayer v-else :level="1">
+                <PageLayer v-else>
                     <PageCodeBox :source="AboutPageUtils.toCodeHtml(block.language, block.source)" />
                 </PageLayer>
             </template>

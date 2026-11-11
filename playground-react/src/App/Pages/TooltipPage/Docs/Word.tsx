@@ -24,7 +24,7 @@ export const WordDocsExample = () => {
                 placement={{ x: "center", y: "top_out" }}
                 offset={{ x: 0, y: 10 }}
                 hoverShowDelayMs={TOOLTIP_HOVER_DELAY_MS}
-                renderContent={(visibilityTarget, transitionDurationMs) => (
+                renderContent={(visibilityTarget, transitionDurationMs, _placement, arrowAim) => (
                     <PageTooltipContent visibilityTarget={visibilityTarget} transitionDurationMs={transitionDurationMs}>
                         A weight of silver, not a coin — eight ounces, counted rather than struck.
                     </PageTooltipContent>

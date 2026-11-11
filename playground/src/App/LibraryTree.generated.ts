@@ -160,7 +160,7 @@ export const LIBRARY: TreemapNode<string> = branch(
             leaf("PointerEffects files", 236),
         ),
         branch("Reveals", leaf("Lens", 288), leaf("Reveal", 355), leaf("ScratchCard", 671)),
-        leaf("Shape", 340),
+        leaf("Shape", 482),
         leaf("SortableGrid", 1924),
         branch(
             "Text",
@@ -195,6 +195,7 @@ export const LIBRARY: TreemapNode<string> = branch(
             leaf("SVGFilters", 1219),
             leaf("SVGGradients", 348),
             leaf("SVGPatterns", 83),
+            leaf("SVGStyles", 1405),
             leaf("SVGDefs files", 25),
         ),
         leaf("SliceAnimationBreakpoints", 99),
@@ -250,5 +251,5 @@ export const LIBRARY: TreemapNode<string> = branch(
         branch("Staircase", leaf("Indents", 49)),
     ),
     leaf("Utils", 116),
-    leaf("src files", 1300),
+    leaf("src files", 1303),
 );

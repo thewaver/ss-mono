@@ -414,6 +414,7 @@ export type * from "./Generators/SVGDefs/SVGGradients/PaintAreaSolid.context.typ
 export type * from "./Generators/SVGDefs/SVGGradients/SVGGradientDefsSolid.types";
 export * from "./Generators/SVGDefs/SVGGradients/SVGGradientDefsSolid.utils";
 export * from "./Generators/SVGDefs/SVGPatterns/SVGPatternDefsSolid.utils";
+export * from "./Generators/SVGDefs/SVGStyles/SVGStyleDefsSolid.utils";
 export type * from "./Generators/SVGDefs/SVGFilters/SVGFilterDefsSolid.types";
 export * from "./Essentials/Input/FileInput/FileInputSolid.utils";
 export * from "./Essentials/Input/Listbox/ListboxSolid.utils";

@@ -5,6 +5,7 @@ import { Button } from "@thewaver/ss-components-vue";
 import type { InteractionTooltipDefs } from "@thewaver/ss-components-vue";
 import * as styles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
 
+import { useNextLayerClass } from "../../StyledComponents/Layer/Layer.context";
 import PageTooltipContent from "../../StyledComponents/TooltipContent/TooltipContent.vue";
 import { provideExampleKnobsContext } from "../ExampleKnobs/ExampleKnobs.context";
 import PageExampleKnobsButton from "../ExampleKnobs/PageExampleKnobsButton.vue";
@@ -15,6 +16,8 @@ const SINGLE_SPAN = 1;
 const SOURCE_MARK = "</>";
 
 const props = defineProps<ExampleProps>();
+
+const nextLayerClass = useNextLayerClass();
 
 defineSlots<ExampleSlots>();
 
@@ -29,19 +32,19 @@ provideExampleKnobsContext({
 const tooltipDefs: InteractionTooltipDefs = {
     placement: { x: "center", y: "top_out" },
     offset: { x: 0, y: 10 },
-    renderContent: ({ visibilityTarget, transitionDurationMs }) =>
-        h(PageTooltipContent, { visibilityTarget, transitionDurationMs }, () => "View source code"),
+    renderContent: ({ visibilityTarget, transitionDurationMs, arrowAim }) =>
+        h(PageTooltipContent, { visibilityTarget, transitionDurationMs, arrowAim }, () => "View source code"),
 };
 </script>
 
 <template>
     <div
-        :class="styles.exampleContainer"
+        :class="[styles.exampleContainer, nextLayerClass]"
         :style="{ gridColumn: `span ${example.span ?? SINGLE_SPAN}` }"
         data-example=""
         :data-testid="example.key"
     >
-        <PageLayer :level="1">
+        <PageLayer>
             <div :class="styles.exampleTitle">
                 {{ `${example.name}:` }}
                 <div :class="styles.exampleActions">

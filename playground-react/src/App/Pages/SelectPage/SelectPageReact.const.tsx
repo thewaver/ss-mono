@@ -16,7 +16,7 @@ export const COUNTRIES_WITH_REACHABLE: SelectOption<string>[] = [
         tooltipDefs: {
             placement: { x: "right_out", y: "center" },
             offset: { x: 10, y: 0 },
-            renderContent: (visibilityTarget, transitionDurationMs) => (
+            renderContent: (visibilityTarget, transitionDurationMs, _placement, _flags, arrowAim) => (
                 <PageTooltipContent visibilityTarget={visibilityTarget} transitionDurationMs={transitionDurationMs}>
                     Not shipping here until the new depot opens.
                 </PageTooltipContent>
@@ -31,7 +31,7 @@ export const COUNTRIES_WITH_REACHABLE: SelectOption<string>[] = [
         tooltipDefs: {
             placement: { x: "right_out", y: "center" },
             offset: { x: 10, y: 0 },
-            renderContent: (visibilityTarget, transitionDurationMs) => (
+            renderContent: (visibilityTarget, transitionDurationMs, _placement, _flags, arrowAim) => (
                 <PageTooltipContent visibilityTarget={visibilityTarget} transitionDurationMs={transitionDurationMs}>
                     Out of stock for the rest of the quarter.
                 </PageTooltipContent>

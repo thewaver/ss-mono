@@ -33,7 +33,7 @@
                         {/each}
                     </ul>
                 {:else}
-                    <PageLayer level={1}>
+                    <PageLayer>
                         <PageCodeBox source={AboutPageUtils.toCodeHtml(block.language, block.source)} />
                     </PageLayer>
                 {/if}

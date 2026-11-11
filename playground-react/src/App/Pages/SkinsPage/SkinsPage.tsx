@@ -72,6 +72,7 @@ import {
     renderPageSelectionFloater,
 } from "../../StyledComponents/GlideFloater/GlideFloater";
 import { PageIcon } from "../../StyledComponents/Icon/Icon";
+import { useNextLayerClass } from "../../StyledComponents/Layer/Layer.context";
 import { PageListboxSurface } from "../../StyledComponents/ListboxSurface/ListboxSurface";
 import { PageProgressContent } from "../../StyledComponents/ProgressContent/ProgressContent";
 import { PageRadioContent } from "../../StyledComponents/RadioContent/RadioContent";
@@ -97,15 +98,23 @@ import type {
     SkinStateProps,
 } from "./SkinsPage.types";
 
-const SkinSampleColumn = (props: PropsWithChildren<SkinSampleColumnProps>) => (
-    <div className={[styles.skinColumn, props.isWide && styles.skinWideColumn].filter(Boolean).join(" ")}>
-        <PageLayer level={1}>
-            <div className={styles.skinColumnName}>{props.name}</div>
+const SkinSampleColumn = (props: PropsWithChildren<SkinSampleColumnProps>) => {
+    const nextLayerClass = useNextLayerClass();
 
-            {props.children}
-        </PageLayer>
-    </div>
-);
+    return (
+        <div
+            className={[styles.skinColumn, nextLayerClass, props.isWide && styles.skinWideColumn]
+                .filter(Boolean)
+                .join(" ")}
+        >
+            <PageLayer>
+                <div className={styles.skinColumnName}>{props.name}</div>
+
+                {props.children}
+            </PageLayer>
+        </div>
+    );
+};
 
 const SkinStateGrid = (props: PropsWithChildren<SkinStateGridProps>) => (
     <div className={[styles.skinStateGrid, props.isFitted && styles.skinFittedStateGrid].filter(Boolean).join(" ")}>

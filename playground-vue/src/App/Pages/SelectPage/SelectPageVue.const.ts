@@ -15,10 +15,10 @@ export const COUNTRIES_WITH_REACHABLE: SelectOption<string>[] = [
         tooltipDefs: {
             placement: { x: "right_out", y: "center" },
             offset: { x: 10, y: 0 },
-            renderContent: ({ visibilityTarget, transitionDurationMs }) =>
+            renderContent: ({ visibilityTarget, transitionDurationMs, arrowAim }) =>
                 h(
                     PageTooltipContent,
-                    { visibilityTarget, transitionDurationMs },
+                    { visibilityTarget, transitionDurationMs, arrowAim },
                     () => "Not shipping here until the new depot opens.",
                 ),
         },
@@ -31,10 +31,10 @@ export const COUNTRIES_WITH_REACHABLE: SelectOption<string>[] = [
         tooltipDefs: {
             placement: { x: "right_out", y: "center" },
             offset: { x: 10, y: 0 },
-            renderContent: ({ visibilityTarget, transitionDurationMs }) =>
+            renderContent: ({ visibilityTarget, transitionDurationMs, arrowAim }) =>
                 h(
                     PageTooltipContent,
-                    { visibilityTarget, transitionDurationMs },
+                    { visibilityTarget, transitionDurationMs, arrowAim },
                     () => "Out of stock for the rest of the quarter.",
                 ),
         },

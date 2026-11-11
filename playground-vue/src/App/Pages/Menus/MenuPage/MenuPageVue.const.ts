@@ -17,8 +17,12 @@ export const ACTIONS_WITH_REACHABLE: MenuItem<Action>[] = [
         tooltipDefs: {
             placement: { x: "right_out", y: "center" },
             offset: { x: 10, y: 0 },
-            renderContent: ({ visibilityTarget, transitionDurationMs }) =>
-                h(PageTooltipContent, { visibilityTarget, transitionDurationMs }, () => "The clipboard is empty."),
+            renderContent: ({ visibilityTarget, transitionDurationMs, arrowAim }) =>
+                h(
+                    PageTooltipContent,
+                    { visibilityTarget, transitionDurationMs, arrowAim },
+                    () => "The clipboard is empty.",
+                ),
         },
     },
     {
@@ -28,10 +32,10 @@ export const ACTIONS_WITH_REACHABLE: MenuItem<Action>[] = [
         tooltipDefs: {
             placement: { x: "right_out", y: "center" },
             offset: { x: 10, y: 0 },
-            renderContent: ({ visibilityTarget, transitionDurationMs }) =>
+            renderContent: ({ visibilityTarget, transitionDurationMs, arrowAim }) =>
                 h(
                     PageTooltipContent,
-                    { visibilityTarget, transitionDurationMs },
+                    { visibilityTarget, transitionDurationMs, arrowAim },
                     () => "Nothing is selected to duplicate.",
                 ),
         },

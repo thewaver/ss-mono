@@ -12,7 +12,7 @@ export const renderToolbarPopup = (
     getTransitionDurationMs: () => number,
     getPlacement: () => AnchorPlacement,
 ) => (
-    <PageLayer level={2}>
+    <PageLayer>
         <PagePopoverSurface
             visibilityTarget={getVisibilityTarget}
             transitionDurationMs={getTransitionDurationMs}

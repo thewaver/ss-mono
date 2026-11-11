@@ -46,7 +46,7 @@ export const PageArticle = (props: PageArticleProps) => {
                                     </Match>
                                     <Match when={block.kind === "code" && block}>
                                         {(getBlock) => (
-                                            <PageLayer level={1}>
+                                            <PageLayer>
                                                 <PageCodeBox
                                                     source={AboutPageUtils.toCodeHtml(
                                                         getBlock().language,

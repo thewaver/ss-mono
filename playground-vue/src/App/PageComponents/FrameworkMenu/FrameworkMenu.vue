@@ -54,7 +54,7 @@ const switchFramework = (framework: PlaygroundFramework) => {
         </template>
 
         <template #renderPopup="{ renderItems, visibilityTarget, transitionDurationMs, placement }">
-            <PageLayer :level="2">
+            <PageLayer>
                 <PagePopoverSurface
                     :visibility-target="visibilityTarget"
                     :transition-duration-ms="transitionDurationMs"

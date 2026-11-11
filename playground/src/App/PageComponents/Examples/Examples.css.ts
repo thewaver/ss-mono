@@ -48,7 +48,7 @@ export const exampleDemo = style({
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
-    gap: themeVars.spacing.full,
+    gap: themeVars.spacing.double,
     minWidth: 0,
 });
 

@@ -63,7 +63,7 @@ const computeTransform = (props: ToastContentProps) => {
 
 export const PageToastContent = (props: ToastContentProps) => {
     return (
-        <PageLayer level={2}>
+        <PageLayer>
             <div
                 style={{
                     transition: `transform ${props.state.isSwiping ? 0 : props.transitionDurationMs}ms`,

@@ -21,8 +21,8 @@ const value = shallowRef<SizeValue>("small");
 const tooltipDefs: InteractionTooltipDefs = {
     placement: { x: "center", y: "top_out" },
     offset: { x: 0, y: 10 },
-    renderContent: ({ visibilityTarget, transitionDurationMs }) =>
-        h(PageTooltipContent, { visibilityTarget, transitionDurationMs }, () => "Out of stock in this size."),
+    renderContent: ({ visibilityTarget, transitionDurationMs, arrowAim }) =>
+        h(PageTooltipContent, { visibilityTarget, transitionDurationMs, arrowAim }, () => "Out of stock in this size."),
 };
 </script>
 

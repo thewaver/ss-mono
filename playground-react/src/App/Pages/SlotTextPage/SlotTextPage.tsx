@@ -95,7 +95,7 @@ export const SlotTextPage = () => {
             component: () => (
                 <div className={styles.stack}>
                     <PageMeasureBox>
-                        <div className={styles.line}>
+                        <div className={styles.numbersLine}>
                             <CounterExample {...commonProps} />
                         </div>
                     </PageMeasureBox>
@@ -114,7 +114,7 @@ export const SlotTextPage = () => {
                 <>
                     <div className={styles.stack}>
                         <PageMeasureBox>
-                            <div className={styles.line}>
+                            <div className={styles.numbersLine}>
                                 <ReelsExample text={pad(reelValue)} reelKey={reelKey} />
                             </div>
                         </PageMeasureBox>
@@ -162,7 +162,7 @@ export const SlotTextPage = () => {
             component: () => (
                 <div className={styles.stack}>
                     <PageMeasureBox>
-                        <div className={styles.line}>
+                        <div className={styles.numbersLine}>
                             <SplitFlapExample {...commonProps} />
                         </div>
                     </PageMeasureBox>
@@ -181,7 +181,7 @@ export const SlotTextPage = () => {
                 <>
                     <div className={styles.stack}>
                         <PageMeasureBox>
-                            <div className={styles.line}>
+                            <div className={styles.numbersLine}>
                                 <WordsExample
                                     {...commonProps}
                                     text={WORDS[wordIndex]}

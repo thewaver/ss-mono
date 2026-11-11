@@ -39,6 +39,7 @@ import PageViewTabs from "./PageComponents/ViewTabs/PageViewTabs.vue";
 import type { PageViewKey } from "./PageComponents/ViewTabs/ViewTabsVue.types";
 import PageDependencies from "./PageDependencies.vue";
 import PageGlideFloater from "./StyledComponents/GlideFloater/PageGlideFloater.vue";
+import { useNextLayerClass } from "./StyledComponents/Layer/Layer.context";
 import PageTreeNodeContent from "./StyledComponents/TreeNodeContent/PageTreeNodeContent.vue";
 
 const VISIBLE_COMPONENT_CONFIGS = AppUtils.flattenConfigs(AppUtils.VISIBLE_MENU_CONFIGS);
@@ -49,6 +50,8 @@ const viewportAnchor = defineModel<ViewportAnchor>("viewportAnchor", { required:
 
 const route = useRoute();
 const router = useRouter();
+
+const nextLayerClass = useNextLayerClass();
 
 const searchTerm = shallowRef("");
 const showsDescriptionOnly = shallowRef(NavSettingsUtils.loadShowsDescriptionOnly());
@@ -184,8 +187,12 @@ const computeNodeText = (node: TreeNode<MenuNodeConfig>) => node.value.name;
                 @update:expanded="setIsMenuExpanded"
             >
                 <template #renderContent="{ phase, transitionDurationMs }">
-                    <nav :class="styles.leftMenu" :style="{ paddingLeft: `${menuGutter}px` }" aria-label="Library">
-                        <PageLayer :level="1">
+                    <nav
+                        :class="[styles.leftMenu, nextLayerClass]"
+                        :style="{ paddingLeft: `${menuGutter}px` }"
+                        aria-label="Library"
+                    >
+                        <PageLayer>
                             <div :class="styles.leftMenuContent">
                                 <div :class="styles.searchContainer">
                                     <PageSidebarToggle

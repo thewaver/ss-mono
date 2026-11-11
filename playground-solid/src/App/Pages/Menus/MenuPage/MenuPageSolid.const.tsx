@@ -20,10 +20,11 @@ export const ACTIONS_WITH_REACHABLE: MenuItem<Action>[] = [
         tooltipDefs: {
             placement: () => ({ x: "right_out", y: "center" }),
             offset: () => ({ x: 10, y: 0 }),
-            renderContent: (getVisibilityTarget, getTransitionDurationMs) => (
+            renderContent: (getVisibilityTarget, getTransitionDurationMs, _getPlacement, _getFlags, getArrowAim) => (
                 <PageTooltipContent
                     visibilityTarget={getVisibilityTarget}
                     transitionDurationMs={getTransitionDurationMs}
+                    arrowAim={getArrowAim}
                 >
                     The clipboard is empty.
                 </PageTooltipContent>
@@ -37,10 +38,11 @@ export const ACTIONS_WITH_REACHABLE: MenuItem<Action>[] = [
         tooltipDefs: {
             placement: () => ({ x: "right_out", y: "center" }),
             offset: () => ({ x: 10, y: 0 }),
-            renderContent: (getVisibilityTarget, getTransitionDurationMs) => (
+            renderContent: (getVisibilityTarget, getTransitionDurationMs, _getPlacement, _getFlags, getArrowAim) => (
                 <PageTooltipContent
                     visibilityTarget={getVisibilityTarget}
                     transitionDurationMs={getTransitionDurationMs}
+                    arrowAim={getArrowAim}
                 >
                     Nothing is selected to duplicate.
                 </PageTooltipContent>
@@ -56,7 +58,7 @@ export const renderMenuPopup = (
     getTransitionDurationMs: () => number,
     getPlacement: () => AnchorPlacement,
 ) => (
-    <PageLayer level={2}>
+    <PageLayer>
         <PagePopoverSurface
             visibilityTarget={getVisibilityTarget}
             transitionDurationMs={getTransitionDurationMs}

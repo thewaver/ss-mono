@@ -18,10 +18,10 @@ const tooltipDefs: InteractionTooltipDefs<FileInputRenderProps> = {
     placement: { x: "center", y: "top_out" },
     offset: { x: 0, y: 10 },
     hoverShowDelayMs: 0,
-    renderContent: ({ visibilityTarget, transitionDurationMs }) =>
+    renderContent: ({ visibilityTarget, transitionDurationMs, arrowAim }) =>
         h(
             PageTooltipContent,
-            { visibilityTarget, transitionDurationMs },
+            { visibilityTarget, transitionDurationMs, arrowAim },
             () => "Focusable so this tooltip can be read, but the file dialog must not open.",
         ),
 };

@@ -53,8 +53,8 @@ const defaultText = computed(() => {
 const tooltipDefs: InteractionTooltipDefs = {
     placement: HINT_PLACEMENT,
     offset: HINT_OFFSET,
-    renderContent: ({ visibilityTarget, transitionDurationMs }) =>
-        h(PageTooltipContent, { visibilityTarget, transitionDurationMs }, () => [
+    renderContent: ({ visibilityTarget, transitionDurationMs, arrowAim }) =>
+        h(PageTooltipContent, { visibilityTarget, transitionDurationMs, arrowAim }, () => [
             props.hint,
             h("div", { "class": styles.propHintControls, "data-hint-controls": "" }, toBreakableText(props.controls)),
             defaultText.value && h("div", { class: styles.propHintDefault }, `Default: ${defaultText.value}`),

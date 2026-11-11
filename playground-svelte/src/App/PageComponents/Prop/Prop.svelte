@@ -1,4 +1,5 @@
 <script lang="ts">
+    import type { ShapeArrowAim } from "@thewaver/ss-utils";
     import { Button } from "@thewaver/ss-components-svelte";
     import * as styles from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.css";
 
@@ -68,8 +69,8 @@
     {@render props.children?.()}
 </div>
 
-{#snippet hintTooltip(visibilityTarget: 0 | 1, transitionDurationMs: number)}
-    <PageTooltipContent {visibilityTarget} {transitionDurationMs}>
+{#snippet hintTooltip(visibilityTarget: 0 | 1, transitionDurationMs: number, _placement: unknown, _flags: unknown, arrowAim: ShapeArrowAim | undefined)}
+    <PageTooltipContent {visibilityTarget} {transitionDurationMs} {arrowAim}>
         {props.hint}
 
         <div class={styles.propHintControls} data-hint-controls="">

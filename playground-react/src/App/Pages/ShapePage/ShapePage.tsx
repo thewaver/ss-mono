@@ -1,17 +1,26 @@
 import { useId, useState } from "react";
 
 import type { SVGDefsColors } from "@thewaver/ss-components-react";
-import { SVGDefsSamples, Shape } from "@thewaver/ss-components-react";
+import { SVGDefsSamples, Shape, TextArea } from "@thewaver/ss-components-react";
 import { ShapeKnobs } from "@thewaver/ss-playground/App/Knobs/Shapes.const";
+import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
 import {
     CORNER_FIELD_WIDTH,
     DEFAULT_EXAMPLE_PATH,
     EXAMPLES_ROOT,
     EXAMPLE_NAMES,
+    FROM_CSS_FIELD_WIDTH,
+    FROM_CSS_MAX_ROWS,
+    FROM_CSS_MIN_ROWS,
     MAX_CORNER_COLUMNS,
     STRESS_ITEMS,
 } from "@thewaver/ss-playground/App/Pages/ShapePage/ShapePage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ShapePage/ShapePage.css";
+import { ShapePageUtils } from "@thewaver/ss-playground/App/Pages/ShapePage/ShapePage.utils";
+import {
+    FIELD_GAP,
+    FIELD_PADDING,
+} from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 import { ShapeConst } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
@@ -23,7 +32,9 @@ import { getIsUsingKind } from "../../PageComponents/PaintPicker/PaintPickerReac
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsDivider, PagePropsGroups, PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { StressTest } from "../../PageComponents/StressTest/StressTest";
+import { PageTextFieldContent } from "../../StyledComponents/TextFieldContent/TextFieldContent";
 import { DefaultExample } from "./Examples/Default";
+import { FromCssExample } from "./Examples/FromCss";
 import { MorphExample } from "./Examples/Morph";
 import { SharedPaintExample } from "./Examples/SharedPaint";
 import { TextWrapExample } from "./Examples/TextWrap";
@@ -161,7 +172,7 @@ const useShapeGeometry = (startingShapeKind: ShapeConst.DefaultShape = ShapeKnob
                 itemKey={"lameExponent"}
                 label={"Lamé Exponent"}
                 hint={
-                    "How square or how pinched each rounded corner is: 2 is a circular round, higher is squarer, lower is pinched inward."
+                    "How square or how pinched each rounded corner is: 1 is a circular round, higher is squarer, 0 is a straight bevel and below 0 scoops inward."
                 }
                 controls={"Sets ShapeProps.lameExponents"}
             >
@@ -296,6 +307,37 @@ const TextWrapExampleWrapper = (props: ShapeExampleProps) => {
     );
 };
 
+const FromCssExampleWrapper = () => {
+    const cssTextState = useState(ShapeKnobs.STARTING_FROM_CSS_TEXT);
+    const invalidDeclarations = ShapePageUtils.findInvalidCssDeclarations(cssTextState[0]);
+
+    return (
+        <>
+            <TextArea
+                value={cssTextState}
+                hasError={invalidDeclarations.length > 0}
+                isAutoSizing={true}
+                minRows={FROM_CSS_MIN_ROWS}
+                maxRows={FROM_CSS_MAX_ROWS}
+                padding={FIELD_PADDING}
+                gap={FIELD_GAP}
+                ariaLabel={"CSS"}
+                renderContent={(flags) => (
+                    <PageTextFieldContent flags={flags} width={FROM_CSS_FIELD_WIDTH} isStretched={true} />
+                )}
+            />
+
+            {invalidDeclarations.length > 0 && (
+                <div className={exampleStyles.exampleReadout} data-readout>
+                    {`Not valid CSS: ${invalidDeclarations.join("; ")}`}
+                </div>
+            )}
+
+            <FromCssExample cssText={cssTextState[0]} />
+        </>
+    );
+};
+
 export const ShapePage = () => {
     const [blurWidth, setBlurWidth] = useState(ShapeKnobs.STARTING_BLUR_WIDTH);
     const [animationDurationMs, setAnimationDurationMs] = useState(ShapeKnobs.STARTING_DURATION_MS);
@@ -357,6 +399,14 @@ export const ShapePage = () => {
                 "the shape writes its contour as shape-outside, so floating it is all the page does for the text to follow the edge",
             component: () => <TextWrapExampleWrapper {...commonProps} />,
             path: `${EXAMPLES_ROOT}/TextWrap.tsx`,
+        },
+        {
+            key: "fromCss",
+            name: EXAMPLE_NAMES.fromCss,
+            readout: () =>
+                "the left box is painted by the browser from the CSS above; the right is a Shape painted only from what computeDefsFromStyle returned for that box",
+            component: () => <FromCssExampleWrapper />,
+            path: `${EXAMPLES_ROOT}/FromCss.tsx`,
         },
         {
             key: "stressTest",

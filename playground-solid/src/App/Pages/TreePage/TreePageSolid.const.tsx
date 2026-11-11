@@ -17,7 +17,7 @@ const toDisabledNode = (
     tooltipDefs: {
         placement: () => ({ x: "right_out", y: "center" }),
         offset: () => ({ x: 10, y: 0 }),
-        renderContent: (getVisibilityTarget, getTransitionDurationMs) => (
+        renderContent: (getVisibilityTarget, getTransitionDurationMs, _getPlacement, _getFlags, getArrowAim) => (
             <PageTooltipContent visibilityTarget={getVisibilityTarget} transitionDurationMs={getTransitionDurationMs}>
                 {reason}
             </PageTooltipContent>

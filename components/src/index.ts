@@ -548,6 +548,8 @@ export type * from "./Generators/SVGDefs/SVGGradients/SVGGradientDefs.types";
 export * from "./Generators/SVGDefs/SVGGradients/SVGGradientDefs.utils";
 export type * from "./Generators/SVGDefs/SVGPatterns/SVGPatternDefs.types";
 export * from "./Generators/SVGDefs/SVGPatterns/SVGPatternDefs.utils";
+export type * from "./Generators/SVGDefs/SVGStyles/SVGStyleDefs.types";
+export * from "./Generators/SVGDefs/SVGStyles/SVGStyleDefs.utils";
 export * from "./Essentials/EdgeFader/EdgeFader.utils";
 export * from "./Essentials/Overlays/Sidebar/Sidebar.utils";
 export * from "./Exotics/ViewportWrapper/ViewportWrapper.utils";

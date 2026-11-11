@@ -37,7 +37,7 @@ export const PageBuildProgress = () => {
             expandedSize={BUILD_PROGRESS_HEIGHT}
             expanded={expandedSignal}
             renderContent={(getPhase) => (
-                <PageLayer level={1}>
+                <PageLayer>
                     <div class={styles.buildProgressClip}>
                         <div
                             class={styles.buildProgressStrip}

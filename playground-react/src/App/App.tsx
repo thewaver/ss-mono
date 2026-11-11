@@ -76,7 +76,7 @@ import { PageViewTabs } from "./PageComponents/ViewTabs/ViewTabs";
 import type { PageViewKey } from "./PageComponents/ViewTabs/ViewTabsReact.types";
 import type { GallerySection } from "./Pages/GalleryPage/GalleryPage.types";
 import { renderPageHighlightFloater } from "./StyledComponents/GlideFloater/GlideFloater";
-import { useLayerClass } from "./StyledComponents/Layer/Layer.context";
+import { useLayerClass, useNextLayerClass } from "./StyledComponents/Layer/Layer.context";
 import { PageTooltipContent } from "./StyledComponents/TooltipContent/TooltipContent";
 import { PageTreeNodeContent } from "./StyledComponents/TreeNodeContent/TreeNodeContent";
 
@@ -351,6 +351,7 @@ const PageDependencies = (props: { name: string; view: PageViewKey }) => {
 
 export function AppContent(props: { viewportAnchor: readonly [ViewportAnchor, (value: ViewportAnchor) => void] }) {
     const location = useLocation();
+    const nextLayerClass = useNextLayerClass();
 
     const [searchTerm, setSearchTerm] = useState("");
     const showsDescriptionOnlyState = useState(NavSettingsUtils.loadShowsDescriptionOnly);
@@ -478,11 +479,11 @@ export function AppContent(props: { viewportAnchor: readonly [ViewportAnchor, (v
                     expanded={menuExpandedState}
                     renderContent={(phase, transitionDurationMs) => (
                         <nav
-                            className={styles.leftMenu}
+                            className={[styles.leftMenu, nextLayerClass].join(" ")}
                             style={{ paddingLeft: `${menuGutter}px` }}
                             aria-label={"Library"}
                         >
-                            <PageLayer level={1}>
+                            <PageLayer>
                                 <div className={styles.leftMenuContent}>
                                     <div className={styles.searchContainer}>
                                         <PageSidebarToggle

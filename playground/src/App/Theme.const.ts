@@ -118,30 +118,52 @@ export const DEFAULT_THEME_VALUES = {
     color: {
         ...SHARED_THEME_VALUES.color,
         primary: DEFAULT_PRIMARY,
-        background: {
-            dark: "rgb(0, 0, 0)",
-            main: "rgb(16, 16, 16)",
-            light: "rgb(32, 32, 32)",
-            contrast: "rgb(255, 255, 255)",
-        },
-        surface: {
-            dark: "rgb(32, 32, 32)",
-            main: "rgb(48, 48, 48)",
-            light: "rgb(64, 64, 64)",
-            contrast: "rgb(255, 255, 255)",
-        },
-        control: {
+        layers: {
             level0: {
-                main: "rgb(0, 0, 0)",
+                dark: "rgb(0, 0, 0)",
+                main: "rgb(8, 8, 8)",
+                light: "rgb(16, 16, 16)",
                 contrast: "rgb(255, 255, 255)",
             },
             level1: {
-                main: "rgb(32, 32, 32)",
+                dark: "rgb(32, 32, 32)",
+                main: "rgb(40, 40, 40)",
+                light: "rgb(48, 48, 48)",
                 contrast: "rgb(255, 255, 255)",
             },
             level2: {
-                main: "rgb(64, 64, 64)",
+                dark: "rgb(64, 64, 64)",
+                main: "rgb(72, 72, 72)",
+                light: "rgb(80, 80, 80)",
                 contrast: "rgb(255, 255, 255)",
+            },
+        },
+    },
+} as const;
+
+export const CONTRAST_THEME_VALUES = {
+    ...SHARED_THEME_VALUES,
+    color: {
+        ...SHARED_THEME_VALUES.color,
+        primary: DEFAULT_PRIMARY,
+        layers: {
+            level0: {
+                dark: "hsl(210, 100%, 15%)",
+                main: "hsl(210, 100%, 20%)",
+                light: "hsl(210, 100%, 25%)",
+                contrast: "hsl(210, 100%, 85%)",
+            },
+            level1: {
+                dark: "hsl(30, 100%, 15%)",
+                main: "hsl(30, 100%, 20%)",
+                light: "hsl(30, 100%, 25%)",
+                contrast: "hsl(30, 100%, 85%)",
+            },
+            level2: {
+                dark: "hsl(300, 100%, 15%)",
+                main: "hsl(300, 100%, 20%)",
+                light: "hsl(300, 100%, 25%)",
+                contrast: "hsl(300, 100%, 85%)",
             },
         },
     },
@@ -152,30 +174,24 @@ export const REACT_THEME_VALUES = {
     color: {
         ...SHARED_THEME_VALUES.color,
         primary: REACT_PRIMARY,
-        background: {
-            dark: "hsl(240, 10%, 10%)",
-            main: "hsl(240, 10%, 15%)",
-            light: "hsl(210, 10%, 20%)",
-            contrast: "hsl(210, 100%, 95%)",
-        },
-        surface: {
-            dark: "hsl(0, 10%, 10%)",
-            main: "hsl(0, 10%, 15%)",
-            light: "hsl(30, 10%, 20%)",
-            contrast: "hsl(30, 100%, 95%)",
-        },
-        control: {
+        layers: {
             level0: {
-                main: "hsl(240, 10%, 5%)",
+                dark: "hsl(240, 10%, 10%)",
+                main: "hsl(240, 10%, 15%)",
+                light: "hsl(210, 10%, 20%)",
                 contrast: "hsl(210, 100%, 95%)",
             },
             level1: {
-                main: "hsl(0, 10%, 5%)",
+                dark: "hsl(0, 10%, 10%)",
+                main: "hsl(0, 10%, 15%)",
+                light: "hsl(30, 10%, 20%)",
                 contrast: "hsl(30, 100%, 95%)",
             },
             level2: {
-                main: "hsl(0, 10%, 0%)",
-                contrast: "hsl(30, 100%, 100%)",
+                dark: "hsl(0, 10%, 10%)",
+                main: "hsl(0, 10%, 15%)",
+                light: "hsl(30, 10%, 20%)",
+                contrast: "hsl(30, 100%, 95%)",
             },
         },
     },
@@ -186,30 +202,24 @@ export const SOLID_THEME_VALUES = {
     color: {
         ...SHARED_THEME_VALUES.color,
         primary: SOLID_PRIMARY,
-        background: {
-            dark: "hsl(0, 10%, 10%)",
-            main: "hsl(30, 10%, 15%)",
-            light: "hsl(30, 10%, 20%)",
-            contrast: "hsl(30, 100%, 95%)",
-        },
-        surface: {
-            dark: "hsl(240, 10%, 10%)",
-            main: "hsl(210, 10%, 15%)",
-            light: "hsl(210, 10%, 20%)",
-            contrast: "hsl(210, 100%, 95%)",
-        },
-        control: {
+        layers: {
             level0: {
-                main: "hsl(0, 10%, 5%)",
+                dark: "hsl(0, 10%, 10%)",
+                main: "hsl(30, 10%, 15%)",
+                light: "hsl(30, 10%, 20%)",
                 contrast: "hsl(30, 100%, 95%)",
             },
             level1: {
-                main: "hsl(240, 10%, 5%)",
+                dark: "hsl(240, 10%, 10%)",
+                main: "hsl(210, 10%, 15%)",
+                light: "hsl(210, 10%, 20%)",
                 contrast: "hsl(210, 100%, 95%)",
             },
             level2: {
-                main: "hsl(240, 10%, 0%)",
-                contrast: "hsl(210, 100%, 100%)",
+                dark: "hsl(240, 10%, 10%)",
+                main: "hsl(210, 10%, 15%)",
+                light: "hsl(210, 10%, 20%)",
+                contrast: "hsl(210, 100%, 95%)",
             },
         },
     },
@@ -220,30 +230,24 @@ export const SVELTE_THEME_VALUES = {
     color: {
         ...SHARED_THEME_VALUES.color,
         primary: SVELTE_PRIMARY,
-        background: {
-            dark: "hsl(300, 10%, 10%)",
-            main: "hsl(270, 10%, 15%)",
-            light: "hsl(270, 10%, 20%)",
-            contrast: "hsl(270, 100%, 95%)",
-        },
-        surface: {
-            dark: "hsl(0, 10%, 10%)",
-            main: "hsl(30, 10%, 15%)",
-            light: "hsl(30, 10%, 20%)",
-            contrast: "hsl(30, 100%, 95%)",
-        },
-        control: {
+        layers: {
             level0: {
-                main: "hsl(300, 10%, 5%)",
+                dark: "hsl(300, 10%, 10%)",
+                main: "hsl(270, 10%, 15%)",
+                light: "hsl(270, 10%, 20%)",
                 contrast: "hsl(270, 100%, 95%)",
             },
             level1: {
-                main: "hsl(0, 10%, 5%)",
+                dark: "hsl(0, 10%, 10%)",
+                main: "hsl(30, 10%, 15%)",
+                light: "hsl(30, 10%, 20%)",
                 contrast: "hsl(30, 100%, 95%)",
             },
             level2: {
-                main: "hsl(0, 10%, 0%)",
-                contrast: "hsl(30, 100%, 100%)",
+                dark: "hsl(0, 10%, 10%)",
+                main: "hsl(30, 10%, 15%)",
+                light: "hsl(30, 10%, 20%)",
+                contrast: "hsl(30, 100%, 95%)",
             },
         },
     },
@@ -254,30 +258,24 @@ export const VUE_THEME_VALUES = {
     color: {
         ...SHARED_THEME_VALUES.color,
         primary: VUE_PRIMARY,
-        background: {
-            dark: "hsl(0, 10%, 10%)",
-            main: "hsl(30, 10%, 15%)",
-            light: "hsl(30, 10%, 20%)",
-            contrast: "hsl(30, 100%, 95%)",
-        },
-        surface: {
-            dark: "hsl(120, 10%, 10%)",
-            main: "hsl(90, 10%, 15%)",
-            light: "hsl(90, 10%, 20%)",
-            contrast: "hsl(90, 100%, 95%)",
-        },
-        control: {
+        layers: {
             level0: {
-                main: "hsl(0, 10%, 5%)",
+                dark: "hsl(0, 10%, 10%)",
+                main: "hsl(30, 10%, 15%)",
+                light: "hsl(30, 10%, 20%)",
                 contrast: "hsl(30, 100%, 95%)",
             },
             level1: {
-                main: "hsl(120, 10%, 5%)",
+                dark: "hsl(120, 10%, 10%)",
+                main: "hsl(90, 10%, 15%)",
+                light: "hsl(90, 10%, 20%)",
                 contrast: "hsl(90, 100%, 95%)",
             },
             level2: {
-                main: "hsl(120, 10%, 0%)",
-                contrast: "hsl(90, 100%, 100%)",
+                dark: "hsl(120, 10%, 10%)",
+                main: "hsl(90, 10%, 15%)",
+                light: "hsl(90, 10%, 20%)",
+                contrast: "hsl(90, 100%, 95%)",
             },
         },
     },

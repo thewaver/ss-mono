@@ -44,6 +44,7 @@
     import PageBuildProgress from "./PageComponents/BuildProgress/PageBuildProgress.svelte";
     import PageFrameworkMenu from "./PageComponents/FrameworkMenu/FrameworkMenu.svelte";
     import PageLayer from "./PageComponents/Layer/Layer.svelte";
+    import { getNextLayerClass } from "./StyledComponents/Layer/Layer.context";
     import PageNavLink from "./PageComponents/NavLink/NavLink.svelte";
     import PageNavLinkGroup from "./PageComponents/NavLink/PageNavLinkGroup.svelte";
     import type { ViewportAnchor } from "./PageComponents/NavSettings/NavSettingsSvelte.types";
@@ -127,6 +128,8 @@
     collectAncestors(VISIBLE_MENU_CONFIGS, [], ANCESTORS_BY_CONFIG);
 
     let { viewportAnchor = $bindable() }: { viewportAnchor: ViewportAnchor } = $props();
+
+    const getNextLayerClassName = getNextLayerClass();
 
     let searchTerm = $state("");
     let showsDescriptionOnly = $state(NavSettingsUtils.loadShowsDescriptionOnly());
@@ -275,8 +278,8 @@
             }
         >
             {#snippet renderContent(phase, transitionDurationMs)}
-                <nav class={styles.leftMenu} style:padding-left={`${menuGutter}px`} aria-label={"Library"}>
-                    <PageLayer level={1}>
+                <nav class={[styles.leftMenu, getNextLayerClassName()]} style:padding-left={`${menuGutter}px`} aria-label={"Library"}>
+                    <PageLayer>
                         <div class={styles.leftMenuContent}>
                             <div class={styles.searchContainer}>
                                 <PageSidebarToggle

@@ -18,6 +18,7 @@
     import PagePropsGroups from "../../PageComponents/PropsPanel/PagePropsGroups.svelte";
     import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
     import DefaultExampleWrapper from "./DefaultExampleWrapper.svelte";
+    import FromCssExampleWrapper from "./FromCssExampleWrapper.svelte";
     import MorphExampleWrapper from "./MorphExampleWrapper.svelte";
     import SharedPaintExampleWrapper from "./SharedPaintExampleWrapper.svelte";
     import type { ShapeExampleProps } from "./ShapePage.types";
@@ -90,6 +91,14 @@
             path: `${EXAMPLES_ROOT}/TextWrap.svelte`,
         },
         {
+            key: "fromCss",
+            name: EXAMPLE_NAMES.fromCss,
+            readout: () =>
+                "the left box is painted by the browser from the CSS above; the right is a Shape painted only from what computeDefsFromStyle returned for that box",
+            component: fromCssExample,
+            path: `${EXAMPLES_ROOT}/FromCss.svelte`,
+        },
+        {
             key: "stressTest",
             name: EXAMPLE_NAMES.stressTest,
             component: stressTestExample,
@@ -111,6 +120,10 @@
 
 {#snippet textWrapExample()}
     <TextWrapExampleWrapper {...commonProps} />
+{/snippet}
+
+{#snippet fromCssExample()}
+    <FromCssExampleWrapper />
 {/snippet}
 
 {#snippet stressTestExample()}

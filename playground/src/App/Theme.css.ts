@@ -2,6 +2,7 @@ import { Color } from "@thewaver/ss-utils";
 import { createTheme, createThemeContract, globalStyle } from "@vanilla-extract/css";
 
 import {
+    CONTRAST_THEME_VALUES,
     type ColorFamily,
     DEFAULT_THEME_VALUES,
     REACT_THEME_VALUES,
@@ -76,6 +77,7 @@ export const themeVars = createThemeContract(toThemeValues(DEFAULT_THEME_VALUES)
 
 export const PLAYGROUND_THEMES = {
     default: createTheme(themeVars, toThemeValues(DEFAULT_THEME_VALUES)),
+    contrast: createTheme(themeVars, toThemeValues(CONTRAST_THEME_VALUES)),
     react: createTheme(themeVars, toThemeValues(REACT_THEME_VALUES)),
     solid: createTheme(themeVars, toThemeValues(SOLID_THEME_VALUES)),
     svelte: createTheme(themeVars, toThemeValues(SVELTE_THEME_VALUES)),
@@ -86,8 +88,8 @@ globalStyle("*", {
     boxSizing: "border-box",
     scrollbarWidth: "thin",
     scrollbarColor: [
-        `${themeVars.color.primary.main} ${themeVars.color.background.dark}`,
-        `${themeVars.color.primary.main} rgb(from ${themeVars.color.background.dark} r g b / 25%)`,
+        `${themeVars.color.primary.main} ${themeVars.color.layers.level0.dark}`,
+        `${themeVars.color.primary.main} rgb(from ${themeVars.color.layers.level0.dark} r g b / 25%)`,
     ],
 });
 
@@ -124,7 +126,10 @@ globalStyle("::-webkit-scrollbar-corner", {
 });
 
 globalStyle("::-webkit-scrollbar-track", {
-    backgroundColor: [themeVars.color.background.dark, `rgb(from ${themeVars.color.background.dark} r g b / 25%)`],
+    backgroundColor: [
+        themeVars.color.layers.level0.dark,
+        `rgb(from ${themeVars.color.layers.level0.dark} r g b / 25%)`,
+    ],
 });
 
 globalStyle("::-webkit-scrollbar-thumb", {

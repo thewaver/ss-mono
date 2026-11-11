@@ -1,4 +1,5 @@
 <script lang="ts">
+    import type { ShapeArrowAim } from "@thewaver/ss-utils";
     import type { DismisserReason } from "@thewaver/ss-components-svelte";
     import { InteractionWrapper, Popover, PopupTrigger } from "@thewaver/ss-components-svelte";
     import * as styles from "@thewaver/ss-playground/App/PageComponents/ExampleKnobs/ExampleKnobs.css";
@@ -6,6 +7,7 @@
 
     import PageTooltipContent from "../../StyledComponents/TooltipContent/TooltipContent.svelte";
     import PageLayer from "../Layer/Layer.svelte";
+    import { getNextLayerClass } from "../../StyledComponents/Layer/Layer.context";
     import PagePropsPanel from "../PropsPanel/PagePropsPanel.svelte";
     import type { PageExampleKnobsButtonProps } from "./ExampleKnobs.types";
     import {
@@ -17,6 +19,8 @@
     } from "@thewaver/ss-playground/App/PageComponents/ExampleKnobs/ExampleKnobs.const";
 
     let props: PageExampleKnobsButtonProps = $props();
+
+    const getNextLayerClassName = getNextLayerClass();
 
     const popupId = $props.id();
 
@@ -69,16 +73,16 @@
 >
     {#snippet renderContent(visibilityTarget, transitionDurationMs)}
         <div
-            class={[styles.exampleKnobsSurface, visibilityTarget === 1 && styles.isVisible]}
+            class={[styles.exampleKnobsSurface, getNextLayerClassName(), visibilityTarget === 1 && styles.isVisible]}
             style:transition={`opacity ${transitionDurationMs}ms`}
         >
-            <PageLayer level={2}>
+            <PageLayer>
                 <PagePropsPanel scope={"local"}>{@render props.renderKnobs()}</PagePropsPanel>
             </PageLayer>
         </div>
     {/snippet}
 </Popover>
 
-{#snippet settingsTooltip(visibilityTarget: 0 | 1, transitionDurationMs: number)}
-    <PageTooltipContent {visibilityTarget} {transitionDurationMs}>Settings</PageTooltipContent>
+{#snippet settingsTooltip(visibilityTarget: 0 | 1, transitionDurationMs: number, _placement: unknown, _flags: unknown, arrowAim: ShapeArrowAim | undefined)}
+    <PageTooltipContent {visibilityTarget} {transitionDurationMs} {arrowAim}>Settings</PageTooltipContent>
 {/snippet}

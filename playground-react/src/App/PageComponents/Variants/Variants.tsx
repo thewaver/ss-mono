@@ -1,9 +1,12 @@
 import * as styles from "@thewaver/ss-playground/App/PageComponents/Variants/Variants.css";
 
+import { useNextLayerClass } from "../../StyledComponents/Layer/Layer.context";
 import { PageLayer } from "../Layer/Layer";
 import type { VariantsProps } from "./Variants.types";
 
 export const PageVariants = (props: VariantsProps) => {
+    const nextLayerClass = useNextLayerClass();
+
     return (
         <div
             className={styles.variantsRoot}
@@ -12,8 +15,13 @@ export const PageVariants = (props: VariantsProps) => {
             }}
         >
             {props.items.map((variant) => (
-                <div key={variant.key} className={styles.variantContainer} data-variant="" data-testid={variant.key}>
-                    <PageLayer level={1}>
+                <div
+                    key={variant.key}
+                    className={[styles.variantContainer, nextLayerClass].join(" ")}
+                    data-variant=""
+                    data-testid={variant.key}
+                >
+                    <PageLayer>
                         <div className={styles.variantTitle}>{variant.name}</div>
 
                         <div className={styles.variantDemo}>{variant.component()}</div>

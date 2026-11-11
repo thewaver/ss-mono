@@ -33,8 +33,12 @@ const value = shallowRef<DateValueRange | undefined>(undefined);
 const tooltipDefs: InteractionTooltipDefs<TextFieldFlags> = {
     placement: { x: "center", y: "top_out" },
     offset: { x: 0, y: 10 },
-    renderContent: ({ visibilityTarget, transitionDurationMs }) =>
-        h(PageTooltipContent, { visibilityTarget, transitionDurationMs }, () => "A tooltip on a date range picker."),
+    renderContent: ({ visibilityTarget, transitionDurationMs, arrowAim }) =>
+        h(
+            PageTooltipContent,
+            { visibilityTarget, transitionDurationMs, arrowAim },
+            () => "A tooltip on a date range picker.",
+        ),
 };
 </script>
 

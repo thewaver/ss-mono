@@ -7,6 +7,7 @@ import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examp
 
 import PageAccordionHeader from "../../StyledComponents/AccordionContent/PageAccordionHeader.vue";
 import PageAccordionPanel from "../../StyledComponents/AccordionContent/PageAccordionPanel.vue";
+import { useNextLayerClass } from "../../StyledComponents/Layer/Layer.context";
 import PageCodeBox from "../CodeBox/CodeBox.vue";
 import PageLayer from "../Layer/Layer.vue";
 import { usePreviewContext } from "../Preview/Preview.context";
@@ -16,6 +17,8 @@ import type { SourceFile } from "../SourceView/SourceViewVue.types";
 import type { PageDocsExampleProps, PageDocsExampleSlots } from "./DocsExampleVue.types";
 
 const props = defineProps<PageDocsExampleProps>();
+
+const nextLayerClass = useNextLayerClass();
 
 defineSlots<PageDocsExampleSlots>();
 
@@ -49,8 +52,8 @@ watch(
     <div v-if="isPreviewDemo" :class="exampleStyles.exampleDemo" data-demo="" :data-testid="path"><slot /></div>
 
     <div v-else-if="!preview" :class="styles.docsExampleStack">
-        <div :class="styles.docsExample" data-docs-example="">
-            <PageLayer :level="1">
+        <div :class="[styles.docsExample, nextLayerClass]" data-docs-example="">
+            <PageLayer>
                 <div :class="styles.docsExampleSection">
                     <div :class="styles.docsExampleDemo" data-demo="" :data-testid="path"><slot /></div>
 

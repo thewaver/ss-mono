@@ -33,8 +33,12 @@ const value = shallowRef<TimeValue | undefined>({ hour: 9, minute: 30 });
 const tooltipDefs: InteractionTooltipDefs<TextFieldFlags> = {
     placement: { x: "center", y: "top_out" },
     offset: { x: 0, y: 10 },
-    renderContent: ({ visibilityTarget, transitionDurationMs }) =>
-        h(PageTooltipContent, { visibilityTarget, transitionDurationMs }, () => "A tooltip on a time picker."),
+    renderContent: ({ visibilityTarget, transitionDurationMs, arrowAim }) =>
+        h(
+            PageTooltipContent,
+            { visibilityTarget, transitionDurationMs, arrowAim },
+            () => "A tooltip on a time picker.",
+        ),
 };
 </script>
 

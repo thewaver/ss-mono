@@ -38,10 +38,17 @@ export const TooltipDocsExample = (props: Props) => {
             tooltipDefs={() => ({
                 placement: () => ({ x: "center", y: "top_out" }),
                 offset: () => ({ x: 0, y: 10 }),
-                renderContent: (getVisibilityTarget, getTransitionDurationMs) => (
+                renderContent: (
+                    getVisibilityTarget,
+                    getTransitionDurationMs,
+                    _getPlacement,
+                    _getFlags,
+                    getArrowAim,
+                ) => (
                     <PageTooltipContent
                         visibilityTarget={getVisibilityTarget}
                         transitionDurationMs={getTransitionDurationMs}
+                        arrowAim={getArrowAim}
                     >
                         Focusable so this tooltip can be read, but no tag may be added or removed.
                     </PageTooltipContent>

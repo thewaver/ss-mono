@@ -15,8 +15,8 @@ defineProps<Props>();
 const tooltipDefs: InteractionTooltipDefs = {
     placement: { x: "center", y: "top_out" },
     offset: { x: 0, y: 10 },
-    renderContent: ({ visibilityTarget, transitionDurationMs }) =>
-        h(PageTooltipContent, { visibilityTarget, transitionDurationMs }, () => "A tooltip on a button."),
+    renderContent: ({ visibilityTarget, transitionDurationMs, arrowAim }) =>
+        h(PageTooltipContent, { visibilityTarget, transitionDurationMs, arrowAim }, () => "A tooltip on a button."),
 };
 </script>
 

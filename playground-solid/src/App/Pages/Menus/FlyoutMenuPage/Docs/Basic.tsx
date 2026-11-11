@@ -54,7 +54,7 @@ export const BasicDocsExample = (props: Props) => {
                 )}
                 renderHighlightFloater={renderPageHighlightFloater}
                 renderPanel={(renderLinks, getVisibilityTarget, getTransitionDurationMs, getPlacement, getSize) => (
-                    <PageLayer level={2}>
+                    <PageLayer>
                         <PagePopoverSurface
                             visibilityTarget={getVisibilityTarget}
                             transitionDurationMs={getTransitionDurationMs}

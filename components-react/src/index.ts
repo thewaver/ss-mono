@@ -157,6 +157,7 @@ export * from "./Generators/SVGDefs/SVGClipPaths/SVGClipPath";
 export * from "./Generators/SVGDefs/SVGGradients/PaintArea.context";
 export type * from "./Generators/SVGDefs/SVGGradients/PaintArea.context.types";
 export * from "./Generators/SVGDefs/SVGGradients/SVGGradientDefsReact.utils";
+export * from "./Generators/SVGDefs/SVGStyles/SVGStyleDefsReact.utils";
 export * from "./Generators/SVGDefs/SVGPatterns/SVGPatternDefsReact.utils";
 export * from "./Abstracts/Glass/GlassReact.utils";
 export * from "./Exotics/Shape/Shape";

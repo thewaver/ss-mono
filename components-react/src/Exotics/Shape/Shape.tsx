@@ -7,16 +7,26 @@ import type { SVGDefs } from "../../Generators/SVGDefs/SVGDefs.types";
 import { useElement } from "../../Utils/refUtils";
 import type { ShapeProps } from "./Shape.types";
 
-const renderDefsElements = (defs: SVGDefs[]) =>
-    defs.map((def, index) => (
-        <Fragment key={index}>
-            {def.gradientOrPattern?.renderDefsElement()}
-            {def.filter?.renderDefsElement()}
-            {def.clipPath?.renderDefsElement()}
-        </Fragment>
-    ));
+const renderDefsElements = (defs: SVGDefs[], fillClips?: ({ id: string; path: string; rule: string } | undefined)[]) =>
+    defs.map((def, index) => {
+        const fillClip = fillClips?.[index];
 
-const renderPath = (def: SVGDefs, index: number, d: string, fillRule?: "evenodd") => {
+        return (
+            <Fragment key={index}>
+                {def.gradientOrPattern?.renderDefsElement()}
+                {def.filter?.renderDefsElement()}
+                {fillClip ? (
+                    <clipPath id={fillClip.id} clipPathUnits="userSpaceOnUse">
+                        <path d={fillClip.path} clipRule={fillClip.rule} />
+                    </clipPath>
+                ) : (
+                    def.clipPath?.renderDefsElement()
+                )}
+            </Fragment>
+        );
+    });
+
+const renderPath = (def: SVGDefs, index: number, d: string, fillRule?: "evenodd", clipId?: string) => {
     const paint = ShapeLayerUtils.computePaint(def);
 
     return (
@@ -27,7 +37,7 @@ const renderPath = (def: SVGDefs, index: number, d: string, fillRule?: "evenodd"
             fill={paint.fill}
             fillOpacity={paint.fillOpacity}
             filter={paint.filter}
-            clipPath={paint.clipPath}
+            clipPath={clipId ? `url(#${clipId})` : paint.clipPath}
             style={paint.mixBlendMode ? { mixBlendMode: paint.mixBlendMode } : undefined}
         />
     );
@@ -64,6 +74,23 @@ export const Shape = (props: ShapeProps) => {
         geometry.lameExponents,
     );
 
+    const fillClips = fillDefs?.map((_def, index) => {
+        const clip = props.fillGeom?.[index]?.clip;
+
+        return (
+            clip && {
+                id: clip.id,
+                ...ShapeLayerUtils.computeFillClip(
+                    geometry.points,
+                    clip,
+                    paths[0].outerPath,
+                    geometry.joinRadii,
+                    geometry.lameExponents,
+                ),
+            }
+        );
+    });
+
     const viewBox = `0 0 ${rootSize.width} ${rootSize.height}`;
 
     return (
@@ -80,9 +107,23 @@ export const Shape = (props: ShapeProps) => {
                     viewBox={viewBox}
                     overflow="visible"
                 >
-                    <defs>{renderDefsElements(fillDefs)}</defs>
+                    <defs>{renderDefsElements(fillDefs, fillClips)}</defs>
 
-                    {fillDefs.map((def, index) => renderPath(def, index, paths[0].outerPath))}
+                    {fillDefs.map((def, index) =>
+                        renderPath(
+                            def,
+                            index,
+                            ShapeLayerUtils.computeFillPath(
+                                geometry.points,
+                                props.fillGeom?.[index],
+                                paths[0].outerPath,
+                                geometry.joinRadii,
+                                geometry.lameExponents,
+                            ),
+                            undefined,
+                            fillClips?.[index]?.id,
+                        ),
+                    )}
                 </svg>
             )}
 

@@ -14,7 +14,7 @@ const PILL_RADIUS = "9999px";
 
 const SHADOW_SMALL = "0 2px 2px 0px rgba(0, 0, 0, 0.75)";
 const SHADOW_MEDIUM = `${SHADOW_SMALL}, 0 4px 8px 0px rgba(0, 0, 0, 0.5)`;
-const SHADOW_LARGE = `${SHADOW_MEDIUM}, 0 16px 64px 0px rgba(0, 0, 0, 0.25)`;
+// const SHADOW_LARGE = `${SHADOW_MEDIUM}, 0 16px 64px 0px rgba(0, 0, 0, 0.25)`;
 
 const INTERACTIBLE_STATES: StyleRule["selectors"] = {
     [skinSelectors.isHovered]: {
@@ -191,10 +191,7 @@ SkinUtils.define(shaded, {
         },
     },
     drawer: {
-        backgroundColor: themeVars.color.surface.main,
-        backgroundImage: `linear-gradient(45deg, ${themeVars.color.surface.dark}, ${themeVars.color.surface.light})`,
-        boxShadow: SHADOW_LARGE,
-        color: themeVars.color.surface.contrast,
+        ...surface(layerVars),
     },
     dropdown: {
         ...INPUT_SHELL,
@@ -253,12 +250,12 @@ SkinUtils.define(shaded, {
         backdropFilter: "blur(20px) grayscale(75%)",
     },
     pageBackground: {
-        backgroundColor: themeVars.color.background.main,
-        backgroundImage: `linear-gradient(315deg, ${themeVars.color.background.dark}, ${themeVars.color.background.light})`,
-        color: themeVars.color.background.contrast,
+        backgroundColor: themeVars.color.layers.level0.main,
+        backgroundImage: `linear-gradient(315deg, ${themeVars.color.layers.level0.dark}, ${themeVars.color.layers.level0.light})`,
+        color: themeVars.color.layers.level0.contrast,
     },
     pageContainer: {
-        ...surface(SkinUtils.extendColor(layerVars)),
+        ...surface(layerVars),
     },
     panel: {
         borderRadius: themeVars.borderRadius.half,
@@ -383,7 +380,7 @@ SkinUtils.define(shaded, {
         fontWeight: "bold",
     },
     surface: {
-        ...surface(themeVars.color.surface),
+        ...surface(layerVars),
     },
     tabsItemBase: {
         paddingBlock: themeVars.spacing.full,
@@ -470,7 +467,7 @@ SkinUtils.define(shaded, {
         },
     },
     tooltip: {
-        borderRadius: themeVars.borderRadius.full,
+        border: [`2px solid ${layerVars.contrast}`, `2px solid rgb(from ${layerVars.contrast} r g b / 25%)`],
         backgroundColor: layerVars.main,
         boxShadow: SHADOW_SMALL,
         color: layerVars.contrast,

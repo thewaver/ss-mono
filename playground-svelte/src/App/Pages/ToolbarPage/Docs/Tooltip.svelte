@@ -1,4 +1,5 @@
 <script lang="ts">
+    import type { ShapeArrowAim } from "@thewaver/ss-utils";
     import { SharedTooltip, Toolbar } from "@thewaver/ss-components-svelte";
     import type { AnchorPlacement, InteractionTooltipDefs, ToolbarAction } from "@thewaver/ss-components-svelte";
     import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
@@ -42,30 +43,30 @@
     ]);
 </script>
 
-{#snippet cutHint(visibilityTarget: 0 | 1, transitionDurationMs: number)}
-    <PageTooltipContent {visibilityTarget} {transitionDurationMs}>Moves the selection to the clipboard</PageTooltipContent>
+{#snippet cutHint(visibilityTarget: 0 | 1, transitionDurationMs: number, _placement: unknown, _flags: unknown, arrowAim: ShapeArrowAim | undefined)}
+    <PageTooltipContent {visibilityTarget} {transitionDurationMs} {arrowAim}>Moves the selection to the clipboard</PageTooltipContent>
 {/snippet}
 
-{#snippet copyHint(visibilityTarget: 0 | 1, transitionDurationMs: number)}
-    <PageTooltipContent {visibilityTarget} {transitionDurationMs}>Copies the selection to the clipboard</PageTooltipContent>
+{#snippet copyHint(visibilityTarget: 0 | 1, transitionDurationMs: number, _placement: unknown, _flags: unknown, arrowAim: ShapeArrowAim | undefined)}
+    <PageTooltipContent {visibilityTarget} {transitionDurationMs} {arrowAim}>Copies the selection to the clipboard</PageTooltipContent>
 {/snippet}
 
-{#snippet clearHint(visibilityTarget: 0 | 1, transitionDurationMs: number)}
-    <PageTooltipContent {visibilityTarget} {transitionDurationMs}>Deletes the selection</PageTooltipContent>
+{#snippet clearHint(visibilityTarget: 0 | 1, transitionDurationMs: number, _placement: unknown, _flags: unknown, arrowAim: ShapeArrowAim | undefined)}
+    <PageTooltipContent {visibilityTarget} {transitionDurationMs} {arrowAim}>Deletes the selection</PageTooltipContent>
 {/snippet}
 
-{#snippet clearDisabledHint(visibilityTarget: 0 | 1, transitionDurationMs: number)}
-    <PageTooltipContent {visibilityTarget} {transitionDurationMs}>
+{#snippet clearDisabledHint(visibilityTarget: 0 | 1, transitionDurationMs: number, _placement: unknown, _flags: unknown, arrowAim: ShapeArrowAim | undefined)}
+    <PageTooltipContent {visibilityTarget} {transitionDurationMs} {arrowAim}>
         Nothing is selected, so there is nothing to clear
     </PageTooltipContent>
 {/snippet}
 
-{#snippet pasteHint(visibilityTarget: 0 | 1, transitionDurationMs: number)}
-    <PageTooltipContent {visibilityTarget} {transitionDurationMs}>Puts the clipboard where the caret is</PageTooltipContent>
+{#snippet pasteHint(visibilityTarget: 0 | 1, transitionDurationMs: number, _placement: unknown, _flags: unknown, arrowAim: ShapeArrowAim | undefined)}
+    <PageTooltipContent {visibilityTarget} {transitionDurationMs} {arrowAim}>Puts the clipboard where the caret is</PageTooltipContent>
 {/snippet}
 
-{#snippet undoHint(visibilityTarget: 0 | 1, transitionDurationMs: number)}
-    <PageTooltipContent {visibilityTarget} {transitionDurationMs}>Takes back the last change</PageTooltipContent>
+{#snippet undoHint(visibilityTarget: 0 | 1, transitionDurationMs: number, _placement: unknown, _flags: unknown, arrowAim: ShapeArrowAim | undefined)}
+    <PageTooltipContent {visibilityTarget} {transitionDurationMs} {arrowAim}>Takes back the last change</PageTooltipContent>
 {/snippet}
 
 <ResizableBar>

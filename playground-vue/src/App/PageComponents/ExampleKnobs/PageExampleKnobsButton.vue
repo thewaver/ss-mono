@@ -13,12 +13,15 @@ import {
 import * as styles from "@thewaver/ss-playground/App/PageComponents/ExampleKnobs/ExampleKnobs.css";
 import * as examplesStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
 
+import { useNextLayerClass } from "../../StyledComponents/Layer/Layer.context";
 import PageTooltipContent from "../../StyledComponents/TooltipContent/TooltipContent.vue";
 import PageLayer from "../Layer/Layer.vue";
 import PagePropsPanel from "../PropsPanel/PagePropsPanel.vue";
 import type { PageExampleKnobsButtonProps, PageExampleKnobsButtonSlots } from "./ExampleKnobs.types";
 
 const props = defineProps<PageExampleKnobsButtonProps>();
+
+const nextLayerClass = useNextLayerClass();
 
 defineSlots<PageExampleKnobsButtonSlots>();
 
@@ -42,8 +45,8 @@ const handleDismiss = (reason: DismisserReason) => {
 const tooltipDefs: InteractionTooltipDefs = {
     placement: TOOLTIP_PLACEMENT,
     offset: TOOLTIP_OFFSET,
-    renderContent: ({ visibilityTarget, transitionDurationMs }) =>
-        h(PageTooltipContent, { visibilityTarget, transitionDurationMs }, () => "Settings"),
+    renderContent: ({ visibilityTarget, transitionDurationMs, arrowAim }) =>
+        h(PageTooltipContent, { visibilityTarget, transitionDurationMs, arrowAim }, () => "Settings"),
 };
 </script>
 
@@ -79,10 +82,10 @@ const tooltipDefs: InteractionTooltipDefs = {
     >
         <template #renderContent="{ visibilityTarget, transitionDurationMs }">
             <div
-                :class="[styles.exampleKnobsSurface, visibilityTarget === 1 && styles.isVisible]"
+                :class="[styles.exampleKnobsSurface, nextLayerClass, visibilityTarget === 1 && styles.isVisible]"
                 :style="{ transition: `opacity ${transitionDurationMs}ms` }"
             >
-                <PageLayer :level="2">
+                <PageLayer>
                     <PagePropsPanel scope="local"><slot name="renderKnobs" /></PagePropsPanel>
                 </PageLayer>
             </div>

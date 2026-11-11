@@ -3,19 +3,22 @@
     import * as styles from "@thewaver/ss-playground/App/Pages/GalleryPage/GalleryPage.css";
 
     import PageLayer from "../../PageComponents/Layer/Layer.svelte";
+    import { getNextLayerClass } from "../../StyledComponents/Layer/Layer.context";
     import PagePreview from "../../PageComponents/Preview/Preview.svelte";
     import PageRouterLink from "../../PageComponents/RouterLink/RouterLink.svelte";
     import type { GalleryTileProps } from "./GalleryPage.types";
 
     let props: GalleryTileProps = $props();
 
+    const getNextLayerClassName = getNextLayerClass();
+
     let previewRef = $state<HTMLElement>();
 
     const getIsOnScreen = ElementObserverSvelteUtils.createViewportIntersectionObserver(() => previewRef);
 </script>
 
-<div class={styles.galleryTile} data-gallery-tile="" data-testid={props.item.href}>
-    <PageLayer level={1}>
+<div class={[styles.galleryTile, getNextLayerClassName()]} data-gallery-tile="" data-testid={props.item.href}>
+    <PageLayer>
         <PageRouterLink class={styles.galleryTileName} href={props.item.href}>
             {props.item.name}
         </PageRouterLink>

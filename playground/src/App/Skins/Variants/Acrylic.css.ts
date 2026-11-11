@@ -18,7 +18,7 @@ const PILL_RADIUS = "9999px";
 
 const SHADOW_SMALL = "0 2px 2px 0px rgba(0, 0, 0, 0.75)";
 const SHADOW_MEDIUM = `${SHADOW_SMALL}, 0 4px 8px 0px rgba(0, 0, 0, 0.5)`;
-const SHADOW_LARGE = `${SHADOW_MEDIUM}, 0 16px 64px 0px rgba(0, 0, 0, 0.25)`;
+// const SHADOW_LARGE = `${SHADOW_MEDIUM}, 0 16px 64px 0px rgba(0, 0, 0, 0.25)`;
 
 const sheen = (color: string, colorAlphaPercent: number, sheenAlphaPercent: number): StyleRule => ({
     backgroundColor: [color, `rgb(from ${color} r g b / ${colorAlphaPercent}%)`],
@@ -206,10 +206,7 @@ SkinUtils.define(acrylic, {
         },
     },
     drawer: {
-        ...sheen(themeVars.color.surface.dark, 25, 10),
-        backdropFilter: "blur(20px)",
-        boxShadow: SHADOW_LARGE,
-        color: themeVars.color.surface.contrast,
+        ...surface(layerVars),
     },
     dropdown: {
         ...INPUT_SHELL,
@@ -267,12 +264,12 @@ SkinUtils.define(acrylic, {
         backdropFilter: "blur(20px) grayscale(75%)",
     },
     pageBackground: {
-        backgroundColor: themeVars.color.background.light,
+        backgroundColor: themeVars.color.layers.level0.light,
         backgroundImage: `linear-gradient(135deg, hsl(from ${themeVars.color.primary.light} h 100 l / 10%), transparent, hsl(from ${themeVars.color.primary.light} h 100 l / 10%))`,
-        color: themeVars.color.background.contrast,
+        color: themeVars.color.layers.level0.contrast,
     },
     pageContainer: {
-        ...surface(SkinUtils.extendColor(layerVars)),
+        ...surface(layerVars),
     },
     panel: {
         backgroundImage: `linear-gradient(to bottom, rgb(from ${layerVars.main} r g b / 25%), rgb(from ${layerVars.main} r g b / 50%))`,
@@ -383,7 +380,7 @@ SkinUtils.define(acrylic, {
         fontWeight: "bold",
     },
     surface: {
-        ...surface(themeVars.color.surface),
+        ...surface(layerVars),
     },
     tabsItemBase: {
         paddingBlock: themeVars.spacing.full,
@@ -461,7 +458,7 @@ SkinUtils.define(acrylic, {
         borderRadius: PILL_RADIUS,
     },
     tooltip: {
-        borderRadius: themeVars.borderRadius.full,
+        border: [`2px solid ${layerVars.contrast}`, `2px solid rgb(from ${layerVars.contrast} r g b / 25%)`],
         backgroundColor: layerVars.main,
         boxShadow: SHADOW_SMALL,
         color: layerVars.contrast,

@@ -198,9 +198,7 @@ SkinUtils.define(blocky, {
         },
     },
     drawer: {
-        backgroundColor: themeVars.color.surface.main,
-        boxShadow: [insetShadowRaised(themeVars.color.surface.main), SHADOW_MEDIUM].join(","),
-        color: themeVars.color.surface.contrast,
+        ...surface(layerVars),
     },
     dropdown: {
         ...INPUT_SHELL,
@@ -261,12 +259,12 @@ SkinUtils.define(blocky, {
         backdropFilter: "blur(20px) grayscale(75%)",
     },
     pageBackground: {
-        backgroundColor: themeVars.color.background.main,
-        color: themeVars.color.background.contrast,
+        backgroundColor: themeVars.color.layers.level0.main,
+        color: themeVars.color.layers.level0.contrast,
         fontFamily: "monospace",
     },
     pageContainer: {
-        ...surface(SkinUtils.extendColor(layerVars)),
+        ...surface(layerVars),
     },
     panel: {
         backgroundColor: [layerVars.main, `rgb(from ${layerVars.main} r g b / 50%)`],
@@ -378,7 +376,7 @@ SkinUtils.define(blocky, {
         fontWeight: "bold",
     },
     surface: {
-        ...surface(themeVars.color.surface),
+        ...surface(layerVars),
     },
     tabsItemBase: {
         paddingBlock: themeVars.spacing.full,

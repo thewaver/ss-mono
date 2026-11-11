@@ -36,7 +36,7 @@ export const PageBuildProgress = () => {
             expandedSize={BUILD_PROGRESS_HEIGHT}
             expanded={expandedState}
             renderContent={(phase) => (
-                <PageLayer level={1}>
+                <PageLayer>
                     <div className={styles.buildProgressClip}>
                         <div
                             className={[styles.buildProgressStrip, phase === "collapsed" && styles.isHidden]

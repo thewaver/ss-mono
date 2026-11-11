@@ -66,7 +66,7 @@ const props = defineProps<ToastContentProps>();
 </script>
 
 <template>
-    <PageLayer :level="2">
+    <PageLayer>
         <div
             :style="{
                 transition: `transform ${state.isSwiping ? 0 : transitionDurationMs}ms`,

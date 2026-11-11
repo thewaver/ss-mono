@@ -65,7 +65,7 @@ const entries = computed((): FlyoutMenuEntryRecord<string>[] =>
         <template
             #renderPanel="{ renderLinks, visibilityTarget, transitionDurationMs: panelDurationMs, placement, size }"
         >
-            <PageLayer :level="2">
+            <PageLayer>
                 <PagePopoverSurface
                     :visibility-target="visibilityTarget"
                     :transition-duration-ms="panelDurationMs"

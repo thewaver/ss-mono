@@ -64,30 +64,32 @@ painters only; the rest keep the name of the thing they are.
 styled component picked its own fill and text color — `"black"`, `surface.dark`, `currentColor` at some
 alpha — on the assumption of what would be behind it, and the assumption was wrong as soon as the control
 appeared somewhere else (a calendar inside a popup, a field inside a modal). The theme now carries one pair
-per layer, `color.control.level0` to `level2`, each a `main` (the control's own fill) and a `contrast` (its
-text, icons and, at 25%, its stroke).
+per layer, `color.layers.level0` to `level2`, each a full family — `dark`, `main`, `light` and `contrast` — so a
+container can paint itself from its level as well as hand it to its controls.
 
-**Three fixed levels, not a running count.** Level 0 is on the page background. Level 1 is inside an
-example box, a variants box, the left menu, a modal, a drawer or a sidebar. Level 2 is inside a popover —
-menus, menubar and toolbar popups, the hover-card navigation flyout, the fan and wheel menus, hover cards,
-tooltips, toasts, spotlight popups and the knobs popover — **except a popover that opens from an input**
-(select, multi-select and autocomplete lists, the date, time and date-range pickers, the color picker),
-which carries its input's level. Nothing adds to its parent's level: an example box inside a modal is
-still level 1. The user's call, with nested layering explicitly deferred: this is the Playground's theme,
-and a consumer may build something else entirely.
+**A container is one level above where it sits, and wears that level itself** — the user's design, replacing three
+fixed levels. Level 0 is the page background. A container (an example, variants or docs box, a gallery tile, a Skins
+column, the left menu, a modal, a drawer, a sidebar, a popover, a hover card, a toast, a tooltip, a spotlight popup)
+takes one more than the level it sits on and stops at 2, the last level the Themes define; so a popover opened from
+an example box is at 2, and one opened from the page at 1. **The container's own element wears its level** as well as
+handing it to its contents: before, a box painted from the fixed `surface` colors while handing its controls a level,
+so the settings popover and an example box looked alike yet held controls in different colors. **A popover that opens
+from an input** (select, multi-select and autocomplete lists, the pickers) carries its input's level and is not a
+container. Two places keep a fixed level: the nav preview, which shows a page at 1, and a docs example's code box,
+which drops to 0.
 
-**The Playground sets the level, not the library.** `PageLayer` in `PageComponents/Layer` provides it, and
-the level-setting surfaces place it themselves: `PageExamples`, `PageVariants` and the left menu in
-`App.tsx`; `PageModalPanel`, `PageDrawerPanel` and `PageSidebarSurface` at 1; `PageTooltipContent`,
-`PageHoverCardContent`, `PageToastContent` and `PageSpotlightPopup` at 2; and each non-input popup at the
-call site that renders it. `PagePopoverSurface` sets nothing, because it serves both kinds of popup and
-takes its level from wherever it is mounted.
+**The Playground sets the level, not the library.** `PageLayer` in `PageComponents/Layer` provides it — with no
+`level`, one above its parent's — and each container puts it inside its root and the next-level class
+(`useNextLayerClass`) on its root, or wraps its root in it where the root is a separate painter (the menu popups,
+toasts). The level reaches a portalled container through context, which every framework keeps across the move to the
+end of the page. `PagePopoverSurface` sets nothing, because it serves both kinds of popup and takes its level from
+wherever it is mounted.
 
 **Every styled component reads the level itself.** Also the user's call, over the alternative of letting
 the containers switch the colors and keeping components unaware: reading the context is one of the few
 pieces of logic a theme is expected to own, because a different theme may not use layers at all. So each
 painter calls `useLayerClass()` and puts the returned class on its root; the class assigns `layerVars.main`
-and `layerVars.contrast` from the matching `color.control.levelN`, and the painter's styles use
+and `layerVars.contrast` from the matching `color.layers.levelN`, and the painter's styles use
 `layerVars` only.
 
 **`PageLayer` also paints the level onto the page, through `PageLayerScope`**, a `display: contents` element
@@ -102,7 +104,7 @@ page background or in a top-level portal of its own: the example box, the left m
 spotlight popups, tooltips — takes the `surface` gradient. Anything contained in an example box
 takes a solid fill of its level: a sample's frames and panels paint `layerVars.main`, unless the frame has a Skin entry: `Table`'s frame is `panel`, and the `Toolbar` and `Menubar` bars are `dropZone`. The one exception is
 `PageSidebarSurface`, which paints exactly the left menu's gradient, since it is a sample of that same
-furniture; a solid fill was tried and reverted by the user. `color.background.*` is off-limits to all of it. Where a solid fill takes away the difference between neighboring tiles or cells, their
+furniture; a solid fill was tried and reverted by the user. The page's own ground, read straight from `color.layers.level0`, is off-limits to all of it. Where a solid fill takes away the difference between neighboring tiles or cells, their
 separators become the 25% stroke, since a separator painted in the fill itself disappears.
 
 **A control's own stroke is `contrast` at 25%.** The user's rule; 50% was tried first and read too strong.
@@ -347,8 +349,15 @@ planned for.
 - **The page's font and backdrop are constants, not the Skin's** — the user's call. The `body` rule in
   `Theme.css.ts` holds the font family, size, line height and the backdrop behind the app, and sets no text
   color: every painted area sets its own.
-- **SVG paint is not reached yet**: a fill or stroke handed to `Shape` through `computeFillDefs` or
-  `computeStrokeDefs` is data, not a class. The user deferred how a Skin reaches it.
+- **A Skin reaches SVG paint through a hidden box**: a fill or stroke handed to `Shape` is data, not a class, so the
+  tooltip surface (`PageTooltipSurface`, shared by the tooltip painter and the Tooltip page's arrow-bed demos, which
+  keep their own outlines and corners) renders an invisible element wearing `skinEntries.tooltip` beside its `Shape` and converts that
+  element's computed style with `SVGStyleDefsUtils` — the user's call that the tooltip wears `tooltip`. The Skin's
+  radius, shadow and border go onto the body before the arrow is attached, and a fill layer whose edges all move by
+  one amount keeps that amount on the arrow's edges. The style is read when the tooltip is drawn, not again when the
+  Skin changes while it is open. The text color comes from the same box. **Every Playground tooltip draws the
+  triangle arrow** — the user's call — so each passes the aim its `renderContent` is handed; a tooltip that passes
+  `arrow` itself (the Tooltip page's knob) keeps its own.
 - **The loading screen is plain black** (`vite/loadingScreen.ts`), the user's call, so it belongs to no Theme or
   Skin and the build config needs neither.
 
@@ -1653,6 +1662,42 @@ the other pages copy. Taken on Claude's judgment under the unsupervised port.
   stale.
 - **A core type is reused in React where its documentation reads true for both**; `CarouselState` is redeclared on
   the React side only because its documentation names `playback`.
+
+### `SVGStyleDefsUtils`: a computed style into fill and stroke
+
+- **It is a utility and knows nothing about elements**: the caller decides what to read and when to read again — the
+  user's call. A computed style is live but announces nothing.
+- **What it cannot convert is skipped and reported with `console.warn`, in production too** — the user's call for this
+  utility, over the general rule that a lossy conversion fails loudly.
+- `ALPHA_BLEND_STEPS` is a guess, the user's to change: CSS blends translucent stops premultiplied and SVG does not, so
+  a segment whose alpha and color both change is sampled.
+- **A corner's radius is a number or a pair** — the user's shape for elliptical corners. The pair is edge-relative
+  (arriving edge, leaving edge) because a contour's corners need not be axis-aligned, so the converter swaps a CSS
+  corner's horizontal and vertical at alternate corners. A pair's inner curve subtracts the other edge's thickness, as
+  CSS does; a single number keeps subtracting the thicker edge, so existing shapes draw the same.
+- **Each fill layer may have its own contour, through `fillGeom`** — the user's call, generic over a CSS-only fix, as
+  long as a `Shape` given none paints exactly as before. An entry moves each edge out or in and rounds the corners
+  the CSS way, or with radii of its own; that is what draws a shadow's spread, an inset shadow's hole and a
+  padding- or content-box background exactly.
+- **Box shadows are fill layers** — outer ones under the background, inset ones over it — each drawn from its layer's
+  solid shape rather than its paint and clipped as CSS clips it: outside the border box, or inside the padding box.
+  With no spread the filter cuts the shadow against its own source; with a spread the source is the moved contour,
+  so the cut is a clip, and **the clip is `fillGeom`'s `clip`, which `Shape` draws from its own contour** — the user's
+  pick. The converter knows only the box, so a clip it drew itself was a rounded rectangle: under a skin with a
+  spread glow, an octagon's cut corners showed the inset glow and an arrow caught the outer one.
+- **A gradient whose origin box differs from its clip box is tiled with a pattern**, as CSS repeats it, rather than
+  skipped: the default origin is the padding box, so any gradient behind a translucent border needs it. The same
+  pattern, with a window onto part of the image, draws `background-size`, `-position` and `-repeat` and each of a
+  border image's nine regions, each region a fill layer whose `fillGeom` is its rectangle with square corners, since
+  `border-radius` does not reach a border image.
+- **`corner-shape` is converted, not passed through**: CSS's `superellipse(K)` draws with exponent `2^K`, measured
+  in Chromium against `squircle` and `superellipse(3)`, while `Shape`'s Lamé exponent `e` draws with `e + 1` (or
+  `1 / (1 - e)` below zero). The two agree only at `round`, `bevel`, `scoop` and the extremes, so the converter
+  maps one onto the other.
+- **Border-image `space` follows the spec, not Chromium**: the spec drops partial tiles and spreads the gaps evenly,
+  and Chromium draws partial tiles at both ends of each edge, so that one mode does not match the browser.
+- **Sides of different colors are one ring per color, each clipped** to the wedges between the box's corner-to-inner-corner
+  seams, using `SVGDefs.clipPath`. `SVGClipPath` reads fractions of the box, so the polygons are fractions.
 
 ### Porting: the SVG generators, `Shape`, `Surface`, `GlassSurface`, `CornerHighlight` and `Glass`
 
@@ -20082,7 +20127,10 @@ with both stops from the same family — not two families mixed, and not a `.mai
 before the rule: a card gradient from `primary.dark` to `secondary.main`, and a drag pad from `surface.dark` to
 `info.dark`, both of which read as arbitrary because they are.
 
-**`color.background.*` is the page's, and nothing else may use it.** Stated by the user after the first pass
+**The page's ground is `color.layers.level0`**, which replaced `color.background.*` at the user's request
+once the Themes gained per-level families; `background` and `surface` were then removed from the Themes. What follows was written
+about `background` and holds for the page's ground. **The page's ground is the page's, and nothing else may use
+it.** Stated by the user after the first pass
 painted every example's stage with a `background.dark` to `background.light` gradient: that family names the
 page's own ground, so an example borrowing it is claiming to be the page. The shadow-casting demos are the one
 exception, and only because a black shadow needs a light ground to read against; they carry a pale stage of
@@ -20098,7 +20146,7 @@ after a second pass wrapped everything in `PageMeasureBox`, which was as wrong a
   it is decoration pretending to be information.
 - **The layer's `main`** is for anything that should read as a control's own surface. The virtualizer's lists
   take it, because a scrolling list of rows is what a select's popup is, and the two looking alike is the
-  useful signal. Which `color.control.levelN` that is gets decided by where the control sits; see _"Layers"_.
+  useful signal. Which `color.layers.levelN` that is gets decided by where the control sits; see _"Layers"_.
 - **A surface-family card** for everything else.
 
 **Text on a background is that family's `contrast`, and a highlight color has to be checked against the

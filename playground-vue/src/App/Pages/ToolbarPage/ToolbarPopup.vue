@@ -7,7 +7,7 @@ defineProps<ToolbarPopupProps>();
 </script>
 
 <template>
-    <PageLayer :level="2">
+    <PageLayer>
         <PagePopoverSurface
             :visibility-target="visibilityTarget"
             :transition-duration-ms="transitionDurationMs"

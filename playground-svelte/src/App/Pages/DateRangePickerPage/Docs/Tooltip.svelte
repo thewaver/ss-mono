@@ -1,4 +1,5 @@
 <script lang="ts">
+    import type { ShapeArrowAim } from "@thewaver/ss-utils";
     import type { DateValueRange } from "@thewaver/ss-components-svelte";
     import { DateRangePicker } from "@thewaver/ss-components-svelte";
     import {
@@ -81,6 +82,6 @@
     {/snippet}
 </DateRangePicker>
 
-{#snippet tooltip(visibilityTarget: 0 | 1, transitionDurationMs: number)}
-    <PageTooltipContent {visibilityTarget} {transitionDurationMs}>A tooltip on a date range picker.</PageTooltipContent>
+{#snippet tooltip(visibilityTarget: 0 | 1, transitionDurationMs: number, _placement: unknown, _flags: unknown, arrowAim: ShapeArrowAim | undefined)}
+    <PageTooltipContent {visibilityTarget} {transitionDurationMs} {arrowAim}>A tooltip on a date range picker.</PageTooltipContent>
 {/snippet}

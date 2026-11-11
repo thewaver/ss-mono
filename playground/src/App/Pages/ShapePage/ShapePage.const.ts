@@ -5,10 +5,17 @@ export const EXAMPLE_NAMES = {
     morph: "Morph",
     sharedPaint: "Shared Paint",
     textWrap: "Text Wrap",
+    fromCss: "From CSS",
     stressTest: "Stress Test",
 };
 
 export const CORNER_FIELD_WIDTH = 80;
+
+export const FROM_CSS_FIELD_WIDTH = 660;
+
+export const FROM_CSS_MIN_ROWS = 3;
+
+export const FROM_CSS_MAX_ROWS = 8;
 
 export const MAX_CORNER_COLUMNS = 6;
 

@@ -22,8 +22,8 @@ const toHint = (text: string): InteractionTooltipDefs => ({
     placement: PLACEMENT,
     offset: OFFSET,
     hoverShowDelayMs: TOOLTIP_HOVER_DELAY_MS,
-    renderContent: ({ visibilityTarget, transitionDurationMs }) =>
-        h(PageTooltipContent, { visibilityTarget, transitionDurationMs }, () => text),
+    renderContent: ({ visibilityTarget, transitionDurationMs, arrowAim }) =>
+        h(PageTooltipContent, { visibilityTarget, transitionDurationMs, arrowAim }, () => text),
 });
 
 type Props = ToolbarTooltipDocsExampleProps;

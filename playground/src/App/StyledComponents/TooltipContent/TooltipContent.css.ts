@@ -1,9 +1,9 @@
 import { style, styleVariants } from "@vanilla-extract/css";
 
+import { skinEntries } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 
 const SHADOW_REACH = "32px";
-const SHADOW = "drop-shadow(0 2px 1px rgba(0, 0, 0, 0.8)) drop-shadow(0 4px 4px rgba(0, 0, 0, 0.65))";
 
 export const isVisible = style({});
 
@@ -17,9 +17,23 @@ export const tooltipVisibility = style({
     },
 });
 
-export const tooltipShadow = style({
-    filter: SHADOW,
+export const tooltipFrame = style({
+    position: "relative",
 });
+
+export const tooltipText = style({
+    display: "contents",
+});
+
+export const tooltipSkinProbe = style([
+    skinEntries.tooltip,
+    {
+        position: "absolute",
+        inset: 0,
+        visibility: "hidden",
+        pointerEvents: "none",
+    },
+]);
 
 export const tooltipRevealVariants = styleVariants({
     fade: {
@@ -80,7 +94,6 @@ export const tooltipRevealVariants = styleVariants({
 });
 
 export const tooltipBody = style({
-    color: themeVars.color.surface.contrast,
     padding: themeVars.spacing.full,
 
     maxWidth: 240,

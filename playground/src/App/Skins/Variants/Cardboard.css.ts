@@ -18,7 +18,7 @@ const PILL_RADIUS = "9999px";
 
 const SHADOW_SMALL = "0 1px 2px 0px rgba(0, 0, 0, 0.8)";
 const SHADOW_MEDIUM = `${SHADOW_SMALL}, 0 2px 8px 0px rgba(0, 0, 0, 0.4)`;
-const SHADOW_LARGE = `${SHADOW_MEDIUM}, 0 8px 64px 0px rgba(0, 0, 0, 0.2)`;
+// const SHADOW_LARGE = `${SHADOW_MEDIUM}, 0 8px 64px 0px rgba(0, 0, 0, 0.2)`;
 
 const INTERACTIBLE_STATES: StyleRule["selectors"] = {
     [skinSelectors.isHovered]: {
@@ -198,9 +198,7 @@ SkinUtils.define(cardboard, {
         },
     },
     drawer: {
-        backgroundColor: themeVars.color.surface.main,
-        boxShadow: SHADOW_LARGE,
-        color: themeVars.color.surface.contrast,
+        ...surface(layerVars),
     },
     dropdown: {
         ...INPUT_SHELL,
@@ -259,11 +257,11 @@ SkinUtils.define(cardboard, {
         backdropFilter: "blur(20px) grayscale(75%)",
     },
     pageBackground: {
-        backgroundColor: themeVars.color.background.main,
-        color: themeVars.color.background.contrast,
+        backgroundColor: themeVars.color.layers.level0.main,
+        color: themeVars.color.layers.level0.contrast,
     },
     pageContainer: {
-        ...surface(SkinUtils.extendColor(layerVars)),
+        ...surface(layerVars),
     },
     panel: {
         borderRadius: themeVars.borderRadius.half,
@@ -375,7 +373,7 @@ SkinUtils.define(cardboard, {
         fontWeight: "bold",
     },
     surface: {
-        ...surface(themeVars.color.surface),
+        ...surface(layerVars),
     },
     tabsItemBase: {
         paddingBlock: themeVars.spacing.full,
@@ -460,7 +458,7 @@ SkinUtils.define(cardboard, {
         },
     },
     tooltip: {
-        borderRadius: themeVars.borderRadius.full,
+        borderBottom: [`2px solid ${layerVars.contrast}`, `2px solid rgb(from ${layerVars.contrast} r g b / 25%)`],
         backgroundColor: layerVars.main,
         boxShadow: SHADOW_SMALL,
         color: layerVars.contrast,

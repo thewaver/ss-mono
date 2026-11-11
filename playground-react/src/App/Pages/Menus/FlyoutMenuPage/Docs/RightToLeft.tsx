@@ -51,7 +51,7 @@ export const RightToLeftDocsExample = () => {
                     )}
                     renderHighlightFloater={renderPageHighlightFloater}
                     renderPanel={(renderLinks, visibilityTarget, transitionDurationMs, placement, size) => (
-                        <PageLayer level={2}>
+                        <PageLayer>
                             <PagePopoverSurface
                                 visibilityTarget={visibilityTarget}
                                 transitionDurationMs={transitionDurationMs}

@@ -30,7 +30,7 @@ export const TooltipDocsExample = (props: Props) => {
             tooltipDefs={{
                 placement: { x: "center", y: "top_out" },
                 offset: { x: 0, y: 10 },
-                renderContent: (visibilityTarget, transitionDurationMs) => (
+                renderContent: (visibilityTarget, transitionDurationMs, _placement, _flags, arrowAim) => (
                     <PageTooltipContent visibilityTarget={visibilityTarget} transitionDurationMs={transitionDurationMs}>
                         Focusable so this tooltip can be read, but neither the arrows nor the stepper may move the
                         value.

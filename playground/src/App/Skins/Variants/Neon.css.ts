@@ -124,7 +124,7 @@ const TAB_FLOATER_SELECTED: StyleRule = {
 };
 
 const surface = (color: SkinBaseColor): StyleRule => ({
-    backgroundColor: [color.main, `rgb(from ${color.main} r g b / 50%)`],
+    backgroundColor: [color.dark, `rgb(from ${color.dark} r g b / 50%)`],
     backdropFilter: "blur(20px)",
     boxShadow: darkGlow(50),
     color: color.contrast,
@@ -209,10 +209,7 @@ SkinUtils.define(neon, {
         },
     },
     drawer: {
-        backgroundColor: [themeVars.color.surface.dark, `rgb(from ${themeVars.color.surface.dark} r g b / 50%)`],
-        backdropFilter: "blur(20px)",
-        boxShadow: darkGlow(50),
-        color: themeVars.color.surface.contrast,
+        ...surface(layerVars),
     },
     dropdown: {
         ...INPUT_SHELL,
@@ -275,13 +272,13 @@ SkinUtils.define(neon, {
         backdropFilter: "blur(20px) grayscale(75%)",
     },
     pageBackground: {
-        backgroundColor: themeVars.color.background.light,
+        backgroundColor: themeVars.color.layers.level0.light,
         backgroundImage: `linear-gradient(135deg, hsl(from ${themeVars.color.primary.light} h 100 l / 10%), transparent, hsl(from ${themeVars.color.primary.light} h 100 l / 10%))`,
-        color: themeVars.color.background.contrast,
+        color: themeVars.color.layers.level0.contrast,
         fontFamily: "monospace",
     },
     pageContainer: {
-        ...surface(SkinUtils.extendColor(layerVars)),
+        ...surface(layerVars),
     },
     panel: {
         backgroundColor: [layerVars.main, `rgb(from ${layerVars.main} r g b / 50%)`],
@@ -393,7 +390,7 @@ SkinUtils.define(neon, {
         fontWeight: "bold",
     },
     surface: {
-        ...surface(themeVars.color.surface),
+        ...surface(layerVars),
     },
     tabsItemBase: {
         paddingBlock: themeVars.spacing.full,
@@ -454,6 +451,7 @@ SkinUtils.define(neon, {
     },
     tooltip: {
         backgroundColor: layerVars.main,
+        boxShadow: lightGlow(layerVars.contrast, 25),
         color: layerVars.contrast,
     },
 });

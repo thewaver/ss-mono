@@ -29,10 +29,11 @@ const anchorRef = shallowRef<HTMLElement>();
             :offset="TOOLTIP_OFFSET"
             :hover-show-delay-ms="TOOLTIP_HOVER_DELAY_MS"
         >
-            <template #renderContent="{ visibilityTarget, transitionDurationMs }">
+            <template #renderContent="{ visibilityTarget, transitionDurationMs, arrowAim }">
                 <PageTooltipContent
                     :visibility-target="visibilityTarget"
                     :transition-duration-ms="transitionDurationMs"
+                    :arrow-aim="arrowAim"
                 >
                     {{ tip }}
                 </PageTooltipContent>

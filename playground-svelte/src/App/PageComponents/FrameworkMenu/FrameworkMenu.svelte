@@ -65,7 +65,7 @@
     transitionDurationMs: number,
     placement: AnchorPlacement,
 )}
-    <PageLayer level={2}>
+    <PageLayer>
         <PagePopoverSurface {visibilityTarget} {transitionDurationMs} {placement}>
             {@render renderItems()}
         </PagePopoverSurface>

@@ -30,10 +30,17 @@ export const DisabledOptionDocsExample = (props: Props) => {
                             ? {
                                   placement: { x: "center", y: "top_out" },
                                   offset: { x: 0, y: 10 },
-                                  renderContent: (visibilityTarget, transitionDurationMs) => (
+                                  renderContent: (
+                                      visibilityTarget,
+                                      transitionDurationMs,
+                                      _placement,
+                                      _flags,
+                                      arrowAim,
+                                  ) => (
                                       <PageTooltipContent
                                           visibilityTarget={visibilityTarget}
                                           transitionDurationMs={transitionDurationMs}
+                                          arrowAim={arrowAim}
                                       >
                                           Out of stock in this size.
                                       </PageTooltipContent>

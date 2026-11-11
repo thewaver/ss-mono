@@ -1,4 +1,5 @@
 <script lang="ts">
+    import type { ShapeArrowAim } from "@thewaver/ss-utils";
     import { Button, SpotlightHint } from "@thewaver/ss-components-svelte";
     import * as styles from "@thewaver/ss-playground/App/Pages/Spotlights/Spotlights.css";
 
@@ -26,8 +27,8 @@
 <div class={styles.root}>
     <PageMeasureBox width={styles.HINT_BOX_WIDTH} height={styles.HINT_BOX_HEIGHT}>
         {#each ANCHORS as anchor, anchorIndex (anchor.id)}
-            {#snippet tooltip(visibilityTarget: 0 | 1, transitionDurationMs: number)}
-                <PageTooltipContent {visibilityTarget} {transitionDurationMs}>{anchor.tooltip}</PageTooltipContent>
+            {#snippet tooltip(visibilityTarget: 0 | 1, transitionDurationMs: number, _placement: unknown, _flags: unknown, arrowAim: ShapeArrowAim | undefined)}
+                <PageTooltipContent {visibilityTarget} {transitionDurationMs} {arrowAim}>{anchor.tooltip}</PageTooltipContent>
             {/snippet}
 
             <div

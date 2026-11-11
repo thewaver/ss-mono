@@ -10,6 +10,9 @@ import { docsDemo, docsSettled, prop, revealProp } from "./helpers";
  *
  * Nothing is compared with a number written down here: the tip is checked against the side it should leave,
  * against the anchor it should line up with, and against the two size settings that were typed in.
+ *
+ * The contour is read from a path the `svg` paints directly (`:scope > path`), never the first path anywhere in it:
+ * the Skin's paint brings definitions with paths of their own, such as a shadow's cut-out, and those come first.
  */
 const DOCS = "/src/App/Pages/TooltipPage/Docs";
 
@@ -51,7 +54,7 @@ const readArrow = async (page: Page): Promise<ArrowReading> => {
         ({ anchorSelector, tooltipSelector }) => {
             const tooltip = document.querySelector<HTMLElement>(tooltipSelector)!;
             const svg = tooltip.querySelector("svg")!;
-            const path = svg.querySelector("path")!;
+            const path = svg.querySelector(":scope > path")!;
             const svgRect = svg.getBoundingClientRect();
             const scale = svgRect.width / Number(svg.getAttribute("width"));
             const anchorRect = document.querySelector(anchorSelector)!.getBoundingClientRect();
@@ -218,10 +221,16 @@ test("the lightning bolt keeps its lean: its tip on the anchor, its base wholly 
  */
 const ARROW_BED = docsDemo(DOCS, "Arrows");
 
+/**
+ * One tooltip's fill layer, the first `svg` a `Shape` draws. A Skin whose tooltip has a border adds a second, the
+ * stroke layer, which traces the same contour, so reading every `svg` would count each tooltip twice.
+ */
+const FILL_LAYER = "div > svg:first-child";
+
 const readArrowBed = (page: Page) =>
-    page.locator(`${ARROW_BED} svg`).evaluateAll((svgs) =>
+    page.locator(`${ARROW_BED} ${FILL_LAYER}`).evaluateAll((svgs) =>
         svgs.map((svg) => {
-            const numbers = (svg.querySelector("path")?.getAttribute("d") ?? "").match(/-?\d+(\.\d+)?/g) ?? [];
+            const numbers = (svg.querySelector(":scope > path")?.getAttribute("d") ?? "").match(/-?\d+(\.\d+)?/g) ?? [];
             const vertices = [];
 
             for (let i = 0; i + 1 < numbers.length; i += 2) {
@@ -293,12 +302,13 @@ test("the arrow going round is drawn at every position, on the side its angle fa
 
     for (const degrees of [0, 26, 45, 90, 153, 180, 207, 270, 333]) {
         await slider.fill(String(degrees));
-        await expect(page.locator(`${CIRCLING} svg`)).toHaveCount(1);
+        await expect(page.locator(`${CIRCLING} ${FILL_LAYER}`)).toHaveCount(1);
         await page.waitForTimeout(100);
 
-        const [reading] = await page.locator(`${CIRCLING} svg`).evaluateAll((svgs) =>
+        const [reading] = await page.locator(`${CIRCLING} ${FILL_LAYER}`).evaluateAll((svgs) =>
             svgs.map((svg) => {
-                const numbers = (svg.querySelector("path")?.getAttribute("d") ?? "").match(/-?\d+(\.\d+)?/g) ?? [];
+                const numbers =
+                    (svg.querySelector(":scope > path")?.getAttribute("d") ?? "").match(/-?\d+(\.\d+)?/g) ?? [];
                 const vertices = [];
 
                 for (let i = 0; i + 1 < numbers.length; i += 2) {

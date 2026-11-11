@@ -4,13 +4,17 @@ import { access } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/DrawerPanel/DrawerPanel.css";
 
 import { PageLayer } from "../../PageComponents/Layer/Layer";
+import { useNextLayerClass } from "../Layer/Layer.context";
 import type { DrawerPanelProps } from "./DrawerPanelSolid.types";
 
 export const PageDrawerPanel = (props: ParentProps<DrawerPanelProps>) => {
+    const getNextLayerClass = useNextLayerClass();
+
     return (
         <div
             class={[
                 styles.drawerPanel,
+                getNextLayerClass(),
                 styles.drawerSizeVariants[access(props.edge)],
                 access(props.visibilityTarget) === 1
                     ? styles.drawerSlideOn
@@ -18,7 +22,7 @@ export const PageDrawerPanel = (props: ParentProps<DrawerPanelProps>) => {
             ].join(" ")}
             style={{ transition: `transform ${access(props.transitionDurationMs)}ms` }}
         >
-            <PageLayer level={1}>{props.children}</PageLayer>
+            <PageLayer>{props.children}</PageLayer>
         </div>
     );
 };

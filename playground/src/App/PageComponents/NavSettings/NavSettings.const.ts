@@ -19,6 +19,7 @@ export const VIEWPORT_ANCHOR_OPTIONS: NavSettingsOption<ViewportAnchor>[] = [
 
 export const THEME_OPTIONS: NavSettingsOption<PlaygroundTheme>[] = [
     { value: "default", label: "Default" },
+    { value: "contrast", label: "Contrast" },
     { value: "solid", label: "Solid" },
     { value: "react", label: "React" },
     { value: "svelte", label: "Svelte" },

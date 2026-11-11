@@ -19,8 +19,8 @@ const toDisabledNode = (
     tooltipDefs: {
         placement: { x: "right_out", y: "center" },
         offset: { x: 10, y: 0 },
-        renderContent: ({ visibilityTarget, transitionDurationMs }) =>
-            h(PageTooltipContent, { visibilityTarget, transitionDurationMs }, () => reason),
+        renderContent: ({ visibilityTarget, transitionDurationMs, arrowAim }) =>
+            h(PageTooltipContent, { visibilityTarget, transitionDurationMs, arrowAim }, () => reason),
     },
 });
 

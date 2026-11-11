@@ -167,7 +167,7 @@ const examples: ExampleDefs[] = [
         <template #counter>
             <div :class="styles.stack">
                 <PageMeasureBox>
-                    <div :class="styles.line">
+                    <div :class="styles.numbersLine">
                         <CounterExample v-bind="commonProps" />
                     </div>
                 </PageMeasureBox>
@@ -185,7 +185,7 @@ const examples: ExampleDefs[] = [
         <template #reels>
             <div :class="styles.stack">
                 <PageMeasureBox>
-                    <div :class="styles.line">
+                    <div :class="styles.numbersLine">
                         <ReelsExample :text="pad(reelValue)" :reel-key="reelKey" />
                     </div>
                 </PageMeasureBox>
@@ -220,7 +220,7 @@ const examples: ExampleDefs[] = [
         <template #splitFlap>
             <div :class="styles.stack">
                 <PageMeasureBox>
-                    <div :class="styles.line">
+                    <div :class="styles.numbersLine">
                         <SplitFlapExample v-bind="commonProps" />
                     </div>
                 </PageMeasureBox>
@@ -238,7 +238,7 @@ const examples: ExampleDefs[] = [
         <template #words>
             <div :class="styles.stack">
                 <PageMeasureBox>
-                    <div :class="styles.line">
+                    <div :class="styles.numbersLine">
                         <WordsExample
                             v-bind="commonProps"
                             :text="WORDS[wordIndex]"

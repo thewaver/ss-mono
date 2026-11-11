@@ -1,4 +1,4 @@
-import { keyframes, style, styleVariants } from "@vanilla-extract/css";
+import { createVar, keyframes, style, styleVariants } from "@vanilla-extract/css";
 
 import { skinEntries } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
@@ -22,10 +22,12 @@ export const toastCard = style([
     },
 ]);
 
+const kindColorVar = createVar();
+
 export const toastKindVariants = styleVariants({
-    info: { color: themeVars.color.info.main },
-    success: { color: themeVars.color.success.main },
-    error: { color: themeVars.color.error.main },
+    info: { vars: { [kindColorVar]: themeVars.color.info.main } },
+    success: { vars: { [kindColorVar]: themeVars.color.success.main } },
+    error: { vars: { [kindColorVar]: themeVars.color.error.main } },
 });
 
 export const toastAnimationOffVariants = styleVariants({
@@ -47,12 +49,10 @@ export const toastBody = style({
 });
 
 export const toastMessage = style({
-    color: themeVars.color.surface.contrast,
     fontSize: themeVars.fontSize.small,
 });
 
 export const toastMeta = style({
-    color: themeVars.color.surface.contrast,
     fontSize: themeVars.fontSize.xSmall,
     fontVariantNumeric: "tabular-nums",
     opacity: 0.5,
@@ -64,7 +64,7 @@ export const toastCountdown = style({
     insetInlineStart: 0,
 
     height: 2,
-    backgroundColor: "currentColor",
+    backgroundColor: kindColorVar,
     animationName: countdown,
     animationTimingFunction: "linear",
     animationFillMode: "forwards",

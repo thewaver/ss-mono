@@ -2,16 +2,19 @@
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/HoverCardContent/HoverCardContent.css";
 
 import PageLayer from "../../PageComponents/Layer/Layer.vue";
+import { useNextLayerClass } from "../Layer/Layer.context";
 import type { HoverCardContentProps } from "./HoverCardContentVue.types";
 
 defineProps<HoverCardContentProps>();
+
+const nextLayerClass = useNextLayerClass();
 </script>
 
 <template>
     <div
-        :class="[styles.hoverCardContent, visibilityTarget === 1 && styles.isVisible]"
+        :class="[styles.hoverCardContent, nextLayerClass, visibilityTarget === 1 && styles.isVisible]"
         :style="{ transition: `opacity ${transitionDurationMs}ms` }"
     >
-        <PageLayer :level="2"><slot /></PageLayer>
+        <PageLayer><slot /></PageLayer>
     </div>
 </template>

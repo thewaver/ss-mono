@@ -13,6 +13,7 @@ import {
 import * as styles from "@thewaver/ss-playground/App/PageComponents/ExampleKnobs/ExampleKnobs.css";
 import * as examplesStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
 
+import { useNextLayerClass } from "../../StyledComponents/Layer/Layer.context";
 import { PageTooltipContent } from "../../StyledComponents/TooltipContent/TooltipContent";
 import { PageLayer } from "../Layer/Layer";
 import { PagePropsPanel } from "../PropsPanel/PropsPanel";
@@ -22,6 +23,7 @@ import type { PageExampleKnobsButtonProps } from "./ExampleKnobs.types";
 export const PageExampleKnobsButton = (props: PageExampleKnobsButtonProps) => {
     const popupId = createUniqueId();
 
+    const getNextLayerClass = useNextLayerClass();
     const [getTriggerRef, setTriggerRef] = createSignal<HTMLElement>();
     const [getIsOpen, setIsOpen] = createSignal(false);
 
@@ -41,10 +43,17 @@ export const PageExampleKnobsButton = (props: PageExampleKnobsButtonProps) => {
                 tooltipDefs={() => ({
                     placement: () => TOOLTIP_PLACEMENT,
                     offset: () => TOOLTIP_OFFSET,
-                    renderContent: (getVisibilityTarget, getTransitionDurationMs) => (
+                    renderContent: (
+                        getVisibilityTarget,
+                        getTransitionDurationMs,
+                        _getPlacement,
+                        _getFlags,
+                        getArrowAim,
+                    ) => (
                         <PageTooltipContent
                             visibilityTarget={getVisibilityTarget}
                             transitionDurationMs={getTransitionDurationMs}
+                            arrowAim={getArrowAim}
                         >
                             Settings
                         </PageTooltipContent>
@@ -78,13 +87,13 @@ export const PageExampleKnobsButton = (props: PageExampleKnobsButtonProps) => {
                 offset={KNOBS_OFFSET}
                 hasAutoFocus={true}
                 onDismiss={handleDismiss}
-                renderContent={(getVisibilityTarget, getTransitionDurationMs) => (
+                renderContent={(getVisibilityTarget, getTransitionDurationMs, _getPlacement, getArrowAim) => (
                     <div
-                        class={styles.exampleKnobsSurface}
+                        class={[styles.exampleKnobsSurface, getNextLayerClass()].join(" ")}
                         classList={{ [styles.isVisible]: getVisibilityTarget() === 1 }}
                         style={{ transition: `opacity ${getTransitionDurationMs()}ms` }}
                     >
-                        <PageLayer level={2}>
+                        <PageLayer>
                             <PagePropsPanel scope={"local"}>{props.renderKnobs()}</PagePropsPanel>
                         </PageLayer>
                     </div>

@@ -21,6 +21,7 @@ import PagePropsDivider from "../../PageComponents/PropsPanel/PagePropsDivider.v
 import PagePropsGroups from "../../PageComponents/PropsPanel/PagePropsGroups.vue";
 import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
 import DefaultExampleWrapper from "./DefaultExampleWrapper.vue";
+import FromCssExampleWrapper from "./FromCssExampleWrapper.vue";
 import MorphExampleWrapper from "./MorphExampleWrapper.vue";
 import type { ShapeExampleProps } from "./ShapePage.types";
 import SharedPaintExampleWrapper from "./SharedPaintExampleWrapper.vue";
@@ -92,6 +93,13 @@ const examples: ExampleDefs[] = [
         readout: () =>
             "the shape writes its contour as shape-outside, so floating it is all the page does for the text to follow the edge",
         path: `${EXAMPLES_ROOT}/TextWrap.vue`,
+    },
+    {
+        key: "fromCss",
+        name: EXAMPLE_NAMES.fromCss,
+        readout: () =>
+            "the left box is painted by the browser from the CSS above; the right is a Shape painted only from what computeDefsFromStyle returned for that box",
+        path: `${EXAMPLES_ROOT}/FromCss.vue`,
     },
     {
         key: "stressTest",
@@ -239,6 +247,10 @@ const examples: ExampleDefs[] = [
 
             <template #textWrap>
                 <TextWrapExampleWrapper v-bind="commonProps" />
+            </template>
+
+            <template #fromCss>
+                <FromCssExampleWrapper />
             </template>
 
             <template #stressTest>

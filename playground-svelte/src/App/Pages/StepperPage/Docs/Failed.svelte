@@ -1,4 +1,5 @@
 <script lang="ts">
+    import type { ShapeArrowAim } from "@thewaver/ss-utils";
     import { Stepper } from "@thewaver/ss-components-svelte";
     import { FAILED_OVERRIDES, STARTING_FAILED } from "@thewaver/ss-playground/App/Pages/StepperPage/StepperPage.const";
     import { StepperPageUtils } from "@thewaver/ss-playground/App/Pages/StepperPage/StepperPage.utils";
@@ -22,12 +23,12 @@
     let current = $state<StepValue>(STARTING_FAILED);
 </script>
 
-{#snippet failedReason(visibilityTarget: 0 | 1, transitionDurationMs: number)}
-    <PageTooltipContent {visibilityTarget} {transitionDurationMs}>{FAILURE_REASON}</PageTooltipContent>
+{#snippet failedReason(visibilityTarget: 0 | 1, transitionDurationMs: number, _placement: unknown, _flags: unknown, arrowAim: ShapeArrowAim | undefined)}
+    <PageTooltipContent {visibilityTarget} {transitionDurationMs} {arrowAim}>{FAILURE_REASON}</PageTooltipContent>
 {/snippet}
 
-{#snippet lockedReason(visibilityTarget: 0 | 1, transitionDurationMs: number)}
-    <PageTooltipContent {visibilityTarget} {transitionDurationMs}>{LOCKED_REASON}</PageTooltipContent>
+{#snippet lockedReason(visibilityTarget: 0 | 1, transitionDurationMs: number, _placement: unknown, _flags: unknown, arrowAim: ShapeArrowAim | undefined)}
+    <PageTooltipContent {visibilityTarget} {transitionDurationMs} {arrowAim}>{LOCKED_REASON}</PageTooltipContent>
 {/snippet}
 
 <Stepper

@@ -7,9 +7,12 @@ import * as styles from "@thewaver/ss-playground/App/Pages/GalleryPage/GalleryPa
 import PageLayer from "../../PageComponents/Layer/Layer.vue";
 import PagePreview from "../../PageComponents/Preview/Preview.vue";
 import PageRouterLink from "../../PageComponents/RouterLink/RouterLink.vue";
+import { useNextLayerClass } from "../../StyledComponents/Layer/Layer.context";
 import type { GalleryTileProps } from "./GalleryPage.types";
 
 defineProps<GalleryTileProps>();
+
+const nextLayerClass = useNextLayerClass();
 
 const previewRef = shallowRef<HTMLElement>();
 
@@ -17,8 +20,8 @@ const isOnScreen = ElementObserverVueUtils.useViewportIntersection(previewRef);
 </script>
 
 <template>
-    <div :class="styles.galleryTile" data-gallery-tile="" :data-testid="item.href">
-        <PageLayer :level="1">
+    <div :class="[styles.galleryTile, nextLayerClass]" data-gallery-tile="" :data-testid="item.href">
+        <PageLayer>
             <PageRouterLink :class="styles.galleryTileName" :href="item.href">{{ item.name }}</PageRouterLink>
 
             <div ref="previewRef" :class="styles.galleryPreview">
