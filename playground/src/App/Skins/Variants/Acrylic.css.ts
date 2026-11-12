@@ -10,7 +10,7 @@ import { skinSelectors, skinVars } from "../Skin.css";
 
 export const acrylic = style({
     vars: {
-        [skinVars.rangeFillThickness]: "8px",
+        [skinVars.rangeTrackThickness]: "20px",
     },
 });
 
@@ -20,12 +20,19 @@ const SHADOW_SMALL = "0 2px 2px 0px rgba(0, 0, 0, 0.75)";
 const SHADOW_MEDIUM = `${SHADOW_SMALL}, 0 4px 8px 0px rgba(0, 0, 0, 0.5)`;
 // const SHADOW_LARGE = `${SHADOW_MEDIUM}, 0 16px 64px 0px rgba(0, 0, 0, 0.25)`;
 
-const sheen = (color: string, colorAlphaPercent: number, sheenAlphaPercent: number): StyleRule => ({
-    backgroundColor: [color, `rgb(from ${color} r g b / ${colorAlphaPercent}%)`],
+const glossFromColorSet = (color: SkinBaseColor, alphaPercent: number): StyleRule => ({
     backgroundImage: [
-        `radial-gradient(100% 50% at top, rgb(255 255 255 / ${sheenAlphaPercent}%), transparent)`,
-        `radial-gradient(100% 50% at bottom, rgb(0 0 0 / ${sheenAlphaPercent * 0.5}%), transparent)`,
-        `linear-gradient(to bottom, rgb(255 255 255 / ${sheenAlphaPercent}%), rgb(0 0 0 / ${sheenAlphaPercent * 0.5}%))`,
+        `radial-gradient(100% 50% at top, hsl(from ${color.light} h 100 90 / ${alphaPercent}%), transparent)`,
+        `radial-gradient(100% 50% at bottom, hsl(from ${color.dark} h 100 90 / ${alphaPercent * 0.5}%), transparent)`,
+        `linear-gradient(to bottom, hsl(from ${color.light} h 100 l), hsl(from ${color.dark} h 100 l))`,
+    ].join(", "),
+});
+
+const glossFromColorString = (color: string, alphaPercent: number): StyleRule => ({
+    backgroundImage: [
+        `radial-gradient(100% 50% at top, hsl(from ${color} h s 90 / ${alphaPercent}%), transparent)`,
+        `radial-gradient(100% 50% at bottom, hsl(from ${color} h s 90 / ${alphaPercent * 0.5}%), transparent)`,
+        `linear-gradient(to bottom, hsl(from ${color} h s max(l - 5, 0) / ${alphaPercent}%), hsl(from ${color} h s min(l + 5, 100) / ${alphaPercent}%))`,
     ].join(", "),
 });
 
@@ -64,11 +71,11 @@ const ITEM_STATES: StyleRule["selectors"] = ObjectUtils.deepMerge(INTERACTIBLE_S
 
 const SWITCH_STATES: StyleRule["selectors"] = ObjectUtils.deepMerge(INPUT_STATES, {
     [SkinUtils.anyOf(skinSelectors.isCheckedWithin, skinSelectors.isMixedWithin)]: {
-        ...sheen(themeVars.color.primary.main, 100, 50),
+        ...glossFromColorSet(themeVars.color.primary, 100),
         border: "none",
     },
     [SkinUtils.anyOf(skinSelectors.hasErrorWithin, skinSelectors.hasError)]: {
-        ...sheen(themeVars.color.error.main, 100, 50),
+        ...glossFromColorSet(themeVars.color.error, 100),
         border: "none",
         color: themeVars.color.error.contrast,
     },
@@ -76,7 +83,7 @@ const SWITCH_STATES: StyleRule["selectors"] = ObjectUtils.deepMerge(INPUT_STATES
 
 const INPUT_SHELL: StyleRule = {
     border: [`2px solid ${layerVars.contrast}`, `2px solid rgb(from ${layerVars.contrast} r g b / 25%)`],
-    backgroundImage: `linear-gradient(to bottom, rgb(from ${layerVars.main} r g b / 75%), rgb(from ${layerVars.main} r g b / 50%))`,
+    backgroundImage: `linear-gradient(to bottom, rgb(from ${layerVars.dark} r g b / 50%), rgb(from ${layerVars.light} r g b / 25%))`,
     backdropFilter: "blur(20px)",
     boxShadow: SHADOW_SMALL,
     color: layerVars.contrast,
@@ -87,7 +94,7 @@ const SWITCH_SHELL: StyleRule = {
 } as const;
 
 const ACCORDION: StyleRule = {
-    backgroundImage: `linear-gradient(to bottom, rgb(from ${layerVars.main} r g b / 25%), rgb(from ${layerVars.main} r g b / 50%))`,
+    backgroundImage: `linear-gradient(to bottom, rgb(from ${layerVars.dark} r g b / 50%), rgb(from ${layerVars.light} r g b / 25%))`,
     borderRadius: themeVars.borderRadius.half,
     boxShadow: SHADOW_SMALL,
     color: layerVars.contrast,
@@ -100,7 +107,7 @@ const ITEM: StyleRule = {
 } as const;
 
 const ITEM_FLOATER_HOVER: StyleRule = {
-    ...sheen(layerVars.contrast, 10, 10),
+    ...glossFromColorString(layerVars.main, 25),
 };
 
 const ITEM_FLOATER_SELECTED: StyleRule = {
@@ -128,7 +135,7 @@ const TAB_FLOATER_SELECTED_VERT: StyleRule = {
 };
 
 const surface = (color: SkinBaseColor): StyleRule => ({
-    ...sheen(color.dark, 25, 10),
+    ...glossFromColorString(layerVars.main, 25),
     backdropFilter: "blur(20px)",
     borderRadius: themeVars.borderRadius.half,
     boxShadow: SHADOW_MEDIUM,
@@ -154,7 +161,7 @@ SkinUtils.define(acrylic, {
         ...ACCORDION,
     },
     button: {
-        ...sheen(themeVars.color.primary.main, 100, 50),
+        ...glossFromColorSet(themeVars.color.primary, 100),
         borderRadius: PILL_RADIUS,
         paddingInline: themeVars.spacing.double,
         boxShadow: SHADOW_SMALL,
@@ -165,13 +172,13 @@ SkinUtils.define(acrylic, {
                 boxShadow: `inset 0 2px 2px rgb(0 0 0 / 100%), inset 0 2px 4px rgb(0 0 0 / 75%), inset 0 2px 8px rgb(0 0 0 / 50%)`,
             },
             [skinSelectors.hasError]: {
-                backgroundColor: themeVars.color.error.main,
+                ...glossFromColorSet(themeVars.color.error, 100),
                 color: themeVars.color.error.contrast,
             },
         }),
     },
     buttonSimple: {
-        ...sheen(layerVars.contrast, 25, 10),
+        ...glossFromColorString(layerVars.main, 25),
         borderRadius: PILL_RADIUS,
         boxShadow: SHADOW_SMALL,
         color: layerVars.contrast,
@@ -272,16 +279,16 @@ SkinUtils.define(acrylic, {
         ...surface(layerVars),
     },
     panel: {
-        backgroundImage: `linear-gradient(to bottom, rgb(from ${layerVars.main} r g b / 25%), rgb(from ${layerVars.main} r g b / 50%))`,
+        backgroundImage: `linear-gradient(to bottom, rgb(from ${layerVars.dark} r g b / 50%), rgb(from ${layerVars.light} r g b / 25%))`,
         boxShadow: SHADOW_SMALL,
         color: layerVars.contrast,
     },
     progressFill: {
-        ...sheen(themeVars.color.primary.main, 100, 50),
+        ...glossFromColorSet(themeVars.color.primary, 100),
         borderRadius: PILL_RADIUS,
         selectors: {
             [skinSelectors.hasErrorWithin]: {
-                backgroundColor: themeVars.color.error.main,
+                ...glossFromColorSet(themeVars.color.error, 100),
             },
         },
     },
@@ -308,28 +315,29 @@ SkinUtils.define(acrylic, {
         backgroundColor: themeVars.color.primary.contrast,
     },
     rangeFill: {
-        ...sheen(themeVars.color.primary.main, 100, 50),
+        ...glossFromColorSet(themeVars.color.primary, 100),
         borderRadius: PILL_RADIUS,
         boxShadow: SHADOW_SMALL,
         selectors: {
             [skinSelectors.hasError]: {
-                backgroundColor: themeVars.color.error.main,
+                ...glossFromColorSet(themeVars.color.error, 100),
             },
         },
     },
     rangeThumb: {
-        ...sheen(layerVars.main, 100, 25),
+        ...glossFromColorString(themeVars.color.primary.contrast, 100),
         borderRadius: "50%",
         border: `2px solid ${themeVars.color.primary.main}`,
         boxShadow: SHADOW_SMALL,
         selectors: {
             [skinSelectors.hasError]: {
+                ...glossFromColorString(themeVars.color.error.contrast, 100),
                 borderColor: themeVars.color.error.main,
             },
         },
     },
     rangeTrack: {
-        ...sheen(layerVars.contrast, 25, 10),
+        ...glossFromColorString(layerVars.main, 25),
         borderRadius: PILL_RADIUS,
         boxShadow: SHADOW_SMALL,
     },
@@ -352,29 +360,30 @@ SkinUtils.define(acrylic, {
         },
     },
     slideButtonFill: {
-        ...sheen(themeVars.color.primary.main, 100, 50),
+        ...glossFromColorSet(themeVars.color.primary, 100),
         borderRadius: PILL_RADIUS,
         selectors: {
             [skinSelectors.hasError]: {
-                backgroundColor: themeVars.color.error.main,
+                ...glossFromColorSet(themeVars.color.error, 100),
             },
         },
     },
     slideButtonThumb: {
-        ...sheen(layerVars.main, 100, 25),
+        ...glossFromColorString(themeVars.color.primary.contrast, 100),
         borderRadius: "50%",
         border: `2px solid ${themeVars.color.primary.main}`,
         boxShadow: SHADOW_SMALL,
         color: themeVars.color.primary.main,
         selectors: {
             [skinSelectors.hasError]: {
-                color: themeVars.color.error.main,
+                ...glossFromColorString(themeVars.color.error.contrast, 100),
                 borderColor: themeVars.color.error.main,
+                color: themeVars.color.error.main,
             },
         },
     },
     slideButtonTrack: {
-        ...sheen(layerVars.contrast, 25, 10),
+        ...glossFromColorString(layerVars.main, 25),
         borderRadius: PILL_RADIUS,
         boxShadow: SHADOW_SMALL,
         fontWeight: "bold",
@@ -435,7 +444,7 @@ SkinUtils.define(acrylic, {
         },
     },
     tag: {
-        ...sheen(layerVars.contrast, 25, 10),
+        ...glossFromColorString(layerVars.main, 25),
         borderRadius: PILL_RADIUS,
         boxShadow: SHADOW_SMALL,
         paddingInline: themeVars.spacing.full,
@@ -447,7 +456,7 @@ SkinUtils.define(acrylic, {
         },
     },
     toggleThumb: {
-        ...sheen(layerVars.contrast, 100, 50),
+        ...glossFromColorString(layerVars.contrast, 100),
         borderRadius: "50%",
         selectors: {
             ...SWITCH_STATES,

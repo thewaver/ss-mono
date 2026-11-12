@@ -15,7 +15,7 @@ export const ARROW_BED_SHAPES = ["box", "rounded_box", "octagon"] as const;
 
 export type ArrowBedShape = (typeof ARROW_BED_SHAPES)[number];
 
-export const ARROW_BED_ARROWS = ["triangle", "bolt"] as const;
+export const ARROW_BED_ARROWS = ["even", "left", "right"] as const;
 
 export type ArrowBedArrow = (typeof ARROW_BED_ARROWS)[number];
 

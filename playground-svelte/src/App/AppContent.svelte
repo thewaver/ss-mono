@@ -29,7 +29,7 @@
         COMPONENT_CONFIGS_BY_ROUTE,
         GALLERY_ROUTE,
         GETTING_STARTED_ROUTE,
-        SKINS_ROUTE,
+        APPEARANCE_ROUTE,
         componentToRouteName,
         flattenConfigs,
         getIsBranchConfig,
@@ -149,7 +149,7 @@
 
     const isGallerySelected = $derived(route.pathname === GALLERY_ROUTE);
 
-    const isSkinsSelected = $derived(route.pathname === SKINS_ROUTE);
+    const isAppearanceSelected = $derived(route.pathname === APPEARANCE_ROUTE);
 
     $effect(() => {
         void route.pathname;
@@ -358,8 +358,8 @@
                                         Gallery
                                     </PageNavLink>
 
-                                    <PageNavLink href={SKINS_ROUTE} isSelected={isSkinsSelected} hasHoverFloater={true}>
-                                        Skins
+                                    <PageNavLink href={APPEARANCE_ROUTE} isSelected={isAppearanceSelected} hasHoverFloater={true}>
+                                        Appearance
                                     </PageNavLink>
                                 </PageNavLinkGroup>
                             </div>

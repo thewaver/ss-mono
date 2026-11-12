@@ -20,8 +20,8 @@ export const VIEWPORT_ANCHOR_OPTIONS: NavSettingsOption<ViewportAnchor>[] = [
 export const THEME_OPTIONS: NavSettingsOption<PlaygroundTheme>[] = [
     { value: "default", label: "Default" },
     { value: "contrast", label: "Contrast" },
-    { value: "solid", label: "Solid" },
     { value: "react", label: "React" },
+    { value: "solid", label: "Solid" },
     { value: "svelte", label: "Svelte" },
     { value: "vue", label: "Vue" },
 ];
@@ -29,11 +29,11 @@ export const THEME_OPTIONS: NavSettingsOption<PlaygroundTheme>[] = [
 export const SKIN_OPTIONS: NavSettingsOption<PlaygroundSkin>[] = [
     { value: "acrylic", label: "Acrylic" },
     { value: "blocky", label: "Blocky" },
-    { value: "cardboard", label: "Cardboard" },
     { value: "cartoon", label: "Cartoon" },
-    { value: "neon", label: "Neon" },
+    { value: "flat", label: "Flat" },
     { value: "shaded", label: "Shaded" },
     { value: "terminal", label: "Terminal" },
+    { value: "xenon", label: "Xenon" },
 ];
 
 export const NO_MOTION_DURATION_MS = 0;

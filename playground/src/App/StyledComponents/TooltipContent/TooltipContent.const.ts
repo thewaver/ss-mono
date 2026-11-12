@@ -19,27 +19,33 @@ export const TOOLTIP_REVEAL_LABELS: Record<TooltipReveal, string> = {
     flip: "Flip down",
 };
 
-export const TOOLTIP_ARROWS = ["none", "triangle", "bolt"] as const;
+export const TOOLTIP_ARROWS = ["none", "even", "left", "right"] as const;
 
 export type TooltipArrow = (typeof TOOLTIP_ARROWS)[number];
 
-export const DEFAULT_TOOLTIP_ARROW: TooltipArrow = "triangle";
+export const DEFAULT_TOOLTIP_ARROW: TooltipArrow = "even";
 
 export const TOOLTIP_ARROW_LABELS: Record<TooltipArrow, string> = {
     none: "None",
-    triangle: "Triangle",
-    bolt: "Lightning bolt",
+    even: "Even",
+    left: "Left",
+    right: "Right",
 };
 
 export const TOOLTIP_ARROW_TEMPLATES: Record<
     Exclude<TooltipArrow, "none">,
     (width: number, length: number) => ShapeArrowTemplate
 > = {
-    triangle: (width, length) => ShapeConst.getIsoscelesArrow(width, length),
-    bolt: (width, length) => ({
+    even: (width, length) => ShapeConst.getIsoscelesArrow(width, length),
+    left: (width, length) => ({
         baseStart: { x: -width, y: 0 },
         tip: { x: 0, y: length },
-        baseEnd: { x: -width * 0.5, y: 0 },
+        baseEnd: { x: 0, y: 0 },
+    }),
+    right: (width, length) => ({
+        baseStart: { x: width, y: 0 },
+        tip: { x: 0, y: length },
+        baseEnd: { x: 0, y: 0 },
     }),
 };
 

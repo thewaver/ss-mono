@@ -17,12 +17,12 @@ import {
 import type { ComponentConfig, MenuNodeConfig } from "./App.types";
 import { AppUtils } from "./App.utils";
 import {
+    APPEARANCE_ROUTE,
     GALLERY_ROUTE,
     GETTING_STARTED_ROUTE,
     MENU_EDGE,
     MENU_ID,
     SEARCH_FIELD_WIDTH,
-    SKINS_ROUTE,
 } from "./AppVue.const";
 import PageAppCommands from "./PageComponents/AppCommands/PageAppCommands.vue";
 import PageBuildProgress from "./PageComponents/BuildProgress/PageBuildProgress.vue";
@@ -80,7 +80,7 @@ const isGettingStartedSelected = computed(() => route.path === GETTING_STARTED_R
 
 const isGallerySelected = computed(() => route.path === GALLERY_ROUTE);
 
-const isSkinsSelected = computed(() => route.path === SKINS_ROUTE);
+const isAppearanceSelected = computed(() => route.path === APPEARANCE_ROUTE);
 
 const isSearching = computed(() => searchTerm.value.trim().length > 0);
 
@@ -275,11 +275,11 @@ const computeNodeText = (node: TreeNode<MenuNodeConfig>) => node.value.name;
                                         </PageNavLink>
 
                                         <PageNavLink
-                                            :href="SKINS_ROUTE"
-                                            :is-selected="isSkinsSelected"
+                                            :href="APPEARANCE_ROUTE"
+                                            :is-selected="isAppearanceSelected"
                                             has-hover-floater
                                         >
-                                            Skins
+                                            Appearance
                                         </PageNavLink>
                                     </PageNavLinkGroup>
                                 </div>

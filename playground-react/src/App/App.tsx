@@ -19,6 +19,7 @@ import type {
     TreeNodeRenderProps,
 } from "@thewaver/ss-components-react";
 import {
+    APPEARANCE_ROUTE,
     GALLERY_NAME_SEPARATOR,
     GALLERY_ROUTE,
     GETTING_STARTED_ROUTE,
@@ -26,7 +27,6 @@ import {
     NAV_PREVIEW_OFFSET,
     NAV_PREVIEW_PLACEMENT,
     SCREEN_HEIGHT,
-    SKINS_ROUTE,
 } from "@thewaver/ss-playground/App/App.const";
 import * as styles from "@thewaver/ss-playground/App/App.css";
 import { LAYOUT } from "@thewaver/ss-playground/App/Layout.const";
@@ -96,8 +96,8 @@ const PageGalleryPage = lazy(() =>
     import("./Pages/GalleryPage/GalleryPage").then((module) => ({ default: module.GalleryPage })),
 );
 
-const PageSkinsPage = lazy(() =>
-    import("./Pages/SkinsPage/SkinsPage").then((module) => ({ default: module.SkinsPage })),
+const PageAppearancePage = lazy(() =>
+    import("./Pages/AppearancePage/AppearancePage").then((module) => ({ default: module.AppearancePage })),
 );
 
 const getIsBranchConfig = (node: MenuNodeConfig): node is MenuBranchConfig => "children" in node;
@@ -371,7 +371,7 @@ export function AppContent(props: { viewportAnchor: readonly [ViewportAnchor, (v
     const isAboutSelected = location.pathname === "/";
     const isGettingStartedSelected = location.pathname === GETTING_STARTED_ROUTE;
     const isGallerySelected = location.pathname === GALLERY_ROUTE;
-    const isSkinsSelected = location.pathname === SKINS_ROUTE;
+    const isAppearanceSelected = location.pathname === APPEARANCE_ROUTE;
 
     useEffect(restoreRootSlash, [location.pathname]);
 
@@ -572,11 +572,11 @@ export function AppContent(props: { viewportAnchor: readonly [ViewportAnchor, (v
                                             </PageNavLink>
 
                                             <PageNavLink
-                                                href={SKINS_ROUTE}
-                                                isSelected={isSkinsSelected}
+                                                href={APPEARANCE_ROUTE}
+                                                isSelected={isAppearanceSelected}
                                                 hasHoverFloater
                                             >
-                                                {"Skins"}
+                                                {"Appearance"}
                                             </PageNavLink>
                                         </PageNavLinkGroup>
                                     </div>
@@ -709,7 +709,7 @@ export function App() {
                         <Route index={true} element={<PageAboutPage />} />
                         <Route path={GETTING_STARTED_ROUTE} element={<PageGettingStartedPage />} />
                         <Route path={GALLERY_ROUTE} element={<PageGalleryPage sections={GALLERY_SECTIONS} />} />
-                        <Route path={SKINS_ROUTE} element={<PageSkinsPage />} />
+                        <Route path={APPEARANCE_ROUTE} element={<PageAppearancePage />} />
                         {COMPONENT_CONFIGS.map((config) => (
                             <Route key={config.name} path={componentToRouteName(config.name)}>
                                 <Route

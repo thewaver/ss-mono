@@ -43,7 +43,7 @@ const INPUT_STATES: StyleRule["selectors"] = ObjectUtils.deepMerge(INTERACTIBLE_
 
 const ITEM_STATES: StyleRule["selectors"] = ObjectUtils.deepMerge(INTERACTIBLE_STATES, {
     [skinSelectors.isSelected]: {
-        color: themeVars.color.primary.main,
+        color: themeVars.color.primary.contrast,
         fontWeight: "bold",
     },
     [skinSelectors.isDisabled]: {
@@ -66,7 +66,7 @@ const SWITCH_STATES: StyleRule["selectors"] = ObjectUtils.deepMerge(INPUT_STATES
 
 const INPUT_SHELL: StyleRule = {
     border: [`2px solid ${layerVars.contrast}`, `2px solid rgb(from ${layerVars.contrast} r g b / 25%)`],
-    backgroundColor: layerVars.main,
+    backgroundColor: layerVars.dark,
     boxShadow: SHADOW_SMALL,
     color: layerVars.contrast,
 } as const;
@@ -77,7 +77,7 @@ const SWITCH_SHELL: StyleRule = {
 
 const ACCORDION: StyleRule = {
     border: "2px solid black",
-    backgroundColor: [layerVars.main, `rgb(from ${layerVars.main} r g b / 50%)`],
+    backgroundColor: layerVars.dark,
     boxShadow: SHADOW_SMALL,
     color: layerVars.contrast,
     fontSize: themeVars.fontSize.medium,
@@ -86,9 +86,6 @@ const ACCORDION: StyleRule = {
 const ITEM: StyleRule = {
     border: "2px solid transparent",
     fontSize: themeVars.fontSize.medium,
-    selectors: {
-        ...ITEM_STATES,
-    },
 } as const;
 
 const ITEM_FLOATER_HOVER: StyleRule = {
@@ -99,9 +96,9 @@ const ITEM_FLOATER_HOVER: StyleRule = {
 
 const ITEM_FLOATER_SELECTED: StyleRule = {
     border: `2px solid black`,
-    backgroundColor: [layerVars.contrast, `rgb(from ${layerVars.contrast} r g b / 10%)`],
+    backgroundColor: themeVars.color.primary.main,
     boxShadow: SHADOW_SMALL,
-    color: themeVars.color.primary.main,
+    color: themeVars.color.primary.contrast,
 };
 
 const TAB_FLOATER_HOVER: StyleRule = {
@@ -114,7 +111,7 @@ const TAB_FLOATER_SELECTED: StyleRule = {
 
 const surface = (color: SkinBaseColor): StyleRule => ({
     border: "2px solid black",
-    backgroundColor: color.light,
+    backgroundColor: color.main,
     boxShadow: SHADOW_MEDIUM,
     color: color.contrast,
     fontSize: themeVars.fontSize.medium,
@@ -247,7 +244,7 @@ SkinUtils.define(cartoon, {
         backdropFilter: "blur(20px) grayscale(75%)",
     },
     pageBackground: {
-        backgroundColor: themeVars.color.layers.level0.light,
+        backgroundColor: themeVars.color.layers.level0.main,
         color: themeVars.color.layers.level0.contrast,
         fontFamily: "monospace",
     },
@@ -256,7 +253,7 @@ SkinUtils.define(cartoon, {
     },
     panel: {
         border: `2px solid black`,
-        backgroundColor: [layerVars.main, `rgb(from ${layerVars.main} r g b / 50%)`],
+        backgroundColor: layerVars.dark,
         boxShadow: SHADOW_SMALL,
         color: layerVars.contrast,
     },
@@ -271,7 +268,7 @@ SkinUtils.define(cartoon, {
     progressTip: {},
     progressTrack: {
         border: `2px solid black`,
-        backgroundColor: [layerVars.main, `rgb(from ${layerVars.main} r g b / 50%)`],
+        backgroundColor: layerVars.dark,
         boxShadow: SHADOW_SMALL,
         selectors: {
             [skinSelectors.hasError]: {
@@ -303,18 +300,16 @@ SkinUtils.define(cartoon, {
         border: `2px solid ${themeVars.color.primary.main}`,
         backgroundColor: themeVars.color.primary.contrast,
         boxShadow: SHADOW_SMALL,
-        color: themeVars.color.primary.main,
         selectors: {
             [skinSelectors.hasError]: {
                 borderColor: themeVars.color.error.main,
                 backgroundColor: themeVars.color.error.contrast,
-                color: themeVars.color.error.contrast,
             },
         },
     },
     rangeTrack: {
         border: `2px solid black`,
-        backgroundColor: [layerVars.contrast, `rgb(from ${layerVars.contrast} r g b / 10%)`],
+        backgroundColor: layerVars.dark,
         boxShadow: SHADOW_SMALL,
         selectors: {
             [skinSelectors.hasError]: {
@@ -363,7 +358,7 @@ SkinUtils.define(cartoon, {
     },
     slideButtonTrack: {
         border: `2px solid black`,
-        backgroundColor: [layerVars.contrast, `rgb(from ${layerVars.contrast} r g b / 10%)`],
+        backgroundColor: layerVars.dark,
         boxShadow: SHADOW_SMALL,
         fontWeight: "bold",
         selectors: {

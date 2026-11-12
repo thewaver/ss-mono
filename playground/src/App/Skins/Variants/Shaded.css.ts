@@ -54,7 +54,7 @@ const SWITCH_STATES: StyleRule["selectors"] = {
 
 const INPUT_SHELL: StyleRule = {
     border: [`2px solid ${layerVars.contrast}`, `2px solid rgb(from ${layerVars.contrast} r g b / 25%)`],
-    backgroundColor: layerVars.main,
+    backgroundColor: layerVars.dark,
     boxShadow: SHADOW_SMALL,
     color: layerVars.contrast,
 } as const;
@@ -65,7 +65,7 @@ const SWITCH_SHELL: StyleRule = {
 
 const ACCORDION: StyleRule = {
     borderRadius: themeVars.borderRadius.half,
-    backgroundColor: [layerVars.main, `rgb(from ${layerVars.main} r g b / 50%)`],
+    backgroundColor: [layerVars.dark, `rgb(from ${layerVars.dark} r g b / 50%)`],
     boxShadow: SHADOW_SMALL,
     color: layerVars.contrast,
     fontSize: themeVars.fontSize.medium,
@@ -74,9 +74,6 @@ const ACCORDION: StyleRule = {
 const ITEM: StyleRule = {
     borderRadius: themeVars.borderRadius.half,
     fontSize: themeVars.fontSize.medium,
-    selectors: {
-        ...ITEM_STATES,
-    },
 } as const;
 
 const ITEM_FLOATER_HOVER: StyleRule = {
@@ -259,7 +256,7 @@ SkinUtils.define(shaded, {
     },
     panel: {
         borderRadius: themeVars.borderRadius.half,
-        backgroundColor: [layerVars.main, `rgb(from ${layerVars.main} r g b / 50%)`],
+        backgroundColor: [layerVars.dark, `rgb(from ${layerVars.dark} r g b / 50%)`],
         boxShadow: SHADOW_SMALL,
         color: layerVars.contrast,
     },
@@ -278,11 +275,11 @@ SkinUtils.define(shaded, {
     progressTrack: {
         border: [layerVars.contrast, `2px solid rgb(from ${layerVars.contrast} r g b / 25%)`],
         borderRadius: PILL_RADIUS,
-        backgroundColor: layerVars.main,
+        backgroundColor: layerVars.dark,
         boxShadow: SHADOW_SMALL,
         selectors: {
             [skinSelectors.hasError]: {
-                borderColor: themeVars.color.error.main,
+                borderColor: themeVars.color.error.dark,
             },
         },
     },
@@ -315,7 +312,7 @@ SkinUtils.define(shaded, {
     rangeThumb: {
         borderRadius: "50%",
         border: `2px solid ${themeVars.color.primary.main}`,
-        backgroundColor: layerVars.main,
+        backgroundColor: themeVars.color.primary.contrast,
         boxShadow: SHADOW_SMALL,
         selectors: {
             [skinSelectors.isStart]: {
@@ -323,6 +320,7 @@ SkinUtils.define(shaded, {
             },
             [skinSelectors.hasError]: {
                 borderColor: themeVars.color.error.main,
+                backgroundColor: themeVars.color.error.contrast,
             },
         },
     },
@@ -363,13 +361,14 @@ SkinUtils.define(shaded, {
     slideButtonThumb: {
         borderRadius: "50%",
         border: `2px solid ${themeVars.color.primary.main}`,
-        backgroundColor: layerVars.main,
+        backgroundColor: themeVars.color.primary.contrast,
         boxShadow: SHADOW_SMALL,
         color: themeVars.color.primary.main,
         selectors: {
             [skinSelectors.hasError]: {
-                color: themeVars.color.error.main,
                 borderColor: themeVars.color.error.main,
+                backgroundColor: themeVars.color.error.contrast,
+                color: themeVars.color.error.main,
             },
         },
     },
@@ -437,10 +436,9 @@ SkinUtils.define(shaded, {
     tag: {
         borderRadius: themeVars.borderRadius.half,
         paddingInline: themeVars.spacing.full,
-        backgroundColor: themeVars.color.primary.main,
-        backgroundImage: `linear-gradient(45deg, ${themeVars.color.primary.dark}, ${themeVars.color.primary.light})`,
+        backgroundColor: [layerVars.contrast, `rgb(from ${layerVars.contrast} r g b / 25%)`],
         boxShadow: SHADOW_SMALL,
-        color: themeVars.color.primary.contrast,
+        color: layerVars.contrast,
         fontSize: themeVars.fontSize.xSmall,
         fontWeight: "bold",
         selectors: {

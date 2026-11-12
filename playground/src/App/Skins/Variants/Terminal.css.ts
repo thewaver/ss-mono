@@ -64,7 +64,7 @@ const SWITCH_STATES: StyleRule["selectors"] = ObjectUtils.deepMerge(INPUT_STATES
 
 const INPUT_SHELL: StyleRule = {
     border: [`2px solid ${layerVars.contrast}`, `2px solid rgb( from ${layerVars.contrast} r g b / 25%)`],
-    backgroundColor: layerVars.main,
+    backgroundColor: layerVars.dark,
     color: layerVars.contrast,
 } as const;
 
@@ -74,7 +74,7 @@ const SWITCH_SHELL: StyleRule = {
 
 const ACCORDION: StyleRule = {
     border: [`2px solid ${layerVars.contrast}`, `2px solid rgb( from ${layerVars.contrast} r g b / 25%)`],
-    backgroundColor: [layerVars.main, `rgb(from ${layerVars.main} r g b / 50%)`],
+    backgroundColor: layerVars.light,
     color: layerVars.contrast,
     fontSize: themeVars.fontSize.medium,
 } as const;
@@ -82,9 +82,6 @@ const ACCORDION: StyleRule = {
 const ITEM: StyleRule = {
     border: "2px solid transparent",
     fontSize: themeVars.fontSize.medium,
-    selectors: {
-        ...ITEM_STATES,
-    },
 } as const;
 
 const ITEM_FLOATER_HOVER: StyleRule = {
@@ -248,7 +245,7 @@ SkinUtils.define(terminal, {
         backdropFilter: "blur(20px) grayscale(75%)",
     },
     pageBackground: {
-        backgroundColor: themeVars.color.layers.level0.dark,
+        backgroundColor: themeVars.color.layers.level0.main,
         color: themeVars.color.layers.level0.contrast,
         fontFamily: "monospace",
     },
@@ -257,7 +254,7 @@ SkinUtils.define(terminal, {
     },
     panel: {
         border: [`2px solid ${layerVars.contrast}`, `2px solid rgb( from ${layerVars.contrast} r g b / 25%)`],
-        backgroundColor: [layerVars.main, `rgb(from ${layerVars.main} r g b / 50%)`],
+        backgroundColor: layerVars.light,
         color: layerVars.contrast,
     },
     progressFill: {
@@ -302,12 +299,10 @@ SkinUtils.define(terminal, {
     rangeThumb: {
         border: `2px solid ${themeVars.color.primary.main}`,
         backgroundColor: themeVars.color.primary.contrast,
-        color: themeVars.color.primary.main,
         selectors: {
             [skinSelectors.hasError]: {
                 borderColor: themeVars.color.error.main,
                 backgroundColor: themeVars.color.error.contrast,
-                color: themeVars.color.error.contrast,
             },
         },
     },
@@ -387,7 +382,7 @@ SkinUtils.define(terminal, {
     },
     tag: {
         paddingInline: themeVars.spacing.full,
-        backgroundColor: [layerVars.contrast, `rgb(from ${layerVars.contrast} r g b / 25%)`],
+        border: [`2px solid ${layerVars.contrast}`, `2px solid rgb(from ${layerVars.contrast} r g b / 25%)`],
         color: layerVars.contrast,
         fontSize: themeVars.fontSize.xSmall,
         fontWeight: "bold",

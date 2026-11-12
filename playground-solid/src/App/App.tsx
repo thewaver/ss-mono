@@ -19,6 +19,7 @@ import type {
     TreeNodeRenderProps,
 } from "@thewaver/ss-components-solid";
 import {
+    APPEARANCE_ROUTE,
     GALLERY_NAME_SEPARATOR,
     GALLERY_ROUTE,
     GETTING_STARTED_ROUTE,
@@ -26,7 +27,6 @@ import {
     NAV_PREVIEW_OFFSET,
     NAV_PREVIEW_PLACEMENT,
     SCREEN_HEIGHT,
-    SKINS_ROUTE,
 } from "@thewaver/ss-playground/App/App.const";
 import * as styles from "@thewaver/ss-playground/App/App.css";
 import { LAYOUT } from "@thewaver/ss-playground/App/Layout.const";
@@ -97,8 +97,8 @@ const PageGalleryPage = lazy(() =>
     import("./Pages/GalleryPage/GalleryPage").then((module) => ({ default: module.GalleryPage })),
 );
 
-const PageSkinsPage = lazy(() =>
-    import("./Pages/SkinsPage/SkinsPage").then((module) => ({ default: module.SkinsPage })),
+const PageAppearancePage = lazy(() =>
+    import("./Pages/AppearancePage/AppearancePage").then((module) => ({ default: module.AppearancePage })),
 );
 
 const PassThroughPage = (props: RouteSectionProps) => <>{props.children}</>;
@@ -388,7 +388,7 @@ export function AppContent(props: RouteSectionProps & { viewportAnchor: SignalPa
 
     const getIsGallerySelected = () => toRoutePath(props.location.pathname) === GALLERY_ROUTE;
 
-    const getIsSkinsSelected = () => toRoutePath(props.location.pathname) === SKINS_ROUTE;
+    const getIsAppearanceSelected = () => toRoutePath(props.location.pathname) === APPEARANCE_ROUTE;
 
     const getIsSearching = createMemo(() => getSearchTerm().trim().length > 0);
 
@@ -586,11 +586,11 @@ export function AppContent(props: RouteSectionProps & { viewportAnchor: SignalPa
                                             </PageNavLink>
 
                                             <PageNavLink
-                                                href={SKINS_ROUTE}
-                                                isSelected={getIsSkinsSelected()}
+                                                href={APPEARANCE_ROUTE}
+                                                isSelected={getIsAppearanceSelected()}
                                                 hasHoverFloater
                                             >
-                                                {"Skins"}
+                                                {"Appearance"}
                                             </PageNavLink>
                                         </PageNavLinkGroup>
                                     </div>
@@ -724,7 +724,7 @@ export function App() {
                     <Route path="/" component={PageAboutPage} />
                     <Route path={GETTING_STARTED_ROUTE} component={PageGettingStartedPage} />
                     <Route path={GALLERY_ROUTE} component={() => <PageGalleryPage sections={GALLERY_SECTIONS} />} />
-                    <Route path={SKINS_ROUTE} component={PageSkinsPage} />
+                    <Route path={APPEARANCE_ROUTE} component={PageAppearancePage} />
                     {COMPONENT_CONFIGS.map((config) => (
                         <Route path={componentToRouteName(config.name)} component={PassThroughPage}>
                             <Route

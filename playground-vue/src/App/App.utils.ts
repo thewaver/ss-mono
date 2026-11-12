@@ -2,13 +2,8 @@ import COMPONENT_DEPENDENCIES from "virtual:component-dependencies";
 import type { DependencyNames } from "virtual:component-dependencies";
 import { type Component, defineAsyncComponent, h } from "vue";
 
-import type {
-    AnchorPlacement,
-    InteractionTooltipDefs,
-    SidebarPhase,
-    TreeNode,
-    TreeNodeRenderProps,
-} from "@thewaver/ss-components-vue";
+import type { InteractionTooltipDefs, SidebarPhase, TreeNode, TreeNodeRenderProps } from "@thewaver/ss-components-vue";
+import { NAV_PREVIEW_ARROW, NAV_PREVIEW_OFFSET, NAV_PREVIEW_PLACEMENT } from "@thewaver/ss-playground/App/App.const";
 import * as styles from "@thewaver/ss-playground/App/App.css";
 import { MENU_DESCRIPTIONS } from "@thewaver/ss-playground/App/MenuDescriptions.const";
 import {
@@ -43,9 +38,6 @@ export namespace AppUtils {
         );
 
     const GALLERY_NAME_SEPARATOR = " / ";
-    const NAV_PREVIEW_PLACEMENT: AnchorPlacement = { x: "right_out", y: "center" };
-    const NAV_PREVIEW_OFFSET = { x: 10, y: 0 };
-    const NAV_PREVIEW_ARROW = "triangle";
 
     type PageLoader = NonNullable<ComponentConfig["component"]>;
 

@@ -1,5 +1,7 @@
 import type { GlobalStyleRule } from "@vanilla-extract/css";
 
+import type { ColorFamily } from "../Theme.const";
+
 export type SkinEntry =
     | "accordionHeader"
     | "accordionPanel"
@@ -74,8 +76,5 @@ export type SkinRule = GlobalStyleRule & {
 export type SkinRules = Record<SkinEntry, SkinRule>;
 
 export type SkinBaseColor = {
-    dark: string;
-    main: string;
-    light: string;
-    contrast: string;
+    [k in keyof ColorFamily]: string;
 };

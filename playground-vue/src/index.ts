@@ -51,8 +51,8 @@ const router = createRouter({
                     props: { sections: AppUtils.GALLERY_SECTIONS },
                 },
                 {
-                    path: "skins",
-                    component: () => import("./App/Pages/SkinsPage/SkinsPage.vue"),
+                    path: "appearance",
+                    component: () => import("./App/Pages/AppearancePage/AppearancePage.vue"),
                 },
                 ...PAGE_ROUTES,
             ],

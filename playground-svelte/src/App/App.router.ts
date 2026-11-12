@@ -2,10 +2,10 @@ import type { LazyRouteComponent, Routes } from "sv-router";
 import { createRouter } from "sv-router";
 
 import {
+    APPEARANCE_ROUTE,
     GALLERY_NAME_SEPARATOR,
     GALLERY_ROUTE,
     GETTING_STARTED_ROUTE,
-    SKINS_ROUTE,
 } from "@thewaver/ss-playground/App/App.const";
 import { MENU_DESCRIPTIONS } from "@thewaver/ss-playground/App/MenuDescriptions.const";
 import { toRouterBase } from "@thewaver/ss-playground/App/PageComponents/FrameworkSwitch/FrameworkSwitch.const";
@@ -18,7 +18,7 @@ import DocsRedirect from "./DocsRedirect.svelte";
 import type { PageViewKey } from "./PageComponents/ViewTabs/ViewTabsSvelte.types";
 import type { GalleryItem, GallerySection } from "./Pages/GalleryPage/GalleryPage.types";
 
-export { GETTING_STARTED_ROUTE, GALLERY_ROUTE, SKINS_ROUTE } from "@thewaver/ss-playground/App/App.const";
+export { GETTING_STARTED_ROUTE, GALLERY_ROUTE, APPEARANCE_ROUTE } from "@thewaver/ss-playground/App/App.const";
 
 export const getIsBranchConfig = (node: MenuNodeConfig): node is MenuBranchConfig => "children" in node;
 
@@ -71,7 +71,7 @@ const ROUTES: Routes = {
     "/": () => import("./Pages/AboutPage/AboutPage.svelte"),
     [GETTING_STARTED_ROUTE]: () => import("./Pages/GettingStartedPage/GettingStartedPage.svelte"),
     [GALLERY_ROUTE]: () => import("./Pages/GalleryPage/GalleryPage.svelte"),
-    [SKINS_ROUTE]: () => import("./Pages/SkinsPage/SkinsPage.svelte"),
+    [APPEARANCE_ROUTE]: () => import("./Pages/AppearancePage/AppearancePage.svelte"),
     ...Object.fromEntries(
         COMPONENT_CONFIGS.map((config) => [
             componentToRouteName(config.name),

@@ -133,7 +133,7 @@ change shape, not just where colors fall; several will be dropped once lived wit
 - **Plasma** — flat and bordered: no gradient or shadow anywhere, 2px rims in the layer's `contrast` color,
   pill radius on everything small and a doubled `full` radius on boxes; buttons and tags are "stickers", a flat
   `primary.light` fill rimmed in `primary.dark`.
-- **Neon** — dark panes at 85–95% over a faint grid, one-pixel strokes that glow (`box-shadow` at 6px and
+- **Xenon** — dark panes at 85–95% over a faint grid, one-pixel strokes that glow (`box-shadow` at 6px and
   14px) and text that glows (`text-shadow`) on anything lit — a button, a selected item, a checked switch —
   with the error color glowing the same way.
 
@@ -164,7 +164,7 @@ change shape, not just where colors fall; several will be dropped once lived wit
 - **HUD** — cut corners (`clip-path` polygons) on panes and small cells, half-strength primary frames, tiny
   spaced uppercase labels, and glow only inward (`inset` shadows) on hover and selection, because an outer glow
   would be clipped.
-- **Cardboard** — the elevation ladder (1, 2, 4, 8dp shadows), filled buttons without borders, text buttons in
+- **Flat** — the elevation ladder (1, 2, 4, 8dp shadows), filled buttons without borders, text buttons in
   primary, filled inputs with only a bottom line, pill chips, and selection as a 12% primary tint.
 - **Aqua** — a glossy cap (a white gradient fading at the midline) over every colored control, pinstriped
   surfaces, sunken wells for inputs and tracks, jelly pills for buttons, tags and the selected item.
@@ -236,7 +236,7 @@ planned for.
   `Sortable`'s items. `dropZone` — the user's — is a box things land in or sit on: `FileInput`'s zone, `Sortable`'s
   surface and the `Toolbar` and `Menubar` bars. `surface` is the example and variant boxes,
   toasts and the knobs popup; `pageContainer` — the user's — is the wrapping box of the docs' "Show code" disclosures
-  and the API tables, and the frame of the Skins page's rows; `panel` the boxes of content inside them, code boxes,
+  and the API tables, and the frame of the Appearance page's rows; `panel` the boxes of content inside them, code boxes,
   prop rows, the dependency chips, the `Table` frame, the `Sidebar` example's frame and the `Preview` box — the last with its fill overridden to a solid `layerVars.main` and no image, the user's override, since its fade runs into that color. `decoration` — the user's — is the small see-through button inside or beside a
   field (select clear, picker triggers, era and AM/PM toggles, stepper arrows, adornments, the sidebar toggle),
   and it reacts to plain `isHovered`: every painter that hands it hover is a button's, and the static adornment
@@ -260,7 +260,7 @@ planned for.
   width. The fill is unclipped and paints over the border and the hint, the user's call, so the hint is covered as
   the thumb passes; the painter does not fade it, and a Skin that wants a fade reads `skinVars.endValue`. Shaded keeps the slide button's
   earlier paint, every other Skin paints its track, fill and thumb with its range's (`RANGE_TRACK`, `RANGE_FILL`,
-  `RANGE_THUMB`), so the two stay in step until a Skin parts them — Cardboard does: its slide button is a pill and
+  `RANGE_THUMB`), so the two stay in step until a Skin parts them — Flat does: its slide button is a pill and
   its thumb takes the strip's main color with the arrow in the family's `contrast`, because a thumb as tall as its
   strip showed the strip's corners behind it, a second shade beside it, and an arrow at 1.22:1 against WCAG 1.4.11's
   3:1 (the user's pick, B on both); `isChecked` and `isMixed` joined
@@ -22266,9 +22266,16 @@ builtin rendered outside a header cell warns and renders nothing, as an orphan `
 target, so sorting could not die silently. With builtins, a consumer who renders none gets no pointer route, and
 the warning is what stands in for the guarantee.
 
-### The Skins page: one row per Skin, picked like a radio
+### The Appearance page: one row per Theme and per Skin, picked like a radio
 
-`/skins` sits under Gallery in the nav. Each row draws the same samples in its own Skin (see _"A Skin's rules stop
+`/appearance` sits under Gallery in the nav and holds two radio groups, Theme
+above Skin. **A Theme row is a grid of swatches** — the user's layout: a column per color family (every family in
+`themeVars.color` with all four shades, so `outline` is left out), a line per shade, in the order
+`THEME_SWATCH_FAMILIES` and `THEME_SWATCH_SHADES` give. The row carries its theme's class itself, so its frame,
+radio and swatches all resolve that theme's variables, and picking it calls `revealTheme` from the row, as the nav's
+Theme field does. Everything below about samples being a picture holds for the swatches too.
+
+Each Skin row draws the same samples in its own Skin (see _"A Skin's rules stop
 at `skinBoundary`"_) and picking a row applies that Skin to the whole Playground through `revealSkin`, the circle
 growing from the row; the nav's Skin field reads the same signal, so the two never disagree. **The samples are a
 picture, not controls** — the user's option A over live samples with a pick button per row. Each row is a `Radio`
@@ -22293,14 +22300,14 @@ are drawn in the row's Skin too, and what marks the picked row differs from row 
 contents so the background follows its corners, which leaves the focus ring alone, since the radio input that
 draws it sits outside the clipped painter.
 
-**Porting: where the four differ.** The row's id comes from `computeSkinRowId` in the shared `SkinsPage.const.ts`,
+**Porting: where the four differ.** The row's id comes from `computeSkinRowId` (and a Theme row's from `computeThemeRowId`) in the shared `AppearancePage.const.ts`,
 since the row and the page's reveal origin both need it and Vue's two live in different files. Vue and Svelte split
 the row, the samples and each sample helper into files of their own; the state grid and bar stack, which are a bare
 `div` each, are written inline there. **Vue's sample helpers default every boolean prop to `undefined`**
 (`withDefaults`), because Vue turns a missing boolean prop into `false`, and `Button` handed `isPressed: false`
 writes `aria-pressed="false"` — a toggle button where Solid draws a plain one. Svelte seeds each sample's own state
 from its props inside `untrack`, so the seed is read once, as Solid's `createSignal(props.x)` does. The spec is
-`e2e/skinsPage.spec.ts`, apart from `skins.spec.ts`, which tests the Skin machinery rather than this page.
+`e2e/appearancePage.spec.ts`, apart from `skins.spec.ts`, which tests the Skin machinery rather than this page.
 
 ### The gallery page: every page's first example, live, on one page
 

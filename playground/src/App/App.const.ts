@@ -1,10 +1,13 @@
 import type { AnchorPlacement } from "@thewaver/ss-components";
+import type { DrawerEdge } from "@thewaver/ss-components";
+
+import type { TooltipArrow } from "./StyledComponents/TooltipContent/TooltipContent.const";
 
 export const GETTING_STARTED_ROUTE = "/getting-started";
 
 export const GALLERY_ROUTE = "/gallery";
 
-export const SKINS_ROUTE = "/skins";
+export const APPEARANCE_ROUTE = "/appearance";
 
 export const GALLERY_NAME_SEPARATOR = " / ";
 
@@ -12,7 +15,7 @@ export const NAV_PREVIEW_PLACEMENT: AnchorPlacement = { x: "right_out", y: "cent
 
 export const NAV_PREVIEW_OFFSET = { x: 10, y: 0 };
 
-export const NAV_PREVIEW_ARROW = "triangle";
+export const NAV_PREVIEW_ARROW: TooltipArrow = "even";
 
 export const SHOW_COMPOSITES = false;
 
@@ -22,7 +25,7 @@ export const SEARCH_FIELD_WIDTH = 280;
 
 export const MENU_ID = "library-menu";
 
-export const MENU_EDGE = "left";
+export const MENU_EDGE: DrawerEdge = "left";
 
 export const PREVIEW_EXCLUDED_PAGES = ["AudioSwitcher", "CommandPalette", "ImageSwitcher", "ViewportWrapper"];
 
