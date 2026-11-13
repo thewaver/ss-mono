@@ -1,15 +1,7 @@
 import { Color } from "@thewaver/ss-utils";
 import { createTheme, createThemeContract, globalStyle } from "@vanilla-extract/css";
 
-import {
-    CONTRAST_THEME_VALUES,
-    type ColorFamily,
-    DEFAULT_THEME_VALUES,
-    REACT_THEME_VALUES,
-    SOLID_THEME_VALUES,
-    SVELTE_THEME_VALUES,
-    VUE_THEME_VALUES,
-} from "./Theme.const";
+import { ALL_THEMES, type ColorFamily, DEFAULT_THEME_VALUES } from "./Theme.const";
 import { toCssFamily } from "./Theme.utils";
 
 const SECONDARY_ROTATIONS = [90, 180, 270];
@@ -75,14 +67,9 @@ export const RAINBOW = Object.fromEntries(RAINBOW_HUES.map((hue) => [hue, toCssF
 
 export const themeVars = createThemeContract(toThemeValues(DEFAULT_THEME_VALUES));
 
-export const PLAYGROUND_THEMES = {
-    default: createTheme(themeVars, toThemeValues(DEFAULT_THEME_VALUES)),
-    contrast: createTheme(themeVars, toThemeValues(CONTRAST_THEME_VALUES)),
-    react: createTheme(themeVars, toThemeValues(REACT_THEME_VALUES)),
-    solid: createTheme(themeVars, toThemeValues(SOLID_THEME_VALUES)),
-    svelte: createTheme(themeVars, toThemeValues(SVELTE_THEME_VALUES)),
-    vue: createTheme(themeVars, toThemeValues(VUE_THEME_VALUES)),
-};
+export const PLAYGROUND_THEMES = Object.fromEntries(
+    Object.entries(ALL_THEMES).map(([name, values]) => [name, createTheme(themeVars, toThemeValues(values), name)]),
+) as Record<keyof typeof ALL_THEMES, string>;
 
 globalStyle("*", {
     boxSizing: "border-box",

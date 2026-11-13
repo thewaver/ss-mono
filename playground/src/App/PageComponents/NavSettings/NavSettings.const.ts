@@ -1,8 +1,9 @@
+import { ALL_THEMES } from "../../Theme.const";
 import type { NavSettingsOption, PlaygroundSkin, PlaygroundTheme, ViewportAnchor } from "./NavSettings.types";
 
 export const DEFAULT_VIEWPORT_ANCHOR: ViewportAnchor = "auto";
 
-export const DEFAULT_THEME: PlaygroundTheme = "react";
+export const DEFAULT_THEME: PlaygroundTheme = "slate_chestnut_cyan";
 
 export const NAV_SETTINGS_STORAGE_PREFIX = "ssPlayground.";
 
@@ -22,10 +23,9 @@ export const VIEWPORT_ANCHOR_OPTIONS: NavSettingsOption<ViewportAnchor>[] = [
 export const THEME_OPTIONS: NavSettingsOption<PlaygroundTheme>[] = [
     { value: "default", label: "Default" },
     { value: "contrast", label: "Contrast" },
-    { value: "react", label: "React" },
-    { value: "solid", label: "Solid" },
-    { value: "svelte", label: "Svelte" },
-    { value: "vue", label: "Vue" },
+    ...(Object.keys(ALL_THEMES) as PlaygroundTheme[])
+        .filter((theme) => theme !== "default" && theme !== "contrast")
+        .map((theme) => ({ value: theme, label: theme })),
 ];
 
 export const SKIN_OPTIONS: NavSettingsOption<PlaygroundSkin>[] = [

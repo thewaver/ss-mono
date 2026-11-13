@@ -2,12 +2,7 @@ import { fileURLToPath } from "node:url";
 import type { Plugin } from "vite";
 import { defineConfig } from "vite";
 
-import {
-    REACT_THEME_VALUES,
-    SOLID_THEME_VALUES,
-    SVELTE_THEME_VALUES,
-    VUE_THEME_VALUES,
-} from "../src/App/Theme.const.ts";
+import { PRIMARIES } from "../src/App/Theme.const.ts";
 import { toCssFamily } from "../src/App/Theme.utils.ts";
 
 const fromHere = (path: string) => fileURLToPath(new URL(path, import.meta.url));
@@ -17,10 +12,10 @@ const REACT_PORT = Number(process.env.PLAYGROUND_REACT_PORT ?? 8083);
 const VUE_PORT = Number(process.env.PLAYGROUND_VUE_PORT ?? 8084);
 const SVELTE_PORT = Number(process.env.PLAYGROUND_SVELTE_PORT ?? 8085);
 
-const SOLID_PRIMARY = toCssFamily(SOLID_THEME_VALUES.color.primary);
-const REACT_PRIMARY = toCssFamily(REACT_THEME_VALUES.color.primary);
-const VUE_PRIMARY = toCssFamily(VUE_THEME_VALUES.color.primary);
-const SVELTE_PRIMARY = toCssFamily(SVELTE_THEME_VALUES.color.primary);
+const SOLID_PRIMARY = toCssFamily(PRIMARIES.cyan);
+const REACT_PRIMARY = toCssFamily(PRIMARIES.cyan);
+const VUE_PRIMARY = toCssFamily(PRIMARIES.lime);
+const SVELTE_PRIMARY = toCssFamily(PRIMARIES.gold);
 
 const themeColors = (): Plugin => ({
     name: "theme-colors",

@@ -1,11 +1,13 @@
 import type { Color } from "@thewaver/ss-utils";
 
+import { toCssFamily } from "./Theme.utils";
+
 export const BORDER_RADIUS_HALF = 5;
 export const BORDER_RADIUS_FULL = 10;
 
-const SHADOW_SMALL = "0 2px 2px 0px rgba(0, 0, 0, 0.65)";
+const SHADOW_SMALL = "0 2px 2px 0px rgba(0, 0, 0, 0.75)";
 const SHADOW_MEDIUM = "0 4px 8px 0px rgba(0, 0, 0, 0.5)";
-const SHADOW_LARGE = "0 16px 64px 0px rgba(0, 0, 0, 0.35)";
+const SHADOW_LARGE = "0 16px 64px 0px rgba(0, 0, 0, 0.25)";
 
 export type ColorFamily = { dark: Color.HSL; main: Color.HSL; light: Color.HSL; contrast: Color.HSL };
 
@@ -13,16 +15,16 @@ const SHARED_THEME_VALUES = {
     scheme: "dark",
     color: {
         info: {
-            dark: "hsl(210, 100%, 50%)",
-            main: "hsl(210, 100%, 60%)",
-            light: "hsl(210, 100%, 70%)",
-            contrast: "hsl(210, 100%, 0%)",
+            dark: "hsl(195, 100%, 50%)",
+            main: "hsl(195, 100%, 60%)",
+            light: "hsl(195, 100%, 70%)",
+            contrast: "hsl(195, 100%, 0%)",
         },
         success: {
-            dark: "hsl(90, 100%, 40%)",
-            main: "hsl(90, 100%, 50%)",
-            light: "hsl(90, 100%, 60%)",
-            contrast: "hsl(90, 100%, 0%)",
+            dark: "hsl(75, 100%, 40%)",
+            main: "hsl(75, 100%, 50%)",
+            light: "hsl(75, 100%, 60%)",
+            contrast: "hsl(75, 100%, 0%)",
         },
         alert: {
             dark: "hsl(45, 100%, 40%)",
@@ -78,53 +80,16 @@ const SHARED_THEME_VALUES = {
     },
 } as const;
 
-const DEFAULT_PRIMARY: ColorFamily = {
-    dark: { h: 0, s: 0, l: 70 },
-    main: { h: 0, s: 0, l: 80 },
-    light: { h: 0, s: 0, l: 90 },
-    contrast: { h: 0, s: 0, l: 0 },
-};
-
-const CONTRAST_PRIMARY: ColorFamily = {
-    dark: { h: 120, s: 100, l: 50 },
-    main: { h: 120, s: 100, l: 60 },
-    light: { h: 120, s: 100, l: 70 },
-    contrast: { h: 90, s: 100, l: 0 },
-};
-
-const REACT_PRIMARY: ColorFamily = {
-    dark: { h: 180, s: 100, l: 40 },
-    main: { h: 180, s: 100, l: 50 },
-    light: { h: 180, s: 100, l: 60 },
-    contrast: { h: 180, s: 100, l: 0 },
-};
-
-const SOLID_PRIMARY: ColorFamily = {
-    dark: { h: 180, s: 100, l: 40 },
-    main: { h: 180, s: 100, l: 50 },
-    light: { h: 180, s: 100, l: 60 },
-    contrast: { h: 180, s: 100, l: 0 },
-};
-
-const SVELTE_PRIMARY: ColorFamily = {
-    dark: { h: 45, s: 100, l: 40 },
-    main: { h: 45, s: 100, l: 50 },
-    light: { h: 45, s: 100, l: 60 },
-    contrast: { h: 45, s: 100, l: 0 },
-};
-
-const VUE_PRIMARY: ColorFamily = {
-    dark: { h: 90, s: 100, l: 40 },
-    main: { h: 90, s: 100, l: 50 },
-    light: { h: 90, s: 100, l: 60 },
-    contrast: { h: 90, s: 100, l: 0 },
-};
-
 export const DEFAULT_THEME_VALUES = {
     ...SHARED_THEME_VALUES,
     color: {
         ...SHARED_THEME_VALUES.color,
-        primary: DEFAULT_PRIMARY,
+        primary: {
+            dark: { h: 0, s: 0, l: 70 },
+            main: { h: 0, s: 0, l: 80 },
+            light: { h: 0, s: 0, l: 90 },
+            contrast: { h: 0, s: 0, l: 0 },
+        },
         layers: {
             level0: {
                 dark: "rgb(0, 0, 0)",
@@ -152,7 +117,12 @@ export const CONTRAST_THEME_VALUES = {
     ...SHARED_THEME_VALUES,
     color: {
         ...SHARED_THEME_VALUES.color,
-        primary: CONTRAST_PRIMARY,
+        primary: {
+            dark: { h: 120, s: 100, l: 40 },
+            main: { h: 120, s: 100, l: 50 },
+            light: { h: 120, s: 100, l: 60 },
+            contrast: { h: 90, s: 100, l: 0 },
+        },
         layers: {
             level0: {
                 dark: "hsl(210, 100%, 10%)",
@@ -176,114 +146,118 @@ export const CONTRAST_THEME_VALUES = {
     },
 } as const;
 
-export const REACT_THEME_VALUES = {
-    ...SHARED_THEME_VALUES,
-    color: {
-        ...SHARED_THEME_VALUES.color,
-        primary: REACT_PRIMARY,
-        layers: {
-            level0: {
-                dark: "hsl(210, 20%, 15%)",
-                main: "hsl(210, 20%, 20%)",
-                light: "hsl(210, 20%, 25%)",
-                contrast: "hsl(210, 100%, 95%)",
-            },
-            level1: {
-                dark: "hsl(30, 20%, 15%)",
-                main: "hsl(30, 20%, 20%)",
-                light: "hsl(30, 20%, 25%)",
-                contrast: "hsl(30, 100%, 95%)",
-            },
-            level2: {
-                dark: "hsl(30, 20%, 10%)",
-                main: "hsl(30, 20%, 15%)",
-                light: "hsl(30, 20%, 20%)",
-                contrast: "hsl(30, 100%, 95%)",
-            },
-        },
-    },
-} as const;
+const PRIMARY_GOLD: ColorFamily = {
+    dark: { h: 45, s: 100, l: 40 },
+    main: { h: 45, s: 100, l: 50 },
+    light: { h: 45, s: 100, l: 60 },
+    contrast: { h: 45, s: 100, l: 0 },
+};
 
-export const SOLID_THEME_VALUES = {
-    ...SHARED_THEME_VALUES,
-    color: {
-        ...SHARED_THEME_VALUES.color,
-        primary: SOLID_PRIMARY,
-        layers: {
-            level0: {
-                dark: "hsl(30, 20%, 15%)",
-                main: "hsl(30, 20%, 20%)",
-                light: "hsl(30, 20%, 25%)",
-                contrast: "hsl(30, 100%, 95%)",
-            },
-            level1: {
-                dark: "hsl(210, 20%, 15%)",
-                main: "hsl(210, 20%, 20%)",
-                light: "hsl(210, 20%, 25%)",
-                contrast: "hsl(210, 100%, 95%)",
-            },
-            level2: {
-                dark: "hsl(210, 20%, 10%)",
-                main: "hsl(210, 20%, 15%)",
-                light: "hsl(210, 20%, 20%)",
-                contrast: "hsl(210, 100%, 95%)",
-            },
-        },
-    },
-} as const;
+const PRIMARY_LIME: ColorFamily = {
+    dark: { h: 90, s: 100, l: 40 },
+    main: { h: 90, s: 100, l: 50 },
+    light: { h: 90, s: 100, l: 60 },
+    contrast: { h: 90, s: 100, l: 0 },
+};
 
-export const SVELTE_THEME_VALUES = {
-    ...SHARED_THEME_VALUES,
-    color: {
-        ...SHARED_THEME_VALUES.color,
-        primary: SVELTE_PRIMARY,
-        layers: {
-            level0: {
-                dark: "hsl(270, 20%, 15%)",
-                main: "hsl(270, 20%, 20%)",
-                light: "hsl(270, 20%, 25%)",
-                contrast: "hsl(270, 100%, 95%)",
-            },
-            level1: {
-                dark: "hsl(30, 20%, 15%)",
-                main: "hsl(30, 20%, 20%)",
-                light: "hsl(30, 20%, 25%)",
-                contrast: "hsl(30, 100%, 95%)",
-            },
-            level2: {
-                dark: "hsl(30, 20%, 10%)",
-                main: "hsl(30, 20%, 15%)",
-                light: "hsl(30, 20%, 20%)",
-                contrast: "hsl(30, 100%, 95%)",
-            },
-        },
-    },
-} as const;
+const PRIMARY_CYAN: ColorFamily = {
+    dark: { h: 180, s: 100, l: 40 },
+    main: { h: 180, s: 100, l: 50 },
+    light: { h: 180, s: 100, l: 60 },
+    contrast: { h: 180, s: 100, l: 0 },
+};
 
-export const VUE_THEME_VALUES = {
+const SURFACE_CHESTNUT: ColorFamily = {
+    dark: { h: 30, s: 20, l: 15 },
+    main: { h: 30, s: 20, l: 20 },
+    light: { h: 30, s: 20, l: 25 },
+    contrast: { h: 30, s: 100, l: 95 },
+};
+
+const SURFACE_OLIVE: ColorFamily = {
+    dark: { h: 90, s: 20, l: 15 },
+    main: { h: 90, s: 20, l: 20 },
+    light: { h: 90, s: 20, l: 25 },
+    contrast: { h: 90, s: 100, l: 95 },
+};
+
+const SURFACE_SLATE: ColorFamily = {
+    dark: { h: 210, s: 20, l: 15 },
+    main: { h: 210, s: 20, l: 20 },
+    light: { h: 210, s: 20, l: 25 },
+    contrast: { h: 210, s: 100, l: 95 },
+};
+
+const SURFACE_PLUM: ColorFamily = {
+    dark: { h: 300, s: 20, l: 15 },
+    main: { h: 300, s: 20, l: 20 },
+    light: { h: 300, s: 20, l: 25 },
+    contrast: { h: 300, s: 100, l: 95 },
+};
+
+const PRIMARIES = {
+    gold: PRIMARY_GOLD,
+    lime: PRIMARY_LIME,
+    cyan: PRIMARY_CYAN,
+};
+
+const SURFACES = {
+    chestnut: SURFACE_CHESTNUT,
+    olive: SURFACE_OLIVE,
+    slate: SURFACE_SLATE,
+    plum: SURFACE_PLUM,
+};
+
+type SurfaceName = keyof typeof SURFACES;
+
+type PrimaryName = keyof typeof PRIMARIES;
+
+export type MixedThemeName = `${SurfaceName}_${SurfaceName}_${PrimaryName}`;
+
+const SURFACE_PRIMARY_SUPPORT: Record<SurfaceName, Set<PrimaryName>> = {
+    chestnut: new Set(["gold"]),
+    olive: new Set(["lime"]),
+    slate: new Set(["cyan"]),
+    plum: new Set(["gold"]),
+};
+
+const toMixedTheme = (S1: ColorFamily, S2: ColorFamily, primary: ColorFamily) => ({
     ...SHARED_THEME_VALUES,
     color: {
         ...SHARED_THEME_VALUES.color,
-        primary: VUE_PRIMARY,
+        primary,
         layers: {
-            level0: {
-                dark: "hsl(30, 20%, 15%)",
-                main: "hsl(30, 20%, 20%)",
-                light: "hsl(30, 20%, 25%)",
-                contrast: "hsl(30, 100%, 95%)",
-            },
-            level1: {
-                dark: "hsl(90, 20%, 15%)",
-                main: "hsl(90, 20%, 20%)",
-                light: "hsl(90, 20%, 25%)",
-                contrast: "hsl(90, 100%, 95%)",
-            },
-            level2: {
-                dark: "hsl(90, 20%, 10%)",
-                main: "hsl(90, 20%, 15%)",
-                light: "hsl(90, 20%, 20%)",
-                contrast: "hsl(90, 100%, 95%)",
-            },
+            level0: toCssFamily(S1),
+            level1: toCssFamily(S2),
+            level2: toCssFamily({
+                dark: { ...S2.dark, l: S2.dark.l - 5 },
+                main: { ...S2.main, l: S2.main.l - 5 },
+                light: { ...S2.light, l: S2.light.l - 5 },
+                contrast: S2.contrast,
+            }),
         },
     },
-} as const;
+});
+
+const MIXED_THEMES = Object.fromEntries(
+    Object.entries(SURFACES).flatMap(([name1, S1]) =>
+        Object.entries(SURFACES)
+            .filter(([name2]) => name1 !== name2)
+            .flatMap(([name2, S2]) =>
+                Object.entries(PRIMARIES)
+                    .filter(([primaryName]) =>
+                        SURFACE_PRIMARY_SUPPORT[name2 as SurfaceName].has(primaryName as PrimaryName),
+                    )
+                    .map(([primaryName, primary]) => [
+                        `${name1}_${name2}_${primaryName}`,
+                        toMixedTheme(S1, S2, primary),
+                    ]),
+            ),
+    ),
+) as Record<MixedThemeName, ReturnType<typeof toMixedTheme>>;
+
+export const ALL_THEMES = {
+    default: DEFAULT_THEME_VALUES,
+    contrast: CONTRAST_THEME_VALUES,
+    ...MIXED_THEMES,
+};
