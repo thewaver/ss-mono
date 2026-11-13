@@ -1,7 +1,7 @@
 import { ObjectUtils } from "@thewaver/ss-utils";
 import { type StyleRule, style } from "@vanilla-extract/css";
 
-import type { SkinBaseColor } from "../Skin.types";
+import type { SkinColorFamily } from "../Skin.types";
 import { SkinUtils } from "../Skin.utils";
 
 import { layerVars } from "../../StyledComponents/Layer/Layer.css";
@@ -12,9 +12,15 @@ export const shaded = style({});
 
 const PILL_RADIUS = "9999px";
 
-const SHADOW_SMALL = "0 2px 2px 0px rgba(0, 0, 0, 0.75)";
-const SHADOW_MEDIUM = `${SHADOW_SMALL}, 0 4px 8px 0px rgba(0, 0, 0, 0.5)`;
-// const SHADOW_LARGE = `${SHADOW_MEDIUM}, 0 16px 64px 0px rgba(0, 0, 0, 0.25)`;
+const SHADOW_SMALL = "0 2px 2px 0 rgba(0, 0, 0, 0.75)";
+const SHADOW_MEDIUM = `${SHADOW_SMALL}, 0 4px 8px 0 rgba(0, 0, 0, 0.5)`;
+// const SHADOW_LARGE = `${SHADOW_MEDIUM}, 0 16px 64px 0 rgba(0, 0, 0, 0.25)`;
+
+const shade = (color: SkinColorFamily, angle: string = "315deg", isTranslucent?: boolean): StyleRule => ({
+    backgroundColor: isTranslucent ? "transparent" : color.main,
+    backgroundImage: `linear-gradient(${angle}, ${color.dark}, ${color.light})`,
+    color: color.contrast,
+});
 
 const INTERACTIBLE_STATES: StyleRule["selectors"] = {
     [skinSelectors.isHovered]: {
@@ -39,6 +45,9 @@ const INPUT_STATES: StyleRule["selectors"] = ObjectUtils.deepMerge(INTERACTIBLE_
 });
 
 const ITEM_STATES: StyleRule["selectors"] = ObjectUtils.deepMerge(INTERACTIBLE_STATES, {
+    [skinSelectors.isHovered]: {
+        filter: "none",
+    },
     [skinSelectors.isSelected]: {
         color: themeVars.color.primary.main,
         fontWeight: "bold",
@@ -54,7 +63,7 @@ const SWITCH_STATES: StyleRule["selectors"] = {
 
 const INPUT_SHELL: StyleRule = {
     border: [`2px solid ${layerVars.contrast}`, `2px solid rgb(from ${layerVars.contrast} r g b / 25%)`],
-    backgroundColor: layerVars.dark,
+    backgroundColor: [layerVars.dark, `rgb(from ${layerVars.dark} r g b / 75%)`],
     boxShadow: SHADOW_SMALL,
     color: layerVars.contrast,
 } as const;
@@ -77,7 +86,7 @@ const ITEM: StyleRule = {
 } as const;
 
 const ITEM_FLOATER_HOVER: StyleRule = {
-    backgroundColor: [layerVars.contrast, `rgb(from ${layerVars.contrast} r g b / 10%)`],
+    backgroundColor: [layerVars.contrast, `rgb(from ${layerVars.contrast} r g b / 25%)`],
 };
 
 const ITEM_FLOATER_SELECTED: StyleRule = {
@@ -104,12 +113,10 @@ const TAB_FLOATER_SELECTED_VERT: StyleRule = {
     borderInlineStart: `2px solid ${themeVars.color.primary.main}`,
 };
 
-const surface = (color: SkinBaseColor): StyleRule => ({
+const surface = (color: SkinColorFamily): StyleRule => ({
+    ...shade(color),
     borderRadius: themeVars.borderRadius.half,
-    backgroundColor: color.main,
-    backgroundImage: `linear-gradient(315deg, ${color.dark}, ${color.light})`,
     boxShadow: SHADOW_MEDIUM,
-    color: color.contrast,
     fontSize: themeVars.fontSize.medium,
 });
 
@@ -131,21 +138,17 @@ SkinUtils.define(shaded, {
         ...ACCORDION,
     },
     button: {
+        ...shade(themeVars.color.primary),
         borderRadius: themeVars.borderRadius.half,
         paddingInline: themeVars.spacing.double,
-        backgroundColor: themeVars.color.primary.main,
-        backgroundImage: `linear-gradient(315deg, ${themeVars.color.primary.dark}, ${themeVars.color.primary.light})`,
         boxShadow: SHADOW_SMALL,
-        color: themeVars.color.primary.contrast,
         fontWeight: "bold",
         selectors: ObjectUtils.deepMerge(INTERACTIBLE_STATES, {
             [skinSelectors.isPressed]: {
                 boxShadow: `inset 0 2px 2px rgb(0 0 0 / 75%), inset 0 4px 4px rgb(0 0 0 / 50%), inset 0 8px 8px rgb(0 0 0 / 25%)`,
             },
             [skinSelectors.hasError]: {
-                backgroundColor: themeVars.color.error.main,
-                backgroundImage: `linear-gradient(315deg, ${themeVars.color.error.dark}, ${themeVars.color.error.light})`,
-                color: themeVars.color.error.contrast,
+                ...shade(themeVars.color.error),
             },
         }),
     },
@@ -192,6 +195,7 @@ SkinUtils.define(shaded, {
     },
     dropdown: {
         ...INPUT_SHELL,
+        backdropFilter: "blur(20px)",
     },
     dropZone: {
         border: [`2px dashed ${layerVars.contrast}`, `2px dashed rgb(from ${layerVars.contrast} r g b / 25%)`],
@@ -247,9 +251,7 @@ SkinUtils.define(shaded, {
         backdropFilter: "blur(20px) grayscale(75%)",
     },
     pageBackground: {
-        backgroundColor: themeVars.color.layers.level0.main,
-        backgroundImage: `linear-gradient(315deg, ${themeVars.color.layers.level0.dark}, ${themeVars.color.layers.level0.light})`,
-        color: themeVars.color.layers.level0.contrast,
+        ...shade(themeVars.color.layers.level0),
     },
     pageContainer: {
         ...surface(layerVars),
@@ -261,27 +263,19 @@ SkinUtils.define(shaded, {
         color: layerVars.contrast,
     },
     progressFill: {
+        ...shade(themeVars.color.primary, skinVars.barAngle),
         borderRadius: PILL_RADIUS,
-        backgroundColor: themeVars.color.primary.main,
-        backgroundImage: `linear-gradient(${skinVars.barAngle}, ${themeVars.color.primary.dark}, ${themeVars.color.primary.light})`,
         selectors: {
             [skinSelectors.hasErrorWithin]: {
-                backgroundColor: themeVars.color.error.main,
-                backgroundImage: `linear-gradient(${skinVars.barAngle}, ${themeVars.color.error.dark}, ${themeVars.color.error.light})`,
+                ...shade(themeVars.color.error, skinVars.barAngle),
             },
         },
     },
     progressTip: {},
     progressTrack: {
-        border: [layerVars.contrast, `2px solid rgb(from ${layerVars.contrast} r g b / 25%)`],
         borderRadius: PILL_RADIUS,
-        backgroundColor: layerVars.dark,
+        backgroundColor: [layerVars.contrast, `rgb(from ${layerVars.contrast} r g b / 25%)`],
         boxShadow: SHADOW_SMALL,
-        selectors: {
-            [skinSelectors.hasError]: {
-                borderColor: themeVars.color.error.dark,
-            },
-        },
     },
     radioBox: {
         ...SWITCH_SHELL,
@@ -298,14 +292,12 @@ SkinUtils.define(shaded, {
         },
     },
     rangeFill: {
+        ...shade(themeVars.color.primary, skinVars.barAngle),
         borderRadius: PILL_RADIUS,
-        backgroundColor: themeVars.color.primary.main,
-        backgroundImage: `linear-gradient(${skinVars.barAngle}, ${themeVars.color.primary.dark}, ${themeVars.color.primary.light})`,
         boxShadow: SHADOW_SMALL,
         selectors: {
             [skinSelectors.hasError]: {
-                backgroundColor: themeVars.color.error.main,
-                backgroundImage: `linear-gradient(${skinVars.barAngle}, ${themeVars.color.error.dark}, ${themeVars.color.error.light})`,
+                ...shade(themeVars.color.error, skinVars.barAngle),
             },
         },
     },
@@ -348,13 +340,12 @@ SkinUtils.define(shaded, {
         },
     },
     slideButtonFill: {
+        ...shade(themeVars.color.primary, skinVars.barAngle),
         borderRadius: PILL_RADIUS,
         backgroundColor: themeVars.color.primary.main,
-        backgroundImage: `linear-gradient(${skinVars.barAngle}, ${themeVars.color.primary.dark}, ${themeVars.color.primary.light})`,
         selectors: {
             [skinSelectors.hasError]: {
-                backgroundColor: themeVars.color.error.main,
-                backgroundImage: `linear-gradient(${skinVars.barAngle}, ${themeVars.color.error.dark}, ${themeVars.color.error.light})`,
+                ...shade(themeVars.color.error, skinVars.barAngle),
             },
         },
     },

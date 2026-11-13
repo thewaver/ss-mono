@@ -9,14 +9,16 @@ import {
     THEME_OPTIONS,
     VIEWPORT_ANCHOR_OPTIONS,
 } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
-import { NO_MOTION_DURATION_MS } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
+import {
+    DEFAULT_THEME,
+    NO_MOTION_DURATION_MS,
+} from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
 import { EXAMPLES_ONLY_PROP } from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.const";
 import { DEFAULT_SKIN } from "@thewaver/ss-playground/App/Skins/Skin.const";
 
 import PageToggleContent from "../../StyledComponents/ToggleContent/ToggleContent.vue";
 import PageExampleKnobsButton from "../ExampleKnobs/PageExampleKnobsButton.vue";
 import PageSelectField from "../Field/PageSelectField.vue";
-import { OWN_FRAMEWORK } from "../FrameworkMenu/FrameworkMenu.const";
 import PageProp from "../Prop/Prop.vue";
 import { appliedSkin, revealSkin } from "../Skin/SkinVue.const";
 import { appliedTheme, revealTheme } from "../Theme/ThemeVue.const";
@@ -94,7 +96,7 @@ const setViewportAnchor = (anchor: ViewportAnchor) => {
                 :controls="EXAMPLES_ONLY_PROP"
                 label="Theme"
                 hint="Which color theme the playground is drawn in, independent of the framework it runs in. The new theme is uncovered by a circle growing from this field."
-                :default-value="computeThemeLabel(OWN_FRAMEWORK)"
+                :default-value="computeThemeLabel(DEFAULT_THEME)"
             >
                 <PageSelectField
                     :id="THEME_FIELD_ID"

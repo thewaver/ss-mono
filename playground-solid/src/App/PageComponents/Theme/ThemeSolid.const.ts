@@ -5,9 +5,7 @@ import type { PlaygroundTheme } from "@thewaver/ss-playground/App/PageComponents
 import { NavSettingsUtils } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.utils";
 import { PLAYGROUND_THEMES } from "@thewaver/ss-playground/App/Theme.css";
 
-import { OWN_FRAMEWORK } from "../FrameworkMenu/FrameworkMenu.const";
-
-const [getAppliedTheme, setAppliedTheme] = createSignal<PlaygroundTheme>(NavSettingsUtils.loadTheme(OWN_FRAMEWORK));
+const [getAppliedTheme, setAppliedTheme] = createSignal<PlaygroundTheme>(NavSettingsUtils.loadTheme());
 
 const applyTheme = (theme: PlaygroundTheme) => {
     document.documentElement.classList.remove(...Object.values(PLAYGROUND_THEMES));

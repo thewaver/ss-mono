@@ -1,7 +1,7 @@
 import { ObjectUtils } from "@thewaver/ss-utils";
 import { type StyleRule, style } from "@vanilla-extract/css";
 
-import type { SkinBaseColor } from "../Skin.types";
+import type { SkinColorFamily } from "../Skin.types";
 import { SkinUtils } from "../Skin.utils";
 
 import { layerVars } from "../../StyledComponents/Layer/Layer.css";
@@ -14,20 +14,34 @@ export const blocky = style({
     },
 });
 
+const OUTSET_SHADOW = "8px 8px 0 0 rgba(0, 0, 0, 0.35)";
 const INSET_SHADOW_THICKNESS = 2;
+const INSET_SHADOW_RAISED = [
+    `inset -${INSET_SHADOW_THICKNESS}px -${INSET_SHADOW_THICKNESS}px 0 rgb(0 0 0 / 65%)`,
+    `inset ${INSET_SHADOW_THICKNESS}px ${INSET_SHADOW_THICKNESS}px 0 rgb(255 255 255 / 65%)`,
+].join(", ");
+const INSET_SHADOW_LOWERED = [
+    `inset ${INSET_SHADOW_THICKNESS}px ${INSET_SHADOW_THICKNESS}px 0 rgb(0 0 0 / 65%)`,
+    `inset -${INSET_SHADOW_THICKNESS}px -${INSET_SHADOW_THICKNESS}px 0 rgb(255 255 255 / 65%)`,
+].join(", ");
 
-const insetShadowRaised = () =>
-    [
-        `inset -${INSET_SHADOW_THICKNESS}px -${INSET_SHADOW_THICKNESS}px 0 rgb(0 0 0 / 65%)`,
-        `inset ${INSET_SHADOW_THICKNESS}px ${INSET_SHADOW_THICKNESS}px 0 rgb(255 255 255 / 65%)`,
-    ].join(", ");
-const insetShadowLowered = () =>
-    [
-        `inset ${INSET_SHADOW_THICKNESS}px ${INSET_SHADOW_THICKNESS}px 0 rgb(0 0 0 / 65%)`,
-        `inset -${INSET_SHADOW_THICKNESS}px -${INSET_SHADOW_THICKNESS}px 0 rgb(255 255 255 / 65%)`,
-    ].join(", ");
+const blockRaised = (color: SkinColorFamily, outsetShadow?: string): StyleRule => ({
+    backgroundColor: color.light,
+    boxShadow: [INSET_SHADOW_RAISED, outsetShadow].filter(Boolean).join(", "),
+    color: color.contrast,
+});
 
-const SHADOW_MEDIUM = "8px 8px 0 0px rgba(0, 0, 0, 0.35)";
+const blockRaisedContrast = (color: SkinColorFamily, outsetShadow?: string): StyleRule => ({
+    backgroundColor: color.contrast,
+    boxShadow: INSET_SHADOW_RAISED,
+    color: color.main,
+});
+
+const blockLowered = (color: SkinColorFamily, outsetShadow?: string): StyleRule => ({
+    backgroundColor: color.dark,
+    boxShadow: [INSET_SHADOW_LOWERED, outsetShadow].filter(Boolean).join(", "),
+    color: color.contrast,
+});
 
 const INTERACTIBLE_STATES: StyleRule["selectors"] = {
     [skinSelectors.isHovered]: {
@@ -45,20 +59,20 @@ const INTERACTIBLE_STATES: StyleRule["selectors"] = {
 const INPUT_STATES: StyleRule["selectors"] = ObjectUtils.deepMerge(INTERACTIBLE_STATES, {
     [skinSelectors.isReadOnly]: {
         backgroundColor: [layerVars.contrast, `rgb(from ${layerVars.contrast} r g b / 25%)`],
-        boxShadow: insetShadowLowered(),
+        boxShadow: INSET_SHADOW_LOWERED,
     },
     [SkinUtils.anyOf(skinSelectors.isCheckedWithin, skinSelectors.isMixedWithin)]: {},
     [SkinUtils.anyOf(skinSelectors.hasErrorWithin, skinSelectors.hasError)]: {
-        backgroundColor: themeVars.color.error.dark,
-        boxShadow: insetShadowLowered(),
+        ...blockLowered(themeVars.color.error),
     },
 });
 
 const ITEM_STATES: StyleRule["selectors"] = ObjectUtils.deepMerge(INTERACTIBLE_STATES, {
+    [skinSelectors.isHovered]: {
+        filter: "none",
+    },
     [skinSelectors.isSelected]: {
-        backgroundColor: themeVars.color.primary.light,
-        boxShadow: insetShadowRaised(),
-        color: themeVars.color.primary.contrast,
+        ...blockRaised(themeVars.color.primary),
         fontWeight: "bold",
     },
     [skinSelectors.isDisabled]: {
@@ -69,15 +83,12 @@ const ITEM_STATES: StyleRule["selectors"] = ObjectUtils.deepMerge(INTERACTIBLE_S
 
 const SWITCH_STATES: StyleRule["selectors"] = ObjectUtils.deepMerge(INPUT_STATES, {
     [SkinUtils.anyOf(skinSelectors.isCheckedWithin, skinSelectors.isMixedWithin)]: {
-        backgroundColor: themeVars.color.primary.dark,
-        boxShadow: insetShadowLowered(),
+        ...blockLowered(themeVars.color.primary),
     },
 });
 
 const INPUT_SHELL: StyleRule = {
-    backgroundColor: layerVars.dark,
-    boxShadow: insetShadowLowered(),
-    color: layerVars.contrast,
+    ...blockLowered(layerVars),
 } as const;
 
 const SWITCH_SHELL: StyleRule = {
@@ -85,9 +96,7 @@ const SWITCH_SHELL: StyleRule = {
 } as const;
 
 const ACCORDION: StyleRule = {
-    backgroundColor: layerVars.light,
-    boxShadow: insetShadowRaised(),
-    color: layerVars.contrast,
+    ...blockRaised(layerVars),
     fontSize: themeVars.fontSize.medium,
 } as const;
 
@@ -96,14 +105,11 @@ const ITEM: StyleRule = {
 } as const;
 
 const ITEM_FLOATER_HOVER: StyleRule = {
-    backgroundColor: layerVars.light,
-    boxShadow: insetShadowRaised(),
+    ...blockRaised(layerVars),
 };
 
 const ITEM_FLOATER_SELECTED: StyleRule = {
-    backgroundColor: themeVars.color.primary.light,
-    boxShadow: insetShadowRaised(),
-    color: themeVars.color.primary.contrast,
+    ...blockRaised(themeVars.color.primary),
 };
 
 const TAB_FLOATER_HOVER: StyleRule = {
@@ -114,20 +120,16 @@ const TAB_FLOATER_SELECTED: StyleRule = {
     ...ITEM_FLOATER_SELECTED,
 };
 
-const surface = (color: SkinBaseColor): StyleRule => ({
+const surface = (color: SkinColorFamily): StyleRule => ({
+    ...blockRaised(color, OUTSET_SHADOW),
     backgroundColor: color.main,
-    boxShadow: [insetShadowRaised(), SHADOW_MEDIUM].join(","),
-    color: color.contrast,
-    fontSize: themeVars.fontSize.medium,
 });
 
 SkinUtils.define(blocky, {
     accordionHeader: {
         selectors: ObjectUtils.deepMerge(SkinUtils.joinedCorners(), INTERACTIBLE_STATES, {
             [skinSelectors.isExpanded]: {
-                backgroundColor: themeVars.color.primary.light,
-                boxShadow: insetShadowRaised(),
-                color: themeVars.color.primary.contrast,
+                ...blockRaised(themeVars.color.primary),
                 fontWeight: "bold",
             },
         }),
@@ -141,45 +143,33 @@ SkinUtils.define(blocky, {
         ...ACCORDION,
     },
     button: {
+        ...blockRaised(themeVars.color.primary),
         paddingInline: themeVars.spacing.double,
-        backgroundColor: themeVars.color.primary.light,
-        boxShadow: insetShadowRaised(),
-        color: themeVars.color.primary.contrast,
         fontWeight: "bold",
         selectors: ObjectUtils.deepMerge(INTERACTIBLE_STATES, {
             [skinSelectors.isPressed]: {
-                backgroundColor: themeVars.color.primary.dark,
-                boxShadow: insetShadowLowered(),
+                ...blockLowered(themeVars.color.primary),
             },
             [skinSelectors.hasError]: {
-                backgroundColor: themeVars.color.error.light,
-                boxShadow: insetShadowRaised(),
-                color: themeVars.color.error.contrast,
+                ...blockRaised(themeVars.color.error),
             },
             [SkinUtils.allOf(skinSelectors.isPressed, skinSelectors.hasError)]: {
-                backgroundColor: themeVars.color.error.dark,
-                boxShadow: insetShadowLowered(),
+                ...blockLowered(themeVars.color.error),
             },
         }),
     },
     buttonSimple: {
-        backgroundColor: layerVars.light,
-        boxShadow: insetShadowRaised(),
-        color: layerVars.contrast,
+        ...blockRaised(layerVars),
         fontSize: themeVars.fontSize.small,
         selectors: ObjectUtils.deepMerge(INTERACTIBLE_STATES, {
             [skinSelectors.isPressed]: {
-                backgroundColor: layerVars.dark,
-                boxShadow: insetShadowLowered(),
+                ...blockLowered(layerVars),
             },
             [skinSelectors.hasError]: {
-                backgroundColor: themeVars.color.error.light,
-                boxShadow: insetShadowRaised(),
-                color: themeVars.color.error.contrast,
+                ...blockRaised(themeVars.color.error),
             },
             [SkinUtils.allOf(skinSelectors.isPressed, skinSelectors.hasError)]: {
-                backgroundColor: themeVars.color.error.dark,
-                boxShadow: insetShadowLowered(),
+                ...blockLowered(themeVars.color.error),
             },
         }),
     },
@@ -271,29 +261,19 @@ SkinUtils.define(blocky, {
         ...surface(layerVars),
     },
     panel: {
-        backgroundColor: layerVars.light,
-        boxShadow: insetShadowRaised(),
-        color: layerVars.contrast,
+        ...blockRaised(layerVars),
     },
     progressFill: {
-        backgroundColor: themeVars.color.primary.light,
-        boxShadow: insetShadowRaised(),
+        ...blockRaised(themeVars.color.primary),
         selectors: {
             [skinSelectors.hasErrorWithin]: {
-                backgroundColor: themeVars.color.error.light,
+                ...blockRaised(themeVars.color.error),
             },
         },
     },
     progressTip: {},
     progressTrack: {
-        backgroundColor: layerVars.dark,
-        boxShadow: insetShadowLowered(),
-        selectors: {
-            [skinSelectors.hasError]: {
-                backgroundColor: themeVars.color.error.dark,
-                boxShadow: insetShadowLowered(),
-            },
-        },
+        ...blockLowered(layerVars),
     },
     radioBox: {
         ...SWITCH_SHELL,
@@ -303,39 +283,32 @@ SkinUtils.define(blocky, {
         },
     },
     radioDot: {
+        ...blockRaisedContrast(themeVars.color.primary),
         borderRadius: "50%",
-        backgroundColor: themeVars.color.primary.contrast,
-        boxShadow: insetShadowRaised(),
     },
     rangeFill: {
-        backgroundColor: themeVars.color.primary.light,
-        boxShadow: insetShadowRaised(),
+        ...blockRaised(themeVars.color.primary),
         selectors: {
             [skinSelectors.hasError]: {
-                backgroundColor: themeVars.color.error.light,
-                boxShadow: insetShadowRaised(),
+                ...blockRaised(themeVars.color.error),
             },
         },
     },
     rangeThumb: {
-        backgroundColor: themeVars.color.primary.contrast,
-        boxShadow: insetShadowRaised(),
+        ...blockRaisedContrast(themeVars.color.primary),
         selectors: {
             [skinSelectors.hasError]: {
-                backgroundColor: themeVars.color.error.contrast,
-                boxShadow: insetShadowRaised(),
+                ...blockRaisedContrast(themeVars.color.error),
             },
         },
     },
     rangeTrack: {
-        backgroundColor: layerVars.dark,
-        boxShadow: insetShadowLowered(),
+        ...blockLowered(layerVars),
     },
     scrollerThumb: {
         selectors: {
             [skinSelectors.line]: {
-                backgroundColor: themeVars.color.primary.light,
-                boxShadow: insetShadowRaised(),
+                ...blockRaised(themeVars.color.primary),
             },
             [skinSelectors.lineActive]: {
                 filter: themeVars.active.filter,
@@ -345,36 +318,28 @@ SkinUtils.define(blocky, {
     scrollerTrack: {
         selectors: {
             [skinSelectors.line]: {
-                backgroundColor: layerVars.dark,
-                boxShadow: insetShadowLowered(),
+                backgroundColor: [layerVars.contrast, `rgb(from ${layerVars.contrast} r g b / 25%)`],
             },
         },
     },
     slideButtonFill: {
-        backgroundColor: themeVars.color.primary.light,
-        boxShadow: insetShadowRaised(),
+        ...blockRaised(themeVars.color.primary),
         selectors: {
             [skinSelectors.hasError]: {
-                backgroundColor: themeVars.color.error.light,
-                boxShadow: insetShadowRaised(),
+                ...blockRaised(themeVars.color.error),
             },
         },
     },
     slideButtonThumb: {
-        backgroundColor: themeVars.color.primary.light,
-        boxShadow: insetShadowRaised(),
-        color: themeVars.color.primary.contrast,
+        ...blockRaised(themeVars.color.primary),
         selectors: {
             [skinSelectors.hasError]: {
-                backgroundColor: themeVars.color.error.light,
-                boxShadow: insetShadowRaised(),
-                color: themeVars.color.error.contrast,
+                ...blockRaised(themeVars.color.error),
             },
         },
     },
     slideButtonTrack: {
-        backgroundColor: layerVars.dark,
-        boxShadow: insetShadowLowered(),
+        ...blockLowered(layerVars),
         fontWeight: "bold",
     },
     surface: {
@@ -405,34 +370,27 @@ SkinUtils.define(blocky, {
         ...TAB_FLOATER_SELECTED,
     },
     tabsTrack: {
-        backgroundColor: layerVars.dark,
-        boxShadow: insetShadowLowered(),
+        ...blockLowered(layerVars),
     },
     tag: {
+        ...blockRaised(layerVars),
         paddingInline: themeVars.spacing.full,
-        backgroundColor: layerVars.light,
-        boxShadow: insetShadowRaised(),
-        color: layerVars.contrast,
         fontSize: themeVars.fontSize.xSmall,
         fontWeight: "bold",
         selectors: ObjectUtils.deepMerge(INTERACTIBLE_STATES, {
             [skinSelectors.hasError]: {
-                backgroundColor: themeVars.color.error.light,
-                color: themeVars.color.error.contrast,
+                ...blockRaised(themeVars.color.error),
             },
         }),
     },
     toggleThumb: {
-        backgroundColor: layerVars.contrast,
-        boxShadow: insetShadowRaised(),
+        ...blockRaisedContrast(layerVars),
         selectors: {
             [SkinUtils.anyOf(skinSelectors.isCheckedWithin, skinSelectors.isMixedWithin)]: {
-                backgroundColor: themeVars.color.primary.contrast,
-                boxShadow: insetShadowRaised(),
+                ...blockRaisedContrast(themeVars.color.primary),
             },
             [skinSelectors.hasErrorWithin]: {
-                backgroundColor: themeVars.color.error.contrast,
-                boxShadow: insetShadowRaised(),
+                ...blockRaisedContrast(themeVars.color.error),
             },
         },
     },
@@ -443,8 +401,6 @@ SkinUtils.define(blocky, {
         },
     },
     tooltip: {
-        backgroundColor: layerVars.light,
-        boxShadow: insetShadowRaised(),
-        color: layerVars.contrast,
+        ...blockRaised(layerVars),
     },
 });

@@ -1,5 +1,6 @@
 import { DEFAULT_SKIN } from "../../Skins/Skin.const";
 import {
+    DEFAULT_THEME,
     DEFAULT_VIEWPORT_ANCHOR,
     NAV_SETTINGS_STORAGE_PREFIX,
     SHOWS_DESCRIPTION_ONLY_OPTIONS,
@@ -7,7 +8,7 @@ import {
     THEME_OPTIONS,
     VIEWPORT_ANCHOR_OPTIONS,
 } from "./NavSettings.const";
-import type { NavSettingKey, PlaygroundTheme } from "./NavSettings.types";
+import type { NavSettingKey } from "./NavSettings.types";
 
 const computeStorageKey = (key: NavSettingKey) => `${NAV_SETTINGS_STORAGE_PREFIX}${key}`;
 
@@ -34,11 +35,11 @@ export namespace NavSettingsUtils {
         }
     };
 
-    export const loadTheme = (fallback: PlaygroundTheme) =>
+    export const loadTheme = () =>
         read(
             "theme",
             THEME_OPTIONS.map((option) => option.value),
-        ) ?? fallback;
+        ) ?? DEFAULT_THEME;
 
     export const loadSkin = () =>
         read(

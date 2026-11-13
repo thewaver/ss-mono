@@ -5,7 +5,7 @@ import { demo, prop, readout, revealProp } from "./helpers";
 /**
  * The page's one example is a button that keeps switching the Playground's theme through `ShapeReveal`, pausing
  * between switches, until it is pressed again or the page is left. Every check here is a relationship rather than
- * a theme written down: which theme a Playground starts on is that framework's own, and which one comes next is
+ * a theme written down: which theme a Playground starts on is the default, and which one comes next is
  * random, so the spec asks only that the theme changed, that it never "changed" to itself, that it stopped when
  * told to, and that the settings' Theme select names the theme the readout names.
  *

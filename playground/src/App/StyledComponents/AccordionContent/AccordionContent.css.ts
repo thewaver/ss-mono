@@ -27,16 +27,7 @@ export const panelJoins: Record<CollapsibleSide, string> = {
     left: isJoinedInlineEnd,
 };
 
-export const accordionWrapper = style([
-    skinEntries.accordionWrapper,
-    {
-        selectors: {
-            [`.${skinEntries.pageContainer} &`]: {
-                borderRadius: "inherit",
-            },
-        },
-    },
-]);
+export const accordionWrapper = style([skinEntries.accordionWrapper]);
 
 export const accordionHeader = style([
     skinEntries.accordionHeader,

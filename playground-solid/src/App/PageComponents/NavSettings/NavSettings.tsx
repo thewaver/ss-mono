@@ -6,14 +6,16 @@ import {
     THEME_OPTIONS,
     VIEWPORT_ANCHOR_OPTIONS,
 } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
-import { NO_MOTION_DURATION_MS } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
+import {
+    DEFAULT_THEME,
+    NO_MOTION_DURATION_MS,
+} from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
 import { EXAMPLES_ONLY_PROP } from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.const";
 import { DEFAULT_SKIN } from "@thewaver/ss-playground/App/Skins/Skin.const";
 
 import { PageToggleContent } from "../../StyledComponents/ToggleContent/ToggleContent";
 import { PageExampleKnobsButton } from "../ExampleKnobs/ExampleKnobs";
 import { PageSelectField } from "../Field/Field";
-import { OWN_FRAMEWORK } from "../FrameworkMenu/FrameworkMenu.const";
 import { PageProp } from "../Prop/Prop";
 import { getAppliedSkin, revealSkin } from "../Skin/SkinSolid.const";
 import { getAppliedTheme, revealTheme } from "../Theme/ThemeSolid.const";
@@ -91,7 +93,7 @@ export const PageNavSettings = (props: PageNavSettingsProps) => {
                             "Which color theme the playground is drawn in, independent of the framework it runs in. The new theme is uncovered by a circle growing from this field."
                         }
                         controls={EXAMPLES_ONLY_PROP}
-                        defaultValue={computeThemeLabel(OWN_FRAMEWORK)}
+                        defaultValue={computeThemeLabel(DEFAULT_THEME)}
                     >
                         <PageSelectField
                             id={THEME_FIELD_ID}

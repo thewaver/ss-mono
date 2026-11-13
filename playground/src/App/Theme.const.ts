@@ -13,27 +13,27 @@ const SHARED_THEME_VALUES = {
     scheme: "dark",
     color: {
         info: {
-            dark: "hsl(210, 100%, 55%)",
+            dark: "hsl(210, 100%, 50%)",
             main: "hsl(210, 100%, 60%)",
-            light: "hsl(210, 100%, 65%)",
+            light: "hsl(210, 100%, 70%)",
             contrast: "hsl(210, 100%, 0%)",
         },
         success: {
-            dark: "hsl(90, 100%, 45%)",
+            dark: "hsl(90, 100%, 40%)",
             main: "hsl(90, 100%, 50%)",
-            light: "hsl(90, 100%, 55%)",
+            light: "hsl(90, 100%, 60%)",
             contrast: "hsl(90, 100%, 0%)",
         },
         alert: {
-            dark: "hsl(45, 100%, 45%)",
+            dark: "hsl(45, 100%, 40%)",
             main: "hsl(45, 100%, 50%)",
-            light: "hsl(45, 100%, 55%)",
+            light: "hsl(45, 100%, 60%)",
             contrast: "hsl(45, 100%, 0%)",
         },
         error: {
-            dark: "hsl(15, 100%, 55%)",
+            dark: "hsl(15, 100%, 50%)",
             main: "hsl(15, 100%, 60%)",
-            light: "hsl(15, 100%, 65%)",
+            light: "hsl(15, 100%, 70%)",
             contrast: "hsl(15, 100%, 0%)",
         },
         outline: {
@@ -79,44 +79,44 @@ const SHARED_THEME_VALUES = {
 } as const;
 
 const DEFAULT_PRIMARY: ColorFamily = {
-    dark: { h: 0, s: 0, l: 85 },
-    main: { h: 0, s: 0, l: 90 },
-    light: { h: 0, s: 0, l: 95 },
+    dark: { h: 0, s: 0, l: 70 },
+    main: { h: 0, s: 0, l: 80 },
+    light: { h: 0, s: 0, l: 90 },
     contrast: { h: 0, s: 0, l: 0 },
 };
 
 const CONTRAST_PRIMARY: ColorFamily = {
-    dark: { h: 120, s: 100, l: 55 },
+    dark: { h: 120, s: 100, l: 50 },
     main: { h: 120, s: 100, l: 60 },
-    light: { h: 120, s: 100, l: 65 },
+    light: { h: 120, s: 100, l: 70 },
     contrast: { h: 90, s: 100, l: 0 },
 };
 
 const REACT_PRIMARY: ColorFamily = {
-    dark: { h: 195, s: 100, l: 45 },
+    dark: { h: 180, s: 100, l: 40 },
     main: { h: 180, s: 100, l: 50 },
-    light: { h: 180, s: 100, l: 55 },
+    light: { h: 180, s: 100, l: 60 },
     contrast: { h: 180, s: 100, l: 0 },
 };
 
 const SOLID_PRIMARY: ColorFamily = {
-    dark: { h: 195, s: 100, l: 45 },
+    dark: { h: 180, s: 100, l: 40 },
     main: { h: 180, s: 100, l: 50 },
-    light: { h: 180, s: 100, l: 55 },
+    light: { h: 180, s: 100, l: 60 },
     contrast: { h: 180, s: 100, l: 0 },
 };
 
 const SVELTE_PRIMARY: ColorFamily = {
-    dark: { h: 30, s: 100, l: 45 },
+    dark: { h: 45, s: 100, l: 40 },
     main: { h: 45, s: 100, l: 50 },
-    light: { h: 45, s: 100, l: 55 },
+    light: { h: 45, s: 100, l: 60 },
     contrast: { h: 45, s: 100, l: 0 },
 };
 
 const VUE_PRIMARY: ColorFamily = {
-    dark: { h: 105, s: 100, l: 45 },
+    dark: { h: 90, s: 100, l: 40 },
     main: { h: 90, s: 100, l: 50 },
-    light: { h: 90, s: 100, l: 55 },
+    light: { h: 90, s: 100, l: 60 },
     contrast: { h: 90, s: 100, l: 0 },
 };
 
@@ -155,22 +155,22 @@ export const CONTRAST_THEME_VALUES = {
         primary: CONTRAST_PRIMARY,
         layers: {
             level0: {
-                dark: "hsl(210, 100%, 15%)",
+                dark: "hsl(210, 100%, 10%)",
                 main: "hsl(210, 100%, 20%)",
-                light: "hsl(210, 100%, 25%)",
-                contrast: "hsl(210, 100%, 95%)",
+                light: "hsl(210, 100%, 30%)",
+                contrast: "hsl(210, 100%, 90%)",
             },
             level1: {
-                dark: "hsl(30, 100%, 15%)",
+                dark: "hsl(30, 100%, 10%)",
                 main: "hsl(30, 100%, 20%)",
-                light: "hsl(30, 100%, 25%)",
-                contrast: "hsl(30, 100%, 95%)",
+                light: "hsl(30, 100%, 30%)",
+                contrast: "hsl(30, 100%, 90%)",
             },
             level2: {
-                dark: "hsl(300, 100%, 15%)",
+                dark: "hsl(300, 100%, 10%)",
                 main: "hsl(300, 100%, 20%)",
-                light: "hsl(300, 100%, 25%)",
-                contrast: "hsl(300, 100%, 95%)",
+                light: "hsl(300, 100%, 30%)",
+                contrast: "hsl(300, 100%, 90%)",
             },
         },
     },

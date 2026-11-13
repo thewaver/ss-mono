@@ -1,7 +1,7 @@
 import { ObjectUtils } from "@thewaver/ss-utils";
 import { type StyleRule, style } from "@vanilla-extract/css";
 
-import type { SkinBaseColor } from "../Skin.types";
+import type { SkinColorFamily } from "../Skin.types";
 import { SkinUtils } from "../Skin.utils";
 
 import { layerVars } from "../../StyledComponents/Layer/Layer.css";
@@ -45,6 +45,9 @@ const INPUT_STATES: StyleRule["selectors"] = ObjectUtils.deepMerge(INTERACTIBLE_
 });
 
 const ITEM_STATES: StyleRule["selectors"] = ObjectUtils.deepMerge(INTERACTIBLE_STATES, {
+    [skinSelectors.isHovered]: {
+        filter: "none",
+    },
     [skinSelectors.isSelected]: {
         color: themeVars.color.primary.main,
         fontWeight: "bold",
@@ -85,7 +88,7 @@ const ITEM: StyleRule = {
 } as const;
 
 const ITEM_FLOATER_HOVER: StyleRule = {
-    backgroundColor: [layerVars.contrast, `rgb(from ${layerVars.contrast} r g b / 10%)`],
+    backgroundColor: [layerVars.contrast, `rgb(from ${layerVars.contrast} r g b / 25%)`],
 };
 
 const ITEM_FLOATER_SELECTED: StyleRule = {
@@ -101,7 +104,7 @@ const TAB_FLOATER_SELECTED: StyleRule = {
     border: `2px solid ${themeVars.color.primary.main}`,
 };
 
-const surface = (color: SkinBaseColor): StyleRule => ({
+const surface = (color: SkinColorFamily): StyleRule => ({
     border: [`2px solid ${color.contrast}`, `2px solid rgb( from ${color.contrast} r g b / 25%)`],
     backgroundColor: color.main,
     color: color.contrast,

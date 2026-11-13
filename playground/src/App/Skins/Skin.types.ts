@@ -75,6 +75,6 @@ export type SkinRule = GlobalStyleRule & {
 
 export type SkinRules = Record<SkinEntry, SkinRule>;
 
-export type SkinBaseColor = {
+export type SkinColorFamily = {
     [k in keyof ColorFamily]: string;
 };

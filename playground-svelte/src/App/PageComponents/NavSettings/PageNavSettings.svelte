@@ -5,7 +5,6 @@
     import PageToggleContent from "../../StyledComponents/ToggleContent/ToggleContent.svelte";
     import PageExampleKnobsButton from "../ExampleKnobs/PageExampleKnobsButton.svelte";
     import PageSelectField from "../Field/PageSelectField.svelte";
-    import { OWN_FRAMEWORK } from "../FrameworkMenu/FrameworkMenu.const";
     import PageProp from "../Prop/Prop.svelte";
     import { getAppliedSkin, revealSkin } from "../Skin/SkinSvelte.const.svelte";
     import { getAppliedTheme, revealTheme } from "../Theme/ThemeSvelte.const.svelte";
@@ -23,7 +22,7 @@
         PlaygroundTheme,
         ViewportAnchor,
     } from "./NavSettingsSvelte.types";
-    import { NO_MOTION_DURATION_MS } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
+    import { DEFAULT_THEME, NO_MOTION_DURATION_MS } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.const";
 
     const computeViewportAnchorLabel = (anchor: ViewportAnchor) =>
         VIEWPORT_ANCHOR_OPTIONS.find((option) => option.value === anchor)?.label ?? String(anchor);
@@ -96,7 +95,7 @@
         controls={EXAMPLES_ONLY_PROP}
         label={"Theme"}
         hint={"Which color theme the playground is drawn in, independent of the framework it runs in. The new theme is uncovered by a circle growing from this field."}
-        defaultValue={computeThemeLabel(OWN_FRAMEWORK)}
+        defaultValue={computeThemeLabel(DEFAULT_THEME)}
     >
         <PageSelectField
             id={THEME_FIELD_ID}

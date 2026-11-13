@@ -2,6 +2,8 @@ import type { NavSettingsOption, PlaygroundSkin, PlaygroundTheme, ViewportAnchor
 
 export const DEFAULT_VIEWPORT_ANCHOR: ViewportAnchor = "auto";
 
+export const DEFAULT_THEME: PlaygroundTheme = "react";
+
 export const NAV_SETTINGS_STORAGE_PREFIX = "ssPlayground.";
 
 export const SHOWS_DESCRIPTION_ONLY_OPTIONS = [true, false];
@@ -31,6 +33,7 @@ export const SKIN_OPTIONS: NavSettingsOption<PlaygroundSkin>[] = [
     { value: "blocky", label: "Blocky" },
     { value: "cartoon", label: "Cartoon" },
     { value: "flat", label: "Flat" },
+    { value: "glossy", label: "Glossy" },
     { value: "shaded", label: "Shaded" },
     { value: "terminal", label: "Terminal" },
     { value: "xenon", label: "Xenon" },

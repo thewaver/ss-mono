@@ -342,7 +342,7 @@ planned for.
   `border-style`: with no width from its entry the browser draws a 3px border, the card grows as it is picked up,
   and the landing marker ends up on a card.
 - **The left nav's settings survive a refresh**, in `localStorage`, at the user's request, through `NavSettingsUtils`.
-  Theme and Skin are written only when picked, so a reader who never picks a Theme keeps each framework's own. Every
+  Theme and Skin are written only when picked, so a reader who never picks one keeps the default (`DEFAULT_THEME`, `DEFAULT_SKIN`). Every
   value read back is checked against that setting's list of options, since browser storage can be edited; a value no
   longer on the list falls back to the default. ASVS 8.2.2 asks that browser storage hold no sensitive data, and these
   are display preferences only.
@@ -994,9 +994,9 @@ two, each over the same core, and a Playground app for each, mirroring the other
 - **The halves are named as React's are**: `<Subject>Vue.utils.ts` exporting `<Subject>VueUtils`, and
   `<Subject>Svelte.utils.svelte.ts` exporting `<Subject>SvelteUtils` — the second `.svelte` in the name is what lets
   a TypeScript module use runes.
-- **Each new app wears its own framework's theme**, `PLAYGROUND_THEMES.vue` and `PLAYGROUND_THEMES.svelte`, applied at
-  load as the other two apply theirs, and the landing page colors each link from that framework's theme. The Theme
-  select in the nav settings is in all four apps.
+- **The Theme is not tied to the framework** — the user's call: every app starts on `DEFAULT_THEME` in
+  `NavSettings.const.ts`, the Themes named after frameworks are to be renamed as more arrive, and the Theme select in
+  the nav settings is in all four apps. The landing page still colors each link from the theme of that name.
 - **The framework switch knows every app's address, not just one other's.** `VITE_PLAYGROUND_URLS` replaced
   `VITE_OTHER_PLAYGROUND_URL`: one address per framework, `/solid/`, `/react/`, `/vue/` and `/svelte/` in the site,
   and each app's standalone port by default (`playground/vite/playgroundUrls.ts`). `npm start` serves the four under
@@ -10191,7 +10191,9 @@ layout. The structure is the root (sizing, a one-cell grid so whatever sits in i
 or with no `renderSection` a `display: contents` element the user asked for so nothing is dropped → the library's
 content element (the flex row or column for `side`) → heading and panel. A box that does not inherit
 `border-radius` breaks the corner chain below it, as `renderGroupBox` does; the Playground's
-`PageAccordionWrapper` inherits only inside a `pageContainer`, matching its header and panel painters.
+`PageAccordionWrapper` always takes its Skin's radius: an unlayered "inherit inside a `pageContainer`" rule beat
+every Skin's layered radius on the Appearance page's rows, and the only accordion that needs the box's corners, the
+docs' "Show code" disclosure, has no wrapper — its header and panel painters still inherit inside a `pageContainer`.
 
 ### Which components pass corners down, and where each run is
 

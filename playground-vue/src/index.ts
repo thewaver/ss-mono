@@ -11,7 +11,6 @@ import { PLAYGROUND_THEMES } from "@thewaver/ss-playground/App/Theme.css";
 import { AppUtils } from "./App/App.utils";
 import App from "./App/App.vue";
 import AppContent from "./App/AppContent.vue";
-import { OWN_FRAMEWORK } from "./App/PageComponents/FrameworkMenu/FrameworkMenu.const";
 
 const PAGE_ROUTES: RouteRecordRaw[] = AppUtils.COMPONENT_CONFIGS.flatMap((config) => {
     const route = AppUtils.componentToRouteName(config.name);
@@ -60,7 +59,7 @@ const router = createRouter({
     ],
 });
 
-document.documentElement.classList.add(PLAYGROUND_THEMES[NavSettingsUtils.loadTheme(OWN_FRAMEWORK)]);
+document.documentElement.classList.add(PLAYGROUND_THEMES[NavSettingsUtils.loadTheme()]);
 document.documentElement.classList.add(PLAYGROUND_SKINS[NavSettingsUtils.loadSkin()]);
 
 createApp(App).use(router).mount("#root");

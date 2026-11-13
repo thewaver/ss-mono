@@ -5,9 +5,7 @@ import type { PlaygroundTheme } from "@thewaver/ss-playground/App/PageComponents
 import { NavSettingsUtils } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.utils";
 import { PLAYGROUND_THEMES } from "@thewaver/ss-playground/App/Theme.css";
 
-import { OWN_FRAMEWORK } from "../FrameworkMenu/FrameworkMenu.const";
-
-let appliedTheme: PlaygroundTheme = NavSettingsUtils.loadTheme(OWN_FRAMEWORK);
+let appliedTheme: PlaygroundTheme = NavSettingsUtils.loadTheme();
 
 const listeners = new Set<() => void>();
 

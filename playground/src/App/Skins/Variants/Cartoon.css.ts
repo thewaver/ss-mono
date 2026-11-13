@@ -1,7 +1,7 @@
 import { ObjectUtils } from "@thewaver/ss-utils";
 import { type StyleRule, style } from "@vanilla-extract/css";
 
-import type { SkinBaseColor } from "../Skin.types";
+import type { SkinColorFamily } from "../Skin.types";
 import { SkinUtils } from "../Skin.utils";
 
 import { layerVars } from "../../StyledComponents/Layer/Layer.css";
@@ -14,8 +14,9 @@ export const cartoon = style({
     },
 });
 
-const SHADOW_SMALL = "4px 4px 0 0px rgba(0, 0, 0, 0.5)";
-const SHADOW_MEDIUM = "8px 8px 0 0px rgba(0, 0, 0, 0.5)";
+const SHADOW_SMALL = "4px 4px 0 0 rgba(0, 0, 0, 0.5)";
+const SHADOW_MEDIUM = "8px 8px 0 0 rgba(0, 0, 0, 0.5)";
+// const SHADOW_LARGE = "16px 16px 0 0 rgba(0, 0, 0, 0.5)";
 
 const INTERACTIBLE_STATES: StyleRule["selectors"] = {
     [skinSelectors.isHovered]: {
@@ -42,6 +43,9 @@ const INPUT_STATES: StyleRule["selectors"] = ObjectUtils.deepMerge(INTERACTIBLE_
 });
 
 const ITEM_STATES: StyleRule["selectors"] = ObjectUtils.deepMerge(INTERACTIBLE_STATES, {
+    [skinSelectors.isHovered]: {
+        filter: "none",
+    },
     [skinSelectors.isSelected]: {
         color: themeVars.color.primary.contrast,
         fontWeight: "bold",
@@ -109,7 +113,7 @@ const TAB_FLOATER_SELECTED: StyleRule = {
     ...ITEM_FLOATER_SELECTED,
 };
 
-const surface = (color: SkinBaseColor): StyleRule => ({
+const surface = (color: SkinColorFamily): StyleRule => ({
     border: "2px solid black",
     backgroundColor: color.main,
     boxShadow: SHADOW_MEDIUM,

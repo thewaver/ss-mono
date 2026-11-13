@@ -1,7 +1,7 @@
 import { ObjectUtils } from "@thewaver/ss-utils";
 import { type StyleRule, style } from "@vanilla-extract/css";
 
-import type { SkinBaseColor } from "../Skin.types";
+import type { SkinColorFamily } from "../Skin.types";
 import { SkinUtils } from "../Skin.utils";
 
 import { layerVars } from "../../StyledComponents/Layer/Layer.css";
@@ -63,6 +63,9 @@ const INPUT_STATES: StyleRule["selectors"] = ObjectUtils.deepMerge(INTERACTIBLE_
 });
 
 const ITEM_STATES: StyleRule["selectors"] = ObjectUtils.deepMerge(INTERACTIBLE_STATES, {
+    [skinSelectors.isHovered]: {
+        filter: "none",
+    },
     [skinSelectors.isSelected]: {
         color: themeVars.color.primary.main,
         fontWeight: "bold",
@@ -82,7 +85,6 @@ const SWITCH_STATES: StyleRule["selectors"] = ObjectUtils.deepMerge(INPUT_STATES
 
 const INPUT_SHELL: StyleRule = {
     backgroundColor: [layerVars.main, `rgb(from ${layerVars.main} r g b / 50%)`],
-    backdropFilter: "blur(20px)",
     boxShadow: lightGlow(layerVars.contrast, 25),
     color: layerVars.contrast,
 } as const;
@@ -120,7 +122,7 @@ const TAB_FLOATER_SELECTED: StyleRule = {
     boxShadow: lightGlow(themeVars.color.primary.main, 100),
 };
 
-const surface = (color: SkinBaseColor): StyleRule => ({
+const surface = (color: SkinColorFamily): StyleRule => ({
     backgroundColor: [color.dark, `rgb(from ${color.dark} r g b / 50%)`],
     backdropFilter: "blur(20px)",
     boxShadow: darkGlow(color.dark, 50),
@@ -210,6 +212,7 @@ SkinUtils.define(xenon, {
     },
     dropdown: {
         ...INPUT_SHELL,
+        backdropFilter: "blur(20px)",
     },
     dropZone: {
         border: [`2px dashed ${layerVars.contrast}`, `2px dashed rgb(from ${layerVars.contrast} r g b / 25%)`],
@@ -296,11 +299,6 @@ SkinUtils.define(xenon, {
     progressTrack: {
         backgroundColor: [layerVars.main, `rgb(from ${layerVars.main} r g b / 50%)`],
         boxShadow: darkGlow(layerVars.main, 50),
-        selectors: {
-            [skinSelectors.hasError]: {
-                boxShadow: lightGlow(themeVars.color.error.main, 100),
-            },
-        },
     },
     radioBox: {
         ...SWITCH_SHELL,

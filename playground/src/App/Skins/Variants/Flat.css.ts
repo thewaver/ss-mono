@@ -1,7 +1,7 @@
 import { ObjectUtils } from "@thewaver/ss-utils";
 import { type StyleRule, style } from "@vanilla-extract/css";
 
-import type { SkinBaseColor } from "../Skin.types";
+import type { SkinColorFamily } from "../Skin.types";
 import { SkinUtils } from "../Skin.utils";
 
 import { layerVars } from "../../StyledComponents/Layer/Layer.css";
@@ -16,9 +16,9 @@ export const flat = style({
 
 const PILL_RADIUS = "9999px";
 
-const SHADOW_SMALL = "0 2px 2px 0px rgba(0, 0, 0, 0.75)";
-const SHADOW_MEDIUM = `${SHADOW_SMALL}, 0 4px 8px 0px rgba(0, 0, 0, 0.5)`;
-// const SHADOW_LARGE = `${SHADOW_MEDIUM}, 0 16px 64px 0px rgba(0, 0, 0, 0.25)`;
+const SHADOW_SMALL = "0 2px 2px 0 rgba(0, 0, 0, 0.75)";
+const SHADOW_MEDIUM = `${SHADOW_SMALL}, 0 4px 8px 0 rgba(0, 0, 0, 0.5)`;
+// const SHADOW_LARGE = `${SHADOW_MEDIUM}, 0 16px 64px 0 rgba(0, 0, 0, 0.25)`;
 
 const INTERACTIBLE_STATES: StyleRule["selectors"] = {
     [skinSelectors.isHovered]: {
@@ -44,6 +44,9 @@ const INPUT_STATES: StyleRule["selectors"] = ObjectUtils.deepMerge(INTERACTIBLE_
 });
 
 const ITEM_STATES: StyleRule["selectors"] = ObjectUtils.deepMerge(INTERACTIBLE_STATES, {
+    [skinSelectors.isHovered]: {
+        filter: "none",
+    },
     [skinSelectors.isSelected]: {
         color: themeVars.color.primary.main,
         fontWeight: "bold",
@@ -118,7 +121,7 @@ const TAB_FLOATER_SELECTED_VERT: StyleRule = {
     borderInlineStart: `2px solid ${themeVars.color.primary.main}`,
 };
 
-const surface = (color: SkinBaseColor): StyleRule => ({
+const surface = (color: SkinColorFamily): StyleRule => ({
     borderRadius: themeVars.borderRadius.half,
     backgroundColor: color.main,
     boxShadow: SHADOW_MEDIUM,
@@ -281,11 +284,6 @@ SkinUtils.define(flat, {
         borderRadius: PILL_RADIUS,
         backgroundColor: layerVars.dark,
         boxShadow: SHADOW_SMALL,
-        selectors: {
-            [skinSelectors.hasError]: {
-                backgroundColor: themeVars.color.error.dark,
-            },
-        },
     },
     radioBox: {
         ...SWITCH_SHELL,
