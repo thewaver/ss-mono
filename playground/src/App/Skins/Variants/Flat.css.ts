@@ -203,6 +203,7 @@ SkinUtils.define(flat, {
     },
     dropdown: {
         ...INPUT_SHELL,
+        borderBottom: "none",
         border: INPUT_SHELL.borderBottom,
     },
     dropZone: {

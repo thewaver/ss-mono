@@ -15,16 +15,16 @@ const SHARED_THEME_VALUES = {
     scheme: "dark",
     color: {
         info: {
-            dark: "hsl(195, 100%, 50%)",
-            main: "hsl(195, 100%, 60%)",
-            light: "hsl(195, 100%, 70%)",
-            contrast: "hsl(195, 100%, 0%)",
+            dark: "hsl(210, 100%, 50%)",
+            main: "hsl(210, 100%, 60%)",
+            light: "hsl(210, 100%, 70%)",
+            contrast: "hsl(210, 100%, 0%)",
         },
         success: {
-            dark: "hsl(75, 100%, 40%)",
-            main: "hsl(75, 100%, 50%)",
-            light: "hsl(75, 100%, 60%)",
-            contrast: "hsl(75, 100%, 0%)",
+            dark: "hsl(90, 100%, 40%)",
+            main: "hsl(90, 100%, 50%)",
+            light: "hsl(90, 100%, 60%)",
+            contrast: "hsl(90, 100%, 0%)",
         },
         alert: {
             dark: "hsl(45, 100%, 40%)",
@@ -154,10 +154,10 @@ const PRIMARY_GOLD: ColorFamily = {
 };
 
 const PRIMARY_LIME: ColorFamily = {
-    dark: { h: 90, s: 100, l: 40 },
-    main: { h: 90, s: 100, l: 50 },
-    light: { h: 90, s: 100, l: 60 },
-    contrast: { h: 90, s: 100, l: 0 },
+    dark: { h: 75, s: 100, l: 40 },
+    main: { h: 75, s: 100, l: 50 },
+    light: { h: 75, s: 100, l: 60 },
+    contrast: { h: 75, s: 100, l: 0 },
 };
 
 const PRIMARY_CYAN: ColorFamily = {
@@ -165,6 +165,13 @@ const PRIMARY_CYAN: ColorFamily = {
     main: { h: 180, s: 100, l: 50 },
     light: { h: 180, s: 100, l: 60 },
     contrast: { h: 180, s: 100, l: 0 },
+};
+
+const PRIMARY_PINK: ColorFamily = {
+    dark: { h: 330, s: 100, l: 65 },
+    main: { h: 330, s: 100, l: 70 },
+    light: { h: 330, s: 100, l: 75 },
+    contrast: { h: 330, s: 100, l: 0 },
 };
 
 const SURFACE_CHESTNUT: ColorFamily = {
@@ -199,6 +206,7 @@ const PRIMARIES = {
     gold: PRIMARY_GOLD,
     lime: PRIMARY_LIME,
     cyan: PRIMARY_CYAN,
+    pink: PRIMARY_PINK,
 };
 
 const SURFACES = {
@@ -218,7 +226,7 @@ const SURFACE_PRIMARY_SUPPORT: Record<SurfaceName, Set<PrimaryName>> = {
     chestnut: new Set(["gold"]),
     olive: new Set(["lime"]),
     slate: new Set(["cyan"]),
-    plum: new Set(["gold"]),
+    plum: new Set(["pink"]),
 };
 
 const toMixedTheme = (S1: ColorFamily, S2: ColorFamily, primary: ColorFamily) => ({

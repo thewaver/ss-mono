@@ -28,7 +28,7 @@ const SHADOW_PRESSED = [
     "inset 0 4px 4px 0 rgb(0 0 0 / 50%)",
     "inset 0 8px 8px 0 rgb(0 0 0 / 25%)",
 ].join(", ");
-const SHADOW_SMALL = "0 2px 2px 0 rgba(0, 0, 0, 0.75)";
+const SHADOW_SMALL = "0 2px 0 0 rgba(0, 0, 0, 0.75)";
 const SHADOW_MEDIUM = `${SHADOW_SMALL}, 0 4px 8px 0 rgba(0, 0, 0, 0.5)`;
 // const SHADOW_LARGE = `${SHADOW_MEDIUM}, 0 16px 64px 0 rgba(0, 0, 0, 0.25)`;
 

@@ -35,6 +35,7 @@ export const SKIN_OPTIONS: NavSettingsOption<PlaygroundSkin>[] = [
     { value: "flat", label: "Flat" },
     { value: "glossy", label: "Glossy" },
     { value: "shaded", label: "Shaded" },
+    { value: "tek", label: "Tek" },
     { value: "terminal", label: "Terminal" },
     { value: "xenon", label: "Xenon" },
 ];
