@@ -15,8 +15,8 @@ export namespace ShortcutVueUtils {
     /**
      * Registers a list of shortcuts for as long as the component is mounted, following the list as it changes.
      *
-     * The bindings belong to the layer on top when the component has mounted — the page, or the dialog the component
-     * was mounted inside — and keep that layer for good, so a list that changes while another layer is open stays on
+     * The bindings belong to the layer on top once the component has first mounted — the page, or the dialog the
+     * component was mounted inside, even one that opened in the same render — and keep that layer for good, so a list that changes while another layer is open stays on
      * the layer it started on. Each change replaces every binding.
      *
      * Must run inside a component's `setup`.
@@ -28,14 +28,29 @@ export namespace ShortcutVueUtils {
         let hasLayer = false;
 
         watchAfterRender([() => toValue(bindings)], ([current]) => {
-            if (!hasLayer) {
-                layer = DismisserUtils.getTopLayer();
-                hasLayer = true;
+            const removers: (() => void)[] = [];
+            let isLive = true;
+
+            const register = () => {
+                if (!isLive) return;
+
+                if (!hasLayer) {
+                    layer = DismisserUtils.getTopLayer();
+                    hasLayer = true;
+                }
+
+                for (const binding of current) removers.push(ShortcutUtils.addBinding({ ...binding, layer }));
+            };
+
+            if (hasLayer) {
+                register();
+            } else {
+                queueMicrotask(register);
             }
 
-            const removers = current.map((binding) => ShortcutUtils.addBinding({ ...binding, layer }));
-
             return () => {
+                isLive = false;
+
                 for (const remove of removers) remove();
             };
         });

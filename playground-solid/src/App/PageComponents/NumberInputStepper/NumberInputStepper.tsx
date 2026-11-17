@@ -15,6 +15,9 @@ export const PageNumberInputStepper = (props: NumberInputStepperProps) => {
                     access(props.flags).isReadOnly ||
                     access(props.stepper).getIsAtMax()
                 }
+                onClick={(e) => {
+                    if (e.detail === 0) access(props.stepper).stepUp();
+                }}
                 onPointerDown={access(props.stepper).startSteppingUp}
                 onPointerUp={access(props.stepper).stopStepping}
                 onMouseLeave={access(props.stepper).stopStepping}
@@ -31,6 +34,9 @@ export const PageNumberInputStepper = (props: NumberInputStepperProps) => {
                     access(props.flags).isReadOnly ||
                     access(props.stepper).getIsAtMin()
                 }
+                onClick={(e) => {
+                    if (e.detail === 0) access(props.stepper).stepDown();
+                }}
                 onPointerDown={access(props.stepper).startSteppingDown}
                 onPointerUp={access(props.stepper).stopStepping}
                 onMouseLeave={access(props.stepper).stopStepping}

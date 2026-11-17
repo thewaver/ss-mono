@@ -2806,9 +2806,10 @@ Built for `CommandPalette`, in `Abstracts/Shortcut`. A shortcut is data — `{ k
   warn on registration. Named keys such as F8 are not characters, and `Toasts`' F8 must keep working in a field.
 - **Warnings print once per message**, since re-registration would otherwise repeat them, and on every build, as
   `Select`'s do.
-- **Which layer a binding takes, per framework.** Solid and Vue read it on the owner's first effect after mounting.
-  React runs a child's effects before its parent's, so a binding inside a `Modal` opened in the same render would read
-  the layer below; React defers the first read to a microtask, after every effect of that render. Vue's
+- **Which layer a binding takes, per framework.** Solid reads it on the owner's first effect after mounting.
+  React runs a child's effects before its parent's, and Vue its `onMounted` hooks, so a binding inside a layer opened
+  in the same render would read the layer below; both defer the first read to a microtask, after every effect of that
+  render. Vue's
   `DismisserVueUtils.useLayer` registers one stable layer object per component (it used to build a new one on each
   opening), since bindings compare layers by identity. React re-registers only when the list of shortcuts changes and
   reads what each does from the latest render.
@@ -12891,7 +12892,10 @@ somebody else's popup.**
   sits however much border and padding the consumer put on their popup. Unset, every scroll target lands short
   by that inset, which reads as an arrow key stopping one option early. `scrollMargin` is the package's own
   answer; the offset has to be worked out in layout space rather than off raw client rects, because `Viewport`
-  scales the page.
+  scales the page. **The offset is live geometry**: anything above the list growing or appearing moves it, so
+  `VirtualizerUtils.observeScrollMargin`, which all four adapters call, measures it again whenever an element before
+  the list, or one of the list's ancestors below the scroller, resizes, appears or goes —
+  measured once, an accordion opening above a `Table` left the window drawing rows where the list no longer was.
 - **A highlighted row must be mounted whether or not it is in view.** `aria-activedescendant` names an element
   by id, and scrolling to a row is not the same instant as mounting it, so the name refers to nothing until the
   window catches up. The row carrying the highlight is pinned into the range.
@@ -22616,8 +22620,9 @@ from the value it holds"_.
 
 - **Only the reader's typing commits.** Solid commits from `onInput`, which `TextField` calls after writing the
   reader's text; a rewrite of the text from the value commits nothing. Svelte's respelling writes the text directly
-  instead of through its typing path. React and Vue already committed only from their text setter, which only
-  `TextField`'s input reaches.
+  instead of through its typing path. React's and Vue's `CurrencyInput` rewrote the text on a change of format
+  through the same setter typing uses, and so committed it; they call `refresh` instead, as their `TimeInput` and
+  `DateInput` do.
 - **A held value the settings no longer allow is shown and flagged.** `MaskedFieldUtils.getIsUnheld` asks whether the
   field, reading its own spelling of the value back, gets a different value; every helper ORs it into the error.
   CurrencyInput now spells a negative amount with its minus whether or not a sign may be typed (its `formatDigits`

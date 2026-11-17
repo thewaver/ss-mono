@@ -8,6 +8,7 @@ import {
     SelectStyles,
     SelectUtils,
     TextFieldUtils,
+    UNLABELED_CONTEXT,
 } from "@thewaver/ss-components";
 import { SelectConst } from "@thewaver/ss-components/internal";
 import { CSSUtils } from "@thewaver/ss-utils";
@@ -20,7 +21,7 @@ import { Popover } from "../../../Primitives/Popover/Popover";
 import { useLatest } from "../../../Utils/refUtils";
 import { Button } from "../../Buttons/Button/Button";
 import { FormFieldReactUtils } from "../FormField/FormFieldReact.utils";
-import { useLabelContext } from "../Label/Label.context";
+import { LabelContextProvider, useLabelContext } from "../Label/Label.context";
 import { ListboxOptions } from "../Listbox/Listbox";
 import { ListboxReactUtils } from "../Listbox/ListboxReact.utils";
 import type { SelectCompositeProps, SelectFieldProps, SelectProps } from "./Select.types";
@@ -327,12 +328,14 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
                             className={SelectStyles.selectClear}
                             style={{ insetInlineEnd: `${spreadPadding.paddingInlineEnd}px` }}
                         >
-                            <Button
-                                isDisabled={isDisabled}
-                                ariaLabel={props.clearAriaLabel}
-                                renderContent={(clearFlags) => props.renderClear?.(clearFlags)}
-                                onClick={clearValue}
-                            />
+                            <LabelContextProvider value={UNLABELED_CONTEXT}>
+                                <Button
+                                    isDisabled={isDisabled}
+                                    ariaLabel={props.clearAriaLabel}
+                                    renderContent={(clearFlags) => props.renderClear?.(clearFlags)}
+                                    onClick={clearValue}
+                                />
+                            </LabelContextProvider>
                         </div>
                     )}
 

@@ -40,6 +40,15 @@ describe("ObjectUtils.onlyDefinedProps", () => {
 
         expect(Object.keys(input)).toEqual(["a", "b"]);
     });
+
+    it("copies a key named __proto__ as a plain key rather than as the prototype", () => {
+        const input = JSON.parse('{"__proto__": {"polluted": true}, "a": 1}');
+        const result = ObjectUtils.onlyDefinedProps(input);
+
+        expect(Object.getPrototypeOf(result)).toBe(Object.prototype);
+        expect(Object.keys(result)).toEqual(["__proto__", "a"]);
+        expect((result as Record<string, unknown>).polluted).toBeUndefined();
+    });
 });
 
 describe("ObjectUtils.deepMerge", () => {
@@ -187,6 +196,14 @@ describe("ObjectUtils.mapifyArray", () => {
         ];
 
         expect(ObjectUtils.mapifyArray(arr, "id")).toEqual({ a: { id: "a", value: 3 } });
+    });
+
+    it("keys an entry named __proto__ as a plain key rather than as the prototype", () => {
+        const arr = [{ id: "__proto__", value: 1 }];
+        const result = ObjectUtils.mapifyArray(arr, "id");
+
+        expect(Object.getPrototypeOf(result)).toBe(Object.prototype);
+        expect(Object.keys(result)).toEqual(["__proto__"]);
     });
 });
 

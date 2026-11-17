@@ -88,4 +88,59 @@ export namespace VirtualizerUtils {
      * @param instance The virtualizer, as handed to {@link observeClientRect}.
      */
     export const remeasureClientRect = (instance: object) => rectReporters.get(instance)?.();
+
+    /**
+     * Reports how far a list starts below the top of its scroller's content, now and whenever that changes.
+     *
+     * The offset is what TanStack calls `scrollMargin`. It moves whenever anything above the list grows, shrinks,
+     * appears or goes — an accordion opening, a banner arriving — so it is measured again whenever an element before
+     * the list, or one of the list's ancestors below the scroller, is resized, added or removed. It is worked out in
+     * layout pixels, so a scaled ancestor does not skew it.
+     *
+     * @param element The list's own element.
+     * @param scrollParent The scroller it sits in, as {@link findScrollParent} finds it.
+     * @param onMargin Called with the offset, in layout pixels.
+     * @returns A function that stops observing.
+     */
+    export const observeScrollMargin = (
+        element: HTMLElement,
+        scrollParent: HTMLElement,
+        onMargin: (margin: number) => void,
+    ) => {
+        const measure = () => {
+            const scrollParentRect = scrollParent.getBoundingClientRect();
+            const scale = scrollParent.offsetHeight ? scrollParentRect.height / scrollParent.offsetHeight : 1;
+            const inset = (element.getBoundingClientRect().top - scrollParentRect.top) / (scale || 1);
+
+            onMargin(inset - scrollParent.clientTop + scrollParent.scrollTop);
+        };
+
+        const resizeObserver = new ResizeObserver(measure);
+        const mutationObserver = new MutationObserver(() => {
+            watch();
+            measure();
+        });
+
+        const watch = () => {
+            resizeObserver.disconnect();
+            mutationObserver.disconnect();
+
+            for (let node: Element | null = element; node && node !== scrollParent; node = node.parentElement) {
+                if (node !== element) resizeObserver.observe(node);
+                if (node.parentElement) mutationObserver.observe(node.parentElement, { childList: true });
+
+                for (let above = node.previousElementSibling; above; above = above.previousElementSibling) {
+                    resizeObserver.observe(above);
+                }
+            }
+        };
+
+        watch();
+        measure();
+
+        return () => {
+            resizeObserver.disconnect();
+            mutationObserver.disconnect();
+        };
+    };
 }

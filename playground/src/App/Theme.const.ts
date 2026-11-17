@@ -202,7 +202,7 @@ const SURFACE_PLUM: ColorFamily = {
     contrast: { h: 300, s: 100, l: 95 },
 };
 
-const PRIMARIES = {
+export const PRIMARIES = {
     gold: PRIMARY_GOLD,
     lime: PRIMARY_LIME,
     cyan: PRIMARY_CYAN,
@@ -220,14 +220,16 @@ type SurfaceName = keyof typeof SURFACES;
 
 type PrimaryName = keyof typeof PRIMARIES;
 
-export type MixedThemeName = `${SurfaceName}_${SurfaceName}_${PrimaryName}`;
+const SURFACE_PRIMARY_SUPPORT = {
+    chestnut: ["gold"],
+    olive: ["lime"],
+    slate: ["cyan"],
+    plum: ["pink"],
+} as const satisfies Record<SurfaceName, readonly PrimaryName[]>;
 
-const SURFACE_PRIMARY_SUPPORT: Record<SurfaceName, Set<PrimaryName>> = {
-    chestnut: new Set(["gold"]),
-    olive: new Set(["lime"]),
-    slate: new Set(["cyan"]),
-    plum: new Set(["pink"]),
-};
+export type MixedThemeName = {
+    [S2 in SurfaceName]: `${Exclude<SurfaceName, S2>}_${S2}_${(typeof SURFACE_PRIMARY_SUPPORT)[S2][number]}`;
+}[SurfaceName];
 
 const toMixedTheme = (S1: ColorFamily, S2: ColorFamily, primary: ColorFamily) => ({
     ...SHARED_THEME_VALUES,
@@ -254,7 +256,9 @@ const MIXED_THEMES = Object.fromEntries(
             .flatMap(([name2, S2]) =>
                 Object.entries(PRIMARIES)
                     .filter(([primaryName]) =>
-                        SURFACE_PRIMARY_SUPPORT[name2 as SurfaceName].has(primaryName as PrimaryName),
+                        (SURFACE_PRIMARY_SUPPORT[name2 as SurfaceName] as readonly PrimaryName[]).includes(
+                            primaryName as PrimaryName,
+                        ),
                     )
                     .map(([primaryName, primary]) => [
                         `${name1}_${name2}_${primaryName}`,

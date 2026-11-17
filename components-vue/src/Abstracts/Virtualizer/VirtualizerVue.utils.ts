@@ -115,11 +115,9 @@ export namespace VirtualizerVueUtils {
                 return;
             }
 
-            const scrollParentRect = scroller.getBoundingClientRect();
-            const scale = scroller.offsetHeight ? scrollParentRect.height / scroller.offsetHeight : 1;
-            const inset = (element.getBoundingClientRect().top - scrollParentRect.top) / (scale || 1);
-
-            scrollMargin.value = inset - scroller.clientTop + scroller.scrollTop;
+            return VirtualizerUtils.observeScrollMargin(element, scroller, (margin) => {
+                scrollMargin.value = margin;
+            });
         });
 
         const computeOptions = (): VirtualizerOptions<HTMLElement, HTMLElement> => {

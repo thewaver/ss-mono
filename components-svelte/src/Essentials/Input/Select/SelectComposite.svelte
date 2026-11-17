@@ -22,6 +22,7 @@
     import ListboxOptions from "../Listbox/ListboxOptions.svelte";
     import { ListboxSvelteUtils } from "../Listbox/ListboxSvelte.utils.svelte.js";
     import type { SelectCompositeProps } from "./Select.types.js";
+    import SelectClearScope from "./SelectClearScope.svelte";
     import SelectField from "./SelectField.svelte";
 
     const EMPTY_QUERY = "";
@@ -199,12 +200,14 @@
 
         {#if props.renderClear && props.selectedOptions.length > 0}
             <div class={styles.selectClear} style:inset-inline-end={`${spreadPadding.paddingInlineEnd}px`}>
-                <Button
-                    {isDisabled}
-                    ariaLabel={props.clearAriaLabel}
-                    renderContent={props.renderClear}
-                    onClick={clearValue}
-                />
+                <SelectClearScope>
+                    <Button
+                        {isDisabled}
+                        ariaLabel={props.clearAriaLabel}
+                        renderContent={props.renderClear}
+                        onClick={clearValue}
+                    />
+                </SelectClearScope>
             </div>
         {/if}
 

@@ -171,6 +171,7 @@ export const Toasts = <T,>(props: ToastsProps<T>) => {
     );
 
     const admittedRef = useLatest(admitted);
+    const entryRefsRef = useLatest(entryRefs);
 
     for (const toast of admitted) {
         lastSeenRef.current.set(toast.id, toast);
@@ -225,8 +226,18 @@ export const Toasts = <T,>(props: ToastsProps<T>) => {
     }, [root, portalRef, alignment, hotkeys, registerOwner, admittedRef]);
 
     useEffect(() => {
+        const region = rootRef.current;
+
+        if (region) {
+            for (const [id, element] of Object.entries(entryRefsRef.current)) {
+                if (admitted.some((toast) => toast.id === id)) continue;
+
+                ToastUtils.rescueFocus(element, region, admitted.length > 0);
+            }
+        }
+
         setEntryIds((previous) => ToastUtils.computeEntryIds(previous, admitted));
-    }, [admitted]);
+    }, [admitted, entryRefsRef]);
 
     useEffect(() => {
         const previous = announcedIdsRef.current;

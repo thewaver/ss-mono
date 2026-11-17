@@ -194,6 +194,16 @@ export const Toasts = defineComponent(
         );
 
         watchAfterRender([admitted], ([list]) => {
+            const region = rootRef.value;
+
+            if (region) {
+                for (const [id, element] of Object.entries(entryRefs.value)) {
+                    if (list.some((toast) => toast.id === id)) continue;
+
+                    ToastUtils.rescueFocus(element, region, list.length > 0);
+                }
+            }
+
             entryIds.value = ToastUtils.computeEntryIds(entryIds.value, list);
         });
 

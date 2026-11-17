@@ -11,6 +11,9 @@
 <PageNumberInputStepperFrame>
     <Button
         isDisabled={props.flags.isDisabled || props.flags.isReadOnly || props.stepper.getIsAtMax()}
+        onClick={(e) => {
+            if (e.detail === 0) props.stepper.stepUp();
+        }}
         onPointerDown={props.stepper.startSteppingUp}
         onPointerUp={props.stepper.stopStepping}
         onMouseLeave={props.stepper.stopStepping}
@@ -22,6 +25,9 @@
 
     <Button
         isDisabled={props.flags.isDisabled || props.flags.isReadOnly || props.stepper.getIsAtMin()}
+        onClick={(e) => {
+            if (e.detail === 0) props.stepper.stepDown();
+        }}
         onPointerDown={props.stepper.startSteppingDown}
         onPointerUp={props.stepper.stopStepping}
         onMouseLeave={props.stepper.stopStepping}

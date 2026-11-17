@@ -1,7 +1,6 @@
 import { type SlotsType, computed, defineComponent, shallowRef } from "vue";
 
 import { CURRENCY_INPUT_DEFAULTS, CurrencyInputUtils, TextSyncUtils } from "@thewaver/ss-components";
-import { CurrencyInputConst } from "@thewaver/ss-components/internal";
 
 import { MaskedFieldVueUtils } from "../../../Abstracts/MaskedField/MaskedFieldVue.utils";
 import { TextField } from "../../../Primitives/TextField/TextField";
@@ -47,11 +46,7 @@ export const CurrencyInput = defineComponent(
         });
 
         watchAfterRender([() => props.locale, () => props.groupSizes?.join(","), getDecimals, getHasSign], () => {
-            const spelling = value.value === undefined ? CurrencyInputConst.EMPTY_TEXT : field.formatValue(value.value);
-
-            if (spelling === field.text.value) return;
-
-            field.text.value = spelling;
+            field.refresh();
         });
 
         return () => (

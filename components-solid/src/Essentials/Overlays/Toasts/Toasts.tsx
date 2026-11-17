@@ -236,6 +236,15 @@ export const Toasts = <T,>(props: ParentProps<ToastsProps<T>>) => {
 
     createEffect(() => {
         const admitted = getAdmitted();
+        const region = untrack(getRootRef);
+
+        if (region) {
+            for (const [id, element] of Object.entries(untrack(getEntryRefs))) {
+                if (admitted.some((toast) => toast.id === id)) continue;
+
+                ToastUtils.rescueFocus(element, region, admitted.length > 0);
+            }
+        }
 
         setEntryIds((prev) => ToastUtils.computeEntryIds(prev, admitted));
     });

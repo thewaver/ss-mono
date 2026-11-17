@@ -205,13 +205,15 @@ export namespace TreeUtils {
         visibleRows: TreeRecordRow<T, TTooltipDefs>[],
         lastFocusedValue: T | undefined,
     ) => {
-        const collapsed = previousExpanded.filter((value) => !expanded.includes(value));
-
-        if (collapsed.length < 1) return;
         if (lastFocusedValue === undefined) return;
         if (visibleRows.some((row) => row.node.value === lastFocusedValue)) return;
 
-        return visibleRows.find((row) => collapsed.includes(row.node.value));
+        const stillExpanded = new Set(expanded);
+        const collapsed = new Set(previousExpanded.filter((value) => !stillExpanded.has(value)));
+
+        if (collapsed.size < 1) return;
+
+        return visibleRows.find((row) => collapsed.has(row.node.value));
     };
 
     /**

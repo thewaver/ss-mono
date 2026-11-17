@@ -66,18 +66,15 @@ export namespace ObjectUtils {
      *
      * Keys explicitly set to `null` are kept — only `undefined` is stripped. Handy
      * before spreading user-supplied options over defaults, since `undefined` would
-     * otherwise overwrite a perfectly good default.
+     * otherwise overwrite a perfectly good default. Every key is copied as a plain key of the result, a key named
+     * `__proto__` included, so no key can change the result's prototype.
      *
      * @returns A new object. The input is not modified.
      */
     export const onlyDefinedProps = <T extends object, K extends keyof T>(obj: T): Partial<T> => {
-        return (Object.keys(obj) as K[]).reduce((res, cur) => {
-            if (obj[cur] !== undefined) {
-                res[cur] = obj[cur];
-            }
+        const entries: [K, T[K]][] = Object.entries(obj) as [K, T[K]][];
 
-            return res;
-        }, {} as Partial<T>);
+        return Object.fromEntries(entries.filter(([, value]) => value !== undefined)) as unknown as Partial<T>;
     };
 
     /**
@@ -146,7 +143,8 @@ export namespace ObjectUtils {
     /**
      * Turns an array of objects into a lookup keyed by one of their string fields.
      *
-     * If two entries share the same key value, the later one wins.
+     * If two entries share the same key value, the later one wins. Every key value becomes a plain key of the result,
+     * `__proto__` included, so no entry can change the result's prototype.
      *
      * @param arr The array to index.
      * @param key Which field to use as the lookup key. Its value must be a string.
@@ -160,13 +158,7 @@ export namespace ObjectUtils {
         arr: Array<T>,
         key: TK,
     ): Record<RK, T> => {
-        return arr.reduce(
-            (prev, cur) => {
-                prev[cur[key] as RK] = cur;
-                return prev;
-            },
-            {} as Record<RK, T>,
-        );
+        return Object.fromEntries(arr.map((item) => [item[key], item])) as Record<RK, T>;
     };
 
     /**

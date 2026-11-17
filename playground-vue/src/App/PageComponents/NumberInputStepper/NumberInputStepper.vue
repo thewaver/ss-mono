@@ -12,6 +12,11 @@ defineProps<NumberInputStepperProps>();
     <PageNumberInputStepperFrame>
         <Button
             :is-disabled="flags.isDisabled || flags.isReadOnly || stepper.getIsAtMax()"
+            @click="
+                (e: MouseEvent | KeyboardEvent) => {
+                    if (e.detail === 0) stepper.stepUp();
+                }
+            "
             @pointer-down="stepper.startSteppingUp"
             @pointer-up="stepper.stopStepping"
             @mouse-leave="stepper.stopStepping"
@@ -25,6 +30,11 @@ defineProps<NumberInputStepperProps>();
 
         <Button
             :is-disabled="flags.isDisabled || flags.isReadOnly || stepper.getIsAtMin()"
+            @click="
+                (e: MouseEvent | KeyboardEvent) => {
+                    if (e.detail === 0) stepper.stepDown();
+                }
+            "
             @pointer-down="stepper.startSteppingDown"
             @pointer-up="stepper.stopStepping"
             @mouse-leave="stepper.stopStepping"

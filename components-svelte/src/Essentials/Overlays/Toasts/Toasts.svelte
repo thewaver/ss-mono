@@ -137,6 +137,16 @@
     $effect(() => {
         const next = admitted;
 
+        untrack(() => {
+            if (!root) return;
+
+            for (const [id, element] of Object.entries(entryRefs)) {
+                if (next.some((toast) => toast.id === id)) continue;
+
+                ToastUtils.rescueFocus(element, root, next.length > 0);
+            }
+        });
+
         entryIds = ToastUtils.computeEntryIds(untrack(() => entryIds), next);
     });
 

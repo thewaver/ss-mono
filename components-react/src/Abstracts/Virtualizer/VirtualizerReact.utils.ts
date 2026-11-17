@@ -94,11 +94,7 @@ export namespace VirtualizerReactUtils {
                 return;
             }
 
-            const scrollParentRect = scrollParent.getBoundingClientRect();
-            const scale = scrollParent.offsetHeight ? scrollParentRect.height / scrollParent.offsetHeight : 1;
-            const inset = (element.getBoundingClientRect().top - scrollParentRect.top) / (scale || 1);
-
-            setScrollMargin(inset - scrollParent.clientTop + scrollParent.scrollTop);
+            return VirtualizerUtils.observeScrollMargin(element, scrollParent, setScrollMargin);
         }, [element, scrollParent]);
 
         const isInsideReactRef = useRef(false);

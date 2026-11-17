@@ -7,6 +7,7 @@ import {
     SELECT_DEFAULTS,
     SelectUtils,
     TextFieldUtils,
+    UNLABELED_CONTEXT,
     SelectStyles as styles,
 } from "@thewaver/ss-components";
 import { SelectConst } from "@thewaver/ss-components/internal";
@@ -20,7 +21,7 @@ import { Popover } from "../../../Primitives/Popover/Popover";
 import { access, accessSignal } from "../../../Utils/propUtils";
 import { Button } from "../../Buttons/Button/Button";
 import { FormFieldSolidUtils } from "../FormField/FormFieldSolid.utils";
-import { useLabelContext } from "../Label/Label.context";
+import { LabelContextProvider, useLabelContext } from "../Label/Label.context";
 import { ListboxOptions } from "../Listbox/Listbox";
 import { ListboxSolidUtils } from "../Listbox/ListboxSolid.utils";
 import type { SelectCompositeProps, SelectFieldProps, SelectProps } from "./SelectSolid.types";
@@ -330,12 +331,14 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
                             class={styles.selectClear}
                             style={{ "inset-inline-end": `${getSpreadPadding().paddingInlineEnd}px` }}
                         >
-                            <Button
-                                isDisabled={getIsDisabled}
-                                ariaLabel={props.clearAriaLabel}
-                                renderContent={(getClearFlags) => props.renderClear?.(getClearFlags)}
-                                onClick={clearValue}
-                            />
+                            <LabelContextProvider value={UNLABELED_CONTEXT}>
+                                <Button
+                                    isDisabled={getIsDisabled}
+                                    ariaLabel={props.clearAriaLabel}
+                                    renderContent={(getClearFlags) => props.renderClear?.(getClearFlags)}
+                                    onClick={clearValue}
+                                />
+                            </LabelContextProvider>
                         </div>
                     </Show>
 

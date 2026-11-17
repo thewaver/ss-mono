@@ -107,13 +107,11 @@ export namespace VirtualizerSvelteUtils {
                 return;
             }
 
-            untrack(() => {
-                const scrollParentRect = scrollParent.getBoundingClientRect();
-                const scale = scrollParent.offsetHeight ? scrollParentRect.height / scrollParent.offsetHeight : 1;
-                const inset = (ref.getBoundingClientRect().top - scrollParentRect.top) / (scale || 1);
-
-                scrollMargin = inset - scrollParent.clientTop + scrollParent.scrollTop;
-            });
+            return untrack(() =>
+                VirtualizerUtils.observeScrollMargin(ref, scrollParent, (margin) => {
+                    scrollMargin = margin;
+                }),
+            );
         });
 
         const computeOptions = (): VirtualizerOptions<HTMLElement, HTMLElement> => {

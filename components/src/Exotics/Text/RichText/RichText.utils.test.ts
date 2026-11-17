@@ -58,13 +58,30 @@ describe("parseContent", () => {
         expect(RichTextUtils.parseContent("[B]x[/b]")).toEqual([text("[B]x[/b]")]);
     });
 
-    it("warns and discards when a closing tag skips past an unclosed one", () => {
+    it("turns an unclosed tag a closing tag skips past back into text, and warns", () => {
         const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
         const result = RichTextUtils.parseContent("[b][i]x[/b]");
 
-        expect(result).toEqual([tag("b", [])]);
-        expect(warn, "the discarded content is announced rather than silently lost").toHaveBeenCalledOnce();
+        expect(result).toEqual([tag("b", [text("[i]x")])]);
+        expect(warn, "the typo is announced as well as shown").toHaveBeenCalledOnce();
         expect(warn.mock.calls[0][0]).toContain("[i]");
+    });
+
+    it("unwinds several skipped tags in the order they were opened, keeping what each held", () => {
+        vi.spyOn(console, "warn").mockImplementation(() => {});
+
+        expect(RichTextUtils.parseContent("[b]a[i]b[u]c[/b]")).toEqual([tag("b", [text("a"), text("[i]b[u]c")])]);
+    });
+
+    it("warns once per parse however many closing tags skip, without the input in the message", () => {
+        const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+        const input = "[b][i]x[/b]".repeat(50);
+
+        RichTextUtils.parseContent(input);
+
+        expect(warn).toHaveBeenCalledOnce();
+        expect(warn.mock.calls[0][0]).toContain("50");
+        expect(warn.mock.calls[0][0].length).toBeLessThan(input.length);
     });
 
     it("takes digits and underscores inside a tag name", () => {
@@ -230,7 +247,7 @@ describe("parseContent on adversarial input", () => {
 
     it("still closes a tag whose name was open, then forgets it", () => {
         expect(RichTextUtils.parseContent("[a][/a][/a]")).toEqual([tag("a", []), text("[/a]")]);
-        expect(RichTextUtils.parseContent("[a][b][/a][/b]")).toEqual([tag("a", []), text("[/b]")]);
+        expect(RichTextUtils.parseContent("[a][b][/a][/b]")).toEqual([tag("a", [text("[b]")]), text("[/b]")]);
     });
 });
 

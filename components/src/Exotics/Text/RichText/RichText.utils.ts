@@ -58,8 +58,8 @@ export namespace RichTextUtils {
      * stray bracket in a translated string shows up on screen rather than swallowing the rest of the
      * sentence. A closing tag with no opening one is text. A tag left unclosed at the end is text, and
      * so is everything inside it. A closing tag that skips over an unclosed tag closes the one it names
-     * and turns the skipped one back into text, warning as it goes, since that case is almost always a
-     * typo rather than an intention.
+     * and turns the skipped one back into text, what it held included. That case is almost always a typo rather
+     * than an intention, so a parse that meets it warns once, naming the first place and how many there were.
      *
      * A tag name, and an attribute name, is a letter or an underscore followed by letters, digits and
      * underscores. Attributes follow the name, each after one or more spaces, written `key="value"` with
@@ -95,6 +95,8 @@ export namespace RichTextUtils {
         const openCounts = new Map<string, number>();
 
         let lastIndex = 0;
+        let unwoundCount = 0;
+        let firstUnwound: { tag: string; skipped: string; index: number } | undefined;
 
         for (const match of input.matchAll(TAG_RE)) {
             const tagRaw = match[0];
@@ -127,13 +129,15 @@ export namespace RichTextUtils {
                         }
 
                         if (popped.length > 1) {
-                            console.warn(
-                                `RichText: closing [${tag}] discarded content from unclosed ` +
-                                    `${popped
-                                        .slice(1)
-                                        .map((frame) => `[${frame.tag}]`)
-                                        .join(", ")} in: ${input}`,
-                            );
+                            unwoundCount++;
+                            firstUnwound ??= { tag, skipped: popped[1].tag, index };
+                        }
+
+                        for (let k = popped.length - 1; k >= 1; k--) {
+                            popped[k - 1].children.push({
+                                type: "text",
+                                content: popped[k].openingMarkup + popped[k].children.map(stringifyNode).join(""),
+                            });
                         }
 
                         stack[stack.length - 1].children.push({
@@ -181,6 +185,14 @@ export namespace RichTextUtils {
                 type: "text",
                 content: unclosed.openingMarkup + unclosed.children.map(stringifyNode).join(""),
             });
+        }
+
+        if (firstUnwound) {
+            console.warn(
+                `RichText: ${unwoundCount} closing tag(s) skipped over an unclosed tag, which was shown as text, the ` +
+                    `first being [/${firstUnwound.tag}] at offset ${firstUnwound.index}, which skipped ` +
+                    `[${firstUnwound.skipped}].`,
+            );
         }
 
         return stack[0].children;

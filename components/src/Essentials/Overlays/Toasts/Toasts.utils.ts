@@ -486,6 +486,40 @@ export namespace ToastUtils {
     export const cycleFocus = (step: 1 | -1) => cycleWithin(registeredStacks, step);
 
     /**
+     * Finds focus a new place when the toast holding it leaves, so the reader does not lose their place.
+     *
+     * Call it as the toast stops being shown, while its element is still in the document, with the toast's element.
+     * It does nothing unless focus is inside that element and shown as keyboard focus, so a toast closed with a pointer
+     * leaves focus to the browser, as any removed element does, and the stack, which holds its countdowns while focus
+     * is inside it, goes on counting. While the stack still holds other toasts, focus moves to the
+     * stack, where the shortcuts and Escape go on working. Otherwise it goes back to where it was before the shortcut
+     * first moved it into a stack, and when that is unknown or gone, to the stack itself rather than the page.
+     *
+     * @param element The leaving toast's element.
+     * @param region The stack's region, which must be focusable.
+     * @param holdsToasts Whether the stack still holds any toast once this one has gone.
+     * @returns `true` when focus moved, and `false` when keyboard focus was not in the toast.
+     */
+    export const rescueFocus = (element: HTMLElement, region: HTMLElement, holdsToasts: boolean) => {
+        const active = document.activeElement;
+
+        if (!active || !element.contains(active) || !active.matches(":focus-visible")) return false;
+
+        if (!holdsToasts && restoreRef?.isConnected) {
+            const target = restoreRef;
+
+            restoreRef = undefined;
+            target.focus();
+
+            return true;
+        }
+
+        region.focus();
+
+        return true;
+    };
+
+    /**
      * Enters a provider's stack in the page-wide register, which keeps every stack in order, holds the shortcuts
      * that reach them, and warns once when two stacks draw at one alignment in one place.
      *

@@ -8,6 +8,7 @@ import {
     SelectStyles,
     SelectUtils,
     TextFieldUtils,
+    UNLABELED_CONTEXT,
 } from "@thewaver/ss-components";
 import { SelectConst } from "@thewaver/ss-components/internal";
 import { CSSUtils } from "@thewaver/ss-utils";
@@ -28,7 +29,7 @@ import type { SlotsContext } from "../../../Utils/typeUtils";
 import { Button } from "../../Buttons/Button/Button";
 import type { ButtonSlots } from "../../Buttons/Button/Button.types";
 import { FormFieldVueUtils } from "../FormField/FormFieldVue.utils";
-import { useLabelContext } from "../Label/Label.context";
+import { provideLabelContext, useLabelContext } from "../Label/Label.context";
 import { ListboxOptions } from "../Listbox/Listbox";
 import type { ListboxOptionsSlots } from "../Listbox/Listbox.types";
 import { ListboxVueUtils } from "../Listbox/ListboxVue.utils";
@@ -176,6 +177,15 @@ const SelectField = defineComponent(
             onQueryInput: null,
         }),
     },
+);
+
+const SelectClearScope = defineComponent(
+    (_props, { slots }) => {
+        provideLabelContext(UNLABELED_CONTEXT);
+
+        return () => slots.default?.();
+    },
+    { name: "SelectClearScope" },
 );
 
 const EMPTY_FORM_VALUE = "";
@@ -366,18 +376,20 @@ export const SelectComposite = defineComponent(
                                             class={SelectStyles.selectClear}
                                             style={{ insetInlineEnd: `${spreadPadding.paddingInlineEnd}px` }}
                                         >
-                                            <Button
-                                                isDisabled={isDisabled}
-                                                ariaLabel={props.clearAriaLabel}
-                                                onClick={clearValue}
-                                            >
-                                                {
+                                            <SelectClearScope>
+                                                <Button
+                                                    isDisabled={isDisabled}
+                                                    ariaLabel={props.clearAriaLabel}
+                                                    onClick={clearValue}
+                                                >
                                                     {
-                                                        renderContent: (clearFlags) =>
-                                                            callSlot(slots.renderClear, clearFlags),
-                                                    } satisfies Partial<ButtonSlots>
-                                                }
-                                            </Button>
+                                                        {
+                                                            renderContent: (clearFlags) =>
+                                                                callSlot(slots.renderClear, clearFlags),
+                                                        } satisfies Partial<ButtonSlots>
+                                                    }
+                                                </Button>
+                                            </SelectClearScope>
                                         </div>
                                     )}
 

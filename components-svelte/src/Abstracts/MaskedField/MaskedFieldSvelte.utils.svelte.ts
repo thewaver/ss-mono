@@ -12,8 +12,8 @@ export namespace MaskedFieldSvelteUtils {
      * The rules are {@link MaskedFieldUtils}'. Typing updates the value only when the digits make a complete,
      * possible value, so a half-finished entry leaves the last good value alone rather than clearing it. A value
      * arriving from outside rewrites the text, unless the user is mid-edit with the value already cleared. A change
-     * of spelling — a locale, a decimal count, a date order — rewrites the text in the new form, as if the user had
-     * typed it. And an incomplete entry is not called an error until the user leaves the field.
+     * of spelling — a locale, a decimal count, a date order — rewrites the text in the new form and commits nothing,
+     * since nobody typed it. And an incomplete entry is not called an error until the user leaves the field.
      *
      * The value is committed from `text`'s setter, as React's hook does, never from watching the text: a change of
      * rules would otherwise read the old text under the new ones and commit a value nobody typed. The rewrite on a

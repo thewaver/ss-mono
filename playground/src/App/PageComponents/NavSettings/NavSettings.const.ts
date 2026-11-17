@@ -3,7 +3,7 @@ import type { NavSettingsOption, PlaygroundSkin, PlaygroundTheme, ViewportAnchor
 
 export const DEFAULT_VIEWPORT_ANCHOR: ViewportAnchor = "auto";
 
-export const DEFAULT_THEME: PlaygroundTheme = "slate_chestnut_cyan";
+export const DEFAULT_THEME: PlaygroundTheme = "slate_chestnut_gold";
 
 export const NAV_SETTINGS_STORAGE_PREFIX = "ssPlayground.";
 
