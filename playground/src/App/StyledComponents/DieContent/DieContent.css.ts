@@ -21,6 +21,14 @@ export const dieFaceShowing = style({
     color: themeVars.color.primary.contrast,
 });
 
+export const dieCore = style({
+    position: "absolute",
+    inset: "25%",
+    borderRadius: "50%",
+    backgroundColor: themeVars.color.primary.main,
+    backgroundImage: `radial-gradient(circle at 35% 30%, ${themeVars.color.primary.light}, ${themeVars.color.primary.dark})`,
+});
+
 export const dieIcon = style({
     display: "grid",
     placeItems: "center",

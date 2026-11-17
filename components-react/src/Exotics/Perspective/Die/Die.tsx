@@ -102,6 +102,16 @@ export const Die = (props: DieProps) => {
                     className={DieStyles.dieBody}
                     style={{ transform: DieUtils.getBodyTransform(roller.orientation, size) }}
                 >
+                    {props.renderCore && (
+                        <div
+                            className={DieStyles.dieCore}
+                            style={{ transform: DieUtils.getCoreTransform(roller.orientation) }}
+                            aria-hidden="true"
+                        >
+                            {props.renderCore()}
+                        </div>
+                    )}
+
                     {geometry.map((faceGeometry, index) => {
                         const isTarget = index === roller.targetFace;
                         const faceBox = DieUtils.getFaceBox(faceGeometry, size);

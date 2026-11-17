@@ -9,6 +9,8 @@ export type DieExampleProps = {
     face: readonly [number, (value: number) => void];
 };
 
+export type PlanetExampleProps = IconCloudExampleProps;
+
 export type IconCloudExampleProps = {
     shape: DieShape;
     size: number;

@@ -1,4 +1,4 @@
-import { Index, createMemo, createSignal, onMount } from "solid-js";
+import { Index, Show, createMemo, createSignal, onMount } from "solid-js";
 
 import { BarrelUtils, DIE_DEFAULTS, DieUtils, DieStyles as styles } from "@thewaver/ss-components";
 import { DieConst } from "@thewaver/ss-components/internal";
@@ -80,6 +80,18 @@ export const Die = (props: DieProps) => {
                     class={styles.dieBody}
                     style={{ transform: DieUtils.getBodyTransform(roller.getOrientation(), getSize()) }}
                 >
+                    <Show when={props.renderCore}>
+                        {(getRenderCore) => (
+                            <div
+                                class={styles.dieCore}
+                                style={{ transform: DieUtils.getCoreTransform(roller.getOrientation()) }}
+                                aria-hidden="true"
+                            >
+                                {getRenderCore()()}
+                            </div>
+                        )}
+                    </Show>
+
                     <Index each={getGeometry()}>
                         {(getFaceGeometry, index) => {
                             const getIsTarget = () => index === roller.getTargetFace();

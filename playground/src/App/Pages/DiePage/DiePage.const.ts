@@ -1,3 +1,5 @@
+import type { DieShapes } from "@thewaver/ss-components";
+
 export const ICON_CLOUD_ICONS = [
     { icon: "🍎", label: "Apple" },
     { icon: "🍋", label: "Lemon" },
@@ -36,9 +38,34 @@ export const ICON_CLOUD_STEPS = [
     { direction: "right" as const, id: "dieCloudRight", label: "Spin right" },
 ];
 
+export const PLANET_ICONS = [
+    { icon: "🛰️", label: "Satellite" },
+    { icon: "🌙", label: "Moon" },
+    { icon: "☄️", label: "Comet" },
+    { icon: "🚀", label: "Rocket" },
+    { icon: "⭐", label: "Star" },
+    { icon: "🛸", label: "Flying saucer" },
+    { icon: "👽", label: "Alien" },
+    { icon: "🌟", label: "Glowing star" },
+    { icon: "💫", label: "Dizzy star" },
+    { icon: "🔭", label: "Telescope" },
+    { icon: "🧑‍🚀", label: "Astronaut" },
+    { icon: "🌠", label: "Shooting star" },
+];
+
+export const PLANET_SHAPE_KEY: DieShapes.SampleKey = "d12";
+
+export const PLANET_STEPS = [
+    { direction: "left" as const, id: "diePlanetLeft", label: "Spin left" },
+    { direction: "up" as const, id: "diePlanetUp", label: "Spin up" },
+    { direction: "down" as const, id: "diePlanetDown", label: "Spin down" },
+    { direction: "right" as const, id: "diePlanetRight", label: "Spin right" },
+];
+
 export const EXAMPLE_NAMES = {
     tabletop: "Tabletop die",
     iconCloud: "Icon cloud",
+    planet: "Planet",
 };
 
 export const EXAMPLES_ROOT = "/src/App/Pages/DiePage/Examples";

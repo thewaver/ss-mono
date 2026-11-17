@@ -81,6 +81,15 @@
         style:perspective={`${BarrelUtils.PERSPECTIVE_PX}px`}
     >
         <div class={styles.dieBody} style:transform={DieUtils.getBodyTransform(roller.getOrientation(), size)}>
+            {#if props.renderCore}
+                <div
+                    class={styles.dieCore}
+                    style:transform={DieUtils.getCoreTransform(roller.getOrientation())}
+                    aria-hidden="true"
+                >
+                    {@render props.renderCore()}
+                </div>
+            {/if}
             {#each geometry as faceGeometry, index (index)}
                 {@const isTarget = index === roller.getTargetFace()}
                 {@const faceBox = DieUtils.getFaceBox(faceGeometry, size)}

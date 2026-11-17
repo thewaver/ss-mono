@@ -176,6 +176,16 @@ export namespace DieUtils {
         `translateZ(${-size * HALF}px) ${Matrix3dUtils.toCss(QuaternionUtils.toMatrix(orientation))}`;
 
     /**
+     * The transform the die's core is drawn with: the die's turn undone, so the core sits at the die's center facing
+     * the viewer however the die is turned.
+     *
+     * @param orientation How the die is turned.
+     * @returns The CSS `transform`.
+     */
+    export const getCoreTransform = (orientation: Quaternion) =>
+        Matrix3dUtils.toCss(Matrix3dUtils.transpose(QuaternionUtils.toMatrix(orientation)));
+
+    /**
      * Where one face's box sits inside the die's box, and the contour it is clipped to.
      *
      * @param face The face.

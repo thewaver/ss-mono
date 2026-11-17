@@ -79,6 +79,16 @@ export const Die = defineComponent(
                             class={DieStyles.dieBody}
                             style={{ transform: DieUtils.getBodyTransform(roller.orientation.value, size) }}
                         >
+                            {slots.renderCore && (
+                                <div
+                                    class={DieStyles.dieCore}
+                                    style={{ transform: DieUtils.getCoreTransform(roller.orientation.value) }}
+                                    aria-hidden="true"
+                                >
+                                    {slots.renderCore()}
+                                </div>
+                            )}
+
                             {geometry.value.map((faceGeometry, index) => {
                                 const isTarget = index === roller.targetFace.value;
                                 const faceBox = DieUtils.getFaceBox(faceGeometry, size);

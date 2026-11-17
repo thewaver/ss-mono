@@ -223,3 +223,71 @@ test("only the face the icon cloud is heading for is offered to a screen reader,
         (await page.locator(CLOUD_OFFERED).getAttribute("aria-label"))!,
     );
 });
+
+/**
+ * The planet is the icon cloud with a core: something drawn at the die's center, inside its faces, that always faces
+ * the viewer however the die is turned, so a flat circle reads as a ball. It sits inside the die's turning body, which
+ * is what lets the browser sort it in depth against the faces, and carries the body's turn undone. So whether it faces
+ * the viewer is read off the two transforms together: the body's, then the core's, must leave no turn at all — only
+ * the push back by the die's radius that the body starts with. The core is decoration, kept from a screen reader.
+ */
+const PLANET = example("planet");
+const PLANET_DIE = `${PLANET} [aria-roledescription="die"]`;
+const PLANET_RIGHT = "#diePlanetRight";
+const PLANET_DOWN = "#diePlanetDown";
+const TURN_TOLERANCE = 1e-6;
+
+const ROTATION_ENTRIES = ["m11", "m12", "m13", "m21", "m22", "m23", "m31", "m32", "m33"] as const;
+
+const IDENTITY_ROTATION = [1, 0, 0, 0, 1, 0, 0, 0, 1];
+
+test("the planet's core stays turned towards the viewer however the die is turned", async ({ page }) => {
+    await page.locator(PLANET_RIGHT).click();
+    await page.locator(PLANET_DOWN).click();
+
+    const { body, combined } = await page.locator(PLANET_DIE).evaluate((die, entries) => {
+        const bodyElement = die.firstElementChild!.firstElementChild as HTMLElement;
+        const core = [...bodyElement.children].find(
+            (child) => !child.matches('[aria-roledescription="face"]'),
+        ) as HTMLElement;
+        const bodyMatrix = new DOMMatrix(bodyElement.style.transform);
+        const combinedMatrix = bodyMatrix.multiply(new DOMMatrix(core.style.transform));
+
+        return {
+            body: entries.map((entry) => bodyMatrix[entry]),
+            combined: entries.map((entry) => combinedMatrix[entry]),
+        };
+    }, ROTATION_ENTRIES);
+
+    expect(
+        body.some((value, index) => Math.abs(value - IDENTITY_ROTATION[index]) > TURN_TOLERANCE),
+        "the die itself is turned",
+    ).toBe(true);
+    combined.forEach((value, index) =>
+        expect(Math.abs(value - IDENTITY_ROTATION[index]), "while its core is not").toBeLessThan(TURN_TOLERANCE),
+    );
+});
+
+test("the planet's core is hidden from a screen reader", async ({ page }) => {
+    const hidden = await page.locator(PLANET_DIE).evaluate((die) => {
+        const body = die.firstElementChild!.firstElementChild as HTMLElement;
+        const core = [...body.children].find((child) => !child.matches('[aria-roledescription="face"]'))!;
+
+        return core.getAttribute("aria-hidden");
+    });
+
+    expect(hidden).toBe("true");
+});
+
+test("a die given no core draws nothing but its faces", async ({ page }) => {
+    const others = await page
+        .locator(CLOUD_DIE)
+        .evaluate(
+            (die) =>
+                [...die.firstElementChild!.firstElementChild!.children].filter(
+                    (child) => !child.matches('[aria-roledescription="face"]'),
+                ).length,
+        );
+
+    expect(others).toBe(0);
+});

@@ -9,6 +9,8 @@ export type DieExampleProps = {
     face: number;
 };
 
+export type PlanetExampleProps = IconCloudExampleProps;
+
 export type IconCloudExampleProps = {
     shape: DieShape;
     size: number;

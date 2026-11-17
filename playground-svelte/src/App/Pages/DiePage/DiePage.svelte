@@ -11,6 +11,8 @@
     ICON_CLOUD_ICONS,
     ICON_CLOUD_TURN_MS,
     NO_MOTION_DURATION_MS,
+    PLANET_ICONS,
+    PLANET_SHAPE_KEY,
 } from "@thewaver/ss-playground/App/Pages/DiePage/DiePage.const";
 
     import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
@@ -20,6 +22,7 @@
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
     import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
     import IconCloudExample from "./Examples/IconCloud.svelte";
+    import PlanetExample from "./Examples/Planet.svelte";
     import TabletopExample from "./Examples/Tabletop.svelte";
 
     let shapeKey = $state<DieShapes.SampleKey>(DieKnobs.STARTING_SHAPE_KEY);
@@ -29,6 +32,8 @@
     let dieFace = $state(0);
     let cloudFace = $state(0);
     let cloudAutoSpin = $state(true);
+    let planetFace = $state(0);
+    let planetAutoSpin = $state(true);
 
     const getPrefersReducedMotion = MediaQueryMonitorSvelteUtils.createReducedMotion();
 
@@ -41,6 +46,10 @@
     const shownMomentumMs = $derived(prefersReducedMotion ? NO_MOTION_DURATION_MS : DIE_DEFAULTS.momentumMs);
     const shape = $derived(DieShapes.SAMPLE_SHAPES[shapeKey]);
     const cloudIdleDelayMs = $derived(prefersReducedMotion ? undefined : ICON_CLOUD_TURN_MS / shape.faces.length);
+    const planetShape = DieShapes.SAMPLE_SHAPES[PLANET_SHAPE_KEY];
+    const planetIdleDelayMs = $derived(
+        prefersReducedMotion ? undefined : ICON_CLOUD_TURN_MS / planetShape.faces.length,
+    );
 
     const examples: ExampleDefs[] = [
         {
@@ -58,6 +67,14 @@
                 `${cloudAutoSpin ? "turning by itself" : "paused"}, facing ${ICON_CLOUD_ICONS[RollerUtils.clampFace(cloudFace, shape.faces.length)]?.label ?? ICON_CLOUD_EMPTY_LABEL} — drag it, or focus it and use the arrow keys, and it settles on the nearest icon`,
             component: iconCloudExample,
             path: `${EXAMPLES_ROOT}/IconCloud.svelte`,
+        },
+        {
+            key: "planet",
+            name: EXAMPLE_NAMES.planet,
+            readout: () =>
+                `${planetAutoSpin ? "turning by itself" : "paused"}, facing ${PLANET_ICONS[RollerUtils.clampFace(planetFace, planetShape.faces.length)]?.label ?? ICON_CLOUD_EMPTY_LABEL} — the core stays turned towards you while the icons circle it`,
+            component: planetExample,
+            path: `${EXAMPLES_ROOT}/Planet.svelte`,
         },
     ];
 </script>
@@ -85,8 +102,20 @@
     />
 {/snippet}
 
+{#snippet planetExample()}
+    <PlanetExample
+        shape={planetShape}
+        size={CLOUD_SIZE}
+        idleDelayMs={planetIdleDelayMs}
+        settleDurationMs={shownSettleDurationMs}
+        momentumMs={shownMomentumMs}
+        bind:face={planetFace}
+        bind:autoSpin={planetAutoSpin}
+    />
+{/snippet}
+
 <PagePropsPanel scope={"global"}>
-    <PageProp itemKey={"shape"} controls={"Picks the sample shape sent to DieProps.shape"} label={"Die"} hint={"Which solid both examples are, from four faces to a hundred."}>
+    <PageProp itemKey={"shape"} controls={"Picks the sample shape sent to DieProps.shape"} label={"Die"} hint={"Which solid the tabletop die and the icon cloud are, from four faces to a hundred. The planet keeps twelve."}>
         <PageSelectField
             value={shapeKey}
             values={DieShapes.SAMPLE_KEYS}

@@ -54,4 +54,10 @@ export type DieProps = BaseDieProps & {
 export type DieSlots = {
     /** Draws one face. The face's box is clipped to its contour, so the painter can simply fill it. */
     renderFace: (props: { index: number; state: DieFaceState }) => VNodeChild;
+    /**
+     * Draws something at the die's center, inside its faces, always turned towards the viewer: a planet's core inside
+     * a cloud of icons. Its box is the die's whole box, centered on the die. It is decoration, hidden from a screen
+     * reader, and shows only through faces painted transparent. Leave it out and nothing is drawn.
+     */
+    renderCore?: () => VNodeChild;
 };

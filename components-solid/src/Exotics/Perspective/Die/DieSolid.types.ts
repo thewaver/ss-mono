@@ -44,6 +44,12 @@ export type DieProps = AccessorValues<BaseDieValues> &
         autoSpin?: SignalSource<boolean>;
         /** Draws one face. The face's box is clipped to its contour, so the painter can simply fill it. */
         renderFace: (getIndex: Accessor<number>, getState: Accessor<DieFaceState>) => JSX.Element;
+        /**
+         * Draws something at the die's center, inside its faces, always turned towards the viewer: a planet's core inside
+         * a cloud of icons. Its box is the die's whole box, centered on the die. It is decoration, hidden from a screen
+         * reader, and shows only through faces painted transparent. Leave it out and nothing is drawn.
+         */
+        renderCore?: () => JSX.Element;
         /** Hands the consumer a controller once the die is up, for rolling and stepping it from outside. */
         onMount?: (controller: DieController) => void;
     };

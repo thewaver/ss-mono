@@ -10,6 +10,8 @@ export type DieExampleProps = {
     "onUpdate:face"?: (value: number) => void;
 };
 
+export type PlanetExampleProps = IconCloudExampleProps;
+
 export type IconCloudExampleProps = {
     "shape": DieShape;
     "size": number;

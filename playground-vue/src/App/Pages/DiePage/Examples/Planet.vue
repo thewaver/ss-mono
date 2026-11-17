@@ -1,0 +1,91 @@
+<script setup lang="ts">
+import { shallowRef, useModel } from "vue";
+
+import { Button, Die } from "@thewaver/ss-components-vue";
+import type { DieController, RollerDirection } from "@thewaver/ss-components-vue";
+import {
+    ICON_CLOUD_EMPTY_LABEL,
+    PLANET_ICONS,
+    PLANET_STEPS,
+} from "@thewaver/ss-playground/App/Pages/DiePage/DiePage.const";
+import * as styles from "@thewaver/ss-playground/App/Pages/DiePage/DiePage.css";
+import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
+
+import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.vue";
+import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
+import PageDieCore from "../../../StyledComponents/DieContent/PageDieCore.vue";
+import PageDieIcon from "../../../StyledComponents/DieContent/PageDieIcon.vue";
+import type { PlanetExampleProps } from "../DiePage.types";
+
+type Props = PlanetExampleProps;
+
+const props = defineProps<Props>();
+
+const face = useModel(props, "face");
+
+const autoSpin = useModel(props, "autoSpin");
+
+const controller = shallowRef<DieController>();
+
+const computeFaceLabel = (index: number) => PLANET_ICONS[index]?.label ?? ICON_CLOUD_EMPTY_LABEL;
+
+const togglePlayback = () => {
+    autoSpin.value = !autoSpin.value;
+};
+
+const stepCloud = (direction: RollerDirection) => {
+    controller.value?.step(direction);
+};
+</script>
+
+<template>
+    <div :class="styles.stage">
+        <PageMeasureBox>
+            <Die
+                v-model:face="face"
+                v-model:autoSpin="autoSpin"
+                :shape="shape"
+                :size="size"
+                :idle-delay-ms="idleDelayMs"
+                :settle-duration-ms="settleDurationMs"
+                :momentum-ms="momentumMs"
+                is-movable
+                is-see-through
+                ariaLabel="A planet circled by icons"
+                :compute-face-label="computeFaceLabel"
+                @mount="(next: DieController) => (controller = next)"
+            >
+                <template #renderFace="{ index, state }">
+                    <PageDieIcon :state="state" :icon="PLANET_ICONS[index]?.icon ?? ''" />
+                </template>
+
+                <template #renderCore>
+                    <PageDieCore />
+                </template>
+            </Die>
+        </PageMeasureBox>
+
+        <div :class="styles.controls">
+            <Button id="diePlanetPlayback" :ariaLabel="autoSpin ? 'Pause' : 'Play'" @click="togglePlayback">
+                <template #renderContent="flags">
+                    <PageControlButtonContent
+                        :flags="flags"
+                        :glyph="autoSpin ? CONTROL_GLYPHS.pause : CONTROL_GLYPHS.play"
+                    />
+                </template>
+            </Button>
+
+            <Button
+                v-for="step in PLANET_STEPS"
+                :id="step.id"
+                :key="step.direction"
+                :ariaLabel="step.label"
+                @click="stepCloud(step.direction)"
+            >
+                <template #renderContent="flags">
+                    <PageControlButtonContent :flags="flags" :glyph="CONTROL_GLYPHS[step.direction]" />
+                </template>
+            </Button>
+        </div>
+    </div>
+</template>

@@ -9,6 +9,8 @@ export type DieExampleProps = AccessorProps<{
     face: SignalSource<number>;
 }>;
 
+export type PlanetExampleProps = IconCloudExampleProps;
+
 export type IconCloudExampleProps = AccessorProps<{
     shape: DieShape;
     size: number;

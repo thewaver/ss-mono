@@ -22,6 +22,8 @@ export const PageDieFace = (props: PageDieFaceProps) => {
     );
 };
 
+export const PageDieCore = () => <div class={styles.dieCore} />;
+
 export const PageDieIcon = (props: PageDieIconProps) => (
     <div
         class={styles.dieIcon}

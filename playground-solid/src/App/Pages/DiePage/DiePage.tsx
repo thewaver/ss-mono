@@ -12,6 +12,8 @@ import {
     ICON_CLOUD_ICONS,
     ICON_CLOUD_TURN_MS,
     NO_MOTION_DURATION_MS,
+    PLANET_ICONS,
+    PLANET_SHAPE_KEY,
 } from "@thewaver/ss-playground/App/Pages/DiePage/DiePage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
@@ -19,6 +21,7 @@ import { PageNumberField, PageSelectField } from "../../PageComponents/Field/Fie
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { IconCloudExample } from "./Examples/IconCloud";
+import { PlanetExample } from "./Examples/Planet";
 import { TabletopExample } from "./Examples/Tabletop";
 
 export const DiePage = () => {
@@ -29,6 +32,8 @@ export const DiePage = () => {
     const dieFaceSignal = createSignal(0);
     const cloudFaceSignal = createSignal(0);
     const cloudAutoSpinSignal = createSignal(true);
+    const planetFaceSignal = createSignal(0);
+    const planetAutoSpinSignal = createSignal(true);
 
     const getPrefersReducedMotion = MediaQueryMonitorSolidUtils.createReducedMotion();
 
@@ -43,6 +48,11 @@ export const DiePage = () => {
 
     const getCloudIdleDelayMs = () =>
         getPrefersReducedMotion() ? undefined : ICON_CLOUD_TURN_MS / getShape().faces.length;
+
+    const getPlanetShape = () => DieShapes.SAMPLE_SHAPES[PLANET_SHAPE_KEY];
+
+    const getPlanetIdleDelayMs = () =>
+        getPrefersReducedMotion() ? undefined : ICON_CLOUD_TURN_MS / getPlanetShape().faces.length;
 
     const getExamples = createMemo(() => [
         {
@@ -80,6 +90,24 @@ export const DiePage = () => {
             ),
             path: `${EXAMPLES_ROOT}/IconCloud.tsx`,
         },
+        {
+            key: "planet",
+            name: EXAMPLE_NAMES.planet,
+            readout: () =>
+                `${planetAutoSpinSignal[0]() ? "turning by itself" : "paused"}, facing ${PLANET_ICONS[RollerUtils.clampFace(planetFaceSignal[0](), getPlanetShape().faces.length)]?.label ?? ICON_CLOUD_EMPTY_LABEL} — the core stays turned towards you while the icons circle it`,
+            component: () => (
+                <PlanetExample
+                    shape={getPlanetShape}
+                    size={CLOUD_SIZE}
+                    idleDelayMs={getPlanetIdleDelayMs}
+                    settleDurationMs={getShownSettleDurationMs}
+                    momentumMs={getShownMomentumMs}
+                    face={planetFaceSignal}
+                    autoSpin={planetAutoSpinSignal}
+                />
+            ),
+            path: `${EXAMPLES_ROOT}/Planet.tsx`,
+        },
     ]);
 
     return (
@@ -88,7 +116,9 @@ export const DiePage = () => {
                 <PageProp
                     key={"shape"}
                     label={"Die"}
-                    hint={"Which solid both examples are, from four faces to a hundred."}
+                    hint={
+                        "Which solid the tabletop die and the icon cloud are, from four faces to a hundred. The planet keeps twelve."
+                    }
                     controls={"Picks the sample shape sent to DieProps.shape"}
                 >
                     <PageSelectField

@@ -25,6 +25,12 @@ export const dieBody = style({
     transformStyle: "preserve-3d",
 });
 
+export const dieCore = style({
+    position: "absolute",
+    inset: 0,
+    transformOrigin: "center center",
+});
+
 export const dieFace = style({
     position: "absolute",
     transformOrigin: "center center",
