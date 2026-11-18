@@ -93,7 +93,7 @@
 {/snippet}
 
 <PagePropsPanel scope={"global"}>
-    <PageProp itemKey={"width"} controls={"Sets CuboidProps.size.width"} label={"Width (px)"} hint={"How wide the box is."}>
+    <PageProp itemKey={"width"} {...CuboidKnobs.WIDTH_TEXT}>
         <PageNumberField
             value={width}
             min={CuboidKnobs.MIN_EXTENT}
@@ -107,7 +107,7 @@
         />
     </PageProp>
 
-    <PageProp itemKey={"height"} controls={"Sets CuboidProps.size.height"} label={"Height (px)"} hint={"How tall the box is."}>
+    <PageProp itemKey={"height"} {...CuboidKnobs.HEIGHT_TEXT}>
         <PageNumberField
             value={height}
             min={CuboidKnobs.MIN_EXTENT}
@@ -121,7 +121,7 @@
         />
     </PageProp>
 
-    <PageProp itemKey={"depth"} controls={"Sets CuboidProps.size.depth"} label={"Depth (px)"} hint={"How deep the box is, front face to back face."}>
+    <PageProp itemKey={"depth"} {...CuboidKnobs.DEPTH_TEXT}>
         <PageNumberField
             value={depth}
             min={CuboidKnobs.MIN_EXTENT}
@@ -137,11 +137,7 @@
 
     <PageProp
         itemKey={"transitionDurationMs"}
-        controls={"Sets CuboidProps.transitionDurationMs"}
-        label={"Turn duration (ms)"}
-        hint={
-            "How long one turn from face to face takes, and how long the box takes to settle after a drag. It is off while the visitor has asked for reduced motion."
-        }
+        {...CuboidKnobs.TRANSITION_DURATION_MS_TEXT}
     >
         <PageNumberField
             value={transitionDurationMs}

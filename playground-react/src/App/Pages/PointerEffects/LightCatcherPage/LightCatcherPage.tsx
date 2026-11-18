@@ -80,25 +80,11 @@ export const LightCatcherPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp
-                    itemKey={"isDisabled"}
-                    label={"Disabled"}
-                    hint={
-                        "Stops the surface answering the pointer and leaves it at its resting brightness and lightness. It is what a page honoring a reduced-motion preference passes."
-                    }
-                    controls={"Sets LightCatcherProps.isDisabled"}
-                >
+                <PageProp itemKey={"isDisabled"} {...LightCatcherKnobs.IS_DISABLED_TEXT}>
                     <PageCheckField value={isDisabled} ariaLabel={"Disabled"} onChange={setIsDisabled} />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"smoothingMs"}
-                    label={"Smoothing (ms)"}
-                    hint={
-                        "How long the light takes to catch up with the pointer. At 0 it follows exactly; raised, it glows on after the pointer and fades behind it."
-                    }
-                    controls={"Sets LightCatcherProps.smoothingMs"}
-                >
+                <PageProp itemKey={"smoothingMs"} {...LightCatcherKnobs.SMOOTHING_MS_TEXT}>
                     <PageNumberField
                         value={smoothingMs}
                         min={LightCatcherKnobs.MIN_SMOOTHING_MS}
@@ -110,14 +96,7 @@ export const LightCatcherPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"activeRangePx"}
-                    label={"Active range (px)"}
-                    hint={
-                        "How near the pointer has to be before the surface answers it at all, measured from its center. Outside it the surface sits at resting."
-                    }
-                    controls={"Sets LightCatcherProps.activeRangePx"}
-                >
+                <PageProp itemKey={"activeRangePx"} {...LightCatcherKnobs.ACTIVE_RANGE_PX_TEXT}>
                     <PageNumberField
                         value={activeRangePx}
                         min={LightCatcherKnobs.MIN_ACTIVE_RANGE_PX}
@@ -129,12 +108,7 @@ export const LightCatcherPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"lightRangePx"}
-                    label={"Light range (px)"}
-                    hint={"How far the light reaches. Full brightness at the surface's own edge, resting out here."}
-                    controls={"Sets LightCatcherProps.lightRangePx"}
-                >
+                <PageProp itemKey={"lightRangePx"} {...LightCatcherKnobs.LIGHT_RANGE_PX_TEXT}>
                     <PageNumberField
                         value={lightRangePx}
                         min={LightCatcherKnobs.MIN_LIGHT_RANGE_PX}
@@ -146,12 +120,7 @@ export const LightCatcherPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"maxBrightness"}
-                    label={"Max brightness"}
-                    hint={"How bright the surface is with the pointer on it. 1 is the content exactly as painted."}
-                    controls={"Sets LightCatcherProps.maxBrightness"}
-                >
+                <PageProp itemKey={"maxBrightness"} {...LightCatcherKnobs.MAX_BRIGHTNESS_TEXT}>
                     <PageNumberField
                         value={maxBrightness}
                         min={LightCatcherKnobs.MIN_BRIGHTNESS}
@@ -163,14 +132,7 @@ export const LightCatcherPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"restingBrightness"}
-                    label={"Resting brightness"}
-                    hint={
-                        "How bright the surface is with nothing near it. Below 1 it dims, which turns a row into a spotlight."
-                    }
-                    controls={"Sets LightCatcherProps.restingBrightness"}
-                >
+                <PageProp itemKey={"restingBrightness"} {...LightCatcherKnobs.RESTING_BRIGHTNESS_TEXT}>
                     <PageNumberField
                         value={restingBrightness}
                         min={LightCatcherKnobs.MIN_BRIGHTNESS}
@@ -182,14 +144,7 @@ export const LightCatcherPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"maxLightness"}
-                    label={"Max lightness"}
-                    hint={
-                        "How far the surface fades toward white with the pointer on it. 0 is untouched. Unlike brightness it lifts the dark parts most, and the two stack."
-                    }
-                    controls={"Sets LightCatcherProps.maxLightness"}
-                >
+                <PageProp itemKey={"maxLightness"} {...LightCatcherKnobs.MAX_LIGHTNESS_TEXT}>
                     <PageNumberField
                         value={maxLightness}
                         min={LightCatcherKnobs.MIN_LIGHTNESS}
@@ -201,12 +156,7 @@ export const LightCatcherPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"restingLightness"}
-                    label={"Resting lightness"}
-                    hint={"How far the surface fades toward white with nothing near it. 0 is untouched."}
-                    controls={"Sets LightCatcherProps.restingLightness"}
-                >
+                <PageProp itemKey={"restingLightness"} {...LightCatcherKnobs.RESTING_LIGHTNESS_TEXT}>
                     <PageNumberField
                         value={restingLightness}
                         min={LightCatcherKnobs.MIN_LIGHTNESS}

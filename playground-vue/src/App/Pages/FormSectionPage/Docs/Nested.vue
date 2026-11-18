@@ -4,6 +4,10 @@ import { computed, shallowRef } from "vue";
 import { Button, Form, FormField, FormSection, TextInput } from "@thewaver/ss-components-vue";
 import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
 import {
+    SOME_FIELDS_NEED_ATTENTION_TEXT,
+    WE_NEED_SOMEWHERE_SEND_TEXT,
+} from "@thewaver/ss-playground/App/Pages/FormSectionPage/FormSectionPage.const";
+import {
     FIELD_GAP,
     FIELD_PADDING,
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
@@ -24,7 +28,7 @@ const street = shallowRef("");
 const card = shallowRef("");
 const outcome = shallowRef("Not ordered yet.");
 
-const streetMessage = computed(() => (street.value.trim().length > 0 ? "" : "We need somewhere to send it."));
+const streetMessage = computed(() => (street.value.trim().length > 0 ? "" : WE_NEED_SOMEWHERE_SEND_TEXT));
 
 const cardMessage = computed(() =>
     /^\d{4}$/.test(card.value) ? "" : `The last ${CARD_DIGITS} digits, and nothing else.`,
@@ -118,7 +122,7 @@ const submit = () => {
                 </PageFormButtons>
 
                 <div :class="exampleStyles.exampleReadout" data-readout>
-                    {{ `${state.isValid ? "Ready to send." : "Some fields need attention."} ${outcome}` }}
+                    {{ `${state.isValid ? "Ready to send." : SOME_FIELDS_NEED_ATTENTION_TEXT} ${outcome}` }}
                 </div>
             </PageFormStack>
         </template>

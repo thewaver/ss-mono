@@ -77,3 +77,5 @@ export const CLOUD_SIZE = 240;
 export const NO_MOTION_DURATION_MS = 0;
 
 export const FIRST_NUMBER = 1;
+
+export const PLANET_CIRCLED_ICONS_LABEL = "A planet circled by icons";

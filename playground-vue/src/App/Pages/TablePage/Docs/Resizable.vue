@@ -3,6 +3,7 @@ import { shallowRef } from "vue";
 
 import type { TableSort } from "@thewaver/ss-components-vue";
 import { Table } from "@thewaver/ss-components-vue";
+import { PARTS_RESIZABLE_COLUMNS_LABEL } from "@thewaver/ss-playground/App/Pages/TablePage/TablePage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/TablePage/TablePage.css";
 
 import PageTableResizer from "../../../StyledComponents/TableContent/PageTableResizer.vue";
@@ -24,7 +25,7 @@ const columns = createPartColumns({ isResizable: true });
             v-model:widths="widths"
             :columns="columns"
             :rows="PARTS"
-            ariaLabel="Parts with resizable columns"
+            :ariaLabel="PARTS_RESIZABLE_COLUMNS_LABEL"
         >
             <template #renderResizer="renderProps">
                 <PageTableResizer :render-props="renderProps" />

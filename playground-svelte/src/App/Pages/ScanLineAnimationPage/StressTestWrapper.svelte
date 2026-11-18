@@ -5,6 +5,7 @@
     import StressTest from "../../PageComponents/StressTest/StressTest.svelte";
     import type { ScanlineAnimationExampleProps } from "./ScanlineAnimationPage.types";
     import StressItem, { STRESS_ITEMS } from "./StressItem.svelte";
+    import { ScanlineAnimationKnobs } from "@thewaver/ss-playground/App/Knobs/ScanlineAnimations.const";
 
     let { playback = $bindable(), ...props }: ScanlineAnimationExampleProps = $props();
 
@@ -17,9 +18,7 @@
 <PagePropsPanel scope={"local"} hasReset={false}>
     <PageProp
         itemKey={"onGraphicsCard"}
-        label={"On the graphics card"}
-        hint={"Draws the stress test's lines in one canvas per item, with the keyframes worked out on the graphics card. Off, every line is an element of its own."}
-        controls={"Sets ScanlineAnimationProps.renderer in the stress test"}
+        {...ScanlineAnimationKnobs.ON_GRAPHICS_CARD_TEXT}
     >
         <PageCheckField
             value={isOnGraphicsCard}

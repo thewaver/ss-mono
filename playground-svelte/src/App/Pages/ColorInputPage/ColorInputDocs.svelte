@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { DOCS_ROOT } from "@thewaver/ss-playground/App/Pages/ColorInputPage/ColorInputPage.const";
+    import { DOCS_SECTIONS, DOCS_ROOT } from "@thewaver/ss-playground/App/Pages/ColorInputPage/ColorInputPage.const";
 
     import PageDocsExample from "../../PageComponents/DocsExample/PageDocsExample.svelte";
     import PageDocsSection from "../../PageComponents/DocsSection/PageDocsSection.svelte";
@@ -11,6 +11,7 @@
     import SnappingDocsExample from "./Docs/Snapping.svelte";
     import SwatchDocsExample from "./Docs/Swatch.svelte";
     import TooltipDocsExample from "./Docs/Tooltip.svelte";
+    import { ColorInputKnobs } from "@thewaver/ss-playground/App/Knobs/ColorInputs.const";
 
     let hasError = $state(false);
     let isDisabled = $state(false);
@@ -24,9 +25,7 @@
     {#snippet renderKnobs()}
         <PageProp
             itemKey={"hasError"}
-            label={"Error"}
-            hint={"Marks the field invalid, for screen readers as well as for the painter."}
-            controls={"Sets ColorInputProps.hasError"}
+            {...ColorInputKnobs.HAS_ERROR_TEXT}
         >
             <PageCheckField
                 value={hasError}
@@ -39,9 +38,7 @@
 
         <PageProp
             itemKey={"isDisabled"}
-            label={"Disabled"}
-            hint={"Turns the field off: pressing it opens no picker, and the Tab key skips it."}
-            controls={"Sets ColorInputProps.isDisabled"}
+            {...ColorInputKnobs.IS_DISABLED_TEXT}
         >
             <PageCheckField
                 value={isDisabled}
@@ -55,8 +52,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Right to left"}
-    content={"Inside a box whose text runs right to left, the field turns round with it: the swatch sits on the right, while the painter keeps the value itself left to right, so rgb(51 102 255) is not scrambled. The picker opens under the field lined up with its right edge and runs right to left too, but neither the square nor the hue strip inside it mirrors, since they are pictures of color rather than text: saturation still grows to the right, the hue strip still starts from red at the left, and the right arrow moves either one to the right."}
+    {...DOCS_SECTIONS.rightLeft}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/RightToLeft.svelte`}>
@@ -73,8 +69,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Correcting a pick"}
-    content={"Every change also runs [prop]onInput[/prop], and whatever it writes to the value is what the field holds. Here every color is pulled to the nearest of four in a palette, so dragging across the square jumps from one to the next."}
+    {...DOCS_SECTIONS.correctingPick}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Snapping.svelte`}>
@@ -82,8 +77,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Tooltip"}
-    content={"Give a field [prop]tooltipDefs[/prop] and it shows a tooltip on hover and on keyboard focus, read by screen readers as the field's description. A disabled field shows no tooltip unless you also keep it reachable when disabled; it can then be focused to read why it is off, and pressing it still opens nothing."}
+    {...DOCS_SECTIONS.tooltip}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Tooltip.svelte`}>
@@ -92,9 +86,7 @@
     {#snippet renderKnobs()}
         <PageProp
             itemKey={"tooltipIsReachableWhenDisabled"}
-            label={"Reachable when disabled"}
-            hint={"Keeps a disabled field's tooltip available: the Tab key can stop on it and hovering it shows the tooltip. Without it a disabled field shows no tooltip at all. It only matters while Disabled is on."}
-            controls={"Sets ColorInputProps.isReachableWhenDisabled"}
+            {...ColorInputKnobs.TOOLTIP_IS_REACHABLE_WHEN_DISABLED_TEXT}
         >
             <PageCheckField
                 value={isReachableWhenDisabled}
@@ -107,9 +99,7 @@
 
         <PageProp
             itemKey={"tooltipIsDisabled"}
-            label={"Disabled"}
-            hint={"Turns the field off: pressing it opens no picker, and the Tab key skips it."}
-            controls={"Sets ColorInputProps.isDisabled"}
+            {...ColorInputKnobs.IS_DISABLED_TEXT}
         >
             <PageCheckField
                 value={isTooltipDisabled}
@@ -123,8 +113,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Named by a Label"}
-    content={"Inside a Label, the field takes its name from the label's text, so it needs no [prop]ariaLabel[/prop], and pressing the text opens the picker."}
+    {...DOCS_SECTIONS.namedLabel}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Labeled.svelte`}>

@@ -85,14 +85,7 @@ export const TrackedGradientsPage = () => {
         <>
             <PagePropsGroups>
                 <PagePropsPanel scope={"sample"}>
-                    <PageProp
-                        itemKey={"configKey"}
-                        label={"Gradient"}
-                        hint={"Which pointer-following gradient is shown. Choosing one brings its own knobs with it."}
-                        controls={
-                            "Picks the sample gradient the example sends to ShapeProps.computeFillDefs or ShapeProps.computeStrokeDefs"
-                        }
-                    >
+                    <PageProp itemKey={"configKey"} {...TrackedGradientKnobs.CONFIG_KEY_TEXT}>
                         <PageGroupedSelectField
                             value={configKey}
                             groups={TRACKED_GRADIENT_GROUPS}

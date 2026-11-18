@@ -8,6 +8,7 @@
     import PageCuboidStack from "../../../StyledComponents/CuboidContent/PageCuboidStack.svelte";
     import type { CuboidWanderingExampleProps } from "../CuboidPage.types";
     import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.svelte";
+    import { SIX_FACES_TURNING_THEMSELVES_LABEL } from "@thewaver/ss-playground/App/Pages/CuboidPage/CuboidPage.const";
 
     const QUARTER_TURN = 1;
 
@@ -61,7 +62,7 @@
             bind:pitch
             size={props.size}
             transitionDurationMs={props.transitionDurationMs}
-            ariaLabel={"Six faces, turning by themselves"}
+            ariaLabel={SIX_FACES_TURNING_THEMSELVES_LABEL}
             computeFaceLabel={computeCuboidFaceLabel}
         >
             {#snippet renderFace(face, state)}

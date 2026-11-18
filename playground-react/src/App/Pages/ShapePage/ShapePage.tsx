@@ -114,12 +114,7 @@ const useShapeGeometry = (startingShapeKind: ShapeConst.DefaultShape = ShapeKnob
 
     const renderKnobs = () => (
         <>
-            <PageProp
-                itemKey={"shapeKind"}
-                label={"Shape"}
-                hint={"The contour the shape is cut to, which also decides how many corners the corner fields offer."}
-                controls={"Picks the example contour sent to ShapeProps.computePoints"}
-            >
+            <PageProp itemKey={"shapeKind"} {...ShapeKnobs.SHAPE_KIND_TEXT}>
                 <PageSelectField
                     value={shapeKind}
                     values={ShapeConst.DEFAULT_SHAPES}
@@ -128,14 +123,7 @@ const useShapeGeometry = (startingShapeKind: ShapeConst.DefaultShape = ShapeKnob
                 />
             </PageProp>
 
-            <PageProp
-                itemKey={"hasIndividualCorners"}
-                label={"Individual corner settings"}
-                hint={"Opens one field per corner instead of one field driving all of them together."}
-                controls={
-                    "Writes the corner fields below into every entry of ShapeProps.joinRadii and ShapeProps.lameExponents at once, or one entry each"
-                }
-            >
+            <PageProp itemKey={"hasIndividualCorners"} {...ShapeKnobs.HAS_INDIVIDUAL_CORNERS_TEXT}>
                 <PageCheckField
                     value={hasIndividualCorners}
                     ariaLabel={"Individual corner settings"}
@@ -143,12 +131,7 @@ const useShapeGeometry = (startingShapeKind: ShapeConst.DefaultShape = ShapeKnob
                 />
             </PageProp>
 
-            <PageProp
-                itemKey={"jointRadiiPx"}
-                label={"Joint Radii (px)"}
-                hint={"How far each corner is rounded. With individual corners off, the first field drives them all."}
-                controls={"Sets ShapeProps.joinRadii"}
-            >
+            <PageProp itemKey={"jointRadiiPx"} {...ShapeKnobs.JOINT_RADII_PX_TEXT}>
                 <div className={styles.valueList} style={{ gridTemplateColumns: templateColumns }}>
                     {pointIterator.map((index) => (
                         <PageNumberField
@@ -168,14 +151,7 @@ const useShapeGeometry = (startingShapeKind: ShapeConst.DefaultShape = ShapeKnob
                 </div>
             </PageProp>
 
-            <PageProp
-                itemKey={"lameExponent"}
-                label={"Lamé Exponent"}
-                hint={
-                    "How square or how pinched each rounded corner is: 1 is a circular round, higher is squarer, 0 is a straight bevel and below 0 scoops inward."
-                }
-                controls={"Sets ShapeProps.lameExponents"}
-            >
+            <PageProp itemKey={"lameExponent"} {...ShapeKnobs.LAME_EXPONENT_TEXT}>
                 <div className={styles.valueList} style={{ gridTemplateColumns: templateColumns }}>
                     {pointIterator.map((index) => (
                         <PageNumberField
@@ -217,16 +193,7 @@ const DefaultExampleWrapper = (props: ShapeExampleProps) => {
             <PageExampleKnobs>
                 {renderKnobs()}
 
-                <PageProp
-                    itemKey={"shouldClipChildren"}
-                    label={"Clip children"}
-                    hint={
-                        "Cuts whatever is inside the shape to the shape's own contour, instead of letting it spill past."
-                    }
-                    controls={
-                        "Decides whether the example's ShapeProps.renderChildren applies the clip path it is handed"
-                    }
-                >
+                <PageProp itemKey={"shouldClipChildren"} {...ShapeKnobs.SHOULD_CLIP_CHILDREN_TEXT}>
                     <PageCheckField
                         value={shouldClipChildren}
                         ariaLabel={"Clip children"}
@@ -234,14 +201,7 @@ const DefaultExampleWrapper = (props: ShapeExampleProps) => {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"shouldPadChildren"}
-                    label={"Pad children"}
-                    hint={
-                        "Insets whatever is inside far enough to clear the rounded corners, so text does not run under them."
-                    }
-                    controls={"Decides whether the example's ShapeProps.renderChildren pads its content to the contour"}
-                >
+                <PageProp itemKey={"shouldPadChildren"} {...ShapeKnobs.SHOULD_PAD_CHILDREN_TEXT}>
                     <PageCheckField
                         value={shouldPadChildren}
                         ariaLabel={"Pad children"}
@@ -261,14 +221,7 @@ const MorphExampleWrapper = (props: ShapeExampleProps) => {
             <MorphExample {...props} starPoints={starPoints} />
 
             <PageExampleKnobs>
-                <PageProp
-                    itemKey={"starPoints"}
-                    label={"Star points"}
-                    hint={
-                        "How many tips the star has. The contour carries twice as many points: one per tip, one per notch between tips."
-                    }
-                    controls={"Sets the number of points of the example star sent to ShapeProps.computePoints"}
-                >
+                <PageProp itemKey={"starPoints"} {...ShapeKnobs.STAR_POINTS_TEXT}>
                     <PageNumberField
                         value={starPoints}
                         min={ShapeKnobs.MIN_STAR_POINTS}
@@ -444,14 +397,7 @@ export const ShapePage = () => {
 
                 <PagePropsPanel scope={"global"}>
                     {usesPattern && (
-                        <PageProp
-                            itemKey={"cellSize"}
-                            label={"Pattern Cell Size (px)"}
-                            hint={"How large one tile of a pattern is before it repeats."}
-                            controls={
-                                "Sets the tile size of the example paints sent to ShapeProps.computeFillDefs and ShapeProps.computeStrokeDefs"
-                            }
-                        >
+                        <PageProp itemKey={"cellSize"} {...ShapeKnobs.CELL_SIZE_TEXT}>
                             <PageNumberField
                                 value={cellSize}
                                 min={ShapeKnobs.MIN_CELL_SIZE}
@@ -463,14 +409,7 @@ export const ShapePage = () => {
                         </PageProp>
                     )}
 
-                    <PageProp
-                        itemKey={"colors"}
-                        label={"Colors"}
-                        hint={"The colors the stroke, the fill and the page's own background are painted from."}
-                        controls={
-                            "Sets the colors of the example paints sent to ShapeProps.computeFillDefs and ShapeProps.computeStrokeDefs"
-                        }
-                    >
+                    <PageProp itemKey={"colors"} {...ShapeKnobs.COLORS_TEXT}>
                         <div className={styles.colorList}>
                             {(Object.keys(colors) as (keyof SVGDefsColors)[]).map((key) => (
                                 <PageColorField
@@ -483,12 +422,7 @@ export const ShapePage = () => {
                         </div>
                     </PageProp>
 
-                    <PageProp
-                        itemKey={"strokeThicknessPx"}
-                        label={"Stroke Thickness (px)"}
-                        hint={"How thick the stroke is."}
-                        controls={"Sets the thickness in the example's ShapeProps.strokeGeom"}
-                    >
+                    <PageProp itemKey={"strokeThicknessPx"} {...ShapeKnobs.STROKE_THICKNESS_PX_TEXT}>
                         <PageNumberField
                             value={edgeThickness}
                             min={ShapeKnobs.MIN_EDGE_THICKNESS}
@@ -499,14 +433,7 @@ export const ShapePage = () => {
                         />
                     </PageProp>
 
-                    <PageProp
-                        itemKey={"blurWidth"}
-                        label={"Blur (px)"}
-                        hint={"How far the stroke is blurred outward, which is what gives it its glow."}
-                        controls={
-                            "Sets the blur of the example paints sent to ShapeProps.computeFillDefs and ShapeProps.computeStrokeDefs"
-                        }
-                    >
+                    <PageProp itemKey={"blurWidth"} {...ShapeKnobs.BLUR_WIDTH_TEXT}>
                         <PageNumberField
                             value={blurWidth}
                             min={ShapeKnobs.MIN_BLUR_WIDTH}
@@ -519,14 +446,7 @@ export const ShapePage = () => {
 
                     {usesTiming && (
                         <>
-                            <PageProp
-                                itemKey={"animationDurationMs"}
-                                label={"Animation duration (ms)"}
-                                hint={"How long one pass of the stroke or fill animation takes."}
-                                controls={
-                                    "Sets the duration of the example paints sent to ShapeProps.computeFillDefs and ShapeProps.computeStrokeDefs"
-                                }
-                            >
+                            <PageProp itemKey={"animationDurationMs"} {...ShapeKnobs.ANIMATION_DURATION_MS_TEXT}>
                                 <PageNumberField
                                     value={animationDurationMs}
                                     min={ShapeKnobs.MIN_DURATION_MS}
@@ -537,14 +457,7 @@ export const ShapePage = () => {
                                 />
                             </PageProp>
 
-                            <PageProp
-                                itemKey={"iterationConfigKey"}
-                                label={"Iteration Pattern"}
-                                hint={"How the animation repeats: once, endlessly, or back and forth."}
-                                controls={
-                                    "Picks how the example paints repeat, sent to ShapeProps.computeFillDefs and ShapeProps.computeStrokeDefs"
-                                }
-                            >
+                            <PageProp itemKey={"iterationConfigKey"} {...ShapeKnobs.ITERATION_CONFIG_KEY_TEXT}>
                                 <PageSelectField
                                     value={iterationConfigKey}
                                     values={SVGDefsSamples.Iteration.SAMPLE_KEYS}

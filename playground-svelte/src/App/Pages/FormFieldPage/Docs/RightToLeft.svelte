@@ -8,20 +8,19 @@
     import PageFormFieldCaption from "../../../StyledComponents/FormFieldContent/PageFormFieldCaption.svelte";
     import PageFormFieldMessage from "../../../StyledComponents/FormFieldContent/PageFormFieldMessage.svelte";
     import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
-
-    const MESSAGE = "Shown to everyone who can see your posts";
+    import { RIGHT_TO_LEFT_MESSAGE } from "@thewaver/ss-playground/App/Pages/FormFieldPage/FormFieldPage.const";
 
     let value = $state("");
 </script>
 
 <div dir={"rtl"}>
-    <FormField message={MESSAGE}>
+    <FormField message={RIGHT_TO_LEFT_MESSAGE}>
         {#snippet renderCaption()}
             <PageFormFieldCaption>Display name</PageFormFieldCaption>
         {/snippet}
 
         {#snippet renderMessage(state)}
-            <PageFormFieldMessage {state}>{MESSAGE}</PageFormFieldMessage>
+            <PageFormFieldMessage {state}>{RIGHT_TO_LEFT_MESSAGE}</PageFormFieldMessage>
         {/snippet}
 
         {#snippet renderControl(state)}

@@ -1,4 +1,5 @@
 import { Reveal } from "@thewaver/ss-components-react";
+import { TORCH_OVER_HIDDEN_NOTE_LABEL } from "@thewaver/ss-playground/App/Pages/Reveals/RevealPage/RevealPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/Reveals/RevealPage/RevealPage.css";
 
 import type { RevealExampleProps } from "../RevealExample.types";
@@ -15,7 +16,7 @@ export const TorchExample = (props: Props) => {
                 joinRadii={props.joinRadii}
                 lameExponents={props.lameExponents}
                 isDisabled={props.isDisabled}
-                ariaLabel={"A torch over a hidden note"}
+                ariaLabel={TORCH_OVER_HIDDEN_NOTE_LABEL}
                 computePoints={props.computePoints}
                 renderContent={() => (
                     <div className={styles.content}>

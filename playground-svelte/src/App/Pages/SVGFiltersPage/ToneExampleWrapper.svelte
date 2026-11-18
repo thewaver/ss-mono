@@ -19,9 +19,7 @@
 <PageExampleKnobs>
     <PageProp
         itemKey={"brightness"}
-        controls={"Sets SVGBrightnessFilterDefs.amount"}
-        label={"Brightness"}
-        hint={"How much lighter or darker the picture is. 1 leaves it alone."}
+        {...SVGFilterKnobs.BRIGHTNESS_TEXT}
     >
         <PageNumberField
             value={brightness}
@@ -35,9 +33,7 @@
 
     <PageProp
         itemKey={"contrast"}
-        controls={"Sets SVGContrastFilterDefs.amount"}
-        label={"Contrast"}
-        hint={"How far the lights and darks are pushed apart. 1 leaves it alone."}
+        {...SVGFilterKnobs.CONTRAST_TEXT}
     >
         <PageNumberField
             value={contrast}
@@ -51,9 +47,7 @@
 
     <PageProp
         itemKey={"inversion"}
-        controls={"Sets SVGInversionFilterDefs.amount"}
-        label={"Inversion"}
-        hint={"How far the colors are flipped to their opposites. 0 leaves them alone, 1 fully inverts."}
+        {...SVGFilterKnobs.INVERSION_TEXT}
     >
         <PageNumberField
             value={inversion}

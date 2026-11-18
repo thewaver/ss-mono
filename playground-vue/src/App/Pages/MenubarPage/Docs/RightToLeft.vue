@@ -3,6 +3,7 @@ import { shallowRef } from "vue";
 
 import { Menubar } from "@thewaver/ss-components-vue";
 import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
+import { RIGHT_LEFT_EDITOR_LABEL } from "@thewaver/ss-playground/App/Pages/MenubarPage/MenubarPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/MenubarPage/MenubarPage.css";
 import { POPOVER_SURFACE_INSET } from "@thewaver/ss-playground/App/StyledComponents/PopoverSurface/PopoverSurface.css";
 
@@ -24,7 +25,7 @@ const lastPicked = shallowRef(NOTHING_PICKED);
         <Menubar
             v-model:checked="checked"
             :actions="WORDS"
-            ariaLabel="Right-to-left editor"
+            :ariaLabel="RIGHT_LEFT_EDITOR_LABEL"
             overflowAriaLabel="More menus"
             :submenu-offset="{ x: POPOVER_SURFACE_INSET, y: -POPOVER_SURFACE_INSET }"
             @activate="(entry: MenubarEntry) => (lastPicked = entry.name)"

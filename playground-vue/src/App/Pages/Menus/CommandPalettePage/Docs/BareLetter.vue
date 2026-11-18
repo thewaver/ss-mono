@@ -4,6 +4,7 @@ import { computed, shallowRef } from "vue";
 import { Button, CommandPalette, TextInput } from "@thewaver/ss-components-vue";
 import type { CommandPaletteItem } from "@thewaver/ss-components-vue";
 import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
+import { SEARCH_GREETINGS_LABEL } from "@thewaver/ss-playground/App/Pages/Menus/CommandPalettePage/CommandPalettePage.const";
 import { CommandPalettePageUtils } from "@thewaver/ss-playground/App/Pages/Menus/CommandPalettePage/CommandPalettePage.utils";
 import {
     FIELD_GAP,
@@ -67,7 +68,7 @@ const toggleShortcut = () => {
         v-model:query="query"
         :actions="actions"
         ariaLabel="Greetings"
-        fieldAriaLabel="Search the greetings"
+        :fieldAriaLabel="SEARCH_GREETINGS_LABEL"
         listAriaLabel="Matching greetings"
         :field-padding="FIELD_PADDING"
         :field-gap="FIELD_GAP"

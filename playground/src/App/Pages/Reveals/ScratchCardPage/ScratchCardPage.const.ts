@@ -13,3 +13,5 @@ export const NOTHING_SCRATCHED = 0;
 export const WINDOW_COUNT = 3;
 
 export const FIRST_WINDOW = 1;
+
+export const SCRATCH_REVEAL_PRIZE_LABEL = "Scratch to reveal the prize";

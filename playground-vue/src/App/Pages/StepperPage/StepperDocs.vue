@@ -3,7 +3,8 @@ import { shallowRef } from "vue";
 
 import { STEPPER_ORIENTATIONS } from "@thewaver/ss-components-vue";
 import type { StepperOrientation } from "@thewaver/ss-components-vue";
-import { DOCS_ROOT } from "@thewaver/ss-playground/App/Pages/StepperPage/StepperPage.const";
+import { StepperKnobs } from "@thewaver/ss-playground/App/Knobs/Steppers.const";
+import { DOCS_ROOT, DOCS_SECTIONS } from "@thewaver/ss-playground/App/Pages/StepperPage/StepperPage.const";
 
 import PageDocsExample from "../../PageComponents/DocsExample/PageDocsExample.vue";
 import PageDocsSection from "../../PageComponents/DocsSection/PageDocsSection.vue";
@@ -34,12 +35,7 @@ const isArcFree = shallowRef(false);
         <BasicDocsExample :orientation="orientation" :is-free-navigation="isFreeNavigation" />
 
         <template #renderKnobs>
-            <PageProp
-                item-key="orientation"
-                label="Orientation"
-                hint="Whether the steps run across the page or down it."
-                controls="Sets StepperProps.orientation"
-            >
+            <PageProp item-key="orientation" v-bind="StepperKnobs.ORIENTATION_TEXT">
                 <PageSelectField
                     :value="orientation"
                     :values="STEPPER_ORIENTATIONS"
@@ -48,12 +44,7 @@ const isArcFree = shallowRef(false);
                 />
             </PageProp>
 
-            <PageProp
-                item-key="isFreeNavigation"
-                label="Free navigation"
-                hint="Lets any step be pressed to jump to it, rather than only the steps already behind you."
-                controls="Sets Step.isNavigable on every step sent to StepperProps.steps"
-            >
+            <PageProp item-key="isFreeNavigation" v-bind="StepperKnobs.FREE_NAVIGATION_TEXT">
                 <PageCheckField
                     :value="isFreeNavigation"
                     ariaLabel="Free navigation"
@@ -63,21 +54,13 @@ const isArcFree = shallowRef(false);
         </template>
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Right to left"
-        content="Inside a box whose text runs right to left, a strip running across starts from the right: the first step sits at the right-hand end and the connectors lead to the left."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.rightLeft" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/RightToLeft.vue`">
         <RightToLeftDocsExample :is-free-navigation="isRightToLeftFree" />
 
         <template #renderKnobs>
-            <PageProp
-                item-key="rightToLeftIsFreeNavigation"
-                label="Free navigation"
-                hint="Lets any step be pressed to jump to it, rather than only the steps already behind you."
-                controls="Sets Step.isNavigable on every step sent to StepperProps.steps"
-            >
+            <PageProp item-key="rightToLeftIsFreeNavigation" v-bind="StepperKnobs.FREE_NAVIGATION_TEXT">
                 <PageCheckField
                     :value="isRightToLeftFree"
                     ariaLabel="Free navigation"
@@ -93,12 +76,7 @@ const isArcFree = shallowRef(false);
         <FailedDocsExample :is-free-navigation="isFailedFree" />
 
         <template #renderKnobs>
-            <PageProp
-                item-key="failedIsFreeNavigation"
-                label="Free navigation"
-                hint="Lets any step be pressed to jump to it, rather than only the steps already behind you."
-                controls="Sets Step.isNavigable on every step sent to StepperProps.steps"
-            >
+            <PageProp item-key="failedIsFreeNavigation" v-bind="StepperKnobs.FREE_NAVIGATION_TEXT">
                 <PageCheckField
                     :value="isFailedFree"
                     ariaLabel="Free navigation"
@@ -108,21 +86,13 @@ const isArcFree = shallowRef(false);
         </template>
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Steps that carry their own content"
-        content="Give the stepper [prop]renderBody[/prop] and each step holds a body beside its connector, so the line runs on past the content rather than stopping at it."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.stepsWithOwnContent" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Detailed.vue`">
         <DetailedDocsExample :is-free-navigation="isDetailedFree" />
 
         <template #renderKnobs>
-            <PageProp
-                item-key="detailedIsFreeNavigation"
-                label="Free navigation"
-                hint="Lets any step be pressed to jump to it, rather than only the steps already behind you."
-                controls="Sets Step.isNavigable on every step sent to StepperProps.steps"
-            >
+            <PageProp item-key="detailedIsFreeNavigation" v-bind="StepperKnobs.FREE_NAVIGATION_TEXT">
                 <PageCheckField
                     :value="isDetailedFree"
                     ariaLabel="Free navigation"
@@ -132,21 +102,13 @@ const isArcFree = shallowRef(false);
         </template>
     </PageDocsExample>
 
-    <PageDocsSection
-        title="No connector"
-        content="The line between steps is optional: leave out [prop]renderConnector[/prop] and nothing is drawn between them, and they sit [prop]gap[/prop] pixels apart."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.noConnector" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Bare.vue`">
         <BareDocsExample :is-free-navigation="isBareFree" />
 
         <template #renderKnobs>
-            <PageProp
-                item-key="bareIsFreeNavigation"
-                label="Free navigation"
-                hint="Lets any step be pressed to jump to it, rather than only the steps already behind you."
-                controls="Sets Step.isNavigable on every step sent to StepperProps.steps"
-            >
+            <PageProp item-key="bareIsFreeNavigation" v-bind="StepperKnobs.FREE_NAVIGATION_TEXT">
                 <PageCheckField
                     :value="isBareFree"
                     ariaLabel="Free navigation"
@@ -156,21 +118,13 @@ const isArcFree = shallowRef(false);
         </template>
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Bent along an arc"
-        content="Give the stepper [prop]computeLayout[/prop] and each step goes where the layout puts it, here along an arc from PlacementLayoutUtils. The connector is handed where the two steps it joins sit, so the run between them follows the curve rather than cutting across it. A step's body has nowhere to go on a curve, so a stepper with a layout takes no [prop]renderBody[/prop]."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.bentAlongArc" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Arc.vue`">
         <ArcDocsExample :is-free-navigation="isArcFree" />
 
         <template #renderKnobs>
-            <PageProp
-                item-key="arcIsFreeNavigation"
-                label="Free navigation"
-                hint="Lets any step be pressed to jump to it, rather than only the steps already behind you."
-                controls="Sets Step.isNavigable on every step sent to StepperProps.steps"
-            >
+            <PageProp item-key="arcIsFreeNavigation" v-bind="StepperKnobs.FREE_NAVIGATION_TEXT">
                 <PageCheckField
                     :value="isArcFree"
                     ariaLabel="Free navigation"

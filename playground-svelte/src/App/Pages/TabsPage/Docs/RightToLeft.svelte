@@ -1,12 +1,6 @@
 <script lang="ts">
     import { Button, Tabs } from "@thewaver/ss-components-svelte";
-    import {
-        PANEL_BODIES,
-        RIGHT_TO_LEFT_TABS,
-        ROW_TAB_GAP,
-        getPanelId,
-        getTabId,
-    } from "@thewaver/ss-playground/App/Pages/TabsPage/TabsPage.const";
+    import { PANEL_BODIES, RIGHT_TO_LEFT_TABS, ROW_TAB_GAP, getPanelId, getTabId, SWITCH_DIRECTION_LABEL } from "@thewaver/ss-playground/App/Pages/TabsPage/TabsPage.const";
     import * as styles from "@thewaver/ss-playground/App/Pages/TabsPage/TabsPage.css";
 
     import PageTabPanel from "../../../PageComponents/TabPanel/TabPanel.svelte";
@@ -55,13 +49,13 @@
 
     <Button
         id={"switchDirection"}
-        ariaLabel={"Switch the direction"}
+        ariaLabel={SWITCH_DIRECTION_LABEL}
         onClick={() => {
             isRightToLeft = !isRightToLeft;
         }}
     >
         {#snippet renderContent(flags)}
-            <PageControlButtonContent {flags}>Switch the direction</PageControlButtonContent>
+            <PageControlButtonContent {flags}>{SWITCH_DIRECTION_LABEL}</PageControlButtonContent>
         {/snippet}
     </Button>
 </div>

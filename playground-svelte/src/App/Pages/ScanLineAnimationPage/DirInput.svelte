@@ -4,6 +4,7 @@
 
     import PageSelectField from "../../PageComponents/Field/PageSelectField.svelte";
     import PageProp from "../../PageComponents/Prop/Prop.svelte";
+    import { ScanlineAnimationKnobs } from "@thewaver/ss-playground/App/Knobs/ScanlineAnimations.const";
 
     let props: {
         value: SliceAnimationBreakpointDirection;
@@ -13,9 +14,7 @@
 
 <PageProp
     itemKey={"direction"}
-    controls={"Sets SliceAnimationBreakpointOpts.dir"}
-    label={"Direction"}
-    hint={"Which way the sweep travels through the lines, and so which lines go first."}
+    {...ScanlineAnimationKnobs.DIRECTION_TEXT}
 >
     <PageSelectField
         value={props.value}

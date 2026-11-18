@@ -49,9 +49,7 @@
 <PagePropsPanel scope={"global"}>
     <PageProp
         itemKey={"lineHeightRatio"}
-        controls={"Sets FittedTextProps.lineHeightRatio"}
-        label={"Line height"}
-        hint={"Each line's height as a multiple of its own font size, which is the room the stack is fitted with."}
+        {...FittedTextKnobs.LINE_HEIGHT_RATIO_TEXT}
     >
         <PageNumberField
             value={lineHeightRatio}

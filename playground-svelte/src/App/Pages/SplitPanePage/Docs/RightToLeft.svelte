@@ -1,7 +1,7 @@
 <script lang="ts">
     import { SplitPane } from "@thewaver/ss-components-svelte";
     import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
-    import { RIGHT_TO_LEFT, STARTING_RIGHT_TO_LEFT } from "@thewaver/ss-playground/App/Pages/SplitPanePage/SplitPanePage.const";
+    import { RIGHT_TO_LEFT, STARTING_RIGHT_TO_LEFT, TWO_PANES_RIGHT_LEFT_LABEL } from "@thewaver/ss-playground/App/Pages/SplitPanePage/SplitPanePage.const";
     import * as styles from "@thewaver/ss-playground/App/Pages/SplitPanePage/SplitPanePage.css";
     import { SplitPanePageUtils } from "@thewaver/ss-playground/App/Pages/SplitPanePage/SplitPanePage.utils";
 
@@ -14,7 +14,7 @@
 
 <div dir={"rtl"} class={styles.docsDirectionBox}>
     <PageSplitPaneFrame>
-        <SplitPane panes={RIGHT_TO_LEFT} bind:ratios ariaLabel={"Two panes in a right-to-left box"}>
+        <SplitPane panes={RIGHT_TO_LEFT} bind:ratios ariaLabel={TWO_PANES_RIGHT_LEFT_LABEL}>
             {#snippet renderPane(_pane, index)}
                 <PageSplitPaneBox>{index === 0 ? "Navigation" : "Content"}</PageSplitPaneBox>
             {/snippet}

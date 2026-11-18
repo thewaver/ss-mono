@@ -69,4 +69,23 @@ export namespace TimedGradientKnobs {
         sweep_diag_1v1: { cycles: CYCLES_KNOB },
         sweep_diag_async_4: { cycles: CYCLES_KNOB },
     };
+
+    export const CONFIG_KEY_TEXT = {
+        label: "Gradient",
+        hint: "Which animated gradient is shown. Choosing one brings its own knobs with it.",
+        controls:
+            "Picks the sample gradient the example sends to ShapeProps.computeFillDefs or ShapeProps.computeStrokeDefs",
+    };
+
+    export const ANIMATION_DURATION_MS_TEXT = {
+        label: "Animation duration (ms)",
+        hint: "How long one pass of the gradient's animation takes.",
+        controls: "Sets SVGAnimationDefs.animationDurationMs",
+    };
+
+    export const ITERATION_CONFIG_KEY_TEXT = {
+        label: "Iteration Pattern",
+        hint: "How the animation repeats: once, endlessly, or back and forth.",
+        controls: "Picks the sample iteration that fills SVGAnimationDefs.animationIterationPatterns",
+    };
 }

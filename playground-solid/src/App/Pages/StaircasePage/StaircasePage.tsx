@@ -58,12 +58,7 @@ export const StaircasePage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp
-                    key={"stepCount"}
-                    label={"Steps"}
-                    hint={"How many steps the staircase holds."}
-                    controls={"Sets the length of the slice of example steps sent to StaircaseProps.steps"}
-                >
+                <PageProp key={"stepCount"} {...StaircaseKnobs.STEP_COUNT_TEXT}>
                     <PageNumberField
                         value={getStepCount}
                         min={StaircaseKnobs.MIN_STEP_COUNT}
@@ -75,12 +70,7 @@ export const StaircasePage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"indent"}
-                    label={"Indent (px)"}
-                    hint={"How far one step is set in from the one before it."}
-                    controls={"Sets StaircaseProps.indent"}
-                >
+                <PageProp key={"indent"} {...StaircaseKnobs.INDENT_TEXT}>
                     <PageNumberField
                         value={getIndent}
                         min={StaircaseKnobs.MIN_INDENT}
@@ -92,12 +82,7 @@ export const StaircasePage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"gap"}
-                    label={"Gap (px)"}
-                    hint={"The space between one step and the next."}
-                    controls={"Sets StaircaseProps.gap"}
-                >
+                <PageProp key={"gap"} {...StaircaseKnobs.GAP_TEXT}>
                     <PageNumberField
                         value={getGap}
                         min={StaircaseKnobs.MIN_GAP}
@@ -109,12 +94,7 @@ export const StaircasePage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"dir"}
-                    label={"Direction"}
-                    hint={"Which way the staircase runs."}
-                    controls={"Sets StaircaseProps.dir"}
-                >
+                <PageProp key={"dir"} {...StaircaseKnobs.DIR_TEXT}>
                     <PageSelectField
                         value={getDir}
                         values={STAIRCASE_DIRS}
@@ -124,12 +104,7 @@ export const StaircasePage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"indentKey"}
-                    label={"Indent function"}
-                    hint={"How the indent grows down the run: evenly, faster and faster, or in and out again."}
-                    controls={"Picks the sample indent function sent to StaircaseProps.computeStepIndent"}
-                >
+                <PageProp key={"indentKey"} {...StaircaseKnobs.INDENT_KEY_TEXT}>
                     <PageSelectField
                         value={getIndentKey}
                         values={StaircaseIndents.SAMPLE_KEYS}

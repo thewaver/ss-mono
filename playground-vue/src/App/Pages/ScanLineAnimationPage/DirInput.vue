@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { SliceAnimationBreakpoints } from "@thewaver/ss-components-vue";
 import type { SliceAnimationBreakpointDirection } from "@thewaver/ss-components-vue";
+import { ScanlineAnimationKnobs } from "@thewaver/ss-playground/App/Knobs/ScanlineAnimations.const";
 
 import PageSelectField from "../../PageComponents/Field/PageSelectField.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
@@ -14,12 +15,7 @@ defineProps<Props>();
 </script>
 
 <template>
-    <PageProp
-        item-key="direction"
-        controls="Sets SliceAnimationBreakpointOpts.dir"
-        label="Direction"
-        hint="Which way the sweep travels through the lines, and so which lines go first."
-    >
+    <PageProp item-key="direction" v-bind="ScanlineAnimationKnobs.DIRECTION_TEXT">
         <PageSelectField
             :value="value"
             :values="SliceAnimationBreakpoints.DIRECTIONS"

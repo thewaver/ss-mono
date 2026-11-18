@@ -45,12 +45,7 @@ const fieldProps = computed(() => ({
     </PageMeasureBox>
 
     <PageExampleKnobs>
-        <PageProp
-            item-key="shapeKind"
-            controls="Picks the example contour sent to ParticleFieldProps.computeShapePoints"
-            label="Shape"
-            hint="The area particles may appear in. A cell spawns only when its center is inside it."
-        >
+        <PageProp item-key="shapeKind" v-bind="ParticleFieldKnobs.SHAPE_KIND_TEXT">
             <PageSelectField
                 :value="shapeKind"
                 :values="ShapeConst.DEFAULT_SHAPES"
@@ -59,12 +54,7 @@ const fieldProps = computed(() => ({
             />
         </PageProp>
 
-        <PageProp
-            item-key="joinRadius"
-            controls="Sets every corner of ParticleFieldProps.shapeJoinRadii"
-            label="Corner radius"
-            hint="How far each corner of the area is rounded, as the Shape page rounds them."
-        >
+        <PageProp item-key="joinRadius" v-bind="ParticleFieldKnobs.JOIN_RADIUS_TEXT">
             <PageNumberField
                 :value="joinRadius"
                 :min="ParticleFieldKnobs.MIN_JOIN_RADIUS"

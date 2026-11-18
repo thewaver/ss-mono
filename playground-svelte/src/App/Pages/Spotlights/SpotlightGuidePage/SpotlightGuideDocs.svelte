@@ -4,7 +4,7 @@
     import { SpotlightKnobs } from "@thewaver/ss-playground/App/Knobs/Spotlights.const";
     import { WCAG_URLS } from "@thewaver/ss-playground/App/PageComponents/DocsProse/DocsProse.const";
     import * as docsStyles from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.css";
-    import { DOCS_ROOT } from "@thewaver/ss-playground/App/Pages/Spotlights/SpotlightGuidePage/SpotlightGuidePage.const";
+    import { DOCS_SECTIONS, DOCS_ROOT } from "@thewaver/ss-playground/App/Pages/Spotlights/SpotlightGuidePage/SpotlightGuidePage.const";
     import { FIELD_WIDTH, PADDING } from "@thewaver/ss-playground/App/Pages/Spotlights/SpotlightTourSteps.const";
 
     import PageDocsAlert from "../../../PageComponents/DocsAlert/PageDocsAlert.svelte";
@@ -16,6 +16,7 @@
     import BasicDocsExample from "./Docs/Basic.svelte";
     import RightToLeftDocsExample from "./Docs/RightToLeft.svelte";
     import TourDocsExample from "./Docs/Tour.svelte";
+    import { SpotlightGuideKnobs } from "@thewaver/ss-playground/App/Knobs/SpotlightGuides.const";
 
     let padding = $state(PADDING);
     let transitionDurationMs = $state(SPOTLIGHT_DEFAULTS.transitionDurationMs);
@@ -40,9 +41,7 @@
     {#snippet renderKnobs()}
         <PageProp
             itemKey={"padding"}
-            label={"Padding (px)"}
-            hint={"How much room is left around the lit element, so the hole is not cut tight against it."}
-            controls={"Sets SpotlightGuideProps.padding"}
+            {...SpotlightGuideKnobs.PADDING_TEXT}
         >
             <PageNumberField
                 value={padding}
@@ -59,9 +58,7 @@
 
         <PageProp
             itemKey={"transitionDurationMs"}
-            label={"Transition duration (ms)"}
-            hint={"How long the guide takes to fade in and out, and to move from one step to the next. At 0 it jumps."}
-            controls={"Sets SpotlightGuideProps.transitionDurationMs"}
+            {...SpotlightGuideKnobs.TRANSITION_DURATION_MS_TEXT}
         >
             <PageNumberField
                 value={transitionDurationMs}
@@ -78,9 +75,7 @@
 
         <PageProp
             itemKey={"popupPlacementX"}
-            label={"Popup across"}
-            hint={"Where the popup sits across the lit element: lined up with an edge from inside, centered, or outside it altogether."}
-            controls={"Sets SpotlightGuideProps.popupPlacement.x"}
+            {...SpotlightGuideKnobs.POPUP_PLACEMENT_X_TEXT}
         >
             <PageSelectField
                 value={placementX}
@@ -95,9 +90,7 @@
 
         <PageProp
             itemKey={"popupPlacementY"}
-            label={"Popup down"}
-            hint={"Where the popup sits above or below the lit element: lined up with an edge from inside, centered, or outside it altogether."}
-            controls={"Sets SpotlightGuideProps.popupPlacement.y"}
+            {...SpotlightGuideKnobs.POPUP_PLACEMENT_Y_TEXT}
         >
             <PageSelectField
                 value={placementY}
@@ -112,9 +105,7 @@
 
         <PageProp
             itemKey={"popupOffsetX"}
-            label={"Offset across (px)"}
-            hint={"How far the popup is held clear of the lit element sideways."}
-            controls={"Sets SpotlightGuideProps.popupOffset.x"}
+            {...SpotlightGuideKnobs.POPUP_OFFSET_X_TEXT}
         >
             <PageNumberField
                 value={offsetX}
@@ -131,9 +122,7 @@
 
         <PageProp
             itemKey={"popupOffsetY"}
-            label={"Offset down (px)"}
-            hint={"How far the popup is held clear of the lit element above or below it."}
-            controls={"Sets SpotlightGuideProps.popupOffset.y"}
+            {...SpotlightGuideKnobs.POPUP_OFFSET_Y_TEXT}
         >
             <PageNumberField
                 value={offsetY}
@@ -151,8 +140,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"A tour with a step the reader does"}
-    content={"A guide seals the whole page, so the element it lights cannot be pressed. For a step the reader is to do, open a SpotlightPrompt over the guide: the guide fades but stays open while the prompt lights the one control, and using the control brings the guide back on the next step. Escape on the prompt brings the guide back on the same step. Escape on the guide closes it, and the tour pauses where it was. The example also keeps the step in sessionStorage, so a reload offers to resume there."}
+    {...DOCS_SECTIONS.tourStepReaderDoes}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Tour.svelte`}>
@@ -160,8 +148,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Right to left"}
-    content={"The popup takes the direction of the element it lights, so inside a box whose text runs right to left, the popup's text and buttons run from the right too. The hole and the overlay are not text, and stay as they are."}
+    {...DOCS_SECTIONS.rightLeft}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/RightToLeft.svelte`}>

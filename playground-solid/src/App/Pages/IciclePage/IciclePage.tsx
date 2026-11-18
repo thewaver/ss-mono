@@ -49,12 +49,7 @@ export const IciclePage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp
-                    key={"columnCount"}
-                    label={"Columns"}
-                    hint={"How many levels fit across at once, counting the one in view."}
-                    controls={"Sets IcicleProps.columnCount"}
-                >
+                <PageProp key={"columnCount"} {...IcicleKnobs.COLUMN_COUNT_TEXT}>
                     <PageNumberField
                         value={getColumnCount}
                         min={IcicleKnobs.MIN_COLUMN_COUNT}
@@ -65,14 +60,7 @@ export const IciclePage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"zoomDurationMs"}
-                    label={"Zoom duration (ms)"}
-                    hint={
-                        "How long a zoom in or out takes. It is off while the visitor has asked for reduced motion, and 0 jumps straight to the new view."
-                    }
-                    controls={"Sets IcicleProps.zoomDurationMs"}
-                >
+                <PageProp key={"zoomDurationMs"} {...IcicleKnobs.ZOOM_DURATION_MS_TEXT}>
                     <PageNumberField
                         value={getZoomDurationMs}
                         min={IcicleKnobs.MIN_ZOOM_DURATION_MS}

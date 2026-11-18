@@ -28,12 +28,7 @@ const offset = computed(() => ({ x: 0, y: offsetY.value }));
         />
 
         <template #renderKnobs>
-            <PageProp
-                item-key="offsetY"
-                label="Offset down (px)"
-                hint="How far the card is held clear of its anchor. The gap is bridged, so the pointer can cross it without losing the card."
-                controls="Sets HoverCardProps.offset.y"
-            >
+            <PageProp item-key="offsetY" v-bind="HoverCardKnobs.OFFSET_Y_TEXT">
                 <PageNumberField
                     :value="offsetY"
                     :min="HoverCardKnobs.MIN_OFFSET"
@@ -45,12 +40,7 @@ const offset = computed(() => ({ x: 0, y: offsetY.value }));
                 />
             </PageProp>
 
-            <PageProp
-                item-key="transitionDurationMs"
-                label="Transition duration (ms)"
-                hint="How long the card takes to fade in and out."
-                controls="Sets HoverCardProps.transitionDurationMs"
-            >
+            <PageProp item-key="transitionDurationMs" v-bind="HoverCardKnobs.TRANSITION_DURATION_MS_TEXT">
                 <PageNumberField
                     :value="transitionDurationMs"
                     :min="HoverCardKnobs.MIN_DURATION"
@@ -62,12 +52,7 @@ const offset = computed(() => ({ x: 0, y: offsetY.value }));
                 />
             </PageProp>
 
-            <PageProp
-                item-key="focusShowDelayMs"
-                label="Focus delay (ms)"
-                hint="How long a keyboard focus has to rest on the anchor before the card opens."
-                controls="Sets HoverCardProps.focusShowDelayMs"
-            >
+            <PageProp item-key="focusShowDelayMs" v-bind="HoverCardKnobs.FOCUS_SHOW_DELAY_MS_TEXT">
                 <PageNumberField
                     :value="focusShowDelayMs"
                     :min="HoverCardKnobs.MIN_DURATION"
@@ -79,12 +64,7 @@ const offset = computed(() => ({ x: 0, y: offsetY.value }));
                 />
             </PageProp>
 
-            <PageProp
-                item-key="hoverShowDelayMs"
-                label="Hover delay (ms)"
-                hint="How long the pointer has to rest on the anchor before the card opens. Leave before then and nothing opens."
-                controls="Sets HoverCardProps.hoverShowDelayMs"
-            >
+            <PageProp item-key="hoverShowDelayMs" v-bind="HoverCardKnobs.HOVER_SHOW_DELAY_MS_TEXT">
                 <PageNumberField
                     :value="hoverShowDelayMs"
                     :min="HoverCardKnobs.MIN_DURATION"

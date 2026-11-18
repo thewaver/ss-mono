@@ -95,23 +95,11 @@ export const CardStackPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp
-                    key={"isDisabled"}
-                    label={"Disabled"}
-                    hint={"Turns the stack off, so no card moves by gesture, button or key."}
-                    controls={"Sets CardStackProps.isDisabled"}
-                >
+                <PageProp key={"isDisabled"} {...CardStackKnobs.IS_DISABLED_TEXT}>
                     <PageCheckField value={getIsDisabled} ariaLabel={"Disabled"} onChange={setIsDisabled} />
                 </PageProp>
 
-                <PageProp
-                    key={"commitRatio"}
-                    label={"Commit ratio"}
-                    hint={
-                        "How far across the stack a card has to be pushed before it leaves. Let go short of it and it springs back."
-                    }
-                    controls={"Sets CardStackProps.commitRatio"}
-                >
+                <PageProp key={"commitRatio"} {...CardStackKnobs.COMMIT_RATIO_TEXT}>
                     <PageNumberField
                         value={getCommitRatio}
                         min={CardStackKnobs.MIN_COMMIT_RATIO}
@@ -123,12 +111,7 @@ export const CardStackPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"transitionDurationMs"}
-                    label={"Duration (ms)"}
-                    hint={"How long a card takes to fly out, and how long one that fell short takes to settle back."}
-                    controls={"Sets CardStackProps.transitionDurationMs"}
-                >
+                <PageProp key={"transitionDurationMs"} {...CardStackKnobs.TRANSITION_DURATION_MS_TEXT}>
                     <PageNumberField
                         value={getTransitionDurationMs}
                         min={CardStackKnobs.MIN_DURATION_MS}
@@ -140,12 +123,7 @@ export const CardStackPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"mountedCount"}
-                    label={"Mounted cards"}
-                    hint={"How many cards are in the document at once, counting the top one."}
-                    controls={"Sets CardStackProps.mountedCount"}
-                >
+                <PageProp key={"mountedCount"} {...CardStackKnobs.MOUNTED_COUNT_TEXT}>
                     <PageNumberField
                         value={getMountedCount}
                         min={CardStackKnobs.MIN_MOUNTED_COUNT}
@@ -157,14 +135,7 @@ export const CardStackPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"cardGap"}
-                    label={"Card gap (px)"}
-                    hint={
-                        "How far apart the cards in the pile sit. The bottom one fills the stack's box, and each card above it is lifted by one more of these."
-                    }
-                    controls={"Sets CardStackProps.cardGap"}
-                >
+                <PageProp key={"cardGap"} {...CardStackKnobs.CARD_GAP_TEXT}>
                     <PageNumberField
                         value={getCardGap}
                         min={CardStackKnobs.MIN_CARD_GAP}
@@ -176,14 +147,7 @@ export const CardStackPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"funnelRatio"}
-                    label={"Funnel"}
-                    hint={
-                        "How much narrower each card is than the one in front of it. The top card is the widest and fills the stack; 0 stacks cards of equal width."
-                    }
-                    controls={"Sets CardStackProps.funnelRatio"}
-                >
+                <PageProp key={"funnelRatio"} {...CardStackKnobs.FUNNEL_RATIO_TEXT}>
                     <PageNumberField
                         value={getFunnelRatio}
                         min={CardStackKnobs.MIN_FUNNEL_RATIO}
@@ -195,12 +159,7 @@ export const CardStackPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"pileSide"}
-                    label={"Pile side"}
-                    hint={"The edge the cards behind the top one peek out of: below the top card, or above it."}
-                    controls={"Sets CardStackProps.pileSide"}
-                >
+                <PageProp key={"pileSide"} {...CardStackKnobs.PILE_SIDE_TEXT}>
                     <PageSelectField
                         value={getPileSide}
                         values={CARD_STACK_PILE_SIDES}

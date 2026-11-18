@@ -44,12 +44,7 @@ const examples: ExampleDefs[] = [
 
 <template>
     <PagePropsPanel scope="global">
-        <PageProp
-            item-key="ringCount"
-            controls="Sets SunburstProps.ringCount"
-            label="Rings"
-            hint="How many levels are drawn around the middle at once."
-        >
+        <PageProp item-key="ringCount" v-bind="SunburstKnobs.RING_COUNT_TEXT">
             <PageNumberField
                 :value="ringCount"
                 :min="SunburstKnobs.MIN_RING_COUNT"
@@ -60,12 +55,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="zoomDurationMs"
-            controls="Sets SunburstProps.zoomDurationMs"
-            label="Zoom duration (ms)"
-            hint="How long a zoom in or out takes. It is off while the visitor has asked for reduced motion, and 0 jumps straight to the new level."
-        >
+        <PageProp item-key="zoomDurationMs" v-bind="SunburstKnobs.ZOOM_DURATION_MS_TEXT">
             <PageNumberField
                 :value="zoomDurationMs"
                 :min="SunburstKnobs.MIN_ZOOM_DURATION_MS"

@@ -56,12 +56,7 @@ const sharedProps = computed(() => {
     </div>
 
     <PageExampleKnobs>
-        <PageProp
-            item-key="separationPercent"
-            controls="Sets the example's separation, read by its RGBAnimationProps.computeSliceAnimation"
-            label="Separation (%)"
-            hint="How far red moves left and blue moves right at the middle of the pass, as a share of the picture's width. Green stays put."
-        >
+        <PageProp item-key="separationPercent" v-bind="RGBAnimationKnobs.SEPARATION_PERCENT_TEXT">
             <PageNumberField
                 :value="separationPercent"
                 :min="RGBAnimationKnobs.MIN_ANAGLYPH_SEPARATION_PERCENT"

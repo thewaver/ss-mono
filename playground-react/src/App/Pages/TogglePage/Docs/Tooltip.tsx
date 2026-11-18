@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { Toggle } from "@thewaver/ss-components-react";
+import { TOGGLE_TOOLTIP_LABEL } from "@thewaver/ss-playground/App/Pages/TogglePage/TogglePage.const";
 
 import { PageToggleContent } from "../../../StyledComponents/ToggleContent/ToggleContent";
 import { PageTooltipContent } from "../../../StyledComponents/TooltipContent/TooltipContent";
@@ -14,10 +15,10 @@ export const TooltipDocsExample = (props: Props) => {
     return (
         <Toggle
             checked={checkedState}
-            ariaLabel={"Toggle with a tooltip"}
+            ariaLabel={TOGGLE_TOOLTIP_LABEL}
             isDisabled={props.isDisabled}
             isReachableWhenDisabled={props.isReachableWhenDisabled}
-            renderContent={(flags) => <PageToggleContent flags={flags}>Toggle with a tooltip</PageToggleContent>}
+            renderContent={(flags) => <PageToggleContent flags={flags}>{TOGGLE_TOOLTIP_LABEL}</PageToggleContent>}
             tooltipDefs={{
                 placement: { x: "center", y: "top_out" },
                 offset: { x: 0, y: 10 },

@@ -3,7 +3,13 @@ import { h, shallowRef } from "vue";
 
 import { Stepper } from "@thewaver/ss-components-vue";
 import type { InteractionTooltipDefs, Step, StepperFlags } from "@thewaver/ss-components-vue";
-import { FAILED_OVERRIDES, STARTING_FAILED } from "@thewaver/ss-playground/App/Pages/StepperPage/StepperPage.const";
+import {
+    CHECKOUT_FAILURE_LABEL,
+    FAILED_OVERRIDES,
+    FAILURE_REASON,
+    LOCKED_REASON,
+    STARTING_FAILED,
+} from "@thewaver/ss-playground/App/Pages/StepperPage/StepperPage.const";
 import { StepperPageUtils } from "@thewaver/ss-playground/App/Pages/StepperPage/StepperPage.utils";
 import { LABELS, ORDER, STEPPER_GAP } from "@thewaver/ss-playground/App/Pages/StepperPage/StepperSteps.const";
 import type { StepValue } from "@thewaver/ss-playground/App/Pages/StepperPage/StepperSteps.types";
@@ -13,9 +19,6 @@ import PageStepContent from "../../../StyledComponents/StepContent/PageStepConte
 import type { PageStepState } from "../../../StyledComponents/StepContent/StepContentVue.types";
 import PageTooltipContent from "../../../StyledComponents/TooltipContent/TooltipContent.vue";
 import type { StepperDocsExampleProps } from "../StepperPageVue.types";
-
-const FAILURE_REASON = "The card was declined, so this step has to be repeated before the order can be reviewed.";
-const LOCKED_REASON = "Review opens once payment succeeds, so there is nothing to look at here yet.";
 
 const REASONS = { failed: FAILURE_REASON, ahead: LOCKED_REASON };
 
@@ -45,7 +48,7 @@ const computeTooltipDefs = (step: Step<StepValue, PageStepState>): InteractionTo
         :steps="StepperPageUtils.buildSteps('failed', current, props.isFreeNavigation, FAILED_OVERRIDES)"
         :current-value="current"
         :gap="STEPPER_GAP"
-        ariaLabel="Checkout with a failure"
+        :ariaLabel="CHECKOUT_FAILURE_LABEL"
         :compute-step-aria-label="StepperPageUtils.describeStep"
         :compute-tooltip-defs="computeTooltipDefs"
         @current-change="(value: StepValue) => (current = value)"

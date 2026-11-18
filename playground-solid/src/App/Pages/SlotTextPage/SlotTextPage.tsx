@@ -135,14 +135,7 @@ export const SlotTextPage = () => {
                         </div>
 
                         <PageExampleKnobs>
-                            <PageProp
-                                key={"reelKey"}
-                                label={"Reel"}
-                                hint={
-                                    "How many extra turns each column makes and how long it takes, which decides the order the columns stop in."
-                                }
-                                controls={"Picks the sample reel sent to SlotTextProps.computeReel"}
-                            >
+                            <PageProp key={"reelKey"} {...SlotTextKnobs.REEL_KEY_TEXT}>
                                 <PageSelectField
                                     value={getReelKey}
                                     values={SlotTextReels.SAMPLE_KEYS}
@@ -208,12 +201,7 @@ export const SlotTextPage = () => {
                         </div>
 
                         <PageExampleKnobs>
-                            <PageProp
-                                key={"mechanism"}
-                                label={"Mechanism"}
-                                hint={"Whether each letter turns on a drum or drops through flaps."}
-                                controls={"Sets SlotTextProps.mechanism"}
-                            >
+                            <PageProp key={"mechanism"} {...SlotTextKnobs.MECHANISM_TEXT}>
                                 <PageSelectField
                                     value={getWordMechanism}
                                     values={SlotTextKnobs.MECHANISMS}
@@ -223,14 +211,7 @@ export const SlotTextPage = () => {
                                 />
                             </PageProp>
 
-                            <PageProp
-                                key={"letterRoute"}
-                                label={"Letter route"}
-                                hint={
-                                    "Forward always goes on round the alphabet, so C to Z passes every letter between; shortest takes the nearer way, so C to Z goes back three."
-                                }
-                                controls={"Sets SlotTextProps.letterRoute"}
-                            >
+                            <PageProp key={"letterRoute"} {...SlotTextKnobs.LETTER_ROUTE_TEXT}>
                                 <PageSelectField
                                     value={getLetterRoute}
                                     values={SlotTextKnobs.LETTER_ROUTES}
@@ -250,14 +231,7 @@ export const SlotTextPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp
-                    key={"value"}
-                    label={"Value"}
-                    hint={
-                        "The number the counter and the departures board show. Changing it is what starts them turning."
-                    }
-                    controls={"Sets the number the example formats into SlotTextProps.text"}
-                >
+                <PageProp key={"value"} {...SlotTextKnobs.VALUE_TEXT}>
                     <PageNumberField
                         value={getValue}
                         min={SlotTextKnobs.MIN_VALUE}
@@ -268,12 +242,7 @@ export const SlotTextPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"turnDurationMs"}
-                    label={"Turn (ms)"}
-                    hint={"How long one column takes to turn from its old character to its new one."}
-                    controls={"Sets SlotTextProps.turnDurationMs"}
-                >
+                <PageProp key={"turnDurationMs"} {...SlotTextKnobs.TURN_DURATION_MS_TEXT}>
                     <PageNumberField
                         value={getTurnMs}
                         min={SlotTextKnobs.MIN_TURN_MS}
@@ -284,14 +253,7 @@ export const SlotTextPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"turnDelayMs"}
-                    label={"Turn delay (ms)"}
-                    hint={
-                        "How long each column waits after the turning column beside it starts, which is what makes the turn ripple along."
-                    }
-                    controls={"Sets SlotTextProps.turnDelayMs"}
-                >
+                <PageProp key={"turnDelayMs"} {...SlotTextKnobs.TURN_DELAY_MS_TEXT}>
                     <PageNumberField
                         value={getTurnDelayMs}
                         min={SlotTextKnobs.MIN_CASCADE_MS}

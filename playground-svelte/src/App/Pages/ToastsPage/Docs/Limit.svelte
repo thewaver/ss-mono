@@ -9,6 +9,7 @@
     import type { ToastDefs } from "../../../StyledComponents/ToastContent/ToastContentSvelte.types";
     import type { ToastsLimitDocsExampleProps } from "../ToastsPageSvelte.types";
     import LimitRaisers from "./LimitRaisers.svelte";
+    import { LIMITED_NOTIFICATIONS_LABEL } from "@thewaver/ss-playground/App/Pages/ToastsPage/ToastsPage.const";
 
     type Props = ToastsLimitDocsExampleProps;
 
@@ -21,7 +22,7 @@
     <div class={styles.raiseRow}>
         <Toasts
             bind:toasts={queue}
-            ariaLabel={"Limited notifications"}
+            ariaLabel={LIMITED_NOTIFICATIONS_LABEL}
             alignment={"bottom_left"}
             limit={props.limit}
             overflow={props.overflow}

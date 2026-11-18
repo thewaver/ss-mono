@@ -30,12 +30,7 @@ const arrivalEffect = shallowRef<ArrivalEffect>(PaintedTextKnobs.STARTING_ARRIVA
     <TypedExample v-bind="props" :compute-animation-name="() => ARRIVAL_EFFECT_NAMES[arrivalEffect]" />
 
     <PageExampleKnobs>
-        <PageProp
-            item-key="arrivalEffect"
-            controls="Picks the example keyframes sent to TypewriterProps.computeAnimationName"
-            label="Arrival effect"
-            hint="How each letter arrives. The keyframes are the Typewriter page's own, played by the painted letters."
-        >
+        <PageProp item-key="arrivalEffect" v-bind="PaintedTextKnobs.ARRIVAL_EFFECT_TEXT">
             <PageSelectField
                 :value="arrivalEffect"
                 :values="ARRIVAL_EFFECTS"

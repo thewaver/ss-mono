@@ -42,12 +42,7 @@ const examples: ExampleDefs[] = [
 
 <template>
     <PagePropsPanel scope="global">
-        <PageProp
-            item-key="zoomDurationMs"
-            controls="Sets TreemapProps.zoomDurationMs"
-            label="Zoom duration (ms)"
-            hint="How long a zoom in or out takes. It is off while the visitor has asked for reduced motion, and 0 jumps straight to the new level."
-        >
+        <PageProp item-key="zoomDurationMs" v-bind="TreemapKnobs.ZOOM_DURATION_MS_TEXT">
             <PageNumberField
                 :value="zoomDurationMs"
                 :min="TreemapKnobs.MIN_ZOOM_DURATION_MS"

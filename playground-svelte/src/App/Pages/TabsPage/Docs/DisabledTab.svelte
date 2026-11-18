@@ -1,13 +1,7 @@
 <script lang="ts">
     import { Tabs } from "@thewaver/ss-components-svelte";
     import type { Tab } from "@thewaver/ss-components-svelte";
-    import {
-        PANEL_BODIES,
-        REACHABLE_TABS,
-        ROW_TAB_GAP,
-        getPanelId,
-        getTabId,
-    } from "@thewaver/ss-playground/App/Pages/TabsPage/TabsPage.const";
+    import { PANEL_BODIES, REACHABLE_TABS, ROW_TAB_GAP, getPanelId, getTabId, PARTLY_DISABLED_VIEWS_LABEL } from "@thewaver/ss-playground/App/Pages/TabsPage/TabsPage.const";
     import * as styles from "@thewaver/ss-playground/App/Pages/TabsPage/TabsPage.css";
 
     import PageTabPanel from "../../../PageComponents/TabPanel/TabPanel.svelte";
@@ -35,7 +29,7 @@
     <Tabs
         orientation={"horizontal"}
         tabGap={ROW_TAB_GAP}
-        ariaLabel={"Partly disabled views"}
+        ariaLabel={PARTLY_DISABLED_VIEWS_LABEL}
         {tabs}
         {selectedValue}
         onSelectionChange={(value) => {

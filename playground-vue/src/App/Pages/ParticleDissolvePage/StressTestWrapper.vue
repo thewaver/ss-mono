@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { shallowRef } from "vue";
 
+import { ParticleDissolveKnobs } from "@thewaver/ss-playground/App/Knobs/ParticleDissolves.const";
 import {
     STRESS_CELL_SIZE,
     STRESS_ITEMS,
@@ -22,12 +23,7 @@ const isOnGraphicsCard = shallowRef(true);
     <div>{{ `${STRESS_CELL_SIZE} px cells` }}</div>
 
     <PagePropsPanel scope="local" :has-reset="false">
-        <PageProp
-            item-key="onGraphicsCard"
-            label="On the graphics card"
-            hint="Draws each card's ash in one canvas, with each particle's motion worked out on the graphics card. Off, every particle is an element of its own."
-            controls="Sets ParticleDissolveProps.renderer in the stress test"
-        >
+        <PageProp item-key="onGraphicsCard" v-bind="ParticleDissolveKnobs.ON_GRAPHICS_CARD_TEXT">
             <PageCheckField
                 :value="isOnGraphicsCard"
                 ariaLabel="On the graphics card"

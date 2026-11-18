@@ -13,6 +13,7 @@
         STRESS_ITEM_SIZE,
         STRESS_ITERATION_DELAY_MS,
     } from "@thewaver/ss-playground/App/Pages/CellAnimationPage/CellAnimationPage.const";
+    import { CellAnimationKnobs } from "@thewaver/ss-playground/App/Knobs/CellAnimations.const";
 
     const STRESS_ITEMS: (StressTestDefs & { size: number })[] = [
         {
@@ -56,9 +57,7 @@
 <PagePropsPanel scope={"local"} hasReset={false}>
     <PageProp
         itemKey={"onGraphicsCard"}
-        label={"On the graphics card"}
-        hint={"Draws the stress test's cells in one canvas per item, with the keyframes worked out on the graphics card. Off, every cell is an element of its own."}
-        controls={"Sets CellAnimationProps.renderer in the stress test"}
+        {...CellAnimationKnobs.ON_GRAPHICS_CARD_TEXT}
     >
         <PageCheckField
             value={isOnGraphicsCard}

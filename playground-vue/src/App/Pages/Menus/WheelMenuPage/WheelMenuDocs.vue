@@ -6,6 +6,7 @@ import { WheelMenuKnobs } from "@thewaver/ss-playground/App/Knobs/WheelMenus.con
 import {
     BAND_WIDTH,
     DOCS_ROOT,
+    DOCS_SECTIONS,
     FIELD_WIDTH,
     HOLE_RADIUS,
 } from "@thewaver/ss-playground/App/Pages/Menus/WheelMenuPage/WheelMenuPage.const";
@@ -38,12 +39,7 @@ const opensOnHold = shallowRef(true);
         />
 
         <template #renderKnobs>
-            <PageProp
-                item-key="spreadDegrees"
-                label="Spread (°)"
-                hint="How much of the circle the wedges are spread over: 360 for a whole wheel, 180 for half of one."
-                controls="Sets WheelMenuProps.spreadDegrees"
-            >
+            <PageProp item-key="spreadDegrees" v-bind="WheelMenuKnobs.SPREAD_DEGREES_TEXT">
                 <PageNumberField
                     :value="spreadDegrees"
                     :min="WheelMenuKnobs.MIN_SPREAD_DEGREES"
@@ -55,12 +51,7 @@ const opensOnHold = shallowRef(true);
                 />
             </PageProp>
 
-            <PageProp
-                item-key="holeRadius"
-                label="Hole radius (px)"
-                hint="How much of the middle is left empty, which is where the close control sits."
-                controls="Sets WheelMenuProps.holeRadius"
-            >
+            <PageProp item-key="holeRadius" v-bind="WheelMenuKnobs.HOLE_RADIUS_TEXT">
                 <PageNumberField
                     :value="holeRadius"
                     :min="WheelMenuKnobs.MIN_HOLE_RADIUS"
@@ -72,12 +63,7 @@ const opensOnHold = shallowRef(true);
                 />
             </PageProp>
 
-            <PageProp
-                item-key="bandWidth"
-                label="Band width (px)"
-                hint="How thick the band of wedges is."
-                controls="Sets WheelMenuProps.bandWidth"
-            >
+            <PageProp item-key="bandWidth" v-bind="WheelMenuKnobs.BAND_WIDTH_TEXT">
                 <PageNumberField
                     :value="bandWidth"
                     :min="WheelMenuKnobs.MIN_BAND_WIDTH"
@@ -89,12 +75,7 @@ const opensOnHold = shallowRef(true);
                 />
             </PageProp>
 
-            <PageProp
-                item-key="wedgeGapDegrees"
-                label="Wedge gap (°)"
-                hint="The space left between one wedge and the next."
-                controls="Sets WheelMenuProps.layoutDefs.wedgeGapDegrees"
-            >
+            <PageProp item-key="wedgeGapDegrees" v-bind="WheelMenuKnobs.WEDGE_GAP_DEGREES_TEXT">
                 <PageNumberField
                     :value="wedgeGapDegrees"
                     :min="WheelMenuKnobs.MIN_WEDGE_GAP_DEGREES"
@@ -108,21 +89,13 @@ const opensOnHold = shallowRef(true);
         </template>
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Submenus as bands"
-        content="Give an item [prop]items[/prop] of its own and its submenu opens as a band round the same center, outside the one that opened it and [prop]levelGap[/prop] away from it. The band is aimed at the wedge that opened it and is only as wide as its own items need, so a short submenu stays short however far out it sits. Over less than a whole turn, a band is shifted to stay inside the spread."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.submenusBands" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Bands.vue`">
         <BandsDocsExample :spread-degrees="bandsSpreadDegrees" />
 
         <template #renderKnobs>
-            <PageProp
-                item-key="bandsSpreadDegrees"
-                label="Spread (°)"
-                hint="How much of the circle the wedges are spread over. Every band stays inside it."
-                controls="Sets WheelMenuProps.spreadDegrees"
-            >
+            <PageProp item-key="bandsSpreadDegrees" v-bind="WheelMenuKnobs.BANDS_SPREAD_DEGREES_TEXT">
                 <PageNumberField
                     :value="bandsSpreadDegrees"
                     :min="WheelMenuKnobs.MIN_SPREAD_DEGREES"
@@ -136,30 +109,19 @@ const opensOnHold = shallowRef(true);
         </template>
     </PageDocsExample>
 
-    <PageDocsSection
-        title="A wedge that asks for room"
-        content="An item may ask for its own share of the turn with [prop]arcDegrees[/prop], and the items that do not ask share what is left. The wedges follow one another from the same start, so two can never overlap. Here Confirm asks for half the turn."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.wedgeAskingForRoom" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Weighted.vue`">
         <WeightedDocsExample />
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Hold and flick"
-        content="With [prop]opensOnHold[/prop] on, pressing the button and holding it down opens the wheel. Move a short way toward a wedge and let go to pick it; come back to the middle before letting go to pick nothing. A plain click still opens the wheel and leaves it open, to be picked from by clicking or with the keyboard."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.holdFlick" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Flick.vue`">
         <FlickDocsExample :opens-on-hold="opensOnHold" />
 
         <template #renderKnobs>
-            <PageProp
-                item-key="opensOnHold"
-                label="Opens on hold"
-                hint="Whether holding the button down opens the wheel, so a flick toward a wedge picks it on release."
-                controls="Sets WheelMenuProps.opensOnHold"
-            >
+            <PageProp item-key="opensOnHold" v-bind="WheelMenuKnobs.OPENS_ON_HOLD_TEXT">
                 <PageCheckField
                     :value="opensOnHold"
                     ariaLabel="Opens on hold"

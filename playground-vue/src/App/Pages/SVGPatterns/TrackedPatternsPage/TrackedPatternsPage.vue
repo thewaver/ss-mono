@@ -86,12 +86,7 @@ const examples: ExampleDefs[] = [
 <template>
     <PagePropsGroups>
         <PagePropsPanel scope="sample">
-            <PageProp
-                item-key="configKey"
-                controls="Picks the sample pattern the example sends to ShapeProps.computeFillDefs"
-                label="Pattern"
-                hint="Which pointer-following pattern is shown. Choosing one brings its own knobs with it."
-            >
+            <PageProp item-key="configKey" v-bind="TrackedPatternKnobs.CONFIG_KEY_TEXT">
                 <PageGroupedSelectField
                     :value="configKey"
                     :groups="TRACKED_PATTERN_GROUPS"

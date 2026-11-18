@@ -3,7 +3,8 @@ import { shallowRef } from "vue";
 
 import type { LabelOrientation } from "@thewaver/ss-components-vue";
 import { LABEL_DEFAULTS, LABEL_ORIENTATIONS } from "@thewaver/ss-components-vue";
-import { DOCS_ROOT } from "@thewaver/ss-playground/App/Pages/LabelPage/LabelPage.const";
+import { LabelKnobs } from "@thewaver/ss-playground/App/Knobs/Labels.const";
+import { DOCS_ROOT, DOCS_SECTIONS } from "@thewaver/ss-playground/App/Pages/LabelPage/LabelPage.const";
 
 import PageDocsExample from "../../PageComponents/DocsExample/PageDocsExample.vue";
 import PageDocsSection from "../../PageComponents/DocsSection/PageDocsSection.vue";
@@ -28,12 +29,7 @@ const isDisabled = shallowRef(false);
         <BasicDocsExample :orientation="orientation" :is-disabled="isDisabled" />
 
         <template #renderKnobs>
-            <PageProp
-                item-key="orientation"
-                label="Orientation"
-                hint="Whether the caption and the checkbox sit side by side or one above the other, in the order they are written."
-                controls="Sets LabelProps.orientation"
-            >
+            <PageProp item-key="orientation" v-bind="LabelKnobs.ORIENTATION_TEXT">
                 <PageSelectField
                     :value="orientation"
                     :values="LABEL_ORIENTATIONS"
@@ -42,12 +38,7 @@ const isDisabled = shallowRef(false);
                 />
             </PageProp>
 
-            <PageProp
-                item-key="isDisabled"
-                label="Disabled"
-                hint="Turns the checkbox off: pressing it or its caption changes nothing, and the Tab key skips it."
-                controls="Sets CheckboxProps.isDisabled on the checkbox inside the label"
-            >
+            <PageProp item-key="isDisabled" v-bind="LabelKnobs.IS_DISABLED_TEXT">
                 <PageCheckField
                     :value="isDisabled"
                     ariaLabel="Disabled"
@@ -57,28 +48,19 @@ const isDisabled = shallowRef(false);
         </template>
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Right to left"
-        content="Inside a box whose text runs right to left, the label lays its children out from the right, so the checkbox, written first, sits to the right of its caption."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.rightLeft" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/RightToLeft.vue`">
         <RightToLeftDocsExample />
     </PageDocsExample>
 
-    <PageDocsSection
-        title="The caption first"
-        content="The caption and the control sit in the order they are written, so a caption written first comes before the control, as is usual beside a switch. Pressing the caption still flips it."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.captionFirst" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/CaptionFirst.vue`">
         <CaptionFirstDocsExample />
     </PageDocsExample>
 
-    <PageDocsSection
-        title="One label per radio"
-        content="A label names one control, so in a radio group each radio gets a label of its own. The group as a whole is named through its own [prop]ariaLabel[/prop], since a caption wrapped round the whole group would name only the first radio, and pressing it would pick that one."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.oneLabelPerRadio" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/LabelPerRadio.vue`">
         <LabelPerRadioDocsExample />

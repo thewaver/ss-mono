@@ -2,7 +2,10 @@ import { useEffect, useId, useState } from "react";
 
 import { Button, ColorArea, Popover, Range } from "@thewaver/ss-components-react";
 import { COLOR_AREA_AXIS_LABELS } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
-import { STARTING_PICKER_HSV } from "@thewaver/ss-playground/App/Pages/ColorAreaPage/ColorAreaPage.const";
+import {
+    SATURATION_BRIGHTNESS_LABEL,
+    STARTING_PICKER_HSV,
+} from "@thewaver/ss-playground/App/Pages/ColorAreaPage/ColorAreaPage.const";
 import { Color } from "@thewaver/ss-utils";
 
 import { PageColorChannels } from "../../../PageComponents/ColorChannels/ColorChannels";
@@ -83,7 +86,7 @@ export const PickerDocsExample = () => {
                         <ColorArea
                             hsv={hsvState}
                             sizing={"fill"}
-                            ariaLabel={"Saturation and brightness"}
+                            ariaLabel={SATURATION_BRIGHTNESS_LABEL}
                             axisLabels={COLOR_AREA_AXIS_LABELS}
                             renderContent={(renderProps) => (
                                 <PageColorAreaContent renderProps={renderProps} size={AREA_SIZE} />

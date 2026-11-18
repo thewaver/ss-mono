@@ -38,9 +38,7 @@
     {#snippet renderKnobs()}
         <PageProp
             itemKey={"track"}
-            label={"Track"}
-            hint={"Which piece is playing. Changing it while it plays is what the switcher crossfades."}
-            controls={"Picks the example track sent to AudioSwitcherProps.src"}
+            {...AudioSwitcherKnobs.TRACK_TEXT}
         >
             <PageSelectField
                 value={trackName}
@@ -55,9 +53,7 @@
 
         <PageProp
             itemKey={"crossfadeMs"}
-            label={"Crossfade (ms)"}
-            hint={"How long the old track takes to fade out while the new one fades in."}
-            controls={"Sets AudioSwitcherProps.crossfadeMs"}
+            {...AudioSwitcherKnobs.CROSSFADE_MS_TEXT}
         >
             <PageNumberField
                 value={crossfadeMs}
@@ -74,9 +70,7 @@
 
         <PageProp
             itemKey={"volume"}
-            label={"Volume (%)"}
-            hint={"How loud the playback is, apart from the system's own volume."}
-            controls={"Sets AudioSwitcherProps.volume, sent as a share of 1"}
+            {...AudioSwitcherKnobs.VOLUME_TEXT}
         >
             <PageNumberField
                 value={volumePercent}

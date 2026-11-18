@@ -2,6 +2,7 @@
 import { computed, shallowRef } from "vue";
 
 import { Tree } from "@thewaver/ss-components-vue";
+import { GENERATED_REPOSITORY_LABEL } from "@thewaver/ss-playground/App/Pages/TreePage/TreePage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/TreePage/TreePage.css";
 
 import PageGlideFloater from "../../../StyledComponents/GlideFloater/PageGlideFloater.vue";
@@ -27,7 +28,7 @@ const computeEstimatedNodeHeight = () => NODE_HEIGHT;
         <Tree
             v-model:expanded="expanded"
             :nodes="nodes"
-            ariaLabel="Generated repository"
+            :ariaLabel="GENERATED_REPOSITORY_LABEL"
             :compute-estimated-node-height="computeEstimatedNodeHeight"
         >
             <template #renderHighlightFloater="floater">

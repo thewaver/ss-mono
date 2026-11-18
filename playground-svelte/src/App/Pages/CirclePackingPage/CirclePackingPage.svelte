@@ -58,9 +58,7 @@
 <PagePropsPanel scope={"global"}>
     <PageProp
         itemKey={"padding"}
-        controls={"Sets CirclePackingProps.padding"}
-        label={"Padding (px)"}
-        hint={"The space left between neighboring circles and around the inside of their parent."}
+        {...CirclePackingKnobs.PADDING_TEXT}
     >
         <PageNumberField
             value={padding}
@@ -76,11 +74,7 @@
 
     <PageProp
         itemKey={"zoomDurationMs"}
-        controls={"Sets CirclePackingProps.zoomDurationMs"}
-        label={"Zoom duration (ms)"}
-        hint={
-            "How long a zoom in or out takes. It is off while the visitor has asked for reduced motion, and 0 jumps straight to the new view."
-        }
+        {...CirclePackingKnobs.ZOOM_DURATION_MS_TEXT}
     >
         <PageNumberField
             value={zoomDurationMs}

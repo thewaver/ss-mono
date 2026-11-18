@@ -2,7 +2,11 @@ import { useState, useSyncExternalStore } from "react";
 
 import { Button, CardStack } from "@thewaver/ss-components-react";
 import type { CardStackControls } from "@thewaver/ss-components-react";
-import { computeCardTilt } from "@thewaver/ss-playground/App/Pages/CardStackPage/CardStackPage.const";
+import {
+    DEAL_CARDS_AGAIN_LABEL,
+    RECALL_LAST_CARD_LABEL,
+    computeCardTilt,
+} from "@thewaver/ss-playground/App/Pages/CardStackPage/CardStackPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/CardStackPage/CardStackPage.css";
 import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 import type { SwipeDirection } from "@thewaver/ss-utils";
@@ -89,7 +93,7 @@ export const DeckExample = (props: Props) => {
                 <Button
                     id={"recall"}
                     isDisabled={props.isDisabled || topIndex === FIRST_INDEX}
-                    ariaLabel={"Recall the last card"}
+                    ariaLabel={RECALL_LAST_CARD_LABEL}
                     renderContent={(flags) => <PageControlButtonContent flags={flags}>Recall</PageControlButtonContent>}
                     onClick={() => {
                         if (controls?.recall()) props.onRecall();
@@ -99,7 +103,7 @@ export const DeckExample = (props: Props) => {
                 {isEmpty && (
                     <Button
                         id={"deal"}
-                        ariaLabel={"Deal the cards again"}
+                        ariaLabel={DEAL_CARDS_AGAIN_LABEL}
                         renderContent={(flags) => (
                             <PageControlButtonContent flags={flags} glyph={CONTROL_GLYPHS.replay} />
                         )}

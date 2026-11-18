@@ -5,6 +5,7 @@ import { TableOfContents } from "@thewaver/ss-components-solid";
 import type { TableOfContentsLink } from "@thewaver/ss-components-solid";
 import {
     HEADING_LEVEL,
+    OUTLINE_RIGHT_LEFT_BOX_LABEL,
     SECTIONS,
     TOC_GAP,
 } from "@thewaver/ss-playground/App/Pages/TableOfContentsPage/TableOfContentsPage.const";
@@ -46,7 +47,7 @@ export const RightToLeftDocsExample = () => {
                 <TableOfContents
                     links={getLinks}
                     gap={TOC_GAP}
-                    ariaLabel={"Outline in a right-to-left box"}
+                    ariaLabel={OUTLINE_RIGHT_LEFT_BOX_LABEL}
                     renderLink={(getLink, getFlags) => (
                         <PageTableOfContentsContent flags={getFlags} depth={() => getLink().depth ?? TOP_DEPTH}>
                             {SECTIONS.find((section) => section.id === getLink().value)?.title}

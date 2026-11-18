@@ -4,6 +4,7 @@ import { Progress } from "@thewaver/ss-components-solid";
 import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
 import {
     BYTES_PER_KB,
+    UPLOAD_DRAWN_RING_LABEL,
     UPLOAD_TICK_BYTES,
     UPLOAD_TICK_MS,
     UPLOAD_TOTAL_BYTES,
@@ -32,7 +33,7 @@ export const RingDocsExample = () => {
             <Progress
                 value={getUploadedBytes}
                 max={UPLOAD_TOTAL_BYTES}
-                ariaLabel={"Upload, drawn as a ring"}
+                ariaLabel={UPLOAD_DRAWN_RING_LABEL}
                 ariaValueText={getValueText}
                 sizing={"fit-content"}
                 renderContent={(getState) => <PageProgressRing state={getState} />}

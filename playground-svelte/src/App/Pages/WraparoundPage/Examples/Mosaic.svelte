@@ -1,7 +1,7 @@
 <script lang="ts">
     import { ImageMosaic, Wraparound } from "@thewaver/ss-components-svelte";
     import { MosaicImages } from "@thewaver/ss-playground/App/Pages/Mosaics/ImageMosaicPage/MosaicImages.const";
-    import { MOSAIC_GAP } from "@thewaver/ss-playground/App/Pages/WraparoundPage/WraparoundPage.const";
+    import { MOSAIC_GAP, PICTURES_REPEATING_EVERY_DIRECTION_LABEL } from "@thewaver/ss-playground/App/Pages/WraparoundPage/WraparoundPage.const";
     import * as styles from "@thewaver/ss-playground/App/Pages/WraparoundPage/WraparoundPage.css";
 
     import type { WraparoundExampleProps } from "../WraparoundPageSvelte.types";
@@ -12,7 +12,7 @@
 </script>
 
 <div class={styles.stage}>
-    <Wraparound ariaLabel={"Pictures, repeating in every direction"}>
+    <Wraparound ariaLabel={PICTURES_REPEATING_EVERY_DIRECTION_LABEL}>
         {#snippet renderContent()}
             <div class={styles.mosaicTile}>
                 <ImageMosaic

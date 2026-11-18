@@ -18,12 +18,7 @@ const stdDeviation = shallowRef(SVGFilterKnobs.Blur.STARTING_DEVIATION);
     <BlurExample v-bind="props" :std-deviation="stdDeviation" />
 
     <PageExampleKnobs>
-        <PageProp
-            item-key="stdDeviation"
-            controls="Sets SVGGaussianBlurFilterDefs.stdDeviation"
-            label="Std deviation"
-            hint="How far the blur reaches. 0 leaves the picture sharp."
-        >
+        <PageProp item-key="stdDeviation" v-bind="SVGFilterKnobs.STD_DEVIATION_TEXT">
             <PageNumberField
                 :value="stdDeviation"
                 :min="SVGFilterKnobs.Blur.MIN_DEVIATION"

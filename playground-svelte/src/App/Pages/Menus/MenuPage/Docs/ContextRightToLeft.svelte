@@ -6,6 +6,7 @@
 
     import { renderPageHighlightFloater } from "../../../../StyledComponents/GlideFloater/GlideFloater.const.svelte";
     import { NESTED_ACTIONS, NOTHING_RUN, renderMenuItem, renderMenuPopup } from "../MenuPage.const.svelte";
+    import { EDITING_AREA_RIGHT_LEFT_LABEL } from "@thewaver/ss-playground/App/Pages/Menus/MenuPage/MenuPage.const";
 
     let lastRun = $state(NOTHING_RUN);
 </script>
@@ -15,7 +16,7 @@
         renderHighlightFloater={renderPageHighlightFloater}
         items={NESTED_ACTIONS}
         ariaLabel={"File actions"}
-        regionAriaLabel={"Editing area in a right-to-left box"}
+        regionAriaLabel={EDITING_AREA_RIGHT_LEFT_LABEL}
         submenuOffset={{ x: POPOVER_SURFACE_INSET, y: -POPOVER_SURFACE_INSET }}
         renderItem={renderMenuItem}
         renderPopup={renderMenuPopup}

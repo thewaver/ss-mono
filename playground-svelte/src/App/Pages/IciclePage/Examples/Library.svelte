@@ -8,6 +8,7 @@
 
     import PageIcicleCell from "../../../StyledComponents/IcicleContent/IcicleContent.svelte";
     import type { IcicleExampleProps } from "../IciclePage.types";
+    import { LIBRARY_S_SOURCE_LINES_LABEL } from "@thewaver/ss-playground/App/Pages/IciclePage/IciclePage.const";
 
     const TOP_LEVEL = 1;
 
@@ -35,7 +36,7 @@
         bind:focus
         columnCount={props.columnCount}
         zoomDurationMs={props.zoomDurationMs}
-        ariaLabel={"The library's source, by lines of code"}
+        ariaLabel={LIBRARY_S_SOURCE_LINES_LABEL}
     >
         {#snippet renderCell(node, state)}
             <PageIcicleCell

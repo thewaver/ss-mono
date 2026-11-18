@@ -4,6 +4,10 @@ import { shallowRef } from "vue";
 import { Collapsible } from "@thewaver/ss-components-vue";
 import * as styles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
 import * as collapsibleStyles from "@thewaver/ss-playground/App/Pages/Accordions/Accordions.css";
+import {
+    HIDE_DELIVERY_NOTES_TEXT,
+    SHOW_DELIVERY_NOTES_TEXT,
+} from "@thewaver/ss-playground/App/Pages/Accordions/CollapsiblePage/CollapsiblePage.const";
 
 import PageAccordionHeader from "../../../../StyledComponents/AccordionContent/PageAccordionHeader.vue";
 import PageAccordionWrapper from "../../../../StyledComponents/AccordionContent/PageAccordionWrapper.vue";
@@ -21,7 +25,7 @@ const isBuilt = shallowRef(false);
 
             <template #renderTrigger="flags">
                 <PageAccordionHeader :flags="flags">{{
-                    flags.isExpanded ? "Hide the delivery notes" : "Show the delivery notes"
+                    flags.isExpanded ? HIDE_DELIVERY_NOTES_TEXT : SHOW_DELIVERY_NOTES_TEXT
                 }}</PageAccordionHeader>
             </template>
 

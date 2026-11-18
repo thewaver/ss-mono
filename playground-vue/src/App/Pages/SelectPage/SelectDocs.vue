@@ -4,7 +4,11 @@ import { shallowRef, watch } from "vue";
 import { FrameRateMonitorVueUtils } from "@thewaver/ss-components-vue";
 import { SelectKnobs } from "@thewaver/ss-playground/App/Knobs/Selects.const";
 import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
-import { DOCS_ROOT, STRESS_COUNT_FIELD_WIDTH } from "@thewaver/ss-playground/App/Pages/SelectPage/SelectPage.const";
+import {
+    DOCS_ROOT,
+    DOCS_SECTIONS,
+    STRESS_COUNT_FIELD_WIDTH,
+} from "@thewaver/ss-playground/App/Pages/SelectPage/SelectPage.const";
 
 import PageDocsExample from "../../PageComponents/DocsExample/PageDocsExample.vue";
 import PageDocsSection from "../../PageComponents/DocsSection/PageDocsSection.vue";
@@ -63,21 +67,11 @@ const setCount = (next: number) => {
         <BasicDocsExample :has-error="hasError" :is-disabled="isDisabled" />
 
         <template #renderKnobs>
-            <PageProp
-                item-key="hasError"
-                label="Error"
-                hint="Marks the field invalid, for screen readers as well as for the painter."
-                controls="Sets SelectProps.hasError"
-            >
+            <PageProp item-key="hasError" v-bind="SelectKnobs.HAS_ERROR_TEXT">
                 <PageCheckField :value="hasError" ariaLabel="Error" @change="(value: boolean) => (hasError = value)" />
             </PageProp>
 
-            <PageProp
-                item-key="isDisabled"
-                label="Disabled"
-                hint="Turns the field off: it does not open, and the Tab key skips it."
-                controls="Sets SelectProps.isDisabled"
-            >
+            <PageProp item-key="isDisabled" v-bind="SelectKnobs.IS_DISABLED_TEXT">
                 <PageCheckField
                     :value="isDisabled"
                     ariaLabel="Disabled"
@@ -87,53 +81,33 @@ const setCount = (next: number) => {
         </template>
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Right to left"
-        content="Inside a box whose text runs right to left, the pick starts from the right of the field, and the arrow and the clear button sit at its left end."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.rightLeft" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/RightToLeft.vue`">
         <RightToLeftDocsExample />
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Clearing the pick"
-        content="Give it [prop]renderClear[/prop] and a clear button sits at the end of the field, drawn only while something is picked and reached with the Tab key after the field. It needs [prop]clearAriaLabel[/prop] to name it, and pressing it empties the value and reports the change like any other pick."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.clearingPick" />
     <PageDocsExample :path="`${DOCS_ROOT}/Clearable.vue`">
         <ClearableDocsExample />
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Records as values"
-        content="An option's value can be any record, not only a string. Here each airport is an object, and the field and the options draw whichever of its parts you choose."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.recordsValues" />
     <PageDocsExample :path="`${DOCS_ROOT}/Records.vue`">
         <RecordsDocsExample />
     </PageDocsExample>
 
-    <PageDocsSection
-        title="More than a name"
-        content="An option draws whatever its painter gives it, here a name with a line of detail beneath it, and is still one option to the arrow keys and to typing."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.moreThanName" />
     <PageDocsExample :path="`${DOCS_ROOT}/Described.vue`">
         <DescribedDocsExample />
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Groups"
-        content="Options can sit in groups under headings: a screen reader announces the group, and the arrow keys walk past the headings. A box drawn around each group is optional, through [prop]renderGroupBox[/prop]."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.groups" />
     <PageDocsExample :path="`${DOCS_ROOT}/Groups.vue`">
         <GroupsDocsExample :has-group-boxes="hasGroupBoxes" />
 
         <template #renderKnobs>
-            <PageProp
-                item-key="hasGroupBoxes"
-                label="Group boxes"
-                hint="Draws a box around each group's heading and options."
-                controls="Passes SelectProps.renderGroupBox, or leaves it out"
-            >
+            <PageProp item-key="hasGroupBoxes" v-bind="SelectKnobs.HAS_GROUP_BOXES_TEXT">
                 <PageCheckField
                     :value="hasGroupBoxes"
                     ariaLabel="Group boxes"
@@ -143,20 +117,12 @@ const setCount = (next: number) => {
         </template>
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Disabled options"
-        content="An option can be disabled: the arrow keys and typing skip it, and it cannot be picked. Kept reachable when disabled, the arrow keys stop on it instead, so a tooltip can say why it is off."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.disabledOptions" />
     <PageDocsExample :path="`${DOCS_ROOT}/DisabledOptions.vue`">
         <DisabledOptionsDocsExample :is-reachable="isReachable" />
 
         <template #renderKnobs>
-            <PageProp
-                item-key="isReachable"
-                label="Reachable when disabled"
-                hint="Lets the arrow keys stop on the disabled options, which then show a tooltip."
-                controls="Sets SelectOption.isReachableWhenDisabled on the disabled options"
-            >
+            <PageProp item-key="isReachable" v-bind="SelectKnobs.IS_REACHABLE_TEXT">
                 <PageCheckField
                     :value="isReachable"
                     ariaLabel="Reachable when disabled"
@@ -166,22 +132,14 @@ const setCount = (next: number) => {
         </template>
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Many options"
-        content="Give it an estimated option height and only the options in view are built, so a list of a hundred thousand opens about as fast as one of fifty. The line under the field shows how long the list took to open and how smoothly it runs while open."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.manyOptions" />
     <PageDocsExample :path="`${DOCS_ROOT}/Virtualized.vue`">
         <VirtualizedDocsExample v-model:visibility="isVirtualizedOpen" :count="count" />
 
         <div :class="exampleStyles.exampleReadout" data-readout>{{ getMeasurement() }}</div>
 
         <template #renderKnobs>
-            <PageProp
-                item-key="count"
-                label="Option count"
-                hint="How many options the list holds. Only the ones in view are built."
-                controls="Sets the number of example options sent to SelectProps.options"
-            >
+            <PageProp item-key="count" v-bind="SelectKnobs.COUNT_TEXT">
                 <PageNumberField
                     :value="count"
                     :min="SelectKnobs.MIN_STRESS_COUNT"
@@ -195,43 +153,29 @@ const setCount = (next: number) => {
         </template>
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Loaded on demand"
-        content="While [prop]hasMoreOptions[/prop] is on, nearing the end of the list calls [prop]onReachEnd[/prop], so options can arrive from a server a batch at a time. The arrow keys stop at the last option held until the next batch lands."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.loadedDemand" />
     <PageDocsExample :path="`${DOCS_ROOT}/OnDemand.vue`">
         <OnDemandDocsExample />
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Autocomplete"
-        content="Give it a [prop]query[/prop] and the field becomes a text box: the reader types to narrow the list. Which options match is yours to decide, so the filtering lives in your code."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.autocomplete" />
     <PageDocsExample :path="`${DOCS_ROOT}/Autocomplete.vue`">
         <AutocompleteDocsExample />
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Autocomplete, loaded on demand"
-        content="The two combine: each change of the query asks the server for its first batch of matches, and nearing the end of the list asks for the next."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.autocompleteLoadedDemand" />
     <PageDocsExample :path="`${DOCS_ROOT}/AutocompleteOnDemand.vue`">
         <AutocompleteOnDemandDocsExample />
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Tooltip"
-        content="Give a field [prop]tooltipDefs[/prop] and it shows a tooltip on hover and on keyboard focus, read by screen readers as the field's description. A disabled field shows no tooltip unless you also keep it reachable when disabled; it can then be focused to read why it is off, and still does not open."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.tooltip" />
     <PageDocsExample :path="`${DOCS_ROOT}/Tooltip.vue`">
         <TooltipDocsExample :is-disabled="isTooltipDisabled" :is-reachable-when-disabled="isReachableWhenDisabled" />
 
         <template #renderKnobs>
             <PageProp
                 item-key="tooltipIsReachableWhenDisabled"
-                label="Reachable when disabled"
-                hint="Keeps a disabled field's tooltip available: the Tab key can stop on it and hovering it shows the tooltip. Without it a disabled field shows no tooltip at all. It only matters while Disabled is on."
-                controls="Sets SelectProps.isReachableWhenDisabled"
+                v-bind="SelectKnobs.TOOLTIP_IS_REACHABLE_WHEN_DISABLED_TEXT"
             >
                 <PageCheckField
                     :value="isReachableWhenDisabled"
@@ -240,12 +184,7 @@ const setCount = (next: number) => {
                 />
             </PageProp>
 
-            <PageProp
-                item-key="tooltipIsDisabled"
-                label="Disabled"
-                hint="Turns the field off: it does not open, and the Tab key skips it."
-                controls="Sets SelectProps.isDisabled"
-            >
+            <PageProp item-key="tooltipIsDisabled" v-bind="SelectKnobs.IS_DISABLED_TEXT">
                 <PageCheckField
                     :value="isTooltipDisabled"
                     ariaLabel="Disabled"
@@ -255,10 +194,7 @@ const setCount = (next: number) => {
         </template>
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Named by a Label"
-        content="Inside a Label, the field takes its name from the label's text, so it needs no [prop]ariaLabel[/prop], and pressing the text opens the list."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.namedLabel" />
     <PageDocsExample :path="`${DOCS_ROOT}/Labeled.vue`">
         <LabeledDocsExample />
     </PageDocsExample>

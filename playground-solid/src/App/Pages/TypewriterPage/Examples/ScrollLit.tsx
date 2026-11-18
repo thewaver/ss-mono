@@ -1,11 +1,10 @@
 import { createSignal } from "solid-js";
 
 import { ElementObserverSolidUtils, Typewriter } from "@thewaver/ss-components-solid";
+import { SCROLL_LIT_TEXT } from "@thewaver/ss-playground/App/Pages/TypewriterPage/TypewriterPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/TypewriterPage/TypewriterPage.css";
 import { TypewriterPageUtils } from "@thewaver/ss-playground/App/Pages/TypewriterPage/TypewriterPage.utils";
 
-const TEXT =
-    "Every word here waits, dimmed, until it reaches the middle of the box, then lights up in reading order as it passes — and dims again on the way back down.";
 const LIT_BAND_PX = 24;
 const CHARACTER_DELAY_MS = 30;
 const CHARACTER_DURATION_MS = 400;
@@ -32,7 +31,7 @@ export const ScrollLitExample = () => {
                     animationDelayMs={CHARACTER_DELAY_MS}
                     animationDurationMs={CHARACTER_DURATION_MS}
                 >
-                    {TEXT}
+                    {SCROLL_LIT_TEXT}
                 </Typewriter>
             </div>
         </div>

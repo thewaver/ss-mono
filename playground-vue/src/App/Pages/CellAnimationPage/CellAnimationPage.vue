@@ -184,12 +184,7 @@ const examples: ExampleDefs[] = [
     <div :class="styles.root">
         <PagePropsGroups>
             <PagePropsPanel scope="sample">
-                <PageProp
-                    item-key="sourceKind"
-                    controls="Picks the kind of example picture sent to CellAnimationProps.src"
-                    label="Source"
-                    hint="What the cells are cut from, in the first example and the stress test: a photograph, or one of the Shape page's gradients or patterns drawn into a picture. Choosing one brings its own knobs with it."
-                >
+                <PageProp item-key="sourceKind" v-bind="CellAnimationKnobs.SOURCE_KIND_TEXT">
                     <PageSelectField
                         :value="sourceKind"
                         :values="CellAnimationKnobs.SOURCE_KINDS"
@@ -198,22 +193,14 @@ const examples: ExampleDefs[] = [
                     />
                 </PageProp>
 
-                <PageProp
-                    v-if="sourceKind === 'image'"
-                    item-key="image"
-                    controls="Picks the example picture sent to CellAnimationProps.src"
-                    label="Image"
-                    hint="Swaps in a picture of your own, so the cells can be watched against something other than the sample."
-                >
+                <PageProp v-if="sourceKind === 'image'" item-key="image" v-bind="CellAnimationKnobs.IMAGE_TEXT">
                     <PageFileField accept="image/*" ariaLabel="Image" @pick="pickImage" />
                 </PageProp>
 
                 <PageProp
                     v-if="sourceKind === 'gradient'"
                     item-key="gradient"
-                    controls="Picks the gradient drawn into the example picture sent to CellAnimationProps.src"
-                    label="Gradient"
-                    hint="Which animated gradient is rendered into the picture the cells are cut from."
+                    v-bind="CellAnimationKnobs.GRADIENT_TEXT"
                 >
                     <PageSelectField
                         :value="gradientKey"
@@ -223,13 +210,7 @@ const examples: ExampleDefs[] = [
                     />
                 </PageProp>
 
-                <PageProp
-                    v-if="sourceKind === 'pattern'"
-                    item-key="pattern"
-                    controls="Picks the pattern drawn into the example picture sent to CellAnimationProps.src"
-                    label="Pattern"
-                    hint="Which repeating pattern is rendered into the picture the cells are cut from."
-                >
+                <PageProp v-if="sourceKind === 'pattern'" item-key="pattern" v-bind="CellAnimationKnobs.PATTERN_TEXT">
                     <PageSelectField
                         :value="patternKey"
                         :values="SVGDefsSources.PATTERN_KEYS"
@@ -241,9 +222,7 @@ const examples: ExampleDefs[] = [
                 <PageProp
                     v-if="sourceKind !== 'image'"
                     item-key="sourceRatio"
-                    controls="Sets the shape of the example picture sent to CellAnimationProps.src"
-                    label="Ratio"
-                    hint="The shape of the picture the gradient or pattern is drawn into, which decides how the cells are proportioned."
+                    v-bind="CellAnimationKnobs.SOURCE_RATIO_TEXT"
                 >
                     <PageSelectField
                         :value="sourceRatio"
@@ -257,12 +236,7 @@ const examples: ExampleDefs[] = [
             <PagePropsDivider />
 
             <PagePropsPanel scope="global">
-                <PageProp
-                    item-key="cellCountCols"
-                    controls="Sets CellAnimationProps.cellCount"
-                    label="Cell count (cols x rows)"
-                    hint="How many columns and rows the picture is cut into. More cells is a finer animation and more work per frame."
-                >
+                <PageProp item-key="cellCountCols" v-bind="CellAnimationKnobs.CELL_COUNT_COLS_TEXT">
                     <div :class="styles.valueList">
                         <PageNumberField
                             :value="cellCount.col"
@@ -283,12 +257,7 @@ const examples: ExampleDefs[] = [
                     </div>
                 </PageProp>
 
-                <PageProp
-                    item-key="originType"
-                    controls="Picks the point the example's weights are measured from, sent to CellAnimationProps.computeSliceWeights"
-                    label="Origin"
-                    hint="Where in the grid the animation starts from. It only applies to weights that are measured from a point."
-                >
+                <PageProp item-key="originType" v-bind="CellAnimationKnobs.ORIGIN_TYPE_TEXT">
                     <PageSelectField
                         :value="originType"
                         :values="CellAnimationOrigins.ORIGIN_TYPES"
@@ -298,12 +267,7 @@ const examples: ExampleDefs[] = [
                     />
                 </PageProp>
 
-                <PageProp
-                    item-key="weightType"
-                    controls="Picks the example's weight function sent to CellAnimationProps.computeSliceWeights"
-                    label="Weight"
-                    hint="How each cell's turn is decided: its distance from the origin, a wave, a random draw, and so on."
-                >
+                <PageProp item-key="weightType" v-bind="CellAnimationKnobs.WEIGHT_TYPE_TEXT">
                     <PageGroupedSelectField
                         :value="weightType"
                         :groups="GROUPPED_WEIGHTS"
@@ -312,12 +276,7 @@ const examples: ExampleDefs[] = [
                     />
                 </PageProp>
 
-                <PageProp
-                    item-key="uniqueWeights"
-                    controls="Sets WeightOpts.shouldMakeUnique"
-                    label="Unique weights"
-                    hint="Gives every cell a turn of its own, so no two move together even where the weight would have tied them."
-                >
+                <PageProp item-key="uniqueWeights" v-bind="CellAnimationKnobs.UNIQUE_WEIGHTS_TEXT">
                     <PageCheckField
                         :value="!!weightOpts.shouldMakeUnique"
                         ariaLabel="Unique weights"
@@ -325,12 +284,7 @@ const examples: ExampleDefs[] = [
                     />
                 </PageProp>
 
-                <PageProp
-                    item-key="normalizeWeights"
-                    controls="Sets WeightOpts.shouldNormalize"
-                    label="Normalize weights"
-                    hint="Spreads the weights out to fill the whole run, so the first cell starts at the beginning and the last ends at the end."
-                >
+                <PageProp item-key="normalizeWeights" v-bind="CellAnimationKnobs.NORMALIZE_WEIGHTS_TEXT">
                     <PageCheckField
                         :value="!!weightOpts.shouldNormalize"
                         ariaLabel="Normalize weights"
@@ -338,12 +292,7 @@ const examples: ExampleDefs[] = [
                     />
                 </PageProp>
 
-                <PageProp
-                    item-key="animationType"
-                    controls="Picks the example's cell keyframes sent to CellAnimationProps.computeSliceAnimation"
-                    label="Animation"
-                    hint="What each cell actually does on its turn: fade, slide, spin, and the rest."
-                >
+                <PageProp item-key="animationType" v-bind="CellAnimationKnobs.ANIMATION_TYPE_TEXT">
                     <PageGroupedSelectField
                         :value="animationType"
                         :groups="GROUPPED_ANIMATIONS"
@@ -352,12 +301,7 @@ const examples: ExampleDefs[] = [
                     />
                 </PageProp>
 
-                <PageProp
-                    item-key="direction"
-                    controls="Sets SliceAnimationBreakpointOpts.dir"
-                    label="Direction"
-                    hint="Which way the run travels through the weights, and so which cells go first."
-                >
+                <PageProp item-key="direction" v-bind="CellAnimationKnobs.DIRECTION_TEXT">
                     <PageSelectField
                         :value="breakpointOpts.dir!"
                         :values="SliceAnimationBreakpoints.DIRECTIONS"
@@ -366,12 +310,7 @@ const examples: ExampleDefs[] = [
                     />
                 </PageProp>
 
-                <PageProp
-                    item-key="easing"
-                    controls="Sets SliceAnimationBreakpointOpts.easing"
-                    label="Easing"
-                    hint="The speed curve a single cell follows from its start to its finish."
-                >
+                <PageProp item-key="easing" v-bind="CellAnimationKnobs.EASING_TEXT">
                     <PageSelectField
                         :value="breakpointOpts.easing!"
                         :values="SliceAnimationBreakpoints.EASINGS"
@@ -380,12 +319,7 @@ const examples: ExampleDefs[] = [
                     />
                 </PageProp>
 
-                <PageProp
-                    item-key="smoothness01"
-                    controls="Sets SliceAnimationBreakpointOpts.smoothness"
-                    label="Smoothness (0-1)"
-                    hint="How much a cell's own movement overlaps its neighbors'. 0 makes each cell wait its turn; 1 blurs them into one sweep."
-                >
+                <PageProp item-key="smoothness01" v-bind="CellAnimationKnobs.SMOOTHNESS01_TEXT">
                     <PageNumberField
                         :value="breakpointOpts.smoothness!"
                         :min="CellAnimationKnobs.MIN_SMOOTHNESS"
@@ -396,12 +330,7 @@ const examples: ExampleDefs[] = [
                     />
                 </PageProp>
 
-                <PageProp
-                    item-key="animationDurationMs"
-                    controls="Sets CellAnimationProps.animationDurationMs"
-                    label="Animation duration (ms)"
-                    hint="How long one pass over the whole grid takes."
-                >
+                <PageProp item-key="animationDurationMs" v-bind="CellAnimationKnobs.ANIMATION_DURATION_MS_TEXT">
                     <PageNumberField
                         :value="animationDurationMs"
                         :min="CellAnimationKnobs.MIN_DURATION_MS"
@@ -414,9 +343,7 @@ const examples: ExampleDefs[] = [
 
                 <PageProp
                     item-key="animationIterationDelayMs"
-                    controls="Sets CellAnimationProps.animationIterationDelayMs"
-                    label="Iteration delay (ms)"
-                    hint="How long the grid waits between one pass and the next."
+                    v-bind="CellAnimationKnobs.ANIMATION_ITERATION_DELAY_MS_TEXT"
                 >
                     <PageNumberField
                         :value="animationIterationDelayMs"
@@ -428,12 +355,7 @@ const examples: ExampleDefs[] = [
                     />
                 </PageProp>
 
-                <PageProp
-                    item-key="animationIterationCount"
-                    controls="Sets CellAnimationProps.animationIterationCount, with -1 sent as Infinity"
-                    label="Iteration count (-1 = endless)"
-                    hint="How many passes to run. -1 means it never stops, and 0 shows the final frame at once."
-                >
+                <PageProp item-key="animationIterationCount" v-bind="CellAnimationKnobs.ANIMATION_ITERATION_COUNT_TEXT">
                     <PageNumberField
                         :value="animationIterationCount"
                         :min="CellAnimationKnobs.MIN_ITERATION_COUNT"
@@ -444,12 +366,7 @@ const examples: ExampleDefs[] = [
                     />
                 </PageProp>
 
-                <PageProp
-                    item-key="finalFrame"
-                    controls="Sets CellAnimationProps.finalFrame"
-                    label="Final frame is"
-                    hint="What the grid is left showing once the passes are done. It has nothing to settle on while the run is endless."
-                >
+                <PageProp item-key="finalFrame" v-bind="CellAnimationKnobs.FINAL_FRAME_TEXT">
                     <PageSelectField
                         :value="finalFrame"
                         :values="CELL_ANIMATION_FINAL_FRAMES"
@@ -459,12 +376,7 @@ const examples: ExampleDefs[] = [
                     />
                 </PageProp>
 
-                <PageProp
-                    item-key="playbackDir"
-                    controls="Sets SliceAnimationPlaybackOpts.dir"
-                    label="Playback direction"
-                    hint="Whether each pass runs one way, or goes out and comes back. Coming back, stack starts with the last cell to arrive and pipe with the first."
-                >
+                <PageProp item-key="playbackDir" v-bind="CellAnimationKnobs.PLAYBACK_DIR_TEXT">
                     <PageSelectField
                         :value="playbackOpts.dir!"
                         :values="SliceAnimationPlayback.DIRECTIONS"
@@ -473,12 +385,7 @@ const examples: ExampleDefs[] = [
                     />
                 </PageProp>
 
-                <PageProp
-                    item-key="holdMs"
-                    controls="Sets SliceAnimationPlaybackOpts.holdMs"
-                    label="Hold at far end (ms)"
-                    hint="How long the grid rests at the far end before turning back. It only applies to stack and pipe, which come back."
-                >
+                <PageProp item-key="holdMs" v-bind="CellAnimationKnobs.HOLD_MS_TEXT">
                     <PageNumberField
                         :value="playbackOpts.holdMs!"
                         :min="CellAnimationKnobs.MIN_HOLD_MS"

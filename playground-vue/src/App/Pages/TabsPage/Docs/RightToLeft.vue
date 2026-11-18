@@ -6,6 +6,7 @@ import {
     PANEL_BODIES,
     RIGHT_TO_LEFT_TABS,
     ROW_TAB_GAP,
+    SWITCH_DIRECTION_LABEL,
     getPanelId,
     getTabId,
 } from "@thewaver/ss-playground/App/Pages/TabsPage/TabsPage.const";
@@ -65,9 +66,9 @@ const switchDirection = () => {
             }}</PageTabPanel>
         </div>
 
-        <Button id="switchDirection" ariaLabel="Switch the direction" @click="switchDirection">
+        <Button id="switchDirection" :ariaLabel="SWITCH_DIRECTION_LABEL" @click="switchDirection">
             <template #renderContent="flags">
-                <PageControlButtonContent :flags="flags">Switch the direction</PageControlButtonContent>
+                <PageControlButtonContent :flags="flags">{{ SWITCH_DIRECTION_LABEL }}</PageControlButtonContent>
             </template>
         </Button>
     </div>

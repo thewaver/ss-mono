@@ -3,7 +3,10 @@ import { shallowRef } from "vue";
 
 import { TagInput } from "@thewaver/ss-components-vue";
 import { computeTagAriaLabel } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
-import { STARTING_TAGS } from "@thewaver/ss-playground/App/Pages/TagInputPage/TagInputPage.const";
+import {
+    STARTING_TAGS,
+    TOPICS_RIGHT_LEFT_BOX_LABEL,
+} from "@thewaver/ss-playground/App/Pages/TagInputPage/TagInputPage.const";
 import {
     FIELD_GAP,
     FIELD_HEIGHT,
@@ -21,7 +24,7 @@ const value = shallowRef(STARTING_TAGS);
     <div dir="rtl">
         <TagInput
             v-model:value="value"
-            ariaLabel="Topics in a right-to-left box"
+            :ariaLabel="TOPICS_RIGHT_LEFT_BOX_LABEL"
             :gap="FIELD_GAP"
             :padding="FIELD_PADDING"
             :min-height="FIELD_HEIGHT"

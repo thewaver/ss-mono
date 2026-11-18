@@ -3,7 +3,10 @@ import { shallowRef } from "vue";
 
 import { Accordion, Button } from "@thewaver/ss-components-vue";
 import type { AccordionItem } from "@thewaver/ss-components-vue";
-import { DOCS_GAP } from "@thewaver/ss-playground/App/Pages/Accordions/AccordionPage/AccordionPage.const";
+import {
+    DOCS_GAP,
+    ENABLED_SECTION_BODIES,
+} from "@thewaver/ss-playground/App/Pages/Accordions/AccordionPage/AccordionPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/Accordions/Accordions.css";
 
 import PageControlRow from "../../../../PageComponents/ControlRow/PageControlRow.vue";
@@ -11,12 +14,6 @@ import PageAccordionHeader from "../../../../StyledComponents/AccordionContent/P
 import PageAccordionPanel from "../../../../StyledComponents/AccordionContent/PageAccordionPanel.vue";
 import PageAccordionWrapper from "../../../../StyledComponents/AccordionContent/PageAccordionWrapper.vue";
 import PageButtonContent from "../../../../StyledComponents/ButtonContent/ButtonContent.vue";
-
-const SECTION_BODIES: Record<string, string[]> = {
-    Shipping: ["Orders leave the warehouse within two working days.", "Tracking arrives by email."],
-    Returns: ["Thirty days, unopened, receipt or order number."],
-    Warranty: ["Two years against manufacturing defects."],
-};
 
 const ITEMS: AccordionItem<string>[] = [{ value: "Shipping" }, { value: "Returns" }, { value: "Warranty" }];
 
@@ -39,7 +36,7 @@ const expanded = shallowRef<string[]>(["Shipping"]);
                     :visibility-target="visibilityTarget"
                     :transition-duration-ms="transitionDurationMs"
                 >
-                    <div v-for="line in SECTION_BODIES[item.value]" :key="line">{{ line }}</div>
+                    <div v-for="line in ENABLED_SECTION_BODIES[item.value]" :key="line">{{ line }}</div>
                 </PageAccordionPanel>
             </template>
         </Accordion>

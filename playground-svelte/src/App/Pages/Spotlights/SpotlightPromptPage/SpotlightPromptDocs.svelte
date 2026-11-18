@@ -10,6 +10,7 @@
     import PageNumberField from "../../../PageComponents/Field/PageNumberField.svelte";
     import PageProp from "../../../PageComponents/Prop/Prop.svelte";
     import BasicDocsExample from "./Docs/Basic.svelte";
+    import { SpotlightPromptKnobs } from "@thewaver/ss-playground/App/Knobs/SpotlightPrompts.const";
 
     let padding = $state(PADDING);
     let transitionDurationMs = $state(SPOTLIGHT_DEFAULTS.transitionDurationMs);
@@ -29,9 +30,7 @@
     {#snippet renderKnobs()}
         <PageProp
             itemKey={"padding"}
-            label={"Padding (px)"}
-            hint={"How much room is left around the lit element, so the hole is not cut tight against it."}
-            controls={"Sets SpotlightPromptProps.padding"}
+            {...SpotlightPromptKnobs.PADDING_TEXT}
         >
             <PageNumberField
                 value={padding}
@@ -48,9 +47,7 @@
 
         <PageProp
             itemKey={"transitionDurationMs"}
-            label={"Transition duration (ms)"}
-            hint={"How long the prompt takes to fade in and out. At 0 it appears and goes at once."}
-            controls={"Sets SpotlightPromptProps.transitionDurationMs"}
+            {...SpotlightPromptKnobs.TRANSITION_DURATION_MS_TEXT}
         >
             <PageNumberField
                 value={transitionDurationMs}

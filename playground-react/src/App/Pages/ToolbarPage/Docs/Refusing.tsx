@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Toolbar } from "@thewaver/ss-components-react";
 import type { ToolbarAction } from "@thewaver/ss-components-react";
 import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
+import { MORE_DOCUMENT_ACTIONS_LABEL } from "@thewaver/ss-playground/App/Pages/ToolbarPage/ToolbarPage.const";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
 import { PageMenuTriggerContent } from "../../../StyledComponents/MenuTriggerContent/MenuTriggerContent";
@@ -28,7 +29,7 @@ export const RefusingDocsExample = () => {
                 <Toolbar
                     actions={ACTIONS}
                     ariaLabel={"Document"}
-                    overflowAriaLabel={"More document actions"}
+                    overflowAriaLabel={MORE_DOCUMENT_ACTIONS_LABEL}
                     renderAction={(action, flags) => (
                         <PageButtonContent flags={flags}>{action.value}</PageButtonContent>
                     )}

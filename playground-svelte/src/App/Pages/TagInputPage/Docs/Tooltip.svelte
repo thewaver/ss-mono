@@ -2,7 +2,7 @@
     import type { ShapeArrowAim } from "@thewaver/ss-utils";
     import { TagInput } from "@thewaver/ss-components-svelte";
     import { computeTagAriaLabel } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
-    import { STARTING_TAGS } from "@thewaver/ss-playground/App/Pages/TagInputPage/TagInputPage.const";
+    import { STARTING_TAGS, DISABLED_BUT_REACHABLE_TOPICS_LABEL } from "@thewaver/ss-playground/App/Pages/TagInputPage/TagInputPage.const";
     import {
         FIELD_GAP,
         FIELD_HEIGHT,
@@ -24,7 +24,7 @@
 
 <TagInput
     bind:value
-    ariaLabel={"Disabled but reachable topics"}
+    ariaLabel={DISABLED_BUT_REACHABLE_TOPICS_LABEL}
     gap={FIELD_GAP}
     padding={FIELD_PADDING}
     minHeight={FIELD_HEIGHT}

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, shallowRef, useModel } from "vue";
 
+import { CellAnimationKnobs } from "@thewaver/ss-playground/App/Knobs/CellAnimations.const";
 import {
     STRESS_CELL_COUNT,
     STRESS_HOLD_MS,
@@ -52,12 +53,7 @@ const pause = () => {
     <div>{{ `${STRESS_CELL_COUNT.col} x ${STRESS_CELL_COUNT.row} cells` }}</div>
 
     <PagePropsPanel scope="local" :has-reset="false">
-        <PageProp
-            item-key="onGraphicsCard"
-            label="On the graphics card"
-            hint="Draws the stress test's cells in one canvas per item, with the keyframes worked out on the graphics card. Off, every cell is an element of its own."
-            controls="Sets CellAnimationProps.renderer in the stress test"
-        >
+        <PageProp item-key="onGraphicsCard" v-bind="CellAnimationKnobs.ON_GRAPHICS_CARD_TEXT">
             <PageCheckField
                 :value="isOnGraphicsCard"
                 ariaLabel="On the graphics card"

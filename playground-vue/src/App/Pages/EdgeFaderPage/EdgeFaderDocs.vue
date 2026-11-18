@@ -4,7 +4,11 @@ import { shallowRef } from "vue";
 import { EDGE_FADER_DEFAULTS } from "@thewaver/ss-components-vue";
 import type { EdgeFaderEdge } from "@thewaver/ss-components-vue";
 import { EdgeFaderKnobs } from "@thewaver/ss-playground/App/Knobs/EdgeFaders.const";
-import { DOCS_ROOT, EDGE_LABELS } from "@thewaver/ss-playground/App/Pages/EdgeFaderPage/EdgeFaderPage.const";
+import {
+    DOCS_ROOT,
+    DOCS_SECTIONS,
+    EDGE_LABELS,
+} from "@thewaver/ss-playground/App/Pages/EdgeFaderPage/EdgeFaderPage.const";
 
 import PageDocsExample from "../../PageComponents/DocsExample/PageDocsExample.vue";
 import PageDocsSection from "../../PageComponents/DocsSection/PageDocsSection.vue";
@@ -34,12 +38,7 @@ const setHasEdge = (edge: EdgeFaderEdge, hasEdge: boolean) => {
         <BasicDocsExample :size="size" />
 
         <template #renderKnobs>
-            <PageProp
-                item-key="size"
-                label="Fade size (px)"
-                hint="How far in from each chosen side the fade reaches."
-                controls="Sets EdgeFaderProps.size"
-            >
+            <PageProp item-key="size" v-bind="EdgeFaderKnobs.SIZE_TEXT">
                 <PageNumberField
                     :value="size"
                     :min="EdgeFaderKnobs.MIN_SIZE"
@@ -52,10 +51,7 @@ const setHasEdge = (edge: EdgeFaderEdge, hasEdge: boolean) => {
         </template>
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Any mix of sides"
-        content="Pass [prop]edges[/prop] any mix of top, right, bottom and left; left out, all four fade. Where two faded sides meet, their fades meet in the corner."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.anyMixSides" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Sides.vue`">
         <SidesDocsExample :edges="edges" />
@@ -78,21 +74,13 @@ const setHasEdge = (edge: EdgeFaderEdge, hasEdge: boolean) => {
         </template>
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Fading only what is out of view"
-        content="Set [prop]isScrollAware[/prop] and a side fades only while there is more to scroll to past it. The fade shrinks as that end comes into view and is gone once it is reached, so a box whose content fits shows no fade at all."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.fadingOnlyOutOfView" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/ScrollAware.vue`">
         <ScrollAwareDocsExample :is-scroll-aware="isScrollAware" />
 
         <template #renderKnobs>
-            <PageProp
-                item-key="isScrollAware"
-                label="Scroll-aware"
-                hint="Whether a side fades only while there is more to scroll to past it."
-                controls="Sets EdgeFaderProps.isScrollAware"
-            >
+            <PageProp item-key="isScrollAware" v-bind="EdgeFaderKnobs.IS_SCROLL_AWARE_TEXT">
                 <PageCheckField
                     :value="isScrollAware"
                     ariaLabel="Scroll-aware"
@@ -102,10 +90,7 @@ const setHasEdge = (edge: EdgeFaderEdge, hasEdge: boolean) => {
         </template>
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Around something that does not scroll"
-        content="Left fixed, the default, the chosen sides fade whether or not anything scrolls, so the fade can soften the edges of any content."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.aroundNonScrolling" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Unscrolled.vue`">
         <UnscrolledDocsExample />

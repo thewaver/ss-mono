@@ -1,6 +1,7 @@
 import { createSignal } from "solid-js";
 
 import { FileInput } from "@thewaver/ss-components-solid";
+import { DISABLED_BUT_REACHABLE_ATTACHMENT_LABEL } from "@thewaver/ss-playground/App/Pages/FileInputPage/FileInputPage.const";
 
 import { PageFileInputContent } from "../../../StyledComponents/FileInputContent/FileInputContent";
 import { PageTooltipContent } from "../../../StyledComponents/TooltipContent/TooltipContent";
@@ -16,7 +17,7 @@ export const TooltipDocsExample = (props: Props) => {
             files={filesSignal}
             isDisabled={props.isDisabled}
             isReachableWhenDisabled={props.isReachableWhenDisabled}
-            ariaLabel={"Disabled but reachable attachment"}
+            ariaLabel={DISABLED_BUT_REACHABLE_ATTACHMENT_LABEL}
             renderContent={(getRenderProps) => <PageFileInputContent renderProps={getRenderProps} />}
             tooltipDefs={() => ({
                 placement: () => ({ x: "center", y: "top_out" }),

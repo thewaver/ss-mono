@@ -5,6 +5,7 @@ import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examp
 import {
     RIGHT_TO_LEFT,
     STARTING_RIGHT_TO_LEFT,
+    TWO_PANES_RIGHT_LEFT_LABEL,
 } from "@thewaver/ss-playground/App/Pages/SplitPanePage/SplitPanePage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/SplitPanePage/SplitPanePage.css";
 import { SplitPanePageUtils } from "@thewaver/ss-playground/App/Pages/SplitPanePage/SplitPanePage.utils";
@@ -25,7 +26,7 @@ export const RightToLeftDocsExample = () => {
                     <SplitPane
                         panes={RIGHT_TO_LEFT}
                         ratios={ratios}
-                        ariaLabel={"Two panes in a right-to-left box"}
+                        ariaLabel={TWO_PANES_RIGHT_LEFT_LABEL}
                         renderPane={(_pane, index) => (
                             <PageSplitPaneBox>{index === 0 ? "Navigation" : "Content"}</PageSplitPaneBox>
                         )}

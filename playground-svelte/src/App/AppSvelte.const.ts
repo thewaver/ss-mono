@@ -446,20 +446,12 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                         docs: CommandPaletteDocs,
                     },
                     {
-                        name: "FanMenu",
-                        docs: FanMenuDocs,
-                    },
-                    {
                         name: "FlyoutMenu",
                         docs: FlyoutMenuDocs,
                     },
                     {
                         name: "Menu",
                         docs: MenuDocs,
-                    },
-                    {
-                        name: "WheelMenu",
-                        docs: WheelMenuDocs,
                     },
                 ],
             },
@@ -639,6 +631,19 @@ export const MENU_CONFIGS: MenuBranchConfig[] = [
                     {
                         name: "Timeline",
                         component: TimelinePage,
+                    },
+                ],
+            },
+            {
+                name: "Menus",
+                children: [
+                    {
+                        name: "FanMenu",
+                        docs: FanMenuDocs,
+                    },
+                    {
+                        name: "WheelMenu",
+                        docs: WheelMenuDocs,
                     },
                 ],
             },

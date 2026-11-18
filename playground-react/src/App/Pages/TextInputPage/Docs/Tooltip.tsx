@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { TextInput } from "@thewaver/ss-components-react";
+import { FIELD_TOOLTIP_LABEL } from "@thewaver/ss-playground/App/Pages/TextInputPage/TextInputPage.const";
 import {
     FIELD_GAP,
     FIELD_PADDING,
@@ -22,7 +23,7 @@ export const TooltipDocsExample = (props: Props) => {
             gap={FIELD_GAP}
             isDisabled={props.isDisabled}
             isReachableWhenDisabled={props.isReachableWhenDisabled}
-            ariaLabel={"Field with a tooltip"}
+            ariaLabel={FIELD_TOOLTIP_LABEL}
             renderContent={(flags) => <PageTextFieldContent flags={flags} />}
             tooltipDefs={{
                 placement: { x: "center", y: "top_out" },

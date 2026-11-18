@@ -3,6 +3,10 @@ import { useState } from "react";
 import { Button, Form, FormField, FormSection, TextInput } from "@thewaver/ss-components-react";
 import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
 import {
+    SOME_FIELDS_NEED_ATTENTION_TEXT,
+    WE_NEED_SOMEWHERE_SEND_TEXT,
+} from "@thewaver/ss-playground/App/Pages/FormSectionPage/FormSectionPage.const";
+import {
     FIELD_GAP,
     FIELD_PADDING,
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
@@ -36,7 +40,7 @@ export const NestedDocsExample = () => {
     const cardState = useState("");
     const [outcome, setOutcome] = useState("Not ordered yet.");
 
-    const streetMessage = streetState[0].trim().length > 0 ? "" : "We need somewhere to send it.";
+    const streetMessage = streetState[0].trim().length > 0 ? "" : WE_NEED_SOMEWHERE_SEND_TEXT;
 
     const cardMessage = /^\d{4}$/.test(cardState[0]) ? "" : `The last ${CARD_DIGITS} digits, and nothing else.`;
 
@@ -100,7 +104,7 @@ export const NestedDocsExample = () => {
                     </PageFormButtons>
 
                     <div className={exampleStyles.exampleReadout} data-readout>
-                        {`${state.isValid ? "Ready to send." : "Some fields need attention."} ${outcome}`}
+                        {`${state.isValid ? "Ready to send." : SOME_FIELDS_NEED_ATTENTION_TEXT} ${outcome}`}
                     </div>
                 </PageFormStack>
             )}

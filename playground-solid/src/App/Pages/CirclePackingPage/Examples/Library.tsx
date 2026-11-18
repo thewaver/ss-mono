@@ -2,6 +2,7 @@ import { CirclePacking, TreemapUtils } from "@thewaver/ss-components-solid";
 import type { CirclePackingNode } from "@thewaver/ss-components-solid";
 import { LIBRARY } from "@thewaver/ss-playground/App/LibraryTree.generated";
 import { formatLines } from "@thewaver/ss-playground/App/LibraryTree.utils";
+import { LIBRARY_S_SOURCE_LINES_LABEL } from "@thewaver/ss-playground/App/Pages/CirclePackingPage/CirclePackingPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/CirclePackingPage/CirclePackingPage.css";
 
 import {
@@ -25,7 +26,7 @@ export const LibraryExample = (props: Props) => {
                     branch={props.branch}
                     padding={props.padding}
                     zoomDurationMs={props.zoomDurationMs}
-                    ariaLabel={"The library's source, by lines of code"}
+                    ariaLabel={LIBRARY_S_SOURCE_LINES_LABEL}
                     renderCircle={(getNode, getState) => (
                         <PageCirclePackingCircle
                             state={getState}

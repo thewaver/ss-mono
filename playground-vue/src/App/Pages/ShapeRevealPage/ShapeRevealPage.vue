@@ -63,12 +63,7 @@ const examples: ExampleDefs[] = [
 
 <template>
     <PagePropsPanel scope="global">
-        <PageProp
-            item-key="durationMs"
-            controls="Sets ShapeRevealOpts.durationMs"
-            label="Duration (ms)"
-            hint="How long the circle takes to grow over the whole window. 0 switches the theme at once, as does the system's reduced-motion setting."
-        >
+        <PageProp item-key="durationMs" v-bind="ShapeRevealKnobs.DURATION_MS_TEXT">
             <PageNumberField
                 :value="durationMs"
                 :min="ShapeRevealKnobs.MIN_DURATION_MS"
@@ -97,12 +92,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="computePoints"
-            controls="Picks the example contour sent to ShapeRevealOpts.computePoints"
-            label="Shape"
-            hint="The contour that grows over the window. A circle is what the reveal draws when none is given."
-        >
+        <PageProp item-key="computePoints" v-bind="ShapeRevealKnobs.COMPUTE_POINTS_TEXT">
             <PageSelectField
                 :value="shape"
                 :values="ShapeRevealKnobs.SHAPES"
@@ -112,12 +102,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="softness"
-            controls="Sets ShapeRevealOpts.softness"
-            label="Softness"
-            hint="How gradually the growing shape's edge fades, as a share of the distance it grows. 0 gives a hard edge."
-        >
+        <PageProp item-key="softness" v-bind="ShapeRevealKnobs.SOFTNESS_TEXT">
             <PageNumberField
                 :value="softness"
                 :min="ShapeRevealKnobs.MIN_SOFTNESS"
@@ -129,12 +114,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="startDegrees"
-            controls="Sets ShapeRevealOpts.startDegrees"
-            label="Start angle (°)"
-            hint="The shape's angle as it starts to grow, clockwise. With the end angle the same, the shape is only tilted. A circle looks the same at any angle."
-        >
+        <PageProp item-key="startDegrees" v-bind="ShapeRevealKnobs.START_DEGREES_TEXT">
             <PageNumberField
                 :value="startDegrees"
                 :min="ShapeRevealKnobs.MIN_DEGREES"
@@ -146,12 +126,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="endDegrees"
-            controls="Sets ShapeRevealOpts.endDegrees"
-            label="End angle (°)"
-            hint="The shape's angle once it covers the window. It turns from the start angle to this one as it grows, on the reveal's own timing."
-        >
+        <PageProp item-key="endDegrees" v-bind="ShapeRevealKnobs.END_DEGREES_TEXT">
             <PageNumberField
                 :value="endDegrees"
                 :min="ShapeRevealKnobs.MIN_DEGREES"

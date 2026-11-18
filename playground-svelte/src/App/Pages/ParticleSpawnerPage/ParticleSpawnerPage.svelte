@@ -330,9 +330,7 @@
     <PagePropsPanel scope={"sample"}>
         <PageProp
             itemKey={"travelPattern"}
-            controls={"Picks the example's travel path function sent to ParticleSpawnerProps.computeParticlePos"}
-            label={"Travel pattern"}
-            hint={"The path a particle takes from where it starts to where it ends. Choosing one brings its own knobs with it."}
+            {...ParticleSpawnerKnobs.TRAVEL_PATTERN_TEXT}
         >
             <PageSelectField
                 value={travelPatternKey}
@@ -361,9 +359,7 @@
     <PagePropsPanel scope={"global"}>
         <PageProp
             itemKey={"particleCount"}
-            controls={"Sets ParticleSpawnerProps.particleCount"}
-            label={"Particle count"}
-            hint={"How many particles are sent on each round."}
+            {...ParticleSpawnerKnobs.PARTICLE_COUNT_TEXT}
         >
             <PageNumberField
                 value={particleCount}
@@ -378,9 +374,7 @@
 
         <PageProp
             itemKey={"travelDurationMs"}
-            controls={"Sets ParticleSpawnerProps.travelDurationMs"}
-            label={"Travel (ms)"}
-            hint={"How long one particle takes to walk its path."}
+            {...ParticleSpawnerKnobs.TRAVEL_DURATION_MS_TEXT}
         >
             <PageNumberField
                 value={travelDurationMs}
@@ -395,9 +389,7 @@
 
         <PageProp
             itemKey={"restDurationMs"}
-            controls={"Sets ParticleSpawnerProps.restDurationMs"}
-            label={"Rest duration (ms)"}
-            hint={"How long a particle stays put at the end of its path before it disappears."}
+            {...ParticleSpawnerKnobs.REST_DURATION_MS_TEXT}
         >
             <PageNumberField
                 value={restDurationMs}
@@ -412,9 +404,7 @@
 
         <PageProp
             itemKey={"spawnDelayMs"}
-            controls={"Sets ParticleSpawnerProps.spawnDelayMs"}
-            label={"Spawn delay (ms)"}
-            hint={"How long each particle waits after the one before it sets off, which is what staggers them."}
+            {...ParticleSpawnerKnobs.SPAWN_DELAY_MS_TEXT}
         >
             <PageNumberField
                 value={spawnDelayMs}
@@ -429,9 +419,7 @@
 
         <PageProp
             itemKey={"iterationPattern"}
-            controls={"Picks the example's list of rounds sent to ParticleSpawnerProps.spawnIterationPatterns"}
-            label={"Iteration pattern"}
-            hint={"How the rounds follow each other: in bursts of three with a pause, one at a time with a pause, or without any pause at all."}
+            {...ParticleSpawnerKnobs.ITERATION_PATTERN_TEXT}
         >
             <PageSelectField
                 value={iterationPatternKey}
@@ -444,9 +432,7 @@
 
         <PageProp
             itemKey={"overshootPercent"}
-            controls={"Sets how far the example's travel path runs past its end, sent to ParticleSpawnerProps.computeParticlePos"}
-            label={"Overshoot (%)"}
-            hint={"How far a particle runs past its destination before coming back to it. 0 stops it dead on target."}
+            {...ParticleSpawnerKnobs.OVERSHOOT_PERCENT_TEXT}
         >
             <PageNumberField
                 value={overshootPercent}
@@ -474,9 +460,7 @@
 
         <PageProp
             itemKey={"travelEasing"}
-            controls={"Picks the speed curve of the example's travel path, sent to ParticleSpawnerProps.computeParticlePos"}
-            label={"Travel easing"}
-            hint={"The speed curve a particle follows along its path."}
+            {...ParticleSpawnerKnobs.TRAVEL_EASING_TEXT}
         >
             <PageSelectField
                 value={travelEasingKey}

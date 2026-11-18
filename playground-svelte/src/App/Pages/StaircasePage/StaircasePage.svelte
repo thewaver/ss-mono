@@ -61,7 +61,7 @@
 {/snippet}
 
 <PagePropsPanel scope={"global"}>
-    <PageProp itemKey={"stepCount"} controls={"Sets the length of the slice of example steps sent to StaircaseProps.steps"} label={"Steps"} hint={"How many steps the staircase holds."}>
+    <PageProp itemKey={"stepCount"} {...StaircaseKnobs.STEP_COUNT_TEXT}>
         <PageNumberField
             value={stepCount}
             min={StaircaseKnobs.MIN_STEP_COUNT}
@@ -75,7 +75,7 @@
         />
     </PageProp>
 
-    <PageProp itemKey={"indent"} controls={"Sets StaircaseProps.indent"} label={"Indent (px)"} hint={"How far one step is set in from the one before it."}>
+    <PageProp itemKey={"indent"} {...StaircaseKnobs.INDENT_TEXT}>
         <PageNumberField
             value={indent}
             min={StaircaseKnobs.MIN_INDENT}
@@ -89,7 +89,7 @@
         />
     </PageProp>
 
-    <PageProp itemKey={"gap"} controls={"Sets StaircaseProps.gap"} label={"Gap (px)"} hint={"The space between one step and the next."}>
+    <PageProp itemKey={"gap"} {...StaircaseKnobs.GAP_TEXT}>
         <PageNumberField
             value={gap}
             min={StaircaseKnobs.MIN_GAP}
@@ -103,7 +103,7 @@
         />
     </PageProp>
 
-    <PageProp itemKey={"dir"} controls={"Sets StaircaseProps.dir"} label={"Direction"} hint={"Which way the staircase runs."}>
+    <PageProp itemKey={"dir"} {...StaircaseKnobs.DIR_TEXT}>
         <PageSelectField
             value={dir}
             values={STAIRCASE_DIRS}
@@ -117,9 +117,7 @@
 
     <PageProp
         itemKey={"indentKey"}
-        controls={"Picks the sample indent function sent to StaircaseProps.computeStepIndent"}
-        label={"Indent function"}
-        hint={"How the indent grows down the run: evenly, faster and faster, or in and out again."}
+        {...StaircaseKnobs.INDENT_KEY_TEXT}
     >
         <PageSelectField
             value={indentKey}

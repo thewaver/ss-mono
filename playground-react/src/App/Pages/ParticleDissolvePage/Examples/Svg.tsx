@@ -5,6 +5,7 @@ import {
     ASH_ANIMATION,
     ASH_SRC,
     NO_EDGE_THICKNESSES,
+    SHAPE_DISSOLVES_LABEL,
     SVG_LABEL,
     SVG_SIZE,
 } from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.const";
@@ -44,7 +45,7 @@ export const SvgExample = (props: Props) => {
                     width={SVG_SIZE.width}
                     height={SVG_SIZE.height}
                     role="img"
-                    aria-label={"The shape that dissolves"}
+                    aria-label={SHAPE_DISSOLVES_LABEL}
                 >
                     <path className={styles.svgShapePath} d={path} />
                     <text className={styles.svgShapeText} x={"50%"} y={"50%"}>

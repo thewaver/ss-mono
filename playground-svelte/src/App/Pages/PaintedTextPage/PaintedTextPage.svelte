@@ -186,9 +186,7 @@
         <PagePropsPanel scope={"global"}>
             <PageProp
                 itemKey={"strokeWidth"}
-                controls={"Sets PaintedTextProps.strokeWidth"}
-                label={"Stroke width (px)"}
-                hint={"How wide the stroke appears, whichever side of the letter's edge it sits on."}
+                {...PaintedTextKnobs.STROKE_WIDTH_TEXT}
             >
                 <PageNumberField
                     value={strokeWidth}
@@ -204,9 +202,7 @@
 
             <PageProp
                 itemKey={"strokeAlignment"}
-                controls={"Sets PaintedTextProps.strokeAlignment"}
-                label={"Stroke alignment"}
-                hint={"Where the stroke sits against the edge of each letter: outside keeps the letters their full shape, inside keeps the text its overall size, and center straddles the edge."}
+                {...PaintedTextKnobs.STROKE_ALIGNMENT_TEXT}
             >
                 <PageSelectField
                     value={strokeAlignment}
@@ -220,9 +216,7 @@
 
             <PageProp
                 itemKey={"colors"}
-                controls={"Sets the colors of the example paints sent to PaintedTextProps.computeFillDefs and PaintedTextProps.computeStrokeDefs"}
-                label={"Colors"}
-                hint={"The colors the fill and the stroke are built from. Each sample uses as many as it needs."}
+                {...PaintedTextKnobs.COLORS_TEXT}
             >
                 <div class={styles.colorList}>
                     {#each colorKeys as key (key)}
@@ -239,9 +233,7 @@
 
             <PageProp
                 itemKey={"blurWidth"}
-                controls={"Sets the blur of the example paints sent to PaintedTextProps.computeFillDefs and PaintedTextProps.computeStrokeDefs"}
-                label={"Blur (px)"}
-                hint={"How far the paint is blurred outward, which is what gives it its glow."}
+                {...PaintedTextKnobs.BLUR_WIDTH_TEXT}
             >
                 <PageNumberField
                     value={blurWidth}
@@ -258,9 +250,7 @@
             {#if usesTiming}
                 <PageProp
                     itemKey={"animationDurationMs"}
-                    controls={"Sets the duration of the example paints sent to PaintedTextProps.computeFillDefs and PaintedTextProps.computeStrokeDefs"}
-                    label={"Animation duration (ms)"}
-                    hint={"How long one pass of the fill or stroke animation takes."}
+                    {...PaintedTextKnobs.ANIMATION_DURATION_MS_TEXT}
                 >
                     <PageNumberField
                         value={animationDurationMs}
@@ -276,9 +266,7 @@
 
                 <PageProp
                     itemKey={"iterationConfigKey"}
-                    controls={"Picks how the example paints repeat, sent to PaintedTextProps.computeFillDefs and PaintedTextProps.computeStrokeDefs"}
-                    label={"Iteration Pattern"}
-                    hint={"How the animation repeats: once, endlessly, or back and forth."}
+                    {...PaintedTextKnobs.ITERATION_CONFIG_KEY_TEXT}
                 >
                     <PageSelectField
                         value={iterationConfigKey}
@@ -294,9 +282,7 @@
             {#if usesPattern}
                 <PageProp
                     itemKey={"cellSize"}
-                    controls={"Sets the tile size of the example paints sent to PaintedTextProps.computeFillDefs and PaintedTextProps.computeStrokeDefs"}
-                    label={"Pattern Cell Size (px)"}
-                    hint={"How large one tile of a pattern is before it repeats."}
+                    {...PaintedTextKnobs.CELL_SIZE_TEXT}
                 >
                     <PageNumberField
                         value={cellSize}

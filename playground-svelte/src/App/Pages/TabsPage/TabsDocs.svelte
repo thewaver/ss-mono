@@ -1,7 +1,7 @@
 <script lang="ts">
     import type { TabsOrientation } from "@thewaver/ss-components-svelte";
     import { TABS_DEFAULTS, TABS_ORIENTATIONS } from "@thewaver/ss-components-svelte";
-    import { DOCS_ROOT } from "@thewaver/ss-playground/App/Pages/TabsPage/TabsPage.const";
+    import { DOCS_SECTIONS, DOCS_ROOT } from "@thewaver/ss-playground/App/Pages/TabsPage/TabsPage.const";
 
     import PageDocsExample from "../../PageComponents/DocsExample/PageDocsExample.svelte";
     import PageDocsSection from "../../PageComponents/DocsSection/PageDocsSection.svelte";
@@ -16,6 +16,7 @@
     import HoverPillDocsExample from "./Docs/HoverPill.svelte";
     import LinksDocsExample from "./Docs/Links.svelte";
     import RightToLeftDocsExample from "./Docs/RightToLeft.svelte";
+    import { TabKnobs } from "@thewaver/ss-playground/App/Knobs/Tabs.const";
 
     let orientation = $state<TabsOrientation>(TABS_DEFAULTS.orientation);
     let isDisabled = $state(false);
@@ -30,9 +31,7 @@
     {#snippet renderKnobs()}
         <PageProp
             itemKey={"orientation"}
-            label={"Orientation"}
-            hint={"Whether the tabs run across the page or down it, which also decides which arrow keys walk them: left and right in a row, up and down in a column."}
-            controls={"Sets TabsProps.orientation"}
+            {...TabKnobs.ORIENTATION_TEXT}
         >
             <PageSelectField
                 value={orientation}
@@ -46,9 +45,7 @@
 
         <PageProp
             itemKey={"isDisabled"}
-            label={"Disabled"}
-            hint={"Turns every tab off: none can be selected, and the Tab key skips the list."}
-            controls={"Sets Tab.isDisabled on every example tab sent to TabsProps.tabs"}
+            {...TabKnobs.IS_DISABLED_TEXT}
         >
             <PageCheckField
                 value={isDisabled}
@@ -62,8 +59,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Right to left"}
-    content={"Inside a box whose text runs right to left, the tabs run from the right and the left arrow key moves on to the next tab. The button below switches the box's direction while the tabs are on screen, and the marker and the arrow keys follow the row as it turns round."}
+    {...DOCS_SECTIONS.rightLeft}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/RightToLeft.svelte`}>
@@ -71,8 +67,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Selecting as the arrows move"}
-    content={"By default the arrow keys move focus along the tabs, and Enter or Space selects the one focused. Set [prop]hasAutoActivation[/prop] and an arrow selects the tab it lands on as well, which suits panels already in the page. Leave it off where showing a panel is expensive, such as one that fetches, since every tab passed on the way would be shown."}
+    {...DOCS_SECTIONS.selectingArrowsMove}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Automatic.svelte`}>
@@ -81,9 +76,7 @@
     {#snippet renderKnobs()}
         <PageProp
             itemKey={"hasAutoActivation"}
-            label={"Automatic activation"}
-            hint={"Selects a tab as soon as an arrow key reaches it. Off, Enter or Space selects it."}
-            controls={"Sets TabsProps.hasAutoActivation"}
+            {...TabKnobs.HAS_AUTO_ACTIVATION_TEXT}
         >
             <PageCheckField
                 value={hasAutoActivation}
@@ -97,8 +90,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"A marker that follows the pointer"}
-    content={"Besides the marker under the selected tab, [prop]renderHighlightFloater[/prop] draws a second one that slides to whichever tab the pointer or the keyboard focus is on."}
+    {...DOCS_SECTIONS.markerThatFollowsPointer}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/HoverPill.svelte`}>
@@ -106,8 +98,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"A disabled tab"}
-    content={"A tab whose record sets [prop]isDisabled[/prop] cannot be selected, and the arrow keys walk past it. With [prop]isReachableWhenDisabled[/prop] set on the record as well, the arrow keys stop on it, so a screen reader names it and says it is unavailable; it still cannot be selected."}
+    {...DOCS_SECTIONS.disabledTab}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/DisabledTab.svelte`}>
@@ -116,9 +107,7 @@
     {#snippet renderKnobs()}
         <PageProp
             itemKey={"isReachableWhenDisabled"}
-            label={"Reachable when disabled"}
-            hint={"Lets the arrow keys stop on the disabled Metrics tab without selecting it."}
-            controls={"Sets Tab.isReachableWhenDisabled on the disabled tab"}
+            {...TabKnobs.IS_REACHABLE_WHEN_DISABLED_TEXT}
         >
             <PageCheckField
                 value={isReachableWhenDisabled}
@@ -132,8 +121,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Links"}
-    content={"Give a tab an [prop]href[/prop] and it is drawn as a native HTML anchor element, and choosing it still reports through [prop]onSelectionChange[/prop]. In a routed app, pass [prop]linkComponent[/prop], a custom link component such as your router's, and the tabs are drawn with it instead. A link needs no panel here, since the page it opens may be mounted anywhere."}
+    {...DOCS_SECTIONS.links}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Links.svelte`}>
@@ -142,9 +130,7 @@
     {#snippet renderKnobs()}
         <PageProp
             itemKey={"hasLinkComponent"}
-            label={"Custom link component"}
-            hint={"Draws the tabs with a custom link component, as a router's link would be. Off, they use the native HTML anchor element."}
-            controls={"Sets TabsProps.linkComponent"}
+            {...TabKnobs.HAS_LINK_COMPONENT_TEXT}
         >
             <PageCheckField
                 value={hasLinkComponent}
@@ -158,8 +144,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"A selection that can be cleared"}
-    content={"Set the selected value to undefined and no tab is selected: the marker plays itself out over [prop]transitionDurationMs[/prop], and plays back in once a tab is chosen again. Which panel shows meanwhile, if any, is yours to decide."}
+    {...DOCS_SECTIONS.clearableSelection}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Clearable.svelte`}>
@@ -167,8 +152,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Placed by a layout"}
-    content={"Give the list [prop]computeLayout[/prop] and the tabs are placed by a layout instead of in a row or a column, here a honeycomb. The arrow keys still walk them in the order they are written, and both markers sit behind the cell they belong to."}
+    {...DOCS_SECTIONS.placedLayout}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Honeycomb.svelte`}>

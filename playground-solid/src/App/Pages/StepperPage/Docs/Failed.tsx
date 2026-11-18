@@ -1,7 +1,13 @@
 import { createSignal } from "solid-js";
 
 import { Stepper, access } from "@thewaver/ss-components-solid";
-import { FAILED_OVERRIDES, STARTING_FAILED } from "@thewaver/ss-playground/App/Pages/StepperPage/StepperPage.const";
+import {
+    CHECKOUT_FAILURE_LABEL,
+    FAILED_OVERRIDES,
+    FAILURE_REASON,
+    LOCKED_REASON,
+    STARTING_FAILED,
+} from "@thewaver/ss-playground/App/Pages/StepperPage/StepperPage.const";
 import { StepperPageUtils } from "@thewaver/ss-playground/App/Pages/StepperPage/StepperPage.utils";
 import { LABELS, ORDER, STEPPER_GAP } from "@thewaver/ss-playground/App/Pages/StepperPage/StepperSteps.const";
 import type { StepValue } from "@thewaver/ss-playground/App/Pages/StepperPage/StepperSteps.types";
@@ -9,9 +15,6 @@ import type { StepValue } from "@thewaver/ss-playground/App/Pages/StepperPage/St
 import { PageStepConnector, PageStepContent } from "../../../StyledComponents/StepContent/StepContent";
 import { PageTooltipContent } from "../../../StyledComponents/TooltipContent/TooltipContent";
 import type { StepperDocsExampleProps } from "../StepperPageSolid.types";
-
-const FAILURE_REASON = "The card was declined, so this step has to be repeated before the order can be reviewed.";
-const LOCKED_REASON = "Review opens once payment succeeds, so there is nothing to look at here yet.";
 
 const REASONS = { failed: FAILURE_REASON, ahead: LOCKED_REASON };
 
@@ -27,7 +30,7 @@ export const FailedDocsExample = (props: Props) => {
             }
             currentValue={getCurrent}
             gap={STEPPER_GAP}
-            ariaLabel={"Checkout with a failure"}
+            ariaLabel={CHECKOUT_FAILURE_LABEL}
             computeStepAriaLabel={StepperPageUtils.describeStep}
             computeTooltipDefs={(step) => {
                 const reason = step.state === "failed" || step.state === "ahead" ? REASONS[step.state] : undefined;

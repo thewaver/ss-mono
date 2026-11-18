@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import { FileInput } from "@thewaver/ss-components-react";
 import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
+import { FILE_WHOSE_NAME_HAS_TEXT } from "@thewaver/ss-playground/App/Pages/FileInputPage/FileInputPage.const";
 
 import { PageFileInputContent } from "../../../StyledComponents/FileInputContent/FileInputContent";
 
@@ -27,7 +28,7 @@ export const RefusingDocsExample = () => {
             />
 
             <div className={exampleStyles.exampleReadout} data-readout>
-                {rejection || "A file whose name has a space in it is refused"}
+                {rejection || FILE_WHOSE_NAME_HAS_TEXT}
             </div>
         </>
     );

@@ -6,13 +6,14 @@
     import type { ToastDefs } from "../../../StyledComponents/ToastContent/ToastContentSvelte.types";
     import type { ToastsAnimationDocsExampleProps } from "../ToastsPageSvelte.types";
     import AnimationRaisers from "./AnimationRaisers.svelte";
+    import { ANIMATED_NOTIFICATIONS_LABEL } from "@thewaver/ss-playground/App/Pages/ToastsPage/ToastsPage.const";
 
     type Props = ToastsAnimationDocsExampleProps;
 
     let props: Props = $props();
 </script>
 
-<Toasts ariaLabel={"Animated notifications"} alignment={"top_left"} transitionDurationMs={props.transitionDurationMs}>
+<Toasts ariaLabel={ANIMATED_NOTIFICATIONS_LABEL} alignment={"top_left"} transitionDurationMs={props.transitionDurationMs}>
     <AnimationRaisers />
 
     {#snippet renderToast(

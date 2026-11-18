@@ -3,6 +3,10 @@ import { computed, shallowRef } from "vue";
 
 import { Button, CommandPalette } from "@thewaver/ss-components-vue";
 import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
+import {
+    MATCHING_NOTE_ACTIONS_LABEL,
+    SEARCH_NOTE_ACTIONS_LABEL,
+} from "@thewaver/ss-playground/App/Pages/Menus/CommandPalettePage/CommandPalettePage.const";
 import { CommandPalettePageUtils } from "@thewaver/ss-playground/App/Pages/Menus/CommandPalettePage/CommandPalettePage.utils";
 import {
     FIELD_GAP,
@@ -58,8 +62,8 @@ const runNoteAction = (value: string) => {
         v-model:query="query"
         :actions="actions"
         ariaLabel="Note actions"
-        fieldAriaLabel="Search the note actions"
-        listAriaLabel="Matching note actions"
+        :fieldAriaLabel="SEARCH_NOTE_ACTIONS_LABEL"
+        :listAriaLabel="MATCHING_NOTE_ACTIONS_LABEL"
         :field-padding="FIELD_PADDING"
         :field-gap="FIELD_GAP"
         @activate="runNoteAction"

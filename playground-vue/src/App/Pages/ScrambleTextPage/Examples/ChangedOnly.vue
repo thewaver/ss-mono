@@ -3,13 +3,13 @@ import { shallowRef } from "vue";
 
 import { Button, ScrambleText } from "@thewaver/ss-components-vue";
 import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
+import { BUILDS } from "@thewaver/ss-playground/App/Pages/ScrambleTextPage/ScrambleTextPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ScrambleTextPage/ScrambleTextPage.css";
 
 import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.vue";
 import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
 import type { ScrambleTextExampleProps } from "../ScrambleTextPageVue.types";
 
-const BUILDS = ["Build 1.4.2 ready", "Build 1.4.3 ready", "Build 1.4.3 RC1 ready", "Build 1.5.0 ready"];
 const BOX_WIDTH = 320;
 const FIRST_BUILD = 0;
 

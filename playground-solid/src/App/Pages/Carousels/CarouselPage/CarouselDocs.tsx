@@ -5,7 +5,7 @@ import type { CarouselOrientation } from "@thewaver/ss-components-solid";
 import { CarouselKnobs } from "@thewaver/ss-playground/App/Knobs/Carousels.const";
 import { WCAG_URLS } from "@thewaver/ss-playground/App/PageComponents/DocsProse/DocsProse.const";
 import * as docsStyles from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.css";
-import { DOCS_ROOT } from "@thewaver/ss-playground/App/Pages/Carousels/CarouselPage/CarouselPage.const";
+import { DOCS_ROOT, DOCS_SECTIONS } from "@thewaver/ss-playground/App/Pages/Carousels/CarouselPage/CarouselPage.const";
 import { FIELD_WIDTH, PLACEMENT_FIELD_WIDTH } from "@thewaver/ss-playground/App/Pages/Carousels/Carousels.const";
 
 import { PageDocsAlert } from "../../../PageComponents/DocsAlert/DocsAlert";
@@ -43,14 +43,7 @@ export const CarouselDocs = () => {
                 path={`${DOCS_ROOT}/Basic.tsx`}
                 renderKnobs={() => (
                     <>
-                        <PageProp
-                            key={"transitionDurationMs"}
-                            label={"Transition duration (ms)"}
-                            hint={
-                                "How long the move from one slide to the next takes. At 0 the carousel jumps straight there."
-                            }
-                            controls={"Sets CarouselProps.transitionDurationMs"}
-                        >
+                        <PageProp key={"transitionDurationMs"} {...CarouselKnobs.TRANSITION_DURATION_MS_TEXT}>
                             <PageNumberField
                                 value={getTransitionDurationMs}
                                 min={CarouselKnobs.MIN_TRANSITION_MS}
@@ -62,12 +55,7 @@ export const CarouselDocs = () => {
                             />
                         </PageProp>
 
-                        <PageProp
-                            key={"orientation"}
-                            label={"Orientation"}
-                            hint={"Which way the slides run and a swipe moves them: across, or up and down."}
-                            controls={"Sets CarouselProps.orientation"}
-                        >
+                        <PageProp key={"orientation"} {...CarouselKnobs.ORIENTATION_TEXT}>
                             <PageSelectField
                                 value={getOrientation}
                                 values={CAROUSEL_ORIENTATIONS}
@@ -76,12 +64,7 @@ export const CarouselDocs = () => {
                             />
                         </PageProp>
 
-                        <PageProp
-                            key={"isDisabled"}
-                            label={"Disabled"}
-                            hint={"Turns the carousel off, so neither its controller nor its swipes do anything."}
-                            controls={"Sets CarouselProps.isDisabled"}
-                        >
+                        <PageProp key={"isDisabled"} {...CarouselKnobs.IS_DISABLED_TEXT}>
                             <PageCheckField value={getIsDisabled} ariaLabel={"Disabled"} onChange={setIsDisabled} />
                         </PageProp>
                     </>
@@ -94,12 +77,7 @@ export const CarouselDocs = () => {
                 />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"Looks"}
-                content={
-                    "Where each slide is drawn is decided by [prop]placement[/prop], a rule that is told how far a slide is from the one showing and answers where to put it. The ready-made rules in CarouselPlacementUtils — a strip, a drum, cover flow and the rest — each come with a create function to tune it, and every one follows the orientation. Cover flow and depth wave draw their slides narrower than the box, so they take a [prop]faceRatio[/prop] saying how much of the box a slide's content fills."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.looks} />
 
             <PageDocsAlert severity={"info"}>
                 The looks here are only examples. Any rule you write can be the{" "}
@@ -111,14 +89,7 @@ export const CarouselDocs = () => {
                 path={`${DOCS_ROOT}/Looks.tsx`}
                 renderKnobs={() => (
                     <>
-                        <PageProp
-                            key={"placement"}
-                            label={"Placement"}
-                            hint={
-                                "The rule that says where each slide is drawn from how far it is from the one showing."
-                            }
-                            controls={"Picks the rule sent to CarouselProps.placement"}
-                        >
+                        <PageProp key={"placement"} {...CarouselKnobs.PLACEMENT_TEXT}>
                             <PageSelectField
                                 value={getPlacement}
                                 values={CarouselPlacements.SAMPLE_KEYS}
@@ -128,12 +99,7 @@ export const CarouselDocs = () => {
                             />
                         </PageProp>
 
-                        <PageProp
-                            key={"orientation"}
-                            label={"Orientation"}
-                            hint={"Which way the slides run. Every rule lays its slides out along it."}
-                            controls={"Sets CarouselProps.orientation"}
-                        >
+                        <PageProp key={"orientation"} {...CarouselKnobs.ORIENTATION_2_TEXT}>
                             <PageSelectField
                                 value={getLooksOrientation}
                                 values={CAROUSEL_ORIENTATIONS}
@@ -147,32 +113,17 @@ export const CarouselDocs = () => {
                 <LooksDocsExample placement={getPlacement} orientation={getLooksOrientation} />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"Looping and moving on its own"}
-                content={
-                    "A carousel loops by default: stepping on from the last slide comes round to the first, the short way. Set [prop]isLooping[/prop] to false and it stops at both ends instead. The controller's [prop]getCanStep[/prop] then answers no at an end, so Previous on the first slide and Next on the last are disabled, and a swipe past an end springs back. Set [prop]autoplayDelayMs[/prop] and the carousel moves to the next slide after each delay; with looping off, it stops for good on the last slide. It holds still while the pointer is over it, while anything inside it has focus, and while the tab is in the background. Whether it is moving is [prop]playback[/prop], which both sides can write, and the controller's [prop]setIsPlaying[/prop] stops and starts it."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.loopingAndSelfMoving} />
 
             <PageDocsExample
                 path={`${DOCS_ROOT}/Looping.tsx`}
                 renderKnobs={() => (
                     <>
-                        <PageProp
-                            key={"isLooping"}
-                            label={"Looping"}
-                            hint={"Whether stepping on from the last slide comes round to the first."}
-                            controls={"Sets CarouselProps.isLooping"}
-                        >
+                        <PageProp key={"isLooping"} {...CarouselKnobs.IS_LOOPING_TEXT}>
                             <PageCheckField value={getIsLooping} ariaLabel={"Looping"} onChange={setIsLooping} />
                         </PageProp>
 
-                        <PageProp
-                            key={"autoplayDelayMs"}
-                            label={"Delay (ms)"}
-                            hint={"How long a slide is held before the carousel moves to the next one on its own."}
-                            controls={"Sets CarouselProps.autoplayDelayMs"}
-                        >
+                        <PageProp key={"autoplayDelayMs"} {...CarouselKnobs.AUTOPLAY_DELAY_MS_TEXT}>
                             <PageNumberField
                                 value={getAutoplayDelayMs}
                                 min={CarouselKnobs.MIN_DELAY_MS}
@@ -189,34 +140,19 @@ export const CarouselDocs = () => {
                 <LoopingDocsExample isLooping={getIsLooping} autoplayDelayMs={getAutoplayDelayMs} />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"Driven from outside"}
-                content={
-                    "A [prop]progress[/prop] from 0 to 1 places the carousel anywhere from the first slide to the last, and the slide showing follows whichever is nearest. Here the box's scroll writes it, so scrolling moves the slides with it."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.drivenOutside} />
 
             <PageDocsExample path={`${DOCS_ROOT}/Scrolled.tsx`}>
                 <ScrolledDocsExample />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"Several slides to a stop"}
-                content={
-                    "Pass [prop]computeGroups[/prop] and the slides are split into groups that rest on screen together, here two at a time. Stepping, the dots and [prop]index[/prop] then count groups, and every placement lays a group out in the room of one slide. It comes with [prop]computeGroupLabel[/prop], which names each group when the carousel announces it."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.severalSlidesStop} />
 
             <PageDocsExample path={`${DOCS_ROOT}/Pairs.tsx`}>
                 <PairsDocsExample />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"Only the nearby slides built"}
-                content={
-                    "Set [prop]isWindowed[/prop] and a slide is built only while it is close enough for the placement to draw it, so a hundred slides cost what a handful do. A slide that comes back is built again from nothing, losing anything it held, such as text typed into it, which is why it is off by default."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.onlyNearbySlidesBuilt} />
 
             <PageDocsExample path={`${DOCS_ROOT}/Windowed.tsx`}>
                 <WindowedDocsExample />

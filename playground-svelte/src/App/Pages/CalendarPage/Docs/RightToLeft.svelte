@@ -1,7 +1,7 @@
 <script lang="ts">
     import type { DateValue } from "@thewaver/ss-components-svelte";
     import { Calendar, DateValueUtils } from "@thewaver/ss-components-svelte";
-    import { LOCALE, TODAY } from "@thewaver/ss-playground/App/Pages/CalendarPage/CalendarPage.const";
+    import { LOCALE, TODAY, CHOOSE_DATE_RIGHT_LEFT_LABEL } from "@thewaver/ss-playground/App/Pages/CalendarPage/CalendarPage.const";
 
     import PageCalendarCaption from "../../../PageComponents/CalendarCaption/CalendarCaption.svelte";
     import PageCalendarDay from "../../../StyledComponents/CalendarContent/PageCalendarDay.svelte";
@@ -21,7 +21,7 @@
             bind:month
             today={TODAY}
             locale={LOCALE}
-            ariaLabel={"Choose a date in a right-to-left box"}
+            ariaLabel={CHOOSE_DATE_RIGHT_LEFT_LABEL}
         >
             {#snippet renderDay(_unused, renderProps)}
                 <PageCalendarDay {renderProps} />

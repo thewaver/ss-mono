@@ -15,6 +15,7 @@ import {
     GRID_GAP,
     PACK_COLUMNS,
     PACK_ROWS,
+    TURN_COUNTERCLOCKWISE_LABEL,
     computeGearHue,
     computeGearKey,
     computeGearLabel,
@@ -113,7 +114,7 @@ watch(
 <template>
     <div :class="styles.sortableGridStack">
         <div v-if="hasTurnButtons" :class="styles.sortableGridTurnControls">
-            <Button ariaLabel="Turn counterclockwise" :is-disabled="!isCarrying" @click="turn(-1)">
+            <Button :ariaLabel="TURN_COUNTERCLOCKWISE_LABEL" :is-disabled="!isCarrying" @click="turn(-1)">
                 <template #renderContent="flags">
                     <PageControlButtonContent :flags="flags" :glyph="CONTROL_GLYPHS.turnLeft" />
                 </template>

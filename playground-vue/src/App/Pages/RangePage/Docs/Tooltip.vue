@@ -3,6 +3,7 @@ import { h, shallowRef } from "vue";
 
 import { Range } from "@thewaver/ss-components-vue";
 import type { InteractionTooltipDefs, RangeRenderProps } from "@thewaver/ss-components-vue";
+import { DISABLED_BUT_REACHABLE_RANGE_LABEL } from "@thewaver/ss-playground/App/Pages/RangePage/RangePage.const";
 import { RANGE_THUMB_SIZE } from "@thewaver/ss-playground/App/StyledComponents/RangeContent/RangeContent.css";
 
 import PageRangeContent from "../../../StyledComponents/RangeContent/RangeContent.vue";
@@ -32,7 +33,7 @@ const tooltipDefs: InteractionTooltipDefs<RangeRenderProps> = {
     <Range
         id="tooltipVolume"
         v-model:value="value"
-        ariaLabel="Disabled but reachable range"
+        :ariaLabel="DISABLED_BUT_REACHABLE_RANGE_LABEL"
         :is-disabled="isDisabled"
         :is-reachable-when-disabled="isReachableWhenDisabled"
         :thumb-size="RANGE_THUMB_SIZE"

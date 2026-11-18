@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import { Menubar } from "@thewaver/ss-components-react";
 import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
+import { RIGHT_LEFT_EDITOR_LABEL } from "@thewaver/ss-playground/App/Pages/MenubarPage/MenubarPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/MenubarPage/MenubarPage.css";
 import { POPOVER_SURFACE_INSET } from "@thewaver/ss-playground/App/StyledComponents/PopoverSurface/PopoverSurface.css";
 
@@ -20,7 +21,7 @@ export const RightToLeftDocsExample = () => {
             <div className={[styles.bar, styles.wideBar, layerClass].join(" ")} dir={"rtl"}>
                 <Menubar
                     actions={WORDS}
-                    ariaLabel={"Right-to-left editor"}
+                    ariaLabel={RIGHT_LEFT_EDITOR_LABEL}
                     overflowAriaLabel={"More menus"}
                     checked={checkedState}
                     submenuOffset={{ x: POPOVER_SURFACE_INSET, y: -POPOVER_SURFACE_INSET }}

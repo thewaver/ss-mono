@@ -1,4 +1,5 @@
 import { Reveal } from "@thewaver/ss-components-react";
+import { COVER_KNOWS_WHEN_BEING_LABEL } from "@thewaver/ss-playground/App/Pages/Reveals/RevealPage/RevealPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/Reveals/RevealPage/RevealPage.css";
 
 import type { RevealExampleProps } from "../RevealExample.types";
@@ -15,7 +16,7 @@ export const PromptExample = (props: Props) => {
                 joinRadii={props.joinRadii}
                 lameExponents={props.lameExponents}
                 isDisabled={props.isDisabled}
-                ariaLabel={"A cover that knows when it is being looked under"}
+                ariaLabel={COVER_KNOWS_WHEN_BEING_LABEL}
                 computePoints={props.computePoints}
                 renderContent={() => (
                     <div className={styles.content}>

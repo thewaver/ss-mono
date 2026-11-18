@@ -6,13 +6,14 @@
     import PageControlRow from "../../../PageComponents/ControlRow/PageControlRow.svelte";
     import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
     import PageSlideButtonContent from "../../../StyledComponents/SlideButtonContent/SlideButtonContent.svelte";
+    import { HOLD_ENTER_SPACE_ARM_DESCRIPTION } from "@thewaver/ss-playground/App/Pages/SlideButtonPage/SlideButtonPage.const";
 
     let isArmed = $state(false);
 </script>
 
 <PageControlRow>
     <SlideButton
-        ariaDescription={"Hold Enter or Space to arm."}
+        ariaDescription={HOLD_ENTER_SPACE_ARM_DESCRIPTION}
         isPressed={isArmed}
         thumbSize={SLIDE_BUTTON_THUMB_SIZE}
         onActivate={() => {

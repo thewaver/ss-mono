@@ -56,12 +56,7 @@ const sharedProps = computed(() => {
     </div>
 
     <PageExampleKnobs>
-        <PageProp
-            item-key="radiusPercent"
-            controls="Sets the example's radius, read by its RGBAnimationProps.computeSliceAnimation"
-            label="Radius (%)"
-            hint="How far the channels circle from their resting place at the widest point of the pass, as a share of the picture's size."
-        >
+        <PageProp item-key="radiusPercent" v-bind="RGBAnimationKnobs.RADIUS_PERCENT_TEXT">
             <PageNumberField
                 :value="radiusPercent"
                 :min="RGBAnimationKnobs.MIN_ORBIT_RADIUS_PERCENT"

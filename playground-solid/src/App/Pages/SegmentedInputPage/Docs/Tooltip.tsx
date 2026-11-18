@@ -1,7 +1,10 @@
 import { createSignal } from "solid-js";
 
 import { SegmentedInput } from "@thewaver/ss-components-solid";
-import { ONE_TIME_CODE_LENGTH } from "@thewaver/ss-playground/App/Pages/SegmentedInputPage/SegmentedInputPage.const";
+import {
+    DISABLED_BUT_REACHABLE_CODE_LABEL,
+    ONE_TIME_CODE_LENGTH,
+} from "@thewaver/ss-playground/App/Pages/SegmentedInputPage/SegmentedInputPage.const";
 import { FIELD_GAP } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
 import { PageSegmentedInputCell } from "../../../StyledComponents/SegmentedInputContent/SegmentedInputContent";
@@ -20,7 +23,7 @@ export const TooltipDocsExample = (props: Props) => {
             gap={FIELD_GAP}
             isDisabled={props.isDisabled}
             isReachableWhenDisabled={props.isReachableWhenDisabled}
-            ariaLabel={"Disabled but reachable code"}
+            ariaLabel={DISABLED_BUT_REACHABLE_CODE_LABEL}
             renderCell={(getCell) => <PageSegmentedInputCell renderProps={getCell} />}
             tooltipDefs={() => ({
                 placement: () => ({ x: "center", y: "top_out" }),

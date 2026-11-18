@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Bracket, BracketUtils, Button } from "@thewaver/ss-components-react";
 import type { BracketNode, BracketStep, PanZoomView } from "@thewaver/ss-components-react";
 import { BracketKnobs } from "@thewaver/ss-playground/App/Knobs/Brackets.const";
+import { KNOCKOUT_DRAW_ONE_FAMILY_LABEL } from "@thewaver/ss-playground/App/Pages/BracketPage/BracketPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/BracketPage/BracketPage.css";
 import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
@@ -93,7 +94,7 @@ export const FamilyExample = (props: Props) => {
                         orientation={props.orientation}
                         rootSide={props.rootSide}
                         layerHeaderSize={headerSize}
-                        ariaLabel={"Knockout draw, one family at a time"}
+                        ariaLabel={KNOCKOUT_DRAW_ONE_FAMILY_LABEL}
                         onActivate={props.onActivate}
                         renderConnector={props.renderConnector}
                         renderNode={renderBracketNode}

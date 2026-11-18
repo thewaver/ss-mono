@@ -2,7 +2,10 @@ import { useState } from "react";
 
 import { TagInput } from "@thewaver/ss-components-react";
 import { computeTagAriaLabel } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
-import { STARTING_TAGS } from "@thewaver/ss-playground/App/Pages/TagInputPage/TagInputPage.const";
+import {
+    STARTING_TAGS,
+    TOPICS_RIGHT_LEFT_BOX_LABEL,
+} from "@thewaver/ss-playground/App/Pages/TagInputPage/TagInputPage.const";
 import {
     FIELD_GAP,
     FIELD_HEIGHT,
@@ -22,7 +25,7 @@ export const RightToLeftDocsExample = () => {
         <div dir={"rtl"}>
             <TagInput
                 value={valueState}
-                ariaLabel={"Topics in a right-to-left box"}
+                ariaLabel={TOPICS_RIGHT_LEFT_BOX_LABEL}
                 gap={FIELD_GAP}
                 padding={FIELD_PADDING}
                 minHeight={FIELD_HEIGHT}

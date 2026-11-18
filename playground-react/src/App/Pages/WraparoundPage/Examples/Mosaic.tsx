@@ -1,6 +1,9 @@
 import { ImageMosaic, Wraparound } from "@thewaver/ss-components-react";
 import { MosaicImages } from "@thewaver/ss-playground/App/Pages/Mosaics/ImageMosaicPage/MosaicImages.const";
-import { MOSAIC_GAP } from "@thewaver/ss-playground/App/Pages/WraparoundPage/WraparoundPage.const";
+import {
+    MOSAIC_GAP,
+    PICTURES_REPEATING_EVERY_DIRECTION_LABEL,
+} from "@thewaver/ss-playground/App/Pages/WraparoundPage/WraparoundPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/WraparoundPage/WraparoundPage.css";
 
 import type { WraparoundExampleProps } from "../WraparoundPageReact.types";
@@ -10,7 +13,7 @@ type Props = WraparoundExampleProps;
 export const MosaicExample = (props: Props) => (
     <div className={styles.stage}>
         <Wraparound
-            ariaLabel={"Pictures, repeating in every direction"}
+            ariaLabel={PICTURES_REPEATING_EVERY_DIRECTION_LABEL}
             renderContent={() => (
                 <div className={styles.mosaicTile}>
                     <ImageMosaic

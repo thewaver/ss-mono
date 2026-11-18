@@ -22,12 +22,7 @@ const computeArrowLabel = (next: ArrowBedArrow) => TOOLTIP_ARROW_LABELS[next];
 </script>
 
 <template>
-    <PageProp
-        :item-key="`${keyPrefix}Arrow`"
-        controls="Picks the template handed to ShapeUtils.attachArrow"
-        label="Arrow"
-        hint="Which arrow every tooltip here grows."
-    >
+    <PageProp :item-key="`${keyPrefix}Arrow`" v-bind="TooltipKnobs.ARROW_TEXT">
         <PageSelectField
             :value="controls.arrow.value"
             :values="ARROW_BED_ARROWS"
@@ -38,12 +33,7 @@ const computeArrowLabel = (next: ArrowBedArrow) => TOOLTIP_ARROW_LABELS[next];
         />
     </PageProp>
 
-    <PageProp
-        :item-key="`${keyPrefix}Width`"
-        controls="Sets the arrow width handed to the template"
-        label="Arrow width (px)"
-        hint="How wide every arrow is across its base. Past twice the length, a corner arrow's sides lean 45° or more."
-    >
+    <PageProp :item-key="`${keyPrefix}Width`" v-bind="TooltipKnobs.ARROW_WIDTH_PX_TEXT">
         <PageNumberField
             :value="controls.arrowWidth.value"
             :min="TooltipKnobs.MIN_ARROW_SIZE"
@@ -55,12 +45,7 @@ const computeArrowLabel = (next: ArrowBedArrow) => TOOLTIP_ARROW_LABELS[next];
         />
     </PageProp>
 
-    <PageProp
-        :item-key="`${keyPrefix}Length`"
-        controls="Sets the arrow length handed to the template"
-        label="Arrow length (px)"
-        hint="How far every arrow's tip stands off its tooltip."
-    >
+    <PageProp :item-key="`${keyPrefix}Length`" v-bind="TooltipKnobs.ARROW_LENGTH_PX_TEXT">
         <PageNumberField
             :value="controls.arrowLength.value"
             :min="TooltipKnobs.MIN_ARROW_SIZE"
@@ -72,12 +57,7 @@ const computeArrowLabel = (next: ArrowBedArrow) => TOOLTIP_ARROW_LABELS[next];
         />
     </PageProp>
 
-    <PageProp
-        :item-key="`${keyPrefix}Shape`"
-        controls="Picks the contour handed to ShapeUtils.attachArrow"
-        label="Shape"
-        hint="The contour every tooltip here is cut to, which is what each arrow's base is walked along from where it attaches."
-    >
+    <PageProp :item-key="`${keyPrefix}Shape`" v-bind="TooltipKnobs.SHAPE_TEXT">
         <PageSelectField
             :value="controls.shape.value"
             :values="ARROW_BED_SHAPES"

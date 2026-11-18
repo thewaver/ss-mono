@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { DOCS_ROOT } from "@thewaver/ss-playground/App/Pages/SegmentedInputPage/SegmentedInputPage.const";
+    import { DOCS_SECTIONS, DOCS_ROOT } from "@thewaver/ss-playground/App/Pages/SegmentedInputPage/SegmentedInputPage.const";
 
     import PageDocsExample from "../../PageComponents/DocsExample/PageDocsExample.svelte";
     import PageDocsSection from "../../PageComponents/DocsSection/PageDocsSection.svelte";
@@ -10,6 +10,7 @@
     import LettersDocsExample from "./Docs/Letters.svelte";
     import RightToLeftDocsExample from "./Docs/RightToLeft.svelte";
     import TooltipDocsExample from "./Docs/Tooltip.svelte";
+    import { SegmentedInputKnobs } from "@thewaver/ss-playground/App/Knobs/SegmentedInputs.const";
 
     let isReadOnly = $state(false);
     let hasError = $state(false);
@@ -24,9 +25,7 @@
     {#snippet renderKnobs()}
         <PageProp
             itemKey={"isReadOnly"}
-            label={"Read-only"}
-            hint={"Its code can be selected and copied, but neither typing nor pasting changes it."}
-            controls={"Sets SegmentedInputProps.isReadOnly"}
+            {...SegmentedInputKnobs.IS_READ_ONLY_TEXT}
         >
             <PageCheckField
                 value={isReadOnly}
@@ -39,9 +38,7 @@
 
         <PageProp
             itemKey={"hasError"}
-            label={"Error"}
-            hint={"Marks the field invalid, for screen readers as well as for the painter."}
-            controls={"Sets SegmentedInputProps.hasError"}
+            {...SegmentedInputKnobs.HAS_ERROR_TEXT}
         >
             <PageCheckField
                 value={hasError}
@@ -54,9 +51,7 @@
 
         <PageProp
             itemKey={"isDisabled"}
-            label={"Disabled"}
-            hint={"Turns the field off: nothing can write to it, and the Tab key skips it."}
-            controls={"Sets SegmentedInputProps.isDisabled"}
+            {...SegmentedInputKnobs.IS_DISABLED_TEXT}
         >
             <PageCheckField
                 value={isDisabled}
@@ -79,8 +74,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Letters as well as digits"}
-    content={"Which characters the field takes is answered one at a time by [prop]computeIsAllowed[/prop], and a refused character is dropped wherever it appears, in a paste as much as in typing. Here letters and digits are allowed, and [prop]inputMode[/prop] is set to text so that a phone offers its whole keyboard rather than digits alone."}
+    {...DOCS_SECTIONS.lettersWellDigits}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Letters.svelte`}>
@@ -88,8 +82,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Tooltip"}
-    content={"Give a field [prop]tooltipDefs[/prop] and it shows a tooltip on hover and on keyboard focus, read by screen readers as the field's description. A disabled field shows no tooltip unless you also keep it reachable when disabled; it can then be focused to read why it is off, and typing still changes nothing."}
+    {...DOCS_SECTIONS.tooltip}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Tooltip.svelte`}>
@@ -98,9 +91,7 @@
     {#snippet renderKnobs()}
         <PageProp
             itemKey={"tooltipIsReachableWhenDisabled"}
-            label={"Reachable when disabled"}
-            hint={"Keeps a disabled field's tooltip available: the Tab key can stop on it and hovering it shows the tooltip. Without it a disabled field shows no tooltip at all. It only matters while Disabled is on."}
-            controls={"Sets SegmentedInputProps.isReachableWhenDisabled"}
+            {...SegmentedInputKnobs.TOOLTIP_IS_REACHABLE_WHEN_DISABLED_TEXT}
         >
             <PageCheckField
                 value={isReachableWhenDisabled}
@@ -113,9 +104,7 @@
 
         <PageProp
             itemKey={"tooltipIsDisabled"}
-            label={"Disabled"}
-            hint={"Turns the field off: nothing can write to it, and the Tab key skips it."}
-            controls={"Sets SegmentedInputProps.isDisabled"}
+            {...SegmentedInputKnobs.IS_DISABLED_TEXT}
         >
             <PageCheckField
                 value={isTooltipDisabled}
@@ -129,8 +118,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Named by a Label"}
-    content={"Inside a Label, the field takes its name from the label's text, so it needs no [prop]ariaLabel[/prop], and pressing the text focuses the field."}
+    {...DOCS_SECTIONS.namedLabel}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Labeled.svelte`}>

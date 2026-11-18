@@ -2,6 +2,7 @@
 import { shallowRef } from "vue";
 
 import { SlideButton } from "@thewaver/ss-components-vue";
+import { HOLD_ENTER_SPACE_SEND_DESCRIPTION } from "@thewaver/ss-playground/App/Pages/SlideButtonPage/SlideButtonPage.const";
 import { SLIDE_BUTTON_THUMB_SIZE } from "@thewaver/ss-playground/App/StyledComponents/SlideButtonContent/SlideButtonContent.css";
 
 import PageSlideButtonContent from "../../../StyledComponents/SlideButtonContent/SlideButtonContent.vue";
@@ -16,7 +17,7 @@ const sends = shallowRef(0);
 
 <template>
     <SlideButton
-        ariaDescription="Hold Enter or Space to send."
+        :ariaDescription="HOLD_ENTER_SPACE_SEND_DESCRIPTION"
         :thumb-size="SLIDE_BUTTON_THUMB_SIZE"
         :mode="mode"
         :completion-ratio="completionRatio"

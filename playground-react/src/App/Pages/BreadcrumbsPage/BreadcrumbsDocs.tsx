@@ -5,6 +5,7 @@ import * as docsStyles from "@thewaver/ss-playground/App/PageComponents/DocsView
 import {
     BREADCRUMB_SEPARATORS,
     DOCS_ROOT,
+    DOCS_SECTIONS,
 } from "@thewaver/ss-playground/App/Pages/BreadcrumbsPage/BreadcrumbsPage.const";
 import type { BreadcrumbSeparatorKey } from "@thewaver/ss-playground/App/Pages/BreadcrumbsPage/BreadcrumbsPage.types";
 
@@ -34,14 +35,7 @@ export const BreadcrumbsDocs = () => {
                 path={`${DOCS_ROOT}/Basic.tsx`}
                 renderKnobs={() => (
                     <>
-                        <PageProp
-                            itemKey={"separator"}
-                            label={"Separator"}
-                            hint={
-                                'What is drawn between the crumbs. Choosing "none" leaves the slot out, so nothing sits between the crumbs and no empty element is rendered. Where drawn, it is hidden from assistive technology.'
-                            }
-                            controls={'Passes BreadcrumbsProps.renderSeparator, or omits it for "none"'}
-                        >
+                        <PageProp itemKey={"separator"} {...BreadcrumbKnobs.SEPARATOR_TEXT}>
                             <PageSelectField
                                 value={separator}
                                 values={BREADCRUMB_SEPARATORS}
@@ -50,16 +44,7 @@ export const BreadcrumbsDocs = () => {
                             />
                         </PageProp>
 
-                        <PageProp
-                            itemKey={"isDisabled"}
-                            label={"Disabled"}
-                            hint={
-                                "Turns every crumb off: it refuses the press and says it is disabled, without the native attribute."
-                            }
-                            controls={
-                                "Sets Breadcrumb.isDisabled on every example crumb sent to BreadcrumbsProps.crumbs"
-                            }
-                        >
+                        <PageProp itemKey={"isDisabled"} {...BreadcrumbKnobs.IS_DISABLED_TEXT}>
                             <PageCheckField value={isDisabled} ariaLabel={"Disabled"} onChange={setIsDisabled} />
                         </PageProp>
                     </>
@@ -68,35 +53,18 @@ export const BreadcrumbsDocs = () => {
                 <BasicDocsExample isDisabled={isDisabled} separator={separator} />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"Right to left"}
-                content={
-                    "Inside a box whose text runs right to left, the trail starts from the right, with the first crumb rightmost. A separator that points, such as the > here, is drawn mirrored by the browser, so it still points along the trail; a slash or a dash is drawn as it is, so pick one that reads either way."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.rightLeft} />
 
             <PageDocsExample path={`${DOCS_ROOT}/RightToLeft.tsx`}>
                 <RightToLeftDocsExample />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"Links"}
-                content={
-                    "Give a crumb an [prop]href[/prop] and it is drawn as a native HTML anchor element, with the address passed through untouched. In a routed app, pass [prop]linkComponent[/prop], a custom link component such as your router's, and the crumbs are drawn with it instead."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.links} />
 
             <PageDocsExample
                 path={`${DOCS_ROOT}/Links.tsx`}
                 renderKnobs={() => (
-                    <PageProp
-                        itemKey={"hasLinkComponent"}
-                        label={"Custom link component"}
-                        hint={
-                            "Draws the crumbs with a custom link component, as a router's link would be. Off, they use the native HTML anchor element."
-                        }
-                        controls={"Sets BreadcrumbsProps.linkComponent"}
-                    >
+                    <PageProp itemKey={"hasLinkComponent"} {...BreadcrumbKnobs.HAS_LINK_COMPONENT_TEXT}>
                         <PageCheckField
                             value={hasLinkComponent}
                             ariaLabel={"Custom link component"}

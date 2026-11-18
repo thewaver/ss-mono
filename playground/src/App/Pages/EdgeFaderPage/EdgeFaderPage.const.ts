@@ -23,3 +23,21 @@ export const EDGE_LABELS: Record<EdgeFaderEdge, string> = {
     bottom: "Bottom",
     left: "Left",
 };
+
+export const DOCS_SECTIONS = {
+    anyMixSides: {
+        title: "Any mix of sides",
+        content:
+            "Pass [prop]edges[/prop] any mix of top, right, bottom and left; left out, all four fade. Where two faded sides meet, their fades meet in the corner.",
+    },
+    fadingOnlyOutOfView: {
+        title: "Fading only what is out of view",
+        content:
+            "Set [prop]isScrollAware[/prop] and a side fades only while there is more to scroll to past it. The fade shrinks as that end comes into view and is gone once it is reached, so a box whose content fits shows no fade at all.",
+    },
+    aroundNonScrolling: {
+        title: "Around something that does not scroll",
+        content:
+            "Left fixed, the default, the chosen sides fade whether or not anything scrolls, so the fade can soften the edges of any content.",
+    },
+};

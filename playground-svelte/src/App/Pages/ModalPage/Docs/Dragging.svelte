@@ -9,6 +9,7 @@
     import PageModalPanel from "../../../StyledComponents/ModalPanel/PageModalPanel.svelte";
     import PageTableMarker from "../../../StyledComponents/TableContent/PageTableMarker.svelte";
     import { PARTS, createPartColumns } from "../../TablePage/TablePage.const.svelte";
+    import { PARTS_REORDERABLE_COLUMNS_LABEL } from "@thewaver/ss-playground/App/Pages/ModalPage/ModalPage.const";
 
     const DRAGGING_TITLE_ID = "modal-page-dragging-title";
 
@@ -45,7 +46,7 @@
                     rows={PARTS}
                     bind:sort
                     bind:order
-                    ariaLabel={"Parts with reorderable columns"}
+                    ariaLabel={PARTS_REORDERABLE_COLUMNS_LABEL}
                     announcements={TABLE_ANNOUNCEMENTS}
                 >
                     {#snippet renderMarker()}

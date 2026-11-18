@@ -11,6 +11,7 @@
     import PageEraCycle from "../../../PageComponents/EraCycle/EraCycle.svelte";
     import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
     import PageTextFieldPlaceholder from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.svelte";
+    import { DATE_RIGHT_LEFT_BOX_LABEL } from "@thewaver/ss-playground/App/Pages/DateInputPage/DateInputPage.const";
 
     let value = $state.raw<DateValue | undefined>(TODAY);
 </script>
@@ -18,7 +19,7 @@
 <div dir={"rtl"}>
     <DateInput
         bind:value
-        ariaLabel={"Date in a right-to-left box"}
+        ariaLabel={DATE_RIGHT_LEFT_BOX_LABEL}
         locale={LOCALE}
         partHints={DATE_PART_HINTS}
         padding={FIELD_PADDING}

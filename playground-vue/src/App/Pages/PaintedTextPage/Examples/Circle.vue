@@ -3,6 +3,7 @@ import { computed, useId, useModel } from "vue";
 
 import { Button, PaintedText, PaintedTextUtils } from "@thewaver/ss-components-vue";
 import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
+import { RING_TEXT } from "@thewaver/ss-playground/App/Pages/PaintedTextPage/PaintedTextPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/PaintedTextPage/PaintedTextPage.css";
 import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 import type { Size2d } from "@thewaver/ss-utils";
@@ -11,8 +12,6 @@ import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.vue";
 import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
 import { computeSampleDefs } from "../PaintedTextPageVue.const";
 import type { PaintedTextCircleExampleProps } from "../PaintedTextPageVue.types";
-
-const RING_TEXT = "PAINTED TEXT • ROUND A CIRCLE • ";
 
 type Props = PaintedTextCircleExampleProps;
 

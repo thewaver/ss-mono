@@ -165,12 +165,7 @@ export const TypewriterPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"textEffect"}
-                    label={"Effect"}
-                    hint={"How each character arrives: plainly, or with one of the entrance effects."}
-                    controls={"Picks the example keyframes sent to TypewriterProps.computeAnimationName"}
-                >
+                <PageProp key={"textEffect"} {...TypewriterKnobs.TEXT_EFFECT_TEXT}>
                     <PageSelectField
                         value={getTextEffect}
                         values={TEXT_EFFECTS}
@@ -179,14 +174,7 @@ export const TypewriterPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"arrivalOrder"}
-                    label={"Arrival order"}
-                    hint={
-                        "The order the characters arrive in: left to right, from the middle out, scattered, and so on. Erasing runs it backwards. The caret is meant for left to right, and jumps about under the others."
-                    }
-                    controls={"Picks the sample weight function sent to TypewriterProps.computeCharacterWeights"}
-                >
+                <PageProp key={"arrivalOrder"} {...TypewriterKnobs.ARRIVAL_ORDER_TEXT}>
                     <PageSelectField
                         value={getArrivalOrder}
                         values={TypewriterKnobs.ARRIVAL_ORDERS}

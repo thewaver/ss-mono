@@ -4,12 +4,11 @@ import { computed, shallowRef } from "vue";
 import { ElementObserverVueUtils, ProximityText } from "@thewaver/ss-components-vue";
 import type { PointSource } from "@thewaver/ss-components-vue";
 import { ProximityTextKnobs } from "@thewaver/ss-playground/App/Knobs/ProximityTexts.const";
+import { TEXT } from "@thewaver/ss-playground/App/Pages/ProximityTextPage/ProximityTextPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ProximityTextPage/ProximityTextPage.css";
 
 import type { ProximityTextExampleProps } from "../ProximityTextPageVue.types";
 
-const TEXT =
-    "The universe keeps on expanding, stretching space in every direction with a quiet and steady motion. Galaxies drift apart across distances too large to picture, carried by a flow that began in the first instant. What was once one dense and burning point has opened into a wide and growing expanse, and every line here closes up as it reaches the middle and spreads out again past it, as though read from inside a turning barrel.";
 const MIDDLE = 0.5;
 const NO_HEIGHT = 0;
 

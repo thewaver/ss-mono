@@ -4,6 +4,7 @@ import { Tabs, access } from "@thewaver/ss-components-solid";
 import type { Tab } from "@thewaver/ss-components-solid";
 import {
     PANEL_BODIES,
+    PARTLY_DISABLED_VIEWS_LABEL,
     REACHABLE_TABS,
     ROW_TAB_GAP,
     getPanelId,
@@ -33,7 +34,7 @@ export const DisabledTabDocsExample = (props: Props) => {
             <Tabs
                 orientation={"horizontal"}
                 tabGap={ROW_TAB_GAP}
-                ariaLabel={"Partly disabled views"}
+                ariaLabel={PARTLY_DISABLED_VIEWS_LABEL}
                 tabs={getTabs}
                 selectedValue={getSelectedValue}
                 onSelectionChange={setSelectedValue}

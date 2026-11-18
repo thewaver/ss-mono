@@ -4,6 +4,7 @@
     import knight_profile from "@thewaver/ss-playground/App/knight_profile.webp";
 
     import type { LensExampleProps } from "../LensPage.types";
+    import { MAGNIFYING_LENS_OVER_PICTURE_LABEL } from "@thewaver/ss-playground/App/Pages/Reveals/LensPage/LensPage.const";
 
     type Props = LensExampleProps;
 
@@ -19,7 +20,7 @@
         joinRadii={props.joinRadii}
         lameExponents={props.lameExponents}
         isDisabled={props.isDisabled}
-        ariaLabel={"A magnifying lens over a picture of a knight"}
+        ariaLabel={MAGNIFYING_LENS_OVER_PICTURE_LABEL}
         computePoints={props.computePoints}
     >
         {#snippet renderContent()}

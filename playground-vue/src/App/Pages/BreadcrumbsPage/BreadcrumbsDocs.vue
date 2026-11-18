@@ -6,6 +6,7 @@ import * as docsStyles from "@thewaver/ss-playground/App/PageComponents/DocsView
 import {
     BREADCRUMB_SEPARATORS,
     DOCS_ROOT,
+    DOCS_SECTIONS,
 } from "@thewaver/ss-playground/App/Pages/BreadcrumbsPage/BreadcrumbsPage.const";
 import type { BreadcrumbSeparatorKey } from "@thewaver/ss-playground/App/Pages/BreadcrumbsPage/BreadcrumbsPage.types";
 
@@ -35,12 +36,7 @@ const hasLinkComponent = shallowRef(false);
         <BasicDocsExample :is-disabled="isDisabled" :separator="separator" />
 
         <template #renderKnobs>
-            <PageProp
-                item-key="separator"
-                label="Separator"
-                hint='What is drawn between the crumbs. Choosing "none" leaves the slot out, so nothing sits between the crumbs and no empty element is rendered. Where drawn, it is hidden from assistive technology.'
-                controls='Passes BreadcrumbsProps.renderSeparator, or omits it for "none"'
-            >
+            <PageProp item-key="separator" v-bind="BreadcrumbKnobs.SEPARATOR_TEXT">
                 <PageSelectField
                     :value="separator"
                     :values="BREADCRUMB_SEPARATORS"
@@ -49,12 +45,7 @@ const hasLinkComponent = shallowRef(false);
                 />
             </PageProp>
 
-            <PageProp
-                item-key="isDisabled"
-                label="Disabled"
-                hint="Turns every crumb off: it refuses the press and says it is disabled, without the native attribute."
-                controls="Sets Breadcrumb.isDisabled on every example crumb sent to BreadcrumbsProps.crumbs"
-            >
+            <PageProp item-key="isDisabled" v-bind="BreadcrumbKnobs.IS_DISABLED_TEXT">
                 <PageCheckField
                     :value="isDisabled"
                     ariaLabel="Disabled"
@@ -64,30 +55,19 @@ const hasLinkComponent = shallowRef(false);
         </template>
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Right to left"
-        content="Inside a box whose text runs right to left, the trail starts from the right, with the first crumb rightmost. A separator that points, such as the > here, is drawn mirrored by the browser, so it still points along the trail; a slash or a dash is drawn as it is, so pick one that reads either way."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.rightLeft" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/RightToLeft.vue`">
         <RightToLeftDocsExample />
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Links"
-        content="Give a crumb an [prop]href[/prop] and it is drawn as a native HTML anchor element, with the address passed through untouched. In a routed app, pass [prop]linkComponent[/prop], a custom link component such as your router's, and the crumbs are drawn with it instead."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.links" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Links.vue`">
         <LinksDocsExample :is-disabled="isDisabled" :has-link-component="hasLinkComponent" />
 
         <template #renderKnobs>
-            <PageProp
-                item-key="hasLinkComponent"
-                label="Custom link component"
-                hint="Draws the crumbs with a custom link component, as a router's link would be. Off, they use the native HTML anchor element."
-                controls="Sets BreadcrumbsProps.linkComponent"
-            >
+            <PageProp item-key="hasLinkComponent" v-bind="BreadcrumbKnobs.HAS_LINK_COMPONENT_TEXT">
                 <PageCheckField
                     :value="hasLinkComponent"
                     ariaLabel="Custom link component"

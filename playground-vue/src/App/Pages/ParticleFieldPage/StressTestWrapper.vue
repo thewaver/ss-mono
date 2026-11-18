@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, shallowRef, useModel } from "vue";
 
+import { ParticleFieldKnobs } from "@thewaver/ss-playground/App/Knobs/ParticleFields.const";
 import {
     STRESS_CELL_COUNT,
     STRESS_ITEMS,
@@ -39,12 +40,7 @@ const fieldProps = computed(() => ({
     <div>{{ `${STRESS_CELL_COUNT.col} x ${STRESS_CELL_COUNT.row} cells` }}</div>
 
     <PagePropsPanel scope="local" :has-reset="false">
-        <PageProp
-            item-key="onGraphicsCard"
-            label="On the graphics card"
-            hint="Draws the stress test's particles in one canvas per field, with the keyframes worked out on the graphics card. Off, every particle is an element of its own."
-            controls="Sets ParticleFieldProps.renderer in the stress test"
-        >
+        <PageProp item-key="onGraphicsCard" v-bind="ParticleFieldKnobs.ON_GRAPHICS_CARD_TEXT">
             <PageCheckField
                 :value="isOnGraphicsCard"
                 ariaLabel="On the graphics card"

@@ -20,8 +20,7 @@ globalStyle(`${root} > :focus-visible`, {
 export const photo = style({
     display: "block",
     width: "100%",
-    height: 260,
-    objectFit: "cover",
+    height: "auto",
     userSelect: "none",
 });
 
@@ -31,7 +30,7 @@ export const print = style({
     gap: themeVars.spacing.half,
     height: 260,
     padding: themeVars.spacing.double,
-    backgroundColor: layerVars.main,
+    backgroundColor: layerVars.dark,
     color: layerVars.contrast,
     fontSize: themeVars.fontSize.small,
     userSelect: "none",

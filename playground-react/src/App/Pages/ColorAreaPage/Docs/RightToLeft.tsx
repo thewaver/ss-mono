@@ -3,7 +3,10 @@ import { useState } from "react";
 import { ColorArea } from "@thewaver/ss-components-react";
 import { COLOR_AREA_AXIS_LABELS } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
 import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
-import { STARTING_HSV } from "@thewaver/ss-playground/App/Pages/ColorAreaPage/ColorAreaPage.const";
+import {
+    SATURATION_BRIGHTNESS_RIGHT_LEFT_LABEL,
+    STARTING_HSV,
+} from "@thewaver/ss-playground/App/Pages/ColorAreaPage/ColorAreaPage.const";
 import type { Color } from "@thewaver/ss-utils";
 
 import { PageColorAreaContent } from "../../../StyledComponents/ColorAreaContent/ColorAreaContent";
@@ -20,7 +23,7 @@ export const RightToLeftDocsExample = () => {
                 <ColorArea
                     hsv={hsvState}
                     sizing={"fill"}
-                    ariaLabel={"Saturation and brightness in a right-to-left box"}
+                    ariaLabel={SATURATION_BRIGHTNESS_RIGHT_LEFT_LABEL}
                     axisLabels={COLOR_AREA_AXIS_LABELS}
                     renderContent={(renderProps) => <PageColorAreaContent renderProps={renderProps} size={AREA_SIZE} />}
                 />

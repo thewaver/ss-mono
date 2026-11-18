@@ -2,6 +2,7 @@ import { createMemo, createSignal } from "solid-js";
 
 import type { TableSort } from "@thewaver/ss-components-solid";
 import { Table } from "@thewaver/ss-components-solid";
+import { PARTS_RESIZABLE_COLUMNS_LABEL } from "@thewaver/ss-playground/App/Pages/TablePage/TablePage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/TablePage/TablePage.css";
 
 import { PageTableResizer } from "../../../StyledComponents/TableContent/TableContent";
@@ -23,7 +24,7 @@ export const ResizableDocsExample = () => {
                 sort={sortSignal}
                 selection={selectionSignal}
                 widths={widthsSignal}
-                ariaLabel={"Parts with resizable columns"}
+                ariaLabel={PARTS_RESIZABLE_COLUMNS_LABEL}
                 renderResizer={(getRenderProps) => <PageTableResizer renderProps={getRenderProps} />}
             />
         </div>

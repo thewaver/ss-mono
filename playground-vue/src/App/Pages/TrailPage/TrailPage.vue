@@ -80,12 +80,7 @@ const examples: ExampleDefs[] = [
 
 <template>
     <PagePropsPanel scope="global">
-        <PageProp
-            item-key="durationMs"
-            controls="Sets TrailProps.durationMs"
-            label="Lap duration (ms)"
-            hint="How long the traveler takes to walk the path once, end to end."
-        >
+        <PageProp item-key="durationMs" v-bind="TrailKnobs.DURATION_MS_TEXT">
             <PageNumberField
                 :value="durationMs"
                 :min="TrailKnobs.MIN_DURATION_MS"
@@ -96,21 +91,11 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="isLooping"
-            controls="Sets TrailProps.isLooping"
-            label="Loops"
-            hint="Sends the traveler round again as soon as it reaches the end, instead of stopping there."
-        >
+        <PageProp item-key="isLooping" v-bind="TrailKnobs.IS_LOOPING_TEXT">
             <PageCheckField :value="isLooping" ariaLabel="Loops" @change="(value: boolean) => (isLooping = value)" />
         </PageProp>
 
-        <PageProp
-            item-key="isTurning"
-            controls="Sets TrailProps.isTurning"
-            label="Faces along the path"
-            hint="Turns the traveler to point the way it is going, instead of leaving it upright the whole way round."
-        >
+        <PageProp item-key="isTurning" v-bind="TrailKnobs.IS_TURNING_TEXT">
             <PageCheckField
                 :value="isTurning"
                 ariaLabel="Faces along the path"

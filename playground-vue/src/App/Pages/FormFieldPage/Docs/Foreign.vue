@@ -2,12 +2,11 @@
 import { shallowRef } from "vue";
 
 import { FormField } from "@thewaver/ss-components-vue";
+import { MESSAGE } from "@thewaver/ss-playground/App/Pages/FormFieldPage/FormFieldPage.const";
 
 import PageFormFieldCaption from "../../../StyledComponents/FormFieldContent/PageFormFieldCaption.vue";
 import PageFormFieldMessage from "../../../StyledComponents/FormFieldContent/PageFormFieldMessage.vue";
 import ForeignInput from "./ForeignInput.vue";
-
-const MESSAGE = "Shown to everyone who can see your posts.";
 
 const value = shallowRef("");
 </script>

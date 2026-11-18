@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { shallowRef } from "vue";
 
-import { DOCS_ROOT } from "@thewaver/ss-playground/App/Pages/TogglePage/TogglePage.const";
+import { ToggleKnobs } from "@thewaver/ss-playground/App/Knobs/Toggles.const";
+import { DOCS_ROOT, DOCS_SECTIONS } from "@thewaver/ss-playground/App/Pages/TogglePage/TogglePage.const";
 
 import PageDocsExample from "../../PageComponents/DocsExample/PageDocsExample.vue";
 import PageDocsSection from "../../PageComponents/DocsSection/PageDocsSection.vue";
@@ -24,21 +25,11 @@ const isTooltipDisabled = shallowRef(false);
         <BasicDocsExample :has-error="hasError" :is-disabled="isDisabled" />
 
         <template #renderKnobs>
-            <PageProp
-                item-key="hasError"
-                label="Error"
-                hint="Marks the toggle invalid, for screen readers as well as for the painter."
-                controls="Sets ToggleProps.hasError"
-            >
+            <PageProp item-key="hasError" v-bind="ToggleKnobs.HAS_ERROR_TEXT">
                 <PageCheckField :value="hasError" ariaLabel="Error" @change="(value: boolean) => (hasError = value)" />
             </PageProp>
 
-            <PageProp
-                item-key="isDisabled"
-                label="Disabled"
-                hint="Turns the toggle off: neither a click nor Space changes it, and the Tab key skips it."
-                controls="Sets ToggleProps.isDisabled"
-            >
+            <PageProp item-key="isDisabled" v-bind="ToggleKnobs.IS_DISABLED_TEXT">
                 <PageCheckField
                     :value="isDisabled"
                     ariaLabel="Disabled"
@@ -48,37 +39,25 @@ const isTooltipDisabled = shallowRef(false);
         </template>
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Right to left"
-        content="Inside a box whose text runs right to left, the track sits to the right of its words, and switching the toggle on slides the handle to the left, the end the text runs toward."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.rightLeft" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/RightToLeft.vue`">
         <RightToLeftDocsExample />
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Mixed"
-        content="A toggle summarizing others can be neither on nor off: set [prop]isMixed[/prop] while they disagree. A switch has no way to say mixed to a screen reader, so while mixed the toggle reads as a mixed checkbox instead, and as a switch again once it is on or off. Pressing it sets a value, so here it turns both of the toggles it controls on or off."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.mixed" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Mixed.vue`">
         <MixedDocsExample />
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Decoration"
-        content="Anything drawn over the toggle goes through [prop]renderDecoration[/prop], which is handed the toggle's state like the painter is: here a corner highlight shows while it is pressed."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.decoration" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Decorated.vue`">
         <DecoratedDocsExample />
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Tooltip"
-        content="Give a toggle [prop]tooltipDefs[/prop] and it shows a tooltip on hover and on keyboard focus, read by screen readers as the toggle's description. A disabled toggle shows no tooltip unless you also keep it reachable when disabled; it can then be focused to read why it is off, and pressing it still changes nothing."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.tooltip" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Tooltip.vue`">
         <TooltipDocsExample :is-disabled="isTooltipDisabled" :is-reachable-when-disabled="isReachableWhenDisabled" />
@@ -86,9 +65,7 @@ const isTooltipDisabled = shallowRef(false);
         <template #renderKnobs>
             <PageProp
                 item-key="tooltipIsReachableWhenDisabled"
-                label="Reachable when disabled"
-                hint="Keeps a disabled toggle's tooltip available: the Tab key can stop on it and hovering it shows the tooltip. Without it a disabled toggle shows no tooltip at all. It only matters while Disabled is on."
-                controls="Sets ToggleProps.isReachableWhenDisabled"
+                v-bind="ToggleKnobs.TOOLTIP_IS_REACHABLE_WHEN_DISABLED_TEXT"
             >
                 <PageCheckField
                     :value="isReachableWhenDisabled"
@@ -97,12 +74,7 @@ const isTooltipDisabled = shallowRef(false);
                 />
             </PageProp>
 
-            <PageProp
-                item-key="tooltipIsDisabled"
-                label="Disabled"
-                hint="Turns the toggle off: neither a click nor Space changes it, and the Tab key skips it."
-                controls="Sets ToggleProps.isDisabled"
-            >
+            <PageProp item-key="tooltipIsDisabled" v-bind="ToggleKnobs.IS_DISABLED_TEXT">
                 <PageCheckField
                     :value="isTooltipDisabled"
                     ariaLabel="Disabled"

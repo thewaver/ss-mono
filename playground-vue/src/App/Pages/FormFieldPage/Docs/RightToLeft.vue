@@ -2,6 +2,7 @@
 import { shallowRef } from "vue";
 
 import { FormField, TextInput } from "@thewaver/ss-components-vue";
+import { RIGHT_TO_LEFT_MESSAGE } from "@thewaver/ss-playground/App/Pages/FormFieldPage/FormFieldPage.const";
 import {
     FIELD_GAP,
     FIELD_PADDING,
@@ -11,20 +12,18 @@ import PageFormFieldCaption from "../../../StyledComponents/FormFieldContent/Pag
 import PageFormFieldMessage from "../../../StyledComponents/FormFieldContent/PageFormFieldMessage.vue";
 import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 
-const MESSAGE = "Shown to everyone who can see your posts";
-
 const value = shallowRef("");
 </script>
 
 <template>
     <div dir="rtl">
-        <FormField :message="MESSAGE">
+        <FormField :message="RIGHT_TO_LEFT_MESSAGE">
             <template #renderCaption>
                 <PageFormFieldCaption>Display name</PageFormFieldCaption>
             </template>
 
             <template #renderMessage="state">
-                <PageFormFieldMessage :state="state">{{ MESSAGE }}</PageFormFieldMessage>
+                <PageFormFieldMessage :state="state">{{ RIGHT_TO_LEFT_MESSAGE }}</PageFormFieldMessage>
             </template>
 
             <template #renderControl="state">

@@ -34,7 +34,7 @@
 </PageMeasureBox>
 
 <PageExampleKnobs>
-    <PageProp itemKey={"shapeKey"} controls={"Picks the sample shape sent to ImageMosaicProps.targetAspectRatio"} label={"Target shape"} hint={"The contour the tiles are packed into."}>
+    <PageProp itemKey={"shapeKey"} {...ImageMosaicKnobs.SHAPE_KEY_TEXT}>
         <PageSelectField
             value={shapeKey}
             values={MosaicImages.SAMPLE_SHAPE_KEYS}
@@ -48,9 +48,7 @@
 
     <PageProp
         itemKey={"isDecorated"}
-        controls={"Decides whether the example ImageMosaicProps.renderItem wraps each image"}
-        label={"Wrapped"}
-        hint={"Puts each tile in a frame of its own, so the packing can be told apart from the pictures in it."}
+        {...ImageMosaicKnobs.IS_DECORATED_TEXT}
     >
         <PageCheckField
             value={isDecorated}

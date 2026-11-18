@@ -8,9 +8,7 @@
     import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
     import { computeSampleDefs } from "../PaintedTextPageSvelte.const";
     import type { PaintedTextPathExampleProps } from "../PaintedTextPageSvelte.types";
-
-    const WAVE_PATH = "M 0 60 C 45 0 90 0 135 60 S 225 120 270 60 S 360 0 405 60 S 495 120 540 60";
-    const WAVE_TEXT = "Riding the wave, round and round • ";
+    import { WAVE_TEXT, WAVE_PATH } from "@thewaver/ss-playground/App/Pages/PaintedTextPage/PaintedTextPage.const";
 
     type Props = PaintedTextPathExampleProps;
 

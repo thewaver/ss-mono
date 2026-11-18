@@ -75,12 +75,7 @@ const examples: ExampleDefs[] = [
 
 <template>
     <PagePropsPanel scope="global">
-        <PageProp
-            item-key="radius"
-            controls="Sets RevealProps.radius"
-            label="Radius (px)"
-            hint="How large the window that follows the pointer is."
-        >
+        <PageProp item-key="radius" v-bind="RevealKnobs.RADIUS_TEXT">
             <PageNumberField
                 :value="radius"
                 :min="RevealKnobs.MIN_RADIUS"
@@ -92,12 +87,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="computePoints"
-            controls="Picks the example contour sent to RevealProps.computePoints"
-            label="Shape"
-            hint="The contour of the window that follows the pointer."
-        >
+        <PageProp item-key="computePoints" v-bind="RevealKnobs.COMPUTE_POINTS_TEXT">
             <PageSelectField
                 :value="shape"
                 :values="RevealKnobs.SHAPES"
@@ -107,12 +97,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="joinRadii"
-            controls="Sets every corner of RevealProps.joinRadii"
-            label="Corner radius (px)"
-            hint="How far the window's corners are rounded. A circular window has no corners, so it is off then."
-        >
+        <PageProp item-key="joinRadii" v-bind="RevealKnobs.JOIN_RADII_TEXT">
             <PageNumberField
                 :value="joinRadius"
                 :min="RevealKnobs.MIN_JOIN_RADIUS"
@@ -124,12 +109,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="lameExponents"
-            controls="Sets every corner of RevealProps.lameExponents"
-            label="Lamé Exponent"
-            hint="How square or how pinched the window's rounded corners are: 1 is a circular round, higher is squarer."
-        >
+        <PageProp item-key="lameExponents" v-bind="RevealKnobs.LAME_EXPONENTS_TEXT">
             <PageNumberField
                 :value="lameExponent"
                 :min="RevealKnobs.MIN_LAME_EXPONENT"
@@ -141,12 +121,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="softness"
-            controls="Sets RevealProps.softness"
-            label="Softness"
-            hint="How gradually the window fades into what is still covered. 0 gives a hard edge."
-        >
+        <PageProp item-key="softness" v-bind="RevealKnobs.SOFTNESS_TEXT">
             <PageNumberField
                 :value="softness"
                 :min="RevealKnobs.MIN_SOFTNESS"
@@ -158,12 +133,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="stepSize"
-            controls="Sets RevealProps.stepSize"
-            label="Step size (px)"
-            hint="How far one press of an arrow key moves the window. Tab to a reveal and it opens at the center; the arrow keys move it from there."
-        >
+        <PageProp item-key="stepSize" v-bind="RevealKnobs.STEP_SIZE_TEXT">
             <PageNumberField
                 :value="stepSize"
                 :min="RevealKnobs.MIN_STEP_SIZE"
@@ -175,12 +145,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="isDisabled"
-            controls="Sets RevealProps.isDisabled"
-            label="Disabled"
-            hint="Stops the window following the pointer or the keyboard, leaving whatever is underneath covered."
-        >
+        <PageProp item-key="isDisabled" v-bind="RevealKnobs.IS_DISABLED_TEXT">
             <PageCheckField
                 :value="isDisabled"
                 ariaLabel="Disabled"

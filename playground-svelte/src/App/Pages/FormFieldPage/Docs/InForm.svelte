@@ -13,9 +13,7 @@
     import PageFormStack from "../../../StyledComponents/FormFieldContent/PageFormStack.svelte";
     import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
     import type { FormFieldInFormDocsExampleProps } from "../FormFieldPageSvelte.types";
-
-    const HINT = "Shown to everyone who can see your posts.";
-    const ERROR = "That name is already taken.";
+    import { ERROR, HINT, SOME_FIELDS_NEED_ATTENTION_TEXT } from "@thewaver/ss-playground/App/Pages/FormFieldPage/FormFieldPage.const";
 
     type Props = FormFieldInFormDocsExampleProps;
 
@@ -69,7 +67,7 @@
             </PageFormButtons>
 
             <div class={exampleStyles.exampleReadout} data-readout>
-                {`${state.isValid ? "Ready to send." : "Some fields need attention."} ${outcome}`}
+                {`${state.isValid ? "Ready to send." : SOME_FIELDS_NEED_ATTENTION_TEXT} ${outcome}`}
             </div>
         </PageFormStack>
     {/snippet}

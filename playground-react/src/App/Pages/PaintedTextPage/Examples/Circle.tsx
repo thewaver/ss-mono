@@ -2,6 +2,7 @@ import { useId } from "react";
 
 import { Button, PaintedText, PaintedTextUtils } from "@thewaver/ss-components-react";
 import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
+import { RING_TEXT } from "@thewaver/ss-playground/App/Pages/PaintedTextPage/PaintedTextPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/PaintedTextPage/PaintedTextPage.css";
 import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
@@ -9,8 +10,6 @@ import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
 import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import { computeSampleDefs } from "../PaintedTextPageReact.const";
 import type { PaintedTextCircleExampleProps } from "../PaintedTextPageReact.types";
-
-const RING_TEXT = "PAINTED TEXT • ROUND A CIRCLE • ";
 
 type Props = PaintedTextCircleExampleProps;
 

@@ -3,6 +3,7 @@ import { createEffect, onCleanup } from "solid-js";
 import type { CuboidFace } from "@thewaver/ss-components-solid";
 import { Cuboid, CuboidUtils, access } from "@thewaver/ss-components-solid";
 import { computeCuboidFaceLabel } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
+import { SIX_FACES_TURNING_THEMSELVES_LABEL } from "@thewaver/ss-playground/App/Pages/CuboidPage/CuboidPage.const";
 import { ObjectUtils } from "@thewaver/ss-utils";
 
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
@@ -60,7 +61,7 @@ export const WanderingExample = (props: Props) => {
                     pitch={props.pitch}
                     size={props.size}
                     transitionDurationMs={props.transitionDurationMs}
-                    ariaLabel={"Six faces, turning by themselves"}
+                    ariaLabel={SIX_FACES_TURNING_THEMSELVES_LABEL}
                     computeFaceLabel={computeCuboidFaceLabel}
                     renderFace={(getFace, getState) => <PageCuboidFace face={getFace} state={getState} />}
                 />

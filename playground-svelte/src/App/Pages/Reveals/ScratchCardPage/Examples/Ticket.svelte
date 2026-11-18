@@ -7,6 +7,7 @@
     import PageMeasureBox from "../../../../PageComponents/MeasureBox/MeasureBox.svelte";
     import PageControlButtonContent from "../../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
     import type { ScratchCardExampleProps } from "../ScratchCardPageSvelte.types";
+    import { SCRATCH_REVEAL_PRIZE_LABEL } from "@thewaver/ss-playground/App/Pages/Reveals/ScratchCardPage/ScratchCardPage.const";
 
     const CARD_WIDTH = 360;
     const PRIZE = "★ 10 000 ★";
@@ -27,7 +28,7 @@
                 softness={props.softness}
                 computePoints={props.computePoints}
                 clearThreshold={props.clearThreshold}
-                ariaLabel={"Scratch to reveal the prize"}
+                ariaLabel={SCRATCH_REVEAL_PRIZE_LABEL}
                 onMount={(next) => {
                     controller = next;
                 }}

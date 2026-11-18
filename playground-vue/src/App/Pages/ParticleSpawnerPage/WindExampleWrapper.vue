@@ -40,12 +40,7 @@ const gustRatio = shallowRef(ParticleSpawnerKnobs.STARTING_WIND_GUST_RATIO);
     </ScrubbedExampleWrapper>
 
     <PageExampleKnobs>
-        <PageProp
-            item-key="windDirectionDegrees"
-            controls="Sets directionDegrees of ParticleModifierUtils.createWind, sent to ParticleSpawnerProps.particleModifiers"
-            label="Direction (degrees)"
-            hint="Which way the wind blows, in degrees clockwise from rightward. 90 blows down."
-        >
+        <PageProp item-key="windDirectionDegrees" v-bind="ParticleSpawnerKnobs.WIND_DIRECTION_DEGREES_TEXT">
             <PageNumberField
                 :value="directionDegrees"
                 :min="ParticleSpawnerKnobs.MIN_WIND_DIRECTION_DEGREES"
@@ -57,12 +52,7 @@ const gustRatio = shallowRef(ParticleSpawnerKnobs.STARTING_WIND_GUST_RATIO);
             />
         </PageProp>
 
-        <PageProp
-            item-key="windStrengthPixels"
-            controls="Sets strengthPixels of ParticleModifierUtils.createWind, sent to ParticleSpawnerProps.particleModifiers"
-            label="Strength (px)"
-            hint="How far a particle is carried off its path halfway along it, between gusts."
-        >
+        <PageProp item-key="windStrengthPixels" v-bind="ParticleSpawnerKnobs.WIND_STRENGTH_PIXELS_TEXT">
             <PageNumberField
                 :value="strengthPixels"
                 :min="ParticleSpawnerKnobs.MIN_WIND_STRENGTH_PIXELS"
@@ -74,12 +64,7 @@ const gustRatio = shallowRef(ParticleSpawnerKnobs.STARTING_WIND_GUST_RATIO);
             />
         </PageProp>
 
-        <PageProp
-            item-key="windGustRatio"
-            controls="Sets gustRatio of ParticleModifierUtils.createWind, sent to ParticleSpawnerProps.particleModifiers"
-            label="Gusts"
-            hint="How much the strength swings above and below itself over time. 0 is a steady wind."
-        >
+        <PageProp item-key="windGustRatio" v-bind="ParticleSpawnerKnobs.WIND_GUST_RATIO_TEXT">
             <PageNumberField
                 :value="gustRatio"
                 :min="ParticleSpawnerKnobs.MIN_WIND_GUST_RATIO"

@@ -1,5 +1,5 @@
 import { Button, Toasts, useToastsContext } from "@thewaver/ss-components-solid";
-import { MESSAGES } from "@thewaver/ss-playground/App/Pages/ToastsPage/ToastsPage.const";
+import { ANIMATED_NOTIFICATIONS_LABEL, MESSAGES } from "@thewaver/ss-playground/App/Pages/ToastsPage/ToastsPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ToastsPage/ToastsPage.css";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
@@ -33,7 +33,7 @@ const Raisers = () => {
 
 export const AnimationDocsExample = (props: Props) => (
     <Toasts<ToastDefs>
-        ariaLabel={"Animated notifications"}
+        ariaLabel={ANIMATED_NOTIFICATIONS_LABEL}
         alignment={"top_left"}
         transitionDurationMs={props.transitionDurationMs}
         renderToast={(getToast, getVisibilityTarget, getTransitionDurationMs, getState, dismiss) => (

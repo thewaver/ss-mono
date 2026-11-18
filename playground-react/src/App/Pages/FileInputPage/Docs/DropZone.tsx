@@ -4,6 +4,7 @@ import { FileInput } from "@thewaver/ss-components-react";
 import type { FileInputRejection } from "@thewaver/ss-components-react";
 import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
 import {
+    DROP_IMAGES_HERE_PRESS_TEXT,
     DROP_ZONE_ACCEPT,
     DROP_ZONE_MAX_FILES,
     DROP_ZONE_MAX_SIZE_BYTES,
@@ -34,7 +35,7 @@ export const DropZoneDocsExample = (props: Props) => {
                 renderContent={(renderProps) => (
                     <PageFileDropZoneContent
                         renderProps={renderProps}
-                        prompt={renderProps.isDragOver ? "Let go to add them" : "Drop images here, or press to choose"}
+                        prompt={renderProps.isDragOver ? "Let go to add them" : DROP_IMAGES_HERE_PRESS_TEXT}
                     />
                 )}
                 onChange={() => setRejections([])}

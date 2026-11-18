@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { shallowRef } from "vue";
 
-import { DOCS_ROOT } from "@thewaver/ss-playground/App/Pages/ButtonPage/ButtonPage.const";
+import { ButtonKnobs } from "@thewaver/ss-playground/App/Knobs/Buttons.const";
+import { DOCS_ROOT, DOCS_SECTIONS } from "@thewaver/ss-playground/App/Pages/ButtonPage/ButtonPage.const";
 
 import PageDocsExample from "../../PageComponents/DocsExample/PageDocsExample.vue";
 import PageDocsSection from "../../PageComponents/DocsSection/PageDocsSection.vue";
@@ -24,21 +25,11 @@ const isReachableWhenDisabled = shallowRef(false);
         <BasicDocsExample :is-disabled="isDisabled" :has-error="hasError" :is-pressed="isPressed" />
 
         <template #renderKnobs>
-            <PageProp
-                item-key="hasError"
-                label="Error"
-                hint="Puts the button in its error look. It changes nothing about what the button accepts or does."
-                controls="Sets Button.hasError"
-            >
+            <PageProp item-key="hasError" v-bind="ButtonKnobs.HAS_ERROR_TEXT">
                 <PageCheckField :value="hasError" ariaLabel="Error" @change="(value: boolean) => (hasError = value)" />
             </PageProp>
 
-            <PageProp
-                item-key="isPressed"
-                label="Pressed"
-                hint="Marks the button as holding a state, like a toggle that stays down. What that looks like is up to the painter; here it gets a 4px inner ring in the secondary color."
-                controls="Sets Button.isPressed"
-            >
+            <PageProp item-key="isPressed" v-bind="ButtonKnobs.IS_PRESSED_TEXT">
                 <PageCheckField
                     :value="isPressed"
                     ariaLabel="Pressed"
@@ -46,12 +37,7 @@ const isReachableWhenDisabled = shallowRef(false);
                 />
             </PageProp>
 
-            <PageProp
-                item-key="isDisabled"
-                label="Disabled"
-                hint="Turns the button off: it ignores presses and hover, and the Tab key skips it."
-                controls="Sets Button.isDisabled"
-            >
+            <PageProp item-key="isDisabled" v-bind="ButtonKnobs.IS_DISABLED_TEXT">
                 <PageCheckField
                     :value="isDisabled"
                     ariaLabel="Disabled"
@@ -61,10 +47,7 @@ const isReachableWhenDisabled = shallowRef(false);
         </template>
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Tooltip"
-        content="Give a button [prop]tooltipDefs[/prop] and it shows a tooltip on hover and on keyboard focus, and links it to the button so screen readers read it as the button's description. A disabled button shows no tooltip unless you also keep it reachable when disabled; then it can still tell people why it is off."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.tooltip" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Tooltip.vue`">
         <TooltipDocsExample :is-disabled="isTooltipDisabled" :is-reachable-when-disabled="isReachableWhenDisabled" />
@@ -72,9 +55,7 @@ const isReachableWhenDisabled = shallowRef(false);
         <template #renderKnobs>
             <PageProp
                 item-key="tooltipIsReachableWhenDisabled"
-                label="Reachable when disabled"
-                hint="Keeps a disabled button's tooltip available: the Tab key can stop on it and hovering it shows the tooltip. Without it a disabled button shows no tooltip at all. It only matters while Disabled is on."
-                controls="Sets Button.isReachableWhenDisabled"
+                v-bind="ButtonKnobs.TOOLTIP_IS_REACHABLE_WHEN_DISABLED_TEXT"
             >
                 <PageCheckField
                     :value="isReachableWhenDisabled"
@@ -83,12 +64,7 @@ const isReachableWhenDisabled = shallowRef(false);
                 />
             </PageProp>
 
-            <PageProp
-                item-key="tooltipIsDisabled"
-                label="Disabled"
-                hint="Turns the button off: it ignores presses and hover, and the Tab key skips it."
-                controls="Sets Button.isDisabled"
-            >
+            <PageProp item-key="tooltipIsDisabled" v-bind="ButtonKnobs.IS_DISABLED_TEXT">
                 <PageCheckField
                     :value="isTooltipDisabled"
                     ariaLabel="Disabled"
@@ -98,19 +74,13 @@ const isReachableWhenDisabled = shallowRef(false);
         </template>
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Decoration"
-        content="Anything drawn over the button goes through [prop]renderDecoration[/prop], which is handed the button's state like the painter is. Here a corner highlight shows while the button is pressed, and a ripple spreads from where it was pressed, which [prop]onActivation[/prop] reports."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.decoration" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Decorated.vue`">
         <DecoratedDocsExample />
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Hold to repeat"
-        content="A button reports the pointer going down and up through [prop]onPointerDown[/prop] and [prop]onPointerUp[/prop], which is enough to repeat an action while it is held: here a step happens at once, then again and again after a short wait until the pointer lifts or leaves. A press from the keyboard still steps once, through [prop]onClick[/prop]."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.holdRepeat" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Repeating.vue`">
         <RepeatingDocsExample />

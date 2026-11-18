@@ -15,3 +15,9 @@ export const EXAMPLE_NAMES = {
 export const EXAMPLES_ROOT = "/src/App/Pages/WraparoundPage/Examples";
 
 export const NO_DRIFT_PX_PER_SECOND = 0;
+
+export const NUMBERED_BUTTONS_REPEATING_EVERY_LABEL = "Numbered buttons, repeating in every direction";
+
+export const TOOLS_LIBRARY_BUILT_DRIFTING_LABEL = "Tools this library is built with, drifting past";
+
+export const PICTURES_REPEATING_EVERY_DIRECTION_LABEL = "Pictures, repeating in every direction";

@@ -2,7 +2,11 @@ import { useState } from "react";
 
 import { FLYOUT_MENU_DEFAULTS } from "@thewaver/ss-components-react";
 import { FlyoutMenuKnobs } from "@thewaver/ss-playground/App/Knobs/FlyoutMenus.const";
-import { DOCS_ROOT, FIELD_WIDTH } from "@thewaver/ss-playground/App/Pages/Menus/FlyoutMenuPage/FlyoutMenuPage.const";
+import {
+    DOCS_ROOT,
+    DOCS_SECTIONS,
+    FIELD_WIDTH,
+} from "@thewaver/ss-playground/App/Pages/Menus/FlyoutMenuPage/FlyoutMenuPage.const";
 
 import { PageDocsExample } from "../../../PageComponents/DocsExample/DocsExample";
 import { PageDocsSection } from "../../../PageComponents/DocsSection/DocsSection";
@@ -22,12 +26,7 @@ export const FlyoutMenuDocs = () => {
                 path={`${DOCS_ROOT}/Basic.tsx`}
                 renderKnobs={() => (
                     <>
-                        <PageProp
-                            itemKey={"hoverShowDelayMs"}
-                            label={"Hover delay (ms)"}
-                            hint={"How long the pointer has to rest on an entry before its panel opens."}
-                            controls={"Sets FlyoutMenuProps.hoverShowDelayMs"}
-                        >
+                        <PageProp itemKey={"hoverShowDelayMs"} {...FlyoutMenuKnobs.HOVER_SHOW_DELAY_MS_TEXT}>
                             <PageNumberField
                                 value={hoverShowDelayMs}
                                 min={FlyoutMenuKnobs.MIN_DELAY_MS}
@@ -39,12 +38,7 @@ export const FlyoutMenuDocs = () => {
                             />
                         </PageProp>
 
-                        <PageProp
-                            itemKey={"transitionDurationMs"}
-                            label={"Transition duration (ms)"}
-                            hint={"How long the panel takes to fade, and to glide from one entry to the next."}
-                            controls={"Sets FlyoutMenuProps.transitionDurationMs"}
-                        >
+                        <PageProp itemKey={"transitionDurationMs"} {...FlyoutMenuKnobs.TRANSITION_DURATION_MS_TEXT}>
                             <PageNumberField
                                 value={transitionDurationMs}
                                 min={FlyoutMenuKnobs.MIN_TRANSITION_MS}
@@ -61,23 +55,13 @@ export const FlyoutMenuDocs = () => {
                 <BasicDocsExample hoverShowDelayMs={hoverShowDelayMs} transitionDurationMs={transitionDurationMs} />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"Too narrow for every entry"}
-                content={
-                    "The bar measures itself, and the entries that do not fit collapse into a last one. Inside its panel each collapsed entry keeps its link and its toggle, and the toggle opens that entry's links in place. Give an entry a [prop]collapse[/prop] of never to keep it on the bar, or always to send it to the end whatever the room."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.tooNarrowEveryEntry} />
 
             <PageDocsExample path={`${DOCS_ROOT}/Narrow.tsx`}>
                 <NarrowDocsExample />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"Right to left"}
-                content={
-                    "Inside a box whose text runs right to left, the entries run from the right, each toggle sits to the left of its link, and Tab walks them in that order. The panel takes the box's direction although it is drawn outside it: it hangs from the right edge of its entry and its links read from the right. A [prop]placement[/prop] you give is used as it stands."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.rightLeft} />
 
             <PageDocsExample path={`${DOCS_ROOT}/RightToLeft.tsx`}>
                 <RightToLeftDocsExample />

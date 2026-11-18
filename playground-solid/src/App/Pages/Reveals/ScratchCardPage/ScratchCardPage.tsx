@@ -121,14 +121,7 @@ export const ScratchCardPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp
-                    key={"precision"}
-                    label={"Precision"}
-                    hint={
-                        "How finely the card measures how much has been scratched off. Finer measurement costs more work each frame."
-                    }
-                    controls={"Sets ScratchCardProps.precision"}
-                >
+                <PageProp key={"precision"} {...ScratchCardKnobs.PRECISION_TEXT}>
                     <PageNumberField
                         value={getPrecision}
                         min={ScratchCardKnobs.MIN_PRECISION}
@@ -139,12 +132,7 @@ export const ScratchCardPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"brushRadius"}
-                    label={"Brush radius (px)"}
-                    hint={"How large a patch one stroke of the pointer clears."}
-                    controls={"Sets ScratchCardProps.brushRadius"}
-                >
+                <PageProp key={"brushRadius"} {...ScratchCardKnobs.BRUSH_RADIUS_TEXT}>
                     <PageNumberField
                         value={getBrushRadius}
                         min={ScratchCardKnobs.MIN_BRUSH_RADIUS}
@@ -155,12 +143,7 @@ export const ScratchCardPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"brushShape"}
-                    label={"Brush shape"}
-                    hint={"The contour of the patch a stroke clears."}
-                    controls={"Picks the example brush contour sent to ScratchCardProps.computePoints"}
-                >
+                <PageProp key={"brushShape"} {...ScratchCardKnobs.BRUSH_SHAPE_TEXT}>
                     <PageSelectField
                         value={getBrushShape}
                         values={ScratchCardKnobs.BRUSH_SHAPES}
@@ -169,12 +152,7 @@ export const ScratchCardPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"softness"}
-                    label={"Edge softness"}
-                    hint={"How gradually a cleared patch fades into what is still covered. 0 gives a hard edge."}
-                    controls={"Sets ScratchCardProps.softness"}
-                >
+                <PageProp key={"softness"} {...ScratchCardKnobs.SOFTNESS_TEXT}>
                     <PageNumberField
                         value={getSoftness}
                         min={ScratchCardKnobs.MIN_SOFTNESS}
@@ -185,12 +163,7 @@ export const ScratchCardPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"clearThreshold"}
-                    label={"Clear threshold"}
-                    hint={"How much of the card has to be scratched off before the rest is cleared for you."}
-                    controls={"Sets ScratchCardProps.clearThreshold"}
-                >
+                <PageProp key={"clearThreshold"} {...ScratchCardKnobs.CLEAR_THRESHOLD_TEXT}>
                     <PageNumberField
                         value={getThreshold}
                         min={ScratchCardKnobs.MIN_THRESHOLD}

@@ -36,14 +36,7 @@ export const CornerPinPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp
-                    itemKey={"reachRatio"}
-                    label={"Reach"}
-                    hint={
-                        "How far past each edge of the box a corner may be taken, as a share of the box. At 0 every corner stays on or inside the box, so the content can only be squeezed; above it, the content can be stretched beyond its own size too."
-                    }
-                    controls={"Sets CornerPinProps.reachRatio"}
-                >
+                <PageProp itemKey={"reachRatio"} {...CornerPinKnobs.REACH_RATIO_TEXT}>
                     <PageNumberField
                         value={reachRatio}
                         min={CornerPinKnobs.MIN_REACH_RATIO}

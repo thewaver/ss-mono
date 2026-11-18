@@ -5,6 +5,7 @@ import { CirclePacking, TreemapUtils } from "@thewaver/ss-components-vue";
 import type { CirclePackingNode } from "@thewaver/ss-components-vue";
 import { LIBRARY } from "@thewaver/ss-playground/App/LibraryTree.generated";
 import { formatLines } from "@thewaver/ss-playground/App/LibraryTree.utils";
+import { LIBRARY_S_SOURCE_LINES_LABEL } from "@thewaver/ss-playground/App/Pages/CirclePackingPage/CirclePackingPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/CirclePackingPage/CirclePackingPage.css";
 
 import PageCirclePackingCircle from "../../../StyledComponents/CirclePackingContent/PageCirclePackingCircle.vue";
@@ -30,7 +31,7 @@ const branch = useModel(props, "branch");
                 :root="LIBRARY"
                 :padding="padding"
                 :zoom-duration-ms="zoomDurationMs"
-                ariaLabel="The library's source, by lines of code"
+                :ariaLabel="LIBRARY_S_SOURCE_LINES_LABEL"
             >
                 <template #renderCircle="{ node, state }">
                     <PageCirclePackingCircle :state="state" :title="getTitle(node, state.weight)" />

@@ -4,6 +4,7 @@ import { shallowRef } from "vue";
 import { TimeInput } from "@thewaver/ss-components-vue";
 import { TIME_SEGMENT_HINTS } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
 import { FIELD_WIDTH } from "@thewaver/ss-playground/App/Pages/DatePickerPage/DatePickerPage.const";
+import { TIME_RIGHT_LEFT_BOX_LABEL } from "@thewaver/ss-playground/App/Pages/TimeInputPage/TimeInputPage.const";
 import {
     FIELD_GAP,
     FIELD_STEPPER_PADDING,
@@ -21,7 +22,7 @@ const value = shallowRef<TimeValue | undefined>({ hour: 14, minute: 30 });
         <TimeInput
             v-model:value="value"
             :is-twelve-hour="true"
-            ariaLabel="Time in a right-to-left box"
+            :ariaLabel="TIME_RIGHT_LEFT_BOX_LABEL"
             :segment-hints="TIME_SEGMENT_HINTS"
             :padding="FIELD_STEPPER_PADDING"
             :gap="FIELD_GAP"

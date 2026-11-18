@@ -56,3 +56,9 @@ export const SKIN_SAMPLE_RANGE = 40;
 export const computeSkinRowId = (skin: PlaygroundSkin) => `skin-row-${skin}`;
 
 export const computeThemeRowId = (theme: PlaygroundTheme) => `theme-row-${theme}`;
+
+export const THEME_DESCRIPTION =
+    "A theme decides the playground's colors. Each row shows one theme: a column per color, a line per shade; picking a row applies it to every page.";
+
+export const SKIN_DESCRIPTION =
+    "A skin decides how the playground is drawn: the shapes, borders, shadows and fonts of its controls, and where the theme's colors go. Each row shows the controls in one skin; picking a row applies it to every page. Custom Essential layouts and Exotic components are mostly excluded though, due to their specialized painters.";

@@ -7,6 +7,7 @@ import {
     TIME_SEGMENT_HINTS,
 } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
 import { FIELD_WIDTH, LOCALE } from "@thewaver/ss-playground/App/Pages/DatePickerPage/DatePickerPage.const";
+import { TIME_RIGHT_LEFT_BOX_LABEL } from "@thewaver/ss-playground/App/Pages/TimePickerPage/TimePickerPage.const";
 import {
     FIELD_GAP,
     FIELD_STEPPER_PADDING,
@@ -30,7 +31,7 @@ const value = shallowRef<TimeValue | undefined>({ hour: 14, minute: 30 });
         <TimePicker
             v-model:value="value"
             :is-twelve-hour="true"
-            ariaLabel="Time in a right-to-left box"
+            :ariaLabel="TIME_RIGHT_LEFT_BOX_LABEL"
             clock-label="Choose a time"
             :segment-hints="TIME_SEGMENT_HINTS"
             :locale="LOCALE"

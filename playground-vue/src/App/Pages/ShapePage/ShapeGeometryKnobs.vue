@@ -79,12 +79,7 @@ const setLameExponent = (index: number, value: number) => {
 </script>
 
 <template>
-    <PageProp
-        item-key="shapeKind"
-        controls="Picks the example contour sent to ShapeProps.computePoints"
-        label="Shape"
-        hint="The contour the shape is cut to, which also decides how many corners the corner fields offer."
-    >
+    <PageProp item-key="shapeKind" v-bind="ShapeKnobs.SHAPE_KIND_TEXT">
         <PageSelectField
             :value="geometry.shapeKind.value"
             :values="ShapeConst.DEFAULT_SHAPES"
@@ -93,12 +88,7 @@ const setLameExponent = (index: number, value: number) => {
         />
     </PageProp>
 
-    <PageProp
-        item-key="hasIndividualCorners"
-        controls="Writes the corner fields below into every entry of ShapeProps.joinRadii and ShapeProps.lameExponents at once, or one entry each"
-        label="Individual corner settings"
-        hint="Opens one field per corner instead of one field driving all of them together."
-    >
+    <PageProp item-key="hasIndividualCorners" v-bind="ShapeKnobs.HAS_INDIVIDUAL_CORNERS_TEXT">
         <PageCheckField
             :value="geometry.hasIndividualCorners.value"
             ariaLabel="Individual corner settings"
@@ -106,12 +96,7 @@ const setLameExponent = (index: number, value: number) => {
         />
     </PageProp>
 
-    <PageProp
-        item-key="jointRadiiPx"
-        controls="Sets ShapeProps.joinRadii"
-        label="Joint Radii (px)"
-        hint="How far each corner is rounded. With individual corners off, the first field drives them all."
-    >
+    <PageProp item-key="jointRadiiPx" v-bind="ShapeKnobs.JOINT_RADII_PX_TEXT">
         <div :class="styles.valueList" :style="{ gridTemplateColumns: templateColumns }">
             <PageNumberField
                 v-for="index in pointIterator"
@@ -128,12 +113,7 @@ const setLameExponent = (index: number, value: number) => {
         </div>
     </PageProp>
 
-    <PageProp
-        item-key="lameExponent"
-        controls="Sets ShapeProps.lameExponents"
-        label="Lamé Exponent"
-        hint="How square or how pinched each rounded corner is: 1 is a circular round, higher is squarer, 0 is a straight bevel and below 0 scoops inward."
-    >
+    <PageProp item-key="lameExponent" v-bind="ShapeKnobs.LAME_EXPONENT_TEXT">
         <div :class="styles.valueList" :style="{ gridTemplateColumns: templateColumns }">
             <PageNumberField
                 v-for="index in pointIterator"

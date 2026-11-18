@@ -3,7 +3,7 @@ import { computed, shallowRef } from "vue";
 
 import { Accordion, AccordionUtils } from "@thewaver/ss-components-vue";
 import type { AccordionItem } from "@thewaver/ss-components-vue";
-import { DOCS_GAP } from "@thewaver/ss-playground/App/Pages/Accordions/AccordionPage/AccordionPage.const";
+import { DOCS_GAP, PANEL_BODIES } from "@thewaver/ss-playground/App/Pages/Accordions/AccordionPage/AccordionPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/Accordions/Accordions.css";
 import {
     headerJoins,
@@ -12,13 +12,6 @@ import {
 
 import { useLayerClass } from "../../../../StyledComponents/Layer/Layer.context";
 import type { AccordionOrientationDocsExampleProps } from "../AccordionPageVue.types";
-
-const PANEL_BODIES: Record<string, string> = {
-    Mountains: "Cold air, long views and a path that only goes up.",
-    Coast: "Salt, wind and a horizon that never quite arrives.",
-    Forest: "Green light, soft ground and no straight lines anywhere.",
-    Desert: "Heat by day, stars by night, and silence in between.",
-};
 
 const ITEMS: AccordionItem<string>[] = [
     { value: "Mountains" },

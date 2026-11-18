@@ -88,12 +88,7 @@ const examples: ExampleDefs[] = [
 <template>
     <PagePropsGroups>
         <PagePropsPanel scope="sample">
-            <PageProp
-                item-key="configKey"
-                controls="Picks the sample gradient the example sends to ShapeProps.computeFillDefs or ShapeProps.computeStrokeDefs"
-                label="Gradient"
-                hint="Which animated gradient is shown. Choosing one brings its own knobs with it."
-            >
+            <PageProp item-key="configKey" v-bind="TimedGradientKnobs.CONFIG_KEY_TEXT">
                 <PageGroupedSelectField
                     :value="configKey"
                     :groups="TIMED_GRADIENT_GROUPS"
@@ -110,12 +105,7 @@ const examples: ExampleDefs[] = [
         <PagePropsPanel scope="global">
             <PageSVGGradientsProps :controls="controls" />
 
-            <PageProp
-                item-key="animationDurationMs"
-                controls="Sets SVGAnimationDefs.animationDurationMs"
-                label="Animation duration (ms)"
-                hint="How long one pass of the gradient's animation takes."
-            >
+            <PageProp item-key="animationDurationMs" v-bind="TimedGradientKnobs.ANIMATION_DURATION_MS_TEXT">
                 <PageNumberField
                     :value="animationDurationMs"
                     :min="SVGGradientKnobs.MIN_DURATION_MS"
@@ -126,12 +116,7 @@ const examples: ExampleDefs[] = [
                 />
             </PageProp>
 
-            <PageProp
-                item-key="iterationConfigKey"
-                controls="Picks the sample iteration that fills SVGAnimationDefs.animationIterationPatterns"
-                label="Iteration Pattern"
-                hint="How the animation repeats: once, endlessly, or back and forth."
-            >
+            <PageProp item-key="iterationConfigKey" v-bind="TimedGradientKnobs.ITERATION_CONFIG_KEY_TEXT">
                 <PageSelectField
                     :value="iterationConfigKey"
                     :values="SVGDefsSamples.Iteration.SAMPLE_KEYS"

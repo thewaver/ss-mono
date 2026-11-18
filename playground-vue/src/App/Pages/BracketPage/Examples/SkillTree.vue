@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Bracket } from "@thewaver/ss-components-vue";
 import type { BracketNode } from "@thewaver/ss-components-vue";
+import { SKILLS_WHAT_THEY_UNLOCK_LABEL } from "@thewaver/ss-playground/App/Pages/BracketPage/BracketPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/BracketPage/BracketPage.css";
 
 import type { BracketExampleProps } from "../BracketPage.types";
@@ -34,7 +35,7 @@ const props = defineProps<Props>();
             :orientation="orientation"
             :root-side="rootSide"
             :layer-header-size="orientation === 'horizontal' ? ACROSS_HEADER_SIZE : DOWN_HEADER_SIZE"
-            ariaLabel="Skills and what they unlock"
+            :ariaLabel="SKILLS_WHAT_THEY_UNLOCK_LABEL"
             @activate="props.onActivate"
         >
             <template #renderConnector="defs">

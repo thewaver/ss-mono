@@ -1,7 +1,6 @@
 import { style, styleVariants } from "@vanilla-extract/css";
 
 import { RAINBOW, themeVars } from "../../Theme.css";
-import { layerVars } from "../Layer/Layer.css";
 
 const rainbowFace = (hue: number) => ({ backgroundColor: RAINBOW[hue].main, color: RAINBOW[hue].contrast });
 
@@ -19,8 +18,8 @@ const cuboidFaceBase = style({
 });
 
 export const cuboidFace = styleVariants({
-    front: [cuboidFaceBase, { backgroundColor: `rgb(from ${layerVars.main} r g b / 50%)`, color: layerVars.contrast }],
-    back: [cuboidFaceBase, { backgroundColor: `rgb(from ${layerVars.main} r g b / 75%)`, color: layerVars.contrast }],
+    front: [cuboidFaceBase, rainbowFace(67.5)],
+    back: [cuboidFaceBase, rainbowFace(247.5)],
     left: [cuboidFaceBase, rainbowFace(22.5)],
     right: [cuboidFaceBase, rainbowFace(202.5)],
     top: [cuboidFaceBase, rainbowFace(112.5)],

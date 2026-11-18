@@ -1,7 +1,7 @@
 <script lang="ts">
     import type { ShapeArrowAim } from "@thewaver/ss-utils";
     import { TextArea } from "@thewaver/ss-components-svelte";
-    import { FIELD_WIDTH, FIXED_HEIGHT } from "@thewaver/ss-playground/App/Pages/TextAreaPage/TextAreaPage.const";
+    import { FIELD_WIDTH, FIXED_HEIGHT, NOTES_TOOLTIP_LABEL } from "@thewaver/ss-playground/App/Pages/TextAreaPage/TextAreaPage.const";
     import {
         FIELD_GAP,
         FIELD_PADDING,
@@ -24,7 +24,7 @@
     gap={FIELD_GAP}
     isDisabled={props.isDisabled}
     isReachableWhenDisabled={props.isReachableWhenDisabled}
-    ariaLabel={"Notes with a tooltip"}
+    ariaLabel={NOTES_TOOLTIP_LABEL}
     tooltipDefs={{
         placement: { x: "center", y: "top_out" },
         offset: { x: 0, y: 10 },

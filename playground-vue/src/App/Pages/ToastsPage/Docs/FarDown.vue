@@ -3,6 +3,7 @@ import { shallowRef } from "vue";
 
 import { Toasts } from "@thewaver/ss-components-vue";
 import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
+import { PROFILE_NOTIFICATIONS_LABEL } from "@thewaver/ss-playground/App/Pages/ToastsPage/ToastsPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ToastsPage/ToastsPage.css";
 
 import PageToastContent from "../../../StyledComponents/ToastContent/ToastContent.vue";
@@ -20,7 +21,7 @@ const setAnswer = (next: ToastsFarDownShowAnswer) => {
 <template>
     <div :class="styles.example">
         <div :class="styles.raiseRow">
-            <Toasts ariaLabel="Profile notifications" alignment="middle_center">
+            <Toasts :ariaLabel="PROFILE_NOTIFICATIONS_LABEL" alignment="middle_center">
                 <FarDownSettingsPanel @answer="setAnswer" />
 
                 <template #renderToast="{ toast, visibilityTarget, transitionDurationMs, state, dismiss }">

@@ -39,12 +39,7 @@ const baseFrequency = computed(() => ({ x: frequencyX.value, y: frequencyY.value
     />
 
     <PageExampleKnobs>
-        <PageProp
-            item-key="type"
-            controls="Sets SVGTurbulenceFilterDefs.type"
-            label="Type"
-            hint="Which noise is generated: fractal noise is soft and cloudy, turbulence is sharper and more veined."
-        >
+        <PageProp item-key="type" v-bind="SVGFilterKnobs.TYPE_TEXT">
             <PageSelectField
                 :value="type"
                 :values="SVGFilterDefs.TURBULENCE_TYPES"
@@ -53,12 +48,7 @@ const baseFrequency = computed(() => ({ x: frequencyX.value, y: frequencyY.value
             />
         </PageProp>
 
-        <PageProp
-            item-key="baseFrequencyX"
-            controls="Sets the x of SVGTurbulenceFilterDefs.baseFrequency"
-            label="Base frequency x"
-            hint="How fine the noise is across. Higher numbers make a tighter grain."
-        >
+        <PageProp item-key="baseFrequencyX" v-bind="SVGFilterKnobs.BASE_FREQUENCY_X_TEXT">
             <PageNumberField
                 :value="frequencyX"
                 :min="SVGFilterKnobs.Turbulence.MIN_FREQUENCY"
@@ -69,12 +59,7 @@ const baseFrequency = computed(() => ({ x: frequencyX.value, y: frequencyY.value
             />
         </PageProp>
 
-        <PageProp
-            item-key="baseFrequencyY"
-            controls="Sets the y of SVGTurbulenceFilterDefs.baseFrequency"
-            label="Base frequency y"
-            hint="How fine the noise is down. Set it apart from the across value to stretch the grain."
-        >
+        <PageProp item-key="baseFrequencyY" v-bind="SVGFilterKnobs.BASE_FREQUENCY_Y_TEXT">
             <PageNumberField
                 :value="frequencyY"
                 :min="SVGFilterKnobs.Turbulence.MIN_FREQUENCY"
@@ -85,12 +70,7 @@ const baseFrequency = computed(() => ({ x: frequencyX.value, y: frequencyY.value
             />
         </PageProp>
 
-        <PageProp
-            item-key="scale"
-            controls="Sets SVGTurbulenceFilterDefs.scale"
-            label="Scale"
-            hint="How far the noise pushes the picture about. 0 leaves the picture where it was."
-        >
+        <PageProp item-key="scale" v-bind="SVGFilterKnobs.SCALE_TEXT">
             <PageNumberField
                 :value="scale"
                 :min="SVGFilterKnobs.Turbulence.MIN_SCALE"
@@ -100,12 +80,7 @@ const baseFrequency = computed(() => ({ x: frequencyX.value, y: frequencyY.value
             />
         </PageProp>
 
-        <PageProp
-            item-key="numOctaves"
-            controls="Sets SVGTurbulenceFilterDefs.numOctaves"
-            label="Octaves"
-            hint="How many layers of noise are piled up. More layers add fine detail and cost more to draw."
-        >
+        <PageProp item-key="numOctaves" v-bind="SVGFilterKnobs.NUM_OCTAVES_TEXT">
             <PageNumberField
                 :value="octaves"
                 :min="SVGFilterKnobs.Turbulence.MIN_OCTAVES"
@@ -115,12 +90,7 @@ const baseFrequency = computed(() => ({ x: frequencyX.value, y: frequencyY.value
             />
         </PageProp>
 
-        <PageProp
-            item-key="seed"
-            controls="Sets SVGTurbulenceFilterDefs.seed"
-            label="Seed"
-            hint="The number the random noise is grown from. Change it for a different pattern at the same settings."
-        >
+        <PageProp item-key="seed" v-bind="SVGFilterKnobs.SEED_TEXT">
             <PageNumberField
                 :value="seed"
                 :min="SVGFilterKnobs.Turbulence.MIN_SEED"
@@ -130,12 +100,7 @@ const baseFrequency = computed(() => ({ x: frequencyX.value, y: frequencyY.value
             />
         </PageProp>
 
-        <PageProp
-            item-key="xChannelSelector"
-            controls="Sets SVGTurbulenceFilterDefs.xChannelSelector"
-            label="X channel"
-            hint="Which channel of the noise decides how far each point moves sideways."
-        >
+        <PageProp item-key="xChannelSelector" v-bind="SVGFilterKnobs.X_CHANNEL_SELECTOR_TEXT">
             <PageSelectField
                 :value="xChannel"
                 :values="SVGFilterDefs.DISPLACEMENT_CHANNELS"
@@ -144,12 +109,7 @@ const baseFrequency = computed(() => ({ x: frequencyX.value, y: frequencyY.value
             />
         </PageProp>
 
-        <PageProp
-            item-key="yChannelSelector"
-            controls="Sets SVGTurbulenceFilterDefs.yChannelSelector"
-            label="Y channel"
-            hint="Which channel of the noise decides how far each point moves up or down."
-        >
+        <PageProp item-key="yChannelSelector" v-bind="SVGFilterKnobs.Y_CHANNEL_SELECTOR_TEXT">
             <PageSelectField
                 :value="yChannel"
                 :values="SVGFilterDefs.DISPLACEMENT_CHANNELS"

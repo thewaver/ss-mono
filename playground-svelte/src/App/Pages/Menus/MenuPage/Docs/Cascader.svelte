@@ -5,10 +5,9 @@
     import { renderPageHighlightFloater } from "../../../../StyledComponents/GlideFloater/GlideFloater.const.svelte";
     import PageMenuTriggerContent from "../../../../StyledComponents/MenuTriggerContent/MenuTriggerContent.svelte";
     import { DESTINATIONS, renderDestinationItem, renderMenuPopup } from "../MenuPage.const.svelte";
+    import { NOTHING_CHOSEN } from "@thewaver/ss-playground/App/Pages/Menus/MenuPage/MenuPage.const";
 
     const PATH_SEPARATOR = " / ";
-    const NOTHING_CHOSEN = "Choose a destination";
-
     let path = $state<string[]>([]);
 
     const pathText = $derived(path.length > 0 ? path.join(PATH_SEPARATOR) : NOTHING_CHOSEN);

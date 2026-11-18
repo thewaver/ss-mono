@@ -5,6 +5,7 @@ import { Button, Die } from "@thewaver/ss-components-vue";
 import type { DieController, RollerDirection } from "@thewaver/ss-components-vue";
 import {
     ICON_CLOUD_EMPTY_LABEL,
+    PLANET_CIRCLED_ICONS_LABEL,
     PLANET_ICONS,
     PLANET_STEPS,
 } from "@thewaver/ss-playground/App/Pages/DiePage/DiePage.const";
@@ -51,7 +52,7 @@ const stepCloud = (direction: RollerDirection) => {
                 :momentum-ms="momentumMs"
                 is-movable
                 is-see-through
-                ariaLabel="A planet circled by icons"
+                :ariaLabel="PLANET_CIRCLED_ICONS_LABEL"
                 :compute-face-label="computeFaceLabel"
                 @mount="(next: DieController) => (controller = next)"
             >

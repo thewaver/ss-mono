@@ -44,14 +44,7 @@ export const FlipbookPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp
-                    key={"transitionDurationMs"}
-                    label={"Turn duration (ms)"}
-                    hint={
-                        "How long one page takes to turn over. It is off while the visitor has asked for reduced motion, and the pages then turn at once."
-                    }
-                    controls={"Sets FlipbookProps.transitionDurationMs"}
-                >
+                <PageProp key={"transitionDurationMs"} {...FlipbookKnobs.TRANSITION_DURATION_MS_TEXT}>
                     <PageNumberField
                         value={getTransitionDurationMs}
                         min={FlipbookKnobs.MIN_DURATION_MS}

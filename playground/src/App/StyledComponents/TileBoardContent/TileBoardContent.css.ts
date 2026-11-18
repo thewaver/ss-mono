@@ -31,7 +31,7 @@ export const tileBoardTileContent = style({
     paddingBottom: themeVars.spacing.half,
     width: "100%",
     height: "100%",
-    backgroundColor: layerVars.main,
+    backgroundColor: layerVars.dark,
     color: layerVars.contrast,
     fontSize: themeVars.fontSize.xSmall,
     fontVariantNumeric: "tabular-nums",

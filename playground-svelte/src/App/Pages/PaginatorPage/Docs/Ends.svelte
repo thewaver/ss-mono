@@ -5,12 +5,7 @@
         computePaginatorPageLabel,
         computePaginatorStepLabel,
     } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
-    import {
-        FIRST_PAGE,
-        ITEM_COUNT,
-        PAGE_SIZE,
-        PAGINATOR_GAP,
-    } from "@thewaver/ss-playground/App/Pages/PaginatorPage/PaginatorPage.const";
+    import { FIRST_PAGE, ITEM_COUNT, PAGE_SIZE, PAGINATOR_GAP, RESULTS_END_JUMPS_LABEL } from "@thewaver/ss-playground/App/Pages/PaginatorPage/PaginatorPage.const";
 
     import PagePaginatorDemo from "../../../StyledComponents/PaginatorContent/PagePaginatorDemo.svelte";
     import PagePaginatorGap from "../../../StyledComponents/PaginatorContent/PagePaginatorGap.svelte";
@@ -30,7 +25,7 @@
         pageSize={PAGE_SIZE}
         gap={PAGINATOR_GAP}
         steps={END_STEPS}
-        ariaLabel={"Results with end jumps"}
+        ariaLabel={RESULTS_END_JUMPS_LABEL}
         computePageLabel={computePaginatorPageLabel}
         computeStepLabel={computePaginatorStepLabel}
         onPageChange={(next) => {

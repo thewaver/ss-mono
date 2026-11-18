@@ -8,6 +8,7 @@
     import { renderToolbarOverflowItem, renderToolbarPopup } from "../ToolbarPage.const.svelte";
     import type { ToolbarBasicDocsExampleProps } from "../ToolbarPageSvelte.types";
     import ResizableBar from "./ResizableBar.svelte";
+    import { MORE_FORMATTING_ACTIONS_LABEL } from "@thewaver/ss-playground/App/Pages/ToolbarPage/ToolbarPage.const";
 
     const ACTIONS: ToolbarAction<string>[] = [
         { value: "Bold" },
@@ -31,7 +32,7 @@
         actions={ACTIONS}
         gap={props.gap}
         ariaLabel={"Formatting"}
-        overflowAriaLabel={"More formatting actions"}
+        overflowAriaLabel={MORE_FORMATTING_ACTIONS_LABEL}
         renderOverflowItem={renderToolbarOverflowItem}
         renderOverflowPopup={renderToolbarPopup}
         onActivate={(value) => {

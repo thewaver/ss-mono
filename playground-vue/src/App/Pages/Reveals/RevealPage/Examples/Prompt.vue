@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Reveal } from "@thewaver/ss-components-vue";
+import { COVER_KNOWS_WHEN_BEING_LABEL } from "@thewaver/ss-playground/App/Pages/Reveals/RevealPage/RevealPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/Reveals/RevealPage/RevealPage.css";
 
 import type { RevealExampleProps } from "../RevealExample.types";
@@ -18,7 +19,7 @@ defineProps<Props>();
             :join-radii="joinRadii"
             :lame-exponents="lameExponents"
             :is-disabled="isDisabled"
-            ariaLabel="A cover that knows when it is being looked under"
+            :ariaLabel="COVER_KNOWS_WHEN_BEING_LABEL"
             :compute-points="computePoints"
         >
             <template #renderContent>

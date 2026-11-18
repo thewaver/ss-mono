@@ -97,9 +97,7 @@
 <PagePropsPanel scope={"global"}>
     <PageProp
         itemKey={"settleDurationMs"}
-        controls={"Sets ScrambleTextProps.settleDurationMs"}
-        label={"Settle duration (ms)"}
-        hint={"How long the text takes to go from all scrambled to fully settled. It is off while the visitor has asked for reduced motion."}
+        {...ScrambleTextKnobs.SETTLE_DURATION_MS_TEXT}
     >
         <PageNumberField
             value={settleDurationMs}
@@ -116,9 +114,7 @@
 
     <PageProp
         itemKey={"scrambleIntervalMs"}
-        controls={"Sets ScrambleTextProps.scrambleIntervalMs"}
-        label={"Scramble interval (ms)"}
-        hint={"How often an unsettled character is swapped for another. Shorter intervals make a busier churn."}
+        {...ScrambleTextKnobs.SCRAMBLE_INTERVAL_MS_TEXT}
     >
         <PageNumberField
             value={scrambleIntervalMs}
@@ -134,9 +130,7 @@
 
     <PageProp
         itemKey={"glyphSet"}
-        controls={"Picks the sample glyph function sent to ScrambleTextProps.computeGlyphs"}
-        label={"Glyphs"}
-        hint={"Which characters the unsettled positions are drawn from. Matched churns a digit among digits and a letter among letters of its own case."}
+        {...ScrambleTextKnobs.GLYPH_SET_TEXT}
     >
         <PageSelectField
             value={glyphSet}
@@ -150,9 +144,7 @@
 
     <PageProp
         itemKey={"settleOrder"}
-        controls={"Picks the sample weight function sent to ScrambleTextProps.computeCharacterWeights"}
-        label={"Settle order"}
-        hint={"The order the characters settle in: left to right, from the middle out, at random, and so on."}
+        {...ScrambleTextKnobs.SETTLE_ORDER_TEXT}
     >
         <PageSelectField
             value={settleOrder}

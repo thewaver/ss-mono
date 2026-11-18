@@ -3,6 +3,7 @@ import { createSignal } from "solid-js";
 import type { DateValueRange } from "@thewaver/ss-components-solid";
 import { DateValueUtils, RangeCalendar } from "@thewaver/ss-components-solid";
 import { LOCALE, TODAY } from "@thewaver/ss-playground/App/Pages/CalendarPage/CalendarPage.const";
+import { CHOOSE_DATE_RANGE_RIGHT_LABEL } from "@thewaver/ss-playground/App/Pages/RangeCalendarPage/RangeCalendarPage.const";
 
 import { PageCalendarCaption } from "../../../PageComponents/CalendarCaption/CalendarCaption";
 import {
@@ -25,7 +26,7 @@ export const RightToLeftDocsExample = () => {
                     month={monthSignal}
                     today={TODAY}
                     locale={LOCALE}
-                    ariaLabel={"Choose a date range in a right-to-left box"}
+                    ariaLabel={CHOOSE_DATE_RANGE_RIGHT_LABEL}
                     renderDay={(_unused, getRenderProps) => <PageCalendarDay renderProps={getRenderProps} />}
                     renderWeekday={(name) => <PageCalendarWeekday>{name}</PageCalendarWeekday>}
                 />

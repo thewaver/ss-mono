@@ -29,14 +29,14 @@ const TIMED_PATTERN_SAMPLE_KEYS = [
 
 export namespace SVGDefsSamples {
     export const SAMPLE_COLORS: SVGDefsColors = {
-        background: "#282420",
+        background: "#00000040",
         primary: "#FFFF00",
         secondary: "#00FFFF",
         tertiary: "#FF00FF",
     };
 
     export const SAMPLE_COLORS_MONO: SVGDefsColors = {
-        background: "#282420",
+        background: "#00000040",
         primary: "#F0F4F8",
         secondary: "#D0D4D8",
         tertiary: "#B0B4B8",

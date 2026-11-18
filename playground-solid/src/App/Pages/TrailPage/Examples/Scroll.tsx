@@ -1,6 +1,7 @@
 import { createEffect, createSignal } from "solid-js";
 
 import { ElementObserverSolidUtils, Trail, access } from "@thewaver/ss-components-solid";
+import { SCROLL_PATH } from "@thewaver/ss-playground/App/Pages/TrailPage/TrailPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/TrailPage/TrailPage.css";
 
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
@@ -8,7 +9,6 @@ import { PageTrailMarker, PageTrailTrack } from "../../../StyledComponents/Trail
 import type { TrailScrollExampleProps } from "../TrailPage.types";
 
 const SCROLL_SIZE = { width: 320, height: styles.SCROLL_BOX_HEIGHT };
-const SCROLL_PATH = "M 24 70 C 70 10, 110 10, 160 70 S 250 130, 296 70";
 const MARKER_ID = "scrollMarker";
 
 type Props = TrailScrollExampleProps;

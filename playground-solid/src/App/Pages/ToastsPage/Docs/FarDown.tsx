@@ -2,7 +2,10 @@ import { createSignal } from "solid-js";
 
 import { Button, Toasts, useToastsContext } from "@thewaver/ss-components-solid";
 import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
-import { FAR_DOWN_MESSAGE } from "@thewaver/ss-playground/App/Pages/ToastsPage/ToastsPage.const";
+import {
+    FAR_DOWN_MESSAGE,
+    PROFILE_NOTIFICATIONS_LABEL,
+} from "@thewaver/ss-playground/App/Pages/ToastsPage/ToastsPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ToastsPage/ToastsPage.css";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
@@ -54,7 +57,7 @@ export const FarDownDocsExample = () => {
         <div class={styles.example}>
             <div class={styles.raiseRow}>
                 <Toasts<ToastDefs>
-                    ariaLabel={"Profile notifications"}
+                    ariaLabel={PROFILE_NOTIFICATIONS_LABEL}
                     alignment={"middle_center"}
                     renderToast={(getToast, getVisibilityTarget, getTransitionDurationMs, getState, dismiss) => (
                         <PageToastContent

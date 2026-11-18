@@ -1,7 +1,10 @@
 import { useState } from "react";
 
 import { NumberInput } from "@thewaver/ss-components-react";
-import { FIELD_WIDTH } from "@thewaver/ss-playground/App/Pages/NumberInputPage/NumberInputPage.const";
+import {
+    DISABLED_BUT_REACHABLE_AMOUNT_LABEL,
+    FIELD_WIDTH,
+} from "@thewaver/ss-playground/App/Pages/NumberInputPage/NumberInputPage.const";
 import {
     FIELD_GAP,
     FIELD_STEPPER_PADDING,
@@ -24,7 +27,7 @@ export const TooltipDocsExample = (props: Props) => {
             isReachableWhenDisabled={props.isReachableWhenDisabled}
             padding={FIELD_STEPPER_PADDING}
             gap={FIELD_GAP}
-            ariaLabel={"Disabled but reachable amount"}
+            ariaLabel={DISABLED_BUT_REACHABLE_AMOUNT_LABEL}
             renderContent={(flags) => <PageTextFieldContent flags={flags} width={FIELD_WIDTH} />}
             renderTrailing={(flags, stepper) => <PageNumberInputStepper flags={flags} stepper={stepper} />}
             tooltipDefs={{

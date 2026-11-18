@@ -81,12 +81,7 @@ const ShapedExampleWrapper = (props: ParticleFieldExampleProps) => {
             </PageMeasureBox>
 
             <PageExampleKnobs>
-                <PageProp
-                    key={"shapeKind"}
-                    label={"Shape"}
-                    hint={"The area particles may appear in. A cell spawns only when its center is inside it."}
-                    controls={"Picks the example contour sent to ParticleFieldProps.computeShapePoints"}
-                >
+                <PageProp key={"shapeKind"} {...ParticleFieldKnobs.SHAPE_KIND_TEXT}>
                     <PageSelectField
                         value={getShapeKind}
                         values={ShapeConst.DEFAULT_SHAPES}
@@ -95,12 +90,7 @@ const ShapedExampleWrapper = (props: ParticleFieldExampleProps) => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"joinRadius"}
-                    label={"Corner radius"}
-                    hint={"How far each corner of the area is rounded, as the Shape page rounds them."}
-                    controls={"Sets every corner of ParticleFieldProps.shapeJoinRadii"}
-                >
+                <PageProp key={"joinRadius"} {...ParticleFieldKnobs.JOIN_RADIUS_TEXT}>
                     <PageNumberField
                         value={getJoinRadius}
                         min={ParticleFieldKnobs.MIN_JOIN_RADIUS}
@@ -125,14 +115,7 @@ const StressTestWrapper = (props: ParticleFieldExampleProps) => {
             <div>{`${STRESS_CELL_COUNT.col} x ${STRESS_CELL_COUNT.row} cells`}</div>
 
             <PagePropsPanel scope={"local"} hasReset={false}>
-                <PageProp
-                    key={"onGraphicsCard"}
-                    label={"On the graphics card"}
-                    hint={
-                        "Draws the stress test's particles in one canvas per field, with the keyframes worked out on the graphics card. Off, every particle is an element of its own."
-                    }
-                    controls={"Sets ParticleFieldProps.renderer in the stress test"}
-                >
+                <PageProp key={"onGraphicsCard"} {...ParticleFieldKnobs.ON_GRAPHICS_CARD_TEXT}>
                     <PageCheckField
                         value={getIsOnGraphicsCard}
                         ariaLabel={"On the graphics card"}
@@ -231,14 +214,7 @@ export const ParticleFieldPage = () => {
     return (
         <div class={styles.root}>
             <PagePropsPanel scope={"global"}>
-                <PageProp
-                    key={"spawnChance"}
-                    label={"Spawn chance (0-1)"}
-                    hint={
-                        "The chance each cell spawns in a given pass. 1 spawns every cell every pass; lower leaves gaps that change from pass to pass. When a cell does spawn is still its weight's call."
-                    }
-                    controls={"Sets ParticleFieldProps.spawnChance"}
-                >
+                <PageProp key={"spawnChance"} {...ParticleFieldKnobs.SPAWN_CHANCE_TEXT}>
                     <PageNumberField
                         value={getSpawnChance}
                         min={ParticleFieldKnobs.MIN_SPAWN_CHANCE}
@@ -249,12 +225,7 @@ export const ParticleFieldPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"cellCount"}
-                    label={"Cell count (cols x rows)"}
-                    hint={"How many columns and rows the field is split into. A cell holds one particle at a time."}
-                    controls={"Sets ParticleFieldProps.cellCount"}
-                >
+                <PageProp key={"cellCount"} {...ParticleFieldKnobs.CELL_COUNT_TEXT}>
                     <div class={styles.valueList}>
                         <PageNumberField
                             value={() => cellCount.col}
@@ -275,16 +246,7 @@ export const ParticleFieldPage = () => {
                     </div>
                 </PageProp>
 
-                <PageProp
-                    key={"originType"}
-                    label={"Origin"}
-                    hint={
-                        "Where in the grid the weights are measured from. It only applies to weights that are measured from a point."
-                    }
-                    controls={
-                        "Picks the point the example's weights are measured from, sent to ParticleFieldProps.computeCellWeights"
-                    }
-                >
+                <PageProp key={"originType"} {...ParticleFieldKnobs.ORIGIN_TYPE_TEXT}>
                     <PageSelectField
                         value={getOriginType}
                         values={CellAnimationOrigins.ORIGIN_TYPES}
@@ -294,14 +256,7 @@ export const ParticleFieldPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"weightType"}
-                    label={"Weight"}
-                    hint={
-                        "The same weights CellAnimation uses: a heavy cell spawns early in the pass and a light one late."
-                    }
-                    controls={"Picks the example's weight function sent to ParticleFieldProps.computeCellWeights"}
-                >
+                <PageProp key={"weightType"} {...ParticleFieldKnobs.WEIGHT_TYPE_TEXT}>
                     <PageGroupedSelectField
                         value={getWeightType}
                         groups={GROUPPED_WEIGHTS}
@@ -310,16 +265,7 @@ export const ParticleFieldPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"animationType"}
-                    label={"Animation"}
-                    hint={
-                        "How a particle appears, played forwards as it arrives and backwards as it leaves: CellAnimation's own keyframes."
-                    }
-                    controls={
-                        "Picks the example's particle keyframes sent to ParticleFieldProps.computeParticleAnimation"
-                    }
-                >
+                <PageProp key={"animationType"} {...ParticleFieldKnobs.ANIMATION_TYPE_TEXT}>
                     <PageGroupedSelectField
                         value={getAnimationType}
                         groups={GROUPPED_ANIMATIONS}
@@ -328,16 +274,7 @@ export const ParticleFieldPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"holdShare"}
-                    label={"Hold (0-1)"}
-                    hint={
-                        "How much of a particle's life it spends fully shown, between appearing and disappearing. 1 cuts in and out."
-                    }
-                    controls={
-                        "Sets how long the example's particle keyframes hold, sent to ParticleFieldProps.computeParticleAnimation"
-                    }
-                >
+                <PageProp key={"holdShare"} {...ParticleFieldKnobs.HOLD_SHARE_TEXT}>
                     <PageNumberField
                         value={getHoldShare}
                         min={ParticleFieldKnobs.MIN_HOLD_SHARE}
@@ -348,27 +285,11 @@ export const ParticleFieldPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"isScattered"}
-                    label={"Scatter in cell"}
-                    hint={
-                        "Places each particle at a random point in its cell rather than at the center, so the grid stops showing."
-                    }
-                    controls={
-                        "Decides whether the example's ParticleFieldProps.computeParticlePos scatters each particle inside its cell"
-                    }
-                >
+                <PageProp key={"isScattered"} {...ParticleFieldKnobs.IS_SCATTERED_TEXT}>
                     <PageCheckField value={getIsScattered} ariaLabel={"Scatter in cell"} onChange={setIsScattered} />
                 </PageProp>
 
-                <PageProp
-                    key={"animationDurationMs"}
-                    label={"Duration (ms)"}
-                    hint={
-                        "How long one pass over the grid takes, and so the shortest time between two spawns from the same cell."
-                    }
-                    controls={"Sets ParticleFieldProps.animationDurationMs"}
-                >
+                <PageProp key={"animationDurationMs"} {...ParticleFieldKnobs.ANIMATION_DURATION_MS_TEXT}>
                     <PageNumberField
                         value={getDurationMs}
                         min={ParticleFieldKnobs.MIN_DURATION_MS}
@@ -379,12 +300,7 @@ export const ParticleFieldPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"particleLifetimeMs"}
-                    label={"Lifetime (ms)"}
-                    hint={"How long one particle lives, from appearing to being removed."}
-                    controls={"Sets ParticleFieldProps.particleLifetimeMs"}
-                >
+                <PageProp key={"particleLifetimeMs"} {...ParticleFieldKnobs.PARTICLE_LIFETIME_MS_TEXT}>
                     <PageNumberField
                         value={getLifetimeMs}
                         min={ParticleFieldKnobs.MIN_LIFETIME_MS}
@@ -395,12 +311,7 @@ export const ParticleFieldPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"iterationDelayMs"}
-                    label={"Iteration delay (ms)"}
-                    hint={"How long the field waits between one pass and the next."}
-                    controls={"Sets ParticleFieldProps.animationIterationDelayMs"}
-                >
+                <PageProp key={"iterationDelayMs"} {...ParticleFieldKnobs.ITERATION_DELAY_MS_TEXT}>
                     <PageNumberField
                         value={getIterationDelayMs}
                         min={ParticleFieldKnobs.MIN_ITERATION_DELAY_MS}

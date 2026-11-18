@@ -21,3 +21,11 @@ export const FAN_LAYOUT_DEFS: FanLayoutDefs = {
     itemWidthRatio: 0.25,
     itemHeightRatio: 0.05,
 };
+
+export const DOCS_SECTIONS = {
+    submenus: {
+        title: "Submenus",
+        content:
+            "Give an item [prop]items[/prop] of its own and picking it replaces the arc with its submenu, rather than opening a second arc beside it. The card at the head of the new arc is the item you came in through, and picking it, or pressing the left arrow, takes you back. A submenu opens on a press, not on a hover, so sweeping the pointer across the arc never drills into a level by accident.",
+    },
+};

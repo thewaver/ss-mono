@@ -2,6 +2,7 @@
 import { shallowRef } from "vue";
 
 import { SPOTLIGHT_DEFAULTS } from "@thewaver/ss-components-vue";
+import { SpotlightHintKnobs } from "@thewaver/ss-playground/App/Knobs/SpotlightHints.const";
 import { SpotlightKnobs } from "@thewaver/ss-playground/App/Knobs/Spotlights.const";
 import { WCAG_URLS } from "@thewaver/ss-playground/App/PageComponents/DocsProse/DocsProse.const";
 import { DOCS_ROOT } from "@thewaver/ss-playground/App/Pages/Spotlights/SpotlightHintPage/SpotlightHintPage.const";
@@ -28,12 +29,7 @@ const transitionDurationMs = shallowRef(SPOTLIGHT_DEFAULTS.transitionDurationMs)
         <BasicDocsExample :padding="padding" :transition-duration-ms="transitionDurationMs" />
 
         <template #renderKnobs>
-            <PageProp
-                item-key="padding"
-                label="Padding (px)"
-                hint="How much room is left around the lit element, so the hole is not cut tight against it."
-                controls="Sets SpotlightHintProps.padding"
-            >
+            <PageProp item-key="padding" v-bind="SpotlightHintKnobs.PADDING_TEXT">
                 <PageNumberField
                     :value="padding"
                     :min="SpotlightKnobs.MIN_PADDING"
@@ -45,12 +41,7 @@ const transitionDurationMs = shallowRef(SPOTLIGHT_DEFAULTS.transitionDurationMs)
                 />
             </PageProp>
 
-            <PageProp
-                item-key="transitionDurationMs"
-                label="Transition duration (ms)"
-                hint="How long the hint takes to fade in and out. At 0 it appears and goes at once."
-                controls="Sets SpotlightHintProps.transitionDurationMs"
-            >
+            <PageProp item-key="transitionDurationMs" v-bind="SpotlightHintKnobs.TRANSITION_DURATION_MS_TEXT">
                 <PageNumberField
                     :value="transitionDurationMs"
                     :min="SpotlightKnobs.MIN_DURATION"

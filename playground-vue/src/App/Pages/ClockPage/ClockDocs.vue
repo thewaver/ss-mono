@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { shallowRef } from "vue";
 
-import { DOCS_ROOT } from "@thewaver/ss-playground/App/Pages/ClockPage/ClockPage.const";
+import { ClockKnobs } from "@thewaver/ss-playground/App/Knobs/Clocks.const";
+import { DOCS_ROOT, DOCS_SECTIONS } from "@thewaver/ss-playground/App/Pages/ClockPage/ClockPage.const";
 
 import PageDocsExample from "../../PageComponents/DocsExample/PageDocsExample.vue";
 import PageDocsSection from "../../PageComponents/DocsSection/PageDocsSection.vue";
@@ -21,12 +22,7 @@ const isTwelveHour = shallowRef(true);
         <BasicDocsExample :is-disabled="isDisabled" />
 
         <template #renderKnobs>
-            <PageProp
-                item-key="isDisabled"
-                label="Disabled"
-                hint="Turns the clock off: no time can be picked, and the Tab key skips it."
-                controls="Sets ClockProps.isDisabled"
-            >
+            <PageProp item-key="isDisabled" v-bind="ClockKnobs.IS_DISABLED_TEXT">
                 <PageCheckField
                     :value="isDisabled"
                     ariaLabel="Disabled"
@@ -36,21 +32,13 @@ const isTwelveHour = shallowRef(true);
         </template>
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Twelve hours"
-        content="Set [prop]isTwelveHour[/prop] and the hour column reads from 12 through 11, starting at midnight, and a column of its own picks the morning or the afternoon. The value underneath stays a 24-hour time, as the line under the clock shows."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.twelveHours" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/TwelveHour.vue`">
         <TwelveHourDocsExample :is-twelve-hour="isTwelveHour" />
 
         <template #renderKnobs>
-            <PageProp
-                item-key="isTwelveHour"
-                label="Twelve hour"
-                hint="Reads the hours from 1 to 12, with a column for morning and afternoon."
-                controls="Sets ClockProps.isTwelveHour"
-            >
+            <PageProp item-key="isTwelveHour" v-bind="ClockKnobs.IS_TWELVE_HOUR_TEXT">
                 <PageCheckField
                     :value="isTwelveHour"
                     ariaLabel="Twelve hour"
@@ -60,19 +48,13 @@ const isTwelveHour = shallowRef(true);
         </template>
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Every fifteen minutes, within opening hours"
-        content="Set [prop]steps[/prop] to offer fewer times in a column, here every fifteen minutes. A [prop]minValue[/prop] and a [prop]maxValue[/prop] keep the time in range: an option is disabled when the time it would pick falls outside them, so with the shop shutting at 17:30, the hour 17 is off whenever the minutes read 45."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.everyFifteenMinutesWithin" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Limits.vue`">
         <LimitsDocsExample />
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Right to left"
-        content="Inside a box whose text runs right to left, the columns run from the right, so the hours sit on the right, and the left arrow moves on to the next column."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.rightLeft" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/RightToLeft.vue`">
         <RightToLeftDocsExample />

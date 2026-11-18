@@ -8,8 +8,8 @@
     import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
     import PageRangeContent from "../../../StyledComponents/RangeContent/RangeContent.svelte";
     import type { TypewriterKaraokeExampleProps } from "../TypewriterPageSvelte.types";
+    import { LYRIC, HOW_FAR_LINE_HAS_LABEL } from "@thewaver/ss-playground/App/Pages/TypewriterPage/TypewriterPage.const";
 
-    const LYRIC = "Twinkle, twinkle, little star";
     const PERCENT = 100;
     const SLIDER_STEP = 1;
     const SLIDER_LENGTH = 110;
@@ -60,7 +60,7 @@
         <Range
             id={"karaokeScrubber"}
             sizing={"fill"}
-            ariaLabel={"How far the line has been sung"}
+            ariaLabel={HOW_FAR_LINE_HAS_LABEL}
             min={0}
             max={PERCENT}
             step={SLIDER_STEP}

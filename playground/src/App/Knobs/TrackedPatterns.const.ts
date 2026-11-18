@@ -89,4 +89,10 @@ export namespace TrackedPatternKnobs {
         hexagon_pt_trail_2: FADE_KNOBS,
         triangle_t_trail_2: FADE_KNOBS,
     };
+
+    export const CONFIG_KEY_TEXT = {
+        label: "Pattern",
+        hint: "Which pointer-following pattern is shown. Choosing one brings its own knobs with it.",
+        controls: "Picks the sample pattern the example sends to ShapeProps.computeFillDefs",
+    };
 }

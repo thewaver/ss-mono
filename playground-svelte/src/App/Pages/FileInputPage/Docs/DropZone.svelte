@@ -2,12 +2,7 @@
     import { FileInput } from "@thewaver/ss-components-svelte";
     import type { FileInputRejection } from "@thewaver/ss-components-svelte";
     import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
-    import {
-        DROP_ZONE_ACCEPT,
-        DROP_ZONE_MAX_FILES,
-        DROP_ZONE_MAX_SIZE_BYTES,
-        DROP_ZONE_REASON_TEXT,
-    } from "@thewaver/ss-playground/App/Pages/FileInputPage/FileInputPage.const";
+    import { DROP_ZONE_ACCEPT, DROP_ZONE_MAX_FILES, DROP_ZONE_MAX_SIZE_BYTES, DROP_ZONE_REASON_TEXT, DROP_IMAGES_HERE_PRESS_TEXT } from "@thewaver/ss-playground/App/Pages/FileInputPage/FileInputPage.const";
 
     import PageFileDropZoneContent from "../../../StyledComponents/FileDropZoneContent/FileDropZoneContent.svelte";
     import type { FileInputDropZoneDocsExampleProps } from "../FileInputPageSvelte.types";
@@ -39,7 +34,7 @@
     {#snippet renderContent(renderProps)}
         <PageFileDropZoneContent
             {renderProps}
-            prompt={renderProps.isDragOver ? "Let go to add them" : "Drop images here, or press to choose"}
+            prompt={renderProps.isDragOver ? "Let go to add them" : DROP_IMAGES_HERE_PRESS_TEXT}
         />
     {/snippet}
 </FileInput>

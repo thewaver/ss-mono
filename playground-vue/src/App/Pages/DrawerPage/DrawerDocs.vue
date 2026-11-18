@@ -3,8 +3,9 @@ import { shallowRef } from "vue";
 
 import { DRAWER_EDGES, MODAL_DEFAULTS } from "@thewaver/ss-components-vue";
 import type { DrawerEdge } from "@thewaver/ss-components-vue";
+import { DrawerKnobs } from "@thewaver/ss-playground/App/Knobs/Drawers.const";
 import { ModalKnobs } from "@thewaver/ss-playground/App/Knobs/Modals.const";
-import { DOCS_ROOT, FIELD_WIDTH } from "@thewaver/ss-playground/App/Pages/DrawerPage/DrawerPage.const";
+import { DOCS_ROOT, DOCS_SECTIONS, FIELD_WIDTH } from "@thewaver/ss-playground/App/Pages/DrawerPage/DrawerPage.const";
 
 import PageDocsExample from "../../PageComponents/DocsExample/PageDocsExample.vue";
 import PageDocsSection from "../../PageComponents/DocsSection/PageDocsSection.vue";
@@ -25,12 +26,7 @@ const isDismissableOnOverlayClick = shallowRef(MODAL_DEFAULTS.isDismissableOnOve
         <BasicDocsExample :edge="edge" :transition-duration-ms="transitionDurationMs" />
 
         <template #renderKnobs>
-            <PageProp
-                item-key="edge"
-                label="Edge"
-                hint="Which edge of the screen the drawer is attached to. It fills the length of that edge, and the painter slides it in from there."
-                controls="Sets DrawerProps.edge"
-            >
+            <PageProp item-key="edge" v-bind="DrawerKnobs.EDGE_TEXT">
                 <PageSelectField
                     :value="edge"
                     :values="DRAWER_EDGES"
@@ -39,12 +35,7 @@ const isDismissableOnOverlayClick = shallowRef(MODAL_DEFAULTS.isDismissableOnOve
                 />
             </PageProp>
 
-            <PageProp
-                item-key="transitionDurationMs"
-                label="Transition duration (ms)"
-                hint="How long the drawer and its overlay take to arrive and leave. At 0 they appear and go at once."
-                controls="Sets DrawerProps.transitionDurationMs"
-            >
+            <PageProp item-key="transitionDurationMs" v-bind="DrawerKnobs.TRANSITION_DURATION_MS_TEXT">
                 <PageNumberField
                     :value="transitionDurationMs"
                     :min="ModalKnobs.MIN_TRANSITION_MS"
@@ -58,21 +49,13 @@ const isDismissableOnOverlayClick = shallowRef(MODAL_DEFAULTS.isDismissableOnOve
         </template>
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Swiping it away"
-        content='Swipe a drawer back toward its edge, more than a third of the way across it, and letting go closes it; short of that it springs back. Under a finger, a swipe over content that has been scrolled scrolls it back instead. A swipe is a drag, and a drag needs a single-pointer way to do the same thing ([wcag id="2.5.7"]WCAG 2.5.7[/wcag]), which here is the press on the overlay. So the two share one switch: turning off [prop]isDismissableOnOverlayClick[/prop] turns the swipe off with it.'
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.swipingAway" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Swipe.vue`">
         <SwipeDocsExample :is-dismissable-on-overlay-click="isDismissableOnOverlayClick" />
 
         <template #renderKnobs>
-            <PageProp
-                item-key="isDismissableOnOverlayClick"
-                label="Closes on overlay click"
-                hint="Whether a press on the overlay closes the drawer. Off, the drawer cannot be swiped away either."
-                controls="Sets DrawerProps.isDismissableOnOverlayClick"
-            >
+            <PageProp item-key="isDismissableOnOverlayClick" v-bind="DrawerKnobs.IS_DISMISSABLE_ON_OVERLAY_CLICK_TEXT">
                 <PageCheckField
                     :value="isDismissableOnOverlayClick"
                     ariaLabel="Closes on overlay click"

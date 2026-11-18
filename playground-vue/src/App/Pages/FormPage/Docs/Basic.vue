@@ -4,6 +4,11 @@ import { computed, shallowRef } from "vue";
 import { Button, Checkbox, Form, FormField, TextInput } from "@thewaver/ss-components-vue";
 import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
 import {
+    DOES_NOT_LOOK_LIKE_TEXT,
+    SOME_FIELDS_NEED_ATTENTION_TEXT,
+    WE_ONLY_USE_SIGN_TEXT,
+} from "@thewaver/ss-playground/App/Pages/FormPage/FormPage.const";
+import {
     FIELD_GAP,
     FIELD_PADDING,
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
@@ -29,7 +34,7 @@ const hasEmailError = computed(() => !email.value.includes("@"));
 const emailMessage = computed(() => {
     if (email.value.length < 1) return "Enter your email.";
 
-    return hasEmailError.value ? "That does not look like an email address." : "We only use it to sign you in.";
+    return hasEmailError.value ? DOES_NOT_LOOK_LIKE_TEXT : WE_ONLY_USE_SIGN_TEXT;
 });
 
 const passwordMessage = computed(() =>
@@ -135,7 +140,7 @@ const reset = () => {
                 </PageFormButtons>
 
                 <div :class="exampleStyles.exampleReadout" data-readout>
-                    {{ `${state.isValid ? "Ready to send." : "Some fields need attention."} ${outcome}` }}
+                    {{ `${state.isValid ? "Ready to send." : SOME_FIELDS_NEED_ATTENTION_TEXT} ${outcome}` }}
                 </div>
             </PageFormStack>
         </template>

@@ -1,7 +1,11 @@
 import { createSignal } from "solid-js";
 
 import { TextArea } from "@thewaver/ss-components-solid";
-import { FIELD_WIDTH, FIXED_HEIGHT } from "@thewaver/ss-playground/App/Pages/TextAreaPage/TextAreaPage.const";
+import {
+    FIELD_WIDTH,
+    FIXED_HEIGHT,
+    NOTES_TOOLTIP_LABEL,
+} from "@thewaver/ss-playground/App/Pages/TextAreaPage/TextAreaPage.const";
 import {
     FIELD_GAP,
     FIELD_PADDING,
@@ -23,7 +27,7 @@ export const TooltipDocsExample = (props: Props) => {
             gap={FIELD_GAP}
             isDisabled={props.isDisabled}
             isReachableWhenDisabled={props.isReachableWhenDisabled}
-            ariaLabel={"Notes with a tooltip"}
+            ariaLabel={NOTES_TOOLTIP_LABEL}
             renderContent={(getFlags) => (
                 <PageTextFieldContent flags={getFlags} width={FIELD_WIDTH} height={FIXED_HEIGHT} />
             )}

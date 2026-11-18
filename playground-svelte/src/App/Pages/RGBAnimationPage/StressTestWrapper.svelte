@@ -7,6 +7,7 @@
     import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.svelte";
     import StressTest from "../../PageComponents/StressTest/StressTest.svelte";
     import StressItem from "./StressItem.svelte";
+    import { RGBAnimationKnobs } from "@thewaver/ss-playground/App/Knobs/RGBAnimations.const";
 
     type Props = BaseRGBAnimationExampleProps & { playback: boolean };
 
@@ -19,9 +20,7 @@
 <PagePropsPanel scope={"local"} hasReset={false}>
     <PageProp
         itemKey={"onGraphicsCard"}
-        label={"On the graphics card"}
-        hint={"Draws the stress test's channels in one canvas per item, with the keyframes worked out on the graphics card. Off, every channel is an element of its own."}
-        controls={"Sets RGBAnimationProps.renderer in the stress test"}
+        {...RGBAnimationKnobs.ON_GRAPHICS_CARD_TEXT}
     >
         <PageCheckField
             value={isOnGraphicsCard}

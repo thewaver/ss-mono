@@ -2,6 +2,7 @@ import { Icicle, TreemapUtils } from "@thewaver/ss-components-react";
 import type { IcicleNode } from "@thewaver/ss-components-react";
 import { LIBRARY } from "@thewaver/ss-playground/App/LibraryTree.generated";
 import { formatLines } from "@thewaver/ss-playground/App/LibraryTree.utils";
+import { LIBRARY_S_SOURCE_LINES_LABEL } from "@thewaver/ss-playground/App/Pages/IciclePage/IciclePage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/IciclePage/IciclePage.css";
 import { PAGE_ICICLE_FAMILIES } from "@thewaver/ss-playground/App/StyledComponents/IcicleContent/IcicleContent.css";
 
@@ -31,7 +32,7 @@ export const LibraryExample = (props: Props) => {
                 focus={props.focus}
                 columnCount={props.columnCount}
                 zoomDurationMs={props.zoomDurationMs}
-                ariaLabel={"The library's source, by lines of code"}
+                ariaLabel={LIBRARY_S_SOURCE_LINES_LABEL}
                 renderCell={(node, state) => (
                     <PageIcicleCell
                         state={state}

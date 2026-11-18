@@ -3,7 +3,12 @@ import { shallowRef } from "vue";
 
 import type { DateValue } from "@thewaver/ss-components-vue";
 import { Calendar, DateValueUtils } from "@thewaver/ss-components-vue";
-import { LOCALE, TODAY, WEEKEND_DAYS } from "@thewaver/ss-playground/App/Pages/CalendarPage/CalendarPage.const";
+import {
+    CHOOSE_WORKING_DAY_LABEL,
+    LOCALE,
+    TODAY,
+    WEEKEND_DAYS,
+} from "@thewaver/ss-playground/App/Pages/CalendarPage/CalendarPage.const";
 
 import PageCalendarCaption from "../../../PageComponents/CalendarCaption/CalendarCaption.vue";
 import PageCalendarDay from "../../../StyledComponents/CalendarContent/PageCalendarDay.vue";
@@ -24,7 +29,7 @@ const month = shallowRef(DateValueUtils.getStartOfMonth(TODAY));
             :today="TODAY"
             :locale="LOCALE"
             :disabled-days="[{ daysOfWeek: WEEKEND_DAYS }]"
-            ariaLabel="Choose a working day"
+            :ariaLabel="CHOOSE_WORKING_DAY_LABEL"
         >
             <template #renderDay="{ flags }">
                 <PageCalendarDay :render-props="flags" />

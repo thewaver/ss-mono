@@ -11,6 +11,7 @@
 
     import PageMeridiemToggle from "../../../PageComponents/MeridiemToggle/MeridiemToggle.svelte";
     import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
+    import { TIME_RIGHT_LEFT_BOX_LABEL } from "@thewaver/ss-playground/App/Pages/TimeInputPage/TimeInputPage.const";
 
     let value = $state.raw<TimeValue | undefined>({ hour: 14, minute: 30 });
 </script>
@@ -19,7 +20,7 @@
     <TimeInput
         bind:value
         isTwelveHour={true}
-        ariaLabel={"Time in a right-to-left box"}
+        ariaLabel={TIME_RIGHT_LEFT_BOX_LABEL}
         segmentHints={TIME_SEGMENT_HINTS}
         padding={FIELD_STEPPER_PADDING}
         gap={FIELD_GAP}

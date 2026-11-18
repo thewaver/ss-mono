@@ -3,6 +3,7 @@ import { h, shallowRef } from "vue";
 
 import { FileInput } from "@thewaver/ss-components-vue";
 import type { FileInputRenderProps, InteractionTooltipDefs } from "@thewaver/ss-components-vue";
+import { DISABLED_BUT_REACHABLE_ATTACHMENT_LABEL } from "@thewaver/ss-playground/App/Pages/FileInputPage/FileInputPage.const";
 
 import PageFileInputContent from "../../../StyledComponents/FileInputContent/FileInputContent.vue";
 import PageTooltipContent from "../../../StyledComponents/TooltipContent/TooltipContent.vue";
@@ -32,7 +33,7 @@ const tooltipDefs: InteractionTooltipDefs<FileInputRenderProps> = {
         v-model:files="files"
         :is-disabled="isDisabled"
         :is-reachable-when-disabled="isReachableWhenDisabled"
-        ariaLabel="Disabled but reachable attachment"
+        :ariaLabel="DISABLED_BUT_REACHABLE_ATTACHMENT_LABEL"
         :tooltip-defs="tooltipDefs"
     >
         <template #renderContent="renderProps">

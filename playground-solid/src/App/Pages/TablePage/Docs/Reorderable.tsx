@@ -3,6 +3,7 @@ import { createMemo, createSignal } from "solid-js";
 import type { TableSort } from "@thewaver/ss-components-solid";
 import { Table } from "@thewaver/ss-components-solid";
 import { TABLE_ANNOUNCEMENTS } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
+import { PARTS_REORDERABLE_COLUMNS_LABEL } from "@thewaver/ss-playground/App/Pages/TablePage/TablePage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/TablePage/TablePage.css";
 
 import { PageTableMarker } from "../../../StyledComponents/TableContent/TableContent";
@@ -24,7 +25,7 @@ export const ReorderableDocsExample = () => {
                 sort={sortSignal}
                 selection={selectionSignal}
                 order={orderSignal}
-                ariaLabel={"Parts with reorderable columns"}
+                ariaLabel={PARTS_REORDERABLE_COLUMNS_LABEL}
                 announcements={TABLE_ANNOUNCEMENTS}
                 renderMarker={() => <PageTableMarker />}
             />

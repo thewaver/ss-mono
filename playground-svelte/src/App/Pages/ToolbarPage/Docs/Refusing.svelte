@@ -7,6 +7,7 @@
     import PageMenuTriggerContent from "../../../StyledComponents/MenuTriggerContent/MenuTriggerContent.svelte";
     import { renderToolbarOverflowItem, renderToolbarPopup } from "../ToolbarPage.const.svelte";
     import ResizableBar from "./ResizableBar.svelte";
+    import { MORE_DOCUMENT_ACTIONS_LABEL } from "@thewaver/ss-playground/App/Pages/ToolbarPage/ToolbarPage.const";
 
     const ACTIONS: ToolbarAction<string>[] = [
         { value: "Undo" },
@@ -25,7 +26,7 @@
     <Toolbar
         actions={ACTIONS}
         ariaLabel={"Document"}
-        overflowAriaLabel={"More document actions"}
+        overflowAriaLabel={MORE_DOCUMENT_ACTIONS_LABEL}
         renderOverflowItem={renderToolbarOverflowItem}
         renderOverflowPopup={renderToolbarPopup}
         onActivate={(value) => {

@@ -60,12 +60,7 @@ const examples: ExampleDefs[] = [
 
 <template>
     <PagePropsPanel scope="global">
-        <PageProp
-            item-key="driftPxPerSecond"
-            controls="Sets WraparoundProps.driftPxPerSecond"
-            label="Marquee speed (px/s)"
-            hint="How far the marquee's strip drifts in a second. It is off while the visitor has asked for reduced motion."
-        >
+        <PageProp item-key="driftPxPerSecond" v-bind="WraparoundKnobs.DRIFT_PX_PER_SECOND_TEXT">
             <PageNumberField
                 :value="driftPxPerSecond"
                 :min="WraparoundKnobs.MIN_DRIFT_PX_PER_SECOND"
@@ -77,12 +72,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="driftDegrees"
-            controls="Sets WraparoundProps.driftDegrees"
-            label="Marquee direction (°)"
-            hint="Which way the marquee's strip drifts: 0 is to the right, 90 down, 180 to the left and 270 up."
-        >
+        <PageProp item-key="driftDegrees" v-bind="WraparoundKnobs.DRIFT_DEGREES_TEXT">
             <PageNumberField
                 :value="driftDegrees"
                 :min="WraparoundKnobs.MIN_DRIFT_DEGREES"

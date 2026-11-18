@@ -127,14 +127,7 @@ const WindExampleWrapper = (props: {
             />
 
             <PageExampleKnobs>
-                <PageProp
-                    itemKey={"windDirectionDegrees"}
-                    label={"Direction (degrees)"}
-                    hint={"Which way the wind blows, in degrees clockwise from rightward. 90 blows down."}
-                    controls={
-                        "Sets directionDegrees of ParticleModifierUtils.createWind, sent to ParticleSpawnerProps.particleModifiers"
-                    }
-                >
+                <PageProp itemKey={"windDirectionDegrees"} {...ParticleSpawnerKnobs.WIND_DIRECTION_DEGREES_TEXT}>
                     <PageNumberField
                         value={directionDegrees}
                         min={ParticleSpawnerKnobs.MIN_WIND_DIRECTION_DEGREES}
@@ -146,14 +139,7 @@ const WindExampleWrapper = (props: {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"windStrengthPixels"}
-                    label={"Strength (px)"}
-                    hint={"How far a particle is carried off its path halfway along it, between gusts."}
-                    controls={
-                        "Sets strengthPixels of ParticleModifierUtils.createWind, sent to ParticleSpawnerProps.particleModifiers"
-                    }
-                >
+                <PageProp itemKey={"windStrengthPixels"} {...ParticleSpawnerKnobs.WIND_STRENGTH_PIXELS_TEXT}>
                     <PageNumberField
                         value={strengthPixels}
                         min={ParticleSpawnerKnobs.MIN_WIND_STRENGTH_PIXELS}
@@ -165,14 +151,7 @@ const WindExampleWrapper = (props: {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"windGustRatio"}
-                    label={"Gusts"}
-                    hint={"How much the strength swings above and below itself over time. 0 is a steady wind."}
-                    controls={
-                        "Sets gustRatio of ParticleModifierUtils.createWind, sent to ParticleSpawnerProps.particleModifiers"
-                    }
-                >
+                <PageProp itemKey={"windGustRatio"} {...ParticleSpawnerKnobs.WIND_GUST_RATIO_TEXT}>
                     <PageNumberField
                         value={gustRatio}
                         min={ParticleSpawnerKnobs.MIN_WIND_GUST_RATIO}
@@ -214,14 +193,7 @@ const AttractionExampleWrapper = (props: {
             />
 
             <PageExampleKnobs>
-                <PageProp
-                    itemKey={"attractionStrengthRatio"}
-                    label={"Strength"}
-                    hint={"How much of the way to the ring a particle passing right by it is drawn."}
-                    controls={
-                        "Sets strengthRatio of ParticleModifierUtils.createAttraction, sent to ParticleSpawnerProps.particleModifiers"
-                    }
-                >
+                <PageProp itemKey={"attractionStrengthRatio"} {...ParticleSpawnerKnobs.ATTRACTION_STRENGTH_RATIO_TEXT}>
                     <PageNumberField
                         value={strengthRatio}
                         min={ParticleSpawnerKnobs.MIN_ATTRACTION_STRENGTH_RATIO}
@@ -233,16 +205,7 @@ const AttractionExampleWrapper = (props: {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"attractionReachPixels"}
-                    label={"Reach (px)"}
-                    hint={
-                        "How far from the ring the pull is felt at all. Particles passing farther away are left alone."
-                    }
-                    controls={
-                        "Sets reachPixels of ParticleModifierUtils.createAttraction, sent to ParticleSpawnerProps.particleModifiers"
-                    }
-                >
+                <PageProp itemKey={"attractionReachPixels"} {...ParticleSpawnerKnobs.ATTRACTION_REACH_PIXELS_TEXT}>
                     <PageNumberField
                         value={reachPixels}
                         min={ParticleSpawnerKnobs.MIN_ATTRACTION_REACH_PIXELS}
@@ -266,14 +229,7 @@ const StressTestWrapper = (props: ParticleSpawnerExampleProps) => {
     return (
         <>
             <PagePropsPanel scope={"local"} hasReset={false}>
-                <PageProp
-                    itemKey={"onGraphicsCard"}
-                    label={"On the graphics card"}
-                    hint={
-                        "Draws each spawner's particles in one canvas that follows them, with their positions worked out as before. Off, every particle is an element of its own."
-                    }
-                    controls={"Sets ParticleSpawnerProps.renderer in the stress test"}
-                >
+                <PageProp itemKey={"onGraphicsCard"} {...ParticleSpawnerKnobs.ON_GRAPHICS_CARD_TEXT}>
                     <PageCheckField
                         value={isOnGraphicsCard}
                         ariaLabel={"On the graphics card"}
@@ -534,16 +490,7 @@ export const ParticleSpawnerPage = () => {
         <>
             <PagePropsGroups>
                 <PagePropsPanel scope={"sample"}>
-                    <PageProp
-                        itemKey={"travelPattern"}
-                        label={"Travel pattern"}
-                        hint={
-                            "The path a particle takes from where it starts to where it ends. Choosing one brings its own knobs with it."
-                        }
-                        controls={
-                            "Picks the example's travel path function sent to ParticleSpawnerProps.computeParticlePos"
-                        }
-                    >
+                    <PageProp itemKey={"travelPattern"} {...ParticleSpawnerKnobs.TRAVEL_PATTERN_TEXT}>
                         <PageSelectField
                             value={travelPatternKey}
                             values={ParticleTravelPaths.PATH_TYPES}
@@ -570,12 +517,7 @@ export const ParticleSpawnerPage = () => {
                 <PagePropsDivider />
 
                 <PagePropsPanel scope={"global"}>
-                    <PageProp
-                        itemKey={"particleCount"}
-                        label={"Particle count"}
-                        hint={"How many particles are sent on each round."}
-                        controls={"Sets ParticleSpawnerProps.particleCount"}
-                    >
+                    <PageProp itemKey={"particleCount"} {...ParticleSpawnerKnobs.PARTICLE_COUNT_TEXT}>
                         <PageNumberField
                             value={particleCount}
                             min={ParticleSpawnerKnobs.MIN_PARTICLE_COUNT}
@@ -587,12 +529,7 @@ export const ParticleSpawnerPage = () => {
                         />
                     </PageProp>
 
-                    <PageProp
-                        itemKey={"travelDurationMs"}
-                        label={"Travel (ms)"}
-                        hint={"How long one particle takes to walk its path."}
-                        controls={"Sets ParticleSpawnerProps.travelDurationMs"}
-                    >
+                    <PageProp itemKey={"travelDurationMs"} {...ParticleSpawnerKnobs.TRAVEL_DURATION_MS_TEXT}>
                         <PageNumberField
                             value={travelDurationMs}
                             min={ParticleSpawnerKnobs.MIN_TRAVEL_DURATION_MS}
@@ -604,12 +541,7 @@ export const ParticleSpawnerPage = () => {
                         />
                     </PageProp>
 
-                    <PageProp
-                        itemKey={"restDurationMs"}
-                        label={"Rest duration (ms)"}
-                        hint={"How long a particle stays put at the end of its path before it disappears."}
-                        controls={"Sets ParticleSpawnerProps.restDurationMs"}
-                    >
+                    <PageProp itemKey={"restDurationMs"} {...ParticleSpawnerKnobs.REST_DURATION_MS_TEXT}>
                         <PageNumberField
                             value={restDurationMs}
                             min={ParticleSpawnerKnobs.MIN_RETENTION_MS}
@@ -621,14 +553,7 @@ export const ParticleSpawnerPage = () => {
                         />
                     </PageProp>
 
-                    <PageProp
-                        itemKey={"spawnDelayMs"}
-                        label={"Spawn delay (ms)"}
-                        hint={
-                            "How long each particle waits after the one before it sets off, which is what staggers them."
-                        }
-                        controls={"Sets ParticleSpawnerProps.spawnDelayMs"}
-                    >
+                    <PageProp itemKey={"spawnDelayMs"} {...ParticleSpawnerKnobs.SPAWN_DELAY_MS_TEXT}>
                         <PageNumberField
                             value={spawnDelayMs}
                             min={ParticleSpawnerKnobs.MIN_SPAWN_DELAY_MS}
@@ -640,16 +565,7 @@ export const ParticleSpawnerPage = () => {
                         />
                     </PageProp>
 
-                    <PageProp
-                        itemKey={"iterationPattern"}
-                        label={"Iteration pattern"}
-                        hint={
-                            "How the rounds follow each other: in bursts of three with a pause, one at a time with a pause, or without any pause at all."
-                        }
-                        controls={
-                            "Picks the example's list of rounds sent to ParticleSpawnerProps.spawnIterationPatterns"
-                        }
-                    >
+                    <PageProp itemKey={"iterationPattern"} {...ParticleSpawnerKnobs.ITERATION_PATTERN_TEXT}>
                         <PageSelectField
                             value={iterationPatternKey}
                             values={ParticleIterationPatterns.PATTERN_TYPES}
@@ -659,16 +575,7 @@ export const ParticleSpawnerPage = () => {
                         />
                     </PageProp>
 
-                    <PageProp
-                        itemKey={"overshootPercent"}
-                        label={"Overshoot (%)"}
-                        hint={
-                            "How far a particle runs past its destination before coming back to it. 0 stops it dead on target."
-                        }
-                        controls={
-                            "Sets how far the example's travel path runs past its end, sent to ParticleSpawnerProps.computeParticlePos"
-                        }
-                    >
+                    <PageProp itemKey={"overshootPercent"} {...ParticleSpawnerKnobs.OVERSHOOT_PERCENT_TEXT}>
                         <PageNumberField
                             value={overshootPercent}
                             min={ParticleSpawnerKnobs.MIN_OVERSHOOT_PERCENT}
@@ -695,14 +602,7 @@ export const ParticleSpawnerPage = () => {
                         />
                     </PageProp>
 
-                    <PageProp
-                        itemKey={"travelEasing"}
-                        label={"Travel easing"}
-                        hint={"The speed curve a particle follows along its path."}
-                        controls={
-                            "Picks the speed curve of the example's travel path, sent to ParticleSpawnerProps.computeParticlePos"
-                        }
-                    >
+                    <PageProp itemKey={"travelEasing"} {...ParticleSpawnerKnobs.TRAVEL_EASING_TEXT}>
                         <PageSelectField
                             value={travelEasingKey}
                             values={ParticleTravelEasings.EASING_TYPES}

@@ -5,6 +5,7 @@
     import PageMeasureBox from "../../../../PageComponents/MeasureBox/MeasureBox.svelte";
     import PageRangeContent from "../../../../StyledComponents/RangeContent/RangeContent.svelte";
     import type { LightCatcherExampleProps } from "../LightCatcherPageSvelte.types";
+    import { WHERE_LIGHT_ACROSS_ROW_LABEL } from "@thewaver/ss-playground/App/Pages/PointerEffects/LightCatcherPage/LightCatcherPage.const";
 
     const LAMPS = [1, 2, 3, 4, 5];
     const PERCENT = 100;
@@ -50,7 +51,7 @@
         <Range
             id={"placedLightSlider"}
             sizing={"fill"}
-            ariaLabel={"Where the light is across the row"}
+            ariaLabel={WHERE_LIGHT_ACROSS_ROW_LABEL}
             min={0}
             max={PERCENT}
             step={SLIDER_STEP}

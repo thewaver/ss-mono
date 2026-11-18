@@ -1,7 +1,7 @@
 <script lang="ts">
     import type { ShapeArrowAim } from "@thewaver/ss-utils";
     import { NumberInput } from "@thewaver/ss-components-svelte";
-    import { FIELD_WIDTH } from "@thewaver/ss-playground/App/Pages/NumberInputPage/NumberInputPage.const";
+    import { FIELD_WIDTH, DISABLED_BUT_REACHABLE_AMOUNT_LABEL } from "@thewaver/ss-playground/App/Pages/NumberInputPage/NumberInputPage.const";
     import {
         FIELD_GAP,
         FIELD_STEPPER_PADDING,
@@ -25,7 +25,7 @@
     isReachableWhenDisabled={props.isReachableWhenDisabled}
     padding={FIELD_STEPPER_PADDING}
     gap={FIELD_GAP}
-    ariaLabel={"Disabled but reachable amount"}
+    ariaLabel={DISABLED_BUT_REACHABLE_AMOUNT_LABEL}
     tooltipDefs={{
         placement: { x: "center", y: "top_out" },
         offset: { x: 0, y: 10 },

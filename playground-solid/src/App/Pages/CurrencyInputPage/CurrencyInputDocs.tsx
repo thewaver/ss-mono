@@ -5,6 +5,7 @@ import { CurrencyInputKnobs } from "@thewaver/ss-playground/App/Knobs/CurrencyIn
 import {
     BUDGET_MAX,
     DOCS_ROOT,
+    DOCS_SECTIONS,
     LOCALE_FIELD_WIDTH,
     LOCALE_GROUPING,
 } from "@thewaver/ss-playground/App/Pages/CurrencyInputPage/CurrencyInputPage.const";
@@ -39,32 +40,15 @@ export const CurrencyInputDocs = () => {
                 path={`${DOCS_ROOT}/Basic.tsx`}
                 renderKnobs={() => (
                     <>
-                        <PageProp
-                            key={"isReadOnly"}
-                            label={"Read-only"}
-                            hint={"Its amount can be selected and copied, but neither typing nor pasting changes it."}
-                            controls={"Sets CurrencyInputProps.isReadOnly"}
-                        >
+                        <PageProp key={"isReadOnly"} {...CurrencyInputKnobs.IS_READ_ONLY_TEXT}>
                             <PageCheckField value={getIsReadOnly} ariaLabel={"Read-only"} onChange={setIsReadOnly} />
                         </PageProp>
 
-                        <PageProp
-                            key={"hasError"}
-                            label={"Error"}
-                            hint={"Marks the field invalid, for screen readers as well as for the painter."}
-                            controls={"Sets CurrencyInputProps.hasError"}
-                        >
+                        <PageProp key={"hasError"} {...CurrencyInputKnobs.HAS_ERROR_TEXT}>
                             <PageCheckField value={getHasError} ariaLabel={"Error"} onChange={setHasError} />
                         </PageProp>
 
-                        <PageProp
-                            key={"isDisabled"}
-                            label={"Disabled"}
-                            hint={
-                                "Turns the field off: nothing can write to it, it shows no caret, and the Tab key skips it."
-                            }
-                            controls={"Sets CurrencyInputProps.isDisabled"}
-                        >
+                        <PageProp key={"isDisabled"} {...CurrencyInputKnobs.IS_DISABLED_TEXT}>
                             <PageCheckField value={getIsDisabled} ariaLabel={"Disabled"} onChange={setIsDisabled} />
                         </PageProp>
                     </>
@@ -73,34 +57,19 @@ export const CurrencyInputDocs = () => {
                 <BasicDocsExample isReadOnly={getIsReadOnly} hasError={getHasError} isDisabled={getIsDisabled} />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"Right to left"}
-                content={
-                    "Inside a box whose text runs right to left, the leading slot, here the symbol, sits on the right and the amount starts beside it, while the digits keep their own order."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.rightLeft} />
 
             <PageDocsExample path={`${DOCS_ROOT}/RightToLeft.tsx`}>
                 <RightToLeftDocsExample />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"Written the local way"}
-                content={
-                    "Give it a [prop]locale[/prop] and the amount is written the way that place writes money: which separators, and in which groups. The [prop]decimals[/prop] say how many digits follow the separator, and [prop]groupSizes[/prop] overrides the locale's grouping, such as the Indian pattern of a group of three and then groups of two. However many groups the amount needs, it gets."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.writtenLocalWay} />
 
             <PageDocsExample
                 path={`${DOCS_ROOT}/Locale.tsx`}
                 renderKnobs={() => (
                     <>
-                        <PageProp
-                            key={"locale"}
-                            label={"Locale"}
-                            hint={"Which country's conventions the amount is written in, which decides the separators."}
-                            controls={"Sets CurrencyInputProps.locale"}
-                        >
+                        <PageProp key={"locale"} {...CurrencyInputKnobs.LOCALE_TEXT}>
                             <PageSelectField
                                 value={getLocale}
                                 values={CurrencyInputKnobs.LOCALES}
@@ -110,12 +79,7 @@ export const CurrencyInputDocs = () => {
                             />
                         </PageProp>
 
-                        <PageProp
-                            key={"decimals"}
-                            label={"Decimals"}
-                            hint={"How many digits are kept after the decimal separator."}
-                            controls={"Sets CurrencyInputProps.decimals"}
-                        >
+                        <PageProp key={"decimals"} {...CurrencyInputKnobs.DECIMALS_TEXT}>
                             <PageSelectField
                                 value={getDecimals}
                                 values={CurrencyInputKnobs.DECIMALS}
@@ -124,14 +88,7 @@ export const CurrencyInputDocs = () => {
                             />
                         </PageProp>
 
-                        <PageProp
-                            key={"groupSizes"}
-                            label={"Grouping"}
-                            hint={
-                                "How the digits before the decimal separator are grouped: the locale's own way, or a pattern such as threes or the Indian lakh."
-                            }
-                            controls={"Sets CurrencyInputProps.groupSizes"}
-                        >
+                        <PageProp key={"groupSizes"} {...CurrencyInputKnobs.GROUP_SIZES_TEXT}>
                             <PageSelectField
                                 value={getGrouping}
                                 values={CurrencyInputKnobs.GROUPINGS}
@@ -146,33 +103,18 @@ export const CurrencyInputDocs = () => {
                 <LocaleDocsExample locale={getLocale} decimals={getDecimals} groupSizes={getGrouping} />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"With a symbol"}
-                content={
-                    "The field keeps no list of currencies, so the symbol is yours to draw, in the leading or the trailing slot, on whichever side your locale puts it."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.symbol} />
 
             <PageDocsExample path={`${DOCS_ROOT}/Symbol.tsx`}>
                 <SymbolDocsExample />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"A limit"}
-                content={
-                    "Give it a [prop]max[/prop] and any amount above it is refused as it is typed, so the field never holds more."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.limit} />
 
             <PageDocsExample
                 path={`${DOCS_ROOT}/Bounded.tsx`}
                 renderKnobs={() => (
-                    <PageProp
-                        key={"max"}
-                        label={"Max"}
-                        hint={"The largest amount the field accepts."}
-                        controls={"Sets CurrencyInputProps.max"}
-                    >
+                    <PageProp key={"max"} {...CurrencyInputKnobs.MAX_TEXT}>
                         <PageNumberField
                             value={getMax}
                             min={CurrencyInputKnobs.MIN_MAX}
@@ -187,22 +129,12 @@ export const CurrencyInputDocs = () => {
                 <BoundedDocsExample max={getMax} />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"Negative amounts"}
-                content={
-                    "With [prop]hasSign[/prop] on, a minus can be typed and the amount can go below zero. Off, the default, a minus is refused."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.negativeAmounts} />
 
             <PageDocsExample
                 path={`${DOCS_ROOT}/Signed.tsx`}
                 renderKnobs={() => (
-                    <PageProp
-                        key={"hasSign"}
-                        label={"Signed"}
-                        hint={"Allows negative amounts to be typed. With it off, a minus sign is refused."}
-                        controls={"Sets CurrencyInputProps.hasSign"}
-                    >
+                    <PageProp key={"hasSign"} {...CurrencyInputKnobs.HAS_SIGN_TEXT}>
                         <PageCheckField value={getHasSign} ariaLabel={"Signed"} onChange={setHasSign} />
                     </PageProp>
                 )}

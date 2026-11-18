@@ -11,6 +11,7 @@ import {
     ITEM_COUNT,
     PAGE_SIZE,
     PAGINATOR_GAP,
+    RESULTS_PAGE_FIELD_LABEL,
 } from "@thewaver/ss-playground/App/Pages/PaginatorPage/PaginatorPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/PaginatorPage/PaginatorPage.css";
 
@@ -35,7 +36,7 @@ export const JumpDocsExample = () => {
                 page={getPage}
                 itemCount={ITEM_COUNT}
                 pageSize={PAGE_SIZE}
-                ariaLabel={"Results with a page field"}
+                ariaLabel={RESULTS_PAGE_FIELD_LABEL}
                 onPageChange={setPage}
             >
                 <div class={styles.jumpRow}>

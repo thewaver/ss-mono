@@ -28,3 +28,30 @@ export const EXAMPLE_NAMES = {
 export const EXAMPLES_ROOT = "/src/App/Pages/ColorInputPage/Examples";
 
 export const DOCS_ROOT = "/src/App/Pages/ColorInputPage/Docs";
+
+export const DOCS_SECTIONS = {
+    rightLeft: {
+        title: "Right to left",
+        content:
+            "Inside a box whose text runs right to left, the field turns round with it: the swatch sits on the right, while the painter keeps the value itself left to right, so rgb(51 102 255) is not scrambled. The picker opens under the field lined up with its right edge and runs right to left too, but neither the square nor the hue strip inside it mirrors, since they are pictures of color rather than text: saturation still grows to the right, the hue strip still starts from red at the left, and the right arrow moves either one to the right.",
+    },
+    correctingPick: {
+        title: "Correcting a pick",
+        content:
+            "Every change also runs [prop]onInput[/prop], and whatever it writes to the value is what the field holds. Here every color is pulled to the nearest of four in a palette, so dragging across the square jumps from one to the next.",
+    },
+    tooltip: {
+        title: "Tooltip",
+        content:
+            "Give a field [prop]tooltipDefs[/prop] and it shows a tooltip on hover and on keyboard focus, read by screen readers as the field's description. A disabled field shows no tooltip unless you also keep it reachable when disabled; it can then be focused to read why it is off, and pressing it still opens nothing.",
+    },
+    namedLabel: {
+        title: "Named by a Label",
+        content:
+            "Inside a Label, the field takes its name from the label's text, so it needs no [prop]ariaLabel[/prop], and pressing the text opens the picker.",
+    },
+};
+
+export const BRAND_COLOR_RIGHT_LEFT_LABEL = "Brand color in a right-to-left box";
+
+export const DISABLED_BUT_REACHABLE_COLOR_LABEL = "Disabled but reachable color";

@@ -101,12 +101,7 @@ const examples: ExampleDefs[] = [
 <template>
     <PagePropsGroups>
         <PagePropsPanel scope="sample">
-            <PageProp
-                item-key="strokeConfigKey"
-                controls="Picks the example border paint sent to GlassSurfaceProps.computeStrokeDefs"
-                label="Border pattern"
-                hint="Which pointer-following gradient lights the panel's edge. Choosing one brings its own knobs with it."
-            >
+            <PageProp item-key="strokeConfigKey" v-bind="GlassSurfaceKnobs.STROKE_CONFIG_KEY_TEXT">
                 <PageGroupedSelectField
                     :value="strokeConfigKey"
                     :groups="STROKE_GROUPS"
@@ -128,12 +123,7 @@ const examples: ExampleDefs[] = [
         <PagePropsDivider />
 
         <PagePropsPanel scope="global">
-            <PageProp
-                item-key="borderRadius"
-                controls="Sets every corner of GlassSurfaceProps.borderRadii"
-                label="Corner radius (px)"
-                hint="How far the panel's corners are rounded."
-            >
+            <PageProp item-key="borderRadius" v-bind="GlassSurfaceKnobs.BORDER_RADIUS_TEXT">
                 <PageNumberField
                     :value="borderRadius"
                     :min="GlassSurfaceKnobs.MIN_BORDER_RADIUS"
@@ -144,12 +134,7 @@ const examples: ExampleDefs[] = [
                 />
             </PageProp>
 
-            <PageProp
-                item-key="borderWidth"
-                controls="Sets every side of GlassSurfaceProps.borderWidths"
-                label="Border width (px)"
-                hint="How thick the lit edge around the panel is."
-            >
+            <PageProp item-key="borderWidth" v-bind="GlassSurfaceKnobs.BORDER_WIDTH_TEXT">
                 <PageNumberField
                     :value="borderWidth"
                     :min="GlassSurfaceKnobs.MIN_BORDER_WIDTH"
@@ -160,12 +145,7 @@ const examples: ExampleDefs[] = [
                 />
             </PageProp>
 
-            <PageProp
-                item-key="colors"
-                controls="Sets the colors of the example border paint sent to GlassSurfaceProps.computeStrokeDefs"
-                label="Border Colors"
-                hint="The colors the edge light is painted from."
-            >
+            <PageProp item-key="colors" v-bind="GlassSurfaceKnobs.COLORS_TEXT">
                 <div :class="styles.colorList">
                     <PageColorField
                         v-for="key in colorKeys"
@@ -177,12 +157,7 @@ const examples: ExampleDefs[] = [
                 </div>
             </PageProp>
 
-            <PageProp
-                item-key="blurWidth"
-                controls="Sets the blur of the example border paint sent to GlassSurfaceProps.computeStrokeDefs"
-                label="Border blur (px)"
-                hint="How far the edge light bleeds outward, which is what makes it glow rather than sit flat."
-            >
+            <PageProp item-key="blurWidth" v-bind="GlassSurfaceKnobs.BLUR_WIDTH_TEXT">
                 <PageNumberField
                     :value="blurWidth"
                     :min="GlassSurfaceKnobs.MIN_BLUR_WIDTH"
@@ -193,12 +168,7 @@ const examples: ExampleDefs[] = [
                 />
             </PageProp>
 
-            <PageProp
-                item-key="blurRadius"
-                controls="Sets GlassSurfaceProps.glassDefs.backdrop.blurRadius"
-                label="Backdrop blur (px)"
-                hint="How far whatever is behind the panel is blurred as it shows through."
-            >
+            <PageProp item-key="blurRadius" v-bind="GlassSurfaceKnobs.BLUR_RADIUS_TEXT">
                 <PageNumberField
                     :value="blurRadius"
                     :min="GlassSurfaceKnobs.MIN_BLUR_RADIUS"
@@ -209,12 +179,7 @@ const examples: ExampleDefs[] = [
                 />
             </PageProp>
 
-            <PageProp
-                item-key="noiseFrequency"
-                controls="Sets GlassSurfaceProps.glassDefs.noise.frequency"
-                label="Noise scale"
-                hint="How fine the grain dusted over the glass is. Higher numbers make a tighter grain."
-            >
+            <PageProp item-key="noiseFrequency" v-bind="GlassSurfaceKnobs.NOISE_FREQUENCY_TEXT">
                 <PageNumberField
                     :value="noiseFrequency"
                     :min="GlassSurfaceKnobs.MIN_GRAIN_FREQUENCY"
@@ -225,12 +190,7 @@ const examples: ExampleDefs[] = [
                 />
             </PageProp>
 
-            <PageProp
-                item-key="noiseOctaves"
-                controls="Sets GlassSurfaceProps.glassDefs.noise.octaves"
-                label="Noise octaves"
-                hint="How many layers of grain are piled up. More layers add fine detail and cost more to draw."
-            >
+            <PageProp item-key="noiseOctaves" v-bind="GlassSurfaceKnobs.NOISE_OCTAVES_TEXT">
                 <PageNumberField
                     :value="noiseOctaves"
                     :min="GlassSurfaceKnobs.MIN_GRAIN_OCTAVES"
@@ -241,12 +201,7 @@ const examples: ExampleDefs[] = [
                 />
             </PageProp>
 
-            <PageProp
-                item-key="rippleScale"
-                controls="Sets GlassSurfaceProps.glassDefs.ripple.scale"
-                label="Ripple bend (px)"
-                hint="How far the glass bends what is behind it, as though it were not quite flat. 0 leaves it looking like a window."
-            >
+            <PageProp item-key="rippleScale" v-bind="GlassSurfaceKnobs.RIPPLE_SCALE_TEXT">
                 <PageNumberField
                     :value="rippleScale"
                     :min="GlassSurfaceKnobs.MIN_RIPPLE_SCALE"
@@ -257,12 +212,7 @@ const examples: ExampleDefs[] = [
                 />
             </PageProp>
 
-            <PageProp
-                item-key="lightHeight"
-                controls="Sets GlassSurfaceProps.glassDefs.sheen.lightHeight"
-                label="Light height"
-                hint="How far above the panel the light lighting the sheen is placed. Lower puts it closer and makes the highlight tighter."
-            >
+            <PageProp item-key="lightHeight" v-bind="GlassSurfaceKnobs.LIGHT_HEIGHT_TEXT">
                 <PageNumberField
                     :value="lightHeight"
                     :min="GlassSurfaceKnobs.MIN_LIGHT_HEIGHT"
@@ -273,12 +223,7 @@ const examples: ExampleDefs[] = [
                 />
             </PageProp>
 
-            <PageProp
-                item-key="surfaceScale"
-                controls="Sets GlassSurfaceProps.glassDefs.sheen.surfaceScale"
-                label="Sheen relief"
-                hint="How deep the relief the sheen is shaded against is. 0 leaves the surface flat and kills the highlight."
-            >
+            <PageProp item-key="surfaceScale" v-bind="GlassSurfaceKnobs.SURFACE_SCALE_TEXT">
                 <PageNumberField
                     :value="surfaceScale"
                     :min="GlassSurfaceKnobs.MIN_SURFACE_SCALE"
@@ -289,12 +234,7 @@ const examples: ExampleDefs[] = [
                 />
             </PageProp>
 
-            <PageProp
-                item-key="specularConstant"
-                controls="Sets GlassSurfaceProps.glassDefs.sheen.specularConstant"
-                label="Sheen brightness"
-                hint="How strong the sheen highlight is overall."
-            >
+            <PageProp item-key="specularConstant" v-bind="GlassSurfaceKnobs.SPECULAR_CONSTANT_TEXT">
                 <PageNumberField
                     :value="specularConstant"
                     :min="GlassSurfaceKnobs.MIN_SPECULAR_CONSTANT"
@@ -305,12 +245,7 @@ const examples: ExampleDefs[] = [
                 />
             </PageProp>
 
-            <PageProp
-                item-key="specularExponent"
-                controls="Sets GlassSurfaceProps.glassDefs.sheen.specularExponent"
-                label="Shininess"
-                hint="How tightly the sheen highlight is focused: low is a broad soft gleam, high is a small hard glint."
-            >
+            <PageProp item-key="specularExponent" v-bind="GlassSurfaceKnobs.SPECULAR_EXPONENT_TEXT">
                 <PageNumberField
                     :value="specularExponent"
                     :min="GlassSurfaceKnobs.MIN_SPECULAR_EXPONENT"
@@ -321,12 +256,7 @@ const examples: ExampleDefs[] = [
                 />
             </PageProp>
 
-            <PageProp
-                item-key="tintOpacity"
-                controls="Sets GlassSurfaceProps.glassDefs.tint.opacity"
-                label="Tint opacity"
-                hint="How strongly the panel is colored. 0 leaves it clear."
-            >
+            <PageProp item-key="tintOpacity" v-bind="GlassSurfaceKnobs.TINT_OPACITY_TEXT">
                 <PageNumberField
                     :value="tintOpacity"
                     :min="GlassSurfaceKnobs.MIN_TINT_OPACITY"
@@ -337,12 +267,7 @@ const examples: ExampleDefs[] = [
                 />
             </PageProp>
 
-            <PageProp
-                item-key="tintColor"
-                controls="Sets GlassSurfaceProps.glassDefs.tint.color"
-                label="Tint color"
-                hint="The color the panel itself is tinted with."
-            >
+            <PageProp item-key="tintColor" v-bind="GlassSurfaceKnobs.TINT_COLOR_TEXT">
                 <PageColorField
                     :value="tintColor"
                     ariaLabel="Tint color"

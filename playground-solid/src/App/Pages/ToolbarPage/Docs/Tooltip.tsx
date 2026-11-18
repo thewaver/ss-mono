@@ -3,6 +3,15 @@ import { createSignal } from "solid-js";
 import { SharedTooltip, Toolbar, access } from "@thewaver/ss-components-solid";
 import type { AnchorPlacement, InteractionTooltipDefs, ToolbarAction } from "@thewaver/ss-components-solid";
 import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
+import {
+    COPIES_SELECTION_CLIPBOARD_TEXT,
+    DELETES_SELECTION_TEXT,
+    MORE_EDITING_ACTIONS_LABEL,
+    MOVES_SELECTION_CLIPBOARD_TEXT,
+    NOTHING_SELECTED_SO_THERE_TEXT,
+    PUTS_CLIPBOARD_WHERE_CARET_TEXT,
+    TAKES_BACK_LAST_CHANGE_TEXT,
+} from "@thewaver/ss-playground/App/Pages/ToolbarPage/ToolbarPage.const";
 import { TOOLTIP_HOVER_DELAY_MS } from "@thewaver/ss-playground/App/StyledComponents/TooltipContent/TooltipContent.const";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
@@ -33,20 +42,16 @@ export const TooltipDocsExample = (props: Props) => {
     const [getLastRun, setLastRun] = createSignal<string>();
 
     const getActions = (): ToolbarAction<string>[] => [
-        { value: "Cut", tooltipDefs: toHint("Moves the selection to the clipboard") },
-        { value: "Copy", tooltipDefs: toHint("Copies the selection to the clipboard") },
+        { value: "Cut", tooltipDefs: toHint(MOVES_SELECTION_CLIPBOARD_TEXT) },
+        { value: "Copy", tooltipDefs: toHint(COPIES_SELECTION_CLIPBOARD_TEXT) },
         {
             value: "Clear",
             isDisabled: access(props.isDisabled),
             isReachableWhenDisabled: access(props.isReachableWhenDisabled),
-            tooltipDefs: toHint(
-                access(props.isDisabled)
-                    ? "Nothing is selected, so there is nothing to clear"
-                    : "Deletes the selection",
-            ),
+            tooltipDefs: toHint(access(props.isDisabled) ? NOTHING_SELECTED_SO_THERE_TEXT : DELETES_SELECTION_TEXT),
         },
-        { value: "Paste", tooltipDefs: toHint("Puts the clipboard where the caret is") },
-        { value: "Undo", tooltipDefs: toHint("Takes back the last change") },
+        { value: "Paste", tooltipDefs: toHint(PUTS_CLIPBOARD_WHERE_CARET_TEXT) },
+        { value: "Undo", tooltipDefs: toHint(TAKES_BACK_LAST_CHANGE_TEXT) },
     ];
 
     return (
@@ -56,7 +61,7 @@ export const TooltipDocsExample = (props: Props) => {
                     <Toolbar
                         actions={getActions}
                         ariaLabel={"Editing"}
-                        overflowAriaLabel={"More editing actions"}
+                        overflowAriaLabel={MORE_EDITING_ACTIONS_LABEL}
                         renderAction={(getAction, getFlags) => (
                             <PageButtonContent flags={getFlags}>{getAction().value}</PageButtonContent>
                         )}

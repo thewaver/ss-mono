@@ -15,12 +15,7 @@ type Props = ArrowBedKnobsProps;
 
 export const ArrowBedKnobs = (props: Props) => (
     <>
-        <PageProp
-            key={`${access(props.keyPrefix)}Arrow`}
-            label={"Arrow"}
-            hint={"Which arrow every tooltip here grows."}
-            controls={"Picks the template handed to ShapeUtils.attachArrow"}
-        >
+        <PageProp key={`${access(props.keyPrefix)}Arrow`} {...TooltipKnobs.ARROW_TEXT}>
             <PageSelectField
                 value={props.arrow[0]}
                 values={ARROW_BED_ARROWS}
@@ -31,14 +26,7 @@ export const ArrowBedKnobs = (props: Props) => (
             />
         </PageProp>
 
-        <PageProp
-            key={`${access(props.keyPrefix)}Width`}
-            label={"Arrow width (px)"}
-            hint={
-                "How wide every arrow is across its base. Past twice the length, a corner arrow's sides lean 45° or more."
-            }
-            controls={"Sets the arrow width handed to the template"}
-        >
+        <PageProp key={`${access(props.keyPrefix)}Width`} {...TooltipKnobs.ARROW_WIDTH_PX_TEXT}>
             <PageNumberField
                 value={props.arrowWidth[0]}
                 min={TooltipKnobs.MIN_ARROW_SIZE}
@@ -50,12 +38,7 @@ export const ArrowBedKnobs = (props: Props) => (
             />
         </PageProp>
 
-        <PageProp
-            key={`${access(props.keyPrefix)}Length`}
-            label={"Arrow length (px)"}
-            hint={"How far every arrow's tip stands off its tooltip."}
-            controls={"Sets the arrow length handed to the template"}
-        >
+        <PageProp key={`${access(props.keyPrefix)}Length`} {...TooltipKnobs.ARROW_LENGTH_PX_TEXT}>
             <PageNumberField
                 value={props.arrowLength[0]}
                 min={TooltipKnobs.MIN_ARROW_SIZE}
@@ -67,14 +50,7 @@ export const ArrowBedKnobs = (props: Props) => (
             />
         </PageProp>
 
-        <PageProp
-            key={`${access(props.keyPrefix)}Shape`}
-            label={"Shape"}
-            hint={
-                "The contour every tooltip here is cut to, which is what each arrow's base is walked along from where it attaches."
-            }
-            controls={"Picks the contour handed to ShapeUtils.attachArrow"}
-        >
+        <PageProp key={`${access(props.keyPrefix)}Shape`} {...TooltipKnobs.SHAPE_TEXT}>
             <PageSelectField
                 value={props.shape[0]}
                 values={ARROW_BED_SHAPES}

@@ -2,7 +2,7 @@
     import { EDGE_FADER_DEFAULTS } from "@thewaver/ss-components-svelte";
     import type { EdgeFaderEdge } from "@thewaver/ss-components-svelte";
     import { EdgeFaderKnobs } from "@thewaver/ss-playground/App/Knobs/EdgeFaders.const";
-    import { DOCS_ROOT, EDGE_LABELS } from "@thewaver/ss-playground/App/Pages/EdgeFaderPage/EdgeFaderPage.const";
+    import { DOCS_SECTIONS, DOCS_ROOT, EDGE_LABELS } from "@thewaver/ss-playground/App/Pages/EdgeFaderPage/EdgeFaderPage.const";
 
     import PageDocsExample from "../../PageComponents/DocsExample/PageDocsExample.svelte";
     import PageDocsSection from "../../PageComponents/DocsSection/PageDocsSection.svelte";
@@ -31,9 +31,7 @@
     {#snippet renderKnobs()}
         <PageProp
             itemKey={"size"}
-            label={"Fade size (px)"}
-            hint={"How far in from each chosen side the fade reaches."}
-            controls={"Sets EdgeFaderProps.size"}
+            {...EdgeFaderKnobs.SIZE_TEXT}
         >
             <PageNumberField
                 value={size}
@@ -50,8 +48,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Any mix of sides"}
-    content={"Pass [prop]edges[/prop] any mix of top, right, bottom and left; left out, all four fade. Where two faded sides meet, their fades meet in the corner."}
+    {...DOCS_SECTIONS.anyMixSides}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Sides.svelte`}>
@@ -76,8 +73,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Fading only what is out of view"}
-    content={"Set [prop]isScrollAware[/prop] and a side fades only while there is more to scroll to past it. The fade shrinks as that end comes into view and is gone once it is reached, so a box whose content fits shows no fade at all."}
+    {...DOCS_SECTIONS.fadingOnlyOutOfView}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/ScrollAware.svelte`}>
@@ -86,9 +82,7 @@
     {#snippet renderKnobs()}
         <PageProp
             itemKey={"isScrollAware"}
-            label={"Scroll-aware"}
-            hint={"Whether a side fades only while there is more to scroll to past it."}
-            controls={"Sets EdgeFaderProps.isScrollAware"}
+            {...EdgeFaderKnobs.IS_SCROLL_AWARE_TEXT}
         >
             <PageCheckField
                 value={isScrollAware}
@@ -102,8 +96,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Around something that does not scroll"}
-    content={"Left fixed, the default, the chosen sides fade whether or not anything scrolls, so the fade can soften the edges of any content."}
+    {...DOCS_SECTIONS.aroundNonScrolling}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Unscrolled.svelte`}>

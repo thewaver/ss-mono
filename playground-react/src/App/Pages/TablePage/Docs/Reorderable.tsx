@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import type { TableSort } from "@thewaver/ss-components-react";
 import { Table } from "@thewaver/ss-components-react";
 import { TABLE_ANNOUNCEMENTS } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
+import { PARTS_REORDERABLE_COLUMNS_LABEL } from "@thewaver/ss-playground/App/Pages/TablePage/TablePage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/TablePage/TablePage.css";
 
 import { PageTableMarker } from "../../../StyledComponents/TableContent/TableContent";
@@ -24,7 +25,7 @@ export const ReorderableDocsExample = () => {
                 sort={sortState}
                 selection={selectionState}
                 order={orderState}
-                ariaLabel={"Parts with reorderable columns"}
+                ariaLabel={PARTS_REORDERABLE_COLUMNS_LABEL}
                 announcements={TABLE_ANNOUNCEMENTS}
                 renderMarker={() => <PageTableMarker />}
             />

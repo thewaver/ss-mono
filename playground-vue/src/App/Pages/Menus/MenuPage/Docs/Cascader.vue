@@ -2,6 +2,7 @@
 import { computed, shallowRef } from "vue";
 
 import { Menu } from "@thewaver/ss-components-vue";
+import { NOTHING_CHOSEN } from "@thewaver/ss-playground/App/Pages/Menus/MenuPage/MenuPage.const";
 import { POPOVER_SURFACE_INSET } from "@thewaver/ss-playground/App/StyledComponents/PopoverSurface/PopoverSurface.css";
 
 import PageGlideFloater from "../../../../StyledComponents/GlideFloater/PageGlideFloater.vue";
@@ -12,8 +13,6 @@ import type { Destination } from "../MenuPageVue.types";
 import MenuPopup from "../MenuPopup.vue";
 
 const PATH_SEPARATOR = " / ";
-const NOTHING_CHOSEN = "Choose a destination";
-
 const path = shallowRef<string[]>([]);
 
 const pathText = computed(() => (path.value.length > 0 ? path.value.join(PATH_SEPARATOR) : NOTHING_CHOSEN));

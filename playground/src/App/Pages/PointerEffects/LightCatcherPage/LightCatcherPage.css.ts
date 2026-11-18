@@ -19,7 +19,7 @@ export const panelCard = style({
     height: 150,
     padding: themeVars.spacing.full,
     borderRadius: themeVars.borderRadius.full,
-    backgroundColor: layerVars.main,
+    backgroundColor: layerVars.dark,
     color: layerVars.contrast,
     fontSize: themeVars.fontSize.small,
     textAlign: "center",

@@ -104,14 +104,7 @@ export const DiePage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp
-                    itemKey={"shape"}
-                    label={"Die"}
-                    hint={
-                        "Which solid the tabletop die and the icon cloud are, from four faces to a hundred. The planet keeps twelve."
-                    }
-                    controls={"Picks the sample shape sent to DieProps.shape"}
-                >
+                <PageProp itemKey={"shape"} {...DieKnobs.SHAPE_TEXT}>
                     <PageSelectField
                         value={shapeKey}
                         values={DieShapes.SAMPLE_KEYS}
@@ -120,12 +113,7 @@ export const DiePage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"rollDurationMs"}
-                    label={"Roll duration (ms)"}
-                    hint={"How long a roll takes to land. It is off while the visitor has asked for reduced motion."}
-                    controls={"Sets DieProps.rollDurationMs"}
-                >
+                <PageProp itemKey={"rollDurationMs"} {...DieKnobs.ROLL_DURATION_MS_TEXT}>
                     <PageNumberField
                         value={rollDurationMs}
                         min={DieKnobs.MIN_ROLL_DURATION_MS}
@@ -137,12 +125,7 @@ export const DiePage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"tumbleCount"}
-                    label={"Tumbles"}
-                    hint={"How many whole turns a roll makes on its way."}
-                    controls={"Sets DieProps.tumbleCount"}
-                >
+                <PageProp itemKey={"tumbleCount"} {...DieKnobs.TUMBLE_COUNT_TEXT}>
                     <PageNumberField
                         value={tumbleCount}
                         min={DieKnobs.MIN_TUMBLE_COUNT}

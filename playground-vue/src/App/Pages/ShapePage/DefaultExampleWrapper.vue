@@ -28,12 +28,7 @@ const shouldPadChildren = shallowRef(ShapeKnobs.STARTING_SHOULD_PAD_CHILDREN);
     <PageExampleKnobs>
         <ShapeGeometryKnobs :geometry="geometry" />
 
-        <PageProp
-            item-key="shouldClipChildren"
-            controls="Decides whether the example's ShapeProps.renderChildren applies the clip path it is handed"
-            label="Clip children"
-            hint="Cuts whatever is inside the shape to the shape's own contour, instead of letting it spill past."
-        >
+        <PageProp item-key="shouldClipChildren" v-bind="ShapeKnobs.SHOULD_CLIP_CHILDREN_TEXT">
             <PageCheckField
                 :value="shouldClipChildren"
                 ariaLabel="Clip children"
@@ -41,12 +36,7 @@ const shouldPadChildren = shallowRef(ShapeKnobs.STARTING_SHOULD_PAD_CHILDREN);
             />
         </PageProp>
 
-        <PageProp
-            item-key="shouldPadChildren"
-            controls="Decides whether the example's ShapeProps.renderChildren pads its content to the contour"
-            label="Pad children"
-            hint="Insets whatever is inside far enough to clear the rounded corners, so text does not run under them."
-        >
+        <PageProp item-key="shouldPadChildren" v-bind="ShapeKnobs.SHOULD_PAD_CHILDREN_TEXT">
             <PageCheckField
                 :value="shouldPadChildren"
                 ariaLabel="Pad children"

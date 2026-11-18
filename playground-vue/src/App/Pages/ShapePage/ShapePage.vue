@@ -132,13 +132,7 @@ const examples: ExampleDefs[] = [
             <PagePropsDivider />
 
             <PagePropsPanel scope="global">
-                <PageProp
-                    v-if="usesPattern"
-                    item-key="cellSize"
-                    controls="Sets the tile size of the example paints sent to ShapeProps.computeFillDefs and ShapeProps.computeStrokeDefs"
-                    label="Pattern Cell Size (px)"
-                    hint="How large one tile of a pattern is before it repeats."
-                >
+                <PageProp v-if="usesPattern" item-key="cellSize" v-bind="ShapeKnobs.CELL_SIZE_TEXT">
                     <PageNumberField
                         :value="cellSize"
                         :min="ShapeKnobs.MIN_CELL_SIZE"
@@ -149,12 +143,7 @@ const examples: ExampleDefs[] = [
                     />
                 </PageProp>
 
-                <PageProp
-                    item-key="colors"
-                    controls="Sets the colors of the example paints sent to ShapeProps.computeFillDefs and ShapeProps.computeStrokeDefs"
-                    label="Colors"
-                    hint="The colors the stroke, the fill and the page's own background are painted from."
-                >
+                <PageProp item-key="colors" v-bind="ShapeKnobs.COLORS_TEXT">
                     <div :class="styles.colorList">
                         <PageColorField
                             v-for="key in colorKeys"
@@ -166,12 +155,7 @@ const examples: ExampleDefs[] = [
                     </div>
                 </PageProp>
 
-                <PageProp
-                    item-key="strokeThicknessPx"
-                    controls="Sets the thickness in the example's ShapeProps.strokeGeom"
-                    label="Stroke Thickness (px)"
-                    hint="How thick the stroke is."
-                >
+                <PageProp item-key="strokeThicknessPx" v-bind="ShapeKnobs.STROKE_THICKNESS_PX_TEXT">
                     <PageNumberField
                         :value="edgeThickness"
                         :min="ShapeKnobs.MIN_EDGE_THICKNESS"
@@ -182,12 +166,7 @@ const examples: ExampleDefs[] = [
                     />
                 </PageProp>
 
-                <PageProp
-                    item-key="blurWidth"
-                    controls="Sets the blur of the example paints sent to ShapeProps.computeFillDefs and ShapeProps.computeStrokeDefs"
-                    label="Blur (px)"
-                    hint="How far the stroke is blurred outward, which is what gives it its glow."
-                >
+                <PageProp item-key="blurWidth" v-bind="ShapeKnobs.BLUR_WIDTH_TEXT">
                     <PageNumberField
                         :value="blurWidth"
                         :min="ShapeKnobs.MIN_BLUR_WIDTH"
@@ -201,9 +180,7 @@ const examples: ExampleDefs[] = [
                 <PageProp
                     v-if="usesTiming"
                     item-key="animationDurationMs"
-                    controls="Sets the duration of the example paints sent to ShapeProps.computeFillDefs and ShapeProps.computeStrokeDefs"
-                    label="Animation duration (ms)"
-                    hint="How long one pass of the stroke or fill animation takes."
+                    v-bind="ShapeKnobs.ANIMATION_DURATION_MS_TEXT"
                 >
                     <PageNumberField
                         :value="animationDurationMs"
@@ -215,13 +192,7 @@ const examples: ExampleDefs[] = [
                     />
                 </PageProp>
 
-                <PageProp
-                    v-if="usesTiming"
-                    item-key="iterationConfigKey"
-                    controls="Picks how the example paints repeat, sent to ShapeProps.computeFillDefs and ShapeProps.computeStrokeDefs"
-                    label="Iteration Pattern"
-                    hint="How the animation repeats: once, endlessly, or back and forth."
-                >
+                <PageProp v-if="usesTiming" item-key="iterationConfigKey" v-bind="ShapeKnobs.ITERATION_CONFIG_KEY_TEXT">
                     <PageSelectField
                         :value="iterationConfigKey"
                         :values="SVGDefsSamples.Iteration.SAMPLE_KEYS"

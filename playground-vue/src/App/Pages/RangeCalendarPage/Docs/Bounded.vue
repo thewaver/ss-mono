@@ -4,6 +4,7 @@ import { shallowRef } from "vue";
 import type { DateValueRange } from "@thewaver/ss-components-vue";
 import { DateValueUtils, RangeCalendar } from "@thewaver/ss-components-vue";
 import { LOCALE, MAX_DATE, MIN_DATE, TODAY } from "@thewaver/ss-playground/App/Pages/CalendarPage/CalendarPage.const";
+import { CHOOSE_DATE_RANGE_WITHIN_LABEL } from "@thewaver/ss-playground/App/Pages/RangeCalendarPage/RangeCalendarPage.const";
 
 import PageCalendarCaption from "../../../PageComponents/CalendarCaption/CalendarCaption.vue";
 import PageCalendarDay from "../../../StyledComponents/CalendarContent/PageCalendarDay.vue";
@@ -25,7 +26,7 @@ const month = shallowRef(DateValueUtils.getStartOfMonth(TODAY));
             :locale="LOCALE"
             :min-value="MIN_DATE"
             :max-value="MAX_DATE"
-            ariaLabel="Choose a date range within the bounds"
+            :ariaLabel="CHOOSE_DATE_RANGE_WITHIN_LABEL"
         >
             <template #renderDay="{ flags }">
                 <PageCalendarDay :render-props="flags" />

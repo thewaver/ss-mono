@@ -4,6 +4,7 @@ import { computed, shallowRef, watch } from "vue";
 import { Bracket, BracketUtils, Button } from "@thewaver/ss-components-vue";
 import type { BracketNode, BracketStep } from "@thewaver/ss-components-vue";
 import { BracketKnobs } from "@thewaver/ss-playground/App/Knobs/Brackets.const";
+import { KNOCKOUT_DRAW_ONE_FAMILY_LABEL } from "@thewaver/ss-playground/App/Pages/BracketPage/BracketPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/BracketPage/BracketPage.css";
 import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
@@ -105,7 +106,7 @@ watch(family, (next) => props.onFamilyChange(describeFamily(DRAW.value, next?.va
                     :orientation="orientation"
                     :root-side="rootSide"
                     :layer-header-size="headerSize"
-                    ariaLabel="Knockout draw, one family at a time"
+                    :ariaLabel="KNOCKOUT_DRAW_ONE_FAMILY_LABEL"
                     @activate="props.onActivate"
                 >
                     <template #renderConnector="defs">

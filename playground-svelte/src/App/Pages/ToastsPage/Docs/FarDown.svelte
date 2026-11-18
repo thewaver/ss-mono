@@ -9,6 +9,7 @@
     import type { ToastsShowAnswer } from "../ToastsPageSvelte.types";
     import FarDownSaveButton from "./FarDownSaveButton.svelte";
     import FarDownSettingsPanel from "./FarDownSettingsPanel.svelte";
+    import { PROFILE_NOTIFICATIONS_LABEL } from "@thewaver/ss-playground/App/Pages/ToastsPage/ToastsPage.const";
 
     let answer = $state<ToastsShowAnswer>();
 
@@ -19,7 +20,7 @@
 
 <div class={styles.example}>
     <div class={styles.raiseRow}>
-        <Toasts ariaLabel={"Profile notifications"} alignment={"middle_center"}>
+        <Toasts ariaLabel={PROFILE_NOTIFICATIONS_LABEL} alignment={"middle_center"}>
             <FarDownSettingsPanel onAnswer={setAnswer} />
 
             {#snippet renderToast(

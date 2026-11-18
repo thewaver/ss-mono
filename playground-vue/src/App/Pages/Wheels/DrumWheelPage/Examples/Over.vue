@@ -3,6 +3,7 @@ import { shallowRef, useModel } from "vue";
 
 import { Button, DrumWheel } from "@thewaver/ss-components-vue";
 import type { WheelController } from "@thewaver/ss-components-vue";
+import { PRIZE_DRUM_TURNING_OVER_LABEL } from "@thewaver/ss-playground/App/Pages/Wheels/DrumWheelPage/DrumWheelPage.const";
 import { pickPrizeIndex } from "@thewaver/ss-playground/App/Pages/Wheels/Wheels.const";
 import type { Size2d } from "@thewaver/ss-utils";
 
@@ -51,7 +52,7 @@ const spin = () => {
                 :wedges="wedges"
                 axis="column"
                 :wedge-size="WEDGE_SIZE"
-                ariaLabel="Prize drum, turning over"
+                :ariaLabel="PRIZE_DRUM_TURNING_OVER_LABEL"
                 :compute-spin-target="computeSpinTarget"
                 :compute-wedge-label="computeWedgeLabel"
                 @selected-wedge-change="props.onSelectedWedgeChange"

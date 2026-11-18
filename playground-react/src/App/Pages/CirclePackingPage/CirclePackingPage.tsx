@@ -48,12 +48,7 @@ export const CirclePackingPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp
-                    itemKey={"padding"}
-                    label={"Padding (px)"}
-                    hint={"The space left between neighboring circles and around the inside of their parent."}
-                    controls={"Sets CirclePackingProps.padding"}
-                >
+                <PageProp itemKey={"padding"} {...CirclePackingKnobs.PADDING_TEXT}>
                     <PageNumberField
                         value={padding}
                         min={CirclePackingKnobs.MIN_PADDING}
@@ -64,14 +59,7 @@ export const CirclePackingPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"zoomDurationMs"}
-                    label={"Zoom duration (ms)"}
-                    hint={
-                        "How long a zoom in or out takes. It is off while the visitor has asked for reduced motion, and 0 jumps straight to the new view."
-                    }
-                    controls={"Sets CirclePackingProps.zoomDurationMs"}
-                >
+                <PageProp itemKey={"zoomDurationMs"} {...CirclePackingKnobs.ZOOM_DURATION_MS_TEXT}>
                     <PageNumberField
                         value={zoomDurationMs}
                         min={CirclePackingKnobs.MIN_ZOOM_DURATION_MS}

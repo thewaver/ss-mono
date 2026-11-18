@@ -22,6 +22,7 @@
         renderPalettePanel,
         renderPalettePlaceholder,
     } from "../CommandPalettePage.const.svelte";
+    import { SEARCH_GREETINGS_LABEL } from "@thewaver/ss-playground/App/Pages/Menus/CommandPalettePage/CommandPalettePage.const";
 
     let visibility = $state(false);
     let query = $state("");
@@ -67,7 +68,7 @@
     bind:query
     {actions}
     ariaLabel={"Greetings"}
-    fieldAriaLabel={"Search the greetings"}
+    fieldAriaLabel={SEARCH_GREETINGS_LABEL}
     listAriaLabel={"Matching greetings"}
     renderOverlay={renderPaletteOverlay}
     fieldPadding={FIELD_PADDING}

@@ -3,6 +3,7 @@ import { shallowRef, useModel } from "vue";
 
 import { Button, Trail } from "@thewaver/ss-components-vue";
 import type { TrailController } from "@thewaver/ss-components-vue";
+import { CIRCUIT_PATH } from "@thewaver/ss-playground/App/Pages/TrailPage/TrailPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/TrailPage/TrailPage.css";
 import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
@@ -13,7 +14,6 @@ import PageTrailVehicle from "../../../StyledComponents/TrailContent/PageTrailVe
 import type { TrailExampleProps } from "../TrailPage.types";
 
 const CIRCUIT_SIZE = { width: 320, height: 130 };
-const CIRCUIT_PATH = "M 60 35 H 260 A 30 30 0 0 1 260 95 H 60 A 30 30 0 0 1 60 35 Z";
 const VEHICLE_LABEL = "▶";
 const VEHICLE_ID = "circuitVehicle";
 

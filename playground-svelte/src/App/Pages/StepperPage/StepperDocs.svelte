@@ -1,7 +1,7 @@
 <script lang="ts">
     import { STEPPER_ORIENTATIONS } from "@thewaver/ss-components-svelte";
     import type { StepperOrientation } from "@thewaver/ss-components-svelte";
-    import { DOCS_ROOT } from "@thewaver/ss-playground/App/Pages/StepperPage/StepperPage.const";
+    import { DOCS_SECTIONS, DOCS_ROOT } from "@thewaver/ss-playground/App/Pages/StepperPage/StepperPage.const";
 
     import PageDocsExample from "../../PageComponents/DocsExample/PageDocsExample.svelte";
     import PageDocsSection from "../../PageComponents/DocsSection/PageDocsSection.svelte";
@@ -14,6 +14,7 @@
     import DetailedDocsExample from "./Docs/Detailed.svelte";
     import FailedDocsExample from "./Docs/Failed.svelte";
     import RightToLeftDocsExample from "./Docs/RightToLeft.svelte";
+    import { StepperKnobs } from "@thewaver/ss-playground/App/Knobs/Steppers.const";
 
     let orientation = $state<StepperOrientation>("horizontal");
     let isFreeNavigation = $state(false);
@@ -30,9 +31,7 @@
     {#snippet renderKnobs()}
         <PageProp
             itemKey={"orientation"}
-            label={"Orientation"}
-            hint={"Whether the steps run across the page or down it."}
-            controls={"Sets StepperProps.orientation"}
+            {...StepperKnobs.ORIENTATION_TEXT}
         >
             <PageSelectField
                 value={orientation}
@@ -46,9 +45,7 @@
 
         <PageProp
             itemKey={"isFreeNavigation"}
-            label={"Free navigation"}
-            hint={"Lets any step be pressed to jump to it, rather than only the steps already behind you."}
-            controls={"Sets Step.isNavigable on every step sent to StepperProps.steps"}
+            {...StepperKnobs.FREE_NAVIGATION_TEXT}
         >
             <PageCheckField
                 value={isFreeNavigation}
@@ -62,8 +59,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Right to left"}
-    content={"Inside a box whose text runs right to left, a strip running across starts from the right: the first step sits at the right-hand end and the connectors lead to the left."}
+    {...DOCS_SECTIONS.rightLeft}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/RightToLeft.svelte`}>
@@ -72,9 +68,7 @@
     {#snippet renderKnobs()}
         <PageProp
             itemKey={"rightToLeftIsFreeNavigation"}
-            label={"Free navigation"}
-            hint={"Lets any step be pressed to jump to it, rather than only the steps already behind you."}
-            controls={"Sets Step.isNavigable on every step sent to StepperProps.steps"}
+            {...StepperKnobs.FREE_NAVIGATION_TEXT}
         >
             <PageCheckField
                 value={isRightToLeftFree}
@@ -98,9 +92,7 @@
     {#snippet renderKnobs()}
         <PageProp
             itemKey={"failedIsFreeNavigation"}
-            label={"Free navigation"}
-            hint={"Lets any step be pressed to jump to it, rather than only the steps already behind you."}
-            controls={"Sets Step.isNavigable on every step sent to StepperProps.steps"}
+            {...StepperKnobs.FREE_NAVIGATION_TEXT}
         >
             <PageCheckField
                 value={isFailedFree}
@@ -114,8 +106,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Steps that carry their own content"}
-    content={"Give the stepper [prop]renderBody[/prop] and each step holds a body beside its connector, so the line runs on past the content rather than stopping at it."}
+    {...DOCS_SECTIONS.stepsWithOwnContent}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Detailed.svelte`}>
@@ -124,9 +115,7 @@
     {#snippet renderKnobs()}
         <PageProp
             itemKey={"detailedIsFreeNavigation"}
-            label={"Free navigation"}
-            hint={"Lets any step be pressed to jump to it, rather than only the steps already behind you."}
-            controls={"Sets Step.isNavigable on every step sent to StepperProps.steps"}
+            {...StepperKnobs.FREE_NAVIGATION_TEXT}
         >
             <PageCheckField
                 value={isDetailedFree}
@@ -140,8 +129,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"No connector"}
-    content={"The line between steps is optional: leave out [prop]renderConnector[/prop] and nothing is drawn between them, and they sit [prop]gap[/prop] pixels apart."}
+    {...DOCS_SECTIONS.noConnector}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Bare.svelte`}>
@@ -150,9 +138,7 @@
     {#snippet renderKnobs()}
         <PageProp
             itemKey={"bareIsFreeNavigation"}
-            label={"Free navigation"}
-            hint={"Lets any step be pressed to jump to it, rather than only the steps already behind you."}
-            controls={"Sets Step.isNavigable on every step sent to StepperProps.steps"}
+            {...StepperKnobs.FREE_NAVIGATION_TEXT}
         >
             <PageCheckField
                 value={isBareFree}
@@ -166,8 +152,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Bent along an arc"}
-    content={"Give the stepper [prop]computeLayout[/prop] and each step goes where the layout puts it, here along an arc from PlacementLayoutUtils. The connector is handed where the two steps it joins sit, so the run between them follows the curve rather than cutting across it. A step's body has nowhere to go on a curve, so a stepper with a layout takes no [prop]renderBody[/prop]."}
+    {...DOCS_SECTIONS.bentAlongArc}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Arc.svelte`}>
@@ -176,9 +161,7 @@
     {#snippet renderKnobs()}
         <PageProp
             itemKey={"arcIsFreeNavigation"}
-            label={"Free navigation"}
-            hint={"Lets any step be pressed to jump to it, rather than only the steps already behind you."}
-            controls={"Sets Step.isNavigable on every step sent to StepperProps.steps"}
+            {...StepperKnobs.FREE_NAVIGATION_TEXT}
         >
             <PageCheckField
                 value={isArcFree}

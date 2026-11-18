@@ -1,5 +1,9 @@
 import { Button, Toasts, access, useToastsContext } from "@thewaver/ss-components-solid";
-import { BURST_SIZE, MESSAGES } from "@thewaver/ss-playground/App/Pages/ToastsPage/ToastsPage.const";
+import {
+    BURST_SIZE,
+    MESSAGES,
+    PLACEMENT_NOTIFICATIONS_LABEL,
+} from "@thewaver/ss-playground/App/Pages/ToastsPage/ToastsPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ToastsPage/ToastsPage.css";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
@@ -42,7 +46,7 @@ const Raisers = () => {
 
 export const PlacementDocsExample = (props: Props) => (
     <Toasts<ToastDefs>
-        ariaLabel={"Placement notifications"}
+        ariaLabel={PLACEMENT_NOTIFICATIONS_LABEL}
         alignment={props.alignment}
         flexDirection={props.flexDirection}
         gap={props.gap}

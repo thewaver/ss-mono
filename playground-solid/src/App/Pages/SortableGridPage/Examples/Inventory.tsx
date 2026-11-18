@@ -17,6 +17,7 @@ import {
     GRID_GAP,
     PACK_COLUMNS,
     PACK_ROWS,
+    TURN_COUNTERCLOCKWISE_LABEL,
     computeGearHue,
     computeGearKey,
     computeGearLabel,
@@ -116,7 +117,7 @@ export const InventoryExample = (props: Props) => {
             <Show when={props.hasTurnButtons}>
                 <div class={styles.sortableGridTurnControls}>
                     <Button
-                        ariaLabel={"Turn counterclockwise"}
+                        ariaLabel={TURN_COUNTERCLOCKWISE_LABEL}
                         isDisabled={() => !getController()?.getIsCarrying()}
                         onClick={() => turn(-1)}
                         renderContent={(getFlags) => (

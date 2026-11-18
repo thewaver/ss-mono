@@ -21,9 +21,7 @@
 
 <PageProp
     itemKey={`${props.keyPrefix}Arrow`}
-    controls={"Picks the template handed to ShapeUtils.attachArrow"}
-    label={"Arrow"}
-    hint={"Which arrow every tooltip here grows."}
+    {...TooltipKnobs.ARROW_TEXT}
 >
     <PageSelectField
         value={arrowBed.arrow}
@@ -39,9 +37,7 @@
 
 <PageProp
     itemKey={`${props.keyPrefix}Width`}
-    controls={"Sets the arrow width handed to the template"}
-    label={"Arrow width (px)"}
-    hint={"How wide every arrow is across its base. Past twice the length, a corner arrow's sides lean 45° or more."}
+    {...TooltipKnobs.ARROW_WIDTH_PX_TEXT}
 >
     <PageNumberField
         value={arrowBed.arrowWidth}
@@ -58,9 +54,7 @@
 
 <PageProp
     itemKey={`${props.keyPrefix}Length`}
-    controls={"Sets the arrow length handed to the template"}
-    label={"Arrow length (px)"}
-    hint={"How far every arrow's tip stands off its tooltip."}
+    {...TooltipKnobs.ARROW_LENGTH_PX_TEXT}
 >
     <PageNumberField
         value={arrowBed.arrowLength}
@@ -77,9 +71,7 @@
 
 <PageProp
     itemKey={`${props.keyPrefix}Shape`}
-    controls={"Picks the contour handed to ShapeUtils.attachArrow"}
-    label={"Shape"}
-    hint={"The contour every tooltip here is cut to, which is what each arrow's base is walked along from where it attaches."}
+    {...TooltipKnobs.SHAPE_TEXT}
 >
     <PageSelectField
         value={arrowBed.shape}

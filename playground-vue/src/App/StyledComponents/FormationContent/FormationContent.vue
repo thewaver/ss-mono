@@ -1,9 +1,6 @@
 <script setup lang="ts">
 import { Shape } from "@thewaver/ss-components-vue";
-import {
-    FILL_OPACITY,
-    STROKE_GEOM,
-} from "@thewaver/ss-playground/App/StyledComponents/FormationContent/FormationContent.const";
+import { STROKE_GEOM } from "@thewaver/ss-playground/App/StyledComponents/FormationContent/FormationContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/FormationContent/FormationContent.css";
 import { layerVars } from "@thewaver/ss-playground/App/StyledComponents/Layer/Layer.css";
 import { themeVars } from "@thewaver/ss-playground/App/Theme.css";
@@ -17,7 +14,7 @@ const props = defineProps<PageFormationItemProps>();
 const layerClass = useLayerClass();
 
 const computePoints = (size: Size2d) => ShapeConst.getDefaultShapePoints(props.shapeKind, size);
-const computeFillDefs = () => [{ color: layerVars.main, opacity: FILL_OPACITY }];
+const computeFillDefs = () => [{ color: layerVars.dark }];
 const computeStrokeDefs = () => [{ color: themeVars.color.primary.main }];
 </script>
 

@@ -5,6 +5,7 @@
     import PageFileInputContent from "../../../StyledComponents/FileInputContent/FileInputContent.svelte";
     import PageTooltipContent from "../../../StyledComponents/TooltipContent/TooltipContent.svelte";
     import type { FileInputTooltipDocsExampleProps } from "../FileInputPageSvelte.types";
+    import { DISABLED_BUT_REACHABLE_ATTACHMENT_LABEL } from "@thewaver/ss-playground/App/Pages/FileInputPage/FileInputPage.const";
 
     type Props = FileInputTooltipDocsExampleProps;
 
@@ -17,7 +18,7 @@
     bind:files
     isDisabled={props.isDisabled}
     isReachableWhenDisabled={props.isReachableWhenDisabled}
-    ariaLabel={"Disabled but reachable attachment"}
+    ariaLabel={DISABLED_BUT_REACHABLE_ATTACHMENT_LABEL}
     tooltipDefs={{
         placement: { x: "center", y: "top_out" },
         offset: { x: 0, y: 10 },

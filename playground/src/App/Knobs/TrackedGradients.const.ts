@@ -799,4 +799,11 @@ export namespace TrackedGradientKnobs {
             trailMs: PIXEL_TRAIL_MS_KNOB,
         },
     };
+
+    export const CONFIG_KEY_TEXT = {
+        label: "Gradient",
+        hint: "Which pointer-following gradient is shown. Choosing one brings its own knobs with it.",
+        controls:
+            "Picks the sample gradient the example sends to ShapeProps.computeFillDefs or ShapeProps.computeStrokeDefs",
+    };
 }

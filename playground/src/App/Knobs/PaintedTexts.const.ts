@@ -54,4 +54,93 @@ export namespace PaintedTextKnobs {
     export const STARTING_CIRCLE_RADIUS = 90;
     export const STARTING_IS_FITTED_TO_PATH = true;
     export const STARTING_ITERATION_KEY: SVGDefsSamples.Iteration.SampleKey = "constant";
+
+    export const FONT_SIZE_TEXT = {
+        label: "Font size (px)",
+        hint: "How large the letters are.",
+        controls: "Sets the font size of the example text sent as PaintedText's children",
+    };
+
+    export const LINE_HEIGHT_TEXT = {
+        label: "Line height",
+        hint: "How tall each line is, as a multiple of the font size, which decides how far apart the lines sit.",
+        controls: "Sets the line height of the example text sent as PaintedText's children",
+    };
+
+    export const FONT_WEIGHT_TEXT = {
+        label: "Font weight",
+        hint: "How heavy the letters are, from 100 to 900.",
+        controls: "Sets the font weight of the example text sent as PaintedText's children",
+    };
+
+    export const ARRIVAL_EFFECT_TEXT = {
+        label: "Arrival effect",
+        hint: "How each letter arrives. The keyframes are the Typewriter page's own, played by the painted letters.",
+        controls: "Picks the example keyframes sent to TypewriterProps.computeAnimationName",
+    };
+
+    export const LAP_DURATION_MS_TEXT = {
+        label: "Lap duration (ms)",
+        hint: "How long the text takes to slide once round the whole length of its path.",
+        controls: "Sets PaintedTextProps.lapDurationMs",
+    };
+
+    export const RADIUS_TEXT = {
+        label: "Radius (px)",
+        hint: "How far the circle the text runs round is from its center.",
+        controls: "Sets the radius of the example circle sent to PaintedTextProps.path",
+    };
+
+    export const IS_FITTED_TO_PATH_TEXT = {
+        label: "Fit to the circle",
+        hint: "Stretches or squeezes the spacing between the letters so the text goes round the circle exactly once, meeting its own start.",
+        controls: "Sets PaintedTextProps.isFittedToPath",
+    };
+
+    export const STROKE_WIDTH_TEXT = {
+        label: "Stroke width (px)",
+        hint: "How wide the stroke appears, whichever side of the letter's edge it sits on.",
+        controls: "Sets PaintedTextProps.strokeWidth",
+    };
+
+    export const STROKE_ALIGNMENT_TEXT = {
+        label: "Stroke alignment",
+        hint: "Where the stroke sits against the edge of each letter: outside keeps the letters their full shape, inside keeps the text its overall size, and center straddles the edge.",
+        controls: "Sets PaintedTextProps.strokeAlignment",
+    };
+
+    export const COLORS_TEXT = {
+        label: "Colors",
+        hint: "The colors the fill and the stroke are built from. Each sample uses as many as it needs.",
+        controls:
+            "Sets the colors of the example paints sent to PaintedTextProps.computeFillDefs and PaintedTextProps.computeStrokeDefs",
+    };
+
+    export const BLUR_WIDTH_TEXT = {
+        label: "Blur (px)",
+        hint: "How far the paint is blurred outward, which is what gives it its glow.",
+        controls:
+            "Sets the blur of the example paints sent to PaintedTextProps.computeFillDefs and PaintedTextProps.computeStrokeDefs",
+    };
+
+    export const ANIMATION_DURATION_MS_TEXT = {
+        label: "Animation duration (ms)",
+        hint: "How long one pass of the fill or stroke animation takes.",
+        controls:
+            "Sets the duration of the example paints sent to PaintedTextProps.computeFillDefs and PaintedTextProps.computeStrokeDefs",
+    };
+
+    export const ITERATION_CONFIG_KEY_TEXT = {
+        label: "Iteration Pattern",
+        hint: "How the animation repeats: once, endlessly, or back and forth.",
+        controls:
+            "Picks how the example paints repeat, sent to PaintedTextProps.computeFillDefs and PaintedTextProps.computeStrokeDefs",
+    };
+
+    export const CELL_SIZE_TEXT = {
+        label: "Pattern Cell Size (px)",
+        hint: "How large one tile of a pattern is before it repeats.",
+        controls:
+            "Sets the tile size of the example paints sent to PaintedTextProps.computeFillDefs and PaintedTextProps.computeStrokeDefs",
+    };
 }

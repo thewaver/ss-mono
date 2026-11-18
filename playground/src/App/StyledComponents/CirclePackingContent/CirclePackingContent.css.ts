@@ -12,11 +12,11 @@ export const circlePackingFrame = style({
 });
 
 export const circlePackingStopLight = style({
-    stopColor: themeVars.color.info.light,
+    stopColor: themeVars.color.secondary.light,
 });
 
 export const circlePackingStopDark = style({
-    stopColor: themeVars.color.info.dark,
+    stopColor: themeVars.color.secondary.dark,
 });
 
 export const circlePackingLeafStopLight = style({

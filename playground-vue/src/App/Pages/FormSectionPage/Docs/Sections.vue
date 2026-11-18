@@ -4,6 +4,11 @@ import { computed, shallowRef } from "vue";
 import { Button, Form, FormField, FormSection, TextInput } from "@thewaver/ss-components-vue";
 import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
 import {
+    DOES_NOT_LOOK_LIKE_TEXT,
+    MISMATCH_MESSAGE,
+    SOME_FIELDS_NEED_ATTENTION_TEXT,
+} from "@thewaver/ss-playground/App/Pages/FormSectionPage/FormSectionPage.const";
+import {
     FIELD_GAP,
     FIELD_PADDING,
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
@@ -19,14 +24,12 @@ import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/Tex
 
 const FIELD_WIDTH = 240;
 const MIN_PASSWORD_LENGTH = 8;
-const MISMATCH_MESSAGE = "The two passwords do not match.";
-
 const email = shallowRef("");
 const password = shallowRef("");
 const confirm = shallowRef("");
 const outcome = shallowRef("Not sent yet.");
 
-const emailMessage = computed(() => (email.value.includes("@") ? "" : "That does not look like an email address."));
+const emailMessage = computed(() => (email.value.includes("@") ? "" : DOES_NOT_LOOK_LIKE_TEXT));
 
 const passwordMessage = computed(() =>
     password.value.length >= MIN_PASSWORD_LENGTH ? "" : `At least ${MIN_PASSWORD_LENGTH} characters.`,
@@ -155,7 +158,7 @@ const reset = () => {
                 </PageFormButtons>
 
                 <div :class="exampleStyles.exampleReadout" data-readout>
-                    {{ `${state.isValid ? "Ready to send." : "Some fields need attention."} ${outcome}` }}
+                    {{ `${state.isValid ? "Ready to send." : SOME_FIELDS_NEED_ATTENTION_TEXT} ${outcome}` }}
                 </div>
             </PageFormStack>
         </template>

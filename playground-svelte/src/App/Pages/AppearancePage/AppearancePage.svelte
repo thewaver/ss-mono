@@ -11,6 +11,8 @@
     } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.types";
     import {
         SKIN_ROW_GAP,
+        SKIN_DESCRIPTION,
+        THEME_DESCRIPTION,
         computeSkinRowId,
         computeThemeRowId,
     } from "@thewaver/ss-playground/App/Pages/AppearancePage/AppearancePage.const";
@@ -48,10 +50,7 @@
     <section class={styles.appearanceSection}>
         <h2 class={styles.appearanceHeading}>Theme</h2>
 
-        <p class={styles.appearanceDescription}>
-            A theme decides the playground's colors. Each row shows one theme: a column per color, a line per shade;
-            picking a row applies it to every page.
-        </p>
+        <p class={styles.appearanceDescription}>{THEME_DESCRIPTION}</p>
 
         <RadioGroup
             bind:value={getAppliedTheme, pickTheme}
@@ -68,11 +67,7 @@
     <section class={styles.appearanceSection}>
         <h2 class={styles.appearanceHeading}>Skin</h2>
 
-        <p class={styles.appearanceDescription}>
-            A skin decides how the playground is drawn: the shapes, borders, shadows and fonts of its controls, and
-            where the theme's colors go. Each row shows the controls in one skin; picking a row applies it to every
-            page.
-        </p>
+        <p class={styles.appearanceDescription}>{SKIN_DESCRIPTION}</p>
 
         <RadioGroup
             bind:value={getAppliedSkin, pickSkin}

@@ -149,21 +149,25 @@ SkinUtils.define(xenon, {
     },
     button: {
         paddingInline: themeVars.spacing.double,
-        boxShadow: lightGlow(layerVars.contrast, 100),
-        color: layerVars.contrast,
+        boxShadow: lightGlow(themeVars.color.primary.main, 100),
+        color: themeVars.color.primary.main,
         fontWeight: "bold",
         selectors: ObjectUtils.deepMerge(INTERACTIBLE_STATES, {
             [skinSelectors.isPressed]: {
-                boxShadow: lightGlow(themeVars.color.primary.main, 100),
-                color: themeVars.color.primary.main,
+                backgroundColor: [
+                    themeVars.color.primary.contrast,
+                    `rgb(from ${themeVars.color.primary.main} r g b / 25%)`,
+                ],
             },
             [skinSelectors.hasError]: {
                 boxShadow: lightGlow(themeVars.color.error.main, 100),
                 color: themeVars.color.error.main,
             },
             [SkinUtils.allOf(skinSelectors.isPressed, skinSelectors.hasError)]: {
-                boxShadow: lightGlow(themeVars.color.error.main, 100),
-                color: themeVars.color.primary.main,
+                backgroundColor: [
+                    themeVars.color.error.contrast,
+                    `rgb(from ${themeVars.color.error.main} r g b / 25%)`,
+                ],
             },
         }),
     },
@@ -173,16 +177,10 @@ SkinUtils.define(xenon, {
         fontSize: themeVars.fontSize.small,
         selectors: ObjectUtils.deepMerge(INTERACTIBLE_STATES, {
             [skinSelectors.isPressed]: {
-                boxShadow: lightGlow(themeVars.color.primary.main, 100),
                 color: themeVars.color.primary.main,
             },
             [skinSelectors.hasError]: {
                 boxShadow: lightGlow(themeVars.color.error.main, 100),
-                color: themeVars.color.error.main,
-            },
-            [SkinUtils.allOf(skinSelectors.isPressed, skinSelectors.hasError)]: {
-                boxShadow: lightGlow(themeVars.color.error.main, 100),
-                color: themeVars.color.primary.main,
             },
         }),
     },

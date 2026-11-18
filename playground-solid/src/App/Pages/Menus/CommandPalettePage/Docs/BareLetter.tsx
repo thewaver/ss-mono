@@ -3,6 +3,7 @@ import { createMemo, createSignal } from "solid-js";
 import { Button, CommandPalette, TextInput } from "@thewaver/ss-components-solid";
 import type { CommandPaletteItem } from "@thewaver/ss-components-solid";
 import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
+import { SEARCH_GREETINGS_LABEL } from "@thewaver/ss-playground/App/Pages/Menus/CommandPalettePage/CommandPalettePage.const";
 import { CommandPalettePageUtils } from "@thewaver/ss-playground/App/Pages/Menus/CommandPalettePage/CommandPalettePage.utils";
 import {
     FIELD_GAP,
@@ -63,7 +64,7 @@ export const BareLetterDocsExample = () => {
                 query={querySignal}
                 actions={getActions}
                 ariaLabel={"Greetings"}
-                fieldAriaLabel={"Search the greetings"}
+                fieldAriaLabel={SEARCH_GREETINGS_LABEL}
                 listAriaLabel={"Matching greetings"}
                 renderOverlay={renderPaletteOverlay}
                 renderPanel={computePalettePanelRenderer(getActions)}

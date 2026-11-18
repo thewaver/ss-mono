@@ -4,6 +4,7 @@ import { shallowRef } from "vue";
 import { Button, Toasts } from "@thewaver/ss-components-vue";
 import type { Toast } from "@thewaver/ss-components-vue";
 import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
+import { LIMITED_NOTIFICATIONS_LABEL } from "@thewaver/ss-playground/App/Pages/ToastsPage/ToastsPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ToastsPage/ToastsPage.css";
 
 import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.vue";
@@ -26,7 +27,7 @@ const clear = () => {
         <div :class="styles.raiseRow">
             <Toasts
                 v-model:toasts="queue"
-                ariaLabel="Limited notifications"
+                :ariaLabel="LIMITED_NOTIFICATIONS_LABEL"
                 alignment="bottom_left"
                 :limit="limit"
                 :overflow="overflow"

@@ -1,6 +1,7 @@
 import { createSignal } from "solid-js";
 
 import { FormField, TextInput } from "@thewaver/ss-components-solid";
+import { RIGHT_TO_LEFT_MESSAGE } from "@thewaver/ss-playground/App/Pages/FormFieldPage/FormFieldPage.const";
 import {
     FIELD_GAP,
     FIELD_PADDING,
@@ -12,17 +13,17 @@ import {
 } from "../../../StyledComponents/FormFieldContent/FormFieldContent";
 import { PageTextFieldContent } from "../../../StyledComponents/TextFieldContent/TextFieldContent";
 
-const MESSAGE = "Shown to everyone who can see your posts";
-
 export const RightToLeftDocsExample = () => {
     const valueSignal = createSignal("");
 
     return (
         <div dir={"rtl"}>
             <FormField
-                message={MESSAGE}
+                message={RIGHT_TO_LEFT_MESSAGE}
                 renderCaption={() => <PageFormFieldCaption>Display name</PageFormFieldCaption>}
-                renderMessage={(getState) => <PageFormFieldMessage state={getState}>{MESSAGE}</PageFormFieldMessage>}
+                renderMessage={(getState) => (
+                    <PageFormFieldMessage state={getState}>{RIGHT_TO_LEFT_MESSAGE}</PageFormFieldMessage>
+                )}
                 renderControl={(getState) => (
                     <TextInput
                         value={valueSignal}

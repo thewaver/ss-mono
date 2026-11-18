@@ -2,7 +2,12 @@ import { useState } from "react";
 
 import type { DateValue } from "@thewaver/ss-components-react";
 import { Calendar, DateValueUtils } from "@thewaver/ss-components-react";
-import { LOCALE, TODAY, WEEKEND_DAYS } from "@thewaver/ss-playground/App/Pages/CalendarPage/CalendarPage.const";
+import {
+    CHOOSE_WORKING_DAY_LABEL,
+    LOCALE,
+    TODAY,
+    WEEKEND_DAYS,
+} from "@thewaver/ss-playground/App/Pages/CalendarPage/CalendarPage.const";
 
 import { PageCalendarCaption } from "../../../PageComponents/CalendarCaption/CalendarCaption";
 import {
@@ -25,7 +30,7 @@ export const DisabledDaysDocsExample = () => {
                 today={TODAY}
                 locale={LOCALE}
                 disabledDays={[{ daysOfWeek: WEEKEND_DAYS }]}
-                ariaLabel={"Choose a working day"}
+                ariaLabel={CHOOSE_WORKING_DAY_LABEL}
                 renderDay={(_unused, renderProps) => <PageCalendarDay renderProps={renderProps} />}
                 renderWeekday={(name) => <PageCalendarWeekday>{name}</PageCalendarWeekday>}
             />

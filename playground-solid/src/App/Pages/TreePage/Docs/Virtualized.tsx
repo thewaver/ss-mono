@@ -1,6 +1,7 @@
 import { createMemo, createSignal } from "solid-js";
 
 import { Tree, access } from "@thewaver/ss-components-solid";
+import { GENERATED_REPOSITORY_LABEL } from "@thewaver/ss-playground/App/Pages/TreePage/TreePage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/TreePage/TreePage.css";
 
 import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater";
@@ -23,7 +24,7 @@ export const VirtualizedDocsExample = (props: Props) => {
                 renderHighlightFloater={renderPageHighlightFloater}
                 nodes={getNodes}
                 expanded={expandedSignal}
-                ariaLabel={"Generated repository"}
+                ariaLabel={GENERATED_REPOSITORY_LABEL}
                 computeEstimatedNodeHeight={() => NODE_HEIGHT}
                 renderNode={(getNode, getRenderProps) => (
                     <PageTreeNodeContent hasHoverFloater renderProps={getRenderProps}>

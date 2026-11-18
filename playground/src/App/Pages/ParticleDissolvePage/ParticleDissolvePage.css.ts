@@ -22,7 +22,7 @@ export const card = style({
     width: 280,
     padding: themeVars.spacing.double,
     borderRadius: themeVars.borderRadius.full,
-    backgroundColor: layerVars.main,
+    backgroundColor: layerVars.dark,
     color: layerVars.contrast,
     fontSize: themeVars.fontSize.small,
 });

@@ -2,6 +2,7 @@
 import { shallowRef } from "vue";
 
 import { Button, SlideButton } from "@thewaver/ss-components-vue";
+import { HOLD_ENTER_SPACE_ARM_DESCRIPTION } from "@thewaver/ss-playground/App/Pages/SlideButtonPage/SlideButtonPage.const";
 import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 import { SLIDE_BUTTON_THUMB_SIZE } from "@thewaver/ss-playground/App/StyledComponents/SlideButtonContent/SlideButtonContent.css";
 
@@ -15,7 +16,7 @@ const isArmed = shallowRef(false);
 <template>
     <PageControlRow>
         <SlideButton
-            ariaDescription="Hold Enter or Space to arm."
+            :ariaDescription="HOLD_ENTER_SPACE_ARM_DESCRIPTION"
             :is-pressed="isArmed"
             :thumb-size="SLIDE_BUTTON_THUMB_SIZE"
             @activate="isArmed = true"

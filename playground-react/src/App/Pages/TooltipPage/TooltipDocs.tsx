@@ -8,6 +8,7 @@ import {
     type ArrowBedArrow,
     type ArrowBedShape,
     DOCS_ROOT,
+    DOCS_SECTIONS,
     FIELD_WIDTH,
 } from "@thewaver/ss-playground/App/Pages/TooltipPage/TooltipPage.const";
 import {
@@ -66,14 +67,7 @@ export const TooltipDocs = () => {
                 path={`${DOCS_ROOT}/Basic.tsx`}
                 renderKnobs={() => (
                     <>
-                        <PageProp
-                            itemKey={"reveal"}
-                            label={"Reveal"}
-                            hint={
-                                "How the tooltip appears and goes, which is the drawing's own: the tooltip only says whether it is showing and for how long the change takes."
-                            }
-                            controls={"Picks how the example content drawn by TooltipProps.renderContent appears"}
-                        >
+                        <PageProp itemKey={"reveal"} {...TooltipKnobs.REVEAL_TEXT}>
                             <PageSelectField
                                 value={reveal}
                                 values={TOOLTIP_REVEALS}
@@ -84,14 +78,7 @@ export const TooltipDocs = () => {
                             />
                         </PageProp>
 
-                        <PageProp
-                            itemKey={"arrow"}
-                            label={"Arrow"}
-                            hint={
-                                "An arrow grown out of the tooltip's body to point at its anchor. It comes out of the side facing the anchor, or out of the nearest corner when the tooltip sits off a corner, and there is none while the tooltip overlaps its anchor. The offset is what makes room for it."
-                            }
-                            controls={"Picks the arrow on the example content drawn by TooltipProps.renderContent"}
-                        >
+                        <PageProp itemKey={"arrow"} {...TooltipKnobs.ARROW_2_TEXT}>
                             <PageSelectField
                                 value={arrow}
                                 values={TOOLTIP_ARROWS}
@@ -104,16 +91,7 @@ export const TooltipDocs = () => {
 
                         {arrow !== "none" && (
                             <>
-                                <PageProp
-                                    itemKey={"arrowWidth"}
-                                    label={"Arrow width (px)"}
-                                    hint={
-                                        "How wide the arrow is across its base. The lightning bolt spans this much from where its base starts to its tip."
-                                    }
-                                    controls={
-                                        "Sets the arrow width on the example content drawn by TooltipProps.renderContent"
-                                    }
-                                >
+                                <PageProp itemKey={"arrowWidth"} {...TooltipKnobs.ARROW_WIDTH_TEXT}>
                                     <PageNumberField
                                         value={arrowWidth}
                                         min={TooltipKnobs.MIN_ARROW_SIZE}
@@ -125,16 +103,7 @@ export const TooltipDocs = () => {
                                     />
                                 </PageProp>
 
-                                <PageProp
-                                    itemKey={"arrowLength"}
-                                    label={"Arrow length (px)"}
-                                    hint={
-                                        "How far the arrow's tip stands off the tooltip. Longer than the offset, and the tip reaches over the anchor."
-                                    }
-                                    controls={
-                                        "Sets the arrow length on the example content drawn by TooltipProps.renderContent"
-                                    }
-                                >
+                                <PageProp itemKey={"arrowLength"} {...TooltipKnobs.ARROW_LENGTH_TEXT}>
                                     <PageNumberField
                                         value={arrowLength}
                                         min={TooltipKnobs.MIN_ARROW_SIZE}
@@ -148,14 +117,7 @@ export const TooltipDocs = () => {
                             </>
                         )}
 
-                        <PageProp
-                            itemKey={"hPlacement"}
-                            label={"Placement across"}
-                            hint={
-                                "Where the tooltip sits across its anchor: inside an edge, centered, or outside it altogether."
-                            }
-                            controls={"Sets TooltipProps.placement.x"}
-                        >
+                        <PageProp itemKey={"hPlacement"} {...TooltipKnobs.H_PLACEMENT_TEXT}>
                             <PageSelectField
                                 value={hPlacement}
                                 values={ANCHOR_H_PLACEMENTS}
@@ -165,14 +127,7 @@ export const TooltipDocs = () => {
                             />
                         </PageProp>
 
-                        <PageProp
-                            itemKey={"vPlacement"}
-                            label={"Placement down"}
-                            hint={
-                                "Where the tooltip sits above or below its anchor: inside an edge, centered, or outside it altogether."
-                            }
-                            controls={"Sets TooltipProps.placement.y"}
-                        >
+                        <PageProp itemKey={"vPlacement"} {...TooltipKnobs.V_PLACEMENT_TEXT}>
                             <PageSelectField
                                 value={vPlacement}
                                 values={ANCHOR_V_PLACEMENTS}
@@ -182,12 +137,7 @@ export const TooltipDocs = () => {
                             />
                         </PageProp>
 
-                        <PageProp
-                            itemKey={"offsetX"}
-                            label={"Offset across (px)"}
-                            hint={"How far the tooltip is nudged sideways from where the placement put it."}
-                            controls={"Sets TooltipProps.offset.x"}
-                        >
+                        <PageProp itemKey={"offsetX"} {...TooltipKnobs.OFFSET_X_TEXT}>
                             <PageNumberField
                                 value={offsetX}
                                 min={TooltipKnobs.MIN_OFFSET}
@@ -199,12 +149,7 @@ export const TooltipDocs = () => {
                             />
                         </PageProp>
 
-                        <PageProp
-                            itemKey={"offsetY"}
-                            label={"Offset down (px)"}
-                            hint={"How far the tooltip is nudged up or down from where the placement put it."}
-                            controls={"Sets TooltipProps.offset.y"}
-                        >
+                        <PageProp itemKey={"offsetY"} {...TooltipKnobs.OFFSET_Y_TEXT}>
                             <PageNumberField
                                 value={offsetY}
                                 min={TooltipKnobs.MIN_OFFSET}
@@ -216,12 +161,7 @@ export const TooltipDocs = () => {
                             />
                         </PageProp>
 
-                        <PageProp
-                            itemKey={"transitionDurationMs"}
-                            label={"Reveal (ms)"}
-                            hint={"How long the tooltip takes to appear and to go."}
-                            controls={"Sets TooltipProps.transitionDurationMs"}
-                        >
+                        <PageProp itemKey={"transitionDurationMs"} {...TooltipKnobs.TRANSITION_DURATION_MS_TEXT}>
                             <PageNumberField
                                 value={transitionDurationMs}
                                 min={TooltipKnobs.MIN_DURATION}
@@ -233,12 +173,7 @@ export const TooltipDocs = () => {
                             />
                         </PageProp>
 
-                        <PageProp
-                            itemKey={"focusShowDelayMs"}
-                            label={"Focus delay (ms)"}
-                            hint={"How long a keyboard focus has to rest on the anchor before the tooltip appears."}
-                            controls={"Sets TooltipProps.focusShowDelayMs"}
-                        >
+                        <PageProp itemKey={"focusShowDelayMs"} {...TooltipKnobs.FOCUS_SHOW_DELAY_MS_TEXT}>
                             <PageNumberField
                                 value={focusShowDelayMs}
                                 min={TooltipKnobs.MIN_DURATION}
@@ -250,14 +185,7 @@ export const TooltipDocs = () => {
                             />
                         </PageProp>
 
-                        <PageProp
-                            itemKey={"hoverShowDelayMs"}
-                            label={"Hover delay (ms)"}
-                            hint={
-                                "How long the pointer has to rest on the anchor before the tooltip appears. Leave before then and nothing shows."
-                            }
-                            controls={"Sets TooltipProps.hoverShowDelayMs"}
-                        >
+                        <PageProp itemKey={"hoverShowDelayMs"} {...TooltipKnobs.HOVER_SHOW_DELAY_MS_TEXT}>
                             <PageNumberField
                                 value={hoverShowDelayMs}
                                 min={TooltipKnobs.MIN_DURATION}
@@ -284,12 +212,7 @@ export const TooltipDocs = () => {
                 />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"On a word in running text"}
-                content={
-                    "The tooltip is handed the element it describes through [prop]anchorRef[/prop] rather than wrapping it, so anything with a ref can carry one, here a word in the middle of a sentence."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.wordRunningText} />
 
             <PageDocsAlert severity={"alert"}>
                 A word is not a tab stop, so this one is given tabindex="0". Without it the keyboard never reaches the
@@ -300,34 +223,19 @@ export const TooltipDocs = () => {
                 <WordDocsExample />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"More than a line"}
-                content={
-                    "What the tooltip shows is whatever [prop]renderContent[/prop] draws, here a title over a paragraph, and it sits where its [prop]placement[/prop] puts it however tall that makes it. It is still read out as the anchor's description, in one run, so nothing in it can be pressed; a link or a button belongs in a HoverCard."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.moreThanLine} />
 
             <PageDocsExample path={`${DOCS_ROOT}/Rich.tsx`}>
                 <RichDocsExample />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"Right to left"}
-                content={
-                    "Inside a box whose text runs right to left, the tooltip takes the box's direction although it is drawn outside it, so its lines read from the right. Its [prop]placement[/prop] is used as it stands: one asked to sit on the left still sits on the left."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.rightLeft} />
 
             <PageDocsExample path={`${DOCS_ROOT}/RightToLeft.tsx`}>
                 <RightToLeftDocsExample />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"An arrow going round"}
-                content={
-                    "An arrow is the drawing's too: [prop]renderContent[/prop] is handed where one should point, and ShapeUtils.attachArrow grows it out of any contour. Move the slider to aim it all the way round: it leaves straight out of the edge it faces, and turns through the diagonal as it rounds a corner."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.arrowGoingRound} />
 
             <PageDocsExample
                 path={`${DOCS_ROOT}/Circling.tsx`}
@@ -349,12 +257,7 @@ export const TooltipDocs = () => {
                 />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"Every arrow at once"}
-                content={
-                    "Eight tooltips round one anchor, one on each side and at each corner, every arrow aimed by the rule a live tooltip's is aimed by, AnchorUtils.computeArrowAim. The corners are where a wide arrow goes wrong: past twice its length, its sides lean 45° or more."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.everyArrowOnce} />
 
             <PageDocsExample
                 path={`${DOCS_ROOT}/Arrows.tsx`}

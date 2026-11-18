@@ -5,6 +5,7 @@
     import PageToggleContent from "../../../StyledComponents/ToggleContent/ToggleContent.svelte";
     import PageTooltipContent from "../../../StyledComponents/TooltipContent/TooltipContent.svelte";
     import type { ToggleTooltipDocsExampleProps } from "../TogglePageSvelte.types";
+    import { TOGGLE_TOOLTIP_LABEL } from "@thewaver/ss-playground/App/Pages/TogglePage/TogglePage.const";
 
     type Props = ToggleTooltipDocsExampleProps;
 
@@ -15,7 +16,7 @@
 
 <Toggle
     bind:checked
-    ariaLabel={"Toggle with a tooltip"}
+    ariaLabel={TOGGLE_TOOLTIP_LABEL}
     isDisabled={props.isDisabled}
     isReachableWhenDisabled={props.isReachableWhenDisabled}
     tooltipDefs={{
@@ -25,7 +26,7 @@
     }}
 >
     {#snippet renderContent(flags)}
-        <PageToggleContent {flags}>Toggle with a tooltip</PageToggleContent>
+        <PageToggleContent {flags}>{TOGGLE_TOOLTIP_LABEL}</PageToggleContent>
     {/snippet}
 </Toggle>
 

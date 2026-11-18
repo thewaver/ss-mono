@@ -114,12 +114,7 @@ const examples: ExampleDefs[] = [
 
 <template>
     <PagePropsPanel scope="global">
-        <PageProp
-            item-key="value"
-            controls="Sets the number the example formats into SlotTextProps.text"
-            label="Value"
-            hint="The number the counter and the departures board show. Changing it is what starts them turning."
-        >
+        <PageProp item-key="value" v-bind="SlotTextKnobs.VALUE_TEXT">
             <PageNumberField
                 :value="value"
                 :min="SlotTextKnobs.MIN_VALUE"
@@ -130,12 +125,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="turnDurationMs"
-            controls="Sets SlotTextProps.turnDurationMs"
-            label="Turn (ms)"
-            hint="How long one column takes to turn from its old character to its new one."
-        >
+        <PageProp item-key="turnDurationMs" v-bind="SlotTextKnobs.TURN_DURATION_MS_TEXT">
             <PageNumberField
                 :value="turnMs"
                 :min="SlotTextKnobs.MIN_TURN_MS"
@@ -146,12 +136,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="turnDelayMs"
-            controls="Sets SlotTextProps.turnDelayMs"
-            label="Turn delay (ms)"
-            hint="How long each column waits after the turning column beside it starts, which is what makes the turn ripple along."
-        >
+        <PageProp item-key="turnDelayMs" v-bind="SlotTextKnobs.TURN_DELAY_MS_TEXT">
             <PageNumberField
                 :value="cascadeMs"
                 :min="SlotTextKnobs.MIN_CASCADE_MS"
@@ -200,12 +185,7 @@ const examples: ExampleDefs[] = [
             </div>
 
             <PageExampleKnobs>
-                <PageProp
-                    item-key="reelKey"
-                    controls="Picks the sample reel sent to SlotTextProps.computeReel"
-                    label="Reel"
-                    hint="How many extra turns each column makes and how long it takes, which decides the order the columns stop in."
-                >
+                <PageProp item-key="reelKey" v-bind="SlotTextKnobs.REEL_KEY_TEXT">
                     <PageSelectField
                         :value="reelKey"
                         :values="SlotTextReels.SAMPLE_KEYS"
@@ -258,12 +238,7 @@ const examples: ExampleDefs[] = [
             </div>
 
             <PageExampleKnobs>
-                <PageProp
-                    item-key="mechanism"
-                    controls="Sets SlotTextProps.mechanism"
-                    label="Mechanism"
-                    hint="Whether each letter turns on a drum or drops through flaps."
-                >
+                <PageProp item-key="mechanism" v-bind="SlotTextKnobs.MECHANISM_TEXT">
                     <PageSelectField
                         :value="wordMechanism"
                         :values="SlotTextKnobs.MECHANISMS"
@@ -273,12 +248,7 @@ const examples: ExampleDefs[] = [
                     />
                 </PageProp>
 
-                <PageProp
-                    item-key="letterRoute"
-                    controls="Sets SlotTextProps.letterRoute"
-                    label="Letter route"
-                    hint="Forward always goes on round the alphabet, so C to Z passes every letter between; shortest takes the nearer way, so C to Z goes back three."
-                >
+                <PageProp item-key="letterRoute" v-bind="SlotTextKnobs.LETTER_ROUTE_TEXT">
                     <PageSelectField
                         :value="letterRoute"
                         :values="SlotTextKnobs.LETTER_ROUTES"

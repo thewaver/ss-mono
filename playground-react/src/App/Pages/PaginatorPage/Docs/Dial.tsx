@@ -11,6 +11,7 @@ import {
     FIRST_PAGE,
     ITEM_COUNT,
     PAGE_SIZE,
+    RESULTS_ROUND_DIAL_LABEL,
 } from "@thewaver/ss-playground/App/Pages/PaginatorPage/PaginatorPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/PaginatorPage/PaginatorPage.css";
 
@@ -37,7 +38,7 @@ export const DialDocsExample = () => {
                         pageSize={PAGE_SIZE}
                         steps={DIAL_STEPS}
                         computeLayout={DIAL_LAYOUT}
-                        ariaLabel={"Results round a dial"}
+                        ariaLabel={RESULTS_ROUND_DIAL_LABEL}
                         computePageLabel={computePaginatorPageLabel}
                         computeStepLabel={computePaginatorStepLabel}
                         onPageChange={setPage}

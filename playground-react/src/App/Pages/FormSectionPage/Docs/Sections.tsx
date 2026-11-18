@@ -3,6 +3,11 @@ import { useState } from "react";
 import { Button, Form, FormField, FormSection, TextInput } from "@thewaver/ss-components-react";
 import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
 import {
+    DOES_NOT_LOOK_LIKE_TEXT,
+    MISMATCH_MESSAGE,
+    SOME_FIELDS_NEED_ATTENTION_TEXT,
+} from "@thewaver/ss-playground/App/Pages/FormSectionPage/FormSectionPage.const";
+import {
     FIELD_GAP,
     FIELD_PADDING,
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
@@ -20,8 +25,6 @@ import { PageTextFieldContent } from "../../../StyledComponents/TextFieldContent
 
 const FIELD_WIDTH = 240;
 const MIN_PASSWORD_LENGTH = 8;
-const MISMATCH_MESSAGE = "The two passwords do not match.";
-
 const renderTextField = (state: readonly [string, (value: string) => void], hasError?: boolean) => (
     <TextInput
         value={state}
@@ -38,7 +41,7 @@ export const SectionsDocsExample = () => {
     const confirmState = useState("");
     const [outcome, setOutcome] = useState("Not sent yet.");
 
-    const emailMessage = emailState[0].includes("@") ? "" : "That does not look like an email address.";
+    const emailMessage = emailState[0].includes("@") ? "" : DOES_NOT_LOOK_LIKE_TEXT;
 
     const passwordMessage =
         passwordState[0].length >= MIN_PASSWORD_LENGTH ? "" : `At least ${MIN_PASSWORD_LENGTH} characters.`;
@@ -123,7 +126,7 @@ export const SectionsDocsExample = () => {
                     </PageFormButtons>
 
                     <div className={exampleStyles.exampleReadout} data-readout>
-                        {`${state.isValid ? "Ready to send." : "Some fields need attention."} ${outcome}`}
+                        {`${state.isValid ? "Ready to send." : SOME_FIELDS_NEED_ATTENTION_TEXT} ${outcome}`}
                     </div>
                 </PageFormStack>
             )}

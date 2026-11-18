@@ -6,6 +6,7 @@
     import PageTableResizer from "../../../StyledComponents/TableContent/PageTableResizer.svelte";
     import { PARTS, createPartColumns } from "../TablePage.const.svelte";
     import type { Part } from "../TablePageSvelte.types";
+    import { PARTS_RESIZABLE_COLUMNS_LABEL } from "@thewaver/ss-playground/App/Pages/TablePage/TablePage.const";
 
     let sort = $state<TableSort>();
     let selection = $state.raw<Part[]>([]);
@@ -21,7 +22,7 @@
         bind:sort
         bind:selection
         bind:widths
-        ariaLabel={"Parts with resizable columns"}
+        ariaLabel={PARTS_RESIZABLE_COLUMNS_LABEL}
     >
         {#snippet renderResizer(renderProps)}
             <PageTableResizer {renderProps} />

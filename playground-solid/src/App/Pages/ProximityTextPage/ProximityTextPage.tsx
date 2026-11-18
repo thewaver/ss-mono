@@ -82,12 +82,7 @@ export const ProximityTextPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp
-                    key={"reachPx"}
-                    label={"Reach (px)"}
-                    hint={"How far from a letter's middle the point still reaches it. Past it, the letter rests."}
-                    controls={"Sets ProximityTextProps.reachPx"}
-                >
+                <PageProp key={"reachPx"} {...ProximityTextKnobs.REACH_PX_TEXT}>
                     <PageNumberField
                         value={getReachPx}
                         min={ProximityTextKnobs.MIN_REACH_PX}
@@ -98,14 +93,7 @@ export const ProximityTextPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"isDisabled"}
-                    label={"Disabled"}
-                    hint={
-                        "Rests every letter and stops following the point. It is what a page honoring a reduced-motion preference passes."
-                    }
-                    controls={"Sets ProximityTextProps.isDisabled"}
-                >
+                <PageProp key={"isDisabled"} {...ProximityTextKnobs.IS_DISABLED_TEXT}>
                     <PageCheckField value={getIsDisabled} ariaLabel={"Disabled"} onChange={setIsDisabled} />
                 </PageProp>
             </PagePropsPanel>

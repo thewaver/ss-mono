@@ -68,25 +68,11 @@ export const TilterPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp
-                    itemKey={"isDisabled"}
-                    label={"Disabled"}
-                    hint={
-                        "Stops the surface following the pointer and leaves it flat. It is what a page honoring a reduced-motion preference passes."
-                    }
-                    controls={"Sets TilterProps.isDisabled"}
-                >
+                <PageProp itemKey={"isDisabled"} {...TilterKnobs.IS_DISABLED_TEXT}>
                     <PageCheckField value={isDisabled} ariaLabel={"Disabled"} onChange={setIsDisabled} />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"smoothingMs"}
-                    label={"Smoothing (ms)"}
-                    hint={
-                        "How long the surface takes to catch up with the pointer. At 0 it follows exactly; raised, it lags a quick movement and glides back flat when the pointer leaves."
-                    }
-                    controls={"Sets TilterProps.smoothingMs"}
-                >
+                <PageProp itemKey={"smoothingMs"} {...TilterKnobs.SMOOTHING_MS_TEXT}>
                     <PageNumberField
                         value={smoothingMs}
                         min={TilterKnobs.MIN_SMOOTHING_MS}
@@ -98,14 +84,7 @@ export const TilterPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"activeRangePx"}
-                    label={"Active range (px)"}
-                    hint={
-                        "How near the pointer has to be before the surface answers it at all, measured from the area's center. Outside it the surface lies flat."
-                    }
-                    controls={"Sets TilterProps.activeRangePx"}
-                >
+                <PageProp itemKey={"activeRangePx"} {...TilterKnobs.ACTIVE_RANGE_PX_TEXT}>
                     <PageNumberField
                         value={activeRangePx}
                         min={TilterKnobs.MIN_ACTIVE_RANGE_PX}
@@ -117,14 +96,7 @@ export const TilterPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"tiltRangePx"}
-                    label={"Tilt range (px)"}
-                    hint={
-                        "How far from the center the pointer starts to tip the surface. The turn is strongest at the surface's own edge and fades to nothing out at this distance."
-                    }
-                    controls={"Sets TilterProps.tiltRangePx"}
-                >
+                <PageProp itemKey={"tiltRangePx"} {...TilterKnobs.TILT_RANGE_PX_TEXT}>
                     <PageNumberField
                         value={tiltRangePx}
                         min={TilterKnobs.MIN_TILT_RANGE_PX}
@@ -136,12 +108,7 @@ export const TilterPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"maxTiltDegrees"}
-                    label={"Max tilt (deg)"}
-                    hint={"How far the surface turns when the pointer is at the very edge of the tilted area."}
-                    controls={"Sets TilterProps.maxTiltDegrees"}
-                >
+                <PageProp itemKey={"maxTiltDegrees"} {...TilterKnobs.MAX_TILT_DEGREES_TEXT}>
                     <PageNumberField
                         value={maxTiltDegrees}
                         min={TilterKnobs.MIN_TILT_DEGREES}
@@ -153,12 +120,7 @@ export const TilterPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"perspectivePx"}
-                    label={"Perspective (px)"}
-                    hint={"How near the viewer sits. Smaller is a more violent perspective; larger flattens the turn."}
-                    controls={"Sets TilterProps.perspectivePx"}
-                >
+                <PageProp itemKey={"perspectivePx"} {...TilterKnobs.PERSPECTIVE_PX_TEXT}>
                     <PageNumberField
                         value={perspectivePx}
                         min={TilterKnobs.MIN_PERSPECTIVE_PX}
@@ -170,12 +132,7 @@ export const TilterPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"sheenOpacity"}
-                    label={"Sheen opacity"}
-                    hint={"How strong the highlight is. It belongs to the page rather than to the component."}
-                    controls={"Sets the opacity of the example sheen drawn by TilterProps.renderSheen"}
-                >
+                <PageProp itemKey={"sheenOpacity"} {...TilterKnobs.SHEEN_OPACITY_TEXT}>
                     <PageNumberField
                         value={sheenOpacity}
                         min={TilterKnobs.MIN_SHEEN_OPACITY}
@@ -187,12 +144,7 @@ export const TilterPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"sheenSpreadPercent"}
-                    label={"Sheen spread (%)"}
-                    hint={"How wide the band of highlight is across the surface."}
-                    controls={"Sets the spread of the example sheen drawn by TilterProps.renderSheen"}
-                >
+                <PageProp itemKey={"sheenSpreadPercent"} {...TilterKnobs.SHEEN_SPREAD_PERCENT_TEXT}>
                     <PageNumberField
                         value={sheenSpreadPercent}
                         min={TilterKnobs.MIN_SHEEN_SPREAD}

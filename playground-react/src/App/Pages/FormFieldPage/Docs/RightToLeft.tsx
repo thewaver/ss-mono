@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { FormField, TextInput } from "@thewaver/ss-components-react";
+import { RIGHT_TO_LEFT_MESSAGE } from "@thewaver/ss-playground/App/Pages/FormFieldPage/FormFieldPage.const";
 import {
     FIELD_GAP,
     FIELD_PADDING,
@@ -12,17 +13,17 @@ import {
 } from "../../../StyledComponents/FormFieldContent/FormFieldContent";
 import { PageTextFieldContent } from "../../../StyledComponents/TextFieldContent/TextFieldContent";
 
-const MESSAGE = "Shown to everyone who can see your posts";
-
 export const RightToLeftDocsExample = () => {
     const valueState = useState("");
 
     return (
         <div dir={"rtl"}>
             <FormField
-                message={MESSAGE}
+                message={RIGHT_TO_LEFT_MESSAGE}
                 renderCaption={() => <PageFormFieldCaption>Display name</PageFormFieldCaption>}
-                renderMessage={(state) => <PageFormFieldMessage state={state}>{MESSAGE}</PageFormFieldMessage>}
+                renderMessage={(state) => (
+                    <PageFormFieldMessage state={state}>{RIGHT_TO_LEFT_MESSAGE}</PageFormFieldMessage>
+                )}
                 renderControl={(state) => (
                     <TextInput
                         value={valueState}

@@ -44,12 +44,7 @@ const exampleProps = computed((): PaintedTextBoxedExampleProps => {
     />
 
     <PageExampleKnobs>
-        <PageProp
-            item-key="radius"
-            controls="Sets the radius of the example circle sent to PaintedTextProps.path"
-            label="Radius (px)"
-            hint="How far the circle the text runs round is from its center."
-        >
+        <PageProp item-key="radius" v-bind="PaintedTextKnobs.RADIUS_TEXT">
             <PageNumberField
                 :value="radius"
                 :min="PaintedTextKnobs.MIN_CIRCLE_RADIUS"
@@ -60,12 +55,7 @@ const exampleProps = computed((): PaintedTextBoxedExampleProps => {
             />
         </PageProp>
 
-        <PageProp
-            item-key="lapDurationMs"
-            controls="Sets PaintedTextProps.lapDurationMs"
-            label="Lap duration (ms)"
-            hint="How long the text takes to slide once round the whole length of its path."
-        >
+        <PageProp item-key="lapDurationMs" v-bind="PaintedTextKnobs.LAP_DURATION_MS_TEXT">
             <PageNumberField
                 :value="lapDurationMs"
                 :min="PaintedTextKnobs.MIN_LAP_DURATION_MS"
@@ -76,12 +66,7 @@ const exampleProps = computed((): PaintedTextBoxedExampleProps => {
             />
         </PageProp>
 
-        <PageProp
-            item-key="isFittedToPath"
-            controls="Sets PaintedTextProps.isFittedToPath"
-            label="Fit to the circle"
-            hint="Stretches or squeezes the spacing between the letters so the text goes round the circle exactly once, meeting its own start."
-        >
+        <PageProp item-key="isFittedToPath" v-bind="PaintedTextKnobs.IS_FITTED_TO_PATH_TEXT">
             <PageCheckField
                 :value="isFittedToPath"
                 ariaLabel="Fit to the circle"

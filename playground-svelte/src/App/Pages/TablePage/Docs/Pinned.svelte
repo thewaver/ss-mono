@@ -8,6 +8,7 @@
     import PageTableResizer from "../../../StyledComponents/TableContent/PageTableResizer.svelte";
     import { PARTS, createPartColumns } from "../TablePage.const.svelte";
     import type { Part } from "../TablePageSvelte.types";
+    import { PARTS_PINNED_COLUMNS_LABEL } from "@thewaver/ss-playground/App/Pages/TablePage/TablePage.const";
 
     let sort = $state<TableSort>();
     let selection = $state.raw<Part[]>([]);
@@ -25,7 +26,7 @@
         bind:selection
         bind:widths
         bind:order
-        ariaLabel={"Parts with pinned columns"}
+        ariaLabel={PARTS_PINNED_COLUMNS_LABEL}
         announcements={TABLE_ANNOUNCEMENTS}
     >
         {#snippet renderResizer(renderProps)}

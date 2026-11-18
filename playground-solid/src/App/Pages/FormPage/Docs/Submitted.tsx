@@ -2,6 +2,7 @@ import { createSignal } from "solid-js";
 
 import { Button, Form, FormField, MultiSelect, Select } from "@thewaver/ss-components-solid";
 import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
+import { PICK_LEAST_ONE_TOPIC_TEXT } from "@thewaver/ss-playground/App/Pages/FormPage/FormPage.const";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
 import {
@@ -43,7 +44,7 @@ export const SubmittedDocsExample = () => {
                     getState().hasSubmitted && planSignal[0]() === undefined ? "Pick a plan." : "";
 
                 const getTopicsMessage = () =>
-                    getState().hasSubmitted && topicsSignal[0]().length < 1 ? "Pick at least one topic." : "";
+                    getState().hasSubmitted && topicsSignal[0]().length < 1 ? PICK_LEAST_ONE_TOPIC_TEXT : "";
 
                 return (
                     <PageFormStack>

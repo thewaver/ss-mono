@@ -12,6 +12,7 @@ import {
     ITEM_COUNT,
     PAGE_SIZE,
     PAGINATOR_GAP,
+    RESULTS_PAGE_FIELD_LABEL,
 } from "@thewaver/ss-playground/App/Pages/PaginatorPage/PaginatorPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/PaginatorPage/PaginatorPage.css";
 
@@ -34,7 +35,7 @@ const page = shallowRef(FIRST_PAGE);
             :page="page"
             :item-count="ITEM_COUNT"
             :page-size="PAGE_SIZE"
-            ariaLabel="Results with a page field"
+            :ariaLabel="RESULTS_PAGE_FIELD_LABEL"
             @page-change="(next: number) => (page = next)"
         >
             <div :class="styles.jumpRow">

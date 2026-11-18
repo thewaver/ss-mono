@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Button, ScrambleText } from "@thewaver/ss-components-react";
 import type { ScrambleTextController } from "@thewaver/ss-components-react";
 import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
+import { LINE } from "@thewaver/ss-playground/App/Pages/ScrambleTextPage/ScrambleTextPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ScrambleTextPage/ScrambleTextPage.css";
 import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
@@ -10,7 +11,6 @@ import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
 import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import type { ScrambleTextExampleProps } from "../ScrambleTextPageReact.types";
 
-const LINE = "DECRYPTING PAYLOAD FROM THE ARCHIVE";
 const BOX_WIDTH = 320;
 const SINGLE_CHARACTER = 1;
 const ROLLS_PER_CHARACTER = 6;

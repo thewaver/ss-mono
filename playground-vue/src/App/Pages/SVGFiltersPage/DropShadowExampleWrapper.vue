@@ -30,12 +30,7 @@ const floodOpacity = shallowRef(SVGFilterKnobs.DropShadow.STARTING_OPACITY);
     />
 
     <PageExampleKnobs>
-        <PageProp
-            item-key="dx"
-            controls="Sets SVGDropShadowFilterDefs.dx"
-            label="Offset x"
-            hint="How far the shadow is thrown sideways from the shape casting it."
-        >
+        <PageProp item-key="dx" v-bind="SVGFilterKnobs.DX_TEXT">
             <PageNumberField
                 :value="dx"
                 :min="SVGFilterKnobs.DropShadow.MIN_OFFSET"
@@ -45,12 +40,7 @@ const floodOpacity = shallowRef(SVGFilterKnobs.DropShadow.STARTING_OPACITY);
             />
         </PageProp>
 
-        <PageProp
-            item-key="dy"
-            controls="Sets SVGDropShadowFilterDefs.dy"
-            label="Offset y"
-            hint="How far the shadow is thrown up or down from the shape casting it."
-        >
+        <PageProp item-key="dy" v-bind="SVGFilterKnobs.DY_TEXT">
             <PageNumberField
                 :value="dy"
                 :min="SVGFilterKnobs.DropShadow.MIN_OFFSET"
@@ -60,12 +50,7 @@ const floodOpacity = shallowRef(SVGFilterKnobs.DropShadow.STARTING_OPACITY);
             />
         </PageProp>
 
-        <PageProp
-            item-key="shadowStdDeviation"
-            controls="Sets SVGDropShadowFilterDefs.stdDeviation"
-            label="Std deviation"
-            hint="How soft the shadow's edge is. 0 gives a hard copy of the shape."
-        >
+        <PageProp item-key="shadowStdDeviation" v-bind="SVGFilterKnobs.SHADOW_STD_DEVIATION_TEXT">
             <PageNumberField
                 :value="stdDeviation"
                 :min="SVGFilterKnobs.DropShadow.MIN_DEVIATION"
@@ -76,12 +61,7 @@ const floodOpacity = shallowRef(SVGFilterKnobs.DropShadow.STARTING_OPACITY);
             />
         </PageProp>
 
-        <PageProp
-            item-key="floodColor"
-            controls="Sets SVGDropShadowFilterDefs.floodColor"
-            label="Flood color"
-            hint="The color the shadow is painted in."
-        >
+        <PageProp item-key="floodColor" v-bind="SVGFilterKnobs.FLOOD_COLOR_TEXT">
             <PageColorField
                 :value="floodColor"
                 ariaLabel="Flood color"
@@ -89,12 +69,7 @@ const floodOpacity = shallowRef(SVGFilterKnobs.DropShadow.STARTING_OPACITY);
             />
         </PageProp>
 
-        <PageProp
-            item-key="floodOpacity"
-            controls="Sets SVGDropShadowFilterDefs.floodOpacity"
-            label="Flood opacity"
-            hint="How solid the shadow is. 0 hides it entirely."
-        >
+        <PageProp item-key="floodOpacity" v-bind="SVGFilterKnobs.FLOOD_OPACITY_TEXT">
             <PageNumberField
                 :value="floodOpacity"
                 :min="SVGFilterKnobs.DropShadow.MIN_OPACITY"

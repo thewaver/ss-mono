@@ -11,6 +11,7 @@ import {
     ITEM_COUNT,
     PAGE_SIZE,
     PAGINATOR_GAP,
+    RESULTS_END_JUMPS_LABEL,
 } from "@thewaver/ss-playground/App/Pages/PaginatorPage/PaginatorPage.const";
 
 import {
@@ -34,7 +35,7 @@ export const EndsDocsExample = () => {
                 pageSize={PAGE_SIZE}
                 gap={PAGINATOR_GAP}
                 steps={END_STEPS}
-                ariaLabel={"Results with end jumps"}
+                ariaLabel={RESULTS_END_JUMPS_LABEL}
                 computePageLabel={computePaginatorPageLabel}
                 computeStepLabel={computePaginatorStepLabel}
                 onPageChange={setPage}

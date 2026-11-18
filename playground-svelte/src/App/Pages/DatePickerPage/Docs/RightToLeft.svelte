@@ -5,7 +5,7 @@
         CALENDAR_TRIGGER_LABEL,
         DATE_PART_HINTS,
     } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
-    import { FIELD_WIDTH, LOCALE, TODAY } from "@thewaver/ss-playground/App/Pages/DatePickerPage/DatePickerPage.const";
+    import { FIELD_WIDTH, LOCALE, TODAY, DATE_RIGHT_LEFT_BOX_LABEL } from "@thewaver/ss-playground/App/Pages/DatePickerPage/DatePickerPage.const";
     import {
         FIELD_GAP,
         FIELD_STEPPER_PADDING,
@@ -26,7 +26,7 @@
 <div dir={"rtl"}>
     <DatePicker
         bind:value
-        ariaLabel={"Date in a right-to-left box"}
+        ariaLabel={DATE_RIGHT_LEFT_BOX_LABEL}
         calendarLabel={"Choose a date"}
         partHints={DATE_PART_HINTS}
         locale={LOCALE}

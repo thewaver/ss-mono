@@ -8,9 +8,9 @@
     import PageTrailMarker from "../../../StyledComponents/TrailContent/PageTrailMarker.svelte";
     import PageTrailTrack from "../../../StyledComponents/TrailContent/PageTrailTrack.svelte";
     import type { TrailExampleProps } from "../TrailPage.types";
+    import { TIMELINE_PATH, POSITION_ALONG_PATH_LABEL } from "@thewaver/ss-playground/App/Pages/TrailPage/TrailPage.const";
 
     const TIMELINE_SIZE = { width: 320, height: 140 };
-    const TIMELINE_PATH = "M 24 108 C 92 12, 168 154, 232 74 S 296 26, 304 58";
     const PERCENT = 100;
     const SLIDER_STEP = 1;
     const MARKER_ID = "timelineMarker";
@@ -50,7 +50,7 @@
         <Range
             id={"timelineScrubber"}
             sizing={"fill"}
-            ariaLabel={"Position along the path"}
+            ariaLabel={POSITION_ALONG_PATH_LABEL}
             min={0}
             max={PERCENT}
             step={SLIDER_STEP}

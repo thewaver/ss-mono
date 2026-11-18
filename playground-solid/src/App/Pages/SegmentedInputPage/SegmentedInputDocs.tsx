@@ -1,6 +1,10 @@
 import { createSignal } from "solid-js";
 
-import { DOCS_ROOT } from "@thewaver/ss-playground/App/Pages/SegmentedInputPage/SegmentedInputPage.const";
+import { SegmentedInputKnobs } from "@thewaver/ss-playground/App/Knobs/SegmentedInputs.const";
+import {
+    DOCS_ROOT,
+    DOCS_SECTIONS,
+} from "@thewaver/ss-playground/App/Pages/SegmentedInputPage/SegmentedInputPage.const";
 
 import { PageDocsExample } from "../../PageComponents/DocsExample/DocsExample";
 import { PageDocsSection } from "../../PageComponents/DocsSection/DocsSection";
@@ -25,30 +29,15 @@ export const SegmentedInputDocs = () => {
                 path={`${DOCS_ROOT}/Basic.tsx`}
                 renderKnobs={() => (
                     <>
-                        <PageProp
-                            key={"isReadOnly"}
-                            label={"Read-only"}
-                            hint={"Its code can be selected and copied, but neither typing nor pasting changes it."}
-                            controls={"Sets SegmentedInputProps.isReadOnly"}
-                        >
+                        <PageProp key={"isReadOnly"} {...SegmentedInputKnobs.IS_READ_ONLY_TEXT}>
                             <PageCheckField value={getIsReadOnly} ariaLabel={"Read-only"} onChange={setIsReadOnly} />
                         </PageProp>
 
-                        <PageProp
-                            key={"hasError"}
-                            label={"Error"}
-                            hint={"Marks the field invalid, for screen readers as well as for the painter."}
-                            controls={"Sets SegmentedInputProps.hasError"}
-                        >
+                        <PageProp key={"hasError"} {...SegmentedInputKnobs.HAS_ERROR_TEXT}>
                             <PageCheckField value={getHasError} ariaLabel={"Error"} onChange={setHasError} />
                         </PageProp>
 
-                        <PageProp
-                            key={"isDisabled"}
-                            label={"Disabled"}
-                            hint={"Turns the field off: nothing can write to it, and the Tab key skips it."}
-                            controls={"Sets SegmentedInputProps.isDisabled"}
-                        >
+                        <PageProp key={"isDisabled"} {...SegmentedInputKnobs.IS_DISABLED_TEXT}>
                             <PageCheckField value={getIsDisabled} ariaLabel={"Disabled"} onChange={setIsDisabled} />
                         </PageProp>
                     </>
@@ -68,23 +57,13 @@ export const SegmentedInputDocs = () => {
                 <RightToLeftDocsExample />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"Letters as well as digits"}
-                content={
-                    "Which characters the field takes is answered one at a time by [prop]computeIsAllowed[/prop], and a refused character is dropped wherever it appears, in a paste as much as in typing. Here letters and digits are allowed, and [prop]inputMode[/prop] is set to text so that a phone offers its whole keyboard rather than digits alone."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.lettersWellDigits} />
 
             <PageDocsExample path={`${DOCS_ROOT}/Letters.tsx`}>
                 <LettersDocsExample />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"Tooltip"}
-                content={
-                    "Give a field [prop]tooltipDefs[/prop] and it shows a tooltip on hover and on keyboard focus, read by screen readers as the field's description. A disabled field shows no tooltip unless you also keep it reachable when disabled; it can then be focused to read why it is off, and typing still changes nothing."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.tooltip} />
 
             <PageDocsExample
                 path={`${DOCS_ROOT}/Tooltip.tsx`}
@@ -92,11 +71,7 @@ export const SegmentedInputDocs = () => {
                     <>
                         <PageProp
                             key={"tooltipIsReachableWhenDisabled"}
-                            label={"Reachable when disabled"}
-                            hint={
-                                "Keeps a disabled field's tooltip available: the Tab key can stop on it and hovering it shows the tooltip. Without it a disabled field shows no tooltip at all. It only matters while Disabled is on."
-                            }
-                            controls={"Sets SegmentedInputProps.isReachableWhenDisabled"}
+                            {...SegmentedInputKnobs.TOOLTIP_IS_REACHABLE_WHEN_DISABLED_TEXT}
                         >
                             <PageCheckField
                                 value={getIsReachableWhenDisabled}
@@ -105,12 +80,7 @@ export const SegmentedInputDocs = () => {
                             />
                         </PageProp>
 
-                        <PageProp
-                            key={"tooltipIsDisabled"}
-                            label={"Disabled"}
-                            hint={"Turns the field off: nothing can write to it, and the Tab key skips it."}
-                            controls={"Sets SegmentedInputProps.isDisabled"}
-                        >
+                        <PageProp key={"tooltipIsDisabled"} {...SegmentedInputKnobs.IS_DISABLED_TEXT}>
                             <PageCheckField
                                 value={getIsTooltipDisabled}
                                 ariaLabel={"Disabled"}
@@ -126,12 +96,7 @@ export const SegmentedInputDocs = () => {
                 />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"Named by a Label"}
-                content={
-                    "Inside a Label, the field takes its name from the label's text, so it needs no [prop]ariaLabel[/prop], and pressing the text focuses the field."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.namedLabel} />
 
             <PageDocsExample path={`${DOCS_ROOT}/Labeled.tsx`}>
                 <LabeledDocsExample />

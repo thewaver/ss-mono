@@ -51,3 +51,21 @@ export const COLLAPSED_SIZE = 48;
 export const EXPANDED_SIZE = 200;
 
 export const MAILBOXES = ["Inbox", "Drafts", "Sent", "Archive", "Spam"];
+
+export const DOCS_SECTIONS = {
+    rightLeft: {
+        title: "Right to left",
+        content:
+            "Inside a box whose text runs right to left, the sidebar stays on the side [prop]edge[/prop] names, the left here, since its edges are the screen's sides; its contents and the content beside it run from the right.",
+    },
+    overNeighbor: {
+        title: "Over its neighbor",
+        content:
+            "Set [prop]layout[/prop] to overlay and the sidebar grows over the content beside it instead of pushing it aside. In the layout it only ever takes its collapsed size, so the neighbor never moves; the panel grows out from the docked edge, raised above what it covers.",
+    },
+    expandingHover: {
+        title: "Expanding on hover",
+        content:
+            'With [prop]isExpandedOnHover[/prop] on, resting the pointer on the sidebar for [prop]hoverShowDelayMs[/prop] expands it, and moving away, pressing Escape or pressing elsewhere collapses it again ([wcag id="1.4.13"]WCAG 1.4.13[/wcag]). It never writes [prop]expanded[/prop], so the button still reads collapsed while the sidebar is only being looked at, and a sidebar expanded by the button stays expanded when the pointer leaves.',
+    },
+};

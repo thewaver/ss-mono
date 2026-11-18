@@ -69,12 +69,7 @@ const examples: ExampleDefs[] = [
 
 <template>
     <PagePropsPanel scope="global">
-        <PageProp
-            item-key="reachPx"
-            controls="Sets ProximityTextProps.reachPx"
-            label="Reach (px)"
-            hint="How far from a letter's middle the point still reaches it. Past it, the letter rests."
-        >
+        <PageProp item-key="reachPx" v-bind="ProximityTextKnobs.REACH_PX_TEXT">
             <PageNumberField
                 :value="reachPx"
                 :min="ProximityTextKnobs.MIN_REACH_PX"
@@ -85,12 +80,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="isDisabled"
-            controls="Sets ProximityTextProps.isDisabled"
-            label="Disabled"
-            hint="Rests every letter and stops following the point. It is what a page honoring a reduced-motion preference passes."
-        >
+        <PageProp item-key="isDisabled" v-bind="ProximityTextKnobs.IS_DISABLED_TEXT">
             <PageCheckField
                 :value="isDisabled"
                 ariaLabel="Disabled"

@@ -1,7 +1,10 @@
 import { createSignal } from "solid-js";
 
 import { Stepper, access } from "@thewaver/ss-components-solid";
-import { STARTING_LINEAR } from "@thewaver/ss-playground/App/Pages/StepperPage/StepperPage.const";
+import {
+    CHECKOUT_WITHOUT_CONNECTORS_LABEL,
+    STARTING_LINEAR,
+} from "@thewaver/ss-playground/App/Pages/StepperPage/StepperPage.const";
 import { StepperPageUtils } from "@thewaver/ss-playground/App/Pages/StepperPage/StepperPage.utils";
 import { LABELS, ORDER, STEPPER_GAP } from "@thewaver/ss-playground/App/Pages/StepperPage/StepperSteps.const";
 import type { StepValue } from "@thewaver/ss-playground/App/Pages/StepperPage/StepperSteps.types";
@@ -19,7 +22,7 @@ export const BareDocsExample = (props: Props) => {
             steps={() => StepperPageUtils.buildSteps("bare", getCurrent(), access(props.isFreeNavigation))}
             currentValue={getCurrent}
             gap={STEPPER_GAP}
-            ariaLabel={"Checkout without connectors"}
+            ariaLabel={CHECKOUT_WITHOUT_CONNECTORS_LABEL}
             computeStepAriaLabel={StepperPageUtils.describeStep}
             onCurrentChange={setCurrent}
             renderStep={(getStep, getFlags) => (

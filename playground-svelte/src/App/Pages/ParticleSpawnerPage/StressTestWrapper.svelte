@@ -12,6 +12,7 @@
         STRESS_PARTICLE_COUNT,
         STRESS_SPAWN_DELAY_MS,
     } from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.const";
+    import { ParticleSpawnerKnobs } from "@thewaver/ss-playground/App/Knobs/ParticleSpawners.const";
 
     const STRESS_ITEMS: (StressTestDefs & { size: number })[] = [
         { count: 4 * 3, cols: 4, gap: 10, size: STRESS_ITEM_SIZE },
@@ -29,9 +30,7 @@
 <PagePropsPanel scope={"local"} hasReset={false}>
     <PageProp
         itemKey={"onGraphicsCard"}
-        label={"On the graphics card"}
-        hint={"Draws each spawner's particles in one canvas that follows them, with their positions worked out as before. Off, every particle is an element of its own."}
-        controls={"Sets ParticleSpawnerProps.renderer in the stress test"}
+        {...ParticleSpawnerKnobs.ON_GRAPHICS_CARD_TEXT}
     >
         <PageCheckField
             value={isOnGraphicsCard}

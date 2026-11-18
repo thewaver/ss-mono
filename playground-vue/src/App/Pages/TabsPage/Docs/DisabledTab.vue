@@ -5,6 +5,7 @@ import { Tabs } from "@thewaver/ss-components-vue";
 import type { Tab } from "@thewaver/ss-components-vue";
 import {
     PANEL_BODIES,
+    PARTLY_DISABLED_VIEWS_LABEL,
     REACHABLE_TABS,
     ROW_TAB_GAP,
     getPanelId,
@@ -38,7 +39,7 @@ const tabs = computed<Tab<string>[]>(() =>
         <Tabs
             orientation="horizontal"
             :tab-gap="ROW_TAB_GAP"
-            ariaLabel="Partly disabled views"
+            :ariaLabel="PARTLY_DISABLED_VIEWS_LABEL"
             :tabs="tabs"
             :selected-value="selectedValue"
             @selection-change="(value: string) => (selectedValue = value)"

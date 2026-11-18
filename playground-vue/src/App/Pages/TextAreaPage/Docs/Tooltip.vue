@@ -3,7 +3,11 @@ import { h, shallowRef } from "vue";
 
 import { TextArea } from "@thewaver/ss-components-vue";
 import type { InteractionTooltipDefs, TextFieldFlags } from "@thewaver/ss-components-vue";
-import { FIELD_WIDTH, FIXED_HEIGHT } from "@thewaver/ss-playground/App/Pages/TextAreaPage/TextAreaPage.const";
+import {
+    FIELD_WIDTH,
+    FIXED_HEIGHT,
+    NOTES_TOOLTIP_LABEL,
+} from "@thewaver/ss-playground/App/Pages/TextAreaPage/TextAreaPage.const";
 import {
     FIELD_GAP,
     FIELD_PADDING,
@@ -34,7 +38,7 @@ const tooltipDefs: InteractionTooltipDefs<TextFieldFlags> = {
         :gap="FIELD_GAP"
         :is-disabled="isDisabled"
         :is-reachable-when-disabled="isReachableWhenDisabled"
-        ariaLabel="Notes with a tooltip"
+        :ariaLabel="NOTES_TOOLTIP_LABEL"
         :tooltip-defs="tooltipDefs"
     >
         <template #renderContent="flags">

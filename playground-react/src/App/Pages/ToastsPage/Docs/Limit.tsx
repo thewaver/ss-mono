@@ -3,7 +3,11 @@ import { useState } from "react";
 import { Button, Toasts, useToastsContext } from "@thewaver/ss-components-react";
 import type { Toast } from "@thewaver/ss-components-react";
 import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
-import { BURST_SIZE, MESSAGES } from "@thewaver/ss-playground/App/Pages/ToastsPage/ToastsPage.const";
+import {
+    BURST_SIZE,
+    LIMITED_NOTIFICATIONS_LABEL,
+    MESSAGES,
+} from "@thewaver/ss-playground/App/Pages/ToastsPage/ToastsPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ToastsPage/ToastsPage.css";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
@@ -54,7 +58,7 @@ export const LimitDocsExample = (props: Props) => {
             <div className={styles.raiseRow}>
                 <Toasts<ToastDefs>
                     toasts={queue}
-                    ariaLabel={"Limited notifications"}
+                    ariaLabel={LIMITED_NOTIFICATIONS_LABEL}
                     alignment={"bottom_left"}
                     limit={props.limit}
                     overflow={props.overflow}

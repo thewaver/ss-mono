@@ -171,9 +171,7 @@
 <PagePropsPanel scope={"global"}>
     <PageProp
         itemKey={"connector"}
-        controls={"Picks the sample connector drawn by BracketProps.renderConnector"}
-        label={"Connectors"}
-        hint={"The line drawn between a match and the one it feeds: straight, elbowed, or curved."}
+        {...BracketKnobs.CONNECTOR_TEXT}
     >
         <PageSelectField
             value={connector}
@@ -187,11 +185,7 @@
 
     <PageProp
         itemKey={"isBeamPlaying"}
-        controls={"Plays the example beam drawn by BracketProps.renderConnector"}
-        label={"Beams moving"}
-        hint={
-            "Whether the pulse runs along the lines between the focused node and the final. It starts stopped while the visitor has asked for reduced motion."
-        }
+        {...BracketKnobs.IS_BEAM_PLAYING_TEXT}
     >
         <PageCheckField
             value={isBeamPlaying}
@@ -202,7 +196,7 @@
         />
     </PageProp>
 
-    <PageProp itemKey={"orientation"} controls={"Sets BracketProps.orientation"} label={"Orientation"} hint={"Whether the rounds run across the page or down it."}>
+    <PageProp itemKey={"orientation"} {...BracketKnobs.ORIENTATION_TEXT}>
         <PageSelectField
             value={orientation}
             values={BRACKET_ORIENTATIONS}
@@ -215,9 +209,7 @@
 
     <PageProp
         itemKey={"rootSide"}
-        controls={"Sets BracketProps.rootSide"}
-        label={"Root side"}
-        hint={"Which end the final holds, and so which way the rounds read."}
+        {...BracketKnobs.ROOT_SIDE_TEXT}
     >
         <PageSelectField
             value={rootSide}
@@ -229,7 +221,7 @@
         />
     </PageProp>
 
-    <PageProp itemKey={"layerGap"} controls={"Sets BracketProps.layerGap"} label={"Layer gap (px)"} hint={"The space between one round and the next."}>
+    <PageProp itemKey={"layerGap"} {...BracketKnobs.LAYER_GAP_TEXT}>
         <PageNumberField
             value={layerGap}
             min={BracketKnobs.MIN_LAYER_GAP}
@@ -242,7 +234,7 @@
         />
     </PageProp>
 
-    <PageProp itemKey={"crossGap"} controls={"Sets BracketProps.crossGap"} label={"Row gap (px)"} hint={"The space between two matches in the same round."}>
+    <PageProp itemKey={"crossGap"} {...BracketKnobs.CROSS_GAP_TEXT}>
         <PageNumberField
             value={crossGap}
             min={BracketKnobs.MIN_CROSS_GAP}
@@ -257,11 +249,7 @@
 
     <PageProp
         itemKey={"transitionDurationMs"}
-        controls={"Sets BracketProps.transitionDurationMs"}
-        label={"Glide (ms)"}
-        hint={
-            "How long the family example takes to glide from one family to the next. It is off while the visitor has asked for reduced motion."
-        }
+        {...BracketKnobs.TRANSITION_DURATION_MS_TEXT}
     >
         <PageNumberField
             value={transitionDurationMs}

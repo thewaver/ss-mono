@@ -3,6 +3,11 @@ import { useState } from "react";
 import { Button, Form, FormField, TextInput } from "@thewaver/ss-components-react";
 import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
 import {
+    ERROR,
+    HINT,
+    SOME_FIELDS_NEED_ATTENTION_TEXT,
+} from "@thewaver/ss-playground/App/Pages/FormFieldPage/FormFieldPage.const";
+import {
     FIELD_GAP,
     FIELD_PADDING,
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
@@ -16,9 +21,6 @@ import {
 } from "../../../StyledComponents/FormFieldContent/FormFieldContent";
 import { PageTextFieldContent } from "../../../StyledComponents/TextFieldContent/TextFieldContent";
 import type { FormFieldInFormDocsExampleProps } from "../FormFieldPageReact.types";
-
-const HINT = "Shown to everyone who can see your posts.";
-const ERROR = "That name is already taken.";
 
 type Props = FormFieldInFormDocsExampleProps;
 
@@ -64,7 +66,7 @@ export const InFormDocsExample = (props: Props) => {
                     </PageFormButtons>
 
                     <div className={exampleStyles.exampleReadout} data-readout>
-                        {`${state.isValid ? "Ready to send." : "Some fields need attention."} ${outcome}`}
+                        {`${state.isValid ? "Ready to send." : SOME_FIELDS_NEED_ATTENTION_TEXT} ${outcome}`}
                     </div>
                 </PageFormStack>
             )}

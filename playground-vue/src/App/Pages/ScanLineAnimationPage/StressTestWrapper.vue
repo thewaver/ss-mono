@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { shallowRef, useModel } from "vue";
 
+import { ScanlineAnimationKnobs } from "@thewaver/ss-playground/App/Knobs/ScanlineAnimations.const";
+
 import PageCheckField from "../../PageComponents/Field/PageCheckField.vue";
 import PageProp from "../../PageComponents/Prop/Prop.vue";
 import PagePropsPanel from "../../PageComponents/PropsPanel/PagePropsPanel.vue";
@@ -21,12 +23,7 @@ const isOnGraphicsCard = shallowRef(true);
     <div>120 lines</div>
 
     <PagePropsPanel scope="local" :has-reset="false">
-        <PageProp
-            item-key="onGraphicsCard"
-            label="On the graphics card"
-            hint="Draws the stress test's lines in one canvas per item, with the keyframes worked out on the graphics card. Off, every line is an element of its own."
-            controls="Sets ScanlineAnimationProps.renderer in the stress test"
-        >
+        <PageProp item-key="onGraphicsCard" v-bind="ScanlineAnimationKnobs.ON_GRAPHICS_CARD_TEXT">
             <PageCheckField
                 :value="isOnGraphicsCard"
                 ariaLabel="On the graphics card"

@@ -158,12 +158,7 @@ const examples: ExampleDefs[] = [
             <PagePropsDivider />
 
             <PagePropsPanel scope="global">
-                <PageProp
-                    item-key="strokeWidth"
-                    controls="Sets PaintedTextProps.strokeWidth"
-                    label="Stroke width (px)"
-                    hint="How wide the stroke appears, whichever side of the letter's edge it sits on."
-                >
+                <PageProp item-key="strokeWidth" v-bind="PaintedTextKnobs.STROKE_WIDTH_TEXT">
                     <PageNumberField
                         :value="strokeWidth"
                         :min="PaintedTextKnobs.MIN_STROKE_WIDTH"
@@ -174,12 +169,7 @@ const examples: ExampleDefs[] = [
                     />
                 </PageProp>
 
-                <PageProp
-                    item-key="strokeAlignment"
-                    controls="Sets PaintedTextProps.strokeAlignment"
-                    label="Stroke alignment"
-                    hint="Where the stroke sits against the edge of each letter: outside keeps the letters their full shape, inside keeps the text its overall size, and center straddles the edge."
-                >
+                <PageProp item-key="strokeAlignment" v-bind="PaintedTextKnobs.STROKE_ALIGNMENT_TEXT">
                     <PageSelectField
                         :value="strokeAlignment"
                         :values="PaintedTextKnobs.STROKE_ALIGNMENTS"
@@ -188,12 +178,7 @@ const examples: ExampleDefs[] = [
                     />
                 </PageProp>
 
-                <PageProp
-                    item-key="colors"
-                    controls="Sets the colors of the example paints sent to PaintedTextProps.computeFillDefs and PaintedTextProps.computeStrokeDefs"
-                    label="Colors"
-                    hint="The colors the fill and the stroke are built from. Each sample uses as many as it needs."
-                >
+                <PageProp item-key="colors" v-bind="PaintedTextKnobs.COLORS_TEXT">
                     <div :class="styles.colorList">
                         <PageColorField
                             v-for="key in colorKeys"
@@ -205,12 +190,7 @@ const examples: ExampleDefs[] = [
                     </div>
                 </PageProp>
 
-                <PageProp
-                    item-key="blurWidth"
-                    controls="Sets the blur of the example paints sent to PaintedTextProps.computeFillDefs and PaintedTextProps.computeStrokeDefs"
-                    label="Blur (px)"
-                    hint="How far the paint is blurred outward, which is what gives it its glow."
-                >
+                <PageProp item-key="blurWidth" v-bind="PaintedTextKnobs.BLUR_WIDTH_TEXT">
                     <PageNumberField
                         :value="blurWidth"
                         :min="PaintedTextKnobs.MIN_BLUR_WIDTH"
@@ -224,9 +204,7 @@ const examples: ExampleDefs[] = [
                 <PageProp
                     v-if="usesTiming"
                     item-key="animationDurationMs"
-                    controls="Sets the duration of the example paints sent to PaintedTextProps.computeFillDefs and PaintedTextProps.computeStrokeDefs"
-                    label="Animation duration (ms)"
-                    hint="How long one pass of the fill or stroke animation takes."
+                    v-bind="PaintedTextKnobs.ANIMATION_DURATION_MS_TEXT"
                 >
                     <PageNumberField
                         :value="animationDurationMs"
@@ -241,9 +219,7 @@ const examples: ExampleDefs[] = [
                 <PageProp
                     v-if="usesTiming"
                     item-key="iterationConfigKey"
-                    controls="Picks how the example paints repeat, sent to PaintedTextProps.computeFillDefs and PaintedTextProps.computeStrokeDefs"
-                    label="Iteration Pattern"
-                    hint="How the animation repeats: once, endlessly, or back and forth."
+                    v-bind="PaintedTextKnobs.ITERATION_CONFIG_KEY_TEXT"
                 >
                     <PageSelectField
                         :value="iterationConfigKey"
@@ -253,13 +229,7 @@ const examples: ExampleDefs[] = [
                     />
                 </PageProp>
 
-                <PageProp
-                    v-if="usesPattern"
-                    item-key="cellSize"
-                    controls="Sets the tile size of the example paints sent to PaintedTextProps.computeFillDefs and PaintedTextProps.computeStrokeDefs"
-                    label="Pattern Cell Size (px)"
-                    hint="How large one tile of a pattern is before it repeats."
-                >
+                <PageProp v-if="usesPattern" item-key="cellSize" v-bind="PaintedTextKnobs.CELL_SIZE_TEXT">
                     <PageNumberField
                         :value="cellSize"
                         :min="PaintedTextKnobs.MIN_CELL_SIZE"

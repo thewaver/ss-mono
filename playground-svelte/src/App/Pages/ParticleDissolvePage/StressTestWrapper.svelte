@@ -10,6 +10,7 @@
     import StressTest from "../../PageComponents/StressTest/StressTest.svelte";
     import type { ParticleDissolveExampleProps } from "./ParticleDissolvePageSvelte.types";
     import StressCard from "./StressCard.svelte";
+    import { ParticleDissolveKnobs } from "@thewaver/ss-playground/App/Knobs/ParticleDissolves.const";
 
     let props: ParticleDissolveExampleProps = $props();
 
@@ -21,9 +22,7 @@
 <PagePropsPanel scope={"local"} hasReset={false}>
     <PageProp
         itemKey={"onGraphicsCard"}
-        label={"On the graphics card"}
-        hint={"Draws each card's ash in one canvas, with each particle's motion worked out on the graphics card. Off, every particle is an element of its own."}
-        controls={"Sets ParticleDissolveProps.renderer in the stress test"}
+        {...ParticleDissolveKnobs.ON_GRAPHICS_CARD_TEXT}
     >
         <PageCheckField
             value={isOnGraphicsCard}

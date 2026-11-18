@@ -5,6 +5,7 @@ import {
     PANEL_BODIES,
     RIGHT_TO_LEFT_TABS,
     ROW_TAB_GAP,
+    SWITCH_DIRECTION_LABEL,
     getPanelId,
     getTabId,
 } from "@thewaver/ss-playground/App/Pages/TabsPage/TabsPage.const";
@@ -59,9 +60,9 @@ export const RightToLeftDocsExample = () => {
 
             <Button
                 id={"switchDirection"}
-                ariaLabel={"Switch the direction"}
+                ariaLabel={SWITCH_DIRECTION_LABEL}
                 renderContent={(getFlags) => (
-                    <PageControlButtonContent flags={getFlags}>Switch the direction</PageControlButtonContent>
+                    <PageControlButtonContent flags={getFlags}>{SWITCH_DIRECTION_LABEL}</PageControlButtonContent>
                 )}
                 onClick={() => {
                     setIsRightToLeft((isRightToLeft) => !isRightToLeft);

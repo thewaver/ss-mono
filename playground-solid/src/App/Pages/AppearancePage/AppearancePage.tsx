@@ -29,6 +29,7 @@ import type {
 } from "@thewaver/ss-playground/App/PageComponents/NavSettings/NavSettings.types";
 import { DOCS_GAP } from "@thewaver/ss-playground/App/Pages/Accordions/AccordionPage/AccordionPage.const";
 import {
+    SKIN_DESCRIPTION,
     SKIN_ROW_GAP,
     SKIN_SAMPLE_EXPANDED_SECTIONS,
     SKIN_SAMPLE_HOVERED_FLAGS,
@@ -44,6 +45,7 @@ import {
     SKIN_SAMPLE_TABS,
     SKIN_SAMPLE_TAB_PANEL,
     SKIN_SAMPLE_TAGS,
+    THEME_DESCRIPTION,
     THEME_SWATCH_FAMILIES,
     THEME_SWATCH_SHADES,
     computeSkinRowId,
@@ -631,11 +633,7 @@ export const AppearancePage = () => {
             <section class={styles.appearanceSection}>
                 <h2 class={styles.appearanceHeading}>{"Theme"}</h2>
 
-                <p class={styles.appearanceDescription}>
-                    {
-                        "A theme decides the playground's colors. Each row shows one theme: a column per color, a line per shade; picking a row applies it to every page."
-                    }
-                </p>
+                <p class={styles.appearanceDescription}>{THEME_DESCRIPTION}</p>
 
                 <RadioGroup
                     value={[getAppliedTheme, pickTheme]}
@@ -650,11 +648,7 @@ export const AppearancePage = () => {
             <section class={styles.appearanceSection}>
                 <h2 class={styles.appearanceHeading}>{"Skin"}</h2>
 
-                <p class={styles.appearanceDescription}>
-                    {
-                        "A skin decides how the playground is drawn: the shapes, borders, shadows and fonts of its controls, and where the theme's colors go. Each row shows the controls in one skin; picking a row applies it to every page."
-                    }
-                </p>
+                <p class={styles.appearanceDescription}>{SKIN_DESCRIPTION}</p>
 
                 <RadioGroup
                     value={[getAppliedSkin, pickSkin]}

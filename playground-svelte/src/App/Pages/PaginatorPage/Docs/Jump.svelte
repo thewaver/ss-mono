@@ -4,13 +4,7 @@
         computePaginatorPageLabel,
         computePaginatorStepLabel,
     } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
-    import {
-        COUNT_FIELD_WIDTH,
-        FIRST_PAGE,
-        ITEM_COUNT,
-        PAGE_SIZE,
-        PAGINATOR_GAP,
-    } from "@thewaver/ss-playground/App/Pages/PaginatorPage/PaginatorPage.const";
+    import { COUNT_FIELD_WIDTH, FIRST_PAGE, ITEM_COUNT, PAGE_SIZE, PAGINATOR_GAP, RESULTS_PAGE_FIELD_LABEL } from "@thewaver/ss-playground/App/Pages/PaginatorPage/PaginatorPage.const";
     import * as styles from "@thewaver/ss-playground/App/Pages/PaginatorPage/PaginatorPage.css";
 
     import PageNumberField from "../../../PageComponents/Field/PageNumberField.svelte";
@@ -31,7 +25,7 @@
         {page}
         itemCount={ITEM_COUNT}
         pageSize={PAGE_SIZE}
-        ariaLabel={"Results with a page field"}
+        ariaLabel={RESULTS_PAGE_FIELD_LABEL}
         onPageChange={(next) => {
             page = next;
         }}

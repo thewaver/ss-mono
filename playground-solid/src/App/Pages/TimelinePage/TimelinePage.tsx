@@ -93,21 +93,11 @@ export const TimelinePage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp
-                    key={"isPannable"}
-                    label={"Drag to move"}
-                    hint={"Lets the timeline be dragged sideways to move through it."}
-                    controls={"Sets TimelineProps.isPannable"}
-                >
+                <PageProp key={"isPannable"} {...TimelineKnobs.IS_PANNABLE_TEXT}>
                     <PageCheckField value={getIsPannable} ariaLabel={"Drag to move"} onChange={setIsPannable} />
                 </PageProp>
 
-                <PageProp
-                    key={"isZoomable"}
-                    label={"Wheel and pinch to zoom"}
-                    hint={"Lets the wheel and a pinch change how much of the timeline is in view."}
-                    controls={"Sets TimelineProps.isZoomable"}
-                >
+                <PageProp key={"isZoomable"} {...TimelineKnobs.IS_ZOOMABLE_TEXT}>
                     <PageCheckField
                         value={getIsZoomable}
                         ariaLabel={"Wheel and pinch to zoom"}
@@ -115,12 +105,7 @@ export const TimelinePage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"isDisabled"}
-                    label={"Disabled"}
-                    hint={"Turns the timeline off, so it neither pans, zooms nor picks."}
-                    controls={"Sets TimelineProps.isDisabled"}
-                >
+                <PageProp key={"isDisabled"} {...TimelineKnobs.IS_DISABLED_TEXT}>
                     <PageCheckField value={getIsDisabled} ariaLabel={"Disabled"} onChange={setIsDisabled} />
                 </PageProp>
 

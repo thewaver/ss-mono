@@ -38,12 +38,7 @@ export const AudioSwitcherDocs = () => {
                 path={`${DOCS_ROOT}/Basic.tsx`}
                 renderKnobs={() => (
                     <>
-                        <PageProp
-                            key={"track"}
-                            label={"Track"}
-                            hint={"Which piece is playing. Changing it while it plays is what the switcher crossfades."}
-                            controls={"Picks the example track sent to AudioSwitcherProps.src"}
-                        >
+                        <PageProp key={"track"} {...AudioSwitcherKnobs.TRACK_TEXT}>
                             <PageSelectField
                                 value={getTrackName}
                                 values={TRACK_NAMES}
@@ -53,12 +48,7 @@ export const AudioSwitcherDocs = () => {
                             />
                         </PageProp>
 
-                        <PageProp
-                            key={"crossfadeMs"}
-                            label={"Crossfade (ms)"}
-                            hint={"How long the old track takes to fade out while the new one fades in."}
-                            controls={"Sets AudioSwitcherProps.crossfadeMs"}
-                        >
+                        <PageProp key={"crossfadeMs"} {...AudioSwitcherKnobs.CROSSFADE_MS_TEXT}>
                             <PageNumberField
                                 value={getCrossfadeMs}
                                 min={AudioSwitcherKnobs.MIN_CROSSFADE_MS}
@@ -70,12 +60,7 @@ export const AudioSwitcherDocs = () => {
                             />
                         </PageProp>
 
-                        <PageProp
-                            key={"volume"}
-                            label={"Volume (%)"}
-                            hint={"How loud the playback is, apart from the system's own volume."}
-                            controls={"Sets AudioSwitcherProps.volume, sent as a share of 1"}
-                        >
+                        <PageProp key={"volume"} {...AudioSwitcherKnobs.VOLUME_TEXT}>
                             <PageNumberField
                                 value={getVolumePercent}
                                 min={AudioSwitcherKnobs.MIN_VOLUME_PERCENT}

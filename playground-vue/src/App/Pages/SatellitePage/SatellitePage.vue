@@ -118,12 +118,7 @@ const examples: ExampleDefs[] = [
             </PageMeasureBox>
 
             <PageExampleKnobs>
-                <PageProp
-                    item-key="hPlacement"
-                    controls="Sets SatelliteDefs.placement.x"
-                    label="Placement across"
-                    hint="Where the satellite sits across its subject: inside an edge, centered, or outside it altogether."
-                >
+                <PageProp item-key="hPlacement" v-bind="SatelliteKnobs.H_PLACEMENT_TEXT">
                     <PageSelectField
                         :value="hPlacement"
                         :values="ANCHOR_H_PLACEMENTS"
@@ -133,12 +128,7 @@ const examples: ExampleDefs[] = [
                     />
                 </PageProp>
 
-                <PageProp
-                    item-key="vPlacement"
-                    controls="Sets SatelliteDefs.placement.y"
-                    label="Placement down"
-                    hint="Where the satellite sits above or below its subject: inside an edge, centered, or outside it altogether."
-                >
+                <PageProp item-key="vPlacement" v-bind="SatelliteKnobs.V_PLACEMENT_TEXT">
                     <PageSelectField
                         :value="vPlacement"
                         :values="ANCHOR_V_PLACEMENTS"
@@ -148,12 +138,7 @@ const examples: ExampleDefs[] = [
                     />
                 </PageProp>
 
-                <PageProp
-                    item-key="offsetX"
-                    controls="Sets SatelliteDefs.offset.x"
-                    label="Offset across (px)"
-                    hint="How far the satellite is nudged sideways from where the placement put it."
-                >
+                <PageProp item-key="offsetX" v-bind="SatelliteKnobs.OFFSET_X_TEXT">
                     <PageNumberField
                         :value="offsetX"
                         :min="SatelliteKnobs.MIN_OFFSET"
@@ -165,12 +150,7 @@ const examples: ExampleDefs[] = [
                     />
                 </PageProp>
 
-                <PageProp
-                    item-key="offsetY"
-                    controls="Sets SatelliteDefs.offset.y"
-                    label="Offset down (px)"
-                    hint="How far the satellite is nudged up or down from where the placement put it."
-                >
+                <PageProp item-key="offsetY" v-bind="SatelliteKnobs.OFFSET_Y_TEXT">
                     <PageNumberField
                         :value="offsetY"
                         :min="SatelliteKnobs.MIN_OFFSET"
@@ -182,12 +162,7 @@ const examples: ExampleDefs[] = [
                     />
                 </PageProp>
 
-                <PageProp
-                    item-key="hasSatellite"
-                    controls="Switches SatelliteProps.satellites between one satellite and none"
-                    label="Render a satellite"
-                    hint="Whether a satellite is rendered at all, so the subject can be seen with and without one."
-                >
+                <PageProp item-key="hasSatellite" v-bind="SatelliteKnobs.HAS_SATELLITE_TEXT">
                     <PageCheckField
                         :value="hasSatellite"
                         ariaLabel="Render a satellite"
@@ -195,12 +170,7 @@ const examples: ExampleDefs[] = [
                     />
                 </PageProp>
 
-                <PageProp
-                    item-key="badgeSize"
-                    controls="Sets the size of the example badge drawn by SatelliteDefs.renderSatellite"
-                    label="Satellite size (px)"
-                    hint="How large the satellite itself is."
-                >
+                <PageProp item-key="badgeSize" v-bind="SatelliteKnobs.BADGE_SIZE_TEXT">
                     <PageNumberField
                         :value="badgeSize"
                         :min="SatelliteKnobs.MIN_BADGE_SIZE"
@@ -212,12 +182,7 @@ const examples: ExampleDefs[] = [
                     />
                 </PageProp>
 
-                <PageProp
-                    item-key="isBehindSubject"
-                    controls="Sets SatelliteDefs.isBehindSubject"
-                    label="Behind the subject"
-                    hint="Puts the satellite under the subject rather than over it, so the subject hides whatever overlaps."
-                >
+                <PageProp item-key="isBehindSubject" v-bind="SatelliteKnobs.IS_BEHIND_SUBJECT_TEXT">
                     <PageCheckField
                         :value="isBehindSubject"
                         ariaLabel="Behind the subject"
@@ -245,12 +210,7 @@ const examples: ExampleDefs[] = [
             </PageMeasureBox>
 
             <PageExampleKnobs>
-                <PageProp
-                    item-key="badgeCorner"
-                    controls="Picks the corner the example turns into SatelliteDefs.placement and SatelliteDefs.offset"
-                    label="Corner"
-                    hint="Which corner the badge is pinned to; the overhang turns outward with it."
-                >
+                <PageProp item-key="badgeCorner" v-bind="SatelliteKnobs.BADGE_CORNER_TEXT">
                     <PageSelectField
                         :value="corner"
                         :values="SatelliteKnobs.BADGE_CORNERS"
@@ -260,12 +220,7 @@ const examples: ExampleDefs[] = [
                     />
                 </PageProp>
 
-                <PageProp
-                    item-key="badgeCount"
-                    controls="Sets the number in the example pill drawn by SatelliteDefs.renderSatellite"
-                    label="Count"
-                    hint="The number on the badge. More digits make it wider, and it grows toward the middle."
-                >
+                <PageProp item-key="badgeCount" v-bind="SatelliteKnobs.BADGE_COUNT_TEXT">
                     <PageNumberField
                         :value="count"
                         :min="SatelliteKnobs.MIN_COUNT"
@@ -277,12 +232,7 @@ const examples: ExampleDefs[] = [
                     />
                 </PageProp>
 
-                <PageProp
-                    item-key="badgeOverhang"
-                    controls="Sets how far the example pushes SatelliteDefs.offset out from the corner"
-                    label="Overhang (px)"
-                    hint="How far the badge pokes out past each of the two edges it is pinned to."
-                >
+                <PageProp item-key="badgeOverhang" v-bind="SatelliteKnobs.BADGE_OVERHANG_TEXT">
                     <PageNumberField
                         :value="overhang"
                         :min="SatelliteKnobs.MIN_OVERHANG"

@@ -7,6 +7,7 @@
     import PageClockFrame from "../../../StyledComponents/ClockContent/PageClockFrame.svelte";
     import PageClockOption from "../../../StyledComponents/ClockContent/PageClockOption.svelte";
     import PageClockUnit from "../../../StyledComponents/ClockContent/PageClockUnit.svelte";
+    import { TIME_RIGHT_LEFT_BOX_LABEL } from "@thewaver/ss-playground/App/Pages/ClockPage/ClockPage.const";
 
     let value = $state.raw<TimeValue | undefined>({ hour: 9, minute: 30 });
 </script>
@@ -16,7 +17,7 @@
         <Clock
             bind:value
             locale={LOCALE}
-            ariaLabel={"Time in a right-to-left box"}
+            ariaLabel={TIME_RIGHT_LEFT_BOX_LABEL}
         >
             {#snippet renderOption(_unused, renderProps)}
                 <PageClockOption {renderProps} />

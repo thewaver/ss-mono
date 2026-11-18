@@ -5,6 +5,7 @@
     import PageCheckboxContent from "../../../StyledComponents/CheckboxContent/CheckboxContent.svelte";
     import PageTooltipContent from "../../../StyledComponents/TooltipContent/TooltipContent.svelte";
     import type { CheckboxTooltipDocsExampleProps } from "../CheckboxPageSvelte.types";
+    import { CHECKBOX_TOOLTIP_LABEL } from "@thewaver/ss-playground/App/Pages/CheckboxPage/CheckboxPage.const";
 
     type Props = CheckboxTooltipDocsExampleProps;
 
@@ -15,7 +16,7 @@
 
 <Checkbox
     bind:checked
-    ariaLabel={"Checkbox with a tooltip"}
+    ariaLabel={CHECKBOX_TOOLTIP_LABEL}
     isDisabled={props.isDisabled}
     isReachableWhenDisabled={props.isReachableWhenDisabled}
     tooltipDefs={{
@@ -26,7 +27,7 @@
     }}
 >
     {#snippet renderContent(flags)}
-        <PageCheckboxContent {flags}>Checkbox with a tooltip</PageCheckboxContent>
+        <PageCheckboxContent {flags}>{CHECKBOX_TOOLTIP_LABEL}</PageCheckboxContent>
     {/snippet}
 </Checkbox>
 

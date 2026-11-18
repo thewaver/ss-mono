@@ -11,6 +11,7 @@
     import PageWheelMount from "../../../../StyledComponents/WheelContent/PageWheelMount.svelte";
     import PageWheelPip from "../../../../StyledComponents/WheelContent/PageWheelPip.svelte";
     import type { WheelExampleProps } from "../../Wheels.types";
+    import { PRIZE_DRUM_TURNING_SIDEWAYS_LABEL } from "@thewaver/ss-playground/App/Pages/Wheels/DrumWheelPage/DrumWheelPage.const";
 
     const WEDGE_SIZE: Size2d = { width: 160, height: 64 };
 
@@ -31,7 +32,7 @@
             {wedges}
             axis={"row"}
             wedgeSize={WEDGE_SIZE}
-            ariaLabel={"Prize drum, turning sideways"}
+            ariaLabel={PRIZE_DRUM_TURNING_SIDEWAYS_LABEL}
             computeSpinTarget={() => pickPrizeIndex(wedges.length)}
             computeWedgeLabel={(index) => `${wedges[index]}, ${index + 1} of ${wedges.length}`}
             onMount={(next) => {

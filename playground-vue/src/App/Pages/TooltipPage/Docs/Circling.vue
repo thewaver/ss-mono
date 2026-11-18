@@ -7,6 +7,7 @@ import {
     CIRCLING_MIN_DEGREES,
     CIRCLING_STEP_DEGREES,
     STARTING_CIRCLING_DEGREES,
+    WHERE_ARROW_SITS_ROUND_LABEL,
 } from "@thewaver/ss-playground/App/Pages/TooltipPage/TooltipPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/TooltipPage/TooltipPage.css";
 import { computeCirclingAim } from "@thewaver/ss-playground/App/Pages/TooltipPage/TooltipPage.utils";
@@ -43,7 +44,7 @@ const degrees = shallowRef(STARTING_CIRCLING_DEGREES);
                 :step="CIRCLING_STEP_DEGREES"
                 sizing="fill"
                 :thumb-size="RANGE_THUMB_SIZE"
-                ariaLabel="Where the arrow sits round the tooltip"
+                :ariaLabel="WHERE_ARROW_SITS_ROUND_LABEL"
             >
                 <template #renderContent="renderProps">
                     <PageRangeContent :render-props="renderProps" />

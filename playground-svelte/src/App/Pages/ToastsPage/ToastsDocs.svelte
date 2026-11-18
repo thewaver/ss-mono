@@ -8,7 +8,7 @@
     } from "@thewaver/ss-components-svelte";
     import { ToastKnobs } from "@thewaver/ss-playground/App/Knobs/Toasts.const";
     import { WCAG_URLS } from "@thewaver/ss-playground/App/PageComponents/DocsProse/DocsProse.const";
-    import { DOCS_ROOT, FIELD_WIDTH, NO_LIMIT } from "@thewaver/ss-playground/App/Pages/ToastsPage/ToastsPage.const";
+    import { DOCS_SECTIONS, DOCS_ROOT, FIELD_WIDTH, NO_LIMIT } from "@thewaver/ss-playground/App/Pages/ToastsPage/ToastsPage.const";
 
     import PageDocsAlert from "../../PageComponents/DocsAlert/PageDocsAlert.svelte";
     import PageDocsExample from "../../PageComponents/DocsExample/PageDocsExample.svelte";
@@ -61,8 +61,7 @@
 </PageDocsAlert>
 
 <PageDocsSection
-    title={"Where the stack sits and how it grows"}
-    content={"Set [prop]alignment[/prop] to put the stack at one of nine places on the screen, and [prop]flexDirection[/prop] for the way it grows from there: down a column or along a row, with new toasts joining at the far end or, reversed, at the near one, while the stack stays where it was put. The [prop]gap[/prop] spaces the toasts and the [prop]margins[/prop] hold the stack off the edges. Two providers at one alignment draw their stacks over each other, and the second warns in the console; every example on this page has a place of its own, so moving this one onto another's shows it. Piling the toasts on each other is the painter's work: each is handed its place in the stack and the measured size of every toast, and this one offsets and shrinks itself from them."}
+    {...DOCS_SECTIONS.whereStackSitsHow}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Placement.svelte`}>
@@ -71,9 +70,7 @@
     {#snippet renderKnobs()}
         <PageProp
             itemKey={"alignment"}
-            label={"Alignment"}
-            hint={"Which corner or edge of the screen the toasts gather at."}
-            controls={"Sets ToastsProps.alignment"}
+            {...ToastKnobs.ALIGNMENT_TEXT}
         >
             <PageSelectField
                 value={alignment}
@@ -88,9 +85,7 @@
 
         <PageProp
             itemKey={"flexDirection"}
-            label={"Flex direction"}
-            hint={"Which way the stack grows from there, and so whether a new toast joins at the near end or the far one."}
-            controls={"Sets ToastsProps.flexDirection"}
+            {...ToastKnobs.FLEX_DIRECTION_TEXT}
         >
             <PageSelectField
                 value={flexDirection}
@@ -105,9 +100,7 @@
 
         <PageProp
             itemKey={"gap"}
-            label={"Gap (px)"}
-            hint={"The space between one toast and the next."}
-            controls={"Sets ToastsProps.gap"}
+            {...ToastKnobs.GAP_TEXT}
         >
             <PageNumberField
                 value={gap}
@@ -123,9 +116,7 @@
 
         <PageProp
             itemKey={"margin"}
-            label={"Margin (px)"}
-            hint={"How far the stack is held off the edges of the screen."}
-            controls={"Sets every side of ToastsProps.margins"}
+            {...ToastKnobs.MARGIN_TEXT}
         >
             <PageNumberField
                 value={margin}
@@ -141,9 +132,7 @@
 
         <PageProp
             itemKey={"stacking"}
-            label={"Stacking"}
-            hint={"Whether the toasts sit in a row of their own, or pile up on each other with only the newest fully shown."}
-            controls={"Picks how the example painter places each toast"}
+            {...ToastKnobs.STACKING_TEXT}
         >
             <PageSelectField
                 value={stacking}
@@ -159,8 +148,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"How many show at once"}
-    content={"Give [prop]limit[/prop] a number and only that many toasts are on screen. What happens to the rest is the [prop]overflow[/prop]: under dismiss_oldest the oldest are taken out of the queue so the newest show, and under hold_newest the newest wait in the queue and come on as places free, running no clock while they wait. The readout counts the queue, which this example holds itself through [prop]toasts[/prop]."}
+    {...DOCS_SECTIONS.howManyShowOnce}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Limit.svelte`}>
@@ -169,9 +157,7 @@
     {#snippet renderKnobs()}
         <PageProp
             itemKey={"limit"}
-            label={"Limit"}
-            hint={"How many toasts may be on screen at once. Choose none and they all show."}
-            controls={"Sets ToastsProps.limit, with no limit sent as undefined"}
+            {...ToastKnobs.LIMIT_TEXT}
         >
             <PageSelectField
                 value={limit}
@@ -187,9 +173,7 @@
 
         <PageProp
             itemKey={"overflow"}
-            label={"Overflow"}
-            hint={"What happens once the limit is reached: the oldest toast is dismissed, or the newest waits its turn."}
-            controls={"Sets ToastsProps.overflow"}
+            {...ToastKnobs.OVERFLOW_TEXT}
         >
             <PageSelectField
                 value={overflow}
@@ -205,8 +189,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"How long a toast stays"}
-    content={"A toast given a [prop]durationMs[/prop] dismisses itself once that time has passed, and one without waits to be dismissed. Hovering or focusing the stack holds every countdown, and so does switching to another tab; a held toast gets the rest of its time back, not a fresh start. Each toast's [prop]onShow[/prop] and [prop]onHide[/prop] run as it starts to arrive and to leave, which the readout counts."}
+    {...DOCS_SECTIONS.howLongToastStays}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Duration.svelte`}>
@@ -215,9 +198,7 @@
     {#snippet renderKnobs()}
         <PageProp
             itemKey={"durationMs"}
-            label={"Duration"}
-            hint={"How long a Timed toast stays before it dismisses itself. Sticky ones wait to be closed."}
-            controls={"Sets Toast.durationMs on each Timed toast raised"}
+            {...ToastKnobs.DURATION_MS_TEXT}
         >
             <PageSelectField
                 value={durationMs}
@@ -234,8 +215,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"How a toast arrives and leaves"}
-    content={"The painter draws the arrival and the exit. It is handed whether its toast is arriving or leaving and how long [prop]transitionDurationMs[/prop] gives it, and the provider keeps a leaving toast on screen until that time is up, so the exit plays out. This painter zooms, slides or fades."}
+    {...DOCS_SECTIONS.howToastArrivesLeaves}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Animation.svelte`}>
@@ -244,9 +224,7 @@
     {#snippet renderKnobs()}
         <PageProp
             itemKey={"animation"}
-            label={"Animation"}
-            hint={"How a toast arrives and leaves."}
-            controls={"Picks how the example painter draws the arrival and the exit"}
+            {...ToastKnobs.ANIMATION_TEXT}
         >
             <PageSelectField
                 value={animation}
@@ -261,9 +239,7 @@
 
         <PageProp
             itemKey={"transitionDurationMs"}
-            label={"Transition duration (ms)"}
-            hint={"How long a toast takes to arrive, to leave, and to slide when the stack shifts."}
-            controls={"Sets ToastsProps.transitionDurationMs"}
+            {...ToastKnobs.TRANSITION_DURATION_MS_TEXT}
         >
             <PageNumberField
                 value={transitionDurationMs}
@@ -281,8 +257,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"A toast that paints itself"}
-    content={"Every toast that brings no painter is drawn by the provider's [prop]renderToast[/prop], and one that brings its own [prop]renderToast[/prop] is drawn by that instead, so a toast raised anywhere can look and behave unlike its neighbors. The provider's painter is handed a dismiss for the toast it draws, and a toast's own painter closes it with the dismiss it was raised with. Here Save raises an ordinary toast, and Delete draft raises one that slides in and carries an Undo button wired to the code that raised it. A toast's painter is read once, when it arrives."}
+    {...DOCS_SECTIONS.toastThatPaintsItself}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/OwnPainter.svelte`}>
@@ -299,8 +274,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"A queue held outside the page"}
-    content={"Hand the provider a queue of your own as [prop]toasts[/prop], bound both ways, and it is yours: code outside any component can raise a toast by writing to it, as the sync here does, and the page can read it, as the count does. The provider still writes to it, taking out a toast whose time is up, one swiped away, and any past the limit."}
+    {...DOCS_SECTIONS.queueHeldOutsidePage}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/SharedQueue.svelte`}>
@@ -308,8 +282,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Right to left"}
-    content={"Each toast reads in the direction of whatever raised it: the element focused when show was called, or the page when nothing was. Publish sits in a right-to-left box, so its toast reads right to left with nothing set in the painter, even though the stack is drawn at the end of the document, outside the box. The [prop]alignment[/prop] names a side of the screen, not of the text, so middle_left stays on the left."}
+    {...DOCS_SECTIONS.rightLeft}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/RightToLeft.svelte`}>
@@ -317,8 +290,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Another shortcut"}
-    content={"The keys that reach the stacks belong to the whole page, so they are set by an InteractionSettings wrapper rather than by a provider. Its [prop]toastHotkeys[/prop] is a pair of shortcuts, forward and back, and the providers under it answer to that pair. Providers that answer to the same pair form a group that the pair cycles through, so this example's stack is reached by F9 and Shift+F9, while F8 still takes you through the other examples. Wrappers nest: an inner one keeps what it does not set and replaces what it does. Setting [prop]toastHotkeys[/prop] to null switches the keys off for the providers under it, and the page then reaches them through ToastUtils.cycleFocus from a control of its own."}
+    {...DOCS_SECTIONS.anotherShortcut}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Hotkeys.svelte`}>

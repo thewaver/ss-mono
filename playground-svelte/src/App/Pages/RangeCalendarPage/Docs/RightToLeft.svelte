@@ -7,6 +7,7 @@
     import PageCalendarDay from "../../../StyledComponents/CalendarContent/PageCalendarDay.svelte";
     import PageCalendarFrame from "../../../StyledComponents/CalendarContent/PageCalendarFrame.svelte";
     import PageCalendarWeekday from "../../../StyledComponents/CalendarContent/PageCalendarWeekday.svelte";
+    import { CHOOSE_DATE_RANGE_RIGHT_LABEL } from "@thewaver/ss-playground/App/Pages/RangeCalendarPage/RangeCalendarPage.const";
 
     let value = $state.raw<DateValueRange | undefined>();
     let month = $state.raw(DateValueUtils.getStartOfMonth(TODAY));
@@ -21,7 +22,7 @@
             bind:month
             today={TODAY}
             locale={LOCALE}
-            ariaLabel={"Choose a date range in a right-to-left box"}
+            ariaLabel={CHOOSE_DATE_RANGE_RIGHT_LABEL}
         >
             {#snippet renderDay(_unused, renderProps)}
                 <PageCalendarDay {renderProps} />

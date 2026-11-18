@@ -3,9 +3,10 @@ import { shallowRef } from "vue";
 
 import type { SortableOrientation } from "@thewaver/ss-components-vue";
 import { SORTABLE_DEFAULTS, SORTABLE_ORIENTATIONS } from "@thewaver/ss-components-vue";
+import { SortableKnobs } from "@thewaver/ss-playground/App/Knobs/Sortables.const";
 import { WCAG_URLS } from "@thewaver/ss-playground/App/PageComponents/DocsProse/DocsProse.const";
 import * as docsStyles from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.css";
-import { DOCS_ROOT } from "@thewaver/ss-playground/App/Pages/SortablePage/SortablePage.const";
+import { DOCS_ROOT, DOCS_SECTIONS } from "@thewaver/ss-playground/App/Pages/SortablePage/SortablePage.const";
 
 import PageDocsAlert from "../../PageComponents/DocsAlert/PageDocsAlert.vue";
 import PageDocsExample from "../../PageComponents/DocsExample/PageDocsExample.vue";
@@ -37,12 +38,7 @@ const isBoardLocked = shallowRef(false);
         <BasicDocsExample :orientation="orientation" :is-disabled="isDisabled" />
 
         <template #renderKnobs>
-            <PageProp
-                item-key="orientation"
-                label="Orientation"
-                hint="Whether the cards are stacked or sit side by side. While one is carried, the up and down arrows choose its place in a stack, and the left and right arrows in a row."
-                controls="Sets SortableProps.orientation"
-            >
+            <PageProp item-key="orientation" v-bind="SortableKnobs.ORIENTATION_TEXT">
                 <PageSelectField
                     :value="orientation"
                     :values="SORTABLE_ORIENTATIONS"
@@ -51,12 +47,7 @@ const isBoardLocked = shallowRef(false);
                 />
             </PageProp>
 
-            <PageProp
-                item-key="isDisabled"
-                label="Disabled"
-                hint="Turns the list off: nothing in it can be picked up or moved, by pointer or by key."
-                controls="Sets SortableProps.isDisabled"
-            >
+            <PageProp item-key="isDisabled" v-bind="SortableKnobs.IS_DISABLED_TEXT">
                 <PageCheckField
                     :value="isDisabled"
                     ariaLabel="Disabled"
@@ -66,30 +57,19 @@ const isBoardLocked = shallowRef(false);
         </template>
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Right to left"
-        content="Inside a box whose text runs right to left, a row of cards runs from the right, and while a card is carried the left arrow moves it on to a later place."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.rightLeft" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/RightToLeft.vue`">
         <RightToLeftDocsExample />
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Between two lists"
-        content="Lists that share a [prop]groupId[/prop] trade cards: drag one across, tap it and then tap a place in the other list, or press Tab while carrying it from the keyboard. Set [prop]isLocked[/prop] on a list and it can still be reordered, but it takes nothing from outside."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.betweenTwoLists" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Pair.vue`">
         <PairDocsExample :is-board-locked="isBoardLocked" />
 
         <template #renderKnobs>
-            <PageProp
-                item-key="isBoardLocked"
-                label="Board locked"
-                hint="Whether the board refuses every card from the hand, while its own cards can still be reordered."
-                controls="Sets SortableProps.isLocked on the board"
-            >
+            <PageProp item-key="isBoardLocked" v-bind="SortableKnobs.IS_BOARD_LOCKED_TEXT">
                 <PageCheckField
                     :value="isBoardLocked"
                     ariaLabel="Board locked"
@@ -99,19 +79,13 @@ const isBoardLocked = shallowRef(false);
         </template>
     </PageDocsExample>
 
-    <PageDocsSection
-        title="A list that refuses some cards"
-        content="Give a list [prop]computeCanAccept[/prop] and it decides card by card what it will take: this board takes nothing costing more than 3. A refused card is refused on every route, not only when it is dropped."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.listRefusingSomeCards" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Picky.vue`">
         <PickyDocsExample />
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Reordering round a ring"
-        content="Hand [prop]computeLayout[/prop] a layout and the cards are placed by it rather than laid in a line, here round a ring. A carried card lands on the nearest place instead of being compared along one axis, since a ring has none."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.reorderingRoundRing" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Ring.vue`">
         <RingDocsExample />

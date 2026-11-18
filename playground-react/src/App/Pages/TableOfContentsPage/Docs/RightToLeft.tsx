@@ -4,6 +4,7 @@ import { TableOfContents } from "@thewaver/ss-components-react";
 import type { TableOfContentsLink } from "@thewaver/ss-components-react";
 import {
     HEADING_LEVEL,
+    OUTLINE_RIGHT_LEFT_BOX_LABEL,
     SECTIONS,
     TOC_GAP,
 } from "@thewaver/ss-playground/App/Pages/TableOfContentsPage/TableOfContentsPage.const";
@@ -51,7 +52,7 @@ export const RightToLeftDocsExample = () => {
                 <TableOfContents
                     links={links}
                     gap={TOC_GAP}
-                    ariaLabel={"Outline in a right-to-left box"}
+                    ariaLabel={OUTLINE_RIGHT_LEFT_BOX_LABEL}
                     renderLink={(link, flags) => (
                         <PageTableOfContentsContent flags={flags} depth={link.depth ?? TOP_DEPTH}>
                             {SECTIONS.find((section) => section.id === link.value)?.title}

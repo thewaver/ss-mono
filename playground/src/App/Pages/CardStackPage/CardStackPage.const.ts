@@ -24,3 +24,7 @@ export const EXAMPLE_NAMES = {
 export const EXAMPLES_ROOT = "/src/App/Pages/CardStackPage/Examples";
 
 export const FIELD_WIDTH = 110;
+
+export const RECALL_LAST_CARD_LABEL = "Recall the last card";
+
+export const DEAL_CARDS_AGAIN_LABEL = "Deal the cards again";

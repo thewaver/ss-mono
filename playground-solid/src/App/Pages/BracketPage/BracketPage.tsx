@@ -47,12 +47,7 @@ const FamilyExampleWrapper = (props: Omit<BracketFamilyExampleProps, "isSnapping
             <FamilyExample {...props} isSnappingToFamily={getIsSnapping} />
 
             <PageExampleKnobs>
-                <PageProp
-                    key={"isSnappingToFamily"}
-                    label={"Snap to family"}
-                    hint={"Glides the window to frame the family in it once a drag, a pinch or the wheel is over."}
-                    controls={"Sets BracketProps.isSnappingToFamily"}
-                >
+                <PageProp key={"isSnappingToFamily"} {...BracketKnobs.IS_SNAPPING_TO_FAMILY_TEXT}>
                     <PageCheckField value={getIsSnapping} ariaLabel={"Snap to family"} onChange={setIsSnapping} />
                 </PageProp>
             </PageExampleKnobs>
@@ -182,12 +177,7 @@ export const BracketPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp
-                    key={"connector"}
-                    label={"Connectors"}
-                    hint={"The line drawn between a match and the one it feeds: straight, elbowed, or curved."}
-                    controls={"Picks the sample connector drawn by BracketProps.renderConnector"}
-                >
+                <PageProp key={"connector"} {...BracketKnobs.CONNECTOR_TEXT}>
                     <PageSelectField
                         value={getConnector}
                         values={BracketConnectors.SAMPLE_KEYS}
@@ -196,23 +186,11 @@ export const BracketPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"isBeamPlaying"}
-                    label={"Beams moving"}
-                    hint={
-                        "Whether the pulse runs along the lines between the focused node and the final. It starts stopped while the visitor has asked for reduced motion."
-                    }
-                    controls={"Plays the example beam drawn by BracketProps.renderConnector"}
-                >
+                <PageProp key={"isBeamPlaying"} {...BracketKnobs.IS_BEAM_PLAYING_TEXT}>
                     <PageCheckField value={getIsBeamPlaying} ariaLabel={"Beams moving"} onChange={setIsBeamPlaying} />
                 </PageProp>
 
-                <PageProp
-                    key={"orientation"}
-                    label={"Orientation"}
-                    hint={"Whether the rounds run across the page or down it."}
-                    controls={"Sets BracketProps.orientation"}
-                >
+                <PageProp key={"orientation"} {...BracketKnobs.ORIENTATION_TEXT}>
                     <PageSelectField
                         value={getOrientation}
                         values={BRACKET_ORIENTATIONS}
@@ -221,12 +199,7 @@ export const BracketPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"rootSide"}
-                    label={"Root side"}
-                    hint={"Which end the final holds, and so which way the rounds read."}
-                    controls={"Sets BracketProps.rootSide"}
-                >
+                <PageProp key={"rootSide"} {...BracketKnobs.ROOT_SIDE_TEXT}>
                     <PageSelectField
                         value={getRootSide}
                         values={BRACKET_ROOT_SIDES}
@@ -235,12 +208,7 @@ export const BracketPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"layerGap"}
-                    label={"Layer gap (px)"}
-                    hint={"The space between one round and the next."}
-                    controls={"Sets BracketProps.layerGap"}
-                >
+                <PageProp key={"layerGap"} {...BracketKnobs.LAYER_GAP_TEXT}>
                     <PageNumberField
                         value={getLayerGap}
                         min={BracketKnobs.MIN_LAYER_GAP}
@@ -251,12 +219,7 @@ export const BracketPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"crossGap"}
-                    label={"Row gap (px)"}
-                    hint={"The space between two matches in the same round."}
-                    controls={"Sets BracketProps.crossGap"}
-                >
+                <PageProp key={"crossGap"} {...BracketKnobs.CROSS_GAP_TEXT}>
                     <PageNumberField
                         value={getCrossGap}
                         min={BracketKnobs.MIN_CROSS_GAP}
@@ -267,14 +230,7 @@ export const BracketPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"transitionDurationMs"}
-                    label={"Glide (ms)"}
-                    hint={
-                        "How long the family example takes to glide from one family to the next. It is off while the visitor has asked for reduced motion."
-                    }
-                    controls={"Sets BracketProps.transitionDurationMs"}
-                >
+                <PageProp key={"transitionDurationMs"} {...BracketKnobs.TRANSITION_DURATION_MS_TEXT}>
                     <PageNumberField
                         value={getTransitionDurationMs}
                         min={BracketKnobs.MIN_TRANSITION_DURATION_MS}

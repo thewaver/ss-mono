@@ -1,6 +1,6 @@
 <script lang="ts">
     import { WCAG_URLS } from "@thewaver/ss-playground/App/PageComponents/DocsProse/DocsProse.const";
-    import { DOCS_ROOT } from "@thewaver/ss-playground/App/Pages/FileInputPage/FileInputPage.const";
+    import { DOCS_SECTIONS, DOCS_ROOT } from "@thewaver/ss-playground/App/Pages/FileInputPage/FileInputPage.const";
 
     import PageDocsAlert from "../../PageComponents/DocsAlert/PageDocsAlert.svelte";
     import PageDocsExample from "../../PageComponents/DocsExample/PageDocsExample.svelte";
@@ -14,6 +14,7 @@
     import MultipleDocsExample from "./Docs/Multiple.svelte";
     import RefusingDocsExample from "./Docs/Refusing.svelte";
     import TooltipDocsExample from "./Docs/Tooltip.svelte";
+    import { FileInputKnobs } from "@thewaver/ss-playground/App/Knobs/FileInputs.const";
 
     let hasError = $state(false);
     let isDisabled = $state(false);
@@ -29,9 +30,7 @@
     {#snippet renderKnobs()}
         <PageProp
             itemKey={"hasError"}
-            label={"Error"}
-            hint={"Marks the control invalid, for screen readers as well as for the painter."}
-            controls={"Sets FileInputProps.hasError"}
+            {...FileInputKnobs.HAS_ERROR_TEXT}
         >
             <PageCheckField
                 value={hasError}
@@ -44,9 +43,7 @@
 
         <PageProp
             itemKey={"isDisabled"}
-            label={"Disabled"}
-            hint={"Turns the control off: pressing it opens no dialog, a dropped file is refused, and the Tab key skips it."}
-            controls={"Sets FileInputProps.isDisabled"}
+            {...FileInputKnobs.IS_DISABLED_TEXT}
         >
             <PageCheckField
                 value={isDisabled}
@@ -60,8 +57,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Several files"}
-    content={"Set [prop]isMultiple[/prop] and the dialog lets several files be picked at once. The value is a list either way; without it, the list holds one file or none."}
+    {...DOCS_SECTIONS.severalFiles}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Multiple.svelte`}>
@@ -69,8 +65,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Only some kinds of file"}
-    content={"The dialog offers only the kinds of file [prop]accept[/prop] names, here images. The control checks every file again as it arrives, since the dialog can be switched to show everything, so a file of another kind is refused rather than kept."}
+    {...DOCS_SECTIONS.someFileKindsOnly}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Images.svelte`}>
@@ -78,8 +73,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Refusing a pick"}
-    content={"Every pick also runs [prop]onChange[/prop], and the control shows whatever its files then hold, so a pick can be refused by writing an empty list back. That is the place for a rule only you know, which no limit on the control can express. Here the files are bound for a system that cannot take a space in a name, so such a file is refused, the control shows its error, and the readout says why. Limits on type, size and count need no code: the control applies them itself, as the next section shows."}
+    {...DOCS_SECTIONS.refusingPick}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Refusing.svelte`}>
@@ -87,8 +81,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Dropping files, within limits"}
-    content={"Files can also be dropped anywhere on the control, and arrive exactly as a pick does. Each arrival is checked against [prop]accept[/prop], then [prop]maxSizeBytes[/prop], then [prop]maxFiles[/prop]: the files that pass are kept, and the ones refused go to [prop]onReject[/prop] together, each with the limit it failed. The painter is told [prop]isDragOver[/prop] while files are held over the control, so it can show where they will land."}
+    {...DOCS_SECTIONS.droppingFilesWithinLimits}
 />
 
 <PageDocsAlert severity="alert">
@@ -103,9 +96,7 @@
     {#snippet renderKnobs()}
         <PageProp
             itemKey={"dropZoneHasError"}
-            label={"Error"}
-            hint={"Marks the control invalid, for screen readers as well as for the painter."}
-            controls={"Sets FileInputProps.hasError"}
+            {...FileInputKnobs.HAS_ERROR_TEXT}
         >
             <PageCheckField
                 value={dropZoneHasError}
@@ -118,9 +109,7 @@
 
         <PageProp
             itemKey={"dropZoneIsDisabled"}
-            label={"Disabled"}
-            hint={"Turns the control off: pressing it opens no dialog, a dropped file is refused, and the Tab key skips it."}
-            controls={"Sets FileInputProps.isDisabled"}
+            {...FileInputKnobs.IS_DISABLED_TEXT}
         >
             <PageCheckField
                 value={dropZoneIsDisabled}
@@ -134,8 +123,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Tooltip"}
-    content={"Give a control [prop]tooltipDefs[/prop] and it shows a tooltip on hover and on keyboard focus, read by screen readers as the control's description. A disabled control shows no tooltip unless you also keep it reachable when disabled; it can then be focused to read why it is off, and pressing it still opens nothing."}
+    {...DOCS_SECTIONS.tooltip}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Tooltip.svelte`}>
@@ -144,9 +132,7 @@
     {#snippet renderKnobs()}
         <PageProp
             itemKey={"tooltipIsReachableWhenDisabled"}
-            label={"Reachable when disabled"}
-            hint={"Keeps a disabled control's tooltip available: the Tab key can stop on it and hovering it shows the tooltip. Without it a disabled control shows no tooltip at all. It only matters while Disabled is on."}
-            controls={"Sets FileInputProps.isReachableWhenDisabled"}
+            {...FileInputKnobs.TOOLTIP_IS_REACHABLE_WHEN_DISABLED_TEXT}
         >
             <PageCheckField
                 value={isReachableWhenDisabled}
@@ -159,9 +145,7 @@
 
         <PageProp
             itemKey={"tooltipIsDisabled"}
-            label={"Disabled"}
-            hint={"Turns the control off: pressing it opens no dialog, a dropped file is refused, and the Tab key skips it."}
-            controls={"Sets FileInputProps.isDisabled"}
+            {...FileInputKnobs.IS_DISABLED_TEXT}
         >
             <PageCheckField
                 value={isTooltipDisabled}
@@ -175,8 +159,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Named by a Label"}
-    content={"Inside a Label, the control takes its name from the label's text, so it needs no [prop]ariaLabel[/prop], and pressing the text opens the dialog."}
+    {...DOCS_SECTIONS.namedLabel}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Labeled.svelte`}>

@@ -32,12 +32,7 @@ const BlurExampleWrapper = (props: SVGFiltersExampleProps) => {
             <BlurExample {...props} stdDeviation={stdDeviation} />
 
             <PageExampleKnobs>
-                <PageProp
-                    itemKey={"stdDeviation"}
-                    label={"Std deviation"}
-                    hint={"How far the blur reaches. 0 leaves the picture sharp."}
-                    controls={"Sets SVGGaussianBlurFilterDefs.stdDeviation"}
-                >
+                <PageProp itemKey={"stdDeviation"} {...SVGFilterKnobs.STD_DEVIATION_TEXT}>
                     <PageNumberField
                         value={stdDeviation}
                         min={SVGFilterKnobs.Blur.MIN_DEVIATION}
@@ -71,12 +66,7 @@ const DropShadowExampleWrapper = (props: SVGFiltersExampleProps) => {
             />
 
             <PageExampleKnobs>
-                <PageProp
-                    itemKey={"dx"}
-                    label={"Offset x"}
-                    hint={"How far the shadow is thrown sideways from the shape casting it."}
-                    controls={"Sets SVGDropShadowFilterDefs.dx"}
-                >
+                <PageProp itemKey={"dx"} {...SVGFilterKnobs.DX_TEXT}>
                     <PageNumberField
                         value={dx}
                         min={SVGFilterKnobs.DropShadow.MIN_OFFSET}
@@ -86,12 +76,7 @@ const DropShadowExampleWrapper = (props: SVGFiltersExampleProps) => {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"dy"}
-                    label={"Offset y"}
-                    hint={"How far the shadow is thrown up or down from the shape casting it."}
-                    controls={"Sets SVGDropShadowFilterDefs.dy"}
-                >
+                <PageProp itemKey={"dy"} {...SVGFilterKnobs.DY_TEXT}>
                     <PageNumberField
                         value={dy}
                         min={SVGFilterKnobs.DropShadow.MIN_OFFSET}
@@ -101,12 +86,7 @@ const DropShadowExampleWrapper = (props: SVGFiltersExampleProps) => {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"shadowStdDeviation"}
-                    label={"Std deviation"}
-                    hint={"How soft the shadow's edge is. 0 gives a hard copy of the shape."}
-                    controls={"Sets SVGDropShadowFilterDefs.stdDeviation"}
-                >
+                <PageProp itemKey={"shadowStdDeviation"} {...SVGFilterKnobs.SHADOW_STD_DEVIATION_TEXT}>
                     <PageNumberField
                         value={stdDeviation}
                         min={SVGFilterKnobs.DropShadow.MIN_DEVIATION}
@@ -117,21 +97,11 @@ const DropShadowExampleWrapper = (props: SVGFiltersExampleProps) => {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"floodColor"}
-                    label={"Flood color"}
-                    hint={"The color the shadow is painted in."}
-                    controls={"Sets SVGDropShadowFilterDefs.floodColor"}
-                >
+                <PageProp itemKey={"floodColor"} {...SVGFilterKnobs.FLOOD_COLOR_TEXT}>
                     <PageColorField value={floodColor} ariaLabel={"Flood color"} onInput={setFloodColor} />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"floodOpacity"}
-                    label={"Flood opacity"}
-                    hint={"How solid the shadow is. 0 hides it entirely."}
-                    controls={"Sets SVGDropShadowFilterDefs.floodOpacity"}
-                >
+                <PageProp itemKey={"floodOpacity"} {...SVGFilterKnobs.FLOOD_OPACITY_TEXT}>
                     <PageNumberField
                         value={floodOpacity}
                         min={SVGFilterKnobs.DropShadow.MIN_OPACITY}
@@ -170,14 +140,7 @@ const TurbulenceExampleWrapper = (props: SVGFiltersExampleProps) => {
             />
 
             <PageExampleKnobs>
-                <PageProp
-                    itemKey={"type"}
-                    label={"Type"}
-                    hint={
-                        "Which noise is generated: fractal noise is soft and cloudy, turbulence is sharper and more veined."
-                    }
-                    controls={"Sets SVGTurbulenceFilterDefs.type"}
-                >
+                <PageProp itemKey={"type"} {...SVGFilterKnobs.TYPE_TEXT}>
                     <PageSelectField
                         value={type}
                         values={SVGFilterDefs.TURBULENCE_TYPES}
@@ -186,12 +149,7 @@ const TurbulenceExampleWrapper = (props: SVGFiltersExampleProps) => {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"baseFrequencyX"}
-                    label={"Base frequency x"}
-                    hint={"How fine the noise is across. Higher numbers make a tighter grain."}
-                    controls={"Sets the x of SVGTurbulenceFilterDefs.baseFrequency"}
-                >
+                <PageProp itemKey={"baseFrequencyX"} {...SVGFilterKnobs.BASE_FREQUENCY_X_TEXT}>
                     <PageNumberField
                         value={frequencyX}
                         min={SVGFilterKnobs.Turbulence.MIN_FREQUENCY}
@@ -202,12 +160,7 @@ const TurbulenceExampleWrapper = (props: SVGFiltersExampleProps) => {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"baseFrequencyY"}
-                    label={"Base frequency y"}
-                    hint={"How fine the noise is down. Set it apart from the across value to stretch the grain."}
-                    controls={"Sets the y of SVGTurbulenceFilterDefs.baseFrequency"}
-                >
+                <PageProp itemKey={"baseFrequencyY"} {...SVGFilterKnobs.BASE_FREQUENCY_Y_TEXT}>
                     <PageNumberField
                         value={frequencyY}
                         min={SVGFilterKnobs.Turbulence.MIN_FREQUENCY}
@@ -218,12 +171,7 @@ const TurbulenceExampleWrapper = (props: SVGFiltersExampleProps) => {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"scale"}
-                    label={"Scale"}
-                    hint={"How far the noise pushes the picture about. 0 leaves the picture where it was."}
-                    controls={"Sets SVGTurbulenceFilterDefs.scale"}
-                >
+                <PageProp itemKey={"scale"} {...SVGFilterKnobs.SCALE_TEXT}>
                     <PageNumberField
                         value={scale}
                         min={SVGFilterKnobs.Turbulence.MIN_SCALE}
@@ -233,12 +181,7 @@ const TurbulenceExampleWrapper = (props: SVGFiltersExampleProps) => {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"numOctaves"}
-                    label={"Octaves"}
-                    hint={"How many layers of noise are piled up. More layers add fine detail and cost more to draw."}
-                    controls={"Sets SVGTurbulenceFilterDefs.numOctaves"}
-                >
+                <PageProp itemKey={"numOctaves"} {...SVGFilterKnobs.NUM_OCTAVES_TEXT}>
                     <PageNumberField
                         value={octaves}
                         min={SVGFilterKnobs.Turbulence.MIN_OCTAVES}
@@ -248,14 +191,7 @@ const TurbulenceExampleWrapper = (props: SVGFiltersExampleProps) => {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"seed"}
-                    label={"Seed"}
-                    hint={
-                        "The number the random noise is grown from. Change it for a different pattern at the same settings."
-                    }
-                    controls={"Sets SVGTurbulenceFilterDefs.seed"}
-                >
+                <PageProp itemKey={"seed"} {...SVGFilterKnobs.SEED_TEXT}>
                     <PageNumberField
                         value={seed}
                         min={SVGFilterKnobs.Turbulence.MIN_SEED}
@@ -265,12 +201,7 @@ const TurbulenceExampleWrapper = (props: SVGFiltersExampleProps) => {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"xChannelSelector"}
-                    label={"X channel"}
-                    hint={"Which channel of the noise decides how far each point moves sideways."}
-                    controls={"Sets SVGTurbulenceFilterDefs.xChannelSelector"}
-                >
+                <PageProp itemKey={"xChannelSelector"} {...SVGFilterKnobs.X_CHANNEL_SELECTOR_TEXT}>
                     <PageSelectField
                         value={xChannel}
                         values={SVGFilterDefs.DISPLACEMENT_CHANNELS}
@@ -279,12 +210,7 @@ const TurbulenceExampleWrapper = (props: SVGFiltersExampleProps) => {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"yChannelSelector"}
-                    label={"Y channel"}
-                    hint={"Which channel of the noise decides how far each point moves up or down."}
-                    controls={"Sets SVGTurbulenceFilterDefs.yChannelSelector"}
-                >
+                <PageProp itemKey={"yChannelSelector"} {...SVGFilterKnobs.Y_CHANNEL_SELECTOR_TEXT}>
                     <PageSelectField
                         value={yChannel}
                         values={SVGFilterDefs.DISPLACEMENT_CHANNELS}
@@ -309,12 +235,7 @@ const HueExampleWrapper = (props: SVGFiltersExampleProps) => {
             <HueExample {...props} deg={deg} saturation={saturation} r={red} g={green} b={blue} />
 
             <PageExampleKnobs>
-                <PageProp
-                    itemKey={"deg"}
-                    label={"Hue rotation"}
-                    hint={"How far every color is turned round the color wheel."}
-                    controls={"Sets SVGHueRotationFilterDefs.deg"}
-                >
+                <PageProp itemKey={"deg"} {...SVGFilterKnobs.DEG_TEXT}>
                     <PageNumberField
                         value={deg}
                         min={SVGFilterKnobs.Hue.MIN_DEG}
@@ -325,12 +246,7 @@ const HueExampleWrapper = (props: SVGFiltersExampleProps) => {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"saturation"}
-                    label={"Saturation"}
-                    hint={"How colorful the result is. 0 takes it to gray, above 1 pushes the colors harder."}
-                    controls={"Sets SVGSaturationFilterDefs.amount"}
-                >
+                <PageProp itemKey={"saturation"} {...SVGFilterKnobs.SATURATION_TEXT}>
                     <PageNumberField
                         value={saturation}
                         min={SVGFilterKnobs.Hue.MIN_AMOUNT}
@@ -341,14 +257,7 @@ const HueExampleWrapper = (props: SVGFiltersExampleProps) => {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"red"}
-                    label={"Red"}
-                    hint={
-                        "How much the red channel is scaled on its own, after the hue and saturation have been applied."
-                    }
-                    controls={"Sets SVGColorFilterDefs.r"}
-                >
+                <PageProp itemKey={"red"} {...SVGFilterKnobs.RED_TEXT}>
                     <PageNumberField
                         value={red}
                         min={SVGFilterKnobs.Hue.MIN_CHANNEL}
@@ -359,14 +268,7 @@ const HueExampleWrapper = (props: SVGFiltersExampleProps) => {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"green"}
-                    label={"Green"}
-                    hint={
-                        "How much the green channel is scaled on its own, after the hue and saturation have been applied."
-                    }
-                    controls={"Sets SVGColorFilterDefs.g"}
-                >
+                <PageProp itemKey={"green"} {...SVGFilterKnobs.GREEN_TEXT}>
                     <PageNumberField
                         value={green}
                         min={SVGFilterKnobs.Hue.MIN_CHANNEL}
@@ -377,14 +279,7 @@ const HueExampleWrapper = (props: SVGFiltersExampleProps) => {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"blue"}
-                    label={"Blue"}
-                    hint={
-                        "How much the blue channel is scaled on its own, after the hue and saturation have been applied."
-                    }
-                    controls={"Sets SVGColorFilterDefs.b"}
-                >
+                <PageProp itemKey={"blue"} {...SVGFilterKnobs.BLUE_TEXT}>
                     <PageNumberField
                         value={blue}
                         min={SVGFilterKnobs.Hue.MIN_CHANNEL}
@@ -409,12 +304,7 @@ const ToneExampleWrapper = (props: SVGFiltersExampleProps) => {
             <ToneExample {...props} brightness={brightness} contrast={contrast} inversion={inversion} />
 
             <PageExampleKnobs>
-                <PageProp
-                    itemKey={"brightness"}
-                    label={"Brightness"}
-                    hint={"How much lighter or darker the picture is. 1 leaves it alone."}
-                    controls={"Sets SVGBrightnessFilterDefs.amount"}
-                >
+                <PageProp itemKey={"brightness"} {...SVGFilterKnobs.BRIGHTNESS_TEXT}>
                     <PageNumberField
                         value={brightness}
                         min={SVGFilterKnobs.Tone.MIN_AMOUNT}
@@ -425,12 +315,7 @@ const ToneExampleWrapper = (props: SVGFiltersExampleProps) => {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"contrast"}
-                    label={"Contrast"}
-                    hint={"How far the lights and darks are pushed apart. 1 leaves it alone."}
-                    controls={"Sets SVGContrastFilterDefs.amount"}
-                >
+                <PageProp itemKey={"contrast"} {...SVGFilterKnobs.CONTRAST_TEXT}>
                     <PageNumberField
                         value={contrast}
                         min={SVGFilterKnobs.Tone.MIN_AMOUNT}
@@ -441,12 +326,7 @@ const ToneExampleWrapper = (props: SVGFiltersExampleProps) => {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"inversion"}
-                    label={"Inversion"}
-                    hint={"How far the colors are flipped to their opposites. 0 leaves them alone, 1 fully inverts."}
-                    controls={"Sets SVGInversionFilterDefs.amount"}
-                >
+                <PageProp itemKey={"inversion"} {...SVGFilterKnobs.INVERSION_TEXT}>
                     <PageNumberField
                         value={inversion}
                         min={SVGFilterKnobs.Tone.MIN_INVERSION}
@@ -469,14 +349,7 @@ const PixelateExampleWrapper = (props: SVGFiltersExampleProps) => {
             <PixelateExample {...props} size={size} />
 
             <PageExampleKnobs>
-                <PageProp
-                    itemKey={"pixelSize"}
-                    label={"Square size (px)"}
-                    hint={
-                        "How wide each square is. Each takes the color at its own middle; 1 leaves the picture alone."
-                    }
-                    controls={"Sets SVGPixelateFilterDefs.size"}
-                >
+                <PageProp itemKey={"pixelSize"} {...SVGFilterKnobs.PIXEL_SIZE_TEXT}>
                     <PageNumberField
                         value={size}
                         min={SVGFilterKnobs.Pixelate.MIN_SIZE}
@@ -557,14 +430,7 @@ export const SVGFiltersPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp
-                    itemKey={"method"}
-                    label={"Method"}
-                    hint={
-                        "Whether each step is fed the result of the one before it, or each works from the original and the results are combined."
-                    }
-                    controls={"Sets SVGFilterAssemblyDefs.method"}
-                >
+                <PageProp itemKey={"method"} {...SVGFilterKnobs.METHOD_TEXT}>
                     <PageSelectField
                         value={method}
                         values={SVGFilterDefs.METHODS}
@@ -573,14 +439,7 @@ export const SVGFiltersPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"elementSize"}
-                    label={"Region sized from the element"}
-                    hint={
-                        "Sizes the area the filter is allowed to paint in from the element itself, rather than from a fixed region."
-                    }
-                    controls={"Switches SVGFilterAssemblyDefs.elementSize between the example element's size and none"}
-                >
+                <PageProp itemKey={"elementSize"} {...SVGFilterKnobs.ELEMENT_SIZE_TEXT}>
                     <PageCheckField
                         value={isSizedFromElement}
                         ariaLabel={"Region sized from the element"}

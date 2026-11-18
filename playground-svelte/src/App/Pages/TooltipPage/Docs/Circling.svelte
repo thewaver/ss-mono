@@ -1,11 +1,6 @@
 <script lang="ts">
     import { Range } from "@thewaver/ss-components-svelte";
-    import {
-        CIRCLING_MAX_DEGREES,
-        CIRCLING_MIN_DEGREES,
-        CIRCLING_STEP_DEGREES,
-        STARTING_CIRCLING_DEGREES,
-    } from "@thewaver/ss-playground/App/Pages/TooltipPage/TooltipPage.const";
+    import { CIRCLING_MAX_DEGREES, CIRCLING_MIN_DEGREES, CIRCLING_STEP_DEGREES, STARTING_CIRCLING_DEGREES, WHERE_ARROW_SITS_ROUND_LABEL } from "@thewaver/ss-playground/App/Pages/TooltipPage/TooltipPage.const";
     import * as styles from "@thewaver/ss-playground/App/Pages/TooltipPage/TooltipPage.css";
     import { computeCirclingAim } from "@thewaver/ss-playground/App/Pages/TooltipPage/TooltipPage.utils";
     import { RANGE_THUMB_SIZE } from "@thewaver/ss-playground/App/StyledComponents/RangeContent/RangeContent.css";
@@ -40,7 +35,7 @@
             step={CIRCLING_STEP_DEGREES}
             sizing={"fill"}
             thumbSize={RANGE_THUMB_SIZE}
-            ariaLabel={"Where the arrow sits round the tooltip"}
+            ariaLabel={WHERE_ARROW_SITS_ROUND_LABEL}
         >
             {#snippet renderContent(renderProps)}
                 <PageRangeContent {renderProps} />

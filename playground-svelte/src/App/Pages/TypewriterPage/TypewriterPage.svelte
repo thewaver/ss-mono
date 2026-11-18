@@ -143,9 +143,7 @@
 
         <PageProp
             itemKey={"textEffect"}
-            controls={"Picks the example keyframes sent to TypewriterProps.computeAnimationName"}
-            label={"Effect"}
-            hint={"How each character arrives: plainly, or with one of the entrance effects."}
+            {...TypewriterKnobs.TEXT_EFFECT_TEXT}
         >
             <PageSelectField
                 value={textEffect}
@@ -159,9 +157,7 @@
 
         <PageProp
             itemKey={"arrivalOrder"}
-            controls={"Picks the sample weight function sent to TypewriterProps.computeCharacterWeights"}
-            label={"Arrival order"}
-            hint={"The order the characters arrive in: left to right, from the middle out, scattered, and so on. Erasing runs it backwards. The caret is meant for left to right, and jumps about under the others."}
+            {...TypewriterKnobs.ARRIVAL_ORDER_TEXT}
         >
             <PageSelectField
                 value={arrivalOrder}

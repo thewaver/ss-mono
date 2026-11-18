@@ -33,9 +33,7 @@
 <PageExampleKnobs>
     <PageProp
         itemKey={"maxBlurPx"}
-        controls={"Sets the example's blur, read by its RGBAnimationProps.computeSliceAnimation"}
-        label={"Blur (px)"}
-        hint={"How soft each channel goes at the worst of its turn out of focus."}
+        {...RGBAnimationKnobs.MAX_BLUR_PX_TEXT}
     >
         <PageNumberField
             value={maxBlurPx}

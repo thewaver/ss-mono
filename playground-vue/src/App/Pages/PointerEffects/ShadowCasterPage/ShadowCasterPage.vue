@@ -65,12 +65,7 @@ const examples: ExampleDefs[] = [
 
 <template>
     <PagePropsPanel scope="global">
-        <PageProp
-            item-key="isDisabled"
-            controls="Sets ShadowCasterProps.isDisabled"
-            label="Disabled"
-            hint="Stops the shadow following the pointer and leaves it at rest. It is what a page honoring a reduced-motion preference passes."
-        >
+        <PageProp item-key="isDisabled" v-bind="ShadowCasterKnobs.IS_DISABLED_TEXT">
             <PageCheckField
                 :value="isDisabled"
                 ariaLabel="Disabled"
@@ -78,12 +73,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="smoothingMs"
-            controls="Sets ShadowCasterProps.smoothingMs"
-            label="Smoothing (ms)"
-            hint="How long the shadow takes to catch up with the pointer. At 0 it follows exactly; raised, it swings after a quick movement and eases back to rest."
-        >
+        <PageProp item-key="smoothingMs" v-bind="ShadowCasterKnobs.SMOOTHING_MS_TEXT">
             <PageNumberField
                 :value="smoothingMs"
                 :min="ShadowCasterKnobs.MIN_SMOOTHING_MS"
@@ -95,12 +85,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="activeRangePx"
-            controls="Sets ShadowCasterProps.activeRangePx"
-            label="Active range (px)"
-            hint="How near the pointer has to be before the shadow answers it at all, measured from the content's center. Outside it the shadow rests."
-        >
+        <PageProp item-key="activeRangePx" v-bind="ShadowCasterKnobs.ACTIVE_RANGE_PX_TEXT">
             <PageNumberField
                 :value="activeRangePx"
                 :min="ShadowCasterKnobs.MIN_ACTIVE_RANGE_PX"
@@ -112,12 +97,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="lightRangePx"
-            controls="Sets ShadowCasterProps.lightRangePx"
-            label="Light range (px)"
-            hint="How far the pointer's light reaches. Past it the shadow is at its longest and faintest."
-        >
+        <PageProp item-key="lightRangePx" v-bind="ShadowCasterKnobs.LIGHT_RANGE_PX_TEXT">
             <PageNumberField
                 :value="lightRangePx"
                 :min="ShadowCasterKnobs.MIN_LIGHT_RANGE_PX"
@@ -129,12 +109,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="maxThrowPx"
-            controls="Sets ShadowCasterProps.maxThrowPx"
-            label="Max throw (px)"
-            hint="How far the shadow is thrown once the pointer is out at the edge of the light."
-        >
+        <PageProp item-key="maxThrowPx" v-bind="ShadowCasterKnobs.MAX_THROW_PX_TEXT">
             <PageNumberField
                 :value="maxThrowPx"
                 :min="ShadowCasterKnobs.MIN_THROW_PX"
@@ -146,12 +121,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="minBlurPx"
-            controls="Sets ShadowCasterProps.minBlurPx"
-            label="Near blur (px)"
-            hint="How soft the shadow is with the pointer on the content."
-        >
+        <PageProp item-key="minBlurPx" v-bind="ShadowCasterKnobs.MIN_BLUR_PX_TEXT">
             <PageNumberField
                 :value="minBlurPx"
                 :min="ShadowCasterKnobs.MIN_BLUR_PX"
@@ -163,12 +133,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="maxBlurPx"
-            controls="Sets ShadowCasterProps.maxBlurPx"
-            label="Far blur (px)"
-            hint="How soft the shadow is once the pointer is out at the edge of the light."
-        >
+        <PageProp item-key="maxBlurPx" v-bind="ShadowCasterKnobs.MAX_BLUR_PX_TEXT">
             <PageNumberField
                 :value="maxBlurPx"
                 :min="ShadowCasterKnobs.MIN_BLUR_PX"
@@ -180,12 +145,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="maxOpacity"
-            controls="Sets ShadowCasterProps.maxOpacity"
-            label="Near opacity"
-            hint="How dark the shadow is with the pointer on the content. It fades as the pointer retreats."
-        >
+        <PageProp item-key="maxOpacity" v-bind="ShadowCasterKnobs.MAX_OPACITY_TEXT">
             <PageNumberField
                 :value="maxOpacity"
                 :min="ShadowCasterKnobs.MIN_OPACITY"
@@ -197,12 +157,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="minOpacity"
-            controls="Sets ShadowCasterProps.minOpacity"
-            label="Far opacity"
-            hint="How dark the shadow is once the pointer is out at the edge of the light. Nothing, by default."
-        >
+        <PageProp item-key="minOpacity" v-bind="ShadowCasterKnobs.MIN_OPACITY_TEXT">
             <PageNumberField
                 :value="minOpacity"
                 :min="ShadowCasterKnobs.MIN_OPACITY"
@@ -214,12 +169,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="restingOpacity"
-            controls="Sets ShadowCasterProps.restingOpacity"
-            label="Resting opacity"
-            hint="How dark the shadow is with no pointer near it at all, or with the effect turned off."
-        >
+        <PageProp item-key="restingOpacity" v-bind="ShadowCasterKnobs.RESTING_OPACITY_TEXT">
             <PageNumberField
                 :value="restingOpacity"
                 :min="ShadowCasterKnobs.MIN_OPACITY"
@@ -231,12 +181,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="color"
-            controls="Sets ShadowCasterProps.color"
-            label="Color"
-            hint="What the shadow is made of. Whatever alpha it carries is replaced by the opacity ramp."
-        >
+        <PageProp item-key="color" v-bind="ShadowCasterKnobs.COLOR_TEXT">
             <PageColorField :value="color" ariaLabel="Color" @input="(value: string) => (color = value)" />
         </PageProp>
     </PagePropsPanel>

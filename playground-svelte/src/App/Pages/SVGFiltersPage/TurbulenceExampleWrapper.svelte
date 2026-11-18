@@ -36,9 +36,7 @@
 <PageExampleKnobs>
     <PageProp
         itemKey={"type"}
-        controls={"Sets SVGTurbulenceFilterDefs.type"}
-        label={"Type"}
-        hint={"Which noise is generated: fractal noise is soft and cloudy, turbulence is sharper and more veined."}
+        {...SVGFilterKnobs.TYPE_TEXT}
     >
         <PageSelectField
             value={type}
@@ -50,9 +48,7 @@
 
     <PageProp
         itemKey={"baseFrequencyX"}
-        controls={"Sets the x of SVGTurbulenceFilterDefs.baseFrequency"}
-        label={"Base frequency x"}
-        hint={"How fine the noise is across. Higher numbers make a tighter grain."}
+        {...SVGFilterKnobs.BASE_FREQUENCY_X_TEXT}
     >
         <PageNumberField
             value={frequencyX}
@@ -66,9 +62,7 @@
 
     <PageProp
         itemKey={"baseFrequencyY"}
-        controls={"Sets the y of SVGTurbulenceFilterDefs.baseFrequency"}
-        label={"Base frequency y"}
-        hint={"How fine the noise is down. Set it apart from the across value to stretch the grain."}
+        {...SVGFilterKnobs.BASE_FREQUENCY_Y_TEXT}
     >
         <PageNumberField
             value={frequencyY}
@@ -82,9 +76,7 @@
 
     <PageProp
         itemKey={"scale"}
-        controls={"Sets SVGTurbulenceFilterDefs.scale"}
-        label={"Scale"}
-        hint={"How far the noise pushes the picture about. 0 leaves the picture where it was."}
+        {...SVGFilterKnobs.SCALE_TEXT}
     >
         <PageNumberField
             value={scale}
@@ -97,9 +89,7 @@
 
     <PageProp
         itemKey={"numOctaves"}
-        controls={"Sets SVGTurbulenceFilterDefs.numOctaves"}
-        label={"Octaves"}
-        hint={"How many layers of noise are piled up. More layers add fine detail and cost more to draw."}
+        {...SVGFilterKnobs.NUM_OCTAVES_TEXT}
     >
         <PageNumberField
             value={octaves}
@@ -112,9 +102,7 @@
 
     <PageProp
         itemKey={"seed"}
-        controls={"Sets SVGTurbulenceFilterDefs.seed"}
-        label={"Seed"}
-        hint={"The number the random noise is grown from. Change it for a different pattern at the same settings."}
+        {...SVGFilterKnobs.SEED_TEXT}
     >
         <PageNumberField
             value={seed}
@@ -127,9 +115,7 @@
 
     <PageProp
         itemKey={"xChannelSelector"}
-        controls={"Sets SVGTurbulenceFilterDefs.xChannelSelector"}
-        label={"X channel"}
-        hint={"Which channel of the noise decides how far each point moves sideways."}
+        {...SVGFilterKnobs.X_CHANNEL_SELECTOR_TEXT}
     >
         <PageSelectField
             value={xChannel}
@@ -141,9 +127,7 @@
 
     <PageProp
         itemKey={"yChannelSelector"}
-        controls={"Sets SVGTurbulenceFilterDefs.yChannelSelector"}
-        label={"Y channel"}
-        hint={"Which channel of the noise decides how far each point moves up or down."}
+        {...SVGFilterKnobs.Y_CHANNEL_SELECTOR_TEXT}
     >
         <PageSelectField
             value={yChannel}

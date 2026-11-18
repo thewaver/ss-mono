@@ -7,6 +7,7 @@ import {
     HAND,
     LIST_GAP,
     LIST_MIN_HEIGHT,
+    ROW_RIGHT_LEFT_BOX_LABEL,
     computeCardKey,
     computeCardLabel,
 } from "@thewaver/ss-playground/App/Pages/SortablePage/SortablePage.const";
@@ -27,7 +28,7 @@ export const RightToLeftDocsExample = () => {
             <PageSortableRoom>
                 <Sortable
                     groupId={"rightToLeft"}
-                    ariaLabel={"Row in a right-to-left box"}
+                    ariaLabel={ROW_RIGHT_LEFT_BOX_LABEL}
                     orientation={"horizontal"}
                     announcements={SORTABLE_ANNOUNCEMENTS}
                     gap={LIST_GAP}

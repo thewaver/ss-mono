@@ -70,14 +70,7 @@ export const WraparoundPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp
-                    key={"driftPxPerSecond"}
-                    label={"Marquee speed (px/s)"}
-                    hint={
-                        "How far the marquee's strip drifts in a second. It is off while the visitor has asked for reduced motion."
-                    }
-                    controls={"Sets WraparoundProps.driftPxPerSecond"}
-                >
+                <PageProp key={"driftPxPerSecond"} {...WraparoundKnobs.DRIFT_PX_PER_SECOND_TEXT}>
                     <PageNumberField
                         value={getDriftPxPerSecond}
                         min={WraparoundKnobs.MIN_DRIFT_PX_PER_SECOND}
@@ -89,14 +82,7 @@ export const WraparoundPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"driftDegrees"}
-                    label={"Marquee direction (°)"}
-                    hint={
-                        "Which way the marquee's strip drifts: 0 is to the right, 90 down, 180 to the left and 270 up."
-                    }
-                    controls={"Sets WraparoundProps.driftDegrees"}
-                >
+                <PageProp key={"driftDegrees"} {...WraparoundKnobs.DRIFT_DEGREES_TEXT}>
                     <PageNumberField
                         value={getDriftDegrees}
                         min={WraparoundKnobs.MIN_DRIFT_DEGREES}

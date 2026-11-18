@@ -2,6 +2,7 @@ import { useState, useSyncExternalStore } from "react";
 
 import { Button, DrumWheel } from "@thewaver/ss-components-react";
 import type { WheelController } from "@thewaver/ss-components-react";
+import { PRIZE_DRUM_TURNING_OVER_LABEL } from "@thewaver/ss-playground/App/Pages/Wheels/DrumWheelPage/DrumWheelPage.const";
 import { pickPrizeIndex } from "@thewaver/ss-playground/App/Pages/Wheels/Wheels.const";
 import type { Size2d } from "@thewaver/ss-utils";
 
@@ -37,7 +38,7 @@ export const OverExample = ({ wedges, ...otherProps }: Props) => {
                         wedges={wedges}
                         axis={"column"}
                         wedgeSize={WEDGE_SIZE}
-                        ariaLabel={"Prize drum, turning over"}
+                        ariaLabel={PRIZE_DRUM_TURNING_OVER_LABEL}
                         computeSpinTarget={() => pickPrizeIndex(wedges.length)}
                         computeWedgeLabel={(index) => `${wedges[index]}, ${index + 1} of ${wedges.length}`}
                         renderWedge={(wedge, state) => <PageWheelCard state={state}>{wedge}</PageWheelCard>}

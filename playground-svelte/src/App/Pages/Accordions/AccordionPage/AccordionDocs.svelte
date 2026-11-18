@@ -2,7 +2,7 @@
     import { ACCORDION_ORIENTATIONS, COLLAPSIBLE_DEFAULTS } from "@thewaver/ss-components-svelte";
     import type { AccordionOrientation } from "@thewaver/ss-components-svelte";
     import { AccordionKnobs } from "@thewaver/ss-playground/App/Knobs/Accordions.const";
-    import {
+    import { DOCS_SECTIONS,
         ACCORDION_POLICIES,
         DEFAULT_ACCORDION_POLICY,
         DOCS_ROOT,
@@ -42,9 +42,7 @@
     {#snippet renderKnobs()}
         <PageProp
             itemKey={"policy"}
-            label={"Policy"}
-            hint={"How many sections may be open: any number, one at a time, or one at a time with never none, where the only way out of an open section is into another one."}
-            controls={"Sets AccordionProps.isSingleExpand and isExpandRequired"}
+            {...AccordionKnobs.POLICY_TEXT}
         >
             <PageSelectField
                 value={policy}
@@ -56,7 +54,7 @@
             />
         </PageProp>
 
-        <PageProp itemKey={"gap"} label={"Gap (px)"} hint={"The space between sections."} controls={"Sets AccordionProps.gap"}>
+        <PageProp itemKey={"gap"} {...AccordionKnobs.GAP_TEXT}>
             <PageNumberField
                 value={gap}
                 min={AccordionKnobs.MIN_GAP}
@@ -72,9 +70,7 @@
 
         <PageProp
             itemKey={"transitionDurationMs"}
-            label={"Transition duration (ms)"}
-            hint={"How long a section takes to open and close. At 0 it opens and closes at once."}
-            controls={"Sets AccordionProps.transitionDurationMs"}
+            {...AccordionKnobs.TRANSITION_DURATION_MS_TEXT}
         >
             <PageNumberField
                 value={transitionDurationMs}
@@ -92,8 +88,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Opening and closing from outside"}
-    content={"The accordion keeps track of which sections are open by itself. To open or close them from elsewhere on the page, hold the list and pass it in as [prop]expanded[/prop]: both sides write it, so a header press updates your list and writing your list opens or closes sections."}
+    {...DOCS_SECTIONS.openingClosingOutside}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Controlled.svelte`}>
@@ -101,8 +96,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Panels that follow their content"}
-    content={"A panel opens to its content's own height and keeps following it. Content that appears after the panel is open makes the panel grow, with no reopening and no height to guess."}
+    {...DOCS_SECTIONS.panelsFollowContent}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Growing.svelte`}>
@@ -110,8 +104,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Built on first open"}
-    content={"Set [prop]isPanelBuiltOnExpand[/prop] and a panel's content is not built until its section is first opened, and it stays built afterwards. Use it for panels that are costly to build."}
+    {...DOCS_SECTIONS.builtFirstOpen}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Deferred.svelte`}>
@@ -119,8 +112,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Scrolled into view"}
-    content={"Set [prop]isScrolledIntoViewOnExpand[/prop] and a section is brought into view once it has finished opening, which matters when the accordion sits in a box that scrolls: opening a section below the fold brings it up."}
+    {...DOCS_SECTIONS.scrolledIntoView}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Scrolled.svelte`}>
@@ -129,9 +121,7 @@
     {#snippet renderKnobs()}
         <PageProp
             itemKey={"isScrolledIntoViewOnExpand"}
-            label={"Scroll into view"}
-            hint={"Brings a section into view once it has finished opening."}
-            controls={"Sets AccordionProps.isScrolledIntoViewOnExpand"}
+            {...AccordionKnobs.IS_SCROLLED_INTO_VIEW_ON_EXPAND_TEXT}
         >
             <PageCheckField
                 value={isScrolledIntoView}
@@ -145,8 +135,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Orientation"}
-    content={"Set [prop]orientation[/prop] to horizontal and the sections sit side by side, each panel opening beside its header and growing in width; vertical, the default, stacks them. The arrow keys that walk the headers follow it: up and down for a column, left and right for a row, reversed in right-to-left text. The panel is also told which way the person moved, forward or backward, so its content can slide in from that side; the motion is yours."}
+    {...DOCS_SECTIONS.orientation}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Orientation.svelte`}>
@@ -155,9 +144,7 @@
     {#snippet renderKnobs()}
         <PageProp
             itemKey={"orientation"}
-            label={"Orientation"}
-            hint={"Which way the sections run: stacked, each panel opening below its header, or side by side, each panel opening beside it."}
-            controls={"Sets AccordionProps.orientation"}
+            {...AccordionKnobs.ORIENTATION_TEXT}
         >
             <PageSelectField
                 value={orientation}

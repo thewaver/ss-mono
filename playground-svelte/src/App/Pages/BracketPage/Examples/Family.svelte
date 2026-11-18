@@ -13,6 +13,7 @@
     import type { BracketFamilyExampleProps } from "../BracketPage.types";
     import PageBracketLayerHeader from "../PageBracketLayerHeader.svelte";
     import PageBracketNode from "../PageBracketNode.svelte";
+    import { KNOCKOUT_DRAW_ONE_FAMILY_LABEL } from "@thewaver/ss-playground/App/Pages/BracketPage/BracketPage.const";
 
     const NODE_SIZE = { width: 96, height: 34 };
     const ROUND_NAMES = ["Final", "Semifinals", "Quarterfinals", "Entrants"];
@@ -91,7 +92,7 @@
                 orientation={props.orientation}
                 rootSide={props.rootSide}
                 layerHeaderSize={headerSize}
-                ariaLabel={"Knockout draw, one family at a time"}
+                ariaLabel={KNOCKOUT_DRAW_ONE_FAMILY_LABEL}
                 onActivate={props.onActivate}
                 renderConnector={props.renderConnector}
             >

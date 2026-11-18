@@ -2,7 +2,7 @@
     import { ColorArea } from "@thewaver/ss-components-svelte";
     import { COLOR_AREA_AXIS_LABELS } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
     import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
-    import { STARTING_HSV } from "@thewaver/ss-playground/App/Pages/ColorAreaPage/ColorAreaPage.const";
+    import { STARTING_HSV, SATURATION_BRIGHTNESS_LABEL } from "@thewaver/ss-playground/App/Pages/ColorAreaPage/ColorAreaPage.const";
     import { Color } from "@thewaver/ss-utils";
 
     import PageColorAreaContent from "../../../StyledComponents/ColorAreaContent/PageColorAreaContent.svelte";
@@ -21,7 +21,7 @@
     bind:hsv
     sizing={"fill"}
     isDisabled={props.isDisabled}
-    ariaLabel={"Saturation and brightness"}
+    ariaLabel={SATURATION_BRIGHTNESS_LABEL}
     axisLabels={COLOR_AREA_AXIS_LABELS}
 >
     {#snippet renderContent(renderProps)}

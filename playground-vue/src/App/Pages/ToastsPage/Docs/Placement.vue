@@ -2,6 +2,7 @@
 import { computed } from "vue";
 
 import { Toasts } from "@thewaver/ss-components-vue";
+import { PLACEMENT_NOTIFICATIONS_LABEL } from "@thewaver/ss-playground/App/Pages/ToastsPage/ToastsPage.const";
 
 import PageToastContent from "../../../StyledComponents/ToastContent/ToastContent.vue";
 import type { ToastsPlacementDocsExampleProps } from "../ToastsPageVue.types";
@@ -19,7 +20,7 @@ const margins = computed(() => ({
 
 <template>
     <Toasts
-        ariaLabel="Placement notifications"
+        :ariaLabel="PLACEMENT_NOTIFICATIONS_LABEL"
         :alignment="alignment"
         :flex-direction="flexDirection"
         :gap="gap"

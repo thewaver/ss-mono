@@ -8,6 +8,7 @@ import {
     ACCORDION_POLICIES,
     DEFAULT_ACCORDION_POLICY,
     DOCS_ROOT,
+    DOCS_SECTIONS,
     FIELD_WIDTH,
 } from "@thewaver/ss-playground/App/Pages/Accordions/AccordionPage/AccordionPage.const";
 import type { AccordionPolicy } from "@thewaver/ss-playground/App/Pages/Accordions/AccordionPage/AccordionPage.types";
@@ -43,12 +44,7 @@ const orientation = shallowRef<AccordionOrientation>("horizontal");
         />
 
         <template #renderKnobs>
-            <PageProp
-                item-key="policy"
-                label="Policy"
-                hint="How many sections may be open: any number, one at a time, or one at a time with never none, where the only way out of an open section is into another one."
-                controls="Sets AccordionProps.isSingleExpand and isExpandRequired"
-            >
+            <PageProp item-key="policy" v-bind="AccordionKnobs.POLICY_TEXT">
                 <PageSelectField
                     :value="policy"
                     :values="ACCORDION_POLICIES"
@@ -57,12 +53,7 @@ const orientation = shallowRef<AccordionOrientation>("horizontal");
                 />
             </PageProp>
 
-            <PageProp
-                item-key="gap"
-                label="Gap (px)"
-                hint="The space between sections."
-                controls="Sets AccordionProps.gap"
-            >
+            <PageProp item-key="gap" v-bind="AccordionKnobs.GAP_TEXT">
                 <PageNumberField
                     :value="gap"
                     :min="AccordionKnobs.MIN_GAP"
@@ -74,12 +65,7 @@ const orientation = shallowRef<AccordionOrientation>("horizontal");
                 />
             </PageProp>
 
-            <PageProp
-                item-key="transitionDurationMs"
-                label="Transition duration (ms)"
-                hint="How long a section takes to open and close. At 0 it opens and closes at once."
-                controls="Sets AccordionProps.transitionDurationMs"
-            >
+            <PageProp item-key="transitionDurationMs" v-bind="AccordionKnobs.TRANSITION_DURATION_MS_TEXT">
                 <PageNumberField
                     :value="transitionDurationMs"
                     :min="AccordionKnobs.MIN_TRANSITION_MS"
@@ -93,37 +79,25 @@ const orientation = shallowRef<AccordionOrientation>("horizontal");
         </template>
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Opening and closing from outside"
-        content="The accordion keeps track of which sections are open by itself. To open or close them from elsewhere on the page, hold the list and pass it in as [prop]expanded[/prop]: both sides write it, so a header press updates your list and writing your list opens or closes sections."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.openingClosingOutside" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Controlled.vue`">
         <ControlledDocsExample />
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Panels that follow their content"
-        content="A panel opens to its content's own height and keeps following it. Content that appears after the panel is open makes the panel grow, with no reopening and no height to guess."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.panelsFollowContent" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Growing.vue`">
         <GrowingDocsExample />
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Built on first open"
-        content="Set [prop]isPanelBuiltOnExpand[/prop] and a panel's content is not built until its section is first opened, and it stays built afterwards. Use it for panels that are costly to build."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.builtFirstOpen" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Deferred.vue`">
         <DeferredDocsExample />
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Scrolled into view"
-        content="Set [prop]isScrolledIntoViewOnExpand[/prop] and a section is brought into view once it has finished opening, which matters when the accordion sits in a box that scrolls: opening a section below the fold brings it up."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.scrolledIntoView" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Scrolled.vue`">
         <ScrolledDocsExample :is-scrolled-into-view-on-expand="isScrolledIntoView" />
@@ -131,9 +105,7 @@ const orientation = shallowRef<AccordionOrientation>("horizontal");
         <template #renderKnobs>
             <PageProp
                 item-key="isScrolledIntoViewOnExpand"
-                label="Scroll into view"
-                hint="Brings a section into view once it has finished opening."
-                controls="Sets AccordionProps.isScrolledIntoViewOnExpand"
+                v-bind="AccordionKnobs.IS_SCROLLED_INTO_VIEW_ON_EXPAND_TEXT"
             >
                 <PageCheckField
                     :value="isScrolledIntoView"
@@ -144,21 +116,13 @@ const orientation = shallowRef<AccordionOrientation>("horizontal");
         </template>
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Orientation"
-        content="Set [prop]orientation[/prop] to horizontal and the sections sit side by side, each panel opening beside its header and growing in width; vertical, the default, stacks them. The arrow keys that walk the headers follow it: up and down for a column, left and right for a row, reversed in right-to-left text. The panel is also told which way the person moved, forward or backward, so its content can slide in from that side; the motion is yours."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.orientation" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Orientation.vue`">
         <OrientationDocsExample :orientation="orientation" />
 
         <template #renderKnobs>
-            <PageProp
-                item-key="orientation"
-                label="Orientation"
-                hint="Which way the sections run: stacked, each panel opening below its header, or side by side, each panel opening beside it."
-                controls="Sets AccordionProps.orientation"
-            >
+            <PageProp item-key="orientation" v-bind="AccordionKnobs.ORIENTATION_TEXT">
                 <PageSelectField
                     :value="orientation"
                     :values="ACCORDION_ORIENTATIONS"

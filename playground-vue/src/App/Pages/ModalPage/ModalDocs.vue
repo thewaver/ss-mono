@@ -6,7 +6,7 @@ import { MODAL_ALIGNMENTS, MODAL_DEFAULTS } from "@thewaver/ss-components-vue";
 import { ModalKnobs } from "@thewaver/ss-playground/App/Knobs/Modals.const";
 import { WCAG_URLS } from "@thewaver/ss-playground/App/PageComponents/DocsProse/DocsProse.const";
 import * as docsStyles from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.css";
-import { DOCS_ROOT, FIELD_WIDTH } from "@thewaver/ss-playground/App/Pages/ModalPage/ModalPage.const";
+import { DOCS_ROOT, DOCS_SECTIONS, FIELD_WIDTH } from "@thewaver/ss-playground/App/Pages/ModalPage/ModalPage.const";
 
 import PageDocsAlert from "../../PageComponents/DocsAlert/PageDocsAlert.vue";
 import PageDocsExample from "../../PageComponents/DocsExample/PageDocsExample.vue";
@@ -32,12 +32,7 @@ const isDismissableOnEscape = shallowRef(false);
         <BasicDocsExample :alignment="alignment" :transition-duration-ms="transitionDurationMs" />
 
         <template #renderKnobs>
-            <PageProp
-                item-key="alignment"
-                label="Alignment"
-                hint="Where the dialog sits: in the middle, or against one edge of the screen and stretched along it."
-                controls="Sets ModalProps.alignment"
-            >
+            <PageProp item-key="alignment" v-bind="ModalKnobs.ALIGNMENT_TEXT">
                 <PageSelectField
                     :value="alignment"
                     :values="MODAL_ALIGNMENTS"
@@ -47,12 +42,7 @@ const isDismissableOnEscape = shallowRef(false);
                 />
             </PageProp>
 
-            <PageProp
-                item-key="transitionDurationMs"
-                label="Transition duration (ms)"
-                hint="How long the dialog and its overlay take to fade in and out. At 0 they appear and go at once."
-                controls="Sets ModalProps.transitionDurationMs"
-            >
+            <PageProp item-key="transitionDurationMs" v-bind="ModalKnobs.TRANSITION_DURATION_MS_TEXT">
                 <PageNumberField
                     :value="transitionDurationMs"
                     :min="ModalKnobs.MIN_TRANSITION_MS"
@@ -66,10 +56,7 @@ const isDismissableOnEscape = shallowRef(false);
         </template>
     </PageDocsExample>
 
-    <PageDocsSection
-        title="A dialog that must be answered"
-        content="Set [prop]role[/prop] to alertdialog for a dialog that interrupts to ask for a decision, so it is announced more insistently than an ordinary one. Point [prop]initialFocusRef[/prop] at the answer that loses nothing, Cancel here, so that is where focus lands. Switching off [prop]isDismissableOnOverlayClick[/prop] keeps a press beside the dialog from closing it, and switching off [prop]isDismissableOnEscape[/prop] does the same for Escape, so the only way out is an answer."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.dialogThatMustBeAnswered" />
 
     <PageDocsAlert severity="alert">
         With both <span :class="docsStyles.docsPropName">isDismissableOnOverlayClick</span> and
@@ -87,12 +74,7 @@ const isDismissableOnEscape = shallowRef(false);
         />
 
         <template #renderKnobs>
-            <PageProp
-                item-key="isDismissableOnOverlayClick"
-                label="Closes on overlay click"
-                hint="Whether a press on the overlay beside the dialog closes it."
-                controls="Sets ModalProps.isDismissableOnOverlayClick"
-            >
+            <PageProp item-key="isDismissableOnOverlayClick" v-bind="ModalKnobs.IS_DISMISSABLE_ON_OVERLAY_CLICK_TEXT">
                 <PageCheckField
                     :value="isDismissableOnOverlayClick"
                     ariaLabel="Closes on overlay click"
@@ -100,12 +82,7 @@ const isDismissableOnEscape = shallowRef(false);
                 />
             </PageProp>
 
-            <PageProp
-                item-key="isDismissableOnEscape"
-                label="Closes on Escape"
-                hint="Whether Escape closes the dialog."
-                controls="Sets ModalProps.isDismissableOnEscape"
-            >
+            <PageProp item-key="isDismissableOnEscape" v-bind="ModalKnobs.IS_DISMISSABLE_ON_ESCAPE_TEXT">
                 <PageCheckField
                     :value="isDismissableOnEscape"
                     ariaLabel="Closes on Escape"
@@ -115,28 +92,19 @@ const isDismissableOnEscape = shallowRef(false);
         </template>
     </PageDocsExample>
 
-    <PageDocsSection
-        title="A popup inside it"
-        content="A popup opened inside the dialog, such as this list, is a layer above it. Escape closes only the layer on top: the first press closes the list and leaves the dialog open, and the next closes the dialog."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.popupInside" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Layered.vue`">
         <LayeredDocsExample />
     </PageDocsExample>
 
-    <PageDocsSection
-        title="A drag inside it"
-        content="Escape pressed while something inside the dialog is being dragged cancels the drag and leaves the dialog open. Try it here: start dragging a column header, press Escape, and the column goes back while the dialog stays. A second Escape then closes the dialog."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.dragInside" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Dragging.vue`">
         <DraggingDocsExample />
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Nothing focusable inside"
-        content="On opening, focus goes to [prop]initialFocusRef[/prop] when there is one, and otherwise to the first thing inside that can take it. A dialog holding only text has nothing that can, so the dialog takes focus itself rather than leaving it on the page behind."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.nothingFocusableInside" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/TextOnly.vue`">
         <TextOnlyDocsExample />

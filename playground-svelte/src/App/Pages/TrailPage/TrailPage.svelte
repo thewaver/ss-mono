@@ -105,9 +105,7 @@
 <PagePropsPanel scope={"global"}>
     <PageProp
         itemKey={"durationMs"}
-        controls={"Sets TrailProps.durationMs"}
-        label={"Lap duration (ms)"}
-        hint={"How long the traveler takes to walk the path once, end to end."}
+        {...TrailKnobs.DURATION_MS_TEXT}
     >
         <PageNumberField
             value={durationMs}
@@ -123,9 +121,7 @@
 
     <PageProp
         itemKey={"isLooping"}
-        controls={"Sets TrailProps.isLooping"}
-        label={"Loops"}
-        hint={"Sends the traveler round again as soon as it reaches the end, instead of stopping there."}
+        {...TrailKnobs.IS_LOOPING_TEXT}
     >
         <PageCheckField
             value={isLooping}
@@ -138,9 +134,7 @@
 
     <PageProp
         itemKey={"isTurning"}
-        controls={"Sets TrailProps.isTurning"}
-        label={"Faces along the path"}
-        hint={"Turns the traveler to point the way it is going, instead of leaving it upright the whole way round."}
+        {...TrailKnobs.IS_TURNING_TEXT}
     >
         <PageCheckField
             value={isTurning}

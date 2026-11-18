@@ -2,6 +2,7 @@
 import { shallowRef } from "vue";
 
 import { Listbox } from "@thewaver/ss-components-vue";
+import { SHIPPING_COUNTRY_GLIDING_LABEL } from "@thewaver/ss-playground/App/Pages/ListboxPage/ListboxPage.const";
 
 import PageGlideFloater from "../../../StyledComponents/GlideFloater/PageGlideFloater.vue";
 import PageListboxSurface from "../../../StyledComponents/ListboxSurface/ListboxSurface.vue";
@@ -22,7 +23,7 @@ const country = shallowRef<string | undefined>("Portugal");
             id="glidingCountry"
             v-model:value="country"
             :options="COUNTRIES_WITH_REACHABLE"
-            ariaLabel="Shipping country, gliding"
+            :ariaLabel="SHIPPING_COUNTRY_GLIDING_LABEL"
         >
             <template #renderOption="{ option, flags }">
                 <PageSelectOptionContent

@@ -7,6 +7,7 @@
     import PageTreemapBar from "../../../StyledComponents/TreemapContent/PageTreemapBar.svelte";
     import PageTreemapTile from "../../../StyledComponents/TreemapContent/PageTreemapTile.svelte";
     import type { TreemapExampleProps } from "../TreemapPage.types";
+    import { LIBRARY_S_SOURCE_LINES_LABEL } from "@thewaver/ss-playground/App/Pages/TreemapPage/TreemapPage.const";
 
     const PARENT_FROM_END = 2;
     const ROOT_ONLY = 1;
@@ -45,7 +46,7 @@
             root={LIBRARY}
             bind:branch
             zoomDurationMs={props.zoomDurationMs}
-            ariaLabel={"The library's source, by lines of code"}
+            ariaLabel={LIBRARY_S_SOURCE_LINES_LABEL}
         >
             {#snippet renderTile(node, state)}
                 <PageTreemapTile name={node.value} weight={formatLines(state.weight)} isBranch={state.isBranch} />

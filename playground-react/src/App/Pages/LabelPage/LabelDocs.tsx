@@ -2,7 +2,8 @@ import { useState } from "react";
 
 import type { LabelOrientation } from "@thewaver/ss-components-react";
 import { LABEL_DEFAULTS, LABEL_ORIENTATIONS } from "@thewaver/ss-components-react";
-import { DOCS_ROOT } from "@thewaver/ss-playground/App/Pages/LabelPage/LabelPage.const";
+import { LabelKnobs } from "@thewaver/ss-playground/App/Knobs/Labels.const";
+import { DOCS_ROOT, DOCS_SECTIONS } from "@thewaver/ss-playground/App/Pages/LabelPage/LabelPage.const";
 
 import { PageDocsExample } from "../../PageComponents/DocsExample/DocsExample";
 import { PageDocsSection } from "../../PageComponents/DocsSection/DocsSection";
@@ -24,14 +25,7 @@ export const LabelDocs = () => {
                 path={`${DOCS_ROOT}/Basic.tsx`}
                 renderKnobs={() => (
                     <>
-                        <PageProp
-                            itemKey={"orientation"}
-                            label={"Orientation"}
-                            hint={
-                                "Whether the caption and the checkbox sit side by side or one above the other, in the order they are written."
-                            }
-                            controls={"Sets LabelProps.orientation"}
-                        >
+                        <PageProp itemKey={"orientation"} {...LabelKnobs.ORIENTATION_TEXT}>
                             <PageSelectField
                                 value={orientation}
                                 values={LABEL_ORIENTATIONS}
@@ -40,14 +34,7 @@ export const LabelDocs = () => {
                             />
                         </PageProp>
 
-                        <PageProp
-                            itemKey={"isDisabled"}
-                            label={"Disabled"}
-                            hint={
-                                "Turns the checkbox off: pressing it or its caption changes nothing, and the Tab key skips it."
-                            }
-                            controls={"Sets CheckboxProps.isDisabled on the checkbox inside the label"}
-                        >
+                        <PageProp itemKey={"isDisabled"} {...LabelKnobs.IS_DISABLED_TEXT}>
                             <PageCheckField value={isDisabled} ariaLabel={"Disabled"} onChange={setIsDisabled} />
                         </PageProp>
                     </>
@@ -56,34 +43,19 @@ export const LabelDocs = () => {
                 <BasicDocsExample orientation={orientation} isDisabled={isDisabled} />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"Right to left"}
-                content={
-                    "Inside a box whose text runs right to left, the label lays its children out from the right, so the checkbox, written first, sits to the right of its caption."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.rightLeft} />
 
             <PageDocsExample path={`${DOCS_ROOT}/RightToLeft.tsx`}>
                 <RightToLeftDocsExample />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"The caption first"}
-                content={
-                    "The caption and the control sit in the order they are written, so a caption written first comes before the control, as is usual beside a switch. Pressing the caption still flips it."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.captionFirst} />
 
             <PageDocsExample path={`${DOCS_ROOT}/CaptionFirst.tsx`}>
                 <CaptionFirstDocsExample />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"One label per radio"}
-                content={
-                    "A label names one control, so in a radio group each radio gets a label of its own. The group as a whole is named through its own [prop]ariaLabel[/prop], since a caption wrapped round the whole group would name only the first radio, and pressing it would pick that one."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.oneLabelPerRadio} />
 
             <PageDocsExample path={`${DOCS_ROOT}/LabelPerRadio.tsx`}>
                 <LabelPerRadioDocsExample />

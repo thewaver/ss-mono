@@ -4,6 +4,7 @@ import { useModel, watch } from "vue";
 import type { CuboidFace } from "@thewaver/ss-components-vue";
 import { Cuboid, CuboidUtils } from "@thewaver/ss-components-vue";
 import { computeCuboidFaceLabel } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
+import { SIX_FACES_TURNING_THEMSELVES_LABEL } from "@thewaver/ss-playground/App/Pages/CuboidPage/CuboidPage.const";
 import { ObjectUtils } from "@thewaver/ss-utils";
 
 import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.vue";
@@ -67,7 +68,7 @@ watch(
                 v-model:pitch="pitch"
                 :size="size"
                 :transition-duration-ms="transitionDurationMs"
-                ariaLabel="Six faces, turning by themselves"
+                :ariaLabel="SIX_FACES_TURNING_THEMSELVES_LABEL"
                 :compute-face-label="computeCuboidFaceLabel"
             >
                 <template #renderFace="{ face, state }">

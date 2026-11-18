@@ -24,9 +24,7 @@
 <PageExampleKnobs>
     <PageProp
         itemKey={"shapeKind"}
-        controls={"Picks the example contour sent to ParticleFieldProps.computeShapePoints"}
-        label={"Shape"}
-        hint={"The area particles may appear in. A cell spawns only when its center is inside it."}
+        {...ParticleFieldKnobs.SHAPE_KIND_TEXT}
     >
         <PageSelectField
             value={shapeKind}
@@ -40,9 +38,7 @@
 
     <PageProp
         itemKey={"joinRadius"}
-        controls={"Sets every corner of ParticleFieldProps.shapeJoinRadii"}
-        label={"Corner radius"}
-        hint={"How far each corner of the area is rounded, as the Shape page rounds them."}
+        {...ParticleFieldKnobs.JOIN_RADIUS_TEXT}
     >
         <PageNumberField
             value={joinRadius}

@@ -7,13 +7,7 @@
     import PageAccordionPanel from "../../../../StyledComponents/AccordionContent/PageAccordionPanel.svelte";
     import PageAccordionWrapper from "../../../../StyledComponents/AccordionContent/PageAccordionWrapper.svelte";
     import type { AccordionBasicDocsExampleProps } from "../AccordionPageSvelte.types";
-
-    const SECTION_BODIES: Record<string, string[]> = {
-        Shipping: ["Orders leave the warehouse within two working days.", "Tracking arrives by email."],
-        Returns: ["Thirty days, unopened, receipt or order number."],
-        Warranty: ["Two years against manufacturing defects."],
-        Unavailable: ["This section is disabled, so its header refuses to open it."],
-    };
+    import { SECTION_BODIES } from "@thewaver/ss-playground/App/Pages/Accordions/AccordionPage/AccordionPage.const";
 
     const ITEMS: AccordionItem<string>[] = [
         { value: "Shipping" },

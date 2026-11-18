@@ -2,6 +2,7 @@
 import { shallowRef } from "vue";
 
 import { MultiListbox } from "@thewaver/ss-components-vue";
+import { COUNTRIES_SHIP_LABEL } from "@thewaver/ss-playground/App/Pages/ListboxPage/ListboxPage.const";
 
 import PageGlideFloater from "../../../StyledComponents/GlideFloater/PageGlideFloater.vue";
 import PageListboxSurface from "../../../StyledComponents/ListboxSurface/ListboxSurface.vue";
@@ -18,7 +19,7 @@ const countries = shallowRef<string[]>(["Denmark"]);
             id="shippingCountries"
             v-model:values="countries"
             :options="GROUPED_COUNTRIES"
-            ariaLabel="Countries to ship to"
+            :ariaLabel="COUNTRIES_SHIP_LABEL"
         >
             <template #renderGroupHeader="{ group, flags }">
                 <PageSelectGroupContent :flags="flags">{{ group.label }}</PageSelectGroupContent>

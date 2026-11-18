@@ -4,8 +4,10 @@ import { shallowRef } from "vue";
 import { COLLAPSIBLE_DEFAULTS, COLLAPSIBLE_SIDES } from "@thewaver/ss-components-vue";
 import type { CollapsibleSide } from "@thewaver/ss-components-vue";
 import { AccordionKnobs } from "@thewaver/ss-playground/App/Knobs/Accordions.const";
+import { CollapsibleKnobs } from "@thewaver/ss-playground/App/Knobs/Collapsibles.const";
 import {
     DOCS_ROOT,
+    DOCS_SECTIONS,
     FIELD_WIDTH,
 } from "@thewaver/ss-playground/App/Pages/Accordions/CollapsiblePage/CollapsiblePage.const";
 
@@ -28,12 +30,7 @@ const side = shallowRef<CollapsibleSide>("right");
         <BasicDocsExample :transition-duration-ms="transitionDurationMs" />
 
         <template #renderKnobs>
-            <PageProp
-                item-key="transitionDurationMs"
-                label="Transition duration (ms)"
-                hint="How long the panel takes to open and close. At 0 it opens and closes at once."
-                controls="Sets CollapsibleProps.transitionDurationMs"
-            >
+            <PageProp item-key="transitionDurationMs" v-bind="CollapsibleKnobs.TRANSITION_DURATION_MS_TEXT">
                 <PageNumberField
                     :value="transitionDurationMs"
                     :min="AccordionKnobs.MIN_TRANSITION_MS"
@@ -47,39 +44,25 @@ const side = shallowRef<CollapsibleSide>("right");
         </template>
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Opening and closing from outside"
-        content="The collapsible keeps track of whether it is open by itself. To open or close it from elsewhere on the page, hold the boolean and pass it in as [prop]expanded[/prop]: both sides write it, so pressing the trigger updates yours and writing yours opens or closes the panel."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.openingClosingOutside" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Controlled.vue`">
         <ControlledDocsExample />
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Built on first open"
-        content="Set [prop]isPanelBuiltOnExpand[/prop] and the panel's contents are not built until it is first opened, and they are kept once they are. It trades a cheaper first render for a pause on that first open."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.builtFirstOpen" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Deferred.vue`">
         <DeferredDocsExample />
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Opening to a side"
-        content="Set [prop]side[/prop] to choose which side of the trigger the panel opens on. Top and bottom grow the panel's height, left and right its width; a sideways panel keeps its contents at their own width and uncovers them, so give them one."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.openingSide" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Side.vue`">
         <SideDocsExample :side="side" />
 
         <template #renderKnobs>
-            <PageProp
-                item-key="side"
-                label="Side"
-                hint="Which side of the trigger the panel opens on."
-                controls="Sets CollapsibleProps.side"
-            >
+            <PageProp item-key="side" v-bind="CollapsibleKnobs.SIDE_TEXT">
                 <PageSelectField
                     :value="side"
                     :values="COLLAPSIBLE_SIDES"

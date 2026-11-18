@@ -4,18 +4,12 @@
     import { Accordion } from "@thewaver/ss-components-svelte";
     import type { AccordionItem } from "@thewaver/ss-components-svelte";
     import * as styles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
-    import { DOCS_GAP } from "@thewaver/ss-playground/App/Pages/Accordions/AccordionPage/AccordionPage.const";
+    import { DOCS_GAP, ENABLED_SECTION_BODIES } from "@thewaver/ss-playground/App/Pages/Accordions/AccordionPage/AccordionPage.const";
     import * as accordionStyles from "@thewaver/ss-playground/App/Pages/Accordions/Accordions.css";
 
     import PageAccordionHeader from "../../../../StyledComponents/AccordionContent/PageAccordionHeader.svelte";
     import PageAccordionPanel from "../../../../StyledComponents/AccordionContent/PageAccordionPanel.svelte";
     import PageAccordionWrapper from "../../../../StyledComponents/AccordionContent/PageAccordionWrapper.svelte";
-
-    const SECTION_BODIES: Record<string, string[]> = {
-        Shipping: ["Orders leave the warehouse within two working days.", "Tracking arrives by email."],
-        Returns: ["Thirty days, unopened, receipt or order number."],
-        Warranty: ["Two years against manufacturing defects."],
-    };
 
     const ITEMS: AccordionItem<string>[] = [{ value: "Shipping" }, { value: "Returns" }, { value: "Warranty" }];
 
@@ -40,7 +34,7 @@
 
         {#snippet renderPanel(item, visibilityTarget, transitionDurationMs)}
             <PageAccordionPanel {visibilityTarget} {transitionDurationMs}>
-                {#each SECTION_BODIES[item.value] as line (line)}
+                {#each ENABLED_SECTION_BODIES[item.value] as line (line)}
                     <div {@attach recordBuilt(item.value)} data-built={item.value}>{line}</div>
                 {/each}
             </PageAccordionPanel>

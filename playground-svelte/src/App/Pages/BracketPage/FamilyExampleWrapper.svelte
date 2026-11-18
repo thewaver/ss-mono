@@ -17,9 +17,7 @@
 <PageExampleKnobs>
     <PageProp
         itemKey={"isSnappingToFamily"}
-        label={"Snap to family"}
-        hint={"Glides the window to frame the family in it once a drag, a pinch or the wheel is over."}
-        controls={"Sets BracketProps.isSnappingToFamily"}
+        {...BracketKnobs.IS_SNAPPING_TO_FAMILY_TEXT}
     >
         <PageCheckField
             value={isSnapping}

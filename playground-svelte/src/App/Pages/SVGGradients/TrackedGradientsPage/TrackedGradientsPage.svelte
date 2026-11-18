@@ -107,9 +107,7 @@
     <PagePropsPanel scope={"sample"}>
         <PageProp
             itemKey={"configKey"}
-            controls={"Picks the sample gradient the example sends to ShapeProps.computeFillDefs or ShapeProps.computeStrokeDefs"}
-            label={"Gradient"}
-            hint={"Which pointer-following gradient is shown. Choosing one brings its own knobs with it."}
+            {...TrackedGradientKnobs.CONFIG_KEY_TEXT}
         >
             <PageGroupedSelectField
                 value={configKey}

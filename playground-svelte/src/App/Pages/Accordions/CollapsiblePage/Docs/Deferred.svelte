@@ -6,8 +6,7 @@
     import PageAccordionHeader from "../../../../StyledComponents/AccordionContent/PageAccordionHeader.svelte";
     import PageAccordionPanel from "../../../../StyledComponents/AccordionContent/PageAccordionPanel.svelte";
     import PageAccordionWrapper from "../../../../StyledComponents/AccordionContent/PageAccordionWrapper.svelte";
-
-    const NOTES = ["Signed for on arrival", "Left with a neighbor", "Returned to the depot"];
+    import { HIDE_DELIVERY_NOTES_TEXT, SHOW_DELIVERY_NOTES_TEXT, DELIVERY_NOTES } from "@thewaver/ss-playground/App/Pages/Accordions/CollapsiblePage/CollapsiblePage.const";
 
     let isBuilt = $state(false);
 
@@ -24,13 +23,13 @@
 
         {#snippet renderTrigger(flags)}
             <PageAccordionHeader {flags}>
-                {flags.isExpanded ? "Hide the delivery notes" : "Show the delivery notes"}
+                {flags.isExpanded ? HIDE_DELIVERY_NOTES_TEXT : SHOW_DELIVERY_NOTES_TEXT}
             </PageAccordionHeader>
         {/snippet}
 
         {#snippet renderPanel(visibilityTarget, transitionDurationMs)}
             <PageAccordionPanel {visibilityTarget} {transitionDurationMs}>
-                <div {@attach recordBuilt}>{NOTES.join(" · ")}</div>
+                <div {@attach recordBuilt}>{DELIVERY_NOTES.join(" · ")}</div>
             </PageAccordionPanel>
         {/snippet}
     </Collapsible>

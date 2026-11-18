@@ -1,6 +1,7 @@
 import { createSignal } from "solid-js";
 
 import { Checkbox } from "@thewaver/ss-components-solid";
+import { CHECKBOX_TOOLTIP_LABEL } from "@thewaver/ss-playground/App/Pages/CheckboxPage/CheckboxPage.const";
 
 import { PageCheckboxContent } from "../../../StyledComponents/CheckboxContent/CheckboxContent";
 import { PageTooltipContent } from "../../../StyledComponents/TooltipContent/TooltipContent";
@@ -14,11 +15,11 @@ export const TooltipDocsExample = (props: Props) => {
     return (
         <Checkbox
             checked={checkedSignal}
-            ariaLabel={"Checkbox with a tooltip"}
+            ariaLabel={CHECKBOX_TOOLTIP_LABEL}
             isDisabled={props.isDisabled}
             isReachableWhenDisabled={props.isReachableWhenDisabled}
             renderContent={(getFlags) => (
-                <PageCheckboxContent flags={getFlags}>Checkbox with a tooltip</PageCheckboxContent>
+                <PageCheckboxContent flags={getFlags}>{CHECKBOX_TOOLTIP_LABEL}</PageCheckboxContent>
             )}
             tooltipDefs={() => ({
                 placement: () => ({ x: "center", y: "top_out" }),

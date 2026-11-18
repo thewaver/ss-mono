@@ -109,14 +109,7 @@ const GlitchExampleWrapper = ({ boxWidth, isPagePlaying, ...props }: WrapperProp
             </div>
 
             <PageExampleKnobs>
-                <PageProp
-                    itemKey={"glitchCount"}
-                    label={"Glitches per pass"}
-                    hint={
-                        "How many tears follow each other in the middle of a pass. Each one shifts every channel its own way."
-                    }
-                    controls={"Sets the example's glitch count, read by its RGBAnimationProps.computeSliceAnimation"}
-                >
+                <PageProp itemKey={"glitchCount"} {...RGBAnimationKnobs.GLITCH_COUNT_TEXT}>
                     <PageNumberField
                         value={glitchOpts.count}
                         min={RGBAnimationKnobs.MIN_GLITCH_COUNT}
@@ -128,12 +121,7 @@ const GlitchExampleWrapper = ({ boxWidth, isPagePlaying, ...props }: WrapperProp
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"shiftPercent"}
-                    label={"Shift (%)"}
-                    hint={"The furthest a channel moves in a tear, as a share of the picture's size."}
-                    controls={"Sets the example's shift, read by its RGBAnimationProps.computeSliceAnimation"}
-                >
+                <PageProp itemKey={"shiftPercent"} {...RGBAnimationKnobs.SHIFT_PERCENT_TEXT}>
                     <PageNumberField
                         value={glitchOpts.shiftPercent}
                         min={RGBAnimationKnobs.MIN_SHIFT_PERCENT}
@@ -172,12 +160,7 @@ const SwellExampleWrapper = ({ boxWidth, isPagePlaying, ...props }: WrapperProps
             </div>
 
             <PageExampleKnobs>
-                <PageProp
-                    itemKey={"scalePercent"}
-                    label={"Scale (%)"}
-                    hint={"How far red grows and blue shrinks at the top of the swell. Green stays put."}
-                    controls={"Sets the example's scale, read by its RGBAnimationProps.computeSliceAnimation"}
-                >
+                <PageProp itemKey={"scalePercent"} {...RGBAnimationKnobs.SCALE_PERCENT_TEXT}>
                     <PageNumberField
                         value={scalePercent}
                         min={RGBAnimationKnobs.MIN_SCALE_PERCENT}
@@ -216,14 +199,7 @@ const OrbitExampleWrapper = ({ boxWidth, isPagePlaying, ...props }: WrapperProps
             </div>
 
             <PageExampleKnobs>
-                <PageProp
-                    itemKey={"radiusPercent"}
-                    label={"Radius (%)"}
-                    hint={
-                        "How far the channels circle from their resting place at the widest point of the pass, as a share of the picture's size."
-                    }
-                    controls={"Sets the example's radius, read by its RGBAnimationProps.computeSliceAnimation"}
-                >
+                <PageProp itemKey={"radiusPercent"} {...RGBAnimationKnobs.RADIUS_PERCENT_TEXT}>
                     <PageNumberField
                         value={radiusPercent}
                         min={RGBAnimationKnobs.MIN_ORBIT_RADIUS_PERCENT}
@@ -262,14 +238,7 @@ const TwistExampleWrapper = ({ boxWidth, isPagePlaying, ...props }: WrapperProps
             </div>
 
             <PageExampleKnobs>
-                <PageProp
-                    itemKey={"maxDegrees"}
-                    label={"Angle (°)"}
-                    hint={
-                        "How far red and blue turn, in opposite directions, at the middle of the pass. Green stays put."
-                    }
-                    controls={"Sets the example's angle, read by its RGBAnimationProps.computeSliceAnimation"}
-                >
+                <PageProp itemKey={"maxDegrees"} {...RGBAnimationKnobs.ANGLE_TEXT}>
                     <PageNumberField
                         value={maxDegrees}
                         min={RGBAnimationKnobs.MIN_TWIST_DEGREES}
@@ -308,12 +277,7 @@ const TiltExampleWrapper = ({ boxWidth, isPagePlaying, ...props }: WrapperProps)
             </div>
 
             <PageExampleKnobs>
-                <PageProp
-                    itemKey={"maxDegrees"}
-                    label={"Angle (°)"}
-                    hint={"How far red and blue swing in depth, in opposite directions. Green stays put."}
-                    controls={"Sets the example's angle, read by its RGBAnimationProps.computeSliceAnimation"}
-                >
+                <PageProp itemKey={"maxDegrees"} {...RGBAnimationKnobs.ANGLE_2_TEXT}>
                     <PageNumberField
                         value={maxDegrees}
                         min={RGBAnimationKnobs.MIN_TILT_DEGREES}
@@ -352,14 +316,7 @@ const AnaglyphExampleWrapper = ({ boxWidth, isPagePlaying, ...props }: WrapperPr
             </div>
 
             <PageExampleKnobs>
-                <PageProp
-                    itemKey={"separationPercent"}
-                    label={"Separation (%)"}
-                    hint={
-                        "How far red moves left and blue moves right at the middle of the pass, as a share of the picture's width. Green stays put."
-                    }
-                    controls={"Sets the example's separation, read by its RGBAnimationProps.computeSliceAnimation"}
-                >
+                <PageProp itemKey={"separationPercent"} {...RGBAnimationKnobs.SEPARATION_PERCENT_TEXT}>
                     <PageNumberField
                         value={separationPercent}
                         min={RGBAnimationKnobs.MIN_ANAGLYPH_SEPARATION_PERCENT}
@@ -398,16 +355,7 @@ const EchoExampleWrapper = ({ boxWidth, isPagePlaying, ...props }: WrapperProps)
             </div>
 
             <PageExampleKnobs>
-                <PageProp
-                    itemKey={"distancePercent"}
-                    label={"Distance (%)"}
-                    hint={
-                        "How far the picture drifts along its figure-eight, as a share of its size. Green and blue follow a little later than red."
-                    }
-                    controls={
-                        "Sets the example's distance, read by its RGBAnimationProps.computeRootAnimation and computeSliceAnimation"
-                    }
-                >
+                <PageProp itemKey={"distancePercent"} {...RGBAnimationKnobs.DISTANCE_PERCENT_TEXT}>
                     <PageNumberField
                         value={distancePercent}
                         min={RGBAnimationKnobs.MIN_ECHO_DISTANCE_PERCENT}
@@ -446,14 +394,7 @@ const HueSwapExampleWrapper = ({ boxWidth, isPagePlaying, ...props }: WrapperPro
             </div>
 
             <PageExampleKnobs>
-                <PageProp
-                    itemKey={"turns"}
-                    label={"Turns"}
-                    hint={
-                        "How many times the two turning channels go round the color wheel, in opposite directions, over one pass. The third stays put, a different one each pass."
-                    }
-                    controls={"Sets the example's turns, read by its RGBAnimationProps.computeSliceAnimation"}
-                >
+                <PageProp itemKey={"turns"} {...RGBAnimationKnobs.TURNS_TEXT}>
                     <PageNumberField
                         value={turns}
                         min={RGBAnimationKnobs.MIN_HUE_TURNS}
@@ -492,12 +433,7 @@ const FocusPullExampleWrapper = ({ boxWidth, isPagePlaying, ...props }: WrapperP
             </div>
 
             <PageExampleKnobs>
-                <PageProp
-                    itemKey={"maxBlurPx"}
-                    label={"Blur (px)"}
-                    hint={"How soft each channel goes at the worst of its turn out of focus."}
-                    controls={"Sets the example's blur, read by its RGBAnimationProps.computeSliceAnimation"}
-                >
+                <PageProp itemKey={"maxBlurPx"} {...RGBAnimationKnobs.MAX_BLUR_PX_TEXT}>
                     <PageNumberField
                         value={maxBlurPx}
                         min={RGBAnimationKnobs.MIN_FOCUS_BLUR_PX}
@@ -540,14 +476,7 @@ const StressTestWrapper = (props: Omit<RGBAnimationExampleProps, "progress">) =>
     return (
         <>
             <PagePropsPanel scope={"local"} hasReset={false}>
-                <PageProp
-                    itemKey={"onGraphicsCard"}
-                    label={"On the graphics card"}
-                    hint={
-                        "Draws the stress test's channels in one canvas per item, with the keyframes worked out on the graphics card. Off, every channel is an element of its own."
-                    }
-                    controls={"Sets RGBAnimationProps.renderer in the stress test"}
-                >
+                <PageProp itemKey={"onGraphicsCard"} {...RGBAnimationKnobs.ON_GRAPHICS_CARD_TEXT}>
                     <PageCheckField
                         value={isOnGraphicsCard}
                         ariaLabel={"On the graphics card"}
@@ -774,12 +703,7 @@ export const RGBAnimationPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp
-                    itemKey={"source"}
-                    label={"Source"}
-                    hint={"The picture the channels are split from: the knight photograph, or a line of SVG text."}
-                    controls={"Picks the example picture sent to RGBAnimationProps.src"}
-                >
+                <PageProp itemKey={"source"} {...RGBAnimationKnobs.SOURCE_TEXT}>
                     <PageSelectField
                         value={sourceKey}
                         values={SOURCE_KEYS}
@@ -788,12 +712,7 @@ export const RGBAnimationPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"animationDurationMs"}
-                    label={"Animation duration (ms)"}
-                    hint={"How long one pass takes."}
-                    controls={"Sets RGBAnimationProps.animationDurationMs"}
-                >
+                <PageProp itemKey={"animationDurationMs"} {...RGBAnimationKnobs.ANIMATION_DURATION_MS_TEXT}>
                     <PageNumberField
                         value={animationDurationMs}
                         min={RGBAnimationKnobs.MIN_DURATION_MS}
@@ -807,9 +726,7 @@ export const RGBAnimationPage = () => {
 
                 <PageProp
                     itemKey={"animationIterationDelayMs"}
-                    label={"Iteration delay (ms)"}
-                    hint={"How long the picture waits between one pass and the next."}
-                    controls={"Sets RGBAnimationProps.animationIterationDelayMs"}
+                    {...RGBAnimationKnobs.ANIMATION_ITERATION_DELAY_MS_TEXT}
                 >
                     <PageNumberField
                         value={animationIterationDelayMs}
@@ -822,14 +739,7 @@ export const RGBAnimationPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"colorMixing"}
-                    label={"Color mixing"}
-                    hint={
-                        "How the channels are put back together. Additive fringes are red, green and blue and read on a dark ground; subtractive ones are cyan, magenta and yellow and read on a light one. Left out, it follows the page's color-scheme at the start of each pass."
-                    }
-                    controls={"Sets RGBAnimationProps.colorMixing, with the color-scheme choice sent as undefined"}
-                >
+                <PageProp itemKey={"colorMixing"} {...RGBAnimationKnobs.COLOR_MIXING_TEXT}>
                     <PageSelectField
                         value={colorMixingChoice}
                         values={RGBAnimationKnobs.COLOR_MIXING_CHOICES}

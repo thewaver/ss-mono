@@ -1,4 +1,5 @@
 import { Lens } from "@thewaver/ss-components-react";
+import { MAGNIFYING_LENS_OVER_PICTURE_LABEL } from "@thewaver/ss-playground/App/Pages/Reveals/LensPage/LensPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/Reveals/LensPage/LensPage.css";
 import knight_profile from "@thewaver/ss-playground/App/knight_profile.webp";
 
@@ -17,7 +18,7 @@ export const PhotoExample = (props: Props) => {
                 joinRadii={props.joinRadii}
                 lameExponents={props.lameExponents}
                 isDisabled={props.isDisabled}
-                ariaLabel={"A magnifying lens over a picture of a knight"}
+                ariaLabel={MAGNIFYING_LENS_OVER_PICTURE_LABEL}
                 computePoints={props.computePoints}
                 renderContent={() => <img className={styles.photo} src={knight_profile} alt={"A knight in armor"} />}
             />

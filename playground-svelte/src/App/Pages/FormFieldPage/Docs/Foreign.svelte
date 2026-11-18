@@ -4,8 +4,7 @@
     import PageFormFieldCaption from "../../../StyledComponents/FormFieldContent/PageFormFieldCaption.svelte";
     import PageFormFieldMessage from "../../../StyledComponents/FormFieldContent/PageFormFieldMessage.svelte";
     import ForeignInput from "./ForeignInput.svelte";
-
-    const MESSAGE = "Shown to everyone who can see your posts.";
+    import { MESSAGE } from "@thewaver/ss-playground/App/Pages/FormFieldPage/FormFieldPage.const";
 
     let value = $state("");
 </script>

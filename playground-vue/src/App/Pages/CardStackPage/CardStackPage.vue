@@ -68,12 +68,7 @@ const examples: ExampleDefs[] = [
 
 <template>
     <PagePropsPanel scope="global">
-        <PageProp
-            item-key="isDisabled"
-            controls="Sets CardStackProps.isDisabled"
-            label="Disabled"
-            hint="Turns the stack off, so no card moves by gesture, button or key."
-        >
+        <PageProp item-key="isDisabled" v-bind="CardStackKnobs.IS_DISABLED_TEXT">
             <PageCheckField
                 :value="isDisabled"
                 ariaLabel="Disabled"
@@ -81,12 +76,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="commitRatio"
-            controls="Sets CardStackProps.commitRatio"
-            label="Commit ratio"
-            hint="How far across the stack a card has to be pushed before it leaves. Let go short of it and it springs back."
-        >
+        <PageProp item-key="commitRatio" v-bind="CardStackKnobs.COMMIT_RATIO_TEXT">
             <PageNumberField
                 :value="commitRatio"
                 :min="CardStackKnobs.MIN_COMMIT_RATIO"
@@ -98,12 +88,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="transitionDurationMs"
-            controls="Sets CardStackProps.transitionDurationMs"
-            label="Duration (ms)"
-            hint="How long a card takes to fly out, and how long one that fell short takes to settle back."
-        >
+        <PageProp item-key="transitionDurationMs" v-bind="CardStackKnobs.TRANSITION_DURATION_MS_TEXT">
             <PageNumberField
                 :value="transitionDurationMs"
                 :min="CardStackKnobs.MIN_DURATION_MS"
@@ -115,12 +100,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="mountedCount"
-            controls="Sets CardStackProps.mountedCount"
-            label="Mounted cards"
-            hint="How many cards are in the document at once, counting the top one."
-        >
+        <PageProp item-key="mountedCount" v-bind="CardStackKnobs.MOUNTED_COUNT_TEXT">
             <PageNumberField
                 :value="mountedCount"
                 :min="CardStackKnobs.MIN_MOUNTED_COUNT"
@@ -132,12 +112,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="cardGap"
-            controls="Sets CardStackProps.cardGap"
-            label="Card gap (px)"
-            hint="How far apart the cards in the pile sit. The bottom one fills the stack's box, and each card above it is lifted by one more of these."
-        >
+        <PageProp item-key="cardGap" v-bind="CardStackKnobs.CARD_GAP_TEXT">
             <PageNumberField
                 :value="cardGap"
                 :min="CardStackKnobs.MIN_CARD_GAP"
@@ -149,12 +124,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="funnelRatio"
-            controls="Sets CardStackProps.funnelRatio"
-            label="Funnel"
-            hint="How much narrower each card is than the one in front of it. The top card is the widest and fills the stack; 0 stacks cards of equal width."
-        >
+        <PageProp item-key="funnelRatio" v-bind="CardStackKnobs.FUNNEL_RATIO_TEXT">
             <PageNumberField
                 :value="funnelRatio"
                 :min="CardStackKnobs.MIN_FUNNEL_RATIO"
@@ -166,12 +136,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="pileSide"
-            controls="Sets CardStackProps.pileSide"
-            label="Pile side"
-            hint="The edge the cards behind the top one peek out of: below the top card, or above it."
-        >
+        <PageProp item-key="pileSide" v-bind="CardStackKnobs.PILE_SIDE_TEXT">
             <PageSelectField
                 :value="pileSide"
                 :values="CARD_STACK_PILE_SIDES"

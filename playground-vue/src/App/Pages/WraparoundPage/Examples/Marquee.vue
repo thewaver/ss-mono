@@ -2,7 +2,10 @@
 import { useModel } from "vue";
 
 import { Button, Wraparound } from "@thewaver/ss-components-vue";
-import { MARQUEE_WORDS } from "@thewaver/ss-playground/App/Pages/WraparoundPage/WraparoundPage.const";
+import {
+    MARQUEE_WORDS,
+    TOOLS_LIBRARY_BUILT_DRIFTING_LABEL,
+} from "@thewaver/ss-playground/App/Pages/WraparoundPage/WraparoundPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/WraparoundPage/WraparoundPage.css";
 import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
@@ -25,7 +28,7 @@ const togglePlayback = () => {
         <div :class="styles.marqueeStage">
             <Wraparound
                 v-model:playback="playback"
-                ariaLabel="Tools this library is built with, drifting past"
+                :ariaLabel="TOOLS_LIBRARY_BUILT_DRIFTING_LABEL"
                 :is-movable="false"
                 :drift-px-per-second="driftPxPerSecond"
                 :drift-degrees="driftDegrees"

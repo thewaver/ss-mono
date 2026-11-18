@@ -13,6 +13,7 @@
         renderMenubarItem,
         renderMenubarPopup,
     } from "../MenubarPage.const.svelte";
+    import { RIGHT_LEFT_EDITOR_LABEL } from "@thewaver/ss-playground/App/Pages/MenubarPage/MenubarPage.const";
 
     const layerClass = $derived.by(getLayerClass());
 
@@ -23,7 +24,7 @@
 <div class={[styles.bar, styles.wideBar, layerClass]} dir={"rtl"}>
     <Menubar
         actions={WORDS}
-        ariaLabel={"Right-to-left editor"}
+        ariaLabel={RIGHT_LEFT_EDITOR_LABEL}
         overflowAriaLabel={"More menus"}
         bind:checked
         submenuOffset={{ x: POPOVER_SURFACE_INSET, y: -POPOVER_SURFACE_INSET }}

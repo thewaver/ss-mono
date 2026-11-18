@@ -10,7 +10,11 @@ import type { NavigatorDirection, SlideButtonMode, SlideButtonOrientation } from
 import { SlideButtonKnobs } from "@thewaver/ss-playground/App/Knobs/SlideButtons.const";
 import { WCAG_URLS } from "@thewaver/ss-playground/App/PageComponents/DocsProse/DocsProse.const";
 import * as docsStyles from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.css";
-import { DOCS_ROOT, FIELD_WIDTH } from "@thewaver/ss-playground/App/Pages/SlideButtonPage/SlideButtonPage.const";
+import {
+    DOCS_ROOT,
+    DOCS_SECTIONS,
+    FIELD_WIDTH,
+} from "@thewaver/ss-playground/App/Pages/SlideButtonPage/SlideButtonPage.const";
 
 import { PageDocsAlert } from "../../PageComponents/DocsAlert/DocsAlert";
 import { PageDocsExample } from "../../PageComponents/DocsExample/DocsExample";
@@ -43,14 +47,7 @@ export const SlideButtonDocs = () => {
                 path={`${DOCS_ROOT}/Basic.tsx`}
                 renderKnobs={() => (
                     <>
-                        <PageProp
-                            key={"mode"}
-                            label={"Mode"}
-                            hint={
-                                "Which pointer gestures confirm: sliding the thumb to the end, pressing and holding, or both. A held Enter or Space confirms under every mode."
-                            }
-                            controls={"Sets SlideButtonProps.mode"}
-                        >
+                        <PageProp key={"mode"} {...SlideButtonKnobs.MODE_TEXT}>
                             <PageSelectField
                                 value={getMode}
                                 values={SLIDE_BUTTON_MODES}
@@ -59,14 +56,7 @@ export const SlideButtonDocs = () => {
                             />
                         </PageProp>
 
-                        <PageProp
-                            key={"completionRatio"}
-                            label={"Completion ratio"}
-                            hint={
-                                "How far along the track the thumb has to be when let go for the slide to complete. At 1 it has to reach the end; short of it, it springs back."
-                            }
-                            controls={"Sets SlideButtonProps.completionRatio"}
-                        >
+                        <PageProp key={"completionRatio"} {...SlideButtonKnobs.COMPLETION_RATIO_TEXT}>
                             <PageNumberField
                                 value={getCompletionRatio}
                                 min={SlideButtonKnobs.MIN_COMPLETION_RATIO}
@@ -78,14 +68,7 @@ export const SlideButtonDocs = () => {
                             />
                         </PageProp>
 
-                        <PageProp
-                            key={"holdDurationMs"}
-                            label={"Hold duration"}
-                            hint={
-                                "How long the button has to be held to confirm without sliding, in milliseconds. It times a held Enter or Space under every mode, and a held pointer under all but slide."
-                            }
-                            controls={"Sets SlideButtonProps.holdDurationMs"}
-                        >
+                        <PageProp key={"holdDurationMs"} {...SlideButtonKnobs.HOLD_DURATION_MS_TEXT}>
                             <PageNumberField
                                 value={getHoldDurationMs}
                                 min={SlideButtonKnobs.MIN_HOLD_DURATION_MS}
@@ -97,23 +80,11 @@ export const SlideButtonDocs = () => {
                             />
                         </PageProp>
 
-                        <PageProp
-                            key={"hasError"}
-                            label={"Error"}
-                            hint={
-                                "Puts the button in its error look. It changes nothing about what the button accepts or does."
-                            }
-                            controls={"Sets SlideButtonProps.hasError"}
-                        >
+                        <PageProp key={"hasError"} {...SlideButtonKnobs.HAS_ERROR_TEXT}>
                             <PageCheckField value={getHasError} ariaLabel={"Error"} onChange={setHasError} />
                         </PageProp>
 
-                        <PageProp
-                            key={"isDisabled"}
-                            label={"Disabled"}
-                            hint={"Turns the button off: it refuses the drag and the hold, and the Tab key skips it."}
-                            controls={"Sets SlideButtonProps.isDisabled"}
-                        >
+                        <PageProp key={"isDisabled"} {...SlideButtonKnobs.IS_DISABLED_TEXT}>
                             <PageCheckField value={getIsDisabled} ariaLabel={"Disabled"} onChange={setIsDisabled} />
                         </PageProp>
                     </>
@@ -128,23 +99,13 @@ export const SlideButtonDocs = () => {
                 />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"Orientation and direction"}
-                content={
-                    "A horizontal button slides from the side the text starts on: left to right, or right to left in a right-to-left page. A vertical one slides up from the bottom of the track, whichever way the text runs. The hold, a held Enter or Space and a click from assistive technology work the same in every direction."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.orientationDirection} />
 
             <PageDocsExample
                 path={`${DOCS_ROOT}/Directions.tsx`}
                 renderKnobs={() => (
                     <>
-                        <PageProp
-                            key={"orientation"}
-                            label={"Orientation"}
-                            hint={"Whether the track runs across the page or up it."}
-                            controls={"Sets SlideButtonProps.orientation"}
-                        >
+                        <PageProp key={"orientation"} {...SlideButtonKnobs.ORIENTATION_TEXT}>
                             <PageSelectField
                                 value={getOrientation}
                                 values={SLIDE_BUTTON_ORIENTATIONS}
@@ -153,14 +114,7 @@ export const SlideButtonDocs = () => {
                             />
                         </PageProp>
 
-                        <PageProp
-                            key={"direction"}
-                            label={"Direction"}
-                            hint={
-                                "Which way text runs around the button, set on the box that holds it. A right-to-left box makes a horizontal button slide leftward; a vertical one is unaffected."
-                            }
-                            controls={"Sets dir on the box around the button"}
-                        >
+                        <PageProp key={"direction"} {...SlideButtonKnobs.DIRECTION_TEXT}>
                             <PageSelectField
                                 value={getDirection}
                                 values={NAVIGATOR_DIRECTIONS}
@@ -174,12 +128,7 @@ export const SlideButtonDocs = () => {
                 <DirectionsDocsExample orientation={getOrientation} direction={getDirection} />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"Holding the thumb at the end"}
-                content={
-                    "To keep the thumb at the end after a successful slide, mark the button pressed until you reset it. The Playground's painter draws a pressed button with its thumb at the end; what a pressed button looks like is up to your painter."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.holdingThumbEnd} />
 
             <PageDocsExample path={`${DOCS_ROOT}/Held.tsx`}>
                 <HeldDocsExample />

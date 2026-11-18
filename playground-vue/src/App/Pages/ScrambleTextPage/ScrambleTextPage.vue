@@ -91,12 +91,7 @@ const examples: ExampleDefs[] = [
 
 <template>
     <PagePropsPanel scope="global">
-        <PageProp
-            item-key="settleDurationMs"
-            controls="Sets ScrambleTextProps.settleDurationMs"
-            label="Settle duration (ms)"
-            hint="How long the text takes to go from all scrambled to fully settled. It is off while the visitor has asked for reduced motion."
-        >
+        <PageProp item-key="settleDurationMs" v-bind="ScrambleTextKnobs.SETTLE_DURATION_MS_TEXT">
             <PageNumberField
                 :value="settleDurationMs"
                 :min="ScrambleTextKnobs.MIN_SETTLE_DURATION_MS"
@@ -108,12 +103,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="scrambleIntervalMs"
-            controls="Sets ScrambleTextProps.scrambleIntervalMs"
-            label="Scramble interval (ms)"
-            hint="How often an unsettled character is swapped for another. Shorter intervals make a busier churn."
-        >
+        <PageProp item-key="scrambleIntervalMs" v-bind="ScrambleTextKnobs.SCRAMBLE_INTERVAL_MS_TEXT">
             <PageNumberField
                 :value="scrambleIntervalMs"
                 :min="ScrambleTextKnobs.MIN_SCRAMBLE_INTERVAL_MS"
@@ -124,12 +114,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="glyphSet"
-            controls="Picks the sample glyph function sent to ScrambleTextProps.computeGlyphs"
-            label="Glyphs"
-            hint="Which characters the unsettled positions are drawn from. Matched churns a digit among digits and a letter among letters of its own case."
-        >
+        <PageProp item-key="glyphSet" v-bind="ScrambleTextKnobs.GLYPH_SET_TEXT">
             <PageSelectField
                 :value="glyphSet"
                 :values="ScrambleTextKnobs.GLYPH_SETS"
@@ -138,12 +123,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="settleOrder"
-            controls="Picks the sample weight function sent to ScrambleTextProps.computeCharacterWeights"
-            label="Settle order"
-            hint="The order the characters settle in: left to right, from the middle out, at random, and so on."
-        >
+        <PageProp item-key="settleOrder" v-bind="ScrambleTextKnobs.SETTLE_ORDER_TEXT">
             <PageSelectField
                 :value="settleOrder"
                 :values="ScrambleTextKnobs.SETTLE_ORDERS"

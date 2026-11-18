@@ -82,14 +82,7 @@ export const ScrambleTextPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp
-                    itemKey={"settleDurationMs"}
-                    label={"Settle duration (ms)"}
-                    hint={
-                        "How long the text takes to go from all scrambled to fully settled. It is off while the visitor has asked for reduced motion."
-                    }
-                    controls={"Sets ScrambleTextProps.settleDurationMs"}
-                >
+                <PageProp itemKey={"settleDurationMs"} {...ScrambleTextKnobs.SETTLE_DURATION_MS_TEXT}>
                     <PageNumberField
                         value={settleDurationMs}
                         min={ScrambleTextKnobs.MIN_SETTLE_DURATION_MS}
@@ -101,14 +94,7 @@ export const ScrambleTextPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"scrambleIntervalMs"}
-                    label={"Scramble interval (ms)"}
-                    hint={
-                        "How often an unsettled character is swapped for another. Shorter intervals make a busier churn."
-                    }
-                    controls={"Sets ScrambleTextProps.scrambleIntervalMs"}
-                >
+                <PageProp itemKey={"scrambleIntervalMs"} {...ScrambleTextKnobs.SCRAMBLE_INTERVAL_MS_TEXT}>
                     <PageNumberField
                         value={scrambleIntervalMs}
                         min={ScrambleTextKnobs.MIN_SCRAMBLE_INTERVAL_MS}
@@ -119,14 +105,7 @@ export const ScrambleTextPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"glyphSet"}
-                    label={"Glyphs"}
-                    hint={
-                        "Which characters the unsettled positions are drawn from. Matched churns a digit among digits and a letter among letters of its own case."
-                    }
-                    controls={"Picks the sample glyph function sent to ScrambleTextProps.computeGlyphs"}
-                >
+                <PageProp itemKey={"glyphSet"} {...ScrambleTextKnobs.GLYPH_SET_TEXT}>
                     <PageSelectField
                         value={glyphSet}
                         values={ScrambleTextKnobs.GLYPH_SETS}
@@ -135,14 +114,7 @@ export const ScrambleTextPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"settleOrder"}
-                    label={"Settle order"}
-                    hint={
-                        "The order the characters settle in: left to right, from the middle out, at random, and so on."
-                    }
-                    controls={"Picks the sample weight function sent to ScrambleTextProps.computeCharacterWeights"}
-                >
+                <PageProp itemKey={"settleOrder"} {...ScrambleTextKnobs.SETTLE_ORDER_TEXT}>
                     <PageSelectField
                         value={settleOrder}
                         values={ScrambleTextKnobs.SETTLE_ORDERS}

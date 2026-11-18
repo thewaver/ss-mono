@@ -14,19 +14,18 @@
     import PageFormSectionCaption from "../../../StyledComponents/FormFieldContent/PageFormSectionCaption.svelte";
     import PageFormStack from "../../../StyledComponents/FormFieldContent/PageFormStack.svelte";
     import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
+    import { MISMATCH_MESSAGE, DOES_NOT_LOOK_LIKE_TEXT, SOME_FIELDS_NEED_ATTENTION_TEXT } from "@thewaver/ss-playground/App/Pages/FormSectionPage/FormSectionPage.const";
 
     type TextState = [() => string, (next: string) => void];
 
     const FIELD_WIDTH = 240;
     const MIN_PASSWORD_LENGTH = 8;
-    const MISMATCH_MESSAGE = "The two passwords do not match.";
-
     let email = $state("");
     let password = $state("");
     let confirm = $state("");
     let outcome = $state("Not sent yet.");
 
-    const emailMessage = $derived(email.includes("@") ? "" : "That does not look like an email address.");
+    const emailMessage = $derived(email.includes("@") ? "" : DOES_NOT_LOOK_LIKE_TEXT);
 
     const passwordMessage = $derived(
         password.length >= MIN_PASSWORD_LENGTH ? "" : `At least ${MIN_PASSWORD_LENGTH} characters.`,
@@ -146,7 +145,7 @@
             </PageFormButtons>
 
             <div class={exampleStyles.exampleReadout} data-readout>
-                {`${state.isValid ? "Ready to send." : "Some fields need attention."} ${outcome}`}
+                {`${state.isValid ? "Ready to send." : SOME_FIELDS_NEED_ATTENTION_TEXT} ${outcome}`}
             </div>
         </PageFormStack>
     {/snippet}

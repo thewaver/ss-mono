@@ -66,12 +66,7 @@ export const LensPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp
-                    key={"zoom"}
-                    label={"Zoom"}
-                    hint={"How many times larger the content is drawn inside the lens. 1 draws it at its own size."}
-                    controls={"Sets LensProps.zoom"}
-                >
+                <PageProp key={"zoom"} {...LensKnobs.ZOOM_TEXT}>
                     <PageNumberField
                         value={getZoom}
                         min={LensKnobs.MIN_ZOOM}
@@ -83,12 +78,7 @@ export const LensPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"radius"}
-                    label={"Radius (px)"}
-                    hint={"How large the lens that follows the pointer is."}
-                    controls={"Sets LensProps.radius"}
-                >
+                <PageProp key={"radius"} {...LensKnobs.RADIUS_TEXT}>
                     <PageNumberField
                         value={getRadius}
                         min={LensKnobs.MIN_RADIUS}
@@ -100,12 +90,7 @@ export const LensPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"computePoints"}
-                    label={"Shape"}
-                    hint={"The contour of the lens."}
-                    controls={"Picks the example contour sent to LensProps.computePoints"}
-                >
+                <PageProp key={"computePoints"} {...LensKnobs.COMPUTE_POINTS_TEXT}>
                     <PageSelectField
                         value={getShape}
                         values={LensKnobs.SHAPES}
@@ -115,12 +100,7 @@ export const LensPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"joinRadii"}
-                    label={"Corner radius (px)"}
-                    hint={"How far the lens's corners are rounded. A circular lens has no corners, so it is off then."}
-                    controls={"Sets every corner of LensProps.joinRadii"}
-                >
+                <PageProp key={"joinRadii"} {...LensKnobs.JOIN_RADII_TEXT}>
                     <PageNumberField
                         value={getJoinRadius}
                         min={LensKnobs.MIN_JOIN_RADIUS}
@@ -132,14 +112,7 @@ export const LensPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"lameExponents"}
-                    label={"Lamé Exponent"}
-                    hint={
-                        "How square or how pinched the lens's rounded corners are: 1 is a circular round, higher is squarer."
-                    }
-                    controls={"Sets every corner of LensProps.lameExponents"}
-                >
+                <PageProp key={"lameExponents"} {...LensKnobs.LAME_EXPONENTS_TEXT}>
                     <PageNumberField
                         value={getLameExponent}
                         min={LensKnobs.MIN_LAME_EXPONENT}
@@ -151,12 +124,7 @@ export const LensPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"softness"}
-                    label={"Softness"}
-                    hint={"How gradually the lens's edge fades into the content around it. 0 gives a hard edge."}
-                    controls={"Sets LensProps.softness"}
-                >
+                <PageProp key={"softness"} {...LensKnobs.SOFTNESS_TEXT}>
                     <PageNumberField
                         value={getSoftness}
                         min={LensKnobs.MIN_SOFTNESS}
@@ -168,14 +136,7 @@ export const LensPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"stepSize"}
-                    label={"Step size (px)"}
-                    hint={
-                        "How far one press of an arrow key moves the lens. Tab to a lens and it opens at the center; the arrow keys move it from there."
-                    }
-                    controls={"Sets LensProps.stepSize"}
-                >
+                <PageProp key={"stepSize"} {...LensKnobs.STEP_SIZE_TEXT}>
                     <PageNumberField
                         value={getStepSize}
                         min={LensKnobs.MIN_STEP_SIZE}
@@ -187,12 +148,7 @@ export const LensPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"isDisabled"}
-                    label={"Disabled"}
-                    hint={"Stops the lens following the pointer or the keyboard, leaving the content as it is."}
-                    controls={"Sets LensProps.isDisabled"}
-                >
+                <PageProp key={"isDisabled"} {...LensKnobs.IS_DISABLED_TEXT}>
                     <PageCheckField value={getIsDisabled} ariaLabel={"Disabled"} onChange={setIsDisabled} />
                 </PageProp>
             </PagePropsPanel>

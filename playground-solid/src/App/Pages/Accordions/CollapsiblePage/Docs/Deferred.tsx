@@ -3,14 +3,17 @@ import { createSignal, onMount } from "solid-js";
 import { Collapsible } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
 import * as collapsibleStyles from "@thewaver/ss-playground/App/Pages/Accordions/Accordions.css";
+import {
+    DELIVERY_NOTES,
+    HIDE_DELIVERY_NOTES_TEXT,
+    SHOW_DELIVERY_NOTES_TEXT,
+} from "@thewaver/ss-playground/App/Pages/Accordions/CollapsiblePage/CollapsiblePage.const";
 
 import {
     PageAccordionHeader,
     PageAccordionPanel,
     PageAccordionWrapper,
 } from "../../../../StyledComponents/AccordionContent/AccordionContent";
-
-const NOTES = ["Signed for on arrival", "Left with a neighbor", "Returned to the depot"];
 
 export const DeferredDocsExample = () => {
     const [getIsBuilt, setIsBuilt] = createSignal(false);
@@ -26,7 +29,7 @@ export const DeferredDocsExample = () => {
                     )}
                     renderTrigger={(getFlags) => (
                         <PageAccordionHeader flags={getFlags}>
-                            {getFlags().isExpanded ? "Hide the delivery notes" : "Show the delivery notes"}
+                            {getFlags().isExpanded ? HIDE_DELIVERY_NOTES_TEXT : SHOW_DELIVERY_NOTES_TEXT}
                         </PageAccordionHeader>
                     )}
                     renderPanel={(getVisibilityTarget, getTransitionDurationMs) => {
@@ -37,7 +40,7 @@ export const DeferredDocsExample = () => {
                                 visibilityTarget={getVisibilityTarget}
                                 transitionDurationMs={getTransitionDurationMs}
                             >
-                                <div>{NOTES.join(" · ")}</div>
+                                <div>{DELIVERY_NOTES.join(" · ")}</div>
                             </PageAccordionPanel>
                         );
                     }}

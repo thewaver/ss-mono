@@ -7,7 +7,12 @@ import {
     CALENDAR_TRIGGER_LABEL,
     DATE_PART_HINTS,
 } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
-import { FIELD_WIDTH, LOCALE, TODAY } from "@thewaver/ss-playground/App/Pages/DatePickerPage/DatePickerPage.const";
+import {
+    DATE_RIGHT_LEFT_BOX_LABEL,
+    FIELD_WIDTH,
+    LOCALE,
+    TODAY,
+} from "@thewaver/ss-playground/App/Pages/DatePickerPage/DatePickerPage.const";
 import {
     FIELD_GAP,
     FIELD_STEPPER_PADDING,
@@ -29,7 +34,7 @@ const value = shallowRef<DateValue | undefined>(TODAY);
     <div dir="rtl">
         <DatePicker
             v-model:value="value"
-            ariaLabel="Date in a right-to-left box"
+            :ariaLabel="DATE_RIGHT_LEFT_BOX_LABEL"
             calendar-label="Choose a date"
             :part-hints="DATE_PART_HINTS"
             :locale="LOCALE"

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { DOCS_ROOT } from "@thewaver/ss-playground/App/Pages/RadioPage/RadioPage.const";
+    import { DOCS_SECTIONS, DOCS_ROOT } from "@thewaver/ss-playground/App/Pages/RadioPage/RadioPage.const";
 
     import PageDocsExample from "../../PageComponents/DocsExample/PageDocsExample.svelte";
     import PageDocsSection from "../../PageComponents/DocsSection/PageDocsSection.svelte";
@@ -12,6 +12,7 @@
     import RatingDocsExample from "./Docs/Rating.svelte";
     import RightToLeftDocsExample from "./Docs/RightToLeft.svelte";
     import SegmentedDocsExample from "./Docs/Segmented.svelte";
+    import { RadioKnobs } from "@thewaver/ss-playground/App/Knobs/Radios.const";
 
     let hasError = $state(false);
     let isDisabled = $state(false);
@@ -24,9 +25,7 @@
     {#snippet renderKnobs()}
         <PageProp
             itemKey={"hasError"}
-            label={"Error"}
-            hint={"Marks the group and its radios invalid, for screen readers as well as for the painter."}
-            controls={"Sets RadioGroupProps.hasError and RadioProps.hasError"}
+            {...RadioKnobs.HAS_ERROR_TEXT}
         >
             <PageCheckField
                 value={hasError}
@@ -39,9 +38,7 @@
 
         <PageProp
             itemKey={"isDisabled"}
-            label={"Disabled"}
-            hint={"Turns every radio off: none can be picked, and the Tab key skips the group."}
-            controls={"Sets RadioProps.isDisabled on every radio"}
+            {...RadioKnobs.IS_DISABLED_TEXT}
         >
             <PageCheckField
                 value={isDisabled}
@@ -55,8 +52,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Right to left"}
-    content={"Inside a box whose text runs right to left, the radios run from the right too, and the left arrow moves on to the next one, while up and down keep their meaning."}
+    {...DOCS_SECTIONS.rightLeft}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/RightToLeft.svelte`}>
@@ -64,8 +60,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Segmented"}
-    content={"Set [prop]orientation[/prop] to horizontal and the radios sit side by side; [prop]renderSelectionFloater[/prop] then draws a marker that slides to the picked one, which is the look of a segmented control."}
+    {...DOCS_SECTIONS.segmented}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Segmented.svelte`}>
@@ -73,8 +68,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"A rating"}
-    content={"Any value can stand behind a radio, numbers included, and the painter decides what each one looks like: here the stars fill up to the one under the pointer, or up to the pick."}
+    {...DOCS_SECTIONS.rating}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Rating.svelte`}>
@@ -82,8 +76,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Bent into an arc"}
-    content={"Give the group [prop]computeLayout[/prop] and the radios are placed by a layout instead of laid in a row or a column, here along an arc. The arrow keys still walk them in the order they are written."}
+    {...DOCS_SECTIONS.bentIntoArc}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Arc.svelte`}>
@@ -91,8 +84,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Decoration"}
-    content={"Anything drawn over a radio goes through [prop]renderDecoration[/prop], which is handed the radio's state like the painter is: here a corner highlight marks the one picked."}
+    {...DOCS_SECTIONS.decoration}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Decorated.svelte`}>
@@ -100,8 +92,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"A disabled option"}
-    content={"One radio can be off while the rest work: the arrow keys skip it and it cannot be picked. Kept reachable when disabled, the arrow keys stop on it without picking it, so its tooltip can say why it is off."}
+    {...DOCS_SECTIONS.disabledOption}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/DisabledOption.svelte`}>
@@ -110,9 +101,7 @@
     {#snippet renderKnobs()}
         <PageProp
             itemKey={"isReachableWhenDisabled"}
-            label={"Reachable when disabled"}
-            hint={"Lets the arrow keys stop on the disabled radio, which then shows its tooltip."}
-            controls={"Sets RadioProps.isReachableWhenDisabled"}
+            {...RadioKnobs.IS_REACHABLE_WHEN_DISABLED_TEXT}
         >
             <PageCheckField
                 value={isReachableWhenDisabled}

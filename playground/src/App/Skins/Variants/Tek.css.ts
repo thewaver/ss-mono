@@ -26,7 +26,10 @@ const insetGlow = (color: string, alphaPercent: number) =>
     ].join(", ");
 
 const outsetGlow = (color: string, alphaPercent: number) =>
-    `0 0 16px 0 rgb(from ${color} r g b / ${alphaPercent * 0.5}%)`;
+    [
+        `0 0 16px 0 rgb(from ${color} r g b / ${alphaPercent * 0.5}%)`,
+        `0 0 32px 0 rgb(from ${color} r g b / ${alphaPercent * 0.25}%)`,
+    ].join(", ");
 
 type DirTo = "top" | "right" | "bottom" | "left";
 
@@ -132,7 +135,8 @@ const ITEM_FLOATER_HOVER: StyleRule = {
 };
 
 const ITEM_FLOATER_SELECTED: StyleRule = {
-    ...unlitBoard(themeVars.color.primary.main, 25),
+    // ...unlitBoard(themeVars.color.primary.main, 25),
+    color: themeVars.color.primary.main,
 };
 
 const TAB_FLOATER_HOVER: StyleRule = {
@@ -178,16 +182,14 @@ SkinUtils.define(tek, {
         ...ACCORDION,
     },
     button: {
-        ...litBoard(layerVars.contrast, new Set(["top", "right", "bottom", "left"])),
+        ...litBoard(themeVars.color.primary.main, new Set(["top", "right", "bottom", "left"])),
         borderBottomLeftRadius: themeVars.borderRadius.full,
         borderTopRightRadius: themeVars.borderRadius.full,
         paddingInline: themeVars.spacing.double,
         fontWeight: "bold",
         selectors: ObjectUtils.deepMerge(INTERACTIBLE_STATES, {
             [skinSelectors.isPressed]: {
-                ...litBoard(themeVars.color.primary.main, new Set(["top", "right", "bottom", "left"])),
-                borderBottomLeftRadius: themeVars.borderRadius.full,
-                borderTopRightRadius: themeVars.borderRadius.full,
+                borderRadius: themeVars.borderRadius.full,
             },
             [skinSelectors.hasError]: {
                 ...litBoard(themeVars.color.error.main, new Set(["top", "right", "bottom", "left"])),
@@ -195,7 +197,7 @@ SkinUtils.define(tek, {
                 borderTopRightRadius: themeVars.borderRadius.full,
             },
             [SkinUtils.allOf(skinSelectors.isPressed, skinSelectors.hasError)]: {
-                color: themeVars.color.primary.main,
+                borderRadius: themeVars.borderRadius.full,
             },
         }),
     },
@@ -206,10 +208,15 @@ SkinUtils.define(tek, {
         fontSize: themeVars.fontSize.small,
         selectors: ObjectUtils.deepMerge(INTERACTIBLE_STATES, {
             [skinSelectors.isPressed]: {
-                ...unlitBoard(themeVars.color.primary.main, 25),
+                color: themeVars.color.primary.main,
             },
             [skinSelectors.hasError]: {
-                ...unlitBoard(themeVars.color.error.main, 25),
+                boxShadow: [
+                    `inset 0 0 0 2px ${themeVars.color.error.main}`,
+                    insetGlow(themeVars.color.error.main, 25 * 0.5),
+                    outsetGlow(themeVars.color.error.main, 25),
+                    SHADOW_SMALL,
+                ].join(", "),
             },
             [SkinUtils.allOf(skinSelectors.isPressed, skinSelectors.hasError)]: {
                 color: themeVars.color.primary.main,

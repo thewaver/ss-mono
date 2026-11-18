@@ -38,12 +38,7 @@ const reachPixels = shallowRef(ParticleSpawnerKnobs.STARTING_ATTRACTION_REACH_PI
     </ScrubbedExampleWrapper>
 
     <PageExampleKnobs>
-        <PageProp
-            item-key="attractionStrengthRatio"
-            controls="Sets strengthRatio of ParticleModifierUtils.createAttraction, sent to ParticleSpawnerProps.particleModifiers"
-            label="Strength"
-            hint="How much of the way to the ring a particle passing right by it is drawn."
-        >
+        <PageProp item-key="attractionStrengthRatio" v-bind="ParticleSpawnerKnobs.ATTRACTION_STRENGTH_RATIO_TEXT">
             <PageNumberField
                 :value="strengthRatio"
                 :min="ParticleSpawnerKnobs.MIN_ATTRACTION_STRENGTH_RATIO"
@@ -55,12 +50,7 @@ const reachPixels = shallowRef(ParticleSpawnerKnobs.STARTING_ATTRACTION_REACH_PI
             />
         </PageProp>
 
-        <PageProp
-            item-key="attractionReachPixels"
-            controls="Sets reachPixels of ParticleModifierUtils.createAttraction, sent to ParticleSpawnerProps.particleModifiers"
-            label="Reach (px)"
-            hint="How far from the ring the pull is felt at all. Particles passing farther away are left alone."
-        >
+        <PageProp item-key="attractionReachPixels" v-bind="ParticleSpawnerKnobs.ATTRACTION_REACH_PIXELS_TEXT">
             <PageNumberField
                 :value="reachPixels"
                 :min="ParticleSpawnerKnobs.MIN_ATTRACTION_REACH_PIXELS"

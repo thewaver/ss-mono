@@ -27,4 +27,52 @@ export namespace LensKnobs {
     export const STARTING_JOIN_RADIUS = 0;
     export const STARTING_LAME_EXPONENT = 1;
     export const STARTING_IS_DISABLED = false;
+
+    export const ZOOM_TEXT = {
+        label: "Zoom",
+        hint: "How many times larger the content is drawn inside the lens. 1 draws it at its own size.",
+        controls: "Sets LensProps.zoom",
+    };
+
+    export const RADIUS_TEXT = {
+        label: "Radius (px)",
+        hint: "How large the lens that follows the pointer is.",
+        controls: "Sets LensProps.radius",
+    };
+
+    export const COMPUTE_POINTS_TEXT = {
+        label: "Shape",
+        hint: "The contour of the lens.",
+        controls: "Picks the example contour sent to LensProps.computePoints",
+    };
+
+    export const JOIN_RADII_TEXT = {
+        label: "Corner radius (px)",
+        hint: "How far the lens's corners are rounded. A circular lens has no corners, so it is off then.",
+        controls: "Sets every corner of LensProps.joinRadii",
+    };
+
+    export const LAME_EXPONENTS_TEXT = {
+        label: "Lamé Exponent",
+        hint: "How square or how pinched the lens's rounded corners are: 1 is a circular round, higher is squarer.",
+        controls: "Sets every corner of LensProps.lameExponents",
+    };
+
+    export const SOFTNESS_TEXT = {
+        label: "Softness",
+        hint: "How gradually the lens's edge fades into the content around it. 0 gives a hard edge.",
+        controls: "Sets LensProps.softness",
+    };
+
+    export const STEP_SIZE_TEXT = {
+        label: "Step size (px)",
+        hint: "How far one press of an arrow key moves the lens. Tab to a lens and it opens at the center; the arrow keys move it from there.",
+        controls: "Sets LensProps.stepSize",
+    };
+
+    export const IS_DISABLED_TEXT = {
+        label: "Disabled",
+        hint: "Stops the lens following the pointer or the keyboard, leaving the content as it is.",
+        controls: "Sets LensProps.isDisabled",
+    };
 }

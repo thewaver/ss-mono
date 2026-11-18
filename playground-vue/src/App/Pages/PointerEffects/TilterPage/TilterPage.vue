@@ -60,12 +60,7 @@ const examples: ExampleDefs[] = [
 
 <template>
     <PagePropsPanel scope="global">
-        <PageProp
-            item-key="isDisabled"
-            controls="Sets TilterProps.isDisabled"
-            label="Disabled"
-            hint="Stops the surface following the pointer and leaves it flat. It is what a page honoring a reduced-motion preference passes."
-        >
+        <PageProp item-key="isDisabled" v-bind="TilterKnobs.IS_DISABLED_TEXT">
             <PageCheckField
                 :value="isDisabled"
                 ariaLabel="Disabled"
@@ -73,12 +68,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="smoothingMs"
-            controls="Sets TilterProps.smoothingMs"
-            label="Smoothing (ms)"
-            hint="How long the surface takes to catch up with the pointer. At 0 it follows exactly; raised, it lags a quick movement and glides back flat when the pointer leaves."
-        >
+        <PageProp item-key="smoothingMs" v-bind="TilterKnobs.SMOOTHING_MS_TEXT">
             <PageNumberField
                 :value="smoothingMs"
                 :min="TilterKnobs.MIN_SMOOTHING_MS"
@@ -90,12 +80,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="activeRangePx"
-            controls="Sets TilterProps.activeRangePx"
-            label="Active range (px)"
-            hint="How near the pointer has to be before the surface answers it at all, measured from the area's center. Outside it the surface lies flat."
-        >
+        <PageProp item-key="activeRangePx" v-bind="TilterKnobs.ACTIVE_RANGE_PX_TEXT">
             <PageNumberField
                 :value="activeRangePx"
                 :min="TilterKnobs.MIN_ACTIVE_RANGE_PX"
@@ -107,12 +92,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="tiltRangePx"
-            controls="Sets TilterProps.tiltRangePx"
-            label="Tilt range (px)"
-            hint="How far from the center the pointer starts to tip the surface. The turn is strongest at the surface's own edge and fades to nothing out at this distance."
-        >
+        <PageProp item-key="tiltRangePx" v-bind="TilterKnobs.TILT_RANGE_PX_TEXT">
             <PageNumberField
                 :value="tiltRangePx"
                 :min="TilterKnobs.MIN_TILT_RANGE_PX"
@@ -124,12 +104,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="maxTiltDegrees"
-            controls="Sets TilterProps.maxTiltDegrees"
-            label="Max tilt (deg)"
-            hint="How far the surface turns when the pointer is at the very edge of the tilted area."
-        >
+        <PageProp item-key="maxTiltDegrees" v-bind="TilterKnobs.MAX_TILT_DEGREES_TEXT">
             <PageNumberField
                 :value="maxTiltDegrees"
                 :min="TilterKnobs.MIN_TILT_DEGREES"
@@ -141,12 +116,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="perspectivePx"
-            controls="Sets TilterProps.perspectivePx"
-            label="Perspective (px)"
-            hint="How near the viewer sits. Smaller is a more violent perspective; larger flattens the turn."
-        >
+        <PageProp item-key="perspectivePx" v-bind="TilterKnobs.PERSPECTIVE_PX_TEXT">
             <PageNumberField
                 :value="perspectivePx"
                 :min="TilterKnobs.MIN_PERSPECTIVE_PX"
@@ -158,12 +128,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="sheenOpacity"
-            controls="Sets the opacity of the example sheen drawn by TilterProps.renderSheen"
-            label="Sheen opacity"
-            hint="How strong the highlight is. It belongs to the page rather than to the component."
-        >
+        <PageProp item-key="sheenOpacity" v-bind="TilterKnobs.SHEEN_OPACITY_TEXT">
             <PageNumberField
                 :value="sheenOpacity"
                 :min="TilterKnobs.MIN_SHEEN_OPACITY"
@@ -175,12 +140,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="sheenSpreadPercent"
-            controls="Sets the spread of the example sheen drawn by TilterProps.renderSheen"
-            label="Sheen spread (%)"
-            hint="How wide the band of highlight is across the surface."
-        >
+        <PageProp item-key="sheenSpreadPercent" v-bind="TilterKnobs.SHEEN_SPREAD_PERCENT_TEXT">
             <PageNumberField
                 :value="sheenSpreadPercent"
                 :min="TilterKnobs.MIN_SHEEN_SPREAD"

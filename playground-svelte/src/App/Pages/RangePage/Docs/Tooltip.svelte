@@ -6,6 +6,7 @@
     import PageRangeContent from "../../../StyledComponents/RangeContent/RangeContent.svelte";
     import PageTooltipContent from "../../../StyledComponents/TooltipContent/TooltipContent.svelte";
     import type { RangeTooltipDocsExampleProps } from "../RangePageSvelte.types";
+    import { DISABLED_BUT_REACHABLE_RANGE_LABEL } from "@thewaver/ss-playground/App/Pages/RangePage/RangePage.const";
 
     type Props = RangeTooltipDocsExampleProps;
 
@@ -17,7 +18,7 @@
 <Range
     bind:value
     id={"tooltipVolume"}
-    ariaLabel={"Disabled but reachable range"}
+    ariaLabel={DISABLED_BUT_REACHABLE_RANGE_LABEL}
     isDisabled={props.isDisabled}
     isReachableWhenDisabled={props.isReachableWhenDisabled}
     thumbSize={RANGE_THUMB_SIZE}

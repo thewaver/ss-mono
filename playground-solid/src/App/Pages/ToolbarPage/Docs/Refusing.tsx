@@ -3,6 +3,7 @@ import { createSignal } from "solid-js";
 import { Toolbar } from "@thewaver/ss-components-solid";
 import type { ToolbarAction } from "@thewaver/ss-components-solid";
 import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
+import { MORE_DOCUMENT_ACTIONS_LABEL } from "@thewaver/ss-playground/App/Pages/ToolbarPage/ToolbarPage.const";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
 import { PageMenuTriggerContent } from "../../../StyledComponents/MenuTriggerContent/MenuTriggerContent";
@@ -28,7 +29,7 @@ export const RefusingDocsExample = () => {
                 <Toolbar
                     actions={ACTIONS}
                     ariaLabel={"Document"}
-                    overflowAriaLabel={"More document actions"}
+                    overflowAriaLabel={MORE_DOCUMENT_ACTIONS_LABEL}
                     renderAction={(getAction, getFlags) => (
                         <PageButtonContent flags={getFlags}>{getAction().value}</PageButtonContent>
                     )}

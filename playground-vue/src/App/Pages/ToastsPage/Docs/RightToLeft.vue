@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Toasts } from "@thewaver/ss-components-vue";
+import { PUBLISHING_NOTIFICATIONS_LABEL } from "@thewaver/ss-playground/App/Pages/ToastsPage/ToastsPage.const";
 
 import PageToastContent from "../../../StyledComponents/ToastContent/ToastContent.vue";
 import RightToLeftRaisers from "./RightToLeftRaisers.vue";
@@ -7,7 +8,7 @@ import RightToLeftRaisers from "./RightToLeftRaisers.vue";
 
 <template>
     <div dir="rtl">
-        <Toasts ariaLabel="Publishing notifications" alignment="middle_left">
+        <Toasts :ariaLabel="PUBLISHING_NOTIFICATIONS_LABEL" alignment="middle_left">
             <RightToLeftRaisers />
 
             <template #renderToast="{ toast, visibilityTarget, transitionDurationMs, state, dismiss }">

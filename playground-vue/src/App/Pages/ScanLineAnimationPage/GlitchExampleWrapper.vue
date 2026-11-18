@@ -49,12 +49,7 @@ const keyframeOpts = reactive({ ...ScanlineAnimationKnobs.STARTING_GLITCH_OPTS }
     </div>
 
     <PageExampleKnobs>
-        <PageProp
-            item-key="count"
-            controls="Sets the number of glitch bursts in the example's ScanlineAnimationProps.computeSliceAnimation"
-            label="Count"
-            hint="How many glitch bursts happen over one pass."
-        >
+        <PageProp item-key="count" v-bind="ScanlineAnimationKnobs.COUNT_TEXT">
             <PageNumberField
                 :value="keyframeOpts.count"
                 :min="ScanlineAnimationKnobs.MIN_GLITCH_COUNT"
@@ -65,12 +60,7 @@ const keyframeOpts = reactive({ ...ScanlineAnimationKnobs.STARTING_GLITCH_OPTS }
             />
         </PageProp>
 
-        <PageProp
-            item-key="maxShift"
-            controls="Sets how far rows slide in the example's ScanlineAnimationProps.computeSliceAnimation"
-            label="Max shift (%)"
-            hint="How far a line can be thrown sideways at the worst of a burst, as a share of its own width."
-        >
+        <PageProp item-key="maxShift" v-bind="ScanlineAnimationKnobs.MAX_SHIFT_TEXT">
             <PageNumberField
                 :value="keyframeOpts.shiftPercent"
                 :min="ScanlineAnimationKnobs.MIN_SHIFT_PERCENT"
@@ -81,12 +71,7 @@ const keyframeOpts = reactive({ ...ScanlineAnimationKnobs.STARTING_GLITCH_OPTS }
             />
         </PageProp>
 
-        <PageProp
-            item-key="chunkyness01"
-            controls="Sets how many neighboring rows slide together in the example's ScanlineAnimationProps.computeSliceAnimation"
-            label="Chunkyness (0-1)"
-            hint="How blocky the glitch is: low values throw single lines about, high values throw thick slabs."
-        >
+        <PageProp item-key="chunkyness01" v-bind="ScanlineAnimationKnobs.CHUNKYNESS01_TEXT">
             <PageNumberField
                 :value="keyframeOpts.chunkyness"
                 :min="ScanlineAnimationKnobs.MIN_CHUNKYNESS"

@@ -138,21 +138,11 @@ const examples: ExampleDefs[] = [
 <template>
     <div :class="styles.root">
         <PagePropsPanel scope="global">
-            <PageProp
-                item-key="image"
-                controls="Picks the example picture sent to ScanlineAnimationProps.src"
-                label="Image"
-                hint="Swaps in a picture of your own, so the sweep can be watched against something other than the sample."
-            >
+            <PageProp item-key="image" v-bind="ScanlineAnimationKnobs.IMAGE_TEXT">
                 <PageFileField accept="image/*" ariaLabel="Image" @pick="handleFile" />
             </PageProp>
 
-            <PageProp
-                item-key="weightType"
-                controls="Picks the example's weight function sent to ScanlineAnimationProps.computeSliceWeights"
-                label="Weight"
-                hint="How each line's turn is decided: its position, a wave, a random draw, and so on."
-            >
+            <PageProp item-key="weightType" v-bind="ScanlineAnimationKnobs.WEIGHT_TYPE_TEXT">
                 <PageGroupedSelectField
                     :value="weightType"
                     :groups="GROUPPED_WEIGHTS"
@@ -161,12 +151,7 @@ const examples: ExampleDefs[] = [
                 />
             </PageProp>
 
-            <PageProp
-                item-key="lineCount"
-                controls="Sets ScanlineAnimationProps.lineCount"
-                label="Line count"
-                hint="How many lines the picture is cut into. More lines is a finer sweep and more work per frame."
-            >
+            <PageProp item-key="lineCount" v-bind="ScanlineAnimationKnobs.LINE_COUNT_TEXT">
                 <PageNumberField
                     :value="lineCount"
                     :min="ScanlineAnimationKnobs.MIN_LINE_COUNT"
@@ -177,12 +162,7 @@ const examples: ExampleDefs[] = [
                 />
             </PageProp>
 
-            <PageProp
-                item-key="orientation"
-                controls="Sets ScanlineAnimationProps.orientation"
-                label="Orientation"
-                hint="Which way the lines run: rows across the picture, or columns down it. The samples here were written for rows, so on columns they still push sideways and some read their place off the row."
-            >
+            <PageProp item-key="orientation" v-bind="ScanlineAnimationKnobs.ORIENTATION_TEXT">
                 <PageSelectField
                     :value="orientation"
                     :values="SCANLINE_ANIMATION_ORIENTATIONS"
@@ -191,12 +171,7 @@ const examples: ExampleDefs[] = [
                 />
             </PageProp>
 
-            <PageProp
-                item-key="animationDurationMs"
-                controls="Sets ScanlineAnimationProps.animationDurationMs"
-                label="Animation duration (ms)"
-                hint="How long one sweep over the whole picture takes."
-            >
+            <PageProp item-key="animationDurationMs" v-bind="ScanlineAnimationKnobs.ANIMATION_DURATION_MS_TEXT">
                 <PageNumberField
                     :value="animationDurationMs"
                     :min="ScanlineAnimationKnobs.MIN_DURATION_MS"
@@ -209,9 +184,7 @@ const examples: ExampleDefs[] = [
 
             <PageProp
                 item-key="animationIterationDelayMs"
-                controls="Sets ScanlineAnimationProps.animationIterationDelayMs"
-                label="Iteration delay (ms)"
-                hint="How long the picture waits between one sweep and the next."
+                v-bind="ScanlineAnimationKnobs.ANIMATION_ITERATION_DELAY_MS_TEXT"
             >
                 <PageNumberField
                     :value="animationIterationDelayMs"

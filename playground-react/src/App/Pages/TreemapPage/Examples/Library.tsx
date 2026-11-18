@@ -3,6 +3,7 @@ import { useMemo } from "react";
 import { Button, Treemap, TreemapUtils } from "@thewaver/ss-components-react";
 import { LIBRARY } from "@thewaver/ss-playground/App/LibraryTree.generated";
 import { formatLines } from "@thewaver/ss-playground/App/LibraryTree.utils";
+import { LIBRARY_S_SOURCE_LINES_LABEL } from "@thewaver/ss-playground/App/Pages/TreemapPage/TreemapPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/TreemapPage/TreemapPage.css";
 
 import { PageTreemapBar, PageTreemapTile } from "../../../StyledComponents/TreemapContent/TreemapContent";
@@ -45,7 +46,7 @@ export const LibraryExample = (props: Props) => {
                     root={LIBRARY}
                     branch={props.branch}
                     zoomDurationMs={props.zoomDurationMs}
-                    ariaLabel={"The library's source, by lines of code"}
+                    ariaLabel={LIBRARY_S_SOURCE_LINES_LABEL}
                     renderTile={(node, state) => (
                         <PageTreemapTile
                             name={node.value}

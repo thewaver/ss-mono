@@ -109,11 +109,7 @@
     <PagePropsPanel scope={"global"}>
         <PageProp
             itemKey={"spawnChance"}
-            controls={"Sets ParticleFieldProps.spawnChance"}
-            label={"Spawn chance (0-1)"}
-            hint={
-                "The chance each cell spawns in a given pass. 1 spawns every cell every pass; lower leaves gaps that change from pass to pass. When a cell does spawn is still its weight's call."
-            }
+            {...ParticleFieldKnobs.SPAWN_CHANCE_TEXT}
         >
             <PageNumberField
                 value={spawnChance}
@@ -129,9 +125,7 @@
 
         <PageProp
             itemKey={"cellCount"}
-            controls={"Sets ParticleFieldProps.cellCount"}
-            label={"Cell count (cols x rows)"}
-            hint={"How many columns and rows the field is split into. A cell holds one particle at a time."}
+            {...ParticleFieldKnobs.CELL_COUNT_TEXT}
         >
             <div class={styles.valueList}>
                 <PageNumberField
@@ -159,11 +153,7 @@
 
         <PageProp
             itemKey={"originType"}
-            controls={"Picks the point the example's weights are measured from, sent to ParticleFieldProps.computeCellWeights"}
-            label={"Origin"}
-            hint={
-                "Where in the grid the weights are measured from. It only applies to weights that are measured from a point."
-            }
+            {...ParticleFieldKnobs.ORIGIN_TYPE_TEXT}
         >
             <PageSelectField
                 value={originType}
@@ -178,9 +168,7 @@
 
         <PageProp
             itemKey={"weightType"}
-            controls={"Picks the example's weight function sent to ParticleFieldProps.computeCellWeights"}
-            label={"Weight"}
-            hint={"The same weights CellAnimation uses: a heavy cell spawns early in the pass and a light one late."}
+            {...ParticleFieldKnobs.WEIGHT_TYPE_TEXT}
         >
             <PageGroupedSelectField
                 value={weightType}
@@ -194,11 +182,7 @@
 
         <PageProp
             itemKey={"animationType"}
-            controls={"Picks the example's particle keyframes sent to ParticleFieldProps.computeParticleAnimation"}
-            label={"Animation"}
-            hint={
-                "How a particle appears, played forwards as it arrives and backwards as it leaves: CellAnimation's own keyframes."
-            }
+            {...ParticleFieldKnobs.ANIMATION_TYPE_TEXT}
         >
             <PageGroupedSelectField
                 value={animationType}
@@ -212,11 +196,7 @@
 
         <PageProp
             itemKey={"holdShare"}
-            controls={"Sets how long the example's particle keyframes hold, sent to ParticleFieldProps.computeParticleAnimation"}
-            label={"Hold (0-1)"}
-            hint={
-                "How much of a particle's life it spends fully shown, between appearing and disappearing. 1 cuts in and out."
-            }
+            {...ParticleFieldKnobs.HOLD_SHARE_TEXT}
         >
             <PageNumberField
                 value={holdShare}
@@ -232,11 +212,7 @@
 
         <PageProp
             itemKey={"isScattered"}
-            controls={"Decides whether the example's ParticleFieldProps.computeParticlePos scatters each particle inside its cell"}
-            label={"Scatter in cell"}
-            hint={
-                "Places each particle at a random point in its cell rather than at the center, so the grid stops showing."
-            }
+            {...ParticleFieldKnobs.IS_SCATTERED_TEXT}
         >
             <PageCheckField
                 value={isScattered}
@@ -249,11 +225,7 @@
 
         <PageProp
             itemKey={"animationDurationMs"}
-            controls={"Sets ParticleFieldProps.animationDurationMs"}
-            label={"Duration (ms)"}
-            hint={
-                "How long one pass over the grid takes, and so the shortest time between two spawns from the same cell."
-            }
+            {...ParticleFieldKnobs.ANIMATION_DURATION_MS_TEXT}
         >
             <PageNumberField
                 value={durationMs}
@@ -269,9 +241,7 @@
 
         <PageProp
             itemKey={"particleLifetimeMs"}
-            controls={"Sets ParticleFieldProps.particleLifetimeMs"}
-            label={"Lifetime (ms)"}
-            hint={"How long one particle lives, from appearing to being removed."}
+            {...ParticleFieldKnobs.PARTICLE_LIFETIME_MS_TEXT}
         >
             <PageNumberField
                 value={lifetimeMs}
@@ -287,9 +257,7 @@
 
         <PageProp
             itemKey={"iterationDelayMs"}
-            controls={"Sets ParticleFieldProps.animationIterationDelayMs"}
-            label={"Iteration delay (ms)"}
-            hint={"How long the field waits between one pass and the next."}
+            {...ParticleFieldKnobs.ITERATION_DELAY_MS_TEXT}
         >
             <PageNumberField
                 value={iterationDelayMs}

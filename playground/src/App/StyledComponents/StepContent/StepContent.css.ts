@@ -120,7 +120,7 @@ export const arcCell = style({
     width: "100%",
     height: "100%",
     borderRadius: 100,
-    backgroundColor: layerVars.main,
+    backgroundColor: layerVars.dark,
     boxShadow: themeVars.shadow.small,
 });
 

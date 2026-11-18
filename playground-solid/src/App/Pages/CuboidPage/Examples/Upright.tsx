@@ -2,6 +2,13 @@ import { For } from "solid-js";
 
 import { Button, CUBOID_FACES, Cuboid } from "@thewaver/ss-components-solid";
 import { computeCuboidFaceLabel } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
+import {
+    SIX_FACES_KEPT_UPRIGHT_LABEL,
+    TURN_FACE_ABOVE_TOWARDS_TEXT,
+    TURN_FACE_BELOW_TOWARDS_TEXT,
+    TURN_FACE_LEFT_TOWARDS_TEXT,
+    TURN_FACE_RIGHT_TOWARDS_TEXT,
+} from "@thewaver/ss-playground/App/Pages/CuboidPage/CuboidPage.const";
 import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
@@ -42,7 +49,7 @@ export const UprightExample = (props: Props) => {
                     transitionDurationMs={props.transitionDurationMs}
                     isUpright={props.isUpright}
                     isDraggable={props.isDraggable}
-                    ariaLabel={"Six faces, kept upright"}
+                    ariaLabel={SIX_FACES_KEPT_UPRIGHT_LABEL}
                     computeFaceLabel={computeCuboidFaceLabel}
                     renderFace={(getFace, getState) => <PageCuboidFace face={getFace} state={getState} />}
                     onMount={setController}
@@ -51,21 +58,21 @@ export const UprightExample = (props: Props) => {
 
             <PageCuboidPad>
                 <div />
-                {renderTurn("uprightPitchUp", "Turn the face above towards you", CONTROL_GLYPHS.up, () => {
+                {renderTurn("uprightPitchUp", TURN_FACE_ABOVE_TOWARDS_TEXT, CONTROL_GLYPHS.up, () => {
                     setPitch((pitch) => pitch + QUARTER_TURN);
                 })}
                 <div />
 
-                {renderTurn("uprightYawLeft", "Turn the face on the left towards you", CONTROL_GLYPHS.left, () => {
+                {renderTurn("uprightYawLeft", TURN_FACE_LEFT_TOWARDS_TEXT, CONTROL_GLYPHS.left, () => {
                     setYaw((yaw) => yaw - QUARTER_TURN);
                 })}
                 <div />
-                {renderTurn("uprightYawRight", "Turn the face on the right towards you", CONTROL_GLYPHS.right, () => {
+                {renderTurn("uprightYawRight", TURN_FACE_RIGHT_TOWARDS_TEXT, CONTROL_GLYPHS.right, () => {
                     setYaw((yaw) => yaw + QUARTER_TURN);
                 })}
 
                 <div />
-                {renderTurn("uprightPitchDown", "Turn the face below towards you", CONTROL_GLYPHS.down, () => {
+                {renderTurn("uprightPitchDown", TURN_FACE_BELOW_TOWARDS_TEXT, CONTROL_GLYPHS.down, () => {
                     setPitch((pitch) => pitch - QUARTER_TURN);
                 })}
                 <div />

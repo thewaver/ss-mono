@@ -36,7 +36,7 @@ export const wheelWedgeSVG = style({
 });
 
 export const wheelWedgeShape = style({
-    fill: layerVars.main,
+    fill: layerVars.dark,
     stroke: themeVars.color.primary.main,
     strokeWidth: 1,
     strokeLinejoin: "round",
@@ -177,7 +177,7 @@ export const wheelCard = style({
     width: "100%",
     height: "100%",
     borderRadius: themeVars.borderRadius.half,
-    backgroundImage: `linear-gradient(160deg, ${layerVars.main}, ${layerVars.main})`,
+    backgroundImage: `linear-gradient(160deg, ${layerVars.dark}, ${layerVars.dark})`,
     border: `2px solid ${themeVars.color.primary.main}`,
     color: layerVars.contrast,
     fontSize: themeVars.fontSize.small,

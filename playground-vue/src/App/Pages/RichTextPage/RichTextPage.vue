@@ -2,6 +2,7 @@
 import { shallowRef } from "vue";
 
 import { RICH_TEXT_DEFAULTS, TextArea } from "@thewaver/ss-components-vue";
+import { RichTextKnobs } from "@thewaver/ss-playground/App/Knobs/RichTexts.const";
 import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 import {
     DEPTH_STEP,
@@ -72,12 +73,7 @@ const examples: ExampleDefs[] = [
 <template>
     <div :class="styles.root">
         <PagePropsPanel scope="global">
-            <PageProp
-                item-key="removeOtherTags"
-                controls="Sets RichTextProps.removeOtherTags"
-                label="Remove other tags"
-                hint="Strips any tag the editor was not told to keep, rather than leaving it in the markup untouched."
-            >
+            <PageProp item-key="removeOtherTags" v-bind="RichTextKnobs.REMOVE_OTHER_TAGS_TEXT">
                 <PageCheckField
                     :value="removeOtherTags"
                     ariaLabel="Remove other tags"
@@ -85,12 +81,7 @@ const examples: ExampleDefs[] = [
                 />
             </PageProp>
 
-            <PageProp
-                item-key="maxDepth"
-                controls="Sets RichTextProps.maxDepth, with -1 sent as Infinity"
-                label="Max depth (-1 = no limit)"
-                hint="How deeply tags may nest. A tag deeper than this prints as typed, and 0 allows no tags."
-            >
+            <PageProp item-key="maxDepth" v-bind="RichTextKnobs.MAX_DEPTH_TEXT">
                 <PageNumberField
                     :value="maxDepth"
                     :min="NO_DEPTH_LIMIT"

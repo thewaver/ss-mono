@@ -3,7 +3,7 @@
 
     import { Button, ColorArea, Popover, Range } from "@thewaver/ss-components-svelte";
     import { COLOR_AREA_AXIS_LABELS } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
-    import { STARTING_PICKER_HSV } from "@thewaver/ss-playground/App/Pages/ColorAreaPage/ColorAreaPage.const";
+    import { STARTING_PICKER_HSV, SATURATION_BRIGHTNESS_LABEL } from "@thewaver/ss-playground/App/Pages/ColorAreaPage/ColorAreaPage.const";
     import { Color } from "@thewaver/ss-utils";
 
     import PageColorChannels from "../../../PageComponents/ColorChannels/ColorChannels.svelte";
@@ -87,7 +87,7 @@
             <ColorArea
                 bind:hsv
                 sizing={"fill"}
-                ariaLabel={"Saturation and brightness"}
+                ariaLabel={SATURATION_BRIGHTNESS_LABEL}
                 axisLabels={COLOR_AREA_AXIS_LABELS}
             >
                 {#snippet renderContent(renderProps)}

@@ -3,7 +3,7 @@ import { useState } from "react";
 import { SIDEBAR_DEFAULTS, SIDEBAR_EDGES, SIDEBAR_LAYOUTS } from "@thewaver/ss-components-react";
 import type { SidebarEdge, SidebarLayout } from "@thewaver/ss-components-react";
 import { SidebarKnobs } from "@thewaver/ss-playground/App/Knobs/Sidebars.const";
-import { DOCS_ROOT, FIELD_WIDTH } from "@thewaver/ss-playground/App/Pages/SidebarPage/SidebarPage.const";
+import { DOCS_ROOT, DOCS_SECTIONS, FIELD_WIDTH } from "@thewaver/ss-playground/App/Pages/SidebarPage/SidebarPage.const";
 
 import { PageDocsExample } from "../../PageComponents/DocsExample/DocsExample";
 import { PageDocsSection } from "../../PageComponents/DocsSection/DocsSection";
@@ -27,14 +27,7 @@ export const SidebarDocs = () => {
                 path={`${DOCS_ROOT}/Basic.tsx`}
                 renderKnobs={() => (
                     <>
-                        <PageProp
-                            itemKey={"edge"}
-                            label={"Edge"}
-                            hint={
-                                "Which side of its neighbor the sidebar is docked to, and so which way it grows. Docked to the top or bottom, it spans the width and grows in height."
-                            }
-                            controls={"Sets SidebarProps.edge"}
-                        >
+                        <PageProp itemKey={"edge"} {...SidebarKnobs.EDGE_TEXT}>
                             <PageSelectField
                                 value={edge}
                                 values={SIDEBAR_EDGES}
@@ -43,12 +36,7 @@ export const SidebarDocs = () => {
                             />
                         </PageProp>
 
-                        <PageProp
-                            itemKey={"transitionDurationMs"}
-                            label={"Transition duration (ms)"}
-                            hint={"How long the sidebar takes to grow and shrink. At 0 it changes size at once."}
-                            controls={"Sets SidebarProps.transitionDurationMs"}
-                        >
+                        <PageProp itemKey={"transitionDurationMs"} {...SidebarKnobs.TRANSITION_DURATION_MS_TEXT}>
                             <PageNumberField
                                 value={transitionDurationMs}
                                 min={SidebarKnobs.MIN_TRANSITION_MS}
@@ -65,33 +53,18 @@ export const SidebarDocs = () => {
                 <BasicDocsExample edge={edge} transitionDurationMs={transitionDurationMs} />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"Right to left"}
-                content={
-                    "Inside a box whose text runs right to left, the sidebar stays on the side [prop]edge[/prop] names, the left here, since its edges are the screen's sides; its contents and the content beside it run from the right."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.rightLeft} />
 
             <PageDocsExample path={`${DOCS_ROOT}/RightToLeft.tsx`}>
                 <RightToLeftDocsExample />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"Over its neighbor"}
-                content={
-                    "Set [prop]layout[/prop] to overlay and the sidebar grows over the content beside it instead of pushing it aside. In the layout it only ever takes its collapsed size, so the neighbor never moves; the panel grows out from the docked edge, raised above what it covers."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.overNeighbor} />
 
             <PageDocsExample
                 path={`${DOCS_ROOT}/Overlay.tsx`}
                 renderKnobs={() => (
-                    <PageProp
-                        itemKey={"layout"}
-                        label={"Layout"}
-                        hint={"Whether growing pushes the content beside the sidebar aside or grows over it."}
-                        controls={"Sets SidebarProps.layout"}
-                    >
+                    <PageProp itemKey={"layout"} {...SidebarKnobs.LAYOUT_TEXT}>
                         <PageSelectField
                             value={layout}
                             values={SIDEBAR_LAYOUTS}
@@ -104,25 +77,13 @@ export const SidebarDocs = () => {
                 <OverlayDocsExample layout={layout} />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"Expanding on hover"}
-                content={
-                    'With [prop]isExpandedOnHover[/prop] on, resting the pointer on the sidebar for [prop]hoverShowDelayMs[/prop] expands it, and moving away, pressing Escape or pressing elsewhere collapses it again ([wcag id="1.4.13"]WCAG 1.4.13[/wcag]). It never writes [prop]expanded[/prop], so the button still reads collapsed while the sidebar is only being looked at, and a sidebar expanded by the button stays expanded when the pointer leaves.'
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.expandingHover} />
 
             <PageDocsExample
                 path={`${DOCS_ROOT}/Hover.tsx`}
                 renderKnobs={() => (
                     <>
-                        <PageProp
-                            itemKey={"isExpandedOnHover"}
-                            label={"Expands on hover"}
-                            hint={
-                                "Whether resting the pointer on the sidebar expands it, without changing its expanded state."
-                            }
-                            controls={"Sets SidebarProps.isExpandedOnHover"}
-                        >
+                        <PageProp itemKey={"isExpandedOnHover"} {...SidebarKnobs.IS_EXPANDED_ON_HOVER_TEXT}>
                             <PageCheckField
                                 value={isExpandedOnHover}
                                 ariaLabel={"Expands on hover"}
@@ -130,12 +91,7 @@ export const SidebarDocs = () => {
                             />
                         </PageProp>
 
-                        <PageProp
-                            itemKey={"hoverShowDelayMs"}
-                            label={"Hover delay (ms)"}
-                            hint={"How long the pointer has to rest on the sidebar before it expands."}
-                            controls={"Sets SidebarProps.hoverShowDelayMs"}
-                        >
+                        <PageProp itemKey={"hoverShowDelayMs"} {...SidebarKnobs.HOVER_SHOW_DELAY_MS_TEXT}>
                             <PageNumberField
                                 value={hoverShowDelayMs}
                                 min={SidebarKnobs.MIN_DELAY_MS}

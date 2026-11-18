@@ -48,4 +48,22 @@ export namespace ScrollerKnobs {
         max: 3000,
         step: 100,
     };
+
+    export const ITEM_COUNT_TEXT = {
+        label: "Item count",
+        hint: "How many items sit in the strip. Few enough to fit, and both buttons are disabled, since there is nowhere to go.",
+        controls: "Sets the number of example items sent as Scroller's children",
+    };
+
+    export const OVERLAP_COUNT_TEXT = {
+        label: "Overlap count",
+        hint: "How many of the items in view stay in view after a press of a step button. At 0 a press moves on by as much as fits; a press always moves by at least one item.",
+        controls: "Sets ScrollerProps.overlapCount",
+    };
+
+    export const POSITION_TEXT = {
+        label: "Position (%)",
+        hint: "How far along the strip is scrolled. It follows the strip as it moves, and a value typed here scrolls it there.",
+        controls: "Sets ScrollerProps.progress, shown as a percentage",
+    };
 }

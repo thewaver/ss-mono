@@ -6,6 +6,7 @@ import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examp
 import {
     RIGHT_TO_LEFT,
     STARTING_RIGHT_TO_LEFT,
+    TWO_PANES_RIGHT_LEFT_LABEL,
 } from "@thewaver/ss-playground/App/Pages/SplitPanePage/SplitPanePage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/SplitPanePage/SplitPanePage.css";
 import { SplitPanePageUtils } from "@thewaver/ss-playground/App/Pages/SplitPanePage/SplitPanePage.utils";
@@ -20,7 +21,7 @@ const ratios = shallowRef(STARTING_RIGHT_TO_LEFT);
 <template>
     <div dir="rtl" :class="styles.docsDirectionBox">
         <PageSplitPaneFrame>
-            <SplitPane v-model:ratios="ratios" :panes="RIGHT_TO_LEFT" ariaLabel="Two panes in a right-to-left box">
+            <SplitPane v-model:ratios="ratios" :panes="RIGHT_TO_LEFT" :ariaLabel="TWO_PANES_RIGHT_LEFT_LABEL">
                 <template #renderPane="{ index }">
                     <PageSplitPaneBox>{{ index === 0 ? "Navigation" : "Content" }}</PageSplitPaneBox>
                 </template>

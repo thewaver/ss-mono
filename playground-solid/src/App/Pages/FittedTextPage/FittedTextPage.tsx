@@ -41,14 +41,7 @@ export const FittedTextPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp
-                    key={"lineHeightRatio"}
-                    label={"Line height"}
-                    hint={
-                        "Each line's height as a multiple of its own font size, which is the room the stack is fitted with."
-                    }
-                    controls={"Sets FittedTextProps.lineHeightRatio"}
-                >
+                <PageProp key={"lineHeightRatio"} {...FittedTextKnobs.LINE_HEIGHT_RATIO_TEXT}>
                     <PageNumberField
                         value={getLineHeightRatio}
                         min={FittedTextKnobs.MIN_LINE_HEIGHT_RATIO}

@@ -67,25 +67,11 @@ export const ShadowCasterPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp
-                    key={"isDisabled"}
-                    label={"Disabled"}
-                    hint={
-                        "Stops the shadow following the pointer and leaves it at rest. It is what a page honoring a reduced-motion preference passes."
-                    }
-                    controls={"Sets ShadowCasterProps.isDisabled"}
-                >
+                <PageProp key={"isDisabled"} {...ShadowCasterKnobs.IS_DISABLED_TEXT}>
                     <PageCheckField value={getIsDisabled} ariaLabel={"Disabled"} onChange={setIsDisabled} />
                 </PageProp>
 
-                <PageProp
-                    key={"smoothingMs"}
-                    label={"Smoothing (ms)"}
-                    hint={
-                        "How long the shadow takes to catch up with the pointer. At 0 it follows exactly; raised, it swings after a quick movement and eases back to rest."
-                    }
-                    controls={"Sets ShadowCasterProps.smoothingMs"}
-                >
+                <PageProp key={"smoothingMs"} {...ShadowCasterKnobs.SMOOTHING_MS_TEXT}>
                     <PageNumberField
                         value={getSmoothingMs}
                         min={ShadowCasterKnobs.MIN_SMOOTHING_MS}
@@ -97,14 +83,7 @@ export const ShadowCasterPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"activeRangePx"}
-                    label={"Active range (px)"}
-                    hint={
-                        "How near the pointer has to be before the shadow answers it at all, measured from the content's center. Outside it the shadow rests."
-                    }
-                    controls={"Sets ShadowCasterProps.activeRangePx"}
-                >
+                <PageProp key={"activeRangePx"} {...ShadowCasterKnobs.ACTIVE_RANGE_PX_TEXT}>
                     <PageNumberField
                         value={getActiveRangePx}
                         min={ShadowCasterKnobs.MIN_ACTIVE_RANGE_PX}
@@ -116,12 +95,7 @@ export const ShadowCasterPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"lightRangePx"}
-                    label={"Light range (px)"}
-                    hint={"How far the pointer's light reaches. Past it the shadow is at its longest and faintest."}
-                    controls={"Sets ShadowCasterProps.lightRangePx"}
-                >
+                <PageProp key={"lightRangePx"} {...ShadowCasterKnobs.LIGHT_RANGE_PX_TEXT}>
                     <PageNumberField
                         value={getLightRangePx}
                         min={ShadowCasterKnobs.MIN_LIGHT_RANGE_PX}
@@ -133,12 +107,7 @@ export const ShadowCasterPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"maxThrowPx"}
-                    label={"Max throw (px)"}
-                    hint={"How far the shadow is thrown once the pointer is out at the edge of the light."}
-                    controls={"Sets ShadowCasterProps.maxThrowPx"}
-                >
+                <PageProp key={"maxThrowPx"} {...ShadowCasterKnobs.MAX_THROW_PX_TEXT}>
                     <PageNumberField
                         value={getMaxThrowPx}
                         min={ShadowCasterKnobs.MIN_THROW_PX}
@@ -150,12 +119,7 @@ export const ShadowCasterPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"minBlurPx"}
-                    label={"Near blur (px)"}
-                    hint={"How soft the shadow is with the pointer on the content."}
-                    controls={"Sets ShadowCasterProps.minBlurPx"}
-                >
+                <PageProp key={"minBlurPx"} {...ShadowCasterKnobs.MIN_BLUR_PX_TEXT}>
                     <PageNumberField
                         value={getMinBlurPx}
                         min={ShadowCasterKnobs.MIN_BLUR_PX}
@@ -167,12 +131,7 @@ export const ShadowCasterPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"maxBlurPx"}
-                    label={"Far blur (px)"}
-                    hint={"How soft the shadow is once the pointer is out at the edge of the light."}
-                    controls={"Sets ShadowCasterProps.maxBlurPx"}
-                >
+                <PageProp key={"maxBlurPx"} {...ShadowCasterKnobs.MAX_BLUR_PX_TEXT}>
                     <PageNumberField
                         value={getMaxBlurPx}
                         min={ShadowCasterKnobs.MIN_BLUR_PX}
@@ -184,12 +143,7 @@ export const ShadowCasterPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"maxOpacity"}
-                    label={"Near opacity"}
-                    hint={"How dark the shadow is with the pointer on the content. It fades as the pointer retreats."}
-                    controls={"Sets ShadowCasterProps.maxOpacity"}
-                >
+                <PageProp key={"maxOpacity"} {...ShadowCasterKnobs.MAX_OPACITY_TEXT}>
                     <PageNumberField
                         value={getMaxOpacity}
                         min={ShadowCasterKnobs.MIN_OPACITY}
@@ -201,14 +155,7 @@ export const ShadowCasterPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"minOpacity"}
-                    label={"Far opacity"}
-                    hint={
-                        "How dark the shadow is once the pointer is out at the edge of the light. Nothing, by default."
-                    }
-                    controls={"Sets ShadowCasterProps.minOpacity"}
-                >
+                <PageProp key={"minOpacity"} {...ShadowCasterKnobs.MIN_OPACITY_TEXT}>
                     <PageNumberField
                         value={getMinOpacity}
                         min={ShadowCasterKnobs.MIN_OPACITY}
@@ -220,12 +167,7 @@ export const ShadowCasterPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"restingOpacity"}
-                    label={"Resting opacity"}
-                    hint={"How dark the shadow is with no pointer near it at all, or with the effect turned off."}
-                    controls={"Sets ShadowCasterProps.restingOpacity"}
-                >
+                <PageProp key={"restingOpacity"} {...ShadowCasterKnobs.RESTING_OPACITY_TEXT}>
                     <PageNumberField
                         value={getRestingOpacity}
                         min={ShadowCasterKnobs.MIN_OPACITY}
@@ -237,12 +179,7 @@ export const ShadowCasterPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"color"}
-                    label={"Color"}
-                    hint={"What the shadow is made of. Whatever alpha it carries is replaced by the opacity ramp."}
-                    controls={"Sets ShadowCasterProps.color"}
-                >
+                <PageProp key={"color"} {...ShadowCasterKnobs.COLOR_TEXT}>
                     <PageColorField value={getColor} ariaLabel={"Color"} onInput={setColor} />
                 </PageProp>
             </PagePropsPanel>

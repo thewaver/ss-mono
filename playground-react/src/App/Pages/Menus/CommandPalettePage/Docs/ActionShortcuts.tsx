@@ -2,6 +2,10 @@ import { useMemo, useState } from "react";
 
 import { Button, CommandPalette } from "@thewaver/ss-components-react";
 import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
+import {
+    MATCHING_NOTE_ACTIONS_LABEL,
+    SEARCH_NOTE_ACTIONS_LABEL,
+} from "@thewaver/ss-playground/App/Pages/Menus/CommandPalettePage/CommandPalettePage.const";
 import { CommandPalettePageUtils } from "@thewaver/ss-playground/App/Pages/Menus/CommandPalettePage/CommandPalettePage.utils";
 import {
     FIELD_GAP,
@@ -56,8 +60,8 @@ export const ActionShortcutsDocsExample = () => {
                 query={queryState}
                 actions={actions}
                 ariaLabel={"Note actions"}
-                fieldAriaLabel={"Search the note actions"}
-                listAriaLabel={"Matching note actions"}
+                fieldAriaLabel={SEARCH_NOTE_ACTIONS_LABEL}
+                listAriaLabel={MATCHING_NOTE_ACTIONS_LABEL}
                 renderOverlay={renderPaletteOverlay}
                 renderPanel={computePalettePanelRenderer(actions)}
                 fieldPadding={FIELD_PADDING}

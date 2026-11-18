@@ -29,23 +29,11 @@ const WanderingExampleWrapper = (props: CuboidExampleProps) => {
             <WanderingExample {...props} turnIntervalMs={() => (getIsTurning() ? getTurnIntervalMs() : undefined)} />
 
             <PageExampleKnobs>
-                <PageProp
-                    key={"isTurning"}
-                    label={"Turns by itself"}
-                    hint={"Lets the box turn to a new face on its own, without anybody clicking it."}
-                    controls={"Switches on the example timer that writes CuboidProps.yaw and CuboidProps.pitch"}
-                >
+                <PageProp key={"isTurning"} {...CuboidKnobs.IS_TURNING_TEXT}>
                     <PageCheckField value={getIsTurning} ariaLabel={"Turns by itself"} onChange={setIsTurning} />
                 </PageProp>
 
-                <PageProp
-                    key={"turnIntervalMs"}
-                    label={"Turn every (ms)"}
-                    hint={
-                        "How long the box rests on a face before turning to the next one. It only applies while the box turns by itself."
-                    }
-                    controls={"Sets how often the example timer writes CuboidProps.yaw and CuboidProps.pitch"}
-                >
+                <PageProp key={"turnIntervalMs"} {...CuboidKnobs.TURN_INTERVAL_MS_TEXT}>
                     <PageNumberField
                         value={getTurnIntervalMs}
                         min={CuboidKnobs.MIN_TURN_INTERVAL_MS}
@@ -71,25 +59,11 @@ const UprightExampleWrapper = (props: Omit<CuboidUprightExampleProps, "isUpright
             <UprightExample {...props} isUpright={getIsUpright} isDraggable={getIsDraggable} />
 
             <PageExampleKnobs>
-                <PageProp
-                    key={"isUpright"}
-                    label={"Stays upright"}
-                    hint={
-                        "Every press turns the box a quarter turn about the screen's own axis, as you see it, and the face it lands on is then spun until it reads the right way up. Off, the box goes back to reading the two counts as a pose, where the far side shows upside down once it has been tipped over the top."
-                    }
-                    controls={"Sets CuboidProps.isUpright"}
-                >
+                <PageProp key={"isUpright"} {...CuboidKnobs.IS_UPRIGHT_TEXT}>
                     <PageCheckField value={getIsUpright} ariaLabel={"Stays upright"} onChange={setIsUpright} />
                 </PageProp>
 
-                <PageProp
-                    key={"isDraggable"}
-                    label={"Draggable"}
-                    hint={
-                        "Lets the box be turned by dragging it. It follows the pointer, and on release settles on the nearest face, writing the turns to the same two counts the buttons do."
-                    }
-                    controls={"Sets CuboidProps.isDraggable"}
-                >
+                <PageProp key={"isDraggable"} {...CuboidKnobs.IS_DRAGGABLE_TEXT}>
                     <PageCheckField value={getIsDraggable} ariaLabel={"Draggable"} onChange={setIsDraggable} />
                 </PageProp>
             </PageExampleKnobs>
@@ -169,12 +143,7 @@ export const CuboidPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp
-                    key={"width"}
-                    label={"Width (px)"}
-                    hint={"How wide the box is."}
-                    controls={"Sets CuboidProps.size.width"}
-                >
+                <PageProp key={"width"} {...CuboidKnobs.WIDTH_TEXT}>
                     <PageNumberField
                         value={getWidth}
                         min={CuboidKnobs.MIN_EXTENT}
@@ -186,12 +155,7 @@ export const CuboidPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"height"}
-                    label={"Height (px)"}
-                    hint={"How tall the box is."}
-                    controls={"Sets CuboidProps.size.height"}
-                >
+                <PageProp key={"height"} {...CuboidKnobs.HEIGHT_TEXT}>
                     <PageNumberField
                         value={getHeight}
                         min={CuboidKnobs.MIN_EXTENT}
@@ -203,12 +167,7 @@ export const CuboidPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"depth"}
-                    label={"Depth (px)"}
-                    hint={"How deep the box is, front face to back face."}
-                    controls={"Sets CuboidProps.size.depth"}
-                >
+                <PageProp key={"depth"} {...CuboidKnobs.DEPTH_TEXT}>
                     <PageNumberField
                         value={getDepth}
                         min={CuboidKnobs.MIN_EXTENT}
@@ -220,14 +179,7 @@ export const CuboidPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"transitionDurationMs"}
-                    label={"Turn duration (ms)"}
-                    hint={
-                        "How long one turn from face to face takes, and how long the box takes to settle after a drag. It is off while the visitor has asked for reduced motion."
-                    }
-                    controls={"Sets CuboidProps.transitionDurationMs"}
-                >
+                <PageProp key={"transitionDurationMs"} {...CuboidKnobs.TRANSITION_DURATION_MS_TEXT}>
                     <PageNumberField
                         value={getTransitionDurationMs}
                         min={CuboidKnobs.MIN_DURATION_MS}

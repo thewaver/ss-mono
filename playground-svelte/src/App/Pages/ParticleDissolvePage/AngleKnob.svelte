@@ -15,9 +15,7 @@
 
 <PageProp
     itemKey={"angleDegrees"}
-    controls={"Sets ParticleDissolveProps.angleDegrees"}
-    label={"Angle (degrees)"}
-    hint={"The direction the edge travels: 0 sweeps up, 90 to the right, 180 down."}
+    {...ParticleDissolveKnobs.ANGLE_DEGREES_TEXT}
 >
     <PageNumberField
         value={props.value}

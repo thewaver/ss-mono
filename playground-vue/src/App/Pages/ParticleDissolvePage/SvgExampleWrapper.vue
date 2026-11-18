@@ -24,12 +24,7 @@ const shapeKind = shallowRef<ShapeConst.DefaultShape>(ParticleDissolveKnobs.STAR
     <PageExampleKnobs>
         <AngleKnob :value="angleDegrees" @input="(value: number) => (angleDegrees = value)" />
 
-        <PageProp
-            item-key="shapeKind"
-            controls="Picks the built-in shape drawn into the SVG inside ParticleDissolve"
-            label="Shape"
-            hint="The SVG shape that dissolves. Particles rise only from inside the shape's fill and along its stroke, however its corners fall in the box."
-        >
+        <PageProp item-key="shapeKind" v-bind="ParticleDissolveKnobs.SHAPE_KIND_TEXT">
             <PageSelectField
                 :value="shapeKind"
                 :values="ShapeConst.DEFAULT_SHAPES"

@@ -41,9 +41,7 @@
 <PageExampleKnobs>
     <PageProp
         itemKey={"windDirectionDegrees"}
-        controls={"Sets directionDegrees of ParticleModifierUtils.createWind, sent to ParticleSpawnerProps.particleModifiers"}
-        label={"Direction (degrees)"}
-        hint={"Which way the wind blows, in degrees clockwise from rightward. 90 blows down."}
+        {...ParticleSpawnerKnobs.WIND_DIRECTION_DEGREES_TEXT}
     >
         <PageNumberField
             value={directionDegrees}
@@ -58,9 +56,7 @@
 
     <PageProp
         itemKey={"windStrengthPixels"}
-        controls={"Sets strengthPixels of ParticleModifierUtils.createWind, sent to ParticleSpawnerProps.particleModifiers"}
-        label={"Strength (px)"}
-        hint={"How far a particle is carried off its path halfway along it, between gusts."}
+        {...ParticleSpawnerKnobs.WIND_STRENGTH_PIXELS_TEXT}
     >
         <PageNumberField
             value={strengthPixels}
@@ -75,9 +71,7 @@
 
     <PageProp
         itemKey={"windGustRatio"}
-        controls={"Sets gustRatio of ParticleModifierUtils.createWind, sent to ParticleSpawnerProps.particleModifiers"}
-        label={"Gusts"}
-        hint={"How much the strength swings above and below itself over time. 0 is a steady wind."}
+        {...ParticleSpawnerKnobs.WIND_GUST_RATIO_TEXT}
     >
         <PageNumberField
             value={gustRatio}

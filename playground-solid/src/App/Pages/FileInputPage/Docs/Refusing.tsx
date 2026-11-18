@@ -2,6 +2,7 @@ import { createSignal } from "solid-js";
 
 import { FileInput } from "@thewaver/ss-components-solid";
 import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
+import { FILE_WHOSE_NAME_HAS_TEXT } from "@thewaver/ss-playground/App/Pages/FileInputPage/FileInputPage.const";
 
 import { PageFileInputContent } from "../../../StyledComponents/FileInputContent/FileInputContent";
 
@@ -27,7 +28,7 @@ export const RefusingDocsExample = () => {
             />
 
             <div class={exampleStyles.exampleReadout} data-readout>
-                {getRejection() || "A file whose name has a space in it is refused"}
+                {getRejection() || FILE_WHOSE_NAME_HAS_TEXT}
             </div>
         </>
     );

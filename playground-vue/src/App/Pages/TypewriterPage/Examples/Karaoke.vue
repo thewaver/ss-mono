@@ -3,6 +3,7 @@ import { shallowRef } from "vue";
 
 import { Button, Range, Typewriter } from "@thewaver/ss-components-vue";
 import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
+import { HOW_FAR_LINE_HAS_LABEL, LYRIC } from "@thewaver/ss-playground/App/Pages/TypewriterPage/TypewriterPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/TypewriterPage/TypewriterPage.css";
 import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
@@ -11,7 +12,6 @@ import PageControlButtonContent from "../../../StyledComponents/ControlButtonCon
 import PageRangeContent from "../../../StyledComponents/RangeContent/RangeContent.vue";
 import type { TypewriterKaraokeExampleProps } from "../TypewriterPageVue.types";
 
-const LYRIC = "Twinkle, twinkle, little star";
 const PERCENT = 100;
 const SLIDER_STEP = 1;
 const SLIDER_LENGTH = 110;
@@ -69,7 +69,7 @@ const seek = (value: number) => {
             <Range
                 id="karaokeScrubber"
                 sizing="fill"
-                ariaLabel="How far the line has been sung"
+                :ariaLabel="HOW_FAR_LINE_HAS_LABEL"
                 :min="0"
                 :max="PERCENT"
                 :step="SLIDER_STEP"

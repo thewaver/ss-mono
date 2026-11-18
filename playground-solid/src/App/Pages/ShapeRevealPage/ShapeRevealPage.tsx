@@ -61,14 +61,7 @@ export const ShapeRevealPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp
-                    key={"durationMs"}
-                    label={"Duration (ms)"}
-                    hint={
-                        "How long the circle takes to grow over the whole window. 0 switches the theme at once, as does the system's reduced-motion setting."
-                    }
-                    controls={"Sets ShapeRevealOpts.durationMs"}
-                >
+                <PageProp key={"durationMs"} {...ShapeRevealKnobs.DURATION_MS_TEXT}>
                     <PageNumberField
                         value={getDurationMs}
                         min={ShapeRevealKnobs.MIN_DURATION_MS}
@@ -97,14 +90,7 @@ export const ShapeRevealPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"computePoints"}
-                    label={"Shape"}
-                    hint={
-                        "The contour that grows over the window. A circle is what the reveal draws when none is given."
-                    }
-                    controls={"Picks the example contour sent to ShapeRevealOpts.computePoints"}
-                >
+                <PageProp key={"computePoints"} {...ShapeRevealKnobs.COMPUTE_POINTS_TEXT}>
                     <PageSelectField
                         value={getShape}
                         values={ShapeRevealKnobs.SHAPES}
@@ -114,14 +100,7 @@ export const ShapeRevealPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"softness"}
-                    label={"Softness"}
-                    hint={
-                        "How gradually the growing shape's edge fades, as a share of the distance it grows. 0 gives a hard edge."
-                    }
-                    controls={"Sets ShapeRevealOpts.softness"}
-                >
+                <PageProp key={"softness"} {...ShapeRevealKnobs.SOFTNESS_TEXT}>
                     <PageNumberField
                         value={getSoftness}
                         min={ShapeRevealKnobs.MIN_SOFTNESS}
@@ -133,14 +112,7 @@ export const ShapeRevealPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"startDegrees"}
-                    label={"Start angle (°)"}
-                    hint={
-                        "The shape's angle as it starts to grow, clockwise. With the end angle the same, the shape is only tilted. A circle looks the same at any angle."
-                    }
-                    controls={"Sets ShapeRevealOpts.startDegrees"}
-                >
+                <PageProp key={"startDegrees"} {...ShapeRevealKnobs.START_DEGREES_TEXT}>
                     <PageNumberField
                         value={getStartDegrees}
                         min={ShapeRevealKnobs.MIN_DEGREES}
@@ -152,14 +124,7 @@ export const ShapeRevealPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"endDegrees"}
-                    label={"End angle (°)"}
-                    hint={
-                        "The shape's angle once it covers the window. It turns from the start angle to this one as it grows, on the reveal's own timing."
-                    }
-                    controls={"Sets ShapeRevealOpts.endDegrees"}
-                >
+                <PageProp key={"endDegrees"} {...ShapeRevealKnobs.END_DEGREES_TEXT}>
                     <PageNumberField
                         value={getEndDegrees}
                         min={ShapeRevealKnobs.MIN_DEGREES}

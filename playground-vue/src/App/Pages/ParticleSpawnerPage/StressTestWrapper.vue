@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { shallowRef, useModel } from "vue";
 
+import { ParticleSpawnerKnobs } from "@thewaver/ss-playground/App/Knobs/ParticleSpawners.const";
 import {
     STRESS_ITEMS,
     STRESS_PARTICLE_COUNT,
@@ -28,12 +29,7 @@ const isOnGraphicsCard = shallowRef(true);
 
 <template>
     <PagePropsPanel scope="local" :has-reset="false">
-        <PageProp
-            item-key="onGraphicsCard"
-            label="On the graphics card"
-            hint="Draws each spawner's particles in one canvas that follows them, with their positions worked out as before. Off, every particle is an element of its own."
-            controls="Sets ParticleSpawnerProps.renderer in the stress test"
-        >
+        <PageProp item-key="onGraphicsCard" v-bind="ParticleSpawnerKnobs.ON_GRAPHICS_CARD_TEXT">
             <PageCheckField
                 :value="isOnGraphicsCard"
                 ariaLabel="On the graphics card"

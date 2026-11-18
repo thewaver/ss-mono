@@ -3,7 +3,10 @@ import { type ComponentPublicInstance, computed, shallowRef, useId, watch } from
 
 import { Button, ColorArea, type DismisserReason, Popover, Range, toElement } from "@thewaver/ss-components-vue";
 import { COLOR_AREA_AXIS_LABELS } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
-import { STARTING_PICKER_HSV } from "@thewaver/ss-playground/App/Pages/ColorAreaPage/ColorAreaPage.const";
+import {
+    SATURATION_BRIGHTNESS_LABEL,
+    STARTING_PICKER_HSV,
+} from "@thewaver/ss-playground/App/Pages/ColorAreaPage/ColorAreaPage.const";
 import { Color } from "@thewaver/ss-utils";
 
 import PageColorChannels from "../../../PageComponents/ColorChannels/ColorChannels.vue";
@@ -85,7 +88,7 @@ watch(hue, (next) => {
                 <ColorArea
                     v-model:hsv="hsv"
                     sizing="fill"
-                    ariaLabel="Saturation and brightness"
+                    :ariaLabel="SATURATION_BRIGHTNESS_LABEL"
                     :axis-labels="COLOR_AREA_AXIS_LABELS"
                 >
                     <template #renderContent="renderProps">

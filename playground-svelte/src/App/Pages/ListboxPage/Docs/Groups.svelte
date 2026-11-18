@@ -6,6 +6,7 @@
     import PageSelectGroupContent from "../../../StyledComponents/SelectGroupContent/SelectGroupContent.svelte";
     import PageSelectOptionContent from "../../../StyledComponents/SelectOptionContent/SelectOptionContent.svelte";
     import { GROUPED_COUNTRIES } from "../../SelectPage/SelectPage.const.svelte";
+    import { COUNTRIES_SHIP_LABEL } from "@thewaver/ss-playground/App/Pages/ListboxPage/ListboxPage.const";
 
     let countries = $state<string[]>(["Denmark"]);
 </script>
@@ -16,7 +17,7 @@
         renderHighlightFloater={renderPageHighlightFloater}
         bind:values={countries}
         options={GROUPED_COUNTRIES}
-        ariaLabel={"Countries to ship to"}
+        ariaLabel={COUNTRIES_SHIP_LABEL}
     >
         {#snippet renderGroupHeader(group, flags)}
             <PageSelectGroupContent {flags}>{group.label}</PageSelectGroupContent>

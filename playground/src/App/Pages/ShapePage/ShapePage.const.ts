@@ -43,3 +43,13 @@ export const STRESS_ITEMS: (StressTestDefs & { size: number })[] = [
 export const EXAMPLES_ROOT = "/src/App/Pages/ShapePage/Examples";
 
 export const DEFAULT_EXAMPLE_PATH = `${EXAMPLES_ROOT}/Default.tsx`;
+
+export const WRAPPED_TEXT = [
+    "A floated Shape carries its own contour as its float area, so the lines of this paragraph run up to the",
+    "edge that is painted rather than to the square box around it. Pick another shape, or round its corners,",
+    "and the text follows, because the contour it wraps against is the same one the fill and the stroke are",
+    "drawn from. Nothing here measures the shape or writes a polygon by hand: the page floats the element and",
+    "sets how far the text keeps clear of it, and that is all. The rest of this paragraph is only here to be",
+    "long enough to wrap all the way around, down past the bottom of the shape and back to the full width of",
+    "the column, which is where you can see that the float ends where the contour does.",
+].join(" ");

@@ -18,9 +18,7 @@
 <PageExampleKnobs>
     <PageProp
         itemKey={"scrollLength"}
-        controls={"Sets how long the example scroll runway that drives InfiniteCorridorProps.progress is"}
-        label={"Scroll length"}
-        hint={"How far the box scrolls to walk one lap of the corridor, in heights of the box. Longer is slower."}
+        {...InfiniteCorridorKnobs.SCROLL_LENGTH_TEXT}
     >
         <PageNumberField
             value={scrollLength}

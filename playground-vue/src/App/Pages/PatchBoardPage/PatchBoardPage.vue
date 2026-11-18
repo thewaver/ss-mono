@@ -99,12 +99,7 @@ const examples: ExampleDefs[] = [
 
 <template>
     <PagePropsPanel scope="global">
-        <PageProp
-            item-key="socketSize"
-            controls="Sets PatchBoardProps.socketSize"
-            label="Socket size"
-            hint="How large each socket is drawn, as a fraction of the board's width, so a wider board has larger sockets."
-        >
+        <PageProp item-key="socketSize" v-bind="PatchBoardKnobs.SOCKET_SIZE_TEXT">
             <PageNumberField
                 :value="socketSize"
                 :min="PatchBoardKnobs.MIN_SOCKET_SIZE"
@@ -115,12 +110,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="isLocked"
-            controls="Sets PatchBoardProps.isLocked"
-            label="Wiring locked"
-            hint="Freezes the wiring as it stands: the cables still show, but none can be dragged, made or pulled out."
-        >
+        <PageProp item-key="isLocked" v-bind="PatchBoardKnobs.IS_LOCKED_TEXT">
             <PageCheckField
                 :value="isLocked"
                 ariaLabel="Wiring locked"
@@ -128,12 +118,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="isDisabled"
-            controls="Sets PatchBoardProps.isDisabled"
-            label="Disabled"
-            hint="Turns the whole board off, so nothing on it responds to the pointer or the keyboard."
-        >
+        <PageProp item-key="isDisabled" v-bind="PatchBoardKnobs.IS_DISABLED_TEXT">
             <PageCheckField
                 :value="isDisabled"
                 ariaLabel="Disabled"
@@ -141,12 +126,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="isBeamPlaying"
-            controls="Plays the example beam drawn by PatchBoardProps.renderCable"
-            label="Beams moving"
-            hint="Whether a pulse runs along every plugged cable, from the output to the input it feeds. It starts stopped while the visitor has asked for reduced motion."
-        >
+        <PageProp item-key="isBeamPlaying" v-bind="PatchBoardKnobs.IS_BEAM_PLAYING_TEXT">
             <PageCheckField
                 :value="isBeamPlaying"
                 ariaLabel="Beams moving"

@@ -10,7 +10,6 @@
     import { getLayerClass } from "../Layer/Layer.context";
     import type { PageFormationItemProps } from "./FormationContentSvelte.types";
     import {
-        FILL_OPACITY,
         STROKE_GEOM,
     } from "@thewaver/ss-playground/App/StyledComponents/FormationContent/FormationContent.const";
 
@@ -22,7 +21,7 @@
 <div class={[styles.formationItem, layerClass]}>
     <Shape
         computePoints={(size) => ShapeConst.getDefaultShapePoints(props.shapeKind, size)}
-        computeFillDefs={() => [{ color: layerVars.main, opacity: FILL_OPACITY }]}
+        computeFillDefs={() => [{ color: layerVars.dark }]}
         computeStrokeDefs={() => [{ color: themeVars.color.primary.main }]}
         strokeGeom={STROKE_GEOM}
     >

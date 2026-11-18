@@ -1,11 +1,7 @@
 <script lang="ts">
     import { Button, Die } from "@thewaver/ss-components-svelte";
     import type { DieController } from "@thewaver/ss-components-svelte";
-    import {
-        ICON_CLOUD_EMPTY_LABEL,
-        PLANET_ICONS,
-        PLANET_STEPS,
-    } from "@thewaver/ss-playground/App/Pages/DiePage/DiePage.const";
+    import { ICON_CLOUD_EMPTY_LABEL, PLANET_ICONS, PLANET_STEPS, PLANET_CIRCLED_ICONS_LABEL } from "@thewaver/ss-playground/App/Pages/DiePage/DiePage.const";
     import * as styles from "@thewaver/ss-playground/App/Pages/DiePage/DiePage.css";
     import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
@@ -34,7 +30,7 @@
             bind:autoSpin
             isMovable={true}
             isSeeThrough={true}
-            ariaLabel={"A planet circled by icons"}
+            ariaLabel={PLANET_CIRCLED_ICONS_LABEL}
             computeFaceLabel={(index) => PLANET_ICONS[index]?.label ?? ICON_CLOUD_EMPTY_LABEL}
             onMount={(next) => {
                 controller = next;

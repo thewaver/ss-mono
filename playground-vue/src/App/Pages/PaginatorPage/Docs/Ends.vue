@@ -12,6 +12,7 @@ import {
     ITEM_COUNT,
     PAGE_SIZE,
     PAGINATOR_GAP,
+    RESULTS_END_JUMPS_LABEL,
 } from "@thewaver/ss-playground/App/Pages/PaginatorPage/PaginatorPage.const";
 
 import PagePaginatorDemo from "../../../StyledComponents/PaginatorContent/PagePaginatorDemo.vue";
@@ -33,7 +34,7 @@ const page = shallowRef(FIRST_PAGE);
             :page-size="PAGE_SIZE"
             :gap="PAGINATOR_GAP"
             :steps="END_STEPS"
-            ariaLabel="Results with end jumps"
+            :ariaLabel="RESULTS_END_JUMPS_LABEL"
             :compute-page-label="computePaginatorPageLabel"
             :compute-step-label="computePaginatorStepLabel"
             @page-change="(next: number) => (page = next)"

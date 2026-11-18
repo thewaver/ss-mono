@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { shallowRef } from "vue";
 
-import { DOCS_ROOT } from "@thewaver/ss-playground/App/Pages/CheckboxPage/CheckboxPage.const";
+import { CheckboxKnobs } from "@thewaver/ss-playground/App/Knobs/Checkboxes.const";
+import { DOCS_ROOT, DOCS_SECTIONS } from "@thewaver/ss-playground/App/Pages/CheckboxPage/CheckboxPage.const";
 
 import PageDocsExample from "../../PageComponents/DocsExample/PageDocsExample.vue";
 import PageDocsSection from "../../PageComponents/DocsSection/PageDocsSection.vue";
@@ -25,21 +26,11 @@ const isTooltipDisabled = shallowRef(false);
         <BasicDocsExample :has-error="hasError" :is-disabled="isDisabled" />
 
         <template #renderKnobs>
-            <PageProp
-                item-key="hasError"
-                label="Error"
-                hint="Marks the checkbox invalid, for screen readers as well as for the painter."
-                controls="Sets CheckboxProps.hasError"
-            >
+            <PageProp item-key="hasError" v-bind="CheckboxKnobs.HAS_ERROR_TEXT">
                 <PageCheckField :value="hasError" ariaLabel="Error" @change="(value: boolean) => (hasError = value)" />
             </PageProp>
 
-            <PageProp
-                item-key="isDisabled"
-                label="Disabled"
-                hint="Turns the checkbox off: neither a click nor Space changes it, and the Tab key skips it."
-                controls="Sets CheckboxProps.isDisabled"
-            >
+            <PageProp item-key="isDisabled" v-bind="CheckboxKnobs.IS_DISABLED_TEXT">
                 <PageCheckField
                     :value="isDisabled"
                     ariaLabel="Disabled"
@@ -49,46 +40,31 @@ const isTooltipDisabled = shallowRef(false);
         </template>
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Right to left"
-        content="Inside a box whose text runs right to left, the box sits to the right of its words."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.rightLeft" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/RightToLeft.vue`">
         <RightToLeftDocsExample />
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Mixed"
-        content="A checkbox can be neither on nor off. Set [prop]isMixed[/prop] and it reads as mixed, to a screen reader as well as on screen, which is what a box summarizing others shows while they disagree. Pressing it sets a value, so here it turns both of the boxes it controls on or off."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.mixed" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Mixed.vue`">
         <MixedDocsExample />
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Refusing a change"
-        content="The checkbox reports a press through [prop]onChange[/prop] and shows whatever its value then holds, so a change can be refused by writing the old value back. Here at least one way to be reached must stay on: whichever box is the last one on refuses to go off."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.refusingChange" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Refusing.vue`">
         <RefusingDocsExample />
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Decoration"
-        content="Anything drawn over the box goes through [prop]renderDecoration[/prop], which is handed the checkbox's state like the painter is: here a corner highlight shows while it is pressed."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.decoration" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Decorated.vue`">
         <DecoratedDocsExample />
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Tooltip"
-        content="Give a checkbox [prop]tooltipDefs[/prop] and it shows a tooltip on hover and on keyboard focus, read by screen readers as the checkbox's description. A disabled checkbox shows no tooltip unless you also keep it reachable when disabled; it can then be focused to read why it is off, and pressing it still changes nothing."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.tooltip" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Tooltip.vue`">
         <TooltipDocsExample :is-disabled="isTooltipDisabled" :is-reachable-when-disabled="isReachableWhenDisabled" />
@@ -96,9 +72,7 @@ const isTooltipDisabled = shallowRef(false);
         <template #renderKnobs>
             <PageProp
                 item-key="tooltipIsReachableWhenDisabled"
-                label="Reachable when disabled"
-                hint="Keeps a disabled checkbox's tooltip available: the Tab key can stop on it and hovering it shows the tooltip. Without it a disabled checkbox shows no tooltip at all. It only matters while Disabled is on."
-                controls="Sets CheckboxProps.isReachableWhenDisabled"
+                v-bind="CheckboxKnobs.TOOLTIP_IS_REACHABLE_WHEN_DISABLED_TEXT"
             >
                 <PageCheckField
                     :value="isReachableWhenDisabled"
@@ -107,12 +81,7 @@ const isTooltipDisabled = shallowRef(false);
                 />
             </PageProp>
 
-            <PageProp
-                item-key="tooltipIsDisabled"
-                label="Disabled"
-                hint="Turns the checkbox off: neither a click nor Space changes it, and the Tab key skips it."
-                controls="Sets CheckboxProps.isDisabled"
-            >
+            <PageProp item-key="tooltipIsDisabled" v-bind="CheckboxKnobs.IS_DISABLED_TEXT">
                 <PageCheckField
                     :value="isTooltipDisabled"
                     ariaLabel="Disabled"

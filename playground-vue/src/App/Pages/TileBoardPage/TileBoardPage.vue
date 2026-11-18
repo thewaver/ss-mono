@@ -143,12 +143,7 @@ const examples: ExampleDefs[] = [
 
 <template>
     <PagePropsPanel scope="global">
-        <PageProp
-            item-key="rows"
-            controls="Sets TileBoardProps.tileCount.row"
-            label="Rows"
-            hint="How many rows of tiles the board has."
-        >
+        <PageProp item-key="rows" v-bind="TileBoardKnobs.ROWS_TEXT">
             <PageNumberField
                 :value="rows"
                 :min="TileBoardKnobs.MIN_ROWS"
@@ -160,12 +155,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="cols"
-            controls="Sets TileBoardProps.tileCount.col"
-            label="Columns"
-            hint="How many tiles sit in a row."
-        >
+        <PageProp item-key="cols" v-bind="TileBoardKnobs.COLS_TEXT">
             <PageNumberField
                 :value="cols"
                 :min="TileBoardKnobs.MIN_COLS"
@@ -177,12 +167,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="tileWidth"
-            controls="Sets TileBoardProps.tileSize.width"
-            label="Tile width"
-            hint="How wide one tile is."
-        >
+        <PageProp item-key="tileWidth" v-bind="TileBoardKnobs.TILE_WIDTH_TEXT">
             <PageNumberField
                 :value="tileWidth"
                 :min="TileBoardKnobs.MIN_TILE_SIZE"
@@ -194,12 +179,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="tileHeight"
-            controls="Sets TileBoardProps.tileSize.height"
-            label="Tile height"
-            hint="How tall one tile is."
-        >
+        <PageProp item-key="tileHeight" v-bind="TileBoardKnobs.TILE_HEIGHT_TEXT">
             <PageNumberField
                 :value="tileHeight"
                 :min="TileBoardKnobs.MIN_TILE_SIZE"
@@ -211,7 +191,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp item-key="gap" controls="Sets TileBoardProps.gap" label="Gap" hint="The space left between tiles.">
+        <PageProp item-key="gap" v-bind="TileBoardKnobs.GAP_TEXT">
             <PageNumberField
                 :value="gap"
                 :min="TileBoardKnobs.MIN_GAP"
@@ -223,12 +203,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="tiling"
-            controls="Sets TileBoardProps.tiling"
-            label="Tiling"
-            hint="How the board is tiled. A shape lays that shape whole; the two halves cut each box corner to corner, from the top left down or the top right down, and the two quarters cut a square or a lozenge into four."
-        >
+        <PageProp item-key="tiling" v-bind="TileBoardKnobs.TILING_TEXT">
             <PageSelectField
                 :value="shape"
                 :values="TileBoardKnobs.TILINGS"
@@ -238,12 +213,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="hasShortFirstRow"
-            controls="Sets TileBoardProps.hasShortFirstRow"
-            label="Start on the short row"
-            hint="Starts the offset rows at the top instead of the second row, for shapes that stagger."
-        >
+        <PageProp item-key="hasShortFirstRow" v-bind="TileBoardKnobs.HAS_SHORT_FIRST_ROW_TEXT">
             <PageCheckField
                 :value="hasShortFirstRow"
                 ariaLabel="Start on the short row"
@@ -251,12 +221,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="taper"
-            controls="Sets TileBoardProps.taper"
-            label="Taper"
-            hint="How wide the top of the board is drawn, as a fraction of the bottom. Below 1 the board leans away, and a piece shrinks as it moves up it."
-        >
+        <PageProp item-key="taper" v-bind="TileBoardKnobs.TAPER_TEXT">
             <PageNumberField
                 :value="taper"
                 :min="TileBoardKnobs.MIN_TAPER"
@@ -291,12 +256,7 @@ const examples: ExampleDefs[] = [
             />
 
             <PageExampleKnobs>
-                <PageProp
-                    item-key="reach"
-                    controls="Sets how far the example lets the piece travel, sent to TileBoardProps.computeIsTileDisabled"
-                    label="Reach"
-                    hint="How many tiles the piece may travel in one move. Tiles out of reach are shown as unavailable."
-                >
+                <PageProp item-key="reach" v-bind="TileBoardKnobs.REACH_TEXT">
                     <PageNumberField
                         :value="reach"
                         :min="TileBoardKnobs.MIN_REACH"

@@ -108,12 +108,7 @@ const examples: ExampleDefs[] = [
 <template>
     <PagePropsGroups>
         <PagePropsPanel scope="sample">
-            <PageProp
-                item-key="configKey"
-                controls="Picks the sample gradient the example sends to ShapeProps.computeFillDefs or ShapeProps.computeStrokeDefs"
-                label="Gradient"
-                hint="Which pointer-following gradient is shown. Choosing one brings its own knobs with it."
-            >
+            <PageProp item-key="configKey" v-bind="TrackedGradientKnobs.CONFIG_KEY_TEXT">
                 <PageGroupedSelectField
                     :value="configKey"
                     :groups="TRACKED_GRADIENT_GROUPS"

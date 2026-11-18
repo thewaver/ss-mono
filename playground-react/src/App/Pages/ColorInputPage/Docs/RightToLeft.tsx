@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import { ColorInput } from "@thewaver/ss-components-react";
 import { COLOR_INPUT_LABELS } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
+import { BRAND_COLOR_RIGHT_LEFT_LABEL } from "@thewaver/ss-playground/App/Pages/ColorInputPage/ColorInputPage.const";
 
 import { pageColorPickerSlots } from "../../../PageComponents/ColorPicker/ColorPicker";
 import { PageColorInputContent } from "../../../StyledComponents/ColorInputContent/ColorInputContent";
@@ -14,7 +15,7 @@ export const RightToLeftDocsExample = () => {
             <ColorInput
                 {...pageColorPickerSlots}
                 value={valueState}
-                ariaLabel={"Brand color in a right-to-left box"}
+                ariaLabel={BRAND_COLOR_RIGHT_LEFT_LABEL}
                 {...COLOR_INPUT_LABELS}
                 renderContent={(renderProps) => <PageColorInputContent renderProps={renderProps} />}
             />

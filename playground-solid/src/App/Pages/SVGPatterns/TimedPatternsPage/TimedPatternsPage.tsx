@@ -3,6 +3,7 @@ import { createStore } from "solid-js/store";
 
 import { SVGDefsSamples } from "@thewaver/ss-components-solid";
 import { SVGPatternKnobs } from "@thewaver/ss-playground/App/Knobs/SVGPatterns.const";
+import { TimedPatternKnobs } from "@thewaver/ss-playground/App/Knobs/TimedPatterns.const";
 import { toGroupEntriesWithNoSample } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
 import type { WithNoSample } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.types";
 import {
@@ -54,12 +55,7 @@ export const TimedPatternsPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp
-                    key={"configKey"}
-                    label={"Pattern"}
-                    hint={"Which repeating pattern is shown."}
-                    controls={"Picks the sample pattern the example sends to ShapeProps.computeFillDefs"}
-                >
+                <PageProp key={"configKey"} {...TimedPatternKnobs.CONFIG_KEY_TEXT}>
                     <PageGroupedSelectField
                         value={getConfigKey}
                         groups={() => toGroupEntriesWithNoSample(GROUPPED_TIMED_PATTERNS)}
@@ -77,12 +73,7 @@ export const TimedPatternsPage = () => {
                     }}
                 />
 
-                <PageProp
-                    key={"animationDurationMs"}
-                    label={"Animation duration (ms)"}
-                    hint={"How long one pass of the pattern's animation takes."}
-                    controls={"Sets SVGAnimationDefs.animationDurationMs"}
-                >
+                <PageProp key={"animationDurationMs"} {...TimedPatternKnobs.ANIMATION_DURATION_MS_TEXT}>
                     <PageNumberField
                         value={getAnimationDurationMs}
                         min={SVGPatternKnobs.MIN_DURATION_MS}
@@ -93,12 +84,7 @@ export const TimedPatternsPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"iterationConfigKey"}
-                    label={"Iteration Pattern"}
-                    hint={"How the animation repeats: once, endlessly, or back and forth."}
-                    controls={"Picks the sample iteration that fills SVGAnimationDefs.animationIterationPatterns"}
-                >
+                <PageProp key={"iterationConfigKey"} {...TimedPatternKnobs.ITERATION_CONFIG_KEY_TEXT}>
                     <PageSelectField
                         value={getIterationConfigKey}
                         values={SVGDefsSamples.Iteration.SAMPLE_KEYS}

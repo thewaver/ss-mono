@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 
 import type { TableSort } from "@thewaver/ss-components-react";
 import { Table } from "@thewaver/ss-components-react";
+import { PARTS_RESIZABLE_COLUMNS_LABEL } from "@thewaver/ss-playground/App/Pages/TablePage/TablePage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/TablePage/TablePage.css";
 
 import { PageTableResizer } from "../../../StyledComponents/TableContent/TableContent";
@@ -23,7 +24,7 @@ export const ResizableDocsExample = () => {
                 sort={sortState}
                 selection={selectionState}
                 widths={widthsState}
-                ariaLabel={"Parts with resizable columns"}
+                ariaLabel={PARTS_RESIZABLE_COLUMNS_LABEL}
                 renderResizer={(renderProps) => <PageTableResizer renderProps={renderProps} />}
             />
         </div>

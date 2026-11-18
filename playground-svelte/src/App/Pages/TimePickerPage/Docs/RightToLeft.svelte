@@ -19,6 +19,7 @@
     import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
     import PageTextFieldPlaceholder from "../../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder.svelte";
     import PageTimePickerTrigger from "../../../StyledComponents/TimePickerTrigger/TimePickerTrigger.svelte";
+    import { TIME_RIGHT_LEFT_BOX_LABEL } from "@thewaver/ss-playground/App/Pages/TimePickerPage/TimePickerPage.const";
 
     let value = $state.raw<TimeValue | undefined>({ hour: 14, minute: 30 });
 </script>
@@ -27,7 +28,7 @@
     <TimePicker
         bind:value
         isTwelveHour={true}
-        ariaLabel={"Time in a right-to-left box"}
+        ariaLabel={TIME_RIGHT_LEFT_BOX_LABEL}
         clockLabel={"Choose a time"}
         segmentHints={TIME_SEGMENT_HINTS}
         locale={LOCALE}

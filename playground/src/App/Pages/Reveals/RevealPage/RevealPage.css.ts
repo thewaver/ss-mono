@@ -25,7 +25,7 @@ export const content = style({
     gap: themeVars.spacing.half,
     height: 200,
     padding: themeVars.spacing.double,
-    backgroundColor: layerVars.main,
+    backgroundColor: layerVars.dark,
     color: layerVars.contrast,
     fontSize: themeVars.fontSize.small,
 });
@@ -49,7 +49,7 @@ export const frostedCover = style({
     width: "100%",
     height: "100%",
     backdropFilter: "blur(8px) saturate(0.4)",
-    backgroundColor: [layerVars.main, `rgb(from ${layerVars.main} r g b / 50%)`],
+    backgroundColor: [layerVars.dark, `rgb(from ${layerVars.dark} r g b / 50%)`],
 });
 
 export const promptCover = style({

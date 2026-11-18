@@ -28,12 +28,7 @@ import { SvgExample } from "./Examples/Svg";
 import type { ParticleDissolveExampleProps } from "./ParticleDissolvePageSolid.types";
 
 const AngleKnob = (props: { value: () => number; onInput: (value: number) => void }) => (
-    <PageProp
-        key={"angleDegrees"}
-        label={"Angle (degrees)"}
-        hint={"The direction the edge travels: 0 sweeps up, 90 to the right, 180 down."}
-        controls={"Sets ParticleDissolveProps.angleDegrees"}
-    >
+    <PageProp key={"angleDegrees"} {...ParticleDissolveKnobs.ANGLE_DEGREES_TEXT}>
         <PageNumberField
             value={props.value}
             min={ParticleDissolveKnobs.MIN_ANGLE}
@@ -86,14 +81,7 @@ const StressTestWrapper = (props: ParticleDissolveExampleProps) => {
             <div>{`${STRESS_CELL_SIZE} px cells`}</div>
 
             <PagePropsPanel scope={"local"} hasReset={false}>
-                <PageProp
-                    key={"onGraphicsCard"}
-                    label={"On the graphics card"}
-                    hint={
-                        "Draws each card's ash in one canvas, with each particle's motion worked out on the graphics card. Off, every particle is an element of its own."
-                    }
-                    controls={"Sets ParticleDissolveProps.renderer in the stress test"}
-                >
+                <PageProp key={"onGraphicsCard"} {...ParticleDissolveKnobs.ON_GRAPHICS_CARD_TEXT}>
                     <PageCheckField
                         value={getIsOnGraphicsCard}
                         ariaLabel={"On the graphics card"}
@@ -138,14 +126,7 @@ const SvgExampleWrapper = (props: ParticleDissolveExampleProps) => {
             <PageExampleKnobs>
                 <AngleKnob value={getAngle} onInput={setAngle} />
 
-                <PageProp
-                    key={"shapeKind"}
-                    label={"Shape"}
-                    hint={
-                        "The SVG shape that dissolves. Particles rise only from inside the shape's fill and along its stroke, however its corners fall in the box."
-                    }
-                    controls={"Picks the built-in shape drawn into the SVG inside ParticleDissolve"}
-                >
+                <PageProp key={"shapeKind"} {...ParticleDissolveKnobs.SHAPE_KIND_TEXT}>
                     <PageSelectField
                         value={getShapeKind}
                         values={ShapeConst.DEFAULT_SHAPES}
@@ -232,14 +213,7 @@ export const ParticleDissolvePage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp
-                    key={"durationMs"}
-                    label={"Duration (ms)"}
-                    hint={
-                        "How long the whole dissolve takes, from the first of the content going to the last particle gone."
-                    }
-                    controls={"Sets ParticleDissolveProps.durationMs"}
-                >
+                <PageProp key={"durationMs"} {...ParticleDissolveKnobs.DURATION_MS_TEXT}>
                     <PageNumberField
                         value={getDurationMs}
                         min={ParticleDissolveKnobs.MIN_DURATION_MS}
@@ -251,14 +225,7 @@ export const ParticleDissolvePage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"particleLifetimeMs"}
-                    label={"Lifetime (ms)"}
-                    hint={
-                        "How long one particle lives. It is held below the duration, so a longer lifetime leaves less time for the edge to travel."
-                    }
-                    controls={"Sets ParticleDissolveProps.particleLifetimeMs"}
-                >
+                <PageProp key={"particleLifetimeMs"} {...ParticleDissolveKnobs.PARTICLE_LIFETIME_MS_TEXT}>
                     <PageNumberField
                         value={getLifetimeMs}
                         min={ParticleDissolveKnobs.MIN_LIFETIME_MS}
@@ -270,14 +237,7 @@ export const ParticleDissolvePage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"featherShare"}
-                    label={"Feather (0-1)"}
-                    hint={
-                        "How gradually the edge fades the content, as a share of the distance the sweep travels. 0 gives a hard edge."
-                    }
-                    controls={"Sets ParticleDissolveProps.featherShare"}
-                >
+                <PageProp key={"featherShare"} {...ParticleDissolveKnobs.FEATHER_SHARE_TEXT}>
                     <PageNumberField
                         value={getFeather}
                         min={ParticleDissolveKnobs.MIN_FEATHER}
@@ -289,12 +249,7 @@ export const ParticleDissolvePage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"spawnChance"}
-                    label={"Spawn chance (0-1)"}
-                    hint={"The chance each particle is released. Lower thins the ash out."}
-                    controls={"Sets ParticleDissolveProps.spawnChance"}
-                >
+                <PageProp key={"spawnChance"} {...ParticleDissolveKnobs.SPAWN_CHANCE_TEXT}>
                     <PageNumberField
                         value={getSpawnChance}
                         min={ParticleDissolveKnobs.MIN_SPAWN_CHANCE}
@@ -306,14 +261,7 @@ export const ParticleDissolvePage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"cellSize"}
-                    label={"Cell size (px)"}
-                    hint={
-                        "The side of one square of the grid particles are released from. Smaller squares mean finer ash and more of them."
-                    }
-                    controls={"Sets ParticleDissolveProps.cellSize"}
-                >
+                <PageProp key={"cellSize"} {...ParticleDissolveKnobs.CELL_SIZE_TEXT}>
                     <PageNumberField
                         value={getCellSize}
                         min={ParticleDissolveKnobs.MIN_CELL_SIZE}

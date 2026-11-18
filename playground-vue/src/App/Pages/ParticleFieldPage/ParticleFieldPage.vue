@@ -95,12 +95,7 @@ const examples: ExampleDefs[] = [
 <template>
     <div :class="styles.root">
         <PagePropsPanel scope="global">
-            <PageProp
-                item-key="spawnChance"
-                controls="Sets ParticleFieldProps.spawnChance"
-                label="Spawn chance (0-1)"
-                hint="The chance each cell spawns in a given pass. 1 spawns every cell every pass; lower leaves gaps that change from pass to pass. When a cell does spawn is still its weight's call."
-            >
+            <PageProp item-key="spawnChance" v-bind="ParticleFieldKnobs.SPAWN_CHANCE_TEXT">
                 <PageNumberField
                     :value="spawnChance"
                     :min="ParticleFieldKnobs.MIN_SPAWN_CHANCE"
@@ -111,12 +106,7 @@ const examples: ExampleDefs[] = [
                 />
             </PageProp>
 
-            <PageProp
-                item-key="cellCount"
-                controls="Sets ParticleFieldProps.cellCount"
-                label="Cell count (cols x rows)"
-                hint="How many columns and rows the field is split into. A cell holds one particle at a time."
-            >
+            <PageProp item-key="cellCount" v-bind="ParticleFieldKnobs.CELL_COUNT_TEXT">
                 <div :class="styles.valueList">
                     <PageNumberField
                         :value="cellCount.col"
@@ -137,12 +127,7 @@ const examples: ExampleDefs[] = [
                 </div>
             </PageProp>
 
-            <PageProp
-                item-key="originType"
-                controls="Picks the point the example's weights are measured from, sent to ParticleFieldProps.computeCellWeights"
-                label="Origin"
-                hint="Where in the grid the weights are measured from. It only applies to weights that are measured from a point."
-            >
+            <PageProp item-key="originType" v-bind="ParticleFieldKnobs.ORIGIN_TYPE_TEXT">
                 <PageSelectField
                     :value="originType"
                     :values="CellAnimationOrigins.ORIGIN_TYPES"
@@ -152,12 +137,7 @@ const examples: ExampleDefs[] = [
                 />
             </PageProp>
 
-            <PageProp
-                item-key="weightType"
-                controls="Picks the example's weight function sent to ParticleFieldProps.computeCellWeights"
-                label="Weight"
-                hint="The same weights CellAnimation uses: a heavy cell spawns early in the pass and a light one late."
-            >
+            <PageProp item-key="weightType" v-bind="ParticleFieldKnobs.WEIGHT_TYPE_TEXT">
                 <PageGroupedSelectField
                     :value="weightType"
                     :groups="GROUPPED_WEIGHTS"
@@ -166,12 +146,7 @@ const examples: ExampleDefs[] = [
                 />
             </PageProp>
 
-            <PageProp
-                item-key="animationType"
-                controls="Picks the example's particle keyframes sent to ParticleFieldProps.computeParticleAnimation"
-                label="Animation"
-                hint="How a particle appears, played forwards as it arrives and backwards as it leaves: CellAnimation's own keyframes."
-            >
+            <PageProp item-key="animationType" v-bind="ParticleFieldKnobs.ANIMATION_TYPE_TEXT">
                 <PageGroupedSelectField
                     :value="animationType"
                     :groups="GROUPPED_ANIMATIONS"
@@ -180,12 +155,7 @@ const examples: ExampleDefs[] = [
                 />
             </PageProp>
 
-            <PageProp
-                item-key="holdShare"
-                controls="Sets how long the example's particle keyframes hold, sent to ParticleFieldProps.computeParticleAnimation"
-                label="Hold (0-1)"
-                hint="How much of a particle's life it spends fully shown, between appearing and disappearing. 1 cuts in and out."
-            >
+            <PageProp item-key="holdShare" v-bind="ParticleFieldKnobs.HOLD_SHARE_TEXT">
                 <PageNumberField
                     :value="holdShare"
                     :min="ParticleFieldKnobs.MIN_HOLD_SHARE"
@@ -196,12 +166,7 @@ const examples: ExampleDefs[] = [
                 />
             </PageProp>
 
-            <PageProp
-                item-key="isScattered"
-                controls="Decides whether the example's ParticleFieldProps.computeParticlePos scatters each particle inside its cell"
-                label="Scatter in cell"
-                hint="Places each particle at a random point in its cell rather than at the center, so the grid stops showing."
-            >
+            <PageProp item-key="isScattered" v-bind="ParticleFieldKnobs.IS_SCATTERED_TEXT">
                 <PageCheckField
                     :value="isScattered"
                     ariaLabel="Scatter in cell"
@@ -209,12 +174,7 @@ const examples: ExampleDefs[] = [
                 />
             </PageProp>
 
-            <PageProp
-                item-key="animationDurationMs"
-                controls="Sets ParticleFieldProps.animationDurationMs"
-                label="Duration (ms)"
-                hint="How long one pass over the grid takes, and so the shortest time between two spawns from the same cell."
-            >
+            <PageProp item-key="animationDurationMs" v-bind="ParticleFieldKnobs.ANIMATION_DURATION_MS_TEXT">
                 <PageNumberField
                     :value="durationMs"
                     :min="ParticleFieldKnobs.MIN_DURATION_MS"
@@ -225,12 +185,7 @@ const examples: ExampleDefs[] = [
                 />
             </PageProp>
 
-            <PageProp
-                item-key="particleLifetimeMs"
-                controls="Sets ParticleFieldProps.particleLifetimeMs"
-                label="Lifetime (ms)"
-                hint="How long one particle lives, from appearing to being removed."
-            >
+            <PageProp item-key="particleLifetimeMs" v-bind="ParticleFieldKnobs.PARTICLE_LIFETIME_MS_TEXT">
                 <PageNumberField
                     :value="lifetimeMs"
                     :min="ParticleFieldKnobs.MIN_LIFETIME_MS"
@@ -241,12 +196,7 @@ const examples: ExampleDefs[] = [
                 />
             </PageProp>
 
-            <PageProp
-                item-key="iterationDelayMs"
-                controls="Sets ParticleFieldProps.animationIterationDelayMs"
-                label="Iteration delay (ms)"
-                hint="How long the field waits between one pass and the next."
-            >
+            <PageProp item-key="iterationDelayMs" v-bind="ParticleFieldKnobs.ITERATION_DELAY_MS_TEXT">
                 <PageNumberField
                     :value="iterationDelayMs"
                     :min="ParticleFieldKnobs.MIN_ITERATION_DELAY_MS"

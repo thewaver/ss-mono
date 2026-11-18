@@ -14,6 +14,7 @@
     import PageFormFieldMessage from "../../../StyledComponents/FormFieldContent/PageFormFieldMessage.svelte";
     import PageFormStack from "../../../StyledComponents/FormFieldContent/PageFormStack.svelte";
     import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
+    import { DOES_NOT_LOOK_LIKE_TEXT, WE_ONLY_USE_SIGN_TEXT, SOME_FIELDS_NEED_ATTENTION_TEXT } from "@thewaver/ss-playground/App/Pages/FormPage/FormPage.const";
 
     const FIELD_WIDTH = 240;
     const MIN_PASSWORD_LENGTH = 8;
@@ -28,7 +29,7 @@
     const computeEmailMessage = () => {
         if (email.length < 1) return "Enter your email.";
 
-        return hasEmailError ? "That does not look like an email address." : "We only use it to sign you in.";
+        return hasEmailError ? DOES_NOT_LOOK_LIKE_TEXT : WE_ONLY_USE_SIGN_TEXT;
     };
 
     const emailMessage = $derived(computeEmailMessage());
@@ -130,7 +131,7 @@
             </PageFormButtons>
 
             <div class={exampleStyles.exampleReadout} data-readout>
-                {`${state.isValid ? "Ready to send." : "Some fields need attention."} ${outcome}`}
+                {`${state.isValid ? "Ready to send." : SOME_FIELDS_NEED_ATTENTION_TEXT} ${outcome}`}
             </div>
         </PageFormStack>
     {/snippet}

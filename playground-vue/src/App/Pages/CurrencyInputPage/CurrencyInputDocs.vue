@@ -6,6 +6,7 @@ import { CurrencyInputKnobs } from "@thewaver/ss-playground/App/Knobs/CurrencyIn
 import {
     BUDGET_MAX,
     DOCS_ROOT,
+    DOCS_SECTIONS,
     LOCALE_FIELD_WIDTH,
     LOCALE_GROUPING,
 } from "@thewaver/ss-playground/App/Pages/CurrencyInputPage/CurrencyInputPage.const";
@@ -41,12 +42,7 @@ const hasSign = shallowRef(true);
         <BasicDocsExample :is-read-only="isReadOnly" :has-error="hasError" :is-disabled="isDisabled" />
 
         <template #renderKnobs>
-            <PageProp
-                item-key="isReadOnly"
-                label="Read-only"
-                hint="Its amount can be selected and copied, but neither typing nor pasting changes it."
-                controls="Sets CurrencyInputProps.isReadOnly"
-            >
+            <PageProp item-key="isReadOnly" v-bind="CurrencyInputKnobs.IS_READ_ONLY_TEXT">
                 <PageCheckField
                     :value="isReadOnly"
                     ariaLabel="Read-only"
@@ -54,21 +50,11 @@ const hasSign = shallowRef(true);
                 />
             </PageProp>
 
-            <PageProp
-                item-key="hasError"
-                label="Error"
-                hint="Marks the field invalid, for screen readers as well as for the painter."
-                controls="Sets CurrencyInputProps.hasError"
-            >
+            <PageProp item-key="hasError" v-bind="CurrencyInputKnobs.HAS_ERROR_TEXT">
                 <PageCheckField :value="hasError" ariaLabel="Error" @change="(value: boolean) => (hasError = value)" />
             </PageProp>
 
-            <PageProp
-                item-key="isDisabled"
-                label="Disabled"
-                hint="Turns the field off: nothing can write to it, it shows no caret, and the Tab key skips it."
-                controls="Sets CurrencyInputProps.isDisabled"
-            >
+            <PageProp item-key="isDisabled" v-bind="CurrencyInputKnobs.IS_DISABLED_TEXT">
                 <PageCheckField
                     :value="isDisabled"
                     ariaLabel="Disabled"
@@ -78,30 +64,19 @@ const hasSign = shallowRef(true);
         </template>
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Right to left"
-        content="Inside a box whose text runs right to left, the leading slot, here the symbol, sits on the right and the amount starts beside it, while the digits keep their own order."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.rightLeft" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/RightToLeft.vue`">
         <RightToLeftDocsExample />
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Written the local way"
-        content="Give it a [prop]locale[/prop] and the amount is written the way that place writes money: which separators, and in which groups. The [prop]decimals[/prop] say how many digits follow the separator, and [prop]groupSizes[/prop] overrides the locale's grouping, such as the Indian pattern of a group of three and then groups of two. However many groups the amount needs, it gets."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.writtenLocalWay" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Locale.vue`">
         <LocaleDocsExample :locale="locale" :decimals="decimals" :group-sizes="grouping" />
 
         <template #renderKnobs>
-            <PageProp
-                item-key="locale"
-                label="Locale"
-                hint="Which country's conventions the amount is written in, which decides the separators."
-                controls="Sets CurrencyInputProps.locale"
-            >
+            <PageProp item-key="locale" v-bind="CurrencyInputKnobs.LOCALE_TEXT">
                 <PageSelectField
                     :value="locale"
                     :values="CurrencyInputKnobs.LOCALES"
@@ -111,12 +86,7 @@ const hasSign = shallowRef(true);
                 />
             </PageProp>
 
-            <PageProp
-                item-key="decimals"
-                label="Decimals"
-                hint="How many digits are kept after the decimal separator."
-                controls="Sets CurrencyInputProps.decimals"
-            >
+            <PageProp item-key="decimals" v-bind="CurrencyInputKnobs.DECIMALS_TEXT">
                 <PageSelectField
                     :value="decimals"
                     :values="CurrencyInputKnobs.DECIMALS"
@@ -125,12 +95,7 @@ const hasSign = shallowRef(true);
                 />
             </PageProp>
 
-            <PageProp
-                item-key="groupSizes"
-                label="Grouping"
-                hint="How the digits before the decimal separator are grouped: the locale's own way, or a pattern such as threes or the Indian lakh."
-                controls="Sets CurrencyInputProps.groupSizes"
-            >
+            <PageProp item-key="groupSizes" v-bind="CurrencyInputKnobs.GROUP_SIZES_TEXT">
                 <PageSelectField
                     :value="grouping"
                     :values="CurrencyInputKnobs.GROUPINGS"
@@ -142,30 +107,19 @@ const hasSign = shallowRef(true);
         </template>
     </PageDocsExample>
 
-    <PageDocsSection
-        title="With a symbol"
-        content="The field keeps no list of currencies, so the symbol is yours to draw, in the leading or the trailing slot, on whichever side your locale puts it."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.symbol" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Symbol.vue`">
         <SymbolDocsExample />
     </PageDocsExample>
 
-    <PageDocsSection
-        title="A limit"
-        content="Give it a [prop]max[/prop] and any amount above it is refused as it is typed, so the field never holds more."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.limit" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Bounded.vue`">
         <BoundedDocsExample :max="max" />
 
         <template #renderKnobs>
-            <PageProp
-                item-key="max"
-                label="Max"
-                hint="The largest amount the field accepts."
-                controls="Sets CurrencyInputProps.max"
-            >
+            <PageProp item-key="max" v-bind="CurrencyInputKnobs.MAX_TEXT">
                 <PageNumberField
                     :value="max"
                     :min="CurrencyInputKnobs.MIN_MAX"
@@ -178,21 +132,13 @@ const hasSign = shallowRef(true);
         </template>
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Negative amounts"
-        content="With [prop]hasSign[/prop] on, a minus can be typed and the amount can go below zero. Off, the default, a minus is refused."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.negativeAmounts" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Signed.vue`">
         <SignedDocsExample :has-sign="hasSign" />
 
         <template #renderKnobs>
-            <PageProp
-                item-key="hasSign"
-                label="Signed"
-                hint="Allows negative amounts to be typed. With it off, a minus sign is refused."
-                controls="Sets CurrencyInputProps.hasSign"
-            >
+            <PageProp item-key="hasSign" v-bind="CurrencyInputKnobs.HAS_SIGN_TEXT">
                 <PageCheckField :value="hasSign" ariaLabel="Signed" @change="(value: boolean) => (hasSign = value)" />
             </PageProp>
         </template>

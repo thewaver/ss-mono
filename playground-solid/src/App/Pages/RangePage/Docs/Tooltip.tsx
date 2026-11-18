@@ -1,6 +1,7 @@
 import { createSignal } from "solid-js";
 
 import { Range } from "@thewaver/ss-components-solid";
+import { DISABLED_BUT_REACHABLE_RANGE_LABEL } from "@thewaver/ss-playground/App/Pages/RangePage/RangePage.const";
 import { RANGE_THUMB_SIZE } from "@thewaver/ss-playground/App/StyledComponents/RangeContent/RangeContent.css";
 
 import { PageRangeContent } from "../../../StyledComponents/RangeContent/RangeContent";
@@ -16,7 +17,7 @@ export const TooltipDocsExample = (props: Props) => {
         <Range
             value={valueSignal}
             id={"tooltipVolume"}
-            ariaLabel={"Disabled but reachable range"}
+            ariaLabel={DISABLED_BUT_REACHABLE_RANGE_LABEL}
             isDisabled={props.isDisabled}
             isReachableWhenDisabled={props.isReachableWhenDisabled}
             thumbSize={RANGE_THUMB_SIZE}

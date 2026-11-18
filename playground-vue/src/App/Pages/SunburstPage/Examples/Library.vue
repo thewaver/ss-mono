@@ -5,6 +5,7 @@ import { Button, Sunburst, TreemapUtils } from "@thewaver/ss-components-vue";
 import type { SunburstNode } from "@thewaver/ss-components-vue";
 import { LIBRARY } from "@thewaver/ss-playground/App/LibraryTree.generated";
 import { formatLines } from "@thewaver/ss-playground/App/LibraryTree.utils";
+import { LIBRARY_S_SOURCE_LINES_LABEL } from "@thewaver/ss-playground/App/Pages/SunburstPage/SunburstPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/SunburstPage/SunburstPage.css";
 import { PAGE_SUNBURST_FAMILIES } from "@thewaver/ss-playground/App/StyledComponents/SunburstContent/SunburstContent.css";
 
@@ -53,7 +54,7 @@ const goUp = () => {
             v-model:branch="branch"
             :ring-count="ringCount"
             :zoom-duration-ms="zoomDurationMs"
-            ariaLabel="The library's source, by lines of code"
+            :ariaLabel="LIBRARY_S_SOURCE_LINES_LABEL"
         >
             <template #renderArc="{ node, state }">
                 <PageSunburstArc

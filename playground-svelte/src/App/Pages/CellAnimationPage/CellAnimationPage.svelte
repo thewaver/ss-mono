@@ -180,9 +180,7 @@
         <PagePropsPanel scope={"sample"}>
             <PageProp
                 itemKey={"sourceKind"}
-                controls={"Picks the kind of example picture sent to CellAnimationProps.src"}
-                label={"Source"}
-                hint={"What the cells are cut from, in the first example and the stress test: a photograph, or one of the Shape page's gradients or patterns drawn into a picture. Choosing one brings its own knobs with it."}
+                {...CellAnimationKnobs.SOURCE_KIND_TEXT}
             >
                 <PageSelectField
                     value={sourceKind}
@@ -197,9 +195,7 @@
             {#if sourceKind === "image"}
                 <PageProp
                     itemKey={"image"}
-                    controls={"Picks the example picture sent to CellAnimationProps.src"}
-                    label={"Image"}
-                    hint={"Swaps in a picture of your own, so the cells can be watched against something other than the sample."}
+                    {...CellAnimationKnobs.IMAGE_TEXT}
                 >
                     <PageFileField
                         accept={"image/*"}
@@ -214,9 +210,7 @@
             {#if sourceKind === "gradient"}
                 <PageProp
                     itemKey={"gradient"}
-                    controls={"Picks the gradient drawn into the example picture sent to CellAnimationProps.src"}
-                    label={"Gradient"}
-                    hint={"Which animated gradient is rendered into the picture the cells are cut from."}
+                    {...CellAnimationKnobs.GRADIENT_TEXT}
                 >
                     <PageSelectField
                         value={gradientKey}
@@ -232,9 +226,7 @@
             {#if sourceKind === "pattern"}
                 <PageProp
                     itemKey={"pattern"}
-                    controls={"Picks the pattern drawn into the example picture sent to CellAnimationProps.src"}
-                    label={"Pattern"}
-                    hint={"Which repeating pattern is rendered into the picture the cells are cut from."}
+                    {...CellAnimationKnobs.PATTERN_TEXT}
                 >
                     <PageSelectField
                         value={patternKey}
@@ -250,9 +242,7 @@
             {#if sourceKind !== "image"}
                 <PageProp
                     itemKey={"sourceRatio"}
-                    controls={"Sets the shape of the example picture sent to CellAnimationProps.src"}
-                    label={"Ratio"}
-                    hint={"The shape of the picture the gradient or pattern is drawn into, which decides how the cells are proportioned."}
+                    {...CellAnimationKnobs.SOURCE_RATIO_TEXT}
                 >
                     <PageSelectField
                         value={sourceRatio}
@@ -271,11 +261,7 @@
         <PagePropsPanel scope={"global"}>
         <PageProp
             itemKey={"cellCountCols"}
-            controls={"Sets CellAnimationProps.cellCount"}
-            label={"Cell count (cols x rows)"}
-            hint={
-                "How many columns and rows the picture is cut into. More cells is a finer animation and more work per frame."
-            }
+            {...CellAnimationKnobs.CELL_COUNT_COLS_TEXT}
         >
             <div class={styles.valueList}>
                 <PageNumberField
@@ -303,11 +289,7 @@
 
         <PageProp
             itemKey={"originType"}
-            controls={"Picks the point the example's weights are measured from, sent to CellAnimationProps.computeSliceWeights"}
-            label={"Origin"}
-            hint={
-                "Where in the grid the animation starts from. It only applies to weights that are measured from a point."
-            }
+            {...CellAnimationKnobs.ORIGIN_TYPE_TEXT}
         >
             <PageSelectField
                 value={originType}
@@ -322,9 +304,7 @@
 
         <PageProp
             itemKey={"weightType"}
-            controls={"Picks the example's weight function sent to CellAnimationProps.computeSliceWeights"}
-            label={"Weight"}
-            hint={"How each cell's turn is decided: its distance from the origin, a wave, a random draw, and so on."}
+            {...CellAnimationKnobs.WEIGHT_TYPE_TEXT}
         >
             <PageGroupedSelectField
                 value={weightType}
@@ -338,11 +318,7 @@
 
         <PageProp
             itemKey={"uniqueWeights"}
-            controls={"Sets WeightOpts.shouldMakeUnique"}
-            label={"Unique weights"}
-            hint={
-                "Gives every cell a turn of its own, so no two move together even where the weight would have tied them."
-            }
+            {...CellAnimationKnobs.UNIQUE_WEIGHTS_TEXT}
         >
             <PageCheckField
                 value={!!weightOpts.shouldMakeUnique}
@@ -355,11 +331,7 @@
 
         <PageProp
             itemKey={"normalizeWeights"}
-            controls={"Sets WeightOpts.shouldNormalize"}
-            label={"Normalize weights"}
-            hint={
-                "Spreads the weights out to fill the whole run, so the first cell starts at the beginning and the last ends at the end."
-            }
+            {...CellAnimationKnobs.NORMALIZE_WEIGHTS_TEXT}
         >
             <PageCheckField
                 value={!!weightOpts.shouldNormalize}
@@ -372,9 +344,7 @@
 
         <PageProp
             itemKey={"animationType"}
-            controls={"Picks the example's cell keyframes sent to CellAnimationProps.computeSliceAnimation"}
-            label={"Animation"}
-            hint={"What each cell actually does on its turn: fade, slide, spin, and the rest."}
+            {...CellAnimationKnobs.ANIMATION_TYPE_TEXT}
         >
             <PageGroupedSelectField
                 value={animationType}
@@ -388,9 +358,7 @@
 
         <PageProp
             itemKey={"direction"}
-            controls={"Sets SliceAnimationBreakpointOpts.dir"}
-            label={"Direction"}
-            hint={"Which way the run travels through the weights, and so which cells go first."}
+            {...CellAnimationKnobs.DIRECTION_TEXT}
         >
             <PageSelectField
                 value={breakpointOpts.dir!}
@@ -404,9 +372,7 @@
 
         <PageProp
             itemKey={"easing"}
-            controls={"Sets SliceAnimationBreakpointOpts.easing"}
-            label={"Easing"}
-            hint={"The speed curve a single cell follows from its start to its finish."}
+            {...CellAnimationKnobs.EASING_TEXT}
         >
             <PageSelectField
                 value={breakpointOpts.easing!}
@@ -420,11 +386,7 @@
 
         <PageProp
             itemKey={"smoothness01"}
-            controls={"Sets SliceAnimationBreakpointOpts.smoothness"}
-            label={"Smoothness (0-1)"}
-            hint={
-                "How much a cell's own movement overlaps its neighbors'. 0 makes each cell wait its turn; 1 blurs them into one sweep."
-            }
+            {...CellAnimationKnobs.SMOOTHNESS01_TEXT}
         >
             <PageNumberField
                 value={breakpointOpts.smoothness!}
@@ -440,9 +402,7 @@
 
         <PageProp
             itemKey={"animationDurationMs"}
-            controls={"Sets CellAnimationProps.animationDurationMs"}
-            label={"Animation duration (ms)"}
-            hint={"How long one pass over the whole grid takes."}
+            {...CellAnimationKnobs.ANIMATION_DURATION_MS_TEXT}
         >
             <PageNumberField
                 value={animationDurationMs}
@@ -458,9 +418,7 @@
 
         <PageProp
             itemKey={"animationIterationDelayMs"}
-            controls={"Sets CellAnimationProps.animationIterationDelayMs"}
-            label={"Iteration delay (ms)"}
-            hint={"How long the grid waits between one pass and the next."}
+            {...CellAnimationKnobs.ANIMATION_ITERATION_DELAY_MS_TEXT}
         >
             <PageNumberField
                 value={animationIterationDelayMs}
@@ -476,9 +434,7 @@
 
         <PageProp
             itemKey={"animationIterationCount"}
-            controls={"Sets CellAnimationProps.animationIterationCount, with -1 sent as Infinity"}
-            label={"Iteration count (-1 = endless)"}
-            hint={"How many passes to run. -1 means it never stops, and 0 shows the final frame at once."}
+            {...CellAnimationKnobs.ANIMATION_ITERATION_COUNT_TEXT}
         >
             <PageNumberField
                 value={animationIterationCount}
@@ -494,11 +450,7 @@
 
         <PageProp
             itemKey={"finalFrame"}
-            controls={"Sets CellAnimationProps.finalFrame"}
-            label={"Final frame is"}
-            hint={
-                "What the grid is left showing once the passes are done. It has nothing to settle on while the run is endless."
-            }
+            {...CellAnimationKnobs.FINAL_FRAME_TEXT}
         >
             <PageSelectField
                 value={finalFrame}
@@ -513,9 +465,7 @@
 
         <PageProp
             itemKey={"playbackDir"}
-            controls={"Sets SliceAnimationPlaybackOpts.dir"}
-            label={"Playback direction"}
-            hint={"Whether each pass runs one way, or goes out and comes back. Coming back, stack starts with the last cell to arrive and pipe with the first."}
+            {...CellAnimationKnobs.PLAYBACK_DIR_TEXT}
         >
             <PageSelectField
                 value={playbackOpts.dir!}
@@ -529,11 +479,7 @@
 
         <PageProp
             itemKey={"holdMs"}
-            controls={"Sets SliceAnimationPlaybackOpts.holdMs"}
-            label={"Hold at far end (ms)"}
-            hint={
-                "How long the grid rests at the far end before turning back. It only applies to stack and pipe, which come back."
-            }
+            {...CellAnimationKnobs.HOLD_MS_TEXT}
         >
             <PageNumberField
                 value={playbackOpts.holdMs!}

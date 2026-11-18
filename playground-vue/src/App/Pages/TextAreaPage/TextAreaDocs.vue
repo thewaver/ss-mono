@@ -2,7 +2,7 @@
 import { shallowRef } from "vue";
 
 import { TextAreaKnobs } from "@thewaver/ss-playground/App/Knobs/TextAreas.const";
-import { DOCS_ROOT, MAX_ROWS } from "@thewaver/ss-playground/App/Pages/TextAreaPage/TextAreaPage.const";
+import { DOCS_ROOT, DOCS_SECTIONS, MAX_ROWS } from "@thewaver/ss-playground/App/Pages/TextAreaPage/TextAreaPage.const";
 
 import PageDocsExample from "../../PageComponents/DocsExample/PageDocsExample.vue";
 import PageDocsSection from "../../PageComponents/DocsSection/PageDocsSection.vue";
@@ -28,12 +28,7 @@ const isTooltipDisabled = shallowRef(false);
         <BasicDocsExample :is-read-only="isReadOnly" :has-error="hasError" :is-disabled="isDisabled" />
 
         <template #renderKnobs>
-            <PageProp
-                item-key="isReadOnly"
-                label="Read-only"
-                hint="Its text can be selected and copied, but neither typing nor pasting changes it."
-                controls="Sets TextAreaProps.isReadOnly"
-            >
+            <PageProp item-key="isReadOnly" v-bind="TextAreaKnobs.IS_READ_ONLY_TEXT">
                 <PageCheckField
                     :value="isReadOnly"
                     ariaLabel="Read-only"
@@ -41,21 +36,11 @@ const isTooltipDisabled = shallowRef(false);
                 />
             </PageProp>
 
-            <PageProp
-                item-key="hasError"
-                label="Error"
-                hint="Marks the field invalid, for screen readers as well as for the painter."
-                controls="Sets TextAreaProps.hasError"
-            >
+            <PageProp item-key="hasError" v-bind="TextAreaKnobs.HAS_ERROR_TEXT">
                 <PageCheckField :value="hasError" ariaLabel="Error" @change="(value: boolean) => (hasError = value)" />
             </PageProp>
 
-            <PageProp
-                item-key="isDisabled"
-                label="Disabled"
-                hint="Turns the field off: nothing can write to it, it shows no caret, and the Tab key skips it."
-                controls="Sets TextAreaProps.isDisabled"
-            >
+            <PageProp item-key="isDisabled" v-bind="TextAreaKnobs.IS_DISABLED_TEXT">
                 <PageCheckField
                     :value="isDisabled"
                     ariaLabel="Disabled"
@@ -65,30 +50,19 @@ const isTooltipDisabled = shallowRef(false);
         </template>
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Right to left"
-        content="Inside a box whose text runs right to left, every line starts from the right of the box, and so does the placeholder. The sides of [prop]padding[/prop] are where the text starts and ends rather than the screen's left and right."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.rightLeft" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/RightToLeft.vue`">
         <RightToLeftDocsExample />
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Growing with what is typed"
-        content="With [prop]isAutoSizing[/prop] on, the box follows its own content: it starts [prop]minRows[/prop] tall and grows a row at a time as lines are added, so nothing has to guess a height. At [prop]maxRows[/prop] it stops growing and scrolls instead."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.growingWithTyping" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Growing.vue`">
         <GrowingDocsExample :max-rows="maxRows" />
 
         <template #renderKnobs>
-            <PageProp
-                item-key="maxRows"
-                label="Max rows"
-                hint="The most rows the box grows to before it starts scrolling."
-                controls="Sets TextAreaProps.maxRows"
-            >
+            <PageProp item-key="maxRows" v-bind="TextAreaKnobs.MAX_ROWS_TEXT">
                 <PageNumberField
                     :value="maxRows"
                     :min="TextAreaKnobs.MIN_MAX_ROWS"
@@ -101,10 +75,7 @@ const isTooltipDisabled = shallowRef(false);
         </template>
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Tooltip"
-        content="Give a field [prop]tooltipDefs[/prop] and it shows a tooltip on hover and on keyboard focus, read by screen readers as the field's description. A disabled field shows no tooltip unless you also keep it reachable when disabled; it can then be focused to read why it is off, and typing still changes nothing."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.tooltip" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Tooltip.vue`">
         <TooltipDocsExample :is-disabled="isTooltipDisabled" :is-reachable-when-disabled="isReachableWhenDisabled" />
@@ -112,9 +83,7 @@ const isTooltipDisabled = shallowRef(false);
         <template #renderKnobs>
             <PageProp
                 item-key="tooltipIsReachableWhenDisabled"
-                label="Reachable when disabled"
-                hint="Keeps a disabled field's tooltip available: the Tab key can stop on it and hovering it shows the tooltip. Without it a disabled field shows no tooltip at all. It only matters while Disabled is on."
-                controls="Sets TextAreaProps.isReachableWhenDisabled"
+                v-bind="TextAreaKnobs.TOOLTIP_IS_REACHABLE_WHEN_DISABLED_TEXT"
             >
                 <PageCheckField
                     :value="isReachableWhenDisabled"
@@ -123,12 +92,7 @@ const isTooltipDisabled = shallowRef(false);
                 />
             </PageProp>
 
-            <PageProp
-                item-key="tooltipIsDisabled"
-                label="Disabled"
-                hint="Turns the field off: nothing can write to it, it shows no caret, and the Tab key skips it."
-                controls="Sets TextAreaProps.isDisabled"
-            >
+            <PageProp item-key="tooltipIsDisabled" v-bind="TextAreaKnobs.IS_DISABLED_TEXT">
                 <PageCheckField
                     :value="isTooltipDisabled"
                     ariaLabel="Disabled"
@@ -138,10 +102,7 @@ const isTooltipDisabled = shallowRef(false);
         </template>
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Named by a Label"
-        content="Inside a Label, the field takes its name from the label's text, so it needs no [prop]ariaLabel[/prop], and pressing the text focuses the field."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.namedLabel" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Labeled.vue`">
         <LabeledDocsExample />

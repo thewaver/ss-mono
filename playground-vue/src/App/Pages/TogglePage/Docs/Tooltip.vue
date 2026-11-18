@@ -3,6 +3,7 @@ import { h, shallowRef } from "vue";
 
 import { Toggle } from "@thewaver/ss-components-vue";
 import type { BinarySwitchFlags, InteractionTooltipDefs } from "@thewaver/ss-components-vue";
+import { TOGGLE_TOOLTIP_LABEL } from "@thewaver/ss-playground/App/Pages/TogglePage/TogglePage.const";
 
 import PageToggleContent from "../../../StyledComponents/ToggleContent/ToggleContent.vue";
 import PageTooltipContent from "../../../StyledComponents/TooltipContent/TooltipContent.vue";
@@ -25,13 +26,13 @@ const tooltipDefs: InteractionTooltipDefs<BinarySwitchFlags> = {
 <template>
     <Toggle
         v-model:checked="checked"
-        ariaLabel="Toggle with a tooltip"
+        :ariaLabel="TOGGLE_TOOLTIP_LABEL"
         :is-disabled="isDisabled"
         :is-reachable-when-disabled="isReachableWhenDisabled"
         :tooltip-defs="tooltipDefs"
     >
         <template #renderContent="flags">
-            <PageToggleContent :flags="flags">Toggle with a tooltip</PageToggleContent>
+            <PageToggleContent :flags="flags">{{ TOGGLE_TOOLTIP_LABEL }}</PageToggleContent>
         </template>
     </Toggle>
 </template>

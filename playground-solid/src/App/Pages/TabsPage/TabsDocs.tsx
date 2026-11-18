@@ -2,7 +2,8 @@ import { createSignal } from "solid-js";
 
 import type { TabsOrientation } from "@thewaver/ss-components-solid";
 import { TABS_DEFAULTS, TABS_ORIENTATIONS } from "@thewaver/ss-components-solid";
-import { DOCS_ROOT } from "@thewaver/ss-playground/App/Pages/TabsPage/TabsPage.const";
+import { TabKnobs } from "@thewaver/ss-playground/App/Knobs/Tabs.const";
+import { DOCS_ROOT, DOCS_SECTIONS } from "@thewaver/ss-playground/App/Pages/TabsPage/TabsPage.const";
 
 import { PageDocsExample } from "../../PageComponents/DocsExample/DocsExample";
 import { PageDocsSection } from "../../PageComponents/DocsSection/DocsSection";
@@ -30,14 +31,7 @@ export const TabsDocs = () => {
                 path={`${DOCS_ROOT}/Basic.tsx`}
                 renderKnobs={() => (
                     <>
-                        <PageProp
-                            key={"orientation"}
-                            label={"Orientation"}
-                            hint={
-                                "Whether the tabs run across the page or down it, which also decides which arrow keys walk them: left and right in a row, up and down in a column."
-                            }
-                            controls={"Sets TabsProps.orientation"}
-                        >
+                        <PageProp key={"orientation"} {...TabKnobs.ORIENTATION_TEXT}>
                             <PageSelectField
                                 value={getOrientation}
                                 values={TABS_ORIENTATIONS}
@@ -46,12 +40,7 @@ export const TabsDocs = () => {
                             />
                         </PageProp>
 
-                        <PageProp
-                            key={"isDisabled"}
-                            label={"Disabled"}
-                            hint={"Turns every tab off: none can be selected, and the Tab key skips the list."}
-                            controls={"Sets Tab.isDisabled on every example tab sent to TabsProps.tabs"}
-                        >
+                        <PageProp key={"isDisabled"} {...TabKnobs.IS_DISABLED_TEXT}>
                             <PageCheckField value={getIsDisabled} ariaLabel={"Disabled"} onChange={setIsDisabled} />
                         </PageProp>
                     </>
@@ -60,33 +49,18 @@ export const TabsDocs = () => {
                 <BasicDocsExample orientation={getOrientation} isDisabled={getIsDisabled} />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"Right to left"}
-                content={
-                    "Inside a box whose text runs right to left, the tabs run from the right and the left arrow key moves on to the next tab. The button below switches the box's direction while the tabs are on screen, and the marker and the arrow keys follow the row as it turns round."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.rightLeft} />
 
             <PageDocsExample path={`${DOCS_ROOT}/RightToLeft.tsx`}>
                 <RightToLeftDocsExample />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"Selecting as the arrows move"}
-                content={
-                    "By default the arrow keys move focus along the tabs, and Enter or Space selects the one focused. Set [prop]hasAutoActivation[/prop] and an arrow selects the tab it lands on as well, which suits panels already in the page. Leave it off where showing a panel is expensive, such as one that fetches, since every tab passed on the way would be shown."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.selectingArrowsMove} />
 
             <PageDocsExample
                 path={`${DOCS_ROOT}/Automatic.tsx`}
                 renderKnobs={() => (
-                    <PageProp
-                        key={"hasAutoActivation"}
-                        label={"Automatic activation"}
-                        hint={"Selects a tab as soon as an arrow key reaches it. Off, Enter or Space selects it."}
-                        controls={"Sets TabsProps.hasAutoActivation"}
-                    >
+                    <PageProp key={"hasAutoActivation"} {...TabKnobs.HAS_AUTO_ACTIVATION_TEXT}>
                         <PageCheckField
                             value={getHasAutoActivation}
                             ariaLabel={"Automatic activation"}
@@ -98,33 +72,18 @@ export const TabsDocs = () => {
                 <AutomaticDocsExample hasAutoActivation={getHasAutoActivation} />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"A marker that follows the pointer"}
-                content={
-                    "Besides the marker under the selected tab, [prop]renderHighlightFloater[/prop] draws a second one that slides to whichever tab the pointer or the keyboard focus is on."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.markerThatFollowsPointer} />
 
             <PageDocsExample path={`${DOCS_ROOT}/HoverPill.tsx`}>
                 <HoverPillDocsExample />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"A disabled tab"}
-                content={
-                    "A tab whose record sets [prop]isDisabled[/prop] cannot be selected, and the arrow keys walk past it. With [prop]isReachableWhenDisabled[/prop] set on the record as well, the arrow keys stop on it, so a screen reader names it and says it is unavailable; it still cannot be selected."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.disabledTab} />
 
             <PageDocsExample
                 path={`${DOCS_ROOT}/DisabledTab.tsx`}
                 renderKnobs={() => (
-                    <PageProp
-                        key={"isReachableWhenDisabled"}
-                        label={"Reachable when disabled"}
-                        hint={"Lets the arrow keys stop on the disabled Metrics tab without selecting it."}
-                        controls={"Sets Tab.isReachableWhenDisabled on the disabled tab"}
-                    >
+                    <PageProp key={"isReachableWhenDisabled"} {...TabKnobs.IS_REACHABLE_WHEN_DISABLED_TEXT}>
                         <PageCheckField
                             value={getIsReachableWhenDisabled}
                             ariaLabel={"Reachable when disabled"}
@@ -136,24 +95,12 @@ export const TabsDocs = () => {
                 <DisabledTabDocsExample isReachableWhenDisabled={getIsReachableWhenDisabled} />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"Links"}
-                content={
-                    "Give a tab an [prop]href[/prop] and it is drawn as a native HTML anchor element, and choosing it still reports through [prop]onSelectionChange[/prop]. In a routed app, pass [prop]linkComponent[/prop], a custom link component such as your router's, and the tabs are drawn with it instead. A link needs no panel here, since the page it opens may be mounted anywhere."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.links} />
 
             <PageDocsExample
                 path={`${DOCS_ROOT}/Links.tsx`}
                 renderKnobs={() => (
-                    <PageProp
-                        key={"hasLinkComponent"}
-                        label={"Custom link component"}
-                        hint={
-                            "Draws the tabs with a custom link component, as a router's link would be. Off, they use the native HTML anchor element."
-                        }
-                        controls={"Sets TabsProps.linkComponent"}
-                    >
+                    <PageProp key={"hasLinkComponent"} {...TabKnobs.HAS_LINK_COMPONENT_TEXT}>
                         <PageCheckField
                             value={getHasLinkComponent}
                             ariaLabel={"Custom link component"}
@@ -165,23 +112,13 @@ export const TabsDocs = () => {
                 <LinksDocsExample hasLinkComponent={getHasLinkComponent} />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"A selection that can be cleared"}
-                content={
-                    "Set the selected value to undefined and no tab is selected: the marker plays itself out over [prop]transitionDurationMs[/prop], and plays back in once a tab is chosen again. Which panel shows meanwhile, if any, is yours to decide."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.clearableSelection} />
 
             <PageDocsExample path={`${DOCS_ROOT}/Clearable.tsx`}>
                 <ClearableDocsExample />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"Placed by a layout"}
-                content={
-                    "Give the list [prop]computeLayout[/prop] and the tabs are placed by a layout instead of in a row or a column, here a honeycomb. The arrow keys still walk them in the order they are written, and both markers sit behind the cell they belong to."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.placedLayout} />
 
             <PageDocsExample path={`${DOCS_ROOT}/Honeycomb.tsx`}>
                 <HoneycombDocsExample />

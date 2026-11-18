@@ -101,14 +101,7 @@ export const LIBRARY: TreemapNode<string> = branch(
         ),
         branch("MediaSwitchers", leaf("AudioSwitcher", 296), leaf("ImageSwitcher", 227)),
         leaf("Menubar", 7),
-        branch(
-            "Menus",
-            leaf("CommandPalette", 390),
-            leaf("FanMenu", 108),
-            leaf("FlyoutMenu", 924),
-            leaf("Menu", 2457),
-            leaf("WheelMenu", 274),
-        ),
+        branch("Menus", leaf("CommandPalette", 390), leaf("FlyoutMenu", 924), leaf("Menu", 2457)),
         branch(
             "Overlays",
             leaf("Drawer", 29),
@@ -141,6 +134,7 @@ export const LIBRARY: TreemapNode<string> = branch(
         branch("Charts", leaf("CirclePacking", 509), leaf("Icicle", 603), leaf("Sunburst", 567), leaf("Treemap", 789)),
         leaf("CornerHighlight", 172),
         branch("Diagrams", leaf("Bracket", 1408), leaf("PatchBoard", 2107), leaf("Timeline", 1440)),
+        branch("Menus", leaf("FanMenu", 108), leaf("WheelMenu", 274)),
         branch("Mosaics", leaf("ElementMosaic", 79), leaf("ImageMosaic", 213)),
         branch("Particles", leaf("ParticleDissolve", 550), leaf("ParticleField", 769), leaf("ParticleSpawner", 1350)),
         branch(

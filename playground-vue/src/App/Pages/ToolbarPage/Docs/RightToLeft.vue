@@ -4,6 +4,7 @@ import { shallowRef } from "vue";
 import { Toolbar } from "@thewaver/ss-components-vue";
 import type { ToolbarAction } from "@thewaver/ss-components-vue";
 import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
+import { MORE_FORMATTING_ACTIONS_LABEL } from "@thewaver/ss-playground/App/Pages/ToolbarPage/ToolbarPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ToolbarPage/ToolbarPage.css";
 
 import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.vue";
@@ -31,7 +32,7 @@ const lastRun = shallowRef<string>();
             <Toolbar
                 :actions="ACTIONS"
                 ariaLabel="Formatting"
-                overflowAriaLabel="More formatting actions"
+                :overflowAriaLabel="MORE_FORMATTING_ACTIONS_LABEL"
                 @activate="(value: string) => (lastRun = value)"
             >
                 <template #renderAction="{ action, flags }">

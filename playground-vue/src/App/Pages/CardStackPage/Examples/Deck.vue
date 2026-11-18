@@ -3,7 +3,11 @@ import { computed, shallowRef } from "vue";
 
 import { Button, CardStack } from "@thewaver/ss-components-vue";
 import type { CardStackControls } from "@thewaver/ss-components-vue";
-import { computeCardTilt } from "@thewaver/ss-playground/App/Pages/CardStackPage/CardStackPage.const";
+import {
+    DEAL_CARDS_AGAIN_LABEL,
+    RECALL_LAST_CARD_LABEL,
+    computeCardTilt,
+} from "@thewaver/ss-playground/App/Pages/CardStackPage/CardStackPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/CardStackPage/CardStackPage.css";
 import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 import type { SwipeDirection } from "@thewaver/ss-utils";
@@ -102,7 +106,7 @@ const deal = () => {
             <Button
                 id="recall"
                 :is-disabled="isDisabled || topIndex === FIRST_INDEX"
-                ariaLabel="Recall the last card"
+                :ariaLabel="RECALL_LAST_CARD_LABEL"
                 @click="recall"
             >
                 <template #renderContent="flags">
@@ -110,7 +114,7 @@ const deal = () => {
                 </template>
             </Button>
 
-            <Button v-if="isEmpty" id="deal" ariaLabel="Deal the cards again" @click="deal">
+            <Button v-if="isEmpty" id="deal" :ariaLabel="DEAL_CARDS_AGAIN_LABEL" @click="deal">
                 <template #renderContent="flags">
                     <PageControlButtonContent :flags="flags" :glyph="CONTROL_GLYPHS.replay" />
                 </template>

@@ -3,6 +3,7 @@ import { useState } from "react";
 import { TimeInput } from "@thewaver/ss-components-react";
 import { TIME_SEGMENT_HINTS } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
 import { FIELD_WIDTH } from "@thewaver/ss-playground/App/Pages/DatePickerPage/DatePickerPage.const";
+import { TIME_RIGHT_LEFT_BOX_LABEL } from "@thewaver/ss-playground/App/Pages/TimeInputPage/TimeInputPage.const";
 import {
     FIELD_GAP,
     FIELD_STEPPER_PADDING,
@@ -20,7 +21,7 @@ export const RightToLeftDocsExample = () => {
             <TimeInput
                 value={valueState}
                 isTwelveHour={true}
-                ariaLabel={"Time in a right-to-left box"}
+                ariaLabel={TIME_RIGHT_LEFT_BOX_LABEL}
                 segmentHints={TIME_SEGMENT_HINTS}
                 padding={FIELD_STEPPER_PADDING}
                 gap={FIELD_GAP}

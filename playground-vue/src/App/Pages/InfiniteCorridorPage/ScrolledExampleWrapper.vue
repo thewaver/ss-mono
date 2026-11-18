@@ -19,12 +19,7 @@ const scrollLength = shallowRef(InfiniteCorridorKnobs.STARTING_SCROLL_LENGTH);
     <ScrolledExample v-bind="props" :scroll-length="scrollLength" />
 
     <PageExampleKnobs>
-        <PageProp
-            item-key="scrollLength"
-            controls="Sets how long the example scroll runway that drives InfiniteCorridorProps.progress is"
-            label="Scroll length"
-            hint="How far the box scrolls to walk one lap of the corridor, in heights of the box. Longer is slower."
-        >
+        <PageProp item-key="scrollLength" v-bind="InfiniteCorridorKnobs.SCROLL_LENGTH_TEXT">
             <PageNumberField
                 :value="scrollLength"
                 :min="InfiniteCorridorKnobs.MIN_SCROLL_LENGTH"

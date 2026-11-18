@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import { Button, Range, Typewriter } from "@thewaver/ss-components-react";
 import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
+import { HOW_FAR_LINE_HAS_LABEL, LYRIC } from "@thewaver/ss-playground/App/Pages/TypewriterPage/TypewriterPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/TypewriterPage/TypewriterPage.css";
 import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
@@ -10,7 +11,6 @@ import { PageControlButtonContent } from "../../../StyledComponents/ControlButto
 import { PageRangeContent } from "../../../StyledComponents/RangeContent/RangeContent";
 import type { TypewriterKaraokeExampleProps } from "../TypewriterPageReact.types";
 
-const LYRIC = "Twinkle, twinkle, little star";
 const PERCENT = 100;
 const SLIDER_STEP = 1;
 const SLIDER_LENGTH = 110;
@@ -64,7 +64,7 @@ export const KaraokeExample = (props: Props) => {
                 <Range
                     id={"karaokeScrubber"}
                     sizing={"fill"}
-                    ariaLabel={"How far the line has been sung"}
+                    ariaLabel={HOW_FAR_LINE_HAS_LABEL}
                     min={0}
                     max={PERCENT}
                     step={SLIDER_STEP}

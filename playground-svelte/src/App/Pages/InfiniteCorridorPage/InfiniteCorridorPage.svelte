@@ -90,11 +90,7 @@
     <PagePropsPanel scope={"sample"}>
         <PageProp
             itemKey={"layout"}
-            controls={"Picks the sample layout sent to InfiniteCorridorProps.layout"}
-            label={"Layout"}
-            hint={
-                "Where the items stand: walls is one row on each wall, from flat against it to turned towards the viewer, and tube lines the inside of a ring of sides, every item upright towards the center. Choosing one brings its own knobs with it."
-            }
+            {...InfiniteCorridorKnobs.LAYOUT_TEXT}
         >
             <PageSelectField
                 value={layoutKey}
@@ -120,11 +116,7 @@
         {#if family === "tube"}
             <PageProp
                 itemKey={"spinDegreesPerSecond"}
-                controls={"Sets how fast the example turns the tube layout sent to InfiniteCorridorProps.layout"}
-                label={"Rotation speed (°/s)"}
-                hint={
-                    "How fast the tube spins round its axis, whatever the corridor's position. The page turns the layout's spinDegrees on a clock; 0 stops it, and below 0 spins it the other way."
-                }
+                {...InfiniteCorridorKnobs.SPIN_DEGREES_PER_SECOND_TEXT}
             >
                 <PageNumberField
                     value={spinDegreesPerSecond}
@@ -146,11 +138,7 @@
     <PagePropsPanel scope={"global"}>
         <PageProp
             itemKey={"itemCount"}
-            controls={"Sets the number of example rooms sent to InfiniteCorridorProps.items"}
-            label={"Item count"}
-            hint={
-                "How many rooms line the corridor. Too few to fill it are repeated, and only the copy nearest the viewer can be reached."
-            }
+            {...InfiniteCorridorKnobs.ITEM_COUNT_TEXT}
         >
             <PageNumberField
                 value={itemCount}
@@ -167,11 +155,7 @@
 
         <PageProp
             itemKey={"glideDurationMs"}
-            controls={"Sets InfiniteCorridorProps.glideDurationMs"}
-            label={"Glide (ms)"}
-            hint={
-                "How long the corridor takes to bring a room into view when it is tabbed to from out of view. It times nothing else, so it shows only on Tab."
-            }
+            {...InfiniteCorridorKnobs.GLIDE_DURATION_MS_TEXT}
         >
             <PageNumberField
                 value={glideDurationMs}

@@ -3,12 +3,13 @@
 
     import PageCheckboxContent from "../../../StyledComponents/CheckboxContent/CheckboxContent.svelte";
     import PageLabelCaption from "../../../StyledComponents/LabelCaption/LabelCaption.svelte";
+    import { ANNOUNCED_SOMETHING_ELSE_LABEL } from "@thewaver/ss-playground/App/Pages/LabelPage/LabelPage.const";
 
     let checked = $state(false);
 </script>
 
 <Label>
-    <Checkbox bind:checked ariaLabel={"Announced as something else"}>
+    <Checkbox bind:checked ariaLabel={ANNOUNCED_SOMETHING_ELSE_LABEL}>
         {#snippet renderContent(flags)}
             <PageCheckboxContent {flags} />
         {/snippet}

@@ -4494,8 +4494,15 @@ range and moves with it. **A knob that starts at the library's default is the on
 Playground's own to state and a `Knobs` constant would only restate the library's. What stays in the page is
 what the example itself is made of: a range handed to the component being shown, as `NumberInputPage`'s
 quantity field has, is the example's content rather than a control tuning it, and so are an example's own
-state, layout sizes, labels and content lists. Patch Board's zoom range is the example's for that reason — its
-buttons are part of what the example shows, and the example's source is on the page. The
+state and layout sizes. Patch Board's zoom range is the example's for that reason — its
+buttons are part of what the example shows, and the example's source is on the page. **Text is the exception:
+any string written identically in all four frameworks lives once, in the shared Playground**, on the user's
+call — an example's labels and content lists included, because a reader of the example's source gains little
+from the literal words behind a well-named constant. A knob's label, hint and "Sets …" line travel as one
+`<NAME>_TEXT` record in its `<Subject>Knobs` namespace, spread into `PageProp`; a docs section's title and
+paragraph as one entry of the page's `DOCS_SECTIONS` in its shared `.const.ts`; an example's strings and
+content lists as named exports of that same file. Page-level `ariaLabel`s on knob fields stay inline, by the
+same call, since they sit beside the control they name. The
 knob types went with them into `PageComponents/Knobs/Knobs.types.ts` as `Knob`, `NumberKnob`, `CheckKnob`,
 `KnobFor` and `Knobs`, and `Samples/Samples.types.ts`, which held nothing else, is gone. `TimedGradientDefsOf`
 and `TrackedGradientDefsOf` stayed in the library beside the entries they read, because the defaults need them
@@ -5923,8 +5930,9 @@ submenu ended up sprawled across a half-circle. Below the root each wedge asks f
 instead, converted to an angle at that band's radius, so a wedge is about the same size however deep it is.
 The block is then centered on the wedge that opened it, which is the thing that makes three bands legible.
 
-**Where the pieces live.** `components/src/Essentials/Menus` holds `Menu` and `WheelMenu`; the Playground
-mirrors it under `Pages/Menus` and the left-hand nav groups them. The arc factory itself is sample code
+**Where the pieces live.** `Menu` is in `Essentials/Menus`; `WheelMenu` and `FanMenu` are in `Exotics/Menus`, moved
+there by the user, and import `Menu` across. The Playground keeps all the menu pages under `Pages/Menus`, and the
+left-hand nav has a Menus group under each category. The arc factory itself is sample code
 rather than component code, and it lived in `Samples/Menu/Layouts` for as long as a menu was the only thing
 asking for one — see _"Every layout sample lives in one place, and none of them is a menu's"_ for where it
 went once that stopped being true.

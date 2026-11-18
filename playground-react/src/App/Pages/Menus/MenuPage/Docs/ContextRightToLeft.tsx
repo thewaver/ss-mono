@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import { ContextMenu } from "@thewaver/ss-components-react";
 import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
+import { EDITING_AREA_RIGHT_LEFT_LABEL } from "@thewaver/ss-playground/App/Pages/Menus/MenuPage/MenuPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/Menus/MenuPage/MenuPage.css";
 import { POPOVER_SURFACE_INSET } from "@thewaver/ss-playground/App/StyledComponents/PopoverSurface/PopoverSurface.css";
 
@@ -18,7 +19,7 @@ export const ContextRightToLeftDocsExample = () => {
                     renderHighlightFloater={renderPageHighlightFloater}
                     items={NESTED_ACTIONS}
                     ariaLabel={"File actions"}
-                    regionAriaLabel={"Editing area in a right-to-left box"}
+                    regionAriaLabel={EDITING_AREA_RIGHT_LEFT_LABEL}
                     submenuOffset={{ x: POPOVER_SURFACE_INSET, y: -POPOVER_SURFACE_INSET }}
                     renderRegion={() => <div className={styles.contextRegion}>Right-click anywhere in this box</div>}
                     renderItem={renderMenuItem}

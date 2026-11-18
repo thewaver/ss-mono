@@ -2,6 +2,7 @@ import { createSignal } from "solid-js";
 
 import { ColorInput } from "@thewaver/ss-components-solid";
 import { COLOR_INPUT_LABELS } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
+import { DISABLED_BUT_REACHABLE_COLOR_LABEL } from "@thewaver/ss-playground/App/Pages/ColorInputPage/ColorInputPage.const";
 
 import { pageColorPickerSlots } from "../../../PageComponents/ColorPicker/ColorPicker";
 import { PageColorInputContent } from "../../../StyledComponents/ColorInputContent/ColorInputContent";
@@ -19,7 +20,7 @@ export const TooltipDocsExample = (props: Props) => {
             value={valueSignal}
             isDisabled={props.isDisabled}
             isReachableWhenDisabled={props.isReachableWhenDisabled}
-            ariaLabel={"Disabled but reachable color"}
+            ariaLabel={DISABLED_BUT_REACHABLE_COLOR_LABEL}
             {...COLOR_INPUT_LABELS}
             renderContent={(getRenderProps) => <PageColorInputContent renderProps={getRenderProps} />}
             tooltipDefs={() => ({

@@ -7,6 +7,7 @@
     import PageTableMarker from "../../../StyledComponents/TableContent/PageTableMarker.svelte";
     import { PARTS, createPartColumns } from "../TablePage.const.svelte";
     import type { Part } from "../TablePageSvelte.types";
+    import { PARTS_REORDERABLE_COLUMNS_LABEL } from "@thewaver/ss-playground/App/Pages/TablePage/TablePage.const";
 
     let sort = $state<TableSort>();
     let selection = $state.raw<Part[]>([]);
@@ -22,7 +23,7 @@
         bind:sort
         bind:selection
         bind:order
-        ariaLabel={"Parts with reorderable columns"}
+        ariaLabel={PARTS_REORDERABLE_COLUMNS_LABEL}
         announcements={TABLE_ANNOUNCEMENTS}
     >
         {#snippet renderMarker()}

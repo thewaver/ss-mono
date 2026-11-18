@@ -3,7 +3,11 @@ import { For, createSignal } from "solid-js";
 import { EDGE_FADER_DEFAULTS } from "@thewaver/ss-components-solid";
 import type { EdgeFaderEdge } from "@thewaver/ss-components-solid";
 import { EdgeFaderKnobs } from "@thewaver/ss-playground/App/Knobs/EdgeFaders.const";
-import { DOCS_ROOT, EDGE_LABELS } from "@thewaver/ss-playground/App/Pages/EdgeFaderPage/EdgeFaderPage.const";
+import {
+    DOCS_ROOT,
+    DOCS_SECTIONS,
+    EDGE_LABELS,
+} from "@thewaver/ss-playground/App/Pages/EdgeFaderPage/EdgeFaderPage.const";
 
 import { PageDocsExample } from "../../PageComponents/DocsExample/DocsExample";
 import { PageDocsSection } from "../../PageComponents/DocsSection/DocsSection";
@@ -29,12 +33,7 @@ export const EdgeFaderDocs = () => {
             <PageDocsExample
                 path={`${DOCS_ROOT}/Basic.tsx`}
                 renderKnobs={() => (
-                    <PageProp
-                        key={"size"}
-                        label={"Fade size (px)"}
-                        hint={"How far in from each chosen side the fade reaches."}
-                        controls={"Sets EdgeFaderProps.size"}
-                    >
+                    <PageProp key={"size"} {...EdgeFaderKnobs.SIZE_TEXT}>
                         <PageNumberField
                             value={getSize}
                             min={EdgeFaderKnobs.MIN_SIZE}
@@ -49,12 +48,7 @@ export const EdgeFaderDocs = () => {
                 <BasicDocsExample size={getSize} />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"Any mix of sides"}
-                content={
-                    "Pass [prop]edges[/prop] any mix of top, right, bottom and left; left out, all four fade. Where two faded sides meet, their fades meet in the corner."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.anyMixSides} />
 
             <PageDocsExample
                 path={`${DOCS_ROOT}/Sides.tsx`}
@@ -80,22 +74,12 @@ export const EdgeFaderDocs = () => {
                 <SidesDocsExample edges={getEdges} />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"Fading only what is out of view"}
-                content={
-                    "Set [prop]isScrollAware[/prop] and a side fades only while there is more to scroll to past it. The fade shrinks as that end comes into view and is gone once it is reached, so a box whose content fits shows no fade at all."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.fadingOnlyOutOfView} />
 
             <PageDocsExample
                 path={`${DOCS_ROOT}/ScrollAware.tsx`}
                 renderKnobs={() => (
-                    <PageProp
-                        key={"isScrollAware"}
-                        label={"Scroll-aware"}
-                        hint={"Whether a side fades only while there is more to scroll to past it."}
-                        controls={"Sets EdgeFaderProps.isScrollAware"}
-                    >
+                    <PageProp key={"isScrollAware"} {...EdgeFaderKnobs.IS_SCROLL_AWARE_TEXT}>
                         <PageCheckField
                             value={getIsScrollAware}
                             ariaLabel={"Scroll-aware"}
@@ -107,12 +91,7 @@ export const EdgeFaderDocs = () => {
                 <ScrollAwareDocsExample isScrollAware={getIsScrollAware} />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"Around something that does not scroll"}
-                content={
-                    "Left fixed, the default, the chosen sides fade whether or not anything scrolls, so the fade can soften the edges of any content."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.aroundNonScrolling} />
 
             <PageDocsExample path={`${DOCS_ROOT}/Unscrolled.tsx`}>
                 <UnscrolledDocsExample />

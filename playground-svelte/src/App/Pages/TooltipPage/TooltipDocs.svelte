@@ -3,7 +3,7 @@
     import { ANCHOR_H_PLACEMENTS, ANCHOR_V_PLACEMENTS, TOOLTIP_DEFAULTS } from "@thewaver/ss-components-svelte";
     import { TooltipKnobs } from "@thewaver/ss-playground/App/Knobs/Tooltips.const";
     import { WCAG_URLS } from "@thewaver/ss-playground/App/PageComponents/DocsProse/DocsProse.const";
-    import { DOCS_ROOT, FIELD_WIDTH } from "@thewaver/ss-playground/App/Pages/TooltipPage/TooltipPage.const";
+    import { DOCS_SECTIONS, DOCS_ROOT, FIELD_WIDTH } from "@thewaver/ss-playground/App/Pages/TooltipPage/TooltipPage.const";
     import {
         TOOLTIP_ARROWS,
         TOOLTIP_ARROW_LABELS,
@@ -65,9 +65,7 @@
     {#snippet renderKnobs()}
         <PageProp
             itemKey={"reveal"}
-            controls={"Picks how the example content drawn by TooltipProps.renderContent appears"}
-            label={"Reveal"}
-            hint={"How the tooltip appears and goes, which is the drawing's own: the tooltip only says whether it is showing and for how long the change takes."}
+            {...TooltipKnobs.REVEAL_TEXT}
         >
             <PageSelectField
                 value={reveal}
@@ -83,11 +81,7 @@
 
         <PageProp
             itemKey={"arrow"}
-            controls={"Picks the arrow on the example content drawn by TooltipProps.renderContent"}
-            label={"Arrow"}
-            hint={
-                "An arrow grown out of the tooltip's body to point at its anchor. It comes out of the side facing the anchor, or out of the nearest corner when the tooltip sits off a corner, and there is none while the tooltip overlaps its anchor. The offset is what makes room for it."
-            }
+            {...TooltipKnobs.ARROW_2_TEXT}
         >
             <PageSelectField
                 value={arrow}
@@ -104,11 +98,7 @@
         {#if arrow !== "none"}
             <PageProp
                 itemKey={"arrowWidth"}
-                controls={"Sets the arrow width on the example content drawn by TooltipProps.renderContent"}
-                label={"Arrow width (px)"}
-                hint={
-                    "How wide the arrow is across its base. The lightning bolt spans this much from where its base starts to its tip."
-                }
+                {...TooltipKnobs.ARROW_WIDTH_TEXT}
             >
                 <PageNumberField
                     value={arrowWidth}
@@ -125,11 +115,7 @@
 
             <PageProp
                 itemKey={"arrowLength"}
-                controls={"Sets the arrow length on the example content drawn by TooltipProps.renderContent"}
-                label={"Arrow length (px)"}
-                hint={
-                    "How far the arrow's tip stands off the tooltip. Longer than the offset, and the tip reaches over the anchor."
-                }
+                {...TooltipKnobs.ARROW_LENGTH_TEXT}
             >
                 <PageNumberField
                     value={arrowLength}
@@ -147,9 +133,7 @@
 
         <PageProp
             itemKey={"hPlacement"}
-            controls={"Sets TooltipProps.placement.x"}
-            label={"Placement across"}
-            hint={"Where the tooltip sits across its anchor: inside an edge, centered, or outside it altogether."}
+            {...TooltipKnobs.H_PLACEMENT_TEXT}
         >
             <PageSelectField
                 value={hPlacement}
@@ -164,9 +148,7 @@
 
         <PageProp
             itemKey={"vPlacement"}
-            controls={"Sets TooltipProps.placement.y"}
-            label={"Placement down"}
-            hint={"Where the tooltip sits above or below its anchor: inside an edge, centered, or outside it altogether."}
+            {...TooltipKnobs.V_PLACEMENT_TEXT}
         >
             <PageSelectField
                 value={vPlacement}
@@ -181,9 +163,7 @@
 
         <PageProp
             itemKey={"offsetX"}
-            controls={"Sets TooltipProps.offset.x"}
-            label={"Offset across (px)"}
-            hint={"How far the tooltip is nudged sideways from where the placement put it."}
+            {...TooltipKnobs.OFFSET_X_TEXT}
         >
             <PageNumberField
                 value={offsetX}
@@ -200,9 +180,7 @@
 
         <PageProp
             itemKey={"offsetY"}
-            controls={"Sets TooltipProps.offset.y"}
-            label={"Offset down (px)"}
-            hint={"How far the tooltip is nudged up or down from where the placement put it."}
+            {...TooltipKnobs.OFFSET_Y_TEXT}
         >
             <PageNumberField
                 value={offsetY}
@@ -219,9 +197,7 @@
 
         <PageProp
             itemKey={"transitionDurationMs"}
-            controls={"Sets TooltipProps.transitionDurationMs"}
-            label={"Reveal (ms)"}
-            hint={"How long the tooltip takes to appear and to go."}
+            {...TooltipKnobs.TRANSITION_DURATION_MS_TEXT}
         >
             <PageNumberField
                 value={transitionDurationMs}
@@ -238,9 +214,7 @@
 
         <PageProp
             itemKey={"focusShowDelayMs"}
-            controls={"Sets TooltipProps.focusShowDelayMs"}
-            label={"Focus delay (ms)"}
-            hint={"How long a keyboard focus has to rest on the anchor before the tooltip appears."}
+            {...TooltipKnobs.FOCUS_SHOW_DELAY_MS_TEXT}
         >
             <PageNumberField
                 value={focusShowDelayMs}
@@ -257,11 +231,7 @@
 
         <PageProp
             itemKey={"hoverShowDelayMs"}
-            controls={"Sets TooltipProps.hoverShowDelayMs"}
-            label={"Hover delay (ms)"}
-            hint={
-                "How long the pointer has to rest on the anchor before the tooltip appears. Leave before then and nothing shows."
-            }
+            {...TooltipKnobs.HOVER_SHOW_DELAY_MS_TEXT}
         >
             <PageNumberField
                 value={hoverShowDelayMs}
@@ -279,8 +249,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"On a word in running text"}
-    content={"The tooltip is handed the element it describes through [prop]anchorRef[/prop] rather than wrapping it, so anything with a ref can carry one, here a word in the middle of a sentence."}
+    {...DOCS_SECTIONS.wordRunningText}
 />
 
 <PageDocsAlert severity={"alert"}>
@@ -293,8 +262,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"More than a line"}
-    content={"What the tooltip shows is whatever [prop]renderContent[/prop] draws, here a title over a paragraph, and it sits where its [prop]placement[/prop] puts it however tall that makes it. It is still read out as the anchor's description, in one run, so nothing in it can be pressed; a link or a button belongs in a HoverCard."}
+    {...DOCS_SECTIONS.moreThanLine}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Rich.svelte`}>
@@ -302,8 +270,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Right to left"}
-    content={"Inside a box whose text runs right to left, the tooltip takes the box's direction although it is drawn outside it, so its lines read from the right. Its [prop]placement[/prop] is used as it stands: one asked to sit on the left still sits on the left."}
+    {...DOCS_SECTIONS.rightLeft}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/RightToLeft.svelte`}>
@@ -311,8 +278,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"An arrow going round"}
-    content={"An arrow is the drawing's too: [prop]renderContent[/prop] is handed where one should point, and ShapeUtils.attachArrow grows it out of any contour. Move the slider to aim it all the way round: it leaves straight out of the edge it faces, and turns through the diagonal as it rounds a corner."}
+    {...DOCS_SECTIONS.arrowGoingRound}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Circling.svelte`}>
@@ -329,8 +295,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Every arrow at once"}
-    content={"Eight tooltips round one anchor, one on each side and at each corner, every arrow aimed by the rule a live tooltip's is aimed by, AnchorUtils.computeArrowAim. The corners are where a wide arrow goes wrong: past twice its length, its sides lean 45° or more."}
+    {...DOCS_SECTIONS.everyArrowOnce}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Arrows.svelte`}>

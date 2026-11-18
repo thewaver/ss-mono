@@ -1,11 +1,7 @@
 <script lang="ts">
     import { TableOfContents } from "@thewaver/ss-components-svelte";
     import type { TableOfContentsLink } from "@thewaver/ss-components-svelte";
-    import {
-        HEADING_LEVEL,
-        SECTIONS,
-        TOC_GAP,
-    } from "@thewaver/ss-playground/App/Pages/TableOfContentsPage/TableOfContentsPage.const";
+    import { HEADING_LEVEL, SECTIONS, TOC_GAP, OUTLINE_RIGHT_LEFT_BOX_LABEL } from "@thewaver/ss-playground/App/Pages/TableOfContentsPage/TableOfContentsPage.const";
     import * as styles from "@thewaver/ss-playground/App/Pages/TableOfContentsPage/TableOfContentsPage.css";
 
     import PageTableOfContentsContent from "../../../StyledComponents/TableOfContentsContent/TableOfContentsContent.svelte";
@@ -32,7 +28,7 @@
 
 <div dir={"rtl"} class={styles.tocRoot}>
     <div class={styles.tocNav}>
-        <TableOfContents {links} gap={TOC_GAP} ariaLabel={"Outline in a right-to-left box"}>
+        <TableOfContents {links} gap={TOC_GAP} ariaLabel={OUTLINE_RIGHT_LEFT_BOX_LABEL}>
             {#snippet renderLink(link, flags)}
                 <PageTableOfContentsContent {flags} depth={link.depth ?? TOP_DEPTH}>
                     {SECTIONS.find((section) => section.id === link.value)?.title}

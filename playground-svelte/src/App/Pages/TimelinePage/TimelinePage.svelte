@@ -108,9 +108,7 @@
 <PagePropsPanel scope={"global"}>
     <PageProp
         itemKey={"isPannable"}
-        controls={"Sets TimelineProps.isPannable"}
-        label={"Drag to move"}
-        hint={"Lets the timeline be dragged sideways to move through it."}
+        {...TimelineKnobs.IS_PANNABLE_TEXT}
     >
         <PageCheckField
             value={isPannable}
@@ -123,9 +121,7 @@
 
     <PageProp
         itemKey={"isZoomable"}
-        controls={"Sets TimelineProps.isZoomable"}
-        label={"Wheel and pinch to zoom"}
-        hint={"Lets the wheel and a pinch change how much of the timeline is in view."}
+        {...TimelineKnobs.IS_ZOOMABLE_TEXT}
     >
         <PageCheckField
             value={isZoomable}
@@ -138,9 +134,7 @@
 
     <PageProp
         itemKey={"isDisabled"}
-        controls={"Sets TimelineProps.isDisabled"}
-        label={"Disabled"}
-        hint={"Turns the timeline off, so it neither pans, zooms nor picks."}
+        {...TimelineKnobs.IS_DISABLED_TEXT}
     >
         <PageCheckField
             value={isDisabled}

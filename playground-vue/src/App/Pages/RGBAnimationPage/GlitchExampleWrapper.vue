@@ -56,12 +56,7 @@ const sharedProps = computed(() => {
     </div>
 
     <PageExampleKnobs>
-        <PageProp
-            item-key="glitchCount"
-            controls="Sets the example's glitch count, read by its RGBAnimationProps.computeSliceAnimation"
-            label="Glitches per pass"
-            hint="How many tears follow each other in the middle of a pass. Each one shifts every channel its own way."
-        >
+        <PageProp item-key="glitchCount" v-bind="RGBAnimationKnobs.GLITCH_COUNT_TEXT">
             <PageNumberField
                 :value="glitchOpts.count"
                 :min="RGBAnimationKnobs.MIN_GLITCH_COUNT"
@@ -73,12 +68,7 @@ const sharedProps = computed(() => {
             />
         </PageProp>
 
-        <PageProp
-            item-key="shiftPercent"
-            controls="Sets the example's shift, read by its RGBAnimationProps.computeSliceAnimation"
-            label="Shift (%)"
-            hint="The furthest a channel moves in a tear, as a share of the picture's size."
-        >
+        <PageProp item-key="shiftPercent" v-bind="RGBAnimationKnobs.SHIFT_PERCENT_TEXT">
             <PageNumberField
                 :value="glitchOpts.shiftPercent"
                 :min="RGBAnimationKnobs.MIN_SHIFT_PERCENT"

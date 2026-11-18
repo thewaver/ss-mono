@@ -18,12 +18,7 @@ const isSnapping = shallowRef(BracketKnobs.STARTING_IS_SNAPPING_TO_FAMILY);
     <FamilyExample v-bind="props" :is-snapping-to-family="isSnapping" />
 
     <PageExampleKnobs>
-        <PageProp
-            item-key="isSnappingToFamily"
-            controls="Sets BracketProps.isSnappingToFamily"
-            label="Snap to family"
-            hint="Glides the window to frame the family in it once a drag, a pinch or the wheel is over."
-        >
+        <PageProp item-key="isSnappingToFamily" v-bind="BracketKnobs.IS_SNAPPING_TO_FAMILY_TEXT">
             <PageCheckField
                 :value="isSnapping"
                 ariaLabel="Snap to family"

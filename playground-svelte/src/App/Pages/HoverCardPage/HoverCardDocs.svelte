@@ -22,9 +22,7 @@
     {#snippet renderKnobs()}
         <PageProp
             itemKey={"offsetY"}
-            label={"Offset down (px)"}
-            hint={"How far the card is held clear of its anchor. The gap is bridged, so the pointer can cross it without losing the card."}
-            controls={"Sets HoverCardProps.offset.y"}
+            {...HoverCardKnobs.OFFSET_Y_TEXT}
         >
             <PageNumberField
                 value={offsetY}
@@ -41,9 +39,7 @@
 
         <PageProp
             itemKey={"transitionDurationMs"}
-            label={"Transition duration (ms)"}
-            hint={"How long the card takes to fade in and out."}
-            controls={"Sets HoverCardProps.transitionDurationMs"}
+            {...HoverCardKnobs.TRANSITION_DURATION_MS_TEXT}
         >
             <PageNumberField
                 value={transitionDurationMs}
@@ -60,9 +56,7 @@
 
         <PageProp
             itemKey={"focusShowDelayMs"}
-            label={"Focus delay (ms)"}
-            hint={"How long a keyboard focus has to rest on the anchor before the card opens."}
-            controls={"Sets HoverCardProps.focusShowDelayMs"}
+            {...HoverCardKnobs.FOCUS_SHOW_DELAY_MS_TEXT}
         >
             <PageNumberField
                 value={focusShowDelayMs}
@@ -79,9 +73,7 @@
 
         <PageProp
             itemKey={"hoverShowDelayMs"}
-            label={"Hover delay (ms)"}
-            hint={"How long the pointer has to rest on the anchor before the card opens. Leave before then and nothing opens."}
-            controls={"Sets HoverCardProps.hoverShowDelayMs"}
+            {...HoverCardKnobs.HOVER_SHOW_DELAY_MS_TEXT}
         >
             <PageNumberField
                 value={hoverShowDelayMs}

@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
 
+import { DELIVERY_NOTES } from "@thewaver/ss-playground/App/Pages/Accordions/CollapsiblePage/CollapsiblePage.const";
+
 import PageAccordionPanel from "../../../../StyledComponents/AccordionContent/PageAccordionPanel.vue";
 import type { CollapsibleDeferredPanelProps } from "../CollapsiblePageVue.types";
-
-const NOTES = ["Signed for on arrival", "Left with a neighbor", "Returned to the depot"];
 
 type Props = CollapsibleDeferredPanelProps;
 
@@ -15,6 +15,6 @@ onMounted(() => props.onBuild());
 
 <template>
     <PageAccordionPanel :visibility-target="visibilityTarget" :transition-duration-ms="transitionDurationMs">
-        <div>{{ NOTES.join(" · ") }}</div>
+        <div>{{ DELIVERY_NOTES.join(" · ") }}</div>
     </PageAccordionPanel>
 </template>

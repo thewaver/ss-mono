@@ -95,21 +95,11 @@ export const CornerHighlightPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp
-                    itemKey={"color"}
-                    label={"Color"}
-                    hint={"The color the corner marks are drawn in."}
-                    controls={"Sets CornerHighlightProps.color"}
-                >
+                <PageProp itemKey={"color"} {...CornerHighlightKnobs.COLOR_TEXT}>
                     <PageColorField value={color} ariaLabel={"Color"} onInput={setColor} />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"cornerLengthWidth"}
-                    label={"Arm across (px)"}
-                    hint={"How long each corner's horizontal arm is."}
-                    controls={"Sets CornerHighlightProps.cornerLength.width"}
-                >
+                <PageProp itemKey={"cornerLengthWidth"} {...CornerHighlightKnobs.CORNER_LENGTH_WIDTH_TEXT}>
                     <PageNumberField
                         value={lengthAcross}
                         min={CornerHighlightKnobs.MIN_LENGTH}
@@ -121,12 +111,7 @@ export const CornerHighlightPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"cornerLengthHeight"}
-                    label={"Arm down (px)"}
-                    hint={"How long each corner's vertical arm is."}
-                    controls={"Sets CornerHighlightProps.cornerLength.height"}
-                >
+                <PageProp itemKey={"cornerLengthHeight"} {...CornerHighlightKnobs.CORNER_LENGTH_HEIGHT_TEXT}>
                     <PageNumberField
                         value={lengthDown}
                         min={CornerHighlightKnobs.MIN_LENGTH}
@@ -138,12 +123,7 @@ export const CornerHighlightPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"strokeThickness"}
-                    label={"Thickness (px)"}
-                    hint={"How thick the corner arms are drawn."}
-                    controls={"Sets CornerHighlightProps.strokeThickness"}
-                >
+                <PageProp itemKey={"strokeThickness"} {...CornerHighlightKnobs.STROKE_THICKNESS_TEXT}>
                     <PageNumberField
                         value={strokeThickness}
                         min={CornerHighlightKnobs.MIN_THICKNESS}
@@ -155,14 +135,7 @@ export const CornerHighlightPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"transitionDurationMs"}
-                    label={"Fade (ms)"}
-                    hint={
-                        "How long the corners take to follow a change of color, which is how the set as a whole fades. The following and drawn-on examples also glide and grow over this time."
-                    }
-                    controls={"Sets CornerHighlightProps.transitionDurationMs"}
-                >
+                <PageProp itemKey={"transitionDurationMs"} {...CornerHighlightKnobs.TRANSITION_DURATION_MS_TEXT}>
                     <PageNumberField
                         value={transitionDurationMs}
                         min={CornerHighlightKnobs.MIN_DURATION}

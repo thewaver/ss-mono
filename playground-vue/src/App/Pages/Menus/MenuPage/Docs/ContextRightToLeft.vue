@@ -3,6 +3,7 @@ import { shallowRef } from "vue";
 
 import { ContextMenu } from "@thewaver/ss-components-vue";
 import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
+import { EDITING_AREA_RIGHT_LEFT_LABEL } from "@thewaver/ss-playground/App/Pages/Menus/MenuPage/MenuPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/Menus/MenuPage/MenuPage.css";
 import { POPOVER_SURFACE_INSET } from "@thewaver/ss-playground/App/StyledComponents/PopoverSurface/PopoverSurface.css";
 
@@ -20,7 +21,7 @@ const lastRun = shallowRef(NOTHING_RUN);
         <ContextMenu
             :items="NESTED_ACTIONS"
             ariaLabel="File actions"
-            regionAriaLabel="Editing area in a right-to-left box"
+            :regionAriaLabel="EDITING_AREA_RIGHT_LEFT_LABEL"
             :submenu-offset="{ x: POPOVER_SURFACE_INSET, y: -POPOVER_SURFACE_INSET }"
             @activate="(action: Action) => (lastRun = action.name)"
         >

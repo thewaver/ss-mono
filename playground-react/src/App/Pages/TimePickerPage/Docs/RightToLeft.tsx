@@ -6,6 +6,7 @@ import {
     TIME_SEGMENT_HINTS,
 } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
 import { FIELD_WIDTH, LOCALE } from "@thewaver/ss-playground/App/Pages/DatePickerPage/DatePickerPage.const";
+import { TIME_RIGHT_LEFT_BOX_LABEL } from "@thewaver/ss-playground/App/Pages/TimePickerPage/TimePickerPage.const";
 import {
     FIELD_GAP,
     FIELD_STEPPER_PADDING,
@@ -31,7 +32,7 @@ export const RightToLeftDocsExample = () => {
             <TimePicker
                 value={valueState}
                 isTwelveHour={true}
-                ariaLabel={"Time in a right-to-left box"}
+                ariaLabel={TIME_RIGHT_LEFT_BOX_LABEL}
                 clockLabel={"Choose a time"}
                 segmentHints={TIME_SEGMENT_HINTS}
                 locale={LOCALE}

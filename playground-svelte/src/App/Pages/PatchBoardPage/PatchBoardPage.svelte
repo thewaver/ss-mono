@@ -158,9 +158,7 @@
 <PagePropsPanel scope={"global"}>
     <PageProp
         itemKey={"socketSize"}
-        controls={"Sets PatchBoardProps.socketSize"}
-        label={"Socket size"}
-        hint={"How large each socket is drawn, as a fraction of the board's width, so a wider board has larger sockets."}
+        {...PatchBoardKnobs.SOCKET_SIZE_TEXT}
     >
         <PageNumberField
             value={socketSize}
@@ -176,9 +174,7 @@
 
     <PageProp
         itemKey={"isLocked"}
-        controls={"Sets PatchBoardProps.isLocked"}
-        label={"Wiring locked"}
-        hint={"Freezes the wiring as it stands: the cables still show, but none can be dragged, made or pulled out."}
+        {...PatchBoardKnobs.IS_LOCKED_TEXT}
     >
         <PageCheckField
             value={isLocked}
@@ -191,9 +187,7 @@
 
     <PageProp
         itemKey={"isDisabled"}
-        controls={"Sets PatchBoardProps.isDisabled"}
-        label={"Disabled"}
-        hint={"Turns the whole board off, so nothing on it responds to the pointer or the keyboard."}
+        {...PatchBoardKnobs.IS_DISABLED_TEXT}
     >
         <PageCheckField
             value={isDisabled}
@@ -206,11 +200,7 @@
 
     <PageProp
         itemKey={"isBeamPlaying"}
-        controls={"Plays the example beam drawn by PatchBoardProps.renderCable"}
-        label={"Beams moving"}
-        hint={
-            "Whether a pulse runs along every plugged cable, from the output to the input it feeds. It starts stopped while the visitor has asked for reduced motion."
-        }
+        {...PatchBoardKnobs.IS_BEAM_PLAYING_TEXT}
     >
         <PageCheckField
             value={isBeamPlaying}

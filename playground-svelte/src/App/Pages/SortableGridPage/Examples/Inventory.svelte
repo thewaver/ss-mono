@@ -21,15 +21,7 @@
     import PageSortableGridLanding from "../../../StyledComponents/SortableGridContent/PageSortableGridLanding.svelte";
     import PageSortableGridSurface from "../../../StyledComponents/SortableGridContent/PageSortableGridSurface.svelte";
     import type { SortableGridPaint } from "../../../StyledComponents/SortableGridContent/SortableGridContentSvelte.types";
-    import {
-        CELL_SIZE,
-        GRID_GAP,
-        PACK_COLUMNS,
-        PACK_ROWS,
-        computeGearHue,
-        computeGearKey,
-        computeGearLabel,
-    } from "@thewaver/ss-playground/App/Pages/SortableGridPage/SortableGridPage.const";
+    import { CELL_SIZE, GRID_GAP, PACK_COLUMNS, PACK_ROWS, computeGearHue, computeGearKey, computeGearLabel, TURN_COUNTERCLOCKWISE_LABEL } from "@thewaver/ss-playground/App/Pages/SortableGridPage/SortableGridPage.const";
 
     type Props = {
         groupId: string;
@@ -117,7 +109,7 @@
 <div class={styles.sortableGridStack}>
     {#if props.hasTurnButtons}
         <div class={styles.sortableGridTurnControls}>
-            <Button ariaLabel={"Turn counterclockwise"} isDisabled={!isCarrying} onClick={() => turn(-1)}>
+            <Button ariaLabel={TURN_COUNTERCLOCKWISE_LABEL} isDisabled={!isCarrying} onClick={() => turn(-1)}>
                 {#snippet renderContent(flags)}
                     <PageControlButtonContent {flags} glyph={CONTROL_GLYPHS.turnLeft} />
                 {/snippet}

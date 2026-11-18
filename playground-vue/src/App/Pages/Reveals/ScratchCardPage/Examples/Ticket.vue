@@ -3,6 +3,7 @@ import { shallowRef } from "vue";
 
 import { Button, ScratchCard } from "@thewaver/ss-components-vue";
 import type { ScratchCardController } from "@thewaver/ss-components-vue";
+import { SCRATCH_REVEAL_PRIZE_LABEL } from "@thewaver/ss-playground/App/Pages/Reveals/ScratchCardPage/ScratchCardPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/Reveals/ScratchCardPage/ScratchCardPage.css";
 import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
@@ -34,7 +35,7 @@ const reset = () => {
                     :softness="softness"
                     :compute-points="computePoints"
                     :clear-threshold="clearThreshold"
-                    ariaLabel="Scratch to reveal the prize"
+                    :ariaLabel="SCRATCH_REVEAL_PRIZE_LABEL"
                     @mount="(next: ScratchCardController) => (controller = next)"
                     @scratch="props.onScratch"
                     @clear="props.onClear"

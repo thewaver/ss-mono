@@ -11,6 +11,7 @@ import {
 import {
     CALENDAR_FIELD_WIDTH,
     DOCS_ROOT,
+    DOCS_SECTIONS,
 } from "@thewaver/ss-playground/App/Pages/RangeCalendarPage/RangeCalendarPage.const";
 
 import { PageDocsExample } from "../../PageComponents/DocsExample/DocsExample";
@@ -34,12 +35,7 @@ export const RangeCalendarDocs = () => {
                 path={`${DOCS_ROOT}/Basic.tsx`}
                 renderKnobs={() => (
                     <>
-                        <PageProp
-                            itemKey={"weekStartsOn"}
-                            label={"Week starts on"}
-                            hint={"Which day begins a week, which decides the order of the column headings."}
-                            controls={"Sets RangeCalendarProps.weekStartsOn"}
-                        >
+                        <PageProp itemKey={"weekStartsOn"} {...RangeCalendarKnobs.WEEK_STARTS_ON_TEXT}>
                             <PageSelectField
                                 value={weekStartsOn}
                                 values={RangeCalendarKnobs.WEEK_STARTS}
@@ -49,12 +45,7 @@ export const RangeCalendarDocs = () => {
                             />
                         </PageProp>
 
-                        <PageProp
-                            itemKey={"isDisabled"}
-                            label={"Disabled"}
-                            hint={"Turns the calendar off: no day can be picked, and the Tab key skips it."}
-                            controls={"Sets RangeCalendarProps.isDisabled"}
-                        >
+                        <PageProp itemKey={"isDisabled"} {...RangeCalendarKnobs.IS_DISABLED_TEXT}>
                             <PageCheckField value={isDisabled} ariaLabel={"Disabled"} onChange={setIsDisabled} />
                         </PageProp>
                     </>
@@ -63,44 +54,24 @@ export const RangeCalendarDocs = () => {
                 <BasicDocsExample weekStartsOn={weekStartsOn} isDisabled={isDisabled} />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"Earliest and latest day"}
-                content={
-                    "A [prop]minValue[/prop] and a [prop]maxValue[/prop] keep both ends of the range between them: the days outside are disabled, and the arrow and page keys stop at the edge."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.earliestLatestDay} />
 
             <PageDocsExample path={`${DOCS_ROOT}/Bounded.tsx`}>
                 <BoundedDocsExample />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"Two months"}
-                content={
-                    "Set [prop]monthCount[/prop] to show several months side by side, so a range can start in one and end in the next. The arrow keys walk from one month into the other, the page keys step them all, and [prop]renderMonthHeader[/prop] draws the title over each."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.twoMonths} />
 
             <PageDocsExample path={`${DOCS_ROOT}/TwoMonths.tsx`}>
                 <TwoMonthsDocsExample />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"Other calendar systems"}
-                content={
-                    "The grid draws the month of whichever calendar the [prop]month[/prop] it is handed is in. Here the month is converted to the chosen calendar, and a range picked in one calendar covers the same days in any other."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.otherCalendarSystems} />
 
             <PageDocsExample
                 path={`${DOCS_ROOT}/Calendars.tsx`}
                 renderKnobs={() => (
-                    <PageProp
-                        itemKey={"calendar"}
-                        label={"Calendar"}
-                        hint={"Which calendar system the month is drawn in."}
-                        controls={"Converts RangeCalendarProps.month to the chosen calendar"}
-                    >
+                    <PageProp itemKey={"calendar"} {...RangeCalendarKnobs.CALENDAR_TEXT}>
                         <PageSelectField
                             value={calendarId}
                             values={CALENDAR_IDS}
@@ -114,12 +85,7 @@ export const RangeCalendarDocs = () => {
                 <CalendarsDocsExample calendar={calendarId} />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"Right to left"}
-                content={
-                    "Inside a box whose text runs right to left, each week runs from the right, and the left arrow moves on to the next day, which is where it is drawn. Up, down and the page keys keep their meaning."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.rightLeft} />
 
             <PageDocsExample path={`${DOCS_ROOT}/RightToLeft.tsx`}>
                 <RightToLeftDocsExample />

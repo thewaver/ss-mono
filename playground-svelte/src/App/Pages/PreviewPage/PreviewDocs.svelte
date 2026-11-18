@@ -1,6 +1,6 @@
 <script lang="ts">
     import { PreviewKnobs } from "@thewaver/ss-playground/App/Knobs/Previews.const";
-    import { COLLAPSED_HEIGHT, DOCS_ROOT } from "@thewaver/ss-playground/App/Pages/PreviewPage/PreviewPage.const";
+    import { DOCS_SECTIONS, COLLAPSED_HEIGHT, DOCS_ROOT } from "@thewaver/ss-playground/App/Pages/PreviewPage/PreviewPage.const";
 
     import PageDocsExample from "../../PageComponents/DocsExample/PageDocsExample.svelte";
     import PageDocsSection from "../../PageComponents/DocsSection/PageDocsSection.svelte";
@@ -23,9 +23,7 @@
     {#snippet renderKnobs()}
         <PageProp
             itemKey={"collapsedHeight"}
-            label={"Collapsed height (px)"}
-            hint={"How much of the content shows while the preview is closed."}
-            controls={"Sets PreviewProps.collapsedHeight"}
+            {...PreviewKnobs.COLLAPSED_HEIGHT_TEXT}
         >
             <PageNumberField
                 value={collapsedHeight}
@@ -42,8 +40,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Right to left"}
-    content={"Inside a box whose text runs right to left, the content and the button that opens it sit against the right edge."}
+    {...DOCS_SECTIONS.rightLeft}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/RightToLeft.svelte`}>
@@ -51,8 +48,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"When everything fits"}
-    content={"Content no taller than [prop]collapsedHeight[/prop] is shown whole, with no button and no fade, since there is nothing behind them."}
+    {...DOCS_SECTIONS.whenEverythingFits}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Short.svelte`}>
@@ -60,8 +56,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Opening and closing from outside"}
-    content={"The preview keeps track of whether it is open by itself. To open or close it from elsewhere on the page, hold the boolean and pass it in as [prop]expanded[/prop]: both sides write it, so pressing Read more updates yours and writing yours opens or closes the preview."}
+    {...DOCS_SECTIONS.openingClosingOutside}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Controlled.svelte`}>
@@ -69,8 +64,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Inside a box that scrolls"}
-    content={"Closing a long preview takes its height out from under the reader, and everything below it jumps up, the button with it. Set [prop]isScrolledIntoViewOnCollapse[/prop] and closing scrolls the preview back into view, so the reader is left where they started."}
+    {...DOCS_SECTIONS.insideBoxThatScrolls}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Scrolled.svelte`}>
@@ -79,9 +73,7 @@
     {#snippet renderKnobs()}
         <PageProp
             itemKey={"isScrolledIntoViewOnCollapse"}
-            label={"Scroll into view on collapse"}
-            hint={"Whether closing the preview scrolls it back into view."}
-            controls={"Sets PreviewProps.isScrolledIntoViewOnCollapse"}
+            {...PreviewKnobs.IS_SCROLLED_INTO_VIEW_ON_COLLAPSE_TEXT}
         >
             <PageCheckField
                 value={isScrolledIntoViewOnCollapse}

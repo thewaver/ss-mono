@@ -2,6 +2,7 @@
 import { shallowRef } from "vue";
 
 import { Tooltip } from "@thewaver/ss-components-vue";
+import { KEEP_WAS_RAISED_MASONS_TEXT } from "@thewaver/ss-playground/App/Pages/TooltipPage/TooltipPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/TooltipPage/TooltipPage.css";
 import { TOOLTIP_HOVER_DELAY_MS } from "@thewaver/ss-playground/App/StyledComponents/TooltipContent/TooltipContent.const";
 
@@ -12,7 +13,7 @@ const anchorRef = shallowRef<HTMLElement>();
 
 <template>
     <div :class="styles.sentence">
-        {{ "The keep was raised by masons paid in "
+        {{ KEEP_WAS_RAISED_MASONS_TEXT
         }}<span id="marks" ref="anchorRef" :class="styles.anchorWord" tabindex="0">marks</span
         >{{ " rather than in coin, which is why the accounts survive at all." }}
 

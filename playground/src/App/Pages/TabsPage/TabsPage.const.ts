@@ -133,3 +133,45 @@ export const HONEYCOMB_DEFS: HoneycombDefs = { perRow: 3, gapRatio: 0 };
 export const HONEYCOMB_LAYOUT = PlacementLayoutUtils.createHoneycomb(HONEYCOMB_DEFS);
 
 export const HONEYCOMB_WIDTH = "294px";
+
+export const DOCS_SECTIONS = {
+    rightLeft: {
+        title: "Right to left",
+        content:
+            "Inside a box whose text runs right to left, the tabs run from the right and the left arrow key moves on to the next tab. The button below switches the box's direction while the tabs are on screen, and the marker and the arrow keys follow the row as it turns round.",
+    },
+    selectingArrowsMove: {
+        title: "Selecting as the arrows move",
+        content:
+            "By default the arrow keys move focus along the tabs, and Enter or Space selects the one focused. Set [prop]hasAutoActivation[/prop] and an arrow selects the tab it lands on as well, which suits panels already in the page. Leave it off where showing a panel is expensive, such as one that fetches, since every tab passed on the way would be shown.",
+    },
+    markerThatFollowsPointer: {
+        title: "A marker that follows the pointer",
+        content:
+            "Besides the marker under the selected tab, [prop]renderHighlightFloater[/prop] draws a second one that slides to whichever tab the pointer or the keyboard focus is on.",
+    },
+    disabledTab: {
+        title: "A disabled tab",
+        content:
+            "A tab whose record sets [prop]isDisabled[/prop] cannot be selected, and the arrow keys walk past it. With [prop]isReachableWhenDisabled[/prop] set on the record as well, the arrow keys stop on it, so a screen reader names it and says it is unavailable; it still cannot be selected.",
+    },
+    links: {
+        title: "Links",
+        content:
+            "Give a tab an [prop]href[/prop] and it is drawn as a native HTML anchor element, and choosing it still reports through [prop]onSelectionChange[/prop]. In a routed app, pass [prop]linkComponent[/prop], a custom link component such as your router's, and the tabs are drawn with it instead. A link needs no panel here, since the page it opens may be mounted anywhere.",
+    },
+    clearableSelection: {
+        title: "A selection that can be cleared",
+        content:
+            "Set the selected value to undefined and no tab is selected: the marker plays itself out over [prop]transitionDurationMs[/prop], and plays back in once a tab is chosen again. Which panel shows meanwhile, if any, is yours to decide.",
+    },
+    placedLayout: {
+        title: "Placed by a layout",
+        content:
+            "Give the list [prop]computeLayout[/prop] and the tabs are placed by a layout instead of in a row or a column, here a honeycomb. The arrow keys still walk them in the order they are written, and both markers sit behind the cell they belong to.",
+    },
+};
+
+export const PARTLY_DISABLED_VIEWS_LABEL = "Partly disabled views";
+
+export const SWITCH_DIRECTION_LABEL = "Switch the direction";

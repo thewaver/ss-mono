@@ -10,6 +10,7 @@
     import PageCuboidStack from "../../../StyledComponents/CuboidContent/PageCuboidStack.svelte";
     import type { CuboidUprightExampleProps } from "../CuboidPage.types";
     import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.svelte";
+    import { SIX_FACES_KEPT_UPRIGHT_LABEL, TURN_FACE_ABOVE_TOWARDS_TEXT, TURN_FACE_LEFT_TOWARDS_TEXT, TURN_FACE_RIGHT_TOWARDS_TEXT, TURN_FACE_BELOW_TOWARDS_TEXT } from "@thewaver/ss-playground/App/Pages/CuboidPage/CuboidPage.const";
 
     const QUARTER_TURN = 1;
 
@@ -35,7 +36,7 @@
             transitionDurationMs={props.transitionDurationMs}
             isUpright={props.isUpright}
             isDraggable={props.isDraggable}
-            ariaLabel={"Six faces, kept upright"}
+            ariaLabel={SIX_FACES_KEPT_UPRIGHT_LABEL}
             computeFaceLabel={computeCuboidFaceLabel}
             onMount={(next) => {
                 controller = next;
@@ -49,21 +50,21 @@
 
     <PageCuboidPad>
         <div></div>
-        {@render renderTurn("uprightPitchUp", "Turn the face above towards you", CONTROL_GLYPHS.up, () => {
+        {@render renderTurn("uprightPitchUp", TURN_FACE_ABOVE_TOWARDS_TEXT, CONTROL_GLYPHS.up, () => {
             pitch = pitch + QUARTER_TURN;
         })}
         <div></div>
 
-        {@render renderTurn("uprightYawLeft", "Turn the face on the left towards you", CONTROL_GLYPHS.left, () => {
+        {@render renderTurn("uprightYawLeft", TURN_FACE_LEFT_TOWARDS_TEXT, CONTROL_GLYPHS.left, () => {
             yaw = yaw - QUARTER_TURN;
         })}
         <div></div>
-        {@render renderTurn("uprightYawRight", "Turn the face on the right towards you", CONTROL_GLYPHS.right, () => {
+        {@render renderTurn("uprightYawRight", TURN_FACE_RIGHT_TOWARDS_TEXT, CONTROL_GLYPHS.right, () => {
             yaw = yaw + QUARTER_TURN;
         })}
 
         <div></div>
-        {@render renderTurn("uprightPitchDown", "Turn the face below towards you", CONTROL_GLYPHS.down, () => {
+        {@render renderTurn("uprightPitchDown", TURN_FACE_BELOW_TOWARDS_TEXT, CONTROL_GLYPHS.down, () => {
             pitch = pitch - QUARTER_TURN;
         })}
         <div></div>

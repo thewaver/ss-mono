@@ -2,7 +2,11 @@ import { For, Show, createSignal } from "solid-js";
 
 import { Button, CardStack, access } from "@thewaver/ss-components-solid";
 import type { CardStackControls } from "@thewaver/ss-components-solid";
-import { computeCardTilt } from "@thewaver/ss-playground/App/Pages/CardStackPage/CardStackPage.const";
+import {
+    DEAL_CARDS_AGAIN_LABEL,
+    RECALL_LAST_CARD_LABEL,
+    computeCardTilt,
+} from "@thewaver/ss-playground/App/Pages/CardStackPage/CardStackPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/CardStackPage/CardStackPage.css";
 import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 import type { SwipeDirection } from "@thewaver/ss-utils";
@@ -88,7 +92,7 @@ export const DeckExample = (props: Props) => {
                     isDisabled={() =>
                         access(props.isDisabled) || (getControls()?.getTopIndex() ?? FIRST_INDEX) === FIRST_INDEX
                     }
-                    ariaLabel={"Recall the last card"}
+                    ariaLabel={RECALL_LAST_CARD_LABEL}
                     renderContent={(getFlags) => (
                         <PageControlButtonContent flags={getFlags}>Recall</PageControlButtonContent>
                     )}
@@ -100,7 +104,7 @@ export const DeckExample = (props: Props) => {
                 <Show when={getControls()?.getIsEmpty()}>
                     <Button
                         id={"deal"}
-                        ariaLabel={"Deal the cards again"}
+                        ariaLabel={DEAL_CARDS_AGAIN_LABEL}
                         renderContent={(getFlags) => (
                             <PageControlButtonContent flags={getFlags} glyph={CONTROL_GLYPHS.replay} />
                         )}

@@ -1,16 +1,10 @@
 <script lang="ts">
     import { Preview } from "@thewaver/ss-components-svelte";
-    import { COLLAPSED_HEIGHT, LONG_PARAGRAPHS } from "@thewaver/ss-playground/App/Pages/PreviewPage/PreviewPage.const";
+    import { COLLAPSED_HEIGHT, LONG_PARAGRAPHS, AFTERWARDS } from "@thewaver/ss-playground/App/Pages/PreviewPage/PreviewPage.const";
     import * as styles from "@thewaver/ss-playground/App/Pages/PreviewPage/PreviewPage.css";
 
     import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.svelte";
     import type { PreviewScrolledDocsExampleProps } from "../PreviewPageSvelte.types";
-
-    const AFTERWARDS = [
-        "The rest of the page carries on below, which is the whole of the problem.",
-        "Open the preview, read to the end of it, and close it again: everything under it jumps up by the height that just disappeared, and the control you pressed goes with it.",
-        "With the scroll asked for, the box comes back to where you were standing.",
-    ];
 
     type Props = PreviewScrolledDocsExampleProps;
 

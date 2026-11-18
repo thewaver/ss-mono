@@ -45,3 +45,16 @@ export const SHOP_ENTRIES: FlyoutMenuEntryRecord<string>[] = [
     { value: "Sale", href: "#sale" },
     { value: "Journal", href: "#journal" },
 ];
+
+export const DOCS_SECTIONS = {
+    tooNarrowEveryEntry: {
+        title: "Too narrow for every entry",
+        content:
+            "The bar measures itself, and the entries that do not fit collapse into a last one. Inside its panel each collapsed entry keeps its link and its toggle, and the toggle opens that entry's links in place. Give an entry a [prop]collapse[/prop] of never to keep it on the bar, or always to send it to the end whatever the room.",
+    },
+    rightLeft: {
+        title: "Right to left",
+        content:
+            "Inside a box whose text runs right to left, the entries run from the right, each toggle sits to the left of its link, and Tab walks them in that order. The panel takes the box's direction although it is drawn outside it: it hangs from the right edge of its entry and its links read from the right. A [prop]placement[/prop] you give is used as it stands.",
+    },
+};

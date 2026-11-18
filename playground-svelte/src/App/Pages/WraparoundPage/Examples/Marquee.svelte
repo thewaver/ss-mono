@@ -1,6 +1,6 @@
 <script lang="ts">
     import { Button, Wraparound } from "@thewaver/ss-components-svelte";
-    import { MARQUEE_WORDS } from "@thewaver/ss-playground/App/Pages/WraparoundPage/WraparoundPage.const";
+    import { MARQUEE_WORDS, TOOLS_LIBRARY_BUILT_DRIFTING_LABEL } from "@thewaver/ss-playground/App/Pages/WraparoundPage/WraparoundPage.const";
     import * as styles from "@thewaver/ss-playground/App/Pages/WraparoundPage/WraparoundPage.css";
     import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
@@ -15,7 +15,7 @@
 <div class={styles.marqueeStack}>
     <div class={styles.marqueeStage}>
         <Wraparound
-            ariaLabel={"Tools this library is built with, drifting past"}
+            ariaLabel={TOOLS_LIBRARY_BUILT_DRIFTING_LABEL}
             isMovable={false}
             driftPxPerSecond={props.driftPxPerSecond}
             driftDegrees={props.driftDegrees}

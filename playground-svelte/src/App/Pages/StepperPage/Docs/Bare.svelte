@@ -1,6 +1,6 @@
 <script lang="ts">
     import { Stepper } from "@thewaver/ss-components-svelte";
-    import { STARTING_LINEAR } from "@thewaver/ss-playground/App/Pages/StepperPage/StepperPage.const";
+    import { STARTING_LINEAR, CHECKOUT_WITHOUT_CONNECTORS_LABEL } from "@thewaver/ss-playground/App/Pages/StepperPage/StepperPage.const";
     import { StepperPageUtils } from "@thewaver/ss-playground/App/Pages/StepperPage/StepperPage.utils";
     import { LABELS, ORDER, STEPPER_GAP } from "@thewaver/ss-playground/App/Pages/StepperPage/StepperSteps.const";
     import type { StepValue } from "@thewaver/ss-playground/App/Pages/StepperPage/StepperSteps.types";
@@ -19,7 +19,7 @@
     steps={StepperPageUtils.buildSteps("bare", current, props.isFreeNavigation)}
     currentValue={current}
     gap={STEPPER_GAP}
-    ariaLabel={"Checkout without connectors"}
+    ariaLabel={CHECKOUT_WITHOUT_CONNECTORS_LABEL}
     computeStepAriaLabel={StepperPageUtils.describeStep}
     onCurrentChange={(value) => {
         current = value;

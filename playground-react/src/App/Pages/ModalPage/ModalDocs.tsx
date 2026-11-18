@@ -5,7 +5,7 @@ import { MODAL_ALIGNMENTS, MODAL_DEFAULTS } from "@thewaver/ss-components-react"
 import { ModalKnobs } from "@thewaver/ss-playground/App/Knobs/Modals.const";
 import { WCAG_URLS } from "@thewaver/ss-playground/App/PageComponents/DocsProse/DocsProse.const";
 import * as docsStyles from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.css";
-import { DOCS_ROOT, FIELD_WIDTH } from "@thewaver/ss-playground/App/Pages/ModalPage/ModalPage.const";
+import { DOCS_ROOT, DOCS_SECTIONS, FIELD_WIDTH } from "@thewaver/ss-playground/App/Pages/ModalPage/ModalPage.const";
 
 import { PageDocsAlert } from "../../PageComponents/DocsAlert/DocsAlert";
 import { PageDocsExample } from "../../PageComponents/DocsExample/DocsExample";
@@ -30,14 +30,7 @@ export const ModalDocs = () => {
                 path={`${DOCS_ROOT}/Basic.tsx`}
                 renderKnobs={() => (
                     <>
-                        <PageProp
-                            itemKey={"alignment"}
-                            label={"Alignment"}
-                            hint={
-                                "Where the dialog sits: in the middle, or against one edge of the screen and stretched along it."
-                            }
-                            controls={"Sets ModalProps.alignment"}
-                        >
+                        <PageProp itemKey={"alignment"} {...ModalKnobs.ALIGNMENT_TEXT}>
                             <PageSelectField
                                 value={alignment}
                                 values={MODAL_ALIGNMENTS}
@@ -47,14 +40,7 @@ export const ModalDocs = () => {
                             />
                         </PageProp>
 
-                        <PageProp
-                            itemKey={"transitionDurationMs"}
-                            label={"Transition duration (ms)"}
-                            hint={
-                                "How long the dialog and its overlay take to fade in and out. At 0 they appear and go at once."
-                            }
-                            controls={"Sets ModalProps.transitionDurationMs"}
-                        >
+                        <PageProp itemKey={"transitionDurationMs"} {...ModalKnobs.TRANSITION_DURATION_MS_TEXT}>
                             <PageNumberField
                                 value={transitionDurationMs}
                                 min={ModalKnobs.MIN_TRANSITION_MS}
@@ -71,12 +57,7 @@ export const ModalDocs = () => {
                 <BasicDocsExample alignment={alignment} transitionDurationMs={transitionDurationMs} />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"A dialog that must be answered"}
-                content={
-                    "Set [prop]role[/prop] to alertdialog for a dialog that interrupts to ask for a decision, so it is announced more insistently than an ordinary one. Point [prop]initialFocusRef[/prop] at the answer that loses nothing, Cancel here, so that is where focus lands. Switching off [prop]isDismissableOnOverlayClick[/prop] keeps a press beside the dialog from closing it, and switching off [prop]isDismissableOnEscape[/prop] does the same for Escape, so the only way out is an answer."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.dialogThatMustBeAnswered} />
 
             <PageDocsAlert severity={"alert"}>
                 With both <span className={docsStyles.docsPropName}>isDismissableOnOverlayClick</span> and{" "}
@@ -91,9 +72,7 @@ export const ModalDocs = () => {
                     <>
                         <PageProp
                             itemKey={"isDismissableOnOverlayClick"}
-                            label={"Closes on overlay click"}
-                            hint={"Whether a press on the overlay beside the dialog closes it."}
-                            controls={"Sets ModalProps.isDismissableOnOverlayClick"}
+                            {...ModalKnobs.IS_DISMISSABLE_ON_OVERLAY_CLICK_TEXT}
                         >
                             <PageCheckField
                                 value={isDismissableOnOverlayClick}
@@ -102,12 +81,7 @@ export const ModalDocs = () => {
                             />
                         </PageProp>
 
-                        <PageProp
-                            itemKey={"isDismissableOnEscape"}
-                            label={"Closes on Escape"}
-                            hint={"Whether Escape closes the dialog."}
-                            controls={"Sets ModalProps.isDismissableOnEscape"}
-                        >
+                        <PageProp itemKey={"isDismissableOnEscape"} {...ModalKnobs.IS_DISMISSABLE_ON_ESCAPE_TEXT}>
                             <PageCheckField
                                 value={isDismissableOnEscape}
                                 ariaLabel={"Closes on Escape"}
@@ -123,34 +97,19 @@ export const ModalDocs = () => {
                 />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"A popup inside it"}
-                content={
-                    "A popup opened inside the dialog, such as this list, is a layer above it. Escape closes only the layer on top: the first press closes the list and leaves the dialog open, and the next closes the dialog."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.popupInside} />
 
             <PageDocsExample path={`${DOCS_ROOT}/Layered.tsx`}>
                 <LayeredDocsExample />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"A drag inside it"}
-                content={
-                    "Escape pressed while something inside the dialog is being dragged cancels the drag and leaves the dialog open. Try it here: start dragging a column header, press Escape, and the column goes back while the dialog stays. A second Escape then closes the dialog."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.dragInside} />
 
             <PageDocsExample path={`${DOCS_ROOT}/Dragging.tsx`}>
                 <DraggingDocsExample />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"Nothing focusable inside"}
-                content={
-                    "On opening, focus goes to [prop]initialFocusRef[/prop] when there is one, and otherwise to the first thing inside that can take it. A dialog holding only text has nothing that can, so the dialog takes focus itself rather than leaving it on the page behind."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.nothingFocusableInside} />
 
             <PageDocsExample path={`${DOCS_ROOT}/TextOnly.tsx`}>
                 <TextOnlyDocsExample />

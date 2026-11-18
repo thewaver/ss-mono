@@ -72,3 +72,13 @@ export const EXAMPLES_ROOT = "/src/App/Pages/TableOfContentsPage/Examples";
 export const PERCENT = 100;
 
 export const DOCS_ROOT = "/src/App/Pages/TableOfContentsPage/Docs";
+
+export const DOCS_SECTIONS = {
+    rightLeft: {
+        title: "Right to left",
+        content:
+            "Inside a box whose text runs right to left, the outline sits on the right of the article, and the painter's marker and indentation move to the right edge of each link, since it draws them on the side the text starts from.",
+    },
+};
+
+export const OUTLINE_RIGHT_LEFT_BOX_LABEL = "Outline in a right-to-left box";

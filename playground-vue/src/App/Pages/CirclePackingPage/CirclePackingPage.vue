@@ -44,12 +44,7 @@ const examples: ExampleDefs[] = [
 
 <template>
     <PagePropsPanel scope="global">
-        <PageProp
-            item-key="padding"
-            controls="Sets CirclePackingProps.padding"
-            label="Padding (px)"
-            hint="The space left between neighboring circles and around the inside of their parent."
-        >
+        <PageProp item-key="padding" v-bind="CirclePackingKnobs.PADDING_TEXT">
             <PageNumberField
                 :value="padding"
                 :min="CirclePackingKnobs.MIN_PADDING"
@@ -60,12 +55,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="zoomDurationMs"
-            controls="Sets CirclePackingProps.zoomDurationMs"
-            label="Zoom duration (ms)"
-            hint="How long a zoom in or out takes. It is off while the visitor has asked for reduced motion, and 0 jumps straight to the new view."
-        >
+        <PageProp item-key="zoomDurationMs" v-bind="CirclePackingKnobs.ZOOM_DURATION_MS_TEXT">
             <PageNumberField
                 :value="zoomDurationMs"
                 :min="CirclePackingKnobs.MIN_ZOOM_DURATION_MS"

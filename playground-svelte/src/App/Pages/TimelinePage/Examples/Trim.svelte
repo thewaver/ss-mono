@@ -1,13 +1,6 @@
 <script lang="ts">
     import { Timeline } from "@thewaver/ss-components-svelte";
-    import type { TimelineEdgeAnnouncements } from "@thewaver/ss-components-svelte";
-    import {
-        LANE_SIZE,
-        REEL,
-        SECOND_STEPS,
-        TRIM_TRACKS,
-        formatStopwatch,
-    } from "@thewaver/ss-playground/App/Pages/TimelinePage/TimelinePage.const";
+    import { LANE_SIZE, REEL, SECOND_STEPS, TRIM_TRACKS, formatStopwatch, EDGE_ANNOUNCEMENTS } from "@thewaver/ss-playground/App/Pages/TimelinePage/TimelinePage.const";
     import { AXIS_HEIGHT, PAGE_TIMELINE_FAMILIES } from "@thewaver/ss-playground/App/StyledComponents/TimelineContent/TimelineContent.css";
 
     import PageTimelineBlock from "../../../StyledComponents/TimelineContent/PageTimelineBlock.svelte";
@@ -21,23 +14,6 @@
     type Props = TimelineTrimExampleProps;
 
     const LANE_GAP = 6;
-
-    const EDGE_ANNOUNCEMENTS: TimelineEdgeAnnouncements = {
-        restingKeyHint: "Press Enter to take hold of the end of this clip.",
-        heldKeyHint:
-            "Left and right arrows move it a second at a time, Home and End switch between the start and the end, Enter drops it and Escape puts it back.",
-        computePlaceLabel: (edge, span) =>
-            `${edge} at ${formatStopwatch(span[edge])}, ${formatStopwatch(span.end - span.start)} long`,
-        computePickedUp: (itemLabel) => `Holding an end of ${itemLabel}.`,
-        computePickedUpByKey: (itemLabel, _zoneLabel, placeLabel, keyHint) =>
-            `Holding ${itemLabel}, ${placeLabel}. ${keyHint}`,
-        computeAimed: (placeLabel) => `${placeLabel.charAt(0).toUpperCase()}${placeLabel.slice(1)}.`,
-        computeZoneEntered: (_zoneLabel, placeLabel) => placeLabel,
-        computeReturned: (itemLabel) => `${itemLabel} put back as it was.`,
-        computeLeftInPlace: (itemLabel) => `${itemLabel} left as it was.`,
-        computeRefused: (itemLabel) => `${itemLabel} put back as it was.`,
-        computeDropped: (_itemLabel, _zoneLabel, placeLabel) => `Dropped, ${placeLabel}.`,
-    };
 
     let { view = $bindable(), clips = $bindable(), ...props }: Props = $props();
 </script>

@@ -28,3 +28,13 @@ export const TEXT_EFFECT_MAP: Record<TypewriterTextEffect, string> = {
     drop: styles.typewriterDrop,
     slide: styles.typewriterSlide,
 };
+
+export const LYRIC = "Twinkle, twinkle, little star";
+
+export const HOW_FAR_LINE_HAS_LABEL = "How far the line has been sung";
+
+export const TEXT =
+    "Scroll this past the middle of the box and it comes apart line by line: the first half flies off to the left, the second to the right, and back again on the way down.";
+
+export const SCROLL_LIT_TEXT =
+    "Every word here waits, dimmed, until it reaches the middle of the box, then lights up in reading order as it passes — and dims again on the way back down.";

@@ -2,7 +2,7 @@
     import type { DateInputFormat, DateValueCalendarId } from "@thewaver/ss-components-svelte";
     import { DATE_INPUT_FORMATS, DateValueUtils } from "@thewaver/ss-components-svelte";
     import { OTHER_CALENDAR } from "@thewaver/ss-playground/App/Pages/CalendarPage/CalendarPage.const";
-    import {
+    import { DOCS_SECTIONS,
         CALENDAR_FIELD_WIDTH,
         DOCS_ROOT,
         FORMAT_FIELD_WIDTH,
@@ -20,6 +20,7 @@
     import LabeledDocsExample from "./Docs/Labeled.svelte";
     import RightToLeftDocsExample from "./Docs/RightToLeft.svelte";
     import TooltipDocsExample from "./Docs/Tooltip.svelte";
+    import { DateInputKnobs } from "@thewaver/ss-playground/App/Knobs/DateInputs.const";
 
     let isReadOnly = $state(false);
     let hasError = $state(false);
@@ -36,9 +37,7 @@
     {#snippet renderKnobs()}
         <PageProp
             itemKey={"isReadOnly"}
-            label={"Read-only"}
-            hint={"Its date can be selected and copied, but neither typing nor pasting changes it."}
-            controls={"Sets DateInputProps.isReadOnly"}
+            {...DateInputKnobs.IS_READ_ONLY_TEXT}
         >
             <PageCheckField
                 value={isReadOnly}
@@ -51,9 +50,7 @@
 
         <PageProp
             itemKey={"hasError"}
-            label={"Error"}
-            hint={"Marks the field invalid, for screen readers as well as for the painter. The field also marks itself while what it shows is not a date."}
-            controls={"Sets DateInputProps.hasError"}
+            {...DateInputKnobs.HAS_ERROR_TEXT}
         >
             <PageCheckField
                 value={hasError}
@@ -66,9 +63,7 @@
 
         <PageProp
             itemKey={"isDisabled"}
-            label={"Disabled"}
-            hint={"Turns the field off: nothing can write to it, it shows no caret, and the Tab key skips it."}
-            controls={"Sets DateInputProps.isDisabled"}
+            {...DateInputKnobs.IS_DISABLED_TEXT}
         >
             <PageCheckField
                 value={isDisabled}
@@ -82,8 +77,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Written day first"}
-    content={"The parts of the date are typed in the order [prop]format[/prop] names: year first by default, or day first, or month first. Only digits are typed, and the field adds each separator as soon as the part before it is complete. The value is the same date in any order, as the line under the field shows."}
+    {...DOCS_SECTIONS.writtenDayFirst}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/DayFirst.svelte`}>
@@ -92,9 +86,7 @@
     {#snippet renderKnobs()}
         <PageProp
             itemKey={"format"}
-            label={"Format"}
-            hint={"The order the parts of the date are typed in, and the separator between them."}
-            controls={"Sets DateInputProps.format"}
+            {...DateInputKnobs.FORMAT_TEXT}
         >
             <PageSelectField
                 value={format}
@@ -110,8 +102,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Before the common era"}
-    content={"A date carries its era, and the digits typed cannot say which one it is. Draw a control in [prop]renderLeading[/prop], which is handed the date's era, the eras its calendar offers and a way to change it, and this date of 44 BC can be moved to AD and back."}
+    {...DOCS_SECTIONS.beforeCommonEra}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Era.svelte`}>
@@ -119,8 +110,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Other calendar systems"}
-    content={"Set [prop]calendar[/prop] and the date is read and written in that calendar system while the value stays the same day, as the line under the field shows. A calendar with one era, such as the Hebrew one, gives the era control nothing to offer, so it is not drawn."}
+    {...DOCS_SECTIONS.otherCalendarSystems}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Calendars.svelte`}>
@@ -129,9 +119,7 @@
     {#snippet renderKnobs()}
         <PageProp
             itemKey={"calendar"}
-            label={"Calendar"}
-            hint={"Which calendar system the date is read and written in."}
-            controls={"Sets DateInputProps.calendar"}
+            {...DateInputKnobs.CALENDAR_TEXT}
         >
             <PageSelectField
                 value={calendarId}
@@ -147,8 +135,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Right to left"}
-    content={"Inside a box whose text runs right to left, the leading content moves to the right, where reading starts, and the text lines up on the right. The date is still written year first, since digits run left to right in either direction."}
+    {...DOCS_SECTIONS.rightLeft}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/RightToLeft.svelte`}>
@@ -156,8 +143,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Tooltip"}
-    content={"Give a field [prop]tooltipDefs[/prop] and it shows a tooltip on hover and on keyboard focus, read by screen readers as the field's description. A disabled field shows no tooltip unless you also keep it reachable when disabled; it can then be focused to read why it is off, and typing still changes nothing."}
+    {...DOCS_SECTIONS.tooltip}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Tooltip.svelte`}>
@@ -166,9 +152,7 @@
     {#snippet renderKnobs()}
         <PageProp
             itemKey={"tooltipIsReachableWhenDisabled"}
-            label={"Reachable when disabled"}
-            hint={"Keeps a disabled field's tooltip available: the Tab key can stop on it and hovering it shows the tooltip. Without it a disabled field shows no tooltip at all. It only matters while Disabled is on."}
-            controls={"Sets DateInputProps.isReachableWhenDisabled"}
+            {...DateInputKnobs.TOOLTIP_IS_REACHABLE_WHEN_DISABLED_TEXT}
         >
             <PageCheckField
                 value={isReachableWhenDisabled}
@@ -181,9 +165,7 @@
 
         <PageProp
             itemKey={"tooltipIsDisabled"}
-            label={"Disabled"}
-            hint={"Turns the field off: nothing can write to it, it shows no caret, and the Tab key skips it."}
-            controls={"Sets DateInputProps.isDisabled"}
+            {...DateInputKnobs.IS_DISABLED_TEXT}
         >
             <PageCheckField
                 value={isTooltipDisabled}
@@ -197,8 +179,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Named by a Label"}
-    content={"Inside a Label, the field takes its name from the label's text, so it needs no [prop]ariaLabel[/prop], and pressing the text focuses the field."}
+    {...DOCS_SECTIONS.namedLabel}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Labeled.svelte`}>

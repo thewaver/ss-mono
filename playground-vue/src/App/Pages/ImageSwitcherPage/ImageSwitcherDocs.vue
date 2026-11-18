@@ -38,12 +38,7 @@ const transitionDurationMs = shallowRef(IMAGE_SWITCHER_DEFAULTS.transitionDurati
         />
 
         <template #renderKnobs>
-            <PageProp
-                item-key="sourceType"
-                label="Source"
-                hint="Which picture to show. Switching crossfades from the old one once the new one has loaded; missing_file points at a file that does not exist, and none passes no source at all."
-                controls="Picks the example picture sent to ImageSwitcherProps.src and ImageSwitcherProps.alt"
-            >
+            <PageProp item-key="sourceType" v-bind="ImageSwitcherKnobs.SOURCE_TYPE_TEXT">
                 <PageSelectField
                     :value="sourceType"
                     :values="ImageSwitcherKnobs.SOURCE_TYPES"
@@ -52,12 +47,7 @@ const transitionDurationMs = shallowRef(IMAGE_SWITCHER_DEFAULTS.transitionDurati
                 />
             </PageProp>
 
-            <PageProp
-                item-key="transitionDurationMs"
-                label="Transition duration (ms)"
-                hint="How long the crossfade from one picture to the next takes."
-                controls="Sets ImageSwitcherProps.transitionDurationMs"
-            >
+            <PageProp item-key="transitionDurationMs" v-bind="ImageSwitcherKnobs.TRANSITION_DURATION_MS_TEXT">
                 <PageNumberField
                     :value="transitionDurationMs"
                     :min="ImageSwitcherKnobs.MIN_DURATION_MS"

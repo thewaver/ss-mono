@@ -39,12 +39,7 @@ const exampleProps = computed((): PaintedTextBoxedExampleProps => {
     />
 
     <PageExampleKnobs>
-        <PageProp
-            item-key="lapDurationMs"
-            controls="Sets PaintedTextProps.lapDurationMs"
-            label="Lap duration (ms)"
-            hint="How long the text takes to slide once round the whole length of its path."
-        >
+        <PageProp item-key="lapDurationMs" v-bind="PaintedTextKnobs.LAP_DURATION_MS_TEXT">
             <PageNumberField
                 :value="lapDurationMs"
                 :min="PaintedTextKnobs.MIN_LAP_DURATION_MS"

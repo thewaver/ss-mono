@@ -67,9 +67,7 @@
 <PagePropsPanel scope={"global"}>
     <PageProp
         itemKey={"durationMs"}
-        controls={"Sets ShapeRevealOpts.durationMs"}
-        label={"Duration (ms)"}
-        hint={"How long the circle takes to grow over the whole window. 0 switches the theme at once, as does the system's reduced-motion setting."}
+        {...ShapeRevealKnobs.DURATION_MS_TEXT}
     >
         <PageNumberField
             value={durationMs}
@@ -101,9 +99,7 @@
 
     <PageProp
         itemKey={"computePoints"}
-        controls={"Picks the example contour sent to ShapeRevealOpts.computePoints"}
-        label={"Shape"}
-        hint={"The contour that grows over the window. A circle is what the reveal draws when none is given."}
+        {...ShapeRevealKnobs.COMPUTE_POINTS_TEXT}
     >
         <PageSelectField
             value={shape}
@@ -116,9 +112,7 @@
 
     <PageProp
         itemKey={"softness"}
-        controls={"Sets ShapeRevealOpts.softness"}
-        label={"Softness"}
-        hint={"How gradually the growing shape's edge fades, as a share of the distance it grows. 0 gives a hard edge."}
+        {...ShapeRevealKnobs.SOFTNESS_TEXT}
     >
         <PageNumberField
             value={softness}
@@ -133,9 +127,7 @@
 
     <PageProp
         itemKey={"startDegrees"}
-        controls={"Sets ShapeRevealOpts.startDegrees"}
-        label={"Start angle (°)"}
-        hint={"The shape's angle as it starts to grow, clockwise. With the end angle the same, the shape is only tilted. A circle looks the same at any angle."}
+        {...ShapeRevealKnobs.START_DEGREES_TEXT}
     >
         <PageNumberField
             value={startDegrees}
@@ -150,9 +142,7 @@
 
     <PageProp
         itemKey={"endDegrees"}
-        controls={"Sets ShapeRevealOpts.endDegrees"}
-        label={"End angle (°)"}
-        hint={"The shape's angle once it covers the window. It turns from the start angle to this one as it grows, on the reveal's own timing."}
+        {...ShapeRevealKnobs.END_DEGREES_TEXT}
     >
         <PageNumberField
             value={endDegrees}

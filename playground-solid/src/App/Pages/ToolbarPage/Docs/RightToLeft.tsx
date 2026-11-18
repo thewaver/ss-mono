@@ -3,6 +3,7 @@ import { createSignal } from "solid-js";
 import { Toolbar } from "@thewaver/ss-components-solid";
 import type { ToolbarAction } from "@thewaver/ss-components-solid";
 import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
+import { MORE_FORMATTING_ACTIONS_LABEL } from "@thewaver/ss-playground/App/Pages/ToolbarPage/ToolbarPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ToolbarPage/ToolbarPage.css";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
@@ -30,7 +31,7 @@ export const RightToLeftDocsExample = () => {
                     <Toolbar
                         actions={ACTIONS}
                         ariaLabel={"Formatting"}
-                        overflowAriaLabel={"More formatting actions"}
+                        overflowAriaLabel={MORE_FORMATTING_ACTIONS_LABEL}
                         renderAction={(getAction, getFlags) => (
                             <PageButtonContent flags={getFlags}>{getAction().value}</PageButtonContent>
                         )}

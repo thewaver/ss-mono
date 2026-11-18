@@ -21,9 +21,7 @@
 <PageExampleKnobs>
     <PageProp
         itemKey={"deg"}
-        controls={"Sets SVGHueRotationFilterDefs.deg"}
-        label={"Hue rotation"}
-        hint={"How far every color is turned round the color wheel."}
+        {...SVGFilterKnobs.DEG_TEXT}
     >
         <PageNumberField
             value={deg}
@@ -37,9 +35,7 @@
 
     <PageProp
         itemKey={"saturation"}
-        controls={"Sets SVGSaturationFilterDefs.amount"}
-        label={"Saturation"}
-        hint={"How colorful the result is. 0 takes it to gray, above 1 pushes the colors harder."}
+        {...SVGFilterKnobs.SATURATION_TEXT}
     >
         <PageNumberField
             value={saturation}
@@ -53,9 +49,7 @@
 
     <PageProp
         itemKey={"red"}
-        controls={"Sets SVGColorFilterDefs.r"}
-        label={"Red"}
-        hint={"How much the red channel is scaled on its own, after the hue and saturation have been applied."}
+        {...SVGFilterKnobs.RED_TEXT}
     >
         <PageNumberField
             value={red}
@@ -69,9 +63,7 @@
 
     <PageProp
         itemKey={"green"}
-        controls={"Sets SVGColorFilterDefs.g"}
-        label={"Green"}
-        hint={"How much the green channel is scaled on its own, after the hue and saturation have been applied."}
+        {...SVGFilterKnobs.GREEN_TEXT}
     >
         <PageNumberField
             value={green}
@@ -85,9 +77,7 @@
 
     <PageProp
         itemKey={"blue"}
-        controls={"Sets SVGColorFilterDefs.b"}
-        label={"Blue"}
-        hint={"How much the blue channel is scaled on its own, after the hue and saturation have been applied."}
+        {...SVGFilterKnobs.BLUE_TEXT}
     >
         <PageNumberField
             value={blue}

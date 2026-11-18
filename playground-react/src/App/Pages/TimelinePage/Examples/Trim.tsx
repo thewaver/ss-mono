@@ -1,7 +1,7 @@
 import { Timeline } from "@thewaver/ss-components-react";
-import type { TimelineEdgeAnnouncements } from "@thewaver/ss-components-react";
 import type { Clip } from "@thewaver/ss-playground/App/Pages/TimelinePage/TimelineItems.types";
 import {
+    EDGE_ANNOUNCEMENTS,
     LANE_SIZE,
     REEL,
     SECOND_STEPS,
@@ -26,23 +26,6 @@ import type { TimelineTrimExampleProps } from "../TimelinePage.types";
 type Props = TimelineTrimExampleProps;
 
 const LANE_GAP = 6;
-
-const EDGE_ANNOUNCEMENTS: TimelineEdgeAnnouncements = {
-    restingKeyHint: "Press Enter to take hold of the end of this clip.",
-    heldKeyHint:
-        "Left and right arrows move it a second at a time, Home and End switch between the start and the end, Enter drops it and Escape puts it back.",
-    computePlaceLabel: (edge, span) =>
-        `${edge} at ${formatStopwatch(span[edge])}, ${formatStopwatch(span.end - span.start)} long`,
-    computePickedUp: (itemLabel) => `Holding an end of ${itemLabel}.`,
-    computePickedUpByKey: (itemLabel, _zoneLabel, placeLabel, keyHint) =>
-        `Holding ${itemLabel}, ${placeLabel}. ${keyHint}`,
-    computeAimed: (placeLabel) => `${placeLabel.charAt(0).toUpperCase()}${placeLabel.slice(1)}.`,
-    computeZoneEntered: (_zoneLabel, placeLabel) => placeLabel,
-    computeReturned: (itemLabel) => `${itemLabel} put back as it was.`,
-    computeLeftInPlace: (itemLabel) => `${itemLabel} left as it was.`,
-    computeRefused: (itemLabel) => `${itemLabel} put back as it was.`,
-    computeDropped: (_itemLabel, _zoneLabel, placeLabel) => `Dropped, ${placeLabel}.`,
-};
 
 export const TrimExample = (props: Props) => {
     const [clips, setClips] = props.clips;

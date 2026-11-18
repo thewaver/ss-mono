@@ -12,13 +12,9 @@
     import PageRangeContent from "../../../StyledComponents/RangeContent/RangeContent.svelte";
     import type { FlipCardPressedExampleProps } from "../FlipCardPage.types";
     import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.svelte";
+    import { EDGE_LABELS, PEEK_OTHER_SIDE_LABEL } from "@thewaver/ss-playground/App/Pages/FlipCardPage/FlipCardPage.const";
 
     const CARD_SIZE = { width: 220, height: 300 };
-
-    const EDGE_LABELS: Record<FlipCardAxis, Record<FlipCardTurnDirection, string>> = {
-        row: { backward: "Press the left edge", forward: "Press the right edge" },
-        column: { backward: "Press the bottom edge", forward: "Press the top edge" },
-    };
 
     const EDGE_GLYPHS: Record<FlipCardAxis, Record<FlipCardTurnDirection, string>> = {
         row: { backward: CONTROL_GLYPHS.left, forward: CONTROL_GLYPHS.right },
@@ -82,7 +78,7 @@
         <Range
             id={"peek"}
             sizing={"fill"}
-            ariaLabel={"Peek at the other side"}
+            ariaLabel={PEEK_OTHER_SIDE_LABEL}
             min={NO_PEEK}
             max={PERCENT}
             step={PEEK_STEP}

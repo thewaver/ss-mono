@@ -3,6 +3,7 @@ import { shallowRef } from "vue";
 
 import { FileInput } from "@thewaver/ss-components-vue";
 import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
+import { FILE_WHOSE_NAME_HAS_TEXT } from "@thewaver/ss-playground/App/Pages/FileInputPage/FileInputPage.const";
 
 import PageFileInputContent from "../../../StyledComponents/FileInputContent/FileInputContent.vue";
 
@@ -26,6 +27,6 @@ const handleChange = (picked: File[]) => {
     </FileInput>
 
     <div :class="exampleStyles.exampleReadout" data-readout>
-        {{ rejection || "A file whose name has a space in it is refused" }}
+        {{ rejection || FILE_WHOSE_NAME_HAS_TEXT }}
     </div>
 </template>

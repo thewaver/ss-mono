@@ -7,6 +7,7 @@
     import PageCalendarDay from "../../../StyledComponents/CalendarContent/PageCalendarDay.svelte";
     import PageCalendarFrame from "../../../StyledComponents/CalendarContent/PageCalendarFrame.svelte";
     import PageCalendarWeekday from "../../../StyledComponents/CalendarContent/PageCalendarWeekday.svelte";
+    import { CHOOSE_DATE_RANGE_WITHIN_LABEL } from "@thewaver/ss-playground/App/Pages/RangeCalendarPage/RangeCalendarPage.const";
 
     let value = $state.raw<DateValueRange | undefined>();
     let month = $state.raw(DateValueUtils.getStartOfMonth(TODAY));
@@ -22,7 +23,7 @@
         locale={LOCALE}
         minValue={MIN_DATE}
         maxValue={MAX_DATE}
-        ariaLabel={"Choose a date range within the bounds"}
+        ariaLabel={CHOOSE_DATE_RANGE_WITHIN_LABEL}
     >
         {#snippet renderDay(_unused, renderProps)}
             <PageCalendarDay {renderProps} />

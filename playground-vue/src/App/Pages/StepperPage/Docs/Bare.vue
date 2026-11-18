@@ -2,7 +2,10 @@
 import { shallowRef } from "vue";
 
 import { Stepper } from "@thewaver/ss-components-vue";
-import { STARTING_LINEAR } from "@thewaver/ss-playground/App/Pages/StepperPage/StepperPage.const";
+import {
+    CHECKOUT_WITHOUT_CONNECTORS_LABEL,
+    STARTING_LINEAR,
+} from "@thewaver/ss-playground/App/Pages/StepperPage/StepperPage.const";
 import { StepperPageUtils } from "@thewaver/ss-playground/App/Pages/StepperPage/StepperPage.utils";
 import { LABELS, ORDER, STEPPER_GAP } from "@thewaver/ss-playground/App/Pages/StepperPage/StepperSteps.const";
 import type { StepValue } from "@thewaver/ss-playground/App/Pages/StepperPage/StepperSteps.types";
@@ -22,7 +25,7 @@ const current = shallowRef<StepValue>(STARTING_LINEAR);
         :steps="StepperPageUtils.buildSteps('bare', current, props.isFreeNavigation)"
         :current-value="current"
         :gap="STEPPER_GAP"
-        ariaLabel="Checkout without connectors"
+        :ariaLabel="CHECKOUT_WITHOUT_CONNECTORS_LABEL"
         :compute-step-aria-label="StepperPageUtils.describeStep"
         @current-change="(value: StepValue) => (current = value)"
     >

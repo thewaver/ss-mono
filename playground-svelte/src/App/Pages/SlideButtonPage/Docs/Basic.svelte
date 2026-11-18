@@ -4,6 +4,7 @@
 
     import PageSlideButtonContent from "../../../StyledComponents/SlideButtonContent/SlideButtonContent.svelte";
     import type { SlideButtonDocsExampleProps } from "../SlideButtonPageSvelte.types";
+    import { HOLD_ENTER_SPACE_SEND_DESCRIPTION } from "@thewaver/ss-playground/App/Pages/SlideButtonPage/SlideButtonPage.const";
 
     type Props = SlideButtonDocsExampleProps;
 
@@ -13,7 +14,7 @@
 </script>
 
 <SlideButton
-    ariaDescription={"Hold Enter or Space to send."}
+    ariaDescription={HOLD_ENTER_SPACE_SEND_DESCRIPTION}
     thumbSize={SLIDE_BUTTON_THUMB_SIZE}
     mode={props.mode}
     completionRatio={props.completionRatio}

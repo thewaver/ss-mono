@@ -63,14 +63,7 @@ export const SatellitePage = () => {
                     </PageMeasureBox>
 
                     <PageExampleKnobs>
-                        <PageProp
-                            itemKey={"hPlacement"}
-                            label={"Placement across"}
-                            hint={
-                                "Where the satellite sits across its subject: inside an edge, centered, or outside it altogether."
-                            }
-                            controls={"Sets SatelliteDefs.placement.x"}
-                        >
+                        <PageProp itemKey={"hPlacement"} {...SatelliteKnobs.H_PLACEMENT_TEXT}>
                             <PageSelectField
                                 value={hPlacement}
                                 values={ANCHOR_H_PLACEMENTS}
@@ -80,14 +73,7 @@ export const SatellitePage = () => {
                             />
                         </PageProp>
 
-                        <PageProp
-                            itemKey={"vPlacement"}
-                            label={"Placement down"}
-                            hint={
-                                "Where the satellite sits above or below its subject: inside an edge, centered, or outside it altogether."
-                            }
-                            controls={"Sets SatelliteDefs.placement.y"}
-                        >
+                        <PageProp itemKey={"vPlacement"} {...SatelliteKnobs.V_PLACEMENT_TEXT}>
                             <PageSelectField
                                 value={vPlacement}
                                 values={ANCHOR_V_PLACEMENTS}
@@ -97,12 +83,7 @@ export const SatellitePage = () => {
                             />
                         </PageProp>
 
-                        <PageProp
-                            itemKey={"offsetX"}
-                            label={"Offset across (px)"}
-                            hint={"How far the satellite is nudged sideways from where the placement put it."}
-                            controls={"Sets SatelliteDefs.offset.x"}
-                        >
+                        <PageProp itemKey={"offsetX"} {...SatelliteKnobs.OFFSET_X_TEXT}>
                             <PageNumberField
                                 value={offsetX}
                                 min={SatelliteKnobs.MIN_OFFSET}
@@ -114,12 +95,7 @@ export const SatellitePage = () => {
                             />
                         </PageProp>
 
-                        <PageProp
-                            itemKey={"offsetY"}
-                            label={"Offset down (px)"}
-                            hint={"How far the satellite is nudged up or down from where the placement put it."}
-                            controls={"Sets SatelliteDefs.offset.y"}
-                        >
+                        <PageProp itemKey={"offsetY"} {...SatelliteKnobs.OFFSET_Y_TEXT}>
                             <PageNumberField
                                 value={offsetY}
                                 min={SatelliteKnobs.MIN_OFFSET}
@@ -131,14 +107,7 @@ export const SatellitePage = () => {
                             />
                         </PageProp>
 
-                        <PageProp
-                            itemKey={"hasSatellite"}
-                            label={"Render a satellite"}
-                            hint={
-                                "Whether a satellite is rendered at all, so the subject can be seen with and without one."
-                            }
-                            controls={"Switches SatelliteProps.satellites between one satellite and none"}
-                        >
+                        <PageProp itemKey={"hasSatellite"} {...SatelliteKnobs.HAS_SATELLITE_TEXT}>
                             <PageCheckField
                                 value={hasSatellite}
                                 ariaLabel={"Render a satellite"}
@@ -146,12 +115,7 @@ export const SatellitePage = () => {
                             />
                         </PageProp>
 
-                        <PageProp
-                            itemKey={"badgeSize"}
-                            label={"Satellite size (px)"}
-                            hint={"How large the satellite itself is."}
-                            controls={"Sets the size of the example badge drawn by SatelliteDefs.renderSatellite"}
-                        >
+                        <PageProp itemKey={"badgeSize"} {...SatelliteKnobs.BADGE_SIZE_TEXT}>
                             <PageNumberField
                                 value={badgeSize}
                                 min={SatelliteKnobs.MIN_BADGE_SIZE}
@@ -163,14 +127,7 @@ export const SatellitePage = () => {
                             />
                         </PageProp>
 
-                        <PageProp
-                            itemKey={"isBehindSubject"}
-                            label={"Behind the subject"}
-                            hint={
-                                "Puts the satellite under the subject rather than over it, so the subject hides whatever overlaps."
-                            }
-                            controls={"Sets SatelliteDefs.isBehindSubject"}
-                        >
+                        <PageProp itemKey={"isBehindSubject"} {...SatelliteKnobs.IS_BEHIND_SUBJECT_TEXT}>
                             <PageCheckField
                                 value={isBehindSubject}
                                 ariaLabel={"Behind the subject"}
@@ -206,14 +163,7 @@ export const SatellitePage = () => {
                     </PageMeasureBox>
 
                     <PageExampleKnobs>
-                        <PageProp
-                            itemKey={"badgeCorner"}
-                            label={"Corner"}
-                            hint={"Which corner the badge is pinned to; the overhang turns outward with it."}
-                            controls={
-                                "Picks the corner the example turns into SatelliteDefs.placement and SatelliteDefs.offset"
-                            }
-                        >
+                        <PageProp itemKey={"badgeCorner"} {...SatelliteKnobs.BADGE_CORNER_TEXT}>
                             <PageSelectField
                                 value={corner}
                                 values={SatelliteKnobs.BADGE_CORNERS}
@@ -223,12 +173,7 @@ export const SatellitePage = () => {
                             />
                         </PageProp>
 
-                        <PageProp
-                            itemKey={"badgeCount"}
-                            label={"Count"}
-                            hint={"The number on the badge. More digits make it wider, and it grows toward the middle."}
-                            controls={"Sets the number in the example pill drawn by SatelliteDefs.renderSatellite"}
-                        >
+                        <PageProp itemKey={"badgeCount"} {...SatelliteKnobs.BADGE_COUNT_TEXT}>
                             <PageNumberField
                                 value={count}
                                 min={SatelliteKnobs.MIN_COUNT}
@@ -240,12 +185,7 @@ export const SatellitePage = () => {
                             />
                         </PageProp>
 
-                        <PageProp
-                            itemKey={"badgeOverhang"}
-                            label={"Overhang (px)"}
-                            hint={"How far the badge pokes out past each of the two edges it is pinned to."}
-                            controls={"Sets how far the example pushes SatelliteDefs.offset out from the corner"}
-                        >
+                        <PageProp itemKey={"badgeOverhang"} {...SatelliteKnobs.BADGE_OVERHANG_TEXT}>
                             <PageNumberField
                                 value={overhang}
                                 min={SatelliteKnobs.MIN_OVERHANG}

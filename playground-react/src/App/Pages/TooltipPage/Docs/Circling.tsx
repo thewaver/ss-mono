@@ -6,6 +6,7 @@ import {
     CIRCLING_MIN_DEGREES,
     CIRCLING_STEP_DEGREES,
     STARTING_CIRCLING_DEGREES,
+    WHERE_ARROW_SITS_ROUND_LABEL,
 } from "@thewaver/ss-playground/App/Pages/TooltipPage/TooltipPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/TooltipPage/TooltipPage.css";
 import { computeCirclingAim } from "@thewaver/ss-playground/App/Pages/TooltipPage/TooltipPage.utils";
@@ -40,7 +41,7 @@ export const CirclingDocsExample = (props: Props) => {
                     step={CIRCLING_STEP_DEGREES}
                     sizing={"fill"}
                     thumbSize={RANGE_THUMB_SIZE}
-                    ariaLabel={"Where the arrow sits round the tooltip"}
+                    ariaLabel={WHERE_ARROW_SITS_ROUND_LABEL}
                     renderContent={(renderProps) => <PageRangeContent renderProps={renderProps} />}
                 />
             </div>

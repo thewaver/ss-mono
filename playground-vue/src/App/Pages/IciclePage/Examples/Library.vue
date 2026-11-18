@@ -5,6 +5,7 @@ import { Icicle, TreemapUtils } from "@thewaver/ss-components-vue";
 import type { IcicleNode } from "@thewaver/ss-components-vue";
 import { LIBRARY } from "@thewaver/ss-playground/App/LibraryTree.generated";
 import { formatLines } from "@thewaver/ss-playground/App/LibraryTree.utils";
+import { LIBRARY_S_SOURCE_LINES_LABEL } from "@thewaver/ss-playground/App/Pages/IciclePage/IciclePage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/IciclePage/IciclePage.css";
 import { PAGE_ICICLE_FAMILIES } from "@thewaver/ss-playground/App/StyledComponents/IcicleContent/IcicleContent.css";
 
@@ -38,7 +39,7 @@ const focus = useModel(props, "focus");
             :root="LIBRARY"
             :column-count="columnCount"
             :zoom-duration-ms="zoomDurationMs"
-            ariaLabel="The library's source, by lines of code"
+            :ariaLabel="LIBRARY_S_SOURCE_LINES_LABEL"
         >
             <template #renderCell="{ node, state }">
                 <PageIcicleCell

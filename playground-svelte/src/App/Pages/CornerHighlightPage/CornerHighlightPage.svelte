@@ -119,7 +119,7 @@
 {/snippet}
 
 <PagePropsPanel scope={"global"}>
-    <PageProp itemKey={"color"} controls={"Sets CornerHighlightProps.color"} label={"Color"} hint={"The color the corner marks are drawn in."}>
+    <PageProp itemKey={"color"} {...CornerHighlightKnobs.COLOR_TEXT}>
         <PageColorField
             value={color}
             ariaLabel={"Color"}
@@ -131,9 +131,7 @@
 
     <PageProp
         itemKey={"cornerLengthWidth"}
-        controls={"Sets CornerHighlightProps.cornerLength.width"}
-        label={"Arm across (px)"}
-        hint={"How long each corner's horizontal arm is."}
+        {...CornerHighlightKnobs.CORNER_LENGTH_WIDTH_TEXT}
     >
         <PageNumberField
             value={lengthAcross}
@@ -148,7 +146,7 @@
         />
     </PageProp>
 
-    <PageProp itemKey={"cornerLengthHeight"} controls={"Sets CornerHighlightProps.cornerLength.height"} label={"Arm down (px)"} hint={"How long each corner's vertical arm is."}>
+    <PageProp itemKey={"cornerLengthHeight"} {...CornerHighlightKnobs.CORNER_LENGTH_HEIGHT_TEXT}>
         <PageNumberField
             value={lengthDown}
             min={CornerHighlightKnobs.MIN_LENGTH}
@@ -162,7 +160,7 @@
         />
     </PageProp>
 
-    <PageProp itemKey={"strokeThickness"} controls={"Sets CornerHighlightProps.strokeThickness"} label={"Thickness (px)"} hint={"How thick the corner arms are drawn."}>
+    <PageProp itemKey={"strokeThickness"} {...CornerHighlightKnobs.STROKE_THICKNESS_TEXT}>
         <PageNumberField
             value={strokeThickness}
             min={CornerHighlightKnobs.MIN_THICKNESS}
@@ -178,11 +176,7 @@
 
     <PageProp
         itemKey={"transitionDurationMs"}
-        controls={"Sets CornerHighlightProps.transitionDurationMs"}
-        label={"Fade (ms)"}
-        hint={
-            "How long the corners take to follow a change of color, which is how the set as a whole fades. The following and drawn-on examples also glide and grow over this time."
-        }
+        {...CornerHighlightKnobs.TRANSITION_DURATION_MS_TEXT}
     >
         <PageNumberField
             value={transitionDurationMs}

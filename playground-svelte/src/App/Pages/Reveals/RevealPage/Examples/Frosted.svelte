@@ -3,6 +3,7 @@
     import * as styles from "@thewaver/ss-playground/App/Pages/Reveals/RevealPage/RevealPage.css";
 
     import type { RevealExampleProps } from "../RevealExample.types";
+    import { FROSTED_COVER_OVER_NOTE_LABEL } from "@thewaver/ss-playground/App/Pages/Reveals/RevealPage/RevealPage.const";
 
     type Props = RevealExampleProps;
 
@@ -17,7 +18,7 @@
         joinRadii={props.joinRadii}
         lameExponents={props.lameExponents}
         isDisabled={props.isDisabled}
-        ariaLabel={"A frosted cover over a note"}
+        ariaLabel={FROSTED_COVER_OVER_NOTE_LABEL}
         computePoints={props.computePoints}
     >
         {#snippet renderContent()}

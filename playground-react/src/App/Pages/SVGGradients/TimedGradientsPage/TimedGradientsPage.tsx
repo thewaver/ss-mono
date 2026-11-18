@@ -65,14 +65,7 @@ export const TimedGradientsPage = () => {
         <>
             <PagePropsGroups>
                 <PagePropsPanel scope={"sample"}>
-                    <PageProp
-                        itemKey={"configKey"}
-                        label={"Gradient"}
-                        hint={"Which animated gradient is shown. Choosing one brings its own knobs with it."}
-                        controls={
-                            "Picks the sample gradient the example sends to ShapeProps.computeFillDefs or ShapeProps.computeStrokeDefs"
-                        }
-                    >
+                    <PageProp itemKey={"configKey"} {...TimedGradientKnobs.CONFIG_KEY_TEXT}>
                         <PageGroupedSelectField
                             value={configKey}
                             groups={TIMED_GRADIENT_GROUPS}
@@ -106,12 +99,7 @@ export const TimedGradientsPage = () => {
                         }}
                     />
 
-                    <PageProp
-                        itemKey={"animationDurationMs"}
-                        label={"Animation duration (ms)"}
-                        hint={"How long one pass of the gradient's animation takes."}
-                        controls={"Sets SVGAnimationDefs.animationDurationMs"}
-                    >
+                    <PageProp itemKey={"animationDurationMs"} {...TimedGradientKnobs.ANIMATION_DURATION_MS_TEXT}>
                         <PageNumberField
                             value={animationDurationMs}
                             min={SVGGradientKnobs.MIN_DURATION_MS}
@@ -122,12 +110,7 @@ export const TimedGradientsPage = () => {
                         />
                     </PageProp>
 
-                    <PageProp
-                        itemKey={"iterationConfigKey"}
-                        label={"Iteration Pattern"}
-                        hint={"How the animation repeats: once, endlessly, or back and forth."}
-                        controls={"Picks the sample iteration that fills SVGAnimationDefs.animationIterationPatterns"}
-                    >
+                    <PageProp itemKey={"iterationConfigKey"} {...TimedGradientKnobs.ITERATION_CONFIG_KEY_TEXT}>
                         <PageSelectField
                             value={iterationConfigKey}
                             values={SVGDefsSamples.Iteration.SAMPLE_KEYS}

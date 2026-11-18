@@ -4,6 +4,13 @@ import { useModel } from "vue";
 import { Button, CUBOID_FACES, Cuboid } from "@thewaver/ss-components-vue";
 import type { CuboidController, CuboidFace } from "@thewaver/ss-components-vue";
 import { computeCuboidFaceLabel } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
+import {
+    SIX_FACES_KEPT_UPRIGHT_LABEL,
+    TURN_FACE_ABOVE_TOWARDS_TEXT,
+    TURN_FACE_BELOW_TOWARDS_TEXT,
+    TURN_FACE_LEFT_TOWARDS_TEXT,
+    TURN_FACE_RIGHT_TOWARDS_TEXT,
+} from "@thewaver/ss-playground/App/Pages/CuboidPage/CuboidPage.const";
 import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
 import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.vue";
@@ -47,7 +54,7 @@ const turnTo = (face: CuboidFace) => {
                 :transition-duration-ms="transitionDurationMs"
                 :is-upright="isUpright"
                 :is-draggable="isDraggable"
-                ariaLabel="Six faces, kept upright"
+                :ariaLabel="SIX_FACES_KEPT_UPRIGHT_LABEL"
                 :compute-face-label="computeCuboidFaceLabel"
                 @mount="(next: CuboidController) => (controller = next)"
             >
@@ -59,35 +66,27 @@ const turnTo = (face: CuboidFace) => {
 
         <PageCuboidPad>
             <div />
-            <Button id="uprightPitchUp" ariaLabel="Turn the face above towards you" @click="turnPitch(QUARTER_TURN)">
+            <Button id="uprightPitchUp" :ariaLabel="TURN_FACE_ABOVE_TOWARDS_TEXT" @click="turnPitch(QUARTER_TURN)">
                 <template #renderContent="flags">
                     <PageControlButtonContent :flags="flags" :glyph="CONTROL_GLYPHS.up" />
                 </template>
             </Button>
             <div />
 
-            <Button
-                id="uprightYawLeft"
-                ariaLabel="Turn the face on the left towards you"
-                @click="turnYaw(-QUARTER_TURN)"
-            >
+            <Button id="uprightYawLeft" :ariaLabel="TURN_FACE_LEFT_TOWARDS_TEXT" @click="turnYaw(-QUARTER_TURN)">
                 <template #renderContent="flags">
                     <PageControlButtonContent :flags="flags" :glyph="CONTROL_GLYPHS.left" />
                 </template>
             </Button>
             <div />
-            <Button
-                id="uprightYawRight"
-                ariaLabel="Turn the face on the right towards you"
-                @click="turnYaw(QUARTER_TURN)"
-            >
+            <Button id="uprightYawRight" :ariaLabel="TURN_FACE_RIGHT_TOWARDS_TEXT" @click="turnYaw(QUARTER_TURN)">
                 <template #renderContent="flags">
                     <PageControlButtonContent :flags="flags" :glyph="CONTROL_GLYPHS.right" />
                 </template>
             </Button>
 
             <div />
-            <Button id="uprightPitchDown" ariaLabel="Turn the face below towards you" @click="turnPitch(-QUARTER_TURN)">
+            <Button id="uprightPitchDown" :ariaLabel="TURN_FACE_BELOW_TOWARDS_TEXT" @click="turnPitch(-QUARTER_TURN)">
                 <template #renderContent="flags">
                     <PageControlButtonContent :flags="flags" :glyph="CONTROL_GLYPHS.down" />
                 </template>

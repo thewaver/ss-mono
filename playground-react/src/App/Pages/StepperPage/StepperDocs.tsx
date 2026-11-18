@@ -2,7 +2,8 @@ import { useState } from "react";
 
 import { STEPPER_ORIENTATIONS } from "@thewaver/ss-components-react";
 import type { StepperOrientation } from "@thewaver/ss-components-react";
-import { DOCS_ROOT } from "@thewaver/ss-playground/App/Pages/StepperPage/StepperPage.const";
+import { StepperKnobs } from "@thewaver/ss-playground/App/Knobs/Steppers.const";
+import { DOCS_ROOT, DOCS_SECTIONS } from "@thewaver/ss-playground/App/Pages/StepperPage/StepperPage.const";
 
 import { PageDocsExample } from "../../PageComponents/DocsExample/DocsExample";
 import { PageDocsSection } from "../../PageComponents/DocsSection/DocsSection";
@@ -16,12 +17,7 @@ import { FailedDocsExample } from "./Docs/Failed";
 import { RightToLeftDocsExample } from "./Docs/RightToLeft";
 
 const renderFreeNavigationKnob = (key: string, value: boolean, setValue: (value: boolean) => void) => (
-    <PageProp
-        itemKey={key}
-        label={"Free navigation"}
-        hint={"Lets any step be pressed to jump to it, rather than only the steps already behind you."}
-        controls={"Sets Step.isNavigable on every step sent to StepperProps.steps"}
-    >
+    <PageProp itemKey={key} {...StepperKnobs.FREE_NAVIGATION_TEXT}>
         <PageCheckField value={value} ariaLabel={"Free navigation"} onChange={setValue} />
     </PageProp>
 );
@@ -41,12 +37,7 @@ export const StepperDocs = () => {
                 path={`${DOCS_ROOT}/Basic.tsx`}
                 renderKnobs={() => (
                     <>
-                        <PageProp
-                            itemKey={"orientation"}
-                            label={"Orientation"}
-                            hint={"Whether the steps run across the page or down it."}
-                            controls={"Sets StepperProps.orientation"}
-                        >
+                        <PageProp itemKey={"orientation"} {...StepperKnobs.ORIENTATION_TEXT}>
                             <PageSelectField
                                 value={orientation}
                                 values={STEPPER_ORIENTATIONS}
@@ -62,12 +53,7 @@ export const StepperDocs = () => {
                 <BasicDocsExample orientation={orientation} isFreeNavigation={isFreeNavigation} />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"Right to left"}
-                content={
-                    "Inside a box whose text runs right to left, a strip running across starts from the right: the first step sits at the right-hand end and the connectors lead to the left."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.rightLeft} />
 
             <PageDocsExample
                 path={`${DOCS_ROOT}/RightToLeft.tsx`}
@@ -92,12 +78,7 @@ export const StepperDocs = () => {
                 <FailedDocsExample isFreeNavigation={isFailedFree} />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"Steps that carry their own content"}
-                content={
-                    "Give the stepper [prop]renderBody[/prop] and each step holds a body beside its connector, so the line runs on past the content rather than stopping at it."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.stepsWithOwnContent} />
 
             <PageDocsExample
                 path={`${DOCS_ROOT}/Detailed.tsx`}
@@ -108,12 +89,7 @@ export const StepperDocs = () => {
                 <DetailedDocsExample isFreeNavigation={isDetailedFree} />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"No connector"}
-                content={
-                    "The line between steps is optional: leave out [prop]renderConnector[/prop] and nothing is drawn between them, and they sit [prop]gap[/prop] pixels apart."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.noConnector} />
 
             <PageDocsExample
                 path={`${DOCS_ROOT}/Bare.tsx`}
@@ -122,12 +98,7 @@ export const StepperDocs = () => {
                 <BareDocsExample isFreeNavigation={isBareFree} />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"Bent along an arc"}
-                content={
-                    "Give the stepper [prop]computeLayout[/prop] and each step goes where the layout puts it, here along an arc from PlacementLayoutUtils. The connector is handed where the two steps it joins sit, so the run between them follows the curve rather than cutting across it. A step's body has nowhere to go on a curve, so a stepper with a layout takes no [prop]renderBody[/prop]."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.bentAlongArc} />
 
             <PageDocsExample
                 path={`${DOCS_ROOT}/Arc.tsx`}

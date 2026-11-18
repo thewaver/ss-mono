@@ -4,6 +4,7 @@
     import * as styles from "@thewaver/ss-playground/App/Pages/SurfacePage/Examples/Banner/Banner.css";
     import knight from "@thewaver/ss-playground/App/knight.webp";
     import { CSSUtils, type Size2d } from "@thewaver/ss-utils";
+    import { SIR_FACE_PLEADS_YOUR_TEXT } from "@thewaver/ss-playground/App/Pages/SurfacePage/SurfacePage.const";
 
     const computeDefs = (size: Size2d, element: HTMLElement | undefined, id: string) =>
         SVGDefsSampleConfigs.Gradient.Timed.toConfig({ family: "flow_diag_2", defs: { banded: true } }).computeSVGDefs(
@@ -42,7 +43,7 @@
     <Surface {...getConfig(id)}>
         <div class={styles.content}>
             <img class={styles.image} src={knight} style:vertical-align={"middle"} />
-            <span><b>{"Alert! Alert!"}</b><br />{"Sir Face pleads for your attention!!"}</span>
+            <span><b>{"Alert! Alert!"}</b><br />{SIR_FACE_PLEADS_YOUR_TEXT}</span>
         </div>
     </Surface>
 </div>

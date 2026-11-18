@@ -1,7 +1,10 @@
 import { useState } from "react";
 
 import { Stepper } from "@thewaver/ss-components-react";
-import { STARTING_LINEAR } from "@thewaver/ss-playground/App/Pages/StepperPage/StepperPage.const";
+import {
+    CHECKOUT_WITHOUT_CONNECTORS_LABEL,
+    STARTING_LINEAR,
+} from "@thewaver/ss-playground/App/Pages/StepperPage/StepperPage.const";
 import { StepperPageUtils } from "@thewaver/ss-playground/App/Pages/StepperPage/StepperPage.utils";
 import { LABELS, ORDER, STEPPER_GAP } from "@thewaver/ss-playground/App/Pages/StepperPage/StepperSteps.const";
 import type { StepValue } from "@thewaver/ss-playground/App/Pages/StepperPage/StepperSteps.types";
@@ -19,7 +22,7 @@ export const BareDocsExample = (props: Props) => {
             steps={StepperPageUtils.buildSteps("bare", current, props.isFreeNavigation)}
             currentValue={current}
             gap={STEPPER_GAP}
-            ariaLabel={"Checkout without connectors"}
+            ariaLabel={CHECKOUT_WITHOUT_CONNECTORS_LABEL}
             computeStepAriaLabel={StepperPageUtils.describeStep}
             onCurrentChange={setCurrent}
             renderStep={(step, flags) => (

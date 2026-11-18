@@ -140,14 +140,7 @@ const StressTestWrapper = (props: ScanlineAnimationExampleProps) => {
             <div>{"120 lines"}</div>
 
             <PagePropsPanel scope={"local"} hasReset={false}>
-                <PageProp
-                    itemKey={"onGraphicsCard"}
-                    label={"On the graphics card"}
-                    hint={
-                        "Draws the stress test's lines in one canvas per item, with the keyframes worked out on the graphics card. Off, every line is an element of its own."
-                    }
-                    controls={"Sets ScanlineAnimationProps.renderer in the stress test"}
-                >
+                <PageProp itemKey={"onGraphicsCard"} {...ScanlineAnimationKnobs.ON_GRAPHICS_CARD_TEXT}>
                     <PageCheckField
                         value={isOnGraphicsCard}
                         ariaLabel={"On the graphics card"}
@@ -182,14 +175,7 @@ const StressTestWrapper = (props: ScanlineAnimationExampleProps) => {
 
 const SmoothnessInput = (props: { value: number; setter: (value: number) => void }) => {
     return (
-        <PageProp
-            itemKey={"smoothness01"}
-            label={"Smoothness (0-1)"}
-            hint={
-                "How much one line's movement overlaps its neighbors'. 0 makes each line wait its turn; 1 blurs them into one sweep."
-            }
-            controls={"Sets SliceAnimationBreakpointOpts.smoothness"}
-        >
+        <PageProp itemKey={"smoothness01"} {...ScanlineAnimationKnobs.SMOOTHNESS01_TEXT}>
             <PageNumberField
                 value={props.value}
                 min={ScanlineAnimationKnobs.MIN_SMOOTHNESS}
@@ -207,12 +193,7 @@ const DirInput = (props: {
     setter: (value: SliceAnimationBreakpointDirection) => void;
 }) => {
     return (
-        <PageProp
-            itemKey={"direction"}
-            label={"Direction"}
-            hint={"Which way the sweep travels through the lines, and so which lines go first."}
-            controls={"Sets SliceAnimationBreakpointOpts.dir"}
-        >
+        <PageProp itemKey={"direction"} {...ScanlineAnimationKnobs.DIRECTION_TEXT}>
             <PageSelectField
                 value={props.value}
                 values={SliceAnimationBreakpoints.DIRECTIONS}
@@ -259,14 +240,7 @@ const GlitchExampleWrapper = (props: ScanlineAnimationExampleProps) => {
             </div>
 
             <PageExampleKnobs>
-                <PageProp
-                    itemKey={"count"}
-                    label={"Count"}
-                    hint={"How many glitch bursts happen over one pass."}
-                    controls={
-                        "Sets the number of glitch bursts in the example's ScanlineAnimationProps.computeSliceAnimation"
-                    }
-                >
+                <PageProp itemKey={"count"} {...ScanlineAnimationKnobs.COUNT_TEXT}>
                     <PageNumberField
                         value={keyframeOpts.count}
                         min={ScanlineAnimationKnobs.MIN_GLITCH_COUNT}
@@ -277,12 +251,7 @@ const GlitchExampleWrapper = (props: ScanlineAnimationExampleProps) => {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"maxShift"}
-                    label={"Max shift (%)"}
-                    hint={"How far a line can be thrown sideways at the worst of a burst, as a share of its own width."}
-                    controls={"Sets how far rows slide in the example's ScanlineAnimationProps.computeSliceAnimation"}
-                >
+                <PageProp itemKey={"maxShift"} {...ScanlineAnimationKnobs.MAX_SHIFT_TEXT}>
                     <PageNumberField
                         value={keyframeOpts.shiftPercent}
                         min={ScanlineAnimationKnobs.MIN_SHIFT_PERCENT}
@@ -293,16 +262,7 @@ const GlitchExampleWrapper = (props: ScanlineAnimationExampleProps) => {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"chunkyness01"}
-                    label={"Chunkyness (0-1)"}
-                    hint={
-                        "How blocky the glitch is: low values throw single lines about, high values throw thick slabs."
-                    }
-                    controls={
-                        "Sets how many neighboring rows slide together in the example's ScanlineAnimationProps.computeSliceAnimation"
-                    }
-                >
+                <PageProp itemKey={"chunkyness01"} {...ScanlineAnimationKnobs.CHUNKYNESS01_TEXT}>
                     <PageNumberField
                         value={keyframeOpts.chunkyness}
                         min={ScanlineAnimationKnobs.MIN_CHUNKYNESS}
@@ -776,23 +736,11 @@ export const ScanlineAnimationPage = () => {
     return (
         <div className={styles.root}>
             <PagePropsPanel scope={"global"}>
-                <PageProp
-                    itemKey={"image"}
-                    label={"Image"}
-                    hint={
-                        "Swaps in a picture of your own, so the sweep can be watched against something other than the sample."
-                    }
-                    controls={"Picks the example picture sent to ScanlineAnimationProps.src"}
-                >
+                <PageProp itemKey={"image"} {...ScanlineAnimationKnobs.IMAGE_TEXT}>
                     <PageFileField accept={"image/*"} ariaLabel={"Image"} onPick={handleFile} />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"weightType"}
-                    label={"Weight"}
-                    hint={"How each line's turn is decided: its position, a wave, a random draw, and so on."}
-                    controls={"Picks the example's weight function sent to ScanlineAnimationProps.computeSliceWeights"}
-                >
+                <PageProp itemKey={"weightType"} {...ScanlineAnimationKnobs.WEIGHT_TYPE_TEXT}>
                     <PageGroupedSelectField
                         value={weightType}
                         groups={GROUPPED_WEIGHTS}
@@ -801,14 +749,7 @@ export const ScanlineAnimationPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"lineCount"}
-                    label={"Line count"}
-                    hint={
-                        "How many lines the picture is cut into. More lines is a finer sweep and more work per frame."
-                    }
-                    controls={"Sets ScanlineAnimationProps.lineCount"}
-                >
+                <PageProp itemKey={"lineCount"} {...ScanlineAnimationKnobs.LINE_COUNT_TEXT}>
                     <PageNumberField
                         value={lineCount}
                         min={ScanlineAnimationKnobs.MIN_LINE_COUNT}
@@ -819,14 +760,7 @@ export const ScanlineAnimationPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"orientation"}
-                    label={"Orientation"}
-                    hint={
-                        "Which way the lines run: rows across the picture, or columns down it. The samples here were written for rows, so on columns they still push sideways and some read their place off the row."
-                    }
-                    controls={"Sets ScanlineAnimationProps.orientation"}
-                >
+                <PageProp itemKey={"orientation"} {...ScanlineAnimationKnobs.ORIENTATION_TEXT}>
                     <PageSelectField
                         value={orientation}
                         values={SCANLINE_ANIMATION_ORIENTATIONS}
@@ -835,12 +769,7 @@ export const ScanlineAnimationPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"animationDurationMs"}
-                    label={"Animation duration (ms)"}
-                    hint={"How long one sweep over the whole picture takes."}
-                    controls={"Sets ScanlineAnimationProps.animationDurationMs"}
-                >
+                <PageProp itemKey={"animationDurationMs"} {...ScanlineAnimationKnobs.ANIMATION_DURATION_MS_TEXT}>
                     <PageNumberField
                         value={animationDurationMs}
                         min={ScanlineAnimationKnobs.MIN_DURATION_MS}
@@ -853,9 +782,7 @@ export const ScanlineAnimationPage = () => {
 
                 <PageProp
                     itemKey={"animationIterationDelayMs"}
-                    label={"Iteration delay (ms)"}
-                    hint={"How long the picture waits between one sweep and the next."}
-                    controls={"Sets ScanlineAnimationProps.animationIterationDelayMs"}
+                    {...ScanlineAnimationKnobs.ANIMATION_ITERATION_DELAY_MS_TEXT}
                 >
                     <PageNumberField
                         value={animationIterationDelayMs}

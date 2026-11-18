@@ -10,6 +10,8 @@ export const formationItem = style({
 });
 
 export const formationItemContent = style({
+    position: "relative",
+    zIndex: 2,
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
@@ -24,5 +26,6 @@ export const formationItemContent = style({
 
 export const formationItemRank = style({
     fontSize: themeVars.fontSize.large,
+    lineHeight: 1,
     color: themeVars.color.primary.main,
 });

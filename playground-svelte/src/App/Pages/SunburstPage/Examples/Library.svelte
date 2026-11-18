@@ -9,6 +9,7 @@
     import PageSunburstArc from "../../../StyledComponents/SunburstContent/PageSunburstArc.svelte";
     import PageSunburstHub from "../../../StyledComponents/SunburstContent/PageSunburstHub.svelte";
     import type { SunburstExampleProps } from "../SunburstPage.types";
+    import { LIBRARY_S_SOURCE_LINES_LABEL } from "@thewaver/ss-playground/App/Pages/SunburstPage/SunburstPage.const";
 
     const PARENT_FROM_END = 2;
     const ROOT_ONLY = 1;
@@ -42,7 +43,7 @@
         bind:branch
         ringCount={props.ringCount}
         zoomDurationMs={props.zoomDurationMs}
-        ariaLabel={"The library's source, by lines of code"}
+        ariaLabel={LIBRARY_S_SOURCE_LINES_LABEL}
     >
         {#snippet renderArc(node, state)}
             <PageSunburstArc {state} family={getFamily(node)} name={node.value} title={getTitle(node, state.weight)} />

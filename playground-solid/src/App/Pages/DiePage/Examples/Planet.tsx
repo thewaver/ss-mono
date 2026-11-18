@@ -4,6 +4,7 @@ import { Button, Die } from "@thewaver/ss-components-solid";
 import type { DieController } from "@thewaver/ss-components-solid";
 import {
     ICON_CLOUD_EMPTY_LABEL,
+    PLANET_CIRCLED_ICONS_LABEL,
     PLANET_ICONS,
     PLANET_STEPS,
 } from "@thewaver/ss-playground/App/Pages/DiePage/DiePage.const";
@@ -35,7 +36,7 @@ export const PlanetExample = (props: Props) => {
                     autoSpin={props.autoSpin}
                     isMovable={true}
                     isSeeThrough={true}
-                    ariaLabel={"A planet circled by icons"}
+                    ariaLabel={PLANET_CIRCLED_ICONS_LABEL}
                     computeFaceLabel={(index) => PLANET_ICONS[index]?.label ?? ICON_CLOUD_EMPTY_LABEL}
                     renderFace={(getIndex, getState) => (
                         <PageDieIcon state={getState} icon={() => PLANET_ICONS[getIndex()]?.icon ?? ""} />

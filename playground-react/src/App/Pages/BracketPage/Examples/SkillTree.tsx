@@ -1,5 +1,6 @@
 import { Bracket } from "@thewaver/ss-components-react";
 import type { BracketNode } from "@thewaver/ss-components-react";
+import { SKILLS_WHAT_THEY_UNLOCK_LABEL } from "@thewaver/ss-playground/App/Pages/BracketPage/BracketPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/BracketPage/BracketPage.css";
 
 import type { BracketExampleProps } from "../BracketPage.types";
@@ -30,7 +31,7 @@ export const SkillTreeExample = (props: Props) => {
                 orientation={props.orientation}
                 rootSide={props.rootSide}
                 layerHeaderSize={props.orientation === "horizontal" ? ACROSS_HEADER_SIZE : DOWN_HEADER_SIZE}
-                ariaLabel={"Skills and what they unlock"}
+                ariaLabel={SKILLS_WHAT_THEY_UNLOCK_LABEL}
                 onActivate={props.onActivate}
                 renderConnector={props.renderConnector}
                 renderNode={renderBracketNode}

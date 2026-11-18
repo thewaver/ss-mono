@@ -4,6 +4,7 @@ import { Button, Sunburst, TreemapUtils } from "@thewaver/ss-components-react";
 import type { SunburstNode } from "@thewaver/ss-components-react";
 import { LIBRARY } from "@thewaver/ss-playground/App/LibraryTree.generated";
 import { formatLines } from "@thewaver/ss-playground/App/LibraryTree.utils";
+import { LIBRARY_S_SOURCE_LINES_LABEL } from "@thewaver/ss-playground/App/Pages/SunburstPage/SunburstPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/SunburstPage/SunburstPage.css";
 import { PAGE_SUNBURST_FAMILIES } from "@thewaver/ss-playground/App/StyledComponents/SunburstContent/SunburstContent.css";
 
@@ -43,7 +44,7 @@ export const LibraryExample = (props: Props) => {
                 branch={props.branch}
                 ringCount={props.ringCount}
                 zoomDurationMs={props.zoomDurationMs}
-                ariaLabel={"The library's source, by lines of code"}
+                ariaLabel={LIBRARY_S_SOURCE_LINES_LABEL}
                 renderArc={(node, state) => (
                     <PageSunburstArc
                         state={state}

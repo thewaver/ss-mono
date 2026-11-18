@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, shallowRef, useModel } from "vue";
 
+import { RGBAnimationKnobs } from "@thewaver/ss-playground/App/Knobs/RGBAnimations.const";
 import { STRESS_ITEMS } from "@thewaver/ss-playground/App/Pages/RGBAnimationPage/RGBAnimationPage.const";
 import type { BaseRGBAnimationExampleProps } from "@thewaver/ss-playground/App/Pages/RGBAnimationPage/RGBAnimationPage.types";
 
@@ -32,12 +33,7 @@ const sharedProps = computed(() => {
 
 <template>
     <PagePropsPanel scope="local" :has-reset="false">
-        <PageProp
-            item-key="onGraphicsCard"
-            label="On the graphics card"
-            hint="Draws the stress test's channels in one canvas per item, with the keyframes worked out on the graphics card. Off, every channel is an element of its own."
-            controls="Sets RGBAnimationProps.renderer in the stress test"
-        >
+        <PageProp item-key="onGraphicsCard" v-bind="RGBAnimationKnobs.ON_GRAPHICS_CARD_TEXT">
             <PageCheckField
                 :value="isOnGraphicsCard"
                 ariaLabel="On the graphics card"

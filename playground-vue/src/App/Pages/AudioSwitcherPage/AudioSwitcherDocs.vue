@@ -40,12 +40,7 @@ const src = computed(() => TRACKS.find((track) => track.name === trackName.value
         <BasicDocsExample :src="src" :crossfade-ms="crossfadeMs" :volume="volumePercent / PERCENT" />
 
         <template #renderKnobs>
-            <PageProp
-                item-key="track"
-                label="Track"
-                hint="Which piece is playing. Changing it while it plays is what the switcher crossfades."
-                controls="Picks the example track sent to AudioSwitcherProps.src"
-            >
+            <PageProp item-key="track" v-bind="AudioSwitcherKnobs.TRACK_TEXT">
                 <PageSelectField
                     :value="trackName"
                     :values="TRACK_NAMES"
@@ -55,12 +50,7 @@ const src = computed(() => TRACKS.find((track) => track.name === trackName.value
                 />
             </PageProp>
 
-            <PageProp
-                item-key="crossfadeMs"
-                label="Crossfade (ms)"
-                hint="How long the old track takes to fade out while the new one fades in."
-                controls="Sets AudioSwitcherProps.crossfadeMs"
-            >
+            <PageProp item-key="crossfadeMs" v-bind="AudioSwitcherKnobs.CROSSFADE_MS_TEXT">
                 <PageNumberField
                     :value="crossfadeMs"
                     :min="AudioSwitcherKnobs.MIN_CROSSFADE_MS"
@@ -72,12 +62,7 @@ const src = computed(() => TRACKS.find((track) => track.name === trackName.value
                 />
             </PageProp>
 
-            <PageProp
-                item-key="volume"
-                label="Volume (%)"
-                hint="How loud the playback is, apart from the system's own volume."
-                controls="Sets AudioSwitcherProps.volume, sent as a share of 1"
-            >
+            <PageProp item-key="volume" v-bind="AudioSwitcherKnobs.VOLUME_TEXT">
                 <PageNumberField
                     :value="volumePercent"
                     :min="AudioSwitcherKnobs.MIN_VOLUME_PERCENT"

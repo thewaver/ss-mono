@@ -43,4 +43,88 @@ export namespace ShapeKnobs {
     export const STARTING_FILL_PAINT_KIND: PaintKind = "solid";
     export const STARTING_ITERATION_KEY: SVGDefsSamples.Iteration.SampleKey = "constant";
     export const DURATION_STEP_MS = 100;
+
+    export const SHAPE_KIND_TEXT = {
+        label: "Shape",
+        hint: "The contour the shape is cut to, which also decides how many corners the corner fields offer.",
+        controls: "Picks the example contour sent to ShapeProps.computePoints",
+    };
+
+    export const HAS_INDIVIDUAL_CORNERS_TEXT = {
+        label: "Individual corner settings",
+        hint: "Opens one field per corner instead of one field driving all of them together.",
+        controls:
+            "Writes the corner fields below into every entry of ShapeProps.joinRadii and ShapeProps.lameExponents at once, or one entry each",
+    };
+
+    export const JOINT_RADII_PX_TEXT = {
+        label: "Joint Radii (px)",
+        hint: "How far each corner is rounded. With individual corners off, the first field drives them all.",
+        controls: "Sets ShapeProps.joinRadii",
+    };
+
+    export const LAME_EXPONENT_TEXT = {
+        label: "Lamé Exponent",
+        hint: "How square or how pinched each rounded corner is: 1 is a circular round, higher is squarer, 0 is a straight bevel and below 0 scoops inward.",
+        controls: "Sets ShapeProps.lameExponents",
+    };
+
+    export const SHOULD_CLIP_CHILDREN_TEXT = {
+        label: "Clip children",
+        hint: "Cuts whatever is inside the shape to the shape's own contour, instead of letting it spill past.",
+        controls: "Decides whether the example's ShapeProps.renderChildren applies the clip path it is handed",
+    };
+
+    export const SHOULD_PAD_CHILDREN_TEXT = {
+        label: "Pad children",
+        hint: "Insets whatever is inside far enough to clear the rounded corners, so text does not run under them.",
+        controls: "Decides whether the example's ShapeProps.renderChildren pads its content to the contour",
+    };
+
+    export const STAR_POINTS_TEXT = {
+        label: "Star points",
+        hint: "How many tips the star has. The contour carries twice as many points: one per tip, one per notch between tips.",
+        controls: "Sets the number of points of the example star sent to ShapeProps.computePoints",
+    };
+
+    export const CELL_SIZE_TEXT = {
+        label: "Pattern Cell Size (px)",
+        hint: "How large one tile of a pattern is before it repeats.",
+        controls:
+            "Sets the tile size of the example paints sent to ShapeProps.computeFillDefs and ShapeProps.computeStrokeDefs",
+    };
+
+    export const COLORS_TEXT = {
+        label: "Colors",
+        hint: "The colors the stroke, the fill and the page's own background are painted from.",
+        controls:
+            "Sets the colors of the example paints sent to ShapeProps.computeFillDefs and ShapeProps.computeStrokeDefs",
+    };
+
+    export const STROKE_THICKNESS_PX_TEXT = {
+        label: "Stroke Thickness (px)",
+        hint: "How thick the stroke is.",
+        controls: "Sets the thickness in the example's ShapeProps.strokeGeom",
+    };
+
+    export const BLUR_WIDTH_TEXT = {
+        label: "Blur (px)",
+        hint: "How far the stroke is blurred outward, which is what gives it its glow.",
+        controls:
+            "Sets the blur of the example paints sent to ShapeProps.computeFillDefs and ShapeProps.computeStrokeDefs",
+    };
+
+    export const ANIMATION_DURATION_MS_TEXT = {
+        label: "Animation duration (ms)",
+        hint: "How long one pass of the stroke or fill animation takes.",
+        controls:
+            "Sets the duration of the example paints sent to ShapeProps.computeFillDefs and ShapeProps.computeStrokeDefs",
+    };
+
+    export const ITERATION_CONFIG_KEY_TEXT = {
+        label: "Iteration Pattern",
+        hint: "How the animation repeats: once, endlessly, or back and forth.",
+        controls:
+            "Picks how the example paints repeat, sent to ShapeProps.computeFillDefs and ShapeProps.computeStrokeDefs",
+    };
 }

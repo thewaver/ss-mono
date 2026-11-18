@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import type { TableColumn, TableSort } from "@thewaver/ss-components-react";
 import { Table } from "@thewaver/ss-components-react";
+import { PARTS_SORTED_PAGE_LABEL } from "@thewaver/ss-playground/App/Pages/TablePage/TablePage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/TablePage/TablePage.css";
 
 import { PageTableHeader } from "../../../PageComponents/TableHeader/TableHeader";
@@ -70,7 +71,7 @@ export const ConsumerSortedDocsExample = () => {
                 rows={rows}
                 sort={sortState}
                 selection={selectionState}
-                ariaLabel={"Parts sorted by the page"}
+                ariaLabel={PARTS_SORTED_PAGE_LABEL}
                 onSortChange={reorder}
             />
         </div>

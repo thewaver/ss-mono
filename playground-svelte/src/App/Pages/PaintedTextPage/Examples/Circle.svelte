@@ -8,8 +8,7 @@
     import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
     import { computeSampleDefs } from "../PaintedTextPageSvelte.const";
     import type { PaintedTextCircleExampleProps } from "../PaintedTextPageSvelte.types";
-
-    const RING_TEXT = "PAINTED TEXT • ROUND A CIRCLE • ";
+    import { RING_TEXT } from "@thewaver/ss-playground/App/Pages/PaintedTextPage/PaintedTextPage.const";
 
     type Props = PaintedTextCircleExampleProps;
 

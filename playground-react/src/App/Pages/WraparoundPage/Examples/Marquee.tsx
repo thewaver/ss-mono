@@ -1,5 +1,8 @@
 import { Button, Wraparound } from "@thewaver/ss-components-react";
-import { MARQUEE_WORDS } from "@thewaver/ss-playground/App/Pages/WraparoundPage/WraparoundPage.const";
+import {
+    MARQUEE_WORDS,
+    TOOLS_LIBRARY_BUILT_DRIFTING_LABEL,
+} from "@thewaver/ss-playground/App/Pages/WraparoundPage/WraparoundPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/WraparoundPage/WraparoundPage.css";
 import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
@@ -12,7 +15,7 @@ export const MarqueeExample = (props: Props) => (
     <div className={styles.marqueeStack}>
         <div className={styles.marqueeStage}>
             <Wraparound
-                ariaLabel={"Tools this library is built with, drifting past"}
+                ariaLabel={TOOLS_LIBRARY_BUILT_DRIFTING_LABEL}
                 isMovable={false}
                 driftPxPerSecond={props.driftPxPerSecond}
                 driftDegrees={props.driftDegrees}

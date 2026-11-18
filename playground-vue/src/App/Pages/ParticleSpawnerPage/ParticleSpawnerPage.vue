@@ -176,12 +176,7 @@ const examples: ExampleDefs[] = [
 <template>
     <PagePropsGroups>
         <PagePropsPanel scope="sample">
-            <PageProp
-                item-key="travelPattern"
-                controls="Picks the example's travel path function sent to ParticleSpawnerProps.computeParticlePos"
-                label="Travel pattern"
-                hint="The path a particle takes from where it starts to where it ends. Choosing one brings its own knobs with it."
-            >
+            <PageProp item-key="travelPattern" v-bind="ParticleSpawnerKnobs.TRAVEL_PATTERN_TEXT">
                 <PageSelectField
                     :value="travelPatternKey"
                     :values="ParticleTravelPaths.PATH_TYPES"
@@ -203,12 +198,7 @@ const examples: ExampleDefs[] = [
         <PagePropsDivider />
 
         <PagePropsPanel scope="global">
-            <PageProp
-                item-key="particleCount"
-                controls="Sets ParticleSpawnerProps.particleCount"
-                label="Particle count"
-                hint="How many particles are sent on each round."
-            >
+            <PageProp item-key="particleCount" v-bind="ParticleSpawnerKnobs.PARTICLE_COUNT_TEXT">
                 <PageNumberField
                     :value="particleCount"
                     :min="ParticleSpawnerKnobs.MIN_PARTICLE_COUNT"
@@ -220,12 +210,7 @@ const examples: ExampleDefs[] = [
                 />
             </PageProp>
 
-            <PageProp
-                item-key="travelDurationMs"
-                controls="Sets ParticleSpawnerProps.travelDurationMs"
-                label="Travel (ms)"
-                hint="How long one particle takes to walk its path."
-            >
+            <PageProp item-key="travelDurationMs" v-bind="ParticleSpawnerKnobs.TRAVEL_DURATION_MS_TEXT">
                 <PageNumberField
                     :value="travelDurationMs"
                     :min="ParticleSpawnerKnobs.MIN_TRAVEL_DURATION_MS"
@@ -237,12 +222,7 @@ const examples: ExampleDefs[] = [
                 />
             </PageProp>
 
-            <PageProp
-                item-key="restDurationMs"
-                controls="Sets ParticleSpawnerProps.restDurationMs"
-                label="Rest duration (ms)"
-                hint="How long a particle stays put at the end of its path before it disappears."
-            >
+            <PageProp item-key="restDurationMs" v-bind="ParticleSpawnerKnobs.REST_DURATION_MS_TEXT">
                 <PageNumberField
                     :value="restDurationMs"
                     :min="ParticleSpawnerKnobs.MIN_RETENTION_MS"
@@ -254,12 +234,7 @@ const examples: ExampleDefs[] = [
                 />
             </PageProp>
 
-            <PageProp
-                item-key="spawnDelayMs"
-                controls="Sets ParticleSpawnerProps.spawnDelayMs"
-                label="Spawn delay (ms)"
-                hint="How long each particle waits after the one before it sets off, which is what staggers them."
-            >
+            <PageProp item-key="spawnDelayMs" v-bind="ParticleSpawnerKnobs.SPAWN_DELAY_MS_TEXT">
                 <PageNumberField
                     :value="spawnDelayMs"
                     :min="ParticleSpawnerKnobs.MIN_SPAWN_DELAY_MS"
@@ -271,12 +246,7 @@ const examples: ExampleDefs[] = [
                 />
             </PageProp>
 
-            <PageProp
-                item-key="iterationPattern"
-                controls="Picks the example's list of rounds sent to ParticleSpawnerProps.spawnIterationPatterns"
-                label="Iteration pattern"
-                hint="How the rounds follow each other: in bursts of three with a pause, one at a time with a pause, or without any pause at all."
-            >
+            <PageProp item-key="iterationPattern" v-bind="ParticleSpawnerKnobs.ITERATION_PATTERN_TEXT">
                 <PageSelectField
                     :value="iterationPatternKey"
                     :values="ParticleIterationPatterns.PATTERN_TYPES"
@@ -286,12 +256,7 @@ const examples: ExampleDefs[] = [
                 />
             </PageProp>
 
-            <PageProp
-                item-key="overshootPercent"
-                controls="Sets how far the example's travel path runs past its end, sent to ParticleSpawnerProps.computeParticlePos"
-                label="Overshoot (%)"
-                hint="How far a particle runs past its destination before coming back to it. 0 stops it dead on target."
-            >
+            <PageProp item-key="overshootPercent" v-bind="ParticleSpawnerKnobs.OVERSHOOT_PERCENT_TEXT">
                 <PageNumberField
                     :value="overshootPercent"
                     :min="ParticleSpawnerKnobs.MIN_OVERSHOOT_PERCENT"
@@ -316,12 +281,7 @@ const examples: ExampleDefs[] = [
                 />
             </PageProp>
 
-            <PageProp
-                item-key="travelEasing"
-                controls="Picks the speed curve of the example's travel path, sent to ParticleSpawnerProps.computeParticlePos"
-                label="Travel easing"
-                hint="The speed curve a particle follows along its path."
-            >
+            <PageProp item-key="travelEasing" v-bind="ParticleSpawnerKnobs.TRAVEL_EASING_TEXT">
                 <PageSelectField
                     :value="travelEasingKey"
                     :values="ParticleTravelEasings.EASING_TYPES"
@@ -335,7 +295,11 @@ const examples: ExampleDefs[] = [
 
     <PageExamples :items="examples" layout="flow">
         <template #singleTarget>
-            <ScrubbedExampleWrapper id="singleTarget" :is-page-playing="playback" v-model:playback="singleTargetPlayback">
+            <ScrubbedExampleWrapper
+                id="singleTarget"
+                :is-page-playing="playback"
+                v-model:playback="singleTargetPlayback"
+            >
                 <template #default="{ playback: examplePlayback, progress }">
                     <SingleTargetExample
                         v-bind="commonProps"
@@ -371,7 +335,11 @@ const examples: ExampleDefs[] = [
         </template>
 
         <template #movingTarget>
-            <ScrubbedExampleWrapper id="movingTarget" :is-page-playing="playback" v-model:playback="movingTargetPlayback">
+            <ScrubbedExampleWrapper
+                id="movingTarget"
+                :is-page-playing="playback"
+                v-model:playback="movingTargetPlayback"
+            >
                 <template #default="{ playback: examplePlayback, progress }">
                     <MovingTargetExample
                         v-bind="commonProps"
@@ -420,7 +388,11 @@ const examples: ExampleDefs[] = [
         </template>
 
         <template #wind>
-            <WindExampleWrapper :example-props="commonProps" :is-page-playing="playback" v-model:playback="windPlayback" />
+            <WindExampleWrapper
+                :example-props="commonProps"
+                :is-page-playing="playback"
+                v-model:playback="windPlayback"
+            />
         </template>
 
         <template #attraction>
@@ -432,7 +404,11 @@ const examples: ExampleDefs[] = [
         </template>
 
         <template #multipleTargets>
-            <ScrubbedExampleWrapper id="multipleTargets" :is-page-playing="playback" v-model:playback="multipleTargetsPlayback">
+            <ScrubbedExampleWrapper
+                id="multipleTargets"
+                :is-page-playing="playback"
+                v-model:playback="multipleTargetsPlayback"
+            >
                 <template #default="{ playback: examplePlayback, progress }">
                     <MultipleTargetsExample
                         v-bind="commonProps"

@@ -7,6 +7,7 @@
     import type { BracketExampleProps } from "../BracketPage.types";
     import PageBracketLayerHeader from "../PageBracketLayerHeader.svelte";
     import PageBracketNode from "../PageBracketNode.svelte";
+    import { SKILLS_WHAT_THEY_UNLOCK_LABEL } from "@thewaver/ss-playground/App/Pages/BracketPage/BracketPage.const";
 
     const NODE_SIZE = { width: 80, height: 36 };
     const TIER_NAMES = ["Tier 4", "Tier 3", "Tier 2", "Tier 1"];
@@ -33,7 +34,7 @@
         orientation={props.orientation}
         rootSide={props.rootSide}
         layerHeaderSize={props.orientation === "horizontal" ? ACROSS_HEADER_SIZE : DOWN_HEADER_SIZE}
-        ariaLabel={"Skills and what they unlock"}
+        ariaLabel={SKILLS_WHAT_THEY_UNLOCK_LABEL}
         onActivate={props.onActivate}
         renderConnector={props.renderConnector}
     >

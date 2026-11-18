@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { Clock } from "@thewaver/ss-components-react";
+import { TIME_RIGHT_LEFT_BOX_LABEL } from "@thewaver/ss-playground/App/Pages/ClockPage/ClockPage.const";
 import { LOCALE } from "@thewaver/ss-playground/App/Pages/DatePickerPage/DatePickerPage.const";
 import type { TimeValue } from "@thewaver/ss-utils";
 
@@ -20,7 +21,7 @@ export const RightToLeftDocsExample = () => {
                 <Clock
                     value={valueState}
                     locale={LOCALE}
-                    ariaLabel={"Time in a right-to-left box"}
+                    ariaLabel={TIME_RIGHT_LEFT_BOX_LABEL}
                     renderOption={(_unused, renderProps) => <PageClockOption renderProps={renderProps} />}
                     renderUnit={(name) => <PageClockUnit>{name}</PageClockUnit>}
                     renderColumn={(renderOptions) => <PageClockColumn>{renderOptions()}</PageClockColumn>}

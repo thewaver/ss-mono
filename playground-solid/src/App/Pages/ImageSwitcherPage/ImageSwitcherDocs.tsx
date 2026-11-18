@@ -34,14 +34,7 @@ export const ImageSwitcherDocs = () => {
             path={`${DOCS_ROOT}/Basic.tsx`}
             renderKnobs={() => (
                 <>
-                    <PageProp
-                        key={"sourceType"}
-                        label={"Source"}
-                        hint={
-                            "Which picture to show. Switching crossfades from the old one once the new one has loaded; missing_file points at a file that does not exist, and none passes no source at all."
-                        }
-                        controls={"Picks the example picture sent to ImageSwitcherProps.src and ImageSwitcherProps.alt"}
-                    >
+                    <PageProp key={"sourceType"} {...ImageSwitcherKnobs.SOURCE_TYPE_TEXT}>
                         <PageSelectField
                             value={getSourceType}
                             values={ImageSwitcherKnobs.SOURCE_TYPES}
@@ -50,12 +43,7 @@ export const ImageSwitcherDocs = () => {
                         />
                     </PageProp>
 
-                    <PageProp
-                        key={"transitionDurationMs"}
-                        label={"Transition duration (ms)"}
-                        hint={"How long the crossfade from one picture to the next takes."}
-                        controls={"Sets ImageSwitcherProps.transitionDurationMs"}
-                    >
+                    <PageProp key={"transitionDurationMs"} {...ImageSwitcherKnobs.TRANSITION_DURATION_MS_TEXT}>
                         <PageNumberField
                             value={getTransitionDurationMs}
                             min={ImageSwitcherKnobs.MIN_DURATION_MS}

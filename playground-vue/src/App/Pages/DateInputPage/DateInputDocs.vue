@@ -3,10 +3,12 @@ import { shallowRef } from "vue";
 
 import type { DateInputFormat, DateValueCalendarId } from "@thewaver/ss-components-vue";
 import { DATE_INPUT_FORMATS, DateValueUtils } from "@thewaver/ss-components-vue";
+import { DateInputKnobs } from "@thewaver/ss-playground/App/Knobs/DateInputs.const";
 import { OTHER_CALENDAR } from "@thewaver/ss-playground/App/Pages/CalendarPage/CalendarPage.const";
 import {
     CALENDAR_FIELD_WIDTH,
     DOCS_ROOT,
+    DOCS_SECTIONS,
     FORMAT_FIELD_WIDTH,
 } from "@thewaver/ss-playground/App/Pages/DateInputPage/DateInputPage.const";
 
@@ -37,12 +39,7 @@ const isTooltipDisabled = shallowRef(false);
         <BasicDocsExample :is-read-only="isReadOnly" :has-error="hasError" :is-disabled="isDisabled" />
 
         <template #renderKnobs>
-            <PageProp
-                item-key="isReadOnly"
-                label="Read-only"
-                hint="Its date can be selected and copied, but neither typing nor pasting changes it."
-                controls="Sets DateInputProps.isReadOnly"
-            >
+            <PageProp item-key="isReadOnly" v-bind="DateInputKnobs.IS_READ_ONLY_TEXT">
                 <PageCheckField
                     :value="isReadOnly"
                     ariaLabel="Read-only"
@@ -50,21 +47,11 @@ const isTooltipDisabled = shallowRef(false);
                 />
             </PageProp>
 
-            <PageProp
-                item-key="hasError"
-                label="Error"
-                hint="Marks the field invalid, for screen readers as well as for the painter. The field also marks itself while what it shows is not a date."
-                controls="Sets DateInputProps.hasError"
-            >
+            <PageProp item-key="hasError" v-bind="DateInputKnobs.HAS_ERROR_TEXT">
                 <PageCheckField :value="hasError" ariaLabel="Error" @change="(value: boolean) => (hasError = value)" />
             </PageProp>
 
-            <PageProp
-                item-key="isDisabled"
-                label="Disabled"
-                hint="Turns the field off: nothing can write to it, it shows no caret, and the Tab key skips it."
-                controls="Sets DateInputProps.isDisabled"
-            >
+            <PageProp item-key="isDisabled" v-bind="DateInputKnobs.IS_DISABLED_TEXT">
                 <PageCheckField
                     :value="isDisabled"
                     ariaLabel="Disabled"
@@ -74,21 +61,13 @@ const isTooltipDisabled = shallowRef(false);
         </template>
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Written day first"
-        content="The parts of the date are typed in the order [prop]format[/prop] names: year first by default, or day first, or month first. Only digits are typed, and the field adds each separator as soon as the part before it is complete. The value is the same date in any order, as the line under the field shows."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.writtenDayFirst" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/DayFirst.vue`">
         <DayFirstDocsExample :format="format" />
 
         <template #renderKnobs>
-            <PageProp
-                item-key="format"
-                label="Format"
-                hint="The order the parts of the date are typed in, and the separator between them."
-                controls="Sets DateInputProps.format"
-            >
+            <PageProp item-key="format" v-bind="DateInputKnobs.FORMAT_TEXT">
                 <PageSelectField
                     :value="format"
                     :values="DATE_INPUT_FORMATS"
@@ -100,30 +79,19 @@ const isTooltipDisabled = shallowRef(false);
         </template>
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Before the common era"
-        content="A date carries its era, and the digits typed cannot say which one it is. Draw a control in [prop]renderLeading[/prop], which is handed the date's era, the eras its calendar offers and a way to change it, and this date of 44 BC can be moved to AD and back."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.beforeCommonEra" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Era.vue`">
         <EraDocsExample />
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Other calendar systems"
-        content="Set [prop]calendar[/prop] and the date is read and written in that calendar system while the value stays the same day, as the line under the field shows. A calendar with one era, such as the Hebrew one, gives the era control nothing to offer, so it is not drawn."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.otherCalendarSystems" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Calendars.vue`">
         <CalendarsDocsExample :calendar="calendarId" />
 
         <template #renderKnobs>
-            <PageProp
-                item-key="calendar"
-                label="Calendar"
-                hint="Which calendar system the date is read and written in."
-                controls="Sets DateInputProps.calendar"
-            >
+            <PageProp item-key="calendar" v-bind="DateInputKnobs.CALENDAR_TEXT">
                 <PageSelectField
                     :value="calendarId"
                     :values="DateValueUtils.getCalendarIds()"
@@ -135,19 +103,13 @@ const isTooltipDisabled = shallowRef(false);
         </template>
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Right to left"
-        content="Inside a box whose text runs right to left, the leading content moves to the right, where reading starts, and the text lines up on the right. The date is still written year first, since digits run left to right in either direction."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.rightLeft" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/RightToLeft.vue`">
         <RightToLeftDocsExample />
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Tooltip"
-        content="Give a field [prop]tooltipDefs[/prop] and it shows a tooltip on hover and on keyboard focus, read by screen readers as the field's description. A disabled field shows no tooltip unless you also keep it reachable when disabled; it can then be focused to read why it is off, and typing still changes nothing."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.tooltip" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Tooltip.vue`">
         <TooltipDocsExample :is-disabled="isTooltipDisabled" :is-reachable-when-disabled="isReachableWhenDisabled" />
@@ -155,9 +117,7 @@ const isTooltipDisabled = shallowRef(false);
         <template #renderKnobs>
             <PageProp
                 item-key="tooltipIsReachableWhenDisabled"
-                label="Reachable when disabled"
-                hint="Keeps a disabled field's tooltip available: the Tab key can stop on it and hovering it shows the tooltip. Without it a disabled field shows no tooltip at all. It only matters while Disabled is on."
-                controls="Sets DateInputProps.isReachableWhenDisabled"
+                v-bind="DateInputKnobs.TOOLTIP_IS_REACHABLE_WHEN_DISABLED_TEXT"
             >
                 <PageCheckField
                     :value="isReachableWhenDisabled"
@@ -166,12 +126,7 @@ const isTooltipDisabled = shallowRef(false);
                 />
             </PageProp>
 
-            <PageProp
-                item-key="tooltipIsDisabled"
-                label="Disabled"
-                hint="Turns the field off: nothing can write to it, it shows no caret, and the Tab key skips it."
-                controls="Sets DateInputProps.isDisabled"
-            >
+            <PageProp item-key="tooltipIsDisabled" v-bind="DateInputKnobs.IS_DISABLED_TEXT">
                 <PageCheckField
                     :value="isTooltipDisabled"
                     ariaLabel="Disabled"
@@ -181,10 +136,7 @@ const isTooltipDisabled = shallowRef(false);
         </template>
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Named by a Label"
-        content="Inside a Label, the field takes its name from the label's text, so it needs no [prop]ariaLabel[/prop], and pressing the text focuses the field."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.namedLabel" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Labeled.vue`">
         <LabeledDocsExample />

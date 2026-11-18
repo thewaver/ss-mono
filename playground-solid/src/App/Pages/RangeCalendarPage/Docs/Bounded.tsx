@@ -3,6 +3,7 @@ import { createSignal } from "solid-js";
 import type { DateValueRange } from "@thewaver/ss-components-solid";
 import { DateValueUtils, RangeCalendar } from "@thewaver/ss-components-solid";
 import { LOCALE, MAX_DATE, MIN_DATE, TODAY } from "@thewaver/ss-playground/App/Pages/CalendarPage/CalendarPage.const";
+import { CHOOSE_DATE_RANGE_WITHIN_LABEL } from "@thewaver/ss-playground/App/Pages/RangeCalendarPage/RangeCalendarPage.const";
 
 import { PageCalendarCaption } from "../../../PageComponents/CalendarCaption/CalendarCaption";
 import {
@@ -26,7 +27,7 @@ export const BoundedDocsExample = () => {
                 locale={LOCALE}
                 minValue={MIN_DATE}
                 maxValue={MAX_DATE}
-                ariaLabel={"Choose a date range within the bounds"}
+                ariaLabel={CHOOSE_DATE_RANGE_WITHIN_LABEL}
                 renderDay={(_unused, getRenderProps) => <PageCalendarDay renderProps={getRenderProps} />}
                 renderWeekday={(name) => <PageCalendarWeekday>{name}</PageCalendarWeekday>}
             />

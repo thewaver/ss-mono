@@ -4,6 +4,11 @@ import { createSignal } from "solid-js";
 import { Button, Form, FormField, FormSection, TextInput } from "@thewaver/ss-components-solid";
 import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
 import {
+    DOES_NOT_LOOK_LIKE_TEXT,
+    MISMATCH_MESSAGE,
+    SOME_FIELDS_NEED_ATTENTION_TEXT,
+} from "@thewaver/ss-playground/App/Pages/FormSectionPage/FormSectionPage.const";
+import {
     FIELD_GAP,
     FIELD_PADDING,
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
@@ -21,8 +26,6 @@ import { PageTextFieldContent } from "../../../StyledComponents/TextFieldContent
 
 const FIELD_WIDTH = 240;
 const MIN_PASSWORD_LENGTH = 8;
-const MISMATCH_MESSAGE = "The two passwords do not match.";
-
 const renderTextField = (signal: Signal<string>, getHasError?: () => boolean) => (
     <TextInput
         value={signal}
@@ -39,7 +42,7 @@ export const SectionsDocsExample = () => {
     const confirmSignal = createSignal("");
     const [getOutcome, setOutcome] = createSignal("Not sent yet.");
 
-    const getEmailMessage = () => (emailSignal[0]().includes("@") ? "" : "That does not look like an email address.");
+    const getEmailMessage = () => (emailSignal[0]().includes("@") ? "" : DOES_NOT_LOOK_LIKE_TEXT);
 
     const getPasswordMessage = () =>
         passwordSignal[0]().length >= MIN_PASSWORD_LENGTH ? "" : `At least ${MIN_PASSWORD_LENGTH} characters.`;
@@ -130,7 +133,7 @@ export const SectionsDocsExample = () => {
                     </PageFormButtons>
 
                     <div class={exampleStyles.exampleReadout} data-readout>
-                        {`${getState().isValid ? "Ready to send." : "Some fields need attention."} ${getOutcome()}`}
+                        {`${getState().isValid ? "Ready to send." : SOME_FIELDS_NEED_ATTENTION_TEXT} ${getOutcome()}`}
                     </div>
                 </PageFormStack>
             )}

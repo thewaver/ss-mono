@@ -44,12 +44,7 @@ const examples: ExampleDefs[] = [
 
 <template>
     <PagePropsPanel scope="global">
-        <PageProp
-            item-key="columnCount"
-            controls="Sets IcicleProps.columnCount"
-            label="Columns"
-            hint="How many levels fit across at once, counting the one in view."
-        >
+        <PageProp item-key="columnCount" v-bind="IcicleKnobs.COLUMN_COUNT_TEXT">
             <PageNumberField
                 :value="columnCount"
                 :min="IcicleKnobs.MIN_COLUMN_COUNT"
@@ -60,12 +55,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="zoomDurationMs"
-            controls="Sets IcicleProps.zoomDurationMs"
-            label="Zoom duration (ms)"
-            hint="How long a zoom in or out takes. It is off while the visitor has asked for reduced motion, and 0 jumps straight to the new view."
-        >
+        <PageProp item-key="zoomDurationMs" v-bind="IcicleKnobs.ZOOM_DURATION_MS_TEXT">
             <PageNumberField
                 :value="zoomDurationMs"
                 :min="IcicleKnobs.MIN_ZOOM_DURATION_MS"

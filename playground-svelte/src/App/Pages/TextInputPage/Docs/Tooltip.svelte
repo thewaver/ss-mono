@@ -9,6 +9,7 @@
     import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
     import PageTooltipContent from "../../../StyledComponents/TooltipContent/TooltipContent.svelte";
     import type { TextInputTooltipDocsExampleProps } from "../TextInputPageSvelte.types";
+    import { FIELD_TOOLTIP_LABEL } from "@thewaver/ss-playground/App/Pages/TextInputPage/TextInputPage.const";
 
     type Props = TextInputTooltipDocsExampleProps;
 
@@ -23,7 +24,7 @@
     gap={FIELD_GAP}
     isDisabled={props.isDisabled}
     isReachableWhenDisabled={props.isReachableWhenDisabled}
-    ariaLabel={"Field with a tooltip"}
+    ariaLabel={FIELD_TOOLTIP_LABEL}
     tooltipDefs={{
         placement: { x: "center", y: "top_out" },
         offset: { x: 0, y: 10 },

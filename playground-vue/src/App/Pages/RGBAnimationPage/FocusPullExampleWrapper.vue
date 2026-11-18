@@ -56,12 +56,7 @@ const sharedProps = computed(() => {
     </div>
 
     <PageExampleKnobs>
-        <PageProp
-            item-key="maxBlurPx"
-            controls="Sets the example's blur, read by its RGBAnimationProps.computeSliceAnimation"
-            label="Blur (px)"
-            hint="How soft each channel goes at the worst of its turn out of focus."
-        >
+        <PageProp item-key="maxBlurPx" v-bind="RGBAnimationKnobs.MAX_BLUR_PX_TEXT">
             <PageNumberField
                 :value="maxBlurPx"
                 :min="RGBAnimationKnobs.MIN_FOCUS_BLUR_PX"

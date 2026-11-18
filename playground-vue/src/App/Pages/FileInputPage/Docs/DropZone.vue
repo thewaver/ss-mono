@@ -5,6 +5,7 @@ import { FileInput } from "@thewaver/ss-components-vue";
 import type { FileInputRejection } from "@thewaver/ss-components-vue";
 import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
 import {
+    DROP_IMAGES_HERE_PRESS_TEXT,
     DROP_ZONE_ACCEPT,
     DROP_ZONE_MAX_FILES,
     DROP_ZONE_MAX_SIZE_BYTES,
@@ -47,7 +48,7 @@ const readout = computed(
         <template #renderContent="renderProps">
             <PageFileDropZoneContent
                 :render-props="renderProps"
-                :prompt="renderProps.isDragOver ? 'Let go to add them' : 'Drop images here, or press to choose'"
+                :prompt="renderProps.isDragOver ? 'Let go to add them' : DROP_IMAGES_HERE_PRESS_TEXT"
             />
         </template>
     </FileInput>

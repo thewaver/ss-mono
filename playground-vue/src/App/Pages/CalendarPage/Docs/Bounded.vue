@@ -3,7 +3,13 @@ import { shallowRef } from "vue";
 
 import type { DateValue } from "@thewaver/ss-components-vue";
 import { Calendar, DateValueUtils } from "@thewaver/ss-components-vue";
-import { LOCALE, MAX_DATE, MIN_DATE, TODAY } from "@thewaver/ss-playground/App/Pages/CalendarPage/CalendarPage.const";
+import {
+    CHOOSE_DATE_WITHIN_AUGUST_LABEL,
+    LOCALE,
+    MAX_DATE,
+    MIN_DATE,
+    TODAY,
+} from "@thewaver/ss-playground/App/Pages/CalendarPage/CalendarPage.const";
 
 import PageCalendarCaption from "../../../PageComponents/CalendarCaption/CalendarCaption.vue";
 import PageCalendarDay from "../../../StyledComponents/CalendarContent/PageCalendarDay.vue";
@@ -25,7 +31,7 @@ const month = shallowRef(DateValueUtils.getStartOfMonth(TODAY));
             :locale="LOCALE"
             :min-value="MIN_DATE"
             :max-value="MAX_DATE"
-            ariaLabel="Choose a date within August"
+            :ariaLabel="CHOOSE_DATE_WITHIN_AUGUST_LABEL"
         >
             <template #renderDay="{ flags }">
                 <PageCalendarDay :render-props="flags" />

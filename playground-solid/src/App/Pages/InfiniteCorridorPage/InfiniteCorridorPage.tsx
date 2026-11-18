@@ -39,14 +39,7 @@ const ScrolledExampleWrapper = (props: InfiniteCorridorExampleProps) => {
             <ScrolledExample {...props} scrollLength={getScrollLength} />
 
             <PageExampleKnobs>
-                <PageProp
-                    key={"scrollLength"}
-                    label={"Scroll length"}
-                    hint={
-                        "How far the box scrolls to walk one lap of the corridor, in heights of the box. Longer is slower."
-                    }
-                    controls={"Sets how long the example scroll runway that drives InfiniteCorridorProps.progress is"}
-                >
+                <PageProp key={"scrollLength"} {...InfiniteCorridorKnobs.SCROLL_LENGTH_TEXT}>
                     <PageNumberField
                         value={getScrollLength}
                         min={InfiniteCorridorKnobs.MIN_SCROLL_LENGTH}
@@ -72,14 +65,7 @@ const ClockExampleWrapper = (props: InfiniteCorridorExampleProps & AccessorValue
             <ClockExample {...props} lapMs={getLapMs} />
 
             <PageExampleKnobs>
-                <PageProp
-                    key={"lapMs"}
-                    label={"Lap (ms)"}
-                    hint={
-                        "How long the clock takes to walk the whole corridor once, past every room and back to the first."
-                    }
-                    controls={"Sets how fast the example clock advances InfiniteCorridorProps.progress"}
-                >
+                <PageProp key={"lapMs"} {...InfiniteCorridorKnobs.LAP_MS_TEXT}>
                     <PageNumberField
                         value={getLapMs}
                         resetValue={() => access(props.startingLapMs)}
@@ -156,14 +142,7 @@ export const InfiniteCorridorPage = () => {
         <>
             <PagePropsGroups>
                 <PagePropsPanel scope={"sample"}>
-                    <PageProp
-                        key={"layout"}
-                        label={"Layout"}
-                        hint={
-                            "Where the items stand: walls is one row on each wall, from flat against it to turned towards the viewer, and tube lines the inside of a ring of sides, every item upright towards the center. Choosing one brings its own knobs with it."
-                        }
-                        controls={"Picks the sample layout sent to InfiniteCorridorProps.layout"}
-                    >
+                    <PageProp key={"layout"} {...InfiniteCorridorKnobs.LAYOUT_TEXT}>
                         <PageSelectField
                             value={getLayoutKey}
                             values={CorridorLayouts.SAMPLE_KEYS}
@@ -184,16 +163,7 @@ export const InfiniteCorridorPage = () => {
                     />
 
                     <Show when={getFamily() === "tube"}>
-                        <PageProp
-                            key={"spinDegreesPerSecond"}
-                            label={"Rotation speed (°/s)"}
-                            hint={
-                                "How fast the tube spins round its axis, whatever the corridor's position. The page turns the layout's spinDegrees on a clock; 0 stops it, and below 0 spins it the other way."
-                            }
-                            controls={
-                                "Sets how fast the example turns the tube layout sent to InfiniteCorridorProps.layout"
-                            }
-                        >
+                        <PageProp key={"spinDegreesPerSecond"} {...InfiniteCorridorKnobs.SPIN_DEGREES_PER_SECOND_TEXT}>
                             <PageNumberField
                                 value={getSpinDegreesPerSecond}
                                 min={CorridorLayoutKnobs.MIN_SPIN_DEGREES_PER_SECOND}
@@ -210,14 +180,7 @@ export const InfiniteCorridorPage = () => {
                 <PagePropsDivider />
 
                 <PagePropsPanel scope={"global"}>
-                    <PageProp
-                        key={"itemCount"}
-                        label={"Item count"}
-                        hint={
-                            "How many rooms line the corridor. Too few to fill it are repeated, and only the copy nearest the viewer can be reached."
-                        }
-                        controls={"Sets the number of example rooms sent to InfiniteCorridorProps.items"}
-                    >
+                    <PageProp key={"itemCount"} {...InfiniteCorridorKnobs.ITEM_COUNT_TEXT}>
                         <PageNumberField
                             value={getItemCount}
                             min={InfiniteCorridorKnobs.MIN_ITEM_COUNT}
@@ -229,14 +192,7 @@ export const InfiniteCorridorPage = () => {
                         />
                     </PageProp>
 
-                    <PageProp
-                        key={"glideDurationMs"}
-                        label={"Glide (ms)"}
-                        hint={
-                            "How long the corridor takes to bring a room into view when it is tabbed to from out of view. It times nothing else, so it shows only on Tab."
-                        }
-                        controls={"Sets InfiniteCorridorProps.glideDurationMs"}
-                    >
+                    <PageProp key={"glideDurationMs"} {...InfiniteCorridorKnobs.GLIDE_DURATION_MS_TEXT}>
                         <PageNumberField
                             value={getGlideDurationMs}
                             min={InfiniteCorridorKnobs.MIN_GLIDE_DURATION_MS}

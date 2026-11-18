@@ -3,7 +3,13 @@ import { shallowRef } from "vue";
 
 import type { DateValue } from "@thewaver/ss-components-vue";
 import { Calendar, DateValueUtils } from "@thewaver/ss-components-vue";
-import { LOCALE, MAX_YEAR, MIN_YEAR, TODAY } from "@thewaver/ss-playground/App/Pages/CalendarPage/CalendarPage.const";
+import {
+    LOCALE,
+    MAX_YEAR,
+    MIN_YEAR,
+    PREVIOUS_TWELVE_YEARS_TEXT,
+    TODAY,
+} from "@thewaver/ss-playground/App/Pages/CalendarPage/CalendarPage.const";
 
 import PageCalendarPagedCaption from "../../../PageComponents/CalendarCaption/CalendarPagedCaption.vue";
 import PageCalendarCell from "../../../StyledComponents/CalendarContent/PageCalendarCell.vue";
@@ -22,7 +28,7 @@ const month = shallowRef(DateValueUtils.getStartOfMonth(TODAY));
             item-key="yearPicker"
             :locale="LOCALE"
             precision="year"
-            previous-label="Previous twelve years"
+            :previous-label="PREVIOUS_TWELVE_YEARS_TEXT"
             next-label="Next twelve years"
         />
 

@@ -4,6 +4,7 @@
 
     import { pageColorPickerSlots } from "../../../PageComponents/ColorPicker/ColorPicker.svelte";
     import PageColorInputContent from "../../../StyledComponents/ColorInputContent/ColorInputContent.svelte";
+    import { BRAND_COLOR_RIGHT_LEFT_LABEL } from "@thewaver/ss-playground/App/Pages/ColorInputPage/ColorInputPage.const";
 
     let value = $state("rgb(51 102 255)");
 </script>
@@ -12,7 +13,7 @@
     <ColorInput
         {...pageColorPickerSlots}
         bind:value
-        ariaLabel={"Brand color in a right-to-left box"}
+        ariaLabel={BRAND_COLOR_RIGHT_LEFT_LABEL}
         {...COLOR_INPUT_LABELS}
     >
         {#snippet renderContent(renderProps)}

@@ -6,6 +6,7 @@
     import type { ToastDefs } from "../../../StyledComponents/ToastContent/ToastContentSvelte.types";
     import type { ToastsPlacementDocsExampleProps } from "../ToastsPageSvelte.types";
     import PlacementRaisers from "./PlacementRaisers.svelte";
+    import { PLACEMENT_NOTIFICATIONS_LABEL } from "@thewaver/ss-playground/App/Pages/ToastsPage/ToastsPage.const";
 
     type Props = ToastsPlacementDocsExampleProps;
 
@@ -13,7 +14,7 @@
 </script>
 
 <Toasts
-    ariaLabel={"Placement notifications"}
+    ariaLabel={PLACEMENT_NOTIFICATIONS_LABEL}
     alignment={props.alignment}
     flexDirection={props.flexDirection}
     gap={props.gap}

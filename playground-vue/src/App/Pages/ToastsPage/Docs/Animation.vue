@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Toasts } from "@thewaver/ss-components-vue";
+import { ANIMATED_NOTIFICATIONS_LABEL } from "@thewaver/ss-playground/App/Pages/ToastsPage/ToastsPage.const";
 
 import PageToastContent from "../../../StyledComponents/ToastContent/ToastContent.vue";
 import type { ToastsAnimationDocsExampleProps } from "../ToastsPageVue.types";
@@ -9,7 +10,11 @@ defineProps<ToastsAnimationDocsExampleProps>();
 </script>
 
 <template>
-    <Toasts ariaLabel="Animated notifications" alignment="top_left" :transition-duration-ms="transitionDurationMs">
+    <Toasts
+        :ariaLabel="ANIMATED_NOTIFICATIONS_LABEL"
+        alignment="top_left"
+        :transition-duration-ms="transitionDurationMs"
+    >
         <AnimationRaisers />
 
         <template

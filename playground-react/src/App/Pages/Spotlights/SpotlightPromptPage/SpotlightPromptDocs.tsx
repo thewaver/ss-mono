@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { SPOTLIGHT_DEFAULTS } from "@thewaver/ss-components-react";
+import { SpotlightPromptKnobs } from "@thewaver/ss-playground/App/Knobs/SpotlightPrompts.const";
 import { SpotlightKnobs } from "@thewaver/ss-playground/App/Knobs/Spotlights.const";
 import { WCAG_URLS } from "@thewaver/ss-playground/App/PageComponents/DocsProse/DocsProse.const";
 import { DOCS_ROOT } from "@thewaver/ss-playground/App/Pages/Spotlights/SpotlightPromptPage/SpotlightPromptPage.const";
@@ -31,14 +32,7 @@ export const SpotlightPromptDocs = () => {
                 path={`${DOCS_ROOT}/Basic.tsx`}
                 renderKnobs={() => (
                     <>
-                        <PageProp
-                            itemKey={"padding"}
-                            label={"Padding (px)"}
-                            hint={
-                                "How much room is left around the lit element, so the hole is not cut tight against it."
-                            }
-                            controls={"Sets SpotlightPromptProps.padding"}
-                        >
+                        <PageProp itemKey={"padding"} {...SpotlightPromptKnobs.PADDING_TEXT}>
                             <PageNumberField
                                 value={padding}
                                 min={SpotlightKnobs.MIN_PADDING}
@@ -52,9 +46,7 @@ export const SpotlightPromptDocs = () => {
 
                         <PageProp
                             itemKey={"transitionDurationMs"}
-                            label={"Transition duration (ms)"}
-                            hint={"How long the prompt takes to fade in and out. At 0 it appears and goes at once."}
-                            controls={"Sets SpotlightPromptProps.transitionDurationMs"}
+                            {...SpotlightPromptKnobs.TRANSITION_DURATION_MS_TEXT}
                         >
                             <PageNumberField
                                 value={transitionDurationMs}

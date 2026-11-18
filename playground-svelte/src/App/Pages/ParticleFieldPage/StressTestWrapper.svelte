@@ -11,6 +11,7 @@
         STRESS_CELL_COUNT,
         STRESS_ITEM_SIZE,
     } from "@thewaver/ss-playground/App/Pages/ParticleFieldPage/ParticleFieldPage.const";
+    import { ParticleFieldKnobs } from "@thewaver/ss-playground/App/Knobs/ParticleFields.const";
 
     const STRESS_ITEMS: (StressTestDefs & { size: number })[] = [
         { count: 4 * 3, cols: 4, gap: 10, size: STRESS_ITEM_SIZE },
@@ -30,9 +31,7 @@
 <PagePropsPanel scope={"local"} hasReset={false}>
     <PageProp
         itemKey={"onGraphicsCard"}
-        label={"On the graphics card"}
-        hint={"Draws the stress test's particles in one canvas per field, with the keyframes worked out on the graphics card. Off, every particle is an element of its own."}
-        controls={"Sets ParticleFieldProps.renderer in the stress test"}
+        {...ParticleFieldKnobs.ON_GRAPHICS_CARD_TEXT}
     >
         <PageCheckField
             value={isOnGraphicsCard}

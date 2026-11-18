@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { Button, CommandPalette, TextInput } from "@thewaver/ss-components-react";
 import type { CommandPaletteItem } from "@thewaver/ss-components-react";
 import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
+import { SEARCH_GREETINGS_LABEL } from "@thewaver/ss-playground/App/Pages/Menus/CommandPalettePage/CommandPalettePage.const";
 import { CommandPalettePageUtils } from "@thewaver/ss-playground/App/Pages/Menus/CommandPalettePage/CommandPalettePage.utils";
 import {
     FIELD_GAP,
@@ -67,7 +68,7 @@ export const BareLetterDocsExample = () => {
                 query={queryState}
                 actions={actions}
                 ariaLabel={"Greetings"}
-                fieldAriaLabel={"Search the greetings"}
+                fieldAriaLabel={SEARCH_GREETINGS_LABEL}
                 listAriaLabel={"Matching greetings"}
                 renderOverlay={renderPaletteOverlay}
                 renderPanel={computePalettePanelRenderer(actions)}

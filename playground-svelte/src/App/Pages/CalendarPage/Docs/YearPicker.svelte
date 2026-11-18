@@ -1,7 +1,7 @@
 <script lang="ts">
     import type { DateValue } from "@thewaver/ss-components-svelte";
     import { Calendar, DateValueUtils } from "@thewaver/ss-components-svelte";
-    import { LOCALE, MAX_YEAR, MIN_YEAR, TODAY } from "@thewaver/ss-playground/App/Pages/CalendarPage/CalendarPage.const";
+    import { LOCALE, MAX_YEAR, MIN_YEAR, TODAY, PREVIOUS_TWELVE_YEARS_TEXT } from "@thewaver/ss-playground/App/Pages/CalendarPage/CalendarPage.const";
 
     import PageCalendarPagedCaption from "../../../PageComponents/CalendarCaption/CalendarPagedCaption.svelte";
     import PageCalendarCell from "../../../StyledComponents/CalendarContent/PageCalendarCell.svelte";
@@ -18,7 +18,7 @@
         itemKey={"yearPicker"}
         locale={LOCALE}
         precision={"year"}
-        previousLabel={"Previous twelve years"}
+        previousLabel={PREVIOUS_TWELVE_YEARS_TEXT}
         nextLabel={"Next twelve years"}
         month={[() => month, (next) => (month = next)]}
     />

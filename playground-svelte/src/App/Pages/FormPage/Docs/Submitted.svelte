@@ -11,6 +11,7 @@
     import PageSelectContent from "../../../StyledComponents/SelectContent/SelectContent.svelte";
     import PageSelectOptionContent from "../../../StyledComponents/SelectOptionContent/SelectOptionContent.svelte";
     import { PLACEHOLDER, renderSelectPopup } from "../../SelectPage/SelectPage.const.svelte";
+    import { PICK_LEAST_ONE_TOPIC_TEXT } from "@thewaver/ss-playground/App/Pages/FormPage/FormPage.const";
 
     const PLANS = [{ value: "Basic" }, { value: "Team" }, { value: "Enterprise" }];
     const TOPICS = [{ value: "Design" }, { value: "Engineering" }, { value: "Research" }, { value: "Sales" }];
@@ -37,7 +38,7 @@
 >
     {#snippet renderContent(state)}
         {@const planMessage = state.hasSubmitted && plan === undefined ? "Pick a plan." : ""}
-        {@const topicsMessage = state.hasSubmitted && topics.length < 1 ? "Pick at least one topic." : ""}
+        {@const topicsMessage = state.hasSubmitted && topics.length < 1 ? PICK_LEAST_ONE_TOPIC_TEXT : ""}
 
         <PageFormStack>
             <FormField hasError={planMessage.length > 0} message={planMessage}>

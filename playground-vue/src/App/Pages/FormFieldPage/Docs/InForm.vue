@@ -4,6 +4,11 @@ import { computed, shallowRef } from "vue";
 import { Button, Form, FormField, TextInput } from "@thewaver/ss-components-vue";
 import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
 import {
+    ERROR,
+    HINT,
+    SOME_FIELDS_NEED_ATTENTION_TEXT,
+} from "@thewaver/ss-playground/App/Pages/FormFieldPage/FormFieldPage.const";
+import {
     FIELD_GAP,
     FIELD_PADDING,
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
@@ -15,9 +20,6 @@ import PageFormFieldMessage from "../../../StyledComponents/FormFieldContent/Pag
 import PageFormStack from "../../../StyledComponents/FormFieldContent/PageFormStack.vue";
 import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.vue";
 import type { FormFieldInFormDocsExampleProps } from "../FormFieldPageVue.types";
-
-const HINT = "Shown to everyone who can see your posts.";
-const ERROR = "That name is already taken.";
 
 type Props = FormFieldInFormDocsExampleProps;
 
@@ -71,7 +73,7 @@ const submit = () => {
                 </PageFormButtons>
 
                 <div :class="exampleStyles.exampleReadout" data-readout>
-                    {{ `${state.isValid ? "Ready to send." : "Some fields need attention."} ${outcome}` }}
+                    {{ `${state.isValid ? "Ready to send." : SOME_FIELDS_NEED_ATTENTION_TEXT} ${outcome}` }}
                 </div>
             </PageFormStack>
         </template>

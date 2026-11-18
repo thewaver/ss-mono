@@ -59,7 +59,7 @@
 {/snippet}
 
 <PagePropsPanel scope={"global"}>
-    <PageProp itemKey={"axis"} controls={"Sets FlipCardProps.axis"} label={"Axis"} hint={"Which way the card turns over to show its other side."}>
+    <PageProp itemKey={"axis"} {...FlipCardKnobs.AXIS_TEXT}>
         <PageSelectField
             value={axis}
             values={FLIP_CARD_AXES}
@@ -74,9 +74,7 @@
 
     <PageProp
         itemKey={"transitionDurationMs"}
-        controls={"Sets FlipCardProps.transitionDurationMs"}
-        label={"Turn duration (ms)"}
-        hint={"How long one turn from face to face takes."}
+        {...FlipCardKnobs.TRANSITION_DURATION_MS_TEXT}
     >
         <PageNumberField
             value={transitionDurationMs}

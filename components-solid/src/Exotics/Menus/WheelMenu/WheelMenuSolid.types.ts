@@ -1,0 +1,29 @@
+import type { JSX } from "solid-js";
+
+import type { BaseWheelMenuValues, InteractionFlags, MenuItemFlags } from "@thewaver/ss-components";
+
+import type { MenuItem, MenuProps } from "../../../Essentials/Menus/Menu/MenuSolid.types";
+import type { AccessorValues, MaybeAccessor, SignalSource } from "../../../Utils/typeUtils";
+
+export type WheelMenuItem<T> = Omit<MenuItem<T>, "items"> & {
+    arcDegrees?: number;
+    items?: WheelMenuItem<T>[];
+};
+
+export type WheelMenuCloserDefs = {
+    ariaLabel: string;
+    renderContent: (getFlags: () => InteractionFlags<MenuItemFlags>) => JSX.Element;
+};
+
+export type WheelMenuProps<T> = Omit<
+    MenuProps<T>,
+    "items" | "checked" | "computeLayout" | "renderGroupHeader" | "renderGroupBox"
+> &
+    AccessorValues<BaseWheelMenuValues> & {
+        /** The items, in the order they sit round the wheel. */
+        items: MaybeAccessor<WheelMenuItem<T>[]>;
+        /** Which values are currently checked, for the checkbox and radio items among them. */
+        checked?: SignalSource<T[]>;
+        /** The control in the hole that closes the menu. */
+        closerDefs?: WheelMenuCloserDefs;
+    };

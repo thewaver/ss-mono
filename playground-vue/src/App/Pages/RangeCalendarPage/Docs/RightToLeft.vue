@@ -4,6 +4,7 @@ import { shallowRef } from "vue";
 import type { DateValueRange } from "@thewaver/ss-components-vue";
 import { DateValueUtils, RangeCalendar } from "@thewaver/ss-components-vue";
 import { LOCALE, TODAY } from "@thewaver/ss-playground/App/Pages/CalendarPage/CalendarPage.const";
+import { CHOOSE_DATE_RANGE_RIGHT_LABEL } from "@thewaver/ss-playground/App/Pages/RangeCalendarPage/RangeCalendarPage.const";
 
 import PageCalendarCaption from "../../../PageComponents/CalendarCaption/CalendarCaption.vue";
 import PageCalendarDay from "../../../StyledComponents/CalendarContent/PageCalendarDay.vue";
@@ -24,7 +25,7 @@ const month = shallowRef(DateValueUtils.getStartOfMonth(TODAY));
                 v-model:month="month"
                 :today="TODAY"
                 :locale="LOCALE"
-                ariaLabel="Choose a date range in a right-to-left box"
+                :ariaLabel="CHOOSE_DATE_RANGE_RIGHT_LABEL"
             >
                 <template #renderDay="{ flags }">
                     <PageCalendarDay :render-props="flags" />

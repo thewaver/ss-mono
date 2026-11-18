@@ -9,6 +9,7 @@
     import PageCirclePackingFrame from "../../../StyledComponents/CirclePackingContent/PageCirclePackingFrame.svelte";
     import PageCirclePackingLabel from "../../../StyledComponents/CirclePackingContent/PageCirclePackingLabel.svelte";
     import type { CirclePackingExampleProps } from "../CirclePackingPage.types";
+    import { LIBRARY_S_SOURCE_LINES_LABEL } from "@thewaver/ss-playground/App/Pages/CirclePackingPage/CirclePackingPage.const";
 
     type Props = CirclePackingExampleProps;
 
@@ -25,7 +26,7 @@
             bind:branch
             padding={props.padding}
             zoomDurationMs={props.zoomDurationMs}
-            ariaLabel={"The library's source, by lines of code"}
+            ariaLabel={LIBRARY_S_SOURCE_LINES_LABEL}
         >
             {#snippet renderCircle(node, state)}
                 <PageCirclePackingCircle {state} title={getTitle(node, state.weight)} />

@@ -202,18 +202,14 @@
 <PagePropsPanel scope={"global"}>
     <PageProp
         itemKey={"source"}
-        controls={"Picks the example picture sent to RGBAnimationProps.src"}
-        label={"Source"}
-        hint={"The picture the channels are split from: the knight photograph, or a line of SVG text."}
+        {...RGBAnimationKnobs.SOURCE_TEXT}
     >
         <PageSelectField value={sourceKey} values={SOURCE_KEYS} ariaLabel={"Source"} onChange={(value) => (sourceKey = value)} />
     </PageProp>
 
     <PageProp
         itemKey={"animationDurationMs"}
-        controls={"Sets RGBAnimationProps.animationDurationMs"}
-        label={"Animation duration (ms)"}
-        hint={"How long one pass takes."}
+        {...RGBAnimationKnobs.ANIMATION_DURATION_MS_TEXT}
     >
         <PageNumberField
             value={animationDurationMs}
@@ -228,9 +224,7 @@
 
     <PageProp
         itemKey={"animationIterationDelayMs"}
-        controls={"Sets RGBAnimationProps.animationIterationDelayMs"}
-        label={"Iteration delay (ms)"}
-        hint={"How long the picture waits between one pass and the next."}
+        {...RGBAnimationKnobs.ANIMATION_ITERATION_DELAY_MS_TEXT}
     >
         <PageNumberField
             value={animationIterationDelayMs}
@@ -245,9 +239,7 @@
 
     <PageProp
         itemKey={"colorMixing"}
-        controls={"Sets RGBAnimationProps.colorMixing, with the color-scheme choice sent as undefined"}
-        label={"Color mixing"}
-        hint={"How the channels are put back together. Additive fringes are red, green and blue and read on a dark ground; subtractive ones are cyan, magenta and yellow and read on a light one. Left out, it follows the page's color-scheme at the start of each pass."}
+        {...RGBAnimationKnobs.COLOR_MIXING_TEXT}
     >
         <PageSelectField
             value={colorMixingChoice}

@@ -22,6 +22,7 @@
         renderPalettePanel,
         renderPalettePlaceholder,
     } from "../CommandPalettePage.const.svelte";
+    import { SEARCH_NOTE_ACTIONS_LABEL, MATCHING_NOTE_ACTIONS_LABEL } from "@thewaver/ss-playground/App/Pages/Menus/CommandPalettePage/CommandPalettePage.const";
 
     let visibility = $state(false);
     let query = $state("");
@@ -55,8 +56,8 @@
     bind:query
     {actions}
     ariaLabel={"Note actions"}
-    fieldAriaLabel={"Search the note actions"}
-    listAriaLabel={"Matching note actions"}
+    fieldAriaLabel={SEARCH_NOTE_ACTIONS_LABEL}
+    listAriaLabel={MATCHING_NOTE_ACTIONS_LABEL}
     renderOverlay={renderPaletteOverlay}
     fieldPadding={FIELD_PADDING}
     fieldGap={FIELD_GAP}

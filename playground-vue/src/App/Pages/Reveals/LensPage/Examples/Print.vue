@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Lens } from "@thewaver/ss-components-vue";
+import { MAGNIFYING_LENS_OVER_PAGE_LABEL } from "@thewaver/ss-playground/App/Pages/Reveals/LensPage/LensPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/Reveals/LensPage/LensPage.css";
 
 import type { LensExampleProps } from "../LensPage.types";
@@ -19,7 +20,7 @@ defineProps<Props>();
             :join-radii="joinRadii"
             :lame-exponents="lameExponents"
             :is-disabled="isDisabled"
-            ariaLabel="A magnifying lens over a page of small print"
+            :ariaLabel="MAGNIFYING_LENS_OVER_PAGE_LABEL"
             :compute-points="computePoints"
         >
             <template #renderContent>

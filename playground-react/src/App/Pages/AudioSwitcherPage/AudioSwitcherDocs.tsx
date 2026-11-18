@@ -38,12 +38,7 @@ export const AudioSwitcherDocs = () => {
                 path={`${DOCS_ROOT}/Basic.tsx`}
                 renderKnobs={() => (
                     <>
-                        <PageProp
-                            itemKey={"track"}
-                            label={"Track"}
-                            hint={"Which piece is playing. Changing it while it plays is what the switcher crossfades."}
-                            controls={"Picks the example track sent to AudioSwitcherProps.src"}
-                        >
+                        <PageProp itemKey={"track"} {...AudioSwitcherKnobs.TRACK_TEXT}>
                             <PageSelectField
                                 value={trackName}
                                 values={TRACK_NAMES}
@@ -53,12 +48,7 @@ export const AudioSwitcherDocs = () => {
                             />
                         </PageProp>
 
-                        <PageProp
-                            itemKey={"crossfadeMs"}
-                            label={"Crossfade (ms)"}
-                            hint={"How long the old track takes to fade out while the new one fades in."}
-                            controls={"Sets AudioSwitcherProps.crossfadeMs"}
-                        >
+                        <PageProp itemKey={"crossfadeMs"} {...AudioSwitcherKnobs.CROSSFADE_MS_TEXT}>
                             <PageNumberField
                                 value={crossfadeMs}
                                 min={AudioSwitcherKnobs.MIN_CROSSFADE_MS}
@@ -70,12 +60,7 @@ export const AudioSwitcherDocs = () => {
                             />
                         </PageProp>
 
-                        <PageProp
-                            itemKey={"volume"}
-                            label={"Volume (%)"}
-                            hint={"How loud the playback is, apart from the system's own volume."}
-                            controls={"Sets AudioSwitcherProps.volume, sent as a share of 1"}
-                        >
+                        <PageProp itemKey={"volume"} {...AudioSwitcherKnobs.VOLUME_TEXT}>
                             <PageNumberField
                                 value={volumePercent}
                                 min={AudioSwitcherKnobs.MIN_VOLUME_PERCENT}

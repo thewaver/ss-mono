@@ -44,3 +44,5 @@ export const CENTER_SHARE = { x: 0.5, y: 0.5 };
 export const ASH_ANIMATION = ParticleDissolveKeyframes.createAsh();
 
 export const ASH_SRC = ParticlePictureUtils.createDotSrc(ASH_COLOR, ASH_COLOR, { fillShare: PARTICLE_SHARE });
+
+export const SHAPE_DISSOLVES_LABEL = "The shape that dissolves";

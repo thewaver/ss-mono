@@ -3,6 +3,7 @@ import { shallowRef } from "vue";
 
 import { ColorInput } from "@thewaver/ss-components-vue";
 import { COLOR_INPUT_LABELS } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
+import { BRAND_COLOR_RIGHT_LEFT_LABEL } from "@thewaver/ss-playground/App/Pages/ColorInputPage/ColorInputPage.const";
 
 import PageColorPickerArea from "../../../PageComponents/ColorPicker/PageColorPickerArea.vue";
 import PageColorPickerHue from "../../../PageComponents/ColorPicker/PageColorPickerHue.vue";
@@ -14,7 +15,7 @@ const value = shallowRef("rgb(51 102 255)");
 
 <template>
     <div dir="rtl">
-        <ColorInput v-model:value="value" ariaLabel="Brand color in a right-to-left box" v-bind="COLOR_INPUT_LABELS">
+        <ColorInput v-model:value="value" :ariaLabel="BRAND_COLOR_RIGHT_LEFT_LABEL" v-bind="COLOR_INPUT_LABELS">
             <template #renderContent="renderProps">
                 <PageColorInputContent :render-props="renderProps" />
             </template>

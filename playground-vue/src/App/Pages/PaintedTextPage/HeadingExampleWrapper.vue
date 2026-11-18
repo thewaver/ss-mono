@@ -35,12 +35,7 @@ const exampleProps = computed((): PaintedTextExampleProps => {
     </PageMeasureBox>
 
     <PageExampleKnobs>
-        <PageProp
-            item-key="fontSize"
-            controls="Sets the font size of the example text sent as PaintedText's children"
-            label="Font size (px)"
-            hint="How large the letters are."
-        >
+        <PageProp item-key="fontSize" v-bind="PaintedTextKnobs.FONT_SIZE_TEXT">
             <PageNumberField
                 :value="fontSize"
                 :min="PaintedTextKnobs.MIN_FONT_SIZE"
@@ -51,12 +46,7 @@ const exampleProps = computed((): PaintedTextExampleProps => {
             />
         </PageProp>
 
-        <PageProp
-            item-key="lineHeight"
-            controls="Sets the line height of the example text sent as PaintedText's children"
-            label="Line height"
-            hint="How tall each line is, as a multiple of the font size, which decides how far apart the lines sit."
-        >
+        <PageProp item-key="lineHeight" v-bind="PaintedTextKnobs.LINE_HEIGHT_TEXT">
             <PageNumberField
                 :value="lineHeight"
                 :min="PaintedTextKnobs.MIN_LINE_HEIGHT"
@@ -67,12 +57,7 @@ const exampleProps = computed((): PaintedTextExampleProps => {
             />
         </PageProp>
 
-        <PageProp
-            item-key="fontWeight"
-            controls="Sets the font weight of the example text sent as PaintedText's children"
-            label="Font weight"
-            hint="How heavy the letters are, from 100 to 900."
-        >
+        <PageProp item-key="fontWeight" v-bind="PaintedTextKnobs.FONT_WEIGHT_TEXT">
             <PageNumberField
                 :value="fontWeight"
                 :min="PaintedTextKnobs.MIN_FONT_WEIGHT"

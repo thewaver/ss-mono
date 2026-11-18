@@ -3,7 +3,7 @@ import { createSignal } from "solid-js";
 import type { FormFieldOrientation } from "@thewaver/ss-components-solid";
 import { FORM_FIELD_DEFAULTS, FORM_FIELD_ORIENTATIONS } from "@thewaver/ss-components-solid";
 import { FormFieldKnobs } from "@thewaver/ss-playground/App/Knobs/FormFields.const";
-import { DOCS_ROOT } from "@thewaver/ss-playground/App/Pages/FormFieldPage/FormFieldPage.const";
+import { DOCS_ROOT, DOCS_SECTIONS } from "@thewaver/ss-playground/App/Pages/FormFieldPage/FormFieldPage.const";
 
 import { PageDocsExample } from "../../PageComponents/DocsExample/DocsExample";
 import { PageDocsSection } from "../../PageComponents/DocsSection/DocsSection";
@@ -28,12 +28,7 @@ export const FormFieldDocs = () => {
                 path={`${DOCS_ROOT}/Basic.tsx`}
                 renderKnobs={() => (
                     <>
-                        <PageProp
-                            key={"orientation"}
-                            label={"Orientation"}
-                            hint={"Whether the caption sits above the control or beside it."}
-                            controls={"Sets FormFieldProps.orientation"}
-                        >
+                        <PageProp key={"orientation"} {...FormFieldKnobs.ORIENTATION_TEXT}>
                             <PageSelectField
                                 value={getOrientation}
                                 values={FORM_FIELD_ORIENTATIONS}
@@ -42,12 +37,7 @@ export const FormFieldDocs = () => {
                             />
                         </PageProp>
 
-                        <PageProp
-                            key={"gap"}
-                            label={"Gap (px)"}
-                            hint={"The space between the caption, the control and the message."}
-                            controls={"Sets FormFieldProps.gap"}
-                        >
+                        <PageProp key={"gap"} {...FormFieldKnobs.GAP_TEXT}>
                             <PageNumberField
                                 value={getGap}
                                 min={FormFieldKnobs.MIN_GAP}
@@ -58,12 +48,7 @@ export const FormFieldDocs = () => {
                             />
                         </PageProp>
 
-                        <PageProp
-                            key={"message"}
-                            label={"Message"}
-                            hint={"The line shown under the control. Leave it empty and no line is rendered at all."}
-                            controls={"Sets FormFieldProps.message"}
-                        >
+                        <PageProp key={"message"} {...FormFieldKnobs.MESSAGE_TEXT}>
                             <PageTextField
                                 value={getMessage}
                                 placeholder={"No message"}
@@ -72,25 +57,11 @@ export const FormFieldDocs = () => {
                             />
                         </PageProp>
 
-                        <PageProp
-                            key={"isRequired"}
-                            label={"Required"}
-                            hint={
-                                "Tells screen readers a value is expected, and hands the caption the state to mark it. Nothing is enforced."
-                            }
-                            controls={"Sets FormFieldProps.isRequired"}
-                        >
+                        <PageProp key={"isRequired"} {...FormFieldKnobs.IS_REQUIRED_TEXT}>
                             <PageCheckField value={getIsRequired} ariaLabel={"Required"} onChange={setIsRequired} />
                         </PageProp>
 
-                        <PageProp
-                            key={"hasError"}
-                            label={"Error"}
-                            hint={
-                                "Puts the field into its error look and reads the message out as the error rather than as help."
-                            }
-                            controls={"Sets FormFieldProps.hasError"}
-                        >
+                        <PageProp key={"hasError"} {...FormFieldKnobs.HAS_ERROR_TEXT}>
                             <PageCheckField value={getHasError} ariaLabel={"Error"} onChange={setHasError} />
                         </PageProp>
                     </>
@@ -105,12 +76,7 @@ export const FormFieldDocs = () => {
                 />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"Right to left"}
-                content={
-                    "Inside a box whose text runs right to left, the caption, the field and the message line up on the right, and what is typed starts from the right of the field. With [prop]orientation[/prop] set to horizontal, the caption sits to the right of the field instead."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.rightLeft} />
 
             <PageDocsExample path={`${DOCS_ROOT}/RightToLeft.tsx`}>
                 <RightToLeftDocsExample />
@@ -127,22 +93,12 @@ export const FormFieldDocs = () => {
                 <ForeignDocsExample />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"Inside a form"}
-                content={
-                    "A field inside a Form reports to it, so the form's [prop]isValid[/prop] is false while the field's [prop]hasError[/prop] is on, and the line under the button says so; nothing here hands the field's state to the form. Saving while the error is on moves focus to the field."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.insideForm} />
 
             <PageDocsExample
                 path={`${DOCS_ROOT}/InForm.tsx`}
                 renderKnobs={() => (
-                    <PageProp
-                        key={"inFormHasError"}
-                        label={"Error"}
-                        hint={"Puts the field in error, which the form hears without being told."}
-                        controls={"Sets FormFieldProps.hasError"}
-                    >
+                    <PageProp key={"inFormHasError"} {...FormFieldKnobs.IN_FORM_HAS_ERROR_TEXT}>
                         <PageCheckField value={getInFormHasError} ariaLabel={"Error"} onChange={setInFormHasError} />
                     </PageProp>
                 )}

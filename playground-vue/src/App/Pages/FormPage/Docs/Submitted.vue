@@ -3,6 +3,7 @@ import { shallowRef } from "vue";
 
 import { Button, Form, FormField, MultiSelect, Select } from "@thewaver/ss-components-vue";
 import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
+import { PICK_LEAST_ONE_TOPIC_TEXT } from "@thewaver/ss-playground/App/Pages/FormPage/FormPage.const";
 
 import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.vue";
 import PageFormButtons from "../../../StyledComponents/FormFieldContent/PageFormButtons.vue";
@@ -39,7 +40,7 @@ const reset = () => {
 const computePlanMessage = (hasSubmitted: boolean) => (hasSubmitted && plan.value === undefined ? "Pick a plan." : "");
 
 const computeTopicsMessage = (hasSubmitted: boolean) =>
-    hasSubmitted && topics.value.length < 1 ? "Pick at least one topic." : "";
+    hasSubmitted && topics.value.length < 1 ? PICK_LEAST_ONE_TOPIC_TEXT : "";
 </script>
 
 <template>

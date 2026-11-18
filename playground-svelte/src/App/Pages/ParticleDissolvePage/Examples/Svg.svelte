@@ -1,12 +1,6 @@
 <script lang="ts">
     import { Button, ParticleDissolve } from "@thewaver/ss-components-svelte";
-    import {
-        NO_EDGE_THICKNESSES,
-        SVG_LABEL,
-        SVG_SIZE,
-        ASH_ANIMATION,
-        ASH_SRC,
-    } from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.const";
+    import { NO_EDGE_THICKNESSES, SVG_LABEL, SVG_SIZE, ASH_ANIMATION, ASH_SRC, SHAPE_DISSOLVES_LABEL } from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.const";
     import * as styles from "@thewaver/ss-playground/App/Pages/ParticleDissolvePage/ParticleDissolvePage.css";
     import { ShapeConst, ShapeUtils } from "@thewaver/ss-utils";
 
@@ -41,7 +35,7 @@
             width={SVG_SIZE.width}
             height={SVG_SIZE.height}
             role="img"
-            aria-label={"The shape that dissolves"}
+            aria-label={SHAPE_DISSOLVES_LABEL}
         >
             <path class={styles.svgShapePath} d={path} />
             <text class={styles.svgShapeText} x={"50%"} y={"50%"}>{SVG_LABEL}</text>

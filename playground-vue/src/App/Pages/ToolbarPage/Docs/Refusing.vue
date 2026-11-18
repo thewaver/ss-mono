@@ -4,6 +4,7 @@ import { shallowRef } from "vue";
 import { Toolbar } from "@thewaver/ss-components-vue";
 import type { ToolbarAction } from "@thewaver/ss-components-vue";
 import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
+import { MORE_DOCUMENT_ACTIONS_LABEL } from "@thewaver/ss-playground/App/Pages/ToolbarPage/ToolbarPage.const";
 
 import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.vue";
 import PageMenuTriggerContent from "../../../StyledComponents/MenuTriggerContent/MenuTriggerContent.vue";
@@ -29,7 +30,7 @@ const lastRun = shallowRef<string>();
         <Toolbar
             :actions="ACTIONS"
             ariaLabel="Document"
-            overflowAriaLabel="More document actions"
+            :overflowAriaLabel="MORE_DOCUMENT_ACTIONS_LABEL"
             @activate="(value: string) => (lastRun = value)"
         >
             <template #renderAction="{ action, flags }">

@@ -4,6 +4,7 @@ import { shallowRef } from "vue";
 import type { TableSort } from "@thewaver/ss-components-vue";
 import { Table } from "@thewaver/ss-components-vue";
 import { TABLE_ANNOUNCEMENTS } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
+import { PARTS_PINNED_COLUMNS_LABEL } from "@thewaver/ss-playground/App/Pages/TablePage/TablePage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/TablePage/TablePage.css";
 
 import PageTableMarker from "../../../StyledComponents/TableContent/PageTableMarker.vue";
@@ -28,7 +29,7 @@ const columns = createPartColumns({ isPinned: true, isResizable: true, isReorder
             v-model:order="order"
             :columns="columns"
             :rows="PARTS"
-            ariaLabel="Parts with pinned columns"
+            :ariaLabel="PARTS_PINNED_COLUMNS_LABEL"
             :announcements="TABLE_ANNOUNCEMENTS"
         >
             <template #renderResizer="renderProps">

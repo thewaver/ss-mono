@@ -3,6 +3,7 @@ import { createMemo, createSignal } from "solid-js";
 import type { TableSort } from "@thewaver/ss-components-solid";
 import { Table } from "@thewaver/ss-components-solid";
 import { TABLE_ANNOUNCEMENTS } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
+import { PARTS_RIGHT_LEFT_BOX_LABEL } from "@thewaver/ss-playground/App/Pages/TablePage/TablePage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/TablePage/TablePage.css";
 
 import { PageTableMarker, PageTableResizer } from "../../../StyledComponents/TableContent/TableContent";
@@ -26,7 +27,7 @@ export const RightToLeftDocsExample = () => {
                 selection={selectionSignal}
                 widths={widthsSignal}
                 order={orderSignal}
-                ariaLabel={"Parts in a right-to-left box"}
+                ariaLabel={PARTS_RIGHT_LEFT_BOX_LABEL}
                 announcements={TABLE_ANNOUNCEMENTS}
                 renderResizer={(getRenderProps) => <PageTableResizer renderProps={getRenderProps} />}
                 renderMarker={() => <PageTableMarker />}

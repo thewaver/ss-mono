@@ -22,14 +22,7 @@ export const HoverCardDocs = () => {
             path={`${DOCS_ROOT}/Basic.tsx`}
             renderKnobs={() => (
                 <>
-                    <PageProp
-                        key={"offsetY"}
-                        label={"Offset down (px)"}
-                        hint={
-                            "How far the card is held clear of its anchor. The gap is bridged, so the pointer can cross it without losing the card."
-                        }
-                        controls={"Sets HoverCardProps.offset.y"}
-                    >
+                    <PageProp key={"offsetY"} {...HoverCardKnobs.OFFSET_Y_TEXT}>
                         <PageNumberField
                             value={getOffsetY}
                             min={HoverCardKnobs.MIN_OFFSET}
@@ -41,12 +34,7 @@ export const HoverCardDocs = () => {
                         />
                     </PageProp>
 
-                    <PageProp
-                        key={"transitionDurationMs"}
-                        label={"Transition duration (ms)"}
-                        hint={"How long the card takes to fade in and out."}
-                        controls={"Sets HoverCardProps.transitionDurationMs"}
-                    >
+                    <PageProp key={"transitionDurationMs"} {...HoverCardKnobs.TRANSITION_DURATION_MS_TEXT}>
                         <PageNumberField
                             value={getTransitionDurationMs}
                             min={HoverCardKnobs.MIN_DURATION}
@@ -58,12 +46,7 @@ export const HoverCardDocs = () => {
                         />
                     </PageProp>
 
-                    <PageProp
-                        key={"focusShowDelayMs"}
-                        label={"Focus delay (ms)"}
-                        hint={"How long a keyboard focus has to rest on the anchor before the card opens."}
-                        controls={"Sets HoverCardProps.focusShowDelayMs"}
-                    >
+                    <PageProp key={"focusShowDelayMs"} {...HoverCardKnobs.FOCUS_SHOW_DELAY_MS_TEXT}>
                         <PageNumberField
                             value={getFocusShowDelayMs}
                             min={HoverCardKnobs.MIN_DURATION}
@@ -75,14 +58,7 @@ export const HoverCardDocs = () => {
                         />
                     </PageProp>
 
-                    <PageProp
-                        key={"hoverShowDelayMs"}
-                        label={"Hover delay (ms)"}
-                        hint={
-                            "How long the pointer has to rest on the anchor before the card opens. Leave before then and nothing opens."
-                        }
-                        controls={"Sets HoverCardProps.hoverShowDelayMs"}
-                    >
+                    <PageProp key={"hoverShowDelayMs"} {...HoverCardKnobs.HOVER_SHOW_DELAY_MS_TEXT}>
                         <PageNumberField
                             value={getHoverShowDelayMs}
                             min={HoverCardKnobs.MIN_DURATION}

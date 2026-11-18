@@ -3,6 +3,7 @@
     import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
 
     import PageFileInputContent from "../../../StyledComponents/FileInputContent/FileInputContent.svelte";
+    import { FILE_WHOSE_NAME_HAS_TEXT } from "@thewaver/ss-playground/App/Pages/FileInputPage/FileInputPage.const";
 
     let files = $state.raw<File[]>([]);
     let rejection = $state("");
@@ -26,5 +27,5 @@
 </FileInput>
 
 <div class={exampleStyles.exampleReadout} data-readout>
-    {rejection || "A file whose name has a space in it is refused"}
+    {rejection || FILE_WHOSE_NAME_HAS_TEXT}
 </div>

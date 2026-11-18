@@ -72,12 +72,7 @@ const examples: ExampleDefs[] = [
 
 <template>
     <PagePropsPanel scope="global">
-        <PageProp
-            item-key="durationMs"
-            controls="Sets ParticleDissolveProps.durationMs"
-            label="Duration (ms)"
-            hint="How long the whole dissolve takes, from the first of the content going to the last particle gone."
-        >
+        <PageProp item-key="durationMs" v-bind="ParticleDissolveKnobs.DURATION_MS_TEXT">
             <PageNumberField
                 :value="durationMs"
                 :min="ParticleDissolveKnobs.MIN_DURATION_MS"
@@ -89,12 +84,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="particleLifetimeMs"
-            controls="Sets ParticleDissolveProps.particleLifetimeMs"
-            label="Lifetime (ms)"
-            hint="How long one particle lives. It is held below the duration, so a longer lifetime leaves less time for the edge to travel."
-        >
+        <PageProp item-key="particleLifetimeMs" v-bind="ParticleDissolveKnobs.PARTICLE_LIFETIME_MS_TEXT">
             <PageNumberField
                 :value="particleLifetimeMs"
                 :min="ParticleDissolveKnobs.MIN_LIFETIME_MS"
@@ -106,12 +96,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="featherShare"
-            controls="Sets ParticleDissolveProps.featherShare"
-            label="Feather (0-1)"
-            hint="How gradually the edge fades the content, as a share of the distance the sweep travels. 0 gives a hard edge."
-        >
+        <PageProp item-key="featherShare" v-bind="ParticleDissolveKnobs.FEATHER_SHARE_TEXT">
             <PageNumberField
                 :value="featherShare"
                 :min="ParticleDissolveKnobs.MIN_FEATHER"
@@ -123,12 +108,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="spawnChance"
-            controls="Sets ParticleDissolveProps.spawnChance"
-            label="Spawn chance (0-1)"
-            hint="The chance each particle is released. Lower thins the ash out."
-        >
+        <PageProp item-key="spawnChance" v-bind="ParticleDissolveKnobs.SPAWN_CHANCE_TEXT">
             <PageNumberField
                 :value="spawnChance"
                 :min="ParticleDissolveKnobs.MIN_SPAWN_CHANCE"
@@ -140,12 +120,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="cellSize"
-            controls="Sets ParticleDissolveProps.cellSize"
-            label="Cell size (px)"
-            hint="The side of one square of the grid particles are released from. Smaller squares mean finer ash and more of them."
-        >
+        <PageProp item-key="cellSize" v-bind="ParticleDissolveKnobs.CELL_SIZE_TEXT">
             <PageNumberField
                 :value="cellSize"
                 :min="ParticleDissolveKnobs.MIN_CELL_SIZE"

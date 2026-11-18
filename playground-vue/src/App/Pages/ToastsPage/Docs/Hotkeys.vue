@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { InteractionSettings, Toasts } from "@thewaver/ss-components-vue";
-import { OWN_HOTKEYS } from "@thewaver/ss-playground/App/Pages/ToastsPage/ToastsPage.const";
+import {
+    NOTIFICATIONS_THEIR_OWN_KEYS_LABEL,
+    OWN_HOTKEYS,
+} from "@thewaver/ss-playground/App/Pages/ToastsPage/ToastsPage.const";
 
 import PageToastContent from "../../../StyledComponents/ToastContent/ToastContent.vue";
 import HotkeysRaisers from "./HotkeysRaisers.vue";
@@ -8,7 +11,7 @@ import HotkeysRaisers from "./HotkeysRaisers.vue";
 
 <template>
     <InteractionSettings :toast-hotkeys="OWN_HOTKEYS">
-        <Toasts ariaLabel="Notifications on their own keys" alignment="top_center">
+        <Toasts :ariaLabel="NOTIFICATIONS_THEIR_OWN_KEYS_LABEL" alignment="top_center">
             <HotkeysRaisers />
 
             <template #renderToast="{ toast, visibilityTarget, transitionDurationMs, state, dismiss }">

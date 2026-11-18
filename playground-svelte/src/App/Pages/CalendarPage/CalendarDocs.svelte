@@ -6,7 +6,7 @@
     } from "@thewaver/ss-components-svelte";
     import { CALENDAR_DEFAULTS, DateValueUtils } from "@thewaver/ss-components-svelte";
     import { CalendarKnobs } from "@thewaver/ss-playground/App/Knobs/Calendars.const";
-    import {
+    import { DOCS_SECTIONS,
         CALENDAR_FIELD_WIDTH,
         DOCS_ROOT,
         OTHER_CALENDAR,
@@ -40,9 +40,7 @@
     {#snippet renderKnobs()}
         <PageProp
             itemKey={"weekStartsOn"}
-            label={"Week starts on"}
-            hint={"Which day begins a week, which decides the order of the column headings."}
-            controls={"Sets CalendarProps.weekStartsOn"}
+            {...CalendarKnobs.WEEK_STARTS_ON_TEXT}
         >
             <PageSelectField
                 value={weekStartsOn}
@@ -57,9 +55,7 @@
 
         <PageProp
             itemKey={"isDisabled"}
-            label={"Disabled"}
-            hint={"Turns the calendar off: no day can be picked, and the Tab key skips it."}
-            controls={"Sets CalendarProps.isDisabled"}
+            {...CalendarKnobs.IS_DISABLED_TEXT}
         >
             <PageCheckField
                 value={isDisabled}
@@ -73,8 +69,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Earliest and latest day"}
-    content={"A [prop]minValue[/prop] and a [prop]maxValue[/prop] keep the pick between them: the days outside are disabled, and the arrow and page keys stop at the edge."}
+    {...DOCS_SECTIONS.earliestLatestDay}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Bounded.svelte`}>
@@ -82,8 +77,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Days that cannot be picked"}
-    content={"List the days to refuse in [prop]disabledDays[/prop]: a date, a span from one date to another, everything before or after a date, or days of the week, here Saturday and Sunday. A rule none of those can describe goes in [prop]computeIsDayDisabled[/prop], which is asked about every day shown, so keep it quick."}
+    {...DOCS_SECTIONS.unpickableDays}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/DisabledDays.svelte`}>
@@ -91,8 +85,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Week numbers"}
-    content={"Draw [prop]renderWeekNumber[/prop] and each week is headed by its number. Countries count weeks differently, so two settings decide it: [prop]weekStartsOn[/prop], the day a week begins, and [prop]minDaysInFirstWeek[/prop], how many days of the new year the first week must hold. Monday and 4 is ISO 8601, used across most of Europe; Sunday and 1 is the count used in the United States."}
+    {...DOCS_SECTIONS.weekNumbers}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/WeekNumbers.svelte`}>
@@ -101,9 +94,7 @@
     {#snippet renderKnobs()}
         <PageProp
             itemKey={"numberedWeekStartsOn"}
-            label={"Week starts on"}
-            hint={"Which day begins a week, which decides the order of the column headings."}
-            controls={"Sets CalendarProps.weekStartsOn"}
+            {...CalendarKnobs.WEEK_STARTS_ON_TEXT}
         >
             <PageSelectField
                 value={numberedWeekStartsOn}
@@ -118,9 +109,7 @@
 
         <PageProp
             itemKey={"minDaysInFirstWeek"}
-            label={"First week holds"}
-            hint={"How many days of the new year the first week must hold, which decides the week numbers."}
-            controls={"Sets CalendarProps.minDaysInFirstWeek"}
+            {...CalendarKnobs.MIN_DAYS_IN_FIRST_WEEK_TEXT}
         >
             <PageSelectField
                 value={minDaysInFirstWeek}
@@ -136,8 +125,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Picking a month"}
-    content={"Set [prop]precision[/prop] to month and the grid holds the year's months, three to a row. A pick sets the first day of that month, and the page keys step a year."}
+    {...DOCS_SECTIONS.pickingMonth}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/MonthPicker.svelte`}>
@@ -145,8 +133,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Picking a year"}
-    content={"Set [prop]precision[/prop] to year and the grid holds twelve years, three to a row, and a pick sets the first day of that year. The limits still apply: here only the years from 2019 to 2031 can be picked."}
+    {...DOCS_SECTIONS.pickingYear}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/YearPicker.svelte`}>
@@ -154,8 +141,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Other calendar systems"}
-    content={"A date carries its own calendar system, and the grid draws the month of whichever calendar the [prop]month[/prop] it is handed is in: its length, its name and its year. Here the month is converted to the chosen calendar, and the picked day stays the same day in any of them."}
+    {...DOCS_SECTIONS.otherCalendarSystems}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Calendars.svelte`}>
@@ -164,9 +150,7 @@
     {#snippet renderKnobs()}
         <PageProp
             itemKey={"calendar"}
-            label={"Calendar"}
-            hint={"Which calendar system the month is drawn in."}
-            controls={"Converts CalendarProps.month to the chosen calendar"}
+            {...CalendarKnobs.CALENDAR_TEXT}
         >
             <PageSelectField
                 value={calendarId}
@@ -182,8 +166,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Right to left"}
-    content={"Inside a box whose text runs right to left, each week runs from the right, and the right arrow moves to the day before, which is where it is drawn. Up, down and the page keys keep their meaning."}
+    {...DOCS_SECTIONS.rightLeft}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/RightToLeft.svelte`}>

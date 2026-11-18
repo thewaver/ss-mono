@@ -183,18 +183,14 @@
     <PagePropsPanel scope={"global"}>
         <PageProp
             itemKey={"image"}
-            controls={"Picks the example picture sent to ScanlineAnimationProps.src"}
-            label={"Image"}
-            hint={"Swaps in a picture of your own, so the sweep can be watched against something other than the sample."}
+            {...ScanlineAnimationKnobs.IMAGE_TEXT}
         >
             <PageFileField accept={"image/*"} ariaLabel={"Image"} onPick={handleFile} />
         </PageProp>
 
         <PageProp
             itemKey={"weightType"}
-            controls={"Picks the example's weight function sent to ScanlineAnimationProps.computeSliceWeights"}
-            label={"Weight"}
-            hint={"How each line's turn is decided: its position, a wave, a random draw, and so on."}
+            {...ScanlineAnimationKnobs.WEIGHT_TYPE_TEXT}
         >
             <PageGroupedSelectField
                 value={weightType}
@@ -208,9 +204,7 @@
 
         <PageProp
             itemKey={"lineCount"}
-            controls={"Sets ScanlineAnimationProps.lineCount"}
-            label={"Line count"}
-            hint={"How many lines the picture is cut into. More lines is a finer sweep and more work per frame."}
+            {...ScanlineAnimationKnobs.LINE_COUNT_TEXT}
         >
             <PageNumberField
                 value={lineCount}
@@ -226,9 +220,7 @@
 
         <PageProp
             itemKey={"orientation"}
-            controls={"Sets ScanlineAnimationProps.orientation"}
-            label={"Orientation"}
-            hint={"Which way the lines run: rows across the picture, or columns down it. The samples here were written for rows, so on columns they still push sideways and some read their place off the row."}
+            {...ScanlineAnimationKnobs.ORIENTATION_TEXT}
         >
             <PageSelectField
                 value={orientation}
@@ -242,9 +234,7 @@
 
         <PageProp
             itemKey={"animationDurationMs"}
-            controls={"Sets ScanlineAnimationProps.animationDurationMs"}
-            label={"Animation duration (ms)"}
-            hint={"How long one sweep over the whole picture takes."}
+            {...ScanlineAnimationKnobs.ANIMATION_DURATION_MS_TEXT}
         >
             <PageNumberField
                 value={animationDurationMs}
@@ -260,9 +250,7 @@
 
         <PageProp
             itemKey={"animationIterationDelayMs"}
-            controls={"Sets ScanlineAnimationProps.animationIterationDelayMs"}
-            label={"Iteration delay (ms)"}
-            hint={"How long the picture waits between one sweep and the next."}
+            {...ScanlineAnimationKnobs.ANIMATION_ITERATION_DELAY_MS_TEXT}
         >
             <PageNumberField
                 value={animationIterationDelayMs}

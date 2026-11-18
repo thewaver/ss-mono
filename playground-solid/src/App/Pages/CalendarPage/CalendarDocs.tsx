@@ -10,6 +10,7 @@ import { CalendarKnobs } from "@thewaver/ss-playground/App/Knobs/Calendars.const
 import {
     CALENDAR_FIELD_WIDTH,
     DOCS_ROOT,
+    DOCS_SECTIONS,
     OTHER_CALENDAR,
     WEEK_START_LABELS,
 } from "@thewaver/ss-playground/App/Pages/CalendarPage/CalendarPage.const";
@@ -44,12 +45,7 @@ export const CalendarDocs = () => {
                 path={`${DOCS_ROOT}/Basic.tsx`}
                 renderKnobs={() => (
                     <>
-                        <PageProp
-                            key={"weekStartsOn"}
-                            label={"Week starts on"}
-                            hint={"Which day begins a week, which decides the order of the column headings."}
-                            controls={"Sets CalendarProps.weekStartsOn"}
-                        >
+                        <PageProp key={"weekStartsOn"} {...CalendarKnobs.WEEK_STARTS_ON_TEXT}>
                             <PageSelectField
                                 value={getWeekStartsOn}
                                 values={() => [...CalendarKnobs.WEEK_STARTS]}
@@ -59,12 +55,7 @@ export const CalendarDocs = () => {
                             />
                         </PageProp>
 
-                        <PageProp
-                            key={"isDisabled"}
-                            label={"Disabled"}
-                            hint={"Turns the calendar off: no day can be picked, and the Tab key skips it."}
-                            controls={"Sets CalendarProps.isDisabled"}
-                        >
+                        <PageProp key={"isDisabled"} {...CalendarKnobs.IS_DISABLED_TEXT}>
                             <PageCheckField value={getIsDisabled} ariaLabel={"Disabled"} onChange={setIsDisabled} />
                         </PageProp>
                     </>
@@ -73,45 +64,25 @@ export const CalendarDocs = () => {
                 <BasicDocsExample weekStartsOn={getWeekStartsOn} isDisabled={getIsDisabled} />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"Earliest and latest day"}
-                content={
-                    "A [prop]minValue[/prop] and a [prop]maxValue[/prop] keep the pick between them: the days outside are disabled, and the arrow and page keys stop at the edge."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.earliestLatestDay} />
 
             <PageDocsExample path={`${DOCS_ROOT}/Bounded.tsx`}>
                 <BoundedDocsExample />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"Days that cannot be picked"}
-                content={
-                    "List the days to refuse in [prop]disabledDays[/prop]: a date, a span from one date to another, everything before or after a date, or days of the week, here Saturday and Sunday. A rule none of those can describe goes in [prop]computeIsDayDisabled[/prop], which is asked about every day shown, so keep it quick."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.unpickableDays} />
 
             <PageDocsExample path={`${DOCS_ROOT}/DisabledDays.tsx`}>
                 <DisabledDaysDocsExample />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"Week numbers"}
-                content={
-                    "Draw [prop]renderWeekNumber[/prop] and each week is headed by its number. Countries count weeks differently, so two settings decide it: [prop]weekStartsOn[/prop], the day a week begins, and [prop]minDaysInFirstWeek[/prop], how many days of the new year the first week must hold. Monday and 4 is ISO 8601, used across most of Europe; Sunday and 1 is the count used in the United States."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.weekNumbers} />
 
             <PageDocsExample
                 path={`${DOCS_ROOT}/WeekNumbers.tsx`}
                 renderKnobs={() => (
                     <>
-                        <PageProp
-                            key={"numberedWeekStartsOn"}
-                            label={"Week starts on"}
-                            hint={"Which day begins a week, which decides the order of the column headings."}
-                            controls={"Sets CalendarProps.weekStartsOn"}
-                        >
+                        <PageProp key={"numberedWeekStartsOn"} {...CalendarKnobs.WEEK_STARTS_ON_TEXT}>
                             <PageSelectField
                                 value={getNumberedWeekStartsOn}
                                 values={() => [...CalendarKnobs.WEEK_STARTS]}
@@ -121,14 +92,7 @@ export const CalendarDocs = () => {
                             />
                         </PageProp>
 
-                        <PageProp
-                            key={"minDaysInFirstWeek"}
-                            label={"First week holds"}
-                            hint={
-                                "How many days of the new year the first week must hold, which decides the week numbers."
-                            }
-                            controls={"Sets CalendarProps.minDaysInFirstWeek"}
-                        >
+                        <PageProp key={"minDaysInFirstWeek"} {...CalendarKnobs.MIN_DAYS_IN_FIRST_WEEK_TEXT}>
                             <PageSelectField
                                 value={getMinDaysInFirstWeek}
                                 values={() => [...CalendarKnobs.MIN_DAYS_IN_FIRST_WEEK]}
@@ -146,44 +110,24 @@ export const CalendarDocs = () => {
                 />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"Picking a month"}
-                content={
-                    "Set [prop]precision[/prop] to month and the grid holds the year's months, three to a row. A pick sets the first day of that month, and the page keys step a year."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.pickingMonth} />
 
             <PageDocsExample path={`${DOCS_ROOT}/MonthPicker.tsx`}>
                 <MonthPickerDocsExample />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"Picking a year"}
-                content={
-                    "Set [prop]precision[/prop] to year and the grid holds twelve years, three to a row, and a pick sets the first day of that year. The limits still apply: here only the years from 2019 to 2031 can be picked."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.pickingYear} />
 
             <PageDocsExample path={`${DOCS_ROOT}/YearPicker.tsx`}>
                 <YearPickerDocsExample />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"Other calendar systems"}
-                content={
-                    "A date carries its own calendar system, and the grid draws the month of whichever calendar the [prop]month[/prop] it is handed is in: its length, its name and its year. Here the month is converted to the chosen calendar, and the picked day stays the same day in any of them."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.otherCalendarSystems} />
 
             <PageDocsExample
                 path={`${DOCS_ROOT}/Calendars.tsx`}
                 renderKnobs={() => (
-                    <PageProp
-                        key={"calendar"}
-                        label={"Calendar"}
-                        hint={"Which calendar system the month is drawn in."}
-                        controls={"Converts CalendarProps.month to the chosen calendar"}
-                    >
+                    <PageProp key={"calendar"} {...CalendarKnobs.CALENDAR_TEXT}>
                         <PageSelectField
                             value={getCalendarId}
                             values={DateValueUtils.getCalendarIds}
@@ -197,12 +141,7 @@ export const CalendarDocs = () => {
                 <CalendarsDocsExample calendar={getCalendarId} />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"Right to left"}
-                content={
-                    "Inside a box whose text runs right to left, each week runs from the right, and the right arrow moves to the day before, which is where it is drawn. Up, down and the page keys keep their meaning."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.rightLeft} />
 
             <PageDocsExample path={`${DOCS_ROOT}/RightToLeft.tsx`}>
                 <RightToLeftDocsExample />

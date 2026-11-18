@@ -70,12 +70,7 @@ const examples: ExampleDefs[] = [
 
 <template>
     <PagePropsPanel scope="global">
-        <PageProp
-            item-key="zoom"
-            controls="Sets LensProps.zoom"
-            label="Zoom"
-            hint="How many times larger the content is drawn inside the lens. 1 draws it at its own size."
-        >
+        <PageProp item-key="zoom" v-bind="LensKnobs.ZOOM_TEXT">
             <PageNumberField
                 :value="zoom"
                 :min="LensKnobs.MIN_ZOOM"
@@ -87,12 +82,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="radius"
-            controls="Sets LensProps.radius"
-            label="Radius (px)"
-            hint="How large the lens that follows the pointer is."
-        >
+        <PageProp item-key="radius" v-bind="LensKnobs.RADIUS_TEXT">
             <PageNumberField
                 :value="radius"
                 :min="LensKnobs.MIN_RADIUS"
@@ -104,12 +94,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="computePoints"
-            controls="Picks the example contour sent to LensProps.computePoints"
-            label="Shape"
-            hint="The contour of the lens."
-        >
+        <PageProp item-key="computePoints" v-bind="LensKnobs.COMPUTE_POINTS_TEXT">
             <PageSelectField
                 :value="shape"
                 :values="LensKnobs.SHAPES"
@@ -119,12 +104,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="joinRadii"
-            controls="Sets every corner of LensProps.joinRadii"
-            label="Corner radius (px)"
-            hint="How far the lens's corners are rounded. A circular lens has no corners, so it is off then."
-        >
+        <PageProp item-key="joinRadii" v-bind="LensKnobs.JOIN_RADII_TEXT">
             <PageNumberField
                 :value="joinRadius"
                 :min="LensKnobs.MIN_JOIN_RADIUS"
@@ -136,12 +116,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="lameExponents"
-            controls="Sets every corner of LensProps.lameExponents"
-            label="Lamé Exponent"
-            hint="How square or how pinched the lens's rounded corners are: 1 is a circular round, higher is squarer."
-        >
+        <PageProp item-key="lameExponents" v-bind="LensKnobs.LAME_EXPONENTS_TEXT">
             <PageNumberField
                 :value="lameExponent"
                 :min="LensKnobs.MIN_LAME_EXPONENT"
@@ -153,12 +128,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="softness"
-            controls="Sets LensProps.softness"
-            label="Softness"
-            hint="How gradually the lens's edge fades into the content around it. 0 gives a hard edge."
-        >
+        <PageProp item-key="softness" v-bind="LensKnobs.SOFTNESS_TEXT">
             <PageNumberField
                 :value="softness"
                 :min="LensKnobs.MIN_SOFTNESS"
@@ -170,12 +140,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="stepSize"
-            controls="Sets LensProps.stepSize"
-            label="Step size (px)"
-            hint="How far one press of an arrow key moves the lens. Tab to a lens and it opens at the center; the arrow keys move it from there."
-        >
+        <PageProp item-key="stepSize" v-bind="LensKnobs.STEP_SIZE_TEXT">
             <PageNumberField
                 :value="stepSize"
                 :min="LensKnobs.MIN_STEP_SIZE"
@@ -187,12 +152,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="isDisabled"
-            controls="Sets LensProps.isDisabled"
-            label="Disabled"
-            hint="Stops the lens following the pointer or the keyboard, leaving the content as it is."
-        >
+        <PageProp item-key="isDisabled" v-bind="LensKnobs.IS_DISABLED_TEXT">
             <PageCheckField
                 :value="isDisabled"
                 ariaLabel="Disabled"

@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { MultiListbox } from "@thewaver/ss-components-react";
+import { COUNTRIES_SHIP_LABEL } from "@thewaver/ss-playground/App/Pages/ListboxPage/ListboxPage.const";
 
 import { renderPageHighlightFloater } from "../../../StyledComponents/GlideFloater/GlideFloater";
 import { PageListboxSurface } from "../../../StyledComponents/ListboxSurface/ListboxSurface";
@@ -18,7 +19,7 @@ export const GroupsDocsExample = () => {
                 renderHighlightFloater={renderPageHighlightFloater}
                 values={countries}
                 options={GROUPED_COUNTRIES}
-                ariaLabel={"Countries to ship to"}
+                ariaLabel={COUNTRIES_SHIP_LABEL}
                 renderGroupHeader={(group, flags) => (
                     <PageSelectGroupContent flags={flags}>{group.label}</PageSelectGroupContent>
                 )}

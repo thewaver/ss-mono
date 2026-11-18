@@ -12,6 +12,7 @@
     import PageTableCellContent from "../../../StyledComponents/TableContent/PageTableCellContent.svelte";
     import { PARTS } from "../TablePage.const.svelte";
     import type { Part } from "../TablePageSvelte.types";
+    import { PARTS_SORTED_PAGE_LABEL } from "@thewaver/ss-playground/App/Pages/TablePage/TablePage.const";
 
     const COMPARATORS: Record<string, (a: Part, b: Part) => number> = {
         sku: (a, b) => a.sku.localeCompare(b.sku),
@@ -91,7 +92,7 @@
         {rows}
         bind:sort
         bind:selection
-        ariaLabel={"Parts sorted by the page"}
+        ariaLabel={PARTS_SORTED_PAGE_LABEL}
         onSortChange={reorder}
     />
 </div>

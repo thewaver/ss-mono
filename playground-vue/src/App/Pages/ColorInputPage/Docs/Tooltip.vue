@@ -4,6 +4,7 @@ import { h, shallowRef } from "vue";
 import { ColorInput } from "@thewaver/ss-components-vue";
 import type { ColorInputRenderProps, InteractionTooltipDefs } from "@thewaver/ss-components-vue";
 import { COLOR_INPUT_LABELS } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
+import { DISABLED_BUT_REACHABLE_COLOR_LABEL } from "@thewaver/ss-playground/App/Pages/ColorInputPage/ColorInputPage.const";
 
 import PageColorPickerArea from "../../../PageComponents/ColorPicker/PageColorPickerArea.vue";
 import PageColorPickerHue from "../../../PageComponents/ColorPicker/PageColorPickerHue.vue";
@@ -35,7 +36,7 @@ const tooltipDefs: InteractionTooltipDefs<ColorInputRenderProps> = {
         v-model:value="value"
         :is-disabled="isDisabled"
         :is-reachable-when-disabled="isReachableWhenDisabled"
-        ariaLabel="Disabled but reachable color"
+        :ariaLabel="DISABLED_BUT_REACHABLE_COLOR_LABEL"
         v-bind="COLOR_INPUT_LABELS"
         :tooltip-defs="tooltipDefs"
     >

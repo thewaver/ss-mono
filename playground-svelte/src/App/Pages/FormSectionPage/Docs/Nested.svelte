@@ -14,6 +14,7 @@
     import PageFormSectionCaption from "../../../StyledComponents/FormFieldContent/PageFormSectionCaption.svelte";
     import PageFormStack from "../../../StyledComponents/FormFieldContent/PageFormStack.svelte";
     import PageTextFieldContent from "../../../StyledComponents/TextFieldContent/TextFieldContent.svelte";
+    import { WE_NEED_SOMEWHERE_SEND_TEXT, SOME_FIELDS_NEED_ATTENTION_TEXT } from "@thewaver/ss-playground/App/Pages/FormSectionPage/FormSectionPage.const";
 
     type TextState = [() => string, (next: string) => void];
 
@@ -24,7 +25,7 @@
     let card = $state("");
     let outcome = $state("Not ordered yet.");
 
-    const streetMessage = $derived(street.trim().length > 0 ? "" : "We need somewhere to send it.");
+    const streetMessage = $derived(street.trim().length > 0 ? "" : WE_NEED_SOMEWHERE_SEND_TEXT);
 
     const cardMessage = $derived(/^\d{4}$/.test(card) ? "" : `The last ${CARD_DIGITS} digits, and nothing else.`);
 </script>
@@ -117,7 +118,7 @@
             </PageFormButtons>
 
             <div class={exampleStyles.exampleReadout} data-readout>
-                {`${state.isValid ? "Ready to send." : "Some fields need attention."} ${outcome}`}
+                {`${state.isValid ? "Ready to send." : SOME_FIELDS_NEED_ATTENTION_TEXT} ${outcome}`}
             </div>
         </PageFormStack>
     {/snippet}

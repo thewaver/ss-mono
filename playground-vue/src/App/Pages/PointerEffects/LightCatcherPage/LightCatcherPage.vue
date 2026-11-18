@@ -71,12 +71,7 @@ const examples: ExampleDefs[] = [
 
 <template>
     <PagePropsPanel scope="global">
-        <PageProp
-            item-key="isDisabled"
-            controls="Sets LightCatcherProps.isDisabled"
-            label="Disabled"
-            hint="Stops the surface answering the pointer and leaves it at its resting brightness and lightness. It is what a page honoring a reduced-motion preference passes."
-        >
+        <PageProp item-key="isDisabled" v-bind="LightCatcherKnobs.IS_DISABLED_TEXT">
             <PageCheckField
                 :value="isDisabled"
                 ariaLabel="Disabled"
@@ -84,12 +79,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="smoothingMs"
-            controls="Sets LightCatcherProps.smoothingMs"
-            label="Smoothing (ms)"
-            hint="How long the light takes to catch up with the pointer. At 0 it follows exactly; raised, it glows on after the pointer and fades behind it."
-        >
+        <PageProp item-key="smoothingMs" v-bind="LightCatcherKnobs.SMOOTHING_MS_TEXT">
             <PageNumberField
                 :value="smoothingMs"
                 :min="LightCatcherKnobs.MIN_SMOOTHING_MS"
@@ -101,12 +91,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="activeRangePx"
-            controls="Sets LightCatcherProps.activeRangePx"
-            label="Active range (px)"
-            hint="How near the pointer has to be before the surface answers it at all, measured from its center. Outside it the surface sits at resting."
-        >
+        <PageProp item-key="activeRangePx" v-bind="LightCatcherKnobs.ACTIVE_RANGE_PX_TEXT">
             <PageNumberField
                 :value="activeRangePx"
                 :min="LightCatcherKnobs.MIN_ACTIVE_RANGE_PX"
@@ -118,12 +103,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="lightRangePx"
-            controls="Sets LightCatcherProps.lightRangePx"
-            label="Light range (px)"
-            hint="How far the light reaches. Full brightness at the surface's own edge, resting out here."
-        >
+        <PageProp item-key="lightRangePx" v-bind="LightCatcherKnobs.LIGHT_RANGE_PX_TEXT">
             <PageNumberField
                 :value="lightRangePx"
                 :min="LightCatcherKnobs.MIN_LIGHT_RANGE_PX"
@@ -135,12 +115,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="maxBrightness"
-            controls="Sets LightCatcherProps.maxBrightness"
-            label="Max brightness"
-            hint="How bright the surface is with the pointer on it. 1 is the content exactly as painted."
-        >
+        <PageProp item-key="maxBrightness" v-bind="LightCatcherKnobs.MAX_BRIGHTNESS_TEXT">
             <PageNumberField
                 :value="maxBrightness"
                 :min="LightCatcherKnobs.MIN_BRIGHTNESS"
@@ -152,12 +127,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="restingBrightness"
-            controls="Sets LightCatcherProps.restingBrightness"
-            label="Resting brightness"
-            hint="How bright the surface is with nothing near it. Below 1 it dims, which turns a row into a spotlight."
-        >
+        <PageProp item-key="restingBrightness" v-bind="LightCatcherKnobs.RESTING_BRIGHTNESS_TEXT">
             <PageNumberField
                 :value="restingBrightness"
                 :min="LightCatcherKnobs.MIN_BRIGHTNESS"
@@ -169,12 +139,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="maxLightness"
-            controls="Sets LightCatcherProps.maxLightness"
-            label="Max lightness"
-            hint="How far the surface fades toward white with the pointer on it. 0 is untouched. Unlike brightness it lifts the dark parts most, and the two stack."
-        >
+        <PageProp item-key="maxLightness" v-bind="LightCatcherKnobs.MAX_LIGHTNESS_TEXT">
             <PageNumberField
                 :value="maxLightness"
                 :min="LightCatcherKnobs.MIN_LIGHTNESS"
@@ -186,12 +151,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="restingLightness"
-            controls="Sets LightCatcherProps.restingLightness"
-            label="Resting lightness"
-            hint="How far the surface fades toward white with nothing near it. 0 is untouched."
-        >
+        <PageProp item-key="restingLightness" v-bind="LightCatcherKnobs.RESTING_LIGHTNESS_TEXT">
             <PageNumberField
                 :value="restingLightness"
                 :min="LightCatcherKnobs.MIN_LIGHTNESS"

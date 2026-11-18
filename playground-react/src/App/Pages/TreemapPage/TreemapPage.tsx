@@ -45,14 +45,7 @@ export const TreemapPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp
-                    itemKey={"zoomDurationMs"}
-                    label={"Zoom duration (ms)"}
-                    hint={
-                        "How long a zoom in or out takes. It is off while the visitor has asked for reduced motion, and 0 jumps straight to the new level."
-                    }
-                    controls={"Sets TreemapProps.zoomDurationMs"}
-                >
+                <PageProp itemKey={"zoomDurationMs"} {...TreemapKnobs.ZOOM_DURATION_MS_TEXT}>
                     <PageNumberField
                         value={zoomDurationMs}
                         min={TreemapKnobs.MIN_ZOOM_DURATION_MS}

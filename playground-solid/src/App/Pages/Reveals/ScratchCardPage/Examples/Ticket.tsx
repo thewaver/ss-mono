@@ -2,6 +2,7 @@ import { createSignal } from "solid-js";
 
 import { Button, ScratchCard } from "@thewaver/ss-components-solid";
 import type { ScratchCardController } from "@thewaver/ss-components-solid";
+import { SCRATCH_REVEAL_PRIZE_LABEL } from "@thewaver/ss-playground/App/Pages/Reveals/ScratchCardPage/ScratchCardPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/Reveals/ScratchCardPage/ScratchCardPage.css";
 import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
@@ -27,7 +28,7 @@ export const TicketExample = (props: Props) => {
                         softness={props.softness}
                         computePoints={props.computePoints()}
                         clearThreshold={props.clearThreshold}
-                        ariaLabel={"Scratch to reveal the prize"}
+                        ariaLabel={SCRATCH_REVEAL_PRIZE_LABEL}
                         onMount={setController}
                         onScratch={props.onScratch}
                         onClear={props.onClear}

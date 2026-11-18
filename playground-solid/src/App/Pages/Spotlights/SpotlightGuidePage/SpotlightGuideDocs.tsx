@@ -2,10 +2,14 @@ import { createMemo, createSignal } from "solid-js";
 
 import type { AnchorHPlacement, AnchorVPlacement } from "@thewaver/ss-components-solid";
 import { ANCHOR_H_PLACEMENTS, ANCHOR_V_PLACEMENTS, SPOTLIGHT_DEFAULTS } from "@thewaver/ss-components-solid";
+import { SpotlightGuideKnobs } from "@thewaver/ss-playground/App/Knobs/SpotlightGuides.const";
 import { SpotlightKnobs } from "@thewaver/ss-playground/App/Knobs/Spotlights.const";
 import { WCAG_URLS } from "@thewaver/ss-playground/App/PageComponents/DocsProse/DocsProse.const";
 import * as docsStyles from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.css";
-import { DOCS_ROOT } from "@thewaver/ss-playground/App/Pages/Spotlights/SpotlightGuidePage/SpotlightGuidePage.const";
+import {
+    DOCS_ROOT,
+    DOCS_SECTIONS,
+} from "@thewaver/ss-playground/App/Pages/Spotlights/SpotlightGuidePage/SpotlightGuidePage.const";
 import { FIELD_WIDTH, PADDING } from "@thewaver/ss-playground/App/Pages/Spotlights/SpotlightTourSteps.const";
 
 import { PageDocsAlert } from "../../../PageComponents/DocsAlert/DocsAlert";
@@ -41,14 +45,7 @@ export const SpotlightGuideDocs = () => {
                 path={`${DOCS_ROOT}/Basic.tsx`}
                 renderKnobs={() => (
                     <>
-                        <PageProp
-                            key={"padding"}
-                            label={"Padding (px)"}
-                            hint={
-                                "How much room is left around the lit element, so the hole is not cut tight against it."
-                            }
-                            controls={"Sets SpotlightGuideProps.padding"}
-                        >
+                        <PageProp key={"padding"} {...SpotlightGuideKnobs.PADDING_TEXT}>
                             <PageNumberField
                                 value={getPadding}
                                 min={SpotlightKnobs.MIN_PADDING}
@@ -60,14 +57,7 @@ export const SpotlightGuideDocs = () => {
                             />
                         </PageProp>
 
-                        <PageProp
-                            key={"transitionDurationMs"}
-                            label={"Transition duration (ms)"}
-                            hint={
-                                "How long the guide takes to fade in and out, and to move from one step to the next. At 0 it jumps."
-                            }
-                            controls={"Sets SpotlightGuideProps.transitionDurationMs"}
-                        >
+                        <PageProp key={"transitionDurationMs"} {...SpotlightGuideKnobs.TRANSITION_DURATION_MS_TEXT}>
                             <PageNumberField
                                 value={getTransitionDurationMs}
                                 min={SpotlightKnobs.MIN_DURATION}
@@ -79,14 +69,7 @@ export const SpotlightGuideDocs = () => {
                             />
                         </PageProp>
 
-                        <PageProp
-                            key={"popupPlacementX"}
-                            label={"Popup across"}
-                            hint={
-                                "Where the popup sits across the lit element: lined up with an edge from inside, centered, or outside it altogether."
-                            }
-                            controls={"Sets SpotlightGuideProps.popupPlacement.x"}
-                        >
+                        <PageProp key={"popupPlacementX"} {...SpotlightGuideKnobs.POPUP_PLACEMENT_X_TEXT}>
                             <PageSelectField
                                 value={getPlacementX}
                                 values={ANCHOR_H_PLACEMENTS}
@@ -96,14 +79,7 @@ export const SpotlightGuideDocs = () => {
                             />
                         </PageProp>
 
-                        <PageProp
-                            key={"popupPlacementY"}
-                            label={"Popup down"}
-                            hint={
-                                "Where the popup sits above or below the lit element: lined up with an edge from inside, centered, or outside it altogether."
-                            }
-                            controls={"Sets SpotlightGuideProps.popupPlacement.y"}
-                        >
+                        <PageProp key={"popupPlacementY"} {...SpotlightGuideKnobs.POPUP_PLACEMENT_Y_TEXT}>
                             <PageSelectField
                                 value={getPlacementY}
                                 values={ANCHOR_V_PLACEMENTS}
@@ -113,12 +89,7 @@ export const SpotlightGuideDocs = () => {
                             />
                         </PageProp>
 
-                        <PageProp
-                            key={"popupOffsetX"}
-                            label={"Offset across (px)"}
-                            hint={"How far the popup is held clear of the lit element sideways."}
-                            controls={"Sets SpotlightGuideProps.popupOffset.x"}
-                        >
+                        <PageProp key={"popupOffsetX"} {...SpotlightGuideKnobs.POPUP_OFFSET_X_TEXT}>
                             <PageNumberField
                                 value={getOffsetX}
                                 min={SpotlightKnobs.MIN_OFFSET}
@@ -130,12 +101,7 @@ export const SpotlightGuideDocs = () => {
                             />
                         </PageProp>
 
-                        <PageProp
-                            key={"popupOffsetY"}
-                            label={"Offset down (px)"}
-                            hint={"How far the popup is held clear of the lit element above or below it."}
-                            controls={"Sets SpotlightGuideProps.popupOffset.y"}
-                        >
+                        <PageProp key={"popupOffsetY"} {...SpotlightGuideKnobs.POPUP_OFFSET_Y_TEXT}>
                             <PageNumberField
                                 value={getOffsetY}
                                 min={SpotlightKnobs.MIN_OFFSET}
@@ -157,23 +123,13 @@ export const SpotlightGuideDocs = () => {
                 />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"A tour with a step the reader does"}
-                content={
-                    "A guide seals the whole page, so the element it lights cannot be pressed. For a step the reader is to do, open a SpotlightPrompt over the guide: the guide fades but stays open while the prompt lights the one control, and using the control brings the guide back on the next step. Escape on the prompt brings the guide back on the same step. Escape on the guide closes it, and the tour pauses where it was. The example also keeps the step in sessionStorage, so a reload offers to resume there."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.tourStepReaderDoes} />
 
             <PageDocsExample path={`${DOCS_ROOT}/Tour.tsx`}>
                 <TourDocsExample />
             </PageDocsExample>
 
-            <PageDocsSection
-                title={"Right to left"}
-                content={
-                    "The popup takes the direction of the element it lights, so inside a box whose text runs right to left, the popup's text and buttons run from the right too. The hole and the overlay are not text, and stay as they are."
-                }
-            />
+            <PageDocsSection {...DOCS_SECTIONS.rightLeft} />
 
             <PageDocsExample path={`${DOCS_ROOT}/RightToLeft.tsx`}>
                 <RightToLeftDocsExample />

@@ -29,7 +29,7 @@ export const timelineFrame = style({
     padding: themeVars.spacing.full,
     border: `1px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
     borderRadius: themeVars.borderRadius.full,
-    backgroundColor: layerVars.main,
+    backgroundColor: layerVars.dark,
     touchAction: "none",
     userSelect: "none",
 });

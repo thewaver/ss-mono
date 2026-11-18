@@ -11,3 +11,5 @@ export const FIELD_WIDTH = 110;
 export const BOX_HEIGHT = 200;
 
 export const ROW_SPAN = 2;
+
+export const WHERE_LIGHT_ACROSS_ROW_LABEL = "Where the light is across the row";

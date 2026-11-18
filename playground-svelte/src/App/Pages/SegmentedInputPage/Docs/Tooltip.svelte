@@ -1,7 +1,7 @@
 <script lang="ts">
     import type { ShapeArrowAim } from "@thewaver/ss-utils";
     import { SegmentedInput } from "@thewaver/ss-components-svelte";
-    import { ONE_TIME_CODE_LENGTH } from "@thewaver/ss-playground/App/Pages/SegmentedInputPage/SegmentedInputPage.const";
+    import { ONE_TIME_CODE_LENGTH, DISABLED_BUT_REACHABLE_CODE_LABEL } from "@thewaver/ss-playground/App/Pages/SegmentedInputPage/SegmentedInputPage.const";
     import { FIELD_GAP } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
     import PageSegmentedInputCell from "../../../StyledComponents/SegmentedInputContent/SegmentedInputContent.svelte";
@@ -21,7 +21,7 @@
     gap={FIELD_GAP}
     isDisabled={props.isDisabled}
     isReachableWhenDisabled={props.isReachableWhenDisabled}
-    ariaLabel={"Disabled but reachable code"}
+    ariaLabel={DISABLED_BUT_REACHABLE_CODE_LABEL}
     tooltipDefs={{
         placement: { x: "center", y: "top_out" },
         offset: { x: 0, y: 10 },

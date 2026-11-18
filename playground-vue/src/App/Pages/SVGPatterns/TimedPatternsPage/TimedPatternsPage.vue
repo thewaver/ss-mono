@@ -3,6 +3,7 @@ import { computed, shallowRef } from "vue";
 
 import { type SVGDefsColors, SVGDefsSamples } from "@thewaver/ss-components-vue";
 import { SVGPatternKnobs } from "@thewaver/ss-playground/App/Knobs/SVGPatterns.const";
+import { TimedPatternKnobs } from "@thewaver/ss-playground/App/Knobs/TimedPatterns.const";
 import { toGroupEntriesWithNoSample } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
 import type { WithNoSample } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.types";
 import { EXAMPLE_NAMES } from "@thewaver/ss-playground/App/Pages/SVGPatterns/TimedPatternsPage/TimedPatternsPage.const";
@@ -63,12 +64,7 @@ const examples: ExampleDefs[] = [
 
 <template>
     <PagePropsPanel scope="global">
-        <PageProp
-            item-key="configKey"
-            controls="Picks the sample pattern the example sends to ShapeProps.computeFillDefs"
-            label="Pattern"
-            hint="Which repeating pattern is shown."
-        >
+        <PageProp item-key="configKey" v-bind="TimedPatternKnobs.CONFIG_KEY_TEXT">
             <PageGroupedSelectField
                 :value="configKey"
                 :groups="TIMED_PATTERN_GROUPS"
@@ -79,12 +75,7 @@ const examples: ExampleDefs[] = [
 
         <PageSVGPatternsProps :controls="controls" />
 
-        <PageProp
-            item-key="animationDurationMs"
-            controls="Sets SVGAnimationDefs.animationDurationMs"
-            label="Animation duration (ms)"
-            hint="How long one pass of the pattern's animation takes."
-        >
+        <PageProp item-key="animationDurationMs" v-bind="TimedPatternKnobs.ANIMATION_DURATION_MS_TEXT">
             <PageNumberField
                 :value="animationDurationMs"
                 :min="SVGPatternKnobs.MIN_DURATION_MS"
@@ -95,12 +86,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="iterationConfigKey"
-            controls="Picks the sample iteration that fills SVGAnimationDefs.animationIterationPatterns"
-            label="Iteration Pattern"
-            hint="How the animation repeats: once, endlessly, or back and forth."
-        >
+        <PageProp item-key="iterationConfigKey" v-bind="TimedPatternKnobs.ITERATION_CONFIG_KEY_TEXT">
             <PageSelectField
                 :value="iterationConfigKey"
                 :values="SVGDefsSamples.Iteration.SAMPLE_KEYS"

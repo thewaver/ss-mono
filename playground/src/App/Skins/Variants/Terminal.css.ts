@@ -131,21 +131,25 @@ SkinUtils.define(terminal, {
     },
     button: {
         paddingInline: themeVars.spacing.double,
-        border: `2px solid ${layerVars.contrast}`,
-        color: layerVars.contrast,
+        border: `2px solid ${themeVars.color.primary.main}`,
+        color: themeVars.color.primary.main,
         fontWeight: "bold",
         selectors: ObjectUtils.deepMerge(INTERACTIBLE_STATES, {
             [skinSelectors.isPressed]: {
-                borderColor: themeVars.color.primary.main,
-                color: themeVars.color.primary.main,
+                backgroundColor: [
+                    themeVars.color.primary.contrast,
+                    `rgb(from ${themeVars.color.primary.main} r g b / 25%)`,
+                ],
             },
             [skinSelectors.hasError]: {
                 borderColor: themeVars.color.error.main,
                 color: themeVars.color.error.main,
             },
             [SkinUtils.allOf(skinSelectors.isPressed, skinSelectors.hasError)]: {
-                borderColor: themeVars.color.error.main,
-                color: themeVars.color.primary.main,
+                backgroundColor: [
+                    themeVars.color.error.contrast,
+                    `rgb(from ${themeVars.color.error.main} r g b / 25%)`,
+                ],
             },
         }),
     },
@@ -155,16 +159,10 @@ SkinUtils.define(terminal, {
         fontSize: themeVars.fontSize.small,
         selectors: ObjectUtils.deepMerge(INTERACTIBLE_STATES, {
             [skinSelectors.isPressed]: {
-                borderColor: themeVars.color.primary.main,
                 color: themeVars.color.primary.main,
             },
             [skinSelectors.hasError]: {
                 borderColor: themeVars.color.error.main,
-                color: themeVars.color.error.main,
-            },
-            [SkinUtils.allOf(skinSelectors.isPressed, skinSelectors.hasError)]: {
-                borderColor: themeVars.color.error.main,
-                color: themeVars.color.primary.main,
             },
         }),
     },

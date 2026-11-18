@@ -50,14 +50,7 @@ export const MorphTextPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp
-                    itemKey={"morphDurationMs"}
-                    label={"Morph duration (ms)"}
-                    hint={
-                        "How long one word takes to melt into the next. It is off while the visitor has asked for reduced motion."
-                    }
-                    controls={"Sets MorphTextProps.morphDurationMs"}
-                >
+                <PageProp itemKey={"morphDurationMs"} {...MorphTextKnobs.MORPH_DURATION_MS_TEXT}>
                     <PageNumberField
                         value={morphDurationMs}
                         min={MorphTextKnobs.MIN_MORPH_DURATION_MS}
@@ -69,14 +62,7 @@ export const MorphTextPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"maxBlurPx"}
-                    label={"Blur (px)"}
-                    hint={
-                        "The most either word is blurred while they cross. More blur melts more of the letters together."
-                    }
-                    controls={"Sets MorphTextProps.maxBlurPx"}
-                >
+                <PageProp itemKey={"maxBlurPx"} {...MorphTextKnobs.MAX_BLUR_PX_TEXT}>
                     <PageNumberField
                         value={maxBlurPx}
                         min={MorphTextKnobs.MIN_MAX_BLUR_PX}

@@ -1,6 +1,7 @@
 import { createSignal } from "solid-js";
 
 import { SPOTLIGHT_DEFAULTS } from "@thewaver/ss-components-solid";
+import { SpotlightHintKnobs } from "@thewaver/ss-playground/App/Knobs/SpotlightHints.const";
 import { SpotlightKnobs } from "@thewaver/ss-playground/App/Knobs/Spotlights.const";
 import { WCAG_URLS } from "@thewaver/ss-playground/App/PageComponents/DocsProse/DocsProse.const";
 import { DOCS_ROOT } from "@thewaver/ss-playground/App/Pages/Spotlights/SpotlightHintPage/SpotlightHintPage.const";
@@ -28,14 +29,7 @@ export const SpotlightHintDocs = () => {
                 path={`${DOCS_ROOT}/Basic.tsx`}
                 renderKnobs={() => (
                     <>
-                        <PageProp
-                            key={"padding"}
-                            label={"Padding (px)"}
-                            hint={
-                                "How much room is left around the lit element, so the hole is not cut tight against it."
-                            }
-                            controls={"Sets SpotlightHintProps.padding"}
-                        >
+                        <PageProp key={"padding"} {...SpotlightHintKnobs.PADDING_TEXT}>
                             <PageNumberField
                                 value={getPadding}
                                 min={SpotlightKnobs.MIN_PADDING}
@@ -47,12 +41,7 @@ export const SpotlightHintDocs = () => {
                             />
                         </PageProp>
 
-                        <PageProp
-                            key={"transitionDurationMs"}
-                            label={"Transition duration (ms)"}
-                            hint={"How long the hint takes to fade in and out. At 0 it appears and goes at once."}
-                            controls={"Sets SpotlightHintProps.transitionDurationMs"}
-                        >
+                        <PageProp key={"transitionDurationMs"} {...SpotlightHintKnobs.TRANSITION_DURATION_MS_TEXT}>
                             <PageNumberField
                                 value={getTransitionDurationMs}
                                 min={SpotlightKnobs.MIN_DURATION}

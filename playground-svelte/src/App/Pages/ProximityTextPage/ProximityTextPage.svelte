@@ -91,9 +91,7 @@
 <PagePropsPanel scope={"global"}>
     <PageProp
         itemKey={"reachPx"}
-        controls={"Sets ProximityTextProps.reachPx"}
-        label={"Reach (px)"}
-        hint={"How far from a letter's middle the point still reaches it. Past it, the letter rests."}
+        {...ProximityTextKnobs.REACH_PX_TEXT}
     >
         <PageNumberField
             value={reachPx}
@@ -107,9 +105,7 @@
 
     <PageProp
         itemKey={"isDisabled"}
-        controls={"Sets ProximityTextProps.isDisabled"}
-        label={"Disabled"}
-        hint={"Rests every letter and stops following the point. It is what a page honoring a reduced-motion preference passes."}
+        {...ProximityTextKnobs.IS_DISABLED_TEXT}
     >
         <PageCheckField value={isDisabled} ariaLabel={"Disabled"} onChange={(value) => (isDisabled = value)} />
     </PageProp>

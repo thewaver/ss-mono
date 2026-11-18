@@ -119,9 +119,7 @@
 <PagePropsPanel scope={"global"}>
     <PageProp
         itemKey={"method"}
-        controls={"Sets SVGFilterAssemblyDefs.method"}
-        label={"Method"}
-        hint={"Whether each step is fed the result of the one before it, or each works from the original and the results are combined."}
+        {...SVGFilterKnobs.METHOD_TEXT}
     >
         <PageSelectField
             value={method}
@@ -133,9 +131,7 @@
 
     <PageProp
         itemKey={"elementSize"}
-        controls={"Switches SVGFilterAssemblyDefs.elementSize between the example element's size and none"}
-        label={"Region sized from the element"}
-        hint={"Sizes the area the filter is allowed to paint in from the element itself, rather than from a fixed region."}
+        {...SVGFilterKnobs.ELEMENT_SIZE_TEXT}
     >
         <PageCheckField
             value={isSizedFromElement}

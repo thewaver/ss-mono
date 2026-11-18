@@ -98,11 +98,7 @@
     <PagePropsPanel scope={"sample"}>
         <PageProp
             itemKey={"strokeConfigKey"}
-            controls={"Picks the example border paint sent to GlassSurfaceProps.computeStrokeDefs"}
-            label={"Border pattern"}
-            hint={
-                "Which pointer-following gradient lights the panel's edge. Choosing one brings its own knobs with it."
-            }
+            {...GlassSurfaceKnobs.STROKE_CONFIG_KEY_TEXT}
         >
             <PageGroupedSelectField
                 value={strokeConfigKey}
@@ -130,7 +126,7 @@
     <PagePropsDivider />
 
     <PagePropsPanel scope={"global"}>
-        <PageProp itemKey={"borderRadius"} controls={"Sets every corner of GlassSurfaceProps.borderRadii"} label={"Corner radius (px)"} hint={"How far the panel's corners are rounded."}>
+        <PageProp itemKey={"borderRadius"} {...GlassSurfaceKnobs.BORDER_RADIUS_TEXT}>
             <PageNumberField
                 value={borderRadius}
                 min={GlassSurfaceKnobs.MIN_BORDER_RADIUS}
@@ -145,9 +141,7 @@
 
         <PageProp
             itemKey={"borderWidth"}
-            controls={"Sets every side of GlassSurfaceProps.borderWidths"}
-            label={"Border width (px)"}
-            hint={"How thick the lit edge around the panel is."}
+            {...GlassSurfaceKnobs.BORDER_WIDTH_TEXT}
         >
             <PageNumberField
                 value={borderWidth}
@@ -161,7 +155,7 @@
             />
         </PageProp>
 
-        <PageProp itemKey={"colors"} controls={"Sets the colors of the example border paint sent to GlassSurfaceProps.computeStrokeDefs"} label={"Border Colors"} hint={"The colors the edge light is painted from."}>
+        <PageProp itemKey={"colors"} {...GlassSurfaceKnobs.COLORS_TEXT}>
             <div class={styles.colorList}>
                 {#each colorKeys as key (key)}
                     <PageColorField
@@ -177,9 +171,7 @@
 
         <PageProp
             itemKey={"blurWidth"}
-            controls={"Sets the blur of the example border paint sent to GlassSurfaceProps.computeStrokeDefs"}
-            label={"Border blur (px)"}
-            hint={"How far the edge light bleeds outward, which is what makes it glow rather than sit flat."}
+            {...GlassSurfaceKnobs.BLUR_WIDTH_TEXT}
         >
             <PageNumberField
                 value={blurWidth}
@@ -195,9 +187,7 @@
 
         <PageProp
             itemKey={"blurRadius"}
-            controls={"Sets GlassSurfaceProps.glassDefs.backdrop.blurRadius"}
-            label={"Backdrop blur (px)"}
-            hint={"How far whatever is behind the panel is blurred as it shows through."}
+            {...GlassSurfaceKnobs.BLUR_RADIUS_TEXT}
         >
             <PageNumberField
                 value={blurRadius}
@@ -213,9 +203,7 @@
 
         <PageProp
             itemKey={"noiseFrequency"}
-            controls={"Sets GlassSurfaceProps.glassDefs.noise.frequency"}
-            label={"Noise scale"}
-            hint={"How fine the grain dusted over the glass is. Higher numbers make a tighter grain."}
+            {...GlassSurfaceKnobs.NOISE_FREQUENCY_TEXT}
         >
             <PageNumberField
                 value={noiseFrequency}
@@ -231,9 +219,7 @@
 
         <PageProp
             itemKey={"noiseOctaves"}
-            controls={"Sets GlassSurfaceProps.glassDefs.noise.octaves"}
-            label={"Noise octaves"}
-            hint={"How many layers of grain are piled up. More layers add fine detail and cost more to draw."}
+            {...GlassSurfaceKnobs.NOISE_OCTAVES_TEXT}
         >
             <PageNumberField
                 value={noiseOctaves}
@@ -249,11 +235,7 @@
 
         <PageProp
             itemKey={"rippleScale"}
-            controls={"Sets GlassSurfaceProps.glassDefs.ripple.scale"}
-            label={"Ripple bend (px)"}
-            hint={
-                "How far the glass bends what is behind it, as though it were not quite flat. 0 leaves it looking like a window."
-            }
+            {...GlassSurfaceKnobs.RIPPLE_SCALE_TEXT}
         >
             <PageNumberField
                 value={rippleScale}
@@ -269,11 +251,7 @@
 
         <PageProp
             itemKey={"lightHeight"}
-            controls={"Sets GlassSurfaceProps.glassDefs.sheen.lightHeight"}
-            label={"Light height"}
-            hint={
-                "How far above the panel the light lighting the sheen is placed. Lower puts it closer and makes the highlight tighter."
-            }
+            {...GlassSurfaceKnobs.LIGHT_HEIGHT_TEXT}
         >
             <PageNumberField
                 value={lightHeight}
@@ -289,11 +267,7 @@
 
         <PageProp
             itemKey={"surfaceScale"}
-            controls={"Sets GlassSurfaceProps.glassDefs.sheen.surfaceScale"}
-            label={"Sheen relief"}
-            hint={
-                "How deep the relief the sheen is shaded against is. 0 leaves the surface flat and kills the highlight."
-            }
+            {...GlassSurfaceKnobs.SURFACE_SCALE_TEXT}
         >
             <PageNumberField
                 value={surfaceScale}
@@ -309,9 +283,7 @@
 
         <PageProp
             itemKey={"specularConstant"}
-            controls={"Sets GlassSurfaceProps.glassDefs.sheen.specularConstant"}
-            label={"Sheen brightness"}
-            hint={"How strong the sheen highlight is overall."}
+            {...GlassSurfaceKnobs.SPECULAR_CONSTANT_TEXT}
         >
             <PageNumberField
                 value={specularConstant}
@@ -327,11 +299,7 @@
 
         <PageProp
             itemKey={"specularExponent"}
-            controls={"Sets GlassSurfaceProps.glassDefs.sheen.specularExponent"}
-            label={"Shininess"}
-            hint={
-                "How tightly the sheen highlight is focused: low is a broad soft gleam, high is a small hard glint."
-            }
+            {...GlassSurfaceKnobs.SPECULAR_EXPONENT_TEXT}
         >
             <PageNumberField
                 value={specularExponent}
@@ -347,9 +315,7 @@
 
         <PageProp
             itemKey={"tintOpacity"}
-            controls={"Sets GlassSurfaceProps.glassDefs.tint.opacity"}
-            label={"Tint opacity"}
-            hint={"How strongly the panel is colored. 0 leaves it clear."}
+            {...GlassSurfaceKnobs.TINT_OPACITY_TEXT}
         >
             <PageNumberField
                 value={tintOpacity}
@@ -363,7 +329,7 @@
             />
         </PageProp>
 
-        <PageProp itemKey={"tintColor"} controls={"Sets GlassSurfaceProps.glassDefs.tint.color"} label={"Tint color"} hint={"The color the panel itself is tinted with."}>
+        <PageProp itemKey={"tintColor"} {...GlassSurfaceKnobs.TINT_COLOR_TEXT}>
             <PageColorField
                 value={tintColor}
                 ariaLabel={"Tint color"}

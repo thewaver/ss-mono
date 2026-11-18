@@ -1,5 +1,8 @@
 import { Button, Toasts, useToastsContext } from "@thewaver/ss-components-react";
-import { RIGHT_TO_LEFT_MESSAGE } from "@thewaver/ss-playground/App/Pages/ToastsPage/ToastsPage.const";
+import {
+    PUBLISHING_NOTIFICATIONS_LABEL,
+    RIGHT_TO_LEFT_MESSAGE,
+} from "@thewaver/ss-playground/App/Pages/ToastsPage/ToastsPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ToastsPage/ToastsPage.css";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
@@ -31,7 +34,7 @@ const Raisers = () => {
 export const RightToLeftDocsExample = () => (
     <div dir={"rtl"}>
         <Toasts<ToastDefs>
-            ariaLabel={"Publishing notifications"}
+            ariaLabel={PUBLISHING_NOTIFICATIONS_LABEL}
             alignment={"middle_left"}
             renderToast={(toast, visibilityTarget, transitionDurationMs, state, dismiss) => (
                 <PageToastContent

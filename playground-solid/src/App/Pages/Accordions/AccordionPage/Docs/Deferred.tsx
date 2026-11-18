@@ -3,7 +3,10 @@ import { createSignal, onMount } from "solid-js";
 import { Accordion } from "@thewaver/ss-components-solid";
 import type { AccordionItem } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
-import { DOCS_GAP } from "@thewaver/ss-playground/App/Pages/Accordions/AccordionPage/AccordionPage.const";
+import {
+    DOCS_GAP,
+    ENABLED_SECTION_BODIES,
+} from "@thewaver/ss-playground/App/Pages/Accordions/AccordionPage/AccordionPage.const";
 import * as accordionStyles from "@thewaver/ss-playground/App/Pages/Accordions/Accordions.css";
 
 import {
@@ -11,12 +14,6 @@ import {
     PageAccordionPanel,
     PageAccordionWrapper,
 } from "../../../../StyledComponents/AccordionContent/AccordionContent";
-
-const SECTION_BODIES: Record<string, string[]> = {
-    Shipping: ["Orders leave the warehouse within two working days.", "Tracking arrives by email."],
-    Returns: ["Thirty days, unopened, receipt or order number."],
-    Warranty: ["Two years against manufacturing defects."],
-};
 
 const ITEMS: AccordionItem<string>[] = [{ value: "Shipping" }, { value: "Returns" }, { value: "Warranty" }];
 
@@ -48,7 +45,7 @@ export const DeferredDocsExample = () => {
                                 visibilityTarget={getVisibilityTarget}
                                 transitionDurationMs={getTransitionDurationMs}
                             >
-                                {SECTION_BODIES[getItem().value].map((line) => (
+                                {ENABLED_SECTION_BODIES[getItem().value].map((line) => (
                                     <div data-built={getItem().value}>{line}</div>
                                 ))}
                             </PageAccordionPanel>

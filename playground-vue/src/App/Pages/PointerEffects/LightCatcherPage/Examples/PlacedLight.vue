@@ -2,6 +2,7 @@
 import { computed, shallowRef } from "vue";
 
 import { LightCatcher, Range } from "@thewaver/ss-components-vue";
+import { WHERE_LIGHT_ACROSS_ROW_LABEL } from "@thewaver/ss-playground/App/Pages/PointerEffects/LightCatcherPage/LightCatcherPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/PointerEffects/LightCatcherPage/LightCatcherPage.css";
 
 import PageMeasureBox from "../../../../PageComponents/MeasureBox/MeasureBox.vue";
@@ -52,7 +53,7 @@ const pointSource = computed(() => ({ ratio: { x: percent.value / PERCENT, y: MI
                 id="placedLightSlider"
                 v-model:value="percent"
                 sizing="fill"
-                ariaLabel="Where the light is across the row"
+                :ariaLabel="WHERE_LIGHT_ACROSS_ROW_LABEL"
                 :min="0"
                 :max="PERCENT"
                 :step="SLIDER_STEP"

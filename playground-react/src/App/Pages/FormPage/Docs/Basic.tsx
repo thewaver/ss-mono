@@ -3,6 +3,11 @@ import { useState } from "react";
 import { Button, Checkbox, Form, FormField, TextInput } from "@thewaver/ss-components-react";
 import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
 import {
+    DOES_NOT_LOOK_LIKE_TEXT,
+    SOME_FIELDS_NEED_ATTENTION_TEXT,
+    WE_ONLY_USE_SIGN_TEXT,
+} from "@thewaver/ss-playground/App/Pages/FormPage/FormPage.const";
+import {
     FIELD_GAP,
     FIELD_PADDING,
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
@@ -41,7 +46,7 @@ export const BasicDocsExample = () => {
     const computeEmailMessage = () => {
         if (emailState[0].length < 1) return "Enter your email.";
 
-        return hasEmailError ? "That does not look like an email address." : "We only use it to sign you in.";
+        return hasEmailError ? DOES_NOT_LOOK_LIKE_TEXT : WE_ONLY_USE_SIGN_TEXT;
     };
 
     const emailMessage = computeEmailMessage();
@@ -117,7 +122,7 @@ export const BasicDocsExample = () => {
                     </PageFormButtons>
 
                     <div className={exampleStyles.exampleReadout} data-readout>
-                        {`${state.isValid ? "Ready to send." : "Some fields need attention."} ${outcome}`}
+                        {`${state.isValid ? "Ready to send." : SOME_FIELDS_NEED_ATTENTION_TEXT} ${outcome}`}
                     </div>
                 </PageFormStack>
             )}

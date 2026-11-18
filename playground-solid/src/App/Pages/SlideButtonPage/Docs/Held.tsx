@@ -1,6 +1,7 @@
 import { createSignal } from "solid-js";
 
 import { Button, SlideButton } from "@thewaver/ss-components-solid";
+import { HOLD_ENTER_SPACE_ARM_DESCRIPTION } from "@thewaver/ss-playground/App/Pages/SlideButtonPage/SlideButtonPage.const";
 import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 import { SLIDE_BUTTON_THUMB_SIZE } from "@thewaver/ss-playground/App/StyledComponents/SlideButtonContent/SlideButtonContent.css";
 
@@ -14,7 +15,7 @@ export const HeldDocsExample = () => {
     return (
         <PageControlRow>
             <SlideButton
-                ariaDescription={"Hold Enter or Space to arm."}
+                ariaDescription={HOLD_ENTER_SPACE_ARM_DESCRIPTION}
                 isPressed={getIsArmed}
                 thumbSize={SLIDE_BUTTON_THUMB_SIZE}
                 renderContent={(getRenderProps) => (

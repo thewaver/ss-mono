@@ -3,6 +3,7 @@ import { shallowRef, useModel } from "vue";
 
 import { Button, Trail } from "@thewaver/ss-components-vue";
 import type { TrailController } from "@thewaver/ss-components-vue";
+import { CONVOY_PATH } from "@thewaver/ss-playground/App/Pages/TrailPage/TrailPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/TrailPage/TrailPage.css";
 import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
@@ -13,7 +14,6 @@ import PageTrailVehicle from "../../../StyledComponents/TrailContent/PageTrailVe
 import type { TrailExampleProps } from "../TrailPage.types";
 
 const CONVOY_SIZE = { width: 320, height: 150 };
-const CONVOY_PATH = "M 30 120 C 80 120, 90 30, 160 30 S 240 120, 290 120";
 const CONVOY_OFFSETS = [0, 0.12, 0.24, 0.36];
 const LEAD_LABEL = "▶";
 

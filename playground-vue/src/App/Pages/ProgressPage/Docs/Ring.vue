@@ -5,6 +5,7 @@ import { Progress } from "@thewaver/ss-components-vue";
 import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
 import {
     BYTES_PER_KB,
+    UPLOAD_DRAWN_RING_LABEL,
     UPLOAD_TICK_BYTES,
     UPLOAD_TICK_MS,
     UPLOAD_TOTAL_BYTES,
@@ -35,7 +36,7 @@ onBeforeUnmount(() => {
     <Progress
         :value="uploadedBytes"
         :max="UPLOAD_TOTAL_BYTES"
-        ariaLabel="Upload, drawn as a ring"
+        :ariaLabel="UPLOAD_DRAWN_RING_LABEL"
         :ariaValueText="valueText"
         sizing="fit-content"
     >

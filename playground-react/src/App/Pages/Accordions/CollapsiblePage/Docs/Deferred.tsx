@@ -3,14 +3,17 @@ import { useEffect, useState } from "react";
 import { Collapsible } from "@thewaver/ss-components-react";
 import * as styles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
 import * as collapsibleStyles from "@thewaver/ss-playground/App/Pages/Accordions/Accordions.css";
+import {
+    DELIVERY_NOTES,
+    HIDE_DELIVERY_NOTES_TEXT,
+    SHOW_DELIVERY_NOTES_TEXT,
+} from "@thewaver/ss-playground/App/Pages/Accordions/CollapsiblePage/CollapsiblePage.const";
 
 import {
     PageAccordionHeader,
     PageAccordionPanel,
     PageAccordionWrapper,
 } from "../../../../StyledComponents/AccordionContent/AccordionContent";
-
-const NOTES = ["Signed for on arrival", "Left with a neighbor", "Returned to the depot"];
 
 type PanelProps = {
     visibilityTarget: 0 | 1;
@@ -23,7 +26,7 @@ const DeferredPanel = (props: PanelProps) => {
 
     return (
         <PageAccordionPanel visibilityTarget={props.visibilityTarget} transitionDurationMs={props.transitionDurationMs}>
-            <div>{NOTES.join(" · ")}</div>
+            <div>{DELIVERY_NOTES.join(" · ")}</div>
         </PageAccordionPanel>
     );
 };
@@ -42,7 +45,7 @@ export const DeferredDocsExample = () => {
                     )}
                     renderTrigger={(flags) => (
                         <PageAccordionHeader flags={flags}>
-                            {flags.isExpanded ? "Hide the delivery notes" : "Show the delivery notes"}
+                            {flags.isExpanded ? HIDE_DELIVERY_NOTES_TEXT : SHOW_DELIVERY_NOTES_TEXT}
                         </PageAccordionHeader>
                     )}
                     renderPanel={(visibilityTarget, transitionDurationMs) => (

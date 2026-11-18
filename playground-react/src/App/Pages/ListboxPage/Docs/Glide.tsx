@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { Listbox } from "@thewaver/ss-components-react";
+import { SHIPPING_COUNTRY_GLIDING_LABEL } from "@thewaver/ss-playground/App/Pages/ListboxPage/ListboxPage.const";
 
 import {
     renderPageHighlightFloater,
@@ -24,7 +25,7 @@ export const GlideDocsExample = (props: Props) => {
                 renderHighlightFloater={props.isGliding ? renderPageHighlightFloater : undefined}
                 value={country}
                 options={COUNTRIES_WITH_REACHABLE}
-                ariaLabel={"Shipping country, gliding"}
+                ariaLabel={SHIPPING_COUNTRY_GLIDING_LABEL}
                 renderOption={(option, flags) => (
                     <PageSelectOptionContent
                         hasHoverFloater={props.isGliding}

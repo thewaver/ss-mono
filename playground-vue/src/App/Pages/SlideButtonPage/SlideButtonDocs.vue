@@ -11,7 +11,11 @@ import type { NavigatorDirection, SlideButtonMode, SlideButtonOrientation } from
 import { SlideButtonKnobs } from "@thewaver/ss-playground/App/Knobs/SlideButtons.const";
 import { WCAG_URLS } from "@thewaver/ss-playground/App/PageComponents/DocsProse/DocsProse.const";
 import * as docsStyles from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.css";
-import { DOCS_ROOT, FIELD_WIDTH } from "@thewaver/ss-playground/App/Pages/SlideButtonPage/SlideButtonPage.const";
+import {
+    DOCS_ROOT,
+    DOCS_SECTIONS,
+    FIELD_WIDTH,
+} from "@thewaver/ss-playground/App/Pages/SlideButtonPage/SlideButtonPage.const";
 
 import PageDocsAlert from "../../PageComponents/DocsAlert/PageDocsAlert.vue";
 import PageDocsExample from "../../PageComponents/DocsExample/PageDocsExample.vue";
@@ -51,12 +55,7 @@ const direction = shallowRef<NavigatorDirection>(NAVIGATOR_DIRECTIONS[0]);
         />
 
         <template #renderKnobs>
-            <PageProp
-                item-key="mode"
-                label="Mode"
-                hint="Which pointer gestures confirm: sliding the thumb to the end, pressing and holding, or both. A held Enter or Space confirms under every mode."
-                controls="Sets SlideButtonProps.mode"
-            >
+            <PageProp item-key="mode" v-bind="SlideButtonKnobs.MODE_TEXT">
                 <PageSelectField
                     :value="mode"
                     :values="SLIDE_BUTTON_MODES"
@@ -65,12 +64,7 @@ const direction = shallowRef<NavigatorDirection>(NAVIGATOR_DIRECTIONS[0]);
                 />
             </PageProp>
 
-            <PageProp
-                item-key="completionRatio"
-                label="Completion ratio"
-                hint="How far along the track the thumb has to be when let go for the slide to complete. At 1 it has to reach the end; short of it, it springs back."
-                controls="Sets SlideButtonProps.completionRatio"
-            >
+            <PageProp item-key="completionRatio" v-bind="SlideButtonKnobs.COMPLETION_RATIO_TEXT">
                 <PageNumberField
                     :value="completionRatio"
                     :min="SlideButtonKnobs.MIN_COMPLETION_RATIO"
@@ -82,12 +76,7 @@ const direction = shallowRef<NavigatorDirection>(NAVIGATOR_DIRECTIONS[0]);
                 />
             </PageProp>
 
-            <PageProp
-                item-key="holdDurationMs"
-                label="Hold duration"
-                hint="How long the button has to be held to confirm without sliding, in milliseconds. It times a held Enter or Space under every mode, and a held pointer under all but slide."
-                controls="Sets SlideButtonProps.holdDurationMs"
-            >
+            <PageProp item-key="holdDurationMs" v-bind="SlideButtonKnobs.HOLD_DURATION_MS_TEXT">
                 <PageNumberField
                     :value="holdDurationMs"
                     :min="SlideButtonKnobs.MIN_HOLD_DURATION_MS"
@@ -99,21 +88,11 @@ const direction = shallowRef<NavigatorDirection>(NAVIGATOR_DIRECTIONS[0]);
                 />
             </PageProp>
 
-            <PageProp
-                item-key="hasError"
-                label="Error"
-                hint="Puts the button in its error look. It changes nothing about what the button accepts or does."
-                controls="Sets SlideButtonProps.hasError"
-            >
+            <PageProp item-key="hasError" v-bind="SlideButtonKnobs.HAS_ERROR_TEXT">
                 <PageCheckField :value="hasError" ariaLabel="Error" @change="(value: boolean) => (hasError = value)" />
             </PageProp>
 
-            <PageProp
-                item-key="isDisabled"
-                label="Disabled"
-                hint="Turns the button off: it refuses the drag and the hold, and the Tab key skips it."
-                controls="Sets SlideButtonProps.isDisabled"
-            >
+            <PageProp item-key="isDisabled" v-bind="SlideButtonKnobs.IS_DISABLED_TEXT">
                 <PageCheckField
                     :value="isDisabled"
                     ariaLabel="Disabled"
@@ -123,21 +102,13 @@ const direction = shallowRef<NavigatorDirection>(NAVIGATOR_DIRECTIONS[0]);
         </template>
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Orientation and direction"
-        content="A horizontal button slides from the side the text starts on: left to right, or right to left in a right-to-left page. A vertical one slides up from the bottom of the track, whichever way the text runs. The hold, a held Enter or Space and a click from assistive technology work the same in every direction."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.orientationDirection" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Directions.vue`">
         <DirectionsDocsExample :orientation="orientation" :direction="direction" />
 
         <template #renderKnobs>
-            <PageProp
-                item-key="orientation"
-                label="Orientation"
-                hint="Whether the track runs across the page or up it."
-                controls="Sets SlideButtonProps.orientation"
-            >
+            <PageProp item-key="orientation" v-bind="SlideButtonKnobs.ORIENTATION_TEXT">
                 <PageSelectField
                     :value="orientation"
                     :values="SLIDE_BUTTON_ORIENTATIONS"
@@ -146,12 +117,7 @@ const direction = shallowRef<NavigatorDirection>(NAVIGATOR_DIRECTIONS[0]);
                 />
             </PageProp>
 
-            <PageProp
-                item-key="direction"
-                label="Direction"
-                hint="Which way text runs around the button, set on the box that holds it. A right-to-left box makes a horizontal button slide leftward; a vertical one is unaffected."
-                controls="Sets dir on the box around the button"
-            >
+            <PageProp item-key="direction" v-bind="SlideButtonKnobs.DIRECTION_TEXT">
                 <PageSelectField
                     :value="direction"
                     :values="NAVIGATOR_DIRECTIONS"
@@ -162,10 +128,7 @@ const direction = shallowRef<NavigatorDirection>(NAVIGATOR_DIRECTIONS[0]);
         </template>
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Holding the thumb at the end"
-        content="To keep the thumb at the end after a successful slide, mark the button pressed until you reset it. The Playground's painter draws a pressed button with its thumb at the end; what a pressed button looks like is up to your painter."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.holdingThumbEnd" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Held.vue`">
         <HeldDocsExample />

@@ -33,6 +33,7 @@
     import DefaultTagsExample from "./Examples/DefaultTags.svelte";
     import GlossaryExample from "./Examples/Glossary.svelte";
     import LinksExample from "./Examples/Links.svelte";
+    import { RichTextKnobs } from "@thewaver/ss-playground/App/Knobs/RichTexts.const";
 
     let content = $state(STARTING_CONTENT);
     let removeOtherTags = $state(RICH_TEXT_DEFAULTS.removeOtherTags);
@@ -118,9 +119,7 @@
     <PagePropsPanel scope={"global"}>
         <PageProp
             itemKey={"removeOtherTags"}
-            controls={"Sets RichTextProps.removeOtherTags"}
-            label={"Remove other tags"}
-            hint={"Strips any tag the editor was not told to keep, rather than leaving it in the markup untouched."}
+            {...RichTextKnobs.REMOVE_OTHER_TAGS_TEXT}
         >
             <PageCheckField
                 value={removeOtherTags}
@@ -133,9 +132,7 @@
 
         <PageProp
             itemKey={"maxDepth"}
-            controls={"Sets RichTextProps.maxDepth, with -1 sent as Infinity"}
-            label={"Max depth (-1 = no limit)"}
-            hint={"How deeply tags may nest. A tag deeper than this prints as typed, and 0 allows no tags."}
+            {...RichTextKnobs.MAX_DEPTH_TEXT}
         >
             <PageNumberField
                 value={maxDepth}

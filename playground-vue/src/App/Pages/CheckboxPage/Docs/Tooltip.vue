@@ -3,6 +3,7 @@ import { h, shallowRef } from "vue";
 
 import { Checkbox } from "@thewaver/ss-components-vue";
 import type { BinarySwitchFlags, InteractionTooltipDefs } from "@thewaver/ss-components-vue";
+import { CHECKBOX_TOOLTIP_LABEL } from "@thewaver/ss-playground/App/Pages/CheckboxPage/CheckboxPage.const";
 
 import PageCheckboxContent from "../../../StyledComponents/CheckboxContent/CheckboxContent.vue";
 import PageTooltipContent from "../../../StyledComponents/TooltipContent/TooltipContent.vue";
@@ -26,13 +27,13 @@ const tooltipDefs: InteractionTooltipDefs<BinarySwitchFlags> = {
 <template>
     <Checkbox
         v-model:checked="checked"
-        ariaLabel="Checkbox with a tooltip"
+        :ariaLabel="CHECKBOX_TOOLTIP_LABEL"
         :is-disabled="isDisabled"
         :is-reachable-when-disabled="isReachableWhenDisabled"
         :tooltip-defs="tooltipDefs"
     >
         <template #renderContent="flags">
-            <PageCheckboxContent :flags="flags">Checkbox with a tooltip</PageCheckboxContent>
+            <PageCheckboxContent :flags="flags">{{ CHECKBOX_TOOLTIP_LABEL }}</PageCheckboxContent>
         </template>
     </Checkbox>
 </template>

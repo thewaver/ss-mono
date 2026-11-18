@@ -1,5 +1,9 @@
 import { Button, InteractionSettings, Toasts, useToastsContext } from "@thewaver/ss-components-react";
-import { HOTKEYS_MESSAGE, OWN_HOTKEYS } from "@thewaver/ss-playground/App/Pages/ToastsPage/ToastsPage.const";
+import {
+    HOTKEYS_MESSAGE,
+    NOTIFICATIONS_THEIR_OWN_KEYS_LABEL,
+    OWN_HOTKEYS,
+} from "@thewaver/ss-playground/App/Pages/ToastsPage/ToastsPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ToastsPage/ToastsPage.css";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
@@ -28,7 +32,7 @@ const Raisers = () => {
 export const HotkeysDocsExample = () => (
     <InteractionSettings toastHotkeys={OWN_HOTKEYS}>
         <Toasts<ToastDefs>
-            ariaLabel={"Notifications on their own keys"}
+            ariaLabel={NOTIFICATIONS_THEIR_OWN_KEYS_LABEL}
             alignment={"top_center"}
             renderToast={(toast, visibilityTarget, transitionDurationMs, state, dismiss) => (
                 <PageToastContent

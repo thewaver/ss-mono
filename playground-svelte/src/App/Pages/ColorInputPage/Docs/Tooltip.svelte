@@ -7,6 +7,7 @@
     import PageColorInputContent from "../../../StyledComponents/ColorInputContent/ColorInputContent.svelte";
     import PageTooltipContent from "../../../StyledComponents/TooltipContent/TooltipContent.svelte";
     import type { ColorInputTooltipDocsExampleProps } from "../ColorInputPageSvelte.types";
+    import { DISABLED_BUT_REACHABLE_COLOR_LABEL } from "@thewaver/ss-playground/App/Pages/ColorInputPage/ColorInputPage.const";
 
     type Props = ColorInputTooltipDocsExampleProps;
 
@@ -20,7 +21,7 @@
     bind:value
     isDisabled={props.isDisabled}
     isReachableWhenDisabled={props.isReachableWhenDisabled}
-    ariaLabel={"Disabled but reachable color"}
+    ariaLabel={DISABLED_BUT_REACHABLE_COLOR_LABEL}
     {...COLOR_INPUT_LABELS}
     tooltipDefs={{
         placement: { x: "center", y: "top_out" },

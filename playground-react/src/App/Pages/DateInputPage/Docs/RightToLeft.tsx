@@ -3,6 +3,7 @@ import { useState } from "react";
 import type { DateValue } from "@thewaver/ss-components-react";
 import { DateInput } from "@thewaver/ss-components-react";
 import { DATE_PART_HINTS } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
+import { DATE_RIGHT_LEFT_BOX_LABEL } from "@thewaver/ss-playground/App/Pages/DateInputPage/DateInputPage.const";
 import { FIELD_WIDTH, LOCALE, TODAY } from "@thewaver/ss-playground/App/Pages/DatePickerPage/DatePickerPage.const";
 import {
     FIELD_GAP,
@@ -21,7 +22,7 @@ export const RightToLeftDocsExample = () => {
             <DateInput
                 value={valueState}
                 locale={LOCALE}
-                ariaLabel={"Date in a right-to-left box"}
+                ariaLabel={DATE_RIGHT_LEFT_BOX_LABEL}
                 partHints={DATE_PART_HINTS}
                 padding={FIELD_PADDING}
                 gap={FIELD_GAP}

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { DOCS_ROOT } from "@thewaver/ss-playground/App/Pages/MultiSelectPage/MultiSelectPage.const";
+    import { DOCS_SECTIONS, DOCS_ROOT } from "@thewaver/ss-playground/App/Pages/MultiSelectPage/MultiSelectPage.const";
 
     import PageDocsExample from "../../PageComponents/DocsExample/PageDocsExample.svelte";
     import PageDocsSection from "../../PageComponents/DocsSection/PageDocsSection.svelte";
@@ -9,6 +9,7 @@
     import ClearableDocsExample from "./Docs/Clearable.svelte";
     import GroupedDocsExample from "./Docs/Grouped.svelte";
     import RightToLeftDocsExample from "./Docs/RightToLeft.svelte";
+    import { MultiSelectKnobs } from "@thewaver/ss-playground/App/Knobs/MultiSelects.const";
 
     let hasError = $state(false);
     let isDisabled = $state(false);
@@ -20,9 +21,7 @@
     {#snippet renderKnobs()}
         <PageProp
             itemKey={"hasError"}
-            label={"Error"}
-            hint={"Marks the field invalid, for screen readers as well as for the painter."}
-            controls={"Sets MultiSelectProps.hasError"}
+            {...MultiSelectKnobs.HAS_ERROR_TEXT}
         >
             <PageCheckField
                 value={hasError}
@@ -35,9 +34,7 @@
 
         <PageProp
             itemKey={"isDisabled"}
-            label={"Disabled"}
-            hint={"Turns the field off: it does not open, and the Tab key skips it."}
-            controls={"Sets MultiSelectProps.isDisabled"}
+            {...MultiSelectKnobs.IS_DISABLED_TEXT}
         >
             <PageCheckField
                 value={isDisabled}
@@ -51,8 +48,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Right to left"}
-    content={"Inside a box whose text runs right to left, the picks start from the right of the field, and the arrow and the clear button sit at its left end."}
+    {...DOCS_SECTIONS.rightLeft}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/RightToLeft.svelte`}>
@@ -60,8 +56,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Groups and a query"}
-    content={"Options can sit in groups, and a [prop]query[/prop] turns the field into a text box that narrows them, as on Select. What counts as a match is yours to decide; here a group the query has emptied is dropped from the list."}
+    {...DOCS_SECTIONS.groupsQuery}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Grouped.svelte`}>
@@ -69,8 +64,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Clearing every pick"}
-    content={"Give it [prop]renderClear[/prop] and a clear button sits at the end of the field while anything is picked; pressing it empties every pick at once and reports the change like any other. It needs [prop]clearAriaLabel[/prop] to name it."}
+    {...DOCS_SECTIONS.clearingEveryPick}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Clearable.svelte`}>

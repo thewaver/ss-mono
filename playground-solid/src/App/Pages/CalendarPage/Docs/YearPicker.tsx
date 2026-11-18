@@ -2,7 +2,13 @@ import { createSignal } from "solid-js";
 
 import type { DateValue } from "@thewaver/ss-components-solid";
 import { Calendar, DateValueUtils } from "@thewaver/ss-components-solid";
-import { LOCALE, MAX_YEAR, MIN_YEAR, TODAY } from "@thewaver/ss-playground/App/Pages/CalendarPage/CalendarPage.const";
+import {
+    LOCALE,
+    MAX_YEAR,
+    MIN_YEAR,
+    PREVIOUS_TWELVE_YEARS_TEXT,
+    TODAY,
+} from "@thewaver/ss-playground/App/Pages/CalendarPage/CalendarPage.const";
 
 import { PageCalendarPagedCaption } from "../../../PageComponents/CalendarCaption/CalendarPagedCaption";
 import { PageCalendarCell, PageCalendarFrame } from "../../../StyledComponents/CalendarContent/CalendarContent";
@@ -19,7 +25,7 @@ export const YearPickerDocsExample = () => {
                 key={"yearPicker"}
                 locale={LOCALE}
                 precision={"year"}
-                previousLabel={"Previous twelve years"}
+                previousLabel={PREVIOUS_TWELVE_YEARS_TEXT}
                 nextLabel={"Next twelve years"}
                 month={monthSignal}
             />

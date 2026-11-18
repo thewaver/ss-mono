@@ -87,12 +87,7 @@ const examples: ExampleDefs[] = [
 
 <template>
     <PagePropsPanel scope="global">
-        <PageProp
-            item-key="isPannable"
-            controls="Sets TimelineProps.isPannable"
-            label="Drag to move"
-            hint="Lets the timeline be dragged sideways to move through it."
-        >
+        <PageProp item-key="isPannable" v-bind="TimelineKnobs.IS_PANNABLE_TEXT">
             <PageCheckField
                 :value="isPannable"
                 ariaLabel="Drag to move"
@@ -100,12 +95,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="isZoomable"
-            controls="Sets TimelineProps.isZoomable"
-            label="Wheel and pinch to zoom"
-            hint="Lets the wheel and a pinch change how much of the timeline is in view."
-        >
+        <PageProp item-key="isZoomable" v-bind="TimelineKnobs.IS_ZOOMABLE_TEXT">
             <PageCheckField
                 :value="isZoomable"
                 ariaLabel="Wheel and pinch to zoom"
@@ -113,12 +103,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="isDisabled"
-            controls="Sets TimelineProps.isDisabled"
-            label="Disabled"
-            hint="Turns the timeline off, so it neither pans, zooms nor picks."
-        >
+        <PageProp item-key="isDisabled" v-bind="TimelineKnobs.IS_DISABLED_TEXT">
             <PageCheckField
                 :value="isDisabled"
                 ariaLabel="Disabled"

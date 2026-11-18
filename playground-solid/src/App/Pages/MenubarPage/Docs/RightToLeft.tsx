@@ -2,6 +2,7 @@ import { createSignal } from "solid-js";
 
 import { Menubar } from "@thewaver/ss-components-solid";
 import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
+import { RIGHT_LEFT_EDITOR_LABEL } from "@thewaver/ss-playground/App/Pages/MenubarPage/MenubarPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/MenubarPage/MenubarPage.css";
 import { POPOVER_SURFACE_INSET } from "@thewaver/ss-playground/App/StyledComponents/PopoverSurface/PopoverSurface.css";
 
@@ -20,7 +21,7 @@ export const RightToLeftDocsExample = () => {
             <div class={[styles.bar, styles.wideBar, getLayerClass()].join(" ")} dir={"rtl"}>
                 <Menubar
                     actions={WORDS}
-                    ariaLabel={"Right-to-left editor"}
+                    ariaLabel={RIGHT_LEFT_EDITOR_LABEL}
                     overflowAriaLabel={"More menus"}
                     checked={checkedSignal}
                     submenuOffset={{ x: POPOVER_SURFACE_INSET, y: -POPOVER_SURFACE_INSET }}

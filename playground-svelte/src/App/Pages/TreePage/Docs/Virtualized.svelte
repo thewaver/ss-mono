@@ -6,6 +6,7 @@
     import PageTreeNodeContent from "../../../StyledComponents/TreeNodeContent/PageTreeNodeContent.svelte";
     import { createStressFiles } from "../TreePage.const.svelte";
     import type { TreeVirtualizedDocsExampleProps } from "../TreePageSvelte.types";
+    import { GENERATED_REPOSITORY_LABEL } from "@thewaver/ss-playground/App/Pages/TreePage/TreePage.const";
 
     const NODE_HEIGHT = 28;
 
@@ -23,7 +24,7 @@
         renderHighlightFloater={renderPageHighlightFloater}
         {nodes}
         bind:expanded
-        ariaLabel={"Generated repository"}
+        ariaLabel={GENERATED_REPOSITORY_LABEL}
         computeEstimatedNodeHeight={() => NODE_HEIGHT}
     >
         {#snippet renderNode(node, renderProps)}

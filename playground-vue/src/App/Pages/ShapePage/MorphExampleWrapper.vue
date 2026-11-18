@@ -18,12 +18,7 @@ const starPoints = shallowRef(ShapeKnobs.STARTING_STAR_POINTS);
     <MorphExample v-bind="props" :star-points="starPoints" />
 
     <PageExampleKnobs>
-        <PageProp
-            item-key="starPoints"
-            controls="Sets the number of points of the example star sent to ShapeProps.computePoints"
-            label="Star points"
-            hint="How many tips the star has. The contour carries twice as many points: one per tip, one per notch between tips."
-        >
+        <PageProp item-key="starPoints" v-bind="ShapeKnobs.STAR_POINTS_TEXT">
             <PageNumberField
                 :value="starPoints"
                 :min="ShapeKnobs.MIN_STAR_POINTS"

@@ -9,6 +9,7 @@
     import PageCuboidStack from "../../../StyledComponents/CuboidContent/PageCuboidStack.svelte";
     import type { CuboidExampleProps } from "../CuboidPage.types";
     import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.svelte";
+    import { TURN_TOP_TOWARDS_YOU_TEXT, TURN_LEFT_FACE_TOWARDS_TEXT, TURN_RIGHT_FACE_TOWARDS_TEXT, TURN_BOTTOM_TOWARDS_YOU_TEXT } from "@thewaver/ss-playground/App/Pages/CuboidPage/CuboidPage.const";
 
     const QUARTER_TURN = 1;
 
@@ -43,21 +44,21 @@
 
     <PageCuboidPad>
         <div></div>
-        {@render renderTurn("pitchUp", "Turn the top towards you", CONTROL_GLYPHS.up, () => {
+        {@render renderTurn("pitchUp", TURN_TOP_TOWARDS_YOU_TEXT, CONTROL_GLYPHS.up, () => {
             pitch = pitch + QUARTER_TURN;
         })}
         <div></div>
 
-        {@render renderTurn("yawLeft", "Turn the left face towards you", CONTROL_GLYPHS.left, () => {
+        {@render renderTurn("yawLeft", TURN_LEFT_FACE_TOWARDS_TEXT, CONTROL_GLYPHS.left, () => {
             yaw = yaw - QUARTER_TURN;
         })}
         <div></div>
-        {@render renderTurn("yawRight", "Turn the right face towards you", CONTROL_GLYPHS.right, () => {
+        {@render renderTurn("yawRight", TURN_RIGHT_FACE_TOWARDS_TEXT, CONTROL_GLYPHS.right, () => {
             yaw = yaw + QUARTER_TURN;
         })}
 
         <div></div>
-        {@render renderTurn("pitchDown", "Turn the bottom towards you", CONTROL_GLYPHS.down, () => {
+        {@render renderTurn("pitchDown", TURN_BOTTOM_TOWARDS_YOU_TEXT, CONTROL_GLYPHS.down, () => {
             pitch = pitch - QUARTER_TURN;
         })}
         <div></div>

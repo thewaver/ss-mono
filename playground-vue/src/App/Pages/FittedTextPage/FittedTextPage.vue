@@ -40,12 +40,7 @@ const examples: ExampleDefs[] = [
 
 <template>
     <PagePropsPanel scope="global">
-        <PageProp
-            item-key="lineHeightRatio"
-            controls="Sets FittedTextProps.lineHeightRatio"
-            label="Line height"
-            hint="Each line's height as a multiple of its own font size, which is the room the stack is fitted with."
-        >
+        <PageProp item-key="lineHeightRatio" v-bind="FittedTextKnobs.LINE_HEIGHT_RATIO_TEXT">
             <PageNumberField
                 :value="lineHeightRatio"
                 :min="FittedTextKnobs.MIN_LINE_HEIGHT_RATIO"

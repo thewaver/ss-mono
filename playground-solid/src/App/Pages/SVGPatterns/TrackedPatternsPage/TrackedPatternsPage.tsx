@@ -71,12 +71,7 @@ export const TrackedPatternsPage = () => {
         <>
             <PagePropsGroups>
                 <PagePropsPanel scope={"sample"}>
-                    <PageProp
-                        key={"configKey"}
-                        label={"Pattern"}
-                        hint={"Which pointer-following pattern is shown. Choosing one brings its own knobs with it."}
-                        controls={"Picks the sample pattern the example sends to ShapeProps.computeFillDefs"}
-                    >
+                    <PageProp key={"configKey"} {...TrackedPatternKnobs.CONFIG_KEY_TEXT}>
                         <PageGroupedSelectField
                             value={getConfigKey}
                             groups={() => toGroupEntriesWithNoSample(GROUPPED_TRACKED_PATTERNS)}

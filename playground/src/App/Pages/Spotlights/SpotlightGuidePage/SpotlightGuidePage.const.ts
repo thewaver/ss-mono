@@ -14,3 +14,16 @@ export const RICH_TOUR_STEPS: TourStep[] = [
 ];
 
 export const DOCS_ROOT = "/src/App/Pages/Spotlights/SpotlightGuidePage/Docs";
+
+export const DOCS_SECTIONS = {
+    tourStepReaderDoes: {
+        title: "A tour with a step the reader does",
+        content:
+            "A guide seals the whole page, so the element it lights cannot be pressed. For a step the reader is to do, open a SpotlightPrompt over the guide: the guide fades but stays open while the prompt lights the one control, and using the control brings the guide back on the next step. Escape on the prompt brings the guide back on the same step. Escape on the guide closes it, and the tour pauses where it was. The example also keeps the step in sessionStorage, so a reload offers to resume there.",
+    },
+    rightLeft: {
+        title: "Right to left",
+        content:
+            "The popup takes the direction of the element it lights, so inside a box whose text runs right to left, the popup's text and buttons run from the right too. The hole and the overlay are not text, and stay as they are.",
+    },
+};

@@ -4,6 +4,7 @@ import { shallowRef } from "vue";
 import type { TableSort } from "@thewaver/ss-components-vue";
 import { Button, Modal, Table } from "@thewaver/ss-components-vue";
 import { TABLE_ANNOUNCEMENTS } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
+import { PARTS_REORDERABLE_COLUMNS_LABEL } from "@thewaver/ss-playground/App/Pages/ModalPage/ModalPage.const";
 import * as tableStyles from "@thewaver/ss-playground/App/Pages/TablePage/TablePage.css";
 
 import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.vue";
@@ -47,7 +48,7 @@ const open = () => {
                         v-model:order="order"
                         :columns="columns"
                         :rows="PARTS"
-                        ariaLabel="Parts with reorderable columns"
+                        :ariaLabel="PARTS_REORDERABLE_COLUMNS_LABEL"
                         :announcements="TABLE_ANNOUNCEMENTS"
                     >
                         <template #renderMarker>

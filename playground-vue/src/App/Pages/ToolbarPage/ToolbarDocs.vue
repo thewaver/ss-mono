@@ -3,7 +3,7 @@ import { shallowRef } from "vue";
 
 import { TOOLBAR_DEFAULTS } from "@thewaver/ss-components-vue";
 import { ToolbarKnobs } from "@thewaver/ss-playground/App/Knobs/Toolbars.const";
-import { DOCS_ROOT } from "@thewaver/ss-playground/App/Pages/ToolbarPage/ToolbarPage.const";
+import { DOCS_ROOT, DOCS_SECTIONS } from "@thewaver/ss-playground/App/Pages/ToolbarPage/ToolbarPage.const";
 
 import PageDocsExample from "../../PageComponents/DocsExample/PageDocsExample.vue";
 import PageDocsSection from "../../PageComponents/DocsSection/PageDocsSection.vue";
@@ -32,12 +32,7 @@ const isReachableWhenDisabled = shallowRef(false);
         />
 
         <template #renderKnobs>
-            <PageProp
-                item-key="barWidth"
-                label="Bar width (px)"
-                hint="How wide the bar is, also set by dragging its corner. Narrow it far enough and actions start moving into the menu at its end."
-                controls="Sets the width of the box the toolbar fills"
-            >
+            <PageProp item-key="barWidth" v-bind="ToolbarKnobs.BAR_WIDTH_TEXT">
                 <PageNumberField
                     :value="barWidth"
                     :min="ToolbarKnobs.MIN_BAR_WIDTH"
@@ -48,12 +43,7 @@ const isReachableWhenDisabled = shallowRef(false);
                 />
             </PageProp>
 
-            <PageProp
-                item-key="gap"
-                label="Gap (px)"
-                hint="The space left between actions on the bar."
-                controls="Sets ToolbarProps.gap"
-            >
+            <PageProp item-key="gap" v-bind="ToolbarKnobs.GAP_TEXT">
                 <PageNumberField
                     :value="gap"
                     :min="ToolbarKnobs.MIN_GAP"
@@ -66,37 +56,25 @@ const isReachableWhenDisabled = shallowRef(false);
         </template>
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Right to left"
-        content="Inside a box whose text runs right to left, the actions run from the right and the left arrow moves on to the next action. Narrow the bar and the menu button sits at its left end."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.rightLeft" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/RightToLeft.vue`">
         <RightToLeftDocsExample />
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Actions that refuse to collapse"
-        content="Each action can say how it takes to a narrow bar through [prop]collapse[/prop]. Set to never, it stays in the row whatever that costs the others, so Share is the last one standing; set to always, it lives in the menu however much room there is, as Print does. A disabled action, Rename here, is skipped by the arrow keys and is still listed in the menu, disabled."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.actionsThatRefuseCollapse" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Refusing.vue`">
         <RefusingDocsExample />
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Actions that stay pressed"
-        content="Pass [prop]pressedValues[/prop] and every action becomes a toggle that stays down until it is pressed again, with the list holding the values of those that are down. An action that collapses becomes a checkbox in the menu, checked from the same list, so narrowing the bar loses nothing."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.actionsThatStayPressed" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Pressed.vue`">
         <PressedDocsExample />
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Tooltips"
-        content="Give an action [prop]tooltipDefs[/prop] and it shows a tooltip on hover and on keyboard focus, and the same tooltip goes with it into the menu. Inside a SharedTooltip the row shares one tooltip, which moves from action to action instead of closing and opening again. A disabled action shows no tooltip unless [prop]isReachableWhenDisabled[/prop] keeps it in the arrow-key walk; then it can still say why it is off."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.tooltips" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Tooltip.vue`">
         <TooltipDocsExample :is-disabled="isTooltipDisabled" :is-reachable-when-disabled="isReachableWhenDisabled" />
@@ -104,9 +82,7 @@ const isReachableWhenDisabled = shallowRef(false);
         <template #renderKnobs>
             <PageProp
                 item-key="tooltipIsReachableWhenDisabled"
-                label="Reachable when disabled"
-                hint="Keeps Clear in the arrow-key walk while it is disabled, so focusing or hovering it shows its tooltip. It only matters while Disabled is on."
-                controls="Sets ToolbarAction.isReachableWhenDisabled"
+                v-bind="ToolbarKnobs.TOOLTIP_IS_REACHABLE_WHEN_DISABLED_TEXT"
             >
                 <PageCheckField
                     :value="isReachableWhenDisabled"
@@ -115,12 +91,7 @@ const isReachableWhenDisabled = shallowRef(false);
                 />
             </PageProp>
 
-            <PageProp
-                item-key="tooltipIsDisabled"
-                label="Disabled"
-                hint="Turns Clear off: pressing it does nothing and the arrow keys skip it."
-                controls="Sets ToolbarAction.isDisabled"
-            >
+            <PageProp item-key="tooltipIsDisabled" v-bind="ToolbarKnobs.TOOLTIP_IS_DISABLED_TEXT">
                 <PageCheckField
                     :value="isTooltipDisabled"
                     ariaLabel="Disabled"
@@ -130,10 +101,7 @@ const isReachableWhenDisabled = shallowRef(false);
         </template>
     </PageDocsExample>
 
-    <PageDocsSection
-        title="A ring of tools"
-        content="Hand [prop]computeLayout[/prop] a layout and the actions are placed by it rather than laid in a row, here round a ring. The layout sizes the bar itself, so nothing runs out of room and there is no menu button, and the arrow keys still walk the actions in the order they are written."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.ringTools" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Ring.vue`">
         <RingDocsExample />

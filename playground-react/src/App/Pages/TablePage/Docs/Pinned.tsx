@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import type { TableSort } from "@thewaver/ss-components-react";
 import { Table } from "@thewaver/ss-components-react";
 import { TABLE_ANNOUNCEMENTS } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
+import { PARTS_PINNED_COLUMNS_LABEL } from "@thewaver/ss-playground/App/Pages/TablePage/TablePage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/TablePage/TablePage.css";
 
 import { PageTableMarker, PageTableResizer } from "../../../StyledComponents/TableContent/TableContent";
@@ -26,7 +27,7 @@ export const PinnedDocsExample = () => {
                 selection={selectionState}
                 widths={widthsState}
                 order={orderState}
-                ariaLabel={"Parts with pinned columns"}
+                ariaLabel={PARTS_PINNED_COLUMNS_LABEL}
                 announcements={TABLE_ANNOUNCEMENTS}
                 renderResizer={(renderProps) => <PageTableResizer renderProps={renderProps} />}
                 renderMarker={() => <PageTableMarker />}

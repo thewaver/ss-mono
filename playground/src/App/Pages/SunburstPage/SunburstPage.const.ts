@@ -7,3 +7,5 @@ export const EXAMPLES_ROOT = "/src/App/Pages/SunburstPage/Examples";
 export const NO_MOTION_DURATION_MS = 0;
 
 export const WIDE_SPAN = 2;
+
+export const LIBRARY_S_SOURCE_LINES_LABEL = "The library's source, by lines of code";

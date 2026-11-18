@@ -39,4 +39,58 @@ export namespace FormationKnobs {
         whorl: 240,
         zigzag: 240,
     };
+
+    export const LAYOUT_KEY_TEXT = {
+        label: "Arrangement",
+        hint: "How the items are arranged: a ring, an arc, a row, a honeycomb, and so on. Choosing one brings its own knobs with it.",
+        controls: "Picks the sample layout sent to FormationProps.computeLayout",
+    };
+
+    export const WIDTH_TEXT = {
+        label: "Width (px)",
+        hint: "How wide the box holding the arrangement is. Every arrangement is measured against it, so this scales the whole thing; each one starts at a width that suits it, and remembers yours.",
+        controls: "Sets the width of the box the example's Formation fills",
+    };
+
+    export const EFFECT_KEY_TEXT = {
+        label: "Pointer effect",
+        hint: "What the items do as the pointer nears them. Choosing one brings its own knobs with it.",
+        controls: "Picks the sample effect sent to FormationProps.computeEffect",
+    };
+
+    export const ITEM_COUNT_TEXT = {
+        label: "Items",
+        hint: "How many items the arrangement holds.",
+        controls: "Sets the length of the slice of example items sent to FormationProps.items",
+    };
+
+    export const SKIPPED_COUNT_TEXT = {
+        label: "Skip from the start",
+        hint: "Leaves out that many items from the front of the list, so an item can be taken out from the start rather than the end.",
+        controls: "Sets where the slice of example items sent to FormationProps.items starts",
+    };
+
+    export const IS_STACKED_IN_REVERSE_TEXT = {
+        label: "Earlier items in front",
+        hint: "Puts the first item on top of the pile instead of the last, which shows where two items overlap.",
+        controls: "Sets FormationProps.isStackedInReverse",
+    };
+
+    export const SHAPE_KIND_TEXT = {
+        label: "Item shape",
+        hint: "The contour each item is cut to.",
+        controls: "Picks the contour of the example items drawn by FormationProps.renderItem",
+    };
+
+    export const TRANSITION_DURATION_MS_TEXT = {
+        label: "Glide (ms)",
+        hint: "How long an item takes to glide to its new place when the arrangement, the item count or a knob changes. At 0 it moves at once, and under reduced motion it always does.",
+        controls: "Sets FormationProps.transitionDurationMs",
+    };
+
+    export const TRANSITION_DELAY_MS_TEXT = {
+        label: "Transition delay (ms)",
+        hint: "How much later each item sets off than the one before it, while gliding is on.",
+        controls: "Sets FormationProps.transitionDelayMs",
+    };
 }

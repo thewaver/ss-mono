@@ -3,7 +3,10 @@ import { h, shallowRef } from "vue";
 
 import { SegmentedInput } from "@thewaver/ss-components-vue";
 import type { InteractionTooltipDefs, TextFieldFlags } from "@thewaver/ss-components-vue";
-import { ONE_TIME_CODE_LENGTH } from "@thewaver/ss-playground/App/Pages/SegmentedInputPage/SegmentedInputPage.const";
+import {
+    DISABLED_BUT_REACHABLE_CODE_LABEL,
+    ONE_TIME_CODE_LENGTH,
+} from "@thewaver/ss-playground/App/Pages/SegmentedInputPage/SegmentedInputPage.const";
 import { FIELD_GAP } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
 import PageSegmentedInputCell from "../../../StyledComponents/SegmentedInputContent/SegmentedInputContent.vue";
@@ -35,7 +38,7 @@ const tooltipDefs: InteractionTooltipDefs<TextFieldFlags> = {
         :gap="FIELD_GAP"
         :is-disabled="isDisabled"
         :is-reachable-when-disabled="isReachableWhenDisabled"
-        ariaLabel="Disabled but reachable code"
+        :ariaLabel="DISABLED_BUT_REACHABLE_CODE_LABEL"
         :tooltip-defs="tooltipDefs"
     >
         <template #renderCell="cell">

@@ -166,11 +166,7 @@
     <PageExampleKnobs>
         <PageProp
             itemKey={"reelKey"}
-            controls={"Picks the sample reel sent to SlotTextProps.computeReel"}
-            label={"Reel"}
-            hint={
-                "How many extra turns each column makes and how long it takes, which decides the order the columns stop in."
-            }
+            {...SlotTextKnobs.REEL_KEY_TEXT}
         >
             <PageSelectField
                 value={reelKey}
@@ -223,9 +219,7 @@
     <PageExampleKnobs>
         <PageProp
             itemKey={"mechanism"}
-            controls={"Sets SlotTextProps.mechanism"}
-            label={"Mechanism"}
-            hint={"Whether each letter turns on a drum or drops through flaps."}
+            {...SlotTextKnobs.MECHANISM_TEXT}
         >
             <PageSelectField
                 value={wordMechanism}
@@ -240,11 +234,7 @@
 
         <PageProp
             itemKey={"letterRoute"}
-            controls={"Sets SlotTextProps.letterRoute"}
-            label={"Letter route"}
-            hint={
-                "Forward always goes on round the alphabet, so C to Z passes every letter between; shortest takes the nearer way, so C to Z goes back three."
-            }
+            {...SlotTextKnobs.LETTER_ROUTE_TEXT}
         >
             <PageSelectField
                 value={letterRoute}
@@ -262,9 +252,7 @@
 <PagePropsPanel scope={"global"}>
     <PageProp
         itemKey={"value"}
-        controls={"Sets the number the example formats into SlotTextProps.text"}
-        label={"Value"}
-        hint={"The number the counter and the departures board show. Changing it is what starts them turning."}
+        {...SlotTextKnobs.VALUE_TEXT}
     >
         <PageNumberField
             {value}
@@ -280,9 +268,7 @@
 
     <PageProp
         itemKey={"turnDurationMs"}
-        controls={"Sets SlotTextProps.turnDurationMs"}
-        label={"Turn (ms)"}
-        hint={"How long one column takes to turn from its old character to its new one."}
+        {...SlotTextKnobs.TURN_DURATION_MS_TEXT}
     >
         <PageNumberField
             value={turnMs}
@@ -298,11 +284,7 @@
 
     <PageProp
         itemKey={"turnDelayMs"}
-        controls={"Sets SlotTextProps.turnDelayMs"}
-        label={"Turn delay (ms)"}
-        hint={
-            "How long each column waits after the turning column beside it starts, which is what makes the turn ripple along."
-        }
+        {...SlotTextKnobs.TURN_DELAY_MS_TEXT}
     >
         <PageNumberField
             value={cascadeMs}

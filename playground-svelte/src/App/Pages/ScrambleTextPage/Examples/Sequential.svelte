@@ -8,8 +8,8 @@
     import PageMeasureBox from "../../../PageComponents/MeasureBox/MeasureBox.svelte";
     import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
     import type { ScrambleTextExampleProps } from "../ScrambleTextPageSvelte.types";
+    import { LINE } from "@thewaver/ss-playground/App/Pages/ScrambleTextPage/ScrambleTextPage.const";
 
-    const LINE = "DECRYPTING PAYLOAD FROM THE ARCHIVE";
     const BOX_WIDTH = 320;
     const SINGLE_CHARACTER = 1;
     const ROLLS_PER_CHARACTER = 6;

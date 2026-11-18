@@ -2,13 +2,7 @@
     import { Sortable } from "@thewaver/ss-components-svelte";
     import type { SortableItem } from "@thewaver/ss-components-svelte";
     import { SORTABLE_ANNOUNCEMENTS } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
-    import {
-        HAND,
-        LIST_GAP,
-        LIST_MIN_HEIGHT,
-        computeCardKey,
-        computeCardLabel,
-    } from "@thewaver/ss-playground/App/Pages/SortablePage/SortablePage.const";
+    import { HAND, LIST_GAP, LIST_MIN_HEIGHT, computeCardKey, computeCardLabel, ROW_RIGHT_LEFT_BOX_LABEL } from "@thewaver/ss-playground/App/Pages/SortablePage/SortablePage.const";
     import type { Card } from "@thewaver/ss-playground/App/Pages/SortablePage/SortablePage.types";
 
     import PageSortableMarker from "../../../StyledComponents/SortableContent/PageSortableMarker.svelte";
@@ -23,7 +17,7 @@
     <PageSortableRoom>
         <Sortable
             groupId={"rightToLeft"}
-            ariaLabel={"Row in a right-to-left box"}
+            ariaLabel={ROW_RIGHT_LEFT_BOX_LABEL}
             orientation={"horizontal"}
             announcements={SORTABLE_ANNOUNCEMENTS}
             gap={LIST_GAP}

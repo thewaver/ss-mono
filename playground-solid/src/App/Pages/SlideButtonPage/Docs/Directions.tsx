@@ -1,6 +1,7 @@
 import { createSignal } from "solid-js";
 
 import { SlideButton, access } from "@thewaver/ss-components-solid";
+import { HOLD_ENTER_SPACE_SEND_DESCRIPTION } from "@thewaver/ss-playground/App/Pages/SlideButtonPage/SlideButtonPage.const";
 import { SLIDE_BUTTON_THUMB_SIZE } from "@thewaver/ss-playground/App/StyledComponents/SlideButtonContent/SlideButtonContent.css";
 
 import { PageSlideButtonContent } from "../../../StyledComponents/SlideButtonContent/SlideButtonContent";
@@ -14,7 +15,7 @@ export const DirectionsDocsExample = (props: Props) => {
     return (
         <div dir={access(props.direction)}>
             <SlideButton
-                ariaDescription={"Hold Enter or Space to send."}
+                ariaDescription={HOLD_ENTER_SPACE_SEND_DESCRIPTION}
                 orientation={props.orientation}
                 thumbSize={SLIDE_BUTTON_THUMB_SIZE}
                 renderContent={(getRenderProps) => (

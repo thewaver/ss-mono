@@ -14,12 +14,7 @@ defineProps<Props>();
 </script>
 
 <template>
-    <PageProp
-        item-key="angleDegrees"
-        controls="Sets ParticleDissolveProps.angleDegrees"
-        label="Angle (degrees)"
-        hint="The direction the edge travels: 0 sweeps up, 90 to the right, 180 down."
-    >
+    <PageProp item-key="angleDegrees" v-bind="ParticleDissolveKnobs.ANGLE_DEGREES_TEXT">
         <PageNumberField
             :value="value"
             :min="ParticleDissolveKnobs.MIN_ANGLE"

@@ -1,7 +1,7 @@
 <script lang="ts">
     import { PlacementLayoutDefaults } from "@thewaver/ss-components-svelte";
     import { WheelMenuKnobs } from "@thewaver/ss-playground/App/Knobs/WheelMenus.const";
-    import {
+    import { DOCS_SECTIONS,
         BAND_WIDTH,
         DOCS_ROOT,
         FIELD_WIDTH,
@@ -32,9 +32,7 @@
     {#snippet renderKnobs()}
         <PageProp
             itemKey={"spreadDegrees"}
-            label={"Spread (°)"}
-            hint={"How much of the circle the wedges are spread over: 360 for a whole wheel, 180 for half of one."}
-            controls={"Sets WheelMenuProps.spreadDegrees"}
+            {...WheelMenuKnobs.SPREAD_DEGREES_TEXT}
         >
             <PageNumberField
                 value={spreadDegrees}
@@ -51,9 +49,7 @@
 
         <PageProp
             itemKey={"holeRadius"}
-            label={"Hole radius (px)"}
-            hint={"How much of the middle is left empty, which is where the close control sits."}
-            controls={"Sets WheelMenuProps.holeRadius"}
+            {...WheelMenuKnobs.HOLE_RADIUS_TEXT}
         >
             <PageNumberField
                 value={holeRadius}
@@ -70,9 +66,7 @@
 
         <PageProp
             itemKey={"bandWidth"}
-            label={"Band width (px)"}
-            hint={"How thick the band of wedges is."}
-            controls={"Sets WheelMenuProps.bandWidth"}
+            {...WheelMenuKnobs.BAND_WIDTH_TEXT}
         >
             <PageNumberField
                 value={bandWidth}
@@ -89,9 +83,7 @@
 
         <PageProp
             itemKey={"wedgeGapDegrees"}
-            label={"Wedge gap (°)"}
-            hint={"The space left between one wedge and the next."}
-            controls={"Sets WheelMenuProps.layoutDefs.wedgeGapDegrees"}
+            {...WheelMenuKnobs.WEDGE_GAP_DEGREES_TEXT}
         >
             <PageNumberField
                 value={wedgeGapDegrees}
@@ -109,8 +101,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Submenus as bands"}
-    content={"Give an item [prop]items[/prop] of its own and its submenu opens as a band round the same center, outside the one that opened it and [prop]levelGap[/prop] away from it. The band is aimed at the wedge that opened it and is only as wide as its own items need, so a short submenu stays short however far out it sits. Over less than a whole turn, a band is shifted to stay inside the spread."}
+    {...DOCS_SECTIONS.submenusBands}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Bands.svelte`}>
@@ -119,9 +110,7 @@
     {#snippet renderKnobs()}
         <PageProp
             itemKey={"bandsSpreadDegrees"}
-            label={"Spread (°)"}
-            hint={"How much of the circle the wedges are spread over. Every band stays inside it."}
-            controls={"Sets WheelMenuProps.spreadDegrees"}
+            {...WheelMenuKnobs.BANDS_SPREAD_DEGREES_TEXT}
         >
             <PageNumberField
                 value={bandsSpreadDegrees}
@@ -139,8 +128,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"A wedge that asks for room"}
-    content={"An item may ask for its own share of the turn with [prop]arcDegrees[/prop], and the items that do not ask share what is left. The wedges follow one another from the same start, so two can never overlap. Here Confirm asks for half the turn."}
+    {...DOCS_SECTIONS.wedgeAskingForRoom}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Weighted.svelte`}>
@@ -148,8 +136,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Hold and flick"}
-    content={"With [prop]opensOnHold[/prop] on, pressing the button and holding it down opens the wheel. Move a short way toward a wedge and let go to pick it; come back to the middle before letting go to pick nothing. A plain click still opens the wheel and leaves it open, to be picked from by clicking or with the keyboard."}
+    {...DOCS_SECTIONS.holdFlick}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Flick.svelte`}>
@@ -158,9 +145,7 @@
     {#snippet renderKnobs()}
         <PageProp
             itemKey={"opensOnHold"}
-            label={"Opens on hold"}
-            hint={"Whether holding the button down opens the wheel, so a flick toward a wedge picks it on release."}
-            controls={"Sets WheelMenuProps.opensOnHold"}
+            {...WheelMenuKnobs.OPENS_ON_HOLD_TEXT}
         >
             <PageCheckField
                 value={opensOnHold}

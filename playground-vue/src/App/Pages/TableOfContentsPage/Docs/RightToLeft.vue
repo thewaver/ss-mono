@@ -5,6 +5,7 @@ import { TableOfContents } from "@thewaver/ss-components-vue";
 import type { TableOfContentsLink } from "@thewaver/ss-components-vue";
 import {
     HEADING_LEVEL,
+    OUTLINE_RIGHT_LEFT_BOX_LABEL,
     SECTIONS,
     TOC_GAP,
 } from "@thewaver/ss-playground/App/Pages/TableOfContentsPage/TableOfContentsPage.const";
@@ -45,7 +46,7 @@ const setHeadingRef = (index: number, element: Element | ComponentPublicInstance
 <template>
     <div dir="rtl" :class="styles.tocRoot">
         <div :class="styles.tocNav">
-            <TableOfContents :links="links" :gap="TOC_GAP" ariaLabel="Outline in a right-to-left box">
+            <TableOfContents :links="links" :gap="TOC_GAP" :ariaLabel="OUTLINE_RIGHT_LEFT_BOX_LABEL">
                 <template #renderLink="{ link, flags }">
                     <PageTableOfContentsContent :flags="flags" :depth="link.depth ?? TOP_DEPTH">{{
                         SECTIONS.find((section) => section.id === link.value)?.title

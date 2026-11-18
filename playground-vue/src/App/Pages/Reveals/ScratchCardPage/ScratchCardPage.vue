@@ -128,12 +128,7 @@ const examples: ExampleDefs[] = [
 
 <template>
     <PagePropsPanel scope="global">
-        <PageProp
-            item-key="precision"
-            controls="Sets ScratchCardProps.precision"
-            label="Precision"
-            hint="How finely the card measures how much has been scratched off. Finer measurement costs more work each frame."
-        >
+        <PageProp item-key="precision" v-bind="ScratchCardKnobs.PRECISION_TEXT">
             <PageNumberField
                 :value="precision"
                 :min="ScratchCardKnobs.MIN_PRECISION"
@@ -144,12 +139,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="brushRadius"
-            controls="Sets ScratchCardProps.brushRadius"
-            label="Brush radius (px)"
-            hint="How large a patch one stroke of the pointer clears."
-        >
+        <PageProp item-key="brushRadius" v-bind="ScratchCardKnobs.BRUSH_RADIUS_TEXT">
             <PageNumberField
                 :value="brushRadius"
                 :min="ScratchCardKnobs.MIN_BRUSH_RADIUS"
@@ -160,12 +150,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="brushShape"
-            controls="Picks the example brush contour sent to ScratchCardProps.computePoints"
-            label="Brush shape"
-            hint="The contour of the patch a stroke clears."
-        >
+        <PageProp item-key="brushShape" v-bind="ScratchCardKnobs.BRUSH_SHAPE_TEXT">
             <PageSelectField
                 :value="brushShape"
                 :values="ScratchCardKnobs.BRUSH_SHAPES"
@@ -174,12 +159,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="softness"
-            controls="Sets ScratchCardProps.softness"
-            label="Edge softness"
-            hint="How gradually a cleared patch fades into what is still covered. 0 gives a hard edge."
-        >
+        <PageProp item-key="softness" v-bind="ScratchCardKnobs.SOFTNESS_TEXT">
             <PageNumberField
                 :value="softness"
                 :min="ScratchCardKnobs.MIN_SOFTNESS"
@@ -190,12 +170,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="clearThreshold"
-            controls="Sets ScratchCardProps.clearThreshold"
-            label="Clear threshold"
-            hint="How much of the card has to be scratched off before the rest is cleared for you."
-        >
+        <PageProp item-key="clearThreshold" v-bind="ScratchCardKnobs.CLEAR_THRESHOLD_TEXT">
             <PageNumberField
                 :value="threshold"
                 :min="ScratchCardKnobs.MIN_THRESHOLD"

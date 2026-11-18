@@ -3,7 +3,10 @@ import { createSignal } from "solid-js";
 import { ColorArea } from "@thewaver/ss-components-solid";
 import { COLOR_AREA_AXIS_LABELS } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
 import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
-import { STARTING_HSV } from "@thewaver/ss-playground/App/Pages/ColorAreaPage/ColorAreaPage.const";
+import {
+    SATURATION_BRIGHTNESS_LABEL,
+    STARTING_HSV,
+} from "@thewaver/ss-playground/App/Pages/ColorAreaPage/ColorAreaPage.const";
 import { Color } from "@thewaver/ss-utils";
 
 import { PageColorAreaContent } from "../../../StyledComponents/ColorAreaContent/ColorAreaContent";
@@ -22,7 +25,7 @@ export const BasicDocsExample = (props: Props) => {
                 hsv={hsvSignal}
                 sizing={"fill"}
                 isDisabled={props.isDisabled}
-                ariaLabel={"Saturation and brightness"}
+                ariaLabel={SATURATION_BRIGHTNESS_LABEL}
                 axisLabels={COLOR_AREA_AXIS_LABELS}
                 renderContent={(getRenderProps) => (
                     <PageColorAreaContent renderProps={getRenderProps} size={AREA_SIZE} />

@@ -56,12 +56,7 @@ const sharedProps = computed(() => {
     </div>
 
     <PageExampleKnobs>
-        <PageProp
-            item-key="maxDegrees"
-            controls="Sets the example's angle, read by its RGBAnimationProps.computeSliceAnimation"
-            label="Angle (°)"
-            hint="How far red and blue turn, in opposite directions, at the middle of the pass. Green stays put."
-        >
+        <PageProp item-key="maxDegrees" v-bind="RGBAnimationKnobs.ANGLE_TEXT">
             <PageNumberField
                 :value="maxDegrees"
                 :min="RGBAnimationKnobs.MIN_TWIST_DEGREES"

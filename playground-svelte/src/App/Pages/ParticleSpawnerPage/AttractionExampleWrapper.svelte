@@ -39,9 +39,7 @@
 <PageExampleKnobs>
     <PageProp
         itemKey={"attractionStrengthRatio"}
-        controls={"Sets strengthRatio of ParticleModifierUtils.createAttraction, sent to ParticleSpawnerProps.particleModifiers"}
-        label={"Strength"}
-        hint={"How much of the way to the ring a particle passing right by it is drawn."}
+        {...ParticleSpawnerKnobs.ATTRACTION_STRENGTH_RATIO_TEXT}
     >
         <PageNumberField
             value={strengthRatio}
@@ -56,9 +54,7 @@
 
     <PageProp
         itemKey={"attractionReachPixels"}
-        controls={"Sets reachPixels of ParticleModifierUtils.createAttraction, sent to ParticleSpawnerProps.particleModifiers"}
-        label={"Reach (px)"}
-        hint={"How far from the ring the pull is felt at all. Particles passing farther away are left alone."}
+        {...ParticleSpawnerKnobs.ATTRACTION_REACH_PIXELS_TEXT}
     >
         <PageNumberField
             value={reachPixels}

@@ -33,12 +33,7 @@ const exampleProps = computed(() => ({
     <ClockExample v-bind="exampleProps" :lap-ms="lapMs" />
 
     <PageExampleKnobs>
-        <PageProp
-            item-key="lapMs"
-            controls="Sets how fast the example clock advances InfiniteCorridorProps.progress"
-            label="Lap (ms)"
-            hint="How long the clock takes to walk the whole corridor once, past every room and back to the first."
-        >
+        <PageProp item-key="lapMs" v-bind="InfiniteCorridorKnobs.LAP_MS_TEXT">
             <PageNumberField
                 :value="lapMs"
                 :reset-value="startingLapMs"

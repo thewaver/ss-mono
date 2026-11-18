@@ -6,8 +6,8 @@
     } from "@thewaver/ss-components-svelte";
     import * as styles from "@thewaver/ss-playground/App/Pages/TypewriterPage/TypewriterPage.css";
     import { TypewriterPageUtils } from "@thewaver/ss-playground/App/Pages/TypewriterPage/TypewriterPage.utils";
+    import { TEXT } from "@thewaver/ss-playground/App/Pages/TypewriterPage/TypewriterPage.const";
 
-    const TEXT = "Scroll this past the middle of the box and it comes apart line by line: the first half flies off to the left, the second to the right, and back again on the way down.";
     const FLY_BAND_PX = 80;
     const CHARACTER_DELAY_MS = 40;
     const CHARACTER_DURATION_MS = 500;

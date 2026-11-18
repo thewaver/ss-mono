@@ -2,6 +2,10 @@ import { createMemo, createSignal } from "solid-js";
 
 import { Button, CommandPalette } from "@thewaver/ss-components-solid";
 import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
+import {
+    MATCHING_NOTE_ACTIONS_LABEL,
+    SEARCH_NOTE_ACTIONS_LABEL,
+} from "@thewaver/ss-playground/App/Pages/Menus/CommandPalettePage/CommandPalettePage.const";
 import { CommandPalettePageUtils } from "@thewaver/ss-playground/App/Pages/Menus/CommandPalettePage/CommandPalettePage.utils";
 import {
     FIELD_GAP,
@@ -55,8 +59,8 @@ export const ActionShortcutsDocsExample = () => {
                 query={querySignal}
                 actions={getActions}
                 ariaLabel={"Note actions"}
-                fieldAriaLabel={"Search the note actions"}
-                listAriaLabel={"Matching note actions"}
+                fieldAriaLabel={SEARCH_NOTE_ACTIONS_LABEL}
+                listAriaLabel={MATCHING_NOTE_ACTIONS_LABEL}
                 renderOverlay={renderPaletteOverlay}
                 renderPanel={computePalettePanelRenderer(getActions)}
                 fieldPadding={FIELD_PADDING}

@@ -28,11 +28,7 @@
 
     <PageProp
         itemKey={"shapeKind"}
-        controls={"Picks the built-in shape drawn into the SVG inside ParticleDissolve"}
-        label={"Shape"}
-        hint={
-            "The SVG shape that dissolves. Particles rise only from inside the shape's fill and along its stroke, however its corners fall in the box."
-        }
+        {...ParticleDissolveKnobs.SHAPE_KIND_TEXT}
     >
         <PageSelectField
             value={shapeKind}

@@ -1,4 +1,5 @@
 import { Lens } from "@thewaver/ss-components-react";
+import { MAGNIFYING_LENS_OVER_PAGE_LABEL } from "@thewaver/ss-playground/App/Pages/Reveals/LensPage/LensPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/Reveals/LensPage/LensPage.css";
 
 import type { LensExampleProps } from "../LensPage.types";
@@ -16,7 +17,7 @@ export const PrintExample = (props: Props) => {
                 joinRadii={props.joinRadii}
                 lameExponents={props.lameExponents}
                 isDisabled={props.isDisabled}
-                ariaLabel={"A magnifying lens over a page of small print"}
+                ariaLabel={MAGNIFYING_LENS_OVER_PAGE_LABEL}
                 computePoints={props.computePoints}
                 renderContent={() => (
                     <div className={styles.print}>

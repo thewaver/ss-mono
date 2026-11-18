@@ -1,7 +1,7 @@
 <script lang="ts">
     import { Button, CardStack } from "@thewaver/ss-components-svelte";
     import type { CardStackControls } from "@thewaver/ss-components-svelte";
-    import { computeCardTilt } from "@thewaver/ss-playground/App/Pages/CardStackPage/CardStackPage.const";
+    import { computeCardTilt, RECALL_LAST_CARD_LABEL, DEAL_CARDS_AGAIN_LABEL } from "@thewaver/ss-playground/App/Pages/CardStackPage/CardStackPage.const";
     import * as styles from "@thewaver/ss-playground/App/Pages/CardStackPage/CardStackPage.css";
     import type { SwipeDirection } from "@thewaver/ss-utils";
     import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
@@ -100,7 +100,7 @@
         <Button
             id={"recall"}
             isDisabled={props.isDisabled || topIndex === FIRST_INDEX}
-            ariaLabel={"Recall the last card"}
+            ariaLabel={RECALL_LAST_CARD_LABEL}
             onClick={() => {
                 if (controls?.recall()) props.onRecall();
             }}
@@ -113,7 +113,7 @@
         {#if isEmpty}
             <Button
                 id={"deal"}
-                ariaLabel={"Deal the cards again"}
+                ariaLabel={DEAL_CARDS_AGAIN_LABEL}
                 onClick={() => {
                     props.onDeal();
                     controls?.deal();

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { DOCS_ROOT } from "@thewaver/ss-playground/App/Pages/TagInputPage/TagInputPage.const";
+    import { DOCS_SECTIONS, DOCS_ROOT } from "@thewaver/ss-playground/App/Pages/TagInputPage/TagInputPage.const";
 
     import PageDocsExample from "../../PageComponents/DocsExample/PageDocsExample.svelte";
     import PageDocsSection from "../../PageComponents/DocsSection/PageDocsSection.svelte";
@@ -12,6 +12,7 @@
     import RightToLeftDocsExample from "./Docs/RightToLeft.svelte";
     import TooltipDocsExample from "./Docs/Tooltip.svelte";
     import UniqueDocsExample from "./Docs/Unique.svelte";
+    import { TagInputKnobs } from "@thewaver/ss-playground/App/Knobs/TagInputs.const";
 
     let hasError = $state(false);
     let isDisabled = $state(false);
@@ -30,9 +31,7 @@
     {#snippet renderKnobs()}
         <PageProp
             itemKey={"hasError"}
-            label={"Error"}
-            hint={"Marks the field invalid, for screen readers as well as for the painter."}
-            controls={"Sets TagInputProps.hasError"}
+            {...TagInputKnobs.HAS_ERROR_TEXT}
         >
             <PageCheckField
                 value={hasError}
@@ -45,9 +44,7 @@
 
         <PageProp
             itemKey={"isDisabled"}
-            label={"Disabled"}
-            hint={"Turns the field off: no tag can be added, none can be removed, and the Tab key skips it."}
-            controls={"Sets TagInputProps.isDisabled"}
+            {...TagInputKnobs.IS_DISABLED_TEXT}
         >
             <PageCheckField
                 value={isDisabled}
@@ -61,8 +58,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Placeholder"}
-    content={"While the field holds no tags and nothing is typed, it draws [prop]renderPlaceholder[/prop]; the first letter typed hides it, and so does a tag."}
+    {...DOCS_SECTIONS.placeholder}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Empty.svelte`}>
@@ -70,8 +66,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Refusing a word"}
-    content={"Every word passes through [prop]computeTag[/prop] before it becomes a tag, which can trim it, change it, or refuse it by answering with nothing. Here words are trimmed and lower-cased, and one already in the list is refused and stays in the field to be edited."}
+    {...DOCS_SECTIONS.refusingWord}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Unique.svelte`}>
@@ -79,8 +74,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Many tags in a narrow box"}
-    content={"Tags that do not fit on one line wrap onto the next, and the box grows to hold them: nothing is cut off and nothing scrolls. The field always takes a row of its own beneath the tags."}
+    {...DOCS_SECTIONS.manyTagsNarrowBox}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Crowded.svelte`}>
@@ -88,8 +82,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Right to left"}
-    content={"Inside a box whose text runs right to left, the tags run from the right, and the arrows are mirrored: from the empty field the right arrow steps back into the tags, and the left arrow walks back toward the field."}
+    {...DOCS_SECTIONS.rightLeft}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/RightToLeft.svelte`}>
@@ -97,8 +90,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Tooltip"}
-    content={"Give a field [prop]tooltipDefs[/prop] and it shows a tooltip on hover and on keyboard focus, read by screen readers as the field's description. A disabled field shows no tooltip unless you also keep it reachable when disabled; it can then be focused to read why it is off, and typing still changes nothing."}
+    {...DOCS_SECTIONS.tooltip}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Tooltip.svelte`}>
@@ -107,9 +99,7 @@
     {#snippet renderKnobs()}
         <PageProp
             itemKey={"tooltipIsReachableWhenDisabled"}
-            label={"Reachable when disabled"}
-            hint={"Keeps a disabled field's tooltip available: the Tab key can stop on it and hovering it shows the tooltip. Without it a disabled field shows no tooltip at all. It only matters while Disabled is on."}
-            controls={"Sets TagInputProps.isReachableWhenDisabled"}
+            {...TagInputKnobs.TOOLTIP_IS_REACHABLE_WHEN_DISABLED_TEXT}
         >
             <PageCheckField
                 value={isReachableWhenDisabled}
@@ -122,9 +112,7 @@
 
         <PageProp
             itemKey={"tooltipIsDisabled"}
-            label={"Disabled"}
-            hint={"Turns the field off: no tag can be added, none can be removed, and the Tab key skips it."}
-            controls={"Sets TagInputProps.isDisabled"}
+            {...TagInputKnobs.IS_DISABLED_TEXT}
         >
             <PageCheckField
                 value={isTooltipDisabled}
@@ -138,8 +126,7 @@
 </PageDocsExample>
 
 <PageDocsSection
-    title={"Named by a Label"}
-    content={"Inside a Label, the field takes its name from the label's text, so it needs no [prop]ariaLabel[/prop], and pressing the text focuses the field."}
+    {...DOCS_SECTIONS.namedLabel}
 />
 
 <PageDocsExample path={`${DOCS_ROOT}/Labeled.svelte`}>

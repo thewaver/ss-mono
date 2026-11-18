@@ -1,6 +1,7 @@
 import { createMemo, createSignal } from "solid-js";
 
 import { RICH_TEXT_DEFAULTS, TextArea } from "@thewaver/ss-components-solid";
+import { RichTextKnobs } from "@thewaver/ss-playground/App/Knobs/RichTexts.const";
 import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 import {
     DEPTH_STEP,
@@ -104,14 +105,7 @@ export const RichTextPage = () => {
     return (
         <div class={styles.root}>
             <PagePropsPanel scope={"global"}>
-                <PageProp
-                    key={"removeOtherTags"}
-                    label={"Remove other tags"}
-                    hint={
-                        "Strips any tag the editor was not told to keep, rather than leaving it in the markup untouched."
-                    }
-                    controls={"Sets RichTextProps.removeOtherTags"}
-                >
+                <PageProp key={"removeOtherTags"} {...RichTextKnobs.REMOVE_OTHER_TAGS_TEXT}>
                     <PageCheckField
                         value={getRemoveOtherTags}
                         ariaLabel={"Remove other tags"}
@@ -119,12 +113,7 @@ export const RichTextPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"maxDepth"}
-                    label={"Max depth (-1 = no limit)"}
-                    hint={"How deeply tags may nest. A tag deeper than this prints as typed, and 0 allows no tags."}
-                    controls={"Sets RichTextProps.maxDepth, with -1 sent as Infinity"}
-                >
+                <PageProp key={"maxDepth"} {...RichTextKnobs.MAX_DEPTH_TEXT}>
                     <PageNumberField
                         value={getMaxDepth}
                         min={NO_DEPTH_LIMIT}

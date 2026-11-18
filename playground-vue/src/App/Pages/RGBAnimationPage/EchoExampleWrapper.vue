@@ -56,12 +56,7 @@ const sharedProps = computed(() => {
     </div>
 
     <PageExampleKnobs>
-        <PageProp
-            item-key="distancePercent"
-            controls="Sets the example's distance, read by its RGBAnimationProps.computeRootAnimation and computeSliceAnimation"
-            label="Distance (%)"
-            hint="How far the picture drifts along its figure-eight, as a share of its size. Green and blue follow a little later than red."
-        >
+        <PageProp item-key="distancePercent" v-bind="RGBAnimationKnobs.DISTANCE_PERCENT_TEXT">
             <PageNumberField
                 :value="distancePercent"
                 :min="RGBAnimationKnobs.MIN_ECHO_DISTANCE_PERCENT"

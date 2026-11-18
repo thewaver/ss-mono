@@ -148,12 +148,7 @@ const examples: ExampleDefs[] = [
 
 <template>
     <PagePropsPanel scope="global">
-        <PageProp
-            item-key="source"
-            controls="Picks the example picture sent to RGBAnimationProps.src"
-            label="Source"
-            hint="The picture the channels are split from: the knight photograph, or a line of SVG text."
-        >
+        <PageProp item-key="source" v-bind="RGBAnimationKnobs.SOURCE_TEXT">
             <PageSelectField
                 :value="sourceKey"
                 :values="SOURCE_KEYS"
@@ -162,12 +157,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="animationDurationMs"
-            controls="Sets RGBAnimationProps.animationDurationMs"
-            label="Animation duration (ms)"
-            hint="How long one pass takes."
-        >
+        <PageProp item-key="animationDurationMs" v-bind="RGBAnimationKnobs.ANIMATION_DURATION_MS_TEXT">
             <PageNumberField
                 :value="animationDurationMs"
                 :min="RGBAnimationKnobs.MIN_DURATION_MS"
@@ -179,12 +169,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="animationIterationDelayMs"
-            controls="Sets RGBAnimationProps.animationIterationDelayMs"
-            label="Iteration delay (ms)"
-            hint="How long the picture waits between one pass and the next."
-        >
+        <PageProp item-key="animationIterationDelayMs" v-bind="RGBAnimationKnobs.ANIMATION_ITERATION_DELAY_MS_TEXT">
             <PageNumberField
                 :value="animationIterationDelayMs"
                 :min="RGBAnimationKnobs.MIN_ITERATION_DELAY_MS"
@@ -196,12 +181,7 @@ const examples: ExampleDefs[] = [
             />
         </PageProp>
 
-        <PageProp
-            item-key="colorMixing"
-            controls="Sets RGBAnimationProps.colorMixing, with the color-scheme choice sent as undefined"
-            label="Color mixing"
-            hint="How the channels are put back together. Additive fringes are red, green and blue and read on a dark ground; subtractive ones are cyan, magenta and yellow and read on a light one. Left out, it follows the page's color-scheme at the start of each pass."
-        >
+        <PageProp item-key="colorMixing" v-bind="RGBAnimationKnobs.COLOR_MIXING_TEXT">
             <PageSelectField
                 :value="colorMixingChoice"
                 :values="RGBAnimationKnobs.COLOR_MIXING_CHOICES"

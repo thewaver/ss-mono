@@ -1,5 +1,11 @@
 import { Button, Cuboid } from "@thewaver/ss-components-react";
 import { computeCuboidFaceLabel } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
+import {
+    TURN_BOTTOM_TOWARDS_YOU_TEXT,
+    TURN_LEFT_FACE_TOWARDS_TEXT,
+    TURN_RIGHT_FACE_TOWARDS_TEXT,
+    TURN_TOP_TOWARDS_YOU_TEXT,
+} from "@thewaver/ss-playground/App/Pages/CuboidPage/CuboidPage.const";
 import { CONTROL_GLYPHS } from "@thewaver/ss-playground/App/StyledComponents/ControlButtonContent/ControlButtonContent.const";
 
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
@@ -40,21 +46,21 @@ export const DefaultExample = (props: Props) => {
 
             <PageCuboidPad>
                 <div />
-                {renderTurn("pitchUp", "Turn the top towards you", CONTROL_GLYPHS.up, () => {
+                {renderTurn("pitchUp", TURN_TOP_TOWARDS_YOU_TEXT, CONTROL_GLYPHS.up, () => {
                     setPitch(pitch + QUARTER_TURN);
                 })}
                 <div />
 
-                {renderTurn("yawLeft", "Turn the left face towards you", CONTROL_GLYPHS.left, () => {
+                {renderTurn("yawLeft", TURN_LEFT_FACE_TOWARDS_TEXT, CONTROL_GLYPHS.left, () => {
                     setYaw(yaw - QUARTER_TURN);
                 })}
                 <div />
-                {renderTurn("yawRight", "Turn the right face towards you", CONTROL_GLYPHS.right, () => {
+                {renderTurn("yawRight", TURN_RIGHT_FACE_TOWARDS_TEXT, CONTROL_GLYPHS.right, () => {
                     setYaw(yaw + QUARTER_TURN);
                 })}
 
                 <div />
-                {renderTurn("pitchDown", "Turn the bottom towards you", CONTROL_GLYPHS.down, () => {
+                {renderTurn("pitchDown", TURN_BOTTOM_TOWARDS_YOU_TEXT, CONTROL_GLYPHS.down, () => {
                     setPitch(pitch - QUARTER_TURN);
                 })}
                 <div />

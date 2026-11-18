@@ -49,12 +49,7 @@ export const SunburstPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp
-                    key={"ringCount"}
-                    label={"Rings"}
-                    hint={"How many levels are drawn around the middle at once."}
-                    controls={"Sets SunburstProps.ringCount"}
-                >
+                <PageProp key={"ringCount"} {...SunburstKnobs.RING_COUNT_TEXT}>
                     <PageNumberField
                         value={getRingCount}
                         min={SunburstKnobs.MIN_RING_COUNT}
@@ -65,14 +60,7 @@ export const SunburstPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    key={"zoomDurationMs"}
-                    label={"Zoom duration (ms)"}
-                    hint={
-                        "How long a zoom in or out takes. It is off while the visitor has asked for reduced motion, and 0 jumps straight to the new level."
-                    }
-                    controls={"Sets SunburstProps.zoomDurationMs"}
-                >
+                <PageProp key={"zoomDurationMs"} {...SunburstKnobs.ZOOM_DURATION_MS_TEXT}>
                     <PageNumberField
                         value={getZoomDurationMs}
                         min={SunburstKnobs.MIN_ZOOM_DURATION_MS}

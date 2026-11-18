@@ -3,6 +3,11 @@ import { createSignal } from "solid-js";
 import { Button, Form, FormField, TextInput, access } from "@thewaver/ss-components-solid";
 import * as exampleStyles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
 import {
+    ERROR,
+    HINT,
+    SOME_FIELDS_NEED_ATTENTION_TEXT,
+} from "@thewaver/ss-playground/App/Pages/FormFieldPage/FormFieldPage.const";
+import {
     FIELD_GAP,
     FIELD_PADDING,
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
@@ -16,9 +21,6 @@ import {
 } from "../../../StyledComponents/FormFieldContent/FormFieldContent";
 import { PageTextFieldContent } from "../../../StyledComponents/TextFieldContent/TextFieldContent";
 import type { FormFieldInFormDocsExampleProps } from "../FormFieldPageSolid.types";
-
-const HINT = "Shown to everyone who can see your posts.";
-const ERROR = "That name is already taken.";
 
 type Props = FormFieldInFormDocsExampleProps;
 
@@ -64,7 +66,7 @@ export const InFormDocsExample = (props: Props) => {
                     </PageFormButtons>
 
                     <div class={exampleStyles.exampleReadout} data-readout>
-                        {`${getState().isValid ? "Ready to send." : "Some fields need attention."} ${getOutcome()}`}
+                        {`${getState().isValid ? "Ready to send." : SOME_FIELDS_NEED_ATTENTION_TEXT} ${getOutcome()}`}
                     </div>
                 </PageFormStack>
             )}

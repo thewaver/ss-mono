@@ -1,6 +1,7 @@
 import { createSignal } from "solid-js";
 
 import { Tooltip } from "@thewaver/ss-components-solid";
+import { KEEP_WAS_RAISED_MASONS_TEXT } from "@thewaver/ss-playground/App/Pages/TooltipPage/TooltipPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/TooltipPage/TooltipPage.css";
 import { TOOLTIP_HOVER_DELAY_MS } from "@thewaver/ss-playground/App/StyledComponents/TooltipContent/TooltipContent.const";
 
@@ -11,7 +12,7 @@ export const WordDocsExample = () => {
 
     return (
         <div class={styles.sentence}>
-            {"The keep was raised by masons paid in "}
+            {KEEP_WAS_RAISED_MASONS_TEXT}
 
             <span ref={setAnchorRef} id={"marks"} class={styles.anchorWord} tabIndex={0}>
                 marks

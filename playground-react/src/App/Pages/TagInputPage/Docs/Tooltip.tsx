@@ -2,7 +2,10 @@ import { useState } from "react";
 
 import { TagInput } from "@thewaver/ss-components-react";
 import { computeTagAriaLabel } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
-import { STARTING_TAGS } from "@thewaver/ss-playground/App/Pages/TagInputPage/TagInputPage.const";
+import {
+    DISABLED_BUT_REACHABLE_TOPICS_LABEL,
+    STARTING_TAGS,
+} from "@thewaver/ss-playground/App/Pages/TagInputPage/TagInputPage.const";
 import {
     FIELD_GAP,
     FIELD_HEIGHT,
@@ -25,7 +28,7 @@ export const TooltipDocsExample = (props: Props) => {
     return (
         <TagInput
             value={valueState}
-            ariaLabel={"Disabled but reachable topics"}
+            ariaLabel={DISABLED_BUT_REACHABLE_TOPICS_LABEL}
             gap={FIELD_GAP}
             padding={FIELD_PADDING}
             minHeight={FIELD_HEIGHT}

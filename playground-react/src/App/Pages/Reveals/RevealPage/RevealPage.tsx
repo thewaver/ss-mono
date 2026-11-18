@@ -73,12 +73,7 @@ export const RevealPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp
-                    itemKey={"radius"}
-                    label={"Radius (px)"}
-                    hint={"How large the window that follows the pointer is."}
-                    controls={"Sets RevealProps.radius"}
-                >
+                <PageProp itemKey={"radius"} {...RevealKnobs.RADIUS_TEXT}>
                     <PageNumberField
                         value={radius}
                         min={RevealKnobs.MIN_RADIUS}
@@ -90,12 +85,7 @@ export const RevealPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"computePoints"}
-                    label={"Shape"}
-                    hint={"The contour of the window that follows the pointer."}
-                    controls={"Picks the example contour sent to RevealProps.computePoints"}
-                >
+                <PageProp itemKey={"computePoints"} {...RevealKnobs.COMPUTE_POINTS_TEXT}>
                     <PageSelectField
                         value={shape}
                         values={RevealKnobs.SHAPES}
@@ -105,14 +95,7 @@ export const RevealPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"joinRadii"}
-                    label={"Corner radius (px)"}
-                    hint={
-                        "How far the window's corners are rounded. A circular window has no corners, so it is off then."
-                    }
-                    controls={"Sets every corner of RevealProps.joinRadii"}
-                >
+                <PageProp itemKey={"joinRadii"} {...RevealKnobs.JOIN_RADII_TEXT}>
                     <PageNumberField
                         value={joinRadius}
                         min={RevealKnobs.MIN_JOIN_RADIUS}
@@ -124,14 +107,7 @@ export const RevealPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"lameExponents"}
-                    label={"Lamé Exponent"}
-                    hint={
-                        "How square or how pinched the window's rounded corners are: 1 is a circular round, higher is squarer."
-                    }
-                    controls={"Sets every corner of RevealProps.lameExponents"}
-                >
+                <PageProp itemKey={"lameExponents"} {...RevealKnobs.LAME_EXPONENTS_TEXT}>
                     <PageNumberField
                         value={lameExponent}
                         min={RevealKnobs.MIN_LAME_EXPONENT}
@@ -143,12 +119,7 @@ export const RevealPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"softness"}
-                    label={"Softness"}
-                    hint={"How gradually the window fades into what is still covered. 0 gives a hard edge."}
-                    controls={"Sets RevealProps.softness"}
-                >
+                <PageProp itemKey={"softness"} {...RevealKnobs.SOFTNESS_TEXT}>
                     <PageNumberField
                         value={softness}
                         min={RevealKnobs.MIN_SOFTNESS}
@@ -160,14 +131,7 @@ export const RevealPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"stepSize"}
-                    label={"Step size (px)"}
-                    hint={
-                        "How far one press of an arrow key moves the window. Tab to a reveal and it opens at the center; the arrow keys move it from there."
-                    }
-                    controls={"Sets RevealProps.stepSize"}
-                >
+                <PageProp itemKey={"stepSize"} {...RevealKnobs.STEP_SIZE_TEXT}>
                     <PageNumberField
                         value={stepSize}
                         min={RevealKnobs.MIN_STEP_SIZE}
@@ -179,14 +143,7 @@ export const RevealPage = () => {
                     />
                 </PageProp>
 
-                <PageProp
-                    itemKey={"isDisabled"}
-                    label={"Disabled"}
-                    hint={
-                        "Stops the window following the pointer or the keyboard, leaving whatever is underneath covered."
-                    }
-                    controls={"Sets RevealProps.isDisabled"}
-                >
+                <PageProp itemKey={"isDisabled"} {...RevealKnobs.IS_DISABLED_TEXT}>
                     <PageCheckField value={isDisabled} ariaLabel={"Disabled"} onChange={setIsDisabled} />
                 </PageProp>
             </PagePropsPanel>

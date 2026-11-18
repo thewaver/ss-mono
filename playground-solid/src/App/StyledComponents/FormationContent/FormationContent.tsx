@@ -1,10 +1,7 @@
 import type { ParentProps } from "solid-js";
 
 import { Shape, access } from "@thewaver/ss-components-solid";
-import {
-    EDGE_THICKNESSES,
-    FILL_OPACITY,
-} from "@thewaver/ss-playground/App/StyledComponents/FormationContent/FormationContent.const";
+import { EDGE_THICKNESSES } from "@thewaver/ss-playground/App/StyledComponents/FormationContent/FormationContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/FormationContent/FormationContent.css";
 import { layerVars } from "@thewaver/ss-playground/App/StyledComponents/Layer/Layer.css";
 import { themeVars } from "@thewaver/ss-playground/App/Theme.css";
@@ -20,7 +17,7 @@ export const PageFormationItem = (props: ParentProps<PageFormationItemProps>) =>
         <div class={[styles.formationItem, getLayerClass()].join(" ")}>
             <Shape
                 computePoints={(size) => ShapeConst.getDefaultShapePoints(access(props.shapeKind), size)}
-                computeFillDefs={() => [{ color: layerVars.main, opacity: FILL_OPACITY }]}
+                computeFillDefs={() => [{ color: layerVars.dark }]}
                 computeStrokeDefs={() => [{ color: themeVars.color.primary.main }]}
                 strokeGeom={() => [{ thicknesses: EDGE_THICKNESSES }]}
                 renderChildren={() => (

@@ -3,6 +3,7 @@ import { useId } from "react";
 import { SVGDefsSampleConfigs, Surface } from "@thewaver/ss-components-react";
 import type { SurfaceProps } from "@thewaver/ss-components-react";
 import * as styles from "@thewaver/ss-playground/App/Pages/SurfacePage/Examples/Banner/Banner.css";
+import { SIR_FACE_PLEADS_YOUR_TEXT } from "@thewaver/ss-playground/App/Pages/SurfacePage/SurfacePage.const";
 import knight from "@thewaver/ss-playground/App/knight.webp";
 import { CSSUtils, type Size2d } from "@thewaver/ss-utils";
 
@@ -47,7 +48,7 @@ export const BannerExample = () => {
                     <span>
                         <b>{"Alert! Alert!"}</b>
                         <br />
-                        {"Sir Face pleads for your attention!!"}
+                        {SIR_FACE_PLEADS_YOUR_TEXT}
                     </span>
                 </div>
             </Surface>

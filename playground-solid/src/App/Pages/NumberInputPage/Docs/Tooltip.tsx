@@ -1,7 +1,10 @@
 import { createSignal } from "solid-js";
 
 import { NumberInput } from "@thewaver/ss-components-solid";
-import { FIELD_WIDTH } from "@thewaver/ss-playground/App/Pages/NumberInputPage/NumberInputPage.const";
+import {
+    DISABLED_BUT_REACHABLE_AMOUNT_LABEL,
+    FIELD_WIDTH,
+} from "@thewaver/ss-playground/App/Pages/NumberInputPage/NumberInputPage.const";
 import {
     FIELD_GAP,
     FIELD_STEPPER_PADDING,
@@ -24,7 +27,7 @@ export const TooltipDocsExample = (props: Props) => {
             isReachableWhenDisabled={props.isReachableWhenDisabled}
             padding={FIELD_STEPPER_PADDING}
             gap={FIELD_GAP}
-            ariaLabel={"Disabled but reachable amount"}
+            ariaLabel={DISABLED_BUT_REACHABLE_AMOUNT_LABEL}
             renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} width={FIELD_WIDTH} />}
             renderTrailing={(getFlags, stepper) => <PageNumberInputStepper flags={getFlags} stepper={stepper} />}
             tooltipDefs={() => ({

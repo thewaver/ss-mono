@@ -1,3 +1,4 @@
+import type { TimelineEdgeAnnouncements } from "@thewaver/ss-components";
 import type { Span } from "@thewaver/ss-utils";
 
 import type { Clip, Meeting } from "./TimelineItems.types";
@@ -72,3 +73,20 @@ export const EXAMPLE_NAMES = {
 };
 
 export const EXAMPLES_ROOT = "/src/App/Pages/TimelinePage/Examples";
+
+export const EDGE_ANNOUNCEMENTS: TimelineEdgeAnnouncements = {
+    restingKeyHint: "Press Enter to take hold of the end of this clip.",
+    heldKeyHint:
+        "Left and right arrows move it a second at a time, Home and End switch between the start and the end, Enter drops it and Escape puts it back.",
+    computePlaceLabel: (edge, span) =>
+        `${edge} at ${formatStopwatch(span[edge])}, ${formatStopwatch(span.end - span.start)} long`,
+    computePickedUp: (itemLabel) => `Holding an end of ${itemLabel}.`,
+    computePickedUpByKey: (itemLabel, _zoneLabel, placeLabel, keyHint) =>
+        `Holding ${itemLabel}, ${placeLabel}. ${keyHint}`,
+    computeAimed: (placeLabel) => `${placeLabel.charAt(0).toUpperCase()}${placeLabel.slice(1)}.`,
+    computeZoneEntered: (_zoneLabel, placeLabel) => placeLabel,
+    computeReturned: (itemLabel) => `${itemLabel} put back as it was.`,
+    computeLeftInPlace: (itemLabel) => `${itemLabel} left as it was.`,
+    computeRefused: (itemLabel) => `${itemLabel} put back as it was.`,
+    computeDropped: (_itemLabel, _zoneLabel, placeLabel) => `Dropped, ${placeLabel}.`,
+};

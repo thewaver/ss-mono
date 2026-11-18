@@ -2,6 +2,7 @@ import { createSignal } from "solid-js";
 
 import { Button, DrumWheel, access } from "@thewaver/ss-components-solid";
 import type { WheelController } from "@thewaver/ss-components-solid";
+import { PRIZE_DRUM_TURNING_SIDEWAYS_LABEL } from "@thewaver/ss-playground/App/Pages/Wheels/DrumWheelPage/DrumWheelPage.const";
 import { pickPrizeIndex } from "@thewaver/ss-playground/App/Pages/Wheels/Wheels.const";
 import type { Size2d } from "@thewaver/ss-utils";
 
@@ -33,7 +34,7 @@ export const SidewaysExample = ({ wedges, ...otherProps }: Props) => {
                         wedges={getWedges}
                         axis={"row"}
                         wedgeSize={WEDGE_SIZE}
-                        ariaLabel={"Prize drum, turning sideways"}
+                        ariaLabel={PRIZE_DRUM_TURNING_SIDEWAYS_LABEL}
                         computeSpinTarget={() => pickPrizeIndex(getWedges().length)}
                         computeWedgeLabel={(index) => `${getWedges()[index]}, ${index + 1} of ${getWedges().length}`}
                         renderWedge={(getWedge, getState) => (

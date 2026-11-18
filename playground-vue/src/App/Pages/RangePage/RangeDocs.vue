@@ -9,6 +9,7 @@ import {
     DIFFICULTY_MIN,
     DIFFICULTY_STEP,
     DOCS_ROOT,
+    DOCS_SECTIONS,
 } from "@thewaver/ss-playground/App/Pages/RangePage/RangePage.const";
 
 import PageDocsExample from "../../PageComponents/DocsExample/PageDocsExample.vue";
@@ -44,12 +45,7 @@ const isTooltipDisabled = shallowRef(false);
         <BasicDocsExample :orientation="orientation" :has-error="hasError" :is-disabled="isDisabled" />
 
         <template #renderKnobs>
-            <PageProp
-                item-key="orientation"
-                label="Orientation"
-                hint="Whether the track runs across the page or up it. Upright, the lowest value is at the bottom."
-                controls="Sets RangeProps.orientation"
-            >
+            <PageProp item-key="orientation" v-bind="RangeKnobs.ORIENTATION_TEXT">
                 <PageSelectField
                     :value="orientation"
                     :values="RANGE_ORIENTATIONS"
@@ -58,21 +54,11 @@ const isTooltipDisabled = shallowRef(false);
                 />
             </PageProp>
 
-            <PageProp
-                item-key="hasError"
-                label="Error"
-                hint="Marks the range invalid, for screen readers as well as for the painter."
-                controls="Sets RangeProps.hasError"
-            >
+            <PageProp item-key="hasError" v-bind="RangeKnobs.HAS_ERROR_TEXT">
                 <PageCheckField :value="hasError" ariaLabel="Error" @change="(value: boolean) => (hasError = value)" />
             </PageProp>
 
-            <PageProp
-                item-key="isDisabled"
-                label="Disabled"
-                hint="Turns the range off: neither dragging nor the arrow keys move it, and the Tab key skips it."
-                controls="Sets RangeProps.isDisabled"
-            >
+            <PageProp item-key="isDisabled" v-bind="RangeKnobs.IS_DISABLED_TEXT">
                 <PageCheckField
                     :value="isDisabled"
                     ariaLabel="Disabled"
@@ -82,21 +68,13 @@ const isTooltipDisabled = shallowRef(false);
         </template>
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Stepping and limits"
-        content="A thumb sits between [prop]min[/prop] and [prop]max[/prop] and moves in steps of [prop]step[/prop], counted from the minimum. The arrow keys move it one step, Home and End take it to either end, and a drag lands on the same steps."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.steppingLimits" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Stepping.vue`">
         <SteppingDocsExample :min="min" :max="max" :step="step" />
 
         <template #renderKnobs>
-            <PageProp
-                item-key="min"
-                label="Min"
-                hint="The lowest value a thumb can take."
-                controls="Sets RangeProps.min"
-            >
+            <PageProp item-key="min" v-bind="RangeKnobs.MIN_TEXT">
                 <PageNumberField
                     :value="min"
                     :min="RangeKnobs.MIN_LIMIT"
@@ -107,12 +85,7 @@ const isTooltipDisabled = shallowRef(false);
                 />
             </PageProp>
 
-            <PageProp
-                item-key="max"
-                label="Max"
-                hint="The highest value a thumb can take."
-                controls="Sets RangeProps.max"
-            >
+            <PageProp item-key="max" v-bind="RangeKnobs.MAX_TEXT">
                 <PageNumberField
                     :value="max"
                     :min="RangeKnobs.MIN_LIMIT"
@@ -123,12 +96,7 @@ const isTooltipDisabled = shallowRef(false);
                 />
             </PageProp>
 
-            <PageProp
-                item-key="step"
-                label="Step"
-                hint="How far one press of an arrow key moves a thumb, and the spacing a drag snaps to."
-                controls="Sets RangeProps.step"
-            >
+            <PageProp item-key="step" v-bind="RangeKnobs.STEP_TEXT">
                 <PageNumberField
                     :value="step"
                     :min="RangeKnobs.MIN_STEP"
@@ -141,21 +109,13 @@ const isTooltipDisabled = shallowRef(false);
         </template>
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Two thumbs"
-        content="Hand it [prop]range[/prop], a start and an end, in place of [prop]value[/prop], and it draws two thumbs over one track. Each thumb is a slider of its own, named by its entry in [prop]thumbLabels[/prop] and with its own stop for the Tab key, and neither can pass the other. Turned off, both thumbs leave the tab order."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.twoThumbs" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Pair.vue`">
         <PairDocsExample :is-disabled="isPairDisabled" />
 
         <template #renderKnobs>
-            <PageProp
-                item-key="pairIsDisabled"
-                label="Disabled"
-                hint="Turns the range off: neither thumb moves, and the Tab key skips both."
-                controls="Sets RangeProps.isDisabled"
-            >
+            <PageProp item-key="pairIsDisabled" v-bind="RangeKnobs.PAIR_IS_DISABLED_TEXT">
                 <PageCheckField
                     :value="isPairDisabled"
                     ariaLabel="Disabled"
@@ -165,19 +125,13 @@ const isTooltipDisabled = shallowRef(false);
         </template>
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Right to left"
-        content="Inside a box whose text runs right to left, the track runs from the right: the lowest value is at the right end, so the thumb for the start of the range sits to the right of the one for its end, and the left arrow key raises a thumb's value rather than lowering it."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.rightLeft" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/RightToLeft.vue`">
         <RightToLeftDocsExample />
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Read as prices"
-        content="A screen reader reads a thumb's bare number unless you pass [prop]computeValueText[/prop], which turns a value into the words to read instead, here a price. It is handed the value and which thumb holds it. Separately, [prop]onChangeEnd[/prop] runs once a change is finished, when a drag lets go or after each key press, for work that should not run on every step of a drag."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.readPrices" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Prices.vue`">
         <PricesDocsExample />
@@ -189,10 +143,7 @@ const isTooltipDisabled = shallowRef(false);
         <KnobDocsExample />
     </PageDocsExample>
 
-    <PageDocsSection
-        title="Tooltip"
-        content="Give a range [prop]tooltipDefs[/prop] and it shows a tooltip on hover and on keyboard focus, read by screen readers as the range's description. A disabled range shows no tooltip unless you also keep it reachable when disabled; it can then be focused to read why it is off, and neither the arrow keys nor a drag move it."
-    />
+    <PageDocsSection v-bind="DOCS_SECTIONS.tooltip" />
 
     <PageDocsExample :path="`${DOCS_ROOT}/Tooltip.vue`">
         <TooltipDocsExample :is-disabled="isTooltipDisabled" :is-reachable-when-disabled="isReachableWhenDisabled" />
@@ -200,9 +151,7 @@ const isTooltipDisabled = shallowRef(false);
         <template #renderKnobs>
             <PageProp
                 item-key="tooltipIsReachableWhenDisabled"
-                label="Reachable when disabled"
-                hint="Keeps a disabled range's tooltip available: the Tab key can stop on it and hovering it shows the tooltip. Without it a disabled range shows no tooltip at all. It only matters while Disabled is on."
-                controls="Sets RangeProps.isReachableWhenDisabled"
+                v-bind="RangeKnobs.TOOLTIP_IS_REACHABLE_WHEN_DISABLED_TEXT"
             >
                 <PageCheckField
                     :value="isReachableWhenDisabled"
@@ -211,12 +160,7 @@ const isTooltipDisabled = shallowRef(false);
                 />
             </PageProp>
 
-            <PageProp
-                item-key="tooltipIsDisabled"
-                label="Disabled"
-                hint="Turns the range off: neither dragging nor the arrow keys move it, and the Tab key skips it."
-                controls="Sets RangeProps.isDisabled"
-            >
+            <PageProp item-key="tooltipIsDisabled" v-bind="RangeKnobs.IS_DISABLED_TEXT">
                 <PageCheckField
                     :value="isTooltipDisabled"
                     ariaLabel="Disabled"

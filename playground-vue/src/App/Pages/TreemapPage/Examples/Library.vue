@@ -4,6 +4,7 @@ import { computed, useModel } from "vue";
 import { Button, Treemap, TreemapUtils } from "@thewaver/ss-components-vue";
 import { LIBRARY } from "@thewaver/ss-playground/App/LibraryTree.generated";
 import { formatLines } from "@thewaver/ss-playground/App/LibraryTree.utils";
+import { LIBRARY_S_SOURCE_LINES_LABEL } from "@thewaver/ss-playground/App/Pages/TreemapPage/TreemapPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/TreemapPage/TreemapPage.css";
 
 import PageTreemapBar from "../../../StyledComponents/TreemapContent/PageTreemapBar.vue";
@@ -47,7 +48,7 @@ const goUp = () => {
                 v-model:branch="branch"
                 :root="LIBRARY"
                 :zoom-duration-ms="zoomDurationMs"
-                ariaLabel="The library's source, by lines of code"
+                :ariaLabel="LIBRARY_S_SOURCE_LINES_LABEL"
             >
                 <template #renderTile="{ node, state }">
                     <PageTreemapTile
