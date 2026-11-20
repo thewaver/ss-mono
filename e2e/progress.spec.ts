@@ -1,6 +1,6 @@
 import { type Locator, type Page, expect, test } from "@playwright/test";
 
-import { accessibleText, docsDemo, docsSettled, inlineStyle, inputValue, prop } from "./helpers";
+import { accessibleText, docsDemo, docsSettled, inlineStyle, inputValue, prop, tabKey } from "./helpers";
 
 const DOCS = "/src/App/Pages/ProgressPage/Docs";
 
@@ -19,7 +19,7 @@ const typeOver = async (page: Page, key: string, text: string) => {
     await knob(page, key).click();
     await page.keyboard.press("ControlOrMeta+a");
     await page.keyboard.type(text);
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
 };
 
 test.beforeEach(async ({ page }) => {

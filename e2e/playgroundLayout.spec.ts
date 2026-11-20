@@ -82,7 +82,7 @@ test("the page links above the menu share one highlight that follows the pointer
 
     const box = (await page.locator("main").boundingBox())!;
 
-    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.mouse.move(box.x + box.width * 0.5, box.y + box.height * 0.5);
 
     await expect(highlight, "leaving the links lets it play out and go").toHaveCount(0);
 });

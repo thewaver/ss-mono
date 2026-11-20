@@ -216,7 +216,12 @@ export const Scroller = defineComponent(
             progress.value = next;
         });
 
-        watchAfterRender([progress, boxRef], ([current, box]) => {
+        const scrollRanges = computed(
+            () =>
+                `${ScrollerUtils.computeScrollRange(metrics.value.x)} ${ScrollerUtils.computeScrollRange(metrics.value.y)}`,
+        );
+
+        watchAfterRender([progress, boxRef, scrollRanges], ([current, box]) => {
             if (!box) return;
 
             ScrollerUtils.scrollToRatios(box, {

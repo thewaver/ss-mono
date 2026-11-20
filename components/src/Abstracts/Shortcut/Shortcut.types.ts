@@ -8,7 +8,9 @@ export type Shortcut = {
     /**
      * The key, as `KeyboardEvent.key` names it: `"k"`, `"F8"`, `"ArrowUp"`, `"?"`. Letter case is ignored, so `"k"`
      * and `"K"` are the same shortcut, and Shift is asked for in `modifiers`. A symbol is named by what it types, so a
-     * question mark is `"?"` whichever key and modifiers a layout needs to type it.
+     * question mark is `"?"` whichever key and modifiers a layout needs to type it. Only a single character stays
+     * quiet in a text field: a named key such as `"Enter"`, `"Delete"` or `"ArrowUp"` fires there too, and editing
+     * loses it.
      */
     key: string;
     /**
@@ -23,7 +25,9 @@ export type ResolvedShortcut = {
     modifiers: ShortcutKeyModifier[];
 };
 
-export type ShortcutKeyEvent = Pick<KeyboardEvent, "key" | "code" | "ctrlKey" | "altKey" | "shiftKey" | "metaKey">;
+export type ShortcutKeyEvent = Pick<KeyboardEvent, "key" | "code" | "ctrlKey" | "altKey" | "shiftKey" | "metaKey"> & {
+    getModifierState?: KeyboardEvent["getModifierState"];
+};
 
 export type ShortcutBinding = {
     shortcut: Shortcut;

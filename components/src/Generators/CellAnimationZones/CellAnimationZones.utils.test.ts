@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import type { Index2d, Size2d } from "@thewaver/ss-utils";
+import type { Count2d, Index2d, Size2d } from "@thewaver/ss-utils";
 
 import { CellAnimationZoneUtils } from "./CellAnimationZones.utils";
 
-const ODD_GRID: Index2d = { col: 7, row: 7 };
+const ODD_GRID: Count2d = { colCount: 7, rowCount: 7 };
 const CELL_SIZE: Size2d = { width: 10, height: 10 };
 
 describe("CellAnimationZoneUtils", () => {

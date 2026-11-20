@@ -1,3 +1,13 @@
+const MAX_STEP_DECIMALS = 12;
+
+/** Moves a number's decimal point by a count of places, reading an exponent it already prints with. */
+const shiftDecimalPoint = (value: number, places: number) => {
+    const [mantissa, exponent = "0"] = String(value).split("e");
+
+    return Number(`${mantissa}e${Number(exponent) + places}`);
+};
+
+/** Everyday arithmetic: rounding, clamping, wrapping, interpolating and counting decimal places. */
 export namespace MathUtils {
     /**
      * Tests whether a whole number is even.
@@ -59,15 +69,16 @@ export namespace MathUtils {
      * Rounds a value to a fixed number of decimal places.
      *
      * Free of the usual floating-point drift, so `roundToDecimalPlaces(1.005, 2)` gives
-     * `1.01` rather than `1`.
+     * `1.01` rather than `1`, and a leftover too small or too large to print without an exponent rounds like any
+     * other number. A half rounds up, toward positive infinity, so `-1.005` gives `-1`.
      *
      * @param value The value to round.
      * @param decimalPlaces How many digits to keep after the point. Defaults to `0`.
      */
     export const roundToDecimalPlaces = (value: number, decimalPlaces: number = 0): number => {
-        const num = Math.round(Number(value + "e" + decimalPlaces));
+        const rounded = Math.round(shiftDecimalPoint(value, decimalPlaces));
 
-        return Number(num + "e" + -decimalPlaces);
+        return shiftDecimalPoint(rounded, -decimalPlaces);
     };
 
     /**
@@ -144,6 +155,19 @@ export namespace MathUtils {
 
         return Math.max(fraction - Number(exponent ?? 0), 0);
     };
+
+    /**
+     * How many decimal places stepping should work to, for values stepped from a base.
+     *
+     * The finest place any of the numbers involved needs — the step, the base the steps are counted from, the value
+     * — so a step of `1` counted from `0.5` keeps its half. Capped at twelve places, beyond which floating point cannot
+     * tell the difference anyway.
+     *
+     * @param values The step, the base and any other number the stepping involves.
+     * @returns The number of decimal places, `0` to `12`.
+     */
+    export const getStepDecimals = (...values: number[]) =>
+        Math.min(Math.max(0, ...values.map(getDecimalCount)), MAX_STEP_DECIMALS);
 
     /**
      * Finds the largest whole number two whole numbers both divide by.

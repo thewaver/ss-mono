@@ -30,6 +30,8 @@ const HALF = 0.5;
 
 const definitions = new WeakMap<SliceAnimationFn, SliceAnimationDefinition>();
 
+const NO_STOPS: SliceStop[] = [];
+
 const composeEnvelope = (stops: SliceStop[], holdShare: number): SliceStop[] => {
     const edge = (1 - holdShare) * HALF;
 
@@ -283,7 +285,7 @@ export namespace SliceAnimationKeyframeUtils {
         const composed = new WeakMap<SliceStop[], SliceStop[]>();
 
         return fromSlices((defs) => {
-            const stops = resolveStops(animation, defs) ?? [];
+            const stops = resolveStops(animation, defs) ?? NO_STOPS;
             const existing = composed.get(stops);
 
             if (existing) return existing;

@@ -50,7 +50,7 @@ const pause = () => {
 </script>
 
 <template>
-    <div>{{ `${STRESS_CELL_COUNT.col} x ${STRESS_CELL_COUNT.row} cells` }}</div>
+    <div>{{ `${STRESS_CELL_COUNT.colCount} x ${STRESS_CELL_COUNT.rowCount} cells` }}</div>
 
     <PagePropsPanel scope="local" :has-reset="false">
         <PageProp item-key="onGraphicsCard" v-bind="CellAnimationKnobs.ON_GRAPHICS_CARD_TEXT">

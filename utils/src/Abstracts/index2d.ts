@@ -1,14 +1,14 @@
+import type { Count2d } from "./count2d.js";
 import { Vec2d, type Vec2dString } from "./vec2d.js";
 
 const K1 = "row";
 const K2 = "col";
 
 /**
- * A row and a column held together.
+ * A row and a column held together: the position of one cell in a grid, counting from zero.
  *
- * The name leans towards an index, but the type is the same either way: a tally of eight rows
- * by four columns and a zero-based index of the cell at row eight, column four are the same
- * value, and which one is meant is decided by the name it is given at the call site.
+ * A tally of how many rows and columns a grid holds is a {@link Count2d}, a separate type, so one
+ * cannot be passed where the other is wanted.
  */
 export type Index2d = Vec2d<typeof K1, typeof K2>;
 
@@ -35,6 +35,7 @@ export namespace Index2d {
     export const toString = Vec2d.toString(K1, K2);
 }
 
+/** Reading a row-and-column pair back from its text form. */
 export namespace Index2dString {
     /** Parses a string such as `ROW3_COL4` back into an {@link Index2d}. */
     export const fromString = Vec2d.fromString(K1, K2);

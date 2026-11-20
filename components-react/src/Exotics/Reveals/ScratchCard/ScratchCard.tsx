@@ -1,4 +1,13 @@
-import { type CSSProperties, type KeyboardEvent, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
+import {
+    type CSSProperties,
+    type KeyboardEvent,
+    useEffect,
+    useId,
+    useLayoutEffect,
+    useMemo,
+    useRef,
+    useState,
+} from "react";
 
 import {
     NavigatorUtils,
@@ -51,7 +60,12 @@ export const ScratchCard = (props: ScratchCardProps) => {
         lameExponents: props.lameExponents,
     };
 
-    const latest = useLatest({ props, path, size, precision, brushRadius, brushShape, clearThreshold, isCleared });
+    const brushContour = useMemo(
+        () => ScratchCardUtils.computeBrushContour(brushShape),
+        [brushRadius, props.computePoints, props.joinRadii, props.lameExponents],
+    );
+
+    const latest = useLatest({ props, path, size, precision, brushRadius, brushContour, clearThreshold, isCleared });
     const isClearingRef = useLatest(isClearing);
 
     const [scheduler] = useState(() =>
@@ -139,11 +153,7 @@ export const ScratchCard = (props: ScratchCardProps) => {
                 return;
             }
 
-            const stamp = ScratchCardUtils.computeStampPath(
-                point,
-                current.brushRadius,
-                ScratchCardUtils.computeBrushPoints(current.brushShape),
-            );
+            const stamp = ScratchCardUtils.computeStampPath(point, current.brushRadius, current.brushContour);
 
             setPath((previous) => previous + stamp);
         },
@@ -173,7 +183,9 @@ export const ScratchCard = (props: ScratchCardProps) => {
 
     return (
         <div ref={rootRef} className={ScratchCardStyles.scratchCardRoot} tabIndex={-1}>
-            {props.renderContent()}
+            <div className={ScratchCardStyles.scratchCardContent} inert={!isCleared}>
+                {props.renderContent()}
+            </div>
 
             <svg className={ScratchCardStyles.scratchCardDefs} aria-hidden="true">
                 <defs>

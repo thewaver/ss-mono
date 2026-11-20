@@ -1,6 +1,6 @@
 import { type Locator, type Page, expect, test } from "@playwright/test";
 
-import { demo, example, readout, waitUntilStill } from "./helpers";
+import { demo, example, readout, tabKey, waitUntilStill } from "./helpers";
 
 /**
  * A `Wraparound` draws its content once for real and as inert copies everywhere else. The window is the region;
@@ -82,6 +82,13 @@ test("pressing a copy presses the matching real button", async ({ page }) => {
 });
 
 /**
+ * How far the pointer is dragged, in screen pixels, and how much of it the content must have followed. The content's
+ * offset is read in layout pixels, so the pointer's travel is divided by the page's scale before the two are compared.
+ */
+const POINTER_TRAVEL = 100;
+const FOLLOWED_SHARE = 0.9;
+
+/**
  * The coast takes its speed from the pointer's last 100ms before it lets go, and the simulated drag sends its moves
  * further apart than that once a parallel sweep loads the machine — so in a sweep the content reads as having been
  * held still before release, and correctly does not coast. It passes every time on its own, hence `@solo`.
@@ -94,15 +101,20 @@ test(
 
         const before = await planeOffset(page, GRID);
         const box = (await page.locator(region(GRID)).boundingBox())!;
+        const scale = await page
+            .locator(region(GRID))
+            .evaluate((element) => element.getBoundingClientRect().width / (element as HTMLElement).offsetWidth);
 
         await page.mouse.move(box.x + 40, box.y + 40);
         await page.mouse.down();
-        await page.mouse.move(box.x + 140, box.y + 80, { steps: 5 });
+        await page.mouse.move(box.x + 40 + POINTER_TRAVEL, box.y + 80, { steps: 5 });
         await page.mouse.up();
 
         const released = await planeOffset(page, GRID);
 
-        expect(released.x - before.x, "the content followed the pointer across").toBeGreaterThan(90);
+        expect(released.x - before.x, "the content followed the pointer across").toBeGreaterThan(
+            (POINTER_TRAVEL * FOLLOWED_SHARE) / scale,
+        );
 
         await waitUntilStill(page.locator(plane(GRID)));
 
@@ -155,7 +167,7 @@ test("tabbing into the content brings the focused item itself into view", async 
     await waitUntilStill(page.locator(plane(GRID)));
 
     for (let index = 0; index < 3; index++) {
-        await page.keyboard.press("Tab");
+        await page.keyboard.press(tabKey(page));
 
         const focused = page.locator(`${original(GRID)} button:focus`);
 
@@ -167,7 +179,7 @@ test("tabbing into the content brings the focused item itself into view", async 
 
 test("a mosaic inside walks with its own keys, and each tile it walks to is brought into view", async ({ page }) => {
     await page.locator(region(MOSAIC)).focus();
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
 
     const focused = page.locator(`${original(MOSAIC)} :focus`);
 

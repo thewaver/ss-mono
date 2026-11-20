@@ -1,4 +1,12 @@
-import { CSSUtils, DOMUtils, type ElementSegment, JSXTextParserUtils, type Rect, StoreUtils } from "@thewaver/ss-utils";
+import {
+    CSSUtils,
+    DOMUtils,
+    type ElementSegment,
+    JSXTextParserUtils,
+    type Rect,
+    StoreUtils,
+    StringUtils,
+} from "@thewaver/ss-utils";
 
 import type {
     LetterAnimation,
@@ -36,8 +44,36 @@ const edgeFrameCache = new Map<string, Record<string, string>>();
 /** Whether a declaration can change how wide a letter is drawn. */
 const getIsWidthKey = (key: string) => CSSUtils.isCssKeyUsedToMeasureText(key) || EXTRA_WIDTH_KEYS.has(key);
 
-/** Finds a keyframes rule by name among the page's style sheets, skipping any whose rules cannot be read. */
+/** Whether a `@media` or `@supports` block's condition holds now; any other grouping rule always applies. */
+const getIsGroupApplied = (rule: CSSGroupingRule) => {
+    if (rule instanceof CSSMediaRule) return window.matchMedia(rule.conditionText).matches;
+    if (rule instanceof CSSSupportsRule) return CSS.supports(rule.conditionText);
+
+    return true;
+};
+
+/** The last keyframes rule of a name among some rules, looking inside `@media`, `@layer` and `@supports` blocks that apply. */
+const findLastKeyframesIn = (rules: CSSRuleList, name: string): CSSKeyframesRule | undefined => {
+    let found: CSSKeyframesRule | undefined;
+
+    for (const rule of Array.from(rules)) {
+        if (rule instanceof CSSKeyframesRule && rule.name === name) {
+            found = rule;
+        } else if (rule instanceof CSSGroupingRule && getIsGroupApplied(rule)) {
+            found = findLastKeyframesIn(rule.cssRules, name) ?? found;
+        }
+    }
+
+    return found;
+};
+
+/**
+ * Finds a keyframes rule by name among the page's style sheets, as CSS picks it: the last of that name, including
+ * one inside a `@media`, `@layer` or `@supports` block that applies. Sheets whose rules cannot be read are skipped.
+ */
 const findKeyframes = (name: string): CSSKeyframesRule | undefined => {
+    let found: CSSKeyframesRule | undefined;
+
     for (const sheet of Array.from(document.styleSheets)) {
         let rules: CSSRuleList;
 
@@ -47,12 +83,10 @@ const findKeyframes = (name: string): CSSKeyframesRule | undefined => {
             continue;
         }
 
-        for (const rule of Array.from(rules)) {
-            if (rule instanceof CSSKeyframesRule && rule.name === name) return rule;
-        }
+        found = findLastKeyframesIn(rules, name) ?? found;
     }
 
-    return undefined;
+    return found;
 };
 
 /** The offset of a keyframe's selector, as a share of the run, taking the furthest when it names several. */
@@ -128,7 +162,7 @@ const measureAtEdgeFrame = (
 
         word.style.display = "inline-block";
 
-        for (const character of Array.from(text)) {
+        for (const character of StringUtils.splitGraphemes(text)) {
             const letter = document.createElement("span");
 
             for (const [key, value] of Object.entries(metrics)) letter.style.setProperty(key, value);
@@ -188,7 +222,7 @@ export namespace LetterDriverUtils {
         const indexed = segments.map((segment): LetterSegment => {
             const result = { ...segment, startIndex: count };
 
-            if (segment.type === "text") count += Array.from(segment.text).length;
+            if (segment.type === "text") count += StringUtils.splitGraphemes(segment.text).length;
             else if (!JSXTextParserUtils.getIsWrapBreak(segment)) count += SINGLE_ELEMENT;
 
             return result;
@@ -207,8 +241,9 @@ export namespace LetterDriverUtils {
      * and rounds it down.
      *
      * @param element The element the lines are laid out in. One with no box of its own, such as an inline element,
-     * falls back to its `clientWidth`.
-     * @returns The width, never more than the room the element has.
+     * falls back to its `clientWidth`. An element that scrolls itself is read with its own scrollbar included, so pass
+     * one that does not scroll, such as a wrapper inside the scrolling box.
+     * @returns The width, never more than the room an element that does not scroll has.
      */
     export const measureLineWidth = (element: HTMLElement) => {
         const style = getComputedStyle(element);
@@ -261,7 +296,7 @@ export namespace LetterDriverUtils {
      */
     export const getCharacters = (segments: readonly ElementSegment[]) =>
         segments.flatMap((segment) => {
-            if (segment.type === "text") return Array.from(segment.text);
+            if (segment.type === "text") return StringUtils.splitGraphemes(segment.text);
             if (segment.type === "atomic") return [WHOLE_ELEMENT_CHARACTER];
 
             return getIsAnimated(segment) ? [LINE_BREAK_CHARACTER] : [];
@@ -331,7 +366,7 @@ export namespace LetterDriverUtils {
 
         for (const segment of segments) {
             if (segment.type === "text") {
-                for (const character of Array.from(segment.text))
+                for (const character of StringUtils.splitGraphemes(segment.text))
                     names.add(computeAnimationName(character, index++, count));
             } else if (!JSXTextParserUtils.getIsWrapBreak(segment)) {
                 index++;
@@ -358,6 +393,55 @@ export namespace LetterDriverUtils {
             },
         });
     };
+
+    /**
+     * Warns in development that the elements `JSXTextParserUtils.findUnsupportedElements` finds will not survive being copied.
+     *
+     * Silent in a production build, and when there is nothing to report.
+     *
+     * @param el The element the pieces are taken from.
+     * @param owner The component copying it, which the warning opens with.
+     * @param copyName What the copy is called in the warning, such as `"typed text"`.
+     */
+    export const warnIfUnsupported = (el: Element | undefined, owner: string, copyName: string) => {
+        if (process.env.NODE_ENV === "production") return;
+
+        const unsupported = JSXTextParserUtils.findUnsupportedElements(el);
+
+        if (!unsupported.length) return;
+
+        console.warn(
+            `${owner}: ${unsupported.map((element) => `<${element.localName}>`).join(", ")} cannot be copied faithfully into the ${copyName}, which loses a canvas's drawing, media playback, a frame's page and a form control's value.`,
+        );
+    };
+
+    /**
+     * Reads the text an element holds, wraps it with {@link wrapAtWidestFrame} and numbers it with
+     * {@link indexSegments}, which is everything a driver does to its text once it has decided to measure.
+     *
+     * The measuring box goes in the element's parent, or in the element itself when it has none.
+     *
+     * Browser only, for the same reasons as {@link wrapAtWidestFrame}.
+     *
+     * @param container The element holding the consumer's text, already rendered.
+     * @param width The line width to wrap at, in pixels, as {@link measureLineWidth} gives it.
+     * @param computeAnimationName Names each letter's keyframes, as {@link wrapAtWidestFrame} takes it.
+     * @returns The wrapped segments with their start index, and how many characters there are in all.
+     */
+    export const layoutLetters = (
+        container: HTMLElement,
+        width: number,
+        computeAnimationName: (character: string, index: number, count: number) => string,
+    ) =>
+        indexSegments(
+            wrapAtWidestFrame(
+                JSXTextParserUtils.getSegmentTokens(container),
+                width,
+                container.parentElement ?? container,
+                computeAnimationName,
+            ),
+        );
+
     /**
      * Builds the registry a wrapper keeps its drawers in.
      *

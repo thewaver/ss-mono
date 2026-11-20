@@ -51,6 +51,8 @@
         lameExponents: props.lameExponents,
     });
 
+    const brushContour = $derived(ScratchCardUtils.computeBrushContour(brushShape));
+
     const scheduler = ScratchCardUtils.createMeasureScheduler(() => {
         clearedRatio = ScratchCardUtils.measureClearedRatio(pathElement ?? undefined, path, getSize(), precision);
     });
@@ -123,11 +125,7 @@
 
                 path =
                     path +
-                    ScratchCardUtils.computeStampPath(
-                        point,
-                        brushRadius,
-                        ScratchCardUtils.computeBrushPoints(brushShape),
-                    );
+                    ScratchCardUtils.computeStampPath(point, brushRadius, brushContour);
             },
         },
     );
@@ -157,7 +155,9 @@
 </script>
 
 <div bind:this={root} class={styles.scratchCardRoot} tabindex="-1">
-    {@render props.renderContent()}
+    <div class={styles.scratchCardContent} inert={!isCleared}>
+        {@render props.renderContent()}
+    </div>
 
     <svg class={styles.scratchCardDefs} aria-hidden="true">
         <defs>

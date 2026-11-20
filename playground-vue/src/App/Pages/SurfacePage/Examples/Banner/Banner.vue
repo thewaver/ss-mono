@@ -45,7 +45,7 @@ const id = useId();
     <div :class="styles.root">
         <Surface v-bind="getConfig(id)">
             <div :class="styles.content">
-                <img :class="styles.image" :src="knight" :style="{ verticalAlign: 'middle' }" />
+                <img :class="styles.image" :src="knight" :style="{ verticalAlign: 'middle' }" alt="" />
                 <span
                     ><b>{{ "Alert! Alert!" }}</b
                     ><br />{{ SIR_FACE_PLEADS_YOUR_TEXT }}</span

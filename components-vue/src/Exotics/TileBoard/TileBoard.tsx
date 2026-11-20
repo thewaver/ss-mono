@@ -107,7 +107,7 @@ export const TileBoard = defineComponent(
         const layout = computed(() =>
             TileBoardUtils.getLayout(
                 props.tiling ?? TILE_BOARD_DEFAULTS.tiling,
-                { row: props.tileCount.row, col: props.tileCount.col },
+                { rowCount: props.tileCount.rowCount, colCount: props.tileCount.colCount },
                 { width: props.tileSize.width, height: props.tileSize.height },
                 props.hasShortFirstRow ?? false,
                 props.taper ?? TILE_BOARD_DEFAULTS.taper,
@@ -160,6 +160,8 @@ export const TileBoard = defineComponent(
         };
 
         const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.target !== tileRefs.get(rovingKey.value)) return;
+
             const action = TileBoardUtils.computeKeyAction(
                 e.key,
                 e.ctrlKey || e.metaKey,
@@ -250,7 +252,7 @@ export const TileBoard = defineComponent(
                     class={[TileBoardStyles.tileBoardRoot, getIsSweepable() && TileBoardStyles.tileBoardIsSweepable]}
                     role="grid"
                     aria-label={props.ariaLabel}
-                    aria-rowcount={currentLayout.count.row}
+                    aria-rowcount={currentLayout.count.rowCount}
                     aria-colcount={TileBoardUtils.getColumnCount(currentLayout)}
                     aria-disabled={isDisabled || undefined}
                     style={{ width: `${boardSize.width}px`, height: `${boardSize.height}px` }}
@@ -261,7 +263,7 @@ export const TileBoard = defineComponent(
                         class={TileBoardStyles.tileBoardPlane}
                         style={{ transform: TileBoardUtils.getTaperTransform(currentLayout) }}
                     >
-                        {Array.from({ length: Math.max(currentLayout.count.row, 0) }, (_unused, rowIndex) => {
+                        {Array.from({ length: Math.max(currentLayout.count.rowCount, 0) }, (_unused, rowIndex) => {
                             const origin = TileBoardUtils.getRowOrigin(rowIndex, currentLayout, gap);
 
                             return (

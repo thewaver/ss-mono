@@ -10,9 +10,12 @@ import { useViewportContext } from "../Viewport/Viewport.context";
  * The Solid side of {@link ElementObserverUtils}: each observer as an accessor in and an accessor out, torn down on
  * cleanup.
  *
- * Each takes an optional disabled accessor so a component that is off screen or collapsed can stop measuring,
- * and each de-duplicates its results, so a resize that does not change the numbers does not wake anything
- * downstream. All of them must run inside a component or another reactive owner.
+ * Most take an optional disabled accessor so a component that is off screen or collapsed can stop measuring. The
+ * two that follow an element's place on screen, {@link createViewportRectObserver} and
+ * {@link createViewportRectListObserver}, take a required visibility accessor instead. The size observers drop
+ * repeated results, so a resize that does not change the numbers does not wake anything downstream; so does the
+ * rectangle list observer, while the single rectangle observer hands every reading to its caller and leaves
+ * repeats to it. All of them must run inside a component or another reactive owner.
  */
 export namespace ElementObserverSolidUtils {
     /**
@@ -134,6 +137,8 @@ export namespace ElementObserverSolidUtils {
      * @param opts.getPadding Grows the rectangle outwards, either evenly or edge by edge. Useful for a
      * hover target that should extend past what is drawn.
      * @param opts.getOffset Shifts the rectangle. Applied after the padding.
+     * @param opts.isMeasuredWhileHidden Whether the measurement taken as the element mounts is taken while `getIsVisible`
+     * says `false`. `true` when left out; `false` leaves a hidden element unmeasured until it is shown.
      */
     export const createViewportRectObserver = <T extends HTMLElement>(
         getRef: Accessor<T | undefined>,
@@ -142,6 +147,7 @@ export namespace ElementObserverSolidUtils {
             setElementRect: Setter<Rect | undefined>;
             getPadding?: () => Bounds | number;
             getOffset?: () => Point2d;
+            isMeasuredWhileHidden?: boolean;
         },
     ) => {
         const viewportContext = useViewportContext();
@@ -153,7 +159,7 @@ export namespace ElementObserverSolidUtils {
         onMount(() => {
             const ref = getRef();
 
-            if (!ref) return;
+            if (!ref || (opts.isMeasuredWhileHidden === false && !getIsVisible())) return;
 
             report(
                 ElementObserverUtils.measureViewportRect(ref, viewportContext, {

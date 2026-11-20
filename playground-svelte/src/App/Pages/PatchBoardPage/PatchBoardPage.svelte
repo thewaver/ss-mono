@@ -18,6 +18,8 @@
     PERCENT,
     RACK_LINKS,
     RACK_NODES,
+    SHARED_FIRST_NODES,
+    SHARED_SECOND_NODES,
     WIDE_SPAN,
 } from "@thewaver/ss-playground/App/Pages/PatchBoardPage/PatchBoardPage.const";
     import type { PatchDevice } from "@thewaver/ss-playground/App/Pages/PatchBoardPage/PatchDevice.types";
@@ -34,6 +36,7 @@
     import MixerExample from "./Examples/Mixer.svelte";
     import PanExample from "./Examples/Pan.svelte";
     import RackExample from "./Examples/Rack.svelte";
+    import SharedExample from "./Examples/Shared.svelte";
     import type { PatchBoardExampleProps } from "./PatchBoardPage.types";
 
     const getLinkWords = (link: PatchBoardLink) =>
@@ -47,6 +50,7 @@
     let rackAction = $state(NOTHING_DONE);
     let panAction = $state(NOTHING_DONE);
     let panView = $state.raw(PAN_STARTING_VIEW);
+    let sharedAction = $state(NOTHING_DONE);
 
     let chainNodes = $state.raw<PatchBoardNode<PatchDevice>[]>(CHAIN_NODES);
     let chainLinks = $state.raw<PatchBoardLink[]>(CHAIN_LINKS);
@@ -56,6 +60,10 @@
     let rackLinks = $state.raw<PatchBoardLink[]>(RACK_LINKS);
     let panNodes = $state.raw<PatchBoardNode<PatchDevice>[]>(PAN_NODES);
     let panLinks = $state.raw<PatchBoardLink[]>(PAN_LINKS);
+    let sharedFirstNodes = $state.raw<PatchBoardNode<PatchDevice>[]>(SHARED_FIRST_NODES);
+    let sharedSecondNodes = $state.raw<PatchBoardNode<PatchDevice>[]>(SHARED_SECOND_NODES);
+    let sharedFirstLinks = $state.raw<PatchBoardLink[]>([]);
+    let sharedSecondLinks = $state.raw<PatchBoardLink[]>([]);
 
     const getPrefersReducedMotion = MediaQueryMonitorSvelteUtils.createReducedMotion();
 
@@ -100,6 +108,15 @@
                 `${panLinks.length} cables at ${Math.round((PERCENT * PAN_SCALE) / SpanUtils.getExtent(panView.x))}%, last: ${panAction} — the board is laid out at its own width and drawn into a smaller window: drag empty board, use the wheel, pinch or press the buttons to move and zoom it; a node still drags under the pointer, and one carried with the arrow keys brings the window with it`,
             component: panExample,
             path: `${EXAMPLES_ROOT}/Pan.svelte`,
+        },
+        {
+            key: "shared",
+            name: EXAMPLE_NAMES.shared,
+            span: WIDE_SPAN,
+            readout: () =>
+                `${sharedFirstNodes.length} on the first board, ${sharedSecondNodes.length} on the second, last: ${sharedAction} — the two boards share a group, so a device dragged or carried from one lands on the other where it was held`,
+            component: sharedExample,
+            path: `${EXAMPLES_ROOT}/Shared.svelte`,
         },
     ];
 </script>
@@ -152,6 +169,19 @@
         onLink={(link) => (panAction = `connected ${getLinkWords(link)}`)}
         onUnlink={(link) => (panAction = `unplugged ${getLinkWords(link)}`)}
         onMove={(nodeKey) => (panAction = `moved ${nodeKey}`)}
+    />
+{/snippet}
+
+{#snippet sharedExample()}
+    <SharedExample
+        {...commonProps}
+        bind:firstNodes={sharedFirstNodes}
+        bind:secondNodes={sharedSecondNodes}
+        bind:firstLinks={sharedFirstLinks}
+        bind:secondLinks={sharedSecondLinks}
+        onLink={(link) => (sharedAction = `connected ${getLinkWords(link)}`)}
+        onUnlink={(link) => (sharedAction = `unplugged ${getLinkWords(link)}`)}
+        onMove={(nodeKey) => (sharedAction = `moved ${nodeKey}`)}
     />
 {/snippet}
 

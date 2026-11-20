@@ -229,7 +229,7 @@ export const Scroller = (props: ScrollerProps) => {
             x: progress.x === reportedProgressRef.current.x ? undefined : progress.x,
             y: progress.y === reportedProgressRef.current.y ? undefined : progress.y,
         });
-    }, [box, progress]);
+    }, [box, progress, ScrollerUtils.computeScrollRange(metrics.x), ScrollerUtils.computeScrollRange(metrics.y)]);
 
     useEffect(() => {
         if (!box) return undefined;

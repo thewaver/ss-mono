@@ -14,11 +14,6 @@ export type NumberInputSeparators = {
 
 export type NumberInputKeyMove = { direction: 1 | -1; distance?: number } | { value: number };
 
-export type NumberInputStepRepeater = {
-    start: (step: () => boolean) => boolean;
-    stop: () => boolean;
-};
-
 export type NumberInputStepper = {
     /** Whether the number sits at or below the lowest allowed value. */
     getIsAtMin: () => boolean;

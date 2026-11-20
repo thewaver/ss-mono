@@ -2,7 +2,7 @@ import { AngleUtils } from "@thewaver/ss-utils";
 
 import type { PlacementLayout, PlacementLayoutDefs } from "../../../Abstracts/Placement/Placement.types";
 import { PlacementLayoutDefaults } from "../../../Generators/PlacementLayouts/PlacementLayouts.const";
-import { PlacementLayoutUtils } from "../../../Generators/PlacementLayouts/PlacementLayouts.utils";
+import { PlacementRingUtils } from "../../../Generators/PlacementLayouts/PlacementRing.utils";
 import { WHEEL_MENU_DEFAULTS } from "./WheelMenu.const";
 import type { WheelMenuArcRecord, WheelMenuLayoutDefs } from "./WheelMenu.types";
 
@@ -130,7 +130,7 @@ export namespace WheelMenuUtils {
             ? (opener.fromAngle + opener.toAngle) * HALF
             : (given.facingDegrees ?? topFacingDegrees);
 
-        const ring = PlacementLayoutUtils.createRing({
+        const ring = PlacementRingUtils.createRing({
             ...given,
             holeRatio: holeRadius / outerRadius,
             wedgeGapDegrees,

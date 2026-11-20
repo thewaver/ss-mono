@@ -16,7 +16,7 @@
         RichTextUtils.parseContent(props.content, allowedAttributes, props.maxDepth ?? RICH_TEXT_DEFAULTS.maxDepth),
     );
 
-    const classMap = $derived(props.computeClassNames?.(RICH_TEXT_DEFAULT_CLASSES) ?? RICH_TEXT_DEFAULT_CLASSES);
+    const classMap = $derived(props.computeClassNames?.({ ...RICH_TEXT_DEFAULT_CLASSES }) ?? RICH_TEXT_DEFAULT_CLASSES);
 
     const removeUnknownTags = $derived(props.removeOtherTags ?? RICH_TEXT_DEFAULTS.removeOtherTags);
 </script>

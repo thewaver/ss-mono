@@ -196,8 +196,16 @@ export const CalendarComposite = defineComponent(
 
         watchAfterRender([], () => LiveAnnouncerUtils.reserve("polite"));
 
+        let lastAnchorDay: DateValue | undefined;
+
         watchAfterRender([() => props.anchorDay], ([anchorDay]) => {
-            if (anchorDay) highlighted.value = anchorDay;
+            const last = lastAnchorDay;
+
+            lastAnchorDay = anchorDay;
+
+            if (!anchorDay || (anchorDay !== last && CalendarUtils.getIsSameCell(anchorDay, last, "day"))) return;
+
+            highlighted.value = anchorDay;
         });
 
         watchAfterRender([pageStart], ([start]) => {
@@ -210,10 +218,13 @@ export const CalendarComposite = defineComponent(
             LiveAnnouncerUtils.announce(computePageLabel());
         });
 
+        const getIsOwnDayElement = (target: EventTarget | null) =>
+            target instanceof Element && target.id.startsWith(`${gridId}-day-`);
+
         watchAfterRender([rovingCellId], ([cellId]) => {
             const root = rootRef.value;
 
-            if (!cellId || !root?.contains(document.activeElement) || root === document.activeElement) return;
+            if (!cellId || !root || !getIsOwnDayElement(document.activeElement)) return;
 
             document.getElementById(cellId)?.focus();
         });
@@ -223,6 +234,8 @@ export const CalendarComposite = defineComponent(
             pages.value[0];
 
         const handleKeyDown = (e: KeyboardEvent) => {
+            if (!getIsOwnDayElement(e.target)) return;
+
             const precision = getPrecision();
 
             const action = CalendarUtils.computeKeyAction(e.key, e.shiftKey, {

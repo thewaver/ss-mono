@@ -1,6 +1,16 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { attributesOf, docsDemo, docsSettled, prop, tabIndex } from "./helpers";
+import {
+    attributesOf,
+    docsDemo,
+    docsSettled,
+    expectAnnounced,
+    markAnnouncements,
+    prop,
+    readAnnouncements,
+    recordAnnouncements,
+    tabIndex,
+} from "./helpers";
 
 /**
  * The calendar's page is its Docs view, one example per feature, each holding its own value and month. None of them
@@ -41,6 +51,7 @@ const activeLabel = (page: Page) => page.evaluate(() => document.activeElement?.
 const shownMonth = (page: Page, key: string) => page.locator(`#${key}MonthTitle`);
 
 test.beforeEach(async ({ page }) => {
+    await recordAnnouncements(page);
     await page.goto("/calendar/docs");
     await expect(page.locator(cell(BASIC)).first()).toBeVisible();
     await docsSettled(page);
@@ -227,29 +238,34 @@ test("the wrapper between a row and its cells is transparent", async ({ page }) 
 const ANNOUNCER = 'body > [role="log"][aria-live="polite"]';
 
 test("paging announces the month it landed on, through a region no component owns", async ({ page }) => {
-    await expect(page.locator(`${ANNOUNCER} > *`), "the region is reserved and empty, not absent").toHaveCount(0);
+    await expect(page.locator(ANNOUNCER), "the region is reserved, not absent").toHaveCount(1);
+    expect(await readAnnouncements(page), "and nothing has been said in it").toEqual([]);
 
     await page.locator("#basicNextMonth").click();
 
-    await expect(page.locator(ANNOUNCER), "paging says where it landed").toContainText("September 2026");
+    await expectAnnounced(page, "September 2026", { message: "paging says where it landed" });
+
+    const mark = await markAnnouncements(page);
 
     await page.locator("#basicPreviousMonth").click();
     await page.locator("#basicPreviousMonth").click();
 
-    await expect(
-        page.locator(ANNOUNCER),
-        "and each page is its own message rather than one that is edited",
-    ).toContainText("July 2026");
+    await expectAnnounced(page, "July 2026", {
+        mark,
+        message: "and each page is its own message rather than one that is edited",
+    });
 });
 
 test("moving within a month announces nothing, so only paging talks", async ({ page }) => {
+    const mark = await markAnnouncements(page);
+
     await page.locator(day(BASIC, "10 August 2026")).click();
     await page.keyboard.press("ArrowRight");
 
-    await expect(
-        page.locator(`${ANNOUNCER} > *`),
+    expect(
+        (await readAnnouncements(page)).slice(mark),
         "a walk inside the visible month is not a page, and says nothing",
-    ).toHaveCount(0);
+    ).toEqual([]);
 });
 
 /**
@@ -388,7 +404,7 @@ test.describe("a month picker", () => {
             "aria-label",
             "January 2027",
         );
-        await expect(page.locator(ANNOUNCER), "and the region says which year it landed on").toContainText("2027");
+        await expectAnnounced(page, "2027", { message: "and the region says which year it landed on" });
 
         await page.locator("#monthPickerPreviousPage").click();
         await page.locator("#monthPickerPreviousPage").click();
@@ -467,9 +483,7 @@ test.describe("a year picker", () => {
             page.locator(`${cell(YEAR_PICKER)}[aria-disabled="true"]`),
             "every year after the maximum is refused",
         ).toHaveCount(9);
-        await expect(page.locator(ANNOUNCER), "and the region names the page as a span of years").toContainText(
-            /2029\D+2040/,
-        );
+        await expectAnnounced(page, /2029\D+2040/, { message: "and the region names the page as a span of years" });
     });
 });
 

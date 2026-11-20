@@ -246,6 +246,12 @@ describe("TableUtils.computeKeyCommand", () => {
         });
         expect(TableUtils.computeKeyCommand(press("x"), { row: 1, col: 0 }, GRID, OPTS)).toBeUndefined();
     });
+
+    it("selects all with Caps Lock on, when the key arrives as a capital", () => {
+        expect(TableUtils.computeKeyCommand(press("A", { ctrlKey: true }), { row: 1, col: 0 }, GRID, OPTS)).toEqual({
+            kind: "select_all",
+        });
+    });
 });
 
 describe("TableUtils.clampCell", () => {

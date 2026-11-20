@@ -3,12 +3,14 @@ import { useHref, useLinkClickHandler } from "react-router";
 
 import type { PageRouterLinkProps } from "./RouterLink.types";
 
-export const PageRouterLink = ({ href, replace, onClick, ...rest }: PageRouterLinkProps) => {
-    const resolvedHref = useHref(href);
-    const navigateOnClick = useLinkClickHandler<HTMLAnchorElement>(href, { replace });
+export const PageRouterLink = (props: PageRouterLinkProps) => {
+    const { href, replace, onClick, ...rest } = props;
+
+    const resolvedHref = useHref(props.href);
+    const navigateOnClick = useLinkClickHandler<HTMLAnchorElement>(props.href, { replace: props.replace });
 
     const handleClick = (e: MouseEvent<HTMLAnchorElement>) => {
-        onClick?.(e);
+        props.onClick?.(e);
 
         if (!e.defaultPrevented) navigateOnClick(e);
     };

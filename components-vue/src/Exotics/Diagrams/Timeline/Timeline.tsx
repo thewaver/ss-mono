@@ -15,6 +15,7 @@ import {
     CarrierUtils,
     type CarryMode,
     LiveAnnouncerUtils,
+    NavigatorUtils,
     PanZoomUtils,
     TIMELINE_DEFAULTS,
     type TimelineEdge,
@@ -171,6 +172,7 @@ export const Timeline = defineComponent(
                 getView: () => latestView,
                 getRange: () => props.range,
                 getSpans: () => spans.value,
+                getItems: () => props.items,
                 getStep: () => steps.value.step,
                 computePointerRatio: getPointerRatio,
                 get computeSnapValue() {
@@ -184,7 +186,7 @@ export const Timeline = defineComponent(
 
         const edgeCarry = computed(() => (carryState.value?.from === zone ? carryState.value.carry : undefined));
 
-        const heldIndex = computed(() => TimelineUtils.getCarriedIndex(edgeCarry.value));
+        const heldIndex = computed(() => TimelineUtils.getCarriedIndex(edgeCarry.value, props.items));
 
         const shownSpans = computed(() =>
             TimelineUtils.computeShownSpans(
@@ -315,6 +317,7 @@ export const Timeline = defineComponent(
                     timelineId,
                     index,
                     props.computeItemAriaLabel?.(props.items[index], index) ?? "",
+                    props.items[index],
                 ),
                 mode,
             );
@@ -374,7 +377,7 @@ export const Timeline = defineComponent(
         const handleKeyDown = (e: KeyboardEvent) => {
             const from = rovingIndex.value;
 
-            if (from === undefined || getIsDisabled()) return;
+            if (from === undefined || getIsDisabled() || NavigatorUtils.getHasCommandModifier(e)) return;
 
             const action = TimelineUtils.computeKeyAction(e.key, {
                 isHolding: !!getEdgeCarry() && CarrierUtils.getCarryMode() !== "drag",

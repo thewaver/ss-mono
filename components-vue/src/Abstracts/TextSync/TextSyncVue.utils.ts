@@ -1,6 +1,6 @@
 import { type MaybeRefOrGetter, shallowRef, toValue } from "vue";
 
-import { type TextSyncElement, type TextSyncMaskResult, TextSyncUtils } from "@thewaver/ss-components";
+import { type TextSyncElement, type TextSyncMaskFn, TextSyncUtils } from "@thewaver/ss-components";
 
 import { watchAfterRender } from "../../Utils/effectUtils";
 
@@ -36,8 +36,7 @@ export namespace TextSyncVueUtils {
         value: MaybeRefOrGetter<string>,
         opts: {
             onInput: (value: string) => void;
-            getComputeMaskedText?: () =>
-                ((previous: string, next: string, caret: number) => TextSyncMaskResult) | undefined;
+            getComputeMaskedText?: () => TextSyncMaskFn | undefined;
         },
     ) => {
         let reported: string | undefined;

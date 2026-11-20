@@ -70,3 +70,23 @@ describe("Typeahead.computeNextIndex", () => {
         expect(TypeaheadUtils.computeNextIndex("🍎🍎", 1, FRUIT.length, computeFruit)).toBe(0);
     });
 });
+
+describe("Typeahead.computeNextIndex with nothing highlighted", () => {
+    it("tests the first item for a one-letter search", () => {
+        expect(TypeaheadUtils.computeNextIndex("l", -1, CITIES.length, computeText)).toBe(0);
+        expect(TypeaheadUtils.computeNextIndex("x", -1, 1, () => "Xanadu")).toBe(0);
+    });
+});
+
+describe("Typeahead.getIsQueryKey with AltGr", () => {
+    const altGraph = (value: string) =>
+        key(value, { ctrlKey: true, altKey: true, getModifierState: (name: string) => name === "AltGraph" });
+
+    it("searches for a character typed with AltGr, though it reports Control and Alt held", () => {
+        expect(TypeaheadUtils.getIsQueryKey(altGraph("ł"), false)).toBe(true);
+    });
+
+    it("still leaves Control and Alt alone without AltGr", () => {
+        expect(TypeaheadUtils.getIsQueryKey(key("ł", { ctrlKey: true, altKey: true }), false)).toBe(false);
+    });
+});

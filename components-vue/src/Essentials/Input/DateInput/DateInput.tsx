@@ -5,6 +5,7 @@ import {
     DateInputUtils,
     type DateValue,
     DateValueUtils,
+    FormValueUtils,
     TextSyncUtils,
 } from "@thewaver/ss-components";
 
@@ -14,13 +15,16 @@ import { TextField } from "../../../Primitives/TextField/TextField";
 import type { TextFieldSlots } from "../../../Primitives/TextField/TextField.types";
 import { watchAfterRender } from "../../../Utils/effectUtils";
 import { callSlot, declareProps, forwardProps, useTwoWay } from "../../../Utils/propUtils";
+import { exposeElement, toElement } from "../../../Utils/refUtils";
 import type { SlotsContext } from "../../../Utils/typeUtils";
 import type { DateInputEra, DateInputProps, DateInputSlots } from "./DateInput.types";
 
-const EMPTY_FORM_VALUE = "";
-
 export const DateInput = defineComponent(
-    (props: DateInputProps, { slots }: SlotsContext<DateInputSlots>) => {
+    (props: DateInputProps, { slots, expose }: SlotsContext<DateInputSlots>) => {
+        const controlRef = shallowRef<HTMLElement>();
+
+        exposeElement(expose, () => controlRef.value);
+
         const value = useTwoWay(props, "value");
 
         const getFormat = () => props.format ?? DATE_INPUT_DEFAULTS.format;
@@ -99,10 +103,13 @@ export const DateInput = defineComponent(
             const textField = (
                 <TextField
                     {...forwarded}
+                    ref={(target) => {
+                        controlRef.value = toElement(target);
+                    }}
                     element={"input"}
                     inputMode={"numeric"}
-                    computeMaskedText={(previous, next, caret) =>
-                        TextSyncUtils.applyMask(mask.value, previous, next, caret)
+                    computeMaskedText={(previous, next, caret, isForwardDeletion) =>
+                        TextSyncUtils.applyMask(mask.value, previous, next, caret, isForwardDeletion)
                     }
                     placeholderHint={DateInputUtils.computeHint(getFormat(), props.partHints)}
                     hasError={(props.hasError ?? false) || field.hasIssue.value}
@@ -129,7 +136,7 @@ export const DateInput = defineComponent(
 
                     <FormValue
                         name={props.name}
-                        values={[value.value ? DateValueUtils.toIso(value.value) : EMPTY_FORM_VALUE]}
+                        values={[value.value ? DateValueUtils.toIso(value.value) : FormValueUtils.EMPTY_TEXT]}
                     />
                 </>
             );
@@ -137,6 +144,7 @@ export const DateInput = defineComponent(
     },
     {
         name: "DateInput",
+        inheritAttrs: false,
         slots: Object as SlotsType<DateInputSlots>,
         props: declareProps<DateInputProps>({
             "isDisabled": Boolean,

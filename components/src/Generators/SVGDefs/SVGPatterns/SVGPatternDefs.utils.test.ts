@@ -4,7 +4,7 @@ import { SVGPatternDefsUtils } from "./SVGPatternDefs.utils";
 
 describe("SVGPatternDefsUtils.computeCells", () => {
     it("places every cell of the tile column by column, each named from the pattern and its place", () => {
-        const cells = SVGPatternDefsUtils.computeCells("p", { rows: 2, cols: 2 }, ({ row, col }) => ({
+        const cells = SVGPatternDefsUtils.computeCells("p", { rowCount: 2, colCount: 2 }, ({ row, col }) => ({
             x: col * 10,
             y: row * 20,
         }));

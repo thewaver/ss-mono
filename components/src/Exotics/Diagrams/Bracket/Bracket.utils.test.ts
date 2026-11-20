@@ -82,6 +82,13 @@ describe("getFacingEdge", () => {
 describe("computeStepId", () => {
     const placements = BracketUtils.computeLayout(FINAL).placements;
 
+    it("steps between layers past a disabled match, so no part of the bracket is out of reach", () => {
+        const enabled = placements.filter((placement) => placement.id.split(".").length !== 2);
+
+        expect(BracketUtils.computeStepId("to_leaves", "0", enabled)?.split(".")).toHaveLength(3);
+        expect(BracketUtils.computeStepId("to_root", "0.0.0", enabled)).toBe("0");
+    });
+
     it("steps toward the root by following the node that this one feeds", () => {
         expect(BracketUtils.computeStepId("to_root", "0.0.0", placements)).toBe("0.0");
         expect(BracketUtils.computeStepId("to_root", "0", placements), "the final feeds nobody").toBeUndefined();

@@ -183,7 +183,7 @@
 </script>
 
 {#snippet letters(segment: LetterSegment & { type: "text" }, isResting: boolean)}
-    {#each Array.from(segment.text) as character, offset (offset)}
+    {#each StringUtils.splitGraphemes(segment.text) as character, offset (offset)}
         <span
             {@attach isResting && attachRest(segment.startIndex + offset)}
             class={styles.proximityTextLetter}

@@ -60,13 +60,13 @@ export const TileBoard = (props: TileBoardProps) => {
     const isDisabled = props.isDisabled ?? false;
 
     const { width: pitchWidth, height: pitchHeight } = props.tileSize;
-    const { row: rowCount, col: colCount } = props.tileCount;
+    const { rowCount: rowCount, colCount: colCount } = props.tileCount;
 
     const layout = useMemo(
         () =>
             TileBoardUtils.getLayout(
                 tiling,
-                { row: rowCount, col: colCount },
+                { rowCount: rowCount, colCount: colCount },
                 { width: pitchWidth, height: pitchHeight },
                 hasShortFirstRow,
                 taper,
@@ -78,7 +78,7 @@ export const TileBoard = (props: TileBoardProps) => {
 
     const geometries = useMemo(
         () =>
-            Array.from({ length: Math.max(layout.count.row, 0) }, (_unused, row) =>
+            Array.from({ length: Math.max(layout.count.rowCount, 0) }, (_unused, row) =>
                 Array.from({ length: TileBoardUtils.getRowLength(row, layout) }, (_unusedCol, col) =>
                     TileBoardUtils.getTileGeometry({ row, col }, layout, gap),
                 ),
@@ -136,6 +136,8 @@ export const TileBoard = (props: TileBoardProps) => {
     };
 
     const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+        if (e.target !== tileRefs.current.get(rovingKey)) return;
+
         const action = TileBoardUtils.computeKeyAction(e.key, e.ctrlKey || e.metaKey, rovingTile, layout);
 
         if (action === undefined) return;
@@ -204,7 +206,7 @@ export const TileBoard = (props: TileBoardProps) => {
             className={className}
             role="grid"
             aria-label={props.ariaLabel}
-            aria-rowcount={layout.count.row}
+            aria-rowcount={layout.count.rowCount}
             aria-colcount={TileBoardUtils.getColumnCount(layout)}
             aria-disabled={isDisabled || undefined}
             style={{ width: `${boardSize.width}px`, height: `${boardSize.height}px` }}
@@ -215,7 +217,7 @@ export const TileBoard = (props: TileBoardProps) => {
                 className={TileBoardStyles.tileBoardPlane}
                 style={{ transform: TileBoardUtils.getTaperTransform(layout) }}
             >
-                {Array.from({ length: Math.max(layout.count.row, 0) }, (_unused, rowIndex) => {
+                {Array.from({ length: Math.max(layout.count.rowCount, 0) }, (_unused, rowIndex) => {
                     const origin = TileBoardUtils.getRowOrigin(rowIndex, layout, gap);
 
                     return (

@@ -4,6 +4,7 @@ import { useRoute, useRouter } from "vue-router";
 
 import { SharedTooltip, Sidebar, Tree, useViewportContext } from "@thewaver/ss-components-vue";
 import type { TreeNode } from "@thewaver/ss-components-vue";
+import { toDocumentTitle } from "@thewaver/ss-playground/App/App.const";
 import * as styles from "@thewaver/ss-playground/App/App.css";
 import { LAYOUT } from "@thewaver/ss-playground/App/Layout.const";
 import { IS_BUILD_PROGRESS_SHOWN } from "@thewaver/ss-playground/App/PageComponents/BuildProgress/BuildProgress.utils";
@@ -57,12 +58,21 @@ const searchTerm = shallowRef("");
 const showsDescriptionOnly = shallowRef(NavSettingsUtils.loadShowsDescriptionOnly());
 
 watch(showsDescriptionOnly, (isShown) => NavSettingsUtils.save("showsDescriptionOnly", isShown), { immediate: true });
+const SITE_TITLE = document.title;
 const pageView = shallowRef<PageViewKey>(DEFAULT_PAGE_VIEW);
 const isAutoHidden = shallowRef(false);
 const browseExpanded = shallowRef<MenuNodeConfig[]>(AppUtils.VISIBLE_MENU_CONFIGS);
 const searchExpanded = shallowRef<MenuNodeConfig[]>([]);
 
 const selectedConfig = computed(() => AppUtils.COMPONENT_CONFIGS_BY_ROUTE[toBaseRoute(route.path)]);
+
+watch(
+    selectedConfig,
+    (config) => {
+        document.title = toDocumentTitle(config?.name, SITE_TITLE);
+    },
+    { immediate: true },
+);
 
 watch(
     () => route.path,
@@ -132,7 +142,7 @@ watch(
 
 const viewportContext = useViewportContext();
 
-const menuGutter = computed(() => Math.max(0, (viewportContext.getSize().width - LAYOUT.pageMaxWidth) / 2));
+const menuGutter = computed(() => Math.max(0, (viewportContext.getSize().width - LAYOUT.pageMaxWidth) * 0.5));
 
 const isMenuHideable = computed(() => viewportContext.getSize().width < LAYOUT.menuHideableBelow);
 

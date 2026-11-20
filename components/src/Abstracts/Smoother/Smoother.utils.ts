@@ -26,10 +26,11 @@ export namespace SmootherUtils {
      * @param target Where it is heading.
      * @param elapsedMs How long has passed since `current` was taken. A negative time is treated as none.
      * @param smoothingMs How slowly it follows. `0` or less lands on the target at once.
-     * @returns The value after `elapsedMs`, never past the target.
+     * @returns The value after `elapsedMs`, never past the target. A value that is not a finite number lands on the
+     * target at once.
      */
     export const getStep = (current: number, target: number, elapsedMs: number, smoothingMs: number): number => {
-        if (smoothingMs <= 0) return target;
+        if (smoothingMs <= 0 || !Number.isFinite(current)) return target;
 
         return current + (target - current) * (1 - MathUtils.getDecay(elapsedMs, smoothingMs));
     };
@@ -40,7 +41,8 @@ export namespace SmootherUtils {
      * The follower is a store of the trailing values, starting on `initialTargets`. `follow` hands it new targets
      * and a smoothing time; frames are asked for only while something is still moving, so a still pointer costs
      * nothing. A change to the number of values, a change too small to be seen, or a smoothing time of `0` or less
-     * puts every value on its target at once. `stop` calls off the frame being waited for and leaves the values
+     * puts every value on its target at once. A target that is not a finite number is ignored and the last one kept.
+     * `stop` calls off the frame being waited for and leaves the values
      * where they are; the next `follow` carries on from there.
      *
      * @param initialTargets Where the values start.
@@ -83,7 +85,9 @@ export namespace SmootherUtils {
         const follow = (nextTargets: number[], nextSmoothingMs: number) => {
             const values = store.get();
 
-            targets = nextTargets;
+            targets = nextTargets.map((target, index) =>
+                Number.isFinite(target) || targets[index] === undefined ? target : targets[index],
+            );
             smoothingMs = nextSmoothingMs;
 
             if (smoothingMs <= 0 || values.length !== targets.length || getIsSettled(values, targets)) {

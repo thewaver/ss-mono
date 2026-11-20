@@ -31,6 +31,14 @@
             isDisabled,
             props.isReachableWhenDisabled ?? false,
             props.isFocusableWhenDisabled ?? false,
+            props.tooltipDefs !== undefined,
+        ),
+    );
+
+    $effect(() =>
+        InteractionTrackerUtils.warnIfReachableWithoutTooltip(
+            props.isReachableWhenDisabled ?? false,
+            props.tooltipDefs !== undefined,
         ),
     );
 

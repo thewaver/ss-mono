@@ -31,7 +31,9 @@ export namespace FittedTextUtils {
         return {
             "font-family": style.fontFamily,
             "font-size": `${REFERENCE_FONT_PX}px`,
+            "font-stretch": style.fontStretch,
             "font-style": style.fontStyle,
+            "font-variant-caps": style.fontVariantCaps as TextMetricsStyle["font-variant-caps"],
             "font-weight": style.fontWeight,
             "letter-spacing": toReference(style.letterSpacing),
             "text-transform": style.textTransform,

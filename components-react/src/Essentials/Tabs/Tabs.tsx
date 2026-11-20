@@ -9,7 +9,14 @@ import {
     useState,
 } from "react";
 
-import { FloaterStyles, InteractionTrackerUtils, TABS_DEFAULTS, TabsStyles, TabsUtils } from "@thewaver/ss-components";
+import {
+    FloaterStyles,
+    InteractionTrackerUtils,
+    SafeHrefUtils,
+    TABS_DEFAULTS,
+    TabsStyles,
+    TabsUtils,
+} from "@thewaver/ss-components";
 
 import { FloaterReactUtils } from "../../Abstracts/Floater/FloaterReact.utils";
 import { NavigatorReactUtils } from "../../Abstracts/Navigator/NavigatorReact.utils";
@@ -27,6 +34,7 @@ export const TabPanel = (props: TabPanelProps) => (
 
 const TabsItem = <T,>(props: TabsItemProps<T>) => {
     const isDisabled = props.flags.isDisabled ?? false;
+    const safeHref = SafeHrefUtils.resolve(props.tab.href, "Tabs");
 
     const handleClick = (e: MouseEvent<HTMLElement>) => {
         if (isDisabled) {
@@ -34,6 +42,8 @@ const TabsItem = <T,>(props: TabsItemProps<T>) => {
 
             return;
         }
+
+        if (safeHref !== undefined && !InteractionTrackerUtils.getIsPlainClick(e.nativeEvent)) return;
 
         props.onSelect(props.tab.value);
     };
@@ -47,7 +57,7 @@ const TabsItem = <T,>(props: TabsItemProps<T>) => {
         "aria-selected": props.isSelected,
     } as const;
 
-    if (props.tab.href === undefined) {
+    if (safeHref === undefined) {
         return (
             <button type="button" ref={props.ref} {...commonProps} onClick={handleClick}>
                 {props.renderContent(props.flags)}
@@ -58,7 +68,7 @@ const TabsItem = <T,>(props: TabsItemProps<T>) => {
     const Link = props.linkComponent ?? "a";
 
     return (
-        <Link ref={props.ref} href={props.tab.href} {...commonProps} onClick={handleClick}>
+        <Link ref={props.ref} href={safeHref} {...commonProps} onClick={handleClick}>
             {props.renderContent(props.flags)}
         </Link>
     );
@@ -73,10 +83,10 @@ export const Tabs = <T,>(props: TabsProps<T>) => {
     const [focusedValue, setFocusedValue] = useState<T | undefined>();
     const [hoveredIndex, setHoveredIndex] = useState<number>();
     const [focusVisibleIndex, setFocusVisibleIndex] = useState<number>();
-    const [previousSelectedValue, setPreviousSelectedValue] = useState(props.selectedValue);
+    const [previousSelectedValue, setPreviousSelectedValue] = useState(() => props.selectedValue);
 
     if (previousSelectedValue !== props.selectedValue) {
-        setPreviousSelectedValue(props.selectedValue);
+        setPreviousSelectedValue(() => props.selectedValue);
         setFocusedValue(undefined);
     }
 
@@ -150,7 +160,7 @@ export const Tabs = <T,>(props: TabsProps<T>) => {
 
         e.preventDefault();
 
-        setFocusedValue(step.value);
+        setFocusedValue(() => step.value);
         itemElements[step.index]?.focus();
 
         if (step.isSelecting) props.onSelectionChange?.(step.value);

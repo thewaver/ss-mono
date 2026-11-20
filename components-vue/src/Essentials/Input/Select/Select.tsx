@@ -188,8 +188,6 @@ const SelectClearScope = defineComponent(
     { name: "SelectClearScope" },
 );
 
-const EMPTY_FORM_VALUE = "";
-
 export const SelectComposite = defineComponent(
     <T,>(props: SelectCompositeProps<T>, { slots }: SlotsContext<SelectCompositeSlots<T>>) => {
         const listboxId = useId();
@@ -315,7 +313,7 @@ export const SelectComposite = defineComponent(
                     props.computeFormValue,
                 );
 
-                return isMultiple || texts.length > 0 ? texts : [EMPTY_FORM_VALUE];
+                return isMultiple || texts.length > 0 ? texts : [FormValueUtils.EMPTY_TEXT];
             };
 
             const spreadPadding = TextFieldUtils.resolvePadding(props.padding ?? SELECT_DEFAULTS.padding);

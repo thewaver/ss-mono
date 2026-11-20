@@ -47,8 +47,17 @@ export type ParticleSpawnerDirectValues = {
 };
 
 export type ParticleSpawnIterationPattern = {
+    /** How many rounds this stage plays, one after another. */
     count: number;
+    /**
+     * How long to wait before this stage begins, in milliseconds — the first stage included — as the SVG animations
+     * wait before theirs. Left out, the stage begins at once.
+     */
     beginDelayMs?: number;
+    /**
+     * Which stage comes after this one, by its place in the list. Left out, or past the end of the list, the
+     * animation ends here and `onAnimationEnd` runs once.
+     */
     nextIndex?: number;
 };
 

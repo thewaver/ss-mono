@@ -70,7 +70,7 @@ describe("computeLifetimeShare and computeEdge", () => {
 
 describe("computeCellWeights", () => {
     it("gives the most weight where the sweep starts and the least where it ends", () => {
-        const weights = ParticleDissolveUtils.computeCellWeights({ col: 4, row: 2 }, BOX, RIGHT);
+        const weights = ParticleDissolveUtils.computeCellWeights({ colCount: 4, rowCount: 2 }, BOX, RIGHT);
 
         expect(weights).toHaveLength(2);
         expect(weights[0]).toHaveLength(4);
@@ -79,12 +79,12 @@ describe("computeCellWeights", () => {
     });
 
     it("releases a cell when the edge reaches it, whatever the lifetime", () => {
-        const count = { col: 10, row: 1 };
+        const count = { colCount: 10, rowCount: 1 };
         const lifetimeShare = 0.5;
         const [weights] = ParticleDissolveUtils.computeCellWeights(count, BOX, RIGHT);
 
         weights!.forEach((weight, col) => {
-            const position = (col + 0.5) / count.col;
+            const position = (col + 0.5) / count.colCount;
             const spawnProgress = (1 - weight) * (1 - lifetimeShare);
 
             expect(ParticleDissolveUtils.computeEdge(spawnProgress, lifetimeShare)).toBeCloseTo(position);
@@ -129,15 +129,24 @@ describe("computeMask", () => {
 
 describe("computeCellCount", () => {
     it("covers the size with squares", () => {
-        expect(ParticleDissolveUtils.computeCellCount({ width: 100, height: 50 }, 10)).toEqual({ col: 10, row: 5 });
-        expect(ParticleDissolveUtils.computeCellCount({ width: 101, height: 50 }, 10)).toEqual({ col: 11, row: 5 });
+        expect(ParticleDissolveUtils.computeCellCount({ width: 100, height: 50 }, 10)).toEqual({
+            colCount: 10,
+            rowCount: 5,
+        });
+        expect(ParticleDissolveUtils.computeCellCount({ width: 101, height: 50 }, 10)).toEqual({
+            colCount: 11,
+            rowCount: 5,
+        });
     });
 
     it("never has none, and never more than a grid can afford", () => {
-        expect(ParticleDissolveUtils.computeCellCount({ width: 0, height: 0 }, 10)).toEqual({ col: 1, row: 1 });
+        expect(ParticleDissolveUtils.computeCellCount({ width: 0, height: 0 }, 10)).toEqual({
+            colCount: 1,
+            rowCount: 1,
+        });
         expect(ParticleDissolveUtils.computeCellCount({ width: 100000, height: 100000 }, 1)).toEqual({
-            col: 80,
-            row: 80,
+            colCount: 80,
+            rowCount: 80,
         });
     });
 });

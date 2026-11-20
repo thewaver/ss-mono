@@ -1,3 +1,4 @@
+import { InteractionTrackerUtils } from "../../Abstracts/InteractionTracker/InteractionTracker.utils";
 import type { NavigatorOrientation } from "../../Abstracts/Navigator/Navigator.types";
 import { NavigatorUtils } from "../../Abstracts/Navigator/Navigator.utils";
 import type { MenuItemKind } from "../Menus/Menu/Menu.types";
@@ -16,8 +17,6 @@ const WALKABLE_STOPS = 2;
 const ROW_ORIENTATION: NavigatorOrientation = "horizontal";
 /** A laid-out bar has no single axis, so both pairs of arrows walk it. */
 const PLACED_ORIENTATION: NavigatorOrientation = "both";
-/** A pressable action that has collapsed becomes a checkbox in the overflow menu. */
-const PRESSED_ITEM_KIND: MenuItemKind = "checkbox";
 /** The arrows that hand an open menubar menu on to the next word or the previous one. */
 const MENU_SWITCH_KEYS = ["ArrowLeft", "ArrowRight"];
 
@@ -31,6 +30,9 @@ const MENU_SWITCH_KEYS = ["ArrowLeft", "ArrowRight"];
 export namespace ToolbarUtils {
     /** The stop that stands for the overflow button. */
     export const OVERFLOW_STOP = -1;
+
+    /** What a pressable action that has collapsed becomes in the overflow menu: a checkbox, which keeps its pressed state. */
+    export const PRESSED_ITEM_KIND: MenuItemKind = "checkbox";
     /**
      * The items the overflow menu holds, one per collapsed action.
      *
@@ -71,11 +73,7 @@ export namespace ToolbarUtils {
      * @returns Their positions, in drawing order. The overflow button is not among them.
      */
     export const computeStops = <T>(actions: ToolbarActionRecord<T>[], shownIndexes: number[]) =>
-        shownIndexes.filter((index) => {
-            const action = actions[index];
-
-            return !action.isDisabled || (action.isReachableWhenDisabled ?? false);
-        });
+        shownIndexes.filter((index) => InteractionTrackerUtils.computeIsNavigable(actions[index]));
 
     /**
      * The stop that holds the row's one tab stop.

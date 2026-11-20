@@ -1,6 +1,6 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { docsDemo, docsSettled, waitUntilStill } from "./helpers";
+import { docsDemo, docsSettled, tabKey, waitUntilStill } from "./helpers";
 
 const DOCS = "/src/App/Pages/TableOfContentsPage/Docs";
 
@@ -202,7 +202,7 @@ test.describe("a table of contents following its own scrolling box", () => {
         const links = page.locator(LINKS);
 
         await links.first().focus();
-        await page.keyboard.press("Tab");
+        await page.keyboard.press(tabKey(page));
         await expect(links.nth(1), "Tab walks the links in order").toBeFocused();
 
         await page.keyboard.press("Enter");

@@ -23,7 +23,7 @@
 
 {#if context}
     <div class={styles.paginatorRow} style:gap={`${props.gap ?? PAGINATOR_DEFAULTS.gap}px`}>
-        {#each entries as entry, index (index)}
+        {#each entries as entry (PaginatorUtils.getEntryKey(entry))}
             {#if entry.kind === "page"}
                 <PaginatorPageControl
                     {context}

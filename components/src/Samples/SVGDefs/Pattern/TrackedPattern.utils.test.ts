@@ -20,19 +20,19 @@ describe("TrackedPatternUtils.computeCoveringCellCount", () => {
     });
 
     it("stops at the first count that covers, rather than overshooting", () => {
-        expect(TrackedPatternUtils.computeCoveringCellCount("grid", CELL, AREA)).toEqual({ rows: 9, cols: 14 });
+        expect(TrackedPatternUtils.computeCoveringCellCount("grid", CELL, AREA)).toEqual({ rowCount: 9, colCount: 14 });
     });
 
     it("still answers with a cell for an area that has not been measured yet", () => {
         expect(TrackedPatternUtils.computeCoveringCellCount("grid", CELL, { width: 0, height: 0 })).toEqual({
-            rows: 1,
-            cols: 1,
+            rowCount: 1,
+            colCount: 1,
         });
     });
 });
 
 describe("TrackedPatternUtils.computeLevel", () => {
-    const count = { rows: 8, cols: 8 };
+    const count = { rowCount: 8, colCount: 8 };
 
     it("rests with no pointer", () => {
         expect(TrackedPatternUtils.computeLevel("grid", { row: 2, col: 2 }, count, CELL, undefined, OPTS)).toBe(0.2);

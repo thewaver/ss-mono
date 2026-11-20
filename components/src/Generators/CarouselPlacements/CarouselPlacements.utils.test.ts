@@ -35,7 +35,7 @@ const edgesOf = (distance: number, index: number) => {
     const { effect } = CarouselPlacementUtils.concertina.place(at(distance, { index }));
     const [alongPercent, , depth] = effect.translate3d as number[];
     const radians = ((effect.rotateY as number) * Math.PI) / 180;
-    const half = (((effect.scale as number[])[0] / 100) * BASE.size.width) / 2;
+    const half = ((effect.scale as number[])[0] / 100) * BASE.size.width * 0.5;
     const center = { x: (alongPercent / 100) * BASE.size.width, z: depth };
 
     return {

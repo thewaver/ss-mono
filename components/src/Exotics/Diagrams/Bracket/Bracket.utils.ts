@@ -45,6 +45,49 @@ const NOT_FOUND = -1;
  * up whatever shape it is — including an uneven bracket where one side has more rounds than the
  * other.
  */
+/**
+ * Every family's members, found in one pass: a placement belongs to its own family, its parent's and its
+ * grandparent's, as `BracketUtils.getIsInFamily` counts them, with the root's family under `undefined`.
+ */
+const groupFamilyMembers = (layout: BracketLayout) => {
+    const groups = new Map<string | undefined, BracketPlacement[]>();
+    const add = (anchorId: string | undefined, placement: BracketPlacement) =>
+        groups.set(anchorId, [...(groups.get(anchorId) ?? []), placement]);
+
+    for (const placement of layout.placements) {
+        const parentId = BracketUtils.getParentId(placement.id);
+
+        add(placement.id, placement);
+        add(parentId, placement);
+
+        if (parentId !== undefined) add(BracketUtils.getParentId(parentId), placement);
+    }
+
+    return groups;
+};
+
+/** The view `BracketUtils.computeFamilyView` answers, from a family's members and its middle round, already found. */
+const computeMembersView = (
+    members: BracketPlacement[],
+    familyLayer: number,
+    geometry: BracketGeometry,
+    margin: number,
+): PanZoomView => {
+    if (members.length === NOTHING) return BracketUtils.computeWholeView(geometry);
+
+    const alongs = members.map((placement) => BracketUtils.getLayerStart(geometry, placement.layer));
+    const acrosses = members.map((placement) => BracketUtils.getCrossStart(geometry, placement));
+    const middle = BracketUtils.getLayerStart(geometry, familyLayer) + geometry.layerExtent * HALF;
+    const reach = Math.max(middle - Math.min(...alongs), Math.max(...alongs) + geometry.layerExtent - middle) + margin;
+    const along = { start: middle - reach, end: middle + reach };
+    const across = {
+        start: Math.min(...acrosses) - margin - geometry.headerExtent,
+        end: Math.max(...acrosses) + geometry.crossExtent + margin,
+    };
+
+    return geometry.isHorizontal ? { x: along, y: across } : { x: across, y: along };
+};
+
 export namespace BracketUtils {
     /**
      * Places every match in a bracket.
@@ -148,7 +191,8 @@ export namespace BracketUtils {
      * @param fromId Where the cursor is now.
      * @param placements The matches the walk may land on. A caller that skips disabled matches passes
      * only the enabled ones, and every step — across a layer or between layers — is resolved against
-     * that list, so a step never answers with a match the caller cannot focus.
+     * that list, so a step never answers with a match the caller cannot focus. A step between layers goes past a
+     * disabled match to the nearest enabled one beyond it, so no part of the bracket is out of the keyboard's reach.
      * @returns The match to move to, or `undefined` when there is none that way — the final has no
      * parent, a first-round match has no feeders, and the layer's ends do not wrap.
      */
@@ -157,14 +201,33 @@ export namespace BracketUtils {
 
         if (!from) return undefined;
 
-        if (step === "to_root") return findPlacement(placements, from.parentId)?.id;
+        if (step === "to_root") {
+            let ancestorId = from.parentId;
+
+            while (ancestorId !== undefined && !findPlacement(placements, ancestorId)) {
+                const cut = ancestorId.lastIndexOf(ID_SEPARATOR);
+
+                ancestorId = cut < NOTHING ? undefined : ancestorId.slice(NOTHING, cut);
+            }
+
+            return ancestorId;
+        }
 
         if (step === "to_leaves") {
             const children = from.childIds.filter((id) => findPlacement(placements, id) !== undefined);
 
-            if (!children.length) return undefined;
+            if (children.length) return children[Math.floor((children.length - SINGLE) * HALF)];
 
-            return children[Math.floor((children.length - SINGLE) * HALF)];
+            const descendants = placements.filter((placement) => placement.id.startsWith(`${from.id}${ID_SEPARATOR}`));
+
+            if (!descendants.length) return undefined;
+
+            const nearestDepth = Math.min(...descendants.map((placement) => placement.id.split(ID_SEPARATOR).length));
+            const nearest = descendants
+                .filter((placement) => placement.id.split(ID_SEPARATOR).length === nearestDepth)
+                .sort(compareByPlace);
+
+            return nearest[Math.floor((nearest.length - SINGLE) * HALF)]?.id;
         }
 
         const layer = getLayerPlacements(placements, from.layer);
@@ -601,24 +664,13 @@ export namespace BracketUtils {
         geometry: BracketGeometry,
         anchorId: string | undefined,
         margin = NOTHING,
-    ): PanZoomView => {
-        const members = layout.placements.filter((placement) => getIsInFamily(placement.id, anchorId));
-
-        if (members.length === NOTHING) return computeWholeView(geometry);
-
-        const alongs = members.map((placement) => getLayerStart(geometry, placement.layer));
-        const acrosses = members.map((placement) => getCrossStart(geometry, placement));
-        const middle = getLayerStart(geometry, getFamilyLayer(layout, anchorId)) + geometry.layerExtent * HALF;
-        const reach =
-            Math.max(middle - Math.min(...alongs), Math.max(...alongs) + geometry.layerExtent - middle) + margin;
-        const along = { start: middle - reach, end: middle + reach };
-        const across = {
-            start: Math.min(...acrosses) - margin - geometry.headerExtent,
-            end: Math.max(...acrosses) + geometry.crossExtent + margin,
-        };
-
-        return geometry.isHorizontal ? { x: along, y: across } : { x: across, y: along };
-    };
+    ): PanZoomView =>
+        computeMembersView(
+            layout.placements.filter((placement) => getIsInFamily(placement.id, anchorId)),
+            getFamilyLayer(layout, anchorId),
+            geometry,
+            margin,
+        );
 
     /**
      * Which family a view is showing, if any.
@@ -645,10 +697,18 @@ export namespace BracketUtils {
         margin = NOTHING,
     ): { anchorId: string | undefined } | undefined => {
         const shown = PanZoomUtils.fitView(view, aspect);
-        const families = getFamilyAnchorIds(layout).map((anchorId) => ({
-            anchorId,
-            view: PanZoomUtils.fitView(computeFamilyView(layout, geometry, anchorId, margin), aspect),
-        }));
+        const membersByAnchor = groupFamilyMembers(layout);
+        const placementsById = new Map(layout.placements.map((placement) => [placement.id, placement]));
+        const families = getFamilyAnchorIds(layout).map((anchorId) => {
+            const anchor = anchorId === undefined ? undefined : placementsById.get(anchorId);
+            const familyLayer = anchor ? anchor.layer + 1 : FIRST_LAYER;
+            const members = membersByAnchor.get(anchorId) ?? [];
+
+            return {
+                anchorId,
+                view: PanZoomUtils.fitView(computeMembersView(members, familyLayer, geometry, margin), aspect),
+            };
+        });
         const widest = Math.max(...families.map((family) => SpanUtils.getExtent(family.view.x)));
 
         if (SpanUtils.getExtent(shown.x) > widest * FRAME_SLACK) return undefined;

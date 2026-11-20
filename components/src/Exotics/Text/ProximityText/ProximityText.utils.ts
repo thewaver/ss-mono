@@ -1,4 +1,4 @@
-import { JSXTextParserUtils, type Point2d, type Rect, StoreUtils } from "@thewaver/ss-utils";
+import { type Point2d, type Rect, StoreUtils } from "@thewaver/ss-utils";
 
 import { ElementObserverUtils } from "../../../Abstracts/ElementObserver/ElementObserver.utils";
 import type { LetterAnimation } from "../../../Abstracts/LetterDriver/LetterDriver.types";
@@ -16,17 +16,6 @@ import type {
 const LETTER_RUN_MS = 1000;
 
 const HALF = 0.5;
-
-/** Names the elements in the text the copy cannot reproduce, so the difference is never a mystery. */
-const warnIfUnsupported = (container: HTMLElement) => {
-    const unsupported = JSXTextParserUtils.findUnsupportedElements(container);
-
-    if (!unsupported.length) return;
-
-    console.warn(
-        `ProximityText: ${unsupported.map((element) => `<${element.localName}>`).join(", ")} cannot be copied faithfully into the drawn text, which loses a canvas's drawing, media playback, a frame's page and a form control's value.`,
-    );
-};
 
 /**
  * Letters that answer to how near a point is: each one plays its keyframes held at a strength, `0` far away and `1`
@@ -119,15 +108,13 @@ export namespace ProximityTextUtils {
 
             if (!isForced && width === store.get().width) return false;
 
-            if (store.get().width === undefined || isContentChange) warnIfUnsupported(container);
+            if (store.get().width === undefined || isContentChange)
+                LetterDriverUtils.warnIfUnsupported(container, "ProximityText", "drawn text");
 
-            const { segments, count } = LetterDriverUtils.indexSegments(
-                LetterDriverUtils.wrapAtWidestFrame(
-                    JSXTextParserUtils.getSegmentTokens(container),
-                    width,
-                    container.parentElement ?? container,
-                    opts.getComputeAnimationName(),
-                ),
+            const { segments, count } = LetterDriverUtils.layoutLetters(
+                container,
+                width,
+                opts.getComputeAnimationName(),
             );
 
             store.set({ segments, count, width });

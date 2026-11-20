@@ -30,6 +30,7 @@ export const Radio = defineComponent(
                     getIsDisabled(),
                     props.isReachableWhenDisabled ?? false,
                     props.isFocusableWhenDisabled ?? false,
+                    props.tooltipDefs !== undefined,
                 ),
             getValue: () => props.value,
         };

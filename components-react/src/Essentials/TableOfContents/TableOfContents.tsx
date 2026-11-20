@@ -1,6 +1,8 @@
 import { type MouseEvent, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import {
+    InteractionTrackerUtils,
+    SafeHrefUtils,
     TABLE_OF_CONTENTS_DEFAULTS,
     type TableOfContentsFlags,
     type TableOfContentsLink,
@@ -17,10 +19,13 @@ import { useLatest, useStableList } from "../../Utils/refUtils";
 import type { TableOfContentsItemProps, TableOfContentsProps } from "./TableOfContents.types";
 
 const TableOfContentsItem = <T,>(props: TableOfContentsItemProps<T>) => {
+    const safeHref = SafeHrefUtils.resolve(props.link.href, "TableOfContents");
+
     const handleClick = (e: MouseEvent<HTMLElement>) => {
         const target = props.link.target;
 
         if (!target) return;
+        if (safeHref !== undefined && !InteractionTrackerUtils.getIsPlainClick(e.nativeEvent)) return;
 
         e.preventDefault();
 
@@ -34,7 +39,7 @@ const TableOfContentsItem = <T,>(props: TableOfContentsItemProps<T>) => {
         "aria-current": props.flags.isCurrent ? ("location" as const) : undefined,
     };
 
-    if (props.link.href === undefined) {
+    if (safeHref === undefined) {
         return (
             <button type="button" ref={props.ref} {...commonProps} onClick={handleClick}>
                 {props.renderContent(props.flags)}
@@ -43,7 +48,7 @@ const TableOfContentsItem = <T,>(props: TableOfContentsItemProps<T>) => {
     }
 
     return (
-        <a ref={props.ref} href={props.link.href} {...commonProps} onClick={handleClick}>
+        <a ref={props.ref} href={safeHref} {...commonProps} onClick={handleClick}>
             {props.renderContent(props.flags)}
         </a>
     );

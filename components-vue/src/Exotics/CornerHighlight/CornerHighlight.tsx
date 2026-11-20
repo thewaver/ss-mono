@@ -1,6 +1,6 @@
 import { type SlotsType, defineComponent } from "vue";
 
-import { CORNER_HIGHLIGHT_DEFAULTS, CornerHighlightStyles, CornerUtils } from "@thewaver/ss-components";
+import { CORNER_HIGHLIGHT_DEFAULTS, CornerHighlightStyles, CornerHighlightUtils } from "@thewaver/ss-components";
 import { CornerHighlightConst } from "@thewaver/ss-components/internal";
 
 import { declareProps } from "../../Utils/propUtils";
@@ -15,13 +15,13 @@ export const CornerHighlight = defineComponent(
             const cornerLength = props.cornerLength ?? CORNER_HIGHLIGHT_DEFAULTS.cornerLength;
             const strokeThickness = props.strokeThickness ?? CORNER_HIGHLIGHT_DEFAULTS.strokeThickness;
             const visibleCorners = [...(props.visibleCorners ?? CORNER_HIGHLIGHT_DEFAULTS.visibleCorners)];
-            const armPoints = CornerUtils.computeArmPoints(cornerLength, strokeThickness);
+            const armPoints = CornerHighlightUtils.computeArmPoints(cornerLength, strokeThickness);
 
             return (
                 <div class={CornerHighlightStyles.cornerHighlightRoot}>
                     <div
                         class={CornerHighlightStyles.cornerHighlightGlow}
-                        style={CornerUtils.computeGlowStyle(color, transitionDurationMs)}
+                        style={CornerHighlightUtils.computeGlowStyle(color, transitionDurationMs)}
                         aria-hidden="true"
                     >
                         {visibleCorners.map((cornerKey) => (

@@ -31,12 +31,22 @@ export type TreeNodeRenderProps<T = unknown> = {
 };
 
 export type TreeNodeRecord<T, TTooltipDefs> = {
+    /** The node's value, which the selection and the open branches list it by. */
     value: T;
+    /**
+     * Where the node leads, which draws it as a link. A plain click activates it as well; a click meant for a new tab
+     * is left to the browser. An address that would run script is refused, and the node drawn as a button.
+     */
     href?: string;
+    /** The nodes inside this one, which make it a branch. */
     children?: TreeNodeRecord<T, TTooltipDefs>[];
+    /** Whether more children are still to come, for a branch loaded on demand: it shows as a branch while empty. */
     hasMoreChildren?: boolean;
+    /** Whether the node can be activated or picked. What sits inside a disabled branch is not disabled with it. */
     isDisabled?: boolean;
+    /** Keeps the node in the arrow-key walk while it is disabled, so a reader hears its name and that it is unavailable. */
     isReachableWhenDisabled?: boolean;
+    /** What the node's tooltip shows. */
     tooltipDefs?: TTooltipDefs;
 };
 

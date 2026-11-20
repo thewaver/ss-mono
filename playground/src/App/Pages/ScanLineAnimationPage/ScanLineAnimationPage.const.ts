@@ -25,28 +25,28 @@ export const STRESS_ITEMS: (StressTestDefs & { size: number; kind: "transform" |
     .map((kind) => [
         {
             count: 4 * 3,
-            cols: 4,
+            colCount: 4,
             gap: 10,
             size: STRESS_LINE_COUNT,
             kind,
         },
         {
             count: 6 * 4,
-            cols: 6,
+            colCount: 6,
             gap: 10,
             size: STRESS_LINE_COUNT,
             kind,
         },
         {
             count: 8 * 6,
-            cols: 8,
+            colCount: 8,
             gap: 10,
             size: STRESS_LINE_COUNT,
             kind,
         },
         {
             count: 12 * 6,
-            cols: 12,
+            colCount: 12,
             gap: 10,
             size: STRESS_LINE_COUNT,
             kind,

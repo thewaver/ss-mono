@@ -9,7 +9,7 @@ import {
     PERCENT,
 } from "@thewaver/ss-playground/App/Pages/ParticleFieldPage/ParticleFieldPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ParticleFieldPage/ParticleFieldPage.css";
-import type { Index2d } from "@thewaver/ss-utils";
+import type { Count2d } from "@thewaver/ss-utils";
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
@@ -55,7 +55,7 @@ const isScattered = shallowRef(ParticleFieldKnobs.STARTING_IS_SCATTERED);
 const originType = shallowRef<CellAnimationOrigins.OriginType>(ParticleFieldKnobs.STARTING_ORIGIN_KEY);
 const weightType = shallowRef<SliceAnimationWeights.WeightType>(ParticleFieldKnobs.STARTING_WEIGHT_KEY);
 const animationType = shallowRef<CellAnimationKeyframes.AnimationType>(ParticleFieldKnobs.STARTING_ANIMATION_KEY);
-const cellCount = shallowRef<Index2d>({ ...ParticleFieldKnobs.STARTING_CELL_COUNT });
+const cellCount = shallowRef<Count2d>({ ...ParticleFieldKnobs.STARTING_CELL_COUNT });
 
 const commonProps = computed<Omit<ParticleFieldExampleProps, "playback" | "onUpdate:playback">>(() => ({
     cellCount: cellCount.value,
@@ -109,20 +109,20 @@ const examples: ExampleDefs[] = [
             <PageProp item-key="cellCount" v-bind="ParticleFieldKnobs.CELL_COUNT_TEXT">
                 <div :class="styles.valueList">
                     <PageNumberField
-                        :value="cellCount.col"
+                        :value="cellCount.colCount"
                         :min="ParticleFieldKnobs.MIN_CELL_COUNT"
                         :max="ParticleFieldKnobs.MAX_CELL_COUNT"
                         :step="ParticleFieldKnobs.CELL_COUNT_STEP"
                         ariaLabel="Columns"
-                        @input="(value: number) => (cellCount = { ...cellCount, col: value })"
+                        @input="(value: number) => (cellCount = { ...cellCount, colCount: value })"
                     />
                     <PageNumberField
-                        :value="cellCount.row"
+                        :value="cellCount.rowCount"
                         :min="ParticleFieldKnobs.MIN_CELL_COUNT"
                         :max="ParticleFieldKnobs.MAX_CELL_COUNT"
                         :step="ParticleFieldKnobs.CELL_COUNT_STEP"
                         ariaLabel="Rows"
-                        @input="(value: number) => (cellCount = { ...cellCount, row: value })"
+                        @input="(value: number) => (cellCount = { ...cellCount, rowCount: value })"
                     />
                 </div>
             </PageProp>

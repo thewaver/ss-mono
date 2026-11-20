@@ -8,15 +8,16 @@
         type CarrierZone,
         type CarryMode,
         type InteractionFlags,
+        NavigatorUtils,
         SORTABLE_GRID_DEFAULTS,
         type SortableGridItemFlags,
         type SortableGridPlace,
         type SortableGridShape,
         type SortableGridSpot,
+        SortableGridStyles as styles,
         SortableGridUtils,
         SortableUtils,
         ViewportUtils,
-        SortableGridStyles as styles,
     } from "@thewaver/ss-components";
     import type { Point2d } from "@thewaver/ss-utils";
 
@@ -199,6 +200,8 @@
     };
 
     const handlePointerDown = (index: number) => (e: PointerEvent) => {
+        hasPendingClick = false;
+
         if (e.button !== 0 || isDisabled) return;
         if ((e.target as HTMLElement).closest(CarrierUtils.INTERACTIVE_SELECTOR)) return;
         if (CarrierUtils.getCarry()) return;
@@ -239,7 +242,7 @@
     };
 
     const handleKeyDown = (index: number) => (e: KeyboardEvent) => {
-        if (isDisabled) return;
+        if (e.target !== e.currentTarget || isDisabled || NavigatorUtils.getHasCommandModifier(e)) return;
 
         const action = SortableGridUtils.computeKeyAction(e.key, {
             index,
@@ -333,7 +336,9 @@
         if (CarrierUtils.getSourceZone() === zone) CarrierUtils.end("cancel");
     });
 
-    $effect(() => untrack(() => props.onMount?.(controller)));
+    $effect(() => {
+        untrack(() => props.onMount?.(controller));
+    });
 
     const carriedZIndex = $derived(
         Math.max(AnchorUtils.getStackingBase(root ?? undefined), ElevationSvelteUtils.getBase(root ?? undefined)) + 1,
@@ -396,6 +401,7 @@
                         sizing="fill"
                         isDisabled={item.isDisabled ?? false}
                         isReachableWhenDisabled={item.isReachableWhenDisabled ?? false}
+                        isFocusableWhenDisabled={!isDisabled && (item.isReachableWhenDisabled ?? false)}
                         isTabbable={rovingIndex === index}
                         tooltipDefs={item.tooltipDefs}
                         extraFlags={{ isCarried: carriedKey === props.computeItemKey(item.value) }}
@@ -409,7 +415,11 @@
                                 attachElement={attachItemElement}
                                 id={getItemId(index)}
                                 {hintId}
-                                label={SortableGridUtils.computeItemLabel(props.computeItemLabel(item.value), item)}
+                                label={props.computeItemAriaLabel(
+                                    item.value,
+                                    SortableGridUtils.getItemShape(item).size,
+                                    item.spot,
+                                )}
                                 position={readingOrder.indexOf(index) + 1}
                                 setSize={items.length}
                                 cells={geometry.cells}

@@ -1,12 +1,6 @@
 import { type MaybeRefOrGetter, toValue } from "vue";
 
-import {
-    type DismisserLayerDefs,
-    DismisserUtils,
-    type Shortcut,
-    type ShortcutBinding,
-    ShortcutUtils,
-} from "@thewaver/ss-components";
+import { type Shortcut, type ShortcutBinding, ShortcutUtils } from "@thewaver/ss-components";
 
 import { watchAfterRender } from "../../Utils/effectUtils";
 
@@ -15,42 +9,18 @@ export namespace ShortcutVueUtils {
     /**
      * Registers a list of shortcuts for as long as the component is mounted, following the list as it changes.
      *
-     * The bindings belong to the layer on top once the component has first mounted — the page, or the dialog the
-     * component was mounted inside, even one that opened in the same render — and keep that layer for good, so a list that changes while another layer is open stays on
-     * the layer it started on. Each change replaces every binding.
+     * The bindings belong to the page: they fire whatever popup or dialog is open, unless a layer that takes input of
+     * its own is on top, as every shortcut on the page does. Each change replaces every binding.
      *
      * Must run inside a component's `setup`.
      *
      * @param bindings The shortcuts and what each does. An empty list registers nothing.
      */
     export const useBindings = (bindings: MaybeRefOrGetter<ShortcutBinding[]>) => {
-        let layer: DismisserLayerDefs | undefined;
-        let hasLayer = false;
-
         watchAfterRender([() => toValue(bindings)], ([current]) => {
-            const removers: (() => void)[] = [];
-            let isLive = true;
-
-            const register = () => {
-                if (!isLive) return;
-
-                if (!hasLayer) {
-                    layer = DismisserUtils.getTopLayer();
-                    hasLayer = true;
-                }
-
-                for (const binding of current) removers.push(ShortcutUtils.addBinding({ ...binding, layer }));
-            };
-
-            if (hasLayer) {
-                register();
-            } else {
-                queueMicrotask(register);
-            }
+            const removers = current.map((binding) => ShortcutUtils.addBinding({ ...binding, layer: undefined }));
 
             return () => {
-                isLive = false;
-
                 for (const remove of removers) remove();
             };
         });
@@ -59,7 +29,7 @@ export namespace ShortcutVueUtils {
     /**
      * Registers one shortcut for as long as the component is mounted and it is not disabled.
      *
-     * {@link useBindings} for a single shortcut, with the same layer rule.
+     * {@link useBindings} for a single shortcut, belonging to the page in the same way.
      *
      * Must run inside a component's `setup`.
      *

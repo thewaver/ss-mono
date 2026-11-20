@@ -19,6 +19,8 @@ import {
     PERCENT,
     RACK_LINKS,
     RACK_NODES,
+    SHARED_FIRST_NODES,
+    SHARED_SECOND_NODES,
     WIDE_SPAN,
 } from "@thewaver/ss-playground/App/Pages/PatchBoardPage/PatchBoardPage.const";
 import { SpanUtils } from "@thewaver/ss-utils";
@@ -32,6 +34,7 @@ import { ChainExample } from "./Examples/Chain";
 import { MixerExample } from "./Examples/Mixer";
 import { PanExample } from "./Examples/Pan";
 import { RackExample } from "./Examples/Rack";
+import { SharedExample } from "./Examples/Shared";
 import type { PatchBoardExampleProps } from "./PatchBoardPage.types";
 
 export const PatchBoardPage = () => {
@@ -52,6 +55,11 @@ export const PatchBoardPage = () => {
     const rackLinksSignal = createSignal(RACK_LINKS);
     const panNodesSignal = createSignal(PAN_NODES);
     const panLinksSignal = createSignal(PAN_LINKS);
+    const sharedFirstNodesSignal = createSignal(SHARED_FIRST_NODES);
+    const sharedSecondNodesSignal = createSignal(SHARED_SECOND_NODES);
+    const sharedFirstLinksSignal = createSignal<PatchBoardLink[]>([]);
+    const sharedSecondLinksSignal = createSignal<PatchBoardLink[]>([]);
+    const [getSharedAction, setSharedAction] = createSignal(NOTHING_DONE);
 
     const getPrefersReducedMotion = MediaQueryMonitorSolidUtils.createReducedMotion();
 
@@ -147,6 +155,26 @@ export const PatchBoardPage = () => {
                     />
                 ),
                 path: `${EXAMPLES_ROOT}/Pan.tsx`,
+            },
+            {
+                key: "shared",
+                name: EXAMPLE_NAMES.shared,
+                span: WIDE_SPAN,
+                readout: () =>
+                    `${sharedFirstNodesSignal[0]().length} on the first board, ${sharedSecondNodesSignal[0]().length} on the second, last: ${getSharedAction()} — the two boards share a group, so a device dragged or carried from one lands on the other where it was held`,
+                component: () => (
+                    <SharedExample
+                        {...commonProps}
+                        firstNodes={sharedFirstNodesSignal}
+                        secondNodes={sharedSecondNodesSignal}
+                        firstLinks={sharedFirstLinksSignal}
+                        secondLinks={sharedSecondLinksSignal}
+                        onLink={(link) => setSharedAction(`connected ${getLinkWords(link)}`)}
+                        onUnlink={(link) => setSharedAction(`unplugged ${getLinkWords(link)}`)}
+                        onMove={(nodeKey) => setSharedAction(`moved ${nodeKey}`)}
+                    />
+                ),
+                path: `${EXAMPLES_ROOT}/Shared.tsx`,
             },
         ];
     });

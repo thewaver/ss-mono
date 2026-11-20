@@ -252,7 +252,7 @@ export const ProximityText = defineComponent(
                                   title: segment.meta?.common.title,
                                   ...toDataAttributes(segment.meta?.common.dataset ?? {}),
                               };
-                        const letters = Array.from(segment.text).map((character, offset) => (
+                        const letters = StringUtils.splitGraphemes(segment.text).map((character, offset) => (
                             <span
                                 key={offset}
                                 ref={setRestLetterRef(segment.startIndex + offset, isResting)}

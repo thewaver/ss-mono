@@ -1,4 +1,4 @@
-import { GestureUtils, MathUtils, StoreUtils } from "@thewaver/ss-utils";
+import { DOMUtils, GestureUtils, MathUtils, StoreUtils } from "@thewaver/ss-utils";
 import type { SwipeAxis, SwipeDirection } from "@thewaver/ss-utils";
 
 import { NavigatorUtils } from "../Navigator/Navigator.utils";
@@ -14,6 +14,7 @@ import type {
     InteractionHoldState,
     InteractionHoldTracker,
     InteractionPageHiddenWatcher,
+    InteractionStepRepeater,
     InteractionSwipeTracker,
     InternalInteractionFlags,
 } from "./InteractionTracker.types";
@@ -56,7 +57,7 @@ const computeRatio = (rect: DOMRect, clientX: number, clientY: number): Interact
 
 /** Whether an element can still scroll further in the direction of a drag. */
 const getHasScrollRoom = (element: Element, axis: SwipeAxis, delta: number) => {
-    const position = axis === "horizontal" ? element.scrollLeft : element.scrollTop;
+    const position = axis === "horizontal" ? DOMUtils.getScrollFromLeft(element) : element.scrollTop;
     const extent =
         axis === "horizontal" ? element.scrollWidth - element.clientWidth : element.scrollHeight - element.clientHeight;
 
@@ -348,9 +349,17 @@ const createSwipeGesture = (opts: {
                 e.stopPropagation();
             };
 
-            element.addEventListener("click", onClick, true);
+            const onKeyDown = () => {
+                hasPendingClick = false;
+            };
 
-            return () => element.removeEventListener("click", onClick, true);
+            element.addEventListener("click", onClick, true);
+            element.addEventListener("keydown", onKeyDown, true);
+
+            return () => {
+                element.removeEventListener("click", onClick, true);
+                element.removeEventListener("keydown", onKeyDown, true);
+            };
         },
         applyTouchAction: (element, isDisabled) => {
             if (isDisabled) {
@@ -379,6 +388,13 @@ const createSwipeGesture = (opts: {
  * Each tracker here watches an element between `observe` and the function it returns, and can be started
  * again afterwards; what changes over time is held in a store.
  */
+const COMPOSITION_KEY_CODE = 229;
+
+const REACHABLE_WITHOUT_TOOLTIP_WARNING =
+    "isReachableWhenDisabled keeps a disabled control in the tab order only while it has a tooltip to explain why, and this one was given none, so it stays out of reach. Give it tooltipDefs, or drop isReachableWhenDisabled.";
+
+let hasWarnedReachableWithoutTooltip = false;
+
 export namespace InteractionTrackerUtils {
     /**
      * Whether an element's focus should be shown.
@@ -394,20 +410,91 @@ export namespace InteractionTrackerUtils {
      * Whether a disabled control should still be reachable by keyboard.
      *
      * A `disabled` control cannot be focused, so a keyboard user never learns it exists, let alone why it
-     * is off. A control that opts in stays reachable: it takes focus, announces that it is disabled, and
-     * reads whatever tooltip it has. The tooltip is welcome and not required, so that a disabled item with
-     * nothing to say is still discoverable.
+     * is off. A control that opts in stays reachable while it has a tooltip to explain why: it takes focus,
+     * announces that it is disabled, and reads the tooltip. One that opts in with nothing to reveal stays out of
+     * the tab order, since a focusable control that explains nothing is worse than one skipped.
      *
      * @param isDisabled Whether the control is disabled. An enabled control is reachable anyway, so
      * this reports `false` for one.
      * @param isReachableWhenDisabled Whether the consumer opted in.
-     * @param isFocusableWhenDisabled A component's own insistence, for an item its container walks.
+     * @param isFocusableWhenDisabled A component's own insistence, for an item its container walks. It needs no
+     * tooltip.
+     * @param hasTooltip Whether the control has a tooltip right now. A caller with no tooltip to ask about passes `true`.
      */
     export const computeIsReachable = (
         isDisabled: boolean,
         isReachableWhenDisabled: boolean,
-        isFocusableWhenDisabled = false,
-    ) => isDisabled && (isReachableWhenDisabled || isFocusableWhenDisabled);
+        isFocusableWhenDisabled: boolean,
+        hasTooltip: boolean,
+    ) => isDisabled && ((isReachableWhenDisabled && hasTooltip) || isFocusableWhenDisabled);
+
+    /**
+     * Whether the arrows of a roving composite may land on an item: it is enabled, or disabled and opted in to stay
+     * reachable.
+     *
+     * The tooltip is not asked about, as {@link computeIsReachable} is when it is left out.
+     *
+     * @param item The item's record, of which only the two flags are read.
+     */
+    export const computeIsNavigable = (item: { isDisabled?: boolean; isReachableWhenDisabled?: boolean }) =>
+        !item.isDisabled || computeIsReachable(true, item.isReachableWhenDisabled ?? false, false, true);
+
+    /**
+     * Warns that a control asked to stay reachable while disabled was given no tooltip, so it stays out of reach.
+     *
+     * Asks whether the tooltip prop was given at all, not whether it holds something right now, so a group passing
+     * the prop to every member stays quiet. Says it once per page, and nothing in production.
+     *
+     * @param isReachableWhenDisabled Whether the consumer asked for the control to stay reachable while disabled.
+     * @param hasTooltipProp Whether a tooltip prop was given.
+     */
+    export const warnIfReachableWithoutTooltip = (isReachableWhenDisabled: boolean, hasTooltipProp: boolean) => {
+        if (process.env.NODE_ENV === "production" || hasWarnedReachableWithoutTooltip) return;
+        if (!isReachableWhenDisabled || hasTooltipProp) return;
+
+        hasWarnedReachableWithoutTooltip = true;
+        console.warn(REACHABLE_WITHOUT_TOOLTIP_WARNING);
+    };
+
+    /**
+     * Whether a key press belongs to a word being composed through an input method, as Japanese, Chinese and Korean
+     * are typed: the Enter that confirms the word, the arrows that pick a candidate.
+     *
+     * Such a key is the input method's, so a control answering keys returns at once and leaves it alone. Asks both
+     * `isComposing` and the `keyCode` an input method sets, since the composition's own events can arrive just
+     * before or after the key that opens or closes it (MDN, `keydown` event, "keydown events with IME").
+     *
+     * @param e The key press.
+     * @returns `true` for a key that is part of a composition.
+     */
+    export const getIsComposing = (e: Pick<KeyboardEvent, "isComposing" | "keyCode">) =>
+        e.isComposing || e.keyCode === COMPOSITION_KEY_CODE;
+
+    /**
+     * Whether a key press was typed with AltGr, the key many layouts reach characters through — Polish "ł", or `@`
+     * and `[` on a German keyboard.
+     *
+     * On Windows the browser reports AltGr as Control and Alt held together, so a character typed with it would read
+     * as a shortcut; this tells the two apart (MDN, `KeyboardEvent.getModifierState`, `"AltGraph"`). Firefox on a Mac
+     * reports Option the same way, and Option types characters there too.
+     *
+     * @param e The key press. One with no `getModifierState`, such as a stand-in, answers `false`.
+     */
+    export const getIsAltGraph = (e: { getModifierState?: (key: string) => boolean }) =>
+        e.getModifierState?.("AltGraph") ?? false;
+
+    /**
+     * Whether a click is a plain one: the main button, with none of Cmd, Ctrl, Shift or Alt held.
+     *
+     * A click on a link with a modifier or another button asks the browser to open it elsewhere — a new tab,
+     * a new window, a download — so a component drawing its item as a link leaves such a click to the browser
+     * and runs none of its own handling, neither its callback nor `preventDefault`.
+     *
+     * @param e The click, or anything carrying its button and modifier keys. In React, its `nativeEvent`.
+     * @returns `true` for a click the component should handle itself.
+     */
+    export const getIsPlainClick = (e: Pick<MouseEvent, "button" | "metaKey" | "ctrlKey" | "shiftKey" | "altKey">) =>
+        e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey;
 
     /**
      * Sets the tab order of one of an element's secondary controls, and stops a disabled one taking focus.
@@ -518,6 +605,8 @@ export namespace InteractionTrackerUtils {
             write({ isActiveByKey: false });
         };
 
+        let wasClearedByDisabling = false;
+
         const observe = (element: HTMLElement, opts: InteractionElementOpts) => {
             element.tabIndex = (!opts.isDisabled || opts.isReachable) && opts.isTabbable ? 0 : -1;
 
@@ -536,9 +625,21 @@ export namespace InteractionTrackerUtils {
                     isActiveByMouse: false,
                 });
 
+                wasClearedByDisabling = true;
                 element.addEventListener("mousedown", preventFocusOnPress);
 
                 return () => element.removeEventListener("mousedown", preventFocusOnPress);
+            }
+
+            if (wasClearedByDisabling) {
+                const isFocused = element.ownerDocument.activeElement === element;
+
+                wasClearedByDisabling = false;
+                write({
+                    isHovered: element.matches(":hover"),
+                    isFocused,
+                    isFocusVisible: isFocused && computeIsFocusVisible(element),
+                });
             }
 
             element.addEventListener("focus", onFocus);
@@ -588,6 +689,59 @@ export namespace InteractionTrackerUtils {
                 return () => document.removeEventListener("visibilitychange", onVisibilityChange);
             },
         };
+    };
+
+    /**
+     * Repeats a step while a stepper button is held, the way a native spinner does.
+     *
+     * Starting steps once straight away, then waits the delay, then steps again on every interval until stopped —
+     * so a tap stays a single step. A first step that is refused starts nothing, and a repeated step that is refused
+     * ends the repeat. That second rule is what keeps a repeat from outliving its press: a stepper button usually
+     * disables itself at the bound it just reached, and a disabled button does not hear the release, so without it the
+     * repeat would run on unseen and walk the value back to the bound the moment anything else moved it away. Starting
+     * again while repeating stops the earlier repeat first, so only one is ever running.
+     *
+     * @param defs.getDelayMs How long to wait before repeating, read each time a repeat starts.
+     * @param defs.getIntervalMs How often to repeat once it has started, read as the repeat begins.
+     * @returns `start(step)`, which takes a function making one step and answering whether it moved, and answers
+     * `false` when the first step was refused; and `stop()`, which ends any repeat and answers whether one was
+     * pending or running. Stopping twice is harmless, and the repeater can be started again after either.
+     */
+    export const createStepRepeater = (defs: {
+        getDelayMs: () => number;
+        getIntervalMs: () => number;
+    }): InteractionStepRepeater => {
+        let repeatDelay: ReturnType<typeof setTimeout> | undefined;
+        let repeatInterval: ReturnType<typeof setInterval> | undefined;
+
+        const stop = () => {
+            const wasStepping = repeatDelay !== undefined || repeatInterval !== undefined;
+
+            clearTimeout(repeatDelay);
+            clearInterval(repeatInterval);
+
+            repeatDelay = undefined;
+            repeatInterval = undefined;
+
+            return wasStepping;
+        };
+
+        const start = (step: () => boolean) => {
+            stop();
+
+            if (!step()) return false;
+
+            repeatDelay = setTimeout(() => {
+                repeatDelay = undefined;
+                repeatInterval = setInterval(() => {
+                    if (!step()) stop();
+                }, defs.getIntervalMs());
+            }, defs.getDelayMs());
+
+            return true;
+        };
+
+        return { start, stop };
     };
 
     /**

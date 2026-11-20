@@ -5,7 +5,9 @@ export type AccordionOrientation = "horizontal" | "vertical";
 export type AccordionMoveDirection = "backward" | "forward";
 
 export type AccordionItem<T> = {
+    /** The section's value, which `expanded` lists while it is open and the painters are handed. */
     value: T;
+    /** Whether the section can be opened or closed. A disabled header is skipped by the arrows unless reachable. */
     isDisabled?: boolean;
     /**
      * Keeps this section's header in the tab order and the arrow-key walk while it is disabled, so focus can land on it

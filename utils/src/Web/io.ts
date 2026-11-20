@@ -29,6 +29,7 @@ const matchesMimeToken = (token: string, type: string) => {
     return (tokenMain === WILDCARD || tokenMain === typeMain) && (tokenSub === WILDCARD || tokenSub === typeSub);
 };
 
+/** Saving data from the browser as a file, and checking a chosen file against an `accept` list. */
 export namespace IOUtils {
     /**
      * Saves a value to the user's machine as a JSON file.

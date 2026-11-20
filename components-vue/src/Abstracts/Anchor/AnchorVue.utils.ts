@@ -69,6 +69,7 @@ export namespace AnchorVueUtils {
         const observedRect = ElementObserverVueUtils.useViewportRect(
             anchorRef,
             () => toValue(isVisible) && !toValue(opts.anchorRect),
+            { isMeasuredWhileHidden: false },
         );
 
         const anchorRect = computed(() => toValue(opts.anchorRect) ?? observedRect.value);

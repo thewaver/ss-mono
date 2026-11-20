@@ -1,4 +1,4 @@
-import type { Index2d, Point2d } from "@thewaver/ss-utils";
+import type { Count2d, Index2d, Point2d } from "@thewaver/ss-utils";
 
 import type { SVGPatternCell } from "./SVGPatternDefs.types";
 
@@ -24,11 +24,11 @@ export namespace SVGPatternDefsUtils {
      */
     export const computeCells = (
         id: string,
-        cellCount: { rows: number; cols: number },
+        cellCount: Count2d,
         computeCellPos: (index: Index2d) => Point2d,
     ): SVGPatternCell[] =>
-        Array.from({ length: cellCount.cols }, (_, col) =>
-            Array.from({ length: cellCount.rows }, (_, row) => {
+        Array.from({ length: cellCount.colCount }, (_, col) =>
+            Array.from({ length: cellCount.rowCount }, (_, row) => {
                 const index = { row, col };
                 const pos = computeCellPos(index);
 

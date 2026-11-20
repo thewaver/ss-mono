@@ -27,6 +27,7 @@ import {
     NAV_PREVIEW_OFFSET,
     NAV_PREVIEW_PLACEMENT,
     SCREEN_HEIGHT,
+    toDocumentTitle,
 } from "@thewaver/ss-playground/App/App.const";
 import * as styles from "@thewaver/ss-playground/App/App.css";
 import { LAYOUT } from "@thewaver/ss-playground/App/Layout.const";
@@ -43,10 +44,11 @@ import {
     EXAMPLES_VIEW,
     PAGE_VIEW_KEYS,
     toBaseRoute,
+    toComponentRoute,
     toPageViewKey,
     toPageViewRoute,
 } from "@thewaver/ss-playground/App/PageComponents/ViewTabs/ViewTabs.const";
-import { FunctionUtils, Size2d, StringUtils } from "@thewaver/ss-utils";
+import { FunctionUtils, Size2d } from "@thewaver/ss-utils";
 
 import type { ComponentConfig, MenuBranchConfig, MenuNodeConfig } from "./App.types";
 import {
@@ -105,7 +107,7 @@ const PassThroughPage = (props: RouteSectionProps) => <>{props.children}</>;
 
 const getIsBranchConfig = (node: MenuNodeConfig): node is MenuBranchConfig => "children" in node;
 
-const componentToRouteName = (name: string) => `/${StringUtils.camelToKebabCase(name)}`;
+const componentToRouteName = (name: string) => toComponentRoute(name);
 
 const getIsMenuFaded = (phase: SidebarPhase) => phase === "collapsing" || phase === "collapsed";
 
@@ -369,11 +371,17 @@ const PageDependencies = (props: { name: string; view: PageViewKey }) => {
     );
 };
 
+const SITE_TITLE = document.title;
+
 export function AppContent(props: RouteSectionProps & { viewportAnchor: SignalPair<ViewportAnchor> }) {
     const getNextLayerClass = useNextLayerClass();
     const [getSelectedConfig, setSelectedConfig] = createSignal<ComponentConfig>();
     const [getSearchTerm, setSearchTerm] = createSignal("");
     const showsDescriptionOnlySignal = createSignal(NavSettingsUtils.loadShowsDescriptionOnly());
+
+    createEffect(() => {
+        document.title = toDocumentTitle(getSelectedConfig()?.name, SITE_TITLE);
+    });
 
     createEffect(() => NavSettingsUtils.save("showsDescriptionOnly", showsDescriptionOnlySignal[0]()));
 
@@ -462,7 +470,7 @@ export function AppContent(props: RouteSectionProps & { viewportAnchor: SignalPa
 
     const viewportContext = useViewportContext();
 
-    const getMenuGutter = createMemo(() => Math.max(0, (viewportContext.getSize().width - LAYOUT.pageMaxWidth) / 2));
+    const getMenuGutter = createMemo(() => Math.max(0, (viewportContext.getSize().width - LAYOUT.pageMaxWidth) * 0.5));
 
     const getIsMenuHideable = createMemo(() => viewportContext.getSize().width < LAYOUT.menuHideableBelow);
 

@@ -5,6 +5,9 @@ import type { TooltipArrow } from "./StyledComponents/TooltipContent/TooltipCont
 
 export const GETTING_STARTED_ROUTE = "/getting-started";
 
+export const toDocumentTitle = (pageName: string | undefined, siteTitle: string) =>
+    pageName === undefined ? siteTitle : `${pageName} — ${siteTitle}`;
+
 export const GALLERY_ROUTE = "/gallery";
 
 export const APPEARANCE_ROUTE = "/appearance";

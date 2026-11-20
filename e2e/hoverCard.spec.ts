@@ -1,6 +1,6 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { activeMatches, docsDemo, docsSettled } from "./helpers";
+import { activeMatches, docsDemo, docsSettled, tabKey } from "./helpers";
 
 const DOCS = "/src/App/Pages/HoverCardPage/Docs";
 const DEMO = docsDemo(DOCS, "Basic");
@@ -57,7 +57,7 @@ const placeControlsAroundAnchor = (page: Page) =>
  */
 const tabToAnchor = async (page: Page) => {
     await page.locator(`#${BEFORE_ID}`).focus();
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
     expect(await activeMatches(page, ANCHOR), "Tab from the element before it lands on the name").toBe(true);
 };
 
@@ -162,7 +162,7 @@ test("Tab from the name moves into the card, through its controls, and on to wha
 }) => {
     await openedByKeyboard(page);
 
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
     expect(await isFocusInsideCard(page), "Tab from the name moves into the card").toBe(true);
     expect(
         await page.evaluate((selector) => {
@@ -176,14 +176,14 @@ test("Tab from the name moves into the card, through its controls, and on to wha
 
     const first = await page.evaluateHandle(() => document.activeElement);
 
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
     expect(await isFocusInsideCard(page), "the next Tab stays in the card").toBe(true);
     expect(
         await page.evaluate((previous) => document.activeElement !== previous, first),
         "and moves on to its next control",
     ).toBe(true);
 
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
     expect(await isFocusInsideCard(page), "Tab past the last control leaves the card").toBe(false);
 
     expect(
@@ -196,10 +196,10 @@ test("Tab from the name moves into the card, through its controls, and on to wha
 test("Shift+Tab from the card's first control goes back to the name, and the card stays open", async ({ page }) => {
     await openedByKeyboard(page);
 
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
     expect(await isFocusInsideCard(page)).toBe(true);
 
-    await page.keyboard.press("Shift+Tab");
+    await page.keyboard.press(tabKey(page, true));
     expect(await activeMatches(page, ANCHOR), "Shift+Tab from the first control goes back to the name").toBe(true);
 
     await page.waitForTimeout(FADE_SETTLED_MS);
@@ -208,14 +208,14 @@ test("Shift+Tab from the card's first control goes back to the name, and the car
         "and the card stays open while the name has keyboard focus, so Tab can go straight back in",
     ).toHaveCount(1);
 
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
     expect(await isFocusInsideCard(page), "which it does").toBe(true);
 });
 
 test("a control inside the card works from the keyboard", async ({ page }) => {
     await openedByKeyboard(page);
 
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
 
     const first = page.locator(`${CARD} button`).first();
     const before = await first.textContent();
@@ -237,7 +237,7 @@ test("a control inside the card works from the keyboard", async ({ page }) => {
 test("Escape from inside the card closes it, puts focus back on the name, and does not reopen it", async ({ page }) => {
     await openedByKeyboard(page);
 
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
     expect(await isFocusInsideCard(page)).toBe(true);
 
     await page.keyboard.press("Escape");

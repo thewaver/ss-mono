@@ -1,6 +1,6 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { docsDemo, docsSettled, inputValue, prop } from "./helpers";
+import { docsDemo, docsSettled, inputValue, prop, tabKey } from "./helpers";
 
 const DOCS = "/src/App/Pages/AudioSwitcherPage/Docs";
 
@@ -126,7 +126,7 @@ test.beforeEach(async ({ page }) => {
     await page.locator(`${prop("crossfadeMs")} input`).click();
     await page.keyboard.press("ControlOrMeta+a");
     await page.keyboard.type(FAST_CROSSFADE_MS);
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
     await expect(page.locator(`${prop("crossfadeMs")} input`)).toHaveValue(FAST_CROSSFADE_MS);
 });
 

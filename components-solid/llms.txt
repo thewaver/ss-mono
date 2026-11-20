@@ -7,6 +7,8 @@ Peer dependencies: `@thewaver/ss-utils`, `solid-js`. Depends on `@thewaver/ss-co
 whose exports it re-exports. CSS entry point: `@thewaver/ss-components/styles.css`
 (structural only, required). Full prop tables and interactive examples: https://ss-components.vercel.app
 
+Browser only: drawing these components on a server is not tested.
+
 Authoritative signatures, prop types and prop-level doc comments are in `dist/index.d.ts` inside the
 published package — read that for ground truth on any single component rather than this file.
 
@@ -15,35 +17,39 @@ published package — read that for ground truth on any single component rather 
 Grouped by the source tree's own top-level folders.
 
 ### Essentials — the standard control and layout set
-Accordion, Collapsible, AudioSwitcher, Breadcrumbs, Button, Calendar, RangeCalendar, Checkbox,
-CheckboxGroup, Clock, ColorArea, ColorInput, CurrencyInput, DateInput, DatePicker, DateRangePicker,
-DateTimePicker, DrumCarousel, TrackCarousel, Drawer, HoverCard, FanMenu, FileInput, Form, FormField,
-FormSection, ImageSwitcher, Label, Listbox, MultiListbox, Menu, Menubar, Modal, MultiSelect, NumberInput, Paginator, Preview,
-Progress, Radio, RadioGroup, Range, Scroller, Select, SlideButton, Sortable, SpotlightGuide,
-SpotlightHint, SpotlightPrompt, SplitPane, Stepper, Table, Tabs, TagInput, TextArea, TextInput,
-TimeInput, TimePicker, Toasts, Toggle, Toolbar, Tooltip, Tree, ViewportWrapper, WheelMenu.
+Accordion, AudioSwitcher, Breadcrumbs, Button, Calendar, Carousel, Checkbox, CheckboxGroup, Clock,
+Collapsible, ColorArea, ColorInput, CommandPalette, CurrencyInput, DateInput, DatePicker, DateRangePicker,
+DateTimePicker, Drawer, EdgeFader, FileInput, FlyoutMenu, Form, FormField, FormSection, HoverCard,
+ImageSwitcher, Label, Listbox, Menu, Menubar, Modal, MultiListbox, MultiSelect, NumberInput, Paginator,
+Preview, Progress, Radio, RadioGroup, Range, RangeCalendar, Scroller, SegmentedInput, Select, SharedTooltip,
+Sidebar, SlideButton, Sortable, SplitPane, SpotlightGuide, SpotlightHint, SpotlightPrompt, Stepper, Table,
+TableOfContents, Tabs, TagInput, TextArea, TextInput, TimeInput, TimePicker, Toasts, Toggle, Toolbar, Tooltip,
+Tree.
 
 ### Exotics — visual and motion effects
-Bracket, CellAnimation, CornerHighlight, Cuboid, ElementMosaic, ImageMosaic, FlipCard, Formation,
-SlotText, PaintedText, ParticleSpawner, PatchBoard, Reveal, RichText, Satellite, ScanlineAnimation,
-ScrambleText, ScratchCard, Shape, SortableGrid, Staircase, TileBoard, Timeline,
-Trail, Typewriter, DrumWheel, OverheadWheel.
+Bracket, CardStack, CellAnimation, CirclePacking, CornerHighlight, CornerPin, Cuboid, Die, DrumWheel,
+ElementMosaic, FanMenu, FittedText, FlipCard, Flipbook, Formation, Icicle, ImageMosaic, InfiniteCorridor,
+Lens, LightCatcher, MorphText, OverheadWheel, PaintedText, ParticleDissolve, ParticleField, ParticleSpawner,
+PatchBoard, ProximityText, RGBAnimation, Reveal, RichText, Satellite, ScanlineAnimation, ScrambleText,
+ScratchCard, ShadowCaster, Shape, SlotText, SortableGrid, Staircase, Sunburst, TileBoard, Tilter, Timeline,
+Trail, Treemap, Typewriter, ViewportWrapper, WheelMenu, Wraparound.
 
 ### Composites — assemblies of the above
 GlassSurface, Surface.
 
 ### Primitives — lower-level building blocks the above are built from
-Barrel, InteractionWrapper, PlacementBox, PlacementItem, Popover.
+Barrel, BinarySwitch, FormValue, InteractionSettings, InteractionWrapper, Mosaic, PlacementBox, PlacementItem,
+Popover, PopupTrigger, Spine, Spotlight, TextField, Wheel.
 
-### Abstracts — Solid-based state/behavior hooks (no markup of their own)
-Anchor, Carrier, CheckedState, ColorExtractor, Cutout, Placement, Proximity, DateTimeValue,
-DateValue, Dismisser, ElementFader, ElementObserver, Elevation, Flattener, FrameRateMonitor,
-FocusManager, Glass, InteractionTracker, LiveAnnouncer, MaskedField, MediaQueryMonitor,
-Navigator, PointerTracker, Rotator, SVG defs (animation/filter/gradient/pattern), SignalMirror,
-TextSync, Typeahead, Viewport, Virtualizer.
+### Abstracts — Solid-based state and behavior helpers (no markup of their own)
+Anchor, Carrier, ColorExtractor, DateTimeValue, Dismisser, ElementFader, ElementObserver, Elevation, Floater,
+FocusManager, FrameRateMonitor, Glass, HoverIntent, InteractionTracker, LetterDriver, MaskedField,
+MediaQueryMonitor, Navigator, PanZoom, PointerTracker, Roller, Rotator, Selection, Shortcut, SignalMirror,
+SliceRenderer, Smoother, TextSync, Typeahead, Viewport, Virtualizer.
 
-### Samples — sample/registry data for the Exotics above (keyframes, weights, gradients,
-patterns, layouts, connectors), meant to be copied or referenced, not a stable API surface.
+### Samples
+Sample and registry data for the Exotics above (keyframes, weights, gradients, patterns, layouts, connectors), meant
+to be copied or referenced, not a stable API surface.
 
 ## License
 MIT.

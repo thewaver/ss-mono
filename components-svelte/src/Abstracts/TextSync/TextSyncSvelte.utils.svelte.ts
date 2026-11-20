@@ -1,6 +1,6 @@
 import { untrack } from "svelte";
 
-import { type TextSyncElement, type TextSyncMaskResult, TextSyncUtils } from "@thewaver/ss-components";
+import { type TextSyncElement, type TextSyncMaskFn, TextSyncUtils } from "@thewaver/ss-components";
 
 /** The Svelte side of {@link TextSyncUtils}: an input kept in step with a value. The masking is framework-free. */
 export namespace TextSyncSvelteUtils {
@@ -28,7 +28,7 @@ export namespace TextSyncSvelteUtils {
         getValue: () => string,
         opts: {
             onInput: (value: string) => void;
-            computeMaskedText?: (previous: string, next: string, caret: number) => TextSyncMaskResult;
+            computeMaskedText?: TextSyncMaskFn;
         },
     ) => {
         const valueSync = TextSyncUtils.createValueSync(getValue, opts);

@@ -44,7 +44,7 @@ export const BannerExample = () => {
         <div class={styles.root}>
             <Surface {...getConfig(id)}>
                 <div class={styles.content}>
-                    <img class={styles.image} src={knight} style={{ "vertical-align": "middle" }} />
+                    <img class={styles.image} src={knight} style={{ "vertical-align": "middle" }} alt="" />
                     <span>
                         <b>{"Alert! Alert!"}</b>
                         <br />

@@ -13,7 +13,7 @@ import {
 import { ParticlePictureUtils } from "@thewaver/ss-playground/App/PageComponents/ParticlePicture/ParticlePicture.utils";
 import { computeParticlePos } from "@thewaver/ss-playground/App/Pages/ParticleFieldPage/ParticleFieldPage.const";
 import { themeVars } from "@thewaver/ss-playground/App/Theme.css";
-import type { Index2d } from "@thewaver/ss-utils";
+import type { Count2d } from "@thewaver/ss-utils";
 
 import type { ParticleFieldExampleProps } from "../ParticleFieldPage.types";
 
@@ -41,7 +41,7 @@ const animation = computed(() =>
 );
 
 const computeCellWeights = computed(
-    () => (count: Index2d) =>
+    () => (count: Count2d) =>
         SliceAnimationWeights.computeSliceWeights(
             props.weightType,
             count,

@@ -1,5 +1,7 @@
 import { type Page, expect, test } from "@playwright/test";
 
+import { tabKey } from "./helpers";
+
 /**
  * The Appearance page draws one row per Skin, each a radio whose samples are painted in that row's Skin whatever the page
  * around it wears, and picking a row applies its Skin to the whole Playground. The samples are a picture, not
@@ -118,7 +120,7 @@ test("nothing among the samples takes focus, by keyboard or from script", async 
     expect(await focusables.count(), "the samples hold controls that would otherwise be focusable").toBeGreaterThan(0);
 
     await skinGroup(page).getByRole("radio", { checked: true }).focus();
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
 
     expect(
         await page.evaluate((selector) => document.activeElement?.closest(selector) !== null, SAMPLES),

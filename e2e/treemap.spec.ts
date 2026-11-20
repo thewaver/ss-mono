@@ -1,6 +1,6 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { example, readout } from "./helpers";
+import { example, readout, tabKey } from "./helpers";
 
 /**
  * The tiles are arithmetic over a tree, so the checks are relationships — the tiles against the box they share,
@@ -104,7 +104,7 @@ test("one tab stop: the arrows walk the branches, Enter goes in and Escape comes
     page,
 }) => {
     await page.locator(UP).focus();
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
 
     const first = await page.evaluate(() => document.activeElement?.textContent ?? "");
 

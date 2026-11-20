@@ -1,6 +1,6 @@
 import { createEffect, createMemo, createSignal, splitProps, untrack } from "solid-js";
 
-import { TextSyncUtils, type TimeInputMeridiem, TimeInputUtils } from "@thewaver/ss-components";
+import { FormValueUtils, TextSyncUtils, type TimeInputMeridiem, TimeInputUtils } from "@thewaver/ss-components";
 import { TimeUtils } from "@thewaver/ss-utils";
 import type { TimeValue, TimeValueMeridiem } from "@thewaver/ss-utils";
 
@@ -9,8 +9,6 @@ import { FormValue } from "../../../Primitives/FormValue/FormValue";
 import { TextField } from "../../../Primitives/TextField/TextField";
 import { access, accessSignal } from "../../../Utils/propUtils";
 import type { TimeInputProps } from "./TimeInputSolid.types";
-
-const EMPTY_FORM_VALUE = "";
 
 export const TimeInput = (props: TimeInputProps) => {
     const valueSignal = accessSignal(() => props.value);
@@ -37,7 +35,7 @@ export const TimeInput = (props: TimeInputProps) => {
         setValue: (next) => valueSignal[1](() => next),
         formatDigits: (digits) => TextSyncUtils.formatWithMask(getMask(), digits),
         getDigitCount: () => getSegmentCount() * TimeInputUtils.SEGMENT_DIGITS,
-        toDigits: (value) => TimeInputUtils.toDigits(value, getIsTwelveHour()),
+        toDigits: (value) => TimeInputUtils.toDigits(value, getIsTwelveHour(), access(props.hasSeconds) ?? false),
         fromDigits,
         getHasImpossibleDigits: (digits) =>
             TimeInputUtils.getHasImpossibleSegment(digits, getSegmentCount(), getIsTwelveHour()),
@@ -104,10 +102,16 @@ export const TimeInput = (props: TimeInputProps) => {
                 value={field.text}
                 element={"input"}
                 inputMode={"numeric"}
-                computeMaskedText={(previous, next, caret) => TextSyncUtils.applyMask(getMask(), previous, next, caret)}
+                computeMaskedText={(previous, next, caret, isForwardDeletion) =>
+                    TextSyncUtils.applyMask(getMask(), previous, next, caret, isForwardDeletion)
+                }
                 placeholderHint={() => TimeInputUtils.computeHint(getSegmentCount(), access(props.segmentHints))}
                 hasError={() => (access(props.hasError) ?? false) || field.getHasIssue()}
-                renderTrailing={props.renderTrailing && ((getFlags) => props.renderTrailing!(getFlags, meridiem))}
+                renderTrailing={
+                    props.renderTrailing === undefined
+                        ? undefined
+                        : (getFlags) => props.renderTrailing!(getFlags, meridiem)
+                }
                 onInput={field.onInput}
                 onKeyDown={handleKeyDown}
                 onBlur={field.onBlur}
@@ -118,7 +122,7 @@ export const TimeInput = (props: TimeInputProps) => {
                 values={() => {
                     const value = valueSignal[0]();
 
-                    return [value ? TimeUtils.toIso(value) : EMPTY_FORM_VALUE];
+                    return [value ? TimeUtils.toIso(value) : FormValueUtils.EMPTY_TEXT];
                 }}
             />
         </>

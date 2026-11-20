@@ -1,6 +1,6 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { accessibleText, activeMatches, attributesOf, centerDistance, docsDemo, docsSettled } from "./helpers";
+import { accessibleText, activeMatches, attributesOf, centerDistance, docsDemo, docsSettled, tabKey } from "./helpers";
 
 /**
  * The one-value list is the Basic example, the several-value list with groups is Groups, the right-to-left list
@@ -98,18 +98,18 @@ test("the list is one tab stop, on the picked option or on the first when nothin
     );
 
     await option(page, SINGLE, selected.indexOf(true)).focus();
-    await page.keyboard.press("Shift+Tab");
+    await page.keyboard.press(tabKey(page, true));
 
     expect(
         await page.evaluate((selector) => !!document.activeElement?.closest(selector), `${SINGLE} ${LISTBOX}`),
         "Shift+Tab leaves the list rather than walking back along it",
     ).toBe(false);
 
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
 
     expect(await focusedIndex(page, SINGLE), "Tab goes in onto the picked option").toBe(selected.indexOf(true));
 
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
 
     expect(
         await page.evaluate((selector) => !!document.activeElement?.closest(selector), `${SINGLE} ${LISTBOX}`),

@@ -11,7 +11,7 @@
         type ParticleFieldCellDefs,
         ParticleDissolveStyles as styles,
     } from "@thewaver/ss-components";
-    import { type Index2d, Index2dUtils, RectUtils } from "@thewaver/ss-utils";
+    import { type Count2d, Index2dUtils, RectUtils } from "@thewaver/ss-utils";
 
     import { ElementObserverSvelteUtils } from "../../../Abstracts/ElementObserver/ElementObserverSvelte.utils.svelte.js";
     import { MediaQueryMonitorSvelteUtils } from "../../../Abstracts/MediaQueryMonitor/MediaQueryMonitorSvelte.utils.svelte.js";
@@ -21,9 +21,9 @@
     const NO_COLOR = "transparent";
     const SINGLE_PASS = 1;
 
-    const getCellKey = (cell: ParticleFieldCellDefs) => Index2dUtils.toFlatIndex(cell.pos, cell.count.col);
+    const getCellKey = (cell: ParticleFieldCellDefs) => Index2dUtils.toFlatIndex(cell.pos, cell.count.colCount);
 
-    let { children, ...props }: ParticleDissolveProps = $props();
+    let props: ParticleDissolveProps = $props();
 
     let root = $state<HTMLDivElement>();
     let content = $state<HTMLDivElement>();
@@ -50,7 +50,7 @@
         ),
     );
 
-    let lastCellCount: Index2d | undefined;
+    let lastCellCount: Count2d | undefined;
 
     const cellCount = $derived.by(() => {
         const next = ParticleDissolveUtils.computeCellCount(
@@ -138,7 +138,7 @@
         style:-webkit-mask-image={mask}
         style:opacity
     >
-        {@render children?.()}
+        {@render props.children?.()}
     </div>
 
     {#if hasParticles}

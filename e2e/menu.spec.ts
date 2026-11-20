@@ -8,6 +8,7 @@ import {
     docsSettled,
     prop,
     tabIndex,
+    tabKey,
     tagName,
 } from "./helpers";
 
@@ -132,11 +133,11 @@ test("Tab leaves the menu for whatever follows its trigger, and Shift+Tab goes b
     page,
 }) => {
     await page.locator(trigger("Basic")).focus();
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
     await page.evaluate(() => document.activeElement?.setAttribute("data-after-trigger", ""));
 
     await openedWithHighlight(page, "Basic");
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
 
     await expect(page.locator(MENU), "Tab closes the menu").toHaveCount(0);
     expect(
@@ -145,7 +146,7 @@ test("Tab leaves the menu for whatever follows its trigger, and Shift+Tab goes b
     ).toBe(true);
 
     await openedWithHighlight(page, "Basic");
-    await page.keyboard.press("Shift+Tab");
+    await page.keyboard.press(tabKey(page, true));
 
     await expect(page.locator(MENU), "Shift+Tab closes it too").toHaveCount(0);
     expect(await activeMatches(page, trigger("Basic")), "and hands focus back to the trigger").toBe(true);

@@ -5,14 +5,6 @@ const MS_PER_SECOND = 1000;
 const INDEFINITE_BEGIN = "indefinite";
 const FIRST_PATTERN_INDEX = 0;
 
-/**
- * Drives SVG's own `animate` elements from a script of iteration patterns.
- *
- * SMIL animation is used rather than CSS because several `animate` elements can be begun in the
- * same instant and stay in step, which is what a filter's worth of animated primitives needs.
- * The cost is that its scheduling has to be driven by hand, and that is what this does. The markup
- * the schedule is spread onto is each framework's.
- */
 /** The outermost `<svg>` an element is drawn in, whose clock its animations run on. */
 const getOutermostSvg = (el: SVGElement) => {
     let svg = el.ownerSVGElement;
@@ -55,6 +47,14 @@ const clockToFrame = (svg: SVGSVGElement, frameMs: number) => {
     svg.setCurrentTime(frameMs / MS_PER_SECOND);
 };
 
+/**
+ * Drives SVG's own `animate` elements from a script of iteration patterns.
+ *
+ * SMIL animation is used rather than CSS because several `animate` elements can be begun in the
+ * same instant and stay in step, which is what a filter's worth of animated primitives needs.
+ * The cost is that its scheduling has to be driven by hand, and that is what this does. The markup
+ * the schedule is spread onto is each framework's.
+ */
 export namespace SVGAnimationDefsUtils {
     /**
      * Rewrites a pattern that loops to itself as a pair that alternate.

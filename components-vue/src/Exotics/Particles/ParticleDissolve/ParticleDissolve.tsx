@@ -10,7 +10,7 @@ import {
     ParticleDissolveUtils,
     type ParticleFieldCellDefs,
 } from "@thewaver/ss-components";
-import { type Index2d, Index2dUtils, RectUtils } from "@thewaver/ss-utils";
+import { type Count2d, Index2dUtils, RectUtils } from "@thewaver/ss-utils";
 
 import { ElementObserverVueUtils } from "../../../Abstracts/ElementObserver/ElementObserverVue.utils";
 import { MediaQueryMonitorVueUtils } from "../../../Abstracts/MediaQueryMonitor/MediaQueryMonitorVue.utils";
@@ -23,7 +23,7 @@ import type { ParticleDissolveProps, ParticleDissolveSlots } from "./ParticleDis
 const NO_COLOR = "transparent";
 const SINGLE_PASS = 1;
 
-const getCellKey = (cell: ParticleFieldCellDefs) => Index2dUtils.toFlatIndex(cell.pos, cell.count.col);
+const getCellKey = (cell: ParticleFieldCellDefs) => Index2dUtils.toFlatIndex(cell.pos, cell.count.colCount);
 
 const ignoreWrite = () => undefined;
 
@@ -55,7 +55,7 @@ export const ParticleDissolve = defineComponent(
             ),
         );
 
-        const cellCount = computed<Index2d>((previous) => {
+        const cellCount = computed<Count2d>((previous) => {
             const next = ParticleDissolveUtils.computeCellCount(
                 size.value,
                 props.cellSize ?? PARTICLE_DISSOLVE_DEFAULTS.cellSize,
@@ -88,7 +88,7 @@ export const ParticleDissolve = defineComponent(
 
         const computeParticleTint = (cell: ParticleFieldCellDefs) => samples.get(getCellKey(cell))?.color ?? NO_COLOR;
 
-        const computeCellWeights = (count: Index2d) =>
+        const computeCellWeights = (count: Count2d) =>
             ParticleDissolveUtils.computeCellWeights(count, size.value, sweep.value);
 
         watchAfterRender([() => props.isDissolved], ([isDissolved]) => {

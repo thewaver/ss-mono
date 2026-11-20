@@ -1,6 +1,6 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { docsDemo, docsExample, docsSettled, inputValue, prop } from "./helpers";
+import { docsDemo, docsExample, docsSettled, inputValue, prop, tabKey } from "./helpers";
 
 const DOCS = "/src/App/Pages/ColorInputPage/Docs";
 
@@ -13,7 +13,7 @@ const POPUP = '[role="dialog"]';
 
 const field = (scope: string) => `${scope} button[aria-haspopup="dialog"]`;
 
-const SETTLE_MS = 200;
+const SAMPLE_GAP_MS = 50;
 const HEX_RADIX = 16;
 
 const knob = (page: Page, key: string) => page.locator(`${prop(key)} input`);
@@ -34,7 +34,7 @@ const dragAcross = async (page: Page, selector: string, from: [number, number], 
 };
 
 /**
- * The settle is load-bearing rather than defensive. A layer's opening placement is provisional — it measures
+ * The wait for the popup to stop moving is load-bearing rather than defensive. A layer's opening placement is provisional — it measures
  * itself on mount, before it has its final size, and the next frame corrects it — so a `boundingBox` read in
  * that first frame reports a box up to 30px away from where the surface ends up, and the drag then starts
  * somewhere other than the middle. `viewport.spec.ts` waits for the same reason.
@@ -42,7 +42,18 @@ const dragAcross = async (page: Page, selector: string, from: [number, number], 
 const openPicker = async (page: Page, scope: string) => {
     await page.locator(field(scope)).click();
     await expect(page.locator(POPUP)).toBeVisible();
-    await page.waitForTimeout(SETTLE_MS);
+
+    await expect
+        .poll(async () => {
+            const before = await page.locator(POPUP).boundingBox();
+
+            await page.waitForTimeout(SAMPLE_GAP_MS);
+
+            const after = await page.locator(POPUP).boundingBox();
+
+            return !!before && !!after && before.x === after.x && before.y === after.y && before.width === after.width;
+        }, "the opening placement has been corrected and the popup has stopped moving")
+        .toBe(true);
 };
 
 /** The text a field's description points at: what a screen reader reads after the field's name. */
@@ -162,7 +173,7 @@ test("opening it from the keyboard puts the sliders within one Tab", async ({ pa
 
     await expect(page.locator(POPUP), "opening it moves focus into the picker").toBeFocused();
 
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
 
     await expect(page.locator(POPUP), "Tab does not carry focus out and close it").toBeVisible();
     await expect(

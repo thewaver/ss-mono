@@ -1,4 +1,4 @@
-import type { Index2d, Rect } from "@thewaver/ss-utils";
+import type { Count2d, Rect } from "@thewaver/ss-utils";
 
 export type ImagePixels = {
     /** The pixels across. */
@@ -22,7 +22,7 @@ export type ImagePixelCell = {
 
 export type ImagePixelGrid = {
     /** How many cells the grid has, across and down. */
-    count: Index2d;
+    count: Count2d;
     /** Each cell's average, row by row. */
     cells: ImagePixelCell[];
 };

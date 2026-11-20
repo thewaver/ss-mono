@@ -5,7 +5,6 @@ import { DateValueUtils } from "../DateValue/DateValue.utils";
 import type { DateTimeValue } from "./DateTimeValue.types";
 
 /** Milliseconds in a second. */
-const MS_PER_SECOND = 1000;
 
 /**
  * Pairs a calendar date with a time of day, and lets the two be edited separately.
@@ -61,8 +60,16 @@ export namespace DateTimeValueUtils {
     /**
      * Joins the two halves back into one instant, in the local time zone.
      *
+     * The time is set as the wall clock reads it, so on a day the clocks change, 10:00 is still 10:00. A time the
+     * clocks skip — 02:30 on the night they go forward — comes out as the browser moves it, an hour later.
+     *
      * @returns The `Date` the value names.
      */
-    export const toDate = (value: DateTimeValue) =>
-        new Date(DateValueUtils.toDate(value.date).getTime() + TimeUtils.getSecondOfDay(value.time) * MS_PER_SECOND);
+    export const toDate = (value: DateTimeValue) => {
+        const date = DateValueUtils.toDate(value.date);
+
+        date.setHours(value.time.hour, value.time.minute, value.time.second ?? 0, 0);
+
+        return date;
+    };
 }

@@ -489,7 +489,7 @@ export namespace CuboidUtils {
     /**
      * The turns a drag in progress stands for, one box width or height being one quarter turn.
      *
-     * @param travel How far the pointer has travelled, as signed fractions of the box's width and height.
+     * @param travel How far the pointer has traveled, as signed fractions of the box's width and height.
      * @param acrossSign What {@link getAcrossSign} gives.
      * @returns The turns, fractional while the drag is held.
      */

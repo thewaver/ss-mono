@@ -193,6 +193,10 @@ describe("getSteppedSocket", () => {
 
     it("starts at the first candidate when the cable is over open space", () => {
         expect(PatchBoardUtils.getSteppedSocket([GATE_IN, LAMP_SIG], undefined, 1)?.end).toEqual(GATE_IN.end);
+        expect(
+            PatchBoardUtils.getSteppedSocket([GATE_IN, LAMP_SIG], undefined, -1)?.end,
+            "and at the last when stepping back",
+        ).toEqual(LAMP_SIG.end);
     });
 });
 

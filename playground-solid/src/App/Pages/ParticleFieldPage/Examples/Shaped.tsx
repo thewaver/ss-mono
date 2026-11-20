@@ -1,4 +1,4 @@
-import { createMemo, createSignal } from "solid-js";
+import { createMemo, createSignal, splitProps } from "solid-js";
 
 import { ElementObserverSolidUtils } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/Pages/ParticleFieldPage/ParticleFieldPage.css";
@@ -9,19 +9,19 @@ import { DefaultExample } from "./Default";
 
 const NO_EDGE_THICKNESSES = [0];
 
-export const ShapedExample = ({
-    shapeKind,
-    joinRadius,
-    ...otherProps
-}: ParticleFieldExampleProps & { shapeKind: () => ShapeConst.DefaultShape; joinRadius: () => number }) => {
+export const ShapedExample = (
+    props: ParticleFieldExampleProps & { shapeKind: () => ShapeConst.DefaultShape; joinRadius: () => number },
+) => {
+    const [, otherProps] = splitProps(props, ["shapeKind", "joinRadius"]);
+
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
 
     const getSize = ElementObserverSolidUtils.createBorderBoxSizeObserver(getRootRef);
 
-    const computeShapePoints = (size: Size2d) => ShapeConst.getDefaultShapePoints(shapeKind(), size);
+    const computeShapePoints = (size: Size2d) => ShapeConst.getDefaultShapePoints(props.shapeKind(), size);
 
     const getContourPath = createMemo(
-        () => ShapeUtils.getPaths(computeShapePoints(getSize()), NO_EDGE_THICKNESSES, [joinRadius()]).outerPath,
+        () => ShapeUtils.getPaths(computeShapePoints(getSize()), NO_EDGE_THICKNESSES, [props.joinRadius()]).outerPath,
     );
 
     return (
@@ -33,7 +33,7 @@ export const ShapedExample = ({
             <DefaultExample
                 {...otherProps}
                 computeShapePoints={computeShapePoints}
-                shapeJoinRadii={() => [joinRadius()]}
+                shapeJoinRadii={() => [props.joinRadius()]}
             />
         </div>
     );

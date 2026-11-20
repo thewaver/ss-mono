@@ -26,8 +26,6 @@ import { ListboxOptions } from "../Listbox/Listbox";
 import { ListboxReactUtils } from "../Listbox/ListboxReact.utils";
 import type { SelectCompositeProps, SelectFieldProps, SelectProps } from "./Select.types";
 
-const EMPTY_FORM_VALUE = "";
-
 const SelectField = (props: SelectFieldProps) => {
     const { ariaLabel, ariaLabelledBy } = FormFieldReactUtils.useAriaName(props.ariaLabel);
     const ariaDescribedBy = FormFieldReactUtils.useAriaDescribedBy();
@@ -285,7 +283,7 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
             props.computeFormValue,
         );
 
-        return isMultiple || texts.length > 0 ? texts : [EMPTY_FORM_VALUE];
+        return isMultiple || texts.length > 0 ? texts : [FormValueUtils.EMPTY_TEXT];
     };
 
     const formValues = props.name === undefined ? [] : computeFormValues();

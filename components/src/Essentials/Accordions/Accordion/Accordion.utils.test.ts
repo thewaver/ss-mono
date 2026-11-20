@@ -98,3 +98,11 @@ describe("computeFocusTarget", () => {
         expect(AccordionUtils.computeFocusTarget("ArrowRight", headers, [0, 1, 2], headers[0])).toBeUndefined();
     });
 });
+
+describe("AccordionUtils.computeToggled with two open under single-expand", () => {
+    it("never closes every section while one is required open", () => {
+        const next = AccordionUtils.computeToggled(["a", "b"], "a", { isSingleExpand: true, isExpandRequired: true });
+
+        expect(next.length).toBeGreaterThan(0);
+    });
+});

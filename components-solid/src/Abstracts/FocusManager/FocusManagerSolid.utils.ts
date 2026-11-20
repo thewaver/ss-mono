@@ -43,10 +43,12 @@ export namespace FocusManagerSolidUtils {
             if (!ref || !isVisible) return;
 
             onCleanup(
-                FocusManagerUtils.focusInto(ref, {
-                    initialRef: untrack(() => opts?.getInitialRef?.()),
-                    origin: getIsOpen ? originKeeper.take() : undefined,
-                }),
+                untrack(() =>
+                    FocusManagerUtils.focusInto(ref, {
+                        initialRef: opts?.getInitialRef?.(),
+                        origin: getIsOpen ? originKeeper.take() : undefined,
+                    }),
+                ),
             );
         });
     };

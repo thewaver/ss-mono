@@ -261,7 +261,7 @@ test("a satellite set behind stacks under the subject while the others stay in f
 
                     if (right - left < 2 || bottom - top < 2) return [];
 
-                    const hit = document.elementFromPoint((left + right) / 2, (top + bottom) / 2);
+                    const hit = document.elementFromPoint((left + right) * 0.5, (top + bottom) * 0.5);
 
                     return [
                         {

@@ -1,4 +1,4 @@
-import type { Index2d, Point2d, Size2d } from "@thewaver/ss-utils";
+import type { Count2d, Index2d, Point2d, Size2d } from "@thewaver/ss-utils";
 
 import { markup } from "../../../Utils/markupUtils.js";
 import type { SvelteMarkup } from "../../../Utils/typeUtils.js";
@@ -22,9 +22,9 @@ export namespace SVGPatternDefsSvelteUtils {
      */
     export const computePattern = (
         id: string,
-        cellCount: { rows: number; cols: number },
+        cellCount: Count2d,
         patternSize: Size2d,
         computeCellPos: (index: Index2d) => Point2d,
-        renderCell: (id: string, index: Index2d, cellCount: { rows: number; cols: number }) => SvelteMarkup,
+        renderCell: (id: string, index: Index2d, cellCount: Count2d) => SvelteMarkup,
     ) => markup(SVGPattern, { id, cellCount, patternSize, computeCellPos, renderCell });
 }

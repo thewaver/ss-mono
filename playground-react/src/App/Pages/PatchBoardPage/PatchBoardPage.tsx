@@ -19,6 +19,8 @@ import {
     PERCENT,
     RACK_LINKS,
     RACK_NODES,
+    SHARED_FIRST_NODES,
+    SHARED_SECOND_NODES,
     WIDE_SPAN,
 } from "@thewaver/ss-playground/App/Pages/PatchBoardPage/PatchBoardPage.const";
 import { SpanUtils } from "@thewaver/ss-utils";
@@ -32,6 +34,7 @@ import { ChainExample } from "./Examples/Chain";
 import { MixerExample } from "./Examples/Mixer";
 import { PanExample } from "./Examples/Pan";
 import { RackExample } from "./Examples/Rack";
+import { SharedExample } from "./Examples/Shared";
 import type { PatchBoardExampleProps } from "./PatchBoardPage.types";
 
 const getLinkWords = (link: PatchBoardLink) =>
@@ -45,6 +48,7 @@ export const PatchBoardPage = () => {
     const [mixerAction, setMixerAction] = useState(NOTHING_DONE);
     const [rackAction, setRackAction] = useState(NOTHING_DONE);
     const [panAction, setPanAction] = useState(NOTHING_DONE);
+    const [sharedAction, setSharedAction] = useState(NOTHING_DONE);
 
     const chainNodesState = useState(CHAIN_NODES);
     const chainLinksState = useState(CHAIN_LINKS);
@@ -55,6 +59,10 @@ export const PatchBoardPage = () => {
     const panNodesState = useState(PAN_NODES);
     const panLinksState = useState(PAN_LINKS);
     const panViewState = useState(PAN_STARTING_VIEW);
+    const sharedFirstNodesState = useState(SHARED_FIRST_NODES);
+    const sharedSecondNodesState = useState(SHARED_SECOND_NODES);
+    const sharedFirstLinksState = useState<PatchBoardLink[]>([]);
+    const sharedSecondLinksState = useState<PatchBoardLink[]>([]);
 
     const prefersReducedMotion = MediaQueryMonitorReactUtils.useReducedMotion();
 
@@ -146,6 +154,26 @@ export const PatchBoardPage = () => {
                 />
             ),
             path: `${EXAMPLES_ROOT}/Pan.tsx`,
+        },
+        {
+            key: "shared",
+            name: EXAMPLE_NAMES.shared,
+            span: WIDE_SPAN,
+            readout: () =>
+                `${sharedFirstNodesState[0].length} on the first board, ${sharedSecondNodesState[0].length} on the second, last: ${sharedAction} — the two boards share a group, so a device dragged or carried from one lands on the other where it was held`,
+            component: () => (
+                <SharedExample
+                    {...commonProps}
+                    firstNodes={sharedFirstNodesState}
+                    secondNodes={sharedSecondNodesState}
+                    firstLinks={sharedFirstLinksState}
+                    secondLinks={sharedSecondLinksState}
+                    onLink={(link) => setSharedAction(`connected ${getLinkWords(link)}`)}
+                    onUnlink={(link) => setSharedAction(`unplugged ${getLinkWords(link)}`)}
+                    onMove={(nodeKey) => setSharedAction(`moved ${nodeKey}`)}
+                />
+            ),
+            path: `${EXAMPLES_ROOT}/Shared.tsx`,
         },
     ];
 

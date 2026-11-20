@@ -217,13 +217,13 @@ const getStarPoints = (tips: Point2d[], { width, height }: Size2d): Point2d[] =>
 };
 
 /**
- * Every result {@link ShapeConst.getPaths} has ever worked out.
+ * Every result {@link ShapeUtils.getPaths} has ever worked out.
  *
  * Deliberately unbounded and never evicted. Generating a shape is expensive and
  * real workloads run to tens of thousands of distinct variations, so any cap large
  * enough to be safe would not be a cap worth having — and one too small turns the
  * cache into a treadmill that recomputes the same corners every frame. Call
- * {@link ShapeConst.clearPathCache} at a natural boundary if the memory ever needs reclaiming.
+ * {@link ShapeUtils.clearPathCache} at a natural boundary if the memory ever needs reclaiming.
  */
 const pathCache = new Map<string, ShapePaths>();
 const writePathCache = (key: string, value: ShapePaths) => {
@@ -232,13 +232,47 @@ const writePathCache = (key: string, value: ShapePaths) => {
     return value;
 };
 
-/**
- * Throws away everything {@link ShapeConst.getPaths} has worked out so far.
- *
- * The cache never evicts on its own, so this is the only way to release it — worth
- * calling when tearing down a screen that generated a great many one-off shapes.
- */
+/** How far inside a candidate rectangle an edge must reach to count as crossing it, so one lying along its side does not. */
+const EDGE_TOUCH_TOLERANCE = 1e-6;
 
+/** Whether any edge of a polygon passes through the inside of an upright rectangle, by clipping each edge to it. */
+const getHasEdgeInside = (pts: Point2d[], left: number, top: number, right: number, bottom: number) => {
+    const minX = left + EDGE_TOUCH_TOLERANCE;
+    const maxX = right - EDGE_TOUCH_TOLERANCE;
+    const minY = top + EDGE_TOUCH_TOLERANCE;
+    const maxY = bottom - EDGE_TOUCH_TOLERANCE;
+
+    for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+        const from = pts[j];
+        const dx = pts[i].x - from.x;
+        const dy = pts[i].y - from.y;
+        const directions = [-dx, dx, -dy, dy];
+        const distances = [from.x - minX, maxX - from.x, from.y - minY, maxY - from.y];
+
+        let enter = 0;
+        let leave = 1;
+        let isOutside = false;
+
+        for (let side = 0; side < directions.length && !isOutside; side++) {
+            const direction = directions[side];
+            const distance = distances[side];
+
+            if (direction === 0) {
+                isOutside = distance <= 0;
+            } else if (direction < 0) {
+                enter = Math.max(enter, distance / direction);
+            } else {
+                leave = Math.min(leave, distance / direction);
+            }
+        }
+
+        if (!isOutside && leave > enter) return true;
+    }
+
+    return false;
+};
+
+/** The built-in shapes and corner styles, and the points that draw them. */
 export namespace ShapeConst {
     /**
      * The built-in shapes {@link getDefaultShapePoints} knows how to build.
@@ -442,7 +476,14 @@ export namespace ShapeConst {
     });
 }
 
+/** Turning a shape's points into the paths that draw it, with rounded or shaped corners, and the room inside it. */
 export namespace ShapeUtils {
+    /**
+     * Throws away everything {@link getPaths} has worked out so far.
+     *
+     * The cache never evicts on its own, so this is the only way to release it — worth
+     * calling when tearing down a screen that generated a great many one-off shapes.
+     */
     export const clearPathCache = () => pathCache.clear();
 
     /**
@@ -470,15 +511,17 @@ export namespace ShapeUtils {
      *
      * Used to work out where text can safely sit inside a non-rectangular shape. It
      * searches rather than solving outright: it samples candidate top and bottom edges,
-     * keeps the best, then narrows the search around it a few times.
+     * keeps the best, then narrows the search around it a few times. A candidate is as wide
+     * as the shape at its narrowest between the two, and one that an edge of the shape
+     * crosses — a notch cut in from any side — is refused, so a dented shape such as a star
+     * gets a rectangle clear of its dents.
      *
-     * Costs roughly 13,000 steps per call, so keep it out of per-frame code — call it
-     * when the shape changes and hold on to the answer.
+     * Weighs roughly 13,000 candidates per call, each against every corner and edge of the shape, so
+     * keep it out of per-frame code — call it when the shape changes and hold on to the answer.
      *
      * @param pts The shape's corners, in order.
      * @returns The rectangle, or an all-zero one if there are fewer than three points.
      */
-
     export const getInnerRect = (pts: Point2d[]) => {
         if (pts.length < 3) return { x: 0, y: 0, width: 0, height: 0 };
 
@@ -513,6 +556,8 @@ export namespace ShapeUtils {
             return { xMin, xMax };
         };
 
+        const corners = pts.map((p) => ({ ...p, bounds: getXBounds(p.y) }));
+
         let bestRect = { x: 0, y: 0, width: 0, height: 0, area: 0 };
         let yB_min = yMin;
         let yB_max = yMax;
@@ -543,12 +588,19 @@ export namespace ShapeUtils {
 
                     const bB = bVals[i].bounds;
                     const bT = tVals[j].bounds;
-                    const xL = Math.max(bB.xMin, bT.xMin);
-                    const xR = Math.min(bB.xMax, bT.xMax);
+                    let xL = Math.max(bB.xMin, bT.xMin);
+                    let xR = Math.min(bB.xMax, bT.xMax);
+
+                    for (const corner of corners) {
+                        if (corner.y <= yB || corner.y >= yT) continue;
+
+                        xL = Math.max(xL, corner.bounds.xMin);
+                        xR = Math.min(xR, corner.bounds.xMax);
+                    }
 
                     if (xR > xL) {
                         const area = (xR - xL) * (yT - yB);
-                        if (area > currentBest.area) {
+                        if (area > currentBest.area && !getHasEdgeInside(pts, xL, yB, xR, yT)) {
                             currentBest = {
                                 x: xL,
                                 y: yB,
@@ -699,6 +751,7 @@ export namespace ShapeUtils {
             { totalX: 0, totalY: 0 },
         );
         const polygonCenter = { x: totalX / vertexCount, y: totalY / vertexCount };
+        const winding = Math.sign(PolygonUtils.getSignedArea(vertices));
 
         for (let i = 0; i < vertexCount; i++) {
             const curr = vertices[i];
@@ -714,8 +767,9 @@ export namespace ShapeUtils {
 
             vectors.unitTangents.push(tangent);
 
-            let normal = { x: -tangent.y, y: tangent.x };
-            if (normal.x * vectorToMidpoint.x + normal.y * vectorToMidpoint.y < 0) {
+            let normal = winding > 0 ? { x: tangent.y, y: -tangent.x } : { x: -tangent.y, y: tangent.x };
+
+            if (winding === 0 && normal.x * vectorToMidpoint.x + normal.y * vectorToMidpoint.y < 0) {
                 normal = { x: tangent.y, y: -tangent.x };
             }
             vectors.unitNormals.push(normal);
@@ -813,7 +867,10 @@ export namespace ShapeUtils {
         if (vertexCount < 3)
             return { outerPath: "", innerPath: "", outerPoints: [], innerPoints: [], outerContour: [] };
 
-        const cacheKey = JSON.stringify({ vertices, edgeThicknesses, joinRadii, lameExponents, offset });
+        const cacheKey = JSON.stringify(
+            { vertices, edgeThicknesses, joinRadii, lameExponents, offset },
+            (_key, value) => (typeof value === "number" && !Number.isFinite(value) ? String(value) : value),
+        );
         const cached = pathCache.get(cacheKey);
 
         if (cached) return cached;
@@ -1072,11 +1129,14 @@ export namespace ShapeUtils {
      *
      * A rounded corner eats into the box diagonally, so content pushed tight against
      * the edge would clip. This returns per-side padding that accounts for both the
-     * corner curve and the stroke thickness.
+     * corner curve and the stroke thickness. Each side takes the larger need of the two
+     * corners at its ends, so one rounded corner pads both sides it joins, and no side
+     * is padded less than its own stroke.
      *
      * @param edgeThicknesses Stroke thickness per side, in CSS order: top, right,
      * bottom, left. Short lists are padded by repeating the last entry.
-     * @param joinRadii Corner radius per corner, padded the same way; a pair counts as its larger reach.
+     * @param joinRadii Corner radius per corner, in CSS order: top-left, top-right,
+     * bottom-right, bottom-left. Padded the same way; a pair counts as its larger reach.
      * @param lameExponents Corner style per corner. See
      * {@link ShapeConst.CORNER_SHAPE_LAME_EXPONENTS}.
      * @returns CSS padding, ready to spread onto a style object.
@@ -1093,24 +1153,32 @@ export namespace ShapeUtils {
         const jr = ObjectUtils.padArray<ShapeJoinRadius>(joinRadii ?? [], 0, count);
         const le = ObjectUtils.padArray(lameExponents ?? [], CIRCLE_KAPPA, count);
 
-        const getCornerPadding = (index: number) => {
-            const t = et[index];
-            const e = le[index];
-            const r = Math.max(...getJoinReaches(jr[index]));
+        const getCornerIntrusion = (cornerIndex: number, thickness: number) => {
+            const e = le[cornerIndex];
+            const r = Math.max(...getJoinReaches(jr[cornerIndex]));
             const cssExponent = e >= 0 ? e + 1 : 1 / (1 - e);
             const fOut = Math.pow(0.5, 1 / cssExponent);
-            const cornerIntrusion = r * (1 - fOut) + t * Math.SQRT1_2;
 
-            return Math.max(t, Math.round(cornerIntrusion));
+            return r * (1 - fOut) + thickness * Math.SQRT1_2;
         };
 
-        const cornerPadding = Array.from({ length: count }, (_, idx) => getCornerPadding(idx));
+        const getSidePadding = (sideIndex: number) => {
+            const t = et[sideIndex];
+            const intrusion = Math.max(
+                getCornerIntrusion(sideIndex, t),
+                getCornerIntrusion((sideIndex + 1) % count, t),
+            );
+
+            return Math.max(t, Math.round(intrusion));
+        };
+
+        const sidePadding = Array.from({ length: count }, (_, idx) => getSidePadding(idx));
 
         return {
-            "padding-top": `${cornerPadding[0]}px`,
-            "padding-right": `${cornerPadding[1]}px`,
-            "padding-bottom": `${cornerPadding[2]}px`,
-            "padding-left": `${cornerPadding[3]}px`,
+            "padding-top": `${sidePadding[0]}px`,
+            "padding-right": `${sidePadding[1]}px`,
+            "padding-bottom": `${sidePadding[2]}px`,
+            "padding-left": `${sidePadding[3]}px`,
         };
     };
 

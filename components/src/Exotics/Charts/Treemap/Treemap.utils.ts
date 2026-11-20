@@ -33,7 +33,7 @@ export namespace TreemapUtils {
      * Works out how much every node in a tree weighs.
      *
      * @param root The whole tree.
-     * @returns A leaf's own weight, with a missing or negative one read as nothing, and for a branch the total of
+     * @returns A leaf's own weight, with a missing, negative or not-finite one read as nothing, and for a branch the total of
      * its children. A weight set on a branch is ignored.
      */
     export const computeWeights = <T>(root: TreemapNode<T>) => {
@@ -42,7 +42,9 @@ export namespace TreemapUtils {
         const walk = (node: TreemapNode<T>): number => {
             const weight = node.children?.length
                 ? node.children.reduce((total, child) => total + walk(child), NOTHING)
-                : Math.max(node.weight ?? NOTHING, NOTHING);
+                : Number.isFinite(node.weight)
+                  ? Math.max(node.weight!, NOTHING)
+                  : NOTHING;
 
             weights.set(node, weight);
 

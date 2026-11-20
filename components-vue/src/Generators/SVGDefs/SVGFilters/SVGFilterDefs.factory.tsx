@@ -250,7 +250,7 @@ export class SVGFilterDefsFactory {
     /**
      * Scales how vivid the colors are.
      *
-     * `0` is greyscale, `1` leaves the colors alone and is skipped, and above `1` oversaturates.
+     * `0` is grayscale, `1` leaves the colors alone and is skipped, and above `1` oversaturates.
      *
      * @param defs The amount.
      * @param custom Content placed inside the primitive, for animating it.
@@ -299,9 +299,9 @@ export class SVGFilterDefsFactory {
     };
 
     /**
-     * Pushes every channel away from mid-grey, or pulls it towards it, leaving opacity alone.
+     * Pushes every channel away from mid-gray, or pulls it towards it, leaving opacity alone.
      *
-     * `0` is flat mid-grey, `1` leaves the colors alone and is skipped, and above `1` raises the contrast.
+     * `0` is flat mid-gray, `1` leaves the colors alone and is skipped, and above `1` raises the contrast.
      *
      * @param defs The amount.
      * @param custom Content placed inside the primitive, for animating it.
@@ -329,7 +329,7 @@ export class SVGFilterDefsFactory {
     /**
      * Inverts the red, green and blue channels, leaving opacity alone.
      *
-     * `1` is a full inversion, `0.5` is flat mid-grey, and `0` leaves the colors alone and is skipped.
+     * `1` is a full inversion, `0.5` is flat mid-gray, and `0` leaves the colors alone and is skipped.
      *
      * @param defs The amount.
      * @param custom Content placed inside the primitive, for animating it.

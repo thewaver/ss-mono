@@ -77,7 +77,7 @@ const installLog = (page: Page, scope: string) =>
                 const box = demoElement.getBoundingClientRect();
                 const rect = element.getBoundingClientRect();
 
-                return { x: rect.x + rect.width / 2 - box.x, y: rect.y + rect.height / 2 - box.y };
+                return { x: rect.x + rect.width * 0.5 - box.x, y: rect.y + rect.height * 0.5 - box.y };
             };
 
             const live = new Map<Node, Trip>();
@@ -381,9 +381,7 @@ test("a route takes each particle out to its target and back to its own spawner"
  * wind blows toward and never as far to the other; turning the wind around turns the lean around. Either way the
  * push fades out before the end of the path, so every particle still lands on the target.
  */
-test("wind pushes particles off their path the way it blows, and they still land on the target", async ({
-    page,
-}) => {
+test("wind pushes particles off their path the way it blows, and they still land on the target", async ({ page }) => {
     await chooseKnob(page, "travelPattern", "line");
     await page.locator(WIND).scrollIntoViewIfNeeded();
     await startPlaying(page, "wind");

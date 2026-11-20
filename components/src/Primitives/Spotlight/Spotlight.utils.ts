@@ -34,7 +34,7 @@ export namespace SpotlightUtils {
      * @returns Whether it warned.
      */
     export const warnIfUnannounced = (announcement: string | undefined, propName: string) => {
-        if (announcement) return false;
+        if (process.env.NODE_ENV === "production" || announcement) return false;
 
         console.warn(computeUnannouncedWarning(propName));
 

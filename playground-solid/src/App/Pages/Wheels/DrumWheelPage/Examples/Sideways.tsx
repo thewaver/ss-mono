@@ -1,4 +1,4 @@
-import { createSignal } from "solid-js";
+import { createSignal, splitProps } from "solid-js";
 
 import { Button, DrumWheel, access } from "@thewaver/ss-components-solid";
 import type { WheelController } from "@thewaver/ss-components-solid";
@@ -20,8 +20,10 @@ const WEDGE_SIZE: Size2d = { width: 160, height: 64 };
 
 type Props = WheelExampleProps;
 
-export const SidewaysExample = ({ wedges, ...otherProps }: Props) => {
-    const getWedges = () => access(wedges);
+export const SidewaysExample = (props: Props) => {
+    const [, otherProps] = splitProps(props, ["wedges"]);
+
+    const getWedges = () => access(props.wedges);
 
     const [getController, setController] = createSignal<WheelController>();
 

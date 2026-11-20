@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { MorphTextUtils } from "./MorphText.utils";
 
@@ -40,6 +40,41 @@ describe("MorphTextUtils.createMorpher", () => {
         morpher.morphTo("two");
 
         expect(morpher.get()).toEqual({ current: "two", previous: undefined, progress: 1 });
+        expect(ended).toEqual(["two"]);
+    });
+});
+
+describe("MorphTextUtils.createMorpher on a page that is not painting", () => {
+    beforeEach(() => {
+        vi.useFakeTimers();
+        vi.stubGlobal("requestAnimationFrame", () => 1);
+        vi.stubGlobal("cancelAnimationFrame", () => undefined);
+    });
+
+    afterEach(() => {
+        vi.useRealTimers();
+        vi.unstubAllGlobals();
+    });
+
+    it("still ends the morph on time, once", () => {
+        const ended: string[] = [];
+        const morpher = MorphTextUtils.createMorpher("one", {
+            getMorphDurationMs: () => 400,
+            onMorphEnd: (text) => ended.push(text),
+        });
+
+        morpher.morphTo("two");
+        vi.advanceTimersByTime(399);
+
+        expect(ended).toEqual([]);
+
+        vi.advanceTimersByTime(1);
+
+        expect(ended).toEqual(["two"]);
+        expect(morpher.get()).toEqual({ current: "two", previous: undefined, progress: 1 });
+
+        vi.advanceTimersByTime(5000);
+
         expect(ended).toEqual(["two"]);
     });
 });

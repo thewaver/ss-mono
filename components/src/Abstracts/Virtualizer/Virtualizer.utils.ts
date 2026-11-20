@@ -37,7 +37,8 @@ export namespace VirtualizerUtils {
      * the bottom edge is aligned against that size, so a scroller with a border, or a horizontal scrollbar, hid the
      * bottom of the row it had just scrolled to by that much — the row counted as in view while part of it was
      * clipped. The box reported here is the one the content is clipped to, which is what a scroll aligns with
-     * natively.
+     * natively. The scroller's content box is what is watched, since a scrollbar appearing shrinks it while leaving
+     * the border box as it was.
      *
      * Typed by the parts of TanStack's virtualizer it reads, so it can be handed over as that option directly.
      *
@@ -66,7 +67,7 @@ export namespace VirtualizerUtils {
 
         const observer = new ResizeObserverOfWindow(report);
 
-        observer.observe(element, { box: "border-box" });
+        observer.observe(element, { box: "content-box" });
 
         return () => {
             rectReporters.delete(instance);
@@ -88,6 +89,33 @@ export namespace VirtualizerUtils {
      * @param instance The virtualizer, as handed to {@link observeClientRect}.
      */
     export const remeasureClientRect = (instance: object) => rectReporters.get(instance)?.();
+
+    /**
+     * Scrolls the list's scroller to an offset, rounded to the nearest whole pixel.
+     *
+     * Stands in for TanStack's own `elementScroll`, and takes the same arguments. A row's offset is the sum of
+     * measurements that a scaled ancestor leaves a hair either side of a whole pixel, and a browser that scrolls only
+     * by whole pixels (Safari) rounds down, so a row scrolled to the bottom edge stopped a pixel short and showed with
+     * its last pixel clipped. Rounding to the nearest pixel lands where the measurements meant.
+     *
+     * Typed by the parts of TanStack's virtualizer it reads, so it can be handed over as that option directly.
+     *
+     * @param offset Where to scroll to, in layout pixels from the start of the scroller's content.
+     * @param options `adjustments` added to the offset, and the `behavior` of the scroll.
+     * @param instance The virtualizer, read for its scroller and whether it runs horizontally.
+     */
+    export const scrollToWholePixel = (
+        offset: number,
+        options: { adjustments?: number; behavior?: ScrollBehavior },
+        instance: { scrollElement: Element | null; options: { horizontal: boolean } },
+    ) => {
+        const position = Math.round(offset + (options.adjustments ?? 0));
+
+        instance.scrollElement?.scrollTo({
+            [instance.options.horizontal ? "left" : "top"]: position,
+            behavior: options.behavior,
+        });
+    };
 
     /**
      * Reports how far a list starts below the top of its scroller's content, now and whenever that changes.

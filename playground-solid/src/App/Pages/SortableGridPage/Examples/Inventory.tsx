@@ -18,6 +18,7 @@ import {
     PACK_COLUMNS,
     PACK_ROWS,
     TURN_COUNTERCLOCKWISE_LABEL,
+    computeGearAriaLabel,
     computeGearHue,
     computeGearKey,
     computeGearLabel,
@@ -163,6 +164,7 @@ export const InventoryExample = (props: Props) => {
                 isTurnable={() => access(props.isTurnable) ?? false}
                 items={props.items}
                 computeItemKey={computeGearKey}
+                computeItemAriaLabel={computeGearAriaLabel}
                 computeItemLabel={computeGearLabel}
                 computeCanAccept={props.computeCanAccept}
                 computeIsSpotBlocked={props.computeIsSpotBlocked}

@@ -1,3 +1,5 @@
+import { splitProps } from "solid-js";
+
 import { ImageMosaic, access } from "@thewaver/ss-components-solid";
 import { MosaicImages } from "@thewaver/ss-playground/App/Pages/Mosaics/ImageMosaicPage/MosaicImages.const";
 
@@ -8,13 +10,15 @@ type Props = ImagesExampleProps;
 
 const MOSAIC_ROUTE = "/image-mosaic";
 
-export const ImagesExample = ({ shapeKey, isDecorated, ...otherProps }: Props) => {
+export const ImagesExample = (props: Props) => {
+    const [, otherProps] = splitProps(props, ["shapeKey", "isDecorated"]);
+
     return (
         <ImageMosaic
             {...otherProps}
-            targetAspectRatio={() => MosaicImages.SAMPLE_SHAPES[access(shapeKey)]}
+            targetAspectRatio={() => MosaicImages.SAMPLE_SHAPES[access(props.shapeKey)]}
             renderItem={(renderImage, getState) =>
-                access(isDecorated) ? (
+                access(props.isDecorated) ? (
                     <PageMosaicLink
                         href={MOSAIC_ROUTE}
                         caption={() => `${getState().readingIndex + 1} of ${getState().itemCount}`}

@@ -1,13 +1,20 @@
 import { Index, type JSX, Show, createMemo } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
-import { BREADCRUMBS_DEFAULTS, BreadcrumbsStyles as styles } from "@thewaver/ss-components";
+import {
+    BREADCRUMBS_DEFAULTS,
+    InteractionTrackerUtils,
+    SafeHrefUtils,
+    BreadcrumbsStyles as styles,
+} from "@thewaver/ss-components";
 
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
 import { access } from "../../Utils/propUtils";
 import type { BreadcrumbsItemProps, BreadcrumbsProps } from "./BreadcrumbsSolid.types";
 
 const BreadcrumbsItem = <T,>(props: BreadcrumbsItemProps<T>) => {
+    const getSafeHref = () => SafeHrefUtils.resolve(access(props.crumb).href, "Breadcrumbs");
+
     const getIsDisabled = () => access(props.flags).isDisabled ?? false;
 
     const handleClick = (e: MouseEvent) => {
@@ -15,6 +22,8 @@ const BreadcrumbsItem = <T,>(props: BreadcrumbsItemProps<T>) => {
             e.preventDefault();
             return;
         }
+
+        if (getSafeHref() !== undefined && !InteractionTrackerUtils.getIsPlainClick(e)) return;
 
         props.onSelect(access(props.crumb).value);
     };
@@ -44,7 +53,7 @@ const BreadcrumbsItem = <T,>(props: BreadcrumbsItemProps<T>) => {
             }
         >
             <Show
-                when={access(props.crumb).href}
+                when={getSafeHref()}
                 fallback={
                     <button
                         type="button"
@@ -59,7 +68,7 @@ const BreadcrumbsItem = <T,>(props: BreadcrumbsItemProps<T>) => {
                 <Dynamic
                     component={props.linkComponent ?? "a"}
                     ref={(element: HTMLElement) => props.ref?.(element)}
-                    href={access(props.crumb).href!}
+                    href={getSafeHref()!}
                     {...commonProps}
                     onClick={handleClick}
                 >
@@ -96,7 +105,7 @@ export const Breadcrumbs = <T,>(props: BreadcrumbsProps<T>) => {
                                 )}
                             />
 
-                            <Show when={props.renderSeparator && index !== getLastIndex()}>
+                            <Show when={props.renderSeparator === undefined ? undefined : index !== getLastIndex()}>
                                 <span class={styles.breadcrumbsSeparator} aria-hidden="true">
                                     {props.renderSeparator!()}
                                 </span>

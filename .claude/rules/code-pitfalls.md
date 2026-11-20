@@ -32,8 +32,10 @@ next render recovers, and shows the moment the order decides something that does
 ### Word boundaries in text are found with Unicode letter classes, never `\b`
 
 `\b` knows only ASCII word characters, with or without the `u` flag, so capitalizing after a boundary turns
-"état" into "éTat". Use property classes under `u` — a letter with no letter or digit before it is
-`(?<![\p{L}\p{N}])\p{L}`. It matches `\b` on ASCII and keeps every other script intact.
+"état" into "éTat". Use property classes under `u` — a letter that starts a word is
+`(?<![\p{L}\p{N}\p{M}])(?<![\p{L}\p{N}]['’])\p{L}`: no letter, digit or combining accent before it, and
+no apostrophe inside a word, so "don't" keeps its lowercase t. It matches `\b` on ASCII and keeps every other
+script intact.
 
 ### Code imported for behavior never imports a string-keyed table of variants
 

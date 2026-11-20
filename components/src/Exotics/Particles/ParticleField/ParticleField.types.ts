@@ -1,11 +1,11 @@
-import type { Index2d, Point2d, Rect, Size2d } from "@thewaver/ss-utils";
+import type { Count2d, Index2d, Point2d, Rect, Size2d } from "@thewaver/ss-utils";
 
 import type { SliceAnimationRenderer } from "../../../Abstracts/SliceAnimation/SliceAnimation.types";
 import type { SliceAnimationFn } from "../../../Generators/SliceAnimationKeyframes/SliceAnimationKeyframes.types";
 
 export type ParticleFieldCellDefs = {
     pos: Index2d;
-    count: Index2d;
+    count: Count2d;
     weight: number;
     size: Size2d;
     rect: Rect;
@@ -32,7 +32,7 @@ export type BaseParticleFieldValues = {
      * How many cells the field is split into, across and down. A cell holds at most one particle at a time, so this is
      * also the most particles the field can show at once.
      */
-    cellCount: Index2d;
+    cellCount: Count2d;
     /**
      * The chance, `0`–`1`, that a cell spawns in a given pass. At `1` every cell spawns in every pass. Each cell is
      * decided once at the start of a pass, and the same pass always decides the same way, so scrubbing back over it
@@ -74,7 +74,7 @@ export type BaseParticleFieldCbs = {
      * A weight per cell, `0`–`1`, handed the grid the field actually drew. It is the cell's turn in a pass: the
      * heaviest spawns first and the lightest last. A cell with no weight counts as `0`.
      */
-    computeCellWeights?: (count: Index2d) => number[][];
+    computeCellWeights?: (count: Count2d) => number[][];
     /**
      * Where a particle appears, relative to the field, given the cell it spawns in. Asked once per spawn, so a
      * random answer scatters particles differently every time. Left out, a particle sits at its cell's center.

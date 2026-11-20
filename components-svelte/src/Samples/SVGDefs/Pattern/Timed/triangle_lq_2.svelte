@@ -18,7 +18,7 @@
         defs: TimedPatternElementDefs;
     };
 
-    const CELL_COUNT = { rows: 8, cols: 8 };
+    const CELL_COUNT = SVGDefsUtils.TILE_CELL_COUNT;
 
     export const triangle_lq_2: TimedPatternConfig = {
         computeSVGDefs: (id, __, ___, defs) => [

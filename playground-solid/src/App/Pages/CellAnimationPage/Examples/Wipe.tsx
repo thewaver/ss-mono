@@ -13,7 +13,7 @@ import {
 } from "@thewaver/ss-components-solid";
 import type { SliceAnimationPlaybackOpts } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/Pages/CellAnimationPage/CellAnimationPage.css";
-import type { Index2d, Size2d } from "@thewaver/ss-utils";
+import type { Count2d, Size2d } from "@thewaver/ss-utils";
 
 import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import type { CellAnimationExampleProps } from "../CellAnimationPage.types";
@@ -42,9 +42,9 @@ export const WipeExample = (props: Props) => {
 
     const [getWipeSize, setWipeSize] = createSignal<Size2d>();
 
-    const getCellCount = createMemo<Index2d>(() => ({
-        col: Math.ceil((getWipeSize()?.width ?? 0) / WIPE_CELL_SIZE),
-        row: Math.ceil((getWipeSize()?.height ?? 0) / WIPE_CELL_SIZE),
+    const getCellCount = createMemo<Count2d>(() => ({
+        colCount: Math.ceil((getWipeSize()?.width ?? 0) / WIPE_CELL_SIZE),
+        rowCount: Math.ceil((getWipeSize()?.height ?? 0) / WIPE_CELL_SIZE),
     }));
 
     const getOrigin = createMemo(() => CellAnimationOrigins.computeOrigin(access(props.originType), getCellCount()));

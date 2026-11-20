@@ -22,6 +22,13 @@ describe("orderEntries", () => {
 
         expect(RadioGroupUtils.orderEntries(entries)).toBe(entries);
     });
+
+    it("keeps the registration order while any radio's element is not yet in the document", () => {
+        const detached = { isConnected: false, compareDocumentPosition: () => 0 } as unknown as HTMLElement;
+        const entries = [LARGE, SMALL].map((item) => ({ ...item, getElementRef: () => detached }));
+
+        expect(RadioGroupUtils.orderEntries(entries)).toBe(entries);
+    });
 });
 
 describe("computeNavigableEntries", () => {

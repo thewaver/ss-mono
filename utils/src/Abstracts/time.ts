@@ -281,11 +281,12 @@ export namespace TimeUtils {
      * dates rather than bare times; that date is never shown.
      *
      * @param value The time to format.
-     * @param options Passed straight to `Intl.DateTimeFormat`.
+     * @param options Passed straight to `Intl.DateTimeFormat`. Left out, the locale's short time is printed: hours and
+     * minutes.
      * @param locale Which locale to format for, or the environment's own when left out.
      */
     export const format = (value: TimeValue, options?: Intl.DateTimeFormatOptions, locale?: string) =>
-        new Intl.DateTimeFormat(locale, options).format(
+        new Intl.DateTimeFormat(locale, options ?? { timeStyle: "short" }).format(
             new Date(ANCHOR_YEAR, 0, 1, value.hour, value.minute, value.second ?? 0),
         );
 }

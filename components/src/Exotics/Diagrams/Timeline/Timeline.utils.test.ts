@@ -165,6 +165,14 @@ describe("computeSteppedEdgeValue", () => {
     it("moves nothing for a step of nothing", () => {
         expect(TimelineUtils.computeSteppedEdgeValue(40, 1, 0, RANGE, toTens)).toBe(40);
     });
+
+    it("reaches the next notch however many steps away it is, as when zoomed far in on a coarse snap", () => {
+        const range = { start: 0, end: 100000 };
+        const toHour = (value: number) => Math.round(value / 3600) * 3600;
+
+        expect(TimelineUtils.computeSteppedEdgeValue(0, 1, 1, range, toHour)).toBe(3600);
+        expect(TimelineUtils.computeSteppedEdgeValue(7200, -1, 1, range, toHour)).toBe(3600);
+    });
 });
 
 describe("computeKeyAction", () => {

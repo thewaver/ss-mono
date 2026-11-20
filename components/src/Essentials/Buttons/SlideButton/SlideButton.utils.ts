@@ -26,6 +26,9 @@ const HOLD_KEYS = ["Enter", " "];
 /** Where the thumb's edge facing the start of the track sits for a given progress. The thumb's own length is not travel, so the progress is scaled by what is left. */
 const computeThumbStart = (progressRatio: number, thumbRatio: number) => progressRatio * (RATIO_MAX - thumbRatio);
 
+const computeUndescribedWarning = (propName: string) =>
+    `SlideButton: no ${propName} was given. Nothing else tells a screen reader user that a plain press does nothing and how to confirm the button instead, such as which key to hold — add one.`;
+
 /**
  * The arithmetic behind a slide-to-confirm button.
  *
@@ -33,9 +36,6 @@ const computeThumbStart = (progressRatio: number, thumbRatio: number) => progres
  * at any length and along either axis. The one thing to keep in mind is that the thumb occupies part of the track,
  * so full progress is the thumb reaching the far end rather than traveling the track's whole length.
  */
-const computeUndescribedWarning = (propName: string) =>
-    `SlideButton: no ${propName} was given. Nothing else tells a screen reader user that a plain press does nothing and how to confirm the button instead, such as which key to hold — add one.`;
-
 export namespace SlideButtonUtils {
     /**
      * Warns, in the console, that a slide button has no description of how to confirm it.
@@ -47,7 +47,8 @@ export namespace SlideButtonUtils {
      * @param propName What the caller's framework calls the prop, so the warning names what they actually wrote.
      */
     export const warnIfUndescribed = (ariaDescription: string | undefined, propName: string) => {
-        if (!ariaDescription) console.warn(computeUndescribedWarning(propName));
+        if (process.env.NODE_ENV !== "production" && !ariaDescription)
+            console.warn(computeUndescribedWarning(propName));
     };
 
     /**
@@ -171,7 +172,7 @@ export namespace SlideButtonUtils {
      * Every position is measured along the axis `getOrientation` names: a horizontal thumb travels away from the edge
      * the text starts on, which `getDirection` says, and a vertical one upward. A press is judged once, where it lands. Under every mode but `"hold"` a press on the thumb that then travels
      * past a few pixels picks the thumb up, and the thumb follows the pointer from the point it was grabbed; letting
-     * go at the completion ratio along the track, the end by default, activates, and letting go anywhere short of it, or the system cancelling the gesture,
+     * go at the completion ratio along the track, the end by default, activates, and letting go anywhere short of it, or the system canceling the gesture,
      * puts it back. Under every mode but `"slide"` a press also starts a hold, which fills over the hold duration and
      * activates when it is full — and a grab cancels it, since the two cannot both be the gesture. A held Enter or
      * Space runs the same hold under every mode, so no setting can leave the button without a keyboard route. The
@@ -193,7 +194,7 @@ export namespace SlideButtonUtils {
      * @returns The store, and the commands to feed it: `drag` and `dragEnd` from a drag tracker over the track, `drag`
      * taking the tracker's ratio on both axes as it comes, `pressKey` and `releaseKey` from the button's key events,
      * `click` from its click event, `stopHold` for focus leaving or the owner going away, and `reset` for the button
-     * becoming disabled, which drops everything under way.
+     * becoming disabled, which drops everything under way and leaves a progress nothing was moving as it is.
      */
     export const createGesture = (defs: SlideButtonGestureDefs) => {
         const store = StoreUtils.create<SlideButtonGestureState>(
@@ -202,6 +203,7 @@ export namespace SlideButtonUtils {
         );
 
         let holdFrame: number | undefined;
+        let holdTimer: ReturnType<typeof setTimeout> | undefined;
         let press: SlideButtonPress | undefined;
         let grabRatio: number | undefined;
         let isPressed = false;
@@ -224,8 +226,10 @@ export namespace SlideButtonUtils {
 
         const stopHold = () => {
             if (holdFrame !== undefined) cancelAnimationFrame(holdFrame);
+            if (holdTimer !== undefined) clearTimeout(holdTimer);
 
             holdFrame = undefined;
+            holdTimer = undefined;
 
             if (!store.get().isHolding) return;
 
@@ -238,23 +242,32 @@ export namespace SlideButtonUtils {
 
             const startedAtMs = performance.now();
 
+            const complete = () => {
+                if (holdFrame !== undefined) cancelAnimationFrame(holdFrame);
+                if (holdTimer !== undefined) clearTimeout(holdTimer);
+
+                holdFrame = undefined;
+                holdTimer = undefined;
+
+                defs.setProgressRatio(RATIO_MAX);
+                defs.onActivate();
+            };
+
             const step = () => {
                 const ratio = computeHoldRatio(performance.now() - startedAtMs, defs.getHoldDurationMs());
 
-                defs.setProgressRatio(ratio);
-
-                if (ratio < RATIO_MAX) {
-                    holdFrame = requestAnimationFrame(step);
+                if (ratio >= RATIO_MAX) {
+                    complete();
 
                     return;
                 }
 
-                holdFrame = undefined;
-
-                defs.onActivate();
+                defs.setProgressRatio(ratio);
+                holdFrame = requestAnimationFrame(step);
             };
 
             store.update((current) => ({ ...current, isHolding: true }));
+            holdTimer = setTimeout(complete, defs.getHoldDurationMs());
             step();
         };
 
@@ -337,11 +350,14 @@ export namespace SlideButtonUtils {
                 defs.onActivate();
             },
             reset: () => {
+                const wasGrabbed = grabRatio !== undefined;
+
                 stopHold();
                 releasePress();
                 press = undefined;
                 setGrabRatio(undefined);
-                defs.setProgressRatio(RATIO_MIN);
+
+                if (wasGrabbed) defs.setProgressRatio(RATIO_MIN);
             },
         };
     };

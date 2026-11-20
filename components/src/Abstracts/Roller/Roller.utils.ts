@@ -14,6 +14,7 @@ import {
 } from "@thewaver/ss-utils";
 
 import { LiveAnnouncerUtils } from "../LiveAnnouncer/LiveAnnouncer.utils";
+import { NavigatorUtils } from "../Navigator/Navigator.utils";
 import { TurnClockUtils } from "../TurnClock/TurnClock.utils";
 import type {
     RollerController,
@@ -116,6 +117,11 @@ const pickTumbleAxis = () => ({ x: Math.random() - HALF, y: Math.random() - HALF
  * time from the keys or a command. A face is anything with a direction out of the solid and a direction that reads as
  * down on it.
  */
+const SAME_TURN_EPSILON = 1e-6;
+
+const getIsSameTurn = (a: Quaternion, b: Quaternion) =>
+    Math.abs(a.w * b.w + a.x * b.x + a.y * b.y + a.z * b.z) > 1 - SAME_TURN_EPSILON;
+
 export namespace RollerUtils {
     /**
      * The upright landing for a face: the rotation that turns it towards the viewer the right way up.
@@ -454,7 +460,7 @@ export namespace RollerUtils {
             if (isRoll) defs.onRollEnd?.(index);
         };
 
-        const settleOnto = (index: number) => {
+        const settleOnto = (index: number, isRoll = false) => {
             halt();
             write({ rollPhase: "settling", isResting: false, restingFace: undefined });
             setTargetFace(index);
@@ -467,7 +473,7 @@ export namespace RollerUtils {
             tween.run(
                 defs.getSettleDurationMs(),
                 (ratio) => write({ orientation: QuaternionUtils.slerp(from, to, SETTLE_EASING(ratio)) }),
-                () => land(index, false, to),
+                () => land(index, isRoll, to),
             );
         };
 
@@ -521,10 +527,15 @@ export namespace RollerUtils {
                                 ),
                             });
                         },
-                        () => land(index, true, to),
+                        () => {
+                            const landing = clampFace(index, getFaceCount());
+
+                            if (landing === index && getIsSameTurn(getLanding(landing, to), to)) land(index, true, to);
+                            else settleOnto(landing, true);
+                        },
                     );
                 },
-                () => write({ isAwaitingTarget: false }),
+                () => write({ rollPhase: "still", isAwaitingTarget: false }),
             );
 
             return true;
@@ -690,7 +701,7 @@ export namespace RollerUtils {
                 const state = store.get();
 
                 if (!defs.getIsMovable() || defs.getIsDisabled() || event.button !== NOTHING) return;
-                if (state.isAwaitingTarget || state.rollPhase === "rolling") return;
+                if (state.isAwaitingTarget || state.rollPhase === "rolling" || press) return;
 
                 const point = { x: event.clientX, y: event.clientY };
                 const scale = DOMUtils.getScreenScale(element);
@@ -709,6 +720,12 @@ export namespace RollerUtils {
 
             const handlePointerMove = (event: PointerEvent) => {
                 if (!press || event.pointerId !== press.pointerId) return;
+
+                if (event.buttons === NOTHING) {
+                    handlePointerUp(event);
+
+                    return;
+                }
 
                 const point = { x: event.clientX, y: event.clientY };
 
@@ -753,9 +770,10 @@ export namespace RollerUtils {
             };
 
             const handleKeyDown = (event: KeyboardEvent) => {
-                const direction = KEY_DIRECTIONS[event.key];
+                const direction = Object.hasOwn(KEY_DIRECTIONS, event.key) ? KEY_DIRECTIONS[event.key] : undefined;
 
                 if (!direction || event.target !== element || !defs.getIsMovable()) return;
+                if (NavigatorUtils.getHasCommandModifier(event)) return;
 
                 event.preventDefault();
                 step(direction);

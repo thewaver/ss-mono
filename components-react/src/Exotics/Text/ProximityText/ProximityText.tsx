@@ -237,7 +237,7 @@ export const ProximityText = (props: ProximityTextProps) => {
                     />
                 );
             case "text": {
-                const letters = Array.from(segment.text).map((character, offset) => (
+                const letters = StringUtils.splitGraphemes(segment.text).map((character, offset) => (
                     <span
                         key={offset}
                         ref={(node) => {

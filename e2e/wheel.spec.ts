@@ -1,6 +1,6 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { example, prop } from "./helpers";
+import { example, expectAnnounced, prop, readAnnouncements, recordAnnouncements } from "./helpers";
 
 /**
  * Both drums on this page take their rotation from the same abstract, so most of what is checked here is checked
@@ -31,8 +31,6 @@ const REEL = example("reel");
 const wheel = (scope: string) => `${scope} [aria-roledescription="wheel"]`;
 const wedge = (scope: string) => `${scope} [aria-roledescription="wedge"]`;
 const spin = (key: string) => `#${key}Spin`;
-
-const ANNOUNCER = '[role="log"][aria-live="polite"]';
 
 const numberField = (key: string) => `${prop(key)} input`;
 const checkField = (key: string) => `${prop(key)} input`;
@@ -107,6 +105,7 @@ const setField = async (page: import("@playwright/test").Page, key: string, valu
 };
 
 test.beforeEach(async ({ page }) => {
+    await recordAnnouncements(page);
     await page.goto("/drum-wheel");
     await expect(page.locator(wheel(SIDEWAYS))).toBeVisible();
     await setField(page, "spinDurationMs", String(DURATION_MS));
@@ -143,10 +142,9 @@ test("spinning lands on a wedge and says which one", async ({ page }) => {
 
     await expect.poll(() => turnedAngle(page, SIDEWAYS), { timeout: SPIN_TOTAL_MS * 2 }).toBeGreaterThan(0);
 
-    await expect(
-        page.locator(ANNOUNCER),
-        "the announcement names the wedge under the marker, not only its position",
-    ).toContainText(/.+, \d+ of 8/);
+    await expectAnnounced(page, /.+, \d+ of 8/, {
+        message: "the announcement names the wedge under the marker, not only its position",
+    });
 });
 
 test("a spin cannot be asked for twice, because the second request has nowhere to go", async ({ page }) => {
@@ -291,17 +289,14 @@ test(
         await page.mouse.move(0, 0);
 
         const seen = new Set<number>();
-        const announced = new Set<string>();
 
         for (let sample = 0; sample < PICK_SAMPLE_COUNT; sample++) {
             (await pickedCards(page, SIDEWAYS)).forEach((index) => seen.add(index));
 
-            const said = ((await page.locator(ANNOUNCER).textContent()) ?? "").trim();
-
-            if (said) announced.add(said);
-
             await page.waitForTimeout(PICK_SAMPLE_GAP_MS);
         }
+
+        const announced = await readAnnouncements(page);
 
         expect(seen.size, "several wedges pass the marker and each is picked out in turn").toBeGreaterThan(1);
 
@@ -309,8 +304,8 @@ test(
 
         expect(settled, "and the last one is the prize").toHaveLength(1);
         expect(
-            [...announced].some((said) => said.includes(`, ${settled[0] + 1} of 8`)),
-            `the wheel said which wedge it came to rest on, and it said ${[...announced].join(" / ")}`,
+            announced.some((said) => said.includes(`, ${settled[0] + 1} of 8`)),
+            `the wheel said which wedge it came to rest on, and it said ${announced.join(" / ")}`,
         ).toBe(true);
     },
 );

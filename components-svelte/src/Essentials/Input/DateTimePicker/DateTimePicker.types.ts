@@ -41,3 +41,8 @@ export type DateTimePickerProps = Omit<
         /** Draws the surface the clock sits on. */
         renderTimePopup: TimePickerProps["renderPopup"];
     };
+
+export type DateTimePickerFieldsScopeProps = {
+    /** The two fields, which read the overriding contexts. */
+    children: Snippet;
+};

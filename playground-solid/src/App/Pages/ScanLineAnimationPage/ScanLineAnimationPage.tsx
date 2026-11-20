@@ -129,7 +129,7 @@ const StressTestWrapper = (props: ScanlineAnimationExampleProps) => {
                               : random < 2
                                 ? ScanlineAnimationKeyframes.createHorizontalHue()
                                 : ScanlineAnimationKeyframes.createHorizontalGrayscale();
-                    const computeSliceWeights = (count: { row: number; col: number }) =>
+                    const computeSliceWeights = (count: { rowCount: number; colCount: number }) =>
                         SliceAnimationWeights.computeSliceWeights(access(props.weightType), count, WEIGHT_ORIGIN);
 
                     return (

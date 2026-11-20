@@ -135,3 +135,9 @@ describe("CSSUtils.spreadableToStyle", () => {
         });
     });
 });
+
+describe("CSSUtils.toAnimationStyle drop-shadow", () => {
+    it("separates drop-shadow's arguments with spaces and leaves out a color it was not given", () => {
+        expect(CSSUtils.toAnimationStyle({ "drop-shadow": [1, 2, 3] }).filter).toBe("drop-shadow(1px 2px 3px)");
+    });
+});

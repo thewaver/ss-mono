@@ -1,4 +1,4 @@
-import { type ConsoleMessage, type Page, expect, test } from "@playwright/test";
+import { type Page, expect, test } from "@playwright/test";
 
 import { docsDemo, docsSettled, isChecked, prop } from "./helpers";
 
@@ -70,21 +70,12 @@ test("the caption alone names its control, through aria-labelledby", async ({ pa
 });
 
 /**
- * The warning fires while the component mounts, so the listener has to be attached before the navigation rather
- * than in `beforeEach` after it. The prop is `ariaLabel` in all four frameworks, and the warning names it so.
+ * The development warning this case once read from the console is checked by `Label.utils.test.ts` instead: the
+ * specs run against a production build, which prints no warnings.
  */
-test("an aria-label inside a Label warns and is dropped", async ({ page }) => {
-    const messages: ConsoleMessage[] = [];
-
-    page.on("console", (message) => messages.push(message));
-
+test("an aria-label inside a Label is dropped", async ({ page }) => {
     await page.goto("/label/docs");
     await expect(page.locator(`${SUPPRESSED} input`)).toBeVisible();
-
-    const warning = messages.find((message) => message.text().startsWith("Label: ariaLabel"));
-
-    expect(warning, "an aria-label inside a Label warns, rather than silently renaming the control").toBeTruthy();
-    expect(warning?.type(), "and it warns rather than logs").toBe("warning");
     await expect(
         page.locator(`${SUPPRESSED} input`),
         "the aria-label is dropped, so the visible caption stays the accessible name",

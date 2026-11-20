@@ -373,6 +373,17 @@ export namespace CellAnimationKeyframes {
         defs: SliceAnimationEvaluationDefs & { origin: Index2d },
         timeline: number,
         easing?: SliceAnimationEasing,
-    ): SliceAnimationEvaluationResult =>
-        SliceAnimationKeyframeUtils.computeAnimation(SAMPLE_ANIMATIONS[type], breakpoints, defs, timeline, easing);
+    ): SliceAnimationEvaluationResult => {
+        if (!Object.hasOwn(SAMPLE_ANIMATIONS, type)) {
+            throw new Error(`CellAnimationKeyframes: there is no animation named "${type}".`);
+        }
+
+        return SliceAnimationKeyframeUtils.computeAnimation(
+            SAMPLE_ANIMATIONS[type],
+            breakpoints,
+            defs,
+            timeline,
+            easing,
+        );
+    };
 }

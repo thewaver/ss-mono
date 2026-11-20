@@ -476,6 +476,8 @@ export const Table = <T,>(props: TableProps<T>) => {
     };
 
     const handleHeaderPointerDown = (e: PointerEvent<HTMLDivElement>, columnIndex: number) => {
+        hasCarriedClickRef.current = false;
+
         const column = columns[columnIndex];
 
         if (e.button !== 0 || isDisabled || !getIsReorderable(column)) return;

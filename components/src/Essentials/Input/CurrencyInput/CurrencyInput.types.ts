@@ -19,7 +19,8 @@ export type BaseCurrencyInputValues = {
     /** How many digits are kept after the decimal separator. */
     decimals?: number;
     /**
-     * Which country's conventions the amount is written in, which decides the separators and where the symbol sits.
+     * Which country's conventions the amount is written in, which decides the separators. The library draws no
+     * currency symbol; a painter that draws one decides where it sits.
      */
     locale?: string;
     /** Whether negative amounts can be entered. */

@@ -10,6 +10,7 @@ import {
     TypewriterStyles as styles,
 } from "@thewaver/ss-components";
 import { TypewriterConst } from "@thewaver/ss-components/internal";
+import { StringUtils } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { LetterDriverContextProvider } from "../../../Abstracts/LetterDriver/LetterDriver.context";
@@ -205,7 +206,9 @@ export const Typewriter = (props: ParentProps<TypewriterProps>) => {
         getIsAnimating,
         getIsHidden: getIsErased,
         getCaretIndex,
-        renderCaret: props.renderCaret && (() => props.renderCaret?.()),
+        get renderCaret() {
+            return props.renderCaret && (() => props.renderCaret?.());
+        },
     };
 
     onMount(() => {
@@ -279,7 +282,7 @@ export const Typewriter = (props: ParentProps<TypewriterProps>) => {
                                             <>
                                                 {getIsAnimating() ? (
                                                     <span style={style}>
-                                                        <Index each={Array.from(segment.text)}>
+                                                        <Index each={StringUtils.splitGraphemes(segment.text)}>
                                                             {(getChar, charIndex) => (
                                                                 <>
                                                                     <span

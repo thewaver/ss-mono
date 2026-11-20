@@ -1,6 +1,6 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { demo, prop } from "./helpers";
+import { demo, prop, tabKey } from "./helpers";
 
 const LEGEND = demo("defaultTags");
 const DIFF = demo("customTags");
@@ -198,7 +198,7 @@ test("a glossary term is a word you can tab to, and its tip is announced when yo
         .poll(() => describingTip(page, 0), { message: "the focused term is described by its tip" })
         .toBeTruthy();
 
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
 
     await expect(page.locator(TERM).nth(1), "Tab moves from one term to the next").toBeFocused();
     await expect

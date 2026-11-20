@@ -182,6 +182,8 @@
     };
 
     const handlePointerDown = (index: number) => (e: PointerEvent) => {
+        hasPendingClick = false;
+
         if (e.button !== 0 || isDisabled) return;
         if ((e.target as HTMLElement).closest(CarrierUtils.INTERACTIVE_SELECTOR)) return;
         if (CarrierUtils.getCarry()) return;
@@ -227,7 +229,7 @@
     };
 
     const handleKeyDown = (index: number) => (e: KeyboardEvent) => {
-        if (isDisabled) return;
+        if (e.target !== e.currentTarget || isDisabled) return;
 
         const action = SortableUtils.computeKeyAction(e.key, {
             index,

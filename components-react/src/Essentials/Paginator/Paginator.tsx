@@ -1,6 +1,7 @@
 import { type MouseEvent, type ReactNode, useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import {
+    InteractionTrackerUtils,
     PAGINATOR_DEFAULTS,
     type PaginatorControlEntry,
     type PaginatorGapEntry,
@@ -10,6 +11,7 @@ import {
     type PaginatorStepRenderProps,
     PaginatorStyles,
     PaginatorUtils,
+    SafeHrefUtils,
 } from "@thewaver/ss-components";
 import { PlacementConst } from "@thewaver/ss-components/internal";
 
@@ -28,6 +30,7 @@ import type {
 
 const PaginatorItem = <TExtra extends object>(props: PaginatorItemProps<TExtra>) => {
     const isDisabled = props.flags.isDisabled ?? false;
+    const safeHref = SafeHrefUtils.resolve(props.href, "Paginator");
 
     const handleClick = (e: MouseEvent<HTMLElement>) => {
         if (isDisabled) {
@@ -35,6 +38,8 @@ const PaginatorItem = <TExtra extends object>(props: PaginatorItemProps<TExtra>)
 
             return;
         }
+
+        if (safeHref !== undefined && !InteractionTrackerUtils.getIsPlainClick(e.nativeEvent)) return;
 
         props.onActivate();
     };
@@ -47,7 +52,7 @@ const PaginatorItem = <TExtra extends object>(props: PaginatorItemProps<TExtra>)
         "aria-current": props.isCurrent ? ("page" as const) : undefined,
     };
 
-    if (props.href === undefined) {
+    if (safeHref === undefined) {
         return (
             <button type="button" ref={props.ref} {...commonProps} onClick={handleClick}>
                 {props.renderContent(props.flags)}
@@ -58,7 +63,7 @@ const PaginatorItem = <TExtra extends object>(props: PaginatorItemProps<TExtra>)
     const Link = props.linkComponent ?? "a";
 
     return (
-        <Link ref={props.ref} href={props.href} {...commonProps} onClick={handleClick}>
+        <Link ref={props.ref} href={safeHref} {...commonProps} onClick={handleClick}>
             {props.renderContent(props.flags)}
         </Link>
     );
@@ -295,10 +300,10 @@ export const PaginatorPages = (props: PaginatorPagesProps) => {
 
     return (
         <div className={PaginatorStyles.paginatorRow} style={{ gap: `${props.gap ?? PAGINATOR_DEFAULTS.gap}px` }}>
-            {entries.map((entry, index) =>
+            {entries.map((entry) =>
                 entry.kind === "page" ? (
                     <PaginatorPageControl
-                        key={index}
+                        key={PaginatorUtils.getEntryKey(entry)}
                         context={context}
                         entry={entry}
                         computePageLabel={props.computePageLabel}
@@ -307,7 +312,7 @@ export const PaginatorPages = (props: PaginatorPagesProps) => {
                     />
                 ) : (
                     <PaginatorGapControl
-                        key={index}
+                        key={PaginatorUtils.getEntryKey(entry)}
                         context={context}
                         entry={entry}
                         computePageLabel={props.computePageLabel}

@@ -6,25 +6,22 @@ import {
     CellAnimationOrigins,
     SliceAnimationWeights,
 } from "@thewaver/ss-components-react";
-import type { Index2d } from "@thewaver/ss-utils";
+import type { Count2d } from "@thewaver/ss-utils";
 
 import type { CellAnimationSourcedExampleProps } from "../CellAnimationPage.types";
 
-export const DefaultExample = ({
-    animationType,
-    originType,
-    weightType,
-    weightOpts,
-    ...otherProps
-}: CellAnimationSourcedExampleProps) => {
+export const DefaultExample = (props: CellAnimationSourcedExampleProps) => {
+    const { animationType, originType, weightType, weightOpts, ...otherProps } = props;
+
     const origin = useMemo(
-        () => CellAnimationOrigins.computeOrigin(originType, otherProps.cellCount),
-        [originType, otherProps.cellCount],
+        () => CellAnimationOrigins.computeOrigin(props.originType, otherProps.cellCount),
+        [props.originType, otherProps.cellCount],
     );
 
     const computeSliceWeights = useMemo(
-        () => (count: Index2d) => SliceAnimationWeights.computeSliceWeights(weightType, count, origin, weightOpts),
-        [weightType, origin, weightOpts],
+        () => (count: Count2d) =>
+            SliceAnimationWeights.computeSliceWeights(props.weightType, count, origin, props.weightOpts),
+        [props.weightType, origin, props.weightOpts],
     );
 
     return (
@@ -32,7 +29,7 @@ export const DefaultExample = ({
             {...otherProps}
             origin={origin}
             computeSliceWeights={computeSliceWeights}
-            computeSliceAnimation={CellAnimationKeyframes.SAMPLE_ANIMATIONS[animationType]}
+            computeSliceAnimation={CellAnimationKeyframes.SAMPLE_ANIMATIONS[props.animationType]}
         />
     );
 };

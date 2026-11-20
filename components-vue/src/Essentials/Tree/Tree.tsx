@@ -16,6 +16,7 @@ import {
     FlattenerUtils,
     FloaterStyles,
     InteractionTrackerUtils,
+    SafeHrefUtils,
     SelectionUtils,
     TREE_DEFAULTS,
     type TreeNodeRenderProps,
@@ -56,12 +57,16 @@ const TreeNodeItem = defineComponent(
         () => {
             const isDisabled = props.flags.isDisabled ?? false;
 
+            const safeHref = SafeHrefUtils.resolve(props.href, "Tree");
+
             const handleClick = (e: MouseEvent) => {
                 if (isDisabled) {
                     e.preventDefault();
 
                     return;
                 }
+
+                if (safeHref !== undefined && !InteractionTrackerUtils.getIsPlainClick(e)) return;
 
                 props.onActivate(e);
             };
@@ -82,7 +87,7 @@ const TreeNodeItem = defineComponent(
 
             const content = callSlot(slots.renderContent, props.flags);
 
-            if (props.href === undefined) {
+            if (safeHref === undefined) {
                 return (
                     <div {...commonProps} onClick={handleClick}>
                         {content}
@@ -92,7 +97,7 @@ const TreeNodeItem = defineComponent(
 
             if (props.linkComponent === undefined) {
                 return (
-                    <a href={props.href} {...commonProps} onClick={handleClick}>
+                    <a href={safeHref} {...commonProps} onClick={handleClick}>
                         {content}
                     </a>
                 );
@@ -100,7 +105,7 @@ const TreeNodeItem = defineComponent(
 
             return h(
                 props.linkComponent,
-                { href: props.href, ...commonProps, onClick: handleClick },
+                { href: safeHref, ...commonProps, onClick: handleClick },
                 { default: () => content },
             );
         },
@@ -375,6 +380,8 @@ const TreeComposite = defineComponent(
         };
 
         const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.target !== e.currentTarget && !findRowById((e.target as Element).id)) return;
+
             const navigable = navigableRows.value;
 
             if (navigable.length < 1) return;
@@ -540,6 +547,7 @@ const TreeComposite = defineComponent(
                         sizing={"fill"}
                         isDisabled={row.node.isDisabled ?? false}
                         isReachableWhenDisabled={row.node.isReachableWhenDisabled ?? false}
+                        isFocusableWhenDisabled={row.node.isReachableWhenDisabled ?? false}
                         isTabbable={row.node.value === rovingValue}
                         tooltipDefs={row.node.tooltipDefs}
                         extraFlags={{

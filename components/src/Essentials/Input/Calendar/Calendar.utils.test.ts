@@ -288,3 +288,20 @@ describe("getRows and the labels", () => {
         expect(CalendarUtils.formatPage(years[0], years, "year", eraId, "en-GB")).toMatch(/2017\D+2028/);
     });
 });
+
+describe("CalendarUtils in a year two Japanese eras share", () => {
+    const reiwaOne = DateValueUtils.withCalendar(date("2019-06-15"), "japanese");
+    const heiseiThirtyOne = DateValueUtils.withCalendar(date("2019-02-01"), "japanese");
+
+    it("puts the whole year on one month page, January to December", () => {
+        const start = CalendarUtils.getPageStart(reiwaOne, "month");
+
+        expect(DateValueUtils.toIso(start)).toBe("2019-01-01");
+        expect(DateValueUtils.isSame(start, CalendarUtils.getPageStart(heiseiThirtyOne, "month"))).toBe(true);
+    });
+
+    it("keeps each era's year its own cell in the year view", () => {
+        expect(DateValueUtils.toIso(CalendarUtils.getCellStart(reiwaOne, "year"))).toBe("2019-05-01");
+        expect(DateValueUtils.toIso(CalendarUtils.getCellStart(heiseiThirtyOne, "year"))).toBe("2019-01-01");
+    });
+});

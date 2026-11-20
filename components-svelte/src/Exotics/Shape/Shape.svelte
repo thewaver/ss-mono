@@ -72,6 +72,7 @@
     {#if fillDefs}
         <svg
             class={styles.shapeFillSVG}
+            aria-hidden="true"
             width={rootSize.width}
             height={rootSize.height}
             {viewBox}
@@ -117,6 +118,7 @@
     {#if strokeDefs}
         <svg
             class={styles.shapeStrokeSVG}
+            aria-hidden="true"
             width={rootSize.width}
             height={rootSize.height}
             {viewBox}

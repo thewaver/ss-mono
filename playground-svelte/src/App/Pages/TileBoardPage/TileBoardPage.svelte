@@ -1,7 +1,7 @@
 <script lang="ts">
     import { TILE_BOARD_DEFAULTS, TileBoardUtils } from "@thewaver/ss-components-svelte";
     import { TileBoardKnobs } from "@thewaver/ss-playground/App/Knobs/TileBoards.const";
-    import { Index2d, type Index2dString } from "@thewaver/ss-utils";
+    import { type Count2d, Index2d, type Index2dString } from "@thewaver/ss-utils";
 
     import PageExampleKnobs from "../../PageComponents/ExampleKnobs/PageExampleKnobs.svelte";
     import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
@@ -50,7 +50,7 @@
     let destination = $state.raw<Index2d>();
     let painted = $state.raw<Index2dString[]>(NO_MARKS);
 
-    const tileCount = $derived<Index2d>({ row: rows, col: cols });
+    const tileCount = $derived<Count2d>({ rowCount: rows, colCount: cols });
 
     const tileSize = $derived({ width: tileWidth, height: tileHeight });
 

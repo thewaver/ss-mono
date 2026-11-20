@@ -11,42 +11,39 @@ import { ShapeConst, type Size2d } from "@thewaver/ss-utils";
 
 import type { TimedGradientExampleProps } from "../../SVGGradientsSolid.types";
 
-export const DefaultExample = ({
-    configKey,
-    configDefs,
-    paintKind,
-    iterationConfigKey,
-    animationDurationMs,
-    colors,
-    blurWidth,
-}: TimedGradientExampleProps) => {
+export const DefaultExample = (props: TimedGradientExampleProps) => {
     const id = createUniqueId();
 
-    const getIterationConfig = () => SVGDefsSamples.Iteration.SAMPLE_CONFIGS[access(iterationConfigKey)];
+    const getIterationConfig = () => SVGDefsSamples.Iteration.SAMPLE_CONFIGS[access(props.iterationConfigKey)];
 
     const computeDefs = (getSize: () => Size2d, getRef: () => HTMLElement | undefined) => {
-        const key = access(configKey);
+        const key = access(props.configKey);
 
-        if (key === NO_SAMPLE_KEY) return computeNoSampleDefs(access(colors), access(paintKind));
+        if (key === NO_SAMPLE_KEY) return computeNoSampleDefs(access(props.colors), access(props.paintKind));
 
         return SVGDefsSampleConfigs.Gradient.Timed.toConfig({
             family: key,
-            defs: access(configDefs),
-        } as SVGDefsSamples.Gradient.Timed.Entry).computeSVGDefs(`${access(paintKind)}-${id}`, undefined, getRef, {
-            getSize,
-            animationDurationMs: access(animationDurationMs),
-            colors: access(colors),
-            blurWidth: access(blurWidth),
-            ...getIterationConfig().computeDefs(access(animationDurationMs)),
-        });
+            defs: access(props.configDefs),
+        } as SVGDefsSamples.Gradient.Timed.Entry).computeSVGDefs(
+            `${access(props.paintKind)}-${id}`,
+            undefined,
+            getRef,
+            {
+                getSize,
+                animationDurationMs: access(props.animationDurationMs),
+                colors: access(props.colors),
+                blurWidth: access(props.blurWidth),
+                ...getIterationConfig().computeDefs(access(props.animationDurationMs)),
+            },
+        );
     };
 
     return (
         <Shape
             computePoints={(size) => ShapeConst.getDefaultShapePoints("square", size)}
-            computeFillDefs={access(paintKind) === "fill" ? computeDefs : undefined}
-            computeStrokeDefs={access(paintKind) === "stroke" ? computeDefs : undefined}
-            strokeGeom={access(paintKind) === "stroke" ? () => [{ thicknesses: [STROKE_THICKNESS] }] : undefined}
+            computeFillDefs={access(props.paintKind) === "fill" ? computeDefs : undefined}
+            computeStrokeDefs={access(props.paintKind) === "stroke" ? computeDefs : undefined}
+            strokeGeom={access(props.paintKind) === "stroke" ? () => [{ thicknesses: [STROKE_THICKNESS] }] : undefined}
             renderChildren={() => <div class={styles.example} />}
         />
     );

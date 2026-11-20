@@ -4,6 +4,7 @@ export type CancellableFunction<A extends unknown[]> = ((...args: A) => void) & 
     cancel: () => void;
 };
 
+/** Small function helpers: doing nothing, debouncing and throttling. */
 export namespace FunctionUtils {
     /** Does nothing. Useful as a default for an optional callback. */
     export const noop = () => {};

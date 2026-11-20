@@ -16,8 +16,8 @@ export const ScanlineAnimation = (props: ScanlineAnimationProps) => {
             {...otherProps}
             cellCount={() =>
                 getOrientation() === "vertical"
-                    ? { row: 1, col: access(local.lineCount) }
-                    : { row: access(local.lineCount), col: 1 }
+                    ? { rowCount: 1, colCount: access(local.lineCount) }
+                    : { rowCount: access(local.lineCount), colCount: 1 }
             }
         />
     );

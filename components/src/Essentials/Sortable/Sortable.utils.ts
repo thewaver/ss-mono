@@ -66,12 +66,7 @@ export namespace SortableUtils {
      */
     export const computeNavigableIndexes = <T, TTooltipDefs>(items: SortableItemRecord<T, TTooltipDefs>[]) =>
         items.reduce<number[]>((acc, item, index) => {
-            const isReachable = InteractionTrackerUtils.computeIsReachable(
-                item.isDisabled ?? false,
-                item.isReachableWhenDisabled ?? false,
-            );
-
-            if (!item.isDisabled || isReachable) acc.push(index);
+            if (InteractionTrackerUtils.computeIsNavigable(item)) acc.push(index);
 
             return acc;
         }, []);

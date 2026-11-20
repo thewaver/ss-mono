@@ -1,6 +1,6 @@
 import { type RefObject, useLayoutEffect, useRef, useState } from "react";
 
-import { type TextSyncElement, type TextSyncMaskResult, TextSyncUtils } from "@thewaver/ss-components";
+import { type TextSyncElement, type TextSyncMaskFn, TextSyncUtils } from "@thewaver/ss-components";
 
 import { useElement, useLatest } from "../../Utils/refUtils";
 
@@ -34,7 +34,7 @@ export namespace TextSyncReactUtils {
         value: string,
         opts: {
             onInput: (value: string) => void;
-            computeMaskedText?: (previous: string, next: string, caret: number) => TextSyncMaskResult;
+            computeMaskedText?: TextSyncMaskFn;
         },
     ) => {
         const latest = useLatest({ value, ...opts });

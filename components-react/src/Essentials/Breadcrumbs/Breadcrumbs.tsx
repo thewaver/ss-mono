@@ -1,12 +1,19 @@
 import type { MouseEvent } from "react";
 
-import { BREADCRUMBS_DEFAULTS, type BreadcrumbsFlags, BreadcrumbsStyles } from "@thewaver/ss-components";
+import {
+    BREADCRUMBS_DEFAULTS,
+    type BreadcrumbsFlags,
+    BreadcrumbsStyles,
+    InteractionTrackerUtils,
+    SafeHrefUtils,
+} from "@thewaver/ss-components";
 
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
 import type { BreadcrumbsItemProps, BreadcrumbsProps } from "./Breadcrumbs.types";
 
 const BreadcrumbsItem = <T,>(props: BreadcrumbsItemProps<T>) => {
     const isDisabled = props.flags.isDisabled ?? false;
+    const safeHref = SafeHrefUtils.resolve(props.crumb.href, "Breadcrumbs");
 
     const handleClick = (e: MouseEvent<HTMLElement>) => {
         if (isDisabled) {
@@ -14,6 +21,8 @@ const BreadcrumbsItem = <T,>(props: BreadcrumbsItemProps<T>) => {
 
             return;
         }
+
+        if (safeHref !== undefined && !InteractionTrackerUtils.getIsPlainClick(e.nativeEvent)) return;
 
         props.onSelect(props.crumb.value);
     };
@@ -37,7 +46,7 @@ const BreadcrumbsItem = <T,>(props: BreadcrumbsItemProps<T>) => {
         "aria-disabled": isDisabled || undefined,
     };
 
-    if (props.crumb.href === undefined) {
+    if (safeHref === undefined) {
         return (
             <button type="button" ref={props.ref} {...commonProps} onClick={handleClick}>
                 {props.renderContent(props.flags)}
@@ -48,7 +57,7 @@ const BreadcrumbsItem = <T,>(props: BreadcrumbsItemProps<T>) => {
     const Link = props.linkComponent ?? "a";
 
     return (
-        <Link ref={props.ref} href={props.crumb.href} {...commonProps} onClick={handleClick}>
+        <Link ref={props.ref} href={safeHref} {...commonProps} onClick={handleClick}>
             {props.renderContent(props.flags)}
         </Link>
     );

@@ -68,7 +68,7 @@ export const Reveal = defineComponent(
             const handleKeyDown = (e: KeyboardEvent) => {
                 const nudge = RevealUtils.getNudge(e);
 
-                if (isDisabled || !nudge) return;
+                if (e.target !== e.currentTarget || isDisabled || !nudge) return;
 
                 e.preventDefault();
 
@@ -103,7 +103,9 @@ export const Reveal = defineComponent(
                     }}
                     onKeydown={handleKeyDown}
                 >
-                    {callSlot(slots.renderContent, undefined)}
+                    <div class={RevealStyles.revealContent} inert>
+                        {callSlot(slots.renderContent, undefined)}
+                    </div>
 
                     <div class={RevealStyles.revealCover}>
                         {callSlot(slots.renderCover, { isRevealing, maskStyle })}

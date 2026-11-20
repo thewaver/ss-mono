@@ -65,3 +65,22 @@ export const useStableList = <T>(list: T[]): T[] => {
 
     return ref.current;
 };
+
+/**
+ * The same value from render to render for as long as `isSame` says it has not changed.
+ *
+ * For a value worked out from a function a consumer may write inline: the function is a new one each render, so
+ * anything memoized on it would be rebuilt each render. Working the value out again is cheap; handing the previous one
+ * back while it is the same keeps everything built from it standing.
+ *
+ * @param value This render's value.
+ * @param isSame Whether two values are the same.
+ * @returns This render's value, or the previous one when `isSame` says they match.
+ */
+export const useStableValue = <T>(value: T, isSame: (previous: T, next: T) => boolean): T => {
+    const ref = useRef(value);
+
+    if (ref.current !== value && !isSame(ref.current, value)) ref.current = value;
+
+    return ref.current;
+};

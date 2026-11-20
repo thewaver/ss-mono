@@ -125,10 +125,17 @@
         hoveredDay = undefined;
     };
 
+    let lastAnchorDay: DateValue | undefined;
+
     $effect(() => {
         const anchor = props.anchorDay;
+        const last = lastAnchorDay;
 
-        if (anchor) highlighted = anchor;
+        lastAnchorDay = anchor;
+
+        if (!anchor || (anchor !== last && CalendarUtils.getIsSameCell(anchor, last, "day"))) return;
+
+        highlighted = anchor;
     });
 
     let previousPageStart: DateValue | undefined;
@@ -147,6 +154,9 @@
         });
     });
 
+    const getIsOwnDayElement = (target: EventTarget | null) =>
+        target instanceof Element && target.id.startsWith(`${gridId}-day-`);
+
     const rovingCellId = $derived.by(() => {
         const rovingIndex = CalendarUtils.findCellIndex(cells, rovingDay, precision);
 
@@ -160,7 +170,7 @@
         if (!cellId || !element) return;
 
         untrack(() => {
-            if (!element.contains(document.activeElement) || element === document.activeElement) return;
+            if (!getIsOwnDayElement(document.activeElement)) return;
 
             document.getElementById(cellId)?.focus();
         });
@@ -171,6 +181,8 @@
     );
 
     const handleKeyDown = (e: KeyboardEvent) => {
+        if (!getIsOwnDayElement(e.target)) return;
+
         const action = CalendarUtils.computeKeyAction(e.key, e.shiftKey, {
             roving: rovingDay,
             precision,

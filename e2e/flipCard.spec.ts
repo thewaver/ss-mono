@@ -18,7 +18,6 @@ const face = (name: string) => `${faces}[aria-label="${name}"]`;
 
 const FLIP = "#press-forward";
 const AXIS_FIELD = `${prop("axis")} [role="combobox"]`;
-const SETTLE_MS = 800;
 
 const transformOf = (page: import("@playwright/test").Page, selector: string) =>
     page.locator(selector).evaluate((element) => (element as HTMLElement).style.transform);
@@ -48,7 +47,6 @@ test("the side turned away is out of reach, rather than merely out of sight", as
 
 test("turning the card swaps which side is the reachable one", async ({ page }) => {
     await page.locator(FLIP).click();
-    await page.waitForTimeout(SETTLE_MS);
 
     await expect(page.locator(face("Back")), "the side asked for is the one in reach").not.toHaveAttribute("inert");
     await expect(page.locator(face("Front"))).toHaveAttribute("inert", "");
@@ -56,7 +54,6 @@ test("turning the card swaps which side is the reachable one", async ({ page }) 
     expect(await readout(page, "pressed"), "and the page is told which side it is showing").toContain("back");
 
     await page.locator(FLIP).click();
-    await page.waitForTimeout(SETTLE_MS);
 
     await expect(page.locator(face("Front")), "and it comes back the way it went").not.toHaveAttribute("inert");
 });
@@ -72,7 +69,6 @@ test("the axis decides which way the card turns, and nothing else about it chang
     expect(await transformOf(page, face("Front")), "and a column card about the horizontal one").toContain("rotateX(");
 
     await page.locator(FLIP).click();
-    await page.waitForTimeout(SETTLE_MS);
 
     await expect(
         page.locator(face("Back")),

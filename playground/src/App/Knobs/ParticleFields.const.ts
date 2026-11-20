@@ -1,5 +1,5 @@
 import type { CellAnimationKeyframes, CellAnimationOrigins, SliceAnimationWeights } from "@thewaver/ss-components";
-import type { Index2d, ShapeConst } from "@thewaver/ss-utils";
+import type { Count2d, ShapeConst } from "@thewaver/ss-utils";
 
 export namespace ParticleFieldKnobs {
     export const MIN_CELL_COUNT = 1;
@@ -22,7 +22,7 @@ export namespace ParticleFieldKnobs {
     export const MAX_JOIN_RADIUS = 120;
     export const JOIN_RADIUS_STEP = 5;
 
-    export const STARTING_CELL_COUNT: Index2d = { col: 21, row: 21 };
+    export const STARTING_CELL_COUNT: Count2d = { colCount: 21, rowCount: 21 };
     export const STARTING_SPAWN_CHANCE = 1;
     export const STARTING_DURATION_MS = 2000;
     export const STARTING_LIFETIME_MS = 800;

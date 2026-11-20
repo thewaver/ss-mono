@@ -1,7 +1,8 @@
 <script lang="ts">
-    import { CURRENCY_INPUT_DEFAULTS, CurrencyInputUtils, TextSyncUtils } from "@thewaver/ss-components";
+    import { CURRENCY_INPUT_DEFAULTS, CurrencyInputUtils, FormValueUtils, TextSyncUtils } from "@thewaver/ss-components";
 
     import { MaskedFieldSvelteUtils } from "../../../Abstracts/MaskedField/MaskedFieldSvelte.utils.svelte.js";
+    import FormValue from "../../../Primitives/FormValue/FormValue.svelte";
     import TextField from "../../../Primitives/TextField/TextField.svelte";
     import type { CurrencyInputProps } from "./CurrencyInput.types.js";
 
@@ -38,13 +39,17 @@
 
 <TextField
     {...props}
+    name={undefined}
     bind:value={getText, setText}
     bind:ref
     element="input"
     inputMode="decimal"
-    computeMaskedText={(previous, next, caret) => TextSyncUtils.applyGroupedMask(groupDefs, previous, next, caret)}
+    computeMaskedText={(previous, next, caret, isForwardDeletion) =>
+        TextSyncUtils.applyGroupedMask(groupDefs, previous, next, caret, isForwardDeletion)}
     placeholderHint={CurrencyInputUtils.computeHint(groupDefs)}
     hasError={(props.hasError ?? false) || field.getHasIssue()}
     onInput={field.onInput}
     onBlur={field.onBlur}
 />
+
+<FormValue name={props.name} values={[FormValueUtils.computeText(value) ?? FormValueUtils.EMPTY_TEXT]} />

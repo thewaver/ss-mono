@@ -63,6 +63,7 @@ export const CornerPin = (props: ParentProps<CornerPinProps>) => {
 
         e.preventDefault();
         axisRefs[corner]?.focus({ preventScroll: true });
+        setFocusVisible(undefined);
         stopGesture?.();
 
         const grip = e.currentTarget as HTMLElement;

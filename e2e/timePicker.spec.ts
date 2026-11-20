@@ -1,6 +1,6 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { docsDemo, docsSettled } from "./helpers";
+import { docsDemo, docsSettled, tabKey } from "./helpers";
 
 /**
  * The time picker's page is its Docs view. The basic example shows no value under its field, so what it holds is
@@ -153,7 +153,7 @@ test.describe("a stepped and bounded clock", () => {
 test("walks with the arrows and commits on Enter", async ({ page }) => {
     await openClock(page, "basic");
 
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
     await expect(page.locator(`${column("hour")} [role="option"][aria-label="09"]`)).toBeFocused();
 
     await page.keyboard.press("ArrowDown");

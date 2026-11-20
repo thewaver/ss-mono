@@ -1,6 +1,6 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { docsDemo, docsSettled, inputValue, offsetHeight, prop, scrollTop } from "./helpers";
+import { docsDemo, docsSettled, inputValue, offsetHeight, prop, scrollTop, tabKey } from "./helpers";
 
 const DOCS = "/src/App/Pages/PreviewPage/Docs";
 
@@ -52,7 +52,7 @@ test("a new collapsed height is the height the closed box takes", async ({ page 
 
     await heightKnob(page).click();
     await page.keyboard.press("ArrowUp");
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
 
     const after = await collapsedHeight(page);
 
@@ -159,23 +159,44 @@ test("content that already fits gets no control at all", async ({ page }) => {
  */
 const scrollBox = (page: Page) => page.locator(`${SCROLLED} [data-scroll-box]`);
 
-const SETTLE_MS = 500;
+const SAMPLE_GAP_MS = 50;
 
 test("closing brings the control back rather than leaving the reader further down", async ({ page }) => {
     await page.locator(trigger(SCROLLED)).click();
-    await page.waitForTimeout(SETTLE_MS);
+    await expect(page.locator(trigger(SCROLLED))).toHaveAttribute("aria-expanded", "true");
+    await expect
+        .poll(() => scrollBox(page).evaluate((element) => element.scrollHeight > element.clientHeight), {
+            message: "the opened text is taller than the box, so there is somewhere to scroll to",
+        })
+        .toBe(true);
 
     await scrollBox(page).evaluate((element) => {
         element.scrollTop = element.scrollHeight;
     });
-    await page.waitForTimeout(SETTLE_MS);
 
-    const deepIn = await scrollTop(scrollBox(page));
-
-    expect(deepIn, "the reader is at the end of the opened text").toBeGreaterThan(0);
+    await expect
+        .poll(() => scrollTop(scrollBox(page)), "the reader is at the end of the opened text")
+        .toBeGreaterThan(0);
 
     await page.locator(trigger(SCROLLED)).click();
-    await page.waitForTimeout(SETTLE_MS);
+    await expect(page.locator(trigger(SCROLLED))).toHaveAttribute("aria-expanded", "false");
+
+    const readLayout = async () => {
+        const box = (await scrollBox(page).boundingBox())!;
+        const pressed = (await page.locator(trigger(SCROLLED)).boundingBox())!;
+
+        return [box.y, box.height, pressed.y].join();
+    };
+
+    await expect
+        .poll(async () => {
+            const before = await readLayout();
+
+            await page.waitForTimeout(SAMPLE_GAP_MS);
+
+            return (await readLayout()) === before;
+        }, "the box has stopped moving after closing")
+        .toBe(true);
 
     const box = (await scrollBox(page).boundingBox())!;
     const pressed = (await page.locator(trigger(SCROLLED)).boundingBox())!;

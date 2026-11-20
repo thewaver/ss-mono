@@ -13,6 +13,7 @@ const ORPHAN_RADIO_CONTEXT: RadioGroupContextType = {
     computeIsTabbable: () => true,
     computePlacement: () => undefined,
     register: () => undefined,
+    reorder: () => undefined,
 };
 
 export const useRadioGroupContext = (): RadioGroupContextType => {

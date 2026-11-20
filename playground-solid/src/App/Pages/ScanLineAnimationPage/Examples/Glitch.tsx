@@ -1,4 +1,4 @@
-import { createEffect, createMemo, createSignal } from "solid-js";
+import { createEffect, createMemo, createSignal, splitProps } from "solid-js";
 
 import {
     ScanlineAnimation,
@@ -51,9 +51,11 @@ type Props = ScanlineAnimationExampleProps &
         keyframeOpts: { count: number; shiftPercent: number; chunkyness: number };
     }>;
 
-export const GlitchExample = ({ keyframeOpts, weightType, ...otherProps }: Props) => {
+export const GlitchExample = (props: Props) => {
+    const [, otherProps] = splitProps(props, ["keyframeOpts", "weightType"]);
+
     const getBreakpointGroups = createMemo(() => {
-        const count = access(keyframeOpts).count;
+        const count = access(props.keyframeOpts).count;
         const shift = Math.min(0.25, count * 0.05);
 
         return getGlitchBreakpointGroups(count, 0.5 - shift, 0.5 + shift);
@@ -63,8 +65,8 @@ export const GlitchExample = ({ keyframeOpts, weightType, ...otherProps }: Props
         return getRandomShifts(
             getBreakpointGroups().length,
             access(otherProps.lineCount),
-            access(keyframeOpts).shiftPercent,
-            access(keyframeOpts).chunkyness,
+            access(props.keyframeOpts).shiftPercent,
+            access(props.keyframeOpts).chunkyness,
         );
     };
 
@@ -96,7 +98,7 @@ export const GlitchExample = ({ keyframeOpts, weightType, ...otherProps }: Props
         <ScanlineAnimation
             {...otherProps}
             computeSliceWeights={(count) =>
-                SliceAnimationWeights.computeSliceWeights(access(weightType), count, WEIGHT_ORIGIN)
+                SliceAnimationWeights.computeSliceWeights(access(props.weightType), count, WEIGHT_ORIGIN)
             }
             computeRootAnimation={(timeline) => {
                 const breakpointGroups = getBreakpointGroups();

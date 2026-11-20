@@ -252,3 +252,24 @@ describe("computeMultiKeyAction", () => {
         ).toBeUndefined();
     });
 });
+
+describe("TreeUtils.expandSiblings when every sibling is open", () => {
+    it("hands back the same list, so nothing is written", () => {
+        const expanded = ["a"];
+        const siblings = [{ node: { value: "a", children: [{ value: "a1" }] }, depth: 0 }] as unknown as Parameters<
+            typeof TreeUtils.expandSiblings<string, unknown>
+        >[1];
+
+        expect(TreeUtils.expandSiblings(expanded, siblings)).toBe(expanded);
+    });
+});
+
+describe("TreeUtils.createBranchDefs through a disabled folder", () => {
+    it("lists the enabled file under a disabled sub-folder as part of the folder above", () => {
+        const defs = TreeUtils.createBranchDefs([
+            { value: "docs", children: [{ value: "archive", isDisabled: true, children: [{ value: "old" }] }] },
+        ]);
+
+        expect(defs.computeChildren("docs")).toEqual(["old"]);
+    });
+});

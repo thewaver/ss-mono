@@ -64,6 +64,7 @@ export const CornerPin = defineComponent(
 
             e.preventDefault();
             axisElements[corner]?.[QuadWarpUtils.AXES[0]]?.focus({ preventScroll: true });
+            focusVisible.value = undefined;
             stopGesture?.();
 
             const grip = e.currentTarget as HTMLElement;

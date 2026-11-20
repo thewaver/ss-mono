@@ -22,8 +22,8 @@ export namespace CarouselPlacementDefaults {
     };
 
     export const COVER_FLOW_DEFAULTS: Required<CoverFlowPlacementDefs> = {
-        spacingRatio: 0.18,
-        gapRatio: 0.28,
+        spacingRatio: 0.2,
+        gapRatio: 0.3,
         angleDegrees: 55,
         depthPx: 180,
         perspectivePx: 800,
@@ -47,12 +47,12 @@ export namespace CarouselPlacementDefaults {
 
     export const FOLDERS_DEFAULTS: Required<FoldersPlacementDefs> = {
         offsetRatio: 0.1,
-        scaleStep: 0.06,
+        scaleStep: 0.05,
         visibleDistance: 4,
     };
 
     export const HINGE_DEFAULTS: Required<HingePlacementDefs> = {
-        offsetRatio: 0.06,
+        offsetRatio: 0.05,
         depthPx: 30,
         perspectivePx: 900,
         visibleDistance: 4,

@@ -1,4 +1,4 @@
-import { createMemo } from "solid-js";
+import { createMemo, splitProps } from "solid-js";
 
 import {
     CellAnimationKeyframes,
@@ -15,23 +15,20 @@ import { themeVars } from "@thewaver/ss-playground/App/Theme.css";
 
 import type { ParticleFieldExampleProps } from "../ParticleFieldPage.types";
 
-export const DefaultExample = ({
-    originType,
-    weightType,
-    animationType,
-    holdShare,
-    isScattered,
-    ...otherProps
-}: ParticleFieldExampleProps &
-    Pick<ParticleFieldProps, "computeShapePoints" | "shapeJoinRadii" | "progress" | "renderer">) => {
+export const DefaultExample = (
+    props: ParticleFieldExampleProps &
+        Pick<ParticleFieldProps, "computeShapePoints" | "shapeJoinRadii" | "progress" | "renderer">,
+) => {
+    const [, otherProps] = splitProps(props, ["originType", "weightType", "animationType", "holdShare", "isScattered"]);
+
     const getSrc = createMemo(() =>
         ParticlePictureUtils.createDotSrc(themeVars.color.success.light, themeVars.color.success.dark),
     );
 
     const getAnimation = createMemo(() =>
         SliceAnimationKeyframeUtils.createEnvelope(
-            CellAnimationKeyframes.SAMPLE_ANIMATIONS[access(animationType)],
-            access(holdShare),
+            CellAnimationKeyframes.SAMPLE_ANIMATIONS[access(props.animationType)],
+            access(props.holdShare),
         ),
     );
 
@@ -39,15 +36,15 @@ export const DefaultExample = ({
         <ParticleField
             {...otherProps}
             src={getSrc}
-            origin={() => CellAnimationOrigins.computeOrigin(access(originType), access(otherProps.cellCount))}
+            origin={() => CellAnimationOrigins.computeOrigin(access(props.originType), access(otherProps.cellCount))}
             computeCellWeights={(count) =>
                 SliceAnimationWeights.computeSliceWeights(
-                    access(weightType),
+                    access(props.weightType),
                     count,
-                    CellAnimationOrigins.computeOrigin(access(originType), count),
+                    CellAnimationOrigins.computeOrigin(access(props.originType), count),
                 )
             }
-            computeParticlePos={(defs) => computeParticlePos(defs.rect, access(isScattered))}
+            computeParticlePos={(defs) => computeParticlePos(defs.rect, access(props.isScattered))}
             computeParticleAnimation={getAnimation()}
         />
     );

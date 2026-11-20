@@ -20,6 +20,8 @@ const computeUnnamedTagsWarning = (propName: string) =>
  * The field is a text input with the tags in front of it, each a button of its own. Focus walks between them by
  * the arrows, reading which way is back from the direction the text runs, so a right-to-left page walks mirrored.
  */
+const SPACE_KEY = " ";
+
 export namespace TagInputUtils {
     /**
      * Warns, in the console, that a tag field has no way to name its tags.
@@ -33,7 +35,8 @@ export namespace TagInputUtils {
      * @param propName What the caller's framework calls the prop, so the warning names what they actually wrote.
      */
     export const warnIfTagsUnnamed = (computeTagAriaLabel: ((tag: string) => string) | undefined, propName: string) => {
-        if (!computeTagAriaLabel) console.warn(computeUnnamedTagsWarning(propName));
+        if (process.env.NODE_ENV !== "production" && !computeTagAriaLabel)
+            console.warn(computeUnnamedTagsWarning(propName));
     };
 
     /**
@@ -95,7 +98,8 @@ export namespace TagInputUtils {
      * What a key pressed on a tag does.
      *
      * A printable key hands focus back to the field and is left to land there, since typing is the only thing a
-     * letter pressed on a tag could mean. Backspace and Delete remove the tag. The arrows walk the tags, the one
+     * letter pressed on a tag could mean. Space is left to the tag, a button, so it presses it as Enter does and
+     * removes it. Backspace and Delete remove the tag. The arrows walk the tags, the one
      * pointing forward returning to the field from the last tag; the one pointing back stops at the first. Every
      * other key does nothing here.
      *
@@ -110,6 +114,7 @@ export namespace TagInputUtils {
         index: number,
         state: { tagCount: number; direction: NavigatorDirection },
     ): TagInputKeyAction | undefined => {
+        if (e.key === SPACE_KEY) return undefined;
         if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) return { kind: "focus_field", isTyping: true };
 
         if (REMOVE_KEYS.includes(e.key)) return { kind: "remove", index };

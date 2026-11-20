@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { type MaskedFieldDefs, MaskedFieldUtils } from "@thewaver/ss-components";
 
@@ -58,7 +58,14 @@ export namespace MaskedFieldReactUtils {
             if (typed) commit(typed.value);
         };
 
+        const lastValueRef = useRef(defs.value);
+
         useEffect(() => {
+            const last = lastValueRef.current;
+
+            lastValueRef.current = defs.value;
+
+            if (defs.value !== last && defs.getIsSame(defs.value, last)) return;
             if (defs.getIsSame(defs.value, defs.fromDigits(digits))) return;
 
             refresh();

@@ -433,6 +433,8 @@ const runExecutor = (
         return texture;
     };
 
+    const drawnTextures = new Set<WebGLTexture>();
+
     const getTexture = (current: ExecutorResources, picture: number, width: number, height: number) => {
         const source = sources.get(picture);
 
@@ -440,16 +442,28 @@ const runExecutor = (
 
         const bySource = current.textures.get(picture) ?? new Map<string, WebGLTexture>();
         const key = `${width}x${height}`;
-        const existing = bySource.get(key);
-
-        if (existing) return existing;
-
-        const texture = uploadTexture(source, width, height);
+        const texture = bySource.get(key) ?? uploadTexture(source, width, height);
 
         bySource.set(key, texture);
         current.textures.set(picture, bySource);
+        drawnTextures.add(texture);
 
         return texture;
+    };
+
+    const releaseUndrawnTextures = (current: ExecutorResources) => {
+        for (const [picture, bySource] of current.textures) {
+            for (const [key, texture] of bySource) {
+                if (drawnTextures.has(texture)) continue;
+
+                gl.deleteTexture(texture);
+                bySource.delete(key);
+            }
+
+            if (bySource.size === 0) current.textures.delete(picture);
+        }
+
+        drawnTextures.clear();
     };
 
     const drawLayers = (item: ExecutorItem, channelMode: number, count: number) => {
@@ -650,6 +664,8 @@ const runExecutor = (
             picture.close();
             start = end;
         }
+
+        releaseUndrawnTextures(current);
 
         const buffers = giveBack(message);
 
@@ -1023,9 +1039,10 @@ const requestPictureEntry = (src: string, onSettled: () => void) => {
         .catch(() =>
             loadImage(src, false)
                 .then((image) => {
-                    console.warn(
-                        `SliceRenderer: the server of ${src} gives no cross-origin permission, so the graphics card may not draw it and it is drawn with page elements instead.`,
-                    );
+                    if (process.env.NODE_ENV !== "production")
+                        console.warn(
+                            `SliceRenderer: the server of ${src} gives no cross-origin permission, so the graphics card may not draw it and it is drawn with page elements instead.`,
+                        );
                     settlePicture(entry, "unshareable", image);
                 })
                 .catch(() => settlePicture(entry, "broken", undefined)),
@@ -1035,7 +1052,7 @@ const requestPictureEntry = (src: string, onSettled: () => void) => {
 };
 
 const checkFrames = (src: string) => {
-    if (framesChecked.has(src)) return;
+    if (process.env.NODE_ENV === "production" || framesChecked.has(src)) return;
 
     framesChecked.add(src);
 
@@ -1090,6 +1107,17 @@ const getPictureId = (current: Host, src: string, image: HTMLImageElement, size:
     current.link.send({ type: "setPicture", id, source });
 
     return id;
+};
+
+const capToTextureSize = (size: Size2d, maxTextureSize: number): Size2d => {
+    const ratio = Math.min(1, maxTextureSize / Math.max(size.width, size.height, 1));
+
+    return ratio === 1
+        ? size
+        : {
+              width: Math.max(1, Math.floor(size.width * ratio)),
+              height: Math.max(1, Math.floor(size.height * ratio)),
+          };
 };
 
 const getSpriteSize = (image: HTMLImageElement): Size2d => {
@@ -1319,7 +1347,7 @@ const writePlacement = (
         width: Math.max(1, Math.round(sliceFrame.size.width * sliceFrame.scale)),
         height: Math.max(1, Math.round(sliceFrame.size.height * sliceFrame.scale)),
     };
-    const textureSize = isSprite ? getSpriteSize(image) : sliceSize;
+    const textureSize = capToTextureSize(isSprite ? getSpriteSize(image) : sliceSize, current.maxTextureSize);
     const picture = getPictureId(current, sliceFrame.src, image, textureSize);
 
     if (picture === undefined) return;
@@ -1374,6 +1402,17 @@ const writePlacement = (
     ints[at + PLACEMENT.easingRow] = item.easingRow;
 };
 
+const reportedItems = new WeakSet<object>();
+
+const reportPlacementError = (item: object, error: unknown) => {
+    if (reportedItems.has(item)) return;
+
+    reportedItems.add(item);
+    queueMicrotask(() => {
+        throw error;
+    });
+};
+
 const flush = () => {
     flushId = undefined;
 
@@ -1419,10 +1458,15 @@ const flush = () => {
                 height: height / sliceFrame.scale,
             };
 
-            writePlacement(current, placement, frame.placements, ints, at, frame);
-            shows.push(() => {
-                if (!item.isDisposed) onShown(rect);
-            });
+            try {
+                writePlacement(current, placement, frame.placements, ints, at, frame);
+                shows.push(() => {
+                    if (!item.isDisposed) onShown(rect);
+                });
+            } catch (error) {
+                reportPlacementError(item, error);
+            }
+
             at += current.stride;
         }
 
@@ -1687,13 +1731,15 @@ export namespace SliceRendererUtils {
         const draw = (frame: SliceRendererFrame, onShown: (rect: Rect) => void) => {
             if (item.isDisposed || current.isLost || current.generation !== item.generation) return;
 
-            submit({
-                item,
-                frame,
-                width: Math.max(1, Math.round(frame.area.width * frame.scale)),
-                height: Math.max(1, Math.round(frame.area.height * frame.scale)),
-                onShown,
-            });
+            const drawn = capToTextureSize(
+                {
+                    width: Math.max(1, Math.round(frame.area.width * frame.scale)),
+                    height: Math.max(1, Math.round(frame.area.height * frame.scale)),
+                },
+                current.maxTextureSize,
+            );
+
+            submit({ item, frame, width: drawn.width, height: drawn.height, onShown });
         };
 
         const dispose = () => {

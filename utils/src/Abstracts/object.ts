@@ -6,7 +6,7 @@ import type { DeepPartial } from "../TypeScript/typeUtils.js";
  * Returning this instead of a fresh `[]` keeps the reference stable between calls,
  * which stops React hooks and memo comparisons from seeing a "change" every render.
  */
-export const EMPTY_ARRAY = [] as const;
+export const EMPTY_ARRAY = Object.freeze([] as const);
 
 /**
  * A frozen empty object, safe to use as a default value.
@@ -14,7 +14,7 @@ export const EMPTY_ARRAY = [] as const;
  * Returning this instead of a fresh `{}` keeps the reference stable between calls,
  * which stops React hooks and memo comparisons from seeing a "change" every render.
  */
-export const EMPTY_OBJECT = {} as const;
+export const EMPTY_OBJECT = Object.freeze({} as const);
 
 const isPlainObject = (value: unknown): value is Record<string, unknown> => {
     if (value === null || typeof value !== "object") return false;
@@ -46,6 +46,11 @@ const mergeOne = <T extends object>(base: T, override: DeepPartial<T> | undefine
     return result as T;
 };
 
+/** How many entries an object, array, `Map` or `Set` holds. */
+const getEntryCount = (value: object) =>
+    value instanceof Map || value instanceof Set ? value.size : Object.keys(value).length;
+
+/** Working with objects and arrays: merging, filtering, picking at random and stepping through a list. */
 export namespace ObjectUtils {
     /**
      * Treats any two empty objects or arrays as equal, and otherwise compares by reference.
@@ -57,7 +62,7 @@ export namespace ObjectUtils {
      */
     export const sameIfEmpty = <T extends object>(obj1: T, obj2: T): boolean => {
         if (!obj1 || !obj2) return obj1 === obj2;
-        if (Object.keys(obj1).length + Object.keys(obj2).length === 0) return true;
+        if (getEntryCount(obj1) + getEntryCount(obj2) === 0) return true;
         return obj1 === obj2;
     };
 
@@ -104,14 +109,14 @@ export namespace ObjectUtils {
      *
      * @param a The array to draw from. It is never modified.
      * @param count How many entries to draw. Asking for at least as many as exist
-     * returns a shuffled copy of everything.
+     * returns a shuffled copy of everything; asking for none, or fewer, returns none.
      * @returns A new array. Uses `Math.random`, so this is not suitable for anything
      * security-related.
      */
     export const getRandomArrayValues = <T>(a: Array<T>, count: number = 1): T[] => {
         const result = [] as T[];
         const newA = [...a];
-        const drawCount = Math.min(Math.max(count, 1), newA.length);
+        const drawCount = Math.min(Math.max(count, 0), newA.length);
 
         for (let i = 0; i < drawCount; i++) {
             const idx = Math.floor(Math.random() * newA.length);
@@ -222,7 +227,7 @@ export namespace ObjectUtils {
      * @returns The previous entry, or `undefined` if there is none.
      */
     export const getPrevArrayElement = <T>(currentKey: T | undefined, allKeys: T[]): T | undefined => {
-        if (!currentKey) return allKeys.at(-1);
+        if (currentKey === undefined) return allKeys.at(-1);
 
         const currentIdx = allKeys.indexOf(currentKey);
 
@@ -238,7 +243,7 @@ export namespace ObjectUtils {
      * @returns The next entry, or `undefined` if there is none.
      */
     export const getNextArrayElement = <T>(currentKey: T | undefined, allKeys: T[]): T | undefined => {
-        if (!currentKey) return allKeys.at(0);
+        if (currentKey === undefined) return allKeys.at(0);
 
         const currentIdx = allKeys.indexOf(currentKey);
 
@@ -304,11 +309,13 @@ export namespace ObjectUtils {
      * asked for, counted in the finished array.
      *
      * @param arr The array. It is never modified.
-     * @param fromIndex Where the entry is now.
+     * @param fromIndex Where the entry is now. Outside the array, nothing moves.
      * @param toIndex Where it ends up. Past the end puts it last.
      * @returns A new array of the same length.
      */
     export const moveArrayElement = <T>(arr: readonly T[], fromIndex: number, toIndex: number): T[] => {
+        if (fromIndex < 0 || fromIndex >= arr.length) return [...arr];
+
         const rest = arr.filter((_unused, index) => index !== fromIndex);
 
         return [...rest.slice(0, toIndex), arr[fromIndex], ...rest.slice(toIndex)];

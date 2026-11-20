@@ -67,8 +67,12 @@ test("each kind of source reaches the cells", async ({ page }) => {
 /**
  * Markup that parses is not markup that paints — a def serialized without the element it refers to would
  * still load as a blank image, and the cells would slice nothing while looking entirely healthy. So this
- * draws each source and counts what came out.
+ * draws each source and counts what came out. An empty box draws one color, transparent, and a flat fill at most
+ * two, with its edge. A pattern's own colors are few, and WebKit draws its tiles with crisp edges where Chrome
+ * softens them into many shades, so the pattern is asked only for more than a flat fill gives.
  */
+const FLAT_FILL_COLORS = 2;
+
 test("a serialized def paints, rather than merely loading", async ({ page }) => {
     const inspect = (selector: string) =>
         page.evaluate(async (selector) => {
@@ -110,7 +114,10 @@ test("a serialized def paints, rather than merely loading", async ({ page }) => 
     expect(drawn.gradient.loaded, "the gradient source has an intrinsic size, so it can anchor the box").toBe(1200);
     expect(drawn.gradient.distinct, "and it is a spread of colors rather than one flat fill").toBeGreaterThan(10);
     expect(drawn.pattern.loaded).toBe(1200);
-    expect(drawn.pattern.distinct, "the pattern paints its cells rather than an empty box").toBeGreaterThan(10);
+    expect(
+        drawn.pattern.distinct,
+        "the pattern paints its cells rather than an empty box or one flat fill",
+    ).toBeGreaterThan(FLAT_FILL_COLORS);
 });
 
 /**

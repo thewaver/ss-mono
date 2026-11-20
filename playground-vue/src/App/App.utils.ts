@@ -9,9 +9,9 @@ import { MENU_DESCRIPTIONS } from "@thewaver/ss-playground/App/MenuDescriptions.
 import {
     EXAMPLES_VIEW,
     PAGE_VIEW_KEYS,
+    toComponentRoute,
     toPageViewRoute,
 } from "@thewaver/ss-playground/App/PageComponents/ViewTabs/ViewTabs.const";
-import { StringUtils } from "@thewaver/ss-utils";
 
 import type { ComponentConfig, MenuBranchConfig, MenuNodeConfig } from "./App.types";
 import { DEPENDENCY_GROUPS, LIST_PAGELESS_COMPONENTS, MENU_CONFIGS, PREVIEW_EXCLUDED_PAGES } from "./AppVue.const";
@@ -24,7 +24,7 @@ import PageTooltipContent from "./StyledComponents/TooltipContent/TooltipContent
 export namespace AppUtils {
     export const getIsBranchConfig = (node: MenuNodeConfig): node is MenuBranchConfig => "children" in node;
 
-    export const componentToRouteName = (name: string) => `/${StringUtils.camelToKebabCase(name)}`;
+    export const componentToRouteName = (name: string) => toComponentRoute(name);
 
     export const getIsMenuFaded = (phase: SidebarPhase) => phase === "collapsing" || phase === "collapsed";
 

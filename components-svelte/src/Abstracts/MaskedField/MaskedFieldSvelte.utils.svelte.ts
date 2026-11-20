@@ -71,10 +71,16 @@ export namespace MaskedFieldSvelteUtils {
             });
         };
 
+        let lastValue: T | undefined;
+
         $effect(() => {
             const value = defs.getValue();
+            const last = lastValue;
+
+            lastValue = value;
 
             untrack(() => {
+                if (value !== last && defs.getIsSame(value, last)) return;
                 if (defs.getIsSame(value, defs.fromDigits(digits))) return;
 
                 refresh();

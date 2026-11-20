@@ -1,9 +1,9 @@
 import type { TileBoardTilingKind } from "@thewaver/ss-components";
-import type { Index2d, Index2dString, Size2d } from "@thewaver/ss-utils";
+import type { Count2d, Index2d, Index2dString, Size2d } from "@thewaver/ss-utils";
 
 export type TileBoardExampleProps = {
     ariaLabel: string;
-    tileCount: Index2d;
+    tileCount: Count2d;
     tileSize: Size2d;
     gap: number;
     shape: TileBoardTilingKind;

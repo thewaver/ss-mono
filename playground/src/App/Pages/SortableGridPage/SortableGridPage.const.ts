@@ -1,4 +1,4 @@
-import type { SortableGridFootprint, SortableGridSpot } from "@thewaver/ss-components";
+import type { SortableGridFootprint, SortableGridSize, SortableGridSpot } from "@thewaver/ss-components";
 
 import type { Gear, GearEntry, GearPlacement } from "./SortableGridPage.types";
 
@@ -50,6 +50,9 @@ const gear = (
 export const computeGearKey = (value: Gear) => value.id;
 
 export const computeGearLabel = (value: Gear) => value.name;
+
+export const computeGearAriaLabel = (value: Gear, size: SortableGridSize, spot: SortableGridSpot) =>
+    `${value.name}, ${size.colCount} by ${size.rowCount}, column ${spot.col + 1}, row ${spot.row + 1}`;
 
 export const computeGearHue = (value: Gear) =>
     [...value.id].reduce((total, letter) => (total + letter.charCodeAt(0) * HUE_STEP) % HUE_COUNT, 0);

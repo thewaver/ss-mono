@@ -1,4 +1,4 @@
-import { createMemo } from "solid-js";
+import { createMemo, splitProps } from "solid-js";
 
 import {
     ScanlineAnimation,
@@ -22,16 +22,20 @@ type Props = ScanlineAnimationExampleProps &
         keyframeOpts: ScanlineHorizontalInterlaceOpts;
     }>;
 
-export const InterlaceExample = ({ keyframeOpts, breakpointOpts, weightType, ...otherProps }: Props) => {
-    const getAnimation = createMemo(() => ScanlineAnimationKeyframes.createHorizontalInterlace(access(keyframeOpts)));
+export const InterlaceExample = (props: Props) => {
+    const [, otherProps] = splitProps(props, ["keyframeOpts", "breakpointOpts", "weightType"]);
+
+    const getAnimation = createMemo(() =>
+        ScanlineAnimationKeyframes.createHorizontalInterlace(access(props.keyframeOpts)),
+    );
 
     return (
         <ScanlineAnimation
             {...otherProps}
             computeSliceWeights={(count) =>
-                SliceAnimationWeights.computeSliceWeights(access(weightType), count, WEIGHT_ORIGIN)
+                SliceAnimationWeights.computeSliceWeights(access(props.weightType), count, WEIGHT_ORIGIN)
             }
-            breakpointOpts={breakpointOpts}
+            breakpointOpts={props.breakpointOpts}
             computeSliceAnimation={getAnimation()}
         />
     );

@@ -366,3 +366,31 @@ describe("createWhorl", () => {
         ).toBeCloseTo(0);
     });
 });
+
+describe("createRing holding one item", () => {
+    it("gives it a box at least as wide as two items each get", () => {
+        const one = PlacementLayoutUtils.createRing()({ ...ROOT, itemCount: 1 });
+        const two = PlacementLayoutUtils.createRing()({ ...ROOT, itemCount: 2 });
+
+        expect(one.placements[0].widthShare).toBeGreaterThanOrEqual(two.placements[0].widthShare);
+    });
+});
+
+describe("createZigzag with one item per leg", () => {
+    it("places every item at a number, in one straight line", () => {
+        const layout = PlacementLayoutUtils.createZigzag({ segmentLength: 1 })({ itemCount: 3 });
+        const lefts = layout.placements.map((placement) => placement.leftShare);
+
+        expect(lefts.every(Number.isFinite)).toBe(true);
+        expect(new Set(lefts).size).toBe(1);
+    });
+});
+
+describe("createHoneycomb with no items", () => {
+    it("answers no height, as the row layout does, rather than an infinite one", () => {
+        const layout = PlacementLayoutUtils.createHoneycomb()({ ...ROOT, itemCount: 0 });
+
+        expect(layout.heightRatio).toBe(0);
+        expect(layout.placements).toEqual([]);
+    });
+});

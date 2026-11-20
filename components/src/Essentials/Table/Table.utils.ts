@@ -22,8 +22,6 @@ import type {
 const CANCEL_KEY = "Escape";
 /** What a repeated press of a column header steps through: up, down, then unsorted. */
 const SORT_CYCLE: (TableSortDirection | undefined)[] = ["ascending", "descending", undefined];
-/** The open rows when none is open, one array so an unchanged answer is the same array. */
-const NO_EXPANDED_ROWS: number[] = [];
 
 /** How many of a sorted list of rows come before a row. */
 const countBefore = (sortedRows: number[], row: number) => {
@@ -206,7 +204,7 @@ export namespace TableUtils {
         expanded: T[],
         computeIsExpandable: ((row: T) => boolean) | undefined,
     ) => {
-        if (expanded.length < 1) return NO_EXPANDED_ROWS;
+        if (expanded.length < 1) return EMPTY_EXPANDED_ROWS;
 
         const open = new Set(expanded);
         const found = rows.reduce<number[]>((acc, row, index) => {
@@ -215,7 +213,7 @@ export namespace TableUtils {
             return acc;
         }, []);
 
-        return found.length < 1 ? NO_EXPANDED_ROWS : found;
+        return found.length < 1 ? EMPTY_EXPANDED_ROWS : found;
     };
 
     /**
@@ -412,6 +410,9 @@ export namespace TableUtils {
     /** What ARIA counts rows and columns from. */
     export const FIRST_ARIA_INDEX = 1;
 
+    /** The open rows when none is open: always this one array, so an unchanged answer is the same array. */
+    export const EMPTY_EXPANDED_ROWS: number[] = [];
+
     /**
      * The id a cell carries, so the grid can move focus to it by position.
      *
@@ -481,9 +482,9 @@ export namespace TableUtils {
     ): TableKeyCommand | undefined => {
         if (grid.colCount < 1) return undefined;
 
-        const expandedRows = opts.expandedRows ?? NO_EXPANDED_ROWS;
+        const expandedRows = opts.expandedRows ?? EMPTY_EXPANDED_ROWS;
 
-        if (e.key === "a" && (e.ctrlKey || e.metaKey)) return { kind: "select_all" };
+        if (e.key.toLowerCase() === "a" && (e.ctrlKey || e.metaKey)) return { kind: "select_all" };
 
         if (e.ctrlKey && (e.key === "Home" || e.key === "End")) {
             return {
@@ -570,7 +571,7 @@ export namespace TableUtils {
     };
 
     /**
-     * The width a resize drag asks for, from where it started and how far the pointer has travelled.
+     * The width a resize drag asks for, from where it started and how far the pointer has traveled.
      *
      * @param startWidth The column's width when the drag began.
      * @param travel How far the pointer has moved along the row, in client pixels, rightwards positive.
@@ -764,6 +765,8 @@ export namespace TableUtils {
         column: TableColumnDefs<T>,
         found: { isReorderable: boolean; hasSortControl: boolean; hasReorderGrip: boolean },
     ) => {
+        if (process.env.NODE_ENV === "production") return;
+
         if (column.isSortable === true && !found.hasSortControl) {
             console.warn(
                 `Table: column "${column.id}" is sortable but its header renders no TableHeaderSort, so a pointer cannot sort it — only Enter on the header cell can.`,
@@ -782,9 +785,10 @@ export namespace TableUtils {
      * cannot open one and only Enter on a row's first cell can.
      */
     export const warnIfExpanderMissing = () => {
-        console.warn(
-            "Table: its rows can open a detail but no row renders a TableRowExpander, so a pointer cannot open one — only Enter on a row's first cell can.",
-        );
+        if (process.env.NODE_ENV !== "production")
+            console.warn(
+                "Table: its rows can open a detail but no row renders a TableRowExpander, so a pointer cannot open one — only Enter on a row's first cell can.",
+            );
     };
 
     /**
@@ -793,9 +797,10 @@ export namespace TableUtils {
      * @param control The control's name, for the message.
      */
     export const warnOutsideCell = (control: string) => {
-        console.warn(
-            `${control}: no Table body cell around it — it has no row to act on and renders nothing. Render it from a column's renderCell.`,
-        );
+        if (process.env.NODE_ENV !== "production")
+            console.warn(
+                `${control}: no Table body cell around it — it has no row to act on and renders nothing. Render it from a column's renderCell.`,
+            );
     };
 
     /**
@@ -804,8 +809,9 @@ export namespace TableUtils {
      * @param control The control's name, for the message.
      */
     export const warnOutsideHeader = (control: string) => {
-        console.warn(
-            `${control}: no Table header cell around it — it has no column to act on and renders nothing. Render it from a column's renderHeader.`,
-        );
+        if (process.env.NODE_ENV !== "production")
+            console.warn(
+                `${control}: no Table header cell around it — it has no column to act on and renders nothing. Render it from a column's renderHeader.`,
+            );
     };
 }

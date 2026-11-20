@@ -99,3 +99,9 @@ describe("mergeFlags", () => {
         expect(TextFieldUtils.mergeFlags([])).toMatchObject({ isHovered: false, isReadOnly: false, isEmpty: true });
     });
 });
+
+describe("computeSpinValue with only spaces", () => {
+    it("announces no value for text of only spaces", () => {
+        expect(TextFieldUtils.computeSpinValue("   ")).toBeUndefined();
+    });
+});

@@ -12,6 +12,8 @@ components carry the same names and the same props, with plain values where Soli
 Solid takes a signal — `value`, `visibility` and the rest are named the same in both, so `v-model:value` is the
 two-way form of `value`. A `render*` callback in Solid is a slot of the same name in Vue.
 
+**Browser only: drawing these components on a server — Next.js, Nuxt, SvelteKit, SolidStart — is not tested.**
+
 ## Install
 
 ```

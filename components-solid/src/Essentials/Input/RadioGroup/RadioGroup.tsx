@@ -35,7 +35,13 @@ export const RadioGroup = <T,>(props: RadioGroupProps<T>) => {
         () => access(props.transitionDurationMs) ?? RADIO_GROUP_DEFAULTS.transitionDurationMs,
     );
 
-    const getOrderedEntries = createMemo(() => RadioGroupUtils.orderEntries(getEntries()));
+    const [getOrderVersion, setOrderVersion] = createSignal(0);
+
+    const getOrderedEntries = createMemo(() => {
+        getOrderVersion();
+
+        return RadioGroupUtils.orderEntries(getEntries());
+    });
 
     const getNavigableEntries = createMemo(() => RadioGroupUtils.computeNavigableEntries(getOrderedEntries()));
 
@@ -97,6 +103,7 @@ export const RadioGroup = <T,>(props: RadioGroupProps<T>) => {
                 setEntries((prev) => prev.filter((item) => item !== entry));
             });
         },
+        reorder: () => setOrderVersion((prev) => prev + 1),
     };
 
     const handleKeyDown = (e: KeyboardEvent) => {

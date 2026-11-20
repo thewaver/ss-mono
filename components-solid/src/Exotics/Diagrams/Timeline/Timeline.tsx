@@ -17,6 +17,7 @@ import {
     type CarryMode,
     type CarryPlace,
     LiveAnnouncerUtils,
+    NavigatorUtils,
     PanZoomUtils,
     TIMELINE_DEFAULTS,
     type TimelineEdge,
@@ -145,6 +146,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
         getView,
         getRange,
         getSpans,
+        getItems,
         getStep: () => getSteps().step,
         computePointerRatio: (clientX) => getPointerRatio(clientX),
         get computeSnapValue() {
@@ -157,7 +159,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
 
     const getEdgeCarry = () => (CarrierSolidUtils.getSourceZone() === zone ? CarrierSolidUtils.getCarry() : undefined);
 
-    const getHeldIndex = createMemo(() => TimelineUtils.getCarriedIndex(getEdgeCarry()));
+    const getHeldIndex = createMemo(() => TimelineUtils.getCarriedIndex(getEdgeCarry(), getItems()));
 
     const getShownSpans = createMemo(() =>
         TimelineUtils.computeShownSpans(
@@ -308,6 +310,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
                 timelineId,
                 index,
                 props.computeItemAriaLabel?.(getItems()[index], index) ?? "",
+                getItems()[index],
             ),
             mode,
         );
@@ -377,7 +380,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
     const handleKeyDown = (e: KeyboardEvent) => {
         const from = getRovingIndex();
 
-        if (from === undefined || getIsDisabled()) return;
+        if (from === undefined || getIsDisabled() || NavigatorUtils.getHasCommandModifier(e)) return;
 
         const action = TimelineUtils.computeKeyAction(e.key, {
             isHolding: !!getEdgeCarry() && CarrierSolidUtils.getCarryMode() !== "drag",

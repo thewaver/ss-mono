@@ -11,7 +11,7 @@
     } from "@thewaver/ss-components-svelte";
     import type { SliceAnimationPlaybackOpts } from "@thewaver/ss-components-svelte";
     import * as styles from "@thewaver/ss-playground/App/Pages/CellAnimationPage/CellAnimationPage.css";
-    import type { Index2d, Size2d } from "@thewaver/ss-utils";
+    import type { Count2d, Size2d } from "@thewaver/ss-utils";
 
     import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.svelte";
     import type { CellAnimationExampleProps } from "../CellAnimationPage.types";
@@ -41,9 +41,9 @@
 
     let wipeSize = $state.raw<Size2d>();
 
-    const cellCount: Index2d = $derived({
-        col: Math.ceil((wipeSize?.width ?? 0) / WIPE_CELL_SIZE),
-        row: Math.ceil((wipeSize?.height ?? 0) / WIPE_CELL_SIZE),
+    const cellCount: Count2d = $derived({
+        colCount: Math.ceil((wipeSize?.width ?? 0) / WIPE_CELL_SIZE),
+        rowCount: Math.ceil((wipeSize?.height ?? 0) / WIPE_CELL_SIZE),
     });
 
     const origin = $derived(CellAnimationOrigins.computeOrigin(props.originType, cellCount));

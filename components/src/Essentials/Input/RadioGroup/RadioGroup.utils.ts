@@ -28,7 +28,7 @@ export namespace RadioGroupUtils {
      * @param hasGroup Whether a group was found.
      */
     export const warnIfOrphaned = (hasGroup: boolean) => {
-        if (hasGroup) return;
+        if (process.env.NODE_ENV === "production" || hasGroup) return;
 
         console.warn(
             "Radio: no RadioGroup ancestor found — the radio cannot read or write a selection, and mutual exclusion, arrow-key navigation and the group's single tab stop are all inert.",
@@ -39,14 +39,15 @@ export namespace RadioGroupUtils {
      * The entries in the order their radios appear in the document.
      *
      * Registration order is whatever order the radios were made in, which a list rendered conditionally or reordered
-     * does not keep; the document order is what a reader walks. It can only be read once every radio has an element,
-     * so until then the registration order stands.
+     * does not keep; the document order is what a reader walks. It can only be read once every radio's element is in
+     * the document, since a detached element has no position to compare, so until then the registration order stands
+     * and the caller sorts again once the newcomers are in.
      *
      * @param entries The entries, in the order they registered.
-     * @returns A new list in document order, or `entries` itself while any radio has no element yet.
+     * @returns A new list in document order, or `entries` itself while any radio's element is missing or detached.
      */
     export const orderEntries = (entries: RadioGroupEntry[]) => {
-        if (entries.some((entry) => entry.getElementRef() === undefined)) return entries;
+        if (entries.some((entry) => !(entry.getElementRef()?.isConnected ?? false))) return entries;
 
         return [...entries].sort((a, b) =>
             a.getElementRef()!.compareDocumentPosition(b.getElementRef()!) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1,

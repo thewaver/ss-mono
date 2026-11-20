@@ -7,6 +7,10 @@ export const scratchCardRoot = style({
     overflow: "hidden",
 });
 
+export const scratchCardContent = style({
+    display: "contents",
+});
+
 export const scratchCardDefs = style({
     position: "absolute",
     width: 0,

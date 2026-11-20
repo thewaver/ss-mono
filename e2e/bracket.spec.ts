@@ -1,6 +1,6 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { example, prop, readout } from "./helpers";
+import { example, prop, readout, tabKey } from "./helpers";
 
 /**
  * The layout is arithmetic over a tree, so the checks are relationships between placed nodes — a parent
@@ -19,16 +19,49 @@ const CONNECTOR = `${BOARD} svg path`;
 
 const SETTLE_MS = 150;
 
+/**
+ * A knob changes what the page draws in the next frame or two, and what a test then reads is the page as drawn, so
+ * the helpers below return once two readings of it, a poll apart, are the same: the markup, and where every node and
+ * drawing is on screen, since a glide moves things without touching the markup.
+ */
+const untilStill = async (page: Page) => {
+    let previous: string | undefined;
+
+    await expect
+        .poll(
+            async () => {
+                const current = await page.evaluate(
+                    () =>
+                        document.body.innerHTML +
+                        [...document.querySelectorAll("li, svg")]
+                            .map((element) => {
+                                const box = element.getBoundingClientRect();
+
+                                return `${box.left},${box.top},${box.width},${box.height}`;
+                            })
+                            .join(";"),
+                );
+                const isStill = current === previous;
+
+                previous = current;
+
+                return isStill;
+            },
+            { message: "the board has stopped changing" },
+        )
+        .toBe(true);
+};
+
 const pick = async (page: Page, key: string, option: string) => {
     await page.locator(`${prop(key)} [role="combobox"]`).click();
     await page.locator('[role="listbox"] [role="option"]', { hasText: option }).first().click();
-    await page.waitForTimeout(SETTLE_MS);
+    await untilStill(page);
 };
 
 const setField = async (page: Page, key: string, value: string) => {
     await page.locator(`${prop(key)} input`).fill(value);
     await page.locator(`${prop(key)} input`).blur();
-    await page.waitForTimeout(SETTLE_MS);
+    await untilStill(page);
 };
 
 const readNodes = (page: Page, scope = BOARD) =>
@@ -235,7 +268,7 @@ test("widening the row gap moves the leaves apart and takes their parents with t
 
 test("the board is one tab stop, and the arrows walk a layer and step between layers", async ({ page }) => {
     await page.locator(`${BOARD} button`).first().focus();
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
 
     const entered = await page.evaluate(() => (document.activeElement?.textContent ?? "").trim());
 
@@ -262,7 +295,7 @@ test("the board is one tab stop, and the arrows walk a layer and step between la
 
 test("a node that cannot be picked is not one of the stops", async ({ page }) => {
     await page.locator(`${BOARD} button`).first().focus();
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
     await page.keyboard.press("End");
 
     const last = await page.evaluate(() => (document.activeElement?.textContent ?? "").trim());
@@ -412,7 +445,7 @@ test("clicking away clears the route, and tabbing back in brings it back", async
     expect(new Set((await connectorPaints(page)).map((connector) => connector.paint)).size, "and no connector").toBe(1);
 
     await page.locator(`${BOARD} button`).first().focus();
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
 
     expect(
         await page.evaluate(() => (document.activeElement?.textContent ?? "").trim()),
@@ -442,7 +475,7 @@ test("round headers make one list per round, each named by its header", async ({
         const list = lists.nth(layer);
         const headerId = await list.getAttribute("aria-labelledby");
 
-        expect(headerId, `layer ${layer} is labelled by something`).toBeTruthy();
+        expect(headerId, `layer ${layer} is labeled by something`).toBeTruthy();
 
         const header = page.locator(`[id="${headerId}"]`);
         const headerText = ((await header.textContent()) ?? "").trim();
@@ -826,43 +859,48 @@ test("the round names stay pinned to the frame's leading edge wherever the camer
 /**
  * A pinned round name floats over the draw, so a node the frame shows at its very edge can sit under its round's
  * name. The name is not something to press, so the node under it still takes the pointer. Read as a press at a point
- * inside both a name and a node, which has to land on the node; the vertical board on the root's family is where the
- * frame puts a quarter-final under the name strip.
+ * inside a name, a node and the frame at once, which has to land on the node; the board as it loads, on the root's
+ * family, is where the frame puts a quarter-final under the name strip.
  */
 test("a node under a pinned round name still takes a press there", async ({ page }) => {
-    await pick(page, "orientation", "vertical");
     await page.locator(FAMILY_FRAME).scrollIntoViewIfNeeded();
 
     const findOverlap = () =>
-        page.evaluate((scope) => {
-            const names = [...document.querySelectorAll(`${scope} [id*="-layer-"]`)].map((header) =>
-                header.firstElementChild!.getBoundingClientRect(),
-            );
+        page.evaluate(
+            ({ scope, frame }) => {
+                const bounds = document.querySelector(frame)!.getBoundingClientRect();
+                const names = [...document.querySelectorAll(`${scope} [id*="-layer-"]`)].map((header) =>
+                    header.firstElementChild!.getBoundingClientRect(),
+                );
 
-            for (const node of document.querySelectorAll(`${scope} li [role="button"]`)) {
-                const box = node.getBoundingClientRect();
+                for (const node of document.querySelectorAll(`${scope} li [role="button"]`)) {
+                    const box = node.getBoundingClientRect();
 
-                for (const name of names) {
-                    const left = Math.max(box.left, name.left);
-                    const right = Math.min(box.right, name.right);
-                    const top = Math.max(box.top, name.top);
-                    const bottom = Math.min(box.bottom, name.bottom);
+                    for (const name of names) {
+                        const left = Math.max(box.left, name.left, bounds.left);
+                        const right = Math.min(box.right, name.right, bounds.right);
+                        const top = Math.max(box.top, name.top, bounds.top);
+                        const bottom = Math.min(box.bottom, name.bottom, bounds.bottom);
 
-                    if (right - left > 4 && bottom - top > 4) {
-                        return {
-                            text: (node.textContent ?? "").trim(),
-                            x: (left + right) * 0.5,
-                            y: (top + bottom) * 0.5,
-                        };
+                        if (right - left > 4 && bottom - top > 4) {
+                            return {
+                                text: (node.textContent ?? "").trim(),
+                                x: (left + right) * 0.5,
+                                y: (top + bottom) * 0.5,
+                            };
+                        }
                     }
                 }
-            }
 
-            return undefined;
-        }, FAMILY);
+                return undefined;
+            },
+            { scope: FAMILY, frame: FAMILY_FRAME },
+        );
 
     await expect
-        .poll(async () => (await findOverlap()) !== undefined, { message: "a node sits under a name" })
+        .poll(async () => (await findOverlap()) !== undefined, {
+            message: "a node sits under a name, inside the frame",
+        })
         .toBe(true);
 
     const overlap = (await findOverlap())!;
@@ -912,28 +950,47 @@ const readBoardTransform = (page: Page) =>
             return getComputedStyle(board).transform;
         });
 
+const numbersIn = (transform: string) => (transform.match(/-?\d+(?:\.\d+)?(?:e-?\d+)?/g) ?? []).map(Number);
+
+const STILL_FRAMES = 5;
+
 /**
  * The board's transform once it has stopped moving: a glide that has drawn the right nodes into view can still be
- * easing its last fraction of a pixel, so a reading taken then is not where the board rests.
+ * easing its last fraction of a pixel, so a reading taken then is not where the board rests. Still means unchanged
+ * across several frames the browser actually drew, counted inside the page. Two readings some time apart are not
+ * enough: a busy machine can draw no frame between them, and they then agree in the middle of a glide.
  */
 const readRestingBoardTransform = async (page: Page) => {
-    let previous = await readBoardTransform(page);
-
     await expect
         .poll(
-            async () => {
-                const current = await readBoardTransform(page);
-                const isStill = current === previous;
+            () =>
+                page
+                    .locator(`${FAMILY} [role="group"], ${FAMILY} ul`)
+                    .first()
+                    .evaluate(
+                        (element, frames) =>
+                            new Promise<boolean>((resolve) => {
+                                const board = element.closest('[class*="bracketRoot"]') ?? element;
+                                const first = getComputedStyle(board).transform;
 
-                previous = current;
+                                let left = frames;
 
-                return isStill;
-            },
+                                const check = () => {
+                                    if (getComputedStyle(board).transform !== first) return resolve(false);
+                                    if (--left === 0) return resolve(true);
+
+                                    requestAnimationFrame(check);
+                                };
+
+                                requestAnimationFrame(check);
+                            }),
+                        STILL_FRAMES,
+                    ),
             { message: "the board has stopped moving" },
         )
         .toBe(true);
 
-    return previous;
+    return readBoardTransform(page);
 };
 
 test("dragging the window towards the final carries the family with it, and letting go frames the final's", async ({
@@ -965,7 +1022,10 @@ test("zoomed out, no round is lit and the draw cannot be dragged off center", as
     await dragFrame(page, 200, 60);
     await page.waitForTimeout(SETTLE_MS);
 
-    expect(await readBoardTransform(page), "the drag moved nothing").toBe(resting);
+    const after = numbersIn(await readBoardTransform(page));
+
+    expect(after.length, "the board is still carrying the same kind of transform").toBe(numbersIn(resting).length);
+    after.forEach((value, index) => expect(value, "the drag moved nothing").toBeCloseTo(numbersIn(resting)[index], 1));
     expect(await framedNodes(page), "and the whole draw is still framed").toEqual([...ALL_NODES].sort());
 });
 

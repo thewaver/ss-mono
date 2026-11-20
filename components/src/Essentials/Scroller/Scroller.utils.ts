@@ -1,6 +1,7 @@
-import { MathUtils, type Point2d, Point2dUtils } from "@thewaver/ss-utils";
+import { DOMUtils, MathUtils, type Point2d, Point2dUtils } from "@thewaver/ss-utils";
 
-import { NumberInputUtils } from "../Input/NumberInput/NumberInput.utils";
+import { ElementObserverUtils } from "../../Abstracts/ElementObserver/ElementObserver.utils";
+import { InteractionTrackerUtils } from "../../Abstracts/InteractionTracker/InteractionTracker.utils";
 import { SCROLLER_AXES, SCROLLER_DEFAULTS } from "./Scroller.const";
 import type {
     ScrollerActivityDefs,
@@ -14,6 +15,11 @@ import type {
     ScrollerProgress,
     ScrollerStep,
 } from "./Scroller.types";
+
+/** The size given to the grid track the box sits in, which takes whatever room its bars leave. */
+const AREA_TRACK = "minmax(0, 1fr)";
+/** The track a bar's strip takes in the area: as thick as the painter draws it. */
+const BAR_TRACK = "auto";
 
 /** How close to an end, in pixels, counts as being at it, so a fractional scroll position still reads as arrived. */
 const SCROLL_EPSILON = 1;
@@ -35,12 +41,6 @@ const TRACK_PRESS_DELAY_MS = 400;
 const TRACK_PRESS_INTERVAL_MS = 100;
 /** Half of anything. */
 const HALF = 0.5;
-/** The `direction` a right-to-left box computes to. */
-const RIGHT_TO_LEFT = "rtl";
-/** The size given to the grid track the box sits in, which takes whatever room its bars leave. */
-const AREA_TRACK = "minmax(0, 1fr)";
-/** The track a bar's strip takes in the area: as thick as the painter draws it. */
-const BAR_TRACK = "auto";
 
 /**
  * Where each box's latest step on each axis began and where it is heading, kept until the box arrives or is moved
@@ -52,15 +52,6 @@ const BAR_TRACK = "auto";
 const stepsInFlight = new WeakMap<HTMLElement, Partial<Record<ScrollerAxis, { from: number; to: number }>>>();
 
 /** Whether an element lays out right to left, which turns the horizontal axis round. */
-const getIsRightToLeft = (element: HTMLElement) => getComputedStyle(element).direction === RIGHT_TO_LEFT;
-
-/**
- * How far a box is scrolled from its start along an axis.
- *
- * A right-to-left box reports `scrollLeft` from `0` downwards, so its size is the distance from the start either way.
- */
-const readPosition = (box: HTMLElement, axis: ScrollerAxis) =>
-    axis === "x" ? Math.abs(box.scrollLeft) : box.scrollTop;
 
 /** The `scrollTo` options that put a box at a distance from its start along an axis. */
 const toScrollOptions = (
@@ -69,7 +60,9 @@ const toScrollOptions = (
     position: number,
     behavior?: ScrollBehavior,
 ): ScrollToOptions =>
-    axis === "x" ? { left: getIsRightToLeft(box) ? -position : position, behavior } : { top: position, behavior };
+    axis === "x"
+        ? { left: DOMUtils.getIsRightToLeft(box) ? -position : position, behavior }
+        : { top: position, behavior };
 
 /** An element's length along an axis, in layout pixels. */
 const readLength = (element: HTMLElement, axis: ScrollerAxis) =>
@@ -84,7 +77,7 @@ const readLength = (element: HTMLElement, axis: ScrollerAxis) =>
  * somewhere off that stretch — means the remembered step no longer describes the box, and it is dropped.
  */
 const computeStepOrigin = (box: HTMLElement, axis: ScrollerAxis) => {
-    const position = readPosition(box, axis);
+    const position = DOMUtils.getScrollFromStart(box, axis);
     const inFlight = stepsInFlight.get(box)?.[axis];
 
     if (!inFlight) return position;
@@ -110,7 +103,7 @@ const computeOffsetWithin = (element: HTMLElement, box: HTMLElement, axis: Scrol
         node = node.offsetParent as HTMLElement | null;
     }
 
-    if (axis === "x" && getIsRightToLeft(box)) return box.clientWidth - offset - element.offsetWidth;
+    if (axis === "x" && DOMUtils.getIsRightToLeft(box)) return box.clientWidth - offset - element.offsetWidth;
 
     return offset;
 };
@@ -154,7 +147,7 @@ export namespace ScrollerUtils {
      * A right-to-left box is measured from its right, so the reading means the same either way.
      */
     export const readMetrics = (box: HTMLElement, axis: ScrollerAxis): ScrollerMetrics => ({
-        start: readPosition(box, axis),
+        start: DOMUtils.getScrollFromStart(box, axis),
         visible: axis === "x" ? box.clientWidth : box.clientHeight,
         total: axis === "x" ? box.scrollWidth : box.scrollHeight,
     });
@@ -302,6 +295,10 @@ export namespace ScrollerUtils {
      * Scrolls a box so a child shows whole along each of the given axes, in one move, by
      * {@link computeRevealTarget}'s rule.
      *
+     * Called as focus arrives, it measures before the browser's own scroll to the newly focused element and applies
+     * the move again once that scroll has begun, so the box ends where this rule puts it in a browser that centers a
+     * focused element (Safari) as well as in one that moves it by the least.
+     *
      * @param box The scrolling box.
      * @param target The element to reveal, anywhere inside the box.
      * @param padding The room to leave between the element and the edge.
@@ -310,12 +307,13 @@ export namespace ScrollerUtils {
     export const reveal = (box: HTMLElement, target: HTMLElement, padding: number, axes: ScrollerAxis[]) => {
         if (axes.length === 0) return;
 
-        box.scrollTo(
-            Object.assign(
-                {},
-                ...axes.map((axis) => toScrollOptions(box, axis, computeRevealTarget(box, target, padding, axis))),
-            ),
+        const options: ScrollToOptions = Object.assign(
+            {},
+            ...axes.map((axis) => toScrollOptions(box, axis, computeRevealTarget(box, target, padding, axis))),
         );
+
+        box.scrollTo(options);
+        queueMicrotask(() => box.scrollTo(options));
     };
 
     /**
@@ -412,7 +410,7 @@ export namespace ScrollerUtils {
         box: HTMLElement,
         step: ScrollerStep,
         axis: ScrollerAxis,
-        start = readPosition(box, axis),
+        start = DOMUtils.getScrollFromStart(box, axis),
         overlapCount = SCROLLER_DEFAULTS.overlapCount,
     ) => {
         const offsets = [...box.children].map((child) => computeOffsetWithin(child as HTMLElement, box, axis));
@@ -439,7 +437,8 @@ export namespace ScrollerUtils {
      *
      * A press made while an earlier step is still gliding is measured from where that step is heading, so five quick
      * presses go five pages, as five slow ones do; see {@link computeStepTarget}. Once the box arrives, or is
-     * scrolled somewhere off its way, the next press is measured from where it is.
+     * scrolled somewhere off its way, the next press is measured from where it is. A step along one axis carries on a
+     * step still gliding along the other, rather than stopping it part-way.
      *
      * @param box The scrolling box, once it exists.
      * @param step Which way.
@@ -466,8 +465,18 @@ export namespace ScrollerUtils {
             computeScrollRange(metrics),
         );
 
-        stepsInFlight.set(box, { ...stepsInFlight.get(box), [axis]: { from: readPosition(box, axis), to: target } });
-        box.scrollTo(toScrollOptions(box, axis, target));
+        const otherAxis: ScrollerAxis = axis === "x" ? "y" : "x";
+        const otherInFlight = stepsInFlight.get(box)?.[otherAxis];
+        const isOtherOnItsWay = otherInFlight !== undefined && computeStepOrigin(box, otherAxis) === otherInFlight.to;
+
+        stepsInFlight.set(box, {
+            ...stepsInFlight.get(box),
+            [axis]: { from: DOMUtils.getScrollFromStart(box, axis), to: target },
+        });
+        box.scrollTo({
+            ...(isOtherOnItsWay ? toScrollOptions(box, otherAxis, otherInFlight.to) : {}),
+            ...toScrollOptions(box, axis, target),
+        });
 
         return true;
     };
@@ -606,7 +615,7 @@ export namespace ScrollerUtils {
             | undefined;
         let isClickSwallowed = false;
 
-        const repeater = NumberInputUtils.createStepRepeater({
+        const repeater = InteractionTrackerUtils.createStepRepeater({
             getDelayMs: () => TRACK_PRESS_DELAY_MS,
             getIntervalMs: () => TRACK_PRESS_INTERVAL_MS,
         });
@@ -636,7 +645,7 @@ export namespace ScrollerUtils {
 
             if (compute) return MathUtils.clamp01(compute(defs.axis, point, rect));
 
-            const position = computeClientPosition(point, rect, defs.axis, getIsRightToLeft(track));
+            const position = computeClientPosition(point, rect, defs.axis, DOMUtils.getIsRightToLeft(track));
 
             return computeRatioAtPosition(
                 position - grabOffset,
@@ -766,7 +775,7 @@ export namespace ScrollerUtils {
 
                 if (thumb?.contains(target)) {
                     const rect = track.getBoundingClientRect();
-                    const isRightToLeft = getIsRightToLeft(track);
+                    const isRightToLeft = DOMUtils.getIsRightToLeft(track);
                     const thumbCenter = getRectCenter(thumb.getBoundingClientRect());
 
                     listen(e.pointerId, point, {
@@ -885,28 +894,6 @@ export namespace ScrollerUtils {
      * @param onMetrics Receives each new reading, on both axes.
      * @returns A function that stops watching.
      */
-    export const observe = (box: HTMLElement, onMetrics: (metrics: ScrollerBoxMetrics) => void) => {
-        const update = () => onMetrics(readBoxMetrics(box));
-        const sizeObserver = new ResizeObserver(update);
-        const childObserver = new MutationObserver(() => {
-            for (const child of box.children) sizeObserver.observe(child);
-
-            update();
-        });
-
-        sizeObserver.observe(box);
-
-        for (const child of box.children) sizeObserver.observe(child);
-
-        childObserver.observe(box, { childList: true });
-        box.addEventListener("scroll", update, { passive: true });
-
-        update();
-
-        return () => {
-            sizeObserver.disconnect();
-            childObserver.disconnect();
-            box.removeEventListener("scroll", update);
-        };
-    };
+    export const observe = (box: HTMLElement, onMetrics: (metrics: ScrollerBoxMetrics) => void) =>
+        ElementObserverUtils.observeScrollBox(box, () => onMetrics(readBoxMetrics(box)));
 }

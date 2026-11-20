@@ -23,24 +23,7 @@ const HALF_PANE = styles.paneSize * 0.5;
 const toOffset = (ratio: number) =>
     `clamp(0px, calc(${ratio * 100}% - ${HALF_PANE}px), calc(100% - ${styles.paneSize}px))`;
 
-export const DefaultExample = ({
-    borderRadius,
-    borderWidth,
-    strokeConfigKey,
-    strokeConfigDefs,
-    colors,
-    blurWidth,
-    blurRadius,
-    noiseFrequency,
-    noiseOctaves,
-    rippleScale,
-    tintColor,
-    tintOpacity,
-    lightHeight,
-    surfaceScale,
-    specularConstant,
-    specularExponent,
-}: GlassSurfaceExampleProps) => {
+export const DefaultExample = (props: GlassSurfaceExampleProps) => {
     const id = useId();
 
     const stageRef = useRef<HTMLDivElement>(null);
@@ -69,40 +52,40 @@ export const DefaultExample = ({
                 })}
             >
                 <GlassSurface
-                    borderRadii={CSSUtils.spreadRadius(borderRadius)}
-                    borderWidths={CSSUtils.spreadWidth(borderWidth)}
+                    borderRadii={CSSUtils.spreadRadius(props.borderRadius)}
+                    borderWidths={CSSUtils.spreadWidth(props.borderWidth)}
                     computeStrokeDefs={(size, element) => {
-                        if (strokeConfigKey === NO_SAMPLE_KEY) return computeNoSampleDefs(colors, "stroke");
+                        if (props.strokeConfigKey === NO_SAMPLE_KEY) return computeNoSampleDefs(props.colors, "stroke");
 
                         return SVGDefsSampleConfigs.Gradient.Tracked.toConfig({
-                            family: strokeConfigKey,
-                            defs: strokeConfigDefs,
+                            family: props.strokeConfigKey,
+                            defs: props.strokeConfigDefs,
                         } as SVGDefsSamples.Gradient.Tracked.Entry).computeSVGDefs(`stroke-${id}`, undefined, element, {
                             getSize: () => size,
-                            colors,
-                            blurWidth,
+                            colors: props.colors,
+                            blurWidth: props.blurWidth,
                         });
                     }}
                     glassDefs={{
                         noise: {
-                            frequency: noiseFrequency,
-                            octaves: noiseOctaves,
+                            frequency: props.noiseFrequency,
+                            octaves: props.noiseOctaves,
                         },
-                        backdrop: { blurRadius },
-                        ripple: { scale: rippleScale },
-                        tint: { color: tintColor, opacity: tintOpacity },
+                        backdrop: { blurRadius: props.blurRadius },
+                        ripple: { scale: props.rippleScale },
+                        tint: { color: props.tintColor, opacity: props.tintOpacity },
                         sheen: {
-                            lightHeight,
-                            surfaceScale,
-                            specularConstant,
-                            specularExponent,
+                            lightHeight: props.lightHeight,
+                            surfaceScale: props.surfaceScale,
+                            specularConstant: props.specularConstant,
+                            specularExponent: props.specularExponent,
                         },
                     }}
                 >
                     <div className={styles.paneContent}>Glass</div>
                 </GlassSurface>
 
-                <div className={styles.paneShadow} style={{ borderRadius: `${borderRadius}px` }} />
+                <div className={styles.paneShadow} style={{ borderRadius: `${props.borderRadius}px` }} />
             </div>
         </div>
     );

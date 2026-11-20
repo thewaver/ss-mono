@@ -1,6 +1,6 @@
 import { type KeyboardEvent, useEffect, useLayoutEffect, useRef, useState } from "react";
 
-import { CARD_STACK_DEFAULTS, CardStackStyles, CardStackUtils } from "@thewaver/ss-components";
+import { CARD_STACK_DEFAULTS, CardStackStyles, CardStackUtils, NavigatorUtils } from "@thewaver/ss-components";
 import { CardStackConst } from "@thewaver/ss-components/internal";
 import { StoreUtils } from "@thewaver/ss-utils";
 
@@ -111,6 +111,8 @@ export const CardStack = <T,>(props: CardStackProps<T>) => {
     }, [controls]);
 
     const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+        if (e.target !== e.currentTarget || NavigatorUtils.getHasCommandModifier(e)) return;
+
         const direction = CardStackUtils.getKeyDirection(e.key);
 
         if (direction === undefined || !pile.send(direction)) return;

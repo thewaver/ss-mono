@@ -24,7 +24,7 @@ const NO_COLOR = "transparent";
 const NEVER_PLAYING: SignalPair<boolean> = [() => false, () => undefined];
 const SINGLE_PASS = 1;
 
-const getCellKey = (cell: ParticleFieldCellDefs) => Index2dUtils.toFlatIndex(cell.pos, cell.count.col);
+const getCellKey = (cell: ParticleFieldCellDefs) => Index2dUtils.toFlatIndex(cell.pos, cell.count.colCount);
 
 export const ParticleDissolve = (props: ParentProps<ParticleDissolveProps>) => {
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
@@ -33,6 +33,8 @@ export const ParticleDissolve = (props: ParentProps<ParticleDissolveProps>) => {
     const getIsDissolved = createMemo(() => access(props.isDissolved));
 
     const [getProgress, setProgress] = createSignal(untrack(getIsDissolved) ? 1 : 0);
+
+    const progressSource: SignalPair<number> = [getProgress, () => undefined];
 
     const getSize = ElementObserverSolidUtils.createBorderBoxSizeObserver(getRootRef);
 
@@ -157,7 +159,7 @@ export const ParticleDissolve = (props: ParentProps<ParticleDissolveProps>) => {
                         animationIterationCount={SINGLE_PASS}
                         particleLifetimeMs={() => getLifetimeShare() * getDurationMs()}
                         playback={NEVER_PLAYING}
-                        progress={[getProgress, () => undefined]}
+                        progress={progressSource}
                         computeCellWeights={(count) =>
                             ParticleDissolveUtils.computeCellWeights(count, getSize(), getSweep())
                         }

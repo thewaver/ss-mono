@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { StringUtils } from "@thewaver/ss-utils";
     import { untrack } from "svelte";
 
     import {
@@ -20,7 +21,7 @@
     const getRegistryState = readStore(registry);
     const isDriven = $derived(getRegistryState().entries.length > 0);
 
-    const characters = $derived(isDriven ? getRegistryState().characters : Array.from(props.text ?? ""));
+    const characters = $derived(isDriven ? getRegistryState().characters : StringUtils.splitGraphemes(props.text ?? ""));
     const segments = $derived(ScrambleTextUtils.getSegments(characters));
 
     const computeGlyphs = $derived(props.computeGlyphs ?? SCRAMBLE_TEXT_DEFAULTS.computeGlyphs);

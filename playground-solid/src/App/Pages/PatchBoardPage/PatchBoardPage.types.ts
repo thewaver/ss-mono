@@ -22,3 +22,10 @@ export type PatchBoardExampleProps = AccessorProps<{
 export type PatchBoardViewExampleProps = PatchBoardExampleProps & {
     view: SignalSource<PanZoomView>;
 };
+
+export type PatchBoardSharedExampleProps = Omit<PatchBoardExampleProps, "nodes" | "links"> & {
+    firstNodes: SignalSource<PatchBoardNode<PatchDevice>[]>;
+    secondNodes: SignalSource<PatchBoardNode<PatchDevice>[]>;
+    firstLinks: SignalSource<PatchBoardLink[]>;
+    secondLinks: SignalSource<PatchBoardLink[]>;
+};

@@ -65,7 +65,9 @@
         y: createStepper("y"),
     };
 
-    $effect(() => untrack(() => props.onMount?.(controller)));
+    $effect(() => {
+        untrack(() => props.onMount?.(controller));
+    });
 
     $effect(() => {
         const next = ScrollerUtils.computeProgress(metrics);
@@ -78,9 +80,15 @@
         });
     });
 
+    const scrollRanges = $derived(
+        `${ScrollerUtils.computeScrollRange(metrics.x)} ${ScrollerUtils.computeScrollRange(metrics.y)}`,
+    );
+
     $effect(() => {
         const current = progress;
         const ref = box;
+
+        void scrollRanges;
 
         if (!ref) return;
 

@@ -84,6 +84,8 @@
     };
 
     const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.target !== tileRefs.get(rovingKey)) return;
+
         const action = TileBoardUtils.computeKeyAction(e.key, e.ctrlKey || e.metaKey, rovingTile, layout);
 
         if (action === undefined) return;
@@ -153,14 +155,14 @@
     class={[styles.tileBoardRoot, isSweepable && styles.tileBoardIsSweepable]}
     role="grid"
     aria-label={props.ariaLabel}
-    aria-rowcount={layout.count.row}
+    aria-rowcount={layout.count.rowCount}
     aria-colcount={TileBoardUtils.getColumnCount(layout)}
     aria-disabled={isDisabled || undefined}
     style:width={`${boardSize.width}px`}
     style:height={`${boardSize.height}px`}
 >
     <div class={styles.tileBoardPlane} style:transform={TileBoardUtils.getTaperTransform(layout)}>
-        {#each { length: Math.max(layout.count.row, 0) }, rowIndex}
+        {#each { length: Math.max(layout.count.rowCount, 0) }, rowIndex}
             {@const origin = TileBoardUtils.getRowOrigin(rowIndex, layout, gap)}
             <div
                 class={styles.tileBoardRow}

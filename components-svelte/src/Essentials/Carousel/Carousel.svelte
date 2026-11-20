@@ -21,7 +21,7 @@
     const HIDDEN_OPACITY = 0;
 
     let {
-        index = $bindable(0),
+        index = $bindable(),
         playback = $bindable(true),
         progress = $bindable(),
         ...props
@@ -45,7 +45,7 @@
     const groupCount = $derived(groups.length);
     const rests = $derived(groups.map(CarouselUtils.getGroupRest));
     const memberships = $derived(CarouselUtils.getGroupMemberships(groups, count));
-    const currentIndex = $derived(CarouselUtils.wrapIndex(index, groupCount));
+    const currentIndex = $derived(CarouselUtils.wrapIndex(index ?? 0, groupCount));
     const currentGroup = $derived(groups[currentIndex]);
     const isDisabled = $derived(props.isDisabled ?? false);
     const isLooping = $derived(props.isLooping ?? CAROUSEL_DEFAULTS.isLooping);
@@ -244,12 +244,17 @@
 
         untrack(() => {
             const previous = placedIndex;
-            const isThere = CarouselUtils.getNearestGroup(position, rests, count, isLooping) === target;
+            const nearest = CarouselUtils.getNearestGroup(position, rests, count, isLooping);
+            const isThere = nearest === target;
 
             placedIndex = target;
 
             if (previous === undefined) {
-                if (!isThere) writeProgress(CarouselUtils.toGroupProgress(rests[target] ?? 0, rests, count, isLooping));
+                if (index === undefined) {
+                    if (!isThere) index = nearest;
+                } else if (!isThere) {
+                    writeProgress(CarouselUtils.toGroupProgress(rests[target] ?? 0, rests, count, isLooping));
+                }
 
                 return;
             }
@@ -413,7 +418,9 @@
         },
     };
 
-    $effect(() => untrack(() => props.onMount?.(controls)));
+    $effect(() => {
+        untrack(() => props.onMount?.(controls));
+    });
 </script>
 
 <div

@@ -11,6 +11,7 @@ import {
 } from "vue";
 
 import {
+    InteractionTrackerUtils,
     PAGINATOR_DEFAULTS,
     type PaginatorControlEntry,
     type PaginatorGapEntry,
@@ -20,6 +21,7 @@ import {
     type PaginatorStepRenderProps,
     PaginatorStyles,
     PaginatorUtils,
+    SafeHrefUtils,
 } from "@thewaver/ss-components";
 import { PlacementConst } from "@thewaver/ss-components/internal";
 
@@ -55,12 +57,16 @@ const PaginatorItem = defineComponent(
         () => {
             const isDisabled = props.flags.isDisabled ?? false;
 
+            const safeHref = SafeHrefUtils.resolve(props.href, "Paginator");
+
             const handleClick = (e: MouseEvent) => {
                 if (isDisabled) {
                     e.preventDefault();
 
                     return;
                 }
+
+                if (safeHref !== undefined && !InteractionTrackerUtils.getIsPlainClick(e)) return;
 
                 props.onActivate();
             };
@@ -75,7 +81,7 @@ const PaginatorItem = defineComponent(
 
             const content = callSlot(slots.renderContent, props.flags);
 
-            if (props.href === undefined) {
+            if (safeHref === undefined) {
                 return (
                     <button type="button" {...commonProps} onClick={handleClick}>
                         {content}
@@ -85,7 +91,7 @@ const PaginatorItem = defineComponent(
 
             if (props.linkComponent === undefined) {
                 return (
-                    <a href={props.href} {...commonProps} onClick={handleClick}>
+                    <a href={safeHref} {...commonProps} onClick={handleClick}>
                         {content}
                     </a>
                 );
@@ -93,7 +99,7 @@ const PaginatorItem = defineComponent(
 
             return h(
                 props.linkComponent,
-                { href: props.href, ...commonProps, onClick: handleClick },
+                { href: safeHref, ...commonProps, onClick: handleClick },
                 { default: () => content },
             );
         },
@@ -427,10 +433,10 @@ export const PaginatorPages = defineComponent(
 
         return () => (
             <div class={PaginatorStyles.paginatorRow} style={{ gap: `${props.gap ?? PAGINATOR_DEFAULTS.gap}px` }}>
-                {entries.value.map((entry, index) =>
+                {entries.value.map((entry) =>
                     entry.kind === "page" ? (
                         <PaginatorPageControl
-                            key={index}
+                            key={PaginatorUtils.getEntryKey(entry)}
                             context={context}
                             entry={entry}
                             computePageLabel={props.computePageLabel}
@@ -439,7 +445,7 @@ export const PaginatorPages = defineComponent(
                         </PaginatorPageControl>
                     ) : (
                         <PaginatorGapControl
-                            key={index}
+                            key={PaginatorUtils.getEntryKey(entry)}
                             context={context}
                             entry={entry}
                             computePageLabel={props.computePageLabel}

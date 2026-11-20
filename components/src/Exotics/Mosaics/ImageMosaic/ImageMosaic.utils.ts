@@ -17,9 +17,9 @@ export namespace ImageMosaicUtils {
      *
      * Each wanted source is fetched once through an `Image` that is never in the document; its size is buffered and
      * written to the store on the next animation frame, so a wall of pictures arriving together costs one write
-     * rather than one each. A picture that fails to load is given a square. Asking for a list drops every source not
-     * in it — its request is abandoned and its size forgotten — and leaves every source already known or already
-     * requested alone.
+     * rather than one each. A picture that fails to load, or reports no size of its own, is given a square. Asking for
+     * a list drops every source not in it — its request is abandoned and its size forgotten — and leaves every source
+     * already known or already requested alone.
      *
      * @returns The store of sizes by source address; `request(sources)`, which takes the list wanted now; and
      * `stop()`, which abandons every request and any pending write, after which `request` starts afresh.
@@ -84,7 +84,12 @@ export namespace ImageMosaicUtils {
 
                 image.decoding = "async";
                 image.onload = () =>
-                    bufferSizeOf(source.src, { width: image.naturalWidth, height: image.naturalHeight });
+                    bufferSizeOf(
+                        source.src,
+                        image.naturalWidth > 0 && image.naturalHeight > 0
+                            ? { width: image.naturalWidth, height: image.naturalHeight }
+                            : UNREADABLE_IMAGE_SIZE,
+                    );
                 image.onerror = () => bufferSizeOf(source.src, UNREADABLE_IMAGE_SIZE);
                 image.src = source.src;
             }

@@ -8,5 +8,5 @@
             "@thewaver/ss-utils": ["../utils/src/index.ts"]
         }
     },
-    "include": ["src/**/*.ts", "src/**/*.svelte"]
+    "include": ["../utils/process-env.d.ts", "src/**/*.ts", "src/**/*.svelte"]
 }

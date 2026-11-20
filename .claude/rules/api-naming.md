@@ -166,7 +166,7 @@ The user's rules for `components/src` and `playground/src`:
   and there TypeScript reports `TS2308`, drops the name, and every consumer gets "only refers to a type".
   **`Utils` does not promise purity** — it marks a namespace with no same-named type to be a companion to.
 - **The subject is singular**: `ToastUtils` from `Toasts.utils.ts`, `KeyframeUtils` from `Keyframes.utils.ts`.
-  The one exception, taken by the user reluctantly and not a licence for a second, is `Defs`, the SVG element's
+  The one exception, taken by the user reluctantly and not a license for a second, is `Defs`, the SVG element's
   name: `SVGDefsUtils`, `SVGGradientDefsUtils`.
 - **Everything inside the braces is exported; private helpers sit above the namespace.** Reading the namespace is
   reading the contract. Two silent hazards: a member shadowing a same-named private calls itself, so a private never
@@ -289,10 +289,12 @@ never an `x`/`y` pair (same type, swaps compile into a plausible wrong cell) and
 that sorts, filters, virtualizes or reorders columns has two different numbers per cell). `data*` indexes the
 arrays as given, `layout*` is the painted position; a component publishing both holds both, sorting an array of
 indices so the original survives, rather than searching per cell. It travels as its own argument, never inside
-the flags. `Index2d` (`{ row, col }`) is the pair type, and the name at the call site says which is meant.
+the flags. `Index2d` (`{ row, col }`) is the pair type for a position, and the name at the call site says which space
+it is in.
 
-**`width` and `height` are lengths, in pixels unless the name says otherwise; a tally of cells is a count** —
-`{ rowCount, colCount }`, or an `Index2d` named for what it tallies. **A length in any other unit carries the unit
+**`width` and `height` are lengths, in pixels unless the name says otherwise; a tally of cells is a count** — a
+count of rows and columns is a `Count2d` (`{ rowCount, colCount }`, from `ss-utils`), never an `Index2d` — the user's
+call, since one type for both lets a count pass where a cell is wanted. **A length in any other unit carries the unit
 in the nearest name the reader sees** — the user's choice: `sizeShare`, `NODE_SIZE_SHARE`, or on the fields where
 nothing holds them (`PlacementRect` is `{ leftShare, topShare, widthShare, heightShare }`). `Share` is a fraction of
 the container's width, on both axes. A name that already says ratio (`aspect`) needs nothing added. The name only

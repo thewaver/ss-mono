@@ -7,7 +7,6 @@ import {
     Virtualizer,
     type VirtualizerOptions,
     defaultRangeExtractor,
-    elementScroll,
     measureElement,
     observeElementOffset,
 } from "@tanstack/virtual-core";
@@ -135,7 +134,7 @@ export namespace VirtualizerSolidUtils {
                 },
                 observeElementRect: VirtualizerUtils.observeClientRect,
                 observeElementOffset,
-                scrollToFn: elementScroll,
+                scrollToFn: VirtualizerUtils.scrollToWholePixel,
                 onChange: (instance) => {
                     instance._willUpdate();
                     publish();
@@ -172,7 +171,11 @@ export namespace VirtualizerSolidUtils {
             publish();
         });
 
-        const getRows = createMemo(() => (opts.getIsDisabled() ? [] : items));
+        const getRows = createMemo(() => {
+            const count = getCount();
+
+            return opts.getIsDisabled() ? [] : items.filter((row) => row.index < count);
+        });
 
         const getTotalSize = createMemo(() => (opts.getIsDisabled() ? 0 : getVirtualTotalSize()));
 

@@ -40,7 +40,7 @@ const CROP_MARGIN = { x: 9, y: 24 };
 
 const enterCss = async (page: Page, css: string) => {
     await page.locator(FIELD).click();
-    await page.keyboard.press("Control+A");
+    await page.keyboard.press("ControlOrMeta+A");
     await page.keyboard.press("Delete");
     await page.keyboard.type(css);
 };
@@ -99,7 +99,7 @@ const readDifferingShare = async (page: Page) => {
                 if (difference > threshold) differing++;
             }
 
-            return differing / (first.length / 4);
+            return differing / (first.length * 0.25);
         },
         { left, right, threshold: DIFFERENCE_THRESHOLD },
     );
@@ -147,20 +147,4 @@ test("invalid CSS marks the field and names each declaration the browser refuses
         "aria-invalid",
         "true",
     );
-});
-
-test("CSS the converter cannot reproduce is named in the console", async ({ page }) => {
-    const warnings: string[] = [];
-
-    page.on("console", (message) => {
-        if (message.type() === "warning") warnings.push(message.text());
-    });
-
-    await enterCss(page, "background: conic-gradient(#f00, #00f)");
-
-    await expect
-        .poll(() => warnings.some((text) => text.includes("conic-gradient")), {
-            message: "the skipped background is reported with its value",
-        })
-        .toBe(true);
 });

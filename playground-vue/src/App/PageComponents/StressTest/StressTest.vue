@@ -69,7 +69,7 @@ const setModalTransitionFinished = (hasTransitionFinished: boolean) => {
                 <div
                     :class="styles.itemGrid"
                     :style="{
-                        gridTemplateColumns: `repeat(${configs[configIndex].cols}, auto)`,
+                        gridTemplateColumns: `repeat(${configs[configIndex].colCount}, auto)`,
                         gap: `${configs[configIndex].gap}px`,
                     }"
                 >

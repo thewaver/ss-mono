@@ -1,10 +1,5 @@
-import {
-    type SVGPatternCellCount,
-    type SVGPatternKind,
-    SVGPatternLayouts,
-    TrackedPatternUtils,
-} from "@thewaver/ss-components";
-import type { Index2d, Point2d, Size2d } from "@thewaver/ss-utils";
+import { type SVGPatternKind, SVGPatternLayouts, TrackedPatternUtils } from "@thewaver/ss-components";
+import type { Count2d, Index2d, Point2d, Size2d } from "@thewaver/ss-utils";
 
 import { SVGPatternDefsSvelteUtils } from "../../Generators/SVGDefs/SVGPatterns/SVGPatternDefsSvelte.utils.js";
 import type { SVGPatternCellRenderer, SVGPatternTrackedCellRenderer } from "./SVGPatternsSvelte.types.js";
@@ -13,11 +8,11 @@ export namespace SVGPatterns {
     export const computeLayoutPattern = (
         kind: SVGPatternKind,
         id: string,
-        requestedCellCount: SVGPatternCellCount,
+        requestedCellCount: Count2d,
         cellSize: Size2d,
         renderCell: SVGPatternCellRenderer,
     ) => {
-        const layout = SVGPatternLayouts.ALL[kind];
+        const layout = SVGPatternLayouts.getLayout(kind);
         const cellCount = layout.computeCellCount(requestedCellCount);
 
         return SVGPatternDefsSvelteUtils.computePattern(
@@ -31,56 +26,56 @@ export namespace SVGPatterns {
 
     export const computeGridPattern = (
         id: string,
-        cellCount: SVGPatternCellCount,
+        cellCount: Count2d,
         cellSize: Size2d,
         renderCell: SVGPatternCellRenderer,
     ) => computeLayoutPattern("grid", id, cellCount, cellSize, renderCell);
 
     export const computeDiagonalPattern = (
         id: string,
-        cellCount: SVGPatternCellCount,
+        cellCount: Count2d,
         cellSize: Size2d,
         renderCell: SVGPatternCellRenderer,
     ) => computeLayoutPattern("diagonal", id, cellCount, cellSize, renderCell);
 
     export const computeHalfShiftPattern = (
         id: string,
-        cellCount: SVGPatternCellCount,
+        cellCount: Count2d,
         cellSize: Size2d,
         renderCell: SVGPatternCellRenderer,
     ) => computeLayoutPattern("half_shift", id, cellCount, cellSize, renderCell);
 
     export const computeHalfDropPattern = (
         id: string,
-        cellCount: SVGPatternCellCount,
+        cellCount: Count2d,
         cellSize: Size2d,
         renderCell: SVGPatternCellRenderer,
     ) => computeLayoutPattern("half_drop", id, cellCount, cellSize, renderCell);
 
     export const computeTrianglePattern = (
         id: string,
-        cellCount: SVGPatternCellCount,
+        cellCount: Count2d,
         cellSize: Size2d,
         renderCell: SVGPatternCellRenderer,
     ) => computeLayoutPattern("triangle", id, cellCount, cellSize, renderCell);
 
     export const computeTriangleSidewaysPattern = (
         id: string,
-        cellCount: SVGPatternCellCount,
+        cellCount: Count2d,
         cellSize: Size2d,
         renderCell: SVGPatternCellRenderer,
     ) => computeLayoutPattern("triangle_sideways", id, cellCount, cellSize, renderCell);
 
     export const computeHexPointyTopPattern = (
         id: string,
-        cellCount: SVGPatternCellCount,
+        cellCount: Count2d,
         cellSize: Size2d,
         renderCell: SVGPatternCellRenderer,
     ) => computeLayoutPattern("hex_pointy_top", id, cellCount, cellSize, renderCell);
 
     export const computeHexFlatTopPattern = (
         id: string,
-        cellCount: SVGPatternCellCount,
+        cellCount: Count2d,
         cellSize: Size2d,
         renderCell: SVGPatternCellRenderer,
     ) => computeLayoutPattern("hex_flat_top", id, cellCount, cellSize, renderCell);

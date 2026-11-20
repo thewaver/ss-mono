@@ -29,6 +29,8 @@ import type {
 const NOTHING = 0;
 /** One socket or one step. */
 const SINGLE = 1;
+
+const MIDDLE = 0.5;
 /** How much further along a snapped spot has to be, as a fraction of the board's width, to count as a move. */
 const SNAP_TOLERANCE = 0.000001;
 /** How many bands each axis is divided into when describing where a node sits. */
@@ -379,7 +381,8 @@ export namespace PatchBoardUtils {
      * the board.
      *
      * @param placed Every socket on the board.
-     * @param end Where the cursor is now. Missing starts at the first socket.
+     * @param end Where the cursor is now. Missing, or on no socket, a step forward lands on the first socket and a
+     * step back on the last.
      * @param step How far to move, negative to go back.
      * @returns The socket, or `undefined` when there are none.
      */
@@ -390,7 +393,8 @@ export namespace PatchBoardUtils {
     ) => {
         if (placed.length < SINGLE) return undefined;
 
-        const index = end === undefined ? -SINGLE : placed.findIndex((socket) => getIsSameEnd(socket.end, end));
+        const found = end === undefined ? -SINGLE : placed.findIndex((socket) => getIsSameEnd(socket.end, end));
+        const index = found >= NOTHING ? found : step > NOTHING ? -SINGLE : placed.length;
 
         return placed[MathUtils.wrapIndex(index + step, placed.length)];
     };
@@ -648,7 +652,6 @@ export namespace PatchBoardUtils {
      * started.
      */
     export const createBoard = <T>(defs: PatchBoardDefs<T>): PatchBoardHandle<T> => {
-        let grabOffset: Point2d = { x: NOTHING, y: NOTHING };
         let hasPendingClick = false;
 
         const getBoundsShare = (): Size2d => ({ width: FULL_WIDTH, height: defs.getHeightRatio() });
@@ -723,7 +726,10 @@ export namespace PatchBoardUtils {
                     return {
                         kind: "spot",
                         ...getClampedSpot(
-                            getSnappedSpot({ x: board.x - grabOffset.x, y: board.y - grabOffset.y }),
+                            getSnappedSpot({
+                                x: board.x - value.grabRatio.x * value.node.sizeShare.width,
+                                y: board.y - value.grabRatio.y * value.node.sizeShare.height,
+                            }),
                             value.node.sizeShare,
                             getBoundsShare(),
                         ),
@@ -876,9 +882,12 @@ export namespace PatchBoardUtils {
 
             const board = from && getPoint(from);
 
-            grabOffset = board
-                ? { x: board.x - node.spot.x, y: board.y - node.spot.y }
-                : { x: node.sizeShare.width * 0.5, y: node.sizeShare.height * 0.5 };
+            const grabRatio: Point2d = board
+                ? {
+                      x: node.sizeShare.width > NOTHING ? (board.x - node.spot.x) / node.sizeShare.width : MIDDLE,
+                      y: node.sizeShare.height > NOTHING ? (board.y - node.spot.y) / node.sizeShare.height : MIDDLE,
+                  }
+                : { x: MIDDLE, y: MIDDLE };
 
             CarrierUtils.start(
                 defs.getZone(),
@@ -887,7 +896,7 @@ export namespace PatchBoardUtils {
                     groupId: defs.getGroupId(),
                     key: getNodeKey(node),
                     label: defs.computeNodeLabel(node.value),
-                    value: { kind: "node", node } satisfies PatchBoardCarry<T>,
+                    value: { kind: "node", node, grabRatio } satisfies PatchBoardCarry<T>,
                 },
                 mode,
             );
@@ -941,6 +950,8 @@ export namespace PatchBoardUtils {
             getEndLabel,
             getIsEndAllowed: getIsAllowed,
             handleNodePointerDown: (node, e, currentTarget) => {
+                hasPendingClick = false;
+
                 if (e.button !== NOTHING || defs.getIsDisabled()) return;
                 if (getIsOnInteractiveDescendant(e.target, currentTarget)) return;
                 if (CarrierUtils.getCarry()) return;
@@ -954,6 +965,8 @@ export namespace PatchBoardUtils {
                 });
             },
             handleSocketPointerDown: (socket, e) => {
+                hasPendingClick = false;
+
                 if (e.button !== NOTHING || defs.getIsDisabled() || defs.getIsLocked() || !socket) return;
                 if (CarrierUtils.getCarry()) return;
 
@@ -1037,8 +1050,10 @@ export namespace PatchBoardUtils {
                     return;
                 }
 
+                if (NavigatorUtils.getHasCommandModifier(e)) return;
+
                 if (isCarrying) {
-                    const nudge = NUDGE_KEYS[e.key];
+                    const nudge = Object.hasOwn(NUDGE_KEYS, e.key) ? NUDGE_KEYS[e.key] : undefined;
 
                     if (!nudge) return;
 

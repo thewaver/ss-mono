@@ -11,7 +11,7 @@ import {
     ROUTE_START,
     STARTING_PIECE,
 } from "@thewaver/ss-playground/App/Pages/TileBoardPage/TileBoardPage.const";
-import { Index2d, type Index2dString } from "@thewaver/ss-utils";
+import { type Count2d, Index2d, type Index2dString } from "@thewaver/ss-utils";
 
 import { PageExampleKnobs } from "../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
@@ -42,7 +42,7 @@ export const TileBoardPage = () => {
     const [getDestination, setDestination] = createSignal<Index2d>();
     const [getPainted, setPainted] = createSignal<Index2dString[]>(NO_MARKS);
 
-    const getTileCount = createMemo((): Index2d => ({ row: getRows(), col: getCols() }));
+    const getTileCount = createMemo((): Count2d => ({ rowCount: getRows(), colCount: getCols() }));
 
     const getTileSize = createMemo(() => ({ width: getTileWidth(), height: getTileHeight() }));
 

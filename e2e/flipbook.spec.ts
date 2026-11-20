@@ -1,7 +1,7 @@
 import type { Page } from "@playwright/test";
 import { expect, test } from "@playwright/test";
 
-import { demo, readout } from "./helpers";
+import { demo, expectAnnounced, markAnnouncements, readAnnouncements, readout, recordAnnouncements } from "./helpers";
 
 /**
  * The book is a named region holding a spine of leaves, two pages to a leaf, and every page is in the document at
@@ -24,7 +24,6 @@ const book = `${region} > div:first-child`;
 
 const NEXT = control("Next page");
 const PREVIOUS = control("Previous page");
-const ANNOUNCER = 'body > [role="log"][aria-live="polite"]';
 
 const DRAG_STEPS = 10;
 
@@ -64,6 +63,7 @@ const drag = async (page: Page, from: number, to: number) => {
 };
 
 test.beforeEach(async ({ page }) => {
+    await recordAnnouncements(page);
     await page.goto("/flipbook");
     await expect(page.locator(region)).toBeVisible();
     await page.mouse.move(0, 0);
@@ -174,12 +174,14 @@ test("a page let go short of the commit point turns partway and falls back", asy
  * appears, and every turn after that is its own message.
  */
 test("a turn announces the spread it opened at, in the page's own words", async ({ page }) => {
-    await expect(page.locator(`${ANNOUNCER} > *`), "nothing is said as the book appears").toHaveCount(0);
+    expect(await readAnnouncements(page), "nothing is said as the book appears").toEqual([]);
 
     await page.locator(NEXT).click();
-    await expect(page.locator(ANNOUNCER)).toContainText("pages 2 and 3 of 12");
+    await expectAnnounced(page, "pages 2 and 3 of 12");
+
+    const mark = await markAnnouncements(page);
 
     await page.locator(region).focus();
     await page.keyboard.press("ArrowLeft");
-    await expect(page.locator(ANNOUNCER), "a key turn is announced the same way").toContainText("page 1 of 12");
+    await expectAnnounced(page, "page 1 of 12", { mark, message: "a key turn is announced the same way" });
 });

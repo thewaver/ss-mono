@@ -1,6 +1,6 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { example, prop, readout } from "./helpers";
+import { example, expectAnnounced, prop, readout, recordAnnouncements } from "./helpers";
 
 /**
  * A die is a convex solid turned so one face is towards the viewer. The geometry is arithmetic the unit tests hold;
@@ -13,18 +13,17 @@ const TABLETOP = example("tabletop");
 const FACE = `${TABLETOP} [aria-roledescription="face"]`;
 const SHOWING = `${FACE}:not([aria-hidden="true"])`;
 const ROLL = "#dieRoll";
-const ANNOUNCER = '[aria-live="polite"]';
-const SETTLE_MS = 150;
 
-const pickShape = async (page: Page, key: string) => {
+const pickShape = async (page: Page, key: string, faces: number) => {
     await page.locator(`${prop("shape")} [role="combobox"]`).click();
     await page.getByRole("option", { name: key, exact: true }).click();
-    await page.waitForTimeout(SETTLE_MS);
+    await expect(page.locator(FACE), `${key} is built`).toHaveCount(faces);
 };
 
 const shownNumber = async (page: Page) => (await readout(page, "tabletop")).match(/^showing (\d+) of/)![1];
 
 test.beforeEach(async ({ page }) => {
+    await recordAnnouncements(page);
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/die");
     await expect(page.locator(FACE).first()).toBeAttached();
@@ -40,8 +39,7 @@ test("every die is built with the faces it should have", async ({ page }) => {
         ["d20", 20],
         ["d100", 100],
     ] as const) {
-        await pickShape(page, key);
-        await expect(page.locator(FACE), key).toHaveCount(count);
+        await pickShape(page, key, count);
     }
 });
 
@@ -57,7 +55,7 @@ test("a roll lands on the face the page chose, and only that face is offered to 
 test("the face that came up is said aloud", async ({ page }) => {
     await page.locator(ROLL).click();
 
-    await expect(page.locator(ANNOUNCER)).toContainText(await shownNumber(page));
+    await expectAnnounced(page, await shownNumber(page));
 });
 
 test("with motion on, the die is busy, offers the face it is heading for and refuses a second roll until it lands", async ({
@@ -115,7 +113,7 @@ test(
     "switching to a smaller die turns it onto its last face rather than snapping there",
     { tag: "@solo" },
     async ({ page }) => {
-        await pickShape(page, "d100");
+        await pickShape(page, "d100", 100);
 
         while (Number(await shownNumber(page)) <= 4) await page.locator(ROLL).click();
 
@@ -219,9 +217,7 @@ test("only the face the icon cloud is heading for is offered to a screen reader,
     await page.keyboard.press("ArrowDown");
 
     await expect(page.locator(CLOUD_OFFERED)).toHaveCount(1);
-    await expect(page.locator(ANNOUNCER)).toContainText(
-        (await page.locator(CLOUD_OFFERED).getAttribute("aria-label"))!,
-    );
+    await expectAnnounced(page, (await page.locator(CLOUD_OFFERED).getAttribute("aria-label"))!);
 });
 
 /**

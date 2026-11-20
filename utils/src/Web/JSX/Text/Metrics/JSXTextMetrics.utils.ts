@@ -2,6 +2,13 @@ import { Size2d } from "../../../../Abstracts/size.js";
 import { StringUtils } from "../../../../Abstracts/string.js";
 import type { TextMetricValue, TextMetricsStyle } from "./JSXTextMetrics.types.js";
 
+/**
+ * The canvas used for measuring, built the first time it is actually needed.
+ *
+ * `undefined` means "not tried yet"; `null` means "tried, and there is no document to build one in". Deliberately
+ * lazy: creating this while the file loads would make the whole package throw on import under Node, during
+ * server-side rendering, and in any test runner without a DOM.
+ */
 let measureContext: CanvasRenderingContext2D | null | undefined;
 const getMeasureContext = () => {
     if (measureContext === undefined) {
@@ -12,6 +19,47 @@ const getMeasureContext = () => {
     }
 
     return measureContext;
+};
+
+const CANVAS_CAPS: readonly CanvasFontVariantCaps[] = [
+    "normal",
+    "small-caps",
+    "all-small-caps",
+    "petite-caps",
+    "all-petite-caps",
+    "unicase",
+    "titling-caps",
+];
+
+const CANVAS_STRETCHES: readonly [CanvasFontStretch, number][] = [
+    ["ultra-condensed", 50],
+    ["extra-condensed", 62.5],
+    ["condensed", 75],
+    ["semi-condensed", 87.5],
+    ["normal", 100],
+    ["semi-expanded", 112.5],
+    ["expanded", 125],
+    ["extra-expanded", 150],
+    ["ultra-expanded", 200],
+];
+
+const NORMAL_STRETCH_PERCENT = 100;
+
+/** The canvas spelling of a `font-variant-caps` value; anything a canvas cannot take is `normal`. */
+const toCanvasCaps = (value: unknown): CanvasFontVariantCaps => CANVAS_CAPS.find((caps) => caps === value) ?? "normal";
+
+/** The canvas keyword nearest a `font-stretch` value, which a canvas takes only as a keyword, never a percentage. */
+const toCanvasStretch = (value: unknown): CanvasFontStretch => {
+    const keyword = CANVAS_STRETCHES.find(([name]) => name === value);
+
+    if (keyword) return keyword[0];
+
+    const percent = typeof value === "string" && value.endsWith("%") ? parseFloat(value) : NORMAL_STRETCH_PERCENT;
+    const target = Number.isNaN(percent) ? NORMAL_STRETCH_PERCENT : percent;
+
+    return CANVAS_STRETCHES.reduce((best, entry) =>
+        Math.abs(entry[1] - target) < Math.abs(best[1] - target) ? entry : best,
+    )[0];
 };
 
 /**
@@ -41,7 +89,7 @@ export namespace JSXTextMetricsUtils {
      */
 
     export const parseTextMetric = (value: TextMetricValue | undefined, fallback: number = 0) => {
-        if (!value) return fallback;
+        if (value === undefined || value === "") return fallback;
 
         const result = typeof value === "number" ? value : parseFloat(value);
 
@@ -50,20 +98,24 @@ export namespace JSXTextMetricsUtils {
     };
 
     /**
-     * The canvas used for measuring, built the first time it is actually needed.
+     * Measures how wide each run of text is drawn in a style, letter and word spacing included.
      *
-     * `undefined` means "not tried yet"; `null` means "tried, and there is no document
-     * to build one in". Deliberately lazy: creating this while the file loads would
-     * make the whole package throw on import under Node, during server-side rendering,
-     * and in any test runner without a DOM.
+     * Measured on a canvas built the first time it is needed, so the file loads under Node and in tests. With no
+     * document to build one in, every width is `0`.
+     *
+     * @param texts The runs to measure.
+     * @param metrics The style they are drawn in.
+     * @returns One width per run, in pixels.
      */
-
     export const measureTextWidths = (texts: string[], metrics: TextMetricsStyle): number[] => {
         const ctx = getMeasureContext();
 
         if (!ctx) return texts.map(() => 0);
 
         ctx.font = `${metrics["font-style"] ?? "normal"} ${metrics["font-weight"] ?? "normal"} ${metrics["font-size"] ?? "1rem"} ${metrics["font-family"] ?? "sans-serif"}`;
+
+        if ("fontVariantCaps" in ctx) ctx.fontVariantCaps = toCanvasCaps(metrics["font-variant-caps"]);
+        if ("fontStretch" in ctx) ctx.fontStretch = toCanvasStretch(metrics["font-stretch"]);
 
         const letterSpacing = parseTextMetric(metrics["letter-spacing"]);
         const wordSpacing = parseTextMetric(metrics["word-spacing"]);
@@ -73,15 +125,18 @@ export namespace JSXTextMetricsUtils {
             const text = texts[i];
 
             if (StringUtils.isWhitespace(texts[i])) {
-                results[i] =
-                    ctx.measureText(text).width + (text.length - 1) * letterSpacing + text.length * wordSpacing;
+                const count = StringUtils.splitGraphemes(text).length;
+
+                results[i] = ctx.measureText(text).width + count * (letterSpacing + wordSpacing);
             } else {
                 const transformedText =
                     typeof metrics["text-transform"] === "string"
                         ? StringUtils.applyTextTransform(text, metrics["text-transform"])
                         : text;
 
-                results[i] = ctx.measureText(transformedText).width + (transformedText.length - 1) * letterSpacing;
+                results[i] =
+                    ctx.measureText(transformedText).width +
+                    StringUtils.splitGraphemes(transformedText).length * letterSpacing;
             }
         }
 

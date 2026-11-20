@@ -18,6 +18,8 @@ const HINT_DIGIT = "0";
  * the field's rather than the reader's to type. These are the rules for that; keeping the text and the amount in
  * step as the reader types is `MaskedFieldUtils`', wired by each framework.
  */
+const LEADING_ZEROS = /^0+/;
+
 export namespace CurrencyInputUtils {
     /**
      * The grouping an amount is written with.
@@ -83,15 +85,30 @@ export namespace CurrencyInputUtils {
             return isNegative ? -magnitude : magnitude;
         };
 
+        const toDigits = (value: number) =>
+            (value < 0 ? TextSyncUtils.MASK_MINUS : "") + DecimalUtils.toDigits(value, defs.getDecimals());
+
+        const toComparableDigits = (digits: string) => {
+            const isNegative = digits.startsWith(TextSyncUtils.MASK_MINUS);
+            const magnitude = (isNegative ? digits.slice(1) : digits).replace(LEADING_ZEROS, "");
+
+            return magnitude === "" ? "" : `${isNegative ? TextSyncUtils.MASK_MINUS : ""}${magnitude}`;
+        };
+
+        const getIsHeldExactly = (digits: string) => {
+            const value = fromDigits(digits);
+
+            return value !== undefined && toComparableDigits(toDigits(value)) === toComparableDigits(digits);
+        };
+
         return {
             formatDigits: (digits) => TextSyncUtils.formatWithGroups({ ...defs.getGroupDefs(), hasSign: true }, digits),
             readDigits: (text) =>
                 defs.getHasSign() ? TextSyncUtils.readSignedDigits(text) : TextSyncUtils.getMaskedDigits(text),
             getDigitCount: () => undefined,
-            toDigits: (value) =>
-                (value < 0 ? TextSyncUtils.MASK_MINUS : "") + DecimalUtils.toDigits(value, defs.getDecimals()),
+            toDigits,
             fromDigits,
-            getHasImpossibleDigits: (digits) => digits.length > 0 && fromDigits(digits) === undefined,
+            getHasImpossibleDigits: (digits) => digits.length > 0 && !getIsHeldExactly(digits),
             getIsSame: (a, b) => a === b,
             settleValue: (value) => MathUtils.clamp(value, defs.getMin() ?? -Infinity, defs.getMax() ?? Infinity),
         };

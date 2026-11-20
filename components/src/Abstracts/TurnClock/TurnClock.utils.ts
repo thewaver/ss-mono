@@ -135,7 +135,9 @@ export namespace TurnClockUtils {
      * Asks for targets that may arrive later, and ignores the answer to any request canceled before it came.
      *
      * A target function that throws is treated exactly like one whose promise is rejected: the request is refused, so
-     * whoever is waiting on it is released.
+     * whoever is waiting on it is released. An error thrown while acting on a target that did arrive is not a refusal:
+     * the refusal handler still runs, so whatever acting on it had already changed can be put back, and the error is
+     * then thrown on, to be reported rather than swallowed.
      *
      * @returns The request.
      */
@@ -145,17 +147,24 @@ export namespace TurnClockUtils {
         const request = <T>(compute: () => T | Promise<T>, onTarget: (target: T) => void, onRefused: () => void) => {
             const current = generation;
 
-            void new Promise<T>((resolve) => resolve(compute()))
-                .then((target) => {
+            void new Promise<T>((resolve) => resolve(compute())).then(
+                (target) => {
                     if (current !== generation) return;
 
-                    onTarget(target);
-                })
-                .catch(() => {
+                    try {
+                        onTarget(target);
+                    } catch (error) {
+                        onRefused();
+
+                        throw error;
+                    }
+                },
+                () => {
                     if (current !== generation) return;
 
                     onRefused();
-                });
+                },
+            );
         };
 
         const cancel = () => {

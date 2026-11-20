@@ -1,10 +1,10 @@
 import { MathUtils } from "@thewaver/ss-utils";
 
 import type { SliceAnimationBreakpointOpts } from "../SliceAnimationBreakpoints/SliceAnimationBreakpoints.types";
+import { SLICE_ANIMATION_PLAYBACK_DEFAULTS } from "./SliceAnimationPlayback.const";
 import type { SliceAnimationPlaybackDirection, SliceAnimationPlaybackOpts } from "./SliceAnimationPlayback.types";
 
 const DEFAULT_DIRECTION: SliceAnimationPlaybackDirection = "normal";
-const DEFAULT_HOLD_MS = 0;
 const ROUND_TRIPS: readonly SliceAnimationPlaybackDirection[] = ["stack", "stack_reverse", "pipe", "pipe_reverse"];
 const FAR_END_STARTS: readonly SliceAnimationPlaybackDirection[] = ["reverse", "stack_reverse", "pipe_reverse"];
 const computeAlternated = (progress: number, outward: number) => {
@@ -39,7 +39,7 @@ export namespace SliceAnimationPlaybackUtils {
      * Only a round trip has a turn to hold at, so this is also whether a hold has any effect.
      *
      * @param dir The direction; `normal` if left out.
-     * @returns `true` for `stack`, `pipe` and their `-reverse` forms.
+     * @returns `true` for `stack`, `pipe`, `stack_reverse` and `pipe_reverse`.
      */
     export const isRoundTrip = (dir: SliceAnimationPlaybackDirection = DEFAULT_DIRECTION) => ROUND_TRIPS.includes(dir);
 
@@ -56,7 +56,7 @@ export namespace SliceAnimationPlaybackUtils {
     export const computeCycleDurationMs = (durationMs: number, opts?: SliceAnimationPlaybackOpts) => {
         if (!isRoundTrip(opts?.dir)) return durationMs;
 
-        return durationMs * 2 + Math.max(opts?.holdMs ?? DEFAULT_HOLD_MS, 0);
+        return durationMs * 2 + Math.max(opts?.holdMs ?? SLICE_ANIMATION_PLAYBACK_DEFAULTS.holdMs, 0);
     };
 
     /**
@@ -64,7 +64,7 @@ export namespace SliceAnimationPlaybackUtils {
      *
      * Forwards is the loop's progress as it is and backwards is its mirror. A round trip spends its first stretch
      * going out, holds at the end for the hold, and spends the last stretch coming back, each trip taking the share
-     * of the loop its duration is; the `-reverse` forms do the same starting from the far end. `stack` and `pipe`
+     * of the loop its duration is; `stack_reverse` and `pipe_reverse` do the same starting from the far end. `stack` and `pipe`
      * run this timeline identically — what sets `pipe` apart is {@link computeBreakpointOpts}.
      *
      * @param timeline How far through the loop playback is, from `0` to `1`; values outside are clamped.

@@ -141,13 +141,22 @@ export namespace ClockUtils {
      *
      * @param readings The column's values.
      * @param target The value to match.
+     * @param cycleLength How many values make one turn of the clock, so distance is measured the shorter way round
+     * — on a twelve-hour column one o'clock is nearer twelve than three. Left out, distance is measured straight.
      * @returns The index of the closest, preferring the earlier one on a tie.
      */
-    export const getNearestIndex = (readings: number[], target: number) =>
-        readings.reduce(
-            (best, reading, index) => (Math.abs(reading - target) < Math.abs(readings[best] - target) ? index : best),
+    export const getNearestIndex = (readings: number[], target: number, cycleLength?: number) => {
+        const getDistance = (reading: number) => {
+            const straight = Math.abs(reading - target);
+
+            return cycleLength === undefined ? straight : Math.min(straight, cycleLength - (straight % cycleLength));
+        };
+
+        return readings.reduce(
+            (best, reading, index) => (getDistance(reading) < getDistance(readings[best]) ? index : best),
             0,
         );
+    };
 
     /**
      * A time of day read off a `Date`, to the second, in the local time zone.
@@ -168,7 +177,8 @@ export namespace ClockUtils {
      *
      * @param value The picked time, if there is one.
      * @param now The time counted as now.
-     * @param hasSeconds Whether the clock offers seconds, in which case the base always carries a second.
+     * @param hasSeconds Whether the clock offers seconds. If it does, the base always carries a second; if not, it
+     * carries none, so a time picked from the clock never holds a second nobody chose.
      * @param minValue The earliest time allowed, if there is one.
      * @param maxValue The latest time allowed, if there is one.
      */
@@ -181,7 +191,7 @@ export namespace ClockUtils {
     ): TimeValue => {
         const base = value ?? TimeUtils.clamp(now, minValue, maxValue);
 
-        return hasSeconds ? { ...base, second: base.second ?? 0 } : base;
+        return hasSeconds ? { ...base, second: base.second ?? 0 } : { hour: base.hour, minute: base.minute };
     };
 
     /**
@@ -257,7 +267,11 @@ export namespace ClockUtils {
      * @returns The index of the nearest reading, since a stepped column cannot show every value.
      */
     export const getRovingIndex = (column: ClockColumn, time: TimeValue, isTwelveHour: boolean) =>
-        getNearestIndex(column.readings, getReading(column.unit, time, isTwelveHour));
+        getNearestIndex(
+            column.readings,
+            getReading(column.unit, time, isTwelveHour),
+            column.unit === "hour" && isTwelveHour ? TWELVE_HOUR_LENGTH : UNIT_LENGTHS[column.unit],
+        );
 
     /**
      * Tests whether an option shows the reading a given time has in its column.

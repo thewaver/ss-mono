@@ -12,6 +12,8 @@ import { Barrel } from "../../../Primitives/Barrel/Barrel";
 import { access, accessSignal } from "../../../Utils/propUtils";
 import type { FlipCardProps } from "./FlipCardSolid.types";
 
+const FACES = [...FlipCardUtils.FACES];
+
 export const FlipCard = (props: FlipCardProps) => {
     const [getIsFlipped] = accessSignal(() => props.flipped);
 
@@ -53,7 +55,7 @@ export const FlipCard = (props: FlipCardProps) => {
             aria-label={access(props.ariaLabel)}
         >
             <Barrel<FlipCardFace>
-                faces={[...FlipCardUtils.FACES]}
+                faces={FACES}
                 axis={() => access(props.axis) ?? FLIP_CARD_DEFAULTS.axis}
                 faceSize={() => access(props.size)}
                 angle={getAngle}

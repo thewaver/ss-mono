@@ -1,6 +1,6 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { docsDemo, docsSettled, inputValue, prop } from "./helpers";
+import { docsDemo, docsSettled, inputValue, prop, tabKey } from "./helpers";
 
 /**
  * The typed date field, the typed time field and the picker each have a Docs page of their own, so each test opens
@@ -199,6 +199,26 @@ test("a half-typed date leaves the previous value alone until it is complete", a
     );
 });
 
+/**
+ * Emptying the field is the one text with no date in it that still commits: no digits means no value, so the
+ * owner is told the date is gone, and an empty field is not an error.
+ */
+test("emptying a date field clears the owner's date", async ({ page }) => {
+    await openDateInput(page);
+    await typeInto(page, field(TYPED), "2026-12-25");
+    await expect(readout(page, TYPED)).toHaveText(holds("2026-12-25"));
+
+    await page.keyboard.press("ControlOrMeta+a");
+    await page.keyboard.press("Backspace");
+
+    await expect(page.locator(field(TYPED))).toHaveValue("");
+    await expect.poll(() => heldValue(page, TYPED, ISO_DATE), { message: "the owner holds no date" }).toBeUndefined();
+    await expect(page.locator(field(TYPED)), "and the field says nothing is wrong").not.toHaveAttribute(
+        "aria-invalid",
+        "true",
+    );
+});
+
 test("the trigger opens a calendar over the field", async ({ page }) => {
     await openDatePicker(page);
     await expect(page.locator(POPUP), "nothing is portaled before it opens").toHaveCount(0);
@@ -256,7 +276,7 @@ test("a date outside the bounds is kept as typed and pulled to the nearest one o
         holds("2026-08-01"),
     );
 
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
 
     await expect(readout(page, BOUNDED), "leaving the field moves the value").not.toHaveText(holds("2026-08-01"));
 
@@ -326,6 +346,22 @@ test("a complete time reaches the owner, and an impossible one does not", async 
     await expect(readout(page, TIME), "nor a 60th minute").toHaveText(holds("14:45"));
 });
 
+test("emptying a time field clears the owner's time", async ({ page }) => {
+    await openTimeInput(page);
+    await typeInto(page, field(TIME), "14:45");
+    await expect(readout(page, TIME)).toHaveText(holds("14:45"));
+
+    await page.keyboard.press("ControlOrMeta+a");
+    await page.keyboard.press("Backspace");
+
+    await expect(page.locator(field(TIME))).toHaveValue("");
+    await expect.poll(() => heldValue(page, TIME, ISO_TIME), { message: "the owner holds no time" }).toBeUndefined();
+    await expect(page.locator(field(TIME)), "and the field says nothing is wrong").not.toHaveAttribute(
+        "aria-invalid",
+        "true",
+    );
+});
+
 test("the arrows step whichever segment the caret is in, and select it", async ({ page }) => {
     await openTimeInput(page);
     await typeInto(page, field(TIME), "14:45");
@@ -375,7 +411,7 @@ test("a seconds field has a third segment of its own", async ({ page }) => {
     await caretAt(page, field(PRECISE), 7);
     await page.keyboard.press("ArrowUp");
 
-    expect(await inputValue(page.locator(field(PRECISE))), "the caret in the seconds steps the seconds").toBe(
+    await expect(page.locator(field(PRECISE)), "the caret in the seconds steps the seconds").toHaveValue(
         `${hours}:${minutes}:${String(Number(seconds) + 1).padStart(2, "0")}`,
     );
 });
@@ -390,7 +426,7 @@ test("bounds pull a typed time in on leaving and clamp a stepped one", async ({ 
 
     await expect(readout(page, SHIFT), "a time before opening is held as typed").toHaveText(holds("00:00"));
 
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
 
     await expect(readout(page, SHIFT), "and leaving the field pulls it in").not.toHaveText(holds("00:00"));
 
@@ -400,7 +436,7 @@ test("bounds pull a typed time in on leaving and clamp a stepped one", async ({ 
 
     await expect(readout(page, SHIFT), "a time after closing is held as typed too").toHaveText(holds("23:59"));
 
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
 
     await expect(readout(page, SHIFT), "until the field is left").not.toHaveText(holds("23:59"));
 

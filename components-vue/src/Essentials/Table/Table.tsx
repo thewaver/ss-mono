@@ -601,6 +601,8 @@ export const Table = defineComponent(
         };
 
         const handleHeaderPointerDown = (e: PointerEvent, columnIndex: number) => {
+            hasCarriedClick = false;
+
             const column = columns.value[columnIndex];
 
             if (e.button !== 0 || getIsDisabled() || !getIsReorderable(column)) return;

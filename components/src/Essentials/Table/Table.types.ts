@@ -205,17 +205,24 @@ export type BaseTableValues<T> = {
 export type BaseTableCbs<T> = {
     /**
      * Guesses how tall a row will be before it is drawn, which is what lets a long table render only what is on screen.
-     * An open detail is guessed at its row's height until it has been drawn and measured.
+     * An open detail is guessed at its row's height until it has been drawn and measured. `layoutRow` is the row's
+     * place on screen, after sorting, counting from `0` — not its place in `rows`.
      */
-    computeEstimatedRowHeight?: (index: number) => number;
+    computeEstimatedRowHeight?: (layoutRow: number) => number;
     /** Runs when the reader sorts by a different column, or reverses the one it is sorted by. */
     onSortChange?: (sort: TableSort | undefined) => void;
     /** Runs when the reader moves a column. */
     onOrderChange?: (order: string[]) => void;
-    /** Names one row for assistive technology, so a reader hears what the row is rather than its number. */
-    computeRowAriaLabel?: (row: T, index: number) => string;
-    /** Runs when a row is activated, by pointer or by key. */
-    onRowActivate?: (row: T, index: number) => void;
+    /**
+     * Names one row for assistive technology, so a reader hears what the row is rather than its number. `layoutRow`
+     * is the row's place on screen, after sorting — read the record from `row`, not `rows[layoutRow]`.
+     */
+    computeRowAriaLabel?: (row: T, layoutRow: number) => string;
+    /**
+     * Runs when a row is activated, by pointer or by key. `layoutRow` is the row's place on screen, after sorting —
+     * read the record from `row`, not `rows[layoutRow]`.
+     */
+    onRowActivate?: (row: T, layoutRow: number) => void;
     /** Runs when the selection changes. */
     onSelectionChange?: (rows: T[]) => void;
     /**

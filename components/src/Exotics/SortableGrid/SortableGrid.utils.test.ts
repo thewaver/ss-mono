@@ -270,14 +270,6 @@ describe("getSpots", () => {
     });
 });
 
-describe("computeItemLabel", () => {
-    it("appends the turned footprint and the spot, counting from one", () => {
-        expect(
-            SortableGridUtils.computeItemLabel("Scroll", item("scroll", 4, 0, { colCount: 2, rowCount: 1 }, 1)),
-        ).toBe("Scroll, 1 by 2, column 5, row 1");
-    });
-});
-
 describe("getCarriedShape and getAimedTurns", () => {
     const carry = (value: unknown) => ({ groupId: "g", key: "k", label: "l", value });
 

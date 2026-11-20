@@ -197,11 +197,39 @@ export const PAN_STARTING_VIEW: PanZoomView = {
     y: { start: 0, end: PAN_SCALE * PAN_BOARD_HEIGHT_RATIO },
 };
 
+export const SHARED_FIRST_NODES: PatchBoardNode<PatchDevice>[] = [
+    {
+        value: { id: "synth", name: "Synth", kind: "source" },
+        spot: { x: 0.05, y: 0.2 },
+        sizeShare: NODE_SIZE_SHARE,
+        sockets: [{ id: "out", kind: "out", label: "out" }],
+    },
+    {
+        value: { id: "delay", name: "Delay", kind: "effect" },
+        spot: { x: 0.4, y: 0.2 },
+        sizeShare: NODE_SIZE_SHARE,
+        sockets: [
+            { id: "in", kind: "in", label: "in" },
+            { id: "out", kind: "out", label: "out" },
+        ],
+    },
+];
+
+export const SHARED_SECOND_NODES: PatchBoardNode<PatchDevice>[] = [
+    {
+        value: { id: "speaker", name: "Speaker", kind: "sink" },
+        spot: { x: 0.7, y: 0.2 },
+        sizeShare: NODE_SIZE_SHARE,
+        sockets: [{ id: "in", kind: "in", label: "in" }],
+    },
+];
+
 export const EXAMPLE_NAMES = {
     chain: "Signal chain",
     mixer: "Mixing desk",
     rack: "Effects rack",
     panZoom: "Zoomed and panned board",
+    shared: "Two boards, one group",
 };
 
 export const EXAMPLES_ROOT = "/src/App/Pages/PatchBoardPage/Examples";

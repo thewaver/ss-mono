@@ -75,9 +75,13 @@ export const CellAnimation = (props: CellAnimationProps) => {
 
     const getCellWeights = createMemo(() => props.computeSliceWeights?.(getCellCount()) ?? []);
 
-    const getColumnEdges = createMemo(() => CellAnimationUtils.computeEdges(getRootSize().width, getCellCount().col));
+    const getColumnEdges = createMemo(() =>
+        CellAnimationUtils.computeEdges(getRootSize().width, getCellCount().colCount),
+    );
 
-    const getRowEdges = createMemo(() => CellAnimationUtils.computeEdges(getRootSize().height, getCellCount().row));
+    const getRowEdges = createMemo(() =>
+        CellAnimationUtils.computeEdges(getRootSize().height, getCellCount().rowCount),
+    );
 
     const getCellBounds = (pos: Index2d) => CellAnimationUtils.computeCellBounds(getColumnEdges(), getRowEdges(), pos);
 
@@ -315,6 +319,7 @@ export const CellAnimation = (props: CellAnimationProps) => {
                 width={getSizeAnchor() === "width" ? "100%" : "auto"}
                 height={getSizeAnchor() === "height" ? "100%" : "auto"}
                 aria-hidden="true"
+                alt=""
             />
 
             <Show

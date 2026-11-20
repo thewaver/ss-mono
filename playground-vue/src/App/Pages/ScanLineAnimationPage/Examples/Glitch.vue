@@ -3,7 +3,7 @@ import { computed, shallowRef, useModel, watch } from "vue";
 
 import { ScanlineAnimation, SliceAnimationKeyframeUtils, SliceAnimationWeights } from "@thewaver/ss-components-vue";
 import type { SliceAnimationBreakpointTriple, SliceStop } from "@thewaver/ss-components-vue";
-import type { Index2d } from "@thewaver/ss-utils";
+import type { Count2d } from "@thewaver/ss-utils";
 
 import type { ScanlineAnimationExampleProps } from "../ScanlineAnimationPage.types";
 
@@ -83,7 +83,7 @@ watch(
     regenerateShifts,
 );
 
-const computeSliceWeights = (count: Index2d) =>
+const computeSliceWeights = (count: Count2d) =>
     SliceAnimationWeights.computeSliceWeights(props.weightType, count, WEIGHT_ORIGIN);
 
 const computeRootAnimation = (timeline: number) => {

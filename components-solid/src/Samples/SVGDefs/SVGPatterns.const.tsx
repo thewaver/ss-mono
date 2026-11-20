@@ -1,13 +1,12 @@
 import { createEffect, createMemo, on, untrack } from "solid-js";
 
 import {
-    type SVGPatternCellCount,
     type SVGPatternKind,
     SVGPatternLayouts,
     type TrackedPatternElementDefs,
     TrackedPatternUtils,
 } from "@thewaver/ss-components";
-import type { Size2d } from "@thewaver/ss-utils";
+import type { Count2d, Size2d } from "@thewaver/ss-utils";
 
 import { PointerTrackerSolidUtils } from "../../Abstracts/PointerTracker/PointerTrackerSolid.utils";
 import { SVGPatternDefsSolidUtils } from "../../Generators/SVGDefs/SVGPatterns/SVGPatternDefsSolid.utils";
@@ -16,17 +15,17 @@ import type { SVGPatternCellRenderer, SVGPatternTrackedCellRenderer } from "./SV
 
 const NO_REF = () => undefined;
 
-const getIsSameCellCount = (a: SVGPatternCellCount, b: SVGPatternCellCount) => a.rows === b.rows && a.cols === b.cols;
+const getIsSameCellCount = (a: Count2d, b: Count2d) => a.rowCount === b.rowCount && a.colCount === b.colCount;
 
 export namespace SVGPatterns {
     export const computeLayoutPattern = (
         kind: SVGPatternKind,
         id: string,
-        requestedCellCount: SVGPatternCellCount,
+        requestedCellCount: Count2d,
         cellSize: Size2d,
         renderCell: SVGPatternCellRenderer,
     ) => {
-        const layout = SVGPatternLayouts.ALL[kind];
+        const layout = SVGPatternLayouts.getLayout(kind);
         const cellCount = layout.computeCellCount(requestedCellCount);
 
         return SVGPatternDefsSolidUtils.computePattern(
@@ -40,56 +39,56 @@ export namespace SVGPatterns {
 
     export const computeGridPattern = (
         id: string,
-        cellCount: SVGPatternCellCount,
+        cellCount: Count2d,
         cellSize: Size2d,
         renderCell: SVGPatternCellRenderer,
     ) => computeLayoutPattern("grid", id, cellCount, cellSize, renderCell);
 
     export const computeDiagonalPattern = (
         id: string,
-        cellCount: SVGPatternCellCount,
+        cellCount: Count2d,
         cellSize: Size2d,
         renderCell: SVGPatternCellRenderer,
     ) => computeLayoutPattern("diagonal", id, cellCount, cellSize, renderCell);
 
     export const computeHalfShiftPattern = (
         id: string,
-        cellCount: SVGPatternCellCount,
+        cellCount: Count2d,
         cellSize: Size2d,
         renderCell: SVGPatternCellRenderer,
     ) => computeLayoutPattern("half_shift", id, cellCount, cellSize, renderCell);
 
     export const computeHalfDropPattern = (
         id: string,
-        cellCount: SVGPatternCellCount,
+        cellCount: Count2d,
         cellSize: Size2d,
         renderCell: SVGPatternCellRenderer,
     ) => computeLayoutPattern("half_drop", id, cellCount, cellSize, renderCell);
 
     export const computeTrianglePattern = (
         id: string,
-        cellCount: SVGPatternCellCount,
+        cellCount: Count2d,
         cellSize: Size2d,
         renderCell: SVGPatternCellRenderer,
     ) => computeLayoutPattern("triangle", id, cellCount, cellSize, renderCell);
 
     export const computeTriangleSidewaysPattern = (
         id: string,
-        cellCount: SVGPatternCellCount,
+        cellCount: Count2d,
         cellSize: Size2d,
         renderCell: SVGPatternCellRenderer,
     ) => computeLayoutPattern("triangle_sideways", id, cellCount, cellSize, renderCell);
 
     export const computeHexPointyTopPattern = (
         id: string,
-        cellCount: SVGPatternCellCount,
+        cellCount: Count2d,
         cellSize: Size2d,
         renderCell: SVGPatternCellRenderer,
     ) => computeLayoutPattern("hex_pointy_top", id, cellCount, cellSize, renderCell);
 
     export const computeHexFlatTopPattern = (
         id: string,
-        cellCount: SVGPatternCellCount,
+        cellCount: Count2d,
         cellSize: Size2d,
         renderCell: SVGPatternCellRenderer,
     ) => computeLayoutPattern("hex_flat_top", id, cellCount, cellSize, renderCell);

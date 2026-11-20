@@ -133,7 +133,7 @@ const TextFieldElement = (props: TextFieldElementProps) => {
                 aria-required={props.isRequired || undefined}
                 aria-invalid={props.flags.hasError || undefined}
                 {...props.ariaAttributes}
-                onInput={(e) => handleInput(e.currentTarget)}
+                onInput={(e) => handleInput(e.currentTarget, (e.nativeEvent as InputEvent).inputType)}
                 onCompositionStart={handleCompositionStart}
                 onCompositionEnd={(e) => handleCompositionEnd(e.currentTarget)}
                 onKeyDown={(e) => {

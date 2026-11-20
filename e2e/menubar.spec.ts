@@ -1,6 +1,6 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { activeDescendantText, activeMatches, docsDemo, docsSettled, prop } from "./helpers";
+import { activeDescendantText, activeMatches, docsDemo, docsSettled, prop, tabKey } from "./helpers";
 
 const DOCS = "/src/App/Pages/MenubarPage/Docs";
 
@@ -24,7 +24,7 @@ const readout = async (page: Page, name: string) =>
  * measured, and are read out of the row by `aria-hidden` rather than by being absent.
  *
  * Which word is which is read off the order the row draws them in, never off their captions: the first word,
- * the second, the last. A word's menu is found through the word itself, by the id its menu is labelled by.
+ * the second, the last. A word's menu is found through the word itself, by the id its menu is labeled by.
  */
 const word = (page: Page, index: number) => page.locator(WORD).nth(index);
 
@@ -70,7 +70,7 @@ const setBarWidth = async (page: Page, value: string) => {
     await page.locator(`${prop("barWidth")} input`).click();
     await page.keyboard.press("ControlOrMeta+a");
     await page.keyboard.type(value);
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
 };
 
 const WIDEST_PX = "100000";
@@ -105,7 +105,7 @@ test("the row is one tab stop, and the arrows walk the words without opening any
     await expect(page.locator(MENU), "and walking a closed bar opens nothing").toHaveCount(0);
 });
 
-test("pressing a word opens its menu, labelled by the word, and moves focus into it", async ({ page }) => {
+test("pressing a word opens its menu, labeled by the word, and moves focus into it", async ({ page }) => {
     await openedByClick(page, 0);
 
     await expect(word(page, 0), "the word says it is open").toHaveAttribute("aria-expanded", "true");

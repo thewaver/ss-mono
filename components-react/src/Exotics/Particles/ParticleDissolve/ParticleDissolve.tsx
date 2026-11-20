@@ -9,7 +9,7 @@ import {
     type ParticleFieldCellDefs,
     ParticleDissolveStyles as styles,
 } from "@thewaver/ss-components";
-import { type Index2d, Index2dUtils, RectUtils } from "@thewaver/ss-utils";
+import { type Count2d, Index2dUtils, RectUtils } from "@thewaver/ss-utils";
 
 import { ElementObserverReactUtils } from "../../../Abstracts/ElementObserver/ElementObserverReact.utils";
 import { MediaQueryMonitorReactUtils } from "../../../Abstracts/MediaQueryMonitor/MediaQueryMonitorReact.utils";
@@ -23,7 +23,7 @@ const SINGLE_PASS = 1;
 
 const ignoreWrite = () => undefined;
 
-const getCellKey = (cell: ParticleFieldCellDefs) => Index2dUtils.toFlatIndex(cell.pos, cell.count.col);
+const getCellKey = (cell: ParticleFieldCellDefs) => Index2dUtils.toFlatIndex(cell.pos, cell.count.colCount);
 
 export const ParticleDissolve = (props: ParticleDissolveProps) => {
     const rootRef = useRef<HTMLDivElement | null>(null);
@@ -63,7 +63,7 @@ export const ParticleDissolve = (props: ParticleDissolveProps) => {
     );
 
     const computeCellWeights = useCallback(
-        (count: Index2d) => ParticleDissolveUtils.computeCellWeights(count, size, sweep),
+        (count: Count2d) => ParticleDissolveUtils.computeCellWeights(count, size, sweep),
         [size, sweep],
     );
 

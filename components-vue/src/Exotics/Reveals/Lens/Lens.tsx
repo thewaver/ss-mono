@@ -69,7 +69,7 @@ export const Lens = defineComponent(
             const handleKeyDown = (e: KeyboardEvent) => {
                 const nudge = RevealUtils.getNudge(e);
 
-                if (isDisabled || !nudge) return;
+                if (e.target !== e.currentTarget || isDisabled || !nudge) return;
 
                 e.preventDefault();
 

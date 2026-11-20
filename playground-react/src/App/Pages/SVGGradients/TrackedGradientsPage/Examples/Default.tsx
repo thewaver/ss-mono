@@ -17,32 +17,23 @@ type Props = TrackedGradientExampleProps & {
     groupSize?: Size2d;
 };
 
-export const TrackedShape = ({
-    configKey,
-    configDefs,
-    paintKind,
-    colors,
-    blurWidth,
-    boxClass,
-    groupElement,
-    groupSize,
-}: Props) => {
+export const TrackedShape = (props: Props) => {
     const id = useId();
 
     const computeDefs = (size: Size2d, element: HTMLElement | undefined) => {
-        if (configKey === NO_SAMPLE_KEY) return computeNoSampleDefs(colors, paintKind);
+        if (props.configKey === NO_SAMPLE_KEY) return computeNoSampleDefs(props.colors, props.paintKind);
 
         return SVGDefsSampleConfigs.Gradient.Tracked.toConfig({
-            family: configKey,
-            defs: configDefs,
+            family: props.configKey,
+            defs: props.configDefs,
         } as SVGDefsSamples.Gradient.Tracked.Entry).computeSVGDefs(
-            `${paintKind}-${id}`,
+            `${props.paintKind}-${id}`,
             undefined,
-            groupElement ?? element,
+            props.groupElement ?? element,
             {
-                getSize: () => groupSize ?? size,
-                colors,
-                blurWidth,
+                getSize: () => props.groupSize ?? size,
+                colors: props.colors,
+                blurWidth: props.blurWidth,
             },
         );
     };
@@ -50,10 +41,10 @@ export const TrackedShape = ({
     return (
         <Shape
             computePoints={(size) => ShapeConst.getDefaultShapePoints("square", size)}
-            computeFillDefs={paintKind === "fill" ? computeDefs : undefined}
-            computeStrokeDefs={paintKind === "stroke" ? computeDefs : undefined}
-            strokeGeom={paintKind === "stroke" ? [{ thicknesses: [STROKE_THICKNESS] }] : undefined}
-            renderChildren={() => <div className={boxClass ?? styles.example} />}
+            computeFillDefs={props.paintKind === "fill" ? computeDefs : undefined}
+            computeStrokeDefs={props.paintKind === "stroke" ? computeDefs : undefined}
+            strokeGeom={props.paintKind === "stroke" ? [{ thicknesses: [STROKE_THICKNESS] }] : undefined}
+            renderChildren={() => <div className={props.boxClass ?? styles.example} />}
         />
     );
 };

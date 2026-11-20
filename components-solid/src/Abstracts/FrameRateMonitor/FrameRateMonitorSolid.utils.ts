@@ -16,14 +16,21 @@ export namespace FrameRateMonitorSolidUtils {
      * Must run inside a component or another reactive owner.
      *
      * @param getIsDisabled Pass `true` to stop counting.
-     * @param opts.startupTimeMs How long to wait before counting. Mounting and the first paint are
+     * @param opts.getStartupTimeMs How long to wait before counting, read each time counting starts. Mounting and the first paint are
      * expensive and would drag the average down for the rest of the session, so a monitor watching a
      * heavy component should let it settle first.
      * @returns `getFrameRate`, giving `current` for the last sample and `average` since counting began.
      * Both are zero until the first sample completes.
      */
-    export const create = (getIsDisabled: Accessor<boolean>, opts?: { startupTimeMs?: number }) => {
-        const monitor = FrameRateMonitorUtils.create(opts);
+    export const create = (
+        getIsDisabled: Accessor<boolean>,
+        opts?: { getStartupTimeMs?: Accessor<number | undefined> },
+    ) => {
+        const monitor = FrameRateMonitorUtils.create({
+            get startupTimeMs() {
+                return opts?.getStartupTimeMs?.();
+            },
+        });
         const getFrameRate = accessStore(monitor);
         const getIsPageHidden = InteractionTrackerSolidUtils.trackPageHidden();
 

@@ -241,6 +241,7 @@
         width={sizeAnchor === "width" ? "100%" : "auto"}
         height={sizeAnchor === "height" ? "100%" : "auto"}
         aria-hidden="true"
+        alt=""
     />
 
     <svg class={styles.rgbAnimationFilterHost} aria-hidden="true">

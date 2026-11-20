@@ -21,7 +21,7 @@ import { InteractionTrackerReactUtils } from "../../../Abstracts/InteractionTrac
 import { SignalMirrorReactUtils } from "../../../Abstracts/SignalMirror/SignalMirrorReact.utils";
 import { SliceRendererReactUtils } from "../../../Abstracts/SliceRenderer/SliceRendererReact.utils";
 import { useViewportContext } from "../../../Abstracts/Viewport/Viewport.context";
-import { useLatest } from "../../../Utils/refUtils";
+import { useLatest, useStableValue } from "../../../Utils/refUtils";
 import type { RGBAnimationProps } from "./RGBAnimation.types";
 
 const WHOLE_PASS = { half: 0.5, isDescending: false };
@@ -88,15 +88,14 @@ export const RGBAnimation = (props: RGBAnimationProps) => {
 
     const picture = SliceRendererReactUtils.usePicture(props.src, isElementsOnly);
 
-    const tables = useMemo(
-        () =>
-            isElementsOnly
-                ? undefined
-                : SliceAnimationUtils.resolveTables(
-                      props.computeSliceAnimation,
-                      evaluationDefs.map(RGBAnimationUtils.toSliceDefs),
-                  ),
-        [isElementsOnly, props.computeSliceAnimation, evaluationDefs],
+    const tables = useStableValue(
+        isElementsOnly
+            ? undefined
+            : SliceAnimationUtils.resolveTables(
+                  props.computeSliceAnimation,
+                  evaluationDefs.map(RGBAnimationUtils.toSliceDefs),
+              ),
+        SliceAnimationUtils.getIsSameTables,
     );
 
     const isOnGraphicsCard = isAvailable && SliceRendererUtils.getCanDraw(renderer, picture) && !!tables;
@@ -218,6 +217,7 @@ export const RGBAnimation = (props: RGBAnimationProps) => {
                 width={sizeAnchor === "width" ? "100%" : "auto"}
                 height={sizeAnchor === "height" ? "100%" : "auto"}
                 aria-hidden="true"
+                alt=""
             />
 
             <svg className={RGBAnimationStyles.rgbAnimationFilterHost} aria-hidden="true">

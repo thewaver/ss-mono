@@ -249,18 +249,20 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
     useEffect(() => {
         const previous = previousIndexRef.current;
         const { count: slideCount, rests: groupRests, isLooping: isLoopingNow } = latest.current;
-        const isThere =
-            CarouselUtils.getNearestGroup(
-                CarouselUtils.toGroupPosition(progressRef.current, groupRests, slideCount, isLoopingNow),
-                groupRests,
-                slideCount,
-                isLoopingNow,
-            ) === currentIndex;
+        const nearest = CarouselUtils.getNearestGroup(
+            CarouselUtils.toGroupPosition(progressRef.current, groupRests, slideCount, isLoopingNow),
+            groupRests,
+            slideCount,
+            isLoopingNow,
+        );
+        const isThere = nearest === currentIndex;
 
         previousIndexRef.current = currentIndex;
 
         if (previous === undefined) {
-            if (!isThere) {
+            if (props.index === undefined) {
+                if (!isThere) setIndex(nearest);
+            } else if (!isThere) {
                 latest.current.writeProgress(
                     CarouselUtils.toGroupProgress(groupRests[currentIndex] ?? 0, groupRests, slideCount, isLoopingNow),
                 );
@@ -277,6 +279,14 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
     const hasProgressMountedRef = useRef(false);
     const onIndexChangeRef = useLatest(props.onIndexChange);
     const currentIndexRef = useLatest(currentIndex);
+
+    useEffect(
+        () => () => {
+            previousIndexRef.current = undefined;
+            hasProgressMountedRef.current = false;
+        },
+        [],
+    );
 
     useEffect(() => {
         if (!hasProgressMountedRef.current) {

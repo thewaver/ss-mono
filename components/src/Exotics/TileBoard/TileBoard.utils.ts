@@ -1,4 +1,5 @@
 import {
+    type Count2d,
     Index2d,
     type Index2dString,
     MathUtils,
@@ -237,7 +238,7 @@ const computeIsCut = (tiling: TileBoardTiling) => tiling.pieces.length > 1 || ti
  * @returns The column count, or for a tiling that cuts boxes, the boxes across times the pieces in each.
  */
 const computeColumnCount = (layout: TileBoardLayout) =>
-    layout.count.col * (computeIsCut(layout) ? layout.pieces[0].length : 1);
+    layout.count.colCount * (computeIsCut(layout) ? layout.pieces[0].length : 1);
 
 /**
  * Which piece of which box a tile is, on a tiling that cuts its boxes.
@@ -361,22 +362,22 @@ const computeSharedEdgeNeighbors = (tile: Index2d, layout: TileBoardLayout): Ind
  * {@link TileBoardUtils.getBoardSize} is the size as drawn.
  */
 const computeFlatBoardSize = (layout: TileBoardLayout): Size2d => {
-    if (layout.count.row < 1 || layout.count.col < 1) return EMPTY_SIZE;
+    if (layout.count.rowCount < 1 || layout.count.colCount < 1) return EMPTY_SIZE;
 
     if (computeIsCut(layout)) {
         const lastCol = computeColumnCount(layout) - 1;
-        const rights = Array.from({ length: Math.min(layout.count.row, layout.pieces.length) }, (_unused, row) => {
+        const rights = Array.from({ length: Math.min(layout.count.rowCount, layout.pieces.length) }, (_unused, row) => {
             const { room } = computePiece({ row, col: lastCol }, layout, layout.pitch);
 
             return room.x + room.width;
         });
 
-        return { width: Math.max(...rights), height: layout.pitch.height * layout.count.row };
+        return { width: Math.max(...rights), height: layout.pitch.height * layout.count.rowCount };
     }
 
     return {
-        width: layout.pitch.width * (layout.count.col - 1) + layout.tileSize.width,
-        height: layout.pitch.height * (layout.count.row - 1) + layout.tileSize.height,
+        width: layout.pitch.width * (layout.count.colCount - 1) + layout.tileSize.width,
+        height: layout.pitch.height * (layout.count.rowCount - 1) + layout.tileSize.height,
     };
 };
 
@@ -538,7 +539,7 @@ export namespace TileBoardUtils {
      */
     export const getLayout = (
         tiling: TileBoardTilingKind,
-        count: Index2d,
+        count: Count2d,
         tileSize: Size2d,
         hasShortFirstRow: boolean,
         taper: number,
@@ -755,7 +756,7 @@ export namespace TileBoardUtils {
      */
     export const getIsOnBoard = (tile: Index2d, layout: TileBoardLayout) =>
         tile.row >= FIRST_INDEX &&
-        tile.row < layout.count.row &&
+        tile.row < layout.count.rowCount &&
         tile.col >= FIRST_INDEX &&
         tile.col < getRowLength(tile.row, layout);
 
@@ -893,7 +894,7 @@ export namespace TileBoardUtils {
      * @param layout The board's layout.
      */
     export const getLastTile = (layout: TileBoardLayout): Index2d => {
-        const row = Math.max(layout.count.row - 1, FIRST_INDEX);
+        const row = Math.max(layout.count.rowCount - 1, FIRST_INDEX);
 
         return { row, col: Math.max(getRowLength(row, layout) - 1, FIRST_INDEX) };
     };
@@ -907,7 +908,7 @@ export namespace TileBoardUtils {
      * @param layout The board's layout.
      */
     export const clampTile = (tile: Index2d, layout: TileBoardLayout): Index2d => {
-        const row = MathUtils.clamp(tile.row, FIRST_INDEX, Math.max(layout.count.row - 1, FIRST_INDEX));
+        const row = MathUtils.clamp(tile.row, FIRST_INDEX, Math.max(layout.count.rowCount - 1, FIRST_INDEX));
 
         return {
             row,
@@ -936,7 +937,7 @@ export namespace TileBoardUtils {
         layout: TileBoardLayout,
         opts?: { hasEdgeKeys?: boolean },
     ): Index2d | undefined => {
-        if (layout.count.row < 1 || layout.count.col < 1) return;
+        if (layout.count.rowCount < 1 || layout.count.colCount < 1) return;
 
         const step = (rows: number, cols: number) => clampTile({ row: from.row + rows, col: from.col + cols }, layout);
 

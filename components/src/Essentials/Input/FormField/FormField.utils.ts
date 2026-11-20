@@ -39,7 +39,8 @@ export namespace FormFieldUtils {
      * @param propName What the caller's framework calls the prop, so the warning names what they actually wrote.
      */
     export const warnIfShadowed = (isCaptioned: boolean, hasAriaLabel: boolean, propName: string) => {
-        if (isCaptioned && hasAriaLabel) console.warn(computeShadowedWarning(propName));
+        if (process.env.NODE_ENV !== "production" && isCaptioned && hasAriaLabel)
+            console.warn(computeShadowedWarning(propName));
     };
 
     /**

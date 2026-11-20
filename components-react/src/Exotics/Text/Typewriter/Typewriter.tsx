@@ -277,7 +277,7 @@ export const Typewriter = (props: TypewriterProps) => {
                 if (isAnimating) {
                     return (
                         <span style={style}>
-                            {Array.from(segment.text).map((character, offset) => (
+                            {StringUtils.splitGraphemes(segment.text).map((character, offset) => (
                                 <Fragment key={offset}>
                                     <span
                                         className={TypewriterStyles.typewriterChar}

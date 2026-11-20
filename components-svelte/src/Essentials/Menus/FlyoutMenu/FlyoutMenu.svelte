@@ -74,7 +74,9 @@
     );
 
     const getListSize = ElementObserverSvelteUtils.createBorderBoxSizeObserver(() => listRef ?? undefined);
-    const getEntrySizes = ElementObserverSvelteUtils.createBorderBoxSizeListObserver(() => entryElements);
+    const getEntrySizes = ElementObserverSvelteUtils.createBorderBoxSizeListObserver(() =>
+        entryElements.slice(0, entries.length),
+    );
     const getOverflowSize = ElementObserverSvelteUtils.createBorderBoxSizeObserver(() => overflowElement ?? undefined);
     const getLinksSize = ElementObserverSvelteUtils.createBorderBoxSizeObserver(() => linksRef ?? undefined);
 

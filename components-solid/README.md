@@ -9,6 +9,8 @@ where one exists.
 Live, editable examples and a full prop table for every component are at
 **[ss-components.vercel.app](https://ss-components.vercel.app)**.
 
+**Browser only: drawing these components on a server — Next.js, Nuxt, SvelteKit, SolidStart — is not tested.**
+
 ## Install
 
 ```

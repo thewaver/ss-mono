@@ -1,12 +1,12 @@
 import { type EasingFn, EasingUtils, MathUtils } from "@thewaver/ss-utils";
 
+import { SLICE_ANIMATION_BREAKPOINT_DEFAULTS } from "./SliceAnimationBreakpoints.const";
 import type {
     SliceAnimationBreakpointOpts,
     SliceAnimationBreakpointTriple,
     SliceAnimationEasing,
 } from "./SliceAnimationBreakpoints.types";
 
-const DEFAULT_SMOOTHNESS = 0.25;
 const DEFAULT_EASING: SliceAnimationEasing = "linear";
 const EASING_CONTROLS: Record<Exclude<SliceAnimationEasing, "linear">, [number, number, number, number]> = {
     "ease": [0.25, 0.1, 0.25, 1],
@@ -20,8 +20,13 @@ const EASINGS = Object.fromEntries(
         EasingUtils.getCubicBezier(x1, y1, x2, y2),
     ]),
 ) as Record<keyof typeof EASING_CONTROLS, EasingFn>;
-const computeEasedRatio = (easing: SliceAnimationEasing, ratio: number) =>
-    easing === DEFAULT_EASING ? ratio : EASINGS[easing](ratio);
+const computeEasedRatio = (easing: SliceAnimationEasing, ratio: number) => {
+    if (easing === DEFAULT_EASING) return ratio;
+    if (!Object.hasOwn(EASINGS, easing))
+        throw new Error(`SliceAnimationBreakpoints: there is no easing named "${easing}".`);
+
+    return EASINGS[easing](ratio);
+};
 
 /**
  * When each cell of a cell animation plays, worked out from its weight.
@@ -51,7 +56,7 @@ export namespace SliceAnimationBreakpointUtils {
     ): SliceAnimationBreakpointTriple => {
         const directed = opts?.dir === "desc" ? weight : 1 - weight;
         const progress = MathUtils.clamp01(directed);
-        const half = MathUtils.clamp01(opts?.smoothness ?? DEFAULT_SMOOTHNESS) * 0.5;
+        const half = MathUtils.clamp01(opts?.smoothness ?? SLICE_ANIMATION_BREAKPOINT_DEFAULTS.smoothness) * 0.5;
         const start = progress * (1 - 2 * half);
 
         return [start, start + half, start + 2 * half];

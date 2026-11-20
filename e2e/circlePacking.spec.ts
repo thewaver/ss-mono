@@ -29,7 +29,7 @@ const pressBranch = async (page: Page, path: string) => {
 
     const point = await branch.evaluate((element) => {
         const { x, y, width, height } = element.querySelector("circle")!.getBoundingClientRect();
-        const radius = width / 2;
+        const radius = width * 0.5;
         const steps = 24;
 
         for (let row = 1; row < steps; row++) {
@@ -37,7 +37,7 @@ const pressBranch = async (page: Page, path: string) => {
                 const px = x + (width * column) / steps;
                 const py = y + (height * row) / steps;
 
-                if (Math.hypot(px - (x + radius), py - (y + height / 2)) > radius * 0.95) continue;
+                if (Math.hypot(px - (x + radius), py - (y + height * 0.5)) > radius * 0.95) continue;
                 if (document.elementFromPoint(px, py)?.closest('[role="button"]') === element) return { x: px, y: py };
             }
         }

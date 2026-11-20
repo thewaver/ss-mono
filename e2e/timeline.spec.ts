@@ -1,6 +1,6 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { example, prop, readout } from "./helpers";
+import { example, prop, readout, tabKey } from "./helpers";
 
 /**
  * The component's whole job is arithmetic over a window, so nothing here pins a pixel. Every check is a
@@ -23,6 +23,28 @@ const TRACKS_ZOOM_IN = "#tracksZoomIn";
 const TRACKS_WHOLE_REEL = "#tracksWholeReel";
 
 const SETTLE_MS = 150;
+
+/**
+ * A gesture sets the window at once and the page draws it a frame or two later, so a test that reads the result
+ * waits until two readings a poll apart are the same.
+ */
+const untilStill = async <T>(read: () => Promise<T>, message: string) => {
+    let previous: string | undefined;
+
+    await expect
+        .poll(
+            async () => {
+                const current = JSON.stringify(await read());
+                const isStill = current === previous;
+
+                previous = current;
+
+                return isStill;
+            },
+            { message },
+        )
+        .toBe(true);
+};
 
 type Block = {
     label: string;
@@ -79,7 +101,7 @@ const dragFrom = async (page: Page, at: { x: number; y: number }, byX: number) =
     await page.mouse.down();
     await page.mouse.move(at.x + byX, at.y, { steps: 8 });
     await page.mouse.up();
-    await page.waitForTimeout(SETTLE_MS);
+    await untilStill(() => readBlocks(page, "body"), "the blocks have stopped moving");
 };
 
 const dragSurface = async (page: Page, scope: string, byX: number) => {
@@ -143,7 +165,7 @@ test("a consumer that names the lanes gets those lanes rather than packed ones",
 });
 
 test("the arrows walk the blocks in time order, whatever order the page listed them in", async ({ page }) => {
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
     await page.locator(BLOCK).first().focus();
 
     const first = await page.evaluate(() => document.activeElement?.getAttribute("aria-label") ?? "");
@@ -181,18 +203,21 @@ test("walking to a block that is off screen brings the window to it", async ({ p
 
     for (let notch = 0; notch < 6; notch++) await page.mouse.wheel(0, -100);
 
-    await page.waitForTimeout(SETTLE_MS);
+    await expect
+        .poll(async () => (await readWindow(page, "meetings")).extent, { message: "the wheel narrowed the window" })
+        .toBeLessThan(660);
+    await untilStill(() => readWindow(page, "meetings"), "the window has stopped zooming");
 
     const zoomed = await readWindow(page, "meetings");
 
     await page.locator(BLOCK).first().focus();
     await page.keyboard.press("Home");
-    await page.waitForTimeout(SETTLE_MS);
+    await untilStill(() => readWindow(page, "meetings"), "the window has stopped moving to the first block");
 
     const home = await readWindow(page, "meetings");
 
     await page.keyboard.press("End");
-    await page.waitForTimeout(SETTLE_MS);
+    await untilStill(() => readWindow(page, "meetings"), "the window has stopped moving to the last block");
 
     const end = await readWindow(page, "meetings");
     const last = await page.evaluate(() => document.activeElement?.getAttribute("aria-label") ?? "");
@@ -211,7 +236,12 @@ test("the wheel zooms about the pointer and a drag moves the window without resi
 
     await page.mouse.move(box.x + box.width * 0.25, box.y + box.height - 4);
     await page.mouse.wheel(0, -300);
-    await page.waitForTimeout(SETTLE_MS);
+    await expect
+        .poll(async () => (await readWindow(page, "meetings")).extent, {
+            message: "the window is narrower than it was",
+        })
+        .toBeLessThan(before.extent);
+    await untilStill(() => readWindow(page, "meetings"), "the window has stopped zooming");
 
     const zoomed = await readWindow(page, "meetings");
 
@@ -232,12 +262,15 @@ test("a button that resets the window puts it back exactly", async ({ page }) =>
     const before = await readWindow(page, "tracks");
 
     await page.locator(TRACKS_ZOOM_IN).click();
-    await page.waitForTimeout(SETTLE_MS);
+    await expect
+        .poll(async () => (await readWindow(page, "tracks")).extent, { message: "zooming in narrows the window" })
+        .toBeLessThan(before.extent);
 
     await page.locator(TRACKS_WHOLE_REEL).click();
-    await page.waitForTimeout(SETTLE_MS);
 
-    expect((await readWindow(page, "tracks")).extent).toBe(before.extent);
+    await expect
+        .poll(async () => (await readWindow(page, "tracks")).extent, { message: "the whole reel is back" })
+        .toBe(before.extent);
 });
 
 /**
@@ -250,9 +283,14 @@ test("a press on a block picks it and a drag from the same block moves the windo
 
     await page.mouse.move(surfaceBox.x + surfaceBox.width * 0.5, surfaceBox.y + surfaceBox.height - 4);
 
+    const unzoomed = await readBlocks(page, MEETINGS);
+
     for (let notch = 0; notch < 4; notch++) await page.mouse.wheel(0, -100);
 
-    await page.waitForTimeout(SETTLE_MS);
+    await expect
+        .poll(() => readBlocks(page, MEETINGS), { message: "the wheel zoomed the blocks" })
+        .not.toEqual(unzoomed);
+    await untilStill(() => readBlocks(page, MEETINGS), "the blocks have stopped zooming");
 
     const block = page.locator(`${MEETINGS} [aria-label*="Pairing"]`);
     const box = (await block.boundingBox())!;
@@ -275,14 +313,20 @@ test("the buttons pan as well as zoom, which is the route for anyone who cannot 
     const before = await readWindow(page, "tracks");
 
     await page.locator(TRACKS_ZOOM_IN).click();
-    await page.waitForTimeout(SETTLE_MS);
+    await expect
+        .poll(async () => (await readWindow(page, "tracks")).extent, { message: "zooming in shows less of the reel" })
+        .toBeLessThan(before.extent);
+    await untilStill(() => readWindow(page, "tracks"), "the window has stopped zooming");
 
     const zoomed = await readWindow(page, "tracks");
 
-    expect(zoomed.extent, "zooming in shows less of the reel").toBeLessThan(before.extent);
-
     await page.locator(TRACKS_LATER).click();
-    await page.waitForTimeout(SETTLE_MS);
+    await expect
+        .poll(async () => (await readWindow(page, "tracks")).from, {
+            message: "and later moves the window on",
+        })
+        .toBeGreaterThan(zoomed.from);
+    await untilStill(() => readWindow(page, "tracks"), "the window has stopped panning");
 
     const panned = await readWindow(page, "tracks");
 
@@ -307,11 +351,12 @@ test("the gestures can be switched off, and the buttons still work when they are
     expect(after, "neither the wheel nor the drag reaches it").toEqual(before);
 
     await page.locator(TRACKS_ZOOM_IN).click();
-    await page.waitForTimeout(SETTLE_MS);
 
-    expect((await readWindow(page, "tracks")).extent, "the controller is untouched by the switch").toBeLessThan(
-        before.extent,
-    );
+    await expect
+        .poll(async () => (await readWindow(page, "tracks")).extent, {
+            message: "the controller is untouched by the switch",
+        })
+        .toBeLessThan(before.extent);
 });
 
 test("a press reports the block it landed on", async ({ page }) => {
@@ -324,7 +369,6 @@ test("a press reports the block it landed on", async ({ page }) => {
 
 test("a disabled timeline is out of the tab order and refuses the keyboard", async ({ page }) => {
     await page.locator(`${prop("isDisabled")} input`).check();
-    await page.waitForTimeout(SETTLE_MS);
 
     const before = await readWindow(page, "meetings");
 
@@ -429,7 +473,10 @@ test("the playhead keeps its place among the clips when the window is zoomed and
 
     for (let notch = 0; notch < 10; notch++) await page.mouse.wheel(0, -100);
 
-    await page.waitForTimeout(SETTLE_MS);
+    await expect
+        .poll(async () => (await playhead(page)).left, { message: "its place across the box has changed" })
+        .not.toBeCloseTo(before.left, 1);
+    await untilStill(() => playhead(page), "the playhead has stopped moving");
 
     const zoomed = await playhead(page);
 
@@ -459,7 +506,12 @@ test("a marker outside the window is still handed over, flagged, and the painter
 }) => {
     await playFor(page, 3);
     await page.locator(TRACKS_ZOOM_IN).click();
-    await page.waitForTimeout(SETTLE_MS);
+    await expect
+        .poll(async () => (await readWindow(page, "tracks")).from > (await markerTime(page)), {
+            message: "zooming in about the middle has left the playhead behind",
+        })
+        .toBe(true);
+    await untilStill(() => readWindow(page, "tracks"), "the window has stopped zooming");
 
     const window = await readWindow(page, "tracks");
     const away = await readMarkers(page, TRACKS);
@@ -472,11 +524,14 @@ test("a marker outside the window is still handed over, flagged, and the painter
     expect(away[0].isPainted, "and the painter was told it is out of view").toBe(false);
 
     await page.locator(TRACKS_WHOLE_REEL).click();
-    await page.waitForTimeout(SETTLE_MS);
+    await expect
+        .poll(async () => (await playhead(page)).isPainted, {
+            message: "bringing it back into the window draws it again",
+        })
+        .toBe(true);
 
     const back = await playhead(page);
 
-    expect(back.isPainted, "bringing it back into the window draws it again").toBe(true);
     expect(back.left).toBeGreaterThanOrEqual(0);
 });
 
@@ -650,7 +705,7 @@ test("Tab still leaves while an end is held, and leaving puts the end back", asy
 
     await holdByKey(page, "Interview");
     await page.keyboard.press("ArrowRight");
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
 
     expect(
         await page.evaluate((selector) => document.querySelector(selector)!.contains(document.activeElement), TRIM),
@@ -677,9 +732,12 @@ const zoomTrimAtStart = async (page: Page) => {
 
     await page.mouse.move(box.x + 2, box.y + box.height - 4);
 
+    const unzoomed = await readBlocks(page, TRIM);
+
     for (let notch = 0; notch < 3; notch++) await page.mouse.wheel(0, -100);
 
-    await page.waitForTimeout(SETTLE_MS);
+    await expect.poll(() => readBlocks(page, TRIM), { message: "the wheel zoomed the clips" }).not.toEqual(unzoomed);
+    await untilStill(() => readBlocks(page, TRIM), "the clips have stopped zooming");
 };
 
 const stripPoint = async (page: Page, name: string, edge: "start" | "end") => {
@@ -725,11 +783,14 @@ test("a press on an end strip picks the end up and the next press puts it down",
 
     await page.mouse.move(from.x + 30, from.y, { steps: 4 });
     await page.mouse.click(from.x + 60, from.y);
-    await page.waitForTimeout(SETTLE_MS);
+    await expect
+        .poll(async () => (await trimSpan(page, "Cold open")).from, {
+            message: "the second press put the start down later",
+        })
+        .toBeGreaterThan(before.from);
 
     const after = await trimSpan(page, "Cold open");
 
-    expect(after.from, "the second press put the start down later").toBeGreaterThan(before.from);
     expect(after.to).toBe(before.to);
     await expect(page.locator(prop("picked")), "and did not press the clip it landed on").toContainText("nothing yet");
 });

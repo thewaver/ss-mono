@@ -12,7 +12,7 @@ import {
 } from "@thewaver/ss-components-vue";
 import type { SliceAnimationPlaybackOpts } from "@thewaver/ss-components-vue";
 import * as styles from "@thewaver/ss-playground/App/Pages/CellAnimationPage/CellAnimationPage.css";
-import type { Index2d, Size2d } from "@thewaver/ss-utils";
+import type { Count2d, Size2d } from "@thewaver/ss-utils";
 
 import PageControlButtonContent from "../../../StyledComponents/ControlButtonContent/ControlButtonContent.vue";
 import type { CellAnimationExampleProps } from "../CellAnimationPage.types";
@@ -42,9 +42,9 @@ const prefersReducedMotion = MediaQueryMonitorVueUtils.useReducedMotion();
 
 const wipeSize = shallowRef<Size2d>();
 
-const cellCount = computed<Index2d>(() => ({
-    col: Math.ceil((wipeSize.value?.width ?? 0) / WIPE_CELL_SIZE),
-    row: Math.ceil((wipeSize.value?.height ?? 0) / WIPE_CELL_SIZE),
+const cellCount = computed<Count2d>(() => ({
+    colCount: Math.ceil((wipeSize.value?.width ?? 0) / WIPE_CELL_SIZE),
+    rowCount: Math.ceil((wipeSize.value?.height ?? 0) / WIPE_CELL_SIZE),
 }));
 
 const origin = computed(() => CellAnimationOrigins.computeOrigin(props.originType, cellCount.value));
@@ -57,7 +57,7 @@ const wipe = () => {
     wipeSize.value = { ...viewportContext.getSize() };
 };
 
-const computeSliceWeights = (count: Index2d) =>
+const computeSliceWeights = (count: Count2d) =>
     SliceAnimationWeights.computeSliceWeights(props.weightType, count, origin.value, props.weightOpts);
 </script>
 

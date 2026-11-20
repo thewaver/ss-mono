@@ -4,6 +4,7 @@ import { MathUtils } from "./math.js";
 const MAX_JITTER_RATIO = 0.5;
 const MIN_SPIN_TURNS = 1;
 
+/** The angles of a turning thing divided into steps: where each step sits, which step an angle shows, and a spin's path. */
 export namespace RotationUtils {
     /**
      * Finds the angle one step occupies when a full turn is divided evenly.

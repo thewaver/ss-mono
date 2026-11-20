@@ -100,7 +100,7 @@ export namespace RGBAnimationUtils {
 
         const slice = {
             pos: { row: 0, col: RGB_ANIMATION_CHANNELS.indexOf(defs.channel) },
-            count: { row: 1, col: RGB_ANIMATION_CHANNELS.length },
+            count: { rowCount: 1, colCount: RGB_ANIMATION_CHANNELS.length },
             weight: 0,
             size: defs.size,
             origin: { row: 0, col: 0 },

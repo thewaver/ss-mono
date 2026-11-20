@@ -46,9 +46,8 @@ export const Tooltip = (props: TooltipProps) => {
         getIsVisible,
         {
             getPlacement: () => access(props.placement),
-            getOffset: props.offset === undefined ? undefined : () => access(props.offset)!,
-            getReservedScreenSize:
-                props.reservedScreenSize === undefined ? undefined : () => access(props.reservedScreenSize)!,
+            getOffset: () => access(props.offset),
+            getReservedScreenSize: () => access(props.reservedScreenSize),
         },
     );
 

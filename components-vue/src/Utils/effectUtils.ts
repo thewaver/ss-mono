@@ -30,8 +30,14 @@ export const watchAfterRender = <const TSources extends readonly WatchSource[]>(
 ) => {
     let cleanup: (() => void) | void;
     let hasStarted = false;
+    let lastValues: readonly unknown[] | undefined;
 
     const run = (values: WatchedValues<TSources>) => {
+        const previous = lastValues;
+
+        if (previous && values.every((value, index) => Object.is(value, previous[index]))) return;
+
+        lastValues = values;
         cleanup?.();
         cleanup = effect(values);
     };

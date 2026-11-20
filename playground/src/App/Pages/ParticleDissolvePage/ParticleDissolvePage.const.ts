@@ -14,9 +14,9 @@ export const EXAMPLE_NAMES = {
 export const STRESS_CELL_SIZE = 8;
 
 export const STRESS_ITEMS: StressTestDefs[] = [
-    { count: 3 * 2, cols: 3, gap: 10 },
-    { count: 4 * 3, cols: 4, gap: 10 },
-    { count: 5 * 4, cols: 5, gap: 10 },
+    { count: 3 * 2, colCount: 3, gap: 10 },
+    { count: 4 * 3, colCount: 4, gap: 10 },
+    { count: 5 * 4, colCount: 5, gap: 10 },
 ];
 
 export const EXAMPLES_ROOT = "/src/App/Pages/ParticleDissolvePage/Examples";

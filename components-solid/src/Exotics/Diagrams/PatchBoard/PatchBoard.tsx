@@ -151,8 +151,8 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
         getLinks,
         getPlacements: () => getPlacements(),
         getPlacedSocketByEndKey: () => getPlacedSocketByEndKey(),
-        computeNodeKey: props.computeNodeKey,
-        computeNodeLabel: props.computeNodeLabel,
+        computeNodeKey: (node) => props.computeNodeKey(node),
+        computeNodeLabel: (node) => props.computeNodeLabel(node),
         updateNodes: (update) => nodesSignal[1]((nodes) => update(nodes)),
         updateLinks: (update) => linksSignal[1]((links) => update(links)),
         focusStop,
@@ -183,9 +183,32 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
     const getAimedPlace = createMemo(() => {
         const place = CarrierSolidUtils.getTargetPlace();
 
-        if (!getCarry() || place === undefined) return undefined;
+        if (!getCarry() || place === undefined || CarrierSolidUtils.getTargetZone() !== board.zone) return undefined;
 
         return place as PatchBoardPlace;
+    });
+
+    const getIsCarriedAway = createMemo(() => {
+        const targetZone = CarrierSolidUtils.getTargetZone();
+
+        return getCarriedNodeKey() !== undefined && targetZone !== undefined && targetZone !== board.zone;
+    });
+
+    const getIncomingNode = createMemo(() => {
+        const carry = CarrierSolidUtils.getCarry();
+
+        if (!carry || CarrierSolidUtils.getSourceZone() === board.zone) return undefined;
+        if (CarrierSolidUtils.getTargetZone() !== board.zone) return undefined;
+
+        const value = carry.value as PatchBoardCarry<T>;
+
+        return value.kind === "node" ? value.node : undefined;
+    });
+
+    const getIncomingSpot = createMemo(() => {
+        const place = CarrierSolidUtils.getTargetPlace() as PatchBoardPlace | undefined;
+
+        return getIncomingNode() && place?.kind === "spot" ? place : undefined;
     });
 
     const getPlacements = createMemo(() =>
@@ -211,8 +234,12 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
         const source = getPlugSource();
         const place = getAimedPlace();
 
+        const awayKey = getIsCarriedAway() ? getCarriedNodeKey() : undefined;
+
         return PatchBoardUtils.getCableDefs(
-            getLinks(),
+            awayKey === undefined
+                ? getLinks()
+                : getLinks().filter((link) => link.from.nodeKey !== awayKey && link.to.nodeKey !== awayKey),
             getPlacedSocketByEndKey(),
             getOrientation(),
             source && place
@@ -327,6 +354,8 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
                                 top: PlacementUtils.toContainerWidth(getPlacement()?.spot.y ?? getNode().spot.y),
                                 width: PlacementUtils.toContainerWidth(getNode().sizeShare.width),
                                 height: PlacementUtils.toContainerWidth(getNode().sizeShare.height),
+                                visibility:
+                                    getIsCarriedAway() && getCarriedNodeKey() === getKey() ? "hidden" : undefined,
                             }}
                         >
                             <div class={styles.patchBoardNodeHolder}>
@@ -459,6 +488,32 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
                     );
                 }}
             </Index>
+
+            <Show when={getIncomingNode()}>
+                {(getNode) => (
+                    <Show when={getIncomingSpot()}>
+                        {(getSpot) => (
+                            <div
+                                class={styles.patchBoardSlot}
+                                aria-hidden="true"
+                                inert
+                                style={{
+                                    left: PlacementUtils.toContainerWidth(getSpot().x),
+                                    top: PlacementUtils.toContainerWidth(getSpot().y),
+                                    width: PlacementUtils.toContainerWidth(getNode().sizeShare.width),
+                                    height: PlacementUtils.toContainerWidth(getNode().sizeShare.height),
+                                }}
+                            >
+                                <div class={styles.patchBoardNodeHolder}>
+                                    <div class={styles.patchBoardNode}>
+                                        {props.renderNode(getNode, () => ({ isCarried: true }))}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </Show>
+                )}
+            </Show>
         </div>
     );
 

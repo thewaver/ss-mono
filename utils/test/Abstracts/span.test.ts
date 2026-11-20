@@ -138,3 +138,14 @@ describe("SpanUtils.getTicks", () => {
         expect(SpanUtils.getTicks(span(10, 10), { step: 1, majorStep: 5 })).toEqual([]);
     });
 });
+
+describe("SpanUtils.getTicks with a decimal step", () => {
+    it("keeps the last mark when the step is a decimal fraction", () => {
+        const values = SpanUtils.getTicks({ start: 0, end: 0.3 }, { step: 0.1, majorStep: 1 }).map(
+            (tick) => tick.value,
+        );
+
+        expect(values).toHaveLength(4);
+        expect(values.at(-1)).toBeCloseTo(0.3);
+    });
+});

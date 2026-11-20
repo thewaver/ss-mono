@@ -14,8 +14,10 @@
     import ValueReport from "../../../Utils/ValueReport.svelte";
     import Tooltip from "../../Overlays/Tooltip/Tooltip.svelte";
     import DatePicker from "../DatePicker/DatePicker.svelte";
+    import { FormFieldSvelteUtils } from "../FormField/FormFieldSvelte.utils.svelte.js";
     import TimePicker from "../TimePicker/TimePicker.svelte";
     import type { DateTimePickerProps } from "./DateTimePicker.types.js";
+    import DateTimePickerFieldsScope from "./DateTimePickerFieldsScope.svelte";
 
     let {
         value = $bindable(),
@@ -43,15 +45,29 @@
 
     const isDisabled = $derived(props.isDisabled ?? false);
 
-    const tooltipDefs = $derived.by(() => {
-        const defs = props.tooltipDefs;
-        const isReachable = InteractionTrackerUtils.computeIsReachable(
+    const isReachable = $derived(
+        InteractionTrackerUtils.computeIsReachable(
             isDisabled,
             props.isReachableWhenDisabled ?? false,
-        );
+            false,
+            props.tooltipDefs !== undefined,
+        ),
+    );
+
+    const tooltipDefs = $derived.by(() => {
+        const defs = props.tooltipDefs;
 
         return defs && (!isDisabled || isReachable) ? defs : undefined;
     });
+
+    $effect(() =>
+        InteractionTrackerUtils.warnIfReachableWithoutTooltip(
+            props.isReachableWhenDisabled ?? false,
+            props.tooltipDefs !== undefined,
+        ),
+    );
+
+    const getGroupLabelledBy = FormFieldSvelteUtils.resolveAriaLabelledBy();
 
     let lastTooltipDefs: typeof props.tooltipDefs;
 
@@ -95,7 +111,8 @@
     {/if}
 {/snippet}
 
-<div bind:this={root} class={styles.dateTimePickerRoot}>
+<div bind:this={root} class={styles.dateTimePickerRoot} role="group" aria-labelledby={getGroupLabelledBy()}>
+    <DateTimePickerFieldsScope>
     <DatePicker
         {...props}
         bind:value={date[0], date[1]}
@@ -104,6 +121,7 @@
         id={props.id && `${props.id}-date`}
         name={props.name && `${props.name}-date`}
         ariaLabel={props.dateLabel}
+        isFocusableWhenDisabled={isReachable}
         minValue={props.minValue?.date}
         maxValue={props.maxValue?.date}
         tooltipDefs={undefined}
@@ -120,6 +138,7 @@
         id={props.id && `${props.id}-time`}
         name={props.name && `${props.name}-time`}
         ariaLabel={props.timeLabel}
+        isFocusableWhenDisabled={isReachable}
         minValue={props.minValue && DateTimePickerUtils.computeMinTime(date[0](), props.minValue)}
         maxValue={props.maxValue && DateTimePickerUtils.computeMaxTime(date[0](), props.maxValue)}
         renderLeading={undefined}
@@ -131,6 +150,7 @@
         renderTrigger={props.renderTimeTrigger}
         renderPopup={props.renderTimePopup}
     />
+    </DateTimePickerFieldsScope>
 
     {#if shownTooltipDefs}
         <Tooltip

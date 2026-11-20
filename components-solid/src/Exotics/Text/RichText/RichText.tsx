@@ -56,7 +56,7 @@ export const RichText = (props: RichTextProps) => {
     return (
         <>
             {renderNodes(getParsedTree(), {
-                classMap: props.computeClassNames?.(RICH_TEXT_DEFAULT_CLASSES) ?? RICH_TEXT_DEFAULT_CLASSES,
+                classMap: props.computeClassNames?.({ ...RICH_TEXT_DEFAULT_CLASSES }) ?? RICH_TEXT_DEFAULT_CLASSES,
                 removeUnknownTags: access(props.removeOtherTags) ?? RICH_TEXT_DEFAULTS.removeOtherTags,
                 renderTag: props.renderTag,
             })}

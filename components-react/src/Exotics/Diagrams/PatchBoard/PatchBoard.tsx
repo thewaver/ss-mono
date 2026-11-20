@@ -152,7 +152,16 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
     const carriedValue = isSource ? (carryState.carry.value as PatchBoardCarry<T>) : undefined;
     const carriedNodeKey = carriedValue?.kind === "node" ? carryState?.carry.key : undefined;
     const plugSource = carriedValue?.kind === "plug" ? carriedValue.from : undefined;
-    const aimedPlace = isSource ? (carryState.toPlace as PatchBoardPlace) : undefined;
+    const aimedPlace = isSource && carryState.to === zone ? (carryState.toPlace as PatchBoardPlace) : undefined;
+
+    const isCarriedAway = carriedNodeKey !== undefined && carryState?.to !== undefined && carryState.to !== zone;
+    const incomingValue =
+        carryState !== undefined && carryState.from !== zone && carryState.to === zone
+            ? (carryState.carry.value as PatchBoardCarry<T>)
+            : undefined;
+    const incomingNode = incomingValue?.kind === "node" ? incomingValue.node : undefined;
+    const incomingPlace = carryState?.toPlace as PatchBoardPlace | undefined;
+    const incomingSpot = incomingNode && incomingPlace?.kind === "spot" ? incomingPlace : undefined;
 
     const placements = PatchBoardUtils.getPlacements(nodes, props.computeNodeKey, carriedNodeKey, aimedPlace);
     const placementByKey = new Map(placements.map((placement) => [placement.key, placement]));
@@ -167,7 +176,9 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
         focusedStop !== undefined && stopKeys.includes(focusedStop) ? focusedStop : stopKeys[PatchBoardConst.NOTHING];
 
     const cableDefs = PatchBoardUtils.getCableDefs(
-        links,
+        isCarriedAway
+            ? links.filter((link) => link.from.nodeKey !== carriedNodeKey && link.to.nodeKey !== carriedNodeKey)
+            : links,
         placedByEndKey,
         orientation,
         plugSource && aimedPlace
@@ -307,6 +318,7 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
                     top: PlacementUtils.toContainerWidth(placement?.spot.y ?? node.spot.y),
                     width: PlacementUtils.toContainerWidth(node.sizeShare.width),
                     height: PlacementUtils.toContainerWidth(node.sizeShare.height),
+                    visibility: isCarriedAway && carriedNodeKey === nodeKey ? "hidden" : undefined,
                 }}
             >
                 <div className={styles.patchBoardNodeHolder}>
@@ -382,6 +394,26 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
             </svg>
 
             {nodes.map(renderNode)}
+
+            {incomingNode && incomingSpot && (
+                <div
+                    className={styles.patchBoardSlot}
+                    aria-hidden="true"
+                    inert
+                    style={{
+                        left: PlacementUtils.toContainerWidth(incomingSpot.x),
+                        top: PlacementUtils.toContainerWidth(incomingSpot.y),
+                        width: PlacementUtils.toContainerWidth(incomingNode.sizeShare.width),
+                        height: PlacementUtils.toContainerWidth(incomingNode.sizeShare.height),
+                    }}
+                >
+                    <div className={styles.patchBoardNodeHolder}>
+                        <div className={styles.patchBoardNode}>
+                            {props.renderNode(incomingNode, { isCarried: true })}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 

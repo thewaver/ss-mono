@@ -1,4 +1,4 @@
-import { JSXTextParserUtils, MathUtils, StoreUtils } from "@thewaver/ss-utils";
+import { MathUtils, StoreUtils } from "@thewaver/ss-utils";
 
 import { ElementObserverUtils } from "../../../Abstracts/ElementObserver/ElementObserver.utils";
 import { LetterDriverUtils } from "../../../Abstracts/LetterDriver/LetterDriver.utils";
@@ -20,17 +20,6 @@ const FULL_WEIGHT = 1;
 const RUN_START = 0;
 /** Where a run has every character in place. */
 const RUN_END = 1;
-
-/** Names the elements in the text the typed copy cannot reproduce, so the difference is never a mystery. */
-const warnIfUnsupported = (container: HTMLElement) => {
-    const unsupported = JSXTextParserUtils.findUnsupportedElements(container);
-
-    if (!unsupported.length) return;
-
-    console.warn(
-        `Typewriter: ${unsupported.map((element) => `<${element.localName}>`).join(", ")} cannot be copied faithfully into the typed text, which loses a canvas's drawing, media playback, a frame's page and a form control's value.`,
-    );
-};
 
 /**
  * Plays text in a character at a time: measures what the consumer rendered, splits it into characters wrapped at the
@@ -204,7 +193,8 @@ export namespace TypewriterUtils {
      * Walks a run's progress forward on every animation frame until it reaches the end or is stopped.
      *
      * Each frame reads the progress afresh, so a write from outside between frames is carried on from rather than
-     * overwritten.
+     * overwritten. A timer for the time left stands behind the frames, so a page that stops painting still reaches the
+     * end on time.
      *
      * @param defs.getProgress The run's progress now.
      * @param defs.setProgress Writes the stepped progress.
@@ -219,7 +209,28 @@ export namespace TypewriterUtils {
         onEnd: () => void;
     }) => {
         let frameId: number | undefined;
+        let timerId: ReturnType<typeof setTimeout> | undefined;
         let lastMs = performance.now();
+
+        const stop = () => {
+            if (frameId !== undefined) cancelAnimationFrame(frameId);
+            if (timerId !== undefined) clearTimeout(timerId);
+
+            frameId = undefined;
+            timerId = undefined;
+        };
+
+        const finish = () => {
+            stop();
+            defs.setProgress(RUN_END);
+            defs.onEnd();
+        };
+
+        const armBackstop = (progress: number) => {
+            if (timerId !== undefined) clearTimeout(timerId);
+
+            timerId = setTimeout(finish, Math.max(0, (RUN_END - progress) * defs.getRunDurationMs()));
+        };
 
         const advance = () => {
             const nowMs = performance.now();
@@ -229,22 +240,22 @@ export namespace TypewriterUtils {
 
             lastMs = nowMs;
             frameId = undefined;
-            defs.setProgress(next);
 
             if (next >= RUN_END) {
-                defs.onEnd();
+                finish();
 
                 return;
             }
 
+            defs.setProgress(next);
+            armBackstop(next);
             frameId = requestAnimationFrame(advance);
         };
 
+        armBackstop(defs.getProgress());
         frameId = requestAnimationFrame(advance);
 
-        return () => {
-            if (frameId !== undefined) cancelAnimationFrame(frameId);
-        };
+        return stop;
     };
 
     /**
@@ -312,16 +323,13 @@ export namespace TypewriterUtils {
 
             if (!isForced && cause === "layout" && width === store.get().width) return false;
 
-            if (store.get().width === undefined || cause === "content") warnIfUnsupported(container);
+            if (store.get().width === undefined || cause === "content")
+                LetterDriverUtils.warnIfUnsupported(container, "Typewriter", "typed text");
 
-            const tokens = JSXTextParserUtils.getSegmentTokens(container);
-            const { segments, count } = LetterDriverUtils.indexSegments(
-                LetterDriverUtils.wrapAtWidestFrame(
-                    tokens,
-                    width,
-                    container.parentElement ?? container,
-                    opts.getComputeAnimationName(),
-                ),
+            const { segments, count } = LetterDriverUtils.layoutLetters(
+                container,
+                width,
+                opts.getComputeAnimationName(),
             );
 
             write({ width, segments, count });

@@ -1,6 +1,6 @@
-import type { Index2d } from "@thewaver/ss-utils";
+import type { Count2d, Index2d } from "@thewaver/ss-utils";
 
-export type WeightFn = (pos: Index2d, count: Index2d, origin: Index2d) => number;
+export type WeightFn = (pos: Index2d, count: Count2d, origin: Index2d) => number;
 
 export type SweepDefs = {
     quadrantsPerSection: number;

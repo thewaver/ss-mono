@@ -46,8 +46,6 @@ export const Satellite = (props: SatelliteProps) => {
         return setter;
     };
 
-    if (!hasSatellites) return <>{props.children}</>;
-
     const layout = SatelliteUtils.computeLayout(
         subjectSize,
         satellites.map((satellite, index) => ({

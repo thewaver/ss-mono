@@ -1,5 +1,6 @@
 import {
     Color,
+    type Count2d,
     type Index2d,
     MathUtils,
     type Point2d,
@@ -13,7 +14,7 @@ import {
 import type { PointerReading } from "../../Abstracts/PointerTracker/PointerTracker.types";
 import type { CycleColorKey, SVGDefsColors } from "./SVGDefs.types";
 import { SVGPatternLayouts } from "./SVGPatternLayouts.const";
-import type { SVGPatternCellIndex, SVGPatternCellPiece, SVGPatternKind } from "./SVGPatternLayouts.types";
+import type { SVGPatternCellPiece, SVGPatternKind } from "./SVGPatternLayouts.types";
 
 const NO_CONSUMERS = 0;
 const TRANSPARENT_ALPHA = 0;
@@ -28,6 +29,15 @@ const SWARM_MIN_PERIOD = 0.45;
 const MIN_PIXEL_TRAIL_SQUARE = 1;
 
 export namespace SVGDefsUtils {
+    /** How many cells across and down one tile of a pattern sample holds, for the samples drawn as a repeating tile. */
+    export const TILE_CELL_COUNT: Count2d = { rowCount: 8, colCount: 8 };
+
+    /**
+     * A switch for building pattern samples: set to `true`, every timed pattern paints the cells that straddle its
+     * tile's seam in its third color, so a cell cut in two by the repeat shows where it is split.
+     *
+     * Left `false` everywhere else. It changes paint only, never which cells exist or where they sit.
+     */
     export const DEBUG_SEAMS = false;
 
     /**
@@ -43,8 +53,8 @@ export namespace SVGDefsUtils {
      * @returns The piece's shape and where in the cell it sits, as fractions of the cell. A layout that does not cut its
      * cells answers the whole cell, as a `square`.
      */
-    export const getCellPiece = (kind: SVGPatternKind, index: SVGPatternCellIndex): SVGPatternCellPiece =>
-        SVGPatternLayouts.ALL[kind].computeCellPiece?.(index) ?? {
+    export const getCellPiece = (kind: SVGPatternKind, index: Index2d): SVGPatternCellPiece =>
+        SVGPatternLayouts.getLayout(kind).computeCellPiece?.(index) ?? {
             shape: "square",
             box: { x: 0, y: 0, width: 1, height: 1 },
         };
@@ -61,11 +71,11 @@ export namespace SVGDefsUtils {
      * cut its cells answers the whole cell alone.
      */
     export const getCellPieces = (kind: SVGPatternKind): SVGPatternCellPiece[] => {
-        const count = SVGPatternLayouts.ALL[kind].computeCellCount({ rows: 2, cols: 2 });
+        const count = SVGPatternLayouts.getLayout(kind).computeCellCount({ rowCount: 2, colCount: 2 });
         const pieces = new Map<ShapeConst.DefaultShape, SVGPatternCellPiece>();
 
-        for (let row = 0; row < count.rows; row++) {
-            for (let col = 0; col < count.cols; col++) {
+        for (let row = 0; row < count.rowCount; row++) {
+            for (let col = 0; col < count.colCount; col++) {
                 const piece = getCellPiece(kind, { row, col });
 
                 if (!pieces.has(piece.shape)) pieces.set(piece.shape, piece);
@@ -102,7 +112,7 @@ export namespace SVGDefsUtils {
      * @param index The cell's place in the grid.
      * @param cellSize One cell's size.
      */
-    export const computeCellCenter = (kind: SVGPatternKind, index: SVGPatternCellIndex, cellSize: Size2d): Point2d => {
+    export const computeCellCenter = (kind: SVGPatternKind, index: Index2d, cellSize: Size2d): Point2d => {
         const points = computeCellPiecePoints(getCellPiece(kind, index), cellSize);
 
         return {
@@ -126,6 +136,14 @@ export namespace SVGDefsUtils {
     export const getCycleStopKeys = (keys: CycleColorKey[], repeats: number) =>
         Array.from({ length: keys.length * repeats + 1 }, (_unused, index) => keys[index % keys.length]);
 
+    /**
+     * The theme's three cycle colors in order, starting from one of them and ending back on it, for a gradient that
+     * walks once round the cycle.
+     *
+     * @param colors The theme's colors.
+     * @param key The color to start and end on.
+     * @returns Four colors: the three in cycle order from `key`, then `key` again.
+     */
     export const getCycleWalk = (colors: SVGDefsColors, key: CycleColorKey) => {
         const start = CYCLE_COLOR_KEYS.indexOf(key);
 
@@ -174,17 +192,34 @@ export namespace SVGDefsUtils {
     export const getSharedFilter = (filter: { id: string } | undefined) =>
         filter && { id: filter.id, renderDefsElement: () => undefined };
 
+    /** The faint fill a sample lays under its pattern: the theme's background, lightened, at a quarter opacity. */
     export const getBaseBackgroundColor = (defs: { colors: SVGDefsColors }) =>
         `hsl(from ${defs.colors.background} h s calc(l * 1.5) / 25%)`;
 
+    /** The stroke a sample draws round its fill: the theme's background, lightened, at half opacity. */
     export const getBaseBorderColor = (defs: { colors: SVGDefsColors }) =>
         `hsl(from ${defs.colors.background} h s calc(l * 1.5) / 50%)`;
 
+    /**
+     * A color with its alpha set to nothing, for the clear end of a fade, so the fade stays in the color's own hue
+     * rather than passing through grey.
+     *
+     * @param color Any CSS color. A hex color is converted directly; anything else through `rgb(from …)`.
+     */
     export const getTransparentColor = (color: string) =>
         Color.Hex.isHex(color)
             ? Color.RGBA.toCss({ ...Color.Hex.toRgb(color), a: TRANSPARENT_ALPHA })
             : `rgb(from ${color} r g b / 0)`;
 
+    /**
+     * How strongly a pointer-following sample shows, fading out as the pointer leaves the box: full on and inside its
+     * edge, gone at twice the distance from the center.
+     *
+     * @param reading The pointer's reading, whose `edgeRatio` is its distance from the box's center over the distance
+     * from the center to the edge in that direction — `1` on the edge.
+     * @param isPointerPresent Whether a pointer is over the page at all.
+     * @returns `1` up to the edge, `0` from twice as far and with no pointer, and a ramp between.
+     */
     export const getPointerFade = (reading: PointerReading, isPointerPresent: boolean) =>
         isPointerPresent
             ? MathUtils.clamp01(
@@ -397,12 +432,26 @@ export namespace SVGDefsUtils {
     export const computePixelTrailAlpha = (ageMs: number, trailMs: number) =>
         trailMs > 0 ? 1 - MathUtils.clamp01(ageMs / trailMs) : 0;
 
+    /**
+     * A distance laid along an angle, as a point.
+     *
+     * @param v The distance.
+     * @param angle The direction, in degrees, clockwise from pointing right.
+     */
     export const offsetDiagonally = (v: number, angle: number) => {
         const rad = (angle * Math.PI) / 180;
 
         return { x: v * Math.cos(rad), y: v * Math.sin(rad) };
     };
 
+    /**
+     * How far along a direction a point in a box sits, from its center, for a sample that sweeps across the box at an
+     * angle.
+     *
+     * @param ratio The point, as a share of the box on each axis, `0` to `1`.
+     * @param angle The direction of the sweep, in degrees.
+     * @returns From `-0.5` at the side the sweep starts from to `0.5` at the far side.
+     */
     export const projectBoxRatioOntoAngle = (ratio: Point2d, angle: number) => {
         const rad = (angle * Math.PI) / 180;
         const x = Math.cos(rad);
@@ -411,19 +460,29 @@ export namespace SVGDefsUtils {
         return ((ratio.x - 0.5) * x + (ratio.y - 0.5) * y) / (Math.abs(x) + Math.abs(y));
     };
 
+    /**
+     * A cell's random values, with the last column and row repeating the first ones' when the pattern is split, so the
+     * tile's edges match where it repeats.
+     *
+     * @param mutableSplitValuesCache Where the first column's and row's values are kept for the last ones; written to.
+     * @param index The cell.
+     * @param cellCount How many rows and columns the tile has.
+     * @param isSplit Whether the edges must match.
+     * @returns Eight random digits.
+     */
     export const getRandomValuesWithSplitControl = (
         mutableSplitValuesCache: Record<string, string>,
         index: { row: number; col: number },
-        cellCount: { rows: number; cols: number },
+        cellCount: Count2d,
         isSplit: boolean,
     ) => {
         let values = RandomUtils.get01ValueString(8);
 
         if (isSplit) {
-            if (index.col === cellCount.cols - 1) {
+            if (index.col === cellCount.colCount - 1) {
                 values = mutableSplitValuesCache[`row${index.row}`] ?? values;
             }
-            if (index.row === cellCount.rows - 1) {
+            if (index.row === cellCount.rowCount - 1) {
                 values = mutableSplitValuesCache[`col${index.col}`] ?? values;
             }
             if (index.col === 0) {

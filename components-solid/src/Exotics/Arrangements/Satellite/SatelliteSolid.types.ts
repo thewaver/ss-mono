@@ -19,8 +19,9 @@ export type SatelliteDefs = AccessorProps<{
 export type SatelliteProps = AccessorProps<{
     /**
      * Everything hanging off the subject, each with its own placement, nudge and stacking. The wrapper grows on
-     * each side by the furthest any of them overhangs, so one padding covers them all. Leave it out or empty and
-     * only the subject is rendered, with no wrapper around it.
+     * each side by the furthest any of them overhangs, so one padding covers them all. The wrapper is drawn
+     * whether or not the list holds anything, so a satellite arriving or leaving never rebuilds the subject; with
+     * none, it has no padding and is exactly the subject's size.
      */
     satellites?: SatelliteDefs[];
 }>;

@@ -1,4 +1,4 @@
-import type { JSX } from "solid-js";
+import { type JSX, untrack } from "solid-js";
 
 import {
     type SVGBrightnessFilterDefs,
@@ -258,7 +258,7 @@ export class SVGFilterDefsFactory {
     /**
      * Scales how vivid the colors are.
      *
-     * `0` is greyscale, `1` leaves the colors alone and is skipped, and above `1` oversaturates.
+     * `0` is grayscale, `1` leaves the colors alone and is skipped, and above `1` oversaturates.
      *
      * @param defs The amount.
      * @param custom Content placed inside the primitive, for animating it.
@@ -307,9 +307,9 @@ export class SVGFilterDefsFactory {
     };
 
     /**
-     * Pushes every channel away from mid-grey, or pulls it towards it, leaving opacity alone.
+     * Pushes every channel away from mid-gray, or pulls it towards it, leaving opacity alone.
      *
-     * `0` is flat mid-grey, `1` leaves the colors alone and is skipped, and above `1` raises the contrast.
+     * `0` is flat mid-gray, `1` leaves the colors alone and is skipped, and above `1` raises the contrast.
      *
      * @param defs The amount.
      * @param custom Content placed inside the primitive, for animating it.
@@ -337,7 +337,7 @@ export class SVGFilterDefsFactory {
     /**
      * Inverts the red, green and blue channels, leaving opacity alone.
      *
-     * `1` is a full inversion, `0.5` is flat mid-grey, and `0` leaves the colors alone and is skipped.
+     * `1` is a full inversion, `0.5` is flat mid-gray, and `0` leaves the colors alone and is skipped.
      *
      * @param defs The amount.
      * @param custom Content placed inside the primitive, for animating it.
@@ -407,12 +407,14 @@ export class SVGFilterDefsFactory {
      * @returns The factory, for the next call.
      */
     public addRGBSplitFilter = (defs: SVGRGBSplitFilterSolidDefs, custom?: JSX.Element) => {
-        const key = this.registry.addRGBSplit({
-            red: access(defs.red),
-            green: access(defs.green),
-            blue: access(defs.blue),
-            maxOffset: defs.maxOffset,
-        });
+        const key = untrack(() =>
+            this.registry.addRGBSplit({
+                red: access(defs.red),
+                green: access(defs.green),
+                blue: access(defs.blue),
+                maxOffset: defs.maxOffset,
+            }),
+        );
 
         if (key === undefined) return this;
 
@@ -513,15 +515,16 @@ export class SVGFilterDefsFactory {
      *
      * The surface is a field of noise lit by a point or distant light. The highlights are kept to the graphic's
      * own shape and added to its colors, so they only ever brighten. The specular constant defaults to `1`, the
-     * exponent to `20` and the light to white. Skipped when the specular constant is `0` or less. Every value may
-     * be an accessor, which the rendered filter follows in place.
+     * exponent to `20` and the light to white. Every value may be an accessor, which the rendered filter follows
+     * in place, except that whether the shine is added at all is decided from the specular constant as first
+     * given: skipped when that is `0` or less, so a shine that should fade in from nothing starts above `0`.
      *
      * @param defs The surface, the light, and how strong, tight and colored the shine is.
      * @param custom Content placed inside the lighting primitive, for animating it.
      * @returns The factory, for the next call.
      */
     public addSpecularLightingFilter = (defs: SVGSpecularLightingFilterSolidDefs, custom?: JSX.Element) => {
-        const key = this.registry.addSpecularLighting(access(defs.specularConstant));
+        const key = this.registry.addSpecularLighting(untrack(() => access(defs.specularConstant)));
 
         if (key === undefined) return this;
 

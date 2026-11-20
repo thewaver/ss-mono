@@ -2,7 +2,12 @@
     import { untrack } from "svelte";
     import { on } from "svelte/events";
 
-    import { CARD_STACK_DEFAULTS, CardStackUtils, CardStackStyles as styles } from "@thewaver/ss-components";
+    import {
+        CARD_STACK_DEFAULTS,
+        CardStackStyles as styles,
+        CardStackUtils,
+        NavigatorUtils,
+    } from "@thewaver/ss-components";
 
     import { InteractionTrackerSvelteUtils } from "../../Abstracts/InteractionTracker/InteractionTrackerSvelte.utils.svelte.js";
     import { readStore } from "../../Utils/storeUtils.js";
@@ -88,9 +93,13 @@
         ),
     );
 
-    $effect(() => untrack(() => props.onMount?.(controls)));
+    $effect(() => {
+        untrack(() => props.onMount?.(controls));
+    });
 
     const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.target !== e.currentTarget || NavigatorUtils.getHasCommandModifier(e)) return;
+
         const direction = CardStackUtils.getKeyDirection(e.key);
 
         if (direction === undefined || !pile.send(direction)) return;

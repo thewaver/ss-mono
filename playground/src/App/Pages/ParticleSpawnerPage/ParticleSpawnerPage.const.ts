@@ -69,8 +69,8 @@ export const STRESS_SPAWN_DELAY_MS = 0;
 export const STRESS_PARTICLE_COUNT = 60;
 
 export const STRESS_ITEMS: (StressTestDefs & { size: number })[] = [
-    { count: 4 * 3, cols: 4, gap: 10, size: STRESS_ITEM_SIZE },
-    { count: 6 * 4, cols: 6, gap: 10, size: STRESS_ITEM_SIZE },
-    { count: 8 * 6, cols: 8, gap: 10, size: STRESS_ITEM_SIZE },
-    { count: 12 * 6, cols: 12, gap: 10, size: STRESS_ITEM_SIZE },
+    { count: 4 * 3, colCount: 4, gap: 10, size: STRESS_ITEM_SIZE },
+    { count: 6 * 4, colCount: 6, gap: 10, size: STRESS_ITEM_SIZE },
+    { count: 8 * 6, colCount: 8, gap: 10, size: STRESS_ITEM_SIZE },
+    { count: 12 * 6, colCount: 12, gap: 10, size: STRESS_ITEM_SIZE },
 ];

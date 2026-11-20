@@ -395,6 +395,8 @@
     };
 
     const handleHeaderPointerDown = (e: PointerEvent, columnIndex: number) => {
+        hasCarriedClick = false;
+
         const column = columns[columnIndex];
 
         if (e.button !== 0 || isDisabled || !getIsReorderable(column)) return;

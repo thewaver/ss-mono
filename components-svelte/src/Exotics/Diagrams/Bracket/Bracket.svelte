@@ -87,7 +87,9 @@
         onSettle: () => snapToFamily(),
     });
 
-    $effect(() => untrack(() => props.onMount?.(panZoom.controller)));
+    $effect(() => {
+        untrack(() => props.onMount?.(panZoom.controller));
+    });
 
     const boardTransform = $derived.by(() => {
         if (!panZoom.getIsActive()) return undefined;
@@ -248,7 +250,7 @@
     };
 
     const handleKeyDown = (e: KeyboardEvent) => {
-        if (rovingId === undefined) return;
+        if (rovingId === undefined || !getIsNode(e.target) || NavigatorUtils.getHasCommandModifier(e)) return;
 
         if (NavigatorUtils.getIsActivationKey(e.key)) {
             e.preventDefault();

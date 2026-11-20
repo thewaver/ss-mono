@@ -58,7 +58,8 @@ export namespace MaskedFieldVueUtils {
 
         watch(
             () => defs.getValue(),
-            (value) => {
+            (value, last) => {
+                if (value !== last && defs.getIsSame(value, last)) return;
                 if (defs.getIsSame(value, defs.fromDigits(digits.value))) return;
 
                 refresh();

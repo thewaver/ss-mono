@@ -68,7 +68,7 @@ the last valid value, or none. Invalid text raises the error and nothing else.
   The reader can edit it like any invalid text; the value moves only once the edit is valid. When the settings allow
   it again, the same text is simply valid again — nothing is remembered or restored.
 - **A format is enforced by an error; a limit is enforced by a correction on blur** — the user's split. A format is
-  what the value is (a sign, a number of decimals, a date or time pattern, a colour notation): breaking it raises the
+  what the value is (a sign, a number of decimals, a date or time pattern, a color notation): breaking it raises the
   error and moves nothing. A limit is where the value sits (a `min` and `max`, an earliest and latest date or time):
   a value outside one is kept as typed or as handed in, and pulled to the nearest bound when the field loses focus,
   edited or not, as `NumberInput` always did. It holds for every input with a limit — `NumberInput`, `CurrencyInput`,

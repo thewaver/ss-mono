@@ -34,13 +34,13 @@ export namespace TileBoardKnobs {
     export const ROWS_TEXT = {
         label: "Rows",
         hint: "How many rows of tiles the board has.",
-        controls: "Sets TileBoardProps.tileCount.row",
+        controls: "Sets TileBoardProps.tileCount.rowCount",
     };
 
     export const COLS_TEXT = {
         label: "Columns",
         hint: "How many tiles sit in a row.",
-        controls: "Sets TileBoardProps.tileCount.col",
+        controls: "Sets TileBoardProps.tileCount.colCount",
     };
 
     export const TILE_WIDTH_TEXT = {

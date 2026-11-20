@@ -1,5 +1,5 @@
 <script lang="ts" generics="T">
-    import { TableOfContentsUtils, TableOfContentsStyles as styles } from "@thewaver/ss-components";
+    import { InteractionTrackerUtils, SafeHrefUtils, TableOfContentsStyles as styles, TableOfContentsUtils } from "@thewaver/ss-components";
 
     import type { TableOfContentsItemProps } from "./TableOfContents.types.js";
 
@@ -7,10 +7,13 @@
 
     const ariaCurrent = $derived(props.flags.isCurrent ? ("location" as const) : undefined);
 
+    const safeHref = $derived(SafeHrefUtils.resolve(props.link.href, "TableOfContents"));
+
     const handleClick = (e: MouseEvent) => {
         const target = props.link.target;
 
         if (!target) return;
+        if (safeHref !== undefined && !InteractionTrackerUtils.getIsPlainClick(e)) return;
 
         e.preventDefault();
 
@@ -19,7 +22,7 @@
     };
 </script>
 
-{#if props.link.href === undefined}
+{#if safeHref === undefined}
     <button
         {@attach props.attachElement}
         type="button"
@@ -33,7 +36,7 @@
 {:else}
     <a
         {@attach props.attachElement}
-        href={props.link.href}
+        href={safeHref}
         class={styles.tableOfContentsItem}
         id={props.link.id}
         aria-current={ariaCurrent}

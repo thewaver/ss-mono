@@ -30,6 +30,7 @@ export namespace Size2d {
     export const toString = Vec2d.toString(K1, K2);
 }
 
+/** Reading a size back from its text form. */
 export namespace Size2dString {
     /** Parses a string such as `WIDTH10_HEIGHT20` back into a {@link Size2d}. */
     export const fromString = Vec2d.fromString(K1, K2);

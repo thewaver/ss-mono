@@ -89,9 +89,9 @@ export namespace TrailUtils {
      * Clamped at both ends, so a traveler near the start or the end takes a shorter, one-sided sample
      * rather than reading off the end of the path.
      *
-     * @param length How many points the path has.
-     * @param at The traveler's position among them.
-     * @param step How far either side to look. A wider sample gives a steadier heading on a rough path
+     * @param length The path's whole length, in pixels.
+     * @param at The traveler's distance along it, in pixels.
+     * @param step How far either side to look, in pixels. A wider sample gives a steadier heading on a rough path
      * and a laggier one on a sharp corner.
      */
     export const getSampleSpan = (length: number, at: number, step: number) => ({
@@ -147,7 +147,9 @@ export namespace TrailUtils {
      *
      * @param defs.getProgress The run's progress now.
      * @param defs.setProgress Writes the stepped progress.
-     * @param defs.getRunDurationMs How long the whole run takes: one pass's duration times {@link getRunExtent}.
+     * @param defs.getRunDurationMs How long the whole run takes: one pass's duration times {@link getRunExtent}. A
+     * looping run of `0` or less arrives once, with one `onLap`, and then stops walking rather than lapping on every
+     * frame.
      * @param defs.getIsLooping Whether the run starts again from the beginning.
      * @param defs.onLap Runs each time the end is reached.
      * @param defs.onEnd Runs when a run that does not loop reaches the end, after `onLap`; the walking has stopped
@@ -167,12 +169,8 @@ export namespace TrailUtils {
 
         const advance = () => {
             const nowMs = performance.now();
-            const step = getSteppedProgress(
-                defs.getProgress(),
-                nowMs - lastMs,
-                defs.getRunDurationMs(),
-                defs.getIsLooping(),
-            );
+            const durationMs = defs.getRunDurationMs();
+            const step = getSteppedProgress(defs.getProgress(), nowMs - lastMs, durationMs, defs.getIsLooping());
 
             lastMs = nowMs;
             frameId = undefined;
@@ -186,6 +184,8 @@ export namespace TrailUtils {
 
                     return;
                 }
+
+                if (durationMs <= 0) return;
             }
 
             frameId = requestAnimationFrame(advance);

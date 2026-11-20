@@ -5,11 +5,7 @@ import type {
     NumberInputRangeDefs,
     NumberInputSeparators,
     NumberInputStepDefs,
-    NumberInputStepRepeater,
 } from "./NumberInput.types";
-
-/** How many decimal places stepping will work to. Beyond this, floating point cannot represent the difference anyway. */
-const MAX_STEP_DECIMALS = 12;
 
 /** How many steps PageUp and PageDown move when the field is not told otherwise. */
 const PAGE_STEP_MULTIPLE = 10;
@@ -25,6 +21,40 @@ const PLAIN_SEPARATORS: NumberInputSeparators = { groupSeparator: "", decimalSep
 
 /** Matches one character of white space, which is what several locales group thousands with. */
 const WHITESPACE = /\s/;
+
+/** Matches a digit of any script. */
+const UNICODE_DIGIT = /\p{Nd}/u;
+
+/** The minus sign typeset text uses, as Swedish and Norwegian numbers are written. */
+const TYPOGRAPHIC_MINUS = "\u2212";
+
+/** How many digits each script's run of digits holds. */
+const DIGITS_PER_RUN = 10;
+
+/** An ASCII digit for any Unicode one: every digit set is a run of ten from its zero, so its place in the run is its value. */
+const toAsciiDigit = (character: string) => {
+    let codePoint = character.codePointAt(0)!;
+    let steps = 0;
+
+    while (UNICODE_DIGIT.test(String.fromCodePoint(codePoint - 1))) {
+        codePoint -= 1;
+        steps += 1;
+    }
+
+    return String(steps % DIGITS_PER_RUN);
+};
+
+/** What a typed character means in a number: any digit as its ASCII one, the typographic minus as a minus, and an ASCII point as the decimal mark wherever the point does not group thousands. */
+const toNumberCharacter = (character: string, separators: NumberInputSeparators) => {
+    if (character >= "0" && character <= "9") return character;
+    if (UNICODE_DIGIT.test(character)) return toAsciiDigit(character);
+    if (character === TYPOGRAPHIC_MINUS) return "-";
+    if (character === PLAIN_DECIMAL_SEPARATOR && separators.groupSeparator !== PLAIN_DECIMAL_SEPARATOR) {
+        return separators.decimalSeparator;
+    }
+
+    return character;
+};
 
 /**
  * Whether a character groups thousands under the given separators.
@@ -53,7 +83,8 @@ export namespace NumberInputUtils {
      * type in. The rules are positional: a minus only at the start or straight after the exponent, a
      * plus only after the exponent, one decimal separator and only before the exponent, a group
      * separator only straight after a digit of the whole part, and an exponent only once and only after a
-     * digit.
+     * digit. Digits of any script are read as their ASCII digits, the typographic minus as a minus, and an ASCII
+     * point as the decimal mark, except in a locale where the point groups thousands.
      *
      * @param text What the user has typed.
      * @param separators The characters that mark the fraction and group thousands, usually read from a
@@ -67,7 +98,8 @@ export namespace NumberInputUtils {
         let hasExponent = false;
         let hasDigit = false;
 
-        for (const character of text) {
+        for (const typed of text) {
+            const character = toNumberCharacter(typed, separators);
             const previous = result[result.length - 1] ?? "";
             const isAfterExponent = hasExponent && EXPONENT_CHARACTERS.includes(previous);
             const isAfterDigit = previous >= "0" && previous <= "9";
@@ -195,15 +227,7 @@ export namespace NumberInputUtils {
 
         if (value === undefined) return clampValue(base, defs);
 
-        const decimals = Math.min(
-            Math.max(
-                MathUtils.getDecimalCount(defs.step),
-                MathUtils.getDecimalCount(distance),
-                MathUtils.getDecimalCount(base),
-                MathUtils.getDecimalCount(value),
-            ),
-            MAX_STEP_DECIMALS,
-        );
+        const decimals = MathUtils.getStepDecimals(defs.step, distance, base, value);
         const scale = 10 ** decimals;
         const stepUnits = Math.round(defs.step * scale);
         const distanceUnits = Math.round(distance * scale);
@@ -298,57 +322,4 @@ export namespace NumberInputUtils {
      */
     export const computeSettledValue = (value: number | undefined, defs: NumberInputRangeDefs) =>
         value === undefined ? undefined : clampValue(value, defs);
-
-    /**
-     * Repeats a step while a stepper button is held, the way a native spinner does.
-     *
-     * Starting steps once straight away, then waits the delay, then steps again on every interval until stopped —
-     * so a tap stays a single step. A first step that is refused starts nothing, and a repeated step that is refused
-     * ends the repeat. That second rule is what keeps a repeat from outliving its press: a stepper button usually
-     * disables itself at the bound it just reached, and a disabled button does not hear the release, so without it the
-     * repeat would run on unseen and walk the value back to the bound the moment anything else moved it away. Starting
-     * again while repeating stops the earlier repeat first, so only one is ever running.
-     *
-     * @param defs.getDelayMs How long to wait before repeating, read each time a repeat starts.
-     * @param defs.getIntervalMs How often to repeat once it has started, read as the repeat begins.
-     * @returns `start(step)`, which takes a function making one step and answering whether it moved, and answers
-     * `false` when the first step was refused; and `stop()`, which ends any repeat and answers whether one was
-     * pending or running. Stopping twice is harmless, and the repeater can be started again after either.
-     */
-    export const createStepRepeater = (defs: {
-        getDelayMs: () => number;
-        getIntervalMs: () => number;
-    }): NumberInputStepRepeater => {
-        let repeatDelay: ReturnType<typeof setTimeout> | undefined;
-        let repeatInterval: ReturnType<typeof setInterval> | undefined;
-
-        const stop = () => {
-            const wasStepping = repeatDelay !== undefined || repeatInterval !== undefined;
-
-            clearTimeout(repeatDelay);
-            clearInterval(repeatInterval);
-
-            repeatDelay = undefined;
-            repeatInterval = undefined;
-
-            return wasStepping;
-        };
-
-        const start = (step: () => boolean) => {
-            stop();
-
-            if (!step()) return false;
-
-            repeatDelay = setTimeout(() => {
-                repeatDelay = undefined;
-                repeatInterval = setInterval(() => {
-                    if (!step()) stop();
-                }, defs.getIntervalMs());
-            }, defs.getDelayMs());
-
-            return true;
-        };
-
-        return { start, stop };
-    };
 }

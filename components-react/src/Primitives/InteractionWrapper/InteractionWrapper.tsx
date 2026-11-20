@@ -27,6 +27,18 @@ export const InteractionWrapper = <TExtra extends object = {}>(props: Interactio
         isDisabled,
         props.isReachableWhenDisabled ?? false,
         props.isFocusableWhenDisabled ?? false,
+        props.tooltipDefs !== undefined,
+    );
+
+    const hasTooltipProp = props.tooltipDefs !== undefined;
+
+    useEffect(
+        () =>
+            InteractionTrackerUtils.warnIfReachableWithoutTooltip(
+                props.isReachableWhenDisabled ?? false,
+                hasTooltipProp,
+            ),
+        [props.isReachableWhenDisabled, hasTooltipProp],
     );
 
     const internalFlags = InteractionTrackerReactUtils.useElementFlags(elementRef, isDisabled, {

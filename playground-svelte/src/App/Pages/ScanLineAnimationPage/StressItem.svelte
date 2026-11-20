@@ -9,28 +9,28 @@
         .map((kind) => [
             {
                 count: 4 * 3,
-                cols: 4,
+                colCount: 4,
                 gap: 10,
                 size: STRESS_LINE_COUNT,
                 kind,
             },
             {
                 count: 6 * 4,
-                cols: 6,
+                colCount: 6,
                 gap: 10,
                 size: STRESS_LINE_COUNT,
                 kind,
             },
             {
                 count: 8 * 6,
-                cols: 8,
+                colCount: 8,
                 gap: 10,
                 size: STRESS_LINE_COUNT,
                 kind,
             },
             {
                 count: 12 * 6,
-                cols: 12,
+                colCount: 12,
                 gap: 10,
                 size: STRESS_LINE_COUNT,
                 kind,
@@ -44,7 +44,7 @@
 
     import { SliceAnimationWeights, ScanlineAnimation, ScanlineAnimationKeyframes } from "@thewaver/ss-components-svelte";
     import type { SliceAnimationRenderer } from "@thewaver/ss-components-svelte";
-    import type { Index2d } from "@thewaver/ss-utils";
+    import type { Count2d } from "@thewaver/ss-utils";
 
     import PageMeasureBox from "../../PageComponents/MeasureBox/MeasureBox.svelte";
     import type { ScanlineAnimationExampleProps } from "./ScanlineAnimationPage.types";
@@ -79,7 +79,7 @@
 
     const animation = untrack(() => pickStressKeyframes(STRESS_ITEMS[configIndex].kind));
 
-    const computeSliceWeights = (count: Index2d) =>
+    const computeSliceWeights = (count: Count2d) =>
         SliceAnimationWeights.computeSliceWeights(weightType, count, WEIGHT_ORIGIN);
 </script>
 

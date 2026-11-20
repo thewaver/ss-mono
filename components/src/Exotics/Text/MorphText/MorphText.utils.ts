@@ -62,10 +62,11 @@ export namespace MorphTextUtils {
     });
 
     /**
-     * Holds the text a `MorphText` shows, and runs the morph from one text to the next on animation frames.
+     * Holds the text a `MorphText` shows, and runs the morph from one text to the next on animation frames, with a
+     * timer behind them so a page that stops painting still ends the morph on time.
      *
-     * A change of text part-way through a morph starts a new one from the text that was arriving, so the copy on
-     * screen never jumps. A morph that takes no time puts the text straight on.
+     * A change of text part-way through a morph starts a new one from the text that was arriving, which takes the
+     * place of the half-melted pair at once. A morph that takes no time puts the text straight on.
      *
      * @param text The text to start on.
      * @param opts What the morpher reads, at the moment it needs it.
@@ -75,11 +76,14 @@ export namespace MorphTextUtils {
         const store = StoreUtils.create<MorphTextState>({ current: text, previous: undefined, progress: DONE });
 
         let frame: number | undefined;
+        let timer: ReturnType<typeof setTimeout> | undefined;
 
         const cancelFrame = () => {
             if (frame !== undefined) cancelAnimationFrame(frame);
+            if (timer !== undefined) clearTimeout(timer);
 
             frame = undefined;
+            timer = undefined;
         };
 
         const rest = (next: string) => {
@@ -108,12 +112,16 @@ export namespace MorphTextUtils {
 
             const startMs = performance.now();
 
+            const finish = () => {
+                rest(next);
+                opts.onMorphEnd?.(next);
+            };
+
             const tick = (nowMs: number) => {
                 const progress = MathUtils.clamp01((nowMs - startMs) / durationMs);
 
                 if (progress >= DONE) {
-                    rest(next);
-                    opts.onMorphEnd?.(next);
+                    finish();
 
                     return;
                 }
@@ -122,6 +130,7 @@ export namespace MorphTextUtils {
                 frame = requestAnimationFrame(tick);
             };
 
+            timer = setTimeout(finish, durationMs);
             frame = requestAnimationFrame(tick);
         };
 

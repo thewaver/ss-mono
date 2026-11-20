@@ -16,7 +16,7 @@
         ParticleFieldStyles as styles,
     } from "@thewaver/ss-components";
     import { ParticleFieldConst } from "@thewaver/ss-components/internal";
-    import { type Index2d, MathUtils, Rect } from "@thewaver/ss-utils";
+    import { type Count2d, MathUtils, Rect } from "@thewaver/ss-utils";
     import { assignInlineVars } from "@vanilla-extract/dynamic";
 
     import { ElementObserverSvelteUtils } from "../../../Abstracts/ElementObserver/ElementObserverSvelte.utils.svelte.js";
@@ -59,7 +59,7 @@
 
     const getRootSize = ElementObserverSvelteUtils.createBorderBoxSizeObserver(() => root ?? undefined);
 
-    let lastCellCount: Index2d | undefined;
+    let lastCellCount: Count2d | undefined;
 
     const cellCount = $derived.by(() => {
         const next = CellAnimationUtils.computeCellCount(props.cellCount, getRootSize());

@@ -113,7 +113,7 @@ test("a short row starts half a tile across from a full one, so its tiles sit in
 
     const pitch = (await boxOf(page, tile(MARKED), 1)).left - first.left;
 
-    expect(shortRowFirst.left - first.left, "half a tile's pitch across").toBe(pitch / 2);
+    expect(shortRowFirst.left - first.left, "half a tile's pitch across").toBe(pitch * 0.5);
     expect(rowOffset, "less than a whole tile down, or the rows would not overlap").toBeLessThan(first.height);
     expect(rowOffset).toBeGreaterThan(0);
 });
@@ -349,8 +349,8 @@ test("a piece rendered above the board lands on the middle of the tile it is giv
                 const tile = cell.getBoundingClientRect();
 
                 return {
-                    x: Math.round(piece.x + piece.width * 0.5 - (tile.x + tile.width * 0.5)),
-                    y: Math.round(piece.bottom - (tile.y + tile.height * 0.5)),
+                    x: Math.round(piece.x + piece.width * 0.5 - (tile.x + tile.width * 0.5)) + 0,
+                    y: Math.round(piece.bottom - (tile.y + tile.height * 0.5)) + 0,
                 };
             },
             { scope: MEEPLE, selector: tile(MEEPLE), index },
@@ -485,6 +485,12 @@ test("on a tapered board a piece stands on its tile and is smaller at the top th
 
     await reach.fill("4");
     await reach.blur();
+
+    await page.locator("#meepleKnobs").click();
+    await expect(
+        page.locator(prop("reach")).first(),
+        "the settings are put away, since where there is no room beside their button they open over the board",
+    ).toBeHidden();
 
     const standing = (index: number) =>
         page.evaluate(

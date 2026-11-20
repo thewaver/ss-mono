@@ -252,7 +252,7 @@ export namespace SpanUtils {
         if (steps.step <= 0 || extent <= 0) return [];
 
         const first = Math.ceil(span.start / steps.step - EPSILON) * steps.step;
-        const count = Math.min(Math.floor((span.end - first) / steps.step) + 1, MAX_TICKS);
+        const count = Math.min(Math.floor((span.end - first) / steps.step + EPSILON) + 1, MAX_TICKS);
         const ticks: SpanTick[] = [];
 
         for (let index = 0; index < count; index++) {

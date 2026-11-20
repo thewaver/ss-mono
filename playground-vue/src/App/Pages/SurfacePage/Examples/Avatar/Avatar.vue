@@ -35,7 +35,7 @@ const strokeId = useId();
 <template>
     <div :class="styles.root">
         <Surface v-bind="getConfig(strokeId)">
-            <img :src="knight_profile" width="100%" />
+            <img :src="knight_profile" width="100%" alt="Sir Face" />
         </Surface>
     </div>
 </template>

@@ -16,6 +16,7 @@ import {
     PACK_COLUMNS,
     PACK_ROWS,
     TURN_COUNTERCLOCKWISE_LABEL,
+    computeGearAriaLabel,
     computeGearHue,
     computeGearKey,
     computeGearLabel,
@@ -156,6 +157,7 @@ watch(
             :is-turnable="isTurnable"
             :compute-item-key="computeGearKey"
             :compute-item-label="computeGearLabel"
+            :compute-item-aria-label="computeGearAriaLabel"
             :compute-can-accept="computeCanAccept"
             :compute-is-spot-blocked="computeIsSpotBlocked"
             @transfer="

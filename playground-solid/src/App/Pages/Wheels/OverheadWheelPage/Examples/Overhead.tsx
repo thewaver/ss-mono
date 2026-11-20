@@ -1,4 +1,4 @@
-import { createSignal } from "solid-js";
+import { createSignal, splitProps } from "solid-js";
 
 import { Button, OverheadWheel, ProximityEffectUtils, access } from "@thewaver/ss-components-solid";
 import type { WheelController } from "@thewaver/ss-components-solid";
@@ -15,8 +15,10 @@ import type { WheelExampleProps } from "../../Wheels.types";
 
 type Props = WheelExampleProps;
 
-export const OverheadExample = ({ wedges, ...otherProps }: Props) => {
-    const getWedges = () => access(wedges);
+export const OverheadExample = (props: Props) => {
+    const [, otherProps] = splitProps(props, ["wedges"]);
+
+    const getWedges = () => access(props.wedges);
 
     const [getController, setController] = createSignal<WheelController>();
 

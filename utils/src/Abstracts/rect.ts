@@ -35,11 +35,13 @@ export namespace Rect {
     export const toString = Vec4d.toString(K1, K2, K3, K4);
 }
 
+/** Reading a rectangle back from its text form. */
 export namespace RectString {
     /** Parses a string such as `X0_Y0_WIDTH10_HEIGHT20` back into a {@link Rect}. */
     export const fromString = Vec4d.fromString(K1, K2, K3, K4);
 }
 
+/** Arithmetic on rectangles: fitting one in another, overlaps, centers and edges. */
 export namespace RectUtils {
     /**
      * Scales one box to sit inside another as large as possible, without distorting it,

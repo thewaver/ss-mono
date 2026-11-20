@@ -16,6 +16,7 @@ import {
     FlattenerUtils,
     FloaterStyles,
     InteractionTrackerUtils,
+    SafeHrefUtils,
     SelectionUtils,
     TREE_DEFAULTS,
     TreeStyles,
@@ -45,6 +46,7 @@ type FloaterTargets = {
 
 const TreeNodeItem = (props: TreeNodeItemProps) => {
     const isDisabled = props.flags.isDisabled ?? false;
+    const safeHref = SafeHrefUtils.resolve(props.href, "Tree");
 
     const handleClick = (e: MouseEvent<HTMLElement>) => {
         if (isDisabled) {
@@ -52,6 +54,8 @@ const TreeNodeItem = (props: TreeNodeItemProps) => {
 
             return;
         }
+
+        if (safeHref !== undefined && !InteractionTrackerUtils.getIsPlainClick(e.nativeEvent)) return;
 
         props.onActivate(e);
     };
@@ -70,7 +74,7 @@ const TreeNodeItem = (props: TreeNodeItemProps) => {
         "aria-setsize": props.setSize,
     };
 
-    if (props.href === undefined) {
+    if (safeHref === undefined) {
         return (
             <div ref={props.ref} {...commonProps} onClick={handleClick}>
                 {props.renderContent(props.flags)}
@@ -81,7 +85,7 @@ const TreeNodeItem = (props: TreeNodeItemProps) => {
     const Link = props.linkComponent ?? "a";
 
     return (
-        <Link ref={props.ref} href={props.href} {...commonProps} onClick={handleClick}>
+        <Link ref={props.ref} href={safeHref} {...commonProps} onClick={handleClick}>
             {props.renderContent(props.flags)}
         </Link>
     );
@@ -110,10 +114,10 @@ const TreeComposite = <T,>(props: TreeCompositeProps<T>) => {
     const typeahead = TypeaheadReactUtils.useBuffer();
 
     const [focusedValue, setFocusedValue] = useState<T | undefined>();
-    const [previousValue, setPreviousValue] = useState(value);
+    const [previousValue, setPreviousValue] = useState(() => value);
 
     if (previousValue !== value) {
-        setPreviousValue(value);
+        setPreviousValue(() => value);
         setFocusedValue(undefined);
     }
 
@@ -172,7 +176,7 @@ const TreeComposite = <T,>(props: TreeCompositeProps<T>) => {
     const focusRow = (row: TreeRow<T>) => {
         const id = getRowId(row);
 
-        setFocusedValue(row.node.value);
+        setFocusedValue(() => row.node.value);
 
         if (rowWindow.isLive) rowWindow.scrollToRow(row.index);
 
@@ -341,6 +345,7 @@ const TreeComposite = <T,>(props: TreeCompositeProps<T>) => {
     };
 
     const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+        if (e.target !== e.currentTarget && !findRowById((e.target as Element).id)) return;
         if (navigableRows.length < 1) return;
 
         const current = findRowById(document.activeElement?.id) ?? rovingRow;
@@ -495,6 +500,7 @@ const TreeComposite = <T,>(props: TreeCompositeProps<T>) => {
                 sizing={"fill"}
                 isDisabled={row.node.isDisabled ?? false}
                 isReachableWhenDisabled={row.node.isReachableWhenDisabled ?? false}
+                isFocusableWhenDisabled={row.node.isReachableWhenDisabled ?? false}
                 isTabbable={row.node.value === rovingRow?.node.value}
                 tooltipDefs={row.node.tooltipDefs}
                 extraFlags={{

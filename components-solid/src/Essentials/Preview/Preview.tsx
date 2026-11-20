@@ -106,7 +106,7 @@ export const Preview = (props: PreviewProps) => {
                     <div ref={setContentRef}>{props.renderContent()}</div>
                 </div>
 
-                <Show when={props.renderOverlay && getIsOverflowing()}>
+                <Show when={props.renderOverlay === undefined ? undefined : getIsOverflowing()}>
                     <div class={styles.previewOverlay}>
                         {props.renderOverlay?.(getOverlayTarget, getTransitionDurationMs)}
                     </div>
@@ -123,7 +123,6 @@ export const Preview = (props: PreviewProps) => {
                             ref={(element) => {
                                 setElementRef(element);
                                 setTriggerRef(element);
-                                props.ref?.(element);
                             }}
                             id={props.id}
                             contentId={() => contentId}

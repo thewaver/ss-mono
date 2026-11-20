@@ -20,6 +20,8 @@ import {
     PERCENT,
     RACK_LINKS,
     RACK_NODES,
+    SHARED_FIRST_NODES,
+    SHARED_SECOND_NODES,
     WIDE_SPAN,
 } from "@thewaver/ss-playground/App/Pages/PatchBoardPage/PatchBoardPage.const";
 import { SpanUtils } from "@thewaver/ss-utils";
@@ -35,6 +37,7 @@ import ChainExample from "./Examples/Chain.vue";
 import MixerExample from "./Examples/Mixer.vue";
 import PanExample from "./Examples/Pan.vue";
 import RackExample from "./Examples/Rack.vue";
+import SharedExample from "./Examples/Shared.vue";
 
 const getLinkWords = (link: PatchBoardLink) =>
     `${link.from.nodeKey} ${link.from.socketId} to ${link.to.nodeKey} ${link.to.socketId}`;
@@ -47,6 +50,7 @@ const mixerAction = shallowRef(NOTHING_DONE);
 const rackAction = shallowRef(NOTHING_DONE);
 const panAction = shallowRef(NOTHING_DONE);
 const panView = shallowRef(PAN_STARTING_VIEW);
+const sharedAction = shallowRef(NOTHING_DONE);
 
 const chainNodes = shallowRef(CHAIN_NODES);
 const chainLinks = shallowRef(CHAIN_LINKS);
@@ -56,6 +60,10 @@ const rackNodes = shallowRef(RACK_NODES);
 const rackLinks = shallowRef(RACK_LINKS);
 const panNodes = shallowRef(PAN_NODES);
 const panLinks = shallowRef(PAN_LINKS);
+const sharedFirstNodes = shallowRef(SHARED_FIRST_NODES);
+const sharedSecondNodes = shallowRef(SHARED_SECOND_NODES);
+const sharedFirstLinks = shallowRef<PatchBoardLink[]>([]);
+const sharedSecondLinks = shallowRef<PatchBoardLink[]>([]);
 
 const prefersReducedMotion = MediaQueryMonitorVueUtils.useReducedMotion();
 
@@ -93,6 +101,14 @@ const examples: ExampleDefs[] = [
         readout: () =>
             `${panLinks.value.length} cables at ${Math.round((PERCENT * PAN_SCALE) / SpanUtils.getExtent(panView.value.x))}%, last: ${panAction.value} — the board is laid out at its own width and drawn into a smaller window: drag empty board, use the wheel, pinch or press the buttons to move and zoom it; a node still drags under the pointer, and one carried with the arrow keys brings the window with it`,
         path: `${EXAMPLES_ROOT}/Pan.vue`,
+    },
+    {
+        key: "shared",
+        name: EXAMPLE_NAMES.shared,
+        span: WIDE_SPAN,
+        readout: () =>
+            `${sharedFirstNodes.value.length} on the first board, ${sharedSecondNodes.value.length} on the second, last: ${sharedAction.value} — the two boards share a group, so a device dragged or carried from one lands on the other where it was held`,
+        path: `${EXAMPLES_ROOT}/Shared.vue`,
     },
 ];
 </script>
@@ -196,6 +212,22 @@ const examples: ExampleDefs[] = [
                 @link="(link: PatchBoardLink) => (panAction = `connected ${getLinkWords(link)}`)"
                 @unlink="(link: PatchBoardLink) => (panAction = `unplugged ${getLinkWords(link)}`)"
                 @move="(nodeKey: string) => (panAction = `moved ${nodeKey}`)"
+            />
+        </template>
+
+        <template #shared>
+            <SharedExample
+                v-model:first-nodes="sharedFirstNodes"
+                v-model:second-nodes="sharedSecondNodes"
+                v-model:first-links="sharedFirstLinks"
+                v-model:second-links="sharedSecondLinks"
+                :socket-size="socketSize"
+                :is-locked="isLocked"
+                :is-disabled="isDisabled"
+                :is-beam-playing="isBeamPlaying"
+                @link="(link: PatchBoardLink) => (sharedAction = `connected ${getLinkWords(link)}`)"
+                @unlink="(link: PatchBoardLink) => (sharedAction = `unplugged ${getLinkWords(link)}`)"
+                @move="(nodeKey: string) => (sharedAction = `moved ${nodeKey}`)"
             />
         </template>
     </PageExamples>

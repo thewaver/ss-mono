@@ -47,6 +47,24 @@ const FOCUS_ATTRIBUTES = ["tabindex", "disabled", "href", "contenteditable", "in
  * layer when it opens, Tab cycles inside it rather than escaping into the page behind, and focus
  * returns to whatever had it when the layer closes.
  */
+const sealCounts = new Map<HTMLElement, number>();
+
+let scrollLockCount = 0;
+let unlockedStyle = { overflow: "", paddingRight: "" };
+
+const getIsSameTabStop = (active: Element | null, stop: HTMLElement) => {
+    if (active === stop) return true;
+    if (!(active instanceof HTMLInputElement) || !(stop instanceof HTMLInputElement)) return false;
+
+    return (
+        active.type === "radio" &&
+        stop.type === "radio" &&
+        active.name !== "" &&
+        active.name === stop.name &&
+        active.form === stop.form
+    );
+};
+
 export namespace FocusManagerUtils {
     /**
      * Whether focus is currently being put back by a layer that has just closed.
@@ -89,13 +107,31 @@ export namespace FocusManagerUtils {
         Array.from((root ?? document.body).querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)).filter(isReachable);
 
     /**
+     * The first element after another one in tab order, across the whole page, that is not skipped.
+     *
+     * For handing focus to where Tab would have gone from an element focus is leaving — a menu's button, a hover
+     * card's anchor — when the layer focus was in sits elsewhere in the document. Anything inside `start` is skipped.
+     *
+     * @param start The element to look after.
+     * @param getIsSkipped Leaves out other elements too, such as anything inside the layer being left.
+     * @returns The element, or `undefined` when nothing focusable follows.
+     */
+    export const getFocusableAfter = (start: HTMLElement, getIsSkipped: (element: HTMLElement) => boolean) =>
+        getFocusableChildren().find(
+            (element) =>
+                (start.compareDocumentPosition(element) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0 &&
+                !start.contains(element) &&
+                !getIsSkipped(element),
+        );
+
+    /**
      * The first thing inside an element that can be tabbed to.
      *
      * @param root Where to look. The whole document body when omitted.
      * @returns The element, or `null` when there is nothing focusable inside.
      */
     export const getFirstFocusableChild = (root?: HTMLElement): HTMLElement | null =>
-        getFocusableChildren(root)[0] ?? null;
+        Array.from((root ?? document.body).querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)).find(isReachable) ?? null;
 
     /**
      * Watches whether anything inside an element can be tabbed to.
@@ -156,10 +192,10 @@ export namespace FocusManagerUtils {
 
         if (!first || !last) return;
 
-        if (e.shiftKey && document.activeElement === first) {
+        if (e.shiftKey && getIsSameTabStop(document.activeElement, first)) {
             e.preventDefault();
             last.focus();
-        } else if (!e.shiftKey && document.activeElement === last) {
+        } else if (!e.shiftKey && getIsSameTabStop(document.activeElement, last)) {
             e.preventDefault();
             first.focus();
         }
@@ -170,11 +206,12 @@ export namespace FocusManagerUtils {
      *
      * Walks from the layer up to `<body>` and marks every sibling along the way, which is what `aria-modal`
      * promises and what a reader that ignores it needs. Live regions are left alone, because an inert region
-     * announces nothing and the layer's own announcements go through them. A sibling that was already inert is
-     * left as it was, so two layers stacked on one another undo only their own work.
+     * announces nothing and the layer's own announcements go through them. A sibling the page itself made inert is
+     * left as it was. Seals are counted per element, so of two layers stacked on one another, whichever closes
+     * first leaves the page sealed until the other closes too.
      *
      * @param layer The element to leave reachable, along with everything inside it.
-     * @returns A function that lifts the seal, restoring exactly the elements this call marked.
+     * @returns A function that lifts this seal. Calling it again does nothing.
      */
     export const sealAround = (layer: HTMLElement) => {
         const sealed: HTMLElement[] = [];
@@ -187,15 +224,13 @@ export namespace FocusManagerUtils {
             if (!parent) break;
 
             for (const child of parent.children) {
-                if (
-                    child === node ||
-                    !(child instanceof HTMLElement) ||
-                    child.inert ||
-                    child.hasAttribute("aria-live")
-                ) {
-                    continue;
-                }
+                if (child === node || !(child instanceof HTMLElement) || child.hasAttribute("aria-live")) continue;
 
+                const count = sealCounts.get(child);
+
+                if (count === undefined && child.inert) continue;
+
+                sealCounts.set(child, (count ?? 0) + 1);
                 child.inert = true;
                 sealed.push(child);
             }
@@ -203,32 +238,61 @@ export namespace FocusManagerUtils {
             node = parent;
         }
 
+        let isLifted = false;
+
         return () => {
-            for (const sibling of sealed) sibling.inert = false;
+            if (isLifted) return;
+
+            isLifted = true;
+
+            for (const sibling of sealed) {
+                const count = (sealCounts.get(sibling) ?? 1) - 1;
+
+                if (count > 0) {
+                    sealCounts.set(sibling, count);
+                } else {
+                    sealCounts.delete(sibling);
+                    sibling.inert = false;
+                }
+            }
         };
     };
 
     /**
      * Stops the document scrolling behind a layer, without the page shifting as its scrollbar disappears.
      *
-     * The width the scrollbar took is handed to the root as padding, so the content stays where it was. A layer
-     * opened over another finds the lock already in place and leaves it, so the outer one lifts it.
+     * The width the scrollbar took is handed to the root as padding, so the content stays where it was. Locks are
+     * counted: the page's own setting is remembered by the first and written back when the last is lifted, in
+     * whatever order the layers close.
      *
-     * @returns A function that restores the root's scrolling exactly as this call found it.
+     * @returns A function that lifts this lock. Calling it again does nothing.
      */
     export const lockScroll = () => {
         const documentRoot = document.documentElement;
-        const previousOverflow = documentRoot.style.overflow;
-        const previousPaddingRight = documentRoot.style.paddingRight;
-        const scrollbarWidth = window.innerWidth - documentRoot.clientWidth;
 
-        documentRoot.style.overflow = "hidden";
+        if (scrollLockCount === 0) {
+            const scrollbarWidth = window.innerWidth - documentRoot.clientWidth;
 
-        if (scrollbarWidth > 0) documentRoot.style.paddingRight = `${scrollbarWidth}px`;
+            unlockedStyle = { overflow: documentRoot.style.overflow, paddingRight: documentRoot.style.paddingRight };
+            documentRoot.style.overflow = "hidden";
+
+            if (scrollbarWidth > 0) documentRoot.style.paddingRight = `${scrollbarWidth}px`;
+        }
+
+        scrollLockCount += 1;
+
+        let isLifted = false;
 
         return () => {
-            documentRoot.style.overflow = previousOverflow;
-            documentRoot.style.paddingRight = previousPaddingRight;
+            if (isLifted) return;
+
+            isLifted = true;
+            scrollLockCount -= 1;
+
+            if (scrollLockCount > 0) return;
+
+            documentRoot.style.overflow = unlockedStyle.overflow;
+            documentRoot.style.paddingRight = unlockedStyle.paddingRight;
         };
     };
 

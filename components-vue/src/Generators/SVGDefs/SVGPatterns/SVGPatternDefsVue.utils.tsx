@@ -1,7 +1,7 @@
 import type { VNodeChild } from "vue";
 
 import { SVGPatternDefsUtils } from "@thewaver/ss-components";
-import type { Index2d, Point2d, Size2d } from "@thewaver/ss-utils";
+import type { Count2d, Index2d, Point2d, Size2d } from "@thewaver/ss-utils";
 
 /** The Vue side of `SVGPatternDefsUtils`: a repeating SVG `pattern` built from a grid of cells. */
 export namespace SVGPatternDefsVueUtils {
@@ -21,10 +21,10 @@ export namespace SVGPatternDefsVueUtils {
      */
     export const computePattern = (
         id: string,
-        cellCount: { rows: number; cols: number },
+        cellCount: Count2d,
         patternSize: Size2d,
         computeCellPos: (index: Index2d) => Point2d,
-        renderCell: (id: string, index: Index2d, cellCount: { rows: number; cols: number }) => VNodeChild,
+        renderCell: (id: string, index: Index2d, cellCount: Count2d) => VNodeChild,
     ) => (
         <pattern id={id} width={patternSize.width} height={patternSize.height} patternUnits="userSpaceOnUse">
             {SVGPatternDefsUtils.computeCells(id, cellCount, computeCellPos).map((cell) => (

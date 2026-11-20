@@ -2,6 +2,7 @@ import {
     type KeyboardEvent,
     type MouseEvent,
     type PointerEvent,
+    useCallback,
     useEffect,
     useId,
     useLayoutEffect,
@@ -15,6 +16,7 @@ import {
     CarrierUtils,
     type CarrierZone,
     type CarryMode,
+    NavigatorUtils,
     SORTABLE_GRID_DEFAULTS,
     type SortableGridFlags,
     type SortableGridItemFlags,
@@ -90,11 +92,20 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
     const viewportContext = useViewportContext();
 
     const rootRef = useRef<HTMLDivElement | null>(null);
+    const latestRef = useLatest(props.ref);
     const itemRefs = useRef<Array<HTMLElement | undefined>>([]);
     const grabOffsetRef = useRef<Point2d>({ x: 0, y: 0 });
     const hasPendingClickRef = useRef(false);
 
     const itemsRef = useRef(items);
+
+    const setRootRef = useCallback(
+        (element: HTMLElement | null) => {
+            rootRef.current = element as HTMLDivElement | null;
+            latestRef.current?.(element);
+        },
+        [latestRef],
+    );
 
     const rootElement = useElement(rootRef);
 
@@ -263,6 +274,8 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
     };
 
     const handlePointerDown = (index: number) => (e: PointerEvent<HTMLDivElement>) => {
+        hasPendingClickRef.current = false;
+
         if (e.button !== 0 || isDisabled) return;
         if ((e.target as HTMLElement).closest(CarrierUtils.INTERACTIVE_SELECTOR)) return;
         if (CarrierUtils.getCarry()) return;
@@ -303,7 +316,7 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
     };
 
     const handleKeyDown = (index: number) => (e: KeyboardEvent<HTMLDivElement>) => {
-        if (isDisabled) return;
+        if (e.target !== e.currentTarget || isDisabled || NavigatorUtils.getHasCommandModifier(e)) return;
 
         const action = SortableGridUtils.computeKeyAction(e.key, {
             index,
@@ -403,6 +416,7 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
     const grid = (
         <InteractionWrapper<SortableGridFlags>
             {...props}
+            ref={setRootRef}
             extraFlags={{
                 isCarrying: carryState !== undefined,
                 isReceiving,
@@ -412,10 +426,7 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
             renderControl={(setElementRef) => (
                 <div
                     id={gridId}
-                    ref={(element) => {
-                        rootRef.current = element;
-                        setElementRef(element);
-                    }}
+                    ref={setElementRef}
                     className={SortableGridStyles.sortableGridRoot}
                     style={{
                         width: `${SortableGridUtils.getExtent(columns, cellSize, gap)}px`,
@@ -464,6 +475,7 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
                                     sizing={"fill"}
                                     isDisabled={item.isDisabled ?? false}
                                     isReachableWhenDisabled={item.isReachableWhenDisabled ?? false}
+                                    isFocusableWhenDisabled={!isDisabled && (item.isReachableWhenDisabled ?? false)}
                                     isTabbable={rovingIndex === index}
                                     tooltipDefs={item.tooltipDefs}
                                     extraFlags={{ isCarried: carriedKey === props.computeItemKey(item.value) }}
@@ -475,9 +487,10 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
                                             }}
                                             id={getItemId(index)}
                                             hintId={hintId}
-                                            label={SortableGridUtils.computeItemLabel(
-                                                props.computeItemLabel(item.value),
-                                                item,
+                                            label={props.computeItemAriaLabel(
+                                                item.value,
+                                                SortableGridUtils.getItemShape(item).size,
+                                                item.spot,
                                             )}
                                             position={readingOrder.indexOf(index) + 1}
                                             setSize={items.length}

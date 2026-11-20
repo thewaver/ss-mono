@@ -157,8 +157,32 @@ export const PatchBoard = defineComponent(
         const plugSource = computed(() => (carriedValue.value?.kind === "plug" ? carriedValue.value.from : undefined));
 
         const aimedPlace = computed(() =>
-            isSource.value ? (carryState.value!.toPlace as PatchBoardPlace | undefined) : undefined,
+            isSource.value && carryState.value!.to === zone
+                ? (carryState.value!.toPlace as PatchBoardPlace | undefined)
+                : undefined,
         );
+
+        const isCarriedAway = computed(() => {
+            const to = carryState.value?.to;
+
+            return carriedNodeKey.value !== undefined && to !== undefined && to !== zone;
+        });
+
+        const incomingNode = computed(() => {
+            const state = carryState.value;
+
+            if (!state || state.from === zone || state.to !== zone) return undefined;
+
+            const value = state.carry.value as PatchBoardCarry<T>;
+
+            return value.kind === "node" ? value.node : undefined;
+        });
+
+        const incomingSpot = computed(() => {
+            const place = carryState.value?.toPlace as PatchBoardPlace | undefined;
+
+            return incomingNode.value && place?.kind === "spot" ? place : undefined;
+        });
 
         const placements = computed(() =>
             PatchBoardUtils.getPlacements(nodes.value, props.computeNodeKey, carriedNodeKey.value, aimedPlace.value),
@@ -302,6 +326,33 @@ export const PatchBoard = defineComponent(
             );
         };
 
+        const renderIncoming = (): VNodeChild => {
+            const node = incomingNode.value;
+            const spot = incomingSpot.value;
+
+            if (!node || !spot) return null;
+
+            return (
+                <div
+                    class={PatchBoardStyles.patchBoardSlot}
+                    aria-hidden="true"
+                    inert
+                    style={{
+                        left: PlacementUtils.toContainerWidth(spot.x),
+                        top: PlacementUtils.toContainerWidth(spot.y),
+                        width: PlacementUtils.toContainerWidth(node.sizeShare.width),
+                        height: PlacementUtils.toContainerWidth(node.sizeShare.height),
+                    }}
+                >
+                    <div class={PatchBoardStyles.patchBoardNodeHolder}>
+                        <div class={PatchBoardStyles.patchBoardNode}>
+                            {callSlot(slots.renderNode, { node, flags: { isCarried: true } })}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
         const renderNode = (node: PatchBoardNode<T>): VNodeChild => {
             const nodeKey = props.computeNodeKey(node.value);
             const placement = placementByKey.value.get(nodeKey);
@@ -316,6 +367,7 @@ export const PatchBoard = defineComponent(
                         top: PlacementUtils.toContainerWidth(placement?.spot.y ?? node.spot.y),
                         width: PlacementUtils.toContainerWidth(node.sizeShare.width),
                         height: PlacementUtils.toContainerWidth(node.sizeShare.height),
+                        visibility: isCarriedAway.value && carriedNodeKey.value === nodeKey ? "hidden" : undefined,
                     }}
                 >
                     <div class={PatchBoardStyles.patchBoardNodeHolder}>
@@ -365,8 +417,11 @@ export const PatchBoard = defineComponent(
         };
 
         return () => {
+            const awayKey = isCarriedAway.value ? carriedNodeKey.value : undefined;
             const cableDefs = PatchBoardUtils.getCableDefs(
-                links.value,
+                awayKey === undefined
+                    ? links.value
+                    : links.value.filter((link) => link.from.nodeKey !== awayKey && link.to.nodeKey !== awayKey),
                 placedByEndKey.value,
                 getOrientation(),
                 plugSource.value && aimedPlace.value
@@ -426,6 +481,8 @@ export const PatchBoard = defineComponent(
                     </svg>
 
                     {nodes.value.map(renderNode)}
+
+                    {renderIncoming()}
                 </div>
             );
 

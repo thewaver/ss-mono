@@ -2,7 +2,7 @@ import { useMemo } from "react";
 
 import { ScanlineAnimation, ScanlineAnimationKeyframes, SliceAnimationWeights } from "@thewaver/ss-components-react";
 import type { ScanlineHorizontalGrayscaleOpts, SliceAnimationBreakpointOpts } from "@thewaver/ss-components-react";
-import type { Index2d } from "@thewaver/ss-utils";
+import type { Count2d } from "@thewaver/ss-utils";
 
 import type { ScanlineAnimationExampleProps } from "../ScanlineAnimationPage.types";
 
@@ -13,19 +13,24 @@ type Props = ScanlineAnimationExampleProps & {
     keyframeOpts: ScanlineHorizontalGrayscaleOpts;
 };
 
-export const GrayscaleExample = ({ keyframeOpts, breakpointOpts, weightType, ...otherProps }: Props) => {
+export const GrayscaleExample = (props: Props) => {
+    const { keyframeOpts, breakpointOpts, weightType, ...otherProps } = props;
+
     const computeSliceWeights = useMemo(
-        () => (count: Index2d) => SliceAnimationWeights.computeSliceWeights(weightType, count, WEIGHT_ORIGIN),
-        [weightType],
+        () => (count: Count2d) => SliceAnimationWeights.computeSliceWeights(props.weightType, count, WEIGHT_ORIGIN),
+        [props.weightType],
     );
 
-    const animation = useMemo(() => ScanlineAnimationKeyframes.createHorizontalGrayscale(keyframeOpts), [keyframeOpts]);
+    const animation = useMemo(
+        () => ScanlineAnimationKeyframes.createHorizontalGrayscale(props.keyframeOpts),
+        [props.keyframeOpts],
+    );
 
     return (
         <ScanlineAnimation
             {...otherProps}
             computeSliceWeights={computeSliceWeights}
-            breakpointOpts={breakpointOpts}
+            breakpointOpts={props.breakpointOpts}
             computeSliceAnimation={animation}
         />
     );

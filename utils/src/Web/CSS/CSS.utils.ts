@@ -55,21 +55,27 @@ const TRANSFORM_ORDER: readonly CSSTransformKey[] = [
     "scaleZ",
 ];
 
+const DROP_SHADOW_COLOR_SLOT = 3;
+
 /**
  * Writes one CSS function call, with the right unit on each argument.
  *
  * Arguments a value does not supply are written as zero, so a partial value is still a valid
- * function call.
+ * function call. `drop-shadow` takes its arguments separated by spaces, and its last one is a color, which is left
+ * out when not supplied.
  */
 const toFunctionCall = (key: CSSAnimationKey, value: number | number[]) => {
     const units = CSSConst.ANIMATION_UNITS[key];
+    const isDropShadow = key === "drop-shadow";
 
     let call = `${key}(`;
 
     for (let idx = 0; idx < units.length; idx++) {
         const arg = Array.isArray(value) ? value[idx] : idx === 0 ? value : undefined;
 
-        call += `${idx === 0 ? "" : ", "}${arg ?? 0}${units[idx]}`;
+        if (isDropShadow && idx === DROP_SHADOW_COLOR_SLOT && arg === undefined) break;
+
+        call += `${idx === 0 ? "" : isDropShadow ? " " : ", "}${arg ?? 0}${units[idx]}`;
     }
 
     return `${call})`;
@@ -98,16 +104,16 @@ const toOpacity = (value: number | number[] | undefined) => {
     return percent === undefined || percent === CSSConst.NEUTRAL_FILTER_VALUES.opacity ? "" : `${percent / PERCENT}`;
 };
 
-/**
- * Tests whether a CSS property passes down to child elements on its own.
- *
- * Inherited properties do not need repeating on a child, so they can be left out
- * when a style is copied onto one.
- *
- * @param key A CSS property name in dashed form, such as `letter-spacing`.
- */
-
+/** Writing and reading CSS from script: property names, inherited properties, animation values and styles. */
 export namespace CSSUtils {
+    /**
+     * Tests whether a CSS property passes down to child elements on its own.
+     *
+     * Inherited properties do not need repeating on a child, so they can be left out
+     * when a style is copied onto one.
+     *
+     * @param key A CSS property name in dashed form, such as `letter-spacing`.
+     */
     export const isInheritedCssKey = (key: string): key is (typeof CSSConst.INHERITED_CSS_KEYS)[number] =>
         INHERITED_CSS_KEYS_SET.has(key);
 

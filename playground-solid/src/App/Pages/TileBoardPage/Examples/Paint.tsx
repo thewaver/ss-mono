@@ -1,3 +1,5 @@
+import { splitProps } from "solid-js";
+
 import { TileBoard, access } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/Pages/TileBoardPage/TileBoardPage.css";
 import { Index2d } from "@thewaver/ss-utils";
@@ -7,18 +9,22 @@ import type { TileBoardExampleProps } from "../TileBoardPage.types";
 
 type Props = TileBoardExampleProps;
 
-export const PaintExample = ({ tiling, marked, ...otherProps }: Props) => (
-    <div class={styles.meepleHost}>
-        <TileBoard
-            {...otherProps}
-            tiling={tiling}
-            computeTileAriaLabel={(tile) => `Row ${tile.row + 1}, tile ${tile.col + 1}`}
-            renderTile={(getTile, getRenderProps) => (
-                <PageTileBoardTile
-                    renderProps={getRenderProps}
-                    isMarked={() => access(marked).includes(Index2d.toString(getTile()))}
-                />
-            )}
-        />
-    </div>
-);
+export const PaintExample = (props: Props) => {
+    const [, otherProps] = splitProps(props, ["tiling", "marked"]);
+
+    return (
+        <div class={styles.meepleHost}>
+            <TileBoard
+                {...otherProps}
+                tiling={props.tiling}
+                computeTileAriaLabel={(tile) => `Row ${tile.row + 1}, tile ${tile.col + 1}`}
+                renderTile={(getTile, getRenderProps) => (
+                    <PageTileBoardTile
+                        renderProps={getRenderProps}
+                        isMarked={() => access(props.marked).includes(Index2d.toString(getTile()))}
+                    />
+                )}
+            />
+        </div>
+    );
+};

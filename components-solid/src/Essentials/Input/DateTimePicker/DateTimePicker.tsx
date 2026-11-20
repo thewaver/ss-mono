@@ -1,4 +1,4 @@
-import { Show, createMemo, createSignal, splitProps } from "solid-js";
+import { Show, createEffect, createMemo, createSignal, splitProps } from "solid-js";
 
 import {
     DateTimePickerUtils,
@@ -13,11 +13,14 @@ import { DateTimeValueSolidUtils } from "../../../Abstracts/DateTimeValue/DateTi
 import { access, accessSignal } from "../../../Utils/propUtils";
 import { Tooltip } from "../../Overlays/Tooltip/Tooltip";
 import { DatePicker } from "../DatePicker/DatePicker";
+import { FormFieldContextProvider, useFormFieldContext } from "../FormField/FormField.context";
+import { FormFieldSolidUtils } from "../FormField/FormFieldSolid.utils";
+import { LabelContextProvider, useLabelContext } from "../Label/Label.context";
 import { TimePicker } from "../TimePicker/TimePicker";
 import type { DateTimePickerProps } from "./DateTimePickerSolid.types";
 
 export const DateTimePicker = (props: DateTimePickerProps) => {
-    const [, halfProps] = splitProps(props, ["tooltipDefs"]);
+    const [, halfProps] = splitProps(props, ["tooltipDefs", "isReachableWhenDisabled"]);
     const [, timeProps] = splitProps(halfProps, ["renderLeading", "triggerId"]);
 
     const { date: dateSignal, time: timeSignal } = DateTimeValueSolidUtils.createSplit(accessSignal(() => props.value));
@@ -34,68 +37,92 @@ export const DateTimePicker = (props: DateTimePickerProps) => {
 
     const getIsDisabled = createMemo(() => access(props.isDisabled) ?? false);
 
-    const getTooltipDefs = createMemo(() => {
-        const defs = access(props.tooltipDefs);
-        const isReachable = InteractionTrackerUtils.computeIsReachable(
+    const getIsReachable = createMemo(() =>
+        InteractionTrackerUtils.computeIsReachable(
             getIsDisabled(),
             access(props.isReachableWhenDisabled) ?? false,
-        );
+            false,
+            access(props.tooltipDefs) !== undefined,
+        ),
+    );
 
-        return defs && (!getIsDisabled() || isReachable) ? defs : undefined;
+    createEffect(() =>
+        InteractionTrackerUtils.warnIfReachableWithoutTooltip(
+            access(props.isReachableWhenDisabled) ?? false,
+            props.tooltipDefs !== undefined,
+        ),
+    );
+
+    const getTooltipDefs = createMemo(() => {
+        const defs = access(props.tooltipDefs);
+
+        return defs && (!getIsDisabled() || getIsReachable()) ? defs : undefined;
     });
 
     const getLastTooltipDefs = createMemo<ReturnType<typeof getTooltipDefs>>(
         (previous) => getTooltipDefs() ?? previous,
     );
 
+    const getGroupLabelledBy = FormFieldSolidUtils.resolveAriaLabelledBy();
+    const outerFieldContext = useFormFieldContext();
+    const outerLabelContext = useLabelContext();
+    const fieldContext = { ...outerFieldContext, getCaptionId: () => undefined };
+    const labelContext = { ...outerLabelContext, getIsLabeled: () => false };
+
     return (
-        <div ref={setRootRef} class={styles.dateTimePickerRoot}>
-            <DatePicker
-                {...halfProps}
-                value={dateSignal}
-                id={access(props.id) === undefined ? undefined : `${access(props.id)}-date`}
-                name={access(props.name) === undefined ? undefined : `${access(props.name)}-date`}
-                visibility={props.dateVisibility}
-                ariaLabel={props.dateLabel}
-                minValue={props.minValue === undefined ? undefined : () => access(props.minValue)!.date}
-                maxValue={props.maxValue === undefined ? undefined : () => access(props.maxValue)!.date}
-                renderContent={(getFlags) => {
-                    setDateFlags(() => getFlags);
+        <div ref={setRootRef} class={styles.dateTimePickerRoot} role="group" aria-labelledby={getGroupLabelledBy()}>
+            <FormFieldContextProvider value={fieldContext}>
+                <LabelContextProvider value={labelContext}>
+                    <DatePicker
+                        {...halfProps}
+                        isFocusableWhenDisabled={getIsReachable}
+                        value={dateSignal}
+                        id={access(props.id) === undefined ? undefined : `${access(props.id)}-date`}
+                        name={access(props.name) === undefined ? undefined : `${access(props.name)}-date`}
+                        visibility={props.dateVisibility}
+                        ariaLabel={props.dateLabel}
+                        minValue={props.minValue === undefined ? undefined : () => access(props.minValue)!.date}
+                        maxValue={props.maxValue === undefined ? undefined : () => access(props.maxValue)!.date}
+                        renderContent={(getFlags) => {
+                            setDateFlags(() => getFlags);
 
-                    return props.renderContent(getFlags);
-                }}
-            />
+                            return props.renderContent(getFlags);
+                        }}
+                    />
 
-            {props.renderSeparator?.()}
+                    {props.renderSeparator?.()}
 
-            <TimePicker
-                {...timeProps}
-                value={timeSignal}
-                id={access(props.id) === undefined ? undefined : `${access(props.id)}-time`}
-                name={access(props.name) === undefined ? undefined : `${access(props.name)}-time`}
-                visibility={props.timeVisibility}
-                ariaLabel={props.timeLabel}
-                minValue={
-                    props.minValue === undefined
-                        ? undefined
-                        : () => DateTimePickerUtils.computeMinTime(dateSignal[0](), access(props.minValue)!)
-                }
-                maxValue={
-                    props.maxValue === undefined
-                        ? undefined
-                        : () => DateTimePickerUtils.computeMaxTime(dateSignal[0](), access(props.maxValue)!)
-                }
-                triggerId={props.timeTriggerId}
-                triggerAriaLabel={props.timeTriggerAriaLabel}
-                renderContent={(getFlags) => {
-                    setTimeFlags(() => getFlags);
+                    <TimePicker
+                        {...timeProps}
+                        isFocusableWhenDisabled={getIsReachable}
+                        value={timeSignal}
+                        id={access(props.id) === undefined ? undefined : `${access(props.id)}-time`}
+                        name={access(props.name) === undefined ? undefined : `${access(props.name)}-time`}
+                        visibility={props.timeVisibility}
+                        ariaLabel={props.timeLabel}
+                        minValue={
+                            props.minValue === undefined
+                                ? undefined
+                                : () => DateTimePickerUtils.computeMinTime(dateSignal[0](), access(props.minValue)!)
+                        }
+                        maxValue={
+                            props.maxValue === undefined
+                                ? undefined
+                                : () => DateTimePickerUtils.computeMaxTime(dateSignal[0](), access(props.maxValue)!)
+                        }
+                        triggerId={props.timeTriggerId}
+                        triggerAriaLabel={props.timeTriggerAriaLabel}
+                        renderContent={(getFlags) => {
+                            setTimeFlags(() => getFlags);
 
-                    return props.renderContent(getFlags);
-                }}
-                renderTrailing={props.renderTimeTrailing}
-                renderTrigger={props.renderTimeTrigger}
-                renderPopup={props.renderTimePopup}
-            />
+                            return props.renderContent(getFlags);
+                        }}
+                        renderTrailing={props.renderTimeTrailing}
+                        renderTrigger={props.renderTimeTrigger}
+                        renderPopup={props.renderTimePopup}
+                    />
+                </LabelContextProvider>
+            </FormFieldContextProvider>
 
             <Show when={getLastTooltipDefs()}>
                 {(getDefs) => (

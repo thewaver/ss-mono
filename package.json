@@ -37,7 +37,9 @@
         "test": "npm run test --workspaces --if-present",
         "verify:dom": "playwright test",
         "verify:dom:ui": "playwright test --ui",
+        "verify:dom:webkit": "playwright test --config playwright.webkit.config.ts",
         "update:library-tree": "node playground/scripts/libraryTree.mjs",
+        "update:readme": "node --experimental-strip-types --no-warnings=ExperimentalWarning playground/scripts/readme.mjs",
         "format": "prettier --write .",
         "prepare": "husky"
     },

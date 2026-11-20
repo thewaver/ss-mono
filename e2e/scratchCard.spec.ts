@@ -23,6 +23,7 @@ const COVER = `${TICKET} [role="button"]`;
 const FULL_THRESHOLD = "1";
 const LOW_THRESHOLD = "0.1";
 const SETTLE_MS = 150;
+const SAMPLE_GAP_MS = 50;
 
 const setField = async (page: Page, key: string, value: string) => {
     await page.locator(`${prop(key)} input`).fill(value);
@@ -35,7 +36,7 @@ const clearedPercent = async (page: Page, key = "ticket") =>
 
 const coverChildCount = (page: Page, selector: string) => page.locator(`${selector} > div`).count();
 
-const rubAcross = async (page: Page, selector: string, fromRatio = 0.2, toRatio = 0.7) => {
+const rubAcross = async (page: Page, selector: string, fromRatio = 0.2, toRatio = 0.7, key = "ticket") => {
     const box = (await page.locator(selector).boundingBox())!;
     const y = box.y + box.height * 0.5;
 
@@ -43,7 +44,16 @@ const rubAcross = async (page: Page, selector: string, fromRatio = 0.2, toRatio 
     await page.mouse.down();
     await page.mouse.move(box.x + box.width * toRatio, y, { steps: 20 });
     await page.mouse.up();
-    await page.waitForTimeout(SETTLE_MS);
+
+    await expect
+        .poll(async () => {
+            const before = await clearedPercent(page, key);
+
+            await page.waitForTimeout(SAMPLE_GAP_MS);
+
+            return (await clearedPercent(page, key)) === before;
+        }, "the reported share stops changing once the rub has been measured")
+        .toBe(true);
 };
 
 const rub = (page: Page, fromRatio: number, toRatio: number) => rubAcross(page, COVER, fromRatio, toRatio);
@@ -180,17 +190,19 @@ test("the brush preview follows the pointer, and only where a consumer asked for
     const box = (await page.locator(COVER).boundingBox())!;
 
     await page.mouse.move(box.x + box.width * 0.5, box.y + box.height * 0.5);
-    await page.waitForTimeout(SETTLE_MS);
 
-    expect(
-        await coverChildCount(page, COVER),
-        "hovering the ticket mounts the preview beside the foil the consumer paints",
-    ).toBe(2);
+    await expect
+        .poll(
+            () => coverChildCount(page, COVER),
+            "hovering the ticket mounts the preview beside the foil the consumer paints",
+        )
+        .toBe(2);
 
     await page.mouse.move(box.x - 50, box.y - 50);
-    await page.waitForTimeout(SETTLE_MS);
 
-    expect(await coverChildCount(page, COVER), "and taking the pointer off the card takes it away again").toBe(1);
+    await expect
+        .poll(() => coverChildCount(page, COVER), "and taking the pointer off the card takes it away again")
+        .toBe(1);
 
     const frostedCover = `${FROSTED} [role="button"]`;
     const frosted = (await page.locator(frostedCover).boundingBox())!;
@@ -205,7 +217,7 @@ test("the brush preview follows the pointer, and only where a consumer asked for
 });
 
 test("each example keeps its own tally, rather than sharing one with the card beside it", async ({ page }) => {
-    await rubAcross(page, `${FROSTED} [role="button"]`);
+    await rubAcross(page, `${FROSTED} [role="button"]`, 0.2, 0.7, "frosted");
 
     expect(await clearedPercent(page, "frosted"), "the frosted cover reports what came off it").toBeGreaterThan(0);
     expect(await clearedPercent(page, "ticket"), "and the ticket beside it is untouched").toBe(0);
@@ -217,9 +229,8 @@ test("the ticket can be put back", async ({ page }) => {
     expect(await clearedPercent(page), "something came off").toBeGreaterThan(0);
 
     await page.locator("#newTicket").click();
-    await page.waitForTimeout(SETTLE_MS);
 
-    expect(await clearedPercent(page), "and the reset put the whole cover back").toBe(0);
+    await expect.poll(() => clearedPercent(page), "and the reset put the whole cover back").toBe(0);
 });
 
 /**

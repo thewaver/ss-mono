@@ -56,8 +56,6 @@ export const Satellite = defineComponent(
         return () => {
             const satellites = getSatellites();
 
-            if (!getHasSatellites()) return slots.default?.();
-
             const layout = SatelliteUtils.computeLayout(
                 subjectSize.value,
                 satellites.map((satellite, index) => ({

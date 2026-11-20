@@ -29,6 +29,7 @@ import {
     type InteractionFlags,
     InteractionTrackerUtils,
     OverflowUtils,
+    SafeHrefUtils,
     FloaterStyles as floaterStyles,
     FlyoutMenuStyles as styles,
 } from "@thewaver/ss-components";
@@ -93,7 +94,9 @@ export const FlyoutMenu = <T,>(props: FlyoutMenuProps<T>) => {
 
     const getListSize = ElementObserverSolidUtils.createBorderBoxSizeObserver(getListRef);
 
-    const getEntrySizes = ElementObserverSolidUtils.createBorderBoxSizeListObserver(getEntryRefs);
+    const getEntrySizes = ElementObserverSolidUtils.createBorderBoxSizeListObserver(() =>
+        getEntryRefs().slice(0, getEntries().length),
+    );
 
     const getOverflowSize = ElementObserverSolidUtils.createBorderBoxSizeObserver(getOverflowRef);
 
@@ -347,7 +350,7 @@ export const FlyoutMenu = <T,>(props: FlyoutMenuProps<T>) => {
                 <Dynamic
                     component={props.linkComponent ?? "a"}
                     ref={setElementRef}
-                    href={getLink().href}
+                    href={SafeHrefUtils.resolve(getLink().href, "FlyoutMenu")}
                     class={styles.flyoutMenuLink}
                     aria-current={getLink().isCurrent ? "page" : undefined}
                     onClick={close}

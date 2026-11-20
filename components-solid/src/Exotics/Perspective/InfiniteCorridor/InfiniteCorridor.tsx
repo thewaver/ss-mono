@@ -1,3 +1,4 @@
+import type { Accessor } from "solid-js";
 import { Index, createEffect, createMemo, createSignal, on, onCleanup } from "solid-js";
 
 import {
@@ -22,7 +23,7 @@ export const InfiniteCorridor = <T,>(props: InfiniteCorridorProps<T>) => {
         InfiniteCorridorConst.NO_PROGRESS,
     );
 
-    const itemRefs: (HTMLElement | undefined)[] = [];
+    const itemPlaces = new Map<HTMLElement, Accessor<number>>();
 
     const getSize = ElementObserverSolidUtils.createBorderBoxSizeObserver(getRootRef);
 
@@ -109,9 +110,10 @@ export const InfiniteCorridor = <T,>(props: InfiniteCorridorProps<T>) => {
     onCleanup(() => stopGlide?.());
 
     const handleFocusIn = (e: FocusEvent) => {
-        const place = itemRefs.findIndex((element) => element?.contains(e.target as Node));
+        const getPlace = [...itemPlaces].find(([element]) => element.contains(e.target as Node))?.[1];
+        const place = getPlace?.();
 
-        if (place < 0 || InfiniteCorridorUtils.getIsInView(getDistance(place), getFocusDistance())) return;
+        if (place === undefined || InfiniteCorridorUtils.getIsInView(getDistance(place), getFocusDistance())) return;
 
         glideTo(place);
     };
@@ -147,14 +149,12 @@ export const InfiniteCorridor = <T,>(props: InfiniteCorridorProps<T>) => {
                         isCopy: getIsCopy(getPlace()),
                     });
 
-                    onCleanup(() => {
-                        itemRefs[getPlace()] = undefined;
-                    });
-
                     return (
                         <div
                             ref={(element) => {
-                                itemRefs[getPlace()] = element;
+                                itemPlaces.set(element, getPlace);
+
+                                onCleanup(() => itemPlaces.delete(element));
                             }}
                             class={styles.infiniteCorridorItem}
                             style={InfiniteCorridorUtils.toItemStyle(getPlacement(), getDistance(getPlace()))}

@@ -3,6 +3,7 @@ import {
     type KeyboardEvent,
     type MouseEvent,
     type PointerEvent,
+    useCallback,
     useEffect,
     useId,
     useLayoutEffect,
@@ -35,7 +36,7 @@ import { useViewportContext } from "../../Abstracts/Viewport/Viewport.context";
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
 import { PlacementBox } from "../../Primitives/PlacementBox/PlacementBox";
 import { PlacementItem } from "../../Primitives/PlacementItem/PlacementItem";
-import { useElement } from "../../Utils/refUtils";
+import { useElement, useLatest } from "../../Utils/refUtils";
 import { LabelReactUtils } from "../Input/Label/LabelReact.utils";
 import type { SortableItem, SortableItemSlotProps, SortableProps } from "./Sortable.types";
 
@@ -73,10 +74,19 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
     const viewportContext = useViewportContext();
 
     const rootRef = useRef<HTMLDivElement | null>(null);
+    const latestRef = useLatest(props.ref);
     const boxRef = useRef<HTMLElement | null>(null);
     const itemRefs = useRef<Array<HTMLElement | undefined>>([]);
     const grabOffsetRef = useRef<Point2d>({ x: 0, y: 0 });
     const hasPendingClickRef = useRef(false);
+
+    const setRootRef = useCallback(
+        (element: HTMLElement | null) => {
+            rootRef.current = element as HTMLDivElement | null;
+            latestRef.current?.(element);
+        },
+        [latestRef],
+    );
 
     const rootElement = useElement(rootRef);
 
@@ -208,6 +218,8 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
     };
 
     const handlePointerDown = (index: number) => (e: PointerEvent<HTMLDivElement>) => {
+        hasPendingClickRef.current = false;
+
         if (e.button !== 0 || isDisabled) return;
         if ((e.target as HTMLElement).closest(CarrierUtils.INTERACTIVE_SELECTOR)) return;
         if (CarrierUtils.getCarry()) return;
@@ -253,7 +265,7 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
     };
 
     const handleKeyDown = (index: number) => (e: KeyboardEvent<HTMLDivElement>) => {
-        if (isDisabled) return;
+        if (e.target !== e.currentTarget || isDisabled) return;
 
         const action = SortableUtils.computeKeyAction(e.key, {
             index,
@@ -425,6 +437,7 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
     const list = (
         <InteractionWrapper<SortableFlags>
             {...props}
+            ref={setRootRef}
             sizing={layout !== undefined ? "fill" : (props.sizing ?? "fit-content")}
             extraFlags={{
                 isCarrying: carryState !== undefined,
@@ -435,10 +448,7 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
             renderControl={(setElementRef) => (
                 <div
                     id={listId}
-                    ref={(element) => {
-                        rootRef.current = element;
-                        setElementRef(element);
-                    }}
+                    ref={setElementRef}
                     className={isHorizontal ? SortableStyles.sortableRow : SortableStyles.sortableColumn}
                     style={{ gap: `${gap}px`, padding: `${endRoom}px` }}
                     role="list"

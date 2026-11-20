@@ -21,7 +21,9 @@ nothing from either tree. `npm run verify:dom` runs it; `verify:dom:ui` opens Pl
 clicked that point a frame later, so anything that re-anchored in between was clicked where it used to be.
 Playwright re-checks that an element is visible, stable and hit-testable at the instant it acts, and gives every
 test a fresh page. **One test per behavior**, `beforeEach` navigates, workers run in parallel. Prefer the
-auto-retrying `expect(locator)` forms, which make waits unnecessary.
+auto-retrying `expect(locator)` forms, which make waits unnecessary. **The exception is a check that nothing
+changed** — act, wait, expect the value as it was: a retrying assertion passes at once and tests nothing, so that wait
+stays a fixed one.
 
 **A test that the machine's load can move runs alone, tagged `@solo`** — the user's rule. A scroll that must
 settle, a painted box read mid-turn, a sampling loop inside a live region's window: these fail under a full
@@ -37,7 +39,7 @@ Things Playwright cannot do for us, each of which reads as a component bug:
 - **Opening a popup is two steps that land in either order** — highlight and focus — so wait on both
   (`aria-activedescendant` and `toBeFocused` for `Menu`); a key pressed between them is lost.
 - **An element under a looping CSS animation can never be clicked**, because it is never stable. Focus it and press
-  Enter instead (`elementHighlight.spec.ts`).
+  Enter instead.
 - **No IME API**: `TextSync`'s composition handling is driven through `page.context().newCDPSession(page)`.
 - **Touch taps only**, and synthetic touch events from page script are ignored by the browser's scrolling, so a real
   finger's scroll-or-dismiss is driven with `Input.dispatchTouchEvent`, in `drawerTouch.spec.ts` alone (the touch
@@ -116,3 +118,7 @@ does. To check that a page has examples at all, use `toBeGreaterThan(0)`.
 
 `fill()` or setting `.value` from script goes around a field that cannot be clicked, focused, or is painted over.
 **Click the field, then type**, which fails exactly where a person would.
+
+**The exception, the user's call: `fill()` is allowed on a Playground knob or a demo's own text field**, which only
+sets up the case and is not what the spec is about — a viewport size, a duration, a wheel's item count. **Never on
+the component under test**: if the field being filled is the one the spec checks, it is clicked and typed into.

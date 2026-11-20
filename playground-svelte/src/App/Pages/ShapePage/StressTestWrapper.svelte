@@ -11,19 +11,19 @@
     const STRESS_ITEMS: (StressTestDefs & { size: number })[] = [
         {
             count: 40,
-            cols: 8,
+            colCount: 8,
             gap: 20,
             size: 160,
         },
         {
             count: 160,
-            cols: 16,
+            colCount: 16,
             gap: 10,
             size: 80,
         },
         {
             count: 640,
-            cols: 32,
+            colCount: 32,
             gap: 5,
             size: 40,
         },

@@ -25,6 +25,7 @@ const WHOLE = 1;
 const HALF = 0.5;
 const FULL_TURN_DEGREES = 360;
 const QUARTER_TURN_DEGREES = 90;
+const SMALLEST_STEP_DEGREES = 1;
 const SMALLEST_RING = 3;
 const BOTTOM_EDGE = { x: 0.5, y: 1 };
 const LEFT_EDGE = { x: 0, y: 0.5 };
@@ -369,13 +370,13 @@ export namespace CarouselPlacementUtils {
      *
      * Neighboring slides meet edge to edge; a slide that would turn past side-on is not drawn.
      *
-     * @param defs `stepDegrees`, how far round the cylinder one slide reaches; `perspectivePx` how far away the
+     * @param defs `stepDegrees`, how far round the cylinder one slide reaches, held at `1` or more; `perspectivePx` how far away the
      * viewer sits.
      * @returns The rule, ready to hand to `placement`.
      */
     export const createCylinder = (defs?: CylinderPlacementDefs): CarouselPlacementRule => {
         const base = CarouselPlacementDefaults.CYLINDER_DEFAULTS;
-        const stepDegrees = defs?.stepDegrees ?? base.stepDegrees;
+        const stepDegrees = Math.max(defs?.stepDegrees ?? base.stepDegrees, SMALLEST_STEP_DEGREES);
         const perspectivePx = defs?.perspectivePx ?? base.perspectivePx;
 
         return {

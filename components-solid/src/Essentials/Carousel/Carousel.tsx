@@ -240,11 +240,13 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
         on(getCurrentIndex, (index, previous) => {
             const position = untrack(getPosition);
             const rests = untrack(getRests);
-            const isThere =
-                CarouselUtils.getNearestGroup(position, rests, untrack(getCount), untrack(getIsLooping)) === index;
+            const nearest = CarouselUtils.getNearestGroup(position, rests, untrack(getCount), untrack(getIsLooping));
+            const isThere = nearest === index;
 
             if (previous === undefined) {
-                if (!isThere) {
+                if (props.index === undefined) {
+                    if (!isThere) setIndex(nearest);
+                } else if (!isThere) {
                     writeProgress(
                         CarouselUtils.toGroupProgress(
                             rests[index] ?? 0,
@@ -310,7 +312,7 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
         const index = getCurrentIndex();
 
         if (CarouselUtils.getIsAnnounced(previous, index, getIsRotating())) {
-            LiveAnnouncerUtils.announce(getAnnouncement(index));
+            untrack(() => LiveAnnouncerUtils.announce(getAnnouncement(index)));
         }
 
         return index;

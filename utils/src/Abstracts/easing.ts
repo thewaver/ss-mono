@@ -83,6 +83,7 @@ const solveBezierParameter = (coefficients: BezierCoefficients, ratio: number) =
     return parameter;
 };
 
+/** Easing curves, named and built from cubic Béziers, and ways to combine and reverse them. */
 export namespace EasingUtils {
     /**
      * Wraps a curve so that it never sees a ratio outside `0` to `1`.

@@ -1,6 +1,8 @@
 import { type Accessor, Index, type JSX, Show, createEffect, createMemo, createSignal, on, onCleanup } from "solid-js";
 
 import {
+    InteractionTrackerUtils,
+    SafeHrefUtils,
     TABLE_OF_CONTENTS_DEFAULTS,
     type TableOfContentsFlags,
     type TableOfContentsLink,
@@ -17,10 +19,13 @@ import { access } from "../../Utils/propUtils";
 import type { TableOfContentsItemProps, TableOfContentsProps } from "./TableOfContentsSolid.types";
 
 const TableOfContentsItem = <T,>(props: TableOfContentsItemProps<T>) => {
+    const getSafeHref = () => SafeHrefUtils.resolve(access(props.link).href, "TableOfContents");
+
     const handleClick = (e: MouseEvent) => {
         const target = access(props.link).target;
 
         if (!target) return;
+        if (getSafeHref() !== undefined && !InteractionTrackerUtils.getIsPlainClick(e)) return;
 
         e.preventDefault();
 
@@ -40,7 +45,7 @@ const TableOfContentsItem = <T,>(props: TableOfContentsItemProps<T>) => {
 
     return (
         <Show
-            when={access(props.link).href}
+            when={getSafeHref()}
             fallback={
                 <button type="button" ref={(element) => props.ref?.(element)} {...commonProps} onClick={handleClick}>
                     {props.renderContent(() => access(props.flags))}

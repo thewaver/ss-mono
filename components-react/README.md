@@ -11,6 +11,8 @@ Live, editable examples and a full prop table for every component are at
 components carry the same names and the same props, with plain values where Solid takes getters and a
 `[value, setValue]` pair where Solid takes a signal — `value`, `visibility` and the rest are named the same in both.
 
+**Browser only: drawing these components on a server — Next.js, Nuxt, SvelteKit, SolidStart — is not tested.**
+
 ## Install
 
 ```

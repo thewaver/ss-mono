@@ -215,6 +215,7 @@ export const RGBAnimation = defineComponent(
                         width={sizeAnchor === "width" ? "100%" : "auto"}
                         height={sizeAnchor === "height" ? "100%" : "auto"}
                         aria-hidden="true"
+                        alt=""
                     />
 
                     <svg class={RGBAnimationStyles.rgbAnimationFilterHost} aria-hidden="true">

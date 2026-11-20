@@ -26,14 +26,18 @@ describe("CellAnimationUtils", () => {
     });
 
     it("rounds the count asked for and holds it between one cell and one per pixel", () => {
-        expect(CellAnimationUtils.computeCellCount({ col: 2.6, row: 0 }, { width: 100, height: 50 })).toEqual({
-            col: 3,
-            row: 1,
-        });
-        expect(CellAnimationUtils.computeCellCount({ col: 500, row: 4 }, { width: 100, height: 50 }).col).toBe(100);
-        expect(CellAnimationUtils.computeCellCount({ col: 4, row: 4 }, { width: 0, height: 0 })).toEqual({
-            col: 1,
-            row: 1,
+        expect(CellAnimationUtils.computeCellCount({ colCount: 2.6, rowCount: 0 }, { width: 100, height: 50 })).toEqual(
+            {
+                colCount: 3,
+                rowCount: 1,
+            },
+        );
+        expect(
+            CellAnimationUtils.computeCellCount({ colCount: 500, rowCount: 4 }, { width: 100, height: 50 }).colCount,
+        ).toBe(100);
+        expect(CellAnimationUtils.computeCellCount({ colCount: 4, rowCount: 4 }, { width: 0, height: 0 })).toEqual({
+            colCount: 1,
+            rowCount: 1,
         });
     });
 
@@ -51,7 +55,7 @@ describe("CellAnimationUtils", () => {
     });
 
     it("lists every cell in reading order, and counts a cell with no weight as none", () => {
-        const defs = CellAnimationUtils.computeCellDefs({ col: 2, row: 2 }, [[0.5]]);
+        const defs = CellAnimationUtils.computeCellDefs({ colCount: 2, rowCount: 2 }, [[0.5]]);
 
         expect(defs.map((cell) => cell.pos)).toEqual([
             { col: 0, row: 0 },
@@ -80,5 +84,16 @@ describe("CellAnimationUtils", () => {
     it("sets the viewer off only once there is a size to set off from", () => {
         expect(CellAnimationUtils.computePerspective({ width: 0, height: 0 })).toBe("none");
         expect(CellAnimationUtils.computePerspective({ width: 100, height: 200 })).toBe("300px");
+    });
+});
+
+describe("CellAnimationUtils.toSourceImage with quotes in the address", () => {
+    it("encodes the address's own quotes, so the CSS string is not ended early", () => {
+        const image = CellAnimationUtils.toSourceImage(
+            'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg"/>',
+        );
+
+        expect(image.slice(5, -2)).not.toContain('"');
+        expect(image).toContain("%22");
     });
 });

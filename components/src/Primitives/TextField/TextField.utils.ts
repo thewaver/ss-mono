@@ -66,7 +66,7 @@ export namespace TextFieldUtils {
      * @param text What the field holds.
      * @param parse The caller's own reading of the text, for text not written the way `Number` reads it. Left out,
      * the text is read with `Number`.
-     * @returns The number, or `undefined` for empty text and text that is not a finite number — a spin button then
+     * @returns The number, or `undefined` for empty text, text of only spaces and text that is not a finite number — a spin button then
      * announces no value rather than a wrong one.
      */
     export const computeSpinValue = (text: string, parse?: (text: string) => number | undefined) => {
@@ -74,7 +74,7 @@ export namespace TextFieldUtils {
 
         const parsed = Number(text);
 
-        return text !== "" && Number.isFinite(parsed) ? parsed : undefined;
+        return text.trim() !== "" && Number.isFinite(parsed) ? parsed : undefined;
     };
 
     /**

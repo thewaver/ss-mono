@@ -19,6 +19,7 @@ const DOCS = "/src/App/Pages/TooltipPage/Docs";
 const ANCHOR = `${docsDemo(DOCS, "Basic")} button`;
 const TOOLTIP = '[role="tooltip"]';
 const SETTLE_MS = 600;
+const SAMPLE_GAP_MS = 50;
 const TOLERANCE_PX = 0.5;
 
 type ArrowReading = {
@@ -48,7 +49,24 @@ const readArrow = async (page: Page): Promise<ArrowReading> => {
     await expect(page.locator(TOOLTIP)).toHaveCount(0);
     await page.locator(ANCHOR).hover();
     await expect(page.locator(TOOLTIP)).toBeVisible();
-    await page.waitForTimeout(SETTLE_MS);
+    await expect
+        .poll(async () => {
+            const before = await page.locator(TOOLTIP).boundingBox();
+
+            await page.waitForTimeout(SAMPLE_GAP_MS);
+
+            const after = await page.locator(TOOLTIP).boundingBox();
+
+            return (
+                !!before &&
+                !!after &&
+                before.x === after.x &&
+                before.y === after.y &&
+                before.width === after.width &&
+                before.height === after.height
+            );
+        }, "the tooltip has stopped moving and resizing")
+        .toBe(true);
 
     return page.evaluate(
         ({ anchorSelector, tooltipSelector }) => {
@@ -98,7 +116,7 @@ test("with no arrow picked, nothing is painted outside the tooltip's box", async
 });
 
 test("above the anchor, the arrow leaves the bottom edge lined up with the anchor's middle", async ({ page }) => {
-    await pick(page, "arrow", "Triangle");
+    await pick(page, "arrow", "Even");
     await pick(page, "hPlacement", "center");
     await pick(page, "vPlacement", "top_out");
 
@@ -110,7 +128,7 @@ test("above the anchor, the arrow leaves the bottom edge lined up with the ancho
 });
 
 test("below the anchor, it leaves the top edge, still lined up", async ({ page }) => {
-    await pick(page, "arrow", "Triangle");
+    await pick(page, "arrow", "Even");
     await pick(page, "hPlacement", "left_in");
     await pick(page, "vPlacement", "bottom_out");
 
@@ -122,7 +140,7 @@ test("below the anchor, it leaves the top edge, still lined up", async ({ page }
 });
 
 test("beside the anchor, it leaves the facing side, lined up down the anchor", async ({ page }) => {
-    await pick(page, "arrow", "Triangle");
+    await pick(page, "arrow", "Even");
     await pick(page, "hPlacement", "right_out");
     await pick(page, "vPlacement", "center");
 
@@ -140,7 +158,7 @@ test("beside the anchor, it leaves the facing side, lined up down the anchor", a
  * direction.
  */
 test("off a corner of the anchor, it leaves the nearest corner along that corner's diagonal", async ({ page }) => {
-    await pick(page, "arrow", "Triangle");
+    await pick(page, "arrow", "Even");
     await type(page, "arrowWidth", 12);
     await type(page, "arrowLength", 12);
     await pick(page, "hPlacement", "left_out");
@@ -163,7 +181,7 @@ test("off a corner of the anchor, it leaves the nearest corner along that corner
 });
 
 test("overlapping its anchor, the tooltip has nothing to point at and draws no arrow", async ({ page }) => {
-    await pick(page, "arrow", "Triangle");
+    await pick(page, "arrow", "Even");
     await pick(page, "hPlacement", "left_in");
     await pick(page, "vPlacement", "bottom_in");
 
@@ -173,7 +191,7 @@ test("overlapping its anchor, the tooltip has nothing to point at and draws no a
 });
 
 test("the tip stands off by the length typed in, and the base is as wide as the width", async ({ page }) => {
-    await pick(page, "arrow", "Triangle");
+    await pick(page, "arrow", "Even");
     await pick(page, "hPlacement", "center");
     await pick(page, "vPlacement", "top_out");
 
@@ -195,8 +213,8 @@ test("the tip stands off by the length typed in, and the base is as wide as the 
     }
 });
 
-test("the lightning bolt keeps its lean: its tip on the anchor, its base wholly to one side", async ({ page }) => {
-    await pick(page, "arrow", "Lightning bolt");
+test("the left arrow keeps its lean: its tip on the anchor, its base wholly to one side", async ({ page }) => {
+    await pick(page, "arrow", "Left");
     await pick(page, "hPlacement", "center");
     await pick(page, "vPlacement", "top_out");
 
@@ -208,9 +226,12 @@ test("the lightning bolt keeps its lean: its tip on the anchor, its base wholly 
     expect(tip.y, "below the body").toBeGreaterThan(reading.size.height);
     expect(Math.abs(tip.x - reading.anchorMiddle.x), "tip lined up with the anchor").toBeLessThan(TOLERANCE_PX);
     expect(
-        nearest.every((vertex) => vertex.x < tip.x),
-        "both base corners on the same side of the tip",
+        nearest.every((vertex) => vertex.x < tip.x + TOLERANCE_PX),
+        "neither base corner reaches past the tip",
     ).toBe(true);
+    expect(Math.min(...nearest.map((vertex) => vertex.x)), "and the base runs off to one side of it").toBeLessThan(
+        tip.x - TOLERANCE_PX,
+    );
 });
 
 /**

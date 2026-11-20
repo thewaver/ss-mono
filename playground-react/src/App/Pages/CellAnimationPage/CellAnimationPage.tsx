@@ -33,7 +33,7 @@ import {
 import * as styles from "@thewaver/ss-playground/App/Pages/CellAnimationPage/CellAnimationPage.css";
 import type { CellAnimationSourceKind } from "@thewaver/ss-playground/App/Pages/CellAnimationPage/CellAnimationPage.types";
 import knight_profile from "@thewaver/ss-playground/App/knight_profile.webp";
-import type { Index2d, Size2d } from "@thewaver/ss-utils";
+import type { Count2d, Size2d } from "@thewaver/ss-utils";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import {
@@ -112,7 +112,7 @@ const StressTestWrapper = ({
 
     return (
         <>
-            <div>{`${STRESS_CELL_COUNT.col} x ${STRESS_CELL_COUNT.row} cells`}</div>
+            <div>{`${STRESS_CELL_COUNT.colCount} x ${STRESS_CELL_COUNT.rowCount} cells`}</div>
 
             <PagePropsPanel scope={"local"} hasReset={false}>
                 <PageProp itemKey={"onGraphicsCard"} {...CellAnimationKnobs.ON_GRAPHICS_CARD_TEXT}>
@@ -180,7 +180,7 @@ export const CellAnimationPage = () => {
     );
     const [animationIterationCount, setAnimationIterationCount] = useState(CellAnimationKnobs.ENDLESS_ITERATION_COUNT);
     const [finalFrame, setFinalFrame] = useState<CellAnimationFinalFrame>(CELL_ANIMATION_DEFAULTS.finalFrame);
-    const [cellCount, setCellCount] = useState<Index2d>(() => ({ ...CellAnimationKnobs.STARTING_CELL_COUNT }));
+    const [cellCount, setCellCount] = useState<Count2d>(() => ({ ...CellAnimationKnobs.STARTING_CELL_COUNT }));
     const [weightOpts, setWeightOpts] = useState<WeightOpts>(() => ({ ...CellAnimationKnobs.STARTING_WEIGHT_OPTS }));
     const [breakpointOpts, setBreakpointOpts] = useState<SliceAnimationBreakpointOpts>(() => ({
         ...CellAnimationKnobs.STARTING_BREAKPOINT_OPTS,
@@ -324,20 +324,20 @@ export const CellAnimationPage = () => {
                     <PageProp itemKey={"cellCountCols"} {...CellAnimationKnobs.CELL_COUNT_COLS_TEXT}>
                         <div className={styles.valueList}>
                             <PageNumberField
-                                value={cellCount.col}
+                                value={cellCount.colCount}
                                 min={CellAnimationKnobs.MIN_CELL_COUNT}
                                 max={CellAnimationKnobs.MAX_CELL_COUNT}
                                 step={CellAnimationKnobs.CELL_COUNT_STEP}
                                 ariaLabel={"Columns"}
-                                onInput={(value) => setCellCount((previous) => ({ ...previous, col: value }))}
+                                onInput={(value) => setCellCount((previous) => ({ ...previous, colCount: value }))}
                             />
                             <PageNumberField
-                                value={cellCount.row}
+                                value={cellCount.rowCount}
                                 min={CellAnimationKnobs.MIN_CELL_COUNT}
                                 max={CellAnimationKnobs.MAX_CELL_COUNT}
                                 step={CellAnimationKnobs.CELL_COUNT_STEP}
                                 ariaLabel={"Rows"}
-                                onInput={(value) => setCellCount((previous) => ({ ...previous, row: value }))}
+                                onInput={(value) => setCellCount((previous) => ({ ...previous, rowCount: value }))}
                             />
                         </div>
                     </PageProp>

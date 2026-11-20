@@ -1,5 +1,5 @@
 export type StressTestDefs = {
     count: number;
-    cols: number;
+    colCount: number;
     gap: number;
 };

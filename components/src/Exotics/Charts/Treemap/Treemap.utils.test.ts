@@ -281,10 +281,19 @@ describe("createZoomClock", () => {
         clock.stop();
         vi.advanceTimersByTime(250);
 
-        expect(clock.get(), "the stop cancelled the timer too").toBe(0);
+        expect(clock.get(), "the stop canceled the timer too").toBe(0);
 
         clock.start(0);
         tick(performance.now());
         expect(clock.get()).toBe(1);
+    });
+});
+
+describe("TreemapUtils.computeWeights with a weight that is not a number", () => {
+    it("reads it as nothing, so the rest of the branch keeps its total", () => {
+        const leaf = { value: "bad", weight: Number.NaN };
+        const root = { value: "root", children: [leaf, { value: "good", weight: 3 }] };
+
+        expect(TreemapUtils.computeWeights(root).get(root)).toBe(3);
     });
 });

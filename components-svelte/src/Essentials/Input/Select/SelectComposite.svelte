@@ -26,7 +26,6 @@
     import SelectField from "./SelectField.svelte";
 
     const EMPTY_QUERY = "";
-    const EMPTY_FORM_VALUE = "";
 
     let {
         ref = $bindable(),
@@ -136,7 +135,7 @@
             props.computeFormValue,
         );
 
-        return isMultiple || texts.length > 0 ? texts : [EMPTY_FORM_VALUE];
+        return isMultiple || texts.length > 0 ? texts : [FormValueUtils.EMPTY_TEXT];
     };
 
     const extraFlags: SelectFlags = $derived({

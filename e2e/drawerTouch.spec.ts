@@ -16,6 +16,8 @@ import { docsSettled } from "./helpers";
  * scroll the content back instead, because the person is reading rather than dismissing. That sheet is the Docs
  * page's swiping example.
  */
+test.skip(({ browserName }) => browserName !== "chromium", "the DevTools Protocol touch input exists only in Chromium");
+
 const DIALOG = '[aria-modal="true"]';
 const PANEL = `${DIALOG} > *`;
 const TOUCH_STEPS = 12;

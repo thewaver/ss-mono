@@ -326,6 +326,7 @@
     };
 
     const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.target !== e.currentTarget && !findRowById((e.target as Element).id)) return;
         if (navigableRows.length < 1) return;
 
         const current = findRowById(document.activeElement?.id) ?? rovingRow;
@@ -443,6 +444,7 @@
             sizing="fill"
             isDisabled={row.node.isDisabled ?? false}
             isReachableWhenDisabled={row.node.isReachableWhenDisabled ?? false}
+            isFocusableWhenDisabled={row.node.isReachableWhenDisabled ?? false}
             isTabbable={row.node.value === rovingRow?.node.value}
             tooltipDefs={row.node.tooltipDefs}
             extraFlags={{

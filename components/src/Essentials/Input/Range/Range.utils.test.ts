@@ -143,3 +143,51 @@ describe("computeNearestThumb", () => {
         expect(RangeUtils.computeNearestThumb([80, 80], 90)).toBe(1);
     });
 });
+
+describe("RangeUtils.computeSteppedValue with a min finer than its step", () => {
+    it("lands on a step counted from min, keeping min's half", () => {
+        expect(RangeUtils.computeSteppedValue(3.4, { min: 0.5, max: 10, step: 1 })).toBe(3.5);
+    });
+});
+
+describe("RangeUtils.createThumbs, a knob changed with no key or pointer first", () => {
+    const SCALE = { orientation: "horizontal", direction: "ltr", min: 0, max: 100, step: 1, thumbSize: 20 } as const;
+
+    const createKnob = () => {
+        const values = [10];
+        const reported: number[][] = [];
+        const thumbs = RangeUtils.createThumbs({
+            getValues: () => values,
+            getScale: () => SCALE,
+            getIsDisabled: () => false,
+            getComputeValueAtPoint: () => () => 0,
+            getElement: () => undefined,
+            setValue: (index, value) => {
+                values[index] = value;
+            },
+            setActiveThumb: () => {},
+            onChangeEnd: (next) => reported.push([...next]),
+        });
+
+        return { values, reported, thumbs };
+    };
+
+    it("reports the end of a screen reader's change, which arrives as input then change alone", () => {
+        const { values, reported, thumbs } = createKnob();
+
+        values[0] = 11;
+        thumbs.handleChange();
+
+        expect(reported).toEqual([[11]]);
+    });
+
+    it("does not report the same values twice when a change repeats the last report", () => {
+        const { values, reported, thumbs } = createKnob();
+
+        values[0] = 11;
+        thumbs.handleChange();
+        thumbs.handleChange();
+
+        expect(reported).toEqual([[11]]);
+    });
+});

@@ -60,7 +60,7 @@ export const RichText = defineComponent(
 
         return () =>
             renderNodes(parsedTree.value, {
-                classMap: props.computeClassNames?.(RICH_TEXT_DEFAULT_CLASSES) ?? RICH_TEXT_DEFAULT_CLASSES,
+                classMap: props.computeClassNames?.({ ...RICH_TEXT_DEFAULT_CLASSES }) ?? RICH_TEXT_DEFAULT_CLASSES,
                 removeUnknownTags: props.removeOtherTags ?? RICH_TEXT_DEFAULTS.removeOtherTags,
                 renderTag: slots.renderTag,
             });

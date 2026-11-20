@@ -232,7 +232,7 @@ export const Bracket = defineComponent(
         const handleKeyDown = (e: KeyboardEvent) => {
             const roving = rovingId.value;
 
-            if (roving === undefined) return;
+            if (roving === undefined || !getIsNode(e.target) || NavigatorUtils.getHasCommandModifier(e)) return;
 
             if (NavigatorUtils.getIsActivationKey(e.key)) {
                 e.preventDefault();

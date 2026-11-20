@@ -6,7 +6,6 @@ import {
     Virtualizer,
     type VirtualizerOptions,
     defaultRangeExtractor,
-    elementScroll,
     measureElement,
     observeElementOffset,
 } from "@tanstack/virtual-core";
@@ -129,7 +128,7 @@ export namespace VirtualizerReactUtils {
             },
             observeElementRect: VirtualizerUtils.observeClientRect,
             observeElementOffset,
-            scrollToFn: elementScroll,
+            scrollToFn: VirtualizerUtils.scrollToWholePixel,
             onChange: (_instance, isSync) => (isSync && !isInsideReactRef.current ? flushSync(rerender) : rerender()),
         };
 

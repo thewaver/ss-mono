@@ -10,5 +10,5 @@
             "@thewaver/ss-utils": ["../utils/src/index.ts"]
         }
     },
-    "include": ["src", "vite.lib.config.ts"]
+    "include": ["../utils/process-env.d.ts", "src", "vite.lib.config.ts"]
 }

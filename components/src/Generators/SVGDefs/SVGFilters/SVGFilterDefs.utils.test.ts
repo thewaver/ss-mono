@@ -131,7 +131,7 @@ describe("SVGFilterDefsUtils matrices", () => {
         ]);
     });
 
-    it("pivots contrast about mid-grey and turns a half inversion into flat grey", () => {
+    it("pivots contrast about mid-gray and turns a half inversion into flat gray", () => {
         expect(rows(SVGFilterDefsUtils.computeContrastMatrix({ amount: 0 }))).toEqual([
             0, 0, 0, 0, 0.5, 0, 0, 0, 0, 0.5, 0, 0, 0, 0, 0.5, 0, 0, 0, 1, 0,
         ]);

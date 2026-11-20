@@ -403,6 +403,8 @@ export const Table = <T,>(props: TableProps<T>) => {
     let hasCarriedClick = false;
 
     const handleHeaderPointerDown = (e: PointerEvent, columnIndex: number) => {
+        hasCarriedClick = false;
+
         const column = getColumns()[columnIndex];
 
         if (e.button !== 0 || getIsDisabled() || !getIsReorderable(column)) return;

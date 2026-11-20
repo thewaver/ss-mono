@@ -5,13 +5,19 @@ import vue from "shiki/langs/vue.mjs";
 import { getDefaultHighlighterConfig, highlighter } from "../../../shiki";
 import { PLAYGROUND_FRAMEWORK_LABELS } from "../../PageComponents/FrameworkSwitch/FrameworkSwitch.const";
 import type { PlaygroundFramework } from "../../PageComponents/FrameworkSwitch/PlaygroundFramework.types";
+import {
+    ABOUT_COMPONENT_KINDS,
+    ABOUT_HEADLESS,
+    ABOUT_HOW_IT_WORKS,
+    ABOUT_PHILOSOPHY,
+    ABOUT_SHARED_CORE,
+    ABOUT_SOURCE_LINK,
+} from "./AboutPage.const";
 import type { AboutBlock, AboutCodeLanguage, AboutLink, AboutSection } from "./AboutPage.types";
 
 const NPM_PACKAGE_ROOT = "https://www.npmjs.com/package/";
 const UTILS_PACKAGE = "@thewaver/ss-utils";
 const CORE_PACKAGE = "@thewaver/ss-components";
-const SOURCE_LINK: AboutLink = { text: "open-source", href: "https://github.com/thewaver/ss-mono" };
-const WCAG_LINK: AboutLink = { text: "WCAG", href: "https://www.w3.org/WAI/standards-guidelines/wcag/" };
 
 const FRAMEWORK_SITES: Record<PlaygroundFramework, string> = {
     solid: "https://www.solidjs.com",
@@ -113,17 +119,15 @@ export namespace AboutPageUtils {
                     kind: "paragraph",
                     text: [
                         `ss-components-${framework} is a free, `,
-                        SOURCE_LINK,
+                        ABOUT_SOURCE_LINK,
                         " library of interface components for ",
                         toFrameworkLink(framework),
-                        ": buttons, text and number fields, date and time pickers, selects, menus, modals, tabs, trees, tables, carousels, and a set of visual and motion effects besides.",
+                        `: ${ABOUT_COMPONENT_KINDS}.`,
                     ],
                 },
                 {
                     kind: "paragraph",
-                    text: [
-                        "It is headless. Every component brings its structure, its behavior and its accessibility wiring, and none of the color, spacing or type. What a component looks like is yours to draw.",
-                    ],
+                    text: [ABOUT_HEADLESS],
                 },
                 {
                     kind: "paragraph",
@@ -136,7 +140,7 @@ export namespace AboutPageUtils {
                         toFrameworkLink("vue"),
                         " and ",
                         toFrameworkLink("svelte"),
-                        ", with the same names and the same props. All four sit on one framework-free core, so a control behaves the same way in each. This site is that library, built four times: pick the framework in the heading above the search field and the page you are reading opens in it.",
+                        `, with the same names and the same props. ${ABOUT_SHARED_CORE} This site is that library, built four times: pick the framework in the heading above the search field and the page you are reading opens in it.`,
                     ],
                 },
             ],
@@ -146,28 +150,7 @@ export namespace AboutPageUtils {
             blocks: [
                 {
                     kind: "list",
-                    items: [
-                        [
-                            "The library owns behavior and you own looks. A component never decides its own paint, so there is nothing to override and nothing to fight.",
-                        ],
-                        [
-                            "Accessible by default. Keyboard routes, focus handling and ARIA roles come built in and are checked against ",
-                            WCAG_LINK,
-                            ". Where a choice of yours would leave a control failing a criterion, the library says so loudly in development instead of quietly going along.",
-                        ],
-                        [
-                            "Your words, not ours. Apart from the name of what a control is, the library ships no sentence a reader would hear or see. Labels and announcements arrive through props, so a page in another language is never read out in English.",
-                        ],
-                        [
-                            "Controls stay out of the way. A component hands you a controller and draws no buttons of its own, so where the buttons go, and how they look, is your decision.",
-                        ],
-                        [
-                            "Nothing is hidden. The pieces the components are built from are exported too, so you can build the control the library does not have.",
-                        ],
-                        [
-                            "One name for one thing. A prop is called the same in every framework; only the way you hand it in changes.",
-                        ],
-                    ],
+                    items: ABOUT_PHILOSOPHY,
                 },
             ],
         },
@@ -176,9 +159,7 @@ export namespace AboutPageUtils {
             blocks: [
                 {
                     kind: "paragraph",
-                    text: [
-                        "A component is a box that behaves. You mount it, give it its data, and give it a render function for whatever it draws. The library calls that function with the control's current state, such as hovered, pressed, showing a focus ring, disabled or open, and you return the markup and styling for that state.",
-                    ],
+                    text: [ABOUT_HOW_IT_WORKS],
                 },
                 {
                     kind: "paragraph",

@@ -110,14 +110,14 @@ test("the pointer can be walked off the anchor onto the tooltip without losing i
     const anchorBox = (await page.locator(ANCHOR).boundingBox())!;
     const tooltipBox = (await page.locator(TOOLTIP).boundingBox())!;
 
-    const midX = anchorBox.x + anchorBox.width / 2;
-    const gapMidY = (anchorBox.y + tooltipBox.y + tooltipBox.height) / 2;
+    const midX = anchorBox.x + anchorBox.width * 0.5;
+    const gapMidY = (anchorBox.y + tooltipBox.y + tooltipBox.height) * 0.5;
 
     await page.mouse.move(midX, gapMidY);
     await page.waitForTimeout(FADE_SETTLED_MS);
     await expect(page.locator(TOOLTIP), "resting in the gap between the two does not lose it").toHaveCount(1);
 
-    await page.mouse.move(tooltipBox.x + tooltipBox.width / 2, tooltipBox.y + tooltipBox.height / 2);
+    await page.mouse.move(tooltipBox.x + tooltipBox.width * 0.5, tooltipBox.y + tooltipBox.height * 0.5);
     await page.waitForTimeout(FADE_SETTLED_MS);
     await expect(page.locator(TOOLTIP), "and neither does arriving on the tooltip itself").toHaveCount(1);
 

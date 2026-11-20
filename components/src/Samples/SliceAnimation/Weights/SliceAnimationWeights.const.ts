@@ -1,4 +1,4 @@
-import type { Index2d } from "@thewaver/ss-utils";
+import type { Count2d, Index2d } from "@thewaver/ss-utils";
 
 import type { WeightFn, WeightOpts } from "../../../Generators/SliceAnimationWeights/SliceAnimationWeights.types";
 import { SliceAnimationWeightUtils } from "../../../Generators/SliceAnimationWeights/SliceAnimationWeights.utils";
@@ -247,6 +247,10 @@ export namespace SliceAnimationWeights {
         zigzag_row: zigzagRow,
     };
 
-    export const computeSliceWeights = (type: WeightType, count: Index2d, origin: Index2d, opts?: WeightOpts) =>
-        SliceAnimationWeightUtils.computeSliceWeights(SAMPLE_WEIGHTS[type], count, origin, opts);
+    export const computeSliceWeights = (type: WeightType, count: Count2d, origin: Index2d, opts?: WeightOpts) => {
+        if (!Object.hasOwn(SAMPLE_WEIGHTS, type))
+            throw new Error(`SliceAnimationWeights: there is no weight named "${type}".`);
+
+        return SliceAnimationWeightUtils.computeSliceWeights(SAMPLE_WEIGHTS[type], count, origin, opts);
+    };
 }

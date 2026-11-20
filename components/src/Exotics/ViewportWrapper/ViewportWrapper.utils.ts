@@ -95,6 +95,8 @@ export namespace ViewportWrapperUtils {
      * @returns Whether it warned, so the caller can stop asking.
      */
     export const warnIfUnsized = (size: Size2d) => {
+        if (process.env.NODE_ENV === "production") return false;
+
         if (size.width > 0 && size.height > 0) return false;
 
         console.warn(

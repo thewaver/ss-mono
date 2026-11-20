@@ -9,8 +9,14 @@ import type { MenuItemKind } from "../Menus/Menu/Menu.types";
 export type ToolbarRole = "toolbar" | "menubar";
 
 export type ToolbarActionRecord<T, TTooltipDefs = unknown> = {
+    /** The action's value, which `onActivate` and `pressedValues` speak of. */
     value: T;
+    /**
+     * Whether the action may move into the overflow menu: `auto` when it does not fit, `never` to keep it in the row
+     * whatever it costs, `always` to keep it in the menu.
+     */
     collapse?: OverflowCollapse;
+    /** Whether the action can be activated. */
     isDisabled?: boolean;
     /**
      * Keeps this action in the arrow-key walk while it is disabled, so focus can land on it and a reader hears its name

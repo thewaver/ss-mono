@@ -53,6 +53,7 @@
 
         e.preventDefault();
         axisRefs[corner]?.focus({ preventScroll: true });
+        focusVisible = undefined;
         stopGesture?.();
 
         const grip = e.currentTarget as HTMLElement;

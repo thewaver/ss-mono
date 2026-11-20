@@ -194,7 +194,7 @@ export namespace FlipbookUtils {
      * @returns `previous` for the left arrow and `next` for the right, which is where the pages read and unread lie;
      * `undefined` for any other key, which the book leaves to the page.
      */
-    export const getKeyStep = (key: string) => KEY_STEPS[key];
+    export const getKeyStep = (key: string) => (Object.hasOwn(KEY_STEPS, key) ? KEY_STEPS[key] : undefined);
 
     /**
      * Which way a committed drag turns the book.

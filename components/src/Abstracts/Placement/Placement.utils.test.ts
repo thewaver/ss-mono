@@ -450,7 +450,7 @@ describe("getRunOverreach", () => {
         expect(
             PlacementUtils.getRunOverreach(arc, beyond),
             "a quarter of the way further round than the arc reaches",
-        ).toBeCloseTo(0.4 * (Math.PI / 4));
+        ).toBeCloseTo(0.4 * (Math.PI * 0.25));
     });
 
     it("measures to the box the centers cover where a layout names no reach rule, as it does for a row", () => {

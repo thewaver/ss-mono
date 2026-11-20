@@ -156,8 +156,15 @@ export type BaseSortableGridCbs<T> = {
     computeIsSpotBlocked?: (spot: SortableGridSpot) => boolean;
     /** The key one item is told apart by, which is what lets an item keep its identity as it moves. */
     computeItemKey: (value: T) => string;
-    /** Names one item for assistive technology. */
+    /** One item's bare name, as the move announcements say it. */
     computeItemLabel: (value: T) => string;
+    /**
+     * Names one item, as it sits, for assistive technology: the whole accessible name, which the library adds
+     * nothing to. A position on a board is not spoken anywhere else, so a name that says where the item is and how
+     * much room it takes — "Sword, 1 by 3, column 2, row 1" — is what a reader needs; the wording is yours, in the
+     * page's language. `computeItemLabel` stays the bare name the move announcements use.
+     */
+    computeItemAriaLabel: (value: T, size: SortableGridSize, spot: SortableGridSpot) => string;
     /**
      * Whether this grid will take an item offered to it, and from which grid, so a grid can refuse what does not
      * belong.

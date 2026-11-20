@@ -3,6 +3,7 @@ export * from "./Abstracts/bitwise.js";
 export * from "./Abstracts/bounds.js";
 export * from "./Abstracts/circle.js";
 export * from "./Abstracts/color.js";
+export * from "./Abstracts/count2d.js";
 export * from "./Abstracts/decimal.js";
 export * from "./Abstracts/dir.js";
 export * from "./Abstracts/easing.js";

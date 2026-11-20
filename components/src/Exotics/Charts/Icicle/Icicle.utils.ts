@@ -222,7 +222,8 @@ export namespace IcicleUtils {
      * @returns The step for {@link computeStep}: up and down within a column, left to the parent, right to the
      * children, Home and End to the column's ends. `undefined` for any other key.
      */
-    export const getKeyStep = (key: string): IcicleStep | undefined => STEP_KEYS[key];
+    export const getKeyStep = (key: string): IcicleStep | undefined =>
+        Object.hasOwn(STEP_KEYS, key) ? STEP_KEYS[key] : undefined;
 
     /**
      * Which node an activated cell brings into view.

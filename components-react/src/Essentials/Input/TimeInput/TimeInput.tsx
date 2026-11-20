@@ -1,14 +1,12 @@
 import { type KeyboardEvent, useEffect, useLayoutEffect, useState } from "react";
 
-import { type TextSyncElement, TextSyncUtils, TimeInputUtils } from "@thewaver/ss-components";
+import { FormValueUtils, type TextSyncElement, TextSyncUtils, TimeInputUtils } from "@thewaver/ss-components";
 import { TimeUtils, type TimeValue, type TimeValueMeridiem } from "@thewaver/ss-utils";
 
 import { MaskedFieldReactUtils } from "../../../Abstracts/MaskedField/MaskedFieldReact.utils";
 import { FormValue } from "../../../Primitives/FormValue/FormValue";
 import { TextField } from "../../../Primitives/TextField/TextField";
 import type { TimeInputMeridiem, TimeInputProps } from "./TimeInput.types";
-
-const EMPTY_FORM_VALUE = "";
 
 export const TimeInput = (props: TimeInputProps) => {
     const [value, setValue] = props.value;
@@ -25,7 +23,7 @@ export const TimeInput = (props: TimeInputProps) => {
         digitCount: segmentCount * TimeInputUtils.SEGMENT_DIGITS,
         setValue,
         formatDigits: (digits) => TextSyncUtils.formatWithMask(mask, digits),
-        toDigits: (next) => TimeInputUtils.toDigits(next, isTwelveHour),
+        toDigits: (next) => TimeInputUtils.toDigits(next, isTwelveHour, props.hasSeconds ?? false),
         fromDigits: (digits) =>
             TimeInputUtils.parseDigits(digits, {
                 segmentCount,
@@ -91,7 +89,9 @@ export const TimeInput = (props: TimeInputProps) => {
                 value={field.text}
                 element={"input"}
                 inputMode={"numeric"}
-                computeMaskedText={(previous, next, caret) => TextSyncUtils.applyMask(mask, previous, next, caret)}
+                computeMaskedText={(previous, next, caret, isForwardDeletion) =>
+                    TextSyncUtils.applyMask(mask, previous, next, caret, isForwardDeletion)
+                }
                 placeholderHint={TimeInputUtils.computeHint(segmentCount, props.segmentHints)}
                 hasError={(props.hasError ?? false) || field.hasIssue}
                 renderTrailing={renderTrailing && ((flags) => renderTrailing(flags, meridiemControl))}
@@ -100,7 +100,7 @@ export const TimeInput = (props: TimeInputProps) => {
                 onBlur={field.onBlur}
             />
 
-            <FormValue name={props.name} values={[value ? TimeUtils.toIso(value) : EMPTY_FORM_VALUE]} />
+            <FormValue name={props.name} values={[value ? TimeUtils.toIso(value) : FormValueUtils.EMPTY_TEXT]} />
         </>
     );
 };

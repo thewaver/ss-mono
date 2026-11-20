@@ -1,6 +1,6 @@
 import { type SlotsType, computed, defineComponent, onScopeDispose, shallowRef } from "vue";
 
-import { CARD_STACK_DEFAULTS, CardStackStyles, CardStackUtils } from "@thewaver/ss-components";
+import { CARD_STACK_DEFAULTS, CardStackStyles, CardStackUtils, NavigatorUtils } from "@thewaver/ss-components";
 import { CardStackConst } from "@thewaver/ss-components/internal";
 
 import { InteractionTrackerVueUtils } from "../../Abstracts/InteractionTracker/InteractionTrackerVue.utils";
@@ -79,6 +79,8 @@ export const CardStack = defineComponent(
         });
 
         const onKeyDown = (e: KeyboardEvent) => {
+            if (e.target !== e.currentTarget || NavigatorUtils.getHasCommandModifier(e)) return;
+
             const direction = CardStackUtils.getKeyDirection(e.key);
 
             if (direction === undefined || !pile.send(direction)) return;

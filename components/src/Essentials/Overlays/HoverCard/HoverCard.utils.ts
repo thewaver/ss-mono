@@ -88,12 +88,7 @@ export namespace HoverCardUtils {
      * @returns The element, or `undefined` when nothing focusable follows the anchor.
      */
     export const findFocusableAfter = (anchor: HTMLElement, card: HTMLElement) =>
-        FocusManagerUtils.getFocusableChildren().find(
-            (element) =>
-                !card.contains(element) &&
-                !anchor.contains(element) &&
-                (anchor.compareDocumentPosition(element) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0,
-        );
+        FocusManagerUtils.getFocusableAfter(anchor, (element) => card.contains(element));
 
     /**
      * Answers a key pressed inside the card: Shift+Tab from its start goes back to the anchor, and Tab from its end

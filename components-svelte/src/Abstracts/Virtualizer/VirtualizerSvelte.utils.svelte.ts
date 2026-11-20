@@ -5,7 +5,6 @@ import {
     Virtualizer,
     type VirtualizerOptions,
     defaultRangeExtractor,
-    elementScroll,
     measureElement,
     observeElementOffset,
 } from "@tanstack/virtual-core";
@@ -135,7 +134,7 @@ export namespace VirtualizerSvelteUtils {
                 },
                 observeElementRect: VirtualizerUtils.observeClientRect,
                 observeElementOffset,
-                scrollToFn: elementScroll,
+                scrollToFn: VirtualizerUtils.scrollToWholePixel,
                 onChange: (instance) => {
                     instance._willUpdate();
                     publish();

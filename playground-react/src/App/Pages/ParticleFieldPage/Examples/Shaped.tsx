@@ -9,21 +9,21 @@ import { DefaultExample } from "./Default";
 
 const NO_EDGE_THICKNESSES = [0];
 
-export const ShapedExample = ({
-    shapeKind,
-    joinRadius,
-    ...otherProps
-}: ParticleFieldExampleProps & { shapeKind: ShapeConst.DefaultShape; joinRadius: number }) => {
+export const ShapedExample = (
+    props: ParticleFieldExampleProps & { shapeKind: ShapeConst.DefaultShape; joinRadius: number },
+) => {
+    const { shapeKind, joinRadius, ...otherProps } = props;
+
     const rootRef = useRef<HTMLDivElement>(null);
 
     const size = ElementObserverReactUtils.useBorderBoxSize(rootRef);
 
     const computeShapePoints = useCallback(
-        (size: Size2d) => ShapeConst.getDefaultShapePoints(shapeKind, size),
-        [shapeKind],
+        (size: Size2d) => ShapeConst.getDefaultShapePoints(props.shapeKind, size),
+        [props.shapeKind],
     );
 
-    const shapeJoinRadii = useMemo(() => [joinRadius], [joinRadius]);
+    const shapeJoinRadii = useMemo(() => [props.joinRadius], [props.joinRadius]);
 
     const contourPath = useMemo(
         () => ShapeUtils.getPaths(computeShapePoints(size), NO_EDGE_THICKNESSES, shapeJoinRadii).outerPath,

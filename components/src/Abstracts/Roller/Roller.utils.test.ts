@@ -180,8 +180,8 @@ describe("getNextFace, passing over a face", () => {
 
 describe("getDragTurn", () => {
     it("turns the point under the pointer along with it, by the travel in radii", () => {
-        const quarterRight = RollerUtils.getDragTurn((RADIUS * Math.PI) / 2, 0, RADIUS);
-        const quarterDown = RollerUtils.getDragTurn(0, (RADIUS * Math.PI) / 2, RADIUS);
+        const quarterRight = RollerUtils.getDragTurn(RADIUS * Math.PI * 0.5, 0, RADIUS);
+        const quarterDown = RollerUtils.getDragTurn(0, RADIUS * Math.PI * 0.5, RADIUS);
 
         expectPoint(QuaternionUtils.rotate(quarterRight, { x: 0, y: 0, z: 1 }), { x: 1, y: 0, z: 0 });
         expectPoint(QuaternionUtils.rotate(quarterDown, { x: 0, y: 0, z: 1 }), { x: 0, y: 1, z: 0 });

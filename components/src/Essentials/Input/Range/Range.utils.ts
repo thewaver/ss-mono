@@ -25,8 +25,9 @@ export namespace RangeUtils {
     /**
      * Rounds a raw value to the nearest step and keeps it inside its bounds.
      *
-     * Steps are counted from `min`, as the arrow keys count them, and the answer is rounded back to the step's own
-     * decimals, so a step of `0.1` gives `0.3` rather than `0.30000000000000004`.
+     * Steps are counted from `min`, as the arrow keys count them, and the answer is rounded to the finest decimals of
+     * the step and `min`, so a step of `0.1` gives `0.3` rather than `0.30000000000000004`, and a step of `1` from a
+     * `min` of `0.5` lands on `3.5`, not `4`.
      *
      * @param value The raw reading.
      * @param defs.min The smallest value allowed, and where steps are counted from.
@@ -39,7 +40,7 @@ export namespace RangeUtils {
             defs.step > 0
                 ? MathUtils.roundToDecimalPlaces(
                       defs.min + Math.round((value - defs.min) / defs.step) * defs.step,
-                      MathUtils.getDecimalCount(defs.step),
+                      MathUtils.getStepDecimals(defs.step, defs.min),
                   )
                 : value;
 
@@ -100,7 +101,7 @@ export namespace RangeUtils {
      * @param names What the caller calls the two props, so the warning names what the consumer wrote.
      */
     export const warnIfAmbiguous = (hasSingle: boolean, hasPair: boolean, names: { single: string; pair: string }) => {
-        if (hasSingle !== hasPair) return;
+        if (process.env.NODE_ENV === "production" || hasSingle !== hasPair) return;
 
         console.warn(
             `Range: give exactly one of ${names.single} and ${names.pair} — ${names.single} drives a single thumb, ${names.pair} drives a pair.`,
@@ -258,6 +259,7 @@ export namespace RangeUtils {
      */
     export const createThumbs = (defs: RangeThumbsDefs) => {
         let valuesAtChangeStart: number[] | undefined;
+        let valuesAtLastEnd: number[] | undefined;
         let trackedPointerId: number | undefined;
         let trackedThumb = 0;
 
@@ -270,6 +272,7 @@ export namespace RangeUtils {
             const startValues = valuesAtChangeStart;
 
             valuesAtChangeStart = undefined;
+            valuesAtLastEnd = values;
 
             if (defs.getIsDisabled()) return;
 
@@ -354,7 +357,12 @@ export namespace RangeUtils {
                 syncElement(element, index);
             },
             handleChange: () => {
-                if (defs.getComputeValueAtPoint() && valuesAtChangeStart === undefined) return;
+                const isEchoOfLastEnd =
+                    valuesAtChangeStart === undefined &&
+                    valuesAtLastEnd !== undefined &&
+                    defs.getValues().every((value, index) => value === valuesAtLastEnd![index]);
+
+                if (defs.getComputeValueAtPoint() && isEchoOfLastEnd) return;
 
                 reportChangeEnd();
             },

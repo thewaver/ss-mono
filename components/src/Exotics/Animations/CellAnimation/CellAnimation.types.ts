@@ -1,4 +1,4 @@
-import type { CSSAnimationValues, Index2d, Size2d } from "@thewaver/ss-utils";
+import type { CSSAnimationValues, Count2d, Index2d, Size2d } from "@thewaver/ss-utils";
 
 import type { SliceAnimationRenderer } from "../../../Abstracts/SliceAnimation/SliceAnimation.types";
 import type { SliceAnimationBreakpointOpts } from "../../../Generators/SliceAnimationBreakpoints/SliceAnimationBreakpoints.types";
@@ -11,7 +11,7 @@ export type SliceAnimationEvaluationResult = CSSAnimationValues;
 
 export type SliceAnimationEvaluationDefs = {
     pos: Index2d;
-    count: Index2d;
+    count: Count2d;
     weight: number;
     size: Size2d;
 };
@@ -26,7 +26,7 @@ export type BaseCellAnimationValues = {
     /**
      * How many cells the picture is cut into, across and down. More cells is a finer animation and more work per frame.
      */
-    cellCount: Index2d;
+    cellCount: Count2d;
     /** How long one pass over the whole grid takes. */
     animationDurationMs?: number;
     /** How many passes to run. Left out, it never stops. */
@@ -65,7 +65,7 @@ export type BaseCellAnimationCbs = {
      * Decides each cell's turn, as a weight per cell. It is what makes a sweep a sweep rather than everything moving at
      * once.
      */
-    computeSliceWeights?: (count: Index2d) => number[][];
+    computeSliceWeights?: (count: Count2d) => number[][];
     /** What the picture as a whole does over the pass, for an effect that is not per cell. */
     computeRootAnimation?: (timeline: number) => SliceAnimationEvaluationResult;
     /**
@@ -81,3 +81,9 @@ export type BaseCellAnimationCbs = {
 };
 
 export type BaseCellAnimationProps = BaseCellAnimationValues & BaseCellAnimationCbs;
+
+/** A cell's place in the grid and its share of the drawing, before its size is known. */
+export type CellAnimationCellDefs = Omit<SliceAnimationEvaluationDefs, "size">;
+
+/** Where a cell sits and how large it is, in the animation's own pixels. */
+export type CellAnimationCellBounds = { col: number; row: number; width: number; height: number };

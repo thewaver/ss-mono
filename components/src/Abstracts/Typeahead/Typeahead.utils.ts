@@ -1,5 +1,6 @@
 import { StoreUtils } from "@thewaver/ss-utils";
 
+import { InteractionTrackerUtils } from "../InteractionTracker/InteractionTracker.utils";
 import type { TypeaheadBuffer, TypeaheadDefs } from "./Typeahead.types";
 
 /** How long typed characters accumulate before the search starts over. */
@@ -51,7 +52,8 @@ export namespace TypeaheadUtils {
     /**
      * Whether a keystroke should be added to the search.
      *
-     * Single characters only, and not while a modifier is held, so shortcuts still reach the browser.
+     * Single characters only, and not while a modifier is held, so shortcuts still reach the browser — except the
+     * Control and Alt that AltGr reports, since a character typed with AltGr is still a character.
      * Space is the exception: it selects the focused item, except while a search is under way, where it
      * must be a searchable character so that two-word labels can be typed.
      *
@@ -59,7 +61,7 @@ export namespace TypeaheadUtils {
      * @param hasQuery Whether a search is already under way.
      */
     export const getIsQueryKey = (e: KeyboardEvent, hasQuery: boolean) => {
-        if (e.ctrlKey || e.metaKey || e.altKey) return false;
+        if (e.metaKey || ((e.ctrlKey || e.altKey) && !InteractionTrackerUtils.getIsAltGraph(e))) return false;
         if ([...e.key].length !== SINGLE_CHARACTER) return false;
 
         return e.key !== SPACE_KEY || hasQuery;
@@ -103,7 +105,7 @@ export namespace TypeaheadUtils {
         if (length < 1 || query.length < 1) return;
 
         const search = (getIsRepeat(query) ? [...query][0] : query).toLowerCase();
-        const start = [...search].length === SINGLE_CHARACTER ? 1 : 0;
+        const start = [...search].length === SINGLE_CHARACTER && from >= 0 ? 1 : 0;
 
         for (let offset = start; offset < length; offset++) {
             const index = (Math.max(from, 0) + offset) % length;

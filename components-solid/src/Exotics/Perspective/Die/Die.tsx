@@ -25,20 +25,38 @@ export const Die = (props: DieProps) => {
     const roller = RollerSolidUtils.createRoller(getRootRef, () => false, {
         faces: getGeometry,
         radius: () => getSize() * DieConst.HALF,
-        rollDurationMs: props.rollDurationMs,
-        settleDurationMs: props.settleDurationMs,
-        restDurationMs: props.restDurationMs,
-        tumbleCount: props.tumbleCount,
-        momentumMs: props.momentumMs,
-        driftAxis: props.driftAxis,
-        idleDelayMs: props.idleDelayMs,
+        get rollDurationMs() {
+            return props.rollDurationMs;
+        },
+        get settleDurationMs() {
+            return props.settleDurationMs;
+        },
+        get restDurationMs() {
+            return props.restDurationMs;
+        },
+        get tumbleCount() {
+            return props.tumbleCount;
+        },
+        get momentumMs() {
+            return props.momentumMs;
+        },
+        get driftAxis() {
+            return props.driftAxis;
+        },
+        get idleDelayMs() {
+            return props.idleDelayMs;
+        },
         isMovable: getIsMovable,
         get computeRollTarget() {
             return props.computeRollTarget;
         },
         computeFaceLabel: (index) => props.computeFaceLabel(index),
-        targetFace: props.face,
-        autoSpin: props.autoSpin,
+        get targetFace() {
+            return props.face;
+        },
+        get autoSpin() {
+            return props.autoSpin;
+        },
         onRollEnd: (index) => props.onRollEnd?.(index),
     });
 

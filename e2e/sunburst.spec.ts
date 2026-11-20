@@ -13,7 +13,6 @@ const LIBRARY = example("library");
 const ARC = `${LIBRARY} svg [role="listitem"]`;
 const BRANCH = `${LIBRARY} svg [role="button"]`;
 const UP = "#sunburstUp";
-const SETTLE_MS = 150;
 
 const arcNamed = (page: Page, name: string) =>
     page.locator(ARC).filter({ has: page.locator("text", { hasText: new RegExp(`^${name}$`) }) });
@@ -66,7 +65,6 @@ test("two rings are drawn around the middle, and nothing further out", async ({ 
 test("the number of rings follows the page", async ({ page }) => {
     await page.locator(`${prop("ringCount")} input`).fill("1");
     await page.locator(`${prop("ringCount")} input`).blur();
-    await page.waitForTimeout(SETTLE_MS);
 
     await expect(arcNamed(page, "Essentials")).toHaveCount(1);
     await expect(arcNamed(page, "Input"), "the second ring has gone").toHaveCount(0);

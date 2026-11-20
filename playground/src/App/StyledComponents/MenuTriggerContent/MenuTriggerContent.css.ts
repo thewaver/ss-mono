@@ -33,8 +33,8 @@ export const menuTriggerChevron = style({
     flexShrink: 0,
     width: 0,
     height: 0,
-    borderLeft: `${TRIGGER_CHEVRON_WIDTH / 2}px solid transparent`,
-    borderRight: `${TRIGGER_CHEVRON_WIDTH / 2}px solid transparent`,
+    borderLeft: `${TRIGGER_CHEVRON_WIDTH * 0.5}px solid transparent`,
+    borderRight: `${TRIGGER_CHEVRON_WIDTH * 0.5}px solid transparent`,
     borderTop: "6px solid currentColor",
     transition: `transform ${themeVars.animation.duration}`,
 

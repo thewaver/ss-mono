@@ -1,4 +1,4 @@
-import type { Index2d, Point2d, Rect, ShapeConst, Size2d } from "@thewaver/ss-utils";
+import type { Count2d, Index2d, Point2d, Rect, ShapeConst, Size2d } from "@thewaver/ss-utils";
 
 export type TileBoardTilingKind =
     | Exclude<
@@ -40,7 +40,7 @@ export type TileBoardTiling = {
 
 export type TileBoardLayout = TileBoardTiling & {
     tiling: TileBoardTilingKind;
-    count: Index2d;
+    count: Count2d;
     tileSize: Size2d;
     hasShortFirstRow: boolean;
     taper: number;
@@ -75,20 +75,23 @@ export type TileBoardRenderProps = {
 };
 
 export type BaseTileBoardValues = {
-    /** Names the board for assistive technology. */
-    ariaLabel?: string;
+    /**
+     * Names the board for assistive technology. Required, since the board is a grid, and a grid with no name is
+     * announced as nothing (WCAG 4.1.2).
+     */
+    ariaLabel: string;
     /**
      * How many tiles the board has, across and down. A tiling that cuts boxes into pieces counts boxes, so three
-     * columns of `square-quarters` is three squares, twelve tiles across.
+     * columns of `square_quarters` is three squares, twelve tiles across.
      */
-    tileCount: Index2d;
+    tileCount: Count2d;
     /** How large one tile is, or for a tiling that cuts boxes into pieces, how large one box is. */
     tileSize: Size2d;
     /**
      * How the board is tiled, which decides each tile's contour, whether rows are offset and which tiles touch.
      * A shape name lays that shape whole, turning alternate pointed triangles over so they interlock.
-     * `triangle-ltr` cuts each box corner to corner from its top left down, `triangle-rtl` from its top right
-     * down; `square-quarters` cuts each box along both diagonals, and `lozenge-quarters` cuts boxes corner to
+     * `triangle_ltr` cuts each box corner to corner from its top left down, `triangle_rtl` from its top right
+     * down; `square_quarters` cuts each box along both diagonals, and `lozenge_quarters` cuts boxes corner to
      * corner the opposite way in turn, which draws lozenges cut into four. Painters are handed each tile's own points,
      * so they never need to know which of these they are drawing.
      */

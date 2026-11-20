@@ -1,18 +1,13 @@
-import type { SVGPatternCellCount, SVGPatternCellIndex } from "@thewaver/ss-components";
+import type { Count2d, Index2d } from "@thewaver/ss-utils";
 
 import type { SVGAnimationDefsSvelteUtils } from "../../Generators/SVGDefs/SVGAnimations/SVGAnimationDefsSvelte.utils.svelte.js";
 import type { SvelteMarkup } from "../../Utils/typeUtils.js";
 
-export type SVGPatternCellRenderer = (
-    id: string,
-    index: SVGPatternCellIndex,
-    cellCount: SVGPatternCellCount,
-    isSplit: boolean,
-) => SvelteMarkup;
+export type SVGPatternCellRenderer = (id: string, index: Index2d, cellCount: Count2d, isSplit: boolean) => SvelteMarkup;
 
 export type SVGPatternTrackedCellRenderer = (
     id: string,
-    index: SVGPatternCellIndex,
+    index: Index2d,
     isSplit: boolean,
     level: number,
 ) => SvelteMarkup;

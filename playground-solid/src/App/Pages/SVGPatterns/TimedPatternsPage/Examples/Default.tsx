@@ -10,18 +10,11 @@ import { ShapeConst } from "@thewaver/ss-utils";
 
 import type { TimedPatternExampleProps } from "../../SVGPatternsSolid.types";
 
-export const DefaultExample = ({
-    configKey,
-    iterationConfigKey,
-    animationDurationMs,
-    colors,
-    cellSize,
-    blurWidth,
-}: TimedPatternExampleProps) => {
+export const DefaultExample = (props: TimedPatternExampleProps) => {
     const id = createUniqueId();
 
-    const getConfigKey = () => access(configKey);
-    const getIterationConfig = () => SVGDefsSamples.Iteration.SAMPLE_CONFIGS[access(iterationConfigKey)];
+    const getConfigKey = () => access(props.configKey);
+    const getIterationConfig = () => SVGDefsSamples.Iteration.SAMPLE_CONFIGS[access(props.iterationConfigKey)];
 
     return (
         <Shape
@@ -29,7 +22,7 @@ export const DefaultExample = ({
             computeFillDefs={(getSize, getRef) => {
                 const key = getConfigKey();
 
-                if (key === NO_SAMPLE_KEY) return computeNoSampleDefs(access(colors), "fill");
+                if (key === NO_SAMPLE_KEY) return computeNoSampleDefs(access(props.colors), "fill");
 
                 return SVGDefsSampleConfigs.Pattern.Timed.SAMPLE_CONFIGS[key].computeSVGDefs(
                     `fill-${id}`,
@@ -37,11 +30,11 @@ export const DefaultExample = ({
                     getRef,
                     {
                         getSize,
-                        cellSize: access(cellSize),
-                        animationDurationMs: access(animationDurationMs),
-                        colors: access(colors),
-                        blurWidth: access(blurWidth),
-                        ...getIterationConfig().computeDefs(access(animationDurationMs)),
+                        cellSize: access(props.cellSize),
+                        animationDurationMs: access(props.animationDurationMs),
+                        colors: access(props.colors),
+                        blurWidth: access(props.blurWidth),
+                        ...getIterationConfig().computeDefs(access(props.animationDurationMs)),
                     },
                 );
             }}

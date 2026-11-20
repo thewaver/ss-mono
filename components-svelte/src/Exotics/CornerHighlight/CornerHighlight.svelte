@@ -1,7 +1,7 @@
 <script lang="ts">
     import type { Snippet } from "svelte";
 
-    import { CORNER_HIGHLIGHT_DEFAULTS, CornerUtils, CornerHighlightStyles as styles } from "@thewaver/ss-components";
+    import { CORNER_HIGHLIGHT_DEFAULTS, CornerHighlightUtils, CornerHighlightStyles as styles } from "@thewaver/ss-components";
     import { CornerHighlightConst } from "@thewaver/ss-components/internal";
 
     import { toStyle } from "../../Utils/styleUtils.js";
@@ -14,13 +14,13 @@
     const cornerLength = $derived(props.cornerLength ?? CORNER_HIGHLIGHT_DEFAULTS.cornerLength);
     const strokeThickness = $derived(props.strokeThickness ?? CORNER_HIGHLIGHT_DEFAULTS.strokeThickness);
     const visibleCorners = $derived([...(props.visibleCorners ?? CORNER_HIGHLIGHT_DEFAULTS.visibleCorners)]);
-    const armPoints = $derived(CornerUtils.computeArmPoints(cornerLength, strokeThickness));
+    const armPoints = $derived(CornerHighlightUtils.computeArmPoints(cornerLength, strokeThickness));
 </script>
 
 <div class={styles.cornerHighlightRoot}>
     <div
         class={styles.cornerHighlightGlow}
-        style={toStyle(CornerUtils.computeGlowStyle(color, transitionDurationMs))}
+        style={toStyle(CornerHighlightUtils.computeGlowStyle(color, transitionDurationMs))}
         aria-hidden="true"
     >
         {#each visibleCorners as cornerKey (cornerKey)}

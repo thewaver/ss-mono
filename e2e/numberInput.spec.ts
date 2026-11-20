@@ -1,6 +1,6 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { accessibleText, docsDemo, docsSettled, inputValue, isReadOnly, prop } from "./helpers";
+import { accessibleText, docsDemo, docsSettled, inputValue, isReadOnly, prop, tabKey } from "./helpers";
 
 const DOCS = "/src/App/Pages/NumberInputPage/Docs";
 
@@ -129,7 +129,7 @@ test("the arrows step and Home and End reach the ends", async ({ page }) => {
  */
 test("a fractional step does not drift", async ({ page }) => {
     await typeOver(page, `${prop("step")} input`, "0.1");
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
 
     await typeOver(page, QUANTITY, "3.7");
     await page.keyboard.press("ArrowUp");

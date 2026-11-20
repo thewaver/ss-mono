@@ -1,6 +1,8 @@
 import { type SlotsType, computed, defineComponent, onScopeDispose, shallowRef } from "vue";
 
 import {
+    FormValueUtils,
+    InteractionTrackerUtils,
     NUMBER_INPUT_DEFAULTS,
     type NumberInputStepDefs,
     type NumberInputStepper,
@@ -8,6 +10,7 @@ import {
 } from "@thewaver/ss-components";
 import { DecimalUtils } from "@thewaver/ss-utils";
 
+import { FormValue } from "../../../Primitives/FormValue/FormValue";
 import { TextField } from "../../../Primitives/TextField/TextField";
 import type { TextFieldSlots } from "../../../Primitives/TextField/TextField.types";
 import { watchAfterRender } from "../../../Utils/effectUtils";
@@ -63,7 +66,7 @@ export const NumberInput = defineComponent(
             return next !== current;
         };
 
-        const repeater = NumberInputUtils.createStepRepeater({
+        const repeater = InteractionTrackerUtils.createStepRepeater({
             getDelayMs: () => props.repeatDelayMs ?? NUMBER_INPUT_DEFAULTS.repeatDelayMs,
             getIntervalMs: () => props.repeatIntervalMs ?? NUMBER_INPUT_DEFAULTS.repeatIntervalMs,
         });
@@ -87,69 +90,78 @@ export const NumberInput = defineComponent(
         };
 
         return () => (
-            <TextField
-                {...{
-                    ...forwardProps(props, TextField),
-                    "value": text.value,
-                    "onUpdate:value": (next: string) => {
-                        text.value = next;
-                    },
-                    "onInput": (next: string) => {
-                        const sanitized = NumberInputUtils.sanitizeText(next, separators.value);
+            <>
+                <TextField
+                    {...{
+                        ...forwardProps(props, TextField),
+                        "name": undefined,
+                        "value": text.value,
+                        "onUpdate:value": (next: string) => {
+                            text.value = next;
+                        },
+                        "onInput": (next: string) => {
+                            const sanitized = NumberInputUtils.sanitizeText(next, separators.value);
 
-                        text.value = sanitized;
+                            text.value = sanitized;
 
-                        const parsed = NumberInputUtils.parseValue(sanitized, separators.value);
+                            const parsed = NumberInputUtils.parseValue(sanitized, separators.value);
 
-                        if (NumberInputUtils.getHasRangeIssue(parsed, stepDefs.value)) return;
+                            if (NumberInputUtils.getHasRangeIssue(parsed, stepDefs.value)) return;
 
-                        reportValue(parsed);
-                    },
-                }}
-                ref={(target) => {
-                    controlRef.value = toElement(target);
-                }}
-                element={"input"}
-                type={"text"}
-                inputMode={props.inputMode ?? NUMBER_INPUT_DEFAULTS.inputMode}
-                isSpinButton={true}
-                computeSpinValue={(next) => NumberInputUtils.parseValue(next, separators.value)}
-                hasError={
-                    (props.hasError ?? false) || NumberInputUtils.getHasRangeIssue(typedValue.value, stepDefs.value)
-                }
-                onKeyDown={(e) => {
-                    if (!getIsWritable()) return;
+                            reportValue(parsed);
+                        },
+                    }}
+                    ref={(target) => {
+                        controlRef.value = toElement(target);
+                    }}
+                    element={"input"}
+                    type={"text"}
+                    inputMode={props.inputMode ?? NUMBER_INPUT_DEFAULTS.inputMode}
+                    isSpinButton={true}
+                    computeSpinValue={(next) => NumberInputUtils.parseValue(next, separators.value)}
+                    hasError={
+                        (props.hasError ?? false) || NumberInputUtils.getHasRangeIssue(typedValue.value, stepDefs.value)
+                    }
+                    onKeyDown={(e) => {
+                        if (!getIsWritable()) return;
 
-                    const move = NumberInputUtils.computeKeyMove(
-                        e.key,
-                        stepDefs.value,
-                        NumberInputUtils.computePageStep(props.pageStep, stepDefs.value.step),
-                    );
+                        const move = NumberInputUtils.computeKeyMove(
+                            e.key,
+                            stepDefs.value,
+                            NumberInputUtils.computePageStep(props.pageStep, stepDefs.value.step),
+                        );
 
-                    if (!move) return;
+                        if (!move) return;
 
-                    e.preventDefault();
+                        e.preventDefault();
 
-                    if ("value" in move) applyValue(move.value);
-                    else stepValue(move.direction, move.distance);
-                }}
-                onBlur={() => applyValue(NumberInputUtils.computeSettledValue(typedValue.value, stepDefs.value))}
-            >
-                {
+                        if ("value" in move) applyValue(move.value);
+                        else stepValue(move.direction, move.distance);
+                    }}
+                    onBlur={() => applyValue(NumberInputUtils.computeSettledValue(typedValue.value, stepDefs.value))}
+                >
                     {
-                        renderContent: slots.renderContent,
-                        renderPlaceholder: slots.renderPlaceholder,
-                        renderLeading: slots.renderLeading,
-                        renderTrailing:
-                            slots.renderTrailing && ((flags) => callSlot(slots.renderTrailing, { flags, stepper })),
-                        renderDecoration: slots.renderDecoration,
-                    } satisfies Partial<TextFieldSlots>
-                }
-            </TextField>
+                        {
+                            renderContent: slots.renderContent,
+                            renderPlaceholder: slots.renderPlaceholder,
+                            renderLeading: slots.renderLeading,
+                            renderTrailing:
+                                slots.renderTrailing && ((flags) => callSlot(slots.renderTrailing, { flags, stepper })),
+                            renderDecoration: slots.renderDecoration,
+                        } satisfies Partial<TextFieldSlots>
+                    }
+                </TextField>
+
+                <FormValue
+                    name={props.name}
+                    values={[FormValueUtils.computeText(value.value) ?? FormValueUtils.EMPTY_TEXT]}
+                />
+            </>
         );
     },
     {
         name: "NumberInput",
+        inheritAttrs: false,
         slots: Object as SlotsType<NumberInputSlots>,
         props: declareProps<NumberInputProps>({
             "isDisabled": Boolean,

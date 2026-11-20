@@ -33,7 +33,7 @@ export type BaseSplitPaneValues = {
     orientation?: SplitPaneOrientation;
     /** How wide the draggable divider between two panes is. */
     gutterSize?: number;
-    /** How far one press of an arrow key moves a divider. */
+    /** How far one press of an arrow key moves a divider, as a share of the split pane's length, from `0` to `1`. */
     keyStep?: number;
     /** Names the split for assistive technology. */
     ariaLabel?: string;

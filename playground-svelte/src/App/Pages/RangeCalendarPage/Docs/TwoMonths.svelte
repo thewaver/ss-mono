@@ -1,24 +1,28 @@
 <script lang="ts">
     import type { DateValueRange } from "@thewaver/ss-components-svelte";
-    import { DateValueUtils, RangeCalendar } from "@thewaver/ss-components-svelte";
+    import { Button, DateValueUtils, RangeCalendar } from "@thewaver/ss-components-svelte";
     import { LOCALE, TODAY } from "@thewaver/ss-playground/App/Pages/CalendarPage/CalendarPage.const";
     import { MONTH_HEADER_OPTIONS } from "@thewaver/ss-playground/App/Pages/RangeCalendarPage/RangeCalendarPage.const";
 
-    import PageCalendarCaption from "../../../PageComponents/CalendarCaption/CalendarCaption.svelte";
+    import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.svelte";
     import PageCalendarDay from "../../../StyledComponents/CalendarContent/PageCalendarDay.svelte";
     import PageCalendarFrame from "../../../StyledComponents/CalendarContent/PageCalendarFrame.svelte";
+    import PageCalendarHeader from "../../../StyledComponents/CalendarContent/PageCalendarHeader.svelte";
     import PageCalendarTitle from "../../../StyledComponents/CalendarContent/PageCalendarTitle.svelte";
     import PageCalendarWeekday from "../../../StyledComponents/CalendarContent/PageCalendarWeekday.svelte";
 
     const MONTH_COUNT = 2;
+    const MONTH_STEP = 1;
 
     let value = $state.raw<DateValueRange | undefined>();
     let month = $state.raw(DateValueUtils.getStartOfMonth(TODAY));
+
+    const page = (direction: 1 | -1) => {
+        month = DateValueUtils.addMonths(month, direction * MONTH_STEP);
+    };
 </script>
 
 <PageCalendarFrame>
-    <PageCalendarCaption month={[() => month, (next) => (month = next)]} itemKey={"twoMonths"} locale={LOCALE} />
-
     <RangeCalendar
         bind:value
         bind:month
@@ -35,10 +39,28 @@
             <PageCalendarWeekday>{name}</PageCalendarWeekday>
         {/snippet}
 
-        {#snippet renderMonthHeader(headerMonth)}
-            <PageCalendarTitle flags={{}}>
-                {DateValueUtils.format(headerMonth, MONTH_HEADER_OPTIONS, LOCALE)}
-            </PageCalendarTitle>
+        {#snippet renderMonthHeader(headerMonth, index)}
+            <PageCalendarHeader>
+                {#if index === 0}
+                    <Button id={"twoMonthsPreviousMonth"} ariaLabel={"Previous month"} onClick={() => page(-1)}>
+                        {#snippet renderContent(flags)}
+                            <PageButtonContent {flags}>◀</PageButtonContent>
+                        {/snippet}
+                    </Button>
+                {/if}
+
+                <PageCalendarTitle flags={{}}>
+                    {DateValueUtils.format(headerMonth, MONTH_HEADER_OPTIONS, LOCALE)}
+                </PageCalendarTitle>
+
+                {#if index === MONTH_COUNT - 1}
+                    <Button id={"twoMonthsNextMonth"} ariaLabel={"Next month"} onClick={() => page(1)}>
+                        {#snippet renderContent(flags)}
+                            <PageButtonContent {flags}>▶</PageButtonContent>
+                        {/snippet}
+                    </Button>
+                {/if}
+            </PageCalendarHeader>
         {/snippet}
     </RangeCalendar>
 </PageCalendarFrame>

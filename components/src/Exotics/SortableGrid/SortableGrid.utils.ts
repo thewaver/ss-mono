@@ -640,20 +640,6 @@ export namespace SortableGridUtils {
     };
 
     /**
-     * An item's accessible name: the consumer's own, then its footprint and where it sits.
-     *
-     * A position on a board cannot be inferred from anything else that is spoken, so it is said with the name.
-     *
-     * @param label The consumer's name for the item.
-     * @param item The item.
-     */
-    export const computeItemLabel = <T, TTooltipDefs>(label: string, item: SortableGridItemRecord<T, TTooltipDefs>) => {
-        const size = getItemShape(item).size;
-
-        return `${label}, ${size.colCount} by ${size.rowCount}, column ${item.spot.col + 1}, row ${item.spot.row + 1}`;
-    };
-
-    /**
      * The shape a carried item takes at a number of turns. An item from a list has no footprint and is one cell.
      *
      * @param carry The carry in flight.
@@ -777,7 +763,7 @@ export namespace SortableGridUtils {
             return { kind: "aim_at_next_zone", step: opts.isShifted ? -1 : 1 };
 
         if (opts.isCarrying) {
-            const nudge = NUDGE_KEYS[key];
+            const nudge = Object.hasOwn(NUDGE_KEYS, key) ? NUDGE_KEYS[key] : undefined;
 
             return nudge ? { kind: "nudge", nudge } : undefined;
         }
@@ -790,7 +776,7 @@ export namespace SortableGridUtils {
             return { kind: "focus", index: key === "Home" ? reading[0] : reading[reading.length - 1] };
         }
 
-        const step = STEP_KEYS[key];
+        const step = Object.hasOwn(STEP_KEYS, key) ? STEP_KEYS[key] : undefined;
 
         if (!step) return;
 

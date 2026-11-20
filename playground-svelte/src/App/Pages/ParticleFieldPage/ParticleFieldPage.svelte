@@ -2,7 +2,7 @@
     import { CellAnimationKeyframes, CellAnimationOrigins, SliceAnimationWeights } from "@thewaver/ss-components-svelte";
     import { ParticleFieldKnobs } from "@thewaver/ss-playground/App/Knobs/ParticleFields.const";
     import * as styles from "@thewaver/ss-playground/App/Pages/ParticleFieldPage/ParticleFieldPage.css";
-    import type { Index2d } from "@thewaver/ss-utils";
+    import type { Count2d } from "@thewaver/ss-utils";
 
     import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../PageComponents/Examples/PageExamples.svelte";
@@ -53,7 +53,7 @@
     let originType = $state<CellAnimationOrigins.OriginType>(ParticleFieldKnobs.STARTING_ORIGIN_KEY);
     let weightType = $state<SliceAnimationWeights.WeightType>(ParticleFieldKnobs.STARTING_WEIGHT_KEY);
     let animationType = $state<CellAnimationKeyframes.AnimationType>(ParticleFieldKnobs.STARTING_ANIMATION_KEY);
-    let cellCount = $state.raw<Index2d>({ ...ParticleFieldKnobs.STARTING_CELL_COUNT });
+    let cellCount = $state.raw<Count2d>({ ...ParticleFieldKnobs.STARTING_CELL_COUNT });
 
     const commonProps: Omit<ParticleFieldExampleProps, "playback"> = $derived({
         cellCount,
@@ -129,23 +129,23 @@
         >
             <div class={styles.valueList}>
                 <PageNumberField
-                    value={cellCount.col}
+                    value={cellCount.colCount}
                     min={ParticleFieldKnobs.MIN_CELL_COUNT}
                     max={ParticleFieldKnobs.MAX_CELL_COUNT}
                     step={ParticleFieldKnobs.CELL_COUNT_STEP}
                     ariaLabel={"Columns"}
                     onInput={(value) => {
-                        cellCount = { ...cellCount, col: value };
+                        cellCount = { ...cellCount, colCount: value };
                     }}
                 />
                 <PageNumberField
-                    value={cellCount.row}
+                    value={cellCount.rowCount}
                     min={ParticleFieldKnobs.MIN_CELL_COUNT}
                     max={ParticleFieldKnobs.MAX_CELL_COUNT}
                     step={ParticleFieldKnobs.CELL_COUNT_STEP}
                     ariaLabel={"Rows"}
                     onInput={(value) => {
-                        cellCount = { ...cellCount, row: value };
+                        cellCount = { ...cellCount, rowCount: value };
                     }}
                 />
             </div>

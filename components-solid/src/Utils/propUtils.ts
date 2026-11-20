@@ -25,7 +25,8 @@ export const access = <T>(value: MaybeAccessor<T>): T => (typeof value === "func
  * Writing checks the current value first and does nothing when it already matches, which stops a
  * write that changes nothing from waking anything downstream. Function updaters are given the
  * current value, as with an ordinary signal, and the write returns the value that ended up in place —
- * which may not be the one asked for, if the source clamped or rejected it.
+ * which may not be the one asked for, if the source clamped or rejected it. A value that is itself a function
+ * is written through an updater, so an ordinary signal stores the function rather than calling it.
  *
  * @param getSource The signal to read and write, read afresh each time.
  */
@@ -35,7 +36,11 @@ export const accessSignal = <T>(getSource: () => SignalSource<T>): Signal<T> => 
         const read = () => untrack(() => getSource()[0]());
         const next = typeof value === "function" ? (value as (prev: T) => T)(read()) : (value as T);
 
-        if (!Object.is(next, read())) (getSource()[1] as (value: T) => void)(next);
+        if (!Object.is(next, read())) {
+            const setter = getSource()[1] as (value: T | (() => T)) => void;
+
+            setter(typeof next === "function" ? () => next : next);
+        }
 
         return read();
     }) as Setter<T>,

@@ -37,7 +37,7 @@ import { PlacementBox } from "../../Primitives/PlacementBox/PlacementBox";
 import { PlacementItem } from "../../Primitives/PlacementItem/PlacementItem";
 import { watchAfterRender } from "../../Utils/effectUtils";
 import { callSlot, declareProps, forwardProps, useTwoWay } from "../../Utils/propUtils";
-import { toElement } from "../../Utils/refUtils";
+import { exposeElement, toElement } from "../../Utils/refUtils";
 import type { SlotsContext } from "../../Utils/typeUtils";
 import { LabelVueUtils } from "../Input/Label/LabelVue.utils";
 import type {
@@ -93,7 +93,7 @@ const SortableItemSlot = defineComponent(
 );
 
 export const Sortable = defineComponent(
-    <T,>(props: SortableProps<T>, { slots }: SlotsContext<SortableSlots<T>>) => {
+    <T,>(props: SortableProps<T>, { slots, expose }: SlotsContext<SortableSlots<T>>) => {
         const items = useTwoWay(props, "items");
 
         const listId = useId();
@@ -102,6 +102,8 @@ export const Sortable = defineComponent(
         const viewportContext = useViewportContext();
 
         const rootRef = shallowRef<HTMLElement>();
+
+        exposeElement(expose, () => rootRef.value);
         const itemRefs: Array<HTMLElement | undefined> = [];
 
         let boxElement: HTMLElement | undefined;
@@ -237,6 +239,8 @@ export const Sortable = defineComponent(
         };
 
         const handlePointerDown = (index: number) => (e: PointerEvent) => {
+            hasPendingClick = false;
+
             if (e.button !== 0 || getIsDisabled()) return;
             if ((e.target as HTMLElement).closest(CarrierUtils.INTERACTIVE_SELECTOR)) return;
             if (CarrierUtils.getCarry()) return;
@@ -282,7 +286,7 @@ export const Sortable = defineComponent(
         };
 
         const handleKeyDown = (index: number) => (e: KeyboardEvent) => {
-            if (getIsDisabled()) return;
+            if (e.target !== e.currentTarget || getIsDisabled()) return;
 
             const action = SortableUtils.computeKeyAction(e.key, {
                 index,

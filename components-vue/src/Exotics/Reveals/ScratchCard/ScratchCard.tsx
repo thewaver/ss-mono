@@ -1,4 +1,4 @@
-import { type CSSProperties, type SlotsType, defineComponent, onScopeDispose, shallowRef, useId } from "vue";
+import { type CSSProperties, type SlotsType, computed, defineComponent, onScopeDispose, shallowRef, useId } from "vue";
 
 import {
     NavigatorUtils,
@@ -47,6 +47,8 @@ export const ScratchCard = defineComponent(
             joinRadii: props.joinRadii,
             lameExponents: props.lameExponents,
         });
+
+        const brushContour = computed(() => ScratchCardUtils.computeBrushContour(getBrushShape()));
 
         const size = ElementObserverVueUtils.useBorderBoxSize(coverRef, getIsDisabled);
 
@@ -121,13 +123,7 @@ export const ScratchCard = defineComponent(
 
                 if (ScratchCardUtils.getIsRubbedAt(pathRef.value ?? undefined, path.value, point, brushRadius)) return;
 
-                path.value =
-                    path.value +
-                    ScratchCardUtils.computeStampPath(
-                        point,
-                        brushRadius,
-                        ScratchCardUtils.computeBrushPoints(getBrushShape()),
-                    );
+                path.value = path.value + ScratchCardUtils.computeStampPath(point, brushRadius, brushContour.value);
             },
         });
 
@@ -156,7 +152,9 @@ export const ScratchCard = defineComponent(
 
             return (
                 <div ref={rootRef} class={ScratchCardStyles.scratchCardRoot} tabindex={-1}>
-                    {callSlot(slots.renderContent, undefined)}
+                    <div class={ScratchCardStyles.scratchCardContent} inert={!isCleared.value}>
+                        {callSlot(slots.renderContent, undefined)}
+                    </div>
 
                     <svg class={ScratchCardStyles.scratchCardDefs} aria-hidden="true">
                         <defs>

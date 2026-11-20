@@ -13,6 +13,8 @@ const EXPECTED_EXPORTS = [
     "BoundsString",
     "CircleUtils",
     "Color",
+    "Count2d",
+    "Count2dString",
     "DecimalUtils",
     "EasingUtils",
     "FunctionUtils",

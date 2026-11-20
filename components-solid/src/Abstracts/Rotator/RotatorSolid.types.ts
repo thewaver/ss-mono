@@ -10,7 +10,7 @@ export type RotatorDefs = AccessorValues<{
     idleDelayMs?: number;
 }> & {
     computeSpinTarget: () => number | Promise<number>;
-    computeSpinDefs?: (index: number, stepCount: number) => RotatorSpinDefs;
+    computeSpinDefs?: (index: number, stepCount: number) => RotatorSpinDefs | undefined;
     computeStepLabel: (index: number, stepCount: number) => string;
     targetIndex?: SignalSource<number>;
     autoSpin?: SignalSource<boolean>;

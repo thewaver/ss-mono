@@ -19,7 +19,7 @@
     import * as styles from "@thewaver/ss-playground/App/Pages/CellAnimationPage/CellAnimationPage.css";
     import knight_profile from "@thewaver/ss-playground/App/knight_profile.webp";
     import type { CellAnimationSourceKind } from "@thewaver/ss-playground/App/Pages/CellAnimationPage/CellAnimationPage.types";
-    import type { Index2d, Size2d } from "@thewaver/ss-utils";
+    import type { Count2d, Size2d } from "@thewaver/ss-utils";
 
     import { CellAnimationKnobs } from "@thewaver/ss-playground/App/Knobs/CellAnimations.const";
     import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
@@ -85,7 +85,7 @@
     let animationIterationDelayMs = $state(CELL_ANIMATION_DEFAULTS.animationIterationDelayMs);
     let animationIterationCount = $state(CellAnimationKnobs.ENDLESS_ITERATION_COUNT);
     let finalFrame = $state<CellAnimationFinalFrame>(CELL_ANIMATION_DEFAULTS.finalFrame);
-    let cellCount = $state.raw<Index2d>({ ...CellAnimationKnobs.STARTING_CELL_COUNT });
+    let cellCount = $state.raw<Count2d>({ ...CellAnimationKnobs.STARTING_CELL_COUNT });
     let weightOpts = $state.raw<WeightOpts>({ ...CellAnimationKnobs.STARTING_WEIGHT_OPTS });
     let breakpointOpts = $state.raw<SliceAnimationBreakpointOpts>({ ...CellAnimationKnobs.STARTING_BREAKPOINT_OPTS });
     let playbackOpts = $state.raw<SliceAnimationPlaybackOpts>({ ...CellAnimationKnobs.STARTING_PLAYBACK_OPTS });
@@ -265,23 +265,23 @@
         >
             <div class={styles.valueList}>
                 <PageNumberField
-                    value={cellCount.col}
+                    value={cellCount.colCount}
                     min={CellAnimationKnobs.MIN_CELL_COUNT}
                     max={CellAnimationKnobs.MAX_CELL_COUNT}
                     step={CellAnimationKnobs.CELL_COUNT_STEP}
                     ariaLabel={"Columns"}
                     onInput={(value) => {
-                        cellCount = { ...cellCount, col: value };
+                        cellCount = { ...cellCount, colCount: value };
                     }}
                 />
                 <PageNumberField
-                    value={cellCount.row}
+                    value={cellCount.rowCount}
                     min={CellAnimationKnobs.MIN_CELL_COUNT}
                     max={CellAnimationKnobs.MAX_CELL_COUNT}
                     step={CellAnimationKnobs.CELL_COUNT_STEP}
                     ariaLabel={"Rows"}
                     onInput={(value) => {
-                        cellCount = { ...cellCount, row: value };
+                        cellCount = { ...cellCount, rowCount: value };
                     }}
                 />
             </div>

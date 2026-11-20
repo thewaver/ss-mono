@@ -14,7 +14,7 @@ import {
     STRESS_ITEMS,
 } from "@thewaver/ss-playground/App/Pages/ParticleFieldPage/ParticleFieldPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ParticleFieldPage/ParticleFieldPage.css";
-import { type Index2d, ShapeConst } from "@thewaver/ss-utils";
+import { type Count2d, ShapeConst } from "@thewaver/ss-utils";
 
 import { PageExampleKnobs } from "../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
@@ -112,7 +112,7 @@ const StressTestWrapper = (props: ParticleFieldExampleProps) => {
 
     return (
         <>
-            <div>{`${STRESS_CELL_COUNT.col} x ${STRESS_CELL_COUNT.row} cells`}</div>
+            <div>{`${STRESS_CELL_COUNT.colCount} x ${STRESS_CELL_COUNT.rowCount} cells`}</div>
 
             <PagePropsPanel scope={"local"} hasReset={false}>
                 <PageProp key={"onGraphicsCard"} {...ParticleFieldKnobs.ON_GRAPHICS_CARD_TEXT}>
@@ -167,7 +167,7 @@ export const ParticleFieldPage = () => {
     const [getAnimationType, setAnimationType] = createSignal<CellAnimationKeyframes.AnimationType>(
         ParticleFieldKnobs.STARTING_ANIMATION_KEY,
     );
-    const [cellCount, setCellCount] = createStore<Index2d>({ ...ParticleFieldKnobs.STARTING_CELL_COUNT });
+    const [cellCount, setCellCount] = createStore<Count2d>({ ...ParticleFieldKnobs.STARTING_CELL_COUNT });
 
     const getExamples = createMemo(() => {
         const commonProps: ParticleFieldExampleProps = {
@@ -228,20 +228,20 @@ export const ParticleFieldPage = () => {
                 <PageProp key={"cellCount"} {...ParticleFieldKnobs.CELL_COUNT_TEXT}>
                     <div class={styles.valueList}>
                         <PageNumberField
-                            value={() => cellCount.col}
+                            value={() => cellCount.colCount}
                             min={ParticleFieldKnobs.MIN_CELL_COUNT}
                             max={ParticleFieldKnobs.MAX_CELL_COUNT}
                             step={ParticleFieldKnobs.CELL_COUNT_STEP}
                             ariaLabel={"Columns"}
-                            onInput={(value) => setCellCount("col", value)}
+                            onInput={(value) => setCellCount("colCount", value)}
                         />
                         <PageNumberField
-                            value={() => cellCount.row}
+                            value={() => cellCount.rowCount}
                             min={ParticleFieldKnobs.MIN_CELL_COUNT}
                             max={ParticleFieldKnobs.MAX_CELL_COUNT}
                             step={ParticleFieldKnobs.CELL_COUNT_STEP}
                             ariaLabel={"Rows"}
-                            onInput={(value) => setCellCount("row", value)}
+                            onInput={(value) => setCellCount("rowCount", value)}
                         />
                     </div>
                 </PageProp>

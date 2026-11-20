@@ -51,3 +51,8 @@ export type DateRangePickerProps = Omit<DateInputProps, "renderTrailing" | "valu
             ]
         >;
     };
+
+export type DateRangePickerFieldsScopeProps = {
+    /** The two fields, which read the overriding contexts. */
+    children: Snippet;
+};

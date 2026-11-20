@@ -24,6 +24,7 @@
             isDisabled,
             props.isReachableWhenDisabled ?? false,
             props.isFocusableWhenDisabled ?? false,
+            props.tooltipDefs !== undefined,
         ),
     );
 

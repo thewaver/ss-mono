@@ -101,18 +101,28 @@ export namespace TimeInputUtils {
     /**
      * Writes a time as the field shows it.
      *
+     * @param value The time.
+     * @param isTwelveHour Whether the field runs one to twelve.
+     * @param hasSeconds Whether the field shows seconds. If it does, a time given without a second reads as `:00`,
+     * since 09:30 and 09:30:00 are the same time.
      * @returns Twelve-hour text with no marker on a twelve-hour field, ISO text otherwise.
      */
-    export const toText = (value: TimeValue, isTwelveHour: boolean) =>
-        isTwelveHour ? TimeUtils.toTwelveHourText(value) : TimeUtils.toIso(value);
+    export const toText = (value: TimeValue, isTwelveHour: boolean, hasSeconds: boolean) => {
+        const shown = hasSeconds ? { ...value, second: value.second ?? 0 } : value;
+
+        return isTwelveHour ? TimeUtils.toTwelveHourText(shown) : TimeUtils.toIso(shown);
+    };
 
     /**
      * Writes a time as the run of digits the field types it with.
      *
+     * @param value The time.
+     * @param isTwelveHour Whether the field runs one to twelve.
+     * @param hasSeconds Whether the field shows seconds, as {@link TimeInputUtils.toText} takes it.
      * @returns The digits of {@link TimeInputUtils.toText}.
      */
-    export const toDigits = (value: TimeValue, isTwelveHour: boolean) =>
-        TextSyncUtils.getMaskedDigits(toText(value, isTwelveHour));
+    export const toDigits = (value: TimeValue, isTwelveHour: boolean, hasSeconds: boolean) =>
+        TextSyncUtils.getMaskedDigits(toText(value, isTwelveHour, hasSeconds));
 
     /**
      * Reads a complete run of digits as a time.
@@ -194,7 +204,7 @@ export namespace TimeInputUtils {
         minValue?: TimeValue,
         maxValue?: TimeValue,
     ) => {
-        const delta = STEP_KEYS[key];
+        const delta = Object.hasOwn(STEP_KEYS, key) ? STEP_KEYS[key] : undefined;
 
         if (delta === undefined || !value) return undefined;
 

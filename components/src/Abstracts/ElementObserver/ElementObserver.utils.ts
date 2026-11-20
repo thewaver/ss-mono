@@ -124,6 +124,9 @@ const observePassageProgress = (
     });
 };
 
+/** Which box a size observer watches, so it fires on the box whose size it reports. */
+const BORDER_BOX_OPTIONS: ResizeObserverOptions = { box: "border-box" };
+
 /**
  * Reports an element's size and position, and keeps reporting as they change.
  *
@@ -205,7 +208,7 @@ export namespace ElementObserverUtils {
             report({ width: entry.borderBoxSize[0].inlineSize, height: entry.borderBoxSize[0].blockSize });
         });
 
-        observer.observe(element);
+        observer.observe(element, BORDER_BOX_OPTIONS);
 
         return () => observer.disconnect();
     };
@@ -238,7 +241,7 @@ export namespace ElementObserverUtils {
         const observer = new ResizeObserver(measure);
 
         for (const element of elements) {
-            if (element) observer.observe(element);
+            if (element) observer.observe(element, BORDER_BOX_OPTIONS);
         }
 
         return () => observer.disconnect();
@@ -281,6 +284,41 @@ export namespace ElementObserverUtils {
                 element.removeEventListener("load", handleLoad, true);
                 document.fonts.removeEventListener("loadingdone", handleLoad);
             }
+        };
+    };
+
+    /**
+     * Watches everything that changes how far a scrolling box can scroll and where it sits.
+     *
+     * The box and each of its children are watched for size, children arriving later are picked up as they arrive,
+     * and the box's own scroll is followed.
+     *
+     * @param box The scrolling box.
+     * @param onChange Called once straight away and again after each of those changes, to read the box afresh.
+     * @returns The function that stops watching.
+     */
+    export const observeScrollBox = (box: HTMLElement, onChange: () => void) => {
+        const update = () => onChange();
+        const sizeObserver = new ResizeObserver(update);
+        const childObserver = new MutationObserver(() => {
+            for (const child of box.children) sizeObserver.observe(child);
+
+            update();
+        });
+
+        sizeObserver.observe(box);
+
+        for (const child of box.children) sizeObserver.observe(child);
+
+        childObserver.observe(box, { childList: true });
+        box.addEventListener("scroll", update, { passive: true });
+
+        update();
+
+        return () => {
+            sizeObserver.disconnect();
+            childObserver.disconnect();
+            box.removeEventListener("scroll", update);
         };
     };
 

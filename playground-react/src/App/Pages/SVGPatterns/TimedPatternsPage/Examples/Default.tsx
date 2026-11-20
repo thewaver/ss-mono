@@ -10,35 +10,28 @@ import { ShapeConst } from "@thewaver/ss-utils";
 
 import type { TimedPatternExampleProps } from "../../SVGPatternsReact.types";
 
-export const DefaultExample = ({
-    configKey,
-    iterationConfigKey,
-    animationDurationMs,
-    colors,
-    cellSize,
-    blurWidth,
-}: TimedPatternExampleProps) => {
+export const DefaultExample = (props: TimedPatternExampleProps) => {
     const id = useId();
 
-    const iterationConfig = SVGDefsSamples.Iteration.SAMPLE_CONFIGS[iterationConfigKey];
+    const iterationConfig = SVGDefsSamples.Iteration.SAMPLE_CONFIGS[props.iterationConfigKey];
 
     return (
         <Shape
             computePoints={(size) => ShapeConst.getDefaultShapePoints("square", size)}
             computeFillDefs={(size, element) => {
-                if (configKey === NO_SAMPLE_KEY) return computeNoSampleDefs(colors, "fill");
+                if (props.configKey === NO_SAMPLE_KEY) return computeNoSampleDefs(props.colors, "fill");
 
-                return SVGDefsSampleConfigs.Pattern.Timed.SAMPLE_CONFIGS[configKey].computeSVGDefs(
+                return SVGDefsSampleConfigs.Pattern.Timed.SAMPLE_CONFIGS[props.configKey].computeSVGDefs(
                     `fill-${id}`,
                     undefined,
                     element,
                     {
                         getSize: () => size,
-                        cellSize,
-                        animationDurationMs,
-                        colors,
-                        blurWidth,
-                        ...iterationConfig.computeDefs(animationDurationMs),
+                        cellSize: props.cellSize,
+                        animationDurationMs: props.animationDurationMs,
+                        colors: props.colors,
+                        blurWidth: props.blurWidth,
+                        ...iterationConfig.computeDefs(props.animationDurationMs),
                     },
                 );
             }}

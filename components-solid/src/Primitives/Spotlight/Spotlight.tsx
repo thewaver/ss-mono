@@ -187,7 +187,7 @@ export const Spotlight = (props: SpotlightProps) => {
                     onClick={() => access(props.mode) === "hint" && dismiss()}
                 />
 
-                <Show when={props.renderHighlight && getElementRect()}>
+                <Show when={props.renderHighlight === undefined ? undefined : getElementRect()}>
                     {(getRect) => (
                         <div
                             class={styles.spotlightDecoration}

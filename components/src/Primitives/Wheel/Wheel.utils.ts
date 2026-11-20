@@ -12,9 +12,6 @@ const ROOT_PATH: number[] = [];
 /** The parent extent a wheel's layout is asked for, since nothing surrounds the ring. */
 const NO_PARENT_EXTENT = 0;
 
-/** The wedge whose resting placement every other wedge is turned from. */
-const FIRST_WEDGE = 0;
-
 /** The correction for a layout that has no sector to measure, which leaves the wedges where they are. */
 const NO_CORRECTION = 0;
 
@@ -29,6 +26,9 @@ const NO_OVERREACH = 0;
 
 /** Where a wheel's wedges sit and what they do near the pointer: the arithmetic both frameworks draw from. */
 export namespace WheelUtils {
+    /** The wedge whose resting placement every other wedge is turned from. */
+    export const FIRST_WEDGE = 0;
+
     /**
      * Lays out a wheel's wedges with the consumer's layout function.
      *

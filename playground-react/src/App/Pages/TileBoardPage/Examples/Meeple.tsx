@@ -9,36 +9,40 @@ import type { TileBoardMeepleExampleProps } from "../TileBoardPage.types";
 
 type Props = TileBoardMeepleExampleProps;
 
-export const MeepleExample = ({ shape, piece, marked, ...otherProps }: Props) => {
+export const MeepleExample = (props: Props) => {
+    const { shape, piece, marked, ...otherProps } = props;
+
     const layout = useMemo(
         () =>
             TileBoardUtils.getLayout(
-                shape,
+                props.shape,
                 otherProps.tileCount,
                 otherProps.tileSize,
                 otherProps.hasShortFirstRow,
                 otherProps.taper,
             ),
-        [shape, otherProps.tileCount, otherProps.tileSize, otherProps.hasShortFirstRow, otherProps.taper],
+        [props.shape, otherProps.tileCount, otherProps.tileSize, otherProps.hasShortFirstRow, otherProps.taper],
     );
 
     return (
         <div className={styles.meepleHost}>
             <TileBoard
                 {...otherProps}
-                tiling={shape}
+                tiling={props.shape}
                 computeTileAriaLabel={(tile) => `Row ${tile.row + 1}, tile ${tile.col + 1}`}
                 renderTile={(tile, renderProps) => (
                     <PageTileBoardTile
                         renderProps={renderProps}
-                        isMarked={Index2d.isSame(tile, piece) || (marked ?? []).includes(Index2d.toString(tile))}
+                        isMarked={
+                            Index2d.isSame(tile, props.piece) || (props.marked ?? []).includes(Index2d.toString(tile))
+                        }
                     />
                 )}
             />
 
             <PageTileBoardMeeple
-                center={TileBoardUtils.getTileCenter(piece, layout)}
-                scale={TileBoardUtils.getTileScale(piece, layout)}
+                center={TileBoardUtils.getTileCenter(props.piece, layout)}
+                scale={TileBoardUtils.getTileScale(props.piece, layout)}
                 tileSize={otherProps.tileSize}
             />
         </div>

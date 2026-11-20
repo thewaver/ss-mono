@@ -1,4 +1,4 @@
-import { createMemo } from "solid-js";
+import { createMemo, splitProps } from "solid-js";
 
 import { Formation, PlacementLayoutUtils, ProximityEffectUtils, access } from "@thewaver/ss-components-solid";
 
@@ -7,9 +7,11 @@ import type { FormationExampleProps } from "../FormationPageSolid.types";
 
 type Props = FormationExampleProps;
 
-export const DefaultExample = ({ layoutEntry, effectEntry, shapeKind, ...otherProps }: Props) => {
+export const DefaultExample = (props: Props) => {
+    const [, otherProps] = splitProps(props, ["layoutEntry", "effectEntry", "shapeKind"]);
+
     const getComputeEffect = createMemo(() => {
-        const entry = access(effectEntry);
+        const entry = access(props.effectEntry);
 
         return entry === undefined ? undefined : ProximityEffectUtils.toEffectFn(entry);
     });
@@ -17,10 +19,10 @@ export const DefaultExample = ({ layoutEntry, effectEntry, shapeKind, ...otherPr
     return (
         <Formation
             {...otherProps}
-            computeLayout={(defs) => PlacementLayoutUtils.toLayoutFn(access(layoutEntry))(defs)}
+            computeLayout={(defs) => PlacementLayoutUtils.toLayoutFn(access(props.layoutEntry))(defs)}
             computeEffect={getComputeEffect()}
             renderItem={(getItem, getState) => (
-                <PageFormationItem state={getState} shapeKind={shapeKind}>
+                <PageFormationItem state={getState} shapeKind={props.shapeKind}>
                     {getItem()}
                 </PageFormationItem>
             )}

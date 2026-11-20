@@ -348,6 +348,24 @@ export namespace PanZoomUtils {
             pinchCenter = center;
         };
 
+        const release = (e: PointerEvent, element: HTMLElement) => {
+            points.delete(e.pointerId);
+            pinchGap = undefined;
+
+            if (points.size < PINCH_POINTERS) panFrom = points.values().next().value;
+
+            if (points.size > NOTHING) return;
+
+            const hasMoved = isGrabbing || hasPinched;
+
+            if (isGrabbing) element.releasePointerCapture(e.pointerId);
+
+            isGrabbing = false;
+            hasPinched = false;
+
+            if (hasMoved) defs.onSettle?.();
+        };
+
         return {
             press: (e) => {
                 if (!getIsPrimaryPress(e)) return;
@@ -359,6 +377,12 @@ export namespace PanZoomUtils {
             },
             move: (e, element) => {
                 if (!points.has(e.pointerId)) return;
+
+                if (e.buttons === NOTHING) {
+                    release(e, element);
+
+                    return;
+                }
 
                 const point = { x: e.clientX, y: e.clientY };
 
@@ -390,23 +414,7 @@ export namespace PanZoomUtils {
 
                 panFrom = point;
             },
-            release: (e, element) => {
-                points.delete(e.pointerId);
-                pinchGap = undefined;
-
-                if (points.size < PINCH_POINTERS) panFrom = points.values().next().value;
-
-                if (points.size > NOTHING) return;
-
-                const hasMoved = isGrabbing || hasPinched;
-
-                if (isGrabbing) element.releasePointerCapture(e.pointerId);
-
-                isGrabbing = false;
-                hasPinched = false;
-
-                if (hasMoved) defs.onSettle?.();
-            },
+            release,
             wheel: (e) => {
                 if (!defs.getIsZoomable()) return;
 
@@ -437,6 +445,7 @@ export namespace PanZoomUtils {
      * @param hasControls Whether the consumer gave `onMount` or shares the view.
      */
     export const warnIfNoControls = (component: string, hasGestures: boolean, hasControls: boolean) => {
-        if (hasGestures && !hasControls) console.warn(`${component}: ${NO_CONTROLS_WARNING}`);
+        if (process.env.NODE_ENV !== "production" && hasGestures && !hasControls)
+            console.warn(`${component}: ${NO_CONTROLS_WARNING}`);
     };
 }

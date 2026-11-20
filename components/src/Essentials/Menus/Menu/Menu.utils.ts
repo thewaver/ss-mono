@@ -163,12 +163,7 @@ export namespace MenuUtils {
     export const computeNextTabStop = (opener: HTMLElement | undefined) => {
         if (!opener) return undefined;
 
-        return FocusManagerUtils.getFocusableChildren().find(
-            (element) =>
-                (opener.compareDocumentPosition(element) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0 &&
-                !opener.contains(element) &&
-                element.closest(MENU_POPUP_SELECTOR) === null,
-        );
+        return FocusManagerUtils.getFocusableAfter(opener, (element) => element.closest(MENU_POPUP_SELECTOR) !== null);
     };
 
     /**
@@ -208,12 +203,15 @@ export namespace MenuUtils {
      * @param item The item being picked. A command never reaches here and is treated as a radio if it does.
      * @param radioGroupValues Every value in the radio group the item belongs to, from
      * {@link MenuUtils.getRadioGroupValues}. Unread for a checkbox.
-     * @returns The new list. A fresh array; the one handed in is not touched.
+     * @returns The new list, a fresh array, or the one handed in when a radio already checked is picked again, so
+     * nothing is written.
      */
-    export const computeNextChecked = <T>(checked: T[], item: MenuItemRecord<T>, radioGroupValues: T[]): T[] =>
-        getKind(item) === "checkbox"
-            ? SelectionUtils.getToggled(checked, item.value)
-            : [...checked.filter((value) => !radioGroupValues.includes(value)), item.value];
+    export const computeNextChecked = <T>(checked: T[], item: MenuItemRecord<T>, radioGroupValues: T[]): T[] => {
+        if (getKind(item) === "checkbox") return SelectionUtils.getToggled(checked, item.value);
+        if (checked.includes(item.value)) return checked;
+
+        return [...checked.filter((value) => !radioGroupValues.includes(value)), item.value];
+    };
 
     /**
      * The values of the radio group an item belongs to.
@@ -317,6 +315,8 @@ export namespace MenuUtils {
             const isReachable = InteractionTrackerUtils.computeIsReachable(
                 item.isDisabled ?? false,
                 item.isReachableWhenDisabled ?? false,
+                false,
+                true,
             );
 
             if (!item.isDisabled || isReachable) acc.push(index);
@@ -701,7 +701,7 @@ export namespace MenuUtils {
      * Which entry a flick is aimed at.
      *
      * Picked by direction rather than by what the pointer is over: the layout's own pick rule, from where the
-     * press went down to where the pointer is now. A flick that has not yet travelled a tenth of the layout's
+     * press went down to where the pointer is now. A flick that has not yet traveled a tenth of the layout's
      * width is aimed at nothing, which is what lets coming back to the middle abort it.
      *
      * @param defs.layout The level's layout.
@@ -771,7 +771,8 @@ export namespace MenuUtils {
      * `contextmenu` event claiming the pointer was at the origin — which is what a keyboard-raised one carries —
      * open it against whatever inside the region has focus, or the region itself, so the menu lands against
      * something the person can see. Both are converted into the space the positioner works in, which a
-     * `Viewport` scaling everything around the region would otherwise throw off.
+     * `Viewport` scaling everything around the region would otherwise throw off. A request another handler has
+     * already taken — a region nested inside this one — is left to it, so only the innermost menu opens.
      *
      * @param region The element the menu belongs to.
      * @param defs.viewportContext The viewport the region sits in.
@@ -788,7 +789,7 @@ export namespace MenuUtils {
         };
 
         const handleContextMenu = (e: MouseEvent) => {
-            if (defs.getIsDisabled()) return;
+            if (e.defaultPrevented || defs.getIsDisabled()) return;
 
             e.preventDefault();
 
@@ -804,7 +805,7 @@ export namespace MenuUtils {
         };
 
         const handleKeyDown = (e: KeyboardEvent) => {
-            if (defs.getIsDisabled()) return;
+            if (e.defaultPrevented || defs.getIsDisabled()) return;
             if (!getIsContextMenuKey(e.key, e.shiftKey)) return;
 
             e.preventDefault();
@@ -916,6 +917,7 @@ export namespace MenuUtils {
      * @param hasGroupPaint Whether it was given `renderGroupHeader` or `renderGroupBox`.
      */
     export const warnIfGroupPaintIgnored = (hasLayout: boolean, hasGroupPaint: boolean) => {
-        if (hasLayout && hasGroupPaint) console.warn(IGNORED_GROUP_PAINT_WARNING);
+        if (process.env.NODE_ENV !== "production" && hasLayout && hasGroupPaint)
+            console.warn(IGNORED_GROUP_PAINT_WARNING);
     };
 }

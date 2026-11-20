@@ -392,3 +392,70 @@ describe("warnIfUndescribed", () => {
         expect(warnCount("Hold Enter or Space to send.")).toBe(0);
     });
 });
+
+describe("createGesture on a page that is not painting", () => {
+    beforeEach(() => {
+        vi.useFakeTimers();
+        vi.stubGlobal("requestAnimationFrame", () => 1);
+        vi.stubGlobal("cancelAnimationFrame", () => undefined);
+    });
+
+    afterEach(() => {
+        vi.useRealTimers();
+        vi.unstubAllGlobals();
+    });
+
+    it("still completes a held key once the hold time has passed, and only once", () => {
+        const { gesture, onActivate, getProgressRatio } = createTestGesture("horizontal");
+
+        gesture.pressKey("Enter", false);
+        vi.advanceTimersByTime(999);
+
+        expect(onActivate, "not before the hold time").not.toHaveBeenCalled();
+
+        vi.advanceTimersByTime(1);
+
+        expect(onActivate).toHaveBeenCalledTimes(1);
+        expect(getProgressRatio(), "and the hold is drawn full").toBe(1);
+
+        vi.advanceTimersByTime(5000);
+
+        expect(onActivate).toHaveBeenCalledTimes(1);
+    });
+
+    it("does not complete a hold released early", () => {
+        const { gesture, onActivate } = createTestGesture("horizontal");
+
+        gesture.pressKey("Enter", false);
+        vi.advanceTimersByTime(500);
+        gesture.releaseKey("Enter");
+        vi.advanceTimersByTime(5000);
+
+        expect(onActivate).not.toHaveBeenCalled();
+    });
+});
+
+describe("createGesture reset", () => {
+    it("leaves a progress the consumer holds alone when nothing was under way", () => {
+        let progressRatio = 1;
+
+        const gesture = SlideButtonUtils.createGesture({
+            getMode: () => "both",
+            getOrientation: () => "horizontal",
+            getDirection: () => "ltr",
+            getThumbSize: () => 40,
+            getHoldDurationMs: () => 1000,
+            getCompletionRatio: () => 1,
+            getTrackSize: () => TRACK_SIZES.horizontal,
+            getProgressRatio: () => progressRatio,
+            setProgressRatio: (ratio) => {
+                progressRatio = ratio;
+            },
+            onActivate: () => {},
+        });
+
+        gesture.reset();
+
+        expect(progressRatio, "a disabled button mounted over a full progress keeps it").toBe(1);
+    });
+});

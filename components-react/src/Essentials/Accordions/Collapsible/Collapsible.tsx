@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 
 import {
     COLLAPSIBLE_DEFAULTS,
@@ -46,6 +46,15 @@ export const Collapsible = (props: CollapsibleProps) => {
 
     const rootRef = useRef<HTMLDivElement | null>(null);
     const triggerRef = useRef<HTMLElement | null>(null);
+    const latestRef = useLatest(props.ref);
+
+    const setTriggerRef = useCallback(
+        (element: HTMLElement | null) => {
+            triggerRef.current = element;
+            latestRef.current?.(element);
+        },
+        [latestRef],
+    );
     const contentRef = useRef<HTMLDivElement | null>(null);
     const isAwaitingScrollRef = useRef(false);
     const wasExpandedRef = useRef(isExpanded);
@@ -95,14 +104,12 @@ export const Collapsible = (props: CollapsibleProps) => {
     const wrapper = (
         <InteractionWrapper<CollapsibleFlags>
             {...props}
+            ref={setTriggerRef}
             sizing={isSideways ? "fit-content" : "fill"}
             extraFlags={{ isExpanded }}
             renderControl={(setElementRef, flags) => (
                 <CollapsibleTrigger
-                    ref={(element) => {
-                        setElementRef(element);
-                        triggerRef.current = element;
-                    }}
+                    ref={setElementRef}
                     id={props.id ?? triggerId}
                     panelId={panelId}
                     flags={flags}

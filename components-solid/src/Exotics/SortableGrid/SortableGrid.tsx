@@ -16,6 +16,7 @@ import {
     CarrierUtils,
     type CarrierZone,
     type CarryMode,
+    NavigatorUtils,
     SORTABLE_GRID_DEFAULTS,
     type SortableGridItemFlags,
     type SortableGridPlace,
@@ -60,7 +61,7 @@ const SortableGridItemSlot = (props: SortableGridItemSlotProps) => {
             onPointerDown={props.onPointerDown}
             onKeyDown={props.onKeyDown}
             onClick={props.onClick}
-            onFocus={props.onFocus}
+            onFocusIn={props.onFocus}
         >
             <Index each={access(props.cells)}>
                 {(getCell) => (
@@ -158,7 +159,7 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
         getGap,
         getScale: () => viewportContext.getScale(),
         getBlockedSpots,
-        computeItemKey: props.computeItemKey,
+        computeItemKey: (value) => props.computeItemKey(value),
         computeCanAccept: (value, fromLabel) => props.computeCanAccept?.(value, fromLabel) ?? true,
         onTransfer: (transfer) => props.onTransfer?.(transfer),
     });
@@ -287,6 +288,8 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
     };
 
     const handlePointerDown = (index: number) => (e: PointerEvent) => {
+        hasPendingClick = false;
+
         if (e.button !== 0 || getIsDisabled()) return;
         if ((e.target as HTMLElement).closest(CarrierUtils.INTERACTIVE_SELECTOR)) return;
         if (CarrierSolidUtils.getCarry()) return;
@@ -327,7 +330,7 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
     };
 
     const handleKeyDown = (index: number) => (e: KeyboardEvent) => {
-        if (getIsDisabled()) return;
+        if (e.target !== e.currentTarget || getIsDisabled() || NavigatorUtils.getHasCommandModifier(e)) return;
 
         const action = SortableGridUtils.computeKeyAction(e.key, {
             index,
@@ -498,6 +501,9 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
                                         sizing={"fill"}
                                         isDisabled={() => getItem().isDisabled ?? false}
                                         isReachableWhenDisabled={() => getItem().isReachableWhenDisabled ?? false}
+                                        isFocusableWhenDisabled={() =>
+                                            !getIsDisabled() && (getItem().isReachableWhenDisabled ?? false)
+                                        }
                                         isTabbable={() => getRovingIndex() === index}
                                         tooltipDefs={() => getItem().tooltipDefs}
                                         extraFlags={() => ({
@@ -512,9 +518,10 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
                                                 id={() => getItemId(index)}
                                                 hintId={() => hintId}
                                                 label={() =>
-                                                    SortableGridUtils.computeItemLabel(
-                                                        props.computeItemLabel(getItem().value),
-                                                        getItem(),
+                                                    props.computeItemAriaLabel(
+                                                        getItem().value,
+                                                        SortableGridUtils.getItemShape(getItem()).size,
+                                                        getItem().spot,
                                                     )
                                                 }
                                                 position={() => getReadingOrder().indexOf(index) + 1}
@@ -536,7 +543,7 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
                         }}
                     </Index>
 
-                    <Show when={props.renderLanding && getLandingPlace()}>
+                    <Show when={props.renderLanding === undefined ? undefined : getLandingPlace()}>
                         {(getPlace) => (
                             <div
                                 class={styles.sortableGridLanding}
@@ -574,7 +581,7 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
         <>
             {renderGrid()}
 
-            <Show when={props.renderCarried && getIsSource() && getCarriedPoint()}>
+            <Show when={props.renderCarried === undefined || !getIsSource() ? undefined : getCarriedPoint()}>
                 {(getPoint: () => Point2d) => (
                     <Portal mount={viewportContext.getPortalRef()}>
                         <div
@@ -588,7 +595,7 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
                             }}
                             aria-hidden="true"
                         >
-                            <Show when={getCarriedItem() && getCarriedGeometry()}>
+                            <Show when={getCarriedItem() === undefined ? undefined : getCarriedGeometry()}>
                                 {props.renderCarried?.(
                                     () => getCarriedItem()!,
                                     () => getCarriedGeometry()!,

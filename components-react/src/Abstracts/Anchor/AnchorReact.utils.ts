@@ -77,7 +77,9 @@ export namespace AnchorReactUtils {
         const [contentSize, setContentSize] = useState<Size2d>();
         const direction = NavigatorReactUtils.useDirection(anchorRef, !isVisible);
 
-        const observedRect = ElementObserverReactUtils.useViewportRect(anchorRef, isVisible && !opts.anchorRect);
+        const observedRect = ElementObserverReactUtils.useViewportRect(anchorRef, isVisible && !opts.anchorRect, {
+            isMeasuredWhileHidden: false,
+        });
         const anchorRect = opts.anchorRect ?? observedRect;
         const screenSize = viewportContext.getSize();
         const layoutOpts = {

@@ -100,8 +100,8 @@ export const Clock = (props: ClockProps) => {
             computeIsTimeDisabled: props.computeIsTimeDisabled,
         });
 
-    const setOptionRef = (unit: ClockUnit, index: number, element: HTMLElement) => {
-        const key = `${unit}:${index}`;
+    const setOptionRef = (columnIndex: number, optionIndex: number, element: HTMLElement) => {
+        const key = `${columnIndex}:${optionIndex}`;
 
         optionRefs.set(key, element);
 
@@ -129,16 +129,17 @@ export const Clock = (props: ClockProps) => {
     createEffect(() => {
         const root = getRootRef();
 
-        getColumns().forEach((column) => {
-            const element = optionRefs.get(`${column.unit}:${getRovingIndex(column)}`);
+        getColumns().forEach((column, columnIndex) => {
+            const element = optionRefs.get(`${columnIndex}:${getRovingIndex(column)}`);
 
             if (element && root) DOMUtils.revealWithin(element, root);
         });
     });
 
     createEffect(() => {
-        const column = getColumns().find((candidate) => candidate.unit === getRovingUnit());
-        const element = column && optionRefs.get(`${column.unit}:${getRovingIndex(column)}`);
+        const columnIndex = getColumns().findIndex((candidate) => candidate.unit === getRovingUnit());
+        const column = getColumns()[columnIndex];
+        const element = column && optionRefs.get(`${columnIndex}:${getRovingIndex(column)}`);
         const root = getRootRef();
 
         if (!element || !root?.contains(document.activeElement) || root === document.activeElement) return;
@@ -164,7 +165,7 @@ export const Clock = (props: ClockProps) => {
         else setHighlightedUnit(action.unit);
     };
 
-    const renderOptions = (getColumn: Accessor<ClockColumn>) => (
+    const renderOptions = (getColumn: Accessor<ClockColumn>, columnIndex: number) => (
         <Index each={getColumn().options}>
             {(getOption, optionIndex) => {
                 const getIsHighlighted = () =>
@@ -185,7 +186,7 @@ export const Clock = (props: ClockProps) => {
                             isNow: getIsAt(getNow()),
                             isHighlighted: getIsHighlighted(),
                         })}
-                        ref={(element) => setOptionRef(getColumn().unit, optionIndex, element)}
+                        ref={(element) => setOptionRef(columnIndex, optionIndex, element)}
                         renderControl={(setElementRef, getRenderProps) => (
                             <ClockOptionControl
                                 ref={setElementRef}
@@ -214,7 +215,7 @@ export const Clock = (props: ClockProps) => {
             onKeyDown={handleKeyDown}
         >
             <Index each={getColumns()}>
-                {(getColumn) => {
+                {(getColumn, columnIndex) => {
                     const getUnit = createMemo(() => getColumn().unit);
                     const getName = createMemo(() => ClockUtils.getUnitName(getUnit(), access(props.locale)));
 
@@ -231,8 +232,8 @@ export const Clock = (props: ClockProps) => {
                                 aria-label={getName()}
                                 aria-disabled={access(props.isDisabled) || undefined}
                             >
-                                {props.renderColumn?.(() => renderOptions(getColumn), getUnit()) ??
-                                    renderOptions(getColumn)}
+                                {props.renderColumn?.(() => renderOptions(getColumn, columnIndex), getUnit()) ??
+                                    renderOptions(getColumn, columnIndex)}
                             </div>
                         </div>
                     );

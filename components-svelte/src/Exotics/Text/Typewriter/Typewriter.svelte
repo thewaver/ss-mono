@@ -245,7 +245,7 @@
                     {@const textStyle = toStyle({ ...segment.nonMetrics, ...segment.metrics })}
                     {#if isAnimating}
                         <span style={textStyle}>
-                            {#each Array.from(segment.text) as character, offset (offset)}
+                            {#each StringUtils.splitGraphemes(segment.text) as character, offset (offset)}
                                 <span
                                     class={styles.typewriterChar}
                                     style={getAnimationStyle(segment.startIndex + offset)}

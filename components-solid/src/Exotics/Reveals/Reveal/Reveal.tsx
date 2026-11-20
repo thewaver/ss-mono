@@ -69,7 +69,7 @@ export const Reveal = (props: RevealProps) => {
     const handleKeyDown = (e: KeyboardEvent) => {
         const nudge = RevealUtils.getNudge(e);
 
-        if (getIsDisabled() || !nudge) return;
+        if (e.target !== e.currentTarget || getIsDisabled() || !nudge) return;
 
         e.preventDefault();
 
@@ -97,7 +97,9 @@ export const Reveal = (props: RevealProps) => {
             onPointerMove={() => setKeyboardPoint(undefined)}
             onKeyDown={handleKeyDown}
         >
-            {props.renderContent()}
+            <div class={styles.revealContent} inert>
+                {props.renderContent()}
+            </div>
 
             <div class={styles.revealCover}>{props.renderCover(getIsRevealing, getMaskStyle)}</div>
         </div>

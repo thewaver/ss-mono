@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from "react";
 
-import { CORNER_HIGHLIGHT_DEFAULTS, CornerHighlightStyles, CornerUtils } from "@thewaver/ss-components";
+import { CORNER_HIGHLIGHT_DEFAULTS, CornerHighlightStyles, CornerHighlightUtils } from "@thewaver/ss-components";
 import { CornerHighlightConst } from "@thewaver/ss-components/internal";
 
 import type { CornerHighlightProps } from "./CornerHighlight.types";
@@ -11,13 +11,13 @@ export const CornerHighlight = (props: PropsWithChildren<CornerHighlightProps>) 
     const cornerLength = props.cornerLength ?? CORNER_HIGHLIGHT_DEFAULTS.cornerLength;
     const strokeThickness = props.strokeThickness ?? CORNER_HIGHLIGHT_DEFAULTS.strokeThickness;
     const visibleCorners = [...(props.visibleCorners ?? CORNER_HIGHLIGHT_DEFAULTS.visibleCorners)];
-    const armPoints = CornerUtils.computeArmPoints(cornerLength, strokeThickness);
+    const armPoints = CornerHighlightUtils.computeArmPoints(cornerLength, strokeThickness);
 
     return (
         <div className={CornerHighlightStyles.cornerHighlightRoot}>
             <div
                 className={CornerHighlightStyles.cornerHighlightGlow}
-                style={CornerUtils.computeGlowStyle(color, transitionDurationMs)}
+                style={CornerHighlightUtils.computeGlowStyle(color, transitionDurationMs)}
                 aria-hidden="true"
             >
                 {visibleCorners.map((cornerKey) => (

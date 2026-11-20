@@ -1,0 +1,59 @@
+# @thewaver/ss-components-svelte
+
+> Svelte components for building shaped UI. Headless: structure, behavior and ARIA wiring only —
+> no color, spacing or typography. The consumer supplies all visual styling.
+
+Peer dependencies: `@thewaver/ss-utils`, `svelte`. Depends on `@thewaver/ss-components`, the framework-free core,
+whose exports it re-exports. CSS entry point: `@thewaver/ss-components/styles.css`
+(structural only, required). Full prop tables and interactive examples: https://ss-components.vercel.app
+
+The examples on the site are written for Solid. The Svelte components carry the same names and props, with plain
+values where Solid takes getters and `bind:` where Solid takes a signal; a `render*` callback in Solid is a snippet
+of the same name in Svelte.
+
+Browser only: drawing these components on a server is not tested.
+
+Authoritative signatures, prop types and prop-level doc comments are in `dist/index.d.ts` inside the
+published package — read that for ground truth on any single component rather than this file.
+
+## Components
+
+Grouped by the source tree's own top-level folders.
+
+### Essentials — the standard control and layout set
+Accordion, AudioSwitcher, Breadcrumbs, Button, Calendar, Carousel, Checkbox, CheckboxGroup, Clock,
+Collapsible, ColorArea, ColorInput, CommandPalette, CurrencyInput, DateInput, DatePicker, DateRangePicker,
+DateTimePicker, Drawer, EdgeFader, FileInput, FlyoutMenu, Form, FormField, FormSection, HoverCard,
+ImageSwitcher, Label, Listbox, Menu, Menubar, Modal, MultiListbox, MultiSelect, NumberInput, Paginator,
+Preview, Progress, Radio, RadioGroup, Range, RangeCalendar, Scroller, SegmentedInput, Select, SharedTooltip,
+Sidebar, SlideButton, Sortable, SplitPane, SpotlightGuide, SpotlightHint, SpotlightPrompt, Stepper, Table,
+TableOfContents, Tabs, TagInput, TextArea, TextInput, TimeInput, TimePicker, Toasts, Toggle, Toolbar, Tooltip,
+Tree.
+
+### Exotics — visual and motion effects
+Bracket, CardStack, CellAnimation, CirclePacking, CornerHighlight, CornerPin, Cuboid, Die, DrumWheel,
+ElementMosaic, FanMenu, FittedText, FlipCard, Flipbook, Formation, Icicle, ImageMosaic, InfiniteCorridor,
+Lens, LightCatcher, MorphText, OverheadWheel, PaintedText, ParticleDissolve, ParticleField, ParticleSpawner,
+PatchBoard, ProximityText, RGBAnimation, Reveal, RichText, Satellite, ScanlineAnimation, ScrambleText,
+ScratchCard, ShadowCaster, Shape, SlotText, SortableGrid, Staircase, Sunburst, TileBoard, Tilter, Timeline,
+Trail, Treemap, Typewriter, ViewportWrapper, WheelMenu, Wraparound.
+
+### Composites — assemblies of the above
+GlassSurface, Surface.
+
+### Primitives — lower-level building blocks the above are built from
+Barrel, BinarySwitch, FormValue, InteractionSettings, InteractionWrapper, Mosaic, PlacementBox, PlacementItem,
+Popover, PopupTrigger, Spine, Spotlight, TextField, Wheel.
+
+### Abstracts — Svelte helpers for state and behavior (no markup of their own)
+Anchor, Carrier, ColorExtractor, DateTimeValue, Dismisser, ElementFader, ElementObserver, Elevation, Floater,
+FocusManager, FrameRateMonitor, Glass, HoverIntent, InteractionTracker, LetterDriver, MaskedField,
+MediaQueryMonitor, Navigator, PanZoom, PointerTracker, Roller, Rotator, Selection, Shortcut, SignalMirror,
+SliceRenderer, Smoother, TextSync, Typeahead, Viewport, Virtualizer.
+
+### Samples
+Sample and registry data for the Exotics above (keyframes, weights, gradients, patterns, layouts, connectors), meant
+to be copied or referenced, not a stable API surface.
+
+## License
+MIT.

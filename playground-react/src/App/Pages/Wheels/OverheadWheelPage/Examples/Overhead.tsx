@@ -17,7 +17,9 @@ const NO_SUBSCRIPTION = () => () => {};
 
 type Props = WheelExampleProps;
 
-export const OverheadExample = ({ wedges, ...otherProps }: Props) => {
+export const OverheadExample = (props: Props) => {
+    const { wedges, ...otherProps } = props;
+
     const [controller, setController] = useState<WheelController>();
 
     const isSpinnable = useSyncExternalStore(
@@ -31,12 +33,12 @@ export const OverheadExample = ({ wedges, ...otherProps }: Props) => {
         <PageWheelStack>
             <OverheadWheel
                 {...otherProps}
-                wedges={wedges}
+                wedges={props.wedges}
                 ariaLabel={"Prize wheel"}
                 computeLayout={PRIZE_WHEEL_RING}
                 computeEffect={ProximityEffectUtils.glow}
-                computeSpinTarget={() => pickPrizeIndex(wedges.length)}
-                computeWedgeLabel={(index) => `${wedges[index]}, ${index + 1} of ${wedges.length}`}
+                computeSpinTarget={() => pickPrizeIndex(props.wedges.length)}
+                computeWedgeLabel={(index) => `${props.wedges[index]}, ${index + 1} of ${props.wedges.length}`}
                 renderWedge={(wedge, state) => <PageWheelWedge state={state}>{wedge}</PageWheelWedge>}
                 onMount={setController}
             />

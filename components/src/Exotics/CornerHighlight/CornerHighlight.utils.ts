@@ -7,7 +7,7 @@ const FAR_GLOW_PX = 16;
  * The geometry and styling behind `CornerHighlight`'s marks: the contour of one corner's arms and the glow the set is lit
  * with. The marks' markup is each framework's.
  */
-export namespace CornerUtils {
+export namespace CornerHighlightUtils {
     /**
      * The contour of one corner's two arms, drawn for the top-left corner and mirrored into the others.
      *

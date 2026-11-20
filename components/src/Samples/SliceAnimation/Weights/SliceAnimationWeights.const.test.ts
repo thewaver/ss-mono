@@ -1,16 +1,16 @@
 import { describe, expect, it } from "vitest";
 
-import type { Index2d } from "@thewaver/ss-utils";
+import type { Count2d } from "@thewaver/ss-utils";
 
 import { CellAnimationOrigins } from "../../CellAnimation/Origins/CellAnimationOrigins.const";
 import { SliceAnimationWeights } from "./SliceAnimationWeights.const";
 
-const ODD_GRID: Index2d = { col: 7, row: 7 };
-const EVEN_COLUMN: Index2d = { col: 1, row: 8 };
-const EVEN_GRID: Index2d = { col: 8, row: 8 };
-const AWKWARD_GRIDS: Index2d[] = [EVEN_GRID, EVEN_COLUMN, { col: 10, row: 4 }, { col: 2, row: 2 }];
+const ODD_GRID: Count2d = { colCount: 7, rowCount: 7 };
+const EVEN_COLUMN: Count2d = { colCount: 1, rowCount: 8 };
+const EVEN_GRID: Count2d = { colCount: 8, rowCount: 8 };
+const AWKWARD_GRIDS: Count2d[] = [EVEN_GRID, EVEN_COLUMN, { colCount: 10, rowCount: 4 }, { colCount: 2, rowCount: 2 }];
 
-const centerOf = (count: Index2d) => CellAnimationOrigins.computeOrigin("center", count);
+const centerOf = (count: Count2d) => CellAnimationOrigins.computeOrigin("center", count);
 
 const DETERMINISTIC_WEIGHTS = SliceAnimationWeights.WEIGHT_TYPES.filter((type) => !type.startsWith("random"));
 
@@ -25,22 +25,26 @@ describe("SliceAnimationWeightsConst", () => {
     });
 
     it("gives a row per y and a column per x", () => {
-        const weights = SliceAnimationWeights.computeSliceWeights("line_row", { col: 3, row: 5 }, { col: 0, row: 0 });
+        const weights = SliceAnimationWeights.computeSliceWeights(
+            "line_row",
+            { colCount: 3, rowCount: 5 },
+            { col: 0, row: 0 },
+        );
 
         expect(weights).toHaveLength(5);
         expect(weights.every((row) => row.length === 3)).toBe(true);
     });
 
     it("returns an empty grid rather than throwing on a zero count", () => {
-        expect(SliceAnimationWeights.computeSliceWeights("line_row", { col: 0, row: 0 }, { col: 0, row: 0 })).toEqual(
-            [],
-        );
+        expect(
+            SliceAnimationWeights.computeSliceWeights("line_row", { colCount: 0, rowCount: 0 }, { col: 0, row: 0 }),
+        ).toEqual([]);
     });
 
     it("stays finite on a single-cell grid, where the farthest bound is zero", () => {
         const weights = SliceAnimationWeights.computeSliceWeights(
             "diamond_default",
-            { col: 1, row: 1 },
+            { colCount: 1, rowCount: 1 },
             { col: 0, row: 0 },
         );
 
@@ -132,8 +136,8 @@ describe("SliceAnimationWeightsConst", () => {
         for (const count of AWKWARD_GRIDS) {
             const weights = SliceAnimationWeights.computeSliceWeights(type, count, centerOf(count)).flat();
 
-            expect(Math.min(...weights), `${count.col}x${count.row}`).toBeGreaterThanOrEqual(0);
-            expect(Math.max(...weights), `${count.col}x${count.row}`).toBeLessThanOrEqual(1);
+            expect(Math.min(...weights), `${count.colCount}x${count.rowCount}`).toBeGreaterThanOrEqual(0);
+            expect(Math.max(...weights), `${count.colCount}x${count.rowCount}`).toBeLessThanOrEqual(1);
         }
     });
 
@@ -155,11 +159,24 @@ describe("SliceAnimationWeightsConst", () => {
         },
     );
 
+    it.each([...AWKWARD_GRIDS, ODD_GRID, { colCount: 3, rowCount: 2 }])(
+        "gives every cell its own turn in sequence_reverse_binary, whatever the count",
+        (count) => {
+            const weights = SliceAnimationWeights.computeSliceWeights(
+                "sequence_reverse_binary",
+                count,
+                centerOf(count),
+            ).flat();
+
+            expect(new Set(weights).size).toBe(count.colCount * count.rowCount);
+        },
+    );
+
     it("turns the mirrored radar the other way round", () => {
         const center = centerOf(ODD_GRID);
         const ccw = SliceAnimationWeights.computeSliceWeights("radar_single", ODD_GRID, center);
         const cw = SliceAnimationWeights.computeSliceWeights("radar_single_cw", ODD_GRID, center);
-        const axes = (weights: number[][]) => [weights[center.row][ODD_GRID.col - 1], weights[center.row][0]];
+        const axes = (weights: number[][]) => [weights[center.row][ODD_GRID.colCount - 1], weights[center.row][0]];
 
         expect(axes(ccw), "counter-clockwise reaches the right of the origin before the left").toEqual(
             axes(cw).reverse(),

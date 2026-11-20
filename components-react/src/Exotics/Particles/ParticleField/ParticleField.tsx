@@ -14,7 +14,7 @@ import {
     SliceRendererUtils,
 } from "@thewaver/ss-components";
 import { ParticleFieldConst } from "@thewaver/ss-components/internal";
-import { MathUtils, Rect } from "@thewaver/ss-utils";
+import { MathUtils, ObjectUtils, Point2d, Rect } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { ElementObserverReactUtils } from "../../../Abstracts/ElementObserver/ElementObserverReact.utils";
@@ -22,12 +22,18 @@ import { InteractionTrackerReactUtils } from "../../../Abstracts/InteractionTrac
 import { SignalMirrorReactUtils } from "../../../Abstracts/SignalMirror/SignalMirrorReact.utils";
 import { SliceRendererReactUtils } from "../../../Abstracts/SliceRenderer/SliceRendererReact.utils";
 import { useViewportContext } from "../../../Abstracts/Viewport/Viewport.context";
-import { useLatest } from "../../../Utils/refUtils";
+import { useLatest, useStableValue } from "../../../Utils/refUtils";
 import type { ParticleFieldProps } from "./ParticleField.types";
 
 const LINEAR = SliceRendererUtils.computeEasing(undefined);
 const NO_RECT: Rect = { x: 0, y: 0, width: 0, height: 0 };
 const NO_TABLES = { tables: [[]], tableIndices: [] };
+
+const isSameOptionalPoints = (a: Point2d[] | undefined, b: Point2d[] | undefined) =>
+    a === b || (a !== undefined && b !== undefined && ObjectUtils.isSameArray(a, b, Point2d.isSame));
+
+const isSameOptionalNumbers = (a: number[] | undefined, b: number[] | undefined) =>
+    a === b || (a !== undefined && b !== undefined && ObjectUtils.isSameArray(a, b));
 
 export const ParticleField = (props: ParticleFieldProps) => {
     const spawnChance = props.spawnChance ?? PARTICLE_FIELD_DEFAULTS.spawnChance;
@@ -74,25 +80,23 @@ export const ParticleField = (props: ParticleFieldProps) => {
 
     const cellCount = CellAnimationUtils.computeCellCount(props.cellCount, rootSize);
 
+    const shapePoints = useStableValue(props.computeShapePoints?.(rootSize), isSameOptionalPoints);
+    const shapeJoinRadii = useStableValue(props.shapeJoinRadii, isSameOptionalNumbers);
+    const shapeLameExponents = useStableValue(props.shapeLameExponents, isSameOptionalNumbers);
+
     const contour = useMemo(
-        () =>
-            ParticleFieldUtils.computeContour(
-                props.computeShapePoints?.(rootSize),
-                props.shapeJoinRadii,
-                props.shapeLameExponents,
-            ),
-        [props.computeShapePoints, props.shapeJoinRadii, props.shapeLameExponents, rootSize],
+        () => ParticleFieldUtils.computeContour(shapePoints, shapeJoinRadii, shapeLameExponents),
+        [shapePoints, shapeJoinRadii, shapeLameExponents],
+    );
+
+    const weights = useStableValue(
+        props.computeCellWeights?.(cellCount) ?? ParticleFieldConst.NO_WEIGHTS,
+        SliceAnimationUtils.getIsSameWeights,
     );
 
     const cells = useMemo(
-        () =>
-            ParticleFieldUtils.computeCells(
-                cellCount,
-                rootSize,
-                props.computeCellWeights?.(cellCount) ?? ParticleFieldConst.NO_WEIGHTS,
-                contour,
-            ),
-        [cellCount.col, cellCount.row, rootSize, props.computeCellWeights, contour],
+        () => ParticleFieldUtils.computeCells(cellCount, rootSize, weights, contour),
+        [cellCount.colCount, cellCount.rowCount, rootSize, weights, contour],
     );
 
     const slices = useMemo(
@@ -106,13 +110,15 @@ export const ParticleField = (props: ParticleFieldProps) => {
 
     const picture = SliceRendererReactUtils.usePicture(props.src, isElementsOnly);
 
-    const tables = useMemo(() => {
-        if (isElementsOnly) return undefined;
-
-        const animation = props.computeParticleAnimation;
-
-        return animation ? SliceAnimationUtils.resolveTables(animation, [...slices.values()]) : NO_TABLES;
-    }, [isElementsOnly, props.computeParticleAnimation, slices]);
+    const animation = props.computeParticleAnimation;
+    const tables = useStableValue(
+        isElementsOnly
+            ? undefined
+            : animation
+              ? SliceAnimationUtils.resolveTables(animation, [...slices.values()])
+              : NO_TABLES,
+        SliceAnimationUtils.getIsSameTables,
+    );
 
     const tableByCell = useMemo(() => {
         const tableIndices = tables?.tableIndices ?? [];
@@ -196,7 +202,7 @@ export const ParticleField = (props: ParticleFieldProps) => {
         tintsRef.current.clear();
         latest.current.setCurrentIteration(ParticleFieldConst.FIRST_ITERATION);
         latest.current.setProgress(ParticleFieldConst.NO_PROGRESS);
-    }, [cellCount.col, cellCount.row]);
+    }, [cellCount.colCount, cellCount.rowCount]);
 
     useLayoutEffect(() => {
         const ids = new Set(particles.map((particle) => particle.id));

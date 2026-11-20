@@ -1,6 +1,6 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { demo, prop } from "./helpers";
+import { demo, prop, tabKey } from "./helpers";
 
 /**
  * A reveal is a cover with a hole cut in it, and the hole is a mask the component hands to the consumer's
@@ -37,7 +37,7 @@ const holeOf = (page: Page): Promise<Hole | undefined> =>
         const [left, top] = positions[1].trim().split(/\s+/).map(parseFloat);
         const [width, height] = sizes[1].trim().split(/\s+/).map(parseFloat);
 
-        return { x: (left + width / 2) / group.offsetWidth, y: (top + height / 2) / group.offsetHeight };
+        return { x: (left + width * 0.5) / group.offsetWidth, y: (top + height * 0.5) / group.offsetHeight };
     });
 
 const isNear = async (page: Page, x: number, y: number) => {
@@ -63,7 +63,7 @@ const tabInto = async (page: Page, selector: string) => {
     for (let presses = 0; presses < MAX_TABS; presses++) {
         if (await isFocused(page, selector)) return;
 
-        await page.keyboard.press("Tab");
+        await page.keyboard.press(tabKey(page));
     }
 
     throw new Error("the reveal was never reached with Tab");
@@ -95,7 +95,7 @@ test("the reveal is one named Tab stop, with nothing inside it to stop at", asyn
     expect(innerStops, "the content and the cover are paint, not controls").toBe(0);
 
     await tabInto(page, TORCH);
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
 
     expect(await isFocused(page, TORCH), "one press takes focus straight out again").toBe(false);
     expect(
@@ -115,7 +115,7 @@ test("reaching it with the keyboard opens the hole at the center, and leaving cl
     expect(opened!.x).toBeCloseTo(0.5, 2);
     expect(opened!.y).toBeCloseTo(0.5, 2);
 
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
 
     expect(await holeOf(page), "focus moved on, and the cover is whole again").toBeUndefined();
 });

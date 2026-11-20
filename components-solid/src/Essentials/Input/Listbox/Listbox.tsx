@@ -192,7 +192,7 @@ export const ListboxOptions = <T,>(props: ListboxOptionsProps<T>) => {
         () => setHoveredIndex(undefined),
     );
 
-    const handleOptionsPointerOver = (e: PointerEvent) => {
+    const handleOptionsPointerMove = (e: PointerEvent) => {
         setIsPointerLed(true);
 
         if (hoverHold.getIsOnTooltip(e.target)) return;
@@ -300,7 +300,7 @@ export const ListboxOptions = <T,>(props: ListboxOptionsProps<T>) => {
             ref={setOptionsRef}
             class={[styles.listboxOptions, getIsHorizontal() ? styles.listboxHorizontal : ""].join(" ")}
             role="presentation"
-            onPointerOver={handleOptionsPointerOver}
+            onPointerMove={handleOptionsPointerMove}
             onPointerLeave={hoverHold.handlePointerLeave}
         >
             {renderFloaters()}
@@ -402,7 +402,7 @@ export const ListboxOptions = <T,>(props: ListboxOptionsProps<T>) => {
             ref={setSizerRef}
             class={rowWindow.getHasNoScroller() ? undefined : styles.listboxSizer}
             style={{ height: rowWindow.getHasNoScroller() ? undefined : `${rowWindow.getTotalSize()}px` }}
-            onPointerOver={(e) => !rowWindow.getHasNoScroller() && handleOptionsPointerOver(e)}
+            onPointerMove={(e) => !rowWindow.getHasNoScroller() && handleOptionsPointerMove(e)}
             onPointerLeave={(e) => !rowWindow.getHasNoScroller() && hoverHold.handlePointerLeave(e)}
         >
             <Show when={!rowWindow.getHasNoScroller()} fallback={renderMountedOptions()}>

@@ -1,6 +1,6 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { accessibleText, docsDemo, docsSettled, prop, tagName } from "./helpers";
+import { accessibleText, docsDemo, docsSettled, prop, tabKey, tagName } from "./helpers";
 
 /**
  * The Basic example carries the knobs — item count, page size, sibling count, boundary count and disabled — and
@@ -35,7 +35,7 @@ const typeInto = async (page: Page, selector: string, value: string) => {
     await page.locator(selector).click();
     await page.keyboard.press("ControlOrMeta+a");
     await page.keyboard.type(value);
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
 };
 
 test.beforeEach(async ({ page: browserPage }) => {

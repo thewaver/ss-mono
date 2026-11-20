@@ -6,7 +6,6 @@
         DismisserUtils,
         type InteractionSizing,
         type MenuItemFlags,
-        type MenuItemKind,
         type MenuTriggerRole,
         MenuUtils,
         OverflowUtils,
@@ -35,7 +34,7 @@
     const NO_RADIO_GROUP: never[] = [];
     const ROW_SIZING: InteractionSizing = "fit-content";
     const PLACED_SIZING: InteractionSizing = "fill";
-    const PRESSED_ITEM_KIND: MenuItemKind = "checkbox";
+    const PRESSED_ITEM_KIND = ToolbarUtils.PRESSED_ITEM_KIND;
     const WORD_ROLE: MenuTriggerRole = "menuitem";
 
     type CompositeProps = ToolbarCompositeProps<T> &
@@ -70,7 +69,9 @@
     const isPlaced = $derived(layout !== undefined);
 
     const getRootSize = ElementObserverSvelteUtils.createBorderBoxSizeObserver(() => root ?? undefined);
-    const getItemSizes = ElementObserverSvelteUtils.createBorderBoxSizeListObserver(() => itemElements);
+    const getItemSizes = ElementObserverSvelteUtils.createBorderBoxSizeListObserver(() =>
+        itemElements.slice(0, actionCount),
+    );
     const getOverflowSize = ElementObserverSvelteUtils.createBorderBoxSizeObserver(() => overflowElement);
 
     const direction = NavigatorSvelteUtils.createDirection(() => root ?? undefined);

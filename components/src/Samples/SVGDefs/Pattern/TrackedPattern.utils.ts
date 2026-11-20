@@ -1,12 +1,11 @@
-import { MathUtils, type Point2d, type Size2d } from "@thewaver/ss-utils";
+import { type Count2d, type Index2d, MathUtils, type Point2d, type Size2d } from "@thewaver/ss-utils";
 
 import type { PointerReading } from "../../../Abstracts/PointerTracker/PointerTracker.types";
 import type { PatternProximityOpts } from "../SVGDefs.types";
 import { SVGDefsUtils } from "../SVGDefs.utils";
 import { SVGPatternLayouts } from "../SVGPatternLayouts.const";
-import type { SVGPatternCellCount, SVGPatternCellIndex, SVGPatternKind } from "../SVGPatternLayouts.types";
+import type { SVGPatternKind } from "../SVGPatternLayouts.types";
 
-const TILE_CELL_COUNT: SVGPatternCellCount = { rows: 8, cols: 8 };
 const MIN_COUNT = 1;
 const FULL_LEVEL = 1;
 const NO_FADE_DURATION_MS = 0;
@@ -124,22 +123,19 @@ export namespace TrackedPatternUtils {
      * @returns The request to hand the layout, in cells across and down, at least one either way. The layout turns
      * it into the count it draws.
      */
-    export const computeCoveringCellCount = (
-        kind: SVGPatternKind,
-        cellSize: Size2d,
-        areaSize: Size2d,
-    ): SVGPatternCellCount => {
-        const layout = SVGPatternLayouts.ALL[kind];
-        const computeTileSize = (count: SVGPatternCellCount) =>
-            layout.computePatternSize(layout.computeCellCount(count), cellSize);
+    export const computeCoveringCellCount = (kind: SVGPatternKind, cellSize: Size2d, areaSize: Size2d): Count2d => {
+        const layout = SVGPatternLayouts.getLayout(kind);
+        const computeTileSize = (count: Count2d) => layout.computePatternSize(layout.computeCellCount(count), cellSize);
 
         let cols = cellSize.width > 0 ? Math.max(MIN_COUNT, Math.floor(areaSize.width / cellSize.width)) : MIN_COUNT;
         let rows = cellSize.height > 0 ? Math.max(MIN_COUNT, Math.floor(areaSize.height / cellSize.height)) : MIN_COUNT;
 
-        while (cellSize.width > 0 && computeTileSize({ rows: MIN_COUNT, cols }).width < areaSize.width) cols += 1;
-        while (cellSize.height > 0 && computeTileSize({ rows, cols: MIN_COUNT }).height < areaSize.height) rows += 1;
+        while (cellSize.width > 0 && computeTileSize({ rowCount: MIN_COUNT, colCount: cols }).width < areaSize.width)
+            cols += 1;
+        while (cellSize.height > 0 && computeTileSize({ rowCount: rows, colCount: MIN_COUNT }).height < areaSize.height)
+            rows += 1;
 
-        return { rows, cols };
+        return { rowCount: rows, colCount: cols };
     };
 
     /**
@@ -158,7 +154,7 @@ export namespace TrackedPatternUtils {
         isTiled: boolean,
         cellSize: Size2d,
         areaSize: Size2d,
-    ): SVGPatternCellCount => (isTiled ? TILE_CELL_COUNT : computeCoveringCellCount(kind, cellSize, areaSize));
+    ): Count2d => (isTiled ? SVGDefsUtils.TILE_CELL_COUNT : computeCoveringCellCount(kind, cellSize, areaSize));
 
     /**
      * Where the pointer is, in the units a pattern filling the area is drawn in.
@@ -199,15 +195,15 @@ export namespace TrackedPatternUtils {
      */
     export const computeLevel = (
         kind: SVGPatternKind,
-        index: SVGPatternCellIndex,
-        cellCount: SVGPatternCellCount,
+        index: Index2d,
+        cellCount: Count2d,
         cellSize: Size2d,
         pointer: Point2d | undefined,
         opts: { isTiled: boolean; reach: number; restLevel: number },
     ) => {
         if (!pointer || opts.reach <= 0 || cellSize.width <= 0 || cellSize.height <= 0) return opts.restLevel;
 
-        const layout = SVGPatternLayouts.ALL[kind];
+        const layout = SVGPatternLayouts.getLayout(kind);
         const pos = layout.computeCellPos(index, cellSize);
         const center = SVGDefsUtils.computeCellCenter(kind, index, cellSize);
         const tileSize = layout.computePatternSize(cellCount, cellSize);

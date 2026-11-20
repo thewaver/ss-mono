@@ -1,6 +1,6 @@
 import { createRenderEffect } from "solid-js";
 
-import { type TextSyncElement, type TextSyncMaskResult, TextSyncUtils } from "@thewaver/ss-components";
+import { type TextSyncElement, type TextSyncMaskFn, TextSyncUtils } from "@thewaver/ss-components";
 
 /** The Solid side of {@link TextSyncUtils}: an input kept in step with a signal. The masking is framework-free. */
 export namespace TextSyncSolidUtils {
@@ -14,7 +14,9 @@ export namespace TextSyncSolidUtils {
      *
      * @param getRef The input or textarea.
      * @param getValue The value it should show.
-     * @param opts What {@link TextSyncUtils.createValueSync} takes.
+     * @param opts.onInput Called with the text, masked when a mask is given, as the person types.
+     * @param opts.getComputeMaskedText The mask to apply on each keystroke, read at that keystroke, so a mask
+     * supplied or changed later applies from the next one. Text already in the field is not masked again.
      * @returns `handleInput`, `handleCompositionStart` and `handleCompositionEnd` to attach to the
      * element's own handlers. All three are needed; composition is not optional for a field that anyone
      * might type Japanese into.
@@ -24,10 +26,15 @@ export namespace TextSyncSolidUtils {
         getValue: () => string,
         opts: {
             onInput: (value: string) => void;
-            computeMaskedText?: (previous: string, next: string, caret: number) => TextSyncMaskResult;
+            getComputeMaskedText?: () => TextSyncMaskFn | undefined;
         },
     ) => {
-        const valueSync = TextSyncUtils.createValueSync(getValue, opts);
+        const valueSync = TextSyncUtils.createValueSync(getValue, {
+            onInput: opts.onInput,
+            get computeMaskedText() {
+                return opts.getComputeMaskedText?.();
+            },
+        });
 
         createRenderEffect(() => {
             const element = getRef();

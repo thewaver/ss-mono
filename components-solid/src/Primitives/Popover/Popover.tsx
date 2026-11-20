@@ -1,4 +1,4 @@
-import { Show, createEffect, createMemo, createSignal } from "solid-js";
+import { Show, createEffect, createMemo, createSignal, untrack } from "solid-js";
 import { Portal } from "solid-js/web";
 
 import { POPOVER_DEFAULTS, PopoverUtils, PopoverStyles as styles } from "@thewaver/ss-components";
@@ -66,7 +66,7 @@ export const Popover = (props: PopoverProps) => {
 
         hasSeenAnchor = presence.hasSeenAnchor;
 
-        if (presence.isGone) props.onDismiss?.("anchor_gone");
+        if (presence.isGone) untrack(() => props.onDismiss?.("anchor_gone"));
     });
 
     DismisserSolidUtils.createLayer(() => access(props.isOpen), {
@@ -75,7 +75,9 @@ export const Popover = (props: PopoverProps) => {
     });
 
     createEffect(() => {
-        props.onTransitionStatusChange?.(getHasTransitionFinished());
+        const hasTransitionFinished = getHasTransitionFinished();
+
+        untrack(() => props.onTransitionStatusChange?.(hasTransitionFinished));
     });
 
     return (
@@ -100,7 +102,9 @@ export const Popover = (props: PopoverProps) => {
                     inert={!access(props.isOpen)}
                     role={access(props.role)}
                     {...access(props.ariaAttributes)}
-                    onKeyDown={(e) => props.onKeyDown?.(e)}
+                    onKeyDown={(e) => {
+                        if (e.currentTarget.contains(e.target as Node)) props.onKeyDown?.(e);
+                    }}
                     onBlur={(e) => props.onBlur?.(e)}
                     onMouseDown={(e) => {
                         if (!PopoverUtils.getIsFocusKeptOnPress(access(props.role))) return;

@@ -102,6 +102,12 @@ import type {
     TrackedPatternConfig,
 } from "./SVGDefsReact.types";
 
+const getSampleFactory = <TFactory>(factories: Record<string, TFactory>, family: string) => {
+    if (!Object.hasOwn(factories, family)) throw new Error(`SVGDefs: there is no sample named "${family}".`);
+
+    return factories[family];
+};
+
 export namespace SVGDefsSampleConfigs {
     export namespace Pattern {
         export namespace Timed {
@@ -146,7 +152,7 @@ export namespace SVGDefsSampleConfigs {
             >;
 
             export const toConfig = (entry: TrackedPatternEntry): TrackedPatternConfig =>
-                (SAMPLE_FACTORIES[entry.family] as (opts?: unknown) => TrackedPatternConfig)(
+                (getSampleFactory(SAMPLE_FACTORIES, entry.family) as (opts?: unknown) => TrackedPatternConfig)(
                     "defs" in entry ? entry.defs : undefined,
                 );
         }
@@ -191,7 +197,7 @@ export namespace SVGDefsSampleConfigs {
             } as const satisfies Record<SVGDefsSamples.Gradient.Timed.SampleKey, (opts?: never) => TimedGradientConfig>;
 
             export const toConfig = (entry: TimedGradientEntry): TimedGradientConfig =>
-                (SAMPLE_FACTORIES[entry.family] as (opts?: unknown) => TimedGradientConfig)(
+                (getSampleFactory(SAMPLE_FACTORIES, entry.family) as (opts?: unknown) => TimedGradientConfig)(
                     "defs" in entry ? entry.defs : undefined,
                 );
         }
@@ -232,7 +238,7 @@ export namespace SVGDefsSampleConfigs {
             >;
 
             export const toConfig = (entry: TrackedGradientEntry): TrackedGradientConfig =>
-                (SAMPLE_FACTORIES[entry.family] as (opts?: unknown) => TrackedGradientConfig)(
+                (getSampleFactory(SAMPLE_FACTORIES, entry.family) as (opts?: unknown) => TrackedGradientConfig)(
                     "defs" in entry ? entry.defs : undefined,
                 );
         }

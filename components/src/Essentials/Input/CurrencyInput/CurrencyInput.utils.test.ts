@@ -96,6 +96,18 @@ describe("createFieldRules", () => {
         expect(rules.settleValue!(4000), "and leaves one inside the bounds alone").toBe(4000);
     });
 
+    it("refuses an amount a number cannot hold exactly, rather than rounding it", () => {
+        const rules = rulesFor(SIGNED);
+
+        expect(rules.getHasImpossibleDigits("9007199254740991"), "the last penny would be lost").toBe(true);
+        expect(rules.getHasImpossibleDigits("3518437208883199"), "a number this size holds it exactly").toBe(false);
+        expect(rules.getHasImpossibleDigits("0012"), "leading zeros are not a difference").toBe(false);
+        expect(rules.getHasImpossibleDigits(`${TextSyncUtils.MASK_MINUS}0`), "nor is a lone minus over zero").toBe(
+            false,
+        );
+        expect(rules.getHasImpossibleDigits(`${TextSyncUtils.MASK_MINUS}1250`)).toBe(false);
+    });
+
     it("has no fixed length and compares amounts by value", () => {
         const rules = rulesFor(BRITISH);
 

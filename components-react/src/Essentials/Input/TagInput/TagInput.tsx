@@ -1,6 +1,7 @@
 import { type KeyboardEvent, useCallback, useEffect, useId, useRef } from "react";
 
 import {
+    InteractionTrackerUtils,
     TAG_INPUT_DEFAULTS,
     type TagInputFlags,
     type TagInputKeyAction,
@@ -11,6 +12,7 @@ import { TagInputConst } from "@thewaver/ss-components/internal";
 
 import { NavigatorReactUtils } from "../../../Abstracts/Navigator/NavigatorReact.utils";
 import { SignalMirrorReactUtils } from "../../../Abstracts/SignalMirror/SignalMirrorReact.utils";
+import { FormValue } from "../../../Primitives/FormValue/FormValue";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import { FormFieldReactUtils } from "../FormField/FormFieldReact.utils";
 import { LabelReactUtils } from "../Label/LabelReact.utils";
@@ -32,7 +34,6 @@ const TagInputFieldElement = (props: TagInputFieldElementProps) => {
             ref={setRef}
             id={props.id}
             type="text"
-            name={props.name}
             className={TagInputStyles.tagInputField}
             style={props.style}
             value={props.value}
@@ -41,6 +42,7 @@ const TagInputFieldElement = (props: TagInputFieldElementProps) => {
             aria-labelledby={props.ariaLabelledBy}
             aria-describedby={props.ariaDescribedBy}
             aria-disabled={props.isDisabled || undefined}
+            aria-invalid={props.hasError || undefined}
             onChange={(e) => props.onChange(e.currentTarget.value)}
             onKeyDown={props.onKeyDown}
         />
@@ -193,16 +195,16 @@ export const TagInput = (props: TagInputProps) => {
                             ref={setElementRef}
                             fieldRef={fieldRef}
                             id={fieldId}
-                            name={props.name}
                             style={props.computeTextStyle?.(flags)}
                             value={text}
                             isDisabled={flags.isDisabled ?? false}
+                            hasError={flags.hasError ?? false}
                             ariaLabel={ariaLabel}
                             ariaLabelledBy={ariaLabelledBy}
                             ariaDescribedBy={ariaDescribedBy}
                             onChange={setText}
                             onKeyDown={(e) => {
-                                if (isDisabled) return;
+                                if (isDisabled || InteractionTrackerUtils.getIsComposing(e.nativeEvent)) return;
 
                                 runKeyAction(
                                     e,
@@ -214,6 +216,8 @@ export const TagInput = (props: TagInputProps) => {
                                 );
                             }}
                         />
+
+                        <FormValue name={props.name} values={tags} />
 
                         {props.renderPlaceholder && isEmpty && tags.length < 1 && (
                             <div className={TagInputStyles.tagInputPlaceholder}>{props.renderPlaceholder(flags)}</div>

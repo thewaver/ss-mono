@@ -1,16 +1,19 @@
 import type { Accessor, JSX, ParentProps } from "solid-js";
-import { Index, Show, createMemo, createSignal, onCleanup, onMount } from "solid-js";
+import { For, Index, Show, createMemo, createSignal, onCleanup, onMount } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
 import {
+    InteractionTrackerUtils,
     PAGINATOR_DEFAULTS,
     type PaginatorControlEntry,
+    type PaginatorEntry,
     type PaginatorGapEntry,
     type PaginatorPageEntry,
     type PaginatorPageRenderProps,
     type PaginatorStep,
     type PaginatorStepRenderProps,
     PaginatorUtils,
+    SafeHrefUtils,
     PaginatorStyles as styles,
 } from "@thewaver/ss-components";
 import { PlacementConst } from "@thewaver/ss-components/internal";
@@ -30,6 +33,8 @@ import type {
 } from "./PaginatorSolid.types";
 
 const PaginatorItem = (props: PaginatorItemProps) => {
+    const getSafeHref = () => SafeHrefUtils.resolve(access(props.href), "Paginator");
+
     const getIsDisabled = () => access(props.flags).isDisabled ?? false;
 
     const handleClick = (e: MouseEvent) => {
@@ -37,6 +42,8 @@ const PaginatorItem = (props: PaginatorItemProps) => {
             e.preventDefault();
             return;
         }
+
+        if (getSafeHref() !== undefined && !InteractionTrackerUtils.getIsPlainClick(e)) return;
 
         props.onActivate();
     };
@@ -59,7 +66,7 @@ const PaginatorItem = (props: PaginatorItemProps) => {
 
     return (
         <Show
-            when={access(props.href)}
+            when={getSafeHref()}
             fallback={
                 <button type="button" ref={(element) => props.ref?.(element)} {...commonProps} onClick={handleClick}>
                     {props.renderContent(() => access(props.flags))}
@@ -69,7 +76,7 @@ const PaginatorItem = (props: PaginatorItemProps) => {
             <Dynamic
                 component={props.linkComponent ?? "a"}
                 ref={(element: HTMLElement) => props.ref?.(element)}
-                href={access(props.href)!}
+                href={getSafeHref()!}
                 {...commonProps}
                 onClick={handleClick}
             >
@@ -296,34 +303,47 @@ export const PaginatorPages = (props: PaginatorPagesProps) => {
         }),
     );
 
+    const getEntriesByKey = createMemo(
+        () => new Map(getEntries().map((entry) => [PaginatorUtils.getEntryKey(entry), entry])),
+    );
+
+    const getEntryKeys = createMemo(() => [...getEntriesByKey().keys()]);
+
     return (
         <div class={styles.paginatorRow} style={{ gap: `${access(props.gap) ?? PAGINATOR_DEFAULTS.gap}px` }}>
-            <Index each={getEntries()}>
-                {(getEntry) => (
-                    <Show
-                        when={getEntry().kind === "page" ? (getEntry() as PaginatorPageEntry) : undefined}
-                        fallback={
-                            <PaginatorGapControl
-                                context={context}
-                                getEntry={() => getEntry() as PaginatorGapEntry}
-                                computePageLabel={props.computePageLabel}
-                                renderPage={props.renderPage}
-                                renderGap={props.renderGap}
-                            />
-                        }
-                    >
-                        {(getPageEntry) => (
-                            <PaginatorPageControl
-                                context={context}
-                                getEntry={getPageEntry}
-                                computePageLabel={props.computePageLabel}
-                                renderPage={props.renderPage}
-                                renderGap={props.renderGap}
-                            />
-                        )}
-                    </Show>
-                )}
-            </Index>
+            <For each={getEntryKeys()}>
+                {(key) => {
+                    const getEntry = createMemo<PaginatorEntry>(
+                        (previous) => getEntriesByKey().get(key) ?? previous,
+                        getEntriesByKey().get(key)!,
+                    );
+
+                    return (
+                        <Show
+                            when={getEntry().kind === "page" ? (getEntry() as PaginatorPageEntry) : undefined}
+                            fallback={
+                                <PaginatorGapControl
+                                    context={context}
+                                    getEntry={() => getEntry() as PaginatorGapEntry}
+                                    computePageLabel={props.computePageLabel}
+                                    renderPage={props.renderPage}
+                                    renderGap={props.renderGap}
+                                />
+                            }
+                        >
+                            {(getPageEntry) => (
+                                <PaginatorPageControl
+                                    context={context}
+                                    getEntry={getPageEntry}
+                                    computePageLabel={props.computePageLabel}
+                                    renderPage={props.renderPage}
+                                    renderGap={props.renderGap}
+                                />
+                            )}
+                        </Show>
+                    );
+                }}
+            </For>
         </div>
     );
 };

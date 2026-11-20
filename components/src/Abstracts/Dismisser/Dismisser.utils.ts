@@ -1,5 +1,6 @@
 import { type Store, StoreUtils } from "@thewaver/ss-utils";
 
+import { InteractionTrackerUtils } from "../InteractionTracker/InteractionTracker.utils";
 import type { DismisserLayerDefs } from "./Dismisser.types";
 
 /** Every open layer, oldest first, so the last entry is the topmost. Replaced rather than edited on each change. */
@@ -69,8 +70,8 @@ const handleFocusOut = (e: FocusEvent) => {
 };
 
 /** Whether a key press is an Escape nothing has answered yet. One whose default something already prevented was used for that thing's own purpose. */
-const getIsUnansweredEscape = (e: Pick<KeyboardEvent, "key" | "defaultPrevented">) =>
-    e.key === "Escape" && !e.defaultPrevented;
+const getIsUnansweredEscape = (e: Pick<KeyboardEvent, "key" | "defaultPrevented" | "isComposing" | "keyCode">) =>
+    e.key === "Escape" && !e.defaultPrevented && !InteractionTrackerUtils.getIsComposing(e);
 
 /** Escape closes only the topmost layer, so nested layers unwind one at a time. */
 const handleKeyDown = (e: KeyboardEvent) => {

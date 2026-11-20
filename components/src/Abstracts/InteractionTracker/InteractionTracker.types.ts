@@ -92,3 +92,8 @@ export type InteractionSwipeTracker = Store<boolean> & {
     observeClicks: (element: HTMLElement) => () => void;
     applyTouchAction: (element: HTMLElement, isDisabled: boolean) => void;
 };
+
+export type InteractionStepRepeater = {
+    start: (step: () => boolean) => boolean;
+    stop: () => boolean;
+};

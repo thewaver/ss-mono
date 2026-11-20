@@ -1,3 +1,4 @@
+import { InteractionTrackerUtils } from "../../../Abstracts/InteractionTracker/InteractionTracker.utils";
 import type { NavigatorDirection } from "../../../Abstracts/Navigator/Navigator.types";
 import { NavigatorUtils } from "../../../Abstracts/Navigator/Navigator.utils";
 import type { CollapsibleSide } from "../Collapsible/Collapsible.types";
@@ -16,7 +17,7 @@ export namespace AccordionUtils {
      */
     export const computeNavigableIndexes = <T>(items: AccordionItem<T>[]) =>
         items.reduce<number[]>((acc, item, index) => {
-            if (!item.isDisabled || item.isReachableWhenDisabled) acc.push(index);
+            if (InteractionTrackerUtils.computeIsNavigable(item)) acc.push(index);
 
             return acc;
         }, []);
@@ -31,21 +32,23 @@ export namespace AccordionUtils {
      * @param value The value of the section whose header was pressed.
      * @param opts.isSingleExpand Whether at most one section may be open.
      * @param opts.isExpandRequired Whether the last open section refuses to close.
-     * @returns The new list, or `expanded` itself when nothing changes.
+     * @returns The new list, or `expanded` itself when nothing changes. With `isSingleExpand`, a list handed in with
+     * several open is first cut to its first, so a required section is never left with none open.
      */
     export const computeToggled = <T>(
         expanded: T[],
         value: T,
         opts: { isSingleExpand?: boolean; isExpandRequired?: boolean },
     ) => {
-        const isExpanded = expanded.includes(value);
-        const isLastExpanded = isExpanded && expanded.length === 1;
+        const current = opts.isSingleExpand && expanded.length > 1 ? expanded.slice(0, 1) : expanded;
+        const isExpanded = current.includes(value);
+        const isLastExpanded = isExpanded && current.length === 1;
 
-        if (isLastExpanded && (opts.isExpandRequired ?? false)) return expanded;
+        if (isLastExpanded && (opts.isExpandRequired ?? false)) return current;
 
         if (opts.isSingleExpand) return isExpanded ? [] : [value];
 
-        return isExpanded ? expanded.filter((entry) => entry !== value) : [...expanded, value];
+        return isExpanded ? current.filter((entry) => entry !== value) : [...current, value];
     };
 
     /**

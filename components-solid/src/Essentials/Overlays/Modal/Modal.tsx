@@ -1,4 +1,4 @@
-import { Show, createEffect, createMemo, createSignal, onCleanup } from "solid-js";
+import { Show, createEffect, createMemo, createSignal, onCleanup, untrack } from "solid-js";
 import { Portal } from "solid-js/web";
 
 import { FocusManagerUtils, MODAL_DEFAULTS, ModalUtils, ModalStyles as styles } from "@thewaver/ss-components";
@@ -120,7 +120,7 @@ export const Modal = (props: ModalProps) => {
     createEffect(() => {
         const hasTransitionFinished = getHasTransitionFinished();
 
-        props.onTransitionStatusChange?.(hasTransitionFinished);
+        untrack(() => props.onTransitionStatusChange?.(hasTransitionFinished));
     });
 
     return (

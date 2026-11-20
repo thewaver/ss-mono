@@ -9,7 +9,7 @@ import {
     ClockUtils,
 } from "@thewaver/ss-components";
 import { ClockConst } from "@thewaver/ss-components/internal";
-import { DOMUtils, type TimeValue } from "@thewaver/ss-utils";
+import { DOMUtils, TimeUtils, type TimeValue } from "@thewaver/ss-utils";
 
 import { NavigatorVueUtils } from "../../../Abstracts/Navigator/NavigatorVue.utils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
@@ -121,8 +121,16 @@ export const Clock = defineComponent(
             value.value = time;
         };
 
+        let lastValue: TimeValue | undefined;
+
         watchAfterRender([value], ([next]) => {
-            if (next) highlighted.value = next;
+            const last = lastValue;
+
+            lastValue = next;
+
+            if (!next || (next !== last && TimeUtils.isSame(next, last))) return;
+
+            highlighted.value = next;
         });
 
         watchAfterRender([() => rovingKeys.value.join()], () => {

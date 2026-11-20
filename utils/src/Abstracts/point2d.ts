@@ -33,11 +33,13 @@ export namespace Point2d {
     export const toString = Vec2d.toString(K1, K2);
 }
 
+/** Reading a 2D point back from its text form. */
 export namespace Point2dString {
     /** Parses a string such as `X10_Y20` back into a {@link Point2d}. */
     export const fromString = Vec2d.fromString(K1, K2);
 }
 
+/** Arithmetic on 2D points: distances, angles, directions, rotation and interpolation. */
 export namespace Point2dUtils {
     /**
      * Shrinks a direction down to length 1, keeping the way it points.

@@ -77,7 +77,7 @@ export namespace RotatorSolidUtils {
             getSettleDurationMs,
             targetIndex: targetIndexSignal,
             computeSpinTarget: () => defs.computeSpinTarget(),
-            computeSpinDefs: defs.computeSpinDefs && ((index, stepCount) => defs.computeSpinDefs!(index, stepCount)),
+            computeSpinDefs: (index, stepCount) => defs.computeSpinDefs?.(index, stepCount),
             computeStepLabel: (index, stepCount) => defs.computeStepLabel(index, stepCount),
             onSpinEnd: (index) => defs.onSpinEnd?.(index),
         });

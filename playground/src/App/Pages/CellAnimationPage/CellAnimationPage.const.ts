@@ -1,4 +1,4 @@
-import type { Index2d } from "@thewaver/ss-utils";
+import type { Count2d } from "@thewaver/ss-utils";
 
 import type { StressTestDefs } from "../../PageComponents/StressTest/StressText.types";
 import type { CellAnimationSourceKind } from "./CellAnimationPage.types";
@@ -19,7 +19,7 @@ export const SOURCE_READOUTS: Record<CellAnimationSourceKind, string> = {
 
 export const IMAGE_CONTAINER_SIZE = 480;
 
-export const STRESS_CELL_COUNT: Index2d = { row: 11, col: 11 };
+export const STRESS_CELL_COUNT: Count2d = { rowCount: 11, colCount: 11 };
 
 export const STRESS_ITEM_SIZE = 120;
 
@@ -30,25 +30,25 @@ export const STRESS_HOLD_MS = 0;
 export const STRESS_ITEMS: (StressTestDefs & { size: number })[] = [
     {
         count: 4 * 3,
-        cols: 4,
+        colCount: 4,
         gap: 10,
         size: STRESS_ITEM_SIZE,
     },
     {
         count: 6 * 4,
-        cols: 6,
+        colCount: 6,
         gap: 10,
         size: STRESS_ITEM_SIZE,
     },
     {
         count: 8 * 6,
-        cols: 8,
+        colCount: 8,
         gap: 10,
         size: STRESS_ITEM_SIZE,
     },
     {
         count: 12 * 6,
-        cols: 12,
+        colCount: 12,
         gap: 10,
         size: STRESS_ITEM_SIZE,
     },

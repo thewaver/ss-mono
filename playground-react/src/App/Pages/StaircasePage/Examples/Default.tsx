@@ -5,11 +5,13 @@ import type { StaircaseExampleProps } from "../StaircasePageReact.types";
 
 type Props = StaircaseExampleProps;
 
-export const DefaultExample = ({ indentKey, ...otherProps }: Props) => {
+export const DefaultExample = (props: Props) => {
+    const { indentKey, ...otherProps } = props;
+
     return (
         <Staircase
             {...otherProps}
-            computeStepIndent={(defs) => StaircaseIndents.SAMPLE_INDENTS[indentKey](defs)}
+            computeStepIndent={(defs) => StaircaseIndents.SAMPLE_INDENTS[props.indentKey](defs)}
             renderStep={(step, state) => <PageStaircaseStep state={state}>{step}</PageStaircaseStep>}
         />
     );

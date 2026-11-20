@@ -15,6 +15,7 @@ import {
     CarrierUtils,
     type CarryMode,
     LiveAnnouncerUtils,
+    NavigatorUtils,
     PanZoomUtils,
     TIMELINE_DEFAULTS,
     type TimelineEdge,
@@ -153,6 +154,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
             getView: () => viewRef.current,
             getRange: () => range,
             getSpans: () => spans,
+            getItems: () => items,
             getStep: () => steps.step,
             computePointerRatio: getPointerRatio,
             computeSnapValue: props.computeSnapValue,
@@ -162,7 +164,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
 
     const carryState = CarrierReactUtils.useCarry();
     const edgeCarry = carryState?.from === zone ? carryState.carry : undefined;
-    const heldIndex = TimelineUtils.getCarriedIndex(edgeCarry);
+    const heldIndex = TimelineUtils.getCarriedIndex(edgeCarry, items);
     const shownSpans = TimelineUtils.computeShownSpans(spans, heldIndex, carryState?.toPlace as Span | undefined);
 
     const order = TimelineUtils.computeOrder(spans, lanes);
@@ -298,7 +300,12 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
         CarrierUtils.start(
             zone,
             span,
-            TimelineUtils.computeEdgeCarry(timelineId, index, props.computeItemAriaLabel?.(items[index], index) ?? ""),
+            TimelineUtils.computeEdgeCarry(
+                timelineId,
+                index,
+                props.computeItemAriaLabel?.(items[index], index) ?? "",
+                items[index],
+            ),
             mode,
         );
     };
@@ -357,7 +364,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
     const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
         const from = rovingIndex;
 
-        if (from === undefined || isDisabled) return;
+        if (from === undefined || isDisabled || NavigatorUtils.getHasCommandModifier(e)) return;
 
         const action = TimelineUtils.computeKeyAction(e.key, {
             isHolding: !!getEdgeCarry() && CarrierUtils.getCarryMode() !== "drag",

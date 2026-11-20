@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { type SignalMirrorSplitDefs, SignalMirrorUtils } from "@thewaver/ss-components";
 
@@ -27,9 +27,10 @@ export namespace SignalMirrorReactUtils {
         source: readonly [T, (value: T) => void] | undefined,
         initial: T,
     ): readonly [T, (value: T) => void] => {
-        const own = useState(initial);
+        const [ownValue, setOwn] = useState(() => initial);
+        const setOwnValue = useCallback((value: T) => setOwn(() => value), []);
 
-        return source ?? own;
+        return source ?? [ownValue, setOwnValue];
     };
 
     /**

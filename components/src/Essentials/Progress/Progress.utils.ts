@@ -52,10 +52,10 @@ export namespace ProgressUtils {
      * @param max The value that counts as finished.
      */
     export const warnIfEmptyRange = (min: number, max: number) => {
-        if (max > min) return;
+        if (process.env.NODE_ENV === "production" || max > min) return;
 
         console.warn(
-            "Progress: getMax is not greater than getMin, so the range is empty and every value reads as complete. aria-valuemax must exceed aria-valuemin.",
+            "Progress: max is not greater than min, so the range is empty and every value reads as complete. aria-valuemax must exceed aria-valuemin.",
         );
     };
 }

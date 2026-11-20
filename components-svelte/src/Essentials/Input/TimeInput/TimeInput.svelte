@@ -2,6 +2,7 @@
     import { untrack } from "svelte";
 
     import {
+        FormValueUtils,
         type InteractionFlags,
         type TextFieldFlags,
         type TextSyncElement,
@@ -14,8 +15,6 @@
     import FormValue from "../../../Primitives/FormValue/FormValue.svelte";
     import TextField from "../../../Primitives/TextField/TextField.svelte";
     import type { TimeInputMeridiem, TimeInputProps } from "./TimeInput.types.js";
-
-    const EMPTY_FORM_VALUE = "";
 
     let { value = $bindable(), ref = $bindable(), ...props }: TimeInputProps = $props();
 
@@ -33,7 +32,7 @@
         },
         formatDigits: (digits) => TextSyncUtils.formatWithMask(mask, digits),
         getDigitCount: () => segmentCount * TimeInputUtils.SEGMENT_DIGITS,
-        toDigits: (next) => TimeInputUtils.toDigits(next, isTwelveHour),
+        toDigits: (next) => TimeInputUtils.toDigits(next, isTwelveHour, props.hasSeconds ?? false),
         fromDigits: (digits) =>
             TimeInputUtils.parseDigits(digits, {
                 segmentCount,
@@ -101,7 +100,8 @@
     bind:ref
     element={"input"}
     inputMode={"numeric"}
-    computeMaskedText={(previous, next, caret) => TextSyncUtils.applyMask(mask, previous, next, caret)}
+    computeMaskedText={(previous, next, caret, isForwardDeletion) =>
+        TextSyncUtils.applyMask(mask, previous, next, caret, isForwardDeletion)}
     placeholderHint={TimeInputUtils.computeHint(segmentCount, props.segmentHints)}
     hasError={(props.hasError ?? false) || field.getHasIssue()}
     renderTrailing={props.renderTrailing ? trailing : undefined}
@@ -110,4 +110,4 @@
     onBlur={field.onBlur}
 />
 
-<FormValue name={props.name} values={[value ? TimeUtils.toIso(value) : EMPTY_FORM_VALUE]} />
+<FormValue name={props.name} values={[value ? TimeUtils.toIso(value) : FormValueUtils.EMPTY_TEXT]} />

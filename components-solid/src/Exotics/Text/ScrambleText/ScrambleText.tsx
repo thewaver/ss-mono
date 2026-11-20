@@ -9,6 +9,7 @@ import {
     ScrambleTextStyles as styles,
 } from "@thewaver/ss-components";
 import { ScrambleTextConst } from "@thewaver/ss-components/internal";
+import { StringUtils } from "@thewaver/ss-utils";
 
 import { LetterDriverContextProvider } from "../../../Abstracts/LetterDriver/LetterDriver.context";
 import type { LetterDriverContextType } from "../../../Abstracts/LetterDriver/LetterDriverSolid.context.types";
@@ -24,7 +25,7 @@ export const ScrambleText = (props: ParentProps<ScrambleTextProps>) => {
     const getDrivenCharacters = accessStore(registry, (state) => state.characters);
 
     const getCharacters = createMemo(
-        () => (getIsDriven() ? getDrivenCharacters() : Array.from(access(props.text) ?? "")),
+        () => (getIsDriven() ? getDrivenCharacters() : StringUtils.splitGraphemes(access(props.text) ?? "")),
         undefined,
         { equals: (a, b) => a.join("") === b.join("") },
     );

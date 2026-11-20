@@ -267,6 +267,7 @@ export const RGBAnimation = (props: RGBAnimationProps) => {
                 width={getSizeAnchor() === "width" ? "100%" : "auto"}
                 height={getSizeAnchor() === "height" ? "100%" : "auto"}
                 aria-hidden="true"
+                alt=""
             />
 
             <svg class={styles.rgbAnimationFilterHost} aria-hidden="true">

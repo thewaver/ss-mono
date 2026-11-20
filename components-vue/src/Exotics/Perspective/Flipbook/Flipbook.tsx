@@ -5,6 +5,7 @@ import {
     FlipbookStyles,
     FlipbookUtils,
     LiveAnnouncerUtils,
+    NavigatorUtils,
     type SpineSide,
     SpineUtils,
 } from "@thewaver/ss-components";
@@ -79,7 +80,7 @@ export const Flipbook = defineComponent(
         });
 
         const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.target !== e.currentTarget) return;
+            if (e.target !== e.currentTarget || NavigatorUtils.getHasCommandModifier(e)) return;
 
             const step = FlipbookUtils.getKeyStep(e.key);
 

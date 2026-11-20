@@ -1,6 +1,6 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { attributesOf, docsDemo, docsSettled, isChecked, isIndeterminate } from "./helpers";
+import { attributesOf, docsDemo, docsSettled, isChecked, isIndeterminate, tabKey } from "./helpers";
 
 const DOCS = "/src/App/Pages/CheckboxGroupPage/Docs";
 
@@ -68,7 +68,7 @@ test("every box is its own tab stop, and the arrows do not walk the group", asyn
     await box(page, DEFAULT, 0).focus();
 
     for (let index = 1; index < count; index++) {
-        await page.keyboard.press("Tab");
+        await page.keyboard.press(tabKey(page));
         expect(
             await page.evaluate(
                 (args) => document.activeElement === document.querySelectorAll(args.selector)[args.index],

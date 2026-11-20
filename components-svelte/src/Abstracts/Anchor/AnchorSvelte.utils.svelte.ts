@@ -117,6 +117,7 @@ export namespace AnchorSvelteUtils {
                 setElementRect: (rect) => {
                     if (!observedRect || !Rect.isSame(observedRect, rect)) observedRect = rect;
                 },
+                isMeasuredWhileHidden: false,
             },
         );
 

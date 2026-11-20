@@ -9,6 +9,7 @@ import {
     ScrambleTextUtils,
 } from "@thewaver/ss-components";
 import { ScrambleTextConst } from "@thewaver/ss-components/internal";
+import { StringUtils } from "@thewaver/ss-utils";
 
 import { provideLetterDriverContext } from "../../../Abstracts/LetterDriver/LetterDriver.context";
 import { watchAfterRender } from "../../../Utils/effectUtils";
@@ -24,7 +25,7 @@ export const ScrambleText = defineComponent(
         const getIsDriven = () => registryState.value.entries.length > 0;
 
         const characters = computed(() =>
-            getIsDriven() ? registryState.value.characters : Array.from(props.text ?? ""),
+            getIsDriven() ? registryState.value.characters : StringUtils.splitGraphemes(props.text ?? ""),
         );
         const segments = computed(() => ScrambleTextUtils.getSegments(characters.value));
 

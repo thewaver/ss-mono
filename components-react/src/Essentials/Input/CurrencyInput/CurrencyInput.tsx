@@ -1,8 +1,9 @@
 import { useLayoutEffect, useMemo } from "react";
 
-import { CURRENCY_INPUT_DEFAULTS, CurrencyInputUtils, TextSyncUtils } from "@thewaver/ss-components";
+import { CURRENCY_INPUT_DEFAULTS, CurrencyInputUtils, FormValueUtils, TextSyncUtils } from "@thewaver/ss-components";
 
 import { MaskedFieldReactUtils } from "../../../Abstracts/MaskedField/MaskedFieldReact.utils";
+import { FormValue } from "../../../Primitives/FormValue/FormValue";
 import { TextField } from "../../../Primitives/TextField/TextField";
 import type { CurrencyInputProps } from "./CurrencyInput.types";
 
@@ -42,18 +43,23 @@ export const CurrencyInput = (props: CurrencyInputProps) => {
     }, [groupDefs]);
 
     return (
-        <TextField
-            {...props}
-            value={field.text}
-            element={"input"}
-            inputMode={"decimal"}
-            computeMaskedText={(previous, next, caret) =>
-                TextSyncUtils.applyGroupedMask(groupDefs, previous, next, caret)
-            }
-            placeholderHint={CurrencyInputUtils.computeHint(groupDefs)}
-            hasError={(props.hasError ?? false) || field.hasIssue}
-            onInput={field.onInput}
-            onBlur={field.onBlur}
-        />
+        <>
+            <TextField
+                {...props}
+                name={undefined}
+                value={field.text}
+                element={"input"}
+                inputMode={"decimal"}
+                computeMaskedText={(previous, next, caret, isForwardDeletion) =>
+                    TextSyncUtils.applyGroupedMask(groupDefs, previous, next, caret, isForwardDeletion)
+                }
+                placeholderHint={CurrencyInputUtils.computeHint(groupDefs)}
+                hasError={(props.hasError ?? false) || field.hasIssue}
+                onInput={field.onInput}
+                onBlur={field.onBlur}
+            />
+
+            <FormValue name={props.name} values={[FormValueUtils.computeText(value) ?? FormValueUtils.EMPTY_TEXT]} />
+        </>
     );
 };

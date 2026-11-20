@@ -213,8 +213,9 @@ export namespace Color {
      * Reads any CSS color string into hue, saturation, value and alpha.
      *
      * Reads hex of any length, `rgb()` and `hsl()` in both the comma and the space syntax, and the named
-     * colors. A value taken through here and written back out comes back unchanged, so a control can hold
-     * its color in this form without it drifting.
+     * colors. A hex value taken through here and written back out as hex comes back unchanged. `rgb()` and `hsl()`
+     * text comes back with its alpha written out (`/ 1`) and may move by a rounding step, and a gray, which has no
+     * hue, comes back with a hue of `0`.
      *
      * @param value The string to read.
      * @returns The color, or `undefined` when the string is not a color this can read. Nothing is
@@ -597,7 +598,8 @@ export namespace Color {
          * Converts to hue, saturation and lightness.
          *
          * @param hsv The color to convert.
-         * @returns The same color as {@link Color.HSL}. The hue is carried across unchanged.
+         * @returns The same color as {@link Color.HSL}. The hue goes through red, green and blue, so a gray's hue,
+         * which a gray does not have, comes out as `0`.
          */
         export const toHsl = (hsv: Color.HSV): Color.HSL => RGB.toHsl(toRgb(hsv));
     }
@@ -729,7 +731,8 @@ export namespace Color {
          * Converts to hue, saturation and value.
          *
          * @param hsl The color to convert.
-         * @returns The same color as {@link Color.HSV}. The hue is carried across unchanged.
+         * @returns The same color as {@link Color.HSV}. The hue goes through red, green and blue, so a gray's hue,
+         * which a gray does not have, comes out as `0`.
          */
         export const toHsv = (hsl: Color.HSL): Color.HSV => RGB.toHsv(toRgb(hsl));
     }

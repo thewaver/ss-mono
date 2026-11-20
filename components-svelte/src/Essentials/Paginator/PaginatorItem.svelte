@@ -1,5 +1,5 @@
 <script lang="ts" generics="TExtra extends object">
-    import { PaginatorStyles as styles } from "@thewaver/ss-components";
+    import { InteractionTrackerUtils, PaginatorStyles as styles, SafeHrefUtils } from "@thewaver/ss-components";
 
     import type { PaginatorItemProps } from "./Paginator.types.js";
 
@@ -8,6 +8,8 @@
     const isDisabled = $derived(props.flags.isDisabled ?? false);
     const ariaCurrent = $derived(props.isCurrent ? ("page" as const) : undefined);
 
+    const safeHref = $derived(SafeHrefUtils.resolve(props.href, "Paginator"));
+
     const handleClick = (e: MouseEvent) => {
         if (isDisabled) {
             e.preventDefault();
@@ -15,11 +17,13 @@
             return;
         }
 
+        if (safeHref !== undefined && !InteractionTrackerUtils.getIsPlainClick(e)) return;
+
         props.onActivate();
     };
 </script>
 
-{#if props.href === undefined}
+{#if safeHref === undefined}
     <button
         {@attach props.attachElement}
         type="button"
@@ -35,7 +39,7 @@
 {:else if props.linkComponent}
     <props.linkComponent
         {@attach props.attachElement}
-        href={props.href}
+        href={safeHref}
         class={styles.paginatorItem}
         id={props.id}
         aria-label={props.ariaLabel}
@@ -48,7 +52,7 @@
 {:else}
     <a
         {@attach props.attachElement}
-        href={props.href}
+        href={safeHref}
         class={styles.paginatorItem}
         id={props.id}
         aria-label={props.ariaLabel}

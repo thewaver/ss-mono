@@ -7,7 +7,7 @@ import type {
     SliceAnimationWeights,
     WeightOpts,
 } from "@thewaver/ss-components";
-import type { Index2d } from "@thewaver/ss-utils";
+import type { Count2d } from "@thewaver/ss-utils";
 
 import type { SVGDefsSourceRatio } from "../PageComponents/SVGDefsSources/SVGDefsSourceSizes.const";
 import type { CellAnimationSourceKind } from "../Pages/CellAnimationPage/CellAnimationPage.types";
@@ -34,7 +34,7 @@ export namespace CellAnimationKnobs {
     export const MAX_HOLD_MS = 5000;
 
     export const STARTING_SOURCE_KIND: CellAnimationSourceKind = "image";
-    export const STARTING_CELL_COUNT: Index2d = { row: 11, col: 11 };
+    export const STARTING_CELL_COUNT: Count2d = { rowCount: 11, colCount: 11 };
     export const STARTING_ORIGIN_KEY: CellAnimationOrigins.OriginType = "center";
     export const STARTING_WEIGHT_KEY: SliceAnimationWeights.WeightType = "diamond_default";
     export const STARTING_ANIMATION_KEY: CellAnimationKeyframes.AnimationType = "zoom_in";

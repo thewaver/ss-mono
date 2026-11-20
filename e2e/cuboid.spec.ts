@@ -155,7 +155,7 @@ const readsUpright = (page: Page) =>
         const [title, body] = [...face.firstElementChild!.children].map((part) => {
             const rect = part.getBoundingClientRect();
 
-            return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+            return { x: rect.left + rect.width * 0.5, y: rect.top + rect.height * 0.5 };
         });
         const down = body!.y - title!.y;
 

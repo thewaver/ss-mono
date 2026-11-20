@@ -1,6 +1,7 @@
 import { Index, Show, createMemo, createSignal, createUniqueId } from "solid-js";
 
 import {
+    InteractionTrackerUtils,
     TAG_INPUT_DEFAULTS,
     type TagInputKeyAction,
     TagInputUtils,
@@ -9,6 +10,7 @@ import {
 
 import { NavigatorSolidUtils } from "../../../Abstracts/Navigator/NavigatorSolid.utils";
 import { SignalMirrorSolidUtils } from "../../../Abstracts/SignalMirror/SignalMirrorSolid.utils";
+import { FormValue } from "../../../Primitives/FormValue/FormValue";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import { access, accessSignal } from "../../../Utils/propUtils";
 import { FormFieldSolidUtils } from "../FormField/FormFieldSolid.utils";
@@ -92,7 +94,7 @@ export const TagInput = (props: TagInputProps) => {
     };
 
     const handleFieldKeyDown = (e: KeyboardEvent) => {
-        if (getIsDisabled()) return;
+        if (getIsDisabled() || InteractionTrackerUtils.getIsComposing(e)) return;
 
         runKeyAction(
             e,
@@ -184,7 +186,6 @@ export const TagInput = (props: TagInputProps) => {
                             }}
                             id={getFieldId()}
                             type="text"
-                            name={access(props.name)}
                             class={styles.tagInputField}
                             style={props.computeTextStyle?.(getFlags)}
                             value={textSignal[0]()}
@@ -193,9 +194,12 @@ export const TagInput = (props: TagInputProps) => {
                             aria-labelledby={getAriaLabelledBy()}
                             aria-describedby={getAriaDescribedBy()}
                             aria-disabled={getFlags().isDisabled || undefined}
+                            aria-invalid={getFlags().hasError || undefined}
                             onInput={(e) => textSignal[1](e.currentTarget.value)}
                             onKeyDown={handleFieldKeyDown}
                         />
+
+                        <FormValue name={props.name} values={getTags} />
 
                         <Show when={props.renderPlaceholder && getIsEmpty() && getTags().length < 1}>
                             <div class={styles.tagInputPlaceholder}>{props.renderPlaceholder!(getFlags)}</div>

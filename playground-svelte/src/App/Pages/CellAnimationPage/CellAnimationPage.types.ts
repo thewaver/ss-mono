@@ -8,10 +8,10 @@ import type {
     SliceAnimationWeights,
     WeightOpts,
 } from "@thewaver/ss-components-svelte";
-import type { Index2d } from "@thewaver/ss-utils";
+import type { Count2d } from "@thewaver/ss-utils";
 
 export type CellAnimationExampleProps = {
-    cellCount: Index2d;
+    cellCount: Count2d;
     originType: CellAnimationOrigins.OriginType;
     weightType: SliceAnimationWeights.WeightType;
     weightOpts: WeightOpts;

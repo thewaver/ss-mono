@@ -77,6 +77,7 @@ export const CornerPin = (props: CornerPinProps) => {
 
         e.preventDefault();
         axisRefs.current[toAxisKey(corner, QuadWarpUtils.AXES[0])]?.focus({ preventScroll: true });
+        setFocusVisible(undefined);
         stopGestureRef.current?.();
 
         const grip = e.currentTarget;

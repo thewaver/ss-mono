@@ -11,5 +11,11 @@
             "@thewaver/ss-playground/*": ["../playground/src/*"]
         }
     },
-    "include": ["src/**/*.ts", "src/**/*.svelte", "../playground/src/global.d.ts", "vite.config.ts"]
+    "include": [
+        "../utils/process-env.d.ts",
+        "src/**/*.ts",
+        "src/**/*.svelte",
+        "../playground/src/global.d.ts",
+        "vite.config.ts"
+    ]
 }

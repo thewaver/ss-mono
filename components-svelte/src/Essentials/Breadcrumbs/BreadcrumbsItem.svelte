@@ -1,5 +1,5 @@
 <script lang="ts" generics="T">
-    import { BreadcrumbsStyles as styles } from "@thewaver/ss-components";
+    import { BreadcrumbsStyles as styles, InteractionTrackerUtils, SafeHrefUtils } from "@thewaver/ss-components";
 
     import type { BreadcrumbsItemProps } from "./Breadcrumbs.types.js";
 
@@ -7,12 +7,16 @@
 
     const isDisabled = $derived(props.flags.isDisabled ?? false);
 
+    const safeHref = $derived(SafeHrefUtils.resolve(props.crumb.href, "Breadcrumbs"));
+
     const handleClick = (e: MouseEvent) => {
         if (isDisabled) {
             e.preventDefault();
 
             return;
         }
+
+        if (safeHref !== undefined && !InteractionTrackerUtils.getIsPlainClick(e)) return;
 
         props.onSelect(props.crumb.value);
     };
@@ -22,7 +26,7 @@
     <span {@attach props.attachElement} class={styles.breadcrumbsCurrent} id={props.crumb.id} aria-current="page">
         {@render props.renderContent(props.flags)}
     </span>
-{:else if props.crumb.href === undefined}
+{:else if safeHref === undefined}
     <button
         {@attach props.attachElement}
         type="button"
@@ -36,7 +40,7 @@
 {:else if props.linkComponent}
     <props.linkComponent
         {@attach props.attachElement}
-        href={props.crumb.href}
+        href={safeHref}
         class={styles.breadcrumbsItem}
         id={props.crumb.id}
         aria-disabled={isDisabled || undefined}
@@ -47,7 +51,7 @@
 {:else}
     <a
         {@attach props.attachElement}
-        href={props.crumb.href}
+        href={safeHref}
         class={styles.breadcrumbsItem}
         id={props.crumb.id}
         aria-disabled={isDisabled || undefined}

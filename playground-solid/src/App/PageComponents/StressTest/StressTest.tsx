@@ -77,7 +77,7 @@ export const StressTest = (props: StressTestProps) => {
                         <div
                             class={styles.itemGrid}
                             style={{
-                                "grid-template-columns": `repeat(${access(props.configs)[getConfigIndex()].cols}, auto)`,
+                                "grid-template-columns": `repeat(${access(props.configs)[getConfigIndex()].colCount}, auto)`,
                                 "gap": `${access(props.configs)[getConfigIndex()].gap}px`,
                             }}
                         >

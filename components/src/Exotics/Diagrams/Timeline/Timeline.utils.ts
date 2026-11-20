@@ -21,8 +21,6 @@ const NOTHING = 0;
 const SINGLE = 1;
 /** Slack for comparing values that arrived by division, where a whole number may be off in its last bits. */
 const EPSILON = 1e-9;
-/** How many steps an edge looks ahead for the next snapped value before giving up. */
-const MAX_SNAP_PROBES = 256;
 /** How many times the gap before the next snapped value is halved, which is past the precision of a double. */
 const MAX_HALVINGS = 64;
 
@@ -210,8 +208,9 @@ export namespace TimelineUtils {
      *
      * @param value Where the edge is.
      * @param direction `1` for later, `-1` for earlier.
-     * @param step How far one press travels when nothing snaps, such as the ruler's tick step, and how far ahead
-     * the next notch is looked for at a time when something does. Zero or less moves nothing.
+     * @param step How far one press travels when nothing snaps, such as the ruler's tick step, and the first
+     * distance the next notch is looked for at when something does; the search doubles from there, so a notch
+     * any distance away inside the range is found. Zero or less moves nothing.
      * @param range Everything the timeline covers. Nothing is looked for beyond it.
      * @param computeSnapValue Rounds a value to where an edge may land. Expected never to decrease as its input
      * grows, which every rounding does.
@@ -234,19 +233,24 @@ export namespace TimelineUtils {
         const snapAt = (distance: number) => clampToRange(computeSnapValue(value + toward * distance));
         const getHasMoved = (distance: number) => (snapAt(distance) - value) * toward > EPSILON;
 
-        let reached: number | undefined;
+        const reach = range.end - range.start + step;
 
-        for (let probe = SINGLE; probe <= MAX_SNAP_PROBES && reached === undefined; probe++) {
-            const distance = step * probe;
+        let short = NOTHING;
+        let far = step;
 
-            if (getHasMoved(distance)) reached = distance;
-            else if (value + toward * distance < range.start || value + toward * distance > range.end) break;
+        while (!getHasMoved(far)) {
+            if (far > reach) return value;
+
+            short = far;
+            far *= 2;
         }
 
-        if (reached === undefined) return value;
+        while (far - short > step) {
+            const middle = (short + far) * 0.5;
 
-        let short = reached - step;
-        let far = reached;
+            if (getHasMoved(middle)) far = middle;
+            else short = middle;
+        }
 
         for (let halving = NOTHING; halving < MAX_HALVINGS; halving++) {
             const middle = (short + far) * 0.5;
@@ -365,22 +369,34 @@ export namespace TimelineUtils {
      * @param groupId The timeline's own group, so no other zone can take it.
      * @param index The item.
      * @param label The item's name, as it is announced.
+     * @param item The item itself, so the hold follows it if the list changes while it is held.
      */
-    export const computeEdgeCarry = (groupId: string, index: number, label: string): Carry => ({
+    export const computeEdgeCarry = (groupId: string, index: number, label: string, item: unknown): Carry => ({
         groupId,
         key: `${index}`,
         label,
-        value: { index } satisfies TimelineEdgeCarry,
+        value: { index, item } satisfies TimelineEdgeCarry,
     });
 
     /**
      * Which item a carry from {@link TimelineUtils.computeEdgeCarry} holds an edge of.
      *
      * @param carry The carry, or `undefined` when nothing is carried.
+     * @param items The items as they are now. The held item is looked up among them, so a list that changed during
+     * the hold still points at the item that was picked up; one no longer in the list holds nothing.
      * @returns The item's index, or `undefined`.
      */
-    export const getCarriedIndex = (carry: Carry | undefined) =>
-        carry === undefined ? undefined : (carry.value as TimelineEdgeCarry).index;
+    export const getCarriedIndex = (carry: Carry | undefined, items: readonly unknown[]) => {
+        if (carry === undefined) return undefined;
+
+        const held = carry.value as TimelineEdgeCarry;
+
+        if (held.item === undefined) return held.index;
+
+        const index = items.indexOf(held.item);
+
+        return index < 0 ? undefined : index;
+    };
 
     /**
      * What a key pressed on the timeline does.
@@ -402,19 +418,19 @@ export namespace TimelineUtils {
         opts: { isHolding: boolean; isEditable: boolean },
     ): TimelineKeyAction | undefined => {
         if (opts.isHolding) {
-            const edge = EDGE_BY_KEY[key];
-            const nudge = NUDGE_BY_KEY[key];
+            const edge = Object.hasOwn(EDGE_BY_KEY, key) ? EDGE_BY_KEY[key] : undefined;
+            const nudge = Object.hasOwn(NUDGE_BY_KEY, key) ? NUDGE_BY_KEY[key] : undefined;
 
             if (key === "Escape") return { kind: "cancel" };
             if (NavigatorUtils.getIsActivationKey(key)) return { kind: "drop" };
             if (edge !== undefined || nudge !== undefined) return { kind: "aim", edge, nudge };
-            if (STEP_BY_KEY[key] !== undefined) return { kind: "ignore" };
+            if (Object.hasOwn(STEP_BY_KEY, key)) return { kind: "ignore" };
         }
 
         if (key === HOLD_KEY && opts.isEditable) return { kind: "hold" };
         if (NavigatorUtils.getIsActivationKey(key)) return { kind: "activate" };
 
-        const step = STEP_BY_KEY[key];
+        const step = Object.hasOwn(STEP_BY_KEY, key) ? STEP_BY_KEY[key] : undefined;
 
         return step === undefined ? undefined : { kind: "step", step };
     };
@@ -468,14 +484,15 @@ export namespace TimelineUtils {
 
                 return moveEdge(span, edge, value, defs.getRange());
             },
-            computeEntryPlace: (carry) => defs.getSpans()[getCarriedIndex(carry)!],
+            computeEntryPlace: (carry) => defs.getSpans()[getCarriedIndex(carry, defs.getItems())!],
             computeIsSamePlace: (first, second) =>
                 asSpan(first).start === asSpan(second).start && asSpan(first).end === asSpan(second).end,
             computeIsPlaceAllowed: () => true,
             computePlaceLabel: (place) => defs.getAnnouncements().computePlaceLabel(defs.getHeldEdge(), asSpan(place)),
             takeAt: () => undefined,
             putAt: () => undefined,
-            moveAt: (_unusedFrom, toPlace, carry) => defs.onSpanChange(getCarriedIndex(carry)!, asSpan(toPlace)),
+            moveAt: (_unusedFrom, toPlace, carry) =>
+                defs.onSpanChange(getCarriedIndex(carry, defs.getItems())!, asSpan(toPlace)),
         };
     };
 }

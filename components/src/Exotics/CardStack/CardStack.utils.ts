@@ -200,7 +200,8 @@ export namespace CardStackUtils {
      * @param key The `key` of the keyboard event.
      * @returns The direction, or `undefined` for a key that is not an arrow.
      */
-    export const getKeyDirection = (key: string) => KEY_DIRECTIONS[key];
+    export const getKeyDirection = (key: string) =>
+        Object.hasOwn(KEY_DIRECTIONS, key) ? KEY_DIRECTIONS[key] : undefined;
 
     /**
      * What one card's painter is told about the push and the flight, which only the top card ever has.
@@ -260,9 +261,12 @@ export namespace CardStackUtils {
 
             leaveTimeout = setTimeout(() => {
                 leaveTimeout = undefined;
-                departures.set(index, direction);
 
                 motion.set({ ...motion.get(), leavingTo: undefined });
+
+                if (defs.getTopIndex() !== index) return;
+
+                departures.set(index, direction);
                 defs.setTopIndex(index + SINGLE);
 
                 defs.onSend?.(direction, card, index);
@@ -364,6 +368,6 @@ export namespace CardStackUtils {
      * @param hasControls Whether the consumer gave `onMount` or shares `topIndex`.
      */
     export const warnIfNoSendRoute = (isSwipeable: boolean, hasControls: boolean) => {
-        if (isSwipeable && !hasControls) console.warn(NO_SEND_ROUTE_WARNING);
+        if (process.env.NODE_ENV !== "production" && isSwipeable && !hasControls) console.warn(NO_SEND_ROUTE_WARNING);
     };
 }

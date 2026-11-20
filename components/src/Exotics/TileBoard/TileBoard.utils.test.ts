@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { Index2d, type Point2d, ShapeConst, type Size2d } from "@thewaver/ss-utils";
+import { type Count2d, Index2d, type Point2d, ShapeConst, type Size2d } from "@thewaver/ss-utils";
 
 import type { TileBoardTilingKind } from "./TileBoard.types";
 import { TileBoardUtils } from "./TileBoard.utils";
 
-const COUNT: Index2d = { row: 5, col: 4 };
+const COUNT: Count2d = { rowCount: 5, colCount: 4 };
 const TILE: Size2d = { width: 80, height: 60 };
 
 const layoutOf = (tiling: TileBoardTilingKind, hasShortFirstRow = false) =>
@@ -154,7 +154,7 @@ describe("getRowLength", () => {
     });
 
     it("never reports a negative length for a board one tile wide", () => {
-        const layout = TileBoardUtils.getLayout("hexagon_pointy_top", { row: 2, col: 1 }, TILE, false, 1);
+        const layout = TileBoardUtils.getLayout("hexagon_pointy_top", { rowCount: 2, colCount: 1 }, TILE, false, 1);
 
         expect(TileBoardUtils.getRowLength(1, layout)).toBe(0);
     });
@@ -204,13 +204,13 @@ describe("getBoardSize", () => {
     });
 
     it("is one tile in each direction for a board of one, where nothing overlaps anything", () => {
-        const layout = TileBoardUtils.getLayout("hexagon_pointy_top", { row: 1, col: 1 }, TILE, false, 1);
+        const layout = TileBoardUtils.getLayout("hexagon_pointy_top", { rowCount: 1, colCount: 1 }, TILE, false, 1);
 
         expect(TileBoardUtils.getBoardSize(layout)).toEqual({ width: 80, height: 60 });
     });
 
     it("takes no room at all when there is nothing to lay out", () => {
-        const layout = TileBoardUtils.getLayout("hexagon_pointy_top", { row: 0, col: 4 }, TILE, false, 1);
+        const layout = TileBoardUtils.getLayout("hexagon_pointy_top", { rowCount: 0, colCount: 4 }, TILE, false, 1);
 
         expect(TileBoardUtils.getBoardSize(layout)).toEqual({ width: 0, height: 0 });
     });
@@ -411,8 +411,8 @@ describe("getTilesWithin", () => {
     it("spreads over a square board as a diamond, which is what four ways out gives", () => {
         const expected = [];
 
-        for (let row = 0; row < COUNT.row; row++) {
-            for (let col = 0; col < COUNT.col; col++) {
+        for (let row = 0; row < COUNT.rowCount; row++) {
+            for (let col = 0; col < COUNT.colCount; col++) {
                 const steps = Math.abs(row - 2) + Math.abs(col - 1);
 
                 if (steps > 0 && steps <= 2) expected.push(`${row}:${col}`);
@@ -564,7 +564,7 @@ describe("computeNextTile", () => {
     });
 
     it("answers nothing for an empty board rather than an index nothing can hold", () => {
-        const layout = TileBoardUtils.getLayout("hexagon_pointy_top", { row: 0, col: 0 }, TILE, false, 1);
+        const layout = TileBoardUtils.getLayout("hexagon_pointy_top", { rowCount: 0, colCount: 0 }, TILE, false, 1);
 
         expect(TileBoardUtils.computeNextTile("ArrowRight", { row: 0, col: 0 }, layout)).toBeUndefined();
     });
@@ -655,7 +655,7 @@ describe("tilings that cut a box into pieces", () => {
         for (const layout of CUT) {
             let covered = 0;
 
-            for (let row = 0; row < COUNT.row; row++) {
+            for (let row = 0; row < COUNT.rowCount; row++) {
                 for (let col = 0; col < TileBoardUtils.getRowLength(row, layout); col++) {
                     covered += areaOf(absolutePoints(at(row, col), layout, 0));
                 }
@@ -690,7 +690,7 @@ describe("tilings that cut a box into pieces", () => {
 
     it("finds every neighbor from both sides, and three for a tile clear of the edges", () => {
         for (const layout of CUT) {
-            for (let row = 0; row < COUNT.row; row++) {
+            for (let row = 0; row < COUNT.rowCount; row++) {
                 for (let col = 0; col < TileBoardUtils.getRowLength(row, layout); col++) {
                     for (const neighbor of TileBoardUtils.getNeighborTiles(at(row, col), layout)) {
                         expect(TileBoardUtils.getNeighborTiles(neighbor, layout), layout.tiling).toContainEqual(
@@ -724,7 +724,7 @@ describe("tilings that cut a box into pieces", () => {
         const layout = layoutOf("hectogon");
 
         expect(layout.pitch.width).toBe(TILE.width);
-        expect(layout.pitch.height).toBeCloseTo((TILE.height * Math.sqrt(3)) / 2);
+        expect(layout.pitch.height).toBeCloseTo(TILE.height * Math.sqrt(3) * 0.5);
         expect(TileBoardUtils.getNeighborTiles(at(2, 2), layout)).toHaveLength(6);
     });
 });

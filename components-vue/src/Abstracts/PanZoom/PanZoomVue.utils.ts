@@ -101,7 +101,10 @@ export namespace PanZoomVueUtils {
         });
 
         const setView = (next: PanZoomView, isImmediate: boolean) => {
-            const clamped = PanZoomUtils.clampView(next, bounds.value);
+            const clamped = PanZoomUtils.clampView(next, {
+                ...bounds.value,
+                canCenterEdges: defs.getCanCenterEdges?.(next) ?? false,
+            });
 
             if (PanZoomUtils.getIsSameView(clamped, view.value)) return false;
 

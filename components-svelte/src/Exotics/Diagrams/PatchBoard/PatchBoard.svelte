@@ -70,7 +70,9 @@
         getIsZoomable: () => isZoomable,
     });
 
-    $effect(() => untrack(() => props.onMount?.(panZoom.controller)));
+    $effect(() => {
+        untrack(() => props.onMount?.(panZoom.controller));
+    });
 
     const layoutWidth = $derived(props.boardWidth ?? getWindowSize().width);
 
@@ -150,7 +152,30 @@
     const carriedValue = $derived(isSource ? (CarrierSvelteUtils.getCarry()?.value as PatchBoardCarry<T>) : undefined);
     const carriedNodeKey = $derived(carriedValue?.kind === "node" ? CarrierSvelteUtils.getCarry()?.key : undefined);
     const plugSource = $derived(carriedValue?.kind === "plug" ? carriedValue.from : undefined);
-    const aimedPlace = $derived(isSource ? (CarrierSvelteUtils.getTargetPlace() as PatchBoardPlace) : undefined);
+    const aimedPlace = $derived(
+        isSource && CarrierSvelteUtils.getTargetZone() === zone
+            ? (CarrierSvelteUtils.getTargetPlace() as PatchBoardPlace)
+            : undefined,
+    );
+
+    const isCarriedAway = $derived(
+        carriedNodeKey !== undefined &&
+            CarrierSvelteUtils.getTargetZone() !== undefined &&
+            CarrierSvelteUtils.getTargetZone() !== zone,
+    );
+    const incomingValue = $derived(
+        CarrierSvelteUtils.getCarry() !== undefined &&
+            CarrierSvelteUtils.getSourceZone() !== zone &&
+            CarrierSvelteUtils.getTargetZone() === zone
+            ? (CarrierSvelteUtils.getCarry()?.value as PatchBoardCarry<T>)
+            : undefined,
+    );
+    const incomingNode = $derived(incomingValue?.kind === "node" ? incomingValue.node : undefined);
+    const incomingSpot = $derived.by(() => {
+        const place = CarrierSvelteUtils.getTargetPlace() as PatchBoardPlace | undefined;
+
+        return incomingNode && place?.kind === "spot" ? place : undefined;
+    });
 
     const placements = $derived(PatchBoardUtils.getPlacements(nodes, props.computeNodeKey, carriedNodeKey, aimedPlace));
     const placementByKey = $derived(new Map(placements.map((placement) => [placement.key, placement])));
@@ -165,7 +190,9 @@
 
     const cableDefs = $derived(
         PatchBoardUtils.getCableDefs(
-            links,
+            isCarriedAway
+                ? links.filter((link) => link.from.nodeKey !== carriedNodeKey && link.to.nodeKey !== carriedNodeKey)
+                : links,
             placedByEndKey,
             orientation,
             plugSource && aimedPlace
@@ -334,6 +361,7 @@
                 style:top={PlacementUtils.toContainerWidth(placement?.spot.y ?? node.spot.y)}
                 style:width={PlacementUtils.toContainerWidth(node.sizeShare.width)}
                 style:height={PlacementUtils.toContainerWidth(node.sizeShare.height)}
+                style:visibility={isCarriedAway && carriedNodeKey === nodeKey ? "hidden" : undefined}
             >
                 <div class={styles.patchBoardNodeHolder}>
                     <InteractionWrapper
@@ -376,6 +404,24 @@
                 {/each}
             </div>
         {/each}
+
+        {#if incomingNode && incomingSpot}
+            <div
+                class={styles.patchBoardSlot}
+                aria-hidden="true"
+                inert
+                style:left={PlacementUtils.toContainerWidth(incomingSpot.x)}
+                style:top={PlacementUtils.toContainerWidth(incomingSpot.y)}
+                style:width={PlacementUtils.toContainerWidth(incomingNode.sizeShare.width)}
+                style:height={PlacementUtils.toContainerWidth(incomingNode.sizeShare.height)}
+            >
+                <div class={styles.patchBoardNodeHolder}>
+                    <div class={styles.patchBoardNode}>
+                        {@render props.renderNode(incomingNode, { isCarried: true })}
+                    </div>
+                </div>
+            </div>
+        {/if}
     </div>
 {/snippet}
 

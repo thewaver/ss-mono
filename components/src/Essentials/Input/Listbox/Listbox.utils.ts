@@ -68,6 +68,8 @@ export namespace ListboxUtils {
             const isReachable = InteractionTrackerUtils.computeIsReachable(
                 option.isDisabled ?? false,
                 option.isReachableWhenDisabled ?? false,
+                false,
+                true,
             );
 
             if (!option.isDisabled || isReachable) acc.push(index);
@@ -451,6 +453,10 @@ export namespace ListboxUtils {
                 isFiltering: defs.getIsFiltering?.() ?? false,
             });
 
+        const readHeldIndex = (options: SelectOption<T, D>[], navigable: number[]) =>
+            navigable.find((index) => options[index].value === store.get().highlightedValue) ??
+            navigable.find((index) => options[index].value === defs.getSelectedOptions()[0]?.value);
+
         const getHighlightedIndex = () => {
             const options = SelectUtils.getFlatOptions(defs.getOptions());
 
@@ -482,7 +488,7 @@ export namespace ListboxUtils {
         };
 
         const handleKeyDown = (e: KeyboardEvent) => {
-            if (defs.getIsDisabled()) return;
+            if (defs.getIsDisabled() || InteractionTrackerUtils.getIsComposing(e)) return;
 
             const options = SelectUtils.getFlatOptions(defs.getOptions());
             const navigable = getNavigableIndexes(options);
@@ -502,7 +508,10 @@ export namespace ListboxUtils {
                 defs.onOpen?.();
 
                 const listboxId = defs.getListboxId();
-                const from = navigable.indexOf(readHighlightedIndex(options, navigable) ?? -1);
+                const startIndex = isOpen
+                    ? readHighlightedIndex(options, navigable)
+                    : readHeldIndex(options, navigable);
+                const from = navigable.indexOf(startIndex ?? -1);
                 const position = TypeaheadUtils.computeNextIndex(query, from, navigable.length, (index) =>
                     computeOptionText(listboxId, navigable[index], options[navigable[index]], defs.computeCustomText),
                 );
@@ -556,7 +565,8 @@ export namespace ListboxUtils {
 
             const isStep = e.key !== FIRST_KEY && e.key !== LAST_KEY;
             const hasWrapped =
-                (position === 0 && from === navigable.length - 1) || (position === navigable.length - 1 && from === 0);
+                position !==
+                NavigatorUtils.computeNextPosition(e.key, from, navigable.length, { ...walkOpts, isLooping: false });
 
             if (isStep && hasWrapped && getHasMoreOptions()) return;
 

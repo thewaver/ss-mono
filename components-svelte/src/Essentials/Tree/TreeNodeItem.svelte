@@ -1,7 +1,7 @@
 <script lang="ts">
     import { on } from "svelte/events";
 
-    import { TreeStyles as styles } from "@thewaver/ss-components";
+    import { InteractionTrackerUtils, SafeHrefUtils, TreeStyles as styles } from "@thewaver/ss-components";
 
     import type { TreeNodeItemProps } from "./Tree.types.js";
 
@@ -13,6 +13,8 @@
     const ariaSelected = $derived(props.isMultiple ? undefined : props.flags.isSelected);
     const ariaChecked = $derived(props.isMultiple ? props.flags.checkedState : undefined);
 
+    const safeHref = $derived(SafeHrefUtils.resolve(props.href, "Tree"));
+
     const handleClick = (e: MouseEvent) => {
         if (isDisabled) {
             e.preventDefault();
@@ -20,11 +22,13 @@
             return;
         }
 
+        if (safeHref !== undefined && !InteractionTrackerUtils.getIsPlainClick(e)) return;
+
         props.onActivate(e);
     };
 </script>
 
-{#if props.href === undefined}
+{#if safeHref === undefined}
     <div
         {@attach props.attachElement}
         {@attach (element) => on(element, "click", handleClick)}
@@ -45,7 +49,7 @@
 {:else if props.linkComponent}
     <props.linkComponent
         {@attach props.attachElement}
-        href={props.href}
+        href={safeHref}
         class={styles.treeNode}
         role="treeitem"
         id={props.id}
@@ -64,7 +68,7 @@
 {:else}
     <a
         {@attach props.attachElement}
-        href={props.href}
+        href={safeHref}
         class={styles.treeNode}
         role="treeitem"
         id={props.id}

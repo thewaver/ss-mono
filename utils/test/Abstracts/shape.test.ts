@@ -448,11 +448,11 @@ describe("ShapeUtils.getRectPadding", () => {
         });
     });
 
-    it("varies per side, in CSS order", () => {
+    it("pads both sides a rounded corner joins, and only those, in CSS order", () => {
         const padding = ShapeUtils.getRectPadding([0, 0, 0, 0], [0, 20, 0, 0]);
 
-        expect(padding["padding-top"]).toBe("0px");
-        expect(padding["padding-right"]).not.toBe("0px");
+        expect(padding["padding-top"]).not.toBe("0px");
+        expect(padding["padding-right"]).toBe(padding["padding-top"]);
         expect(padding["padding-bottom"]).toBe("0px");
         expect(padding["padding-left"]).toBe("0px");
     });
@@ -627,5 +627,85 @@ describe("ShapeUtils.attachArrow", () => {
 
         expect(ShapeUtils.attachArrow(geometry, undefined, ARROW)).toBe(geometry);
         expect(ShapeUtils.attachArrow(geometry, { point: { x: 50, y: 40 }, angle: -90 }, ARROW)).toBe(geometry);
+    });
+});
+
+describe("ShapeUtils.getPaths caching", () => {
+    it("draws a notched corner differently from a square one, whichever is drawn first", () => {
+        const square = [
+            { x: 0, y: 0 },
+            { x: 100, y: 0 },
+            { x: 100, y: 100 },
+            { x: 0, y: 100 },
+        ];
+        const radii = square.map(() => 20);
+        const squareCorners = ShapeUtils.getPaths(
+            square,
+            [0],
+            radii,
+            square.map(() => Infinity),
+        );
+        const notchedCorners = ShapeUtils.getPaths(
+            square,
+            [0],
+            radii,
+            square.map(() => -Infinity),
+        );
+
+        expect(notchedCorners.outerPath).not.toBe(squareCorners.outerPath);
+    });
+});
+
+describe("ShapeUtils.getPaths on a concave shape", () => {
+    it("draws the stroke inside every edge of a U, the ones facing its middle included", () => {
+        const u = [
+            { x: 0, y: 0 },
+            { x: 30, y: 0 },
+            { x: 30, y: 30 },
+            { x: 20, y: 30 },
+            { x: 20, y: 10 },
+            { x: 10, y: 10 },
+            { x: 10, y: 30 },
+            { x: 0, y: 30 },
+        ];
+        const { innerPoints } = ShapeUtils.getPaths(u, [2]);
+
+        expect(innerPoints.length).toBe(u.length);
+        expect(innerPoints.every((point) => PolygonUtils.getIsPointInside(u, point))).toBe(true);
+
+        const reversed = [...u].reverse();
+        const { innerPoints: reversedInnerPoints } = ShapeUtils.getPaths(reversed, [2]);
+
+        expect(reversedInnerPoints.every((point) => PolygonUtils.getIsPointInside(reversed, point))).toBe(true);
+    });
+});
+
+describe("ShapeUtils.getInnerRect on a dented shape", () => {
+    const STARS = ShapeConst.DEFAULT_SHAPES.filter((name) => name.endsWith("_star"));
+
+    it.each(STARS)("keeps the rectangle inside every notch of a %s", (name) => {
+        const points = ShapeConst.getDefaultShapePoints(name, { width: 200, height: 200 });
+        const rect = ShapeUtils.getInnerRect(points);
+        const inset = 0.5;
+        const probes = [
+            { x: rect.x + inset, y: rect.y + inset },
+            { x: rect.x + rect.width - inset, y: rect.y + inset },
+            { x: rect.x + inset, y: rect.y + rect.height - inset },
+            { x: rect.x + rect.width - inset, y: rect.y + rect.height - inset },
+            { x: rect.x + rect.width * 0.5, y: rect.y + inset },
+            { x: rect.x + inset, y: rect.y + rect.height * 0.5 },
+        ];
+
+        expect(rect.width * rect.height).toBeGreaterThan(0);
+        expect(probes.every((point) => PolygonUtils.getIsPointInside(points, point))).toBe(true);
+        expect(
+            points.some(
+                (corner) =>
+                    corner.x > rect.x &&
+                    corner.x < rect.x + rect.width &&
+                    corner.y > rect.y &&
+                    corner.y < rect.y + rect.height,
+            ),
+        ).toBe(false);
     });
 });

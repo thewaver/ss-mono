@@ -1,6 +1,6 @@
 import { type Locator, type Page, expect, test } from "@playwright/test";
 
-import { docsDemo, docsSettled } from "./helpers";
+import { docsDemo, docsSettled, tabKey } from "./helpers";
 
 const DOCS = "/src/App/Pages/Menus/FlyoutMenuPage/Docs";
 
@@ -11,7 +11,7 @@ const DOCS = "/src/App/Pages/Menus/FlyoutMenuPage/Docs";
  * point at the same element and only the open entry's toggle says it is expanded.
  *
  * Entries and links are found by the text the page gives them and toggles by the name the library gives them, since
- * the toggle's name is what a screen reader hears; nothing here reads a colour or a size.
+ * the toggle's name is what a screen reader hears; nothing here reads a color or a size.
  */
 const SHOP = docsDemo(DOCS, "Basic");
 const NARROW = docsDemo(DOCS, "Narrow");
@@ -130,11 +130,11 @@ test("the bar's highlight sits behind the hovered entry's link and toggle togeth
 
 test("tabbing along the bar stops on each link and toggle and opens nothing", async ({ page }) => {
     await linkIn(page, SHOP, "Clothing").focus();
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
 
     expect(await toggleIn(page, SHOP, "Clothing").evaluate((element) => element === document.activeElement)).toBe(true);
 
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
 
     expect(await activeText(page), "the next stop is the next entry's link").toBe("Homeware");
     await expect(page.locator(`${SHOP} button[aria-expanded="true"]`), "and nothing opened on the way").toHaveCount(0);
@@ -169,9 +169,9 @@ test("Tab past the panel's last link goes on to the next entry and closes the pa
     await page.keyboard.press("Enter");
     await expect.poll(() => activeText(page)).toBe("Shirts");
 
-    await page.keyboard.press("Tab");
-    await page.keyboard.press("Tab");
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
+    await page.keyboard.press(tabKey(page));
+    await page.keyboard.press(tabKey(page));
 
     await expect.poll(() => activeText(page), "focus carries on along the bar").toBe("Homeware");
     await expect(toggle, "and the panel it left has closed").toHaveAttribute("aria-expanded", "false");

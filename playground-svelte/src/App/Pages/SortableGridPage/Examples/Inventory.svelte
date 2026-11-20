@@ -21,7 +21,7 @@
     import PageSortableGridLanding from "../../../StyledComponents/SortableGridContent/PageSortableGridLanding.svelte";
     import PageSortableGridSurface from "../../../StyledComponents/SortableGridContent/PageSortableGridSurface.svelte";
     import type { SortableGridPaint } from "../../../StyledComponents/SortableGridContent/SortableGridContentSvelte.types";
-    import { CELL_SIZE, GRID_GAP, PACK_COLUMNS, PACK_ROWS, computeGearHue, computeGearKey, computeGearLabel, TURN_COUNTERCLOCKWISE_LABEL } from "@thewaver/ss-playground/App/Pages/SortableGridPage/SortableGridPage.const";
+    import { CELL_SIZE, GRID_GAP, PACK_COLUMNS, PACK_ROWS, computeGearHue, computeGearAriaLabel, computeGearKey, computeGearLabel, TURN_COUNTERCLOCKWISE_LABEL } from "@thewaver/ss-playground/App/Pages/SortableGridPage/SortableGridPage.const";
 
     type Props = {
         groupId: string;
@@ -152,6 +152,7 @@
         bind:items
         computeItemKey={computeGearKey}
         computeItemLabel={computeGearLabel}
+        computeItemAriaLabel={computeGearAriaLabel}
         computeCanAccept={props.computeCanAccept}
         computeIsSpotBlocked={props.computeIsSpotBlocked}
         renderItem={renderGear}

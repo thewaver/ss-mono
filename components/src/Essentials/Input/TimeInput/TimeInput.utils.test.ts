@@ -56,3 +56,9 @@ describe("TimeInputUtils.computeStep", () => {
         expect(TimeInputUtils.computeStep("ArrowUp", undefined, 0)).toBeUndefined();
     });
 });
+
+describe("TimeInputUtils.toText on a field with seconds", () => {
+    it("reads a time given without seconds as :00", () => {
+        expect(TimeInputUtils.toText({ hour: 9, minute: 30 }, false, true)).toBe("09:30:00");
+    });
+});

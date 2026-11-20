@@ -1,20 +1,19 @@
-import { type CSSAnimationValues, type Index2d, MathUtils, type Size2d } from "@thewaver/ss-utils";
+import { type CSSAnimationValues, type Count2d, type Index2d, MathUtils, type Size2d } from "@thewaver/ss-utils";
 
 import type { SliceAnimationSlice, SliceAnimationTiming } from "../../../Abstracts/SliceAnimation/SliceAnimation.types";
 import { SliceAnimationUtils } from "../../../Abstracts/SliceAnimation/SliceAnimation.utils";
 import type { SliceAnimationFn } from "../../../Generators/SliceAnimationKeyframes/SliceAnimationKeyframes.types";
-import type { CellAnimationFinalFrame, SliceAnimationEvaluationDefs } from "./CellAnimation.types";
+import type {
+    CellAnimationCellBounds,
+    CellAnimationCellDefs,
+    CellAnimationFinalFrame,
+    SliceAnimationEvaluationDefs,
+} from "./CellAnimation.types";
 
 const DEFAULT_CELL_WEIGHT = 0;
 const PERSPECTIVE_RATIO = 1.5;
 const BLEED_PX = 1;
 const DEPTH_STEPS = 100;
-
-/** A cell's place in the grid and its share of the drawing, before its size is known. */
-export type CellAnimationCellDefs = Omit<SliceAnimationEvaluationDefs, "size">;
-
-/** Where a cell sits and how large it is, in the animation's own pixels. */
-export type CellAnimationCellBounds = { col: number; row: number; width: number; height: number };
 
 /**
  * Cuts a picture into a grid of cells, applies a sample's numbers to each cell, and answers which cells alternate with
@@ -24,6 +23,8 @@ export type CellAnimationCellBounds = { col: number; row: number; width: number;
  * or a checkerboard alternate direction across the grid. The clock and the timing every slice animation shares are in
  * `SliceAnimationUtils`. `ParticleField` runs on the same grid and the same clock.
  */
+const CSS_STRING_BREAKERS = /["\\\n\r]/g;
+
 export namespace CellAnimationUtils {
     /**
      * Whether a cell sits on an even row.
@@ -66,9 +67,9 @@ export namespace CellAnimationUtils {
      * @param requested The count asked for, across and down.
      * @param size The room the grid has.
      */
-    export const computeCellCount = (requested: Index2d, size: Size2d): Index2d => ({
-        col: MathUtils.clamp(Math.round(requested.col), 1, Math.max(Math.round(size.width), 1)),
-        row: MathUtils.clamp(Math.round(requested.row), 1, Math.max(Math.round(size.height), 1)),
+    export const computeCellCount = (requested: Count2d, size: Size2d): Count2d => ({
+        colCount: MathUtils.clamp(Math.round(requested.colCount), 1, Math.max(Math.round(size.width), 1)),
+        rowCount: MathUtils.clamp(Math.round(requested.rowCount), 1, Math.max(Math.round(size.height), 1)),
     });
 
     /**
@@ -77,7 +78,7 @@ export namespace CellAnimationUtils {
      * @param a One count.
      * @param b The other.
      */
-    export const getIsSameCount = (a: Index2d, b: Index2d) => a.col === b.col && a.row === b.row;
+    export const getIsSameCount = (a: Count2d, b: Count2d) => a.colCount === b.colCount && a.rowCount === b.rowCount;
 
     /**
      * Where the lines between cells fall along one side, rounded to whole pixels.
@@ -116,9 +117,9 @@ export namespace CellAnimationUtils {
      * @param count The grid's size in cells.
      * @param weights A weight per cell, by row then column. A cell with none counts as `0`.
      */
-    export const computeCellDefs = (count: Index2d, weights: number[][]): CellAnimationCellDefs[] =>
-        Array.from({ length: count.col * count.row }, (_, idx) => {
-            const pos = { col: idx % count.col, row: Math.floor(idx / count.col) };
+    export const computeCellDefs = (count: Count2d, weights: number[][]): CellAnimationCellDefs[] =>
+        Array.from({ length: count.colCount * count.rowCount }, (_, idx) => {
+            const pos = { col: idx % count.colCount, row: Math.floor(idx / count.colCount) };
 
             return { pos, count, weight: weights[pos.row]?.[pos.col] ?? DEFAULT_CELL_WEIGHT };
         });
@@ -165,11 +166,14 @@ export namespace CellAnimationUtils {
      * A source as a CSS image, quoted.
      *
      * A drawn source is a data URI carrying parentheses, which CSS refuses inside an unquoted `url()` — the cells
-     * would paint nothing while the box still sized itself.
+     * would paint nothing while the box still sized itself. A double quote, a backslash or a line break inside the
+     * address is percent-encoded, so a hand-written SVG data address with quoted attributes does not end the string
+     * early.
      *
      * @param src The source's address.
      */
-    export const toSourceImage = (src: string) => `url("${src}")`;
+    export const toSourceImage = (src: string) =>
+        `url("${src.replace(CSS_STRING_BREAKERS, (character) => encodeURIComponent(character))}")`;
 
     /**
      * What the grid shows, given how many passes have run.

@@ -141,6 +141,7 @@ export type PatchBoardCarry<T> =
     | {
           kind: "node";
           node: PatchBoardNode<T>;
+          grabRatio: Point2d;
       }
     | {
           kind: "plug";
@@ -238,7 +239,10 @@ export type PatchBoardHandle<T> = {
 };
 
 export type BasePatchBoardValues = {
-    /** Identifies the board, so two boards can tell their own sockets from each other's. */
+    /**
+     * The group the board's nodes and cables belong to. Boards with different ids keep their own apart; boards that
+     * share one let a node be dragged or carried from one into another, landing where it was held.
+     */
     groupId: string;
     /** Names the board for assistive technology. */
     ariaLabel: string;

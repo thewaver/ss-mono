@@ -2,7 +2,7 @@
     "name": "@thewaver/ss-components",
     "type": "module",
     "version": "0.0.6",
-    "description": "The framework-free core of the ss-components libraries: behavior, styles and types shared by @thewaver/ss-components-solid and @thewaver/ss-components-react.",
+    "description": "The framework-free core of the ss-components libraries: behavior, styles and types shared by @thewaver/ss-components-solid, @thewaver/ss-components-react, @thewaver/ss-components-vue and @thewaver/ss-components-svelte.",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
     "exports": {
@@ -24,6 +24,9 @@
         "dist"
     ],
     "license": "MIT",
+    "publishConfig": {
+        "access": "public"
+    },
     "author": "Luís Santos",
     "repository": {
         "type": "git",

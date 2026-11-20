@@ -1,5 +1,5 @@
 import {
-    type Index2d,
+    type Count2d,
     Index2dUtils,
     MathUtils,
     type Point2d,
@@ -75,16 +75,16 @@ export namespace ParticleFieldUtils {
      * @param contour From {@link computeContour}. A cell whose center is outside it is left out.
      */
     export const computeCells = (
-        count: Index2d,
+        count: Count2d,
         size: Size2d,
         weights: number[][],
         contour: Point2d[] | undefined,
     ): ParticleFieldCellDefs[] => {
-        const cellSize = { width: size.width / count.col, height: size.height / count.row };
+        const cellSize = { width: size.width / count.colCount, height: size.height / count.rowCount };
         const cells: ParticleFieldCellDefs[] = [];
 
-        for (let row = 0; row < count.row; row++) {
-            for (let col = 0; col < count.col; col++) {
+        for (let row = 0; row < count.rowCount; row++) {
+            for (let col = 0; col < count.colCount; col++) {
                 const rect = { x: col * cellSize.width, y: row * cellSize.height, ...cellSize };
 
                 if (contour && !PolygonUtils.getIsPointInside(contour, RectUtils.getCenter(rect))) continue;
@@ -120,7 +120,7 @@ export namespace ParticleFieldUtils {
     export const createRoster = (seed = Math.floor(Math.random() * HASH_RANGE)) => {
         let byCell = new Map<number, ParticleFieldParticle>();
         let particles = NO_PARTICLES;
-        let grid: Index2d | undefined;
+        let grid: Count2d | undefined;
 
         const clear = () => {
             byCell = new Map();
@@ -144,7 +144,7 @@ export namespace ParticleFieldUtils {
              * or left, the list is the same array as before.
              */
             refresh: (defs: {
-                count: Index2d;
+                count: Count2d;
                 cells: ParticleFieldCellDefs[];
                 clockMs: number;
                 durationMs: number;
@@ -154,7 +154,7 @@ export namespace ParticleFieldUtils {
                 hasEnded: boolean;
                 computeParticlePos?: (cell: ParticleFieldCellDefs) => Point2d;
             }) => {
-                if (grid && (grid.col !== defs.count.col || grid.row !== defs.count.row)) clear();
+                if (grid && (grid.colCount !== defs.count.colCount || grid.rowCount !== defs.count.rowCount)) clear();
 
                 grid = defs.count;
 
@@ -168,7 +168,7 @@ export namespace ParticleFieldUtils {
 
                         if (defs.clockMs < spawnMs || defs.clockMs >= spawnMs + defs.lifetimeMs) continue;
 
-                        const key = Index2dUtils.toFlatIndex(cell.pos, cell.count.col);
+                        const key = Index2dUtils.toFlatIndex(cell.pos, cell.count.colCount);
 
                         if (RandomUtils.hash(seed, defs.pass, key) >= defs.spawnChance) continue;
 

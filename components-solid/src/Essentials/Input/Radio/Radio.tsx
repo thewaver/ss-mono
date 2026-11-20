@@ -1,4 +1,4 @@
-import { Show, createSignal } from "solid-js";
+import { Show, createSignal, onMount } from "solid-js";
 
 import { InteractionTrackerUtils } from "@thewaver/ss-components";
 import { PlacementConst } from "@thewaver/ss-components/internal";
@@ -23,6 +23,7 @@ export const Radio = <T,>(props: RadioProps<T>) => {
             getIsDisabled(),
             access(props.isReachableWhenDisabled) ?? false,
             access(props.isFocusableWhenDisabled) ?? false,
+            access(props.tooltipDefs) !== undefined,
         );
 
     const entry = {
@@ -33,6 +34,8 @@ export const Radio = <T,>(props: RadioProps<T>) => {
     };
 
     context.register(entry);
+
+    onMount(() => context.reorder());
 
     const getPlacement = () => context.computePlacement(entry);
 

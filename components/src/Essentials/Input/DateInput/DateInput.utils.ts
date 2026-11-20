@@ -73,17 +73,19 @@ export namespace DateInputUtils {
      * refuse.
      *
      * @param anchor Any date in the year the field is typing into, usually its value or today.
-     * @returns A range per part: years run to the length of the era, months to the calendar's count for the year.
+     * @returns A range per part: years run to the length of the era, months to the most any year of the calendar
+     * has — thirteen in the Hebrew one, whose leap years add a month — so a month only some years have is refused
+     * by the whole date, as a day only some months have is.
      */
     export const computeBounds = (anchor: DateValue): Bounds => {
-        const monthCount = DateValueUtils.getMonthsInYear(anchor);
-        const dayCeiling = Array.from({ length: monthCount }, (_, month) =>
-            DateValueUtils.getDaysInMonth(anchor.set({ month: month + 1, day: 1 })),
+        const yearStart = DateValueUtils.getStartOfYear(anchor);
+        const dayCeiling = Array.from({ length: DateValueUtils.getMonthsInYear(anchor) }, (_, month) =>
+            DateValueUtils.getDaysInMonth(DateValueUtils.addMonths(yearStart, month)),
         ).reduce((longest, days) => Math.max(longest, days), 1);
 
         return {
             year: { min: 1, max: DateValueUtils.getYearsInEra(anchor) },
-            month: { min: 1, max: monthCount },
+            month: { min: 1, max: DateValueUtils.getMaxMonthsInYear(anchor) },
             day: { min: 1, max: dayCeiling },
         };
     };

@@ -27,6 +27,7 @@ export type PolygonCrossing = PolygonContourPoint & {
     distance: number;
 };
 
+/** Geometry of polygons: edges, intersections, area, containment and regular polygons' sizes. */
 export namespace PolygonUtils {
     /**
      * Formats points for an SVG `points` attribute, as in `"0,0 10,0 10,10"`.

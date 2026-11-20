@@ -29,8 +29,10 @@
     import ValueReport from "../../../Utils/ValueReport.svelte";
     import Tooltip from "../../Overlays/Tooltip/Tooltip.svelte";
     import DateInput from "../DateInput/DateInput.svelte";
+    import { FormFieldSvelteUtils } from "../FormField/FormFieldSvelte.utils.svelte.js";
     import RangeCalendar from "../RangeCalendar/RangeCalendar.svelte";
     import type { DateRangePickerProps } from "./DateRangePicker.types.js";
+    import DateRangePickerFieldsScope from "./DateRangePickerFieldsScope.svelte";
 
     const toMonth = (value: DateValue, calendar: DateValueCalendarId): DateValue =>
         DateValueUtils.getStartOfMonth(DateValueUtils.withCalendar(value, calendar));
@@ -121,15 +123,29 @@
         TextFieldUtils.mergeFlags([startFlags, endFlags].flatMap((flags) => (flags ? [flags] : []))),
     );
 
-    const tooltipDefs = $derived.by(() => {
-        const defs = props.tooltipDefs;
-        const isReachable = InteractionTrackerUtils.computeIsReachable(
+    const isReachable = $derived(
+        InteractionTrackerUtils.computeIsReachable(
             isDisabled,
             props.isReachableWhenDisabled ?? false,
-        );
+            false,
+            props.tooltipDefs !== undefined,
+        ),
+    );
+
+    const tooltipDefs = $derived.by(() => {
+        const defs = props.tooltipDefs;
 
         return defs && (!isDisabled || isReachable) ? defs : undefined;
     });
+
+    $effect(() =>
+        InteractionTrackerUtils.warnIfReachableWithoutTooltip(
+            props.isReachableWhenDisabled ?? false,
+            props.tooltipDefs !== undefined,
+        ),
+    );
+
+    const getGroupLabelledBy = FormFieldSvelteUtils.resolveAriaLabelledBy();
 
     let lastTooltipDefs: typeof props.tooltipDefs;
 
@@ -219,7 +235,8 @@
     {@render props.renderPopup(renderCalendar, monthPair, visibilityTarget, transitionDurationMs)}
 {/snippet}
 
-<div bind:this={root} class={styles.dateRangePickerRoot}>
+<div bind:this={root} class={styles.dateRangePickerRoot} role="group" aria-labelledby={getGroupLabelledBy()}>
+    <DateRangePickerFieldsScope>
     <DateInput
         {...props}
         bind:value={start[0], start[1]}
@@ -228,6 +245,7 @@
         name={props.name && `${props.name}-start`}
         ariaLabel={props.startLabel}
         tooltipDefs={undefined}
+        isFocusableWhenDisabled={isReachable}
         renderContent={startContent}
     />
 
@@ -241,9 +259,11 @@
         name={props.name && `${props.name}-end`}
         ariaLabel={props.endLabel}
         tooltipDefs={undefined}
+        isFocusableWhenDisabled={isReachable}
         renderContent={endContent}
         renderTrailing={trailing}
     />
+    </DateRangePickerFieldsScope>
 
     <Popover
         id={popupId}

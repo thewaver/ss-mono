@@ -1,4 +1,4 @@
-import { MathUtils, ObjectUtils, RotationUtils, StoreUtils } from "@thewaver/ss-utils";
+import { MathUtils, ObjectUtils, RotationUtils, StoreUtils, StringUtils } from "@thewaver/ss-utils";
 
 import type {
     SlotTextDirection,
@@ -82,7 +82,7 @@ export namespace SlotTextUtils {
     export const getSlots = (text: string, letters = ""): SlotTextSlot[] => {
         let wheelIndex = NO_WHEEL;
 
-        return Array.from(text).map((character) => {
+        return StringUtils.splitGraphemes(text).map((character) => {
             const isDigit = character >= "0" && character <= "9";
             const isLetter = !isDigit && letters.includes(character);
 
@@ -525,7 +525,7 @@ export namespace SlotTextUtils {
      * The flaps a split-flap column draws at a drawn position, and where among them it stands.
      *
      * Three flaps are enough to draw any moment, and they are handed out afresh as the column moves, so a column
-     * travelling through forty characters still draws three. The one that fell last lies below the middle line and
+     * traveling through forty characters still draws three. The one that fell last lies below the middle line and
      * shows the bottom half of the character on show; the one on show carries that character's top half on its front
      * and the next character's bottom half on its back; the next one stands behind it with the next character's top
      * half. Laid out by `SpineUtils.leaves` at the position given, the column reads as one character while the flap

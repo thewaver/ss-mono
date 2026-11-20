@@ -187,7 +187,8 @@ export type CarouselGroupProps =
            * — reachable, read out and at rest in the placement, which measures distances from the group's middle.
            *
            * What comes back is checked: each range is held inside the list and to whole slides, empty ones are dropped
-           * and the rest put in order of their start, with a console warning whenever anything had to be fixed. With
+           * and the rest put in order of their start, with a console warning in development whenever anything had to be
+           * fixed. With
            * nothing usable left, every slide becomes its own group, also with a warning.
            */
           computeGroups: CarouselGroupFn;

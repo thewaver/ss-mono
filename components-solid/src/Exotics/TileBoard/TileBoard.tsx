@@ -121,6 +121,8 @@ export const TileBoard = (props: TileBoardProps) => {
 
     const handleKeyDown = (e: KeyboardEvent) => {
         const roving = getRovingTile();
+
+        if (e.target !== tileRefs.get(Index2d.toString(roving))) return;
         const action = TileBoardUtils.computeKeyAction(e.key, e.ctrlKey || e.metaKey, roving, getLayout());
 
         if (action === undefined) return;
@@ -194,7 +196,7 @@ export const TileBoard = (props: TileBoardProps) => {
             classList={{ [styles.tileBoardIsSweepable]: getIsSweepable() }}
             role="grid"
             aria-label={access(props.ariaLabel)}
-            aria-rowcount={getLayout().count.row}
+            aria-rowcount={getLayout().count.rowCount}
             aria-colcount={TileBoardUtils.getColumnCount(getLayout())}
             aria-disabled={getIsDisabled() || undefined}
             style={{ width: `${getBoardSize().width}px`, height: `${getBoardSize().height}px` }}
@@ -202,7 +204,7 @@ export const TileBoard = (props: TileBoardProps) => {
             onPointerDown={(e) => sweeper.press(e)}
         >
             <div class={styles.tileBoardPlane} style={{ transform: TileBoardUtils.getTaperTransform(getLayout()) }}>
-                <Index each={Array.from({ length: Math.max(getLayout().count.row, 0) })}>
+                <Index each={Array.from({ length: Math.max(getLayout().count.rowCount, 0) })}>
                     {(_, rowIndex) => (
                         <div
                             class={styles.tileBoardRow}

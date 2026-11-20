@@ -8,6 +8,7 @@ import {
     ScrambleTextUtils,
 } from "@thewaver/ss-components";
 import { ScrambleTextConst } from "@thewaver/ss-components/internal";
+import { StringUtils } from "@thewaver/ss-utils";
 
 import { LetterDriverContextProvider } from "../../../Abstracts/LetterDriver/LetterDriver.context";
 import type { LetterDriverContextType } from "../../../Abstracts/LetterDriver/LetterDriver.context.types";
@@ -21,7 +22,7 @@ export const ScrambleText = (props: ScrambleTextProps) => {
     const isDriven = registryState.entries.length > 0;
 
     const characters = useMemo(
-        () => (isDriven ? registryState.characters : Array.from(props.text ?? "")),
+        () => (isDriven ? registryState.characters : StringUtils.splitGraphemes(props.text ?? "")),
         [isDriven, registryState.characters, props.text],
     );
     const segments = useMemo(() => ScrambleTextUtils.getSegments(characters), [characters]);

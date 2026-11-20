@@ -88,6 +88,15 @@ export const FileInput = (props: FileInputProps) => {
 
     const controlRef = useRef<HTMLElement | null>(null);
     const control = useElement(controlRef);
+    const latestRef = useLatest(props.ref);
+
+    const setControlRef = useCallback(
+        (element: HTMLElement | null) => {
+            controlRef.current = element;
+            latestRef.current?.(element);
+        },
+        [latestRef],
+    );
 
     const isDisabled = props.isDisabled ?? false;
 
@@ -132,13 +141,11 @@ export const FileInput = (props: FileInputProps) => {
     return (
         <InteractionWrapper<FileInputRenderProps>
             {...props}
+            ref={setControlRef}
             extraFlags={extraFlags}
             renderControl={(setElementRef, flags) => (
                 <FileInputElement
-                    ref={(element) => {
-                        setElementRef(element);
-                        controlRef.current = element;
-                    }}
+                    ref={setElementRef}
                     id={props.id}
                     name={props.name}
                     ariaLabel={props.ariaLabel}

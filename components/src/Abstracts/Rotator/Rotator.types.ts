@@ -21,7 +21,7 @@ export type RotatorCoreDefs = {
     getSettleDurationMs: () => number;
     targetIndex: [get: () => number, set: (value: number) => void];
     computeSpinTarget: () => number | Promise<number>;
-    computeSpinDefs?: (index: number, stepCount: number) => RotatorSpinDefs;
+    computeSpinDefs?: (index: number, stepCount: number) => RotatorSpinDefs | undefined;
     computeStepLabel: (index: number, stepCount: number) => string;
     onSpinEnd?: (index: number) => void;
 };

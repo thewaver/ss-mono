@@ -37,8 +37,9 @@ export namespace AnchorSolidUtils {
      * @param getIsVisible Whether the content is currently shown. Measuring stops when it is not.
      * @param opts.getPlacement The placement to aim for, given the direction text runs in at the anchor, so a
      * default can line the content up with the edge the text starts from.
-     * @param opts.getOffset The gap to hold between anchor and content.
-     * @param opts.getReservedScreenSize A margin to keep clear at the screen edges.
+     * @param opts.getOffset The gap to hold between anchor and content. Answering `undefined` means no gap.
+     * @param opts.getReservedScreenSize A margin to keep clear at the screen edges. Answering `undefined` means
+     * none.
      * @param opts.getAnchorRect Supplies the anchor rectangle directly, for content anchored to
      * something that is not an element — a caret position, a pointer, a cell in a canvas. Given this,
      * no element is observed.
@@ -57,8 +58,8 @@ export namespace AnchorSolidUtils {
         getIsVisible: Accessor<boolean>,
         opts: {
             getPlacement: (direction: NavigatorDirection) => AnchorPlacement;
-            getOffset?: () => Point2d;
-            getReservedScreenSize?: () => Size2d;
+            getOffset?: () => Point2d | undefined;
+            getReservedScreenSize?: () => Size2d | undefined;
             getAnchorRect?: () => Rect | undefined;
             getIsPinned?: () => boolean;
         },
@@ -124,6 +125,7 @@ export namespace AnchorSolidUtils {
             () => getIsVisible() && !opts.getAnchorRect,
             {
                 setElementRect: setAnchorRect,
+                isMeasuredWhileHidden: false,
             },
         );
 

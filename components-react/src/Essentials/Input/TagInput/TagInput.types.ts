@@ -38,14 +38,14 @@ export type TagInputFieldElementProps = {
     fieldRef: RefObject<HTMLInputElement | null>;
     /** Put on the text field, so an id is enough to reach it from a label or a test. */
     id?: string;
-    /** The field's name when it is submitted as part of a form. */
-    name?: string;
     /** The text's style, from the consumer's `computeTextStyle`. */
     style?: TextFieldTextStyle;
     /** What is typed but not yet a tag. */
     value: string;
     /** Whether the field refuses input. */
     isDisabled: boolean;
+    /** Whether the field is announced as holding a value in error. */
+    hasError: boolean;
     /** The field's accessible name, already resolved against any surrounding label. */
     ariaLabel?: string;
     /** The id of the caption naming the field, already resolved against any surrounding label or form field. */

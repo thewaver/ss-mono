@@ -26,7 +26,7 @@
 
     const DEFAULT_MARGINS = CSSUtils.spreadMargin(0);
 
-    let { toasts = $bindable([]), children, ...props }: ToastsProps<T> = $props();
+    let { toasts = $bindable([]), ...props }: ToastsProps<T> = $props();
 
     const viewportContext = getViewportContext();
     const portalTarget = $derived(viewportContext.getPortalRef() ?? document.body);
@@ -205,7 +205,7 @@
     );
 </script>
 
-{@render children?.()}
+{@render props.children?.()}
 
 {#if portalTarget}
     <div

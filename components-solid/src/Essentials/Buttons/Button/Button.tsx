@@ -89,12 +89,13 @@ export const Button = (props: ButtonProps) => {
             {...props}
             extraFlags={() => ({ isPending: getIsPending() })}
             onActivation={
-                props.onActivation &&
-                ((activation) => {
-                    if (getIsPending()) return;
+                props.onActivation === undefined
+                    ? undefined
+                    : (activation) => {
+                          if (getIsPending()) return;
 
-                    props.onActivation?.(activation);
-                })
+                          props.onActivation?.(activation);
+                      }
             }
             renderControl={(setElementRef, getFlags) => (
                 <ButtonElement

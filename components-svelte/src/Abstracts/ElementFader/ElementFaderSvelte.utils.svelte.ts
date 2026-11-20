@@ -11,7 +11,7 @@ export namespace ElementFaderSvelteUtils {
      *
      * {@link ElementFaderUtils.createFader} with its three fields read as getters, each waking its readers only when
      * its own field changes, and its `show` and `hide` called whenever `getIsVisible` changes. Anything in flight is
-     * cancelled when the component is destroyed. The options are read when they are needed, so functions reading the
+     * canceled when the component is destroyed. The options are read when they are needed, so functions reading the
      * component's props always see the current ones.
      *
      * Must run while a component is being set up.

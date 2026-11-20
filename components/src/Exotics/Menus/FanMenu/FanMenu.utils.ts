@@ -1,5 +1,5 @@
 import type { PlacementLayoutFn } from "../../../Abstracts/Placement/Placement.types";
-import { PlacementLayoutUtils } from "../../../Generators/PlacementLayouts/PlacementLayouts.utils";
+import { PlacementRingUtils } from "../../../Generators/PlacementLayouts/PlacementRing.utils";
 import type { FanLayoutDefs } from "./FanMenu.types";
 
 const FAN_FACING_DEGREES = 0;
@@ -32,7 +32,7 @@ export namespace FanMenuUtils {
                 itemHeightRatio = FAN_ITEM_HEIGHT_RATIO,
                 ...ringDefs
             } = layoutDefs ?? {};
-            const layout = PlacementLayoutUtils.createRing({
+            const layout = PlacementRingUtils.createRing({
                 facingDegrees: FAN_FACING_DEGREES,
                 spreadDegrees: defs.itemCount * spreadDegreesPerItem,
                 tiltRatio: FAN_TILT_RATIO,

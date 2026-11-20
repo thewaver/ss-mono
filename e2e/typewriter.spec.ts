@@ -434,7 +434,7 @@ test("while typing, the caret sits right after the most recent arrival, on that 
         ).not.toContain(false);
         expect(frame.started.slice(frame.caretAfter + 1), "and none after it has").not.toContain(true);
 
-        const middle = (frame.caret!.top + frame.caret!.bottom) / 2;
+        const middle = (frame.caret!.top + frame.caret!.bottom) * 0.5;
 
         expect(middle, "the caret is on the line of the character it follows").toBeGreaterThanOrEqual(
             frame.before!.top,
@@ -470,7 +470,7 @@ test("at rest after typing, the caret sits after the last character, on its line
             const lastLine = [...range.getClientRects()].at(-1)!;
 
             return {
-                caretMiddle: (caretRect.top + caretRect.bottom) / 2,
+                caretMiddle: (caretRect.top + caretRect.bottom) * 0.5,
                 caretLeft: caretRect.left,
                 lineTop: lastLine.top,
                 lineBottom: lastLine.bottom,
@@ -499,7 +499,7 @@ test("at rest after typing, the caret sits after the last character, on its line
 /**
  * `computeCharacterWeights` decides the order the characters arrive in, and the page's "Arrival order" knob
  * hands it one of the sample orders. The order is read as each character's start delay, compared with its
- * neighbours' — left to right means every character starts after the one before it, right to left means every
+ * neighbors' — left to right means every character starts after the one before it, right to left means every
  * one starts before it — and erasing plays the same order backwards.
  */
 test("the arrival order decides which characters arrive first, and erasing runs it backwards", async ({ page }) => {

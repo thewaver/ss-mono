@@ -141,7 +141,7 @@ const TextFieldElement = defineComponent(
                 "aria-required": props.isRequired || undefined,
                 "aria-invalid": props.flags.hasError || undefined,
                 ...props.ariaAttributes,
-                "onInput": (e: Event) => handleInput(e.currentTarget as TextSyncElement),
+                "onInput": (e: Event) => handleInput(e.currentTarget as TextSyncElement, (e as InputEvent).inputType),
                 "onCompositionstart": () => handleCompositionStart(),
                 "onCompositionend": (e: CompositionEvent) => handleCompositionEnd(e.currentTarget as TextSyncElement),
                 "onKeydown": (e: KeyboardEvent) => {

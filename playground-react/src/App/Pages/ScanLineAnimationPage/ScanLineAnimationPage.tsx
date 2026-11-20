@@ -35,7 +35,7 @@ import {
 } from "@thewaver/ss-playground/App/Pages/ScanLineAnimationPage/ScanLineAnimationPage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/ScanLineAnimationPage/ScanlineAnimationPage.css";
 import knight from "@thewaver/ss-playground/App/knight.webp";
-import type { Index2d } from "@thewaver/ss-utils";
+import type { Count2d } from "@thewaver/ss-utils";
 
 import { PageExampleKnobs } from "../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
@@ -112,7 +112,7 @@ const StressItem = ({ configIndex, modalPlayback, weightType, ...props }: Stress
     const [animation] = useState(() => pickStressKeyframes(STRESS_ITEMS[configIndex].kind));
 
     const computeSliceWeights = useMemo(
-        () => (count: Index2d) => SliceAnimationWeights.computeSliceWeights(weightType, count, WEIGHT_ORIGIN),
+        () => (count: Count2d) => SliceAnimationWeights.computeSliceWeights(weightType, count, WEIGHT_ORIGIN),
         [weightType],
     );
 

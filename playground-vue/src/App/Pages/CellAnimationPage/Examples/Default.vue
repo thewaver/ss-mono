@@ -7,7 +7,7 @@ import {
     CellAnimationOrigins,
     SliceAnimationWeights,
 } from "@thewaver/ss-components-vue";
-import type { Index2d } from "@thewaver/ss-utils";
+import type { Count2d } from "@thewaver/ss-utils";
 
 import type { CellAnimationSourcedExampleProps } from "../CellAnimationPage.types";
 
@@ -20,7 +20,7 @@ const progress = useModel(props, "progress");
 
 const origin = computed(() => CellAnimationOrigins.computeOrigin(props.originType, props.cellCount));
 
-const computeSliceWeights = (count: Index2d) =>
+const computeSliceWeights = (count: Count2d) =>
     SliceAnimationWeights.computeSliceWeights(props.weightType, count, origin.value, props.weightOpts);
 </script>
 

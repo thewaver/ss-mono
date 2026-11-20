@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 
+import type { Count2d } from "@thewaver/ss-utils";
+
 import { ParticleFieldUtils } from "./ParticleField.utils";
 
 const SQUARE = [
@@ -27,7 +29,12 @@ describe("ParticleFieldUtils", () => {
     });
 
     it("keeps to the cells whose centers are inside the contour", () => {
-        const cells = ParticleFieldUtils.computeCells({ col: 2, row: 1 }, { width: 20, height: 10 }, [[1]], SQUARE);
+        const cells = ParticleFieldUtils.computeCells(
+            { colCount: 2, rowCount: 1 },
+            { width: 20, height: 10 },
+            [[1]],
+            SQUARE,
+        );
 
         expect(
             cells.map((cell) => cell.pos),
@@ -35,12 +42,12 @@ describe("ParticleFieldUtils", () => {
         ).toEqual([{ col: 0, row: 0 }]);
         expect(cells[0].weight).toBe(1);
         expect(
-            ParticleFieldUtils.computeCells({ col: 2, row: 1 }, { width: 20, height: 10 }, [], undefined),
+            ParticleFieldUtils.computeCells({ colCount: 2, rowCount: 1 }, { width: 20, height: 10 }, [], undefined),
         ).toHaveLength(2);
     });
 
     it("shows the same particles each time a point in the pass is revisited, and a list unchanged is the same list", () => {
-        const count = { col: 4, row: 4 };
+        const count = { colCount: 4, rowCount: 4 };
         const cells = ParticleFieldUtils.computeCells(count, { width: 40, height: 40 }, [], undefined);
         const roster = ParticleFieldUtils.createRoster(7);
         const at = (clockMs: number) =>
@@ -67,7 +74,7 @@ describe("ParticleFieldUtils", () => {
 
     it("drops every particle for a grid of another size, and leaves nobody once the passes are done", () => {
         const roster = ParticleFieldUtils.createRoster(7);
-        const refresh = (count: { col: number; row: number }, hasEnded = false) =>
+        const refresh = (count: Count2d, hasEnded = false) =>
             roster.refresh({
                 count,
                 cells: ParticleFieldUtils.computeCells(count, { width: 40, height: 40 }, [], undefined),
@@ -79,13 +86,13 @@ describe("ParticleFieldUtils", () => {
                 hasEnded,
             }).particles;
 
-        const small = refresh({ col: 2, row: 2 });
-        const large = refresh({ col: 3, row: 3 });
+        const small = refresh({ colCount: 2, rowCount: 2 });
+        const large = refresh({ colCount: 3, rowCount: 3 });
 
         expect(
             large.some((particle) => small.includes(particle)),
             "nothing is carried across",
         ).toBe(false);
-        expect(refresh({ col: 3, row: 3 }, true)).toEqual([]);
+        expect(refresh({ colCount: 3, rowCount: 3 }, true)).toEqual([]);
     });
 });

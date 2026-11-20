@@ -27,6 +27,7 @@ import {
     NAV_PREVIEW_OFFSET,
     NAV_PREVIEW_PLACEMENT,
     SCREEN_HEIGHT,
+    toDocumentTitle,
 } from "@thewaver/ss-playground/App/App.const";
 import * as styles from "@thewaver/ss-playground/App/App.css";
 import { LAYOUT } from "@thewaver/ss-playground/App/Layout.const";
@@ -42,10 +43,11 @@ import {
     EXAMPLES_VIEW,
     PAGE_VIEW_KEYS,
     toBaseRoute,
+    toComponentRoute,
     toPageViewKey,
     toPageViewRoute,
 } from "@thewaver/ss-playground/App/PageComponents/ViewTabs/ViewTabs.const";
-import { FunctionUtils, Size2d, StringUtils } from "@thewaver/ss-utils";
+import { FunctionUtils, Size2d } from "@thewaver/ss-utils";
 
 import type { ComponentConfig, MenuBranchConfig, MenuNodeConfig } from "./App.types";
 import {
@@ -102,7 +104,9 @@ const PageAppearancePage = lazy(() =>
 
 const getIsBranchConfig = (node: MenuNodeConfig): node is MenuBranchConfig => "children" in node;
 
-const componentToRouteName = (name: string) => `/${StringUtils.camelToKebabCase(name)}`;
+const SITE_TITLE = document.title;
+
+const componentToRouteName = (name: string) => toComponentRoute(name);
 
 const getIsMenuFaded = (phase: SidebarPhase) => phase === "collapsing" || phase === "collapsed";
 
@@ -368,6 +372,10 @@ export function AppContent(props: { viewportAnchor: readonly [ViewportAnchor, (v
 
     const selectedConfig = COMPONENT_CONFIGS_BY_ROUTE[toBaseRoute(location.pathname)];
 
+    useEffect(() => {
+        document.title = toDocumentTitle(selectedConfig?.name, SITE_TITLE);
+    }, [selectedConfig]);
+
     const isAboutSelected = location.pathname === "/";
     const isGettingStartedSelected = location.pathname === GETTING_STARTED_ROUTE;
     const isGallerySelected = location.pathname === GALLERY_ROUTE;
@@ -447,7 +455,7 @@ export function AppContent(props: { viewportAnchor: readonly [ViewportAnchor, (v
 
     const viewportContext = useViewportContext();
 
-    const menuGutter = Math.max(0, (viewportContext.getSize().width - LAYOUT.pageMaxWidth) / 2);
+    const menuGutter = Math.max(0, (viewportContext.getSize().width - LAYOUT.pageMaxWidth) * 0.5);
 
     const isMenuHideable = viewportContext.getSize().width < LAYOUT.menuHideableBelow;
 

@@ -2,15 +2,17 @@
     import { untrack } from "svelte";
 
     import {
+        InteractionTrackerUtils,
         TAG_INPUT_DEFAULTS,
         type TagInputFlags,
         type TagInputKeyAction,
-        TagInputUtils,
         TagInputStyles as styles,
+        TagInputUtils,
     } from "@thewaver/ss-components";
     import { TagInputConst } from "@thewaver/ss-components/internal";
 
     import { NavigatorSvelteUtils } from "../../../Abstracts/Navigator/NavigatorSvelte.utils.svelte.js";
+    import FormValue from "../../../Primitives/FormValue/FormValue.svelte";
     import InteractionWrapper from "../../../Primitives/InteractionWrapper/InteractionWrapper.svelte";
     import { toStyle } from "../../../Utils/styleUtils.js";
     import { FormFieldSvelteUtils } from "../FormField/FormFieldSvelte.utils.svelte.js";
@@ -153,7 +155,6 @@
                 {@attach attachElement}
                 id={fieldId}
                 type="text"
-                name={props.name}
                 class={styles.tagInputField}
                 style={props.computeTextStyle ? toStyle(props.computeTextStyle(flags)) : undefined}
                 value={text}
@@ -162,6 +163,7 @@
                 aria-labelledby={getAriaLabelledBy()}
                 aria-describedby={getAriaDescribedBy()}
                 aria-disabled={flags.isDisabled || undefined}
+                aria-invalid={flags.hasError || undefined}
                 oninput={(e) => {
                     const input = e.currentTarget;
 
@@ -170,7 +172,7 @@
                     if (input.value !== text) input.value = text;
                 }}
                 onkeydown={(e) => {
-                    if (isDisabled) return;
+                    if (isDisabled || InteractionTrackerUtils.getIsComposing(e)) return;
 
                     runKeyAction(
                         e,
@@ -182,6 +184,8 @@
                     );
                 }}
             />
+
+            <FormValue name={props.name} values={value} />
 
             {#if props.renderPlaceholder && isEmpty && value.length < 1}
                 <div class={styles.tagInputPlaceholder}>{@render props.renderPlaceholder(flags)}</div>

@@ -90,6 +90,7 @@ export const Shape = (props: ShapeProps) => {
             {getFillDefs() && (
                 <svg
                     class={styles.shapeFillSVG}
+                    aria-hidden="true"
                     width={getRootSize().width}
                     height={getRootSize().height}
                     viewBox={`0 0 ${getRootSize().width} ${getRootSize().height}`}
@@ -138,6 +139,7 @@ export const Shape = (props: ShapeProps) => {
             {getStrokeDefs() && (
                 <svg
                     class={styles.shapeStrokeSVG}
+                    aria-hidden="true"
                     width={getRootSize().width}
                     height={getRootSize().height}
                     viewBox={`0 0 ${getRootSize().width} ${getRootSize().height}`}

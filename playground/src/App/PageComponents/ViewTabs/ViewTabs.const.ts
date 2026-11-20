@@ -1,3 +1,5 @@
+import { StringUtils } from "@thewaver/ss-utils";
+
 import type { PageViewKey } from "./PageView.types";
 
 export const PAGE_VIEW_KEYS: PageViewKey[] = ["docs", "api", "examples"];
@@ -15,6 +17,8 @@ export const PAGE_VIEW_SEGMENTS: Record<PageViewKey, string> = {
 };
 
 export const DEFAULT_PAGE_VIEW: PageViewKey = "docs";
+
+export const toComponentRoute = (name: string) => `/${StringUtils.camelToKebabCase(name).replace(/^-/, "")}`;
 
 export const toPageViewRoute = (baseRoute: string, key: PageViewKey) => `${baseRoute}${PAGE_VIEW_SEGMENTS[key]}`;
 

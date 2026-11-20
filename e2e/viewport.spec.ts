@@ -13,7 +13,6 @@ const LISTBOX = '[role="listbox"]';
 
 const SCROLL_BY = 80;
 const DRIFT_TOLERANCE = 2;
-const SETTLE_MS = 200;
 const OUTSIDE_PROBE = 20;
 
 /** A layer placed outside its anchor may be cut by the viewport, but it may never sit over the anchor. */
@@ -26,10 +25,34 @@ const expectNoOverlap = (anchor: { y: number; height: number }, layer: { y: numb
 const isPaintedAt = (page: Page, point: { x: number; y: number }) =>
     page.evaluate((at) => document.elementFromPoint(at.x, at.y)?.closest('[role="listbox"]') !== null, point);
 
+/**
+ * What a test measures is where things are drawn, which a layer settles into a frame or two after whatever moved it,
+ * so a measurement waits until the boxes it will read are in the same place on two readings a poll apart.
+ */
+const untilStill = async (page: Page, selectors: string[]) => {
+    let previous: string | undefined;
+
+    await expect
+        .poll(
+            async () => {
+                const current = JSON.stringify(
+                    await Promise.all(selectors.map((selector) => page.locator(selector).boundingBox())),
+                );
+                const isStill = current === previous;
+
+                previous = current;
+
+                return isStill;
+            },
+            { message: `${selectors.join(", ")} stopped moving` },
+        )
+        .toBe(true);
+};
+
 const parkRoamer = async (page: Page, x: string, y: string) => {
     await page.locator("#roamerX").fill(x);
     await page.locator("#roamerY").fill(y);
-    await page.waitForTimeout(SETTLE_MS);
+    await untilStill(page, ["#roamingCountry"]);
 };
 
 /**
@@ -59,7 +82,7 @@ test("a list opened against any edge stops at the viewport it belongs to", async
         await parkRoamer(page, x, y);
         await page.locator("#roamingCountry").click();
         await expect(page.locator(LISTBOX)).toBeVisible();
-        await page.waitForTimeout(SETTLE_MS);
+        await untilStill(page, [LISTBOX]);
 
         const stage = (await page.locator("[data-stage]").boundingBox())!;
         const anchor = (await page.locator("#roamingCountry").boundingBox())!;
@@ -86,7 +109,7 @@ test("a list with nowhere to fit keeps its size and is cut by the edge", async (
 
     await page.locator("#roamingCountry").click();
     await expect(page.locator(LISTBOX)).toBeVisible();
-    await page.waitForTimeout(SETTLE_MS);
+    await untilStill(page, [LISTBOX]);
 
     const stage = (await page.locator("[data-stage]").boundingBox())!;
     const anchor = (await page.locator("#roamingCountry").boundingBox())!;
@@ -115,7 +138,7 @@ test("the scale slider resizes the content without moving the boundary", async (
     const anchorBefore = (await page.locator("#roamingCountry").boundingBox())!;
 
     await page.locator("#viewportScale").fill("50");
-    await page.waitForTimeout(SETTLE_MS);
+    await untilStill(page, ["[data-stage]", "#roamingCountry"]);
 
     const stageAfter = (await page.locator("[data-stage]").boundingBox())!;
     const anchorAfter = (await page.locator("#roamingCountry").boundingBox())!;
@@ -148,7 +171,6 @@ test("a nested viewport's scale is the product of both, not either one", async (
     const outer = await readOuterScale(page);
 
     await page.locator("#viewportScale").fill("50");
-    await page.waitForTimeout(SETTLE_MS);
 
     await expect(page.locator("[data-inner-readout]"), "the inner square is drawing at half").toHaveText(
         asReadout(outer * 0.5),
@@ -161,7 +183,6 @@ test("a nested viewport's scale is the product of both, not either one", async (
     const window = page.viewportSize()!;
 
     await page.setViewportSize({ width: window.width, height: Math.round(window.height * 0.5) });
-    await page.waitForTimeout(SETTLE_MS);
 
     await expect(
         page.locator("[data-inner-readout]"),
@@ -210,11 +231,11 @@ test("a list at either end of a scrolled box stays clear of its anchor", async (
         await page.locator(`${SCROLLED} [data-scroll-box]`).evaluate((element, edge) => {
             element.scrollTop = edge === "top" ? 0 : element.scrollHeight;
         }, to);
-        await page.waitForTimeout(SETTLE_MS);
+        await untilStill(page, ["#scrolledCountry"]);
 
         await page.locator("#scrolledCountry").click();
         await expect(page.locator(LISTBOX)).toBeVisible();
-        await page.waitForTimeout(SETTLE_MS);
+        await untilStill(page, [LISTBOX]);
 
         const anchor = (await page.locator("#scrolledCountry").boundingBox())!;
         const list = (await page.locator(LISTBOX).boundingBox())!;
@@ -234,11 +255,11 @@ test("a list with too little room keeps the anchor's edge and is cut at the far 
         await page.locator(`${SCROLLED} [data-scroll-box]`).evaluate((element, value) => {
             element.scrollTop = value;
         }, top);
-        await page.waitForTimeout(SETTLE_MS);
+        await untilStill(page, ["#scrolledCountry"]);
 
         await page.locator("#scrolledCountry").click({ force: true });
         await expect(page.locator(LISTBOX)).toBeVisible();
-        await page.waitForTimeout(SETTLE_MS);
+        await untilStill(page, [LISTBOX]);
 
         const anchor = (await page.locator("#scrolledCountry").boundingBox())!;
         const list = (await page.locator(LISTBOX).boundingBox())!;
@@ -269,7 +290,7 @@ const gapToAnchor = (anchor: { y: number; height: number }, list: { y: number; h
 test("an open list stays on its anchor's edge while the box under it scrolls", async ({ page }) => {
     await page.locator("#scrolledCountry").click();
     await expect(page.locator(LISTBOX)).toBeVisible();
-    await page.waitForTimeout(SETTLE_MS);
+    await untilStill(page, ["#scrolledCountry", LISTBOX]);
 
     const anchorBefore = (await page.locator("#scrolledCountry").boundingBox())!;
     const before = (await page.locator(LISTBOX).boundingBox())!;
@@ -281,7 +302,12 @@ test("an open list stays on its anchor's edge while the box under it scrolls", a
     await page.locator(`${SCROLLED} [data-scroll-box]`).evaluate((element, by) => {
         element.scrollTop += by;
     }, SCROLL_BY);
-    await page.waitForTimeout(SETTLE_MS);
+    await expect
+        .poll(async () => (await page.locator("#scrolledCountry").boundingBox())!.y, {
+            message: "the scroll really did move the anchor",
+        })
+        .not.toBe(anchorBefore.y);
+    await untilStill(page, ["#scrolledCountry", LISTBOX]);
 
     const anchorAfter = (await page.locator("#scrolledCountry").boundingBox())!;
     const after = (await page.locator(LISTBOX).boundingBox())!;

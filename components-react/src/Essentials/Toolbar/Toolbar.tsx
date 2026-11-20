@@ -47,7 +47,7 @@ export const ToolbarComposite = <T,>(props: ToolbarCompositeProps<T>) => {
     const isPlaced = layout !== undefined;
 
     const rootSize = ElementObserverReactUtils.useBorderBoxSize(rootRef);
-    const itemSizes = ElementObserverReactUtils.useBorderBoxSizes(itemElements);
+    const itemSizes = ElementObserverReactUtils.useBorderBoxSizes(itemElements.slice(0, actionCount));
     const overflowSize = ElementObserverReactUtils.useBorderBoxSize(overflowRef);
 
     const direction = NavigatorReactUtils.useDirection(rootRef);

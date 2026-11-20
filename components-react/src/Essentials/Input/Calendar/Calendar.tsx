@@ -154,8 +154,17 @@ export const CalendarComposite = (props: CalendarCompositeProps) => {
 
     useEffect(() => LiveAnnouncerUtils.reserve("polite"), []);
 
+    const lastAnchorDayRef = useRef(props.anchorDay);
+
     useEffect(() => {
-        if (props.anchorDay) setHighlighted(props.anchorDay);
+        const anchorDay = props.anchorDay;
+        const last = lastAnchorDayRef.current;
+
+        lastAnchorDayRef.current = anchorDay;
+
+        if (!anchorDay || (anchorDay !== last && CalendarUtils.getIsSameCell(anchorDay, last, "day"))) return;
+
+        setHighlighted(anchorDay);
     }, [props.anchorDay]);
 
     useEffect(() => {
@@ -168,6 +177,9 @@ export const CalendarComposite = (props: CalendarCompositeProps) => {
         LiveAnnouncerUtils.announce(computePageLabel());
     }, [pageStart]);
 
+    const getIsOwnDayElement = (target: EventTarget | null) =>
+        target instanceof Element && target.id.startsWith(`${gridId}-day-`);
+
     const rovingIndex = CalendarUtils.findCellIndex(cells, rovingDay, precision);
     const rovingCell = rovingIndex === undefined ? undefined : cells[rovingIndex];
     const rovingCellId = rovingCell && toCellId(gridId, rovingCell);
@@ -175,7 +187,7 @@ export const CalendarComposite = (props: CalendarCompositeProps) => {
     useLayoutEffect(() => {
         const root = rootRef.current;
 
-        if (!rovingCellId || !root?.contains(document.activeElement) || root === document.activeElement) return;
+        if (!rovingCellId || !root || !getIsOwnDayElement(document.activeElement)) return;
 
         document.getElementById(rovingCellId)?.focus();
     }, [rovingCellId]);
@@ -183,6 +195,8 @@ export const CalendarComposite = (props: CalendarCompositeProps) => {
     const rovingPage = pages.find((page) => CalendarUtils.getIsSameCell(page.start, rovingDay, "month")) ?? pages[0];
 
     const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+        if (!getIsOwnDayElement(e.target)) return;
+
         const action = CalendarUtils.computeKeyAction(e.key, e.shiftKey, {
             roving: rovingDay,
             precision,

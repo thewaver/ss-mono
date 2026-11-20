@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { example, prop, variant } from "./helpers";
+import { example, expectAnnounced, prop, recordAnnouncements, variant } from "./helpers";
 
 /**
  * What happens to the library when the browser stops handing out animation frames. A page that is not
@@ -92,7 +92,19 @@ test("an anchored layer opens in place, then tracks its anchor on the event alon
     await page.locator(`${SCROLLED} [data-scroll-box]`).evaluate((element, by) => {
         element.scrollTop += by;
     }, SCROLL_BY);
-    await page.waitForTimeout(SETTLE_MS);
+
+    await expect
+        .poll(
+            async () =>
+                Math.abs(
+                    gapToAnchor(
+                        (await page.locator("#scrolledCountry").boundingBox())!,
+                        (await page.locator(LISTBOX).boundingBox())!,
+                    ),
+                ),
+            "and one event is enough to land it exactly, so the poll is not what keeps it there",
+        )
+        .toBeLessThanOrEqual(DRIFT_TOLERANCE);
 
     const anchorAfter = (await page.locator("#scrolledCountry").boundingBox())!;
     const after = (await page.locator(LISTBOX).boundingBox())!;
@@ -109,7 +121,6 @@ const WHEEL_IDLE_DELAY_MS = 1000;
 const WHEEL_SPIN_TOTAL_MS = 6000;
 
 const OVERHEAD_WHEEL = example("overhead");
-const ANNOUNCER = '[role="log"][aria-live="polite"]';
 
 const setDuration = async (page: import("@playwright/test").Page, key: string, value: number) => {
     await page.locator(`${prop(key)} input`).fill(String(value));
@@ -131,6 +142,7 @@ const wedgeTransform = (page: import("@playwright/test").Page) =>
  * thing lost is the turning itself, which nobody was watching.
  */
 test("a spin still lands on its prize when no frame ever arrives", async ({ page }) => {
+    await recordAnnouncements(page);
     await page.goto("/overhead-wheel");
     await expect(page.locator(`${OVERHEAD_WHEEL} [aria-roledescription="wheel"]`)).toBeVisible();
 
@@ -139,7 +151,7 @@ test("a spin still lands on its prize when no frame ever arrives", async ({ page
 
     await page.locator("#overheadSpin").click();
 
-    await expect(page.locator(ANNOUNCER)).toContainText(/.+, \d+ of 8/, { timeout: WHEEL_SPIN_TOTAL_MS });
+    await expectAnnounced(page, /.+, \d+ of 8/, { timeout: WHEEL_SPIN_TOTAL_MS });
     await expect
         .poll(() => page.locator("#overheadSpin").getAttribute("aria-disabled"), { timeout: WHEEL_SPIN_TOTAL_MS })
         .toBe(null);

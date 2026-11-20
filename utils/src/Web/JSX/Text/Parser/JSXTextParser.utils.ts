@@ -3,6 +3,7 @@ import { deepEqual } from "fast-equals";
 import { EMPTY_ARRAY } from "../../../../Abstracts/object.js";
 import { StringUtils } from "../../../../Abstracts/string.js";
 import { CSSUtils } from "../../../CSS/CSS.utils.js";
+import { DOMUtils } from "../../../DOM/DOM.utils.js";
 import type { TextMetricsStyle, TextNonMetricStyle } from "../Metrics/JSXTextMetrics.types.js";
 import { JSXTextMetricsUtils } from "../Metrics/JSXTextMetrics.utils.js";
 
@@ -75,8 +76,6 @@ const hangingWhitespaceStyle: TextNonMetricStyle = {
     "vertical-align": "top",
 };
 
-const TRAILING_WHITESPACE = /\s+$/u;
-
 /**
  * Splits the white space each wrapped line ends on into a piece of its own, styled by {@link hangingWhitespaceStyle}
  * and marked as hanging.
@@ -90,7 +89,8 @@ const hangTrailingWhitespace = (segments: readonly ElementSegment[]) =>
     segments.flatMap((segment, index): ElementSegment[] => {
         if (segment.type !== "text" || segments[index + 1] !== wrapLineBreakToken) return [segment];
 
-        const trailing = TRAILING_WHITESPACE.exec(segment.text)?.[0];
+        const head = segment.text.trimEnd();
+        const trailing = segment.text.slice(head.length);
 
         if (!trailing) return [segment];
 
@@ -100,8 +100,6 @@ const hangTrailingWhitespace = (segments: readonly ElementSegment[]) =>
             nonMetrics: { ...segment.nonMetrics, ...hangingWhitespaceStyle },
             isHanging: true,
         };
-        const head = segment.text.slice(0, -trailing.length);
-
         return head ? [{ ...segment, text: head }, hanging] : [hanging];
     });
 
@@ -125,6 +123,9 @@ const WHOLE_ELEMENT_SELECTOR = "svg, video, audio, canvas, iframe, object, embed
 const UNSUPPORTED_ELEMENT_SELECTOR = "canvas, video, audio, iframe, object, embed, input, select, textarea, button";
 
 const NO_SCALE = 1;
+
+/** Elements whose contents are never drawn as text, whatever a page styles them as. */
+const UNRENDERED_ELEMENT_NAMES = new Set(["STYLE", "SCRIPT", "TEMPLATE"]);
 
 /**
  * How much larger an element is drawn on screen than it is laid out — not `1` inside a scaled ancestor. A client rect
@@ -189,6 +190,7 @@ const splitComputedStyle = (style: CSSStyleDeclaration, baselineStyle?: CSSStyle
     return { metrics, nonMetrics };
 };
 
+/** Reading rendered text into styled pieces and laying them into lines, for components that redraw text themselves. */
 export namespace JSXTextParserUtils {
     /** Tests whether two runs of text would be measured identically — same font, spacing and case. */
     export const isSameMetricsStyle = (a: StyledTextSegment, b: StyledTextSegment) => deepEqual(a.metrics, b.metrics);
@@ -230,7 +232,8 @@ export namespace JSXTextParserUtils {
      * breaks in place, wherever they are; childless elements such as images are carried
      * through whole as a copy, and so are an `<svg>`, media, frames, `<select>` and
      * `<textarea>`, whose children are not text, along with the size the original
-     * was laid out at.
+     * was laid out at. What the page does not draw is left out: anything with `display: none`,
+     * and the contents of `<style>`, `<script>` and `<template>`.
      *
      * Inherited properties are weighed against `el` itself rather than against each
      * piece's own parent, since `el` is the context the result will be redrawn in — so a
@@ -297,7 +300,12 @@ export namespace JSXTextParserUtils {
                 return;
             }
 
+            if (UNRENDERED_ELEMENT_NAMES.has(element.nodeName)) return;
+
             const computed = getComputedStyle(element);
+
+            if (computed.display === "none") return;
+
             const isBlockLike = CSSUtils.isBlockLike(computed.display);
 
             if (
@@ -307,7 +315,7 @@ export namespace JSXTextParserUtils {
                 const box = element.getBoundingClientRect();
                 const width = box.width / scale;
                 const height = box.height / scale;
-                const copy = node.cloneNode(true) as HTMLElement;
+                const copy = DOMUtils.cloneWithUniqueIds(node as HTMLElement);
 
                 if (!isBlockLike) {
                     copy.style.width = `${width}px`;
@@ -333,7 +341,7 @@ export namespace JSXTextParserUtils {
 
                 if (element instanceof HTMLAnchorElement) {
                     nextMeta.anchor = {
-                        href: element.href,
+                        href: StringUtils.toSafeHref(element.href),
                         target: element.target,
                         rel: element.rel,
                     };
@@ -473,7 +481,13 @@ export namespace JSXTextParserUtils {
         };
 
         const addToken = (token: ElementSegment, tokenWidth: number) => {
-            if (tokenWidth > remainingWidth && !(token.type === "text" && StringUtils.isWhitespace(token.text))) {
+            const isLineEmpty = remainingWidth === width;
+
+            if (
+                !isLineEmpty &&
+                tokenWidth > remainingWidth &&
+                !(token.type === "text" && StringUtils.isWhitespace(token.text))
+            ) {
                 addLineBreak(wrapLineBreakToken);
             }
 

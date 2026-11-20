@@ -1,4 +1,4 @@
-import { createEffect, onCleanup } from "solid-js";
+import { createEffect, onCleanup, untrack } from "solid-js";
 
 import { type ElementFaderOpts, ElementFaderUtils } from "@thewaver/ss-components";
 
@@ -11,7 +11,7 @@ export namespace ElementFaderSolidUtils {
      *
      * {@link ElementFaderUtils.createFader} with its three fields read as accessors, each notifying only when
      * its own field changes, and its `show` and `hide` called whenever `getIsVisible` changes. Anything in
-     * flight is cancelled when the owner is disposed.
+     * flight is canceled when the owner is disposed.
      *
      * Must run inside a component or another reactive owner.
      *
@@ -32,11 +32,9 @@ export namespace ElementFaderSolidUtils {
         const getHasTransitionFinished = accessStore(fader, (state) => state.hasTransitionFinished);
 
         createEffect(() => {
-            if (getIsVisible()) {
-                fader.show();
-            } else {
-                fader.hide();
-            }
+            const isVisible = getIsVisible();
+
+            untrack(() => (isVisible ? fader.show() : fader.hide()));
         });
 
         return {

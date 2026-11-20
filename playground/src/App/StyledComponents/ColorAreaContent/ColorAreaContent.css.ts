@@ -131,7 +131,7 @@ const checkerboard = {
         `linear-gradient(-45deg, transparent 75%, rgba(255, 255, 255, 0.25) 75%)`,
     ].join(","),
     backgroundSize: `${CHECKER_SIZE}px ${CHECKER_SIZE}px`,
-    backgroundPosition: `0 0, 0 ${CHECKER_SIZE / 2}px, ${CHECKER_SIZE / 2}px -${CHECKER_SIZE / 2}px, -${CHECKER_SIZE / 2}px 0`,
+    backgroundPosition: `0 0, 0 ${CHECKER_SIZE * 0.5}px, ${CHECKER_SIZE * 0.5}px -${CHECKER_SIZE * 0.5}px, -${CHECKER_SIZE * 0.5}px 0`,
 } as const;
 
 export const colorSwatchChecker = style({

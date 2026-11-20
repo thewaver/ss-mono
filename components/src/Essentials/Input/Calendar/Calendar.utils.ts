@@ -19,7 +19,6 @@ const YEARS_PER_PAGE = 12;
 /** How many pages one long step covers above `day` precision. */
 const PAGES_PER_LEAP = 12;
 /** Pushes a date to noon before handing it to `Intl`, so a time-zone shift cannot move it onto another day. */
-const MIDDAY_MS = 12 * 60 * 60 * 1000;
 
 /** How many pages the page keys move. */
 const PAGE_STEP = 1;
@@ -49,11 +48,10 @@ const IGNORED_MONTH_COUNT_WARNING =
 /** The same options with the era written out, for a date that is not in the current era. */
 const withEra = (options: Intl.DateTimeFormatOptions): Intl.DateTimeFormatOptions => ({ ...options, era: "short" });
 
-/** The first day of a date's year. */
-const getStartOfYear = (value: DateValue) => DateValueUtils.getStartOfMonth(value).set({ month: 1 }) as DateValue;
+/** The first day of a date's year as its era counts it, which in an era that began part-way through is the era's first. */
+const getStartOfEraYear = (value: DateValue) => DateValueUtils.getStartOfMonth(value).set({ month: 1 }) as DateValue;
 
 /** A `Date` at noon on the given day, safe to hand to `Intl.DateTimeFormat`. */
-const toIntlDate = (value: DateValue) => new Date(DateValueUtils.toDate(value).getTime() + MIDDAY_MS);
 
 /**
  * The arithmetic behind a calendar grid at each precision: which dates a page holds, what one cell covers, and
@@ -69,18 +67,17 @@ export namespace CalendarUtils {
      *
      * @param value Any date on the page.
      * @param precision What one cell holds.
-     * @returns The first of the month for `day`, the first day of the year for `month`, and for `year` the
-     * first day of the first year of its twelve — pages run from year 1 of the era in twelves, so 2017 to 2028
-     * is one page.
+     * @returns The first of the month for `day`; for `month`, the first of the year's first month, which in an era
+     * that began part-way through a year falls in the era before, so the page still holds the whole year; and for
+     * `year` the first day of the first year of its twelve — pages run from year 1 of the era in twelves, so 2017
+     * to 2028 is one page.
      */
     export const getPageStart = (value: DateValue, precision: CalendarPrecision): DateValue => {
         if (precision === "day") return DateValueUtils.getStartOfMonth(value);
 
-        const yearStart = getStartOfYear(value);
+        if (precision === "month") return DateValueUtils.getStartOfYear(value);
 
-        if (precision === "month") return yearStart;
-
-        return yearStart.set({ year: value.year - ((value.year - 1) % YEARS_PER_PAGE) }) as DateValue;
+        return getStartOfEraYear(value).set({ year: value.year - ((value.year - 1) % YEARS_PER_PAGE) }) as DateValue;
     };
 
     /**
@@ -93,7 +90,7 @@ export namespace CalendarUtils {
         if (precision === "day") return value;
         if (precision === "month") return DateValueUtils.getStartOfMonth(value);
 
-        return getStartOfYear(value);
+        return getStartOfEraYear(value);
     };
 
     /**
@@ -248,7 +245,7 @@ export namespace CalendarUtils {
             ...options,
             calendar: DateValueUtils.getCalendarId(start),
             timeZone: getLocalTimeZone(),
-        }).formatRange(toIntlDate(start), toIntlDate(end));
+        }).formatRange(DateValueUtils.toIntlDate(start), DateValueUtils.toIntlDate(end));
 
     /**
      * The page's cells cut into rows.
@@ -624,7 +621,11 @@ export namespace CalendarUtils {
         precision: CalendarPrecision | undefined,
         monthCount: number | undefined,
     ) => {
-        if (monthCount !== undefined && (precision ?? CALENDAR_DEFAULTS.precision) !== "day") {
+        if (
+            process.env.NODE_ENV !== "production" &&
+            monthCount !== undefined &&
+            (precision ?? CALENDAR_DEFAULTS.precision) !== "day"
+        ) {
             console.warn(IGNORED_MONTH_COUNT_WARNING);
         }
     };

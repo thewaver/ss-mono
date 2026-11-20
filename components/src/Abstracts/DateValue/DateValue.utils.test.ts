@@ -425,3 +425,35 @@ describe("getWeekNumber", () => {
         expect(week("2026-12-26", 0, 1)).toBe(52);
     });
 });
+
+describe("DateValueUtils in a year two eras share", () => {
+    const reiwaOne = inCalendar("japanese", 2019, 6, 15);
+    const heiseiThirtyOne = inCalendar("japanese", 2019, 2, 1);
+
+    it("starts the year in January, in the era before", () => {
+        const start = DateValueUtils.getStartOfYear(reiwaOne);
+
+        expect(DateValueUtils.isSame(DateValueUtils.withCalendar(start, "gregory"), gregorian(2019, 1, 1))).toBe(true);
+    });
+
+    it("names every month once, in either era's part of the year", () => {
+        for (const value of [reiwaOne, heiseiThirtyOne]) {
+            const names = DateValueUtils.getMonthNames(value, "en-US");
+
+            expect(new Set(names).size).toBe(names.length);
+            expect(names).toEqual(DateValueUtils.getMonthNames(inCalendar("gregory", 2019, 6, 15), "en-US"));
+        }
+    });
+
+    it("counts week numbers on from January rather than from the era's first month", () => {
+        const weekOfReiwa = DateValueUtils.getWeekNumber(reiwaOne, 1, 4);
+        const weekInGregorian = DateValueUtils.getWeekNumber(gregorian(2019, 6, 15), 1, 4);
+
+        expect(weekOfReiwa).toBe(weekInGregorian);
+    });
+
+    it("knows the most months any year of a calendar has", () => {
+        expect(DateValueUtils.getMaxMonthsInYear(inCalendar("hebrew", 2025, 6, 1))).toBe(13);
+        expect(DateValueUtils.getMaxMonthsInYear(gregorian(2025, 6, 1))).toBe(12);
+    });
+});

@@ -15,6 +15,20 @@ export type PatchBoardExampleProps = {
     "onMove": (nodeKey: string) => void;
 };
 
+export type PatchBoardSharedExampleProps = Omit<
+    PatchBoardExampleProps,
+    "nodes" | "onUpdate:nodes" | "links" | "onUpdate:links"
+> & {
+    "firstNodes": PatchBoardNode<PatchDevice>[];
+    "onUpdate:firstNodes"?: (nodes: PatchBoardNode<PatchDevice>[]) => void;
+    "secondNodes": PatchBoardNode<PatchDevice>[];
+    "onUpdate:secondNodes"?: (nodes: PatchBoardNode<PatchDevice>[]) => void;
+    "firstLinks": PatchBoardLink[];
+    "onUpdate:firstLinks"?: (links: PatchBoardLink[]) => void;
+    "secondLinks": PatchBoardLink[];
+    "onUpdate:secondLinks"?: (links: PatchBoardLink[]) => void;
+};
+
 export type PatchBoardViewExampleProps = PatchBoardExampleProps & {
     "view": PanZoomView;
     "onUpdate:view"?: (view: PanZoomView) => void;

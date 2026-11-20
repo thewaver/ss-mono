@@ -185,3 +185,28 @@ test("the page keys step both months at once", async ({ page }) => {
 
     expect((await gridLabels(page))[0], "the first grid does not just take the second one's month").not.toBe(before[1]);
 });
+
+/**
+ * The two-month example pages with its own buttons, one at each outer edge: "previous" in the first month's heading
+ * and "next" in the last's, so each is drawn once. A press moves both months by one, which is what lets the
+ * second grid's month reappear as the first's rather than the pair jumping by two.
+ */
+const PREVIOUS = `${TWO_MONTHS} #twoMonthsPreviousMonth`;
+const NEXT = `${TWO_MONTHS} #twoMonthsNextMonth`;
+
+test("the month buttons are drawn once each, and step both months by one", async ({ page }) => {
+    await expect(page.locator(PREVIOUS), "one previous button across both headings").toHaveCount(1);
+    await expect(page.locator(NEXT), "one next button across both headings").toHaveCount(1);
+
+    const before = await gridLabels(page);
+
+    await page.locator(NEXT).click();
+
+    await expect
+        .poll(async () => (await gridLabels(page))[0], { message: "the second month becomes the first" })
+        .toBe(before[1]);
+
+    await page.locator(PREVIOUS).click();
+
+    await expect.poll(() => gridLabels(page), { message: "and previous puts both back" }).toEqual(before);
+});

@@ -6,6 +6,7 @@
         DateInputUtils,
         type DateValue,
         DateValueUtils,
+        FormValueUtils,
         type InteractionFlags,
         type TextFieldFlags,
         TextSyncUtils,
@@ -15,8 +16,6 @@
     import FormValue from "../../../Primitives/FormValue/FormValue.svelte";
     import TextField from "../../../Primitives/TextField/TextField.svelte";
     import type { DateInputEra, DateInputProps } from "./DateInput.types.js";
-
-    const EMPTY_FORM_VALUE = "";
 
     let { value = $bindable(), ref = $bindable(), ...props }: DateInputProps = $props();
 
@@ -98,7 +97,8 @@
     bind:ref
     element={"input"}
     inputMode={"numeric"}
-    computeMaskedText={(previous, next, caret) => TextSyncUtils.applyMask(mask, previous, next, caret)}
+    computeMaskedText={(previous, next, caret, isForwardDeletion) =>
+        TextSyncUtils.applyMask(mask, previous, next, caret, isForwardDeletion)}
     placeholderHint={DateInputUtils.computeHint(format, props.partHints)}
     hasError={(props.hasError ?? false) || field.getHasIssue()}
     renderLeading={props.renderLeading ? leading : undefined}
@@ -106,4 +106,4 @@
     onBlur={field.onBlur}
 />
 
-<FormValue name={props.name} values={[value ? DateValueUtils.toIso(value) : EMPTY_FORM_VALUE]} />
+<FormValue name={props.name} values={[value ? DateValueUtils.toIso(value) : FormValueUtils.EMPTY_TEXT]} />

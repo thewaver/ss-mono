@@ -43,6 +43,12 @@ reading.
 9. `GlassSurface`'s ripple layer shows a defect at its edge — _postponed until the platform catches up_
 10. Arbitrary placement — the gaps the trials left — _open_
 11. The Playground's painters in Windows high-contrast mode — _open, decided, not yet built_
+12. Every array lookup is trusted to find something — _decided, not yet built_
+13. Planned: drawing every component on a server — _decided, not yet built_
+14. Solid 2 — _decided, not yet built_
+15. TypeScript 7 — _waiting on 7.1_
+16. Joining scripts in the letter-by-letter text components — _decided, not yet built_
+17. `Table`'s end-pinned column in Safari inside a scaled `Viewport` — _postponed until the platform catches up_
 
 ---
 
@@ -437,6 +443,103 @@ on.
 
 ---
 
+## 12. Every array lookup is trusted to find something
+
+**What happens.** Code reads `items[index]` and uses the result as if it were there. When the index is past the end,
+the value is `undefined`, the compiler says nothing, and the fault surfaces somewhere further on — a `NaN` in a
+position, a crash reading a property of nothing. An earlier review of `ss-utils` found several of its bugs were this
+shape.
+
+**Decided by the user: turn on the compiler option that catches it, in all six packages.** The option is
+`noUncheckedIndexedAccess`: with it on, every lookup by index or by key is typed as possibly missing, so each one has
+to be checked or proved before use. It goes in `tsconfig.base.json`, which every package and Playground extends.
+`utils/tsconfig.json` does not extend the base, so it gets the option in its own file.
+
+**What it costs**, measured by passing the option by hand: 359 errors in `ss-utils`, 1,213 in the core and 1,065 in
+the Solid package; React, Vue, Svelte and the Playgrounds were not counted. Most are lookups already guarded by a
+length check the compiler cannot follow.
+
+**Not yet settled:** how each error is answered — an early return, a default, or a non-null assertion (`!`) where the
+index is already proved in range — and the order the packages are taken in.
+
+---
+
+## 13. Planned: drawing every component on a server
+
+**What a consumer meets today.** Next.js, Nuxt, SvelteKit and SolidStart draw a page on a server first, then hand it
+to the browser. Whether these components can be drawn there is not known: the built core and `ss-utils` load in Node
+without touching the browser (probed), but no component has been drawn on a server. The React package also carries no
+`"use client"` line, so a Next.js consumer has to wrap each component in a file of their own before it will load.
+
+**Decided by the user.** Each component package's README says **"browser only, server rendering not tested"**, so
+nobody is misled meanwhile; that sentence is already written (`ss-utils`' README does not carry it, since that package
+loads in Node). **This item is the project of making it true the other way**: every component draws on a server
+without error and takes over in the browser without a mismatch, tested in a small app per framework — Next.js, Nuxt,
+SvelteKit and SolidStart.
+
+**Not yet settled:** whether the React package gains a `"use client"` line as part of it.
+
+---
+
+## 14. Solid 2
+
+**What a consumer meets today.** Solid 2 is out (`solid-js` 2.0.3, `@solidjs/router` 2.0.1). The Solid package
+asks for `^1.9.15`, so a consumer on Solid 2 gets a warning on install, and the package uses functions Solid 2
+removed.
+
+**Decided by the user: a port, not yet started.** Solid 2 removes `on` (imported in 45 files of the Solid package),
+`createComputed` (12), `batch` (4) and `createResource` (2); each use is rewritten to Solid 2's equivalent, and the
+Playground's router moves to 2.0 with it.
+
+**Not yet settled:** whether the package then asks for Solid 2 only, or keeps working on Solid 1 too.
+
+---
+
+## 15. TypeScript 7
+
+**Waiting on TypeScript 7.1**, by the user: 7.0 broke some build tools. The repository stays on 6 until then
+(`decisions.md`, under _"TypeScript stays on 6 until 7.1"_). When 7.1 is out, the move is to update `typescript`
+and get the type check green in every package.
+
+---
+
+## 16. Joining scripts in the letter-by-letter text components
+
+**What a reader sees.** `ScrambleText` and `Typewriter` put each character in a box of its own while they animate,
+and so does `PaintedText` while a wrapper drives it or its letters push each other. In Arabic, and any other script
+whose letters join, the letters come out unjoined, and right to left text runs the wrong way, because a browser only
+shapes and orders letters within one box — CSS Text 3 §7.3 keeps shaping only across inline boxes, and a box per
+letter is an inline-block. Accented letters and joined emoji are not part of this item: those are split by
+grapheme, which fixed them.
+
+**Decided by the user: a later piece of work.** A run of a joining or right-to-left script keeps a word in one box,
+animated as one piece, rather than a box per character. **Not yet settled:** how a word moves where each letter used
+to move on its own (one timing for the word, or the word's first letter's), and how the components tell which runs
+need it.
+
+---
+
+## 17. `Table`'s end-pinned column in Safari inside a scaled `Viewport` — _postponed until the platform catches up_
+
+**What a reader sees.** A table with a column pinned to the end edge, inside a `Viewport` that scales its content
+(any scale but 1), shows that column in Safari about 34 layout pixels further toward the end than it belongs — partly
+past the frame's edge — and it stays there however far the table is scrolled, until it is scrolled all the way to the
+end, where it is right. The start-pinned column is unaffected, and Chrome is right at the same scale.
+
+**It is WebKit's fault, not the table's.** The pin is plain CSS, `position: sticky` with `inset-inline-end`, in
+`Table.css.ts`; the table computes nothing. The error is exactly the scroller's width times one minus one over the
+scale, so WebKit works out where an end-sticky element stops from the scroller's scaled-down width — the matching
+report is [WebKit bug 267765](https://lists.webkit.org/pipermail/webkit-unassigned/2025-March/1215250.html), sticky
+grid columns misplaced under a transform. Found by the WebKit run, where the Safari profile's screen made the
+Playground scale by about 1.07.
+
+**Postponed by the user rather than worked around:** a correction would have to detect the engine and undo a
+miscalculation by hand, and would itself break once WebKit is fixed. **The trigger is checkable**: re-open when bug
+267765 is resolved, and confirm with `table.spec.ts`'s _"a pinned column stays put at either edge"_ under a
+`Viewport` scale other than 1 in WebKit.
+
+---
+
 ## Accepted limits
 
 Faults that have been looked at and consciously left alone. Not outstanding work, not numbered, and not part
@@ -567,6 +670,18 @@ what a grid's single tab stop exists to prevent: a ten-column table would take e
 instead of one. Success criterion 2.1.1 is met either way, since the function is reachable from the keyboard;
 what is given up is 3.3.2-style discoverability, and the user weighed that against the tab order and kept the
 tab order. The reasoning behind the whole arrangement is in `decisions.md`.
+
+**On a Mac, a `Table` column cannot be resized from the keyboard as shipped.** Accepted by the user. The keyboard route
+is Control with Left or Right on a header cell, and macOS takes Control with an arrow for moving between desktops,
+by default. Reachable on the Table page's _Resizable columns_ example in any Mac browser. A second key was offered —
+Option with the arrows — and declined; the pointer route still works, and someone who turns the desktop shortcut off
+in System Settings gets the keyboard route back.
+
+**On an iPhone, a `NumberInput` or `CurrencyInput` that takes negative numbers may offer no minus key.** Accepted by
+the user. Both use the decimal keypad (`inputMode="decimal"`: `NumberInput` by default, `CurrencyInput` always), and
+MDN says that keypad "may or may not show a minus key"; WebKit's bug about iPhones lacking it (193825) is still open.
+Reachable on an iPhone in a field with no minimum; not checked on a device. Changing the keypad when negatives are
+allowed was offered and declined.
 
 **Screenshot baselines, and with them any automated check on appearance.** Accepted by the user, on two
 grounds: style in this project is far too fluid for a baseline image to mean anything for long,
@@ -896,7 +1011,7 @@ accepting that the number of items is the solid's. The first two readings are st
 ### A fifth round of Exotics candidates, and what became of each
 
 Seven were put to the user from portfolio showcases, each with a published example. The user then went through
-three whole catalogues, [Fancy Components](https://www.fancycomponents.dev),
+three whole catalogs, [Fancy Components](https://www.fancycomponents.dev),
 [Made With GSAP](https://madewithgsap.com/effects) and [React Bits](https://reactbits.dev), which yielded more
 than the single picks did. What was taken up has been built. The rest:
 
@@ -929,7 +1044,7 @@ mostly reachable with what exists.
 
 **The round went on through [Magic UI](https://magicui.design), [Animata](https://animata.design),
 [Aceternity UI](https://ui.aceternity.com), [Motion Primitives](https://motion-primitives.com) and
-[Skiper UI](https://skiper-ui.com)**, which is every catalogue it set out to browse. What was taken up from Magic UI
+[Skiper UI](https://skiper-ui.com)**, which is every catalog it set out to browse. What was taken up from Magic UI
 and Skiper UI is numbered. Animata, Aceternity UI and Motion Primitives gave nothing to take: the first had nothing
 past what exists, the second is mostly graphics-card spectacle, and the third's dock is kept only as a reference for
 how arrangements move. Element pictures, for cutting a live button into pieces, are postponed under item 1 until

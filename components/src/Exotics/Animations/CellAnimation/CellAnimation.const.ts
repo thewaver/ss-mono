@@ -7,7 +7,7 @@ export const CELL_ANIMATION_DEFAULTS = {
     animationDurationMs: 2000,
     animationIterationCount: Infinity,
     animationIterationDelayMs: 1000,
-    sizeAnchor: "width",
+    sizeAnchor: "width" as "width" | "height",
     finalFrame: "cells" as CellAnimationFinalFrame,
     origin: { row: 0, col: 0 } as Index2d,
     renderer: SLICE_ANIMATION_DEFAULTS.renderer,

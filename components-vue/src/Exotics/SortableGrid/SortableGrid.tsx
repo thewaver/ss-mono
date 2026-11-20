@@ -15,6 +15,7 @@ import {
     CarrierUtils,
     type CarrierZone,
     type CarryMode,
+    NavigatorUtils,
     SORTABLE_GRID_DEFAULTS,
     type SortableGridFlags,
     type SortableGridItemFlags,
@@ -40,7 +41,7 @@ import type {
 } from "../../Primitives/InteractionWrapper/InteractionWrapper.types";
 import { watchAfterRender } from "../../Utils/effectUtils";
 import { callSlot, declareProps, forwardProps, useTwoWay } from "../../Utils/propUtils";
-import { toElement } from "../../Utils/refUtils";
+import { exposeElement, toElement } from "../../Utils/refUtils";
 import type { SlotsContext } from "../../Utils/typeUtils";
 import type {
     SortableGridController,
@@ -109,7 +110,7 @@ const SortableGridItemSlot = defineComponent(
 );
 
 export const SortableGrid = defineComponent(
-    <T,>(props: SortableGridProps<T>, { slots }: SlotsContext<SortableGridSlots<T>>) => {
+    <T,>(props: SortableGridProps<T>, { slots, expose }: SlotsContext<SortableGridSlots<T>>) => {
         const items = useTwoWay(props, "items");
 
         const gridId = useId();
@@ -118,6 +119,8 @@ export const SortableGrid = defineComponent(
         const viewportContext = useViewportContext();
 
         const rootRef = shallowRef<HTMLElement>();
+
+        exposeElement(expose, () => rootRef.value);
         const itemRefs: Array<HTMLElement | undefined> = [];
 
         let grabOffset: Point2d = { x: 0, y: 0 };
@@ -258,6 +261,8 @@ export const SortableGrid = defineComponent(
         };
 
         const handlePointerDown = (index: number) => (e: PointerEvent) => {
+            hasPendingClick = false;
+
             if (e.button !== 0 || getIsDisabled()) return;
             if ((e.target as HTMLElement).closest(CarrierUtils.INTERACTIVE_SELECTOR)) return;
             if (CarrierUtils.getCarry()) return;
@@ -298,7 +303,7 @@ export const SortableGrid = defineComponent(
         };
 
         const handleKeyDown = (index: number) => (e: KeyboardEvent) => {
-            if (getIsDisabled()) return;
+            if (e.target !== e.currentTarget || getIsDisabled() || NavigatorUtils.getHasCommandModifier(e)) return;
 
             const action = SortableGridUtils.computeKeyAction(e.key, {
                 index,
@@ -443,6 +448,7 @@ export const SortableGrid = defineComponent(
                         sizing={"fill"}
                         isDisabled={item.isDisabled ?? false}
                         isReachableWhenDisabled={item.isReachableWhenDisabled ?? false}
+                        isFocusableWhenDisabled={!getIsDisabled() && (item.isReachableWhenDisabled ?? false)}
                         isTabbable={rovingIndex === index}
                         tooltipDefs={item.tooltipDefs}
                         extraFlags={{ isCarried: carriedKey === props.computeItemKey(item.value) }}
@@ -457,9 +463,10 @@ export const SortableGrid = defineComponent(
                                         }}
                                         id={getItemId(index)}
                                         hintId={hintId}
-                                        label={SortableGridUtils.computeItemLabel(
-                                            props.computeItemLabel(item.value),
-                                            item,
+                                        label={props.computeItemAriaLabel(
+                                            item.value,
+                                            SortableGridUtils.getItemShape(item).size,
+                                            item.spot,
                                         )}
                                         position={readingOrder.indexOf(index) + 1}
                                         setSize={items.value.length}
@@ -631,6 +638,7 @@ export const SortableGrid = defineComponent(
             "onUpdate:items": null,
             "computeItemKey": null,
             "computeItemLabel": null,
+            "computeItemAriaLabel": null,
             "computeCanAccept": null,
             "onTransfer": null,
             "onMount": null,

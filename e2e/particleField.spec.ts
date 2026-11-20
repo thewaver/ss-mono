@@ -68,6 +68,9 @@ const setNumber = async (page: Page, key: string, value: number) => {
     await page.locator(`${prop(key)} input`).blur();
 };
 
+/** How far the walk to the first particle steps before giving up, in presses of the progress slider. */
+const MAX_PROGRESS_STEPS = 100;
+
 const placesOf = (page: Page, key: string) =>
     page
         .locator(`${demo(key)} ${FIELD} > div`)
@@ -109,7 +112,9 @@ test("at a spawn chance of 0 nothing spawns", async ({ page }) => {
 
 /**
  * Below 1, each cell is decided once per pass and the decision is kept, so dragging away from a point in the pass and
- * back to it shows exactly the particles it showed before rather than rolling again.
+ * back to it shows exactly the particles it showed before rather than rolling again. The point is the first one,
+ * stepping from the start of the pass, at which some cell has won its roll — how many cells start the pass at once
+ * is the weight's business, and a single cell can lose its roll.
  */
 test("a pass decided by chance shows the same particles each time it is revisited", async ({ page }) => {
     await page.locator("#particleFieldPlayback").click();
@@ -120,13 +125,23 @@ test("a pass decided by chance shows the same particles each time it is revisite
     await slider.focus();
     await page.keyboard.press("Home");
 
-    const first = await placesOf(page, "default");
+    let first = await placesOf(page, "default");
+    let steps = 0;
+
+    while (first.length === 0 && steps < MAX_PROGRESS_STEPS) {
+        await page.keyboard.press("ArrowRight");
+        steps += 1;
+        first = await placesOf(page, "default");
+    }
+
+    expect(first.length, "some cells won their roll").toBeGreaterThan(0);
 
     await page.keyboard.press("End");
     await expect.poll(() => placesOf(page, "default"), { message: "the far end of the pass is empty" }).toEqual([]);
     await page.keyboard.press("Home");
 
-    expect(first.length, "some cells won their roll").toBeGreaterThan(0);
+    for (let step = 0; step < steps; step++) await page.keyboard.press("ArrowRight");
+
     await expect
         .poll(() => placesOf(page, "default"), { message: "and the same ones show on the way back" })
         .toEqual(first);

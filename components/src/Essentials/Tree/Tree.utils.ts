@@ -85,11 +85,7 @@ export namespace TreeUtils {
      * hears its name, that it is unavailable, and its tooltip — though it still cannot be opened or chosen.
      */
     export const computeIsNavigable = <T, TTooltipDefs>(row: TreeRecordRow<T, TTooltipDefs>) =>
-        !row.node.isDisabled ||
-        InteractionTrackerUtils.computeIsReachable(
-            row.node.isDisabled ?? false,
-            row.node.isReachableWhenDisabled ?? false,
-        );
+        InteractionTrackerUtils.computeIsNavigable(row.node);
 
     /**
      * Which row holds the tree's single tab stop.
@@ -173,17 +169,18 @@ export namespace TreeUtils {
      *
      * @param expanded The values open now.
      * @param siblings The rows to open, from {@link computeSiblings}.
-     * @returns The new list.
+     * @returns The new list, or the one handed in when every such branch is already open, so nothing is written.
      */
-    export const expandSiblings = <T, TTooltipDefs>(expanded: T[], siblings: TreeRecordRow<T, TTooltipDefs>[]) => [
-        ...expanded,
-        ...siblings
+    export const expandSiblings = <T, TTooltipDefs>(expanded: T[], siblings: TreeRecordRow<T, TTooltipDefs>[]) => {
+        const opened = siblings
             .filter(
                 (sibling) =>
                     getIsBranch(sibling.node) && !sibling.node.isDisabled && !expanded.includes(sibling.node.value),
             )
-            .map((sibling) => sibling.node.value),
-    ];
+            .map((sibling) => sibling.node.value);
+
+        return opened.length < 1 ? expanded : [...expanded, ...opened];
+    };
 
     /**
      * Where focus should go when a branch is closed from outside while focus was inside it.
@@ -311,7 +308,8 @@ export namespace TreeUtils {
      * @param hasConnector Whether it was given `renderConnector`.
      */
     export const warnIfConnectorIgnored = (hasLayout: boolean, hasConnector: boolean) => {
-        if (!hasLayout && hasConnector) console.warn(IGNORED_CONNECTOR_WARNING);
+        if (process.env.NODE_ENV !== "production" && !hasLayout && hasConnector)
+            console.warn(IGNORED_CONNECTOR_WARNING);
     };
 
     /**
@@ -349,7 +347,8 @@ export namespace TreeUtils {
      * fully, partly or not ticked.
      *
      * A disabled node is left out of every folder, so ticking a folder never changes it and it never counts toward the
-     * folder's state; it can still hold a tick of its own from before.
+     * folder's state; it can still hold a tick of its own from before. What sits under a disabled folder is not
+     * disabled with it: a folder above reaches through it to the enabled nodes inside, as ticking everything does.
      *
      * @param nodes The tree's roots, with everything under them.
      * @returns Defs for `SelectionUtils.getBranchState` and `SelectionUtils.getBranchSelection`, keyed by value.
@@ -359,14 +358,16 @@ export namespace TreeUtils {
     ): SelectionBranchDefs<T> => {
         const children = new Map<T, T[]>();
 
+        const getTickableChildren = (list: TreeNodeRecord<T, TTooltipDefs>[]): T[] =>
+            list.flatMap((child) =>
+                child.isDisabled ? getTickableChildren(child.children ?? NO_CHILDREN) : [child.value],
+            );
+
         const walk = (list: TreeNodeRecord<T, TTooltipDefs>[]) =>
             list.forEach((node) => {
                 const own = node.children ?? NO_CHILDREN;
 
-                children.set(
-                    node.value,
-                    own.filter((child) => !child.isDisabled).map((child) => child.value),
-                );
+                children.set(node.value, getTickableChildren(own));
                 walk(own);
             });
 

@@ -1,6 +1,6 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { docsDemo, docsSettled, inputValue, prop } from "./helpers";
+import { docsDemo, docsSettled, inputValue, prop, tabKey } from "./helpers";
 
 const DOCS = "/src/App/Pages/CurrencyInputPage/Docs";
 
@@ -130,7 +130,7 @@ test("a bound leaves a typed amount alone until the field is left, then pulls it
         "true",
     );
 
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
 
     expect(
         amountOf(await inputValue(page.locator(BOUNDED))),

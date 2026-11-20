@@ -4,8 +4,8 @@ import type { WeightFn } from "../../../../Generators/SliceAnimationWeights/Slic
 import { SliceAnimationWeightUtils } from "../../../../Generators/SliceAnimationWeights/SliceAnimationWeights.utils";
 
 export const sequenceEvenOdd: WeightFn = (pos, count) => {
-    const total = count.col * count.row;
-    const idx = Index2dUtils.toFlatIndex(pos, count.col);
+    const total = count.colCount * count.rowCount;
+    const idx = Index2dUtils.toFlatIndex(pos, count.colCount);
     const evenCount = Math.ceil(total * 0.5);
 
     return SliceAnimationWeightUtils.fromOrderedIndex(

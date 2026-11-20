@@ -135,3 +135,37 @@ describe("SplitPaneUtils.warnIfGutterUnnamed", () => {
         warn.mockRestore();
     });
 });
+
+describe("SplitPaneUtils.computePointerBoundary inside a scaled viewport", () => {
+    const toRect = (width: number) => ({ left: 0, top: 0, right: width, bottom: 100, width, height: 100 }) as DOMRect;
+
+    it("keeps the boundary under the pointer when the split is drawn at half its layout size, gutters and all", () => {
+        const layoutWidth = 400;
+        const gutterSize = 20;
+        const scale = 0.5;
+
+        for (const paneCount of [2, 3]) {
+            const available = layoutWidth - gutterSize * (paneCount - 1);
+
+            for (const [index, boundary] of [
+                [0, 0.25],
+                [paneCount - 2, 0.7],
+            ]) {
+                const layoutOffset = boundary * available + gutterSize * (index + 0.5);
+
+                expect(
+                    SplitPaneUtils.computePointerBoundary({
+                        point: { clientX: layoutOffset * scale, clientY: 0 },
+                        rootRect: toRect(layoutWidth * scale),
+                        index,
+                        orientation: "horizontal",
+                        direction: "ltr",
+                        gutterSize,
+                        paneCount,
+                        layoutExtent: layoutWidth,
+                    }),
+                ).toBeCloseTo(boundary);
+            }
+        }
+    });
+});

@@ -51,6 +51,7 @@ export namespace Point3d {
     export const toString = Vec3d.toString(K1, K2, K3);
 }
 
+/** Reading a 3D point back from its text form. */
 export namespace Point3dString {
     /** Parses a string such as `X10_Y20_Z30` back into a {@link Point3d}. */
     export const fromString = Vec3d.fromString(K1, K2, K3);

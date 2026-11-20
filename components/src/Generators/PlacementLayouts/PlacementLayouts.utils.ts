@@ -1,185 +1,13 @@
-import { AngleUtils, type Point2d, Point2dUtils } from "@thewaver/ss-utils";
-
-import type { PlacementLayoutFn, PlacementRect } from "../../Abstracts/Placement/Placement.types";
-import { PlacementLayoutDefaults } from "./PlacementLayouts.const";
-import type {
-    ArcDefs,
-    BandDefs,
-    CliffDefs,
-    ColumnDefs,
-    FittedLayoutFn,
-    HoneycombDefs,
-    PlacementLayoutEntry,
-    RowDefs,
-    SizedLayout,
-    SizedLayoutFn,
-    WhorlDefs,
-    ZigzagDefs,
-} from "./PlacementLayouts.types";
-
-const FULL_TURN_DEGREES = 360;
-const HALF = 0.5;
-const SINGLE_ITEM = 1;
-const NO_ITEMS = 0;
-const NOTHING = 0;
-const FULL_SHARE = 1;
-const AXIS_DEGREES = [-360, -270, -180, -90, 0, 90, 180, 270, 360];
-const HEX_HEIGHT_RATIO = 2 / Math.sqrt(3);
-const HEX_ROW_STEP_RATIO = 0.75;
-const EVEN_ROW = 0;
-const ROW_PARITY = 2;
-const ARC_SAMPLES = 512;
-const OVAL_WIDTH = 1;
-const UNSCALED = 1;
-const NO_SPREAD_DEGREES = 0;
-const NO_HOLE = 0;
-const WHOLE_RADIUS = 1;
-const CELL_WIDTH = 1;
-const ITEM_QUARTERS = 2;
-const HEX_CLIP_PATH = "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)";
-const QUARTER = 0.25;
-const WHORL_SIZE = 3;
-const CLIFF_SIZE = 3;
-const CLIFF_CENTER = 0.5;
-const CLIFF_SHIFT_RATIOS = [0, 0.5, -0.25];
-const CLIFF_DROP_RATIOS = [0, 0.5, 0.75];
-
-const toSum = (values: number[]) => values.reduce((total, value) => total + value, NOTHING);
-
-type ArcBox = {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    tiltDegrees?: number;
-    fromAngle?: number;
-    toAngle?: number;
-};
-
-type ArcExtent = {
-    left: number;
-    top: number;
-    right: number;
-    bottom: number;
-};
-
-const toTurnExtent = (outerRadius: number): ArcExtent => ({
-    left: -outerRadius,
-    top: -outerRadius,
-    right: outerRadius,
-    bottom: outerRadius,
-});
-
-type ArcSpan = {
-    low: number;
-    high: number;
-};
-
-const toSpan = (values: number[]): ArcSpan => ({ low: Math.min(...values), high: Math.max(...values) });
-
-const toHalfSize = (width: number, height: number, tiltDegrees: number): Point2d => {
-    const radians = tiltDegrees * AngleUtils.RADIANS_PER_DEGREE;
-    const cos = Math.abs(Math.cos(radians));
-    const sin = Math.abs(Math.sin(radians));
-
-    return { x: (width * cos + height * sin) * HALF, y: (width * sin + height * cos) * HALF };
-};
-
-const toFillingScale = (room: number, span: ArcSpan) => {
-    const length = span.high - span.low;
-
-    return length > NOTHING ? (room * 2) / length : Number.POSITIVE_INFINITY;
-};
-
-const toFittingScale = (room: number, halfSize: number, reach: number) =>
-    halfSize > room || reach === NOTHING ? Number.POSITIVE_INFINITY : (room - halfSize) / Math.abs(reach);
-
-const toEllipsePoint = (radiusX: number, radiusY: number, degrees: number) => {
-    const radians = degrees * AngleUtils.RADIANS_PER_DEGREE;
-
-    return { x: Math.cos(radians) * radiusX, y: Math.sin(radians) * radiusY };
-};
-
-const toEvenArcAngles = (
-    itemCount: number,
-    radiusX: number,
-    radiusY: number,
-    fromAngle: number,
-    toAngle: number,
-): number[] => {
-    if (itemCount <= NO_ITEMS) return [];
-    if (itemCount === SINGLE_ITEM) return [(fromAngle + toAngle) * HALF];
-
-    const step = (toAngle - fromAngle) / ARC_SAMPLES;
-    const walked: number[] = [NOTHING];
-    let previous = toEllipsePoint(radiusX, radiusY, fromAngle);
-    let total = NOTHING;
-
-    for (let sample = SINGLE_ITEM; sample <= ARC_SAMPLES; sample++) {
-        const point = toEllipsePoint(radiusX, radiusY, fromAngle + step * sample);
-
-        total += Point2dUtils.getDistance(previous, point);
-        walked.push(total);
-        previous = point;
-    }
-
-    const gaps = itemCount - SINGLE_ITEM;
-    const angles: number[] = [];
-    let sample = NOTHING;
-
-    for (let index = NOTHING; index < itemCount; index++) {
-        const target = (total * index) / gaps;
-
-        while (sample < ARC_SAMPLES - SINGLE_ITEM && walked[sample + SINGLE_ITEM] < target) sample++;
-
-        const spanned = walked[sample + SINGLE_ITEM] - walked[sample];
-        const share = spanned <= NOTHING ? NOTHING : (target - walked[sample]) / spanned;
-
-        angles.push(fromAngle + step * (sample + share));
-    }
-
-    return angles;
-};
-
-const toFittedLayout = (placements: PlacementRect[]) => ({
-    placements,
-    heightRatio: placements.reduce(
-        (lowest, placement) => Math.max(lowest, placement.topShare + placement.heightShare * HALF),
-        NOTHING,
-    ),
-});
-
-/**
- * Lays a run of equal boxes along one axis, the first one's near edge against the start of the box.
- *
- * The cross axis is centered for a column and left where the caller put it for a row, which is what
- * makes {@link toFittedLayout}'s height come out as the run's own extent rather than as the box's.
- */
-const toRun = (itemCount: number, size: Point2d, gap: number, isVertical: boolean): PlacementRect[] => {
-    const step = (isVertical ? size.y : size.x) + gap;
-
-    return Array.from({ length: itemCount }, (_unused, index) => ({
-        leftShare: isVertical ? FULL_SHARE * HALF : size.x * HALF + step * index,
-        topShare: isVertical ? size.y * HALF + step * index : size.y * HALF,
-        widthShare: size.x,
-        heightShare: size.y,
-    }));
-};
-
-const computeWhorl = (itemCount: number, itemStepRatio: number, whorlStepRatio: number): PlacementRect[] =>
-    Array.from({ length: itemCount }, (_, index) => {
-        const itemSize = QUARTER * ITEM_QUARTERS;
-        const itemDrop = itemSize * itemStepRatio;
-        const whorlTop = Math.floor(index / WHORL_SIZE) * (itemDrop + itemSize * whorlStepRatio);
-        const place = index % WHORL_SIZE;
-
-        return {
-            topShare: QUARTER + whorlTop + (place === 0 ? NOTHING : itemDrop),
-            leftShare: QUARTER * (place === 0 ? 2 : place === 1 ? 1 : 3),
-            widthShare: itemSize,
-            heightShare: itemSize,
-        };
-    });
+import type { PlacementLayoutFn } from "../../Abstracts/Placement/Placement.types";
+import { PlacementArcUtils } from "./PlacementArc.utils";
+import { PlacementCliffUtils } from "./PlacementCliff.utils";
+import { PlacementColumnUtils } from "./PlacementColumn.utils";
+import { PlacementHoneycombUtils } from "./PlacementHoneycomb.utils";
+import type { PlacementLayoutEntry } from "./PlacementLayouts.types";
+import { PlacementRingUtils } from "./PlacementRing.utils";
+import { PlacementRowUtils } from "./PlacementRow.utils";
+import { PlacementWhorlUtils } from "./PlacementWhorl.utils";
+import { PlacementZigzagUtils } from "./PlacementZigzag.utils";
 
 /**
  * The arrangements this library ships, as factories a consumer can tune or take as they are.
@@ -194,392 +22,50 @@ const computeWhorl = (itemCount: number, itemStepRatio: number, whorlStepRatio: 
  * is the same split an SVG draws.
  */
 export namespace PlacementLayoutUtils {
-    /**
-     * Places items round a band, at even angles.
-     *
-     * Each item is given the wedge of the ring it sits in as well as its box, so a control can hand its
-     * painter a shape rather than a rectangle. A spread below a whole turn opens the band into an arc of
-     * wedges, and the box stays the whole circle, so a part-ring leaves the side it does not cover empty and
-     * nested bands still share a center.
-     *
-     * @param defs How wide the band is, which way it faces, and how its items sit on it.
-     * @returns A layout function, sized — it states the width it was drawn at.
-     */
-    export const createRing = (defs?: BandDefs): SizedLayoutFn => {
-        const base = PlacementLayoutDefaults.BAND_DEFAULTS;
-        const spreadDegrees = Math.min(
-            Math.max(defs?.spreadDegrees ?? base.spreadDegrees, NO_SPREAD_DEGREES),
-            FULL_TURN_DEGREES,
-        );
-        const facingDegrees = defs?.facingDegrees ?? base.facingDegrees;
-        const holeRatio = Math.min(Math.max(defs?.holeRatio ?? base.holeRatio, NO_HOLE), WHOLE_RADIUS);
-        const bandWidth = WHOLE_RADIUS - holeRatio;
-        const wedgeGapDegrees = defs?.wedgeGapDegrees ?? base.wedgeGapDegrees;
-        const tiltRatio = defs?.tiltRatio ?? base.tiltRatio;
-        const itemRadiusRatio = defs?.itemRadiusRatio ?? base.itemRadiusRatio;
-        const itemHeightRatio = defs?.itemHeightRatio ?? base.itemHeightRatio;
-        const itemMaxWidthRatio = defs?.itemMaxWidthRatio ?? base.itemMaxWidthRatio;
-        const computeItemArcs = defs?.computeItemArcs;
-        const innerRadius = holeRatio;
-        const outerRadius = WHOLE_RADIUS;
-        const itemRadius = innerRadius + bandWidth * itemRadiusRatio;
-
-        return ({ itemCount }): SizedLayout => {
-            const declared = computeItemArcs?.() ?? [];
-            const asked = Array.from({ length: itemCount }, (_unused, index) => declared[index]);
-            const askedTotal = toSum(asked.map((arc) => arc ?? NOTHING));
-            const freeCount = asked.filter((arc) => arc === undefined).length;
-            const evenArc = Math.max(spreadDegrees - askedTotal, NOTHING) / Math.max(freeCount, SINGLE_ITEM);
-            const wanted = asked.map((arc) => arc ?? evenArc);
-            const total = toSum(wanted);
-            const arcs = wanted.map((arc) => (arc * spreadDegrees) / Math.max(total, Number.EPSILON));
-            const blockArc = toSum(arcs);
-            const start = facingDegrees - blockArc * HALF;
-
-            const boxes: ArcBox[] = [];
-            let walked = NOTHING;
-
-            for (let index = NOTHING; index < itemCount; index++) {
-                const fromAngle = start + walked + wedgeGapDegrees * HALF;
-                const toAngle = start + walked + arcs[index] - wedgeGapDegrees * HALF;
-                const centerAngle = (fromAngle + toAngle) * HALF;
-                const radians = centerAngle * AngleUtils.RADIANS_PER_DEGREE;
-                const itemWidth = Math.min(
-                    2 *
-                        itemRadius *
-                        Math.sin(Math.max(toAngle - fromAngle, NOTHING) * HALF * AngleUtils.RADIANS_PER_DEGREE),
-                    bandWidth * itemMaxWidthRatio,
-                );
-
-                walked += arcs[index];
-
-                boxes.push({
-                    x: Math.cos(radians) * itemRadius,
-                    y: Math.sin(radians) * itemRadius,
-                    width: itemWidth,
-                    height: itemWidth * itemHeightRatio,
-                    tiltDegrees: centerAngle * tiltRatio,
-                    fromAngle,
-                    toAngle,
-                });
-            }
-
-            const extent = toTurnExtent(outerRadius);
-            const width = extent.right - extent.left;
-            const height = extent.bottom - extent.top;
-            const origin = { x: -extent.left / width, y: -extent.top / width };
-
-            const placements = boxes.map<PlacementRect>((box) => ({
-                leftShare: origin.x + box.x / width,
-                topShare: origin.y + box.y / width,
-                widthShare: box.width / width,
-                heightShare: box.height / width,
-                angle: box.tiltDegrees,
-                sector:
-                    box.fromAngle === undefined || box.toAngle === undefined
-                        ? undefined
-                        : {
-                              innerRadius: innerRadius / width,
-                              outerRadius: outerRadius / width,
-                              fromAngle: box.fromAngle,
-                              toAngle: box.toAngle,
-                              origin,
-                          },
-            }));
-
-            return {
-                placements,
-                extent: width,
-                heightRatio: height / width,
-                pickRule: "angle",
-                reachRule: "arc",
-                origin,
-            };
-        };
-    };
+    /** {@link PlacementRingUtils.createRing}: places items round a band, at even angles. */
+    export const createRing = PlacementRingUtils.createRing;
 
     /** {@link createRing} at its defaults. */
     export const ring = createRing();
 
-    /**
-     * Places items along a piece of an oval, evenly spaced by the distance walked rather than by angle.
-     *
-     * The box is the oval's: as wide as it is given, and `ovalHeightRatio` of that tall, whatever the items. Only
-     * the piece the spread covers is drawn, so the piece is then grown evenly until it meets the box on one side
-     * and centered on the other, and shrunk back evenly until every item fits inside the box. Items keep the size
-     * they were given throughout — only the curve and where the items sit on it are scaled — so changing an item's
-     * size never moves the box. An item too large for the box on its own is left as it is and reaches past it.
-     *
-     * Stepping by distance rather than angle matters once the oval is not a circle, where equal angles bunch
-     * the items at its flat ends.
-     *
-     * @param defs How tall the oval is, how far the piece sweeps and which way it faces, and how large its items
-     * are.
-     * @returns A layout function, sized — it states the width it was drawn at.
-     */
-    export const createArc = (defs?: ArcDefs): SizedLayoutFn => {
-        const base = PlacementLayoutDefaults.ARC_DEFAULTS;
-        const ovalHeightRatio = defs?.ovalHeightRatio ?? base.ovalHeightRatio;
-        const spreadDegrees = defs?.spreadDegrees ?? base.spreadDegrees;
-        const facingDegrees = defs?.facingDegrees ?? base.facingDegrees;
-        const tiltRatio = defs?.tiltRatio ?? base.tiltRatio;
-        const itemWidth = defs?.itemWidthRatio ?? base.itemWidthRatio;
-        const itemHeight = defs?.itemHeightRatio ?? base.itemHeightRatio;
-        const radiusX = OVAL_WIDTH * HALF;
-        const radiusY = ovalHeightRatio * HALF;
-
-        return ({ itemCount }): SizedLayout => {
-            const widestSpread =
-                (FULL_TURN_DEGREES * Math.max(itemCount - SINGLE_ITEM, NOTHING)) / Math.max(itemCount, SINGLE_ITEM);
-            const spread = Math.min(Math.max(spreadDegrees, NO_SPREAD_DEGREES), widestSpread);
-            const fromAngle = facingDegrees - spread * HALF;
-            const toAngle = fromAngle + spread;
-            const angles = toEvenArcAngles(itemCount, radiusX, radiusY, fromAngle, toAngle);
-
-            const piece = [
-                fromAngle,
-                toAngle,
-                ...AXIS_DEGREES.filter((angle) => angle > fromAngle && angle < toAngle),
-            ].map((angle) => toEllipsePoint(radiusX, radiusY, angle));
-            const across = toSpan(piece.map((point) => point.x));
-            const down = toSpan(piece.map((point) => point.y));
-            const center = { x: (across.low + across.high) * HALF, y: (down.low + down.high) * HALF };
-            const filling = Math.min(toFillingScale(radiusX, across), toFillingScale(radiusY, down));
-
-            const items = angles.map((angle) => {
-                const tiltDegrees = angle * tiltRatio;
-
-                return {
-                    point: toEllipsePoint(radiusX, radiusY, angle),
-                    halfSize: toHalfSize(itemWidth, itemHeight, tiltDegrees),
-                    tiltDegrees,
-                };
-            });
-
-            const scale = items.reduce(
-                (smallest, item) =>
-                    Math.min(
-                        smallest,
-                        toFittingScale(radiusX, item.halfSize.x, item.point.x - center.x),
-                        toFittingScale(radiusY, item.halfSize.y, item.point.y - center.y),
-                    ),
-                Number.isFinite(filling) ? filling : UNSCALED,
-            );
-
-            const toBoxPoint = (point: Point2d) => ({
-                x: radiusX + (point.x - center.x) * scale,
-                y: radiusY + (point.y - center.y) * scale,
-            });
-
-            return {
-                placements: items.map<PlacementRect>((item) => {
-                    const at = toBoxPoint(item.point);
-
-                    return {
-                        leftShare: at.x,
-                        topShare: at.y,
-                        widthShare: itemWidth,
-                        heightShare: itemHeight,
-                        angle: item.tiltDegrees,
-                    };
-                }),
-                extent: OVAL_WIDTH,
-                heightRatio: ovalHeightRatio,
-                pickRule: "angle",
-                reachRule: "arc",
-                origin: toBoxPoint({ x: NOTHING, y: NOTHING }),
-                radii: { x: radiusX * scale, y: radiusY * scale },
-            };
-        };
-    };
+    /** {@link PlacementArcUtils.createArc}: places items along a piece of an oval, evenly spaced by the distance walked rather than by angle. */
+    export const createArc = PlacementArcUtils.createArc;
 
     /** {@link createArc} at its defaults. */
     export const arc = createArc();
 
-    /**
-     * Places items in a line across the box, filling its width.
-     *
-     * The arrangement a control would have had without a layout at all, which is what it is here for: it
-     * is the shape where the right answer is obvious by eye, so an effect or a walk that is wrong in it is
-     * plainly wrong. It declares that it runs horizontally, so an item giving way to a growing neighbor
-     * moves sideways and nowhere else.
-     *
-     * @param defs The gap between items, as a share of an item's width, and how tall an item is against it.
-     * @returns A layout function, fitted — it fills whatever room it is given.
-     */
-    export const createRow = (defs?: RowDefs): FittedLayoutFn => {
-        const gapRatio = defs?.gapRatio ?? PlacementLayoutDefaults.ROW_DEFAULTS.gapRatio;
-        const itemHeightRatio = defs?.itemHeightRatio ?? PlacementLayoutDefaults.ROW_DEFAULTS.itemHeightRatio;
-
-        return ({ itemCount }) => {
-            const spans = Math.max(itemCount + (itemCount - SINGLE_ITEM) * gapRatio, SINGLE_ITEM);
-            const width = FULL_SHARE / spans;
-
-            return {
-                ...toFittedLayout(toRun(itemCount, { x: width, y: width * itemHeightRatio }, width * gapRatio, false)),
-                reachRule: "horizontal",
-            };
-        };
-    };
+    /** {@link PlacementRowUtils.createRow}: places items in a line across the box, filling its width. */
+    export const createRow = PlacementRowUtils.createRow;
 
     /** {@link createRow} at its defaults. */
     export const row = createRow();
 
-    /**
-     * Places items in a line down the box.
-     *
-     * A row read down rather than across: its items fill the box's width, as a row's fill its width, so a narrow
-     * column is a narrow box — the consumer sets the width on whatever holds it, and the column grows as tall as its
-     * items come to. Its items give way vertically.
-     *
-     * @param defs How tall an item is against its own width, and the gap between.
-     * @returns A layout function, fitted — its height is whatever the items come to.
-     */
-    export const createColumn = (defs?: ColumnDefs): FittedLayoutFn => {
-        const gapRatio = defs?.gapRatio ?? PlacementLayoutDefaults.COLUMN_DEFAULTS.gapRatio;
-        const itemHeightRatio = defs?.itemHeightRatio ?? PlacementLayoutDefaults.COLUMN_DEFAULTS.itemHeightRatio;
-
-        return ({ itemCount }) => ({
-            ...toFittedLayout(
-                toRun(itemCount, { x: FULL_SHARE, y: itemHeightRatio }, itemHeightRatio * gapRatio, true),
-            ),
-            reachRule: "vertical",
-        });
-    };
+    /** {@link PlacementColumnUtils.createColumn}: places items in a line down the box. */
+    export const createColumn = PlacementColumnUtils.createColumn;
 
     /** {@link createColumn} at its defaults. */
     export const column = createColumn();
 
-    /**
-     * Packs items into staggered rows of hexagonal cells.
-     *
-     * Every cell carries the clip path that makes it a hexagon, so a consumer gets the shape without
-     * drawing it. Rows alternate by half a cell, which is what makes the packing tighter than a grid.
-     *
-     * @param defs How many cells to a row, and the gap between them as a share of a cell.
-     * @returns A layout function, sized — it states the width it was drawn at.
-     */
-    export const createHoneycomb = (defs?: HoneycombDefs): SizedLayoutFn => {
-        const cellWidth = CELL_WIDTH;
-        const perRow = Math.max(defs?.perRow ?? PlacementLayoutDefaults.HONEYCOMB_DEFAULTS.perRow, SINGLE_ITEM);
-        const gap = (defs?.gapRatio ?? PlacementLayoutDefaults.HONEYCOMB_DEFAULTS.gapRatio) * cellWidth;
-
-        return ({ itemCount }): SizedLayout => {
-            const cellHeight = cellWidth * HEX_HEIGHT_RATIO;
-            const columnStep = cellWidth + gap;
-            const rowStep = cellHeight * HEX_ROW_STEP_RATIO + gap;
-            const rowCount = Math.max(Math.ceil(itemCount / perRow), SINGLE_ITEM);
-            const columnCount = Math.min(itemCount, perRow);
-            const hasStaggeredRow = rowCount > SINGLE_ITEM;
-            const width = columnStep * columnCount + (hasStaggeredRow ? columnStep * HALF : NOTHING);
-            const height = rowStep * (rowCount - SINGLE_ITEM) + cellHeight;
-
-            const placements = Array.from({ length: itemCount }, (_unused, index): PlacementRect => {
-                const row = Math.floor(index / perRow);
-                const stagger = row % ROW_PARITY === EVEN_ROW ? NOTHING : columnStep * HALF;
-
-                return {
-                    leftShare: (stagger + columnStep * (index % perRow) + cellWidth * HALF) / width,
-                    topShare: (rowStep * row + cellHeight * HALF) / width,
-                    widthShare: cellWidth / width,
-                    heightShare: cellHeight / width,
-                    clipPath: HEX_CLIP_PATH,
-                };
-            });
-
-            return {
-                placements,
-                extent: width,
-                heightRatio: height / width,
-                pickRule: "nearest",
-                spreadRule: "cartesian",
-            };
-        };
-    };
+    /** {@link PlacementHoneycombUtils.createHoneycomb}: packs items into staggered rows of hexagonal cells. */
+    export const createHoneycomb = PlacementHoneycombUtils.createHoneycomb;
 
     /** {@link createHoneycomb} at its defaults. */
     export const honeycomb = createHoneycomb();
 
-    /**
-     * Steps items down and across in threes, like a stack of cards dealt down a slope.
-     *
-     * @param defs How far each group of three drops below the one before it.
-     * @returns A layout function, fitted — it fills whatever room it is given.
-     */
-    export const createCliff = (defs?: CliffDefs): FittedLayoutFn => {
-        const cliffStepRatio = defs?.cliffStepRatio ?? PlacementLayoutDefaults.CLIFF_DEFAULTS.cliffStepRatio;
-        const itemSize = QUARTER * ITEM_QUARTERS;
-        const leaderLeft =
-            CLIFF_CENTER - itemSize * ((Math.min(...CLIFF_SHIFT_RATIOS) + Math.max(...CLIFF_SHIFT_RATIOS)) * HALF);
-
-        return ({ itemCount }) => ({
-            ...toFittedLayout(
-                Array.from({ length: itemCount }, (_unused, index) => {
-                    const place = index % CLIFF_SIZE;
-
-                    return {
-                        topShare:
-                            itemSize * HALF +
-                            itemSize * (Math.floor(index / CLIFF_SIZE) * cliffStepRatio + CLIFF_DROP_RATIOS[place]),
-                        leftShare: leaderLeft + itemSize * CLIFF_SHIFT_RATIOS[place],
-                        widthShare: itemSize,
-                        heightShare: itemSize,
-                    };
-                }),
-            ),
-            spreadRule: "circular",
-        });
-    };
+    /** {@link PlacementCliffUtils.createCliff}: steps items down and across in threes, like a stack of cards dealt down a slope. */
+    export const createCliff = PlacementCliffUtils.createCliff;
 
     /** {@link createCliff} at its defaults. */
     export const cliff = createCliff();
 
-    /**
-     * Turns items about each other in threes, each group set below the one before it.
-     *
-     * The three whorls in the registry are this factory at three spacings, and they stay three entries
-     * because a whorl is read against the shape put into it — a circle, a hexagon and a square each want
-     * different spacing, so the second entry shows something the first does not.
-     *
-     * @param defs How far an item steps within its group, and how far a group steps from the last.
-     * @returns A layout function, fitted — it fills whatever room it is given.
-     */
-    export const createWhorl = (defs?: WhorlDefs): FittedLayoutFn => {
-        const itemStepRatio = defs?.itemStepRatio ?? PlacementLayoutDefaults.WHORL_DEFAULTS.itemStepRatio;
-        const whorlStepRatio = defs?.whorlStepRatio ?? PlacementLayoutDefaults.WHORL_DEFAULTS.whorlStepRatio;
-
-        return ({ itemCount }) => ({
-            ...toFittedLayout(computeWhorl(itemCount, itemStepRatio, whorlStepRatio)),
-            spreadRule: "circular",
-        });
-    };
+    /** {@link PlacementWhorlUtils.createWhorl}: turns items about each other in threes, each group set below the one before it. */
+    export const createWhorl = PlacementWhorlUtils.createWhorl;
 
     /** {@link createWhorl} at its defaults. */
     export const whorl = createWhorl();
 
-    /**
-     * Walks items down the box, turning back on itself every few steps.
-     *
-     * @param defs How many items make up one leg before it turns.
-     * @returns A layout function, fitted — it fills whatever room it is given.
-     */
-    export const createZigzag = (defs?: ZigzagDefs): FittedLayoutFn => {
-        const segmentLength = defs?.segmentLength ?? PlacementLayoutDefaults.ZIGZAG_DEFAULTS.segmentLength;
-        const step = 1 / (1 + segmentLength);
-        const peak = segmentLength - 1;
-
-        return ({ itemCount }) => ({
-            ...toFittedLayout(
-                Array.from({ length: itemCount }, (_unused, index) => ({
-                    topShare: step * (index + 1),
-                    leftShare: step * (peak - Math.abs((index % (peak * 2)) - peak) + 1),
-                    widthShare: step * 2,
-                    heightShare: step * 2,
-                })),
-            ),
-            spreadRule: "circular",
-        });
-    };
+    /** {@link PlacementZigzagUtils.createZigzag}: walks items down the box, turning back on itself every few steps. */
+    export const createZigzag = PlacementZigzagUtils.createZigzag;
 
     /** {@link createZigzag} at its defaults. */
     export const zigzag = createZigzag();

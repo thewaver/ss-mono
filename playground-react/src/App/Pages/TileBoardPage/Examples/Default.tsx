@@ -9,31 +9,36 @@ import type { TileBoardExampleProps } from "../TileBoardPage.types";
 
 type Props = TileBoardExampleProps;
 
-export const DefaultExample = ({ shape, marked, ...otherProps }: Props) => {
+export const DefaultExample = (props: Props) => {
+    const { shape, marked, ...otherProps } = props;
+
     const layout = useMemo(
         () =>
             TileBoardUtils.getLayout(
-                shape,
+                props.shape,
                 otherProps.tileCount,
                 otherProps.tileSize,
                 otherProps.hasShortFirstRow,
                 otherProps.taper,
             ),
-        [shape, otherProps.tileCount, otherProps.tileSize, otherProps.hasShortFirstRow, otherProps.taper],
+        [props.shape, otherProps.tileCount, otherProps.tileSize, otherProps.hasShortFirstRow, otherProps.taper],
     );
 
     return (
         <div className={styles.meepleHost}>
             <TileBoard
                 {...otherProps}
-                tiling={shape}
+                tiling={props.shape}
                 computeTileAriaLabel={(tile) => `Row ${tile.row + 1}, tile ${tile.col + 1}`}
                 renderTile={(tile, renderProps) => (
-                    <PageTileBoardTile renderProps={renderProps} isMarked={marked.includes(Index2d.toString(tile))} />
+                    <PageTileBoardTile
+                        renderProps={renderProps}
+                        isMarked={props.marked.includes(Index2d.toString(tile))}
+                    />
                 )}
             />
 
-            {marked.map((key) => (
+            {props.marked.map((key) => (
                 <PageTileBoardMeeple
                     key={key}
                     center={TileBoardUtils.getTileCenter(Index2dString.fromString(key), layout)}

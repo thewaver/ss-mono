@@ -247,7 +247,7 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
     };
 
     const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
-        if (rovingId === undefined) return;
+        if (rovingId === undefined || !getIsNode(e.target) || NavigatorUtils.getHasCommandModifier(e)) return;
 
         if (NavigatorUtils.getIsActivationKey(e.key)) {
             e.preventDefault();

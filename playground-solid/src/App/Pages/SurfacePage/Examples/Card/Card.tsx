@@ -42,7 +42,7 @@ export const CardExample = () => {
             <Surface {...config}>
                 <div class={styles.surfaceRoot}>
                     <div class={styles.pic}>
-                        <img src={knight_profile} width="100%" />
+                        <img src={knight_profile} width="100%" alt="" />
                         <div class={styles.picContent}>
                             <div class={styles.name}>{"Sir Face"}</div>
                             <div class={styles.role}>{UI_UX_VANGUARD_600_TEXT}</div>

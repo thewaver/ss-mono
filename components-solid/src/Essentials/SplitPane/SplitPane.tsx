@@ -101,6 +101,7 @@ export const SplitPane = (props: SplitPaneProps) => {
             direction: getDirection(),
             gutterSize: getGutterSize(),
             paneCount: access(props.panes).length,
+            layoutExtent: SplitPaneUtils.getLayoutExtent(root, getOrientation()),
         });
     };
 

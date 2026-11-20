@@ -1,6 +1,14 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { demo, prop, readout, waitUntilStill } from "./helpers";
+import {
+    demo,
+    expectAnnounced,
+    prop,
+    readAnnouncements,
+    readout,
+    recordAnnouncements,
+    waitUntilStill,
+} from "./helpers";
 
 const board = (key: string, label: string) => `${demo(key)} [role="group"][aria-label="${label}"]`;
 
@@ -14,8 +22,6 @@ const node = (key: string, label: string, boardLabel: string) =>
  */
 const socket = (key: string, label: string, boardLabel: string) =>
     `${board(key, boardLabel)} [role="button"][aria-label^="${label},"]`;
-
-const ANNOUNCER = 'body > [role="log"][aria-live="polite"]';
 
 const CHAIN = "chain";
 const CHAIN_LABEL = "Signal chain";
@@ -64,6 +70,7 @@ const cableCount = async (page: Page, key: string) => {
 };
 
 test.beforeEach(async ({ page }) => {
+    await recordAnnouncements(page);
     await page.goto("/patch-board");
     await expect(page.locator("[data-example]").first()).toBeVisible();
 });
@@ -112,7 +119,7 @@ test("a cable can be taken from one socket and dropped in another without a poin
     await page.locator(socket(CHAIN, "Clock tick", CHAIN_LABEL)).focus();
     await page.keyboard.press("Enter");
 
-    await expect(page.locator(ANNOUNCER), "picking it up says where it came from").toContainText("Clock tick");
+    await expectAnnounced(page, "Clock tick", { message: "picking it up says where it came from" });
 
     await page.keyboard.press("ArrowRight");
     await page.keyboard.press("ArrowRight");
@@ -137,9 +144,7 @@ test("a socket that cannot take the cable says so, and refuses the drop", async 
     await page.keyboard.press("ArrowRight");
     await page.keyboard.press("ArrowRight");
 
-    await expect(page.locator(ANNOUNCER), "the aim is announced as one that cannot be made").toContainText(
-        "cannot connect",
-    );
+    await expectAnnounced(page, "cannot connect", { message: "the aim is announced as one that cannot be made" });
 
     await page.keyboard.press("Enter");
 
@@ -172,7 +177,7 @@ test("pressing a connected input unplugs it", async ({ page }) => {
     await page.locator(socket(CHAIN, "Gate in", CHAIN_LABEL)).focus();
     await page.keyboard.press("Enter");
 
-    await expect(page.locator(ANNOUNCER), "the removal is announced").toContainText("unplugged");
+    await expectAnnounced(page, "unplugged", { message: "the removal is announced" });
 
     expect(await cableCount(page, CHAIN), "and the cable is gone").toBe(0);
 });
@@ -250,6 +255,54 @@ test("a box is moved by dragging it, and its cable comes along", async ({ page }
     expect(Math.hypot(end.x - after.x, end.y - after.y), "and the cable is still on the socket it was on").toBeLessThan(
         2,
     );
+});
+
+/**
+ * Two boards sharing a group. A box dragged off the first and over the second is drawn on the second where it would
+ * land, as an inert copy nobody can reach, while its place on the first stands empty; letting go moves it across,
+ * and the readout counts it on its new board. Aimed at the left of the second board, clear of the speaker already
+ * there.
+ */
+const SHARED = "shared";
+const FIRST_LABEL = "Instruments";
+const SECOND_LABEL = "Outputs";
+
+test("a box dragged from one board to another is previewed on the second, and lands there", async ({ page }) => {
+    await page.locator(demo(SHARED)).scrollIntoViewIfNeeded();
+
+    expect(await readout(page, SHARED), "two boxes on the first board, one on the second").toContain(
+        "2 on the first board, 1 on the second",
+    );
+
+    const box = await page.locator(node(SHARED, "Synth", FIRST_LABEL)).boundingBox();
+    const target = await page.locator(board(SHARED, SECOND_LABEL)).boundingBox();
+
+    if (!box || !target) throw new Error("the example has no such board or node");
+
+    await page.mouse.move(box.x + box.width * 0.5, box.y + box.height * 0.5);
+    await page.mouse.down();
+    await page.mouse.move(target.x + target.width * 0.25, target.y + target.height * 0.5, { steps: 20 });
+
+    await expect(
+        page.locator(`${board(SHARED, SECOND_LABEL)} [inert][aria-hidden="true"]`),
+        "the second board draws where the box would land",
+    ).toHaveCount(1);
+    await expect(
+        page.locator(node(SHARED, "Synth", FIRST_LABEL)),
+        "and the first no longer shows it in its old place",
+    ).toBeHidden();
+
+    await page.mouse.up();
+
+    await expect(page.locator(node(SHARED, "Synth", SECOND_LABEL)), "the box is now on the second board").toHaveCount(
+        1,
+    );
+    await expect(page.locator(node(SHARED, "Synth", FIRST_LABEL)), "and gone from the first").toHaveCount(0);
+    await expect(
+        page.locator(`${board(SHARED, SECOND_LABEL)} [inert][aria-hidden="true"]`),
+        "with the preview cleared",
+    ).toHaveCount(0);
+    expect(await readout(page, SHARED)).toContain("1 on the first board, 2 on the second");
 });
 
 /**
@@ -368,18 +421,29 @@ test("a cable that would close a loop is refused, and the same socket takes one 
 /**
  * From the keyboard the refusal is heard before it is tried: once a cable from the reverb is aimed at the
  * delay's feedback socket, the aim is announced as one that cannot connect. The sockets are stepped through
- * in turn until the feedback socket is the one aimed at.
+ * in turn until the feedback socket is the one aimed at — each step waits for its own announcement before the
+ * next, so the walk never runs ahead of what has been heard. One lap of the board's controls bounds the walk.
  */
 test("a cable aimed at a socket that would close a loop is announced as refused", async ({ page }) => {
+    const lap = await page.locator(`${board(RACK, RACK_LABEL)} [role="button"]`).count();
+
     await page.locator(socket(RACK, "Reverb out", RACK_LABEL)).focus();
     await page.keyboard.press("Enter");
 
-    await expect(async () => {
-        await page.keyboard.press("ArrowRight");
-        await expect(page.locator(ANNOUNCER)).toContainText("Delay feedback", { timeout: 200 });
-    }, "the feedback socket can be reached by stepping").toPass({ timeout: 5_000 });
+    let heard = await readAnnouncements(page);
 
-    await expect(page.locator(ANNOUNCER), "and the aim there is refused").toContainText(
+    for (let step = 0; step < lap && !heard.at(-1)?.includes("Delay feedback"); step++) {
+        const count = heard.length;
+
+        await page.keyboard.press("ArrowRight");
+        await expect
+            .poll(async () => (await readAnnouncements(page)).length, { message: "each step is announced" })
+            .toBeGreaterThan(count);
+
+        heard = await readAnnouncements(page);
+    }
+
+    expect(heard.at(-1), "the feedback socket is reached by stepping, and the aim there is refused").toContain(
         "Delay feedback, cannot connect",
     );
 
@@ -550,7 +614,9 @@ test("the wheel over the board zooms it", async ({ page }) => {
     await page.mouse.wheel(0, 400);
     await waitUntilStill(page.locator(board(PAN, PAN_LABEL)));
 
-    expect((await panState(page, "Mic")).boardWidth, "the board is drawn smaller").toBeLessThan(start.boardWidth);
+    await expect
+        .poll(async () => (await panState(page, "Mic")).boardWidth, { message: "the board is drawn smaller" })
+        .toBeLessThan(start.boardWidth);
 });
 
 /**

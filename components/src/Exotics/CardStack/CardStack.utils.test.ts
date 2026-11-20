@@ -123,6 +123,19 @@ describe("createPile", () => {
         vi.unstubAllGlobals();
     });
 
+    it("leaves a top the consumer wrote during the flight alone, and reports nothing", () => {
+        const pile = create();
+
+        topIndex = 1;
+        pile.send("left");
+        topIndex = 0;
+        vi.advanceTimersByTime(TRANSITION_MS);
+
+        expect(topIndex, "dealing again by writing zero is not undone").toBe(0);
+        expect(sent).toEqual([]);
+        expect(pile.motion.get().leavingTo, "and the flight is over").toBeUndefined();
+    });
+
     it("flies the card out, then moves the pile on and reports it", () => {
         const pile = create();
 

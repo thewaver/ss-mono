@@ -1,6 +1,6 @@
 import { type Locator, type Page, expect, test } from "@playwright/test";
 
-import { accessibleText, activeText, attributesOf, docsDemo, docsSettled, prop } from "./helpers";
+import { accessibleText, activeText, attributesOf, docsDemo, docsSettled, prop, tabKey } from "./helpers";
 
 /**
  * The toolbar decides what fits by measuring, so nothing here writes down a width or a number of buttons:
@@ -24,6 +24,7 @@ const MENU_ITEM = '[role="menu"] [role="menuitem"]';
 const WIDE_PX = "700";
 const NARROW_PX = "320";
 const SETTLE_MS = 250;
+const REGROUP_GAP_MS = 100;
 
 const FAR_PX = 2000;
 const CORNER_INSET_PX = 6;
@@ -32,7 +33,7 @@ const setBarWidth = async (page: Page, value: string) => {
     await page.locator(`${prop("barWidth")} input`).click();
     await page.keyboard.press("ControlOrMeta+a");
     await page.keyboard.type(value);
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
     await page.waitForTimeout(SETTLE_MS);
 };
 
@@ -58,7 +59,16 @@ const dragBarCorner = async (page: Page, scope: string, dx: number) => {
     await page.mouse.move(corner.x - CORNER_INSET_PX + dx, corner.y - CORNER_INSET_PX, { steps: 10 });
     await page.mouse.up();
     await page.mouse.move(0, 0);
-    await page.waitForTimeout(SETTLE_MS);
+
+    await expect
+        .poll(async () => {
+            const before = JSON.stringify([await readRow(page, scope), await readCollapsed(page, scope)]);
+
+            await page.waitForTimeout(REGROUP_GAP_MS);
+
+            return JSON.stringify([await readRow(page, scope), await readCollapsed(page, scope)]) === before;
+        }, "the row has stopped regrouping after the drag")
+        .toBe(true);
 };
 
 const narrowest = (page: Page, scope: string) => dragBarCorner(page, scope, -FAR_PX);
@@ -98,8 +108,8 @@ const focusedText = (page: Page) => page.evaluate(() => (document.activeElement?
  */
 const tabIntoToolbar = async (page: Page, scope: string) => {
     await page.locator(`${scope} ${TOOLBAR} [tabindex="0"]`).first().focus();
-    await page.keyboard.press("Shift+Tab");
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page, true));
+    await page.keyboard.press(tabKey(page));
 };
 
 const isInsideToolbar = (page: Page, scope: string) =>
@@ -218,7 +228,7 @@ test("tabbing again leaves the toolbar rather than moving along it", async ({ pa
     expect(await isInsideToolbar(page, DEFAULT), "focus went in").toBe(true);
 
     await page.keyboard.press("ArrowRight");
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
 
     expect(await isInsideToolbar(page, DEFAULT), "and one more tab is out of it entirely").toBe(false);
 });

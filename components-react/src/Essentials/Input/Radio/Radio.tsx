@@ -20,6 +20,7 @@ export const Radio = <T,>(props: RadioProps<T>) => {
         isDisabled,
         props.isReachableWhenDisabled ?? false,
         props.isFocusableWhenDisabled ?? false,
+        props.tooltipDefs !== undefined,
     );
 
     const latest = useLatest({ value: props.value, isDisabled, isReachable });

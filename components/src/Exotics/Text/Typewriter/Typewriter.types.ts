@@ -78,7 +78,11 @@ export type TypewriterPlayer = {
 export type BaseTypewriterValues = {
     /** How long one character takes to arrive. */
     animationDurationMs?: number;
-    /** How long each character waits after the one before it, which is what makes the text type rather than appear. */
+    /**
+     * How long each character's turn takes, which is what makes the text type rather than appear. The run spreads the
+     * characters' starts over the count times this, so the gap between two is this times the count over the count
+     * less one — slightly longer than this, and closer to it the longer the text.
+     */
     animationDelayMs?: number;
     /** How long to wait before the first character arrives. */
     initialAnimationDelayMs?: number;

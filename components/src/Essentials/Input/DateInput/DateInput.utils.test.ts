@@ -90,3 +90,12 @@ describe("DateInputUtils.getHasImpossiblePart", () => {
         expect(DateInputUtils.getHasImpossiblePart("20260230", "iso", bounds)).toBe(false);
     });
 });
+
+describe("DateInputUtils.computeBounds in a calendar with leap months", () => {
+    it("lets a Hebrew month run to thirteen while the year typed is still unknown", () => {
+        const ordinaryYear = DateValueUtils.withCalendar(date("2025-06-01"), "hebrew");
+
+        expect(DateValueUtils.getMonthsInYear(ordinaryYear)).toBe(12);
+        expect(DateInputUtils.computeBounds(ordinaryYear).month.max).toBe(13);
+    });
+});

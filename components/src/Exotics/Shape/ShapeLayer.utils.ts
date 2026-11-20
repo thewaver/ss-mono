@@ -157,7 +157,7 @@ export namespace ShapeLayerUtils {
 
         return pairs.map(([, geom]) => {
             const { thicknesses, offset } = geom as ShapeStrokeGeom;
-            const key = `${thicknesses.map((t) => Math.floor(t)).join("_")}_${offset ?? ""}`;
+            const key = `${thicknesses.join("_")}_${offset ?? ""}`;
 
             cache[key] ??= ShapeUtils.getPaths(points, thicknesses, joinRadii, lameExponents, offset);
 

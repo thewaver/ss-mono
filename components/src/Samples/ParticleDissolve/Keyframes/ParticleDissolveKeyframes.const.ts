@@ -29,7 +29,7 @@ export namespace ParticleDissolveKeyframes {
         const byKey = new Map<number, SliceStop[]>();
 
         return SliceAnimationKeyframeUtils.fromSlices(({ pos, count }) => {
-            const key = pos.row * count.col + pos.col;
+            const key = pos.row * count.colCount + pos.col;
             const existing = byKey.get(key);
 
             if (existing) return existing;

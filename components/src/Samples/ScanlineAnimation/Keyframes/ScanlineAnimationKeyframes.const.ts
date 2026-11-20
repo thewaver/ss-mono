@@ -108,7 +108,7 @@ export namespace ScanlineAnimationKeyframes {
         ];
 
         return SliceAnimationKeyframeUtils.fromSlices(({ pos, count }) =>
-            RandomUtils.hash(pos.row, count.row, SliceAnimationWeightUtils.FIXED_HASH_SEED) < dropChance
+            RandomUtils.hash(pos.row, count.rowCount, SliceAnimationWeightUtils.FIXED_HASH_SEED) < dropChance
                 ? dropped
                 : NO_STOPS,
         );

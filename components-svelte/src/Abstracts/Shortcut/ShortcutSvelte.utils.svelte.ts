@@ -1,40 +1,25 @@
 import { untrack } from "svelte";
 
-import {
-    type DismisserLayerDefs,
-    DismisserUtils,
-    type Shortcut,
-    type ShortcutBinding,
-    ShortcutUtils,
-} from "@thewaver/ss-components";
+import { type Shortcut, type ShortcutBinding, ShortcutUtils } from "@thewaver/ss-components";
 
 /** The Svelte side of {@link ShortcutUtils}: shortcuts registered for as long as their owner is mounted. */
 export namespace ShortcutSvelteUtils {
     /**
      * Registers a list of shortcuts for as long as the owner is mounted, following the list as it changes.
      *
-     * The bindings belong to the layer on top when the owner first runs its effects — the page, or the dialog the
-     * owner was mounted inside — and keep that layer for good, so a list that changes while another layer is open
-     * stays on the layer it started on. Each change replaces every binding.
+     * The bindings belong to the page: they fire whatever popup or dialog is open, unless a layer that takes input of
+     * its own is on top, as every shortcut on the page does. Each change replaces every binding.
      *
      * Must run while a component is being set up.
      *
      * @param getBindings The shortcuts and what each does. An empty list registers nothing.
      */
     export const createBindings = (getBindings: () => ShortcutBinding[]) => {
-        let layer: DismisserLayerDefs | undefined;
-        let hasLayer = false;
-
         $effect(() => {
             const bindings = getBindings();
 
             return untrack(() => {
-                if (!hasLayer) {
-                    layer = DismisserUtils.getTopLayer();
-                    hasLayer = true;
-                }
-
-                const removers = bindings.map((binding) => ShortcutUtils.addBinding({ ...binding, layer }));
+                const removers = bindings.map((binding) => ShortcutUtils.addBinding({ ...binding, layer: undefined }));
 
                 return () => {
                     for (const remove of removers) remove();
@@ -46,7 +31,7 @@ export namespace ShortcutSvelteUtils {
     /**
      * Registers one shortcut for as long as the owner is mounted and it is not disabled.
      *
-     * {@link createBindings} for a single shortcut, with the same layer rule.
+     * {@link createBindings} for a single shortcut, belonging to the page in the same way.
      *
      * Must run while a component is being set up.
      *

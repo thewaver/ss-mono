@@ -1,7 +1,7 @@
 <script lang="ts">
     import { SliceAnimationKeyframeUtils, SliceAnimationWeights, ScanlineAnimation } from "@thewaver/ss-components-svelte";
     import type { SliceAnimationBreakpointTriple, SliceStop } from "@thewaver/ss-components-svelte";
-    import type { Index2d } from "@thewaver/ss-utils";
+    import type { Count2d } from "@thewaver/ss-utils";
 
     import type { ScanlineAnimationExampleProps } from "../ScanlineAnimationPage.types";
 
@@ -73,7 +73,7 @@
 
     let shifts = $derived(generateShifts());
 
-    const computeSliceWeights = (count: Index2d) =>
+    const computeSliceWeights = (count: Count2d) =>
         SliceAnimationWeights.computeSliceWeights(weightType, count, WEIGHT_ORIGIN);
 
     const animation = $derived.by(() => {

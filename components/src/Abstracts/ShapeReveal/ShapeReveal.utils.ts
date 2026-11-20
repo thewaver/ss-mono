@@ -73,14 +73,15 @@ export namespace ShapeRevealUtils {
     /**
      * Where a named spot of the viewport is.
      *
-     * @param spot The center or one of the four corners.
+     * @param spot The center or one of the four corners. A name that is neither is read as the center.
      * @param size The viewport's size, in pixels.
      * @returns The spot, in viewport pixels from the top-left corner.
      */
-    export const resolveSpot = (spot: ShapeRevealSpot, size: Size2d): Point2d => ({
-        x: SPOT_RATIOS[spot].x * size.width,
-        y: SPOT_RATIOS[spot].y * size.height,
-    });
+    export const resolveSpot = (spot: ShapeRevealSpot, size: Size2d): Point2d => {
+        const ratios = Object.hasOwn(SPOT_RATIOS, spot) ? SPOT_RATIOS[spot] : SPOT_RATIOS.center;
+
+        return { x: ratios.x * size.width, y: ratios.y * size.height };
+    };
 
     /**
      * Where a reveal grows from, as a point in viewport pixels.
@@ -135,7 +136,9 @@ export namespace ShapeRevealUtils {
      * take it. Its size is a starting point only, since the result is scaled.
      * @param coverRadius The distance the nearest edge has to reach.
      * @returns The corners relative to the center, in pixels, or `undefined` when the contour has fewer than three
-     * corners or does not enclose its center.
+     * corners or its edge passes through its center. A contour whose corners' average falls outside it, such as an
+     * L, is still returned: the reveal then grows away from the origin rather than out of it, and the new page
+     * appears all at once.
      */
     export const computeOutline = (computePoints: (size: Size2d) => Point2d[], coverRadius: number) => {
         const side = coverRadius * 2;

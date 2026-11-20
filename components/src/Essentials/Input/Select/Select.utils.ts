@@ -60,7 +60,7 @@ export namespace SelectUtils {
      * How the popup list is named, given what the consumer said and where the field sits.
      *
      * A listbox has to be named. An exact name from the consumer is written as `aria-label`; without one the list
-     * is labelled by the `Label` the field sits in, or by the field itself when there is none. Neither fallback is
+     * is labeled by the `Label` the field sits in, or by the field itself when there is none. Neither fallback is
      * exact — the `Label` reads everything inside it, the field's current text included — which is why the consumer's
      * own name always wins.
      *
@@ -105,7 +105,7 @@ export namespace SelectUtils {
      * @param hasGroupBox Whether it was given `renderGroupBox`.
      */
     export const warnIfGroupBoxIgnored = (isWindowed: boolean, hasGroupBox: boolean) => {
-        if (isWindowed && hasGroupBox) console.warn(IGNORED_GROUP_BOX_WARNING);
+        if (process.env.NODE_ENV !== "production" && isWindowed && hasGroupBox) console.warn(IGNORED_GROUP_BOX_WARNING);
     };
 
     /**

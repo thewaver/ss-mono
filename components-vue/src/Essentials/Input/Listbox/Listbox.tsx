@@ -236,7 +236,7 @@ export const ListboxOptions = defineComponent(
                       : undefined,
         );
 
-        const handleOptionsPointerOver = (e: PointerEvent) => {
+        const handleOptionsPointerMove = (e: PointerEvent) => {
             isPointerLed.value = true;
             hoveredIndex.value = findOptionIndex(e.target);
         };
@@ -405,7 +405,7 @@ export const ListboxOptions = defineComponent(
                     ref={optionsRef}
                     class={[ListboxStyles.listboxOptions, isHorizontal && ListboxStyles.listboxHorizontal]}
                     role="presentation"
-                    onPointerover={handleOptionsPointerOver}
+                    onPointermove={handleOptionsPointerMove}
                     onPointerleave={handleOptionsPointerLeave}
                 >
                     {renderFloaters()}
@@ -451,7 +451,7 @@ export const ListboxOptions = defineComponent(
                         ref={sizerRef}
                         class={ListboxStyles.listboxSizer}
                         style={{ height: `${rowWindow.totalSize.value}px` }}
-                        onPointerover={handleOptionsPointerOver}
+                        onPointermove={handleOptionsPointerMove}
                         onPointerleave={handleOptionsPointerLeave}
                     >
                         {renderFloaters()}

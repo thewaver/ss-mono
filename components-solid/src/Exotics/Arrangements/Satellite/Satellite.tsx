@@ -1,5 +1,5 @@
 import type { ParentProps } from "solid-js";
-import { Index, Show, createMemo, createSignal, onCleanup } from "solid-js";
+import { Index, createMemo, createSignal, onCleanup } from "solid-js";
 
 import { SATELLITE_DEFAULTS, SatelliteUtils, SatelliteStyles as styles } from "@thewaver/ss-components";
 import { SatelliteConst } from "@thewaver/ss-components/internal";
@@ -51,42 +51,40 @@ export const Satellite = (props: ParentProps<SatelliteProps>) => {
     };
 
     return (
-        <Show when={getSatellites().length > SatelliteConst.NOTHING} fallback={props.children}>
+        <div
+            class={styles.satelliteRoot}
+            style={CSSUtils.spreadableToStyle(getLayout().padding, StringUtils.camelToKebabCase)}
+        >
             <div
-                class={styles.satelliteRoot}
-                style={CSSUtils.spreadableToStyle(getLayout().padding, StringUtils.camelToKebabCase)}
+                ref={setSubjectRef}
+                class={styles.satelliteSubject}
+                style={{ "z-index": SatelliteConst.SUBJECT_Z_INDEX }}
             >
-                <div
-                    ref={setSubjectRef}
-                    class={styles.satelliteSubject}
-                    style={{ "z-index": SatelliteConst.SUBJECT_Z_INDEX }}
-                >
-                    {props.children}
-                </div>
-
-                <Index each={getSatellites()}>
-                    {(getSatellite, index) => {
-                        const getOffset = () => getLayout().satelliteOffsets[index] ?? SatelliteConst.UNPLACED;
-
-                        return (
-                            <div
-                                ref={(element) => setSatelliteRef(index, element)}
-                                class={styles.satelliteBody}
-                                style={{
-                                    "left": `${getOffset().x}px`,
-                                    "top": `${getOffset().y}px`,
-                                    "z-index":
-                                        (access(getSatellite().isBehindSubject) ?? SATELLITE_DEFAULTS.isBehindSubject)
-                                            ? SatelliteConst.BEHIND_Z_INDEX
-                                            : SatelliteConst.FRONT_Z_INDEX,
-                                }}
-                            >
-                                {getSatellite().renderSatellite()}
-                            </div>
-                        );
-                    }}
-                </Index>
+                {props.children}
             </div>
-        </Show>
+
+            <Index each={getSatellites()}>
+                {(getSatellite, index) => {
+                    const getOffset = () => getLayout().satelliteOffsets[index] ?? SatelliteConst.UNPLACED;
+
+                    return (
+                        <div
+                            ref={(element) => setSatelliteRef(index, element)}
+                            class={styles.satelliteBody}
+                            style={{
+                                "left": `${getOffset().x}px`,
+                                "top": `${getOffset().y}px`,
+                                "z-index":
+                                    (access(getSatellite().isBehindSubject) ?? SATELLITE_DEFAULTS.isBehindSubject)
+                                        ? SatelliteConst.BEHIND_Z_INDEX
+                                        : SatelliteConst.FRONT_Z_INDEX,
+                            }}
+                        >
+                            {getSatellite().renderSatellite()}
+                        </div>
+                    );
+                }}
+            </Index>
+        </div>
     );
 };

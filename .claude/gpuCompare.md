@@ -38,7 +38,7 @@ nothing installed, stop what you start. The frame-rate comparison is `perfCompar
   To check geometry exactly, temporarily make `SliceRendererUtils` sample the full picture with plain `LINEAR` filtering, then
   put it back.
 - **A box-sized clip cannot see overflow.** Since the cell container stopped clipping, check anything that flies in
-  from outside (`tumble_left`) with a clip padded well past the box, on a single item, since in a grid the neighbours'
+  from outside (`tumble_left`) with a clip padded well past the box, on a single item, since in a grid the neighbors'
   overflow lands in each other's space.
 - An enlarged side-by-side with a difference map (each pixel's difference times four) shows at a glance whether a
   difference is sampling, timing or geometry.

@@ -7,12 +7,13 @@
         type CarryMode,
         type InteractionFlags,
         LiveAnnouncerUtils,
+        NavigatorUtils,
         PanZoomUtils,
         TIMELINE_DEFAULTS,
         type TimelineEdge,
         type TimelineItemRenderProps,
-        TimelineUtils,
         TimelineStyles as styles,
+        TimelineUtils,
     } from "@thewaver/ss-components";
     import { type Point2d, type Span, SpanUtils } from "@thewaver/ss-utils";
 
@@ -121,6 +122,7 @@
         getView: () => view,
         getRange: () => range,
         getSpans: () => spans,
+        getItems: () => items,
         getStep: () => steps.step,
         computePointerRatio: getPointerRatio,
         get computeSnapValue() {
@@ -132,7 +134,7 @@
     CarrierSvelteUtils.registerZone(zone);
 
     const edgeCarry = $derived(CarrierSvelteUtils.getSourceZone() === zone ? CarrierSvelteUtils.getCarry() : undefined);
-    const heldIndex = $derived(TimelineUtils.getCarriedIndex(edgeCarry));
+    const heldIndex = $derived(TimelineUtils.getCarriedIndex(edgeCarry, items));
 
     const shownSpans = $derived(
         TimelineUtils.computeShownSpans(
@@ -186,7 +188,9 @@
         ),
     );
 
-    $effect(() => untrack(() => props.onMount?.(controller)));
+    $effect(() => {
+        untrack(() => props.onMount?.(controller));
+    });
 
     const gestures = PanZoomUtils.createGestureTracker({
         getAxes: () => ACROSS_ONLY,
@@ -254,7 +258,12 @@
         CarrierUtils.start(
             zone,
             span,
-            TimelineUtils.computeEdgeCarry(timelineId, index, props.computeItemAriaLabel?.(items[index], index) ?? ""),
+            TimelineUtils.computeEdgeCarry(
+                timelineId,
+                index,
+                props.computeItemAriaLabel?.(items[index], index) ?? "",
+                items[index],
+            ),
             mode,
         );
     };
@@ -311,7 +320,7 @@
     const handleKeyDown = (e: KeyboardEvent) => {
         const from = rovingIndex;
 
-        if (from === undefined || isDisabled) return;
+        if (from === undefined || isDisabled || NavigatorUtils.getHasCommandModifier(e)) return;
 
         const action = TimelineUtils.computeKeyAction(e.key, {
             isHolding: !!getEdgeCarry() && CarrierUtils.getCarryMode() !== "drag",

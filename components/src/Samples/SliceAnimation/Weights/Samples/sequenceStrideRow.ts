@@ -5,7 +5,7 @@ import { SliceAnimationWeightUtils } from "../../../../Generators/SliceAnimation
 
 export const sequenceStrideRow: WeightFn = (pos, count, origin) =>
     SliceAnimationWeightUtils.stride(
-        Index2dUtils.toFlatIndex(pos, count.col),
-        Index2dUtils.toFlatIndex(SliceAnimationWeightUtils.getRoundedPos(origin), count.col),
-        count.col * count.row,
+        Index2dUtils.toFlatIndex(pos, count.colCount),
+        Index2dUtils.toFlatIndex(SliceAnimationWeightUtils.getRoundedPos(origin), count.colCount),
+        count.colCount * count.rowCount,
     );

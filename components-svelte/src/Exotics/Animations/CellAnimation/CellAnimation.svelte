@@ -10,7 +10,7 @@
         CellAnimationStyles as styles,
     } from "@thewaver/ss-components";
     import { CellAnimationConst } from "@thewaver/ss-components/internal";
-    import { type Index2d, MathUtils, Rect } from "@thewaver/ss-utils";
+    import { type Count2d, MathUtils, Rect } from "@thewaver/ss-utils";
     import { assignInlineVars } from "@vanilla-extract/dynamic";
 
     import { ElementObserverSvelteUtils } from "../../../Abstracts/ElementObserver/ElementObserverSvelte.utils.svelte.js";
@@ -49,7 +49,7 @@
 
     const getRootSize = ElementObserverSvelteUtils.createBorderBoxSizeObserver(() => img ?? undefined);
 
-    let lastCellCount: Index2d | undefined;
+    let lastCellCount: Count2d | undefined;
 
     const cellCount = $derived.by(() => {
         const next = CellAnimationUtils.computeCellCount(props.cellCount, getRootSize());
@@ -62,8 +62,8 @@
     });
 
     const weights = $derived(props.computeSliceWeights?.(cellCount) ?? CellAnimationConst.NO_WEIGHTS);
-    const columnEdges = $derived(CellAnimationUtils.computeEdges(getRootSize().width, cellCount.col));
-    const rowEdges = $derived(CellAnimationUtils.computeEdges(getRootSize().height, cellCount.row));
+    const columnEdges = $derived(CellAnimationUtils.computeEdges(getRootSize().width, cellCount.colCount));
+    const rowEdges = $derived(CellAnimationUtils.computeEdges(getRootSize().height, cellCount.rowCount));
     const cellDefs = $derived(CellAnimationUtils.computeCellDefs(cellCount, weights));
     const evaluationDefs = $derived(CellAnimationUtils.computeEvaluationDefs(cellDefs, columnEdges, rowEdges));
     const slices = $derived(SliceAnimationUtils.withOrigin(evaluationDefs, origin));
@@ -261,6 +261,7 @@
         width={sizeAnchor === "width" ? "100%" : "auto"}
         height={sizeAnchor === "height" ? "100%" : "auto"}
         aria-hidden="true"
+        alt=""
     />
 
     {#if isOnGraphicsCard}

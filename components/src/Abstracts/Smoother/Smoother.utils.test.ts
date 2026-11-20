@@ -26,3 +26,10 @@ describe("SmootherUtils.getStep", () => {
         expect(SmootherUtils.getStep(0, 10, 1_000_000, 100)).toBeLessThanOrEqual(10);
     });
 });
+
+describe("SmootherUtils.getStep from a value that is not finite", () => {
+    it("lands on the target, rather than staying not a number", () => {
+        expect(SmootherUtils.getStep(Infinity, 5, 16, 100)).toBe(5);
+        expect(SmootherUtils.getStep(Number.NaN, 5, 16, 100)).toBe(5);
+    });
+});

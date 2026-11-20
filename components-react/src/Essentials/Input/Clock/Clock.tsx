@@ -9,7 +9,7 @@ import {
     ClockUtils,
 } from "@thewaver/ss-components";
 import { ClockConst } from "@thewaver/ss-components/internal";
-import { DOMUtils, type TimeValue } from "@thewaver/ss-utils";
+import { DOMUtils, TimeUtils, type TimeValue } from "@thewaver/ss-utils";
 
 import { NavigatorReactUtils } from "../../../Abstracts/Navigator/NavigatorReact.utils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
@@ -91,8 +91,16 @@ export const Clock = (props: ClockProps) => {
         setValue(time);
     };
 
+    const lastValueRef = useRef(value);
+
     useEffect(() => {
-        if (value) setHighlighted(value);
+        const last = lastValueRef.current;
+
+        lastValueRef.current = value;
+
+        if (!value || (value !== last && TimeUtils.isSame(value, last))) return;
+
+        setHighlighted(value);
     }, [value]);
 
     const rovingKeys = columns.map((column) => toOptionKey(column.unit, getRovingIndex(column)));

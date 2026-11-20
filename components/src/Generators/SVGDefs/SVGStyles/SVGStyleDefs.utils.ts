@@ -1,4 +1,4 @@
-import { type Point2d, type ShapeJoinRadius, ShapeUtils, type Size2d } from "@thewaver/ss-utils";
+import { type Point2d, type ShapeJoinRadius, type Size2d } from "@thewaver/ss-utils";
 
 import type { ShapeFillClip, ShapeFillGeom } from "../../../Exotics/Shape/Shape.types";
 import type { SVGGradientColor } from "../SVGGradients/SVGGradientDefs.types";
@@ -22,9 +22,6 @@ type StyleBox = {
     borders: BorderWidths;
     padding: BorderWidths;
     radii: CornerRadii;
-    lameExponents: number[];
-    points: Point2d[];
-    outerPath: string;
 };
 
 type Rect = { x: number; y: number; width: number; height: number };
@@ -78,18 +75,33 @@ const HORIZONTAL_PLACES: Record<string, number> = { left: 0, center: 50, right: 
 const VERTICAL_PLACES: Record<string, number> = { top: 0, center: 50, bottom: 100 };
 const RADIAL_EXTENTS = ["closest-side", "closest-corner", "farthest-side", "farthest-corner"];
 
-const warnSkipped = (property: string, value: string) => console.warn(`${WARNING_PREFIX} ${property}: ${value}`);
+const warnSkipped = (property: string, value: string) => {
+    if (process.env.NODE_ENV !== "production") console.warn(`${WARNING_PREFIX} ${property}: ${value}`);
+};
 
 const splitTopLevel = (text: string, isSeparator: (character: string) => boolean) => {
     const parts: string[] = [];
     let depth = 0;
     let current = "";
+    let quote: string | undefined;
+    let isEscaped = false;
 
     for (const character of text) {
-        if (character === "(") depth++;
-        if (character === ")") depth--;
+        if (isEscaped) {
+            isEscaped = false;
+        } else if (character === "\\") {
+            isEscaped = true;
+        } else if (quote) {
+            if (character === quote) quote = undefined;
+        } else if (character === '"' || character === "'") {
+            quote = character;
+        } else if (character === "(") {
+            depth++;
+        } else if (character === ")") {
+            depth--;
+        }
 
-        if (depth === 0 && isSeparator(character)) {
+        if (depth === 0 && !quote && isSeparator(character)) {
             parts.push(current);
             current = "";
         } else {
@@ -1121,7 +1133,7 @@ export namespace SVGStyleDefsUtils {
      * sliced into its nine regions. Each has its entry in `fillGeom` saying which area it is clipped to. A solid border
      * becomes the stroke, with its per-side widths in `strokeGeom`: one paint for one color, or one clipped paint per
      * color when the sides differ; a border image takes its place. Whatever SVG paint cannot reproduce is left out and
-     * reported with `console.warn`, once per call: conic gradients, images, fixed or blended layers,
+     * reported with `console.warn` in development, once per call: conic gradients, images, fixed or blended layers,
      * `background-clip: text`, gradients interpolated in another color space or holding colors other than `rgb()`,
      * color hints and patterned borders. Other CSS properties are not read.
      *
@@ -1153,15 +1165,8 @@ export namespace SVGStyleDefsUtils {
         };
         const radii = computeBorderRadii(style, size);
         const joinRadii = toJoinRadii(radii);
-        const points = [
-            { x: 0, y: 0 },
-            { x: size.width, y: 0 },
-            { x: size.width, y: size.height },
-            { x: 0, y: size.height },
-        ];
         const lameExponents = computeLameExponents(style);
-        const outerPath = ShapeUtils.getPaths(points, [0], joinRadii, lameExponents).outerPath;
-        const box: StyleBox = { size, borders, padding, radii, lameExponents, points, outerPath };
+        const box: StyleBox = { size, borders, padding, radii };
         const shadows = computeShadowLayers(style, box, id);
         const layers = [
             ...shadows.outer,

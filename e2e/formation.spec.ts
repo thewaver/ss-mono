@@ -76,13 +76,13 @@ test("a position written as a fraction of the width lands at that fraction of th
     const second = await boxOf(page, item(FORMATION), 1);
     const third = await boxOf(page, item(FORMATION), 2);
     const places = [box, second, third];
-    const leftEdge = Math.min(...places.map((place) => place.left - place.width / 2));
-    const rightEdge = Math.max(...places.map((place) => place.left + place.width / 2));
+    const leftEdge = Math.min(...places.map((place) => place.left - place.width * 0.5));
+    const rightEdge = Math.max(...places.map((place) => place.left + place.width * 0.5));
 
     expect(ratio, "and it lands inside the formation rather than somewhere the viewport put it").toBeGreaterThan(0);
     expect(ratio, "and it lands inside the formation rather than somewhere the viewport put it").toBeLessThan(1);
     expect(
-        (leftEdge + rightEdge) / 2 / box.hostWidth,
+        ((leftEdge + rightEdge) * 0.5) / box.hostWidth,
         "a cliff is centered in the formation however far its places lean",
     ).toBeCloseTo(0.5, 2);
 });

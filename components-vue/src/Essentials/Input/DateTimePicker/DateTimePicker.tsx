@@ -1,4 +1,4 @@
-import { type SlotsType, computed, defineComponent, shallowRef } from "vue";
+import { type SlotsType, computed, defineComponent, shallowRef, watch } from "vue";
 
 import {
     DateTimePickerStyles,
@@ -18,9 +18,25 @@ import { Tooltip } from "../../Overlays/Tooltip/Tooltip";
 import type { TooltipSlots } from "../../Overlays/Tooltip/Tooltip.types";
 import { DatePicker } from "../DatePicker/DatePicker";
 import type { DatePickerSlots } from "../DatePicker/DatePicker.types";
+import { provideFormFieldContext, useFormFieldContext } from "../FormField/FormField.context";
+import { FormFieldVueUtils } from "../FormField/FormFieldVue.utils";
+import { provideLabelContext, useLabelContext } from "../Label/Label.context";
 import { TimePicker } from "../TimePicker/TimePicker";
 import type { TimePickerSlots } from "../TimePicker/TimePicker.types";
 import type { DateTimePickerProps, DateTimePickerSlots } from "./DateTimePicker.types";
+
+const DateTimePickerFieldsScope = defineComponent(
+    (_props, { slots }) => {
+        const outerFieldContext = useFormFieldContext();
+        const outerLabelContext = useLabelContext();
+
+        provideFormFieldContext({ ...outerFieldContext, getCaptionId: () => undefined });
+        provideLabelContext({ ...outerLabelContext, getIsLabeled: () => false });
+
+        return () => slots.default?.();
+    },
+    { name: "DateTimePickerFieldsScope" },
+);
 
 export const DateTimePicker = defineComponent(
     (props: DateTimePickerProps, { slots }: SlotsContext<DateTimePickerSlots>) => {
@@ -38,16 +54,29 @@ export const DateTimePicker = defineComponent(
         const getPairFlags = () =>
             TextFieldUtils.mergeFlags([dateFlags.value, timeFlags.value].flatMap((flags) => (flags ? [flags] : [])));
 
+        const isReachable = computed(() =>
+            InteractionTrackerUtils.computeIsReachable(
+                props.isDisabled ?? false,
+                props.isReachableWhenDisabled ?? false,
+                false,
+                props.tooltipDefs !== undefined,
+            ),
+        );
+
         const tooltipDefs = computed(() => {
             const defs = props.tooltipDefs;
-            const isDisabled = props.isDisabled ?? false;
-            const isReachable = InteractionTrackerUtils.computeIsReachable(
-                isDisabled,
-                props.isReachableWhenDisabled ?? false,
-            );
 
-            return defs && (!isDisabled || isReachable) ? defs : undefined;
+            return defs && (!(props.isDisabled ?? false) || isReachable.value) ? defs : undefined;
         });
+
+        watch(
+            [() => props.isReachableWhenDisabled ?? false, () => props.tooltipDefs !== undefined],
+            ([isReachableWhenDisabled, hasTooltipProp]) =>
+                InteractionTrackerUtils.warnIfReachableWithoutTooltip(isReachableWhenDisabled, hasTooltipProp),
+            { immediate: true },
+        );
+
+        const groupLabelledBy = FormFieldVueUtils.useAriaLabelledBy();
 
         const lastTooltipDefs = computed<typeof tooltipDefs.value>((previous) => tooltipDefs.value ?? previous);
 
@@ -74,6 +103,7 @@ export const DateTimePicker = defineComponent(
                     dateVisibility.value = isOpen;
                 },
                 "ariaLabel": props.dateLabel,
+                "isFocusableWhenDisabled": isReachable.value,
                 "minValue": props.minValue?.date,
                 "maxValue": props.maxValue?.date,
                 "tooltipDefs": undefined,
@@ -94,6 +124,7 @@ export const DateTimePicker = defineComponent(
                     timeVisibility.value = isOpen;
                 },
                 "ariaLabel": props.timeLabel,
+                "isFocusableWhenDisabled": isReachable.value,
                 "minValue": props.minValue && DateTimePickerUtils.computeMinTime(date.value, props.minValue),
                 "maxValue": props.maxValue && DateTimePickerUtils.computeMaxTime(date.value, props.maxValue),
                 "triggerId": props.timeTriggerId,
@@ -102,39 +133,46 @@ export const DateTimePicker = defineComponent(
             };
 
             return (
-                <div ref={rootRef} class={DateTimePickerStyles.dateTimePickerRoot}>
-                    <DatePicker {...dateHalf}>
-                        {
+                <div
+                    ref={rootRef}
+                    class={DateTimePickerStyles.dateTimePickerRoot}
+                    role="group"
+                    aria-labelledby={groupLabelledBy.value}
+                >
+                    <DateTimePickerFieldsScope>
+                        <DatePicker {...dateHalf}>
                             {
-                                renderContent: renderFieldContent(dateFlags),
-                                renderPlaceholder: slots.renderPlaceholder,
-                                renderLeading: slots.renderLeading,
-                                renderDecoration: slots.renderDecoration,
-                                renderTrigger: slots.renderTrigger,
-                                renderDay: slots.renderDay,
-                                renderWeekday: slots.renderWeekday,
-                                renderPopup: slots.renderPopup,
-                            } satisfies Partial<DatePickerSlots>
-                        }
-                    </DatePicker>
+                                {
+                                    renderContent: renderFieldContent(dateFlags),
+                                    renderPlaceholder: slots.renderPlaceholder,
+                                    renderLeading: slots.renderLeading,
+                                    renderDecoration: slots.renderDecoration,
+                                    renderTrigger: slots.renderTrigger,
+                                    renderDay: slots.renderDay,
+                                    renderWeekday: slots.renderWeekday,
+                                    renderPopup: slots.renderPopup,
+                                } satisfies Partial<DatePickerSlots>
+                            }
+                        </DatePicker>
 
-                    {callSlot(slots.renderSeparator, undefined)}
+                        {callSlot(slots.renderSeparator, undefined)}
 
-                    <TimePicker {...timeHalf}>
-                        {
+                        <TimePicker {...timeHalf}>
                             {
-                                renderContent: renderFieldContent(timeFlags),
-                                renderPlaceholder: slots.renderPlaceholder,
-                                renderDecoration: slots.renderDecoration,
-                                renderTrailing: slots.renderTimeTrailing,
-                                renderTrigger: slots.renderTimeTrigger,
-                                renderOption: slots.renderOption,
-                                renderUnit: slots.renderUnit,
-                                renderColumn: slots.renderColumn,
-                                renderPopup: slots.renderTimePopup,
-                            } satisfies Partial<TimePickerSlots>
-                        }
-                    </TimePicker>
+                                {
+                                    renderContent: renderFieldContent(timeFlags),
+                                    renderPlaceholder: slots.renderPlaceholder,
+                                    renderDecoration: slots.renderDecoration,
+                                    renderTrailing: slots.renderTimeTrailing,
+                                    renderTrigger: slots.renderTimeTrigger,
+                                    renderOption: slots.renderOption,
+                                    renderUnit: slots.renderUnit,
+                                    renderColumn: slots.renderColumn,
+                                    renderPopup: slots.renderTimePopup,
+                                } satisfies Partial<TimePickerSlots>
+                            }
+                        </TimePicker>
+                    </DateTimePickerFieldsScope>
 
                     {lastTooltipDefs.value &&
                         (() => {

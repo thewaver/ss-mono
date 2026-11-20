@@ -3,6 +3,7 @@ import { Dynamic } from "solid-js/web";
 
 import {
     InteractionTrackerUtils,
+    SafeHrefUtils,
     TABS_DEFAULTS,
     type Tab,
     TabsUtils,
@@ -27,6 +28,8 @@ export const TabPanel = (props: TabPanelProps) => {
 };
 
 const TabsItem = <T,>(props: TabsItemProps<T>) => {
+    const getSafeHref = () => SafeHrefUtils.resolve(access(props.tab).href, "Tabs");
+
     const getIsDisabled = () => access(props.flags).isDisabled ?? false;
 
     const handleClick = (e: MouseEvent) => {
@@ -34,6 +37,8 @@ const TabsItem = <T,>(props: TabsItemProps<T>) => {
             e.preventDefault();
             return;
         }
+
+        if (getSafeHref() !== undefined && !InteractionTrackerUtils.getIsPlainClick(e)) return;
 
         props.onSelect(access(props.tab).value);
     };
@@ -57,7 +62,7 @@ const TabsItem = <T,>(props: TabsItemProps<T>) => {
 
     return (
         <Show
-            when={access(props.tab).href}
+            when={getSafeHref()}
             fallback={
                 <button type="button" ref={(element) => props.ref?.(element)} {...commonProps} onClick={handleClick}>
                     {props.renderContent(() => access(props.flags))}
@@ -67,7 +72,7 @@ const TabsItem = <T,>(props: TabsItemProps<T>) => {
             <Dynamic
                 component={props.linkComponent ?? "a"}
                 ref={(element: HTMLElement) => props.ref?.(element)}
-                href={access(props.tab).href!}
+                href={getSafeHref()!}
                 {...commonProps}
                 onClick={handleClick}
             >

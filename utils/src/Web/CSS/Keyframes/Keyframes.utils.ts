@@ -19,7 +19,7 @@ export type KeyframesHandle = {
 let sharedStyleTag: HTMLStyleElement | null = null;
 let sharedSheet: CSSStyleSheet | null = null;
 let nameCounter = 0;
-const registry: Record<string, { name: string; count: number }> = {};
+const registry = new Map<string, { name: string; count: number }>();
 const getSharedSheet = (): CSSStyleSheet | null => {
     if (sharedSheet) return sharedSheet;
 
@@ -31,27 +31,27 @@ const getSharedSheet = (): CSSStyleSheet | null => {
     return sharedSheet;
 };
 
-/**
- * Registers a `@keyframes` animation at runtime and gives back the name to use.
- *
- * All animations share one `<style>` element, created on first use. Identical
- * animations are recognized and reuse a single rule, so a hundred elements
- * animating the same way cost one rule between them, with a tally kept of how many
- * are relying on it.
- *
- * Browser only. Always call `destroy` when the animation is no longer needed, or
- * the rule stays in the document forever.
- *
- * @param baseName A readable prefix for the generated name. A counter is appended
- * to keep it unique.
- * @param steps The animation, keyed by percentage — `{ 0: {...}, 100: {...} }`.
- * Property names are written in JavaScript style and converted for you.
- * @returns The name to animate with, and a `destroy` to release it. If there is no
- * stylesheet to write to, `uniqueName` falls back to `baseName` and `destroy` does
- * nothing.
- */
-
+/** Runtime `@keyframes` animations, kept in one shared stylesheet and released when unused. */
 export namespace KeyframeUtils {
+    /**
+     * Registers a `@keyframes` animation at runtime and gives back the name to use.
+     *
+     * All animations share one `<style>` element, created on first use. Identical
+     * animations are recognized and reuse a single rule, so a hundred elements
+     * animating the same way cost one rule between them, with a tally kept of how many
+     * are relying on it.
+     *
+     * Browser only. Always call `destroy` when the animation is no longer needed, or
+     * the rule stays in the document forever.
+     *
+     * @param baseName A readable prefix for the generated name. A counter is appended
+     * to keep it unique.
+     * @param steps The animation, keyed by percentage — `{ 0: {...}, 100: {...} }`.
+     * Property names are written in JavaScript style and converted for you.
+     * @returns The name to animate with, and a `destroy` to release it. If there is no
+     * stylesheet to write to, `uniqueName` falls back to `baseName` and `destroy` does
+     * nothing.
+     */
     export const createKeyframes = (
         baseName: string,
         steps: Record<number, Partial<CSSStyleDeclaration>>,
@@ -70,13 +70,15 @@ export namespace KeyframeUtils {
             })
             .join(" ");
 
-        if (!registry[ruleBody]) {
+        let activeRule = registry.get(ruleBody);
+
+        if (!activeRule) {
             const uniqueName = `${baseName}-${++nameCounter}`;
             sheet.insertRule(`@keyframes ${uniqueName} { ${ruleBody} }`, sheet.cssRules.length);
-            registry[ruleBody] = { name: uniqueName, count: 0 };
+            activeRule = { name: uniqueName, count: 0 };
+            registry.set(ruleBody, activeRule);
         }
 
-        const activeRule = registry[ruleBody];
         activeRule.count++;
 
         let released = false;
@@ -99,7 +101,7 @@ export namespace KeyframeUtils {
                     sheet.deleteRule(indexToDelete);
                 }
 
-                delete registry[ruleBody];
+                registry.delete(ruleBody);
 
                 if (killOrphanStyle && sharedStyleTag && sheet.cssRules.length === 0) {
                     sharedStyleTag.remove();

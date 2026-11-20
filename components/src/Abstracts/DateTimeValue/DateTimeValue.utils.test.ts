@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 
 import { CalendarDate } from "@internationalized/date";
 
@@ -31,5 +31,25 @@ describe("compare", () => {
         expect(DateTimeValueUtils.compare(lateOnEarlierDay, earlyOnLaterDay)).toBeLessThan(0);
         expect(DateTimeValueUtils.compare(sameDayEarlier, lateOnEarlierDay)).toBeLessThan(0);
         expect(DateTimeValueUtils.compare(lateOnEarlierDay, lateOnEarlierDay)).toBe(0);
+    });
+});
+
+describe("toDate on the days the clocks change", () => {
+    const zone = process.env.TZ;
+
+    afterEach(() => {
+        process.env.TZ = zone;
+    });
+
+    it.each([
+        ["going forward", day(2025, 3, 9)],
+        ["going back", day(2025, 11, 2)],
+    ])("keeps the wall-clock time on the day the clocks are %s", (_case, date) => {
+        process.env.TZ = "America/New_York";
+
+        const value = { date, time: { hour: 10, minute: 0 } };
+        const back = DateTimeValueUtils.fromDate(DateTimeValueUtils.toDate(value), false);
+
+        expect(DateTimeValueUtils.isSame(back, value)).toBe(true);
     });
 });

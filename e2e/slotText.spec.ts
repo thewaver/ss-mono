@@ -19,12 +19,10 @@ import { accessibleText, demo, example, prop, readout, revealProp } from "./help
 const COUNTER = example("counter");
 const COLUMN = `${COUNTER} [data-demo] [style*="rotateX"]`;
 
-const SETTLE_MS = 250;
-
 const setField = async (page: Page, key: string, value: string) => {
     await page.locator(`${prop(key)} input`).fill(value);
     await page.locator(`${prop(key)} input`).blur();
-    await page.waitForTimeout(SETTLE_MS);
+    await untilStill(page, readColumns);
 };
 
 /**
@@ -55,8 +53,30 @@ const readColumns = (page: Page) =>
     }, COUNTER);
 
 /**
+ * The columns are set by inline styles the moment the page changes, and the turn itself is a transition the browser
+ * runs from them, so "settled" is the readings stopping changing: two a poll apart that are the same.
+ */
+const untilStill = async <T>(page: Page, read: (page: Page) => Promise<T>) => {
+    let previous: string | undefined;
+
+    await expect
+        .poll(
+            async () => {
+                const current = JSON.stringify(await read(page));
+                const isStill = current === previous;
+
+                previous = current;
+
+                return isStill;
+            },
+            { message: "the columns have stopped changing" },
+        )
+        .toBe(true);
+};
+
+/**
  * A demo holds more than its `SlotText` — the measure box around it reads out its size — so what the component
- * says is read off the component itself, the outermost labelled group in the demo. The faces inside a
+ * says is read off the component itself, the outermost labeled group in the demo. The faces inside a
  * column are groups too, hidden from a screen reader, which is why it is the first one that is read.
  */
 const slotTextIn = (page: Page, key: string) => page.locator(`${demo(key)} [role="group"][aria-label]`).first();
@@ -64,7 +84,7 @@ const slotTextIn = (page: Page, key: string) => page.locator(`${demo(key)} [role
 test.beforeEach(async ({ page }) => {
     await page.goto("/slot-text");
     await expect(page.locator(COLUMN).first()).toBeVisible();
-    await page.waitForTimeout(SETTLE_MS);
+    await untilStill(page, readColumns);
 });
 
 test("a column that carries keeps turning the way the number is going", async ({ page }) => {
@@ -73,7 +93,9 @@ test("a column that carries keeps turning the way the number is going", async ({
     const before = await readColumns(page);
 
     await page.locator("#stepUp").click();
-    await page.waitForTimeout(SETTLE_MS);
+    await expect
+        .poll(async () => (await readColumns(page)).at(-1)!.angle, { message: "the units turn" })
+        .not.toBe(before[before.length - 1].angle);
 
     const after = await readColumns(page);
 
@@ -97,7 +119,9 @@ test("counting down turns the columns back the other way", async ({ page }) => {
     const before = await readColumns(page);
 
     await page.locator("#stepDown").click();
-    await page.waitForTimeout(SETTLE_MS);
+    await expect
+        .poll(async () => (await readColumns(page)).at(-1)!.angle, { message: "the units turn" })
+        .toBeLessThan(before[before.length - 1].angle);
 
     const after = await readColumns(page);
 
@@ -111,15 +135,15 @@ test("a column waits for every column to its right that is also carrying", async
     await setField(page, "turnDelayMs", "100");
     await setField(page, "value", "199");
     await page.locator("#stepUp").click();
-    await page.waitForTimeout(SETTLE_MS);
+    await expect
+        .poll(async () => (await readColumns(page)).map((column) => column.delayMs), {
+            message: "the units start at once, the tens after one beat, the hundreds after two",
+        })
+        .toEqual([200, 100, 0]);
 
     const columns = await readColumns(page);
 
     expect(columns.length, "199 to 200 carries all three").toBe(3);
-    expect(
-        columns.map((column) => column.delayMs),
-        "the units start at once, the tens after one beat, the hundreds after two",
-    ).toEqual([200, 100, 0]);
 });
 
 test("a column whose digit has not changed waits for nobody", async ({ page }) => {
@@ -267,7 +291,8 @@ const pickReel = async (page: Page, key: string) => {
     await revealProp(page, "reelKey");
     await page.locator(`${prop("reelKey")} [role="combobox"]`).click();
     await page.locator('[role="listbox"] [role="option"]', { hasText: key }).first().click();
-    await page.waitForTimeout(SETTLE_MS);
+    await expect(page.locator('[role="listbox"]'), "the reel is picked").toBeHidden();
+    await untilStill(page, readReelColumns);
 };
 
 /**
@@ -657,7 +682,8 @@ const pickWordKnob = async (page: Page, key: string, option: string) => {
     await page.locator(`${prop(key)} [role="combobox"]`).click();
     await page.locator('[role="listbox"] [role="option"]', { hasText: option }).first().click();
     await page.keyboard.press("Escape");
-    await page.waitForTimeout(SETTLE_MS);
+    await expect(page.locator('[role="listbox"]'), "the knob is set").toBeHidden();
+    await untilStill(page, readWordAngles);
 };
 
 const readWordAngles = (page: Page) =>
@@ -683,7 +709,9 @@ const turnTwoWords = async (page: Page) => {
         const before = await readWordAngles(page);
 
         await page.locator(NEXT_WORD).click();
-        await page.waitForTimeout(SETTLE_MS);
+        await expect
+            .poll(() => readWordAngles(page), { message: "the next word turns the columns" })
+            .not.toEqual(before);
 
         const after = await readWordAngles(page);
 

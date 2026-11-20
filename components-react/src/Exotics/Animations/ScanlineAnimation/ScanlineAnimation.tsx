@@ -14,7 +14,7 @@ export const ScanlineAnimation = ({
     return (
         <CellAnimation
             {...otherProps}
-            cellCount={isVertical ? { row: 1, col: lineCount } : { row: lineCount, col: 1 }}
+            cellCount={isVertical ? { rowCount: 1, colCount: lineCount } : { rowCount: lineCount, colCount: 1 }}
             computeSliceAnimation={computeSliceAnimation}
         />
     );

@@ -214,3 +214,91 @@ describe("StringUtils.mergePunctuation", () => {
         expect(StringUtils.mergePunctuation(["one", " ", "two"])).toEqual(["one", " ", "two"]);
     });
 });
+
+describe("StringUtils.toSafeHref", () => {
+    it.each([
+        "javascript:alert(1)",
+        "JaVaScRiPt:alert(1)",
+        " javascript:alert(1)",
+        "\u0001javascript:alert(1)",
+        "java\tscript:alert(1)",
+        "java\nscript:alert(1)",
+    ])("refuses %j, which would run script", (href) => {
+        expect(StringUtils.toSafeHref(href)).toBeUndefined();
+    });
+
+    it.each(["/path", "https://example.com/a?b=c", "mailto:someone@example.com", "tel:+15550100", "#section"])(
+        "passes %j unchanged",
+        (href) => {
+            expect(StringUtils.toSafeHref(href)).toBe(href);
+        },
+    );
+
+    it("answers nothing for nothing", () => {
+        expect(StringUtils.toSafeHref(undefined)).toBeUndefined();
+    });
+});
+
+describe("StringUtils.camelToKebabCase at the edges", () => {
+    it("gives a vendor-prefixed name its leading dash", () => {
+        expect(StringUtils.camelToKebabCase("WebkitTransform")).toBe("-webkit-transform");
+    });
+
+    it("passes a custom property through untouched", () => {
+        expect(StringUtils.camelToKebabCase("--myVar")).toBe("--myVar");
+    });
+});
+
+describe("StringUtils.mergePunctuation, opening side", () => {
+    it.each([
+        [
+            ["Pay", " ", "$", "5"],
+            ["Pay", " ", "$5"],
+        ],
+        [
+            ["a", " ", "(", "see", " ", "b", ")"],
+            ["a", " ", "(see", " ", "b)"],
+        ],
+        [
+            ["drop", " ", "-", "5"],
+            ["drop", " ", "-5"],
+        ],
+    ])("glues %j onto the word after it", (tokens, expected) => {
+        expect(StringUtils.mergePunctuation(tokens)).toEqual(expected);
+    });
+
+    it("leaves a currency sign after a number on that number", () => {
+        expect(StringUtils.mergePunctuation(["5", "$"])).toEqual(["5$"]);
+    });
+});
+
+describe("StringUtils.applyTextTransform capitalize, inside words", () => {
+    it("does not raise a letter after an apostrophe inside a word", () => {
+        expect(StringUtils.applyTextTransform("don't stop", "capitalize")).toBe("Don't Stop");
+        expect(StringUtils.applyTextTransform("don’t stop", "capitalize")).toBe("Don’t Stop");
+    });
+
+    it("does not raise a letter after a combining accent", () => {
+        expect(StringUtils.applyTextTransform("été", "capitalize")).toBe("Été");
+    });
+});
+
+describe("StringUtils.replaceTabs with a run of tabs", () => {
+    it("collapses the run to one space", () => {
+        expect(StringUtils.replaceTabs("a\t\tb")).toBe("a b");
+    });
+});
+
+describe("StringUtils.splitGraphemes", () => {
+    it("keeps a letter with its combining accent, and joined emoji, as one character each", () => {
+        expect(StringUtils.splitGraphemes("éa")).toEqual(["é", "a"]);
+        expect(StringUtils.splitGraphemes("\u{1F468}‍\u{1F469}‍\u{1F467}!")).toEqual([
+            "\u{1F468}‍\u{1F469}‍\u{1F467}",
+            "!",
+        ]);
+    });
+
+    it("gives nothing for an empty string", () => {
+        expect(StringUtils.splitGraphemes("")).toEqual([]);
+    });
+});

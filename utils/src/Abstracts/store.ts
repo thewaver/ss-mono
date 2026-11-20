@@ -38,6 +38,7 @@ export type WritableStore<T> = Store<T> & {
     update: (update: (current: T) => T) => boolean;
 };
 
+/** A minimal store: a value that can be read, written and subscribed to, for state shared outside any framework. */
 export namespace StoreUtils {
     /**
      * Makes a store holding `initial`.

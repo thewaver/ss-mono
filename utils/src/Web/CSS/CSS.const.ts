@@ -1,5 +1,6 @@
 import type { CSSAnimationKey, CSSFilterKey } from "./CSS.types.js";
 
+/** Lists of CSS property names grouped by what they affect, and the unit each animatable function takes. */
 export namespace CSSConst {
     /**
      * CSS properties that pass down to child elements on their own.
@@ -41,7 +42,9 @@ export namespace CSSConst {
     export const CSS_KEYS_USED_TO_MEASURE_TEXT = [
         "font-family",
         "font-size",
+        "font-stretch",
         "font-style",
+        "font-variant-caps",
         "font-weight",
         "letter-spacing",
         "line-height",
@@ -125,7 +128,6 @@ export namespace CSSConst {
         "font-optical-sizing",
         "font-palette",
         "font-size-adjust",
-        "font-stretch",
         "font-synthesis",
         "font-synthesis-position",
         "font-synthesis-small-caps",
@@ -133,7 +135,6 @@ export namespace CSSConst {
         "font-synthesis-weight",
         "font-variant",
         "font-variant-alternates",
-        "font-variant-caps",
         "font-variant-east-asian",
         "font-variant-emoji",
         "font-variant-ligatures",
@@ -286,7 +287,6 @@ export namespace CSSConst {
         "font-language-override",
         "font-variant",
         "font-variant-alternates",
-        "font-variant-caps",
         "font-variant-east-asian",
         "font-variant-ligatures",
         "font-variant-numeric",

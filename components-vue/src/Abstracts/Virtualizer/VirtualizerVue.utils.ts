@@ -15,7 +15,6 @@ import {
     Virtualizer,
     type VirtualizerOptions,
     defaultRangeExtractor,
-    elementScroll,
     measureElement,
     observeElementOffset,
 } from "@tanstack/virtual-core";
@@ -141,7 +140,7 @@ export namespace VirtualizerVueUtils {
                 },
                 observeElementRect: VirtualizerUtils.observeClientRect,
                 observeElementOffset,
-                scrollToFn: elementScroll,
+                scrollToFn: VirtualizerUtils.scrollToWholePixel,
                 onChange: () => publish(),
             };
         };

@@ -1,8 +1,8 @@
 import type { CellAnimationKeyframes, CellAnimationOrigins, SliceAnimationWeights } from "@thewaver/ss-components-vue";
-import type { Index2d } from "@thewaver/ss-utils";
+import type { Count2d } from "@thewaver/ss-utils";
 
 export type ParticleFieldExampleProps = {
-    "cellCount": Index2d;
+    "cellCount": Count2d;
     "spawnChance": number;
     "animationIterationDelayMs": number;
     "animationDurationMs": number;

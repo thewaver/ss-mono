@@ -110,23 +110,27 @@ export namespace ElementObserverReactUtils {
      * @param isVisible Whether to keep measuring.
      * @param opts.padding Grows the rectangle outwards, either evenly or edge by edge.
      * @param opts.offset Shifts the rectangle. Applied after the padding.
+     * @param opts.isMeasuredWhileHidden Whether the measurement taken as the element mounts is taken while `isVisible`
+     * is `false`. `true` when left out; `false` leaves a hidden element unmeasured until it is shown.
      * @returns The rectangle, or `undefined` before the element has been measured.
      */
     export const useViewportRect = (
         ref: RefObject<HTMLElement | null>,
         isVisible: boolean,
-        opts?: { padding?: Bounds | number; offset?: Point2d },
+        opts?: { padding?: Bounds | number; offset?: Point2d; isMeasuredWhileHidden?: boolean },
     ) => {
         const viewportContext = useViewportContext();
         const element = useElement(ref);
         const latest = useLatest(opts);
         const [rect, setRect] = useDedupedState<Rect | undefined>(undefined, ElementObserverUtils.isSameRect);
 
+        const isVisibleRef = useLatest(isVisible);
+
         useLayoutEffect(() => {
-            if (!element) return;
+            if (!element || (latest.current?.isMeasuredWhileHidden === false && !isVisibleRef.current)) return;
 
             setRect(ElementObserverUtils.measureViewportRect(element, viewportContext, latest.current));
-        }, [element, viewportContext, latest]);
+        }, [element, viewportContext, latest, isVisibleRef]);
 
         useLayoutEffect(() => {
             if (!element || !isVisible) return;

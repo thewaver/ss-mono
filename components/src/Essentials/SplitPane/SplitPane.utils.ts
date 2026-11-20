@@ -9,6 +9,9 @@ import type {
     SplitPaneOrientation,
 } from "./SplitPane.types";
 
+/** The scale of a split whose layout length is not known: none. */
+const NO_SCALE = 1;
+
 const computeRatioBounds = (pane: SplitPaneEntry, available: number) => {
     if (available <= 0) return { min: 0, max: 1 };
 
@@ -59,6 +62,8 @@ export namespace SplitPaneUtils {
      * write.
      */
     export const warnIfGutterUnnamed = (panes: SplitPaneEntry[], propName: string) => {
+        if (process.env.NODE_ENV === "production") return;
+
         const unnamed = findUnnamedGutters(panes);
 
         if (unnamed.length > 0)
@@ -203,13 +208,25 @@ export namespace SplitPaneUtils {
     };
 
     /**
+     * The root's length along the split in layout pixels, before any scale above it, as
+     * {@link computePointerBoundary} takes it.
+     *
+     * @param root The split's root element.
+     * @param orientation The split's orientation.
+     */
+    export const getLayoutExtent = (root: HTMLElement, orientation: SplitPaneOrientation) =>
+        orientation === "horizontal" ? root.offsetWidth : root.offsetHeight;
+
+    /**
      * Where a boundary would sit under the pointer.
      *
-     * Measured against the root's client rect on both sides of the division, so a scale applied above the split
-     * cancels out. The pointer is read as the middle of the gutter being dragged.
+     * Measured against the root's client rect, with the gutters, which are given in layout pixels, scaled to match,
+     * so a scale applied above the split — a `Viewport` — leaves the boundary under the pointer. The pointer is read
+     * as the middle of the gutter being dragged.
      *
-     * @param params The pointer, the root's client rect, the boundary, the orientation, the direction, and the
-     * gutter size.
+     * @param params The pointer, the root's client rect, the boundary, the orientation, the direction, the gutter
+     * size, and `layoutExtent`: the root's length along the split in layout pixels (`offsetWidth` or
+     * `offsetHeight`), which is how the scale is read. Left out, no scale is assumed.
      * @returns The boundary as a ratio, or `undefined` when there is no room to divide.
      */
     export const computePointerBoundary = (params: {
@@ -220,16 +237,19 @@ export namespace SplitPaneUtils {
         direction: NavigatorDirection | undefined;
         gutterSize: number;
         paneCount: number;
+        layoutExtent?: number;
     }) => {
-        const { point, rootRect, index, orientation, direction, gutterSize, paneCount } = params;
+        const { point, rootRect, index, orientation, direction, gutterSize, paneCount, layoutExtent } = params;
         const total = orientation === "horizontal" ? rootRect.width : rootRect.height;
-        const available = total - computeTotalGutterSize(gutterSize, paneCount);
+        const scale = layoutExtent ? total / layoutExtent : NO_SCALE;
+        const scaledGutter = gutterSize * scale;
+        const available = total - computeTotalGutterSize(scaledGutter, paneCount);
 
         if (available <= 0) return undefined;
 
         const offset = computePointerOffset(point, rootRect, orientation, direction);
 
-        return (offset - gutterSize * (index + 0.5)) / available;
+        return (offset - scaledGutter * (index + 0.5)) / available;
     };
 
     /**

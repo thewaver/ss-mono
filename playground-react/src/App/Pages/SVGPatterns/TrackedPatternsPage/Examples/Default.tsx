@@ -10,23 +10,23 @@ import { ShapeConst } from "@thewaver/ss-utils";
 
 import type { TrackedPatternExampleProps } from "../../SVGPatternsReact.types";
 
-export const DefaultExample = ({ configKey, configDefs, colors, cellSize, blurWidth }: TrackedPatternExampleProps) => {
+export const DefaultExample = (props: TrackedPatternExampleProps) => {
     const id = useId();
 
     return (
         <Shape
             computePoints={(size) => ShapeConst.getDefaultShapePoints("square", size)}
             computeFillDefs={(size, element) => {
-                if (configKey === NO_SAMPLE_KEY) return computeNoSampleDefs(colors, "fill");
+                if (props.configKey === NO_SAMPLE_KEY) return computeNoSampleDefs(props.colors, "fill");
 
                 return SVGDefsSampleConfigs.Pattern.Tracked.toConfig({
-                    family: configKey,
-                    defs: configDefs,
+                    family: props.configKey,
+                    defs: props.configDefs,
                 } as SVGDefsSamples.Pattern.Tracked.Entry).computeSVGDefs(`fill-${id}`, undefined, element, {
                     getSize: () => size,
-                    cellSize,
-                    colors,
-                    blurWidth,
+                    cellSize: props.cellSize,
+                    colors: props.colors,
+                    blurWidth: props.blurWidth,
                 });
             }}
             renderChildren={() => <div className={styles.example} />}

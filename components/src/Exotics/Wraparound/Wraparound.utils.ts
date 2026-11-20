@@ -9,9 +9,11 @@ import {
     StoreUtils,
 } from "@thewaver/ss-utils";
 
+import { NavigatorUtils } from "../../Abstracts/Navigator/Navigator.utils";
 import type { WraparoundPlane, WraparoundPlaneOpts, WraparoundPlaneState, WraparoundTile } from "./Wraparound.types";
 
 /** What joins a cell's column and row in its key. */
+const NO_BUTTONS = 0;
 const TILE_KEY_SEPARATOR = ",";
 
 /** How far the pointer must travel before a press counts as a drag rather than a tap. */
@@ -38,6 +40,16 @@ const MS_PER_SECOND = 1000;
 const ORIGIN: Point2d = { x: 0, y: 0 };
 
 const ORIGINAL_TILE: WraparoundTile = { column: 0, row: 0 };
+
+/** No scale above an element, which is what one with no layout width is taken to have. */
+const NO_SCALE = 1;
+
+/**
+ * How much the page draws an element larger or smaller than its layout size — a `Viewport`'s scale — read off the
+ * element itself, so a pointer's on-screen distances can be turned into the layout pixels tiles are sized in.
+ */
+const getScale = (element: HTMLElement, box: DOMRect) =>
+    element.offsetWidth ? box.width / element.offsetWidth : NO_SCALE;
 
 type Motion =
     | { kind: "glide"; from: Point2d; to: Point2d; startMs: number; durationMs: number }
@@ -397,9 +409,15 @@ export namespace WraparoundUtils {
 
             const box = original.getBoundingClientRect();
             const target = element.getBoundingClientRect();
+            const scale = getScale(original, box);
             const { shift, delta } = computeReveal(
                 getOriginalPosition(),
-                { x: target.left - box.left, y: target.top - box.top, width: target.width, height: target.height },
+                {
+                    x: (target.left - box.left) / scale,
+                    y: (target.top - box.top) / scale,
+                    width: target.width / scale,
+                    height: target.height / scale,
+                },
                 opts.getTileSize(),
                 opts.getViewportSize(),
             );
@@ -429,8 +447,9 @@ export namespace WraparoundUtils {
         const observe = (root: HTMLElement) => {
             const toLocal = (event: PointerEvent): Point2d => {
                 const box = root.getBoundingClientRect();
+                const scale = getScale(root, box);
 
-                return { x: event.clientX - box.left, y: event.clientY - box.top };
+                return { x: (event.clientX - box.left) / scale, y: (event.clientY - box.top) / scale };
             };
 
             const moveOriginalUnder = (event: PointerEvent) =>
@@ -455,11 +474,13 @@ export namespace WraparoundUtils {
 
                 const target = event.target;
 
+                const start = toLocal(event);
+
                 press = {
                     pointerId: event.pointerId,
-                    start: { x: event.clientX, y: event.clientY },
+                    start,
                     startOffset: store.get().offset,
-                    samples: [{ point: { x: event.clientX, y: event.clientY }, timeMs: event.timeStamp }],
+                    samples: [{ point: start, timeMs: event.timeStamp }],
                     isDragging: false,
                     isFromOriginal: target instanceof Node && (opts.getOriginal()?.contains(target) ?? false),
                 };
@@ -467,7 +488,11 @@ export namespace WraparoundUtils {
 
             const handlePointerMove = (event: PointerEvent) => {
                 if (!press) {
-                    const isFocusShown = opts.getOriginal()?.querySelector(":focus-visible") !== null;
+                    const original = opts.getOriginal();
+                    const focused = document.activeElement;
+                    const isFocusShown =
+                        !original ||
+                        (focused instanceof Element && original.contains(focused) && focused.matches(":focus-visible"));
 
                     if (event.pointerType === "mouse" && !isFocusShown && !opts.getIsDisabled()) {
                         moveOriginalUnder(event);
@@ -478,9 +503,17 @@ export namespace WraparoundUtils {
 
                 if (event.pointerId !== press.pointerId) return;
 
-                const moved = { x: event.clientX - press.start.x, y: event.clientY - press.start.y };
+                if (event.buttons === NO_BUTTONS) {
+                    handlePointerUp(event);
 
-                if (!press.isDragging && opts.getIsMovable() && Math.hypot(moved.x, moved.y) > DRAG_SLOP_PX) {
+                    return;
+                }
+
+                const point = toLocal(event);
+                const moved = { x: point.x - press.start.x, y: point.y - press.start.y };
+                const scale = getScale(root, root.getBoundingClientRect());
+
+                if (!press.isDragging && opts.getIsMovable() && Math.hypot(moved.x, moved.y) * scale > DRAG_SLOP_PX) {
                     press.isDragging = true;
                     root.setPointerCapture(event.pointerId);
                     store.update((state) => ({ ...state, isDragging: true }));
@@ -488,7 +521,7 @@ export namespace WraparoundUtils {
 
                 if (!press.isDragging) return;
 
-                press.samples.push({ point: { x: event.clientX, y: event.clientY }, timeMs: event.timeStamp });
+                press.samples.push({ point, timeMs: event.timeStamp });
                 press.samples = press.samples.filter((sample) => event.timeStamp - sample.timeMs <= VELOCITY_WINDOW_MS);
 
                 setOffset({ x: press.startOffset.x + moved.x, y: press.startOffset.y + moved.y });
@@ -551,7 +584,9 @@ export namespace WraparoundUtils {
                     return;
                 }
 
-                const delta = computeKeyDelta(event.key, opts.getKeyStepPx(), opts.getViewportSize());
+                const delta = NavigatorUtils.getHasCommandModifier(event)
+                    ? undefined
+                    : computeKeyDelta(event.key, opts.getKeyStepPx(), opts.getViewportSize());
 
                 if (!delta) return;
 

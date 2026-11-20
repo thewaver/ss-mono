@@ -1,10 +1,14 @@
 # Working with this user
 
 How to work here. Library-wide rules are in [`rules/conventions.md`](rules/conventions.md) and the scoped rule
-files beside it, and per-component decisions in [`decisions.md`](decisions.md), both here in `.claude/`; outstanding
+files beside it, and per-component decisions in [`decisions/`](decisions/), indexed by
+[`decisions.md`](decisions.md), all here in `.claude/`; outstanding
 work is in [`backlog.md`](../backlog.md) at the repo root, beside [`brief.md`](../brief.md). The rules load on their
-own — `conventions.md` in every session, each scoped file once a file it names is opened. Read `decisions.md`
-before starting anything.
+own — `conventions.md` in every session, each scoped file once a file it names is opened. **The decisions do not
+load on their own: before starting anything, read whole the file of each component the task touches** —
+`decisions/Select.md` for `Select`, named after its folder in `components/src` — and the topic files it falls under
+(`porting-*`, `playground-*`, `repo-layout`, `ss-utils`, `verification` and the rest, listed in the index). Use the
+index to follow a pointer written as "`decisions.md`, under _"a heading"_".
 
 ## How work gets reviewed
 
@@ -83,7 +87,11 @@ never adds length.
 
 **A reply that reports work ends with one line saying whether the session can be closed** — they run several sessions.
 It says nothing is running and nothing is waiting on them, or names what is open: an agent working, a decision
-pending, a step not done. Uncommitted changes do not keep a session open. **The same line states where the ports and
+pending, a step not done. Uncommitted changes do not keep a session open. **A session can be closed only when the
+task it was given is finished, or has reached a checkpoint a next session can pick up from** — the user's rule: what
+is done, what is not, what comes next and how to do it, written down where that session will read it. **The line
+says which of the two it is** — "work complete" or "documented for continuation in `<file>`" — never just "can be
+closed". **The same line states where the ports and
 the specs stand**: whether the work reached all four frameworks (or why it needed no porting, or what is left), and
 which specs ran and how (or that none ran, and why) — e.g. _"Ported to all four, Scroller spec green in all four —
 nothing running, nothing waiting on you."_ A line leaving either out reads as "not checked". **The line appears only
@@ -200,6 +208,14 @@ be delegated, what it saves, and which way the tokens go (splitting costs more i
 on a well-specified part can cost less overall, if the part outweighs the agent's cold start). Wait for them to take
 it up.
 
+**Every turn ends by saying how loudly it should call them** — their design, carried out by
+`.claude/hooks/notify.mjs` on the `Stop` hook. As the last tool call of a turn, run
+`node .claude/hooks/notify.mjs mark <mode> <session id>`, where the session id is the folder name inside this
+session's scratchpad path and the mode is `ask` when the reply needs their answer (three beeps), `announce` when it
+reports something finished (one beep), or `quiet` when it reports progress while work carries on (none). Left
+unmarked, a turn gets one beep. The hook stays silent within a minute of their last message, and an alert they do
+not answer repeats every three minutes, three alerts at most.
+
 **A long-running command never blocks the conversation**: specs, builds, installs and anything slower than a few
 seconds run with `run_in_background`, and the reply carries on.
 
@@ -249,6 +265,9 @@ _"Documentation blocks"_ describes:
 - every member of an exported `*Props` type in the library, and the types that feed one;
 - the generated-file warning `libraryTree.mjs` writes atop `playground/src/App/LibraryTree.generated.ts`.
 
+**Commented-out lines in `playground/src/App/Skins/Variants/` are the user's own** — definitions they keep while
+working on the Skins. Leave them be, and do not report them.
+
 The Playground's own `*.utils.ts` files stay bare. **`utils/` (`@thewaver/ss-utils`) is the opposite**: every export
 there is documented; read its neighbors and keep doing so. **`e2e/` welcomes explanatory blocks**, as its specs show.
 
@@ -278,6 +297,10 @@ This file, the rules and `decisions.md` are written for Claude; `backlog.md` and
   short; check them before an architectural call.
 - **`decisions.md`** — the same at the local level: why one control, abstract or corner of the repo is the way it is.
   The record of arguments already had, and where `backlog.md` items point for reasoning. Most new writing lands here.
+  **It is an index plus one file per component or topic in `decisions/`** — the user's choice, once the single file
+  had grown past what a session can read. "`decisions.md`" anywhere in these documents means the index and those
+  files together. A new entry goes into its component's file (a new file if there is none, a topic file when it
+  covers several components), and its heading is added to the index in the same edit.
   **It never restates a value the code shows** — a default, a constant, a limit — the user's correction, after a
   copied cell size had already drifted from the code. Name where the value lives and say only what the code cannot:
   that it was a guess, whose call it is, why it is that.

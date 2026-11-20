@@ -13,6 +13,8 @@ type Fade = {
 };
 
 /** The part of an audio switcher that is not about any framework: two elements, and the crossfade between them. */
+const AUTOPLAY_REFUSED_ERROR = "NotAllowedError";
+
 export namespace AudioSwitcherUtils {
     /**
      * Makes the pair of audio elements a switcher crossfades between, and the commands that drive them.
@@ -105,6 +107,9 @@ export namespace AudioSwitcherUtils {
                 .catch((err) => {
                     startingElements.delete(element);
                     stoppedWhileStarting.delete(element);
+
+                    if (!isMounted || !(err instanceof DOMException) || err.name !== AUTOPLAY_REFUSED_ERROR) return;
+
                     console.warn("Playback prevented by browser autoplay restrictions:", err);
                     defs.setIsPlaying(false);
                     clearFade(element);
@@ -113,7 +118,7 @@ export namespace AudioSwitcherUtils {
 
         const fadeOut = (element: HTMLAudioElement) => {
             const fadeOutTick = () => {
-                element.volume = Math.max(element.volume - getStep(), 0);
+                element.volume = getStep() > 0 ? Math.max(element.volume - getStep(), 0) : 0;
 
                 if (element.volume === 0) {
                     element.pause();

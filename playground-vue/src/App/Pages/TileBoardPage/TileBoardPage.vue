@@ -13,7 +13,7 @@ import {
     ROUTE_START,
     STARTING_PIECE,
 } from "@thewaver/ss-playground/App/Pages/TileBoardPage/TileBoardPage.const";
-import { Index2d, type Index2dString } from "@thewaver/ss-utils";
+import { type Count2d, Index2d, type Index2dString } from "@thewaver/ss-utils";
 
 import PageExampleKnobs from "../../PageComponents/ExampleKnobs/PageExampleKnobs.vue";
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
@@ -46,7 +46,7 @@ const piece = shallowRef<Index2d>(STARTING_PIECE);
 const destination = shallowRef<Index2d>();
 const painted = shallowRef<Index2dString[]>(NO_MARKS);
 
-const tileCount = computed((): Index2d => ({ row: rows.value, col: cols.value }));
+const tileCount = computed((): Count2d => ({ rowCount: rows.value, colCount: cols.value }));
 
 const tileSize = computed(() => ({ width: tileWidth.value, height: tileHeight.value }));
 

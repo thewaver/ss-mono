@@ -103,7 +103,10 @@ export namespace PanZoomSolidUtils {
         );
 
         const setView = (view: PanZoomView, isImmediate: boolean) => {
-            const next = PanZoomUtils.clampView(view, untrack(getBounds));
+            const next = PanZoomUtils.clampView(view, {
+                ...untrack(getBounds),
+                canCenterEdges: untrack(() => defs.getCanCenterEdges?.(view)) ?? false,
+            });
 
             if (PanZoomUtils.getIsSameView(next, untrack(getView))) return false;
 

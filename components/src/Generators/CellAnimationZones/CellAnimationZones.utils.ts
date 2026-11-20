@@ -59,6 +59,10 @@ export namespace CellAnimationZoneUtils {
      * @param defs The cell, its weight, the grid and the origin, as the animation is handed them.
      * @returns `true` when the cell is in the zone.
      */
-    export const isInZone = (type: CellAnimationZoneType, defs: SliceAnimationEvaluationDefs & { origin: Index2d }) =>
-        zoneRegistry[type](defs);
+    export const isInZone = (type: CellAnimationZoneType, defs: SliceAnimationEvaluationDefs & { origin: Index2d }) => {
+        if (!Object.hasOwn(zoneRegistry, type))
+            throw new Error(`CellAnimationZones: there is no zone named "${type}".`);
+
+        return zoneRegistry[type](defs);
+    };
 }

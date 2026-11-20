@@ -1,10 +1,8 @@
 import type { ApiGroup, ApiGroupKind, ApiInclude } from "virtual:component-api";
 
-import { StringUtils } from "@thewaver/ss-utils";
-
 import { getDefaultHighlighterConfig, highlighter } from "../../../shiki";
 import { toOwnAppHref } from "../FrameworkSwitch/FrameworkSwitch.const";
-import { toPageViewRoute } from "../ViewTabs/ViewTabs.const";
+import { toComponentRoute, toPageViewRoute } from "../ViewTabs/ViewTabs.const";
 import type { DocsTableOfContentsEntry } from "./DocsView.types";
 
 const WRAPPER_PATTERN = /<\/?pre[^>]*>|<\/?code[^>]*>/g;
@@ -36,7 +34,7 @@ export const toDocsIncludeHref = (include: ApiInclude, unit: string) => {
 
     if (include.target.unit.toLowerCase() === unit.toLowerCase()) return fragment;
 
-    const route = toPageViewRoute(`/${StringUtils.camelToKebabCase(include.target.unit)}`, "api");
+    const route = toPageViewRoute(toComponentRoute(include.target.unit), "api");
 
     return toOwnAppHref(`${route}${fragment}`);
 };

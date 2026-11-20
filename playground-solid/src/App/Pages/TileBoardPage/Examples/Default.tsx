@@ -1,4 +1,4 @@
-import { For, createMemo } from "solid-js";
+import { For, createMemo, splitProps } from "solid-js";
 
 import { TileBoard, TileBoardUtils, access } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/Pages/TileBoardPage/TileBoardPage.css";
@@ -9,10 +9,12 @@ import type { TileBoardExampleProps } from "../TileBoardPage.types";
 
 type Props = TileBoardExampleProps;
 
-export const DefaultExample = ({ tiling, marked, ...otherProps }: Props) => {
+export const DefaultExample = (props: Props) => {
+    const [, otherProps] = splitProps(props, ["tiling", "marked"]);
+
     const getLayout = createMemo(() =>
         TileBoardUtils.getLayout(
-            access(tiling),
+            access(props.tiling),
             access(otherProps.tileCount),
             access(otherProps.tileSize),
             access(otherProps.hasShortFirstRow),
@@ -24,17 +26,17 @@ export const DefaultExample = ({ tiling, marked, ...otherProps }: Props) => {
         <div class={styles.meepleHost}>
             <TileBoard
                 {...otherProps}
-                tiling={tiling}
+                tiling={props.tiling}
                 computeTileAriaLabel={(tile) => `Row ${tile.row + 1}, tile ${tile.col + 1}`}
                 renderTile={(getTile, getRenderProps) => (
                     <PageTileBoardTile
                         renderProps={getRenderProps}
-                        isMarked={() => access(marked).includes(Index2d.toString(getTile()))}
+                        isMarked={() => access(props.marked).includes(Index2d.toString(getTile()))}
                     />
                 )}
             />
 
-            <For each={access(marked)}>
+            <For each={access(props.marked)}>
                 {(key) => (
                     <PageTileBoardMeeple
                         center={() => TileBoardUtils.getTileCenter(Index2dString.fromString(key), getLayout())}

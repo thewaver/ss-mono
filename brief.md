@@ -14,8 +14,8 @@ purpose: it answers "what is outstanding", and neither of them is.
 | [Blockers and known issues](#blockers-and-known-issues)   |     4 |
 | [Deliberately not built](#deliberately-not-built)         |     1 |
 | [Accessibility gaps](#accessibility-gaps)                 |     5 |
-| [Planned projects](#planned-projects)                     |     2 |
-| [Waiting on browser support](#waiting-on-browser-support) |     4 |
+| [Planned projects](#planned-projects)                     |     5 |
+| [Waiting on browser support](#waiting-on-browser-support) |     5 |
 
 ---
 
@@ -28,6 +28,7 @@ Something that misbehaves, or a cost nobody has paid down.
 | 10  | **Any placed control**     | A layout guesses each item's box, so content wider than the guess overflows it and, on a ring, overlaps a neighbor                        |
 | 10  | **Any placed control**     | Nothing stops a layout outgrowing the room it is in — a ring can reach past the screen, and a placed toolbar has nothing to collapse into |
 | 10  | **`Menu`, hold and flick** | How far a flick must travel to pick an item is a guess — about 30px on the demo wheel — not a measured number                             |
+| 12  | **Every package**          | A lookup past the end of an array is used as if it found something; the compiler option that would catch it is off                        |
 
 ## Deliberately not built
 
@@ -51,9 +52,13 @@ They cluster, and no single item owns them.
 
 ## Planned projects
 
-| #   | What                                          | Standing                                                                                                      |
-| --- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| 2   | **A consumer-facing layer above the library** | **Deferred to a near-future session of its own.** Painted, ready-to-use controls, as Magic UI sells templates |
+| #   | What                                             | Standing                                                                                                              |
+| --- | ------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------- |
+| 2   | **A consumer-facing layer above the library**    | **Deferred to a near-future session of its own.** Painted, ready-to-use controls, as Magic UI sells templates         |
+| 13  | **Drawing every component on a server**          | Decided, not yet built. Tested in Next.js, Nuxt, SvelteKit and SolidStart; until then the READMEs say browser only    |
+| 14  | **Solid 2**                                      | Decided, not yet built. A consumer on Solid 2 cannot install the Solid package cleanly                                |
+| 15  | **TypeScript 7**                                 | Waiting on 7.1, since 7.0 broke some tools                                                                            |
+| 16  | **Joining scripts in the letter-by-letter text** | Decided, not yet built. Arabic and other joining scripts animate unjoined in ScrambleText, Typewriter and PaintedText |
 
 ## Waiting on browser support
 
@@ -65,4 +70,5 @@ to watch; nothing here is worth starting before then.
 | 3   | **`ColorInput`, eyedropper**     | Picking a color by clicking anywhere on screen. Chromium-only, at 27%. Waits on Firefox and Safari, or Baseline                                                                                                                                              |
 | 1   | **Cell animation**               | It can slice a picture but not the control's own children; one picture of the element would do it, and that waits on HTML-in-Canvas                                                                                                                          |
 | 7   | **Every anchored layer**         | A popup paints where its anchor was one frame ago, so it trails during a scroll. Waits on CSS anchor positioning reaching Baseline                                                                                                                           |
+| 17  | **`Table`, end-pinned column**   | In Safari, inside a scaled `Viewport`, the column pinned to the end sits about 34px too far toward the end until the table is scrolled fully. A WebKit bug; waits on its fix                                                                                 |
 | 9   | **`GlassSurface`, ripple layer** | The rippled edge shows a defect under real GPU rendering that clipping it, however it's clipped, either reproduces or replaces with a different one — a known, unresolved gap in `backdrop-filter` plus `feDisplacementMap`, not particular to this codebase |

@@ -176,7 +176,11 @@ export const Carousel = defineComponent(
         const getNearestGroup = (at: number) =>
             CarouselUtils.getNearestGroup(at, rests.value, count.value, getIsLooping());
 
-        if (getNearestGroup(position.value) !== currentIndex.value) {
+        const nearestAtMount = getNearestGroup(position.value);
+
+        if (nearestAtMount !== currentIndex.value && props.index === undefined) {
+            index.value = nearestAtMount;
+        } else if (nearestAtMount !== currentIndex.value) {
             writeProgress(
                 CarouselUtils.toGroupProgress(
                     rests.value[currentIndex.value] ?? 0,

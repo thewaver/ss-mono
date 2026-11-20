@@ -5,6 +5,7 @@ import {
     CSSUtils,
     type Index2d,
     MathUtils,
+    ObjectUtils,
 } from "@thewaver/ss-utils";
 
 import type { SliceAnimationEvaluationDefs } from "../../Exotics/Animations/CellAnimation/CellAnimation.types";
@@ -96,12 +97,14 @@ export namespace SliceAnimationUtils {
      * @param defs.getIterationDelayMs How long to wait between passes.
      * @param defs.onIterationEnd Runs at the end of each pass.
      * @param defs.onAnimationEnd Runs once the last pass is done, before it is counted.
-     * @returns Stops the frames and any wait between passes. Another call starts again from the progress as it is.
+     * @returns Stops the frames and any wait between passes, also when called from inside one of the callbacks above
+     * or from something a progress write sets off. Another call starts again from the progress as it is.
      */
     export const runPasses = (defs: SliceAnimationPassDefs) => {
         let frameId: ReturnType<typeof requestAnimationFrame> | undefined;
         let timeout: ReturnType<typeof setTimeout> | undefined;
         let lastMs = performance.now();
+        let isStopped = false;
 
         const advance = (nowMs: number) => {
             const durationMs = defs.getDurationMs();
@@ -115,6 +118,8 @@ export namespace SliceAnimationUtils {
             lastMs = nowMs;
             defs.setProgress(next);
 
+            if (isStopped) return;
+
             if (next < FULL_PROGRESS) {
                 frameId = requestAnimationFrame(advance);
 
@@ -122,6 +127,8 @@ export namespace SliceAnimationUtils {
             }
 
             defs.onIterationEnd?.();
+
+            if (isStopped) return;
 
             if (defs.getCurrentIteration() + 1 >= defs.getIterationCount()) {
                 defs.onAnimationEnd?.();
@@ -134,6 +141,9 @@ export namespace SliceAnimationUtils {
                 timeout = undefined;
                 defs.setProgress(NO_PROGRESS);
                 defs.setCurrentIteration(defs.getCurrentIteration() + 1);
+
+                if (isStopped) return;
+
                 lastMs = performance.now();
                 frameId = requestAnimationFrame(advance);
             }, defs.getIterationDelayMs());
@@ -142,6 +152,8 @@ export namespace SliceAnimationUtils {
         frameId = requestAnimationFrame(advance);
 
         return () => {
+            isStopped = true;
+
             if (frameId !== undefined) cancelAnimationFrame(frameId);
 
             clearTimeout(timeout);
@@ -236,6 +248,31 @@ export namespace SliceAnimationUtils {
         })[1],
         isDescending: timing.breakpointOpts.dir === "desc",
     });
+
+    /**
+     * Whether two grids of weights hold the same numbers in the same places.
+     *
+     * For a renderer that works the weights out again each time it draws, from a function a consumer may pass anew
+     * each time: everything built from the weights need only be rebuilt when this says they changed.
+     */
+    export const getIsSameWeights = (a: readonly (readonly number[])[], b: readonly (readonly number[])[]) =>
+        ObjectUtils.isSameArray(a, b, (first, second) => ObjectUtils.isSameArray(first, second));
+
+    /**
+     * Whether two answers of {@link resolveTables} hold the same tables, in the same order, for the same slices.
+     *
+     * The counterpart of {@link getIsSameWeights}, for a sample a consumer may build anew each time.
+     */
+    export const getIsSameTables = (a: SliceAnimationTables | undefined, b: SliceAnimationTables | undefined) =>
+        a === b ||
+        (a !== undefined &&
+            b !== undefined &&
+            ObjectUtils.isSameArray(a.tableIndices, b.tableIndices) &&
+            ObjectUtils.isSameArray(
+                a.tables,
+                b.tables,
+                (first, second) => first === second || JSON.stringify(first) === JSON.stringify(second),
+            ));
 
     /**
      * The tables a sample plays on each slice, each distinct table once, for a renderer that works the keyframes out

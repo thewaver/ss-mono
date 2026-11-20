@@ -1,3 +1,4 @@
+import { InteractionTrackerUtils } from "../../Abstracts/InteractionTracker/InteractionTracker.utils";
 import type { NavigatorDirection } from "../../Abstracts/Navigator/Navigator.types";
 import { NavigatorUtils } from "../../Abstracts/Navigator/Navigator.utils";
 import type { Tab, TabsKeyStep, TabsOrientation } from "./Tabs.types";
@@ -23,6 +24,8 @@ export namespace TabsUtils {
      * @param tabs The tabs, in the order they are shown.
      */
     export const warnIfUnpaired = <T>(tabs: Tab<T>[]) => {
+        if (process.env.NODE_ENV === "production") return;
+
         const unpaired = tabs.flatMap((tab, index) =>
             tab.href === undefined && (tab.id === undefined || tab.panelId === undefined) ? [index] : [],
         );
@@ -55,7 +58,7 @@ export namespace TabsUtils {
      */
     export const computeNavigableIndexes = <T>(tabs: Tab<T>[]) =>
         tabs.reduce<number[]>((acc, tab, index) => {
-            if (!tab.isDisabled || tab.isReachableWhenDisabled) acc.push(index);
+            if (InteractionTrackerUtils.computeIsNavigable(tab)) acc.push(index);
 
             return acc;
         }, []);

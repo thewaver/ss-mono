@@ -145,6 +145,8 @@ export namespace ElementObserverSvelteUtils {
      * @param opts.getPadding Grows the rectangle outwards, either evenly or edge by edge. Useful for a hover target
      * that should extend past what is drawn.
      * @param opts.getOffset Shifts the rectangle. Applied after the padding.
+     * @param opts.isMeasuredWhileHidden Whether the measurement taken as the element mounts is taken while `getIsVisible`
+     * says `false`. `true` when left out; `false` leaves a hidden element unmeasured until it is shown.
      */
     export const createViewportRectObserver = (
         getRef: () => HTMLElement | undefined,
@@ -153,6 +155,7 @@ export namespace ElementObserverSvelteUtils {
             setElementRect: (rect: Rect) => void;
             getPadding?: () => Bounds | number;
             getOffset?: () => Point2d;
+            isMeasuredWhileHidden?: boolean;
         },
     ) => {
         const viewportContext = getViewportContext();
@@ -160,7 +163,7 @@ export namespace ElementObserverSvelteUtils {
         $effect(() => {
             const ref = getRef();
 
-            if (!ref) return;
+            if (!ref || (opts.isMeasuredWhileHidden === false && !untrack(getIsVisible))) return;
 
             untrack(() =>
                 opts.setElementRect(

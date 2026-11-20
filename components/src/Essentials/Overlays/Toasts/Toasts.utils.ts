@@ -93,7 +93,7 @@ const printedWarnings = new Set<string>();
 
 /** Prints a warning unless it has been printed before. */
 const warnOnce = (message: string) => {
-    if (printedWarnings.has(message)) return;
+    if (process.env.NODE_ENV === "production" || printedWarnings.has(message)) return;
 
     printedWarnings.add(message);
     console.warn(message);
@@ -127,7 +127,11 @@ const computeFreeId = (toasts: BaseToast<unknown>[]) => {
 const getIsFocusableElement = (target: unknown): target is HTMLElement =>
     typeof HTMLElement !== "undefined" && target instanceof HTMLElement;
 
-/** Hands focus back to where it was before the shortcut moved it into a stack, when Escape is pressed in one. */
+/**
+ * Hands focus back to where it was before the shortcut moved it into a stack, when Escape is pressed in one. Where
+ * that place cannot take focus — the page itself, on a page nothing had been focused on — the stack lets go of focus,
+ * which returns it to the page.
+ */
 const handleStackKeyDown = (e: KeyboardEvent) => {
     if (e.key !== ESCAPE_KEY || !restoreRef) return;
 
@@ -139,6 +143,10 @@ const handleStackKeyDown = (e: KeyboardEvent) => {
 
     e.preventDefault();
     target.focus();
+
+    const focused = document.activeElement;
+
+    if (focused !== target && getIsFocusableElement(focused)) focused.blur();
 };
 
 /** Moves focus to the next or previous stack of the given ones that holds toasts. */

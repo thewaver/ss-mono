@@ -123,3 +123,15 @@ describe("ClockUtils.computeKeyAction", () => {
         });
     });
 });
+
+describe("ClockUtils at the edges of a turn", () => {
+    it("measures nearness round the clock, so one o'clock on a column stepping by three lands on twelve", () => {
+        expect(ClockUtils.getNearestIndex([12, 3, 6, 9], 1, 12)).toBe(0);
+    });
+
+    it("leaves the second out of the base when the clock offers none", () => {
+        const base = ClockUtils.computeBase(undefined, { hour: 14, minute: 23, second: 47 }, false);
+
+        expect(base).toEqual({ hour: 14, minute: 23 });
+    });
+});

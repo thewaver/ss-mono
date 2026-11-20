@@ -1,6 +1,6 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { docsDemo, docsSettled, prop, turnDegrees } from "./helpers";
+import { docsDemo, docsSettled, prop, tabKey, turnDegrees } from "./helpers";
 
 const DOCS = "/src/App/Pages/SortablePage/Docs";
 
@@ -174,7 +174,7 @@ test("keyboard: Tab moves the carried item to the other list", async ({ page }) 
     await page.locator(item(PAIR, "Ember Sprite")).focus();
 
     await page.keyboard.press("Enter");
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
     await page.keyboard.press("Enter");
 
     await expect
@@ -438,7 +438,7 @@ test("a list that refuses an item is not offered as a destination", async ({ pag
     await page.locator(item(PICKY, "Tide Caller")).focus();
 
     await page.keyboard.press("Enter");
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
     await page.keyboard.press("Enter");
 
     expect(await orderOf(page, PICKY, "Hand"), "the expensive card is still in the hand").toEqual(hand);
@@ -447,7 +447,7 @@ test("a list that refuses an item is not offered as a destination", async ({ pag
     await page.locator(item(PICKY, "Ember Sprite")).focus();
 
     await page.keyboard.press("Enter");
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
     await page.keyboard.press("Enter");
 
     await expect

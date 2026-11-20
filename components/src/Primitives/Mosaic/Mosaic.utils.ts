@@ -165,16 +165,19 @@ const partitionIntoRows = (
 
     for (let row = 1; row <= rowCount; row++) {
         for (let end = row; end <= cellCount; end++) {
-            for (let start = row - 1; start < end; start++) {
-                if (cost[row - 1][start] === Infinity) continue;
-
+            for (let start = end - 1; start >= row - 1; start--) {
                 const extent = getRowExtent(ratioSums, { from: start, to: end }, anchoredExtent, gap);
 
-                if (extent === Infinity) continue;
+                if (extent === Infinity) break;
 
-                const total = cost[row - 1][start] + (extent - targetRowExtent) ** 2;
+                const error = (extent - targetRowExtent) ** 2;
 
-                if (total >= cost[row][end]) continue;
+                if (extent < targetRowExtent && error > cost[row][end]) break;
+                if (cost[row - 1][start] === Infinity) continue;
+
+                const total = cost[row - 1][start] + error;
+
+                if (total > cost[row][end]) continue;
 
                 cost[row][end] = total;
                 cut[row][end] = start;
@@ -630,7 +633,8 @@ export namespace MosaicUtils {
      * @param key The `key` of the keyboard event.
      * @returns The step, or `undefined` for a key the walk leaves alone.
      */
-    export const getStepForKey = (key: string): MosaicStep | undefined => STEP_BY_KEY[key];
+    export const getStepForKey = (key: string): MosaicStep | undefined =>
+        Object.hasOwn(STEP_BY_KEY, key) ? STEP_BY_KEY[key] : undefined;
 
     /**
      * Glides a tile from the box it was in to the box it is now in, through the Web Animations API.
@@ -643,7 +647,7 @@ export namespace MosaicUtils {
      * @param params The tile's element, the glide running on it if any, the box it was in and the box it is in now,
      * whether the preset sizes tiles, how long to take, and whether this pass is a re-pack.
      * @returns The glide now running, or `undefined` when the tile jumped or had nowhere to go. Any glide passed in
-     * is cancelled either way.
+     * is canceled either way.
      */
     export const glideTile = (params: {
         element: HTMLElement;

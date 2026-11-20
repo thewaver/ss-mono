@@ -1,6 +1,6 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { computedStyle, docsDemo, docsSettled, inlineStyle, inputValue, prop } from "./helpers";
+import { computedStyle, docsDemo, docsSettled, inlineStyle, inputValue, prop, tabKey } from "./helpers";
 
 const DOCS = "/src/App/Pages/ImageSwitcherPage/Docs";
 
@@ -235,7 +235,7 @@ test("the transition duration the consumer sets reaches both elements", async ({
 
     await knob.click();
     await page.keyboard.press("ArrowDown");
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
 
     const after = await inputValue(knob);
 

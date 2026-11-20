@@ -197,7 +197,7 @@ export const ListboxOptions = <T,>(props: ListboxOptionsProps<T>) => {
 
     const hoverHold = TooltipReactUtils.useHoverHold(findOptionElement(hoveredIndex), () => setHoveredIndex(undefined));
 
-    const handleOptionsPointerOver = (target: EventTarget) => {
+    const handleOptionsPointerMove = (target: EventTarget) => {
         if (hoverHold.getIsOnTooltip(target)) return;
 
         const option = target instanceof Element ? target.closest(OPTION_SELECTOR) : null;
@@ -292,7 +292,7 @@ export const ListboxOptions = <T,>(props: ListboxOptionsProps<T>) => {
                 .filter(Boolean)
                 .join(" ")}
             role="presentation"
-            onPointerOver={(e) => handleOptionsPointerOver(e.target)}
+            onPointerMove={(e) => handleOptionsPointerMove(e.target)}
             onPointerLeave={handleOptionsPointerLeave}
         >
             {renderFloaters()}
@@ -346,7 +346,7 @@ export const ListboxOptions = <T,>(props: ListboxOptionsProps<T>) => {
                 ref={sizerRef}
                 className={ListboxStyles.listboxSizer}
                 style={{ height: `${rowWindow.totalSize}px` }}
-                onPointerOver={(e) => handleOptionsPointerOver(e.target)}
+                onPointerMove={(e) => handleOptionsPointerMove(e.target)}
                 onPointerLeave={handleOptionsPointerLeave}
             >
                 {renderFloaters()}

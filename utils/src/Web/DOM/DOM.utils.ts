@@ -47,7 +47,106 @@ const revealIn = (scroller: HTMLElement, element: HTMLElement) => {
     }
 };
 
+const ID_LIST_ATTRIBUTES = ["aria-labelledby", "aria-describedby", "aria-controls", "aria-owns", "for"];
+
+const HREF_ATTRIBUTES = ["href", "xlink:href"];
+
+let copyCount = 0;
+
+const escapeForPattern = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+/** Measuring and moving elements on the page: text direction, scroll positions, the drawn scale, and rectangles. */
 export namespace DOMUtils {
+    /**
+     * Copies an element with everything inside it, giving every id in the copy a suffix of its own.
+     *
+     * An id must be unique in the document, and a reference resolves to the first element carrying it, so a plain
+     * copy of an `<svg>` holding a gradient points its `url(#…)` at the original's gradient, and two copies repeat
+     * every id. Each call takes a fresh suffix, and the references inside the copy to its own ids — `url(#…)` in
+     * attributes and inline styles, `href="#…"`, and the id lists of `aria-labelledby`, `aria-describedby`,
+     * `aria-controls`, `aria-owns` and `for` — are rewritten to match. A reference to an id outside the copy is left
+     * alone.
+     *
+     * @param element The element to copy.
+     * @returns The copy, not yet in the document.
+     */
+    export const cloneWithUniqueIds = <T extends Element>(element: T): T => {
+        const copy = element.cloneNode(true) as T;
+        const withIds = [copy, ...copy.querySelectorAll("[id]")].filter((node) => node.id !== "");
+
+        if (withIds.length === 0) return copy;
+
+        const suffix = `-copy${++copyCount}`;
+        const renamed = new Map(withIds.map((node) => [node.id, `${node.id}${suffix}`]));
+        const urlPattern = new RegExp(
+            `url\\(\\s*(['"]?)#(${[...renamed.keys()].map(escapeForPattern).join("|")})\\1\\s*\\)`,
+            "g",
+        );
+
+        for (const node of withIds) node.id = renamed.get(node.id)!;
+
+        for (const node of [copy, ...copy.querySelectorAll("*")]) {
+            for (const attribute of [...node.attributes]) {
+                const name = attribute.name;
+                let value = attribute.value.replace(
+                    urlPattern,
+                    (_match, quote: string, id: string) => `url(${quote}#${renamed.get(id)}${quote})`,
+                );
+
+                if (HREF_ATTRIBUTES.includes(name) && value.startsWith("#") && renamed.has(value.slice(1))) {
+                    value = `#${renamed.get(value.slice(1))}`;
+                }
+
+                if (ID_LIST_ATTRIBUTES.includes(name)) {
+                    value = value
+                        .split(/\s+/)
+                        .map((id) => renamed.get(id) ?? id)
+                        .join(" ");
+                }
+
+                if (value !== attribute.value) node.setAttribute(name, value);
+            }
+        }
+
+        return copy;
+    };
+
+    /**
+     * Whether an element's text, and the way its content scrolls sideways, runs right to left.
+     *
+     * @param element The element to ask.
+     * @returns `true` when its computed `direction` is `rtl`.
+     */
+    export const getIsRightToLeft = (element: Element) => getComputedStyle(element).direction === "rtl";
+
+    /**
+     * How far a box is scrolled from where its content starts, along one axis.
+     *
+     * A right-to-left box reports `scrollLeft` from `0` at rest downwards, so this answers the distance from the start
+     * either way, never a negative number.
+     *
+     * @param box The scrolling box.
+     * @param axis `"x"` for sideways, `"y"` for up and down.
+     * @returns The distance, in pixels.
+     */
+    export const getScrollFromStart = (box: Element, axis: "x" | "y") =>
+        axis === "x" ? Math.abs(box.scrollLeft) : box.scrollTop;
+
+    /**
+     * How far a box is scrolled from its left edge, whichever way its text runs.
+     *
+     * Built on {@link getScrollFromStart}: for a right-to-left box the start is the right edge, so the distance from
+     * the left is what is left to scroll towards the start's far side.
+     *
+     * @param box The scrolling box.
+     * @returns The distance from the left edge, in pixels.
+     */
+    export const getScrollFromLeft = (box: Element) => {
+        const fromStart = getScrollFromStart(box, "x");
+
+        return getIsRightToLeft(box) ? box.scrollWidth - box.clientWidth - fromStart : fromStart;
+    };
+
     /**
      * Finds how much larger or smaller an element is drawn than its own layout says — the scale a CSS transform
      * on it or on any ancestor applies.

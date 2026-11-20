@@ -1,6 +1,6 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { docsDemo, docsSettled, inputValue } from "./helpers";
+import { docsDemo, docsSettled, inputValue, tabKey } from "./helpers";
 
 /**
  * The date range picker's page is its Docs view. The basic and bounded examples show the range they hold in a line
@@ -41,7 +41,7 @@ const clear = async (page: Page, selector: string) => {
     await page.locator(selector).click();
     await page.keyboard.press("ControlOrMeta+a");
     await page.keyboard.press("Backspace");
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
 };
 
 test.beforeEach(async ({ page }) => {
@@ -175,7 +175,7 @@ test("a date typed outside the bounds is kept as typed and moved inside on leavi
 
     await expect(page.locator(field(BOUNDED, 0)), "the typed start is kept as typed").toHaveValue("2026-08-01");
 
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
 
     await expect(page.locator(field(BOUNDED, 0)), "until the field is left").not.toHaveValue("2026-08-01");
 

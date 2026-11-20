@@ -1,6 +1,6 @@
 import { type SlotsType, computed, defineComponent, shallowRef } from "vue";
 
-import { type TextSyncElement, TextSyncUtils, TimeInputUtils } from "@thewaver/ss-components";
+import { FormValueUtils, type TextSyncElement, TextSyncUtils, TimeInputUtils } from "@thewaver/ss-components";
 import { TimeUtils, type TimeValue, type TimeValueMeridiem } from "@thewaver/ss-utils";
 
 import { MaskedFieldVueUtils } from "../../../Abstracts/MaskedField/MaskedFieldVue.utils";
@@ -9,13 +9,16 @@ import { TextField } from "../../../Primitives/TextField/TextField";
 import type { TextFieldSlots } from "../../../Primitives/TextField/TextField.types";
 import { watchAfterRender } from "../../../Utils/effectUtils";
 import { callSlot, declareProps, forwardProps, useTwoWay } from "../../../Utils/propUtils";
+import { exposeElement, toElement } from "../../../Utils/refUtils";
 import type { SlotsContext } from "../../../Utils/typeUtils";
 import type { TimeInputMeridiem, TimeInputProps, TimeInputSlots } from "./TimeInput.types";
 
-const EMPTY_FORM_VALUE = "";
-
 export const TimeInput = defineComponent(
-    (props: TimeInputProps, { slots }: SlotsContext<TimeInputSlots>) => {
+    (props: TimeInputProps, { slots, expose }: SlotsContext<TimeInputSlots>) => {
+        const controlRef = shallowRef<HTMLElement>();
+
+        exposeElement(expose, () => controlRef.value);
+
         const value = useTwoWay(props, "value");
 
         const getIsTwelveHour = () => props.isTwelveHour ?? false;
@@ -33,7 +36,7 @@ export const TimeInput = defineComponent(
             },
             formatDigits: (digits) => TextSyncUtils.formatWithMask(mask.value, digits),
             getDigitCount: () => getSegmentCount() * TimeInputUtils.SEGMENT_DIGITS,
-            toDigits: (next) => TimeInputUtils.toDigits(next, getIsTwelveHour()),
+            toDigits: (next) => TimeInputUtils.toDigits(next, getIsTwelveHour(), props.hasSeconds ?? false),
             fromDigits: (digits) =>
                 TimeInputUtils.parseDigits(digits, {
                     segmentCount: getSegmentCount(),
@@ -103,10 +106,13 @@ export const TimeInput = defineComponent(
             const textField = (
                 <TextField
                     {...forwarded}
+                    ref={(target) => {
+                        controlRef.value = toElement(target);
+                    }}
                     element={"input"}
                     inputMode={"numeric"}
-                    computeMaskedText={(previous, next, caret) =>
-                        TextSyncUtils.applyMask(mask.value, previous, next, caret)
+                    computeMaskedText={(previous, next, caret, isForwardDeletion) =>
+                        TextSyncUtils.applyMask(mask.value, previous, next, caret, isForwardDeletion)
                     }
                     placeholderHint={TimeInputUtils.computeHint(getSegmentCount(), props.segmentHints)}
                     hasError={(props.hasError ?? false) || field.hasIssue.value}
@@ -134,7 +140,7 @@ export const TimeInput = defineComponent(
 
                     <FormValue
                         name={props.name}
-                        values={[value.value ? TimeUtils.toIso(value.value) : EMPTY_FORM_VALUE]}
+                        values={[value.value ? TimeUtils.toIso(value.value) : FormValueUtils.EMPTY_TEXT]}
                     />
                 </>
             );
@@ -142,6 +148,7 @@ export const TimeInput = defineComponent(
     },
     {
         name: "TimeInput",
+        inheritAttrs: false,
         slots: Object as SlotsType<TimeInputSlots>,
         props: declareProps<TimeInputProps>({
             "isDisabled": Boolean,

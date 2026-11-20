@@ -42,6 +42,24 @@ export namespace ScratchCardUtils {
         shape.computePoints?.({ width: shape.radius * 2, height: shape.radius * 2 });
 
     /**
+     * The brush's contour as it is drawn, rounded and shaped corners included, for stamping the rub with.
+     *
+     * The same contour {@link computeBrushClipPath} draws the preview with, so what is rubbed off matches the brush the
+     * person sees, `joinRadii` and `lameExponents` included.
+     *
+     * @param shape The brush.
+     * @returns Every point the contour is drawn through, or `undefined` for a brush drawn as a circle.
+     */
+    export const computeBrushContour = (shape: ScratchCardBrushShape) => {
+        const points = computeBrushPoints(shape);
+
+        return (
+            points &&
+            ShapeUtils.getPaths(points, NO_EDGE_THICKNESSES, shape.joinRadii, shape.lameExponents).outerContour
+        );
+    };
+
+    /**
      * The brush shape as a CSS clip path, for drawing the cursor.
      *
      * @param shape The brush.
@@ -86,8 +104,9 @@ export namespace ScratchCardUtils {
      *
      * @param point Where to stamp.
      * @param radius The brush's radius.
-     * @param points The brush's contour. Without one, two arcs are used to draw a circle — a single arc
-     * cannot describe a full circle, since its start and end would coincide.
+     * @param points The brush's contour, from {@link computeBrushContour} so its corners are shaped as the preview's
+     * are. Without one, two arcs are used to draw a circle — a single arc cannot describe a full circle, since its
+     * start and end would coincide.
      */
     export const computeStampPath = (point: Point2d, radius: number, points: Point2d[] | undefined) => {
         const at = (value: number) => value.toFixed(COORDINATE_DIGITS);

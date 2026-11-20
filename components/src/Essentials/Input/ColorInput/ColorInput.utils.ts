@@ -53,7 +53,7 @@ export namespace ColorInputUtils {
      * A value that cannot be read changes nothing but the flag saying so, so the last color the picker held stays
      * on screen and nothing of the consumer's is overwritten. A readable one sets the notation to its own, and
      * replaces the color only when it is a different color from the one already held — so the field's own write
-     * coming back, spelled differently, does not throw away what the picker holds, such as a hue that a grey
+     * coming back, spelled differently, does not throw away what the picker holds, such as a hue that a gray
      * cannot carry.
      *
      * @param value The consumer's new value.

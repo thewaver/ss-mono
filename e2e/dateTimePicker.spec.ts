@@ -1,6 +1,6 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { docsDemo, docsSettled, inputValue } from "./helpers";
+import { docsDemo, docsSettled, inputValue, tabKey } from "./helpers";
 
 /**
  * The date and time picker's page is its Docs view. The basic example is the picker itself, empty; "two fields of
@@ -47,7 +47,7 @@ const clear = async (page: Page, selector: string) => {
     await page.locator(selector).click();
     await page.keyboard.press("ControlOrMeta+a");
     await page.keyboard.press("Backspace");
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
 };
 
 test.beforeEach(async ({ page }) => {

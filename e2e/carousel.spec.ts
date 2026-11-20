@@ -1,6 +1,16 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { docsDemo, docsExample, docsSettled, prop, waitUntilStill } from "./helpers";
+import {
+    docsDemo,
+    docsExample,
+    docsSettled,
+    expectAnnounced,
+    markAnnouncements,
+    prop,
+    recordAnnouncements,
+    tabKey,
+    waitUntilStill,
+} from "./helpers";
 
 /**
  * The carousel's page is its Docs view, one example per feature. The basic one is a plain strip with the Previous,
@@ -16,8 +26,8 @@ const DOCS = "/src/App/Pages/Carousels/CarouselPage/Docs";
 
 const MANUAL = docsDemo(DOCS, "Basic");
 const MANUAL_EXAMPLE = docsExample(DOCS, "Basic");
-const SKINS = docsDemo(DOCS, "Skins");
-const SKINS_EXAMPLE = docsExample(DOCS, "Skins");
+const LOOKS = docsDemo(DOCS, "Looks");
+const LOOKS_EXAMPLE = docsExample(DOCS, "Looks");
 const ROTATING = docsDemo(DOCS, "Looping");
 const SCROLLED = docsDemo(DOCS, "Scrolled");
 const WINDOWED = docsDemo(DOCS, "Windowed");
@@ -51,7 +61,7 @@ const shortenDelay = async (page: Page) => {
     await page.locator(`${prop("autoplayDelayMs")} input`).click();
     await page.keyboard.press("ControlOrMeta+a");
     await page.keyboard.type(String(DELAY_MS));
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
     await page.mouse.move(0, 0);
 };
 
@@ -66,6 +76,7 @@ const pickOption = async (page: Page, scope: string, key: string, name: string) 
 };
 
 test.beforeEach(async ({ page }) => {
+    await recordAnnouncements(page);
     await page.goto("/carousel/docs");
     await expect(page.locator(region(MANUAL))).toBeVisible();
     await docsSettled(page);
@@ -349,29 +360,29 @@ test("the slide showing fills the carousel's box exactly, across or up and down"
  * example's starting placement, draws the next slide turned and overlapping on the right of the one showing.
  */
 test("pressing a slide drawn beside the one showing brings it up", async ({ page }) => {
-    const count = await slideCountOf(page, SKINS);
+    const count = await slideCountOf(page, LOOKS);
 
-    await page.locator(viewport(SKINS)).scrollIntoViewIfNeeded();
+    await page.locator(viewport(LOOKS)).scrollIntoViewIfNeeded();
 
-    const box = (await page.locator(viewport(SKINS)).boundingBox())!;
+    const box = (await page.locator(viewport(LOOKS)).boundingBox())!;
 
     await page.mouse.click(box.x + box.width * 0.92, box.y + box.height * 0.5);
 
     await expect
-        .poll(() => currentSlide(page, SKINS), { message: "the slide on the right came up" })
+        .poll(() => currentSlide(page, LOOKS), { message: "the slide on the right came up" })
         .toBe(position(2, count));
 });
 
 test("a press on the slide showing does not move the carousel", async ({ page }) => {
-    const before = await currentSlide(page, SKINS);
+    const before = await currentSlide(page, LOOKS);
 
-    await page.locator(viewport(SKINS)).scrollIntoViewIfNeeded();
+    await page.locator(viewport(LOOKS)).scrollIntoViewIfNeeded();
 
-    const box = (await page.locator(viewport(SKINS)).boundingBox())!;
+    const box = (await page.locator(viewport(LOOKS)).boundingBox())!;
 
     await page.mouse.click(box.x + box.width * 0.5, box.y + box.height * 0.5);
 
-    expect(await currentSlide(page, SKINS)).toBe(before);
+    expect(await currentSlide(page, LOOKS)).toBe(before);
 });
 
 /**
@@ -410,45 +421,45 @@ const faceTransform = (page: Page, scope: string) =>
         .evaluate((element) => (element as HTMLElement).style.transform);
 
 const openDrum = async (page: Page) => {
-    await pickOption(page, SKINS_EXAMPLE, "placement", "drum");
+    await pickOption(page, LOOKS_EXAMPLE, "placement", "drum");
     await page.mouse.move(0, 0);
 };
 
 test("a drum steps by turning, and its slides ride the faces round", async ({ page }) => {
     await openDrum(page);
-    const count = await slideCountOf(page, SKINS);
-    const before = await faceTransform(page, SKINS);
+    const count = await slideCountOf(page, LOOKS);
+    const before = await faceTransform(page, LOOKS);
 
     expect(before, "a face carries its place round the ring and its turn in one transform").toContain("translate3d(");
 
-    await page.locator(control(SKINS, "Next slide")).click();
+    await page.locator(control(LOOKS, "Next slide")).click();
 
-    expect(await currentSlide(page, SKINS), "the step lands on the next slide, exactly as on the track").toBe(
+    expect(await currentSlide(page, LOOKS), "the step lands on the next slide, exactly as on the track").toBe(
         position(2, count),
     );
     await expect
-        .poll(() => faceTransform(page, SKINS), { message: "and the faces turned to bring it to the front" })
+        .poll(() => faceTransform(page, LOOKS), { message: "and the faces turned to bring it to the front" })
         .not.toBe(before);
 });
 
 test("a swipe turns the drum the way the finger went", async ({ page }) => {
     await openDrum(page);
-    const count = await slideCountOf(page, SKINS);
+    const count = await slideCountOf(page, LOOKS);
 
-    await swipeAcross(page, SKINS, 0.8, 0.3);
+    await swipeAcross(page, LOOKS, 0.8, 0.3);
 
-    expect(await currentSlide(page, SKINS), "pushing the faces leftwards turns the next one round").toBe(
+    expect(await currentSlide(page, LOOKS), "pushing the faces leftwards turns the next one round").toBe(
         position(2, count),
     );
 });
 
 test("the faces of a drum that have turned away are out of reach, not merely out of sight", async ({ page }) => {
     await openDrum(page);
-    const away = page.locator(`${slide(SKINS)}[aria-hidden="true"]`);
+    const away = page.locator(`${slide(LOOKS)}[aria-hidden="true"]`);
 
     await expect(away.first()).toHaveAttribute("inert", "");
     await expect(
-        page.locator(`${slide(SKINS)}:not([aria-hidden="true"])`),
+        page.locator(`${slide(LOOKS)}:not([aria-hidden="true"])`),
         "exactly one face is the current one, backs and far faces included",
     ).toHaveCount(1);
 });
@@ -460,22 +471,22 @@ test("the faces of a drum that have turned away are out of reach, not merely out
  */
 test("a drum on the other axis turns end over end, and takes its swipe the same way", async ({ page }) => {
     await openDrum(page);
-    const count = await slideCountOf(page, SKINS);
+    const count = await slideCountOf(page, LOOKS);
 
-    expect(await faceTransform(page, SKINS), "on the upright axis by default").toContain("rotateY(");
+    expect(await faceTransform(page, LOOKS), "on the upright axis by default").toContain("rotateY(");
 
-    await pickOption(page, SKINS_EXAMPLE, "orientation", "vertical");
+    await pickOption(page, LOOKS_EXAMPLE, "orientation", "vertical");
 
-    expect(await faceTransform(page, SKINS), "and end over end once it is laid on its side").toContain("rotateX(");
+    expect(await faceTransform(page, LOOKS), "and end over end once it is laid on its side").toContain("rotateX(");
 
-    await expect(page.locator(viewport(SKINS)), "the browser keeps the axis the barrel no longer travels on").toHaveCSS(
+    await expect(page.locator(viewport(LOOKS)), "the browser keeps the axis the barrel no longer travels on").toHaveCSS(
         "touch-action",
         "pan-x",
     );
 
-    await swipeDown(page, SKINS, 0.8, 0.3);
+    await swipeDown(page, LOOKS, 0.8, 0.3);
 
-    expect(await currentSlide(page, SKINS), "pushing the faces upwards brings the next one round").toBe(
+    expect(await currentSlide(page, LOOKS), "pushing the faces upwards brings the next one round").toBe(
         position(2, count),
     );
 });
@@ -512,11 +523,14 @@ test(
             await page.locator(control(WINDOWED, "Next slide")).click();
         }
 
-        await page.waitForTimeout(SETTLE_MS);
-
-        expect((await countsOf(page)).built, "stepping on builds the newcomers and drops the ones left behind").toBe(
-            before.built,
-        );
+        await expect
+            .poll(() => currentSlide(page, WINDOWED), { message: "the carousel arrives at the fourth slide" })
+            .toBe(position(4, before.total));
+        await expect
+            .poll(async () => (await countsOf(page)).built, {
+                message: "stepping on builds the newcomers and drops the ones left behind",
+            })
+            .toBe(before.built);
         await expect(page.locator(slide(WINDOWED))).toHaveCount(before.built);
         expect(await currentSlide(page, WINDOWED), "and the carousel really did move").toBe(position(4, before.total));
     },
@@ -527,8 +541,6 @@ test(
  * as current are all about a pair. The example's slide count is even, so every pair is whole; how many pairs
  * there are is read off the slides' own labels rather than written down.
  */
-const ANNOUNCER = 'body > [role="log"][aria-live="polite"]';
-
 const currentSlides = (page: Page, scope: string) =>
     page
         .locator(`${slide(scope)}:not([aria-hidden="true"])`)
@@ -581,12 +593,12 @@ test("a step announces the pair it landed on", async ({ page }) => {
     const slideCount = await slideCountOf(page, PAIRS);
 
     await page.locator(control(PAIRS, "Next slide")).click();
-    await expect(page.locator(ANNOUNCER), "the pair is named by its two slides").toContainText(`3–4 of ${slideCount}`);
+    await expectAnnounced(page, `3–4 of ${slideCount}`, { message: "the pair is named by its two slides" });
+
+    const mark = await markAnnouncements(page);
 
     await page.locator(control(PAIRS, "Previous slide")).click();
-    await expect(page.locator(ANNOUNCER), "and stepping back names the first pair").toContainText(
-        `1–2 of ${slideCount}`,
-    );
+    await expectAnnounced(page, `1–2 of ${slideCount}`, { mark, message: "and stepping back names the first pair" });
 });
 
 /**

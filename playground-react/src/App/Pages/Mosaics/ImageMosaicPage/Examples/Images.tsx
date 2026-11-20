@@ -8,13 +8,15 @@ type Props = ImagesExampleProps;
 
 const MOSAIC_ROUTE = "/image-mosaic";
 
-export const ImagesExample = ({ shapeKey, isDecorated, ...otherProps }: Props) => {
+export const ImagesExample = (props: Props) => {
+    const { shapeKey, isDecorated, ...otherProps } = props;
+
     return (
         <ImageMosaic
             {...otherProps}
-            targetAspectRatio={MosaicImages.SAMPLE_SHAPES[shapeKey]}
+            targetAspectRatio={MosaicImages.SAMPLE_SHAPES[props.shapeKey]}
             renderItem={(renderImage, state) =>
-                isDecorated ? (
+                props.isDecorated ? (
                     <PageMosaicLink href={MOSAIC_ROUTE} caption={`${state.readingIndex + 1} of ${state.itemCount}`}>
                         {renderImage()}
                     </PageMosaicLink>

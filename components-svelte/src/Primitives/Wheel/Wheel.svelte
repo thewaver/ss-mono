@@ -17,8 +17,6 @@
     import Barrel from "../Barrel/Barrel.svelte";
     import type { WheelController, WheelProps } from "./Wheel.types.js";
 
-    const FIRST_WEDGE = 0;
-
     let { targetIndex = $bindable(0), autoSpin = $bindable(true), ...props }: WheelProps<T> = $props();
 
     const wedgeCount = $derived(props.wedges.length);
@@ -102,7 +100,7 @@
         face,
         isSelected: index === selectedIndex,
         angle: getWedgeAngle(index),
-        placement: layout?.placements[FIRST_WEDGE],
+        placement: layout?.placements[WheelConst.FIRST_WEDGE],
     });
 
     const controller: WheelController = {

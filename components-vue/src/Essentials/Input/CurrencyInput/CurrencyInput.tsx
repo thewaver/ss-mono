@@ -1,8 +1,9 @@
 import { type SlotsType, computed, defineComponent, shallowRef } from "vue";
 
-import { CURRENCY_INPUT_DEFAULTS, CurrencyInputUtils, TextSyncUtils } from "@thewaver/ss-components";
+import { CURRENCY_INPUT_DEFAULTS, CurrencyInputUtils, FormValueUtils, TextSyncUtils } from "@thewaver/ss-components";
 
 import { MaskedFieldVueUtils } from "../../../Abstracts/MaskedField/MaskedFieldVue.utils";
+import { FormValue } from "../../../Primitives/FormValue/FormValue";
 import { TextField } from "../../../Primitives/TextField/TextField";
 import type { TextFieldSlots } from "../../../Primitives/TextField/TextField.types";
 import { watchAfterRender } from "../../../Utils/effectUtils";
@@ -50,41 +51,50 @@ export const CurrencyInput = defineComponent(
         });
 
         return () => (
-            <TextField
-                {...{
-                    ...forwardProps(props, TextField),
-                    "value": field.text.value,
-                    "onUpdate:value": (next: string) => {
-                        field.text.value = next;
-                    },
-                }}
-                ref={(target) => {
-                    controlRef.value = toElement(target);
-                }}
-                element={"input"}
-                inputMode={"decimal"}
-                computeMaskedText={(previous, next, caret) =>
-                    TextSyncUtils.applyGroupedMask(groupDefs.value, previous, next, caret)
-                }
-                placeholderHint={CurrencyInputUtils.computeHint(groupDefs.value)}
-                hasError={(props.hasError ?? false) || field.hasIssue.value}
-                onInput={field.onInput}
-                onBlur={field.onBlur}
-            >
-                {
+            <>
+                <TextField
+                    {...{
+                        ...forwardProps(props, TextField),
+                        "name": undefined,
+                        "value": field.text.value,
+                        "onUpdate:value": (next: string) => {
+                            field.text.value = next;
+                        },
+                    }}
+                    ref={(target) => {
+                        controlRef.value = toElement(target);
+                    }}
+                    element={"input"}
+                    inputMode={"decimal"}
+                    computeMaskedText={(previous, next, caret, isForwardDeletion) =>
+                        TextSyncUtils.applyGroupedMask(groupDefs.value, previous, next, caret, isForwardDeletion)
+                    }
+                    placeholderHint={CurrencyInputUtils.computeHint(groupDefs.value)}
+                    hasError={(props.hasError ?? false) || field.hasIssue.value}
+                    onInput={field.onInput}
+                    onBlur={field.onBlur}
+                >
                     {
-                        renderContent: slots.renderContent,
-                        renderPlaceholder: slots.renderPlaceholder,
-                        renderLeading: slots.renderLeading,
-                        renderTrailing: slots.renderTrailing,
-                        renderDecoration: slots.renderDecoration,
-                    } satisfies Partial<TextFieldSlots>
-                }
-            </TextField>
+                        {
+                            renderContent: slots.renderContent,
+                            renderPlaceholder: slots.renderPlaceholder,
+                            renderLeading: slots.renderLeading,
+                            renderTrailing: slots.renderTrailing,
+                            renderDecoration: slots.renderDecoration,
+                        } satisfies Partial<TextFieldSlots>
+                    }
+                </TextField>
+
+                <FormValue
+                    name={props.name}
+                    values={[FormValueUtils.computeText(value.value) ?? FormValueUtils.EMPTY_TEXT]}
+                />
+            </>
         );
     },
     {
         name: "CurrencyInput",
+        inheritAttrs: false,
         slots: Object as SlotsType<TextFieldSlots>,
         props: declareProps<CurrencyInputProps>({
             "isDisabled": Boolean,

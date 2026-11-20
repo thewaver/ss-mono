@@ -106,6 +106,7 @@ export const Shape = defineComponent(
                     {fillDefs && (
                         <svg
                             class={ShapeStyles.shapeFillSVG}
+                            aria-hidden="true"
                             width={size.width}
                             height={size.height}
                             viewBox={viewBox}
@@ -140,6 +141,7 @@ export const Shape = defineComponent(
                     {strokeDefs && (
                         <svg
                             class={ShapeStyles.shapeStrokeSVG}
+                            aria-hidden="true"
                             width={size.width}
                             height={size.height}
                             viewBox={viewBox}

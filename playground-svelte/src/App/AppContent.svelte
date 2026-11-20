@@ -58,7 +58,12 @@
     import { renderPageHighlightFloater } from "./StyledComponents/GlideFloater/GlideFloater.const.svelte";
     import PageTooltipContent from "./StyledComponents/TooltipContent/TooltipContent.svelte";
     import PageTreeNodeContent from "./StyledComponents/TreeNodeContent/PageTreeNodeContent.svelte";
-    import { NAV_PREVIEW_ARROW, NAV_PREVIEW_OFFSET, NAV_PREVIEW_PLACEMENT } from "@thewaver/ss-playground/App/App.const";
+    import {
+        NAV_PREVIEW_ARROW,
+        NAV_PREVIEW_OFFSET,
+        NAV_PREVIEW_PLACEMENT,
+        toDocumentTitle,
+    } from "@thewaver/ss-playground/App/App.const";
 
     const getIsMenuFaded = (phase: SidebarPhase) => phase === "collapsing" || phase === "collapsed";
 
@@ -143,6 +148,12 @@
 
     const selectedConfig = $derived(COMPONENT_CONFIGS_BY_ROUTE[toBaseRoute(route.pathname)]);
 
+    const siteTitle = document.title;
+
+    $effect(() => {
+        document.title = toDocumentTitle(selectedConfig?.name, siteTitle);
+    });
+
     const isAboutSelected = $derived(route.pathname === "/");
 
     const isGettingStartedSelected = $derived(route.pathname === GETTING_STARTED_ROUTE);
@@ -215,7 +226,7 @@
 
     const viewportContext = getViewportContext();
 
-    const menuGutter = $derived(Math.max(0, (viewportContext.getSize().width - LAYOUT.pageMaxWidth) / 2));
+    const menuGutter = $derived(Math.max(0, (viewportContext.getSize().width - LAYOUT.pageMaxWidth) * 0.5));
 
     const isMenuHideable = $derived(viewportContext.getSize().width < LAYOUT.menuHideableBelow);
 

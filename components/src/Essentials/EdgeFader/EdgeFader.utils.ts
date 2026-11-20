@@ -1,3 +1,6 @@
+import { DOMUtils } from "@thewaver/ss-utils";
+
+import { ElementObserverUtils } from "../../Abstracts/ElementObserver/ElementObserver.utils";
 import { FocusManagerUtils } from "../../Abstracts/FocusManager/FocusManager.utils";
 import type { EdgeFaderEdge, EdgeFaderMaskStyle, EdgeFaderMetrics } from "./EdgeFader.types";
 
@@ -29,22 +32,30 @@ export namespace EdgeFaderUtils {
     /**
      * Measures how far a box can still scroll towards each side, and how wide its scrollbars are.
      *
-     * The scrollbars are read as the difference between the box's outer and inner sizes, so a box with none reads
-     * zero for both, which is what keeps the mask arithmetic unchanged there.
+     * The scrollbars are read as the difference between the box's outer and inner sizes less its borders, so a box
+     * with none reads zero for both, which is what keeps the mask arithmetic unchanged there. The sideways distances
+     * are read by the box's left and right edges, whichever way its text runs.
      *
      * @param root The scrolling box.
      * @returns The distance left to scroll past each side, in pixels, and the width of each scrollbar strip.
      */
-    export const readMetrics = (root: HTMLElement): EdgeFaderMetrics => ({
-        remaining: {
-            top: root.scrollTop,
-            right: root.scrollWidth - root.clientWidth - root.scrollLeft,
-            bottom: root.scrollHeight - root.clientHeight - root.scrollTop,
-            left: root.scrollLeft,
-        },
-        gutterWidth: root.offsetWidth - root.clientWidth,
-        gutterHeight: root.offsetHeight - root.clientHeight,
-    });
+    export const readMetrics = (root: HTMLElement): EdgeFaderMetrics => {
+        const fromLeft = DOMUtils.getScrollFromLeft(root);
+        const style = getComputedStyle(root);
+        const borderWidth = parseFloat(style.borderLeftWidth) + parseFloat(style.borderRightWidth);
+        const borderHeight = parseFloat(style.borderTopWidth) + parseFloat(style.borderBottomWidth);
+
+        return {
+            remaining: {
+                top: root.scrollTop,
+                right: root.scrollWidth - root.clientWidth - fromLeft,
+                bottom: root.scrollHeight - root.clientHeight - root.scrollTop,
+                left: fromLeft,
+            },
+            gutterWidth: root.offsetWidth - root.clientWidth - borderWidth,
+            gutterHeight: root.offsetHeight - root.clientHeight - borderHeight,
+        };
+    };
 
     /**
      * Whether a box has anything to scroll, along either axis.
@@ -140,30 +151,12 @@ export namespace EdgeFaderUtils {
         root: HTMLElement,
         cbs: { onMetrics: (metrics: EdgeFaderMetrics) => void; onHasFocusable: (hasFocusable: boolean) => void },
     ) => {
-        const update = () => cbs.onMetrics(readMetrics(root));
-        const sizeObserver = new ResizeObserver(update);
-        const childObserver = new MutationObserver(() => {
-            for (const child of root.children) sizeObserver.observe(child);
-
-            update();
-        });
-
-        sizeObserver.observe(root);
-
-        for (const child of root.children) sizeObserver.observe(child);
-
-        childObserver.observe(root, { childList: true });
-        root.addEventListener("scroll", update, { passive: true });
-
-        update();
-
+        const stopBoxWatch = ElementObserverUtils.observeScrollBox(root, () => cbs.onMetrics(readMetrics(root)));
         const stopFocusWatch = FocusManagerUtils.observeHasFocusable(root, cbs.onHasFocusable);
 
         return () => {
-            sizeObserver.disconnect();
-            childObserver.disconnect();
+            stopBoxWatch();
             stopFocusWatch();
-            root.removeEventListener("scroll", update);
         };
     };
 }

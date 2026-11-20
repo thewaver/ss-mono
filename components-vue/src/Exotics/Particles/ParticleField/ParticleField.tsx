@@ -14,7 +14,7 @@ import {
     SliceRendererUtils,
 } from "@thewaver/ss-components";
 import { ParticleFieldConst } from "@thewaver/ss-components/internal";
-import { type Index2d, MathUtils, Rect } from "@thewaver/ss-utils";
+import { type Count2d, MathUtils, Rect } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { ElementObserverVueUtils } from "../../../Abstracts/ElementObserver/ElementObserverVue.utils";
@@ -56,7 +56,7 @@ export const ParticleField = defineComponent(
 
         const rootSize = ElementObserverVueUtils.useBorderBoxSize(rootRef);
 
-        const cellCount = computed<Index2d>((previous) => {
+        const cellCount = computed<Count2d>((previous) => {
             const next = CellAnimationUtils.computeCellCount(props.cellCount, rootSize.value);
 
             return previous && CellAnimationUtils.getIsSameCount(previous, next) ? previous : next;

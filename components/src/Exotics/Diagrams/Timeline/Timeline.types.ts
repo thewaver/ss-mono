@@ -15,6 +15,7 @@ export type TimelineEdge = "start" | "end";
 
 export type TimelineEdgeCarry = {
     index: number;
+    item?: unknown;
 };
 
 export type TimelineEdgeAnnouncements = CarrierAnnouncements & {
@@ -89,6 +90,7 @@ export type TimelineEdgeZoneDefs = {
     getView: () => Span;
     getRange: () => Span;
     getSpans: () => Span[];
+    getItems: () => readonly unknown[];
     getStep: () => number;
     computePointerRatio: (clientX: number) => number;
     computeSnapValue?: (value: number) => number;

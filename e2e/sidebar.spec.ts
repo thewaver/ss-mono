@@ -14,6 +14,7 @@ const PUSH = "Basic";
 const OVERLAY = "Overlay";
 const HOVER = "Hover";
 const SETTLE_MS = 500;
+const SAMPLE_GAP_MS = 50;
 
 const toggle = (page: Page, key: string) => page.locator(`${docsDemo(DOCS, key)} button[aria-controls]`);
 
@@ -34,6 +35,17 @@ const panelWidth = async (page: Page, key: string) =>
 
 const hoverReadout = async (page: Page) =>
     ((await page.locator(`${docsDemo(DOCS, HOVER)} [data-readout]`).textContent()) ?? "").trim();
+
+const settled = (page: Page, read: () => Promise<number>, message: string) =>
+    expect
+        .poll(async () => {
+            const before = await read();
+
+            await page.waitForTimeout(SAMPLE_GAP_MS);
+
+            return (await read()) === before;
+        }, message)
+        .toBe(true);
 
 test.beforeEach(async ({ page }) => {
     await page.goto("/sidebar/docs");
@@ -189,13 +201,13 @@ test.describe("on a window narrow enough to hide the menu", () => {
         await page.mouse.move(800, 600);
 
         await expect.poll(menuWidth, "auto-hide collapses the menu once the pointer is away").toBeLessThan(openWidth);
-        await page.waitForTimeout(SETTLE_MS);
+        await settled(page, menuWidth, "the collapse has finished");
 
         const collapsedWidth = await menuWidth();
 
         await page.locator("#library-menu").hover();
         await expect.poll(menuWidth, "resting on the strip expands it").toBeGreaterThan(collapsedWidth);
-        await page.waitForTimeout(SETTLE_MS);
+        await settled(page, menuWidth, "the expansion has finished");
 
         const expandedWidth = await menuWidth();
 
@@ -263,7 +275,7 @@ test.describe("on a window narrow enough to hide the menu", () => {
             "with the pointer still on the menu, which is the case being tested",
         ).toBe(true);
 
-        await page.waitForTimeout(SETTLE_MS);
+        await settled(page, menuWidth, "the collapse has finished");
 
         const collapsedWidth = await menuWidth();
 

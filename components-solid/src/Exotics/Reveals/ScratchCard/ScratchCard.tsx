@@ -57,7 +57,7 @@ export const ScratchCard = (props: ScratchCardProps) => {
         lameExponents: access(props.lameExponents),
     }));
 
-    const getBrushPoints = createMemo(() => ScratchCardUtils.computeBrushPoints(getBrushShape()));
+    const getBrushContour = createMemo(() => ScratchCardUtils.computeBrushContour(getBrushShape()));
 
     const getBlurDeviation = createMemo(() => ScratchCardUtils.computeBlurDeviation(getBrushRadius(), getSoftness()));
 
@@ -128,7 +128,7 @@ export const ScratchCard = (props: ScratchCardProps) => {
 
         if (ScratchCardUtils.getIsRubbedAt(getPathRef(), getPath(), point, getBrushRadius())) return;
 
-        setPath((previous) => previous + ScratchCardUtils.computeStampPath(point, getBrushRadius(), getBrushPoints()));
+        setPath((previous) => previous + ScratchCardUtils.computeStampPath(point, getBrushRadius(), getBrushContour()));
         scheduler.schedule();
     };
 
@@ -156,7 +156,9 @@ export const ScratchCard = (props: ScratchCardProps) => {
 
     return (
         <div ref={setRootRef} class={styles.scratchCardRoot} tabindex={-1}>
-            {props.renderContent()}
+            <div class={styles.scratchCardContent} inert={!getIsCleared()}>
+                {props.renderContent()}
+            </div>
 
             <svg class={styles.scratchCardDefs} aria-hidden="true">
                 <defs>

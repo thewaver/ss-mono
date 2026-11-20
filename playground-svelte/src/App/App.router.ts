@@ -9,8 +9,11 @@ import {
 } from "@thewaver/ss-playground/App/App.const";
 import { MENU_DESCRIPTIONS } from "@thewaver/ss-playground/App/MenuDescriptions.const";
 import { toRouterBase } from "@thewaver/ss-playground/App/PageComponents/FrameworkSwitch/FrameworkSwitch.const";
-import { EXAMPLES_VIEW, toPageViewRoute } from "@thewaver/ss-playground/App/PageComponents/ViewTabs/ViewTabs.const";
-import { StringUtils } from "@thewaver/ss-utils";
+import {
+    EXAMPLES_VIEW,
+    toComponentRoute,
+    toPageViewRoute,
+} from "@thewaver/ss-playground/App/PageComponents/ViewTabs/ViewTabs.const";
 
 import type { ComponentConfig, MenuBranchConfig, MenuNodeConfig } from "./App.types";
 import { MENU_CONFIGS, PREVIEW_EXCLUDED_PAGES } from "./AppSvelte.const";
@@ -22,7 +25,7 @@ export { GETTING_STARTED_ROUTE, GALLERY_ROUTE, APPEARANCE_ROUTE } from "@thewave
 
 export const getIsBranchConfig = (node: MenuNodeConfig): node is MenuBranchConfig => "children" in node;
 
-export const componentToRouteName = (name: string) => `/${StringUtils.camelToKebabCase(name)}`;
+export const componentToRouteName = (name: string) => toComponentRoute(name);
 
 export const flattenConfigs = (nodes: MenuNodeConfig[]): ComponentConfig[] =>
     nodes.flatMap((node) => (getIsBranchConfig(node) ? flattenConfigs(node.children) : [node]));

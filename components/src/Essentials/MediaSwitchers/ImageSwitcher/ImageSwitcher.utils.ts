@@ -28,7 +28,8 @@ export namespace ImageSwitcherUtils {
      * picture left on screen.
      *
      * @returns The store, and `show`, which takes the picture, or `undefined` for none, and returns a function that
-     * abandons the preload, or `undefined` when nothing was started.
+     * abandons the preload, or `undefined` when nothing was started. Call it before the next `show`: a preload left
+     * running can finish after a later one and put the older picture on screen.
      */
     export const createSwitcher = () => {
         const store = StoreUtils.create(INITIAL_STATE);

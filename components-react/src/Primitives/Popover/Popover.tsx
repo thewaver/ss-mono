@@ -99,7 +99,9 @@ export const Popover = (props: PopoverProps) => {
             inert={!props.isOpen}
             role={props.role}
             {...props.ariaAttributes}
-            onKeyDown={(e) => props.onKeyDown?.(e)}
+            onKeyDown={(e) => {
+                if (e.currentTarget.contains(e.target as Node)) props.onKeyDown?.(e);
+            }}
             onBlur={(e) => {
                 if (e.target !== e.currentTarget) return;
 

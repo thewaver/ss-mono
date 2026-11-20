@@ -1,6 +1,12 @@
 import { type SlotsType, defineComponent, h } from "vue";
 
-import { BREADCRUMBS_DEFAULTS, type BreadcrumbsFlags, BreadcrumbsStyles } from "@thewaver/ss-components";
+import {
+    BREADCRUMBS_DEFAULTS,
+    type BreadcrumbsFlags,
+    BreadcrumbsStyles,
+    InteractionTrackerUtils,
+    SafeHrefUtils,
+} from "@thewaver/ss-components";
 
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
 import type {
@@ -16,12 +22,16 @@ const BreadcrumbsItem = defineComponent(
         () => {
             const isDisabled = props.flags.isDisabled ?? false;
 
+            const safeHref = SafeHrefUtils.resolve(props.crumb.href, "Breadcrumbs");
+
             const handleClick = (e: MouseEvent) => {
                 if (isDisabled) {
                     e.preventDefault();
 
                     return;
                 }
+
+                if (safeHref !== undefined && !InteractionTrackerUtils.getIsPlainClick(e)) return;
 
                 props.onSelect(props.crumb.value);
             };
@@ -42,7 +52,7 @@ const BreadcrumbsItem = defineComponent(
                 "aria-disabled": isDisabled || undefined,
             };
 
-            if (props.crumb.href === undefined) {
+            if (safeHref === undefined) {
                 return (
                     <button type="button" {...commonProps} onClick={handleClick}>
                         {content}
@@ -52,7 +62,7 @@ const BreadcrumbsItem = defineComponent(
 
             if (props.linkComponent === undefined) {
                 return (
-                    <a href={props.crumb.href} {...commonProps} onClick={handleClick}>
+                    <a href={safeHref} {...commonProps} onClick={handleClick}>
                         {content}
                     </a>
                 );
@@ -60,7 +70,7 @@ const BreadcrumbsItem = defineComponent(
 
             return h(
                 props.linkComponent,
-                { href: props.crumb.href, ...commonProps, onClick: handleClick },
+                { href: safeHref, ...commonProps, onClick: handleClick },
                 { default: () => content },
             );
         },

@@ -105,7 +105,7 @@ export namespace PlacementItemUtils {
      * A glide started before the previous one finished supersedes it: only the latest one reports.
      *
      * @returns `watch`, to call once the element has been written with its new placement and transition. Its
-     * `onSettled` runs once every animation then on the element has finished or been cancelled, unless another
+     * `onSettled` runs once every animation then on the element has finished or been canceled, unless another
      * `watch` was called in the meantime.
      */
     export const createGlideWatcher = () => {

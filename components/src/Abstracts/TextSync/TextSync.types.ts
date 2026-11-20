@@ -5,6 +5,13 @@ export type TextSyncMaskResult = {
     caret: number;
 };
 
+export type TextSyncMaskFn = (
+    previous: string,
+    next: string,
+    caret: number,
+    isForwardDeletion: boolean,
+) => TextSyncMaskResult;
+
 export type TextSyncGroupDefs = {
     groupSizes: number[];
     groupSeparator: string;
@@ -15,7 +22,7 @@ export type TextSyncGroupDefs = {
 
 export type TextSyncValueSync = {
     sync: (element: TextSyncElement) => void;
-    handleInput: (element: TextSyncElement) => void;
+    handleInput: (element: TextSyncElement, inputType?: string) => void;
     handleCompositionStart: () => void;
     handleCompositionEnd: (element: TextSyncElement) => void;
 };

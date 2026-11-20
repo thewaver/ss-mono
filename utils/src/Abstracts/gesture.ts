@@ -10,6 +10,7 @@ export type SwipeDirection = "left" | "right" | "up" | "down";
 /** Where a pointer was seen, and when. */
 export type GestureSample = { point: Point2d; timeMs: number };
 
+/** Reading a swipe or a drag: its axis, direction, progress, speed and the coast after release. */
 export namespace GestureUtils {
     /**
      * Finds which axis a swipe direction belongs to.

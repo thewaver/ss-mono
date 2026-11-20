@@ -4,4 +4,7 @@ import type { WeightFn } from "../../../../Generators/SliceAnimationWeights/Slic
 import { SliceAnimationWeightUtils } from "../../../../Generators/SliceAnimationWeights/SliceAnimationWeights.utils";
 
 export const sequenceLinear: WeightFn = (pos, count) =>
-    SliceAnimationWeightUtils.fromOrderedIndex(Index2dUtils.toFlatIndex(pos, count.col), count.col * count.row);
+    SliceAnimationWeightUtils.fromOrderedIndex(
+        Index2dUtils.toFlatIndex(pos, count.colCount),
+        count.colCount * count.rowCount,
+    );

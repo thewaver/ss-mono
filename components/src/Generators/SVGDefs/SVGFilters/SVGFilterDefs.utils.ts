@@ -199,9 +199,9 @@ export namespace SVGFilterDefsUtils {
         computeChannelMatrix(defs.amount, defs.amount, defs.amount, 0);
 
     /**
-     * The color matrix that pushes every channel away from mid-grey or pulls it towards it, leaving opacity alone.
+     * The color matrix that pushes every channel away from mid-gray or pulls it towards it, leaving opacity alone.
      *
-     * @param defs.amount `0` is flat mid-grey, `1` leaves the colors alone, above `1` raises the contrast.
+     * @param defs.amount `0` is flat mid-gray, `1` leaves the colors alone, above `1` raises the contrast.
      */
     export const computeContrastMatrix = (defs: SVGContrastFilterDefs) =>
         computeChannelMatrix(defs.amount, defs.amount, defs.amount, 0.5 * (1 - defs.amount));
@@ -209,7 +209,7 @@ export namespace SVGFilterDefsUtils {
     /**
      * The color matrix that inverts red, green and blue, leaving opacity alone.
      *
-     * @param defs.amount `1` is a full inversion, `0.5` is flat mid-grey, `0` leaves the colors alone.
+     * @param defs.amount `1` is a full inversion, `0.5` is flat mid-gray, `0` leaves the colors alone.
      */
     export const computeInversionMatrix = (defs: SVGInversionFilterDefs) => {
         const slope = 1 - 2 * defs.amount;

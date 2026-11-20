@@ -89,7 +89,7 @@
     aria-required={props.isRequired || undefined}
     aria-invalid={props.flags.hasError || undefined}
     {...props.ariaAttributes}
-    oninput={(e: Event) => handleInput(e.currentTarget as TextSyncElement)}
+    oninput={(e: Event) => handleInput(e.currentTarget as TextSyncElement, (e as InputEvent).inputType)}
     oncompositionstart={handleCompositionStart}
     oncompositionend={(e: CompositionEvent) => handleCompositionEnd(e.currentTarget as TextSyncElement)}
     onkeydown={(e: KeyboardEvent) => {

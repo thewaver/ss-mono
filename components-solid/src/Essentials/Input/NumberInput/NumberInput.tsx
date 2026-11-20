@@ -1,6 +1,8 @@
-import { createEffect, createMemo, createSignal, onCleanup, untrack } from "solid-js";
+import { createEffect, createMemo, createSignal, onCleanup, splitProps, untrack } from "solid-js";
 
 import {
+    FormValueUtils,
+    InteractionTrackerUtils,
     NUMBER_INPUT_DEFAULTS,
     type NumberInputStepDefs,
     type NumberInputStepper,
@@ -8,6 +10,7 @@ import {
 } from "@thewaver/ss-components";
 import { DecimalUtils } from "@thewaver/ss-utils";
 
+import { FormValue } from "../../../Primitives/FormValue/FormValue";
 import { TextField } from "../../../Primitives/TextField/TextField";
 import { access } from "../../../Utils/propUtils";
 import type { NumberInputProps } from "./NumberInputSolid.types";
@@ -56,7 +59,7 @@ export const NumberInput = (props: NumberInputProps) => {
         return next !== current;
     };
 
-    const repeater = NumberInputUtils.createStepRepeater({
+    const repeater = InteractionTrackerUtils.createStepRepeater({
         getDelayMs: () => access(props.repeatDelayMs) ?? NUMBER_INPUT_DEFAULTS.repeatDelayMs,
         getIntervalMs: () => access(props.repeatIntervalMs) ?? NUMBER_INPUT_DEFAULTS.repeatIntervalMs,
     });
@@ -87,41 +90,54 @@ export const NumberInput = (props: NumberInputProps) => {
         textSignal[1](NumberInputUtils.formatValue(value, separators));
     });
 
+    const [, fieldProps] = splitProps(props, ["name"]);
+
     return (
-        <TextField
-            {...props}
-            value={textSignal}
-            element={"input"}
-            type={"text"}
-            inputMode={() => access(props.inputMode) ?? NUMBER_INPUT_DEFAULTS.inputMode}
-            isSpinButton={true}
-            computeSpinValue={(text) => NumberInputUtils.parseValue(text, getSeparators())}
-            hasError={() => (access(props.hasError) ?? false) || getHasRangeIssue()}
-            renderTrailing={props.renderTrailing && ((getFlags) => props.renderTrailing!(getFlags, stepper))}
-            onInput={(text) => {
-                const sanitized = NumberInputUtils.sanitizeText(text, getSeparators());
+        <>
+            <TextField
+                {...fieldProps}
+                value={textSignal}
+                element={"input"}
+                type={"text"}
+                inputMode={() => access(props.inputMode) ?? NUMBER_INPUT_DEFAULTS.inputMode}
+                isSpinButton={true}
+                computeSpinValue={(text) => NumberInputUtils.parseValue(text, getSeparators())}
+                hasError={() => (access(props.hasError) ?? false) || getHasRangeIssue()}
+                renderTrailing={
+                    props.renderTrailing === undefined
+                        ? undefined
+                        : (getFlags) => props.renderTrailing!(getFlags, stepper)
+                }
+                onInput={(text) => {
+                    const sanitized = NumberInputUtils.sanitizeText(text, getSeparators());
 
-                textSignal[1](sanitized);
+                    textSignal[1](sanitized);
 
-                const value = NumberInputUtils.parseValue(sanitized, getSeparators());
+                    const value = NumberInputUtils.parseValue(sanitized, getSeparators());
 
-                if (NumberInputUtils.getHasRangeIssue(value, getStepDefs())) return;
+                    if (NumberInputUtils.getHasRangeIssue(value, getStepDefs())) return;
 
-                reportValue(value);
-            }}
-            onKeyDown={(e) => {
-                if (!getIsWritable()) return;
+                    reportValue(value);
+                }}
+                onKeyDown={(e) => {
+                    if (!getIsWritable()) return;
 
-                const move = NumberInputUtils.computeKeyMove(e.key, getStepDefs(), getPageStep());
+                    const move = NumberInputUtils.computeKeyMove(e.key, getStepDefs(), getPageStep());
 
-                if (!move) return;
+                    if (!move) return;
 
-                e.preventDefault();
+                    e.preventDefault();
 
-                if ("value" in move) applyValue(move.value);
-                else stepValue(move.direction, move.distance);
-            }}
-            onBlur={() => applyValue(NumberInputUtils.computeSettledValue(getTypedValue(), getStepDefs()))}
-        />
+                    if ("value" in move) applyValue(move.value);
+                    else stepValue(move.direction, move.distance);
+                }}
+                onBlur={() => applyValue(NumberInputUtils.computeSettledValue(getTypedValue(), getStepDefs()))}
+            />
+
+            <FormValue
+                name={props.name}
+                values={() => [FormValueUtils.computeText(props.value[0]()) ?? FormValueUtils.EMPTY_TEXT]}
+            />
+        </>
     );
 };

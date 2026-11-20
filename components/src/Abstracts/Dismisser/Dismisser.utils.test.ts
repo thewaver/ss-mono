@@ -63,6 +63,24 @@ describe("Escape", () => {
         remove();
     });
 
+    it("is left to an input method whose candidate list it closes, so the layer around the field stays open", () => {
+        const dialog = layer();
+
+        const remove = DismisserUtils.addLayer(dialog.defs);
+
+        document.dispatchEvent(
+            Object.assign(new Event("keydown", { cancelable: true }), { key: "Escape", isComposing: true }),
+        );
+
+        expect(dialog.reasons).toEqual([]);
+
+        pressKey("Escape");
+
+        expect(dialog.reasons, "the next Escape, once nothing is being composed, closes it").toEqual(["escape"]);
+
+        remove();
+    });
+
     it("marks the key it uses, and ignores every other key", () => {
         const dialog = layer();
 

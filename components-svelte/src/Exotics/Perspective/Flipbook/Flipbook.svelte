@@ -4,11 +4,12 @@
 
     import {
         FLIPBOOK_DEFAULTS,
+        FlipbookStyles as styles,
         FlipbookUtils,
         LiveAnnouncerUtils,
+        NavigatorUtils,
         type SpineSide,
         SpineUtils,
-        FlipbookStyles as styles,
     } from "@thewaver/ss-components";
 
     import { InteractionTrackerSvelteUtils } from "../../../Abstracts/InteractionTracker/InteractionTrackerSvelte.utils.svelte.js";
@@ -81,7 +82,7 @@
     });
 
     const handleKeyDown = (e: KeyboardEvent) => {
-        if (e.target !== e.currentTarget) return;
+        if (e.target !== e.currentTarget || NavigatorUtils.getHasCommandModifier(e)) return;
 
         const step = FlipbookUtils.getKeyStep(e.key);
 
@@ -97,7 +98,9 @@
         turn: (step) => book.turn(step),
     };
 
-    $effect(() => untrack(() => props.onMount?.(controls)));
+    $effect(() => {
+        untrack(() => props.onMount?.(controls));
+    });
 </script>
 
 <div

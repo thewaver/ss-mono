@@ -118,7 +118,7 @@ export namespace PanZoomReactUtils {
 
         const [api] = useState(() => {
             const setView = (next: PanZoomView, isImmediate: boolean) => {
-                const clamped = PanZoomUtils.clampView(next, latest.current.computeBounds(liveRequested.current));
+                const clamped = PanZoomUtils.clampView(next, latest.current.computeBounds(next));
 
                 if (PanZoomUtils.getIsSameView(clamped, liveView.current)) return false;
 

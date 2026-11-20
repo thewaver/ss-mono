@@ -1,6 +1,6 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { activeText, docsDemo, docsSettled, prop } from "./helpers";
+import { activeText, docsDemo, docsSettled, prop, tabKey } from "./helpers";
 
 const MODAL_DOCS = "/src/App/Pages/ModalPage/Docs";
 
@@ -68,19 +68,19 @@ test.describe("Modal", () => {
 
         expect(await activeText(page), "focus lands on the first focusable child").toContain("Focus 1");
 
-        await page.keyboard.press("Tab");
+        await page.keyboard.press(tabKey(page));
         expect(await activeText(page), "Tab walks forward inside the dialog").toContain("Focus 2");
 
-        await page.keyboard.press("Tab");
+        await page.keyboard.press(tabKey(page));
         expect(await activeText(page), "and on to the last child").toContain("Focus 3");
 
-        await page.keyboard.press("Tab");
+        await page.keyboard.press(tabKey(page));
         expect(
             await activeText(page),
             "Tab off the last child wraps to the first rather than escaping to the page behind",
         ).toContain("Focus 1");
 
-        await page.keyboard.press("Shift+Tab");
+        await page.keyboard.press(tabKey(page, true));
         expect(await activeText(page), "and Shift+Tab off the first wraps the other way").toContain("Focus 3");
     });
 
@@ -116,7 +116,7 @@ test.describe("Modal with nothing focusable inside", () => {
 
         await expect(page.locator(DIALOG), "with no child to focus, the dialog is the one holding focus").toBeFocused();
 
-        await page.keyboard.press("Tab");
+        await page.keyboard.press(tabKey(page));
 
         expect(
             await page.evaluate((selector) => {
@@ -405,7 +405,7 @@ test.describe("A drag inside a modal", () => {
 
         await expect(
             page.locator(DIALOG),
-            "the Escape that cancelled the drag does not also close the dialog",
+            "the Escape that canceled the drag does not also close the dialog",
         ).toHaveCount(1);
         await expect(page.locator(HEADER).nth(0), "the release after Escape drops nothing").toHaveText(firstTitle);
 

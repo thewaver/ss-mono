@@ -246,3 +246,25 @@ describe("MathUtils.getDecay", () => {
         expect(MathUtils.getDecay(10, 0)).toBe(0);
     });
 });
+
+describe("MathUtils.roundToDecimalPlaces at the edges", () => {
+    it("rounds a leftover too small to print without an exponent", () => {
+        expect(MathUtils.roundToDecimalPlaces(0.1 + 0.2 - 0.3, 2)).toBe(0);
+    });
+
+    it("rounds a number too large to print without an exponent", () => {
+        expect(MathUtils.roundToDecimalPlaces(1.5e21, 2)).toBe(1.5e21);
+    });
+
+    it("rounds a negative half up, toward positive infinity", () => {
+        expect(MathUtils.roundToDecimalPlaces(-1.005, 2)).toBe(-1);
+    });
+});
+
+describe("MathUtils.getStepDecimals", () => {
+    it("takes the finest place among the numbers, capped at twelve", () => {
+        expect(MathUtils.getStepDecimals(1, 0.5)).toBe(1);
+        expect(MathUtils.getStepDecimals(0.25, 1)).toBe(2);
+        expect(MathUtils.getStepDecimals(1e-20)).toBe(12);
+    });
+});

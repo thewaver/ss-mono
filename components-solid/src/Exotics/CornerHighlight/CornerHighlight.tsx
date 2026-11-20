@@ -1,7 +1,11 @@
 import { For, createMemo } from "solid-js";
 import type { ParentProps } from "solid-js";
 
-import { CORNER_HIGHLIGHT_DEFAULTS, CornerUtils, CornerHighlightStyles as styles } from "@thewaver/ss-components";
+import {
+    CORNER_HIGHLIGHT_DEFAULTS,
+    CornerHighlightUtils,
+    CornerHighlightStyles as styles,
+} from "@thewaver/ss-components";
 
 import { access } from "../../Utils/propUtils";
 import type { CornerHighlightProps } from "./CornerHighlightSolid.types";
@@ -27,7 +31,7 @@ export const CornerHighlight = (props: ParentProps<CornerHighlightProps>) => {
         <div class={styles.cornerHighlightRoot}>
             <div
                 class={styles.cornerHighlightGlow}
-                style={CornerUtils.computeGlowStyle(getColor(), getTransitionDurationMs())}
+                style={CornerHighlightUtils.computeGlowStyle(getColor(), getTransitionDurationMs())}
                 aria-hidden="true"
             >
                 <For each={getVisibleCorners()}>
@@ -41,7 +45,7 @@ export const CornerHighlight = (props: ParentProps<CornerHighlightProps>) => {
                         >
                             <polygon
                                 fill="currentColor"
-                                points={CornerUtils.computeArmPoints(getCornerLength(), getStrokeThickness())}
+                                points={CornerHighlightUtils.computeArmPoints(getCornerLength(), getStrokeThickness())}
                             />
                         </svg>
                     )}

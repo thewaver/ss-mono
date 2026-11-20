@@ -34,8 +34,24 @@ import type { TooltipSlots } from "../../Overlays/Tooltip/Tooltip.types";
 import type { CalendarSlots } from "../Calendar/Calendar.types";
 import { DateInput } from "../DateInput/DateInput";
 import type { DateInputSlots } from "../DateInput/DateInput.types";
+import { provideFormFieldContext, useFormFieldContext } from "../FormField/FormField.context";
+import { FormFieldVueUtils } from "../FormField/FormFieldVue.utils";
+import { provideLabelContext, useLabelContext } from "../Label/Label.context";
 import { RangeCalendar } from "../RangeCalendar/RangeCalendar";
 import type { DateRangePickerProps, DateRangePickerSlots } from "./DateRangePicker.types";
+
+const DateRangePickerFieldsScope = defineComponent(
+    (_props, { slots }) => {
+        const outerFieldContext = useFormFieldContext();
+        const outerLabelContext = useLabelContext();
+
+        provideFormFieldContext({ ...outerFieldContext, getCaptionId: () => undefined });
+        provideLabelContext({ ...outerLabelContext, getIsLabeled: () => false });
+
+        return () => slots.default?.();
+    },
+    { name: "DateRangePickerFieldsScope" },
+);
 
 const toMonth = (value: DateValue, calendar: DateValueCalendarId): DateValue =>
     DateValueUtils.getStartOfMonth(DateValueUtils.withCalendar(value, calendar));
@@ -98,16 +114,29 @@ export const DateRangePicker = defineComponent(
         const getPairFlags = () =>
             TextFieldUtils.mergeFlags([startFlags.value, endFlags.value].flatMap((flags) => (flags ? [flags] : [])));
 
+        const isReachable = computed(() =>
+            InteractionTrackerUtils.computeIsReachable(
+                getIsDisabled(),
+                props.isReachableWhenDisabled ?? false,
+                false,
+                props.tooltipDefs !== undefined,
+            ),
+        );
+
         const tooltipDefs = computed(() => {
             const defs = props.tooltipDefs;
-            const isDisabled = getIsDisabled();
-            const isReachable = InteractionTrackerUtils.computeIsReachable(
-                isDisabled,
-                props.isReachableWhenDisabled ?? false,
-            );
 
-            return defs && (!isDisabled || isReachable) ? defs : undefined;
+            return defs && (!getIsDisabled() || isReachable.value) ? defs : undefined;
         });
+
+        watch(
+            [() => props.isReachableWhenDisabled ?? false, () => props.tooltipDefs !== undefined],
+            ([isReachableWhenDisabled, hasTooltipProp]) =>
+                InteractionTrackerUtils.warnIfReachableWithoutTooltip(isReachableWhenDisabled, hasTooltipProp),
+            { immediate: true },
+        );
+
+        const groupLabelledBy = FormFieldVueUtils.useAriaLabelledBy();
 
         const lastTooltipDefs = computed<typeof tooltipDefs.value>((previous) => tooltipDefs.value ?? previous);
 
@@ -175,6 +204,7 @@ export const DateRangePicker = defineComponent(
                 "name": props.name && `${props.name}-start`,
                 "ariaLabel": props.startLabel,
                 "tooltipDefs": undefined,
+                "isFocusableWhenDisabled": isReachable.value,
             };
 
             const endField = {
@@ -188,6 +218,7 @@ export const DateRangePicker = defineComponent(
                 "name": props.name && `${props.name}-end`,
                 "ariaLabel": props.endLabel,
                 "tooltipDefs": undefined,
+                "isFocusableWhenDisabled": isReachable.value,
             };
 
             const renderTrigger = () => (
@@ -220,27 +251,34 @@ export const DateRangePicker = defineComponent(
             );
 
             return (
-                <div ref={rootRef} class={DateRangePickerStyles.dateRangePickerRoot}>
-                    <DateInput {...startField}>
-                        {
+                <div
+                    ref={rootRef}
+                    class={DateRangePickerStyles.dateRangePickerRoot}
+                    role="group"
+                    aria-labelledby={groupLabelledBy.value}
+                >
+                    <DateRangePickerFieldsScope>
+                        <DateInput {...startField}>
                             {
-                                ...fieldSlots,
-                                renderContent: renderFieldContent(startFlags),
-                            } satisfies Partial<DateInputSlots>
-                        }
-                    </DateInput>
+                                {
+                                    ...fieldSlots,
+                                    renderContent: renderFieldContent(startFlags),
+                                } satisfies Partial<DateInputSlots>
+                            }
+                        </DateInput>
 
-                    {callSlot(slots.renderSeparator, undefined)}
+                        {callSlot(slots.renderSeparator, undefined)}
 
-                    <DateInput {...endField}>
-                        {
+                        <DateInput {...endField}>
                             {
-                                ...fieldSlots,
-                                renderContent: renderFieldContent(endFlags),
-                                renderTrailing: renderTrigger,
-                            } satisfies Partial<DateInputSlots>
-                        }
-                    </DateInput>
+                                {
+                                    ...fieldSlots,
+                                    renderContent: renderFieldContent(endFlags),
+                                    renderTrailing: renderTrigger,
+                                } satisfies Partial<DateInputSlots>
+                            }
+                        </DateInput>
+                    </DateRangePickerFieldsScope>
 
                     <Popover
                         id={popupId}

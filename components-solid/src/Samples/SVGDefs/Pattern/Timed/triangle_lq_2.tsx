@@ -9,7 +9,7 @@ export const triangle_lq_2: TimedPatternConfig = {
     computeSVGDefs: (id, __, ___, defs) => {
         const splitValuesCache: Record<string, string> = {};
         const cellSize = defs.cellSize;
-        const cellCount = { rows: 8, cols: 8 };
+        const cellCount = SVGDefsUtils.TILE_CELL_COUNT;
 
         const pieces = SVGDefsUtils.getCellPieces("lozenge_quarters").map((piece) => (
             <path

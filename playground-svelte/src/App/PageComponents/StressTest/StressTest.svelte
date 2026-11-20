@@ -65,7 +65,7 @@
             </div>
             <div
                 class={styles.itemGrid}
-                style:grid-template-columns={`repeat(${props.configs[configIndex].cols}, auto)`}
+                style:grid-template-columns={`repeat(${props.configs[configIndex].colCount}, auto)`}
                 style:gap={`${props.configs[configIndex].gap}px`}
             >
                 {#each arr as index (index)}

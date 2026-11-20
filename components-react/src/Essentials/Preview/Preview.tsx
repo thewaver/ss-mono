@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef } from "react";
+import { useCallback, useEffect, useId, useRef } from "react";
 
 import {
     CollapsibleUtils,
@@ -45,6 +45,7 @@ export const Preview = (props: PreviewProps) => {
 
     const rootRef = useRef<HTMLDivElement | null>(null);
     const triggerRef = useRef<HTMLElement | null>(null);
+    const latestRef = useLatest(props.ref);
     const contentRef = useRef<HTMLDivElement | null>(null);
     const isAwaitingScrollRef = useRef(false);
     const wasExpandedRef = useRef(isExpanded);
@@ -55,6 +56,14 @@ export const Preview = (props: PreviewProps) => {
 
     const contentHeight = ElementObserverReactUtils.useBorderBoxHeight(contentRef);
     const isOverflowing = PreviewUtils.computeIsOverflowing(contentHeight, props.collapsedHeight);
+
+    const setTriggerRef = useCallback(
+        (element: HTMLElement | null) => {
+            triggerRef.current = element;
+            latestRef.current?.(element);
+        },
+        [latestRef],
+    );
 
     const fader = ElementFaderReactUtils.useFader(isExpanded, { transitionDurationMs, ref: rootRef });
 
@@ -111,14 +120,12 @@ export const Preview = (props: PreviewProps) => {
             {isOverflowing && (
                 <InteractionWrapper<PreviewFlags>
                     {...props}
+                    ref={setTriggerRef}
                     sizing={"fit-content"}
                     extraFlags={{ isExpanded }}
                     renderControl={(setElementRef, flags) => (
                         <PreviewTrigger
-                            ref={(element) => {
-                                setElementRef(element);
-                                triggerRef.current = element;
-                            }}
+                            ref={setElementRef}
                             id={props.id}
                             contentId={contentId}
                             flags={flags}

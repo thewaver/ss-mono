@@ -9,7 +9,7 @@ import {
     SliceRendererUtils,
 } from "@thewaver/ss-components";
 import { CellAnimationConst } from "@thewaver/ss-components/internal";
-import { type Index2d, MathUtils, Rect } from "@thewaver/ss-utils";
+import { type Count2d, MathUtils, Rect } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { ElementObserverVueUtils } from "../../../Abstracts/ElementObserver/ElementObserverVue.utils";
@@ -50,7 +50,7 @@ export const CellAnimation = defineComponent(
         const rootWidth = computed(() => rootSize.value.width);
         const rootHeight = computed(() => rootSize.value.height);
 
-        const cellCount = computed<Index2d>((previous) => {
+        const cellCount = computed<Count2d>((previous) => {
             const next = CellAnimationUtils.computeCellCount(props.cellCount, rootSize.value);
 
             return previous && CellAnimationUtils.getIsSameCount(previous, next) ? previous : next;
@@ -58,9 +58,9 @@ export const CellAnimation = defineComponent(
 
         const weights = computed(() => props.computeSliceWeights?.(cellCount.value) ?? CellAnimationConst.NO_WEIGHTS);
 
-        const columnEdges = computed(() => CellAnimationUtils.computeEdges(rootWidth.value, cellCount.value.col));
+        const columnEdges = computed(() => CellAnimationUtils.computeEdges(rootWidth.value, cellCount.value.colCount));
 
-        const rowEdges = computed(() => CellAnimationUtils.computeEdges(rootHeight.value, cellCount.value.row));
+        const rowEdges = computed(() => CellAnimationUtils.computeEdges(rootHeight.value, cellCount.value.rowCount));
 
         const cellDefs = computed(() => CellAnimationUtils.computeCellDefs(cellCount.value, weights.value));
 
@@ -290,6 +290,7 @@ export const CellAnimation = defineComponent(
                         width={sizeAnchor === "width" ? "100%" : "auto"}
                         height={sizeAnchor === "height" ? "100%" : "auto"}
                         aria-hidden="true"
+                        alt=""
                     />
 
                     {isOnGraphicsCard.value ? (

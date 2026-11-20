@@ -410,3 +410,12 @@ describe("getSections", () => {
         });
     });
 });
+
+describe("MenuUtils.computeNextChecked for a radio already checked", () => {
+    it("hands back the same list, so nothing is written", () => {
+        const checked = ["small"];
+        const item = { value: "small", kind: "radio" } as Parameters<typeof MenuUtils.computeNextChecked<string>>[1];
+
+        expect(MenuUtils.computeNextChecked(checked, item, ["small", "large"])).toBe(checked);
+    });
+});

@@ -4,7 +4,7 @@
 
     import { CLOCK_DEFAULTS, type ClockColumn, type ClockRenderProps, type ClockUnit, ClockUtils, type InteractionFlags, ClockStyles as styles } from "@thewaver/ss-components";
     import { ClockConst } from "@thewaver/ss-components/internal";
-    import { DOMUtils, type TimeValue } from "@thewaver/ss-utils";
+    import { DOMUtils, type TimeValue, TimeUtils } from "@thewaver/ss-utils";
 
     import { NavigatorSvelteUtils } from "../../../Abstracts/Navigator/NavigatorSvelte.utils.svelte.js";
     import InteractionWrapper from "../../../Primitives/InteractionWrapper/InteractionWrapper.svelte";
@@ -59,10 +59,17 @@
         value = time;
     };
 
+    let lastValue: TimeValue | undefined;
+
     $effect(() => {
         const next = value;
+        const last = lastValue;
 
-        if (next) highlighted = next;
+        lastValue = next;
+
+        if (!next || (next !== last && TimeUtils.isSame(next, last))) return;
+
+        highlighted = next;
     });
 
     const rovingKeys = $derived(columns.map((column) => toOptionKey(column.unit, getRovingIndex(column))));

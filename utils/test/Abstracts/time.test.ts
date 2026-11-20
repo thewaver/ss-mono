@@ -277,3 +277,11 @@ describe("the twelve-hour text form", () => {
         }
     });
 });
+
+describe("TimeUtils.format with no options", () => {
+    it("prints the time, not the date it is placed on", () => {
+        const text = TimeUtils.format({ hour: 9, minute: 30 }, undefined, "en-GB");
+
+        expect(text).toBe("09:30");
+    });
+});

@@ -38,6 +38,7 @@ export namespace Bounds {
     export const toString = Vec4d.toString(K1, K2, K3, K4);
 }
 
+/** Reading bounds back from their text form. */
 export namespace BoundsString {
     /** Parses a string such as `LEFT0_TOP0_RIGHT10_BOTTOM20` back into a {@link Bounds}. */
     export const fromString = Vec4d.fromString(K1, K2, K3, K4);

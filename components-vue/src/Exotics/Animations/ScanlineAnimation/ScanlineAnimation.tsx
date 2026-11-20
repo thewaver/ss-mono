@@ -27,7 +27,11 @@ export const ScanlineAnimation = defineComponent(
                             progress.value = value;
                         },
                     }}
-                    cellCount={isVertical ? { row: 1, col: props.lineCount } : { row: props.lineCount, col: 1 }}
+                    cellCount={
+                        isVertical
+                            ? { rowCount: 1, colCount: props.lineCount }
+                            : { rowCount: props.lineCount, colCount: 1 }
+                    }
                     computeSliceAnimation={props.computeSliceAnimation}
                 />
             );

@@ -1,4 +1,4 @@
-import type { Locator, Page } from "@playwright/test";
+import { type Locator, type Page, expect } from "@playwright/test";
 
 /**
  * A demo is found by the key its page gave it, never by the caption it displays. A caption is editorial —
@@ -379,3 +379,81 @@ export const centerDistance = async (first: Locator, second: Locator) => {
 
     return Math.hypot(a.x + a.width * 0.5 - (b.x + b.width * 0.5), a.y + a.height * 0.5 - (b.y + b.height * 0.5));
 };
+
+/**
+ * The library's announcer takes each message out of its live region a second after adding it, so a spec that reads
+ * the region can come too late on a busy machine and find it empty, though the message was said. These keep every
+ * message instead, from the moment the page starts: {@link recordAnnouncements} is called before the page is opened,
+ * {@link markAnnouncements} just before the action that should speak, and {@link expectAnnounced} then waits for a
+ * message said since the mark, so an earlier message with the same words cannot answer for it.
+ */
+type AnnouncementRecord = { politeness: string; text: string };
+
+type AnnouncementWindow = { __announcements?: AnnouncementRecord[] };
+
+/** Starts keeping every message added to a live region of the pages opened from here on. */
+export const recordAnnouncements = (page: Page) =>
+    page.addInitScript(() => {
+        const record = window as unknown as AnnouncementWindow;
+
+        record.__announcements = [];
+
+        new MutationObserver((changes) => {
+            for (const change of changes) {
+                const region = change.target;
+
+                if (!(region instanceof Element) || !region.matches('[role="log"][aria-live]')) continue;
+
+                for (const node of change.addedNodes) {
+                    record.__announcements?.push({
+                        politeness: region.getAttribute("aria-live") ?? "",
+                        text: node.textContent ?? "",
+                    });
+                }
+            }
+        }).observe(document, { childList: true, subtree: true });
+    });
+
+/** Every message said so far at one politeness, oldest first. */
+export const readAnnouncements = (page: Page, politeness = "polite") =>
+    page.evaluate(
+        (level) =>
+            ((window as unknown as AnnouncementWindow).__announcements ?? [])
+                .filter((message) => message.politeness === level)
+                .map((message) => message.text),
+        politeness,
+    );
+
+/** How many messages have been said so far at one politeness, to hand to {@link expectAnnounced} as its mark. */
+export const markAnnouncements = async (page: Page, politeness = "polite") =>
+    (await readAnnouncements(page, politeness)).length;
+
+/**
+ * Waits for a message containing `expected` to be said after `mark`.
+ *
+ * @param mark From {@link markAnnouncements}, taken before the action that should speak. `0` counts everything.
+ */
+export const expectAnnounced = (
+    page: Page,
+    expected: string | RegExp,
+    opts: { mark?: number; message?: string; politeness?: string; timeout?: number } = {},
+) =>
+    expect
+        .poll(
+            async () =>
+                (await readAnnouncements(page, opts.politeness))
+                    .slice(opts.mark ?? 0)
+                    .some((text) => (typeof expected === "string" ? text.includes(expected) : expected.test(text))),
+            { message: opts.message ?? `"${expected}" is announced`, timeout: opts.timeout },
+        )
+        .toBe(true);
+
+/**
+ * The key a keyboard user presses to move focus to the next control, or with `isBackward` to the previous one.
+ *
+ * Safari's Tab, as it ships, stops only at text fields and elements given a `tabindex`, and leaves buttons, links and
+ * radios to Option+Tab; Playwright's WebKit does the same. A Safari user moving through every control presses
+ * Option+Tab, so in WebKit a spec does too, and everywhere else presses Tab.
+ */
+export const tabKey = (page: Page, isBackward = false) =>
+    `${page.context().browser()?.browserType().name() === "webkit" ? "Alt+" : ""}${isBackward ? "Shift+" : ""}Tab`;

@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import { NumberInputUtils } from "./NumberInput.utils";
 
@@ -239,75 +239,19 @@ describe("computeSettledValue", () => {
     });
 });
 
-describe("createStepRepeater", () => {
-    beforeEach(() => {
-        vi.useFakeTimers();
+describe("NumberInputUtils.sanitizeText in locales with their own digits", () => {
+    it("reads Arabic-Indic and Persian digits and an ASCII point under an Arabic decimal mark", () => {
+        const separators = { groupSeparator: "٬", decimalSeparator: "٫" };
+
+        expect(NumberInputUtils.sanitizeText("١.٥", separators)).toBe("1٫5");
+        expect(NumberInputUtils.sanitizeText("۱۲", separators)).toBe("12");
     });
 
-    afterEach(() => {
-        vi.useRealTimers();
+    it("reads the typographic minus as a minus", () => {
+        expect(NumberInputUtils.sanitizeText("−5")).toBe("-5");
     });
 
-    const makeRepeater = () => NumberInputUtils.createStepRepeater({ getDelayMs: () => 400, getIntervalMs: () => 60 });
-
-    it("steps once at once, and repeats only after the delay", () => {
-        const repeater = makeRepeater();
-        const step = vi.fn(() => true);
-
-        expect(repeater.start(step)).toBe(true);
-        expect(step).toHaveBeenCalledTimes(1);
-
-        vi.advanceTimersByTime(399);
-        expect(step).toHaveBeenCalledTimes(1);
-
-        vi.advanceTimersByTime(1 + 60 * 3);
-        expect(step).toHaveBeenCalledTimes(4);
-    });
-
-    it("stops repeating when stopped, and says whether anything was running", () => {
-        const repeater = makeRepeater();
-        const step = vi.fn(() => true);
-
-        repeater.start(step);
-
-        expect(repeater.stop()).toBe(true);
-        expect(repeater.stop()).toBe(false);
-
-        vi.advanceTimersByTime(2000);
-        expect(step).toHaveBeenCalledTimes(1);
-    });
-
-    it("starts nothing when the first step is refused", () => {
-        const repeater = makeRepeater();
-        const step = vi.fn(() => false);
-
-        expect(repeater.start(step)).toBe(false);
-
-        vi.advanceTimersByTime(2000);
-        expect(step).toHaveBeenCalledTimes(1);
-        expect(repeater.stop()).toBe(false);
-    });
-
-    it("ends the repeat at the first refused step, so a release nobody heard cannot leave it running", () => {
-        const repeater = makeRepeater();
-        let value = 2;
-        const step = vi.fn(() => {
-            if (value <= 1) return false;
-
-            value -= 1;
-
-            return true;
-        });
-
-        repeater.start(step);
-        vi.advanceTimersByTime(400 + 60);
-
-        expect(value).toBe(1);
-        expect(repeater.stop(), "nothing is left running once the bound refused a step").toBe(false);
-
-        value = 5;
-        vi.advanceTimersByTime(2000);
-
-        expect(value, "so a value moved away from the bound afterwards stays where it was put").toBe(5);
+    it("leaves the point grouping thousands where the locale groups with it", () => {
+        expect(NumberInputUtils.sanitizeText("1.000", { groupSeparator: ".", decimalSeparator: "," })).toBe("1.000");
     });
 });

@@ -1,6 +1,13 @@
 import { type ComponentPublicInstance, type SlotsType, computed, defineComponent, h, shallowRef, watch } from "vue";
 
-import { FloaterStyles, InteractionTrackerUtils, TABS_DEFAULTS, TabsStyles, TabsUtils } from "@thewaver/ss-components";
+import {
+    FloaterStyles,
+    InteractionTrackerUtils,
+    SafeHrefUtils,
+    TABS_DEFAULTS,
+    TabsStyles,
+    TabsUtils,
+} from "@thewaver/ss-components";
 
 import { FloaterVueUtils } from "../../Abstracts/Floater/FloaterVue.utils";
 import { NavigatorVueUtils } from "../../Abstracts/Navigator/NavigatorVue.utils";
@@ -35,12 +42,16 @@ const TabsItem = defineComponent(
         () => {
             const isDisabled = props.flags.isDisabled ?? false;
 
+            const safeHref = SafeHrefUtils.resolve(props.tab.href, "Tabs");
+
             const handleClick = (e: MouseEvent) => {
                 if (isDisabled) {
                     e.preventDefault();
 
                     return;
                 }
+
+                if (safeHref !== undefined && !InteractionTrackerUtils.getIsPlainClick(e)) return;
 
                 props.onSelect(props.tab.value);
             };
@@ -56,7 +67,7 @@ const TabsItem = defineComponent(
 
             const content = callSlot(slots.renderContent, props.flags);
 
-            if (props.tab.href === undefined) {
+            if (safeHref === undefined) {
                 return (
                     <button type="button" {...commonProps} onClick={handleClick}>
                         {content}
@@ -66,7 +77,7 @@ const TabsItem = defineComponent(
 
             if (props.linkComponent === undefined) {
                 return (
-                    <a href={props.tab.href} {...commonProps} onClick={handleClick}>
+                    <a href={safeHref} {...commonProps} onClick={handleClick}>
                         {content}
                     </a>
                 );
@@ -74,7 +85,7 @@ const TabsItem = defineComponent(
 
             return h(
                 props.linkComponent,
-                { href: props.tab.href, ...commonProps, onClick: handleClick },
+                { href: safeHref, ...commonProps, onClick: handleClick },
                 { default: () => content },
             );
         },

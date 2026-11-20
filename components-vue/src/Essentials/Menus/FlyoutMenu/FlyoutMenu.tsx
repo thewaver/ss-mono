@@ -31,6 +31,7 @@ import {
     type InteractionFlags,
     InteractionTrackerUtils,
     OverflowUtils,
+    SafeHrefUtils,
 } from "@thewaver/ss-components";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
@@ -94,7 +95,9 @@ export const FlyoutMenu = defineComponent(
         const getTransitionDurationMs = () => props.transitionDurationMs ?? FLYOUT_MENU_DEFAULTS.transitionDurationMs;
 
         const listSize = ElementObserverVueUtils.useBorderBoxSize(listRef);
-        const entrySizes = ElementObserverVueUtils.useBorderBoxSizes(entryElements);
+        const entrySizes = ElementObserverVueUtils.useBorderBoxSizes(() =>
+            entryElements.value.slice(0, props.entries.length),
+        );
         const overflowSize = ElementObserverVueUtils.useBorderBoxSize(overflowRef);
         const linksSize = ElementObserverVueUtils.useBorderBoxSize(linksRef);
 
@@ -373,14 +376,15 @@ export const FlyoutMenu = defineComponent(
                         renderControl: ({ setElementRef, flags }) => {
                             const content = callSlot(slots.renderLink, { link, flags });
 
+                            const href = SafeHrefUtils.resolve(link.href, "FlyoutMenu");
                             const linkProps = {
-                                "href": link.href,
+                                "href": href,
                                 "class": FlyoutMenuStyles.flyoutMenuLink,
                                 "aria-current": link.isCurrent ? ("page" as const) : undefined,
                                 "onClick": close,
                             };
 
-                            if (props.linkComponent === undefined) {
+                            if (props.linkComponent === undefined || href === undefined) {
                                 return (
                                     <a ref={setElementRef} {...linkProps}>
                                         {content}
@@ -390,7 +394,7 @@ export const FlyoutMenu = defineComponent(
 
                             return h(
                                 props.linkComponent,
-                                { ref: setElementRef, ...linkProps },
+                                { ref: setElementRef, ...linkProps, href },
                                 { default: () => content },
                             );
                         },

@@ -3,11 +3,11 @@ import { MathUtils, type Point2d, ShapeUtils, type Size2d } from "@thewaver/ss-u
 import type { CutoutMaskStyle } from "../../../Abstracts/Cutout/Cutout.types";
 import { CutoutUtils } from "../../../Abstracts/Cutout/Cutout.utils";
 import type { PointerReading } from "../../../Abstracts/PointerTracker/PointerTracker.types";
+import { ScratchCardUtils } from "../ScratchCard/ScratchCard.utils";
 
 const NO_EDGE_THICKNESSES = [0];
 const INSIDE_EDGE_RATIO = 1;
 const NO_HOLE_RADIUS = 0;
-const BLUR_SPREAD = 3;
 const BLUR_MARGIN = 2;
 const HALF = 0.5;
 
@@ -52,7 +52,7 @@ export namespace RevealUtils {
         lameExponents: number[] | undefined,
     ) => {
         const size = radius * 2;
-        const blur = (softness * radius) / BLUR_SPREAD;
+        const blur = ScratchCardUtils.computeBlurDeviation(radius, softness);
         const inset = blur * BLUR_MARGIN;
         const side = Math.max(size - inset * 2, 0);
         const points = computePoints?.({ width: side, height: side });
@@ -155,7 +155,11 @@ export namespace RevealUtils {
      * @returns One step's direction for an arrow key, or `undefined` for anything else.
      */
     export const getNudge = (e: Pick<KeyboardEvent, "key" | "altKey" | "ctrlKey" | "metaKey">) =>
-        e.altKey || e.ctrlKey || e.metaKey ? undefined : NUDGE_KEYS[e.key];
+        e.altKey || e.ctrlKey || e.metaKey
+            ? undefined
+            : Object.hasOwn(NUDGE_KEYS, e.key)
+              ? NUDGE_KEYS[e.key]
+              : undefined;
 
     /**
      * Where one press of an arrow puts the window.

@@ -31,7 +31,10 @@ export type BaseBarrelValues<T> = {
 };
 
 export type BaseBarrelCbs = {
-    /** How one face is placed and drawn, for a barrel whose faces are not evenly spaced. */
+    /**
+     * What one face is called for assistive technology, and whether it is kept out of the accessibility tree, which
+     * the faces turned away from the viewer should be. Asked again whenever what it reads changes.
+     */
     computeFaceDefs: (index: number, face: BarrelFace) => BarrelFaceDefs;
 };
 

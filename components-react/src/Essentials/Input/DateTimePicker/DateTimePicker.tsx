@@ -1,4 +1,4 @@
-import { useCallback, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import {
     DateTimePickerStyles,
@@ -14,6 +14,9 @@ import { DateTimeValueReactUtils } from "../../../Abstracts/DateTimeValue/DateTi
 import { Tooltip } from "../../Overlays/Tooltip/Tooltip";
 import type { TooltipProps } from "../../Overlays/Tooltip/Tooltip.types";
 import { DatePicker } from "../DatePicker/DatePicker";
+import { FormFieldContextProvider, useFormFieldContext } from "../FormField/FormField.context";
+import { FormFieldReactUtils } from "../FormField/FormFieldReact.utils";
+import { LabelContextProvider, useLabelContext } from "../Label/Label.context";
 import { TimePicker } from "../TimePicker/TimePicker";
 import type { DateTimePickerProps } from "./DateTimePicker.types";
 
@@ -55,7 +58,21 @@ export const DateTimePicker = (props: DateTimePickerProps) => {
     const pairFlags = TextFieldUtils.mergeFlags([dateFlags, timeFlags].flatMap((flags) => (flags ? [flags] : [])));
 
     const isDisabled = props.isDisabled ?? false;
-    const isReachable = InteractionTrackerUtils.computeIsReachable(isDisabled, props.isReachableWhenDisabled ?? false);
+    const isReachable = InteractionTrackerUtils.computeIsReachable(
+        isDisabled,
+        props.isReachableWhenDisabled ?? false,
+        false,
+        tooltipDefs !== undefined,
+    );
+
+    useEffect(
+        () =>
+            InteractionTrackerUtils.warnIfReachableWithoutTooltip(
+                props.isReachableWhenDisabled ?? false,
+                tooltipDefs !== undefined,
+            ),
+        [props.isReachableWhenDisabled, tooltipDefs !== undefined],
+    );
     const shownTooltipDefs = tooltipDefs && (!isDisabled || isReachable) ? tooltipDefs : undefined;
 
     const tooltipProps: Omit<TooltipProps, "anchorRef"> | undefined = shownTooltipDefs && {
@@ -71,48 +88,65 @@ export const DateTimePicker = (props: DateTimePickerProps) => {
 
     const shownTooltipProps = tooltipProps ?? lastTooltipPropsRef.current;
 
+    const groupLabelledBy = FormFieldReactUtils.useAriaLabelledBy();
+    const outerFieldContext = useFormFieldContext();
+    const outerLabelContext = useLabelContext();
+    const fieldContext = useMemo(() => ({ ...outerFieldContext, getCaptionId: () => undefined }), [outerFieldContext]);
+    const labelContext = useMemo(() => ({ ...outerLabelContext, getIsLabeled: () => false }), [outerLabelContext]);
+
     return (
-        <div ref={(element) => setRoot(element ?? undefined)} className={DateTimePickerStyles.dateTimePickerRoot}>
-            <DatePicker
-                {...halfProps}
-                value={dateState}
-                id={props.id && `${props.id}-date`}
-                name={props.name && `${props.name}-date`}
-                visibility={props.dateVisibility}
-                ariaLabel={props.dateLabel}
-                minValue={minValue?.date}
-                maxValue={maxValue?.date}
-                renderContent={(flags) => (
-                    <>
-                        {props.renderContent(flags)}
-                        <FlagsReport flags={flags} onChange={reportDateFlags} />
-                    </>
-                )}
-            />
+        <div
+            ref={(element) => setRoot(element ?? undefined)}
+            className={DateTimePickerStyles.dateTimePickerRoot}
+            role="group"
+            aria-labelledby={groupLabelledBy}
+        >
+            <FormFieldContextProvider value={fieldContext}>
+                <LabelContextProvider value={labelContext}>
+                    <DatePicker
+                        {...halfProps}
+                        isFocusableWhenDisabled={isReachable}
+                        value={dateState}
+                        id={props.id && `${props.id}-date`}
+                        name={props.name && `${props.name}-date`}
+                        visibility={props.dateVisibility}
+                        ariaLabel={props.dateLabel}
+                        minValue={minValue?.date}
+                        maxValue={maxValue?.date}
+                        renderContent={(flags) => (
+                            <>
+                                {props.renderContent(flags)}
+                                <FlagsReport flags={flags} onChange={reportDateFlags} />
+                            </>
+                        )}
+                    />
 
-            {props.renderSeparator?.()}
+                    {props.renderSeparator?.()}
 
-            <TimePicker
-                {...timeProps}
-                value={timeState}
-                id={props.id && `${props.id}-time`}
-                name={props.name && `${props.name}-time`}
-                visibility={props.timeVisibility}
-                ariaLabel={props.timeLabel}
-                minValue={minValue && DateTimePickerUtils.computeMinTime(dateState[0], minValue)}
-                maxValue={maxValue && DateTimePickerUtils.computeMaxTime(dateState[0], maxValue)}
-                triggerId={props.timeTriggerId}
-                triggerAriaLabel={props.timeTriggerAriaLabel}
-                renderContent={(flags) => (
-                    <>
-                        {props.renderContent(flags)}
-                        <FlagsReport flags={flags} onChange={reportTimeFlags} />
-                    </>
-                )}
-                renderTrailing={props.renderTimeTrailing}
-                renderTrigger={props.renderTimeTrigger}
-                renderPopup={props.renderTimePopup}
-            />
+                    <TimePicker
+                        {...timeProps}
+                        isFocusableWhenDisabled={isReachable}
+                        value={timeState}
+                        id={props.id && `${props.id}-time`}
+                        name={props.name && `${props.name}-time`}
+                        visibility={props.timeVisibility}
+                        ariaLabel={props.timeLabel}
+                        minValue={minValue && DateTimePickerUtils.computeMinTime(dateState[0], minValue)}
+                        maxValue={maxValue && DateTimePickerUtils.computeMaxTime(dateState[0], maxValue)}
+                        triggerId={props.timeTriggerId}
+                        triggerAriaLabel={props.timeTriggerAriaLabel}
+                        renderContent={(flags) => (
+                            <>
+                                {props.renderContent(flags)}
+                                <FlagsReport flags={flags} onChange={reportTimeFlags} />
+                            </>
+                        )}
+                        renderTrailing={props.renderTimeTrailing}
+                        renderTrigger={props.renderTimeTrigger}
+                        renderPopup={props.renderTimePopup}
+                    />
+                </LabelContextProvider>
+            </FormFieldContextProvider>
 
             {shownTooltipProps && <Tooltip {...shownTooltipProps} anchorRef={tooltipProps ? root : undefined} />}
         </div>

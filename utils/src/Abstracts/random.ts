@@ -16,6 +16,7 @@ const mix = (value: number) => {
     return hash >>> 0;
 };
 
+/** Random numbers, seeded ones that repeat, string hashes and shuffling. */
 export namespace RandomUtils {
     /**
      * Builds a random alternating `0;1;0;…` string for an SVG animation `values`
@@ -46,7 +47,9 @@ export namespace RandomUtils {
      * order, gives an unrelated answer.
      *
      * Only the whole-number part of each value takes part, within the 32-bit range, so `1.5` and `1` hash alike.
-     * Not suitable for anything security-related.
+     * Zeros at the start take no part either, so `hash(0, a)` and `hash(0, 0, a)` equal `hash(a)`; give every call
+     * site the same number of values, or start with a seed that is not `0`. Not suitable for anything
+     * security-related.
      *
      * @param values The numbers to hash. None at all answers `0`.
      * @returns A number from `0` (inclusive) to `1` (exclusive).

@@ -12,7 +12,6 @@ import { example, prop, readout } from "./helpers";
 const LIBRARY = example("library");
 const CELL = `${LIBRARY} li`;
 const BUTTON = `${LIBRARY} [role="button"]`;
-const SETTLE_MS = 150;
 
 const cellNamed = (page: Page, name: string) => page.locator(BUTTON).filter({ hasText: new RegExp(`^${name} \\d`) });
 
@@ -51,7 +50,6 @@ test("three columns fit across, and the fourth level is not drawn", async ({ pag
 test("the number of columns follows the page", async ({ page }) => {
     await page.locator(`${prop("columnCount")} input`).fill("4");
     await page.locator(`${prop("columnCount")} input`).blur();
-    await page.waitForTimeout(SETTLE_MS);
 
     await expect(cellNamed(page, "Calendar"), "a fourth level now fits").toHaveCount(1);
 });

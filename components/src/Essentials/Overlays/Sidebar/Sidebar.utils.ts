@@ -52,7 +52,7 @@ export namespace SidebarUtils {
      */
     export const observePointerAway = (root: HTMLElement | undefined, onAway: () => void) => {
         const handlePointerMove = (e: PointerEvent) => {
-            if (getHasOpenPopupOutside(root) || DismisserUtils.getIsWithinOwnedLayer(e.target as Node | null, [root])) {
+            if (DismisserUtils.getIsWithinOwnedLayer(e.target as Node | null, [root]) || getHasOpenPopupOutside(root)) {
                 return;
             }
 

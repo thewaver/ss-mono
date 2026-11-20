@@ -106,7 +106,8 @@ export namespace RotatorUtils {
      * the wheel waits for it before starting; a rejection abandons the spin and leaves the wheel where
      * it was.
      * @param defs.computeSpinDefs How many turns to take and how far to overshoot, per target. An
-     * overshoot is what makes the wheel look like it is losing momentum rather than stopping dead.
+     * overshoot is what makes the wheel look like it is losing momentum rather than stopping dead. Omitted,
+     * or answering `undefined`, means three turns and no overshoot.
      * @param defs.computeStepLabel How to announce the step landed on, given its zero-based index and
      * the step count.
      * @param defs.onSpinEnd Called with the step landed on.
@@ -188,7 +189,7 @@ export namespace RotatorUtils {
                         turnTo(spinAngle - jitterAngle, defs.getSettleDurationMs(), SPIN_EASING, settle);
                     });
                 },
-                () => write({ isAwaitingTarget: false }),
+                () => write({ spinPhase: "still", isAwaitingTarget: false }),
             );
 
             return true;

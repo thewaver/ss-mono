@@ -150,9 +150,10 @@ describe("ObjectUtils.getRandomArrayValues", () => {
         expect(ObjectUtils.getRandomArrayValues([1, 2, 3])).toHaveLength(1);
     });
 
-    it("clamps the count to what exists, and to at least one", () => {
+    it("clamps the count to what exists, and draws none when asked for none", () => {
         expect(ObjectUtils.getRandomArrayValues([1, 2], 10)).toHaveLength(2);
-        expect(ObjectUtils.getRandomArrayValues([1, 2], 0)).toHaveLength(1);
+        expect(ObjectUtils.getRandomArrayValues([1, 2], 0)).toEqual([]);
+        expect(ObjectUtils.getRandomArrayValues([1, 2], -1)).toEqual([]);
     });
 
     it("does not modify the input", () => {
@@ -369,5 +370,32 @@ describe("ObjectUtils.moveArrayElement", () => {
         ObjectUtils.moveArrayElement(values, 0, 1);
 
         expect(values).toEqual(["a", "b"]);
+    });
+});
+
+describe("the shared empty defaults", () => {
+    it("are frozen, so no caller can change them for the others", () => {
+        expect(Object.isFrozen(EMPTY_ARRAY)).toBe(true);
+        expect(Object.isFrozen(EMPTY_OBJECT)).toBe(true);
+    });
+});
+
+describe("stepping from an entry that is falsy", () => {
+    it("steps on from 0, rather than taking it for no entry", () => {
+        expect(ObjectUtils.getNextArrayElement(0, [0, 1, 2])).toBe(1);
+        expect(ObjectUtils.getPrevArrayElement(2, [0, 1, 2])).toBe(1);
+        expect(ObjectUtils.getPrevArrayElement(1, [0, 1, 2])).toBe(0);
+        expect(ObjectUtils.getPrevArrayElement(0, [0, 1, 2])).toBeUndefined();
+    });
+});
+
+describe("ObjectUtils at the edges their doc blocks name", () => {
+    it("does not take a filled Map for an empty one", () => {
+        expect(ObjectUtils.sameIfEmpty(new Map([["a", 1]]), new Map())).toBe(false);
+        expect(ObjectUtils.sameIfEmpty(new Map(), new Map())).toBe(true);
+    });
+
+    it("leaves the array as it was when the entry to move is not in it", () => {
+        expect(ObjectUtils.moveArrayElement(["a", "b"], 5, 0)).toEqual(["a", "b"]);
     });
 });

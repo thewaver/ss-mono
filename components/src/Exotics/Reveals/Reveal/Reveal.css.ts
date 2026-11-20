@@ -5,6 +5,10 @@ export const revealRoot = style({
     overflow: "hidden",
 });
 
+export const revealContent = style({
+    display: "contents",
+});
+
 export const revealCover = style({
     position: "absolute",
     inset: 0,

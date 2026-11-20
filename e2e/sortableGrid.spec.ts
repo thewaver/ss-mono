@@ -1,6 +1,6 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { demo, readout } from "./helpers";
+import { demo, expectAnnounced, readAnnouncements, readout, recordAnnouncements, tabKey } from "./helpers";
 
 const grid = (key: string, label: string) => `${demo(key)} [role="list"][aria-label="${label}"]`;
 
@@ -12,8 +12,6 @@ const grid = (key: string, label: string) => `${demo(key)} [role="list"][aria-la
  */
 const item = (key: string, label: string, gridLabel: string) =>
     `${grid(key, gridLabel)} [role="listitem"][aria-label^="${label},"]`;
-
-const ANNOUNCER = 'body > [role="log"][aria-live="polite"]';
 
 /**
  * Every geometric assertion here compares two rects measured in the same pass rather than a rect against
@@ -88,6 +86,7 @@ const sizeOf = async (page: Page, key: string, gridLabel: string, label: string)
 };
 
 test.beforeEach(async ({ page }) => {
+    await recordAnnouncements(page);
     await page.goto("/sortable-grid");
     await expect(page.locator("[data-example]").first()).toBeVisible();
 });
@@ -134,7 +133,7 @@ test("a drop onto an occupied cell is refused, and the item stays where it was",
     await page.keyboard.press("Enter");
     await page.keyboard.press("ArrowUp");
 
-    await expect(page.locator(ANNOUNCER), "the aim says out loud that it will not fit").toContainText("no room");
+    await expectAnnounced(page, "no room", { message: "the aim says out loud that it will not fit" });
 
     await page.keyboard.press("Enter");
 
@@ -208,7 +207,7 @@ test("an L turned one way fits and the other way does not", async ({ page }) => 
     await page.keyboard.press("Enter");
     await page.keyboard.press("r");
 
-    await expect(page.locator(ANNOUNCER), "clockwise lands the arm on the flint").toContainText("no room");
+    await expectAnnounced(page, "no room", { message: "clockwise lands the arm on the flint" });
 
     await page.keyboard.press("Enter");
 
@@ -229,7 +228,7 @@ test("an L turned one way fits and the other way does not", async ({ page }) => 
 test("an item carried out of one grid arrives in the other", async ({ page }) => {
     await page.locator(item("pair", "Gem", "Stash")).focus();
     await page.keyboard.press("Enter");
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
     await page.keyboard.press("Enter");
 
     await expect(page.locator(item("pair", "Gem", "Stash")), "the gem has left the stash").toHaveCount(0);
@@ -244,7 +243,7 @@ test("an item carried out of one grid arrives in the other", async ({ page }) =>
 test("an item crosses from a list into a grid, and is given a single cell", async ({ page }) => {
     await page.locator(`${demo("loot")} [role="listitem"][aria-label="Iron Key"]`).focus();
     await page.keyboard.press("Enter");
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
     await page.keyboard.press("Enter");
 
     expect(await sizeOf(page, "loot", "Pack", "Iron Key"), "it lands one cell by one").toBe("1x1");
@@ -259,7 +258,7 @@ test("an item crosses from a list into a grid, and is given a single cell", asyn
 test("a locked grid is not offered as a destination", async ({ page }) => {
     await page.locator(item("locked", "Potion", "Pack")).focus();
     await page.keyboard.press("Enter");
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
     await page.keyboard.press("Enter");
 
     await expect(page.locator(item("locked", "Potion", "Stash")), "the stash took nothing").toHaveCount(0);
@@ -298,10 +297,7 @@ test("a press in the notch of an L belongs to the board rather than to the item"
 
     expect(await spotOf(page, "pack", "Pack", "Pickaxe"), "the pickaxe never moved").toBe("7,2");
 
-    await expect(
-        page.locator(`${ANNOUNCER} > *`),
-        "and nothing was ever picked up, so the reserved region is still empty",
-    ).toHaveCount(0);
+    expect(await readAnnouncements(page), "and nothing was ever picked up, so nothing was said").toEqual([]);
 });
 
 /**
@@ -370,7 +366,7 @@ test("a pointer drop onto a wall is refused, and the item stays where it was", a
     await page.mouse.move(to.x, to.y, { steps: 10 });
     await page.mouse.up();
 
-    await expect(page.locator(`${ANNOUNCER} > *`), "the drag did pick the potion up").not.toHaveCount(0);
+    expect((await readAnnouncements(page)).length, "the drag did pick the potion up").toBeGreaterThan(0);
 
     expect(await spotOf(page, WALLS, WALLS_LABEL, "Potion"), "but it did not land on the wall").toBe(before);
 });
@@ -395,7 +391,7 @@ test("a pointer drop that would reach over a wall is refused", async ({ page }) 
     await page.mouse.move(to.x, to.y, { steps: 10 });
     await page.mouse.up();
 
-    await expect(page.locator(`${ANNOUNCER} > *`), "the drag did pick the shield up").not.toHaveCount(0);
+    expect((await readAnnouncements(page)).length, "the drag did pick the shield up").toBeGreaterThan(0);
 
     expect(await spotOf(page, WALLS, WALLS_LABEL, "Kite Shield"), "but it is still where it started").toBe(before);
 });
@@ -412,7 +408,7 @@ test("the arrows step a carried item over walls, but not over another item", asy
     await page.keyboard.press("ArrowUp");
     await page.keyboard.press("ArrowUp");
 
-    await expect(page.locator(ANNOUNCER), "the scroll's cell is aimed at, not stepped over").toContainText("no room");
+    await expectAnnounced(page, "no room", { message: "the scroll's cell is aimed at, not stepped over" });
 
     await page.keyboard.press("ArrowUp");
     await page.keyboard.press("ArrowLeft");
@@ -436,7 +432,7 @@ test("a keyboard drop that would reach over a wall is refused", async ({ page })
     await page.keyboard.press("ArrowUp");
     await page.keyboard.press("ArrowUp");
 
-    await expect(page.locator(ANNOUNCER), "the aim over the walls has no room").toContainText("no room");
+    await expectAnnounced(page, "no room", { message: "the aim over the walls has no room" });
 
     await page.keyboard.press("Enter");
 

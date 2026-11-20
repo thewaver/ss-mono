@@ -107,7 +107,7 @@ const TextFieldElement = (props: TextFieldElementProps) => {
             onInput: (value) => {
                 void props.onInput?.(value);
             },
-            computeMaskedText: props.computeMaskedText,
+            getComputeMaskedText: () => props.computeMaskedText,
         },
     );
 
@@ -160,7 +160,9 @@ const TextFieldElement = (props: TextFieldElementProps) => {
                 aria-required={access(props.isRequired) || undefined}
                 aria-invalid={access(props.flags).hasError || undefined}
                 {...access(props.ariaAttributes)}
-                onInput={(e: InputEvent & { currentTarget: TextSyncElement }) => handleInput(e.currentTarget)}
+                onInput={(e: InputEvent & { currentTarget: TextSyncElement }) =>
+                    handleInput(e.currentTarget, e.inputType)
+                }
                 onCompositionStart={handleCompositionStart}
                 onCompositionEnd={(e: CompositionEvent & { currentTarget: TextSyncElement }) =>
                     handleCompositionEnd(e.currentTarget)

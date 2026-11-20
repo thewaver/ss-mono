@@ -70,6 +70,10 @@ describe("computeTagKeyAction", () => {
         expect(TagInputUtils.computeTagKeyAction(key("z", { ctrlKey: true }), 1, state)).toBeUndefined();
     });
 
+    it("leaves Space to the tag, which presses it as Enter does", () => {
+        expect(TagInputUtils.computeTagKeyAction(key(" "), 1, state)).toBeUndefined();
+    });
+
     it("removes the tag on Backspace and Delete", () => {
         expect(TagInputUtils.computeTagKeyAction(key("Backspace"), 1, state)).toEqual({ kind: "remove", index: 1 });
         expect(TagInputUtils.computeTagKeyAction(key("Delete"), 1, state)).toEqual({ kind: "remove", index: 1 });

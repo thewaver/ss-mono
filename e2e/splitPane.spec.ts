@@ -199,6 +199,7 @@ test("minimums that cannot fit overflow rather than shrink", async ({ page }) =>
 const OVERSHOOT_PX = 2000;
 const TRIPLE_FLOOR_PX = 80;
 const BOUNDED_CONTENT_FLOOR_PX = 160;
+const SUM_DIGITS = 2;
 
 test("a drag stops where the pixel bounds do, rather than writing past them", async ({ page }) => {
     const drag = async (scope: string, index: number, dx: number) => {
@@ -214,10 +215,19 @@ test("a drag stops where the pixel bounds do, rather than writing past them", as
         await page.mouse.up();
     };
 
+    /**
+     * The box and the tracks are read unrounded, and their sums compared to two decimal places: a pane can end on a half pixel, and `offsetWidth` rounds each one on
+     * its own, so two halves rounded up read one pixel past a box they fit exactly. Chrome lays out in 64ths of a pixel,
+     * which add up exactly; Firefox's 60ths do not quite, so the sum is allowed a few thousandths of a pixel and nothing
+     * a person could see.
+     */
     const tracks = (scope: string) =>
         page.locator(root(scope)).evaluate((element) => ({
-            box: (element as HTMLElement).offsetWidth,
-            sum: Array.from(element.children).reduce((total, child) => total + (child as HTMLElement).offsetWidth, 0),
+            box: parseFloat(getComputedStyle(element).width),
+            sum: Array.from(element.children).reduce(
+                (total, child) => total + parseFloat(getComputedStyle(child).width),
+                0,
+            ),
             panes: Array.from(element.children)
                 .filter((child) => child.getAttribute("role") !== "separator")
                 .map((child) => (child as HTMLElement).offsetWidth),
@@ -228,7 +238,10 @@ test("a drag stops where the pixel bounds do, rather than writing past them", as
     const triple = await tracks(TRIPLE);
 
     expect(triple.panes[1], "the middle pane stops on its floor").toBe(TRIPLE_FLOOR_PX);
-    expect(triple.sum, "and the tracks still add up to the container rather than spilling out of it").toBe(triple.box);
+    expect(triple.sum, "and the tracks still add up to the container rather than spilling out of it").toBeCloseTo(
+        triple.box,
+        SUM_DIGITS,
+    );
 
     await drag(BOUNDED, 0, OVERSHOOT_PX);
 
@@ -237,5 +250,5 @@ test("a drag stops where the pixel bounds do, rather than writing past them", as
     expect(bounded.panes[1], "a drag the other way stops on the neighbor's floor instead").toBe(
         BOUNDED_CONTENT_FLOOR_PX,
     );
-    expect(bounded.sum).toBe(bounded.box);
+    expect(bounded.sum).toBeCloseTo(bounded.box, SUM_DIGITS);
 });

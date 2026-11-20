@@ -20,9 +20,13 @@ export type SortableFlags = {
 };
 
 export type SortableItemRecord<T, TTooltipDefs> = {
+    /** The item's value, which the list holds and the painters are handed. */
     value: T;
+    /** Whether the item can be picked up. A disabled item stays where it is and is skipped by the arrows. */
     isDisabled?: boolean;
+    /** Keeps the item in the arrow-key walk while it is disabled, so a reader hears its name and that it is unavailable. */
     isReachableWhenDisabled?: boolean;
+    /** What the item's tooltip shows. */
     tooltipDefs?: TTooltipDefs;
 };
 

@@ -106,6 +106,7 @@
             direction: getDirection(),
             gutterSize,
             paneCount,
+            layoutExtent: SplitPaneUtils.getLayoutExtent(root, orientation),
         });
 
         if (boundary === undefined) return;

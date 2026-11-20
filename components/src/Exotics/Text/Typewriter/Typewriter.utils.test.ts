@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { TypewriterUtils } from "./Typewriter.utils";
 
@@ -75,5 +75,56 @@ describe("getIsResetSkipped", () => {
         expect(TypewriterUtils.getIsResetSkipped(true, "layout", false, undefined)).toBe(false);
         expect(TypewriterUtils.getIsResetSkipped(true, "layout", undefined, false)).toBe(true);
         expect(TypewriterUtils.getIsResetSkipped(true, "other", false, false)).toBe(false);
+    });
+});
+
+describe("TypewriterUtils.run on a page that is not painting", () => {
+    beforeEach(() => {
+        vi.useFakeTimers();
+        vi.stubGlobal("requestAnimationFrame", () => 1);
+        vi.stubGlobal("cancelAnimationFrame", () => undefined);
+    });
+
+    afterEach(() => {
+        vi.useRealTimers();
+        vi.unstubAllGlobals();
+    });
+
+    it("still reaches the end of the run on time, once", () => {
+        let progress = 0;
+        const onEnd = vi.fn();
+
+        TypewriterUtils.run({
+            getProgress: () => progress,
+            setProgress: (next) => {
+                progress = next;
+            },
+            getRunDurationMs: () => 1000,
+            onEnd,
+        });
+
+        vi.advanceTimersByTime(999);
+
+        expect(onEnd).not.toHaveBeenCalled();
+
+        vi.advanceTimersByTime(1);
+
+        expect(onEnd).toHaveBeenCalledTimes(1);
+        expect(progress).toBe(1);
+    });
+
+    it("does not end a run that was stopped", () => {
+        const onEnd = vi.fn();
+        const stop = TypewriterUtils.run({
+            getProgress: () => 0,
+            setProgress: () => {},
+            getRunDurationMs: () => 1000,
+            onEnd,
+        });
+
+        stop();
+        vi.advanceTimersByTime(5000);
+
+        expect(onEnd).not.toHaveBeenCalled();
     });
 });

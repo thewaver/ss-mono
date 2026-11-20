@@ -29,17 +29,17 @@ export const Wheel = <T,>(props: WheelProps<T>) => {
 
     const rotation = RotatorSolidUtils.createRotator(getIsDisabled, {
         stepCount: getWedgeCount,
-        spinDurationMs: props.spinDurationMs,
-        settleDurationMs: props.settleDurationMs,
-        restDurationMs: props.restDurationMs,
-        idleDelayMs: props.idleDelayMs,
-        computeSpinTarget: props.computeSpinTarget,
-        computeSpinDefs: props.computeSpinDefs,
-        computeStepLabel: props.computeWedgeLabel,
-        onStepChange: props.onSelectedWedgeChange,
+        spinDurationMs: () => access(props.spinDurationMs),
+        settleDurationMs: () => access(props.settleDurationMs),
+        restDurationMs: () => access(props.restDurationMs),
+        idleDelayMs: () => access(props.idleDelayMs),
+        computeSpinTarget: () => props.computeSpinTarget(),
+        computeSpinDefs: (index, stepCount) => props.computeSpinDefs?.(index, stepCount),
+        computeStepLabel: (index, stepCount) => props.computeWedgeLabel(index, stepCount),
+        onStepChange: (index) => props.onSelectedWedgeChange?.(index),
         targetIndex: props.targetIndex,
         autoSpin: props.autoSpin,
-        onSpinEnd: props.onSpinEnd,
+        onSpinEnd: (index) => props.onSpinEnd?.(index),
     });
 
     const getWedgeLabel = (index: number) => props.computeWedgeLabel(index, getWedgeCount());

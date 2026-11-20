@@ -1,0 +1,27 @@
+{
+    "hooks": {
+        "UserPromptSubmit": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "node",
+                        "args": [".claude/hooks/notify.mjs", "start"]
+                    }
+                ]
+            }
+        ],
+        "Stop": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "node",
+                        "args": [".claude/hooks/notify.mjs", "stop"],
+                        "async": true
+                    }
+                ]
+            }
+        ]
+    }
+}

@@ -30,7 +30,7 @@ import {
 import * as styles from "@thewaver/ss-playground/App/Pages/CellAnimationPage/CellAnimationPage.css";
 import type { CellAnimationSourceKind } from "@thewaver/ss-playground/App/Pages/CellAnimationPage/CellAnimationPage.types";
 import knight_profile from "@thewaver/ss-playground/App/knight_profile.webp";
-import type { Index2d, Size2d } from "@thewaver/ss-utils";
+import type { Count2d, Size2d } from "@thewaver/ss-utils";
 
 import type { ExampleDefs } from "../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../PageComponents/Examples/PageExamples.vue";
@@ -90,7 +90,7 @@ const animationDurationMs = shallowRef(CELL_ANIMATION_DEFAULTS.animationDuration
 const animationIterationDelayMs = shallowRef(CELL_ANIMATION_DEFAULTS.animationIterationDelayMs);
 const animationIterationCount = shallowRef(CellAnimationKnobs.ENDLESS_ITERATION_COUNT);
 const finalFrame = shallowRef<CellAnimationFinalFrame>(CELL_ANIMATION_DEFAULTS.finalFrame);
-const cellCount = shallowRef<Index2d>({ ...CellAnimationKnobs.STARTING_CELL_COUNT });
+const cellCount = shallowRef<Count2d>({ ...CellAnimationKnobs.STARTING_CELL_COUNT });
 const weightOpts = shallowRef<WeightOpts>({ ...CellAnimationKnobs.STARTING_WEIGHT_OPTS });
 const breakpointOpts = shallowRef<SliceAnimationBreakpointOpts>({ ...CellAnimationKnobs.STARTING_BREAKPOINT_OPTS });
 const playbackOpts = shallowRef<SliceAnimationPlaybackOpts>({ ...CellAnimationKnobs.STARTING_PLAYBACK_OPTS });
@@ -142,7 +142,7 @@ const pickImage = (file: File) => {
     imageSrc.value = URL.createObjectURL(file);
 };
 
-const setCellCount = (next: Partial<Index2d>) => {
+const setCellCount = (next: Partial<Count2d>) => {
     cellCount.value = { ...cellCount.value, ...next };
 };
 
@@ -239,20 +239,20 @@ const examples: ExampleDefs[] = [
                 <PageProp item-key="cellCountCols" v-bind="CellAnimationKnobs.CELL_COUNT_COLS_TEXT">
                     <div :class="styles.valueList">
                         <PageNumberField
-                            :value="cellCount.col"
+                            :value="cellCount.colCount"
                             :min="CellAnimationKnobs.MIN_CELL_COUNT"
                             :max="CellAnimationKnobs.MAX_CELL_COUNT"
                             :step="CellAnimationKnobs.CELL_COUNT_STEP"
                             ariaLabel="Columns"
-                            @input="(value: number) => setCellCount({ col: value })"
+                            @input="(value: number) => setCellCount({ colCount: value })"
                         />
                         <PageNumberField
-                            :value="cellCount.row"
+                            :value="cellCount.rowCount"
                             :min="CellAnimationKnobs.MIN_CELL_COUNT"
                             :max="CellAnimationKnobs.MAX_CELL_COUNT"
                             :step="CellAnimationKnobs.CELL_COUNT_STEP"
                             ariaLabel="Rows"
-                            @input="(value: number) => setCellCount({ row: value })"
+                            @input="(value: number) => setCellCount({ rowCount: value })"
                         />
                     </div>
                 </PageProp>

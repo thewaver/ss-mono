@@ -7,6 +7,7 @@ import {
     Point2dUtils,
     type Rect,
     StoreUtils,
+    StringUtils,
 } from "@thewaver/ss-utils";
 
 import { ElementObserverUtils } from "../../../Abstracts/ElementObserver/ElementObserver.utils";
@@ -58,6 +59,8 @@ const getIsTextSegment = (segment: ElementSegment): segment is TextSegment => se
 
 /** Names the parts of the text a path cannot carry, so the difference is never a mystery. */
 const warnIfNotOnPath = (tokens: readonly ElementSegment[]) => {
+    if (process.env.NODE_ENV === "production") return;
+
     const elements = tokens.flatMap((token) => (token.type === "atomic" ? [`<${token.element.localName}>`] : []));
     const breakCount = tokens.filter((token) => token.type === "linebreak").length;
 
@@ -77,17 +80,6 @@ const createSVGElement = <TName extends keyof SVGElementTagNameMap>(name: TName)
 
 /** What a whole element is drawn as once it is in the SVG. */
 type AtomicKind = "image" | "svg" | "foreign";
-
-/** Names the elements in the text the painted copy cannot reproduce, so the difference is never a mystery. */
-const warnIfUnsupported = (source: HTMLElement) => {
-    const unsupported = JSXTextParserUtils.findUnsupportedElements(source);
-
-    if (!unsupported.length) return;
-
-    console.warn(
-        `PaintedText: ${unsupported.map((element) => `<${element.localName}>`).join(", ")} cannot be copied faithfully into the painted text, which loses a canvas's drawing, media playback, a frame's page and a form control's value.`,
-    );
-};
 
 /** Which SVG element stands in for a whole element: an image for `<img>`, itself for `<svg>`, a foreign object otherwise. */
 const getAtomicKind = (element: Element): AtomicKind => {
@@ -120,7 +112,7 @@ const createLayoutNode = (segment: ElementSegment) => {
 
             if (segment.isBlockLike) wrap.style.width = "100%";
 
-            wrap.append(segment.element.cloneNode(true));
+            wrap.append(DOMUtils.cloneWithUniqueIds(segment.element));
 
             return wrap;
         }
@@ -157,7 +149,7 @@ const createPushingLayoutNode = (segment: ElementSegment) => {
         span.style.setProperty(key, String(value));
     }
 
-    for (const character of Array.from(segment.text)) {
+    for (const character of StringUtils.splitGraphemes(segment.text)) {
         const letter = document.createElement("span");
 
         letter.style.display = "inline-block";
@@ -190,7 +182,7 @@ const createAtomicNode = (element: Element, box: { x: number; y: number; width: 
         kind === "image"
             ? document.createElementNS(SVG_NAMESPACE, "image")
             : kind === "svg"
-              ? (element.cloneNode(true) as SVGSVGElement)
+              ? (DOMUtils.cloneWithUniqueIds(element) as SVGSVGElement)
               : document.createElementNS(SVG_NAMESPACE, "foreignObject");
 
     node.setAttribute("x", `${box.x}`);
@@ -571,7 +563,7 @@ export namespace PaintedTextUtils {
             const segments = tokens.filter(getIsTextSegment);
 
             if (isContentChange || store.get().width === undefined) {
-                warnIfUnsupported(source);
+                LetterDriverUtils.warnIfUnsupported(source, "PaintedText", "painted text");
                 warnIfNotOnPath(tokens);
             }
 
@@ -620,7 +612,7 @@ export namespace PaintedTextUtils {
             let unit = 0;
 
             segments.forEach((segment, runIndex) => {
-                for (const character of Array.from(segment.text)) {
+                for (const character of StringUtils.splitGraphemes(segment.text)) {
                     if (unit < charCount) {
                         const start = text.getStartPositionOfChar(unit);
                         const end = text.getEndPositionOfChar(unit);
@@ -682,7 +674,8 @@ export namespace PaintedTextUtils {
             pathBases = [];
             pathShape = undefined;
 
-            if (isContentChange || store.get().width === undefined) warnIfUnsupported(source);
+            if (isContentChange || store.get().width === undefined)
+                LetterDriverUtils.warnIfUnsupported(source, "PaintedText", "painted text");
 
             const width = LetterDriverUtils.measureLineWidth(source);
             const computePushingName = opts.getComputePushingAnimationName?.();
@@ -737,7 +730,7 @@ export namespace PaintedTextUtils {
                     const baseline = probe.getBoundingClientRect().top;
 
                     if (computePushingName) {
-                        Array.from(segment.text).forEach((character, charIndex) => {
+                        StringUtils.splitGraphemes(segment.text).forEach((character, charIndex) => {
                             const element = node.childNodes[charIndex] as HTMLElement;
 
                             letters.push({
@@ -754,7 +747,7 @@ export namespace PaintedTextUtils {
                         const range = document.createRange();
                         let offset = 0;
 
-                        for (const character of Array.from(segment.text)) {
+                        for (const character of StringUtils.splitGraphemes(segment.text)) {
                             range.setStart(textNode, offset);
                             range.setEnd(textNode, offset + character.length);
                             offset += character.length;

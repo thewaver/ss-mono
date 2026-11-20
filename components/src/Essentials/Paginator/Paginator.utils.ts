@@ -53,11 +53,24 @@ const bridge = (from: number, to: number): PaginatorEntry[] => {
  */
 export namespace PaginatorUtils {
     /**
+     * A key for one entry of the row that stays with what the entry shows, rather than with where it sits.
+     *
+     * A page keeps its key as the row around it changes, so the control a person pressed is the same element after
+     * the row redraws, and keeps focus; keyed by position instead, the control left under the focus would show
+     * another page. A gap is keyed by the pages it stands for.
+     *
+     * @param entry The entry.
+     * @returns The key.
+     */
+    export const getEntryKey = (entry: PaginatorEntry) =>
+        entry.kind === "page" ? `page-${entry.page}` : `gap-${entry.from}-${entry.to}`;
+
+    /**
      * The entries to draw for a given page.
      *
      * The window around the current page keeps its width as it approaches either end rather than
-     * shrinking, so the control does not change size as the user pages through — the window slides up
-     * against the boundary pages instead. Where the boundaries and the window would cover everything
+     * shrinking — it slides up against the boundary pages instead — so the run of pages around the current one
+     * stays as long as the user pages through. Where the boundaries and the window would cover everything
      * anyway, every page is listed and no gaps appear.
      *
      * @param page The current page, counting from one. Clamped, so an out-of-range page is treated as
@@ -248,8 +261,9 @@ export namespace PaginatorUtils {
      * @param piece The piece's name, for the message.
      */
     export const warnOutsideRoot = (piece: string) => {
-        console.warn(
-            `${piece}: no PaginatorRoot around it — it has no item count or page to draw from and renders nothing. Render it inside a PaginatorRoot.`,
-        );
+        if (process.env.NODE_ENV !== "production")
+            console.warn(
+                `${piece}: no PaginatorRoot around it — it has no item count or page to draw from and renders nothing. Render it inside a PaginatorRoot.`,
+            );
     };
 }

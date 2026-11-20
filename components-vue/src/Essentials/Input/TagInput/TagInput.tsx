@@ -1,6 +1,7 @@
 import { type SlotsType, defineComponent, shallowRef, useId } from "vue";
 
 import {
+    InteractionTrackerUtils,
     TAG_INPUT_DEFAULTS,
     type TagInputFlags,
     type TagInputKeyAction,
@@ -10,6 +11,7 @@ import {
 import { TagInputConst } from "@thewaver/ss-components/internal";
 
 import { NavigatorVueUtils } from "../../../Abstracts/Navigator/NavigatorVue.utils";
+import { FormValue } from "../../../Primitives/FormValue/FormValue";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import type { InteractionWrapperSlots } from "../../../Primitives/InteractionWrapper/InteractionWrapper.types";
 import { watchAfterRender } from "../../../Utils/effectUtils";
@@ -187,7 +189,6 @@ export const TagInput = defineComponent(
                                         }}
                                         id={getFieldId()}
                                         type="text"
-                                        name={props.name}
                                         class={TagInputStyles.tagInputField}
                                         style={props.computeTextStyle?.(flags)}
                                         value={text.value}
@@ -196,12 +197,13 @@ export const TagInput = defineComponent(
                                         aria-labelledby={ariaLabelledBy.value}
                                         aria-describedby={ariaDescribedBy.value}
                                         aria-disabled={flags.isDisabled || undefined}
+                                        aria-invalid={flags.hasError || undefined}
                                         onInput={(e) => {
                                             text.value = (e.currentTarget as HTMLInputElement).value;
                                             typeCount.value += 1;
                                         }}
                                         onKeydown={(e) => {
-                                            if (isDisabled) return;
+                                            if (isDisabled || InteractionTrackerUtils.getIsComposing(e)) return;
 
                                             runKeyAction(
                                                 e,
@@ -213,6 +215,8 @@ export const TagInput = defineComponent(
                                             );
                                         }}
                                     />
+
+                                    <FormValue name={props.name} values={tags.value} />
 
                                     {slots.renderPlaceholder && isEmpty && tagCount < 1 && (
                                         <div class={TagInputStyles.tagInputPlaceholder}>

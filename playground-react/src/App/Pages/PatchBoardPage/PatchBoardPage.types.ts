@@ -13,6 +13,13 @@ export type PatchBoardExampleProps = {
     onMove: (nodeKey: string) => void;
 };
 
+export type PatchBoardSharedExampleProps = Omit<PatchBoardExampleProps, "nodes" | "links"> & {
+    firstNodes: PatchBoardExampleProps["nodes"];
+    secondNodes: PatchBoardExampleProps["nodes"];
+    firstLinks: PatchBoardExampleProps["links"];
+    secondLinks: PatchBoardExampleProps["links"];
+};
+
 export type PatchBoardViewExampleProps = PatchBoardExampleProps & {
     view: readonly [PanZoomView, (view: PanZoomView) => void];
 };

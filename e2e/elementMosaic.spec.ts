@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { example, prop, waitUntilStill } from "./helpers";
+import { example, prop, tabKey, waitUntilStill } from "./helpers";
 
 /**
  * Three properties of the packing can only be confirmed in a browser, because all three depend on sizes the
@@ -200,7 +200,7 @@ test("taking an item out keeps every other tile's own element", async ({ page })
 });
 
 /**
- * The walked example passes `onActivate`, which turns the mosaic into one labelled list with a single Tab
+ * The walked example passes `onActivate`, which turns the mosaic into one labeled list with a single Tab
  * stop: a `role="button"` inside each tile, only one of which is in the tab order at a time. Left and Right
  * follow the reading order, which is the DOM order; Up and Down follow what the eye sees, going to the tile
  * directly below or above. Pressing a tile grows it, the rest re-pack around it, and focus has to survive the
@@ -314,7 +314,7 @@ test.describe("the walked mosaic", () => {
         ).toEqual(["0"]);
 
         await page.locator(WALK_TILE).first().focus();
-        await page.keyboard.press("Tab");
+        await page.keyboard.press(tabKey(page));
 
         expect(await isFocusInside(page, WALK_LIST), "one Tab press leaves the mosaic altogether").toBe(false);
     });

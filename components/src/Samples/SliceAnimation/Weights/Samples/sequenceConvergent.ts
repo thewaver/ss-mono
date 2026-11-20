@@ -4,8 +4,8 @@ import type { WeightFn } from "../../../../Generators/SliceAnimationWeights/Slic
 import { SliceAnimationWeightUtils } from "../../../../Generators/SliceAnimationWeights/SliceAnimationWeights.utils";
 
 export const sequenceConvergent: WeightFn = (pos, count) => {
-    const total = count.col * count.row;
-    const idx = Index2dUtils.toFlatIndex(pos, count.col);
+    const total = count.colCount * count.rowCount;
+    const idx = Index2dUtils.toFlatIndex(pos, count.colCount);
     const progress = total <= 1 ? 0.5 : idx / (total - 1);
     const edgeDistance = Math.abs(progress - 0.5) * 2;
 

@@ -30,7 +30,10 @@ Open problems are in `backlog.md` at the repo root; nothing here is a task.
 
 `const DEFAULT_X = …` at module scope, one blank line between logical blocks, and a prop with a default resolved
 in one place rather than at each read. Props are read as `props.x`, never destructured — except in Svelte, where
-`$props()` is destructured for its `$bindable` members and the rest are read through `props`. Types live in the
+`$props()` is destructured for its `$bindable` members and the rest are read through `props`. **The exception, the
+user's call: a component that passes most of its props on to another may separate the ones it holds back** — Solid
+with `splitProps`, React and Svelte by destructuring them out beside a rest object that is passed on whole
+(`ScanlineAnimation` keeps `lineCount` and `orientation` from `CellAnimation` this way). Types live in the
 owning component's own `<Component>.types.ts`, never in a shared per-directory types file even when siblings
 consume them; a shared `Xs.types.ts` is unwound rather than extended. Names drop a redundant directory prefix
 (`ExampleDefs`, not `PageExampleDefs`).

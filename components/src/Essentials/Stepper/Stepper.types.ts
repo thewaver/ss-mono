@@ -10,8 +10,11 @@ export type StepperFlags = {
 };
 
 export type Step<TValue, TState> = {
+    /** The step's value, which the current step is told by. */
     value: TValue;
+    /** Where the step stands — done, current, failed or whatever the consumer's states are — handed to the painter. */
     state: TState;
+    /** Whether a person may go to this step. Left out, they may. */
     isNavigable?: boolean;
     /**
      * Keeps this step in the tab order while it cannot be navigated to, so focus can land on it and a reader hears
@@ -19,14 +22,20 @@ export type Step<TValue, TState> = {
      * so its explanation can be read.
      */
     isReachableWhenDisabled?: boolean;
+    /** The id put on the step's control, so a label or a test can reach it. One is generated when left out. */
     id?: string;
 };
 
 export type StepperConnectorDefs = {
+    /** The step the connector leaves, counting from zero. */
     index: number;
+    /** Where the step it leaves was placed, when the steps follow a layout. */
     from?: PlacementRect;
+    /** Where the step it reaches was placed, when the steps follow a layout. */
     to?: PlacementRect;
+    /** The layout's center, so a connector can follow the curve the steps sit on. */
     origin?: Point2d;
+    /** The layout's radii, for the same. */
     radii?: Point2d;
 };
 

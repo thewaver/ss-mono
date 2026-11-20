@@ -1,3 +1,4 @@
+/** Reading and writing flags packed into the bits of a number. */
 export namespace BitwiseUtils {
     /**
      * Checks whether a single flag is switched on inside a bitmask.

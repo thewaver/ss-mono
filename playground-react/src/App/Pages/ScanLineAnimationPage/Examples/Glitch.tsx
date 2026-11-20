@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { ScanlineAnimation, SliceAnimationKeyframeUtils, SliceAnimationWeights } from "@thewaver/ss-components-react";
 import type { SliceAnimationBreakpointTriple, SliceStop } from "@thewaver/ss-components-react";
-import type { Index2d } from "@thewaver/ss-utils";
+import type { Count2d } from "@thewaver/ss-utils";
 
 import type { ScanlineAnimationExampleProps } from "../ScanlineAnimationPage.types";
 
@@ -46,31 +46,33 @@ type Props = ScanlineAnimationExampleProps & {
     keyframeOpts: { count: number; shiftPercent: number; chunkyness: number };
 };
 
-export const GlitchExample = ({ keyframeOpts, weightType, ...otherProps }: Props) => {
+export const GlitchExample = (props: Props) => {
+    const { keyframeOpts, weightType, ...otherProps } = props;
+
     const breakpointGroups = useMemo(() => {
-        const count = keyframeOpts.count;
+        const count = props.keyframeOpts.count;
         const shift = Math.min(0.25, count * 0.05);
 
         return getGlitchBreakpointGroups(count, 0.5 - shift, 0.5 + shift);
-    }, [keyframeOpts.count]);
+    }, [props.keyframeOpts.count]);
 
     const generateShifts = () =>
         getRandomShifts(
             breakpointGroups.length,
             otherProps.lineCount,
-            keyframeOpts.shiftPercent,
-            keyframeOpts.chunkyness,
+            props.keyframeOpts.shiftPercent,
+            props.keyframeOpts.chunkyness,
         );
 
     const [shifts, setShifts] = useState(generateShifts);
 
     useEffect(() => {
         setShifts(generateShifts());
-    }, [breakpointGroups, otherProps.lineCount, keyframeOpts.shiftPercent, keyframeOpts.chunkyness]);
+    }, [breakpointGroups, otherProps.lineCount, props.keyframeOpts.shiftPercent, props.keyframeOpts.chunkyness]);
 
     const computeSliceWeights = useMemo(
-        () => (count: Index2d) => SliceAnimationWeights.computeSliceWeights(weightType, count, WEIGHT_ORIGIN),
-        [weightType],
+        () => (count: Count2d) => SliceAnimationWeights.computeSliceWeights(props.weightType, count, WEIGHT_ORIGIN),
+        [props.weightType],
     );
 
     const animation = useMemo(() => {

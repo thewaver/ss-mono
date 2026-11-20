@@ -26,8 +26,6 @@ import { ListboxOptions } from "../Listbox/Listbox";
 import { ListboxSolidUtils } from "../Listbox/ListboxSolid.utils";
 import type { SelectCompositeProps, SelectFieldProps, SelectProps } from "./SelectSolid.types";
 
-const EMPTY_FORM_VALUE = "";
-
 const SelectField = (props: SelectFieldProps) => {
     const { getAriaLabel, getAriaLabelledBy } = FormFieldSolidUtils.resolveAriaName(
         props.ariaLabel === undefined ? undefined : () => access(props.ariaLabel)!,
@@ -63,7 +61,7 @@ const SelectField = (props: SelectFieldProps) => {
     const { handleInput, handleCompositionStart, handleCompositionEnd } = TextSyncSolidUtils.createValueSync(
         getElementRef,
         () => (getIsEditing() ? access(props.query) : getValueText()),
-        { onInput: props.onQueryInput },
+        { onInput: (value) => props.onQueryInput(value) },
     );
 
     const selectValueText = (element: HTMLInputElement) => {
@@ -241,7 +239,7 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
             props.computeFormValue,
         );
 
-        return getIsMultiple() || texts.length > 0 ? texts : [EMPTY_FORM_VALUE];
+        return getIsMultiple() || texts.length > 0 ? texts : [FormValueUtils.EMPTY_TEXT];
     };
 
     const clearValue = () => {

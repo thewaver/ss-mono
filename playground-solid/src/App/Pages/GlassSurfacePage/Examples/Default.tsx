@@ -24,24 +24,7 @@ const HALF_PANE = styles.paneSize * 0.5;
 const toOffset = (ratio: number) =>
     `clamp(0px, calc(${ratio * 100}% - ${HALF_PANE}px), calc(100% - ${styles.paneSize}px))`;
 
-export const DefaultExample = ({
-    borderRadius,
-    borderWidth,
-    strokeConfigKey,
-    strokeConfigDefs,
-    colors,
-    blurWidth,
-    blurRadius,
-    noiseFrequency,
-    noiseOctaves,
-    rippleScale,
-    tintColor,
-    tintOpacity,
-    lightHeight,
-    surfaceScale,
-    specularConstant,
-    specularExponent,
-}: GlassSurfaceExampleProps) => {
+export const DefaultExample = (props: GlassSurfaceExampleProps) => {
     const id = createUniqueId();
 
     const [getStageRef, setStageRef] = createSignal<HTMLElement>();
@@ -60,7 +43,7 @@ export const DefaultExample = ({
         },
     });
 
-    const getStrokeKey = () => access(strokeConfigKey);
+    const getStrokeKey = () => access(props.strokeConfigKey);
 
     return (
         <div ref={setStageRef} class={styles.stage} style={{ "background-image": `url(${knight})` }}>
@@ -73,42 +56,42 @@ export const DefaultExample = ({
                 })}
             >
                 <GlassSurface
-                    borderRadii={() => CSSUtils.spreadRadius(access(borderRadius))}
-                    borderWidths={() => CSSUtils.spreadWidth(access(borderWidth))}
+                    borderRadii={() => CSSUtils.spreadRadius(access(props.borderRadius))}
+                    borderWidths={() => CSSUtils.spreadWidth(access(props.borderWidth))}
                     computeStrokeDefs={(getSize, getRef) => {
                         const strokeKey = getStrokeKey();
 
-                        if (strokeKey === NO_SAMPLE_KEY) return computeNoSampleDefs(access(colors), "stroke");
+                        if (strokeKey === NO_SAMPLE_KEY) return computeNoSampleDefs(access(props.colors), "stroke");
 
                         return SVGDefsSampleConfigs.Gradient.Tracked.toConfig({
                             family: strokeKey,
-                            defs: access(strokeConfigDefs),
+                            defs: access(props.strokeConfigDefs),
                         } as SVGDefsSamples.Gradient.Tracked.Entry).computeSVGDefs(`stroke-${id}`, undefined, getRef, {
                             getSize,
-                            colors: access(colors),
-                            blurWidth: access(blurWidth),
+                            colors: access(props.colors),
+                            blurWidth: access(props.blurWidth),
                         });
                     }}
                     glassDefs={() => ({
                         noise: {
-                            frequency: access(noiseFrequency),
-                            octaves: access(noiseOctaves),
+                            frequency: access(props.noiseFrequency),
+                            octaves: access(props.noiseOctaves),
                         },
-                        backdrop: { blurRadius: access(blurRadius) },
-                        ripple: { scale: access(rippleScale) },
-                        tint: { color: access(tintColor), opacity: access(tintOpacity) },
+                        backdrop: { blurRadius: access(props.blurRadius) },
+                        ripple: { scale: access(props.rippleScale) },
+                        tint: { color: access(props.tintColor), opacity: access(props.tintOpacity) },
                         sheen: {
-                            lightHeight: access(lightHeight),
-                            surfaceScale: access(surfaceScale),
-                            specularConstant: access(specularConstant),
-                            specularExponent: access(specularExponent),
+                            lightHeight: access(props.lightHeight),
+                            surfaceScale: access(props.surfaceScale),
+                            specularConstant: access(props.specularConstant),
+                            specularExponent: access(props.specularExponent),
                         },
                     })}
                 >
                     <div class={styles.paneContent}>Glass</div>
                 </GlassSurface>
 
-                <div class={styles.paneShadow} style={{ "border-radius": `${access(borderRadius)}px` }} />
+                <div class={styles.paneShadow} style={{ "border-radius": `${access(props.borderRadius)}px` }} />
             </div>
         </div>
     );

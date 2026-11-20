@@ -36,7 +36,7 @@ const PADDLE_UP_AND_DOWN_HEIGHT = 200;
 
 const createPaddleFrames = (acrossHeight: number, upAndDownHeight: number): SlideFrameSet => {
     const upAndDownPanel = `calc(${upAndDownHeight}px / 2 - ${PADDLE_UP_AND_DOWN_EDGE})`;
-    const upAndDownSpine = upAndDownHeight / 2;
+    const upAndDownSpine = upAndDownHeight * 0.5;
 
     const upAndDownFront = style([
         slideFrame,

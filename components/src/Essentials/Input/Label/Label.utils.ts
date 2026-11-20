@@ -30,6 +30,7 @@ export namespace LabelUtils {
      * @param propName What the caller's framework calls the prop, so the warning names what they actually wrote.
      */
     export const warnIfShadowed = (isLabeled: boolean, hasAriaLabel: boolean, propName: string) => {
-        if (isLabeled && hasAriaLabel) console.warn(computeShadowedWarning(propName));
+        if (process.env.NODE_ENV !== "production" && isLabeled && hasAriaLabel)
+            console.warn(computeShadowedWarning(propName));
     };
 }

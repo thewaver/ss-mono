@@ -7,12 +7,14 @@ import type { FormationExampleProps } from "../FormationPageReact.types";
 
 type Props = FormationExampleProps;
 
-export const DefaultExample = ({ layoutEntry, effectEntry, shapeKind, ...otherProps }: Props) => {
-    const computeLayout = useMemo(() => PlacementLayoutUtils.toLayoutFn(layoutEntry), [layoutEntry]);
+export const DefaultExample = (props: Props) => {
+    const { layoutEntry, effectEntry, shapeKind, ...otherProps } = props;
+
+    const computeLayout = useMemo(() => PlacementLayoutUtils.toLayoutFn(props.layoutEntry), [props.layoutEntry]);
 
     const computeEffect = useMemo(
-        () => (effectEntry === undefined ? undefined : ProximityEffectUtils.toEffectFn(effectEntry)),
-        [effectEntry],
+        () => (props.effectEntry === undefined ? undefined : ProximityEffectUtils.toEffectFn(props.effectEntry)),
+        [props.effectEntry],
     );
 
     return (
@@ -21,7 +23,7 @@ export const DefaultExample = ({ layoutEntry, effectEntry, shapeKind, ...otherPr
             computeLayout={computeLayout}
             computeEffect={computeEffect}
             renderItem={(item, state) => (
-                <PageFormationItem state={state} shapeKind={shapeKind}>
+                <PageFormationItem state={state} shapeKind={props.shapeKind}>
                     {item}
                 </PageFormationItem>
             )}

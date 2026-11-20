@@ -12,7 +12,7 @@ import {
 } from "@thewaver/ss-components-react";
 import type { SliceAnimationPlaybackOpts } from "@thewaver/ss-components-react";
 import * as styles from "@thewaver/ss-playground/App/Pages/CellAnimationPage/CellAnimationPage.css";
-import type { Index2d, Size2d } from "@thewaver/ss-utils";
+import type { Count2d, Size2d } from "@thewaver/ss-utils";
 
 import { PageControlButtonContent } from "../../../StyledComponents/ControlButtonContent/ControlButtonContent";
 import type { CellAnimationExampleProps } from "../CellAnimationPage.types";
@@ -41,10 +41,10 @@ export const WipeExample = (props: Props) => {
 
     const [wipeSize, setWipeSize] = useState<Size2d>();
 
-    const cellCount = useMemo<Index2d>(
+    const cellCount = useMemo<Count2d>(
         () => ({
-            col: Math.ceil((wipeSize?.width ?? 0) / WIPE_CELL_SIZE),
-            row: Math.ceil((wipeSize?.height ?? 0) / WIPE_CELL_SIZE),
+            colCount: Math.ceil((wipeSize?.width ?? 0) / WIPE_CELL_SIZE),
+            rowCount: Math.ceil((wipeSize?.height ?? 0) / WIPE_CELL_SIZE),
         }),
         [wipeSize],
     );

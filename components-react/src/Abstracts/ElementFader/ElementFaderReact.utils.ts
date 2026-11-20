@@ -10,7 +10,7 @@ export namespace ElementFaderReactUtils {
      * Drives one element's fade in and out from a visibility flag.
      *
      * `ElementFaderUtils.createFader` as a hook: `show` or `hide` is called whenever `isVisible` changes, the
-     * three fields are read as state, and anything in flight is cancelled on unmount. The options are read
+     * three fields are read as state, and anything in flight is canceled on unmount. The options are read
      * when they are needed, so a new duration or callback takes effect on the next fade without restarting
      * the current one.
      *

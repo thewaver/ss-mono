@@ -349,7 +349,7 @@ export namespace CircleUtils {
             return {
                 x: from.x + u * dx,
                 y: from.y + u * dy,
-                radius: (w0 * Math.cosh(r0)) / Math.cosh(ZOOM_RHO * s + r0) / 2,
+                radius: ((w0 * Math.cosh(r0)) / Math.cosh(ZOOM_RHO * s + r0)) * 0.5,
             };
         };
     };

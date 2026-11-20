@@ -1,4 +1,5 @@
 import { DismisserUtils } from "../Dismisser/Dismisser.utils";
+import { InteractionTrackerUtils } from "../InteractionTracker/InteractionTracker.utils";
 import type {
     ResolvedShortcut,
     Shortcut,
@@ -39,7 +40,7 @@ const bindings: ShortcutBindingDefs[] = [];
 const warned = new Set<string>();
 
 const warnOnce = (message: string) => {
-    if (warned.has(message)) return;
+    if (process.env.NODE_ENV === "production" || warned.has(message)) return;
 
     warned.add(message);
     console.warn(message);
@@ -92,10 +93,16 @@ const computeIsShortcutMatch = (shortcut: Shortcut, e: ShortcutKeyEvent, isApple
     if (!getIsKeyMatch(resolved.key, e)) return false;
 
     const isShiftFree = !resolved.modifiers.includes("shift") && getIsCaselessCharacter(resolved.key);
+    const isTypedWithAltGraph =
+        InteractionTrackerUtils.getIsAltGraph(e) &&
+        e.key === resolved.key &&
+        !resolved.modifiers.includes("ctrl") &&
+        !resolved.modifiers.includes("alt");
 
     return MODIFIER_ORDER.every(
         (modifier) =>
             (modifier === "shift" && isShiftFree) ||
+            ((modifier === "ctrl" || modifier === "alt") && isTypedWithAltGraph) ||
             resolved.modifiers.includes(modifier) === getIsModifierHeld(e, modifier),
     );
 };
@@ -118,7 +125,7 @@ const getIsEditableElement = (target: EventTarget | null) => {
 };
 
 const handleKeyDown = (e: KeyboardEvent) => {
-    if (e.defaultPrevented || e.isComposing) return;
+    if (e.defaultPrevented || InteractionTrackerUtils.getIsComposing(e)) return;
 
     const layer = DismisserUtils.getTopLayer();
     const isApple = readIsApplePlatform();
@@ -228,14 +235,16 @@ export namespace ShortcutUtils {
      * It fires only while its layer is {@link DismisserUtils.getTopLayer}'s answer, and never on a key press something
      * else already handled with `preventDefault()` or one still composing text. Once it fires, the key press is
      * prevented, so the browser's own shortcut on the same keys does not run as well. A character key shortcut stays
-     * quiet while focus is in an editable field.
+     * quiet while focus is in an editable field; any other key does not, so a shortcut on Enter, Delete, Backspace, Home
+     * or an arrow, or one taking a key an editor uses with a modifier (`mod+a`, Shift with an arrow), fires and is
+     * prevented in every text field too, and takes that key away from editing there.
      *
      * Warns once in the console, for a character key shortcut, since
      * {@link https://www.w3.org/WAI/WCAG22/Understanding/character-key-shortcuts.html WCAG 2.1.4} asks that it can be
      * turned off or remapped, and for a shortcut already registered on the same layer, where only the later one fires.
      *
-     * @param defs The shortcut, what it does, and the layer it belongs to: {@link DismisserUtils.getTopLayer} read
-     * when its owner appeared, or `undefined` for the page itself.
+     * @param defs The shortcut, what it does, and the layer it belongs to: a layer's own defs for a shortcut that
+     * answers only while that layer is on top, or `undefined` for the page itself.
      * @returns The function that removes the binding. Calling it twice is harmless.
      */
     export const addBinding = (defs: ShortcutBindingDefs) => {

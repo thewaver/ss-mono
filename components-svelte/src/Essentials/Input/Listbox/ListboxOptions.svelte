@@ -173,14 +173,14 @@
     );
 
     const attachHoverWatch = (element: HTMLElement) => {
-        const stopOver = on(element, "pointerover", (e) => {
+        const stopMove = on(element, "pointermove", (e) => {
             isPointerLed = true;
             hoveredIndex = findOptionIndex(e.target);
         });
         const stopLeave = on(element, "pointerleave", handleOptionsPointerLeave);
 
         return () => {
-            stopOver();
+            stopMove();
             stopLeave();
         };
     };

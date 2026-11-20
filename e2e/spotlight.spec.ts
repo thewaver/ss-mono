@@ -1,6 +1,16 @@
 import { type Locator, type Page, expect, test } from "@playwright/test";
 
-import { activeMatches, docsDemo, docsSettled, scrollTop, waitUntilStill } from "./helpers";
+import {
+    activeMatches,
+    docsDemo,
+    docsSettled,
+    expectAnnounced,
+    readAnnouncements,
+    recordAnnouncements,
+    scrollTop,
+    tabKey,
+    waitUntilStill,
+} from "./helpers";
 
 const GUIDE_DOCS = "/src/App/Pages/Spotlights/SpotlightGuidePage/Docs";
 const HINT_DOCS = "/src/App/Pages/Spotlights/SpotlightHintPage/Docs";
@@ -12,6 +22,7 @@ const GUIDE = docsDemo(GUIDE_DOCS, "Basic");
 const TOUR = docsDemo(GUIDE_DOCS, "Tour");
 
 const SETTLE_MS = 300;
+const SAMPLE_GAP_MS = 50;
 
 /**
  * The overlay is portaled and every part of it is styled through a hashed class, so these key on what the
@@ -25,7 +36,6 @@ const BLOCKER = 'div[style*="polygon(evenodd"]';
 const CORNERS = "svg polygon";
 const POPUP = '[role="dialog"]';
 const TOOLTIP = '[role="tooltip"]';
-const ANNOUNCER = '[role="log"][aria-live="polite"]';
 
 /** Every layer the spotlight paints sits here, so a tooltip that is to stay readable has to beat it. */
 const SPOTLIGHT_Z_INDEX = 10;
@@ -66,6 +76,7 @@ const stopSliding = (page: Page) =>
 
 /** Each preset has a Docs page of its own, so each test opens the one it is about. */
 const open = async (page: Page, route: string, scope: string) => {
+    await recordAnnouncements(page);
     await page.goto(route);
     await expect(page.locator(scope)).toBeVisible();
     await docsSettled(page);
@@ -156,7 +167,7 @@ test("a prompt refuses every other control until the highlighted one is used", a
         .catch(() => undefined);
     expect(await readoutOf(page, PROMPT), "the trigger behind the overlay is unreachable").toBe(atRest);
 
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
     expect(await activeMatches(page, "#promptBuy"), "and focus is pulled back to the one live control").toBe(true);
 
     await page.locator("#promptBuy").click();
@@ -198,15 +209,13 @@ test("a guide seals the page and puts focus in its own popup", async ({ page }) 
 
     await page.locator("#guideStart").click();
     await expect(page.locator(POPUP)).toBeVisible();
-    await page.waitForTimeout(SETTLE_MS);
 
     await expect(page.locator(POPUP), "the popup names itself as a modal dialog").toHaveAttribute("aria-modal", "true");
-    expect(await isFocusInsidePopup(page), "and focus lands inside it").toBe(true);
+    await expect.poll(() => isFocusInsidePopup(page), "and focus lands inside it").toBe(true);
 
-    expect(
-        await inertCount(page),
-        "everything beside the portal is inert, so the page is out of reach entirely",
-    ).toBeGreaterThan(alreadyInert);
+    await expect
+        .poll(() => inertCount(page), "everything beside the portal is inert, so the page is out of reach entirely")
+        .toBeGreaterThan(alreadyInert);
 });
 
 test("a guide steps between elements and hands the page back when it finishes", async ({ page }) => {
@@ -277,16 +286,14 @@ test("a step change is announced, and opening the tour is not announced twice", 
     await page.locator("#guideStart").click();
     await expect(page.locator(POPUP)).toBeVisible();
 
-    await expect(
-        page.locator(ANNOUNCER),
+    expect(
+        (await readAnnouncements(page)).some((text) => text.includes("Step 1 of")),
         "the popup took focus, so the reader is already on the first step",
-    ).not.toContainText("Step 1 of");
+    ).toBe(false);
 
     await page.locator("#guideNext").click();
 
-    await expect(page.locator(ANNOUNCER), "and the step that replaces it under held focus is spoken").toContainText(
-        "Step 2 of",
-    );
+    await expectAnnounced(page, "Step 2 of", { message: "and the step that replaces it under held focus is spoken" });
 });
 
 /**
@@ -306,16 +313,24 @@ test("a guide scrolls a step that is out of sight into view", async ({ page }) =
 
     await page.locator("#guideStart").click();
     await expect(page.locator(POPUP)).toBeVisible();
-    await page.waitForTimeout(SETTLE_MS);
+
+    await expect
+        .poll(async () => {
+            const before = await scrollTop(strip);
+
+            await page.waitForTimeout(SAMPLE_GAP_MS);
+
+            return (await scrollTop(strip)) === before;
+        }, "the strip has stopped moving at the first step")
+        .toBe(true);
 
     const atFirstStep = await scrollTop(strip);
 
     await page.locator("#guideNext").click();
-    await page.waitForTimeout(SETTLE_MS);
 
-    expect(await scrollTop(strip), "the second is reached rather than highlighted off-screen").toBeGreaterThan(
-        atFirstStep,
-    );
+    await expect
+        .poll(() => scrollTop(strip), "the second is reached rather than highlighted off-screen")
+        .toBeGreaterThan(atFirstStep);
 });
 
 /**
@@ -445,7 +460,7 @@ test.describe("a tour with a step the reader does", () => {
 
         await expect(page.locator("[inert]"), "the covered guide has let go of the page").toHaveCount(alreadyInert);
 
-        await page.keyboard.press("Tab");
+        await page.keyboard.press(tabKey(page));
         expect(await isActive(addButton(page)), "the prompt on top pulls focus to the one control it lights").toBe(
             true,
         );

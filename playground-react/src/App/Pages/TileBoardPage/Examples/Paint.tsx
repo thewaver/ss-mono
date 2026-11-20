@@ -7,15 +7,22 @@ import type { TileBoardExampleProps } from "../TileBoardPage.types";
 
 type Props = TileBoardExampleProps;
 
-export const PaintExample = ({ shape, marked, ...otherProps }: Props) => (
-    <div className={styles.meepleHost}>
-        <TileBoard
-            {...otherProps}
-            tiling={shape}
-            computeTileAriaLabel={(tile) => `Row ${tile.row + 1}, tile ${tile.col + 1}`}
-            renderTile={(tile, renderProps) => (
-                <PageTileBoardTile renderProps={renderProps} isMarked={marked.includes(Index2d.toString(tile))} />
-            )}
-        />
-    </div>
-);
+export const PaintExample = (props: Props) => {
+    const { shape, marked, ...otherProps } = props;
+
+    return (
+        <div className={styles.meepleHost}>
+            <TileBoard
+                {...otherProps}
+                tiling={props.shape}
+                computeTileAriaLabel={(tile) => `Row ${tile.row + 1}, tile ${tile.col + 1}`}
+                renderTile={(tile, renderProps) => (
+                    <PageTileBoardTile
+                        renderProps={renderProps}
+                        isMarked={props.marked.includes(Index2d.toString(tile))}
+                    />
+                )}
+            />
+        </div>
+    );
+};

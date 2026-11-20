@@ -64,8 +64,7 @@ const monthNameCache = new Map<string, string[]>();
 /** The calendar implementation behind an identifier. */
 const getCalendarOf = (id: DateValueCalendarId) => createCalendar(id);
 
-/** A `Date` at noon on the given day, safe to hand to `Intl.DateTimeFormat`. */
-const toIntlDate = (value: DateValue) => new Date(value.toDate(getLocalTimeZone()).getTime() + MIDDAY_MS);
+const toNoonDate = (value: DateValue) => new Date(value.toDate(getLocalTimeZone()).getTime() + MIDDAY_MS);
 
 /** Builds a Gregorian date from a year that may be zero or negative, mapping those onto the BC era. */
 const fromAstronomicalYear = (year: number, month: number, day: number) =>
@@ -90,6 +89,15 @@ const getEraSample = (id: DateValueCalendarId, era: string) => getEraStart(id, e
  * has, what the eras are called. All formatting goes through `Intl` in the local time zone.
  */
 export namespace DateValueUtils {
+    /**
+     * A `Date` at noon on the given day, in the local time zone, safe to hand to `Intl.DateTimeFormat`.
+     *
+     * Noon, because a midnight anchor can land on the hour a zone skips or repeats and print the day before.
+     *
+     * @param value The day.
+     */
+    export const toIntlDate = toNoonDate;
+
     /**
      * Every calendar this supports.
      *
@@ -176,7 +184,7 @@ export namespace DateValueUtils {
                 .find((part) => part.type === "era")?.value;
 
         const eras = ids.map((eraId) => {
-            const at = toIntlDate(getEraSample(id, eraId));
+            const at = toNoonDate(getEraSample(id, eraId));
 
             return {
                 id: eraId,
@@ -221,6 +229,14 @@ export namespace DateValueUtils {
      */
     export const getYearsInEra = (value: DateValue) => value.calendar.getYearsInEra?.(value) ?? Infinity;
 
+    /**
+     * The most months any year of the date's calendar has: thirteen in the Hebrew calendar, whose leap years add one.
+     *
+     * @returns The calendar's own answer, or the date's own year's count for a calendar that gives none.
+     */
+    export const getMaxMonthsInYear = (value: DateValue) =>
+        value.calendar.getMaximumMonthsInYear?.() ?? getMonthsInYear(value);
+
     /** How many days the date's month has. */
     export const getDaysInMonth = (value: DateValue) => value.calendar.getDaysInMonth(value);
 
@@ -243,6 +259,18 @@ export namespace DateValueUtils {
      * @param months How far to move. Negative goes backwards.
      */
     export const addMonths = (value: DateValue, months: number) => value.add({ months }) as DateValue;
+
+    /**
+     * The first day of the first month of the date's year, reached by counting months back.
+     *
+     * In a calendar whose eras change part-way through a year, such as the Japanese one, the year's first months
+     * belong to the era before: the first month of Reiwa 1 is January 2019, which is Heisei 31. Asking the date for
+     * its month 1 instead lands on the first month the era has.
+     *
+     * @param value Any date in the year.
+     * @returns The first of the year's first month, in whatever era that falls.
+     */
+    export const getStartOfYear = (value: DateValue) => addMonths(getStartOfMonth(value), 1 - value.month);
 
     /**
      * Shifts a date by a number of years, clamping the day to the month it lands in.
@@ -304,7 +332,7 @@ export namespace DateValueUtils {
      * @returns `0` for the first column of the week through to `6` for the last.
      */
     export const getWeekdayOffset = (value: DateValue, weekStartsOn: DateValueWeekStart) =>
-        (toIntlDate(value).getDay() - weekStartsOn + DAYS_PER_WEEK) % DAYS_PER_WEEK;
+        (toNoonDate(value).getDay() - weekStartsOn + DAYS_PER_WEEK) % DAYS_PER_WEEK;
 
     /**
      * The first day of the week a date falls in.
@@ -337,7 +365,7 @@ export namespace DateValueUtils {
         minDaysInFirstWeek: DateValueMinDaysInFirstWeek,
     ) => {
         const getFirstWeekStart = (yearDay: DateValue) =>
-            getStartOfWeek(yearDay.set({ month: 1, day: minDaysInFirstWeek }) as DateValue, weekStartsOn);
+            getStartOfWeek(getStartOfYear(yearDay).set({ day: minDaysInFirstWeek }) as DateValue, weekStartsOn);
 
         const weekStart = getStartOfWeek(value, weekStartsOn);
         const nextYear = getFirstWeekStart(addYears(value, 1));
@@ -346,7 +374,7 @@ export namespace DateValueUtils {
 
         const yearStart =
             compare(weekStart, nextYear) >= 0 ? nextYear : compare(weekStart, ownYear) >= 0 ? ownYear : lastYear;
-        const days = Math.round((toIntlDate(weekStart).getTime() - toIntlDate(yearStart).getTime()) / DAY_MS);
+        const days = Math.round((toNoonDate(weekStart).getTime() - toNoonDate(yearStart).getTime()) / DAY_MS);
 
         return Math.round(days / DAYS_PER_WEEK) + 1;
     };
@@ -492,9 +520,9 @@ export namespace DateValueUtils {
             calendar: id,
             timeZone: getLocalTimeZone(),
         });
-        const anchor = getStartOfMonth(value);
+        const anchor = getStartOfYear(value);
         const names = Array.from({ length: getMonthsInYear(value) }, (_, month) =>
-            formatter.format(toIntlDate(anchor.set({ month: month + 1, day: 1 }))),
+            formatter.format(toNoonDate(addMonths(anchor, month))),
         );
 
         monthNameCache.set(key, names);
@@ -563,6 +591,6 @@ export namespace DateValueUtils {
             timeZone: getLocalTimeZone(),
         });
 
-        return (date: DateValue) => formatter.format(toIntlDate(date));
+        return (date: DateValue) => formatter.format(toNoonDate(date));
     };
 }

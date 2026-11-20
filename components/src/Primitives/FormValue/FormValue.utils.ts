@@ -1,5 +1,8 @@
 /** Turns the values a control holds into the text a native form submit carries. */
 export namespace FormValueUtils {
+    /** The entry a control holding no value submits, as an empty native field does. */
+    export const EMPTY_TEXT = "";
+
     /**
      * Writes one value as the text a form submits for it.
      *

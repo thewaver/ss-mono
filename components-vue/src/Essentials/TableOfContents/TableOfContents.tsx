@@ -1,6 +1,8 @@
 import { type SlotsType, computed, defineComponent, shallowRef, watch } from "vue";
 
 import {
+    InteractionTrackerUtils,
+    SafeHrefUtils,
     TABLE_OF_CONTENTS_DEFAULTS,
     type TableOfContentsFlags,
     type TableOfContentsLink,
@@ -26,10 +28,13 @@ import type { TableOfContentsItemProps, TableOfContentsProps, TableOfContentsSlo
 const TableOfContentsItem = defineComponent(
     <T,>(props: TableOfContentsItemProps<T>, { slots }: SlotsContext<InteractionControlSlots<TableOfContentsFlags>>) =>
         () => {
+            const safeHref = SafeHrefUtils.resolve(props.link.href, "TableOfContents");
+
             const handleClick = (e: MouseEvent) => {
                 const target = props.link.target;
 
                 if (!target) return;
+                if (safeHref !== undefined && !InteractionTrackerUtils.getIsPlainClick(e)) return;
 
                 e.preventDefault();
 
@@ -45,7 +50,7 @@ const TableOfContentsItem = defineComponent(
 
             const content = callSlot(slots.renderContent, props.flags);
 
-            if (props.link.href === undefined) {
+            if (safeHref === undefined) {
                 return (
                     <button type="button" {...commonProps} onClick={handleClick}>
                         {content}
@@ -54,7 +59,7 @@ const TableOfContentsItem = defineComponent(
             }
 
             return (
-                <a href={props.link.href} {...commonProps} onClick={handleClick}>
+                <a href={safeHref} {...commonProps} onClick={handleClick}>
                     {content}
                 </a>
             );

@@ -1,6 +1,6 @@
 import type { CSSLogicalPadding } from "@thewaver/ss-utils";
 
-import type { TextSyncMaskResult } from "../../Abstracts/TextSync/TextSync.types";
+import type { TextSyncMaskFn } from "../../Abstracts/TextSync/TextSync.types";
 
 export type TextFieldElementType = "input" | "textarea";
 
@@ -77,9 +77,10 @@ export type BaseTextFieldValues = BaseTextFieldFieldValues & BaseTextFieldLayout
 export type BaseTextFieldCbs = {
     /**
      * Rewrites what the reader typed before it is accepted, and says where the caret should end up — which is how a
-     * field formats as you type without the caret jumping.
+     * field formats as you type without the caret jumping. `isForwardDeletion` says whether the edit deleted forwards,
+     * as Delete does, so a deleted separator can take the digit on the right side of it.
      */
-    computeMaskedText?: (previous: string, next: string, caret: number) => TextSyncMaskResult;
+    computeMaskedText?: TextSyncMaskFn;
     /**
      * Reads the field's text as the number a spin button announces holding, for text not written the way `Number`
      * reads it — a decimal comma, or grouped thousands. Answer `undefined` for text that is not a number yet. Left

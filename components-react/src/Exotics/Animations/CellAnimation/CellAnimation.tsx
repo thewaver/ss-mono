@@ -17,7 +17,7 @@ import { InteractionTrackerReactUtils } from "../../../Abstracts/InteractionTrac
 import { SignalMirrorReactUtils } from "../../../Abstracts/SignalMirror/SignalMirrorReact.utils";
 import { SliceRendererReactUtils } from "../../../Abstracts/SliceRenderer/SliceRendererReact.utils";
 import { useViewportContext } from "../../../Abstracts/Viewport/Viewport.context";
-import { useLatest } from "../../../Utils/refUtils";
+import { useLatest, useStableValue } from "../../../Utils/refUtils";
 import type { CellAnimationProps } from "./CellAnimation.types";
 
 const NO_RECT: Rect = { x: 0, y: 0, width: 0, height: 0 };
@@ -76,24 +76,24 @@ export const CellAnimation = (props: CellAnimationProps) => {
 
     const cellCount = CellAnimationUtils.computeCellCount(props.cellCount, rootSize);
 
-    const weights = useMemo(
-        () => props.computeSliceWeights?.(cellCount) ?? CellAnimationConst.NO_WEIGHTS,
-        [props.computeSliceWeights, cellCount.col, cellCount.row],
+    const weights = useStableValue(
+        props.computeSliceWeights?.(cellCount) ?? CellAnimationConst.NO_WEIGHTS,
+        SliceAnimationUtils.getIsSameWeights,
     );
 
     const columnEdges = useMemo(
-        () => CellAnimationUtils.computeEdges(rootSize.width, cellCount.col),
-        [rootSize.width, cellCount.col],
+        () => CellAnimationUtils.computeEdges(rootSize.width, cellCount.colCount),
+        [rootSize.width, cellCount.colCount],
     );
 
     const rowEdges = useMemo(
-        () => CellAnimationUtils.computeEdges(rootSize.height, cellCount.row),
-        [rootSize.height, cellCount.row],
+        () => CellAnimationUtils.computeEdges(rootSize.height, cellCount.rowCount),
+        [rootSize.height, cellCount.rowCount],
     );
 
     const cellDefs = useMemo(
         () => CellAnimationUtils.computeCellDefs(cellCount, weights),
-        [cellCount.col, cellCount.row, weights],
+        [cellCount.colCount, cellCount.rowCount, weights],
     );
 
     const evaluationDefs = useMemo(
@@ -112,9 +112,9 @@ export const CellAnimation = (props: CellAnimationProps) => {
 
     const picture = SliceRendererReactUtils.usePicture(props.src, isElementsOnly);
 
-    const tables = useMemo(
-        () => (isElementsOnly ? undefined : SliceAnimationUtils.resolveTables(props.computeSliceAnimation, slices)),
-        [isElementsOnly, props.computeSliceAnimation, slices],
+    const tables = useStableValue(
+        isElementsOnly ? undefined : SliceAnimationUtils.resolveTables(props.computeSliceAnimation, slices),
+        SliceAnimationUtils.getIsSameTables,
     );
 
     const isOnGraphicsCard = isAvailable && SliceRendererUtils.getCanDraw(renderer, picture) && !!tables;
@@ -318,6 +318,7 @@ export const CellAnimation = (props: CellAnimationProps) => {
                 width={sizeAnchor === "width" ? "100%" : "auto"}
                 height={sizeAnchor === "height" ? "100%" : "auto"}
                 aria-hidden="true"
+                alt=""
             />
 
             {isOnGraphicsCard ? (

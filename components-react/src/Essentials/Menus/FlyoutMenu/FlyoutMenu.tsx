@@ -29,6 +29,7 @@ import {
     type InteractionFlags,
     InteractionTrackerUtils,
     OverflowUtils,
+    SafeHrefUtils,
 } from "@thewaver/ss-components";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
@@ -134,7 +135,7 @@ export const FlyoutMenu = <T,>(props: FlyoutMenuProps<T>) => {
         props.floaterTransitionDurationMs ?? FLYOUT_MENU_DEFAULTS.floaterTransitionDurationMs;
 
     const listSize = ElementObserverReactUtils.useBorderBoxSize(listRef);
-    const entrySizes = ElementObserverReactUtils.useBorderBoxSizes(entryElements);
+    const entrySizes = ElementObserverReactUtils.useBorderBoxSizes(entryElements.slice(0, entries.length));
     const overflowSize = ElementObserverReactUtils.useBorderBoxSize(overflowRef);
     const linksSize = ElementObserverReactUtils.useBorderBoxSize(linksRef);
 
@@ -347,22 +348,27 @@ export const FlyoutMenu = <T,>(props: FlyoutMenuProps<T>) => {
 
     const Link = props.linkComponent ?? "a";
 
-    const renderLink = (link: FlyoutMenuLinkRecord<T>) => (
-        <InteractionWrapper<FlyoutMenuLinkFlags>
-            extraFlags={{ isCurrent: link.isCurrent ?? false }}
-            renderControl={(setElementRef, flags) => (
-                <Link
-                    ref={setElementRef}
-                    href={link.href}
-                    className={FlyoutMenuStyles.flyoutMenuLink}
-                    aria-current={link.isCurrent ? "page" : undefined}
-                    onClick={close}
-                >
-                    {props.renderLink(link, flags)}
-                </Link>
-            )}
-        />
-    );
+    const renderLink = (link: FlyoutMenuLinkRecord<T>) => {
+        const href = SafeHrefUtils.resolve(link.href, "FlyoutMenu");
+        const LinkElement = href === undefined ? "a" : Link;
+
+        return (
+            <InteractionWrapper<FlyoutMenuLinkFlags>
+                extraFlags={{ isCurrent: link.isCurrent ?? false }}
+                renderControl={(setElementRef, flags) => (
+                    <LinkElement
+                        ref={setElementRef}
+                        href={href as string}
+                        className={FlyoutMenuStyles.flyoutMenuLink}
+                        aria-current={link.isCurrent ? "page" : undefined}
+                        onClick={close}
+                    >
+                        {props.renderLink(link, flags)}
+                    </LinkElement>
+                )}
+            />
+        );
+    };
 
     const renderToggle = (defs: ToggleDefs) => (
         <InteractionWrapper<FlyoutMenuToggleFlags>

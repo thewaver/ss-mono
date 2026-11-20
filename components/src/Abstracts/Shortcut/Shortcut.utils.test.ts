@@ -228,3 +228,22 @@ describe("addBinding", () => {
         expect(listened.removed, "it goes with the last, and removing twice is harmless").toBe(1);
     });
 });
+
+describe("ShortcutUtils.computeIsMatch with AltGr", () => {
+    const altGraph = (key: string, code: string) =>
+        press(key, { code, ctrlKey: true, altKey: true, getModifierState: (name) => name === "AltGraph" });
+
+    it("takes a character typed with AltGr as the character, not as Control and Alt", () => {
+        expect(ShortcutUtils.computeIsMatch({ key: "@" }, altGraph("@", "KeyQ"), false)).toBe(true);
+    });
+
+    it("still refuses a key AltGr changed into another character, so Option on a Mac fires no letter's shortcut", () => {
+        expect(ShortcutUtils.computeIsMatch({ key: "l" }, altGraph("¬", "KeyL"), true)).toBe(false);
+    });
+
+    it("leaves a shortcut that names Control or Alt to ask for them as before", () => {
+        expect(ShortcutUtils.computeIsMatch({ key: "@", modifiers: ["ctrl"] }, altGraph("@", "KeyQ"), false)).toBe(
+            false,
+        );
+    });
+});

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import {
     DATE_INPUT_DEFAULTS,
@@ -25,6 +25,9 @@ import { PopupTrigger } from "../../../Primitives/PopupTrigger/PopupTrigger";
 import { Tooltip } from "../../Overlays/Tooltip/Tooltip";
 import type { TooltipProps } from "../../Overlays/Tooltip/Tooltip.types";
 import { DateInput } from "../DateInput/DateInput";
+import { FormFieldContextProvider, useFormFieldContext } from "../FormField/FormField.context";
+import { FormFieldReactUtils } from "../FormField/FormFieldReact.utils";
+import { LabelContextProvider, useLabelContext } from "../Label/Label.context";
 import { RangeCalendar } from "../RangeCalendar/RangeCalendar";
 import type { DateRangePickerProps } from "./DateRangePicker.types";
 
@@ -90,7 +93,21 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
 
     const pairFlags = TextFieldUtils.mergeFlags([startFlags, endFlags].flatMap((flags) => (flags ? [flags] : [])));
 
-    const isReachable = InteractionTrackerUtils.computeIsReachable(isDisabled, props.isReachableWhenDisabled ?? false);
+    const isReachable = InteractionTrackerUtils.computeIsReachable(
+        isDisabled,
+        props.isReachableWhenDisabled ?? false,
+        false,
+        tooltipDefs !== undefined,
+    );
+
+    useEffect(
+        () =>
+            InteractionTrackerUtils.warnIfReachableWithoutTooltip(
+                props.isReachableWhenDisabled ?? false,
+                tooltipDefs !== undefined,
+            ),
+        [props.isReachableWhenDisabled, tooltipDefs !== undefined],
+    );
     const shownTooltipDefs = tooltipDefs && (!isDisabled || isReachable) ? tooltipDefs : undefined;
 
     const tooltipProps: Omit<TooltipProps, "anchorRef"> | undefined = shownTooltipDefs && {
@@ -163,71 +180,88 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
         />
     );
 
+    const groupLabelledBy = FormFieldReactUtils.useAriaLabelledBy();
+    const outerFieldContext = useFormFieldContext();
+    const outerLabelContext = useLabelContext();
+    const fieldContext = useMemo(() => ({ ...outerFieldContext, getCaptionId: () => undefined }), [outerFieldContext]);
+    const labelContext = useMemo(() => ({ ...outerLabelContext, getIsLabeled: () => false }), [outerLabelContext]);
+
     return (
-        <div ref={setRootRef} className={DateRangePickerStyles.dateRangePickerRoot}>
-            <DateInput
-                {...fieldProps}
-                value={startState}
-                id={props.id && `${props.id}-start`}
-                name={props.name && `${props.name}-start`}
-                ariaLabel={props.startLabel}
-                renderContent={(flags) => (
-                    <>
-                        {props.renderContent(flags)}
-                        <FlagsReport flags={flags} onChange={reportStartFlags} />
-                    </>
-                )}
-            />
+        <div
+            ref={setRootRef}
+            className={DateRangePickerStyles.dateRangePickerRoot}
+            role="group"
+            aria-labelledby={groupLabelledBy}
+        >
+            <FormFieldContextProvider value={fieldContext}>
+                <LabelContextProvider value={labelContext}>
+                    <DateInput
+                        {...fieldProps}
+                        isFocusableWhenDisabled={isReachable}
+                        value={startState}
+                        id={props.id && `${props.id}-start`}
+                        name={props.name && `${props.name}-start`}
+                        ariaLabel={props.startLabel}
+                        renderContent={(flags) => (
+                            <>
+                                {props.renderContent(flags)}
+                                <FlagsReport flags={flags} onChange={reportStartFlags} />
+                            </>
+                        )}
+                    />
 
-            {props.renderSeparator?.()}
+                    {props.renderSeparator?.()}
 
-            <DateInput
-                {...fieldProps}
-                value={endState}
-                id={endFieldId}
-                name={props.name && `${props.name}-end`}
-                ariaLabel={props.endLabel}
-                renderContent={(flags) => (
-                    <>
-                        {props.renderContent(flags)}
-                        <FlagsReport flags={flags} onChange={reportEndFlags} />
-                    </>
-                )}
-                renderTrailing={() => (
-                    <InteractionWrapper<PopupTriggerFlags>
-                        isDisabled={isLocked}
-                        extraFlags={{ isOpen }}
-                        renderControl={(setElementRef, flags) => (
-                            <PopupTrigger
-                                ref={setElementRef}
-                                id={props.triggerId}
-                                popupId={popupId}
-                                isOpen={isOpen}
-                                ariaLabel={props.triggerAriaLabel}
-                                flags={flags}
-                                renderContent={props.renderTrigger}
-                                onToggle={() => (isOpen ? dismiss() : open())}
+                    <DateInput
+                        {...fieldProps}
+                        isFocusableWhenDisabled={isReachable}
+                        value={endState}
+                        id={endFieldId}
+                        name={props.name && `${props.name}-end`}
+                        ariaLabel={props.endLabel}
+                        renderContent={(flags) => (
+                            <>
+                                {props.renderContent(flags)}
+                                <FlagsReport flags={flags} onChange={reportEndFlags} />
+                            </>
+                        )}
+                        renderTrailing={() => (
+                            <InteractionWrapper<PopupTriggerFlags>
+                                isDisabled={isLocked}
+                                extraFlags={{ isOpen }}
+                                renderControl={(setElementRef, flags) => (
+                                    <PopupTrigger
+                                        ref={setElementRef}
+                                        id={props.triggerId}
+                                        popupId={popupId}
+                                        isOpen={isOpen}
+                                        ariaLabel={props.triggerAriaLabel}
+                                        flags={flags}
+                                        renderContent={props.renderTrigger}
+                                        onToggle={() => (isOpen ? dismiss() : open())}
+                                    />
+                                )}
                             />
                         )}
                     />
-                )}
-            />
 
-            <Popover
-                id={popupId}
-                role={"dialog"}
-                ariaAttributes={{ "aria-label": props.calendarLabel }}
-                isOpen={isOpen}
-                anchorRef={root}
-                placement={props.placement ?? DATE_RANGE_PICKER_DEFAULTS.placement[direction]}
-                offset={props.offset}
-                transitionDurationMs={props.popupTransitionDurationMs}
-                hasAutoFocus={true}
-                onDismiss={(reason) => (reason === "escape" ? dismiss() : setIsOpen(false))}
-                renderContent={(visibilityTarget, transitionDurationMs) =>
-                    props.renderPopup(renderCalendar, monthState, visibilityTarget, transitionDurationMs)
-                }
-            />
+                    <Popover
+                        id={popupId}
+                        role={"dialog"}
+                        ariaAttributes={{ "aria-label": props.calendarLabel }}
+                        isOpen={isOpen}
+                        anchorRef={root}
+                        placement={props.placement ?? DATE_RANGE_PICKER_DEFAULTS.placement[direction]}
+                        offset={props.offset}
+                        transitionDurationMs={props.popupTransitionDurationMs}
+                        hasAutoFocus={true}
+                        onDismiss={(reason) => (reason === "escape" ? dismiss() : setIsOpen(false))}
+                        renderContent={(visibilityTarget, transitionDurationMs) =>
+                            props.renderPopup(renderCalendar, monthState, visibilityTarget, transitionDurationMs)
+                        }
+                    />
+                </LabelContextProvider>
+            </FormFieldContextProvider>
 
             {shownTooltipProps && <Tooltip {...shownTooltipProps} anchorRef={tooltipProps ? root : undefined} />}
         </div>

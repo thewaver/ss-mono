@@ -38,5 +38,7 @@
         untrack(() => switcher.setSource(src, props.shouldAutoPlayOnMount ?? false));
     });
 
-    $effect(() => untrack(() => props.onMount?.(switcher.controller)));
+    $effect(() => {
+        untrack(() => props.onMount?.(switcher.controller));
+    });
 </script>

@@ -212,7 +212,20 @@ test("the box takes a click and the caret lands in the field", async ({ page }) 
     await expect(page.locator(field(BASIC)), "and the keystrokes reach it").toHaveValue("typed");
 });
 
-test("a disabled tag input refuses the keyboard as well as the pointer", async ({ page }) => {
+/**
+ * Playwright's WebKit still goes back in history on a Backspace nobody claimed, which Safari itself stopped doing; a
+ * disabled tag rightly leaves the key alone, so there the page would leave. Once the page has seen the key, the
+ * history step is refused, as Safari would refuse it.
+ */
+test("a disabled tag input refuses the keyboard as well as the pointer", async ({ page, browserName }) => {
+    if (browserName === "webkit") {
+        await page.evaluate(() =>
+            window.addEventListener("keydown", (e) => {
+                if (e.key === "Backspace") e.preventDefault();
+            }),
+        );
+    }
+
     await page.locator(`${prop("isDisabled")} input`).click();
 
     const before = await tagWords(page, BASIC);

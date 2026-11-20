@@ -61,7 +61,9 @@ export const ToolbarComposite = defineComponent(
         const layout = computed(() => props.computeLayout?.({ itemCount: actionCount.value }));
 
         const rootSize = ElementObserverVueUtils.useBorderBoxSize(rootRef);
-        const itemSizes = ElementObserverVueUtils.useBorderBoxSizes(itemElements);
+        const itemSizes = ElementObserverVueUtils.useBorderBoxSizes(() =>
+            itemElements.value.slice(0, actionCount.value),
+        );
         const overflowSize = ElementObserverVueUtils.useBorderBoxSize(overflowRef);
 
         const direction = NavigatorVueUtils.useDirection(rootRef);

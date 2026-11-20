@@ -32,6 +32,6 @@
 
 <div class={styles.root}>
     <Surface {...getConfig(strokeId)}>
-        <img src={knight_profile} width="100%" />
+        <img src={knight_profile} width="100%" alt="Sir Face" />
     </Surface>
 </div>

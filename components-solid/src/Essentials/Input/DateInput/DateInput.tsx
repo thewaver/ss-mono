@@ -6,6 +6,7 @@ import {
     DateInputUtils,
     type DateValue,
     DateValueUtils,
+    FormValueUtils,
     TextSyncUtils,
 } from "@thewaver/ss-components";
 
@@ -14,8 +15,6 @@ import { FormValue } from "../../../Primitives/FormValue/FormValue";
 import { TextField } from "../../../Primitives/TextField/TextField";
 import { access, accessSignal } from "../../../Utils/propUtils";
 import type { DateInputProps } from "./DateInputSolid.types";
-
-const EMPTY_FORM_VALUE = "";
 
 export const DateInput = (props: DateInputProps) => {
     const valueSignal = accessSignal(() => props.value);
@@ -100,10 +99,14 @@ export const DateInput = (props: DateInputProps) => {
                 value={field.text}
                 element={"input"}
                 inputMode={"numeric"}
-                computeMaskedText={(previous, next, caret) => TextSyncUtils.applyMask(getMask(), previous, next, caret)}
+                computeMaskedText={(previous, next, caret, isForwardDeletion) =>
+                    TextSyncUtils.applyMask(getMask(), previous, next, caret, isForwardDeletion)
+                }
                 placeholderHint={() => DateInputUtils.computeHint(getFormat(), access(props.partHints))}
                 hasError={() => (access(props.hasError) ?? false) || field.getHasIssue()}
-                renderLeading={props.renderLeading && ((getFlags) => props.renderLeading!(getFlags, era))}
+                renderLeading={
+                    props.renderLeading === undefined ? undefined : (getFlags) => props.renderLeading!(getFlags, era)
+                }
                 onInput={field.onInput}
                 onBlur={field.onBlur}
             />
@@ -113,7 +116,7 @@ export const DateInput = (props: DateInputProps) => {
                 values={() => {
                     const value = valueSignal[0]();
 
-                    return [value ? DateValueUtils.toIso(value) : EMPTY_FORM_VALUE];
+                    return [value ? DateValueUtils.toIso(value) : FormValueUtils.EMPTY_TEXT];
                 }}
             />
         </>

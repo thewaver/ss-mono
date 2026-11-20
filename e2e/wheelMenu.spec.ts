@@ -1,6 +1,6 @@
 import { type Locator, type Page, expect, test } from "@playwright/test";
 
-import { activeDescendantText, activeMatches, docsDemo, docsSettled, prop } from "./helpers";
+import { activeDescendantText, activeMatches, docsDemo, docsSettled, prop, tabKey } from "./helpers";
 
 const DOCS = "/src/App/Pages/Menus/WheelMenuPage/Docs";
 
@@ -20,7 +20,7 @@ const setBandsSpread = async (page: Page, degrees: string) => {
     await page.locator(`${prop("bandsSpreadDegrees")} input`).click();
     await page.keyboard.press("ControlOrMeta+a");
     await page.keyboard.type(degrees);
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
 };
 
 /** The same open-and-focus race the ordinary menu spec waits on: a level is ready once it holds focus. */

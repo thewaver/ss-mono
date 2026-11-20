@@ -87,6 +87,19 @@ const ACTIVATION_KEYS = ["Enter", " "];
  */
 export namespace NavigatorUtils {
     /**
+     * Whether a key is pressed with Alt, Control or Command held.
+     *
+     * Such a press is the browser's or the system's — Alt with Left goes back a page — so a control walking with the
+     * arrows leaves it alone: it returns without acting and without `preventDefault`. A control that uses one of the
+     * combinations on purpose, as `Table` resizes a column with Control and an arrow, checks for it before this.
+     *
+     * @param e The key press.
+     * @returns `true` when any of the three is held. Shift is not counted.
+     */
+    export const getHasCommandModifier = (e: Pick<KeyboardEvent, "altKey" | "ctrlKey" | "metaKey">) =>
+        e.altKey || e.ctrlKey || e.metaKey;
+
+    /**
      * Whether a key means "act on the thing the cursor is on".
      *
      * Enter and Space, which is what every roving widget in the library treats as activation — a day in a
@@ -111,7 +124,7 @@ export namespace NavigatorUtils {
      * @returns The key to act on.
      */
     export const computeLogicalKey = (key: string, direction: NavigatorDirection | undefined) =>
-        direction === "rtl" ? (MIRRORED_KEYS[key] ?? key) : key;
+        direction === "rtl" && Object.hasOwn(MIRRORED_KEYS, key) ? MIRRORED_KEYS[key] : key;
 
     /**
      * Which way text runs at an element right now, read once from its computed style.

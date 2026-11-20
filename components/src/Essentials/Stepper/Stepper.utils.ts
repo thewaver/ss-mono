@@ -17,7 +17,7 @@ export namespace StepperUtils {
      * @param hasBody Whether it was given `renderBody`.
      */
     export const warnIfBodyIgnored = (hasLayout: boolean, hasBody: boolean) => {
-        if (hasLayout && hasBody) console.warn(IGNORED_BODY_WARNING);
+        if (process.env.NODE_ENV !== "production" && hasLayout && hasBody) console.warn(IGNORED_BODY_WARNING);
     };
 
     /**

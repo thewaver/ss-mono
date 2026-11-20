@@ -17,8 +17,9 @@ export namespace CutoutUtils {
      * are, which is how a spotlight or an onboarding overlay lets the thing underneath show
      * through.
      *
-     * Every property is written twice, once plain and once `-webkit-` prefixed, because Safari
-     * still needs the prefixed spelling.
+     * The image, position, size and repeat are written twice, once plain and once `-webkit-` prefixed, for engines
+     * that read only the prefixed spelling. `mask-composite` is written once, plain, which every current browser
+     * reads (Safari since 15.4).
      *
      * @param holes Where to cut, in pixels relative to the element's own top-left corner. A hole
      * may carry an `image` to soften its shape — a radial gradient gives a faded edge; without one

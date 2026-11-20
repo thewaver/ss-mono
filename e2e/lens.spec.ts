@@ -1,6 +1,6 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { demo, prop } from "./helpers";
+import { demo, prop, tabKey } from "./helpers";
 
 /**
  * A lens draws its content twice: once as itself, and once as a copy scaled up and shown only inside a window that
@@ -92,7 +92,7 @@ const tabInto = async (page: Page, selector: string) => {
     for (let presses = 0; presses < MAX_TABS; presses++) {
         if (await isFocused(page, selector)) return;
 
-        await page.keyboard.press("Tab");
+        await page.keyboard.press(tabKey(page));
     }
 
     throw new Error("the lens was never reached with Tab");
@@ -124,7 +124,7 @@ test("the lens is one named Tab stop, and its magnified copy is hidden from scre
     await expect(page.locator(LAYER), "the copy cannot be reached or operated").toHaveJSProperty("inert", true);
 
     await tabInto(page, PHOTO);
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
 
     expect(await isFocused(page, PHOTO), "one press takes focus straight out again").toBe(false);
     expect(
@@ -144,7 +144,7 @@ test("reaching it with the keyboard opens the lens at the center, and leaving cl
     expect(opened!.x).toBeCloseTo(0.5, RATIO_DIGITS);
     expect(opened!.y).toBeCloseTo(0.5, RATIO_DIGITS);
 
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
 
     expect(await lensOf(page), "focus moved on, and the lens closed").toBeUndefined();
 });

@@ -1,6 +1,15 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { computedStyle, docsDemo, docsSettled, prop } from "./helpers";
+import {
+    computedStyle,
+    docsDemo,
+    docsSettled,
+    expectAnnounced,
+    prop,
+    readAnnouncements,
+    recordAnnouncements,
+    tabKey,
+} from "./helpers";
 
 /**
  * The Docs page holds one `Toasts` provider per example, each at a place of its own, so the page carries several
@@ -77,6 +86,7 @@ const holdingStacks = (page: Page) =>
     );
 
 test.beforeEach(async ({ page }) => {
+    await recordAnnouncements(page);
     await page.goto("/toasts/docs");
     await expect(page.locator("#raiseInfo")).toBeVisible();
     await docsSettled(page);
@@ -103,13 +113,19 @@ test("both announcer regions exist before there is anything to announce", async 
 test("a toast is announced at its own urgency rather than the region's", async ({ page }) => {
     await page.locator("#raiseSuccess").click();
 
-    await expect(page.locator(POLITE_LOG), "an ordinary toast waits its turn").toContainText("Settings saved.");
-    await expect(page.locator(ASSERTIVE_LOG), "and does not interrupt anything").not.toContainText("Settings saved.");
+    await expectAnnounced(page, "Settings saved.", { message: "an ordinary toast waits its turn" });
+    expect(
+        (await readAnnouncements(page, "assertive")).some((text) => text.includes("Settings saved.")),
+        "and does not interrupt anything",
+    ).toBe(false);
 
     await page.locator("#raiseError").click();
 
-    await expect(page.locator(ASSERTIVE_LOG), "a failure interrupts").toContainText("Upload failed");
-    await expect(page.locator(POLITE_LOG), "and is not also announced politely").not.toContainText("Upload failed");
+    await expectAnnounced(page, "Upload failed", { message: "a failure interrupts", politeness: "assertive" });
+    expect(
+        (await readAnnouncements(page)).some((text) => text.includes("Upload failed")),
+        "and is not also announced politely",
+    ).toBe(false);
 });
 
 test("the stack has a keyboard route into it, and one back out", async ({ page }) => {
@@ -124,7 +140,7 @@ test("the stack has a keyboard route into it, and one back out", async ({ page }
         "F8 puts the focus on the stack, which nothing could otherwise tab to",
     ).toBe(true);
 
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
 
     expect(
         await page.evaluate(

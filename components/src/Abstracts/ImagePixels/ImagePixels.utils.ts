@@ -1,4 +1,4 @@
-import { type Index2d, MathUtils, type Point2d, type Size2d } from "@thewaver/ss-utils";
+import { type Count2d, MathUtils, type Point2d, type Size2d } from "@thewaver/ss-utils";
 
 import type {
     ImageFitMapping,
@@ -139,16 +139,16 @@ export namespace ImagePixelsUtils {
      * @param box The size of the box.
      * @returns The cell count, across and down.
      */
-    export const computeGridCount = (box: Size2d): Index2d => {
+    export const computeGridCount = (box: Size2d): Count2d => {
         const longest = Math.max(box.width, box.height);
 
-        if (longest <= 0) return { col: 1, row: 1 };
+        if (longest <= 0) return { colCount: 1, rowCount: 1 };
 
         const side = longest / GRID_LONGEST_SIDE;
 
         return {
-            col: MathUtils.clamp(Math.round(box.width / side), 1, GRID_LONGEST_SIDE),
-            row: MathUtils.clamp(Math.round(box.height / side), 1, GRID_LONGEST_SIDE),
+            colCount: MathUtils.clamp(Math.round(box.width / side), 1, GRID_LONGEST_SIDE),
+            rowCount: MathUtils.clamp(Math.round(box.height / side), 1, GRID_LONGEST_SIDE),
         };
     };
 
@@ -162,16 +162,16 @@ export namespace ImagePixelsUtils {
      * @param count How many cells the grid has, across and down.
      * @returns One entry per cell, row by row. A cell with no opaque pixel is black with an alpha of `0`.
      */
-    export const computeCellAverages = (pixels: ImagePixels, count: Index2d): ImagePixelGrid => {
+    export const computeCellAverages = (pixels: ImagePixels, count: Count2d): ImagePixelGrid => {
         const cells: ImagePixelCell[] = [];
 
-        for (let row = 0; row < count.row; row++) {
-            const top = Math.floor((row * pixels.height) / count.row);
-            const bottom = Math.max(top + 1, Math.floor(((row + 1) * pixels.height) / count.row));
+        for (let row = 0; row < count.rowCount; row++) {
+            const top = Math.floor((row * pixels.height) / count.rowCount);
+            const bottom = Math.max(top + 1, Math.floor(((row + 1) * pixels.height) / count.rowCount));
 
-            for (let col = 0; col < count.col; col++) {
-                const left = Math.floor((col * pixels.width) / count.col);
-                const right = Math.max(left + 1, Math.floor(((col + 1) * pixels.width) / count.col));
+            for (let col = 0; col < count.colCount; col++) {
+                const left = Math.floor((col * pixels.width) / count.colCount);
+                const right = Math.max(left + 1, Math.floor(((col + 1) * pixels.width) / count.colCount));
 
                 let red = 0;
                 let green = 0;
@@ -221,9 +221,9 @@ export namespace ImagePixelsUtils {
         share: Point2d,
         alphaThreshold: number = DEFAULT_ALPHA_THRESHOLD,
     ) => {
-        const col = MathUtils.clamp(Math.floor(share.x * grid.count.col), 0, grid.count.col - 1);
-        const row = MathUtils.clamp(Math.floor(share.y * grid.count.row), 0, grid.count.row - 1);
-        const cell = grid.cells[row * grid.count.col + col];
+        const col = MathUtils.clamp(Math.floor(share.x * grid.count.colCount), 0, grid.count.colCount - 1);
+        const row = MathUtils.clamp(Math.floor(share.y * grid.count.rowCount), 0, grid.count.rowCount - 1);
+        const cell = grid.cells[row * grid.count.colCount + col];
 
         if (!cell || cell.alpha < alphaThreshold || cell.alpha <= 0) return undefined;
 
@@ -262,8 +262,8 @@ export namespace ImagePixelsUtils {
         const count = computeGridCount(box);
         const canvas = document.createElement("canvas");
 
-        canvas.width = count.col * OVERSAMPLE;
-        canvas.height = count.row * OVERSAMPLE;
+        canvas.width = count.colCount * OVERSAMPLE;
+        canvas.height = count.rowCount * OVERSAMPLE;
 
         const context = canvas.getContext("2d", { willReadFrequently: true });
 

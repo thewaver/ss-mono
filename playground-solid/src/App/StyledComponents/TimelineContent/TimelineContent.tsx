@@ -79,8 +79,8 @@ export const PageTimelineMarker = (props: PageTimelineMarkerProps) => {
     return (
         <Show when={access(props.marker).isInView}>
             <div
-                class={`${styles.timelineMarker} ${styles.timelineMarkerTones[access(props.tone)]}`}
-                classList={{ [getLayerClass()]: true }}
+                class={styles.timelineMarker}
+                classList={{ [styles.timelineMarkerTones[access(props.tone)]]: true, [getLayerClass()]: true }}
             />
         </Show>
     );
@@ -93,8 +93,9 @@ export const PageTimelineBlock = (props: PageTimelineBlockProps) => {
 
     return (
         <div
-            class={`${styles.timelineBlock} ${styles.timelineBlockFamily[access(props.family)]}`}
+            class={styles.timelineBlock}
             classList={{
+                [styles.timelineBlockFamily[access(props.family)]]: true,
                 [getLayerClass()]: true,
                 [styles.isHovered]: getFlags().isHovered,
                 [styles.isFocusVisible]: getFlags().isFocusVisible,

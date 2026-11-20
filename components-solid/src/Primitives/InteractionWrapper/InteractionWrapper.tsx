@@ -28,6 +28,14 @@ export const InteractionWrapper = <TExtra extends object = {}>(props: Interactio
             getIsDisabled(),
             access(props.isReachableWhenDisabled) ?? false,
             access(props.isFocusableWhenDisabled) ?? false,
+            getTooltipDefs() !== undefined,
+        ),
+    );
+
+    createEffect(() =>
+        InteractionTrackerUtils.warnIfReachableWithoutTooltip(
+            access(props.isReachableWhenDisabled) ?? false,
+            props.tooltipDefs !== undefined,
         ),
     );
 
@@ -91,13 +99,15 @@ export const InteractionWrapper = <TExtra extends object = {}>(props: Interactio
 
     return (
         <div
-            class={[styles.interactionRoot, styles.interactionSizingVariants[getSizing()]].join(" ")}
+            class={styles.interactionRoot}
             role={access(props.role) ?? INTERACTION_WRAPPER_DEFAULTS.role}
             style={{
                 "min-width": access(props.minWidth) ? `${access(props.minWidth)}px` : undefined,
                 "min-height": access(props.minHeight) ? `${access(props.minHeight)}px` : undefined,
             }}
             classList={{
+                [styles.interactionSizingVariants["fit-content"]]: getSizing() === "fit-content",
+                [styles.interactionSizingVariants.fill]: getSizing() === "fill",
                 [styles.interactionDisabled]: getIsDisabled(),
                 [styles.interactionError]: access(props.hasError),
                 [styles.interactionPressed]: access(props.isPressed),

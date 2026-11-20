@@ -1,4 +1,10 @@
-import type { TextSyncElement, TextSyncGroupDefs, TextSyncMaskResult, TextSyncValueSync } from "./TextSync.types";
+import type {
+    TextSyncElement,
+    TextSyncGroupDefs,
+    TextSyncMaskFn,
+    TextSyncMaskResult,
+    TextSyncValueSync,
+} from "./TextSync.types";
 
 /** The low end of the digit range. */
 const DIGIT_FIRST = "0";
@@ -56,6 +62,9 @@ const splitSign = (text: string, hasSign: boolean | undefined) =>
         ? { sign: MINUS_SIGN, rest: text.split(MINUS_SIGN).join("") }
         : { sign: "", rest: text };
 
+/** The `inputType` an input event carries for a deletion forwards, as Delete makes. */
+const FORWARD_DELETION_INPUT_TYPE = "deleteContentForward";
+
 /**
  * Keeps a text input's displayed value in step with the value a component holds, masks included.
  *
@@ -82,16 +91,26 @@ export namespace TextSyncUtils {
      * @param previous The text before this edit, needed to tell an insertion from a deletion.
      * @param next The text the input now holds.
      * @param caret Where the caret is in `next`.
+     * @param isForwardDeletion Whether the edit deleted forwards, as Delete does, so a separator deleted that way
+     * takes the digit after it rather than the one before. Read from the input event's `inputType`.
      * @returns The masked text and where to put the caret.
      */
-    export const applyMask = (pattern: string, previous: string, next: string, caret: number): TextSyncMaskResult => {
+    export const applyMask = (
+        pattern: string,
+        previous: string,
+        next: string,
+        caret: number,
+        isForwardDeletion = false,
+    ): TextSyncMaskResult => {
         const previousDigits = getDigits(previous);
-        const isDeletion = next.length < previous.length;
+        const isSeparatorDeletion = next.length < previous.length && getDigits(next).length === previousDigits.length;
 
         let digits = getDigits(next);
         let digitIndex = getDigits(next.slice(0, caret)).length;
 
-        if (isDeletion && digits.length === previousDigits.length && digitIndex > 0) {
+        if (isSeparatorDeletion && isForwardDeletion && digitIndex < digits.length) {
+            digits = digits.slice(0, digitIndex) + digits.slice(digitIndex + 1);
+        } else if (isSeparatorDeletion && !isForwardDeletion && digitIndex > 0) {
             digits = digits.slice(0, digitIndex - 1) + digits.slice(digitIndex);
             digitIndex -= 1;
         }
@@ -238,6 +257,7 @@ export namespace TextSyncUtils {
      * @param previous The text before this edit, needed to tell an insertion from a deletion.
      * @param next The text the input now holds.
      * @param caret Where the caret is in `next`.
+     * @param isForwardDeletion Whether the edit deleted forwards, as {@link TextSyncUtils.applyMask} takes it.
      * @returns The formatted text and where to put the caret. Leading zeroes are dropped, and clearing
      * every digit leaves the sign alone.
      */
@@ -246,17 +266,21 @@ export namespace TextSyncUtils {
         previous: string,
         next: string,
         caret: number,
+        isForwardDeletion = false,
     ): TextSyncMaskResult => {
         const { sign } = splitSign(next, defs.hasSign);
         const previousDigits = getDigits(previous);
-        const isDeletion = next.length < previous.length;
+        const isSeparatorDeletion = next.length < previous.length && getDigits(next).length === previousDigits.length;
 
         let digits = getDigits(next);
         let digitsAfter = getDigits(next.slice(caret)).length;
 
-        if (isDeletion && digits.length === previousDigits.length && digits.length > digitsAfter) {
-            const index = digits.length - digitsAfter;
+        const index = digits.length - digitsAfter;
 
+        if (isSeparatorDeletion && isForwardDeletion && digitsAfter > 0) {
+            digits = digits.slice(0, index) + digits.slice(index + 1);
+            digitsAfter -= 1;
+        } else if (isSeparatorDeletion && !isForwardDeletion && index > 0) {
             digits = digits.slice(0, index - 1) + digits.slice(index);
         }
 
@@ -325,7 +349,8 @@ export namespace TextSyncUtils {
      * use, rather than the raw keystrokes.
      * @param opts.computeMaskedText Applies a mask on every keystroke, as
      * {@link TextSyncUtils.applyMask} or {@link TextSyncUtils.applyGroupedMask} do. Without one the text
-     * passes through unchanged.
+     * passes through unchanged. Told whether the edit deleted forwards, which `handleInput` reads from the
+     * input event's `inputType` when it is handed one.
      * @returns `sync` to bring an element in step with the value, and `handleInput`, `handleCompositionStart`
      * and `handleCompositionEnd` to attach to the element's own handlers. All three handlers are needed;
      * composition is not optional for a field that anyone might type Japanese into.
@@ -334,7 +359,7 @@ export namespace TextSyncUtils {
         getValue: () => string,
         opts: {
             onInput: (value: string) => void;
-            computeMaskedText?: (previous: string, next: string, caret: number) => TextSyncMaskResult;
+            computeMaskedText?: TextSyncMaskFn;
         },
     ): TextSyncValueSync => {
         let isComposing = false;
@@ -361,13 +386,15 @@ export namespace TextSyncUtils {
 
         const reportMaskedValue = (
             element: TextSyncElement,
-            computeMaskedText: (previous: string, next: string, caret: number) => TextSyncMaskResult,
+            computeMaskedText: TextSyncMaskFn,
+            inputType: string | undefined,
         ) => {
             const hasSelection = element.selectionStart !== null;
             const { text, caret } = computeMaskedText(
                 getValue(),
                 element.value,
                 element.selectionStart ?? element.value.length,
+                inputType === FORWARD_DELETION_INPUT_TYPE,
             );
 
             element.value = text;
@@ -379,11 +406,11 @@ export namespace TextSyncUtils {
 
         return {
             sync,
-            handleInput: (element: TextSyncElement) => {
+            handleInput: (element: TextSyncElement, inputType?: string) => {
                 if (isComposing) return;
 
                 if (opts.computeMaskedText) {
-                    reportMaskedValue(element, opts.computeMaskedText);
+                    reportMaskedValue(element, opts.computeMaskedText, inputType);
 
                     return;
                 }
@@ -394,11 +421,15 @@ export namespace TextSyncUtils {
                 isComposing = true;
             },
             handleCompositionEnd: (element: TextSyncElement) => {
-                opts.onInput(element.value);
-
                 isComposing = false;
 
-                sync(element);
+                if (opts.computeMaskedText) {
+                    reportMaskedValue(element, opts.computeMaskedText, undefined);
+
+                    return;
+                }
+
+                reportValue(element);
             },
         };
     };

@@ -51,6 +51,9 @@ export const CalendarComposite = (props: CalendarCompositeProps) => {
 
     const gridId = createUniqueId();
 
+    const getIsOwnDayElement = (target: EventTarget | null) =>
+        target instanceof Element && target.id.startsWith(`${gridId}-day-`);
+
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
     const [getHighlighted, setHighlighted] = createSignal<DateValue | undefined>();
     const [getHoveredDay, setHoveredDay] = createSignal<DateValue | undefined>();
@@ -206,7 +209,7 @@ export const CalendarComposite = (props: CalendarCompositeProps) => {
         const cell = getCells()[CalendarUtils.findCellIndex(getCells(), getRovingDay(), getPrecision()) ?? -1];
         const root = getRootRef();
 
-        if (!cell || !root?.contains(document.activeElement) || root === document.activeElement) return;
+        if (!cell || !root || !getIsOwnDayElement(document.activeElement)) return;
 
         document.getElementById(`${gridId}-day-${DateValueUtils.toIso(cell)}`)?.focus();
     });
@@ -215,6 +218,8 @@ export const CalendarComposite = (props: CalendarCompositeProps) => {
         getPages().find((page) => CalendarUtils.getIsSameCell(page.start, getRovingDay(), "month")) ?? getPages()[0];
 
     const handleKeyDown = (e: KeyboardEvent) => {
+        if (!getIsOwnDayElement(e.target)) return;
+
         const action = CalendarUtils.computeKeyAction(e.key, e.shiftKey, {
             roving: getRovingDay(),
             precision: getPrecision(),

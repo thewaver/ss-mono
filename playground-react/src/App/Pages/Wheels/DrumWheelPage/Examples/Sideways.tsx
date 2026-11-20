@@ -21,7 +21,9 @@ const NO_SUBSCRIPTION = () => () => {};
 
 type Props = WheelExampleProps;
 
-export const SidewaysExample = ({ wedges, ...otherProps }: Props) => {
+export const SidewaysExample = (props: Props) => {
+    const { wedges, ...otherProps } = props;
+
     const [controller, setController] = useState<WheelController>();
 
     const isSpinnable = useSyncExternalStore(
@@ -35,12 +37,12 @@ export const SidewaysExample = ({ wedges, ...otherProps }: Props) => {
                 <PageWheelMount>
                     <DrumWheel
                         {...otherProps}
-                        wedges={wedges}
+                        wedges={props.wedges}
                         axis={"row"}
                         wedgeSize={WEDGE_SIZE}
                         ariaLabel={PRIZE_DRUM_TURNING_SIDEWAYS_LABEL}
-                        computeSpinTarget={() => pickPrizeIndex(wedges.length)}
-                        computeWedgeLabel={(index) => `${wedges[index]}, ${index + 1} of ${wedges.length}`}
+                        computeSpinTarget={() => pickPrizeIndex(props.wedges.length)}
+                        computeWedgeLabel={(index) => `${props.wedges[index]}, ${index + 1} of ${props.wedges.length}`}
                         renderWedge={(wedge, state) => <PageWheelCard state={state}>{wedge}</PageWheelCard>}
                         renderWedgeBack={(_wedge, state) => <PageWheelCard state={state} />}
                         onMount={setController}

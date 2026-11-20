@@ -112,3 +112,17 @@ describe("ShapeLayerUtils.computePaint", () => {
         });
     });
 });
+
+describe("ShapeLayerUtils.computeLayerPaths with fractional thicknesses", () => {
+    it("draws strokes of 1.2 and 1.8 with contours of their own", () => {
+        const paths = ShapeLayerUtils.computeLayerPaths(
+            SQUARE,
+            ["a", "b"],
+            [{ thicknesses: [1.2] }, { thicknesses: [1.8] }],
+            undefined,
+            undefined,
+        );
+
+        expect(paths[1]).not.toBe(paths[0]);
+    });
+});

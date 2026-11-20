@@ -1,4 +1,4 @@
-import { type Index2d, MathUtils, type Size2d } from "@thewaver/ss-utils";
+import { type Count2d, type Index2d, MathUtils, type Size2d } from "@thewaver/ss-utils";
 
 import type { RippleDefs, SweepDefs, WeightFn, WeightOpts } from "./SliceAnimationWeights.types";
 
@@ -47,15 +47,20 @@ const normalizeWeights = (weights: number[][]) => {
 
     return result;
 };
+/** The span a grid of one weight throughout is spread across, since it has no next weight to spread toward. */
+const LONE_WEIGHT_GAP = 1;
 const makeWeightsUnique = (weights: number[][]) => {
     const indexed = getIndexedWeights(weights);
     const orderedKeys = getOrderedKeys(indexed);
 
-    if (orderedKeys.length <= 1) return weights;
+    if (orderedKeys.length < 1) return weights;
 
     const result = weights.map((row) => [...row]);
     const lastBucket = indexed.get(orderedKeys[orderedKeys.length - 1])!;
-    const lastGap = orderedKeys[orderedKeys.length - 1] - orderedKeys[orderedKeys.length - 2];
+    const lastGap =
+        orderedKeys.length > 1
+            ? orderedKeys[orderedKeys.length - 1] - orderedKeys[orderedKeys.length - 2]
+            : LONE_WEIGHT_GAP;
     const maxWeight = 1 + lastGap * ((lastBucket.length - 1) / lastBucket.length);
 
     let gap = lastGap;
@@ -79,15 +84,15 @@ const makeWeightsUnique = (weights: number[][]) => {
 };
 
 /** How far a cell sits from the further of the two grid edges it lies between, on each axis. */
-const getFarthestEdge = (cell: Index2d, count: Index2d): Index2d => ({
-    row: Math.max(count.row - 1 - cell.row, cell.row),
-    col: Math.max(count.col - 1 - cell.col, cell.col),
+const getFarthestEdge = (cell: Index2d, count: Count2d): Index2d => ({
+    row: Math.max(count.rowCount - 1 - cell.row, cell.row),
+    col: Math.max(count.colCount - 1 - cell.col, cell.col),
 });
 
 /** Pulls a cell back inside the grid, leaving it alone if it already fits. */
-const getInsideGrid = (cell: Index2d, count: Index2d): Index2d => ({
-    row: Math.max(Math.min(cell.row, count.row), 0),
-    col: Math.max(Math.min(cell.col, count.col), 0),
+const getInsideGrid = (cell: Index2d, count: Count2d): Index2d => ({
+    row: Math.max(Math.min(cell.row, count.rowCount - 1), 0),
+    col: Math.max(Math.min(cell.col, count.colCount - 1), 0),
 });
 
 /**
@@ -139,7 +144,7 @@ export namespace SliceAnimationWeightUtils {
      * @param count The number of columns and rows.
      * @returns The same numbers as a width and a height.
      */
-    export const toBounds = (count: Index2d): Size2d => ({ width: count.col, height: count.row });
+    export const toBounds = (count: Count2d): Size2d => ({ width: count.colCount, height: count.rowCount });
 
     /**
      * How far the farthest edge of the grid is from the origin, on each axis.
@@ -151,7 +156,7 @@ export namespace SliceAnimationWeightUtils {
      * @param count The number of columns and rows.
      * @returns The column and row distances to the farthest edge.
      */
-    export const getMaxDistance = (origin: Index2d, count: Index2d): Index2d => {
+    export const getMaxDistance = (origin: Index2d, count: Count2d): Index2d => {
         const farthest = getFarthestEdge(origin, count);
 
         return { col: Math.max(farthest.col, MIN_MAX_DISTANCE), row: Math.max(farthest.row, MIN_MAX_DISTANCE) };
@@ -184,8 +189,8 @@ export namespace SliceAnimationWeightUtils {
      * @param count The number of columns and rows.
      * @returns The largest `down` and `up` distances.
      */
-    export const getMaxDiagonalDistance = (origin: Index2d, count: Index2d) => {
-        const far = { col: count.col - 1 - origin.col, row: count.row - 1 - origin.row };
+    export const getMaxDiagonalDistance = (origin: Index2d, count: Count2d) => {
+        const far = { col: count.colCount - 1 - origin.col, row: count.rowCount - 1 - origin.row };
 
         return {
             down: Math.max(origin.col + far.row, far.col + origin.row, MIN_MAX_DISTANCE),
@@ -207,7 +212,7 @@ export namespace SliceAnimationWeightUtils {
      */
     export const getMaxDiagonalDistanceInBand = (
         origin: Index2d,
-        count: Index2d,
+        count: Count2d,
         dist: { down: number; up: number },
     ) => {
         const fallingOrigin = origin.col - origin.row;
@@ -216,14 +221,14 @@ export namespace SliceAnimationWeightUtils {
         const maxUpInFallingBand = (falling: number) =>
             getBandMax(
                 Math.ceil(Math.max(0, falling)),
-                Math.floor(Math.min(count.col - 1, count.row - 1 + falling)),
+                Math.floor(Math.min(count.colCount - 1, count.rowCount - 1 + falling)),
                 (col) => Math.abs(2 * col - falling - risingOrigin),
             );
 
         const maxDownInRisingBand = (rising: number) =>
             getBandMax(
-                Math.ceil(Math.max(0, rising - (count.row - 1))),
-                Math.floor(Math.min(count.col - 1, rising)),
+                Math.ceil(Math.max(0, rising - (count.rowCount - 1))),
+                Math.floor(Math.min(count.colCount - 1, rising)),
                 (col) => Math.abs(2 * col - rising - fallingOrigin),
             );
 
@@ -381,7 +386,7 @@ export namespace SliceAnimationWeightUtils {
      * @param defs How many sweeps there are and where each starts.
      * @returns The cell's weight.
      */
-    export const radar = (pos: Index2d, count: Index2d, origin: Index2d, defs: SweepDefs) => {
+    export const radar = (pos: Index2d, count: Count2d, origin: Index2d, defs: SweepDefs) => {
         const { quadrantsPerSection, clockDownMul, clockRightMul, clockUpMul, clockLeftMul } = defs;
 
         if (pos.col === origin.col && pos.row === origin.row) return 1;
@@ -417,7 +422,7 @@ export namespace SliceAnimationWeightUtils {
             }
         }
 
-        return 1 - result / (maxWeight - 1);
+        return 1 - (result + 1) / maxWeight;
     };
 
     /**
@@ -432,7 +437,7 @@ export namespace SliceAnimationWeightUtils {
      * @param defs How many arms there are and where each starts.
      * @returns The cell's weight.
      */
-    export const spiral = (pos: Index2d, count: Index2d, origin: Index2d, defs: SweepDefs) => {
+    export const spiral = (pos: Index2d, count: Count2d, origin: Index2d, defs: SweepDefs) => {
         const { quadrantsPerSection, clockDownMul, clockRightMul, clockUpMul, clockLeftMul } = defs;
 
         if (pos.col === origin.col && pos.row === origin.row) return 1;
@@ -476,7 +481,8 @@ export namespace SliceAnimationWeightUtils {
      * Each weight is clamped to `0` to `1` and rounded to {@link WEIGHT_DECIMAL_PLACES}; an origin outside the
      * grid is pulled back inside it first; and the random seed moves on once, so a random weight gives a new
      * order each run. Two options reshape the result. `shouldMakeUnique` spreads cells that share a weight across
-     * the gap to the next one, so no two go at exactly the same moment. `shouldNormalize` spaces the distinct
+     * the gap to the next one, so no two go at exactly the same moment, as far as the rounding allows: up to 1,001
+     * cells, since three decimal places hold 1,001 weights from `0` to `1`. `shouldNormalize` spaces the distinct
      * weights evenly from `0` to `1` by rank, so a weight that bunches up still uses the whole timeline.
      *
      * @param compute The weight function to run for each cell.
@@ -485,13 +491,13 @@ export namespace SliceAnimationWeightUtils {
      * @param opts Whether to break ties and whether to even out the spacing.
      * @returns The weights, row by row.
      */
-    export const computeSliceWeights = (compute: WeightFn, count: Index2d, origin: Index2d, opts?: WeightOpts) => {
+    export const computeSliceWeights = (compute: WeightFn, count: Count2d, origin: Index2d, opts?: WeightOpts) => {
         const boundOrigin = getInsideGrid(origin, count);
 
         advanceRandomSeed();
 
-        let weights = Array.from({ length: Math.max(count.row, 0) }, (_, row) =>
-            Array.from({ length: Math.max(count.col, 0) }, (_, col) =>
+        let weights = Array.from({ length: Math.max(count.rowCount, 0) }, (_, row) =>
+            Array.from({ length: Math.max(count.colCount, 0) }, (_, col) =>
                 MathUtils.roundToDecimalPlaces(
                     MathUtils.clamp01(compute({ col, row }, count, boundOrigin)),
                     WEIGHT_DECIMAL_PLACES,

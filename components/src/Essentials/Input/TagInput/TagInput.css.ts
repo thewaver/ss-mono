@@ -30,9 +30,6 @@ export const tagInputField = style({
     cursor: "text",
 
     selectors: {
-        "&:focus": {
-            outline: "0 none",
-        },
         "&[aria-disabled='true']": {
             caretColor: "transparent",
             cursor: "not-allowed",

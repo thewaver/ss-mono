@@ -4,6 +4,7 @@ import {
     FLIPBOOK_DEFAULTS,
     FlipbookUtils,
     LiveAnnouncerUtils,
+    NavigatorUtils,
     type SpineSide,
     SpineUtils,
     FlipbookStyles as styles,
@@ -81,7 +82,7 @@ export const Flipbook = <T,>(props: FlipbookProps<T>) => {
     });
 
     const handleKeyDown = (e: KeyboardEvent) => {
-        if (e.target !== e.currentTarget) return;
+        if (e.target !== e.currentTarget || NavigatorUtils.getHasCommandModifier(e)) return;
 
         const step = FlipbookUtils.getKeyStep(e.key);
 

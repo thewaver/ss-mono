@@ -1,6 +1,6 @@
 import { type Locator, type Page, expect, test } from "@playwright/test";
 
-import { accessibleText, activeMatches, docsDemo, docsSettled, prop, tabIndex } from "./helpers";
+import { accessibleText, activeMatches, docsDemo, docsSettled, prop, tabIndex, tabKey } from "./helpers";
 
 /**
  * `Button`'s page is its Docs view. A plain button, a disabled one, a reachable disabled one and an errored one are
@@ -106,8 +106,9 @@ test("a disabled button shows its tooltip only when it is kept reachable", async
     await expect(button, "kept reachable it carries the same ARIA state").toHaveAttribute("aria-disabled", "true");
     expect(await tabIndex(button), "what differs is that it keeps its tab stop").toBe(0);
 
-    await page.keyboard.press("Shift");
     await button.focus();
+    await page.keyboard.press(tabKey(page, true));
+    await page.keyboard.press(tabKey(page));
     expect(await activeMatches(page, TOOLTIP_BUTTON), "so it can be focused").toBe(true);
     await expect(page.locator(TOOLTIP), "and its tooltip is read by keyboard").toBeVisible();
 

@@ -8,7 +8,7 @@ export namespace TableConst {
     export const ROW_LEVEL = 1;
     export const DETAIL_LEVEL = 2;
     export const EMPTY_PINNED_ROWS: number[] = [];
-    export const EMPTY_EXPANDED_ROWS: number[] = [];
+    export const EMPTY_EXPANDED_ROWS = TableUtils.EMPTY_EXPANDED_ROWS;
     export const EMPTY_WIDTHS: Record<string, number> = {};
     export const EMPTY_ORDER: string[] = [];
     export const EMPTY_SELECTION: never[] = [];

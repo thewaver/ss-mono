@@ -100,6 +100,7 @@ export const SplitPane = (props: SplitPaneProps) => {
             direction,
             gutterSize,
             paneCount,
+            layoutExtent: SplitPaneUtils.getLayoutExtent(root, orientation),
         });
 
         if (boundary === undefined) return;

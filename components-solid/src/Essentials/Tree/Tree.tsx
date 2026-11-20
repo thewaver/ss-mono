@@ -5,6 +5,7 @@ import { Dynamic } from "solid-js/web";
 import {
     FlattenerUtils,
     InteractionTrackerUtils,
+    SafeHrefUtils,
     SelectionUtils,
     TREE_DEFAULTS,
     TreeUtils,
@@ -27,6 +28,8 @@ import { TooltipSolidUtils } from "../Overlays/Tooltip/TooltipSolid.utils";
 import type { MultiTreeProps, TreeCompositeProps, TreeNodeItemProps, TreeProps, TreeRow } from "./TreeSolid.types";
 
 const TreeNodeItem = (props: TreeNodeItemProps) => {
+    const getSafeHref = () => SafeHrefUtils.resolve(access(props.href), "Tree");
+
     const getIsDisabled = () => access(props.flags).isDisabled ?? false;
 
     const handleClick = (e: MouseEvent) => {
@@ -34,6 +37,8 @@ const TreeNodeItem = (props: TreeNodeItemProps) => {
             e.preventDefault();
             return;
         }
+
+        if (getSafeHref() !== undefined && !InteractionTrackerUtils.getIsPlainClick(e)) return;
 
         props.onActivate(e);
     };
@@ -72,7 +77,7 @@ const TreeNodeItem = (props: TreeNodeItemProps) => {
 
     return (
         <Show
-            when={access(props.href)}
+            when={getSafeHref()}
             fallback={
                 <div ref={(element) => props.ref?.(element)} {...commonProps} onClick={handleClick}>
                     {props.renderContent(() => access(props.flags))}
@@ -82,7 +87,7 @@ const TreeNodeItem = (props: TreeNodeItemProps) => {
             <Dynamic
                 component={props.linkComponent ?? "a"}
                 ref={(element: HTMLElement) => props.ref?.(element)}
-                href={access(props.href)!}
+                href={getSafeHref()!}
                 {...commonProps}
                 onClick={handleClick}
             >
@@ -325,6 +330,8 @@ const TreeComposite = <T,>(props: TreeCompositeProps<T>) => {
     };
 
     const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.target !== e.currentTarget && !findRowById((e.target as Element).id)) return;
+
         const navigable = getNavigableRows();
 
         if (navigable.length < 1) return;
@@ -481,6 +488,7 @@ const TreeComposite = <T,>(props: TreeCompositeProps<T>) => {
                 sizing={"fill"}
                 isDisabled={() => getRow().node.isDisabled ?? false}
                 isReachableWhenDisabled={() => getRow().node.isReachableWhenDisabled ?? false}
+                isFocusableWhenDisabled={() => getRow().node.isReachableWhenDisabled ?? false}
                 isTabbable={() => getRow().node.value === getRovingRow()?.node.value}
                 tooltipDefs={() => getRow().node.tooltipDefs}
                 extraFlags={() => ({

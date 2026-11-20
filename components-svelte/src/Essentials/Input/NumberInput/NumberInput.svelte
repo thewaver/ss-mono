@@ -2,15 +2,18 @@
     import { untrack } from "svelte";
 
     import {
+        FormValueUtils,
         type InteractionFlags,
         NUMBER_INPUT_DEFAULTS,
         type NumberInputStepDefs,
         type NumberInputStepper,
+        InteractionTrackerUtils,
         NumberInputUtils,
         type TextFieldFlags,
     } from "@thewaver/ss-components";
     import { DecimalUtils } from "@thewaver/ss-utils";
 
+    import FormValue from "../../../Primitives/FormValue/FormValue.svelte";
     import TextField from "../../../Primitives/TextField/TextField.svelte";
     import type { NumberInputProps } from "./NumberInput.types.js";
 
@@ -55,7 +58,7 @@
         return next !== current;
     };
 
-    const repeater = NumberInputUtils.createStepRepeater({
+    const repeater = InteractionTrackerUtils.createStepRepeater({
         getDelayMs: () => props.repeatDelayMs ?? NUMBER_INPUT_DEFAULTS.repeatDelayMs,
         getIntervalMs: () => props.repeatIntervalMs ?? NUMBER_INPUT_DEFAULTS.repeatIntervalMs,
     });
@@ -90,6 +93,7 @@
 
 <TextField
     {...props}
+    name={undefined}
     bind:value={text}
     bind:ref
     element="input"
@@ -124,3 +128,5 @@
     }}
     onBlur={() => applyValue(NumberInputUtils.computeSettledValue(typedValue, stepDefs))}
 />
+
+<FormValue name={props.name} values={[FormValueUtils.computeText(value) ?? FormValueUtils.EMPTY_TEXT]} />

@@ -60,33 +60,30 @@
     );
 </script>
 
-{#if !hasSatellites}
-    {@render props.children?.()}
-{:else}
-    <div
-        class={styles.satelliteRoot}
-        style:padding-left={`${layout.padding.paddingLeft}px`}
-        style:padding-top={`${layout.padding.paddingTop}px`}
-        style:padding-right={`${layout.padding.paddingRight}px`}
-        style:padding-bottom={`${layout.padding.paddingBottom}px`}
-    >
-        <div bind:this={subject} class={styles.satelliteSubject} style:z-index={SatelliteConst.SUBJECT_Z_INDEX}>
-            {@render props.children?.()}
-        </div>
-
-        {#each satellites as satellite, index (index)}
-            {@const offset = layout.satelliteOffsets[index] ?? SatelliteConst.UNPLACED}
-            <div
-                {@attach attachSatellite(index)}
-                class={styles.satelliteBody}
-                style:left={`${offset.x}px`}
-                style:top={`${offset.y}px`}
-                style:z-index={(satellite.isBehindSubject ?? SATELLITE_DEFAULTS.isBehindSubject)
-                    ? SatelliteConst.BEHIND_Z_INDEX
-                    : SatelliteConst.FRONT_Z_INDEX}
-            >
-                {@render satellite.renderSatellite()}
-            </div>
-        {/each}
+<div
+    class={styles.satelliteRoot}
+    style:padding-left={`${layout.padding.paddingLeft}px`}
+    style:padding-top={`${layout.padding.paddingTop}px`}
+    style:padding-right={`${layout.padding.paddingRight}px`}
+    style:padding-bottom={`${layout.padding.paddingBottom}px`}
+>
+    <div bind:this={subject} class={styles.satelliteSubject} style:z-index={SatelliteConst.SUBJECT_Z_INDEX}>
+        {@render props.children?.()}
     </div>
-{/if}
+
+    {#each satellites as satellite, index (index)}
+        {@const offset = layout.satelliteOffsets[index] ?? SatelliteConst.UNPLACED}
+        <div
+            {@attach attachSatellite(index)}
+            class={styles.satelliteBody}
+            style:left={`${offset.x}px`}
+            style:top={`${offset.y}px`}
+            style:z-index={(satellite.isBehindSubject ?? SATELLITE_DEFAULTS.isBehindSubject)
+                ? SatelliteConst.BEHIND_Z_INDEX
+                : SatelliteConst.FRONT_Z_INDEX}
+        >
+            {@render satellite.renderSatellite()}
+        </div>
+    {/each}
+</div>
+

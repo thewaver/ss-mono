@@ -14,4 +14,5 @@ export type RadioGroupContextType = {
     computeIsTabbable: (value: unknown) => boolean;
     computePlacement: (entry: RadioGroupEntry) => PlacementRect | undefined;
     register: (entry: RadioGroupEntry) => void;
+    reorder: () => void;
 };

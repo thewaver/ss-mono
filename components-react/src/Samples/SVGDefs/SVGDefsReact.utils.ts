@@ -1,7 +1,7 @@
 import { type RefObject, useEffect, useMemo, useRef, useState } from "react";
 
 import { type PointSource, SVGDefsUtils, TrackedPatternUtils } from "@thewaver/ss-components";
-import type { Index2d, Point2d, Size2d } from "@thewaver/ss-utils";
+import type { Count2d, Index2d, Point2d, Size2d } from "@thewaver/ss-utils";
 
 import { PointerTrackerReactUtils } from "../../Abstracts/PointerTracker/PointerTrackerReact.utils";
 import { SVGFilterDefsFactory } from "../../Generators/SVGDefs/SVGFilters/SVGFilterDefs.factory";
@@ -139,7 +139,7 @@ export namespace SVGDefsReactUtils {
     export const useSplitValues = () => {
         const [cache] = useState(() => ({ split: {} as Record<string, string>, cells: {} as Record<string, string> }));
 
-        return (cellId: string, index: Index2d, cellCount: { rows: number; cols: number }, isSplit: boolean) =>
+        return (cellId: string, index: Index2d, cellCount: Count2d, isSplit: boolean) =>
             (cache.cells[cellId] ??= SVGDefsUtils.getRandomValuesWithSplitControl(
                 cache.split,
                 index,

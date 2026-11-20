@@ -266,3 +266,28 @@ describe("createCursor", () => {
         expect(cursor.get().highlightRequests - before).toBe(2);
     });
 });
+
+describe("createCursor with two options and more to come", () => {
+    it("steps from the first to the second, since that is an ordinary step and not a wrap", () => {
+        const cursor = ListboxUtils.createCursor({
+            focusModel: "active_descendant",
+            getListboxId: () => "list",
+            getOptions: () => [{ value: "a" }, { value: "b" }],
+            getSelectedOptions: () => [],
+            getIsDisabled: () => false,
+            getIsOpen: () => true,
+            getIsFilterable: () => true,
+            getHasMoreOptions: () => true,
+            onOpen: () => undefined,
+            onClose: () => undefined,
+            onPick: () => undefined,
+        });
+
+        cursor.highlight("a");
+        cursor.handleKeyDown(keyEvent("ArrowDown"));
+        expect(cursor.getHighlightedIndex()).toBe(1);
+
+        cursor.handleKeyDown(keyEvent("ArrowDown"));
+        expect(cursor.getHighlightedIndex(), "and from the last it does not wrap, since more are coming").toBe(1);
+    });
+});

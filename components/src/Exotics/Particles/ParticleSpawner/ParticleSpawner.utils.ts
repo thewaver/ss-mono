@@ -60,7 +60,22 @@ type Leg = { legIndex: number; t: number; elapsedMs: number };
 
 const participants = new Set<FrameParticipant>();
 
+const reportedParticipants = new WeakSet<FrameParticipant>();
+
 let sharedFrameId: ReturnType<typeof requestAnimationFrame> | undefined;
+
+const runGuarded = (participant: FrameParticipant, step: () => void) => {
+    try {
+        step();
+    } catch (error) {
+        if (reportedParticipants.has(participant)) return;
+
+        reportedParticipants.add(participant);
+        queueMicrotask(() => {
+            throw error;
+        });
+    }
+};
 
 const runSharedFrame = (nowMs: number) => {
     sharedFrameId = undefined;
@@ -68,11 +83,11 @@ const runSharedFrame = (nowMs: number) => {
     const current = [...participants];
 
     for (const participant of current) {
-        if (participants.has(participant)) participant.read();
+        if (participants.has(participant)) runGuarded(participant, () => participant.read());
     }
 
     for (const participant of current) {
-        if (participants.has(participant)) participant.write(nowMs);
+        if (participants.has(participant)) runGuarded(participant, () => participant.write(nowMs));
     }
 
     if (participants.size > 0 && sharedFrameId === undefined) sharedFrameId = requestAnimationFrame(runSharedFrame);
@@ -296,7 +311,8 @@ export namespace ParticleSpawnerUtils {
      * @param defs.onParticleArrive Runs as a particle is taken away at its last stop, with its place in its round. Only
      * while the round runs, never for a written `progress`.
      * @param defs.onIterationEnd Runs at the end of each played round.
-     * @param defs.onAnimationEnd Runs after the last played round of a stage that names no next one.
+     * @param defs.onAnimationEnd Runs after the last played round of a stage that names no next one, or one past the
+     * end of the list.
      * @param defs.onTick Runs after each draw that placed any particle.
      * @returns `particles`, the particles that are out, as a store; `setIsRunning`, `restart`, `render`, `scrub`, `emit`,
      * `drawParticle`, `getPlacement`, `getHasEnded` and `stop`.
@@ -458,14 +474,44 @@ export namespace ParticleSpawnerUtils {
             waitStartMs = performance.now();
             waitTimer = setTimeout(() => {
                 waitTimer = undefined;
-                stageIndex = pendingStage ?? FIRST_STAGE;
-                pendingStage = undefined;
-                repeatIndex = 0;
-                played = createPlayed();
-                writeProgress(NO_PROGRESS);
-                lastMs = performance.now();
-                syncFrame();
+                startStage(pendingStage ?? FIRST_STAGE);
             }, waitMs);
+        };
+
+        const startStage = (index: number) => {
+            stageIndex = index;
+            pendingStage = undefined;
+            repeatIndex = 0;
+            played = createPlayed();
+            writeProgress(NO_PROGRESS);
+            lastMs = performance.now();
+            syncFrame();
+        };
+
+        const enterStage = (index: number) => {
+            const pattern = defs.getPatterns()[index];
+
+            if (!pattern) {
+                hasEnded = true;
+                defs.onAnimationEnd?.();
+
+                return;
+            }
+
+            const delayMs = pattern.beginDelayMs ?? NO_DELAY_MS;
+
+            if (delayMs <= NO_DELAY_MS) {
+                startStage(index);
+
+                return;
+            }
+
+            stageIndex = index;
+            played = undefined;
+            pendingStage = index;
+            waitMs = delayMs;
+            armWait();
+            syncFrame();
         };
 
         const settleWait = () => {
@@ -498,9 +544,7 @@ export namespace ParticleSpawnerUtils {
                 return;
             }
 
-            pendingStage = nextIndex;
-            waitMs = pattern?.beginDelayMs ?? NO_DELAY_MS;
-            armWait();
+            enterStage(nextIndex);
         };
 
         const advancePlayed = (nowMs: number) => {
@@ -601,7 +645,9 @@ export namespace ParticleSpawnerUtils {
                 isRunning = next;
 
                 if (next) {
-                    if (!played && !hasEnded) played = createPlayed();
+                    const isUnstarted = !played && !hasEnded && pendingStage === undefined;
+
+                    if (isUnstarted && defs.getPatterns()[stageIndex]) enterStage(stageIndex);
 
                     lastMs = performance.now();
                     armWait();
@@ -622,9 +668,12 @@ export namespace ParticleSpawnerUtils {
                 stageIndex = FIRST_STAGE;
                 repeatIndex = 0;
                 hasEnded = false;
-                played = isRunning ? createPlayed() : undefined;
+                played = undefined;
                 lastMs = performance.now();
                 writeProgress(NO_PROGRESS);
+
+                if (isRunning && defs.getPatterns()[FIRST_STAGE]) enterStage(FIRST_STAGE);
+
                 syncFrame();
 
                 if (!isRunning) render();

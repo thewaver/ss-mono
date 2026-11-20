@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import type { Index2d } from "@thewaver/ss-utils";
+import type { Count2d } from "@thewaver/ss-utils";
 
 import { CellAnimationOrigins } from "./CellAnimationOrigins.const";
 
-const ODD_GRID: Index2d = { col: 7, row: 7 };
-const EVEN_COLUMN: Index2d = { col: 1, row: 8 };
+const ODD_GRID: Count2d = { colCount: 7, rowCount: 7 };
+const EVEN_COLUMN: Count2d = { colCount: 1, rowCount: 8 };
 
 describe("CellAnimationOriginsConst", () => {
     it("puts each named origin on the cell its name promises", () => {
@@ -19,7 +19,10 @@ describe("CellAnimationOriginsConst", () => {
     });
 
     it("lands a centered origin between cells on an even count, which is where the parity weights break", () => {
-        expect(CellAnimationOrigins.computeOrigin("center", { col: 4, row: 4 })).toEqual({ col: 1.5, row: 1.5 });
+        expect(CellAnimationOrigins.computeOrigin("center", { colCount: 4, rowCount: 4 })).toEqual({
+            col: 1.5,
+            row: 1.5,
+        });
         expect(CellAnimationOrigins.computeOrigin("center", EVEN_COLUMN)).toEqual({ col: 0, row: 3.5 });
     });
 });

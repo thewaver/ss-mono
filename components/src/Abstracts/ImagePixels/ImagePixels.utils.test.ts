@@ -114,13 +114,13 @@ describe("computeFit", () => {
 
 describe("computeGridCount", () => {
     it("gives the longest side 96 cells and keeps the cells square", () => {
-        expect(ImagePixelsUtils.computeGridCount({ width: 480, height: 240 })).toEqual({ col: 96, row: 48 });
-        expect(ImagePixelsUtils.computeGridCount({ width: 100, height: 100 })).toEqual({ col: 96, row: 96 });
+        expect(ImagePixelsUtils.computeGridCount({ width: 480, height: 240 })).toEqual({ colCount: 96, rowCount: 48 });
+        expect(ImagePixelsUtils.computeGridCount({ width: 100, height: 100 })).toEqual({ colCount: 96, rowCount: 96 });
     });
 
     it("never has none, whatever the box", () => {
-        expect(ImagePixelsUtils.computeGridCount({ width: 0, height: 0 })).toEqual({ col: 1, row: 1 });
-        expect(ImagePixelsUtils.computeGridCount({ width: 1000, height: 1 })).toEqual({ col: 96, row: 1 });
+        expect(ImagePixelsUtils.computeGridCount({ width: 0, height: 0 })).toEqual({ colCount: 1, rowCount: 1 });
+        expect(ImagePixelsUtils.computeGridCount({ width: 1000, height: 1 })).toEqual({ colCount: 96, rowCount: 1 });
     });
 });
 
@@ -128,7 +128,7 @@ describe("computeCellAverages", () => {
     it("averages each cell's pixels", () => {
         const grid = ImagePixelsUtils.computeCellAverages(
             pixels(4, 2, (x) => (x < 2 ? [200, 0, 0, 255] : [0, 100, 0, 255])),
-            { col: 2, row: 1 },
+            { colCount: 2, rowCount: 1 },
         );
 
         expect(grid.cells).toEqual([
@@ -140,7 +140,7 @@ describe("computeCellAverages", () => {
     it("counts a pixel by its opacity, so a mostly transparent cell keeps the color of what is painted", () => {
         const grid = ImagePixelsUtils.computeCellAverages(
             pixels(2, 2, (x, y) => (x === 0 && y === 0 ? [255, 0, 0, 255] : [0, 0, 255, 0])),
-            { col: 1, row: 1 },
+            { colCount: 1, rowCount: 1 },
         );
 
         expect(grid.cells[0]).toEqual({ red: 255, green: 0, blue: 0, alpha: 0.25 });
@@ -149,7 +149,7 @@ describe("computeCellAverages", () => {
     it("answers black with no opacity for a cell nothing paints", () => {
         const grid = ImagePixelsUtils.computeCellAverages(
             pixels(2, 2, () => [9, 9, 9, 0]),
-            { col: 1, row: 1 },
+            { colCount: 1, rowCount: 1 },
         );
 
         expect(grid.cells[0]).toEqual({ red: 0, green: 0, blue: 0, alpha: 0 });
@@ -158,7 +158,7 @@ describe("computeCellAverages", () => {
     it("gives every cell at least one pixel when there are more cells than pixels", () => {
         const grid = ImagePixelsUtils.computeCellAverages(
             pixels(1, 1, () => [10, 20, 30, 255]),
-            { col: 3, row: 3 },
+            { colCount: 3, rowCount: 3 },
         );
 
         expect(grid.cells).toHaveLength(9);
@@ -168,7 +168,7 @@ describe("computeCellAverages", () => {
 describe("computeColorAt", () => {
     const grid = ImagePixelsUtils.computeCellAverages(
         pixels(4, 2, (x) => (x < 2 ? [200, 10, 20, 255] : [0, 0, 0, 0])),
-        { col: 2, row: 1 },
+        { colCount: 2, rowCount: 1 },
     );
 
     it("answers the color of the cell the point is in", () => {
@@ -187,7 +187,7 @@ describe("computeColorAt", () => {
     it("counts a partly transparent cell as painted once it passes the threshold", () => {
         const faint = ImagePixelsUtils.computeCellAverages(
             pixels(2, 2, (x, y) => (x === 0 && y === 0 ? [255, 0, 0, 255] : [0, 0, 0, 0])),
-            { col: 1, row: 1 },
+            { colCount: 1, rowCount: 1 },
         );
 
         expect(ImagePixelsUtils.computeColorAt(faint, { x: 0.5, y: 0.5 })).toBeUndefined();

@@ -1,4 +1,4 @@
-import { type ComponentPublicInstance, type SlotsType, defineComponent, shallowRef } from "vue";
+import { type ComponentPublicInstance, type SlotsType, defineComponent, shallowRef, watch } from "vue";
 
 import {
     INTERACTION_WRAPPER_DEFAULTS,
@@ -35,7 +35,15 @@ export const InteractionWrapper = defineComponent(
                 getIsDisabled(),
                 props.isReachableWhenDisabled ?? false,
                 props.isFocusableWhenDisabled ?? false,
+                props.tooltipDefs !== undefined,
             );
+
+        watch(
+            [() => props.isReachableWhenDisabled ?? false, () => props.tooltipDefs !== undefined],
+            ([isReachableWhenDisabled, hasTooltipProp]) =>
+                InteractionTrackerUtils.warnIfReachableWithoutTooltip(isReachableWhenDisabled, hasTooltipProp),
+            { immediate: true },
+        );
 
         const internalFlags = InteractionTrackerVueUtils.useElementFlags(element, getIsDisabled, {
             isReachable: getIsReachable,

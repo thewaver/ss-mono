@@ -187,7 +187,7 @@ export namespace RichTextUtils {
             });
         }
 
-        if (firstUnwound) {
+        if (process.env.NODE_ENV !== "production" && firstUnwound) {
             console.warn(
                 `RichText: ${unwoundCount} closing tag(s) skipped over an unclosed tag, which was shown as text, the ` +
                     `first being [/${firstUnwound.tag}] at offset ${firstUnwound.index}, which skipped ` +

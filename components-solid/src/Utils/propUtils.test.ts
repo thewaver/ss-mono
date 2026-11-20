@@ -1,7 +1,7 @@
 import { createRoot, createSignal } from "solid-js";
 import { describe, expect, it } from "vitest";
 
-import { access } from "./propUtils";
+import { access, accessSignal } from "./propUtils";
 
 describe("access", () => {
     it("returns a plain value unchanged", () => {
@@ -30,6 +30,22 @@ describe("access", () => {
             setCount(2);
 
             expect(access(props.count)).toBe(2);
+
+            dispose();
+        });
+    });
+});
+
+describe("accessSignal", () => {
+    it("stores a value that is itself a function in an ordinary signal, rather than calling it", () => {
+        createRoot((dispose) => {
+            const source = createSignal<() => string>(() => "first");
+            const [getValue, setValue] = accessSignal(() => source);
+            const second = () => "second";
+
+            setValue(() => second);
+
+            expect(getValue()).toBe(second);
 
             dispose();
         });

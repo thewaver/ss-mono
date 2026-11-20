@@ -12,6 +12,7 @@ import {
     prop,
     selectionRange,
     setSelectionRange,
+    tabKey,
 } from "./helpers";
 
 const DOCS = "/src/App/Pages/TextInputPage/Docs";
@@ -170,7 +171,9 @@ test("an errored field announces itself invalid", async ({ page }) => {
  * It runs on the upper-casing field, because there a value reported mid-composition shows: its owner would write
  * the half-composed letters back upper-cased, into the middle of the IME's own buffer.
  */
-test("a composition is left alone until it is committed", async ({ page }) => {
+test("a composition is left alone until it is committed", async ({ page, browserName }) => {
+    test.skip(browserName !== "chromium", "the DevTools Protocol composition input exists only in Chromium");
+
     const session = await page.context().newCDPSession(page);
 
     await page.locator(COUPON).click();
@@ -416,7 +419,7 @@ test("Escape puts the old text back", async ({ page }) => {
 test("leaving the field keeps the edit", async ({ page }) => {
     await editButton(page).click();
     await typeOver(page, "Alan Turing");
-    await page.keyboard.press("Tab");
+    await page.keyboard.press(tabKey(page));
 
     await expect
         .poll(() => accessibleText(editButton(page)), { message: "focus leaving commits, the same as Enter" })

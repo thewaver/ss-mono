@@ -9,6 +9,7 @@ const HALF_TURN_DEGREES = 180;
 const FULL_TURN_DEGREES = 360;
 const FULL_TURN_EPSILON = 1e-4;
 
+/** SVG geometry written as markup: point lists, gradient coordinates, arcs, wedges and ring sectors. */
 export namespace SVGUtils {
     /**
      * Formats points for an SVG `points` attribute, as in `"0,0 10,0 10,10"`.

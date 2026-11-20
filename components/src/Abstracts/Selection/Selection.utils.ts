@@ -98,11 +98,17 @@ export namespace SelectionUtils {
      * @returns `true`, `false` or `"mixed"`, which is what a tri-state box and `aria-checked` both want.
      */
     export const getBranchState = <T>(item: T, selection: T[], defs: SelectionBranchDefs<T>): CheckedState => {
-        const children = defs.computeChildren(item) ?? EMPTY_CHILDREN;
+        const selected = new Set(selection);
 
-        if (children.length < 1) return selection.includes(item);
+        const judge = (node: T): CheckedState => {
+            const children = defs.computeChildren(node) ?? EMPTY_CHILDREN;
 
-        return getFoldedState(children.map((child) => getBranchState(child, selection, defs)));
+            if (children.length < 1) return selected.has(node);
+
+            return getFoldedState(children.map(judge));
+        };
+
+        return judge(item);
     };
 
     /**

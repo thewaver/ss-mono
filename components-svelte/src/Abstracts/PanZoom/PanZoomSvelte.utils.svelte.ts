@@ -114,7 +114,7 @@ export namespace PanZoomSvelteUtils {
         const setView = (next: PanZoomView, isImmediate: boolean) => {
             const clamped = PanZoomUtils.clampView(
                 next,
-                untrack(() => bounds),
+                untrack(() => ({ ...bounds, canCenterEdges: defs.getCanCenterEdges?.(next) ?? false })),
             );
 
             if (

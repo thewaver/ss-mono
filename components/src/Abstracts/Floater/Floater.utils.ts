@@ -115,8 +115,10 @@ export namespace FloaterUtils {
     /**
      * Measures the box round an item, and keeps measuring it, until the returned function is called.
      *
-     * The box is measured again whenever the item or the container changes size — so a label that grows, or a control
-     * that is squeezed, carries the marker with it. The first reading arrives as soon as observing starts.
+     * The box is measured again whenever the item, the container or anything before the item inside the container
+     * changes size — so a label that grows, a control that is squeezed, or an earlier item that widens and pushes this
+     * one along carries the marker with it. Items added after observing starts are not watched until it starts again.
+     * The first reading arrives as soon as observing starts.
      *
      * @param container The element the marker is positioned in.
      * @param target The item's element.
@@ -128,7 +130,15 @@ export namespace FloaterUtils {
         target: HTMLElement,
         onBounds: (bounds: FloaterBounds) => void,
     ) => {
-        return ElementObserverUtils.observeBorderBoxSizes([container, target], () =>
+        const earlier: HTMLElement[] = [];
+
+        for (let node: Element | null = target; node && node !== container; node = node.parentElement) {
+            for (let above = node.previousElementSibling; above; above = above.previousElementSibling) {
+                if (above instanceof HTMLElement) earlier.push(above);
+            }
+        }
+
+        return ElementObserverUtils.observeBorderBoxSizes([container, target, ...earlier], () =>
             onBounds(measureBounds(container, target)),
         );
     };

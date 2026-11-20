@@ -13,6 +13,7 @@ import {
     ProximityTextStyles as styles,
 } from "@thewaver/ss-components";
 import { ProximityTextConst } from "@thewaver/ss-components/internal";
+import { StringUtils } from "@thewaver/ss-utils";
 import type { Rect } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
@@ -196,7 +197,7 @@ export const ProximityText = (props: ParentProps<ProximityTextProps>) => {
                 );
             case "text": {
                 const renderLetters = () => (
-                    <Index each={Array.from(segment.text)}>
+                    <Index each={StringUtils.splitGraphemes(segment.text)}>
                         {(getCharacter, charIndex) => (
                             <span
                                 ref={(element) => {

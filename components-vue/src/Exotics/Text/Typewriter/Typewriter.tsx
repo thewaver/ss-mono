@@ -214,7 +214,9 @@ export const Typewriter = defineComponent(
             getIsAnimating: () => isAnimating.value,
             getIsHidden: getIsErasedNow,
             getCaretIndex: () => caretIndex.value,
-            renderCaret: slots.renderCaret ? () => callSlot(slots.renderCaret, undefined) : undefined,
+            get renderCaret() {
+                return slots.renderCaret ? () => callSlot(slots.renderCaret, undefined) : undefined;
+            },
         });
 
         watchAfterRender([], () => {
@@ -288,7 +290,7 @@ export const Typewriter = defineComponent(
                         if (isRunning) {
                             return (
                                 <span style={style}>
-                                    {Array.from(segment.text).map((character, offset) => (
+                                    {StringUtils.splitGraphemes(segment.text).map((character, offset) => (
                                         <Fragment key={offset}>
                                             <span
                                                 class={TypewriterStyles.typewriterChar}

@@ -55,7 +55,7 @@ const SortableItemSlot = (props: SortableItemSlotProps) => {
             onPointerDown={props.onPointerDown}
             onKeyDown={props.onKeyDown}
             onClick={props.onClick}
-            onFocus={props.onFocus}
+            onFocusIn={props.onFocus}
         >
             {props.renderContent(() => access(props.flags))}
         </div>
@@ -231,6 +231,8 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
     };
 
     const handlePointerDown = (index: number) => (e: PointerEvent) => {
+        hasPendingClick = false;
+
         if (e.button !== 0 || getIsDisabled()) return;
         if ((e.target as HTMLElement).closest(CarrierUtils.INTERACTIVE_SELECTOR)) return;
         if (CarrierSolidUtils.getCarry()) return;
@@ -276,7 +278,7 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
     };
 
     const handleKeyDown = (index: number) => (e: KeyboardEvent) => {
-        if (getIsDisabled()) return;
+        if (e.target !== e.currentTarget || getIsDisabled()) return;
 
         const action = SortableUtils.computeKeyAction(e.key, {
             index,
@@ -449,7 +451,6 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
                     ref={(element) => {
                         setRootRef(element);
                         setElementRef(element);
-                        props.ref?.(element);
                     }}
                     class={getOrientation() === "horizontal" ? styles.sortableRow : styles.sortableColumn}
                     style={{
@@ -467,7 +468,7 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
                                 {(getItem, index) => renderPlacedItem(index, renderItemAt(getItem, index))}
                             </Index>
 
-                            <Show when={props.renderMarker && getMarkerPlacement()} keyed>
+                            <Show when={props.renderMarker === undefined ? undefined : getMarkerPlacement()} keyed>
                                 {(placement: PlacementRect) => (
                                     <PlacementItem placement={() => placement}>
                                         <div class={styles.sortableMarkerPlaced} aria-hidden="true">
@@ -479,7 +480,14 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
                         </>,
                     )}
 
-                    <Show when={props.renderMarker && getLayout() === undefined && getMarkerOffset()} keyed>
+                    <Show
+                        when={
+                            props.renderMarker === undefined || getLayout() !== undefined
+                                ? undefined
+                                : getMarkerOffset()
+                        }
+                        keyed
+                    >
                         {(offset: number) => (
                             <div
                                 class={
@@ -531,7 +539,7 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
 
             {renderList()}
 
-            <Show when={props.renderCarried && getIsSource() && getCarriedPoint()}>
+            <Show when={props.renderCarried === undefined || !getIsSource() ? undefined : getCarriedPoint()}>
                 {(getPoint: () => Point2d) => (
                     <Portal mount={viewportContext.getPortalRef()}>
                         <div

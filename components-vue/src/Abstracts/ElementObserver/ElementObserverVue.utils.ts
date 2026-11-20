@@ -128,6 +128,8 @@ export namespace ElementObserverVueUtils {
      * @param isVisible Whether to keep measuring.
      * @param opts.padding Grows the rectangle outwards, either evenly or edge by edge. Read at each measurement.
      * @param opts.offset Shifts the rectangle. Applied after the padding. Read at each measurement.
+     * @param opts.isMeasuredWhileHidden Whether the measurement taken as the element mounts is taken while `isVisible`
+     * is `false`. `true` when left out; `false` leaves a hidden element unmeasured until it is shown.
      * @returns A ref of the rectangle, or `undefined` before the element has been measured.
      */
     export const useViewportRect = (
@@ -136,6 +138,7 @@ export namespace ElementObserverVueUtils {
         opts?: {
             padding?: MaybeRefOrGetter<Bounds | number | undefined>;
             offset?: MaybeRefOrGetter<Point2d | undefined>;
+            isMeasuredWhileHidden?: boolean;
         },
     ) => {
         const viewportContext = useViewportContext();
@@ -145,7 +148,7 @@ export namespace ElementObserverVueUtils {
         const getOffset = () => toValue(opts?.offset) ?? { x: 0, y: 0 };
 
         watchAfterRender([() => toValue(ref)], ([element]) => {
-            if (!element) return;
+            if (!element || (opts?.isMeasuredWhileHidden === false && !toValue(isVisible))) return;
 
             setRect(
                 ElementObserverUtils.measureViewportRect(element, viewportContext, {

@@ -47,7 +47,9 @@ export const ToolbarComposite = <T,>(props: ToolbarCompositeProps<T>) => {
 
     const getRootSize = ElementObserverSolidUtils.createBorderBoxSizeObserver(getRootRef);
 
-    const getItemSizes = ElementObserverSolidUtils.createBorderBoxSizeListObserver(getItemRefs);
+    const getItemSizes = ElementObserverSolidUtils.createBorderBoxSizeListObserver(() =>
+        getItemRefs().slice(0, getActions().length),
+    );
 
     const getOverflowSize = ElementObserverSolidUtils.createBorderBoxSizeObserver(getOverflowRef);
 

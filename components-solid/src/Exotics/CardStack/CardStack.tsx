@@ -4,6 +4,7 @@ import {
     CARD_STACK_DEFAULTS,
     type CardStackCardState,
     CardStackUtils,
+    NavigatorUtils,
     CardStackStyles as styles,
 } from "@thewaver/ss-components";
 import { CardStackConst } from "@thewaver/ss-components/internal";
@@ -119,6 +120,8 @@ export const CardStack = <T,>(props: CardStackProps<T>) => {
         });
 
     const onKeyDown = (e: KeyboardEvent) => {
+        if (e.target !== e.currentTarget || NavigatorUtils.getHasCommandModifier(e)) return;
+
         const direction: SwipeDirection | undefined = CardStackUtils.getKeyDirection(e.key);
 
         if (direction === undefined || !pile.send(direction)) return;

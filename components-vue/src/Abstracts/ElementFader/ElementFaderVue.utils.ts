@@ -12,7 +12,7 @@ export namespace ElementFaderVueUtils {
      *
      * `ElementFaderUtils.createFader` as a composable: `show` or `hide` is called once the component has rendered and
      * whenever `isVisible` changes, the three fields are read as refs, each notifying only when its own field
-     * changes, and anything in flight is cancelled on unmount. The options are read when they are needed, so a new
+     * changes, and anything in flight is canceled on unmount. The options are read when they are needed, so a new
      * duration or callback takes effect on the next fade without restarting the current one.
      *
      * Must run inside a component's `setup`.

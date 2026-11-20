@@ -383,7 +383,7 @@ export namespace CarouselUtils {
      *
      * Without `computeGroups` every slide is its own group, which is how a carousel moves when it has none. What a
      * consumer's `computeGroups` returned is held inside the list and to whole slides, empty ranges are dropped and
-     * the rest put in order of their start; overlapping and repeated ranges are kept. A console warning names what
+     * the rest put in order of their start; overlapping and repeated ranges are kept. In development, a console warning names what
      * had to be fixed, and when nothing usable is left the carousel falls back to one group per slide, with a
      * warning of its own. An empty list has no groups and warns about nothing.
      *
@@ -401,12 +401,15 @@ export namespace CarouselUtils {
         const kept = held.filter((group) => group.end > group.start);
 
         if (kept.length < 1) {
-            console.warn(FALLBACK_GROUPS_WARNING);
+            if (process.env.NODE_ENV !== "production") console.warn(FALLBACK_GROUPS_WARNING);
 
             return toSingleGroups(count);
         }
 
         const ordered = [...kept].sort(compareGroups);
+
+        if (process.env.NODE_ENV === "production") return ordered;
+
         const fixes = [
             held.some((group, index) => group.start !== groups[index].start || group.end !== groups[index].end)
                 ? "held inside the list, to whole slides"

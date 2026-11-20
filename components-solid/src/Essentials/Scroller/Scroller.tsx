@@ -204,9 +204,21 @@ export const Scroller = (props: ParentProps<ScrollerProps>) => {
         setProgress(next);
     });
 
+    const getScrollRanges = createMemo(
+        () => {
+            const metrics = getMetrics();
+
+            return { x: ScrollerUtils.computeScrollRange(metrics.x), y: ScrollerUtils.computeScrollRange(metrics.y) };
+        },
+        undefined,
+        { equals: (a, b) => a.x === b.x && a.y === b.y },
+    );
+
     createEffect(() => {
         const progress = getProgress();
         const box = getBoxRef();
+
+        getScrollRanges();
 
         if (!box) return;
 

@@ -322,3 +322,54 @@ describe("applyFilter", () => {
         expect(TextSyncUtils.applyFilter(digits, 0, "12", 2)).toEqual({ text: "", caret: 0 });
     });
 });
+
+describe("TextSyncUtils masks, a separator deleted from either side", () => {
+    it("takes the digit before a separator Backspace deleted, and the one after a separator Delete deleted", () => {
+        expect(TextSyncUtils.applyMask("##/##", "12/34", "1234", 2)).toEqual({ text: "13/4", caret: 1 });
+        expect(TextSyncUtils.applyMask("##/##", "12/34", "1234", 2, true)).toEqual({ text: "12/4", caret: 2 });
+    });
+
+    it("does the same in a grouped number", () => {
+        const defs = { groupSizes: [3], groupSeparator: ",", decimalSeparator: ".", decimals: 0, hasSign: false };
+
+        expect(TextSyncUtils.applyGroupedMask(defs, "1,234", "1234", 1).text).toBe("234");
+        expect(TextSyncUtils.applyGroupedMask(defs, "1,234", "1234", 1, true)).toEqual({ text: "134", caret: 1 });
+    });
+});
+
+describe("TextSyncUtils.createValueSync, when a composed word is confirmed", () => {
+    const createField = (value: string) => {
+        const field = {
+            value,
+            selectionStart: value.length as number | null,
+            selectionEnd: value.length as number | null,
+            setSelectionRange(start: number, end: number) {
+                field.selectionStart = start;
+                field.selectionEnd = end;
+            },
+        };
+
+        return field;
+    };
+
+    it("reports the masked text, as ordinary typing does", () => {
+        const reported: string[] = [];
+        let held = "";
+        const sync = TextSyncUtils.createValueSync(() => held, {
+            onInput: (value) => {
+                held = value;
+                reported.push(value);
+            },
+            computeMaskedText: (previous, next, caret, isForwardDeletion) =>
+                TextSyncUtils.applyMask("##/##", previous, next, caret, isForwardDeletion),
+        });
+        const field = createField("1234");
+
+        sync.handleCompositionStart();
+        sync.handleInput(field as never);
+        sync.handleCompositionEnd(field as never);
+
+        expect(reported).toEqual(["12/34"]);
+        expect(field.value).toBe("12/34");
+    });
+});

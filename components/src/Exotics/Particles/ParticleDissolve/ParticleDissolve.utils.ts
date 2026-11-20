@@ -1,4 +1,4 @@
-import { type Index2d, MathUtils, type Point2d, type Size2d } from "@thewaver/ss-utils";
+import { type Count2d, MathUtils, type Point2d, type Size2d } from "@thewaver/ss-utils";
 
 import type { ParticleDissolveSweep } from "./ParticleDissolve.types";
 
@@ -114,13 +114,13 @@ export namespace ParticleDissolveUtils {
      * @returns A weight from `0` to `1` for each cell by row then column, heaviest where the sweep starts, in the form
      * `ParticleField` takes.
      */
-    export const computeCellWeights = (count: Index2d, size: Size2d, sweep: ParticleDissolveSweep) => {
-        const cellWidth = size.width / count.col;
-        const cellHeight = size.height / count.row;
+    export const computeCellWeights = (count: Count2d, size: Size2d, sweep: ParticleDissolveSweep) => {
+        const cellWidth = size.width / count.colCount;
+        const cellHeight = size.height / count.rowCount;
 
-        return Array.from({ length: count.row }, (_, row) =>
+        return Array.from({ length: count.rowCount }, (_, row) =>
             Array.from(
-                { length: count.col },
+                { length: count.colCount },
                 (_, col) =>
                     1 - computeSweepPosition({ x: (col + 0.5) * cellWidth, y: (row + 0.5) * cellHeight }, size, sweep),
             ),
@@ -164,12 +164,12 @@ export namespace ParticleDissolveUtils {
      * @returns Enough squares to cover the size, at least one and at most 80 across or down, so a very large content
      * still has a grid it can afford.
      */
-    export const computeCellCount = (size: Size2d, cellSize: number): Index2d => {
+    export const computeCellCount = (size: Size2d, cellSize: number): Count2d => {
         const side = Math.max(cellSize, 1);
 
         return {
-            col: MathUtils.clamp(Math.ceil(size.width / side), 1, MAX_CELLS_PER_AXIS),
-            row: MathUtils.clamp(Math.ceil(size.height / side), 1, MAX_CELLS_PER_AXIS),
+            colCount: MathUtils.clamp(Math.ceil(size.width / side), 1, MAX_CELLS_PER_AXIS),
+            rowCount: MathUtils.clamp(Math.ceil(size.height / side), 1, MAX_CELLS_PER_AXIS),
         };
     };
 
