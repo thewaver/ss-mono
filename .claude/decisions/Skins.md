@@ -9,9 +9,10 @@ gradient button; another Skin might paint a bordered one with heavily rounded co
 Skin owns everything that paints — color, background, shadow, border, radius, padding, font — while display,
 size, position, z-index, transforms and transitions stay in the painter, for now. **A Skin is picked the way a
 Theme is**: a class on `<html>`, swapped from the left nav's settings (`PageComponents/Skin`, beside
-`PageComponents/Theme`), from `PLAYGROUND_SKINS` in `Skins/Skin.const.ts`. **No Skin reads the theme's shadow
-scale**: Shaded and Glass hold their own copies (`SHADOW_SMALL`, `SHADOW_MEDIUM`, `SHADOW_LARGE`), and
-`themeVars.shadow` stays only for the custom painters outside the Skins, until the user decides their shadows. **Every Skin lives in
+`PageComponents/Theme`), from `PLAYGROUND_SKINS` in `Skins/Skin.const.ts`. **Shadows belong to the Skins, and the Theme has
+none** — the user's call: each Skin that casts them holds its own (`SHADOW_SMALL`, `SHADOW_MEDIUM`,
+`SHADOW_LARGE` in Shaded and Glass), and a painter outside the Skins — a custom layout, an Exotic, a page — casts
+none. **Every Skin lives in
 `Skins/Variants/`**, one file each, the user's placement; `Skins/` itself holds only the machinery.
 
 **Fourteen Skins were built, Shaded being the default; `PLAYGROUND_SKINS` holds the ones still kept**, and
@@ -209,7 +210,12 @@ planned for.
   line, the Paginator demo's row numbers). It is a variable rather than an entry because those uses paint different
   properties. It falls back to the Theme's `primary.main`; a Skin sets `skinColorVars.accentColor` in its root style
   to change it, and `define` resets it at every Skin root, so a nested Skin does not inherit the outer one's. Named
-  after CSS's `accent-color`, since "highlight" already means the hover floater here. **`Calendar`'s month title
+  after CSS's `accent-color`, since "highlight" already means the hover floater here. **`skinVars.outlineColor` is
+  the focus ring's color**, the user's call to make it work like `accentColor`: it falls back to the Theme's
+  `outline.main`, a Skin overrides it through `skinColorVars.outlineColor`, and the page-wide `:focus-visible` rule
+  lives in `Skin.css.ts` beside it, so the real ring and every painted copy of it (`SegmentedInput`'s caret cell,
+  `TagInput`'s picked tag, `ColorArea`, the Exotics' and Pages' rings) stay one color. Named after CSS's
+  `outline-color`, since "outline" means the focus indicator here. **`Calendar`'s month title
   wears `decoration`**, the user's call: it is a small button opening a picker, like the picker triggers. **The
   Appearance page's Input group shows `InlineEdit` at rest and hovered**, its painter handed fixed flags since the
   previews cannot be hovered. The same way, the **Drop zone** column shows the file drop zone's painter in five fixed states and the

@@ -1,8 +1,8 @@
-import { createVar, fallbackVar, layer, style } from "@vanilla-extract/css";
+import { createVar, fallbackVar, globalStyle, layer, style } from "@vanilla-extract/css";
 
 import type { SkinEntry, SkinState } from "./Skin.types";
 
-import { themeVars } from "../Theme.css";
+import { FOCUS_RING_WIDTH, themeVars } from "../Theme.css";
 
 export const skinLayer = layer("skin");
 
@@ -20,15 +20,21 @@ export const skinSizeVars = {
 
 export const skinColorVars = {
     accentColor: createVar(),
+    outlineColor: createVar(),
 };
 
 export const skinVars = {
     barAngle: fallbackVar(barAngle, "90deg"),
     accentColor: fallbackVar(skinColorVars.accentColor, themeVars.color.primary.main),
+    outlineColor: fallbackVar(skinColorVars.outlineColor, themeVars.color.outline.main),
     startValue: createVar(),
     endValue: createVar(),
     ...skinSizeVars,
 };
+
+globalStyle(":focus-visible", {
+    outline: `${FOCUS_RING_WIDTH}px solid ${skinVars.outlineColor}`,
+});
 
 export const skinBoundary = style({});
 

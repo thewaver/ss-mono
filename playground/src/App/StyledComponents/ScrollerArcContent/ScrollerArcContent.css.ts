@@ -48,7 +48,6 @@ export const scrollerArcThumb = style({
     marginLeft: -ARC_THUMB_SIZE * 0.5,
     borderRadius: "50%",
     backgroundColor: themeVars.color.primary.main,
-    boxShadow: themeVars.shadow.small,
 
     selectors: {
         [`&.${isDragging}`]: {

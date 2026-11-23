@@ -1,6 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
-import { skinEntries, skinStates } from "../../Skins/Skin.css";
+import { skinEntries, skinStates, skinVars } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 import { FIELD_FONT_SIZE, fieldSurface } from "../TextFieldContent/TextFieldContent.css";
 
@@ -29,7 +29,7 @@ export const tagContent = style([
 
         selectors: {
             [`&.${isFocused}`]: {
-                outline: `2px solid ${themeVars.color.outline.main}`,
+                outline: `2px solid ${skinVars.outlineColor}`,
                 outlineOffset: 1,
             },
         },

@@ -26,7 +26,6 @@ export const trailVehicle = style({
     color: themeVars.color.primary.contrast,
     fontSize: themeVars.fontSize.xSmall,
     fontWeight: "bold",
-    boxShadow: themeVars.shadow.small,
 });
 
 export const trailMarker = style({
@@ -35,7 +34,6 @@ export const trailMarker = style({
     borderRadius: "50%",
     border: `2px solid ${themeVars.color.primary.main}`,
     background: `radial-gradient(circle at 70% 30%, ${themeVars.color.primary.light}, ${themeVars.color.primary.dark})`,
-    boxShadow: themeVars.shadow.small,
 });
 
 export const trailReadout = style({

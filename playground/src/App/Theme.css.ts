@@ -86,10 +86,6 @@ globalStyle(":focus", {
 
 export const FOCUS_RING_WIDTH = 2;
 
-globalStyle(":focus-visible", {
-    outline: `${FOCUS_RING_WIDTH}px solid ${themeVars.color.outline.main}`,
-});
-
 globalStyle("[role='presentation'] > :focus-visible:has(> :only-child)", {
     isolation: "isolate",
 });

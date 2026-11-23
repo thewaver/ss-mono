@@ -81,7 +81,6 @@ export const treeRadialNode = style([
         width: "100%",
         height: "100%",
         borderRadius: "50%",
-        boxShadow: themeVars.shadow.small,
         fontSize: themeVars.fontSize.xSmall,
         whiteSpace: "nowrap",
         transition: `background-color ${themeVars.animation.duration}, color ${themeVars.animation.duration}`,

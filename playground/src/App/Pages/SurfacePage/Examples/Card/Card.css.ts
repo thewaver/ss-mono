@@ -7,7 +7,6 @@ export const borderRadius = 20;
 export const root = style({
     width: 400,
     borderRadius,
-    boxShadow: themeVars.shadow.small,
 });
 
 export const surfaceRoot = style({

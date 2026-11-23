@@ -1,6 +1,7 @@
 <script lang="ts">
     import { Shape } from "@thewaver/ss-components-svelte";
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/TileBoardContent/TileBoardContent.css";
+    import { skinVars } from "@thewaver/ss-playground/App/Skins/Skin.css";
     import { themeVars } from "@thewaver/ss-playground/App/Theme.css";
 
     import { getLayerClass } from "../Layer/Layer.context";
@@ -17,7 +18,7 @@
     const renderProps = $derived(props.renderProps);
 
     const strokeColor = $derived(
-        renderProps.isFocusVisible ? themeVars.color.outline.main : themeVars.color.primary.main,
+        renderProps.isFocusVisible ? skinVars.outlineColor : themeVars.color.primary.main,
     );
 </script>
 

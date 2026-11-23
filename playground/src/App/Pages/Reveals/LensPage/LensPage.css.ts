@@ -1,6 +1,6 @@
 import { globalStyle, style } from "@vanilla-extract/css";
 
-import { skinEntries } from "../../../Skins/Skin.css";
+import { skinEntries, skinVars } from "../../../Skins/Skin.css";
 import { FOCUS_RING_WIDTH, themeVars } from "../../../Theme.css";
 
 export const root = style({
@@ -8,7 +8,7 @@ export const root = style({
     overflow: "hidden",
     selectors: {
         "&:has(> :focus-visible)": {
-            outline: `${FOCUS_RING_WIDTH}px solid ${themeVars.color.outline.main}`,
+            outline: `${FOCUS_RING_WIDTH}px solid ${skinVars.outlineColor}`,
         },
     },
 });

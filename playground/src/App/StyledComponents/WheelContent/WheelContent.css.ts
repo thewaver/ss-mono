@@ -161,7 +161,6 @@ export const wheelSpin = style([
         border: `2px solid ${themeVars.color.primary.light}`,
         color: themeVars.color.primary.contrast,
         fontWeight: "bold",
-        boxShadow: themeVars.shadow.medium,
     },
 ]);
 

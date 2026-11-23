@@ -36,7 +36,6 @@ export const spawnerMarker = style({
     borderRadius: themeVars.borderRadius.half,
     backgroundColor: themeVars.color.primary.light,
     backgroundImage: `radial-gradient(circle at 70% 30%, ${themeVars.color.primary.light}, ${themeVars.color.primary.dark})`,
-    boxShadow: themeVars.shadow.small,
 });
 
 const bobUpAndDown = keyframes({
@@ -90,7 +89,6 @@ export const targetMarker = style({
     borderRadius: themeVars.borderRadius.half,
     backgroundColor: themeVars.color.secondary.light,
     backgroundImage: `radial-gradient(circle at 70% 30%, ${themeVars.color.secondary.light}, ${themeVars.color.secondary.dark})`,
-    boxShadow: themeVars.shadow.small,
 });
 
 const moveAroundCorners = keyframes({

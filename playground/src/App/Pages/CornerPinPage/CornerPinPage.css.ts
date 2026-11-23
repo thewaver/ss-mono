@@ -1,5 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
+import { skinVars } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 
 const GRIP_SIZE = 20;
@@ -49,7 +50,7 @@ export const grip = style({
             boxShadow: `0 0 0 1px rgba(0, 0, 0, 0.5), 0 0 0 5px ${themeVars.color.secondary.main}`,
         },
         [`&.${isFocused}`]: {
-            outline: `2px solid ${themeVars.color.outline.main}`,
+            outline: `2px solid ${skinVars.outlineColor}`,
             outlineOffset: 2,
         },
     },

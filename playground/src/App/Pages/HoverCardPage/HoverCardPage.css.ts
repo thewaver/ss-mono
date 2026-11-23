@@ -1,5 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
+import { skinVars } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 
 export const sentence = style({});
@@ -17,7 +18,7 @@ export const handle = style({
             textDecoration: "underline",
         },
         "&:focus-visible": {
-            outline: `2px solid ${themeVars.color.outline.main}`,
+            outline: `2px solid ${skinVars.outlineColor}`,
             outlineOffset: 2,
         },
     },

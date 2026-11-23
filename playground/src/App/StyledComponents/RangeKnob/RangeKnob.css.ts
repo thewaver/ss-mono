@@ -22,10 +22,10 @@ export const rangeKnob = style([
 
         selectors: {
             [`&.${isFocused}`]: {
-                boxShadow: `${themeVars.shadow.small}, inset 0 0 0 2px ${themeVars.color.primary.main}`,
+                boxShadow: `inset 0 0 0 2px ${themeVars.color.primary.main}`,
             },
             [`&.${hasError}`]: {
-                boxShadow: `${themeVars.shadow.small}, inset 0 0 0 2px ${themeVars.color.error.main}`,
+                boxShadow: `inset 0 0 0 2px ${themeVars.color.error.main}`,
             },
             [`&.${isDisabled}`]: {
                 opacity: 0.5,

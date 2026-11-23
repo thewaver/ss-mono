@@ -2,6 +2,7 @@ import { style } from "@vanilla-extract/css";
 
 import { ARROW_BED_BOX_SIZE, ARROW_BED_GAP, CIRCLING_SLIDER_WIDTH } from "./TooltipPage.const";
 
+import { skinVars } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 
 export const anchorRow = style({
@@ -26,7 +27,7 @@ export const anchorWord = style({
 
     selectors: {
         "&:focus-visible": {
-            outline: `2px solid ${themeVars.color.outline.main}`,
+            outline: `2px solid ${skinVars.outlineColor}`,
             outlineOffset: 2,
         },
     },

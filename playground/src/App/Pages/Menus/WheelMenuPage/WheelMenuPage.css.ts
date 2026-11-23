@@ -85,7 +85,6 @@ export const closer = style([
         width: "100%",
         height: "100%",
         borderRadius: "50%",
-        boxShadow: themeVars.shadow.small,
         fontSize: themeVars.fontSize.medium,
         transition: "background-color 120ms ease-out, color 120ms ease-out",
     },

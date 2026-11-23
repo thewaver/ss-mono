@@ -1,6 +1,6 @@
 import { createVar, style } from "@vanilla-extract/css";
 
-import { skinEntries, skinStates } from "../../Skins/Skin.css";
+import { skinEntries, skinStates, skinVars } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 import { SWATCH_RING_COLOR } from "../ColorInputContent/ColorInputContent.css";
 import { FIELD_HEIGHT, FIELD_PADDING } from "../TextFieldContent/TextFieldContent.css";
@@ -58,7 +58,7 @@ export const colorAreaThumb = style({
             transform: "scale(1.2)",
         },
         [`${colorAreaSquare}.${isFocused} &`]: {
-            outline: `2px solid ${themeVars.color.outline.main}`,
+            outline: `2px solid ${skinVars.outlineColor}`,
             outlineOffset: 2,
         },
     },
@@ -99,7 +99,7 @@ export const hueThumb = style({
 
     selectors: {
         [`&.${isFocused}`]: {
-            outline: `2px solid ${themeVars.color.outline.main}`,
+            outline: `2px solid ${skinVars.outlineColor}`,
             outlineOffset: 2,
         },
     },

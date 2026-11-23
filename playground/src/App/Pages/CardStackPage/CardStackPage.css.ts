@@ -34,7 +34,6 @@ export const deckCard = style({
     backgroundImage: panel(themeVars.color.primary.dark, themeVars.color.primary.light),
     color: themeVars.color.primary.contrast,
     fontSize: themeVars.fontSize.medium,
-    boxShadow: themeVars.shadow.small,
     userSelect: "none",
     transitionProperty: "transform, opacity",
     transitionTimingFunction: "ease-out",

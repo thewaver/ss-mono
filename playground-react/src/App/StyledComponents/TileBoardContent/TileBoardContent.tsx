@@ -1,4 +1,5 @@
 import { Shape } from "@thewaver/ss-components-react";
+import { skinVars } from "@thewaver/ss-playground/App/Skins/Skin.css";
 import {
     EDGE_STROKE_GEOM,
     FOCUS_STROKE_GEOM,
@@ -15,7 +16,7 @@ export const PageTileBoardTile = (props: PageTileBoardTileProps) => {
 
     const renderProps = props.renderProps;
 
-    const strokeColor = renderProps.isFocusVisible ? themeVars.color.outline.main : themeVars.color.primary.main;
+    const strokeColor = renderProps.isFocusVisible ? skinVars.outlineColor : themeVars.color.primary.main;
 
     return (
         <div

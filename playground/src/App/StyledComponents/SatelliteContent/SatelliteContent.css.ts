@@ -26,7 +26,6 @@ export const satelliteBadge = style({
     backgroundImage: `radial-gradient(circle at 70% 30%, ${themeVars.color.primary.light}, ${themeVars.color.primary.dark})`,
     color: themeVars.color.primary.contrast,
     fontSize: themeVars.fontSize.xSmall,
-    boxShadow: themeVars.shadow.small,
 });
 
 export const satelliteBadgeMuted = style({
@@ -49,5 +48,4 @@ export const satellitePill = style({
     color: themeVars.color.primary.contrast,
     fontSize: themeVars.fontSize.large,
     whiteSpace: "nowrap",
-    boxShadow: themeVars.shadow.small,
 });

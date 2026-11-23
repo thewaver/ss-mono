@@ -1,7 +1,7 @@
 import { style } from "@vanilla-extract/css";
 
-import { skinEntries, skinStates } from "../../Skins/Skin.css";
-import { FOCUS_RING_WIDTH, themeVars } from "../../Theme.css";
+import { skinEntries, skinStates, skinVars } from "../../Skins/Skin.css";
+import { FOCUS_RING_WIDTH } from "../../Theme.css";
 import { FIELD_FONT_SIZE, FIELD_HEIGHT, fieldSurface } from "../TextFieldContent/TextFieldContent.css";
 
 const CELL_WIDTH = 36;
@@ -22,7 +22,7 @@ export const segmentedInputCell = style([
 
         selectors: {
             [`&.${hasCaret}`]: {
-                outline: `${FOCUS_RING_WIDTH}px solid ${themeVars.color.outline.main}`,
+                outline: `${FOCUS_RING_WIDTH}px solid ${skinVars.outlineColor}`,
             },
         },
     },

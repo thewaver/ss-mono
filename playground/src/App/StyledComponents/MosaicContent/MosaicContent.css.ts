@@ -12,7 +12,6 @@ export const mosaicTile = style({
     boxSizing: "border-box",
     padding: themeVars.spacing.half,
     borderRadius: themeVars.borderRadius.half,
-    boxShadow: themeVars.shadow.small,
     fontSize: themeVars.fontSize.xSmall,
     overflow: "hidden",
 });

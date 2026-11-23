@@ -5,10 +5,6 @@ import { toCssFamily } from "./Theme.utils";
 export const BORDER_RADIUS_HALF = 5;
 export const BORDER_RADIUS_FULL = 10;
 
-const SHADOW_SMALL = "0 2px 2px 0px rgba(0, 0, 0, 0.75)";
-const SHADOW_MEDIUM = "0 4px 8px 0px rgba(0, 0, 0, 0.5)";
-const SHADOW_LARGE = "0 16px 64px 0px rgba(0, 0, 0, 0.25)";
-
 export type ColorFamily = { dark: Color.HSL; main: Color.HSL; light: Color.HSL; contrast: Color.HSL };
 
 const SHARED_THEME_VALUES = {
@@ -59,11 +55,6 @@ const SHARED_THEME_VALUES = {
     borderRadius: {
         half: `${BORDER_RADIUS_HALF}px`,
         full: `${BORDER_RADIUS_FULL}px`,
-    },
-    shadow: {
-        small: SHADOW_SMALL,
-        medium: `${SHADOW_SMALL}, ${SHADOW_MEDIUM}`,
-        large: `${SHADOW_SMALL}, ${SHADOW_MEDIUM}, ${SHADOW_LARGE}`,
     },
     hover: {
         filter: "brightness(125%)",

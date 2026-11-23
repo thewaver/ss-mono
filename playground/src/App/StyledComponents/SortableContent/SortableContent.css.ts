@@ -88,7 +88,6 @@ export const sortableRingMarker = style({
     height: "70%",
     borderRadius: themeVars.borderRadius.half,
     backgroundColor: themeVars.color.primary.main,
-    boxShadow: themeVars.shadow.small,
 });
 
 export const sortableRoom = style({

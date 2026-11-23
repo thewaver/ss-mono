@@ -12,7 +12,6 @@ export const staircaseStep = style({
     backgroundColor: themeVars.color.primary.light,
     backgroundImage: `linear-gradient(45deg, ${themeVars.color.primary.dark}, ${themeVars.color.primary.light})`,
     color: themeVars.color.primary.contrast,
-    boxShadow: themeVars.shadow.small,
     fontSize: themeVars.fontSize.small,
     whiteSpace: "nowrap",
     overflow: "hidden",

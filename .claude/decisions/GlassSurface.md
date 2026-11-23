@@ -32,8 +32,8 @@ component.
 
 **The ripple samples outside the pane, so the displacement is faded to nothing at the edges.**
 `feDisplacementMap` at scale _k_ reaches up to _k_/2 pixels away, and for a `backdrop-filter` those pixels are
-outside the element, where the browser has nothing real to give it. The Playground's shadow exposed this
-first — `themeVars.shadow.large` is offset sixteen pixels downward, so the bottom was the only edge with
+outside the element, where the browser has nothing real to give it. A drop shadow exposed this
+first — one offset sixteen pixels downward, so the bottom was the only edge with
 anything to pull and it alone grew a smeared band — but a large corner radius showed the true extent: at 150px
 on a 300px pane the visible boundary is a circle touching the rectangle's edges, and the whole rim was chewed.
 

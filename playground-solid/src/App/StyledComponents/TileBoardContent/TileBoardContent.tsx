@@ -1,4 +1,5 @@
 import { Shape, access } from "@thewaver/ss-components-solid";
+import { skinVars } from "@thewaver/ss-playground/App/Skins/Skin.css";
 import {
     EDGE_THICKNESSES,
     FOCUS_THICKNESSES,
@@ -16,7 +17,7 @@ export const PageTileBoardTile = (props: PageTileBoardTileProps) => {
     const getRenderProps = () => access(props.renderProps);
 
     const getStrokeColor = () =>
-        getRenderProps().isFocusVisible ? themeVars.color.outline.main : themeVars.color.primary.main;
+        getRenderProps().isFocusVisible ? skinVars.outlineColor : themeVars.color.primary.main;
 
     return (
         <div

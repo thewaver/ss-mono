@@ -11,7 +11,6 @@ export const docsAlertRoot = style({
     maxWidth: layoutVars.readingWidth,
     padding: `${themeVars.spacing.full} ${themeVars.spacing.double}`,
     borderRadius: themeVars.borderRadius.full,
-    boxShadow: themeVars.shadow.medium,
     border: `2px solid ${color}`,
     backgroundColor,
     color,

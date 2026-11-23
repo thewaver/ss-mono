@@ -45,7 +45,6 @@ export const paneShadow = style({
     position: "absolute",
     inset: 0,
     pointerEvents: "none",
-    boxShadow: themeVars.shadow.large,
 });
 
 export const paneContent = style({

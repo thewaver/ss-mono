@@ -573,13 +573,14 @@ shipped painter reaches the Skins and nothing else, since a consumer's Theme can
 from the level are settled (`decisions.md`, under _"Skins"_); these are the Theme reads the painters still make themselves, counted with the
 custom layouts (the arc Stepper, the radial Tree, the Paginator's dial, the hex tabs, `Sortable`'s ring) left out.
 
-- **Colors.** `FormField` and the segmented radio read `error`; `SegmentedInput` and `TagInput` read the Theme's
-  focus `outline` color, `SegmentedInput` also `FOCUS_RING_WIDTH`. **Deferred by the user:** `Stepper`'s markers
+- **Colors.** `FormField` and the segmented radio read `error`, to be discussed. The focus ring's color moved to
+  `skinVars.outlineColor` (`decisions.md`, under _"Skins"_). **Deferred by the user:** `Stepper`'s markers
   (primary, success, alert and error, one per step state) and `Toast` (info, success and error), since each reads
   several colors and needs more thought. The accents moved to `skinVars.accentColor` (`decisions.md`, under
   _"Skins"_).
 - **Sizing** — spacing, font sizes and corner radii, about 190 reads across nearly every painter, plus the indent
-  `TableOfContents` and `TreeNode` compute from Theme spacing in their components, in all four frameworks.
+  `TableOfContents` and `TreeNode` compute from Theme spacing in their components, in all four frameworks, and
+  `SegmentedInput`'s ring width, `FOCUS_RING_WIDTH`.
 - **Hover, press and disabled effects** — about 35 reads across 15 painters.
 - **Animation durations** — about 145 reads across 44 painters. Under the Skins decision transitions stay in the
   painters, so where their values come from is part of the same question.

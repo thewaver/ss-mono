@@ -2,6 +2,7 @@
 import { computed } from "vue";
 
 import { Shape } from "@thewaver/ss-components-vue";
+import { skinVars } from "@thewaver/ss-playground/App/Skins/Skin.css";
 import {
     EDGE_STROKE_GEOM,
     FOCUS_STROKE_GEOM,
@@ -17,7 +18,7 @@ const props = defineProps<PageTileBoardTileProps>();
 const layerClass = useLayerClass();
 
 const strokeColor = computed(() =>
-    props.renderProps.isFocusVisible ? themeVars.color.outline.main : themeVars.color.primary.main,
+    props.renderProps.isFocusVisible ? skinVars.outlineColor : themeVars.color.primary.main,
 );
 </script>
 

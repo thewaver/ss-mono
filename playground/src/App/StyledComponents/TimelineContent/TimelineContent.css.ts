@@ -1,6 +1,6 @@
 import { style, styleVariants } from "@vanilla-extract/css";
 
-import { skinEntries } from "../../Skins/Skin.css";
+import { skinEntries, skinVars } from "../../Skins/Skin.css";
 import { FOCUS_RING_WIDTH, RAINBOW, RAINBOW_HUES, themeVars } from "../../Theme.css";
 
 export const AXIS_HEIGHT = 22;
@@ -105,7 +105,6 @@ export const timelineBlock = style({
     minWidth: 0,
     padding: `0 ${themeVars.spacing.half}`,
     borderRadius: themeVars.borderRadius.half,
-    boxShadow: themeVars.shadow.small,
     cursor: "pointer",
     overflow: "hidden",
     transition: `filter ${themeVars.animation.duration}`,
@@ -115,14 +114,14 @@ export const timelineBlock = style({
             filter: "brightness(1.2)",
         },
         [`&.${isFocusVisible}`]: {
-            outline: `${FOCUS_RING_WIDTH}px solid ${themeVars.color.outline.main}`,
+            outline: `${FOCUS_RING_WIDTH}px solid ${skinVars.outlineColor}`,
             outlineOffset: 1,
         },
         [`&.${isHeldStart}`]: {
-            boxShadow: `inset ${HELD_EDGE_WIDTH}px 0 0 ${themeVars.color.outline.main}`,
+            boxShadow: `inset ${HELD_EDGE_WIDTH}px 0 0 ${skinVars.outlineColor}`,
         },
         [`&.${isHeldEnd}`]: {
-            boxShadow: `inset -${HELD_EDGE_WIDTH}px 0 0 ${themeVars.color.outline.main}`,
+            boxShadow: `inset -${HELD_EDGE_WIDTH}px 0 0 ${skinVars.outlineColor}`,
         },
         [`&.${isDisabled}`]: {
             filter: themeVars.disabled.filter,

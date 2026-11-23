@@ -1,6 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
-import { skinEntries } from "../../Skins/Skin.css";
+import { skinEntries, skinVars } from "../../Skins/Skin.css";
 import { FOCUS_RING_WIDTH, themeVars } from "../../Theme.css";
 
 export const isCarried = style({});
@@ -26,7 +26,6 @@ export const patchNode = style([
         padding: themeVars.spacing.full,
         border: `2px solid ${themeVars.color.primary.main}`,
         borderRadius: themeVars.borderRadius.half,
-        boxShadow: themeVars.shadow.small,
         cursor: "grab",
         transition: `border-color ${themeVars.animation.duration}, box-shadow ${themeVars.animation.duration}`,
 
@@ -35,12 +34,11 @@ export const patchNode = style([
                 borderColor: themeVars.color.primary.main,
             },
             [`&.${isFocusVisible}`]: {
-                outline: `${FOCUS_RING_WIDTH}px solid ${themeVars.color.outline.main}`,
+                outline: `${FOCUS_RING_WIDTH}px solid ${skinVars.outlineColor}`,
                 outlineOffset: 2,
             },
             [`&.${isCarried}`]: {
                 cursor: "grabbing",
-                boxShadow: themeVars.shadow.medium,
             },
             [`&.${isDisabled}`]: {
                 filter: themeVars.disabled.filter,
@@ -103,7 +101,7 @@ export const patchSocket = style([
                 borderStyle: "dashed",
             },
             [`&.${isFocusVisible}`]: {
-                outline: `${FOCUS_RING_WIDTH}px solid ${themeVars.color.outline.main}`,
+                outline: `${FOCUS_RING_WIDTH}px solid ${skinVars.outlineColor}`,
                 outlineOffset: 2,
             },
             [`&.${isDisabled}`]: {

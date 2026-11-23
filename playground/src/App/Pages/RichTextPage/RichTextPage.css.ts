@@ -2,6 +2,7 @@ import { style } from "@vanilla-extract/css";
 
 import { PREVIEW_WIDTH } from "./RichTextPage.const";
 
+import { skinVars } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 
 export const root = style({
@@ -66,7 +67,7 @@ export const glossaryTerm = style({
 
     selectors: {
         "&:focus-visible": {
-            outline: `2px solid ${themeVars.color.outline.main}`,
+            outline: `2px solid ${skinVars.outlineColor}`,
             outlineOffset: 2,
         },
     },
@@ -78,7 +79,7 @@ export const link = style({
 
     selectors: {
         "&:focus-visible": {
-            outline: `2px solid ${themeVars.color.outline.main}`,
+            outline: `2px solid ${skinVars.outlineColor}`,
             outlineOffset: 2,
         },
     },
