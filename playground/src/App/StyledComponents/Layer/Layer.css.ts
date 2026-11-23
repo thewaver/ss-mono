@@ -1,24 +1,13 @@
-import { assignVars, createThemeContract, globalStyle, style, styleVariants } from "@vanilla-extract/css";
+import { style } from "@vanilla-extract/css";
 
-import { themeVars } from "../../Theme.css";
+import type { LayerLevel } from "../../PageComponents/Layer/Layer.context.types";
 
-export const layerVars = createThemeContract({
-    dark: null,
-    main: null,
-    light: null,
-    contrast: null,
-});
-
-export const layerLevelVariants = styleVariants({
-    0: { vars: assignVars(layerVars, themeVars.color.layers.level0) },
-    1: { vars: assignVars(layerVars, themeVars.color.layers.level1) },
-    2: { vars: assignVars(layerVars, themeVars.color.layers.level2) },
-});
+export const layerLevelVariants: Record<LayerLevel, string> = {
+    0: style({}),
+    1: style({}),
+    2: style({}),
+};
 
 export const layerScope = style({
     display: "contents",
-});
-
-globalStyle(":root", {
-    vars: assignVars(layerVars, themeVars.color.layers.level0),
 });

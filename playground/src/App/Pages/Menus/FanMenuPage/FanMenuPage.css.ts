@@ -1,7 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
 import { skinEntries, skinStates } from "../../../Skins/Skin.css";
-import { layerVars } from "../../../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../../../Theme.css";
 
 export const itemHighlighted = style([skinStates.isHovered]);
@@ -50,10 +49,10 @@ export const itemFloaterVisible = style({
 export const itemDisabled = style([skinStates.isDisabled]);
 
 export const shortcut = style({
+    border: "1px solid color-mix(in srgb, currentColor 25%, transparent)",
     flex: "none",
     padding: `0 ${themeVars.spacing.half}`,
     borderRadius: themeVars.borderRadius.half,
-    border: `1px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
     fontFamily: "monospace",
     fontSize: themeVars.fontSize.xSmall,
     opacity: 0.75,

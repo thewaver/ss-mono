@@ -4,7 +4,6 @@ import { LAYOUT } from "../../Layout.const";
 
 import { layoutVars } from "../../Layout.css";
 import { skinEntries } from "../../Skins/Skin.css";
-import { layerVars } from "../../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../../Theme.css";
 
 export const docsLayout = style({
@@ -95,23 +94,31 @@ export const docsTable = style({
     textAlign: "left",
 });
 
-export const docsHeadCell = style({
-    borderBottom: `1px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
-    padding: themeVars.spacing.full,
-    whiteSpace: "nowrap",
-    fontWeight: "bold",
-});
+export const docsHeadCell = style([
+    skinEntries.divider,
+    {
+        padding: themeVars.spacing.full,
+        whiteSpace: "nowrap",
+        fontWeight: "bold",
+        borderBottomWidth: 1,
+        borderBottomStyle: "solid",
+    },
+]);
 
-export const docsCell = style({
-    padding: themeVars.spacing.full,
-    verticalAlign: "top",
+export const docsCell = style([
+    skinEntries.divider,
+    {
+        padding: themeVars.spacing.full,
+        verticalAlign: "top",
 
-    selectors: {
-        [`tr:not(:last-child) > &`]: {
-            borderBottom: `1px solid rgb(from ${layerVars.contrast} r g b / 10%)`,
+        selectors: {
+            [`tr:not(:last-child) > &`]: {
+                borderBottomWidth: 1,
+                borderBottomStyle: "solid",
+            },
         },
     },
-});
+]);
 
 export const docsNameCell = style([docsCell, { whiteSpace: "nowrap", fontFamily: "monospace" }]);
 

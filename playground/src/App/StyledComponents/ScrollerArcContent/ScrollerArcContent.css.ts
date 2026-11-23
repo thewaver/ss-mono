@@ -3,7 +3,6 @@ import { style } from "@vanilla-extract/css";
 import { ARC_THUMB_SIZE } from "./ScrollerArcContent.const";
 
 import { themeVars } from "../../Theme.css";
-import { layerVars } from "../Layer/Layer.css";
 
 export const ARC_LINE = 6;
 
@@ -36,7 +35,7 @@ export const scrollerArcSvg = style({
 
 export const scrollerArcPath = style({
     fill: "none",
-    stroke: `rgb(from ${layerVars.contrast} r g b / 25%)`,
+    stroke: `color-mix(in srgb, currentColor 25%, transparent)`,
     strokeWidth: ARC_LINE,
     strokeLinecap: "round",
 });

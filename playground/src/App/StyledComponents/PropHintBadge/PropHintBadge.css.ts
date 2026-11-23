@@ -1,7 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
-import { layerVars } from "../Layer/Layer.css";
 
 export const isHovered = style({});
 export const isActive = style({});
@@ -15,9 +14,7 @@ export const propHintBadge = style({
     flexShrink: 0,
     width: BADGE_SIZE,
     height: BADGE_SIZE,
-    border: `1px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
     borderRadius: "50%",
-    color: layerVars.contrast,
     fontSize: themeVars.fontSize.xSmall,
     fontWeight: "bold",
     cursor: "help",

@@ -2,7 +2,6 @@ import { style } from "@vanilla-extract/css";
 
 import { skinEntries, skinStates } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
-import { layerVars } from "../Layer/Layer.css";
 import { FIELD_HEIGHT } from "../TextFieldContent/TextFieldContent.css";
 
 const CELL_SIZE = 46;
@@ -58,31 +57,26 @@ export const calendarWeekday = style({
     justifyContent: "center",
     width: CELL_SIZE,
     height: CELL_SIZE,
-    color: layerVars.contrast,
     fontSize: themeVars.fontSize.xSmall,
     textTransform: "uppercase",
     opacity: 0.75,
 });
 
-export const calendarTitle = style({
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    height: FIELD_HEIGHT,
-    paddingInline: themeVars.spacing.full,
-    borderRadius: themeVars.borderRadius.half,
-    color: layerVars.contrast,
-    fontSize: themeVars.fontSize.small,
-    fontWeight: "bold",
-    whiteSpace: "nowrap",
-    transition: `color ${themeVars.animation.duration}`,
-
-    selectors: {
-        [`&.${isHovered}`]: {
-            color: themeVars.color.primary.main,
-        },
+export const calendarTitle = style([
+    skinEntries.decoration,
+    {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        height: FIELD_HEIGHT,
+        paddingInline: themeVars.spacing.full,
+        borderRadius: themeVars.borderRadius.half,
+        fontSize: themeVars.fontSize.small,
+        fontWeight: "bold",
+        whiteSpace: "nowrap",
+        transition: `color ${themeVars.animation.duration}, background-color ${themeVars.animation.duration}`,
     },
-});
+]);
 
 export const calendarHeader = style({
     display: "flex",
@@ -91,7 +85,6 @@ export const calendarHeader = style({
     gap: themeVars.spacing.half,
     width: "100%",
     paddingBottom: themeVars.spacing.half,
-    color: layerVars.contrast,
     fontSize: themeVars.fontSize.small,
 });
 

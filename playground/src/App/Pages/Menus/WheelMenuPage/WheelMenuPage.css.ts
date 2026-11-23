@@ -1,6 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
-import { layerVars } from "../../../StyledComponents/Layer/Layer.css";
+import { skinEntries } from "../../../Skins/Skin.css";
 import { themeVars } from "../../../Theme.css";
 
 export const stage = style({
@@ -19,8 +19,8 @@ export const canvas = style({
 });
 
 export const wedge = style({
-    fill: layerVars.main,
-    stroke: layerVars.contrast,
+    stroke: "currentColor",
+    fill: "black",
     strokeWidth: 1,
     strokeOpacity: 0.25,
     vectorEffect: "non-scaling-stroke",
@@ -45,7 +45,7 @@ export const wedgeGradientTo = style({
 });
 
 export const wedgeDisabled = style({
-    fill: layerVars.main,
+    fill: "black",
     opacity: 0.4,
     cursor: "not-allowed",
 });
@@ -58,7 +58,6 @@ export const label = style({
     justifyContent: "center",
     alignItems: "center",
     gap: themeVars.spacing.half,
-    color: layerVars.contrast,
     fontSize: themeVars.fontSize.xSmall,
     textAlign: "center",
     pointerEvents: "none",
@@ -69,27 +68,28 @@ export const labelHighlighted = style({
 });
 
 export const shortcut = style({
+    border: "1px solid color-mix(in srgb, currentColor 25%, transparent)",
     flex: "none",
     padding: `0 ${themeVars.spacing.half}`,
     borderRadius: themeVars.borderRadius.half,
-    border: `1px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
     fontFamily: "monospace",
     fontSize: themeVars.fontSize.xSmall,
     opacity: 0.75,
 });
 
-export const closer = style({
-    display: "grid",
-    placeItems: "center",
-    width: "100%",
-    height: "100%",
-    borderRadius: "50%",
-    backgroundColor: layerVars.main,
-    boxShadow: themeVars.shadow.small,
-    color: layerVars.contrast,
-    fontSize: themeVars.fontSize.medium,
-    transition: "background-color 120ms ease-out, color 120ms ease-out",
-});
+export const closer = style([
+    skinEntries.buttonSimple,
+    {
+        display: "grid",
+        placeItems: "center",
+        width: "100%",
+        height: "100%",
+        borderRadius: "50%",
+        boxShadow: themeVars.shadow.small,
+        fontSize: themeVars.fontSize.medium,
+        transition: "background-color 120ms ease-out, color 120ms ease-out",
+    },
+]);
 
 export const closerHighlighted = style({
     backgroundColor: themeVars.color.primary.light,

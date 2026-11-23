@@ -45,10 +45,11 @@ reading.
 11. The Playground's painters in Windows high-contrast mode — _open, decided, not yet built_
 12. Every array lookup is trusted to find something — _decided, not yet built_
 13. Planned: drawing every component on a server — _decided, not yet built_
-14. Solid 2 — _decided, not yet built_
+14. Solid 2 — _decided, waiting on TypeScript 7.1_
 15. TypeScript 7 — _waiting on 7.1_
 16. Joining scripts in the letter-by-letter text components — _decided, not yet built_
 17. `Table`'s end-pinned column in Safari inside a scaled `Viewport` — _postponed until the platform catches up_
+18. The standard Essentials painters still read the Theme directly — _open, partly deferred_
 
 ---
 
@@ -487,9 +488,29 @@ SvelteKit and SolidStart.
 asks for `^1.9.15`, so a consumer on Solid 2 gets a warning on install, and the package uses functions Solid 2
 removed.
 
-**Decided by the user: a port, not yet started.** Solid 2 removes `on` (imported in 45 files of the Solid package),
-`createComputed` (12), `batch` (4) and `createResource` (2); each use is rewritten to Solid 2's equivalent, and the
-Playground's router moves to 2.0 with it.
+**Decided by the user: a port, done together with item 15 once TypeScript 7.1 is out** — one rewrite rather than
+two. Solid 2 removes `on` (imported in 45 files of the Solid package), `createComputed` (12), `batch` (4) and
+`createResource` (2); each use is rewritten to Solid 2's equivalent, and the Playground's router moves to 2.0 with
+it.
+
+**The rest of the rewrite**, from Solid's migration guide (`documentation/solid-2.0/MIGRATION.md` in
+`solidjs/solid`):
+
+- Every `createEffect` splits into two functions — one that reads the values, one that acts on them. This is the
+  bulk of the work: a rewrite of each effect, not a rename.
+- `onMount` becomes `onSettled`, `<Index>` becomes `<For keyed={false}>`, `splitProps` becomes `omit`,
+  `mergeProps` becomes `merge`, and `Context.Provider` becomes the context itself (`<Theme value={…}>`).
+- Store setters take a draft to change in place, instead of a path or a new value; `createStore` is imported from
+  `solid-js`, no longer `solid-js/store`.
+- `solid-js/web` becomes the `@solidjs/web` package, and `jsxImportSource` in `tsconfig.base.json` becomes
+  `@solidjs/web`.
+- The build plugin `vite-plugin-solid` is replaced by `@solidjs/vite-plugin` (3.x), in both the Solid package and
+  `playground-solid`.
+- Every update is batched: a value written is not seen by a read until the batch finishes (`flush()` forces it).
+  Expect specs that check timing to go red; per `CLAUDE.md`, ask before changing either side.
+
+**Could be split across agents**, one per group of components, once the shared parts (imports, build plugin, the
+`tsconfig` setting) have landed.
 
 **Not yet settled:** whether the package then asks for Solid 2 only, or keeps working on Solid 1 too.
 
@@ -499,7 +520,12 @@ Playground's router moves to 2.0 with it.
 
 **Waiting on TypeScript 7.1**, by the user: 7.0 broke some build tools. The repository stays on 6 until then
 (`decisions.md`, under _"TypeScript stays on 6 until 7.1"_). When 7.1 is out, the move is to update `typescript`
-and get the type check green in every package.
+and get the type check green in every package, alongside item 14.
+
+**What 7.0 broke here**: it has no interface that code can call into, and four things here call it — the script
+that builds the Playground's props tables (`playground/vite/componentApiBuild.ts`), tsup's declaration build,
+`vue-tsc` and `svelte-check`. 7.1 is to bring a new and different interface, so the props-table script will need
+rewriting against it, and the Vue and Svelte checkers must support 7.1 before those two packages can move.
 
 ---
 
@@ -537,6 +563,30 @@ Playground scale by about 1.07.
 miscalculation by hand, and would itself break once WebKit is fixed. **The trigger is checkable**: re-open when bug
 267765 is resolved, and confirm with `table.spec.ts`'s _"a pinned column stays put at either edge"_ under a
 `Viewport` scale other than 1 in WebKit.
+
+---
+
+## 18. The standard Essentials painters still read the Theme directly
+
+**What it is.** Item 2's painted set ships the standard Essentials painters, and the user's rule for it is that a
+shipped painter reaches the Skins and nothing else, since a consumer's Theme can have any shape. The colors that came
+from the level are settled (`decisions.md`, under _"Skins"_); these are the Theme reads the painters still make themselves, counted with the
+custom layouts (the arc Stepper, the radial Tree, the Paginator's dial, the hex tabs, `Sortable`'s ring) left out.
+
+- **Colors.** `FormField` and the segmented radio read `error`; `SegmentedInput` and `TagInput` read the Theme's
+  focus `outline` color, `SegmentedInput` also `FOCUS_RING_WIDTH`. **Deferred by the user:** `Stepper`'s markers
+  (primary, success, alert and error, one per step state) and `Toast` (info, success and error), since each reads
+  several colors and needs more thought. The accents moved to `skinVars.accentColor` (`decisions.md`, under
+  _"Skins"_).
+- **Sizing** — spacing, font sizes and corner radii, about 190 reads across nearly every painter, plus the indent
+  `TableOfContents` and `TreeNode` compute from Theme spacing in their components, in all four frameworks.
+- **Hover, press and disabled effects** — about 35 reads across 15 painters.
+- **Animation durations** — about 145 reads across 44 painters. Under the Skins decision transitions stay in the
+  painters, so where their values come from is part of the same question.
+
+**Not yet settled:** where sizes and timings come from, if not the Theme — the tooltip's text padding and its reveal
+offsets are examples that cannot move into an entry, since the tooltip's entry is measured and only its paint
+copied.
 
 ---
 
@@ -734,6 +784,13 @@ answer to "what is next for development"** — see the note at the top of this f
 commitment, and an entry that already carries the user's verdict is recorded here so that the same sketch is
 not put to them twice. An entry leaves this section in one of two directions: upward into a numbered item, which is the user's
 decision to take, or into `conventions.md` / `decisions.md` if building it settles something.
+
+### Other inputs with `InlineEdit`'s look
+
+The user's idea, not yet committed to: let other inputs rest as plain text and show their field only on hover or
+keyboard focus, the way `InlineEdit` does — the Skins already paint that through `input` with the state `isInline`
+(`decisions.md`, under _"Skins"_). Which inputs, and whether it is a prop of the control or a choice of the painter,
+are open.
 
 ### A text field whose painter draws the text, as a checkbox's painter draws the box
 

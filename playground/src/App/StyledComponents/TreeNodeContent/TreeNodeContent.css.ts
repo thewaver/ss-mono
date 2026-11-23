@@ -2,7 +2,6 @@ import { globalStyle, style } from "@vanilla-extract/css";
 
 import { skinEntries, skinStates } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
-import { layerVars } from "../Layer/Layer.css";
 
 export const isBranch = style({});
 export const isExpanded = style({});
@@ -74,50 +73,48 @@ export const treeNodePending = style({
 export const isRootRank = style({});
 export const isOuterRank = style({});
 
-export const treeRadialNode = style({
-    display: "grid",
-    placeItems: "center",
-    width: "100%",
-    height: "100%",
-    borderRadius: "50%",
-    backgroundColor: layerVars.main,
-    boxShadow: themeVars.shadow.small,
-    color: layerVars.contrast,
-    fontSize: themeVars.fontSize.xSmall,
-    whiteSpace: "nowrap",
-    transition: `background-color ${themeVars.animation.duration}, color ${themeVars.animation.duration}`,
+export const treeRadialNode = style([
+    skinEntries.itemStatic,
+    {
+        display: "grid",
+        placeItems: "center",
+        width: "100%",
+        height: "100%",
+        borderRadius: "50%",
+        boxShadow: themeVars.shadow.small,
+        fontSize: themeVars.fontSize.xSmall,
+        whiteSpace: "nowrap",
+        transition: `background-color ${themeVars.animation.duration}, color ${themeVars.animation.duration}`,
 
-    selectors: {
-        [`&.${isOuterRank}`]: {
-            scale: "0.7",
-            fontSize: themeVars.fontSize.xSmall,
-        },
-        [`&.${isHovered}`]: {
-            color: themeVars.color.primary.main,
-        },
-        [`&.${isSelected}`]: {
-            backgroundColor: themeVars.color.primary.light,
-            backgroundImage: `linear-gradient(45deg, ${themeVars.color.primary.dark}, ${themeVars.color.primary.light})`,
-            color: themeVars.color.primary.contrast,
-        },
-        [`&.${isRootRank}`]: {
-            backgroundColor: themeVars.color.primary.light,
-            backgroundImage: `radial-gradient(circle at 70% 30%, ${themeVars.color.primary.light}, ${themeVars.color.primary.dark})`,
-            color: themeVars.color.primary.contrast,
-            fontWeight: "bold",
-        },
-        [`&.${isRootRank}.${isHovered}`]: {
-            filter: themeVars.hover.filter,
-        },
-        [`&.${isRootRank}.${isSelected}`]: {
-            boxShadow: `0 0 0 3px ${themeVars.color.primary.light}`,
-        },
-        [`&.${isDisabled}`]: {
-            opacity: themeVars.disabled.opacity,
-            filter: themeVars.disabled.filter,
+        selectors: {
+            [`&.${isOuterRank}`]: {
+                scale: "0.7",
+                fontSize: themeVars.fontSize.xSmall,
+            },
+            [`&.${isHovered}`]: {
+                color: themeVars.color.primary.main,
+            },
+            [`&.${isSelected}`]: {
+                backgroundColor: themeVars.color.primary.light,
+                backgroundImage: `linear-gradient(45deg, ${themeVars.color.primary.dark}, ${themeVars.color.primary.light})`,
+                color: themeVars.color.primary.contrast,
+            },
+            [`&.${isRootRank}`]: {
+                fontWeight: "bold",
+            },
+            [`&.${isRootRank}.${isHovered}`]: {
+                filter: themeVars.hover.filter,
+            },
+            [`&.${isRootRank}.${isSelected}`]: {
+                boxShadow: `0 0 0 3px ${themeVars.color.primary.light}`,
+            },
+            [`&.${isDisabled}`]: {
+                opacity: themeVars.disabled.opacity,
+                filter: themeVars.disabled.filter,
+            },
         },
     },
-});
+]);
 
 globalStyle(`[role="treeitem"]:has(> ${treeRadialNode})`, {
     borderRadius: "50%",
@@ -135,7 +132,7 @@ export const treeConnector = style({
 
 export const treeConnectorPath = style({
     fill: "none",
-    stroke: layerVars.contrast,
+    stroke: "currentColor",
     strokeWidth: 2,
     strokeOpacity: 0.35,
     strokeLinecap: "round",

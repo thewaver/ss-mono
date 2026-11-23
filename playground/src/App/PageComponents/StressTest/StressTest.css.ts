@@ -1,6 +1,6 @@
 import { style, styleVariants } from "@vanilla-extract/css";
 
-import { layerVars } from "../../StyledComponents/Layer/Layer.css";
+import { skinEntries } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 
 export const itemGrid = style({
@@ -8,16 +8,18 @@ export const itemGrid = style({
     fontSize: themeVars.fontSize.xSmall,
 });
 
-export const fpsCounter = style({
-    position: "absolute",
-    top: 0,
-    right: 0,
-    zIndex: 10,
+export const fpsCounter = style([
+    skinEntries.panel,
+    {
+        position: "absolute",
+        top: 0,
+        right: 0,
+        zIndex: 10,
 
-    backgroundColor: layerVars.main,
-    padding: themeVars.spacing.full,
-    whiteSpace: "pre",
-});
+        padding: themeVars.spacing.full,
+        whiteSpace: "pre",
+    },
+]);
 
 export const fpsCounterVariants = styleVariants({
     incredible: {

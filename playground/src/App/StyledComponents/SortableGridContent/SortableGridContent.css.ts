@@ -1,7 +1,6 @@
 import { createVar, globalStyle, style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
-import { layerVars } from "../Layer/Layer.css";
 
 export const isCarried = style({});
 export const isHovered = style({});
@@ -15,19 +14,20 @@ export const isBlocked = style({});
 export const tileHue = createVar();
 
 export const sortableGridCell = style({
+    border: "1px solid color-mix(in srgb, currentColor 10%, transparent)",
+    backgroundColor: "color-mix(in srgb, currentColor 10%, transparent)",
     flex: "1 1 auto",
-    border: `1px solid rgb(from ${layerVars.contrast} r g b / 10%)`,
     borderRadius: themeVars.borderRadius.half,
-    backgroundColor: `rgb(from ${layerVars.contrast} r g b / 10%)`,
 
     selectors: {
         [`&.${isOdd}`]: {
-            backgroundColor: `rgb(from ${layerVars.contrast} r g b / 25%)`,
+            backgroundColor: "color-mix(in srgb, currentColor 25%, transparent)",
         },
         [`&.${isBlocked}`]: {
-            borderColor: `rgb(from ${layerVars.contrast} r g b / 50%)`,
-            backgroundColor: `rgb(from ${layerVars.contrast} r g b / 25%)`,
-            backgroundImage: `repeating-linear-gradient(45deg, rgb(from ${layerVars.contrast} r g b / 35%) 0 3px, transparent 3px 7px)`,
+            borderColor: "color-mix(in srgb, currentColor 50%, transparent)",
+            backgroundColor: "color-mix(in srgb, currentColor 25%, transparent)",
+            backgroundImage:
+                "repeating-linear-gradient(45deg, color-mix(in srgb, currentColor 35%, transparent) 0 3px, transparent 3px 7px)",
         },
     },
 });
@@ -57,7 +57,7 @@ export const sortableGridItemShape = style({
 });
 
 export const sortableGridItemContour = style({
-    fill: layerVars.main,
+    fill: "black",
     stroke: `rgb(from ${themeVars.color.primary.main} r g b / 50%)`,
     strokeWidth: 2,
     transition: `fill ${themeVars.animation.duration}, stroke ${themeVars.animation.duration}`,
@@ -139,20 +139,20 @@ export const sortableGridLandingContour = style({
 });
 
 export const sortableGridSurface = style({
+    border: "1px dashed color-mix(in srgb, currentColor 25%, transparent)",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
     position: "absolute",
     inset: `calc(-1 * ${themeVars.spacing.half})`,
     zIndex: -1,
-    border: `1px dashed rgb(from ${layerVars.contrast} r g b / 25%)`,
     borderRadius: themeVars.borderRadius.full,
     pointerEvents: "none",
     transition: `border-color ${themeVars.animation.duration}, background-color ${themeVars.animation.duration}`,
 
     selectors: {
         [`&.${isCarrying}`]: {
-            borderColor: `rgb(from ${layerVars.contrast} r g b / 50%)`,
+            borderColor: "color-mix(in srgb, currentColor 50%, transparent)",
         },
         [`&.${isReceiving}`]: {
             borderColor: themeVars.color.primary.main,

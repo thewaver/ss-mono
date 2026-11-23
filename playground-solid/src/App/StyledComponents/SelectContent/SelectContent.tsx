@@ -25,7 +25,9 @@ export const PageSelectContent = (props: ParentProps<SelectContentProps>) => {
                 [styles.hasError]: access(props.flags).hasError,
             }}
         >
-            <div class={styles.selectValue}>{props.children}</div>
+            <div class={styles.selectValue} classList={{ [styles.isValueEmpty]: access(props.flags).isEmpty }}>
+                {props.children}
+            </div>
             <Show when={access(props.hasClearSpace) && !access(props.flags).isEmpty}>
                 <div class={styles.selectClearSpace} />
             </Show>

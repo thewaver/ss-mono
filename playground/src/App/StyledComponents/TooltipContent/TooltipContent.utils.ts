@@ -9,7 +9,7 @@ import {
 } from "@thewaver/ss-utils";
 
 import { TooltipKnobs } from "../../Knobs/Tooltips.const";
-import { DEFAULT_TOOLTIP_ARROW, JOIN_RADII, TOOLTIP_ARROW_TEMPLATES, type TooltipArrow } from "./TooltipContent.const";
+import { DEFAULT_TOOLTIP_ARROW, TOOLTIP_ARROW_TEMPLATES, type TooltipArrow } from "./TooltipContent.const";
 import type { TooltipBodyStyle } from "./TooltipContent.types";
 
 export const getTooltipHasArrow = (arrow: TooltipArrow | undefined) => (arrow ?? DEFAULT_TOOLTIP_ARROW) !== "none";
@@ -31,7 +31,7 @@ export const computeTooltipGeometry = (
     const arrow = defs.arrow ?? DEFAULT_TOOLTIP_ARROW;
     const body = {
         points: ShapeConst.getDefaultShapePoints("square", size),
-        joinRadii: bodyStyle?.joinRadii ?? JOIN_RADII,
+        joinRadii: bodyStyle?.joinRadii,
         lameExponents: bodyStyle?.lameExponents,
         strokeThicknesses: bodyStyle?.strokeThicknesses,
     };

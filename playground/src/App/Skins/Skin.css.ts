@@ -2,6 +2,8 @@ import { createVar, fallbackVar, layer, style } from "@vanilla-extract/css";
 
 import type { SkinEntry, SkinState } from "./Skin.types";
 
+import { themeVars } from "../Theme.css";
+
 export const skinLayer = layer("skin");
 
 const barAngle = createVar();
@@ -16,8 +18,13 @@ export const skinSizeVars = {
     progressTipHeight: createVar(),
 };
 
+export const skinColorVars = {
+    accentColor: createVar(),
+};
+
 export const skinVars = {
     barAngle: fallbackVar(barAngle, "90deg"),
+    accentColor: fallbackVar(skinColorVars.accentColor, themeVars.color.primary.main),
     startValue: createVar(),
     endValue: createVar(),
     ...skinSizeVars,
@@ -29,16 +36,22 @@ export const skinEntries: Record<SkinEntry, string> = {
     accordionHeader: style({}),
     accordionPanel: style({}),
     accordionWrapper: style({}),
+    breadcrumb: style({}),
+    breadcrumbSeparator: style({}),
     button: style({}),
     buttonSimple: style({}),
     checkboxBox: style({}),
     checkboxMark: style({}),
     decoration: style({}),
+    divider: style({}),
     drawer: style({}),
     dropdown: style({}),
     dropZone: style({}),
+    grip: style({}),
     input: style({}),
     itemBase: style({}),
+    itemGroup: style({}),
+    itemGroupLabel: style({}),
     itemHoverFloater: style({}),
     itemSelectionFloater: style({}),
     itemStatic: style({}),
@@ -46,6 +59,7 @@ export const skinEntries: Record<SkinEntry, string> = {
     pageBackground: style({}),
     pageContainer: style({}),
     panel: style({}),
+    placeholder: style({}),
     progressFill: style({}),
     progressTip: style({}),
     progressTrack: style({}),
@@ -59,7 +73,13 @@ export const skinEntries: Record<SkinEntry, string> = {
     slideButtonFill: style({}),
     slideButtonThumb: style({}),
     slideButtonTrack: style({}),
+    splitPaneFrame: style({}),
+    splitPaneGrip: style({}),
+    splitPaneGutter: style({}),
     surface: style({}),
+    tableCell: style({}),
+    tableDetail: style({}),
+    tableHeader: style({}),
     tabsItemBase: style({}),
     tabsItemHoverFloater: style({}),
     tabsItemSelectionFloater: style({}),
@@ -92,6 +112,12 @@ export const skinStates: Record<SkinState, string> = {
     hasError: style({}),
     hasHoverFloater: style({}),
     hasSelectionFloater: style({}),
+    isCurrent: style({}),
+    isSortable: style({}),
+    isSorted: style({}),
+    isPinned: style({}),
+    isCarried: style({}),
+    isInline: style({}),
 };
 
 export const skinSelectors = {
@@ -113,6 +139,13 @@ export const skinSelectors = {
     hasError: `&.${skinStates.hasError}`,
     hasHoverFloater: `&.${skinStates.hasHoverFloater}`,
     hasSelectionFloater: `&.${skinStates.hasSelectionFloater}`,
+    isCurrent: `&.${skinStates.isCurrent}`,
+    isSortable: `&.${skinStates.isSortable}`,
+    isSorted: `&.${skinStates.isSorted}`,
+    isPinned: `&.${skinStates.isPinned}`,
+    isCarried: `&.${skinStates.isCarried}`,
+    isInline: `&.${skinStates.isInline}`,
+    isInlineAtRest: `&.${skinStates.isInline}:not(&.${skinStates.isHovered})`,
     isCheckedWithin: `.${skinStates.isChecked} &`,
     isMixedWithin: `.${skinStates.isMixed} &`,
     hasErrorWithin: `.${skinStates.hasError} &`,

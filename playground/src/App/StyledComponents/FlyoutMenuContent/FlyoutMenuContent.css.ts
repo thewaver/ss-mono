@@ -1,5 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
+import { skinVars } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 
 export const isCurrent = style({});
@@ -13,7 +14,7 @@ export const flyoutMenuLink = style({
 
     selectors: {
         [`&.${isCurrent}`]: {
-            color: themeVars.color.primary.main,
+            color: skinVars.accentColor,
             fontWeight: "bold",
         },
     },
@@ -41,7 +42,7 @@ export const flyoutMenuOverflowToggle = style([
 ]);
 
 export const flyoutMenuChevron = style({
-    color: themeVars.color.primary.main,
+    color: skinVars.accentColor,
     fontSize: themeVars.fontSize.xSmall,
     transition: `transform ${themeVars.animation.duration}`,
 

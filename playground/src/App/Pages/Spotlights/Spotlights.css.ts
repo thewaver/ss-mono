@@ -1,6 +1,5 @@
 import { keyframes, style } from "@vanilla-extract/css";
 
-import { layerVars } from "../../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../../Theme.css";
 
 export const HINT_BOX_WIDTH = 240;
@@ -71,14 +70,14 @@ export const tourStrip = style({
     gap: themeVars.spacing.double,
     height: 48,
     padding: themeVars.spacing.full,
-    backgroundColor: layerVars.main,
+    backgroundColor: "black",
     overflowY: "auto",
 });
 
 export const tourTarget = style({
     width: "fit-content",
     padding: `${themeVars.spacing.full} ${themeVars.spacing.double}`,
-    border: `2px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
+    border: "2px solid currentColor",
     borderRadius: themeVars.borderRadius.full,
     opacity: 0.75,
 });

@@ -2,7 +2,6 @@
 import { Shape } from "@thewaver/ss-components-vue";
 import { STROKE_GEOM } from "@thewaver/ss-playground/App/StyledComponents/FormationContent/FormationContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/FormationContent/FormationContent.css";
-import { layerVars } from "@thewaver/ss-playground/App/StyledComponents/Layer/Layer.css";
 import { themeVars } from "@thewaver/ss-playground/App/Theme.css";
 import { ShapeConst, type Size2d } from "@thewaver/ss-utils";
 
@@ -14,7 +13,7 @@ const props = defineProps<PageFormationItemProps>();
 const layerClass = useLayerClass();
 
 const computePoints = (size: Size2d) => ShapeConst.getDefaultShapePoints(props.shapeKind, size);
-const computeFillDefs = () => [{ color: layerVars.dark }];
+const computeFillDefs = () => [{ color: "black" }];
 const computeStrokeDefs = () => [{ color: themeVars.color.primary.main }];
 </script>
 

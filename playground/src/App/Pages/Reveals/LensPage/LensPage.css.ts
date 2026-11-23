@@ -1,6 +1,6 @@
 import { globalStyle, style } from "@vanilla-extract/css";
 
-import { layerVars } from "../../../StyledComponents/Layer/Layer.css";
+import { skinEntries } from "../../../Skins/Skin.css";
 import { FOCUS_RING_WIDTH, themeVars } from "../../../Theme.css";
 
 export const root = style({
@@ -24,17 +24,18 @@ export const photo = style({
     userSelect: "none",
 });
 
-export const print = style({
-    display: "flex",
-    flexDirection: "column",
-    gap: themeVars.spacing.half,
-    height: 260,
-    padding: themeVars.spacing.double,
-    backgroundColor: layerVars.dark,
-    color: layerVars.contrast,
-    fontSize: themeVars.fontSize.small,
-    userSelect: "none",
-});
+export const print = style([
+    skinEntries.panel,
+    {
+        display: "flex",
+        flexDirection: "column",
+        gap: themeVars.spacing.half,
+        height: 260,
+        padding: themeVars.spacing.double,
+        fontSize: themeVars.fontSize.small,
+        userSelect: "none",
+    },
+]);
 
 export const printTitle = style({
     color: themeVars.color.primary.main,

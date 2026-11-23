@@ -2,14 +2,13 @@ import { style } from "@vanilla-extract/css";
 
 import { skinEntries, skinStates } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
-import { layerVars } from "../Layer/Layer.css";
 
 const ZONE_WIDTH = 320;
 const ZONE_HEIGHT = 120;
 
 export const isHovered = style([skinStates.isHovered]);
 export const isDragOver = style([skinStates.isReceiving]);
-export const isEmpty = style({});
+export const isEmpty = style([skinEntries.placeholder]);
 export const isDisabled = style([skinStates.isDisabled]);
 export const hasError = style([skinStates.hasError]);
 
@@ -44,7 +43,6 @@ export const fileDropZoneNames = style({
 
     selectors: {
         [`&.${isEmpty}`]: {
-            color: `rgb(from ${layerVars.contrast} r g b / 50%)`,
             fontStyle: "italic",
         },
     },

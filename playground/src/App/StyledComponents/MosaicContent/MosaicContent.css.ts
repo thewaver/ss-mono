@@ -1,7 +1,6 @@
 import { style, styleVariants } from "@vanilla-extract/css";
 
 import { RAINBOW, RAINBOW_HUES, themeVars } from "../../Theme.css";
-import { layerVars } from "../Layer/Layer.css";
 
 export const PAGE_MOSAIC_FAMILIES = RAINBOW_HUES;
 
@@ -61,7 +60,6 @@ export const mosaicCaption = style({
     left: 0,
     padding: themeVars.spacing.half,
     background: "rgba(0, 0, 0, 0.55)",
-    color: layerVars.contrast,
     fontSize: themeVars.fontSize.xSmall,
     textAlign: "center",
 });

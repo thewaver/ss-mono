@@ -1,7 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
-import { layerVars } from "../Layer/Layer.css";
 
 const SPIN_SIZE = 84;
 const PIP_SIZE = 20;
@@ -36,7 +35,7 @@ export const wheelWedgeSVG = style({
 });
 
 export const wheelWedgeShape = style({
-    fill: layerVars.dark,
+    fill: "black",
     stroke: themeVars.color.primary.main,
     strokeWidth: 1,
     strokeLinejoin: "round",
@@ -58,7 +57,6 @@ export const wheelWedgeLabel = style({
     justifyContent: "center",
     alignItems: "center",
     gap: "0.5em",
-    color: layerVars.contrast,
     textAlign: "center",
     textWrap: "balance",
 
@@ -106,10 +104,10 @@ export const wheelPipLeft = style([
 ]);
 
 export const wheelPipShape = style({
+    fill: "black",
     display: "block",
     width: "100%",
     height: "100%",
-    fill: layerVars.main,
     stroke: themeVars.color.primary.main,
     strokeWidth: 2,
     strokeLinejoin: "round",
@@ -177,9 +175,8 @@ export const wheelCard = style({
     width: "100%",
     height: "100%",
     borderRadius: themeVars.borderRadius.half,
-    backgroundImage: `linear-gradient(160deg, ${layerVars.dark}, ${layerVars.dark})`,
     border: `2px solid ${themeVars.color.primary.main}`,
-    color: layerVars.contrast,
+    backgroundColor: "black",
     fontSize: themeVars.fontSize.small,
     textAlign: "center",
     userSelect: "none",
@@ -195,7 +192,7 @@ export const wheelCard = style({
 });
 
 export const wheelCardBack = style({
-    backgroundImage: `repeating-linear-gradient(45deg, ${themeVars.color.primary.main} 0 6px, ${layerVars.main} 6px 12px)`,
+    backgroundImage: `repeating-linear-gradient(45deg, ${themeVars.color.primary.main} 0 6px, black 6px 12px)`,
 });
 
 export const wheelCardRank = style({

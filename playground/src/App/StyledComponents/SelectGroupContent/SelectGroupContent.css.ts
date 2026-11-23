@@ -1,48 +1,62 @@
 import { style } from "@vanilla-extract/css";
 
+import { skinEntries, skinStates } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
-import { layerVars } from "../Layer/Layer.css";
 
-export const isChecked = style({});
-export const isMixed = style({});
+export const isChecked = style([skinStates.isChecked]);
+export const isMixed = style([skinStates.isMixed]);
 
-export const selectGroupContent = style({
-    display: "flex",
-    alignItems: "center",
-    gap: themeVars.spacing.half,
-    padding: `${themeVars.spacing.full} ${themeVars.spacing.full} ${themeVars.spacing.half}`,
-    color: `rgb(from ${layerVars.contrast} r g b / 50%)`,
-    fontSize: themeVars.fontSize.xSmall,
-    letterSpacing: "0.05em",
-    textTransform: "uppercase",
-    whiteSpace: "nowrap",
-});
+export const selectGroupContent = style([
+    skinEntries.itemGroupLabel,
+    {
+        display: "flex",
+        alignItems: "center",
+        gap: themeVars.spacing.half,
+        padding: `${themeVars.spacing.full} ${themeVars.spacing.full} ${themeVars.spacing.half}`,
+        fontSize: themeVars.fontSize.xSmall,
+        letterSpacing: "0.05em",
+        textTransform: "uppercase",
+        whiteSpace: "nowrap",
+    },
+]);
 
 export const selectGroupMark = style({
     display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    width: 14,
-    height: 14,
-    border: `2px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
-    borderRadius: themeVars.borderRadius.half,
-    color: themeVars.color.primary.main,
-    fontSize: themeVars.fontSize.small,
-    transition: `border-color ${themeVars.animation.duration}`,
+    flexShrink: 0,
+});
 
-    selectors: {
-        [`&:not(.${isChecked}):not(.${isMixed})`]: {
-            color: "transparent",
-        },
-        [`&.${isChecked}, &.${isMixed}`]: {
-            borderColor: themeVars.color.primary.main,
+export const selectGroupMarkBox = style([
+    skinEntries.checkboxBox,
+    {
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        width: 16,
+        height: 16,
+        fontSize: themeVars.fontSize.small,
+        transition: `border-color ${themeVars.animation.duration}`,
+    },
+]);
+
+export const selectGroupMarkTick = style([
+    skinEntries.checkboxMark,
+    {
+        transform: "scale(0)",
+        transition: `transform ${themeVars.animation.duration}`,
+
+        selectors: {
+            [`${selectGroupMark}.${isChecked} &, ${selectGroupMark}.${isMixed} &`]: {
+                transform: "scale(1)",
+            },
         },
     },
-});
+]);
 
-export const selectGroupBox = style({
-    margin: themeVars.spacing.half,
-    paddingBottom: themeVars.spacing.half,
-    borderRadius: themeVars.borderRadius.full,
-    backgroundColor: `rgb(from ${layerVars.contrast} r g b / 5%)`,
-});
+export const selectGroupBox = style([
+    skinEntries.itemGroup,
+    {
+        margin: themeVars.spacing.half,
+        paddingBottom: themeVars.spacing.half,
+        borderRadius: themeVars.borderRadius.full,
+    },
+]);

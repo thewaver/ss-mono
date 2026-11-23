@@ -3,7 +3,6 @@ import type { PropsWithChildren } from "react";
 import { Shape } from "@thewaver/ss-components-react";
 import { STROKE_GEOM } from "@thewaver/ss-playground/App/StyledComponents/FormationContent/FormationContent.const";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/FormationContent/FormationContent.css";
-import { layerVars } from "@thewaver/ss-playground/App/StyledComponents/Layer/Layer.css";
 import { themeVars } from "@thewaver/ss-playground/App/Theme.css";
 import { ShapeConst } from "@thewaver/ss-utils";
 
@@ -17,7 +16,7 @@ export const PageFormationItem = (props: PropsWithChildren<PageFormationItemProp
         <div className={[styles.formationItem, layerClass].join(" ")}>
             <Shape
                 computePoints={(size) => ShapeConst.getDefaultShapePoints(props.shapeKind, size)}
-                computeFillDefs={() => [{ color: layerVars.dark }]}
+                computeFillDefs={() => [{ color: "black" }]}
                 computeStrokeDefs={() => [{ color: themeVars.color.primary.main }]}
                 strokeGeom={STROKE_GEOM}
                 renderChildren={() => (

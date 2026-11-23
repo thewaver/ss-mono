@@ -1,19 +1,20 @@
 import { style } from "@vanilla-extract/css";
 
+import { skinEntries } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
-import { layerVars } from "../Layer/Layer.css";
 
-export const dieFace = style({
-    display: "grid",
-    placeItems: "center",
-    width: "100%",
-    height: "100%",
-    border: `1px solid ${themeVars.color.primary.main}`,
-    backgroundColor: layerVars.main,
-    color: layerVars.contrast,
-    fontWeight: "bold",
-    userSelect: "none",
-});
+export const dieFace = style([
+    skinEntries.itemStatic,
+    {
+        display: "grid",
+        placeItems: "center",
+        width: "100%",
+        height: "100%",
+        border: `1px solid ${themeVars.color.primary.main}`,
+        fontWeight: "bold",
+        userSelect: "none",
+    },
+]);
 
 export const dieFaceShowing = style({
     backgroundColor: themeVars.color.primary.light,

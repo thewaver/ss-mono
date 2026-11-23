@@ -1,6 +1,6 @@
 import { globalStyle, style } from "@vanilla-extract/css";
 
-import { layerVars } from "../../../StyledComponents/Layer/Layer.css";
+import { skinEntries } from "../../../Skins/Skin.css";
 import { FOCUS_RING_WIDTH, themeVars } from "../../../Theme.css";
 
 const panel = (from: string, to: string) => `linear-gradient(135deg, ${from}, ${to})`;
@@ -19,16 +19,17 @@ globalStyle(`${root} > :focus-visible`, {
     outline: "0 none",
 });
 
-export const content = style({
-    display: "flex",
-    flexDirection: "column",
-    gap: themeVars.spacing.half,
-    height: 200,
-    padding: themeVars.spacing.double,
-    backgroundColor: layerVars.dark,
-    color: layerVars.contrast,
-    fontSize: themeVars.fontSize.small,
-});
+export const content = style([
+    skinEntries.panel,
+    {
+        display: "flex",
+        flexDirection: "column",
+        gap: themeVars.spacing.half,
+        height: 200,
+        padding: themeVars.spacing.double,
+        fontSize: themeVars.fontSize.small,
+    },
+]);
 
 export const contentTitle = style({
     color: themeVars.color.primary.main,
@@ -46,10 +47,10 @@ export const solidCover = style({
 });
 
 export const frostedCover = style({
+    backgroundColor: "rgb(0 0 0 / 50%)",
     width: "100%",
     height: "100%",
     backdropFilter: "blur(8px) saturate(0.4)",
-    backgroundColor: [layerVars.dark, `rgb(from ${layerVars.dark} r g b / 50%)`],
 });
 
 export const promptCover = style({

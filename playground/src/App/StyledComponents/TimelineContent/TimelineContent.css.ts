@@ -1,7 +1,7 @@
 import { style, styleVariants } from "@vanilla-extract/css";
 
+import { skinEntries } from "../../Skins/Skin.css";
 import { FOCUS_RING_WIDTH, RAINBOW, RAINBOW_HUES, themeVars } from "../../Theme.css";
-import { layerVars } from "../Layer/Layer.css";
 
 export const AXIS_HEIGHT = 22;
 
@@ -20,19 +20,21 @@ const MARKER_WIDTH = 2;
 const MARKER_HEAD = 8;
 const HELD_EDGE_WIDTH = 3;
 
-export const timelineFrame = style({
-    display: "flex",
-    flexDirection: "column",
-    gap: themeVars.spacing.half,
-    width: "100%",
-    maxWidth: FRAME_WIDTH,
-    padding: themeVars.spacing.full,
-    border: `1px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
-    borderRadius: themeVars.borderRadius.full,
-    backgroundColor: layerVars.dark,
-    touchAction: "none",
-    userSelect: "none",
-});
+export const timelineFrame = style([
+    skinEntries.panel,
+    {
+        border: "1px solid color-mix(in srgb, currentColor 25%, transparent)",
+        display: "flex",
+        flexDirection: "column",
+        gap: themeVars.spacing.half,
+        width: "100%",
+        maxWidth: FRAME_WIDTH,
+        padding: themeVars.spacing.full,
+        borderRadius: themeVars.borderRadius.full,
+        touchAction: "none",
+        userSelect: "none",
+    },
+]);
 
 export const timelineRow = style({
     display: "flex",
@@ -54,7 +56,6 @@ export const timelineLaneName = style({
     justifyContent: "flex-end",
     boxSizing: "border-box",
     paddingRight: themeVars.spacing.half,
-    color: layerVars.contrast,
     fontSize: themeVars.fontSize.xSmall,
     opacity: 0.5,
     whiteSpace: "nowrap",
@@ -67,15 +68,15 @@ export const timelineTrack = style({
 });
 
 export const timelineRule = style({
+    backgroundColor: "color-mix(in srgb, currentColor 10%, transparent)",
     position: "absolute",
     top: AXIS_HEIGHT,
     bottom: 0,
     width: 1,
-    backgroundColor: `rgb(from ${layerVars.contrast} r g b / 10%)`,
 
     selectors: {
         [`&.${isMajor}`]: {
-            backgroundColor: `rgb(from ${layerVars.contrast} r g b / 25%)`,
+            backgroundColor: "color-mix(in srgb, currentColor 25%, transparent)",
         },
     },
 });
@@ -88,7 +89,6 @@ export const timelineTickLabel = style({
     alignItems: "center",
     height: AXIS_HEIGHT,
     paddingLeft: themeVars.spacing.half,
-    color: layerVars.contrast,
     fontSize: themeVars.fontSize.xSmall,
     fontVariantNumeric: "tabular-nums",
     opacity: 0.75,

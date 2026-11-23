@@ -11,7 +11,7 @@ purpose: it answers "what is outstanding", and neither of them is.
 
 | Section                                                   | Count |
 | --------------------------------------------------------- | ----: |
-| [Blockers and known issues](#blockers-and-known-issues)   |     4 |
+| [Blockers and known issues](#blockers-and-known-issues)   |     5 |
 | [Deliberately not built](#deliberately-not-built)         |     1 |
 | [Accessibility gaps](#accessibility-gaps)                 |     5 |
 | [Planned projects](#planned-projects)                     |     5 |
@@ -29,6 +29,7 @@ Something that misbehaves, or a cost nobody has paid down.
 | 10  | **Any placed control**     | Nothing stops a layout outgrowing the room it is in — a ring can reach past the screen, and a placed toolbar has nothing to collapse into |
 | 10  | **`Menu`, hold and flick** | How far a flick must travel to pick an item is a guess — about 30px on the demo wheel — not a measured number                             |
 | 12  | **Every package**          | A lookup past the end of an array is used as if it found something; the compiler option that would catch it is off                        |
+| 18  | **Essentials painters**    | They still read the Theme for some colors, sizes, effects and timings; Stepper's and Toast's colors are deferred                          |
 
 ## Deliberately not built
 
@@ -56,7 +57,7 @@ They cluster, and no single item owns them.
 | --- | ------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------- |
 | 2   | **A consumer-facing layer above the library**    | **Deferred to a near-future session of its own.** Painted, ready-to-use controls, as Magic UI sells templates         |
 | 13  | **Drawing every component on a server**          | Decided, not yet built. Tested in Next.js, Nuxt, SvelteKit and SolidStart; until then the READMEs say browser only    |
-| 14  | **Solid 2**                                      | Decided, not yet built. A consumer on Solid 2 cannot install the Solid package cleanly                                |
+| 14  | **Solid 2**                                      | Waiting on TypeScript 7.1, done with it. A consumer on Solid 2 cannot install the Solid package cleanly               |
 | 15  | **TypeScript 7**                                 | Waiting on 7.1, since 7.0 broke some tools                                                                            |
 | 16  | **Joining scripts in the letter-by-letter text** | Decided, not yet built. Arabic and other joining scripts animate unjoined in ScrambleText, Typewriter and PaintedText |
 

@@ -1,15 +1,17 @@
 import { style } from "@vanilla-extract/css";
 
+import { skinEntries } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
-import { layerVars } from "../Layer/Layer.css";
 
-export const circlePackingFrame = style({
-    width: "100%",
-    height: "100%",
-    backgroundColor: layerVars.main,
-    borderRadius: themeVars.borderRadius.full,
-    cursor: "pointer",
-});
+export const circlePackingFrame = style([
+    skinEntries.panel,
+    {
+        width: "100%",
+        height: "100%",
+        borderRadius: themeVars.borderRadius.full,
+        cursor: "pointer",
+    },
+]);
 
 export const circlePackingStopLight = style({
     stopColor: themeVars.color.secondary.light,
@@ -44,8 +46,8 @@ export const circlePackingBranch = style({
 });
 
 export const circlePackingLabel = style({
-    fill: layerVars.contrast,
-    stroke: layerVars.main,
+    stroke: themeVars.color.primary.main,
+    fill: "currentColor",
     strokeWidth: 3,
     paintOrder: "stroke",
     fontSize: themeVars.fontSize.xSmall,

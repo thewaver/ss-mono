@@ -1,7 +1,7 @@
 import { style } from "@vanilla-extract/css";
 
+import { skinEntries } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
-import { layerVars } from "../Layer/Layer.css";
 
 export const hasError = style({});
 
@@ -40,11 +40,15 @@ export const formSectionCaption = style({
     fontWeight: "bold",
 });
 
-export const formSectionBody = style({
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "start",
-    gap: themeVars.spacing.full,
-    paddingInlineStart: themeVars.spacing.full,
-    borderInlineStart: `1px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
-});
+export const formSectionBody = style([
+    skinEntries.divider,
+    {
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "start",
+        gap: themeVars.spacing.full,
+        paddingInlineStart: themeVars.spacing.full,
+        borderInlineStartWidth: 1,
+        borderInlineStartStyle: "solid",
+    },
+]);

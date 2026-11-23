@@ -2,9 +2,9 @@ import { style } from "@vanilla-extract/css";
 
 import { skinEntries, skinStates } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
-import { layerVars } from "../Layer/Layer.css";
 
 const SWATCH_SIZE = 24;
+export const SWATCH_RING_COLOR = "#888888";
 
 export const isHovered = style([skinStates.isHovered]);
 export const isDisabled = style([skinStates.isDisabled]);
@@ -25,7 +25,7 @@ export const colorInputSwatch = style({
     width: SWATCH_SIZE,
     height: SWATCH_SIZE,
     borderRadius: themeVars.borderRadius.half,
-    boxShadow: `inset 0 0 0 1px rgb(from ${layerVars.contrast} r g b / 25%)`,
+    boxShadow: `inset 0 0 0 1px ${SWATCH_RING_COLOR}`,
 });
 
 export const colorInputValue = style({

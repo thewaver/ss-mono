@@ -27,7 +27,11 @@ const layerClass = useLayerClass();
                 flags.checkedState === 'mixed' && styles.isMixed,
             ]"
         >
-            {{ flags.checkedState === "mixed" ? MIXED_MARK : CHECKED_MARK }}
+            <div :class="styles.selectGroupMarkBox">
+                <div :class="styles.selectGroupMarkTick">
+                    {{ flags.checkedState === "mixed" ? MIXED_MARK : CHECKED_MARK }}
+                </div>
+            </div>
         </div>
 
         <slot />

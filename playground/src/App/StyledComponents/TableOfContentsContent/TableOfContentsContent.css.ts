@@ -1,5 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
+import { skinVars } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 
 export const isCurrent = style({});
@@ -15,7 +16,7 @@ export const tableOfContentsContent = style({
     selectors: {
         [`&.${isCurrent}`]: {
             opacity: 1,
-            borderInlineStartColor: themeVars.color.primary.main,
+            borderInlineStartColor: skinVars.accentColor,
         },
         [`&.${isHovered}`]: {
             opacity: 1,

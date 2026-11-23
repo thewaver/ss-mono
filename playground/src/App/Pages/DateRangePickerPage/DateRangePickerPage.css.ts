@@ -1,6 +1,5 @@
 import { style } from "@vanilla-extract/css";
 
-import { layerVars } from "../../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../../Theme.css";
 
 export const dateRangeRow = style({
@@ -10,7 +9,6 @@ export const dateRangeRow = style({
 });
 
 export const dateRangeSeparator = style({
-    color: layerVars.contrast,
     fontSize: themeVars.fontSize.small,
     opacity: 0.75,
 });

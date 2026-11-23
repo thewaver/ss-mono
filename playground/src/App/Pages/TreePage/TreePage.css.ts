@@ -1,7 +1,5 @@
 import { style } from "@vanilla-extract/css";
 
-import { layerVars } from "../../StyledComponents/Layer/Layer.css";
-
 export const treeScroller = style({
     overflowY: "auto",
     maxHeight: 320,
@@ -18,8 +16,8 @@ export const rankRing = style({
     position: "absolute",
     top: "50%",
     left: "50%",
+    border: "1px dashed color-mix(in srgb, currentColor 25%, transparent)",
     borderRadius: "50%",
-    border: `1px dashed rgb(from ${layerVars.contrast} r g b / 25%)`,
     transform: "translate(-50%, -50%)",
     pointerEvents: "none",
 });

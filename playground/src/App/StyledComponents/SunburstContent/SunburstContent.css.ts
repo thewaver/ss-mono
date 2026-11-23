@@ -1,7 +1,7 @@
 import { globalStyle, style, styleVariants } from "@vanilla-extract/css";
 
+import { skinEntries } from "../../Skins/Skin.css";
 import { RAINBOW, RAINBOW_HUES, themeVars } from "../../Theme.css";
-import { layerVars } from "../Layer/Layer.css";
 
 export const PAGE_SUNBURST_FAMILIES = RAINBOW_HUES;
 
@@ -43,7 +43,6 @@ export const sunburstHub = style({
     width: "100%",
     height: "100%",
     borderRadius: "50%",
-    color: layerVars.contrast,
     fontSize: themeVars.fontSize.xSmall,
     textAlign: "center",
     cursor: "pointer",
@@ -53,9 +52,7 @@ globalStyle(`button:has(${sunburstHub})`, {
     borderRadius: "50%",
 });
 
-export const sunburstHubHovered = style({
-    backgroundColor: layerVars.main,
-});
+export const sunburstHubHovered = style([skinEntries.itemStatic]);
 
 export const sunburstHubAtRoot = style({
     cursor: "default",

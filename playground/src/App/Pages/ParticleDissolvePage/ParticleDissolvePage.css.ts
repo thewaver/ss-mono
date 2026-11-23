@@ -1,6 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
-import { layerVars } from "../../StyledComponents/Layer/Layer.css";
+import { skinEntries } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 
 export const stack = style({
@@ -15,17 +15,18 @@ export const buttonRow = style({
     gap: themeVars.spacing.full,
 });
 
-export const card = style({
-    display: "flex",
-    flexDirection: "column",
-    gap: themeVars.spacing.full,
-    width: 280,
-    padding: themeVars.spacing.double,
-    borderRadius: themeVars.borderRadius.full,
-    backgroundColor: layerVars.dark,
-    color: layerVars.contrast,
-    fontSize: themeVars.fontSize.small,
-});
+export const card = style([
+    skinEntries.panel,
+    {
+        display: "flex",
+        flexDirection: "column",
+        gap: themeVars.spacing.full,
+        width: 280,
+        padding: themeVars.spacing.double,
+        borderRadius: themeVars.borderRadius.full,
+        fontSize: themeVars.fontSize.small,
+    },
+]);
 
 export const cardTitle = style({
     color: themeVars.color.primary.main,

@@ -27,7 +27,7 @@ const isHovered = computed(() => {
             :class="[
                 styles.navLinkContent,
                 layerClass,
-                hasHoverFloater ? styles.hasHoverFloater : styles.hasNoHoverFloater,
+                hasHoverFloater && styles.hasHoverFloater,
                 hasSelectionFloater && styles.hasSelectionFloater,
                 isHovered && styles.isHovered,
                 isSelected && styles.isSelected,

@@ -6,16 +6,22 @@ export type SkinEntry =
     | "accordionHeader"
     | "accordionPanel"
     | "accordionWrapper"
+    | "breadcrumb"
+    | "breadcrumbSeparator"
     | "button"
     | "buttonSimple"
     | "checkboxBox"
     | "checkboxMark"
     | "decoration"
+    | "divider"
     | "drawer"
     | "dropdown"
     | "dropZone"
+    | "grip"
     | "input"
     | "itemBase"
+    | "itemGroup"
+    | "itemGroupLabel"
     | "itemHoverFloater"
     | "itemSelectionFloater"
     | "itemStatic"
@@ -23,6 +29,7 @@ export type SkinEntry =
     | "pageBackground"
     | "pageContainer"
     | "panel"
+    | "placeholder"
     | "progressFill"
     | "progressTip"
     | "progressTrack"
@@ -36,7 +43,13 @@ export type SkinEntry =
     | "slideButtonFill"
     | "slideButtonThumb"
     | "slideButtonTrack"
+    | "splitPaneFrame"
+    | "splitPaneGrip"
+    | "splitPaneGutter"
     | "surface"
+    | "tableCell"
+    | "tableDetail"
+    | "tableHeader"
     | "tabsItemBase"
     | "tabsItemHoverFloater"
     | "tabsItemSelectionFloater"
@@ -67,7 +80,13 @@ export type SkinState =
     | "isDisabled"
     | "hasError"
     | "hasHoverFloater"
-    | "hasSelectionFloater";
+    | "hasSelectionFloater"
+    | "isCurrent"
+    | "isSortable"
+    | "isSorted"
+    | "isPinned"
+    | "isCarried"
+    | "isInline";
 
 export type SkinRule = GlobalStyleRule & {
     selectors?: Record<string, GlobalStyleRule>;
@@ -75,6 +94,36 @@ export type SkinRule = GlobalStyleRule & {
 
 export type SkinRules = Record<SkinEntry, SkinRule>;
 
+export type SkinBaseEntry =
+    | "accordionPanel"
+    | "breadcrumb"
+    | "breadcrumbSeparator"
+    | "divider"
+    | "grip"
+    | "itemGroup"
+    | "itemGroupLabel"
+    | "overlay"
+    | "placeholder"
+    | "progressTip"
+    | "scrollerThumb"
+    | "scrollerTrack"
+    | "splitPaneFrame"
+    | "splitPaneGrip"
+    | "splitPaneGutter"
+    | "tableCell"
+    | "tableDetail"
+    | "tableHeader";
+
+export type SkinBasePartEntry = "input" | "itemStatic" | "tabsItemBase";
+
+export type SkinBaseRules = Record<SkinBaseEntry | SkinBasePartEntry, SkinRule>;
+
+export type SkinOwnRules = Omit<SkinRules, SkinBaseEntry> & Partial<Pick<SkinRules, SkinBaseEntry>>;
+
 export type SkinColorFamily = {
     [k in keyof ColorFamily]: string;
 };
+
+export type SkinLevelValues = { l0: string; l1?: string; l2?: string };
+
+export type SkinLevelFamilies = Record<"level0" | "level1" | "level2", SkinColorFamily>;

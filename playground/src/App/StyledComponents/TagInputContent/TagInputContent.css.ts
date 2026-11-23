@@ -2,7 +2,6 @@ import { style } from "@vanilla-extract/css";
 
 import { skinEntries, skinStates } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
-import { layerVars } from "../Layer/Layer.css";
 import { FIELD_FONT_SIZE, fieldSurface } from "../TextFieldContent/TextFieldContent.css";
 
 export const isHovered = style([skinStates.isHovered]);
@@ -42,8 +41,10 @@ export const tagRemove = style({
     opacity: 0.75,
 });
 
-export const tagInputPlaceholder = style({
-    color: `rgb(from ${layerVars.contrast} r g b / 50%)`,
-    fontSize: FIELD_FONT_SIZE,
-    pointerEvents: "none",
-});
+export const tagInputPlaceholder = style([
+    skinEntries.placeholder,
+    {
+        fontSize: FIELD_FONT_SIZE,
+        pointerEvents: "none",
+    },
+]);

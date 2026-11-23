@@ -1,7 +1,7 @@
 import { globalStyle, style } from "@vanilla-extract/css";
 
+import { skinEntries } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
-import { layerVars } from "../Layer/Layer.css";
 
 const GLOW_NEAR = "6px";
 const GLOW_FAR = "14px";
@@ -23,35 +23,36 @@ export const tileBoardTile = style({
     },
 });
 
-export const tileBoardTileContent = style({
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "flex-end",
-    paddingBottom: themeVars.spacing.half,
-    width: "100%",
-    height: "100%",
-    backgroundColor: layerVars.dark,
-    color: layerVars.contrast,
-    fontSize: themeVars.fontSize.xSmall,
-    fontVariantNumeric: "tabular-nums",
-    textAlign: "center",
+export const tileBoardTileContent = style([
+    skinEntries.itemStatic,
+    {
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "flex-end",
+        paddingBottom: themeVars.spacing.half,
+        width: "100%",
+        height: "100%",
+        fontSize: themeVars.fontSize.xSmall,
+        fontVariantNumeric: "tabular-nums",
+        textAlign: "center",
 
-    selectors: {
-        [`&.${isMarked}`]: {
-            backgroundColor: themeVars.color.primary.light,
-            backgroundImage: `linear-gradient(215deg, ${themeVars.color.primary.light}, ${themeVars.color.primary.dark})`,
-            color: themeVars.color.primary.contrast,
-        },
-        [`&.${isHovered}`]: {
-            filter: themeVars.hover.filter,
-        },
-        [`&.${isDisabled}`]: {
-            opacity: themeVars.disabled.opacity,
-            filter: themeVars.disabled.filter,
+        selectors: {
+            [`&.${isMarked}`]: {
+                backgroundColor: themeVars.color.primary.light,
+                backgroundImage: `linear-gradient(215deg, ${themeVars.color.primary.light}, ${themeVars.color.primary.dark})`,
+                color: themeVars.color.primary.contrast,
+            },
+            [`&.${isHovered}`]: {
+                filter: themeVars.hover.filter,
+            },
+            [`&.${isDisabled}`]: {
+                opacity: themeVars.disabled.opacity,
+                filter: themeVars.disabled.filter,
+            },
         },
     },
-});
+]);
 
 globalStyle(`[role="gridcell"]:has(${tileBoardTile}):focus-visible`, {
     outline: "0 none",

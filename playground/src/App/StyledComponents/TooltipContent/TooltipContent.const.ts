@@ -1,7 +1,5 @@
 import { type ShapeArrowTemplate, ShapeConst } from "@thewaver/ss-utils";
 
-import { BORDER_RADIUS_FULL } from "../../Theme.const";
-
 import { tooltipRevealVariants } from "./TooltipContent.css";
 
 export const TOOLTIP_HOVER_DELAY_MS = 300;
@@ -48,5 +46,3 @@ export const TOOLTIP_ARROW_TEMPLATES: Record<
         baseEnd: { x: 0, y: 0 },
     }),
 };
-
-export const JOIN_RADII = [BORDER_RADIUS_FULL];

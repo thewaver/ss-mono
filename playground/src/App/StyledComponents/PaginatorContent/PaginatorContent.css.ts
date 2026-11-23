@@ -1,8 +1,7 @@
 import { style } from "@vanilla-extract/css";
 
-import { skinEntries, skinStates } from "../../Skins/Skin.css";
+import { skinEntries, skinStates, skinVars } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
-import { layerVars } from "../Layer/Layer.css";
 
 export const isCurrent = style([skinStates.isPressed]);
 export const isHovered = style([skinStates.isHovered]);
@@ -20,22 +19,8 @@ const cellBase = style({
 });
 
 const cellText = style({
-    color: layerVars.contrast,
     borderRadius: themeVars.borderRadius.half,
     fontSize: themeVars.fontSize.small,
-
-    selectors: {
-        [`&.${isHovered}`]: {
-            color: themeVars.color.primary.main,
-        },
-        [`&.${isActive}`]: {
-            filter: themeVars.active.filter,
-        },
-        [`&.${isDisabled}`]: {
-            opacity: themeVars.disabled.opacity,
-            filter: themeVars.disabled.filter,
-        },
-    },
 });
 
 export const paginatorPage = style([skinEntries.buttonSimple, cellBase]);
@@ -82,8 +67,8 @@ export const paginatorWedgeCanvas = style({
 });
 
 export const paginatorWedgeShape = style({
-    fill: `rgb(from ${layerVars.contrast} r g b / 10%)`,
-    stroke: layerVars.contrast,
+    fill: `color-mix(in srgb, currentColor 10%, transparent)`,
+    stroke: "currentColor",
     strokeWidth: 1,
     strokeOpacity: 0.25,
     vectorEffect: "non-scaling-stroke",
@@ -136,7 +121,6 @@ export const paginatorWedgeLabel = style({
     inset: 0,
     justifyContent: "center",
     alignItems: "center",
-    color: layerVars.contrast,
     fontSize: themeVars.fontSize.small,
     textAlign: "center",
     pointerEvents: "none",
@@ -172,28 +156,30 @@ export const paginatorPanel = style([
 ]);
 
 export const paginatorPanelSummary = style({
-    color: layerVars.contrast,
     fontFamily: "monospace",
     fontSize: themeVars.fontSize.xSmall,
     opacity: 0.75,
 });
 
-export const paginatorPanelRow = style({
-    display: "flex",
-    justifyContent: "space-between",
-    gap: themeVars.spacing.full,
-    borderBlockEnd: `1px solid rgb(from ${layerVars.contrast} r g b / 10%)`,
-    paddingBlock: themeVars.spacing.half,
-    color: layerVars.contrast,
+export const paginatorPanelRow = style([
+    skinEntries.divider,
+    {
+        display: "flex",
+        justifyContent: "space-between",
+        gap: themeVars.spacing.full,
+        paddingBlock: themeVars.spacing.half,
+        borderBlockEndWidth: 1,
+        borderBlockEndStyle: "solid",
 
-    selectors: {
-        "&:last-child": {
-            borderBlockEnd: "none",
+        selectors: {
+            "&:last-child": {
+                borderBlockEnd: "none",
+            },
         },
     },
-});
+]);
 
 export const paginatorPanelIndex = style({
-    color: themeVars.color.primary.main,
+    color: skinVars.accentColor,
     fontFamily: "monospace",
 });

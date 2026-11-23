@@ -1,80 +1,66 @@
 import { style, styleVariants } from "@vanilla-extract/css";
 
+import { skinEntries, skinStates, skinVars } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
-import { layerVars } from "../Layer/Layer.css";
 
 const CONTROL_SIZE = 24;
 const RESIZER_WIDTH = 8;
 
-export const isSortable = style({});
+export const isSortable = style([skinStates.isSortable]);
 export const isResizable = style({});
-export const isSorted = style({});
-export const isHovered = style({});
-export const isSelected = style({});
+export const isSorted = style([skinStates.isSorted]);
+export const isHovered = style([skinStates.isHovered]);
+export const isSelected = style([skinStates.isSelected]);
 export const isResizing = style({});
 export const isDisabled = style({});
-export const isPinnedStart = style({});
-export const isPinnedEnd = style({});
+export const isPinnedStart = style([skinStates.isPinned]);
+export const isPinnedEnd = style([skinStates.isPinned]);
 export const isExpanded = style({});
-
-const HOVER_TINT = `rgb(from ${layerVars.contrast} r g b / 10%)`;
-const SELECTED_TINT = `rgb(from ${themeVars.color.primary.main} r g b / 25%)`;
-const SELECTED_HOVER_TINT = `rgb(from ${themeVars.color.primary.main} r g b / 35%)`;
-const PIN_EDGE = `1px solid rgb(from ${layerVars.contrast} r g b / 25%)`;
-
-const tint = (color: string) => ({
-    backgroundColor: layerVars.main,
-    backgroundImage: `linear-gradient(${color}, ${color})`,
-});
 
 export const alignVariants = styleVariants({
     start: { justifyContent: "flex-start", textAlign: "left" },
     end: { justifyContent: "flex-end", textAlign: "right" },
 });
 
-export const tableHeaderContent = style({
-    display: "flex",
-    alignItems: "center",
-    gap: themeVars.spacing.half,
-    height: "100%",
-    padding: themeVars.spacing.half,
-    borderBottom: `2px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
-    backgroundColor: layerVars.main,
-    color: layerVars.contrast,
-    fontSize: themeVars.fontSize.small,
-    fontWeight: 700,
-    whiteSpace: "nowrap",
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-    transition: `background-color ${themeVars.animation.duration}, color ${themeVars.animation.duration}`,
+export const tableHeaderContent = style([
+    skinEntries.tableHeader,
+    {
+        display: "flex",
+        alignItems: "center",
+        gap: themeVars.spacing.half,
+        height: "100%",
+        padding: themeVars.spacing.half,
+        fontSize: themeVars.fontSize.small,
+        fontWeight: 700,
+        whiteSpace: "nowrap",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        borderBottomWidth: 2,
+        borderBottomStyle: "solid",
+        transition: `background-color ${themeVars.animation.duration}, color ${themeVars.animation.duration}`,
 
-    selectors: {
-        [`&.${isSortable}`]: {
-            cursor: "pointer",
-        },
-        [`&.${isResizable}`]: {
-            paddingInlineEnd: RESIZER_WIDTH,
-        },
-        [`&.${isSortable}.${isHovered}`]: {
-            backgroundColor: HOVER_TINT,
-        },
-        [`&.${isPinnedStart}`]: {
-            borderInlineEnd: PIN_EDGE,
-        },
-        [`&.${isPinnedEnd}`]: {
-            borderInlineStart: PIN_EDGE,
-        },
-        [`&.${isPinnedStart}.${isSortable}.${isHovered}, &.${isPinnedEnd}.${isSortable}.${isHovered}`]:
-            tint(HOVER_TINT),
-        [`&.${isSorted}`]: {
-            color: themeVars.color.primary.main,
-        },
-        [`&.${isDisabled}`]: {
-            filter: themeVars.disabled.filter,
-            opacity: themeVars.disabled.opacity,
+        selectors: {
+            [`&.${isSortable}`]: {
+                cursor: "pointer",
+            },
+            [`&.${isResizable}`]: {
+                paddingInlineEnd: RESIZER_WIDTH,
+            },
+            [`&.${isPinnedStart}`]: {
+                borderInlineEndWidth: 1,
+                borderInlineEndStyle: "solid",
+            },
+            [`&.${isPinnedEnd}`]: {
+                borderInlineStartWidth: 1,
+                borderInlineStartStyle: "solid",
+            },
+            [`&.${isDisabled}`]: {
+                filter: themeVars.disabled.filter,
+                opacity: themeVars.disabled.opacity,
+            },
         },
     },
-});
+]);
 
 export const tableText = style({
     minWidth: 0,
@@ -110,50 +96,40 @@ export const tableSortMarker = style({
     },
 });
 
-export const tableCellContent = style({
-    display: "flex",
-    alignItems: "center",
-    height: "100%",
-    padding: themeVars.spacing.half,
-    borderBottom: `1px solid rgb(from ${layerVars.contrast} r g b / 10%)`,
-    fontSize: themeVars.fontSize.small,
-    whiteSpace: "nowrap",
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-    transition: `background-color ${themeVars.animation.duration}, color ${themeVars.animation.duration}`,
+export const tableCellContent = style([
+    skinEntries.tableCell,
+    {
+        display: "flex",
+        alignItems: "center",
+        height: "100%",
+        padding: themeVars.spacing.half,
+        fontSize: themeVars.fontSize.small,
+        whiteSpace: "nowrap",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        borderBottomWidth: 1,
+        borderBottomStyle: "solid",
+        transition: `background-color ${themeVars.animation.duration}, color ${themeVars.animation.duration}`,
 
-    selectors: {
-        [`&.${isHovered}`]: {
-            backgroundColor: HOVER_TINT,
-        },
-        [`&.${isSelected}`]: {
-            backgroundColor: SELECTED_TINT,
-            color: themeVars.color.primary.light,
-        },
-        [`&.${isSelected}.${isHovered}`]: {
-            backgroundColor: SELECTED_HOVER_TINT,
-        },
-        [`&.${isExpanded}`]: {
-            borderBottomColor: "transparent",
-        },
-        [`&.${isPinnedStart}`]: {
-            backgroundColor: layerVars.main,
-            borderInlineEnd: PIN_EDGE,
-        },
-        [`&.${isPinnedEnd}`]: {
-            backgroundColor: layerVars.main,
-            borderInlineStart: PIN_EDGE,
-        },
-        [`&.${isPinnedStart}.${isHovered}, &.${isPinnedEnd}.${isHovered}`]: tint(HOVER_TINT),
-        [`&.${isPinnedStart}.${isSelected}, &.${isPinnedEnd}.${isSelected}`]: tint(SELECTED_TINT),
-        [`&.${isPinnedStart}.${isSelected}.${isHovered}, &.${isPinnedEnd}.${isSelected}.${isHovered}`]:
-            tint(SELECTED_HOVER_TINT),
-        [`&.${isDisabled}`]: {
-            filter: themeVars.disabled.filter,
-            opacity: themeVars.disabled.opacity,
+        selectors: {
+            [`&.${isExpanded}`]: {
+                borderBottomColor: "transparent",
+            },
+            [`&.${isPinnedStart}`]: {
+                borderInlineEndWidth: 1,
+                borderInlineEndStyle: "solid",
+            },
+            [`&.${isPinnedEnd}`]: {
+                borderInlineStartWidth: 1,
+                borderInlineStartStyle: "solid",
+            },
+            [`&.${isDisabled}`]: {
+                filter: themeVars.disabled.filter,
+                opacity: themeVars.disabled.opacity,
+            },
         },
     },
-});
+]);
 
 export const tableCellLeading = style({
     display: "flex",
@@ -179,41 +155,44 @@ export const tableRowExpander = style({
     },
 });
 
-export const tableDetailContent = style({
-    padding: themeVars.spacing.full,
-    borderBottom: `1px solid rgb(from ${layerVars.contrast} r g b / 10%)`,
-    backgroundColor: `rgb(from ${layerVars.contrast} r g b / 5%)`,
-    fontSize: themeVars.fontSize.small,
-    lineHeight: 1.5,
+export const tableDetailContent = style([
+    skinEntries.tableDetail,
+    {
+        padding: themeVars.spacing.full,
+        fontSize: themeVars.fontSize.small,
+        lineHeight: 1.5,
+        borderBottomWidth: 1,
+        borderBottomStyle: "solid",
 
-    selectors: {
-        [`&.${isSelected}`]: {
-            backgroundColor: SELECTED_TINT,
-        },
-        [`&.${isDisabled}`]: {
-            filter: themeVars.disabled.filter,
-            opacity: themeVars.disabled.opacity,
-        },
-    },
-});
-
-export const tableResizerHandle = style({
-    width: "100%",
-    height: "100%",
-    borderRight: `2px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
-    transition: `border-color ${themeVars.animation.duration}`,
-
-    selectors: {
-        [`&:hover, &.${isResizing}`]: {
-            borderRightColor: themeVars.color.primary.main,
+        selectors: {
+            [`&.${isDisabled}`]: {
+                filter: themeVars.disabled.filter,
+                opacity: themeVars.disabled.opacity,
+            },
         },
     },
-});
+]);
+
+export const tableResizerHandle = style([
+    skinEntries.grip,
+    {
+        width: "100%",
+        height: "100%",
+        borderRight: "2px solid currentColor",
+        transition: `border-color ${themeVars.animation.duration}`,
+
+        selectors: {
+            [`&:hover, &.${isResizing}`]: {
+                borderRightColor: skinVars.accentColor,
+            },
+        },
+    },
+]);
 
 export const tableMarker = style({
     width: 2,
     height: "100%",
-    backgroundColor: themeVars.color.primary.main,
+    backgroundColor: skinVars.accentColor,
 });
 
 export const tableReorderGrip = style({

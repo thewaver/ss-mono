@@ -12,7 +12,6 @@ export const splitPaneRoot = style({
 export const splitPanePane = style({
     minWidth: 0,
     minHeight: 0,
-    overflow: "hidden",
     borderRadius: 0,
 });
 

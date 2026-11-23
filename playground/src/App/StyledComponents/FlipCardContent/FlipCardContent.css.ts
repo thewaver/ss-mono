@@ -2,7 +2,6 @@ import { style } from "@vanilla-extract/css";
 
 import { skinEntries } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
-import { layerVars } from "../Layer/Layer.css";
 
 const cardFace = style({
     display: "flex",
@@ -13,7 +12,6 @@ const cardFace = style({
     width: "100%",
     height: "100%",
     borderRadius: themeVars.borderRadius.half,
-    color: layerVars.contrast,
     userSelect: "none",
 });
 

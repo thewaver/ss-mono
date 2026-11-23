@@ -1,6 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
-import { layerVars } from "../../StyledComponents/Layer/Layer.css";
+import { skinEntries } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 
 export const HOST_SIZE = 400;
@@ -32,15 +32,17 @@ export const controls = style({
     maxWidth: HOST_SIZE,
 });
 
-export const host = style({
-    alignSelf: "center",
-    width: HOST_SIZE,
-    height: HOST_SIZE,
-    borderRadius: themeVars.borderRadius.half,
-    backgroundColor: [layerVars.main, `rgb(from ${layerVars.main} r g b / 50%)`],
-    outline: [`1px dashed ${layerVars.contrast}`, `1px dashed rgb(from ${layerVars.contrast} r g b / 25%)`],
-    outlineOffset: -1,
-});
+export const host = style([
+    skinEntries.panel,
+    {
+        outline: "1px dashed color-mix(in srgb, currentColor 25%, transparent)",
+        alignSelf: "center",
+        width: HOST_SIZE,
+        height: HOST_SIZE,
+        borderRadius: themeVars.borderRadius.half,
+        outlineOffset: -1,
+    },
+]);
 
 export const roamer = style({
     position: "absolute",

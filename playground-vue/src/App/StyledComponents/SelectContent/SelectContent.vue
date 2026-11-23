@@ -24,7 +24,7 @@ const layerClass = useLayerClass();
         ]"
         :style="{ width: width ? `${width}px` : undefined }"
     >
-        <div :class="styles.selectValue"><slot /></div>
+        <div :class="[styles.selectValue, flags.isEmpty && styles.isValueEmpty]"><slot /></div>
         <div v-if="hasClearSpace && !flags.isEmpty" :class="styles.selectClearSpace" />
         <div :class="styles.selectChevron" />
     </div>

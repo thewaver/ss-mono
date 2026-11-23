@@ -153,6 +153,23 @@ export const skinPanel = style([
     },
 ]);
 
+export const skinDropZoneSample = style([
+    skinEntries.dropZone,
+    {
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: themeVars.spacing.quarter,
+        padding: themeVars.spacing.half,
+        fontSize: themeVars.fontSize.small,
+    },
+]);
+
+export const skinTooltipSample = style({
+    alignSelf: "center",
+    paddingBlockEnd: themeVars.spacing.double,
+});
+
 export const skinWideSample = style({
     display: "flex",
     flexDirection: "column",

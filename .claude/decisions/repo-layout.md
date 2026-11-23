@@ -78,12 +78,14 @@ wherever it is mounted.
 **Every styled component reads the level itself.** Also the user's call, over the alternative of letting
 the containers switch the colors and keeping components unaware: reading the context is one of the few
 pieces of logic a theme is expected to own, because a different theme may not use layers at all. So each
-painter calls `useLayerClass()` and puts the returned class on its root; the class assigns `layerVars.main`
-and `layerVars.contrast` from the matching `color.layers.levelN`, and the painter's styles use
-`layerVars` only.
+painter calls `useLayerClass()` and puts the returned class on its root. **The class only names the level; only a
+Skin turns it into paint** — the user's design, so that no painter assumes the Theme has three background levels.
+Nothing outside the Skins reads a color by level (`Skins.md`, _"Skins"_): what used to now wears a Skin entry, derives
+from the surrounding text color, or takes a fixed color (`Skins.md`, under the custom-layout rule).
 
-**`PageLayer` also paints the level onto the page, through `PageLayerScope`**, a `display: contents` element
-carrying the same class, and `:root` carries level 0. That is what reaches paint no component owns: a page's
+**`PageLayer` also marks the level on the page, through `PageLayerScope`**, a `display: contents` element
+carrying the same class, and the Skin's root counts as level 0, so `<html>` and anything portalled to the end of the
+page have the level-0 values. That is what reaches paint no component owns: a page's
 own stylesheet, text typed into a library input (styled through `computeTextStyle`, which is a plain
 function), and anything a library control renders between a provider and a painter. It takes no part in
 layout, and the library measures its own wrappers rather than what a slot returns, so nothing positioned
@@ -92,7 +94,7 @@ sees it.
 **Where a surface sits decides its paint, not what it is.** The user's rule. Anything page-level — on the
 page background or in a top-level portal of its own: the example box, the left menu, modals, drawers, toasts,
 spotlight popups, tooltips — takes the `surface` gradient. Anything contained in an example box
-takes a solid fill of its level: a sample's frames and panels paint `layerVars.main`, unless the frame has a Skin entry: `Table`'s frame is `panel`, and the `Toolbar` and `Menubar` bars are `dropZone`. The one exception is
+takes a solid fill of its level: a sample's frames and panels wear `panel` (the Preview box and the Spotlights tour strip are plain black, the user's pick), unless the frame has a Skin entry: `Table`'s frame is `panel`, and the `Toolbar` and `Menubar` bars are `dropZone`. The one exception is
 `PageSidebarSurface`, which paints exactly the left menu's gradient, since it is a sample of that same
 furniture; a solid fill was tried and reverted by the user. The page's own ground, read straight from `color.layers.level0`, is off-limits to all of it. Where a solid fill takes away the difference between neighboring tiles or cells, their
 separators become the 25% stroke, since a separator painted in the fill itself disappears.

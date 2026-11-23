@@ -2,7 +2,6 @@ import { style } from "@vanilla-extract/css";
 
 import { skinEntries, skinStates } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
-import { layerVars } from "../Layer/Layer.css";
 
 const OPTION_WIDTH = 52;
 const OPTION_HEIGHT = 34;
@@ -39,7 +38,6 @@ export const clockUnit = style({
     justifyContent: "center",
     width: OPTION_WIDTH,
     height: OPTION_HEIGHT,
-    color: layerVars.contrast,
     fontSize: themeVars.fontSize.xSmall,
     textTransform: "uppercase",
     opacity: 0.5,

@@ -2,18 +2,20 @@ import { style } from "@vanilla-extract/css";
 
 import { MOSAIC_GAP } from "./WraparoundPage.const";
 
-import { layerVars } from "../../StyledComponents/Layer/Layer.css";
+import { skinEntries } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 
 const GRID_CELL_SIZE = 72;
 const MARQUEE_ROW_HEIGHT = 64;
 
-export const stage = style({
-    width: "100%",
-    height: 360,
-    borderRadius: themeVars.borderRadius.half,
-    backgroundColor: layerVars.main,
-});
+export const stage = style([
+    skinEntries.panel,
+    {
+        width: "100%",
+        height: 360,
+        borderRadius: themeVars.borderRadius.half,
+    },
+]);
 
 export const smallStage = style([stage, { height: 240 }]);
 
@@ -35,7 +37,6 @@ export const gridCell = style({
     border: "none",
     borderRadius: themeVars.borderRadius.half,
     backgroundColor: `rgb(from ${themeVars.color.primary.main} r g b / 25%)`,
-    color: layerVars.contrast,
     fontSize: themeVars.fontSize.large,
     fontWeight: "bold",
     cursor: "pointer",
@@ -74,7 +75,6 @@ export const marqueeWord = style({
     padding: `${themeVars.spacing.half} ${themeVars.spacing.full}`,
     borderRadius: themeVars.borderRadius.half,
     backgroundColor: `rgb(from ${themeVars.color.primary.main} r g b / 25%)`,
-    color: layerVars.contrast,
     fontSize: themeVars.fontSize.large,
     fontWeight: "bold",
     whiteSpace: "nowrap",

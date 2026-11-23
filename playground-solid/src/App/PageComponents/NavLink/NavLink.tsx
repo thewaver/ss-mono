@@ -30,7 +30,6 @@ export const PageNavLink = (props: ParentProps<PageNavLinkProps>) => {
                 classList={{
                     [getLayerClass()]: true,
                     [styles.hasHoverFloater]: access(props.hasHoverFloater) ?? false,
-                    [styles.hasNoHoverFloater]: !(access(props.hasHoverFloater) ?? false),
                     [styles.hasSelectionFloater]: access(props.hasSelectionFloater) ?? false,
                     [styles.isHovered]: groupContext?.getIsHighlighted(getRef()) ?? false,
                     [styles.isSelected]: access(props.isSelected),

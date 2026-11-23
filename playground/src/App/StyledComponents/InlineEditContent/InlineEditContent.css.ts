@@ -1,7 +1,7 @@
 import { style } from "@vanilla-extract/css";
 
+import { skinEntries, skinStates } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
-import { layerVars } from "../Layer/Layer.css";
 import {
     FIELD_BORDER,
     FIELD_FONT_SIZE,
@@ -11,35 +11,35 @@ import {
     FIELD_WIDTH,
 } from "../TextFieldContent/TextFieldContent.css";
 
-export const isHinted = style({});
+export const isHinted = style([skinStates.isHovered]);
 export const isDisabled = style({});
 
-export const inlineEditContent = style({
-    boxSizing: "border-box",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: FIELD_GAP,
-    width: FIELD_WIDTH,
-    height: FIELD_HEIGHT,
-    paddingInline: FIELD_PADDING - FIELD_BORDER,
-    border: `${FIELD_BORDER}px solid transparent`,
-    borderRadius: themeVars.borderRadius.half,
-    fontSize: FIELD_FONT_SIZE,
-    textAlign: "start",
-    cursor: "text",
-    transition: `border-color ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}`,
+export const inlineEditContent = style([
+    skinEntries.input,
+    skinStates.isInline,
+    {
+        boxSizing: "border-box",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: FIELD_GAP,
+        width: FIELD_WIDTH,
+        height: FIELD_HEIGHT,
+        paddingInline: FIELD_PADDING - FIELD_BORDER,
+        borderRadius: themeVars.borderRadius.half,
+        fontSize: FIELD_FONT_SIZE,
+        textAlign: "start",
+        cursor: "text",
+        transition: `border-color ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}`,
 
-    selectors: {
-        [`&.${isHinted}`]: {
-            borderColor: `rgb(from ${layerVars.contrast} r g b / 25%)`,
-        },
-        [`&.${isDisabled}`]: {
-            cursor: "not-allowed",
-            opacity: themeVars.disabled.opacity,
+        selectors: {
+            [`&.${isDisabled}`]: {
+                cursor: "not-allowed",
+                opacity: themeVars.disabled.opacity,
+            },
         },
     },
-});
+]);
 
 export const inlineEditText = style({
     overflow: "hidden",

@@ -1,9 +1,8 @@
 import { style } from "@vanilla-extract/css";
 
-import { skinEntries } from "../../Skins/Skin.css";
+import { skinEntries, skinVars } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 import { controlButtonBase, isActive, isDisabled, isHovered } from "../ControlButtonContent/ControlButtonContent.css";
-import { layerVars } from "../Layer/Layer.css";
 
 export const CAROUSEL_SLIDE_HEIGHT = 140;
 
@@ -33,13 +32,14 @@ export const carouselSlideBody = style({
     opacity: 0.75,
 });
 
-export const carouselSlideBack = style({
-    height: "100%",
-    minHeight: "100%",
-    borderRadius: themeVars.borderRadius.half,
-    backgroundColor: `rgb(from ${layerVars.contrast} r g b / 10%)`,
-    userSelect: "none",
-});
+export const carouselSlideBack = style([
+    skinEntries.panel,
+    {
+        height: "100%",
+        minHeight: "100%",
+        userSelect: "none",
+    },
+]);
 
 export const carouselBox = style({
     display: "flex",
@@ -66,7 +66,7 @@ export const carouselPick = style([
 
         selectors: {
             [`&.${isCurrent}`]: {
-                backgroundColor: themeVars.color.primary.main,
+                backgroundColor: skinVars.accentColor,
             },
         },
     },

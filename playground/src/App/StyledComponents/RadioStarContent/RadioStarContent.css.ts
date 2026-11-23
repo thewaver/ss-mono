@@ -1,7 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
-import { layerVars } from "../Layer/Layer.css";
 
 export const isFilled = style({});
 export const isHovered = style({});
@@ -14,7 +13,7 @@ export const starContent = style({
     alignItems: "center",
     width: 32,
     height: 40,
-    color: `rgb(from ${layerVars.contrast} r g b / 25%)`,
+    color: `color-mix(in srgb, currentColor 25%, transparent)`,
     fontSize: themeVars.fontSize.large,
     transition: `color ${themeVars.animation.duration}, filter ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}`,
 
@@ -47,7 +46,6 @@ export const starNumber = style({
     position: "absolute",
     insetBlockEnd: "100%",
     insetInline: 0,
-    color: layerVars.contrast,
     fontSize: themeVars.fontSize.xSmall,
     textAlign: "center",
     pointerEvents: "none",

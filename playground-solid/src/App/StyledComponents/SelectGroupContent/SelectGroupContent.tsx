@@ -32,7 +32,11 @@ export const PageSelectGroupContent = (props: ParentProps<SelectGroupContentProp
                             [styles.isMixed]: getGroupFlags().checkedState === "mixed",
                         }}
                     >
-                        {getGroupFlags().checkedState === "mixed" ? MIXED_MARK : CHECKED_MARK}
+                        <div class={styles.selectGroupMarkBox}>
+                            <div class={styles.selectGroupMarkTick}>
+                                {getGroupFlags().checkedState === "mixed" ? MIXED_MARK : CHECKED_MARK}
+                            </div>
+                        </div>
                     </div>
                 )}
             </Show>

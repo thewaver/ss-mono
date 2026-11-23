@@ -25,7 +25,7 @@
     ]}
     style:width={props.width ? `${props.width}px` : undefined}
 >
-    <div class={styles.selectValue}>{@render props.children?.()}</div>
+    <div class={[styles.selectValue, props.flags.isEmpty && styles.isValueEmpty]}>{@render props.children?.()}</div>
     {#if props.hasClearSpace && !props.flags.isEmpty}
         <div class={styles.selectClearSpace}></div>
     {/if}

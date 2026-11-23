@@ -2,7 +2,6 @@ import { style } from "@vanilla-extract/css";
 
 import { skinEntries, skinStates } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
-import { layerVars } from "../Layer/Layer.css";
 
 export const FIELD_WIDTH = 240;
 export const FIELD_HEIGHT = 40;
@@ -47,21 +46,23 @@ export const textFieldContent = style([
     },
 ]);
 
-export const textFieldPlaceholder = style({
-    display: "flex",
-    alignItems: "center",
-    height: "100%",
-    color: `rgb(from ${layerVars.contrast} r g b / 50%)`,
-    fontSize: FIELD_FONT_SIZE,
-    opacity: 0,
-    transition: `opacity ${themeVars.animation.duration}`,
+export const textFieldPlaceholder = style([
+    skinEntries.placeholder,
+    {
+        display: "flex",
+        alignItems: "center",
+        height: "100%",
+        fontSize: FIELD_FONT_SIZE,
+        opacity: 0,
+        transition: `opacity ${themeVars.animation.duration}`,
 
-    selectors: {
-        [`&.${isTopAligned}`]: {
-            alignItems: "flex-start",
-        },
-        [`&.${isEmpty}`]: {
-            opacity: 1,
+        selectors: {
+            [`&.${isTopAligned}`]: {
+                alignItems: "flex-start",
+            },
+            [`&.${isEmpty}`]: {
+                opacity: 1,
+            },
         },
     },
-});
+]);

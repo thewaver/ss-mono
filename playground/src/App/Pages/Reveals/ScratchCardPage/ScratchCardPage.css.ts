@@ -1,6 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
-import { layerVars } from "../../../StyledComponents/Layer/Layer.css";
+import { skinEntries } from "../../../Skins/Skin.css";
 import { themeVars } from "../../../Theme.css";
 
 const panel = (from: string, to: string) => `linear-gradient(135deg, ${from}, ${to})`;
@@ -25,16 +25,18 @@ export const buttonRow = style({
     justifyContent: "center",
 });
 
-export const prize = style({
-    display: "grid",
-    placeItems: "center",
-    padding: themeVars.spacing.double,
-    backgroundColor: layerVars.main,
-    color: themeVars.color.primary.main,
-    fontFamily: "monospace",
-    fontSize: themeVars.fontSize.xLarge,
-    letterSpacing: "0.1em",
-});
+export const prize = style([
+    skinEntries.panel,
+    {
+        display: "grid",
+        placeItems: "center",
+        padding: themeVars.spacing.double,
+        color: themeVars.color.primary.main,
+        fontFamily: "monospace",
+        fontSize: themeVars.fontSize.xLarge,
+        letterSpacing: "0.1em",
+    },
+]);
 
 export const foil = style({
     width: "100%",
@@ -43,16 +45,17 @@ export const foil = style({
     backgroundBlendMode: "soft-light",
 });
 
-export const pane = style({
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    gap: themeVars.spacing.half,
-    padding: themeVars.spacing.double,
-    backgroundColor: layerVars.dark,
-    color: layerVars.contrast,
-    fontSize: themeVars.fontSize.small,
-});
+export const pane = style([
+    skinEntries.panel,
+    {
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        gap: themeVars.spacing.half,
+        padding: themeVars.spacing.double,
+        fontSize: themeVars.fontSize.small,
+    },
+]);
 
 export const paneTitle = style({
     color: themeVars.color.primary.main,
@@ -60,10 +63,10 @@ export const paneTitle = style({
 });
 
 export const frost = style({
+    backgroundColor: "rgb(0 0 0 / 50%)",
     width: "100%",
     height: "100%",
     backdropFilter: "blur(8px) saturate(0.4)",
-    backgroundColor: [layerVars.dark, `rgb(from ${layerVars.dark} r g b / 50%)`],
 });
 
 export const coin = style({
@@ -88,12 +91,14 @@ export const windows = style({
     backgroundImage: panel(themeVars.color.primary.dark, themeVars.color.primary.light),
 });
 
-export const windowPrize = style({
-    display: "grid",
-    placeItems: "center",
-    padding: themeVars.spacing.double,
-    backgroundColor: layerVars.main,
-    color: themeVars.color.primary.main,
-    fontFamily: "monospace",
-    fontSize: themeVars.fontSize.xLarge,
-});
+export const windowPrize = style([
+    skinEntries.panel,
+    {
+        display: "grid",
+        placeItems: "center",
+        padding: themeVars.spacing.double,
+        color: themeVars.color.primary.main,
+        fontFamily: "monospace",
+        fontSize: themeVars.fontSize.xLarge,
+    },
+]);

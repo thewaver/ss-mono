@@ -1,6 +1,5 @@
 import { style } from "@vanilla-extract/css";
 
-import { layerVars } from "../../../../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../../../../Theme.css";
 
 export const borderRadius = 20;
@@ -74,7 +73,7 @@ export const bioFade = style({
 });
 
 export const bio = style({
+    color: "color-mix(in srgb, currentColor 75%, transparent)",
     fontSize: themeVars.fontSize.medium,
     fontWeight: 400,
-    color: `rgb(from ${layerVars.contrast} r g b / 75%)`,
 });

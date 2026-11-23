@@ -1,7 +1,6 @@
 import { globalStyle, keyframes, style } from "@vanilla-extract/css";
 
 import { MEASURE_BOX_PADDING } from "../../PageComponents/MeasureBox/MeasureBox.css";
-import { layerVars } from "../../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../../Theme.css";
 
 export const typewriterFade = keyframes({
@@ -232,7 +231,7 @@ export const karaokeLine = style({
 });
 
 globalStyle(`${karaokeLine} span`, {
-    backgroundImage: `linear-gradient(90deg, ${themeVars.color.primary.main} 50%, ${layerVars.contrast} 50%)`,
+    backgroundImage: `linear-gradient(90deg, ${themeVars.color.primary.main} 50%, ${themeVars.color.layers.level1.contrast} 50%)`,
     backgroundSize: "200% 100%",
     backgroundClip: "text",
     WebkitBackgroundClip: "text",

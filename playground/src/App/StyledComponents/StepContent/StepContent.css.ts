@@ -1,7 +1,7 @@
 import { style, styleVariants } from "@vanilla-extract/css";
 
+import { skinEntries } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
-import { layerVars } from "../Layer/Layer.css";
 
 export const isCurrent = style({});
 export const isHovered = style({});
@@ -81,26 +81,33 @@ export const marker = styleVariants({
         },
     ],
     ahead: [
+        skinEntries.itemStatic,
         {
             ...markerBase,
-            backgroundColor: "transparent",
-            border: `2px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
         },
     ],
 });
 
-export const rowConnector = style({
-    width: 32,
-    height: 2,
-    backgroundColor: `rgb(from ${layerVars.contrast} r g b / 25%)`,
-});
+export const rowConnector = style([
+    skinEntries.divider,
+    {
+        width: 32,
+        height: 2,
+        borderBlockStartWidth: 2,
+        borderBlockStartStyle: "solid",
+    },
+]);
 
-export const columnConnector = style({
-    width: 2,
-    height: 20,
-    marginInlineStart: `calc(${themeVars.spacing.double} - 1px)`,
-    backgroundColor: `rgb(from ${layerVars.contrast} r g b / 25%)`,
-});
+export const columnConnector = style([
+    skinEntries.divider,
+    {
+        width: 2,
+        height: 20,
+        marginInlineStart: `calc(${themeVars.spacing.double} - 1px)`,
+        borderInlineStartWidth: 2,
+        borderInlineStartStyle: "solid",
+    },
+]);
 
 export const columnRailConnector = style([columnConnector, { height: "auto", alignSelf: "stretch" }]);
 
@@ -114,15 +121,17 @@ export const stepBody = style({
     opacity: 0.75,
 });
 
-export const arcCell = style({
-    display: "grid",
-    placeItems: "center start",
-    width: "100%",
-    height: "100%",
-    borderRadius: 100,
-    backgroundColor: layerVars.dark,
-    boxShadow: themeVars.shadow.small,
-});
+export const arcCell = style([
+    skinEntries.itemStatic,
+    {
+        display: "grid",
+        placeItems: "center start",
+        width: "100%",
+        height: "100%",
+        borderRadius: 100,
+        boxShadow: themeVars.shadow.small,
+    },
+]);
 
 export const arcConnector = style({
     position: "absolute",
@@ -136,7 +145,7 @@ export const arcConnector = style({
 
 export const arcConnectorPath = style({
     fill: "none",
-    stroke: layerVars.contrast,
+    stroke: "currentColor",
     strokeWidth: 2,
     strokeOpacity: 0.35,
     strokeLinecap: "round",

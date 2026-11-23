@@ -3,10 +3,12 @@ import { type StyleRule, style } from "@vanilla-extract/css";
 
 import type { SkinColorFamily } from "../Skin.types";
 import { SkinUtils } from "../Skin.utils";
+import { SkinBaseUtils } from "../SkinBase.utils";
 
-import { layerVars } from "../../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../../Theme.css";
 import { skinSelectors, skinVars } from "../Skin.css";
+
+const LEVEL = SkinUtils.computeLevelFamily(themeVars.color.layers);
 
 export const tek = style({
     vars: {
@@ -66,22 +68,9 @@ const unlitBoard = (color: string, alphaPercent: number): StyleRule => ({
     color: color,
 });
 
-const INTERACTIBLE_STATES: StyleRule["selectors"] = {
-    [skinSelectors.isHovered]: {
-        filter: themeVars.hover.filter,
-    },
-    [skinSelectors.isActive]: {
-        filter: themeVars.active.filter,
-    },
-    [skinSelectors.isDisabled]: {
-        filter: themeVars.disabled.filter,
-        opacity: themeVars.disabled.opacity,
-    },
-} as const;
-
-const INPUT_STATES: StyleRule["selectors"] = ObjectUtils.deepMerge(INTERACTIBLE_STATES, {
+const INPUT_STATES: StyleRule["selectors"] = ObjectUtils.deepMerge(SkinBaseUtils.INTERACTIBLE_STATES, {
     [skinSelectors.isReadOnly]: {
-        ...litBoard(layerVars.contrast, new Set(["top"])),
+        ...litBoard(LEVEL.contrast, new Set(["top"])),
     },
     [SkinUtils.anyOf(skinSelectors.isCheckedWithin, skinSelectors.isMixedWithin)]: {},
     [SkinUtils.anyOf(skinSelectors.hasErrorWithin, skinSelectors.hasError)]: {
@@ -89,7 +78,7 @@ const INPUT_STATES: StyleRule["selectors"] = ObjectUtils.deepMerge(INTERACTIBLE_
     },
 });
 
-const ITEM_STATES: StyleRule["selectors"] = ObjectUtils.deepMerge(INTERACTIBLE_STATES, {
+const ITEM_STATES: StyleRule["selectors"] = ObjectUtils.deepMerge(SkinBaseUtils.INTERACTIBLE_STATES, {
     [skinSelectors.isHovered]: {
         filter: "none",
     },
@@ -103,7 +92,7 @@ const ITEM_STATES: StyleRule["selectors"] = ObjectUtils.deepMerge(INTERACTIBLE_S
     },
 });
 
-const SWITCH_STATES: StyleRule["selectors"] = ObjectUtils.deepMerge(INTERACTIBLE_STATES, {
+const SWITCH_STATES: StyleRule["selectors"] = ObjectUtils.deepMerge(SkinBaseUtils.INTERACTIBLE_STATES, {
     [SkinUtils.anyOf(skinSelectors.isCheckedWithin, skinSelectors.isMixedWithin)]: {
         ...unlitBoard(themeVars.color.primary.main, 25),
     },
@@ -113,17 +102,17 @@ const SWITCH_STATES: StyleRule["selectors"] = ObjectUtils.deepMerge(INTERACTIBLE
 });
 
 const INPUT_SHELL: StyleRule = {
-    ...litBoard(layerVars.contrast, new Set(["top"])),
+    ...litBoard(LEVEL.contrast, new Set(["top"])),
 } as const;
 
 const SWITCH_SHELL: StyleRule = {
-    ...unlitBoard(layerVars.contrast, 25),
+    ...unlitBoard(LEVEL.contrast, 25),
 } as const;
 
 const ACCORDION: StyleRule = {
-    ...litBoard(layerVars.dark, new Set(["top", "right", "bottom", "left"]), 100),
+    ...litBoard(LEVEL.dark, new Set(["top", "right", "bottom", "left"]), 100),
     borderRadius: themeVars.borderRadius.full,
-    color: layerVars.contrast,
+    color: LEVEL.contrast,
 } as const;
 
 const ITEM: StyleRule = {
@@ -131,7 +120,7 @@ const ITEM: StyleRule = {
 } as const;
 
 const ITEM_FLOATER_HOVER: StyleRule = {
-    ...unlitBoard(layerVars.contrast, 25),
+    ...unlitBoard(LEVEL.contrast, 25),
 };
 
 const ITEM_FLOATER_SELECTED: StyleRule = {
@@ -140,7 +129,7 @@ const ITEM_FLOATER_SELECTED: StyleRule = {
 };
 
 const TAB_FLOATER_HOVER: StyleRule = {
-    ...litBoard(layerVars.contrast, new Set(["top", "right", "bottom", "left"])),
+    ...litBoard(LEVEL.contrast, new Set(["top", "right", "bottom", "left"])),
     borderTopLeftRadius: themeVars.borderRadius.full,
     borderBottomRightRadius: themeVars.borderRadius.full,
 };
@@ -164,335 +153,306 @@ const surface = (color: SkinColorFamily): StyleRule => {
     };
 };
 
-SkinUtils.define(tek, {
-    accordionHeader: {
-        selectors: ObjectUtils.deepMerge(SkinUtils.joinedCorners(), INTERACTIBLE_STATES, {
-            [skinSelectors.isExpanded]: {
-                color: themeVars.color.primary.main,
-                fontWeight: "bold",
-            },
-        }),
-    },
-    accordionPanel: {
-        selectors: {
-            ...SkinUtils.joinedCorners(),
+SkinUtils.define(
+    tek,
+    SkinBaseUtils.merge(LEVEL, {
+        accordionHeader: {
+            selectors: ObjectUtils.deepMerge(SkinUtils.joinedCorners(), SkinBaseUtils.INTERACTIBLE_STATES, {
+                [skinSelectors.isExpanded]: {
+                    color: themeVars.color.primary.main,
+                    fontWeight: "bold",
+                },
+            }),
         },
-    },
-    accordionWrapper: {
-        ...ACCORDION,
-    },
-    button: {
-        ...litBoard(themeVars.color.primary.main, new Set(["top", "right", "bottom", "left"])),
-        borderBottomLeftRadius: themeVars.borderRadius.full,
-        borderTopRightRadius: themeVars.borderRadius.full,
-        paddingInline: themeVars.spacing.double,
-        fontWeight: "bold",
-        selectors: ObjectUtils.deepMerge(INTERACTIBLE_STATES, {
-            [skinSelectors.isPressed]: {
-                borderRadius: themeVars.borderRadius.full,
-            },
-            [skinSelectors.hasError]: {
-                ...litBoard(themeVars.color.error.main, new Set(["top", "right", "bottom", "left"])),
-                borderBottomLeftRadius: themeVars.borderRadius.full,
-                borderTopRightRadius: themeVars.borderRadius.full,
-            },
-            [SkinUtils.allOf(skinSelectors.isPressed, skinSelectors.hasError)]: {
-                borderRadius: themeVars.borderRadius.full,
-            },
-        }),
-    },
-    buttonSimple: {
-        ...unlitBoard(layerVars.contrast, 25),
-        borderTopLeftRadius: themeVars.borderRadius.half,
-        borderBottomRightRadius: themeVars.borderRadius.half,
-        fontSize: themeVars.fontSize.small,
-        selectors: ObjectUtils.deepMerge(INTERACTIBLE_STATES, {
-            [skinSelectors.isPressed]: {
-                color: themeVars.color.primary.main,
-            },
-            [skinSelectors.hasError]: {
-                boxShadow: [
-                    `inset 0 0 0 2px ${themeVars.color.error.main}`,
-                    insetGlow(themeVars.color.error.main, 25 * 0.5),
-                    outsetGlow(themeVars.color.error.main, 25),
-                    SHADOW_SMALL,
-                ].join(", "),
-            },
-            [SkinUtils.allOf(skinSelectors.isPressed, skinSelectors.hasError)]: {
-                color: themeVars.color.primary.main,
-            },
-        }),
-    },
-    checkboxBox: {
-        ...SWITCH_SHELL,
-        selectors: {
-            ...SWITCH_STATES,
+        accordionWrapper: {
+            ...ACCORDION,
         },
-    },
-    checkboxMark: {
-        color: themeVars.color.primary.main,
-        fontSize: themeVars.fontSize.medium,
-        fontWeight: "bold",
-        [skinSelectors.hasErrorWithin]: {
-            color: themeVars.color.error.main,
+        button: {
+            ...litBoard(themeVars.color.primary.main, new Set(["top", "right", "bottom", "left"])),
+            borderBottomLeftRadius: themeVars.borderRadius.full,
+            borderTopRightRadius: themeVars.borderRadius.full,
+            paddingInline: themeVars.spacing.double,
+            fontWeight: "bold",
+            selectors: ObjectUtils.deepMerge(SkinBaseUtils.INTERACTIBLE_STATES, {
+                [skinSelectors.isPressed]: {
+                    borderRadius: themeVars.borderRadius.full,
+                },
+                [skinSelectors.hasError]: {
+                    ...litBoard(themeVars.color.error.main, new Set(["top", "right", "bottom", "left"])),
+                    borderBottomLeftRadius: themeVars.borderRadius.full,
+                    borderTopRightRadius: themeVars.borderRadius.full,
+                },
+                [SkinUtils.allOf(skinSelectors.isPressed, skinSelectors.hasError)]: {
+                    borderRadius: themeVars.borderRadius.full,
+                },
+            }),
         },
-    },
-    decoration: {
-        backgroundColor: "transparent",
-        opacity: 0.75,
-        selectors: {
-            ...INTERACTIBLE_STATES,
+        buttonSimple: {
+            ...unlitBoard(LEVEL.contrast, 25),
+            borderTopLeftRadius: themeVars.borderRadius.half,
+            borderBottomRightRadius: themeVars.borderRadius.half,
+            fontSize: themeVars.fontSize.small,
+            selectors: ObjectUtils.deepMerge(SkinBaseUtils.INTERACTIBLE_STATES, {
+                [skinSelectors.isPressed]: {
+                    color: themeVars.color.primary.main,
+                },
+                [skinSelectors.hasError]: {
+                    boxShadow: [
+                        `inset 0 0 0 2px ${themeVars.color.error.main}`,
+                        insetGlow(themeVars.color.error.main, 25 * 0.5),
+                        outsetGlow(themeVars.color.error.main, 25),
+                        SHADOW_SMALL,
+                    ].join(", "),
+                },
+                [SkinUtils.allOf(skinSelectors.isPressed, skinSelectors.hasError)]: {
+                    color: themeVars.color.primary.main,
+                },
+            }),
         },
-    },
-    drawer: {
-        ...surface(layerVars),
-    },
-    dropdown: {
-        ...unlitBoard(layerVars.contrast, 10),
-        backdropFilter: "blur(20px)",
-    },
-    dropZone: {
-        border: [`2px dashed ${layerVars.contrast}`, `2px dashed rgb(from ${layerVars.contrast} r g b / 25%)`],
-        selectors: ObjectUtils.deepMerge(INPUT_STATES, {
-            [SkinUtils.anyOf(skinSelectors.hasErrorWithin, skinSelectors.hasError)]: {
-                border: "2px solid white",
+        checkboxBox: {
+            ...SWITCH_SHELL,
+            selectors: {
+                ...SWITCH_STATES,
             },
-            [skinSelectors.isCarrying]: {
-                border: "2px solid white",
-                boxShadow: insetGlow(layerVars.contrast, 25),
-            },
-            [skinSelectors.isReceiving]: {
-                border: "2px solid white",
-                boxShadow: insetGlow(themeVars.color.primary.main, 100),
-                backgroundColor: [
-                    themeVars.color.primary.main,
-                    `rgb(from ${themeVars.color.primary.main} r g b / 10%)`,
-                ],
-            },
-        }),
-    },
-    input: {
-        ...INPUT_SHELL,
-        selectors: ObjectUtils.deepMerge(INPUT_STATES, {
-            [skinSelectors.fieldText]: {
-                color: layerVars.contrast,
-                caretColor: themeVars.color.primary.main,
-                fontSize: themeVars.fontSize.medium,
-            },
-            [skinSelectors.fieldTextDisabled]: {
-                color: [layerVars.contrast, `rgb(from ${layerVars.contrast} r g b / ${themeVars.disabled.opacity})`],
-            },
-        }),
-    },
-    itemBase: {
-        ...ITEM,
-        selectors: ObjectUtils.deepMerge(ITEM_STATES, {
-            [skinSelectors.isHoveredWithoutFloater]: {
-                ...ITEM_FLOATER_HOVER,
-            },
-            [skinSelectors.isSelectedWithoutFloater]: {
-                ...ITEM_FLOATER_SELECTED,
-            },
-        }),
-    },
-    itemHoverFloater: {
-        ...ITEM_FLOATER_HOVER,
-    },
-    itemSelectionFloater: {
-        ...ITEM_FLOATER_SELECTED,
-    },
-    itemStatic: {
-        ...ITEM,
-        ...ITEM_FLOATER_HOVER,
-    },
-    overlay: {
-        backdropFilter: "blur(20px) grayscale(75%)",
-    },
-    pageBackground: {
-        backgroundColor: themeVars.color.layers.level0.light,
-        backgroundImage: `linear-gradient(135deg, hsl(from ${themeVars.color.primary.light} h 100 l / 10%), transparent, hsl(from ${themeVars.color.primary.light} h 100 l / 10%))`,
-        color: themeVars.color.layers.level0.contrast,
-    },
-    pageContainer: {
-        ...surface(layerVars),
-    },
-    panel: {
-        ...litBoard(layerVars.dark, new Set(["top", "right", "bottom", "left"]), 100),
-        borderRadius: themeVars.borderRadius.full,
-        color: layerVars.contrast,
-    },
-    progressFill: {
-        ...unlitBoard(themeVars.color.primary.main, 100),
-        borderTopLeftRadius: themeVars.borderRadius.full,
-        borderBottomRightRadius: themeVars.borderRadius.full,
-        selectors: {
+        },
+        checkboxMark: {
+            color: themeVars.color.primary.main,
+            fontSize: themeVars.fontSize.medium,
+            fontWeight: "bold",
             [skinSelectors.hasErrorWithin]: {
-                ...unlitBoard(themeVars.color.error.main, 100),
+                color: themeVars.color.error.main,
             },
         },
-    },
-    progressTip: {},
-    progressTrack: {
-        ...unlitBoard(layerVars.contrast, 10),
-        borderTopLeftRadius: themeVars.borderRadius.full,
-        borderBottomRightRadius: themeVars.borderRadius.full,
-    },
-    radioBox: {
-        ...SWITCH_SHELL,
-        borderRadius: "50%",
-        selectors: {
-            ...SWITCH_STATES,
-        },
-    },
-    radioDot: {
-        borderRadius: "50%",
-        backgroundColor: themeVars.color.primary.main,
-        [skinSelectors.hasErrorWithin]: {
-            backgroundColor: themeVars.color.error.main,
-        },
-    },
-    rangeFill: {
-        ...unlitBoard(themeVars.color.primary.main, 100),
-        borderTopLeftRadius: themeVars.borderRadius.full,
-        borderBottomRightRadius: themeVars.borderRadius.full,
-        selectors: {
-            [skinSelectors.hasError]: {
-                ...unlitBoard(themeVars.color.error.main, 100),
+        decoration: {
+            backgroundColor: "transparent",
+            opacity: 0.75,
+            selectors: {
+                ...SkinBaseUtils.INTERACTIBLE_STATES,
             },
         },
-    },
-    rangeThumb: {
-        ...unlitBoard(themeVars.color.primary.main, 100),
-        border: `2px solid ${themeVars.color.primary.main}`,
-        borderTopLeftRadius: themeVars.borderRadius.full,
-        borderBottomRightRadius: themeVars.borderRadius.full,
-        backgroundColor: themeVars.color.primary.contrast,
-        selectors: {
-            [skinSelectors.hasError]: {
-                ...unlitBoard(themeVars.color.error.main, 100),
-                border: `2px solid ${themeVars.color.error.main}`,
-                backgroundColor: themeVars.color.error.contrast,
+        drawer: {
+            ...surface(LEVEL),
+        },
+        dropdown: {
+            ...unlitBoard(LEVEL.contrast, 10),
+            backdropFilter: "blur(20px)",
+        },
+        dropZone: {
+            border: [`2px dashed ${LEVEL.contrast}`, `2px dashed rgb(from ${LEVEL.contrast} r g b / 25%)`],
+            selectors: ObjectUtils.deepMerge(INPUT_STATES, {
+                [SkinUtils.anyOf(skinSelectors.hasErrorWithin, skinSelectors.hasError)]: {
+                    border: "2px solid white",
+                },
+                [skinSelectors.isCarrying]: {
+                    border: "2px solid white",
+                    boxShadow: insetGlow(LEVEL.contrast, 25),
+                },
+                [skinSelectors.isReceiving]: {
+                    border: "2px solid white",
+                    boxShadow: insetGlow(themeVars.color.primary.main, 100),
+                    backgroundColor: [
+                        themeVars.color.primary.main,
+                        `rgb(from ${themeVars.color.primary.main} r g b / 10%)`,
+                    ],
+                },
+            }),
+        },
+        input: {
+            ...INPUT_SHELL,
+            selectors: ObjectUtils.deepMerge(INPUT_STATES, {
+                [skinSelectors.fieldTextDisabled]: {
+                    color: [LEVEL.contrast, `rgb(from ${LEVEL.contrast} r g b / ${themeVars.disabled.opacity})`],
+                },
+            }),
+        },
+        itemBase: {
+            ...ITEM,
+            selectors: ObjectUtils.deepMerge(ITEM_STATES, {
+                [skinSelectors.isHoveredWithoutFloater]: {
+                    ...ITEM_FLOATER_HOVER,
+                },
+                [skinSelectors.isSelectedWithoutFloater]: {
+                    ...ITEM_FLOATER_SELECTED,
+                },
+            }),
+        },
+        itemHoverFloater: {
+            ...ITEM_FLOATER_HOVER,
+        },
+        itemSelectionFloater: {
+            ...ITEM_FLOATER_SELECTED,
+        },
+        itemStatic: {
+            ...ITEM,
+            ...ITEM_FLOATER_HOVER,
+        },
+        pageBackground: {
+            backgroundColor: themeVars.color.layers.level0.light,
+            backgroundImage: `linear-gradient(135deg, hsl(from ${themeVars.color.primary.light} h 100 l / 10%), transparent, hsl(from ${themeVars.color.primary.light} h 100 l / 10%))`,
+            color: themeVars.color.layers.level0.contrast,
+        },
+        pageContainer: {
+            ...surface(LEVEL),
+        },
+        panel: {
+            ...litBoard(LEVEL.dark, new Set(["top", "right", "bottom", "left"]), 100),
+            borderRadius: themeVars.borderRadius.full,
+            color: LEVEL.contrast,
+        },
+        progressFill: {
+            ...unlitBoard(themeVars.color.primary.main, 100),
+            borderTopLeftRadius: themeVars.borderRadius.full,
+            borderBottomRightRadius: themeVars.borderRadius.full,
+            selectors: {
+                [skinSelectors.hasErrorWithin]: {
+                    ...unlitBoard(themeVars.color.error.main, 100),
+                },
             },
         },
-    },
-    rangeTrack: {
-        ...unlitBoard(layerVars.contrast, 10),
-        borderTopLeftRadius: themeVars.borderRadius.full,
-        borderBottomRightRadius: themeVars.borderRadius.full,
-    },
-    scrollerThumb: {
-        selectors: {
-            [skinSelectors.line]: {
-                backgroundColor: themeVars.color.primary.main,
-            },
-            [skinSelectors.lineActive]: {
-                filter: themeVars.active.filter,
+        progressTrack: {
+            ...unlitBoard(LEVEL.contrast, 10),
+            borderTopLeftRadius: themeVars.borderRadius.full,
+            borderBottomRightRadius: themeVars.borderRadius.full,
+        },
+        radioBox: {
+            ...SWITCH_SHELL,
+            borderRadius: "50%",
+            selectors: {
+                ...SWITCH_STATES,
             },
         },
-    },
-    scrollerTrack: {
-        selectors: {
-            [skinSelectors.line]: {
-                backgroundColor: [layerVars.contrast, `rgb(from ${layerVars.contrast} r g b / 25%)`],
+        radioDot: {
+            borderRadius: "50%",
+            backgroundColor: themeVars.color.primary.main,
+            [skinSelectors.hasErrorWithin]: {
+                backgroundColor: themeVars.color.error.main,
             },
         },
-    },
-    slideButtonFill: {
-        ...unlitBoard(themeVars.color.primary.contrast, 100),
-        borderTopLeftRadius: themeVars.borderRadius.full,
-        borderBottomRightRadius: themeVars.borderRadius.full,
-        selectors: {
-            [skinSelectors.hasError]: {
-                ...unlitBoard(themeVars.color.error.contrast, 100),
+        rangeFill: {
+            ...unlitBoard(themeVars.color.primary.main, 100),
+            borderTopLeftRadius: themeVars.borderRadius.full,
+            borderBottomRightRadius: themeVars.borderRadius.full,
+            selectors: {
+                [skinSelectors.hasError]: {
+                    ...unlitBoard(themeVars.color.error.main, 100),
+                },
             },
         },
-    },
-    slideButtonThumb: {
-        ...unlitBoard(themeVars.color.primary.main, 100),
-        border: `2px solid ${themeVars.color.primary.main}`,
-        borderTopLeftRadius: themeVars.borderRadius.full,
-        borderBottomRightRadius: themeVars.borderRadius.full,
-        backgroundColor: themeVars.color.primary.contrast,
-        selectors: {
-            [skinSelectors.hasError]: {
-                ...unlitBoard(themeVars.color.error.main, 100),
-                border: `2px solid ${themeVars.color.error.main}`,
-                backgroundColor: themeVars.color.error.contrast,
+        rangeThumb: {
+            ...unlitBoard(themeVars.color.primary.main, 100),
+            border: `2px solid ${themeVars.color.primary.main}`,
+            borderTopLeftRadius: themeVars.borderRadius.full,
+            borderBottomRightRadius: themeVars.borderRadius.full,
+            backgroundColor: themeVars.color.primary.contrast,
+            selectors: {
+                [skinSelectors.hasError]: {
+                    ...unlitBoard(themeVars.color.error.main, 100),
+                    border: `2px solid ${themeVars.color.error.main}`,
+                    backgroundColor: themeVars.color.error.contrast,
+                },
             },
         },
-    },
-    slideButtonTrack: {
-        ...unlitBoard(layerVars.contrast, 10),
-        borderTopLeftRadius: themeVars.borderRadius.full,
-        borderBottomRightRadius: themeVars.borderRadius.full,
-        fontWeight: "bold",
-    },
-    surface: {
-        ...surface(layerVars),
-    },
-    tabsItemBase: {
-        paddingBlock: themeVars.spacing.full,
-        paddingInline: themeVars.spacing.double,
-        fontSize: themeVars.fontSize.small,
-        fontWeight: "bold",
-        selectors: ObjectUtils.deepMerge(ITEM_STATES, {
-            [skinSelectors.isVertical]: {
-                paddingBlock: themeVars.spacing.full,
-                paddingInline: themeVars.spacing.double,
-            },
-            [skinSelectors.isHoveredWithoutFloater]: {
-                ...TAB_FLOATER_HOVER,
-            },
-            [skinSelectors.isSelectedWithoutFloater]: {
-                ...TAB_FLOATER_SELECTED,
-            },
-        }),
-    },
-    tabsItemHoverFloater: {
-        ...TAB_FLOATER_HOVER,
-    },
-    tabsItemSelectionFloater: {
-        ...TAB_FLOATER_SELECTED,
-    },
-    tabsTrack: {
-        ...unlitBoard(layerVars.contrast, 10),
-        borderTopLeftRadius: themeVars.borderRadius.full,
-        borderBottomRightRadius: themeVars.borderRadius.full,
-    },
-    tag: {
-        ...unlitBoard(layerVars.contrast, 25),
-        borderTopLeftRadius: themeVars.borderRadius.half,
-        borderBottomRightRadius: themeVars.borderRadius.half,
-        paddingInline: themeVars.spacing.full,
-        fontSize: themeVars.fontSize.xSmall,
-        fontWeight: "bold",
-        selectors: {
-            ...INTERACTIBLE_STATES,
+        rangeTrack: {
+            ...unlitBoard(LEVEL.contrast, 10),
+            borderTopLeftRadius: themeVars.borderRadius.full,
+            borderBottomRightRadius: themeVars.borderRadius.full,
         },
-    },
-    toggleThumb: {
-        ...unlitBoard(layerVars.contrast, 100),
-        borderTopLeftRadius: themeVars.borderRadius.half,
-        borderBottomRightRadius: themeVars.borderRadius.half,
-        selectors: {
-            [SkinUtils.anyOf(skinSelectors.isCheckedWithin, skinSelectors.isMixedWithin)]: {
-                ...unlitBoard(themeVars.color.primary.main, 100),
-            },
-            [SkinUtils.anyOf(skinSelectors.hasErrorWithin, skinSelectors.hasError)]: {
-                ...unlitBoard(themeVars.color.error.main, 100),
+        slideButtonFill: {
+            ...unlitBoard(themeVars.color.primary.contrast, 100),
+            borderTopLeftRadius: themeVars.borderRadius.full,
+            borderBottomRightRadius: themeVars.borderRadius.full,
+            selectors: {
+                [skinSelectors.hasError]: {
+                    ...unlitBoard(themeVars.color.error.contrast, 100),
+                },
             },
         },
-    },
-    toggleTrack: {
-        ...SWITCH_SHELL,
-        borderTopLeftRadius: themeVars.borderRadius.full,
-        borderBottomRightRadius: themeVars.borderRadius.full,
-        selectors: {
-            ...SWITCH_STATES,
+        slideButtonThumb: {
+            ...unlitBoard(themeVars.color.primary.main, 100),
+            border: `2px solid ${themeVars.color.primary.main}`,
+            borderTopLeftRadius: themeVars.borderRadius.full,
+            borderBottomRightRadius: themeVars.borderRadius.full,
+            backgroundColor: themeVars.color.primary.contrast,
+            selectors: {
+                [skinSelectors.hasError]: {
+                    ...unlitBoard(themeVars.color.error.main, 100),
+                    border: `2px solid ${themeVars.color.error.main}`,
+                    backgroundColor: themeVars.color.error.contrast,
+                },
+            },
         },
-    },
-    tooltip: {
-        ...unlitBoard(layerVars.main, 100),
-        color: layerVars.contrast,
-    },
-});
+        slideButtonTrack: {
+            ...unlitBoard(LEVEL.contrast, 10),
+            borderTopLeftRadius: themeVars.borderRadius.full,
+            borderBottomRightRadius: themeVars.borderRadius.full,
+            fontWeight: "bold",
+        },
+        splitPaneFrame: {
+            borderRadius: themeVars.borderRadius.full,
+        },
+        surface: {
+            ...surface(LEVEL),
+        },
+        tabsItemBase: {
+            paddingBlock: themeVars.spacing.full,
+            paddingInline: themeVars.spacing.double,
+            fontSize: themeVars.fontSize.small,
+            fontWeight: "bold",
+            selectors: ObjectUtils.deepMerge(ITEM_STATES, {
+                [skinSelectors.isHoveredWithoutFloater]: {
+                    ...TAB_FLOATER_HOVER,
+                },
+                [skinSelectors.isSelectedWithoutFloater]: {
+                    ...TAB_FLOATER_SELECTED,
+                },
+            }),
+        },
+        tabsItemHoverFloater: {
+            ...TAB_FLOATER_HOVER,
+        },
+        tabsItemSelectionFloater: {
+            ...TAB_FLOATER_SELECTED,
+        },
+        tabsTrack: {
+            ...unlitBoard(LEVEL.contrast, 10),
+            borderTopLeftRadius: themeVars.borderRadius.full,
+            borderBottomRightRadius: themeVars.borderRadius.full,
+        },
+        tag: {
+            ...unlitBoard(LEVEL.contrast, 25),
+            borderTopLeftRadius: themeVars.borderRadius.half,
+            borderBottomRightRadius: themeVars.borderRadius.half,
+            paddingInline: themeVars.spacing.full,
+            fontSize: themeVars.fontSize.xSmall,
+            fontWeight: "bold",
+            selectors: {
+                ...SkinBaseUtils.INTERACTIBLE_STATES,
+            },
+        },
+        toggleThumb: {
+            ...unlitBoard(LEVEL.contrast, 100),
+            borderTopLeftRadius: themeVars.borderRadius.half,
+            borderBottomRightRadius: themeVars.borderRadius.half,
+            selectors: {
+                [SkinUtils.anyOf(skinSelectors.isCheckedWithin, skinSelectors.isMixedWithin)]: {
+                    ...unlitBoard(themeVars.color.primary.main, 100),
+                },
+                [SkinUtils.anyOf(skinSelectors.hasErrorWithin, skinSelectors.hasError)]: {
+                    ...unlitBoard(themeVars.color.error.main, 100),
+                },
+            },
+        },
+        toggleTrack: {
+            ...SWITCH_SHELL,
+            borderTopLeftRadius: themeVars.borderRadius.full,
+            borderBottomRightRadius: themeVars.borderRadius.full,
+            selectors: {
+                ...SWITCH_STATES,
+            },
+        },
+        tooltip: {
+            ...unlitBoard(LEVEL.main, 100),
+            color: LEVEL.contrast,
+        },
+    }),
+);

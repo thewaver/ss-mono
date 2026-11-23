@@ -1,13 +1,27 @@
-import { globalStyle } from "@vanilla-extract/css";
+import { createVar, globalStyle } from "@vanilla-extract/css";
 
-import type { SkinEntry, SkinRule, SkinRules } from "./Skin.types";
+import type { LayerLevel } from "../PageComponents/Layer/Layer.context.types";
+import type { SkinColorFamily, SkinEntry, SkinLevelFamilies, SkinLevelValues, SkinRule, SkinRules } from "./Skin.types";
 
+import { layerLevelVariants } from "../StyledComponents/Layer/Layer.css";
 import { BODY_FONT_FAMILY } from "../Theme.css";
-import { skinBoundary, skinEntries, skinLayer, skinSelectors, skinSizeVars } from "./Skin.css";
+import { skinBoundary, skinColorVars, skinEntries, skinLayer, skinSelectors, skinSizeVars } from "./Skin.css";
 
-const UNSET_SIZE_VARS = Object.fromEntries(Object.values(skinSizeVars).map((sizeVar) => [sizeVar, "initial"]));
+const UNSET_VARS = Object.fromEntries(
+    [...Object.values(skinSizeVars), ...Object.values(skinColorVars)].map((skinVar) => [skinVar, "initial"]),
+);
 
-const ROOT_RESET = { fontFamily: BODY_FONT_FAMILY, vars: UNSET_SIZE_VARS };
+const ROOT_RESET = { fontFamily: BODY_FONT_FAMILY, vars: UNSET_VARS };
+
+const LEVELS: LayerLevel[] = [0, 1, 2];
+
+const pendingLevelVars: [string, SkinLevelValues][] = [];
+
+const pickLevel = (values: SkinLevelValues, level: LayerLevel) =>
+    [values.l0, values.l1 ?? values.l0, values.l2 ?? values.l1 ?? values.l0][level];
+
+const computeLevelVars = (levelVars: [string, SkinLevelValues][], level: LayerLevel) =>
+    Object.fromEntries(levelVars.map(([levelVar, values]) => [levelVar, pickLevel(values, level)]));
 
 const splitSelectorList = (selector: string) => {
     const parts: string[] = [];
@@ -58,6 +72,8 @@ const defineRule = (root: string, target: string, rule: SkinRule) => {
 };
 
 export namespace SkinUtils {
+    export const PILL_RADIUS = "9999px";
+
     export const anyOf = (...selectors: string[]) => selectors.join(", ");
 
     export const allOf = (...selectors: string[]) => `&${selectors.map((selector) => `:is(${selector})`).join("")}`;
@@ -70,8 +86,38 @@ export namespace SkinUtils {
             ]),
         );
 
+    export const byLevel = (values: SkinLevelValues) => {
+        const levelVar = createVar();
+
+        pendingLevelVars.push([levelVar, values]);
+
+        return levelVar;
+    };
+
+    export const computeLevelFamily = (families: SkinLevelFamilies): SkinColorFamily => {
+        const computeShade = (shade: keyof SkinColorFamily) =>
+            byLevel({ l0: families.level0[shade], l1: families.level1[shade], l2: families.level2[shade] });
+
+        return {
+            dark: computeShade("dark"),
+            main: computeShade("main"),
+            light: computeShade("light"),
+            contrast: computeShade("contrast"),
+        };
+    };
+
     export const define = (root: string, rules: SkinRules) => {
-        globalStyle(`.${root}`, { "@layer": { [skinLayer]: ROOT_RESET } });
+        const levelVars = pendingLevelVars.splice(0);
+
+        globalStyle(`.${root}`, {
+            "@layer": {
+                [skinLayer]: { ...ROOT_RESET, vars: { ...ROOT_RESET.vars, ...computeLevelVars(levelVars, 0) } },
+            },
+        });
+
+        LEVELS.forEach((level) => {
+            defineRule(root, `.${layerLevelVariants[level]}`, { vars: computeLevelVars(levelVars, level) });
+        });
 
         (Object.keys(rules) as SkinEntry[]).forEach((entry) => {
             defineRule(root, `.${skinEntries[entry]}`, rules[entry]);

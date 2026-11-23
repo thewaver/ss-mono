@@ -1,11 +1,10 @@
 import { style } from "@vanilla-extract/css";
 
-import { skinEntries, skinStates } from "../../Skins/Skin.css";
+import { skinEntries, skinStates, skinVars } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
-import { layerVars } from "../Layer/Layer.css";
 
-export const isCarried = style({});
-export const isHovered = style({});
+export const isCarried = style([skinStates.isCarried]);
+export const isHovered = style([skinStates.isHovered]);
 const disabled = style({});
 export const isDisabled = style([disabled, skinStates.isDisabled]);
 export const isReceiving = style([skinStates.isReceiving]);
@@ -24,14 +23,7 @@ export const sortableItemContent = style([
         transition: `opacity ${themeVars.animation.duration}, border-color ${themeVars.animation.duration}, background-color ${themeVars.animation.duration}`,
 
         selectors: {
-            [`&.${isHovered}`]: {
-                borderColor: `rgb(from ${layerVars.contrast} r g b / 50%)`,
-            },
             [`&.${isCarried}`]: {
-                borderColor: themeVars.color.primary.main,
-                backgroundColor: "transparent",
-                color: `rgb(from ${layerVars.contrast} r g b / 50%)`,
-                boxShadow: "none",
                 cursor: "grabbing",
             },
             [`&.${disabled}`]: {
@@ -78,7 +70,7 @@ export const sortableEmpty = style({
 const sortableMarker = style({
     alignSelf: "stretch",
     borderRadius: themeVars.borderRadius.half,
-    backgroundColor: themeVars.color.primary.main,
+    backgroundColor: skinVars.accentColor,
 });
 
 export const sortableMarkerRow = style([sortableMarker, { width: 3 }]);

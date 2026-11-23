@@ -2,7 +2,6 @@ import { style } from "@vanilla-extract/css";
 
 import { skinEntries, skinStates } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
-import { layerVars } from "../Layer/Layer.css";
 
 export const isSelected = style([skinStates.isSelected]);
 export const isHovered = style([skinStates.isHovered]);
@@ -100,13 +99,13 @@ export const tabPanel = style([
 const HEX_CLIP = "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)";
 
 export const hexTab = style([
+    skinEntries.tabsItemBase,
     tabBase,
     {
         display: "grid",
         placeItems: "center",
         width: "100%",
         height: "100%",
-        backgroundColor: `rgb(from ${layerVars.contrast} r g b / 10%)`,
         fontSize: themeVars.fontSize.xSmall,
         fontWeight: "bold",
         transition: `color ${themeVars.animation.duration}, background-color ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}`,

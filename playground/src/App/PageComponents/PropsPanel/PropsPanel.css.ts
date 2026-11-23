@@ -1,6 +1,6 @@
 import { style, styleVariants } from "@vanilla-extract/css";
 
-import { layerVars } from "../../StyledComponents/Layer/Layer.css";
+import { skinEntries } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 
 export const propsGroups = style({
@@ -33,7 +33,11 @@ export const propsPanelScopeVariants = styleVariants({
     ],
 });
 
-export const propsPanelDivider = style({
-    borderTop: `1px solid rgb(from ${layerVars.contrast} r g b / 10%)`,
-    width: "100%",
-});
+export const propsPanelDivider = style([
+    skinEntries.divider,
+    {
+        width: "100%",
+        borderTopWidth: 1,
+        borderTopStyle: "solid",
+    },
+]);

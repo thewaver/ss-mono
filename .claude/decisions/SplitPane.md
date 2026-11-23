@@ -99,3 +99,16 @@ writing `ratios` from outside all count alike. `moveBoundary` also drops it, and
 re-records it afterwards. A restore can therefore never put the divider back somewhere the boundary has since
 been moved away from, and the consumer's own write is the case that matters most, since the component never
 sees it happen and a check tied to its own handlers would miss it.
+
+### A pane does not clip its contents, so a painted pane keeps its shadow
+
+The user's call, D of four. Each pane's wrapper used to clip with `overflow: hidden`, so a pane's content could not
+spill into its neighbor when dragged narrow — and it also cut away anything a painted pane drew outside its own box,
+which is where a shadow falls: every Skin whose `panel` casts one showed panes without it. **The wrapper now clips
+nothing, and the consumer's box keeps its own content in** with its own `overflow`, which the `renderPane` block says.
+An extra clipping element inside the library cannot replace it: anything the library wraps around the consumer's box
+clips that box's shadow too, so the clip has to be on the box or inside it, and only the consumer renders those. The
+frame's corners still reach the panes at either end as `border-radius: inherit` on the wrapper, for a painter that
+reads them; they no longer clip. Set aside: room left in the painter for the shadow (a guess per Skin), and
+`overflow-clip-margin` (no Safari support). The comparison example clips its pictures in its own box, so the wipe is
+unchanged.

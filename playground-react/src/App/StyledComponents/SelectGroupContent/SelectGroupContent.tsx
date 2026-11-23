@@ -36,7 +36,11 @@ export const PageSelectGroupContent = (props: PropsWithChildren<SelectGroupConte
                         .filter(Boolean)
                         .join(" ")}
                 >
-                    {flags.checkedState === "mixed" ? MIXED_MARK : CHECKED_MARK}
+                    <div className={styles.selectGroupMarkBox}>
+                        <div className={styles.selectGroupMarkTick}>
+                            {flags.checkedState === "mixed" ? MIXED_MARK : CHECKED_MARK}
+                        </div>
+                    </div>
                 </div>
             )}
 

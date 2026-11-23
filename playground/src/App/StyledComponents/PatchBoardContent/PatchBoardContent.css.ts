@@ -1,7 +1,7 @@
 import { style } from "@vanilla-extract/css";
 
+import { skinEntries } from "../../Skins/Skin.css";
 import { FOCUS_RING_WIDTH, themeVars } from "../../Theme.css";
-import { layerVars } from "../Layer/Layer.css";
 
 export const isCarried = style({});
 export const isHovered = style({});
@@ -14,41 +14,42 @@ export const isRefused = style({});
 export const isIn = style({});
 export const isPending = style({});
 
-export const patchNode = style({
-    display: "flex",
-    flex: "1 1 auto",
-    flexDirection: "column",
-    justifyContent: "center",
-    gap: themeVars.spacing.half,
-    minWidth: 0,
-    padding: themeVars.spacing.full,
-    border: `2px solid ${themeVars.color.primary.main}`,
-    borderRadius: themeVars.borderRadius.half,
-    backgroundColor: layerVars.dark,
-    color: layerVars.contrast,
-    boxShadow: themeVars.shadow.small,
-    cursor: "grab",
-    transition: `border-color ${themeVars.animation.duration}, box-shadow ${themeVars.animation.duration}`,
+export const patchNode = style([
+    skinEntries.itemStatic,
+    {
+        display: "flex",
+        flex: "1 1 auto",
+        flexDirection: "column",
+        justifyContent: "center",
+        gap: themeVars.spacing.half,
+        minWidth: 0,
+        padding: themeVars.spacing.full,
+        border: `2px solid ${themeVars.color.primary.main}`,
+        borderRadius: themeVars.borderRadius.half,
+        boxShadow: themeVars.shadow.small,
+        cursor: "grab",
+        transition: `border-color ${themeVars.animation.duration}, box-shadow ${themeVars.animation.duration}`,
 
-    selectors: {
-        [`&.${isHovered}`]: {
-            borderColor: themeVars.color.primary.main,
-        },
-        [`&.${isFocusVisible}`]: {
-            outline: `${FOCUS_RING_WIDTH}px solid ${themeVars.color.outline.main}`,
-            outlineOffset: 2,
-        },
-        [`&.${isCarried}`]: {
-            cursor: "grabbing",
-            boxShadow: themeVars.shadow.medium,
-        },
-        [`&.${isDisabled}`]: {
-            filter: themeVars.disabled.filter,
-            opacity: themeVars.disabled.opacity,
-            cursor: "default",
+        selectors: {
+            [`&.${isHovered}`]: {
+                borderColor: themeVars.color.primary.main,
+            },
+            [`&.${isFocusVisible}`]: {
+                outline: `${FOCUS_RING_WIDTH}px solid ${themeVars.color.outline.main}`,
+                outlineOffset: 2,
+            },
+            [`&.${isCarried}`]: {
+                cursor: "grabbing",
+                boxShadow: themeVars.shadow.medium,
+            },
+            [`&.${isDisabled}`]: {
+                filter: themeVars.disabled.filter,
+                opacity: themeVars.disabled.opacity,
+                cursor: "default",
+            },
         },
     },
-});
+]);
 
 export const patchNodeName = style({
     fontSize: themeVars.fontSize.small,
@@ -65,52 +66,54 @@ export const patchNodeKind = style({
     letterSpacing: "0.08em",
 });
 
-export const patchSocket = style({
-    flex: "1 1 auto",
-    width: "100%",
-    height: "100%",
-    boxSizing: "border-box",
-    borderRadius: "50%",
-    border: `2px solid ${themeVars.color.primary.main}`,
-    background: layerVars.main,
-    cursor: "crosshair",
-    transition: `background ${themeVars.animation.duration}, border-color ${themeVars.animation.duration}, transform ${themeVars.animation.duration}`,
+export const patchSocket = style([
+    skinEntries.itemStatic,
+    {
+        flex: "1 1 auto",
+        width: "100%",
+        height: "100%",
+        boxSizing: "border-box",
+        borderRadius: "50%",
+        border: `2px solid ${themeVars.color.primary.main}`,
+        cursor: "crosshair",
+        transition: `background ${themeVars.animation.duration}, border-color ${themeVars.animation.duration}, transform ${themeVars.animation.duration}`,
 
-    selectors: {
-        [`&.${isIn}`]: {
-            borderColor: themeVars.color.secondary.main,
-        },
-        [`&.${isTaken}`]: {
-            background: `radial-gradient(circle at 70% 30%, ${themeVars.color.primary.light}, ${themeVars.color.primary.dark})`,
-        },
-        [`&.${isIn}.${isTaken}`]: {
-            background: `radial-gradient(circle at 70% 30%, ${themeVars.color.secondary.light}, ${themeVars.color.secondary.dark})`,
-        },
-        [`&.${isHovered}`]: {
-            transform: "scale(1.25)",
-        },
-        [`&.${isSource}`]: {
-            transform: "scale(1.25)",
-            borderColor: themeVars.color.alert.main,
-        },
-        [`&.${isAimed}`]: {
-            transform: "scale(1.4)",
-        },
-        [`&.${isRefused}`]: {
-            borderColor: themeVars.color.error.main,
-            borderStyle: "dashed",
-        },
-        [`&.${isFocusVisible}`]: {
-            outline: `${FOCUS_RING_WIDTH}px solid ${themeVars.color.outline.main}`,
-            outlineOffset: 2,
-        },
-        [`&.${isDisabled}`]: {
-            filter: themeVars.disabled.filter,
-            opacity: themeVars.disabled.opacity,
-            cursor: "default",
+        selectors: {
+            [`&.${isIn}`]: {
+                borderColor: themeVars.color.secondary.main,
+            },
+            [`&.${isTaken}`]: {
+                background: `radial-gradient(circle at 70% 30%, ${themeVars.color.primary.light}, ${themeVars.color.primary.dark})`,
+            },
+            [`&.${isIn}.${isTaken}`]: {
+                background: `radial-gradient(circle at 70% 30%, ${themeVars.color.secondary.light}, ${themeVars.color.secondary.dark})`,
+            },
+            [`&.${isHovered}`]: {
+                transform: "scale(1.25)",
+            },
+            [`&.${isSource}`]: {
+                transform: "scale(1.25)",
+                borderColor: themeVars.color.alert.main,
+            },
+            [`&.${isAimed}`]: {
+                transform: "scale(1.4)",
+            },
+            [`&.${isRefused}`]: {
+                borderColor: themeVars.color.error.main,
+                borderStyle: "dashed",
+            },
+            [`&.${isFocusVisible}`]: {
+                outline: `${FOCUS_RING_WIDTH}px solid ${themeVars.color.outline.main}`,
+                outlineOffset: 2,
+            },
+            [`&.${isDisabled}`]: {
+                filter: themeVars.disabled.filter,
+                opacity: themeVars.disabled.opacity,
+                cursor: "default",
+            },
         },
     },
-});
+]);
 
 export const patchCable = style({
     fill: "none",

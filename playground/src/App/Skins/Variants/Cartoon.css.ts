@@ -3,10 +3,12 @@ import { type StyleRule, style } from "@vanilla-extract/css";
 
 import type { SkinColorFamily } from "../Skin.types";
 import { SkinUtils } from "../Skin.utils";
+import { SkinBaseUtils } from "../SkinBase.utils";
 
-import { layerVars } from "../../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../../Theme.css";
 import { skinSelectors, skinVars } from "../Skin.css";
+
+const LEVEL = SkinUtils.computeLevelFamily(themeVars.color.layers);
 
 export const cartoon = style({
     vars: {
@@ -18,22 +20,9 @@ const SHADOW_SMALL = "4px 4px 0 0 rgba(0, 0, 0, 0.5)";
 const SHADOW_MEDIUM = "8px 8px 0 0 rgba(0, 0, 0, 0.5)";
 // const SHADOW_LARGE = "16px 16px 0 0 rgba(0, 0, 0, 0.5)";
 
-const INTERACTIBLE_STATES: StyleRule["selectors"] = {
-    [skinSelectors.isHovered]: {
-        filter: themeVars.hover.filter,
-    },
-    [skinSelectors.isActive]: {
-        filter: themeVars.active.filter,
-    },
-    [skinSelectors.isDisabled]: {
-        filter: themeVars.disabled.filter,
-        opacity: themeVars.disabled.opacity,
-    },
-} as const;
-
-const INPUT_STATES: StyleRule["selectors"] = ObjectUtils.deepMerge(INTERACTIBLE_STATES, {
+const INPUT_STATES: StyleRule["selectors"] = ObjectUtils.deepMerge(SkinBaseUtils.INTERACTIBLE_STATES, {
     [skinSelectors.isReadOnly]: {
-        backgroundColor: [layerVars.contrast, `rgb(from ${layerVars.contrast} r g b / 10%)`],
+        backgroundColor: [LEVEL.contrast, `rgb(from ${LEVEL.contrast} r g b / 10%)`],
     },
     [SkinUtils.anyOf(skinSelectors.isCheckedWithin, skinSelectors.isMixedWithin)]: {},
     [SkinUtils.anyOf(skinSelectors.hasErrorWithin, skinSelectors.hasError)]: {
@@ -42,7 +31,7 @@ const INPUT_STATES: StyleRule["selectors"] = ObjectUtils.deepMerge(INTERACTIBLE_
     },
 });
 
-const ITEM_STATES: StyleRule["selectors"] = ObjectUtils.deepMerge(INTERACTIBLE_STATES, {
+const ITEM_STATES: StyleRule["selectors"] = ObjectUtils.deepMerge(SkinBaseUtils.INTERACTIBLE_STATES, {
     [skinSelectors.isHovered]: {
         filter: "none",
     },
@@ -69,10 +58,10 @@ const SWITCH_STATES: StyleRule["selectors"] = ObjectUtils.deepMerge(INPUT_STATES
 });
 
 const INPUT_SHELL: StyleRule = {
-    border: [`2px solid ${layerVars.contrast}`, `2px solid rgb(from ${layerVars.contrast} r g b / 25%)`],
-    backgroundColor: layerVars.dark,
+    border: [`2px solid ${LEVEL.contrast}`, `2px solid rgb(from ${LEVEL.contrast} r g b / 25%)`],
+    backgroundColor: LEVEL.dark,
     boxShadow: SHADOW_SMALL,
-    color: layerVars.contrast,
+    color: LEVEL.contrast,
 } as const;
 
 const SWITCH_SHELL: StyleRule = {
@@ -81,9 +70,9 @@ const SWITCH_SHELL: StyleRule = {
 
 const ACCORDION: StyleRule = {
     border: "2px solid black",
-    backgroundColor: layerVars.dark,
+    backgroundColor: LEVEL.dark,
     boxShadow: SHADOW_SMALL,
-    color: layerVars.contrast,
+    color: LEVEL.contrast,
     fontSize: themeVars.fontSize.medium,
 } as const;
 
@@ -94,7 +83,7 @@ const ITEM: StyleRule = {
 
 const ITEM_FLOATER_HOVER: StyleRule = {
     border: `2px solid black`,
-    backgroundColor: [layerVars.contrast, `rgb(from ${layerVars.contrast} r g b / 10%)`],
+    backgroundColor: [LEVEL.contrast, `rgb(from ${LEVEL.contrast} r g b / 10%)`],
     boxShadow: SHADOW_SMALL,
 };
 
@@ -121,320 +110,288 @@ const surface = (color: SkinColorFamily): StyleRule => ({
     fontSize: themeVars.fontSize.medium,
 });
 
-SkinUtils.define(cartoon, {
-    accordionHeader: {
-        selectors: ObjectUtils.deepMerge(SkinUtils.joinedCorners(), INTERACTIBLE_STATES, {
-            [skinSelectors.isExpanded]: {
-                color: themeVars.color.primary.main,
-                fontWeight: "bold",
-            },
-        }),
-    },
-    accordionPanel: {
-        selectors: {
-            ...SkinUtils.joinedCorners(),
+SkinUtils.define(
+    cartoon,
+    SkinBaseUtils.merge(LEVEL, {
+        accordionHeader: {
+            selectors: ObjectUtils.deepMerge(SkinUtils.joinedCorners(), SkinBaseUtils.INTERACTIBLE_STATES, {
+                [skinSelectors.isExpanded]: {
+                    color: themeVars.color.primary.main,
+                    fontWeight: "bold",
+                },
+            }),
         },
-    },
-    accordionWrapper: {
-        ...ACCORDION,
-    },
-    button: {
-        paddingInline: themeVars.spacing.double,
-        border: "2px solid black",
-        backgroundColor: themeVars.color.primary.main,
-        boxShadow: SHADOW_SMALL,
-        color: themeVars.color.primary.contrast,
-        fontWeight: "bold",
-        selectors: ObjectUtils.deepMerge(INTERACTIBLE_STATES, {
-            [skinSelectors.isPressed]: {
-                boxShadow: `inset 4px 4px 0 rgb(0 0 0 / 50%)`,
-            },
-            [skinSelectors.hasError]: {
-                backgroundColor: themeVars.color.error.main,
-                color: themeVars.color.error.contrast,
-            },
-        }),
-    },
-    buttonSimple: {
-        border: "2px solid black",
-        backgroundColor: [layerVars.contrast, `rgb(from ${layerVars.contrast} r g b / 25%)`],
-        boxShadow: SHADOW_SMALL,
-        color: layerVars.contrast,
-        fontSize: themeVars.fontSize.small,
-        selectors: ObjectUtils.deepMerge(INTERACTIBLE_STATES, {
-            [skinSelectors.isPressed]: {
-                boxShadow: `inset 2px 2px 0 rgb(0 0 0 / 50%)`,
-            },
-            [skinSelectors.hasError]: {
-                backgroundColor: themeVars.color.error.main,
-                color: themeVars.color.error.contrast,
-            },
-        }),
-    },
-    checkboxBox: {
-        ...SWITCH_SHELL,
-        selectors: {
-            ...SWITCH_STATES,
+        accordionWrapper: {
+            ...ACCORDION,
         },
-    },
-    checkboxMark: {
-        color: themeVars.color.primary.contrast,
-        fontSize: themeVars.fontSize.medium,
-        fontWeight: "bold",
-    },
-    decoration: {
-        backgroundColor: "transparent",
-        opacity: 0.75,
-        selectors: {
-            ...INTERACTIBLE_STATES,
+        button: {
+            paddingInline: themeVars.spacing.double,
+            border: "2px solid black",
+            backgroundColor: themeVars.color.primary.main,
+            boxShadow: SHADOW_SMALL,
+            color: themeVars.color.primary.contrast,
+            fontWeight: "bold",
+            selectors: ObjectUtils.deepMerge(SkinBaseUtils.INTERACTIBLE_STATES, {
+                [skinSelectors.isPressed]: {
+                    boxShadow: `inset 4px 4px 0 rgb(0 0 0 / 50%)`,
+                },
+                [skinSelectors.hasError]: {
+                    backgroundColor: themeVars.color.error.main,
+                    color: themeVars.color.error.contrast,
+                },
+            }),
         },
-    },
-    drawer: {
-        ...surface(layerVars),
-    },
-    dropdown: {
-        ...INPUT_SHELL,
-    },
-    dropZone: {
-        border: [`2px dashed ${layerVars.contrast}`, `2px dashed rgb(from ${layerVars.contrast} r g b / 25%)`],
-        selectors: ObjectUtils.deepMerge(INPUT_STATES, {
-            [skinSelectors.isCarrying]: {
-                borderColor: [layerVars.contrast, `rgb(from ${layerVars.contrast} r g b / 50%)`],
-            },
-            [skinSelectors.isReceiving]: {
-                borderColor: themeVars.color.primary.main,
-                backgroundColor: [
-                    themeVars.color.primary.main,
-                    `rgb(from ${themeVars.color.primary.main} r g b / 10%)`,
-                ],
-            },
-        }),
-    },
-    input: {
-        ...INPUT_SHELL,
-        selectors: ObjectUtils.deepMerge(INPUT_STATES, {
-            [skinSelectors.fieldText]: {
-                color: layerVars.contrast,
-                caretColor: themeVars.color.primary.main,
-                fontSize: themeVars.fontSize.medium,
-            },
-            [skinSelectors.fieldTextDisabled]: {
-                color: [layerVars.contrast, `rgb(from ${layerVars.contrast} r g b / ${themeVars.disabled.opacity})`],
-            },
-        }),
-    },
-    itemBase: {
-        ...ITEM,
-        selectors: ObjectUtils.deepMerge(ITEM_STATES, {
-            [skinSelectors.isHoveredWithoutFloater]: {
-                ...ITEM_FLOATER_HOVER,
-            },
-            [skinSelectors.isSelectedWithoutFloater]: {
-                ...ITEM_FLOATER_SELECTED,
-            },
-        }),
-    },
-    itemHoverFloater: {
-        ...ITEM_FLOATER_HOVER,
-    },
-    itemSelectionFloater: {
-        ...ITEM_FLOATER_SELECTED,
-    },
-    itemStatic: {
-        ...ITEM,
-        ...ITEM_FLOATER_HOVER,
-    },
-    overlay: {
-        backdropFilter: "blur(20px) grayscale(75%)",
-    },
-    pageBackground: {
-        backgroundColor: themeVars.color.layers.level0.main,
-        color: themeVars.color.layers.level0.contrast,
-        fontFamily: "monospace",
-    },
-    pageContainer: {
-        ...surface(layerVars),
-    },
-    panel: {
-        border: `2px solid black`,
-        backgroundColor: layerVars.dark,
-        boxShadow: SHADOW_SMALL,
-        color: layerVars.contrast,
-    },
-    progressFill: {
-        backgroundColor: themeVars.color.primary.main,
-        selectors: {
-            [skinSelectors.hasErrorWithin]: {
-                backgroundColor: themeVars.color.error.main,
+        buttonSimple: {
+            border: "2px solid black",
+            backgroundColor: [LEVEL.contrast, `rgb(from ${LEVEL.contrast} r g b / 25%)`],
+            boxShadow: SHADOW_SMALL,
+            color: LEVEL.contrast,
+            fontSize: themeVars.fontSize.small,
+            selectors: ObjectUtils.deepMerge(SkinBaseUtils.INTERACTIBLE_STATES, {
+                [skinSelectors.isPressed]: {
+                    boxShadow: `inset 2px 2px 0 rgb(0 0 0 / 50%)`,
+                },
+                [skinSelectors.hasError]: {
+                    backgroundColor: themeVars.color.error.main,
+                    color: themeVars.color.error.contrast,
+                },
+            }),
+        },
+        checkboxBox: {
+            ...SWITCH_SHELL,
+            selectors: {
+                ...SWITCH_STATES,
             },
         },
-    },
-    progressTip: {},
-    progressTrack: {
-        border: `2px solid black`,
-        backgroundColor: layerVars.dark,
-        boxShadow: SHADOW_SMALL,
-        selectors: {
-            [skinSelectors.hasError]: {
-                borderColor: themeVars.color.error.main,
+        checkboxMark: {
+            color: themeVars.color.primary.contrast,
+            fontSize: themeVars.fontSize.medium,
+            fontWeight: "bold",
+        },
+        decoration: {
+            backgroundColor: "transparent",
+            opacity: 0.75,
+            selectors: {
+                ...SkinBaseUtils.INTERACTIBLE_STATES,
             },
         },
-    },
-    radioBox: {
-        ...SWITCH_SHELL,
-        borderRadius: "50%",
-        selectors: {
-            ...SWITCH_STATES,
+        drawer: {
+            ...surface(LEVEL),
         },
-    },
-    radioDot: {
-        borderRadius: "50%",
-        backgroundColor: themeVars.color.primary.contrast,
-    },
-    rangeFill: {
-        backgroundColor: themeVars.color.primary.main,
-        boxShadow: SHADOW_SMALL,
-        selectors: {
-            [skinSelectors.hasError]: {
-                backgroundColor: themeVars.color.error.main,
-            },
+        dropdown: {
+            ...INPUT_SHELL,
         },
-    },
-    rangeThumb: {
-        border: `2px solid ${themeVars.color.primary.main}`,
-        backgroundColor: themeVars.color.primary.contrast,
-        boxShadow: SHADOW_SMALL,
-        selectors: {
-            [skinSelectors.hasError]: {
-                borderColor: themeVars.color.error.main,
-                backgroundColor: themeVars.color.error.contrast,
-            },
+        dropZone: {
+            border: [`2px dashed ${LEVEL.contrast}`, `2px dashed rgb(from ${LEVEL.contrast} r g b / 25%)`],
+            selectors: ObjectUtils.deepMerge(INPUT_STATES, {
+                [skinSelectors.isCarrying]: {
+                    borderColor: [LEVEL.contrast, `rgb(from ${LEVEL.contrast} r g b / 50%)`],
+                },
+                [skinSelectors.isReceiving]: {
+                    borderColor: themeVars.color.primary.main,
+                    backgroundColor: [
+                        themeVars.color.primary.main,
+                        `rgb(from ${themeVars.color.primary.main} r g b / 10%)`,
+                    ],
+                },
+            }),
         },
-    },
-    rangeTrack: {
-        border: `2px solid black`,
-        backgroundColor: layerVars.dark,
-        boxShadow: SHADOW_SMALL,
-        selectors: {
-            [skinSelectors.hasError]: {
-                borderColor: themeVars.color.error.main,
-            },
+        input: {
+            ...INPUT_SHELL,
+            selectors: ObjectUtils.deepMerge(INPUT_STATES, {
+                [skinSelectors.fieldTextDisabled]: {
+                    color: [LEVEL.contrast, `rgb(from ${LEVEL.contrast} r g b / ${themeVars.disabled.opacity})`],
+                },
+            }),
         },
-    },
-    scrollerThumb: {
-        selectors: {
-            [skinSelectors.line]: {
-                backgroundColor: themeVars.color.primary.main,
-            },
-            [skinSelectors.lineActive]: {
-                filter: themeVars.active.filter,
-            },
+        itemBase: {
+            ...ITEM,
+            selectors: ObjectUtils.deepMerge(ITEM_STATES, {
+                [skinSelectors.isHoveredWithoutFloater]: {
+                    ...ITEM_FLOATER_HOVER,
+                },
+                [skinSelectors.isSelectedWithoutFloater]: {
+                    ...ITEM_FLOATER_SELECTED,
+                },
+            }),
         },
-    },
-    scrollerTrack: {
-        selectors: {
-            [skinSelectors.line]: {
-                backgroundColor: [layerVars.contrast, `rgb(from ${layerVars.contrast} r g b / 25%)`],
-            },
+        itemHoverFloater: {
+            ...ITEM_FLOATER_HOVER,
         },
-    },
-    slideButtonFill: {
-        backgroundColor: themeVars.color.primary.main,
-        boxShadow: SHADOW_SMALL,
-        selectors: {
-            [skinSelectors.hasError]: {
-                backgroundColor: themeVars.color.error.main,
-            },
+        itemSelectionFloater: {
+            ...ITEM_FLOATER_SELECTED,
         },
-    },
-    slideButtonThumb: {
-        border: `2px solid ${themeVars.color.primary.main}`,
-        backgroundColor: themeVars.color.primary.contrast,
-        boxShadow: SHADOW_SMALL,
-        color: themeVars.color.primary.main,
-        selectors: {
-            [skinSelectors.hasError]: {
-                borderColor: themeVars.color.error.main,
-                backgroundColor: themeVars.color.error.contrast,
-                color: themeVars.color.error.main,
+        itemStatic: {
+            ...ITEM,
+            ...ITEM_FLOATER_HOVER,
+        },
+        pageBackground: {
+            backgroundColor: themeVars.color.layers.level0.main,
+            color: themeVars.color.layers.level0.contrast,
+            fontFamily: "monospace",
+        },
+        pageContainer: {
+            ...surface(LEVEL),
+        },
+        panel: {
+            border: `2px solid black`,
+            backgroundColor: LEVEL.dark,
+            boxShadow: SHADOW_SMALL,
+            color: LEVEL.contrast,
+        },
+        progressFill: {
+            backgroundColor: themeVars.color.primary.main,
+            selectors: {
+                [skinSelectors.hasErrorWithin]: {
+                    backgroundColor: themeVars.color.error.main,
+                },
             },
         },
-    },
-    slideButtonTrack: {
-        border: `2px solid black`,
-        backgroundColor: layerVars.dark,
-        boxShadow: SHADOW_SMALL,
-        fontWeight: "bold",
-        selectors: {
-            [skinSelectors.hasError]: {
-                borderColor: themeVars.color.error.main,
+        progressTrack: {
+            border: `2px solid black`,
+            backgroundColor: LEVEL.dark,
+            boxShadow: SHADOW_SMALL,
+            selectors: {
+                [skinSelectors.hasError]: {
+                    borderColor: themeVars.color.error.main,
+                },
             },
         },
-    },
-    surface: {
-        ...surface(layerVars),
-    },
-    tabsItemBase: {
-        paddingBlock: themeVars.spacing.full,
-        paddingInline: themeVars.spacing.double,
-        fontSize: themeVars.fontSize.small,
-        fontWeight: "bold",
-        selectors: ObjectUtils.deepMerge(ITEM_STATES, {
-            [skinSelectors.isVertical]: {
-                paddingBlock: themeVars.spacing.full,
-                paddingInline: themeVars.spacing.double,
-            },
-            [skinSelectors.isHoveredWithoutFloater]: {
-                ...TAB_FLOATER_HOVER,
-            },
-            [skinSelectors.isSelectedWithoutFloater]: {
-                ...TAB_FLOATER_SELECTED,
-            },
-        }),
-    },
-    tabsItemHoverFloater: {
-        ...TAB_FLOATER_HOVER,
-    },
-    tabsItemSelectionFloater: {
-        ...TAB_FLOATER_SELECTED,
-    },
-    tabsTrack: {
-        border: `2px solid black`,
-        backgroundColor: [layerVars.contrast, `rgb(from ${layerVars.contrast} r g b / 10%)`],
-        boxShadow: SHADOW_SMALL,
-    },
-    tag: {
-        paddingInline: themeVars.spacing.full,
-        backgroundColor: [layerVars.contrast, `rgb(from ${layerVars.contrast} r g b / 25%)`],
-        boxShadow: SHADOW_SMALL,
-        color: layerVars.contrast,
-        fontSize: themeVars.fontSize.xSmall,
-        fontWeight: "bold",
-        selectors: {
-            ...INTERACTIBLE_STATES,
-        },
-    },
-    toggleThumb: {
-        backgroundColor: [layerVars.contrast, `rgb(from ${layerVars.contrast} r g b / 75%)`],
-        selectors: {
-            [SkinUtils.anyOf(skinSelectors.isCheckedWithin, skinSelectors.isMixedWithin)]: {
-                backgroundColor: themeVars.color.primary.contrast,
-            },
-            [skinSelectors.hasErrorWithin]: {
-                backgroundColor: themeVars.color.error.contrast,
+        radioBox: {
+            ...SWITCH_SHELL,
+            borderRadius: "50%",
+            selectors: {
+                ...SWITCH_STATES,
             },
         },
-    },
-    toggleTrack: {
-        ...SWITCH_SHELL,
-        selectors: {
-            ...SWITCH_STATES,
+        radioDot: {
+            borderRadius: "50%",
+            backgroundColor: themeVars.color.primary.contrast,
         },
-    },
-    tooltip: {
-        border: [`2px solid ${layerVars.contrast}`, `2px solid rgb(from ${layerVars.contrast} r g b / 25%)`],
-        backgroundColor: layerVars.main,
-        boxShadow: SHADOW_SMALL,
-        color: layerVars.contrast,
-    },
-});
+        rangeFill: {
+            backgroundColor: themeVars.color.primary.main,
+            boxShadow: SHADOW_SMALL,
+            selectors: {
+                [skinSelectors.hasError]: {
+                    backgroundColor: themeVars.color.error.main,
+                },
+            },
+        },
+        rangeThumb: {
+            border: `2px solid ${themeVars.color.primary.main}`,
+            backgroundColor: themeVars.color.primary.contrast,
+            boxShadow: SHADOW_SMALL,
+            selectors: {
+                [skinSelectors.hasError]: {
+                    borderColor: themeVars.color.error.main,
+                    backgroundColor: themeVars.color.error.contrast,
+                },
+            },
+        },
+        rangeTrack: {
+            border: `2px solid black`,
+            backgroundColor: LEVEL.dark,
+            boxShadow: SHADOW_SMALL,
+            selectors: {
+                [skinSelectors.hasError]: {
+                    borderColor: themeVars.color.error.main,
+                },
+            },
+        },
+        slideButtonFill: {
+            backgroundColor: themeVars.color.primary.main,
+            boxShadow: SHADOW_SMALL,
+            selectors: {
+                [skinSelectors.hasError]: {
+                    backgroundColor: themeVars.color.error.main,
+                },
+            },
+        },
+        slideButtonThumb: {
+            border: `2px solid ${themeVars.color.primary.main}`,
+            backgroundColor: themeVars.color.primary.contrast,
+            boxShadow: SHADOW_SMALL,
+            color: themeVars.color.primary.main,
+            selectors: {
+                [skinSelectors.hasError]: {
+                    borderColor: themeVars.color.error.main,
+                    backgroundColor: themeVars.color.error.contrast,
+                    color: themeVars.color.error.main,
+                },
+            },
+        },
+        slideButtonTrack: {
+            border: `2px solid black`,
+            backgroundColor: LEVEL.dark,
+            boxShadow: SHADOW_SMALL,
+            fontWeight: "bold",
+            selectors: {
+                [skinSelectors.hasError]: {
+                    borderColor: themeVars.color.error.main,
+                },
+            },
+        },
+        surface: {
+            ...surface(LEVEL),
+        },
+        tabsItemBase: {
+            paddingBlock: themeVars.spacing.full,
+            paddingInline: themeVars.spacing.double,
+            fontSize: themeVars.fontSize.small,
+            fontWeight: "bold",
+            selectors: ObjectUtils.deepMerge(ITEM_STATES, {
+                [skinSelectors.isHoveredWithoutFloater]: {
+                    ...TAB_FLOATER_HOVER,
+                },
+                [skinSelectors.isSelectedWithoutFloater]: {
+                    ...TAB_FLOATER_SELECTED,
+                },
+            }),
+        },
+        tabsItemHoverFloater: {
+            ...TAB_FLOATER_HOVER,
+        },
+        tabsItemSelectionFloater: {
+            ...TAB_FLOATER_SELECTED,
+        },
+        tabsTrack: {
+            border: `2px solid black`,
+            backgroundColor: [LEVEL.contrast, `rgb(from ${LEVEL.contrast} r g b / 10%)`],
+            boxShadow: SHADOW_SMALL,
+        },
+        tag: {
+            paddingInline: themeVars.spacing.full,
+            backgroundColor: [LEVEL.contrast, `rgb(from ${LEVEL.contrast} r g b / 25%)`],
+            boxShadow: SHADOW_SMALL,
+            color: LEVEL.contrast,
+            fontSize: themeVars.fontSize.xSmall,
+            fontWeight: "bold",
+            selectors: {
+                ...SkinBaseUtils.INTERACTIBLE_STATES,
+            },
+        },
+        toggleThumb: {
+            backgroundColor: [LEVEL.contrast, `rgb(from ${LEVEL.contrast} r g b / 75%)`],
+            selectors: {
+                [SkinUtils.anyOf(skinSelectors.isCheckedWithin, skinSelectors.isMixedWithin)]: {
+                    backgroundColor: themeVars.color.primary.contrast,
+                },
+                [skinSelectors.hasErrorWithin]: {
+                    backgroundColor: themeVars.color.error.contrast,
+                },
+            },
+        },
+        toggleTrack: {
+            ...SWITCH_SHELL,
+            selectors: {
+                ...SWITCH_STATES,
+            },
+        },
+        tooltip: {
+            border: [`2px solid ${LEVEL.contrast}`, `2px solid rgb(from ${LEVEL.contrast} r g b / 25%)`],
+            backgroundColor: LEVEL.main,
+            boxShadow: SHADOW_SMALL,
+            color: LEVEL.contrast,
+        },
+    }),
+);

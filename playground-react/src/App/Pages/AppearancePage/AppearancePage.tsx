@@ -12,6 +12,7 @@ import {
     Range,
     SHAPE_REVEAL_DEFAULTS,
     SlideButton,
+    SplitPane,
     Tabs,
     TagInput,
     TextInput,
@@ -31,9 +32,12 @@ import { DOCS_GAP } from "@thewaver/ss-playground/App/Pages/Accordions/Accordion
 import {
     SKIN_DESCRIPTION,
     SKIN_ROW_GAP,
+    SKIN_SAMPLE_DROP_PROMPT,
     SKIN_SAMPLE_EXPANDED_SECTIONS,
     SKIN_SAMPLE_HOVERED_FLAGS,
     SKIN_SAMPLE_HOVERED_OPTION,
+    SKIN_SAMPLE_INLINE_FLAGS,
+    SKIN_SAMPLE_INLINE_HOVERED_FLAGS,
     SKIN_SAMPLE_OPTIONS,
     SKIN_SAMPLE_PROGRESS,
     SKIN_SAMPLE_RANGE,
@@ -42,19 +46,26 @@ import {
     SKIN_SAMPLE_SELECTED_OPTION,
     SKIN_SAMPLE_SELECTED_TAB,
     SKIN_SAMPLE_SLIDE_DESCRIPTION,
+    SKIN_SAMPLE_SPLIT,
     SKIN_SAMPLE_TABS,
     SKIN_SAMPLE_TAB_PANEL,
     SKIN_SAMPLE_TAGS,
+    SKIN_SAMPLE_TOOLTIP_TEXT,
     THEME_DESCRIPTION,
     THEME_SWATCH_FAMILIES,
     THEME_SWATCH_SHADES,
     computeSkinRowId,
+    computeSkinSampleTooltipAim,
     computeThemeRowId,
 } from "@thewaver/ss-playground/App/Pages/AppearancePage/AppearancePage.const";
 import * as styles from "@thewaver/ss-playground/App/Pages/AppearancePage/AppearancePage.css";
 import { RADIO_GROUP_GAP } from "@thewaver/ss-playground/App/Pages/RadioPage/RadioPage.const";
+import { PAIR } from "@thewaver/ss-playground/App/Pages/SplitPanePage/SplitPanePage.const";
 import { ROW_TAB_GAP, getPanelId, getTabId } from "@thewaver/ss-playground/App/Pages/TabsPage/TabsPage.const";
 import { PLAYGROUND_SKINS } from "@thewaver/ss-playground/App/Skins/Skin.const";
+import { skinStates } from "@thewaver/ss-playground/App/Skins/Skin.css";
+import { NO_FILES } from "@thewaver/ss-playground/App/StyledComponents/FileDropZoneContent/FileDropZoneContent.const";
+import * as dropZoneStyles from "@thewaver/ss-playground/App/StyledComponents/FileDropZoneContent/FileDropZoneContent.css";
 import { RANGE_THUMB_SIZE } from "@thewaver/ss-playground/App/StyledComponents/RangeContent/RangeContent.css";
 import { SLIDE_BUTTON_THUMB_SIZE } from "@thewaver/ss-playground/App/StyledComponents/SlideButtonContent/SlideButtonContent.css";
 import {
@@ -62,6 +73,8 @@ import {
     FIELD_HEIGHT,
     FIELD_PADDING,
 } from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
+import * as tooltipStyles from "@thewaver/ss-playground/App/StyledComponents/TooltipContent/TooltipContent.css";
+import { computeTooltipGeometry } from "@thewaver/ss-playground/App/StyledComponents/TooltipContent/TooltipContent.utils";
 import { PLAYGROUND_THEMES } from "@thewaver/ss-playground/App/Theme.css";
 import person from "@thewaver/ss-playground/App/person.svg";
 
@@ -83,6 +96,7 @@ import {
     renderPageSelectionFloater,
 } from "../../StyledComponents/GlideFloater/GlideFloater";
 import { PageIcon } from "../../StyledComponents/Icon/Icon";
+import { PageInlineEditContent } from "../../StyledComponents/InlineEditContent/InlineEditContent";
 import { useNextLayerClass } from "../../StyledComponents/Layer/Layer.context";
 import { PageListboxSurface } from "../../StyledComponents/ListboxSurface/ListboxSurface";
 import { PageProgressContent } from "../../StyledComponents/ProgressContent/ProgressContent";
@@ -90,6 +104,11 @@ import { PageRadioContent } from "../../StyledComponents/RadioContent/RadioConte
 import { PageRangeContent } from "../../StyledComponents/RangeContent/RangeContent";
 import { PageSelectOptionContent } from "../../StyledComponents/SelectOptionContent/SelectOptionContent";
 import { PageSlideButtonContent } from "../../StyledComponents/SlideButtonContent/SlideButtonContent";
+import {
+    PageSplitPaneBox,
+    PageSplitPaneFrame,
+    PageSplitPaneGutter,
+} from "../../StyledComponents/SplitPaneContent/SplitPaneContent";
 import { PageTabContent, PageTabFloater, PageTabGutter } from "../../StyledComponents/TabContent/TabContent";
 import {
     PageTagContent,
@@ -100,6 +119,7 @@ import { PageTextFieldAdornment } from "../../StyledComponents/TextFieldAdornmen
 import { PageTextFieldButtonContent } from "../../StyledComponents/TextFieldButtonContent/TextFieldButtonContent";
 import { PageTextFieldContent } from "../../StyledComponents/TextFieldContent/TextFieldContent";
 import { PageToggleContent } from "../../StyledComponents/ToggleContent/ToggleContent";
+import { PageTooltipSurface } from "../../StyledComponents/TooltipContent/TooltipSurface";
 import type {
     SkinHoveredOptionProps,
     SkinRowProps,
@@ -161,6 +181,12 @@ const SkinSimpleButtonSample = (props: SkinStateProps) => (
         hasError={props.hasError}
         renderContent={(flags) => <PageControlButtonContent flags={flags}>{props.state}</PageControlButtonContent>}
     />
+);
+
+const SkinInlineSample = (props: SkinStateProps) => (
+    <PageInlineEditContent flags={props.isHovered ? SKIN_SAMPLE_INLINE_HOVERED_FLAGS : SKIN_SAMPLE_INLINE_FLAGS}>
+        {props.state}
+    </PageInlineEditContent>
 );
 
 const SkinInputSample = (props: SkinStateProps) => {
@@ -285,6 +311,55 @@ const SkinTagSample = (props: SkinStateProps) => {
         />
     );
 };
+
+const SkinSplitPaneSample = () => {
+    const ratios = useState(SKIN_SAMPLE_SPLIT);
+
+    return (
+        <PageSplitPaneFrame>
+            <SplitPane
+                panes={PAIR}
+                ratios={ratios}
+                orientation={"horizontal"}
+                ariaLabel={"Split pane"}
+                renderPane={(_pane, index) => (
+                    <PageSplitPaneBox>{index === 0 ? "Navigation" : "Content"}</PageSplitPaneBox>
+                )}
+                renderGutter={(flags) => <PageSplitPaneGutter flags={flags} orientation={"horizontal"} />}
+            />
+        </PageSplitPaneFrame>
+    );
+};
+
+const SkinDropZoneSample = (props: SkinStateProps) => (
+    <div
+        className={[
+            styles.skinDropZoneSample,
+            props.isHovered && skinStates.isHovered,
+            props.isReceiving && skinStates.isReceiving,
+            props.isDisabled && skinStates.isDisabled,
+            props.hasError && skinStates.hasError,
+        ]
+            .filter(Boolean)
+            .join(" ")}
+    >
+        <div className={dropZoneStyles.fileDropZonePrompt}>{SKIN_SAMPLE_DROP_PROMPT}</div>
+        <div className={[dropZoneStyles.fileDropZoneNames, dropZoneStyles.isEmpty].join(" ")}>{NO_FILES}</div>
+    </div>
+);
+
+const SkinTooltipSample = () => (
+    <div className={styles.skinTooltipSample}>
+        <PageTooltipSurface
+            hasArrow={true}
+            computeGeometry={(size, bodyStyle) =>
+                computeTooltipGeometry(size, { arrow: "even", arrowAim: computeSkinSampleTooltipAim(size) }, bodyStyle)
+            }
+        >
+            <div className={tooltipStyles.tooltipBody}>{SKIN_SAMPLE_TOOLTIP_TEXT}</div>
+        </PageTooltipSurface>
+    </div>
+);
 
 const SkinHoveredOption = (props: SkinHoveredOptionProps) => (
     <div className={styles.skinHoveredOption}>
@@ -416,6 +491,8 @@ const SkinSamples = (props: SkinSamplesProps) => {
                     <SkinInputSample state={"Read-only"} isReadOnly />
                     <SkinInputSample state={"Disabled"} isDisabled />
                     <SkinInputSample state={"Error"} hasError />
+                    <SkinInlineSample state={"Inline"} />
+                    <SkinInlineSample state={"Inline hovered"} isHovered />
                 </SkinStateGrid>
             </SkinSampleColumn>
 
@@ -532,6 +609,34 @@ const SkinSamples = (props: SkinSamplesProps) => {
                         )}
                     />
                 </div>
+            </SkinSampleColumn>
+
+            <SkinSampleColumn name={"Split pane"}>
+                <SkinSplitPaneSample />
+            </SkinSampleColumn>
+
+            <SkinSampleColumn name={"Drop zone"}>
+                <SkinStateGrid>
+                    <SkinBarCell state={"Default"}>
+                        <SkinDropZoneSample state={"Default"} />
+                    </SkinBarCell>
+                    <SkinBarCell state={"Hovered"}>
+                        <SkinDropZoneSample state={"Hovered"} isHovered />
+                    </SkinBarCell>
+                    <SkinBarCell state={"Receiving"}>
+                        <SkinDropZoneSample state={"Receiving"} isReceiving />
+                    </SkinBarCell>
+                    <SkinBarCell state={"Disabled"}>
+                        <SkinDropZoneSample state={"Disabled"} isDisabled />
+                    </SkinBarCell>
+                    <SkinBarCell state={"Error"}>
+                        <SkinDropZoneSample state={"Error"} hasError />
+                    </SkinBarCell>
+                </SkinStateGrid>
+            </SkinSampleColumn>
+
+            <SkinSampleColumn name={"Tooltip"}>
+                <SkinTooltipSample />
             </SkinSampleColumn>
         </>
     );

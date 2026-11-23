@@ -1,13 +1,15 @@
 import { style } from "@vanilla-extract/css";
 
-import { layerVars } from "../../StyledComponents/Layer/Layer.css";
+import { skinEntries } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 
-export const frame = style({
-    height: 160,
-    borderRadius: themeVars.borderRadius.full,
-    backgroundColor: layerVars.main,
-});
+export const frame = style([
+    skinEntries.panel,
+    {
+        height: 160,
+        borderRadius: themeVars.borderRadius.full,
+    },
+]);
 
 export const frameBody = style({
     display: "flex",
@@ -25,11 +27,13 @@ export const controlRow = style({
     padding: themeVars.spacing.double,
 });
 
-export const panel = style({
-    height: 180,
-    borderRadius: themeVars.borderRadius.full,
-    backgroundColor: layerVars.main,
-});
+export const panel = style([
+    skinEntries.panel,
+    {
+        height: 180,
+        borderRadius: themeVars.borderRadius.full,
+    },
+]);
 
 export const panelBody = style({
     display: "flex",

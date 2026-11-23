@@ -2,8 +2,12 @@ import { createVar, style } from "@vanilla-extract/css";
 
 import { skinEntries, skinStates } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
-import { layerVars } from "../Layer/Layer.css";
+import { SWATCH_RING_COLOR } from "../ColorInputContent/ColorInputContent.css";
 import { FIELD_HEIGHT, FIELD_PADDING } from "../TextFieldContent/TextFieldContent.css";
+
+const CHECKER_BASE_COLOR = "#cccccc";
+
+const SWATCH_RING = `inset 0 0 0 1px ${SWATCH_RING_COLOR}`;
 
 export const hueVar = createVar();
 export const thumbXVar = createVar();
@@ -24,7 +28,7 @@ export const colorAreaSquare = style({
         "linear-gradient(to top, #000, transparent)",
         `linear-gradient(to right, #fff, hsl(${hueVar} 100% 50%))`,
     ].join(","),
-    boxShadow: `inset 0 0 0 1px rgb(from ${layerVars.contrast} r g b / 25%)`,
+    boxShadow: SWATCH_RING,
     cursor: "crosshair",
 
     selectors: {
@@ -75,10 +79,10 @@ export const hueTrack = style({
     width: "100%",
     height: HUE_TRACK_HEIGHT,
     borderRadius: HUE_TRACK_HEIGHT * 0.5,
+    boxShadow: SWATCH_RING,
     backgroundImage: `linear-gradient(to right, ${[0, 60, 120, 180, 240, 300, 360]
         .map((hue) => `hsl(${hue} 100% 50%)`)
         .join(",")})`,
-    boxShadow: `inset 0 0 0 1px rgb(from ${layerVars.contrast} r g b / 25%)`,
 });
 
 export const hueThumb = style({
@@ -107,7 +111,7 @@ export const colorSwatch = style({
     borderRadius: themeVars.borderRadius.half,
     backgroundColor: swatchVar,
     backgroundClip: "padding-box",
-    boxShadow: `inset 0 0 0 1px rgb(from ${layerVars.contrast} r g b / 25%)`,
+    boxShadow: SWATCH_RING,
 });
 
 export const colorPickerPopup = style([
@@ -124,6 +128,7 @@ export const colorPickerPopup = style([
 const CHECKER_SIZE = 8;
 
 const checkerboard = {
+    backgroundColor: CHECKER_BASE_COLOR,
     backgroundImage: [
         `linear-gradient(45deg, rgba(255, 255, 255, 0.25) 25%, transparent 25%)`,
         `linear-gradient(-45deg, rgba(255, 255, 255, 0.25) 25%, transparent 25%)`,
@@ -137,7 +142,6 @@ const checkerboard = {
 export const colorSwatchChecker = style({
     ...checkerboard,
     borderRadius: themeVars.borderRadius.half,
-    backgroundColor: layerVars.main,
 });
 
 export const colorChannels = style({
@@ -154,7 +158,6 @@ export const colorChannel = style({
 });
 
 export const colorChannelLabel = style({
-    color: layerVars.contrast,
     fontSize: themeVars.fontSize.xSmall,
     textTransform: "uppercase",
     opacity: 0.5,
@@ -187,7 +190,6 @@ export const colorPreviewChecker = style({
     width: "100%",
     height: 28,
     borderRadius: themeVars.borderRadius.half,
-    backgroundColor: layerVars.main,
 });
 
 export const colorPreview = style({
@@ -195,5 +197,5 @@ export const colorPreview = style({
     height: "100%",
     borderRadius: themeVars.borderRadius.half,
     backgroundColor: swatchVar,
-    boxShadow: `inset 0 0 0 1px rgb(from ${layerVars.contrast} r g b / 25%)`,
+    boxShadow: SWATCH_RING,
 });

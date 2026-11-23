@@ -31,6 +31,8 @@ export type SkinListboxSampleProps = {
 
 export type SkinStateProps = {
     state: string;
+    isHovered?: boolean;
+    isReceiving?: boolean;
     isPressed?: boolean;
     isChecked?: boolean;
     isMixed?: boolean;

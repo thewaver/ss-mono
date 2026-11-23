@@ -22,6 +22,8 @@
     import SkinButtonSample from "./SkinButtonSample.svelte";
     import SkinBarCell from "./SkinBarCell.svelte";
     import SkinCheckboxSample from "./SkinCheckboxSample.svelte";
+    import SkinDropZoneSample from "./SkinDropZoneSample.svelte";
+    import SkinInlineSample from "./SkinInlineSample.svelte";
     import SkinInputSample from "./SkinInputSample.svelte";
     import SkinListboxSample from "./SkinListboxSample.svelte";
     import SkinProgressSample from "./SkinProgressSample.svelte";
@@ -30,8 +32,10 @@
     import SkinSimpleButtonSample from "./SkinSimpleButtonSample.svelte";
     import SkinSampleColumn from "./SkinSampleColumn.svelte";
     import SkinSlideSample from "./SkinSlideSample.svelte";
+    import SkinSplitPaneSample from "./SkinSplitPaneSample.svelte";
     import SkinTagSample from "./SkinTagSample.svelte";
     import SkinToggleSample from "./SkinToggleSample.svelte";
+    import SkinTooltipSample from "./SkinTooltipSample.svelte";
     import type { SkinSamplesProps } from "./AppearancePage.types";
 
     let props: SkinSamplesProps = $props();
@@ -86,6 +90,8 @@
         <SkinInputSample state={"Read-only"} isReadOnly={true} />
         <SkinInputSample state={"Disabled"} isDisabled={true} />
         <SkinInputSample state={"Error"} hasError={true} />
+        <SkinInlineSample state={"Inline"} />
+        <SkinInlineSample state={"Inline hovered"} isHovered={true} />
     </div>
 </SkinSampleColumn>
 
@@ -198,4 +204,22 @@
             {/snippet}
         </Accordion>
     </div>
+</SkinSampleColumn>
+
+<SkinSampleColumn name={"Split pane"}>
+    <SkinSplitPaneSample />
+</SkinSampleColumn>
+
+<SkinSampleColumn name={"Drop zone"}>
+    <div class={styles.skinStateGrid}>
+        <SkinBarCell state={"Default"}><SkinDropZoneSample state={"Default"} /></SkinBarCell>
+        <SkinBarCell state={"Hovered"}><SkinDropZoneSample state={"Hovered"} isHovered={true} /></SkinBarCell>
+        <SkinBarCell state={"Receiving"}><SkinDropZoneSample state={"Receiving"} isReceiving={true} /></SkinBarCell>
+        <SkinBarCell state={"Disabled"}><SkinDropZoneSample state={"Disabled"} isDisabled={true} /></SkinBarCell>
+        <SkinBarCell state={"Error"}><SkinDropZoneSample state={"Error"} hasError={true} /></SkinBarCell>
+    </div>
+</SkinSampleColumn>
+
+<SkinSampleColumn name={"Tooltip"}>
+    <SkinTooltipSample />
 </SkinSampleColumn>

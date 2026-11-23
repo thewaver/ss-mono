@@ -64,7 +64,7 @@ of its themes including those whose names overlap a Skin above — the user's po
 were bad, not the ideas. Each started as a copy of Shaded's file, the user's method, and keeps all of its
 entries. Protos styled only a field, two buttons and a checkbox, from a random palette in JavaScript; the
 translation onto the Theme is: Protos' two accents → `primary` and `secondary`; its "mix" color (black or white
-against the background) → `layerVars.contrast`, and its inverse → that color inverted with relative color syntax;
+against the background) → the level's `contrast` (`LEVEL.contrast`), and its inverse → that color inverted with relative color syntax;
 its shadow color (the background 25 lighter or darker) → `background.dark` darkened, clamped at zero; its
 lightness shifts, hue spins and mixes → `hsl(from …)` and `color-mix()`. Every Theme here is dark, so Protos'
 dark-background branch is the one taken. Protos painted a checkbox like its primary button; here a checked or mixed
@@ -80,6 +80,17 @@ selectors may nest, a top-level comma inside `:is(…)` is not split — and put
 A variables contract like Theme's was weighed and set aside: it caps every Skin at the properties the first one
 planned for.
 
+- **What every Skin writes the same is written once, in `SkinBaseUtils`** (`Skins/SkinBase.utils.ts`) — the user's
+  call, to keep the Skins DRY. `compute(level)` builds the shared rules from the Skin's `LEVEL`, and each Skin passes
+  its own rules through `merge(LEVEL, rules)` into `define`, which lays them over the base with
+  `ObjectUtils.deepMerge`. **The base holds only what is identical in every Skin and depends on nothing but the
+  Theme, `LEVEL` and the machinery** — a rule written the same but calling a Skin's own helper (`...ITEM`,
+  `surface(LEVEL)`, `ACCORDION`) paints differently per Skin and stays in each. `SkinBaseEntry` names the entries the
+  base covers whole, which a Skin may leave out or override; `SkinBasePartEntry` names those it covers in part
+  (`input`, `itemStatic`, `tabsItemBase`), which every Skin still writes, so the type check still
+  fails on a missing entry. `SkinBaseUtils.INTERACTIBLE_STATES` is the shared hover, press and disabled filter. **The base may also hold a look the user picked from one Skin for all of them**: `scrollerThumb` is
+  Shaded's minus its shadow, and Blocky overrides it with its raised bevel. A new rule every Skin would start on goes in the base; a Skin that wants its own look writes the entry, and its values win.
+
 - **A Skin's rules stop at `skinBoundary`**, so a box can wear a different Skin from the page around it (the Skins
   page's rows). Each rule is emitted as `@scope (.<skin root>) to (.skinBoundary) { :scope <selector> }` inside the
   layer. The lower boundary is what isolates a row, not the nearer root winning: the cascade compares
@@ -88,6 +99,19 @@ planned for.
   the Skin's root class inside it, so no root is also its own limit. `:scope` stands where `.<root>` used to, so
   specificity is unchanged. What a nested box opens in a portal (a list, a tooltip) lands outside it and wears the
   page's Skin.
+
+- **Only a Skin reacts to the level, and it names every value it uses there** — the user's design, so a consumer
+  whose Theme has no background levels, or who wants the level to change something other than color, describes it
+  in their own terms. `PageLayer` reports the level only, as one of three empty classes (`layerLevelVariants`);
+  nothing carries a color. `SkinUtils.byLevel({ l0, l1, l2 })` hands back a variable whose value is the one for the
+  level an element sits at, `l1` and `l2` falling back to the level below when left out. Being a variable, it
+  inherits, so the nearest level wins — a docs code box dropping to 0 inside a level-1 example takes `l0`, which no
+  selector matching an ancestor could do. `define` writes the values onto the level classes inside the Skin's own
+  scope, and the `l0` values onto the Skin's root, so `<html>` and anything portalled to the end of the page have
+  them. `byLevel` calls collect until the next `define`, which takes them, so a Skin calls it before `define`.
+  Every Skin builds its `LEVEL` family with `SkinUtils.computeLevelFamily(themeVars.color.layers)` for now — the helper is shared at the user's request, and the Skin still names the Theme colors it passes. It is a function rather than one shared constant because a `byLevel` variable belongs to the `define` that takes it, so a family built once would be assigned in one Skin only.
+  **A level can change a value, not which elements a rule matches.** A Skin rule matching a level class on the
+  element itself was tried first and set aside: most painted parts do not carry the class.
 
 - **The layer is what lets a painter override a Skin.** Unlayered rules always beat layered ones, so any paint
   still in a painter wins over its entry, whatever the specificity or stylesheet order. Paint left in a painter
@@ -126,7 +150,7 @@ planned for.
   surface and the `Toolbar` and `Menubar` bars. `surface` is the example and variant boxes,
   toasts and the knobs popup; `pageContainer` — the user's — is the wrapping box of the docs' "Show code" disclosures
   and the API tables, and the frame of the Appearance page's rows; `panel` the boxes of content inside them, code boxes,
-  prop rows, the dependency chips, the `Table` frame, the `Sidebar` example's frame and the `Preview` box — the last with its fill overridden to a solid `layerVars.main` and no image, the user's override, since its fade runs into that color. `decoration` — the user's — is the small see-through button inside or beside a
+  prop rows, the dependency chips, the `Table` frame, the `Sidebar` example's frame and the `Preview` box — the last with its fill overridden to the level's solid `main` and no image, the user's override, since its fade runs into that color; that fill and the fade are plain black now, the user's pick. `decoration` — the user's — is the small see-through button inside or beside a
   field (select clear, picker triggers, era and AM/PM toggles, stepper arrows, adornments, the sidebar toggle),
   and it reacts to plain `isHovered`: every painter that hands it hover is a button's, and the static adornment
   never passes hover on (_"The in-field adornment painter"_). `tag` is a tag input's chip; the other chips and badges keep
@@ -161,6 +185,45 @@ planned for.
   along the bar keeps its direction there. **A pair's thumbs are one entry with two states**, `isStart` and
   `isEnd` — the user's pick over two entries, since a Skin writes the thumb once and only the difference; a
   single-value range's thumb carries neither.
+- **The entries that replaced the level's colors in the standard Essentials** — the user's picks, after the layer
+  stopped carrying colors. `placeholder` is text standing in for a missing value, painted as the surrounding text color at 50% so it
+  follows its field's or zone's own text color (the user caught it pinned to the level's color) (field and tag placeholders, an
+  empty select value, empty file names, an empty popover); `divider` a line between parts (the form-section rule,
+  Paginator's panel rows, Stepper's connectors, the docs props table's rules, the line between a docs example and its
+  knobs, the props panel's rule); `grip` a handle's mark (Table's resize handle); `itemGroup` and `itemGroupLabel` the box and label of grouped items (Select's and Menu's groups);
+  `breadcrumb` and `breadcrumbSeparator`; and the Table's own three, `tableHeader`, `tableCell` and `tableDetail`.
+  Five shared states came with them: `isCurrent`, `isSortable`, `isSorted`, `isPinned` (worn for either pinned edge)
+  and `isCarried`, the last on `itemStatic` for a carried `Sortable` item. **The Select group's select-all mark wears
+  `checkboxBox` and `checkboxMark`**, the user's call, with its checked and mixed states on a wrapper around them as
+  on a checkbox row; it is 16px, the user's size, smaller than a checkbox's to fit the group's small header. **`InlineEdit`'s resting text wears `input` with the state `isInline`** — the user's call, like `isReadOnly` on a
+  field: under `skinSelectors.isInlineAtRest` (inline and not hovered) each Skin removes its field paint, so the
+  value reads as plain text, and the hint — hover or keyboard focus, sent as `isHovered` — shows the Skin's full
+  field, previewing the editor that opens. Every Skin starts on the same resting rule. **`SplitPane` has an entry per part** — the user's call: `splitPaneFrame` around everything, `splitPaneGutter` between
+  the panes (dragging is `isActive`) and `splitPaneGrip` on the gutter. **Each pane wears `panel`**, the user's call
+  over a pane entry of SplitPane's own, so a pane looks like every other box of content in its Skin. The frame starts on the old 25% border and 10% background and no rounding: `SplitPane` hands the frame's corners
+  to the panes at its ends and clips them there, so a rounded frame in the base rounded every square Skin's panes.
+  The Skins that round their panels (Flat, Glossy, Shaded, Tek) round the frame themselves. The comparison example's
+  image box keeps no entry, since the picture covers it. **`skinVars.accentColor` is the Skin's accent** — the user's design: the color a painter uses for a current
+  item's mark, an always-on accent or a drop and resize line (Carousel's current dot, FlyoutMenu's current link and
+  submenu arrow, MenuItem's check, TableOfContents' current bar, Sortable's and Table's drop lines, Table's resize
+  line, the Paginator demo's row numbers). It is a variable rather than an entry because those uses paint different
+  properties. It falls back to the Theme's `primary.main`; a Skin sets `skinColorVars.accentColor` in its root style
+  to change it, and `define` resets it at every Skin root, so a nested Skin does not inherit the outer one's. Named
+  after CSS's `accent-color`, since "highlight" already means the hover floater here. **`Calendar`'s month title
+  wears `decoration`**, the user's call: it is a small button opening a picker, like the picker triggers. **The
+  Appearance page's Input group shows `InlineEdit` at rest and hovered**, its painter handed fixed flags since the
+  previews cannot be hovered. The same way, the **Drop zone** column shows the file drop zone's painter in five fixed states and the
+  **Tooltip** column draws the tooltip's painted surface in place, its arrow aimed at its own bottom edge. **A Stepper marker for a step not reached yet wears `itemStatic`**, the user's pick over a `stroke` ring; its
+  circle and number size stay the painter's. **The painter keeps the geometry and the
+  entry the color**: a painter sets a line's width and style on the side it draws, and the entry sets `borderColor`;
+  where the part is a mark rather than a border, the entry sets `color` and the painter draws in `currentColor`.
+  The Table's selected tints, its sorted color and the breadcrumb's link color moved into the entries too, so those
+  painters read no Theme color. Every Skin starts on the same rules, which reproduce the painters' old look in its
+  own `LEVEL`. **One entry means one alpha per Skin**: the Paginator panel's rows went from 10% to the divider's 25%;
+  the Table resize handle went from 25% to the grip's 50%; the menu groups gained the
+  select groups' background, the level's text color at 5% opacity; and the Carousel slide's back is now a `panel`
+  rather than that color at 10%.
+
 - **Entries are as few as possible, but a component with an entry for one part gets one for each part** — the
   user's rule. So the accordion body has `accordionPanel` beside `accordionHeader` rather than borrowing
   `panel`. The surface of a section is `accordionWrapper`, the user's design, and the header and panel draw only on top
@@ -168,11 +231,25 @@ planned for.
 - **A modal's backdrop has one entry, `overlay`, for the see-through kind**; the opaque kind is always solid
   black, the user's call, so its painter paints it and no Skin can change it. The painter otherwise keeps only
   what animates the backdrop open and shut.
-- **Only a control's standard layout gets entries; a custom variant keeps its own paint** — the user's rule. The
-  progress ring, range knob, scroller arc and color area are left alone, because whoever builds a
-  custom tab layout or progress wants full control of the element — a painter of their own, not a
-  set of classes to restyle. A radius computed from a painter's own size (a track's thickness) also stays in the
-  painter.
+- **A custom layout gets no entries of its own, but wears existing ones where they fit** — the user's rule, stated
+  precisely after it was first read as "custom layouts keep their own paint": they _may_ have their own paint, so no
+  entry is created to accommodate one, but a part painted with the properties an entry sets wears that entry. So the
+  range knob wears `rangeThumb`, the radial tree's nodes `itemStatic` (the centre told apart only by its size and bold label, the user's experiment), the honeycomb's hex tab `tabsItemBase` and the arc
+  stepper's cell `itemStatic`. **SVG lines and glyphs take no entry**, since entries paint boxes: the arc stepper's and
+  radial tree's connectors, the progress ring's track, the scroller arc, the paginator dial's wedge and the rating's
+  empty stars derive from the surrounding text color (`currentColor`, or `color-mix(in srgb, currentColor N%,
+transparent)`), so they follow the Skin at any level. **The color area's rings are a fixed `#888888`** like
+  `ColorInput`'s swatch ring (`SWATCH_RING_COLOR`), and its checkerboards a fixed light base, since both frame or
+  show an arbitrary color rather than the Skin. **The Exotics follow the same rule**, the user's mapping: text takes
+  the surrounding color; lines, borders and faint tints derive from it at their old strengths; content frames and
+  cards wear `panel`, tiles and cells `itemStatic` (except the drum's cards, solid black, since a see-through face on
+  a turning drum shows the faces behind it), WheelMenu's close button `buttonSimple`; and what no entry paints
+  — SVG fills and one-off fills (the Wheel's wedges and pips, the WheelMenu's wedges, Formation's shapes,
+  SortableGrid's item contour, the frosted covers, Bracket's layer header, the Wheel card back's stripes) — is black,
+  with SVG strokes in the Theme's primary (CirclePacking's label halo). The Typewriter karaoke's unread half takes the
+  Theme's level-1 text color: the line's text is transparent so its gradient shows, which leaves `currentColor` empty.
+  Exotics may read the Theme, since they do not ship. A radius computed from a painter's own size (a track's
+  thickness) stays in the painter.
 - **Hover in a list is the floater's, everywhere a list can have one** — the user's rule. Hover and selection are
   two separate choices, since most lists glide a hover floater but paint their own selected state (the nav, `Tree`,
   `Select`, `Menu`), and only the `Listbox` examples have a selection floater too. So an item is three entries,

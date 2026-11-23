@@ -1,22 +1,23 @@
 import { style } from "@vanilla-extract/css";
 
+import { skinEntries } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
-import { layerVars } from "../Layer/Layer.css";
 
 const panel = (from: string, to: string) => `linear-gradient(215deg, ${from}, ${to})`;
 
-export const treemapTile = style({
-    display: "flex",
-    flexDirection: "column",
-    width: "100%",
-    height: "100%",
-    padding: themeVars.spacing.half,
-    border: `1px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
-    backgroundColor: layerVars.main,
-    color: layerVars.contrast,
-    fontSize: themeVars.fontSize.xSmall,
-    overflow: "hidden",
-});
+export const treemapTile = style([
+    skinEntries.itemStatic,
+    {
+        border: "1px solid color-mix(in srgb, currentColor 25%, transparent)",
+        display: "flex",
+        flexDirection: "column",
+        width: "100%",
+        height: "100%",
+        padding: themeVars.spacing.half,
+        fontSize: themeVars.fontSize.xSmall,
+        overflow: "hidden",
+    },
+]);
 
 export const treemapTileBranch = style({
     backgroundImage: panel(themeVars.color.primary.dark, themeVars.color.primary.light),
@@ -29,18 +30,19 @@ export const treemapTileWeight = style({
     opacity: 0.7,
 });
 
-export const treemapBar = style({
-    display: "flex",
-    alignItems: "center",
-    gap: themeVars.spacing.full,
-    width: "100%",
-    height: 30,
-    paddingInline: themeVars.spacing.half,
-    backgroundColor: layerVars.main,
-    color: layerVars.contrast,
-    fontSize: themeVars.fontSize.xSmall,
-    cursor: "pointer",
-});
+export const treemapBar = style([
+    skinEntries.itemStatic,
+    {
+        display: "flex",
+        alignItems: "center",
+        gap: themeVars.spacing.full,
+        width: "100%",
+        height: 30,
+        paddingInline: themeVars.spacing.half,
+        fontSize: themeVars.fontSize.xSmall,
+        cursor: "pointer",
+    },
+]);
 
 export const treemapBarHovered = style({
     filter: themeVars.hover.filter,

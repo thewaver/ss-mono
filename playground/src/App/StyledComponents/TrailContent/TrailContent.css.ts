@@ -1,7 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
-import { layerVars } from "../Layer/Layer.css";
 
 const VEHICLE_WIDTH = 44;
 const VEHICLE_HEIGHT = 22;
@@ -43,7 +42,6 @@ export const trailReadout = style({
     display: "flex",
     gap: themeVars.spacing.full,
     alignItems: "center",
-    color: layerVars.contrast,
     fontSize: themeVars.fontSize.xSmall,
     fontVariantNumeric: "tabular-nums",
 });

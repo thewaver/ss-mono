@@ -25,6 +25,8 @@ import type { SkinSamplesProps } from "./AppearancePage.types";
 import SkinBarCell from "./SkinBarCell.vue";
 import SkinButtonSample from "./SkinButtonSample.vue";
 import SkinCheckboxSample from "./SkinCheckboxSample.vue";
+import SkinDropZoneSample from "./SkinDropZoneSample.vue";
+import SkinInlineSample from "./SkinInlineSample.vue";
 import SkinInputSample from "./SkinInputSample.vue";
 import SkinListboxSample from "./SkinListboxSample.vue";
 import SkinProgressSample from "./SkinProgressSample.vue";
@@ -33,8 +35,10 @@ import SkinRangeSample from "./SkinRangeSample.vue";
 import SkinSampleColumn from "./SkinSampleColumn.vue";
 import SkinSimpleButtonSample from "./SkinSimpleButtonSample.vue";
 import SkinSlideSample from "./SkinSlideSample.vue";
+import SkinSplitPaneSample from "./SkinSplitPaneSample.vue";
 import SkinTagSample from "./SkinTagSample.vue";
 import SkinToggleSample from "./SkinToggleSample.vue";
+import SkinTooltipSample from "./SkinTooltipSample.vue";
 
 const props = defineProps<SkinSamplesProps>();
 
@@ -95,6 +99,8 @@ const tabs = computed(() =>
             <SkinInputSample state="Read-only" is-read-only />
             <SkinInputSample state="Disabled" is-disabled />
             <SkinInputSample state="Error" has-error />
+            <SkinInlineSample state="Inline" />
+            <SkinInlineSample state="Inline hovered" is-hovered />
         </div>
     </SkinSampleColumn>
 
@@ -209,5 +215,23 @@ const tabs = computed(() =>
                 </template>
             </Accordion>
         </div>
+    </SkinSampleColumn>
+
+    <SkinSampleColumn name="Split pane">
+        <SkinSplitPaneSample />
+    </SkinSampleColumn>
+
+    <SkinSampleColumn name="Drop zone">
+        <div :class="styles.skinStateGrid">
+            <SkinBarCell state="Default"><SkinDropZoneSample state="Default" /></SkinBarCell>
+            <SkinBarCell state="Hovered"><SkinDropZoneSample state="Hovered" is-hovered /></SkinBarCell>
+            <SkinBarCell state="Receiving"><SkinDropZoneSample state="Receiving" is-receiving /></SkinBarCell>
+            <SkinBarCell state="Disabled"><SkinDropZoneSample state="Disabled" is-disabled /></SkinBarCell>
+            <SkinBarCell state="Error"><SkinDropZoneSample state="Error" has-error /></SkinBarCell>
+        </div>
+    </SkinSampleColumn>
+
+    <SkinSampleColumn name="Tooltip">
+        <SkinTooltipSample />
     </SkinSampleColumn>
 </template>

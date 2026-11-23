@@ -2,7 +2,6 @@ import { style } from "@vanilla-extract/css";
 
 import { skinEntries, skinStates } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
-import { layerVars } from "../Layer/Layer.css";
 import { SELECT_CLEAR_SIZE } from "../SelectClear/SelectClear.css";
 
 const FIELD_WIDTH = 240;
@@ -16,6 +15,7 @@ export const FIELD_GAP = 10;
 export const FIELD_FONT_SIZE = themeVars.fontSize.medium;
 
 export const isEmpty = style({});
+export const isValueEmpty = style([skinEntries.placeholder]);
 export const isFiltering = style({});
 export const isHovered = style([skinStates.isHovered]);
 export const isActive = style({});
@@ -55,9 +55,6 @@ export const selectValue = style({
     transition: `opacity ${themeVars.animation.duration}`,
 
     selectors: {
-        [`${selectContent}.${isEmpty} &`]: {
-            color: `rgb(from ${layerVars.contrast} r g b / 50%)`,
-        },
         [`${selectContent}.${isFiltering} &`]: {
             opacity: 0,
         },

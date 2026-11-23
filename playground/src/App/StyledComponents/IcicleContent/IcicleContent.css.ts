@@ -1,7 +1,7 @@
 import { style, styleVariants } from "@vanilla-extract/css";
 
+import { skinEntries } from "../../Skins/Skin.css";
 import { RAINBOW, RAINBOW_HUES, themeVars } from "../../Theme.css";
-import { layerVars } from "../Layer/Layer.css";
 
 export const PAGE_ICICLE_FAMILIES = RAINBOW_HUES;
 
@@ -20,21 +20,18 @@ export const icicleCellFamily = styleVariants(
 );
 
 export const icicleCell = style({
+    borderBottom: "1px solid color-mix(in srgb, currentColor 25%, transparent)",
+    borderRight: "1px solid color-mix(in srgb, currentColor 25%, transparent)",
     width: "100%",
     height: "100%",
     padding: `2px ${themeVars.spacing.half}`,
-    borderRight: `1px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
-    borderBottom: `1px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
     fontSize: themeVars.fontSize.xSmall,
     whiteSpace: "nowrap",
     overflow: "hidden",
     cursor: "pointer",
 });
 
-export const icicleCellRoot = style({
-    backgroundColor: layerVars.main,
-    color: layerVars.contrast,
-});
+export const icicleCellRoot = style([skinEntries.itemStatic]);
 
 export const icicleLabel = style({
     transition: `opacity ${themeVars.animation.duration}`,

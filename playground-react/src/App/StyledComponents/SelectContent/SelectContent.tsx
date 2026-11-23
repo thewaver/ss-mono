@@ -25,7 +25,9 @@ export const PageSelectContent = (props: PropsWithChildren<SelectContentProps>) 
                 .join(" ")}
             style={{ width: props.width ? `${props.width}px` : undefined }}
         >
-            <div className={styles.selectValue}>{props.children}</div>
+            <div className={[styles.selectValue, props.flags.isEmpty && styles.isValueEmpty].filter(Boolean).join(" ")}>
+                {props.children}
+            </div>
             {props.hasClearSpace && !props.flags.isEmpty && <div className={styles.selectClearSpace} />}
             <div className={styles.selectChevron} />
         </div>

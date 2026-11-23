@@ -856,6 +856,7 @@ several — **and its heading is added here in the same edit.**
 
 - Controls: `SplitPane`, where CSS grid is the arithmetic
 - `SplitPane`, and the three things a splitter was missing
+- A pane does not clip its contents, so a painted pane keeps its shadow
 
 **[`Spotlight.md`](decisions/Spotlight.md)**
 

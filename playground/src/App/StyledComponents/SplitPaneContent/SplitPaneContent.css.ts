@@ -1,40 +1,37 @@
 import { style } from "@vanilla-extract/css";
 
-import { skinEntries } from "../../Skins/Skin.css";
+import { skinEntries, skinStates } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
-import { layerVars } from "../Layer/Layer.css";
 
 const FRAME_MAX_WIDTH = 380;
 const PICTURE_ASPECT = 1;
 
-export const isDragging = style({});
+export const isDragging = style([skinStates.isActive]);
 export const isDisabled = style({});
 
 const gutterBase = {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: themeVars.borderRadius.half,
     transition: `background-color ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}`,
 
     selectors: {
-        [`&.${isDragging}`]: {
-            backgroundColor: themeVars.color.primary.main,
-        },
         [`&.${isDisabled}`]: {
             opacity: themeVars.disabled.opacity,
         },
     },
 } as const;
 
-export const rowGutter = style({ ...gutterBase, width: "100%", height: "100%" });
+export const rowGutter = style([skinEntries.splitPaneGutter, { ...gutterBase, width: "100%", height: "100%" }]);
 
-export const columnGutter = style({ ...gutterBase, width: "100%", height: "100%" });
+export const columnGutter = style([skinEntries.splitPaneGutter, { ...gutterBase, width: "100%", height: "100%" }]);
 
-export const gutterGrip = style({
-    borderRadius: themeVars.borderRadius.half,
-    backgroundColor: `rgb(from ${layerVars.contrast} r g b / 50%)`,
-});
+export const gutterGrip = style([
+    skinEntries.splitPaneGrip,
+    {
+        backgroundColor: "currentColor",
+    },
+]);
 
 export const rowGrip = style([gutterGrip, { width: 2, height: 24 }]);
 
@@ -51,15 +48,15 @@ export const splitPaneBox = style([
     },
 ]);
 
-export const splitPaneFrame = style({
-    width: "100%",
-    maxWidth: FRAME_MAX_WIDTH,
-    height: 220,
-    padding: themeVars.spacing.half,
-    border: `1px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
-    borderRadius: themeVars.borderRadius.full,
-    backgroundColor: `rgb(from ${layerVars.contrast} r g b / 10%)`,
-});
+export const splitPaneFrame = style([
+    skinEntries.splitPaneFrame,
+    {
+        width: "100%",
+        maxWidth: FRAME_MAX_WIDTH,
+        height: 220,
+        padding: themeVars.spacing.half,
+    },
+]);
 
 export const compareFrame = style([
     splitPaneFrame,

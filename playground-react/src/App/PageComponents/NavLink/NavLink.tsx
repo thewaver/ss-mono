@@ -30,7 +30,7 @@ export const PageNavLink = (props: PropsWithChildren<PageNavLinkProps>) => {
                 className={[
                     styles.navLinkContent,
                     layerClass,
-                    (props.hasHoverFloater ?? false) ? styles.hasHoverFloater : styles.hasNoHoverFloater,
+                    (props.hasHoverFloater ?? false) && styles.hasHoverFloater,
                     props.hasSelectionFloater && styles.hasSelectionFloater,
                     isHovered && styles.isHovered,
                     props.isSelected && styles.isSelected,

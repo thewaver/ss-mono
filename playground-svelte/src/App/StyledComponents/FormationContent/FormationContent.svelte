@@ -3,7 +3,6 @@
 
     import { Shape } from "@thewaver/ss-components-svelte";
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/FormationContent/FormationContent.css";
-    import { layerVars } from "@thewaver/ss-playground/App/StyledComponents/Layer/Layer.css";
     import { themeVars } from "@thewaver/ss-playground/App/Theme.css";
     import { ShapeConst } from "@thewaver/ss-utils";
 
@@ -21,7 +20,7 @@
 <div class={[styles.formationItem, layerClass]}>
     <Shape
         computePoints={(size) => ShapeConst.getDefaultShapePoints(props.shapeKind, size)}
-        computeFillDefs={() => [{ color: layerVars.dark }]}
+        computeFillDefs={() => [{ color: "black" }]}
         computeStrokeDefs={() => [{ color: themeVars.color.primary.main }]}
         strokeGeom={STROKE_GEOM}
     >

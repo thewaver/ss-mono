@@ -1,7 +1,6 @@
 import { createVar, keyframes, style } from "@vanilla-extract/css";
 
 import { skinEntries } from "../../Skins/Skin.css";
-import { layerVars } from "../../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../../Theme.css";
 
 export const fadeDurationVar = createVar();
@@ -49,7 +48,6 @@ export const digit = style({
 export const slotTile = style([skinEntries.input, digit]);
 
 export const fixed = style({
-    color: layerVars.contrast,
     fontFamily: "monospace",
     fontSize: themeVars.fontSize.xLarge,
 });
@@ -72,7 +70,7 @@ export const flapTile = style([
             top: "50%",
             height: 2,
             transform: "translateY(-50%)",
-            backgroundColor: `rgb(from ${layerVars.contrast} r g b / 10%)`,
+            backgroundColor: "color-mix(in srgb, currentColor 10%, transparent)",
         },
     },
 ]);

@@ -1,4 +1,5 @@
 import type { InteractionFlags, SelectOptionFlags } from "@thewaver/ss-components";
+import type { ShapeArrowAim, Size2d } from "@thewaver/ss-utils";
 
 import type { PlaygroundSkin, PlaygroundTheme } from "../../PageComponents/NavSettings/NavSettings.types";
 import type { ThemeSwatchFamily, ThemeSwatchShade } from "./AppearancePage.types";
@@ -31,6 +32,8 @@ export const SKIN_SAMPLE_OPTIONS = [{ value: "Selected" }, { value: "Plain" }, {
 
 export const SKIN_SAMPLE_SELECTED_OPTION = "Selected";
 
+export const SKIN_SAMPLE_SPLIT = [0.5, 0.5];
+
 export const SKIN_SAMPLE_HOVERED_OPTION = "Hovered";
 
 export const SKIN_SAMPLE_HOVERED_FLAGS: InteractionFlags<SelectOptionFlags> = {
@@ -38,6 +41,19 @@ export const SKIN_SAMPLE_HOVERED_FLAGS: InteractionFlags<SelectOptionFlags> = {
     isHighlighted: false,
     isSelected: false,
 };
+
+export const SKIN_SAMPLE_INLINE_FLAGS: InteractionFlags = {};
+
+export const SKIN_SAMPLE_INLINE_HOVERED_FLAGS: InteractionFlags = { isHovered: true };
+
+export const SKIN_SAMPLE_DROP_PROMPT = "Drop files here";
+
+export const SKIN_SAMPLE_TOOLTIP_TEXT = "A tooltip, pointing down.";
+
+export const computeSkinSampleTooltipAim = (size: Size2d): ShapeArrowAim => ({
+    point: { x: size.width * 0.5, y: size.height },
+    angle: 90,
+});
 
 export const SKIN_SAMPLE_SECTIONS = [{ value: "Open" }, { value: "Closed" }, { value: "Disabled", isDisabled: true }];
 

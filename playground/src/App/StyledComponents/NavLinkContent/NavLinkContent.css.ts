@@ -2,7 +2,6 @@ import { globalStyle, style } from "@vanilla-extract/css";
 
 import { skinEntries, skinStates } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
-import { layerVars } from "../Layer/Layer.css";
 
 export const isHovered = style([skinStates.isHovered]);
 export const isSelected = style([skinStates.isSelected]);
@@ -32,11 +31,3 @@ const navLinkBase = style({
 });
 
 export const navLinkContent = style([skinEntries.itemBase, navLinkBase]);
-
-export const hasNoHoverFloater = style({
-    selectors: {
-        [`${navLink}:hover > &`]: {
-            backgroundColor: `rgb(from ${layerVars.contrast} r g b / 25%)`,
-        },
-    },
-});

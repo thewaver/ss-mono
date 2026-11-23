@@ -1,8 +1,7 @@
 import { globalStyle, style } from "@vanilla-extract/css";
 
-import { skinEntries, skinStates } from "../../Skins/Skin.css";
+import { skinEntries, skinStates, skinVars } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
-import { layerVars } from "../Layer/Layer.css";
 
 export const isHovered = style([skinStates.isHovered]);
 export const isActive = style({});
@@ -40,7 +39,7 @@ export const menuItemSubmenuMark = style({
 
 export const menuItemMark = style({
     width: "1ch",
-    color: themeVars.color.primary.main,
+    color: skinVars.accentColor,
     fontSize: themeVars.fontSize.small,
     textAlign: "center",
 });
@@ -49,8 +48,12 @@ globalStyle(`${menuItemMark} + div`, {
     flex: 1,
 });
 
-export const menuGroupBox = style({
-    paddingBottom: themeVars.spacing.half,
-    marginBottom: themeVars.spacing.half,
-    borderBottom: `1px solid rgb(from ${layerVars.contrast} r g b / 15%)`,
-});
+export const menuGroupBox = style([
+    skinEntries.itemGroup,
+    {
+        paddingBottom: themeVars.spacing.half,
+        marginBottom: themeVars.spacing.half,
+        borderBottomWidth: 1,
+        borderBottomStyle: "solid",
+    },
+]);

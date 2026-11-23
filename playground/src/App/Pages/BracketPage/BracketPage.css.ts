@@ -1,6 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
-import { layerVars } from "../../StyledComponents/Layer/Layer.css";
+import { skinEntries } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 
 const panel = (from: string, to: string) => `linear-gradient(135deg, ${from}, ${to})`;
@@ -14,26 +14,28 @@ export const board = style({
     color: themeVars.color.primary.dark,
 });
 
-export const node = style({
-    display: "grid",
-    placeItems: "center",
-    width: "100%",
-    height: "100%",
-    padding: `0 ${themeVars.spacing.half}`,
-    border: `2px solid ${themeVars.color.primary.main}`,
-    borderRadius: themeVars.borderRadius.half,
-    backgroundColor: layerVars.dark,
-    color: layerVars.contrast,
-    fontSize: themeVars.fontSize.xSmall,
-    textAlign: "center",
-    cursor: "pointer",
-});
+export const node = style([
+    skinEntries.itemStatic,
+    {
+        display: "grid",
+        placeItems: "center",
+        width: "100%",
+        height: "100%",
+        padding: `0 ${themeVars.spacing.half}`,
+        border: `2px solid ${themeVars.color.primary.main}`,
+        borderRadius: themeVars.borderRadius.half,
+        fontSize: themeVars.fontSize.xSmall,
+        textAlign: "center",
+        cursor: "pointer",
+    },
+]);
 
 export const nodeOnRoute = style({
     boxShadow: `0 0 0 2px ${themeVars.color.secondary.main}`,
 });
 
 export const layerHeader = style({
+    backgroundColor: "black",
     position: "relative",
     zIndex: 1,
     display: "grid",
@@ -41,8 +43,6 @@ export const layerHeader = style({
     width: "100%",
     height: "100%",
     borderRadius: themeVars.borderRadius.half,
-    backgroundColor: layerVars.contrast,
-    color: layerVars.main,
     fontSize: themeVars.fontSize.xSmall,
     textAlign: "center",
 });

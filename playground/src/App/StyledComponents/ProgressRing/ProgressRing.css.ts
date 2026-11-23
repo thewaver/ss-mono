@@ -1,7 +1,6 @@
 import { keyframes, style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
-import { layerVars } from "../Layer/Layer.css";
 
 export const RING_SIZE = 96;
 export const RING_STROKE = 8;
@@ -36,7 +35,7 @@ export const progressRingSvg = style({
 
 export const progressRingTrack = style({
     fill: "none",
-    stroke: `rgb(from ${layerVars.contrast} r g b / 25%)`,
+    stroke: `color-mix(in srgb, currentColor 25%, transparent)`,
 });
 
 export const progressRingFill = style({
