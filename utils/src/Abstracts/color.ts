@@ -30,6 +30,10 @@ const CONTRAST_LEVELS: Record<Color.ContrastLevel, number> = { A: 3, AA: 4.5, AA
 const CONTRAST_OFFSET = 0.05;
 const CONTRAST_MIN = 1;
 const CONTRAST_MAX = 21;
+const PERCEIVED_LIGHTNESS_LINEAR_LIMIT = 216 / 24389;
+const PERCEIVED_LIGHTNESS_LINEAR_SLOPE = 24389 / 27;
+const PERCEIVED_LIGHTNESS_SCALE = 116;
+const PERCEIVED_LIGHTNESS_OFFSET = 16;
 const LIGHTNESS_BISECTIONS = 24;
 const LIGHTNESS_ROUNDING = 100;
 const HALF = 0.5;
@@ -294,6 +298,48 @@ export namespace Color {
         if (!a || !b) return undefined;
 
         return toContrastRatio(toLuminance(a), toLuminance(b));
+    };
+
+    /**
+     * Measures how much light a color gives off, as WCAG's relative luminance.
+     *
+     * It runs from `0` for black to `1` for white, and it is the number {@link Color.getContrastRatio} compares:
+     * the ratio of two colors is their luminances, each plus `0.05`, the lighter over the darker. It is linear in
+     * light, not in how bright a color looks — a gray halfway along it looks much lighter than halfway — which is
+     * what {@link Color.getPerceivedLightness} is for.
+     *
+     * Opacity takes no part, as in {@link Color.getContrastRatio}.
+     *
+     * @param color The color, as a CSS color string or a {@link Color.RGB} value.
+     * @returns The luminance, unrounded. `undefined` when the string is not a color.
+     */
+    export const getLuminance = (color: string | Color.RGB): number | undefined => {
+        const rgb = toContrastRgb(color);
+
+        return rgb && toLuminance(rgb);
+    };
+
+    /**
+     * Measures how light a color looks, as CIE lightness (L*).
+     *
+     * It runs from `0` for black to `100` for white, spaced so that equal steps look like equal steps, and it reads
+     * only how light a color is, not its hue: pure red and a gray of the same lightness measure alike. It is worked
+     * out from {@link Color.getLuminance}, so two colors this ranks in one order {@link Color.getContrastRatio}
+     * ranks the same way against black or white.
+     *
+     * Opacity takes no part, as in {@link Color.getContrastRatio}.
+     *
+     * @param color The color, as a CSS color string or a {@link Color.RGB} value.
+     * @returns The lightness, unrounded. `undefined` when the string is not a color.
+     */
+    export const getPerceivedLightness = (color: string | Color.RGB): number | undefined => {
+        const luminance = getLuminance(color);
+
+        if (luminance === undefined) return undefined;
+
+        return luminance <= PERCEIVED_LIGHTNESS_LINEAR_LIMIT
+            ? luminance * PERCEIVED_LIGHTNESS_LINEAR_SLOPE
+            : Math.cbrt(luminance) * PERCEIVED_LIGHTNESS_SCALE - PERCEIVED_LIGHTNESS_OFFSET;
     };
 
     /**

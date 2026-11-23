@@ -124,6 +124,9 @@
         playback &&
             !getIsPageHidden() &&
             !frameState.hasEnded &&
+            getRootSize().width > 0 &&
+            getRootSize().height > 0 &&
+            SliceRendererUtils.getIsSettled(getPicture()) &&
             !!root &&
             (isOnGraphicsCard ? !!getItem() : !!container),
     );

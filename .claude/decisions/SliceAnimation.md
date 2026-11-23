@@ -568,3 +568,25 @@ The user's call, for `ParticleField`, `ParticleSpawner`, `ParticleDissolve` (thr
 - **`CellAnimation`'s container takes `contain: size layout style`, never `paint`, and no `overflow: hidden`**: cells are meant to fly in from outside the box (`tumble_left` and its siblings start there), so the container never clips them — the user's call.
 - Layout containment also makes each root a stacking context, so a `z-index` a consumer gives a particle now orders it only among its siblings.
 - **Measured headless on `ParticleDissolve`'s Card, it changed neither layout nor style time**, since the particles were already absolutely positioned. Kept as the user's call; a GPU window was not measured. **Particles do not get compositor layers of their own** — a later measurement counted seven layers on the whole page mid-dissolve at a 4 px cell size. What cost most there was a fade written as a filter, which the next entry is about.
+
+### A run's clock waits until there is something to draw
+
+**The clock starts only once the picture has settled and the box has a size.** `CellAnimation`, `RGBAnimation`,
+`ParticleField` and `ParticleSpawner` used to start their frame loop as soon as their elements existed. A picture
+still loading counts as drawable on the graphics card (`getCanDraw`, so a component does not draw it twice over while
+it arrives), and `CellAnimation` and `RGBAnimation` take their size from the anchor `<img>`, which measures nothing
+until the picture has loaded. So a freshly mounted component spent its first frame or two with the clock running and
+nothing drawn: found in a game's screen wipe, where the clearing pass mounted at the swap and the next scene showed
+uncovered for one frame. The pass also lost those frames of its own animation.
+
+`SliceRendererUtils.getIsSettled` is the shared test: `false` only while the picture is loading, so a picture that
+loaded, one the graphics card may not read, and one that failed all count as settled — the last two are drawn with
+page elements or not at all, and waiting on them would wait forever. A component that never asked for a picture
+(`renderer: "elements"` in the three that skip loading it) passes `undefined`, which counts as settled; there the
+measured size is what waits on the picture, since the anchor only has one once it has loaded. `ParticleField`
+already waited on its size and now waits on the picture too; `ParticleSpawner` waits on the picture before it may
+spawn, since a particle is the picture and has no size before it arrives.
+
+**A component whose box never gets a size never starts**, and so never reports an end. That is deliberate rather
+than an oversight: a pass playing where it cannot be seen is the fault this removes. A consumer that waits on the end
+of a pass to move on keeps a timer of its own as well, per the conventions on animations something waits on.

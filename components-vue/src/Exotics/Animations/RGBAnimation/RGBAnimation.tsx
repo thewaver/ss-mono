@@ -104,6 +104,9 @@ export const RGBAnimation = defineComponent(
                 isPlaying.value &&
                 !isPageHidden.value &&
                 currentIteration.value < getIterationCount() &&
+                rootSize.value.width > 0 &&
+                rootSize.value.height > 0 &&
+                SliceRendererUtils.getIsSettled(picture.value) &&
                 !!rootRef.value &&
                 (!isOnGraphicsCard.value || !!item.value),
         );

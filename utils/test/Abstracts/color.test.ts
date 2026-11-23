@@ -478,6 +478,66 @@ describe("Color.getContrastRatio", () => {
     });
 });
 
+describe("Color.getLuminance", () => {
+    it("spans zero to one", () => {
+        expect(Color.getLuminance(BLACK)).toBeCloseTo(0, 10);
+        expect(Color.getLuminance(WHITE)).toBeCloseTo(1, 10);
+    });
+
+    it("weighs the channels as WCAG does", () => {
+        expect(Color.getLuminance(RED)).toBeCloseTo(0.2126, 10);
+        expect(Color.getLuminance(GREEN)).toBeCloseTo(0.7152, 10);
+        expect(Color.getLuminance(BLUE)).toBeCloseTo(0.0722, 10);
+    });
+
+    it("is the number getContrastRatio compares", () => {
+        HUES.forEach((hue) => {
+            const rgb = Color.HSL.toRgb({ h: hue, s: 80, l: 45 });
+            const luminance = Color.getLuminance(rgb)!;
+
+            expect(Color.getContrastRatio(rgb, BLACK)).toBeCloseTo((luminance + 0.05) / 0.05, 10);
+        });
+    });
+
+    it("takes a CSS string and a channel value alike", () => {
+        expect(Color.getLuminance("hsl(0 100% 50%)")).toBeCloseTo(Color.getLuminance({ r: 255, g: 0, b: 0 })!, 10);
+    });
+
+    it("answers undefined for a string that is not a color", () => {
+        expect(Color.getLuminance("nonsense")).toBeUndefined();
+    });
+});
+
+describe("Color.getPerceivedLightness", () => {
+    it("spans zero to one hundred", () => {
+        expect(Color.getPerceivedLightness(BLACK)).toBeCloseTo(0, 10);
+        expect(Color.getPerceivedLightness(WHITE)).toBeCloseTo(100, 10);
+    });
+
+    it("matches the published CIE lightness of the primaries", () => {
+        expect(Color.getPerceivedLightness(RED)).toBeCloseTo(53.2, 1);
+        expect(Color.getPerceivedLightness(GREEN)).toBeCloseTo(87.7, 1);
+        expect(Color.getPerceivedLightness(BLUE)).toBeCloseTo(32.3, 1);
+    });
+
+    it("puts a mid gray near the middle, where luminance puts it a fifth of the way", () => {
+        expect(Color.getPerceivedLightness(GREY)).toBeCloseTo(53.59, 1);
+        expect(Color.getLuminance(GREY)).toBeLessThan(0.25);
+    });
+
+    it("runs on through the dark end without a jump", () => {
+        const nearBlack = Array.from({ length: 12 }, (_, step) =>
+            Color.getPerceivedLightness({ r: step, g: step, b: step })!,
+        );
+
+        nearBlack.slice(1).forEach((lightness, index) => expect(lightness).toBeGreaterThan(nearBlack[index]));
+    });
+
+    it("answers undefined for a string that is not a color", () => {
+        expect(Color.getPerceivedLightness("nonsense")).toBeUndefined();
+    });
+});
+
 describe("Color.getContrastingColor", () => {
     it("keeps the hue and the saturation it was handed", () => {
         const got = Color.getContrastingColor(210, 80, WHITE, "AA");

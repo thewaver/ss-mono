@@ -135,7 +135,8 @@ export const ParticleField = defineComponent(
                 !isPageHidden.value &&
                 !hasEnded.value &&
                 rootSize.value.width > 0 &&
-                rootSize.value.height > 0,
+                rootSize.value.height > 0 &&
+                SliceRendererUtils.getIsSettled(picture.value),
         );
 
         const clockMs = computed(() => MathUtils.clamp01(progress.value) * getDurationMs());

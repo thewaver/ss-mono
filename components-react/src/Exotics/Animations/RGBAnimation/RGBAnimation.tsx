@@ -121,7 +121,14 @@ export const RGBAnimation = (props: RGBAnimationProps) => {
 
     const hasEnded = currentIteration >= iterationCount;
 
-    const isRunning = isPlaying && !isPageHidden && !hasEnded && (!isOnGraphicsCard || !!item);
+    const isRunning =
+        isPlaying &&
+        !isPageHidden &&
+        !hasEnded &&
+        rootSize.width > 0 &&
+        rootSize.height > 0 &&
+        SliceRendererUtils.getIsSettled(picture) &&
+        (!isOnGraphicsCard || !!item);
 
     const drawnSrcRef = useRef(props.src);
 

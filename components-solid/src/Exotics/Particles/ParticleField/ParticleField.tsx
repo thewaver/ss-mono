@@ -145,7 +145,8 @@ export const ParticleField = (props: ParticleFieldProps) => {
             getIsWindowVisible() &&
             !getHasEnded() &&
             getRootSize().width > 0 &&
-            getRootSize().height > 0,
+            getRootSize().height > 0 &&
+            SliceRendererUtils.getIsSettled(getPicture()),
     );
 
     const roster = ParticleFieldUtils.createRoster();

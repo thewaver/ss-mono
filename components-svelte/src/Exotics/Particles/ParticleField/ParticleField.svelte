@@ -136,7 +136,12 @@
     const hasEnded = $derived(currentIteration >= iterationCount);
 
     const isRunning = $derived(
-        playback && !getIsPageHidden() && !hasEnded && getRootSize().width > 0 && getRootSize().height > 0,
+        playback &&
+            !getIsPageHidden() &&
+            !hasEnded &&
+            getRootSize().width > 0 &&
+            getRootSize().height > 0 &&
+            SliceRendererUtils.getIsSettled(getPicture()),
     );
 
     const clockMs = $derived(MathUtils.clamp01(progress) * durationMs);

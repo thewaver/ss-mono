@@ -143,7 +143,13 @@ export const ParticleField = (props: ParticleFieldProps) => {
 
     const hasEnded = currentIteration >= iterationCount;
 
-    const isRunning = isPlaying && !isPageHidden && !hasEnded && rootSize.width > 0 && rootSize.height > 0;
+    const isRunning =
+        isPlaying &&
+        !isPageHidden &&
+        !hasEnded &&
+        rootSize.width > 0 &&
+        rootSize.height > 0 &&
+        SliceRendererUtils.getIsSettled(picture);
 
     const clockMs = MathUtils.clamp01(progress) * durationMs;
 

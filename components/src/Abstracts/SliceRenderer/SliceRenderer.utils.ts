@@ -1572,6 +1572,16 @@ export namespace SliceRendererUtils {
         picture?.status !== "broken";
 
     /**
+     * Whether a picture has finished loading, whichever way it went. A component's clock waits on it: one started
+     * while the picture is still arriving spends its first frames drawing nothing, so a pass that should open on a
+     * covered screen opens on an empty one.
+     *
+     * @param picture The picture, from {@link requestPicture}, or `undefined` for a component that never asked for one.
+     * @returns `false` only while the picture is loading.
+     */
+    export const getIsSettled = (picture: SliceRendererPicture | undefined) => picture?.status !== "loading";
+
+    /**
      * Any CSS color as the four numbers the graphics card multiplies a picture by, each `0`–`1`.
      *
      * Parsed by the browser, so a named color, `hsl()` or `color-mix()` all work. Remembered by its text.

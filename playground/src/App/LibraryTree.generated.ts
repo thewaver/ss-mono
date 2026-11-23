@@ -49,7 +49,7 @@ export const LIBRARY: TreemapNode<string> = branch(
         leaf("Shortcut", 364),
         leaf("SignalMirror", 292),
         leaf("SliceAnimation", 349),
-        leaf("SliceRenderer", 2294),
+        leaf("SliceRenderer", 2304),
         leaf("Smoother", 145),
         leaf("TextSync", 517),
         leaf("TurnClock", 217),
@@ -129,7 +129,7 @@ export const LIBRARY: TreemapNode<string> = branch(
     ),
     branch(
         "Exotics",
-        branch("Animations", leaf("CellAnimation", 780), leaf("RGBAnimation", 630), leaf("ScanlineAnimation", 71)),
+        branch("Animations", leaf("CellAnimation", 783), leaf("RGBAnimation", 633), leaf("ScanlineAnimation", 71)),
         branch("Arrangements", leaf("Formation", 119), leaf("Satellite", 216), leaf("Staircase", 163)),
         leaf("CardStack", 786),
         branch("Charts", leaf("CirclePacking", 509), leaf("Icicle", 604), leaf("Sunburst", 567), leaf("Treemap", 791)),
@@ -137,7 +137,7 @@ export const LIBRARY: TreemapNode<string> = branch(
         branch("Diagrams", leaf("Bracket", 1468), leaf("PatchBoard", 2181), leaf("Timeline", 1462)),
         branch("Menus", leaf("FanMenu", 108), leaf("WheelMenu", 274)),
         branch("Mosaics", leaf("ElementMosaic", 79), leaf("ImageMosaic", 218)),
-        branch("Particles", leaf("ParticleDissolve", 552), leaf("ParticleField", 769), leaf("ParticleSpawner", 1408)),
+        branch("Particles", leaf("ParticleDissolve", 552), leaf("ParticleField", 770), leaf("ParticleSpawner", 1412)),
         branch(
             "Perspective",
             leaf("CornerPin", 360),

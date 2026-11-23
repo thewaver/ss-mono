@@ -159,6 +159,9 @@ export const CellAnimation = (props: CellAnimationProps) => {
             getIsPlaying() &&
             getIsWindowVisible() &&
             !getHasEnded() &&
+            getRootSize().width > 0 &&
+            getRootSize().height > 0 &&
+            SliceRendererUtils.getIsSettled(getPicture()) &&
             !!getRootRef() &&
             (getIsOnGraphicsCard() ? !!getItem() : !!getContainerRef()),
     );

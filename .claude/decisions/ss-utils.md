@@ -388,6 +388,18 @@ which the function is never told, so a translucent color is measured as though i
 **The ratio itself is not exported.** `toLuminance` and `toContrastRatio` are module-private, because what was
 asked for was one function.
 
+### `Color.getLuminance` and `Color.getPerceivedLightness`: two numbers a palette is tuned by
+
+Asked for by the user, while tuning a game's palette: next to each shade's contrast against white and black they
+wanted how light it looks. **Both reuse the luminance `getContrastRatio` already computed privately**, so the three
+can never disagree. `getLuminance` is WCAG's relative luminance, `0`–`1`, linear in light; `getPerceivedLightness`
+is CIE L*, `0`–`100`, spaced so equal steps look equal, and it is the one to tune by — a mid gray is about a fifth
+of the way along luminance and about half along lightness.
+
+**The luminance keeps WCAG's own `0.03928` threshold** for leaving the linear segment, not sRGB's `0.04045`: the two
+differ only for channel values of about 10 or 11 out of 255, by far less than any rounding a palette sees, and
+keeping one formula means lightness, luminance and contrast all come from the same numbers.
+
 ### `CSSUtils.toAnimationStyle`: what a frame costs, and the three rules that came of measuring it
 
 The stress tests of `CellAnimation`, `ScanlineAnimation`, `ParticleSpawner`, `ParticleField` and `ParticleDissolve` were profiled in headless Chromium, which draws in software: a production build, each test running with no pause between passes, the median of three runs, and every candidate fix tried as a probe on a copy of the library before any was built. **The user's rule for these: any improvement is taken unless it makes the code unreadable or unmaintainable.** The user took three rules from it, and chose to put the first two in the builder rather than in `assignAnimationProps`: which CSS property carries a value is the builder's question, and answering it in the writer would have left two answers. **Unverified in a GPU window**, which is where a rendering change has to be seen.

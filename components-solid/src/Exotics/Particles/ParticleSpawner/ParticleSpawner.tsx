@@ -106,7 +106,11 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
         return tint;
     };
 
-    const getCanSpawn = () => !!getRootRef() && getIsWindowVisible() && getTargets().length > 0;
+    const getCanSpawn = () =>
+        !!getRootRef() &&
+        getIsWindowVisible() &&
+        getTargets().length > 0 &&
+        SliceRendererUtils.getIsSettled(getPicture());
 
     const measureFrame = (): ParticleSpawnerFrame => {
         const rootRef = getRootRef();

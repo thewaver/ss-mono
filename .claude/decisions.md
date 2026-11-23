@@ -183,6 +183,7 @@ several — **and its heading is added here in the same edit.**
 - `ss-utils`: the arguments behind the utilities, which their own documentation does not carry
 - `Color`: `colord` reads and recognises, and does nothing else
 - `Color.getContrastingColor`: the hue and saturation are kept and the lightness is solved for
+- `Color.getLuminance` and `Color.getPerceivedLightness`: two numbers a palette is tuned by
 - `CSSUtils.toAnimationStyle`: what a frame costs, and the three rules that came of measuring it
 - `JSXTextParserUtils`: an inherited style is weighed against where the text lands, not against its own parent
 - `JSXTextParserUtils`: the space a wrapped line ends on hangs, as a piece of its own that takes no room
@@ -808,6 +809,7 @@ several — **and its heading is added here in the same edit.**
 - The scanline page stays a gallery of effects
 - The 0..1 guarantee belongs to `computeSliceWeights`, not to each formula
 - Particle and cell layers are contained, and never clipped
+- A run's clock waits until there is something to draw
 
 **[`SliceAnimationPlayback.md`](decisions/SliceAnimationPlayback.md)**
 

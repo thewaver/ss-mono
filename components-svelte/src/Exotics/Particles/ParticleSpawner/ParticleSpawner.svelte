@@ -99,7 +99,9 @@
 
     const getItem = SliceRendererSvelteUtils.createItem(() => canvas ?? undefined, getIsAvailable);
 
-    const canSpawn = $derived(!!root && isWindowVisible && props.targets.length > 0);
+    const canSpawn = $derived(
+        !!root && isWindowVisible && props.targets.length > 0 && SliceRendererUtils.getIsSettled(getPicture()),
+    );
 
     const getTint = (defs: ParticleTravelDefs) => {
         const cached = tints.get(defs.id);

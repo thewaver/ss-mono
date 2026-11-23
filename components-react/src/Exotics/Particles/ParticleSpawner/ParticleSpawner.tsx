@@ -92,7 +92,11 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
 
     const item = SliceRendererReactUtils.useItem(canvasRef, isAvailable);
 
-    const canSpawn = rootElement !== undefined && isWindowVisible && props.targets.length > 0;
+    const canSpawn =
+        rootElement !== undefined &&
+        isWindowVisible &&
+        props.targets.length > 0 &&
+        SliceRendererUtils.getIsSettled(picture);
 
     const latest = useLatest({
         props,

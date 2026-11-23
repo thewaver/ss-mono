@@ -37,7 +37,8 @@ their keys (`circle_g_2`) predate the rule.
 **A value a platform reads under its own name keeps that spelling** — CSS values (`"fit-content"`, `"ease-in-out"`,
 including hand-computed easings that are the CSS curves), SVG attribute values (`"userSpaceOnUse"`,
 `"fractalNoise"`) and `Intl` calendar ids (`"islamic-umalqura"`). **Identifiers are not values** and stay camelCase:
-property names, function names, and the Playground's `data-testid` keys (`selectAll`).
+property names, function names, and the Playground's `data-testid` keys (`selectAll`). The one exception is a
+sample's family prefix, under _"A sample exported on its own carries its family as an upper-case prefix"_.
 
 ### "Outline" means the focus indicator; paint along an edge is a "stroke", and the edge itself is a "contour"
 
@@ -184,6 +185,24 @@ The user's rules for `components/src` and `playground/src`:
 namespace sharing its name in the same file (`point2d.ts` holds `Point2d`, `Point2dString` and `Point2dUtils`), and
 `Color` and `ShapeConst` as they are. A file in `components/src` or `playground/src` holding more than one
 namespace is a question to ask before merging.
+
+### A sample exported on its own carries its family as an upper-case prefix
+
+The user's rule. A sample a consumer picks one of — a weight function, an origin, a keyframe sample — is exported
+under its own name rather than inside a namespace, because a namespace ships whole. Measured with a stand-in built
+the way `components` is built: the library's `export * as` becomes an object assembled at run time, and a consumer
+using one of forty functions kept all forty (2,625 against 707 bytes). A consumer's own `import * as` shakes down
+cleanly, but then each consumer picks the name and nothing keeps it consistent.
+
+**So the family goes into the name, in a different case from the member**: `WEIGHT_FN_lineDiagonalUp`. The case
+change marks where the family ends and the member begins, the way a namespace's dot would; a camelCase prefix
+(`weightLineDiagonalUp`) runs into the name and loses the boundary. It is a deliberate exception to "identifiers stay
+camelCase", taken because the prefix's whole job is to look separate.
+
+**Not applied yet.** The existing samples (`lineDiagonalUp` and the rest) predate the rule, and renaming them breaks
+every consumer. The user takes that on when they next work on the library, so no session renames them unasked; until
+then the existing names stand. Only the weights' prefix was named; the prefix for each other family is settled at
+the rename.
 
 ### Documentation blocks
 
