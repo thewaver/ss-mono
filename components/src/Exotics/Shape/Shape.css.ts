@@ -2,6 +2,7 @@ import { style } from "@vanilla-extract/css";
 
 export const shapeRoot = style({
     position: "relative",
+    isolation: "isolate",
     pointerEvents: "visiblePainted",
 });
 

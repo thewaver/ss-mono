@@ -16,6 +16,8 @@ export const skinSizeVars = {
     progressTrackThickness: createVar(),
     progressTipWidth: createVar(),
     progressTipHeight: createVar(),
+    splitPaneGripWidth: createVar(),
+    splitPaneGripHeight: createVar(),
 };
 
 export const skinColorVars = {

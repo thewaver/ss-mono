@@ -35,6 +35,12 @@ Part of the decisions record. Every heading is indexed in `.claude/decisions.md`
   maps one onto the other.
 - **Border-image `space` follows the spec, not Chromium**: the spec drops partial tiles and spreads the gaps evenly,
   and Chromium draws partial tiles at both ends of each edge, so that one mode does not match the browser.
+- **`backdrop-filter` is passed through, not converted** — the user's request, so a Skin's frosted tooltip reaches
+  `Shape`. SVG has no way to read what lies behind it, so the converter hands the value back as written and the
+  consumer draws a layer beside the `Shape` wearing it, cut to the contour `onContourChange` reports (see `Shape.md`).
+  Filter Effects 2, §2.1: the filtered backdrop gets the element's own clips and opacity. Any ancestor that is a
+  Backdrop Root (`opacity` below 1, `filter`, `mask`, `clip-path`, `backdrop-filter`, `mix-blend-mode`) cuts off what
+  the layer can see, so a fade must run on the layer and the `Shape` separately, never on a box around both.
 - **Sides of different colors are one ring per color, each clipped** to the wedges between the box's corner-to-inner-corner
   seams, using `SVGDefs.clipPath`. `SVGClipPath` reads fractions of the box, so the polygons are fractions.
 

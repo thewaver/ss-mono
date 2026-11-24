@@ -17,6 +17,7 @@ const NOTHING_CONVERTED: Converted = {
     strokeGeom: [],
     joinRadii: [],
     lameExponents: [],
+    backdropFilter: undefined,
 };
 
 export const FromCssExample = (props: Props) => {

@@ -160,7 +160,8 @@ export const skinDropZoneSample = style([
         flexDirection: "column",
         alignItems: "center",
         gap: themeVars.spacing.quarter,
-        padding: themeVars.spacing.half,
+        paddingBlock: themeVars.spacing.double,
+        paddingInline: themeVars.spacing.full,
         fontSize: themeVars.fontSize.small,
     },
 ]);

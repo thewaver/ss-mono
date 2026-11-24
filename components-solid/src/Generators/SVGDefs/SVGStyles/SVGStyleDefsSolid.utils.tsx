@@ -130,7 +130,8 @@ export namespace SVGStyleDefsSolidUtils {
      * @param size The size of the box being painted.
      * @param id Prefix for the gradient and clip ids, unique in the document.
      * @returns `fillDefs` and `strokeDefs` for `computeFillDefs` and `computeStrokeDefs`, plus `fillGeom`,
-     * `strokeGeom`, `joinRadii` and `lameExponents` for the props of those names.
+     * `strokeGeom`, `joinRadii` and `lameExponents` for the props of those names, and `backdropFilter`, the style's
+     * `backdrop-filter` for a layer drawn beside the shape and cut to the contour its `onContourChange` reports.
      */
     export const computeDefsFromStyle = (style: SVGStyleSource, size: Size2d, id: string) => {
         const defs = SVGStyleDefsUtils.computeDefsFromStyle(style, size, id);
@@ -142,6 +143,7 @@ export namespace SVGStyleDefsSolidUtils {
             strokeGeom: defs.strokeGeom,
             joinRadii: defs.joinRadii,
             lameExponents: defs.lameExponents,
+            backdropFilter: defs.backdropFilter,
         };
     };
 }

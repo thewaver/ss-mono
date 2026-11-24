@@ -775,6 +775,7 @@ several — **and its heading is added here in the same edit.**
 - `hectogon` is the near-circle, named for what it is
 - Every built-in shape with more than three corners has a `_star` version
 - `Shape`: the contour is also the float area
+- `Shape`: a blur behind it is drawn beside it, from `onContourChange`
 - `Shape`: a morph is the consumer's signal read inside `computePoints`
 
 **[`ShapeReveal.md`](decisions/ShapeReveal.md)**

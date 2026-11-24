@@ -40,7 +40,21 @@ export namespace SkinBaseUtils {
             color: `rgb(from ${level.contrast} r g b / 50%)`,
         },
         divider: {
-            borderColor: `rgb(from ${level.contrast} r g b / 25%)`,
+            borderColor: `rgb(from ${level.contrast} r g b / 10%)`,
+        },
+        dropZone: {
+            border: [`2px dashed ${level.contrast}`, `2px dashed rgb(from ${level.contrast} r g b / 25%)`],
+            selectors: ObjectUtils.deepMerge(INTERACTIBLE_STATES, {
+                [skinSelectors.isCarrying]: {
+                    borderColor: [level.contrast, `rgb(from ${level.contrast} r g b / 50%)`],
+                },
+                [skinSelectors.isReceiving]: {
+                    borderColor: themeVars.color.primary.main,
+                },
+                [SkinUtils.anyOf(skinSelectors.hasErrorWithin, skinSelectors.hasError)]: {
+                    borderColor: themeVars.color.error.main,
+                },
+            }),
         },
         grip: {
             color: `rgb(from ${level.contrast} r g b / 50%)`,
@@ -60,8 +74,8 @@ export namespace SkinBaseUtils {
             },
         },
         itemGroup: {
-            borderColor: `rgb(from ${level.contrast} r g b / 15%)`,
-            backgroundColor: `rgb(from ${level.contrast} r g b / 5%)`,
+            borderColor: `rgb(from ${level.contrast} r g b / 25%)`,
+            backgroundColor: `rgb(from ${level.contrast} r g b / 10%)`,
         },
         itemGroupLabel: {
             color: `rgb(from ${level.contrast} r g b / 50%)`,
@@ -103,16 +117,11 @@ export namespace SkinBaseUtils {
                 },
             },
         },
-        splitPaneFrame: {
-            border: `1px solid rgb(from ${level.contrast} r g b / 25%)`,
-            backgroundColor: `rgb(from ${level.contrast} r g b / 10%)`,
-        },
         splitPaneGrip: {
             borderRadius: themeVars.borderRadius.half,
             color: `rgb(from ${level.contrast} r g b / 50%)`,
         },
         splitPaneGutter: {
-            borderRadius: themeVars.borderRadius.half,
             selectors: {
                 [skinSelectors.isActive]: {
                     backgroundColor: themeVars.color.primary.main,

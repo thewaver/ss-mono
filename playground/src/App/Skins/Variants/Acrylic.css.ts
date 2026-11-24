@@ -204,21 +204,7 @@ SkinUtils.define(
         dropdown: {
             ...INPUT_SHELL,
             backdropFilter: "blur(20px)",
-        },
-        dropZone: {
-            border: [`2px dashed ${LEVEL.contrast}`, `2px dashed rgb(from ${LEVEL.contrast} r g b / 25%)`],
-            selectors: ObjectUtils.deepMerge(INPUT_STATES, {
-                [skinSelectors.isCarrying]: {
-                    borderColor: [LEVEL.contrast, `rgb(from ${LEVEL.contrast} r g b / 50%)`],
-                },
-                [skinSelectors.isReceiving]: {
-                    borderColor: themeVars.color.primary.main,
-                    backgroundColor: [
-                        themeVars.color.primary.main,
-                        `rgb(from ${themeVars.color.primary.main} r g b / 10%)`,
-                    ],
-                },
-            }),
+            boxShadow: SHADOW_MEDIUM,
         },
         input: {
             ...INPUT_SHELL,
@@ -343,6 +329,9 @@ SkinUtils.define(
             boxShadow: SHADOW_SMALL,
             fontWeight: "bold",
         },
+        splitPaneFrame: {
+            border: `2px dashed rgb(from ${LEVEL.contrast} r g b / 25%)`,
+        },
         surface: {
             ...surface(LEVEL),
         },
@@ -418,9 +407,10 @@ SkinUtils.define(
             borderRadius: SkinUtils.PILL_RADIUS,
         },
         tooltip: {
-            border: [`2px solid ${LEVEL.contrast}`, `2px solid rgb(from ${LEVEL.contrast} r g b / 25%)`],
-            backgroundColor: LEVEL.main,
-            boxShadow: SHADOW_SMALL,
+            backgroundImage: `linear-gradient(to bottom, rgb(from ${LEVEL.dark} r g b / 50%), rgb(from ${LEVEL.light} r g b / 25%))`,
+            boxShadow: SHADOW_MEDIUM,
+            backdropFilter: "blur(20px)",
+            backgroundOrigin: "border-box",
             color: LEVEL.contrast,
         },
     }),

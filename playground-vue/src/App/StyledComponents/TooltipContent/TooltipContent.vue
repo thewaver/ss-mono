@@ -6,6 +6,7 @@ import {
     getTooltipHasArrow,
 } from "@thewaver/ss-playground/App/StyledComponents/TooltipContent/TooltipContent.utils";
 import type { Size2d } from "@thewaver/ss-utils";
+import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import PageLayer from "../../PageComponents/Layer/Layer.vue";
 import type { TooltipContentProps } from "./TooltipContent.types";
@@ -20,11 +21,11 @@ const computeGeometry = (size: Size2d, bodyStyle: TooltipBodyStyle | undefined) 
 <template>
     <div
         :class="[
-            styles.tooltipVisibility,
+            styles.tooltipReveal,
             styles.tooltipRevealVariants[reveal ?? 'fade'],
             visibilityTarget === 1 && styles.isVisible,
         ]"
-        :style="{ transitionDuration: `${transitionDurationMs}ms` }"
+        :style="assignInlineVars({ [styles.tooltipRevealDuration]: `${transitionDurationMs}ms` })"
     >
         <TooltipSurface :has-arrow="getTooltipHasArrow(arrow)" :compute-geometry="computeGeometry">
             <div :class="[styles.tooltipBody, isWide && styles.tooltipBodyWide]">

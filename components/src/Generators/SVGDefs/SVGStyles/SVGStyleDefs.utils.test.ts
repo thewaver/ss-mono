@@ -42,6 +42,29 @@ describe("SVGStyleDefsUtils.computeDefsFromStyle", () => {
         expect(warn.mock.calls.some(([message]) => String(message).includes("conic-gradient"))).toBe(true);
     });
 
+    it("hands back a backdrop filter as written, and none when the style sets none", () => {
+        const computeBackdrop = (backdropFilter: string) =>
+            SVGStyleDefsUtils.computeDefsFromStyle(styleWith({ backdropFilter }), { width: 100, height: 50 }, "test")
+                .backdropFilter;
+
+        expect(computeBackdrop("blur(20px)")).toBe("blur(20px)");
+        expect(computeBackdrop("none")).toBeUndefined();
+    });
+
+    it("reads a gradient whose colors the browser reports as color(srgb …), as it does relative colors", () => {
+        const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+        const computeFills = (backgroundImage: string) =>
+            SVGStyleDefsUtils.computeDefsFromStyle(styleWith({ backgroundImage }), { width: 100, height: 50 }, "test")
+                .fill;
+
+        const fromSrgb = computeFills("linear-gradient(color(srgb 0.2 0.4 0.6 / 0.5), color(srgb 1 0.8 0 / 0.25))");
+        const fromRgb = computeFills("linear-gradient(rgba(51, 102, 153, 0.5), rgba(255, 204, 0, 0.25))");
+
+        expect(warn.mock.calls.some(([message]) => String(message).includes("background-image"))).toBe(false);
+        expect(fromSrgb.length).toBeGreaterThan(0);
+        expect(JSON.stringify(fromSrgb)).toBe(JSON.stringify(fromRgb));
+    });
+
     it("keeps a gradient listed after an image whose quoted address holds a parenthesis", () => {
         const gradient = "linear-gradient(rgb(255, 0, 0), rgb(0, 0, 255))";
         const computeFills = (backgroundImage: string) =>

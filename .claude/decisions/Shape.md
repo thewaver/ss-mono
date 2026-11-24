@@ -71,6 +71,15 @@ ruled out library-wide.
 
 **Shape writes `shape-outside: polygon(…) border-box` on its root, from the same outer contour the fill is drawn along.** A consumer who floats the Shape gets text wrapping to the painted edge and has nothing else to compute. The property does nothing on an element that is not floated, so every other Shape user, `GlassSurface` included, is unaffected. `border-box` is chosen over the default `margin-box` because the points are measured in the root's own box: a margin on the root would otherwise shift the contour off the paint. `shape-margin` is left to the consumer, since how far text keeps clear is paint. Fewer than three points writes nothing. MDN checked: it applies to floats only, accepts a shape followed by a box keyword, and has been Baseline widely available since January 2020.
 
+### `Shape`: a blur behind it is drawn beside it, from `onContourChange`
+
+**`Shape` draws no `backdrop-filter` of its own** — the user's call, after a first version put the blurred layer
+inside it, which made `Shape` specific to one use and put the layer inside whatever box the consumer fades, where a
+fade blinds it. Instead `onContourChange` reports `{ size, path, points }` whenever the outer contour changes, and the
+consumer draws the layer as a sibling, cut with `clip-path: path(…)`. **An event with values, not getters, and not
+read out of `renderChildren`**: in React, Vue and Svelte `renderChildren` runs on every render, so storing from it
+would write state during a render. `PageTooltipSurface` is the example.
+
 ### `Shape`: a morph is the consumer's signal read inside `computePoints`
 
 **No morph prop exists; the Playground example is the whole feature.** `computePoints` already runs inside the memo that builds the contour, so a signal it reads re-runs the contour, and `joinRadii` and `lameExponents` are accessors blended the same way. The two point sets must be the same length, since blending pairs one point with one point. `Point2dUtils.lerp` is the per-pair step, in ss-utils beside `MathUtils.lerp`. Under reduced motion the example jumps straight to the other shape. It also rounds its value to 1/64 steps, because `ShapeUtils.getPaths` keeps every result forever: a smooth value would add one entry per frame on every press, while a stepped one reuses the same 65 contours.

@@ -95,7 +95,7 @@ const ITEM: StyleRule = {
 
 const ITEM_FLOATER_HOVER: StyleRule = {
     backgroundColor: [LEVEL.contrast, `rgb(from ${LEVEL.contrast} r g b / 10%)`],
-    boxShadow: lightGlow(LEVEL.contrast, 25),
+    boxShadow: lightGlow(LEVEL.contrast, 10),
 };
 
 const ITEM_FLOATER_SELECTED: StyleRule = {
@@ -197,26 +197,6 @@ SkinUtils.define(
         dropdown: {
             ...INPUT_SHELL,
             backdropFilter: "blur(20px)",
-        },
-        dropZone: {
-            border: [`2px dashed ${LEVEL.contrast}`, `2px dashed rgb(from ${LEVEL.contrast} r g b / 25%)`],
-            selectors: ObjectUtils.deepMerge(INPUT_STATES, {
-                [SkinUtils.anyOf(skinSelectors.hasErrorWithin, skinSelectors.hasError)]: {
-                    border: "2px solid white",
-                },
-                [skinSelectors.isCarrying]: {
-                    border: "2px solid white",
-                    boxShadow: lightGlow(LEVEL.contrast, 25),
-                },
-                [skinSelectors.isReceiving]: {
-                    border: "2px solid white",
-                    boxShadow: lightGlow(themeVars.color.primary.main, 100),
-                    backgroundColor: [
-                        themeVars.color.primary.main,
-                        `rgb(from ${themeVars.color.primary.main} r g b / 10%)`,
-                    ],
-                },
-            }),
         },
         input: {
             ...INPUT_SHELL,
@@ -340,6 +320,9 @@ SkinUtils.define(
             boxShadow: darkGlow(LEVEL.main, 50),
             fontWeight: "bold",
         },
+        splitPaneFrame: {
+            border: `2px dashed rgb(from ${LEVEL.contrast} r g b / 25%)`,
+        },
         surface: {
             ...surface(LEVEL),
         },
@@ -397,8 +380,9 @@ SkinUtils.define(
             },
         },
         tooltip: {
-            backgroundColor: LEVEL.main,
-            boxShadow: lightGlow(LEVEL.contrast, 25),
+            backgroundColor: [LEVEL.main, `rgb(from ${LEVEL.main} r g b / 50%)`],
+            boxShadow: darkGlow(LEVEL.main, 50),
+            backdropFilter: "blur(20px)",
             color: LEVEL.contrast,
         },
     }),

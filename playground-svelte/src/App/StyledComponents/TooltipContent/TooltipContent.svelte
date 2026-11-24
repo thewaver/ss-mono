@@ -1,11 +1,13 @@
 <script lang="ts">
     import type { Snippet } from "svelte";
 
+    import { toStyle } from "@thewaver/ss-components-svelte";
     import * as styles from "@thewaver/ss-playground/App/StyledComponents/TooltipContent/TooltipContent.css";
     import {
         computeTooltipGeometry,
         getTooltipHasArrow,
     } from "@thewaver/ss-playground/App/StyledComponents/TooltipContent/TooltipContent.utils";
+    import { assignInlineVars } from "@vanilla-extract/dynamic";
 
     import PageLayer from "../../PageComponents/Layer/Layer.svelte";
     import type { TooltipContentProps } from "./TooltipContent.types";
@@ -16,11 +18,11 @@
 
 <div
     class={[
-        styles.tooltipVisibility,
+        styles.tooltipReveal,
         styles.tooltipRevealVariants[props.reveal ?? "fade"],
         props.visibilityTarget === 1 && styles.isVisible,
     ]}
-    style:transition-duration={`${props.transitionDurationMs}ms`}
+    style={toStyle(assignInlineVars({ [styles.tooltipRevealDuration]: `${props.transitionDurationMs}ms` }))}
 >
     <TooltipSurface
         hasArrow={getTooltipHasArrow(props.arrow)}

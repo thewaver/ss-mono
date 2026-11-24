@@ -200,7 +200,10 @@ planned for.
   field: under `skinSelectors.isInlineAtRest` (inline and not hovered) each Skin removes its field paint, so the
   value reads as plain text, and the hint — hover or keyboard focus, sent as `isHovered` — shows the Skin's full
   field, previewing the editor that opens. Every Skin starts on the same resting rule. **`SplitPane` has an entry per part** — the user's call: `splitPaneFrame` around everything, `splitPaneGutter` between
-  the panes (dragging is `isActive`) and `splitPaneGrip` on the gutter. **Each pane wears `panel`**, the user's call
+  the panes (dragging is `isActive`) and `splitPaneGrip` on the gutter. The grip's size is `skinVars.splitPaneGripWidth`
+  and `splitPaneGripHeight`, asked for by the user; like the range thumb's pair, the names describe the side-by-side
+  split's upright grip and swap for a stacked one. The gutter's thickness has no variable: it is the `gutterSize`
+  number the library lays out and drags with, and the page's knob owns it. **Each pane wears `panel`**, the user's call
   over a pane entry of SplitPane's own, so a pane looks like every other box of content in its Skin. The frame starts on the old 25% border and 10% background and no rounding: `SplitPane` hands the frame's corners
   to the panes at its ends and clips them there, so a rounded frame in the base rounded every square Skin's panes.
   The Skins that round their panels (Flat, Glossy, Shaded, Tek) round the frame themselves. The comparison example's

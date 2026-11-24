@@ -12,6 +12,25 @@ import { TooltipKnobs } from "../../Knobs/Tooltips.const";
 import { DEFAULT_TOOLTIP_ARROW, TOOLTIP_ARROW_TEMPLATES, type TooltipArrow } from "./TooltipContent.const";
 import type { TooltipBodyStyle } from "./TooltipContent.types";
 
+const PATH_NUMBER_PATTERN = /-?\d*\.?\d+(?:e[+-]?\d+)?/gi;
+
+export const computeTooltipBackdropBox = (contourPath: string) => {
+    const numbers = (contourPath.match(PATH_NUMBER_PATTERN) ?? []).map(Number);
+    const xs = numbers.filter((_, index) => index % 2 === 0);
+    const ys = numbers.filter((_, index) => index % 2 === 1);
+
+    if (ys.length === 0) return undefined;
+
+    const left = Math.min(...xs);
+    const top = Math.min(...ys);
+    let index = 0;
+    const path = contourPath.replace(PATH_NUMBER_PATTERN, (number) =>
+        String(Number(number) - (index++ % 2 === 0 ? left : top)),
+    );
+
+    return { left, top, width: Math.max(...xs) - left, height: Math.max(...ys) - top, path };
+};
+
 export const getTooltipHasArrow = (arrow: TooltipArrow | undefined) => (arrow ?? DEFAULT_TOOLTIP_ARROW) !== "none";
 
 export const toTooltipBodyStyle = (

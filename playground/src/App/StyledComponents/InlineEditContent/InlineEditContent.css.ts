@@ -26,7 +26,6 @@ export const inlineEditContent = style([
         width: FIELD_WIDTH,
         height: FIELD_HEIGHT,
         paddingInline: FIELD_PADDING - FIELD_BORDER,
-        borderRadius: themeVars.borderRadius.half,
         fontSize: FIELD_FONT_SIZE,
         textAlign: "start",
         cursor: "text",

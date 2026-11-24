@@ -42,6 +42,9 @@ const WARNING_PREFIX = "SVGStyleDefsUtils skipped";
 const SHADOW_REACH_DEVIATIONS = 3;
 
 const RGBA_PATTERN = /^rgba?\(\s*([\d.]+)[\s,]+([\d.]+)[\s,]+([\d.]+)(?:[\s,/]+([\d.]+)(%)?)?\s*\)$/i;
+const SRGB_PATTERN =
+    /^color\(\s*srgb\s+(-?[\d.]+(?:e[+-]?\d+)?%?)\s+(-?[\d.]+(?:e[+-]?\d+)?%?)\s+(-?[\d.]+(?:e[+-]?\d+)?%?)(?:\s*\/\s*([\d.]+)(%)?)?\s*\)$/i;
+const SRGB_CHANNEL_MAX = 255;
 const LENGTH_PATTERN = /^(-?[\d.]+(?:e[+-]?\d+)?)(%|px)$/i;
 const ANGLE_PATTERN = /^(-?[\d.]+(?:e[+-]?\d+)?)(deg|grad|rad|turn)$/i;
 const GRADIENT_PATTERN = /^(repeating-)?(linear|radial)-gradient\((.*)\)$/is;
@@ -68,6 +71,7 @@ const AXIS_REPEATS = ["repeat", "no-repeat", "space", "round"];
 const BORDER_IMAGE_REPEATS = ["stretch", "repeat", "round", "space"];
 const BOX_KINDS = ["border-box", "padding-box", "content-box"];
 const PAINTLESS_BORDER_STYLES = ["none", "hidden"];
+const PAINTLESS_BACKDROP_FILTERS = ["none", ""];
 const SIDE_ANGLES: Record<string, number> = { top: 0, right: 90, bottom: 180, left: 270 };
 const HORIZONTAL_SIGNS: Record<string, number> = { left: -1, right: 1 };
 const VERTICAL_SIGNS: Record<string, number> = { top: -1, bottom: 1 };
@@ -124,14 +128,28 @@ const readLayerValue = (value: string, layerIndex: number) => {
     return list[layerIndex % list.length] ?? "";
 };
 
+const parseAlpha = (value: string | undefined, percent: string | undefined) =>
+    value === undefined ? 1 : Number(value) / (percent ? PERCENT : 1);
+
+const parseSrgbChannel = (value: string) =>
+    value.endsWith("%") ? (Number(value.slice(0, -1)) * SRGB_CHANNEL_MAX) / PERCENT : Number(value) * SRGB_CHANNEL_MAX;
+
 const parseRgba = (text: string): Rgba | undefined => {
     const match = RGBA_PATTERN.exec(text);
 
-    if (!match) return undefined;
+    if (match)
+        return { r: Number(match[1]), g: Number(match[2]), b: Number(match[3]), a: parseAlpha(match[4], match[5]) };
 
-    const alpha = match[4] === undefined ? 1 : Number(match[4]) / (match[5] ? PERCENT : 1);
+    const srgbMatch = SRGB_PATTERN.exec(text);
 
-    return { r: Number(match[1]), g: Number(match[2]), b: Number(match[3]), a: alpha };
+    if (!srgbMatch) return undefined;
+
+    return {
+        r: parseSrgbChannel(srgbMatch[1]),
+        g: parseSrgbChannel(srgbMatch[2]),
+        b: parseSrgbChannel(srgbMatch[3]),
+        a: parseAlpha(srgbMatch[4], srgbMatch[5]),
+    };
 };
 
 const printRgba = (color: Rgba) => `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`;
@@ -1134,8 +1152,11 @@ export namespace SVGStyleDefsUtils {
      * becomes the stroke, with its per-side widths in `strokeGeom`: one paint for one color, or one clipped paint per
      * color when the sides differ; a border image takes its place. Whatever SVG paint cannot reproduce is left out and
      * reported with `console.warn` in development, once per call: conic gradients, images, fixed or blended layers,
-     * `background-clip: text`, gradients interpolated in another color space or holding colors other than `rgb()`,
-     * color hints and patterned borders. Other CSS properties are not read.
+     * `background-clip: text`, gradients interpolated in another color space or holding colors other than `rgb()` and
+     * `color(srgb …)` (the form a browser reports for relative colors such as `rgb(from … r g b / 50%)`), color hints
+     * and patterned borders. A `backdrop-filter` cannot be drawn in SVG, so it is handed back as written, in
+     * `backdropFilter`, for a layer beside the `Shape` cut to the contour its `onContourChange` reports. Other CSS
+     * properties are not read.
      *
      * @param style The computed style, as `getComputedStyle` returns it.
      * @param size The size of the box being painted, which must be the box the style was computed for. With no width
@@ -1144,11 +1165,23 @@ export namespace SVGStyleDefsUtils {
      * @returns The `fill` paints and their `fillGeom`, the `stroke` paints, plus `strokeGeom` and `joinRadii`, whose entries run top, right, bottom,
      * left and from the top-left corner clockwise, for a contour wound clockwise from its top-left corner. Each
      * `joinRadii` entry is a pair, `lameExponents` holds each corner's shape, and a stroke paint's `clip` holds the
-     * areas it may paint, as fractions of the box.
+     * areas it may paint, as fractions of the box. `backdropFilter` is `undefined` when the style sets none.
      */
     export const computeDefsFromStyle = (style: SVGStyleSource, size: Size2d, id: string): SVGStyleDefs => {
+        const backdropFilter = PAINTLESS_BACKDROP_FILTERS.includes(style.backdropFilter)
+            ? undefined
+            : style.backdropFilter;
+
         if (size.width <= 0 || size.height <= 0) {
-            return { fill: [], fillGeom: [], stroke: [], strokeGeom: [], joinRadii: [], lameExponents: [] };
+            return {
+                fill: [],
+                fillGeom: [],
+                stroke: [],
+                strokeGeom: [],
+                joinRadii: [],
+                lameExponents: [],
+                backdropFilter,
+            };
         }
 
         const borders = {
@@ -1181,6 +1214,7 @@ export namespace SVGStyleDefsUtils {
             ...computeStrokeParts(style, size, id, borders),
             joinRadii,
             lameExponents,
+            backdropFilter,
         };
     };
 }

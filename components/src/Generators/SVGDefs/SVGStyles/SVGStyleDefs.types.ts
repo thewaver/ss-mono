@@ -5,6 +5,7 @@ import type { SVGLinearGradientDefs, SVGRadialGradientDefs } from "../SVGGradien
 
 export type SVGStyleSource = Pick<
     CSSStyleDeclaration,
+    | "backdropFilter"
     | "backgroundAttachment"
     | "backgroundBlendMode"
     | "backgroundClip"
@@ -89,4 +90,5 @@ export type SVGStyleDefs = {
     strokeGeom: ShapeStrokeGeom[];
     joinRadii: ShapeJoinRadius[];
     lameExponents: number[];
+    backdropFilter: string | undefined;
 };

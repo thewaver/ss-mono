@@ -1,6 +1,6 @@
-import { Fragment, type SlotsType, defineComponent, shallowRef } from "vue";
+import { Fragment, type SlotsType, defineComponent, onMounted, onUpdated, shallowRef } from "vue";
 
-import { ElementObserverUtils, ShapeLayerUtils, ShapeStyles } from "@thewaver/ss-components";
+import { ElementObserverUtils, type ShapeContour, ShapeLayerUtils, ShapeStyles } from "@thewaver/ss-components";
 import { ShapeConst } from "@thewaver/ss-components/internal";
 
 import type { SVGDefs } from "../../Generators/SVGDefs/SVGDefs.types";
@@ -50,6 +50,28 @@ export const Shape = defineComponent(
         const rootRef = shallowRef<HTMLDivElement>();
         const rootSize = shallowRef(ShapeConst.INITIAL_SIZE);
 
+        let renderedContour: ShapeContour | undefined;
+        let reportedContour: ShapeContour | undefined;
+
+        const reportContour = () => {
+            const contour = renderedContour;
+
+            if (!props.onContourChange || !contour) return;
+
+            const isSame =
+                reportedContour?.path === contour.path &&
+                reportedContour.size.width === contour.size.width &&
+                reportedContour.size.height === contour.size.height;
+
+            if (isSame) return;
+
+            reportedContour = contour;
+            props.onContourChange(contour);
+        };
+
+        onMounted(reportContour);
+        onUpdated(reportContour);
+
         watchAfterRender([rootRef], ([root]) => {
             if (!root) return;
 
@@ -94,6 +116,8 @@ export const Shape = defineComponent(
                     }
                 );
             });
+
+            renderedContour = { size, path: paths[0].outerPath, points: paths[0].outerPoints };
 
             const viewBox = `0 0 ${size.width} ${size.height}`;
 
@@ -172,6 +196,7 @@ export const Shape = defineComponent(
             strokeGeom: null,
             fillGeom: null,
             computePoints: null,
+            onContourChange: null,
             computeStrokeDefs: null,
             computeFillDefs: null,
         }),

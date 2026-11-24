@@ -6,6 +6,7 @@ import {
     computeTooltipGeometry,
     getTooltipHasArrow,
 } from "@thewaver/ss-playground/App/StyledComponents/TooltipContent/TooltipContent.utils";
+import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { PageLayer } from "../../PageComponents/Layer/Layer";
 import type { TooltipContentProps } from "./TooltipContent.types";
@@ -13,9 +14,9 @@ import { PageTooltipSurface } from "./TooltipSurface";
 
 export const PageTooltipContent = (props: ParentProps<TooltipContentProps>) => (
     <div
-        class={[styles.tooltipVisibility, styles.tooltipRevealVariants[access(props.reveal) ?? "fade"]].join(" ")}
+        class={[styles.tooltipReveal, styles.tooltipRevealVariants[access(props.reveal) ?? "fade"]].join(" ")}
         classList={{ [styles.isVisible]: access(props.visibilityTarget) === 1 }}
-        style={{ "transition-duration": `${access(props.transitionDurationMs)}ms` }}
+        style={assignInlineVars({ [styles.tooltipRevealDuration]: `${access(props.transitionDurationMs)}ms` })}
     >
         <PageTooltipSurface
             hasArrow={() => getTooltipHasArrow(access(props.arrow))}

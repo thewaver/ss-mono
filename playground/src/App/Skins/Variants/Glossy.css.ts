@@ -219,21 +219,6 @@ SkinUtils.define(
             ...INPUT_SHELL,
             backdropFilter: "blur(20px)",
         },
-        dropZone: {
-            border: [`2px dashed ${LEVEL.contrast}`, `2px dashed rgb(from ${LEVEL.contrast} r g b / 25%)`],
-            selectors: ObjectUtils.deepMerge(INPUT_STATES, {
-                [skinSelectors.isCarrying]: {
-                    borderColor: [LEVEL.contrast, `rgb(from ${LEVEL.contrast} r g b / 50%)`],
-                },
-                [skinSelectors.isReceiving]: {
-                    borderColor: themeVars.color.primary.main,
-                    backgroundColor: [
-                        themeVars.color.primary.main,
-                        `rgb(from ${themeVars.color.primary.main} r g b / 10%)`,
-                    ],
-                },
-            }),
-        },
         input: {
             ...INPUT_SHELL,
             selectors: ObjectUtils.deepMerge(INPUT_STATES, {
@@ -273,7 +258,6 @@ SkinUtils.define(
         panel: {
             ...gloss(LEVEL, { outterShadow: SHADOW_SMALL }),
             borderRadius: themeVars.borderRadius.full,
-            fontSize: themeVars.fontSize.medium,
         },
         progressFill: {
             ...gloss(themeVars.color.primary, { angle: skinVars.barAngle }),
@@ -363,6 +347,9 @@ SkinUtils.define(
         },
         splitPaneFrame: {
             borderRadius: themeVars.borderRadius.full,
+            backgroundColor: [LEVEL.dark, `rgb(from ${LEVEL.dark} r g b / 75%)`],
+            boxShadow: SHADOW_GROOVE,
+            color: LEVEL.contrast,
         },
         surface: {
             ...surface(LEVEL),
@@ -442,10 +429,9 @@ SkinUtils.define(
             },
         },
         tooltip: {
-            border: [`2px solid ${LEVEL.contrast}`, `2px solid rgb(from ${LEVEL.contrast} r g b / 25%)`],
-            backgroundColor: LEVEL.main,
-            boxShadow: SHADOW_SMALL,
-            color: LEVEL.contrast,
+            ...gloss(LEVEL, { outterShadow: SHADOW_MEDIUM }),
+            borderRadius: themeVars.borderRadius.full,
+            backgroundOrigin: "border-box",
         },
     }),
 );

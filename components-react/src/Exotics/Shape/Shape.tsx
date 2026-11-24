@@ -4,7 +4,7 @@ import { ElementObserverUtils, ShapeLayerUtils, ShapeStyles } from "@thewaver/ss
 import { ShapeConst } from "@thewaver/ss-components/internal";
 
 import type { SVGDefs } from "../../Generators/SVGDefs/SVGDefs.types";
-import { useElement } from "../../Utils/refUtils";
+import { useElement, useLatest } from "../../Utils/refUtils";
 import type { ShapeProps } from "./Shape.types";
 
 const renderDefsElements = (defs: SVGDefs[], fillClips?: ({ id: string; path: string; rule: string } | undefined)[]) =>
@@ -47,6 +47,7 @@ export const Shape = (props: ShapeProps) => {
     const rootRef = useRef<HTMLDivElement>(null);
     const rootElement = useElement(rootRef);
     const [rootSize, setRootSize] = useState(ShapeConst.INITIAL_SIZE);
+    const onContourChangeRef = useLatest(props.onContourChange);
 
     useLayoutEffect(() => {
         const root = rootRef.current;
@@ -90,6 +91,16 @@ export const Shape = (props: ShapeProps) => {
             }
         );
     });
+
+    const contourPath = paths[0].outerPath;
+    const contourPointsRef = useLatest(paths[0].outerPoints);
+    const hasContourListener = props.onContourChange !== undefined;
+
+    useLayoutEffect(() => {
+        if (!hasContourListener) return;
+
+        onContourChangeRef.current?.({ size: rootSize, path: contourPath, points: contourPointsRef.current });
+    }, [hasContourListener, rootSize, contourPath]);
 
     const viewBox = `0 0 ${rootSize.width} ${rootSize.height}`;
 

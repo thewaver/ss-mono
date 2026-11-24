@@ -3,6 +3,7 @@ import { type ParentProps, createMemo, createSignal, createUniqueId, onMount } f
 import { SVGStyleDefsSolidUtils, Shape, access } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/TooltipContent/TooltipContent.css";
 import {
+    computeTooltipBackdropBox,
     fitFillGeomToArrow,
     toTooltipBodyStyle,
 } from "@thewaver/ss-playground/App/StyledComponents/TooltipContent/TooltipContent.utils";
@@ -18,6 +19,10 @@ export const PageTooltipSurface = (props: ParentProps<TooltipSurfaceProps>) => {
     const getLayerClass = useNextLayerClass();
 
     const [getProbe, setProbe] = createSignal<HTMLElement>();
+    const [getContourPath, setContourPath] = createSignal("");
+    const [getBackdropFilter, setBackdropFilter] = createSignal<string>();
+
+    const getBackdropBox = createMemo(() => computeTooltipBackdropBox(getContourPath()));
 
     let probeElement: HTMLDivElement | undefined;
 
@@ -68,19 +73,40 @@ export const PageTooltipSurface = (props: ParentProps<TooltipSurfaceProps>) => {
         <div class={[styles.tooltipFrame, getLayerClass()].join(" ")}>
             <div ref={probeElement} class={styles.tooltipSkinProbe} aria-hidden="true" />
 
-            <Shape
-                computePoints={(size) => props.computeGeometry(size, toTooltipBodyStyle(convert(size)))}
-                fillGeom={() =>
-                    fitFillGeomToArrow(lastConversion?.converted.fillGeom ?? [], access(props.hasArrow) ?? false)
-                }
-                computeFillDefs={(getSize) => convert(getSize())?.fillDefs ?? []}
-                computeStrokeDefs={getHasBorder() ? (getSize) => convert(getSize())?.strokeDefs ?? [] : undefined}
-                renderChildren={() => (
-                    <div class={styles.tooltipText} style={{ color: getTextColor() }}>
-                        {props.children}
-                    </div>
-                )}
-            />
+            {getBackdropFilter() && getBackdropBox() && (
+                <div
+                    class={[styles.tooltipBackdrop, styles.tooltipFadePart].join(" ")}
+                    aria-hidden="true"
+                    style={{
+                        "backdrop-filter": getBackdropFilter(),
+                        "clip-path": `path("${getBackdropBox()?.path}")`,
+                        "left": `${getBackdropBox()?.left}px`,
+                        "top": `${getBackdropBox()?.top}px`,
+                        "width": `${getBackdropBox()?.width}px`,
+                        "height": `${getBackdropBox()?.height}px`,
+                    }}
+                />
+            )}
+
+            <div class={styles.tooltipFadePart}>
+                <Shape
+                    computePoints={(size) => props.computeGeometry(size, toTooltipBodyStyle(convert(size)))}
+                    fillGeom={() =>
+                        fitFillGeomToArrow(lastConversion?.converted.fillGeom ?? [], access(props.hasArrow) ?? false)
+                    }
+                    onContourChange={(contour) => {
+                        setContourPath(contour.path);
+                        setBackdropFilter(lastConversion?.converted.backdropFilter);
+                    }}
+                    computeFillDefs={(getSize) => convert(getSize())?.fillDefs ?? []}
+                    computeStrokeDefs={getHasBorder() ? (getSize) => convert(getSize())?.strokeDefs ?? [] : undefined}
+                    renderChildren={() => (
+                        <div class={styles.tooltipText} style={{ color: getTextColor() }}>
+                            {props.children}
+                        </div>
+                    )}
+                />
+            </div>
         </div>
     );
 };

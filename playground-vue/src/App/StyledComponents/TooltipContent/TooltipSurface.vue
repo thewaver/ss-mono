@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { computed, shallowRef, useId, watchPostEffect } from "vue";
 
-import { ElementObserverUtils } from "@thewaver/ss-components";
+import { ElementObserverUtils, type ShapeContour } from "@thewaver/ss-components";
 import { SVGStyleDefsVueUtils, Shape } from "@thewaver/ss-components-vue";
 import * as styles from "@thewaver/ss-playground/App/StyledComponents/TooltipContent/TooltipContent.css";
 import {
+    computeTooltipBackdropBox,
     fitFillGeomToArrow,
     toTooltipBodyStyle,
 } from "@thewaver/ss-playground/App/StyledComponents/TooltipContent/TooltipContent.utils";
@@ -19,6 +20,7 @@ const id = useId();
 const layerClass = useNextLayerClass();
 const probeRef = shallowRef<HTMLDivElement>();
 const probeSize = shallowRef<Size2d>({ width: 0, height: 0 });
+const contourPath = shallowRef("");
 
 watchPostEffect((onCleanup) => {
     const probe = probeRef.value;
@@ -47,6 +49,26 @@ const fillGeom = computed(() => fitFillGeomToArrow(skin.value?.converted.fillGeo
 
 const computePoints = (size: Size2d) => props.computeGeometry(size, toTooltipBodyStyle(skin.value?.converted));
 
+const backdropStyle = computed(() => {
+    const backdropFilter = skin.value?.converted.backdropFilter;
+    const box = computeTooltipBackdropBox(contourPath.value);
+
+    if (!backdropFilter || !box) return undefined;
+
+    return {
+        backdropFilter,
+        clipPath: `path("${box.path}")`,
+        left: `${box.left}px`,
+        top: `${box.top}px`,
+        width: `${box.width}px`,
+        height: `${box.height}px`,
+    };
+});
+
+const onContourChange = (contour: ShapeContour) => {
+    contourPath.value = contour.path;
+};
+
 const computeFillDefs = () => skin.value?.converted.fillDefs ?? [];
 
 const computeStrokeDefs = computed(() => {
@@ -60,15 +82,25 @@ const computeStrokeDefs = computed(() => {
     <div :class="[styles.tooltipFrame, layerClass]">
         <div ref="probeRef" :class="styles.tooltipSkinProbe" aria-hidden="true" />
 
-        <Shape
-            :compute-points="computePoints"
-            :fill-geom="fillGeom"
-            :compute-fill-defs="computeFillDefs"
-            :compute-stroke-defs="computeStrokeDefs"
-        >
-            <template #renderChildren>
-                <div :class="styles.tooltipText" :style="{ color: skin?.textColor }"><slot /></div>
-            </template>
-        </Shape>
+        <div
+            v-if="backdropStyle"
+            :class="[styles.tooltipBackdrop, styles.tooltipFadePart]"
+            aria-hidden="true"
+            :style="backdropStyle"
+        />
+
+        <div :class="styles.tooltipFadePart">
+            <Shape
+                :compute-points="computePoints"
+                :fill-geom="fillGeom"
+                :on-contour-change="onContourChange"
+                :compute-fill-defs="computeFillDefs"
+                :compute-stroke-defs="computeStrokeDefs"
+            >
+                <template #renderChildren>
+                    <div :class="styles.tooltipText" :style="{ color: skin?.textColor }"><slot /></div>
+                </template>
+            </Shape>
+        </div>
     </div>
 </template>

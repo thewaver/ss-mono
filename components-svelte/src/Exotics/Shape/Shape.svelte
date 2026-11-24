@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { untrack } from "svelte";
+
     import { ElementObserverUtils, ShapeLayerUtils, ShapeStyles as styles } from "@thewaver/ss-components";
     import { ShapeConst } from "@thewaver/ss-components/internal";
 
@@ -60,6 +62,18 @@
             );
         }),
     );
+
+    $effect(() => {
+        const onContourChange = props.onContourChange;
+
+        if (!onContourChange) return;
+
+        const size = rootSize;
+        const path = paths[0].outerPath;
+        const points = paths[0].outerPoints;
+
+        untrack(() => onContourChange({ size, path, points }));
+    });
 
     const viewBox = $derived(`0 0 ${rootSize.width} ${rootSize.height}`);
 </script>

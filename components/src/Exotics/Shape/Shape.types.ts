@@ -54,6 +54,15 @@ export type BaseShapeValues = {
     fillGeom?: (ShapeFillGeom | undefined)[];
 };
 
+export type ShapeContour = {
+    /** The size of the shape's box, in pixels. */
+    size: Size2d;
+    /** The outer contour as SVG path data in the box's own pixels, ready for `clip-path: path(…)`. */
+    path: string;
+    /** The corners the outer contour passes through, in the box's own pixels. */
+    points: Point2d[];
+};
+
 export type BaseShapeCbs = {
     /**
      * The corners of the contour, worked out from the element's size. It may instead return the corners together with
@@ -62,6 +71,11 @@ export type BaseShapeCbs = {
      * on the size is the only thing that knows which entry goes with which corner.
      */
     computePoints: (size: Size2d) => Point2d[] | ShapeGeometry;
+    /**
+     * Called with the shape's outer contour once it is first drawn and again whenever it changes, so something outside
+     * the shape can be cut to the same edge, such as a blurred layer beside it. Left out, nothing is reported.
+     */
+    onContourChange?: (contour: ShapeContour) => void;
 };
 
 export type BaseShapeProps = BaseShapeValues & BaseShapeCbs;

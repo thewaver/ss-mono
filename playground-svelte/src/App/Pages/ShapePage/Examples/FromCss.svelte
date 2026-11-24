@@ -16,6 +16,7 @@
         strokeGeom: [],
         joinRadii: [],
         lameExponents: [],
+        backdropFilter: undefined,
     };
 
     let props: Props = $props();

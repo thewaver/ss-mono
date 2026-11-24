@@ -1,4 +1,4 @@
-import { For, createMemo, createSignal, onCleanup, onMount } from "solid-js";
+import { For, createEffect, createMemo, createSignal, onCleanup, onMount, untrack } from "solid-js";
 
 import { ElementObserverUtils, ShapeLayerUtils, ShapeStyles as styles } from "@thewaver/ss-components";
 import { Size2d } from "@thewaver/ss-utils";
@@ -76,6 +76,17 @@ export const Shape = (props: ShapeProps) => {
             </clipPath>
         );
     };
+
+    createEffect(() => {
+        const onContourChange = props.onContourChange;
+
+        if (!onContourChange) return;
+
+        const size = getRootSize();
+        const paths = getPaths()[0];
+
+        untrack(() => onContourChange({ size, path: paths.outerPath, points: paths.outerPoints }));
+    });
 
     const getShapeOutside = createMemo(() => ShapeLayerUtils.computeShapeOutside(getPaths()[0].outerContour));
 

@@ -1,4 +1,4 @@
-import { spawn } from "node:child_process";
+import { execFileSync, spawn } from "node:child_process";
 import { readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -14,6 +14,33 @@ const MAC_SOUND = "/System/Library/Sounds/Glass.aiff";
 const MAC_VOLUME = "4";
 const WINDOWS_SOUND = "C:\\Windows\\Media\\Windows Notify System Generic.wav";
 const WINDOWS_TAIL_MS = 2000;
+const ACTIVE_WINDOW_MS = 60_000;
+const EDITOR_PROCESS_NAMES = new Set(["Code", "Code - Insiders"]);
+const ACTIVITY_PROBE = `
+Add-Type -TypeDefinition @'
+using System;
+using System.Runtime.InteropServices;
+public static class ClaudeNotifyProbe {
+    [StructLayout(LayoutKind.Sequential)] struct LastInputInfo { public uint cbSize; public uint dwTime; }
+    [DllImport("user32.dll")] static extern bool GetLastInputInfo(ref LastInputInfo info);
+    [DllImport("user32.dll")] static extern IntPtr GetForegroundWindow();
+    [DllImport("user32.dll")] static extern uint GetWindowThreadProcessId(IntPtr window, out uint processId);
+    public static uint IdleMs() {
+        var info = new LastInputInfo();
+        info.cbSize = (uint)Marshal.SizeOf(info);
+        GetLastInputInfo(ref info);
+        return unchecked((uint)Environment.TickCount - info.dwTime);
+    }
+    public static uint ForegroundProcessId() {
+        uint id;
+        GetWindowThreadProcessId(GetForegroundWindow(), out id);
+        return id;
+    }
+}
+'@
+$name = try { (Get-Process -Id ([ClaudeNotifyProbe]::ForegroundProcessId()) -ErrorAction Stop).ProcessName } catch { "" }
+"$([ClaudeNotifyProbe]::IdleMs())|$name"
+`;
 
 const [command, ...args] = process.argv.slice(2);
 
@@ -54,7 +81,25 @@ const beep = (count) => {
 
         spawn("powershell.exe", ["-NoProfile", "-Command", `${plays}; Start-Sleep -Milliseconds ${WINDOWS_TAIL_MS}`], {
             stdio: "ignore",
+            windowsHide: true,
         });
+    }
+};
+
+const getIsActiveInEditor = () => {
+    if (process.platform !== "win32") return false;
+
+    try {
+        const output = execFileSync(
+            "powershell.exe",
+            ["-NoProfile", "-EncodedCommand", Buffer.from(ACTIVITY_PROBE, "utf16le").toString("base64")],
+            { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"], timeout: 10_000, windowsHide: true },
+        ).trim();
+        const [idleMs, name] = output.split("|");
+
+        return Number(idleMs) < ACTIVE_WINDOW_MS && EDITOR_PROCESS_NAMES.has(name);
+    } catch {
+        return false;
     }
 };
 
@@ -67,6 +112,7 @@ const startFollowUps = (sessionId, alertId, count, alertsLeft) => {
         {
             detached: true,
             stdio: "ignore",
+            windowsHide: true,
         },
     ).unref();
 };
@@ -81,7 +127,7 @@ const followUp = (sessionId, alertId, count, alertsLeft) => {
 
             if (!isCurrent || hasHeardBack) return;
 
-            beep(count);
+            if (!getIsActiveInEditor()) beep(count);
 
             if (left > 1) tick(left - 1);
         }, REPEAT_DELAY_MS);
@@ -115,11 +161,12 @@ if (command === "start") {
         const alertId = String(now);
         const stamp = Number(readText(paths.stamp) ?? 0);
         const isIdle = now - stamp >= IDLE_THRESHOLD_MS;
+        const shouldPlay = isIdle && !getIsActiveInEditor();
 
         writeFileSync(paths.alert, alertId);
 
-        if (isIdle) beep(count);
+        if (shouldPlay) beep(count);
 
-        startFollowUps(sessionId, alertId, count, isIdle ? ALERT_LIMIT - 1 : ALERT_LIMIT);
+        startFollowUps(sessionId, alertId, count, shouldPlay ? ALERT_LIMIT - 1 : ALERT_LIMIT);
     }
 }

@@ -18,6 +18,7 @@ const NOTHING_CONVERTED: Converted = {
     strokeGeom: [],
     joinRadii: [],
     lameExponents: [],
+    backdropFilter: undefined,
 };
 
 const props = defineProps<Props>();

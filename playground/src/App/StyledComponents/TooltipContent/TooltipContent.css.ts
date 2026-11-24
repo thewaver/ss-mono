@@ -1,4 +1,4 @@
-import { style, styleVariants } from "@vanilla-extract/css";
+import { createVar, style, styleVariants } from "@vanilla-extract/css";
 
 import { skinEntries } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
@@ -7,18 +7,15 @@ const SHADOW_REACH = "32px";
 
 export const isVisible = style({});
 
-export const tooltipVisibility = style({
-    opacity: 0,
-
-    selectors: {
-        [`&.${isVisible}`]: {
-            opacity: 1,
-        },
-    },
-});
-
 export const tooltipFrame = style({
     position: "relative",
+    zIndex: 0,
+});
+
+export const tooltipBackdrop = style({
+    position: "absolute",
+    zIndex: -1,
+    pointerEvents: "none",
 });
 
 export const tooltipText = style({
@@ -60,7 +57,6 @@ export const tooltipRevealVariants = styleVariants({
         },
     },
     clip: {
-        opacity: 1,
         transitionProperty: "clip-path",
         clipPath: `inset(-${SHADOW_REACH} 100% -${SHADOW_REACH} -${SHADOW_REACH})`,
 
@@ -101,4 +97,21 @@ export const tooltipBody = style({
 
 export const tooltipBodyWide = style({
     maxWidth: "none",
+});
+
+export const tooltipRevealDuration = createVar();
+
+export const tooltipReveal = style({
+    transitionDuration: tooltipRevealDuration,
+});
+
+export const tooltipFadePart = style({
+    transitionProperty: "opacity",
+    transitionDuration: tooltipRevealDuration,
+
+    selectors: {
+        [`${tooltipReveal}:not(${isVisible}):not(${tooltipRevealVariants.clip}) &`]: {
+            opacity: 0,
+        },
+    },
 });
