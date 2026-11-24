@@ -31,8 +31,8 @@ shared unpainted box, as Range's and SlideButton's fills and thumbs do, so a tra
 the fill is unclipped, the user's call. Only an indeterminate bar keeps its fill inside the track, which clips the sweep.
 A zero-size element takes the position and centers the tip on it, so a Skin's `transform` on `progressTip` cannot
 displace it and right to left needs no rule of its own. Its transition has to stay the same as the fill's. No tip while
-indeterminate: a sweeping fill has no end to follow. Every Skin's entry starts empty, the user's call; they paint it,
-and size it through `progressTipWidth` and `progressTipHeight`.
+indeterminate: a sweeping fill has no end to follow. Every Skin's paint starts empty, the user's call; the base sizes the
+tip as a square as thick as the track, and a Skin overrides its width and height directly.
 
 **`skinVars.startValue` and `skinVars.endValue`**, the user's names, carry a bar's position from 0 to 1 for Skins to
 read, written by the Progress, Range and SlideButton painters on their outermost element so every part inherits them.

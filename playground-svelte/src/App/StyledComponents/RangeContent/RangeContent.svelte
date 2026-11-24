@@ -15,8 +15,6 @@
     const center = (ratio: number) =>
         `calc(${ratio} * (100% - ${styles.RANGE_THUMB_SIZE}px) + ${styles.RANGE_THUMB_SIZE * 0.5}px)`;
 
-    const HALF_DRAWN_THUMB = `${styles.RANGE_DRAWN_THUMB_WIDTH} * 0.5`;
-
     let props: RangeContentProps = $props();
 
     const layerClass = $derived.by(getLayerClass());
@@ -29,9 +27,9 @@
 
     const fill = $derived(props.renderProps.fill);
 
-    const fillStart = $derived(isPair ? `calc(${center(fill.start)} - ${HALF_DRAWN_THUMB})` : "0px");
+    const fillStart = $derived(isPair ? center(fill.start) : "0px");
 
-    const fillSpan = $derived(`calc(${center(fill.end)} + ${HALF_DRAWN_THUMB} - ${fillStart})`);
+    const fillSpan = $derived(`calc(${center(fill.end)} - ${fillStart})`);
 </script>
 
 <div
@@ -55,6 +53,7 @@
             styles.rangeFill,
             styles.rangeFillVariants[orientation],
             props.renderProps.hasError && styles.hasError,
+            !isPair && styles.isStart,
         ]}
         style={toStyle(
             orientation === "vertical"

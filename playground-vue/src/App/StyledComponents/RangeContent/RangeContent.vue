@@ -14,8 +14,6 @@ const travel = (ratio: number) => `calc(${ratio} * (100% - ${styles.RANGE_THUMB_
 const center = (ratio: number) =>
     `calc(${ratio} * (100% - ${styles.RANGE_THUMB_SIZE}px) + ${styles.RANGE_THUMB_SIZE * 0.5}px)`;
 
-const HALF_DRAWN_THUMB = `${styles.RANGE_DRAWN_THUMB_WIDTH} * 0.5`;
-
 const props = defineProps<RangeContentProps>();
 
 const layerClass = useLayerClass();
@@ -28,9 +26,9 @@ const length = computed(() => props.length ?? DEFAULT_RANGE_CONTENT_LENGTH);
 
 const fill = computed(() => props.renderProps.fill);
 
-const fillStart = computed(() => (isPair.value ? `calc(${center(fill.value.start)} - ${HALF_DRAWN_THUMB})` : "0px"));
+const fillStart = computed(() => (isPair.value ? center(fill.value.start) : "0px"));
 
-const fillSpan = computed(() => `calc(${center(fill.value.end)} + ${HALF_DRAWN_THUMB} - ${fillStart.value})`);
+const fillSpan = computed(() => `calc(${center(fill.value.end)} - ${fillStart.value})`);
 
 const valueVars = computed(() =>
     assignInlineVars({
@@ -59,7 +57,12 @@ const valueVars = computed(() =>
         />
 
         <div
-            :class="[styles.rangeFill, styles.rangeFillVariants[orientation], renderProps.hasError && styles.hasError]"
+            :class="[
+                styles.rangeFill,
+                styles.rangeFillVariants[orientation],
+                renderProps.hasError && styles.hasError,
+                !isPair && styles.isStart,
+            ]"
             :style="
                 orientation === 'vertical'
                     ? { bottom: fillStart, height: fillSpan }

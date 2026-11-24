@@ -113,7 +113,7 @@ const PixelTrail = (props: PixelTrailProps) => {
         if (!stamp) return [{ value: "transparent" }, { value: "transparent", stop: 100 }];
 
         const alpha = squareAlpha * SVGDefsUtils.computePixelTrailAlpha(frameMs - stamp.bornMs, trailMs);
-        const value = `rgb(from ${computeColor(stamp)} r g b / ${alpha})`;
+        const value = SVGDefsUtils.computeAlphaColor(computeColor(stamp), alpha);
 
         return [{ value }, { value, stop: 100 }];
     };

@@ -6,17 +6,23 @@ import { SkinUtils } from "../Skin.utils";
 import { SkinBaseUtils } from "../SkinBase.utils";
 
 import { themeVars } from "../../Theme.css";
-import { skinSelectors, skinVars } from "../Skin.css";
+import { skinSelectors } from "../Skin.css";
 
 const LEVEL = SkinUtils.computeLevelFamily(themeVars.color.layers);
 
-export const xenon = style({
-    vars: {
-        [skinVars.rangeTrackThickness]: "20px",
-    },
-});
+export const xenon = style({});
 
-const darkGlow = (color: string, alphaPercent: number) =>
+const darkGlow = (color: string, alphaPercent: number) => [
+    [
+        `inset 0 0 1px 1px color-mix(in srgb, ${color} ${alphaPercent * 1}%, transparent)`,
+        `inset 0 0 8px 2px color-mix(in srgb, ${color} ${alphaPercent * 0.9}%, transparent)`,
+        `inset 0 0 32px 4px color-mix(in srgb, ${color} ${alphaPercent * 0.75}%, transparent)`,
+        `inset 0 0 64px 8px color-mix(in srgb, ${color} ${alphaPercent * 0.5}%, transparent)`,
+        `0 0 1px 1px color-mix(in srgb, ${color} ${alphaPercent * 1}%, transparent)`,
+        `0 0 8px 2px color-mix(in srgb, ${color} ${alphaPercent * 0.9}%, transparent)`,
+        `0 0 32px 4px color-mix(in srgb, ${color} ${alphaPercent * 0.75}%, transparent)`,
+        `0 0 64px 8px color-mix(in srgb, ${color} ${alphaPercent * 0.5}%, transparent)`,
+    ].join(", "),
     [
         `inset 0 0 1px 1px hsl(from ${color} h s 10 / ${alphaPercent * 1}%)`,
         `inset 0 0 8px 2px hsl(from ${color} h s 10 / ${alphaPercent * 0.9}%)`,
@@ -26,9 +32,20 @@ const darkGlow = (color: string, alphaPercent: number) =>
         `0 0 8px 2px hsl(from ${color} h s 10 / ${alphaPercent * 0.9}%)`,
         `0 0 32px 4px hsl(from ${color} h s 10 / ${alphaPercent * 0.75}%)`,
         `0 0 64px 8px hsl(from ${color} h s 10 / ${alphaPercent * 0.5}%)`,
-    ].join(", ");
+    ].join(", "),
+];
 
-const lightGlow = (color: string, alphaPercent: number) =>
+const lightGlow = (color: string, alphaPercent: number) => [
+    [
+        `inset 0 0 1px 1px color-mix(in srgb, ${color} ${alphaPercent * 1}%, transparent)`,
+        `inset 0 0 8px 2px color-mix(in srgb, ${color} ${alphaPercent * 0.5}%, transparent)`,
+        `inset 0 0 32px 4px color-mix(in srgb, ${color} ${alphaPercent * 0.25}%, transparent)`,
+        `inset 0 0 64px 8px color-mix(in srgb, ${color} ${alphaPercent * 0.1}%, transparent)`,
+        `0 0 1px 1px color-mix(in srgb, ${color} ${alphaPercent * 1}%, transparent)`,
+        `0 0 8px 2px color-mix(in srgb, ${color} ${alphaPercent * 0.5}%, transparent)`,
+        `0 0 32px 4px color-mix(in srgb, ${color} ${alphaPercent * 0.25}%, transparent)`,
+        `0 0 64px 8px color-mix(in srgb, ${color} ${alphaPercent * 0.1}%, transparent)`,
+    ].join(", "),
     [
         `inset 0 0 1px 1px hsl(from ${color} h 100 min(l * 1.5, 100) / ${alphaPercent * 1}%)`,
         `inset 0 0 8px 2px hsl(from ${color} h 100 min(l * 1, 100) / ${alphaPercent * 0.5}%)`,
@@ -38,11 +55,12 @@ const lightGlow = (color: string, alphaPercent: number) =>
         `0 0 8px 2px hsl(from ${color} h 100 min(l * 1, 100) / ${alphaPercent * 0.5}%)`,
         `0 0 32px 4px hsl(from ${color} h 100 min(l * 1, 100) / ${alphaPercent * 0.25}%)`,
         `0 0 64px 8px hsl(from ${color} h 100 min(l * 1, 100) / ${alphaPercent * 0.1}%)`,
-    ].join(", ");
+    ].join(", "),
+];
 
 const INPUT_STATES: StyleRule["selectors"] = ObjectUtils.deepMerge(SkinBaseUtils.INTERACTIBLE_STATES, {
     [skinSelectors.isReadOnly]: {
-        backgroundColor: [LEVEL.contrast, `rgb(from ${LEVEL.contrast} r g b / 10%)`],
+        backgroundColor: `color-mix(in srgb, ${LEVEL.contrast} 10%, transparent)`,
     },
     [SkinUtils.anyOf(skinSelectors.isCheckedWithin, skinSelectors.isMixedWithin)]: {},
     [SkinUtils.anyOf(skinSelectors.hasErrorWithin, skinSelectors.hasError)]: {
@@ -73,7 +91,7 @@ const SWITCH_STATES: StyleRule["selectors"] = ObjectUtils.deepMerge(INPUT_STATES
 });
 
 const INPUT_SHELL: StyleRule = {
-    backgroundColor: [LEVEL.main, `rgb(from ${LEVEL.main} r g b / 50%)`],
+    backgroundColor: `color-mix(in srgb, ${LEVEL.main} 50%, transparent)`,
     boxShadow: lightGlow(LEVEL.contrast, 25),
     color: LEVEL.contrast,
 } as const;
@@ -83,7 +101,7 @@ const SWITCH_SHELL: StyleRule = {
 } as const;
 
 const ACCORDION: StyleRule = {
-    backgroundColor: [LEVEL.main, `rgb(from ${LEVEL.main} r g b / 50%)`],
+    backgroundColor: `color-mix(in srgb, ${LEVEL.main} 50%, transparent)`,
     boxShadow: darkGlow(LEVEL.main, 50),
     color: LEVEL.contrast,
     fontSize: themeVars.fontSize.medium,
@@ -94,7 +112,7 @@ const ITEM: StyleRule = {
 } as const;
 
 const ITEM_FLOATER_HOVER: StyleRule = {
-    backgroundColor: [LEVEL.contrast, `rgb(from ${LEVEL.contrast} r g b / 10%)`],
+    backgroundColor: `color-mix(in srgb, ${LEVEL.contrast} 10%, transparent)`,
     boxShadow: lightGlow(LEVEL.contrast, 10),
 };
 
@@ -112,7 +130,7 @@ const TAB_FLOATER_SELECTED: StyleRule = {
 };
 
 const surface = (color: SkinColorFamily): StyleRule => ({
-    backgroundColor: [color.dark, `rgb(from ${color.dark} r g b / 50%)`],
+    backgroundColor: `color-mix(in srgb, ${color.dark} 50%, transparent)`,
     backdropFilter: "blur(20px)",
     boxShadow: darkGlow(color.dark, 50),
     color: color.contrast,
@@ -140,20 +158,14 @@ SkinUtils.define(
             fontWeight: "bold",
             selectors: ObjectUtils.deepMerge(SkinBaseUtils.INTERACTIBLE_STATES, {
                 [skinSelectors.isPressed]: {
-                    backgroundColor: [
-                        themeVars.color.primary.contrast,
-                        `rgb(from ${themeVars.color.primary.main} r g b / 25%)`,
-                    ],
+                    backgroundColor: `color-mix(in srgb, ${themeVars.color.primary.main} 25%, transparent)`,
                 },
                 [skinSelectors.hasError]: {
                     boxShadow: lightGlow(themeVars.color.error.main, 100),
                     color: themeVars.color.error.main,
                 },
                 [SkinUtils.allOf(skinSelectors.isPressed, skinSelectors.hasError)]: {
-                    backgroundColor: [
-                        themeVars.color.error.contrast,
-                        `rgb(from ${themeVars.color.error.main} r g b / 25%)`,
-                    ],
+                    backgroundColor: `color-mix(in srgb, ${themeVars.color.error.main} 25%, transparent)`,
                 },
             }),
         },
@@ -202,7 +214,7 @@ SkinUtils.define(
             ...INPUT_SHELL,
             selectors: ObjectUtils.deepMerge(INPUT_STATES, {
                 [skinSelectors.fieldTextDisabled]: {
-                    color: [LEVEL.contrast, `rgb(from ${LEVEL.contrast} r g b / ${themeVars.disabled.opacity})`],
+                    color: `color-mix(in srgb, ${LEVEL.contrast} calc(${themeVars.disabled.opacity} * 100%), transparent)`,
                 },
             }),
         },
@@ -237,7 +249,7 @@ SkinUtils.define(
             ...surface(LEVEL),
         },
         panel: {
-            backgroundColor: [LEVEL.main, `rgb(from ${LEVEL.main} r g b / 50%)`],
+            backgroundColor: `color-mix(in srgb, ${LEVEL.main} 50%, transparent)`,
             boxShadow: darkGlow(LEVEL.main, 50),
             color: LEVEL.contrast,
         },
@@ -252,7 +264,7 @@ SkinUtils.define(
             },
         },
         progressTrack: {
-            backgroundColor: [LEVEL.main, `rgb(from ${LEVEL.main} r g b / 50%)`],
+            backgroundColor: `color-mix(in srgb, ${LEVEL.main} 50%, transparent)`,
             boxShadow: darkGlow(LEVEL.main, 50),
         },
         radioBox: {
@@ -290,7 +302,7 @@ SkinUtils.define(
             },
         },
         rangeTrack: {
-            backgroundColor: [LEVEL.main, `rgb(from ${LEVEL.main} r g b / 50%)`],
+            backgroundColor: `color-mix(in srgb, ${LEVEL.main} 50%, transparent)`,
             boxShadow: darkGlow(LEVEL.main, 50),
         },
         slideButtonFill: {
@@ -316,12 +328,12 @@ SkinUtils.define(
             },
         },
         slideButtonTrack: {
-            backgroundColor: [LEVEL.main, `rgb(from ${LEVEL.main} r g b / 50%)`],
+            backgroundColor: `color-mix(in srgb, ${LEVEL.main} 50%, transparent)`,
             boxShadow: darkGlow(LEVEL.main, 50),
             fontWeight: "bold",
         },
         splitPaneFrame: {
-            border: `2px dashed rgb(from ${LEVEL.contrast} r g b / 25%)`,
+            border: `2px dashed color-mix(in srgb, ${LEVEL.contrast} 25%, transparent)`,
         },
         surface: {
             ...surface(LEVEL),
@@ -351,7 +363,7 @@ SkinUtils.define(
         },
         tag: {
             paddingInline: themeVars.spacing.full,
-            backgroundColor: [LEVEL.contrast, `rgb(from ${LEVEL.contrast} r g b / 25%)`],
+            backgroundColor: `color-mix(in srgb, ${LEVEL.contrast} 25%, transparent)`,
             color: LEVEL.contrast,
             fontSize: themeVars.fontSize.xSmall,
             fontWeight: "bold",
@@ -360,7 +372,7 @@ SkinUtils.define(
             },
         },
         toggleThumb: {
-            backgroundColor: [LEVEL.contrast, `rgb(from ${LEVEL.contrast} r g b / 75%)`],
+            backgroundColor: `color-mix(in srgb, ${LEVEL.contrast} 75%, transparent)`,
             boxShadow: lightGlow(LEVEL.contrast, 25),
             selectors: {
                 [SkinUtils.anyOf(skinSelectors.isCheckedWithin, skinSelectors.isMixedWithin)]: {
@@ -380,7 +392,7 @@ SkinUtils.define(
             },
         },
         tooltip: {
-            backgroundColor: [LEVEL.main, `rgb(from ${LEVEL.main} r g b / 50%)`],
+            backgroundColor: `color-mix(in srgb, ${LEVEL.main} 50%, transparent)`,
             boxShadow: darkGlow(LEVEL.main, 50),
             backdropFilter: "blur(20px)",
             color: LEVEL.contrast,

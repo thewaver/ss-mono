@@ -77,7 +77,7 @@ export const paginatorWedgeShape = style({
 
     selectors: {
         [`.${isHovered} &`]: {
-            fill: `rgb(from ${themeVars.color.primary.main} r g b / 30%)`,
+            fill: `color-mix(in srgb, ${themeVars.color.primary.main} 30%, transparent)`,
         },
         [`.${isActive} &`]: {
             filter: themeVars.active.filter,

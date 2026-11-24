@@ -61,7 +61,7 @@ export const marker = styleVariants({
             backgroundColor: themeVars.color.primary.light,
             backgroundImage: `radial-gradient(circle at 70% 30%, ${themeVars.color.primary.light}, ${themeVars.color.primary.dark})`,
             color: themeVars.color.primary.contrast,
-            boxShadow: `0 0 0 3px rgb(from ${themeVars.color.primary.main} r g b / 35%)`,
+            boxShadow: `0 0 0 3px color-mix(in srgb, ${themeVars.color.primary.main} 35%, transparent)`,
         },
     ],
     failed: [

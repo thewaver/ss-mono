@@ -591,9 +591,9 @@ count.** It ships from the library now, but it is sample code a consumer copies 
 component internals, and it was written to the Playground's old license. `playground/src` is a harness;
 citing either is not an argument.
 
-**A use that carries a fallback is not evidence for a use that doesn't.** Relative color syntax
-appears 71 times in Samples and twice in `components/src`, both in `Composites/Surface/Surface.css.ts` and
-both in vanilla-extract's array-value form — `backgroundColor: [fillColorVar, "rgb(from …)"]` — which
-emits the plain variable first, so an engine that does not understand the newer syntax keeps a working
-color. That is graceful degradation, not a hard dependency. Check where the feature actually lives and
-whether existing uses degrade; if the new code has no fallback, say so.
+**A use that carries a fallback is not evidence for a use that doesn't.** A feature with a fallback
+degrades gracefully; one without is a hard dependency. Check where the feature actually lives and whether
+existing uses degrade; if the new code has no fallback, say so. Relative color syntax now lives only in
+hue, saturation and lightness shifts; transparency everywhere, `Surface` and the Samples' gradient stops
+included, is `color-mix()`, which needs no fallback (`rules/styling.md`, _"A see-through color is
+`color-mix()`"_).

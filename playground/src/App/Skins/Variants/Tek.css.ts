@@ -6,15 +6,11 @@ import { SkinUtils } from "../Skin.utils";
 import { SkinBaseUtils } from "../SkinBase.utils";
 
 import { themeVars } from "../../Theme.css";
-import { skinSelectors, skinVars } from "../Skin.css";
+import { skinSelectors } from "../Skin.css";
 
 const LEVEL = SkinUtils.computeLevelFamily(themeVars.color.layers);
 
-export const tek = style({
-    vars: {
-        [skinVars.rangeTrackThickness]: "20px",
-    },
-});
+export const tek = style({});
 
 const SHADOW_SMALL = "0 2px 0 0 rgba(0, 0, 0, 0.75)";
 const SHADOW_MEDIUM = `${SHADOW_SMALL}, 0 4px 8px 0 rgba(0, 0, 0, 0.5)`;
@@ -22,24 +18,24 @@ const SHADOW_MEDIUM = `${SHADOW_SMALL}, 0 4px 8px 0 rgba(0, 0, 0, 0.5)`;
 
 const insetGlow = (color: string, alphaPercent: number) =>
     [
-        `inset 0 0 1px 1px hsl(from ${color} h s min(l * 1, 100) / ${alphaPercent * 0.9}%)`,
-        `inset 0 0 4px 2px hsl(from ${color} h s min(l * 1, 100) / ${alphaPercent * 0.75}%)`,
-        `inset 0 0 8px 4px hsl(from ${color} h s min(l * 1, 100) / ${alphaPercent * 0.5}%)`,
+        `inset 0 0 1px 1px color-mix(in srgb, ${color} ${alphaPercent * 0.9}%, transparent)`,
+        `inset 0 0 4px 2px color-mix(in srgb, ${color} ${alphaPercent * 0.75}%, transparent)`,
+        `inset 0 0 8px 4px color-mix(in srgb, ${color} ${alphaPercent * 0.5}%, transparent)`,
     ].join(", ");
 
 const outsetGlow = (color: string, alphaPercent: number) =>
     [
-        `0 0 16px 0 rgb(from ${color} r g b / ${alphaPercent * 0.5}%)`,
-        `0 0 32px 0 rgb(from ${color} r g b / ${alphaPercent * 0.25}%)`,
+        `0 0 16px 0 color-mix(in srgb, ${color} ${alphaPercent * 0.5}%, transparent)`,
+        `0 0 32px 0 color-mix(in srgb, ${color} ${alphaPercent * 0.25}%, transparent)`,
     ].join(", ");
 
 type DirTo = "top" | "right" | "bottom" | "left";
 
 const sideGradient = (color: string, dirTo: DirTo, alphaPercent: number = 50) =>
     [
-        `linear-gradient(to ${dirTo}, rgb(from ${color} r g b / 10%), rgb(from ${color} r g b / 0%) ${alphaPercent * 0.25}%)`,
-        `linear-gradient(to ${dirTo}, rgb(from ${color} r g b / 10%), rgb(from ${color} r g b / 0%) ${alphaPercent * 0.5}%)`,
-        `linear-gradient(to ${dirTo}, rgb(from ${color} r g b / 10%), rgb(from ${color} r g b / 0%) ${alphaPercent}%)`,
+        `linear-gradient(to ${dirTo}, color-mix(in srgb, ${color} 10%, transparent), rgb(from ${color} r g b / 0%) ${alphaPercent * 0.25}%)`,
+        `linear-gradient(to ${dirTo}, color-mix(in srgb, ${color} 10%, transparent), rgb(from ${color} r g b / 0%) ${alphaPercent * 0.5}%)`,
+        `linear-gradient(to ${dirTo}, color-mix(in srgb, ${color} 10%, transparent), rgb(from ${color} r g b / 0%) ${alphaPercent}%)`,
     ].join(", ");
 
 const sideInsetShadow = (color: string, dirTo: DirTo) =>
@@ -50,7 +46,7 @@ const litBoard = (color: string, dirsTo: Set<DirTo>, alphaPercent: number = 50):
     // borderBottomRightRadius: dirsTo.has("top") || dirsTo.has("left") ? 0 : themeVars.borderRadius.full,
     // borderBottomLeftRadius: dirsTo.has("top") || dirsTo.has("right") ? 0 : themeVars.borderRadius.full,
     // borderTopLeftRadius: dirsTo.has("bottom") || dirsTo.has("right") ? 0 : themeVars.borderRadius.full,
-    backgroundColor: [color, `rgb(from ${color} r g b / ${alphaPercent * 0.25}%)`],
+    backgroundColor: `color-mix(in srgb, ${color} ${alphaPercent * 0.25}%, transparent)`,
     backgroundImage: Array.from(dirsTo, (dirTo) => sideGradient(color, dirTo)).join(", "),
     boxShadow: [
         ...Array.from(dirsTo, (dirTo) => sideInsetShadow(color, dirTo)),
@@ -63,7 +59,7 @@ const litBoard = (color: string, dirsTo: Set<DirTo>, alphaPercent: number = 50):
 });
 
 const unlitBoard = (color: string, alphaPercent: number): StyleRule => ({
-    backgroundColor: [color, `rgb(from ${color} r g b / ${alphaPercent}%)`],
+    backgroundColor: `color-mix(in srgb, ${color} ${alphaPercent}%, transparent)`,
     boxShadow: [insetGlow(color, alphaPercent * 0.5), outsetGlow(color, alphaPercent), SHADOW_SMALL].join(", "),
     color: color,
 });
@@ -241,7 +237,7 @@ SkinUtils.define(
             ...INPUT_SHELL,
             selectors: ObjectUtils.deepMerge(INPUT_STATES, {
                 [skinSelectors.fieldTextDisabled]: {
-                    color: [LEVEL.contrast, `rgb(from ${LEVEL.contrast} r g b / ${themeVars.disabled.opacity})`],
+                    color: `color-mix(in srgb, ${LEVEL.contrast} calc(${themeVars.disabled.opacity} * 100%), transparent)`,
                 },
             }),
         },
@@ -368,7 +364,7 @@ SkinUtils.define(
             fontWeight: "bold",
         },
         splitPaneFrame: {
-            border: `2px dashed rgb(from ${LEVEL.contrast} r g b / 25%)`,
+            border: `2px dashed color-mix(in srgb, ${LEVEL.contrast} 25%, transparent)`,
         },
         surface: {
             ...surface(LEVEL),

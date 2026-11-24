@@ -18,6 +18,8 @@ import type { SVGPatternCellPiece, SVGPatternKind } from "./SVGPatternLayouts.ty
 
 const NO_CONSUMERS = 0;
 const TRANSPARENT_ALPHA = 0;
+const PERCENT = 100;
+const HUE_KEEPING_PERCENT = 0.01;
 const FULL_STOP = 100;
 const POINTER_FADE_START_RATIO = 1;
 const POINTER_FADE_END_RATIO = 2;
@@ -153,6 +155,20 @@ export namespace SVGDefsUtils {
     };
 
     /**
+     * A color at the given opacity, for a gradient stop, that keeps its hue even when fully clear.
+     *
+     * A stop fading to nothing still lends its color to the ramp beside it, so a clear stop has to keep the color it
+     * fades from or the ramp passes through gray. At `0` the result is a hundredth of a percent opaque, which nothing
+     * can see.
+     *
+     * @param color Any CSS color.
+     * @param alpha How opaque, from `0` to `1`.
+     * @returns A `color-mix()` of the color with `transparent`.
+     */
+    export const computeAlphaColor = (color: string, alpha: number) =>
+        `color-mix(in srgb, ${color} ${Math.max(alpha * PERCENT, HUE_KEEPING_PERCENT)}%, transparent)`;
+
+    /**
      * The five color stops of a band that fades out symmetrically either side of its core.
      *
      * Transparent at both ends, the falloff alpha a spread either side of the core, and the core alpha at
@@ -160,7 +176,7 @@ export namespace SVGDefsUtils {
      * an options object, so each sample keeps its own defaults and two samples asking for different cores
      * cannot end up sharing one.
      *
-     * @param color Any CSS color; the stops are built with `rgb(from …)`, so a named color works.
+     * @param color Any CSS color; the stops are built with {@link computeAlphaColor}, so a named color works.
      * @param defs.coreStop Where the core sits, `0`–`100`.
      * @param defs.coreAlpha How opaque the core is.
      * @param defs.falloffSpread How far either side of the core the falloff stops sit.
@@ -171,11 +187,11 @@ export namespace SVGDefsUtils {
         color: string,
         defs: { coreStop: number; coreAlpha: number; falloffSpread: number; falloffAlpha: number },
     ) => [
-        { value: `rgb(from ${color} r g b / 0)` },
-        { value: `rgb(from ${color} r g b / ${defs.falloffAlpha})`, stop: defs.coreStop - defs.falloffSpread },
-        { value: `rgb(from ${color} r g b / ${defs.coreAlpha})`, stop: defs.coreStop },
-        { value: `rgb(from ${color} r g b / ${defs.falloffAlpha})`, stop: defs.coreStop + defs.falloffSpread },
-        { value: `rgb(from ${color} r g b / 0)`, stop: FULL_STOP },
+        { value: computeAlphaColor(color, TRANSPARENT_ALPHA) },
+        { value: computeAlphaColor(color, defs.falloffAlpha), stop: defs.coreStop - defs.falloffSpread },
+        { value: computeAlphaColor(color, defs.coreAlpha), stop: defs.coreStop },
+        { value: computeAlphaColor(color, defs.falloffAlpha), stop: defs.coreStop + defs.falloffSpread },
+        { value: computeAlphaColor(color, TRANSPARENT_ALPHA), stop: FULL_STOP },
     ];
 
     /**
@@ -202,14 +218,19 @@ export namespace SVGDefsUtils {
 
     /**
      * A color with its alpha set to nothing, for the clear end of a fade, so the fade stays in the color's own hue
-     * rather than passing through grey.
+     * rather than passing through gray.
      *
-     * @param color Any CSS color. A hex color is converted directly; anything else through `rgb(from …)`.
+     * @param color Any CSS color. One {@link Color.parse} can read — hex, `rgb()`, `hsl()` or a named color — comes back
+     * as a finished color, which an SVG animation can interpolate in every browser; anything else, such as a custom
+     * property, goes through {@link computeAlphaColor}, which Chromium will not animate.
      */
-    export const getTransparentColor = (color: string) =>
-        Color.Hex.isHex(color)
-            ? Color.RGBA.toCss({ ...Color.Hex.toRgb(color), a: TRANSPARENT_ALPHA })
-            : `rgb(from ${color} r g b / 0)`;
+    export const getTransparentColor = (color: string) => {
+        const parsed = Color.parse(color);
+
+        return parsed
+            ? Color.RGBA.toCss({ ...Color.HSV.toRgb(parsed), a: TRANSPARENT_ALPHA })
+            : computeAlphaColor(color, TRANSPARENT_ALPHA);
+    };
 
     /**
      * How strongly a pointer-following sample shows, fading out as the pointer leaves the box: full on and inside its

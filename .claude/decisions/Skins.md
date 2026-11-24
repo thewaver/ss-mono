@@ -4,10 +4,17 @@ Part of the decisions record. Every heading is indexed in `.claude/decisions.md`
 
 ### Skins
 
-**A Theme is pure colors; a Skin is shape and where those colors go** — the user's split. Shaded paints a
-gradient button; another Skin might paint a bordered one with heavily rounded corners, from the same Theme. A
-Skin owns everything that paints — color, background, shadow, border, radius, padding, font — while display,
-size, position, z-index, transforms and transitions stay in the painter, for now. **A Skin is picked the way a
+**A Theme is values — colors and the scales, spacing, font sizes, radii, durations; a Skin is CSS: shape and where
+those values go** — the user's split, in their words "Theme is consts, Skin is css", taken after comparing Material
+UI, whose theme holds a few scales and whose per-component detail is CSS written per component. The two stay
+separate so any Theme combines with any Skin. Shaded paints a gradient button; another Skin might paint a bordered
+one with heavily rounded corners, from the same Theme. A Skin owns everything that paints — color, background,
+shadow, border, radius, padding, font — and the size of a bar's parts and the split pane's grip, written as plain
+widths and heights; display, position, z-index, transforms and transitions stay in the painter. **A Skin hands
+painters no values**: `skinVars` keeps only `accentColor` and `outlineColor`, each a color many unrelated painters
+must match (the user kept both), and the values painters write for Skins to read (`barAngle`, `startValue`,
+`endValue`). A size a Skin sets is never read back by a painter: a painter that used to compute with one was
+rebuilt so the layout follows whatever size the Skin wrote (below, under the bars). **A Skin is picked the way a
 Theme is**: a class on `<html>`, swapped from the left nav's settings (`PageComponents/Skin`, beside
 `PageComponents/Theme`), from `PLAYGROUND_SKINS` in `Skins/Skin.const.ts`. **Shadows belong to the Skins, and the Theme has
 none** — the user's call: each Skin that casts them holds its own (`SHADOW_SMALL`, `SHADOW_MEDIUM`,
@@ -43,7 +50,7 @@ change shape, not just where colors fall; several will be dropped once lived wit
   see-through white and black (light top-left when raised, swapped when sunk), so it shades whatever color lies
   under it rather than being derived from that color. Fields and switch boxes are sunk; buttons, thumbs, panels and popups
   are raised; surfaces add a hard offset drop shadow; a selected item is a raised `primary.main` block; the
-  progress fill is segmented; the range track is thickened through `skinVars`.
+  progress fill is segmented.
 - **Pixel** — 4px borders with the corner pixel clipped off (`clip-path` notches), checkerboard dither for
   hover, tracks and the checked toggle, monospace; nothing casts a shadow, since a clip would cut it.
 - **Blueprint** — outlines only: transparent surfaces, one-pixel lines in the layer's `contrast` color, dashed
@@ -186,6 +193,17 @@ planned for.
   along the bar keeps its direction there. **A pair's thumbs are one entry with two states**, `isStart` and
   `isEnd` — the user's pick over two entries, since a Skin writes the thumb once and only the difference; a
   single-value range's thumb carries neither.
+- **A bar's parts are sized by the Skin, and the painters lay out around whatever it writes** — the user's call.
+  The base sets the range's track, fill and thumb, the progress track and the tip (Shaded thins its range track);
+  under `isVertical` a Skin swaps width and height. The range painter stacks its parts in one grid cell, so the bar
+  is as tall as its tallest part with no arithmetic, and centers each thumb on its press area with `translate`
+  against the thumb's own size, flipped under `:dir(rtl)`. The progress tip defaults to a square as thick as the
+  track. **The range fill runs from thumb center to thumb center.** A Skin that rounds the fill's ends lengthens it
+  by half its own thickness at each end with `SkinUtils.roundedFillEnds`, so its rounded end shares the thumb's
+  center — the user's original reason for the overhang, a pill fill and a round thumb whose circles did not line
+  up. Half the thumb's width would line up only when the two are equally thick. A
+  single-value range's fill begins at the track's start and carries `isStart`, under which the start is not
+  lengthened.
 - **The entries that replaced the level's colors in the standard Essentials** — the user's picks, after the layer
   stopped carrying colors. `placeholder` is text standing in for a missing value, painted as the surrounding text color at 50% so it
   follows its field's or zone's own text color (the user caught it pinned to the level's color) (field and tag placeholders, an
@@ -200,9 +218,10 @@ planned for.
   field: under `skinSelectors.isInlineAtRest` (inline and not hovered) each Skin removes its field paint, so the
   value reads as plain text, and the hint — hover or keyboard focus, sent as `isHovered` — shows the Skin's full
   field, previewing the editor that opens. Every Skin starts on the same resting rule. **`SplitPane` has an entry per part** — the user's call: `splitPaneFrame` around everything, `splitPaneGutter` between
-  the panes (dragging is `isActive`) and `splitPaneGrip` on the gutter. The grip's size is `skinVars.splitPaneGripWidth`
-  and `splitPaneGripHeight`, asked for by the user; like the range thumb's pair, the names describe the side-by-side
-  split's upright grip and swap for a stacked one. The gutter's thickness has no variable: it is the `gutterSize`
+  the panes (dragging is `isActive`) and `splitPaneGrip` on the gutter. The grip's size is the Skin's, asked for by the user:
+  the base's `splitPaneGrip` sets the side-by-side split's upright grip, and a stacked split's grip carries `isVertical`,
+  under which the width and height swap. The gutter centers the grip, so any size sits in the middle; one thicker
+  than the gutter spills onto the panes. The gutter's thickness has no variable: it is the `gutterSize`
   number the library lays out and drags with, and the page's knob owns it. **Each pane wears `panel`**, the user's call
   over a pane entry of SplitPane's own, so a pane looks like every other box of content in its Skin. The frame starts on the old 25% border and 10% background and no rounding: `SplitPane` hands the frame's corners
   to the panes at its ends and clips them there, so a rounded frame in the base rounded every square Skin's panes.

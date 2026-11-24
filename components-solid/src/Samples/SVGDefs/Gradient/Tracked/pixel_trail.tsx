@@ -112,7 +112,7 @@ export const createPixelTrailSample =
 
                 const alpha =
                     squareAlpha * SVGDefsUtils.computePixelTrailAlpha(clock.getFrameMs() - stamp.bornMs, trailMs);
-                const value = `rgb(from ${getColor(stamp)} r g b / ${alpha})`;
+                const value = SVGDefsUtils.computeAlphaColor(getColor(stamp), alpha);
 
                 return [{ value }, { value, stop: 100 }];
             };

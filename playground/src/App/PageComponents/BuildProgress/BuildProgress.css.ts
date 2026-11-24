@@ -50,7 +50,7 @@ export const buildProgressFill = style({
     top: 0,
     bottom: 0,
     left: 0,
-    backgroundColor: `rgb(from ${themeVars.color.info.contrast} r g b / 15%)`,
+    backgroundColor: `color-mix(in srgb, ${themeVars.color.info.contrast} 15%, transparent)`,
     transition: `width ${themeVars.animation.duration}`,
 });
 

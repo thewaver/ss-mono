@@ -67,9 +67,9 @@ const getCycleColor = (colors: SVGDefsColors, atMs: number, opts?: GradientHandT
 };
 
 const computeSweepColors = (color: string, alpha: number) => [
-    { value: `rgb(from ${color} r g b / 0)` },
-    { value: `rgb(from ${color} r g b / ${alpha})` },
-    { value: `rgb(from ${color} r g b / 0)` },
+    { value: SVGDefsUtils.computeAlphaColor(color, 0) },
+    { value: SVGDefsUtils.computeAlphaColor(color, alpha) },
+    { value: SVGDefsUtils.computeAlphaColor(color, 0) },
 ];
 
 const clock = SVGDefsUtils.createClock(TrailStampConst.TRAIL_LIFETIME_MS);

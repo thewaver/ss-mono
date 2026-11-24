@@ -8,7 +8,7 @@ const MARKER_SIZE = 16;
 
 export const trailTrack = style({
     fill: "none",
-    stroke: `rgb(from ${themeVars.color.primary.main} r g b / 35%)`,
+    stroke: `color-mix(in srgb, ${themeVars.color.primary.main} 35%, transparent)`,
     strokeWidth: 2,
     strokeDasharray: "6 6",
     strokeLinecap: "round",

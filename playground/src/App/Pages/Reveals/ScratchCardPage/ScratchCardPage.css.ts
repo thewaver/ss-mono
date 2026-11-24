@@ -74,12 +74,12 @@ export const coin = style({
     height: "100%",
     borderRadius: themeVars.borderRadius.half,
     border: `2px dashed ${themeVars.color.primary.contrast}`,
-    backgroundColor: `rgb(from ${themeVars.color.primary.contrast} r g b / 15%)`,
+    backgroundColor: `color-mix(in srgb, ${themeVars.color.primary.contrast} 15%, transparent)`,
 });
 
 export const coinRubbing = style({
     borderStyle: "solid",
-    backgroundColor: `rgb(from ${themeVars.color.primary.contrast} r g b / 35%)`,
+    backgroundColor: `color-mix(in srgb, ${themeVars.color.primary.contrast} 35%, transparent)`,
 });
 
 export const windows = style({

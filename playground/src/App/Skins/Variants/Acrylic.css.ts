@@ -6,15 +6,11 @@ import { SkinUtils } from "../Skin.utils";
 import { SkinBaseUtils } from "../SkinBase.utils";
 
 import { themeVars } from "../../Theme.css";
-import { skinSelectors, skinVars } from "../Skin.css";
+import { skinSelectors } from "../Skin.css";
 
 const LEVEL = SkinUtils.computeLevelFamily(themeVars.color.layers);
 
-export const acrylic = style({
-    vars: {
-        [skinVars.rangeTrackThickness]: "20px",
-    },
-});
+export const acrylic = style({});
 
 const SHADOW_SMALL = "0 2px 0 0 rgba(0, 0, 0, 0.75)";
 const SHADOW_MEDIUM = `${SHADOW_SMALL}, 0 4px 8px 0 rgba(0, 0, 0, 0.5)`;
@@ -38,7 +34,7 @@ const sheenFromColorString = (color: string, alphaPercent: number): StyleRule =>
 
 const INPUT_STATES: StyleRule["selectors"] = ObjectUtils.deepMerge(SkinBaseUtils.INTERACTIBLE_STATES, {
     [skinSelectors.isReadOnly]: {
-        backgroundImage: `linear-gradient(to bottom, rgb(from ${LEVEL.main} r g b / 25%), rgb(from ${LEVEL.main} r g b / 10%))`,
+        backgroundImage: `linear-gradient(to bottom, color-mix(in srgb, ${LEVEL.main} 25%, transparent), color-mix(in srgb, ${LEVEL.main} 10%, transparent))`,
     },
     [SkinUtils.anyOf(skinSelectors.isCheckedWithin, skinSelectors.isMixedWithin)]: {},
     [SkinUtils.anyOf(skinSelectors.hasErrorWithin, skinSelectors.hasError)]: {
@@ -72,8 +68,8 @@ const SWITCH_STATES: StyleRule["selectors"] = ObjectUtils.deepMerge(INPUT_STATES
 });
 
 const INPUT_SHELL: StyleRule = {
-    border: [`2px solid ${LEVEL.contrast}`, `2px solid rgb(from ${LEVEL.contrast} r g b / 25%)`],
-    backgroundImage: `linear-gradient(to bottom, rgb(from ${LEVEL.dark} r g b / 50%), rgb(from ${LEVEL.light} r g b / 25%))`,
+    border: `2px solid color-mix(in srgb, ${LEVEL.contrast} 25%, transparent)`,
+    backgroundImage: `linear-gradient(to bottom, color-mix(in srgb, ${LEVEL.dark} 50%, transparent), color-mix(in srgb, ${LEVEL.light} 25%, transparent))`,
     boxShadow: SHADOW_SMALL,
     color: LEVEL.contrast,
 } as const;
@@ -83,7 +79,7 @@ const SWITCH_SHELL: StyleRule = {
 } as const;
 
 const ACCORDION: StyleRule = {
-    backgroundImage: `linear-gradient(to bottom, rgb(from ${LEVEL.dark} r g b / 50%), rgb(from ${LEVEL.light} r g b / 25%))`,
+    backgroundImage: `linear-gradient(to bottom, color-mix(in srgb, ${LEVEL.dark} 50%, transparent), color-mix(in srgb, ${LEVEL.light} 25%, transparent))`,
     borderRadius: themeVars.borderRadius.half,
     boxShadow: SHADOW_SMALL,
     color: LEVEL.contrast,
@@ -210,7 +206,7 @@ SkinUtils.define(
             ...INPUT_SHELL,
             selectors: ObjectUtils.deepMerge(INPUT_STATES, {
                 [skinSelectors.fieldTextDisabled]: {
-                    color: [LEVEL.contrast, `rgb(from ${LEVEL.contrast} r g b / ${themeVars.disabled.opacity})`],
+                    color: `color-mix(in srgb, ${LEVEL.contrast} calc(${themeVars.disabled.opacity} * 100%), transparent)`,
                 },
             }),
         },
@@ -244,7 +240,7 @@ SkinUtils.define(
             ...surface(LEVEL),
         },
         panel: {
-            backgroundImage: `linear-gradient(to bottom, rgb(from ${LEVEL.dark} r g b / 50%), rgb(from ${LEVEL.light} r g b / 25%))`,
+            backgroundImage: `linear-gradient(to bottom, color-mix(in srgb, ${LEVEL.dark} 50%, transparent), color-mix(in srgb, ${LEVEL.light} 25%, transparent))`,
             boxShadow: SHADOW_SMALL,
             color: LEVEL.contrast,
         },
@@ -259,7 +255,7 @@ SkinUtils.define(
         },
         progressTrack: {
             borderRadius: SkinUtils.PILL_RADIUS,
-            backgroundColor: [LEVEL.main, `rgb(from ${LEVEL.main} r g b / 50%)`],
+            backgroundColor: `color-mix(in srgb, ${LEVEL.main} 50%, transparent)`,
             boxShadow: SHADOW_SMALL,
         },
         radioBox: {
@@ -273,7 +269,7 @@ SkinUtils.define(
             borderRadius: "50%",
             backgroundColor: themeVars.color.primary.contrast,
         },
-        rangeFill: {
+        rangeFill: ObjectUtils.deepMerge(SkinUtils.roundedFillEnds("20px"), {
             ...sheenFromColorSet(themeVars.color.primary, 100),
             borderRadius: SkinUtils.PILL_RADIUS,
             boxShadow: SHADOW_SMALL,
@@ -282,7 +278,7 @@ SkinUtils.define(
                     ...sheenFromColorSet(themeVars.color.error, 100),
                 },
             },
-        },
+        }),
         rangeThumb: {
             ...sheenFromColorString(themeVars.color.primary.contrast, 100),
             borderRadius: "50%",
@@ -330,7 +326,7 @@ SkinUtils.define(
             fontWeight: "bold",
         },
         splitPaneFrame: {
-            border: `2px dashed rgb(from ${LEVEL.contrast} r g b / 25%)`,
+            border: `2px dashed color-mix(in srgb, ${LEVEL.contrast} 25%, transparent)`,
         },
         surface: {
             ...surface(LEVEL),
@@ -372,14 +368,11 @@ SkinUtils.define(
             },
         },
         tabsTrack: {
-            borderBlockEnd: [`2px solid ${LEVEL.contrast}`, `2px solid rgb(from ${LEVEL.contrast} r g b / 10%)`],
+            borderBlockEnd: `2px solid color-mix(in srgb, ${LEVEL.contrast} 10%, transparent)`,
             selectors: {
                 [skinSelectors.isVertical]: {
                     borderBlockEnd: "none",
-                    borderInlineStart: [
-                        `2px solid ${LEVEL.contrast}`,
-                        `2px solid rgb(from ${LEVEL.contrast} r g b / 10%)`,
-                    ],
+                    borderInlineStart: `2px solid color-mix(in srgb, ${LEVEL.contrast} 10%, transparent)`,
                 },
             },
         },
@@ -407,7 +400,7 @@ SkinUtils.define(
             borderRadius: SkinUtils.PILL_RADIUS,
         },
         tooltip: {
-            backgroundImage: `linear-gradient(to bottom, rgb(from ${LEVEL.dark} r g b / 50%), rgb(from ${LEVEL.light} r g b / 25%))`,
+            backgroundImage: `linear-gradient(to bottom, color-mix(in srgb, ${LEVEL.dark} 50%, transparent), color-mix(in srgb, ${LEVEL.light} 25%, transparent))`,
             boxShadow: SHADOW_MEDIUM,
             backdropFilter: "blur(20px)",
             backgroundOrigin: "border-box",

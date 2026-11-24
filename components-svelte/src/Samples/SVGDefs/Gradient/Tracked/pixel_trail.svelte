@@ -158,7 +158,7 @@
         if (!stamp) return EMPTY_COLORS;
 
         const alpha = squareAlpha * SVGDefsUtils.computePixelTrailAlpha(frameMs - stamp.bornMs, trailMs);
-        const value = `rgb(from ${getColor(stamp, frameMs)} r g b / ${alpha})`;
+        const value = SVGDefsUtils.computeAlphaColor(getColor(stamp, frameMs), alpha);
 
         return [{ value }, { value, stop: 100 }];
     };

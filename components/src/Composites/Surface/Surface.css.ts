@@ -8,7 +8,7 @@ export const strokeOpacityVar = createVar();
 export const surfaceDivRoot = style({
     position: "relative",
     overflow: "hidden",
-    backgroundColor: [fillColorVar, `rgb(from ${fillColorVar} r g b / ${fillOpacityVar})`],
+    backgroundColor: `color-mix(in srgb, ${fillColorVar} calc(${fillOpacityVar} * 100%), transparent)`,
 });
 
 export const surfaceDivBorder = style({
@@ -19,5 +19,5 @@ export const surfaceDivBorder = style({
 
     borderRadius: "inherit",
     borderStyle: "solid",
-    borderColor: [strokeColorVar, `rgb(from ${strokeColorVar} r g b / ${strokeOpacityVar})`],
+    borderColor: `color-mix(in srgb, ${strokeColorVar} calc(${strokeOpacityVar} * 100%), transparent)`,
 });

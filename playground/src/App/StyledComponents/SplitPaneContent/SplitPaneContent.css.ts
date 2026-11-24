@@ -1,12 +1,10 @@
-import { fallbackVar, style } from "@vanilla-extract/css";
+import { style } from "@vanilla-extract/css";
 
-import { skinEntries, skinStates, skinVars } from "../../Skins/Skin.css";
+import { skinEntries, skinStates } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 
 const FRAME_MAX_WIDTH = 380;
 const PICTURE_ASPECT = 1;
-const GRIP_WIDTH = fallbackVar(skinVars.splitPaneGripWidth, "2px");
-const GRIP_HEIGHT = fallbackVar(skinVars.splitPaneGripHeight, "24px");
 
 export const isDragging = style([skinStates.isActive]);
 export const isDisabled = style({});
@@ -35,9 +33,9 @@ export const gutterGrip = style([
     },
 ]);
 
-export const rowGrip = style([gutterGrip, { width: GRIP_WIDTH, height: GRIP_HEIGHT }]);
+export const rowGrip = style([gutterGrip]);
 
-export const columnGrip = style([gutterGrip, { width: GRIP_HEIGHT, height: GRIP_WIDTH }]);
+export const columnGrip = style([gutterGrip, skinStates.isVertical]);
 
 export const splitPaneBox = style([
     skinEntries.panel,

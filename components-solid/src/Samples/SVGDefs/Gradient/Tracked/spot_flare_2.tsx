@@ -91,16 +91,22 @@ export const spot_flare_2 = (opts?: GradientFlareOpts): TrackedGradientConfig =>
                             origin: () => getReading().boxRatio,
                             scale: opts?.glowScale ?? SpotFlare2Const.DEFAULTS.glowScale,
                             colors: [
-                                { value: `rgb(from ${defs.colors.primary} r g b / 1)` },
+                                { value: SVGDefsUtils.computeAlphaColor(defs.colors.primary, 1) },
                                 {
-                                    value: `rgb(from ${defs.colors.primary} r g b / ${opts?.coreAlpha ?? SpotFlare2Const.DEFAULTS.coreAlpha})`,
+                                    value: SVGDefsUtils.computeAlphaColor(
+                                        defs.colors.primary,
+                                        opts?.coreAlpha ?? SpotFlare2Const.DEFAULTS.coreAlpha,
+                                    ),
                                     stop: opts?.coreStop ?? SpotFlare2Const.DEFAULTS.coreStop,
                                 },
                                 {
-                                    value: `rgb(from ${defs.colors.primary} r g b / ${opts?.falloffAlpha ?? SpotFlare2Const.DEFAULTS.falloffAlpha})`,
+                                    value: SVGDefsUtils.computeAlphaColor(
+                                        defs.colors.primary,
+                                        opts?.falloffAlpha ?? SpotFlare2Const.DEFAULTS.falloffAlpha,
+                                    ),
                                     stop: opts?.falloffStop ?? SpotFlare2Const.DEFAULTS.falloffStop,
                                 },
-                                { value: `rgb(from ${defs.colors.primary} r g b / 0)`, stop: 100 },
+                                { value: SVGDefsUtils.computeAlphaColor(defs.colors.primary, 0), stop: 100 },
                             ],
                         });
                     },

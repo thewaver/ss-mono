@@ -84,11 +84,11 @@
         const crestStop = opts?.crestStop ?? DEFAULTS.crestStop;
 
         return [
-            { value: `rgb(from ${color} r g b / 0)` },
-            { value: `rgb(from ${color} r g b / 0)`, stop: crestStop - spread },
-            { value: `rgb(from ${color} r g b / ${alpha})`, stop: crestStop },
-            { value: `rgb(from ${color} r g b / 0)`, stop: Math.min(crestStop + spread, CREST_OUTER_LIMIT) },
-            { value: `rgb(from ${color} r g b / 0)`, stop: 100 },
+            { value: SVGDefsUtils.computeAlphaColor(color, 0) },
+            { value: SVGDefsUtils.computeAlphaColor(color, 0), stop: crestStop - spread },
+            { value: SVGDefsUtils.computeAlphaColor(color, alpha), stop: crestStop },
+            { value: SVGDefsUtils.computeAlphaColor(color, 0), stop: Math.min(crestStop + spread, CREST_OUTER_LIMIT) },
+            { value: SVGDefsUtils.computeAlphaColor(color, 0), stop: 100 },
         ];
     };
 
@@ -183,12 +183,12 @@
         origin: getReading().boxRatio,
         scale: props.opts?.sourceScale ?? DEFAULTS.sourceScale,
         colors: [
-            { value: `rgb(from ${color} r g b / 1)` },
+            { value: SVGDefsUtils.computeAlphaColor(color, 1) },
             {
-                value: `rgb(from ${color} r g b / ${props.opts?.sourceAlpha ?? DEFAULTS.sourceAlpha})`,
+                value: SVGDefsUtils.computeAlphaColor(color, props.opts?.sourceAlpha ?? DEFAULTS.sourceAlpha),
                 stop: props.opts?.sourceStop ?? DEFAULTS.sourceStop,
             },
-            { value: `rgb(from ${color} r g b / 0)`, stop: 100 },
+            { value: SVGDefsUtils.computeAlphaColor(color, 0), stop: 100 },
         ],
     })}
 />

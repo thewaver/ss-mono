@@ -37,6 +37,26 @@ An SVG `fill` cannot take a CSS gradient, so a gradient-filled path renders its 
 generated id, with the stops as vanilla-extract classes (a presentation attribute will not resolve a CSS custom
 property) and the picked state pointing `fill` at it inline.
 
+### A see-through color is `color-mix()`; relative color syntax is only for what `color-mix()` cannot say
+
+The user's rule. **A color made see-through is `color-mix(in srgb, X 25%, transparent)`, with no fallback** — the
+same result as `rgb(from X r g b / 25%)`, but widely available since May 2023, where relative color syntax was fully
+supported only from late 2024 (Chrome 131, Firefox 133, Safari 18). An alpha written as a fraction becomes
+`calc(${alpha} * 100%)`. Relative color syntax stays only for a change it alone can express:
+
+- **A change of hue, saturation or lightness**, which `color-mix()` cannot reproduce. It is written as vanilla-extract's
+  `[fallback, relative]` array, and the fallback is the unshifted color at the same transparency — never a fallback
+  that can paint text on its own color, as an `[original, "rgb(from original …)"]` pair does to a see-through
+  `contrast` background under `contrast` text. **A gradient carries no fallback** — the user's call: a second copy
+  of every gradient made the code too hard to read, and losing the gradient in an older browser is accepted.
+
+**An SVG gradient stop never reaches 0%** — the user's call. SVG blends stops without premultiplying, so a
+transparent stop's color shows mid-ramp ([SVG 2](https://www.w3.org/TR/SVG2/pservers.html#StopColorProperties)),
+and `color-mix()` at 0% is transparent black — a dark band. A stop at 0.01% is invisible and keeps its hue in
+Chromium, Firefox and WebKit, measured, Firefox storing it as the color at zero opacity.
+`SVGDefsUtils.computeAlphaColor` applies the floor; a stop goes through it. CSS gradients premultiply
+([CSS Images 3](https://www.w3.org/TR/css-images-3/#coloring-gradient-line)), so `transparent` is harmless there.
+
 ### A Playground style names a theme token, never repeats its number
 
 The user's rule: a number equal to a token is not the token, because the theme can no longer move it. In

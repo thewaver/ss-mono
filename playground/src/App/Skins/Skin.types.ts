@@ -114,7 +114,8 @@ export type SkinBaseEntry =
     | "tableDetail"
     | "tableHeader";
 
-export type SkinBasePartEntry = "input" | "itemStatic" | "tabsItemBase";
+export type SkinBasePartEntry =
+    "input" | "itemStatic" | "progressTrack" | "rangeFill" | "rangeThumb" | "rangeTrack" | "tabsItemBase";
 
 export type SkinBaseRules = Record<SkinBaseEntry | SkinBasePartEntry, SkinRule>;
 

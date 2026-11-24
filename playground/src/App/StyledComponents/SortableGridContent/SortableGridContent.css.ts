@@ -58,7 +58,7 @@ export const sortableGridItemShape = style({
 
 export const sortableGridItemContour = style({
     fill: "black",
-    stroke: `rgb(from ${themeVars.color.primary.main} r g b / 50%)`,
+    stroke: `color-mix(in srgb, ${themeVars.color.primary.main} 50%, transparent)`,
     strokeWidth: 2,
     transition: `fill ${themeVars.animation.duration}, stroke ${themeVars.animation.duration}`,
 
@@ -125,14 +125,14 @@ export const sortableGridLanding = style({
 });
 
 export const sortableGridLandingContour = style({
-    fill: `rgb(from ${themeVars.color.error.main} r g b / 25%)`,
+    fill: `color-mix(in srgb, ${themeVars.color.error.main} 25%, transparent)`,
     stroke: themeVars.color.error.main,
     strokeWidth: 2,
     strokeDasharray: "5 4",
 
     selectors: {
         [`.${isAllowed} &`]: {
-            fill: `rgb(from ${themeVars.color.primary.main} r g b / 25%)`,
+            fill: `color-mix(in srgb, ${themeVars.color.primary.main} 25%, transparent)`,
             stroke: themeVars.color.primary.main,
         },
     },
@@ -156,7 +156,7 @@ export const sortableGridSurface = style({
         },
         [`&.${isReceiving}`]: {
             borderColor: themeVars.color.primary.main,
-            backgroundColor: `rgb(from ${themeVars.color.primary.main} r g b / 10%)`,
+            backgroundColor: `color-mix(in srgb, ${themeVars.color.primary.main} 10%, transparent)`,
         },
         [`&.${isDisabled}`]: {
             filter: themeVars.disabled.filter,

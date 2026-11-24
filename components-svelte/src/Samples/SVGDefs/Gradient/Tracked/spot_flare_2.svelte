@@ -81,16 +81,16 @@
             origin: ratio,
             scale: props.opts?.glowScale ?? DEFAULTS.glowScale,
             colors: [
-                { value: `rgb(from ${color} r g b / 1)` },
+                { value: SVGDefsUtils.computeAlphaColor(color, 1) },
                 {
-                    value: `rgb(from ${color} r g b / ${props.opts?.coreAlpha ?? DEFAULTS.coreAlpha})`,
+                    value: SVGDefsUtils.computeAlphaColor(color, props.opts?.coreAlpha ?? DEFAULTS.coreAlpha),
                     stop: props.opts?.coreStop ?? DEFAULTS.coreStop,
                 },
                 {
-                    value: `rgb(from ${color} r g b / ${props.opts?.falloffAlpha ?? DEFAULTS.falloffAlpha})`,
+                    value: SVGDefsUtils.computeAlphaColor(color, props.opts?.falloffAlpha ?? DEFAULTS.falloffAlpha),
                     stop: props.opts?.falloffStop ?? DEFAULTS.falloffStop,
                 },
-                { value: `rgb(from ${color} r g b / 0)`, stop: 100 },
+                { value: SVGDefsUtils.computeAlphaColor(color, 0), stop: 100 },
             ],
         });
     };

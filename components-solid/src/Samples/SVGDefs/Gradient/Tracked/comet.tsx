@@ -127,8 +127,8 @@ export const createCometSample =
                                         share,
                                     ),
                                     colors: () => [
-                                        { value: `rgb(from ${getColor(comet)} r g b / ${getAlpha()})` },
-                                        { value: `rgb(from ${getColor(comet)} r g b / 0)`, stop: 100 },
+                                        { value: SVGDefsUtils.computeAlphaColor(getColor(comet), getAlpha()) },
+                                        { value: SVGDefsUtils.computeAlphaColor(getColor(comet), 0), stop: 100 },
                                     ],
                                 }),
                         },

@@ -101,23 +101,23 @@ const createRipple = (
             const spread = getSpread();
 
             return [
-                { value: `rgb(from ${color} r g b / 0)` },
+                { value: SVGDefsUtils.computeAlphaColor(color, 0) },
                 {
-                    value: `rgb(from ${color} r g b / 0)`,
+                    value: SVGDefsUtils.computeAlphaColor(color, 0),
                     stop: (opts?.crestStop ?? SpotRipple1Const.DEFAULTS.crestStop) - spread,
                 },
                 {
-                    value: `rgb(from ${color} r g b / ${alpha})`,
+                    value: SVGDefsUtils.computeAlphaColor(color, alpha),
                     stop: opts?.crestStop ?? SpotRipple1Const.DEFAULTS.crestStop,
                 },
                 {
-                    value: `rgb(from ${color} r g b / 0)`,
+                    value: SVGDefsUtils.computeAlphaColor(color, 0),
                     stop: Math.min(
                         (opts?.crestStop ?? SpotRipple1Const.DEFAULTS.crestStop) + spread,
                         SpotRippleConst.CREST_OUTER_LIMIT,
                     ),
                 },
-                { value: `rgb(from ${color} r g b / 0)`, stop: 100 },
+                { value: SVGDefsUtils.computeAlphaColor(color, 0), stop: 100 },
             ];
         },
     };
@@ -151,12 +151,15 @@ export const spot_ripple_1 = (opts?: GradientRippleSampleOpts): TrackedGradientC
                             origin: () => getReading().boxRatio,
                             scale: opts?.sourceScale ?? SpotRipple1Const.DEFAULTS.sourceScale,
                             colors: [
-                                { value: `rgb(from ${defs.colors.primary} r g b / 1)` },
+                                { value: SVGDefsUtils.computeAlphaColor(defs.colors.primary, 1) },
                                 {
-                                    value: `rgb(from ${defs.colors.primary} r g b / ${opts?.sourceAlpha ?? SpotRipple1Const.DEFAULTS.sourceAlpha})`,
+                                    value: SVGDefsUtils.computeAlphaColor(
+                                        defs.colors.primary,
+                                        opts?.sourceAlpha ?? SpotRipple1Const.DEFAULTS.sourceAlpha,
+                                    ),
                                     stop: opts?.sourceStop ?? SpotRipple1Const.DEFAULTS.sourceStop,
                                 },
-                                { value: `rgb(from ${defs.colors.primary} r g b / 0)`, stop: 100 },
+                                { value: SVGDefsUtils.computeAlphaColor(defs.colors.primary, 0), stop: 100 },
                             ],
                         });
                     },

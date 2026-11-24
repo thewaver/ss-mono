@@ -13,8 +13,6 @@ const travel = (ratio: number) => `calc(${ratio} * (100% - ${styles.RANGE_THUMB_
 const center = (ratio: number) =>
     `calc(${ratio} * (100% - ${styles.RANGE_THUMB_SIZE}px) + ${styles.RANGE_THUMB_SIZE * 0.5}px)`;
 
-const HALF_DRAWN_THUMB = `${styles.RANGE_DRAWN_THUMB_WIDTH} * 0.5`;
-
 export const PageRangeContent = (props: RangeContentProps) => {
     const layerClass = useLayerClass();
 
@@ -26,9 +24,9 @@ export const PageRangeContent = (props: RangeContentProps) => {
 
     const fill = props.renderProps.fill;
 
-    const fillStart = isPair ? `calc(${center(fill.start)} - ${HALF_DRAWN_THUMB})` : "0px";
+    const fillStart = isPair ? center(fill.start) : "0px";
 
-    const fillSpan = `calc(${center(fill.end)} + ${HALF_DRAWN_THUMB} - ${fillStart})`;
+    const fillSpan = `calc(${center(fill.end)} - ${fillStart})`;
 
     return (
         <div
@@ -63,6 +61,7 @@ export const PageRangeContent = (props: RangeContentProps) => {
                     styles.rangeFill,
                     styles.rangeFillVariants[orientation],
                     props.renderProps.hasError && styles.hasError,
+                    !isPair && styles.isStart,
                 ]
                     .filter(Boolean)
                     .join(" ")}

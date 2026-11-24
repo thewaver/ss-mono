@@ -30,16 +30,22 @@ export const spot_1 = (opts?: GradientSpotOpts): TrackedGradientConfig => ({
                         origin: () => getReading().boxRatio,
                         scale: opts?.glowScale ?? Spot1Const.DEFAULTS.glowScale,
                         colors: [
-                            { value: `rgb(from ${defs.colors.primary} r g b / 1)` },
+                            { value: SVGDefsUtils.computeAlphaColor(defs.colors.primary, 1) },
                             {
-                                value: `rgb(from ${defs.colors.primary} r g b / ${opts?.coreAlpha ?? Spot1Const.DEFAULTS.coreAlpha})`,
+                                value: SVGDefsUtils.computeAlphaColor(
+                                    defs.colors.primary,
+                                    opts?.coreAlpha ?? Spot1Const.DEFAULTS.coreAlpha,
+                                ),
                                 stop: opts?.coreStop ?? Spot1Const.DEFAULTS.coreStop,
                             },
                             {
-                                value: `rgb(from ${defs.colors.primary} r g b / ${opts?.falloffAlpha ?? Spot1Const.DEFAULTS.falloffAlpha})`,
+                                value: SVGDefsUtils.computeAlphaColor(
+                                    defs.colors.primary,
+                                    opts?.falloffAlpha ?? Spot1Const.DEFAULTS.falloffAlpha,
+                                ),
                                 stop: opts?.falloffStop ?? Spot1Const.DEFAULTS.falloffStop,
                             },
-                            { value: `rgb(from ${defs.colors.primary} r g b / 0)`, stop: 100 },
+                            { value: SVGDefsUtils.computeAlphaColor(defs.colors.primary, 0), stop: 100 },
                         ],
                     });
                 },

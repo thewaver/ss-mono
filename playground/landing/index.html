@@ -15,10 +15,26 @@
                 font-family: system-ui, sans-serif;
                 background-color: black;
                 background-image:
-                    radial-gradient(at 20% 20%, rgb(from var(--react-primary) r g b / 10%), transparent 50%),
-                    radial-gradient(at 40% 40%, rgb(from var(--solid-primary) r g b / 10%), transparent 50%),
-                    radial-gradient(at 60% 60%, rgb(from var(--svelte-primary) r g b / 10%), transparent 50%),
-                    radial-gradient(at 80% 80%, rgb(from var(--vue-primary) r g b / 10%), transparent 50%);
+                    radial-gradient(
+                        at 20% 20%,
+                        color-mix(in srgb, var(--react-primary) 10%, transparent),
+                        transparent 50%
+                    ),
+                    radial-gradient(
+                        at 40% 40%,
+                        color-mix(in srgb, var(--solid-primary) 10%, transparent),
+                        transparent 50%
+                    ),
+                    radial-gradient(
+                        at 60% 60%,
+                        color-mix(in srgb, var(--svelte-primary) 10%, transparent),
+                        transparent 50%
+                    ),
+                    radial-gradient(
+                        at 80% 80%,
+                        color-mix(in srgb, var(--vue-primary) 10%, transparent),
+                        transparent 50%
+                    );
                 color: white;
                 color-scheme: "dark";
             }

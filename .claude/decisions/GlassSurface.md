@@ -15,7 +15,7 @@ approximating it with `border-radius`.
 by Chromium and ignored by Firefox and Safari, both of which support `backdrop-filter` with the CSS functions
 and both of which parse the `url()` form as perfectly valid. That last part is what rules out
 vanilla-extract's `[fallback, desired]` array: the array works by the browser _rejecting_ the second
-declaration, which is why `backgroundColor: [dark, "rgb(from …)"]` works elsewhere in the Playground, and
+declaration, which is how the Skins’ `[unshifted, "hsl(from …)"]` pairs degrade, and
 here nothing is rejected — the value parses and the effect is simply missing, so the blur would be discarded
 in favor of a url() that does nothing. Two elements instead: a lower layer carrying only the blur and an
 upper one carrying only the `url()`. Chromium composes both; the other two get the blur and an inert second

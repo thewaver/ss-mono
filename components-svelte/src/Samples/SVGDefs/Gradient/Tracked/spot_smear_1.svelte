@@ -65,16 +65,16 @@
     const getStampId = (id: string, index: number) => `gradient${index + 2}-${id}`;
 
     const computePoolColors = (color: string, alpha: number, opts?: GradientFalloffOpts) => [
-        { value: `rgb(from ${color} r g b / ${alpha})` },
+        { value: SVGDefsUtils.computeAlphaColor(color, alpha) },
         {
-            value: `rgb(from ${color} r g b / ${alpha * (opts?.coreAlpha ?? DEFAULTS.coreAlpha)})`,
+            value: SVGDefsUtils.computeAlphaColor(color, alpha * (opts?.coreAlpha ?? DEFAULTS.coreAlpha)),
             stop: opts?.coreStop ?? DEFAULTS.coreStop,
         },
         {
-            value: `rgb(from ${color} r g b / ${alpha * (opts?.falloffAlpha ?? DEFAULTS.falloffAlpha)})`,
+            value: SVGDefsUtils.computeAlphaColor(color, alpha * (opts?.falloffAlpha ?? DEFAULTS.falloffAlpha)),
             stop: opts?.falloffStop ?? DEFAULTS.falloffStop,
         },
-        { value: `rgb(from ${color} r g b / 0)`, stop: 100 },
+        { value: SVGDefsUtils.computeAlphaColor(color, 0), stop: 100 },
     ];
 
     const clock = SVGDefsSvelteUtils.createClock(TRAIL_LIFETIME_MS);

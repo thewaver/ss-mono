@@ -52,9 +52,9 @@ const getShortestTurn = (from: number, to: number) => {
 const getSweepRotation = (angle: number, arc: number) => angle - HandTrailConst.HALF_TURN - arc * 0.5;
 
 const computeSweepColors = (color: string, alpha: number) => [
-    { value: `rgb(from ${color} r g b / 0)` },
-    { value: `rgb(from ${color} r g b / ${alpha})` },
-    { value: `rgb(from ${color} r g b / 0)` },
+    { value: SVGDefsUtils.computeAlphaColor(color, 0) },
+    { value: SVGDefsUtils.computeAlphaColor(color, alpha) },
+    { value: SVGDefsUtils.computeAlphaColor(color, 0) },
 ];
 
 const clock = SVGDefsUtils.createClock(TrailStampConst.TRAIL_LIFETIME_MS);

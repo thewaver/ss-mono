@@ -94,16 +94,22 @@ const FlareSpot = (props: FlarePartProps) => {
         origin: reading.boxRatio,
         scale: props.opts?.glowScale ?? SpotFlare3Const.DEFAULTS.glowScale,
         colors: [
-            { value: `rgb(from ${color} r g b / 1)` },
+            { value: SVGDefsUtils.computeAlphaColor(color, 1) },
             {
-                value: `rgb(from ${color} r g b / ${props.opts?.coreAlpha ?? SpotFlare3Const.DEFAULTS.coreAlpha})`,
+                value: SVGDefsUtils.computeAlphaColor(
+                    color,
+                    props.opts?.coreAlpha ?? SpotFlare3Const.DEFAULTS.coreAlpha,
+                ),
                 stop: props.opts?.coreStop ?? SpotFlare3Const.DEFAULTS.coreStop,
             },
             {
-                value: `rgb(from ${color} r g b / ${props.opts?.falloffAlpha ?? SpotFlare3Const.DEFAULTS.falloffAlpha})`,
+                value: SVGDefsUtils.computeAlphaColor(
+                    color,
+                    props.opts?.falloffAlpha ?? SpotFlare3Const.DEFAULTS.falloffAlpha,
+                ),
                 stop: props.opts?.falloffStop ?? SpotFlare3Const.DEFAULTS.falloffStop,
             },
-            { value: `rgb(from ${color} r g b / 0)`, stop: 100 },
+            { value: SVGDefsUtils.computeAlphaColor(color, 0), stop: 100 },
         ],
     });
 };

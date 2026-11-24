@@ -127,22 +127,22 @@ across the surface is one full color pass. Composition is a fragment in the `cus
 `computeLinearGradient`, which is what the deleted `hue_rot_3` already did.
 
 **A transparent stop must cycle too, and this is the part that decided the implementation.** The samples
-spell a faded stop as `rgb(from ${color} r g b / 0)`, and a gradient ramp between a transparent stop and an
+spell a faded stop through `SVGDefsUtils.computeAlphaColor`, and a gradient ramp between a transparent stop and an
 opaque one interpolates the two colors **without premultiplying** — so the hue of a fully transparent stop
 is visible in the middle of the ramp. Measured in Chromium: a ramp from transparent yellow to opaque cyan
 samples `rgb(175 255 175)` at its midpoint where transparent-cyan-to-opaque-cyan samples `rgb(0 255 255)`.
 Leaving the faded stops on the starting hue while the opaque one cycled would therefore wash every band
 through a muddy green for most of the cycle.
 
-**SMIL cannot animate a relative color, which is why `SVGDefsUtils.getTransparentColor` exists.** An
-`animate` on `stop-color` whose `values` are `rgb(from … r g b / 0)` is ignored outright — measured in
-Chromium, the stop sits on its attribute value for the whole duration while a hex-valued control interpolates
-normally. SMIL's color parser predates CSS relative color syntax and does not resolve `from`. Concrete
+**Chromium's SMIL cannot animate a computed color, which is why `SVGDefsUtils.getTransparentColor` exists.** An
+`animate` on `stop-color` whose `values` are `rgb(from …)` or `color-mix(…)` is ignored outright in Chromium —
+the stop sits on its attribute value for the whole duration while a hex-valued control interpolates normally.
+Firefox and WebKit animate all three. Concrete
 forms all work: `rgba(r,g,b,a)`, `#rrggbbaa`, and the space-separated `rgb(r g b / a)` that
-`Color.RGBA.toCss` emits. So `getTransparentColor` resolves a hex palette color to that concrete form and
-falls back to the relative spelling for anything that is not a hex — a non-hex color then behaves exactly as
-it does in the non-cycling sibling, which is to say the faded stops hold still. The guard mirrors the one the
-tracked `c` variants already use around `Color.Hex.isHex`.
+`Color.RGBA.toCss` emits. So `getTransparentColor` resolves any color `Color.parse` can read — hex, `rgb()`,
+`hsl()`, a named color — to that concrete form, and falls back to `computeAlphaColor` for the rest, a custom
+property chiefly; such a color then behaves in Chromium exactly as it does in the non-cycling sibling, which is to
+say the faded stops hold still.
 
 **Only the `c` variants use it.** The samples that do not animate their colors keep the relative spelling,
 which reads better and works for any color string.
@@ -616,8 +616,8 @@ interpolation being wrong; it is a finding about this palette. Do not swap it ba
 the other is for, which is why the swap costs a line.
 
 **Blending needs the colors as hex, and that is a real limit rather than a hidden one.** `SVGDefsColors`
-holds plain strings, and every other sample treats them as opaque and hands them to relative color syntax,
-which accepts any CSS color. Blending in JavaScript needs the numbers, so `getCycleColor` guards with
+holds plain strings, and every other sample treats them as opaque and hands them to `color-mix()` through
+`computeAlphaColor`, which accepts any CSS color. Blending in JavaScript needs the numbers, so `getCycleColor` guards with
 `Color.Hex.isHex` and falls back to the unblended color when either end is not hex. The Playground's color
 picker emits hex and `SAMPLE_COLORS` are hex, so the blend runs in practice; a consumer passing `oklch(…)`
 gets the stepping behavior rather than a broken gradient. Tightening `SVGDefsColors` to `Color.Hex` would

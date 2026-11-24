@@ -8,18 +8,6 @@ export const skinLayer = layer("skin");
 
 const barAngle = createVar();
 
-export const skinSizeVars = {
-    rangeTrackThickness: createVar(),
-    rangeFillThickness: createVar(),
-    rangeThumbWidth: createVar(),
-    rangeThumbHeight: createVar(),
-    progressTrackThickness: createVar(),
-    progressTipWidth: createVar(),
-    progressTipHeight: createVar(),
-    splitPaneGripWidth: createVar(),
-    splitPaneGripHeight: createVar(),
-};
-
 export const skinColorVars = {
     accentColor: createVar(),
     outlineColor: createVar(),
@@ -31,7 +19,6 @@ export const skinVars = {
     outlineColor: fallbackVar(skinColorVars.outlineColor, themeVars.color.outline.main),
     startValue: createVar(),
     endValue: createVar(),
-    ...skinSizeVars,
 };
 
 globalStyle(":focus-visible", {

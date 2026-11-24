@@ -11,9 +11,9 @@ import { SVGDefsSolidUtils } from "../../SVGDefsSolid.utils";
 const NO_REF = () => undefined;
 
 const computeSweepColors = (color: string, alpha: number) => [
-    { value: `rgb(from ${color} r g b / 0)` },
-    { value: `rgb(from ${color} r g b / ${alpha})` },
-    { value: `rgb(from ${color} r g b / 0)` },
+    { value: SVGDefsUtils.computeAlphaColor(color, 0) },
+    { value: SVGDefsUtils.computeAlphaColor(color, alpha) },
+    { value: SVGDefsUtils.computeAlphaColor(color, 0) },
 ];
 
 export const hand_1 = (opts?: GradientHandOpts): TrackedGradientConfig => ({

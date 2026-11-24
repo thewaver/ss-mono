@@ -14,8 +14,6 @@ const travel = (ratio: number) => `calc(${ratio} * (100% - ${styles.RANGE_THUMB_
 const center = (ratio: number) =>
     `calc(${ratio} * (100% - ${styles.RANGE_THUMB_SIZE}px) + ${styles.RANGE_THUMB_SIZE * 0.5}px)`;
 
-const HALF_DRAWN_THUMB = `${styles.RANGE_DRAWN_THUMB_WIDTH} * 0.5`;
-
 export const PageRangeContent = (props: RangeContentProps) => {
     const getLayerClass = useLayerClass();
 
@@ -25,11 +23,9 @@ export const PageRangeContent = (props: RangeContentProps) => {
 
     const getLength = () => access(props.length) ?? DEFAULT_RANGE_CONTENT_LENGTH;
 
-    const getFillStart = () =>
-        getIsPair() ? `calc(${center(access(props.renderProps).fill.start)} - ${HALF_DRAWN_THUMB})` : "0px";
+    const getFillStart = () => (getIsPair() ? center(access(props.renderProps).fill.start) : "0px");
 
-    const getFillSpan = () =>
-        `calc(${center(access(props.renderProps).fill.end)} + ${HALF_DRAWN_THUMB} - ${getFillStart()})`;
+    const getFillSpan = () => `calc(${center(access(props.renderProps).fill.end)} - ${getFillStart()})`;
 
     return (
         <div
@@ -60,6 +56,7 @@ export const PageRangeContent = (props: RangeContentProps) => {
                 classList={{
                     [styles.rangeFillVariants[getOrientation()]]: true,
                     [styles.hasError]: access(props.renderProps).hasError,
+                    [styles.isStart]: !getIsPair(),
                 }}
                 style={
                     getOrientation() === "vertical"

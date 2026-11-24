@@ -10,11 +10,7 @@ import { skinSelectors, skinVars } from "../Skin.css";
 
 const LEVEL = SkinUtils.computeLevelFamily(themeVars.color.layers);
 
-export const glossy = style({
-    vars: {
-        [skinVars.rangeTrackThickness]: "20px",
-    },
-});
+export const glossy = style({});
 
 const SHADOW_GROOVE = [
     "inset 0 2px 4px 0 rgba(0, 0, 0, 0.75)",
@@ -59,7 +55,7 @@ const gloss = (
 
 const INPUT_STATES: StyleRule["selectors"] = ObjectUtils.deepMerge(SkinBaseUtils.INTERACTIBLE_STATES, {
     [skinSelectors.isReadOnly]: {
-        backgroundColor: [LEVEL.contrast, `rgb(from ${LEVEL.contrast} r g b / 10%)`],
+        backgroundColor: `color-mix(in srgb, ${LEVEL.contrast} 10%, transparent)`,
     },
     [SkinUtils.anyOf(skinSelectors.hasErrorWithin, skinSelectors.hasError)]: {
         boxShadow: [`0 0 0 2px ${themeVars.color.error.main}`, SHADOW_GROOVE].join(", "),
@@ -85,7 +81,7 @@ const SWITCH_STATES: StyleRule["selectors"] = {
 
 const INPUT_SHELL: StyleRule = {
     borderRadius: themeVars.borderRadius.full,
-    backgroundColor: [LEVEL.dark, `rgb(from ${LEVEL.dark} r g b / 75%)`],
+    backgroundColor: `color-mix(in srgb, ${LEVEL.dark} 75%, transparent)`,
     boxShadow: SHADOW_GROOVE,
     color: LEVEL.contrast,
 } as const;
@@ -107,7 +103,7 @@ const ITEM: StyleRule = {
 
 const ITEM_FLOATER_HOVER: StyleRule = {
     borderRadius: themeVars.borderRadius.full,
-    backgroundColor: [LEVEL.contrast, `rgb(from ${LEVEL.contrast} r g b / 10%)`],
+    backgroundColor: `color-mix(in srgb, ${LEVEL.contrast} 10%, transparent)`,
     boxShadow: sheen({ outterShadow: SHADOW_SMALL }),
 };
 
@@ -173,7 +169,7 @@ SkinUtils.define(
         },
         buttonSimple: {
             borderRadius: themeVars.borderRadius.full,
-            backgroundColor: [LEVEL.contrast, `rgb(from ${LEVEL.contrast} r g b / 25%)`],
+            backgroundColor: `color-mix(in srgb, ${LEVEL.contrast} 25%, transparent)`,
             boxShadow: sheen({ outterShadow: SHADOW_SMALL }),
             color: LEVEL.contrast,
             fontSize: themeVars.fontSize.small,
@@ -224,7 +220,7 @@ SkinUtils.define(
             selectors: ObjectUtils.deepMerge(INPUT_STATES, {
                 ...INPUT_STATES,
                 [skinSelectors.fieldTextDisabled]: {
-                    color: [LEVEL.contrast, `rgb(from ${LEVEL.contrast} r g b / ${themeVars.disabled.opacity})`],
+                    color: `color-mix(in srgb, ${LEVEL.contrast} calc(${themeVars.disabled.opacity} * 100%), transparent)`,
                 },
             }),
         },
@@ -269,7 +265,7 @@ SkinUtils.define(
             },
         },
         progressTrack: {
-            backgroundColor: [LEVEL.dark, `rgb(from ${LEVEL.dark} r g b / 75%)`],
+            backgroundColor: `color-mix(in srgb, ${LEVEL.dark} 75%, transparent)`,
             boxShadow: SHADOW_GROOVE,
         },
         radioBox: {
@@ -286,7 +282,7 @@ SkinUtils.define(
                 backgroundColor: themeVars.color.error.main,
             },
         },
-        rangeFill: {
+        rangeFill: ObjectUtils.deepMerge(SkinUtils.roundedFillEnds("20px"), {
             ...gloss(themeVars.color.primary, { angle: skinVars.barAngle }),
             borderRadius: SkinUtils.PILL_RADIUS,
             selectors: {
@@ -294,7 +290,7 @@ SkinUtils.define(
                     ...gloss(themeVars.color.error, { angle: skinVars.barAngle }),
                 },
             },
-        },
+        }),
         rangeThumb: {
             borderRadius: "50%",
             border: `2px solid ${themeVars.color.primary.main}`,
@@ -312,7 +308,7 @@ SkinUtils.define(
         },
         rangeTrack: {
             borderRadius: SkinUtils.PILL_RADIUS,
-            backgroundColor: [LEVEL.dark, `rgb(from ${LEVEL.dark} r g b / 75%)`],
+            backgroundColor: `color-mix(in srgb, ${LEVEL.dark} 75%, transparent)`,
             boxShadow: SHADOW_GROOVE,
         },
         slideButtonFill: {
@@ -341,13 +337,13 @@ SkinUtils.define(
         },
         slideButtonTrack: {
             borderRadius: SkinUtils.PILL_RADIUS,
-            backgroundColor: [LEVEL.dark, `rgb(from ${LEVEL.dark} r g b / 75%)`],
+            backgroundColor: `color-mix(in srgb, ${LEVEL.dark} 75%, transparent)`,
             boxShadow: SHADOW_GROOVE,
             fontWeight: "bold",
         },
         splitPaneFrame: {
             borderRadius: themeVars.borderRadius.full,
-            backgroundColor: [LEVEL.dark, `rgb(from ${LEVEL.dark} r g b / 75%)`],
+            backgroundColor: `color-mix(in srgb, ${LEVEL.dark} 75%, transparent)`,
             boxShadow: SHADOW_GROOVE,
             color: LEVEL.contrast,
         },
@@ -392,14 +388,14 @@ SkinUtils.define(
         },
         tabsTrack: {
             borderRadius: themeVars.borderRadius.full,
-            backgroundColor: [LEVEL.dark, `rgb(from ${LEVEL.dark} r g b / 75%)`],
+            backgroundColor: `color-mix(in srgb, ${LEVEL.dark} 75%, transparent)`,
             boxShadow: SHADOW_GROOVE,
             color: LEVEL.contrast,
         },
         tag: {
             borderRadius: themeVars.borderRadius.half,
             paddingInline: themeVars.spacing.full,
-            backgroundColor: [LEVEL.contrast, `rgb(from ${LEVEL.contrast} r g b / 25%)`],
+            backgroundColor: `color-mix(in srgb, ${LEVEL.contrast} 25%, transparent)`,
             boxShadow: sheen({ outterShadow: SHADOW_SMALL }),
             color: LEVEL.contrast,
             fontSize: themeVars.fontSize.xSmall,
@@ -410,7 +406,7 @@ SkinUtils.define(
         },
         toggleThumb: {
             borderRadius: themeVars.borderRadius.half,
-            backgroundColor: [LEVEL.contrast, `rgb(from ${LEVEL.contrast} r g b / 75%)`],
+            backgroundColor: `color-mix(in srgb, ${LEVEL.contrast} 75%, transparent)`,
             boxShadow: sheen(),
             selectors: {
                 [SkinUtils.anyOf(skinSelectors.isCheckedWithin, skinSelectors.isMixedWithin)]: {

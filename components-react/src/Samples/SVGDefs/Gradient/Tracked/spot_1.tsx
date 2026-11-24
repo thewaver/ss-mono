@@ -25,16 +25,19 @@ const SpotGradient = (props: SpotGradientProps) => {
         origin: reading.boxRatio,
         scale: props.opts?.glowScale ?? Spot1Const.DEFAULTS.glowScale,
         colors: [
-            { value: `rgb(from ${color} r g b / 1)` },
+            { value: SVGDefsUtils.computeAlphaColor(color, 1) },
             {
-                value: `rgb(from ${color} r g b / ${props.opts?.coreAlpha ?? Spot1Const.DEFAULTS.coreAlpha})`,
+                value: SVGDefsUtils.computeAlphaColor(color, props.opts?.coreAlpha ?? Spot1Const.DEFAULTS.coreAlpha),
                 stop: props.opts?.coreStop ?? Spot1Const.DEFAULTS.coreStop,
             },
             {
-                value: `rgb(from ${color} r g b / ${props.opts?.falloffAlpha ?? Spot1Const.DEFAULTS.falloffAlpha})`,
+                value: SVGDefsUtils.computeAlphaColor(
+                    color,
+                    props.opts?.falloffAlpha ?? Spot1Const.DEFAULTS.falloffAlpha,
+                ),
                 stop: props.opts?.falloffStop ?? Spot1Const.DEFAULTS.falloffStop,
             },
-            { value: `rgb(from ${color} r g b / 0)`, stop: 100 },
+            { value: SVGDefsUtils.computeAlphaColor(color, 0), stop: 100 },
         ],
     });
 };

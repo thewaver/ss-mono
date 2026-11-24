@@ -10,11 +10,7 @@ import { skinSelectors, skinVars } from "../Skin.css";
 
 const LEVEL = SkinUtils.computeLevelFamily(themeVars.color.layers);
 
-export const terminal = style({
-    vars: {
-        [skinVars.rangeTrackThickness]: "20px",
-    },
-});
+export const terminal = style({});
 
 const SEGMENT_WIDTH = 8;
 const SEGMENT_GAP = 2;
@@ -24,7 +20,7 @@ const segments = (color: string) =>
 
 const INPUT_STATES: StyleRule["selectors"] = ObjectUtils.deepMerge(SkinBaseUtils.INTERACTIBLE_STATES, {
     [skinSelectors.isReadOnly]: {
-        backgroundColor: [LEVEL.contrast, `rgb(from ${LEVEL.contrast} r g b / 10%)`],
+        backgroundColor: `color-mix(in srgb, ${LEVEL.contrast} 10%, transparent)`,
     },
     [SkinUtils.anyOf(skinSelectors.isCheckedWithin, skinSelectors.isMixedWithin)]: {},
     [SkinUtils.anyOf(skinSelectors.hasErrorWithin, skinSelectors.hasError)]: {
@@ -55,7 +51,7 @@ const SWITCH_STATES: StyleRule["selectors"] = ObjectUtils.deepMerge(INPUT_STATES
 });
 
 const INPUT_SHELL: StyleRule = {
-    border: [`2px solid ${LEVEL.contrast}`, `2px solid rgb( from ${LEVEL.contrast} r g b / 25%)`],
+    border: `2px solid color-mix(in srgb, ${LEVEL.contrast} 25%, transparent)`,
     backgroundColor: LEVEL.dark,
     color: LEVEL.contrast,
 } as const;
@@ -65,7 +61,7 @@ const SWITCH_SHELL: StyleRule = {
 } as const;
 
 const ACCORDION: StyleRule = {
-    border: [`2px solid ${LEVEL.contrast}`, `2px solid rgb( from ${LEVEL.contrast} r g b / 25%)`],
+    border: `2px solid color-mix(in srgb, ${LEVEL.contrast} 25%, transparent)`,
     backgroundColor: LEVEL.light,
     color: LEVEL.contrast,
     fontSize: themeVars.fontSize.medium,
@@ -77,7 +73,7 @@ const ITEM: StyleRule = {
 } as const;
 
 const ITEM_FLOATER_HOVER: StyleRule = {
-    backgroundColor: [LEVEL.contrast, `rgb(from ${LEVEL.contrast} r g b / 25%)`],
+    backgroundColor: `color-mix(in srgb, ${LEVEL.contrast} 25%, transparent)`,
 };
 
 const ITEM_FLOATER_SELECTED: StyleRule = {
@@ -94,7 +90,7 @@ const TAB_FLOATER_SELECTED: StyleRule = {
 };
 
 const surface = (color: SkinColorFamily): StyleRule => ({
-    border: [`2px solid ${color.contrast}`, `2px solid rgb( from ${color.contrast} r g b / 25%)`],
+    border: `2px solid color-mix(in srgb, ${color.contrast} 25%, transparent)`,
     backgroundColor: color.main,
     color: color.contrast,
     fontSize: themeVars.fontSize.medium,
@@ -122,20 +118,14 @@ SkinUtils.define(
             fontWeight: "bold",
             selectors: ObjectUtils.deepMerge(SkinBaseUtils.INTERACTIBLE_STATES, {
                 [skinSelectors.isPressed]: {
-                    backgroundColor: [
-                        themeVars.color.primary.contrast,
-                        `rgb(from ${themeVars.color.primary.main} r g b / 25%)`,
-                    ],
+                    backgroundColor: `color-mix(in srgb, ${themeVars.color.primary.main} 25%, transparent)`,
                 },
                 [skinSelectors.hasError]: {
                     borderColor: themeVars.color.error.main,
                     color: themeVars.color.error.main,
                 },
                 [SkinUtils.allOf(skinSelectors.isPressed, skinSelectors.hasError)]: {
-                    backgroundColor: [
-                        themeVars.color.error.contrast,
-                        `rgb(from ${themeVars.color.error.main} r g b / 25%)`,
-                    ],
+                    backgroundColor: `color-mix(in srgb, ${themeVars.color.error.main} 25%, transparent)`,
                 },
             }),
         },
@@ -183,7 +173,7 @@ SkinUtils.define(
             ...INPUT_SHELL,
             selectors: ObjectUtils.deepMerge(INPUT_STATES, {
                 [skinSelectors.fieldTextDisabled]: {
-                    color: [LEVEL.contrast, `rgb(from ${LEVEL.contrast} r g b / ${themeVars.disabled.opacity})`],
+                    color: `color-mix(in srgb, ${LEVEL.contrast} calc(${themeVars.disabled.opacity} * 100%), transparent)`,
                 },
             }),
         },
@@ -217,7 +207,7 @@ SkinUtils.define(
             ...surface(LEVEL),
         },
         panel: {
-            border: [`2px solid ${LEVEL.contrast}`, `2px solid rgb( from ${LEVEL.contrast} r g b / 25%)`],
+            border: `2px solid color-mix(in srgb, ${LEVEL.contrast} 25%, transparent)`,
             backgroundColor: LEVEL.light,
             color: LEVEL.contrast,
         },
@@ -230,7 +220,7 @@ SkinUtils.define(
             },
         },
         progressTrack: {
-            border: [`2px solid ${LEVEL.contrast}`, `2px solid rgb( from ${LEVEL.contrast} r g b / 25%)`],
+            border: `2px solid color-mix(in srgb, ${LEVEL.contrast} 25%, transparent)`,
             selectors: {
                 [skinSelectors.hasError]: {
                     borderColor: themeVars.color.error.main,
@@ -270,7 +260,7 @@ SkinUtils.define(
             },
         },
         rangeTrack: {
-            border: [`2px solid ${LEVEL.contrast}`, `2px solid rgb( from ${LEVEL.contrast} r g b / 25%)`],
+            border: `2px solid color-mix(in srgb, ${LEVEL.contrast} 25%, transparent)`,
         },
         slideButtonFill: {
             backgroundColor: themeVars.color.primary.main,
@@ -293,11 +283,11 @@ SkinUtils.define(
             },
         },
         slideButtonTrack: {
-            border: [`2px solid ${LEVEL.contrast}`, `2px solid rgb( from ${LEVEL.contrast} r g b / 25%)`],
+            border: `2px solid color-mix(in srgb, ${LEVEL.contrast} 25%, transparent)`,
             fontWeight: "bold",
         },
         splitPaneFrame: {
-            border: `2px dashed rgb(from ${LEVEL.contrast} r g b / 25%)`,
+            border: `2px dashed color-mix(in srgb, ${LEVEL.contrast} 25%, transparent)`,
         },
         surface: {
             ...surface(LEVEL),
@@ -323,11 +313,11 @@ SkinUtils.define(
             ...TAB_FLOATER_SELECTED,
         },
         tabsTrack: {
-            border: [`2px solid ${LEVEL.contrast}`, `2px solid rgb(from ${LEVEL.contrast} r g b / 25%)`],
+            border: `2px solid color-mix(in srgb, ${LEVEL.contrast} 25%, transparent)`,
         },
         tag: {
             paddingInline: themeVars.spacing.full,
-            border: [`2px solid ${LEVEL.contrast}`, `2px solid rgb(from ${LEVEL.contrast} r g b / 25%)`],
+            border: `2px solid color-mix(in srgb, ${LEVEL.contrast} 25%, transparent)`,
             color: LEVEL.contrast,
             fontSize: themeVars.fontSize.xSmall,
             fontWeight: "bold",
@@ -336,7 +326,7 @@ SkinUtils.define(
             },
         },
         toggleThumb: {
-            backgroundColor: [LEVEL.contrast, `rgb(from ${LEVEL.contrast} r g b / 75%)`],
+            backgroundColor: `color-mix(in srgb, ${LEVEL.contrast} 75%, transparent)`,
             selectors: {
                 [SkinUtils.anyOf(skinSelectors.isCheckedWithin, skinSelectors.isMixedWithin)]: {
                     backgroundColor: themeVars.color.primary.main,
@@ -353,7 +343,7 @@ SkinUtils.define(
             },
         },
         tooltip: {
-            border: [`2px solid ${LEVEL.contrast}`, `2px solid rgb( from ${LEVEL.contrast} r g b / 25%)`],
+            border: `2px solid color-mix(in srgb, ${LEVEL.contrast} 25%, transparent)`,
             backgroundColor: LEVEL.light,
             color: LEVEL.contrast,
         },

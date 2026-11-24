@@ -132,7 +132,7 @@ export const docsPropName = style({
     gap: themeVars.spacing.half,
     padding: "0.125rem 0.25rem",
     borderRadius: themeVars.borderRadius.half,
-    backgroundColor: `rgb(from currentColor r g b / 25%)`,
+    backgroundColor: `color-mix(in srgb, currentColor 25%, transparent)`,
     fontFamily: "monospace",
     whiteSpace: "nowrap",
 });

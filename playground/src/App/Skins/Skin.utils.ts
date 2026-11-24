@@ -5,11 +5,9 @@ import type { SkinColorFamily, SkinEntry, SkinLevelFamilies, SkinLevelValues, Sk
 
 import { layerLevelVariants } from "../StyledComponents/Layer/Layer.css";
 import { BODY_FONT_FAMILY } from "../Theme.css";
-import { skinBoundary, skinColorVars, skinEntries, skinLayer, skinSelectors, skinSizeVars } from "./Skin.css";
+import { skinBoundary, skinColorVars, skinEntries, skinLayer, skinSelectors } from "./Skin.css";
 
-const UNSET_VARS = Object.fromEntries(
-    [...Object.values(skinSizeVars), ...Object.values(skinColorVars)].map((skinVar) => [skinVar, "initial"]),
-);
+const UNSET_VARS = Object.fromEntries(Object.values(skinColorVars).map((skinVar) => [skinVar, "initial"]));
 
 const ROOT_RESET = { fontFamily: BODY_FONT_FAMILY, vars: UNSET_VARS };
 
@@ -85,6 +83,35 @@ export namespace SkinUtils {
                 Object.fromEntries(corners.map((corner) => [corner, radius])),
             ]),
         );
+
+    export const roundedFillEnds = (thickness: string): SkinRule => {
+        const radius = `calc(${thickness} * 0.5)`;
+        const pullBack = `calc(${thickness} * -0.5)`;
+
+        return {
+            height: thickness,
+            paddingInline: radius,
+            marginInlineStart: pullBack,
+            selectors: {
+                [skinSelectors.isStart]: {
+                    paddingInlineStart: 0,
+                    marginInlineStart: 0,
+                },
+                [skinSelectors.isVertical]: {
+                    width: thickness,
+                    height: "auto",
+                    paddingInline: 0,
+                    marginInlineStart: 0,
+                    paddingBlock: radius,
+                    marginBottom: pullBack,
+                },
+                [allOf(skinSelectors.isVertical, skinSelectors.isStart)]: {
+                    paddingBottom: 0,
+                    marginBottom: 0,
+                },
+            },
+        };
+    };
 
     export const byLevel = (values: SkinLevelValues) => {
         const levelVar = createVar();

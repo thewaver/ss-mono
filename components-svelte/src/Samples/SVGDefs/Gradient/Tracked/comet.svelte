@@ -163,8 +163,8 @@
                 origin: chains[comet]?.[index] ?? RESTING_POINT,
                 scale: MathUtils.lerp(headScale, tailScale, share),
                 colors: [
-                    { value: `rgb(from ${color} r g b / ${alpha})` },
-                    { value: `rgb(from ${color} r g b / 0)`, stop: 100 },
+                    { value: SVGDefsUtils.computeAlphaColor(color, alpha) },
+                    { value: SVGDefsUtils.computeAlphaColor(color, 0), stop: 100 },
                 ],
             })}
         />

@@ -119,7 +119,7 @@ const PixelTrail = defineComponent(
                 if (!stamp) return NO_COLORS;
 
                 const alpha = squareAlpha * SVGDefsUtils.computePixelTrailAlpha(frameMs.value - stamp.bornMs, trailMs);
-                const value = `rgb(from ${getColor(stamp)} r g b / ${alpha})`;
+                const value = SVGDefsUtils.computeAlphaColor(getColor(stamp), alpha);
 
                 return [{ value }, { value, stop: 100 }];
             };

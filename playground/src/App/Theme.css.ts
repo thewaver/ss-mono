@@ -74,10 +74,7 @@ export const PLAYGROUND_THEMES = Object.fromEntries(
 globalStyle("*", {
     boxSizing: "border-box",
     scrollbarWidth: "thin",
-    scrollbarColor: [
-        `${themeVars.color.primary.main} ${themeVars.color.layers.level0.dark}`,
-        `${themeVars.color.primary.main} rgb(from ${themeVars.color.layers.level0.dark} r g b / 25%)`,
-    ],
+    scrollbarColor: `${themeVars.color.primary.main} color-mix(in srgb, ${themeVars.color.layers.level0.dark} 25%, transparent)`,
 });
 
 globalStyle(":focus", {
@@ -109,10 +106,7 @@ globalStyle("::-webkit-scrollbar-corner", {
 });
 
 globalStyle("::-webkit-scrollbar-track", {
-    backgroundColor: [
-        themeVars.color.layers.level0.dark,
-        `rgb(from ${themeVars.color.layers.level0.dark} r g b / 25%)`,
-    ],
+    backgroundColor: `color-mix(in srgb, ${themeVars.color.layers.level0.dark} 25%, transparent)`,
 });
 
 globalStyle("::-webkit-scrollbar-thumb", {

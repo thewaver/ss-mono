@@ -63,16 +63,19 @@ const getCycleColor = (colors: SVGDefsColors, atMs: number, opts?: GradientSmear
 };
 
 const computePoolColors = (color: string, alpha: number, opts?: GradientFalloffOpts) => [
-    { value: `rgb(from ${color} r g b / ${alpha})` },
+    { value: SVGDefsUtils.computeAlphaColor(color, alpha) },
     {
-        value: `rgb(from ${color} r g b / ${alpha * (opts?.coreAlpha ?? SpotSmear3Const.DEFAULTS.coreAlpha)})`,
+        value: SVGDefsUtils.computeAlphaColor(color, alpha * (opts?.coreAlpha ?? SpotSmear3Const.DEFAULTS.coreAlpha)),
         stop: opts?.coreStop ?? SpotSmear3Const.DEFAULTS.coreStop,
     },
     {
-        value: `rgb(from ${color} r g b / ${alpha * (opts?.falloffAlpha ?? SpotSmear3Const.DEFAULTS.falloffAlpha)})`,
+        value: SVGDefsUtils.computeAlphaColor(
+            color,
+            alpha * (opts?.falloffAlpha ?? SpotSmear3Const.DEFAULTS.falloffAlpha),
+        ),
         stop: opts?.falloffStop ?? SpotSmear3Const.DEFAULTS.falloffStop,
     },
-    { value: `rgb(from ${color} r g b / 0)`, stop: 100 },
+    { value: SVGDefsUtils.computeAlphaColor(color, 0), stop: 100 },
 ];
 
 const clock = SVGDefsUtils.createClock(TrailStampConst.TRAIL_LIFETIME_MS);

@@ -1,14 +1,9 @@
-import { fallbackVar, keyframes, style } from "@vanilla-extract/css";
+import { keyframes, style } from "@vanilla-extract/css";
 
-import { skinEntries, skinStates, skinVars } from "../../Skins/Skin.css";
+import { skinEntries, skinStates } from "../../Skins/Skin.css";
 import { themeVars } from "../../Theme.css";
 
-const PROGRESS_THICKNESS = 8;
 const PROGRESS_LENGTH = 160;
-
-const TRACK_THICKNESS = fallbackVar(skinVars.progressTrackThickness, `${PROGRESS_THICKNESS}px`);
-const TIP_WIDTH = fallbackVar(skinVars.progressTipWidth, TRACK_THICKNESS);
-const TIP_HEIGHT = fallbackVar(skinVars.progressTipHeight, TRACK_THICKNESS);
 
 export const isIndeterminate = style({});
 export const hasError = style([skinStates.hasError]);
@@ -33,16 +28,16 @@ export const progressTrack = style([
     skinEntries.progressTrack,
     {
         position: "relative",
-        width: "100%",
-        height: TRACK_THICKNESS,
         transition: `border-color ${themeVars.animation.duration}`,
 
         selectors: {
             [`&.${isIndeterminate}`]: {
                 overflow: "hidden",
             },
+            [`&:not(.${isVertical})`]: {
+                width: "100%",
+            },
             [`&.${isVertical}`]: {
-                width: TRACK_THICKNESS,
                 height: PROGRESS_LENGTH,
             },
         },
@@ -113,15 +108,6 @@ export const progressTip = style([
     skinEntries.progressTip,
     {
         flexShrink: 0,
-        width: TIP_WIDTH,
-        height: TIP_HEIGHT,
-
-        selectors: {
-            [`&.${isVertical}`]: {
-                width: TIP_HEIGHT,
-                height: TIP_WIDTH,
-            },
-        },
     },
 ]);
 

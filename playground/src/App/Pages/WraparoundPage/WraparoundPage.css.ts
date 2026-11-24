@@ -36,7 +36,7 @@ export const gridCell = style({
     height: GRID_CELL_SIZE,
     border: "none",
     borderRadius: themeVars.borderRadius.half,
-    backgroundColor: `rgb(from ${themeVars.color.primary.main} r g b / 25%)`,
+    backgroundColor: `color-mix(in srgb, ${themeVars.color.primary.main} 25%, transparent)`,
     fontSize: themeVars.fontSize.large,
     fontWeight: "bold",
     cursor: "pointer",
@@ -44,7 +44,7 @@ export const gridCell = style({
 
     selectors: {
         "&:hover": {
-            backgroundColor: `rgb(from ${themeVars.color.primary.main} r g b / 50%)`,
+            backgroundColor: `color-mix(in srgb, ${themeVars.color.primary.main} 50%, transparent)`,
         },
         "&:focus-visible": {
             outline: `2px solid ${themeVars.color.primary.main}`,
@@ -74,7 +74,7 @@ export const marqueeTile = style({
 export const marqueeWord = style({
     padding: `${themeVars.spacing.half} ${themeVars.spacing.full}`,
     borderRadius: themeVars.borderRadius.half,
-    backgroundColor: `rgb(from ${themeVars.color.primary.main} r g b / 25%)`,
+    backgroundColor: `color-mix(in srgb, ${themeVars.color.primary.main} 25%, transparent)`,
     fontSize: themeVars.fontSize.large,
     fontWeight: "bold",
     whiteSpace: "nowrap",

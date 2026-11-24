@@ -8,6 +8,11 @@ import { SkinUtils } from "./Skin.utils";
 import { themeVars } from "../Theme.css";
 import { skinSelectors } from "./Skin.css";
 
+const RANGE_THICKNESS = "20px";
+const PROGRESS_THICKNESS = "8px";
+const GRIP_THICKNESS = "2px";
+const GRIP_LENGTH = "24px";
+
 export namespace SkinBaseUtils {
     export const INTERACTIBLE_STATES: NonNullable<StyleRule["selectors"]> = {
         [skinSelectors.isHovered]: {
@@ -37,16 +42,16 @@ export namespace SkinBaseUtils {
             },
         },
         breadcrumbSeparator: {
-            color: `rgb(from ${level.contrast} r g b / 50%)`,
+            color: `color-mix(in srgb, ${level.contrast} 50%, transparent)`,
         },
         divider: {
-            borderColor: `rgb(from ${level.contrast} r g b / 10%)`,
+            borderColor: `color-mix(in srgb, ${level.contrast} 10%, transparent)`,
         },
         dropZone: {
-            border: [`2px dashed ${level.contrast}`, `2px dashed rgb(from ${level.contrast} r g b / 25%)`],
+            border: `2px dashed color-mix(in srgb, ${level.contrast} 25%, transparent)`,
             selectors: ObjectUtils.deepMerge(INTERACTIBLE_STATES, {
                 [skinSelectors.isCarrying]: {
-                    borderColor: [level.contrast, `rgb(from ${level.contrast} r g b / 50%)`],
+                    borderColor: `color-mix(in srgb, ${level.contrast} 50%, transparent)`,
                 },
                 [skinSelectors.isReceiving]: {
                     borderColor: themeVars.color.primary.main,
@@ -57,7 +62,7 @@ export namespace SkinBaseUtils {
             }),
         },
         grip: {
-            color: `rgb(from ${level.contrast} r g b / 50%)`,
+            color: `color-mix(in srgb, ${level.contrast} 50%, transparent)`,
         },
         input: {
             selectors: {
@@ -74,22 +79,22 @@ export namespace SkinBaseUtils {
             },
         },
         itemGroup: {
-            borderColor: `rgb(from ${level.contrast} r g b / 25%)`,
-            backgroundColor: `rgb(from ${level.contrast} r g b / 10%)`,
+            borderColor: `color-mix(in srgb, ${level.contrast} 25%, transparent)`,
+            backgroundColor: `color-mix(in srgb, ${level.contrast} 10%, transparent)`,
         },
         itemGroupLabel: {
-            color: `rgb(from ${level.contrast} r g b / 50%)`,
+            color: `color-mix(in srgb, ${level.contrast} 50%, transparent)`,
         },
         itemStatic: {
             selectors: {
                 [skinSelectors.isHovered]: {
-                    borderColor: `rgb(from ${level.contrast} r g b / 50%)`,
+                    borderColor: `color-mix(in srgb, ${level.contrast} 50%, transparent)`,
                 },
                 [skinSelectors.isCarried]: {
                     borderColor: themeVars.color.primary.main,
                     backgroundColor: "transparent",
                     boxShadow: "none",
-                    color: `rgb(from ${level.contrast} r g b / 50%)`,
+                    color: `color-mix(in srgb, ${level.contrast} 50%, transparent)`,
                 },
             },
         },
@@ -99,7 +104,46 @@ export namespace SkinBaseUtils {
         placeholder: {
             color: "color-mix(in srgb, currentColor 50%, transparent)",
         },
-        progressTip: {},
+        progressTip: {
+            height: "100%",
+            aspectRatio: "1",
+            selectors: {
+                [skinSelectors.isVertical]: {
+                    width: "100%",
+                    height: "auto",
+                },
+            },
+        },
+        progressTrack: {
+            height: PROGRESS_THICKNESS,
+            selectors: {
+                [skinSelectors.isVertical]: {
+                    width: PROGRESS_THICKNESS,
+                },
+            },
+        },
+        rangeFill: {
+            height: RANGE_THICKNESS,
+            selectors: {
+                [skinSelectors.isVertical]: {
+                    width: RANGE_THICKNESS,
+                    height: "auto",
+                },
+            },
+        },
+        rangeThumb: {
+            width: RANGE_THICKNESS,
+            height: RANGE_THICKNESS,
+        },
+        rangeTrack: {
+            height: RANGE_THICKNESS,
+            selectors: {
+                [skinSelectors.isVertical]: {
+                    width: RANGE_THICKNESS,
+                    height: "auto",
+                },
+            },
+        },
         scrollerThumb: {
             selectors: {
                 [skinSelectors.line]: {
@@ -113,13 +157,21 @@ export namespace SkinBaseUtils {
         scrollerTrack: {
             selectors: {
                 [skinSelectors.line]: {
-                    backgroundColor: [level.contrast, `rgb(from ${level.contrast} r g b / 25%)`],
+                    backgroundColor: `color-mix(in srgb, ${level.contrast} 25%, transparent)`,
                 },
             },
         },
         splitPaneGrip: {
+            width: GRIP_THICKNESS,
+            height: GRIP_LENGTH,
             borderRadius: themeVars.borderRadius.half,
-            color: `rgb(from ${level.contrast} r g b / 50%)`,
+            color: `color-mix(in srgb, ${level.contrast} 50%, transparent)`,
+            selectors: {
+                [skinSelectors.isVertical]: {
+                    width: GRIP_LENGTH,
+                    height: GRIP_THICKNESS,
+                },
+            },
         },
         splitPaneGutter: {
             selectors: {
@@ -129,52 +181,52 @@ export namespace SkinBaseUtils {
             },
         },
         tableCell: {
-            borderColor: `rgb(from ${level.contrast} r g b / 10%)`,
+            borderColor: `color-mix(in srgb, ${level.contrast} 10%, transparent)`,
             selectors: {
                 [skinSelectors.isHovered]: {
-                    backgroundColor: `rgb(from ${level.contrast} r g b / 10%)`,
+                    backgroundColor: `color-mix(in srgb, ${level.contrast} 10%, transparent)`,
                 },
                 [skinSelectors.isSelected]: {
-                    backgroundColor: `rgb(from ${themeVars.color.primary.main} r g b / 25%)`,
+                    backgroundColor: `color-mix(in srgb, ${themeVars.color.primary.main} 25%, transparent)`,
                     color: themeVars.color.primary.light,
                 },
                 [SkinUtils.allOf(skinSelectors.isSelected, skinSelectors.isHovered)]: {
-                    backgroundColor: `rgb(from ${themeVars.color.primary.main} r g b / 35%)`,
+                    backgroundColor: `color-mix(in srgb, ${themeVars.color.primary.main} 35%, transparent)`,
                 },
                 [skinSelectors.isPinned]: {
                     backgroundColor: level.main,
-                    borderInlineColor: `rgb(from ${level.contrast} r g b / 25%)`,
+                    borderInlineColor: `color-mix(in srgb, ${level.contrast} 25%, transparent)`,
                 },
                 [SkinUtils.allOf(skinSelectors.isPinned, skinSelectors.isHovered)]: {
                     backgroundColor: level.main,
-                    backgroundImage: `linear-gradient(rgb(from ${level.contrast} r g b / 10%), rgb(from ${level.contrast} r g b / 10%))`,
+                    backgroundImage: `linear-gradient(color-mix(in srgb, ${level.contrast} 10%, transparent), color-mix(in srgb, ${level.contrast} 10%, transparent))`,
                 },
                 [SkinUtils.allOf(skinSelectors.isPinned, skinSelectors.isSelected)]: {
                     backgroundColor: level.main,
-                    backgroundImage: `linear-gradient(rgb(from ${themeVars.color.primary.main} r g b / 25%), rgb(from ${themeVars.color.primary.main} r g b / 25%))`,
+                    backgroundImage: `linear-gradient(color-mix(in srgb, ${themeVars.color.primary.main} 25%, transparent), color-mix(in srgb, ${themeVars.color.primary.main} 25%, transparent))`,
                 },
                 [SkinUtils.allOf(skinSelectors.isPinned, skinSelectors.isSelected, skinSelectors.isHovered)]: {
                     backgroundColor: level.main,
-                    backgroundImage: `linear-gradient(rgb(from ${themeVars.color.primary.main} r g b / 35%), rgb(from ${themeVars.color.primary.main} r g b / 35%))`,
+                    backgroundImage: `linear-gradient(color-mix(in srgb, ${themeVars.color.primary.main} 35%, transparent), color-mix(in srgb, ${themeVars.color.primary.main} 35%, transparent))`,
                 },
             },
         },
         tableDetail: {
-            borderColor: `rgb(from ${level.contrast} r g b / 10%)`,
-            backgroundColor: `rgb(from ${level.contrast} r g b / 5%)`,
+            borderColor: `color-mix(in srgb, ${level.contrast} 10%, transparent)`,
+            backgroundColor: `color-mix(in srgb, ${level.contrast} 5%, transparent)`,
             selectors: {
                 [skinSelectors.isSelected]: {
-                    backgroundColor: `rgb(from ${themeVars.color.primary.main} r g b / 25%)`,
+                    backgroundColor: `color-mix(in srgb, ${themeVars.color.primary.main} 25%, transparent)`,
                 },
             },
         },
         tableHeader: {
             backgroundColor: level.main,
-            borderColor: `rgb(from ${level.contrast} r g b / 25%)`,
+            borderColor: `color-mix(in srgb, ${level.contrast} 25%, transparent)`,
             color: level.contrast,
             selectors: {
                 [SkinUtils.allOf(skinSelectors.isSortable, skinSelectors.isHovered)]: {
-                    backgroundImage: `linear-gradient(rgb(from ${level.contrast} r g b / 10%), rgb(from ${level.contrast} r g b / 10%))`,
+                    backgroundImage: `linear-gradient(color-mix(in srgb, ${level.contrast} 10%, transparent), color-mix(in srgb, ${level.contrast} 10%, transparent))`,
                 },
                 [skinSelectors.isSorted]: {
                     color: themeVars.color.primary.main,

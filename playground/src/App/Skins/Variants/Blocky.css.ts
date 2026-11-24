@@ -6,15 +6,11 @@ import { SkinUtils } from "../Skin.utils";
 import { SkinBaseUtils } from "../SkinBase.utils";
 
 import { themeVars } from "../../Theme.css";
-import { skinSelectors, skinVars } from "../Skin.css";
+import { skinSelectors } from "../Skin.css";
 
 const LEVEL = SkinUtils.computeLevelFamily(themeVars.color.layers);
 
-export const blocky = style({
-    vars: {
-        [skinVars.rangeTrackThickness]: "20px",
-    },
-});
+export const blocky = style({});
 
 const OUTSET_SHADOW = "8px 8px 0 0 rgba(0, 0, 0, 0.35)";
 const INSET_SHADOW_THICKNESS = 2;
@@ -47,7 +43,7 @@ const blockLowered = (color: SkinColorFamily, outsetShadow?: string): StyleRule 
 
 const INPUT_STATES: StyleRule["selectors"] = ObjectUtils.deepMerge(SkinBaseUtils.INTERACTIBLE_STATES, {
     [skinSelectors.isReadOnly]: {
-        backgroundColor: [LEVEL.contrast, `rgb(from ${LEVEL.contrast} r g b / 25%)`],
+        backgroundColor: `color-mix(in srgb, ${LEVEL.contrast} 25%, transparent)`,
         boxShadow: INSET_SHADOW_LOWERED,
     },
     [SkinUtils.anyOf(skinSelectors.isCheckedWithin, skinSelectors.isMixedWithin)]: {},
@@ -187,7 +183,7 @@ SkinUtils.define(
             ...INPUT_SHELL,
             selectors: ObjectUtils.deepMerge(INPUT_STATES, {
                 [skinSelectors.fieldTextDisabled]: {
-                    color: [LEVEL.contrast, `rgb(from ${LEVEL.contrast} r g b / ${themeVars.disabled.opacity})`],
+                    color: `color-mix(in srgb, ${LEVEL.contrast} calc(${themeVars.disabled.opacity} * 100%), transparent)`,
                 },
                 [skinSelectors.fieldTextError]: {
                     color: themeVars.color.error.contrast,

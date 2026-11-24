@@ -133,8 +133,8 @@ export const createSwarmSample =
                                         share,
                                     ),
                                     colors: () => [
-                                        { value: `rgb(from ${getColor(tracer)} r g b / ${getAlpha()})` },
-                                        { value: `rgb(from ${getColor(tracer)} r g b / 0)`, stop: 100 },
+                                        { value: SVGDefsUtils.computeAlphaColor(getColor(tracer), getAlpha()) },
+                                        { value: SVGDefsUtils.computeAlphaColor(getColor(tracer), 0), stop: 100 },
                                     ],
                                 }),
                         },
